@@ -16,6 +16,7 @@ Page({
     })
   },
   onLoad: function () {
+
     if (app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo,
@@ -49,6 +50,11 @@ Page({
     this.setData({
       userInfo: e.detail.userInfo,
       hasUserInfo: true
+    })
+  },
+  jump: function(e){
+    wx.navigateTo({
+      url: '/pages/test/scan',
     })
   }
 })
