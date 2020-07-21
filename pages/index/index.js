@@ -53,8 +53,21 @@ Page({
     })
   },
   jump: function(e){
+
+    /*
+    wx.removeTabBarBadge({
+      index: 0
+    })
+    
+    wx.removeTabBarBadge({
+      index: 1
+    })
+    wx.removeTabBarBadge({
+      index: 2
+    })
+    */
     wx.navigateTo({
-      url: '/pages/test/scan',
+      url: '/pages/test/tab/tab',
     })
   }
 })
