@@ -6,6 +6,7 @@
 	"setting": {
 		"urlCheck": true,
 		"es6": true,
+		"enhance": false,
 		"postcss": true,
 		"preloadBackgroundData": false,
 		"minified": true,
@@ -16,7 +17,15 @@
 		"scopeDataCheck": false,
 		"compileHotReLoad": false,
 		"uglifyFileName": false,
+		"checkInvalidKey": true,
+		"checkSiteMap": true,
 		"uploadWithSourceMap": true,
+		"compileHotReLoad": false,
+		"babelSetting": {
+			"ignore": [],
+			"disablePlugins": [],
+			"outputPath": ""
+		},
 		"useIsolateContext": true,
 		"nodeModules": false,
 		"enhance": false,

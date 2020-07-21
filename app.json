@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/logs/logs",
-    "pages/test/scan"
+    "pages/test/scan/scan",
+    "pages/test/tab/tab"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -15,5 +16,31 @@
   "useExtendedLib": {
     "kbone": false,
     "weui": true
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#000000",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "社群",
+        "iconPath": "images/zhihu-fill.png",
+        "selectedIconPath": "images/zhihu-fill-hl.png"
+      },
+      {
+        "pagePath": "pages/test/scan/scan",
+        "text": "签售",
+        "iconPath": "images/book-3-line.png",
+        "selectedIconPath": "images/book-3-line-hl.png"
+      },
+      {
+        "pagePath": "pages/logs/logs",
+        "text": "我的",
+        "iconPath": "images/home-2-line.png",
+        "selectedIconPath": "images/home-2-line-hl.png"
+      }
+    ]
   }
 }
