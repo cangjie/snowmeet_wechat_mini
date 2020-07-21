@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/logs/logs",
     "pages/test/scan/scan",
-    "pages/test/tab/tab"
+    "pages/test/tab/tab",
+    "pages/admin/equip_maintain/search_order/search_order"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -13,7 +14,6 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-
   "tabBar": {
     "color": "#7A7E83",
     "selectedColor": "#000000",

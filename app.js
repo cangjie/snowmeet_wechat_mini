@@ -38,10 +38,10 @@ App({
     adminTabbarItem: [
       {
         "pagePath": "pages/index/index",
-        "text": "社群",
+        "text": "订单",
         "iconPath": "images/zhihu-fill.png",
         "selectedIconPath": "images/zhihu-fill-hl.png",
-        
+        "pagePath": "/pages/admin/equip_maintain/search_order/search_order"
       },
       {
         "pagePath": "pages/test/scan/scan",

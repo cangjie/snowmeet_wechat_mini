@@ -64,5 +64,12 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  tabSwitch: function(e) {
+    console.log(e)
+    var switchUrl = e.detail.item.pagePath
+    wx.navigateTo({
+      url: switchUrl
+    })
   }
 })
