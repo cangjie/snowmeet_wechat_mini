@@ -11,26 +11,24 @@
 		"preloadBackgroundData": false,
 		"minified": true,
 		"newFeature": false,
-		"autoAudits": false,
 		"coverView": true,
+		"nodeModules": false,
+		"autoAudits": false,
 		"showShadowRootInWxmlPanel": true,
 		"scopeDataCheck": false,
-		"compileHotReLoad": false,
 		"uglifyFileName": false,
 		"checkInvalidKey": true,
 		"checkSiteMap": true,
 		"uploadWithSourceMap": true,
-		"compileHotReLoad": false,
 		"babelSetting": {
 			"ignore": [],
 			"disablePlugins": [],
 			"outputPath": ""
 		},
-		"useIsolateContext": true,
-		"nodeModules": false,
-		"enhance": false,
 		"useCompilerModule": false,
-		"userConfirmedUseCompilerModuleSwitch": false
+		"userConfirmedUseCompilerModuleSwitch": false,
+		"compileHotReLoad": false,
+		"useIsolateContext": true
 	},
 	"compileType": "miniprogram",
 	"libVersion": "2.11.3",
@@ -67,6 +65,7 @@
 		"miniprogram": {
 			"current": -1,
 			"list": []
-		}
+		},
+		"miniprogramRoot": "/modules/package.json"
 	}
 }

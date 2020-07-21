@@ -1,21 +1,20 @@
 // pages/test/tab/tab.js
+const app = getApp()
 Page({
 
   /**
    * Page initial data
    */
   data: {
-   
-  
+    tabbarItemList: [],
+    tabIndex: 1
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    wx.showTabBar({
-      animation: true
-    })
+    this.setData({tabbarItemList: app.globalData.adminTabbarItem})
   },
 
   /**

@@ -13,10 +13,7 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "useExtendedLib": {
-    "kbone": false,
-    "weui": true
-  },
+
   "tabBar": {
     "color": "#7A7E83",
     "selectedColor": "#000000",
