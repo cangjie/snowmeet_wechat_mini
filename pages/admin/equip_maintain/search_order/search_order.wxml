@@ -1,0 +1,9 @@
+<!--pages/admin/equip_maintain/search_order/search_order.wxml-->
+<mp-cells title="表单" footer="">
+  <mp-cell prop="waybillNo" title="快递单号" ext-class=" weui-cell_vcode">
+    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="请输入快递单号" value="{{waybillNo}}"  bindinput="waybillNoInput" />
+    <view slot="footer" class="weui-vcode-btn" bindtap="scan" >扫一扫</view>
+  </mp-cell>
+</mp-cells>
+<button bindtap="click"  > 查 询 </button>
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
