@@ -6,6 +6,7 @@
     "mp-cell": "../../../modules/cell/cell",
     "mp-checkbox": "../../../modules/checkbox/checkbox",
     "mp-checkbox-group": "../../../modules/checkbox-group/checkbox-group",
-    "mp-form": "../../../modules/form/form"
+    "mp-form": "../../../modules/form/form",
+    "mp-uploader": "../../../modules/uploader/uploader"
   }
 }

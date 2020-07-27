@@ -6,4 +6,20 @@
   </mp-cell>
 </mp-cells>
 <button bindtap="click"  > 查 询 </button>
+<view class="weui-flex" style="height:100rpx" bindtap="clickOrder" id="odr_1" >
+  <view class="weui-flex__item"><view class="placeholder">weui</view></view>
+  <view class="weui-flex__item"><view class="placeholder">next line</view></view>
+</view>
+<view style="height:10rpx" >\r</view>
+<view class="weui-flex" style="height:100rpx" id="odr2" bindtap="clickOrder" >
+  <view class="weui-flex__item"><view class="placeholder">weui</view></view>
+  <view class="weui-flex__item"><view class="placeholder">next line</view></view>
+</view>
+<view class="page__bd">
+  <mp-cells>
+    <mp-cell>
+      <mp-uploader bindfail="uploadError" bindsuccess="uploadSuccess" select="{{selectFile}}" upload="{{uplaodFile}}" files="{{files}}" max-count="5" title="图片上传" tips="图片上传提示"></mp-uploader>
+    </mp-cell>
+  </mp-cells>
+</view>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
