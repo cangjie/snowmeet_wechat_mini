@@ -22,6 +22,12 @@ App({
             {
               this.globalData.sessionKey = res.data.session_key
               this.globalData.openId = res.data.openid
+              this.globalData.role = res.data.role
+              if (this.globalData.role == 'staff') {
+                wx.navigateTo({
+                  url: '/pages/admin/equip_maintain/search_order/search_order',
+                })
+              }
             }
             catch(errMsg)
             {
@@ -57,7 +63,7 @@ App({
     sessionKey:'',
     openId:'',
     unionId:'',
-    roll:'',
+    role:'',
     adminTabbarItem: [
       {
         "pagePath": "pages/index/index",
