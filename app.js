@@ -10,6 +10,25 @@ App({
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
+        var url = 'https://' + this.globalData.domainName + '/api/get_open_id_session_key.aspx?code=' + res.code
+        wx.request({
+          url: url,
+          header: {
+            'content-type': 'application/json' // 默认值
+          },
+          success: res => {
+            //console.log(res.data)
+            try
+            {
+              this.globalData.sessionKey = res.data.session_key
+              this.globalData.openId = res.data.openid
+            }
+            catch(errMsg)
+            {
+              console.log(errMsg)
+            }
+          }
+        })
       }
     })
     // 获取用户信息
@@ -21,7 +40,6 @@ App({
             success: res => {
               // 可以将 res 发送给后台解码出 unionId
               this.globalData.userInfo = res.userInfo
-
               // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
               // 所以此处加入 callback 以防止这种情况
               if (this.userInfoReadyCallback) {
@@ -34,7 +52,12 @@ App({
     })
   },
   globalData: {
+    domainName:'mini.luqinwenda.com',
     userInfo: null,
+    sessionKey:'',
+    openId:'',
+    unionId:'',
+    roll:'',
     adminTabbarItem: [
       {
         "pagePath": "pages/index/index",
