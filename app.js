@@ -1,4 +1,5 @@
 //app.js
+var crypto  = require('/utils/crypt.js')
 App({
   onLaunch: function () {
     // 展示本地存储能力
@@ -46,6 +47,14 @@ App({
             success: res => {
               // 可以将 res 发送给后台解码出 unionId
               this.globalData.userInfo = res.userInfo
+              this.globalData.encryptedData = res.encryptedData
+              this.globalData.iv = res.iv
+              //console.log('注册成功123abc!@#','aes加密：',aes.aesEncrypt('注册成功123abc!@#'))
+              //console.log(aes.aesEncrypt('注册成功123abc!@#'),'aes解密：',aes.aesDecrypt(aes.aesEncrypt('注册成功123abc!@#')))
+
+              console.log(crypto.encrypted("福田区", this.globalData.sessionKey, this.globalData.iv))//加密
+              console.log(crypto.decrypted("ZOrm989bMUvrC4E2YHrCYQ==", this.globalData.sessionKey, this.globalData.iv))//解密
+
               // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
               // 所以此处加入 callback 以防止这种情况
               if (this.userInfoReadyCallback) {
@@ -58,12 +67,15 @@ App({
     })
   },
   globalData: {
+    appId:'wxd1310896f2aa68bb',
     domainName:'mini.luqinwenda.com',
     userInfo: null,
     sessionKey:'',
     openId:'',
     unionId:'',
     role:'',
+    encryptedData: '',
+    iv:'',
     adminTabbarItem: [
       {
         "pagePath": "pages/index/index",
