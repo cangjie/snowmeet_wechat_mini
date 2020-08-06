@@ -11,7 +11,7 @@ App({
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        var url = 'https://' + this.globalData.domainName + '/api/get_open_id_session_key.aspx?code=' + res.code
+        var url = 'https://' + this.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
         wx.request({
           url: url,
           header: {
@@ -22,7 +22,6 @@ App({
             try
             {
               this.globalData.sessionKey = res.data.session_key
-              this.globalData.openId = res.data.openid
               this.globalData.role = res.data.role
               if (this.globalData.role == 'staff') {
                 wx.navigateTo({
@@ -36,6 +35,7 @@ App({
             }
           }
         })
+
       }
     })
     // 获取用户信息
@@ -49,12 +49,27 @@ App({
               this.globalData.userInfo = res.userInfo
               this.globalData.encryptedData = res.encryptedData
               this.globalData.iv = res.iv
+              wx.request({
+                url: 'https://' + this.globalData.domainName + '/api/decode_encrypted_data.aspx',
+                data:{
+                  encdata: res.encryptedData,
+                  sessionkey: this.globalData.sessionKey,
+                  iv: res.iv
+                },
+                success: res => {
+                  if (res.data.encdata == this.globalData.encryptedData && res.data.sessionkey == this.globalData.sessionKey && res.data.iv == this.globalData.iv) {
+                    console.log('well')
+                  }
+                }
+              })
               //console.log('注册成功123abc!@#','aes加密：',aes.aesEncrypt('注册成功123abc!@#'))
               //console.log(aes.aesEncrypt('注册成功123abc!@#'),'aes解密：',aes.aesDecrypt(aes.aesEncrypt('注册成功123abc!@#')))
-
-              console.log(crypto.encrypted("福田区", this.globalData.sessionKey, this.globalData.iv))//加密
-              console.log(crypto.decrypted("ZOrm989bMUvrC4E2YHrCYQ==", this.globalData.sessionKey, this.globalData.iv))//解密
-
+            /*
+              var encStr = crypto.encrypted("福田区", this.globalData.sessionKey, res.iv)
+              console.log(encStr)//加密
+              var decStr = crypto.decrypted(res.encryptedData, this.globalData.sessionKey, res.iv)
+              console.log(decStr)//解密
+*/
               // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
               // 所以此处加入 callback 以防止这种情况
               if (this.userInfoReadyCallback) {
@@ -71,7 +86,6 @@ App({
     domainName:'mini.luqinwenda.com',
     userInfo: null,
     sessionKey:'',
-    openId:'',
     unionId:'',
     role:'',
     encryptedData: '',

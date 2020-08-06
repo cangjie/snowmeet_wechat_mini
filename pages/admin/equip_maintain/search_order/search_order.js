@@ -1,4 +1,5 @@
 // pages/admin/equip_maintain/search_order/search_order.js
+var wxloginModule = require('../../../../utils/wxlogin.js')
 const app = getApp()
 Page({
 
@@ -22,6 +23,18 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    wxloginModule.wxlogin()
+    wx.checkSession({
+      success: (res) => {
+        console.log('check session')
+      },
+      fail: (res) => {
+
+      }
+    })
+
+
+
     this.setData({tabbarItemList: app.globalData.adminTabbarItem})
     this.setData({
       selectFile: this.selectFile.bind(this),
