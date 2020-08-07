@@ -1,12 +1,22 @@
 function wxlogin() {
   wx.checkSession({
     success: (res) => {
-
+      const app = getApp()
+      var url = 'https://' + app.globalData.domainName + '/api/check_session_key.aspx?sessionkey=' + app.globalData.sessionKey
+      wx.request({
+        url: url,
+        success: (res) => {
+          if (res.data.status == 0) {
+            app.globalData.role = res.data.role
+          }
+        }
+      })
     },
     fail: (res) => {
       wx.login({
         success: res => {
-          var url = 'https://' + this.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
+          const app = getApp()
+          var url = 'https://' + app.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
           wx.request({
             url: url,
             header: {
@@ -15,7 +25,7 @@ function wxlogin() {
             success: res => {
               try
               {
-                const app = getApp()
+                
                 app.globalData.sessionKey = res.data.session_key
                 app.globalData.role = res.data.role
               }

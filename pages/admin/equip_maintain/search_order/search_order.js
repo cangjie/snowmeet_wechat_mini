@@ -24,14 +24,7 @@ Page({
    */
   onLoad: function (options) {
     wxloginModule.wxlogin()
-    wx.checkSession({
-      success: (res) => {
-        console.log('check session')
-      },
-      fail: (res) => {
-
-      }
-    })
+    
 
 
 
