@@ -92,22 +92,21 @@ App({
     iv:'',
     adminTabbarItem: [
       {
-        "pagePath": "pages/index/index",
         "text": "订单",
         "iconPath": "images/zhihu-fill.png",
         "selectedIconPath": "images/zhihu-fill-hl.png",
-        "pagePath": "/pages/admin/equip_maintain/search_order/search_order"
+        "pagePath": "/pages/admin/equip_maintain/uploadimages/uploadimages"
       },
       {
-        "pagePath": "pages/test/scan/scan",
-        "text": "签售",
+        "pagePath": "/pages/admin/equip_maintain/uploadimage/uploadimage",
+        "text": "上传测试",
         "iconPath": "images/book-3-line.png",
         "selectedIconPath": "images/book-3-line-hl.png",
         
       },
       {
-        "pagePath": "pages/logs/logs",
-        "text": "我的",
+        "pagePath": "/pages/admin/equip_maintain/uploadimage/uploadimage",
+        "text": "上传测试",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png",
       }

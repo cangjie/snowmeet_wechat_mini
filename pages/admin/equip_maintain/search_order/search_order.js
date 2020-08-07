@@ -24,11 +24,8 @@ Page({
    */
   onLoad: function (options) {
     wxloginModule.wxlogin()
-    
-
-
-
-    this.setData({tabbarItemList: app.globalData.adminTabbarItem})
+    this.setData({tabbarItemList: app.globalData.adminTabbarItem,
+    tabIndex: 0})
     this.setData({
       selectFile: this.selectFile.bind(this),
       uplaodFile: this.uplaodFile.bind(this)
