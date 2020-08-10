@@ -87,19 +87,29 @@ Page({
     console.log('upload files', files)
     // 文件上传的函数，返回一个promise
     return new Promise((resolve, reject) => {
-      wx.uploadFile({
-        filePath: files.tempFilePaths[0],
-        name: 'name',
-        url: 'https://mini.luqinwenda.com/upload.aspx',
-        success: (res)=>{
-          console.log(res)
-          resolve('aaa')
-        },
-        fail: (res)=>{
-          console.log(res)
-        }
-      })
+      for(var i = 0; i < files.tempFilePaths.length; i++)
+      {
+        wx.uploadFile({
+          filePath: files.tempFilePaths[i],
+          name: 'name',
+          url: 'https://mini.luqinwenda.com/upload.aspx',
+          success: (res)=>{
+            var filesData = this.data.files
+            //var filesData = [{url: 'http://mini.luqinwenda.com/upload/1596954732.jpg'}]
+            var uploadFilesData = res.data.split(',')
+            for(var i = 0; i < uploadFilesData.length; i++) {
+              filesData.push({url: 'https://' + app.globalData.domainName + uploadFilesData[i]})
+            }
+            this.setData({files: filesData})
+            console.log(res)
+          },
+          fail: (res)=>{
+            console.log(res)
+          }
+        })
+      }
     })
+    
   },
   selectFile(files) {
     console.log('files', files)
