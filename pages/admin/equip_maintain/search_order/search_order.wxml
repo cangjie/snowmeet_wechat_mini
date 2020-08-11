@@ -1,11 +1,33 @@
 <!--pages/admin/equip_maintain/search_order/search_order.wxml-->
 <mp-cells title="表单" footer="">
-  <mp-cell prop="waybillNo" title="快递单号" ext-class=" weui-cell_vcode">
-    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="请输入快递单号" value="{{waybillNo}}"  bindinput="waybillNoInput" />
+  <mp-cell prop="waybillNo" title="" ext-class=" weui-cell_vcode">
+    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="输入手机号或快递单号" value="{{waybillNo}}"  bindinput="waybillNoInput" />
     <view slot="footer" class="weui-vcode-btn" bindtap="scan" >扫一扫</view>
   </mp-cell>
 </mp-cells>
 <button bindtap="click"  > 查 询 </button>
+<mp-cells ext-class="my-cells" title="带说明的列表项">
+    <mp-cell>
+      <view  class="flex-wrp" style="flex-direction:row;height:100rpx">
+        <view class="flex-wrp" style="flex-direction:column;height:120rpx">
+          <view style="height:105rpx">
+            <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
+          </view>
+          <view >苍杰</view>
+        </view>
+  
+        <view  >bbb</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+        <view>标题文字（使用slot）</view>
+        <view slot="footer">说明文字</view>
+    </mp-cell>
+</mp-cells>
+
+
+
+
 <view class="weui-flex" style="height:100rpx" bindtap="clickOrder" id="odr_1" >
   <view class="weui-flex__item"><view class="placeholder">weui</view></view>
   <view class="weui-flex__item"><view class="placeholder">next line</view></view>
@@ -15,11 +37,8 @@
   <view class="weui-flex__item"><view class="placeholder">weui</view></view>
   <view class="weui-flex__item"><view class="placeholder">next line</view></view>
 </view>
-<view class="page__bd">
-  <mp-cells>
-    <mp-cell>
-      <mp-uploader bindfail="uploadError" bindsuccess="uploadSuccess" select="{{selectFile}}" upload="{{uplaodFile}}" files="{{files}}" max-count="5" title="图片上传" tips="图片上传提示"></mp-uploader>
-    </mp-cell>
-  </mp-cells>
-</view>
+
+
+
+
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
