@@ -13,9 +13,13 @@
           <view style="height:105rpx">
             <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
           </view>
-          <view style="margin-top:1rpx" >苍杰</view>
+          <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
         </view>
-        <view style="margin-left:10rpx" >bbb</view>
+        <view style="margin-left:10rpx;flex-direction:column" >
+          <view style="font-size:12px">手机:13501177897 运单号:SF000000000</view>
+          <view style="font-size:12px">代取:APO 全地域 花</view>
+          <view style="font-size:12px">2020-8-1</view>
+        </view>
       </view>
     </mp-cell>
    <mp-cell style="height:200rpx; margin-top:0rpx" >
@@ -24,9 +28,13 @@
           <view style="height:105rpx">
             <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
           </view>
-          <view style="margin-top:1rpx" >苍杰</view>
+          <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
         </view>
-        <view style="margin-left:10rpx" >bbb</view>
+        <view style="margin-left:10rpx;flex-direction:column" >
+          <view style="font-size:12px">手机:13501177897 运单号:SF000000000</view>
+          <view style="font-size:12px">养护寄存:Fischer RC4 178cm 红色</view>
+          <view style="font-size:12px">2020-8-1</view>
+        </view>
       </view>
     </mp-cell>
 </mp-cells>
