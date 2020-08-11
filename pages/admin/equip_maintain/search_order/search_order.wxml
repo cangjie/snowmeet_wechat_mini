@@ -7,38 +7,27 @@
 </mp-cells>
 <button bindtap="click"  > 查 询 </button>
 <mp-cells ext-class="my-cells" title="带说明的列表项">
-    <mp-cell>
-      <view  class="flex-wrp" style="flex-direction:row;height:100rpx">
-        <view class="flex-wrp" style="flex-direction:column;height:120rpx">
+    <mp-cell style="height:200rpx; margin-top:0rpx" >
+      <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx">
+        <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
           <view style="height:105rpx">
             <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
           </view>
-          <view >苍杰</view>
+          <view style="margin-top:1rpx" >苍杰</view>
         </view>
-  
-        <view  >bbb</view>
+        <view style="margin-left:10rpx" >bbb</view>
       </view>
     </mp-cell>
-    <mp-cell>
-        <view>标题文字（使用slot）</view>
-        <view slot="footer">说明文字</view>
+   <mp-cell style="height:200rpx; margin-top:0rpx" >
+      <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx">
+        <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
+          <view style="height:105rpx">
+            <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
+          </view>
+          <view style="margin-top:1rpx" >苍杰</view>
+        </view>
+        <view style="margin-left:10rpx" >bbb</view>
+      </view>
     </mp-cell>
 </mp-cells>
-
-
-
-
-<view class="weui-flex" style="height:100rpx" bindtap="clickOrder" id="odr_1" >
-  <view class="weui-flex__item"><view class="placeholder">weui</view></view>
-  <view class="weui-flex__item"><view class="placeholder">next line</view></view>
-</view>
-<view style="height:10rpx" >\r</view>
-<view class="weui-flex" style="height:100rpx" id="odr2" bindtap="clickOrder" >
-  <view class="weui-flex__item"><view class="placeholder">weui</view></view>
-  <view class="weui-flex__item"><view class="placeholder">next line</view></view>
-</view>
-
-
-
-
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
