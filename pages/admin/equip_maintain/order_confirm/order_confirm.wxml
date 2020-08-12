@@ -1,0 +1,64 @@
+<!--pages/admin/equip_maintain/order_confirm/order_confirm.wxml-->
+<!--scroll-view scroll-y="true" style="height:1100rpx" -->
+<mp-cells ext-class="my-cells" title="基本信息">
+  <mp-cell style="height:200rpx; margin-top:0rpx"   >
+      <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx;margin-left:10rpx;margin-top:10rpx">
+        <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
+          <view style="height:105rpx">
+            <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
+          </view>
+          <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
+        </view>
+        <view style="margin-left:10rpx;flex-direction:column" >
+          <view style="font-size:12px">手机:13501177897 运单号:顺丰SF000000000</view>
+          <view style="font-size:12px">回寄地址:北京市东城区金狮子胡同1号养心殿</view>
+          <view style="font-size:12px">发来物品:寄存牌 万龙雪板H11区022</view>
+          <view style="font-size:12px">需求:养护寄存</view>
+        </view>
+      </view>
+    </mp-cell>
+</mp-cells>
+<mp-cells ext-class="my-cells" title="需要确认的信息" >
+    <mp-cell prop="称谓" title="称谓" class="form-font" >
+      <view class="flex-wrp" style="margin-top:0rpx;margin-left:50rpx;flex-direction:row"  >
+        <view>
+          <input  data-field="realName" class="weui-input" placeholder="请输入称谓" style="width:200rpx" />
+        </view>
+        <view style="margin-left:10rpx">
+          <radio-group>
+            <radio value="先生" ></radio>先生 <radio value="女士" ></radio>女士
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell prop="装备" title="装备" class="form-font" >
+      <radio-group style="margin-top:0rpx;margin-left:50rpx;" >
+        <radio value="双板" ></radio>双板 <radio value="双板鞋" ></radio>双板鞋 <radio value="单板" ></radio>单板 <radio value="单板鞋" ></radio>单板鞋 <radio value="其它" ></radio>其它
+      </radio-group>
+    </mp-cell>
+    <mp-cell prop="品牌" title="品牌" class="form-font" >
+      <view class="flex-wrp" style="margin-top:0rpx;margin-left:50rpx;flex-direction:row"  >
+        <picker value="{{index}}" range="{{array}}" style="width:250rpx">
+          <view class="picker">{{array[index]}}</view>
+        </picker>
+        <input style="width:250rpx" placeholder="菲舍尔" />
+      </view>
+    </mp-cell>
+    <mp-cell prop="款式" title="款式" class="form-font" >
+      <input style="width:250rpx" placeholder="RC4" style="margin-left:50rpx;"/>
+    </mp-cell>
+    <mp-cell prop="规格" title="规格" class="form-font" >
+      <input style="width:250rpx" placeholder="178" style="margin-left:50rpx;" />
+    </mp-cell>
+    <mp-cell prop="颜色" title="颜色" class="form-font" >
+      <input style="width:250rpx" placeholder="黑" style="margin-left:50rpx;" />
+    </mp-cell>
+    <mp-cell prop="附件" title="附件" class="form-font" >
+      <input style="width:500rpx" placeholder="雪杖 帽子 手套 眼镜" style="margin-left:50rpx;" />
+    </mp-cell>
+    <mp-cell prop="照片" title="照片" class="form-font" >
+      <mp-uploader max-count="5" title="图片上传" tips="图片上传提示" style="margin-left:50rpx;" ></mp-uploader>
+    </mp-cell>
+</mp-cells>
+<!--/scroll-view-->
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
