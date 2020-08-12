@@ -91,8 +91,12 @@ Page({
     this.setData({waybillNo: e.detail.value})
   },
   clickOrder: function(e) {
+    var switchUrl = '/pages/admin/equip_maintain/receit_express/receit_express'
+    if (e.currentTarget.id=='2') {
+      switchUrl = '/pages/admin/equip_maintain/order_confirm/order_confirm'
+    }
     wx.navigateTo({
-      url: '/pages/admin/equip_maintain/order_confirm/order_confirm',
+      url: switchUrl
     })
   }
 })

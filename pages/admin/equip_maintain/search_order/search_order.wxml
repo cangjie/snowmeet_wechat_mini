@@ -7,7 +7,7 @@
 </mp-cells>
 <button bindtap="click"  > 查 询 </button>
 <mp-cells ext-class="my-cells" title="带说明的列表项">
-    <mp-cell style="height:200rpx; margin-top:0rpx" bindtap="clickOrder"  >
+    <mp-cell id="1" style="height:200rpx; margin-top:0rpx" bindtap="clickOrder"  >
       <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx">
         <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
           <view style="height:105rpx">
@@ -18,11 +18,12 @@
         <view style="margin-left:10rpx;flex-direction:column" >
           <view style="font-size:12px">手机:13501177897 运单号:SF000000000</view>
           <view style="font-size:12px">代取:APO 全地域 花</view>
+          <view style="font-size:12px">状态:未开始</view>
           <view style="font-size:12px">2020-8-1</view>
         </view>
       </view>
     </mp-cell>
-    <mp-cell style="height:200rpx; margin-top:0rpx"  bindtap="clickOrder">
+    <mp-cell id="2" style="height:200rpx; margin-top:0rpx"  bindtap="clickOrder">
       <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx"  >
         <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
           <view style="height:105rpx">
@@ -33,6 +34,7 @@
         <view style="margin-left:10rpx;flex-direction:column" >
           <view style="font-size:12px">手机:13501177897 运单号:SF000000000</view>
           <view style="font-size:12px">养护寄存:Fischer RC4 178cm 红色</view>
+          <view style="font-size:12px">状态:快递已签收</view>
           <view style="font-size:12px">2020-8-1</view>
         </view>
       </view>

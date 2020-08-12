@@ -1,4 +1,6 @@
-// pages/admin/equip_maintain/up.js
+// pages/admin/equip_maintain/receit_express/receit_express.js
+var wxloginModule = require('../../../../utils/wxlogin.js')
+const app = getApp()
 Page({
 
   /**
@@ -12,7 +14,9 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-
+    wxloginModule.wxlogin()
+    this.setData({tabbarItemList: app.globalData.adminTabbarItem,
+    tabIndex: 0})
   },
 
   /**

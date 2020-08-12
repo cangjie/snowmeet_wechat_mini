@@ -9,6 +9,6 @@
     "mp-form": "../../../../modules/form/form",
     "mp-uploader": "../../../../modules/uploader/uploader"
   },
-  "navigationBarTitleText": "查询未开始的订单"
+  "navigationBarTitleText": "签收快递"
   
 }

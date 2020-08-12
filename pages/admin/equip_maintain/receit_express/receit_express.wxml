@@ -1,0 +1,23 @@
+<!--pages/admin/equip_maintain/receit_express/receit_express.wxml-->
+<mp-cells ext-class="my-cells" title="基本信息">
+  <mp-cell style="height:200rpx; margin-top:0rpx"   >
+      <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx;margin-left:10rpx;margin-top:10rpx">
+        <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
+          <view style="height:105rpx">
+            <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
+          </view>
+          <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
+        </view>
+        <view style="margin-left:10rpx;flex-direction:column" >
+          <view style="font-size:12px">手机:13501177897 运单号:顺丰SF000000000</view>
+          <view style="font-size:12px">回寄地址:北京市东城区金狮子胡同1号养心殿</view>
+          <view style="font-size:12px">发来物品:寄存牌 万龙雪板H11区022</view>
+          <view style="font-size:12px">需求:养护寄存</view>
+        </view>
+      </view>
+    </mp-cell>
+</mp-cells>
+<mp-cell prop="照片" title="照片" class="form-font" >
+      <mp-uploader max-count="3" title="图片上传" tips="快递单 标签纸 邮寄实物" style="margin-left:50rpx;" ></mp-uploader>
+    </mp-cell>
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
