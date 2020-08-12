@@ -7,7 +7,7 @@
 </mp-cells>
 <button bindtap="click"  > 查 询 </button>
 <mp-cells ext-class="my-cells" title="带说明的列表项">
-    <mp-cell style="height:200rpx; margin-top:0rpx" >
+    <mp-cell style="height:200rpx; margin-top:0rpx" bindtap="clickOrder"  >
       <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx">
         <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
           <view style="height:105rpx">
@@ -22,8 +22,8 @@
         </view>
       </view>
     </mp-cell>
-   <mp-cell style="height:200rpx; margin-top:0rpx" >
-      <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx">
+    <mp-cell style="height:200rpx; margin-top:0rpx"  bindtap="clickOrder">
+      <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx"  >
         <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
           <view style="height:105rpx">
             <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>

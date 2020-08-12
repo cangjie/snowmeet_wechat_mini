@@ -5,7 +5,8 @@
     "pages/test/scan/scan",
     "pages/test/tab/tab",
     "pages/admin/equip_maintain/search_order/search_order",
-    "pages/admin/equip_maintain/uploadimage/uploadimage"
+    "pages/admin/equip_maintain/uploadimage/uploadimage",
+    "pages/admin/equip_maintain/order_confirm/order_confirm"
   ],
   "window": {
     "backgroundTextStyle": "light",

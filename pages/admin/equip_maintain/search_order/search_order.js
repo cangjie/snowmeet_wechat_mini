@@ -91,6 +91,8 @@ Page({
     this.setData({waybillNo: e.detail.value})
   },
   clickOrder: function(e) {
-    console.log(e)
+    wx.navigateTo({
+      url: '/pages/admin/equip_maintain/order_confirm/order_confirm',
+    })
   }
 })
