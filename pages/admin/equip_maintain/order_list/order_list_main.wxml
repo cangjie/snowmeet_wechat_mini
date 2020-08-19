@@ -1,0 +1,20 @@
+<mp-cells ext-class="my-cells" title="根据不同选项查询订单">
+  <mp-cell>
+    <button style="width:400rpx" bindtap="goToAssign" > 未 分 配 客 服 订 单 </button>
+  </mp-cell>
+  <mp-cell  style="height:72rpx" >
+    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="输入或扫描快递单号" value="{{waybillNo}}"  bindinput="waybillNoInput" />
+    <view slot="footer" class="weui-vcode-btn" bindtap="scan" >扫一扫</view>
+  </mp-cell>
+  <mp-cell><button bindtap="goToOrdderlistByWaybill"> 查 询 </button></mp-cell>
+  <mp-cell  style="height:72rpx" >
+    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="查询单个订单" value="{{waybillNo}}"  bindinput="waybillNoInput" />
+    <view slot="footer" class="weui-vcode-btn" bindtap="scan" >扫一扫</view>
+  </mp-cell>
+  <mp-cell><button bindtap="goToSingleOrderDetail"> 查 询 </button></mp-cell>
+  <mp-cell>
+    <button> 全 部 订 单 </button>
+  </mp-cell>
+</mp-cells>
+
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

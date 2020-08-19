@@ -7,7 +7,12 @@
     "pages/admin/equip_maintain/search_order/search_order",
     "pages/admin/equip_maintain/uploadimage/uploadimage",
     "pages/admin/equip_maintain/order_confirm/order_confirm",
-    "pages/admin/equip_maintain/receit_express/receit_express"
+    "pages/admin/equip_maintain/receit_express/receit_express",
+    "pages/admin/equip_maintain/order_list/order_list_all/order_list_all",
+    "pages/admin/equip_maintain/order_list/order_list_by_id/order_list_by_id",
+    "pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill",
+    "pages/admin/equip_maintain/order_list/order_list_main",
+    "pages/admin/equip_maintain/order_list/order_detail_assign/order_detail_assign"
   ],
   "window": {
     "backgroundTextStyle": "light",
