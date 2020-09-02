@@ -109,7 +109,7 @@ App({
   },
   globalData: {
     appId:'wxd1310896f2aa68bb',
-    domainName:'mini.luqinwenda.com',
+    domainName:'mini.snowmeet.top',
     userInfo: null,
     sessionKey:'',
     unionId:'',
