@@ -76,5 +76,10 @@ Page({
     wx.navigateTo({
       url: '/pages/admin/equip_maintain/order_list/order_detail_assign/order_detail_assign',
     })
+  },
+  goToSingleOrderDetail: function() {
+    wx.navigateTo({
+      url: '/pages/admin/equip_maintain/order_list/order_detail/order_detail',
+    })
   }
 })

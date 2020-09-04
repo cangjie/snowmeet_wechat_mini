@@ -12,7 +12,12 @@
     "pages/admin/equip_maintain/order_list/order_list_by_id/order_list_by_id",
     "pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill",
     "pages/admin/equip_maintain/order_list/order_list_main",
-    "pages/admin/equip_maintain/order_list/order_detail_assign/order_detail_assign"
+    "pages/admin/equip_maintain/order_list/order_detail_assign/order_detail_assign",
+    "pages/admin/equip_maintain/order_list/order_detail/order_detail",
+    "pages/admin/equip_maintain/order_list/task/task_finish/task_finish",
+    "pages/admin/equip_maintain/order_list/task/task_stop/task_stop",
+    "pages/admin/equip_maintain/order_list/task/task_executing/task_executing",
+    "pages/admin/equip_maintain/order_list/task/task_pending/task_pending"
   ],
   "window": {
     "backgroundTextStyle": "light",

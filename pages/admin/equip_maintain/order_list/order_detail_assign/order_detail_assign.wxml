@@ -57,7 +57,7 @@
     <input bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="347"/>
   </mp-cell>
   <mp-cell prop="滑行偏好" title="滑行偏好" >
-    <input bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="树林"/>
+    <checkbox></checkbox>雪道 <checkbox></checkbox>公园 <checkbox></checkbox>竞技 <checkbox></checkbox>树林 <checkbox></checkbox>野雪
   </mp-cell>
   <mp-cell prop="修刃角度" title="修刃角度" >
     <radio-group>
