@@ -118,6 +118,12 @@ App({
     iv:'',
     adminTabbarItem: [
       {
+        "text": "养护",
+        "iconPath": "/images/icons/icon_maintain_white.jpg",
+        "selectedIconPath": "/images/icons/icon_maintain_white.jpg",
+        "pagePath": "/pages/admin/equip_maintain/search_order/search_order"
+      },
+      {
         "text": "订单",
         "iconPath": "images/zhihu-fill.png",
         "selectedIconPath": "images/zhihu-fill-hl.png",
