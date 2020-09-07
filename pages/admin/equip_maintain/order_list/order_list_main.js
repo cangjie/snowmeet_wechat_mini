@@ -1,5 +1,6 @@
 // pages/admin/equip_maintain/order_list/order_list_main.js
 var wxloginModule = require('../../../../utils/wxlogin.js')
+require('../../../../utils/md5.js')
 const app = getApp()
 Page({
 
