@@ -86,5 +86,10 @@ Page({
     wx.navigateTo({
       url: '/pages/admin/equip_maintain/order_list/order_detail/order_detail',
     })
+  },
+  goToPaymentTest: function() {
+    wx.navigateTo({
+      url: '/pages/test/pay/pay',
+    })
   }
 })

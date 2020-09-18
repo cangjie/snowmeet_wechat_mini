@@ -13,7 +13,7 @@
   </mp-cell>
   <mp-cell><button bindtap="goToSingleOrderDetail"> 查 询 </button></mp-cell>
   <mp-cell>
-    <button> 全 部 订 单 </button>
+    <button bindtap="goToPaymentTest"> 全 部 订 单 </button>
   </mp-cell>
 </mp-cells>
 
