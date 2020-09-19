@@ -13,20 +13,26 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    var nonce = Math.random().toString().replace('0.', '')
-    if (nonce.length > 32) {
-      nonce = nonce.substr(0, 31)
-    }
+
+
+    var nonce = '5f65c189a158c'
     var appId = 'wxd1310896f2aa68bb'
-    var prePayId = 'wx18211635069509ed85376deffcba200000'
-    var timeStamp = new Date().valueOf().toString()
-    var payStr = 'appId=' + appId + '&nonceStr=' + nonce + '&package=prepay_id=' + prePayId + '&signType=MD5&timeStamp=' + timeStamp
+    var prePayId = 'wx19163001458924eb4dbd3f509cd2000000'
+    var timeStamp = '1600504201'
+    var paySign = '55A62DF9D3366552724249AEBA37F9C0'
+
+
+
+    var payStr = 'appId=' + appId + '&nonceStr=' + nonce + '&package=prepay_id=' + prePayId + '&signType=MD5&timeStamp=' + timeStamp + '&key=jihuowangluoactivenetworkjarrodc'
+
+
+
     wx.requestPayment({
       timeStamp: timeStamp,
       nonceStr: nonce,
       package: 'prepay_id=' + prePayId,
       signType: "MD5",
-      paySign: md5(payStr),
+      paySign: paySign,
       success: function(res) {
         console.log(res)
       },
