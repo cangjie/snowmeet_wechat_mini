@@ -18,7 +18,7 @@ Page({
       nonce = nonce.substr(0, 31)
     }
     var appId = 'wxd1310896f2aa68bb'
-    var prePayId = 'wx18211635069509ed85376deffcba200000'
+    var prePayId = 'wx18213935243983f043f6802acda1990000'
     var timeStamp = new Date().valueOf().toString()
     var payStr = 'appId=' + appId + '&nonceStr=' + nonce + '&package=prepay_id=' + prePayId + '&signType=MD5&timeStamp=' + timeStamp
     wx.requestPayment({
