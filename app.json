@@ -17,7 +17,8 @@
     "pages/admin/equip_maintain/order_list/task/task_finish/task_finish",
     "pages/admin/equip_maintain/order_list/task/task_stop/task_stop",
     "pages/admin/equip_maintain/order_list/task/task_executing/task_executing",
-    "pages/admin/equip_maintain/order_list/task/task_pending/task_pending"
+    "pages/admin/equip_maintain/order_list/task/task_pending/task_pending",
+    "pages/test/pay/pay"
   ],
   "window": {
     "backgroundTextStyle": "light",

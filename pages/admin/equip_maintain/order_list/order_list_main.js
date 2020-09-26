@@ -1,5 +1,6 @@
 // pages/admin/equip_maintain/order_list/order_list_main.js
 var wxloginModule = require('../../../../utils/wxlogin.js')
+var md5 = require('../../../../utils/md5.js')
 const app = getApp()
 Page({
 
@@ -17,6 +18,10 @@ Page({
     wxloginModule.wxlogin()
     this.setData({tabbarItemList: app.globalData.adminTabbarItem,
     tabIndex: 0})
+    /*
+    var md5String = md5("appId=wxd678efh567hg6787&nonceStr=5K8264ILTKCH16CQ2502SI8ZNMTM67VS&package=prepay_id=wx2017033010242291fcfe0db70013231072&signType=MD5&timeStamp=1490840662&key=qazwsxedcrfvtgbyhnujmikolp111111")
+    console.log(md5String)
+    */
   },
 
   /**
@@ -80,6 +85,11 @@ Page({
   goToSingleOrderDetail: function() {
     wx.navigateTo({
       url: '/pages/admin/equip_maintain/order_list/order_detail/order_detail',
+    })
+  },
+  goToPaymentTest: function() {
+    wx.navigateTo({
+      url: '/pages/test/pay/pay',
     })
   }
 })
