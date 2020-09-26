@@ -87,3 +87,6 @@
 </mp-cells>
 
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
+<mp-dialog title="没有新订单" show="{{showOneButtonDialog}}" bindbuttontap="tapDialogButton" buttons="{{oneButton}}">
+        <view>目前所有订单已经都分配了客服!</view>
+    </mp-dialog>

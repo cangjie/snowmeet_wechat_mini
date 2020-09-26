@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-
+    showOneButtonDialog: false,
+    oneButton: [{text: '返回'}]
   },
 
   /**
@@ -17,6 +18,23 @@ Page({
     wxloginModule.wxlogin()
     this.setData({tabbarItemList: app.globalData.adminTabbarItem,
       tabIndex: 0})
+      
+      var url = 'https://' + app.globalData.domainName + '/api/get_a_new_maintain_order.aspx?sessionkey=' + app.globalData.sessionKey
+      wx.request({
+        url: url,
+        success: res => {
+          if (res.data.count > 0) {
+           
+          }
+          else {
+            this.setData({showOneButtonDialog: true})
+          }
+        },
+        fail: res => {
+          this.setData({showOneButtonDialog: true})
+        } 
+      })
+
   },
 
   /**
@@ -66,5 +84,13 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  tapDialogButton: function() {
+    this.setData({showOneButtonDialog: false})
+    wx.navigateBack({
+      delta: 0
+    })
   }
+
+
 })
