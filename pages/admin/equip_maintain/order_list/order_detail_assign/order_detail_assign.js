@@ -8,7 +8,13 @@ Page({
    */
   data: {
     showOneButtonDialog: false,
-    oneButton: [{text: '返回'}]
+    oneButton: [{text: '返回'}],
+    task_info:{},
+    user_filled_info:{},
+    user_head_image:'',
+    user_nick:'',
+    order_date:'',
+    order_time:''
   },
 
   /**
@@ -19,12 +25,20 @@ Page({
     this.setData({tabbarItemList: app.globalData.adminTabbarItem,
       tabIndex: 0})
       
-      var url = 'https://' + app.globalData.domainName + '/api/get_a_new_maintain_order.aspx?sessionkey=' + app.globalData.sessionKey
+      var url = 'https://' + app.globalData.domainName + '/api/get_a_new_maintain_order.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: url,
         success: res => {
           if (res.data.count > 0) {
-           
+            var maintain_task =  res.data.maintain_task_arr[0].maintain_task
+            var str_task_id = maintain_task.id.toString()
+            str_task_id = new Array(9 - str_task_id.length).join('0')+str_task_id
+            maintain_task.id = str_task_id
+            var str_card_no = maintain_task.card_no
+            str_card_no = str_card_no.substring(0, 3) + '-' + str_card_no.substring(3, 6) + '-' + str_card_no.substring(6, 9)
+            maintain_task.card_no = str_card_no
+            this.setData({task_info: maintain_task, order_date: maintain_task.create_date.toString().split(' ')[0], order_time: maintain_task.create_date.toString().split(' ')[1]})
+            this.setData({user_filled_info: res.data.maintain_task_arr[0].user_filled_info})
           }
           else {
             this.setData({showOneButtonDialog: true})
