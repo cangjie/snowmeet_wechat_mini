@@ -166,7 +166,7 @@ Page({
       + '", "hobby": "' + this.data.ski_hobby + '", "edge_degree": "' + this.data.edge_degree
       + '", "candle_temperature": "' + this.data.candle_temperature + '", "service_open_id": "@#$current_open_id$#@"}, '
       + ' "keys": {"id": "' + this.data.key_task_id.toString() + '"}}'
-      var url = 'https://' + app.globalData.domainName + '/api/update_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&table=maintain_task'
+      var url = 'https://' + app.globalData.domainName + '/api/assign_a_new_maintain_order.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&table=maintain_task'
       wx.request({
         url: url,
         data: postData,
