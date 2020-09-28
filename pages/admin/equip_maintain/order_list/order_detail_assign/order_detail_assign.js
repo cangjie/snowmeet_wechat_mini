@@ -27,7 +27,11 @@ Page({
     candle_temperature:'',
     buy_channel:'',
     err_title:'没有新订单',
-    err_msg:'目前所有订单已经都分配了客服!'
+    err_msg:'目前所有订单已经都分配了客服!',
+    key_task_id:0,
+    dialogShow: false,
+    success_message: '',
+    buttons: [{text: '取消'}, {text: '确定'}]
   },
 
   /**
@@ -47,6 +51,7 @@ Page({
             var maintain_task =  res.data.maintain_task_arr[0].maintain_task
             var str_task_id = maintain_task.id.toString()
             str_task_id = new Array(9 - str_task_id.length).join('0')+str_task_id
+            this.setData({key_task_id: maintain_task.id})
             maintain_task.id = str_task_id
             var str_card_no = maintain_task.card_no
             str_card_no = str_card_no.substring(0, 3) + '-' + str_card_no.substring(3, 6) + '-' + str_card_no.substring(6, 9)
@@ -135,23 +140,62 @@ Page({
     
   },
   onSubmit: function() {
+    var err = false
     if (this.data.gender == '') {
       this.setData({err_title: '请填写必填项', err_msg: '请选择性别', showOneButtonDialog: true})
+      err = true
     }
     if (this.data.edge_degree == '') {
       this.setData({err_title: '请填写必填项', err_msg: '请选择修刃角度', showOneButtonDialog: true})
+      err = true
     }
+    /*
     if (this.data.candle_temperature == '') {
       this.setData({err_title: '请填写必填项', err_msg: '请选择蜡温', showOneButtonDialog: true})
+      err = true
     }
+    */
     if (this.data.real_name == '') {
       this.setData({err_title: '请填写必填项', err_msg: '请填写姓名', showOneButtonDialog: true})
+      err = true
     }
-    var postData = 'cell_number=' + encodeURIComponent(this.data.cell) + '&contact_name=' + encodeURIComponent(this.data.real_name)
-      + '&contact_gender=' + encodeURIComponent(this.data.gender) + '&user_relation=' + encodeURIComponent(this.data.user_relationship)
-      + '&body_length=' + encodeURIComponent(this.data.body_length) + '&boot_length=' + encodeURIComponent(this.data.boot_length)
-      + '&hobby=' + encodeURIComponent(this.data.ski_hobby) + '&edge_degree=' + encodeURIComponent(this.data.edge_degree)
-      + '&candle_temperature=' + encodeURIComponent(this.data.candle_temperature)
+    if (!err) {
+      var postData = '{"fields_data": {"cell_number": "' + this.data.cell + '", "contact_name": "' + this.data.real_name
+      + '", "contact_gender": "' + this.data.gender + '", "user_relation": "' + this.data.user_relationship
+      + '", "body_length": "' + this.data.body_length + '", "boot_length": "' + this.data.boot_length
+      + '", "hobby": "' + this.data.ski_hobby + '", "edge_degree": "' + this.data.edge_degree
+      + '", "candle_temperature": "' + this.data.candle_temperature + '", "service_open_id": "@#$current_open_id$#@"}, '
+      + ' "keys": {"id": "' + this.data.key_task_id.toString() + '"}}'
+      var url = 'https://' + app.globalData.domainName + '/api/update_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&table=maintain_task'
+      wx.request({
+        url: url,
+        data: postData,
+        method: 'POST',
+        success: res => {
+          if (res.data.status == 0 && res.data.affect_rows == 1) {
+            var msg = this.data.real_name.trim() + ' ' + ((this.data.gender.trim()) == '男'?'先生':'女士') + ' ' + '的订单已经指派给你，点击“确定”，联系下一位客户；点击“取消”，回到主界面。'
+            this.setData({success_message: msg, dialogShow: true })
+
+          }
+        },
+        fail: res => {
+          var i = 0
+        }
+      })
+    }
+
+  },
+  tapDialogButtonNext: function(e) {
+    if (e.detail.index==0) {
+      wx.navigateTo({
+        url: '../order_list_main',
+      })
+    }
+    else {
+      wx.navigateTo({
+        url: 'order_detail_assign',
+      })
+    }
   },
   formInputChange: function(e) {
     switch(e.currentTarget.id){

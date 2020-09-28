@@ -96,3 +96,6 @@
 <mp-dialog title="{{err_title}}" show="{{showOneButtonDialog}}" bindbuttontap="tapDialogButton" buttons="{{oneButton}}">
   <view>{{err_msg}}</view>
 </mp-dialog>
+<mp-dialog title="指派成功" show="{{dialogShow}}" bindbuttontap="tapDialogButtonNext" buttons="{{buttons}}">
+  <view>{{success_message}}</view>
+</mp-dialog>
