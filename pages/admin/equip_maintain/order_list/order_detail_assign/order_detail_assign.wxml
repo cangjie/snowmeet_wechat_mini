@@ -3,26 +3,26 @@
       <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx;margin-left:10rpx;margin-top:10rpx">
         <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
           <view style="height:105rpx">
-            <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
+            <image style="width:100rpx;height:100rpx" src="{{user_info.head_image}}"></image>
           </view>
-          <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
+          <view style="margin-top:1rpx;font-size:12px" >{{user_info.nick}}</view>
         </view>
         <view style="width:500rpx;margin-left:10rpx;flex-direction:column" >
           <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
-            <view style="width:250rpx" >订单号: xxxxxxx</view> 
-            <view style="width:250rpx" >下单日期: yyyy-mm-dd</view>
+            <view style="width:250rpx" >订单号: {{task_info.id}}</view> 
+            <view style="width:250rpx" >下单日期: {{order_date}}</view>
           </view>
           <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
-            <view style="width:250rpx" >下单方式: 线上</view> 
-            <view style="width:250rpx">套餐卡号: xxx-xxx-xxx</view>
+            <view style="width:250rpx" >下单方式: {{task_info.order_type}}</view> 
+            <view style="width:250rpx">下单时间: {{order_time}}</view>
           </view>
           <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
             <view style="width:250rpx" >套餐金额: 200</view> 
-            <view style="width:250rpx">业务类型: 装备养护</view>
+            <view style="width:250rpx">套餐卡号: {{task_info.card_no}}</view>
           </view>
           <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
-            <view style="width:250rpx" >装备类型: 单板</view> 
-            <view style="width:250rpx"></view>
+            <view style="width:250rpx" >装备类型: {{user_filled_info.equip_type}}</view> 
+            <view style="width:250rpx">业务类型: {{task_info.name}}</view>
           </view>
         </view>
       </view>
@@ -30,17 +30,17 @@
 </mp-cells>
 <mp-cells title="联系方式" footer="" >
   <mp-cell prop="手机号" title="手机号" ext-class="">
-    <input bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="13501177897"/>
+    <input id="cell" bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="{{user_info.cell_number}}"/>
   </mp-cell>
   <mp-cell prop="姓名" title="姓名" ext-class=""    >
     <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
       <view style="width:200rpx;"  >
-        <input bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="苍杰"/>
+        <input id="real_name"  bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder=""/>
       </view>
       <view style="width:300rpx;"  >
-        <radio-group>
-          <radio></radio>先生
-          <radio></radio>女士
+        <radio-group id='gender' bindtap="formInputChange" >
+          <radio id='gender_male'></radio>先生
+          <radio id='gender_female'></radio>女士
         </radio-group>
       </view>
     </view>
@@ -48,32 +48,38 @@
 </mp-cells>
 <mp-cells title="使用人信息" footer="" >
   <mp-cell prop="使用人" title="使用人">
-    <input bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="本人"/>
+    <input id="user_relationship" bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="本人"/>
   </mp-cell>
-  <mp-cell prop="身高" title="身高" >
-    <input bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="180"/>
+  <mp-cell  prop="身高" title="身高" >
+    <input id="body_length" bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder=""/>
   </mp-cell>
   <mp-cell prop="鞋长" title="鞋长" >
-    <input bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder="347"/>
+    <input id="boot_length" bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder=""/>
   </mp-cell>
   <mp-cell prop="滑行偏好" title="滑行偏好" >
-    <checkbox></checkbox>雪道 <checkbox></checkbox>公园 <checkbox></checkbox>竞技 <checkbox></checkbox>树林 <checkbox></checkbox>野雪
+    <checkbox-group id="hobby" bindchange="formInputChange" >
+      <checkbox value='雪道'></checkbox>雪道 
+      <checkbox value='公园'></checkbox>公园 
+      <checkbox value='竞技'></checkbox>竞技 
+      <checkbox value='树林'></checkbox>树林 
+      <checkbox value='野雪'></checkbox>野雪
+    </checkbox-group>
   </mp-cell>
   <mp-cell prop="修刃角度" title="修刃角度" >
-    <radio-group>
-      <radio></radio>89 <radio></radio>88 <radio></radio>87 <radio></radio>86及以下
+    <radio-group id='edge_degree' bindchange="formInputChange" >
+      <radio value='89' ></radio>89 <radio value='88' ></radio>88 <radio value='87' ></radio>87 <radio value='86及以下' ></radio>86及以下
     </radio-group>
   </mp-cell>
   <mp-cell prop="蜡温" title="蜡温" >
-    <radio-group>
-      <radio></radio>高 <radio></radio>中 <radio></radio>低
+    <radio-group id='candle_temperature' bindchange="formInputChange" >
+      <radio value='高' ></radio>高 <radio value='中' ></radio>中 <radio value='低' ></radio>低
     </radio-group>
   </mp-cell>
   <mp-cell prop="购买渠道" title="购买渠道" >
-    <input bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder=""/>
+    <input id='buy_channel' bindinput="formInputChange" style="margin-left:20rpx" data-field="number" class="weui-input" placeholder=""/>
   </mp-cell>
   <mp-cell prop="" title="" >
-    <button> 提 交 </button>
+    <button bindtap="onSubmit"> 提 交 </button>
   </mp-cell>
   <mp-cell prop="" title="" >
     
@@ -87,3 +93,6 @@
 </mp-cells>
 
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
+<mp-dialog title="{{err_title}}" show="{{showOneButtonDialog}}" bindbuttontap="tapDialogButton" buttons="{{oneButton}}">
+  <view>{{err_msg}}</view>
+</mp-dialog>

@@ -17,6 +17,7 @@ Page({
 
     var nonce = '5f65c189a158c'
     var appId = 'wxd1310896f2aa68bb'
+
     var prePayId = 'wx19163001458924eb4dbd3f509cd2000000'
     var timeStamp = '1600504201'
     var paySign = '55A62DF9D3366552724249AEBA37F9C0'
@@ -24,8 +25,6 @@ Page({
 
 
     var payStr = 'appId=' + appId + '&nonceStr=' + nonce + '&package=prepay_id=' + prePayId + '&signType=MD5&timeStamp=' + timeStamp + '&key=jihuowangluoactivenetworkjarrodc'
-
-
 
     wx.requestPayment({
       timeStamp: timeStamp,
