@@ -6,16 +6,24 @@ Page({
    * Page initial data
    */
   data: {
-
+    waybillNo:'',
+    maintain_task_arr:[],
+    mainntain_task_count: '0'
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    this.setData({waybillNo: options.waybillno})
     wxloginModule.wxlogin()
     this.setData({tabbarItemList: app.globalData.adminTabbarItem,
       tabIndex: 0})
+    var url = 'https://' + app.globalData.domainName + '/api/maintain_orders_get_by_waybill.aspx?waybillno=' + this.data.waybillNo
+    wx.request({
+      url: url,
+      sud
+    })
   },
 
   /**

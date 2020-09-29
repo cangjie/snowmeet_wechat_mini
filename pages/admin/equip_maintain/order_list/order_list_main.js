@@ -8,7 +8,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    waybillNo:''
   },
 
   /**
@@ -74,7 +74,7 @@ Page({
   },
   goToOrdderlistByWaybill: function() {
     wx.navigateTo({
-      url: '/pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill',
+      url: '/pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill?waybillno=' + this.data.waybillNo,
     })
   },
   goToAssign: function() {
@@ -91,5 +91,18 @@ Page({
     wx.navigateTo({
       url: '/pages/test/pay/pay',
     })
+  },
+  scanWaybill: function(source) {
+    wx.scanCode({
+      onlyFromCamera: false,
+      success: (res) => {
+        wx.navigateTo({
+          url: '/pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill?waybillno=' + res.result
+        })
+      }
+    })
+  },
+  waybillNoInputChange: function(source) {
+    this.setData({waybillNo: source.detail.value})
   }
 })

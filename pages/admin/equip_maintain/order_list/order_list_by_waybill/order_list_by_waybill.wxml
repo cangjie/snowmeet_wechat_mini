@@ -1,7 +1,7 @@
 <mp-cells title="" footer="">
   <mp-cell prop="waybillNo" title="" ext-class=" weui-cell_vcode">
-    <view>快递单号: xxxxxxxxxxxxxxx</view>
-    <view>订单数量: x</view>
+    <view>快递单号: {{waybillNo}}</view>
+    <view>订单数量: {{mainntain_task_count}}</view>
     <view>
       <radio-group>
         <radio value="yes" ></radio>签收无误 <radio value="no" ></radio>签收有误
