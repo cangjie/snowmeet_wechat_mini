@@ -22,7 +22,9 @@ Page({
     var url = 'https://' + app.globalData.domainName + '/api/maintain_orders_get_by_waybill.aspx?waybillno=' + this.data.waybillNo
     wx.request({
       url: url,
-      sud
+      success: function(res) {
+        var a = 0
+      }
     })
   },
 
