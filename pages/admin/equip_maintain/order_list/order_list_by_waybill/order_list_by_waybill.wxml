@@ -41,5 +41,6 @@
 </mp-cells>
 <mp-dialog title="{{msgTitle}}" show="{{dialogShow}}" bindbuttontap="tabDialogButton" buttons="{{dialogButton}}">
   <view>{{msgBody}}</view>
+  <input value="aaa"></input>
 </mp-dialog>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
