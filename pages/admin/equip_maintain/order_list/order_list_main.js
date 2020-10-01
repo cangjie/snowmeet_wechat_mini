@@ -8,7 +8,8 @@ Page({
    * Page initial data
    */
   data: {
-    waybillNo:''
+    waybillNo:'',
+    canSearchByWaybill:false
   },
 
   /**
@@ -103,6 +104,11 @@ Page({
     })
   },
   waybillNoInputChange: function(source) {
-    this.setData({waybillNo: source.detail.value})
+    if (source.detail.value.toString().trim() == '' ) {
+      this.setData({canSearchByWaybill: false})
+    }
+    else {
+      this.setData({canSearchByWaybill: true, waybillNo: source.detail.value})
+    }
   }
 })
