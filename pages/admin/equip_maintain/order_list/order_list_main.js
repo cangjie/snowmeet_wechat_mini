@@ -9,6 +9,7 @@ Page({
    */
   data: {
     waybillNo:'',
+    orderId: '',
     canSearchByWaybill:false
   },
 
@@ -85,7 +86,7 @@ Page({
   },
   goToSingleOrderDetail: function() {
     wx.navigateTo({
-      url: '/pages/admin/equip_maintain/order_list/order_detail/order_detail',
+      url: '/pages/admin/equip_maintain/order_list/order_detail/order_detail?id=' + this.data.orderId,
     })
   },
   goToPaymentTest: function() {
@@ -110,5 +111,8 @@ Page({
     else {
       this.setData({canSearchByWaybill: true, waybillNo: source.detail.value})
     }
+  },
+  orderIdInput: function(source) {
+    this.setData({orderId: source.detail.value})
   }
 })

@@ -4,26 +4,26 @@
       <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx;margin-left:10rpx;margin-top:10rpx">
         <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
           <view style="height:105rpx">
-            <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
+            <image style="width:100rpx;height:100rpx" src="{{userInfo.head_image}}"></image>
           </view>
-          <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
+          <view style="margin-top:1rpx;font-size:12px" >{{maintainTask.contact_name}}</view>
         </view>
         <view style="width:500rpx;margin-left:10rpx;flex-direction:column" >
           <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
-            <view style="width:250rpx" >订单号: xxxxxxx</view> 
-            <view style="width:250rpx" >下单日期: yyyy-mm-dd</view>
+            <view style="width:250rpx" >订单号: {{maintainTask.id}}</view> 
+            <view style="width:250rpx" >下单日期: {{orderDate}}</view>
           </view>
           <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
-            <view style="width:250rpx" >下单方式: 线上</view> 
-            <view style="width:250rpx">套餐卡号: xxx-xxx-xxx</view>
+            <view style="width:250rpx" >下单方式: {{maintainTask.order_type}}</view> 
+            <view style="width:250rpx">下单时间: {{orderTime}}</view>
           </view>
           <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
-            <view style="width:250rpx" >套餐金额: 200</view> 
+            <view style="width:250rpx" >套餐金额: {{price}}</view> 
+            <view style="width:250rpx">套餐卡号: {{maintainTask.card_no}}</view>
+          </view>
+          <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
+            <view style="width:250rpx" >装备类型: {{userFilledInfo.equip_type}}</view> 
             <view style="width:250rpx">业务类型: 装备养护</view>
-          </view>
-          <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
-            <view style="width:250rpx" >装备类型: 单板</view> 
-            <view style="width:250rpx"></view>
           </view>
         </view>
       </view>
@@ -38,15 +38,15 @@
       <view>开始时间</view>
     </view>
   </mp-cell>
-  <mp-cell >
+  <mp-cell wx:for="{{maintain_task_detail}}" >
     <view id="detail_0" bindtap="goToDetail" class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
-      <view style="width:150rpx;color:green" >取板</view>
-      <view style="width:150rpx;color:green" >苍杰</view>
-      <view style="width:150rpx;color:green" >已完成</view>
-      <view style="width:150rpx;color:green" >2020-9-1 16:00</view>
+      <view style="width:150rpx;color:gray" >{{item.name}}</view>
+      <view style="width:150rpx;color:gray" >--</view>
+      <view style="width:150rpx;color:gray" >未开始</view>
+      <view style="width:150rpx;color:gray" >--</view>
     </view>
   </mp-cell>
-  <mp-cell>
+  <!--mp-cell>
     <view id="detail_1" bindtap="goToDetail" class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
       <view style="width:150rpx;color:orange" >补板底</view>
       <view style="width:150rpx;color:orange" >崔洋</view>
@@ -77,6 +77,6 @@
       <view style="width:150rpx;color:gray" >未开始</view>
       <view style="width:150rpx;color:gray" >--</view>
     </view>
-  </mp-cell>
+  </mp-cell-->
 </mp-cells>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

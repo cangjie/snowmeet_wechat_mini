@@ -8,10 +8,10 @@
   </mp-cell>
   <mp-cell><button bindtap="goToOrdderlistByWaybill" disabled="{{!canSearchByWaybill}}" > 查 询 </button></mp-cell>
   <mp-cell  style="height:72rpx" >
-    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="查询单个订单" value="{{waybillNo}}"  bindinput="waybillNoInput" />
+    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="查询单个订单" value="{{orderId}}"  bindinput="orderIdInput" />
     <view slot="footer" id="orderIdScan" class="weui-vcode-btn" bindtap="scan" >扫一扫</view>
   </mp-cell>
-  <mp-cell><button bindtap="goToSingleOrderDetail"> 查 询 </button></mp-cell>
+  <mp-cell><button bindtap="goToSingleOrderDetail" disabled="{{orderId == ''}}"> 查 询 </button></mp-cell>
   <mp-cell>
     <button bindtap="goToPaymentTest"> 全 部 订 单 </button>
   </mp-cell>
