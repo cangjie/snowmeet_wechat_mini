@@ -1,2 +1,8 @@
 <!--pages/admin/equip_maintain/order_list/order_list_all/order_list_all.wxml-->
-<text>pages/admin/equip_maintain/order_list/order_list_all/order_list_all.wxml</text>
+<view class="flex-wrp" style="flex-direction:row;" >
+  <view><button style="width:180rpx;font-size:8pt">无客服</button></view> 
+  <view><button style="width:180rpx;font-size:8pt">未确认</button></view>
+  <view><button style="width:180rpx;font-size:8pt">进行中</button></view>
+  <view><button style="width:180rpx;font-size:8pt">已完成</button></view>
+</view>
+

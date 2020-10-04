@@ -91,5 +91,10 @@ Page({
     wx.navigateTo({
       url: '/pages/test/pay/pay',
     })
+  },
+  goToOrderListAll: function() {
+    wx.navigateTo({
+      url: '/pages/admin/equip_maintain/order_list/order_list_all/order_list_all',
+    })
   }
 })
