@@ -87,6 +87,7 @@ Page({
       url: '/pages/admin/equip_maintain/order_list/order_detail/order_detail',
     })
   },
+
   goToPaymentTest: function() {
     wx.navigateTo({
       url: '/pages/test/pay/pay',
@@ -95,6 +96,11 @@ Page({
   goToOrderListAll: function() {
     wx.navigateTo({
       url: '/pages/admin/equip_maintain/order_list/order_list_all/order_list_all',
+    })},
+
+  gotoCreateTaskFaceToFace: function() {
+    wx.navigateTo({
+      url: '/pages/admin/equip_maintain/accept_equip/accept_equip',
     })
   }
 })
