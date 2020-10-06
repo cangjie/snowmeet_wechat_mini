@@ -6,6 +6,9 @@ Page({
    */
   data: {
 
+    skiBrandArray:['请选择...', 'APO', 'Fischer', 'Head', 'StockLi', 'Nordica', 'Atomic', '其它...'],
+    boardBrandArray:['请选择...', 'Nitro', 'Burton', 'Capita', 'APO', '其它...'],
+    brandIndex: 0
   },
 
   /**

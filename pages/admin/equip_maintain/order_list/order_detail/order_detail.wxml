@@ -48,7 +48,7 @@
   </mp-cell>
   <mp-cell>
     <view id="detail_1" bindtap="goToDetail" class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
-      <view style="width:150rpx;color:orange" >补板底</view>
+      <view style="width:150rpx;color:orange" >安全检查</view>
       <view style="width:150rpx;color:orange" >崔洋</view>
       <view style="width:150rpx;color:orange" >强行终止</view>
       <view style="width:150rpx;color:orange" >2020-9-1 17:00</view>

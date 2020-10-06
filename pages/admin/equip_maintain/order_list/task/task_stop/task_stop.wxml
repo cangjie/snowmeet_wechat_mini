@@ -33,7 +33,7 @@
   <mp-cell style="height:50rpx">
     <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
       <view  style="font-size:12px;width:150rpx" >任务名称：</view>
-      <view  style="font-size:12px;width:300rpx" >补板底</view>
+      <view  style="font-size:12px;width:300rpx" >安全检查</view>
     </view>
   </mp-cell>
   <mp-cell style="height:50rpx">
