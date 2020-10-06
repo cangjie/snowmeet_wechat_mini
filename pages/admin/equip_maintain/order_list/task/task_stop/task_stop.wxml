@@ -44,6 +44,63 @@
   </mp-cell>
   <mp-cell style="height:50rpx">
     <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
+      <view  style="font-size:12px;width:150rpx" >工序：</view>
+      <view  style="font-size:12px;width:300rpx" >待养护存放区领取雪板</view>
+    </view>
+  </mp-cell>
+
+  <mp-cell style="height:50rpx">
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
+      <view  style="font-size:12px;width:150rpx" >上传照片：</view>
+      <view  style="font-size:12px;width:300rpx" >
+        <mp-uploader title="雪板款式特写" tips="拍雪板的xxx部位，需要N张照片"></mp-uploader>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell style="height:50rpx">
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
+      <view  style="font-size:12px;width:150rpx" >原厂唯一码：</view>
+      <view  style="font-size:12px;width:300rpx" >
+        <input />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell style="height:50rpx">
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
+      <view  style="font-size:12px;width:150rpx" >上传照片：</view>
+      <view  style="font-size:12px;width:300rpx" >
+        <mp-uploader title="雪板原厂唯一码" tips=""></mp-uploader>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell style="height:50rpx">
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
+      <view  style="font-size:12px;width:150rpx" >上传照片：</view>
+      <view  style="font-size:12px;width:300rpx" >
+        <mp-uploader title="代理商RFID" tips=""></mp-uploader>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell style="height:50rpx">
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
+      <view  style="font-size:12px;width:150rpx" >上传照片：</view>
+      <view  style="font-size:12px;width:300rpx" >
+        <mp-uploader title="原固定器间距" tips=""></mp-uploader>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell style="height:50rpx">
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
+      <view  style="font-size:12px;width:150rpx" >上传照片：</view>
+      <view  style="font-size:12px;width:300rpx" >
+        <mp-uploader title="原固定器DIN" tips=""></mp-uploader>
+      </view>
+    </view>
+  </mp-cell>
+
+
+  <!--mp-cell style="height:50rpx">
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
       <view  style="font-size:12px;width:150rpx" >负责人：</view>
       <view  style="font-size:12px;width:300rpx;" >崔洋</view>
     </view>
@@ -90,6 +147,6 @@
       <view style="width:150rpx;color:green" >已完成</view>
       <view style="width:150rpx;color:green" >2020-9-1 17:00</view>
     </view>
-  </mp-cell>
+  </mp-cell-->
 </mp-cells>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
