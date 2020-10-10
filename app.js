@@ -127,7 +127,7 @@ App({
         "text": "订单",
         "iconPath": "images/zhihu-fill.png",
         "selectedIconPath": "images/zhihu-fill-hl.png",
-        "pagePath": "/pages/admin/equip_maintain/uploadimages/uploadimages"
+        "pagePath": "/pages/test/upload/upload"
       },
       {
         "pagePath": "/pages/admin/equip_maintain/uploadimage/uploadimage",

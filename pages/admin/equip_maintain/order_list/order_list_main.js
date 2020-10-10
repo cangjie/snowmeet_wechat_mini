@@ -102,5 +102,10 @@ Page({
     wx.navigateTo({
       url: '/pages/admin/equip_maintain/accept_equip/accept_equip',
     })
+  },
+  tabSwitch: function(source) {
+    wx.navigateTo({
+      url: source.detail.item.pagePath,
+    })
   }
 })
