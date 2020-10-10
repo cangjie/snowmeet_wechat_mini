@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "mp-uploader": "/modules/uploader/uploader"
+  }
+}
