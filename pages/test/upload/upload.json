@@ -1,5 +1,6 @@
 {
   "usingComponents": {
-    "mp-uploader": "/modules/uploader/uploader"
+    "mp-uploader": "/modules/uploader/uploader",
+    "mp-dialog": "/modules/dialog/dialog"
   }
 }

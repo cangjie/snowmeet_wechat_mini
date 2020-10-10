@@ -8,7 +8,12 @@ Page({
    */
   data: {
     files:[],
-
+    buttons: [{text: '取消'}, {text: '确定'}],
+    dialogShow: false,
+    uploadFileArray:[],
+    stepId:['2','7','9'],
+    uploadIndex:0,
+    fileArray:[]
   },
 
   /**
@@ -16,10 +21,20 @@ Page({
    */
   onLoad: function (options) {
     wxloginModule.wxlogin()
+    var fileArray = [this.data.stepId.length]
+    var uploadFileArray = [this.data.stepId.length]
+    for(var i = 0; i < this.data.stepId.length; i++) {
+      fileArray[i] = []
+      uploadFileArray[i] = {stepId: this.data.stepId[i], files: []}
+    }
     this.setData({
       selectFile: this.selectFile.bind(this),
-      uploadFile: this.uploadFile.bind(this)
+      uploadFile: this.uploadFile.bind(this),
+      currentStepId: this.data.stepId[this.data.uploadIndex],
+      fileArray: fileArray,
+      uploadFileArray: uploadFileArray
     })
+    
   },
 
   /**
@@ -102,6 +117,46 @@ Page({
         })
       }
     })
+  },
+  uploadSuccess: function(res) {
+    var detail = res.detail
+  },
+  uploadError: function(res){
+    var detail = res.detail
+  },
+  clickUpload: function(res) {
+    var detail = res.detail
+    this.setData({dialogShow: true})
+  },
+  tapUpload: function(res) {
+    var target = res.currentTarget
+    var id = target.id.split('-')[1].trim()
+    var files = []
+    var uploadFileArray = this.data.uploadFileArray
+    for(var i = 0; i < uploadFileArray.length; i++) {
+      if (uploadFileArray[i].stepId == id) {
+        files = uploadFileArray[i].files
+        break;
+      }
+    }
+    this.setData({currentStepId: id, dialogShow: true, files: files})
+  },
+  tapDialogButton: function(res) {
+    var detail = res.detail
+    if (detail.item.text == '取消') {
+      this.setData({files: [], dialogShow: false})
+    }
+    else {
+      var uploadFileArray = this.data.uploadFileArray
+      for(var i = 0; i < uploadFileArray.length; i++){
+        if (uploadFileArray[i].stepId == this.data.currentStepId) {
+          uploadFileArray[i].files = this.data.files
+          break
+        }
+      }
+      this.setData({uploadFileArray: uploadFileArray, dialogShow: false})
+    }
+    
   }
 
 })
