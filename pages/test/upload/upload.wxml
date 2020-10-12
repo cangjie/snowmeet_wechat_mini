@@ -1,14 +1,5 @@
 <!--pages/test/upload/upload.wxml-->
 <!--text>pages/test/upload/upload.wxml</text-->
-<block wx:for="{{uploadFileArray}}" >
-  <view><button id="btn-{{item.stepId}}" bindtap="tapUpload"> 上 传 图 片 集 {{item.stepId}}</button></view>
-  <view class="flex-wrp" style="flex-direction:row;" >
-    <view wx:for="{{item.files}}"  ><image style="width:150rpx;height:150rpx" src="{{item.url}}" ></image></view>
-  </view>
-  <view> </view>
+<block wx:for="{{stepId}}" >
+  <multi-uploader detail_id="{{item}}" image_count="3" ></multi-uploader>
 </block>
-<mp-dialog title="test" show="{{dialogShow}}" bindbuttontap="tapDialogButton" buttons="{{buttons}}">
-  <view>
-    <mp-uploader  bindfail="uploadError" bindsuccess="uploadSuccess" select="{{selectFile}}" upload="{{uploadFile}}" files="{{files}}" max-count="3" title="图片上传" tips="图片上传提示"   ></mp-uploader>
-  </view>
-</mp-dialog>
