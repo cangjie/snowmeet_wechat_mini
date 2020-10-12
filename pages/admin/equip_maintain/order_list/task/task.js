@@ -1,5 +1,6 @@
-// pages/admin/equip_maintain/order_list/task/task_pending/task_pending.js
-var wxloginModule = require('../../../../../../utils/wxlogin.js')
+// pages/admin/equip_maintain/order_list/task/task.js
+//var wxloginModule = require('../   ../../../../../../utils/wxlogin.js')
+var wxloginnModule = require('../../../../../utils/wxlogin.js')
 const app = getApp()
 Page({
 
@@ -14,9 +15,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    wxloginModule.wxlogin()
-    this.setData({tabbarItemList: app.globalData.adminTabbarItem,
-      tabIndex: 0})
+
   },
 
   /**

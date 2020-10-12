@@ -22,7 +22,7 @@ Page({
     this.setData({tabbarItemList: app.globalData.adminTabbarItem,
       tabIndex: 0})
     this.setData({orderId: options.id})
-    var url = 'https://' + app.globalData.domainName + '/api/maintain_task_get_by_id.aspx?id=' + this.data.orderId+'&sessionkey='+encodeURIComponent(app.globalData.sessionKey.trim())
+    var url = 'https://' + app.globalData.domainName + '/api/maintain_task_get_by_id.aspx?taskid=' + this.data.orderId+'&sessionkey='+encodeURIComponent(app.globalData.sessionKey.trim())
     wx.request({
       url: url,
       success: (res) => {
@@ -118,24 +118,7 @@ Page({
 
   },
   goToDetail: function(res) {
-    var targetUrl = ''
-    switch(res.currentTarget.id) {
-      case "detail_0":
-        targetUrl = '/pages/admin/equip_maintain/order_list/task/task_finish/task_finish'
-        break
-      case 'detail_1':
-        targetUrl = '/pages/admin/equip_maintain/order_list/task/task_stop/task_stop'
-        break
-      case 'detail_2':
-        targetUrl = '/pages/admin/equip_maintain/order_list/task/task_executing/task_executing'
-        break
-      case 'detail_3':
-        targetUrl = '/pages/admin/equip_maintain/order_list/task/task_pending/task_pending'
-        break
-      default:
-        break
-    }
-
+    var targetUrl = '/pages/admin/equip_maintain/order_list/task/task?taskid=' + res.currentTarget.id.trim().split('_')[1]
     wx.navigateTo({
       url: targetUrl,
     })
