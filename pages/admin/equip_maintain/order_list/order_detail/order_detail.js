@@ -23,16 +23,38 @@ Page({
       tabIndex: 0})
     this.setData({orderId: options.id, taskid: options.id})
 
-    var urlSelectTable = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from maintain_task_detail where task_id = ' + this.data.taskid + ' order by sort, [id] ')
+    var urlSelectTable = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from maintain_task_detail left join mini_users on oper_open_id = open_id  where task_id = ' + this.data.taskid + ' order by sort, [id] ')
     wx.request({
       url: urlSelectTable,
       success: (res) => {
         if (res.data.count > 0) {
           var maintain_task_detail_arr = res.data.rows
-          this.setData({maintain_task_detail: res.data.rows})
+          //this.setData({maintain_task_detail: res.data.rows})
+          for(var i = 0; i < maintain_task_detail_arr.length; i++) {
+            maintain_task_detail_arr[i].color = 'gray'
+            if (maintain_task_detail_arr[i].start_date_time != ''){
+              var startDateTime = new Date(maintain_task_detail_arr[i].start_date_time)
+              maintain_task_detail_arr[i].start_date_time = startDateTime.getFullYear().toString() + '-' + (startDateTime.getMonth() + 1).toString() + '-' + startDateTime.getDate().toString() + ' ' + startDateTime.getHours().toString() + ':' + startDateTime.getMinutes().toString()
+            }
+            else {
+              maintain_task_detail_arr[i].start_date_time = ''
+            }
+            if (maintain_task_detail_arr[i].real_name == ''){
+              maintain_task_detail_arr[i].real_name = '--'
+            }
+            switch(maintain_task_detail_arr[i].status) {
+              case '已开始':
+                maintain_task_detail_arr[i].color = 'red'
+                break
+              default:
+                break
+            } 
+          }
+          this.setData({maintain_task_detail: maintain_task_detail_arr})
         }
       }
     })
+    
   },
 
   /**

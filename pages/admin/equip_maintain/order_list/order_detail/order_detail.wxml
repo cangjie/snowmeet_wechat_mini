@@ -15,10 +15,10 @@
   </mp-cell>
   <mp-cell wx:for="{{maintain_task_detail}}" >
     <view id="detail_{{item.id}}" bindtap="goToDetail" class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
-      <view style="width:150rpx;color:gray" >{{item.name}}</view>
-      <view style="width:150rpx;color:gray" >--</view>
-      <view style="width:150rpx;color:gray" >未开始</view>
-      <view style="width:150rpx;color:gray" >--</view>
+      <view style="width:150rpx;color:{{item.color}}" >{{item.name}}</view>
+      <view style="width:150rpx;color:{{item.color}}" >{{item.real_name}}</view>
+      <view style="width:150rpx;color:{{item.color}}" >{{item.status}}</view>
+      <view style="width:150rpx;color:{{item.color}}" >{{item.start_date_time}}</view>
     </view>
   </mp-cell>
   <!--mp-cell>
