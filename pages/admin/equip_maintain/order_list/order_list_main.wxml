@@ -4,15 +4,15 @@
     <button style="width:400rpx" bindtap="goToAssign" > 未 分 配 客 服 订 单 </button>
   </mp-cell>
   <mp-cell  style="height:72rpx" >
-    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="输入或扫描快递单号" value="{{waybillNo}}"  bindinput="waybillNoInput" />
-    <view slot="footer" class="weui-vcode-btn" bindtap="scan" >扫一扫</view>
+    <input bindinput="waybillNoInputChange" data-field="mobile" class="weui-input" placeholder="输入或扫描快递单号" value="{{waybillNo}}"    />
+    <view slot="footer" id="waybillScan" class="weui-vcode-btn" bindtap="scanWaybill" >扫一扫</view>
   </mp-cell>
-  <mp-cell><button bindtap="goToOrdderlistByWaybill"> 查 询 </button></mp-cell>
+  <mp-cell><button bindtap="goToOrdderlistByWaybill" disabled="{{!canSearchByWaybill}}" > 查 询 </button></mp-cell>
   <mp-cell  style="height:72rpx" >
-    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="查询单个订单" value="{{waybillNo}}"  bindinput="waybillNoInput" />
-    <view slot="footer" class="weui-vcode-btn" bindtap="scan" >扫一扫</view>
+    <input bindinput="formInputChange" data-field="mobile" class="weui-input" placeholder="查询单个订单" value="{{orderId}}"  bindinput="orderIdInput" />
+    <view slot="footer" id="orderIdScan" class="weui-vcode-btn" bindtap="scan" >扫一扫</view>
   </mp-cell>
-  <mp-cell><button bindtap="goToSingleOrderDetail"> 查 询 </button></mp-cell>
+  <mp-cell><button bindtap="goToSingleOrderDetail" disabled="{{orderId == ''}}"> 查 询 </button></mp-cell>
   <mp-cell>
     <!--button bindtap="goToPaymentTest"> 全 部 订 单 </button-->
     <button bindtap="goToOrderListAll"> 全 部 订 单 </button>

@@ -1,0 +1,26 @@
+<view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx;margin-left:10rpx;margin-top:10rpx">
+  <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
+    <view style="height:105rpx">
+      <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
+      </view>
+      <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
+  </view>
+  <view style="width:500rpx;margin-left:10rpx;flex-direction:column" >
+    <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
+        <view style="width:250rpx" >订单号: xxxxxxx</view> 
+        <view style="width:250rpx" >下单日期: yyyy-mm-dd</view>
+      </view>
+      <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
+        <view style="width:250rpx" >下单方式: 线上</view> 
+        <view style="width:250rpx">套餐卡号: xxx-xxx-xxx</view>
+      </view>
+      <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
+        <view style="width:250rpx" >套餐金额: 200</view> 
+        <view style="width:250rpx">业务类型: 装备养护</view>
+      </view>
+      <view class="flex-wrp" style="font-size:12px;flex-direction:row;margin-top:0rpx">
+        <view style="width:250rpx" >装备类型: 单板</view> 
+        <view style="width:250rpx"></view>
+      </view>
+  </view>
+</view>

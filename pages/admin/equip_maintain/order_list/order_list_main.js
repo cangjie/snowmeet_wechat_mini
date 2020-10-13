@@ -8,7 +8,9 @@ Page({
    * Page initial data
    */
   data: {
-
+    waybillNo:'',
+    orderId: '',
+    canSearchByWaybill:false
   },
 
   /**
@@ -74,7 +76,7 @@ Page({
   },
   goToOrdderlistByWaybill: function() {
     wx.navigateTo({
-      url: '/pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill',
+      url: '/pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill?waybillno=' + this.data.waybillNo,
     })
   },
   goToAssign: function() {
@@ -84,7 +86,7 @@ Page({
   },
   goToSingleOrderDetail: function() {
     wx.navigateTo({
-      url: '/pages/admin/equip_maintain/order_list/order_detail/order_detail',
+      url: '/pages/admin/equip_maintain/order_list/order_detail/order_detail?id=' + this.data.orderId,
     })
   },
 
@@ -93,19 +95,26 @@ Page({
       url: '/pages/test/pay/pay',
     })
   },
-  goToOrderListAll: function() {
-    wx.navigateTo({
-      url: '/pages/admin/equip_maintain/order_list/order_list_all/order_list_all',
-    })},
 
-  gotoCreateTaskFaceToFace: function() {
-    wx.navigateTo({
-      url: '/pages/admin/equip_maintain/accept_equip/accept_equip',
+  scanWaybill: function(source) {
+    wx.scanCode({
+      onlyFromCamera: false,
+      success: (res) => {
+        wx.navigateTo({
+          url: '/pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill?waybillno=' + res.result
+        })
+      }
     })
   },
-  tabSwitch: function(source) {
-    wx.navigateTo({
-      url: source.detail.item.pagePath,
-    })
+  waybillNoInputChange: function(source) {
+    if (source.detail.value.toString().trim() == '' ) {
+      this.setData({canSearchByWaybill: false})
+    }
+    else {
+      this.setData({canSearchByWaybill: true, waybillNo: source.detail.value})
+    }
+  },
+  orderIdInput: function(source) {
+    this.setData({orderId: source.detail.value})
   }
 })

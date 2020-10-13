@@ -8,7 +8,7 @@
     "mp-checkbox-group": "../../../../modules/checkbox-group/checkbox-group",
     "mp-form": "../../../../modules/form/form",
     "mp-uploader": "../../../../modules/uploader/uploader",
-    "mp-dialog": "../../../../modules/dialog/dialog"
+    "task-info": "../../../../components/maintain_task_description/maintain_task_description"
   },
-  "navigationBarTitleText": "根据快递单查找维护订单"
+  "navigationBarTitleText": "任务详情"
 }

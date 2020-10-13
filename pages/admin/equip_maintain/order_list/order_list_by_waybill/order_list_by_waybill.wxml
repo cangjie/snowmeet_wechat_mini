@@ -1,9 +1,9 @@
 <mp-cells title="" footer="">
   <mp-cell prop="waybillNo" title="" ext-class=" weui-cell_vcode">
-    <view>快递单号: xxxxxxxxxxxxxxx</view>
-    <view>订单数量: x</view>
+    <view>快递单号: {{waybillNo}}</view>
+    <view>订单数量: {{maintain_task_count}}</view>
     <view>
-      <radio-group>
+      <radio-group id="waybill_radio_{{waybillNo}}" bindchange="checkWaybill" >
         <radio value="yes" ></radio>签收无误 <radio value="no" ></radio>签收有误
       </radio-group>
     </view>
@@ -11,48 +11,36 @@
 </mp-cells>
 
 <mp-cells ext-class="my-cells" title="带说明的列表项">
-    <mp-cell id="1" style="height:200rpx; margin-top:0rpx" bindtap="clickOrder"  >
-      <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx">
-        <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
-          <view style="height:105rpx">
-            <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
+    <block wx:for="{{maintain_task_arr}}" wx:for-item="task" >
+      <block wx:for="{{associateUserInfo}}" wx:for-item="user" >
+        <mp-cell wx:if="{{task.open_id == user.open_id}}" id="1" style="height:200rpx; margin-top:0rpx" bindtap="clickOrder"  >
+          <view class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx">
+            <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
+              <view style="height:105rpx">
+                <image style="width:100rpx;height:100rpx" src="{{user.head_image}}"></image>
+              </view>
+              <view style="margin-top:1rpx;font-size:12px" >{{task.contact_name}}</view>
+            </view>
+            <view style="margin-left:10rpx;flex-direction:column" >
+              <view style="font-size:12px">卡号: {{task.card_no}}  手机:{{user.cell_number}}</view>
+              <view style="font-size:12px">物品: {{task.send_item}}</view>
+              <view style="font-size:12px">雪场: 万龙 寄存牌号: {{task.wanlong_no}}</view>
+              <view style="font-size:12px">
+                <radio-group id="task_radio_{{task.id}}" bindchange="checkTask">
+                  <radio value="yes" ></radio>核对无误  <radio value="no" ></radio>核对有误
+                </radio-group>
+              </view>
+            </view>
           </view>
-          <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
-        </view>
-        <view style="margin-left:10rpx;flex-direction:column" >
-          <view style="font-size:12px">卡号: xxx-xxx-xxx  手机:13501177897</view>
-          <view style="font-size:12px">物品: 寄存牌</view>
-          <view style="font-size:12px">雪场: 万龙 寄存牌号: G-23</view>
-          <view style="font-size:12px">
-            <radio-group>
-              <radio ></radio>核对无误  <radio ></radio>核对有误
-            </radio-group>
-          </view>
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell id="2" style="height:200rpx; margin-top:0rpx"  bindtap="clickOrder">
-      <view  class="flex-wrp" style="flex-direction:row;height:130rpx;margin-top:0rpx"  >
-        <view class="flex-wrp" style="flex-direction:column;height:120rpx;margin-top:1rpx">
-          <view style="height:105rpx">
-            <image style="width:100rpx;height:100rpx" src="http://thirdwx.qlogo.cn/mmopen/qE9MKluetOmAdicYiaLTickd4PMHcyDxib5N36S1g8SAWoGZjvd8HSLRKcpibom0ZJzwDQt4ibuqFAhOnqicMW30FRPsWF6NCDsfpoB/132"></image>
-          </view>
-          <view style="margin-top:1rpx;font-size:12px" >苍杰</view>
-        </view>
-        <view style="margin-left:10rpx;flex-direction:column" >
-          <view style="font-size:12px">卡号: xxx-xxx-xxx  手机:13501177897</view>
-          <view style="font-size:12px">物品: 单板</view>
-          <view style="font-size:12px">品牌: Nitro</view>
-          <view style="font-size:12px">
-            <radio-group>
-              <radio ></radio>核对无误  <radio ></radio>核对有误
-            </radio-group>
-          </view>
-        </view>
-      </view>
-    </mp-cell>
+        </mp-cell>
+      </block>
+    </block>
     <mp-cell>
-      <button> 提 交 </button>
+      <button bindtouchend="submit" > 提 交 </button>
     </mp-cell>
 </mp-cells>
+<mp-dialog title="{{msgTitle}}" show="{{dialogShow}}" bindbuttontap="tabDialogButton" buttons="{{dialogButton}}">
+  <view wx:if="{{msgTitle!='快递有误'}}" >{{msgBody}}</view>
+  <input wx:if="{{msgTitle=='快递有误'}}" placeholder="{{msgBody}}" bindinput="inputMemo" ></input>
+</mp-dialog>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
