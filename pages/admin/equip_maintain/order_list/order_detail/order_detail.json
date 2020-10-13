@@ -7,7 +7,8 @@
     "mp-checkbox": "../../../../modules/checkbox/checkbox",
     "mp-checkbox-group": "../../../../modules/checkbox-group/checkbox-group",
     "mp-form": "../../../../modules/form/form",
-    "mp-uploader": "../../../../modules/uploader/uploader"
+    "mp-uploader": "../../../../modules/uploader/uploader",
+    "task-info": "../../../../components/maintain_task_description/maintain_task_description"
   },
   "navigationBarTitleText": "订单详情"
 }

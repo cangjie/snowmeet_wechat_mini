@@ -8,14 +8,24 @@ Page({
    * Page initial data
    */
   data: {
-
+    taskId: '0'
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-
+    this.setData({taskid: options.taskid})
+    var detailId = options.detailid
+    var urlSelectTable = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from maintain_task_detail where [id] = ' + detailId )
+    wx.request({
+      url: urlSelectTable,
+      success: (res) => {
+        if (res.data.count>0){
+          this.setData({maintainTaskDetail: res.data.rows[0]})
+        }
+      }
+    })
   },
 
   /**

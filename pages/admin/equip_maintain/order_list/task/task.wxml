@@ -1,7 +1,7 @@
 <!--pages/admin/equip_maintain/order_list/task/task_finish/task_finish.wxml-->
 <mp-cells ext-class="my-cells" title="基本信息">
   <mp-cell style="height:200rpx; margin-top:0rpx" >
-    <task-info taskid="5" ></task-info>
+    <task-info taskid="{{taskid}}" ></task-info>
   </mp-cell>
 </mp-cells>
 <mp-cells ext-class="my-cells" title="任务信息">
