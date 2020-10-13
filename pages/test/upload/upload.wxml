@@ -1,5 +1,5 @@
 <!--pages/test/upload/upload.wxml-->
 <!--text>pages/test/upload/upload.wxml</text-->
 <block wx:for="{{stepId}}" >
-  <multi-uploader detail_id="{{item}}" image_count="3" ></multi-uploader>
+  <multi-uploader id="{{item}}" image_count="5" bindUploadEvent="uploaded" ></multi-uploader>
 </block>

@@ -157,6 +157,9 @@ Page({
       this.setData({uploadFileArray: uploadFileArray, dialogShow: false})
     }
     
+  },
+  uploaded: function(res) {
+    var detail = res.detail
   }
 
 })

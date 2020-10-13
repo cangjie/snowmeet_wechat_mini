@@ -56,6 +56,7 @@ Component({
                 filesData.push({url: 'https://' + app.globalData.domainName + uploadFilesData[i]})
               }
               this.setData({files: filesData})
+              this.triggerEvent('UploadEvent', {files: filesData})
               console.log(res)
             },
             fail: (res)=>{
