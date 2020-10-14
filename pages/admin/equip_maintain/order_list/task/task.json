@@ -8,7 +8,8 @@
     "mp-checkbox-group": "../../../../modules/checkbox-group/checkbox-group",
     "mp-form": "../../../../modules/form/form",
     "mp-uploader": "../../../../modules/uploader/uploader",
-    "task-info": "../../../../components/maintain_task_description/maintain_task_description"
+    "task-info": "../../../../components/maintain_task_description/maintain_task_description",
+    "multi-uploader": "../../../../components/uploader/multi-uploader"
   },
   "navigationBarTitleText": "任务详情"
 }

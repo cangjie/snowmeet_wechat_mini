@@ -8,22 +8,22 @@
   <mp-cell style="height:50rpx">
     <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
       <view  style="font-size:12px;width:150rpx" >任务名称：</view>
-      <view  style="font-size:12px;width:300rpx" >取板</view>
+      <view  style="font-size:12px;width:300rpx" >{{maintainTaskDetail.name}}</view>
     </view>
   </mp-cell>
   <mp-cell style="height:50rpx">
     <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
       <view  style="font-size:12px;width:150rpx" >任务状态：</view>
-      <view  style="font-size:12px;width:300rpx;color:gray" >未开始</view>
+      <view  style="font-size:12px;width:300rpx;color:{{color}}" >{{maintainTaskDetail.status}}</view>
     </view>
   </mp-cell>
   <mp-cell style="height:50rpx">
     <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
       <view  style="font-size:12px;width:150rpx" >负责人：</view>
-      <view  style="font-size:12px;width:300rpx;" >--</view>
+      <view  style="font-size:12px;width:300rpx;" >{{operRealName}}</view>
     </view>
   </mp-cell>
-  <mp-cell style="height:50rpx">
+  <!--mp-cell style="height:50rpx">
     <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx;margin-left:10rpx" >
       <view  style="font-size:12px;width:150rpx" >特殊需求：</view>
       <view  style="font-size:12px;width:300rpx;color:green" >--</view>
@@ -40,20 +40,74 @@
       <view  style="font-size:12px;width:150rpx" >工作照片：</view>
       <view  style="font-size:12px;width:300rpx;color:green" >--</view>
     </view>
-  </mp-cell>
-  <mp-cell>
-    <button> 开 始 任 务  </button>
-  </mp-cell>
+  </mp-cell-->
+
+  
+  <block wx:if="{{maintainTaskDetail.status == '未开始'}}" >
+    <mp-cell>
+      <button> 开 始 任 务  </button>
+    </mp-cell>
+  </block>
+  <block wx:if="{{maintainTaskDetail.status == '已开始'}}" >
+    <mp-cell>
+      <button> 保 存 </button>
+    </mp-cell>
+    <mp-cell>
+      <button style="color:green" > 设 置 完 成 </button>
+    </mp-cell>
+    <mp-cell>
+      <button style="color:orange" > 强 行 中 止 </button>
+    </mp-cell>
+  </block>
 </mp-cells>
-<mp-cells ext-class="my-cells" title="下一步">
-  <mp-cell>
-    <view id="detail_4" bindtap="goToDetail" class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
-      <view style="width:150rpx;color:gray" >交付</view>
-      <view style="width:150rpx;color:gray" >--</view>
-      <view style="width:150rpx;color:gray" >未开始</view>
-      <view style="width:150rpx;color:gray" >--</view>
+<mp-cells ext-class="my-cells" title="任务详情({{maintainTaskDetailSub.length}})">
+  <block wx:for="{{maintainTaskDetailSub}}" >
+    <block wx:if="{{item.action_type == '工序'}}"  >
+      <mp-cell>
+        <view  class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
+          <view style="width:50rpx" >{{item.no}}</view>
+          <view>{{item.action_type}}:{{item.action_to_do}}</view>
+        </view>
+      </mp-cell>
+    </block>
+    <block wx:if="{{item.action_type == '填写'}}"  >
+      <mp-cell>
+        <view  class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
+          <view style="width:50rpx" >{{item.no}}</view>
+          <view>
+            {{item.action_type}}:{{item.action_to_do}}
+            <input placeholder="{{item.action_to_do}}" />
+          </view>
+        </view>
+      </mp-cell>
+    </block>
+    <block wx:if="{{item.action_type == '拍照'}}"  >
+      <mp-cell style="height:500rpx">
+        <view  class="flex-wrp" style="flex-direction:row;height:500rpx;margin-top:1rpx;font-size:12px">
+          <view style="width:50rpx;height:500rpx" >{{item.no}}</view>
+          <view style="height:500rpx" >
+            <multi-uploader title="拍照：{{item.action_to_do}}" image_count="3" detail_id="{{item.id}}" ></multi-uploader>
+          </view>
+        </view>
+      </mp-cell>
+    </block>
+  </block>
+  <!--mp-cell wx:for="{{maintainTaskDetailSub}}" >
+    <view  class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
+      <view style="width:50rpx" >{{item.no}}</view>
+      <view>
+        <block wx:if="{{item.action_type == '工序'}}" >
+          <view id="view_{{item.no}}" >{{item.action_type}}:{{item.action_to_do}}</view>
+        </block>
+        <block wx:if="{{item.action_type == '拍照'}}" >
+          <mp-uploader ></mp-uploader>
+        </block>
+        <block wx:if="{{item.action_type == '填写'}}" >
+          <input placeholder="{{item.action_to_do}}" />
+        </block>
+      </view>
     </view>
-  </mp-cell>
+  </mp-cell-->
 </mp-cells>
 <mp-cells ext-class="my-cells" title="上一步">
   <mp-cell>

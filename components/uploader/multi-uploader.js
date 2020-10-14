@@ -12,6 +12,10 @@ Component({
     image_count: {
       type: String,
       value: '3'
+    },
+    title:{
+      type: String,
+      value: ''
     }
   },
   /**
