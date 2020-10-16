@@ -9,7 +9,8 @@ Page({
    */
   data: {
     taskId: '0',
-    uploadedFiles: []
+    uploadedFiles: [],
+    inputedContents:[]
   },
 
   /**
@@ -146,5 +147,21 @@ Page({
       uploadedFiles.push({id: detailId, files: source.detail.files})
     }
     this.setData(uploadedFiles, uploadedFiles)
+  },
+  inputed: function(source) {
+    var detailId = source.currentTarget.id.split('_')[1].trim()
+    var word = source.detail.value.trim()
+    var done = false
+    var inputedContents = this.data.inputedContents
+    for(var i = 0; i < inputedContents.length; i++) {
+      if (inputedContents[i].id == detailId) {
+        inputedContents[i].content = word.trim()
+        done = true
+        break
+      }
+    }
+    if (!done) {
+      inputedContents.push({id: detailId, content: word})
+    }
   }
 })

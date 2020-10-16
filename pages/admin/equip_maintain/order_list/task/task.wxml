@@ -76,7 +76,7 @@
           <view style="width:50rpx" >{{item.no}}</view>
           <view>
             {{item.action_type}}:{{item.action_to_do}}
-            <input placeholder="{{item.action_to_do}}" />
+            <input id="input_{{item.id}}" bindinput="inputed"  placeholder="{{item.action_to_do}}" />
           </view>
         </view>
       </mp-cell>
