@@ -60,7 +60,7 @@ Component({
                 filesData.push({url: 'https://' + app.globalData.domainName + uploadFilesData[i]})
               }
               this.setData({files: filesData})
-              this.triggerEvent('UploadEvent', {files: filesData})
+              this.triggerEvent('Uploaded', {files: filesData}, "100")
               console.log(res)
             },
             fail: (res)=>{

@@ -8,7 +8,8 @@ Page({
    * Page initial data
    */
   data: {
-    taskId: '0'
+    taskId: '0',
+    uploadedFiles: []
   },
 
   /**
@@ -129,5 +130,21 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  uploaded: function(source, option) {
+    var detailId = source.currentTarget.id.split('_')[1].trim()
+    var uploadedFiles = this.data.uploadedFiles
+    var done = false
+    for(var i = 0; i < uploadedFiles.length; i++) {
+      if (uploadedFiles[i].id == detailId) {
+        uploadedFiles[i].files = source.detail.files
+        done = true
+        break
+      }
+    }
+    if (!done) {
+      uploadedFiles.push({id: detailId, files: source.detail.files})
+    }
+    this.setData(uploadedFiles, uploadedFiles)
   }
 })

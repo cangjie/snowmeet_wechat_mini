@@ -86,7 +86,7 @@
         <view  class="flex-wrp" style="flex-direction:row;height:500rpx;margin-top:1rpx;font-size:12px">
           <view style="width:50rpx;height:500rpx" >{{item.no}}</view>
           <view style="height:500rpx" >
-            <multi-uploader title="拍照：{{item.action_to_do}}" image_count="3" detail_id="{{item.id}}" ></multi-uploader>
+            <multi-uploader id="upload_{{item.id}}" title="拍照：{{item.action_to_do}}" image_count="3" detail_id="{{item.id}}" bindUploaded="uploaded" ></multi-uploader>
           </view>
         </view>
       </mp-cell>
