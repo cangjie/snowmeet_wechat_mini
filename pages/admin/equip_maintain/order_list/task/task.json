@@ -9,7 +9,8 @@
     "mp-form": "../../../../modules/form/form",
     "mp-uploader": "../../../../modules/uploader/uploader",
     "task-info": "../../../../components/maintain_task_description/maintain_task_description",
-    "multi-uploader": "../../../../components/uploader/multi-uploader"
+    "multi-uploader": "../../../../components/uploader/multi-uploader",
+    "ski-board-base-info": "../../../../components/ski_board_base_info/ski_board_base_info"
   },
   "navigationBarTitleText": "任务详情"
 }

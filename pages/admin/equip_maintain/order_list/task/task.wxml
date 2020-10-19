@@ -70,6 +70,16 @@
         </view>
       </mp-cell>
     </block>
+    <block wx:if="{{item.action_to_do == '雪板类别：单板/双板'}}"  >
+      <mp-cell style="height:500rpx">
+        <view  class="flex-wrp" style="flex-direction:row;height:500rpx;margin-top:1rpx;font-size:12px">
+          <view style="width:50rpx;height:500rpx" >{{item.no}}</view>
+          <view style="height:500rpx" >
+            <ski-board-base-info ></ski-board-base-info>
+          </view>
+        </view>
+      </mp-cell>
+    </block>
     <block wx:if="{{item.action_type == '填写'}}"  >
       <mp-cell>
         <view  class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">

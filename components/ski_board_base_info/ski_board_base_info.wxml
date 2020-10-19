@@ -1,0 +1,20 @@
+<view class="flex-wrp" style="flex-direction:row;height:100rpx" >
+  <radio-group>
+    <radio checked="true" > 双 板 </radio> / 
+    <radio> 单 板 </radio>
+  </radio-group>
+</view>
+<view style="color:gray" style="height:100rpx" >
+  <input bindtap="selectSkiBoardInfo"  disabled="true" placeholder="选择品牌" />
+</view>
+<view style="color:gray;height:100rpx">
+  <input  disabled="true" placeholder="选择系列" />
+</view>
+<view style="color:gray;height:100rpx">
+  <picker id="year"  bindchange="bindPickerChange" range="{{years}}" value="{{yearIndex}}" >
+    <view class="picker" >年份：{{years[yearIndex]}}</view>
+  </picker>
+</view>
+<view style="color:gray;height:100rpx">
+  <input disabled="true" placeholder="选择长度" />
+</view>
