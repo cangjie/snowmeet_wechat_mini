@@ -5,7 +5,7 @@
   </radio-group>
 </view>
 <view style="color:gray" style="height:100rpx" >
-  <input bindtap="selectSkiBoardInfo"  disabled="true" placeholder="选择品牌" />
+  <input  bindtap="selectSkiBoardInfo"  disabled="true" placeholder="选择品牌" />
 </view>
 <view style="color:gray;height:100rpx">
   <input  disabled="true" placeholder="选择系列" />
@@ -15,7 +15,7 @@
 </view>
 <view class="flex-wrp" style="flex-direction:row;color:gray;height:100rpx;margin-top:0rpx">
   <view style="width:100rpx;height:100rpx">年份：</view>
-  <picker id="year"  style="width:100rpx;height:100rpx;margin-top:0rpx"  bindchange="bindPickerChange" range="{{years}}" value="{{yearIndex}}" >
+  <picker id="year"  style="width:100rpx;height:100rpx;margin-top:0rpx" bindchange="yearPickerChange"   range="{{years}}" value="{{yearIndex}}" >
     <view class="picker" style="width:100rpx;margin-top:0rpx;height:100rpx;" >{{years[yearIndex]}}</view>
   </picker>
 </view>
