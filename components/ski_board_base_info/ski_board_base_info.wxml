@@ -1,21 +1,39 @@
 <view class="flex-wrp" style="flex-direction:row;height:100rpx" >
-  <radio-group>
-    <radio checked="true" > 双 板 </radio> / 
-    <radio> 单 板 </radio>
+  <radio-group bindtap="showPickerDialog" >
+    <radio id="radio_1" checked="true" value="双板" > 双 板 </radio> / 
+    <radio id="radio_2" value="单板" > 单 板 </radio>
   </radio-group>
 </view>
 <view style="color:gray" style="height:100rpx" >
-  <input  bindtap="selectSkiBoardInfo"  disabled="true" placeholder="选择品牌" />
+  <input  id="txtBrand" bindtap="selectSkiBoardInfo"  disabled="{{txtBrandDisable}}" placeholder="选择品牌" value="{{confirmedFilledInfo.brand}}" />
 </view>
 <view style="color:gray;height:100rpx">
-  <input  disabled="true" placeholder="选择系列" />
+  <input id="txtSerial"  placeholder="选择系列" disabled="{{txtSerialDisable}}"  value="{{confirmedFilledInfo.serial}}"/>
 </view>
 <view style="color:gray;height:100rpx">
-  <input disabled="true" placeholder="选择长度" />
+  <input id="txtScale" disabled="{{txtScaleDisable}}" placeholder="选择长度" value="{{confirmedFilledInfo.scale}}" />
 </view>
 <view class="flex-wrp" style="flex-direction:row;color:gray;height:100rpx;margin-top:0rpx">
   <view style="width:100rpx;height:100rpx">年份：</view>
-  <picker id="year"  style="width:100rpx;height:100rpx;margin-top:0rpx" bindchange="yearPickerChange"   range="{{years}}" value="{{yearIndex}}" >
+  <picker id="year"  style="width:100rpx;height:100rpx;margin-top:0rpx" bindchange="yearPickerChange"   range="{{years}}" value="{{yearIndex}}" disabled="{{yearDisable}}" >
     <view class="picker" style="width:100rpx;margin-top:0rpx;height:100rpx;" >{{years[yearIndex]}}</view>
   </picker>
 </view>
+<mp-dialog title="test" style="width:100%" show="{{dialogShow}}" bindbuttontap="tapDialogButton" buttons="{{dialogButtons}}">
+  <view>
+    <picker-view indicator-style="height: 50px;" style="width: 100%; height: 300px;" value="" bindchange="pickerViewChange">
+      <picker-view-column>
+        <view wx:for="{{brandList}}" wx:key="{{brandList}}" style="line-height: 50px; text-align: center;">{{item}}</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view wx:for="{{serialList}}" wx:key="{{serialList}}" style="line-height: 50px; text-align: center;">{{item}}</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view wx:for="{{scaleList}}" wx:key="{{scaleList}}" style="line-height: 50px; text-align: center;">{{item}}</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view wx:for="{{yearList}}" wx:key="{{yearList}}" style="line-height: 50px; text-align: center;">{{item}}</view>
+      </picker-view-column>
+    </picker-view>
+  </view>
+</mp-dialog>
