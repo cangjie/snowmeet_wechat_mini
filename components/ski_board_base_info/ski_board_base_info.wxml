@@ -4,7 +4,7 @@
     <radio id="radio_2" value="单板" > 单 板 </radio>
   </radio-group>
 </view>
-<view style="color:gray" style="height:100rpx" >
+<view style="color:gray;height:100rpx">
   <input  id="txtBrand" bindtap="selectSkiBoardInfo"  disabled="{{txtBrandDisable}}" placeholder="选择品牌" value="{{confirmedFilledInfo.brand}}" />
 </view>
 <view style="color:gray;height:100rpx">
@@ -19,7 +19,8 @@
     <view class="picker" style="width:100rpx;margin-top:0rpx;height:100rpx;" >{{years[yearIndex]}}</view>
   </picker>
 </view>
-<mp-dialog title="test" style="width:100%" show="{{dialogShow}}" bindbuttontap="tapDialogButton" buttons="{{dialogButtons}}">
+<mp-dialog title="test" style="width:100%" show="{{dialogShow}}" bindbuttontap="tapDialogButton" buttons="{{dialogButtons}}"  >
+  
   <view>
     <picker-view id="pv" indicator-style="height: 50px;" style="width: 100%; height: 300px;" value="{{pickViewValue}}" bindchange="pickerViewChange">
       <picker-view-column id="pvc_brand" >
@@ -36,4 +37,5 @@
       </picker-view-column>
     </picker-view>
   </view>
+  <view>{{dialogTitle}}</view>
 </mp-dialog>

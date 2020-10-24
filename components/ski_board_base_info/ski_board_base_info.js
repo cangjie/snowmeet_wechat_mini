@@ -46,7 +46,6 @@ Component({
     yearIndex: 0,
     dialogButtons: [{text: '取消'}, {text: '确定'}],
     dialogShow: false,
-    userFilledInfo:{},
     confirmedFilledInfo: {
       type: '双板',
       brand: '',
@@ -63,7 +62,8 @@ Component({
     txtSerialDisable: true,
     txtScaleDisable: true,
     yearDisable: true,
-    pickViewValue:[0,0,0,0]
+    pickViewValue:[0,0,0,0],
+    dialogTitle:''
   },
 
   /**
@@ -109,25 +109,18 @@ Component({
         type = "单板"
       }
       var confirmedFilledInfo = this.data.confirmedFilledInfo
-      confirmedFilledInfo.type = type
-      confirmedFilledInfo.brand = ''
-      confirmedFilledInfo.serial = ''
-      confirmedFilledInfo.scale = ''
-      confirmedFilledInfo.year = ''
-      var userFilledInfo = this.data.userFilledInfo
-      if (userFilledInfo.type != type) {
-        userFilledInfo.type = type
-        userFilledInfo.brand = ''
-        userFilledInfo.serial = ''
-        userFilledInfo.scale = ''
-        userFilledInfo.year = ''
+      if (confirmedFilledInfo.type != type) {
+        confirmedFilledInfo.type = type
+        confirmedFilledInfo.brand = ''
+        confirmedFilledInfo.serial = ''
+        confirmedFilledInfo.scale = ''
+        confirmedFilledInfo.year = ''
       }
-      this.setData({dialogShow: true, userFilledInfo: userFilledInfo, confirmedFilledInfo: confirmedFilledInfo})
+      this.setData({dialogShow: true, confirmedFilledInfo: confirmedFilledInfo})
       this.fillPickView()
     },
     fillPickView: function() {
       var allSkiBoardScales = this.data.allSkiBoardScales
-      var userFilledInfo = this.data.userFilledInfo
       var pickViewValue = this.data.pickViewValue
       var brandList = []
       var serialList = []
@@ -141,56 +134,43 @@ Component({
       var serialIndex = 0
       var scaleIndex = 0
       var yearIndex = 0
-
+      var currentBrand = ''
+      var currentSerial = ''
+      var currentScale = ''
+      var currentYear = ''
+      var info = this.data.confirmedFilledInfo
       for(var i = 0; i < allSkiBoardScales.length; i++) {
-        if (allSkiBoardScales[i].type==userFilledInfo.type) {   // && lastBrand != allSkiBoardScales[i].brand) {
+        if (allSkiBoardScales[i].type==info.type) {
           if (lastBrand != allSkiBoardScales[i].brand) {
-            if (userFilledInfo.brand == allSkiBoardScales[i].brand) {
-              pickViewValue[0] = brandIndex
-            }
             brandList.push(allSkiBoardScales[i].brand)
-            brandIndex++
             lastBrand = allSkiBoardScales[i].brand
+            if (brandIndex == pickViewValue[0]) {
+              currentBrand = allSkiBoardScales[i].brand
+            }
+            brandIndex++
           }
-          if (userFilledInfo.brand == ''){
-            userFilledInfo.brand = allSkiBoardScales[i].brand
-          }
-          if (userFilledInfo.brand == allSkiBoardScales[i].brand) {
-            if (lastSerial != allSkiBoardScales[i].serial) {
-              if (userFilledInfo.serial == allSkiBoardScales[i].serial) {
-                pickViewValue[1] = serialIndex
-              }
+          if (currentBrand == allSkiBoardScales[i].brand) {
+            if (lastSerial != allSkiBoardScales[i].serial){
               serialList.push(allSkiBoardScales[i].serial)
-              serialIndex++
               lastSerial = allSkiBoardScales[i].serial
-            }
-            
-            if (userFilledInfo.serial == '') {
-              userFilledInfo.serial = allSkiBoardScales[i].serial
-            }
-            if (userFilledInfo.serial == allSkiBoardScales[i].serial) {
-              if (lastScale != allSkiBoardScales[i].scale) {
-                if (userFilledInfo.scale == allSkiBoardScales[i].scale) {
-                  pickViewValue[2] = scaleIndex
-                }
-                scaleList.push(allSkiBoardScales[i].scale)
-                scaleIndex++
-                lastScale = allSkiBoardScales[i].scale
+              if (serialIndex == pickViewValue[1]) {
+                currentSerial = allSkiBoardScales[i].serial
               }
-              if (userFilledInfo.scale == '') {
-                userFilledInfo.scale = allSkiBoardScales[i].scale
-              }
-              if (userFilledInfo.scale == allSkiBoardScales[i].scale) {
-                if (lastYear != allSkiBoardScales[i].year) {
-                  if (userFilledInfo.year == allSkiBoardScales[i].year) {
-                    pickViewValue[3] = yearIndex
-                  }
-                  yearList.push(allSkiBoardScales[i].year)
-                  yearIndex++
-                  lastYear = allSkiBoardScales[i].year
-                }
-              }
+              serialIndex++
             }
+          }
+          if (currentBrand == allSkiBoardScales[i].brand && currentSerial == allSkiBoardScales[i].serial) {
+            if (lastScale != allSkiBoardScales[i].scale) {
+              scaleList.push(allSkiBoardScales[i].scale)
+              lastScale = allSkiBoardScales[i].scale
+              if (scaleIndex == pickViewValue[2]) {
+                currentScale = allSkiBoardScales[i].scale
+              }
+              scaleIndex++
+            }
+          }
+          if (currentBrand == allSkiBoardScales[i].brand && currentSerial == allSkiBoardScales[i].serial && currentScale == allSkiBoardScales[i].scale) {
+            yearList.push(allSkiBoardScales[i].year)
           }
         }
       }
@@ -198,72 +178,51 @@ Component({
       serialList.push('自填')
       scaleList.push('自填')
       yearList.push('自填')
+      var dialogTitle = brandList[pickViewValue[0]] + ' ' + serialList[pickViewValue[1]] + ' ' + scaleList[pickViewValue[2]] + ' ' + yearList[pickViewValue[3]]
 
-      this.setData({brandList: brandList, serialList: serialList, scaleList: scaleList, yearList: yearList, pickViewValue: pickViewValue})
+      this.setData({brandList: brandList, serialList: serialList, scaleList: scaleList, yearList: yearList, dialogTitle: dialogTitle})
     },
     pickerViewChange: function(e) {
-      var userFilledInfo = this.data.userFilledInfo
-      if (userFilledInfo.brand != this.data.brandList[e.detail.value[0]]) {
-        userFilledInfo.brand = this.data.brandList[e.detail.value[0]]
-        userFilledInfo.serial = ''
-        userFilledInfo.scale = ''
-        userFilledInfo.year = ''
-      }
-      else {
-        if (userFilledInfo.serial != this.data.serialList[e.detail.value[1]]) {
-          userFilledInfo.serial = this.data.serialList[e.detail.value[1]]
-          userFilledInfo.scale = ''
-          userFilledInfo.year = ''
-        }
-        else {
-          if (userFilledInfo.scale != this.data.scaleList[e.detail.value[2]]) {
-            userFilledInfo.scale = this.data.scaleList[e.detail.value[2]]
-            userFilledInfo.year = ''
-          }
-          else {
-            if (userFilledInfo.year != this.data.yearList[e.detail.value[3]]) {
-              userFilledInfo.year = this.data.yearList[e.detail.value[3]]
-            }
-          }
-        }
-      }
+      
       this.setData({pickViewValue: e.detail.value})
       this.fillPickView()
     },
     tapDialogButton: function (e) {
-      var userFilledInfo = this.data.userFilledInfo
+      var pickViewValue = this.data.pickViewValue
       var confirmedFilledInfo = this.data.confirmedFilledInfo
       var txtBrandDisable = true
       var txtSerialDisable = true
       var txtScaleDisable = true
       var yearDisable = true
+      var brandList = this.data.brandList
+      var serialList = this.data.serialList
+      var scaleList = this.data.scaleList
+      var yearList = this.data.yearList
+      var years = this.data.years
       if (e.detail.index == 1) {
-        if (userFilledInfo.brand != '自填' && userFilledInfo.brand != '') {
-          confirmedFilledInfo.brand = userFilledInfo.brand
-          
+        if (pickViewValue[0] < brandList.length - 1) {
+          confirmedFilledInfo.brand = brandList[pickViewValue[0]]
         }
         else {
           confirmedFilledInfo.brand = ''
           txtBrandDisable = false
         }
-        if (userFilledInfo.serial != '自填' && userFilledInfo.serial != '') {
-          confirmedFilledInfo.serial = userFilledInfo.serial
-          
+        if (pickViewValue[1] < serialList.length - 1) {
+          confirmedFilledInfo.serial = serialList[pickViewValue[1]]
         }
         else {
           confirmedFilledInfo.serial = ''
           txtSerialDisable = false
         }
-        if (userFilledInfo.scale != '自填'  && userFilledInfo.scale != '') {
-          confirmedFilledInfo.scale = userFilledInfo.scale
-          
+        if (pickViewValue[2] < scaleList.length - 1) {
+          confirmedFilledInfo.scale = scaleList[pickViewValue[2]]
         }
         else {
           confirmedFilledInfo.scale = ''
           txtScaleDisable = false
         }
-        if (confirmedFilledInfo.year != '自填' && confirmedFilledInfo.year != '') {
-          confirmedFilledInfo.year = userFilledInfo.year
+        if (pickViewValue[3] < yearList.length - 1) {
+          confirmedFilledInfo.year = yearList[pickViewValue[3]]
           var yearIndex = 0
           for(var i = 0; i < years.length; i++){
             if (confirmedFilledInfo.year == years[i]) {
