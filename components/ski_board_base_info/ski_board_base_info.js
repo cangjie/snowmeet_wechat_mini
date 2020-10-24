@@ -252,7 +252,6 @@ Component({
               break
             }
           }
-
         }
         else {
           confirmedFilledInfo.year = ''
@@ -260,12 +259,9 @@ Component({
         }
         this.triggerEvent('infoChange', {confirmedFilledInfo: confirmedFilledInfo}, 100)
       }
-      
-      
       this.setData({dialogShow: false, txtBrandDisable: txtBrandDisable, txtSerialDisable: txtSerialDisable,
         txtScaleDisable: txtScaleDisable, yearDisable: yearDisable, confirmedFilledInfo: confirmedFilledInfo})
       this.fillPickView()
     }
   },
-  
 })

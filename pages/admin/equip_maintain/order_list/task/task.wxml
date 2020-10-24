@@ -49,12 +49,14 @@
         </view>
       </mp-cell>
     </block>
-    <block wx:if="{{item.action_to_do == '雪板类别：单板/双板'}}"  >
+    <block wx:if="{{item.action_type == '组件'}}"  >
       <mp-cell style="height:600rpx">
         <view  class="flex-wrp" style="flex-direction:row;height:600rpx;margin-top:1rpx;font-size:12px">
           <view style="width:50rpx;height:600rpx" >{{item.no}}</view>
           <view style="height:600rpx" >
-            <ski-board-base-info bindinfoChange="equipInfoChange" ></ski-board-base-info>
+            <block wx:if="{{item.action_to_do == 'ski-board-base-info'}}" >
+              <ski-board-base-info bindinfoChange='equipInfoChange' ></ski-board-base-info>
+            </block>
           </view>
         </view>
       </mp-cell>
