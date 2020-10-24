@@ -54,7 +54,7 @@
         <view  class="flex-wrp" style="flex-direction:row;height:600rpx;margin-top:1rpx;font-size:12px">
           <view style="width:50rpx;height:600rpx" >{{item.no}}</view>
           <view style="height:600rpx" >
-            <ski-board-base-info ></ski-board-base-info>
+            <ski-board-base-info bindinfoChange="equipInfoChange" ></ski-board-base-info>
           </view>
         </view>
       </mp-cell>

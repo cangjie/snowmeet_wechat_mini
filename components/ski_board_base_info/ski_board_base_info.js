@@ -101,7 +101,28 @@ Component({
       }
     },
     yearPickerChange: function(e) {
-      this.setData({yearIndex: e.detail.value})
+      var confirmedFilledInfo = this.data.confirmedFilledInfo
+      confirmedFilledInfo.year = this.data.years[e.detail.value]
+      this.setData({yearIndex: e.detail.value, confirmedFilledInfo: confirmedFilledInfo})
+      this.triggerEvent('infoChange', {confirmedFilledInfo: confirmedFilledInfo}, 100)
+    },
+    textChange: function(e) {
+      var confirmedFilledInfo = this.data.confirmedFilledInfo
+      switch(e.currentTarget.id) {
+        case 'txtBrand':
+          confirmedFilledInfo.brand = e.detail.value
+          break
+        case 'txtSerial':
+          confirmedFilledInfo.serial = e.detail.value
+          break
+        case 'txtScale':
+          confirmedFilledInfo.scale = e.detail.value
+          break
+        default:
+          break
+      }
+      this.setData({confirmedFilledInfo: confirmedFilledInfo})
+      this.triggerEvent('infoChange', {confirmedFilledInfo: confirmedFilledInfo}, 100)
     },
     showPickerDialog: function(source) {
       var type = "双板"
@@ -237,6 +258,7 @@ Component({
           confirmedFilledInfo.year = ''
           yearDisable = false
         }
+        this.triggerEvent('infoChange', {confirmedFilledInfo: confirmedFilledInfo}, 100)
       }
       
       

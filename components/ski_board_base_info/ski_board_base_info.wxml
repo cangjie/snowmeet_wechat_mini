@@ -5,13 +5,13 @@
   </radio-group>
 </view>
 <view style="color:gray;height:100rpx">
-  <input  id="txtBrand" bindtap="selectSkiBoardInfo"  disabled="{{txtBrandDisable}}" placeholder="选择品牌" value="{{confirmedFilledInfo.brand}}" />
+  <input  id="txtBrand" bindinput="textChange" bindtap="selectSkiBoardInfo"  disabled="{{txtBrandDisable}}" placeholder="选择品牌" value="{{confirmedFilledInfo.brand}}" />
 </view>
 <view style="color:gray;height:100rpx">
-  <input id="txtSerial"  bindtap="selectSkiBoardInfo" placeholder="选择系列" disabled="{{txtSerialDisable}}"  value="{{confirmedFilledInfo.serial}}"/>
+  <input id="txtSerial" bindinput="textChange" bindtap="selectSkiBoardInfo" placeholder="选择系列" disabled="{{txtSerialDisable}}"  value="{{confirmedFilledInfo.serial}}"/>
 </view>
 <view style="color:gray;height:100rpx">
-  <input id="txtScale" bindtap="selectSkiBoardInfo" disabled="{{txtScaleDisable}}" placeholder="选择长度" value="{{confirmedFilledInfo.scale}}" />
+  <input id="txtScale" bindtap="selectSkiBoardInfo" disabled="{{txtScaleDisable}}" placeholder="选择长度" value="{{confirmedFilledInfo.scale}}" bindinput="textChange" />
 </view>
 <view class="flex-wrp" style="flex-direction:row;color:gray;height:100rpx;margin-top:0rpx">
   <view style="width:100rpx;height:100rpx">年份：</view>

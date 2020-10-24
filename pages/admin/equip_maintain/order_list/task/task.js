@@ -163,5 +163,8 @@ Page({
     if (!done) {
       inputedContents.push({id: detailId, content: word})
     }
+  },
+  equipInfoChange: function(e) {
+    var equipInfo = e.detail.confirmedFilledInfo
   }
 })
