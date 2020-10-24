@@ -62,7 +62,8 @@ Component({
     txtBrandDisable: true,
     txtSerialDisable: true,
     txtScaleDisable: true,
-    yearDisable: true
+    yearDisable: true,
+    pickViewValue:[0,0,0,0]
   },
 
   /**
@@ -70,7 +71,34 @@ Component({
    */
   methods: {
     selectSkiBoardInfo: function(source) {
-      var s = source
+      var showDialog = false
+      switch(source.currentTarget.id) {
+        case "txtBrand":
+          if (this.data.txtBrandDisable) {
+            showDialog = true
+          }
+          break;
+        case "txtSerial" :
+          if (this.data.txtSerialDisable) {
+            showDialog = true
+          }
+          break
+        case "txtScale":
+          if (this.data.txtScaleDisable) {
+            showDialog = true
+          }
+          break
+        case "year":
+          if (this.data.yearDisable) {
+            showDialog = true
+          }
+          break
+        default:
+          break
+      }
+      if (showDialog) {
+        this.showPickerDialog(source)
+      }
     },
     yearPickerChange: function(e) {
       this.setData({yearIndex: e.detail.value})
@@ -87,17 +115,20 @@ Component({
       confirmedFilledInfo.scale = ''
       confirmedFilledInfo.year = ''
       var userFilledInfo = this.data.userFilledInfo
-      userFilledInfo.type = type
-      userFilledInfo.brand = ''
-      userFilledInfo.serial = ''
-      userFilledInfo.scale = ''
-      userFilledInfo.year = ''
+      if (userFilledInfo.type != type) {
+        userFilledInfo.type = type
+        userFilledInfo.brand = ''
+        userFilledInfo.serial = ''
+        userFilledInfo.scale = ''
+        userFilledInfo.year = ''
+      }
       this.setData({dialogShow: true, userFilledInfo: userFilledInfo, confirmedFilledInfo: confirmedFilledInfo})
       this.fillPickView()
     },
     fillPickView: function() {
       var allSkiBoardScales = this.data.allSkiBoardScales
       var userFilledInfo = this.data.userFilledInfo
+      var pickViewValue = this.data.pickViewValue
       var brandList = []
       var serialList = []
       var scaleList = []
@@ -106,10 +137,19 @@ Component({
       var lastSerial = ''
       var lastScale = ''
       var lastYear = ''
+      var brandIndex = 0
+      var serialIndex = 0
+      var scaleIndex = 0
+      var yearIndex = 0
+
       for(var i = 0; i < allSkiBoardScales.length; i++) {
         if (allSkiBoardScales[i].type==userFilledInfo.type) {   // && lastBrand != allSkiBoardScales[i].brand) {
           if (lastBrand != allSkiBoardScales[i].brand) {
+            if (userFilledInfo.brand == allSkiBoardScales[i].brand) {
+              pickViewValue[0] = brandIndex
+            }
             brandList.push(allSkiBoardScales[i].brand)
+            brandIndex++
             lastBrand = allSkiBoardScales[i].brand
           }
           if (userFilledInfo.brand == ''){
@@ -117,7 +157,11 @@ Component({
           }
           if (userFilledInfo.brand == allSkiBoardScales[i].brand) {
             if (lastSerial != allSkiBoardScales[i].serial) {
+              if (userFilledInfo.serial == allSkiBoardScales[i].serial) {
+                pickViewValue[1] = serialIndex
+              }
               serialList.push(allSkiBoardScales[i].serial)
+              serialIndex++
               lastSerial = allSkiBoardScales[i].serial
             }
             
@@ -126,7 +170,11 @@ Component({
             }
             if (userFilledInfo.serial == allSkiBoardScales[i].serial) {
               if (lastScale != allSkiBoardScales[i].scale) {
+                if (userFilledInfo.scale == allSkiBoardScales[i].scale) {
+                  pickViewValue[2] = scaleIndex
+                }
                 scaleList.push(allSkiBoardScales[i].scale)
+                scaleIndex++
                 lastScale = allSkiBoardScales[i].scale
               }
               if (userFilledInfo.scale == '') {
@@ -134,7 +182,11 @@ Component({
               }
               if (userFilledInfo.scale == allSkiBoardScales[i].scale) {
                 if (lastYear != allSkiBoardScales[i].year) {
+                  if (userFilledInfo.year == allSkiBoardScales[i].year) {
+                    pickViewValue[3] = yearIndex
+                  }
                   yearList.push(allSkiBoardScales[i].year)
+                  yearIndex++
                   lastYear = allSkiBoardScales[i].year
                 }
               }
@@ -146,7 +198,8 @@ Component({
       serialList.push('自填')
       scaleList.push('自填')
       yearList.push('自填')
-      this.setData({brandList: brandList, serialList: serialList, scaleList: scaleList, yearList: yearList})
+
+      this.setData({brandList: brandList, serialList: serialList, scaleList: scaleList, yearList: yearList, pickViewValue: pickViewValue})
     },
     pickerViewChange: function(e) {
       var userFilledInfo = this.data.userFilledInfo
@@ -174,6 +227,7 @@ Component({
           }
         }
       }
+      this.setData({pickViewValue: e.detail.value})
       this.fillPickView()
     },
     tapDialogButton: function (e) {
@@ -210,16 +264,26 @@ Component({
         }
         if (confirmedFilledInfo.year != '自填' && confirmedFilledInfo.year != '') {
           confirmedFilledInfo.year = userFilledInfo.year
-          
+          var yearIndex = 0
+          for(var i = 0; i < years.length; i++){
+            if (confirmedFilledInfo.year == years[i]) {
+              yearIndex = i
+              this.setData({yearIndex: yearIndex})
+              break
+            }
+          }
+
         }
         else {
           confirmedFilledInfo.year = ''
           yearDisable = false
         }
-        
       }
+      
+      
       this.setData({dialogShow: false, txtBrandDisable: txtBrandDisable, txtSerialDisable: txtSerialDisable,
         txtScaleDisable: txtScaleDisable, yearDisable: yearDisable, confirmedFilledInfo: confirmedFilledInfo})
+      this.fillPickView()
     }
   },
   
