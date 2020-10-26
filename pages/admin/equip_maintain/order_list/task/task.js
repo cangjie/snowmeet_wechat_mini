@@ -42,16 +42,6 @@ Page({
               break
           }
           this.setData({maintainTaskDetail: res.data.rows[0], color: color})
-          /*
-          var taskUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_get_by_id.aspx?taskid=' + maintainTaskDetail.task_id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-          wx.request({
-            url: taskUrl,
-            success: (res) => {
-              if (res.data.status == 0) {
-                this.setData({maintainTask: res.data.maintain_task})
-              }
-            }
-          })*/
           var miniUserGetUrl = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?openid=' + this.data.maintainTaskDetail.oper_open_id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
           wx.request({
             url: miniUserGetUrl,
@@ -134,19 +124,20 @@ Page({
   },
   uploaded: function(source, option) {
     var detailId = source.currentTarget.id.split('_')[1].trim()
-    var uploadedFiles = this.data.uploadedFiles
+    var inputedContents = this.data.inputedContents
     var done = false
-    for(var i = 0; i < uploadedFiles.length; i++) {
-      if (uploadedFiles[i].id == detailId) {
-        uploadedFiles[i].files = source.detail.files
+    for(var i = 0; i < inputedContents.length; i++) {
+      if (inputedContents[i].id == detailId) {
+        inputedContents[i].content = source.detail.files
         done = true
         break
       }
     }
     if (!done) {
-      uploadedFiles.push({id: detailId, files: source.detail.files})
+      inputedContents.push({id: detailId, content: source.detail.files})
+
     }
-    this.setData(uploadedFiles, uploadedFiles)
+    this.setData(inputedContents, inputedContents)
   },
   inputed: function(source) {
     var detailId = source.currentTarget.id.split('_')[1].trim()
@@ -164,7 +155,24 @@ Page({
       inputedContents.push({id: detailId, content: word})
     }
   },
-  equipInfoChange: function(e) {
-    var equipInfo = e.detail.confirmedFilledInfo
+  equipInfoChange: function(source) {
+    var detailId = source.currentTarget.id.split('_')[1].trim()
+    var equipInfo = source.detail.confirmedFilledInfo
+    var valueStr = ''
+    for(var item in equipInfo) {
+      valueStr = valueStr + (valueStr!=''?', ':'') + item.toString() + ': "' + equipInfo[item].trim() + '" '
+    }
+    var inputedContents = this.data.inputedContents
+    var done = false
+    for(var i = 0; i < inputedContents.length; i++) {
+      if (inputedContents[i].id == detailId) {
+        inputedContents[i].content = valueStr.trim()
+        done = true
+        break
+      }
+    }
+    if (!done) {
+      inputedContents.push({id: detailId, content: equipInfo})
+    }
   }
 })

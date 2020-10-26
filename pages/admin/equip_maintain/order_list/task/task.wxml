@@ -55,7 +55,7 @@
           <view style="width:50rpx;height:600rpx" >{{item.no}}</view>
           <view style="height:600rpx" >
             <block wx:if="{{item.action_to_do == 'ski-board-base-info'}}" >
-              <ski-board-base-info bindinfoChange='equipInfoChange' ></ski-board-base-info>
+              <ski-board-base-info id="component_{{item.id}}" bindinfoChange='equipInfoChange' ></ski-board-base-info>
             </block>
           </view>
         </view>
