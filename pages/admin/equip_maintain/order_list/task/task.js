@@ -154,6 +154,7 @@ Page({
     if (!done) {
       inputedContents.push({id: detailId, content: word})
     }
+    this.save()
   },
   equipInfoChange: function(source) {
     var detailId = source.currentTarget.id.split('_')[1].trim()
@@ -173,6 +174,22 @@ Page({
     }
     if (!done) {
       inputedContents.push({id: detailId, content: equipInfo})
+    }
+  },
+  save: function(e) {
+    var inputedContents = this.data.inputedContents
+    for(var item in inputedContents) {
+      if (typeof(inputedContents[item].content) == 'string') {
+        var val = inputedContents[item].content
+      }
+      else {
+        if (inputedContents[item].content.length == undefined) {
+          var valSet = inputedContents[item].content
+        }
+        else{
+          var arr = inputedContents[item].content
+        }
+      }
     }
   }
 })
