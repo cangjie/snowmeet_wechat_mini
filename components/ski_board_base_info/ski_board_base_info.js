@@ -26,7 +26,26 @@ Component({
       value: '请选择...'
     }
   },
-
+  ready: function() {
+    var confirmedFilledInfo = this.data.confirmedFilledInfo
+    confirmedFilledInfo.type = this.properties.type
+    confirmedFilledInfo.brand = this.properties.brand
+    confirmedFilledInfo.serial = this.properties.serial
+    confirmedFilledInfo.scale = this.properties.scale
+    confirmedFilledInfo.year = this.properties.year
+    var typeSki = true
+    var yearIndex = 0
+    if (this.properties.type == '单板') {
+      typeSki = false
+    }
+    for(var i = 0;  i < this.data.years.length; i++) {
+      if (this.properties.year == this.data.years[i].toString()) {
+        yearIndex = i
+        break
+      }
+    }
+    this.setData({confirmedFilledInfo: confirmedFilledInfo, typeSki: typeSki, yearIndex: yearIndex})
+  },
   lifetimes: {
     attached: function() {
       var url = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from ski_board_scale_list order by [type], brand, [serial], scale, [year]')
@@ -63,7 +82,8 @@ Component({
     txtScaleDisable: true,
     yearDisable: true,
     pickViewValue:[0,0,0,0],
-    dialogTitle:''
+    dialogTitle:'',
+    typeSki: true
   },
 
   /**
@@ -92,6 +112,18 @@ Component({
           if (this.data.yearDisable) {
             showDialog = true
           }
+          break
+        case "radioType":
+          var confirmedFilledInfo = this.data.confirmedFilledInfo
+          if (source.detail.value.trim() != confirmedFilledInfo.type) {
+            confirmedFilledInfo.type = source.detail.value.trim()
+            confirmedFilledInfo.brand = ""
+            confirmedFilledInfo.scale = ""
+            confirmedFilledInfo.serial = ""
+            confirmedFilledInfo.year = ""
+            showDialog = true
+          }
+          this.setData({confirmedFilledInfo: confirmedFilledInfo})
           break
         default:
           break
@@ -125,19 +157,7 @@ Component({
       this.triggerEvent('infoChange', {confirmedFilledInfo: confirmedFilledInfo}, 100)
     },
     showPickerDialog: function(source) {
-      var type = "双板"
-      if (source.target.id=='radio_2') {
-        type = "单板"
-      }
-      var confirmedFilledInfo = this.data.confirmedFilledInfo
-      if (confirmedFilledInfo.type != type) {
-        confirmedFilledInfo.type = type
-        confirmedFilledInfo.brand = ''
-        confirmedFilledInfo.serial = ''
-        confirmedFilledInfo.scale = ''
-        confirmedFilledInfo.year = ''
-      }
-      this.setData({dialogShow: true, confirmedFilledInfo: confirmedFilledInfo})
+      this.setData({dialogShow: true})
       this.fillPickView()
     },
     fillPickView: function() {
@@ -201,7 +221,7 @@ Component({
       yearList.push('自填')
       var dialogTitle = brandList[pickViewValue[0]] + ' ' + serialList[pickViewValue[1]] + ' ' + scaleList[pickViewValue[2]] + ' ' + yearList[pickViewValue[3]]
 
-      this.setData({brandList: brandList, serialList: serialList, scaleList: scaleList, yearList: yearList, dialogTitle: dialogTitle})
+      this.setData({brandList: brandList, serialList: serialList, scaleList: scaleList, yearList: yearList, dialogTitle: dialogTitle, pickViewValue: pickViewValue})
     },
     pickerViewChange: function(e) {
       
