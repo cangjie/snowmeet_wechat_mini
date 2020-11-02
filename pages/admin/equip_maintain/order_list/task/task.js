@@ -10,7 +10,9 @@ Page({
   data: {
     taskId: '0',
     uploadedFiles: [],
-    inputedContents:[]
+    inputedContents:[],
+    isExecuting: false,
+    allFinishAbove: true
   },
 
   /**
@@ -25,6 +27,26 @@ Page({
       success: (res) => {
         if (res.data.count>0){
           var color = 'gray'
+          var taskId = parseInt(res.data.rows[0].task_id.toString())
+          var sort = parseInt(res.data.rows[0].sort)
+          var isExecuting = false
+          var allFinishAbove = true
+          urlSelectTable = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from maintain_task_detail where task_id = ' + taskId.toString() + ' order by [sort],[id] ')
+          wx.request({
+            url: urlSelectTable,
+            success: (res) => {
+              for(var i = 0; i < res.data.count > 0; i++) {
+                if (res.data.rows[i].status == '已开始') {
+                  isExecuting = true
+                }
+                var currentSort = parseInt(res.data.rows[i].sort.toString())
+                if (currentSort < sort && res.data.rows[i].status != '已完成' && res.data.rows[i].status != '强行中止' ) {
+                  allFinishAbove = false
+                }
+              }
+              this.setData({isExecuting: isExecuting, allFinishAbove: allFinishAbove})
+            }
+          })
           switch(res.data.rows[0].status) {
             case '已开始':
               color = 'red'

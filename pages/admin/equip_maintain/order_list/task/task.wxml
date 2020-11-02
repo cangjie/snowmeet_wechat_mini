@@ -22,12 +22,12 @@
       <view  style="font-size:12px;width:300rpx;" >{{operRealName}}</view>
     </view>
   </mp-cell>  
-  <block wx:if="{{maintainTaskDetail.status == '未开始'}}" >
+  <block wx:if="{{maintainTaskDetail.status == '未开始' && !isExecuting && allFinishAbove}}" >
     <mp-cell>
       <button> 开 始 任 务  </button>
     </mp-cell>
   </block>
-  <block wx:if="{{maintainTaskDetail.status == '已开始'}}" >
+  <block wx:if="{{maintainTaskDetail.status=='已开始'}}" >
     <mp-cell>
       <button bindtap="save"> 保 存 </button>
     </mp-cell>
