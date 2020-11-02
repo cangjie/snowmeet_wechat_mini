@@ -10,7 +10,9 @@ Page({
   data: {
     taskId: '0',
     uploadedFiles: [],
-    inputedContents:[]
+    inputedContents:[],
+    isExecuting: false,
+    allFinishAbove: true
   },
 
   /**
@@ -25,6 +27,26 @@ Page({
       success: (res) => {
         if (res.data.count>0){
           var color = 'gray'
+          var taskId = parseInt(res.data.rows[0].task_id.toString())
+          var sort = parseInt(res.data.rows[0].sort)
+          var isExecuting = false
+          var allFinishAbove = true
+          urlSelectTable = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from maintain_task_detail where task_id = ' + taskId.toString() + ' order by [sort],[id] ')
+          wx.request({
+            url: urlSelectTable,
+            success: (res) => {
+              for(var i = 0; i < res.data.count > 0; i++) {
+                if (res.data.rows[i].status == '已开始') {
+                  isExecuting = true
+                }
+                var currentSort = parseInt(res.data.rows[i].sort.toString())
+                if (currentSort < sort && res.data.rows[i].status != '已完成' && res.data.rows[i].status != '强行中止' ) {
+                  allFinishAbove = false
+                }
+              }
+              this.setData({isExecuting: isExecuting, allFinishAbove: allFinishAbove})
+            }
+          })
           switch(res.data.rows[0].status) {
             case '已开始':
               color = 'red'
@@ -59,13 +81,34 @@ Page({
       }
     })
 
-    urlSelectTable = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from maintain_task_detail_sub where detail_id = ' + detailId + '  order by sort,id ')
+    urlSelectTable = 'https://' + app.globalData.domainName + '/api/maintain_task_detail_sub_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&detailid=' +  + detailId
     wx.request({
       url: urlSelectTable,
       success: (res) => {
         var maintainTaskDetailSub = res.data.rows
         for(var i = 0; i < maintainTaskDetailSub.length; i++) {
           maintainTaskDetailSub[i].no = (i+1).toString()
+          var content = maintainTaskDetailSub[i].action_content
+          if (typeof(content) == 'string') {
+            if ((content[0] == '"' && content[content.length - 1] == '"') 
+              || (content[0] == "'" && content[content.length - 1] == "'")){
+                content = content.substr(1, content.length - 1)
+                content = content.substr(0, content.length - 1)
+              }
+          }
+          else {
+            switch(maintainTaskDetailSub[i].action_type.trim()) {
+              case "拍照":
+                var urlStr = ''
+                for(var urlItem in content) {
+                  urlStr = urlStr + (urlStr == ''? '' : ',') + content[urlItem].url
+                }
+                maintainTaskDetailSub[i].fileUrls = urlStr.toString()
+                break
+              default:
+                break;
+            }
+          }
         }
         this.setData({maintainTaskDetailSub: maintainTaskDetailSub})
       }
@@ -154,7 +197,6 @@ Page({
     if (!done) {
       inputedContents.push({id: detailId, content: word})
     }
-    this.save()
   },
   equipInfoChange: function(source) {
     var detailId = source.currentTarget.id.split('_')[1].trim()
@@ -186,6 +228,14 @@ Page({
     })
     /*
     var inputedContents = this.data.inputedContents
+    wx.request({
+      url: 'https://' + app.globalData.domainName + '/api/maintain_task_detail_sub_save.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+      data: inputedContents,
+      success: (res) => {
+        console.log(res.data)
+      }
+    })
+    /*
     for(var item in inputedContents) {
       if (typeof(inputedContents[item].content) == 'string') {
         var val = inputedContents[item].content

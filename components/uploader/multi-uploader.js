@@ -16,6 +16,10 @@ Component({
     title:{
       type: String,
       value: ''
+    },
+    uploaded_files:{
+      type: String,
+      value: ''
     }
   },
   /**
@@ -31,6 +35,14 @@ Component({
         uploadFile: this.uploadFile.bind(this)
       })
     }
+  },
+  ready: function (){
+    var uploadedFilesArr = this.properties.uploaded_files.split(',')
+    var files = this.data.files
+    for(var i = 0; i < uploadedFilesArr.length; i++) {
+      files.push({url: uploadedFilesArr[i].trim()})
+    }
+    this.setData({files: files})
   },
   /**
    * Component methods
@@ -69,6 +81,18 @@ Component({
           })
         }
       })
+    },
+    delete: function(e) {
+      var deleteIndex = e.detail.index
+      var files = this.data.files
+      var newFiles = []
+      for(var i = 0; i < files.length; i++) {
+        if (i != deleteIndex) {
+          newFiles.push(files[i])
+        }
+      }
+      this.setData({files: newFiles})
+      this.triggerEvent('Uploaded', {files: newFiles}, "100")
     }
   },
   

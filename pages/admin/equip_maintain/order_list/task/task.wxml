@@ -22,14 +22,14 @@
       <view  style="font-size:12px;width:300rpx;" >{{operRealName}}</view>
     </view>
   </mp-cell>  
-  <block wx:if="{{maintainTaskDetail.status == '未开始'}}" >
+  <block wx:if="{{maintainTaskDetail.status == '未开始' && !isExecuting && allFinishAbove}}" >
     <mp-cell>
       <button> 开 始 任 务  </button>
     </mp-cell>
   </block>
-  <block wx:if="{{maintainTaskDetail.status == '已开始'}}" >
+  <block wx:if="{{maintainTaskDetail.status=='已开始'}}" >
     <mp-cell>
-      <button> 保 存 </button>
+      <button bindtap="save"> 保 存 </button>
     </mp-cell>
     <mp-cell>
       <button style="color:green" > 设 置 完 成 </button>
@@ -55,7 +55,7 @@
           <view style="width:50rpx;height:600rpx" >{{item.no}}</view>
           <view style="height:600rpx" >
             <block wx:if="{{item.action_to_do == 'ski-board-base-info'}}" >
-              <ski-board-base-info id="component_{{item.id}}" bindinfoChange='equipInfoChange' ></ski-board-base-info>
+              <ski-board-base-info id="component_{{item.id}}" type="{{item.action_content.type}}" brand="{{item.action_content.brand}}" serial="{{item.action_content.serial}}" scale="{{item.action_content.scale}}" year="{{item.action_content.year}}" bindinfoChange='equipInfoChange' ></ski-board-base-info>
             </block>
           </view>
         </view>
@@ -67,7 +67,7 @@
           <view style="width:50rpx" >{{item.no}}</view>
           <view>
             {{item.action_type}}:{{item.action_to_do}}
-            <input id="input_{{item.id}}" bindinput="inputed"  placeholder="{{item.action_to_do}}" />
+            <input id="input_{{item.id}}" bindinput="inputed"  placeholder="{{item.action_to_do}}" value="{{item.action_content}}" />
           </view>
         </view>
       </mp-cell>
@@ -77,7 +77,7 @@
         <view  class="flex-wrp" style="flex-direction:row;height:500rpx;margin-top:1rpx;font-size:12px">
           <view style="width:50rpx;height:500rpx" >{{item.no}}</view>
           <view style="height:500rpx" >
-            <multi-uploader id="upload_{{item.id}}" title="拍照：{{item.action_to_do}}" image_count="3" detail_id="{{item.id}}" bindUploaded="uploaded" ></multi-uploader>
+            <multi-uploader id="upload_{{item.id}}" title="拍照：{{item.action_to_do}}" image_count="3" detail_id="{{item.id}}" bindUploaded="uploaded" uploaded_files="{{item.fileUrls}}" ></multi-uploader>
           </view>
         </view>
       </mp-cell>

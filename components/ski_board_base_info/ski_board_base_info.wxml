@@ -1,7 +1,7 @@
 <view class="flex-wrp" style="flex-direction:row;height:100rpx" >
-  <radio-group bindtap="showPickerDialog" >
-    <radio id="radio_1" checked="true" value="双板" > 双 板 </radio> / 
-    <radio id="radio_2" value="单板" > 单 板 </radio>
+  <radio-group id="radioType" bindchange="selectSkiBoardInfo" >
+    <radio id="radio_1" checked="{{typeSki}}"  value="双板" > 双 板 </radio> / 
+    <radio id="radio_2" checked="{{!typeSki}}" value="单板" > 单 板 </radio>
   </radio-group>
 </view>
 <view style="color:gray;height:100rpx">
