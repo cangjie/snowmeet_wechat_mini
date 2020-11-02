@@ -177,6 +177,14 @@ Page({
     }
   },
   save: function(e) {
+    wx.request({
+      url: 'https://' + app.globalData.domainName + '/api/maintain_task_detail_sub_save.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+      data: this.data.inputedContents,
+      success: (res) => {
+        var a = res.data
+      }
+    })
+    /*
     var inputedContents = this.data.inputedContents
     for(var item in inputedContents) {
       if (typeof(inputedContents[item].content) == 'string') {
@@ -191,5 +199,6 @@ Page({
         }
       }
     }
+    */
   }
 })
