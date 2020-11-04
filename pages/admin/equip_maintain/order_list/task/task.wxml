@@ -84,13 +84,3 @@
     </block>
   </block>
 </mp-cells>
-<mp-cells ext-class="my-cells" title="上一步">
-  <mp-cell>
-    <view id="detail_2" bindtap="goToDetail" class="flex-wrp" style="flex-direction:row;height:60rpx;margin-top:1rpx;font-size:12px">
-      <view style="width:150rpx;color:red" >修刃</view>
-      <view style="width:150rpx;color:red" >徐聪聪</view>
-      <view style="width:150rpx;color:red" >进行中</view>
-      <view style="width:150rpx;color:red" >2020-9-1 18:00</view>
-    </view>
-  </mp-cell>
-</mp-cells>
