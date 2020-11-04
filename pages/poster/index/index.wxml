@@ -1,0 +1,14 @@
+<!--pages/poster/index/index.wxml-->
+<view class="flex-wrp" style="flex-direction:row;width:100%;margin:10rpx;text-align:center">
+  <view style="width:50%;text-align:center;text-decoration:underline" > 精美海报下载 </view>
+  <view style="width:50%;text-align:cente" > 生成个性海报 </view>
+</view>
+<view style="margin:10rpx" > </view>
+<view style="margin:10rpx;text-align:center" >title</view>
+<view style="margin:10rpx;text-align:center" >
+  <image style="width:70%" src="../images/poster1.png" mode="widthFix" ></image>
+</view>
+<button style="width:100%"> 分 享 </button>
+<cover-view class="cover-view" style="display:none">
+  aa
+</cover-view>

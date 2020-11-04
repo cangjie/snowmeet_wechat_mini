@@ -1,12 +1,16 @@
 {
-  
   "pages": [
     "pages/index/index",
     "pages/logs/logs",
     "pages/test/scan/scan",
-    "pages/test/tab/tab",  
+    "pages/test/tab/tab",
     "pages/test/pay/pay",
-    "pages/test/upload/upload"
+    "pages/test/upload/upload",
+    "pages/login/login",
+    "pages/skipass/index/index",
+    "pages/poster/index/index",
+    "pages/shop/index/index",
+    "pages/mine/index/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -29,25 +33,25 @@
         "selectedIconPath": "images/home-2-line-hl.png"
       },
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/skipass/index/index",
         "text": "雪票",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png"
       },
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/poster/index/index",
         "text": "打卡",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png"
       },
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/shop/index/index",
         "text": "商城",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png"
       },
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/mine/index/index",
         "text": "我的",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png"
