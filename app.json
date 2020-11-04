@@ -4,22 +4,9 @@
     "pages/index/index",
     "pages/logs/logs",
     "pages/test/scan/scan",
-    "pages/test/tab/tab",
-    "pages/admin/equip_maintain/search_order/search_order",
-    "pages/admin/equip_maintain/uploadimage/uploadimage",
-    "pages/admin/equip_maintain/order_confirm/order_confirm",
-    "pages/admin/equip_maintain/receit_express/receit_express",
-    "pages/admin/equip_maintain/order_list/order_list_all/order_list_all",
-    "pages/admin/equip_maintain/order_list/order_list_by_id/order_list_by_id",
-    "pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill",
-    "pages/admin/equip_maintain/order_list/order_list_main",
-    "pages/admin/equip_maintain/order_list/order_detail_assign/order_detail_assign",
-    "pages/admin/equip_maintain/order_list/order_detail/order_detail",   
+    "pages/test/tab/tab",  
     "pages/test/pay/pay",
-    "pages/admin/equip_maintain/accept_equip/accept_equip",
-    "pages/test/upload/upload",
-    "pages/admin/equip_maintain/order_list/task/task"
-
+    "pages/test/upload/upload"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -37,18 +24,30 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "社群",
-        "iconPath": "images/zhihu-fill.png",
-        "selectedIconPath": "images/zhihu-fill-hl.png"
+        "text": "首页",
+        "iconPath": "images/home-2-line.png",
+        "selectedIconPath": "images/home-2-line-hl.png"
       },
       {
-        "pagePath": "pages/test/scan/scan",
-        "text": "签售",
-        "iconPath": "images/book-3-line.png",
-        "selectedIconPath": "images/book-3-line-hl.png"
+        "pagePath": "pages/index/index",
+        "text": "雪票",
+        "iconPath": "images/home-2-line.png",
+        "selectedIconPath": "images/home-2-line-hl.png"
       },
       {
-        "pagePath": "pages/logs/logs",
+        "pagePath": "pages/index/index",
+        "text": "打卡",
+        "iconPath": "images/home-2-line.png",
+        "selectedIconPath": "images/home-2-line-hl.png"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "商城",
+        "iconPath": "images/home-2-line.png",
+        "selectedIconPath": "images/home-2-line-hl.png"
+      },
+      {
+        "pagePath": "pages/index/index",
         "text": "我的",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png"

@@ -1,9 +1,12 @@
 //index.js
 //获取应用实例
 const app = getApp()
+var wxloginModule = require('../../utils/wxlogin.js')
 
 Page({
   data: {
+    tabbarItemList: [],
+    tabIndex: 0,
     motto: 'Hello World',
     userInfo: {},
     hasUserInfo: false,
@@ -43,7 +46,9 @@ Page({
         }
       })
     }
-    
+    wxloginModule.wxlogin()
+    this.setData({tabbarItemList: app.globalData.adminTabbarItem,
+    tabIndex: 0})
   },
   onShow: function(e) {
     
@@ -57,21 +62,6 @@ Page({
     })
   },
   jump: function(e){
-
-    /*
-    wx.removeTabBarBadge({
-      index: 0
-    })
     
-    wx.removeTabBarBadge({
-      index: 1
-    })
-    wx.removeTabBarBadge({
-      index: 2
-    })
-    */
-    wx.navigateTo({
-      url: '/pages/test/tab/tab',
-    })
   }
 })
