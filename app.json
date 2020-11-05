@@ -10,7 +10,8 @@
     "pages/skipass/index/index",
     "pages/poster/index/index",
     "pages/shop/index/index",
-    "pages/mine/index/index"
+    "pages/mine/index/index",
+    "pages/poster/personalposter/personalposter"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -46,7 +47,7 @@
       },
       {
         "pagePath": "pages/shop/index/index",
-        "text": "商城",
+        "text": "积分",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png"
       },

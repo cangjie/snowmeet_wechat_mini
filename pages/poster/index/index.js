@@ -62,5 +62,10 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  goToPersonalize: function(){
+    wx.navigateTo({
+      url: '../personalposter/personalposter',
+    })
   }
 })

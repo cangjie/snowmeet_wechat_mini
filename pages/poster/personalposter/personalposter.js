@@ -1,4 +1,4 @@
-// pages/skipass/index/index.js
+// pages/poster/personalposter/personalposter.js
 Page({
 
   /**
@@ -12,7 +12,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    
+
   },
 
   /**
@@ -61,6 +61,12 @@ Page({
    * Called when user click on the top right corner to share
    */
   onShareAppMessage: function () {
+
+  },
+  goToIndex: function(){
+    wx.navigateBack()
+  },
+  share: function(){
 
   }
 })

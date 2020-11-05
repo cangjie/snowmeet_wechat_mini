@@ -1,2 +1,2 @@
 <!--pages/skipass/index/index.wxml-->
-<text>pages/skipass/index/index.wxml</text>
+<web-view src="https://mini.snowmeet.top" > </web-view>
