@@ -1,17 +1,17 @@
 <view class="page__bd page__bd_spacing"  >
     <view class="weui-flex">
-        <view class="weui-flex__item"><view class="placeholder">weui</view></view>
+      <image src="images/1.jpg"  mode="heightFix"></image>
     </view>
     <view class="weui-flex">
-        <view class="weui-flex__item"><view class="placeholder">weui</view></view>
-        <view class="weui-flex__item"><view class="placeholder">weui</view></view>
+        <view class="weui-flex__item" style="width:50%"><image src="images/7.jpg" mode="aspectFill" ></image></view>
+        <view class="weui-flex__item" style="width:50%"><image src="images/9.jpg" mode="aspectFill" ></image></view>
     </view>
     <view class="weui-flex">
-        <view class="weui-flex__item"><view class="placeholder">weui</view></view>
-        <view class="weui-flex__item"><view class="placeholder">weui</view></view>
-        <view class="weui-flex__item"><view class="placeholder">weui</view></view>
+        <view class="weui-flex__item" style="width:33%" ><image src="images/4.jpg" mode="heightFix" ></image></view>
+        <view class="weui-flex__item" style="width:33%" ><image src="images/7.jpg" mode="heightFix" ></image></view>
+        <view class="weui-flex__item" style="width:33%" ><image src="images/9.jpg" mode="heightFix" ></image></view>
     </view>
-    <view class="weui-flex">
+    <!--view class="weui-flex">
         <view class="weui-flex__item"><view class="placeholder">weui</view></view>
         <view class="weui-flex__item"><view class="placeholder">weui</view></view>
         <view class="weui-flex__item"><view class="placeholder">weui</view></view>
@@ -21,5 +21,5 @@
         <view><view class="placeholder">weui</view></view>
         <view class="weui-flex__item"><view class="placeholder">weui</view></view>
         <view><view class="placeholder">weui</view></view>
-    </view>
+    </view-->
 </view>
