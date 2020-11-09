@@ -46,6 +46,12 @@ Page({
               case '已开始':
                 maintain_task_detail_arr[i].color = 'red'
                 break
+              case '已完成':
+                maintain_task_detail_arr[i].color = 'green'
+                break
+              case '强行中止':
+                maintain_task_detail_arr[i].color = 'orange'
+                break
               default:
                 break
             } 
