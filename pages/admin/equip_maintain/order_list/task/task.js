@@ -18,9 +18,10 @@ Page({
   /**
    * Lifecycle function--Called when page load
    */
-  onLoad: function (options) {
-    this.setData({taskid: options.taskid})
+  onLoad: function load(options) {
+    this.setData({taskid: options.taskid, options: options})
     var detailId = options.detailid
+    this.setData({detailId: detailId})
     var urlSelectTable = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from maintain_task_detail where [id] = ' + detailId )
     wx.request({
       url: urlSelectTable,
@@ -218,37 +219,104 @@ Page({
       inputedContents.push({id: detailId, content: equipInfo})
     }
   },
+  startTask: function(e) {
+    wx.request({
+      url: 'https://' + app.globalData.domainName + '/api/maintain_task_detail_sub_save.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+      data: this.data.inputedContents,
+      success: (res) => {
+        
+      }
+    })
+    var url = 'https://' + app.globalData.domainName + '/api/maintain_task_detail_status_set.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)+'&id=' + this.data.detailId.toString() + '&status=' + encodeURIComponent('已开始')
+    wx.request({
+      url: url,
+      success: (res) => {
+        if (res.data.success == '1') {
+          var maintainTaskDetail = this.data.maintainTaskDetail
+          maintainTaskDetail.status = '已开始'
+          var urlSelectTable = 'https://' + app.globalData.domainName + '/api/maintain_task_detail_sub_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&detailid=' +  + this.data.detailId.toString()
+          wx.request({
+            url: urlSelectTable,
+            success: (res) => {
+              var maintainTaskDetailSub = res.data.rows
+              for(var i = 0; i < maintainTaskDetailSub.length; i++) {
+                maintainTaskDetailSub[i].no = (i+1).toString()
+                var content = maintainTaskDetailSub[i].action_content
+                if (typeof(content) == 'string') {
+                  if ((content[0] == '"' && content[content.length - 1] == '"') 
+                    || (content[0] == "'" && content[content.length - 1] == "'")){
+                      content = content.substr(1, content.length - 1)
+                      content = content.substr(0, content.length - 1)
+                    }
+                }
+                else {
+                  switch(maintainTaskDetailSub[i].action_type.trim()) {
+                    case "拍照":
+                      var urlStr = ''
+                      for(var urlItem in content) {
+                        urlStr = urlStr + (urlStr == ''? '' : ',') + content[urlItem].url
+                      }
+                      maintainTaskDetailSub[i].fileUrls = urlStr.toString()
+                      break
+                    default:
+                      break;
+                  }
+                }
+              }
+              this.setData({maintainTaskDetailSub: maintainTaskDetailSub, maintainTaskDetail: maintainTaskDetail})
+            }
+          })
+        }
+      }
+    })
+  },
   save: function(e) {
     wx.request({
       url: 'https://' + app.globalData.domainName + '/api/maintain_task_detail_sub_save.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
       data: this.data.inputedContents,
       success: (res) => {
-        var a = res.data
+        
       }
     })
-    /*
-    var inputedContents = this.data.inputedContents
+  },
+  finish: function(e) {
     wx.request({
       url: 'https://' + app.globalData.domainName + '/api/maintain_task_detail_sub_save.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
-      data: inputedContents,
+      data: this.data.inputedContents,
       success: (res) => {
-        console.log(res.data)
+        
       }
     })
-    /*
-    for(var item in inputedContents) {
-      if (typeof(inputedContents[item].content) == 'string') {
-        var val = inputedContents[item].content
-      }
-      else {
-        if (inputedContents[item].content.length == undefined) {
-          var valSet = inputedContents[item].content
-        }
-        else{
-          var arr = inputedContents[item].content
+    var url = 'https://' + app.globalData.domainName + '/api/maintain_task_detail_status_set.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)+'&id=' + this.data.detailId.toString() + '&status=' + encodeURIComponent('已完成')
+    wx.request({
+      url: url,
+      success: (res) => {
+        if (res.data.success == '1') {
+          var maintainTaskDetail = this.data.maintainTaskDetail
+          maintainTaskDetail.status = '已完成'
+          this.setData({maintainTaskDetail: maintainTaskDetail})
         }
       }
-    }
-    */
+    })
+  },
+  stop: function(e) {
+    wx.request({
+      url: 'https://' + app.globalData.domainName + '/api/maintain_task_detail_sub_save.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+      data: this.data.inputedContents,
+      success: (res) => {
+        
+      }
+    })
+    var url = 'https://' + app.globalData.domainName + '/api/maintain_task_detail_status_set.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)+'&id=' + this.data.detailId.toString() + '&status=' + encodeURIComponent('强行中止')
+    wx.request({
+      url: url,
+      success: (res) => {
+        if (res.data.success == '1') {
+          var maintainTaskDetail = this.data.maintainTaskDetail
+          maintainTaskDetail.status = '强行中止'
+          this.setData({maintainTaskDetail: maintainTaskDetail})
+        }
+      }
+    })
   }
 })

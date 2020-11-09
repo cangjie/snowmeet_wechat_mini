@@ -24,7 +24,7 @@
   </mp-cell>  
   <block wx:if="{{maintainTaskDetail.status == '未开始' && !isExecuting && allFinishAbove}}" >
     <mp-cell>
-      <button> 开 始 任 务  </button>
+      <button bindtap="startTask" > 开 始 任 务  </button>
     </mp-cell>
   </block>
   <block wx:if="{{maintainTaskDetail.status=='已开始'}}" >
@@ -32,10 +32,10 @@
       <button bindtap="save"> 保 存 </button>
     </mp-cell>
     <mp-cell>
-      <button style="color:green" > 设 置 完 成 </button>
+      <button style="color:green" bindtap="finish" > 设 置 完 成 </button>
     </mp-cell>
     <mp-cell>
-      <button style="color:orange" > 强 行 中 止 </button>
+      <button style="color:orange" bindtap="stop" > 强 行 中 止 </button>
     </mp-cell>
   </block>
 </mp-cells>
