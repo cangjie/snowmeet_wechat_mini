@@ -1,7 +1,7 @@
 <!--pages/poster/index/index.wxml-->
-<view class="flex-wrp" style="flex-direction:row;width:100%;margin:10rpx;text-align:center">
-  <view style="width:50%;text-align:center;text-decoration:underline" > 精美海报下载 </view>
-  <view style="width:50%;text-align:center" bindtap="goToPersonalize" > 生成个性海报 </view>
+<view class="weui-flex" style="flex-direction:row;width:100%;margin:10rpx;text-align:center">
+  <view class="weui-flex__item" style="width:50%;text-align:center;text-decoration:underline" > 精美海报下载 </view>
+  <view class="weui-flex__item" style="width:50%;text-align:center" bindtap="goToPersonalize" > 生成个性海报 </view>
 </view>
 <view style="margin:10rpx" > </view>
 <view style="margin:10rpx;text-align:center" >title</view>
