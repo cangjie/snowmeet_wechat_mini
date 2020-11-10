@@ -41,7 +41,7 @@
       },
       {
         "pagePath": "pages/poster/index/index",
-        "text": "打卡",
+        "text": "分享",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png"
       },

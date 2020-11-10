@@ -8,8 +8,10 @@
 <view style="margin:10rpx;text-align:center" >
   <image style="width:70%" src="../images/poster1.png" mode="widthFix" ></image>
 </view>
-<mp-uploader ></mp-uploader>
+<view style="margin-left:100rpx;margin-bottom:10rpx">
+  <mp-uploader></mp-uploader>
+</view>
+<view style="margin-top:10rpx;text-align:center" >
+  <image style="width:70%" src="../images/poster1.png" mode="widthFix" ></image>
+</view>
 <button style="width:100%" bindtap="share"> 下 载 </button>
-<cover-view class="cover-view" style="display:none">
-  aa
-</cover-view>
