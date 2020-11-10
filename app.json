@@ -11,7 +11,8 @@
     "pages/poster/index/index",
     "pages/shop/index/index",
     "pages/mine/index/index",
-    "pages/poster/personalposter/personalposter"
+    "pages/poster/personalposter/personalposter",
+    "components/myinfo/myinfo"
   ],
   "window": {
     "backgroundTextStyle": "light",
