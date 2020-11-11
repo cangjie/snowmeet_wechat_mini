@@ -15,12 +15,12 @@ Page({
   onLoad: function (options) {
 
 
-    var nonce = '5f65c189a158c'
+    var nonce = '5faba423536a5'
     var appId = 'wxd1310896f2aa68bb'
 
-    var prePayId = 'wx19163001458924eb4dbd3f509cd2000000'
-    var timeStamp = '1600504201'
-    var paySign = '55A62DF9D3366552724249AEBA37F9C0'
+    var prePayId = 'wx11164315231153e7a4b222a09654c00000'
+    var timeStamp = '1605084195'
+    var paySign = 'D69B65CBFC380D1928AF315FCDAF2E36'
 
 
 
