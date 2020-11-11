@@ -1,4 +1,4 @@
-<button bindtap="gotoCreateTaskFaceToFace"  >线下生成养护单</button>
+<button bindtap="gotoCreateTaskFaceToFace" bindtap="gotoAccept"  >线下生成养护单</button>
 <mp-cells ext-class="my-cells" title="根据不同选项查询订单">
   <mp-cell>
     <button style="width:400rpx" bindtap="goToAssign" > 未 分 配 客 服 订 单 </button>

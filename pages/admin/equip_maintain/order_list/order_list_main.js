@@ -116,5 +116,10 @@ Page({
   },
   orderIdInput: function(source) {
     this.setData({orderId: source.detail.value})
+  },
+  gotoAccept: function(source) {
+    wx.navigateTo({
+      url: '../accept_equip/accept_equip',
+    })
   }
 })
