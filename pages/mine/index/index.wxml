@@ -1,7 +1,7 @@
 <myinfo></myinfo>
-<view class="page__bd page__bd_spacing" >
+<!--view class="page__bd page__bd_spacing" >
   <view class="weui-cell weui-cell_access js_item" >我的订单</view>
   <view class="weui-cell weui-cell_access js_item" >我的返现</view>
   <view class="weui-cell weui-cell_access js_item" >我的积分</view>
   <view class="weui-cell weui-cell_access js_item" >我的分享</view>
-</view>
+</view-->
