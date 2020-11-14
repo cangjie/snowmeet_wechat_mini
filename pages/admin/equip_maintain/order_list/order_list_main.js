@@ -121,5 +121,10 @@ Page({
     wx.navigateTo({
       url: '../accept_equip/accept_equip',
     })
+  },
+  goHome: function(source) {
+    wx.navigateTo({
+      url: '../../../index/index',
+    })
   }
 })

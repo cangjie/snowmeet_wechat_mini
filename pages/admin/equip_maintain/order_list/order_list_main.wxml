@@ -18,5 +18,4 @@
     <button bindtap="goToOrderListAll"> 全 部 订 单 </button>
   </mp-cell>
 </mp-cells>
-
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

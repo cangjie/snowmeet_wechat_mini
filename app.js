@@ -47,6 +47,7 @@ App({
             //console.log(res.data)
             try
             {
+              /*
               this.globalData.sessionKey = res.data.session_key
               this.globalData.role = res.data.role
               if (this.globalData.role == 'staff') {
@@ -54,6 +55,7 @@ App({
                   url: '/pages/admin/equip_maintain/order_list/order_list_main',
                 })
               }
+              */
             }
             catch(errMsg)
             {

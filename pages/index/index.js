@@ -47,9 +47,11 @@ Page({
   },
   onShow: function(e) {
     if (app.globalData.role == 'staff') {
+      /*
       wx.navigateTo({
         url: '/pages/admin/equip_maintain/search_order/search_order',
       })
+      */
     }
   },
   getUserInfo: function(e) {
