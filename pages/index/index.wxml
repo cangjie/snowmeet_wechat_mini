@@ -1,16 +1,19 @@
-<!--index.wxml-->
-<view class="container">
-  <view class="userinfo">
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-    <block wx:else>
-      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-    </block>
-  </view>
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
-  </view>
-  <view>
-    <button bindtap="jump" > 跳 转 </button>
+<view>
+  <view class="weui-flex" wx:for="{{productsPairListArray}}" >
+    
+    <view  wx:if="{{item[0].title==''}}" class="weui-flex__item cell-left" ></view>
+    <view  wx:else class="weui-flex__item product-cell cell-left" id="{{item[0].product_id}}" bindtap="gotoDetail" >
+      <view><b style="font-size:85%" >{{item[0].title}}</b></view>
+      <view style="text-align:center;margin-top:20rpx" ><image src="{{item[0].head_img[0]}}" mode="scaleToFill" style="width:300rpx;height:300rpx" ></image></view>
+      <view style="font-size:80%" >价格：{{item[0].min_price/100}}元</view>
+    </view>
+    <view  wx:if="{{item[1].title==''}}" class="weui-flex__item cell-right" ></view>
+    <view  wx:else class="weui-flex__item product-cell cell-right" id="{{item[1].product_id}}" bindtap="gotoDetail" >
+      <view><b style="font-size:85%" >{{item[1].title}}</b></view>
+      <view style="text-align:center;margin-top:20rpx" ><image src="{{item[1].head_img[0]}}" mode="scaleToFill" style="width:300rpx;height:300rpx" ></image></view>
+      <view style="font-size:80%" >价格：{{item[1].min_price/100}}元</view>
+    </view>
+    
   </view>
 </view>
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

@@ -144,6 +144,26 @@ App({
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png",
       }
+    ],
+    userTabBarItem: [
+      {
+        "pagePath": "/pages/index/index",
+        "text": "装备",
+        "iconPath": "images/zhihu-fill.png",
+        "selectedIconPath": "images/zhihu-fill-hl.png"
+      },
+      {
+        "pagePath": "/pages/skipass/skipass",
+        "text": "雪票",
+        "iconPath": "images/book-3-line.png",
+        "selectedIconPath": "images/book-3-line-hl.png"
+      },
+      {
+        "pagePath": "/pages/logs/logs",
+        "text": "我的",
+        "iconPath": "images/home-2-line.png",
+        "selectedIconPath": "images/home-2-line-hl.png"
+      }
     ]
   }
 })

@@ -1,3 +1,6 @@
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "mp-tabbar": "/modules/tabbar/tabbar"
+  },
+  "navigationBarTitleText": "易龙雪聚"
 }

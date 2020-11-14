@@ -1,5 +1,4 @@
 {
-  
   "pages": [
     "pages/index/index",
     "pages/logs/logs",
@@ -14,12 +13,12 @@
     "pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill",
     "pages/admin/equip_maintain/order_list/order_list_main",
     "pages/admin/equip_maintain/order_list/order_detail_assign/order_detail_assign",
-    "pages/admin/equip_maintain/order_list/order_detail/order_detail",   
+    "pages/admin/equip_maintain/order_list/order_detail/order_detail",
     "pages/test/pay/pay",
     "pages/admin/equip_maintain/accept_equip/accept_equip",
     "pages/test/upload/upload",
-    "pages/admin/equip_maintain/order_list/task/task"
-
+    "pages/admin/equip_maintain/order_list/task/task",
+    "pages/skipass/skipass"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -28,5 +27,11 @@
     "navigationBarTextStyle": "black"
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "plugins": {
+    "mini-shop-plugin": {
+      "version": "1.0.72",
+      "provider": "wx34345ae5855f892d"
+    }
+  }
 }

@@ -53,6 +53,35 @@ Page({
       })
       */
     }
+
+    this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 0})
+    var url = 'https://' + app.globalData.domainName + '/api/mini_shop_products_list_get.aspx'
+    wx.request({
+      url: url,
+      success: (res) => {
+        if (res.data.errcode==0){
+          var productsPairListArray = []
+          var pair = []
+          for(var i = 0; i < res.data.spus.length; i++) {
+            if (i % 2 == 0) {
+              pair = []
+            }
+            pair.push(res.data.spus[i])
+            if (i % 2 == 1) {
+              productsPairListArray.push(pair)
+            }
+          }
+          if (pair.length == 1){
+            pair.push({title: ''})
+            productsPairListArray.push(pair)
+          }
+          this.setData({productsPairListArray: productsPairListArray})
+        }
+        
+      }
+    })
+
+
   },
   getUserInfo: function(e) {
     console.log(e)
@@ -78,6 +107,31 @@ Page({
     */
     wx.navigateTo({
       url: '/pages/test/tab/tab',
+    })
+  },
+  gotoDetail: function(e) {
+    var id = e.currentTarget.id
+    var path = ''
+    for(var i = 0; i < this.data.productsPairListArray.length; i++) {
+      if (this.data.productsPairListArray[i][0].product_id == id) {
+        path = this.data.productsPairListArray[i][0].path
+      }
+      else if (this.data.productsPairListArray[i][1].title != '') {
+        path = this.data.productsPairListArray[i][1].path
+      }
+      else {
+
+      }
+    }
+    if (path!='') {
+      wx.navigateTo({
+        url: path
+      })
+    }
+  },
+  tabSwitch: function(e) {
+    wx.navigateTo({
+      url: e.detail.item.pagePath
     })
   }
 })
