@@ -1,4 +1,6 @@
 // pages/skipass/skipass.js
+var wxloginModule = require('../../utils/wxlogin.js')
+const app = getApp()
 Page({
 
   /**
@@ -12,7 +14,8 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-
+    wxloginModule.wxlogin()
+    this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey),  tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1})
   },
 
   /**
@@ -26,7 +29,7 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow: function () {
-
+    
   },
 
   /**

@@ -47,8 +47,9 @@ App({
             //console.log(res.data)
             try
             {
-              /*
+              
               this.globalData.sessionKey = res.data.session_key
+              /*
               this.globalData.role = res.data.role
               if (this.globalData.role == 'staff') {
                 wx.navigateTo({
