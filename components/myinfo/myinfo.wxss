@@ -1,0 +1,2 @@
+/* components/myinfo/myinfo.wxss */
+@import '/app.wxss';

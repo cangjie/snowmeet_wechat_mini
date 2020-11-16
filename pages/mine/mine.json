@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "my-info": "../../components/myinfo/myinfo",
+    "mp-tabbar": "/modules/tabbar/tabbar"
+  }
+}

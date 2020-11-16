@@ -160,7 +160,7 @@ App({
         "selectedIconPath": "images/book-3-line-hl.png"
       },
       {
-        "pagePath": "/pages/logs/logs",
+        "pagePath": "/pages/mine/mine",
         "text": "我的",
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png"
