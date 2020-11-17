@@ -78,7 +78,7 @@ Page({
       var iv = res.detail.iv
       var encStr = crypto.encrypted("福田区", app.globalData.sessionKey, res.iv)
       console.log(encStr)//加密
-      var decStr = crypto.decrypted(encryptedData, app.globalData.sessionKey, res.iv)
+      var decStr = crypto.decrypted(encStr, app.globalData.sessionKey, res.iv)
       console.log(decStr)//解密
       //var decryptedString = crypto.decrypted(encryptedData, app.globalData.sessionKey, iv)
     }
