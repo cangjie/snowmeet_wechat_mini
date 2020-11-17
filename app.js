@@ -85,6 +85,7 @@ App({
                 success: res => {
                   if (res.data.encdata == this.globalData.encryptedData && res.data.sessionkey == this.globalData.sessionKey && res.data.iv == this.globalData.iv) {
                     console.log('well')
+                    
                   }
                 }
               })
