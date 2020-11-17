@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    needValidCell: true
   },
 
   /**

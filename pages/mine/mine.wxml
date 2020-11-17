@@ -1,3 +1,3 @@
 <my-info ></my-info>
-<button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" > 授 权 登 录 </button>
+<auth validType="info" ></auth>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

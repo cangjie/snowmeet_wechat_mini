@@ -1,4 +1,5 @@
 <view>
-  <web-view style="height:100rpx" src="https://mini.snowmeet.top/pages/ski_pass_product_list_new.aspx?sessionkey={{sessionKey}}" ></web-view>
+  <auth wx:if="{{needValidCell}}" ></auth>
+  <web-view wx:else style="height:100rpx" src="https://mini.snowmeet.top/pages/ski_pass_product_list_new.aspx?sessionkey={{sessionKey}}" ></web-view>
 </view>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

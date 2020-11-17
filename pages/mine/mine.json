@@ -1,6 +1,7 @@
 {
   "usingComponents": {
     "my-info": "../../components/myinfo/myinfo",
-    "mp-tabbar": "/modules/tabbar/tabbar"
+    "mp-tabbar": "/modules/tabbar/tabbar",
+    "auth": "../../components/auth/auth"
   }
 }
