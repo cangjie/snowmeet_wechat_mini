@@ -42,11 +42,27 @@ Component({
       }
     }
     else if (this.properties.validType == 'cell') {
-      var needGet = true
-      if (needGet) {
-        var title = '需要您授权获取手机号'
-        this.setData({show: false, validType: 'cell'})
-      }
+      var url = 'https://' + app.globalData.domainName + '/api/cell_number_used_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: url,
+        success: res => {
+          if (res.data.status == 0){
+            if (res.data.need_update==1) {
+              var title = '需要您授权获取手机号'
+              if (res.data.number != '') {
+                title = '需要您重新授权获取手机号'
+              }
+              this.setData({show: true, validType: 'cell', title: title})
+            }
+            else {
+              this.triggerEvent("UpdateSuccess", {})
+            }
+          }
+          else{
+            
+          }
+        }
+      })
     }
   },
   /**
@@ -56,6 +72,20 @@ Component({
     getUserInfo: function(res) {
       app.globalData.userInfo = res.detail.userInfo
       this.setData({show: false})
+    },
+    getPhoneNumber: function(res) {
+      if(res.detail.errMsg=='getPhoneNumber:ok')
+      {
+        var url = 'https://' + app.globalData.domainName + '/api/cell_number_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)+'&encdata='+encodeURIComponent(res.detail.encryptedData)+'&iv='+encodeURIComponent(res.detail.iv)
+        wx.request({
+          url: url,
+          success: res => {
+            this.setData({show: false})
+            app.globalData.cellNumber = res.data.phoneNumber
+            this.triggerEvent("UpdateSuccess", {})
+          }
+        })
+      }
     }
   }
 })

@@ -65,5 +65,8 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  onUpdateSuccess: function() {
+    this.setData({needValidCell: false})
   }
 })
