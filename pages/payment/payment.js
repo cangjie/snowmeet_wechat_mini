@@ -1,3 +1,4 @@
+// pages/payment/payment.js
 const app = getApp()
 var wxloginModule = require('../../utils/wxlogin.js')
 Page({
@@ -6,15 +7,35 @@ Page({
    * Page initial data
    */
   data: {
-
+    needValidCell: true,
+    orderId: 0,
+    prepayId:'',
+    timeStamp:'',
+    nonce:'',
+    sign:'',
+    totalString: ''
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    var totalString = 'nonceStr=' + options.nonce + '&package=prepay_id=' + options.prepayid + '&signType=MD5&timeStamp=' + options.timestamp
     wxloginModule.wxlogin()
-    this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2})
+    this.setData({orderId : options.orderid, prepayId: options.prepayid, timeStamp: options.timestamp, nonce: options.nonce, sign: options.sign})
+    wx.requestPayment({
+      nonceStr: options.nonce,
+      package: 'prepay_id=' + options.prepayid,
+      paySign: options.sign,
+      timeStamp: options.timestamp,
+      signType: 'MD5',
+      success: (res) => {
+
+      },
+      fail: (res) => {
+
+      }
+    })
   },
 
   /**
@@ -65,9 +86,7 @@ Page({
   onShareAppMessage: function () {
 
   },
-  tabSwitch: function(e) {
-    wx.navigateTo({
-      url: e.detail.item.pagePath
-    })
+  onUpdateSuccess: function(){
+    this.setData({needValidCell: false})
   }
 })

@@ -19,7 +19,8 @@
     "pages/test/upload/upload",
     "pages/admin/equip_maintain/order_list/task/task",
     "pages/skipass/skipass",
-    "pages/mine/mine"
+    "pages/mine/mine",
+    "pages/payment/payment"
   ],
   "window": {
     "backgroundTextStyle": "light",

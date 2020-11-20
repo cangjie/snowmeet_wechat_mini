@@ -1,0 +1,4 @@
+<auth wx:if="{{needValidCell}}" validType="cell" bindUpdateSuccess="onUpdateSuccess" ></auth>
+<view wx:else >
+  start to pay {{orderId}} {{prepayId}}
+</view>
