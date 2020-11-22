@@ -1,7 +1,6 @@
 <!--components/myinfo/myinfo.wxml-->
-<view class="weui-flex" style="flex-direction:row" >
+<!--view class="weui-flex" style="flex-direction:row" >
   <view  style="width:200rpx;margin:10rpx" >
-    <!--image  class="userinfo-avatar"  style="width:150rpx;height:150rpx;margin-left:50rpx;margin-bottom:50rpx" src="../../pages/mine/images/lovely_ski.jpeg" ></image-->
     <open-data type="userAvatarUrl" ></open-data>
   </view>
   <view  style="width:500rpx" >
@@ -9,4 +8,12 @@
     <view>积分：xxx</view>
     <view>返现余额：xxx</view>
   </view>
+</view-->
+<!--image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+<text class="userinfo-nickname">{{userInfo.nickName}}</text-->
+<view>
+  <open-data type="userAvatarUrl" class="userinfo-avatar" ></open-data>
+</view>
+<view>
+  <open-data type="userNickName"  class="userinfo-nickname" ></open-data>
 </view>
