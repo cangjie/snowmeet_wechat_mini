@@ -97,8 +97,8 @@ App({
       {
         "pagePath": "/pages/index/index",
         "text": "装备",
-        "iconPath": "images/zhihu-fill.png",
-        "selectedIconPath": "images/zhihu-fill-hl.png"
+        "iconPath": "/images/equip.jpg",
+        "selectedIconPath": "/images/equip.jpg"
       },
       {
         "pagePath": "/pages/skipass/skipass",

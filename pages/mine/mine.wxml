@@ -1,3 +1,7 @@
 <my-info ></my-info>
 <auth validType="info" ></auth>
+<mp-cells ext-class="my-cells" >
+  <mp-cell value="我的雪票" footer="" bindtap="gotoSkipass"></mp-cell>
+  <mp-cell value="我的订单" footer="" bindtap="gotoOrders" ></mp-cell>
+</mp-cells>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

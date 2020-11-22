@@ -20,7 +20,8 @@
     "pages/admin/equip_maintain/order_list/task/task",
     "pages/skipass/skipass",
     "pages/mine/mine",
-    "pages/payment/payment"
+    "pages/payment/payment",
+    "pages/mine/my_ski_pass/my_ski_pass"
   ],
   "window": {
     "backgroundTextStyle": "light",

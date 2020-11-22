@@ -1,5 +1,6 @@
+// pages/mine/my_ski_pass/my_ski_pass.js
 const app = getApp()
-var wxloginModule = require('../../utils/wxlogin.js')
+var wxloginModule = require('../../../utils/wxlogin.js')
 Page({
 
   /**
@@ -14,7 +15,7 @@ Page({
    */
   onLoad: function (options) {
     wxloginModule.wxlogin()
-    this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2})
+    this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey)})
   },
 
   /**
@@ -64,21 +65,5 @@ Page({
    */
   onShareAppMessage: function () {
 
-  },
-  tabSwitch: function(e) {
-    wx.navigateTo({
-      url: e.detail.item.pagePath
-    })
-  },
-  gotoOrders: function(e) {
-    wx.navigateTo({
-      url: 'plugin-private://wx34345ae5855f892d/pages/orderList/orderList?tabId=all',
-     
-    });
-  },
-  gotoSkipass: function(e) {
-    wx.navigateTo({
-      url: '/pages/mine/my_ski_pass/my_ski_pass',
-    })
   }
 })
