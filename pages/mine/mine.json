@@ -2,6 +2,9 @@
   "usingComponents": {
     "my-info": "../../components/myinfo/myinfo",
     "mp-tabbar": "/modules/tabbar/tabbar",
-    "auth": "../../components/auth/auth"
-  }
+    "auth": "../../components/auth/auth",
+    "mp-cells": "/modules/cells/cells",
+    "mp-cell": "/modules/cell/cell"
+  },
+  "navigationBarTitleText": "易龙雪聚"
 }

@@ -17,15 +17,17 @@ Page({
   },
   onLoad: function () {
     wxloginModule.wxlogin()
+    /*
+    wx.navigateTo({
+      url: '/pages/admin/equip_maintain/order_list/order_list_main',
+    })
+    */
   },
   onShow: function(e) {
-    if (app.globalData.role == 'staff') {
-      /*
-      wx.navigateTo({
-        url: '/pages/admin/equip_maintain/search_order/search_order',
-      })
-      */
-    }
+   
+    
+      
+    
 
     this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 0})
     var url = 'https://' + app.globalData.domainName + '/api/mini_shop_products_list_get.aspx'

@@ -24,11 +24,12 @@ Page({
     wxloginModule.wxlogin()
     this.setData({orderId : options.orderid, prepayId: options.prepayid, timeStamp: options.timestamp, nonce: options.nonce, sign: options.sign})
     wx.requestPayment({
+      appId: app.globalData.appId,      
+      timeStamp: options.timestamp,
       nonceStr: options.nonce,
       package: 'prepay_id=' + options.prepayid,
-      paySign: options.sign,
-      timeStamp: options.timestamp,
       signType: 'MD5',
+      paySign: options.sign,
       success: (res) => {
 
       },
