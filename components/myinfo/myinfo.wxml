@@ -9,11 +9,15 @@
     <view>返现余额：xxx</view>
   </view>
 </view-->
-<!--image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-<text class="userinfo-nickname">{{userInfo.nickName}}</text-->
-<view>
-  <open-data type="userAvatarUrl" class="userinfo-avatar" ></open-data>
-</view>
-<view>
-  <open-data type="userNickName"  class="userinfo-nickname" ></open-data>
+<!--image bindtap="bindViewTap" class="userinfo-avatar" src="{{avatarUrl}}" mode="cover"></image>
+<text class="userinfo-nickname">{{nick}}</text-->
+
+
+<view class="weui-flex" >
+  <view class="weui-flex__item"></view>
+  <view class="weui-flex__item" style="text-align:center;width:70rpx">
+    <view class="userinfo-avatar"  ><open-data class="userinfo-avatar" type="userAvatarUrl"  style="text-align:center"  ></open-data></view>
+    <view class="userinfo-nickname"  ><open-data type="userNickName"    style="text-align:center;margin-left:-50rpx"  ></open-data></view>
+  </view>
+  <view class="weui-flex__item"></view>
 </view>

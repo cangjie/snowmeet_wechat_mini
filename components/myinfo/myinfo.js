@@ -1,4 +1,5 @@
 // components/myinfo/myinfo.js
+const app = getApp()
 Component({
   /**
    * Component properties
@@ -13,7 +14,9 @@ Component({
   data: {
 
   },
-
+  ready: function() {
+    
+  },
   /**
    * Component methods
    */
