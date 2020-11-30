@@ -11,6 +11,7 @@ function wxlogin() {
           }
         }
       })
+      
     },
     fail: (res) => {
       wx.login({
@@ -39,6 +40,7 @@ function wxlogin() {
       })
     }
   })
+
 }
 module.exports={
   wxlogin: wxlogin

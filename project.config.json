@@ -31,9 +31,11 @@
     "useIsolateContext": true,
     "useCompilerModule": false,
     "userConfirmedUseCompilerModuleSwitch": false,
+    "userConfirmedBundleSwitch": false,
     "packNpmManually": false,
     "packNpmRelationList": [],
-    "minifyWXSS": true
+    "minifyWXSS": true,
+    "bundle": false
   },
   "compileType": "miniprogram",
   "libVersion": "2.11.3",
@@ -47,24 +49,23 @@
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
   "condition": {
-    "search": {
-      "list": []
-    },
-    "conversation": {
+    "plugin": {
       "list": []
     },
     "game": {
       "list": []
     },
-    "plugin": {
-      "list": []
-    },
     "gamePlugin": {
       "list": []
     },
-    "miniprogramRoot": "/modules/package.json",
     "miniprogram": {
-      "list": []
+      "list": [
+        {
+          "name": "skipass",
+          "pathName": "pages/skipass/skipass",
+          "scene": 1067
+        }
+      ]
     }
   }
 }

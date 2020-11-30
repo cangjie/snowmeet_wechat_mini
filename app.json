@@ -21,7 +21,8 @@
     "pages/skipass/skipass",
     "pages/mine/mine",
     "pages/payment/payment",
-    "pages/mine/my_ski_pass/my_ski_pass"
+    "pages/mine/my_ski_pass/my_ski_pass",
+    "pages/maintain/in_shop_request/in_shop_request"
   ],
   "window": {
     "backgroundTextStyle": "light",

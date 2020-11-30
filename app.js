@@ -58,7 +58,8 @@ App({
 
       }
     })
-   },
+  },
+  
   globalData: {
     appId:'wxd1310896f2aa68bb',
     domainName:'mini.snowmeet.top',

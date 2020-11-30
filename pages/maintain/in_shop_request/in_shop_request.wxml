@@ -1,0 +1,62 @@
+<official-account ></official-account>
+<auth wx:if="{{needValidCell}}" validType="cell" bindUpdateSuccess="onUpdateSuccess" ></auth>
+<view wx:else >
+  <view style="text-align:center" ><b>雪具养护-填写信息</b></view>
+  <view>
+    <mp-cells ext-class="my-cells" title="">
+      <mp-cell  >
+        <view class="flex-wrp" style="flex-direction:row;" >
+          <view style="width:200rpx;text-align:right" >装备类型：</view>
+          <view >
+            <radio-group>
+              <radio checked="true" >双板</radio>
+              <radio>单板</radio>
+            </radio-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="flex-wrp" style="flex-direction:row;" >
+          <view style="width:200rpx;text-align:right" >品牌：</view>
+          <view></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="flex-wrp" style="flex-direction:row;" >
+          <view style="width:200rpx;text-align:right" >长度：</view>
+          <view></view>
+        </view>
+      </mp-cell>
+      <mp-cell >
+        <view class="flex-wrp" style="flex-direction:row;" >
+          <view style="width:200rpx;text-align:right" >项目：</view>
+          <view >
+            <radio-group>
+              <radio checked="true" >修刃打蜡</radio>
+              <radio>单修刃</radio>
+            </radio-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell >
+        <view class="flex-wrp" style="flex-direction:row;" >
+          <view style="width:200rpx;text-align:right" >其他维修：</view>
+          <view >
+            <radio-group>
+              <radio checked="true" >不需要</radio>
+              <radio>需要</radio>
+            </radio-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell >
+        <view class="flex-wrp" style="flex-direction:row;" >
+          <view style="width:200rpx;text-align:right" >取板时间：</view>
+          <view>
+            
+          </view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+</view>
