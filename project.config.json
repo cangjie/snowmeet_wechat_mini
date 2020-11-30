@@ -63,7 +63,14 @@
         {
           "name": "skipass",
           "pathName": "pages/skipass/skipass",
+          "query": "",
           "scene": 1067
+        },
+        {
+          "name": "mine",
+          "pathName": "pages/mine/mine",
+          "query": "",
+          "scene": null
         }
       ]
     }

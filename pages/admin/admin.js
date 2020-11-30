@@ -1,5 +1,8 @@
+// pages/admin/admin.js
 const app = getApp()
-var wxloginModule = require('../../utils/wxlogin.js')
+function init(that) {
+  that.setData({role: app.globalData.role})
+}
 Page({
 
   /**
@@ -13,17 +16,15 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    //wxloginModule.wxlogin()
     if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
       var that = this
       app.loginPromise.then(function(resolve) {
-        that.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role})
+        init(that)
       })
     }
     else {
-      this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role})
+      init(this)
     }
-    
   },
 
   /**
@@ -73,26 +74,5 @@ Page({
    */
   onShareAppMessage: function () {
 
-  },
-  tabSwitch: function(e) {
-    wx.navigateTo({
-      url: e.detail.item.pagePath
-    })
-  },
-  gotoOrders: function(e) {
-    wx.navigateTo({
-      url: 'plugin-private://wx34345ae5855f892d/pages/orderList/orderList?tabId=all',
-     
-    });
-  },
-  gotoSkipass: function(e) {
-    wx.navigateTo({
-      url: '/pages/mine/my_ski_pass/my_ski_pass',
-    })
-  },
-  gotoAdmin: function(e) {
-    wx.navigateTo({
-      url: '/pages/admin/admin',
-    })
   }
 })

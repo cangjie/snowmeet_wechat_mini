@@ -14,8 +14,16 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    wxloginModule.wxlogin()
-    this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey),  tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1})
+    //wxloginModule.wxlogin()
+    if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
+      var that = this
+      app.loginPromise.then(function(resovle){
+        that.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey),  tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1})
+      })
+    }
+    else {
+      this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey),  tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1})
+    }
   },
 
   /**
