@@ -1,30 +1,18 @@
-// pages/admin/admin.js
-const app = getApp()
-function init(that) {
-  that.setData({role: app.globalData.role})
-}
+// pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_confirm.js
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    role: ''
+
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
-      var that = this
-      app.loginPromise.then(function(resolve) {
-        init(that)
-      })
-    }
-    else {
-      init(this)
-    }
+
   },
 
   /**
@@ -75,9 +63,9 @@ Page({
   onShareAppMessage: function () {
 
   },
-  gotoInShopOrderConfirm: function() {
+  gotoDetail: function() {
     wx.navigateTo({
-      url: './equip_maintain/in_shop_order_confirm/in_shop_order_confirm',
+      url: './in_shop_order_detail/in_shop_order_detail',
     })
   }
 })

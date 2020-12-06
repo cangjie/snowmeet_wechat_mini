@@ -67,9 +67,15 @@
           "scene": 1067
         },
         {
-          "name": "mine",
-          "pathName": "pages/mine/mine",
-          "query": "",
+          "name": "maitain_request",
+          "pathName": "pages/maintain/in_shop_request/in_shop_request",
+          "query": "shop=万龙",
+          "scene": null
+        },
+        {
+          "name": "pages/index/index",
+          "pathName": "pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_detail/in_shop_order_detail",
+          "query": "scene=17",
           "scene": null
         }
       ]
