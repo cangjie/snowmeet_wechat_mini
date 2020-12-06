@@ -1,9 +1,9 @@
 //app.js
 var crypto  = require('/utils/crypt.js')
 App({
-  onLaunch: function () {
+  onLaunch: function (res) {
     const updateManager = wx.getUpdateManager()
-
+    this.globalData.scene = res.scene
     updateManager.onCheckForUpdate(function (res) {
       // 请求完新版本信息的回调
       console.log(res.hasUpdate)

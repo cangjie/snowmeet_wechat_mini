@@ -108,5 +108,8 @@ Page({
     wx.navigateTo({
       url: e.detail.item.pagePath
     })
+  },
+  officalLoad: function(e){
+    
   }
 })

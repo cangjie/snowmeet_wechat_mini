@@ -1,4 +1,6 @@
+
 <view>
+  <official-account bindload="officalLoad"  ></official-account>
   <view class="weui-flex" wx:for="{{productsPairListArray}}" >
     
     <view  wx:if="{{item[0].title==''}}" class="weui-flex__item cell-left" ></view>
