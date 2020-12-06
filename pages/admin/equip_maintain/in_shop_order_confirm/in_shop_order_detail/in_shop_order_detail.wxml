@@ -24,10 +24,10 @@
     <mp-cell>
       <view style="text-aligh:left;color:gray">用户填写：{{maintain_in_shop_request.equip_type}} {{maintain_in_shop_request.brand}} {{maintain_in_shop_request.scale}}</view>
     </mp-cell>
-    <mp-cell>
+    <mp-cell wx:if="{{maintain_in_shop_request.equip_type!=''}}" >
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >装备：{{maintain_in_shop_request.equip_type}}</view>
-        <view><equip-info type="{{maintain_in_shop_request.equip_type}}" ></equip-info></view>
+        <view  ><equip-info type="{{maintain_in_shop_request.equip_type}}" ></equip-info></view>
       </view>
     </mp-cell>
     <mp-cell>

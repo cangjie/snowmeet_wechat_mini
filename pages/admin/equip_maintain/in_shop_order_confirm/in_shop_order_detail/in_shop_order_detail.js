@@ -6,7 +6,8 @@ Page({
    * Page initial data
    */
   data: {
-    edgeDegree: '89'
+    edgeDegree: '89',
+    //maintain_in_shop_request:{equip_type: '双板'}
   },
 
   /**
@@ -24,7 +25,7 @@ Page({
               success: (res) => {
                 if (res.data.status == 0) {
                   resolve(res.data.maintain_in_shop_request)
-                  
+                  that.setData({maintain_in_shop_request: resolve})
                 } 
               }
             })
