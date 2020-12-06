@@ -13,7 +13,8 @@ Page({
     timeStamp:'',
     nonce:'',
     sign:'',
-    totalString: ''
+    totalString: '',
+    havePaid: false
   },
 
   /**
@@ -22,6 +23,7 @@ Page({
   onLoad: function (options) {
     var totalString = 'nonceStr=' + options.nonce + '&package=prepay_id=' + options.prepayid + '&signType=MD5&timeStamp=' + options.timestamp
     wxloginModule.wxlogin()
+    var orderId = options.orderid
     this.setData({orderId : options.orderid, prepayId: options.prepayid, timeStamp: options.timestamp, nonce: options.nonce, sign: options.sign})
     wx.requestPayment({
       appId: app.globalData.appId,      
@@ -31,7 +33,27 @@ Page({
       signType: 'MD5',
       paySign: options.sign,
       success: (res) => {
+        
+        var orderInfoUrl = 'https://' + app.globalData.domainName + '/api/order_info_get.aspx?orderid=' + orderId + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: orderInfoUrl,
+          success: (res) => {
+            if (res.data.status == 0) {
+              if (res.data.order_online.type.trim()=='雪票') {
+                /*
+                wx.requestSubscribeMessage({
+                  tmplIds: ['Fp_lJYTxVZVbc5PdvA-z-8UqUrf6VNAYH4EVFuf2af8'],
+                  success: (res)=>{ 
 
+                  }
+                })
+                */
+              }
+              this.setData({havePaid: true, orderInfo: res.data.order_online})
+            }
+          }
+        })
+        
       },
       fail: (res) => {
 

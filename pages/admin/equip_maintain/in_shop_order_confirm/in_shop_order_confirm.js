@@ -1,29 +1,18 @@
-// pages/skipass/skipass.js
-var wxloginModule = require('../../utils/wxlogin.js')
-const app = getApp()
+// pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_confirm.js
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    needValidCell: true
+
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    //wxloginModule.wxlogin()
-    if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
-      var that = this
-      app.loginPromise.then(function(resovle){
-        that.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey),  tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1})
-      })
-    }
-    else {
-      this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey),  tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1})
-    }
+
   },
 
   /**
@@ -37,7 +26,7 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow: function () {
-    
+
   },
 
   /**
@@ -74,7 +63,9 @@ Page({
   onShareAppMessage: function () {
 
   },
-  onUpdateSuccess: function() {
-    this.setData({needValidCell: false})
+  gotoDetail: function() {
+    wx.navigateTo({
+      url: './in_shop_order_detail/in_shop_order_detail',
+    })
   }
 })

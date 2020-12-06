@@ -19,9 +19,10 @@ Page({
     wxloginModule.wxlogin()
     /*
     wx.navigateTo({
-      url: '/pages/admin/equip_maintain/order_list/order_list_main',
+      url: '/pages/maintain/in_shop_request/in_shop_request',
     })
     */
+    
   },
   onShow: function(e) {
    

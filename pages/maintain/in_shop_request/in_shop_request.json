@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "auth": "../../../components/auth/auth",
+    "mp-cells": "/modules/cells/cells",
+    "mp-cell": "/modules/cell/cell"
+  },
+  "navigationBarTitleText": "易龙雪聚"
+}

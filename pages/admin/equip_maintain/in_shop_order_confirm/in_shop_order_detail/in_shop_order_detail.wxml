@@ -1,0 +1,83 @@
+<view>
+  <mp-cells>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >手机：</view>
+        <view><input value="{{userInfo.cell_number}}" type="number" ></input></view>
+        <view style="text-aligh:right;padding-right:10rpx;background-color:green;color:#fff;margin-left:10rpx;padding:10rpx;" bindtap="call"><b> 拨 打 </b></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >姓名：</view>
+        <view><input placeholder="{{userInfo.nick}}" value="{{userInfo.real_name}}" ></input></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >称谓：</view>
+        <view>
+          <radio-group><radio  checked="{{userInfo.gender=='男'}}" value="男" >先生</radio><radio checked="{{userInfo.gender=='女'}}" value="女" >女士</radio></radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="text-aligh:left;color:gray">用户填写：{{maintain_in_shop_request.equip_type}} {{maintain_in_shop_request.brand}} {{maintain_in_shop_request.scale}}</view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >装备：</view>
+        <view  ><equip-info type="{{equipType}}" ></equip-info></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >修刃：</view>
+        <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+          <checkbox style="width:150rpx" value="修刃" checked="{{maintain_in_shop_request.edge=='1'}}"  ></checkbox><input style="width:150rpx" placeholder="89" ></input>度
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >打蜡：</view>
+        <view><checkbox style="width:150rpx" checked="{{maintain_in_shop_request.candle=='1'}}" value="打蜡" ></checkbox></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >杂项：</view>
+        <view>
+          <checkbox style="width:150rpx">补板底</checkbox>
+          <checkbox style="width:150rpx">修底刃</checkbox>
+          <checkbox style="width:150rpx">粘板面</checkbox>
+          <checkbox style="width:150rpx">其它...</checkbox>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >说明：</view>
+        <view><input placeholder="填写备注" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >额外费用：</view>
+        <view><input placeholder="0" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >总费用：</view>
+        <view><input placeholder="100" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >取板：</view>
+        <view><input value="{{maintain_in_shop_request.pick_date}}" /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

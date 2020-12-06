@@ -27,6 +27,7 @@ Component({
     }
   },
   ready: function() {
+    /*
     var confirmedFilledInfo = this.data.confirmedFilledInfo
     confirmedFilledInfo.type = this.properties.type
     confirmedFilledInfo.brand = this.properties.brand
@@ -45,14 +46,40 @@ Component({
       }
     }
     this.setData({confirmedFilledInfo: confirmedFilledInfo, typeSki: typeSki, yearIndex: yearIndex})
+    */
   },
   lifetimes: {
     attached: function() {
-      var url = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from ski_board_scale_list order by [type], brand, [serial], scale, [year]')
-      wx.request({
-        url: url,
-        success: (res) => {
-          this.setData({allSkiBoardScales: res.data.rows})
+      var that = this
+      app.loginPromise.then(function(resolve){
+        if (app.globalData.sessionKey != '') {
+          var url = 'https://' + app.globalData.domainName + '/api/select_table.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&sql=' + encodeURIComponent('select * from ski_board_scale_list order by [type], brand, [serial], scale, [year]')
+          wx.request({
+            url: url,
+            success: (res) => {
+              that.setData({allSkiBoardScales: res.data.rows})
+              //that.fillPickView()
+              var confirmedFilledInfo = that.data.confirmedFilledInfo
+              confirmedFilledInfo.type = that.properties.type
+              confirmedFilledInfo.brand = that.properties.brand
+              confirmedFilledInfo.serial = that.properties.serial
+              confirmedFilledInfo.scale = that.properties.scale
+              confirmedFilledInfo.year = that.properties.year
+              var typeSki = true
+              var yearIndex = 0
+              if (that.properties.type == '单板') {
+                typeSki = false
+              }
+              for(var i = 0;  i < that.data.years.length; i++) {
+                if (that.properties.year == that.data.years[i].toString()) {
+                yearIndex = i
+                break
+                }
+              }
+              that.setData({confirmedFilledInfo: confirmedFilledInfo, typeSki: typeSki, yearIndex: yearIndex})
+              that.fillPickView()
+            }
+          })
         }
       })
     }

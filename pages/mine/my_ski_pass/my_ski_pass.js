@@ -14,8 +14,17 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    wxloginModule.wxlogin()
-    this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey)})
+    //wxloginModule.wxlogin()
+    //this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey)})
+    if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
+      var that = this
+      app.loginPromise.then(function(resolve) {
+        that.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey)})
+      })
+    }
+    else {
+      this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey)})
+    }
   },
 
   /**
