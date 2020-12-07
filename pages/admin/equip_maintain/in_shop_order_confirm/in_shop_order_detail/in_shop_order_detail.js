@@ -7,6 +7,10 @@ Page({
    */
   data: {
     edgeDegree: '89',
+    summary: 0,
+    productFee: 0,
+    btnDisabled: true,
+    btnText: ' 提 交 '
     //maintain_in_shop_request:{equip_type: '双板'}
   },
 
@@ -52,7 +56,20 @@ Page({
             })
           })
           getUserInfoPromise.then(function(resolve) {
-            that.setData({userInfo: resolve})//, equipInfo:{}, edge: res.data.maintain_in_shop_request.edge, degree: '89', candle: res.data.maintain_in_shop_request.candle, othersItem: '', memo: '', additonalFee: 0, pickDate: that.data.maintain_in_shop_request.pick_date})
+            var confirmedInfo = {}
+            confirmedInfo.request_id = that.data.maintain_in_shop_request.id
+            confirmedInfo.cell_number = resolve.cell_number
+            confirmedInfo.real_name = resolve.real_name
+            confirmedInfo.gender = resolve.gender
+            confirmedInfo.equipInfo = {}
+            confirmedInfo.edge = that.data.maintain_in_shop_request.edge
+            confirmedInfo.degree = '89'
+            confirmedInfo.candle = that.data.maintain_in_shop_request.candle
+            confirmedInfo.repair_more = that.data.maintain_in_shop_request.repair_more
+            confirmedInfo.shop = that.data.maintain_in_shop_request.shop
+            that.setData({userInfo: resolve, confirmedInfo: confirmedInfo})
+            that.viewSummary()
+            
           })
         })
         
@@ -111,6 +128,136 @@ Page({
   call: function() {
     wx.makePhoneCall({
       phoneNumber: this.data.userInfo.cell_number,
+    })
+  },
+  changeCellNumber: function(e) {
+    var newNumber = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.cell_number = newNumber
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  changeRealName: function(e) {
+    var realName = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.real_name = realName
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  changeGender: function(e) {
+    var gender = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.gender = gender
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  equipInfoChange: function(e) {
+    var equipInfo = e.detail.confirmedFilledInfo
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.equipInfo = equipInfo
+    this.setData({confirmedInfo: confirmedInfo})
+    this.viewSummary()
+  },
+  changeEdge: function(e) {
+    var edge = false
+    if (e.detail.value.length == 1) {
+      edge = true
+    }
+    var confirmedInfo = this.data.confirmedInfo
+    if (edge) {
+      confirmedInfo.edge = '1'
+    }
+    else {
+      confirmedInfo.edge = '0'
+    }
+    this.setData({confirmedInfo: confirmedInfo})
+    this.viewSummary()
+  },
+  degreeChange: function(e) {
+    var degree = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.degree = degree
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  changeCandle: function(e) {
+    var candle = false
+    if (e.detail.value.length == 1) {
+      candle = true
+    }
+    var confirmedInfo = this.data.confirmedInfo
+    if (candle) {
+      confirmedInfo.candle = '1'
+    }
+    else {
+      confirmedInfo.candle = '0'
+    }
+    this.setData({confirmedInfo: confirmedInfo})
+    this.viewSummary()
+  },
+  changeRepairMore: function(e) {
+    var repairMore = ''
+    for(var i = 0; i < e.detail.value.length; i++) {
+      repairMore = repairMore + ((repairMore == '')? '' : ',') + e.detail.value[i]
+    }
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.repair_more = repairMore
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  changeMemo: function(e) {
+    var memo = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.memo = memo
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  changeAdditionalFee: function(e) {
+    var fee = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.additional_fee = fee
+    this.setData({confirmedInfo: confirmedInfo})
+    this.viewSummary()
+  },
+  changePickDate: function(e) {
+    var pickDate = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.pick_date = pickDate
+    this.setData({confirmedInfo: confirmedInfo})
+    this.viewSummary()
+  },
+  viewSummary: function(e) {
+    wx.request({
+      url: 'https://' + app.globalData.domainName + '/api/maintain_task_order_place_in_shop.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&action=view',
+      method: 'POST',
+      data: this.data.confirmedInfo,
+      success: (res) => {
+        var btnDisabled = true
+        var btnText = ' 提 交 '
+        if (res.data.total_fee == '0') {
+          btnText = '请选择服务器项目'
+        }
+        else {
+          var type = ''
+          var brand = ''
+          var serial = ''
+          var year = ''
+          var scale = ''
+          var info  = this.data.confirmedInfo.equipInfo
+          try{
+            type = info.type
+            brand = info.brand
+            serial = info.serial
+            scale = info.scale
+            year = info.year
+          }
+          catch(err) {
+
+          }
+          if (type == '' || type == undefined || brand == '' || brand == undefined ||  serial == '' || serial == undefined || year == '' || year == undefined || scale == '' || scale == undefined) {
+            btnText = '请选择装备信息'
+          }
+          else {
+            btnText = ' 提 交 '
+            btnDisabled = false
+          }
+        }
+        this.setData({"summary": res.data.total_fee, "productFee": res.data.product_fee, btnText: btnText, btnDisabled: btnDisabled})
+      }
     })
   }
 })
