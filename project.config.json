@@ -89,6 +89,12 @@
           "pathName": "pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_detail/in_shop_order_detail",
           "query": "scene=20-board",
           "scene": null
+        },
+        {
+          "name": "maintain_pay",
+          "pathName": "pages/payment/payment",
+          "query": "scene=orderid-9485",
+          "scene": null
         }
       ]
     }

@@ -10,7 +10,9 @@ Page({
     summary: 0,
     productFee: 0,
     btnDisabled: true,
-    btnText: ' 提 交 '
+    btnText: ' 提 交 ',
+    orderId: 0,
+    wxaCodeUrl:''
     //maintain_in_shop_request:{equip_type: '双板'}
   },
 
@@ -68,7 +70,7 @@ Page({
             confirmedInfo.repair_more = that.data.maintain_in_shop_request.repair_more
             confirmedInfo.shop = that.data.maintain_in_shop_request.shop
             that.setData({userInfo: resolve, confirmedInfo: confirmedInfo})
-            that.viewSummary()
+            that.viewSummary('view')
             
           })
         })
@@ -153,7 +155,7 @@ Page({
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.equipInfo = equipInfo
     this.setData({confirmedInfo: confirmedInfo})
-    this.viewSummary()
+    this.viewSummary('view')
   },
   changeEdge: function(e) {
     var edge = false
@@ -168,7 +170,7 @@ Page({
       confirmedInfo.edge = '0'
     }
     this.setData({confirmedInfo: confirmedInfo})
-    this.viewSummary()
+    this.viewSummary('view')
   },
   degreeChange: function(e) {
     var degree = e.detail.value
@@ -189,7 +191,7 @@ Page({
       confirmedInfo.candle = '0'
     }
     this.setData({confirmedInfo: confirmedInfo})
-    this.viewSummary()
+    this.viewSummary('view')
   },
   changeRepairMore: function(e) {
     var repairMore = ''
@@ -211,18 +213,21 @@ Page({
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.additional_fee = fee
     this.setData({confirmedInfo: confirmedInfo})
-    this.viewSummary()
+    this.viewSummary('view')
   },
   changePickDate: function(e) {
     var pickDate = e.detail.value
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.pick_date = pickDate
     this.setData({confirmedInfo: confirmedInfo})
-    this.viewSummary()
+    this.viewSummary('view')
   },
-  viewSummary: function(e) {
+  submit: function(e) {
+    this.viewSummary('placeorder')
+  },
+  viewSummary: function(action) {
     wx.request({
-      url: 'https://' + app.globalData.domainName + '/api/maintain_task_order_place_in_shop.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&action=view',
+      url: 'https://' + app.globalData.domainName + '/api/maintain_task_order_place_in_shop.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&action=' + action,
       method: 'POST',
       data: this.data.confirmedInfo,
       success: (res) => {
@@ -257,6 +262,11 @@ Page({
           }
         }
         this.setData({"summary": res.data.total_fee, "productFee": res.data.product_fee, btnText: btnText, btnDisabled: btnDisabled})
+        if (action=='placeorder') {
+          var orderId = res.data.order_id
+          var wxaCodeUrl = 'https://' + app.globalData.domainName + '/get_wxacode_unlimit.aspx?page=' + encodeURIComponent('pages/payment/payment') + '&scene=orderid-' + orderId
+          this.setData({orderId: orderId, wxaCodeUrl: wxaCodeUrl})
+        }
       }
     })
   }

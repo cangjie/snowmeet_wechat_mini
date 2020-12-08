@@ -23,7 +23,21 @@ Page({
   onLoad: function (options) {
     var totalString = 'nonceStr=' + options.nonce + '&package=prepay_id=' + options.prepayid + '&signType=MD5&timeStamp=' + options.timestamp
     wxloginModule.wxlogin()
-    var orderId = options.orderid
+    var orderId = ''
+    try{
+      orderId = options.orderid
+    }
+    catch(msg) {
+
+    }
+    if (orderId == '' || orderId == undefined) {
+      try{
+        orderId = options.scene.split('-')[1].trim()
+      }
+      catch(msg) {
+
+      }
+    }
     this.setData({orderId : options.orderid, prepayId: options.prepayid, timeStamp: options.timestamp, nonce: options.nonce, sign: options.sign})
     wx.requestPayment({
       appId: app.globalData.appId,      

@@ -1,5 +1,5 @@
 <view>
-  <mp-cells>
+  <mp-cells wx:if="{{orderId==0}}">
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >手机：</view>
@@ -102,7 +102,15 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <button disabled="{{btnDisabled}}" >{{btnText}}</button>
+      <button disabled="{{btnDisabled}}" bindtap="submit" >{{btnText}}</button>
     </mp-cell>
   </mp-cells>
+  <view wx:else >
+    <view style="text-align:center" >
+       请顾客扫描以下二维码支付。
+    </view>
+    <view style="text-align:center" >
+      <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
+    </view>
+  </view>
 </view>
