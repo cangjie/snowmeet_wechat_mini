@@ -1,0 +1,17 @@
+<!--pages/mine/my_maintain/my_maintain.wxml-->
+<mp-cells>
+  <block wx:for="{{rows}}" >
+    <mp-cell>
+      <view>电话:{{item.confirmed_cell}}</view>
+      <view>
+        装备:{{item.confirmed_equip_type}} {{item.confirmed_brand}} {{item.confirmed_serial}} {{item.confirmed_scale}} {{item.confirmed_year}}
+      </view>
+      <view>
+        提取日期:{{item.confirmed_pick_date}} 项目:
+        <block wx:if="{{item.confirmed_edge=='1'}}" >修刃 {{item.confirmed_degree}}度</block>
+        <block wx:if="{{item.confirmed_candle=='1'}}" >打蜡</block>
+      </view>
+      <view>备注:{{item.confirmed_memo}}</view>
+    </mp-cell>
+  </block>
+</mp-cells>

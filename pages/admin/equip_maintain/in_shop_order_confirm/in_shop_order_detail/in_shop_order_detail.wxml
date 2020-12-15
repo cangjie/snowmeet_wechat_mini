@@ -86,7 +86,7 @@
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
         <view class="left-column" >额外费用：</view>
-        <view><input placeholder="0" type="number" bindinput="changeAdditionalFee" /></view>
+        <view><input placeholder="0" type="text" bindinput="changeAdditionalFee" /></view>
       </view>
     </mp-cell>
     <mp-cell>

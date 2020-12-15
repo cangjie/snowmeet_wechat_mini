@@ -97,6 +97,10 @@ Page({
   pickDateChange: function(e) {
     this.setData({pickDate: e.detail.value.trim()})
   },
+  repairChange: function(e) {
+    this.setData({repair: ((e.detail.value.trim()=='1')?true:false)})
+    this.checkValid()
+  },
   submit: function(e) {
     if (this.checkValid()) {
       var url = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_create.aspx?sessionkey=' + encodeURIComponent(this.data.sessionKey.trim()) + '&shop=' + encodeURIComponent(this.data.shop) + '&type=' + encodeURIComponent(this.data.type) + '&brand=' + encodeURIComponent(this.data.brand) + '&scale=' + encodeURIComponent(this.data.scale) + '&edge=' + (this.data.edge? '1' : '0') + '&candle=' + (this.data.candle? '1' : '0') + '&repair=' + (this.data.repair? '1':'0') + '&pickdate=' + encodeURIComponent(this.data.pickDate)
@@ -111,6 +115,34 @@ Page({
             }
             var wxaCodeUrl = 'https://' + app.globalData.domainName + '/get_wxacode_unlimit.aspx?page=' + encodeURIComponent('pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_detail/in_shop_order_detail') + '&scene=' + res.data.id + '-' + type
             this.setData({wxaCodeUrl: wxaCodeUrl, id: res.data.id})
+            var requestId = res.data.id
+            //var that = this
+            var payOrderIdInterval = setInterval(function(){
+              var orderId = 0
+              var orderPromise = new Promise(function(resolve){
+                var requestUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&id=' + requestId
+                wx.request({
+                  url: requestUrl,
+                  success: (res) => {
+                    if (res.data.status == 0){
+                      orderId = res.data.maintain_in_shop_request.order_id
+                      resolve({})
+                    }
+                  }
+                })
+              })
+              orderPromise.then(function(resolve){
+                if (orderId!=0){
+                  clearInterval(payOrderIdInterval)
+                  wx.navigateTo({
+                    url: '/pages/payment/payment?orderid=' + orderId
+                  })
+                }
+              })
+            }, 10000)
+            
+            
+            
           }
         }
       })
@@ -119,7 +151,7 @@ Page({
   },
   checkValid: function() {
     if (this.data.brand.trim() != '') {
-      if (this.data.edge || this.data.candle || this.repair) {
+      if (this.data.edge || this.data.candle || this.data.repair) {
         this.setData({buttonDisable: false, buttonText: " 提 交 "})
         return true
       }

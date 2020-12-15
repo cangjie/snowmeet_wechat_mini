@@ -28,14 +28,13 @@
       "disablePlugins": [],
       "outputPath": ""
     },
+    "bundle": false,
     "useIsolateContext": true,
     "useCompilerModule": false,
     "userConfirmedUseCompilerModuleSwitch": false,
-    "userConfirmedBundleSwitch": false,
     "packNpmManually": false,
     "packNpmRelationList": [],
-    "minifyWXSS": true,
-    "bundle": false
+    "minifyWXSS": true
   },
   "compileType": "miniprogram",
   "libVersion": "2.11.3",
@@ -94,6 +93,17 @@
           "name": "maintain_pay",
           "pathName": "pages/payment/payment",
           "query": "scene=orderid-9485",
+          "scene": null
+        },
+        {
+          "name": "pages/admin/equip_maintain/order_list/order_list_main",
+          "pathName": "pages/admin/equip_maintain/order_list/order_list_main",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "mymaintain",
+          "pathName": "pages/mine/my_maintain/my_maintain",
           "scene": null
         }
       ]

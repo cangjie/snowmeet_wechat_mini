@@ -42,9 +42,9 @@
         <view class="flex-wrp" style="flex-direction:row;" >
           <view style="width:200rpx;text-align:right" >其他维修：</view>
           <view >
-            <radio-group>
-              <radio checked="true" >不需要</radio>
-              <radio>需要</radio>
+            <radio-group bindchange="repairChange">
+              <radio checked="true" value="0" >不需要</radio>
+              <radio value="1">需要</radio>
             </radio-group>
           </view>
         </view>
