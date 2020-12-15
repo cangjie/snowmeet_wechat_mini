@@ -21,58 +21,70 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    var totalString = 'nonceStr=' + options.nonce + '&package=prepay_id=' + options.prepayid + '&signType=MD5&timeStamp=' + options.timestamp
-    wxloginModule.wxlogin()
-    var orderId = ''
-    try{
-      orderId = options.orderid
-    }
-    catch(msg) {
 
-    }
-    if (orderId == '' || orderId == undefined) {
-      try{
-        orderId = options.scene.split('-')[1].trim()
-      }
-      catch(msg) {
+    //options.test = 'aa'
 
+    var gatherParameters = new Promise(function(resolve){
+      if (options.scene == undefined) {
+        resolve({})
       }
-    }
-    this.setData({orderId : options.orderid, prepayId: options.prepayid, timeStamp: options.timestamp, nonce: options.nonce, sign: options.sign})
-    wx.requestPayment({
-      appId: app.globalData.appId,      
-      timeStamp: options.timestamp,
-      nonceStr: options.nonce,
-      package: 'prepay_id=' + options.prepayid,
-      signType: 'MD5',
-      paySign: options.sign,
-      success: (res) => {
-        
-        var orderInfoUrl = 'https://' + app.globalData.domainName + '/api/order_info_get.aspx?orderid=' + orderId + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      else {
+        var orderId = options.scene.split('-')[1]
+        options.orderid = orderId
+        var prepayUrl = 'https://' + app.globalData.domainName + '/payment/pre_pay.aspx?orderid=' + orderId
         wx.request({
-          url: orderInfoUrl,
+          url: prepayUrl,
           success: (res) => {
             if (res.data.status == 0) {
-              if (res.data.order_online.type.trim()=='雪票') {
-                /*
-                wx.requestSubscribeMessage({
-                  tmplIds: ['Fp_lJYTxVZVbc5PdvA-z-8UqUrf6VNAYH4EVFuf2af8'],
-                  success: (res)=>{ 
-
-                  }
-                })
-                */
-              }
-              this.setData({havePaid: true, orderInfo: res.data.order_online})
+              options.nonce = res.data.nonce
+              options.prepayid = res.data.prepay_id
+              options.timestamp = res.data.timestamp
+              options.sign = res.data.sign
+              resolve({})
             }
+            
+
           }
         })
-        
-      },
-      fail: (res) => {
-
       }
     })
+
+    var that = this
+    gatherParameters.then(function(resolve){
+      var totalString = 'nonceStr=' + options.nonce + '&package=prepay_id=' + options.prepayid + '&signType=MD5&timeStamp=' + options.timestamp
+      wxloginModule.wxlogin()
+      var orderId = options.orderid
+      
+      that.setData({orderId : options.orderid, prepayId: options.prepayid, timeStamp: options.timestamp, nonce: options.nonce, sign: options.sign})
+      wx.requestPayment({
+        appId: app.globalData.appId,      
+        timeStamp: options.timestamp,
+        nonceStr: options.nonce,
+        package: 'prepay_id=' + options.prepayid,
+        signType: 'MD5',
+        paySign: options.sign,
+        success: (res) => {
+          
+          var orderInfoUrl = 'https://' + app.globalData.domainName + '/api/order_info_get.aspx?orderid=' + orderId + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: orderInfoUrl,
+            success: (res) => {
+              if (res.data.status == 0) {
+                if (res.data.order_online.type.trim()=='雪票') {
+                  
+                }
+                that.setData({havePaid: true, orderInfo: res.data.order_online})
+              }
+            }
+          })
+          
+        },
+        fail: (res) => {
+  
+        }
+      })
+    })
+    
   },
 
   /**
