@@ -109,8 +109,11 @@
     <view style="text-align:center" >
        请顾客扫描以下二维码支付。
     </view>
-    <view style="text-align:center" >
+    <view wx:if="{{!paid}}" style="text-align:center" >
       <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
+    </view>
+    <view wx:else style="text-align:center;color:red" >
+      支付成功！
     </view>
   </view>
 </view>

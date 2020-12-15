@@ -266,6 +266,27 @@ Page({
           var orderId = res.data.order_id
           var wxaCodeUrl = 'https://' + app.globalData.domainName + '/get_wxacode_unlimit.aspx?page=' + encodeURIComponent('pages/payment/payment') + '&scene=orderid-' + orderId
           this.setData({orderId: orderId, wxaCodeUrl: wxaCodeUrl})
+          var getPaymentPromise = new Promise(function(resolve){
+            var paid = false
+            var t = setInterval(() => {
+              var orderInfoUrl = 'https://' + app.globalData.domainName + '/api/order_info_get.aspx?orderid=' + orderId + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+              wx.request({
+                url: orderInfoUrl,
+                success: (res) => {
+                  if (res.data.status == 0) {
+                    if (res.data.order_online.pay_state == '1'){
+                      clearInterval(t)
+                      resolve([])
+                    }
+                  }
+                }
+              })
+            }, 2000);
+          })
+          var that = this
+          getPaymentPromise.then(function(resolve) {
+            that.setData({paid: true})
+          })
         }
       }
     })

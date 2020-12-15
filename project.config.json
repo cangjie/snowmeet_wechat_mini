@@ -90,9 +90,9 @@
           "scene": null
         },
         {
-          "name": "maintain_pay",
+          "name": "pages/index/index",
           "pathName": "pages/payment/payment",
-          "query": "scene=orderid-9485",
+          "query": "scene=orderid-9520",
           "scene": null
         },
         {
