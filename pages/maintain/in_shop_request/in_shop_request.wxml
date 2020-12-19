@@ -4,7 +4,7 @@
   <view style="text-align:center" ><b>雪具养护-填写信息</b></view>
   <view wx:if="{{id=='0'}}" >
     <mp-cells ext-class="my-cells" title="">
-      <mp-cell  >
+      <mp-cell>
         <view class="flex-wrp" style="flex-direction:row;" >
           <view style="width:200rpx;text-align:right" >装备类型：</view>
           <view >
@@ -17,8 +17,12 @@
       </mp-cell>
       <mp-cell>
         <view class="flex-wrp" style="flex-direction:row;" >
-          <view style="width:200rpx;text-align:right" >品牌：</view>
-          <view><input type="text" placeholder="" value="{{brand}}" bindinput="inputBrand" /></view>
+          <view style="width:200rpx;text-align:right" >品牌(必填)：</view>
+          <view>
+            <picker mode="selector" value="{{brandSelectIndex}}" range="{{displayedBrandList}}" bindchange="selectBrand">
+              <view>{{displayedBrandList[brandSelectIndex]}}</view>
+            </picker>
+          </view>
         </view>
       </mp-cell>
       <mp-cell>

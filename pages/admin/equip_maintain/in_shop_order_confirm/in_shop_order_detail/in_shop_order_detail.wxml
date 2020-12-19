@@ -25,9 +25,30 @@
       <view style="text-aligh:left;color:gray">用户填写：{{maintain_in_shop_request.equip_type}} {{maintain_in_shop_request.brand}} {{maintain_in_shop_request.scale}}</view>
     </mp-cell>
     <mp-cell>
-      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
-        <view class="left-column" >装备：</view>
-        <view  ><equip-info type="{{equipType}}" bindinfoChange="equipInfoChange" ></equip-info></view>
+      <view class="flex-wrp" style="flex-direction:row;" >
+        <view style="width:200rpx;text-align:right" >装备类型：</view>
+        <view >
+          <radio-group bindchange="selectType">
+            <radio checked="{{confirmedInfo.equipInfo.type=='双板'}}" value="双板" >双板</radio>
+            <radio checked="{{confirmedInfo.equipInfo.type=='单板'}}" value="单板" >单板</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;" >
+        <view style="width:200rpx;text-align:right" >品牌(必填)：</view>
+        <view>
+          <picker mode="selector" value="{{brandSelectIndex}}" range="{{displayedBrandList}}" bindchange="selectBrand">
+            <view>{{displayedBrandList[brandSelectIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;" >
+        <view style="width:200rpx;text-align:right" >长度：</view>
+        <view><input type="text" placeholder="" bindinput="changeScale" /></view>
       </view>
     </mp-cell>
     <mp-cell>
