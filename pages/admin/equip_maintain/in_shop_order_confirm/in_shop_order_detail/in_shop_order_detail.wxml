@@ -48,7 +48,7 @@
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;" >
         <view style="width:200rpx;text-align:right" >长度：</view>
-        <view><input type="text" placeholder="" bindinput="changeScale" /></view>
+        <view><input type="text" placeholder="" bindinput="changeScale" value="{{maintain_in_shop_request.scale}}" /></view>
       </view>
     </mp-cell>
     <mp-cell>

@@ -28,7 +28,7 @@
       <mp-cell>
         <view class="flex-wrp" style="flex-direction:row;" >
           <view style="width:200rpx;text-align:right" >长度：</view>
-          <view><input type="text" placeholder="" /></view>
+          <view><input type="text" placeholder="" bindinput="inputScale" /></view>
         </view>
       </mp-cell>
       <mp-cell >

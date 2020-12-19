@@ -128,6 +128,9 @@ Page({
     this.setData({repair: ((e.detail.value.trim()=='1')?true:false)})
     this.checkValid()
   },
+  inputScale: function(e) {
+    this.setData({scale: e.detail.value})
+  },
   submit: function(e) {
     if (this.checkValid()) {
       var brand = this.data.displayedBrandList[this.data.brandSelectIndex]
