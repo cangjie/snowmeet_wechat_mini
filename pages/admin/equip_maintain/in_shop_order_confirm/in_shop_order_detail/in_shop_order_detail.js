@@ -97,6 +97,7 @@ Page({
               confirmedInfo.repair_more = that.data.maintain_in_shop_request.repair_more
               confirmedInfo.shop = that.data.maintain_in_shop_request.shop
               confirmedInfo.degree = '89'
+              confirmedInfo.pick_date = that.data.maintain_in_shop_request.pick_date
               var displayedBrandList = that.data.skiBrandList
               if (equipInfo.type=='双板') {
                 displayedBrandList = that.data.skiBrandList
@@ -119,66 +120,6 @@ Page({
       })
     })
   },
-  onLoad1: function (options) {
-    var optionArr = options.scene.split('-')
-    var id = optionArr[0]
-    var equipType = '双板'
-    if(optionArr[1] == 'board') {
-      equipType = '单板'
-    }
-    this.setData({equipType: equipType})
-    var that = this
-    app.loginPromise.then(function(resolve){
-      if (app.globalData.sessionKey != '') {
-        var getUserFilledInfoPromise = new Promise(function(resolve) {
-            var url = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&id=' + id
-            wx.request({
-              url: url,
-              success: (res) => {
-                if (res.data.status == 0) {
-                  resolve(res.data.maintain_in_shop_request)
-                  that.setData({maintain_in_shop_request: resolve})
-                } 
-              }
-            })
-        })
-        getUserFilledInfoPromise.then(function(resolve){
-          var pickDate = new Date(resolve.pick_date)
-          resolve.pick_date = pickDate.getFullYear().toString() + '-' + (1 + pickDate.getMonth()).toString() + '-' + pickDate.getDate().toString()
-          that.setData({maintain_in_shop_request: resolve})
-          var getUserInfoPromise = new Promise(function(resolve){
-            var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&openid=' + encodeURIComponent(that.data.maintain_in_shop_request.open_id)
-            wx.request({
-              url: url,
-              success: (res) => {
-                if (res.data.status == 0 && res.data.count > 0){
-                  resolve(res.data.mini_users[0])
-                }
-              }
-            })
-          })
-          getUserInfoPromise.then(function(resolve) {
-            var confirmedInfo = {}
-            confirmedInfo.request_id = that.data.maintain_in_shop_request.id
-            confirmedInfo.cell_number = resolve.cell_number
-            confirmedInfo.real_name = resolve.real_name
-            confirmedInfo.gender = resolve.gender
-            confirmedInfo.equipInfo = {}
-            confirmedInfo.edge = that.data.maintain_in_shop_request.edge
-            confirmedInfo.degree = '89'
-            confirmedInfo.candle = that.data.maintain_in_shop_request.candle
-            confirmedInfo.repair_more = that.data.maintain_in_shop_request.repair_more
-            confirmedInfo.shop = that.data.maintain_in_shop_request.shop
-            that.setData({userInfo: resolve, confirmedInfo: confirmedInfo})
-            that.viewSummary('view')
-            
-          })
-        })
-        
-      }
-    })
-  },
-
   /**
    * Lifecycle function--Called when page is initially rendered
    */

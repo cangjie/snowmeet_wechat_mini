@@ -86,7 +86,7 @@
         {
           "name": "maintain_confirm",
           "pathName": "pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_detail/in_shop_order_detail",
-          "query": "scene=63",
+          "query": "scene=71",
           "scene": null
         },
         {
@@ -105,6 +105,11 @@
           "name": "mymaintain",
           "pathName": "pages/mine/my_maintain/my_maintain",
           "query": "",
+          "scene": null
+        },
+        {
+          "name": "maintain_quick",
+          "pathName": "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_quick",
           "scene": null
         }
       ]
