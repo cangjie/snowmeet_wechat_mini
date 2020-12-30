@@ -29,7 +29,7 @@ Page({
       }
       else {
         var orderId = 0
-        if (options.orerid!=undefined || options.orderid != 0) {
+        if (options.orderid!=undefined || options.orderid != 0) {
           orderId = options.orderid
         }
         else {

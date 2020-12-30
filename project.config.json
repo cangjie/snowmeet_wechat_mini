@@ -60,27 +60,9 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/index/index",
-          "pathName": "pages/index/index",
-          "query": "",
-          "scene": 1047
-        },
-        {
-          "name": "skipass",
-          "pathName": "pages/skipass/skipass",
-          "query": "",
-          "scene": 1067
-        },
-        {
           "name": "maitain_request",
           "pathName": "pages/maintain/in_shop_request/in_shop_request",
           "query": "shop=万龙",
-          "scene": null
-        },
-        {
-          "name": "pages/index/index",
-          "pathName": "pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_detail/in_shop_order_detail",
-          "query": "scene=17",
           "scene": null
         },
         {
@@ -96,12 +78,6 @@
           "scene": null
         },
         {
-          "name": "pages/admin/equip_maintain/order_list/order_list_main",
-          "pathName": "pages/admin/equip_maintain/order_list/order_list_main",
-          "query": "",
-          "scene": null
-        },
-        {
           "name": "mymaintain",
           "pathName": "pages/mine/my_maintain/my_maintain",
           "query": "",
@@ -110,7 +86,14 @@
         {
           "name": "maintain_quick",
           "pathName": "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_quick",
+          "query": "",
           "scene": null
+        },
+        {
+          "name": "pay_maintain_request",
+          "pathName": "pages/maintain/in_shop_request_payment/in_shop_request_payment",
+          "query": "scene=173",
+          "scene": 1011
         }
       ]
     }

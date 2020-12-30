@@ -1,4 +1,4 @@
-<view>
+<view wx:if="{{wxaCodeUrl==''}}" >
   <mp-cells title="当前店铺" >
     <mp-cell>{{confirmedInfo.shop}}</mp-cell>
   </mp-cells>
@@ -92,7 +92,48 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <button bindtap="submit" > 提 交 </button>
+      <button bindtap="submit" disabled="{{!canSubmit}}" > 提 交 </button>
     </mp-cell>
   </mp-cells>
+</view>
+<view wx:else >
+  <view wx:if="{{!paid}}" >
+    <view style="text-align:center" >
+       请顾客扫描以下二维码支付。
+    </view>
+    <view wx:if="{{!paid}}" style="text-align:center" >
+      <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
+    </view>
+  </view>
+  <view wx:if="{{!filledContanctInfo && paid}}" >
+    <mp-cells title="填写联系信息" >
+      <mp-cell>
+        <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+          <view class="left-column" >手机：</view>
+          <view><input value="{{cell}}" type="number" bindinput="changeCellNumber" ></input></view>
+          <view style="text-align:right;padding-right:10rpx;background-color:green;color:#fff;margin-left:10rpx;padding:10rpx;" bindtap="call"><b> 拨 打 </b></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+          <view class="left-column" >姓名：</view>
+          <view><input placeholder="{{nick}}" value="{{realName}}" bindinput="changeRealName" ></input></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+          <view class="left-column" >称谓：</view>
+          <view>
+            <radio-group bindchange="changeGender" ><radio  checked="{{gender=='男'}}" value="男" >先生</radio><radio checked="{{gender=='女'}}" value="女" >女士</radio></radio-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <button bindtap="submitContactInfo" > 提 交 </button>
+      </mp-cell>
+    </mp-cells>
+  </view>
+  <view wx:if="{{paid && filledContanctInfo}}" >
+    下单成功
+  </view>
 </view>

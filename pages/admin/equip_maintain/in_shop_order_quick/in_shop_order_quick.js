@@ -20,7 +20,13 @@ Page({
     pickDateDescription: '明天',
     totalCharge: 0,
     additional_fee: 0,
-    request_id: 0
+    request_id: 0,
+    wxaCodeUrl: '',
+    paid: false,
+    filledContanctInfo:false,
+    canSubmit: false,
+    intervalIdOrderId: 0,
+    intervalIdPaid: 0
   },
 
   /**
@@ -71,7 +77,14 @@ Page({
   selectBrand: function(e){
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.equipInfo.brand = this.data.displayedBrandList[e.detail.value]
-    this.setData({brandSelectIndex: e.detail.value, confirmedInfo: confirmedInfo})
+    if (confirmedInfo.equipInfo.brand != '') {
+      var canSubmit = false
+      if (this.data.totalCharge > 0) {
+        canSubmit = true
+      }
+      this.setData({brandSelectIndex: e.detail.value, confirmedInfo: confirmedInfo, canSubmit: canSubmit})
+    }
+    
   },
   changeScale: function(e) {
     var confirmedInfo = this.data.confirmedInfo
@@ -138,29 +151,30 @@ Page({
   },
   changePickDate: function(e) {
     var pickDateStr = e.detail.value
-    try {
-      var pickDate = new Date(pickDateStr)
-      var nowDate = new Date()
-      var confirmedInfo = this.data.confirmedInfo
-      confirmedInfo.pick_date = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth()+1).toString() + '-' + pickDate.getDate().toString()
-      if (nowDate.toDateString() == pickDate.toDateString()) {
-        this.setData({pickDateDescription: '今天', confirmedInfo: confirmedInfo})
-      }
-      else {
-        nowDate.setDate(nowDate.getDate() + 1)
+    if (pickDateStr.split('-')[2].trim() != '') {
+      try {
+        var pickDate = new Date(pickDateStr)
+        var nowDate = new Date()
+        var confirmedInfo = this.data.confirmedInfo
+        confirmedInfo.pick_date = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth()+1).toString() + '-' + pickDate.getDate().toString()
         if (nowDate.toDateString() == pickDate.toDateString()) {
-          this.setData({pickDateDescription: '明天', confirmedInfo: confirmedInfo})
+          this.setData({pickDateDescription: '今天', confirmedInfo: confirmedInfo})
         }
         else {
-          this.setData({pickDateDescription: '', confirmedInfo: confirmedInfo})
+          nowDate.setDate(nowDate.getDate() + 1)
+          if (nowDate.toDateString() == pickDate.toDateString()) {
+            this.setData({pickDateDescription: '明天', confirmedInfo: confirmedInfo})
+          }
+          else {
+            this.setData({pickDateDescription: '', confirmedInfo: confirmedInfo})
+          }
         }
+        this.viewSummary('view')
       }
-      this.viewSummary('view')
-    }
-    catch(msg){
+      catch(msg){
 
+      }
     }
-
   },
   /**
    * Lifecycle function--Called when page is initially rendered
@@ -212,34 +226,89 @@ Page({
   },
   viewSummary: function(action) {
     var confirmedInfo = this.data.confirmedInfo
-    var url = 'https://' + app.globalData.domainName + '/api/maintain_task_order_place_in_shop.aspx?action=' + action + '&sessionkey=' + app.globalData.sessionKey
-    var preRequestPromise = new Promise(function(resolve) {
-      var urlPreOrder = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_create_by_staff_quickly.aspx?sessionkey=' + app.globalData.sessionKey
-      wx.request({
-        url: urlPreOrder,
-        method: 'POST',
-        data: confirmedInfo,
-        success: (res) => {
-          if (res.data.status == 0) {
-            resolve(res.data)
-          }
-        }
-      })
-    })
+    var url = 'https://' + app.globalData.domainName + '/api/maintain_task_order_place_in_shop.aspx?action=' + action + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+    
     if (action=='placeorder') {
-      preRequestPromise.then(function(resolve){
-        confirmedInfo.request_id = resolve.maintain_in_shop_request_id
+      var that = this
+      var preRequestPromise = new Promise(function(resolve) {
+        var urlPreOrder = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_create_by_staff_quickly.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
-          url: url,
+          url: urlPreOrder,
           method: 'POST',
           data: confirmedInfo,
           success: (res) => {
             if (res.data.status == 0) {
-              var totalCharge = res.data.total_fee
-              this.setData({totalCharge: totalCharge})
+              resolve(res.data)
             }
           }
         })
+      })
+      preRequestPromise.then(function(resolve){
+        confirmedInfo.request_id = resolve.maintain_in_shop_request_id
+        var wxaCodeUrl = 'https://' + app.globalData.domainName + '/get_wxacode_unlimit.aspx?page=' + encodeURIComponent('pages/maintain/in_shop_request_payment/in_shop_request_payment') + '&scene=' + resolve.maintain_in_shop_request_id
+        that.setData({wxaCodeUrl: wxaCodeUrl, request_id: resolve.maintain_in_shop_request_id})
+        that.data.intervalIdOrderId = setInterval(() => {
+          var getOrderIdPromise = new Promise(function(resolve) {
+            var getOrderIdUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get.aspx?id=' + that.data.confirmedInfo.request_id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+            wx.request({
+              url: getOrderIdUrl,
+              success: (res) => {
+                if (res.data.status == 0){
+                  resolve({maintain_in_shop_request: res.data.maintain_in_shop_request})
+                }
+              }
+            })
+          })
+          getOrderIdPromise.then(function(resolve) {
+            if (resolve.maintain_in_shop_request.order_id > 0) {
+              var orderId = resolve.maintain_in_shop_request.order_id
+              clearInterval(that.data.intervalIdOrderId)
+              that.data.intervalIdPaid = setInterval(() => {
+                var getPayStatePromise = new Promise(function(resolve){
+                  var orderInfoUrl = 'https://' + app.globalData.domainName + '/api/order_info_get.aspx?orderid=' + orderId + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+                  wx.request({
+                    url: orderInfoUrl,
+                    success: (res) => {
+                      if (res.data.status == 0) {
+                        if (res.data.order_online.pay_state == '1'){
+                          //clearInterval(that.data.intervalIdPaid)
+                          resolve({order_online: res.data.order_online, paid: true})
+                        }
+                      }
+                    }
+                  })
+                })
+                getPayStatePromise.then(function(resolve){
+                  if (resolve.paid) {
+                    clearInterval(that.data.intervalIdPaid)
+                    that.setData({paid: true})
+                    var customorOpenId = resolve.order_online.open_id
+                    var getUserInfoPromise = new Promise(function(resolve) {
+                      var getUserInfoUrl = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&openid=' + encodeURIComponent(customorOpenId)
+                      wx.request({
+                        url: getUserInfoUrl,
+                        success: (res) => {
+                          if (res.data.status == 0 && res.data.count > 0){
+                            resolve(res.data.mini_users[0])
+                          }
+                        }
+                      })
+                      
+                    })
+                    getUserInfoPromise.then(function(resolve) {
+                      var realName = resolve.real_name
+                      if (realName.trim() == '') {
+                        realName = resolve.nick
+                      }
+                      that.setData({cell: resolve.cell_number, nick: resolve.nick, realName: realName, gender: resolve.gender})
+                    })
+                  }
+                })
+                
+              }, 1000);
+            }
+          })
+        }, 1000)
       })
     }
     else {
@@ -250,43 +319,48 @@ Page({
         success: (res) => {
           if (res.data.status == 0) {
             var totalCharge = res.data.total_fee
-            confirmedInfo.product_id = res.data.product_id
-            this.setData({totalCharge: totalCharge})
+            confirmedInfo.product_id = res.data.product_id.toString()
+            var canSubmit = false
+            if (confirmedInfo.equipInfo.brand != '' && totalCharge > 0) {
+              canSubmit = true
+            }
+            this.setData({totalCharge: totalCharge, canSubmit: canSubmit})
           }
         }
       })
     }
-  },
-  viewSummary1: function(action) {
-    
-    if (action=='placeorder') {
-      var urlPreOrder = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_create_by_staff_quickly.aspx?sessionkey=' + app.globalData.sessionKey
-      wx.request({
-        url: urlPreOrder,
-        method: 'POST',
-        data: this.data.confirmedInfo,
-        success: (res) => {
-          if (res.data.status == 0) {
-
-          }
-        }
-      })
-    }
-    action = 'view'
-    var url = 'https://' + app.globalData.domainName + '/api/maintain_task_order_place_in_shop.aspx?action=' + action + '&sessionkey=' + app.globalData.sessionKey
-    wx.request({
-      url: url,
-      method: 'POST',
-      data: this.data.confirmedInfo,
-      success: (res) => {
-        if (res.data.status == 0) {
-          var totalCharge = res.data.total_fee
-          this.setData({totalCharge: totalCharge})
-        }
-      }
-    })
   },
   submit: function() {
     this.viewSummary('placeorder')
+  },
+  changeGender: function(e) {
+    this.setData({gender: e.detail.value})
+  },
+  changeRealName: function(e) {
+    this.setData({realName: e.detail.value})
+  },
+  changeCellNumber: function(e) {
+    this.setData({cell: e.detail.value})
+  },
+  submitContactInfo: function(e) {
+    if (this.data.gender != undefined && this.data.gender != ''
+    && this.data.realName != undefined && this.data.realName != ''
+    && this.data.cell != undefined && this.data.cell != '') {
+      var submitData = {}
+      submitData.confirmed_cell = this.data.cell
+      submitData.confirmed_name = this.data.realName
+      submitData.confirmed_gender = this.data.gender
+      var updateContactInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_modify.aspx?id=' + this.data.confirmedInfo.request_id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: updateContactInfoUrl,
+        method: 'POST',
+        data: submitData,
+        success: (res) => {
+          if (res.data.status == 0 && res.data.result > 0) {
+            this.setData({filledContanctInfo: true})
+          }
+        }
+      })
+    }
   }
 })
