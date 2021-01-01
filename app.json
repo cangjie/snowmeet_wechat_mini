@@ -28,7 +28,9 @@
     "pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_detail/in_shop_order_detail",
     "pages/mine/my_maintain/my_maintain",
     "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_quick",
-    "pages/maintain/in_shop_request_payment/in_shop_request_payment"
+    "pages/maintain/in_shop_request_payment/in_shop_request_payment",
+    "pages/mine/my_maintain/my_maintain_detail",
+    "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick"
   ],
   "window": {
     "backgroundTextStyle": "light",

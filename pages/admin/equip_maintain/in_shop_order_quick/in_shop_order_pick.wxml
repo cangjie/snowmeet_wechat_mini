@@ -1,0 +1,53 @@
+<mp-cells title="当前店铺" >
+  <mp-cell>{{maintain_in_shop_request.shop}}</mp-cell>
+</mp-cells>
+<mp-cells title="装备信息">
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;" >
+      <view style="width:200rpx;text-align:right" >装备类型：</view>
+      <view >{{maintain_in_shop_request.confirmed_equip_type}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;" >
+      <view style="width:200rpx;text-align:right" >品牌：</view>
+      <view >{{maintain_in_shop_request.confirmed_brand}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;" >
+      <view style="width:200rpx;text-align:right" >长度：</view>
+      <view >{{maintain_in_shop_request.confirmed_scale}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="服务项目">
+  <mp-cell>
+    <block wx:if="{{maintain_in_shop_request.confirmed_edge=='1'}}" >修刃 {{maintain_in_shop_request.degree}}</block>
+    <block wx:if="{{maintain_in_shop_request.confirmed_candle=='1'}}" >打蜡</block>
+    {{maintain_in_shop_request.confirmed_more}} {{maintain_in_shop_request.memo}}
+  </mp-cell>
+</mp-cells>
+<mp-cells title="用户信息" >
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;" >
+      <view style="width:200rpx;text-align:right" >姓名：</view>
+      <view >{{maintain_in_shop_request.confirmed_name}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;" >
+      <view style="width:200rpx;text-align:right" >性别：</view>
+      <view >{{maintain_in_shop_request.confirmed_gender}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;" >
+      <view style="width:200rpx;text-align:right" >电话：</view>
+      <view >{{maintain_in_shop_request.confirmed_cell}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <button disabled="{{isFinish}}" bindtap="setFinish" > 确 认 提 取 </button>
+  </mp-cell>
+</mp-cells>

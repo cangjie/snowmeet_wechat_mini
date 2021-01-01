@@ -1,7 +1,7 @@
 <!--pages/mine/my_maintain/my_maintain.wxml-->
 <mp-cells>
   <block wx:for="{{rows}}" >
-    <mp-cell>
+    <mp-cell id="{{item.id}}" bindtap="showDetail">
       <view>电话:{{item.confirmed_cell}}</view>
       <view>
         装备:{{item.confirmed_equip_type}} {{item.confirmed_brand}} {{item.confirmed_serial}} {{item.confirmed_scale}} {{item.confirmed_year}}

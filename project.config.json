@@ -94,6 +94,12 @@
           "pathName": "pages/maintain/in_shop_request_payment/in_shop_request_payment",
           "query": "scene=173",
           "scene": 1011
+        },
+        {
+          "name": "maintain_pick",
+          "pathName": "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick",
+          "query": "scene=199",
+          "scene": null
         }
       ]
     }

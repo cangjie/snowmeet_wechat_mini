@@ -1,4 +1,4 @@
-// pages/mine/my_maintain/my_maintain.js
+// pages/mine/my_maintain/my_maintain_detail.js
 const app = getApp()
 Page({
 
@@ -6,30 +6,19 @@ Page({
    * Page initial data
    */
   data: {
-
+    id: '0',
+    wxaCodeUrl: ''
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    this.data.id = options.id
     var that = this
     app.loginPromise.then(function(resolve) {
-      var url = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_mine_list.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: url,
-        success: (res) => {
-          if (res.data.status == 0){
-            var arr = res.data.maintain_in_shop_request
-            for(var i = 0; i < arr.length; i++) {
-              var pick = new Date(arr[i].confirmed_pick_date)
-              arr[i].confirmed_pick_date = pick.getFullYear().toString() + '-' + (1 + pick.getMonth()).toString() + '-' + pick.getDate().toString()
-
-            }
-            that.setData({count: res.data.count, rows: res.data.maintain_in_shop_request})
-          }
-        }
-      })
+      var wxaCodeUrl = 'https://' + app.globalData.domainName + '/get_wxacode_unlimit.aspx?page=' + encodeURIComponent('pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick') + '&scene=' + that.data.id
+      that.setData({wxaCodeUrl: wxaCodeUrl})
     })
   },
 
@@ -80,10 +69,5 @@ Page({
    */
   onShareAppMessage: function () {
 
-  },
-  showDetail: function(e) {
-    wx.navigateTo({
-      url: 'my_maintain_detail?id=' + e.currentTarget.id,
-    })
   }
 })
