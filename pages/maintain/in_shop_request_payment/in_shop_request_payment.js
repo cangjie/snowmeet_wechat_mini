@@ -108,15 +108,21 @@ Page({
           placeOrderPromise.then(function(resolve) {
             var paymentStep = that.data.paymentStep
             paymentStep = 3
-            that.setData({paymentStep: paymentStep})
             var orderId = resolve.orderId
-            that.setData({orderId: orderId})
+            that.setData({orderId: orderId, paymentStep: paymentStep})
+            
             wx.navigateTo({
               url: '../../payment/payment?orderid=' + orderId
             })
+            
           })
         }
       })
+    })
+  },
+  goToPayment: function(e) {
+    wx.navigateTo({
+      url: '../../payment/payment?orderid=' + this.data.orderId
     })
   }
 })

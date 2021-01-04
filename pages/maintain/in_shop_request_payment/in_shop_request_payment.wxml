@@ -13,6 +13,9 @@
     请稍候，正在生成支付订单。。。
   </view>
   <view wx:if="{{paymentStep == 3}}" style="text-align:center" >
-    订单已经生成，马上跳转到微信支付。。。
+    <view>
+      订单已经生成，马上跳转到微信支付，如果系统未自动跳转，请点击以下按钮支付。
+    </view>
+    <button bindtap="goToPayment"> 去 支 付 </button>
   </view>
 </view>
