@@ -70,7 +70,9 @@ Page({
     this.setData({needValidCell: false})
     var that = this
     app.loginPromise.then(function(resolve) {
-     
+      var paymentStep = that.data.paymentStep
+      paymentStep = 1
+      that.setData({paymentStep: paymentStep})
       var updatePromise = new Promise(function(resolve){
         var updateInfo = {}
         updateInfo.open_id = ''
@@ -100,10 +102,13 @@ Page({
       })
       updatePromise.then(function(resolve) {
         var paymentStep = that.data.paymentStep
-        paymentStep++
+        paymentStep = 2
         that.setData({paymentStep: paymentStep})
         if (resolve.result > 0) {
           placeOrderPromise.then(function(resolve) {
+            var paymentStep = that.data.paymentStep
+            paymentStep = 3
+            that.setData({paymentStep: paymentStep})
             var orderId = resolve.orderId
             that.setData({orderId: orderId})
             wx.navigateTo({

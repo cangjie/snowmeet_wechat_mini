@@ -1,9 +1,18 @@
-<auth wx:if="{{needValidCell}}" validType="cell" bindUpdateSuccess="onUpdateSuccess" ></auth>
+<view wx:if="{{needValidCell}}" >
+  <auth  validType="cell" bindUpdateSuccess="onUpdateSuccess" ></auth>
+  请确认您的手机号。
+</view>
 <view wx:else >
   <view wx:if="{{paymentStep == 0}}" style="text-align:center" >
-    请稍候，正在核对你的个人和装备信息。。。
+    请稍候，正在通过微信登录。。。
   </view>
   <view wx:if="{{paymentStep == 1}}" style="text-align:center" >
-    请稍候，正在为您生成支付订单。。。
+    请稍候，正在确认您的装备和个人信息。。。
+  </view>
+  <view wx:if="{{paymentStep == 2}}" style="text-align:center" >
+    请稍候，正在生成支付订单。。。
+  </view>
+  <view wx:if="{{paymentStep == 3}}" style="text-align:center" >
+    订单已经生成，马上跳转到微信支付。。。
   </view>
 </view>
