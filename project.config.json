@@ -72,9 +72,9 @@
           "scene": null
         },
         {
-          "name": "pages/index/index",
-          "pathName": "pages/payment/payment",
-          "query": "scene=orderid-9520",
+          "name": "index",
+          "pathName": "pages/index/index",
+          "query": "",
           "scene": null
         },
         {

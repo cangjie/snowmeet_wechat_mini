@@ -1,7 +1,7 @@
 <!--pages/admin/admin.wxml-->
 <view wx:if="{{role=='staff'}}" >
   <mp-cells ext-class="my-cells" title="我的管理项" >
-    <mp-cell value="雪具维护确认" bindtap="gotoInShopOrderConfirm" ></mp-cell>
+  <mp-cell value="学具养护收款" bindtap="goToMaintainInShopQuick" ></mp-cell>
   </mp-cells>
 </view>
 <view wx:else >

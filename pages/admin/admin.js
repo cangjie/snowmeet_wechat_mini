@@ -79,5 +79,10 @@ Page({
     wx.navigateTo({
       url: './equip_maintain/in_shop_order_confirm/in_shop_order_confirm',
     })
+  },
+  goToMaintainInShopQuick: function() {
+    wx.navigateTo({
+      url: './equip_maintain/in_shop_order_quick/in_shop_order_quick',
+    })
   }
 })

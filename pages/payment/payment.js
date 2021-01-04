@@ -45,6 +45,9 @@ Page({
             options.nonce = res.data.nonce
             options.sign = res.data.sign
             resolve({})
+          },
+          fail: (res) => {
+            
           }
         })
       }
