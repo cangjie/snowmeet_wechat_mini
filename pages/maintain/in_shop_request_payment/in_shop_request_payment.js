@@ -7,7 +7,8 @@ Page({
    */
   data: {
     needValidCell: true,
-    id: 0
+    id: 0,
+    paymentStep: 0
   },
 
   /**
@@ -69,6 +70,7 @@ Page({
     this.setData({needValidCell: false})
     var that = this
     app.loginPromise.then(function(resolve) {
+     
       var updatePromise = new Promise(function(resolve){
         var updateInfo = {}
         updateInfo.open_id = ''
@@ -97,9 +99,13 @@ Page({
         })
       })
       updatePromise.then(function(resolve) {
+        var paymentStep = that.data.paymentStep
+        paymentStep++
+        that.setData({paymentStep: paymentStep})
         if (resolve.result > 0) {
           placeOrderPromise.then(function(resolve) {
             var orderId = resolve.orderId
+            that.setData({orderId: orderId})
             wx.navigateTo({
               url: '../../payment/payment?orderid=' + orderId
             })
