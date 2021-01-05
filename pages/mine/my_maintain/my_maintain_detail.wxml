@@ -1,6 +1,9 @@
-<view >
+<view wx:if="{{maintain_in_shop_request.finish == '0'}}">
   <view style="text-align:center" >凭此二维码取板</view>
   <View style="text-align:center" >
     <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
   </View>
+</view>
+<view wx:else style="text-align:center" >
+  您已经取板
 </view>

@@ -19,6 +19,15 @@ Page({
     app.loginPromise.then(function(resolve) {
       var wxaCodeUrl = 'https://' + app.globalData.domainName + '/get_wxacode_unlimit.aspx?page=' + encodeURIComponent('pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick') + '&scene=' + that.data.id
       that.setData({wxaCodeUrl: wxaCodeUrl})
+      var getInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get.aspx?id=' + that.data.id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getInfoUrl,
+        success: (res) => {
+          if (res.data.status == 0) {
+            that.setData({maintain_in_shop_request: res.data.maintain_in_shop_request})
+          }
+        }
+      })
     })
   },
 

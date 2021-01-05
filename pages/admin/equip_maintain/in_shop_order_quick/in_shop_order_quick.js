@@ -14,7 +14,7 @@ Page({
       shop: '万龙',
       degree: '89',
       edge: 0,
-      candle: 0,
+      candle: 0
 
     },
     pickDateDescription: '明天',
@@ -34,10 +34,13 @@ Page({
    */
   onLoad: function (options) {
     var pickDate = new Date()
+    var pickDateStartStr = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth() + 1).toString() + '-' + pickDate.getDate().toString()
+    var pickDateEndStr = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth() + 2).toString() + '-' + pickDate.getDate().toString()
     pickDate.setDate(pickDate.getDate() + 1)
+
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.pick_date = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth() + 1).toString() + '-' + pickDate.getDate().toString()
-    this.setData({confirmedInfo: confirmedInfo})
+    this.setData({confirmedInfo: confirmedInfo, pickDateStart: pickDateStartStr, pickDateEnd: pickDateEndStr})
     var brandListUrl = 'https://' + app.globalData.domainName + '/api/brand_list_get.aspx'
     wx.request({
       url: brandListUrl,
@@ -147,6 +150,42 @@ Page({
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.additional_fee = fee
     this.setData({confirmedInfo: confirmedInfo})
+    this.viewSummary('view')
+  },
+  pickDateChange: function(e) {
+    var pickDate = new Date(e.detail.value)
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.pick_date = e.detail.value
+    var nowDate = new Date()
+    var pickDateDescription = ''
+    if (nowDate.getDate() == pickDate.getDate() && nowDate.getMonth() == pickDate.getMonth()) {
+      pickDateDescription = '今天'
+    }
+    else if (nowDate.getDate() + 1 == pickDate.getDate() ) {
+      pickDateDescription = '明天'
+    }
+    else if (nowDate.getDate() + 2 == pickDate.getDate()) {
+      pickDateDescription = '后天'
+    }
+    else if (nowDate.getDate() + 3 == pickDate.getDate()) {
+      pickDateDescription = '大后天'
+    }
+    else if (nowDate.getDate() + 7 > pickDate.getDate() && pickDate.getDay() == 0) {
+      pickDateDescription = '本周日'
+    }
+    else if (nowDate.getDate() + 7 > pickDate.getDate() && pickDate.getDay() == 6) {
+      pickDateDescription = '本周六'
+    }
+    else if (nowDate.getDate() + 14 > pickDate.getDate() && pickDate.getDay() == 0) {
+      pickDateDescription = '下周日'
+    }
+    else if (nowDate.getDate() + 14 > pickDate.getDate() && pickDate.getDay() == 6) {
+      pickDateDescription = '下周六'
+    }
+    else {
+      pickDateDescription = ''
+    }
+    this.setData({confirmedInfo: confirmedInfo, pickDateDescription: pickDateDescription})
     this.viewSummary('view')
   },
   changePickDate: function(e) {

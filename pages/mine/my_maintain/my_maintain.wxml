@@ -12,6 +12,11 @@
         <block wx:if="{{item.confirmed_candle=='1'}}" >打蜡</block>
       </view>
       <view>备注:{{item.confirmed_memo}}</view>
+      <view>
+        状态:
+        <block wx:if="{{item.finish == '1'}}" >已取板</block>
+        <block wx:else  >进行中</block>
+      </view>
     </mp-cell>
   </block>
 </mp-cells>
