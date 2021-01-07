@@ -133,6 +133,14 @@
         </view>
       </mp-cell>
       <mp-cell>
+        <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+          <view class="left-column" >拍照：</view>
+          <view>
+            <multi-uploader id="uploadPhotos" title="雪板及附件" image_count="3" detail_id="0" bindUploaded="uploaded" uploaded_files="{{photoFiles}}" ></multi-uploader>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
         <button bindtap="submitContactInfo" > 提 交 </button>
       </mp-cell>
     </mp-cells>

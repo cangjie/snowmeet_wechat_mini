@@ -48,7 +48,22 @@ function init(app, that) {
           if (res.authSetting['scope.userInfo']) {
             wx.getUserInfo({
               success: res => {
+                var gender = ''
+                switch(res.userInfo.gender) {
+                  case 1:
+                    gender = '男'
+                    break
+                  case 2:
+                    gender = '女'
+                    break
+                  default:
+                    break
+                }
                 app.globalData.userInfo = res.userInfo
+                var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(res.userInfo.nickName) + '&headimage=' + encodeURIComponent(res.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
+                wx.request({
+                  url: updateUrl
+                })
               }
             })
           }

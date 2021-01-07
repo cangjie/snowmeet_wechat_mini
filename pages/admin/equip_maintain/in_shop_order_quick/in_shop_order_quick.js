@@ -26,7 +26,8 @@ Page({
     filledContanctInfo:false,
     canSubmit: false,
     intervalIdOrderId: 0,
-    intervalIdPaid: 0
+    intervalIdPaid: 0,
+    photoFiles: ''
   },
 
   /**
@@ -389,6 +390,7 @@ Page({
       submitData.confirmed_cell = this.data.cell
       submitData.confirmed_name = this.data.realName
       submitData.confirmed_gender = this.data.gender
+      submitData.confirmed_images = this.data.photoFiles
       var updateContactInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_modify.aspx?id=' + this.data.confirmedInfo.request_id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: updateContactInfoUrl,
@@ -401,5 +403,15 @@ Page({
         }
       })
     }
+  },
+  uploaded: function(e) {
+    var files = e.detail.files
+    var photoFiles = ''
+    for(var i in files) {
+      if (files[i].url != '') {
+        photoFiles = photoFiles + ((photoFiles.trim() != '')? ',' : '') + files[i].url
+      }
+    }
+    this.setData({photoFiles: photoFiles})
   }
 })

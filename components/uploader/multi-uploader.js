@@ -40,7 +40,9 @@ Component({
     var uploadedFilesArr = this.properties.uploaded_files.split(',')
     var files = this.data.files
     for(var i = 0; i < uploadedFilesArr.length; i++) {
-      files.push({url: uploadedFilesArr[i].trim()})
+      if (uploadedFilesArr[i].trim() != '') {
+        files.push({url: uploadedFilesArr[i].trim()})
+      }
     }
     this.setData({files: files})
   },
