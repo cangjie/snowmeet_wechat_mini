@@ -9,7 +9,9 @@ Page({
     customerSessionKey: '',
     isStaff: false,
     nick: '',
-    cell: ''
+    cell: '',
+    haveDemand: true,
+    demandFinish: false
   },
 
   /**
@@ -17,10 +19,10 @@ Page({
    */
   onLoad: function (options) {
     if (options.scene == undefined) {
-      this.data.customerSessionKey = options.customer
+      this.data.customerSessionKey = decodeURIComponent(options.customer)
     }
     else {
-      this.data.customerSessionKey = options.scene
+      this.data.customerSessionKey = decodeURIComponent(options.scene)
     }
     var that = this
     var loginPromise = new Promise(function(resolve){
@@ -48,6 +50,18 @@ Page({
           success: (res) => {
             if (res.data.status == 0 && res.data.count > 0) {
               that.setData({nick: res.data.mini_users[0].nick, cell: res.data.mini_users[0].cell_number})
+            }
+          }
+        })
+        
+        var queryDemandUrl = 'https://' + app.globalData.domainName + '/api/warmer.aspx?customer=' + encodeURIComponent(that.data.customerSessionKey) + '&staff=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: queryDemandUrl,
+          success: (res) => {
+            if (res.data.status == 0) {
+              if (res.data.have_demand == 0) {
+                that.setData({haveDemand: false})
+              }
             }
           }
         })
@@ -103,5 +117,16 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  confirmDemand: function() {
+    var demandUrl = 'https://' + app.globalData.domainName + '/api/warmer.aspx?action=demand&customer=' + encodeURIComponent(this.data.customerSessionKey) +  '&staff=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: demandUrl,
+      success: (res) => {
+        if (res.data.status == 0) {
+          this.setData({demandFinish: true})
+        }
+      }
+    })
   }
 })

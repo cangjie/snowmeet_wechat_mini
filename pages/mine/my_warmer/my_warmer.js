@@ -39,37 +39,14 @@ Page({
           success: (res) => {
             if (res.data.status == 0) {
               if (res.data.have_demand == 0) {
-                that.setData({canDemand: true})
+                var wxaCodeUrl = 'https://' + app.globalData.domainName + '/get_wxacode_unlimit.aspx?page=' + encodeURIComponent('pages/admin/warmer_demand/warmer_demand') + '&scene=' + app.globalData.sessionKey
+                that.setData({canDemand: true, wxaCodeUrl: wxaCodeUrl})
               }
             }
           }
         })
     })
-    /*
-    if (app.globalData.sessionKey==undefined || app.globalData.sessionKey == ''){
-      
-      app.loginPromiseNew.then(function(resolve) {
-        var needVerifyCell = false
-        if (resolve.cellNumber == undefined || resolve.cellNumber == '') {
-          needVerifyCell = true
-        }
-        that.setData({isLogin: true, needVerifyCell: needVerifyCell})
-        var canDemandUrl = 'https://' + resolve.domainName + '/api/warmer.aspx?customer=' + resolve.sessionKey
-        wx.request({
-          url: canDemandUrl,
-          success: (res) => {
-            if (res.data.status == 0) {
-              if (res.data.have_demand == 0) {
-                that.setData({canDemand: true})
-              }
-            }
-          }
-        })
-      })
-    }
-    else {
-      this.setData({isLogin: true})
-    }*/
+    
   },
 
   /**

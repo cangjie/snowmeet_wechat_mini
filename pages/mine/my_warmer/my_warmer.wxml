@@ -6,9 +6,9 @@
       <view style="text-align:center" >
         请出示如下二维码换取暖宝。
       </view>
-      <view>
-
-    </view>
+      <view style="text-align:center" >
+        <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
+      </view>
     </block>
     <view wx:else  style="text-align:center">
       您已经领取过暖宝。
