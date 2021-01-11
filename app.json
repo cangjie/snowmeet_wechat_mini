@@ -30,7 +30,9 @@
     "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_quick",
     "pages/maintain/in_shop_request_payment/in_shop_request_payment",
     "pages/mine/my_maintain/my_maintain_detail",
-    "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick"
+    "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick",
+    "pages/mine/my_warmer/my_warmer",
+    "pages/admin/warmer_demand/warmer_demand"
   ],
   "window": {
     "backgroundTextStyle": "light",

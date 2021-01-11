@@ -106,6 +106,18 @@
           "pathName": "pages/mine/mine",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "my_warmer",
+          "pathName": "pages/mine/my_warmer/my_warmer",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "demand_warmer",
+          "pathName": "pages/admin/warmer_demand/warmer_demand",
+          "query": "customer=nMVEV1WOSKRCmQWywLvuww==",
+          "scene": 1011
         }
       ]
     }

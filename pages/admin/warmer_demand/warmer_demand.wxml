@@ -1,0 +1,8 @@
+<!--pages/admin/warmer_demand/warmer_demand.wxml-->
+<view wx:if="{{isStaff}}" >
+  <view >昵称： {{nick}}</view>
+  <view >手机： {{cell}}</view>
+</view>
+<view wx:else >
+  没有权限
+</view>

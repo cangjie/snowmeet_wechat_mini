@@ -35,6 +35,80 @@ App({
 
   
   },
+  loginPromiseNew: new Promise(function(resolve){
+    wx.login({
+      success: res => {
+        const app = getApp()
+        var url = 'https://' + app.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
+        wx.request({
+          url: url,
+          header: {
+            'content-type': 'application/json' // 默认值
+          },
+          success: res => {
+            try
+            {
+              app.globalData.sessionKey = res.data.session_key
+              var getUserInfoPromise = new Promise(function(resolve) {
+                var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+                wx.request({
+                  url: url,
+                  success: (res) => {
+                    if (res.data.status == 0 && res.data.count > 0){
+                      if (res.data.mini_users[0].is_admin == '1') {
+                        app.globalData.role = 'staff'
+                      }
+                      if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
+                        wx.getUserInfo({
+                          success: (res) => {
+                            if (res.userInfo != null) {
+                              app.globalData.userInfo = res.userInfo
+                              var gender = ''
+                              switch(res.userInfo.gender) {
+                                case 1:
+                                  gender = '男'
+                                  break
+                                case 2:
+                                  gender = '女'
+                                  break
+                                default:
+                                  break
+                              }
+                              app.globalData.userInfo.gender = gender
+                              var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(app.globalData.userInfo.nickName) + '&headimage=' + encodeURIComponent(app.globalData.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
+                              wx.request({
+                                url: updateUrl
+                              })
+                              
+                            }
+                          }
+                        })
+                      }
+                      else {
+                        app.globalData.userInfo = {avatarUrl: res.data.mini_users[0].head_image, nickName: res.data.mini_users[0].nick, gender: res.data.mini_users[0].gender}
+                      }
+                    }
+                    resolve(app.globalData)
+                  }
+                })
+                
+              })
+              
+              getUserInfoPromise.then(function(resolveMsg){
+                resolve(app.globalData)
+              })
+              
+            }
+            catch(errMsg)
+            {
+              console.log(errMsg)
+            }
+          }
+        })
+
+      }
+    })
+  }),
   loginPromise: new Promise(function(resolve){
     wx.login({
       success: res => {
