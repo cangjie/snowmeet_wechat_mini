@@ -1,5 +1,6 @@
 // pages/admin/warmer_demand/warmer_demand.js
 const app = getApp()
+var log = require('../../../utils/log')
 Page({
 
   /**
@@ -18,6 +19,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    log.info('warmer demand confirm scan finish.')
     if (options.scene == undefined) {
       this.data.customerSessionKey = decodeURIComponent(options.customer)
     }
@@ -28,6 +30,7 @@ Page({
     var loginPromise = new Promise(function(resolve){
       if (app.globalData.sessionKey==undefined || app.globalData.sessionKey == ''){
         app.loginPromiseNew.then(function(resolveData) {
+          log.info('Login real time.')
           var needVerifyCell = false
           if (resolve.cellNumber == undefined || resolve.cellNumber == '') {
             needVerifyCell = true
@@ -37,7 +40,9 @@ Page({
         })
       }
       else {
+        log.info('Have logged in.')
         that.setData({isLogin: true})
+        
         resolve(app.globalData)
       }
     })
