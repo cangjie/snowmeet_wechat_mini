@@ -286,6 +286,9 @@ Page({
       preRequestPromise.then(function(resolve){
         confirmedInfo.request_id = resolve.maintain_in_shop_request_id
         var wxaCodeUrl = 'https://' + app.globalData.domainName + '/get_wxacode_unlimit.aspx?page=' + encodeURIComponent('pages/maintain/in_shop_request_payment/in_shop_request_payment') + '&scene=' + resolve.maintain_in_shop_request_id
+
+        wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_in_shop_maintain_id_' +  resolve.maintain_in_shop_request_id
+
         that.setData({wxaCodeUrl: wxaCodeUrl, request_id: resolve.maintain_in_shop_request_id})
         that.data.intervalIdOrderId = setInterval(() => {
           var getOrderIdPromise = new Promise(function(resolve) {
