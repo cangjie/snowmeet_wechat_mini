@@ -1,0 +1,5 @@
+/* pages/admin/expierence/expierence_admit.wxss */
+.left-column{
+  width:200rpx;
+  text-align: right;
+}

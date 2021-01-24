@@ -120,6 +120,18 @@
           "pathName": "pages/admin/warmer_demand/warmer_demand",
           "query": "scene=oGxeqeUU5Yeezu9Upb6qHA%3D%3D",
           "scene": null
+        },
+        {
+          "name": "expierence_admit",
+          "pathName": "pages/admin/expierence/expierence_admit",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "expierence_return",
+          "pathName": "pages/admin/expierence/expierence_return",
+          "query": "",
+          "scene": null
         }
       ]
     }

@@ -32,7 +32,9 @@
     "pages/mine/my_maintain/my_maintain_detail",
     "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick",
     "pages/mine/my_warmer/my_warmer",
-    "pages/admin/warmer_demand/warmer_demand"
+    "pages/admin/warmer_demand/warmer_demand",
+    "pages/admin/expierence/expierence_admit",
+    "pages/admin/expierence/expierence_return"
   ],
   "window": {
     "backgroundTextStyle": "light",

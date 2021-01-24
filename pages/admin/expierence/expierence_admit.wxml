@@ -1,0 +1,51 @@
+<view>
+  <mp-cells title="确认需要体验的装备信息" >
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >扫码：</view>
+        <view > 点 击 扫 一 扫 </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >名称：</view>
+        <view>xxxxxx</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >尺寸：</view>
+        <view>xxxxxx</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="抵押物信息" >
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >证照：</view>
+        <view>xxxxxx</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >押金：</view>
+        <view>xxxxxx</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >手机：</view>
+        <view>xxxxxx</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="体验时间" >
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >时长：</view>
+        <view>2小时</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <button> 提 交 </button>
+</view>
