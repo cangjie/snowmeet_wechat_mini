@@ -34,7 +34,8 @@
     "pages/mine/my_warmer/my_warmer",
     "pages/admin/warmer_demand/warmer_demand",
     "pages/admin/expierence/expierence_admit",
-    "pages/admin/expierence/expierence_return"
+    "pages/admin/expierence/expierence_return",
+    "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_paid_list"
   ],
   "window": {
     "backgroundTextStyle": "light",
