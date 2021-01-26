@@ -1,0 +1,26 @@
+<view wx:if="{{role=='staff'}}">
+  <mp-cells title="修改联系信息" >
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >手机：</view>
+        <view>
+          <input value="{{order.confirmed_cell}}" />
+        </view>
+      </view> 
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >姓名：</view>
+        <view>
+          <input value="{{order.confirmed_name}}" />
+        </view>
+      </view> 
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="拍照上传" >
+    <mp-cell>
+      <multi-uploader id="uploadPhotos" title="雪板及附件" image_count="3" detail_id="0" bindUploaded="uploaded" uploaded_files="{{photoFiles}}" ></multi-uploader>
+    </mp-cell>
+  </mp-cells>
+  <button> 提 交 </button>
+</view>
