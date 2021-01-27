@@ -1,21 +1,47 @@
 <view>
+  <mp-cells title="当前店铺" >
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >店铺：</view>
+        <view>
+          <radio-group id="shopName" bindchange="changeInfo" >
+
+            <radio wx:if="{{filledAdmitInfo.shop=='八易'}}" checked="true" value="八易" >八易</radio>
+            <radio wx:else  value="八易" >八易</radio> 
+
+            <radio wx:if="{{filledAdmitInfo.shop=='南山'}}" checked="true" value="南山" >南山</radio>
+            <radio wx:else  value="南山" >南山</radio> 
+
+            <radio wx:if="{{filledAdmitInfo.shop=='万龙'}}" checked="true" value="万龙" >万龙</radio>
+            <radio wx:else value="万龙" >万龙</radio> 
+
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="确认需要体验的装备信息" >
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
-        <view class="left-column" >扫码：</view>
-        <view > 点 击 扫 一 扫 </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >名称：</view>
-        <view>xxxxxx</view>
+        <view><input id="equipName" type="text" style="width:400rpx" bindchange="changeInfo" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >尺寸：</view>
-        <view>xxxxxx</view>
+        <view><input id="scale" maxlength="3" type="number" style="width:50rpx" bindchange="changeInfo" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      如试滑板有伤，需要拍照：
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >照片：</view>
+        <view>
+          <multi-uploader id="equipPhotooUpload" title="试滑板拍照" image_count="3" detail_id="0" bindUploaded="uploaded" uploaded_files="{{equipPhotoFiles}}" ></multi-uploader>
+        </view>
       </view>
     </mp-cell>
   </mp-cells>
@@ -23,19 +49,53 @@
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >证照：</view>
-        <view>xxxxxx</view>
+        <view>
+          <multi-uploader id="idcardPhotoUpload" title="证件正反面照片" image_count="2" detail_id="0" bindUploaded="uploaded" uploaded_files="{{idCardPhotoFiles}}" ></multi-uploader>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      如无法上传需要填写以下信息：
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >证件类型：</view>
+        <view>
+          <radio-group bindchange="changeInfo" id="idcardType" >
+            <radio wx:if="{{filledAdmitInfo.guarantee_credential_type=='身份证'}}" checked="true" value="身份证" >身份证</radio>
+            <radio wx:else value="身份证" >身份证</radio>
+
+            <radio wx:if="{{filledAdmitInfo.guarantee_credential_type=='护照'}}" checked="true" value="护照" >护照</radio>
+            <radio wx:else value="护照" >护照</radio>
+
+            <radio wx:if="{{filledAdmitInfo.guarantee_credential_type=='军官证'}}" checked="true" value="军官证" >军官证</radio>
+            <radio wx:else value="军官证" >军官证</radio>
+
+            <radio wx:if="{{filledAdmitInfo.guarantee_credential_type=='其他'}}" checked="true" value="其他" >其他</radio>
+            <radio wx:else value="其他" >其他</radio>
+
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >证件号码：</view>
+        <view><input id="idcardNo" maxlength="20" type="number" style="width:300rpx" bindchange="changeInfo" /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="联系信息及押金" >
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >手机：</view>
+        <view><input id="cell" maxlength="11" type="number" style="width:200rpx" bindchange="changeInfo" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >押金：</view>
-        <view>xxxxxx</view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
-        <view class="left-column" >手机：</view>
-        <view>xxxxxx</view>
+        <view><input maxlength="5" id="cash" type="number" style="width:100rpx"  value="2000" bindchange="changeInfo" /></view>
       </view>
     </mp-cell>
   </mp-cells>
@@ -43,9 +103,9 @@
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >时长：</view>
-        <view>2小时</view>
+        <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" ><input type="number" maxlength="2" value="{{hourLength}}"  id="hourLength" style="width:40rpx" bindchange="changeInfo" />小时</view>
       </view>
     </mp-cell>
   </mp-cells>
-  <button> 提 交 </button>
+  <button disabled="{{!infoIsValid}}" > 提 交 </button>
 </view>
