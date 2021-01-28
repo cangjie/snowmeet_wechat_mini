@@ -1,4 +1,5 @@
 // pages/admin/expierence/expierence_admit.js
+const app = getApp()
 Page({
 
   /**
@@ -12,23 +13,29 @@ Page({
       asset_photos:'',
       guarantee_credential_type: '身份证',
       guarantee_credential_no: '',
-      guarantee_credentail_photos: '',
+      guarantee_credential_photos: '',
       cell_number: '',
-      guarantee_cash: 2000,
+      guarantee_cash: 2000
     },
     hourLength: 2,
-    infoIsValid: false
+    infoIsValid: false,
+    role: '',
+    currentExpierenceId: 0,
+    paid: false
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.setData({role: app.globalData.role})
+    })
     var nowTime = new Date()
-    var startTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString()
+    var startTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
     nowTime.setHours(nowTime.getHours()+2)
-    nowTime.setMinutes(nowTime.getMinutes() + 30)
-    var endTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + this.data.hourLength).toString() + '-' + nowTime.getDate().toString()
+    var endTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + this.data.hourLength).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
     var filledAdmitInfo = this.data.filledAdmitInfo
     filledAdmitInfo.start_time = startTimeStr
     filledAdmitInfo.end_time = endTimeStr
@@ -119,11 +126,62 @@ Page({
       default:
         break
     }
-    
+    this.checkValid()
   },
   checkValid: function() {
     var filledAdmitInfo = this.data.filledAdmitInfo
+    var valid = true
     if (filledAdmitInfo.asset_name != '' && filledAdmitInfo.asset_scale != '' 
-    && (filledAdmitInfo.guarantee_credentail_photos != '' || (filledAdmitInfo.guarantee_credential_type != '' && filledAdmitInfo.guarantee_credential_no != '') ) && )
+    && (filledAdmitInfo.guarantee_credentail_photos != '' || (filledAdmitInfo.guarantee_credential_type != '' && filledAdmitInfo.guarantee_credential_no != '') ) && filledAdmitInfo.cell_number != '' && filledAdmitInfo.guarantee_cash != '' && this.data.hourLength != '' && filledAdmitInfo.shop != '') {
+      try{
+        parseInt(filledAdmitInfo.guarantee_cash)
+      }
+      catch(err){
+        valid = false
+      }
+      try{
+        parseInt(this.data.hourLength)
+      }
+      catch(err){
+        valid = false
+      }
+    }
+    else {
+      valid = false
+    }
+    this.setData({infoIsValid: valid})
+  },
+  uploaded: function(e) {
+    var filledAdmitInfo = this.data.filledAdmitInfo
+    var id = e.currentTarget.id
+    var fileArr = e.detail.files
+    var files = ''
+    for(var i = 0; i < fileArr.length; i++){
+      files = files + (i>0?',':'') + fileArr[i].url
+    }
+    switch(id) {
+      case 'equipPhotooUpload':
+        filledAdmitInfo.asset_photos = files
+        break
+      case '':
+        filledAdmitInfo.guarantee_credential_photos = files
+        break
+      default:
+        break
+    }
+  },
+  submit: function(e) {
+    var submitUrl = 'https://' + app.globalData.domainName + '/api/expierence_admit.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+    var filledAdmitInfo = this.data.filledAdmitInfo
+    wx.request({
+      url: submitUrl,
+      method: 'POST',
+      data: filledAdmitInfo,
+      success: (res) => {
+        var responseData = res.data
+        var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_expierence_guarantee_cash_' + responseData.expierence_list_id
+        this.setData({currentExpierenceId: responseData.expierence_list_id, wxaCodeUrl: wxaCodeUrl})
+      }
+    })
   }
 })

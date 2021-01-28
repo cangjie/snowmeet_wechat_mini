@@ -1,5 +1,6 @@
-<view>
-  <mp-cells title="当前店铺" >
+<block wx:if="{{role=='staff'}}" >
+  <view wx:if="{{currentExpierenceId==0}}">
+    <mp-cells title="当前店铺" >
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >店铺：</view>
@@ -19,8 +20,8 @@
         </view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <mp-cells title="确认需要体验的装备信息" >
+    </mp-cells>
+    <mp-cells title="确认需要体验的装备信息" >
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >名称：</view>
@@ -44,8 +45,8 @@
         </view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <mp-cells title="抵押物信息" >
+    </mp-cells>
+    <mp-cells title="抵押物信息" >
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >证照：</view>
@@ -84,8 +85,8 @@
         <view><input id="idcardNo" maxlength="20" type="number" style="width:300rpx" bindchange="changeInfo" /></view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <mp-cells title="联系信息及押金" >
+    </mp-cells>
+    <mp-cells title="联系信息及押金" >
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >手机：</view>
@@ -98,14 +99,28 @@
         <view><input maxlength="5" id="cash" type="number" style="width:100rpx"  value="2000" bindchange="changeInfo" /></view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <mp-cells title="体验时间" >
+    </mp-cells>
+    <mp-cells title="体验时间" >
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >时长：</view>
         <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" ><input type="number" maxlength="2" value="{{hourLength}}"  id="hourLength" style="width:40rpx" bindchange="changeInfo" />小时</view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <button disabled="{{!infoIsValid}}" > 提 交 </button>
-</view>
+    </mp-cells>
+    <button disabled="{{!infoIsValid}}" bindtap="submit" > 提 交 </button>
+  </view>
+  <block wx:else >
+    <view wx:if="{{!paid}}" >
+      <view style="text-align:center" >
+       请顾客扫描以下二维码支付。
+      </view>
+      <view  style="text-align:center" >
+        <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
+      </view>
+    </view>
+    <view wx:else >
+      支付押金支付成功。
+    </view>
+  </block>
+</block>
