@@ -35,7 +35,7 @@ Page({
     var nowTime = new Date()
     var startTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
     nowTime.setHours(nowTime.getHours()+2)
-    var endTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + this.data.hourLength).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
+    var endTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
     var filledAdmitInfo = this.data.filledAdmitInfo
     filledAdmitInfo.start_time = startTimeStr
     filledAdmitInfo.end_time = endTimeStr
@@ -181,6 +181,22 @@ Page({
         var responseData = res.data
         var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_expierence_guarantee_cash_' + responseData.expierence_list_id
         this.setData({currentExpierenceId: responseData.expierence_list_id, wxaCodeUrl: wxaCodeUrl})
+        var intervalId = setInterval(() => {
+          var getInfoUrl = 'https://' + app.globalData.domainName + '/api/expierence_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)+'&id='+responseData.expierence_list_id
+          wx.request({
+            url: getInfoUrl,
+            success: (res) => {
+              if (res.data.status == 0 && res.data.count > 0) {
+                if (res.data.expierence_list_arr[0].guarantee_order_id > 0 && res.data.expierence_list_arr[0].pay_state == 1) {
+                  clearInterval(intervalId)
+                  this.setData({paid: true})
+                }
+
+              }
+            }
+          })
+          
+        }, 1000);
       }
     })
   }
