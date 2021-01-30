@@ -1,7 +1,11 @@
 <!--pages/admin/admin.wxml-->
 <view wx:if="{{role=='staff'}}" >
-  <mp-cells ext-class="my-cells" title="我的管理项" >
-  <mp-cell value="雪具养护收款" bindtap="goToMaintainInShopQuick" ></mp-cell>
+  <mp-cells ext-class="my-cells" title="养护相关" >
+    <mp-cell value="雪具养护收款" bindtap="goToMaintainInShopQuick" ></mp-cell>
+  </mp-cells>
+  <mp-cells ext-class="my-cells" title="试滑" >
+    <mp-cell id="expierence_admit" value="试滑收押金" bindtap="nav" ></mp-cell>
+    <mp-cell id="expierence_active_list" value="当前试滑列表" bindtap="nav" ></mp-cell>
   </mp-cells>
 </view>
 <view wx:else >

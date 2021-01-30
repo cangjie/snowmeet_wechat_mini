@@ -84,5 +84,22 @@ Page({
     wx.navigateTo({
       url: './equip_maintain/in_shop_order_quick/in_shop_order_quick',
     })
+  },
+  nav: function(e) {
+    var path = '/pages/index/index'
+    var id = e.currentTarget.id
+    switch(id) {
+      case 'expierence_admit':
+        path = '/pages/admin/expierence/expierence_admit'
+        break
+      case 'expierence_active_list':
+        path = '/pages/admin/expierence/expierence_active_list'
+        break
+      default:
+        break
+    }
+    wx.navigateTo({
+      url: path
+    })
   }
 })

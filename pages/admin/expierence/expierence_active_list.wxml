@@ -1,0 +1,18 @@
+<view wx:if="{{role=='staff'}}">
+  <mp-cells>
+    <mp-cell wx:for="{{expierence_list_arr}}" bindtap="gotoRefund" id="{{item.id}}" >
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column"  >手机：</view>
+        <view class="right-column" >{{item.cell_number}}</view>
+        <view class="left-column"  >结束：</view>
+        <view class="right-column" >{{item.endTimeStr}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column"  >名称：</view>
+        <view class="right-column" >{{item.asset_name}}</view>
+        <view class="left-column"  >长度：</view>
+        <view class="right-column" >{{item.asset_scale}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

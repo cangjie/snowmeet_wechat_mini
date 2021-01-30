@@ -138,6 +138,12 @@
           "pathName": "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_paid_list",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "expierence_active_list",
+          "pathName": "pages/admin/expierence/expierence_active_list",
+          "query": "",
+          "scene": null
         }
       ]
     }
