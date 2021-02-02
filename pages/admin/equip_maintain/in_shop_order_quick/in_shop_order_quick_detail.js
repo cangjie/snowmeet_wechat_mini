@@ -6,7 +6,10 @@ Page({
    * Page initial data
    */
   data: {
-
+    filledInfo: false,
+    canSubmit: false,
+    cell: '',
+    realName: ''
   },
 
   /**
@@ -76,5 +79,46 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  uploaded: function(e) {
+    var filesStr = ''
+    for(var i = 0; i < e.detail.files.length; i++) {
+      filesStr = filesStr + ((i>0)?',':'') + e.detail.files[i].url
+    }
+    this.data.uploadedFile = filesStr
+  },
+  submit: function() {
+    var updateContactInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_modify.aspx?id=' + this.data.id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+    var submitData = {}
+    submitData.confirmed_cell = this.data.cell
+    submitData.confirmed_name = this.data.realName
+    submitData.confirmed_images = this.data.uploadedFile
+    wx.request({
+      url: updateContactInfoUrl,
+      method: 'POST',
+      data: submitData,
+      success: (res) => {
+        this.setData({filledInfo: true})
+      }
+    })
+  },
+  inputText: function(e){
+    var id = e.currentTarget.id
+    switch(id) {
+      case 'realName':
+        this.data.realName = e.detail.value
+        break
+      case 'cell':
+        this.data.cell = e.detail.value
+        break
+      default:
+        break
+    }
+    if (this.data.cell != '' && this.data.realName != '') {
+      this.setData({canSubmit: true})
+    }
+    else {
+      this.setData({canSubmit: false})
+    }
   }
 })
