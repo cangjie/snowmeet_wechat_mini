@@ -73,6 +73,7 @@ Page({
   },
   datePickerChanged: function(e) {
     this.setData({currentDate: e.detail.value})
+    this.getData(e.detail.value)
   },
   getData: function(currentDate) {
     var urlGetCurrentDateOrder = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_list_all.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
