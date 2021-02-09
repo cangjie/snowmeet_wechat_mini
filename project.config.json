@@ -144,6 +144,12 @@
           "pathName": "pages/admin/expierence/expierence_active_list",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "ski_pass",
+          "pathName": "pages/skipass/skipass",
+          "query": "",
+          "scene": null
         }
       ]
     }
