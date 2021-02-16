@@ -150,6 +150,11 @@
           "pathName": "pages/skipass/skipass",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "ble_printer_test",
+          "pathName": "pages/ble/printer_test",
+          "scene": null
         }
       ]
     }
