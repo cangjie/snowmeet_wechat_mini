@@ -150,6 +150,11 @@
           "pathName": "pages/skipass/skipass",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "non-snow season index",
+          "pathName": "pages/admin/equip_maintain/order_list/order_list_main",
+          "scene": null
         }
       ]
     }
