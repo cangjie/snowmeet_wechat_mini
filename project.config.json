@@ -154,6 +154,18 @@
         {
           "name": "ble_printer_test",
           "pathName": "pages/ble/printer_test",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "order_list_main",
+          "pathName": "pages/admin/equip_maintain/order_list/order_list_main",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "scan test",
+          "pathName": "pages/test/scan/scan",
           "scene": null
         }
       ]
