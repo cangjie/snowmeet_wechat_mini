@@ -1,4 +1,6 @@
 // pages/ble/printer_test.js
+var tsc = require('../../utils/ble_printer/tsc.js')
+var encode = require('../../utils/ble_printer/encoding.js')
 Page({
 
   /**
@@ -135,5 +137,25 @@ Page({
         }
       }
     })
+  },
+  printLabel: function() {
+    var cmd = tsc.jpPrinter.createNew()
+    cmd.setCls()
+    cmd.setSize(74, 49)
+    cmd.setGap(4)
+    cmd.setBox(10, 10, 464, 230, 5)//绘制一个边框
+    cmd.setBar(10, 75, 455, 5);//绘制一条黑线
+    cmd.setText(150, 20, "TSS24.BF2", 0, 2, 2, "棒棒糖")//绘制文字
+    cmd.setText(340, 20, "TSS24.BF2", 0, 2, 2, "8 元")//绘制文字
+    cmd.setText(360, 40, "TSS24.BF2", 0, 1, 1, ".8")//绘制文字
+    cmd.setText(50, 100, "TSS24.BF2", 0, 1, 1, "单位：______")//绘制文字
+    cmd.setText(140, 90, "TSS24.BF2", 0, 1, 1, "包")//绘制文字
+    cmd.setText(50, 140, "TSS24.BF2", 0, 1, 1, "重量：______")//绘制文字
+    cmd.setText(140, 130, "TSS24.BF2", 0, 1, 1, "500g")//绘制文字
+    cmd.setText(50, 170, "TSS24.BF2", 0, 1, 1, "条码:")//绘制文字
+    cmd.setBarCode(120, 170, "128", 48, 0, 0, 2, 2, "12345678")//绘制code128条码
+    cmd.setBar(300, 80, 5, 150);//绘制一条黑线
+    cmd.setQrcode(320, 90, "L", 5, "A", "http://www.howbest.cn/cn/")//绘制一个二维码
+    cmd.setPagePrint()//执行打印指令
   }
 })
