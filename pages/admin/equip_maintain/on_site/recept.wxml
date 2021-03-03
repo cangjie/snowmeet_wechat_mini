@@ -1,0 +1,136 @@
+<view>
+  <mp-cells title="当前店铺" >
+    <mp-cell>{{confirmedInfo.shop}}</mp-cell>
+  </mp-cells>
+  <mp-cells title="装备信息">
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;" >
+        <view style="width:200rpx;text-align:right" >装备类型：</view>
+        <view >
+          <radio-group bindchange="selectType">
+            <radio checked="{{true}}" value="双板" >双板</radio>
+            <radio  value="单板" >单板</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;" >
+        <view style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>品牌：</view>
+        <view>
+          <picker mode="selector" value="{{brandSelectIndex}}" range="{{displayedBrandList}}" bindchange="selectBrand">
+            <view>{{displayedBrandList[brandSelectIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;" >
+        <view style="width:200rpx;text-align:right" >长度：</view>
+        <view><input type="text" placeholder="" bindinput="changeScale" value="" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+        <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+          <view class="left-column" >拍照：</view>
+          <view>
+            <multi-uploader id="uploadPhotos" title="雪板及附件" image_count="3" detail_id="0" bindUploaded="uploaded" uploaded_files="{{photoFiles}}" ></multi-uploader>
+          </view>
+        </view>
+      </mp-cell>
+  </mp-cells>
+  <mp-cells title="服务项目">
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >修刃：</view>
+        <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+          <checkbox-group bindchange="changeEdge">
+            <checkbox style="width:150rpx" value="修刃"  ></checkbox>
+          </checkbox-group>
+          <input style="width:150rpx" value="{{confirmedInfo.degree}}" bindinput="degreeChange" ></input>度
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >打蜡：</view>
+        <view>
+          <checkbox-group bindchange="changeCandle" >
+            <checkbox style="width:150rpx"  value="打蜡" ></checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >杂项：</view>
+        <view>
+          <checkbox-group bindchange="changeRepairMore" >
+            <checkbox style="width:150rpx" value="补板底" >补板底</checkbox>
+            <checkbox style="width:150rpx" value="修底刃" >修底刃</checkbox>
+            <checkbox style="width:150rpx" value="粘板面" >粘板面</checkbox>
+            <checkbox style="width:150rpx" value="雪杖等附件寄存" >雪杖等附件寄存</checkbox>
+            <checkbox style="width:150rpx" value="其它" >其它...</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >说明：</view>
+        <view><input placeholder="填写备注" bindinput="changeMemo" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >额外费用：</view>
+        <view><input placeholder="0" type="text" bindinput="changeAdditionalFee" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >取板：</view>
+        <view>
+          <picker mode="date" value="{{confirmedInfo.pick_date}}" start="{{pickDateStart}}" end="{{pickDateEnd}}" bindchange="pickDateChange" >
+            <view class="picker" >{{confirmedInfo.pick_date}}{{pickDateDescription}}</view>
+          </picker>
+        </view>
+      </view> 
+    </mp-cell>
+    
+  </mp-cells>
+  <mp-cells title="联系停息" >
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >手机：</view>
+        <view><input value="{{cell}}" type="number" bindinput="changeCellNumber" ></input></view>
+        <view style="text-align:right;padding-right:10rpx;background-color:green;color:#fff;margin-left:10rpx;padding:10rpx;" bindtap="call"><b> 拨 打 </b></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >姓名：</view>
+        <view><input placeholder="{{nick}}" value="{{realName}}" bindinput="changeRealName" ></input></view>
+        </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >称谓：</view>
+        <view>
+          <radio-group bindchange="changeGender" ><radio  checked="{{gender=='男'}}" value="男" >先生</radio><radio checked="{{gender=='女'}}" value="女" >女士</radio></radio-group>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="确认费用" >
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >总费用：</view>
+        <view>{{totalCharge}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <button bindtap="submit" disabled="{{!canSubmit}}" > 提 交 </button>
+    </mp-cell>
+  </mp-cells>
+</view>

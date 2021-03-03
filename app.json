@@ -39,7 +39,8 @@
     "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_quick_detail",
     "pages/admin/expierence/expierence_active_list",
     "pages/admin/expierence/ expierence_refund",
-    "pages/ble/printer_test"
+    "pages/ble/printer_test",
+    "pages/admin/equip_maintain/on_site/recept"
   ],
   "window": {
     "backgroundTextStyle": "light",

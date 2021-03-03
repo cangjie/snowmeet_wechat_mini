@@ -166,6 +166,13 @@
         {
           "name": "scan test",
           "pathName": "pages/test/scan/scan",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "on_site_maintain_recept",
+          "pathName": "pages/admin/equip_maintain/on_site/recept",
+          "query": "",
           "scene": null
         }
       ]
