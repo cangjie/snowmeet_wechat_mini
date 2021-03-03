@@ -1,12 +1,7 @@
 // pages/ble/printer_test.js
-<<<<<<< HEAD
-var tsc = require('../../utils/ble_printer/tsc.js')
-var encode = require('../../utils/ble_printer/encoding.js')
-=======
 var app = getApp();
 var tsc = require("../../utils/ble_label_printer/tsc.js");
 var encode = require("../../utils/ble_label_printer/encoding.js");
->>>>>>> 506546922c3a6441816cf12e7dfcb2b107e11fce
 Page({
 
   /**
