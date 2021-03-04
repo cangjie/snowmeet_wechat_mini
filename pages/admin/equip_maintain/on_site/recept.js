@@ -254,6 +254,9 @@ Page({
         },
         complete: (res)=>{
           console.log(res)
+          wx.navigateTo({
+            url: 'recept_pay?id=' + that.data.confirmedInfo.request_id
+          })
         }
       })
     })
@@ -339,6 +342,7 @@ Page({
     else {
       pickDateDescription = ''
     }
+    this.checkValid()
     this.setData({confirmedInfo: confirmedInfo, pickDateDescription: pickDateDescription})
   }
 })

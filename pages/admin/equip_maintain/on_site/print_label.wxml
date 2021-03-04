@@ -1,0 +1,5 @@
+<view>
+  <view wx:if="{{deviceId!=''}}">确认设备ID: {{deviceId}}, 开始连接</view>
+  <view wx:if="{{services!=undefined}}">已经查找到设备</view>
+  <view wx:if="{{canRead && canWrite && canNotify}}" >连接成功</view>
+</view>

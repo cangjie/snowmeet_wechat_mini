@@ -40,7 +40,9 @@
     "pages/admin/expierence/expierence_active_list",
     "pages/admin/expierence/ expierence_refund",
     "pages/ble/printer_test",
-    "pages/admin/equip_maintain/on_site/recept"
+    "pages/admin/equip_maintain/on_site/recept",
+    "pages/admin/equip_maintain/on_site/recept_pay",
+    "pages/admin/equip_maintain/on_site/print_label"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,0 +1,18 @@
+<view>
+  <block wx:if="{{!paid}}" >
+    <view style="text-align:center">
+      请顾客打开微信扫一扫，扫描二维码关注公众号后，点击提示的消息付款。付款成功后，页面会自动跳转。
+    </view>
+    <view style="text-align:center" >
+      <image wx:if="{{qrCodeUrl!='' && !paymentTimeOut}}" src="{{qrCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
+    </view>
+    <view wx:if="{{orderId>0}}" >用户开始支付。</view>
+    <view wx:if="{{paymentTimeOut}}" >支付超时，请返回重新下单。</view>
+  </block>
+  <block wx:else >
+    <view style="text-align:center">用户支付成功</view>
+    <button bindtap="gotoPrint">打印标签</button>
+    <button>补全信息</button>
+    <button>查看列表</button>
+  </block>
+</view>
