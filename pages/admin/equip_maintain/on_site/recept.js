@@ -9,13 +9,18 @@ Page({
     confirmedInfo: {
       shop: '万龙',
       degree: '89',
+      edge: 0,
+      candle: 0,
       equipInfo: {
         type: '双板',
         brand: ''
-      }
+      },
+      additional_fee: 0
     },
     pickDateDescription: '明天',
-    totalCharge: 0
+    totalCharge: 0,
+    submitInfoValid: false,
+    actionMode: 'add'
   },
 
   /**
@@ -54,6 +59,42 @@ Page({
           this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: 0, displayedBrandList: skiList})
       }
     })
+    var that = this
+    app.loginPromiseNew.then(function (resolve) {
+      that.data.sessionKey = resolve.sessionKey
+    })
+  },
+  checkValid: function() {
+    if (this.data.actionMode == 'add') {
+      if (this.data.confirmedInfo.equipInfo.brand == '' || 
+      (this.data.confirmedInfo.edge != 1 && this.data.confirmedInfo.candle != 1 && this.data.confirmedInfo.additional_fee == 0)) {
+        this.setData({submitInfoValid: false})
+      }
+      else {
+        var url = 'https://' + app.globalData.domainName + '/api/maintain_task_order_place_in_shop.aspx?action=view&sessionkey=' + encodeURIComponent(this.data.sessionKey)
+        console.log(this.data.confirmedInfo)
+        wx.request({
+          url: url,
+          method: 'POST',
+          data: this.data.confirmedInfo,
+          success: (res) => {
+            if (res.data.status == 0) {
+              var totalCharge = res.data.total_fee
+              this.data.confirmedInfo.product_id = res.data.product_id.toString()
+              var canSubmit = false
+              if (totalCharge > 0) {
+                canSubmit = true
+              }
+              this.setData({totalCharge: totalCharge, submitInfoValid: canSubmit})
+            }
+          },
+          fail: (res) => {
+            this.setData({totalCharge: 0, submitInfoValid: false})
+          }
+        })
+        
+      }
+    }
   },
   selectType: function(e) {
     var confirmedInfo = this.data.confirmedInfo
@@ -64,8 +105,6 @@ Page({
     else {
       this.setData({brandSelectIndex: 0, displayedBrandList: this.data.skiBrandList, confirmedInfo: confirmedInfo})
     }
-    
-
   },
   selectBrand: function(e){
     var confirmedInfo = this.data.confirmedInfo
@@ -75,9 +114,149 @@ Page({
       if (this.data.totalCharge > 0) {
         canSubmit = true
       }
+      
       this.setData({brandSelectIndex: e.detail.value, confirmedInfo: confirmedInfo, canSubmit: canSubmit})
+      this.checkValid()
     }
     
+  },
+  changeScale: function(e) {
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.equipInfo.scale = e.detail.value
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  uploaded: function(e) {
+    var files = e.detail.files
+    var photoFiles = ''
+    for(var i in files) {
+      if (files[i].url != '') {
+        photoFiles = photoFiles + ((photoFiles.trim() != '')? ',' : '') + files[i].url
+      }
+    }
+    this.setData({photoFiles: photoFiles})
+  },
+  changeEdge: function(e) {
+    var edge = false
+    if (e.detail.value.length == 1) {
+      edge = true
+    }
+    var confirmedInfo = this.data.confirmedInfo
+    if (edge) {
+      confirmedInfo.edge = '1'
+    }
+    else {
+      confirmedInfo.edge = '0'
+    }
+    this.setData({confirmedInfo: confirmedInfo})
+    this.checkValid()
+    //this.viewSummary('view')
+  },
+  degreeChange: function(e) {
+    var degree = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.degree = degree
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  changeCandle: function(e) {
+    var candle = false
+    if (e.detail.value.length == 1) {
+      candle = true
+    }
+    var confirmedInfo = this.data.confirmedInfo
+    if (candle) {
+      confirmedInfo.candle = '1'
+    }
+    else {
+      confirmedInfo.candle = '0'
+    }
+    this.setData({confirmedInfo: confirmedInfo})
+    this.checkValid()
+  },
+  changeRepairMore: function(e) {
+    var repairMore = ''
+    for(var i = 0; i < e.detail.value.length; i++) {
+      repairMore = repairMore + ((repairMore == '')? '' : ',') + e.detail.value[i]
+    }
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.repair_more = repairMore
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  changeMemo: function(e) {
+    var memo = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.memo = memo
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  changeAdditionalFee: function(e) {
+    var fee = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.additional_fee = fee
+    this.setData({confirmedInfo: confirmedInfo})
+    this.checkValid()
+  },
+  changeGender: function(e) {
+    this.setData({gender: e.detail.value})
+  },
+  changeRealName: function(e) {
+    this.setData({realName: e.detail.value})
+  },
+  changeCellNumber: function(e) {
+    this.setData({cell: e.detail.value})
+  },
+  submit: function() {
+    var that = this
+    var preRequestPromise = new Promise(function(resolve) {
+      var urlPreOrder = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_create_by_staff_quickly.aspx?sessionkey=' + encodeURIComponent(that.data.sessionKey)
+      wx.request({
+        url: urlPreOrder,
+        method: 'POST',
+        data: that.data.confirmedInfo,
+        success: (res) => {
+          if (res.data.status == 0) {
+            resolve(res.data)
+          }
+        }
+      })
+    })
+    
+    preRequestPromise.then(function(resolve){
+      that.data.confirmedInfo.request_id = resolve.maintain_in_shop_request_id
+      var submitData = {}
+      if (that.data.gender != undefined && that.data.gender != '') {
+        submitData.confirmed_gender = that.data.gender
+      }
+      else{
+        submitData.confirmed_gender = ''
+      }
+      if (that.data.realName != undefined && that.data.realName != '') {
+        submitData.confirmed_name = that.data.realName
+      }
+      else {
+        submitData.confirmed_name = ''
+      }
+      if (that.data.cell != undefined && that.data.cell != '') {
+        submitData.confirmed_cell = that.data.cell
+      }
+      else {
+        submitData.confirmed_cell = ''
+      }
+      submitData.confirmed_images = that.data.photoFiles
+      var updateContactInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_modify.aspx?id=' + resolve.maintain_in_shop_request_id + '&sessionkey=' + encodeURIComponent(that.data.sessionKey)
+      wx.request({
+        url: updateContactInfoUrl,
+        method: 'POST',
+        data: submitData,
+        success: (res) => {
+          
+        },
+        fail: (res) => {
+
+        },
+        complete: (res)=>{
+          console.log(res)
+        }
+      })
+    })
   },
   /**
    * Lifecycle function--Called when page is initially rendered

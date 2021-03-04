@@ -1,4 +1,10 @@
 <view>
+  <mp-cells title="当前操作" >
+    <mp-cell>
+      <view wx:if="{{actionMode=='add'}}">现场下单</view>
+      <view wx:else >修改订单</view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="当前店铺" >
     <mp-cell>{{confirmedInfo.shop}}</mp-cell>
   </mp-cells>
@@ -18,7 +24,7 @@
       <view class="flex-wrp" style="flex-direction:row;" >
         <view style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>品牌：</view>
         <view>
-          <picker mode="selector" value="{{brandSelectIndex}}" range="{{displayedBrandList}}" bindchange="selectBrand">
+          <picker disabled="{{actionMode=='mod'}}" mode="selector" value="{{brandSelectIndex}}" range="{{displayedBrandList}}" bindchange="selectBrand">
             <view>{{displayedBrandList[brandSelectIndex]}}</view>
           </picker>
         </view>
@@ -45,7 +51,7 @@
         <view class="left-column" >修刃：</view>
         <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
           <checkbox-group bindchange="changeEdge">
-            <checkbox style="width:150rpx" value="修刃"  ></checkbox>
+            <checkbox style="width:150rpx" value="修刃" disabled="{{actionMode=='mod'}}" ></checkbox>
           </checkbox-group>
           <input style="width:150rpx" value="{{confirmedInfo.degree}}" bindinput="degreeChange" ></input>度
         </view>
@@ -56,7 +62,7 @@
         <view class="left-column" >打蜡：</view>
         <view>
           <checkbox-group bindchange="changeCandle" >
-            <checkbox style="width:150rpx"  value="打蜡" ></checkbox>
+            <checkbox style="width:150rpx"  value="打蜡" disabled="{{actionMode=='mod'}}" ></checkbox>
           </checkbox-group>
         </view>
       </view>
@@ -84,7 +90,7 @@
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
         <view class="left-column" >额外费用：</view>
-        <view><input placeholder="0" type="text" bindinput="changeAdditionalFee" /></view>
+        <view><input placeholder="0" disabled="{{actionMode=='mod'}}" type="text" bindinput="changeAdditionalFee" value="{{confirmedInfo.additional_fee}}" /></view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -104,7 +110,7 @@
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >手机：</view>
         <view><input value="{{cell}}" type="number" bindinput="changeCellNumber" ></input></view>
-        <view style="text-align:right;padding-right:10rpx;background-color:green;color:#fff;margin-left:10rpx;padding:10rpx;" bindtap="call"><b> 拨 打 </b></view>
+        <view style="text-align:right;background-color:green;color:#fff" bindtap="call"><b> 拨 打 </b></view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -130,7 +136,7 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <button bindtap="submit" disabled="{{!canSubmit}}" > 提 交 </button>
+      <button bindtap="submit" disabled="{{!submitInfoValid}}" > 提 交 </button>
     </mp-cell>
   </mp-cells>
 </view>

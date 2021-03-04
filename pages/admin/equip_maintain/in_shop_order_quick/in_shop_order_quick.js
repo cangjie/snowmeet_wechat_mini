@@ -355,6 +355,7 @@ Page({
       })
     }
     else {
+      console.log(confirmedInfo)
       wx.request({
         url: url,
         method: 'POST',
@@ -395,6 +396,7 @@ Page({
       submitData.confirmed_gender = this.data.gender
       submitData.confirmed_images = this.data.photoFiles
       var updateContactInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_modify.aspx?id=' + this.data.confirmedInfo.request_id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+
       wx.request({
         url: updateContactInfoUrl,
         method: 'POST',
