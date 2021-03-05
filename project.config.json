@@ -178,7 +178,7 @@
         {
           "name": "print label",
           "pathName": "pages/admin/equip_maintain/on_site/print_label",
-          "query": "id=279",
+          "query": "id=313",
           "scene": null
         }
       ]

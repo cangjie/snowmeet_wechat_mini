@@ -2,4 +2,6 @@
   <view wx:if="{{deviceId!=''}}">确认设备ID: {{deviceId}}, 开始连接</view>
   <view wx:if="{{services!=undefined}}">已经查找到设备</view>
   <view wx:if="{{canRead && canWrite && canNotify}}" >连接成功</view>
+  <button id="label" bindtap="print" disabled="{{!canRead || !canWrite || !canNotify || nowPrinting}}" >打印标签</button>
+  <button id="invoice" bindtap="print" disabled="{{!canRead || !canWrite || !canNotify || nowPrinting}}" >打印小票</button>
 </view>

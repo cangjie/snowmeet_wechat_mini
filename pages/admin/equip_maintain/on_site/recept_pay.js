@@ -44,6 +44,23 @@ Page({
         if (res.data.status == 0) {
           if (res.data.order_online.pay_state == '1') {
             this.setData({paid: true})
+            var allocateTaskFlowNumUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_allocate_flow_num.aspx?id=' + this.data.id + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
+            wx.request({
+              url: allocateTaskFlowNumUrl,
+              success: (res) => {
+                var toastTitle = ''
+                if (res.data.status == 0) {
+                  toastTitle = '支付成功，流水号：' + res.data.task_flow_num
+                  
+                }
+                else {
+                  oastTitle = '支付成功，流水号未分配'
+                }
+                wx.showToast({
+                  title: toastTitle
+                })
+              }
+            })
           }
           else {
             var orderTime = new Date(res.data.order_online.create_date.toString())
