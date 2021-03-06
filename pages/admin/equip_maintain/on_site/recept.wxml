@@ -13,9 +13,9 @@
       <view class="flex-wrp" style="flex-direction:row;" >
         <view style="width:200rpx;text-align:right" >装备类型：</view>
         <view >
-          <radio-group bindchange="selectType">
-            <radio checked="{{true}}" value="双板" >双板</radio>
-            <radio  value="单板" >单板</radio>
+          <radio-group bindchange="selectType"  >
+            <radio checked="{{confirmedInfo.equipInfo.type == '双板'}}" value="双板" disabled="{{id>0}}" >双板</radio>
+            <radio checked="{{confirmedInfo.equipInfo.type == '单板'}}" value="单板" disabled="{{id>0}}" >单板</radio>
           </radio-group>
         </view>
       </view>
@@ -24,7 +24,7 @@
       <view class="flex-wrp" style="flex-direction:row;" >
         <view style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>品牌：</view>
         <view>
-          <picker disabled="{{actionMode=='mod'}}" mode="selector" value="{{brandSelectIndex}}" range="{{displayedBrandList}}" bindchange="selectBrand">
+          <picker disabled="{{id>0}}" mode="selector" value="{{brandSelectIndex}}" range="{{displayedBrandList}}" bindchange="selectBrand">
             <view>{{displayedBrandList[brandSelectIndex]}}</view>
           </picker>
         </view>
@@ -33,7 +33,7 @@
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;" >
         <view style="width:200rpx;text-align:right" >长度：</view>
-        <view><input type="text" placeholder="" bindinput="changeScale" value="" /></view>
+        <view><input type="text" placeholder="" bindinput="changeScale" value="{{confirmedInfo.equipInfo.scale}}" /></view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -51,9 +51,9 @@
         <view class="left-column" >修刃：</view>
         <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
           <checkbox-group bindchange="changeEdge">
-            <checkbox style="width:150rpx" value="修刃" disabled="{{actionMode=='mod'}}" ></checkbox>
+            <checkbox style="width:150rpx" value="修刃" disabled="{{id>0}}" checked="{{confirmedInfo.edge==1}}" ></checkbox>
           </checkbox-group>
-          <input style="width:150rpx" value="{{confirmedInfo.degree}}" bindinput="degreeChange" ></input>度
+          <input style="width:150rpx" disabled="{{id>0}}" value="{{confirmedInfo.degree}}" bindinput="degreeChange"  value="{{confirmedInfo.degree}}"></input>度
         </view>
       </view>
     </mp-cell>
@@ -62,7 +62,7 @@
         <view class="left-column" >打蜡：</view>
         <view>
           <checkbox-group bindchange="changeCandle" >
-            <checkbox style="width:150rpx"  value="打蜡" disabled="{{actionMode=='mod'}}" ></checkbox>
+            <checkbox style="width:150rpx" disabled="{{id>0}}" value="打蜡"  checked="{{confirmedInfo.candle}}" ></checkbox>
           </checkbox-group>
         </view>
       </view>
@@ -72,11 +72,11 @@
         <view class="left-column" >杂项：</view>
         <view>
           <checkbox-group bindchange="changeRepairMore" >
-            <checkbox style="width:150rpx" value="补板底" >补板底</checkbox>
-            <checkbox style="width:150rpx" value="修底刃" >修底刃</checkbox>
-            <checkbox style="width:150rpx" value="粘板面" >粘板面</checkbox>
-            <checkbox style="width:150rpx" value="雪杖等附件寄存" >雪杖等附件寄存</checkbox>
-            <checkbox style="width:150rpx" value="其它" >其它...</checkbox>
+            <checkbox style="width:150rpx" value="补板底" disabled="{{id>0}}" checked="{{fixBottom}}" >补板底</checkbox>
+            <checkbox style="width:150rpx" value="修底刃" disabled="{{id>0}}" checked="{{bottomEdge}}" >修底刃</checkbox>
+            <checkbox style="width:150rpx" value="粘板面" disabled="{{id>0}}" checked="{{pasteFace}}" >粘板面</checkbox>
+            <checkbox style="width:150rpx" value="雪杖等附件寄存" disabled="{{id>0}}" checked="{{withPole}}" >雪杖等附件寄存</checkbox>
+            <checkbox style="width:150rpx" value="其它" disabled="{{id>0}}" checked="{{others}}" >其它...</checkbox>
           </checkbox-group>
         </view>
       </view>
@@ -84,20 +84,20 @@
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
         <view class="left-column" >说明：</view>
-        <view><input placeholder="填写备注" bindinput="changeMemo" /></view>
+        <view><input placeholder="填写备注" bindinput="changeMemo" value="{{confirmedInfo.confirmed_memo}}" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
         <view class="left-column" >额外费用：</view>
-        <view><input placeholder="0" disabled="{{actionMode=='mod'}}" type="text" bindinput="changeAdditionalFee" value="{{confirmedInfo.additional_fee}}" /></view>
+        <view><input disabled="{{id>0}}" placeholder="0"  type="text" bindinput="changeAdditionalFee" value="{{confirmedInfo.additional_fee}}" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
         <view class="left-column" >取板：</view>
         <view>
-          <picker mode="date" value="{{confirmedInfo.pick_date}}" start="{{pickDateStart}}" end="{{pickDateEnd}}" bindchange="pickDateChange" >
+          <picker mode="date" value="{{confirmedInfo.pick_date}}" start="{{pickDateStart}}" end="{{pickDateEnd}}" bindchange="pickDateChange" disabled="{{id>0}}" >
             <view class="picker" >{{confirmedInfo.pick_date}}{{pickDateDescription}}</view>
           </picker>
         </view>
@@ -128,15 +128,19 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="确认费用" >
-    <mp-cell>
+  <mp-cells title="确认费用" wx:if="{{id==0}}" >
+    <mp-cell  >
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
         <view class="left-column" >总费用：</view>
         <view>{{totalCharge}}</view>
       </view>
     </mp-cell>
-    <mp-cell>
-      <button bindtap="submit" disabled="{{!submitInfoValid}}" > 提 交 </button>
-    </mp-cell>
   </mp-cells>
+  <button wx:if="{{id==0}}" bindtap="submit" disabled="{{!submitInfoValid}}" > 提 交 </button>
+  <block wx:else >
+    <button  bindtap="update" > 更 新 </button>
+    <view> </view>
+    <button  bindtap="gotoPrint" > 重 新 打 印 </button>
+  </block>
+  
 </view>

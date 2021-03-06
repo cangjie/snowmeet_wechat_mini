@@ -157,6 +157,7 @@ Page({
         command.setText(20, 20 + 40 + 65 + 65, "TSS24.BF2", 0, 1, 1, "打蜡：")
         command.setText(20, 20 + 40 + 65 + 65 + 65, "TSS24.BF2", 0, 1, 1, "刮蜡：")
       }
+      command.setQrcode(320, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)
       command.setText(20, 350, "TSS24.BF2", 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
       command.setText(320, 350, "TSS24.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
       command.setPagePrint()

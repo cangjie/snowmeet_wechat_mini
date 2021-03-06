@@ -75,6 +75,11 @@ Page({
   onShareAppMessage: function () {
 
   },
+  gotoScan: function(){
+    wx.navigateTo({
+      url: 'scan/scan',
+    })
+  },
   gotoInShopOrderConfirm: function() {
     wx.navigateTo({
       url: './equip_maintain/in_shop_order_confirm/in_shop_order_confirm',
@@ -82,7 +87,12 @@ Page({
   },
   goToMaintainInShopQuick: function() {
     wx.navigateTo({
-      url: './equip_maintain/in_shop_order_quick/in_shop_order_quick',
+      url: './equip_maintain/on_site/recept',
+    })
+  },
+  goToMaintainInShopList: function() {
+    wx.navigateTo({
+      url: './equip_maintain/on_site/recept_list',
     })
   },
   nav: function(e) {

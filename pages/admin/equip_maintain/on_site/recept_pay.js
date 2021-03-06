@@ -54,7 +54,7 @@ Page({
                   
                 }
                 else {
-                  oastTitle = '支付成功，流水号未分配'
+                  toastTitle = '支付成功，流水号未分配'
                 }
                 wx.showToast({
                   title: toastTitle

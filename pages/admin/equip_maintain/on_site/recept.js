@@ -6,6 +6,7 @@ Page({
    * Page initial data
    */
   data: {
+    id: 0,
     confirmedInfo: {
       shop: '万龙',
       degree: '89',
@@ -20,13 +21,102 @@ Page({
     pickDateDescription: '明天',
     totalCharge: 0,
     submitInfoValid: false,
-    actionMode: 'add'
+    fixBottom: false,
+    bottomEdge: false,
+    pasteFace: false,
+    withPole: false,
+    others: false
   },
-
+  fillBrand: function(type, brand) {
+    if (this.data.id > 0){
+      if (type == '双板') {
+        if (this.data.boardBrandList == undefined) {
+          setTimeout((res)=>{
+            this.fillBrand(type, brand)
+          }, 1000)
+        }
+        else {
+          var list = this.data.boardBrandList
+          var selectedIndex = 0
+          for(var i = 0; i < list.length; i++) {
+            if (list[i] == brand) {
+              selectedIndex = i
+              break;
+            }
+          }
+          this.setData({brandSelectIndex: selectedIndex})
+        }
+      }
+      if (type == '单板') {
+        if (this.data.skiBrandList == undefined) {
+          setTimeout((res)=>{
+            this.fillBrand(type, brand)
+          }, 1000)
+        }
+        else {
+          var list = this.data.boardBrandList
+          var selectedIndex = 0
+          for(var i = 0; i < list.length; i++) {
+            if (list[i] == brand) {
+              selectedIndex = i
+              break;
+            }
+          }
+          this.setData({brandSelectIndex: selectedIndex})
+        }
+      }
+    }
+  },
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    if (options.id != undefined) {
+      try{
+        this.setData({id: parseInt(options.id)})
+        var getInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&id=' + this.data.id
+        wx.request({
+          url: getInfoUrl,
+          success: (res) => {
+            if (res.data.status == 0) {
+              var order = res.data.maintain_in_shop_request
+              var confimedInfo = this.data.confirmedInfo
+              confirmedInfo.equipInfo.type = order.confirmed_equip_type
+              confimedInfo.equipInfo.brand = order.confirmed_brand
+              confimedInfo.equipInfo.scale = order.confirmed_scale
+              var photoFiles = order.confirmed_images
+              if (order.confirmed_edge == '1') {
+                confirmedInfo.edge = 1
+                confirmedInfo.degree = order.confirmed_degree
+              }
+              else {
+                confirmedInfo.edge = 0
+                confirmedInfo.degree = ''
+              }
+              if (order.confirmed_candle == '1') {
+                confirmedInfo.candle = 1
+              }
+              else {
+                confirmedInfo.candle = 0
+              }
+              confirmedInfo.additional_fee = order.confirmed_additional_fee
+              var pickDate = new Date(order.confirmed_pick_date.toString())
+              confirmedInfo.pick_date = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth() + 1).toString() + '-' + pickDate.getDate().toString()
+              var fixBottom = order.confirmed_more.indexOf('补板底') >= 0 ? true:false
+              var pasteFace = order.confirmed_more.indexOf('粘板面') >= 0 ? true:false
+              var bottomEdge = order.confirmed_more.indexOf('修底刃') >= 0 ? true:false
+              var withPole = order.confirmed_more.indexOf('雪杖') >= 0 ? true:false
+              var others = order.confirmed_more.indexOf('其它') >= 0 ? true:false
+              this.setData({confirmedInfo: confirmedInfo, cell: order.confirmed_cell, realName: order.confirmed_name, gender: order.confirmed_gender, fixBottom: fixBottom, bottomEdge: bottomEdge, pasteFace: pasteFace, withPole: withPole, others: others, pickDateDescription: '', photoFiles: order.confirmed_images})
+              this.fillBrand(order.confirmed_equip_type, order.confirmed_brand)
+            }
+          }
+        })
+      }
+      catch(msg) {
+
+      }
+    }
     var pickDate = new Date()
     var pickDateStartStr = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth() + 1).toString() + '-' + pickDate.getDate().toString()
     var pickDateEndStr = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth() + 2).toString() + '-' + pickDate.getDate().toString()
@@ -45,18 +135,43 @@ Page({
           skiList.push('请选择...')
           var boardList = []
           boardList.push('请选择...')
+          var selectedBrandIndex = 0
+          var skisIndex = 0
+          var boardIndex = 0
           for(var i = 0; i < listArray.length; i++){
             if (listArray[i].brand_type == '双板') {
-              skiList.push(listArray[i].brand_name+ (listArray[i].chinese_name.trim() != ''?'/':'')+listArray[i].chinese_name)
+              var brandName = listArray[i].brand_name+ (listArray[i].chinese_name.trim() != ''?'/':'')+listArray[i].chinese_name
+              skiList.push(brandName)
+              if (brandName == confirmedInfo.equipInfo.brand) {
+                selectedBrandIndex = skisIndex
+              }
+              skisIndex++
             }
             else{
-              boardList.push(listArray[i].brand_name+ (listArray[i].chinese_name.trim() != ''?'/':'')+listArray[i].chinese_name)
+              var brandName = listArray[i].brand_name+ (listArray[i].chinese_name.trim() != ''?'/':'')+listArray[i].chinese_name
+              boardList.push(brandName)
+              if (brandName == confirmedInfo.equipInfo.brand) {
+                selectedBrandIndex = boardIndex
+              }
+              boardIndex++
             }
             
           }
+          if (this.data.id > 0) {
+            selectedBrandIndex++
+          }
+          
           skiList.push('未知')
           boardList.push('未知')
-          this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: 0, displayedBrandList: skiList})
+
+          
+          if (confirmedInfo.equipInfo.type == '双板') {
+            this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: 0, displayedBrandList: skiList})
+          }
+          if (confirmedInfo.equipInfo.type == '单板') {
+            this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: 0, displayedBrandList: boardList})
+          }
+          
       }
     })
     var that = this
@@ -65,7 +180,7 @@ Page({
     })
   },
   checkValid: function() {
-    if (this.data.actionMode == 'add') {
+    if (this.data.id == 0) {
       if (this.data.confirmedInfo.equipInfo.brand == '' || 
       (this.data.confirmedInfo.edge != 1 && this.data.confirmedInfo.candle != 1 && this.data.confirmedInfo.additional_fee == 0)) {
         this.setData({submitInfoValid: false})
@@ -184,7 +299,7 @@ Page({
   changeMemo: function(e) {
     var memo = e.detail.value
     var confirmedInfo = this.data.confirmedInfo
-    confirmedInfo.memo = memo
+    confirmedInfo.confirmed_memo = memo
     this.setData({confirmedInfo: confirmedInfo})
   },
   changeAdditionalFee: function(e) {
@@ -259,6 +374,34 @@ Page({
           })
         }
       })
+    })
+  },
+  update: function() {
+     var confirmedInfo = this.data.confirmedInfo
+     var submitData = {}
+     submitData.confirmed_name = this.data.realName
+     submitData.confirmed_cell = this.data.cell
+     submitData.confirmed_gender = this.data.gender
+     submitData.confirmed_images = this.data.photoFiles
+     submitData.confirmed_memo = confirmedInfo.confirmed_memo
+     submitData.confirmed_scale = confirmedInfo.equipInfo.scale
+     var updateContactInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_modify.aspx?id=' + this.data.id + '&sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+     wx.request({
+       url: updateContactInfoUrl,
+       data: submitData,
+       method: 'POST',
+       success: (res) => {
+        this.setData({confirmedInfo: confirmedInfo})
+
+        wx.showToast({
+          title: '更新成功',
+        })
+       }
+     })
+  },
+  gotoPrint: function() {
+    wx.navigateTo({
+      url: 'print_label?id=' + this.data.id
     })
   },
   /**
