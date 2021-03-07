@@ -1,0 +1,5 @@
+/* pages/admin/equip_maintain/on_site/recept.wxss */
+.left-column{
+  width:200rpx;
+  text-align: right;
+}

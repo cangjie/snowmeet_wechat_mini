@@ -152,8 +152,40 @@
           "scene": null
         },
         {
-          "name": "non-snow season index",
+
+          "name": "ble_printer_test",
+          "pathName": "pages/ble/printer_test",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "order_list_main",
           "pathName": "pages/admin/equip_maintain/order_list/order_list_main",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "scan test",
+          "pathName": "pages/test/scan/scan",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "on_site_maintain_recept",
+          "pathName": "pages/admin/equip_maintain/on_site/recept",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "print label",
+          "pathName": "pages/admin/equip_maintain/on_site/print_label",
+          "query": "id=313",
+          "scene": null
+        },
+        {
+          "name": "recept_list",
+          "pathName": "pages/admin/equip_maintain/on_site/recept_list",
+          "query": "",
           "scene": null
         }
       ]

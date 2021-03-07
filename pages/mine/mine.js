@@ -16,7 +16,7 @@ Page({
     //wxloginModule.wxlogin()
     if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
       var that = this
-      app.loginPromise.then(function(resolve) {
+      app.loginPromiseNew.then(function(resolve) {
         that.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role})
       })
     }

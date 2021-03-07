@@ -1,0 +1,2 @@
+<button bindtap="connect" >Connect Printer</button>
+<button bindtap="printLabel" >Label Test</button>
