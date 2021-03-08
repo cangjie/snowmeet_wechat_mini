@@ -25,7 +25,9 @@ Page({
     printerNum: 1
   },
   connectDevice: function(){
+    this.data.deviceId = "DC:0D:30:92:10:48"
     var deviceId = this.data.deviceId
+
     wx.openBluetoothAdapter({
       success: (res) => {
         wx.createBLEConnection({
@@ -202,7 +204,7 @@ Page({
   prepareSend: function(buff) {
     console.log(buff)
     var that = this
-    var time = 1024
+    var time = 128
     var looptime = parseInt(buff.length / time);
     var lastData = parseInt(buff.length % time);
     console.log(looptime + "---" + lastData)
@@ -275,7 +277,7 @@ Page({
           that.setData({
             currentTime: currentTime
           })
-          that.Send(buff)
+          that.send(buff)
         } else {
           // wx.showToast({
           //   title: '已打印第' + currentPrint + '张',
