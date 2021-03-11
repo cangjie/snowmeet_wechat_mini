@@ -1,0 +1,3 @@
+<!--pages/test/ble/label_printer.wxml-->
+<view>扫描设备：{{deviceName}}</view>
+<view wx:if="{{findDevice}}" >找到设备</view>
