@@ -5,10 +5,20 @@ Page({
    * Page initial data
    */
   data: {
-    deviceName: 'Printer_1048_BLE',
+    deviceName: 'Printer_1048',
     errMsg: '',
     isScanning: false,
-    findDevice: false
+    findDevice: false,
+    connected: false,
+    currentDeviceId: '',
+    currentService:[],
+    currentServiceIndex: 0,
+    currentCharacter:{},
+    findWriteCharacter: false,
+    findReadCharacter: false,
+    findNotifyCharacter: false,
+    connectFinish: false
+
   },
 
   /**
@@ -78,6 +88,7 @@ Page({
                   console.log(res)
                   if (devices.length > 0){
                     this.setData({findDevice: true})
+                    this.connectOneBleDevice(devices[0])
                   }
                 },
               })
@@ -86,6 +97,93 @@ Page({
           })
         }, 5000);
         
+      }
+    })
+  },
+  connectOneBleDevice: function(device) {
+    console.log(device)
+    wx.createBLEConnection({
+      deviceId: device.deviceId,
+      success: (res) => {
+        console.log(res)
+        this.setData({connected: true})
+        this.getServiceId(device.deviceId)
+      },
+      fail: (res) => {
+        console.log(res)
+      }
+    })
+  },
+  getServiceId: function(deviceId) {
+    wx.getBLEDeviceServices({
+      deviceId: deviceId,
+      success: (res) => {
+        console.log(res)
+        this.setData({currentDeviceId: deviceId, currentService: res.services})
+        this.getCharacteristics()
+      },
+      fail: (res) => {
+        console.log(res)
+      }
+    })
+  },
+  getCharacteristics: function() {
+    var char = this.data.currentCharacter
+    var write = this.data.findWriteCharacter
+    var read = this.data.findReadCharacter
+    var notify = this.data.findNotifyCharacter
+    wx.getBLEDeviceCharacteristics({
+      deviceId: this.data.currentDeviceId,
+      serviceId: this.data.currentService[this.data.currentServiceIndex].uuid,
+      success: (res) => {
+        console.log(res)
+        for(var i = 0; i < res.characteristics.length; i++){
+          var properties = res.characteristics[i].properties
+          var item = res.characteristics[i].uuid
+          if (!notify) {
+            if (properties.notify) {
+              char = this.data.currentCharacter
+              char.notifyCharacterId = item
+              char.notifyServiceId = this.data.currentService[this.data.currentServiceIndex].uuid
+              notify = true
+            }
+          }
+          if (!read) {
+            if (properties.read) {
+              char = this.data.currentCharacter
+              char.readCharacterId = item
+              char.readServiceId = this.data.currentService[this.data.currentServiceIndex].uuid
+              read = true
+            }
+          }
+          if (!write) {
+            if (properties.write) {
+              char = this.data.currentCharacter
+              char.writeCharacterId = item
+              char.writeServiceId = this.data.currentService[this.data.currentServiceIndex].uuid
+              write = true
+            }
+          }
+        }
+        if (!write || !read || !notify) {
+          this.data.currentServiceIndex = this.data.currentServiceIndex + 1
+          this.data.findReadCharacter = read
+          this.data.findWriteCharacter = write
+          this.data.findNotifyCharacter = notify
+          if (this.data.currentServiceIndex == this.data.currentService.length) {
+            this.setData({errMsg: '特征值不全'})
+          }
+          else {
+            this.getCharacteristics()
+          }
+        }
+        else {
+          console.log(this.data.currentCharacter)
+          this.setData({connectFinish: true})
+        }
+      },
+      fail: (res) => {
+        console.log(res)
       }
     })
   },

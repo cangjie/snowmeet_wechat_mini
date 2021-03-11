@@ -1,3 +1,6 @@
 <!--pages/test/ble/label_printer.wxml-->
 <view>扫描设备：{{deviceName}}</view>
 <view wx:if="{{findDevice}}" >找到设备</view>
+<view wx:if="{{connected}}" >连接成功</view>
+<view wx:if="{{connectFinish}}" >特征值获取完毕</view>
+<view wx:else >{{errMsg}}</view>
