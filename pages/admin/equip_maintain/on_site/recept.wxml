@@ -21,9 +21,12 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="flex-wrp" style="flex-direction:row;" >
+      <view  class="flex-wrp" style="flex-direction:row;" >
         <view style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>品牌：</view>
-        <view>
+        <view wx:if="{{id>0}}" >
+          {{confirmedInfo.equipInfo.brand}}
+        </view>
+        <view wx:else>
           <picker disabled="{{id>0}}" mode="selector" value="{{brandSelectIndex}}" range="{{displayedBrandList}}" bindchange="selectBrand">
             <view>{{displayedBrandList[brandSelectIndex]}}</view>
           </picker>

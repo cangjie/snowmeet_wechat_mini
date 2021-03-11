@@ -142,17 +142,21 @@ Page({
             if (listArray[i].brand_type == '双板') {
               var brandName = listArray[i].brand_name+ (listArray[i].chinese_name.trim() != ''?'/':'')+listArray[i].chinese_name
               skiList.push(brandName)
+              /*
               if (brandName == confirmedInfo.equipInfo.brand) {
                 selectedBrandIndex = skisIndex
               }
+              */
               skisIndex++
             }
             else{
               var brandName = listArray[i].brand_name+ (listArray[i].chinese_name.trim() != ''?'/':'')+listArray[i].chinese_name
               boardList.push(brandName)
+              /*
               if (brandName == confirmedInfo.equipInfo.brand) {
                 selectedBrandIndex = boardIndex
               }
+              */
               boardIndex++
             }
             
@@ -166,10 +170,23 @@ Page({
 
           
           if (confirmedInfo.equipInfo.type == '双板') {
-            this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: 0, displayedBrandList: skiList})
+            for (var i = 0; i < skiList.length; i++){
+              if (confirmedInfo.equipInfo.brand == skiList[i].trim()){
+                selectedBrandIndex = i
+                break
+              }
+
+            }
+            this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: selectedBrandIndex, displayedBrandList: skiList})
           }
           if (confirmedInfo.equipInfo.type == '单板') {
-            this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: 0, displayedBrandList: boardList})
+            for (var i = 0; i < boardList.length; i++){
+              if (confirmedInfo.equipInfo.brand == boardList[i].trim()){
+                selectedBrandIndex = i
+                break
+              }
+            }
+            this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: selectedBrandIndex, displayedBrandList: boardList})
           }
           
       }
