@@ -1,3 +1,5 @@
 <view>
   <view wx:for="{{showedMsg}}" >{{item}}</view>
+  <button id="label" bindtap="print" disabled="{{!readyForPrint}}" >打印标签</button>
+  <button id="invoice" bindtap="print" disabled="{{!readyForPrint}}" >打印小票</button>
 </view>

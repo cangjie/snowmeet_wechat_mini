@@ -289,7 +289,8 @@ Page({
               lastData: 0,
               currentTime: 1,
               isLabelSend: false,
-              currentPrint: 1
+              currentPrint: 1,
+              
             })
           } else {
             currentPrint++

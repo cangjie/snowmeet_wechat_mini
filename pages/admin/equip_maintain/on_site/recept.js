@@ -418,7 +418,7 @@ Page({
   },
   gotoPrint: function() {
     wx.navigateTo({
-      url: 'print_label?id=' + this.data.id
+      url: 'print_label_new?id=' + this.data.id
     })
   },
   /**
