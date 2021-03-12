@@ -42,7 +42,6 @@
     "pages/ble/printer_test",
     "pages/admin/equip_maintain/on_site/recept",
     "pages/admin/equip_maintain/on_site/recept_pay",
-    "pages/admin/equip_maintain/on_site/print_label",
     "pages/admin/equip_maintain/on_site/recept_list",
     "pages/admin/scan/scan",
     "pages/test/ble/label_printer",

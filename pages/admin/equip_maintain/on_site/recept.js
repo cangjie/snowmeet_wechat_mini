@@ -197,6 +197,13 @@ Page({
     })
   },
   checkValid: function() {
+    var cellValid = true
+    if (this.data.cell != undefined && this.data.cell.trim() != '') {
+      var cell = this.data.cell.trim()
+      if (cell.length != 11 || cell.indexOf('1')!=0) {
+        cellValid = false
+      }
+    }
     if (this.data.id == 0) {
       if (this.data.confirmedInfo.equipInfo.brand == '' || 
       (this.data.confirmedInfo.edge != 1 && this.data.confirmedInfo.candle != 1 && this.data.confirmedInfo.additional_fee == 0)) {
@@ -217,7 +224,7 @@ Page({
               if (totalCharge > 0) {
                 canSubmit = true
               }
-              this.setData({totalCharge: totalCharge, submitInfoValid: canSubmit})
+              this.setData({totalCharge: totalCharge, submitInfoValid: canSubmit && cellValid })
             }
           },
           fail: (res) => {
@@ -227,6 +234,13 @@ Page({
         
       }
     }
+  
+    
+  },
+  call: function() {
+    wx.makePhoneCall({
+      phoneNumber: this.data.cell
+    })
   },
   selectType: function(e) {
     var confirmedInfo = this.data.confirmedInfo
@@ -334,6 +348,7 @@ Page({
   },
   changeCellNumber: function(e) {
     this.setData({cell: e.detail.value})
+    this.checkValid()
   },
   submit: function() {
     var that = this
