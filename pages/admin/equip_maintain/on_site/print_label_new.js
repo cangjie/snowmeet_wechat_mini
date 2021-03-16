@@ -450,6 +450,14 @@ Page({
               currentPrint: 1,
               readyForPrint: true
             })
+            wx.closeBLEConnection({
+              deviceId: that.data.currentDevice.deviceId,
+              success: (res) => {
+                wx.showToast({
+                  title: '打印完毕，蓝牙打印机断开。',
+                })
+              }
+            })
           } else {
             currentPrint++
             that.setData({
