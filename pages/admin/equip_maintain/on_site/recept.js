@@ -362,6 +362,9 @@ Page({
           if (res.data.status == 0) {
             resolve(res.data)
           }
+        },
+        fail:(res)=>{
+          console.log(res)
         }
       })
     })
