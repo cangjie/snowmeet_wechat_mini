@@ -143,6 +143,12 @@
           "pathName": "pages/test/ble/label_printer",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "on_site_recept_batch",
+          "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
+          "query": "id=313",
+          "scene": null
         }
       ]
     }

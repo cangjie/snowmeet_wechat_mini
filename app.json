@@ -45,7 +45,8 @@
     "pages/admin/equip_maintain/on_site/recept_list",
     "pages/admin/scan/scan",
     "pages/test/ble/label_printer",
-    "pages/admin/equip_maintain/on_site/print_label_new"
+    "pages/admin/equip_maintain/on_site/print_label_new",
+    "pages/admin/equip_maintain/on_site/recept_batch"
   ],
   "window": {
     "backgroundTextStyle": "light",
