@@ -11,8 +11,7 @@
   </block>
   <block wx:else >
     <view style="text-align:center">用户支付成功</view>
-    <button bindtap="gotoPrint">打印标签</button>
-    <button>补全信息</button>
+    <button wx:if="{{batchId==0}}" bindtap="gotoPrint">打印标签</button>
     <button>查看列表</button>
   </block>
 </view>

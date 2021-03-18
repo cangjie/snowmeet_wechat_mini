@@ -71,6 +71,16 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+        /*
+    wx.showModal({
+      title: '是否添加添加下一单？',
+      confirmText: '新增',
+      cancelText: '结算',
+      success: (res) => {
+        
+      }
+    })
+    */
     if (options.id != undefined) {
       try{
         this.setData({id: parseInt(options.id)})

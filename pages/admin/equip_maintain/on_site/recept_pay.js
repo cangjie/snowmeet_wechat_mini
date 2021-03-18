@@ -7,6 +7,7 @@ Page({
    */
   data: {
     id: 0,
+    batchId: 0,
     paid: false,
     qrCodeUrl: '',
     orderId: 0,
@@ -30,10 +31,12 @@ Page({
         this.setData({orderId: -1})
       }
     })
-    if (this.data.orderId == 0) {
-      setTimeout(() => {
-        this.getOrderId()
-      }, 1000);
+    if (this.data.batchId == 0){
+      if (this.data.orderId == 0 ) {
+        setTimeout(() => {
+          this.getOrderId()
+        }, 1000);
+      }
     }
   },
   getOrderInfo: function() {
@@ -90,13 +93,26 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    this.data.id = options.id
+    var qrCodeUrl = ''
+    if (options.id != undefined) {
+      this.data.id = options.id
+    }
+    if (options.batchId != undefined) {
+      this.data.batchId = options.batchId
+    }
+    if (this.data.batchId > 0) {
+      qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_in_shop_maintain_batch_id_' + this.data.batchId
+    }
+    if (this.data.id > 0){
+      qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_in_shop_maintain_id_' + this.data.id
+    }
     var that = this
     app.loginPromiseNew.then(function (resolve) {
       that.data.sessionKey = resolve.sessionKey
-      var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_in_shop_maintain_id_' + that.data.id
       that.setData({qrCodeUrl: qrCodeUrl})
-      that.getOrderId()
+      if (that.data.batchId == 0){
+        that.getOrderId()
+      }
     })
     
   },
