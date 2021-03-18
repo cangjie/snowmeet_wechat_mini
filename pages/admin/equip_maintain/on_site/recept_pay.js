@@ -13,7 +13,18 @@ Page({
     orderId: 0,
     paymentTimeOut: false
   },
-
+  getBatchOrderId: function() {
+    var getBatchOrderUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_batch.aspx?batchid=' + this.data.batchId + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
+    wx.request({
+      url: getBatchOrderUrl,
+      success: (res) => {
+        if (res.data.status == 0 && res.data.count > 0) {
+          this.data.id = res.data.maintain_in_shop_request[0].id
+          this.getOrderId()
+        }
+      }
+    })
+  },
   getOrderId: function(){
     var getOrderIdUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get.aspx?id=' + this.data.id + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
     wx.request({
@@ -31,13 +42,13 @@ Page({
         this.setData({orderId: -1})
       }
     })
-    if (this.data.batchId == 0){
-      if (this.data.orderId == 0 ) {
-        setTimeout(() => {
-          this.getOrderId()
-        }, 1000);
-      }
+    //if (this.data.batchId == 0){
+    if (this.data.orderId == 0 ) {
+      setTimeout(() => {
+        this.getOrderId()
+      }, 1000);
     }
+    //}
   },
   getOrderInfo: function() {
     var orderInfoUrl = 'https://' + app.globalData.domainName + '/api/order_info_get.aspx?orderid=' + this.data.orderId + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
@@ -89,6 +100,11 @@ Page({
       
     }
   },
+  gotoList: function() {
+    wx.navigateTo({
+      url: 'recept_list',
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */
@@ -98,7 +114,7 @@ Page({
       this.data.id = options.id
     }
     if (options.batchId != undefined) {
-      this.data.batchId = options.batchId
+      this.setData({batchId: options.batchId})
     }
     if (this.data.batchId > 0) {
       qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_in_shop_maintain_batch_id_' + this.data.batchId
@@ -112,6 +128,9 @@ Page({
       that.setData({qrCodeUrl: qrCodeUrl})
       if (that.data.batchId == 0){
         that.getOrderId()
+      }
+      else {
+        that.getBatchOrderId()
       }
     })
     
