@@ -65,7 +65,7 @@
         <view class="left-column" >打蜡：</view>
         <view>
           <checkbox-group bindchange="changeCandle" >
-            <checkbox style="width:150rpx" disabled="{{id>0}}" value="打蜡"  checked="{{confirmedInfo.candle}}" ></checkbox>
+            <checkbox style="width:150rpx" disabled="{{id>0}}" value="打蜡"  checked="{{confirmedInfo.candle==1}}" ></checkbox>
           </checkbox-group>
         </view>
       </view>

@@ -18,10 +18,12 @@ Page({
       notifyServiceId:'', notifyCharacterUuid: ''},
     currentDeviceIndex: 0,
     currentServiceIndex: 0,
-    showedMsg: []
+    showedMsg: [],
+    reConnecting: false,
+    reConnectTimes: 0
   },
   getDeviceNameList: function() {
-    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/blt_device_list.aspx'
+    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/blt_device_list_new.aspx'
     var that = this
     var deviceName = []
     wx.request({
@@ -36,11 +38,16 @@ Page({
           that.data.deviceName = deviceName
           this.getDeviceNameListInRange()
         }
+      },
+      fail: (res)=>{
+        console.log(res)
       }
     })
   },
+
   getDeviceNameListInRange: function() {
     var that = this
+    that.data.currentDeviceIndex = 0
     wx.openBluetoothAdapter({
       success: (res) => {
         wx.getBluetoothAdapterState({
@@ -86,7 +93,7 @@ Page({
   searchInRangedBluetoothDevices: function() {
     var showedMsg = this.data.showedMsg
     showedMsg.push('开始扫描蓝牙设备。')
-    this.setData({showedMsg: showedMsg})
+    this.setData({showedMsg: showedMsg, deviceInRange: []})
     wx.startBluetoothDevicesDiscovery({
       success: (res) => {
         setTimeout(() => {
@@ -282,7 +289,39 @@ Page({
       }
     })
   },
+  reConnect: function() {
+    if (!this.data.readyForPrint){
+      if (!this.data.reConnecting) {
+        this.data.reConnecting = true
+        this.getDeviceNameListInRange()
+      }
+      
+      setTimeout(() => {
+        this.reConnect()
+      }, 1000);
+      
+    }
+    else {
+      this.data.reConnecting = false
+    }
+  },
   print: function(e){
+    if (!this.data.readyForPrint) {
+      if (!this.data.reConnecting){
+        this.getDeviceNameListInRange()
+        this.data.reConnecting = true
+      }
+      if (this.data.reConnectTimes < 100)
+      {
+        this.data.reConnectTimes++
+        setTimeout(() => {
+          this.print(e)
+        }, 1000)
+      }
+      return
+    }
+    this.data.reConnectTimes = 0
+    this.data.reConnecting = false
     var showedMsg = this.data.showedMsg
     var printType = e.currentTarget.id
     if (this.data.maintain_in_shop_request == undefined) {
@@ -456,6 +495,7 @@ Page({
                 wx.showToast({
                   title: '打印完毕，蓝牙打印机断开。',
                 })
+                that.data.readyForPrint = false
               }
             })
           } else {
