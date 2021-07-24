@@ -42,13 +42,6 @@ Page({
         this.setData({orderId: -1})
       }
     })
-    //if (this.data.batchId == 0){
-    if (this.data.orderId == 0 ) {
-      setTimeout(() => {
-        this.getOrderId()
-      }, 1000);
-    }
-    //}
   },
   getOrderInfo: function() {
     var orderInfoUrl = 'https://' + app.globalData.domainName + '/api/order_info_get.aspx?orderid=' + this.data.orderId + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
@@ -58,23 +51,7 @@ Page({
         if (res.data.status == 0) {
           if (res.data.order_online.pay_state == '1') {
             this.setData({paid: true})
-            var allocateTaskFlowNumUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_allocate_flow_num.aspx?id=' + this.data.id + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
-            wx.request({
-              url: allocateTaskFlowNumUrl,
-              success: (res) => {
-                var toastTitle = ''
-                if (res.data.status == 0) {
-                  toastTitle = '支付成功，流水号：' + res.data.task_flow_num
-                  
-                }
-                else {
-                  toastTitle = '支付成功，流水号未分配'
-                }
-                wx.showToast({
-                  title: toastTitle
-                })
-              }
-            })
+            
           }
           else {
             var orderTime = new Date(res.data.order_online.create_date.toString())
@@ -126,14 +103,50 @@ Page({
     app.loginPromiseNew.then(function (resolve) {
       that.data.sessionKey = resolve.sessionKey
       that.setData({qrCodeUrl: qrCodeUrl})
-      if (that.data.batchId == 0){
-        that.getOrderId()
+      if (that.data.id == 0) {
+        var getBatchOrderUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_batch.aspx?batchid=' + that.data.batchId + '&sessionkey=' + encodeURIComponent(that.data.sessionKey)
+        wx.request({
+          url: getBatchOrderUrl,
+          success: (res) => {
+            if (res.data.status == 0 && res.data.count > 0) {
+              that.data.id = res.data.maintain_in_shop_request[0].id
+              that.refreshPayStatus()
+            }
+          }
+        })
       }
       else {
-        that.getBatchOrderId()
+        that.refreshPayStatus()
       }
     })
     
+  },
+  refreshPayStatus: function(){
+    if (!this.data.paid && !this.data.paymentTimeOut) {
+      this.getOrderId()
+      setTimeout(() => {
+        this.refreshPayStatus()
+      }, 1000);
+    }
+    else {
+      var allocateTaskFlowNumUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_allocate_flow_num.aspx?id=' + this.data.id + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
+      wx.request({
+        url: allocateTaskFlowNumUrl,
+        success: (res) => {
+          var toastTitle = ''
+          if (res.data.status == 0) {
+            toastTitle = '支付成功，流水号：' + res.data.task_flow_num
+            
+          }
+          else {
+            toastTitle = '支付成功，流水号未分配'
+          }
+          wx.showToast({
+            title: toastTitle
+          })
+        }
+      })
+    }
   },
   gotoPrint: function() {
     wx.navigateTo({

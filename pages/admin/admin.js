@@ -112,6 +112,11 @@ Page({
       url: './equip_maintain/on_site/recept_list',
     })
   },
+  goToMaintainInShopQuickBatch: function(){
+    wx.navigateTo({
+      url: './equip_maintain/on_site/recept_batch',
+    })
+  },
   nav: function(e) {
     var path = '/pages/index/index'
     var id = e.currentTarget.id
