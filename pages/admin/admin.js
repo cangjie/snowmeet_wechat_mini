@@ -1,7 +1,23 @@
 // pages/admin/admin.js
 const app = getApp()
 function init(that) {
+  var role = app.globalData.role
+  var isSchoolStaff = false
+  var ajaxUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff/' +  encodeURIComponent(app.globalData.sessionKey)
+  wx.request({
+    url: ajaxUrl,
+    method: 'GET',
+    success: (res) => {
+      if (res.data.status == undefined) {
+        that.setData({isSchoolStaff: true})
+      }
+    },
+    fail: (res) => {
+
+    }
+  })
   that.setData({role: app.globalData.role})
+  
 }
 Page({
 
@@ -9,7 +25,8 @@ Page({
    * Page initial data
    */
   data: {
-    role: ''
+    role: '',
+    isSchoolStaff: false
   },
 
   /**

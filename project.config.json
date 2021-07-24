@@ -47,8 +47,10 @@
   },
   "scripts": {},
   "isGameTourist": false,
-  "simulatorType": "wechat",
-  "simulatorPluginLibVersion": {},
+  "simulatorType": "qywx_simulator_plugin",
+  "simulatorPluginLibVersion": {
+    "qywx_simulator_plugin": "2.4.0"
+  },
   "condition": {
     "plugin": {
       "list": []
@@ -152,7 +154,6 @@
           "scene": null
         },
         {
-
           "name": "ble_printer_test",
           "pathName": "pages/ble/printer_test",
           "query": "",
