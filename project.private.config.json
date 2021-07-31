@@ -149,6 +149,12 @@
           "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "school_lesson_detail",
+          "pathName": "pages/admin/school/lesson/detail_info",
+          "query": "",
+          "scene": null
         }
       ]
     }
