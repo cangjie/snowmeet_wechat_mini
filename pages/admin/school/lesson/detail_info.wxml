@@ -67,7 +67,10 @@
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" >视频\照片：</view>
       <view class="right-column">
-        <multi-uploader id="uploadItems" title="曾经的照片和视频" image_count="5" bindUploaded="uploaded" uploaded_files="{{uploadedFiles}}" ></multi-uploader>
+        <video-uploader id="video-uploader" bindfail="uploadVideoError" bindsuccess="uploadVideoSuccess" select="{{selectedViddeos}}" upload="{{uploadVideo}}" files="{{videoThumbs}}" max-count="4" title="上传1分钟以内的视频" binddelete="deleteVideo"  />
+        <!--mp-uploader  bindfail="uploadError" bindsuccess="uploadSuccess" select="{{selectFile}}" upload="{{uploadFile}}" files="{{files}}" max-count="3" title="{{title}}" binddelete="delete" ></mp-uploader-->
+        <!--multi-uploader id="uploadPhotos" title="雪板及附件" image_count="3" detail_id="0" bindUploaded="uploaded" uploaded_files="{{photoFiles}}" ></multi-uploader-->
+
       </view>
     </view>
   </mp-cell>
