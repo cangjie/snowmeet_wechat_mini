@@ -1,6 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "mp-gallery": "/modules/gallery/gallery"
+    "video-gallery": "video-gallery"
   }
 }

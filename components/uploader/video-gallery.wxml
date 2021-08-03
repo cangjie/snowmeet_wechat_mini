@@ -1,0 +1,17 @@
+<view class="weui-gallery {{show ? 'weui-gallery_show' : ''}} {{extClass}}">
+  <view class="weui-gallery__info">{{current+1}}/{{currentImgs.length}}</view>
+  <swiper class="weui-gallery__img__wrp"  indicator-dots="{{false}}" bindchange="change" current="{{current}}" autoplay="{{false}}" duration="{{500}}">
+    <block wx:for="{{currentImgs}}" wx:key="index">
+      <swiper-item>
+      <video src="{{item}}" mode="aspectFit" class="weui-gallery__img" ></video>
+        <!--image mode="aspectFit" class="weui-gallery__img" src="{{item}}"></image-->
+      </swiper-item>
+    </block>
+  </swiper>
+  <view class="weui-gallery__opr" >
+    <navigator bindtap="hideGallery" class="weui-gallery__del">返回</navigator>
+  </view>
+  <view class="weui-gallery__opr" wx:if="{{showDelete}}">
+    <navigator bindtap="deleteImg" class="weui-gallery__del">删除</navigator>
+  </view>
+</view>

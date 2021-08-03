@@ -67,18 +67,6 @@ Page({
   onShareAppMessage: function () {
 
   },
-  /*
-  uploaded: function(e) {
-    var files = e.detail.files
-    var uploadedFiles = ''
-    for(var i in files) {
-      if (files[i].url != '') {
-        uploadedFiles = uploadedFiles + ((uploadedFiles.trim() != '')? ',' : '') + files[i].url
-      }
-    }
-    this.setData({uploadedFiles: uploadedFiles})
-  },
-  */
   uploadVideo: function(files) {
     var uploadUrl = 'https://' + app.globalData.domainName + '/upload_video.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     return new Promise((resolve, reject) => {
