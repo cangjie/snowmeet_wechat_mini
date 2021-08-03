@@ -7,7 +7,12 @@ Page({
    */
   data: {
     
-    videoThumbs: []
+    videoThumbs: [],
+    school_lesson: {},
+    instructors:[{open_id: '', name: '请选择……', head_image: '/images/unknown_person.png'}],
+    instructorNames: ['请选择……'],
+    instructorSelectedIndex: 0,
+    formInvalidMessage: ''
   },
 
   /**
@@ -17,6 +22,30 @@ Page({
     //var videoThumbs = this.data.videoThumbs
     //videoThumbs.push({url: 'https://mini.snowmeet.top/upload/20210802/1627912001.jpg'})
     //this.setData({videoThumbs: videoThumbs})
+    var pickerDateStart = '2021-8-1'
+    var nowDate = new Date();
+    var monthStr = (nowDate.getMonth() + 1).toString()
+    var dayStr = nowDate.getDate().toString()
+    pickerDateStart = nowDate.getFullYear().toString() + '-' + '00'.substr(0, 2-monthStr.length) + monthStr + '-' + '00'.substr(0, 2 - dayStr.length) + dayStr;
+    var pickerDateEnd = nowDate.getFullYear().toString() + '-' + (nowDate.getMonth() + 3).toString() + '-' + nowDate.getDate().toString();
+    var school_lesson = this.data.school_lesson
+    school_lesson.lesson_date = pickerDateStart
+    this.setData({pickerDateStart: pickerDateStart, pickerDateEnd: pickerDateEnd, school_lesson: school_lesson})
+
+    wx.request({
+      url: 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor',
+      method: 'GET',
+      success: (res) => {
+        var instructors = this.data.instructors
+        var instructorNames = this.data.instructorNames
+        for(var i in res.data) {
+          instructors.push(res.data[i])
+          instructorNames.push(res.data[i].name)
+        }
+        this.setData({instructors: instructors, instructorNames: instructorNames})
+      }
+    })
+
   },
 
   /**
@@ -92,6 +121,7 @@ Page({
     })
   },
   deleteVideo: function(res) {
+    var videos = ''
     var videoThumbs = this.data.videoThumbs
     var delIndex = res.detail.index
     var newVideoThumbs = []
@@ -100,15 +130,126 @@ Page({
         newVideoThumbs.push(videoThumbs[i])
       }
     }
+    for(var item in newVideoThumbs) {
+      videos = videos + ',' + videoThumbs[item].url.replace('.jpg', '.mp4')
+    }
+    videos = videos.substr(1, videos.length - 1)
+    this.data.school_lesson.videos = videos
     this.setData({videoThumbs: newVideoThumbs})
   },
   uploadVideoSuccess: function(res) {
+    var videos = ''
     var r = res.detail.urls
     var newVideoThumb = 'https://' + app.globalData.domainName.trim() + r[0]
     newVideoThumb = newVideoThumb.toLowerCase().replace('.mp4', '.jpg')
     var videoThumbs = this.data.videoThumbs
     videoThumbs.push({url: newVideoThumb})
+    for(var item in videoThumbs) {
+      videos = videos + ',' + videoThumbs[item].url.replace('.jpg', '.mp4')
+    }
+    videos = videos.substr(1, videos.length - 1)
+    this.data.school_lesson.videos = videos
     this.setData({videoThumbs: videoThumbs})
+  },
+  inputValueChange: function(res) {
+    var sourceId = res.currentTarget.id
+    var inputedValue = res.detail.value.trim()
+    switch(sourceId) {
+      case 'cell_number':
+        this.data.school_lesson.cell_number = inputedValue
+        break
+      case 'name':
+        this.data.school_lesson.name = inputedValue
+        break
+      case 'gender':
+        this.data.school_lesson.gender = inputedValue
+        break
+      case 'student_relation':
+        this.data.school_lesson.student_relation = inputedValue
+        break
+      case 'student_cell_number':
+        this.data.school_lesson.student_cell_number = inputedValue
+        break
+      case 'student_name':
+        this.data.school_lesson.student_name = inputedValue
+        break
+      case 'student_gender':
+        this.data.school_lesson.student_gender = inputedValue
+        break
+      case 'demand':
+        this.data.school_lesson.demand = inputedValue
+        break
+      case 'resort':
+        this.data.school_lesson.resort = inputedValue
+        break
+      case 'training_plan':
+        this.data.school_lesson.training_plan = inputedValue
+        break
+      case 'lesson_date':
+        var school_lesson = this.data.school_lesson
+        school_lesson.lesson_date = inputedValue
+        this.setData({school_lesson: school_lesson})
+        break;
+      case 'instructor_picker':
+        this.data.school_lesson.instructor_open_id = this.data.instructors[inputedValue].open_id
+        this.setData({instructorSelectedIndex: inputedValue})
+        break
+      default:
+        break
+    }
+  },
+  submit: function() {
+    var school_lesson = this.data.school_lesson
+    if (school_lesson.cell_number == undefined || school_lesson.cell_number.length != 11 || school_lesson.cell_number.substr(0, 1) != '1') {
+      this.setData({formInvalidMessage: '请填写正确的手机号。'})
+      return
+    }
+    if (school_lesson.name == undefined || school_lesson.name.trim() == '') {
+      this.setData({formInvalidMessage: '请填写姓名。'})
+      return
+    }
+    if (school_lesson.gender == undefined || school_lesson.gender.trim() == '') {
+      this.setData({formInvalidMessage: '请选择性别。'})
+      return
+    }
+    if (school_lesson.student_relation == undefined || school_lesson.student_relation == '') {
+      this.setData({formInvalidMessage: '请选择用户和学员的关系。'})
+      return
+    }
+    if (school_lesson.student_cell_number == undefined || school_lesson.student_cell_number.length != 11 || school_lesson.student_cell_number.substr(0, 1) != '1') {
+      this.setData({formInvalidMessage: '请填写正确的学员手机号。'})
+      return
+    }
+    if (school_lesson.student_name == undefined || school_lesson.student_name.trim() == '') {
+      this.setData({formInvalidMessage: '请填写学员姓名。'})
+      return
+    }
+    if (school_lesson.student_gender == undefined || school_lesson.student_gender == '') {
+      this.setData({formInvalidMessage: '请选择学员性别。'})
+      return
+    }
+    if (school_lesson.resort == undefined || school_lesson.resort.trim() == '') {
+      this.setData({formInvalidMessage: '请选择教学的雪场。'})
+      return
+    }
+    if (school_lesson.instructor_open_id == undefined || school_lesson.instructor_open_id.trim() == '') {
+      this.setData({formInvalidMessage: '请选择教练。'})
+      return
+    }
+    if (school_lesson.training_plan == undefined || school_lesson.training_plan.trim() == '') {
+      this.setData({formInvalidMessage: '请填写教学计划。'})
+      return
+    }
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/schoollesson?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+    
+    wx.request({
+      url: submitUrl,
+      method: 'POST',
+      data: school_lesson,
+      success: (res) => {
+        var data = res.data
+      }
+    })
   }
   
 })
