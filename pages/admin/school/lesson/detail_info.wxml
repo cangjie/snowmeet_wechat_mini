@@ -1,4 +1,5 @@
-<mp-cells title="用户个人信息" >
+<view wx:if="{{role == 'staff'}}" >
+  <mp-cells title="用户个人信息" >
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>手机：</view>
@@ -21,8 +22,8 @@
       </view>
     </view>
   </mp-cell>
-</mp-cells>
-<mp-cells title="学员个人信息" >
+  </mp-cells>
+  <mp-cells title="学员个人信息" >
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>和学员关系：</view>
@@ -36,13 +37,13 @@
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>学员手机：</view>
-      <view class="right-column"><input type="text" id="student_cell_number" bindinput="inputValueChange" /></view>
+      <view class="right-column"><input type="text" id="student_cell_number" bindinput="inputValueChange" value="{{school_lesson.student_cell_number}}" /></view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>学员姓名：</view>
-      <view class="right-column"><input type="text" id="student_name" bindinput="inputValueChange" /></view>
+      <view class="right-column"><input type="text" id="student_name" bindinput="inputValueChange" value="{{school_lesson.student_name}}" /></view>
     </view>
   </mp-cell>
   <mp-cell>
@@ -50,13 +51,16 @@
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>学员性别：</view>
       <view class="right-column">
         <radio-group id="student_gender" bindchange="inputValueChange" >
-          <radio value="男" ></radio>男 <radio value="女" ></radio>女
+          <radio value="男" wx:if="{{school_lesson.student_gender == '男'}}"  checked >男</radio>
+          <radio value="男" wx:else  >男</radio> 
+          <radio value="女" wx:if="{{school_lesson.student_gender == '女'}}" >女</radio>
+          <radio value="女" wx:else  >女</radio> 
         </radio-group>
       </view>
     </view>
   </mp-cell>
-</mp-cells>
-<mp-cells title="学员需求" >
+  </mp-cells>
+  <mp-cells title="学员需求" >
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" >教学需求：</view>
@@ -71,8 +75,8 @@
       </view>
     </view>
   </mp-cell>
-</mp-cells>
-<mp-cells title="教学计划">
+  </mp-cells>
+  <mp-cells title="教学计划">
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>日期：</view>
@@ -116,7 +120,8 @@
       </view>
     </view>
   </mp-cell>
-</mp-cells>
-<mp-cells title="{{formInvalidMessage}}">
-  <mp-cell><button bindtap="submit" > 提 交 </button></mp-cell>
-</mp-cells>
+  </mp-cells>
+  <mp-cells title="{{formInvalidMessage}}">
+  <mp-cell><button bindtap="submit" > 下一步 确认订单 </button></mp-cell>
+  </mp-cells>
+</view>

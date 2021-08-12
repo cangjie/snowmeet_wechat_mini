@@ -47,7 +47,8 @@
     "pages/test/ble/label_printer",
     "pages/admin/equip_maintain/on_site/print_label_new",
     "pages/admin/equip_maintain/on_site/recept_batch",
-    "pages/admin/school/lesson/detail_info"
+    "pages/admin/school/lesson/detail_info",
+    "pages/admin/school/lesson/detail_confirm_order"
   ],
   "window": {
     "backgroundTextStyle": "light",
