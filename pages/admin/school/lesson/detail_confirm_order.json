@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "school_lesson_info": "/components/school_lesson_info/school_lesson_info"
+  }
+}

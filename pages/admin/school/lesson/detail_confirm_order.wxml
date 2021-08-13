@@ -1,0 +1,4 @@
+<!--pages/admin/school/lesson/detail_confirm_order.wxml-->
+<view wx:if="{{role == 'staff'}}" >
+  <school_lesson_info wx:if="{{school_lesson.id != undefined}}" lesson_id="{{school_lesson.id}}" ></school_lesson_info>
+</view>
