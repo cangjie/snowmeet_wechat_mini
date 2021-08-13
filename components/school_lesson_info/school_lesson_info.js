@@ -32,7 +32,23 @@ Component({
       url: getInfoUrl,
       method: 'GET',
       success: (res) => {
-        that.setData({school_lesson: res.data})
+        var school_lesson = res.data
+        school_lesson.instructor_name = ''
+        //that.setData({school_lesson: res.data})
+        var getInstrucorUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor'
+        wx.request({
+          url: getInstrucorUrl,
+          method: 'GET',
+          success: (res) => {
+            var instructors = res.data
+            for(var i in instructors) {
+              if (instructors[i].open_id == school_lesson.instructor_open_id) {
+                school_lesson.instructor_name = instructors[i].name
+              }
+            }
+            that.setData({school_lesson: school_lesson})
+          }
+        })
       }
     })
   }

@@ -1,5 +1,8 @@
 {
   "usingComponents": {
-    "school_lesson_info": "/components/school_lesson_info/school_lesson_info"
-  }
+    "school_lesson_info": "/components/school_lesson_info/school_lesson_info",
+    "mp-cells": "/modules/cells/cells",
+    "mp-cell": "/modules/cell/cell"
+  },
+  "navigationBarTitleText": "学校-确认订单"
 }

@@ -6,7 +6,11 @@ Page({
    * Page initial data
    */
   data: {
-    role: ''
+    role: '',
+    training_fee: 0,
+    ticket_fee: 0,
+    rent_fee: 0,
+    others_fee: 0
   },
 
   /**
