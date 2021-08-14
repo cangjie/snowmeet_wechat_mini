@@ -52,5 +52,11 @@
       "version": "1.0.72",
       "provider": "wx34345ae5855f892d"
     }
+  },
+  "useExtendedLib": {
+    "kbone": true,
+    "weui": true
   }
+
+  
 }

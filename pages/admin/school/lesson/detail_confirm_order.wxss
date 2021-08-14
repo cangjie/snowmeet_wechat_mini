@@ -1,4 +1,5 @@
 /* pages/admin/school/lesson/detail_confirm_order.wxss */
+/*@import 'weui-miniprogram/weui-wxss/dist/style/weui.wxss';*/
 .left-column{
   width:25%;
   text-align: right;

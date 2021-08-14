@@ -1,7 +1,7 @@
 {
   "component": true,
   "usingComponents": {
-    "mp-cells": "/modules/cells/cells",
-    "mp-cell": "/modules/cell/cell"
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell"
   }
 }
