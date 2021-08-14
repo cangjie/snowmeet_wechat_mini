@@ -10,9 +10,11 @@ Page({
     training_fee: 0,
     ticket_fee: 0,
     rent_fee: 0,
-    others_fee: 0
+    others_fee: 0,
+    errMsg: '',
+    canSubmit: false,
+    
   },
-
   /**
    * Lifecycle function--Called when page load
    */
@@ -25,13 +27,10 @@ Page({
         url: 'https://' + app.globalData.domainName + '/core/schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
         method: 'GET',
         success: (res) => {
-          that.setData({school_lesson: res.data})
+          that.setData({school_lesson: res.data, canSubmit: true})
         }
       })
     })
-    
-    
-
   },
 
   /**
@@ -81,5 +80,79 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  inputFee: function(res){
+    var inputedValue = res.detail.value.trim()
+    var intValue = intValue = parseInt(inputedValue)
+    var errMsg = ''
+    if (isNaN(intValue)) {
+      errMsg = '请输入整数的'
+    }
+    switch (res.currentTarget.id) {
+      case "training_fee":
+        if (errMsg!='') {
+          errMsg = errMsg + '教练费用金额。'
+        }
+        else {
+          this.setData({training_fee: intValue})
+        }
+        break;
+      case "ticket_fee":
+        if (errMsg!='') {
+          errMsg = errMsg + '雪票价格。'
+        }
+        else {
+          this.setData({ticket_fee: intValue})
+        }
+        break;
+      case "rent_fee":
+        if (errMsg!='') {
+          errMsg = errMsg + '雪具租赁价格。'
+        }
+        else {
+          this.setData({rent_fee: intValue})
+        }
+        break;
+      case "others_fee":
+        if (errMsg!='') {
+          errMsg = errMsg + '其他费用。'
+        }
+        else{
+          this.setData({others_fee: intValue})
+        }
+        break;
+      default:
+        break;
+    }
+    if (errMsg!='') {
+      this.setData({canSubmit: false, errMsg: errMsg})
+    }
+    else{
+      this.setData({canSubmit: true, errMsg: ''})
+      this.data.school_lesson.rent_fee = this.data.rent_fee
+      this.data.school_lesson.training_fee = this.data.training_fee
+      this.data.school_lesson.others_fee = this.data.rent_fee
+      this.data.school_lesson.ticket_fee = this.data.ticket_fee
+    }
+  },
+  submit: function() {
+    var school_lesson = this.data.school_lesson
+    school_lesson.training_fee = this.data.training_fee
+    school_lesson.ticket_fee = this.data.ticket_fee
+    school_lesson.rent_fee = this.data.rent_fee
+    school_lesson.others_fee = this.data.others_fee
+    wx.request({
+      url: 'https://' + app.globalData.domainName + '/core/schoollesson/' + this.data.school_lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+      method: 'PUT',
+      data: school_lesson,
+      success: (res) => {
+        console.log(res)
+      }
+    })
+    
+  },
+  inputMemo: function(res) {
+    this.data.school_lesson.memo = res.detail.value.trim()
+    
   }
 })
