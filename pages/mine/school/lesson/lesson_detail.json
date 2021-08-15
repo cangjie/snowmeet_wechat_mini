@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "school_lesson_info": "/components/school_lesson_info/school_lesson_info",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "video-uploader": "/components/uploader/video-uploader"
+  },
+  "navigationBarTitleText": "滑雪学校-课程确认"
+}

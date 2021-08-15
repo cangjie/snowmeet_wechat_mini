@@ -28,9 +28,9 @@
                 </view>
             </block>
         </view>
-        <view wx:if="{{currentFiles.length < maxCount}}" class="weui-uploader__input-box">
+        <view wx:if="{{currentFiles.length < maxCount && canUpload}}" class="weui-uploader__input-box">
             <view class="weui-uploader__input" bindtap="chooseVideo"></view>
         </view>
     </view>
 </view>
-<video-gallery class="gallery" hide-on-click="{{true}}" show-delete="{{showDelete}}" show="{{showPreview}}" binddelete="deletePic" img-urls="{{previewImageUrls}}" current="{{previewCurrent}}"></video-gallery>
+<video-gallery class="gallery" hide-on-click="{{true}}" show-delete="{{showDelete && canUpload}}" show="{{showPreview}}" binddelete="deletePic" img-urls="{{previewImageUrls}}" current="{{previewCurrent}}"></video-gallery>

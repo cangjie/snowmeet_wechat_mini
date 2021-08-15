@@ -20,14 +20,19 @@ Page({
    */
   onLoad: function (options) {
     var id = options.id
+    this.setData({lesson_id: id})
     var that = this
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
+      var getLessonInfoUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
-        url: 'https://' + app.globalData.domainName + '/core/schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+        url: getLessonInfoUrl,
         method: 'GET',
         success: (res) => {
           that.setData({school_lesson: res.data, canSubmit: true})
+        },
+        fail:(res) => {
+          console.log(res)
         }
       })
     })
@@ -128,7 +133,11 @@ Page({
       this.setData({canSubmit: false, errMsg: errMsg})
     }
     else{
-      this.setData({canSubmit: true, errMsg: ''})
+      var canSubmit = false
+      if (this.data.school_lesson!=undefined) {
+        canSubmit = true
+      }
+      this.setData({canSubmit: canSubmit, errMsg: ''})
       this.data.school_lesson.rent_fee = this.data.rent_fee
       this.data.school_lesson.training_fee = this.data.training_fee
       this.data.school_lesson.others_fee = this.data.rent_fee
@@ -141,12 +150,15 @@ Page({
     school_lesson.ticket_fee = this.data.ticket_fee
     school_lesson.rent_fee = this.data.rent_fee
     school_lesson.others_fee = this.data.others_fee
+    var that = this
     wx.request({
       url: 'https://' + app.globalData.domainName + '/core/schoollesson/' + this.data.school_lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
       method: 'PUT',
       data: school_lesson,
       success: (res) => {
-        console.log(res)
+        wx.navigateTo({
+          url: '/pages/mine/school/lesson/lesson_detail?id=' + that.data.school_lesson.id
+        })
       }
     })
     

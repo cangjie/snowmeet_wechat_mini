@@ -153,6 +153,10 @@ Component({
       // 是否显示delete按钮
       type: Boolean,
       value: true
+    },
+    canUpload: {
+      type: Boolean,
+      value:true
     }
   },
   data: {
@@ -181,7 +185,7 @@ Component({
 
     chooseVideo() {
       if (this.uploading) return;
-      wx.chooseVideo({
+      wx.chooseMedia({
         count: this.data.maxCount - this.data.files.length,
         success: res => {
           // console.log('chooseVideo resp', res)
@@ -214,8 +218,12 @@ Component({
 
 
           const mgr = wx.getFileSystemManager();
-          const content = mgr.readFileSync(res.tempFilePath)
-          const thumbContent = mgr.readFileSync(res.thumbTempFilePath)
+          var uploadedFile = res.tempFiles[0]
+          
+          const thumbContent = mgr.readFileSync(uploadedFile.thumbTempFilePath)
+
+          const content = mgr.readFileSync(uploadedFile.tempFilePath)
+          
           const obj = {
             tempFilePath: res.tempFilePath,
             thumbTempFilePath: res.thumbTempFilePath,
