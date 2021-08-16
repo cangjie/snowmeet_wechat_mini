@@ -186,7 +186,11 @@ Component({
     chooseVideo() {
       if (this.uploading) return;
       wx.chooseMedia({
-        count: this.data.maxCount - this.data.files.length,
+        count: 1,
+        maxDuration: 60,
+        sourceType:['album'],
+        sizeType:['compressed'],
+        mediaType:['video'],
         success: res => {
           // console.log('chooseVideo resp', res)
           // 首先检查文件大小
@@ -225,8 +229,8 @@ Component({
           const content = mgr.readFileSync(uploadedFile.tempFilePath)
           
           const obj = {
-            tempFilePath: res.tempFilePath,
-            thumbTempFilePath: res.thumbTempFilePath,
+            tempFilePath: uploadedFile.tempFilePath,
+            thumbTempFilePath: uploadedFile.thumbTempFilePath,
             //tempFiles: res.tempFiles,
             content,
             thumbContent
@@ -234,11 +238,11 @@ Component({
 
           this.triggerEvent('select', obj, {});
           const files = [
-            /*{
+          {
             loading: true,
             // @ts-ignore
             url: `data:Video/mp4;base64,${wx.arrayBufferToBase64(content)}`
-          },*/
+          },
         {
           loading: true,
           // @ts-ignore
