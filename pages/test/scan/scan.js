@@ -41,7 +41,9 @@ Page({
    * Lifecycle function--Called when page unload
    */
   onUnload: function () {
-
+    app.loginPromiseNew.then(function(resolve){
+      var sessionKey = app.globalData.sessionKey
+    })
   },
 
   /**
@@ -69,6 +71,11 @@ Page({
       success: (res) => {
         console.log(res)
       }
+    })
+  },
+  gotoTest: function(e) {
+    wx.navigateTo({
+      url: './test',
     })
   }
 })
