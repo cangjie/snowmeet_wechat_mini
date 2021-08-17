@@ -222,11 +222,18 @@ Component({
 
 
           const mgr = wx.getFileSystemManager();
-          var uploadedFile = res.tempFiles[0]
-          
-          const thumbContent = mgr.readFileSync(uploadedFile.thumbTempFilePath)
 
-          const content = mgr.readFileSync(uploadedFile.tempFilePath)
+
+          var uploadedFile = res.tempFiles[0]
+
+          
+
+          const content = mgr.readFileSync(uploadedFile.tempFilePath, "base64", 0)
+          
+          
+
+          const thumbContent = mgr.readFileSync(uploadedFile.thumbTempFilePath, "base64", 0)
+
           
           const obj = {
             tempFilePath: uploadedFile.tempFilePath,

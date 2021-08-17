@@ -32,7 +32,8 @@
     "pages/admin/school/lesson/detail_info",
     "pages/admin/school/lesson/detail_confirm_order",
     "pages/mine/school/lesson/lesson_detail",
-    "pages/test/scan/test"
+    "pages/test/scan/test",
+    "pages/test/upload/choose_video_upload"
   ],
   "window": {
     "backgroundTextStyle": "light",

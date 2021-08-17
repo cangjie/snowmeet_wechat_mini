@@ -41,6 +41,12 @@
           "pathName": "pages/mine/school/lesson/lesson_detail",
           "query": "id=24",
           "scene": null
+        },
+        {
+          "name": "upload_big_file",
+          "pathName": "pages/test/upload/choose_video_upload",
+          "query": "",
+          "scene": null
         }
       ]
     }
