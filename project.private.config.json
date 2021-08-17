@@ -1,0 +1,24 @@
+{
+  "setting": {},
+  "condition": {
+    "plugin": {
+      "list": []
+    },
+    "game": {
+      "list": []
+    },
+    "gamePlugin": {
+      "list": []
+    },
+    "miniprogram": {
+      "list": [
+        {
+          "name": "maintain_order_list",
+          "pathName": "pages/admin/equip_maintain/order_list/order_list_main",
+          "query": "",
+          "scene": null
+        }
+      ]
+    }
+  }
+}
