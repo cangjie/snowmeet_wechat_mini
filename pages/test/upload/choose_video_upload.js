@@ -71,42 +71,10 @@ Page({
       sizeType:['compressed'],
       mediaType:['image', 'video'],
       success: (res) => {
-
-
-        const ab = new ArrayBuffer(1024*1024*100)
-
-        const mgr = wx.getFileSystemManager();
-
         var uploadedFile = res.tempFiles[0]
-
-        const fd = mgr.openSync({filePath: uploadedFile.tempFilePath, flag: 'r'})
-
-        const r = mgr.read({
-          fd: fd, 
-          arrayBuffer: ab, 
-          length: 10,
-          success: (res) => {
-            console.log(res)
-          },
-          fail: (res) => {
-            console.log(res)
-          }})
-
-        console.log(r)
-
-        //const content = mgr.readFileSync(uploadedFile.tempFilePath, 'base64', 0)
-        
-        //console.log(content)
-        /*  
-        mgr.readFile({
-          filePath: uploadedFile.tempFilePath,
-          encoding: 'base64',
-          position: 0,
-          success: (res) => {
-            console.log(res)
-          }
-        })
-        */
+        const mgr = wx.getFileSystemManager();
+        var content = mgr.readFileSync(uploadedFile.tempFilePath)
+        console.log(content)
       }
     })
   }
