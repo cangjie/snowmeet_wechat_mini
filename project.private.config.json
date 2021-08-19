@@ -47,6 +47,12 @@
           "pathName": "pages/test/upload/choose_video_upload",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "admin_index",
+          "pathName": "pages/admin/admin",
+          "query": "",
+          "scene": null
         }
       ]
     }

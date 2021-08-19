@@ -74,6 +74,7 @@
         <video-uploader id="video-uploader" bindfail="uploadVideoError" bindsuccess="uploadVideoSuccess" select="{{selectedViddeos}}" upload="{{uploadVideo}}" files="{{videoThumbs}}" max-count="4" title="上传1分钟以内的mp4视频" binddelete="deleteVideo"  />
       </view>
     </view>
+    <view><button bindtap="uploadTest" > 上 传 测 试 </button></view>
   </mp-cell>
   </mp-cells>
   <mp-cells title="教学计划">

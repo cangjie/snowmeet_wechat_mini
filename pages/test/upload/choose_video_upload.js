@@ -1,4 +1,5 @@
 // pages/test/upload/choose_video_upload.js
+const app = getApp()
 Page({
 
   /**
@@ -12,7 +13,9 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    app.loginPromiseNew.then(function(resolve){
 
+    })
   },
 
   /**
@@ -63,6 +66,27 @@ Page({
   onShareAppMessage: function () {
 
   },
+  upload1: function(){
+    wx.chooseMedia({
+      count: 1,
+      maxDuration: 60,
+      sourceType:['album'],
+      sizeType:['compressed'],
+      mediaType:['video'],
+      success: (res) => {
+        var uploadUrl = 'https://' + app.globalData.domainName + '/upload_video.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+        //uploadUrl = 'https://mini.snowmeet.top/upload_video.aspx?sessionkey=rKYZc73RUrr93oriEAnkyw%3D%3D'
+        wx.uploadFile({
+          filePath: res.tempFiles[0].tempFilePath,
+          name: 'test.mp4',
+          url: uploadUrl,
+          success: (res) => {
+            console.log(res)
+          }
+        })
+      }
+    })
+  },
   upload: function() {
     wx.chooseMedia({
       count: 1,
@@ -71,42 +95,10 @@ Page({
       sizeType:['compressed'],
       mediaType:['image', 'video'],
       success: (res) => {
-
-
-        const ab = new ArrayBuffer(1024*1024*100)
-
-        const mgr = wx.getFileSystemManager();
-
         var uploadedFile = res.tempFiles[0]
-
-        const fd = mgr.openSync({filePath: uploadedFile.tempFilePath, flag: 'r'})
-
-        const r = mgr.read({
-          fd: fd, 
-          arrayBuffer: ab, 
-          length: 10,
-          success: (res) => {
-            console.log(res)
-          },
-          fail: (res) => {
-            console.log(res)
-          }})
-
-        console.log(r)
-
-        //const content = mgr.readFileSync(uploadedFile.tempFilePath, 'base64', 0)
-        
-        //console.log(content)
-        /*  
-        mgr.readFile({
-          filePath: uploadedFile.tempFilePath,
-          encoding: 'base64',
-          position: 0,
-          success: (res) => {
-            console.log(res)
-          }
-        })
-        */
+        const mgr = wx.getFileSystemManager();
+        var content = mgr.readFileSync(uploadedFile.tempFilePath)
+        console.log(content)
       }
     })
   }

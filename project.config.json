@@ -22,9 +22,9 @@
         "uploadWithSourceMap": true,
         "compileHotReLoad": false,
         "lazyloadPlaceholderEnable": false,
-        "useMultiFrameRuntime": false,
-        "useApiHook": false,
-        "useApiHostProcess": false,
+        "useMultiFrameRuntime": true,
+        "useApiHook": true,
+        "useApiHostProcess": true,
         "babelSetting": {
             "ignore": [],
             "disablePlugins": [],
@@ -48,9 +48,7 @@
     "scripts": {},
     "isGameTourist": false,
     "simulatorType": "wechat",
-    "simulatorPluginLibVersion": {
-        "qywx_simulator_plugin": "2.4.0"
-    },
+    "simulatorPluginLibVersion": {},
     "condition": {
         "plugin": {
             "list": []

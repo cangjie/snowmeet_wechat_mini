@@ -104,7 +104,20 @@ Page({
   },
   uploadVideo: function(files) {
     var uploadUrl = 'https://' + app.globalData.domainName + '/upload_video.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-    return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      filePath: files.thumbTempFilePath,
+      name: 'name',
+      url: uploadUrl,
+      success: (res) => {
+        console.log(res)
+      }
+    })
+    return new Promise(function(resolve){
+      //resolve({url: ['']})
+    })
+    /*
+    return new Promise(function(resolve)  {
+      
       wx.uploadFile({
         filePath: files.thumbTempFilePath,
         name: 'name',
@@ -122,9 +135,12 @@ Page({
               resolve({"urls": [res.data.trim()]})
             }
           })
+        },
+        fail: (res) => {
+          console.log(res)
         }
       })
-    })
+    })*/
   },
   deleteVideo: function(res) {
     var videos = ''
@@ -262,6 +278,25 @@ Page({
       success: (res) => {
         wx.navigateTo({
           url: './detail_confirm_order?id=' + res.data.id,
+        })
+      }
+    })
+  },
+  uploadTest: function(res) {
+    wx.chooseMedia({
+      count: 1,
+      maxDuration: 60,
+      sourceType:['album'],
+      sizeType:['compressed'],
+      mediaType:['video'],
+      success:(res) => {
+        wx.uploadFile({
+          filePath: res.tempFiles[0].tempFilePath,
+          name: 'name',
+          url: 'https://' + app.globalData.domainName + '/upload_video.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+          success: (res) => {
+            console.log(res)
+          }
         })
       }
     })
