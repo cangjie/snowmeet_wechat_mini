@@ -1,4 +1,4 @@
-// pages/test/scan.js
+// pages/test/scan/test.js
 const app = getApp()
 Page({
 
@@ -6,14 +6,16 @@ Page({
    * Page initial data
    */
   data: {
-    
+
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    
+    app.loginPromiseNew.then(function(resolve){
+      var r = resolve
+    })
   },
 
   /**
@@ -41,9 +43,7 @@ Page({
    * Lifecycle function--Called when page unload
    */
   onUnload: function () {
-    app.loginPromiseNew.then(function(resolve){
-      var sessionKey = app.globalData.sessionKey
-    })
+
   },
 
   /**
@@ -65,17 +65,5 @@ Page({
    */
   onShareAppMessage: function () {
 
-  },
-  scan: function(e) {
-    wx.scanCode({
-      success: (res) => {
-        console.log(res)
-      }
-    })
-  },
-  gotoTest: function(e) {
-    wx.navigateTo({
-      url: './test',
-    })
   }
 })

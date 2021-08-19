@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "mp-tabbar": "/modules/tabbar/tabbar"
+    "mp-tabbar": "weui-miniprogram/tabbar/tabbar"
   },
   "navigationBarTitleText": "易龙雪聚"
 }

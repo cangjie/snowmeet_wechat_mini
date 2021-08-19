@@ -12,7 +12,8 @@ Page({
     instructors:[{open_id: '', name: '请选择……', head_image: '/images/unknown_person.png'}],
     instructorNames: ['请选择……'],
     instructorSelectedIndex: 0,
-    formInvalidMessage: ''
+    formInvalidMessage: '',
+    role: ''
   },
 
   /**
@@ -22,6 +23,11 @@ Page({
     //var videoThumbs = this.data.videoThumbs
     //videoThumbs.push({url: 'https://mini.snowmeet.top/upload/20210802/1627912001.jpg'})
     //this.setData({videoThumbs: videoThumbs})
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.setData({role: app.globalData.role})
+    })
+
     var pickerDateStart = '2021-8-1'
     var nowDate = new Date();
     var monthStr = (nowDate.getMonth() + 1).toString()
@@ -98,7 +104,20 @@ Page({
   },
   uploadVideo: function(files) {
     var uploadUrl = 'https://' + app.globalData.domainName + '/upload_video.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-    return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      filePath: files.thumbTempFilePath,
+      name: 'name',
+      url: uploadUrl,
+      success: (res) => {
+        console.log(res)
+      }
+    })
+    return new Promise(function(resolve){
+      //resolve({url: ['']})
+    })
+    /*
+    return new Promise(function(resolve)  {
+      
       wx.uploadFile({
         filePath: files.thumbTempFilePath,
         name: 'name',
@@ -116,9 +135,12 @@ Page({
               resolve({"urls": [res.data.trim()]})
             }
           })
+        },
+        fail: (res) => {
+          console.log(res)
         }
       })
-    })
+    })*/
   },
   deleteVideo: function(res) {
     var videos = ''
@@ -166,6 +188,13 @@ Page({
         break
       case 'student_relation':
         this.data.school_lesson.student_relation = inputedValue
+        if (inputedValue.trim() == '本人') {
+          var school_lesson_temp = this.data.school_lesson
+          school_lesson_temp.student_cell_number = this.data.school_lesson.cell_number
+          school_lesson_temp.student_name = this.data.school_lesson.name
+          school_lesson_temp.student_gender = this.data.school_lesson.gender
+          this.setData({school_lesson: school_lesson_temp})
+        }
         break
       case 'student_cell_number':
         this.data.school_lesson.student_cell_number = inputedValue
@@ -247,7 +276,28 @@ Page({
       method: 'POST',
       data: school_lesson,
       success: (res) => {
-        var data = res.data
+        wx.navigateTo({
+          url: './detail_confirm_order?id=' + res.data.id,
+        })
+      }
+    })
+  },
+  uploadTest: function(res) {
+    wx.chooseMedia({
+      count: 1,
+      maxDuration: 60,
+      sourceType:['album'],
+      sizeType:['compressed'],
+      mediaType:['video'],
+      success:(res) => {
+        wx.uploadFile({
+          filePath: res.tempFiles[0].tempFilePath,
+          name: 'name',
+          url: 'https://' + app.globalData.domainName + '/upload_video.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+          success: (res) => {
+            console.log(res)
+          }
+        })
       }
     })
   }

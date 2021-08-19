@@ -37,6 +37,69 @@ App({
   },
   loginPromiseNew: new Promise(function(resolve){
     wx.login({
+      success: (res) => {
+        const app = getApp()
+        if (app.globalData.sessionKey == undefined || app.globalData.sessionKey == '' || app.globalData.userInfo == null) {
+          var url = 'https://' + app.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
+          wx.request({
+            url: url,
+            method: 'GET',
+            success: (res) => {
+              app.globalData.sessionKey = res.data.session_key
+              
+              var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+              wx.request({
+                url: url,
+                success: (res) => {
+                  if (res.data.status == 0 && res.data.count > 0){
+                    if (res.data.mini_users[0].is_admin == '1') {
+                      app.globalData.role = 'staff'
+                    }
+                    if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
+                      wx.getUserInfo({
+                        success: (res) => {
+                          if (res.userInfo != null) {
+                            app.globalData.userInfo = res.userInfo
+                            var gender = ''
+                            switch(res.userInfo.gender) {
+                              case 1:
+                                gender = '男'
+                                break
+                              case 2:
+                                gender = '女'
+                                break
+                              default:
+                                break
+                            }
+                            app.globalData.userInfo.gender = gender
+                            var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(app.globalData.userInfo.nickName) + '&headimage=' + encodeURIComponent(app.globalData.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
+                            wx.request({
+                              url: updateUrl
+                            })
+                            resolve(app.globalData)
+                            }
+                          }
+                        })
+                      }
+                      else {
+                        app.globalData.userInfo = {avatarUrl: res.data.mini_users[0].head_image, nickName: res.data.mini_users[0].nick, gender: res.data.mini_users[0].gender}
+                      }
+                    }
+                    resolve(app.globalData)
+                  }
+                })
+              
+            }
+          })
+        }
+        else {
+          resolve(app.globalData)
+        }
+      }
+    })
+  }),
+  loginPromiseNewTest: new Promise(function(resolve){
+    wx.login({
       success: res => {
         const app = getApp()
         var url = 'https://' + app.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code

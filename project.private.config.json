@@ -13,104 +13,8 @@
     "miniprogram": {
       "list": [
         {
-          "name": "maitain_request",
-          "pathName": "pages/maintain/in_shop_request/in_shop_request",
-          "query": "shop=万龙",
-          "scene": null
-        },
-        {
-          "name": "maintain_confirm",
-          "pathName": "pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_detail/in_shop_order_detail",
-          "query": "scene=71",
-          "scene": null
-        },
-        {
           "name": "index",
           "pathName": "pages/index/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "mymaintain",
-          "pathName": "pages/mine/my_maintain/my_maintain",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "maintain_quick",
-          "pathName": "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_quick",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "pay_maintain_request",
-          "pathName": "pages/maintain/in_shop_request_payment/in_shop_request_payment",
-          "query": "scene=173",
-          "scene": 1011
-        },
-        {
-          "name": "maintain_pick",
-          "pathName": "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick",
-          "query": "scene=199",
-          "scene": null
-        },
-        {
-          "name": "mine",
-          "pathName": "pages/mine/mine",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "my_warmer",
-          "pathName": "pages/mine/my_warmer/my_warmer",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "demand_warmer",
-          "pathName": "pages/admin/warmer_demand/warmer_demand",
-          "query": "scene=oGxeqeUU5Yeezu9Upb6qHA%3D%3D",
-          "scene": null
-        },
-        {
-          "name": "expierence_admit",
-          "pathName": "pages/admin/expierence/expierence_admit",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "expierence_return",
-          "pathName": "pages/admin/expierence/expierence_return",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "in_shop_order_paid_list",
-          "pathName": "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_paid_list",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "expierence_active_list",
-          "pathName": "pages/admin/expierence/expierence_active_list",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "ski_pass",
-          "pathName": "pages/skipass/skipass",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "ble_printer_test",
-          "pathName": "pages/ble/printer_test",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "order_list_main",
-          "pathName": "pages/admin/equip_maintain/order_list/order_list_main",
           "query": "",
           "scene": null
         },
@@ -121,38 +25,32 @@
           "scene": null
         },
         {
-          "name": "on_site_maintain_recept",
-          "pathName": "pages/admin/equip_maintain/on_site/recept",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "pages/admin/equip_maintain/on_site/print_label_new",
-          "pathName": "pages/admin/equip_maintain/on_site/print_label_new",
-          "query": "id=313",
-          "scene": null
-        },
-        {
-          "name": "recept_list",
-          "pathName": "pages/admin/equip_maintain/on_site/recept_list",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "ble_label_test",
-          "pathName": "pages/test/ble/label_printer",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "on_site_recept_batch",
-          "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
-          "query": "",
-          "scene": null
-        },
-        {
           "name": "school_lesson_detail",
           "pathName": "pages/admin/school/lesson/detail_info",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "lesson_detail_confirm_order",
+          "pathName": "pages/admin/school/lesson/detail_confirm_order",
+          "query": "id=59",
+          "scene": null
+        },
+        {
+          "name": "custom_training_plan_confirm",
+          "pathName": "pages/mine/school/lesson/lesson_detail",
+          "query": "id=24",
+          "scene": null
+        },
+        {
+          "name": "upload_big_file",
+          "pathName": "pages/test/upload/choose_video_upload",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "admin_index",
+          "pathName": "pages/admin/admin",
           "query": "",
           "scene": null
         },

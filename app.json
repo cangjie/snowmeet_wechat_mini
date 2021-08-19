@@ -4,39 +4,21 @@
     "pages/logs/logs",
     "pages/test/scan/scan",
     "pages/test/tab/tab",
-    "pages/admin/equip_maintain/search_order/search_order",
-    "pages/admin/equip_maintain/uploadimage/uploadimage",
-    "pages/admin/equip_maintain/order_confirm/order_confirm",
-    "pages/admin/equip_maintain/receit_express/receit_express",
-    "pages/admin/equip_maintain/order_list/order_list_all/order_list_all",
-    "pages/admin/equip_maintain/order_list/order_list_by_id/order_list_by_id",
-    "pages/admin/equip_maintain/order_list/order_list_by_waybill/order_list_by_waybill",
-    "pages/admin/equip_maintain/order_list/order_list_main",
-    "pages/admin/equip_maintain/order_list/order_detail_assign/order_detail_assign",
-    "pages/admin/equip_maintain/order_list/order_detail/order_detail",
     "pages/test/pay/pay",
-    "pages/admin/equip_maintain/accept_equip/accept_equip",
     "pages/test/upload/upload",
-    "pages/admin/equip_maintain/order_list/task/task",
     "pages/skipass/skipass",
     "pages/mine/mine",
     "pages/payment/payment",
     "pages/mine/my_ski_pass/my_ski_pass",
     "pages/maintain/in_shop_request/in_shop_request",
     "pages/admin/admin",
-    "pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_confirm",
-    "pages/admin/equip_maintain/in_shop_order_confirm/in_shop_order_detail/in_shop_order_detail",
     "pages/mine/my_maintain/my_maintain",
-    "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_quick",
     "pages/maintain/in_shop_request_payment/in_shop_request_payment",
     "pages/mine/my_maintain/my_maintain_detail",
-    "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_pick",
     "pages/mine/my_warmer/my_warmer",
     "pages/admin/warmer_demand/warmer_demand",
     "pages/admin/expierence/expierence_admit",
     "pages/admin/expierence/expierence_return",
-    "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_paid_list",
-    "pages/admin/equip_maintain/in_shop_order_quick/in_shop_order_quick_detail",
     "pages/admin/expierence/expierence_active_list",
     "pages/admin/expierence/ expierence_refund",
     "pages/ble/printer_test",
@@ -47,7 +29,11 @@
     "pages/test/ble/label_printer",
     "pages/admin/equip_maintain/on_site/print_label_new",
     "pages/admin/equip_maintain/on_site/recept_batch",
-    "pages/admin/school/lesson/detail_info"
+    "pages/admin/school/lesson/detail_info",
+    "pages/admin/school/lesson/detail_confirm_order",
+    "pages/mine/school/lesson/lesson_detail",
+    "pages/test/scan/test",
+    "pages/test/upload/choose_video_upload"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -62,5 +48,9 @@
       "version": "1.0.72",
       "provider": "wx34345ae5855f892d"
     }
+  },
+  "useExtendedLib": {
+    "kbone": true,
+    "weui": true
   }
 }

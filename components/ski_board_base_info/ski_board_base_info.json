@@ -1,6 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "mp-dialog": "../../modules/dialog/dialog"
+    "mp-dialog": "weui-miniprogram/dialog/dialog"
   }
 }

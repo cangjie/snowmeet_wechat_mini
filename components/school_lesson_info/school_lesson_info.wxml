@@ -1,0 +1,66 @@
+<mp-cells title="报名信息" >
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column" >手机：</view>
+      <view class="right-column">{{school_lesson.cell_number}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >姓名：</view>
+      <view class="right-column">{{school_lesson.name}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >性别：</view>
+      <view class="right-column">{{school_lesson.gender}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="学员信息" >
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >和学员关系：</view>
+      <view class="right-column">{{school_lesson.student_relation}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >手机：</view>
+      <view class="right-column">{{school_lesson.student_cell_number}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >姓名：</view>
+      <view class="right-column">{{school_lesson.student_name}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >性别：</view>
+      <view class="right-column">{{school_lesson.student_gender}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="约课信息" >
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >约课时间：</view>
+      <view class="right-column">{{school_lesson.lesson_date}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >教练：</view>
+      <view class="right-column">{{school_lesson.instructor_name}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column"  >雪场：</view>
+      <view class="right-column">{{school_lesson.resort}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>

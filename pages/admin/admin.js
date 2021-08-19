@@ -127,6 +127,12 @@ Page({
       case 'expierence_active_list':
         path = '/pages/admin/expierence/expierence_active_list'
         break
+      case 'test_upload':
+        path = '/pages/test/upload/choose_video_upload'
+        break
+      case 'reserve_instructor':
+        path = '/pages/admin/school/lesson/detail_info'
+        break
       default:
         break
     }

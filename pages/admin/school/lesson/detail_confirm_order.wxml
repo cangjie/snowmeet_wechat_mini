@@ -1,0 +1,48 @@
+<!--pages/admin/school/lesson/detail_confirm_order.wxml-->
+<view wx:if="{{role == 'staff'}}" >
+  <mp-cells title="确认订单" >
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column"  >金额：</view>
+        <view class="right-column"><input id="training_fee" style="width:60rpx" value="{{training_fee}}" bindinput="inputFee"  /></view>
+    </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column"  >雪票：</view>
+        <view class="right-column"><input id="ticket_fee" style="width:60rpx" value="{{ticket_fee}}"  bindinput="inputFee" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column"  >雪具租赁：</view>
+        <view class="right-column"><input id="rent_fee" style="width:60rpx" value="{{rent_fee}}" bindinput="inputFee"  /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column"  >其他：</view>
+        <view class="right-column"><input id="others_fee" style="width:60rpx" value="{{others_fee}}" bindinput="inputFee" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column"  >总计：</view>
+        <view class="right-column">{{training_fee + ticket_fee + rent_fee + others_fee}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column"  >备注：</view>
+        <view class="right-column"><textarea id="memo" auto-height="1" maxlength="700" bindinput="inputMemo"></textarea></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view><font style="color:#ff0000" >{{errMsg}}</font></view>
+    </mp-cell>
+    <mp-cell>
+      <button disabled="{{!canSubmit}}" bindtap="submit" > 确 认 订 单 </button>
+    </mp-cell>
+  </mp-cells>
+  <school_lesson_info wx:if="{{school_lesson != undefined}}" lesson_id="{{lesson_id}}" ></school_lesson_info>
+</view>

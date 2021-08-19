@@ -1,6 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "mp-uploader": "../../modules/uploader/uploader"
+    "mp-uploader": "weui-miniprogram/uploader/uploader"
   }
 }

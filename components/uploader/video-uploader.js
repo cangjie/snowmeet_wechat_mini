@@ -153,6 +153,10 @@ Component({
       // 是否显示delete按钮
       type: Boolean,
       value: true
+    },
+    canUpload: {
+      type: Boolean,
+      value:true
     }
   },
   data: {
@@ -181,8 +185,13 @@ Component({
 
     chooseVideo() {
       if (this.uploading) return;
-      wx.chooseVideo({
-        count: this.data.maxCount - this.data.files.length,
+      var that = this
+      wx.chooseMedia({
+        count: 1,
+        maxDuration: 60,
+        sourceType:['album'],
+        sizeType:['compressed'],
+        mediaType:['video'],
         success: res => {
           // console.log('chooseVideo resp', res)
           // 首先检查文件大小
@@ -194,8 +203,8 @@ Component({
             }
           });
 */
-          if (typeof this.data.select === 'function') {
-            const ret = this.data.select(res);
+          if (typeof that.data.select === 'function') {
+            const ret = that.data.select(res);
 
             if (ret === false) {
               return;
@@ -203,9 +212,9 @@ Component({
           }
 
           if (invalidIndex >= 0) {
-            this.triggerEvent('fail', {
+            that.triggerEvent('fail', {
               type: 1,
-              errMsg: `chooseVideo:fail size exceed ${this.data.maxSize}`,
+              errMsg: `chooseVideo:fail size exceed ${that.data.maxSize}`,
               total: res.tempFilePaths.length,
               index: invalidIndex
             }, {});
@@ -214,77 +223,98 @@ Component({
 
 
           const mgr = wx.getFileSystemManager();
-          const content = mgr.readFileSync(res.tempFilePath)
-          const thumbContent = mgr.readFileSync(res.thumbTempFilePath)
-          const obj = {
-            tempFilePath: res.tempFilePath,
-            thumbTempFilePath: res.thumbTempFilePath,
-            //tempFiles: res.tempFiles,
-            content,
-            thumbContent
-          }; // 触发选中的事件，开发者根据内容来上传文件，上传了把上传的结果反馈到files属性里面
 
-          this.triggerEvent('select', obj, {});
-          const files = [
-            /*{
-            loading: true,
-            // @ts-ignore
-            url: `data:Video/mp4;base64,${wx.arrayBufferToBase64(content)}`
-          },*/
-        {
-          loading: true,
-          // @ts-ignore
-          url: `data:image/jpg;base64,${wx.arrayBufferToBase64(thumbContent)}`
 
-        }];
-          if (!files || !files.length) return;
+          var uploadedFile = res.tempFiles[0]
 
-          if (typeof this.data.upload === 'function') {
-            const len = this.data.files.length;
-            const newFiles = this.data.files.concat(files);
-            this.setData({
-              files: newFiles,
-              currentFiles: newFiles
-            });
-            this.loading = true;
-            this.data.upload(obj).then(json => {
-              this.loading = false;
+          
 
-              if (json.urls) {
-                const oldFiles = this.data.files;
-                json.urls.forEach((url, index) => {
-                  oldFiles[len + index].url = url;
-                  oldFiles[len + index].loading = false;
-                });
-                this.setData({
-                  files: oldFiles,
+          
+          
+          
+
+          const thumbContent = mgr.readFileSync(uploadedFile.thumbTempFilePath, "base64", 0)
+          const content = ''//mgr.readFileSync(uploadedFile.tempFilePath, "base64", 0)
+
+          wx.getFileInfo({
+            filePath: uploadedFile.tempFilePath,
+            success:(res)=>{
+              var position = 0
+              var content = ''
+              for(;position < res.size;) {
+                var length = Math.min(1024*1024, res.size - position)
+                content = content + mgr.readFileSync(uploadedFile.tempFilePath, 'base64', position, length)
+                position = position + length
+              }
+              const obj = {
+                tempFilePath: uploadedFile.tempFilePath,
+                thumbTempFilePath: uploadedFile.thumbTempFilePath,
+                //tempFiles: res.tempFiles,
+                content,
+                thumbContent
+              }; // 触发选中的事件，开发者根据内容来上传文件，上传了把上传的结果反馈到files属性里面
+              that.triggerEvent('select', obj, {});
+              const files = [{
+                loading: true,
+                  // @ts-ignore
+                url: `data:Video/mp4;base64,${content}`
+              },
+              {
+                loading: true,
+                // @ts-ignore
+                url: `data:image/jpg;base64,${thumbContent}`
+      
+              }];
+              if (!files || !files.length) return;
+              if (typeof that.data.upload === 'function') {
+                const len = that.data.files.length;
+                const newFiles = that.data.files.concat(files);
+                that.setData({
+                  files: newFiles,
                   currentFiles: newFiles
                 });
-                this.triggerEvent('success', json, {});
-              } else {
-                this.triggerEvent('fail', {
-                  type: 3,
-                  errMsg: 'upload file fail, urls not found'
-                }, {});
+                that.loading = true;
+                that.data.upload(obj).then(json => {
+                  that.loading = false;
+    
+                  if (json.urls) {
+                    const oldFiles = that.data.files;
+                    json.urls.forEach((url, index) => {
+                      oldFiles[len + index].url = url;
+                      oldFiles[len + index].loading = false;
+                    });
+                    that.setData({
+                      files: oldFiles,
+                      currentFiles: newFiles
+                    });
+                    that.triggerEvent('success', json, {});
+                  } else {
+                    that.triggerEvent('fail', {
+                      type: 3,
+                      errMsg: 'upload file fail, urls not found'
+                    }, {});
+                  }
+                }).catch(err => {
+                  that.loading = false;
+                  const oldFiles = that.data.files;
+                  res.tempFilePaths.forEach((item, index) => {
+                    oldFiles[len + index].error = true;
+                    oldFiles[len + index].loading = false;
+                  });
+                  that.setData({
+                    files: oldFiles,
+                    currentFiles: newFiles
+                  });
+                  that.triggerEvent('fail', {
+                    type: 3,
+                    errMsg: 'upload file fail',
+                    error: err
+                  }, {});
+                });
               }
-            }).catch(err => {
-              this.loading = false;
-              const oldFiles = this.data.files;
-              res.tempFilePaths.forEach((item, index) => {
-                oldFiles[len + index].error = true;
-                oldFiles[len + index].loading = false;
-              });
-              this.setData({
-                files: oldFiles,
-                currentFiles: newFiles
-              });
-              this.triggerEvent('fail', {
-                type: 3,
-                errMsg: 'upload file fail',
-                error: err
-              }, {});
-            });
-          }
+            }
+          })
+          
         },
         fail: fail => {
           if (fail.errMsg.indexOf('chooseVideo:fail cancel') >= 0) {
