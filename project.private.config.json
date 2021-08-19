@@ -155,6 +155,11 @@
           "pathName": "pages/admin/school/lesson/detail_info",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "detail info",
+          "pathName": "pages/admin/school/lesson/detail_info",
+          "scene": null
         }
       ]
     }
