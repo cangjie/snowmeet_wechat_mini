@@ -104,6 +104,7 @@ Page({
   },
   uploadVideo: function(files) {
     var uploadUrl = 'https://' + app.globalData.domainName + '/upload_video.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+    /*
     wx.uploadFile({
       filePath: files.thumbTempFilePath,
       name: 'name',
@@ -115,12 +116,13 @@ Page({
     return new Promise(function(resolve){
       //resolve({url: ['']})
     })
-    /*
+    */
+    
     return new Promise(function(resolve)  {
       
       wx.uploadFile({
         filePath: files.thumbTempFilePath,
-        name: 'name',
+        name: 'thumb',
         url: uploadUrl,
         success: (res) => {
           var timeStampArr = res.data.trim().split('/')
@@ -129,7 +131,7 @@ Page({
           uploadUrl = uploadUrl + '&timestamp=' + timeStamp
           wx.uploadFile({
             filePath: files.tempFilePath,
-            name: 'name',
+            name: 'video',
             url: uploadUrl,
             success: (res) => {
               resolve({"urls": [res.data.trim()]})
@@ -140,7 +142,7 @@ Page({
           console.log(res)
         }
       })
-    })*/
+    })
   },
   deleteVideo: function(res) {
     var videos = ''
