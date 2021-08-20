@@ -49,7 +49,8 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <button wx:if="{{role == 'staff'}}" open-type="share" > 通过企业微信转发 </button>
+      <!--button wx:if="{{role == 'staff'}}" open-type="share" > 通过企业微信转发 </button-->
+      <button wx:if="{{role == 'staff'}}" bindtap="share" open-type="share"  > 通过企业微信转发 </button>
     </mp-cell>
     <mp-cell>
       <button > 确 认 支 付 </button>

@@ -83,6 +83,13 @@ Page({
    * Called when user click on the top right corner to share
    */
   onShareAppMessage: function () {
-
+    var that = this
+    return {
+      title: '课程确认',
+      path: '/pages/mine/school/lesson/lesson_detail?id=' + that.data.school_lesson_id,
+      success: (res) => {
+        console.log(res)
+      }
+    }
   }
 })
