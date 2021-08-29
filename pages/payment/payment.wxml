@@ -1,6 +1,7 @@
 <auth wx:if="{{needValidCell}}" validType="cell" bindUpdateSuccess="onUpdateSuccess" ></auth>
 <view wx:else >
   <view wx:if="{{havePaid}}" >
+    <official-account></official-account>
     <view wx:if="{{orderInfo.type=='雪票'}}" >
       <view wx:if="{{orderInfo.pay_state=='1'}}" style="text-align:center" >
         <view>支付成功，请搜索“易龙雪聚”或者通过以下二维码关注公众号后查看雪票。</view> 

@@ -33,13 +33,13 @@
         {
           "name": "lesson_detail_confirm_order",
           "pathName": "pages/admin/school/lesson/detail_confirm_order",
-          "query": "id=59",
+          "query": "id=73",
           "scene": null
         },
         {
           "name": "custom_training_plan_confirm",
           "pathName": "pages/mine/school/lesson/lesson_detail",
-          "query": "id=24",
+          "query": "id=59",
           "scene": null
         },
         {
@@ -57,6 +57,7 @@
         {
           "name": "detail info",
           "pathName": "pages/admin/school/lesson/detail_info",
+          "query": "",
           "scene": null
         }
       ]

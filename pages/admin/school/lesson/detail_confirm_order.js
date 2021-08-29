@@ -13,7 +13,13 @@ Page({
     others_fee: 0,
     errMsg: '',
     canSubmit: false,
-    
+    totalFee: 0,
+    school_lesson:{
+      training_fee: 0,
+      ticket_fee: 0,
+      others_fee: 0,
+      rent_fee: 0
+    }
   },
   /**
    * Lifecycle function--Called when page load
@@ -29,7 +35,7 @@ Page({
         url: getLessonInfoUrl,
         method: 'GET',
         success: (res) => {
-          that.setData({school_lesson: res.data, canSubmit: true})
+          that.setData({school_lesson: res.data, canSubmit: true, training_fee: res.data.training_fee, ticket_fee: res.data.ticket_fee, rent_fee: res.data.rent_fee, others_fee: res.data.others_fee, totalFee: res.data.training_fee + res.data.ticket_fee + res.data.rent_fee + res.data.others_fee})
         },
         fail:(res) => {
           console.log(res)
@@ -88,10 +94,11 @@ Page({
   },
   inputFee: function(res){
     var inputedValue = res.detail.value.trim()
-    var intValue = intValue = parseInt(inputedValue)
+    var floatValue = parseFloat(inputedValue)
+    var totalFee = this.data.totalFee
     var errMsg = ''
-    if (isNaN(intValue)) {
-      errMsg = '请输入整数的'
+    if (isNaN(floatValue)) {
+      errMsg = '请输入正确的'
     }
     switch (res.currentTarget.id) {
       case "training_fee":
@@ -99,7 +106,7 @@ Page({
           errMsg = errMsg + '教练费用金额。'
         }
         else {
-          this.setData({training_fee: intValue})
+          this.setData({training_fee: inputedValue})
         }
         break;
       case "ticket_fee":
@@ -107,7 +114,7 @@ Page({
           errMsg = errMsg + '雪票价格。'
         }
         else {
-          this.setData({ticket_fee: intValue})
+          this.setData({ticket_fee: inputedValue})
         }
         break;
       case "rent_fee":
@@ -115,7 +122,7 @@ Page({
           errMsg = errMsg + '雪具租赁价格。'
         }
         else {
-          this.setData({rent_fee: intValue})
+          this.setData({rent_fee: inputedValue})
         }
         break;
       case "others_fee":
@@ -123,7 +130,7 @@ Page({
           errMsg = errMsg + '其他费用。'
         }
         else{
-          this.setData({others_fee: intValue})
+          this.setData({others_fee: inputedValue})
         }
         break;
       default:
@@ -138,10 +145,40 @@ Page({
         canSubmit = true
       }
       this.setData({canSubmit: canSubmit, errMsg: ''})
-      this.data.school_lesson.rent_fee = this.data.rent_fee
-      this.data.school_lesson.training_fee = this.data.training_fee
-      this.data.school_lesson.others_fee = this.data.rent_fee
-      this.data.school_lesson.ticket_fee = this.data.ticket_fee
+      var floatRentFee = 0
+      try{
+        floatRentFee = parseFloat(this.data.rent_fee)
+        this.data.school_lesson.rent_fee = floatRentFee
+      }
+      catch{
+
+      }
+      var floatTrainingFee = 0
+      try{
+        floatTrainingFee = parseFloat(this.data.training_fee)
+        this.data.school_lesson.training_fee = floatTrainingFee
+      }
+      catch{
+
+      }
+      var floatOthersFee = 0
+      try{
+        floatOthersFee = parseFloat(this.data.others_fee)
+        this.data.school_lesson.others_fee = floatOthersFee
+      }
+      catch{
+
+      }
+      var floatTicketFee = 0
+      try{
+        floatTicketFee = parseFloat(this.data.ticket_fee)
+        this.data.school_lesson.ticket_fee = floatTicketFee
+      }
+      catch{
+
+      }
+      totalFee = this.data.school_lesson.training_fee + this.data.school_lesson.ticket_fee + this.data.school_lesson.rent_fee + this.data.school_lesson.others_fee
+      this.setData({totalFee: totalFee})
     }
   },
   submit: function() {

@@ -28,7 +28,7 @@
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column"  >总计：</view>
-        <view class="right-column">{{training_fee + ticket_fee + rent_fee + others_fee}}</view>
+        <view class="right-column">{{totalFee}}</view>
       </view>
     </mp-cell>
     <mp-cell>

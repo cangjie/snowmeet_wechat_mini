@@ -91,5 +91,62 @@ Page({
         console.log(res)
       }
     }
+  },
+  placeOrder: function() {
+    var trainingProductId = 203
+    var ticketProductId = 202
+    var rentProductId = 204
+    var othersProductId = 205
+    
+    var placeOrderUrl = 'https://' + app.globalData.domainName + '/api/place_online_order.aspx?token=' + encodeURIComponent(app.globalData.sessionKey)
+    var schoolLesson = this.data.school_lesson
+    var trainingCount = parseInt(schoolLesson.training_fee / 0.01)
+    var ticketCount = parseInt(schoolLesson.ticket_fee / 0.01)
+    var rentCount = parseInt(schoolLesson.rent_fee / 0.01)
+    var othersCount = parseInt(schoolLesson.others_fee / 0.01)
+    var elementStr = ''
+    //var trainingStr = ''
+    if (trainingCount > 0) {
+      elementStr = elementStr + ", {'product_id':" + trainingProductId.toString() + ", 'count': " + trainingCount.toString() + " }"
+    }
+    //var ticketStr = ''
+    if (ticketCount > 0) {
+      elementStr = elementStr + ", {'product_id': " + ticketProductId.toString() + ", 'count': " + ticketCount.toString() + "}"
+    }
+    //var rentStr = ''
+    if (rentCount > 0) {
+      elementStr = elementStr + ", {'product_id': " + rentProductId.toString() + ", 'count': " + rentCount.toString() + "}"
+    }
+    //var othersStr = ''
+    if (othersCount > 0) {
+      elementStr = elementStr + ", {'product_id': " + othersProductId.toString() + ", 'count': " + othersCount.toString() + "}"
+    }
+    elementStr = elementStr.substr(1, elementStr.length - 1)
+    var cartStr = "{'cart_array': [" + elementStr + "]}"
+    //var cart = {cart_array: [{product_id: trainingProductId, count: trainingCount},{product_id: ticketProductId, count: ticketCount },{product_id: rentProductId, count: rentCount},{product_id: othersProductId, count: othersCount}]}
+    placeOrderUrl = placeOrderUrl + "&cart=" + encodeURIComponent(cartStr)
+    var that = this
+    wx.request({
+      url: placeOrderUrl,
+      method: 'POST',
+      //data: {cart: cart},
+      success: (res) => {
+        console.log(res)
+        var schoolLesson = this.data.school_lesson
+        schoolLesson.order_id = res.data.order_id
+        var updateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/' + schoolLesson.id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: updateUrl,
+          method: 'PUT',
+          data: schoolLesson,
+          success: (res) => {
+            console.log(res)
+            wx.navigateTo({
+              url: '/pages/payment/payment?orderid=' + schoolLesson.order_id,
+            })
+          }
+        })
+      }
+    })
   }
 })
