@@ -16,6 +16,7 @@ Page({
    */
   onLoad: function (options) {
    
+
     var that = this
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})

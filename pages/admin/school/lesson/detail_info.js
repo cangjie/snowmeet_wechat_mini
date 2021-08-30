@@ -1,4 +1,5 @@
 // pages/admin/school/lesson/detail_info.js
+const util = require('../../../../utils/util.js')
 const app = getApp()
 Page({
 
@@ -8,12 +9,25 @@ Page({
   data: {
     
     videoThumbs: [],
-    school_lesson: {},
     instructors:[{open_id: '', name: '请选择……', head_image: '/images/unknown_person.png'}],
     instructorNames: ['请选择……'],
     instructorSelectedIndex: 0,
     formInvalidMessage: '',
-    role: ''
+    role: '',
+    school_lesson:{
+      cell_number: '',
+      name: '',
+      gender:'',
+      student_name: '',
+      student_gender: '',
+      student_cell_number: '',
+      student_gender: '',
+      demand: '',
+      videos: '',
+      lesson_date: '',
+      instructor_open_id: '',
+      training_plan: ''
+    }
   },
 
   /**
@@ -23,21 +37,41 @@ Page({
     //var videoThumbs = this.data.videoThumbs
     //videoThumbs.push({url: 'https://mini.snowmeet.top/upload/20210802/1627912001.jpg'})
     //this.setData({videoThumbs: videoThumbs})
-    var that = this
-    app.loginPromiseNew.then(function(resolve){
-      that.setData({role: app.globalData.role})
-    })
-
     var pickerDateStart = '2021-8-1'
     var nowDate = new Date();
     var monthStr = (nowDate.getMonth() + 1).toString()
     var dayStr = nowDate.getDate().toString()
-    pickerDateStart = nowDate.getFullYear().toString() + '-' + '00'.substr(0, 2-monthStr.length) + monthStr + '-' + '00'.substr(0, 2 - dayStr.length) + dayStr;
-    var pickerDateEnd = nowDate.getFullYear().toString() + '-' + (nowDate.getMonth() + 3).toString() + '-' + nowDate.getDate().toString();
-    var school_lesson = this.data.school_lesson
-    school_lesson.lesson_date = pickerDateStart
-    this.setData({pickerDateStart: pickerDateStart, pickerDateEnd: pickerDateEnd, school_lesson: school_lesson})
+    //pickerDateStart = nowDate.getFullYear().toString() + '-' + '00'.substr(0, 2-monthStr.length) + monthStr + '-' + '00'.substr(0, 2 - dayStr.length) + dayStr;
+    pickerDateStart = util.formatDate(nowDate)
+    var endDate = new Date(nowDate.setMonth(nowDate.getMonth() + 4))
+    var pickerDateEnd = util.formatDate(endDate)
+    
+    var schoolLesson = this.data.school_lesson
+    schoolLesson.lesson_date = pickerDateStart
+    this.setData({pickerDateStart: pickerDateStart, pickerDateEnd: pickerDateEnd, school_lesson: schoolLesson})
 
+
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.setData({role: app.globalData.role})
+      if (options.id != undefined) {
+        var getSchoolLessonUrl = 'https://' + app.globalData.domainName.trim() + '/core/schoollesson/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: getSchoolLessonUrl,
+          method: 'GET',
+          success: (res) => {
+            console.log(res)
+            var schoolLesson = res.data
+            var lessonDate = new Date(schoolLesson.lesson_date.toString())
+            schoolLesson.lesson_date = util.formatDate(lessonDate)
+            that.setData({school_lesson: res.data})
+          }
+        })
+      }
+    })
+
+    
+    
     wx.request({
       url: 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor',
       method: 'GET',

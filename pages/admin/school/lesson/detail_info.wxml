@@ -3,13 +3,13 @@
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>手机：</view>
-      <view class="right-column"><input id="cell_number" type="text" bindinput="inputValueChange" /></view>
+      <view class="right-column"><input id="cell_number" type="text" bindinput="inputValueChange" value="{{school_lesson.cell_number}}" /></view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>姓名：</view>
-      <view class="right-column"><input type="text" id="name" bindinput="inputValueChange" /></view>
+      <view class="right-column"><input type="text" id="name" bindinput="inputValueChange" value="{{school_lesson.name}}" /></view>
     </view>
   </mp-cell>
   <mp-cell>
@@ -17,7 +17,8 @@
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>性别：</view>
       <view class="right-column">
         <radio-group id="gender" bindchange="inputValueChange" >
-          <radio value="男" ></radio>男 <radio value="女" ></radio>女
+          <radio wx:if="{{school_lesson.gender == '男'}}" checked="{{school_lesson.gender == '男'}}"  value="男"  ></radio>男
+          <radio value="女" checked="{{school_lesson.gender == '女'}}" ></radio>女
         </radio-group>
       </view>
     </view>
@@ -29,7 +30,11 @@
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>和学员关系：</view>
       <view class="right-column">
         <radio-group id="student_relation"  bindchange="inputValueChange">
-          <radio value="本人" ></radio>本人<radio value="子女" ></radio>子女<radio value="配偶" ></radio>配偶<radio value="朋友" ></radio>朋友<radio value="其他" ></radio>其他
+          <radio value="本人" checked="{{school_lesson.student_relation=='本人'}}" >本人</radio>
+          <radio value="子女" checked="{{school_lesson.student_relation=='子女'}}" >子女</radio>
+          <radio value="配偶" checked="{{school_lesson.student_relation=='配偶'}}" >配偶</radio>
+          <radio value="朋友" checked="{{school_lesson.student_relation=='朋友'}}" >朋友</radio>
+          <radio value="其他" checked="{{school_lesson.student_relation=='其他'}}" >其他</radio>
         </radio-group>
       </view>
     </view>
@@ -64,7 +69,7 @@
   <mp-cell>
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" >教学需求：</view>
-      <view class="right-column"><textarea auto-height="1" maxlength="700" id="demand" bindinput="inputValueChange"  ></textarea></view>
+      <view class="right-column"><textarea auto-height="1" maxlength="700" id="demand" bindinput="inputValueChange"  >{{school_lesson.demand}}</textarea></view>
     </view>
   </mp-cell>
   <mp-cell>
@@ -92,7 +97,9 @@
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>雪场：</view>
       <view class="right-column">
         <radio-group id="resort" bindchange="inputValueChange" >
-          <radio value="八易" ></radio>八易 <radio value="万龙" ></radio>万龙 <radio value="南山" ></radio>南山
+          <radio value="八易" checked="{{school_lesson.resort == '八易'}}" >八易</radio> 
+          <radio value="万龙" checked="{{school_lesson.resort == '万龙'}}" >万龙</radio> 
+          <radio value="南山" checked="{{school_lesson.resort == '南山'}}" >南山</radio>
         </radio-group>
       </view>
     </view>
@@ -116,7 +123,7 @@
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>教学计划：</view>
       <view class="right-column">
-        <textarea id="training_plan" auto-height="1" maxlength="700" bindinput="inputValueChange"></textarea>
+        <textarea id="training_plan" auto-height="1" maxlength="700" bindinput="inputValueChange">{{school_lesson.training_plan}}</textarea>
       </view>
     </view>
   </mp-cell>
