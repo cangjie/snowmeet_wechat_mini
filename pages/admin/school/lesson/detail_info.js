@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-    
+    id: 0,
     videoThumbs: [],
     instructors:[{open_id: '', name: '请选择……', head_image: '/images/unknown_person.png'}],
     instructorNames: ['请选择……'],
@@ -55,6 +55,7 @@ Page({
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
       if (options.id != undefined) {
+        that.data.id = options.id
         var getSchoolLessonUrl = 'https://' + app.globalData.domainName.trim() + '/core/schoollesson/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: getSchoolLessonUrl,
@@ -64,14 +65,28 @@ Page({
             var schoolLesson = res.data
             var lessonDate = new Date(schoolLesson.lesson_date.toString())
             schoolLesson.lesson_date = util.formatDate(lessonDate)
-            that.setData({school_lesson: res.data})
+            var videoArr = schoolLesson.videos.split(',')
+            var videoThumbs = []
+            for(var i = 0; i < videoArr.length; i++){
+              if (videoArr[i].trim() != ''){
+                videoThumbs.push({url:videoArr[i].replace('.mp4', '.jpg')})
+              }
+            }
+            var instructors = that.data.instructors
+            var instructorIndex = 0;
+            for(var i = 0; i < instructors.length; i++){
+              if (instructors[i].open_id == schoolLesson.instructor_open_id) {
+                instructorIndex = i
+                break
+              }
+            }
+            that.setData({school_lesson: res.data, videoThumbs: videoThumbs, instructorSelectedIndex: instructorIndex})
           }
         })
       }
     })
 
-    
-    
+
     wx.request({
       url: 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor',
       method: 'GET',
@@ -85,9 +100,7 @@ Page({
         this.setData({instructors: instructors, instructorNames: instructorNames})
       }
     })
-
   },
-
   /**
    * Lifecycle function--Called when page is initially rendered
    */
@@ -305,18 +318,36 @@ Page({
       this.setData({formInvalidMessage: '请填写教学计划。'})
       return
     }
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/schoollesson?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+
+    if (this.data.id == 0)
+    {
+      var submitUrl = 'https://' + app.globalData.domainName + '/core/schoollesson?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     
-    wx.request({
-      url: submitUrl,
-      method: 'POST',
-      data: school_lesson,
-      success: (res) => {
-        wx.navigateTo({
-          url: './detail_confirm_order?id=' + res.data.id,
-        })
-      }
-    })
+      wx.request({
+        url: submitUrl,
+        method: 'POST',
+        data: school_lesson,
+        success: (res) => {
+          wx.navigateTo({
+            url: './detail_confirm_order?id=' + res.data.id,
+          })
+        }
+      })
+    }
+    else {
+      var id = this.data.id.toString()
+      var submitUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: submitUrl,
+        method: 'PUT',
+        data: school_lesson,
+        success: (res) => {
+          wx.navigateTo({
+            url: './detail_confirm_order?id=' + id,
+          })
+        }
+      })
+    }
   },
   uploadTest: function(res) {
     wx.chooseMedia({
