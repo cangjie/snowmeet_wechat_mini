@@ -1,4 +1,5 @@
-<view>
+<auth wx:if="{{role!='staff' && needUpdate}}" validType="cell" bindUpdateSuccess="onUpdateSuccess" ></auth>
+<view wx:if="{{canView || role == 'staff'}}">
   <school_lesson_info wx:if="{{school_lesson.id != undefined}}" lesson_id="{{school_lesson.id}}"  ></school_lesson_info>
   <mp-cells title="教学计划" >
     <mp-cell>

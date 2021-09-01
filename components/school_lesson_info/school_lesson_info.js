@@ -1,4 +1,5 @@
 // components/school_lesson_info/school_lesson_info.js
+const util = require('../../utils/util.js')
 const app = getApp()
 Component({
   /**
@@ -29,7 +30,7 @@ Component({
       var id = this.properties.lesson_id
       var that = this
       app.loginPromiseNew.then(function(resolve){
-        var getInfoUrl = 'https://' + app.globalData.domainName + '/core/'  + 'schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+        var getInfoUrl = 'https://' + app.globalData.domainName + '/core/'  + 'schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
         
         wx.request({
           url: getInfoUrl,
@@ -37,6 +38,13 @@ Component({
           success: (res) => {
             var school_lesson = res.data
             school_lesson.instructor_name = ''
+            try{
+              var lessonDate = new Date(school_lesson.lesson_date)
+              school_lesson.lesson_date = util.formatDate(lessonDate)
+            }
+            catch{
+
+            }
           //that.setData({school_lesson: res.data})
             var getInstrucorUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor'
             wx.request({

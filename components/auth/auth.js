@@ -91,7 +91,11 @@ function init(app, that) {
             that.setData({show: true, validType: 'cell', title: title})
           }
           else {
-            that.triggerEvent("UpdateSuccess", {})
+            app.loginPromiseNew.then(function(resolve){
+              console.log(resolve)
+              that.triggerEvent("UpdateSuccess", {})
+            })
+            
           }
         }
         else{

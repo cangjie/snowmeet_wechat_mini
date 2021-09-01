@@ -33,7 +33,8 @@
     "pages/admin/school/lesson/detail_confirm_order",
     "pages/mine/school/lesson/lesson_detail",
     "pages/test/scan/test",
-    "pages/test/upload/choose_video_upload"
+    "pages/test/upload/choose_video_upload",
+    "pages/admin/school/lesson/lesson_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

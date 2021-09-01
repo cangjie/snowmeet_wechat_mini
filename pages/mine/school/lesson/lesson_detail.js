@@ -8,7 +8,9 @@ Page({
   data: {
     role: '',
     isLogin: false,
-    showPreview: false
+    showPreview: false,
+    canView: true,
+    needUpdate: false
   },
 
   /**
@@ -16,25 +18,35 @@ Page({
    */
   onLoad: function (options) {
    
-
+    this.data.id = options.id
     var that = this
     app.loginPromiseNew.then(function(resolve){
-      that.setData({role: app.globalData.role})
-      wx.request({
-        url: 'https://' + app.globalData.domainName + '/core/schoollesson/' + options.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
-        method: 'GET',
-        success: (res) => {
-          var school_lesson = res.data
-          var tempImageUrlArray = school_lesson.videos.toString().split(',')
-          school_lesson.videos_array = new Array()
-          for(var i in tempImageUrlArray) {
-            //school_lesson.videos_array[i] = school_lesson.videos_array[i].replace('.mp4', '.jpg')
-            school_lesson.videos_array.push({url: tempImageUrlArray[i].replace('.mp4', '.jpg')})
+      if (app.globalData.cellNumber != ''){
+        that.setData({role: app.globalData.role})
+        var getSchoolLessonInfoUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/' + options.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
+        wx.request({
+          url: getSchoolLessonInfoUrl,
+          method: 'GET',
+          success: (res) => {
+            var school_lesson = res.data
+            var tempImageUrlArray = school_lesson.videos.toString().split(',')
+            school_lesson.videos_array = new Array()
+            for(var i in tempImageUrlArray) {
+              //school_lesson.videos_array[i] = school_lesson.videos_array[i].replace('.mp4', '.jpg')
+              school_lesson.videos_array.push({url: tempImageUrlArray[i].replace('.mp4', '.jpg')})
+            }
+            var canView = true
+            if (school_lesson.cell_number != app.globalData.cellNumber) {
+              canView = false
+            }
+            that.setData({school_lesson: school_lesson, isLogin: true, school_lesson_id: options.id, canView: canView})
           }
-          
-          that.setData({school_lesson: school_lesson, isLogin: true, school_lesson_id: options.id})
-        }
-      })
+        })
+      }
+      else {
+        that.setData({needUpdate: true})
+      }
+      
     })
   },
 
@@ -92,6 +104,15 @@ Page({
         console.log(res)
       }
     }
+  },
+  onUpdateSuccess: function() {
+    if (app.globalData.cellNumber != '' && this.data.needUpdate){
+      wx.navigateTo({
+        url: 'lesson_detail?id=' + this.data.id,
+      })
+    }
+    
+    
   },
   placeOrder: function() {
     var trainingProductId = 203

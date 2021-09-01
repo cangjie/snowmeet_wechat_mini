@@ -117,7 +117,9 @@ App({
                 wx.request({
                   url: url,
                   success: (res) => {
+                    
                     if (res.data.status == 0 && res.data.count > 0){
+                      app.globalData.cellNumber = res.data.mini_users[0].cell_number
                       if (res.data.mini_users[0].is_admin == '1') {
                         app.globalData.role = 'staff'
                       }
@@ -146,6 +148,7 @@ App({
                             }
                           }
                         })
+                        
                       }
                       else {
                         app.globalData.userInfo = {avatarUrl: res.data.mini_users[0].head_image, nickName: res.data.mini_users[0].nick, gender: res.data.mini_users[0].gender}
