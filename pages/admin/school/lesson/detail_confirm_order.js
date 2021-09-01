@@ -6,6 +6,7 @@ Page({
    * Page initial data
    */
   data: {
+    finishLoad: false,
     role: '',
     training_fee: 0,
     ticket_fee: 0,
@@ -35,7 +36,7 @@ Page({
         url: getLessonInfoUrl,
         method: 'GET',
         success: (res) => {
-          that.setData({school_lesson: res.data, canSubmit: true, training_fee: res.data.training_fee, ticket_fee: res.data.ticket_fee, rent_fee: res.data.rent_fee, others_fee: res.data.others_fee, totalFee: res.data.training_fee + res.data.ticket_fee + res.data.rent_fee + res.data.others_fee})
+          that.setData({school_lesson: res.data, canSubmit: true, training_fee: res.data.training_fee, ticket_fee: res.data.ticket_fee, rent_fee: res.data.rent_fee, others_fee: res.data.others_fee, totalFee: res.data.training_fee + res.data.ticket_fee + res.data.rent_fee + res.data.others_fee, finishLoad: true})
         },
         fail:(res) => {
           console.log(res)

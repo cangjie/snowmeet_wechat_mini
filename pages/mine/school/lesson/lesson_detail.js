@@ -10,7 +10,8 @@ Page({
     isLogin: false,
     showPreview: false,
     canView: true,
-    needUpdate: false
+    needUpdate: false,
+    loadComponent: false
   },
 
   /**
@@ -39,7 +40,14 @@ Page({
             if (school_lesson.cell_number != app.globalData.cellNumber) {
               canView = false
             }
-            that.setData({school_lesson: school_lesson, isLogin: true, school_lesson_id: options.id, canView: canView})
+            that.setData({loadComponent: true, school_lesson: school_lesson, isLogin: true, school_lesson_id: options.id, canView: canView})
+            if (school_lesson != undefined && school_lesson.open_id.trim() == '' && app.globalData.role != 'staff' ) {
+              var assignUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/assignopenid/' + options.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+              wx.request({
+                url: assignUrl,
+                method: 'Get'
+              })
+            }
           }
         })
       }

@@ -44,5 +44,5 @@
       <button disabled="{{!canSubmit}}" bindtap="submit" > 确 认 订 单 </button>
     </mp-cell>
   </mp-cells>
-  <school_lesson_info wx:if="{{school_lesson != undefined}}" lesson_id="{{lesson_id}}" ></school_lesson_info>
+  <school_lesson_info wx:if="{{finishLoad}}" lesson_id="{{lesson_id}}" ></school_lesson_info>
 </view>
