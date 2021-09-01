@@ -23,7 +23,7 @@ Page({
     app.loginPromiseNew.then(function(resolve){
       if (app.globalData.cellNumber != ''){
         that.setData({role: app.globalData.role})
-        var getSchoolLessonInfoUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/' + options.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
+        var getSchoolLessonInfoUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLesson/' + options.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
         wx.request({
           url: getSchoolLessonInfoUrl,
           method: 'GET',
@@ -156,7 +156,7 @@ Page({
         console.log(res)
         var schoolLesson = this.data.school_lesson
         schoolLesson.order_id = res.data.order_id
-        var updateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/' + schoolLesson.id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        var updateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLesson/' + schoolLesson.id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: updateUrl,
           method: 'PUT',

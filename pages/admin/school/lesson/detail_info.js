@@ -56,7 +56,7 @@ Page({
       that.setData({role: app.globalData.role})
       if (options.id != undefined) {
         that.data.id = options.id
-        var getSchoolLessonUrl = 'https://' + app.globalData.domainName.trim() + '/core/schoollesson/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        var getSchoolLessonUrl = 'https://' + app.globalData.domainName.trim() + '/core/schoollesson/GetSchoolLesson/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: getSchoolLessonUrl,
           method: 'GET',
@@ -321,7 +321,7 @@ Page({
 
     if (this.data.id == 0)
     {
-      var submitUrl = 'https://' + app.globalData.domainName + '/core/schoollesson?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      var submitUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/PostSchoolLesson?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     
       wx.request({
         url: submitUrl,
@@ -336,7 +336,7 @@ Page({
     }
     else {
       var id = this.data.id.toString()
-      var submitUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      var submitUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/PutSchoolLesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: submitUrl,
         method: 'PUT',

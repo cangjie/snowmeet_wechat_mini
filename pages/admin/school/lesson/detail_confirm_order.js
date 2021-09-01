@@ -30,7 +30,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
-      var getLessonInfoUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      var getLessonInfoUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: getLessonInfoUrl,
         method: 'GET',
@@ -189,7 +189,7 @@ Page({
     school_lesson.others_fee = this.data.others_fee
     var that = this
     wx.request({
-      url: 'https://' + app.globalData.domainName + '/core/schoollesson/' + this.data.school_lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+      url: 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLesson/' + this.data.school_lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
       method: 'PUT',
       data: school_lesson,
       success: (res) => {

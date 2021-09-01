@@ -30,7 +30,7 @@ Component({
       var id = this.properties.lesson_id
       var that = this
       app.loginPromiseNew.then(function(resolve){
-        var getInfoUrl = 'https://' + app.globalData.domainName + '/core/'  + 'schoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
+        var getInfoUrl = 'https://' + app.globalData.domainName + '/core/'  + 'schoollesson/GetSchoolLesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
         
         wx.request({
           url: getInfoUrl,
