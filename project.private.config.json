@@ -27,7 +27,7 @@
         {
           "name": "school_lesson_detail",
           "pathName": "pages/admin/school/lesson/detail_info",
-          "query": "id=73",
+          "query": "",
           "scene": null
         },
         {

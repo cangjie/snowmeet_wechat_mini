@@ -190,7 +190,7 @@ Page({
     school_lesson.others_fee = this.data.others_fee
     var that = this
     wx.request({
-      url: 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLesson/' + this.data.school_lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
+      url: 'https://' + app.globalData.domainName + '/core/schoollesson/PutSchoolLesson/' + this.data.school_lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey),
       method: 'PUT',
       data: school_lesson,
       success: (res) => {

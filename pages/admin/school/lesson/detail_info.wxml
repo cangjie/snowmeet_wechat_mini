@@ -17,7 +17,7 @@
       <view class="left-column" style="width:200rpx;text-align:right" ><font style="color:#ff0000" >*</font>性别：</view>
       <view class="right-column">
         <radio-group id="gender" bindchange="inputValueChange" >
-          <radio wx:if="{{school_lesson.gender == '男'}}" checked="{{school_lesson.gender == '男'}}"  value="男"  ></radio>男
+          <radio checked="{{school_lesson.gender == '男'}}"  value="男"  ></radio>男
           <radio value="女" checked="{{school_lesson.gender == '女'}}" ></radio>女
         </radio-group>
       </view>
