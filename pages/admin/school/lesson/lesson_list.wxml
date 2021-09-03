@@ -1,2 +1,32 @@
 <!--pages/admin/school/lesson/lesson_list.wxml-->
-<text>pages/admin/school/lesson/lesson_list.wxml</text>
+<view wx:if="{{role == 'staff'}}" >
+  <mp-cell wx:for="{{schoolLessonArr}}" >
+    <view bindtap="goToDetail" id="{{item.id}}">
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="col1" >姓名：</view>
+        <view class="col2" >{{item.name}}</view>
+        <view class="col3" >手机：</view>
+        <view class="col4" >{{item.cell_number}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="col1" >状态：</view>
+        <view class="col2" >{{item.status}}</view>
+        <view class="col3" >关系：</view>
+        <view class="col4" >{{item.student_relation}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="col1" >预约时间：</view>
+        <view class="col2" >{{item.create_date}}</view>
+        <view class="col3" >雪场：</view>
+        <view class="col4" >{{item.resort}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="col1" >上课时间：</view>
+        <view class="col2" >{{item.lesson_date}}</view>
+        <view class="col3" >教练：</view>
+        <view class="col4" >{{item.instructorName}}</view>
+      </view>
+    </view>
+  </mp-cell>
+  
+</view>

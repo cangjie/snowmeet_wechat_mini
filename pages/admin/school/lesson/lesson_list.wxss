@@ -1,1 +1,25 @@
 /* pages/admin/school/lesson/lesson_list.wxss */
+.col1{
+  width:20%;
+  text-align: right;
+  font-size: 11pt;
+  margin-top:10rpx
+}
+.col3{
+  width:20%;
+  text-align: right;
+  font-size: 11pt;
+  margin-top:10rpx
+}
+.col2{
+  width:30%;
+  text-align: left;
+  font-size: 11pt;
+  margin-top:10rpx;
+}
+.col4{
+  width:30%;
+  text-align: left;
+  font-size: 11pt;
+  margin-top:10rpx;
+}

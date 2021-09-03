@@ -1,18 +1,84 @@
 // pages/admin/school/lesson/lesson_list.js
+const util = require('../../../../utils/util.js')
+const app = getApp()
+
 Page({
 
   /**
    * Page initial data
    */
   data: {
-
+    role:'',
+    sessionKey: ''
   },
 
   /**
    * Lifecycle function--Called when page load
    */
-  onLoad: function (options) {
+  pageInitPromise: new Promise(function(resolve){
+    
+    var sessionKey = ''
+    var role = ''
+    var instructors = []
 
+    var that = this
+    app.loginPromiseNew.then(function(r){
+      sessionKey = app.globalData.sessionKey
+      role = app.globalData.role
+      var getInstructorUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor'
+      wx.request({
+        url: getInstructorUrl,
+        method: 'GET',
+        success: (res) => {
+          resolve({sessionKey: r.sessionKey, role: r.role, instructors: res.data})
+        }
+      })
+    })
+  }),
+  onLoad: function (options) {
+    var that = this
+    this.pageInitPromise.then(function(resolve) {
+      console.log(resolve)
+      var getListUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLessons?sessionkey=' + encodeURIComponent(resolve.sessionKey)
+      wx.request({
+        url: getListUrl,
+        method: 'Get',
+        success: (res) => {
+          var lessons = res.data
+          for(var i in lessons) {
+            var createDate = new Date(lessons[i].create_date)
+            lessons[i].create_date = util.formatDate(createDate)
+            var lessonDate = new Date(lessons[i].lesson_date)
+            lessons[i].lesson_date = util.formatDate(lessonDate)
+            var instructorName = ''
+            for(var j in resolve.instructors) {
+              if (resolve.instructors[j].open_id.trim() == lessons[i].instructor_open_id.trim()) {
+                instructorName = resolve.instructors[j].name
+                break
+              }
+            }
+            lessons[i].instructorName = instructorName
+            var status = ''
+            if (lessons[i].open_id.trim() == '') {
+              status = '未打开'
+            }
+            else if (lessons[i].pay_state == '0') {
+              status = '未支付'
+            }
+            else if (lessons[i].order_id != '0') {
+              status = '正在支付'
+            }
+            else if (lessons[i].pay_state == '1'){
+              status = '已支付'
+            }
+
+            lessons[i].status = status
+          }
+          that.setData({role: resolve.role, sessionKey: resolve.sessionKey, instructors: resolve.instructors, schoolLessonArr: lessons})
+        }
+      })
+    })
+    
   },
 
   /**
@@ -62,5 +128,11 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  goToDetail: function(source) {
+    var id = source.currentTarget.id
+    wx.navigateTo({
+      url: 'detail_info?id=' + id,
+    })
   }
 })
