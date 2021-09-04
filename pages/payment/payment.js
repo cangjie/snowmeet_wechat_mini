@@ -80,17 +80,26 @@ Page({
           wx.request({
             url: orderInfoUrl,
             success: (res) => {
-              if (res.data.status == 0) {
-                if (res.data.order_online.type.trim()=='雪票') {
-                  /*
-                  wx.requestSubscribeMessage({
-                    tmplIds: ['Fp_lJYTxVZVbc5PdvA-z-8UqUrf6VNAYH4EVFuf2af8'],
-                    success: (res)=>{ 
-  
-                    }
-                  })
-                  */
+              if (res.data.status == 0 && res.data.order_online.pay_state == '1') {
+                var orderType = res.data.order_online.type.trim()
+                switch(orderType){
+                  case '雪票':
+                    break
+                  case '课程':
+                    var syncPayStateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/syncpaystate/' + orderId
+                    wx.request({
+                      url: syncPayStateUrl,
+                      method: 'GET',
+                      success: (res) => {
+
+                      }
+                    })
+                    break
+                  default:
+                    break
                 }
+
+                
                 that.setData({havePaid: true, orderInfo: res.data.order_online})
               }
             }

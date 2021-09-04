@@ -39,7 +39,7 @@
         {
           "name": "custom_training_plan_confirm",
           "pathName": "pages/mine/school/lesson/lesson_detail",
-          "query": "id=73",
+          "query": "id=78",
           "scene": null
         },
         {
