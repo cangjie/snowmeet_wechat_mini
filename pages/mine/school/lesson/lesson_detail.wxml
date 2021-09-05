@@ -49,13 +49,15 @@
         <view class="right-column" >{{school_lesson.training_fee + school_lesson.ticket_fee + school_lesson.rent_fee + school_lesson.others_fee}}</view>
       </view>
     </mp-cell>
-    <mp-cell>
-      <!--button wx:if="{{role == 'staff'}}" open-type="share" > 通过企业微信转发 </button-->
-      <button wx:if="{{role == 'staff'}}" bindtap="share" open-type="share"  > 通过企业微信转发 </button>
+    <mp-cell  wx:if="{{role=='staff'}}" >
+      <button bindtap="share" open-type="share"  > 通过企业微信转发 </button>
+      <button wx:if="{{school_lesson.status=='已支付'}}" bindtap="share" bindtap="tapUseButton"  > 上 课 前 核 销 </button>
+      <mp-dialog title=" 确 认 核 销 " style="width:100%" show="{{useDialogShow}}" bindbuttontap="tapDialogButton" buttons="{{dialogButtons}}" >
+        <textarea placeholder="填写备注" style="text-align: left;" bindinput="inputMemo" ></textarea>
+      </mp-dialog>
     </mp-cell>
     <mp-cell>
-      <button bindtap="placeOrder"> 确 认 支 付 </button>
+      <button wx:if="{{school_lesson.status=='未支付' || school_lesson.status=='支付未成功'}}" bindtap="placeOrder"> 确 认 支 付 </button>
     </mp-cell>
   </mp-cells>
-  
 </view>

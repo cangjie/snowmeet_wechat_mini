@@ -30,6 +30,9 @@ function init(app, that) {
                     url: updateUrl
                   })
                 }
+              },
+              fail: (res) => {
+                console.log(res)
               }
             })
           }

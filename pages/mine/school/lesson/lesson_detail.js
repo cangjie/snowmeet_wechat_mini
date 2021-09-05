@@ -1,5 +1,5 @@
 // pages/mine/school/lesson/lesson_detail.js
-const app = getApp()
+var app = getApp()
 Page({
 
   /**
@@ -11,7 +11,9 @@ Page({
     showPreview: false,
     canView: true,
     needUpdate: false,
-    loadComponent: false
+    loadComponent: false,
+    dialogButtons: [{text: '取消'}, {text: '确定'}],
+    useDialogShow: false
   },
 
   /**
@@ -26,6 +28,16 @@ Page({
       success: (res) => {
         console.log(res)
         var school_lesson = res.data
+        if (school_lesson.status == '支付未成功') {
+          var syncPayStateUrl = 'https://' + app.domainName + '/core/schoollesson/SyncPayState/' + school_lesson.order_id.toString()
+          wx.request({
+            url: syncPayStateUrl,
+            success: (res) => {
+              that.setData({school_lesson: res.data})
+            }
+          })
+
+        }
         var tempImageUrlArray = school_lesson.videos.toString().split(',')
         school_lesson.videos_array = new Array()
         for(var i in tempImageUrlArray) {
@@ -70,52 +82,6 @@ Page({
       }
     })
   },
-  onLoad1: function (options) {
-   
-    this.data.id = options.id
-    var that = this
-    app.loginPromiseNew.then(function(resolve){
-      if (app.globalData.cellNumber != ''){
-        that.setData({role: app.globalData.role})
-        var getSchoolLessonInfoUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLesson/' + options.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
-        wx.request({
-          url: getSchoolLessonInfoUrl,
-          method: 'GET',
-          success: (res) => {
-            var school_lesson = res.data
-            var tempImageUrlArray = school_lesson.videos.toString().split(',')
-            school_lesson.videos_array = new Array()
-            for(var i in tempImageUrlArray) {
-              school_lesson.videos_array.push({url: tempImageUrlArray[i].replace('.mp4', '.jpg')})
-            }
-            var canView = true
-            if (school_lesson.cell_number != app.globalData.cellNumber) {
-              canView = false
-            }
-            that.setData({school_lesson: school_lesson, isLogin: true, school_lesson_id: options.id, canView: canView})
-            if (school_lesson != undefined && school_lesson.open_id.trim() == '' && app.globalData.role != 'staff' ) {
-              var assignUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/assignopenid/' + options.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-              wx.request({
-                url: assignUrl,
-                method: 'GET',
-                success: (res) => {
-                  that.setData({loadComponent: true})
-                }
-              })
-            }
-            else{
-              that.setData({loadComponent: true})
-            }
-          }
-        })
-      }
-      else {
-        that.setData({needUpdate: true})
-      }
-      
-    })
-  },
-
   /**
    * Lifecycle function--Called when page is initially rendered
    */
@@ -173,6 +139,7 @@ Page({
   },
   onUpdateSuccess: function() {
     this.setData({needUpdate: false})
+    app = getApp()
     this.fillPageData()
   },
   placeOrder: function() {
@@ -231,5 +198,41 @@ Page({
         })
       }
     })
+  },
+  tapUseButton: function(source) {
+    this.setData({useDialogShow: true})
+  },
+  tapDialogButton: function(source){
+    console.log(source)
+    this.setData({useDialogShow: false})
+    var that = this
+    if (source.detail.index == 1) {
+      console.log('use operation')
+      var lesson = this.data.school_lesson
+      lesson.used = 1
+      lesson.use_date = new Date()
+      lesson.use_memo = this.data.tempUseMemo
+      var updateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/PutSchoolLesson/' + lesson.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: updateUrl,
+        method: 'PUT',
+        data: lesson,
+        success: (res) => {
+          console.log(res)
+          //that.setData({school_lesson: res.data})
+          var getSchoolLessonUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/getschoollesson/' + lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: getSchoolLessonUrl,
+            method: 'GET',
+            success: (res) => {
+              that.setData({school_lesson: res.data})
+            }
+          })
+        }
+      })
+    }
+  },
+  inputMemo: function(source) {
+    this.data.tempUseMemo = source.detail.value.trim()
   }
 })

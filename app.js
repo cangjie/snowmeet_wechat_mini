@@ -38,161 +38,80 @@ App({
   loginPromiseNew: new Promise(function(resolve){
     var app = getApp();
     console.log('start to log in.')
-    if (app == null || app.globalData == undefined || app.globalData.sessionKey == undefined || app.globalData.sessionKey == '' || app.globalData.userInfo == null) {
-      wx.login({
-        success:(res)=>{
-          app = getApp()
-          console.log('weixin log in success.')
-          console.log(res)
-          var url = 'https://' + app.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
-          wx.request({
-            url: url,
-            method: 'GET',
-            success: (res) => {
-              console.log('get seesionkey success')
-              console.log(res)
-              app.globalData.sessionKey = res.data.session_key
-              var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-              wx.request({
-                url: url,
-                method: 'GET',
-                success: (res) => {
-                  console.log('get user info success')
-                  console.log(res)
-                  if (res.data.status == 0 && res.data.count > 0){
-                    if (res.data.mini_users[0].is_admin == '1') {
-                      app.globalData.role = 'staff'
-                    }
-                    if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
-                      console.log('get user detail info')
-                      wx.getUserInfo({
-                        success: (res) => {
-                          console.log('get user detail info success')
-                          console.log(res)
-                          if (res.userInfo != null) {
-                            app.globalData.userInfo = res.userInfo
-                            var gender = ''
-                            switch(res.userInfo.gender) {
-                              case 1:
-                                gender = '男'
-                                break
-                              case 2:
-                                gender = '女'
-                                break
-                              default:
-                                break
-                            }
-                            app.globalData.userInfo.gender = gender
-                            
-                            var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(app.globalData.userInfo.nickName) + '&headimage=' + encodeURIComponent(app.globalData.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
-                            wx.request({
-                              url: updateUrl,
-                              success: (res) =>{
-                                console.log('update user info success')
-                              }
-                            })
-                            resolve(app.globalData)
-                          }
-                        },
-                        fail: (res) => {
-                          resolve(app.globalData)
-                        }
-                      })
-                    }
-                    else{
-                      resolve(app.globalData)
-                    }
-                  }
-                }
-              })
-            }
-          })
-        }
-      })
-    }
-    else{
-      console.log('already logged in.')
-      resolve(app.globalData)
-    }
-  }),
-  
-  loginPromiseNewTest: new Promise(function(resolve){
     wx.login({
-      success: res => {
+      success:(res)=>{
         const app = getApp()
+        console.log('weixin log in success.')
+        console.log(res)
         var url = 'https://' + app.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
         wx.request({
           url: url,
-          header: {
-            'content-type': 'application/json' // 默认值
-          },
-          success: res => {
-            try
-            {
-              app.globalData.sessionKey = res.data.session_key
-              var getUserInfoPromise = new Promise(function(resolve) {
-                var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-                wx.request({
-                  url: url,
-                  success: (res) => {
-                    
-                    if (res.data.status == 0 && res.data.count > 0){
-                      app.globalData.cellNumber = res.data.mini_users[0].cell_number
-                      if (res.data.mini_users[0].is_admin == '1') {
-                        app.globalData.role = 'staff'
-                      }
-                      if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
-                        wx.getUserInfo({
-                          success: (res) => {
-                            if (res.userInfo != null) {
-                              app.globalData.userInfo = res.userInfo
-                              var gender = ''
-                              switch(res.userInfo.gender) {
-                                case 1:
-                                  gender = '男'
-                                  break
-                                case 2:
-                                  gender = '女'
-                                  break
-                                default:
-                                  break
-                              }
-                              app.globalData.userInfo.gender = gender
-                              var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(app.globalData.userInfo.nickName) + '&headimage=' + encodeURIComponent(app.globalData.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
-                              wx.request({
-                                url: updateUrl
-                              })
-                              
-                            }
+          method: 'GET',
+          success: (res) => {
+            console.log('get seesionkey success')
+            console.log(res)
+            app.globalData.sessionKey = res.data.session_key
+            var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+            wx.request({
+              url: url,
+              method: 'GET',
+              success: (res) => {
+                console.log('get user info success')
+                console.log(res)
+                if (res.data.status == 0 && res.data.count > 0){
+                  if (res.data.mini_users[0].is_admin == '1') {
+                    app.globalData.role = 'staff'
+                  }
+                  app.globalData.cellNumber = res.data.mini_users[0].cell_number
+                  if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
+                    console.log('get user detail info')
+                    wx.getUserInfo({
+                      success: (res) => {
+                        console.log('get user detail info success')
+                        console.log(res)
+                        if (res.userInfo != null) {
+                          app.globalData.userInfo = res.userInfo
+                          var gender = ''
+                          switch(res.userInfo.gender) {
+                            case 1:
+                              gender = '男'
+                              break
+                            case 2:
+                              gender = '女'
+                              break
+                            default:
+                              break
                           }
-                        })
-                        
+                          app.globalData.userInfo.gender = gender  
+                          var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(app.globalData.userInfo.nickName) + '&headimage=' + encodeURIComponent(app.globalData.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
+                          wx.request({
+                            url: updateUrl,
+                            success: (res) =>{
+                              console.log('update user info success')
+                            }
+                          })
+                          resolve(app.globalData)
+                        }
+                      },
+                      fail: (res) => {
+                        console.log(res)
+                        resolve(app.globalData)
                       }
-                      else {
-                        app.globalData.userInfo = {avatarUrl: res.data.mini_users[0].head_image, nickName: res.data.mini_users[0].nick, gender: res.data.mini_users[0].gender}
-                      }
-                    }
+                    })
+                  }
+                  else{
                     resolve(app.globalData)
                   }
-                })
-                
-              })
-              
-              getUserInfoPromise.then(function(resolveMsg){
-                resolve(app.globalData)
-              })
-              
-            }
-            catch(errMsg)
-            {
-              console.log(errMsg)
-            }
+                }
+              }
+            })
           }
         })
-
       }
     })
+    
   }),
+  /*
   loginPromise: new Promise(function(resolve){
     wx.login({
       success: res => {
@@ -267,6 +186,7 @@ App({
       }
     })
   }),
+  */
   globalData: {
     appId:'wxd1310896f2aa68bb',
     domainName:'mini.snowmeet.top',

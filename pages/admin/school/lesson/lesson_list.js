@@ -58,21 +58,7 @@ Page({
               }
             }
             lessons[i].instructorName = instructorName
-            var status = ''
-            if (lessons[i].open_id.trim() == '') {
-              status = '未打开'
-            }
-            else if (lessons[i].pay_state == '0') {
-              status = '未支付'
-            }
-            else if (lessons[i].order_id != '0') {
-              status = '正在支付'
-            }
-            else if (lessons[i].pay_state == '1'){
-              status = '已支付'
-            }
-
-            lessons[i].status = status
+            
           }
           that.setData({role: resolve.role, sessionKey: resolve.sessionKey, instructors: resolve.instructors, schoolLessonArr: lessons})
         }
@@ -131,8 +117,20 @@ Page({
   },
   goToDetail: function(source) {
     var id = source.currentTarget.id
-    wx.navigateTo({
-      url: 'detail_info?id=' + id,
+    var targetUrl = 'detail_info?id=' + id
+    var getSchoolLessonUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/getschoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
+    wx.request({
+      url: getSchoolLessonUrl,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.status != '未打开' && res.data.status != '未支付'){
+          targetUrl = '/pages/mine/school/lesson/lesson_detail?id=' + id
+        }
+        wx.navigateTo({
+          url: targetUrl
+        })
+      }
     })
+    
   }
 })
