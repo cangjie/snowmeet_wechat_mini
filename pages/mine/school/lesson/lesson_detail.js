@@ -17,7 +17,60 @@ Page({
   /**
    * Lifecycle function--Called when page load
    */
-  onLoad: function (options) {
+  fillPageData: function(){
+    var that = this
+    var getSchoolLessonInfoUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLesson/' + that.data.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&cell=' + app.globalData.cellNumber
+    wx.request({
+      url: getSchoolLessonInfoUrl,
+      method: 'GET',
+      success: (res) => {
+        console.log(res)
+        var school_lesson = res.data
+        var tempImageUrlArray = school_lesson.videos.toString().split(',')
+        school_lesson.videos_array = new Array()
+        for(var i in tempImageUrlArray) {
+          if (tempImageUrlArray[i].trim() != ''){
+            school_lesson.videos_array.push({url: tempImageUrlArray[i].replace('.mp4', '.jpg')})
+          }
+        }
+        var canView = true
+        if (school_lesson.cell_number != app.globalData.cellNumber) {
+          canView = false
+        }
+        that.setData({school_lesson: school_lesson, isLogin: true, school_lesson_id: that.data.id, canView: canView})
+        if (school_lesson != undefined && school_lesson.open_id.trim() == '' && app.globalData.role != 'staff' ) {
+          var assignUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/assignopenid/' + that.data.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: assignUrl,
+            method: 'GET',
+            success: (res) => {
+              that.setData({loadComponent: true})
+            }
+          })
+        }
+        else{
+          that.setData({loadComponent: true})
+        }
+      }
+    })
+  },
+  onLoad: function(options){
+    this.data.id = options.id
+    var that = this
+    console.log('page start')
+    app.loginPromiseNew.then(function(resolve){
+      console.log('after log in')
+      that.setData({role: app.globalData.role})
+      if (app.globalData.role == 'staff' || app.globalData.cellNumber != '') {
+        console.log('ready to load page data')
+        that.fillPageData()
+      }
+      else {
+        that.setData({needUpdate: true})
+      }
+    })
+  },
+  onLoad1: function (options) {
    
     this.data.id = options.id
     var that = this
@@ -33,7 +86,6 @@ Page({
             var tempImageUrlArray = school_lesson.videos.toString().split(',')
             school_lesson.videos_array = new Array()
             for(var i in tempImageUrlArray) {
-              //school_lesson.videos_array[i] = school_lesson.videos_array[i].replace('.mp4', '.jpg')
               school_lesson.videos_array.push({url: tempImageUrlArray[i].replace('.mp4', '.jpg')})
             }
             var canView = true
@@ -120,13 +172,8 @@ Page({
     }
   },
   onUpdateSuccess: function() {
-    if (app.globalData.cellNumber != '' && this.data.needUpdate){
-      wx.navigateTo({
-        url: 'lesson_detail?id=' + this.data.id,
-      })
-    }
-    
-    
+    this.setData({needUpdate: false})
+    this.fillPageData()
   },
   placeOrder: function() {
     var trainingProductId = 203
@@ -170,7 +217,7 @@ Page({
         console.log(res)
         var schoolLesson = this.data.school_lesson
         schoolLesson.order_id = res.data.order_id
-        var updateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/GetSchoolLesson/' + schoolLesson.id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        var updateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/PutSchoolLesson/' + schoolLesson.id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: updateUrl,
           method: 'PUT',

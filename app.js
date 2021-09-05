@@ -36,28 +36,39 @@ App({
   
   },
   loginPromiseNew: new Promise(function(resolve){
-    wx.login({
-      success: (res) => {
-        const app = getApp()
-        if (app.globalData.sessionKey == undefined || app.globalData.sessionKey == '' || app.globalData.userInfo == null) {
+    var app = getApp();
+    console.log('start to log in.')
+    if (app == null || app.globalData == undefined || app.globalData.sessionKey == undefined || app.globalData.sessionKey == '' || app.globalData.userInfo == null) {
+      wx.login({
+        success:(res)=>{
+          app = getApp()
+          console.log('weixin log in success.')
+          console.log(res)
           var url = 'https://' + app.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
           wx.request({
             url: url,
             method: 'GET',
             success: (res) => {
+              console.log('get seesionkey success')
+              console.log(res)
               app.globalData.sessionKey = res.data.session_key
-              
               var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
               wx.request({
                 url: url,
+                method: 'GET',
                 success: (res) => {
+                  console.log('get user info success')
+                  console.log(res)
                   if (res.data.status == 0 && res.data.count > 0){
                     if (res.data.mini_users[0].is_admin == '1') {
                       app.globalData.role = 'staff'
                     }
                     if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
+                      console.log('get user detail info')
                       wx.getUserInfo({
                         success: (res) => {
+                          console.log('get user detail info success')
+                          console.log(res)
                           if (res.userInfo != null) {
                             app.globalData.userInfo = res.userInfo
                             var gender = ''
@@ -72,32 +83,39 @@ App({
                                 break
                             }
                             app.globalData.userInfo.gender = gender
+                            
                             var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(app.globalData.userInfo.nickName) + '&headimage=' + encodeURIComponent(app.globalData.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
                             wx.request({
-                              url: updateUrl
+                              url: updateUrl,
+                              success: (res) =>{
+                                console.log('update user info success')
+                              }
                             })
                             resolve(app.globalData)
-                            }
                           }
-                        })
-                      }
-                      else {
-                        app.globalData.userInfo = {avatarUrl: res.data.mini_users[0].head_image, nickName: res.data.mini_users[0].nick, gender: res.data.mini_users[0].gender}
-                      }
+                        },
+                        fail: (res) => {
+                          resolve(app.globalData)
+                        }
+                      })
                     }
-                    resolve(app.globalData)
+                    else{
+                      resolve(app.globalData)
+                    }
                   }
-                })
-              
+                }
+              })
             }
           })
         }
-        else {
-          resolve(app.globalData)
-        }
-      }
-    })
+      })
+    }
+    else{
+      console.log('already logged in.')
+      resolve(app.globalData)
+    }
   }),
+  
   loginPromiseNewTest: new Promise(function(resolve){
     wx.login({
       success: res => {
