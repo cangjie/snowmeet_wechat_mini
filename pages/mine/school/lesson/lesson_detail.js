@@ -234,5 +234,10 @@ Page({
   },
   inputMemo: function(source) {
     this.data.tempUseMemo = source.detail.value.trim()
+  },
+  uploadLessonVideo: function(){
+    wx.navigateTo({
+      url: '../../../admin/school/lesson/upload_lesson_remark_videos?id=' + this.data.id,
+    })
   }
 })

@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "video-uploader": "/components/uploader/video-uploader",
+    "school_lesson_info": "/components/school_lesson_info/school_lesson_info"
+  }
+}
