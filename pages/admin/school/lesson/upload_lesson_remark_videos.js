@@ -20,7 +20,14 @@ Page({
     var that = this
     this.setData({uploadVideo: this.uploadVideo.bind(this)})
     app.loginPromiseNew.then(function(resolve){
-      that.setData({role: app.globalData.role, id: id, loadComponents: true})
+      var getLessonUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/getschoollesson/' + id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getLessonUrl,
+        method: 'GET',
+        success:(res)=>{
+          that.setData({role: app.globalData.role, id: id, loadComponents: true, school_lesson:res.data})
+        }
+      })   
     })
   },
 
@@ -73,6 +80,10 @@ Page({
 
   },
 
+  inputRemark: function(source){
+    this.data.school_lesson.instructor_remark = source.detail.value.trim()
+  },
+
   uploadVideo: function(files) {
     var uploadUrl = 'https://' + app.globalData.domainName + '/upload_video.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     return new Promise(function(resolve)  {  
@@ -111,7 +122,7 @@ Page({
       videos = videos + ',' + videoThumbs[item].url.replace('.jpg', '.mp4')
     }
     videos = videos.substr(1, videos.length - 1)
-    this.data.school_lesson.videos = videos
+    this.data.school_lesson.lesson_videos = videos
     this.setData({videoThumbs: videoThumbs})
   },
   deleteVideo: function(res) {
@@ -128,7 +139,18 @@ Page({
       videos = videos + ',' + videoThumbs[item].url.replace('.jpg', '.mp4')
     }
     videos = videos.substr(1, videos.length - 1)
-    this.data.school_lesson.videos = videos
+    this.data.school_lesson.lesson_videos = videos
     this.setData({videoThumbs: newVideoThumbs})
+  },
+  submit: function() {
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/PutSchoolLesson/' + this.data.school_lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'PUT',
+      data: this.data.school_lesson,
+      success:(res)=>{
+        console.log(res)
+      }
+    })
   }
 })
