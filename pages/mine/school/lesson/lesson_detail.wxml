@@ -55,7 +55,7 @@
       <mp-dialog title=" 确 认 核 销 " style="width:100%" show="{{useDialogShow}}" bindbuttontap="tapDialogButton" buttons="{{dialogButtons}}" >
         <textarea placeholder="填写备注" style="text-align: left;" bindinput="inputMemo" ></textarea>
       </mp-dialog>
-      <button wx:if="{{school_lesson.status=='已核销'}}" bindtap="share" bindtap="uploadLessonVideo"  > 教练点评及视频 </button>
+      <button wx:if="{{school_lesson.status=='已核销' || school_lesson.status=='教练已点评'}}" bindtap="share" bindtap="uploadLessonVideo"  > 教练点评及视频 </button>
     </mp-cell>
     <mp-cell>
       <button wx:if="{{school_lesson.status=='未支付' || school_lesson.status=='支付未成功'}}" bindtap="placeOrder"> 确 认 支 付 </button>

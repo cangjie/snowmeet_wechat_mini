@@ -123,7 +123,7 @@ Page({
       url: getSchoolLessonUrl,
       method: 'GET',
       success: (res) => {
-        if (res.data.status != '未打开' && res.data.status != '未支付'){
+        if (res.data.status != '未打开' && res.data.status != '未支付' ){
           targetUrl = '/pages/mine/school/lesson/lesson_detail?id=' + id
         }
         wx.navigateTo({

@@ -25,7 +25,18 @@ Page({
         url: getLessonUrl,
         method: 'GET',
         success:(res)=>{
-          that.setData({role: app.globalData.role, id: id, loadComponents: true, school_lesson:res.data})
+          var videoThumbs = []
+          var videoThumbArr = []
+          if (res.data.lesson_videos != null){
+            videoThumbArr = res.data.lesson_videos.split(',')
+          }  
+          
+          for(var i = 0; i < videoThumbArr.length; i++) {
+            if (videoThumbArr[i].trim() != ''){
+              videoThumbs.push({url: videoThumbArr[i].trim().replace('.mp4', '.jpg')})
+            }
+          }
+          that.setData({role: app.globalData.role, id: id, loadComponents: true, school_lesson:res.data, videoThumbs: videoThumbs})
         }
       })   
     })

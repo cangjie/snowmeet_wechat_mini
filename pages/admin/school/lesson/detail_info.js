@@ -80,6 +80,7 @@ Page({
                 break
               }
             }
+            
             that.setData({school_lesson: res.data, videoThumbs: videoThumbs, instructorSelectedIndex: instructorIndex})
           }
         })

@@ -4,7 +4,7 @@
       <video-uploader id="video-uploader" bindfail="uploadVideoError" bindsuccess="uploadVideoSuccess" select="{{selectedViddeos}}" upload="{{uploadVideo}}" files="{{videoThumbs}}" max-count="4" title="上传1分钟以内的mp4视频" binddelete="deleteVideo"  />
     </mp-cell>
     <mp-cell>
-      <textarea placeholder="教练点评" bindinput="inputRemark" ></textarea>
+      <textarea placeholder="{{(school_lesson.instructor_remark != null)?'':'教练点评'}}" bindinput="inputRemark" >{{(school_lesson.instructor_remark != null)?school_lesson.instructor_remark:''}}</textarea>
     </mp-cell>
     <mp-cell>
       <button bindtap="submit"> 提 交 </button>
