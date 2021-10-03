@@ -14,6 +14,7 @@
   </mp-cells>
   <mp-cells ext-class="my-cells" title="滑雪学校" >
     <mp-cell id="reserve_instructor" value="课程预约" bindtap="nav" ></mp-cell>
+    <mp-cell id="reserve_instructor_list" value="预约列表" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="测试" >
     <mp-cell id="test_upload" value="上传视频" bindtap="nav" ></mp-cell>

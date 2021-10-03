@@ -50,7 +50,7 @@
       </view>
     </mp-cell>
     <mp-cell  wx:if="{{role=='staff'}}" >
-      <button bindtap="share" open-type="share"  > 通过企业微信转发 </button>
+      <button bindtap="share" open-type="share" style="width:65%"  > 通过企业微信转发 </button>
       <button wx:if="{{school_lesson.status=='已支付'}}" bindtap="share" bindtap="tapUseButton"  > 上 课 前 核 销 </button>
       <mp-dialog title=" 确 认 核 销 " style="width:100%" show="{{useDialogShow}}" bindbuttontap="tapDialogButton" buttons="{{dialogButtons}}" >
         <textarea placeholder="填写备注" style="text-align: left;" bindinput="inputMemo" ></textarea>

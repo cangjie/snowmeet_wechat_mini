@@ -35,7 +35,7 @@ Page({
   onLoad: function (options) {
     if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
       var that = this
-      app.loginPromise.then(function(resolve) {
+      app.loginPromiseNew.then(function(resolve) {
         init(that)
       })
     }
@@ -132,6 +132,9 @@ Page({
         break
       case 'reserve_instructor':
         path = '/pages/admin/school/lesson/detail_info'
+        break
+      case 'reserve_instructor_list':
+        path = '/pages/admin/school/lesson/lesson_list'
         break
       default:
         break
