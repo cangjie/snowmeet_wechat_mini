@@ -67,7 +67,8 @@ Page({
     })
   },
   onLoad: function(options){
-    this.data.id = options.id
+    //this.data.id = options.id
+    this.setData({id: options.id})
     var that = this
     console.log('page start')
     app.loginPromiseNew.then(function(resolve){
@@ -129,9 +130,10 @@ Page({
    */
   onShareAppMessage: function () {
     var that = this
+    var jumpUrl = '/pages/mine/school/lesson/lesson_detail?id=' + that.data.school_lesson_id
     return {
       title: '课程确认',
-      path: '/pages/mine/school/lesson/lesson_detail?id=' + that.data.school_lesson_id,
+      path: jumpUrl,
       success: (res) => {
         console.log(res)
       }
