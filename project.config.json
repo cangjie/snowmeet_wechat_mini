@@ -116,8 +116,8 @@
                 {
                     "name": "lesson_custom_detail",
                     "pathName": "pages/mine/school/lesson/lesson_detail",
-                    "query": "id=107",
-                    "scene": 1000
+                    "query": "id=111",
+                    "scene": 1007
                 }
             ]
         }

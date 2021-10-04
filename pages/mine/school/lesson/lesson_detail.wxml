@@ -58,7 +58,7 @@
       <button wx:if="{{school_lesson.status=='已核销' || school_lesson.status=='教练已点评'}}" bindtap="share" bindtap="uploadLessonVideo"  > 教练点评及视频 </button>
     </mp-cell>
     <mp-cell>
-      <button wx:if="{{school_lesson.status=='未支付' || school_lesson.status=='支付未成功'}}" bindtap="placeOrder"> 确 认 支 付 </button>
+      <button wx:if="{{school_lesson.status=='未打开' || school_lesson.status=='未支付' || school_lesson.status=='支付未成功'}}" bindtap="placeOrder"> 确 认 支 付 </button>
     </mp-cell>
   </mp-cells>
 </view>
