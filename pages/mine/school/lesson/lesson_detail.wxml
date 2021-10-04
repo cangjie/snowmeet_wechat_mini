@@ -62,4 +62,3 @@
     </mp-cell>
   </mp-cells>
 </view>
-<view>{{id}}</view>
