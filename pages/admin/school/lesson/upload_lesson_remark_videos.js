@@ -163,7 +163,7 @@ Page({
       success:(res)=>{
         console.log(res)
         wx.navigateTo({
-          url: '/pages/mine/school/lesson/lesson_detail?id=' + that.data.id,
+          url: '/pages/admin/school/lesson/lesson_list',
         })
       }
     })
