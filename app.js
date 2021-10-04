@@ -231,14 +231,14 @@ App({
       {
         "pagePath": "/pages/skipass/skipass",
         "text": "雪票",
-        "iconPath": "images/book-3-line.png",
-        "selectedIconPath": "images/book-3-line-hl.png"
+        "iconPath": "/images/book-3-line.png",
+        "selectedIconPath": "/images/book-3-line-hl.png"
       },
       {
         "pagePath": "/pages/mine/mine",
         "text": "我的",
-        "iconPath": "images/home-2-line.png",
-        "selectedIconPath": "images/home-2-line-hl.png"
+        "iconPath": "/images/home-2-line.png",
+        "selectedIconPath": "/images/home-2-line-hl.png"
       }
     ]
   }
