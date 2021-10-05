@@ -208,6 +208,7 @@ Page({
     console.log(source)
     this.setData({useDialogShow: false})
     var that = this
+    
     if (source.detail.index == 1) {
       console.log('use operation')
       var lesson = this.data.school_lesson
@@ -228,6 +229,9 @@ Page({
             method: 'GET',
             success: (res) => {
               that.setData({school_lesson: res.data})
+              wx.navigateTo({
+                url: 'lesson_detail?id=' + that.data.id,
+              })
             }
           })
         }

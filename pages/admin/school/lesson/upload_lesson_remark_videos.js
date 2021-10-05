@@ -154,6 +154,7 @@ Page({
     this.setData({videoThumbs: newVideoThumbs})
   },
   submit: function() {
+    var that = this
     var updateUrl = 'https://' + app.globalData.domainName + '/core/schoollesson/PutSchoolLesson/' + this.data.school_lesson.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: updateUrl,
@@ -161,6 +162,9 @@ Page({
       data: this.data.school_lesson,
       success:(res)=>{
         console.log(res)
+        wx.navigateTo({
+          url: '/pages/admin/school/lesson/lesson_list',
+        })
       }
     })
   }
