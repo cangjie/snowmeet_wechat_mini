@@ -6,7 +6,8 @@ Page({
    * Page initial data
    */
   data: {
-    role: ''
+    role: '',
+    canGetInfo: false
   },
 
   /**
@@ -17,11 +18,11 @@ Page({
     if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
       var that = this
       app.loginPromiseNew.then(function(resolve) {
-        that.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role})
+        that.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role, canGetInfo: true})
       })
     }
     else {
-      this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role})
+      this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role, canGetInfo: true})
     }
     
   },
