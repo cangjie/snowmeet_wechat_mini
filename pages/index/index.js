@@ -16,7 +16,7 @@ Page({
     })
   },
   onLoad: function () {
-    wxloginModule.wxlogin()
+    //wxloginModule.wxlogin()
     /*
     wx.navigateTo({
       url: '/pages/maintain/in_shop_request/in_shop_request',
