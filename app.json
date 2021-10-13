@@ -1,58 +1,59 @@
 {
-  "pages": [
-    "pages/index/index",
-    "pages/logs/logs",
-    "pages/test/scan/scan",
-    "pages/test/tab/tab",
-    "pages/test/pay/pay",
-    "pages/test/upload/upload",
-    "pages/skipass/skipass",
-    "pages/mine/mine",
-    "pages/payment/payment",
-    "pages/mine/my_ski_pass/my_ski_pass",
-    "pages/maintain/in_shop_request/in_shop_request",
-    "pages/admin/admin",
-    "pages/mine/my_maintain/my_maintain",
-    "pages/maintain/in_shop_request_payment/in_shop_request_payment",
-    "pages/mine/my_maintain/my_maintain_detail",
-    "pages/mine/my_warmer/my_warmer",
-    "pages/admin/warmer_demand/warmer_demand",
-    "pages/admin/expierence/expierence_admit",
-    "pages/admin/expierence/expierence_return",
-    "pages/admin/expierence/expierence_active_list",
-    "pages/admin/expierence/ expierence_refund",
-    "pages/ble/printer_test",
-    "pages/admin/equip_maintain/on_site/recept",
-    "pages/admin/equip_maintain/on_site/recept_pay",
-    "pages/admin/equip_maintain/on_site/recept_list",
-    "pages/admin/scan/scan",
-    "pages/test/ble/label_printer",
-    "pages/admin/equip_maintain/on_site/print_label_new",
-    "pages/admin/equip_maintain/on_site/recept_batch",
-    "pages/admin/school/lesson/detail_info",
-    "pages/admin/school/lesson/detail_confirm_order",
-    "pages/mine/school/lesson/lesson_detail",
-    "pages/test/scan/test",
-    "pages/test/upload/choose_video_upload",
-    "pages/admin/school/lesson/lesson_list",
-    "pages/admin/school/lesson/upload_lesson_remark_videos"
-  ],
-  "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "WeChat",
-    "navigationBarTextStyle": "black"
-  },
-  "style": "v2",
-  "sitemapLocation": "sitemap.json",
-  "plugins": {
-    "mini-shop-plugin": {
-      "version": "1.0.72",
-      "provider": "wx34345ae5855f892d"
+    "pages": [
+        "pages/index/index",
+        "pages/logs/logs",
+        "pages/test/scan/scan",
+        "pages/test/tab/tab",
+        "pages/test/pay/pay",
+        "pages/test/upload/upload",
+        "pages/skipass/skipass",
+        "pages/mine/mine",
+        "pages/payment/payment",
+        "pages/mine/my_ski_pass/my_ski_pass",
+        "pages/maintain/in_shop_request/in_shop_request",
+        "pages/admin/admin",
+        "pages/mine/my_maintain/my_maintain",
+        "pages/maintain/in_shop_request_payment/in_shop_request_payment",
+        "pages/mine/my_maintain/my_maintain_detail",
+        "pages/mine/my_warmer/my_warmer",
+        "pages/admin/warmer_demand/warmer_demand",
+        "pages/admin/expierence/expierence_admit",
+        "pages/admin/expierence/expierence_return",
+        "pages/admin/expierence/expierence_active_list",
+        "pages/admin/expierence/ expierence_refund",
+        "pages/ble/printer_test",
+        "pages/admin/equip_maintain/on_site/recept",
+        "pages/admin/equip_maintain/on_site/recept_pay",
+        "pages/admin/equip_maintain/on_site/recept_list",
+        "pages/admin/scan/scan",
+        "pages/test/ble/label_printer",
+        "pages/admin/equip_maintain/on_site/print_label_new",
+        "pages/admin/equip_maintain/on_site/recept_batch",
+        "pages/admin/school/lesson/detail_info",
+        "pages/admin/school/lesson/detail_confirm_order",
+        "pages/mine/school/lesson/lesson_detail",
+        "pages/test/scan/test",
+        "pages/test/upload/choose_video_upload",
+        "pages/admin/school/lesson/lesson_list",
+        "pages/admin/school/lesson/upload_lesson_remark_videos",
+        "pages/payment/pay_temp_order"
+    ],
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#fff",
+        "navigationBarTitleText": "WeChat",
+        "navigationBarTextStyle": "black"
+    },
+    "style": "v2",
+    "sitemapLocation": "sitemap.json",
+    "plugins": {
+        "mini-shop-plugin": {
+            "version": "1.0.72",
+            "provider": "wx34345ae5855f892d"
+        }
+    },
+    "useExtendedLib": {
+        "kbone": true,
+        "weui": true
     }
-  },
-  "useExtendedLib": {
-    "kbone": true,
-    "weui": true
-  }
 }

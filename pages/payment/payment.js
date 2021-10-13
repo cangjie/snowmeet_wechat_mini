@@ -1,6 +1,6 @@
 // pages/payment/payment.js
 const app = getApp()
-var wxloginModule = require('../../utils/wxlogin.js')
+//var wxloginModule = require('../../utils/wxlogin.js')
 Page({
 
   /**
