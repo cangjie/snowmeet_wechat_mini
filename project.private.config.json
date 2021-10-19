@@ -71,6 +71,12 @@
           "pathName": "pages/mine/mine",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "pay temp",
+          "pathName": "pages/payment/pay_temp_order",
+          "query": "id=8622",
+          "scene": null
         }
       ]
     }

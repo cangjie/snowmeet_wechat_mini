@@ -7,7 +7,8 @@ Page({
      */
     data: {
         tempOrderId: 0,
-        validCellNumber: false
+        validCellNumber: false,
+        errorMessage: ''
     },
 
     /**
@@ -29,42 +30,89 @@ Page({
 
     },
 
+    placePayOrder: function(orderId){
+      var that = this
+      var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrderOnline/' + orderId + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getOrderUrl,
+        method: 'GET',
+        success:(res)=>{
+          console.log('Get Order:', res)
+          if (res.data.pay_state == 0){
+            var wepayUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/Pay/' + encodeURIComponent(app.globalData.sessionKey)+ '?id=' + orderId
+            wx.request({
+              url: wepayUrl,
+              method: 'GET',
+              success:(res)=>{
+                console.log('prepay', res)
+                var wepay = res.data
+                wx.requestPayment({
+                  nonceStr: wepay.nonce,
+                  package: 'prepay_id=' + wepay.prepay_id,
+                  paySign: wepay.sign,
+                  timeStamp: wepay.timestamp,
+                  signType: 'RSA',
+                  success: (res) => {
+                    console.log('pay success', res)  
+                  }
+                })
+              }
+            })
+          }
+          else{
+            if (res.data.pay_state == 1){
+              that.setData({errorMessage: '此订单已经支付。'})
+            }
+            else{
+              that.setData({errorMessage: '订单状态异常。'})
+            }
+          }
+        }
+      })
+    },
+
     placeOrder: function() {
-        var placeOrderUrl = 'https://' + app.globalData.domainName.trim() 
-        + '/api/place_online_order_temp.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-        + '&id=' + this.data.tempOrderId
+        var that = this
+        var getOrderTempUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlineTemp/GetOrderOnlineTemp/' + this.data.tempOrderId + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
-          url: placeOrderUrl,
+          url: getOrderTempUrl,
           method: 'GET',
-          success: (res) => {
-              if (res.data!=null && res.data.order_id != null 
-                && res.data.order_id.toString() != '' && res.data.order_id > 0) {
-                  var orderId = res.data.order_id
-                  var notify = res.data.notify
-                  console.log('new order id: ' + orderId.toString())
-                  var wepayUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/Pay/' + app.globalData.sessionKey
-                  + '?id=' + orderId + '&mchid=1&notify=' + encodeURIComponent(notify)
-                  wx.request({
-                    url: wepayUrl,
-                    method: 'GET',
-                    success: (res) => {
-                        console.log('prepay', res)
-                        var wepay = res.data
-                        wx.requestPayment({
-                          nonceStr: wepay.nonce,
-                          package: 'prepay_id=' + wepay.prepay_id,
-                          paySign: wepay.sign,
-                          timeStamp: wepay.timestamp,
-                          signType: 'RSA',
-                          success: (res) => {
-                            console.log('pay success', res)  
-                          }
-                        })
-                    }
-                  })
+          success:(res) =>{
+              var orderId = 0
+              try{
+                
+                orderId = parseInt(res.data.online_order_id)
+                if (isNaN(orderId))
+                {
+                    orderId = 0
+
+                }
+              }
+              catch{
+
+              }
+              if (orderId == 0){
+                var placeOrderUrl = 'https://' + app.globalData.domainName.trim() 
+                + '/api/place_online_order_temp.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+                + '&id=' + this.data.tempOrderId
+                wx.request({
+                  url: placeOrderUrl,
+                  method: 'GET',
+                  success:(res)=>{
+                    orderId = res.data.order_id
+                    that.placePayOrder(orderId)
+                  }
+                })
+              }
+              else{
+                that.placePayOrder(orderId)
+
               }
           }
         })
+
+
+
     },
 
     /**

@@ -1,2 +1,3 @@
 <!--pages/payment/pay_temp_order.wxml-->
 <auth wx:if="{{validCellNumber}}" validType="cell" bindUpdateSuccess="cellUpdate" ></auth>
+{{errorMessage}}
