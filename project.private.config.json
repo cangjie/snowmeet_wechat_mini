@@ -75,7 +75,13 @@
         {
           "name": "pay temp",
           "pathName": "pages/payment/pay_temp_order",
-          "query": "id=8622",
+          "query": "id=8627",
+          "scene": null
+        },
+        {
+          "name": "my maintain",
+          "pathName": "pages/mine/my_maintain/my_maintain",
+          "query": "",
           "scene": null
         }
       ]

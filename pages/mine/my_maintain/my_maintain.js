@@ -14,7 +14,7 @@ Page({
    */
   onLoad: function (options) {
     var that = this
-    app.loginPromise.then(function(resolve) {
+    app.loginPromiseNew.then(function(resolve) {
       var url = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_mine_list.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: url,
