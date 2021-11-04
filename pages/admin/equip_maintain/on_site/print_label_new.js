@@ -1,6 +1,6 @@
 // pages/admin/equip_maintain/on_site/print_label_new.js
 const app = getApp()
-var tsc = require("../../../../utils/ble_label_printer/tsc.js");
+var tsc = require("../../../../utils/ble_label_printer/tsc.js")
 Page({
 
   /**
@@ -267,6 +267,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    console.log('page start')
     if (options.devicescene != undefined && options.devicescene != '') {
       this.data.deviceScene = options.devicescene
     }
@@ -369,6 +370,10 @@ Page({
     var pickDate = new Date(this.data.maintain_in_shop_request.confirmed_pick_date)
     var pickDateStr = (pickDate.getMonth()+1).toString() + '-' + pickDate.getDate().toString()
     var scale = this.data.maintain_in_shop_request.confirmed_scale
+    var urgent = false
+    if (this.data.maintain_in_shop_request.confirmed_urgent.toString() == '1'){
+      urgent = true
+    }
     var pickDateTitle = '次日'
     if (pickDate.getDate() == orderDate.getDate()) {
       pickDateTitle = '当日'
@@ -381,7 +386,7 @@ Page({
     command.setSize(75, 50)//设置标签大小，单位mm.具体参数请用尺子量一下
     command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
     command.setCls()//清除缓冲区
-    command.setText(20, 20, "TSS24.BF2", 0, 1, 1, orderNum + "   " + maskedName + "   " + maskedCell)
+    command.setText(20, 20, "TSS24.BF2", 0, 1, 1, (urgent?'(急)':'') + orderNum + "   " + maskedName + "   " + maskedCell)
     command.setText(20, 20 + 40, "TSS24.BF2", 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)
     if (edge.toString() == '1') {
       command.setText(20, 20 + 40 + 65, "TSS24.BF2", 0, 1, 1, "修刃 " + degree + "：")

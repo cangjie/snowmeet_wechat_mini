@@ -16,7 +16,8 @@ Page({
         type: '双板',
         brand: ''
       },
-      additional_fee: 0
+      additional_fee: 0,
+      urgent:false
     },
     pickDateDescription: '明天',
     totalCharge: 0,
@@ -577,5 +578,12 @@ Page({
     }
     this.checkValid()
     this.setData({confirmedInfo: confirmedInfo, pickDateDescription: pickDateDescription})
+  },
+  changeUrgent:function(e) {
+    console.log(e)
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.urgent = e.detail.value?1:0
+    this.setData({confirmedInfo: confirmedInfo})
+    this.checkValid()
   }
 })

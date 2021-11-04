@@ -1,6 +1,6 @@
 <view wx:if="{{role=='staff'}}" >
   <view  style="margin-left:10rpx">
-    <picker mode="date" value="{{currentDate}}" start="2020-10-1" end="2021-5-31" bindchange="datePickerChanged" >
+    <picker mode="date" value="{{currentDate}}" start="2021-10-1" end="2022-5-31" bindchange="datePickerChanged" >
       <view class="picker" >订单日期：{{currentDate}}</view>
     </picker>
   </view>
@@ -24,7 +24,10 @@
       </view>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column"  >提取：</view>
-        <view class="right-column" >{{item.pick_date_str}}</view>
+        <view class="right-column flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+          <view>{{item.pick_date_str}}</view>
+          <view wx:if="{{item.confirmed_urgent=='1'}}" style="color:red"> 急 </view>
+        </view>
         <view class="left-column"  >状态：</view>
         <view wx:if="{{item.status=='补信息'}}" class="right-column" style="color:red" >{{item.status}}</view>
         <view wx:else class="right-column" >{{item.status}}</view>

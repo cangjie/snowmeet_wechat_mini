@@ -107,6 +107,9 @@ Page({
             orderArr[i].serviceItem = serviceItem
             var amount = parseFloat(orderArr[i].order_real_pay_price.toString())
             orderArr[i].order_real_pay_price = amount.toFixed(2)
+            if (isNaN(orderArr[i].order_real_pay_price)){
+              orderArr[i].order_real_pay_price = orderArr[i].confirmed_additional_fee
+            }
           }
           this.setData({orders: orderArr, totalCount: orderArr.length, needInfoCount: needInfoCount})
         }

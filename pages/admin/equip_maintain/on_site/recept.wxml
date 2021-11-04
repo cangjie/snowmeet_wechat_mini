@@ -98,6 +98,14 @@
     </mp-cell>
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >加急：</view>
+        <view>
+          <switch bindchange="changeUrgent"></switch>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
         <view class="left-column" >取板：</view>
         <view>
           <picker mode="date" value="{{confirmedInfo.pick_date}}" start="{{pickDateStart}}" end="{{pickDateEnd}}" bindchange="pickDateChange" disabled="{{id>0}}" >

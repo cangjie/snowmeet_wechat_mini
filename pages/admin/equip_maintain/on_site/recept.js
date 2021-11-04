@@ -16,7 +16,8 @@ Page({
         type: '双板',
         brand: ''
       },
-      additional_fee: 0
+      additional_fee: 0,
+      urgent: 0
     },
     pickDateDescription: '明天',
     totalCharge: 0,
@@ -401,6 +402,7 @@ Page({
         submitData.confirmed_cell = ''
       }
       submitData.confirmed_images = that.data.photoFiles
+      submitData.urgent = that.data.confirmedInfo.urgent
       var updateContactInfoUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_modify.aspx?id=' + resolve.maintain_in_shop_request_id + '&sessionkey=' + encodeURIComponent(that.data.sessionKey)
       wx.request({
         url: updateContactInfoUrl,
@@ -532,5 +534,12 @@ Page({
     }
     this.checkValid()
     this.setData({confirmedInfo: confirmedInfo, pickDateDescription: pickDateDescription})
+  },
+  changeUrgent:function(e) {
+    console.log(e)
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.urgent = e.detail.value?1:0
+    this.setData({confirmedInfo: confirmedInfo})
+    this.checkValid()
   }
 })
