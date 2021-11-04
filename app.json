@@ -36,9 +36,7 @@
         "pages/test/upload/choose_video_upload",
         "pages/admin/school/lesson/lesson_list",
         "pages/admin/school/lesson/upload_lesson_remark_videos",
-        "pages/payment/pay_temp_order",
-        "pages/admin/equip_maintain/on_site/print_lable",
-        "pages/admin/equip_maintain/on_site/print_label"
+        "pages/payment/pay_temp_order"
     ],
     "window": {
         "backgroundTextStyle": "light",
