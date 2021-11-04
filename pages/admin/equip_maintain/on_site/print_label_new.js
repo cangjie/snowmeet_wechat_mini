@@ -281,12 +281,13 @@ Page({
           url: getInfoUrl,
           success: (res) => {
             that.data.maintain_in_shop_request = res.data.maintain_in_shop_request
+            var showedMsg = that.data.showedMsg
+            showedMsg.push('准备获取设备列表')
+            that.setData({showedMsg: showedMsg})
+            that.getDeviceNameList()
           }
         })
-        var showedMsg = that.data.showedMsg
-        showedMsg.push('准备获取设备列表')
-        that.setData({showedMsg: showedMsg})
-        that.getDeviceNameList()
+        
       }
     })
   },

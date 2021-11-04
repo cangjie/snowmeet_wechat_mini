@@ -1,5 +1,4 @@
 const formatTime = date => {
-
   const year = date.getFullYear()
   const month = date.getMonth() + 1
   const day = date.getDate()
@@ -8,13 +7,6 @@ const formatTime = date => {
   const second = date.getSeconds()
 
   return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
-  
-}
-
-const formatDate = date => {
-  var monthStr = (date.getMonth() + 1).toString()
-  var dayStr = date.getDate().toString()
-  return date.getFullYear().toString() + '-' + '00'.substr(0, 2-monthStr.length) + monthStr + '-' + '00'.substr(0, 2 - dayStr.length) + dayStr
 }
 
 const formatNumber = n => {
@@ -23,6 +15,5 @@ const formatNumber = n => {
 }
 
 module.exports = {
-  formatTime: formatTime,
-  formatDate: formatDate
+  formatTime: formatTime
 }
