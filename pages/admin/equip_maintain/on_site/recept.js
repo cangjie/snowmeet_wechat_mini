@@ -118,6 +118,7 @@ Page({
               var bottomEdge = order.confirmed_more.indexOf('修底刃') >= 0 ? true:false
               var withPole = order.confirmed_more.indexOf('雪杖') >= 0 ? true:false
               var others = order.confirmed_more.indexOf('其它') >= 0 ? true:false
+              confirmedInfo.urgent = order.confirmed_urgent == '1'?true:false
               this.setData({confirmedInfo: confirmedInfo, cell: order.confirmed_cell, realName: order.confirmed_name, gender: order.confirmed_gender, fixBottom: fixBottom, bottomEdge: bottomEdge, pasteFace: pasteFace, withPole: withPole, others: others, pickDateDescription: '', photoFiles: order.confirmed_images})
               this.fillBrand(order.confirmed_equip_type, order.confirmed_brand)
             }
