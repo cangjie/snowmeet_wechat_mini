@@ -6,7 +6,7 @@
     "setting": {
         "urlCheck": false,
         "es6": false,
-        "enhance": false,
+        "enhance": true,
         "postcss": true,
         "preloadBackgroundData": false,
         "minified": true,
@@ -129,8 +129,8 @@
                     "scene": null
                 },
                 {
-                    "name": "pages/admin/equip_maintain/on_site/print_label",
-                    "pathName": "pages/admin/equip_maintain/on_site/print_label",
+                    "name": "pages/admin/equip_maintain/on_site/print_label_new",
+                    "pathName": "pages/admin/equip_maintain/on_site/print_label_new",
                     "query": "id=788",
                     "scene": null
                 }

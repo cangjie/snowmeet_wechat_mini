@@ -42,7 +42,7 @@ Component({
               var lessonDate = new Date(school_lesson.lesson_date)
               school_lesson.lesson_date = util.formatDate(lessonDate)
             }
-            catch{
+            catch(err){
 
             }
           //that.setData({school_lesson: res.data})
