@@ -118,7 +118,7 @@ Page({
         this.data.hourLength = value
         var nowTime = new Date()
         //var endTime = nowTime.setHours(nowTime.getHours() + parseInt(value))
-        var startTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString()
+        var startTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
         nowTime.setHours(nowTime.getHours()+2)
         nowTime.setMinutes(nowTime.getMinutes() + 30)
         //var endTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + this.data.hourLength).toString() + '-' + nowTime.getDate().toString()
