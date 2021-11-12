@@ -83,6 +83,12 @@
           "pathName": "pages/mine/my_maintain/my_maintain",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "common pay",
+          "pathName": "pages/payment/confirm_payment",
+          "query": "controller=MaintainLive&action=PlaceOrderBatch&id=450",
+          "scene": null
         }
       ]
     }

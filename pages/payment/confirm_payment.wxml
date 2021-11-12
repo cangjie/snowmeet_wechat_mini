@@ -1,0 +1,3 @@
+<auth wx:if="{{doValidCellNumber}}" validType="cell" bindUpdateSuccess="cellUpdate" ></auth>
+<view wx:else >
+</view>
