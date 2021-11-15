@@ -49,9 +49,9 @@
           "scene": null
         },
         {
-          "name": "admin_index",
-          "pathName": "pages/admin/admin",
-          "query": "",
+          "name": "pay maintain",
+          "pathName": "pages/payment/confirm_payment",
+          "query": "controller=maintainlive&action=placeorderbatch&id=514",
           "scene": null
         },
         {
