@@ -1,3 +1,6 @@
 <auth wx:if="{{doValidCellNumber}}" validType="cell" bindUpdateSuccess="cellUpdate" ></auth>
 <view wx:else >
+  <view wx:if="{{paySuccess}}" >
+    <view style="text-align: center;" >您已经支付成功。</view>
+  </view>
 </view>

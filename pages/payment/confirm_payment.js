@@ -9,7 +9,9 @@ Page({
     id:0,
     controller: '',
     action: '',
-    doValidCell: false
+    doValidCell: false,
+    paySuccess: false,
+    doValidInfo: false
   },
 
   /**
@@ -54,6 +56,7 @@ Page({
               signType: 'RSA',
               success: (res) => {
                 console.log('pay success', res)  
+
               }
             })
           }
