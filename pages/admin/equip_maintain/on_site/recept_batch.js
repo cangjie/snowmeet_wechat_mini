@@ -27,7 +27,10 @@ Page({
     pasteFace: false,
     withPole: false,
     others: false,
-    batchId: 0
+    batchId: 0,
+    ticketInfo: null,
+    lastMaintainInfo: null,
+    ticketCode: ''
   },
   fillBrand: function(type, brand) {
     if (this.data.id > 0){
@@ -69,6 +72,44 @@ Page({
       }
     }
   },
+  getTicketInfo: function(code) {
+    var that = this
+    var getTickUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + code
+    wx.request({
+      url: getTickUrl,
+      method: 'GET',
+      success: (res)=>{
+        that.setData({ticketInfo: res.data})
+        var openId = res.data.open_id
+        var getLastUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetLast/' + encodeURIComponent(openId) + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: getLastUrl,
+          method: 'GET',
+          success: (res)=>{
+            var confirmedInfo = that.data.confirmedInfo
+            confirmedInfo.equipInfo.type = res.data.confirmed_equip_type
+            confirmedInfo.equipInfo.brand = res.data.confirmed_brand
+            confirmedInfo.equipInfo.scale = res.data.confirmed_scale
+            var cell = res.data.confirmed_cell
+            var realName = res.data.confirmed_name
+            var brandList = that.data.skiBrandList
+            if (res.data.confirmed_equip_type == '单板') {
+              brandList = that.data.boardBrandList
+            }
+            var brandSelectIndex = that.data.brandSelectIndex
+            for(var i = 0; i < brandList.length; i++) {
+              if (brandList[i].trim() == res.data.confirmed_brand){
+                brandSelectIndex = i
+                break
+              }
+            }
+            that.setData({lastMaintainInfo: res.data, confirmedInfo: confirmedInfo, cell: cell, realName:realName, gender: res.data.confirmed_gender, displayedBrandList: brandList, brandSelectIndex: brandSelectIndex})
+            //that.selectType()
+          }
+        })
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */
@@ -85,6 +126,9 @@ Page({
     */
    if (options.batchId != undefined) {
      this.data.batchId = options.batchId
+   }
+   if (options.ticketCode != undefined){
+     this.data.ticketCode = options.ticketCode
    }
     if (options.id != undefined) {
       try{
@@ -204,6 +248,7 @@ Page({
             this.setData({skiBrandList: skiList, boardBrandList: boardList, brandSelectIndex: selectedBrandIndex, displayedBrandList: boardList})
           }
           
+          
       }
     })
     var that = this
@@ -226,8 +271,14 @@ Page({
               }
               that.setData({cell:cell, realName: name, gender: gender})
             }
+            
           }
         })
+      }
+      else{
+        if (options.ticketCode != undefined){
+          that.getTicketInfo(options.ticketCode)
+        }
       }
     })
   },
@@ -388,6 +439,7 @@ Page({
   submit: function() {
     var that = this
     var preRequestPromise = new Promise(function(resolve) {
+      that.data.confirmedInfo.ticket_code = that.data.ticketCode
       var urlPreOrder = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_create_by_staff_quickly.aspx?sessionkey=' + encodeURIComponent(that.data.sessionKey) + '&batchid=' + that.data.batchId
       wx.request({
         url: urlPreOrder,

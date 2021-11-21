@@ -8,6 +8,9 @@
   <mp-cells title="当前店铺" >
     <mp-cell>{{confirmedInfo.shop}}</mp-cell>
   </mp-cells>
+  <mp-cells wx:if="{{ticketInfo!=null}}" title="{{ticketInfo.name}}" >
+    <mp-cell>{{ticketInfo.memo}}</mp-cell>
+  </mp-cells>
   <mp-cells title="装备信息">
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;" >
