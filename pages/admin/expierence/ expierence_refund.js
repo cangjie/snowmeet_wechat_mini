@@ -133,7 +133,35 @@ Page({
         }
       }
       else {
-        that.setData({refund: true, message: resolve.error_message})
+        //that.setData({refund: true, message: resolve.error_message})
+        var getNewUrl = 'https://' + app.globalData.domainName + '/core/Experience/GetExperience/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: getNewUrl,
+          method: 'GET',
+          success: (res)=>{
+            var outTradeNo = res.data.order.out_trade_no
+            var exp = res.data
+            var refundUrl = 'https://' + app.globalData.domainName + '/core/WepayOrder/Refund/' + outTradeNo + '?amount=' + (100 * parseInt(that.data.refundAmount.toString())).toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            wx.request({
+              url: refundUrl,
+              method: 'GET',
+              success:(res)=>{
+                that.setData({refund: true, message: '退款成功'})
+                var updateUrl = 'https://' + app.globalData.domainName + '/core/Experience/PutExperience/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+                exp.return_memo = that.data.memo
+                exp.refund_amount = that.data.refundAmount
+                wx.request({
+                  url: updateUrl,
+                  method: 'PUT',
+                  data: exp,
+                  success:(res)=>{
+
+                  }
+                })
+              }
+            })
+          }
+        })
       }
     })
   }

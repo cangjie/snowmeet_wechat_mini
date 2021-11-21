@@ -49,9 +49,9 @@
           "scene": null
         },
         {
-          "name": "admin_index",
-          "pathName": "pages/admin/admin",
-          "query": "",
+          "name": "pay maintain",
+          "pathName": "pages/payment/confirm_payment",
+          "query": "controller=maintainlive&action=placeorderbatch&id=514",
           "scene": null
         },
         {
@@ -88,6 +88,12 @@
           "name": "common pay",
           "pathName": "pages/payment/confirm_payment",
           "query": "controller=MaintainLive&action=PlaceOrderBatch&id=450",
+          "scene": null
+        },
+        {
+          "name": "confirm pay",
+          "pathName": "pages/payment/confirm_payment",
+          "query": "controller=experience&action=placeorder&id=182",
           "scene": null
         }
       ]
