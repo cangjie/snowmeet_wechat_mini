@@ -101,6 +101,12 @@
           "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
           "query": "ticketCode=001001001",
           "scene": null
+        },
+        {
+          "name": "maitain recept with ticket",
+          "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
+          "query": "ticketCode=001001001",
+          "scene": null
         }
       ]
     }

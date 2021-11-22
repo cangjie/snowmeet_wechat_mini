@@ -79,7 +79,12 @@ Page({
       url: getTickUrl,
       method: 'GET',
       success: (res)=>{
+        
+        if (res.data.used == 1){
+          that.setData({submitInfoValid: false})
+        }
         that.setData({ticketInfo: res.data})
+        
         var openId = res.data.open_id
         var getLastUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetLast/' + encodeURIComponent(openId) + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
@@ -284,6 +289,10 @@ Page({
   },
   checkValid: function() {
     var cellValid = true
+    if (this.data.ticketInfo != undefined && this.data.ticketInfo != null && this.data.ticketInfo.used == 1) {
+      this.setData({submitInfoValid: false})
+      return
+    }
     if (this.data.cell != undefined && this.data.cell.trim() != '') {
       var cell = this.data.cell.trim()
       if (cell.length != 11 || cell.indexOf('1')!=0) {

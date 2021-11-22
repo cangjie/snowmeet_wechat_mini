@@ -9,7 +9,7 @@
     <mp-cell>{{confirmedInfo.shop}}</mp-cell>
   </mp-cells>
   <mp-cells wx:if="{{ticketInfo!=null}}" title="{{ticketInfo.name}}" >
-    <mp-cell>{{ticketInfo.memo}}</mp-cell>
+    <mp-cell><font wx:if="{{ticketInfo.used == 1}}" style="color:#ff0000" >已核销</font>{{ticketInfo.memo}}</mp-cell>
   </mp-cells>
   <mp-cells title="装备信息">
     <mp-cell>
