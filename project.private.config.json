@@ -91,12 +91,6 @@
           "scene": null
         },
         {
-          "name": "confirm pay",
-          "pathName": "pages/payment/confirm_payment",
-          "query": "controller=experience&action=placeorder&id=214",
-          "scene": null
-        },
-        {
           "name": "Maintain with Ticket",
           "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
           "query": "ticketCode=001001001",
@@ -106,6 +100,12 @@
           "name": "maitain recept with ticket",
           "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
           "query": "ticketCode=001001001",
+          "scene": null
+        },
+        {
+          "name": "pages/Print/pring_image_test",
+          "pathName": "pages/Print/pring_image_test",
+          "query": "",
           "scene": null
         }
       ]

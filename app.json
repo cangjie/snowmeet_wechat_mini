@@ -39,7 +39,8 @@
     "pages/payment/pay_temp_order",
     "pages/payment/confirm_payment",
     "pages/Print/Print",
-    "pages/Print/test"
+    "pages/Print/test",
+    "pages/Print/pring_image_test"
   ],
   "window": {
     "backgroundTextStyle": "light",
