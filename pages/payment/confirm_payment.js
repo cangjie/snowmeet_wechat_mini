@@ -11,7 +11,8 @@ Page({
     action: '',
     doValidCell: false,
     paySuccess: false,
-    doValidInfo: false
+    doValidInfo: false,
+    payMessage: ['系统正在为您生成订单。']
   },
 
   /**
@@ -39,6 +40,14 @@ Page({
       method: 'GET',
       success:(res)=>{
         var orderId = res.data.id
+        var msg = that.data.payMessage
+        if (orderId == undefined){
+          msg.push('订单生成失败，也许是因为这个订单您已经支付过了，请联系店员核实。')
+          that.setData({payMessage: msg})
+          return
+        }
+        msg.push('您的订单号是：' + orderId + '，请耐心等待系统正在加密您的支付信息。')
+        that.setData({payMessage: msg})
         console.log('Order created.', res)
         that.setData({orderId: res.data.id})
         var wepayUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/Pay/' + encodeURIComponent(app.globalData.sessionKey)+ '?id=' + orderId
@@ -47,6 +56,8 @@ Page({
           method: 'GET',
           success:(res)=>{
             console.log('prepay', res)
+            msg.push('请注意：支付准备已经完成，您即将被要求在手机上输入微信支付密码，请注意保护您的隐私及资金安全。')
+            that.setData({payMessage: msg})
             var wepay = res.data
             wx.requestPayment({
               nonceStr: wepay.nonce,
