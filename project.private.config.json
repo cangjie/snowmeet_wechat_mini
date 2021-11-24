@@ -93,7 +93,7 @@
         {
           "name": "confirm pay",
           "pathName": "pages/payment/confirm_payment",
-          "query": "controller=experience&action=placeorder&id=182",
+          "query": "controller=experience&action=placeorder&id=214",
           "scene": null
         },
         {
