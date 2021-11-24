@@ -83,7 +83,13 @@ Page({
         if (res.data.used == 1){
           that.setData({submitInfoValid: false})
         }
-        that.setData({ticketInfo: res.data})
+        if (res.data.code == undefined || res.data.code == null) {
+          that.setData({ticketCode: ''})
+        }
+        else {
+          that.setData({ticketInfo: res.data})
+        }
+        
         
         var openId = res.data.open_id
         var getLastUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetLast/' + encodeURIComponent(openId) + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
