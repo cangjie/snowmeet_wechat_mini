@@ -20,7 +20,8 @@ Page({
     currentServiceIndex: 0,
     showedMsg: [],
     reConnecting: false,
-    reConnectTimes: 0
+    reConnectTimes: 0,
+    qrCodeSize: 200,
   },
   getDeviceNameList: function() {
     var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/blt_device_list_new.aspx'
@@ -269,18 +270,13 @@ Page({
   onLoad: function (options) {
 
     
-    //const ctx_out = wx.createCanvasContext('img', this)
+    const ctx_out = wx.createCanvasContext('img', this)
     //var imgUrl = '../../images/katerina.jpg'
     var imgUrl = 'http://weixin.snowmeet.top/images/qrcode/pay_in_shop_maintain_batch_id_676_1640362216.jpg'
     
     var that = this
-    wx.getImageInfo({
-      src: imgUrl,
-      success:(res)=>{
-        that.setData({imgData: res})
-      }
-    })
-    /*
+    
+    
     wx.getImageInfo({
       src: imgUrl,
       success:(res)=>{
@@ -289,13 +285,18 @@ Page({
           canvasHeight: res.height,
         });
         console.log("画布宽度" + res.width, "画布高度" + res.height);
-       
-        ctx_out.drawImage(imgUrl, 0, 0);
-        ctx_out.draw();
+        
+        ctx_out.drawImage(res.path, 350, 150, that.data.qrCodeSize, that.data.qrCodeSize);
+        ctx_out.transform(300,0,0,200,0,0)
+        ctx_out.setTransform(300,0,0,200,0,0)
+        //ctx_out.rect(10,10, 550, 360)
+        //ctx_out.fill()
+        //ctx_out.transform(100,0,0,50,0,0)
+        ctx_out.draw()
         
       }
     })
-    */
+    
  
     console.log('page start')
     if (options.devicescene != undefined && options.devicescene != '') {
@@ -351,6 +352,7 @@ Page({
     }
   },
   print: function(e){
+    var that = this
     if (!this.data.readyForPrint) {
       if (!this.data.reConnecting){
         this.getDeviceNameListInRange()
@@ -380,14 +382,24 @@ Page({
     command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
     command.setCls()//清除缓冲区
 
-    command.setBitmap(0,0, 0, this.data.imgData)
+    wx.canvasGetImageData({
+      canvasId: 'img',
+      height: 370,
+      width: 560,
+      x: 0,
+      y: 0,
+      success:(res)=>{
+        command.setBitmap(0, 0, 0, res)
+        command.setPrint(1)
+        that.prepareSend(command.getData())//发送数据
+      }
+    })
+
     
-    command.setPagePrint()
-    this.prepareSend(command.getData())
   },
   prepareSend: function(buff){
     var that = this
-    var time = 128
+    var time = 1024
     var looptime = parseInt(buff.length / time);
     var lastData = parseInt(buff.length % time);
     console.log(looptime + "---" + lastData)

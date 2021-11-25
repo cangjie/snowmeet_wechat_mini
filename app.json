@@ -40,7 +40,8 @@
     "pages/payment/confirm_payment",
     "pages/Print/Print",
     "pages/Print/test",
-    "pages/Print/pring_image_test"
+    "pages/Print/pring_image_test",
+    "pages/Print/cavas_test"
   ],
   "window": {
     "backgroundTextStyle": "light",
