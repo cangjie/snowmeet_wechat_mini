@@ -271,6 +271,8 @@ Page({
 
     
     const ctx_out = wx.createCanvasContext('img', this)
+    ctx_out.fillStyle = '#FFFFFF'
+    ctx_out.fillRect(0,0,570,380)
     //var imgUrl = '../../images/katerina.jpg'
     var imgUrl = 'http://weixin.snowmeet.top/images/qrcode/pay_in_shop_maintain_batch_id_676_1640362216.jpg'
     
@@ -287,12 +289,19 @@ Page({
         console.log("画布宽度" + res.width, "画布高度" + res.height);
         
         ctx_out.drawImage(res.path, 350, 150, that.data.qrCodeSize, that.data.qrCodeSize);
-        ctx_out.transform(300,0,0,200,0,0)
-        ctx_out.setTransform(300,0,0,200,0,0)
+        //ctx_out.draw()
+        wx.getImageInfo({
+          src: 'https://mini.snowmeet.top/images/snowmeet_logo.png',
+          success:(res)=>{
+            ctx_out.drawImage(res.path, 10, 10, 210, 140);
+            ctx_out.draw()
+          }
+        })
+
         //ctx_out.rect(10,10, 550, 360)
         //ctx_out.fill()
         //ctx_out.transform(100,0,0,50,0,0)
-        ctx_out.draw()
+        
         
       }
     })
