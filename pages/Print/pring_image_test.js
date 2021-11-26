@@ -288,12 +288,30 @@ Page({
         });
         console.log("画布宽度" + res.width, "画布高度" + res.height);
         
-        ctx_out.drawImage(res.path, 350, 150, that.data.qrCodeSize, that.data.qrCodeSize);
+        ctx_out.drawImage(res.path, 350, 110, that.data.qrCodeSize, that.data.qrCodeSize);
+        
         //ctx_out.draw()
         wx.getImageInfo({
-          src: 'https://mini.snowmeet.top/images/snowmeet_logo.png',
+          src: 'https://mini.snowmeet.top/images/logo.png',
           success:(res)=>{
-            ctx_out.drawImage(res.path, 10, 10, 210, 140);
+            ctx_out.drawImage(res.path, 0, 0, 400, 85);
+            ctx_out.fillStyle = '#000000'
+
+            ctx_out.setFontSize(30)
+            ctx_out.strokeText('养护券',420, 40)
+            
+            ctx_out.setFontSize(15)
+            
+            ctx_out.fillText("请在2021年12月10日前，", 360, 320)
+            ctx_out.fillText("通过微信扫一扫，在您个", 360, 340)
+            ctx_out.fillText("人账户中绑定此二维码。", 360, 360)
+            ctx_out.setFontSize(19)
+            ctx_out.fillText("*此券可以在易龙雪聚万龙养护中心试用。", 10, 150)
+            ctx_out.fillText("*此券可以在易龙雪聚万龙养护中心试用。", 10, 180)
+            ctx_out.fillText("*此券可以在易龙雪聚万龙养护中心试用。", 10, 210)
+            ctx_out.fillText("*此券可以在易龙雪聚万龙养护中心试用。", 10, 240)
+            ctx_out.fillText("*此券可以在易龙雪聚万龙养护中心试用。", 10, 270)
+            ctx_out.fillText("*此券可以在易龙雪聚万龙养护中心试用。", 10, 300)
             ctx_out.draw()
           }
         })
@@ -408,7 +426,7 @@ Page({
   },
   prepareSend: function(buff){
     var that = this
-    var time = 1024
+    var time = 5120
     var looptime = parseInt(buff.length / time);
     var lastData = parseInt(buff.length % time);
     console.log(looptime + "---" + lastData)
