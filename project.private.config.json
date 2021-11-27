@@ -103,8 +103,8 @@
           "scene": null
         },
         {
-          "name": "pages/Print/pring_image_test",
-          "pathName": "pages/Print/pring_image_test",
+          "name": "print ticket",
+          "pathName": "pages/admin/printer/gprinter/test_print_tickets",
           "query": "",
           "scene": null
         }

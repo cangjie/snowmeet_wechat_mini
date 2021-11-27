@@ -1,2 +1,3 @@
-<!--pages/admin/printer/gprinter/ticket.wxml-->
-<text>pages/admin/printer/gprinter/ticket.wxml</text>
+<view>
+  <view wx:for="{{msg}}" >{{item}}</view>
+</view>

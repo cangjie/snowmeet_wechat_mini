@@ -41,7 +41,9 @@
     "pages/Print/Print",
     "pages/Print/test",
     "pages/Print/pring_image_test",
-    "pages/Print/cavas_test"
+    "pages/Print/cavas_test",
+    "pages/admin/printer/gprinter/test_print_tickets",
+    "pages/admin/printer/gprinter/ticket"
   ],
   "window": {
     "backgroundTextStyle": "light",
