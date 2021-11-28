@@ -14,6 +14,7 @@ Page({
   onLoad: function (options) {
     var tickets = []
     tickets.push({code:'001001001', name:'保养券', memo:'修刃打蜡双项减20;修刃打蜡单项减10;保养前请店员扫此码;地点：万龙雪具大厅6号门滚梯下'})
+    tickets.push({code:'001001002', name:'试滑券', memo:'每周限领取一张;每次2小时;超时补交200元使用全天。'})
     this.setData({tickets: tickets})
   },
 

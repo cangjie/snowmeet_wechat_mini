@@ -226,8 +226,7 @@ Page({
             success:(res)=>{
               context.drawImage(res.path, 0, 0, 400, 85)
               context.fillStyle = '#000000'
-              context.setFontSize(35)
-              context.strokeText(ticket.name,420, 40)
+              
               var txtArr = ticket.memo.split(';')
               context.setFontSize(19)
               for(var i = 0; i < txtArr.length; i++){
@@ -238,6 +237,8 @@ Page({
               context.fillText('请在' + nowDate.getFullYear() + '年' + (nowDate.getMonth() + 1).toString() + '月' + nowDate.getDate().toString() + '日前，', 360, 320)
               context.fillText("通过微信扫一扫，在您个", 360, 340)
               context.fillText("人账户中绑定此二维码。", 360, 360)
+              context.setFontSize(35)
+              context.strokeText(ticket.name,420, 40)
               context.draw()
               wx.canvasGetImageData({
                 canvasId: 'img',
@@ -285,14 +286,16 @@ Page({
       buf = new ArrayBuffer(this.data.sendOneTimeData)
       dataView = new DataView(buf)
       for (var i = 0; i < this.data.sendOneTimeData; ++i) {
-        dataView.setUint8(i, buff[(this.data.sendCurrentTime - 1) * this.data.sendOneTimeData + i])
+        var index = this.data.sendCurrentTime  * this.data.sendOneTimeData + i
+        dataView.setUint8(i, buff[index])
       }
     }
     else{
       buf = new ArrayBuffer(this.data.sendLastData)
       dataView = new DataView(buf)
       for (var i = 0; i < this.data.sendLastData; ++i) {
-        dataView.setUint8(i, buff[(this.data.sendCurrentTime - 1) * this.data.sendOneTimeData + i])
+        var index = this.data.sendCurrentTime * this.data.sendOneTimeData + i
+        dataView.setUint8(i, buff[index])
       }
     }
     console.log(buf)
@@ -317,8 +320,8 @@ Page({
         else{
           msg.push('发送完成')
           that.setData({msg: msg})
-          //that.data.currentTicketIndex++
-          //that.drawTickets()
+          that.data.currentTicketIndex++
+          that.drawTickets()
         }
       }
     })
