@@ -107,6 +107,12 @@
           "pathName": "pages/admin/printer/gprinter/test_print_tickets",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "print ticket test",
+          "pathName": "pages/Print/pring_image_test",
+          "query": "",
+          "scene": null
         }
       ]
     }

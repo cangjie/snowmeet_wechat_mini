@@ -192,6 +192,7 @@ Page({
     })
   },
   getCharacteristics: function() {
+    var that = this
     var showedMsg = this.data.showedMsg
     showedMsg.push('开始获取特性列表。')
     this.setData({showedMsg: showedMsg})
@@ -217,42 +218,45 @@ Page({
           if (!canNotify) {
             if (properties.notify) {
               canNotify = true
-              this.data.currentDevice.notifyServiceId = this.data.currentDevice.services[this.data.currentServiceIndex].uuid
-              this.data.currentDevice.notifyCharacterUuid = item
+              that.data.currentDevice.notifyServiceId = that.data.currentDevice.services[that.data.currentServiceIndex].uuid
+              that.data.currentDevice.notifyCharacterUuid = item
             }
           }
           if (!canRead) {
             if (properties.read) {
               canRead = true
-              this.data.currentDevice.readServiceId = this.data.currentDevice.services[this.data.currentServiceIndex].uuid
-              this.data.currentDevice.readCharacterUuid = item
+              that.data.currentDevice.readServiceId = that.data.currentDevice.services[that.data.currentServiceIndex].uuid
+              that.data.currentDevice.readCharacterUuid = item
             }
           }
           if (!canWrite) {
             if (properties.write) {
               canWrite = true
-              this.data.currentDevice.writeServiceId = this.data.currentDevice.services[this.data.currentServiceIndex].uuid
-              this.data.currentDevice.writeCharacterUuid = item
+              that.data.currentDevice.writeServiceId = that.data.currentDevice.services[that.data.currentServiceIndex].uuid
+              that.data.currentDevice.writeCharacterUuid = item
             }
           }
 
         }
         if (!canNotify || !canRead || !canWrite) {
-          this.data.currentServiceIndex++
-          if (this.data.currentServiceIndex >= this.data.currentDevice.services.length) {
+          that.data.currentServiceIndex++
+          if (that.data.currentServiceIndex >= that.data.currentDevice.services.length) {
             showedMsg.push('特征值不全。')
-            this.setData({showedMsg: showedMsg})
-            this.data.currentDeviceIndex++
-            this.tryConnectDevice()
+            that.setData({showedMsg: showedMsg})
+            that.data.currentDeviceIndex++
+            that.tryConnectDevice()
           }
           else{
-            this.getCharacteristics()
+            that.getCharacteristics()
           }
 
         }
         else{
           showedMsg.push('连接成功')
-          this.setData({showedMsg: showedMsg, readyForPrint: true})
+          that.setData({showedMsg: showedMsg, readyForPrint: true})
+          console.log('read ' + that.data.currentDevice.readServiceId + ' ' + that.data.currentDevice.readCharacterUuid)
+          console.log('write ' + that.data.currentDevice.writeServiceId + ' ' + that.data.currentDevice.writeCharacterUuid)
+          console.log('notify ' + that.data.currentDevice.notifyServiceId + ' ' + that.data.currentDevice.notifyCharacterUuid)
         }
 
       },
@@ -403,11 +407,7 @@ Page({
     this.setData({showedMsg: showedMsg, readyForPrint: false})
     
     
-    var command = tsc.jpPrinter.createNew()
-    command.setCls()//清除缓冲区，防止下一个没生效
-    command.setSize(75, 50)//设置标签大小，单位mm.具体参数请用尺子量一下
-    command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
-    command.setCls()//清除缓冲区
+    
 
     wx.canvasGetImageData({
       canvasId: 'img',
@@ -416,6 +416,11 @@ Page({
       x: 0,
       y: 0,
       success:(res)=>{
+        var command = tsc.jpPrinter.createNew()
+        command.setCls()//清除缓冲区，防止下一个没生效
+        command.setSize(75, 50)//设置标签大小，单位mm.具体参数请用尺子量一下
+        command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
+        command.setCls()//清除缓冲区
         command.setBitmap(0, 0, 0, res)
         command.setPrint(1)
         that.prepareSend(command.getData())//发送数据
@@ -470,8 +475,8 @@ Page({
     var that = this
     wx.writeBLECharacteristicValue({
       deviceId: this.data.currentDevice.deviceId,
-      serviceId: this.data.currentDevice.writeServiceId,
-      characteristicId: this.data.currentDevice.writeCharacterUuid,
+      serviceId: '49535343-FE7D-4AE5-8FA9-9FAFD205E455',
+      characteristicId: '49535343-8841-43F4-A8D4-ECBE34729BB3',
       value: buf,
       success: function (res) {
         console.log(currentPrint)
@@ -482,17 +487,6 @@ Page({
           })
           that.setData({nowPrinting: false})
         }
-        //console.log(res)
-      },
-      fail: function (e) {
-        wx.showToast({
-          title: '打印第' + currentPrint + '张失败',
-          icon: 'none',
-        })
-
-        //console.log(e)
-      },
-      complete: function () {
         currentTime++
         console.log(currentTime)
         if (currentTime <= loopTime) {
@@ -532,6 +526,19 @@ Page({
             that.send(buff)
           }
         }
+
+        //console.log(res)
+      },
+      fail: function (e) {
+        wx.showToast({
+          title: '打印第' + currentPrint + '张失败',
+          icon: 'none',
+        })
+
+        //console.log(e)
+      },
+      complete: function () {
+        
       }
     })    
   },
