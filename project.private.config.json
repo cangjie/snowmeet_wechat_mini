@@ -91,6 +91,7 @@
           "scene": null
         },
         {
+<<<<<<< HEAD
           "name": "Maintain with Ticket",
           "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
           "query": "ticketCode=001001001",
@@ -112,6 +113,11 @@
           "name": "print ticket test",
           "pathName": "pages/Print/pring_image_test",
           "query": "",
+=======
+          "name": "confirm pay",
+          "pathName": "pages/payment/confirm_payment",
+          "query": "controller=experience&action=placeorder&id=214",
+>>>>>>> master
           "scene": null
         }
       ]

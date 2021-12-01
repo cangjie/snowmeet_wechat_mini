@@ -3,4 +3,9 @@
   <view wx:if="{{paySuccess}}" >
     <view style="text-align: center;" >您已经支付成功。</view>
   </view>
+  <view wx:else >
+    <view wx:for="{{payMessage}}" >
+      <view>{{item}}</view>
+    </view>
+  </view>
 </view>

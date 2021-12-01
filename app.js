@@ -63,7 +63,7 @@ App({
                     app.globalData.role = 'staff'
                   }
                   app.globalData.cellNumber = res.data.mini_users[0].cell_number
-                  if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
+                  if (res.data.mini_users[0].nick == ''  || res.data.mini_users[0].nick == '微信用户'  || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
                     console.log('get user detail info')
                     wx.getUserInfo({
                       success: (res) => {
