@@ -8,7 +8,7 @@ function init(app, that) {
       url: url,
       success: (res) => {
         if (res.data.status == 0 && res.data.count > 0){
-          if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
+          if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '' || res.data.mini_users[0].nick == '微信用户') {
             wx.getUserInfo({
               success: (res) => {
                 if (res.userInfo != null) {
