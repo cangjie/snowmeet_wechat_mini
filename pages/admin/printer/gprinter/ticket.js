@@ -320,6 +320,12 @@ Page({
         else{
           msg.push('发送完成')
           that.setData({msg: msg})
+          //set finish print
+          var code = that.data.tickets[that.data.currentTicketIndex].code
+          var setPrintedUrl = 'https://' + app.globalData.domainName + '/core/ticket/SetPrinted/' + code + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: setPrintedUrl
+          })
           that.data.currentTicketIndex++
           that.drawTickets()
         }

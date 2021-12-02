@@ -1,0 +1,20 @@
+<!--pages/admin/ticket/ticket_template_list.wxml-->
+<view>
+  <view style="height: 50rpx;" ></view>
+  <view wx:for="{{ticketTemplateArr}}" >
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;" >
+      <view style="width: 100rpx;" ></view>
+      <view style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;">
+        <view style="background-color: greenyellow;text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><b>{{item.name}}</b></view>
+        <view wx:for="{{item.usage}}" >
+        *{{item}}
+        </view>
+        <view class="flex-wrp"  style="flex-direction:row" >
+          <button disabled="true"> 发 放 </button> <button id="print_{{item.id}}" bindtap="print" > 打 印 </button><input id="print_num_{{item.id}}" value="{{item.printNum}}" style="width: 50rpx;margin-top: 15rpx;" bindinput="changeNum"></input><view style="height: 80rpx;margin-top:15rpx;margin-right: 10rpx;">张</view>
+        </view>
+      </view>
+      <view style="width: 100rpx;" ></view>
+    </view>
+    <view style="height: 50rpx;" ></view>
+  </view>
+</view>

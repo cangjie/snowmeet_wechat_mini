@@ -15,9 +15,12 @@
     <mp-cell id="reserve_instructor" value="课程预约" bindtap="nav" ></mp-cell>
     <mp-cell id="reserve_instructor_list" value="预约列表" bindtap="nav" ></mp-cell>
   </mp-cells>
-  <mp-cells ext-class="my-cells" title="测试" >
+   <mp-cells ext-class="my-cells" title="优惠券" >
+    <mp-cell id="ticket_print" value="打印" bindtap="nav" ></mp-cell>
+  </mp-cells> 
+  <!--mp-cells ext-class="my-cells" title="测试" >
     <mp-cell id="test_upload" value="上传视频" bindtap="nav" ></mp-cell>
-  </mp-cells>
+  </mp-cells-->
 </view>
 <view wx:else >
   您不是管理员

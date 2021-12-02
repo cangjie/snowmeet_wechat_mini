@@ -136,6 +136,9 @@ Page({
       case 'reserve_instructor_list':
         path = '/pages/admin/school/lesson/lesson_list'
         break
+      case 'ticket_print':
+        path = '/pages/admin/ticket/ticket_template_list'
+        break
       default:
         break
     }
