@@ -1,0 +1,30 @@
+<view class="btn-area flex-wrp" style="margin-top: 25rpx;flex-direction:row; text-align: center;">
+  <navigator style="width: 50%;text-align: center;color:{{unUsedColor}};" url="ticket_list?used=0" open-type="redirect" hover-class="other-navigator-hover" >未使用</navigator>
+  <navigator style="width: 50%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >已使用</navigator>
+</view>
+<view style="height: 1rpx; background-color:#c0c0c0;"></view>
+<view wx:for="{{ticketArr}}" >
+  <view style="height: 1rpx;" ></view>
+  <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;" >
+    <view style="width: 100rpx;"></view>
+    <view id="{{item.code}}" style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;" bindtap="showDetail">
+      <view style="background-color: greenyellow;text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><b>{{item.name}}</b></view>
+      <view wx:for="{{item.usage}}" style="margin-left: 50rpx;">
+        *{{item}}
+      </view>
+    </view>
+    <view style="width: 100rpx;"></view>
+  </view>
+  <view style="height: 1rpx;" ></view>
+</view>
+<cover-view bindtap="hideDetail" class="cover-view" style="height: 100%;background-color: #c0c0c0; top: {{currentY}}rpx;left: 0rpx; position: absolute;width:100%;display: {{showCover}};opacity: 0.9;">
+  <cover-view class="container" bindtap="hideDetail" >
+    <canvas canvas-id="img" style="width: 300rpx; height: 300rpx;" ></canvas>
+    <!--image style="width: 300rpx;height: 300rpx;" mode="aspectFit" src="{{currentQrUrl}}" ></image-->
+    <!--cover-view class="flex-wrp" style="flex-direction:row;" bindtap="hideDetail" >
+      <cover-view class="flex-item">aaa</cover-view>
+      <cover-view class="flex-item">bbb</cover-view>
+      <cover-view class="flex-item">ccc</cover-view>
+    </cover-view-->
+  </cover-view>
+</cover-view>

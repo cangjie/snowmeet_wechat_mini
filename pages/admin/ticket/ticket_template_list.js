@@ -93,7 +93,7 @@ Page({
     if (name!=''){
       var msg = '您即将打印 ' + printNum + '张 ' + name 
       wx.showModal({
-        cancelColor: 'cancelColor',
+        //cancelColor: 'cancelColor',
         title: '准备打印',
         content: msg,
         success:(res)=>{

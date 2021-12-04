@@ -44,7 +44,9 @@
     "pages/Print/cavas_test",
     "pages/admin/printer/gprinter/test_print_tickets",
     "pages/admin/printer/gprinter/ticket",
-    "pages/admin/ticket/ticket_template_list"
+    "pages/admin/ticket/ticket_template_list",
+    "pages/mine/ticket/ticket_list",
+    "pages/mine/ticket/ticket_bind"
   ],
   "window": {
     "backgroundTextStyle": "light",

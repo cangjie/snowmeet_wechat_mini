@@ -1,0 +1,7 @@
+/* pages/mine/ticket/ticket_list.wxss */
+.navigator-hover {
+  color:blue;
+}
+.other-navigator-hover {
+  color:red;
+}

@@ -237,6 +237,7 @@ Page({
               context.fillText('请在' + nowDate.getFullYear() + '年' + (nowDate.getMonth() + 1).toString() + '月' + nowDate.getDate().toString() + '日前，', 360, 320)
               context.fillText("通过微信扫一扫，在您个", 360, 340)
               context.fillText("人账户中绑定此二维码。", 360, 360)
+              context.fillText(ticket.code, 410, 110)
               context.setFontSize(35)
               context.strokeText(ticket.name,420, 40)
               context.draw()
@@ -265,7 +266,7 @@ Page({
   },
   prepareSend: function(buff){
     var that = this
-    var oneTimeData= 5120
+    var oneTimeData= 51200
     var loopTime = parseInt(buff.length / oneTimeData);
     var lastData = parseInt(buff.length % oneTimeData);
     console.log(loopTime + "---" + lastData)

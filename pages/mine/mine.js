@@ -95,5 +95,10 @@ Page({
     wx.navigateTo({
       url: '/pages/admin/admin',
     })
+  },
+  gotoTicket: function(){
+    wx.navigateTo({
+      url: '/pages/mine/ticket/ticket_list',
+    })
   }
 })
