@@ -89,6 +89,9 @@ Page({
   },
   showDetail: function(source){
     console.log(source)
+    if (this.options.used == 1){
+      return
+    }
     var code = source.currentTarget.id
     //var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code
     var qrCodeUrl = 'https://' + app.globalData.domainName + '/show_image.aspx?img=' 
