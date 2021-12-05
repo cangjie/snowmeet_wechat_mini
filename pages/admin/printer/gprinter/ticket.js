@@ -216,7 +216,8 @@ Page({
       var context = wx.createCanvasContext('img', this)
       context.fillStyle = '#FFFFFF'
       context.fillRect(0,0,570,380)
-      var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + ticket.code
+      var qrCodeUrl = 'https://' + app.globalData.domainName + '/show_image.aspx?img='  
+      + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + ticket.code)
       wx.getImageInfo({
         src: qrCodeUrl,
         success:(res)=>{
