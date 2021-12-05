@@ -19,7 +19,8 @@
 </view>
 <cover-view bindtap="hideDetail" class="cover-view" style="height: 100%;background-color: #c0c0c0; top: {{currentY}}rpx;left: 0rpx; position: absolute;width:100%;display: {{showCover}};opacity: 0.9;">
   <cover-view class="container" bindtap="hideDetail" >
-    <canvas canvas-id="img" style="width: 300rpx; height: 300rpx;" ></canvas>
+    <cover-image src="{{currentQrUrl}}" style="width: 300rpx; height: 300rpx;" ></cover-image>
+    <!--canvas canvas-id="img" style="width: 300rpx; height: 300rpx;" ></canvas-->
     <!--image style="width: 300rpx;height: 300rpx;" mode="aspectFit" src="{{currentQrUrl}}" ></image-->
     <!--cover-view class="flex-wrp" style="flex-direction:row;" bindtap="hideDetail" >
       <cover-view class="flex-item">aaa</cover-view>
