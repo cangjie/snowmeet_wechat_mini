@@ -90,7 +90,7 @@ Page({
   showDetail: function(source){
     console.log(source)
     var code = source.currentTarget.id
-    var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_id_' + code
+    var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code
     wx.getImageInfo({
       src: qrCodeUrl,
       success:(res)=>{

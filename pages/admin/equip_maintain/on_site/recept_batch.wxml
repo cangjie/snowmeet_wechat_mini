@@ -8,8 +8,15 @@
   <mp-cells title="当前店铺" >
     <mp-cell>{{confirmedInfo.shop}}</mp-cell>
   </mp-cells>
-  <mp-cells wx:if="{{ticketInfo!=null}}" title="{{ticketInfo.name}}" >
-    <mp-cell><font wx:if="{{ticketInfo.used == 1}}" style="color:#ff0000" >已核销</font>{{ticketInfo.memo}}</mp-cell>
+  <mp-cells wx:if="{{ticketInfo!=null}}" title="{{ticketInfo.name}}-{{ticketInfo.code}}" >
+    <mp-cell>
+      <view wx:if="{{ticketInfo.used == 1}}" >
+        <font  style="color:#ff0000" >已核销</font>
+      </view>
+      <view wx:for="{{ticketInfo.usage}}" >
+        *{{item}}
+      </view>
+    </mp-cell>
   </mp-cells>
   <mp-cells title="装备信息">
     <mp-cell>

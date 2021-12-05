@@ -27,7 +27,7 @@
         {
           "name": "school_lesson_detail",
           "pathName": "pages/admin/school/lesson/detail_info",
-          "query": "",
+          "query": "id=107",
           "scene": null
         },
         {
@@ -39,7 +39,7 @@
         {
           "name": "custom_training_plan_confirm",
           "pathName": "pages/mine/school/lesson/lesson_detail",
-          "query": "id=117",
+          "query": "id=73",
           "scene": null
         },
         {
@@ -49,9 +49,9 @@
           "scene": null
         },
         {
-          "name": "pay maintain",
-          "pathName": "pages/payment/confirm_payment",
-          "query": "controller=maintainlive&action=placeorderbatch&id=514",
+          "name": "admin_index",
+          "pathName": "pages/admin/admin",
+          "query": "",
           "scene": null
         },
         {
@@ -61,63 +61,33 @@
           "scene": null
         },
         {
-          "name": "lesson_list",
+          "name": "lesson list",
           "pathName": "pages/admin/school/lesson/lesson_list",
           "query": "",
           "scene": null
         },
         {
-          "name": "mine",
-          "pathName": "pages/mine/mine",
-          "query": "",
-          "scene": null
+          "name": "lesson_custom_detail",
+          "pathName": "pages/mine/school/lesson/lesson_detail",
+          "query": "id=107",
+          "scene": 1000
         },
         {
-          "name": "pay temp",
+          "name": "pay temp order",
           "pathName": "pages/payment/pay_temp_order",
-          "query": "id=8627",
+          "query": "id=8602",
           "scene": null
         },
         {
-          "name": "my maintain",
-          "pathName": "pages/mine/my_maintain/my_maintain",
-          "query": "",
+          "name": "bind ticket",
+          "pathName": "pages/mine/ticket/ticket_bind",
+          "query": "ticketCode=862850254",
           "scene": null
         },
         {
-          "name": "common pay",
-          "pathName": "pages/payment/confirm_payment",
-          "query": "controller=MaintainLive&action=PlaceOrderBatch&id=450",
-          "scene": null
-        },
-        {
-<<<<<<< HEAD
-          "name": "Maintain with Ticket",
+          "name": "maintain recept",
           "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
-          "query": "ticketCode=001001001",
-          "scene": null
-        },
-        {
-          "name": "maitain recept with ticket",
-          "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
-          "query": "ticketCode=001001001",
-          "scene": null
-        },
-        {
-          "name": "print ticket",
-          "pathName": "pages/admin/printer/gprinter/test_print_tickets",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "print ticket test",
-          "pathName": "pages/Print/pring_image_test",
-          "query": "",
-=======
-          "name": "confirm pay",
-          "pathName": "pages/payment/confirm_payment",
-          "query": "controller=experience&action=placeorder&id=214",
->>>>>>> master
+          "query": "ticketCode=174190747",
           "scene": null
         }
       ]

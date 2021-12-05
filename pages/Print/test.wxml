@@ -1,2 +1,0 @@
-<!--pages/Print/test.wxml-->
-<button bindtap="gotoPrinter" >测试测试</button>
