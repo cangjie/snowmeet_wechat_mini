@@ -1,5 +1,5 @@
 <auth wx:if="{{needToGetCell}}" validType="cell" bindUpdateSuccess="onUpdateCellSuccess"  ></auth>
-<auth wx:if="{{needToGetInfo}}" validType="cell" bindUpdateSuccess="onUpdateInfoSuccess"  ></auth>
+<auth wx:if="{{needToGetInfo}}" validType="info" bindUpdateSuccess="onUpdateInfoSuccess"  ></auth>
 <view wx:if="{{!needToGetCell && !needToGetInfo && ticket != null}}">
   <view class="flex-wrp" style="flex-direction: row;width: 100%;">
     <view style="width: 100rpx;"></view>

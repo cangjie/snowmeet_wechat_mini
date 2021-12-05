@@ -81,7 +81,7 @@
         {
           "name": "bind ticket",
           "pathName": "pages/mine/ticket/ticket_bind",
-          "query": "ticketCode=862850254",
+          "query": "ticketCode=573803620",
           "scene": null
         },
         {

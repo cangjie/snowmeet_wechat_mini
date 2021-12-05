@@ -18,7 +18,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function (resolve){
       if (app.globalData.cellNumber == undefined || app.globalData.cellNumber == null || app.globalData.cellNumber == ''){
-        that.setData({neettoGetCell: true})
+        that.setData({needToGetCell: true})
       }
       else{
         if (app.globalData.userInfo == undefined || app.globalData.userInfo == null) {
@@ -39,12 +39,19 @@ Page({
     })
   },
   onUpdateCellSuccess: function() {
-    if (app.globalData.userInfo == undefined || app.globalData.userInfo == null) {
+    var that = this
+    if (app.globalData.userInfo == undefined || app.globalData.userInfo == null || app.globalData.userInfo.nickName == null 
+      || app.globalData.userInfo.nickName == undefined || app.globalData.userInfo.nickName == '' 
+      || app.globalData.userInfo.nickName == '微信用户') {
       that.setData({needToGetInfo: true, needToGetCell: false})
     }
     else {
       that.setData({needToGetCell: false})
     }
+  },
+
+  onUpdateInfoSuccess: function(){
+    this.setData({needToGetInfo: false})
   },
 
   gotoBind: function(){
