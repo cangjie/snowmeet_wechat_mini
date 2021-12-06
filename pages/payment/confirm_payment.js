@@ -50,7 +50,7 @@ Page({
         that.setData({payMessage: msg})
         console.log('Order created.', res)
         that.setData({orderId: res.data.id})
-        var wepayUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/Pay/' + encodeURIComponent(app.globalData.sessionKey)+ '?id=' + orderId
+        var wepayUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/Pay/'+orderId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: wepayUrl,
           method: 'GET',

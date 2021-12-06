@@ -39,7 +39,7 @@ Page({
         success:(res)=>{
           console.log('Get Order:', res)
           if (res.data.pay_state == 0){
-            var wepayUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/Pay/' + encodeURIComponent(app.globalData.sessionKey)+ '?id=' + orderId
+            var wepayUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/Pay/' + orderId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
               url: wepayUrl,
               method: 'GET',
