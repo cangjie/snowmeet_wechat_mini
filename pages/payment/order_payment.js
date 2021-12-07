@@ -30,8 +30,12 @@ Page({
             signType: 'RSA',
             success: (res) => {
               console.log('pay success', res)  
+              var callBack = '/pages/mine/my_ski_pass/my_ski_pass'
+              if (options.callback != undefined){
+                callBack = decodeURIComponent(options.callback)
+              }
               wx.navigateTo({
-                url: '/pages/mine/my_ski_pass/my_ski_pass',
+                url: callBack,
               })
             }
           })
