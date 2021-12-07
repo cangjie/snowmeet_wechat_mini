@@ -79,6 +79,7 @@
           "scene": null
         },
         {
+<<<<<<< HEAD
           "name": "pages/admin/equip_maintain/on_site/print_label_new",
           "pathName": "pages/admin/equip_maintain/on_site/print_label_new",
           "query": "id=788",
@@ -94,6 +95,17 @@
           "name": "pay order test",
           "pathName": "pages/payment/pay_temp_order",
           "query": "id=8754",
+=======
+          "name": "bind ticket",
+          "pathName": "pages/mine/ticket/ticket_bind",
+          "query": "ticketCode=573803620",
+          "scene": null
+        },
+        {
+          "name": "maintain recept",
+          "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
+          "query": "ticketCode=174190747",
+>>>>>>> c93c8a5235b27330e10559bc690d55aeb4962040
           "scene": null
         }
       ]

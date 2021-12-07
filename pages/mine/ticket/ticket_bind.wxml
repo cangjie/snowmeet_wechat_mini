@@ -1,2 +1,18 @@
-<!--pages/mine/ticket/ticket_bind.wxml-->
-<text>pages/mine/ticket/ticket_bind.wxml</text>
+<auth wx:if="{{needToGetCell}}" validType="cell" bindUpdateSuccess="onUpdateCellSuccess"  ></auth>
+<auth wx:if="{{needToGetInfo}}" validType="info" bindUpdateSuccess="onUpdateInfoSuccess"  ></auth>
+<view wx:if="{{!needToGetCell && !needToGetInfo && ticket != null}}">
+  <view class="flex-wrp" style="flex-direction: row;width: 100%;">
+    <view style="width: 100rpx;"></view>
+    <view style="width: 80%;border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;">
+      <view style="background-color: greenyellow;text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><b>{{ticket.name}}</b></view>
+      <view wx:for="{{ticket.usage}}" style="margin-left: 50rpx;">
+        *{{item}}
+      </view>
+    </view>
+    <view style="width: 100rpx;"></view>
+  </view>
+  <view wx:if="{{ticket.open_id == ''}}" style="margin-top: 50rpx;" >
+    <button bindtap="gotoBind" > 确 认 绑 定 </button>
+  </view>
+  <view wx:else style="margin-top: 50rpx;text-align: center;" > 此 券 已 经 被 绑 定 </view>
+</view>

@@ -87,7 +87,12 @@ Page({
           that.setData({ticketCode: ''})
         }
         else {
-          that.setData({ticketInfo: res.data})
+          var ticket = res.data
+          if (ticket!=null && ticket != undefined){
+            ticket.usage = ticket.memo.split(';')
+            that.setData({ticketInfo: ticket})
+          }
+          
         }
         
         
@@ -125,16 +130,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-        /*
-    wx.showModal({
-      title: '是否添加添加下一单？',
-      confirmText: '新增',
-      cancelText: '结算',
-      success: (res) => {
-        
-      }
-    })
-    */
+
    if (options.batchId != undefined) {
      this.data.batchId = options.batchId
    }

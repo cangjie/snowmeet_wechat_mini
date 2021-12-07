@@ -89,18 +89,15 @@ Page({
   },
   showDetail: function(source){
     console.log(source)
+    if (this.options.used == 1){
+      return
+    }
     var code = source.currentTarget.id
-    var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_id_' + code
-    wx.getImageInfo({
-      src: qrCodeUrl,
-      success:(res)=>{
-        var context = wx.createCanvasContext('img', this)
-        context.drawImage(res.path, 0, 0, 150, 150)
-        context.draw()
-        this.setData({currentQrUrl: qrCodeUrl, currentY:source.detail.y, showCover: 'block'})
-        
-      }
-    })
+    //var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code
+    var qrCodeUrl = 'https://' + app.globalData.domainName + '/show_image.aspx?img=' 
+    + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code)
+    this.setData({currentQrUrl: qrCodeUrl, currentY:source.detail.y, showCover: 'block'})
+   
     
   },
   hideDetail: function(){
