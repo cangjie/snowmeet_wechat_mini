@@ -79,23 +79,6 @@
           "scene": null
         },
         {
-<<<<<<< HEAD
-          "name": "pages/admin/equip_maintain/on_site/print_label_new",
-          "pathName": "pages/admin/equip_maintain/on_site/print_label_new",
-          "query": "id=788",
-          "scene": null
-        },
-        {
-          "name": "pay test",
-          "pathName": "pages/payment/confirm_payment",
-          "query": "controller=maintainlive&action=PlaceOrderBatch&id=936",
-          "scene": null
-        },
-        {
-          "name": "pay order test",
-          "pathName": "pages/payment/pay_temp_order",
-          "query": "id=8754",
-=======
           "name": "bind ticket",
           "pathName": "pages/mine/ticket/ticket_bind",
           "query": "ticketCode=573803620",
@@ -105,7 +88,12 @@
           "name": "maintain recept",
           "pathName": "pages/admin/equip_maintain/on_site/recept_batch",
           "query": "ticketCode=174190747",
->>>>>>> c93c8a5235b27330e10559bc690d55aeb4962040
+          "scene": null
+        },
+        {
+          "name": "pay confirmed order",
+          "pathName": "pages/payment/order_payment",
+          "query": "orderid=16389",
           "scene": null
         }
       ]

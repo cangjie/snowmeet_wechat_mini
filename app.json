@@ -42,7 +42,8 @@
     "pages/admin/printer/gprinter/ticket",
     "pages/admin/ticket/ticket_template_list",
     "pages/mine/ticket/ticket_list",
-    "pages/mine/ticket/ticket_bind"
+    "pages/mine/ticket/ticket_bind",
+    "pages/payment/order_payment"
   ],
   "window": {
     "backgroundTextStyle": "light",
