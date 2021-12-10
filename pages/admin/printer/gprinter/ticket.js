@@ -255,6 +255,7 @@ Page({
                   command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
                   command.setCls()//清除缓冲区
                   command.setBitmap(0, 0, 0, res)
+                  //command.setText(20, 20 + 40, "TSS24.BF2", 0, 1, 1,'aaawrwerwerwer')
                   command.setPrint(1)
                   that.prepareSend(command.getData())
                 }
@@ -267,7 +268,7 @@ Page({
   },
   prepareSend: function(buff){
     var that = this
-    var oneTimeData= 51200
+    var oneTimeData= 128
     var loopTime = parseInt(buff.length / oneTimeData);
     var lastData = parseInt(buff.length % oneTimeData);
     console.log(loopTime + "---" + lastData)
@@ -301,6 +302,9 @@ Page({
       }
     }
     console.log(buf)
+
+
+    setTimeout(()=>{
     wx.writeBLECharacteristicValue({
       characteristicId: this.data.writeCharacterId,
       //characteristicId: '49535343-8841-43F4-A8D4-ECBE34729BB3',
@@ -333,6 +337,7 @@ Page({
         }
       }
     })
+  },1)
   },
 
   prepareBLEAdapterPromise: new Promise(function(resolve){

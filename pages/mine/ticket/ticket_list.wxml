@@ -1,3 +1,4 @@
+<view>
 <view class="btn-area flex-wrp" style="margin-top: 25rpx;flex-direction:row; text-align: center;">
   <navigator style="width: 50%;text-align: center;color:{{unUsedColor}};" url="ticket_list?used=0" open-type="redirect" hover-class="other-navigator-hover" >未使用</navigator>
   <navigator style="width: 50%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >已使用</navigator>
@@ -16,16 +17,12 @@
     <view style="width: 100rpx;"></view>
   </view>
   <view style="height: 1rpx;" ></view>
+  
 </view>
-<cover-view bindtap="hideDetail" class="cover-view" style="height: 100%;background-color: #c0c0c0; top: {{currentY}}rpx;left: 0rpx; position: absolute;width:100%;display: {{showCover}};opacity: 0.9;">
-  <cover-view class="container" bindtap="hideDetail" >
-    <cover-image src="{{currentQrUrl}}" style="width: 300rpx; height: 300rpx;" ></cover-image>
-    <!--canvas canvas-id="img" style="width: 300rpx; height: 300rpx;" ></canvas-->
-    <!--image style="width: 300rpx;height: 300rpx;" mode="aspectFit" src="{{currentQrUrl}}" ></image-->
-    <!--cover-view class="flex-wrp" style="flex-direction:row;" bindtap="hideDetail" >
-      <cover-view class="flex-item">aaa</cover-view>
-      <cover-view class="flex-item">bbb</cover-view>
-      <cover-view class="flex-item">ccc</cover-view>
-    </cover-view-->
-  </cover-view>
+<cover-view bindtap="hideDetail" class="cover-view" style="height: 100%;background-color: #c0c0c0;position:fixed;top:0px;width:100%;display: {{showCover}};opacity: {{opacity}};">
+
+<cover-image src="{{currentQrUrl}}" style="position:relative;top:150px;left:100px;width: 300rpx; height: 300rpx;" ></cover-image>
+
+
 </cover-view>
+</view>

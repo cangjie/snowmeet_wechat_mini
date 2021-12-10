@@ -13,7 +13,8 @@ Page({
     showCover: 'none',
     ticketArr:[],
     currentQrUrl :'',
-    currentY: 0
+    currentY: 0,
+    opacity: 0
   },
 
   /**
@@ -96,11 +97,11 @@ Page({
     //var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code
     var qrCodeUrl = 'https://' + app.globalData.domainName + '/show_image.aspx?img=' 
     + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code)
-    this.setData({currentQrUrl: qrCodeUrl, currentY:source.detail.y, showCover: 'block'})
+    this.setData({currentQrUrl: qrCodeUrl, currentX: 200,currentY:source.detail.y, showCover: 'block', opacity: 0.8 })
    
     
   },
   hideDetail: function(){
-    this.setData({showCover: 'none'})
+    this.setData({showCover: 'none', opacity: 0})
   }
 })

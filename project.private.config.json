@@ -81,7 +81,7 @@
         {
           "name": "bind ticket",
           "pathName": "pages/mine/ticket/ticket_bind",
-          "query": "ticketCode=573803620",
+          "query": "ticketCode=690525992",
           "scene": null
         },
         {
@@ -94,6 +94,18 @@
           "name": "pay confirmed order",
           "pathName": "pages/payment/order_payment",
           "query": "orderid=16389",
+          "scene": null
+        },
+        {
+          "name": "ticket android",
+          "pathName": "pages/admin/printer/gprinter/test_print_tickets",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "mine",
+          "pathName": "pages/mine/mine",
+          "query": "",
           "scene": null
         }
       ]
