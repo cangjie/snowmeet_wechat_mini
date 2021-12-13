@@ -126,6 +126,9 @@ Page({
       var msg = that.data.msg
       msg.push('所有蓝牙设备，均连接失败。')
       that.setData({msg:msg})
+      wx.closeBLEConnection({
+        deviceId: that.data.deviceId,
+      })
     }
     
   },
@@ -265,6 +268,11 @@ Page({
         }
       })
     }
+    else{
+      wx.closeBLEConnection({
+        deviceId: this.data.deviceId,
+      })
+    }
   },
   prepareSend: function(buff){
     var that = this
@@ -337,7 +345,7 @@ Page({
         }
       }
     })
-  },1)
+  }, 25)
   },
 
   prepareBLEAdapterPromise: new Promise(function(resolve){
