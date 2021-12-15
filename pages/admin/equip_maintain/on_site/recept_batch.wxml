@@ -6,7 +6,12 @@
     </mp-cell>
   </mp-cells>
   <mp-cells title="当前店铺" >
-    <mp-cell>{{confirmedInfo.shop}}</mp-cell>
+    <mp-cell>
+      <radio-group bindchange="selectShop" >
+        <radio checked="{{confirmedInfo.shop=='万龙'}}" value="万龙" >万龙</radio>
+        <radio checked="{{confirmedInfo.shop=='南山'}}" value="南山" >南山</radio>
+      </radio-group>
+    </mp-cell>
   </mp-cells>
   <mp-cells wx:if="{{ticketInfo!=null}}" title="{{ticketInfo.name}}-{{ticketInfo.code}}" >
     <mp-cell>

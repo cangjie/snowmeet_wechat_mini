@@ -130,7 +130,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-
+    var that = this
    if (options.batchId != undefined) {
      this.data.batchId = options.batchId
    }
@@ -173,6 +173,7 @@ Page({
               var bottomEdge = order.confirmed_more.indexOf('修底刃') >= 0 ? true:false
               var withPole = order.confirmed_more.indexOf('雪杖') >= 0 ? true:false
               var others = order.confirmed_more.indexOf('其它') >= 0 ? true:false
+              
               this.setData({confirmedInfo: confirmedInfo, cell: order.confirmed_cell, realName: order.confirmed_name, gender: order.confirmed_gender, fixBottom: fixBottom, bottomEdge: bottomEdge, pasteFace: pasteFace, withPole: withPole, others: others, pickDateDescription: '', photoFiles: order.confirmed_images})
               this.fillBrand(order.confirmed_equip_type, order.confirmed_brand)
             }
@@ -191,7 +192,23 @@ Page({
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.pick_date = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth() + 1).toString() + '-' + pickDate.getDate().toString()
     this.setData({confirmedInfo: confirmedInfo, pickDateStart: pickDateStartStr, pickDateEnd: pickDateEndStr})
-    
+    wx.getLocation({
+      type: 'wgs84',
+      success:(res)=>{
+        var latitude = res.latitude
+        var longitude = res.longitude
+        if (longitude < 116.1){
+          confirmedInfo.shop = '万龙'
+        }
+        else{
+          confirmedInfo.shop = '南山'
+        }
+        that.setData({confirmedInfo: confirmedInfo})
+      },
+      fail:(res)=>{
+        console.log('get location', res)
+      }
+    })
     var brandListUrl = 'https://' + app.globalData.domainName + '/api/brand_list_get.aspx'
     wx.request({
       url: brandListUrl,
@@ -398,6 +415,12 @@ Page({
     var degree = e.detail.value
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.degree = degree
+    this.setData({confirmedInfo: confirmedInfo})
+  },
+  selectShop:function(e){
+    var shop = e.detail.value
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.shop = shop
     this.setData({confirmedInfo: confirmedInfo})
   },
   changeCandle: function(e) {
