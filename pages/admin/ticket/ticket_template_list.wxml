@@ -1,5 +1,12 @@
 <!--pages/admin/ticket/ticket_template_list.wxml-->
 <view>
+  <view class="flex-wrp"  style="flex-direction:row;" >
+    选择渠道：
+    <picker id="pik_channel" value="{{channelIndex}}" range="{{channelArr}}" bindchange="setChannel" >
+      <view class="picker" >{{channelArr[channelIndex]}}</view>
+    </picker>
+    <input id="txt_channel"  wx:if="{{channelIndex == channelArr.length -1}}" placeholder="填写新渠道名称" bindinput="setChannel" />
+  </view>
   <view style="height: 50rpx;" ></view>
   <view wx:for="{{ticketTemplateArr}}" >
     <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;" >
