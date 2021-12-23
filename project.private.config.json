@@ -113,6 +113,12 @@
           "pathName": "pages/payment/confirm_payment",
           "query": "controller=maintainlive&action=PlaceOrderBatch&id=1062",
           "scene": null
+        },
+        {
+          "name": "skipass",
+          "pathName": "pages/skipass/skipass",
+          "query": "",
+          "scene": null
         }
       ]
     }
