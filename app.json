@@ -43,7 +43,8 @@
     "pages/admin/ticket/ticket_template_list",
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
-    "pages/payment/order_payment"
+    "pages/payment/order_payment",
+    "pages/skipass/skipass_today"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -63,10 +64,13 @@
     "kbone": true,
     "weui": true
   },
-  "requiredBackgroundModes": ["audio", "location"],
+  "requiredBackgroundModes": [
+    "audio",
+    "location"
+  ],
   "permission": {
     "scope.userLocation": {
-      "desc" : "仅仅店员使用来确定门店位置。" 
+      "desc": "仅仅店员使用来确定门店位置。"
     }
   }
 }

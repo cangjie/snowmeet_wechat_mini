@@ -115,8 +115,8 @@
           "scene": null
         },
         {
-          "name": "skipass",
-          "pathName": "pages/skipass/skipass",
+          "name": "skipass today",
+          "pathName": "pages/skipass/skipass_today",
           "query": "",
           "scene": null
         }
