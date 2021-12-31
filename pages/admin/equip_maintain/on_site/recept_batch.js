@@ -200,8 +200,11 @@ Page({
         if (longitude < 116.1){
           confirmedInfo.shop = '万龙'
         }
-        else{
+        else if (longitude < 117 ){
           confirmedInfo.shop = '南山'
+        }
+        else{
+          confirmedInfo.shop = '渔阳'
         }
         that.setData({confirmedInfo: confirmedInfo})
       },
