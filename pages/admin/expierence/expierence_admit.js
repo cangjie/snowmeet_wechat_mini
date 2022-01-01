@@ -40,6 +40,26 @@ Page({
     filledAdmitInfo.start_time = startTimeStr
     filledAdmitInfo.end_time = endTimeStr
     this.setData({filledAdmitInfo: filledAdmitInfo})
+    wx.getLocation({
+      type: 'wgs84',
+      success:(res)=>{
+        var latitude = res.latitude
+        var longitude = res.longitude
+        if (longitude < 116.1){
+          filledAdmitInfo.shop = '万龙'
+        }
+        else if (longitude < 117 ){
+          filledAdmitInfo.shop = '南山'
+        }
+        else{
+          filledAdmitInfo.shop = '渔阳'
+        }
+        that.setData({filledAdmitInfo: filledAdmitInfo})
+      },
+      fail:(res)=>{
+        console.log('get location', res)
+      }
+    })
   },
 
   /**
