@@ -95,6 +95,7 @@ Page({
               confirmedInfo.equipInfo.type = order.confirmed_equip_type
               confimedInfo.equipInfo.brand = order.confirmed_brand
               confimedInfo.equipInfo.scale = order.confirmed_scale
+              confirmedInfo.shop = order.shop
               var photoFiles = order.confirmed_images
               if (order.confirmed_edge == '1') {
                 confirmedInfo.edge = 1

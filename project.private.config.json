@@ -109,9 +109,15 @@
           "scene": null
         },
         {
+<<<<<<< HEAD
           "name": "pages/payment/confirm_payment",
           "pathName": "pages/payment/confirm_payment",
           "query": "controller=maintainlive&action=PlaceOrderBatch&id=1003",
+=======
+          "name": "confirm payment",
+          "pathName": "pages/payment/confirm_payment",
+          "query": "controller=maintainlive&action=PlaceOrderBatch&id=1062",
+>>>>>>> dbf232588687db8c0343f8a5949480340b8da851
           "scene": null
         }
       ]
