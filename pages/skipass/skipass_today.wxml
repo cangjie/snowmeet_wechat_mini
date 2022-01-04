@@ -1,0 +1,9 @@
+<view>
+  <view wx:for="{{productArr}}" >
+    <view><hr/></view>
+    <view>
+      <button id="btn_{{item.id}}" bindtap="gotoPay" >{{item.name}}</button>
+    </view>
+    <view><hr/></view>
+  </view>
+</view>

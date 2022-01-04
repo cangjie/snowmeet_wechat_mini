@@ -130,7 +130,7 @@ Component({
   ready: function() {
     if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
       var that = this
-      app.loginPromise.then(function(resolve){
+      app.loginPromiseNew.then(function(resolve){
         init(app, that)
       })
     }

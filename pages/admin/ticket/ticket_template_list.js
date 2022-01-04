@@ -6,7 +6,10 @@ Page({
    * Page initial data
    */
   data: {
-    ticketTemplateArr:[]
+    ticketTemplateArr:[],
+    channelArr:[],
+    channelIndex:0,
+    channelName:''
   },
 
   /**
@@ -25,6 +28,19 @@ Page({
             ticketTemplateArr[i].usage = ticketTemplateArr[i].memo.trim().split(';')
             ticketTemplateArr[i].printNum = 1
           }
+          var channelArr = []
+
+          var getChannelUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetChannels'
+          wx.request({
+            url: getChannelUrl,
+            success:(res)=>{
+              for(var i = 0; i < res.data.length; i++){
+                channelArr.push(res.data[i])
+              }
+              channelArr.push('添加新渠道...')
+              that.setData({channelArr: channelArr, channelName: channelArr[that.data.channelIndex]})
+            }
+          })
           that.setData({ticketTemplateArr: ticketTemplateArr})
         }
       })
@@ -80,6 +96,7 @@ Page({
 
   },
   print:function(source){
+    var that = this
     var id = parseInt(source.currentTarget.id.replace('print_', ''))
     var ticketTemplateArr = this.data.ticketTemplateArr
     var name = ''
@@ -98,7 +115,7 @@ Page({
         content: msg,
         success:(res)=>{
           if (res.confirm){
-            var generateTicketsUrl = 'https://' + app.globalData.domainName + '/core/ticket/GenerateTickets/' + id + '?count=' + printNum + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            var generateTicketsUrl = 'https://' + app.globalData.domainName + '/core/ticket/GenerateTickets/' + id + '?count=' + printNum + '&channel=' + that.data.channelName + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
               url: generateTicketsUrl,
               success:(res)=>{
@@ -124,5 +141,17 @@ Page({
       }
     }
 
+  },
+  setChannel: function(source){
+    console.log(source)
+    if (source.currentTarget.id == 'txt_channel'){
+      this.data.channelName = source.detail.value
+    }
+    else {
+      var channelArr = this.data.channelArr
+      var channelIndex = parseInt(source.detail.value)
+      var channelName = channelArr[channelIndex]
+      this.setData({channelName: channelName, channelIndex: channelIndex})
+    }
   }
 })

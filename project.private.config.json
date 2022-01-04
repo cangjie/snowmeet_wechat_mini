@@ -119,6 +119,12 @@
           "query": "controller=maintainlive&action=PlaceOrderBatch&id=1062",
 >>>>>>> dbf232588687db8c0343f8a5949480340b8da851
           "scene": null
+        },
+        {
+          "name": "skipass today",
+          "pathName": "pages/skipass/skipass_today",
+          "query": "",
+          "scene": null
         }
       ]
     }
