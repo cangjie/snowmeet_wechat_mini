@@ -107,6 +107,12 @@
           "pathName": "pages/mine/mine",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "pages/payment/confirm_payment",
+          "pathName": "pages/payment/confirm_payment",
+          "query": "controller=maintainlive&action=PlaceOrderBatch&id=1003",
+          "scene": null
         }
       ]
     }
