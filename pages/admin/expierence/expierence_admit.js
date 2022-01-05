@@ -48,6 +48,9 @@ Page({
         if (longitude < 116.1){
           filledAdmitInfo.shop = '万龙'
         }
+        else if (longitude < 116.75){
+          filledAdmitInfo.shop = '怀北'
+        }
         else if (longitude < 117 ){
           filledAdmitInfo.shop = '南山'
         }

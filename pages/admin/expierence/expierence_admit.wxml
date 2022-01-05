@@ -19,6 +19,9 @@
             <radio wx:if="{{filledAdmitInfo.shop=='渔阳'}}" checked="true" value="渔阳" >渔阳</radio>
             <radio wx:else value="渔阳" >渔阳</radio> 
 
+            <radio wx:if="{{filledAdmitInfo.shop=='怀北'}}" checked="true" value="怀北" >怀北</radio>
+            <radio wx:else value="怀北" >怀北</radio> 
+
           </radio-group>
         </view>
       </view>

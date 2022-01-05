@@ -11,6 +11,7 @@
         <radio checked="{{confirmedInfo.shop=='万龙'}}" value="万龙" >万龙</radio>
         <radio checked="{{confirmedInfo.shop=='南山'}}" value="南山" >南山</radio>
         <radio checked="{{confirmedInfo.shop=='渔阳'}}" value="渔阳" >渔阳</radio>
+        <radio checked="{{confirmedInfo.shop=='怀北'}}" value="怀北" >怀北</radio>
       </radio-group>
     </mp-cell>
   </mp-cells>

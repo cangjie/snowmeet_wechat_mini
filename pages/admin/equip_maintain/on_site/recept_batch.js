@@ -200,6 +200,9 @@ Page({
         if (longitude < 116.1){
           confirmedInfo.shop = '万龙'
         }
+        else if (longitude < 116.75){
+          confirmedInfo.shop = '怀北'
+        }
         else if (longitude < 117 ){
           confirmedInfo.shop = '南山'
         }
