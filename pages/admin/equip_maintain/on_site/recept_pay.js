@@ -104,13 +104,53 @@ Page({
       that.data.sessionKey = resolve.sessionKey
       that.setData({qrCodeUrl: qrCodeUrl})
       if (that.data.id == 0) {
-        var getBatchOrderUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_batch.aspx?batchid=' + that.data.batchId + '&sessionkey=' + encodeURIComponent(that.data.sessionKey)
+        var getBatchOrderUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_batch.aspx?batchid=' 
+        + that.data.batchId + '&sessionkey=' + encodeURIComponent(that.data.sessionKey)
         wx.request({
           url: getBatchOrderUrl,
           success: (res) => {
             if (res.data.status == 0 && res.data.count > 0) {
+              console.log(res.data)
               that.data.id = res.data.maintain_in_shop_request[0].id
-              that.refreshPayStatus()
+              if (res.data.maintain_in_shop_request[0].pay_method == '微信'){
+                
+                that.refreshPayStatus()
+              }
+              else{
+
+                ///////////////////////////////////////
+                //Insert a blank order
+                ///////////////
+                var blankOrderUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/PlaceBlankOrderBatch/' + that.data.batchId + '?sessionKey=' + encodeURIComponent(that.data.sessionKey)
+                wx.request({
+                  url: blankOrderUrl,
+                  success:(res)=>{
+                    if(res.data.id > 0){
+                      var allocateTaskFlowNumUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_allocate_flow_num.aspx?id=' 
+                      + that.data.id + '&sessionkey=' + encodeURIComponent(that.data.sessionKey)
+                      wx.request({
+                        url: allocateTaskFlowNumUrl,
+                        success: (res) => {
+                          var toastTitle = ''
+                          that.setData({paid: true})
+                          if (res.data.status == 0) {
+                            toastTitle = '支付成功，流水号：' + res.data.task_flow_num
+            
+                          }
+                          else {
+                            toastTitle = '支付成功，流水号未分配'
+                          }
+                          wx.showToast({
+                            title: toastTitle
+                          })
+                        }
+                      })
+                    }
+                    
+                  }
+                })
+                
+              }
             }
           }
         })

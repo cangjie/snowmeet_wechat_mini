@@ -17,7 +17,9 @@ Page({
         brand: ''
       },
       additional_fee: 0,
-      urgent:false
+      urgent:false,
+      payMethod: '微信',
+      payMemo:''
     },
     pickDateDescription: '明天',
     totalCharge: 0,
@@ -30,7 +32,9 @@ Page({
     batchId: 0,
     ticketInfo: null,
     lastMaintainInfo: null,
-    ticketCode: ''
+    ticketCode: '',
+    payMethodList: ['微信', '现金', '支付宝','次卡', '招待', '试滑', '买板'],
+    payMethodSelectIndex: 0
   },
   fillBrand: function(type, brand) {
     if (this.data.id > 0){
@@ -146,10 +150,10 @@ Page({
           success: (res) => {
             if (res.data.status == 0) {
               var order = res.data.maintain_in_shop_request
-              var confimedInfo = this.data.confirmedInfo
+              var confirmedInfo = this.data.confirmedInfo
               confirmedInfo.equipInfo.type = order.confirmed_equip_type
-              confimedInfo.equipInfo.brand = order.confirmed_brand
-              confimedInfo.equipInfo.scale = order.confirmed_scale
+              confirmedInfo.equipInfo.brand = order.confirmed_brand
+              confirmedInfo.equipInfo.scale = order.confirmed_scale
               var photoFiles = order.confirmed_images
               if (order.confirmed_edge == '1') {
                 confirmedInfo.edge = 1
@@ -677,5 +681,19 @@ Page({
     confirmedInfo.urgent = e.detail.value?1:0
     this.setData({confirmedInfo: confirmedInfo})
     this.checkValid()
+  },
+  changePayMethod: function(e) {
+    console.log(e)
+    var selectIndex = e.detail.value
+    var selectedPayMethod = this.data.payMethodList[selectIndex]
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.payMethod = selectedPayMethod
+    this.setData({confirmedInfo: confirmedInfo, payMethodSelectIndex: selectIndex})
+  },
+  inputPayMemo: function(e) {
+    console.log(e)
+    var confirmedInfo = this.data.confirmedInfo
+    confirmedInfo.payMemo = e.detail.value
+    this.setData({confirmedInfo: confirmedInfo})
   }
 })

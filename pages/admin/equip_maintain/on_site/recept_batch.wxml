@@ -164,6 +164,23 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <mp-cells title="支付方式" >
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx">
+        <view class="left-column" >
+          <picker mode="selector" range="{{payMethodList}}" bindchange="changePayMethod" >
+            <view>{{payMethodList[payMethodSelectIndex]}}</view>
+          </picker>
+        </view>
+        <view>
+          <block wx:if="{{payMethodSelectIndex > 2}}" >
+            <input style="width: 100%;" type="text" placeholder="备注,招待了谁?谁的次卡等" bindinput="inputPayMemo" />
+          </block>
+        </view>
+      </view>
+      
+    </mp-cell>
+  </mp-cells>
   <button wx:if="{{id==0}}" bindtap="submit" disabled="{{!submitInfoValid}}" > 提 交 </button>
   <block wx:else >
     <button  bindtap="update" > 更 新 </button>
