@@ -1,0 +1,14 @@
+<view wx:if="{{haveRight}}" >
+  <view style="text-align: center;">您现有龙珠</view>
+  <view style="text-align: center;">{{userPointsSummary}}</view>
+  <view style="text-align: center;">本次打开</view>
+  <view style="text-align: center;">{{deviceInfo.name}}</view>
+  <view style="text-align: center;">所需龙珠</view>
+  <view style="text-align: center;">{{deviceInfo.need_points}}</view>
+  <view>
+    <button disabled="{{userPointsSummary < deviceInfo.need_points}}" > 点 击 此 处 连 接 蓝 牙 </button>
+  </view>
+</view>
+<view wx:else>
+  没有权限
+</view>

@@ -20,8 +20,7 @@
     "pages/admin/expierence/expierence_admit",
     "pages/admin/expierence/expierence_return",
     "pages/admin/expierence/expierence_active_list",
-    "pages/admin/expierence/ expierence_refund",
-    "pages/ble/printer_test",
+    "pages/admin/expierence/expierence_refund",
     "pages/admin/equip_maintain/on_site/recept",
     "pages/admin/equip_maintain/on_site/recept_pay",
     "pages/admin/equip_maintain/on_site/recept_list",
@@ -44,7 +43,8 @@
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
     "pages/payment/order_payment",
-    "pages/skipass/skipass_today"
+    "pages/skipass/skipass_today",
+    "pages/blt/open_lock"
   ],
   "window": {
     "backgroundTextStyle": "light",
