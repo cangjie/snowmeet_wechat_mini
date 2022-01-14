@@ -6,7 +6,7 @@
   <view style="text-align: center;">所需龙珠</view>
   <view style="text-align: center;">{{deviceInfo.need_points}}</view>
   <view>
-    <button disabled="{{userPointsSummary < deviceInfo.need_points}}" > 点 击 此 处 连 接 蓝 牙 </button>
+    <button disabled="{{userPointsSummary < deviceInfo.need_points}}" bindtap="bltOpen" > 点 击 此 处 连 接 蓝 牙 </button>
   </view>
 </view>
 <view wx:else>
