@@ -9,7 +9,9 @@ Page({
     deviceId:0,
     haveRight: false,
     userPointsSummary: 0,
-    findDevice: false
+    findDevice: false,
+    serviceId:'',
+    charId:''
   },
 
   bltOpen: function(e){
@@ -69,7 +71,6 @@ Page({
               for(var i = 0; i < res.devices.length; i++){
                 if (that.data.deviceInfo.device_name.toLowerCase() == res.devices[i].name.toLowerCase() 
                 || that.data.deviceInfo.device_name_2.toLowerCase() == res.devices[i].name.toLowerCase()){
-                  //that.setData({findDevice: true, currentDevice: res.devices[i]})
                   that.data.findDevice = true
                   that.data.currentDevice = res.devices[i]
                   console.log('Device found')
@@ -95,23 +96,9 @@ Page({
           deviceId: deviceId,
           success:(res)=>{
             var serviceId = ''
-            var charId = ''
-            var found = false
-            for(var i = 0; i < res.services.length && !found ; i++){
+            for(var i = 0; i < res.services.length; i++){
               var serviceId = res.services[i].uuid
-              wx.getBLEDeviceCharacteristics({
-                deviceId: that.data.currentDevice.deviceId,
-                serviceId: serviceId,
-                success:(res)=>{
-                  for(var j = 0; j < res.characteristics.length && !found; j++){
-                    if (res.characteristics[j].properties.write){
-                      found = true
-                      console.log('char found!')
-                      break
-                    }
-                  }
-                }
-              })
+              that.getChar(deviceId, serviceId)
             }
             
           },
@@ -123,6 +110,70 @@ Page({
     })
   },
 
+  getChar:function(deviceId, serviceId){
+    var that = this
+    wx.getBLEDeviceCharacteristics({
+      deviceId: deviceId,
+      serviceId: serviceId,
+      success:(res)=>{
+        if (that.data.serviceId == '' && that.data.charId == ''){
+          for(var i = 0; i < res.characteristics.length; i++){
+            var char = res.characteristics[i]
+            if (char.properties.write){
+              that.data.serviceId = serviceId
+              that.data.charId = char.uuid
+              var ab = new ArrayBuffer(6)
+              var intAb = new Uint8Array(ab)
+              intAb[0] = 0x4F
+              intAb[1] = 0x50
+              intAb[2] = 0x45
+              intAb[3] = 0x4E
+              intAb[4] = 0x0A
+              intAb[5] = 0x0D
+              console.log('ab', ab)
+              wx.writeBLECharacteristicValue({
+                characteristicId: char.uuid,
+                deviceId: deviceId,
+                serviceId: serviceId,
+                value: ab,
+                success:(res)=>{
+                  console.log('write', res)
+                  wx.closeBLEConnection({
+                    deviceId: deviceId,
+                  })
+                  that.data.currentDevice.deviceId = ''
+                  that.data.serviceId = ''
+                  that.data.charId = ''
+                  var chargePointUrl = 'https://' + app.globalData.domainName + '/core/Point/SetPoint?points=' 
+                  + encodeURIComponent('-' + that.data.deviceInfo.need_points) + '&sessionKey=' 
+                  + encodeURIComponent(app.globalData.sessionKey) + '&memo=' + encodeURIComponent('连接设备' + that.data.currentDevice.name)
+                  wx.request({
+                    url: chargePointUrl,
+                    method: 'GET',
+                    success:(res)=>{
+                      wx.showToast({
+                        title: '连接成功',
+                        success: (res) => {
+                          console.log(that.data.userPointsSummary)
+                          var sum = that.data.userPointsSummary
+                          console.log(that.data.deviceInfo)
+                          var needPoints = that.data.deviceInfo.need_points
+                          
+                          that.setData({userPointsSummary: sum - needPoints})
+                        },
+                        fail: (res) => {},
+                        complete: (res) => {},
+                      })
+                    }
+                  })
+                }
+              })
+            }
+          }
+        }
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */
