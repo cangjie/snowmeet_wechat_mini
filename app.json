@@ -44,7 +44,8 @@
     "pages/mine/ticket/ticket_bind",
     "pages/payment/order_payment",
     "pages/skipass/skipass_today",
-    "pages/blt/open_lock"
+    "pages/blt/open_lock",
+    "pages/skipass/fill_certificate_no"
   ],
   "window": {
     "backgroundTextStyle": "light",

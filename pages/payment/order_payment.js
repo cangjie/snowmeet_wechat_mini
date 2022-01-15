@@ -8,11 +8,12 @@ Page({
   data: {
 
   },
-
+  
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+    
     app.loginPromiseNew.then(function(resolve){
       var wepayUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/Pay/'+options.orderid + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
@@ -30,7 +31,8 @@ Page({
             signType: 'RSA',
             success: (res) => {
               console.log('pay success', res)  
-              var callBack = '/pages/mine/my_ski_pass/my_ski_pass'
+              //var callBack = '/pages/mine/my_ski_pass/my_ski_pass'
+              var callBack = '/pages/skipass/fill_certificate_no?orderid=' + options.orderid
               if (options.callback != undefined){
                 callBack = decodeURIComponent(options.callback)
               }
@@ -92,4 +94,5 @@ Page({
   onShareAppMessage: function () {
 
   }
+  
 })

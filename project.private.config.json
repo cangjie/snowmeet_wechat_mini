@@ -1,4 +1,5 @@
 {
+  "setting": {},
   "condition": {
     "plugin": {
       "list": []
@@ -87,6 +88,12 @@
           "name": "open_lock",
           "pathName": "pages/blt/open_lock",
           "query": "id=1",
+          "scene": null
+        },
+        {
+          "name": "fill cert no",
+          "pathName": "pages/skipass/fill_certificate_no",
+          "query": "orderid=18622",
           "scene": null
         }
       ]
