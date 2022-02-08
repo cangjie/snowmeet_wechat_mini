@@ -16,13 +16,11 @@
     </view>
     <view style="width: 100rpx;"></view>
   </view>
+  <view><button open-type="share" > 转 发 给 朋 友 </button></view>
   <view style="height: 1rpx;" ></view>
   
 </view>
 <cover-view bindtap="hideDetail" class="cover-view" style="height: 100%;background-color: #c0c0c0;position:fixed;top:0px;width:100%;display: {{showCover}};opacity: {{opacity}};">
-
-<cover-image src="{{currentQrUrl}}" style="position:relative;top:150px;left:100px;width: 300rpx; height: 300rpx;" ></cover-image>
-
-
+  <cover-image src="{{currentQrUrl}}" style="position:relative;top:150px;left:100px;width: 300rpx; height: 300rpx;" ></cover-image>
 </cover-view>
 </view>

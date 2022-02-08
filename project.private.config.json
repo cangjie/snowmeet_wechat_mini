@@ -95,6 +95,12 @@
           "pathName": "pages/skipass/fill_certificate_no",
           "query": "orderid=18622",
           "scene": null
+        },
+        {
+          "name": "my ticket",
+          "pathName": "pages/mine/ticket/ticket_list",
+          "query": "",
+          "scene": null
         }
       ]
     }
