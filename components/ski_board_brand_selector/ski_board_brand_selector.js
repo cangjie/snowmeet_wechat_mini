@@ -45,18 +45,38 @@ Component({
         method:'GET',
         success:(res)=>{
           var listArray = res.data.brand_list
+          var selectedIndex = 0
+          var skiIndex = 0
+          var boardIndex = 0
           for(var i = 0; i < listArray.length; i++){
             var brandName = listArray[i].brand_name+ (listArray[i].chinese_name.trim() != ''?'/':'')+listArray[i].chinese_name
+            
             if (listArray[i].brand_type == '双板'){
               skiList.push(brandName)
+              skiIndex++
             }
             if (listArray[i].brand_type == '单板'){
               boardList.push(brandName)
+              boardIndex++
+            }
+            if (selectedIndex == 0 && (listArray[i].brand_name == that.data.brand 
+              || listArray[i].chinese_name == that.data.brand
+              || brandName == that.data.brand)){
+              selectedIndex = (that.data.equipType == '' ||  that.data.equipType == '双板')?skiIndex:boardIndex 
             }
           }
+          
+          
+
           skiList.push('未知')
           boardList.push('未知')
-          that.setData({displayedBrandList: skiList, selectedIndex: 0, skiList: skiList, boardList: boardList})
+          var displayedBrandList = (that.data.equipType == '' ||  that.data.equipType == '双板')?skiList:boardList
+
+          if (that.data.brand !='' && selectedIndex == 0){
+            selectedIndex = displayedBrandList.length - 1
+          }
+
+          that.setData({displayedBrandList: displayedBrandList, selectedIndex: selectedIndex, skiList: skiList, boardList: boardList})
         }
       })
 

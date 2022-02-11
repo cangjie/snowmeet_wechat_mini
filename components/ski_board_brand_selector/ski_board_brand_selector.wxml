@@ -25,7 +25,7 @@
             </picker>
           </view>
           <view  >
-            <input hidden="{{selectedIndex < displayedBrandList.length - 1}}" type="text" placeholder="手动填写品牌" style="margin-left: 20rpx;" bindinput="inputBrand" ></input>
+            <input hidden="{{selectedIndex < displayedBrandList.length - 1}}" type="text" placeholder="手动填写品牌" style="margin-left: 20rpx;" bindinput="inputBrand" value="{{brand}}" ></input>
           </view>
         </view>
       </view>
