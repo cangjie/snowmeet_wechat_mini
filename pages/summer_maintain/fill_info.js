@@ -5,13 +5,34 @@ Page({
    * Page initial data
    */
   data: {
-
+    equipType: '',
+    brand:'',
+    scale:'',
+    binderBrand:'',
+    binderColor:'',
+    itemToPost:'',
+    labelNo: '',
+    associateItem: '',
+    keep: true,
+    contactName:'',
+    address:'',
+    cell:''
   },
 
   getSelectedBrand: function(e){
     console.log(e)
   },
 
+  inputChanged: function(e){
+    var that = this
+    console.log(e)
+    switch(e.type){
+      case 'BrandSelected':
+        that.setData({equipType: e.detail.equipType, brand: e.detail.brand})
+      default:
+        break
+    }
+  },
   /**
    * Lifecycle function--Called when page load
    */

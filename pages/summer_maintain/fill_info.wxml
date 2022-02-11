@@ -1,6 +1,6 @@
 <!--pages/summer_maintain/fill_info.wxml-->
 <view>
-  <board-brand-selector   bindBrandSelected="getSelectedBrand" ></board-brand-selector>
+  <board-brand-selector   bindBrandSelected="inputChanged" ></board-brand-selector>
   <mp-cells>
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
@@ -8,6 +8,19 @@
         <view class="right-column"><input style="width: 100rpx;" /></view>
       </view>
     </mp-cell>
+    <mp-cell wx:if="{{equipType=='单板'}}">
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >固定器品牌：</view>
+        <view class="right-column"><input style="width: 100rpx;" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:if="{{equipType=='单板'}}">
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >固定器颜色：</view>
+        <view class="right-column"><input style="width: 100rpx;" /></view>
+      </view>
+    </mp-cell>
+
   </mp-cells>
 </view>
 

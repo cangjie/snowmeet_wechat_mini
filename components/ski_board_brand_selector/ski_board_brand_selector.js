@@ -96,7 +96,7 @@ Component({
       else {
         displayedBrandList = that.data.skiList
       }
-      that.setData({selectedIndex: 0, displayedBrandList: displayedBrandList})
+      that.setData({selectedIndex: 0, displayedBrandList: displayedBrandList, equipType: equipType})
     },
     selectBrand: function(e){
       var that = this
