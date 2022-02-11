@@ -86,6 +86,11 @@ Page({
    * Called when user click on the top right corner to share
    */
   onShareAppMessage: function () {
+    
+      return {
+        title: '转发测试',
+        path: '/pages/mine/ticket/ticket_list'
+      }
 
   },
   showDetail: function(source){
