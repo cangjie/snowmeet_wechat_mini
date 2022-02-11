@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "auth": "../../../components/auth/auth",
-    "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell"
-  },
-  "navigationBarTitleText": "易龙雪聚"
-}
