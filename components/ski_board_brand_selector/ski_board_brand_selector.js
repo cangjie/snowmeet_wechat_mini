@@ -34,9 +34,9 @@ Component({
   pageLifetimes:{
     show: function(e) {
       var that = this
-      that.data.equipType = that.properties.equipType
-      that.data.brand = that.properties.brand
-      that.data.readOnly = that.properties.readOnly
+      that.data.equipType = (that.properties.equipType!=undefined)?that.properties.equipType:''
+      that.data.brand = (that.properties.brand!=undefined)?that.properties.brand:''
+      that.data.readOnly = (that.properties.readOnly!=undefined)?that.properties.readOnly:false
       var skiList = that.data.skiList
       var boardList = that.data.boardList
       var brandListUrl = 'https://' + app.globalData.domainName + '/api/brand_list_get.aspx'
@@ -60,7 +60,7 @@ Component({
               boardIndex++
             }
             if (selectedIndex == 0 && (listArray[i].brand_name == that.data.brand 
-              || listArray[i].chinese_name == that.data.brand
+              || (listArray[i].chinese_name == that.data.brand && listArray[i].chinese_name!='')
               || brandName == that.data.brand)){
               selectedIndex = (that.data.equipType == '' ||  that.data.equipType == '双板')?skiIndex:boardIndex 
             }

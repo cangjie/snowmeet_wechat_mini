@@ -13,7 +13,7 @@
   </mp-cell>
   <mp-cell>
     <view  class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
-      <view class="left-column">品牌：</view>
+      <view class="left-column"><font style="color:red" >*</font>品牌：</view>
       <view class="right-column">
         <view wx:if="{{readOnly}}" >
           {{brand}}

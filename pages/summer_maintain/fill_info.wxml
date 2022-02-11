@@ -1,4 +1,13 @@
 <!--pages/summer_maintain/fill_info.wxml-->
 <view>
-  <board-brand-selector  brand="Cuiyang" equipType="双板" readOnly="true" bindBrandSelected="getSelectedBrand" ></board-brand-selector>
+  <board-brand-selector   bindBrandSelected="getSelectedBrand" ></board-brand-selector>
+  <mp-cells>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >长度：</view>
+        <view class="right-column"><input style="width: 100rpx;" /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
 </view>
+
