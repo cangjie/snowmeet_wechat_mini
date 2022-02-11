@@ -1,4 +1,4 @@
 <!--pages/summer_maintain/fill_info.wxml-->
 <view>
-  <board-brand-selector></board-brand-selector>
+  <board-brand-selector  brand="APO" bindBrandSelected="getSelectedBrand" ></board-brand-selector>
 </view>

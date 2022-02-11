@@ -8,6 +8,10 @@ Page({
 
   },
 
+  getSelectedBrand: function(e){
+    console.log(e)
+  },
+
   /**
    * Lifecycle function--Called when page load
    */
