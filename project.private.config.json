@@ -95,6 +95,12 @@
           "pathName": "pages/skipass/fill_certificate_no",
           "query": "orderid=18622",
           "scene": null
+        },
+        {
+          "name": "summer maintain",
+          "pathName": "pages/summer_maintain/fill_info",
+          "query": "",
+          "scene": null
         }
       ]
     }

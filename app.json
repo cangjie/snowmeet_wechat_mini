@@ -43,7 +43,8 @@
     "pages/payment/order_payment",
     "pages/skipass/skipass_today",
     "pages/blt/open_lock",
-    "pages/skipass/fill_certificate_no"
+    "pages/skipass/fill_certificate_no",
+    "pages/summer_maintain/fill_info"
   ],
   "window": {
     "backgroundTextStyle": "light",

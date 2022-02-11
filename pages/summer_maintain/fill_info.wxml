@@ -1,0 +1,4 @@
+<!--pages/summer_maintain/fill_info.wxml-->
+<view>
+  <board-brand-selector></board-brand-selector>
+</view>

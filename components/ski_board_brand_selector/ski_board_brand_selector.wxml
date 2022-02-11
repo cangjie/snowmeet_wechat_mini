@@ -1,0 +1,15 @@
+<!--components/ski_board_brand_selector/ski_board_brand_selector.wxml-->
+<mp-cells title="选择雪板的类型和品牌" >
+  <mp-cell>
+    <view  class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+      <view class="left-column">类型：</view>
+      <view class="right-column">选择</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view  class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+      <view class="left-column">品牌：</view>
+      <view class="right-column">选择</view>
+    </view>
+  </mp-cell>
+</mp-cells>
