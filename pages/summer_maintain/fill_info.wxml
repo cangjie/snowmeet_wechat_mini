@@ -5,22 +5,90 @@
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >长度：</view>
-        <view class="right-column"><input style="width: 100rpx;" /></view>
+        <view class="right-column"><input id="scale" style="width: 100rpx;" bindinput="inputChanged" /></view>
       </view>
     </mp-cell>
     <mp-cell wx:if="{{equipType=='单板'}}">
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >固定器品牌：</view>
-        <view class="right-column"><input style="width: 100rpx;" /></view>
+        <view class="right-column"><input id="binderBrand" style="width: 100rpx;" bindinput="inputChanged" /></view>
       </view>
     </mp-cell>
     <mp-cell wx:if="{{equipType=='单板'}}">
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >固定器颜色：</view>
-        <view class="right-column"><input style="width: 100rpx;" /></view>
+        <view class="right-column"><input id="binderColor" style="width: 100rpx;" bindinput="inputChanged" /></view>
       </view>
     </mp-cell>
-
+  </mp-cells>
+  <mp-cells title="填写快递信息">
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >邮寄：</view>
+        <view class="right-column">
+          <radio-group bindchange="inputChanged" id="sendItem" >
+            <radio checked="{{sendItem=='万龙存板牌'}}" value="万龙存板牌" >万龙存板牌</radio>
+            <radio checked="{{sendItem=='雪板实物'}}" value="雪板实物" >雪板实物</radio>
+            <radio checked="{{sendItem=='现场交付'}}" value="现场交付" >现场交付</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:if="{{sendItem=='万龙存板牌'}}" >
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >存板编号：</view>
+        <view class="right-column">
+          <input type="text" style="width: 300rpx;" placeholder="填写万龙存板牌编号" bindinput="inputChanged" />
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="完成养护后，是否寄存" >
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >寄存：</view>
+        <view class="right-column">
+          <radio-group id="keep" bindchange="inputChanged" >
+            <radio checked="{{keep}}" value="是" >是</radio>
+            <radio checked="{{!keep}}" value="否" >否</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:if="{{!keep}}">
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >快递地址：</view>
+        <view class="right-column">
+          <input type="text" style="width: 300rpx;" placeholder="填写快递地址" bindinput="inputChanged" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >联系人姓名：</view>
+        <view class="right-column">
+          <input type="text" style="width: 300rpx;" placeholder="填写联系人的真实姓名" bindinput="inputChanged" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >联系人电话：</view>
+        <view class="right-column">
+          <input type="text" style="width: 300rpx;" placeholder="填写联系人电话" bindinput="inputChanged" />
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="随雪板存放的其他物品" >
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >附件：</view>
+        <view class="right-column">
+          <input type="text" style="width: 450rpx;" placeholder="除雪板以外的附件，如：雪杖、板包。" bindinput="inputChanged" />
+        </view>
+      </view>
+    </mp-cell>
   </mp-cells>
 </view>
 

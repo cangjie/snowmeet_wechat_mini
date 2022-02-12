@@ -10,8 +10,8 @@ Page({
     scale:'',
     binderBrand:'',
     binderColor:'',
-    itemToPost:'',
-    labelNo: '',
+    sendItem:'万龙存板牌',
+    wanlongNo: '',
     associateItem: '',
     keep: true,
     contactName:'',
@@ -30,6 +30,20 @@ Page({
       case 'BrandSelected':
         that.setData({equipType: e.detail.equipType, brand: e.detail.brand})
       default:
+        switch(e.currentTarget.id){
+          case 'scale':
+            that.setData({scale: e.detail.value})
+            break
+          case 'sendItem':
+            that.setData({sendItem: e.detail.value})
+            break
+          case 'keep':
+            var keep = (e.detail.value=='是')?true:false
+            that.setData({keep: keep})
+            break
+          default:
+            break
+        }
         break
     }
   },
