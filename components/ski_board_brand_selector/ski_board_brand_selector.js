@@ -31,8 +31,8 @@ Component({
     boardList: ['请选择...'],
 
   }, 
-  pageLifetimes:{
-    show: function(e) {
+  lifetimes:{
+    attached: function(e) {
       var that = this
       that.data.equipType = (that.properties.equipType!=undefined)?that.properties.equipType:''
       that.data.brand = (that.properties.brand!=undefined)?that.properties.brand:''

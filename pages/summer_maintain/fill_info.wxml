@@ -1,7 +1,11 @@
 <!--pages/summer_maintain/fill_info.wxml-->
 <view>
-  <board-brand-selector   bindBrandSelected="inputChanged" ></board-brand-selector>
-  <mp-cells>
+  <view wx:if="{{step==0}}">
+    <auth  validType="cell" bindUpdateSuccess="updateInfoSucess" ></auth>
+  </view>
+  <view wx:if="{{step==1}}">
+    <board-brand-selector   bindBrandSelected="inputChanged" ></board-brand-selector>
+    <mp-cells>
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >长度：</view>
@@ -20,8 +24,8 @@
         <view class="right-column"><input id="binderColor" style="width: 100rpx;" bindinput="inputChanged" /></view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <mp-cells title="填写快递信息">
+    </mp-cells>
+    <mp-cells title="填写快递信息">
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >邮寄：</view>
@@ -38,19 +42,32 @@
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >存板编号：</view>
         <view class="right-column">
-          <input type="text" style="width: 300rpx;" placeholder="填写万龙存板牌编号" bindinput="inputChanged" />
+          <input id="wanlongNo" type="text" style="width: 300rpx;" placeholder="填写万龙存板牌编号" bindinput="inputChanged" />
         </view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <mp-cells title="完成养护后，是否寄存" >
+    </mp-cells>
+    <mp-cells title="服务选择" wx:if="{{sendItem=='万龙存板牌'}}" >
+    <mp-cell>
+      <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+        <view class="left-column" >选择服务：</view>
+        <view class="right-column">
+          <radio-group id="selectedService" bindchange="inputChanged" >
+            <radio checked="{{selectedService=='非雪季养护'}}" value="非雪季养护" >非雪季养护</radio>
+            <radio checked="{{selectedService=='代取回寄'}}" value="代取回寄" >代取回寄</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    </mp-cells>
+    <mp-cells title="完成养护后，是否寄存" >
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >寄存：</view>
         <view class="right-column">
-          <radio-group id="keep" bindchange="inputChanged" >
-            <radio checked="{{keep}}" value="是" >是</radio>
-            <radio checked="{{!keep}}" value="否" >否</radio>
+          <radio-group id="keep" bindchange="inputChanged"  >
+            <radio disabled="{{selectedService=='代取回寄'}}" checked="{{keep}}" value="是" >是</radio>
+            <radio disabled="{{selectedService=='代取回寄'}}" checked="{{!keep}}" value="否" >否</radio>
           </radio-group>
         </view>
       </view>
@@ -59,36 +76,44 @@
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >快递地址：</view>
         <view class="right-column">
-          <input type="text" style="width: 300rpx;" placeholder="填写快递地址" bindinput="inputChanged" />
+          <input id="address" type="text" style="width: 300rpx;" placeholder="填写快递地址" bindinput="inputChanged" />
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
-        <view class="left-column" >联系人姓名：</view>
+        <view class="left-column" ><font style="color:red" >*</font>联系人姓名：</view>
         <view class="right-column">
-          <input type="text" style="width: 300rpx;" placeholder="填写联系人的真实姓名" bindinput="inputChanged" />
+          <input id="contact" type="text" style="width: 300rpx;" placeholder="填写联系人的真实姓名" bindinput="inputChanged" />
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
-        <view class="left-column" >联系人电话：</view>
+        <view class="left-column" ><font style="color:red" >*</font>联系人电话：</view>
         <view class="right-column">
-          <input type="text" style="width: 300rpx;" placeholder="填写联系人电话" bindinput="inputChanged" />
+          <input id="cell" type="text" style="width: 300rpx;" placeholder="填写联系人电话" value="{{cell}}" bindinput="inputChanged" />
         </view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <mp-cells title="随雪板存放的其他物品" >
+    </mp-cells>
+    <mp-cells title="随雪板存放的其他物品" >
     <mp-cell>
       <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
         <view class="left-column" >附件：</view>
         <view class="right-column">
-          <input type="text" style="width: 450rpx;" placeholder="除雪板以外的附件，如：雪杖、板包。" bindinput="inputChanged" />
+          <input id="associate" type="text" style="width: 450rpx;" placeholder="除雪板以外的附件，如：雪杖、板包。" bindinput="inputChanged" />
         </view>
       </view>
     </mp-cell>
-  </mp-cells>
+    </mp-cells>
+    <mp-cells title="支付" >
+    <mp-cell wx:if="{{!valid}}">
+      <font style="color: red" >{{validInfo}}</font>
+    </mp-cell>
+    <mp-cell>
+      <button style="width: 500rpx;" bindtap="submit">{{selectedService}} 点击支付{{needToPay}}元</button>
+    </mp-cell>
+    </mp-cells>
+  </view>
 </view>
-
