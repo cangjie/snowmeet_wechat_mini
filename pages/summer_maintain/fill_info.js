@@ -117,8 +117,40 @@ Page({
   submit: function(){
     var that = this
     that.checkValid()
+    
     if (that.data.valid){
-
+      var submitData = {
+        id: 0,
+        open_id: app.globalData.sessionKey,
+        equip_type: that.data.equipType.trim(),
+        brand: that.data.brand.trim(),
+        scale: that.data.scale.trim(),
+        binder_brand: that.data.binderBrand.trim(),
+        binder_color: that.data.binderColor.trim(),
+        send_item: that.data.sendItem.trim(),
+        wanlong_no: that.data.wanlongNo.trim(),
+        associates: that.data.associateItem.trim(),
+        keep: that.data.keep?'是':'否',
+        contact_name: that.data.contactName.trim(),
+        address: that.data.address.trim(),
+        cell: that.data.cell.trim(),
+        service: that.data.selectedService.trim(),
+        code: '',
+        order_id:0,
+        source: ''
+      }
+      var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/PlaceOrder'
+      wx.request({
+        url: submitUrl,
+        method: 'POST',
+        data: submitData,
+        success:(res)=>{
+          console.log(res)
+          wx.navigateTo({
+            url: '/pages/payment/order_payment?orderid='+res.data.toString(),
+          })
+        }
+      })
     }
   },
   /**
