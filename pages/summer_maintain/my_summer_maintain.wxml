@@ -1,0 +1,42 @@
+<view>
+  <view wx:for="{{list}}" >
+    <view style="height: 1rpx;" ></view>
+    <view style="margin-left: 80rpx; margin-right: 80rpx;" >
+      <view style="text-align: center; background-color: gray;">
+        <font style="color:white;" ><b>{{item.service}}</b></font>
+      </view>
+      <view style="text-align: center;">
+        <image src="{{item.qrcodeUrl}}" mode="aspectFit" style="width:200rpx;height: 200rpx;" ></image>
+      </view>
+      <view style="text-align: center;">{{item.code}}</view>
+      <view wx:if="{{item.state=='未填快递单号'}}" >
+        <button>填写快递单号</button>
+      </view>
+      <view class="flex-wrp" style="flex-direction: row;margin-top: 10rpx;">
+        <view style="width: 150rpx;text-align: right;" >订单状态：</view>
+        <view>{{item.state}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction: row;margin-top: 10rpx;">
+        <view style="width: 150rpx;text-align: right;" >装备类型：</view>
+        <view>{{item.equip_type}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction: row;margin-top: 10rpx;">
+        <view style="width: 150rpx;text-align: right;" >品牌：</view>
+        <view>{{item.brand}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction: row;margin-top: 10rpx;">
+        <view style="width: 150rpx;text-align: right;" >长度：</view>
+        <view>{{item.scale}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction: row;margin-top: 10rpx;">
+        <view style="width: 150rpx;text-align: right;" >是否寄存：</view>
+        <view>{{item.keep}}</view>
+      </view>
+      <view wx:if="{{item.keep=='否'}}" class="flex-wrp" style="flex-direction: row;margin-top: 10rpx;">
+        <view style="width: 150rpx;text-align: right;" >快递地址：</view>
+        <view>{{item.address}}</view>
+      </view>
+    </view>
+    <view style="height: 10rpx;" ></view>
+  </view>
+</view>

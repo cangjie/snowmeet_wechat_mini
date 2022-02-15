@@ -147,7 +147,7 @@ Page({
         success:(res)=>{
           console.log(res)
           wx.navigateTo({
-            url: '/pages/payment/order_payment?orderid='+res.data.toString(),
+            url: '/pages/payment/order_payment?orderid='+res.data.toString()+'&callback=' + encodeURIComponent('/pages/summer_maintain/summer_maintain_pay_success'),
           })
         }
       })

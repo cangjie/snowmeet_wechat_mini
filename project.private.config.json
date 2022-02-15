@@ -101,6 +101,12 @@
           "pathName": "pages/summer_maintain/fill_info",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "pages/summer_maintain/summer_maintain_pay_success",
+          "pathName": "pages/summer_maintain/summer_maintain_pay_success",
+          "query": "",
+          "scene": null
         }
       ]
     }

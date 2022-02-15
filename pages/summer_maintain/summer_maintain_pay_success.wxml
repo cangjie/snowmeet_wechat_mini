@@ -1,0 +1,8 @@
+<view style="margin-top: 50rpx;text-align: center;">支付成功</view>
+<view style="margin-top: 50rpx;text-align: center;">您获赠一张22-23雪季养护券</view>
+<view style="margin-top: 50rpx;text-align: center;">
+  <button bindtap="gotoMyTicket">点此查看</button>
+</view>
+<view style="margin-top: 50rpx;text-align: center;">
+  <button style="width: 600rpx;">点击查看我的非雪季服务卡</button>
+</view>

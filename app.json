@@ -44,7 +44,9 @@
     "pages/skipass/skipass_today",
     "pages/blt/open_lock",
     "pages/skipass/fill_certificate_no",
-    "pages/summer_maintain/fill_info"
+    "pages/summer_maintain/fill_info",
+    "pages/summer_maintain/summer_maintain_pay_success",
+    "pages/summer_maintain/my_summer_maintain"
   ],
   "window": {
     "backgroundTextStyle": "light",
