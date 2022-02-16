@@ -33,7 +33,7 @@
           <radio-group bindchange="inputChanged" id="sendItem" >
             <radio checked="{{sendItem=='万龙存板牌'}}" value="万龙存板牌" >万龙存板牌</radio>
             <radio checked="{{sendItem=='雪板实物'}}" value="雪板实物" >雪板实物</radio>
-            <radio checked="{{sendItem=='现场交付'}}" value="现场交付" >现场交付</radio>
+            <!--radio checked="{{sendItem=='现场交付'}}" value="现场交付" >现场交付</radio-->
           </radio-group>
         </view>
       </view>

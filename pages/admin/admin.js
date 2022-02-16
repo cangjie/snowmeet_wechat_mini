@@ -145,5 +145,21 @@ Page({
     wx.navigateTo({
       url: path
     })
+  },
+  gotoSummerMaintain: function(e) {
+    switch(e.currentTarget.id){
+      case 'SummerMaintainRecept':
+        wx.navigateTo({
+          url: '/pages/admin/equip_maintain/summer/summer_recept',
+        })
+        break
+      case 'SummerMaintainList':
+        wx.navigateTo({
+          url: '/pages/admin/equip_maintain/summer/summer_list',
+        })
+        break 
+      default:
+        break
+    }
   }
 })

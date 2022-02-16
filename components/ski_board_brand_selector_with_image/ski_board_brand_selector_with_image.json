@@ -1,0 +1,9 @@
+{
+  "component": true,
+  "usingComponents": {
+    "ski_board_brand_selector": "../ski_board_brand_selector/ski_board_brand_selector",
+    "multi-uploader": "/components/uploader/multi-uploader",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell"
+  }
+}
