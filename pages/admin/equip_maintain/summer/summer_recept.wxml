@@ -1,1 +1,32 @@
 <ski_board_brand_selector_with_image equipType="单板" brand="APO" readOnly="" bindEquipInfoChanged="equipInfoChanged" ></ski_board_brand_selector_with_image>
+<mp-cells title="寄或存" >
+  <mp-cell>
+    <view class="flex-wrp" style="direction: row;" >
+      <view class="left-column" >是否寄存：</view>
+      <view>
+        <radio-group>
+          <radio value="是" >是</radio>
+          <radio value="否" >否</radio>
+        </radio-group>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="direction: row;" >
+      <view class="left-column" >回寄地址：</view>
+      <view></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="direction: row;" >
+      <view class="left-column" >收件人姓名：</view>
+      <view></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="direction: row;" >
+      <view class="left-column" >收件人电话：</view>
+      <view></view>
+    </view>
+  </mp-cell>
+</mp-cells>
