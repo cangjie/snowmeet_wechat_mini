@@ -5,11 +5,39 @@ Page({
    * Page initial data
    */
   data: {
-
+    keep: true,
+    address:'',
+    name:'',
+    cell:'',
+    equipType:'',
+    brand:'',
+    images:''
   },
   equipInfoChanged:function(e){
     console.log(e)
   },
+
+  inputChanged: function(e){
+    var that = this
+    console.log(e)
+    switch(e.currentTarget.id){
+      case 'keep':
+        that.setData({keep: e.detail.value=='是'?true:false})
+        break
+      case 'name':
+        that.setData({name: e.detail.value})
+        break
+      case 'address':
+        that.setData({address: e.detail.value})
+        break
+      case 'cell':
+        that.setData({cell: e.detail.value})
+        break
+      default:
+        break
+    }
+  },
+
   /**
    * Lifecycle function--Called when page load
    */
