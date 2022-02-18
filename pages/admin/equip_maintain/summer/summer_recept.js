@@ -80,6 +80,7 @@ Page({
         contact_name: that.data.name.trim(),
         address: that.data.address.trim(),
         cell: that.data.cell.trim(),
+        service:'非雪季养护',
         oper_open_id: app.globalData.sessionKey
       }
       var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/Recept'
@@ -88,7 +89,12 @@ Page({
         data: submitData,
         method: 'POST',
         success:(res)=>{
-          
+          var id = parseInt(res.data)
+          if (id>0){
+            wx.navigateTo({
+              url: 'summer_recept_pay?id=' + id.toString(),
+            })
+          }
         }
       })
     }

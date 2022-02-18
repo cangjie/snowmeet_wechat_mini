@@ -103,9 +103,9 @@
           "scene": null
         },
         {
-          "name": "pages/summer_maintain/summer_maintain_pay_success",
-          "pathName": "pages/summer_maintain/summer_maintain_pay_success",
-          "query": "",
+          "name": "view payment",
+          "pathName": "pages/payment/view_payment",
+          "query": "id=27&item=summermaintain",
           "scene": null
         }
       ]
