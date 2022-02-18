@@ -19,6 +19,10 @@ Component({
     images:{
       type: String,
       value:''
+    },
+    scale:{
+      type:String,
+      value:''
     }
   },
 
@@ -29,7 +33,8 @@ Component({
     brand: '',
     equipType:'双板',
     images:'',
-    readOnly: false
+    readOnly: false,
+    scale: ''
   },
   lifetimes:{
     attached: function(e){
@@ -38,7 +43,8 @@ Component({
       var equipType = that.properties.equipType==undefined?'双板':that.properties.equipType.trim()
       var images = that.properties.images==undefined?'':that.properties.images.trim()
       var readOnly = that.properties.readOnly==undefined?false:that.properties.readOnly
-      that.setData({equipType: equipType, brand: brand, images: images, readOnly: readOnly})
+      var scale = that.properties.scale
+      that.setData({equipType: equipType, brand: brand, images: images, readOnly: readOnly, scale: scale})
     },
     
   },
@@ -53,7 +59,12 @@ Component({
       var equipType = e.detail.equipType
       var images = that.data.images
       that.setData({equipType: equipType, brand: brand})
-      that.triggerEvent('EquipInfoChanged', {equipType: equipType, brand: brand, images: images})
+      that.triggerEvent('EquipInfoChanged', {equipType: equipType, brand: brand, images: images, scale: that.data.scale})
+    },
+    scaleChanged: function(e){
+      var that = this
+      that.setData({scale: e.detail.value})
+      that.triggerEvent('EquipInfoChanged', {equipType: that.data.equipType, brand: that.data.brand, images: that.data.images, scale: that.data.scale})
     },
     uploaded: function(e){
       var that = this
@@ -65,7 +76,7 @@ Component({
         }
       }
       that.setData({images: photoFiles})
-      that.triggerEvent('EquipInfoChanged', {equipType: that.data.equipType, brand: that.data.brand, images: that.data.images})
+      that.triggerEvent('EquipInfoChanged', {equipType: that.data.equipType, brand: that.data.brand, images: that.data.images, scale: that.data.scale})
     }
   }
 })

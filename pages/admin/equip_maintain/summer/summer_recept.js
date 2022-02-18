@@ -1,4 +1,5 @@
 // pages/admin/equip_maintain/summer/summer_recept.js
+const app = getApp()
 Page({
 
   /**
@@ -9,12 +10,16 @@ Page({
     address:'',
     name:'',
     cell:'',
-    equipType:'',
+    equipType:'双板',
     brand:'',
-    images:''
+    images:'',
+    msg:'',
+    role: ''
   },
   equipInfoChanged:function(e){
     console.log(e)
+    var that = this
+    that.setData({equipType: e.detail.equipType, brand: e.detail.brand, images: e.detail.images, scale: e.detail.scale})
   },
 
   inputChanged: function(e){
@@ -37,12 +42,66 @@ Page({
         break
     }
   },
+  checkValid: function(){
+    var msg = ''
+    var that = this
+    if (that.data.equipType.trim()==''){
+      msg = '请选择装备类型。'
+    }
+    if (that.data.brand.trim()==''){
+      msg = '请选择品牌。'
+    }
+    if (!that.data.keep){
+      if (that.data.address.trim()==''){
+        msg = '请填写快递地址。'
+      }
+      if (that.data.name.trim()==''){
+        msg = '请填写收件人姓名。'
+      }
+      if (that.data.cell.trim()==''){
+        msg = '请填写收件人电话。'
+      }
+    }
+    that.setData({msg: msg})
+    return msg
+  },
+
+  submit: function(e){
+    var that = this
+    if (that.checkValid()==''){
+      var submitData = {
+        id: 0,
+        open_id: '',
+        equip_type: that.data.equipType.trim(),
+        brand: that.data.brand.trim(),
+        scale: that.data.scale.trim(),
+        images: that.data.images.trim(),
+        keep: that.data.keep?'是':'否',
+        contact_name: that.data.name.trim(),
+        address: that.data.address.trim(),
+        cell: that.data.cell.trim(),
+        oper_open_id: app.globalData.sessionKey
+      }
+      var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/Recept'
+      wx.request({
+        url: submitUrl,
+        data: submitData,
+        method: 'POST',
+        success:(res)=>{
+          
+        }
+      })
+    }
+  },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.setData({role: app.globalData.role})
+    })
   },
 
   /**

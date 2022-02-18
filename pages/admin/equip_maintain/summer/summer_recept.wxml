@@ -1,35 +1,37 @@
-<ski_board_brand_selector_with_image equipType="单板" brand="APO" readOnly="" bindEquipInfoChanged="equipInfoChanged" ></ski_board_brand_selector_with_image>
-<mp-cells title="寄或存" >
-  <mp-cell>
-    <view class="flex-wrp" style="direction: row;" >
-      <view class="left-column" >是否寄存：</view>
-      <view>
-        <radio-group id="keep" bindchange="inputChanged">
-          <radio value="是" checked="{{keep}}" >是</radio>
-          <radio value="否" checked="{{!keep}}" >否</radio>
-        </radio-group>
+<view wx:if="{{role=='staff'}}" >
+  <ski_board_brand_selector_with_image equipType="{{equipType}}" brand="{{brand}}" images="{{images}}" bindEquipInfoChanged="equipInfoChanged" ></ski_board_brand_selector_with_image>
+  <mp-cells title="寄或存" >
+    <mp-cell>
+      <view class="flex-wrp" style="direction: row;" >
+        <view class="left-column" >是否寄存：</view>
+        <view>
+          <radio-group id="keep" bindchange="inputChanged">
+            <radio value="是" checked="{{keep}}" >是</radio>
+            <radio value="否" checked="{{!keep}}" >否</radio>
+          </radio-group>
+        </view>
       </view>
-    </view>
-  </mp-cell>
-  <mp-cell wx:if="{{!keep}}" >
-    <view class="flex-wrp" style="direction: row;" >
-      <view class="left-column" >回寄地址：</view>
-      <view><input id="address" type="text" bindchange="inputChanged" /></view>
-    </view>
-  </mp-cell>
-  <mp-cell wx:if="{{!keep}}" >
-    <view class="flex-wrp" style="direction: row;" >
-      <view class="left-column" >收件人姓名：</view>
-      <view><input id="name" type="text" bindchange="inputChanged" /></view>
-    </view>
-  </mp-cell>
-  <mp-cell wx:if="{{!keep}}" >
-    <view class="flex-wrp" style="direction: row;" >
-      <view class="left-column" >收件人电话：</view>
-      <view><input id="cell" type="text" bindchange="inputChanged" /></view>
-    </view>
-  </mp-cell>
-</mp-cells>
-<mp-cells title="" >
-  <mp-cell><button> 提 交 </button></mp-cell>
-</mp-cells>
+    </mp-cell>
+    <mp-cell wx:if="{{!keep}}" >
+      <view class="flex-wrp" style="direction: row;" >
+        <view class="left-column" >回寄地址：</view>
+        <view><input id="address" type="text" bindchange="inputChanged" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:if="{{!keep}}" >
+      <view class="flex-wrp" style="direction: row;" >
+        <view class="left-column" >收件人姓名：</view>
+        <view><input id="name" type="text" bindchange="inputChanged" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:if="{{!keep}}" >
+      <view class="flex-wrp" style="direction: row;" >
+        <view class="left-column" >收件人电话：</view>
+        <view><input id="cell" type="text" bindchange="inputChanged" /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="{{msg}}" >
+    <mp-cell><button bindtap="submit"> 提 交 </button></mp-cell>
+  </mp-cells>
+</view>

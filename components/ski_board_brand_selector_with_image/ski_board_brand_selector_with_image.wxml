@@ -8,4 +8,10 @@
       </view>
     </view>
   </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column" >长度：</view>
+      <view><input id="scale" style="width: 100rpx;" bindinput="scaleChanged" value="{{scale}}" /></view>
+    </view>
+  </mp-cell>
 </mp-cells>

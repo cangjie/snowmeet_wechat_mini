@@ -137,7 +137,9 @@ Page({
         service: that.data.selectedService.trim(),
         code: '',
         order_id:0,
-        source: ''
+        source: '',
+        //owner_name: '',
+        //owner_cell:''
       }
       var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/PlaceOrder'
       wx.request({
