@@ -1,1 +1,12 @@
-<invoice item="summermaintain" itemId="28" ></invoice>
+<block>
+  <block wx:if="{{state==0}}">
+    <auth type="cell" validType="cell" bindUpdateSuccess="cellUpdate" ></auth>
+    <invoice item="summermaintain" itemId="{{id}}" ></invoice>
+    <view style="margin-top: 50rpx;" >
+      <button bindtap="submitPay"> 确 认 支 付 </button>
+    </view>
+  </block>
+  <block wx:if="{{state==1}}" >
+    <view style="margin-top: 100rpx;" ><b>支付成功</b></view>
+  </block>
+</block>

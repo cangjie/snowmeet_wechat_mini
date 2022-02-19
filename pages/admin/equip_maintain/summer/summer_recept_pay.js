@@ -9,7 +9,10 @@ Page({
     role: '',
     state: 0,
     id: 0,
-    wxaCodeUrl:''
+    wxaCodeUrl:'',
+    owner_cell: '',
+    owner_name: '',
+    open_id: ''
   },
 
   /**
@@ -32,9 +35,46 @@ Page({
       method:'GET',
       success:(res)=>{
         if (res.data.code != '' && res.data.order_id != 0){
-          that.setData({state: 1})
+          that.setData({state: 1, open_id: res.data.open_id, owner_name: res.data.contact_name, owner_cell: res.data.cell})
           clearInterval(that.data.intervalId)
+          if (that.data.owner_cell.trim() == ''){
+            var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniAppUser?openId=' + encodeURIComponent(that.data.open_id) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            wx.request({
+              url: getUserInfoUrl,
+              method:'GET',
+              success:(res)=>{
+                that.setData({owner_cell: res.data.cell_number})
+              }
+            })
+          }
         }
+      }
+    })
+  },
+
+  infoChange: function(e){
+    var that = this
+    var value = e.detail.value
+    switch(e.currentTarget.id){
+      case 'name':
+        that.setData({owner_name: value})
+        break
+      case 'cell':
+        that.setData({owner_cell: value})
+        break
+      default:
+        break
+    }
+  },
+
+  submitInfo: function(){
+    var that = this
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/UpdateOwnerInfo/' + that.data.id + '?name=' + encodeURIComponent(that.data.owner_name) + '&cell=' + encodeURIComponent(that.data.owner_cell) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: submitUrl,
+      method: 'GET',
+      success:(res)=>{
+        that.setData({state: 2})
       }
     })
   },

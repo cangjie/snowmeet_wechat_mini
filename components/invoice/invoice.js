@@ -23,6 +23,8 @@ Component({
     id: 0,
     role:'',
     amount:0,
+    orderPrice: 0,
+    orderRealPayPrice: 0,
     dataset:{}
   },
 
@@ -55,6 +57,17 @@ Component({
         method: 'GET',
         success:(res)=>{
           that.setData({dataset: res.data})
+          var getProductUrl = 'https://' + app.globalData.domainName + '/core/Product/Get/144'
+          wx.request({
+            url: getProductUrl,
+            method: 'GET',
+            success:(res)=>{
+              var price = res.data.sale_price
+              that.setData({orderPrice: price, orderRealPayPrice: price})
+              that.triggerEvent('invoice', {productArr:[{productId: 144, salePrice: price, count:1}], orderPrice: price, orderRealPayPrice: price})
+            }
+          })
+          
         }
       })
     },

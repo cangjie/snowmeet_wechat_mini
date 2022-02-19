@@ -7,4 +7,23 @@
         <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
     </view>
   </view>
+  <view wx:if="{{state==1}}" >
+    <mp-cells title="确认联系电话和真实姓名" >
+      <mp-cell>
+        <view class="flex-wrp" style="flex-direction: row; margin-top: 5rpx;">
+          <view class="left-column" >姓名：</view>
+          <view class="right-column"><input id="name" style="width: 150rpx;" bindinput="infoChange"  /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="flex-wrp" style="flex-direction: row; margin-top: 5rpx;">
+          <view class="left-column" >电话：</view>
+          <view class="right-column"><input id="cell" style="width: 350rpx;" value="{{owner_cell}}" bindinput="infoChange"  /></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <view style="margin-top: 50rpx;text-align: center;">
+      <button bindtap="submitInfo" > 提 交 </button>
+    </view>
+  </view>
 </view>

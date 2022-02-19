@@ -1,5 +1,7 @@
 {
   "usingComponents": {
-    "invoice": "/components/invoice/invoice"
-  }
+    "invoice": "/components/invoice/invoice",
+    "auth": "/components/auth/auth"
+  },
+  "navigationBarTitleText": "确认支付"
 }
