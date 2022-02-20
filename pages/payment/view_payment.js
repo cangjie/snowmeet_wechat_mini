@@ -38,8 +38,9 @@ Page({
    */
   onLoad: function (options) {
     var that = this
+    that.setData({id: options.id, item: options.item})
     app.loginPromiseNew.then(function(resolve){
-      that.setData({id: options.id, item: options.item})
+      
     })
   },
 

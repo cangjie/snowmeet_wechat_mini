@@ -12,7 +12,7 @@
       <mp-cell>
         <view class="flex-wrp" style="flex-direction: row; margin-top: 5rpx;">
           <view class="left-column" >姓名：</view>
-          <view class="right-column"><input id="name" style="width: 150rpx;" bindinput="infoChange"  /></view>
+          <view class="right-column"><input id="name" style="width: 150rpx;" bindinput="infoChange" value="{{owner_name}}" /></view>
         </view>
       </mp-cell>
       <mp-cell>

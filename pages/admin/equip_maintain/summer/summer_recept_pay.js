@@ -35,7 +35,11 @@ Page({
       method:'GET',
       success:(res)=>{
         if (res.data.code != '' && res.data.order_id != 0){
-          that.setData({state: 1, open_id: res.data.open_id, owner_name: res.data.contact_name, owner_cell: res.data.cell})
+          var owner_name = res.data.owner_name.trim()
+          if (owner_name.trim() == ''){
+            owner_name = res.data.owner_name
+          }
+          that.setData({state: 1, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell})
           clearInterval(that.data.intervalId)
           if (that.data.owner_cell.trim() == ''){
             var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniAppUser?openId=' + encodeURIComponent(that.data.open_id) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)

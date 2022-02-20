@@ -1,7 +1,7 @@
 <block>
   <block wx:if="{{state==0}}">
     <auth type="cell" validType="cell" bindUpdateSuccess="cellUpdate" ></auth>
-    <invoice item="summermaintain" itemId="{{id}}" ></invoice>
+    <invoice item="{{item}}" itemId="{{id}}" ></invoice>
     <view style="margin-top: 50rpx;" >
       <button bindtap="submitPay"> 确 认 支 付 </button>
     </view>
