@@ -81,7 +81,8 @@ Page({
         address: that.data.address.trim(),
         cell: that.data.cell.trim(),
         service:'非雪季养护',
-        oper_open_id: app.globalData.sessionKey
+        oper_open_id: app.globalData.sessionKey,
+        send_item: '现场交付'
       }
       var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/Recept'
       wx.request({

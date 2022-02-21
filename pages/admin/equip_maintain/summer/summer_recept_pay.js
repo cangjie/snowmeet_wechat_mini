@@ -20,7 +20,8 @@ Page({
    */
   onLoad: function (options) {
     var that = this
-    that.setData({id: options.id, wxaCodeUrl: 'https://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_summermaintain_' + that.data.id})
+    var wxaCodeUrl = 'https://' + app.globalData.domainName.trim() + '/show_image.aspx?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_summermaintain_' + options.id)
+    that.setData({id: options.id, wxaCodeUrl: wxaCodeUrl})
     app.loginPromiseNew.then(function(reolve){
       var intervalId = setInterval(that.refreshStatus, 1000)
       that.setData({intervalId: intervalId, role: app.globalData.role })

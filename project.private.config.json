@@ -105,7 +105,7 @@
         {
           "name": "view payment",
           "pathName": "pages/payment/view_payment",
-          "query": "id=29&item=summermaintain",
+          "query": "id=35&item=summermaintain",
           "scene": null
         },
         {
