@@ -1,5 +1,6 @@
 <view wx:if="{{role=='staff'}}" >
-  <ski_board_brand_selector_with_image equipType="{{equipType}}" brand="{{brand}}" images="{{images}}" bindEquipInfoChanged="equipInfoChanged" ></ski_board_brand_selector_with_image>
+  <ski_board_brand_selector_with_image wx:if="{{id!=0}}" equipType="{{equipType}}" brand="{{brand}}" images="{{images}}" scale="{{scale}}" bindEquipInfoChanged="equipInfoChanged" ></ski_board_brand_selector_with_image>
+  <ski_board_brand_selector_with_image wx:else bindEquipInfoChanged="equipInfoChanged" ></ski_board_brand_selector_with_image>
   <mp-cells title="寄或存" >
     <mp-cell>
       <view class="flex-wrp" style="direction: row;" >
@@ -31,7 +32,24 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <mp-cells wx:if="{{id!=0}}" title="雪板持有人姓名电话" style="margin-top: 50rpx;" >
+    <mp-cell>
+      <view class="flex-wrp" style="direction: row;margin-top: 20rpx;" >
+        <view class="left-column" style="margin-top: 20rpx" >姓名：</view>
+        <view><input id="owner_name" style="margin-top: 20rpx"  type="text" bindchange="inputChanged" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="flex-wrp" style="direction: row;margin-top: 20rpx;" >
+        <view class="left-column" style="margin-top: 20rpx" >电话：</view>
+        <view><input id="owner_cell" style="margin-top: 20rpx"  type="text" bindchange="inputChanged" /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="{{msg}}" >
-    <mp-cell><button bindtap="submit"> 提 交 </button></mp-cell>
+    <mp-cell>
+      <button wx:if="{{id==0}}" bindtap="submit"> 提 交 </button>
+      <button wx:else > 修 改 </button>
+    </mp-cell>
   </mp-cells>
 </view>

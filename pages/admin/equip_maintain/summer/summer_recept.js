@@ -14,7 +14,9 @@ Page({
     brand:'',
     images:'',
     msg:'',
-    role: ''
+    role: '',
+    id: 0
+
   },
   equipInfoChanged:function(e){
     console.log(e)
@@ -106,8 +108,28 @@ Page({
    */
   onLoad: function (options) {
     var that = this
+    
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
+      
+      
+      if (options.id!=undefined){
+        var id = parseInt(options.id)
+        var getInfoUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/GetSummerMaintain/' + id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: getInfoUrl,
+          method: 'GET',
+          success: (res)=>{
+            var keep = res.data.keep=='是'?true:false
+            var scale = res.data.scale
+            var deliverName = res.data.contact_name
+            var deliverCell = res.data.cell
+            var ownerName = res.data.owner_name
+            var ownerCell = res.data.owner_cell
+            that.setData({id:id, equipType: res.data.equip_type, brand: res.data.brand, images: res.data.images,scale: scale, keep: keep, deliverCell: deliverCell, deliverName: deliverName, ownerCell: ownerCell, ownerName: ownerName})
+          }
+        })
+      }
     })
   },
 

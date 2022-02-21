@@ -97,9 +97,9 @@
           "scene": null
         },
         {
-          "name": "summer maintain",
-          "pathName": "pages/summer_maintain/fill_info",
-          "query": "",
+          "name": "mod summer maintain info",
+          "pathName": "pages/admin/equip_maintain/summer/summer_recept",
+          "query": "id=2",
           "scene": null
         },
         {
