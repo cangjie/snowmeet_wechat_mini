@@ -40,6 +40,12 @@ Page({
       case 'cell':
         that.setData({cell: e.detail.value})
         break
+      case 'owner_name':
+        that.setData({ownerName: e.detail.value})
+        break
+      case 'owner_cell':
+        that.setData({ownerCell: e.detail.value})
+        break
       default:
         break
     }
@@ -66,6 +72,32 @@ Page({
     }
     that.setData({msg: msg})
     return msg
+  },
+
+  update: function(e){
+    var that = this
+    var updateData = that.data.originData
+    updateData.equip_type = that.data.equipType
+    updateData.brand = that.data.brand
+    updateData.images = that.data.images
+    updateData.scale = that.data.scale
+    updateData.keep = that.data.keep?'是':'否'
+    updateData.contact_name = that.data.name
+    updateData.cell = that.data.cell
+    updateData.address = that.data.address
+    updateData.owner_name = that.data.ownerName
+    updateData.owner_cell = that.data.ownerCell
+    var updateUrl = 'https://' + app.globalData.domainName.trim() + '/core/SummerMaintain/UpdateInfo?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'PUT',
+      data: updateData,
+      success:(res)=>{
+        wx.showToast({
+          title: '更新成功',
+        })
+      }
+    })
   },
 
   submit: function(e){
@@ -126,7 +158,7 @@ Page({
             var deliverCell = res.data.cell
             var ownerName = res.data.owner_name
             var ownerCell = res.data.owner_cell
-            that.setData({id:id, equipType: res.data.equip_type, brand: res.data.brand, images: res.data.images,scale: scale, keep: keep, deliverCell: deliverCell, deliverName: deliverName, ownerCell: ownerCell, ownerName: ownerName})
+            that.setData({id:id, equipType: res.data.equip_type, brand: res.data.brand, images: res.data.images,scale: scale, keep: keep, cell: deliverCell, name: deliverName, address: res.data.address, ownerCell: ownerCell, ownerName: ownerName, originData: res.data})
           }
         })
       }

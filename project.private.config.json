@@ -99,7 +99,7 @@
         {
           "name": "mod summer maintain info",
           "pathName": "pages/admin/equip_maintain/summer/summer_recept",
-          "query": "id=2",
+          "query": "id=4",
           "scene": null
         },
         {

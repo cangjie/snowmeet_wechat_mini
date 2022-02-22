@@ -16,19 +16,19 @@
     <mp-cell wx:if="{{!keep}}" >
       <view class="flex-wrp" style="direction: row;" >
         <view class="left-column" >回寄地址：</view>
-        <view><input id="address" type="text" bindchange="inputChanged" /></view>
+        <view><input id="address" value="{{address}}" type="text" bindchange="inputChanged" /></view>
       </view>
     </mp-cell>
     <mp-cell wx:if="{{!keep}}" >
       <view class="flex-wrp" style="direction: row;" >
         <view class="left-column" >收件人姓名：</view>
-        <view><input id="name" type="text" bindchange="inputChanged" /></view>
+        <view><input id="name" value="{{name}}" type="text" bindchange="inputChanged" /></view>
       </view>
     </mp-cell>
     <mp-cell wx:if="{{!keep}}" >
       <view class="flex-wrp" style="direction: row;" >
         <view class="left-column" >收件人电话：</view>
-        <view><input id="cell" type="text" bindchange="inputChanged" /></view>
+        <view><input id="cell" value="{{cell}}" type="text" bindchange="inputChanged" /></view>
       </view>
     </mp-cell>
   </mp-cells>
@@ -36,20 +36,20 @@
     <mp-cell>
       <view class="flex-wrp" style="direction: row;margin-top: 20rpx;" >
         <view class="left-column" style="margin-top: 20rpx" >姓名：</view>
-        <view><input id="owner_name" style="margin-top: 20rpx"  type="text" bindchange="inputChanged" /></view>
+        <view><input id="owner_name" style="margin-top: 20rpx" value="{{ownerName}}" type="text" bindchange="inputChanged" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="flex-wrp" style="direction: row;margin-top: 20rpx;" >
         <view class="left-column" style="margin-top: 20rpx" >电话：</view>
-        <view><input id="owner_cell" style="margin-top: 20rpx"  type="text" bindchange="inputChanged" /></view>
+        <view><input id="owner_cell" value="{{ownerCell}}" style="margin-top: 20rpx"  type="text" bindchange="inputChanged" /></view>
       </view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="{{msg}}" >
     <mp-cell>
       <button wx:if="{{id==0}}" bindtap="submit"> 提 交 </button>
-      <button wx:else > 修 改 </button>
+      <button wx:else bindtap="update" > 修 改 </button>
     </mp-cell>
   </mp-cells>
 </view>
