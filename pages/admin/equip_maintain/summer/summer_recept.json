@@ -2,7 +2,8 @@
   "usingComponents": {
     "ski_board_brand_selector_with_image": "/components/ski_board_brand_selector_with_image/ski_board_brand_selector_with_image",
     "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell"
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "pay-method": "/components/pay_method_selector/pay_method_selector"
   },
   "navigationBarTitleText": "非雪季养护收板"
 }

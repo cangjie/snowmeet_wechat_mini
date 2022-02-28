@@ -15,13 +15,22 @@ Page({
     images:'',
     msg:'',
     role: '',
-    id: 0
+    id: 0,
+    payMethod: '微信',
+    ownerName:'',
+    ownerCell:''
 
   },
   equipInfoChanged:function(e){
     console.log(e)
     var that = this
     that.setData({equipType: e.detail.equipType, brand: e.detail.brand, images: e.detail.images, scale: e.detail.scale})
+  },
+
+  payMethodChanged: function(e){
+    console.log(e)
+    var that = this
+    that.setData({payMethod: e.detail.payMethod})
   },
 
   inputChanged: function(e){
@@ -116,7 +125,10 @@ Page({
         cell: that.data.cell.trim(),
         service:'非雪季养护',
         oper_open_id: app.globalData.sessionKey,
-        send_item: '现场交付'
+        send_item: '现场交付',
+        pay_method: that.data.payMethod,
+        owner_name: that.data.ownerName,
+        owner_cell: that.data.ownerCell
       }
       var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/Recept'
       wx.request({

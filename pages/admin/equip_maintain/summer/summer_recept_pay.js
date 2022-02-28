@@ -35,7 +35,7 @@ Page({
       url: getSummerMaintainUrl,
       method:'GET',
       success:(res)=>{
-        if (res.data.code != '' && res.data.order_id != 0){
+        if (res.data.toString().trim() != '' && res.data.code != '' && res.data.order_id != 0){
           var owner_name = res.data.owner_name.trim()
           if (owner_name.trim() == ''){
             owner_name = res.data.owner_name

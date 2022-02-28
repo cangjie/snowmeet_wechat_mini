@@ -32,7 +32,10 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells wx:if="{{id!=0}}" title="雪板持有人姓名电话" style="margin-top: 50rpx;" >
+  
+  <pay-method wx:if="{{id==0}}" bindPayMethodChanged="payMethodChanged" ></pay-method>
+  <pay-method wx:if="{{id!=0}}" readOnly="true" payMethod="微信" ></pay-method>
+  <mp-cells wx:if="{{id!=0 || (id==0 && payMethod!='微信')}}" title="雪板持有人姓名电话" style="margin-top: 50rpx;" >
     <mp-cell>
       <view class="flex-wrp" style="direction: row;margin-top: 20rpx;" >
         <view class="left-column" style="margin-top: 20rpx" >姓名：</view>
