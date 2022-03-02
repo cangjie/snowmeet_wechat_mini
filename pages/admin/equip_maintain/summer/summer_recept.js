@@ -130,7 +130,11 @@ Page({
         owner_name: that.data.ownerName,
         owner_cell: that.data.ownerCell
       }
+
       var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/Recept'
+      if (that.data.payMethod.trim()!='微信'){
+        submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/ReceptWithOthersPayment'
+      }
       wx.request({
         url: submitUrl,
         data: submitData,
