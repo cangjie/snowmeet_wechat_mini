@@ -43,6 +43,12 @@
           <view class="right-column" >{{orderRealPayPrice}}元</view>
         </view>
       </mp-cell>
+      <mp-cell>
+        <view class="flex-wrp" style="flex-direction: row;margin-top:0rpx">
+          <view class="left-column"  >支付方式：</view>
+          <view class="right-column" >{{dataset.pay_method}}</view>
+        </view>
+      </mp-cell>
     </mp-cells>
   </view>
 </view>

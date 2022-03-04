@@ -25,7 +25,8 @@ Component({
     amount:0,
     orderPrice: 0,
     orderRealPayPrice: 0,
-    dataset:{}
+    dataset:{},
+    payMethod: '微信'
   },
 
   lifetimes:{
@@ -59,19 +60,25 @@ Component({
         method: 'GET',
         success:(res)=>{
           that.setData({dataset: res.data})
-          var getProductUrl = 'https://' + app.globalData.domainName + '/core/Product/Get/144'
+          var productId = 144
+          if (res.data.service=='代取回寄') {
+            productId = 145
+          }
+          var currentItem = res.data
+          var getProductUrl = 'https://' + app.globalData.domainName + '/core/Product/Get/' + productId.toString()
           wx.request({
             url: getProductUrl,
             method: 'GET',
             success:(res)=>{
               var price = res.data.sale_price
               that.setData({orderPrice: price, orderRealPayPrice: price})
-              that.triggerEvent('invoice', {productArr:[{productId: 144, salePrice: price, count:1}], orderPrice: price, orderRealPayPrice: price})
+              that.triggerEvent('invoice', {productArr:[{productId: 144, salePrice: price, count:1}], orderPrice: price, orderRealPayPrice: price, item: currentItem})
             }
           })
           
         }
       })
-    },
+    }
+    
   }
 })

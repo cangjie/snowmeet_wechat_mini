@@ -8,7 +8,8 @@ Page({
   data: {
     id: 0,
     state: 0,
-    item:''
+    item:'',
+    payMethod: '微信'
   },
 
   submitPay: function(){
@@ -91,5 +92,27 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  getInvoiceInfo: function(e){
+    var that = this
+    console.log(e)
+    console.log(app.globalData.sessionKey)
+    that.setData({payMethod: e.detail.item.pay_method})
+    switch(that.data.item){
+      case 'summermaintain':
+        if (e.detail.item.pay_method!='微信' && e.detail.item.open_id==''){
+          var setOpenIdUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/SetOpenId/' + e.detail.item.id + '?sessionKey=' + app.globalData.sessionKey
+          wx.request({
+            url: setOpenIdUrl,
+            method:'GET',
+            success:(res)=>{
+
+            }
+          })
+        }
+        break
+      default:
+        break
+    }
   }
 })

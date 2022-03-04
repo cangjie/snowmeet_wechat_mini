@@ -12,7 +12,8 @@ Page({
     wxaCodeUrl:'',
     owner_cell: '',
     owner_name: '',
-    open_id: ''
+    open_id: '',
+    payMethod: '微信'
   },
 
   /**
@@ -35,7 +36,8 @@ Page({
       url: getSummerMaintainUrl,
       method:'GET',
       success:(res)=>{
-        if (res.data.toString().trim() != '' && res.data.code != '' && res.data.order_id != 0){
+        that.setData({payMethod: res.data.pay_method})
+        if (res.data.pay_method == '微信' && res.data.toString().trim() != '' && res.data.code != '' && res.data.order_id != 0){
           var owner_name = res.data.owner_name.trim()
           if (owner_name.trim() == ''){
             owner_name = res.data.owner_name
@@ -52,6 +54,10 @@ Page({
               }
             })
           }
+        }
+        else if (res.data.pay_method != '微信' && res.data.open_id.trim()!= ''){
+          clearInterval(that.data.intervalId)
+          that.setData({state: 1, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell})
         }
       }
     })

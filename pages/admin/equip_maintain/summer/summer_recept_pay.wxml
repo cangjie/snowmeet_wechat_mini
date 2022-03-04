@@ -1,7 +1,12 @@
 <view wx:if="{{role=='staff'}}">
   <view wx:if="{{state==0}}" >
     <view style="text-align:center" >
+      <block wx:if="{{payMethod=='微信'}}" >
        请顾客扫描以下二维码支付。
+      </block>
+      <block wx:else >
+        请顾客扫描以下二维码支付，并且点击在手机上弹出的消息确认身份。
+      </block>
     </view>
     <view  style="text-align:center" >
         <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
