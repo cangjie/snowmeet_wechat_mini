@@ -105,13 +105,13 @@
         {
           "name": "view payment",
           "pathName": "pages/payment/view_payment",
-          "query": "id=1039&item=summermaintain",
+          "query": "id=1050&item=summermaintain",
           "scene": null
         },
         {
           "name": "summer maintain recept pay",
           "pathName": "pages/admin/equip_maintain/summer/summer_recept_pay",
-          "query": "id=28",
+          "query": "id=1051",
           "scene": null
         }
       ]

@@ -42,7 +42,7 @@ Page({
           if (owner_name.trim() == ''){
             owner_name = res.data.owner_name
           }
-          that.setData({state: 1, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell})
+          that.setData({state: 1, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell, item: res.data})
           clearInterval(that.data.intervalId)
           if (that.data.owner_cell.trim() == ''){
             var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniAppUser?openId=' + encodeURIComponent(that.data.open_id) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -55,9 +55,16 @@ Page({
             })
           }
         }
-        else if (res.data.pay_method != '微信' && res.data.open_id.trim()!= ''){
-          clearInterval(that.data.intervalId)
-          that.setData({state: 1, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell})
+        else if (res.data.pay_method != '微信'){
+          if (res.data.open_id.trim() != '') {
+            clearInterval(that.data.intervalId)
+            that.setData({state: 2, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell, item: res.data})
+          }
+          else if (res.data.open_id.trim() == '' && res.data.code!=''){
+            clearInterval(that.data.intervalId)
+            that.setData({state: 2, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell, item: res.data})
+          }
+          
         }
       }
     })
@@ -89,7 +96,18 @@ Page({
       }
     })
   },
-
+  confirmNoOpenId: function(e){
+    var that = this
+    clearInterval(that.data.intervalId)
+    var setOpenIdUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/SetBlankOpenId/' + that.data.id + '?sessionKey=' + app.globalData.sessionKey
+    wx.request({
+      url: setOpenIdUrl,
+      method:'GET',
+      success:(res)=>{
+        that.setData({state: 2})
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page is initially rendered
    */

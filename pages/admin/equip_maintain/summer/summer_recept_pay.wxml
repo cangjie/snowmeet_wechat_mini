@@ -2,15 +2,19 @@
   <view wx:if="{{state==0}}" >
     <view style="text-align:center" >
       <block wx:if="{{payMethod=='微信'}}" >
-       请顾客扫描以下二维码支付。
+        请顾客扫描以下二维码支付。
       </block>
       <block wx:else >
-        请顾客扫描以下二维码支付，并且点击在手机上弹出的消息确认身份。
+        <view>请顾客扫描以下二维码，并且点击在手机上弹出的消息确认身份。</view>
+        <view>如果用户拒绝扫码，请点击以下按钮</view>
+        <button bindtap="confirmNoOpenId"> 确 认 是 散 客 </button>
       </block>
+
     </view>
     <view  style="text-align:center" >
         <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:600rpx;height:600rpx" ></image>
     </view>
+    
   </view>
   <view wx:if="{{state==1}}" >
     <mp-cells title="确认联系电话和真实姓名" >
@@ -30,5 +34,9 @@
     <view style="margin-top: 50rpx;text-align: center;">
       <button bindtap="submitInfo" > 提 交 </button>
     </view>
+  </view>
+  <view wx:if="{{state==2}}" >
+    <view>订单已生效</view>
+    <invoice item="summermaintain" itemId="{{id}}"   ></invoice>
   </view>
 </view>
