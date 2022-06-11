@@ -79,6 +79,11 @@ Page({
         msg = '请填写收件人电话。'
       }
     }
+    if (that.data.payMethod!='微信'){
+      if (that.data.ownerName=='' || that.data.ownerCell == ''){
+        msg = '如果不是微信支付，则必须填写顾客姓名和电话。'
+      }
+    }
     that.setData({msg: msg})
     return msg
   },
