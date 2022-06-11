@@ -1,0 +1,124 @@
+<mp-cells title="基本信息" >
+  <mp-cell >
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >店铺：</view>
+      <view class="right-column" >
+        <picker>
+          <picker-view>南山</picker-view>
+        </picker>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >顾客手机：</view>
+      <view class="right-column" style="display: flex;" >
+        <input style="width: 350rpx;" placeholder="请输入顾客手机号" />
+        <checkbox >散客</checkbox>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;"  >
+      <view class="left-column" >顾客称呼：</view>
+      <view class="right-column" style="display: flex;" >
+        <input style="width: 150rpx;" placeholder="" />
+        <radio-group>
+          <radio>先生</radio><radio>女士</radio>
+        </radio-group>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="价格信息" >
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;"  >
+      <view class="left-column"  >零售总价：</view>
+      <view class="right-column" ><input placeholder="填写零售总价" /></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;"  >
+      <view class="left-column"  >订单总价：</view>
+      <view class="right-column" ><input placeholder="填写成交总价" /></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;"  >
+      <view class="left-column"  >智慧商贸单号：</view>
+      <view class="right-column"  >
+        <textarea style="width: 550rpx; height: 150rpx;" placeholder="一行一个" ></textarea>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="优惠券" >
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;"  >
+      <view class="left-column"  >已选优惠券：</view>
+      <view class="right-column" style="display: flex;" >内购券 编号：xxx-xxx-xxx <button style="width:200rpx">取消</button></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <scroll-view style="height: 300rpx;" scroll-y="true">
+      <view style="border-width: 1rpx; border-color: #c0c0c0;border-style: solid;">
+        <view style="background-color: green; text-align: center;color: #FFFFFF;" >内购券</view>
+        <text decode="{{true}}" style="font-size: 9pt;" >
+          &nbsp;&nbsp;&nbsp;&nbsp;balabala<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;测试测试测试<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;打折打折打折<br/>
+          <br/>
+        </text>
+        <view style="height: 15rpx;"></view>
+      </view>
+      <view style="height: 15rpx;"></view>
+      <view style="border-width: 1rpx; border-color: #c0c0c0;border-style: solid;">
+        <view style="background-color: green; text-align: center;color: #FFFFFF;" >内购券</view>
+        <text decode="{{true}}" style="font-size: 9pt;" >
+          &nbsp;&nbsp;&nbsp;&nbsp;balabala<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;测试测试测试<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;打折打折打折<br/>
+          <br/>
+        </text>
+        <view style="height: 15rpx;"></view>
+      </view>
+    </scroll-view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column"  >优惠金额：</view>
+      <view class="right-column" ><input placeholder="输入减免金额" /></view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="支付方式" >
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column"  >应付金额：</view>
+      <view class="right-column" >¥1234</view>
+    </view>
+  </mp-cell>
+  <mp-cell >
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column"  >实际支付：</view>
+      <view class="right-column" >
+        <picker>
+          <picker-view>全额支付</picker-view>
+        </picker>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column"  >支付方式：</view>
+      <view class="right-column" >
+        <picker>
+          <picker-view>微信支付</picker-view>
+        </picker>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell >
+    <button> 提 交 </button>
+  </mp-cell>
+</mp-cells>
