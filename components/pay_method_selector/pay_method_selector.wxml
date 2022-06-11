@@ -1,0 +1,15 @@
+<mp-cells title="请选择支付方式" >
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction: row;margin-top: 5rpx; height: 50rpx;">
+      <view class="flex-item left-column" >支付方式：</view>
+      <view class="flex-item right-column">
+        <picker wx:if="{{!readOnly}}" mode="selector" range="{{list}}" bindchange="changePayMethod" >
+            <view>{{list[selectedIndex]}}</view>
+          </picker>
+          <view wx:else >
+            {{payMethod}}
+          </view>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>

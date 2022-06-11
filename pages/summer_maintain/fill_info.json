@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "board-brand-selector": "/components/ski_board_brand_selector/ski_board_brand_selector",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell"
+  },
+  "navigationBarTitleText": "非雪季养护下单"
+}

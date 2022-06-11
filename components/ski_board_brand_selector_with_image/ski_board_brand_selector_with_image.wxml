@@ -1,0 +1,17 @@
+<ski_board_brand_selector bindBrandSelected="brandChanged" equipType="{{equipType}}" brand="{{brand}}" readOnly="{{readOnly}}" ></ski_board_brand_selector>
+<mp-cells title="照片" >
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column" >拍照：</view>
+      <view>
+        <multi-uploader id="uploadPhotos" title="雪板及附件" image_count="3" detail_id="0" bindUploaded="uploaded" uploaded_files="{{images}}" ></multi-uploader>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+      <view class="left-column" >长度：</view>
+      <view><input id="scale" style="width: 100rpx;" bindinput="scaleChanged" value="{{scale}}" /></view>
+    </view>
+  </mp-cell>
+</mp-cells>

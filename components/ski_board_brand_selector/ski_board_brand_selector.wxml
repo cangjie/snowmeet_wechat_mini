@@ -1,0 +1,34 @@
+<!--components/ski_board_brand_selector/ski_board_brand_selector.wxml-->
+<mp-cells title="选择雪板的类型和品牌" >
+  <mp-cell>
+    <view  class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+      <view class="left-column">类型：</view>
+      <view class="right-column">
+        <radio-group bindchange="selectType"  >
+            <radio  checked="{{equipType=='' || equipType=='双板'}}"  value="双板"  disabled="{{readOnly}}" >双板</radio>
+            <radio  checked="{{equipType=='单板'}}" value="单板"  disabled="{{readOnly}}" >单板</radio>
+          </radio-group>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view  class="flex-wrp"  style="flex-direction:row;margin-top:0rpx"  >
+      <view class="left-column"><font style="color:red" >*</font>品牌：</view>
+      <view class="right-column">
+        <view wx:if="{{readOnly}}" >
+          {{brand}}
+        </view>
+        <view wx:else class="flex-wrp"  style="flex-direction:row;margin-top:0rpx" >
+          <view>
+            <picker  mode="selector" value="{{selectedIndex}}" range="{{displayedBrandList}}"  bindchange="selectBrand"  >
+              <view>{{displayedBrandList[selectedIndex]}}</view>
+            </picker>
+          </view>
+          <view  >
+            <input hidden="{{selectedIndex < displayedBrandList.length - 1}}" type="text" placeholder="手动填写品牌" style="margin-left: 20rpx;" bindinput="inputBrand" value="{{brand}}" ></input>
+          </view>
+        </view>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>

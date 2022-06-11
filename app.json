@@ -10,10 +10,8 @@
     "pages/mine/mine",
     "pages/payment/payment",
     "pages/mine/my_ski_pass/my_ski_pass",
-    "pages/maintain/in_shop_request/in_shop_request",
     "pages/admin/admin",
     "pages/mine/my_maintain/my_maintain",
-    "pages/maintain/in_shop_request_payment/in_shop_request_payment",
     "pages/mine/my_maintain/my_maintain_detail",
     "pages/mine/my_warmer/my_warmer",
     "pages/admin/warmer_demand/warmer_demand",
@@ -45,7 +43,14 @@
     "pages/payment/order_payment",
     "pages/skipass/skipass_today",
     "pages/blt/open_lock",
-    "pages/skipass/fill_certificate_no"
+    "pages/skipass/fill_certificate_no",
+    "pages/summer_maintain/fill_info",
+    "pages/summer_maintain/summer_maintain_pay_success",
+    "pages/summer_maintain/my_summer_maintain",
+    "pages/admin/equip_maintain/summer/summer_recept",
+    "pages/admin/equip_maintain/summer/summer_list",
+    "pages/admin/equip_maintain/summer/summer_recept_pay",
+    "pages/payment/view_payment"
   ],
   "window": {
     "backgroundTextStyle": "light",

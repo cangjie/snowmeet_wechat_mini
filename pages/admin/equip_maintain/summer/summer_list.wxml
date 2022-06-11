@@ -1,0 +1,30 @@
+<view wx:if="{{role=='staff'}}">
+  <mp-cells title="共{{list.length}}项" >
+    <mp-cell wx:for="{{list}}" id="{{item.id}}" bindtap="tap" >
+      <view class="flex-wrp" style="flex-direction: row; margin-top: 5rpx;">
+        <view class="left-column" >服务：</view>
+        <view class="right-column" >{{item.service}}</view>
+        <view class="left-column" >交付：</view>
+        <view class="right-column" >{{item.send_item}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction: row; margin-top: 5rpx;">
+        <view class="left-column" >类型：</view>
+        <view class="right-column" >{{item.equip_type}}</view>
+        <view class="left-column" >品牌：</view>
+        <view class="right-column" >{{item.brand}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction: row; margin-top: 5rpx;">
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >{{item.owner_name}}</view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >{{item.owner_cell}}</view>
+      </view>
+      <view class="flex-wrp" style="flex-direction: row; margin-top: 5rpx;">
+        <view class="left-column" >寄存：</view>
+        <view class="right-column" >{{item.keep?'是':'否'}}</view>
+        <view class="left-column" >日期：</view>
+        <view class="right-column" >{{item.dateStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells> 
+</view>

@@ -1,0 +1,159 @@
+// pages/admin/equip_maintain/summer/summer_recept_pay.js
+const app = getApp()
+Page({
+
+  /**
+   * Page initial data
+   */
+  data: {
+    role: '',
+    state: 0,
+    id: 0,
+    wxaCodeUrl:'',
+    owner_cell: '',
+    owner_name: '',
+    open_id: '',
+    payMethod: '微信'
+  },
+
+  /**
+   * Lifecycle function--Called when page load
+   */
+  onLoad: function (options) {
+    var that = this
+    var wxaCodeUrl = 'https://' + app.globalData.domainName.trim() + '/show_image.aspx?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_summermaintain_' + options.id)
+    that.setData({id: options.id, wxaCodeUrl: wxaCodeUrl})
+    app.loginPromiseNew.then(function(reolve){
+      var intervalId = setInterval(that.refreshStatus, 1000)
+      that.setData({intervalId: intervalId, role: app.globalData.role })
+    })
+  },
+
+  refreshStatus: function(){
+    var that = this
+    var getSummerMaintainUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/GetSummerMaintain/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getSummerMaintainUrl,
+      method:'GET',
+      success:(res)=>{
+        that.setData({payMethod: res.data.pay_method})
+        if (res.data.pay_method == '微信' && res.data.toString().trim() != '' && res.data.code != '' && res.data.order_id != 0){
+          var owner_name = res.data.owner_name.trim()
+          if (owner_name.trim() == ''){
+            owner_name = res.data.owner_name
+          }
+          that.setData({state: 1, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell, item: res.data})
+          clearInterval(that.data.intervalId)
+          if (that.data.owner_cell.trim() == ''){
+            var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniAppUser?openId=' + encodeURIComponent(that.data.open_id) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            wx.request({
+              url: getUserInfoUrl,
+              method:'GET',
+              success:(res)=>{
+                that.setData({owner_cell: res.data.cell_number})
+              }
+            })
+          }
+        }
+        else if (res.data.pay_method != '微信'){
+          if (res.data.open_id.trim() != '') {
+            clearInterval(that.data.intervalId)
+            that.setData({state: 2, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell, item: res.data})
+          }
+          else if (res.data.open_id.trim() == '' && res.data.code!=''){
+            clearInterval(that.data.intervalId)
+            that.setData({state: 2, open_id: res.data.open_id, owner_name: owner_name, owner_cell: res.data.cell, item: res.data})
+          }
+          
+        }
+      }
+    })
+  },
+
+  infoChange: function(e){
+    var that = this
+    var value = e.detail.value
+    switch(e.currentTarget.id){
+      case 'name':
+        that.setData({owner_name: value})
+        break
+      case 'cell':
+        that.setData({owner_cell: value})
+        break
+      default:
+        break
+    }
+  },
+
+  submitInfo: function(){
+    var that = this
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/UpdateOwnerInfo/' + that.data.id + '?name=' + encodeURIComponent(that.data.owner_name) + '&cell=' + encodeURIComponent(that.data.owner_cell) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: submitUrl,
+      method: 'GET',
+      success:(res)=>{
+        that.setData({state: 2})
+      }
+    })
+  },
+  confirmNoOpenId: function(e){
+    var that = this
+    clearInterval(that.data.intervalId)
+    var setOpenIdUrl = 'https://' + app.globalData.domainName + '/core/SummerMaintain/SetBlankOpenId/' + that.data.id + '?sessionKey=' + app.globalData.sessionKey
+    wx.request({
+      url: setOpenIdUrl,
+      method:'GET',
+      success:(res)=>{
+        that.setData({state: 2})
+      }
+    })
+  },
+  /**
+   * Lifecycle function--Called when page is initially rendered
+   */
+  onReady: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page show
+   */
+  onShow: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page hide
+   */
+  onHide: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page unload
+   */
+  onUnload: function () {
+
+  },
+
+  /**
+   * Page event handler function--Called when user drop down
+   */
+  onPullDownRefresh: function () {
+
+  },
+
+  /**
+   * Called when page reach bottom
+   */
+  onReachBottom: function () {
+
+  },
+
+  /**
+   * Called when user click on the top right corner to share
+   */
+  onShareAppMessage: function () {
+
+  }
+})

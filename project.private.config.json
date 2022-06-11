@@ -86,6 +86,24 @@
           "pathName": "pages/skipass/fill_certificate_no",
           "query": "orderid=18622",
           "scene": null
+        },
+        {
+          "name": "mod summer maintain info",
+          "pathName": "pages/admin/equip_maintain/summer/summer_recept",
+          "query": "id=4",
+          "scene": null
+        },
+        {
+          "name": "view payment",
+          "pathName": "pages/payment/view_payment",
+          "query": "id=1050&item=summermaintain",
+          "scene": null
+        },
+        {
+          "name": "summer maintain recept pay",
+          "pathName": "pages/admin/equip_maintain/summer/summer_recept_pay",
+          "query": "id=1051",
+          "scene": null
         }
       ]
     }
