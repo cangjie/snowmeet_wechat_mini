@@ -5,7 +5,30 @@ Page({
    * Page initial data
    */
   data: {
+    payMethodList:['微信支付', '支付宝转账', '微信转账','多拉宝', 'POS刷卡', '现金'],
+    payMethodSelectedIndex: 0,
+    showCustomerInfo: false,
+    payOptionList:['全额支付', '部分支付', '无需付款'],
+    payOptionSelectedIndex: 0
+  },
 
+  payMethodChanged(e){
+    console.log('pay method changed', e)
+    var that = this
+    var selectedValue = e.detail.value
+    var showCustomerInfo = that.data.showCustomerInfo
+    if (selectedValue >0){
+      showCustomerInfo = true
+    }
+    else{
+      showCustomerInfo = false
+    }
+    that.setData({payMethodSelectedIndex: selectedValue, showCustomerInfo: showCustomerInfo})
+  },
+  payOptionChanged(e){
+    var that = this
+    var selectedValue = e.detail.value
+    that.setData({payOptionSelectedIndex: selectedValue})
   },
 
   /**
