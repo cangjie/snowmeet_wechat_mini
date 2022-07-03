@@ -13,7 +13,6 @@
     "pages/admin/admin",
     "pages/mine/my_maintain/my_maintain",
     "pages/mine/my_maintain/my_maintain_detail",
-    "pages/mine/my_warmer/my_warmer",
     "pages/admin/warmer_demand/warmer_demand",
     "pages/admin/expierence/expierence_admit",
     "pages/admin/expierence/expierence_return",
