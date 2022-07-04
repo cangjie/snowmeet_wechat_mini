@@ -43,7 +43,7 @@ App({
         const app = getApp()
         console.log('weixin log in success.')
         console.log(res)
-        var url = 'https://' + app.globalData.domainName + '/api/get_login_info.aspx?code=' + res.code
+        var url = 'https://' + app.globalData.domainName + '/core/MiniAppHelper/Login?code=' + res.code
         wx.request({
           url: url,
           method: 'GET',
@@ -51,7 +51,8 @@ App({
             console.log('get seesionkey success')
             console.log(res)
             app.globalData.sessionKey = res.data.session_key
-            var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+            //var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+            url = url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
               url: url,
               method: 'GET',
