@@ -161,5 +161,16 @@ Page({
       default:
         break
     }
+  },
+  gotoSale:(e)=>{
+    switch(e.currentTarget.id){
+      case "shopSale":
+        wx.navigateTo({
+          url: 'sale/shop_sale',
+        })
+        break
+      default:
+        break
+    }
   }
 })
