@@ -1,0 +1,23 @@
+<view wx:if="{{role=='staff'}}" >
+  <mp-cells title="通过手机号" >
+    <mp-cell>
+      <view style="display:flex; flex-direction: row;">
+        <view class="right-column" >
+          <input placeholder="填写手机号" bindinput="cellChanged" />
+        </view>
+        <view class="left-column" >
+          <button style="width: 180rpx" bindtap="gotoShopSale" >确认</button>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="扫描优惠券" >
+    <mp-cell><button> 扫 一 扫 </button></mp-cell>
+  </mp-cells>
+  <mp-cells title="刷脸" >
+    <mp-cell style="text-align: center;"><button disabled="true" >Still to come.</button> </mp-cell>
+  </mp-cells>
+  <mp-cells title="散客" >
+    <mp-cell><button bindtap="gotoShopSale" > 直 接 进 入 </button></mp-cell>
+  </mp-cells>
+</view>

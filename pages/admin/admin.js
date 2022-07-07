@@ -166,7 +166,7 @@ Page({
     switch(e.currentTarget.id){
       case "shopSale":
         wx.navigateTo({
-          url: 'sale/shop_sale',
+          url: 'sale/shop_sale_entry',
         })
         break
       default:

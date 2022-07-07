@@ -1,7 +1,9 @@
 {
   "usingComponents": {
     "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell"
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "user-info": "/components/user_info/user_info",
+    "shop-selector": "/components/shop_selector/shop_selector"
   },
   "navigationBarTitleText": "店销现货"
 }

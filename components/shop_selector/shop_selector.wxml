@@ -1,0 +1,15 @@
+<!--components/shop_selector/shop_selector.wxml-->
+<mp-cells title="选择店铺" >
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;">
+      <view class="left-column" >
+        店铺：
+      </view>
+      <vie class="right-column" >
+        <picker mode="selector" range="{{name_list}}" bindchange="selectChanged" >
+          <picker-view>{{name_list[currentSelectedIndex]}}</picker-view>
+        </picker>
+      </vie>
+    </view>
+  </mp-cell>
+</mp-cells>

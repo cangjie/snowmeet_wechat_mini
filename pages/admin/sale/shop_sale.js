@@ -1,4 +1,5 @@
 // pages/admin/sale/shop_sale.js
+const app = getApp()
 Page({
 
   /**
@@ -9,7 +10,15 @@ Page({
     payMethodSelectedIndex: 0,
     showCustomerInfo: false,
     payOptionList:['全额支付', '部分支付', '无需付款'],
-    payOptionSelectedIndex: 0
+    payOptionSelectedIndex: 0,
+    role:'',
+    open_id: ''
+  },
+
+  cellChanged(e){
+    this.setData({open_id: ''})
+    console.log('cell changed:', e)
+    this.setData({open_id: e.detail.value})
   },
 
   payMethodChanged(e){
@@ -35,7 +44,12 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.setData({role: app.globalData.role, open_id: ''})
+      that.setData({open_id: options.cell})
+      
+    })
   },
 
   /**
@@ -85,5 +99,12 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+
+  submit(){
+    wx.navigateBack()
+  },
+  shopSelected(e){
+    console.log('shop selected', e)
   }
 })
