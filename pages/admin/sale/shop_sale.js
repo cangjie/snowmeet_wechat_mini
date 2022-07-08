@@ -106,5 +106,8 @@ Page({
   },
   shopSelected(e){
     console.log('shop selected', e)
+  },
+  ticketSelected(e){
+    console.log('ticket selected', e)
   }
 })

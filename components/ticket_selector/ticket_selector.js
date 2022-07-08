@@ -1,0 +1,56 @@
+// components/card_selector/card_selector.js
+const app = getApp()
+Component({
+  /**
+   * Component properties
+   */
+  properties: {
+    ticket_code_arr:{
+      type: String,
+      value: ''
+    },
+    selected_card_no:{
+      type: String,
+      value:''
+    }
+  },
+
+  /**
+   * Component initial data
+   */
+  data: {
+    current_selected_index: -1
+  },
+
+  lifetimes:{
+    ready: function(){
+      var that = this
+      that.data.selected_card_no = that.properties.selected_card_no
+      var url = 'https://' + app.globalData.domainName + '/core/Ticket/GetUnusedTicketsByCode?ticketCodeArr=' + encodeURIComponent(that.properties.ticket_code_arr)
+      wx.request({
+        url: url,
+        method: 'GET',
+        success: (res)=>{
+          that.setData({ticket_list: res.data})
+        }
+      })
+    }
+  },
+
+  /**
+   * Component methods
+   */
+  methods: {
+    cancel(e){
+      var that = this
+      that.setData({current_selected_index: -1})
+      that.triggerEvent('TicketSelected', {code: ''})
+    },
+    select(e){
+      console.log('select ticket', e)
+      var that = this
+      that.setData({current_selected_index: e.currentTarget.id})
+      that.triggerEvent('TicketSelected', {code: that.data.ticket_list[that.data.current_selected_index].code})
+    }
+  }
+})

@@ -1,0 +1,35 @@
+<mp-cells title="优惠券" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"  >
+        <view class="left-column"  >已选优惠券：</view>
+        <view class="right-column" style="display: flex;" >{{ticket_list[current_selected_index].name}} 编号：{{ticket_list[current_selected_index].code}} <button style="width:200rpx" bindtap="cancel">取消</button></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <scroll-view style="height: 300rpx;" scroll-y="true">
+        <view wx:for="{{ticket_list}}" style="margin-top: 15rpx;border-width: 1rpx; border-color: #c0c0c0;border-style: solid;">
+          <view style="background-color: green; text-align: center;color: #FFFFFF;" >{{item.name}}</view>
+          
+          <view id="{{index}}" wx:if="{{index==current_selected_index}}" style="background-color: #c0c0c0;" bindtap="select" >
+            <text  decode="{{true}}" style="font-size: 9pt; " >
+              &nbsp;&nbsp;&nbsp;&nbsp;balabala<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;测试测试测试<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;打折打折打折<br/>
+              <br/>
+            </text>
+          </view>
+          <view  id="{{index}}" wx:else  bindtap="select" >
+            <text  decode="{{true}}" style="font-size: 9pt; " >
+              &nbsp;&nbsp;&nbsp;&nbsp;balabala<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;测试测试测试<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;打折打折打折<br/>
+              <br/>
+            </text>
+          </view>
+          <view style="height: 15rpx;"></view>
+        </view>
+        <view style="height: 15rpx;"></view>
+        
+      </scroll-view>
+    </mp-cell>
+  </mp-cells>
