@@ -31,7 +31,15 @@ Component({
         url: url,
         method: 'GET',
         success: (res)=>{
-          that.setData({ticket_list: res.data})
+          var ticketList = res.data
+          
+          for(var i = 0; i < ticketList.length; i++){
+            //ticketList[i].usage = ticketList[i].memo.split(';')
+            ticketList[i].usage = ticketList[i].memo.toString().replace(/;/g,'\r\n')
+          }
+          
+          
+          that.setData({ticket_list: ticketList})
         }
       })
     }

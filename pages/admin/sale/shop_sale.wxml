@@ -40,7 +40,7 @@
     </mp-cell>
   </mp-cells>
   <user-info wx:if="{{userInfoDisplay}}" open_id="{{open_id}}" cell="{{cell}}" code="{{code}}" bindUserFound="userFound" ></user-info>
-  <ticket-selector ticket_code_arr="" bindTicketSelected="ticketSelected" ></ticket-selector>
+  <ticket-selector wx:if="{{ticketsRefresh}}" ticket_code_arr="{{code}}" bindTicketSelected="ticketSelected" ></ticket-selector>
   <mp-cells>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
