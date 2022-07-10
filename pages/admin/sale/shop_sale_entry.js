@@ -78,5 +78,16 @@ Page({
     wx.navigateTo({
       url: 'shop_sale?cell=' + that.data.cell,
     })
+  },
+  scan(){
+    wx.scanCode({
+      onlyFromCamera: false,
+      success: (res)=>{
+        console.log('scan code', res)
+        wx.navigateTo({
+          url: res.result,
+        })
+      }
+    })
   }
 })

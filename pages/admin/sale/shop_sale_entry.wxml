@@ -12,7 +12,7 @@
     </mp-cell>
   </mp-cells>
   <mp-cells title="扫描优惠券" >
-    <mp-cell><button> 扫 一 扫 </button></mp-cell>
+    <mp-cell><!--button bindtap="scan"> 扫 一 扫 </button-->请打开微信“扫一扫”，扫描优惠券。</mp-cell>
   </mp-cells>
   <mp-cells title="刷脸" >
     <mp-cell style="text-align: center;"><button disabled="true" >Still to come.</button> </mp-cell>

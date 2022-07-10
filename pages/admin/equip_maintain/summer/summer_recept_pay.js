@@ -21,7 +21,7 @@ Page({
    */
   onLoad: function (options) {
     var that = this
-    var wxaCodeUrl = 'https://' + app.globalData.domainName.trim() + '/show_image.aspx?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_summermaintain_' + options.id)
+    var wxaCodeUrl = 'https://' + app.globalData.domainName.trim() + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_summermaintain_' + options.id)
     that.setData({id: options.id, wxaCodeUrl: wxaCodeUrl})
     app.loginPromiseNew.then(function(reolve){
       var intervalId = setInterval(that.refreshStatus, 1000)

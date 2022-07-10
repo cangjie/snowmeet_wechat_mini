@@ -22,7 +22,7 @@ Page({
         success:(res)=>{
           var list = res.data
           for(var i = 0; i < list.length; i++){
-            list[i].qrcodeUrl = 'https://' + app.globalData.domainName + '/show_image.aspx?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=use_service_card_' + list[i].code)
+            list[i].qrcodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=use_service_card_' + list[i].code)
           }
           that.setData({list: res.data})
         }

@@ -95,8 +95,13 @@ Page({
     }
     var code = source.currentTarget.id
     //var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code
-    var qrCodeUrl = 'https://' + app.globalData.domainName + '/show_image.aspx?img=' 
+
+
+    var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' 
+    //+ encodeURIComponent('show_qrcode.aspx?qrcodetext=' + code)
     + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code)
+
+
     this.setData({currentQrUrl: qrCodeUrl, currentX: 200,currentY:source.detail.y, showCover: 'block', opacity: 0.8 })
    
     

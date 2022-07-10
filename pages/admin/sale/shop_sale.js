@@ -12,7 +12,10 @@ Page({
     payOptionList:['全额支付', '部分支付', '无需付款'],
     payOptionSelectedIndex: 0,
     role:'',
-    open_id: ''
+    open_id: '',
+    cell: '',
+    code:'',
+    userInfoDisplay: true
   },
 
   cellChanged(e){
@@ -45,12 +48,24 @@ Page({
    */
   onLoad(options) {
     var that = this
+    if (options.cell != null){
+      that.setData({cell: options.cell})
+    }
+    if (options.code != null){
+      that.setData({code: options.code})
+    }
+    
     app.loginPromiseNew.then(function(resolve){
-      that.setData({role: app.globalData.role, open_id: ''})
-      that.setData({open_id: options.cell})
+      that.setData({role: app.globalData.role})
       
     })
   },
+
+  userFound(e){
+    console.log('User Found', e)
+
+  },
+  
 
   /**
    * Lifecycle function--Called when page is initially rendered

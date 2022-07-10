@@ -1,45 +1,4 @@
-<user-info wx:if="{{open_id!=''}}" open_id="{{open_id}}" ></user-info>
 <view wx:if="{{role=='staff'}}">
-  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
-  <mp-cells title="订单信息 智慧商贸订单可以为多个" >
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;"  >
-        <view class="left-column"  >智慧商贸单号：</view>
-        <view class="right-column"  >
-          <input placeholder="填写智慧商贸订单号" />
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;"  >
-        <view class="left-column"  >零售总价：</view>
-        <view class="right-column" ><input placeholder="填写零售总价" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;"  >
-        <view class="left-column"  >订单总价：</view>
-        <view class="right-column" ><input placeholder="填写成交总价" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <button> 添 加 下 一 单 </button>
-    </mp-cell>
-  </mp-cells>
-  <mp-cells title="订单小计" >
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;"  >
-        <view class="left-column"  >零售总价：</view>
-        <view class="right-column" >¥xxx.xx</view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;"  >
-        <view class="left-column"  >订单总价：</view>
-        <view class="right-column" >¥xxx.xx</view>
-      </view>
-    </mp-cell>
-  </mp-cells>
   <mp-cells title="支付方式" >
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
@@ -80,7 +39,8 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <ticket-selector ticket_code_arr="105664224,347999202,408990519,470133846,670225871" bindTicketSelected="ticketSelected" ></ticket-selector>
+  <user-info wx:if="{{userInfoDisplay}}" open_id="{{open_id}}" cell="{{cell}}" code="{{code}}" bindUserFound="userFound" ></user-info>
+  <ticket-selector ticket_code_arr="" bindTicketSelected="ticketSelected" ></ticket-selector>
   <mp-cells>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
@@ -89,6 +49,50 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <mp-cells title="订单信息 智慧商贸订单可以为多个" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"  >
+        <view class="left-column"  >智慧商贸单号：</view>
+        <view class="right-column"  >
+          <input placeholder="填写智慧商贸订单号" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"  >
+        <view class="left-column"  >零售总价：</view>
+        <view class="right-column" ><input placeholder="填写零售总价" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"  >
+        <view class="left-column"  >订单总价：</view>
+        <view class="right-column" ><input placeholder="填写成交总价" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <button> 添 加 下 一 单 </button>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="订单小计" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"  >
+        <view class="left-column"  >零售总价：</view>
+        <view class="right-column" >¥xxx.xx</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"  >
+        <view class="left-column"  >订单总价：</view>
+        <view class="right-column" >¥xxx.xx</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  
+  
+  
+  
   <mp-cells title="结算信息" >
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
