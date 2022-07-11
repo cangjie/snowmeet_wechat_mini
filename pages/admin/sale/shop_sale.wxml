@@ -11,34 +11,6 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="顾客信息" wx:if="{{showCustomerInfo}}" >
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;align-self: center;" >
-        <radio-group>
-          <radio checked="{{true}}">会员</radio><radio>散客</radio>
-        </radio-group>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" >顾客手机：</view>
-        <view class="right-column" style="display: flex;" >
-          <input style="width: 350rpx;"   bindinput="cellChanged" placeholder="请输入顾客手机号" />
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;"  >
-        <view class="left-column" >顾客称呼：</view>
-        <view class="right-column" style="display: flex;" >
-          <input style="width: 150rpx;" placeholder="" />
-          <radio-group>
-            <radio>先生</radio><radio>女士</radio>
-          </radio-group>
-        </view>
-      </view>
-    </mp-cell>
-  </mp-cells>
   <user-info wx:if="{{userInfoDisplay}}" open_id="{{open_id}}" cell="{{cell}}" code="{{code}}" bindUserFound="userFound" ></user-info>
   <ticket-selector wx:if="{{ticketsRefresh}}" ticket_code_arr="{{code}}" bindTicketSelected="ticketSelected" ></ticket-selector>
   <mp-cells>

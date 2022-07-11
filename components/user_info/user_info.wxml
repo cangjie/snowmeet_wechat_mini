@@ -1,3 +1,42 @@
-<block wx:if="{{role=='staff'}}" >
-<vie>{{nick}}</vie>
-</block>
+<mp-cells title="顾客基本信息"  wx:if="{{role=='staff'}}"  >
+  <mp-cell>
+    <radio-group style="text-align: center;"  >
+      <radio class="left-column" checked="{{userFind}}"> 会员 </radio><radio class="right-column" checked="{{!userFind}}"> 散客 </radio>
+    </radio-group>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" >手机号：</view>
+      <view class="right-column" ><input value="{{userInfo.cell_number}}" placeholder="输入手机号" /></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" >昵称：</view>
+      <view class="right-column" >{{userInfo.nick}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;"  >
+      <view class="left-column" >顾客称呼：</view>
+      <view class="right-column" style="display: flex;" >
+        <input style="width: 150rpx;" placeholder="您贵姓？" />
+        <radio-group>
+          <radio>先生</radio><radio>女士</radio>
+        </radio-group>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" >上次消费：</view>
+      <view class="right-column" >yyyy-mm-dd 养护</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" >现有龙珠：</view>
+      <view class="right-column" >x颗</view>
+    </view>
+  </mp-cell>
+</mp-cells>

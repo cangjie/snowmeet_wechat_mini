@@ -34,7 +34,7 @@ Component({
     ready: function(){
       var that = this
       app.loginPromiseNew.then(function(resolve){
-        //that.setData({role: app.globalData.role, nick: that.properties.open_id})
+        that.setData({role: app.globalData.role})
         var getInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/'
         if (that.properties.open_id.trim() != ''){
           getInfoUrl = getInfoUrl + 'GetMiniAppUser?openId=' + that.properties.open_id
@@ -55,11 +55,19 @@ Component({
           wx.request({
             url: getInfoUrl,
             success:(res)=>{
-              that.triggerEvent('UserFound', {user_info: res.data})
-              that.setData({userFind: true, userInfo: res.data})
+              that.triggerEvent('UserFound', {user_found: true, user_info: res.data})
+              that.setData({userFind: true, userInfo: res.data, role: app.globalData.role})
+            },
+            fail:(res)=>{
+              that.triggerEvent('UserFound', {user_found: false, user_info: res.data})
+              that.setData({userFind: false, userInfo: null, role: app.globalData.role})
             }
             
           })
+        }
+        else{
+          that.triggerEvent('UserFound', {user_found: false, user_info: null})
+          that.setData({userFind: false, userInfo: null, role: app.globalData.role})
         }
       })
     }

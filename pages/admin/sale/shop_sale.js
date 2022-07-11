@@ -16,7 +16,7 @@ Page({
     cell: '',
     code:'',
     userInfoDisplay: true,
-    ticketsRefresh: true
+    ticketsRefresh: true,
   },
 
   cellChanged(e){
@@ -36,7 +36,12 @@ Page({
     else{
       showCustomerInfo = false
     }
-    that.setData({payMethodSelectedIndex: selectedValue, showCustomerInfo: showCustomerInfo})
+    var displayUserInfo = that.data.userInfoDisplay
+    if (selectedValue != 0){
+      displayUserInfo = true
+    }
+    that.setData({payMethodSelectedIndex: selectedValue, showCustomerInfo: showCustomerInfo,
+      userInfoDisplay: displayUserInfo})
   },
   payOptionChanged(e){
     var that = this
@@ -58,7 +63,6 @@ Page({
     
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
-      
     })
   },
 
@@ -66,20 +70,27 @@ Page({
     console.log('User Found', e)
     var that = this
     var code = that.data.code.trim()
-    var getTicketsUrl = 'https://' + app.globalData.domainName + '/core/ticket/GetTicketsByUser/0?openId=' 
-    + encodeURIComponent(e.detail.user_info.open_id) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getTicketsUrl,
-      method: 'GET',
-      success:(res)=>{
-        console.log('current tickets', res)
-        for(var i = 0; i < res.data.length; i++){
-          code = code + ((code == '')? '' : ',') + res.data[i].code
+    if (e.detail.user_found){
+      var getTicketsUrl = 'https://' + app.globalData.domainName + '/core/ticket/GetTicketsByUser/0?openId=' 
+      + encodeURIComponent(e.detail.user_info.open_id) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getTicketsUrl,
+        method: 'GET',
+        success:(res)=>{
+          console.log('current tickets', res)
+          for(var i = 0; i < res.data.length; i++){
+            code = code + ((code == '')? '' : ',') + res.data[i].code
+          }
+          that.setData({code: code, ticketsRefresh: false})
+          that.setData({ticketsRefresh: true})
         }
-        that.setData({code: code, ticketsRefresh: false})
-        that.setData({ticketsRefresh: true})
+      })
+    }
+    else {
+      if (that.data.payMethodSelectedIndex == 0){
+        that.setData({userInfoDisplay: false})
       }
-    })
+    }
   },
   
 
