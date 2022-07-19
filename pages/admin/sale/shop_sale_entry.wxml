@@ -1,4 +1,9 @@
 <view wx:if="{{role=='staff'}}" >
+  <mp-cells title="顾客扫码验证身份" >
+    <mp-cell style="text-align: center;">
+      <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="通过手机号" >
     <mp-cell>
       <view style="display:flex; flex-direction: row;">

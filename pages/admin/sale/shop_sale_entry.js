@@ -17,7 +17,42 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve){
       if (app.globalData.role == 'staff') {
-        that.setData({role: app.globalData.role})
+
+
+        
+
+        that.setData({role: app.globalData.role, sessionKey: encodeURIComponent(app.globalData.sessionKey)})
+        var getScanIdUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetInterviewId?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: getScanIdUrl,
+          method: 'GET',
+          success:(res)=>{
+            var id = res.data
+            if (id > 0){
+              var interVal = setInterval(that.checkScan, 1000)
+              var qrcodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=shop_sale_interact_id_' + id)
+              that.setData({qrcodeUrl: qrcodeUrl, interVal: interVal, actId: id})
+            }
+          }
+        })
+      }
+    })
+  },
+  checkScan: function(){
+    var that = this
+    var checkScanUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/CheckScan/' + that.data.actId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: checkScanUrl,
+      success:(res)=>{
+        if (res.statusCode != '200'){
+          clearInterval(that.data.interVal)
+        }
+        else{
+          
+        }
+      },
+      fail:(res)=>{
+        clearInterval(that.data.interVal)
       }
     })
   },

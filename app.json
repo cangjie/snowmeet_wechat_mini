@@ -51,7 +51,8 @@
     "pages/admin/equip_maintain/summer/summer_recept_pay",
     "pages/payment/view_payment",
     "pages/admin/sale/shop_sale",
-    "pages/admin/sale/shop_sale_entry"
+    "pages/admin/sale/shop_sale_entry",
+    "pages/shop_sale/shop_landing"
   ],
   "window": {
     "backgroundTextStyle": "light",
