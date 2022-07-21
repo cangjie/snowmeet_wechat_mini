@@ -60,7 +60,9 @@ Page({
     if (options.code != null){
       that.setData({code: options.code})
     }
-    
+    if (options.openid != null){
+      that.setData({open_id: options.openid})
+    }
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
     })

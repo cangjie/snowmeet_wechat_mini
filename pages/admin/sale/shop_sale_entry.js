@@ -40,7 +40,7 @@ Page({
   },
   checkScan: function(){
     var that = this
-    var checkScanUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/CheckScan/' + that.data.actId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var checkScanUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetScanInfo/' + that.data.actId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: checkScanUrl,
       success:(res)=>{
@@ -48,7 +48,27 @@ Page({
           clearInterval(that.data.interVal)
         }
         else{
-          
+          var scan = res.data
+          var needJump = false
+          if (scan.scan ==1){
+            var word = '顾客已扫码。'
+            if (scan.miniAppUser == null || scan.miniAppUser.cell_number == ''){
+              word = '顾客不是会员。'
+            }
+            else {
+              word = '顾客是会员。'
+              clearInterval(that.data.interVal)
+              needJump = true
+            }
+            wx.showToast({
+              title: word,
+            })
+            if (needJump){
+              wx.navigateTo({
+                url: 'shop_sale?openid=' + res.data.miniAppUser.open_id,
+              })
+            }
+          }
         }
       },
       fail:(res)=>{
