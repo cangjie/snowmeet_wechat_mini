@@ -48,7 +48,7 @@
         {
           "name": "shop sale",
           "pathName": "pages/admin/sale/shop_sale",
-          "query": "code=408990519",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },

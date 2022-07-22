@@ -153,5 +153,8 @@ Page({
   },
   ticketSelected(e){
     console.log('ticket selected', e)
+  },
+  userUpdate(e){
+    console.log('user info update:', e)
   }
 })

@@ -38,7 +38,7 @@ Component({
         var getInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/'
         if (that.properties.open_id.trim() != ''){
           getInfoUrl = getInfoUrl + 'GetMiniAppUser?openId=' + that.properties.open_id
-          + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         }
         else if (that.properties.cell.trim() != ''){
           getInfoUrl = getInfoUrl + 'GetUserByCell/' + that.properties.cell 
@@ -55,6 +55,7 @@ Component({
           wx.request({
             url: getInfoUrl,
             success:(res)=>{
+              console.log('user info:', res.data)
               that.triggerEvent('UserFound', {user_found: true, user_info: res.data})
               that.setData({userFind: true, userInfo: res.data, role: app.globalData.role})
             },
@@ -76,7 +77,30 @@ Component({
    * Component methods
    */
   methods: {
-    
+    userInfoChanged: function(e){
+      console.log('user info changed:', e)
+      var that = this
+      var userInfo = that.data.userInfo
+      if (userInfo == null){
+        userInfo = {}
+      }
+      var value = e.detail.value
+      switch(e.currentTarget.id){
+        case 'real_name':
+          userInfo.real_name = value
+          break
+        case 'cell':
+          userInfo.cell_number = value
+          break
+        case 'gender':
+          userInfo.gender = value
+          break
+        default:
+          break
+      }
+      that.triggerEvent('UserInfoUpdate', {user_info: userInfo})
+      that.setData({userInfo: userInfo})
+    }
 
   }
 

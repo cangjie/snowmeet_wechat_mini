@@ -25,6 +25,9 @@ Component({
   lifetimes:{
     ready: function(){
       var that = this
+      if (that.properties.ticket_code_arr == ''){
+        return
+      }
       that.data.selected_card_no = that.properties.selected_card_no
       var url = 'https://' + app.globalData.domainName + '/core/Ticket/GetUnusedTicketsByCode?ticketCodeArr=' + encodeURIComponent(that.properties.ticket_code_arr)
       wx.request({

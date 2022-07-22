@@ -7,7 +7,7 @@
   <mp-cell>
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" >手机号：</view>
-      <view class="right-column" ><input value="{{userInfo.cell_number}}" placeholder="输入手机号" /></view>
+      <view class="right-column" ><input id="cell" value="{{userInfo.cell_number}}" placeholder="输入手机号" bindinput="userInfoChanged" /></view>
     </view>
   </mp-cell>
   <mp-cell>
@@ -20,9 +20,9 @@
     <view style="display: flex;flex-direction: row;"  >
       <view class="left-column" >顾客称呼：</view>
       <view class="right-column" style="display: flex;" >
-        <input style="width: 150rpx;" placeholder="您贵姓？" />
-        <radio-group>
-          <radio>先生</radio><radio>女士</radio>
+        <input style="width: 150rpx;" id="real_name" placeholder="您贵姓？" bindinput="userInfoChanged" value="{{userInfo.real_name}}" />
+        <radio-group id="gender" bindchange="userInfoChanged" >
+          <radio checked="{{userInfo.gender=='男'}}" value="男" >先生</radio><radio checked="{{userInfo.gender=='女'}}" value="女" >女士</radio>
         </radio-group>
       </view>
     </view>
