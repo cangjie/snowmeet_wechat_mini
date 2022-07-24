@@ -48,7 +48,7 @@
         {
           "name": "shop sale",
           "pathName": "pages/admin/sale/shop_sale",
-          "query": "",
+          "query": "cell=18601197897",
           "launchMode": "default",
           "scene": null
         },

@@ -17,6 +17,72 @@ Page({
     code:'',
     userInfoDisplay: true,
     ticketsRefresh: true,
+    mi7Orders:[{mi7OrderNo: null, mi7OrderSalePrice: null, mi7OrderChargePrice: null}]
+  },
+
+  modMi7Order(e){
+    console.log('input mi7 order', e)
+    var that = this
+    var mi7Orders = that.data.mi7Orders
+    var index = -1
+    var sourceId = e.currentTarget.id
+    var sourceName = ''
+    try{
+      index = parseInt(sourceId.split('_')[1])
+      sourceName = sourceId.split('_')[0]
+    }
+    catch{
+      return;
+    }
+    switch(sourceName.trim()){
+      case 'mi7OrderNo':
+        var orderNo = e.detail.value
+        if (orderNo.trim() == ''){
+          wx.showToast({
+            title: '订单号不能为空。',
+            icon: 'none'
+          })
+        }
+        else{
+          mi7Orders[index].mi7OrderNo = orderNo
+        }
+        break
+      case 'mi7OrderSalePrice':
+        var salePrice = parseFloat(e.detail.value)
+        if (isNaN(salePrice)){
+          wx.showToast({
+            title: '请填写正确格式的价格。',
+            icon: 'none'
+          })
+          mi7Orders[index].mi7OrderSalePrice = null
+        }
+        else{
+          mi7Orders[index].mi7OrderSalePrice = salePrice.toString()
+        }
+        break
+      case 'mi7OrderChargePrice':
+        var chargePrice = parseFloat(e.detail.value)
+        if (isNaN(chargePrice)){
+          wx.showToast({
+            title: '请填写正确格式的价格。',
+            icon:'none'
+          })
+          mi7Orders[index].mi7OrderChargePrice = null
+        }
+        else{
+          mi7Orders[index].mi7OrderChargePrice = chargePrice
+        } 
+        break
+      default:
+        break
+    }
+    that.setData({mi7Orders: mi7Orders})
+  },
+  addMi7Order(e){
+    var that = this
+    var mi7Orders = that.data.mi7Orders
+    mi7Orders.push({mi7OrderNo: null, mi7SalePrice: null, mi7ChargePrice: null})
+    that.setData({mi7Orders: mi7Orders})
   },
 
   cellChanged(e){
