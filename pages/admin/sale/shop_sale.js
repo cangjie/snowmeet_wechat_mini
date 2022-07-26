@@ -17,7 +17,12 @@ Page({
     code:'',
     userInfoDisplay: true,
     ticketsRefresh: true,
-    mi7Orders:[{mi7OrderNo: null, mi7OrderSalePrice: null, mi7OrderChargePrice: null}]
+    mi7Orders:[{mi7OrderNo: null, mi7OrderSalePrice: null, mi7OrderChargePrice: null}],
+    ticketDiscount:0,
+    othersDiscount:0,
+    totalSalePrice:0,
+    totalChargePrice:0,
+    currentCharge: 0
   },
 
   modMi7Order(e){
@@ -70,13 +75,25 @@ Page({
           mi7Orders[index].mi7OrderChargePrice = null
         }
         else{
-          mi7Orders[index].mi7OrderChargePrice = chargePrice
+          mi7Orders[index].mi7OrderChargePrice = chargePrice.toString()
         } 
         break
       default:
         break
     }
-    that.setData({mi7Orders: mi7Orders})
+    var totalSalePrice = 0
+    var totalChargePrice = 0;
+    for(var i = 0; i < mi7Orders.length; i++){
+      var salePrice = parseFloat(mi7Orders[i].mi7OrderSalePrice)
+      if (!isNaN(salePrice)){
+        totalSalePrice = totalSalePrice + salePrice
+      }
+      var chargePrice = parseFloat(mi7Orders[i].mi7OrderChargePrice)
+      if (!isNaN(chargePrice)){
+        totalChargePrice = totalChargePrice + chargePrice
+      }
+    }
+    that.setData({mi7Orders: mi7Orders, totalChargePrice: totalChargePrice, totalSalePrice: totalSalePrice})
   },
   addMi7Order(e){
     var that = this
@@ -84,13 +101,42 @@ Page({
     mi7Orders.push({mi7OrderNo: null, mi7SalePrice: null, mi7ChargePrice: null})
     that.setData({mi7Orders: mi7Orders})
   },
-
+  ticketDiscount(e){
+    var that = this
+    var discount = parseFloat(e.detail.value)
+    if (!isNaN(discount)){
+      that.setData({ticketDiscount: discount})
+    }
+    else{
+      that.setData({ticketDiscount: 0})
+    }
+  },
+  othersDiscount(e){
+    var that = this
+    var discount = parseFloat(e.detail.value)
+    if (!isNaN(discount)){
+      that.setData({othersDiscount: discount})
+    }
+    else{
+      that.setData({othersDiscount: 0})
+    }
+  },
   cellChanged(e){
     this.setData({open_id: ''})
     console.log('cell changed:', e)
     this.setData({open_id: e.detail.value})
   },
 
+  setCurrentCharge(e){
+    var that = this
+    var currentCharge = parseFloat(e.detail.value)
+    if (!isNaN(currentCharge)){
+      that.setData({currentCharge: currentCharge})
+    }
+    else{
+      that.setData({currentCharge: 0})
+    }
+  },
   payMethodChanged(e){
     console.log('pay method changed', e)
     var that = this

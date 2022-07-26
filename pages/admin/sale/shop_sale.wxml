@@ -17,7 +17,7 @@
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column"  >优惠金额：</view>
-        <view class="right-column" ><input placeholder="输入减免金额" /></view>
+        <view class="right-column" ><input placeholder="输入减免金额"  bindinput="ticketDiscount"  /></view>
       </view>
     </mp-cell>
   </mp-cells>
@@ -56,13 +56,13 @@
     <mp-cell>
       <view style="display: flex;flex-direction: row;"  >
         <view class="left-column"  >零售总价：</view>
-        <view class="right-column" >¥xxx.xx</view>
+        <view class="right-column" >¥{{totalSalePrice}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;"  >
         <view class="left-column"  >订单总价：</view>
-        <view class="right-column" >¥xxx.xx</view>
+        <view class="right-column" >¥{{totalChargePrice}}</view>
       </view>
     </mp-cell>
   </mp-cells>
@@ -74,19 +74,19 @@
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column"  >应付金额：</view>
-        <view class="right-column" >¥1234</view>
+        <view class="right-column" >¥{{totalSalePrice}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column"  >优惠券减免：</view>
-        <view class="right-column" >¥1234</view>
+        <view class="right-column" >¥{{totalChargePrice - ticketDiscount}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column"  >额外减免：</view>
-        <view class="right-column" ><input placeholder="输入额外减免金额" /></view>
+        <view class="right-column" ><input placeholder="输入额外减免金额" bindinput="othersDiscount"  /></view>
       </view>
     </mp-cell>
     <mp-cell >
@@ -103,8 +103,8 @@
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column"  >本次支付金额：</view>
         <view class="right-column" >
-          <view wx:if="{{payOptionSelectedIndex!=1}}" >¥xxx.yy</view>
-          <view wx:else style="display: flex; flex-direction: row;">¥<input placeholder="填写支付金额" /></view>
+          <view wx:if="{{payOptionSelectedIndex!=1}}" >¥{{totalChargePrice - ticketDiscount - othersDiscount}}</view>
+          <view wx:else style="display: flex; flex-direction: row;">¥<input placeholder="填写支付金额" bindinput="setCurrentCharge" /></view>
         </view>
       </view>
     </mp-cell>

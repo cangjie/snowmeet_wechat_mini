@@ -42,7 +42,7 @@ Component({
         }
         else if (that.properties.cell.trim() != ''){
           getInfoUrl = getInfoUrl + 'GetUserByCell/' + that.properties.cell 
-          + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         }
         else if (that.properties.code.trim() != ''){
           getInfoUrl = getInfoUrl + 'GetMiniUserByTicket/' + that.properties.code 
