@@ -27,7 +27,9 @@ Component({
     cell:'',
     points: 0,
     nick: '',
-    userFind: false
+    userFind: false,
+    totalPoints: 0,
+    earnedPoints:0
   },
 
   lifetimes:{
@@ -58,6 +60,33 @@ Component({
               console.log('user info:', res.data)
               that.triggerEvent('UserFound', {user_found: true, user_info: res.data})
               that.setData({userFind: true, userInfo: res.data, role: app.globalData.role})
+              var getTotalPointsUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsSummary?openId=' + encodeURIComponent(res.data.open_id) +  '&openIdType=' + encodeURIComponent('snowmeet_mini')
+              wx.request({
+                url: getTotalPointsUrl,
+                method: 'GET',
+                success:(res)=>{
+                  var totalPoints = parseInt(res.data)
+                  if (!isNaN(totalPoints)){
+                    that.setData({totalPoints: totalPoints})
+                  }
+                },
+                
+                complete:()=>{
+                  var getEarnedPointsUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsTotalEarned?openId=' + encodeURIComponent(res.data.open_id) +  '&openIdType=' + encodeURIComponent('snowmeet_mini')
+                  wx.request({
+                    url: getEarnedPointsUrl,
+                    method:'GET',
+                    success:(res)=>{
+                      var earnedPoints = parseInt(res.data)
+                      if (!isNaN(earnedPoints)) {
+                        that.setData({earnedPoints: earnedPoints})
+                      }
+                    }
+                  })
+                }
+                
+              })
+              
             },
             fail:(res)=>{
               that.triggerEvent('UserFound', {user_found: false, user_info: res.data})

@@ -108,10 +108,23 @@
         </view>
       </view>
     </mp-cell>
+    <mp-cell >
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column"  >龙珠系数：</view>
+        <view class="right-column" >{{scoreRate}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell >
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column"  >获得龙珠：</view>
+        <view class="right-column" >{{score}}</view>
+      </view>
+    </mp-cell>
+    <!--
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column"  >获得龙珠：</view>
-        <view class="right-column" >x颗</view>
+        <view class="right-column" >{{score}}颗</view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -126,7 +139,7 @@
         <view class="right-column" >x张</view>
       </view>
     </mp-cell>
-    
+    -->
     <mp-cell >
       <button bindtap="submit" > 提 交 </button>
     </mp-cell>
