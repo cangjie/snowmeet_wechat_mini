@@ -24,7 +24,9 @@ Page({
     totalChargePrice:0,
     currentCharge: 0,
     soreRate: 0,
-    score:0
+    score:0,
+    orderId: 0,
+    
   },
 
   modMi7Order(e){
@@ -342,7 +344,7 @@ Page({
       order.ssyn = ''
       order.memo = ''
       order.shop = that.data.shop
-      order.mchid = 0
+      order.mchid = '0'
       order.ticket_amount = that.data.ticketDiscount
       order.score_rate = 0
       order.generate_score = 0
@@ -410,7 +412,7 @@ Page({
         mi7.real_charge = mi7Orders[i].mi7OrderChargePrice
         order.mi7Orders.push(mi7)
       }
-
+      order.user = that.data.user_info
       var submitUrl = 'https://' + app.globalData.domainName + '/core/orderonlines/placeorderbystaff?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: submitUrl,
@@ -418,6 +420,17 @@ Page({
         data: order,
         success:(res)=>{
           console.log('submit order', res)
+          that.setData({orderId: res.data.id, submitedOrder: order})
+          if (order.ticket_code != null && order.ticket_code != ''){
+            var ticketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + order.ticket_code
+            wx.request({
+              url: ticketUrl,
+              method: 'GET',
+              success:(res)=>{
+                that.setData({orderTicket: res.data})
+              }
+            })
+          }
         }
 
       })
@@ -436,5 +449,7 @@ Page({
   },
   userUpdate(e){
     console.log('user info update:', e)
+    var that = this
+    that.setData({user_info: e.detail.user_info})
   }
 })
