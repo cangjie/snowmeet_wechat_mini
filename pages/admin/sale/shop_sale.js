@@ -411,7 +411,7 @@ Page({
         order.mi7Orders.push(mi7)
       }
 
-      var submitUrl = 'https://' + app.globalData.domainName + '/core/orderonlines/placebystaff?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      var submitUrl = 'https://' + app.globalData.domainName + '/core/orderonlines/placeorderbystaff?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: submitUrl,
         method: 'POST',
