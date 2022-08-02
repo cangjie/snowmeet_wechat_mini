@@ -295,7 +295,7 @@ Page({
     order.id = 0
     order.type = '店销现货'
     order.shop = that.data.shop
-    if (that.data.user_info != null){
+    if (that.data.user_info != undefined && that.data.user_info != null){
       if (that.data.user_info.open_id != null){
         order.open_id = that.data.user_info.open_id
       }
@@ -318,124 +318,124 @@ Page({
         name = that.data.user_info.nick
       }
       order.name = name
-      order.pay_method = that.data.payMethodList[that.data.payMethodSelectedIndex]
-      if (!isNaN(that.data.totalChargePrice)){
-        order.order_price = that.data.totalSalePrice
-      }
-      else{
-        wx.showToast({
-          title: '零售总价不对。',
-          icon: 'none'
-        })
-        return
-      }
-      if (!isNaN(that.data.totalChargePrice)){
-        order.order_real_pay_price = that.data.totalChargePrice
-      }
-      else{
-        wx.showToast({
-          title: '订单总价不对。',
-          icon: 'none'
-        })
-        return
-      }
-      order.pay_state = 0
-      order.code = ''
-      order.ssyn = ''
-      order.memo = ''
-      order.shop = that.data.shop
-      order.mchid = '0'
-      order.ticket_amount = that.data.ticketDiscount
-      order.score_rate = 0
-      order.generate_score = 0
-      order.ticket_code = that.data.ticketCode
-      order.out_trade_no = ''
-      order.pay_memo = that.data.payOptionList[that.data.payOptionSelectedIndex]
-      order.other_discount = that.data.othersDiscount
-      order.final_price = that.data.totalChargePrice - that.data.ticketDiscount - that.data.othersDiscount
-
-      if (order.totalSalePrice == 0){
-        wx.showToast({
-          title: '请正确填写销售总价。',
-          icon: 'none'
-        })
-        return
-      }
-      if (order.totalChargePrice == 0){
-        wx.showToast({
-          title: '请正确填写成交总价。',
-          icon: 'none'
-        })
-        return
-      }
-
-      if (order.final_price == 0){
-        wx.showToast({
-          title: '订单最终支付金额不对。',
-          icon: 'none'
-        })
-        return
-      }
-
-      
-
-      switch(order.pay_memo){
-        case '全额支付':
-          var payment = {}
-          payment.order_id = 0
-          payment.pay_method = order.pay_method
-          payment.amount = order.final_price
-          order.payments = []
-          order.payments.push(payment)
-          break
-        case '部分支付':
-          var payment = {}
-          payment.order_id = 0
-          payment.pay_method = order.pay_method
-          payment.amount = that.data.currentCharge
-          order.payments = []
-          order.payments.push(payment)
-          break
-        case '无需支付':
-          break
-        
-      }
-
-      var mi7Orders = that.data.mi7Orders
-      order.mi7Orders = []
-      for(var i = 0; i < mi7Orders.length; i++){
-        var mi7 = {}
-        mi7.id = 0
-        mi7.order_id = 0
-        mi7.mi7_order_id = mi7Orders[i].mi7OrderNo
-        mi7.sale_price = mi7Orders[i].mi7OrderSalePrice
-        mi7.real_charge = mi7Orders[i].mi7OrderChargePrice
-        order.mi7Orders.push(mi7)
-      }
-      order.user = that.data.user_info
-      var submitUrl = 'https://' + app.globalData.domainName + '/core/orderonlines/placeorderbystaff?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: submitUrl,
-        method: 'POST',
-        data: order,
-        success:(res)=>{
-          console.log('submit order', res)
-          that.setData({orderId: res.data.id, submitedOrder: order})
-          if (order.ticket_code != null && order.ticket_code != ''){
-            var ticketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + order.ticket_code
-            wx.request({
-              url: ticketUrl,
-              method: 'GET',
-              success:(res)=>{
-                that.setData({orderTicket: res.data})
-              }
-            })
-          }
-        }
-
-      })
-
     }
+    else{
+      order.cell_number = ''
+      order.open_id = ''
+      order.name = ''
+    }
+    order.pay_method = that.data.payMethodList[that.data.payMethodSelectedIndex]
+    if (!isNaN(that.data.totalChargePrice)){
+      order.order_price = that.data.totalSalePrice
+    }
+    else{
+      wx.showToast({
+        title: '零售总价不对。',
+        icon: 'none'
+      })
+      return
+    }
+    if (!isNaN(that.data.totalChargePrice)){
+      order.order_real_pay_price = that.data.totalChargePrice
+    }
+    else{
+      wx.showToast({
+        title: '订单总价不对。',
+        icon: 'none'
+      })
+      return
+    }
+    order.pay_state = 0
+    order.code = ''
+    order.ssyn = ''
+    order.memo = ''
+    order.shop = that.data.shop
+    order.mchid = '0'
+    order.ticket_amount = that.data.ticketDiscount
+    order.score_rate = 0
+    order.generate_score = 0
+    order.ticket_code = that.data.ticketCode
+    order.out_trade_no = ''
+    order.pay_memo = that.data.payOptionList[that.data.payOptionSelectedIndex]
+    order.other_discount = that.data.othersDiscount
+    order.final_price = that.data.totalChargePrice - that.data.ticketDiscount - that.data.othersDiscount
+
+    if (order.totalSalePrice == 0){
+      wx.showToast({
+        title: '请正确填写销售总价。',
+        icon: 'none'
+      })
+      return
+    }
+    if (order.totalChargePrice == 0){
+      wx.showToast({
+        title: '请正确填写成交总价。',
+        icon: 'none'
+      })
+      return
+    }
+
+    if (order.final_price == 0){
+      wx.showToast({
+        title: '订单最终支付金额不对。',
+        icon: 'none'
+      })
+      return
+    }
+    switch(order.pay_memo){
+      case '全额支付':
+        var payment = {}
+        payment.order_id = 0
+        payment.pay_method = order.pay_method
+        payment.amount = order.final_price
+        order.payments = []
+        order.payments.push(payment)
+        break
+      case '部分支付':
+        var payment = {}
+        payment.order_id = 0
+        payment.pay_method = order.pay_method
+        payment.amount = that.data.currentCharge
+        order.payments = []
+        order.payments.push(payment)
+        break
+      case '无需支付':
+        break
+        
+    }
+    var mi7Orders = that.data.mi7Orders
+    order.mi7Orders = []
+    for(var i = 0; i < mi7Orders.length; i++){
+      var mi7 = {}
+      mi7.id = 0
+      mi7.order_id = 0
+      mi7.mi7_order_id = mi7Orders[i].mi7OrderNo
+      mi7.sale_price = mi7Orders[i].mi7OrderSalePrice
+      mi7.real_charge = mi7Orders[i].mi7OrderChargePrice
+      order.mi7Orders.push(mi7)
+    }
+    order.user = that.data.user_info
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/orderonlines/placeorderbystaff?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: submitUrl,
+      method: 'POST',
+      data: order,
+      success:(res)=>{
+        console.log('submit order', res)
+        var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_order_id_' + res.data.id)
+        that.setData({orderId: res.data.id, submitedOrder: res.data, qrCodeUrl: qrCodeUrl})
+        if (order.ticket_code != undefined && order.ticket_code != null && order.ticket_code != ''){
+          var ticketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + order.ticket_code
+          wx.request({
+            url: ticketUrl,
+            method: 'GET',
+            success:(res)=>{
+              that.setData({orderTicket: res.data})
+            }
+          })
+        }
+      }
+    })
   },
   shopSelected(e){
     console.log('shop selected', e)

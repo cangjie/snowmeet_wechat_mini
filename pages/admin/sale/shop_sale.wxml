@@ -121,26 +121,6 @@
           <view class="right-column" >{{score}}</view>
         </view>
       </mp-cell>
-      <!--
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view class="left-column"  >获得龙珠：</view>
-          <view class="right-column" >{{score}}颗</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view class="left-column"  >现有龙珠：</view>
-          <view class="right-column" >x颗</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view class="left-column"  >到期优惠券：</view>
-          <view class="right-column" >x张</view>
-        </view>
-      </mp-cell>
-      -->
       <mp-cell >
         <button bindtap="submit" > 提 交 </button>
       </mp-cell>
@@ -148,21 +128,23 @@
   </block>
   <block wx:else >
     <view style="text-align: center;">订单确认</view>
-    
-    
-    <mp-cells title="顾客信息" >
+    <mp-cells title="顾客信息" wx:if="{{submitedOrder.name!=''}}"  >
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >手机号：</view>
-          <view class="right-column" >{{user_info.cell_number}}</view>
+          <view class="right-column" >{{submitedOrder.cell_number}}</view>
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >称呼：</view>
-          <view class="right-column" wx:if="{{user_info.gender=='女'}}" >{{user_info.real_name}} 女士</view>
-          <view class="right-column" wx:else >{{user_info.real_name}} 先生</view>
+          <view class="right-column"  >{{submitedOrder.name}}</view>
         </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="顾客信息" wx:else  >
+      <mp-cell>
+        <view>散客</view>
       </mp-cell>
     </mp-cells>
     <mp-cells title="支付金额" >
@@ -248,6 +230,11 @@
           <view class="right-column" wx:if="{{orderTicket.used == 0}}" >未核销</view>
           <view class="right-column"  wx:else >已核销</view>
         </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells wx:if="{{submitedOrder.open_id == '' || submitedOrder.pay_method == '微信支付'}}" title="请扫码确认订单" >
+      <mp-cell style="text-align: center;">
+        <image mode="aspectFit" style="width: 300rpx;" src="{{qrCodeUrl}}" ></image>
       </mp-cell>
     </mp-cells>
   </block>
