@@ -1,4 +1,5 @@
 <view wx:if="{{role=='staff'}}" >
+  <mi7_order></mi7_order>
   <mp-cells title="顾客扫码验证身份" >
     <mp-cell style="text-align: center;">
       <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>

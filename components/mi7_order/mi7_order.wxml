@@ -1,0 +1,29 @@
+<mp-cells title="订单明细" >
+  <mp-cell>
+    <view>订单1</view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >智慧商贸单号：</view>
+      <view class="right-column" style="display: flex; flex-direction: row;">
+        <view><input    placeholder="填写智慧商贸订单号" bindinput="modMi7Order" /></view>
+        <view><checkbox >紧急开单</checkbox></view>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >零售总价：</view>
+      <view class="right-column" ><input    placeholder="填写零售总价" bindinput="modMi7Order" /></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >成交总价：</view>
+      <view class="right-column" ><input    placeholder="填写成交总价" bindinput="modMi7Order" /></view>
+    </view>
+  </mp-cell>
+  <mp-cell style="text-align: center;" >
+    <button> 添 加 下 一 单 </button>
+  </mp-cell>
+</mp-cells>

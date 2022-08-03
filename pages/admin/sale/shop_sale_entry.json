@@ -1,7 +1,8 @@
 {
   "usingComponents": {
     "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell"
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "mi7_order":"/components/mi7_order/mi7_order"
   },
   "navigationBarTitleText": "店销现货-顾客身份识别"
 }
