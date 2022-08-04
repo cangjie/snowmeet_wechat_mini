@@ -144,5 +144,8 @@ Page({
         })
       }
     })
+  },
+  getMi7Order(e){
+    console.log('mi7 order str', e)
   }
 })

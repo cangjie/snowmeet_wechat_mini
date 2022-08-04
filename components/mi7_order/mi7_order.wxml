@@ -1,29 +1,45 @@
 <mp-cells title="订单明细" >
-  <mp-cell>
-    <view>订单1</view>
-  </mp-cell>
-  <mp-cell>
-    <view style="display:flex; flex-direction: row;">
-      <view class="left-column" >智慧商贸单号：</view>
-      <view class="right-column" style="display: flex; flex-direction: row;">
-        <view><input    placeholder="填写智慧商贸订单号" bindinput="modMi7Order" /></view>
-        <view><checkbox >紧急开单</checkbox></view>
+  <block wx:for="{{mi7Orders}}" bindMi7OrderChanged="getMi7Order" >
+    <mp-cell>
+      <view>订单{{index+1}}</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display:flex; flex-direction: row;">
+        <view class="left-column" >智慧商贸单号：</view>
+        <view class="right-column" style="display: flex; flex-direction: row;">
+          <view><input id="mi7OrderNo_{{index}}" value="{{item.mi7OrderNo}}" disabled="{{item.mi7OrderNo=='紧急开单'}}"  placeholder="填写智慧商贸订单号" bindinput="modMi7Order" /></view>
+          <view>
+            <switch id="switch_{{index}}" checked="{{item.mi7OrderNo=='紧急开单'}}" bindchange="modMi7Order" >紧急开单</switch>
+          </view>
+        </view>
       </view>
-    </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display:flex; flex-direction: row;">
+        <view class="left-column" >零售价：</view>
+        <view class="right-column" ><input id="mi7OrderSalePrice_{{index}}"  value="{{item.mi7SalePrice}}"   placeholder="填写零售总价" bindinput="modMi7Order" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display:flex; flex-direction: row;">
+        <view class="left-column" >成交价：</view>
+        <view class="right-column" ><input id="mi7OrderChargePrice_{{index}}" value="{{item.mi7ChargePrice}}"   placeholder="填写成交总价" bindinput="modMi7Order"  /></view>
+      </view>
+    </mp-cell> 
+  </block>
+  <mp-cell style="text-align: center;" >
+    <button bindtap="addNew" > 添 加 下 一 单 </button>
   </mp-cell>
   <mp-cell>
     <view style="display:flex; flex-direction: row;">
-      <view class="left-column" >零售总价：</view>
-      <view class="right-column" ><input    placeholder="填写零售总价" bindinput="modMi7Order" /></view>
+      <view class="left-column" >销售总价：</view>
+      <view class="right-column" >¥{{totalSalePrice}}</view>
     </view>
   </mp-cell>
   <mp-cell>
     <view style="display:flex; flex-direction: row;">
       <view class="left-column" >成交总价：</view>
-      <view class="right-column" ><input    placeholder="填写成交总价" bindinput="modMi7Order" /></view>
+      <view class="right-column" >¥{{totalChargePrice}}</view>
     </view>
-  </mp-cell>
-  <mp-cell style="text-align: center;" >
-    <button> 添 加 下 一 单 </button>
   </mp-cell>
 </mp-cells>
