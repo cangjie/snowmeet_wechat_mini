@@ -64,8 +64,9 @@ Page({
               title: word,
             })
             if (needJump){
+              var jumpUrl = 'shop_sale?openid=' + res.data.miniAppUser.open_id + (that.data.mi7OrderStr!=''? '&mi7OrderStr=' + that.data.mi7OrderStr: '')
               wx.navigateTo({
-                url: 'shop_sale?openid=' + res.data.miniAppUser.open_id,
+                url: jumpUrl,
               })
             }
           }
@@ -147,5 +148,7 @@ Page({
   },
   getMi7Order(e){
     console.log('mi7 order str', e)
+    var that = this
+    that.data.mi7OrderStr = e.detail.mi7OrderStr
   }
 })

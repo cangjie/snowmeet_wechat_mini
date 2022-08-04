@@ -40,8 +40,11 @@ Component({
           mi7Orders.push(item)
         }
       }
-      mi7Orders.push({mi7OrderNo: null, mi7SalePrice: null, mi7ChargePrice: null})
+      if (mi7Orders.length == 0){
+        mi7Orders.push({mi7OrderNo: null, mi7SalePrice: null, mi7ChargePrice: null})
+      }
       that.setData({mi7Orders: mi7Orders, totalSalePrice: totalSalePrice, totalChargePrice: totalChargePrice})
+      that.triggerEvent('Mi7OrderChanged',{mi7OrderStr: that.properties.mi7OrderStr, mi7Orders, totalChargePrice,totalSalePrice})
     }
 
   },
@@ -139,7 +142,7 @@ Component({
         
       }
       that.setData({mi7Orders: mi7Orders, totalChargePrice: totalChargePrice, totalSalePrice: totalSalePrice})
-      that.triggerEvent('Mi7OrderChanged',{mi7OrderStr})
+      that.triggerEvent('Mi7OrderChanged',{mi7OrderStr,mi7Orders, otalChargePrice,totalSalePrice})
     }
 
   }

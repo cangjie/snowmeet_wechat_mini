@@ -196,18 +196,34 @@ Page({
    */
   onLoad(options) {
     var that = this
-    if (options.cell != null){
+    if (options.cell != undefined || options.cell != null){
       that.setData({cell: options.cell})
     }
-    if (options.code != null){
+    if (options.code != undefined || options.code != null){
       that.setData({code: options.code})
     }
-    if (options.openid != null){
+    if (options.openid != undefined || options.openid != null){
       that.setData({open_id: options.openid})
     }
+
+    if (options.mi7OrderStr != undefined || options.mi7OrderStr != null){
+      
+     
+      that.setData({mi7OrderStr: options.mi7OrderStr})
+
+    }
+
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
     })
+  },
+
+
+  changeMi7Order(e){
+    console.log('mi7 order changed:', e)
+    var that = this
+    that.setData({mi7OrderStr: e.detail.mi7OrderStr, mi7Orders: e.detail.mi7Orders, totalSalePrice: e.detail.totalSalePrice, totalChargePrice: e.detail.totalChargePrice})
+    
   },
 
   userFound(e){

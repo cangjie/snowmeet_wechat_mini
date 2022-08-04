@@ -4,7 +4,8 @@
     "mp-cell": "weui-miniprogram/cell/cell",
     "user-info": "/components/user_info/user_info",
     "shop-selector": "/components/shop_selector/shop_selector",
-    "ticket-selector": "/components/ticket_selector/ticket_selector"
+    "ticket-selector": "/components/ticket_selector/ticket_selector",
+    "mi7orders": "/components/mi7_order/mi7_order"
   },
   "navigationBarTitleText": "店销现货"
 }

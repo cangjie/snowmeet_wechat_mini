@@ -48,7 +48,7 @@
         {
           "name": "shop sale",
           "pathName": "pages/admin/sale/shop_sale",
-          "query": "cell=13501177897",
+          "query": "cell=13501177897&mi7OrderStr=sdde23,123,120;紧急开单,100,100",
           "launchMode": "default",
           "scene": null
         },

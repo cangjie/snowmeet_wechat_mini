@@ -23,54 +23,7 @@
       </mp-cell>
     </mp-cells>
     <shop-selector bindShopSelected="shopSelected" ></shop-selector>
-    <mp-cells title="订单信息 智慧商贸订单可以为多个" >
-      <block wx:for="{{mi7Orders}}">
-        <mp-cell>
-          <view>订单{{index+1}}</view>
-        </mp-cell>
-        <mp-cell>
-          <view style="display: flex;flex-direction: row;"  >
-            <view class="left-column"  >智慧商贸单号：</view>
-            <view class="right-column"  >
-              <input id="mi7OrderNo_{{index}}" value="{{item.mi7OrderNo}}"   placeholder="填写智慧商贸订单号" bindinput="modMi7Order" />
-            </view>
-          </view>
-        </mp-cell>
-        <mp-cell>
-          <view style="display: flex;flex-direction: row;"  >
-            <view class="left-column"  >零售总价：</view>
-            <view class="right-column" ><input id="mi7OrderSalePrice_{{index}}"   placeholder="填写零售总价" bindinput="modMi7Order" value="{{item.mi7OrderSalePrice}}" /></view>
-          </view>
-        </mp-cell>
-        <mp-cell>
-          <view style="display: flex;flex-direction: row;"  >
-            <view class="left-column"  >订单总价：</view>
-            <view class="right-column" ><input id="mi7OrderChargePrice_{{index}}"  placeholder="填写成交总价" bindinput="modMi7Order" value="{{item.mi7OrderChargePrice}}"  /></view>
-          </view>
-        </mp-cell>
-      </block>
-      <mp-cell>
-        <button bindtap="addMi7Order"> 添 加 下 一 单 </button>
-      </mp-cell>
-    </mp-cells>
-    <mp-cells title="订单小计" >
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;"  >
-          <view class="left-column"  >零售总价：</view>
-          <view class="right-column" >¥{{totalSalePrice}}</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;"  >
-          <view class="left-column"  >订单总价：</view>
-          <view class="right-column" >¥{{totalChargePrice}}</view>
-        </view>
-      </mp-cell>
-    </mp-cells>
-    
-    
-    
-    
+    <mi7orders mi7OrderStr="{{mi7OrderStr}}" bindMi7OrderChanged="changeMi7Order" ></mi7orders>  
     <mp-cells title="结算信息" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
