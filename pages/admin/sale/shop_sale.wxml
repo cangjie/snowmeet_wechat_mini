@@ -1,18 +1,6 @@
 <view wx:if="{{role=='staff'}}">
   <block wx:if="{{orderId == 0}}" >
-    <mp-cells title="支付方式" >
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view class="left-column"  >支付方式：</view>
-          <view class="right-column" >
-            <picker mode="selector" range="{{payMethodList}}" bindchange="payMethodChanged" >
-              <picker-view>{{payMethodList[payMethodSelectedIndex]}}</picker-view>
-            </picker>
-          </view>
-        </view>
-      </mp-cell>
-    </mp-cells>
-    <user-info wx:if="{{userInfoDisplay}}" open_id="{{open_id}}" cell="{{cell}}" code="{{code}}" bindUserFound="userFound" bindUserInfoUpdate="userUpdate" ></user-info>
+    <user-info  open_id="{{open_id}}" cell="{{cell}}" code="{{code}}" bindUserFound="userFound" bindUserInfoUpdate="userUpdate" ></user-info>
     <ticket-selector wx:if="{{ticketsRefresh}}" ticket_code_arr="{{code}}" bindTicketSelected="ticketSelected" ></ticket-selector>
     <mp-cells>
       <mp-cell>
@@ -41,6 +29,16 @@
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >额外减免：</view>
           <view class="right-column" ><input placeholder="输入额外减免金额" bindinput="othersDiscount"  /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column"  >支付方式：</view>
+          <view class="right-column" >
+            <picker mode="selector" range="{{payMethodList}}" bindchange="payMethodChanged" >
+              <picker-view>{{payMethodList[payMethodSelectedIndex]}}</picker-view>
+            </picker>
+          </view>
         </view>
       </mp-cell>
       <mp-cell >
@@ -72,6 +70,14 @@
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >获得龙珠：</view>
           <view class="right-column" >{{score}}</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column"  >放弃龙珠：</view>
+          <view class="right-column" >
+            <switch checked="{{isGiveUpScore}}" bindchange="giveUpScore" ></switch>
+          </view>
         </view>
       </mp-cell>
       <mp-cell >
@@ -149,6 +155,16 @@
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >支付方式：</view>
           <view class="right-column" >{{submitedOrder.pay_method}}</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column"  >支付方式：</view>
+          <view class="right-column" >
+            <picker mode="selector" range="{{payMethodList}}" bindchange="payMethodChanged" >
+              <picker-view>{{payMethodList[payMethodSelectedIndex]}}</picker-view>
+            </picker>
+          </view>
         </view>
       </mp-cell>
       <mp-cell>

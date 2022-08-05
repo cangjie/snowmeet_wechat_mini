@@ -26,79 +26,7 @@ Page({
     soreRate: 0,
     score:0,
     orderId: 0,
-    
-  },
-
-  modMi7Order(e){
-    console.log('input mi7 order', e)
-    var that = this
-    var mi7Orders = that.data.mi7Orders
-    var index = -1
-    var sourceId = e.currentTarget.id
-    var sourceName = ''
-    try{
-      index = parseInt(sourceId.split('_')[1])
-      sourceName = sourceId.split('_')[0]
-    }
-    catch{
-      return;
-    }
-    switch(sourceName.trim()){
-      case 'mi7OrderNo':
-        var orderNo = e.detail.value
-        if (orderNo.trim() == ''){
-          wx.showToast({
-            title: '订单号不能为空。',
-            icon: 'none'
-          })
-        }
-        else{
-          mi7Orders[index].mi7OrderNo = orderNo
-        }
-        break
-      case 'mi7OrderSalePrice':
-        var salePrice = parseFloat(e.detail.value)
-        if (isNaN(salePrice)){
-          wx.showToast({
-            title: '请填写正确格式的价格。',
-            icon: 'none'
-          })
-          mi7Orders[index].mi7OrderSalePrice = null
-        }
-        else{
-          mi7Orders[index].mi7OrderSalePrice = salePrice.toString()
-        }
-        break
-      case 'mi7OrderChargePrice':
-        var chargePrice = parseFloat(e.detail.value)
-        if (isNaN(chargePrice)){
-          wx.showToast({
-            title: '请填写正确格式的价格。',
-            icon:'none'
-          })
-          mi7Orders[index].mi7OrderChargePrice = null
-        }
-        else{
-          mi7Orders[index].mi7OrderChargePrice = chargePrice.toString()
-        } 
-        break
-      default:
-        break
-    }
-    var totalSalePrice = 0
-    var totalChargePrice = 0;
-    for(var i = 0; i < mi7Orders.length; i++){
-      var salePrice = parseFloat(mi7Orders[i].mi7OrderSalePrice)
-      if (!isNaN(salePrice)){
-        totalSalePrice = totalSalePrice + salePrice
-      }
-      var chargePrice = parseFloat(mi7Orders[i].mi7OrderChargePrice)
-      if (!isNaN(chargePrice)){
-        totalChargePrice = totalChargePrice + chargePrice
-      }
-    }
-    that.setData({mi7Orders: mi7Orders, totalChargePrice: totalChargePrice, totalSalePrice: totalSalePrice})
-    that.computeScore()
+    isGiveUpScore: false
   },
 
   computeScore(){
@@ -207,10 +135,8 @@ Page({
     }
 
     if (options.mi7OrderStr != undefined || options.mi7OrderStr != null){
-      
-     
       that.setData({mi7OrderStr: options.mi7OrderStr})
-
+      
     }
 
     app.loginPromiseNew.then(function(resolve){
@@ -223,7 +149,7 @@ Page({
     console.log('mi7 order changed:', e)
     var that = this
     that.setData({mi7OrderStr: e.detail.mi7OrderStr, mi7Orders: e.detail.mi7Orders, totalSalePrice: e.detail.totalSalePrice, totalChargePrice: e.detail.totalChargePrice})
-    
+    that.computeScore()
   },
 
   userFound(e){
@@ -309,6 +235,7 @@ Page({
     var that = this
     var order = {}
     order.id = 0
+    order.open_id = ''
     order.type = '店销现货'
     order.shop = that.data.shop
     if (that.data.user_info != undefined && that.data.user_info != null){
@@ -340,6 +267,7 @@ Page({
       order.open_id = ''
       order.name = ''
     }
+    
     order.pay_method = that.data.payMethodList[that.data.payMethodSelectedIndex]
     if (!isNaN(that.data.totalChargePrice)){
       order.order_price = that.data.totalSalePrice
@@ -426,8 +354,8 @@ Page({
       mi7.id = 0
       mi7.order_id = 0
       mi7.mi7_order_id = mi7Orders[i].mi7OrderNo
-      mi7.sale_price = mi7Orders[i].mi7OrderSalePrice
-      mi7.real_charge = mi7Orders[i].mi7OrderChargePrice
+      mi7.sale_price = mi7Orders[i].mi7SalePrice
+      mi7.real_charge = mi7Orders[i].mi7ChargePrice
       order.mi7Orders.push(mi7)
     }
     order.user = that.data.user_info
@@ -467,5 +395,15 @@ Page({
     console.log('user info update:', e)
     var that = this
     that.setData({user_info: e.detail.user_info})
+  },
+  giveUpScore(e){
+    var that = this
+    if (e.detail.value) {
+      that.setData({isGiveUpScore: true, scoreRate: 0, score: 0})
+    }
+    else {
+      that.setData({isGiveUpScore: false})
+      that.computeScore()
+    }
   }
 })

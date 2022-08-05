@@ -59,38 +59,9 @@ Component({
             success:(res)=>{
               console.log('user info:', res.data)
               //that.triggerEvent('UserFound', {user_found: true, user_info: res.data})
-              that.setData({user_info: res.data, user_found: true})
+              //that.setData({user_info: res.data, user_found: true})
               that.setData({userFind: true, userInfo: res.data, role: app.globalData.role})
-              var getTotalPointsUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsSummary?openId=' + encodeURIComponent(res.data.open_id) +  '&openIdType=' + encodeURIComponent('snowmeet_mini')
-              wx.request({
-                url: getTotalPointsUrl,
-                method: 'GET',
-                success:(res)=>{
-                  var totalPoints = parseInt(res.data)
-                  if (!isNaN(totalPoints)){
-                    that.setData({totalPoints: totalPoints})
-                  }
-                },
-                complete:()=>{
-                  var getEarnedPointsUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsTotalEarned?openId=' + encodeURIComponent(res.data.open_id) +  '&openIdType=' + encodeURIComponent('snowmeet_mini')
-                  wx.request({
-                    url: getEarnedPointsUrl,
-                    method:'GET',
-                    success:(res)=>{
-                      var earnedPoints = parseInt(res.data)
-                      if (!isNaN(earnedPoints)) {
-                        that.setData({earnedPoints: earnedPoints})
-                      }
-                    },
-                    complete:()=>{
-                      that.triggerEvent('UserFound', {user_found: true, user_info: that.data.user_info})
-                    }
-
-                  })
-                }
-                
-              })
-              
+              that.getScore()
             },
             fail:(res)=>{
               that.triggerEvent('UserFound', {user_found: false, user_info: res.data})
@@ -106,10 +77,44 @@ Component({
       })
     }
   },
+  
   /**
    * Component methods
    */
   methods: {
+    getScore:function(){
+      var that = this
+      var getTotalPointsUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsSummary?openId=' + encodeURIComponent(that.data.userInfo.open_id) +  '&openIdType=' + encodeURIComponent('snowmeet_mini')
+      wx.request({
+        url: getTotalPointsUrl,
+        method: 'GET',
+        success:(res)=>{
+          var totalPoints = parseInt(res.data)
+          if (!isNaN(totalPoints)){
+            that.setData({totalPoints: totalPoints})
+          }
+        },
+        complete:()=>{
+          var getEarnedPointsUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsTotalEarned?openId=' + encodeURIComponent(that.data.userInfo.open_id) +  '&openIdType=' + encodeURIComponent('snowmeet_mini')
+          wx.request({
+            url: getEarnedPointsUrl,
+            method:'GET',
+            success:(res)=>{
+              var earnedPoints = parseInt(res.data)
+              if (!isNaN(earnedPoints)) {
+                that.setData({earnedPoints: earnedPoints})
+              }
+            },
+            complete:()=>{
+              that.triggerEvent('UserFound', {user_found: true, user_info: that.data.userInfo})
+            }
+  
+          })
+        }
+        
+      })
+      
+    },
     userInfoChanged: function(e){
       console.log('user info changed:', e)
       var that = this
@@ -124,6 +129,19 @@ Component({
           break
         case 'cell':
           userInfo.cell_number = value
+          if (value.length == 11){
+            var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetUserByCell/' + value + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            wx.request({
+              url: getUserInfoUrl,
+              method: 'GET',
+              success:(res)=>{
+                console.log('user info found', res)
+                //that.triggerEvent('UserFound', {user_info: res.data})
+                that.setData({userInfo: res.data})
+                that.getScore()
+              }
+            })
+          }
           break
         case 'gender':
           userInfo.gender = value

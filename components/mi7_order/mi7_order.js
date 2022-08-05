@@ -142,7 +142,7 @@ Component({
         
       }
       that.setData({mi7Orders: mi7Orders, totalChargePrice: totalChargePrice, totalSalePrice: totalSalePrice})
-      that.triggerEvent('Mi7OrderChanged',{mi7OrderStr,mi7Orders, otalChargePrice,totalSalePrice})
+      that.triggerEvent('Mi7OrderChanged',{mi7OrderStr,mi7Orders, totalChargePrice,totalSalePrice})
     }
 
   }
