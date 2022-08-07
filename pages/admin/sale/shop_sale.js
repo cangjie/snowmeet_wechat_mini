@@ -296,6 +296,7 @@ Page({
     order.shop = that.data.shop
     order.mchid = '0'
     order.ticket_amount = that.data.ticketDiscount
+    order.have_score = (that.data.isGiveUpScore?0:1)
     order.score_rate = 0
     order.generate_score = 0
     order.ticket_code = that.data.ticketCode
@@ -405,5 +406,60 @@ Page({
       that.setData({isGiveUpScore: false})
       that.computeScore()
     }
+  },
+  setPaymentSucess(){
+    var that = this
+    var order = that.data.submitedOrder
+    if (order.payments == null || order.payments == undefined || order.payments.length == 0){
+      wx.showToast({
+        title: '无法确认收款',
+        icon: 'none'
+      })
+      return
+    }
+    var payment = order.payments[order.payments.length - 1]
+    var setSuccessUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/SetPaymentSuccess/' + payment.id + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setSuccessUrl,
+      method: 'GET',
+      success: (res)=>{
+        var orderRefresh = res.data
+        if (orderRefresh != undefined && orderRefresh != null){
+          wx.showToast({
+            title: '订单已确认收款',
+            icon: 'none',
+            success:()=>{
+              wx.navigateTo({
+                url: '/pages/admin/sale/shop_sale_entry',
+              })
+            }
+          })
+          
+        }
+      }
+    })
+  },
+  confirmNonPaidOrder(){
+    var that = this
+    var setSuccessUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/SetPaymentSuccess/' + that.data.submitedOrder.id + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setSuccessUrl,
+      method: 'GET',
+      success:(res)=>{
+        var orderRefresh = res.data
+        if (orderRefresh != undefined && orderRefresh != null){
+          wx.showToast({
+            title: '订单已确认无需付款',
+            icon: 'none',
+            success:()=>{
+              wx.navigateTo({
+                url: '/pages/admin/sale/shop_sale_entry',
+              })
+            }
+          })
+          
+        }
+      }
+    })
   }
 })

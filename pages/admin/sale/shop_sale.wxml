@@ -159,24 +159,26 @@
       </mp-cell>
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
-          <view class="left-column"  >支付方式：</view>
-          <view class="right-column" >
-            <picker mode="selector" range="{{payMethodList}}" bindchange="payMethodChanged" >
-              <picker-view>{{payMethodList[payMethodSelectedIndex]}}</picker-view>
-            </picker>
-          </view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >支付选项：</view>
           <view class="right-column" >{{submitedOrder.pay_memo}}</view>
         </view>
       </mp-cell>
-      <mp-cell wx:if="{{submitedOrder.pay_memo!='无需支付'}}" >
+      <block wx:if="{{submitedOrder.pay_memo!='无需付款'}}" >
+        <mp-cell  >
+          <view style="display: flex;flex-direction: row;" >
+            <view class="left-column"  >本次支付：</view>
+            <view class="right-column"    >
+              ¥{{submitedOrder.payments[0].amount}}
+            </view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <button bindtap="setPaymentSucess" > 确 认 收 款 </button>
+        </mp-cell>
+      </block>
+      <mp-cell wx:else >
         <view style="display: flex;flex-direction: row;" >
-          <view class="left-column"  >本次支付：</view>
-          <view class="right-column"    >{{submitedOrder.payments[0].amount}}</view>
+          <button bindtap="confirmNonPaidOrder" >确认免支付订单</button>
         </view>
       </mp-cell>
     </mp-cells>
@@ -184,7 +186,7 @@
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >优惠券码：</view>
-          <view class="right-column" >{{orderTicket.code}}</view>
+          <view class="right-column" style="width: 350rpx" >{{orderTicket.code}}</view>
         </view>
       </mp-cell>
       <mp-cell>
@@ -201,7 +203,7 @@
         </view>
       </mp-cell>
     </mp-cells>
-    <mp-cells wx:if="{{submitedOrder.open_id == '' || submitedOrder.pay_method == '微信支付'}}" title="请扫码确认订单" >
+    <mp-cells wx:if="{{submitedOrder.open_id == '' || (submitedOrder.pay_method == '微信支付' && submitedOrder.pay_memo != '无需付款')  }}" title="请扫码确认订单" >
       <mp-cell style="text-align: center;">
         <image mode="aspectFit" style="width: 300rpx;" src="{{qrCodeUrl}}" ></image>
       </mp-cell>

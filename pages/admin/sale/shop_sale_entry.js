@@ -150,5 +150,11 @@ Page({
     console.log('mi7 order str', e)
     var that = this
     that.data.mi7OrderStr = e.detail.mi7OrderStr
+  },
+  gotoShopSaleDirectly(){
+    var that = this
+    wx.navigateTo({
+      url: 'shop_sale' + (that.data.mi7OrderStr!=''? '?mi7OrderStr=' + that.data.mi7OrderStr: '')
+    })
   }
 })
