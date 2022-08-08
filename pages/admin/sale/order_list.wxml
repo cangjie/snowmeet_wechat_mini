@@ -1,0 +1,60 @@
+<view wx:if="{{role=='staff'}}">
+  <view style="display: flex; flex-direction: row;padding-top: 20rpx;">
+    <view style="padding-left: 20rpx;">开始：</view>
+    <view>
+      <picker mode="date" start="2022-1-1" end="2023-5-15" >
+        <view class="picker" >2022-8-8</view>
+      </picker>
+    </view>
+    <view style="padding-left: 20rpx;" >结束：</view>
+    <view>
+      <picker mode="date" start="2022-1-1" end="2023-5-15" >
+        <view class="picker" >2022-8-8</view>
+      </picker>
+    </view>
+    <view style="padding-left: 20rpx;" >状态：</view>
+    <view>全部</view>
+  </view>
+  <mp-cells title="订单列表"  >
+    <mp-cell bindtap="gotoDetail">
+      <view style="display: flex; flex-direction: row;" >
+        <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
+        <view style="width: 187rpx;" class="list" >12345</view>
+        <view style="width: 187rpx;padding-left: 10rpx; text-align: right;" class="list" >订单金额：</view>
+        <view class="list" >¥1234</view>
+      </view>
+      <view style="display: flex; flex-direction: row;" >
+        <view style="width: 187rpx; text-align: right;" class="list" >订单日期：</view>
+        <view style="width:187rpx" class="list" >2022-8-1</view>
+        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >订单时间：</view>
+        <view style="width: 187rpx;" class="list" >12:00</view>
+      </view>
+      <view style="display: flex; flex-direction: row;" >
+        <view style="width: 187rpx; text-align: right;" class="list" >店员：</view>
+        <view style="width:187rpx" class="list" >崔老板儿</view>
+        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >状态：</view>
+        <view style="width: 187rpx;" class="list" >已完成</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
+        <view style="width: 187rpx;" class="list" >12345</view>
+        <view style="width: 187rpx;padding-left: 10rpx; text-align: right;" class="list" >订单金额：</view>
+        <view class="list" >¥1234</view>
+      </view>
+      <view style="display: flex; flex-direction: row;" >
+        <view style="width: 187rpx; text-align: right;" class="list" >订单日期：</view>
+        <view style="width:187rpx" class="list" >2022-8-1</view>
+        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >订单时间：</view>
+        <view style="width: 187rpx;" class="list" >12:00</view>
+      </view>
+      <view style="display: flex; flex-direction: row;" >
+        <view style="width: 187rpx; text-align: right;" class="list" >店员：</view>
+        <view style="width:187rpx" class="list" >崔老板儿</view>
+        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >状态：</view>
+        <view style="width: 187rpx;" class="list" >已完成</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

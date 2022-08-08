@@ -163,14 +163,20 @@ Page({
     }
   },
   gotoSale:(e)=>{
+    var navUrl = ''
     switch(e.currentTarget.id){
       case "shopSale":
-        wx.navigateTo({
-          url: 'sale/shop_sale_entry',
-        })
+        navUrl = 'sale/shop_sale_entry'
+        break
+      case "shopSaleList":
+        navUrl = 'sale/order_list'
         break
       default:
         break
     }
-  }
+    wx.navigateTo({
+      url: navUrl,
+    })
+  },
+  
 })

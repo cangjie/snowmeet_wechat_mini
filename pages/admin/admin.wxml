@@ -5,6 +5,7 @@
   </mp-cells> 
   <mp-cells ext-class="my-cells" title="店铺销售" >
     <mp-cell id="shopSale" bindtap="gotoSale" >店销现货</mp-cell>
+    <mp-cell id="shopSaleList" bindtap="gotoSale" >订单列表</mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="养护相关" >
     <mp-cell value="现场雪具养护批量收款" bindtap="goToMaintainInShopQuickBatch" ></mp-cell>

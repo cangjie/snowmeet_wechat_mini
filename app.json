@@ -52,7 +52,9 @@
     "pages/payment/view_payment",
     "pages/admin/sale/shop_sale",
     "pages/admin/sale/shop_sale_entry",
-    "pages/shop_sale/shop_landing"
+    "pages/shop_sale/shop_landing",
+    "pages/admin/sale/order_list",
+    "pages/admin/sale/order_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

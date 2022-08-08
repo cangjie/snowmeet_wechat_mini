@@ -1,0 +1,4 @@
+/* pages/admin/sale/order_list.wxss */
+.list{
+  font-size: 11pt;
+}
