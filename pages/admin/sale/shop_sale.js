@@ -9,7 +9,7 @@ Page({
     payMethodList:['微信支付', '支付宝转账', '微信转账','多拉宝', 'POS刷卡', '现金'],
     payMethodSelectedIndex: 0,
     showCustomerInfo: false,
-    payOptionList:['全额支付', '部分支付', '无需付款'],
+    payOptionList:['全额支付', '部分支付', '暂缓支付', '无需付款'],
     payOptionSelectedIndex: 0,
     role:'',
     open_id: '',
