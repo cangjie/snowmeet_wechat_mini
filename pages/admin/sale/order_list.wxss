@@ -2,3 +2,15 @@
 .list{
   font-size: 11pt;
 }
+.left-column{
+  width:25%;
+  text-align: right;
+  font-size: 10pt;
+  margin-top:20rpx;
+}
+.right-column{
+  width:75%;
+  text-align: left;
+  font-size: 10pt;
+  margin-top:20rpx;
+}

@@ -24,7 +24,7 @@ Component({
           method: 'GET',
           success:(res)=>{
             console.log('get shop list:', res)
-            var name_list = []
+            var name_list = ['选择店铺...']
             for(var i = 0; i < res.data.length; i++){
               name_list.push(res.data[i].name)
             }

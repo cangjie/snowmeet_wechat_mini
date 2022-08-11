@@ -1,20 +1,36 @@
 <view wx:if="{{role=='staff'}}">
-  <view style="display: flex; flex-direction: row;padding-top: 20rpx;">
-    <view style="padding-left: 20rpx;">开始：</view>
-    <view>
-      <picker mode="date" start="2022-1-1" end="2023-5-15" >
-        <view class="picker" >2022-8-8</view>
-      </picker>
-    </view>
-    <view style="padding-left: 20rpx;" >结束：</view>
-    <view>
-      <picker mode="date" start="2022-1-1" end="2023-5-15" >
-        <view class="picker" >2022-8-8</view>
-      </picker>
-    </view>
-    <view style="padding-left: 20rpx;" >状态：</view>
-    <view>全部</view>
-  </view>
+  <shop-selector style="height: 10rpx;" bindShopSelected="shopSelected" ></shop-selector>
+  <mp-cells title="选择订单状态" >
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;height: 50rpx;" >
+        <view class="left-column"  >订单状态：</view>
+        <view class="right-column" >
+          <picker mode="selector" range="{{statusList}}" bindchange="statusSelected" >
+            <view>{{statusList[statusSelectedIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="查询起止时间" >
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;font-size: 10pt;height: 50rpx;">
+        <view style="padding-left: 20rpx;height: 50rpx;width:100rpx">开始：</view>
+        <view style="width: 250rpx;">
+          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" bindchange="startDateSelected" >
+            <view class="picker" >{{startDate}}</view>
+          </picker>
+        </view>
+        <view style="padding-left: 20rpx;width:100rpx" >结束：</view>
+        <view style="width: 250rpx;">
+          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" bindchange="endDateSelected" >
+            <view class="picker" >{{endDate}}</view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view style="text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><button> 查 询 </button></view>
   <mp-cells title="订单列表"  >
     <mp-cell bindtap="gotoDetail">
       <view style="display: flex; flex-direction: row;" >
