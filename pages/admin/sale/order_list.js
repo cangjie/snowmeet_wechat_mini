@@ -11,7 +11,9 @@ Page({
     startDate: new Date(),
     endDate: new Date(),
     nowDateStr: '',
-    statusList:['全部', '待支付', '部分支付', '暂缓支付', '支付完成', '订单关闭']
+    statusList:['全部', '待支付', '部分支付', '暂缓支付', '支付完成', '订单关闭'],
+    orderList:[],
+    totalAmount: 0
   },
 
   statusSelected(e){
@@ -24,6 +26,34 @@ Page({
     console.log('shop selected:', e)
     that.setData({shop: e.detail.shop})
   },
+
+  search(){
+    var that = this
+    var searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=' 
+      + that.data.startDate + '&endDate=' + that.data.endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    if (that.data.statusSelectedIndex>0){
+      searchUrl = searchUrl + '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex])
+    }
+    if (that.data.shop!=''){
+      searchUrl = searchUrl + '&shop=' + encodeURIComponent(that.data.shop)
+    }
+    wx.request({
+      url: searchUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('search result:', res.data)
+        var orderList = res.data
+        var totalAmount = 0
+        for(var i = 0; i < orderList.length; i++){
+          totalAmount = totalAmount + orderList[i].final_price
+          var orderDateTime = new Date(orderList[i].create_date)
+          orderList[i].date = orderDateTime.getFullYear().toString() + '-' + (orderDateTime.getMonth() + 1).toString() + '-' + orderDateTime.getDate().toString()
+          orderList[i].time = orderDateTime.getHours().toString() + ':' + orderDateTime.getMinutes().toString()
+        }
+        that.setData({orderList: orderList, totalAmount: totalAmount})
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */
@@ -35,6 +65,7 @@ Page({
     console.log('now date', nowDate)
     app.loginPromiseNew.then(function(resolve) {
       that.setData({role: app.globalData.role})
+      that.search()
     })
   },
 
@@ -97,9 +128,10 @@ Page({
   onShareAppMessage() {
 
   },
-  gotoDetail(){
+  gotoDetail(e){
+    var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'order_detail',
+      url: 'order_detail?id=' + id,
     })
   }
 })

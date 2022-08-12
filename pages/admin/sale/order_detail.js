@@ -16,6 +16,15 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
+      var orderId = parseInt(options.id)
+      var getOrderUrl = 'https://' + app.globalData.domainName + '/core/GetWholeOrderByStaff/' + orderId + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getOrderUrl,
+        method: 'GET',
+        success:(res)=>{
+          that.setData({order: res.data})
+        }
+      })
     })
   },
 

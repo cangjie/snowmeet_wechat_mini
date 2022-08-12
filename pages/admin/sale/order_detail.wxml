@@ -1,5 +1,142 @@
 <view wx:if="{{role=='staff'}}" >
-  <view style="display: flex; flex-direction: row;" >
+  <mp-cells title="订单基本信息" >
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >订单号：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >订单状态：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >订单日期：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >订单时间：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >店铺：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >店员：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >零售总价：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >成交总价：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >优惠券：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >优惠减免：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >额外减免：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >订单金额：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >支付选项：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >已付金额：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >订单欠款：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <user-info open_id="{{order.open_id}}" ></user-info>
+  <mp-cells title="订单明细" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >智慧商贸编号：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >名称：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >零售价：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >成交价：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="支付记录"  >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;">支付ID：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;"></view>
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;">支付方式：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;"></view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >日期：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >时间：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >店员：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >状态：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" >金额：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;" ></view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <!--view style="display: flex; flex-direction: row;" >
     <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
     <view style="width: 187rpx;" class="list" >12345</view>
     <view style="width: 187rpx;padding-left: 10rpx; text-align: right;" class="list" >订单金额：</view>
@@ -49,5 +186,5 @@
     <view style="width: 150rpx;" >110</view>
     <view style="width: 150rpx;" >支付宝转账</view>
   </view>
-  <view ><button> 追 加 收 款 </button></view>
+  <view ><button> 追 加 收 款 </button></view-->
 </view>

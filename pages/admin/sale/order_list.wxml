@@ -30,47 +30,30 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view style="text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><button> 查 询 </button></view>
-  <mp-cells title="订单列表"  >
-    <mp-cell bindtap="gotoDetail">
+  <view style="text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><button bindtap="search" > 查 询 </button></view>
+  <mp-cells title="订单列表 共有订单{{orderList.length}}个，总金额：￥{{totalAmount}}"  >
+    <mp-cell wx:for="{{orderList}}" id="{{item.id}}" bindtap="gotoDetail">
       <view style="display: flex; flex-direction: row;" >
         <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
-        <view style="width: 187rpx;" class="list" >12345</view>
+        <view style="width: 187rpx;" class="list" >{{item.id}}</view>
         <view style="width: 187rpx;padding-left: 10rpx; text-align: right;" class="list" >订单金额：</view>
-        <view class="list" >¥1234</view>
+        <view class="list" >¥{{item.final_price}}</view>
       </view>
       <view style="display: flex; flex-direction: row;" >
         <view style="width: 187rpx; text-align: right;" class="list" >订单日期：</view>
-        <view style="width:187rpx" class="list" >2022-8-1</view>
+        <view style="width:187rpx" class="list" >{{item.date}}</view>
         <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >订单时间：</view>
-        <view style="width: 187rpx;" class="list" >12:00</view>
+        <view style="width: 187rpx;" class="list" >{{item.time}}</view>
       </view>
       <view style="display: flex; flex-direction: row;" >
-        <view style="width: 187rpx; text-align: right;" class="list" >店员：</view>
-        <view style="width:187rpx" class="list" >崔老板儿</view>
+        <view style="width: 187rpx; text-align: right;" class="list" >店铺：</view>
+        <view style="width:187rpx" class="list" >{{item.shop}}</view>
         <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >状态：</view>
-        <view style="width: 187rpx;" class="list" >已完成</view>
+        <view style="width: 187rpx;" class="list" >{{item.status}}</view>
       </view>
     </mp-cell>
-    <mp-cell>
-      <view style="display: flex; flex-direction: row;" >
-        <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
-        <view style="width: 187rpx;" class="list" >12345</view>
-        <view style="width: 187rpx;padding-left: 10rpx; text-align: right;" class="list" >订单金额：</view>
-        <view class="list" >¥1234</view>
-      </view>
-      <view style="display: flex; flex-direction: row;" >
-        <view style="width: 187rpx; text-align: right;" class="list" >订单日期：</view>
-        <view style="width:187rpx" class="list" >2022-8-1</view>
-        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >订单时间：</view>
-        <view style="width: 187rpx;" class="list" >12:00</view>
-      </view>
-      <view style="display: flex; flex-direction: row;" >
-        <view style="width: 187rpx; text-align: right;" class="list" >店员：</view>
-        <view style="width:187rpx" class="list" >崔老板儿</view>
-        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >状态：</view>
-        <view style="width: 187rpx;" class="list" >已完成</view>
-      </view>
+    <mp-cell wx:if="{{orderList.length > 0}}">
+      <view style="text-align: center;padding-top: 50rpx;" >——————列表结束——————</view>
     </mp-cell>
   </mp-cells>
 </view>
