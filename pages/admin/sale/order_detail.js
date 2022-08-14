@@ -1,4 +1,5 @@
 // pages/admin/sale/order_detail.js
+const util = require('../../../utils/util.js')
 const app = getApp()
 Page({
 
@@ -6,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    isOrderInfoReady: false
   },
 
   /**
@@ -17,12 +18,20 @@ Page({
     app.loginPromiseNew.then(function(resolve){
       that.setData({role: app.globalData.role})
       var orderId = parseInt(options.id)
-      var getOrderUrl = 'https://' + app.globalData.domainName + '/core/GetWholeOrderByStaff/' + orderId + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetWholeOrderByStaff/' + orderId + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: getOrderUrl,
         method: 'GET',
         success:(res)=>{
-          that.setData({order: res.data})
+          var order = res.data
+          order.date = util.formatDate(new Date(order.create_date))
+          order.time = util.formatTimeStr(new Date(order.create_date))
+          for(var i = 0; i < order.payments.length; i++){
+            var payment = order.payments[i]
+            payment.date = util.formatDate(new Date(payment.create_date))
+            payment.time = util.formatTimeStr(new Date(payment.create_date))
+          }
+          that.setData({order: order, isOrderInfoReady: true})
         }
       })
     })
