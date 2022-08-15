@@ -96,6 +96,10 @@ Page({
     }
   },
   payMethodChanged(e){
+    var that = this
+    console.log('pay method changed', e)
+    that.setData({payMethod: e.detail.payMethod})
+    /*
     console.log('pay method changed', e)
     var that = this
     var selectedValue = e.detail.value
@@ -112,6 +116,7 @@ Page({
     }
     that.setData({payMethodSelectedIndex: selectedValue, showCustomerInfo: showCustomerInfo,
       userInfoDisplay: displayUserInfo})
+      */
   },
   payOptionChanged(e){
     var that = this
@@ -268,7 +273,7 @@ Page({
       order.name = ''
     }
     
-    order.pay_method = that.data.payMethodList[that.data.payMethodSelectedIndex]
+    order.pay_method = that.data.payMethod
     if (!isNaN(that.data.totalChargePrice)){
       order.order_price = that.data.totalSalePrice
     }

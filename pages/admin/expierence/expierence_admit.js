@@ -40,7 +40,7 @@ Page({
     filledAdmitInfo.start_time = startTimeStr
     filledAdmitInfo.end_time = endTimeStr
     this.setData({filledAdmitInfo: filledAdmitInfo})
-    wx.getLocation({
+    wx.getFuzzyLocation({
       type: 'wgs84',
       success:(res)=>{
         var latitude = res.latitude

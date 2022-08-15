@@ -7,7 +7,10 @@ Page({
    * Page initial data
    */
   data: {
-    isOrderInfoReady: false
+    isOrderInfoReady: false,
+    payMethod: '微信支付',
+    chargeAmount: 0,
+    showModal: false
   },
 
   /**
@@ -84,5 +87,56 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  charge(){
+    var that = this
+    wx.pageScrollTo({
+      duration: 0,
+      scrollTop: 0
+    })
+    that.setData({showModal: true})
+  },
+  confirmCharge(){
+    var that = this
+    var amount = that.data.chargeAmount
+    var order = that.data.order
+    if (amount==0){
+      amount = order.final_price - order.paidAmount
+    }
+    var title = '确认已经收到用户通过' + that.data.payMethod + '支付的¥' + amount + '了吗？' 
+    if (that.data.payMethod == '微信支付'){
+      title = '请用户扫描下方二维码，支付¥' + amount
+    }
+    wx.showModal({
+      cancelColor: 'cancelColor',
+      title: title,
+      success:(res)=>{
+        console.log('confirm payment', res)
+        if (res.cancel){
+          that.setData({showModal: false})
+        }
+      }
+    })
+
+  },
+  payMethodChanged(e){
+    var that = this
+    that.setData({payMethod: e.detail.payMethod})
+  },
+  setChargeAmount(e){
+    var that = this
+    var amount = parseFloat(e.detail.value)
+    if (isNaN(amount)){
+      wx.showToast({
+        title: '请填写正确的支付金额',
+        icon: 'none'
+      })
+    }
+    else{
+      that.setData({chargeAmount: amount})
+    }
+  },
+  hideModal(){
+    this.setData({showModal: false})
   }
 })

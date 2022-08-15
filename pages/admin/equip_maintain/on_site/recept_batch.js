@@ -196,7 +196,7 @@ Page({
     var confirmedInfo = this.data.confirmedInfo
     confirmedInfo.pick_date = pickDate.getFullYear().toString() + '-' + (pickDate.getMonth() + 1).toString() + '-' + pickDate.getDate().toString()
     this.setData({confirmedInfo: confirmedInfo, pickDateStart: pickDateStartStr, pickDateEnd: pickDateEndStr})
-    wx.getLocation({
+    wx.getFuzzyLocation({
       type: 'wgs84',
       success:(res)=>{
         var latitude = res.latitude

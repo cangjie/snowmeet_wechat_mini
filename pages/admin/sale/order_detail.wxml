@@ -136,56 +136,24 @@
         <view style="font-size: 10pt;text-align: left;width: 180rpx;" ></view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <button disabled="{{order.paidAmount <= 0 || order.status == '订单关闭' || order.status == '支付完成'}}" bindtap="charge" > 追 加 收 款 </button>
+    </mp-cell>
   </mp-cells>
-  <!--view style="display: flex; flex-direction: row;" >
-    <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
-    <view style="width: 187rpx;" class="list" >12345</view>
-    <view style="width: 187rpx;padding-left: 10rpx; text-align: right;" class="list" >订单金额：</view>
-    <view class="list" >¥1234</view>
-  </view>
-  <view style="display: flex; flex-direction: row;" >
-    <view style="width: 187rpx; text-align: right;" class="list" >订单日期：</view>
-    <view style="width:187rpx" class="list" >2022-8-1</view>
-    <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >订单时间：</view>
-    <view style="width: 187rpx;" class="list" >12:00</view>
-  </view>
-  <view style="display: flex; flex-direction: row;" >
-    <view style="width: 187rpx; text-align: right;" class="list" >店员：</view>
-    <view style="width:187rpx" class="list" >崔老板儿</view>
-    <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >状态：</view>
-    <view style="width: 187rpx;" class="list" >已完成</view>
-  </view>
-  <view style="margin-top: 30rpx; margin-bottom: 10rpx;">
-    商品列表
-  </view>
-  <view style="display: flex; flex-direction: row;"  >
-    <view style="width: 150rpx;">名称</view>
-    <view style="width: 150rpx;" >售价</view>
-    <view style="width: 150rpx;" >成交</view>
-    <view style="width: 150rpx;" >数量</view>
-    <view style="width: 150rpx;" >小计</view>
-  </view>
-  <view style="display: flex; flex-direction: row;"  >
-    <view style="width: 150rpx;" >帽子</view>
-    <view style="width: 150rpx;" >120</view>
-    <view style="width: 150rpx;" >110</view>
-    <view style="width: 150rpx;" >1</view>
-    <view style="width: 150rpx;" >110</view>
-  </view>
-  <view style="margin-top: 30rpx; margin-bottom: 10rpx;">
-    支付列表
-  </view>
-  <view style="display: flex; flex-direction: row;"  >
-    <view style="width: 190rpx;">日期</view>
-    <view style="width: 190rpx;" >时间</view>
-    <view style="width: 150rpx;" >金额</view>
-    <view style="width: 150rpx;" >方式</view>
-  </view>
-  <view style="display: flex; flex-direction: row;"  >
-    <view style="width: 190rpx;">2022-8-1</view>
-    <view style="width: 190rpx;" >12:00</view>
-    <view style="width: 150rpx;" >110</view>
-    <view style="width: 150rpx;" >支付宝转账</view>
-  </view>
-  <view ><button> 追 加 收 款 </button></view-->
+  <cover-view wx:if="{{showModal}}" style="height: 100%;background-color: #ffffff;position:fixed;top:0px;width:100%;opacity: 1;" bindtap="hideModal">
+    <mp-cells title="追加收款" >
+      <mp-cell>
+        <pay-method payMethod="微信支付" bindPayMethodSelected="payMethodChanged" ></pay-method>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" >支付金额：</view>
+          <view class="right-column" ><input placeholder="{{order.final_price - order.paidAmount}}" bindinput="setChargeAmount" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <button bindtap="confirmCharge"> 确 认 </button>
+      </mp-cell>
+    </mp-cells>
+  </cover-view>
 </view>

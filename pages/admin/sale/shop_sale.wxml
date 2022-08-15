@@ -32,14 +32,15 @@
         </view>
       </mp-cell>
       <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
+        <!--view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >支付方式：</view>
           <view class="right-column" >
             <picker mode="selector" range="{{payMethodList}}" bindchange="payMethodChanged" >
               <picker-view>{{payMethodList[payMethodSelectedIndex]}}</picker-view>
             </picker>
           </view>
-        </view>
+        </view-->
+        <pay_method payMethod="微信支付" bindPayMethodSelected="payMethodChanged" ></pay_method>
       </mp-cell>
       <mp-cell >
         <view style="display: flex;flex-direction: row;" >

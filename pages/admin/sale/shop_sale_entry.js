@@ -13,7 +13,7 @@ Page({
   /**
    * Lifecycle function--Called when page load
    */
-  onLoad(options) {
+  onShow(options) {
     var that = this
     app.loginPromiseNew.then(function(resolve){
       if (app.globalData.role == 'staff') {
@@ -37,6 +37,12 @@ Page({
         })
       }
     })
+  },
+  onUnload: function(){
+    clearInterval(this.data.interVal)
+  },
+  onHide:function(){
+    clearInterval(this.data.interVal)
   },
   checkScan: function(){
     var that = this
@@ -88,12 +94,6 @@ Page({
 
   },
 
-  /**
-   * Lifecycle function--Called when page show
-   */
-  onShow() {
-
-  },
 
   /**
    * Lifecycle function--Called when page hide
@@ -131,6 +131,7 @@ Page({
   },
   gotoShopSale() {
     var that = this
+    clearInterval(that.data.interVal)
     wx.navigateTo({
       url: 'shop_sale?cell=' + that.data.cell,
     })
@@ -153,6 +154,7 @@ Page({
   },
   gotoShopSaleDirectly(){
     var that = this
+    clearInterval(that.data.interVal)
     wx.navigateTo({
       url: 'shop_sale' + (that.data.mi7OrderStr!=''? '?mi7OrderStr=' + that.data.mi7OrderStr: '')
     })
