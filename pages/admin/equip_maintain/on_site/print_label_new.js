@@ -23,7 +23,7 @@ Page({
     reConnectTimes: 0
   },
   getDeviceNameList: function() {
-    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/blt_device_list_new.aspx'
+    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/blt_device.htm'
     var that = this
     var deviceName = []
     wx.request({

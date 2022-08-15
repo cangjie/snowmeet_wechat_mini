@@ -387,7 +387,7 @@ Page({
   
   getDeviceNameListPromise: new Promise(function(resolve){
     var deviceScene = 'maintain_on_site_label_print'
-    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/blt_device_list_new.aspx'
+    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/blt_device.htm'
     
     wx.request({
       url: getDeviceNameUrl,

@@ -82,5 +82,8 @@
     "scope.userLocation": {
       "desc": "仅仅店员使用来确定门店位置。"
     }
-  }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ]
 }

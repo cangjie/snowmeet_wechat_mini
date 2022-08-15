@@ -31,7 +31,7 @@ Page({
     
 
     this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 0})
-    var url = 'https://' + app.globalData.domainName + '/api/mini_shop_products_list_get.aspx'
+    var url = 'https://' + app.globalData.domainName + '/mini_shop_products_list_get.htm'
     wx.request({
       url: url,
       success: (res) => {
