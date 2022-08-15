@@ -154,12 +154,14 @@ App({
         "iconPath": "/images/equip.jpg",
         "selectedIconPath": "/images/equip.jpg"
       },
+      /*
       {
         "pagePath": "/pages/skipass/skipass",
         "text": "雪票",
         "iconPath": "/images/book-3-line.png",
         "selectedIconPath": "/images/book-3-line-hl.png"
       },
+      */
       {
         "pagePath": "/pages/mine/mine",
         "text": "我的",
