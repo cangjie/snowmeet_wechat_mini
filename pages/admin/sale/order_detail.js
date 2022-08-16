@@ -90,10 +90,12 @@ Page({
   },
   charge(){
     var that = this
+    
     wx.pageScrollTo({
       duration: 0,
-      scrollTop: 0
+      scrollTop: 100000
     })
+    
     that.setData({showModal: true})
   },
   confirmCharge(){

@@ -109,6 +109,20 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <mp-cells wx:if="{{showModal}}" title="追加收款" >
+    <mp-cell>
+      <pay-method payMethod="微信支付" bindPayMethodSelected="payMethodChanged" ></pay-method>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >支付金额：</view>
+        <view class="right-column" ><input placeholder="{{order.final_price - order.paidAmount}}" bindinput="setChargeAmount" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <button bindtap="confirmCharge"> 确 认 </button>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="支付记录"  >
     <mp-cell wx:for="{{order.payments}}" >
       <view style="display: flex;flex-direction: row;" >
@@ -140,20 +154,6 @@
       <button disabled="{{order.paidAmount <= 0 || order.status == '订单关闭' || order.status == '支付完成'}}" bindtap="charge" > 追 加 收 款 </button>
     </mp-cell>
   </mp-cells>
-  <cover-view wx:if="{{showModal}}" style="height: 100%;background-color: #ffffff;position:fixed;top:0px;width:100%;opacity: 1;" >
-    <mp-cells title="追加收款" >
-      <mp-cell>
-        <pay-method payMethod="微信支付" bindPayMethodSelected="payMethodChanged" ></pay-method>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex; flex-direction: row;" >
-          <view class="left-column" >支付金额：</view>
-          <view class="right-column" ><input placeholder="{{order.final_price - order.paidAmount}}" bindinput="setChargeAmount" /></view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <button bindtap="confirmCharge"> 确 认 </button>
-      </mp-cell>
-    </mp-cells>
-  </cover-view>
+  
+  
 </view>

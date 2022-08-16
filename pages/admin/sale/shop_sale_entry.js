@@ -70,6 +70,7 @@ Page({
               title: word,
             })
             if (needJump){
+              clearInterval(that.data.interVal)
               var jumpUrl = 'shop_sale?openid=' + res.data.miniAppUser.open_id + (that.data.mi7OrderStr!=''? '&mi7OrderStr=' + that.data.mi7OrderStr: '')
               wx.navigateTo({
                 url: jumpUrl,
