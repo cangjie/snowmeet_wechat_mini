@@ -140,7 +140,7 @@
       <button disabled="{{order.paidAmount <= 0 || order.status == '订单关闭' || order.status == '支付完成'}}" bindtap="charge" > 追 加 收 款 </button>
     </mp-cell>
   </mp-cells>
-  <cover-view wx:if="{{showModal}}" style="height: 100%;background-color: #ffffff;position:fixed;top:0px;width:100%;opacity: 1;" bindtap="hideModal">
+  <cover-view wx:if="{{showModal}}" style="height: 100%;background-color: #ffffff;position:fixed;top:0px;width:100%;opacity: 1;" >
     <mp-cells title="追加收款" >
       <mp-cell>
         <pay-method payMethod="微信支付" bindPayMethodSelected="payMethodChanged" ></pay-method>

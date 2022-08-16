@@ -115,6 +115,25 @@ Page({
         if (res.cancel){
           that.setData({showModal: false})
         }
+        if (res.confirm){
+          var rechargeUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/OrderChargeByStaff/' + order.id + '?amount=' + encodeURIComponent(amount) + '&payMethod=' + encodeURIComponent(that.data.payMethod) + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: rechargeUrl,
+            method: 'GET',
+            success:(res)=>{
+              var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetWholeOrderByStaff/' + order.id + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+              wx.request({
+                url: getOrderUrl,
+                method: 'GET',
+                success:(res)=>{
+                  that.setData({showModal: false, order: res.data})
+                  
+                }
+              })
+            }
+          })
+          
+        }
       }
     })
 

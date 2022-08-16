@@ -242,6 +242,13 @@ Page({
     order.id = 0
     order.open_id = ''
     order.type = '店销现货'
+    if (that.data.shop == ''){
+      wx.showToast({
+        title: '请选择门店',
+        icon: 'none'
+      })
+      return
+    }
     order.shop = that.data.shop
     if (that.data.user_info != undefined && that.data.user_info != null){
       if (that.data.user_info.open_id != null){

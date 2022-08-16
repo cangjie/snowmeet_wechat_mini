@@ -43,7 +43,7 @@ Component({
       console.log('shop select changed:', e)
       var that = this
       that.setData({currentSelectedIndex: e.detail.value})
-      if (e.data.value == 0){
+      if (e.detail.value == 0){
         that.triggerEvent('ShopSelected', {shop: ''})
       }
       else{
