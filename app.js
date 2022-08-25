@@ -106,6 +106,9 @@ App({
                 }
               }
             })
+          },
+          fail:(res)=>{
+            console.log('request fail', res)
           }
         })
       }
