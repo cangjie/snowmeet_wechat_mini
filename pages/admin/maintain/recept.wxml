@@ -1,0 +1,157 @@
+<block>
+  <view wx:if="{{scene=='查看用户基本信息'}}" >
+    <user-info></user-info>
+    <mp-cells title="最近养护记录" >
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;">
+          <view style="text-align: left;" class="left-column">2022-1-1</view>
+          <view class="right-column" >双板 atomic 178 修刃 89 打蜡</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;">
+          <view style="text-align: left;" class="left-column">2022-1-1</view>
+          <view class="right-column" >双板 atomic 178 修刃 89 打蜡</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;">
+          <view style="text-align: left;" class="left-column">2022-1-1</view>
+          <view class="right-column" >双板 atomic 178 修刃 89 打蜡</view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="养护过的装备">
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;">
+          <view><checkbox></checkbox></view>
+          <view>
+            <view style="font-size: 10pt;">atomic 178 wold cup 2022 本人</view>
+            <view style="display: flex;flex-direction: row;">
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >上次养护：</view>
+              <view style="font-size: 10pt;" >2022-1-1</view>
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >项目：</view>
+              <view style="font-size: 10pt;" >修刃89 打蜡</view>
+            </view>
+            <view style="display: flex;flex-direction: row;">
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >DIN：</view>
+              <view style="font-size: 10pt;width:175rpx;" >7/8</view>
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >鞋长：</view>
+              <view style="font-size: 10pt;width:175rpx" >234</view>
+            </view>
+            <view style="display: flex;flex-direction: row;">
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >身高：</view>
+              <view style="font-size: 10pt;width:175rpx" >190cm</view>
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >体重：</view>
+              <view style="font-size: 10pt;width:175rpx" >115kg</view>
+            </view>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;">
+          <view><checkbox></checkbox></view>
+          <view>
+            <view style="font-size: 10pt;">fischer 170 wold cup 2022 配偶</view>
+            <view style="display: flex;flex-direction: row;">
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >上次养护：</view>
+              <view style="font-size: 10pt;" >2022-1-1</view>
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >项目：</view>
+              <view style="font-size: 10pt;" >修刃89 打蜡</view>
+            </view>
+            <view style="display: flex;flex-direction: row;">
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >DIN：</view>
+              <view style="font-size: 10pt;width:175rpx;" >7/8</view>
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >鞋长：</view>
+              <view style="font-size: 10pt;width:175rpx" >234</view>
+            </view>
+            <view style="display: flex;flex-direction: row;">
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >身高：</view>
+              <view style="font-size: 10pt;width:175rpx" >190cm</view>
+              <view style="font-size: 10pt;width:175rpx;text-align: right;" >体重：</view>
+              <view style="font-size: 10pt;width:175rpx" >115kg</view>
+            </view>
+          </view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <view style="text-align:center;">
+      <button bindtap="gotoPlaceOrder"> 下 一 步 </button>
+    </view>
+  </view>
+  <view wx:if="{{scene=='确定养护项目'}}">
+    <mp-cells title="Atomic 178" >
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="font-size: 10pt;">2022-1-1</view>
+          <view style="font-size: 10pt;" >修刃 打蜡</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="font-size: 10pt;" >2022-2-1</view>
+          <view style="font-size: 10pt;" >打蜡</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">类型：</view>
+          <view style="width: 175rpx;"></view>
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">品牌：</view>
+          <view style="width: 175rpx;"></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">长度：</view>
+          <view style="width: 175rpx;font-size: 10pt;"></view>
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">鞋长：</view>
+          <view style="width: 175rpx;font-size: 10pt;"></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">身高：</view>
+          <view style="width: 175rpx;font-size: 10pt;"></view>
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">体重：</view>
+          <view style="width: 175rpx;font-size: 10pt;"></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">DIN：</view>
+          <view style="width: 175rpx;font-size: 10pt;"></view>
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">关系：</view>
+          <view style="width: 175rpx;font-size: 10pt;">本人/长辈/配偶/朋友</view>
+        </view>
+      </mp-cell>
+      <mp-cell>拍照</mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column"  >项目：</view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" >额外费用：</view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <view ><button> 增 加 </button></view>
+    <view style="display: flex; flex-direction: row;" >
+      <view style="width: 375rpx;" ><button bindtap="gotoRecept" > 上 一 步 </button></view>
+      <view style="width: 375rpx;" ><button bindtap="gotoConfirm" > 下 一 步 </button></view>
+    </view>
+  </view>
+  <view wx:if="{{scene=='确认订单'}}" >
+    <mp-cells title="确认订单">
+      <mp-cell style="text-align: center;">确认优惠券</mp-cell>
+      <mp-cell style="text-align: center;">支付方式</mp-cell>
+      <mp-cell style="text-align: center;">额外减免</mp-cell>
+      <mp-cell style="text-align: center;">实际支付</mp-cell>
+    </mp-cells>
+    <view><button> 确 认 </button></view>
+  </view>
+</block>

@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "user-info": "/components/user_info/user_info"
+  },
+  "navigationBarTitleText": "雪具养护下单"
+}

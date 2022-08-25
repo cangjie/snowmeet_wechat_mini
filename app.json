@@ -54,7 +54,8 @@
     "pages/admin/sale/shop_sale_entry",
     "pages/shop_sale/shop_landing",
     "pages/admin/sale/order_list",
-    "pages/admin/sale/order_detail"
+    "pages/admin/sale/order_detail",
+    "pages/admin/maintain/recept"
   ],
   "window": {
     "backgroundTextStyle": "light",

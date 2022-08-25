@@ -178,5 +178,9 @@ Page({
       url: navUrl,
     })
   },
-  
+  goToMaintainRecept(){
+    wx.redirectTo({
+      url: '/pages/admin/maintain/recept',
+    })
+  }
 })
