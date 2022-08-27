@@ -55,7 +55,8 @@
     "pages/shop_sale/shop_landing",
     "pages/admin/sale/order_list",
     "pages/admin/sale/order_detail",
-    "pages/admin/maintain/recept"
+    "pages/admin/maintain/recept",
+    "pages/admin/maintain/order_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

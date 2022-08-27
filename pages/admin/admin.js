@@ -109,7 +109,7 @@ Page({
   },
   goToMaintainInShopList: function() {
     wx.navigateTo({
-      url: './equip_maintain/on_site/recept_list',
+      url: '/pages/admin/maintain/order_list',
     })
   },
   goToMaintainInShopQuickBatch: function(){
