@@ -1,4 +1,4 @@
-// pages/admin/maintain/order_list.js
+// pages/admin/maintain/task.js
 Page({
 
   /**
@@ -6,12 +6,6 @@ Page({
    */
   data: {
 
-  },
-
-  gotoTask(){
-    wx.navigateTo({
-      url: 'task',
-    })
   },
 
   /**

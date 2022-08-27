@@ -1,0 +1,174 @@
+<mp-cells title="用户联系信息" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >姓名：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >电话：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="装备信息" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >类型：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >品牌：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >系列：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >年款：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="用户个人信息" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >身高：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >体重：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >鞋长：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >关系：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="单板安全检查" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >前脚：</view>
+      <view class="right-column" >(左/右)</view>
+      <view class="left-column" >间距：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >角度：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >确认：</view>
+      <view class="right-column" ><checkbox></checkbox></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <input placeholder="填写备注" />
+  </mp-cell>
+  <mp-cell>问题拍照</mp-cell>
+</mp-cells>
+<mp-cells title="双板安全检查" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >DIN：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >鞋长：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >确认：</view>
+      <view class="right-column" ><checkbox></checkbox></view>
+      <view class="left-column" ></view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <input placeholder="填写备注" />
+  </mp-cell>
+  <mp-cell>问题拍照</mp-cell>
+</mp-cells>
+<mp-cells title="修刃" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >角度：</view>
+      <view class="right-column" >89</view>
+      <view class="left-column" >状态：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >开始：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >完成：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >技师：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >备注：</view>
+      <view class="right-column" ><input placeholder="填写备注" /></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <button style="width: 150rpx; font-size: 10pt;"> 开 始 </button> <button style="width:150rpx;font-size: 10pt;"> 完 成 </button><button style="width: 300rpx;font-size: 10pt;" >强制结束</button>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="打蜡" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >状态：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >技师：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >开始：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >完成：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <input placeholder="填写备注" />
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <button style="width: 150rpx; font-size: 10pt;"> 开 始 </button> <button style="width:150rpx;font-size: 10pt;"> 完 成 </button><button style="width: 300rpx;font-size: 10pt;" >强制结束</button>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="维修" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >状态：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >技师：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >开始：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >完成：</view>
+      <view class="right-column" ></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <input placeholder="填写备注" />
+  </mp-cell>
+  <mp-cell>问题拍照</mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <button style="width: 150rpx; font-size: 10pt;"> 开 始 </button> <button style="width:150rpx;font-size: 10pt;"> 完 成 </button><button style="width: 300rpx;font-size: 10pt;" >强制结束</button>
+    </view>
+  </mp-cell>
+</mp-cells>
