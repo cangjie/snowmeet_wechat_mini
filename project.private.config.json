@@ -1,12 +1,12 @@
 {
+  "setting": {},
   "condition": {
     "miniprogram": {
       "list": [
         {
-          "name": "order list",
-          "pathName": "pages/admin/equip_maintain/order_list/task/task_executing/task_executing",
+          "name": "maintain_order_list",
+          "pathName": "pages/admin/equip_maintain/order_list/order_list_main",
           "query": "",
-          "launchMode": "default",
           "scene": null
         }
       ]

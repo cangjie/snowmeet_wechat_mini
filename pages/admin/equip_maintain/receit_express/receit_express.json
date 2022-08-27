@@ -1,13 +1,13 @@
 {
   "usingComponents": {
-    "mp-tabbar": "../../../../modules/tabbar/tabbar",
-    "mp-toptips": "../../../../modules/toptips/toptips",
-    "mp-cells": "../../../../modules/cells/cells",
-    "mp-cell": "../../../../modules/cell/cell",
-    "mp-checkbox": "../../../../modules/checkbox/checkbox",
-    "mp-checkbox-group": "../../../../modules/checkbox-group/checkbox-group",
-    "mp-form": "../../../../modules/form/form",
-    "mp-uploader": "../../../../modules/uploader/uploader"
+    "mp-tabbar": "/modules/tabbar/tabbar",
+    "mp-toptips": "/modules/toptips/toptips",
+    "mp-cells": "/modules/cells/cells",
+    "mp-cell": "/modules/cell/cell",
+    "mp-checkbox": "/modules/checkbox/checkbox",
+    "mp-checkbox-group": "/modules/checkbox-group/checkbox-group",
+    "mp-form": "/modules/form/form",
+    "mp-uploader": "/modules/uploader/uploader"
   },
   "navigationBarTitleText": "签收快递"
   
