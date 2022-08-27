@@ -1,0 +1,15 @@
+{
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "order list",
+          "pathName": "pages/admin/equip_maintain/order_list/task/task_executing/task_executing",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
+  }
+}
