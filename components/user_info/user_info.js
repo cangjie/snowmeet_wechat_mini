@@ -151,6 +151,11 @@ Component({
       }
       that.triggerEvent('UserInfoUpdate', {user_info: userInfo})
       that.setData({userInfo: userInfo})
+    },
+    call(){
+      wx.makePhoneCall({
+        phoneNumber: this.data.cell
+      })
     }
 
   }

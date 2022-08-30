@@ -8,6 +8,18 @@ Page({
     scene: '查看用户基本信息'
   },
 
+  
+
+  userInfoUpdate(e){
+    console.log('user info update', e)
+    var that = this
+    var userInfo = e.detail.user_info
+    that.setData({userInfo: userInfo})
+    if (userInfo.user_found){
+      
+    }
+  },
+
   /**
    * Lifecycle function--Called when page load
    */

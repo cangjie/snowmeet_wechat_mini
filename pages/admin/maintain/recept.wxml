@@ -1,6 +1,6 @@
 <block>
   <view wx:if="{{scene=='查看用户基本信息'}}" >
-    <user-info></user-info>
+    <user-info bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" ></user-info>
     <mp-cells title="最近养护记录" >
       <mp-cell>
         <view style="display:flex; flex-direction: row;">
