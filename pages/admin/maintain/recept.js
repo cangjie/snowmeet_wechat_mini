@@ -10,7 +10,8 @@ Page({
     scene: '查看用户基本信息',
     equipArr:[],
     selectedEquipArr:[],
-    maintainLogArr:[]
+    maintainLogArr:[],
+    relationItems:['本人', '配偶', '朋友', '长辈']
   },
 
   
@@ -66,18 +67,37 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
+    var that = this
     var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('双板')
     wx.request({
       url: getBrandUrl,
       method: 'GET',
       success:(res)=>{
-        that.setData({skiBrands: res.data})
+        
+        var skiBrands = []
+        for(var i = 0; i < res.data.length; i++){
+          var brand = res.data[i].brand_name.trim()
+          if (res.data[i].chinese_name.trim()!=''){
+            brand = brand + '/' + res.data[i].chinese_name.trim()
+          }
+          skiBrands.push(brand)
+          
+        }
+        that.setData({skiBrands: skiBrands})
         getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('单板')
         wx.request({
           url: getBrandUrl,
           method: 'GET',
           success:(res)=>{
-            that.setData({boardBrands: res.data})
+            var boardBrands = []
+            for(var i = 0; i < res.data.length; i++){
+              var brand = res.data[i].brand_name.trim()
+              if (res.data[i].chinese_name.trim()!=''){
+                brand = brand + '/' + res.data[i].chinese_name.trim()
+              }
+              boardBrands.push(brand)
+            }
+            that.setData({boardBrands: boardBrands})
           }
         })
       }

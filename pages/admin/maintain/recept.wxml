@@ -64,8 +64,9 @@
     </view>
   </view>
   <view wx:if="{{scene=='确定养护项目'}}">
-    <mp-cells title="Atomic 178" >
-      <mp-cell>
+
+    <mp-cells wx:for="{{selectedEquipArr}}" title="{{item.brand + ' ' + item.scale}}" >
+      <!--mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view style="font-size: 10pt;">2022-1-1</view>
           <view style="font-size: 10pt;" >修刃 打蜡</view>
@@ -76,37 +77,79 @@
           <view style="font-size: 10pt;" >2022-2-1</view>
           <view style="font-size: 10pt;" >打蜡</view>
         </view>
-      </mp-cell>
+      </mp-cell-->
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
-          <view style="width: 175rpx;text-align: right;font-size: 10pt;">类型：</view>
-          <view style="width: 175rpx;"></view>
-          <view style="width: 175rpx;text-align: right;font-size: 10pt;">品牌：</view>
-          <view style="width: 175rpx;"></view>
+          <view style="width: 100rpx;text-align: right;font-size: 10pt;">类型：</view>
+          <view style="width: 250rpx;">
+            <radio-group style="display: flex; flex-direction: row;" >
+              <radio checked="{{item.type == '双板'}}" style="font-size: 10pt;" >双板</radio>
+              <radio checked="{{item.type == '单板'}}" style="font-size: 10pt;" >单板</radio>
+            </radio-group>
+          </view>
+          <view style="width: 100rpx;text-align: right;font-size: 10pt;">品牌：</view>
+          <view style="width: 250rpx;">
+            <picker wx:if="{{item.type=='单板'}}" mode="selector" range="{{boardBrands}}"  >
+              <picker-view style="font-size: 10pt;" >{{item.brand}}</picker-view>
+            </picker>
+            <picker wx:if="{{item.type=='双板'}}" mode="selector" range="{{skiBrands}}"  >
+              <picker-view style="font-size: 10pt;" >{{item.brand}}</picker-view>
+            </picker>
+          </view>
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view style="width: 175rpx;text-align: right;font-size: 10pt;">长度：</view>
-          <view style="width: 175rpx;font-size: 10pt;"></view>
-          <view style="width: 175rpx;text-align: right;font-size: 10pt;">鞋长：</view>
-          <view style="width: 175rpx;font-size: 10pt;"></view>
+          <view style="width: 175rpx;font-size: 10pt;"><input placeholder="填写长度" value="{{item.scale}}" /></view>
+          <block wx:if="{{item.type=='单板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">前脚：</view>
+            <view style="width: 175rpx;font-size: 10pt;">
+              <radio-group>
+                <radio style="font-size: 10pt;" >左</radio>
+                <radio style="font-size: 10pt;" >右</radio>
+              </radio-group>
+            </view>
+          </block>
+          <block wx:if="{{item.type=='双板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">鞋长：</view>
+            <view style="width: 175rpx;font-size: 10pt;"><input placeholder="鞋长" value="" /></view>
+          </block>  
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view style="width: 175rpx;text-align: right;font-size: 10pt;">身高：</view>
           <view style="width: 175rpx;font-size: 10pt;"></view>
-          <view style="width: 175rpx;text-align: right;font-size: 10pt;">体重：</view>
-          <view style="width: 175rpx;font-size: 10pt;"></view>
+          <block wx:if="{{item.type == '单板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">间距：</view>
+            <view style="width: 175rpx;font-size: 10pt;"><input /></view>
+          </block>
+          <block wx:if="{{item.type == '双板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">体重：</view>
+            <view style="width: 175rpx;font-size: 10pt;"></view>
+          </block> 
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
-          <view style="width: 175rpx;text-align: right;font-size: 10pt;">DIN：</view>
-          <view style="width: 175rpx;font-size: 10pt;"></view>
+          <block wx:if="{{item.type == '单板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">角度：</view>
+            <view style="width: 175rpx;font-size: 10pt;"></view>
+          </block>
+          <block wx:if="{{item.type == '双板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">DIN：</view>
+            <view style="width: 175rpx;font-size: 10pt;display: flex; flex-direction: row;" >
+              前：<input style="width: 50rpx;" placeholder="3" /> 后：<input style="width: 50rpx;" placeholder="4" />
+            </view>
+          </block>
+          
           <view style="width: 175rpx;text-align: right;font-size: 10pt;">关系：</view>
-          <view style="width: 175rpx;font-size: 10pt;">本人/长辈/配偶/朋友</view>
+          <view style="width: 175rpx;font-size: 10pt;">
+            <picker mode="selector" range="{{relationItems}}" >
+              <picker-view>本人</picker-view>
+            </picker>
+          </view>
         </view>
       </mp-cell>
       <mp-cell>拍照</mp-cell>
