@@ -1,8 +1,14 @@
 <block>
   <view wx:if="{{scene=='查看用户基本信息'}}" >
     <user-info bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" ></user-info>
-    <mp-cells title="最近养护记录" >
-      <mp-cell>
+    <mp-cells wx:if="{{maintainLogArr.length > 0}}" title="最近养护记录" >
+      <mp-cell wx:for="{{maintainLogArr}}" >
+        <view style="display:flex; flex-direction: row;">
+          <view style="text-align: left;" class="left-column">{{item.date}}</view>
+          <view class="right-column" >{{item.desc}}</view>
+        </view>
+      </mp-cell>
+      <!--mp-cell>
         <view style="display:flex; flex-direction: row;">
           <view style="text-align: left;" class="left-column">2022-1-1</view>
           <view class="right-column" >双板 atomic 178 修刃 89 打蜡</view>
@@ -13,68 +19,46 @@
           <view style="text-align: left;" class="left-column">2022-1-1</view>
           <view class="right-column" >双板 atomic 178 修刃 89 打蜡</view>
         </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display:flex; flex-direction: row;">
-          <view style="text-align: left;" class="left-column">2022-1-1</view>
-          <view class="right-column" >双板 atomic 178 修刃 89 打蜡</view>
-        </view>
-      </mp-cell>
+      </mp-cell-->
     </mp-cells>
-    <mp-cells title="养护过的装备">
-      <mp-cell>
-        <view style="display: flex; flex-direction: row;">
-          <view><checkbox></checkbox></view>
-          <view>
-            <view style="font-size: 10pt;">atomic 178 wold cup 2022 本人</view>
-            <view style="display: flex;flex-direction: row;">
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >上次养护：</view>
-              <view style="font-size: 10pt;" >2022-1-1</view>
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >项目：</view>
-              <view style="font-size: 10pt;" >修刃89 打蜡</view>
-            </view>
-            <view style="display: flex;flex-direction: row;">
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >DIN：</view>
-              <view style="font-size: 10pt;width:175rpx;" >7/8</view>
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >鞋长：</view>
-              <view style="font-size: 10pt;width:175rpx" >234</view>
-            </view>
-            <view style="display: flex;flex-direction: row;">
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >身高：</view>
-              <view style="font-size: 10pt;width:175rpx" >190cm</view>
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >体重：</view>
-              <view style="font-size: 10pt;width:175rpx" >115kg</view>
+    <checkbox-group bindchange="checkEquip" >
+      <mp-cells wx:if="{{equipArr.length > 0}}" title="养护过的装备">
+        <mp-cell wx:for="{{equipArr}}" >
+          <view style="display: flex; flex-direction: row;">
+            <view><checkbox value="{{index}}" /></view>
+            <view>
+              <view style="font-size: 10pt;">{{item.type}} {{item.brand}} {{item.scale}}</view>
             </view>
           </view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex; flex-direction: row;">
-          <view><checkbox></checkbox></view>
-          <view>
-            <view style="font-size: 10pt;">fischer 170 wold cup 2022 配偶</view>
-            <view style="display: flex;flex-direction: row;">
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >上次养护：</view>
-              <view style="font-size: 10pt;" >2022-1-1</view>
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >项目：</view>
-              <view style="font-size: 10pt;" >修刃89 打蜡</view>
-            </view>
-            <view style="display: flex;flex-direction: row;">
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >DIN：</view>
-              <view style="font-size: 10pt;width:175rpx;" >7/8</view>
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >鞋长：</view>
-              <view style="font-size: 10pt;width:175rpx" >234</view>
-            </view>
-            <view style="display: flex;flex-direction: row;">
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >身高：</view>
-              <view style="font-size: 10pt;width:175rpx" >190cm</view>
-              <view style="font-size: 10pt;width:175rpx;text-align: right;" >体重：</view>
-              <view style="font-size: 10pt;width:175rpx" >115kg</view>
+        </mp-cell>
+        <!--mp-cell>
+          <view style="display: flex; flex-direction: row;">
+            <view><checkbox></checkbox></view>
+            <view>
+              <view style="font-size: 10pt;">fischer 170 wold cup 2022 配偶</view>
+              <view style="display: flex;flex-direction: row;">
+                <view style="font-size: 10pt;width:175rpx;text-align: right;" >上次养护：</view>
+                <view style="font-size: 10pt;" >2022-1-1</view>
+                <view style="font-size: 10pt;width:175rpx;text-align: right;" >项目：</view>
+                <view style="font-size: 10pt;" >修刃89 打蜡</view>
+              </view>
+              <view style="display: flex;flex-direction: row;">
+                <view style="font-size: 10pt;width:175rpx;text-align: right;" >DIN：</view>
+                <view style="font-size: 10pt;width:175rpx;" >7/8</view>
+                <view style="font-size: 10pt;width:175rpx;text-align: right;" >鞋长：</view>
+                <view style="font-size: 10pt;width:175rpx" >234</view>
+              </view>
+              <view style="display: flex;flex-direction: row;">
+                <view style="font-size: 10pt;width:175rpx;text-align: right;" >身高：</view>
+                <view style="font-size: 10pt;width:175rpx" >190cm</view>
+                <view style="font-size: 10pt;width:175rpx;text-align: right;" >体重：</view>
+                <view style="font-size: 10pt;width:175rpx" >115kg</view>
+              </view>
             </view>
           </view>
-        </view>
-      </mp-cell>
-    </mp-cells>
+        </mp-cell-->
+      </mp-cells>
+    </checkbox-group>
     <view style="text-align:center;">
       <button bindtap="gotoPlaceOrder"> 下 一 步 </button>
     </view>
