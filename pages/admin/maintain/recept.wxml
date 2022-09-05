@@ -120,14 +120,14 @@
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view style="width: 175rpx;text-align: right;font-size: 10pt;">身高：</view>
-          <view style="width: 175rpx;font-size: 10pt;"></view>
+          <view style="width: 175rpx;font-size: 10pt;"><input placeholder="填写身高" value="{{item.height}}" /></view>
           <block wx:if="{{item.type == '单板'}}" >
             <view style="width: 175rpx;text-align: right;font-size: 10pt;">间距：</view>
             <view style="width: 175rpx;font-size: 10pt;"><input /></view>
           </block>
           <block wx:if="{{item.type == '双板'}}" >
             <view style="width: 175rpx;text-align: right;font-size: 10pt;">体重：</view>
-            <view style="width: 175rpx;font-size: 10pt;"></view>
+            <view style="width: 175rpx;font-size: 10pt;"><input placeholder="填写体重" value="{{item.weight}}" /></view>
           </block> 
         </view>
       </mp-cell>
@@ -135,24 +135,26 @@
         <view style="display: flex; flex-direction: row;" >
           <block wx:if="{{item.type == '单板'}}" >
             <view style="width: 175rpx;text-align: right;font-size: 10pt;">角度：</view>
-            <view style="width: 175rpx;font-size: 10pt;"></view>
+            <view style="width: 175rpx;font-size: 10pt;"><input placeholder="填写固定器角度" value="{{item.angle}}" /></view>
           </block>
           <block wx:if="{{item.type == '双板'}}" >
             <view style="width: 175rpx;text-align: right;font-size: 10pt;">DIN：</view>
             <view style="width: 175rpx;font-size: 10pt;display: flex; flex-direction: row;" >
-              前：<input style="width: 50rpx;" placeholder="3" /> 后：<input style="width: 50rpx;" placeholder="4" />
+              前：<input style="width: 50rpx;" placeholder="3" value="{{item.din_font}}" /> 后：<input style="width: 50rpx;" placeholder="4" value="{{item.din_rear}}"  />
             </view>
           </block>
           
           <view style="width: 175rpx;text-align: right;font-size: 10pt;">关系：</view>
           <view style="width: 175rpx;font-size: 10pt;">
             <picker mode="selector" range="{{relationItems}}" >
-              <picker-view>本人</picker-view>
+              <picker-view>{{item.relation}}</picker-view>
             </picker>
           </view>
         </view>
       </mp-cell>
-      <mp-cell>拍照</mp-cell>
+      <mp-cell>
+        <multi-uploader id="uploadPhotos" title="雪板及附件" image_count="3" detail_id="0" bindUploaded="uploaded" uploaded_files="{{photoFiles}}" ></multi-uploader>
+      </mp-cell>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view class="left-column"  >项目：</view>
