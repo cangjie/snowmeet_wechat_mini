@@ -60,6 +60,7 @@ Page({
     for(var i = 0; i < e.detail.value.length; i++){
       var index = parseInt(e.detail.value[i].toString())
       selectedEquipArr[i] = equipArr[index]
+      selectedEquipArr[i].relation = '本人'
     }
     that.setData({selectedEquipArr: selectedEquipArr})
   },
@@ -157,7 +158,7 @@ Page({
     that.setData({scene: '确定养护项目'})
     var selectedEquipArr = that.data.selectedEquipArr
     if (selectedEquipArr.length == 0){
-      selectedEquipArr[0] = {type: '', brand: '', scale: '', serial: '', year: ''}
+      selectedEquipArr[0] = {type: '双板', brand: '请选择。。。', scale: '', serial: '', year: ''}
       that.setData({selectedEquipArr: selectedEquipArr})
     }
 
@@ -169,5 +170,14 @@ Page({
   gotoRecept(){
     var that = this
     that.setData({scene: '查看用户基本信息'})
+  },
+  changed(e){
+    console.log('select changed', e)
+  },
+  addNew(){
+    var that = this
+    var selectedEquipArr = that.data.selectedEquipArr
+    selectedEquipArr.push({type: '双板'})
+    that.setData({selectedEquipArr: selectedEquipArr})
   }
 })
