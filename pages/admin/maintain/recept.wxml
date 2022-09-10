@@ -59,8 +59,9 @@
         </mp-cell-->
       </mp-cells>
     </checkbox-group>
+    <shop-selector bindShopSelected="shopSelected" ></shop-selector>
     <view style="text-align:center;">
-      <button bindtap="gotoPlaceOrder"> 下 一 步 </button>
+      <button bindtap="gotoPlaceOrder" disabled="{{shop == undefined || shop == ''}}" > 下 一 步 </button>
     </view>
   </view>
   <view wx:if="{{scene=='确定养护项目'}}">
@@ -164,6 +165,16 @@
               <checkbox value='修刃' >修刃 </checkbox>
             </checkbox-group>
             <input id="degree_{{index}}" placeholder="89" style="width: 100rpx;" bindinput="changed" value="{{item.degree}}" />度
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" style="width:15%"  >加急：</view>
+          <view>
+            <checkbox-group id="urgent_{{index}}" bindchange="changed" >
+              <checkbox style="font-size: 10pt;" value="1"  checked="{{item.urgent=='1'}}" >加急</checkbox>
+            </checkbox-group>
           </view>
         </view>
       </mp-cell>

@@ -11,6 +11,7 @@ Page({
     equipArr:[],
     selectedEquipArr:[],
     maintainLogArr:[],
+    maintainWholeLog:[],
     relationItems:['本人', '配偶', '朋友', '长辈']
   },
 
@@ -37,6 +38,7 @@ Page({
             method: 'GET',
             success:(res)=>{
               console.log('maintain log', res)
+
               maintainLogArr[0] = res.data[0]
               maintainLogArr[1] = res.data[1]
               maintainLogArr[2] = res.data[2]
@@ -45,7 +47,7 @@ Page({
                 maintainLogArr[i].date = util.formatDate(new Date(maintainLogArr[i].create_date))
                 maintainLogArr[i].desc = desc
               }
-              that.setData({equipArr: equipArr, maintainLogArr: maintainLogArr})
+              that.setData({equipArr: equipArr, maintainLogArr: maintainLogArr, maintainWholeLog: res.data})
             }
           })
         }
@@ -55,12 +57,39 @@ Page({
   checkEquip(e){
     console.log('check equip', e)
     var that = this
+    var wholeLog = that.data.maintainWholeLog
+    var that = this
     var selectedEquipArr = []
     var equipArr = that.data.equipArr
     for(var i = 0; i < e.detail.value.length; i++){
       var index = parseInt(e.detail.value[i].toString())
       selectedEquipArr[i] = equipArr[index]
       selectedEquipArr[i].relation = '本人'
+      for(var j = 0; j < wholeLog.length; j++){
+        var log = wholeLog[j]
+        var equip = selectedEquipArr[i]
+        if (equip.type == log.confirmed_equip_type && equip.brand == log.confirmed_brand && equip.scale == log.confirmed_scale ){
+
+          equip.footLength = log.confirmed_foot_length
+          equip.front = log.confirmed_front
+
+          equip.height = log.confirmed_height
+          
+          equip.weight = log.confirmed_weight
+          equip.binderGap = log.confirmed_binder_gap
+
+          equip.angle = log.confirmed_angle
+          equip.dinFront = log.confirmed_front_din
+          equip.dinRear = log.confirmed_rear_din
+
+          equip.relation = log.confirmed_relation
+
+          equip.othersCharge = 0
+          
+          break
+
+        }
+      }
     }
     that.setData({selectedEquipArr: selectedEquipArr})
   },
@@ -104,7 +133,11 @@ Page({
       }
     })
   },
-
+  shopSelected(e){
+    console.log('shop selected', e)
+    var that = this
+    that.setData({shop: e.detail.shop})
+  },
   /**
    * Lifecycle function--Called when page is initially rendered
    */
@@ -255,6 +288,9 @@ Page({
         break
       case 'othersCharge':
         currentEquip.othersCharge = value
+        break
+      case 'urgent':
+        currentEquip.urgent = value.length.toString()
         break
       default:
         break
