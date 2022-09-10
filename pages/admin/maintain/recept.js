@@ -173,6 +173,93 @@ Page({
   },
   changed(e){
     console.log('select changed', e)
+    var that = this
+    var targetIdArr = e.currentTarget.id.split('_')
+    var targetType = targetIdArr[0]
+    var targetId = parseInt(targetIdArr[1])
+    var selectedEquipArr = that.data.selectedEquipArr
+    var currentEquip = selectedEquipArr[targetId]
+    var value = e.detail.value
+    switch(targetType){
+      case 'type':
+        currentEquip.type = value
+        currentEquip.brand = ''
+        break
+      case 'brand':
+        var brandList = that.data.skiBrands
+        if (currentEquip.type == '单板'){
+          brandList = that.data.boardBrands
+        }
+        currentEquip.brand = brandList[parseInt(value)]
+        break
+      case 'scale':
+        currentEquip.scale = value
+        break
+      case 'front':
+        currentEquip.front = value
+        break
+      case 'footLength':
+        currentEquip.footLength = value
+        break
+      case 'height':
+        currentEquip.height = value
+        break
+      case 'weight':
+        currentEquip.weight = value
+        break
+      case 'binderGap':
+        currentEquip.binderGap = value
+        break
+      case 'binderAngle':
+        currentEquip.angle = value
+        break
+      case 'dinFront':
+        currentEquip.dinFront = value
+        break
+      case 'dinRear':
+        currentEquip.dinRear = value
+        break
+      case 'relation':
+        var relation = that.data.relationItems[parseInt(value)]
+        currentEquip.relation = relation
+        break
+      case 'item':
+        var edge = false
+        var candle = false
+        for(var i = 0; i < value.length; i++){
+          switch(value[i].trim()){
+            case '打蜡':
+              candle = true
+              break
+            case '修刃':
+              edge = true
+              break
+            default:
+              break
+          }
+        }
+        currentEquip.candle = candle
+        currentEquip.edge = edge
+        break;
+      case 'degree':
+        currentEquip.degree = value
+        break
+      case 'others':
+        var v = ''
+        for(var i = 0; i < value.length; i++){
+          v = v + (v==''?'':',') + value[i].trim()
+        }
+        break
+      case 'memo':
+        currentEquip.memo = value
+        break
+      case 'othersCharge':
+        currentEquip.othersCharge = value
+        break
+      default:
+        break
+    }
+    that.setData({selectedEquipArr: selectedEquipArr})
   },
   addNew(){
     var that = this
