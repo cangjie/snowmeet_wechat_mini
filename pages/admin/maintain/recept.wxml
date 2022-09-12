@@ -216,12 +216,44 @@
     </view>
   </view>
   <view wx:if="{{scene=='确认订单'}}" >
-    <mp-cells title="确认订单">
-      <mp-cell style="text-align: center;">确认优惠券</mp-cell>
-      <mp-cell style="text-align: center;">支付方式</mp-cell>
-      <mp-cell style="text-align: center;">额外减免</mp-cell>
-      <mp-cell style="text-align: center;">实际支付</mp-cell>
+    <ticket-selector wx:if="{{userInfo != undefined && userInfo.open_id != undefined && userInfo.open_id != ''}}" open_id="{{userInfo.open_id}}"  ></ticket-selector>
+    <mp-cells title="支付">
+      <mp-cell style="text-align: center;">
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column" >应付金额：</view>
+          <view class="right-column" >¥{{totalSummary}}</view>
+        </view>
+      </mp-cell>
+      <mp-cell style="text-align: center;">
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column" >额外减免：</view>
+          <view class="right-column" style="display: flex; flex-direction: row;" >¥<input style="width: 150rpx;" value="{{othersDiscount}}" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column" >实际支付：</view>
+          <view class="right-column" >¥{{totalSummary - othersDiscount}}</view>
+        </view>
+      </mp-cell>
+      <mp-cell style="text-align: center;">
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column" >支付选项：</view>
+          <view class="right-column" >
+            <picker mode="selector" range="{{payOptionList}}" bindchange="payOptionChange" >
+              <picker-view>{{payOptionList[payOptionSelectedIndex]}}</picker-view>
+            </picker>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell wx:if="{{payOptionSelectedIndex == 0}}" style="text-align: center;">
+        <pay-method />
+      </mp-cell>
     </mp-cells>
-    <view><button> 确 认 </button></view>
+    <!--view><button> 确 认 </button></view-->
+    <view style="display: flex; flex-direction: row;" >
+      <view style="width: 375rpx;" ><button bindtap="gotoPlaceOrder" > 上 一 步 </button></view>
+      <view style="width: 375rpx;" ><button bindtap="gotoFinish" > 确 认 </button></view>
+    </view>
   </view>
 </block>

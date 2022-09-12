@@ -12,6 +12,10 @@ Component({
     selected_card_no:{
       type: String,
       value:''
+    },
+    open_id: {
+      type: String,
+      value: ''
     }
   },
 
@@ -26,25 +30,46 @@ Component({
     ready: function(){
       var that = this
       if (that.properties.ticket_code_arr == ''){
-        return
-      }
-      that.data.selected_card_no = that.properties.selected_card_no
-      var url = 'https://' + app.globalData.domainName + '/core/Ticket/GetUnusedTicketsByCode?ticketCodeArr=' + encodeURIComponent(that.properties.ticket_code_arr)
-      wx.request({
-        url: url,
-        method: 'GET',
-        success: (res)=>{
-          var ticketList = res.data
-          
-          for(var i = 0; i < ticketList.length; i++){
-            //ticketList[i].usage = ticketList[i].memo.split(';')
-            ticketList[i].usage = ticketList[i].memo.toString().replace(/;/g,'\r\n')
+          if (that.properties.open_id == ''){
+            return
           }
-          
-          
-          that.setData({ticket_list: ticketList})
-        }
-      })
+          else{
+            var getTicketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicketsByUser/0?openId=' + encodeURIComponent(that.properties.open_id) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            wx.request({
+              url: getTicketUrl,
+              method: 'GET',
+              success:(res)=>{
+                var ticketList = res.data
+                for(var i = 0; i < ticketList.length; i++){
+                  ticketList[i].usage = ticketList[i].memo.toString().replace(/;/g,'\r\n')
+                }
+                that.setData({ticket_list: ticketList})
+
+              }
+            })
+          }
+      }
+      else {
+
+      
+        that.data.selected_card_no = that.properties.selected_card_no
+        var url = 'https://' + app.globalData.domainName + '/core/Ticket/GetUnusedTicketsByCode?ticketCodeArr=' + encodeURIComponent(that.properties.ticket_code_arr)
+        wx.request({
+          url: url,
+          method: 'GET',
+          success: (res)=>{
+            var ticketList = res.data
+            
+            for(var i = 0; i < ticketList.length; i++){
+              //ticketList[i].usage = ticketList[i].memo.split(';')
+              ticketList[i].usage = ticketList[i].memo.toString().replace(/;/g,'\r\n')
+            }
+            
+            
+            that.setData({ticket_list: ticketList})
+          }
+        })
+      }
     }
   },
 

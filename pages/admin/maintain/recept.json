@@ -4,7 +4,9 @@
     "mp-cell": "weui-miniprogram/cell/cell",
     "user-info": "/components/user_info/user_info",
     "multi-uploader": "/components/uploader/multi-uploader",
-    "shop-selector" : "/components/shop_selector/shop_selector"
+    "shop-selector" : "/components/shop_selector/shop_selector",
+    "ticket-selector": "/components/ticket_selector/ticket_selector",
+    "pay-method": "/components/pay_method/pay_method"
   },
   "navigationBarTitleText": "雪具养护下单"
 }

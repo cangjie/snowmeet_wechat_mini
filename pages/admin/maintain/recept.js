@@ -12,7 +12,10 @@ Page({
     selectedEquipArr:[],
     maintainLogArr:[],
     maintainWholeLog:[],
-    relationItems:['本人', '配偶', '朋友', '长辈']
+    relationItems:['本人', '配偶', '朋友', '长辈'],
+    payOptionList:['立即支付', '稍后支付', '次卡支付', '无需支付'],
+    payOptionSelectedIndex: 0,
+    othersDiscount: 0
   },
 
   
@@ -47,6 +50,7 @@ Page({
                 maintainLogArr[i].date = util.formatDate(new Date(maintainLogArr[i].create_date))
                 maintainLogArr[i].desc = desc
               }
+
               that.setData({equipArr: equipArr, maintainLogArr: maintainLogArr, maintainWholeLog: res.data})
             }
           })
@@ -138,6 +142,11 @@ Page({
     var that = this
     that.setData({shop: e.detail.shop})
   },
+  payOptionChange(e){
+    console.log('pay option change', e)
+    var that = this
+    that.setData({payOptionSelectedIndex: e.detail.value})
+  },
   /**
    * Lifecycle function--Called when page is initially rendered
    */
@@ -188,17 +197,113 @@ Page({
   },
   gotoPlaceOrder(){
     var that = this
+    var getProductUrl = 'https://' + app.globalData.domainName + '/core/Product/GetMaintainProduct?shop=' + encodeURIComponent(that.data.shop)
+    wx.request({
+      url: getProductUrl,
+      method:'GET',
+      success:(res)=>{
+        console.log('maintian products', res)
+        that.setData({productList: res.data})
+      }
+    })
     that.setData({scene: '确定养护项目'})
     var selectedEquipArr = that.data.selectedEquipArr
     if (selectedEquipArr.length == 0){
       selectedEquipArr[0] = {type: '双板', brand: '请选择。。。', scale: '', serial: '', year: ''}
       that.setData({selectedEquipArr: selectedEquipArr})
     }
-
+    
   },
   gotoConfirm(){
     var that = this
     that.setData({scene: '确认订单'})
+    var selectedEquipArr = that.data.selectedEquipArr
+    var totalSummary = 0
+    for(var i = 0; i < selectedEquipArr.length; i++){
+      var equip = selectedEquipArr[i]
+      var productId = 0
+      var price = 0
+      if (equip.urgent == 1){
+        if (equip.edge && equip.candle){
+          for(var i = 0; i < that.data.productList.length; i++){
+            var name = that.data.productList[i].name
+            if (name.indexOf('立等')>=0 && name.indexOf('修刃')>=0 && name.indexOf('打蜡')>=0 ){
+              productId = that.data.productList[i].id
+              price = that.data.productList[i].sale_price
+              break
+            }
+          }
+        }
+        else{
+          if (equip.edge){
+            for(var i = 0; i < that.data.productList.length; i++){
+              var name = that.data.productList[i].name
+              if (name.indexOf('立等')>=0 && name.indexOf('修刃')>=0 && name.indexOf('打蜡')<0 ){
+                productId = that.data.productList[i].id
+                price = that.data.productList[i].sale_price
+                break
+              }
+            }
+          }
+          if (equip.candle){
+            for(var i = 0; i < that.data.productList.length; i++){
+              var name = that.data.productList[i].name
+              if (name.indexOf('立等')>=0 && name.indexOf('修刃')<0 && name.indexOf('打蜡')>=0 ){
+                productId = that.data.productList[i].id
+                price = that.data.productList[i].sale_price
+                break
+              }
+            }
+          }
+        }
+      }
+      else {
+        if (equip.edge && equip.candle){
+          for(var i = 0; i < that.data.productList.length; i++){
+            var name = that.data.productList[i].name
+            if (name.indexOf('次日')>=0 && name.indexOf('修刃')>=0 && name.indexOf('打蜡')>=0 ){
+              productId = that.data.productList[i].id
+              price = that.data.productList[i].sale_price
+              break
+            }
+          }
+        }
+        else{
+          if (equip.edge){
+            for(var i = 0; i < that.data.productList.length; i++){
+              var name = that.data.productList[i].name
+              if (name.indexOf('次日')>=0 && name.indexOf('修刃')>=0 && name.indexOf('打蜡')<0 ){
+                productId = that.data.productList[i].id
+                price = that.data.productList[i].sale_price
+                break
+              }
+            }
+          }
+          if (equip.candle){
+            for(var i = 0; i < that.data.productList.length; i++){
+              var name = that.data.productList[i].name
+              if (name.indexOf('次日')>=0 && name.indexOf('修刃')<0 && name.indexOf('打蜡')>=0 ){
+                productId = that.data.productList[i].id
+                price = that.data.productList[i].sale_price
+                break
+              }
+            }
+          }
+        }
+      }
+      equip.productId = productId
+      equip.productPrice = price
+      
+      if (equip.othersCharge == undefined){
+        equip.othersCharge = 0;
+      }
+      var othersCharge = parseFloat(equip.othersCharge)
+      equip.othersCharge = othersCharge
+      equip.summary = equip.productPrice + equip.othersCharge
+      totalSummary += equip.summary
+
+    }
+    that.setData({totalSummary: totalSummary})
   },
   gotoRecept(){
     var that = this
