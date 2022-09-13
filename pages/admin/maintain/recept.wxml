@@ -216,6 +216,14 @@
     </view>
   </view>
   <view wx:if="{{scene=='确认订单'}}" >
+    <mp-cells title="养护的装备和项目">
+      <mp-cell wx:for="{{selectedEquipArr}}" >
+        <view wx:if="{{item.productId != 0 || item.othersCharge != 0}}" style="display: flex; flex-direction: row;" >
+          <view class="left-column" style="width: 40%">{{item.brand}} {{item.scale}}：</view>
+          <view class="right-column" style="width: 60%">{{item.edge?('修刃'+item.degree+'度'):''}} {{item.candle?'打蜡':''}} {{item.more!=undefined?item.more:''}}</view>
+        </view>
+      </mp-cell>
+    </mp-cells>
     <ticket-selector wx:if="{{userInfo != undefined && userInfo.open_id != undefined && userInfo.open_id != ''}}" open_id="{{userInfo.open_id}}"  ></ticket-selector>
     <mp-cells title="支付">
       <mp-cell style="text-align: center;">
@@ -227,7 +235,7 @@
       <mp-cell style="text-align: center;">
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column" >额外减免：</view>
-          <view class="right-column" style="display: flex; flex-direction: row;" >¥<input style="width: 150rpx;" value="{{othersDiscount}}" /></view>
+          <view class="right-column" style="display: flex; flex-direction: row;" >¥<input style="width: 150rpx;" value="{{othersDiscount}}" bindinput="setDiscount" /></view>
         </view>
       </mp-cell>
       <mp-cell>

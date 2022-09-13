@@ -89,6 +89,8 @@ Page({
           equip.relation = log.confirmed_relation
 
           equip.othersCharge = 0
+
+          
           
           break
 
@@ -378,6 +380,9 @@ Page({
         }
         currentEquip.candle = candle
         currentEquip.edge = edge
+        if (edge && (currentEquip.degree == undefined || currentEquip.degree == '')){
+          currentEquip.degree = '89'
+        }
         break;
       case 'degree':
         currentEquip.degree = value
@@ -387,6 +392,7 @@ Page({
         for(var i = 0; i < value.length; i++){
           v = v + (v==''?'':',') + value[i].trim()
         }
+        currentEquip.more = v
         break
       case 'memo':
         currentEquip.memo = value
@@ -407,5 +413,12 @@ Page({
     var selectedEquipArr = that.data.selectedEquipArr
     selectedEquipArr.push({type: '双板'})
     that.setData({selectedEquipArr: selectedEquipArr})
+  },
+  setDiscount(e){
+    var that = this
+    var discount = parseFloat(e.detail.value)
+    if (discount != undefined){
+      that.setData({othersDiscount: discount})
+    }
   }
 })
