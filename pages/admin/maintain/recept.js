@@ -15,7 +15,9 @@ Page({
     relationItems:['本人', '配偶', '朋友', '长辈'],
     payOptionList:['立即支付', '稍后支付', '次卡支付', '无需支付'],
     payOptionSelectedIndex: 0,
-    othersDiscount: 0
+    othersDiscount: 0,
+    ticketDiscount: 0,
+    payMethod: '微信支付'
   },
 
   
@@ -417,8 +419,89 @@ Page({
   setDiscount(e){
     var that = this
     var discount = parseFloat(e.detail.value)
-    if (discount != undefined){
-      that.setData({othersDiscount: discount})
+    if (discount == undefined){
+      discount = 0
     }
+    that.setData({othersDiscount: discount})
+    
+  },
+  setTicketDiscount(e){
+    var that = this
+    var discount = parseFloat(e.detail.value)
+    if (discount==undefined){
+      discount = 0
+      //that.setData({ticketDiscount: discount})
+    }
+    that.setData({ticketDiscount: discount})
+  },
+  gotoFinish(){
+    var that = this
+    var submitData = {
+      shop: that.data.shop,
+      payMethod: that.data.payMethod,
+      payOption: that.data.payOptionList[that.data.payOptionSelectedIndex],
+      summaryPrice: that.data.totalSummary,
+      ticketDiscount: that.data.ticketDiscount,
+      discount: that.data.discount,
+      ticketCode: that.data.ticketCode,
+      orderId: 0,
+      customerOpenId: that.data.open_id,
+      cell: that.data.cell
+    }
+    var items = []
+    for(var i = 0; i < that.data.selectedEquipArr.length; i++){
+      var equip = that.data.selectedEquipArr[i]
+      var items = []
+      var item = {
+        id: 0,
+        shop: that.data.shop,
+        open_id: that.data.open_id,
+        confirmed_equip_type: equip.type,
+        confirmed_brand: equip.brand,
+        confirmed_serial: equip.serial,
+        confirmed_scale: equip.scale,
+        confirmed_year: equip.year,
+        confirmed_edge: equip.edge?1:0,
+        confirmed_degree: equip.degree==undefined?'':equip.degree,
+        confirmed_candle: equip.candle?1:0,
+        confirmed_more: equip.more,
+        confirmed_memo: equip.memo,
+        confirmed_additional_fee: parseFloat(equip.othersCharge)==undefined?0:parseFloat(equip.othersCharge),
+        confirmed_cell: that.data.cell,
+        confirmed_name: '',
+        confirmed_gender: '',
+        confirmed_product_id: equip.productId,
+        confirmed_images: equip.images,
+        confirmed_urgent: equip.urgent?1:0,
+        confirmed_foot_length: equip.footLength,
+        confirmed_front: equip.front,
+        confirmed_height: equip.height,
+        confirmed_weight: equip.weight,
+        confirmed_binder_gap: equip.binderGap,
+        confirmed_front_din: equip.dinFront,
+        confirmed_rear_din: equip.dinRear,
+        confirmed_angle: equip.angle,
+        confirmed_relation: equip.relation,
+        pay_method: that.data.payMethod
+      }
+      items.push(item)
+    }
+    submitData.items = items
+
+    var submitUrl = 'https://' + app.domainName + '/core/maintainlive/recept'
+    wx.request({
+      url: submitUrl,
+      method: 'POST',
+      data: {sessionKey: encodeURIComponent(app.globalData.sessionKey), maintainOrder: submitData},
+      success: (res)=>{
+        console.log(res)
+      }
+    })
+
+  },
+  setPayMethod(e){
+    console.log('set pay method', e)
+    var that = this
+    that.setData({payMethod: e.detail.payMethod})
   }
 })

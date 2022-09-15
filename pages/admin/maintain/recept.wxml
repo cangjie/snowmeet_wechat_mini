@@ -225,6 +225,10 @@
       </mp-cell>
     </mp-cells>
     <ticket-selector wx:if="{{userInfo != undefined && userInfo.open_id != undefined && userInfo.open_id != ''}}" open_id="{{userInfo.open_id}}"  ></ticket-selector>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column">优惠券减免：</view>
+      <view class="right-column" style="display: flex;flex-direction: row;">¥<input type="text" bindinput="setTicketDiscount"  /></view>
+    </view>
     <mp-cells title="支付">
       <mp-cell style="text-align: center;">
         <view style="display: flex;flex-direction: row;" >
@@ -241,7 +245,7 @@
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column" >实际支付：</view>
-          <view class="right-column" >¥{{totalSummary - othersDiscount}}</view>
+          <view class="right-column" >¥{{totalSummary - othersDiscount - ticketDiscount}}</view>
         </view>
       </mp-cell>
       <mp-cell style="text-align: center;">
@@ -255,7 +259,7 @@
         </view>
       </mp-cell>
       <mp-cell wx:if="{{payOptionSelectedIndex == 0}}" style="text-align: center;">
-        <pay-method />
+        <pay-method bindPayMethodSelected="setPayMethod" />
       </mp-cell>
     </mp-cells>
     <!--view><button> 确 认 </button></view-->
