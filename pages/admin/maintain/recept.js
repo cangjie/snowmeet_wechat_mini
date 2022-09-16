@@ -436,6 +436,16 @@ Page({
   },
   gotoFinish(){
     var that = this
+    var openId = ''
+    var cell = ''
+    var name = ''
+    var gender = ''
+    if (that.data.userInfo != undefined && that.data.userInfo != null){
+      cell = that.data.userInfo.cell_number
+      name = that.data.userInfo.real_name
+      gender = that.data.userInfo.gender
+      openId = that.data.userInfo.open_id
+    }
     var submitData = {
       shop: that.data.shop,
       payMethod: that.data.payMethod,
@@ -445,8 +455,10 @@ Page({
       discount: that.data.discount,
       ticketCode: that.data.ticketCode,
       orderId: 0,
-      customerOpenId: that.data.open_id,
-      cell: that.data.cell
+      customerOpenId: openId,
+      cell: cell,
+      name: name,
+      gender: gender
     }
     var items = []
     for(var i = 0; i < that.data.selectedEquipArr.length; i++){
@@ -456,6 +468,7 @@ Page({
         id: 0,
         shop: that.data.shop,
         open_id: that.data.open_id,
+        confirmed_cell: that.data.cell,
         confirmed_equip_type: equip.type,
         confirmed_brand: equip.brand,
         confirmed_serial: equip.serial,
@@ -488,11 +501,11 @@ Page({
     }
     submitData.items = items
 
-    var submitUrl = 'https://' + app.domainName + '/core/maintainlive/recept'
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/maintainlive/recept?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: submitUrl,
       method: 'POST',
-      data: {sessionKey: encodeURIComponent(app.globalData.sessionKey), maintainOrder: submitData},
+      data: submitData,
       success: (res)=>{
         console.log(res)
       }
