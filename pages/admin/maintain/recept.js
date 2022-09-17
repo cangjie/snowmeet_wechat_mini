@@ -43,10 +43,10 @@ Page({
             method: 'GET',
             success:(res)=>{
               console.log('maintain log', res)
-
-              maintainLogArr[0] = res.data[0]
-              maintainLogArr[1] = res.data[1]
-              maintainLogArr[2] = res.data[2]
+              for(var i = 0; i < 3 && i < res.data.length; i++){
+                maintainLogArr[i] = res.data[i]
+              }
+              
               for(var i = 0; i < maintainLogArr.length; i++){
                 var desc = maintainLogArr[i].confirmed_equip_type + ' ' + maintainLogArr[i].confirmed_brand + ' ' + maintainLogArr[i].confirmed_scale + ' ' + ((maintainLogArr[i].confirmed_edge == 1)?('修刃' + maintainLogArr[i].confirmed_degree): ' ') + (maintainLogArr[i].confirmed_candle == 1? '打蜡' : ' ') + maintainLogArr[i].confirmed_more
                 maintainLogArr[i].date = util.formatDate(new Date(maintainLogArr[i].create_date))
@@ -467,7 +467,7 @@ Page({
       var item = {
         id: 0,
         shop: that.data.shop,
-        open_id: that.data.open_id,
+        open_id: that.data.userInfo.open_id,
         confirmed_cell: that.data.cell,
         confirmed_equip_type: equip.type,
         confirmed_brand: equip.brand,
@@ -481,8 +481,8 @@ Page({
         confirmed_memo: equip.memo,
         confirmed_additional_fee: parseFloat(equip.othersCharge)==undefined?0:parseFloat(equip.othersCharge),
         confirmed_cell: that.data.cell,
-        confirmed_name: '',
-        confirmed_gender: '',
+        confirmed_name: that.data.userInfo.real_name,
+        confirmed_gender: that.data.userInfo.gender,
         confirmed_product_id: equip.productId,
         confirmed_images: equip.images,
         confirmed_urgent: equip.urgent?1:0,

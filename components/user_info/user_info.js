@@ -137,8 +137,13 @@ Component({
               success:(res)=>{
                 console.log('user info found', res)
                 //that.triggerEvent('UserFound', {user_info: res.data})
-                that.setData({userInfo: res.data})
-                that.getScore()
+                if (res.statusCode == 200){
+                  that.setData({userInfo: res.data, userFind: true})
+                  that.getScore()
+                }
+                else{
+                  that.setData({userFind: false})
+                }
               }
             })
           }
