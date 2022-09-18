@@ -1,0 +1,75 @@
+<!--pages/admin/maintain/order_detail.wxml-->
+<mp-cells title="订单基本信息" >
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >订单号：</view>
+      <view class="right-column" >{{order.order.id}}</view>
+      <view class="left-column" >订单状态：</view>
+      <view class="right-column" >{{order.order.status}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >订单日期：</view>
+      <view class="right-column" >{{order.date}}</view>
+      <view class="left-column" >订单时间：</view>
+      <view class="right-column" >{{order.time}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >支付方式：</view>
+      <view class="right-column" >{{order.order.pay_method}}</view>
+      <view class="left-column" >支付选项：</view>
+      <view class="right-column" >{{order.order.pay_memo}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >姓名：</view>
+      <view class="right-column" >{{order.order.name}}</view>
+      <view class="left-column" >任务数：</view>
+      <view class="right-column" >{{order.items.length}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >电话：</view>
+      <view class="right-column" >{{order.order.cell_number}}</view>
+      <view class="left-column" >优惠券：</view>
+      <view class="right-column" >{{order.ticket!=null?(order.ticket.code + ' ' + order.ticket.name):''}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >订单金额：</view>
+      <view class="right-column" >¥{{order.order.order_price}}</view>
+      <view class="left-column" >额外减免：</view>
+      <view class="right-column" >¥{{order.order.other_discount}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >优惠券减免：</view>
+      <view class="right-column" >¥{{order.order.ticket_amount}}</view>
+      <view class="left-column" >实际应付：</view>
+      <view class="right-column" >¥{{order.order.final_price}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >预计龙珠：</view>
+      <view class="right-column" >0</view>
+      <view class="left-column" >会员：</view>
+      <view class="right-column" >{{(order.order.open_id != undefined && order.order.open_id != null && order.order.open_id!= '')? '是':'否'}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="包含任务">
+  <mp-cell wx:for="{{order.items}}" >
+    <view id="{{item.id}}" style="display: flex; flex-direction: row;">
+      <view class="left-column" style="width: 30%;" >{{item.confirmed_brand + ' ' + item.confirmed_scale}}：</view>
+      <view class="right-column" style="width: 70%;" >{{item.confirmed_edge=='1'? ('修刃' + item.confirmed_degree):''}} {{item.confirmed_candle=='1'? '打蜡':''}} {{item.confirmed_more}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>

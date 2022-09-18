@@ -58,6 +58,13 @@
           "query": "q=https%3A%2F%2Fmini.snowmeet.top%2Fmapp%2Fsale_entry%3Fid%3D123&scancode_time=1658128984",
           "launchMode": "default",
           "scene": 1011
+        },
+        {
+          "name": "maintain order detail",
+          "pathName": "pages/admin/maintain/order_detail",
+          "query": "orderId=24656",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }
