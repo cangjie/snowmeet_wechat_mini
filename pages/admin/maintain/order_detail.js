@@ -41,6 +41,30 @@ Page({
     })
   },
 
+  confirmPaid(){
+    var that = this
+    var confirmUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/MaitainOrderPaySuccessManual/' + that.data.order.order.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: confirmUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          console.log('order info update', res)
+          var order = that.data.order
+          order.order.status = res.data.order.status
+          
+          wx.showToast({
+            title: '收款成功',
+            icon: 'none',
+            complete:(res)=>{
+              that.setData({order: order})
+            }
+          })
+        }
+      }
+    })
+  },
+
   /**
    * Lifecycle function--Called when page is initially rendered
    */

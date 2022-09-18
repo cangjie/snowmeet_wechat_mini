@@ -73,3 +73,12 @@
     </view>
   </mp-cell>
 </mp-cells>
+<view wx:if="{{order.order.pay_method == '微信支付'}}" >
+
+</view>
+<view wx:else  >
+  <view wx:if="{{order.order.status == '待支付'}}" style="text-align: center;"><button   bindtap="confirmPaid" > 确 认 收 款 </button></view>
+  <view wx:if="{{order.order.open_id == undefined || order.order.open_id == null || order.order.open_id == ''}}" style="text-align: center;" >
+  
+  </view>
+</view>

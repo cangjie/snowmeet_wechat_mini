@@ -508,19 +508,20 @@ Page({
       data: submitData,
       success: (res)=>{
         console.log(res)
-        if (res.data.orderId == 0){
+        if (res.data.orderId == 0){ 
           wx.showToast({
             title: '无需付款，任务已添加。',
             icon: 'none'
           })
         }
         else{
+          var orderId = res.data.orderId
           wx.showToast({
             title: '订单已生成，请顾客确认。',
             icon: 'none',
             success:(res)=>{
               wx.redirectTo({
-                url: 'order_detail?orderId=' + res.orderId,
+                url: 'order_detail?orderId=' + orderId,
               })
             }
           })

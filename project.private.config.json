@@ -62,7 +62,7 @@
         {
           "name": "maintain order detail",
           "pathName": "pages/admin/maintain/order_detail",
-          "query": "orderId=24656",
+          "query": "orderId=24657",
           "launchMode": "default",
           "scene": null
         }
