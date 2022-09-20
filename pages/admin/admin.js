@@ -108,9 +108,14 @@ Page({
     })
   },
   goToMaintainInShopList: function() {
+    /*
     wx.navigateTo({
       url: '/pages/admin/maintain/order_list',
     })
+    */
+   wx.navigateTo({
+     url: '/pages/admin/maintain/task_list',
+   })
   },
   goToMaintainInShopQuickBatch: function(){
     wx.navigateTo({

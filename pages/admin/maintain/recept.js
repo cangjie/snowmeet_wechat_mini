@@ -463,24 +463,28 @@ Page({
     var items = []
     for(var i = 0; i < that.data.selectedEquipArr.length; i++){
       var equip = that.data.selectedEquipArr[i]
+      var degree = parseInt(equip.degree)
+      if (degree==undefined){
+        degree = 89
+      }
       var items = []
+      
       var item = {
         id: 0,
         shop: that.data.shop,
         open_id: that.data.userInfo.open_id,
-        confirmed_cell: that.data.cell,
+        confirmed_cell: that.data.userInfo.cell_number,
         confirmed_equip_type: equip.type,
         confirmed_brand: equip.brand,
         confirmed_serial: equip.serial,
         confirmed_scale: equip.scale,
         confirmed_year: equip.year,
         confirmed_edge: equip.edge?1:0,
-        confirmed_degree: equip.degree==undefined?'':equip.degree,
+        confirmed_degree: equip.degree,
         confirmed_candle: equip.candle?1:0,
         confirmed_more: equip.more,
         confirmed_memo: equip.memo,
         confirmed_additional_fee: parseFloat(equip.othersCharge)==undefined?0:parseFloat(equip.othersCharge),
-        confirmed_cell: that.data.cell,
         confirmed_name: that.data.userInfo.real_name,
         confirmed_gender: that.data.userInfo.gender,
         confirmed_product_id: equip.productId,
