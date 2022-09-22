@@ -1,14 +1,5 @@
 <view>
-  <view style="display: flex;flex-direction: row;"  >
-    选择查询日期：
-    <picker mode="date" start="2022-9-1" end="2023-5-31" >
-      <picker-view>{{start}}</picker-view>
-    </picker>
-    <text decode="true">&nbsp;~&nbsp;</text>
-    <picker mode="date" start="2022-9-1" end="2023-5-31" >
-      <picker-view>{{end}}</picker-view>
-    </picker>
-  </view>
+  <date-selector bindDateSelected="dateSelected"/>
   <mp-cells title="共{{tasks.length}}个任务">
     <mp-cell wx:for="{{tasks}}" >
       <view style="display: flex;flex-direction: row;" >

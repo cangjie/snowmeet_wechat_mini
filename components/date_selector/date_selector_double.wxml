@@ -1,0 +1,10 @@
+<view style="display: flex;flex-direction: row; font-size: 10pt;"  >
+    选择查询日期：
+    <picker mode="date" start="{{rangeStart}}" end="{{rangeEnd}}" bindchange="startSelected"  >
+      <picker-view>{{start}}</picker-view>
+    </picker>
+    <text decode="true">&nbsp;~&nbsp;</text>
+    <picker mode="date" start="{{rangeStart}}" end="{{rangeEnd}}" bindchange="endSelected"  >
+      <picker-view>{{end}}</picker-view>
+    </picker>
+  </view>

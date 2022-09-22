@@ -21,24 +21,7 @@ Page({
     that.setData({start: util.formatDate(start), end: util.formatDate(end)})
     app.loginPromiseNew.then(function (resolve){
 
-      var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: getTaskUrl,
-        method: 'GET',
-        success:(res)=>{
-          console.log('get tasks', res)
-          var tasks = res.data
-          for(var i = 0; i < tasks.length; i++){
-            var task = tasks[i]
-            task.memo = ''
-            task.date = util.formatDate(new Date(task.create_date))
-            if (task.confirmed_equip_type == '双板' && task.confirmed_serial == ''){
-              task.memo = '信息不全'
-            }
-          }
-          that.setData({tasks: tasks})
-        }
-      })
+      that.getData()
     })
   },
 
@@ -47,6 +30,28 @@ Page({
    */
   onReady() {
 
+  },
+
+  getData(){
+    var that = this
+    var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getTaskUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('get tasks', res)
+        var tasks = res.data
+        for(var i = 0; i < tasks.length; i++){
+          var task = tasks[i]
+          task.memo = ''
+          task.date = util.formatDate(new Date(task.create_date))
+          if (task.confirmed_equip_type == '双板' && task.confirmed_serial == ''){
+            task.memo = '信息不全'
+          }
+        }
+        that.setData({tasks: tasks})
+      }
+    })
   },
 
   /**
@@ -89,5 +94,11 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  dateSelected(e){
+    console.log('date selected', e)
+    var that = this
+    that.setData({start: e.detail.start, end: e.detail.end})
+    that.getData()
   }
 })
