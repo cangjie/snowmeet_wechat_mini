@@ -1,7 +1,7 @@
 <view>
   <date-selector bindDateSelected="dateSelected"/>
   <mp-cells title="共{{tasks.length}}个任务">
-    <mp-cell wx:for="{{tasks}}" >
+    <mp-cell wx:for="{{tasks}}" id="{{item.id}}" bindtap="gotoDetail" >
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >编号：</view>
         <view class="right-column" >{{item.task_flow_num}}</view>
@@ -16,7 +16,7 @@
       </view>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >品牌：</view>
-        <view class="right-column" >{{item.confirmed_brand}}</view>
+        <view class="right-co  lumn" >{{item.confirmed_brand}}</view>
         <view class="left-column" >长度：</view>
         <view class="right-column" >{{item.confirmed_scale}}</view>
       </view>

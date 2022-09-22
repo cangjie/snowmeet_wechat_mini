@@ -100,5 +100,10 @@ Page({
     var that = this
     that.setData({start: e.detail.start, end: e.detail.end})
     that.getData()
+  },
+  gotoDetail(e){
+    wx.navigateTo({
+      url: 'task?id=' + e.currentTarget.id,
+    })
   }
 })

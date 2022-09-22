@@ -1,4 +1,6 @@
 // pages/admin/maintain/task.js
+const util = require('../../../utils/util.js')
+const app = getApp()
 Page({
 
   /**
@@ -12,7 +14,16 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    app.loginPromiseNew.then(function(resolve){
+      var getInfoUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTask/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getInfoUrl,
+        method: 'GET',
+        success:(res)=>{
+          console.log('task info', res)
+        }
+      })
+    })
   },
 
   /**
