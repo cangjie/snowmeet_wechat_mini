@@ -16,7 +16,7 @@
       </view>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >品牌：</view>
-        <view class="right-co  lumn" >{{item.confirmed_brand}}</view>
+        <view class="right-column" >{{item.confirmed_brand}}</view>
         <view class="left-column" >长度：</view>
         <view class="right-column" >{{item.confirmed_scale}}</view>
       </view>

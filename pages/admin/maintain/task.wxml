@@ -2,9 +2,9 @@
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >姓名：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{task.confirmed_name}}{{task.confirmed_gender=='男'?'先生':''}}{{task.confirmed_gender=='女'?'先生':''}}</view>
       <view class="left-column" >电话：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{task.confirmed_cell}}</view>
     </view>
   </mp-cell>
 </mp-cells>
@@ -12,82 +12,111 @@
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >类型：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{task.confirmed_equip_type}}</view>
       <view class="left-column" >品牌：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{task.confirmed_brand}}</view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >系列：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" style="display: flex; flex-direction: row;" >
+        <picker mode="selector" range="{{serialList}}" >
+          <picker-view>{{serialList[serialSelectedIndex]}}</picker-view>
+        </picker>
+        <input style="width: 100rpx;" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='未知'}}" />
+      </view>
       <view class="left-column" >年款：</view>
-      <view class="right-column" ></view>
+      <text decode="true" > &nbsp; </text>
+      <view class="right-column" >
+        <picker mode="selector" range="{{yearList}}" >
+          <picker-view>{{yearList[yearListSelectedIndex]}}</picker-view>
+        </picker>
+      </view>
     </view>
   </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" >长度：</view>
+      <view class="right-column" ></view>
+      <block wx:if="{{task.confirmed_equip_type=='双板'}}" >
+        <view class="left-column" >鞋长：</view>
+        <view class="right-column" ></view>
+      </block>
+      <block wx:if="{{task.confirmed_equip_type=='单板'}}" >
+        <view class="left-column" >前脚：</view>
+        <view class="right-column" ></view>
+      </block>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" style="width: 94rpx;" >关系：</view>
+      <view class="right-column" >{{task.confirmed_relation==''?'本人':confirmed_relation}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell wx:if="{{task.confirmed_equip_type == '双板'}}" >
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" style="width: 99rpx;" >序列号：</view>
+      <view class="right-column" style="display: flex; flex-direction: row;"  >
+        <block wx:if="{{serialDiff}}">
+          左<input style="width: 170rpx;" />右<input style="width: 170rpx;" />
+        </block>
+        <block wx:else >
+          <input style="width:200rpx"  />
+        </block>
+        <checkbox-group bindchange="setSerialDiff" ><checkbox value="serial_diff">分左右</checkbox></checkbox-group>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell wx:else >
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" >序列号：</view>
+      <view class="right-column" >
+        <input style="width: 200rpx;" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <image style="width:150rpx; margin-right: 1rpx;" mode="widthFix" wx:for="{{task.images}}"  src="{{item}}" bindtap="showGallery" id="{{index}}" />
+    <mp-gallery show="{{showGallery}}" showDelete="{{false}}" imgUrls="{{task.images}}" current="{{galleryIndex}}"  ></mp-gallery>
+  </mp-cell>
+  <mp-cell><button> 保 存 修 改 </button></mp-cell>
 </mp-cells>
-<mp-cells title="用户个人信息" >
+
+<mp-cells title="安全检查信息" >
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >身高：</view>
       <view class="right-column" ></view>
-      <view class="left-column" >体重：</view>
-      <view class="right-column" ></view>
+      <block wx:if="{{task.confirmed_equip_type=='双板'}}" >
+        <view class="left-column" >体重：</view>
+        <view class="right-column" ></view>
+      </block>
+      <block wx:if="{{task.confirmed_equip_type=='单板'}}" >
+        <view class="left-column" >间距：</view>
+        <view class="right-column" ></view>
+      </block>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="view-table-scale" >
-      <view class="left-column" >鞋长：</view>
-      <view class="right-column" ></view>
-      <view class="left-column" >关系：</view>
-      <view class="right-column" ></view>
+      <block wx:if="{{task.confirmed_equip_type=='双板'}}" >
+        <view class="left-column"  >DIN：</view>
+        <view class="right-column" ></view>
+      </block>
+      <block wx:if="{{task.confirmed_equip_type=='单板'}}" >
+        <view class="left-column"  >角度：</view>
+        <view class="right-column" ></view>
+      </block>
+      <view class="left-column"  >确认：</view>
+      <view class="right-column" >
+        <checkbox-group><checkbox value="safe" ></checkbox></checkbox-group>
+      </view>
     </view>
   </mp-cell>
 </mp-cells>
-<mp-cells title="单板安全检查" >
-  <mp-cell>
-    <view class="view-table-scale" >
-      <view class="left-column" >前脚：</view>
-      <view class="right-column" >(左/右)</view>
-      <view class="left-column" >间距：</view>
-      <view class="right-column" ></view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-table-scale" >
-      <view class="left-column" >角度：</view>
-      <view class="right-column" ></view>
-      <view class="left-column" >确认：</view>
-      <view class="right-column" ><checkbox></checkbox></view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <input placeholder="填写备注" />
-  </mp-cell>
-  <mp-cell>问题拍照</mp-cell>
-</mp-cells>
-<mp-cells title="双板安全检查" >
-  <mp-cell>
-    <view class="view-table-scale" >
-      <view class="left-column" >DIN：</view>
-      <view class="right-column" ></view>
-      <view class="left-column" >鞋长：</view>
-      <view class="right-column" ></view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-table-scale" >
-      <view class="left-column" >确认：</view>
-      <view class="right-column" ><checkbox></checkbox></view>
-      <view class="left-column" ></view>
-      <view class="right-column" ></view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <input placeholder="填写备注" />
-  </mp-cell>
-  <mp-cell>问题拍照</mp-cell>
-</mp-cells>
+
 <mp-cells title="修刃" >
   <mp-cell>
     <view class="view-table-scale" >
