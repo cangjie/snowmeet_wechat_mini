@@ -60,10 +60,10 @@
       <view class="left-column" style="width: 99rpx;" >序列号：</view>
       <view class="right-column" style="display: flex; flex-direction: row;"  >
         <block wx:if="{{idDiff}}">
-          左<input id="id_left" style="width: 170rpx;" value="{{task.id_left}}" />右<input id="id_right" style="width: 170rpx;" value="{{task.id_right}}" />
+          左<input id="id_left" style="width: 170rpx;" value="{{task.id_left}}" bindinput="mod" />右<input id="id_right" style="width: 170rpx;" bindinput="mod"  value="{{task.id_right}}" />
         </block>
         <block wx:else >
-          <input id="id_no" style="width:200rpx" value="{{task.confirmed_id}}" />
+          <input id="id_no" style="width:200rpx" value="{{task.confirmed_id}}" bindinput="mod" />
         </block>
         <checkbox-group bindchange="setIdDiff" ><checkbox checked="{{idDiff}}" value="id_diff">分左右</checkbox></checkbox-group>
       </view>
@@ -73,7 +73,7 @@
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" >序列号：</view>
       <view class="right-column" >
-        <input id="id_no" style="width: 200rpx;" value="{{task.confirmed_id}}" />
+        <input id="id_no" style="width: 200rpx;" bindinput="mod" value="{{task.confirmed_id}}" />
       </view>
     </view>
   </mp-cell>
@@ -81,21 +81,21 @@
     <image style="width:150rpx; margin-right: 1rpx;" mode="widthFix" wx:for="{{task.images}}"  src="{{item}}" bindtap="showGallery" id="{{index}}" />
     <mp-gallery show="{{showGallery}}" showDelete="{{false}}" imgUrls="{{task.images}}" current="{{galleryIndex}}"  ></mp-gallery>
   </mp-cell>
-  <mp-cell><button> 保 存 修 改 </button></mp-cell>
+  <mp-cell><button bindtap="updateTask"> 保 存 修 改 </button></mp-cell>
 </mp-cells>
 
 <mp-cells title="安全检查信息" >
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >身高：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{task.confirmed_height}}</view>
       <block wx:if="{{task.confirmed_equip_type=='双板'}}" >
         <view class="left-column" >体重：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{task.confirmed_weight}}</view>
       </block>
       <block wx:if="{{task.confirmed_equip_type=='单板'}}" >
         <view class="left-column" >间距：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{task.confirmed_binder_gap}}</view>
       </block>
     </view>
   </mp-cell>
@@ -103,52 +103,61 @@
     <view class="view-table-scale" >
       <block wx:if="{{task.confirmed_equip_type=='双板'}}" >
         <view class="left-column"  >DIN：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >前 {{task.confirmed_front_din}} 后 {{task.confirmed_rear_din}}</view>
       </block>
       <block wx:if="{{task.confirmed_equip_type=='单板'}}" >
         <view class="left-column"  >角度：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{task.confirmed_angle}}</view>
       </block>
-      <view class="left-column"  >确认：</view>
+      <view class="left-column"  >备注：</view>
       <view class="right-column" >
-        <checkbox-group><checkbox value="safe" ></checkbox></checkbox-group>
+        <input wx:if="{{stepSafe==undefined}}" bindinput="mod" id="safe_memo" />
+        <block wx:else >{{stepSafe.memo}}</block>
       </view>
     </view>
   </mp-cell>
+  <mp-cell>
+    <button disabled="{{stepSafe!=undefined}}" bindtap="safeCheck" > 确 认 安 全 </button>
+  </mp-cell>
 </mp-cells>
 
-<mp-cells title="修刃" >
+<mp-cells title="修刃" wx:if="{{task.confirmed_edge == 1}}" >
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >角度：</view>
-      <view class="right-column" >89</view>
+      <view class="right-column" >{{task.confirmed_degree}}</view>
       <view class="left-column" >状态：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{stepEdge==undefined?'未开始':stepEdge.status}}</view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >开始：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{stepEdge!=undefined?stepEdge.start_time_str:''}}</view>
       <view class="left-column" >完成：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{stepEdge!=undefined?stepEdge.end_time_str:''}}</view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >技师：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{stepEdge!=undefined?stepEdge.staffName:''}}</view>
       <view class="left-column" >备注：</view>
-      <view class="right-column" ><input placeholder="填写备注" /></view>
+      <view class="right-column" >
+        <input wx:if="{{stepEdge!=undefined && stepEdge.status == '已开始'}}"  placeholder="填写备注" id="edge_memo" bindinput="mod"   />
+        <block wx:else >{{stepEdge!=undefined?stepEdge.memo:''}}</block>
+      </view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="view-table-scale" >
-      <button style="width: 150rpx; font-size: 10pt;"> 开 始 </button> <button style="width:150rpx;font-size: 10pt;"> 完 成 </button><button style="width: 300rpx;font-size: 10pt;" >强制结束</button>
+      <button id="edge" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{stepEdge!=undefined}}" > 开 始 </button> 
+      <button id="{{stepEdge==undefined?'edge':(stepEdge.id+'_edge')}}" bindtap="endStep" style="width:150rpx;font-size: 10pt;" disabled="{{stepEdge==undefined || !stepEdge.isMine || stepEdge.status == '已完成' || stepEdge.status == '强行终止' }}"> 完 成 </button>
+      <button id="{{stepEdge==undefined?'edge':(stepEdge.id+'_edge')}}" bindtap="endStep" style="width: 300rpx;font-size: 10pt;"  disabled="{{stepEdge==undefined || stepEdge.isMine || stepEdge.status == '已完成' || stepEdge.status == '强行终止'}}" >强行终止</button>
     </view>
   </mp-cell>
 </mp-cells>
-<mp-cells title="打蜡" >
+<mp-cells title="打蜡" wx:if="{{task.confirmed_candle == 1}}" >
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >状态：</view>
@@ -174,7 +183,7 @@
     </view>
   </mp-cell>
 </mp-cells>
-<mp-cells title="维修" >
+<mp-cells title="维修" wx:if="{{task.confirmed_more != ''}}" >
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >状态：</view>
