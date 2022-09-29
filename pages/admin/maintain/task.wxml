@@ -161,25 +161,28 @@
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >状态：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{stepWax==undefined?'未开始':stepWax.status}}</view>
       <view class="left-column" >技师：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{stepWax!=undefined?stepWax.staffName:''}}</view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >开始：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{stepWax!=undefined?stepWax.start_time_str:''}}</view>
       <view class="left-column" >完成：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" >{{stepWax!=undefined?stepWax.end_time_str:''}}</view>
     </view>
   </mp-cell>
   <mp-cell>
-    <input placeholder="填写备注" />
+    <input wx:if="{{stepWax!=undefined && stepWax.status == '已开始'}}"  placeholder="填写备注" id="wax_memo" bindinput="mod"   />
+        <block wx:else >{{stepWax!=undefined?stepWax.memo:''}}</block>
   </mp-cell>
   <mp-cell>
     <view class="view-table-scale" >
-      <button style="width: 150rpx; font-size: 10pt;"> 开 始 </button> <button style="width:150rpx;font-size: 10pt;"> 完 成 </button><button style="width: 300rpx;font-size: 10pt;" >强制结束</button>
+      <button id="wax" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{stepWax!=undefined}}" > 开 始 </button> 
+      <button id="{{stepWax==undefined?'wax':(stepWax.id+'_wax')}}" bindtap="endStep" style="width:150rpx;font-size: 10pt;" disabled="{{stepWax==undefined || !stepWax.isMine || stepWax.status == '已完成' || stepWax.status == '强行终止' }}"> 完 成 </button>
+      <button id="{{stepWax==undefined?'wax':(stepWax.id+'_wax')}}" bindtap="endStep" style="width: 300rpx;font-size: 10pt;"  disabled="{{stepWax==undefined || stepWax.isMine || stepWax.status == '已完成' || stepWax.status == '强行终止'}}" >强行终止</button>
     </view>
   </mp-cell>
 </mp-cells>
