@@ -24,7 +24,7 @@
         <picker id="serial_picker" mode="selector" range="{{serialList}}" bindchange="mod" >
           <picker-view>{{serialList[serialSelectedIndex]}}</picker-view>
         </picker>
-        <input id="serial_input" style="width: 100rpx;" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='未知'}}" bindinput="mod" />
+        <input id="serial_input" style="width: 100rpx;" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='新增'}}" bindinput="mod" />
       </view>
       <view class="left-column" >年款：</view>
       <text decode="true" > &nbsp; </text>
@@ -107,7 +107,7 @@
       </block>
       <block wx:if="{{task.confirmed_equip_type=='单板'}}" >
         <view class="left-column"  >角度：</view>
-        <view class="right-column" >{{task.confirmed_angle}}</view>
+        <view class="right-column" >左{{task.confirmed_left_angle}} 右{{task.confirmed_right_angle}}</view>
       </block>
       <view class="left-column"  >备注：</view>
       <view class="right-column" >

@@ -66,7 +66,8 @@ Page({
                 serialList.push(res.data[i].serial_name)
               }
               serialList.push('未知')
-              var serialSelectedIndex = serialList.length - 1
+              serialList.push('新增')
+              var serialSelectedIndex = serialList.length - 2
               for(var i = 0; i < serialList.length; i++){
                 if (task.confirmed_serial == serialList[i]){
                   serialSelectedIndex = i
@@ -184,6 +185,11 @@ Page({
 
   updateTask(){
     var that = this
+    var task = that.data.task
+    //task.confirmed_serial = that.data.serialList[]
+    if (task.confirmed_serial == '' || task.confirmed_serial == '新增'){
+      task.confirmed_serial = '未知'
+    }
     var updateUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/UpdateTask?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: updateUrl,

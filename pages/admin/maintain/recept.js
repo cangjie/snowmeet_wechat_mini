@@ -75,27 +75,19 @@ Page({
         var log = wholeLog[j]
         var equip = selectedEquipArr[i]
         if (equip.type == log.confirmed_equip_type && equip.brand == log.confirmed_brand && equip.scale == log.confirmed_scale ){
-
           equip.footLength = log.confirmed_foot_length
           equip.front = log.confirmed_front
-
           equip.height = log.confirmed_height
-          
           equip.weight = log.confirmed_weight
           equip.binderGap = log.confirmed_binder_gap
-
           equip.angle = log.confirmed_angle
           equip.dinFront = log.confirmed_front_din
           equip.dinRear = log.confirmed_rear_din
-
           equip.relation = log.confirmed_relation
-
           equip.othersCharge = 0
-
-          
-          
+          equip.leftAngle = log.confirmed_left_angle
+          equip.rightAngle = log.confirmed_right_angle
           break
-
         }
       }
     }
@@ -405,6 +397,12 @@ Page({
       case 'urgent':
         currentEquip.urgent = value.length.toString()
         break
+      case 'binderAngleLeft':
+        currentEquip.leftAngle = value
+        break
+      case 'binderAngleRight':
+        currentEquip.rightAngle = value
+        break
       default:
         break
     }
@@ -497,7 +495,8 @@ Page({
         confirmed_binder_gap: equip.binderGap,
         confirmed_front_din: equip.dinFront,
         confirmed_rear_din: equip.dinRear,
-        confirmed_angle: equip.angle,
+        confirmed_left_angle: equip.leftAngle,
+        confirmed_right_angle: equip.rightAngle,
         confirmed_relation: equip.relation,
         pay_method: that.data.payMethod
       }

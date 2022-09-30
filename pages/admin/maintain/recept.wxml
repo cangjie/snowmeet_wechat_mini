@@ -136,7 +136,10 @@
         <view style="display: flex; flex-direction: row;" >
           <block wx:if="{{item.type == '单板'}}" >
             <view style="width: 175rpx;text-align: right;font-size: 10pt;">角度：</view>
-            <view style="width: 175rpx;font-size: 10pt;"><input id="binderAngle_{{index}}" placeholder="填写固定器角度" value="{{item.angle}}" bindinput="changed" /></view>
+            <view style="width: 175rpx;font-size: 10pt;display: flex;flex-direction: row;"  >
+              左<input id="binderAngleLeft_{{index}}" style="width: 100rpx;" placeholder="填写" value="{{item.leftAngle}}" bindinput="changed" />
+              右<input id="binderAngleRight_{{index}}" style="width: 100rpx;" placeholder="填写" value="{{item.rightAngle}}" bindinput="changed" />
+            </view>
           </block>
           <block wx:if="{{item.type == '双板'}}" >
             <view style="width: 175rpx;text-align: right;font-size: 10pt;">DIN：</view>
