@@ -221,32 +221,32 @@ Page({
       var price = 0
       if (equip.urgent == 1){
         if (equip.edge && equip.candle){
-          for(var i = 0; i < that.data.productList.length; i++){
-            var name = that.data.productList[i].name
+          for(var j = 0; j < that.data.productList.length; j++){
+            var name = that.data.productList[j].name
             if (name.indexOf('立等')>=0 && name.indexOf('修刃')>=0 && name.indexOf('打蜡')>=0 ){
-              productId = that.data.productList[i].id
-              price = that.data.productList[i].sale_price
+              productId = that.data.productList[j].id
+              price = that.data.productList[j].sale_price
               break
             }
           }
         }
         else{
           if (equip.edge){
-            for(var i = 0; i < that.data.productList.length; i++){
-              var name = that.data.productList[i].name
+            for(var j = 0; j < that.data.productList.length; j++){
+              var name = that.data.productList[j].name
               if (name.indexOf('立等')>=0 && name.indexOf('修刃')>=0 && name.indexOf('打蜡')<0 ){
-                productId = that.data.productList[i].id
-                price = that.data.productList[i].sale_price
+                productId = that.data.productList[j].id
+                price = that.data.productList[j].sale_price
                 break
               }
             }
           }
           if (equip.candle){
-            for(var i = 0; i < that.data.productList.length; i++){
-              var name = that.data.productList[i].name
+            for(var j = 0; j < that.data.productList.length; j++){
+              var name = that.data.productList[j].name
               if (name.indexOf('立等')>=0 && name.indexOf('修刃')<0 && name.indexOf('打蜡')>=0 ){
-                productId = that.data.productList[i].id
-                price = that.data.productList[i].sale_price
+                productId = that.data.productList[j].id
+                price = that.data.productList[j].sale_price
                 break
               }
             }
@@ -255,32 +255,32 @@ Page({
       }
       else {
         if (equip.edge && equip.candle){
-          for(var i = 0; i < that.data.productList.length; i++){
-            var name = that.data.productList[i].name
+          for(var j = 0; j < that.data.productList.length; j++){
+            var name = that.data.productList[j].name
             if (name.indexOf('次日')>=0 && name.indexOf('修刃')>=0 && name.indexOf('打蜡')>=0 ){
-              productId = that.data.productList[i].id
-              price = that.data.productList[i].sale_price
+              productId = that.data.productList[j].id
+              price = that.data.productList[j].sale_price
               break
             }
           }
         }
         else{
           if (equip.edge){
-            for(var i = 0; i < that.data.productList.length; i++){
-              var name = that.data.productList[i].name
+            for(var j = 0; j < that.data.productList.length; j++){
+              var name = that.data.productList[j].name
               if (name.indexOf('次日')>=0 && name.indexOf('修刃')>=0 && name.indexOf('打蜡')<0 ){
-                productId = that.data.productList[i].id
-                price = that.data.productList[i].sale_price
+                productId = that.data.productList[j].id
+                price = that.data.productList[j].sale_price
                 break
               }
             }
           }
           if (equip.candle){
-            for(var i = 0; i < that.data.productList.length; i++){
-              var name = that.data.productList[i].name
+            for(var j = 0; j < that.data.productList.length; j++){
+              var name = that.data.productList[j].name
               if (name.indexOf('次日')>=0 && name.indexOf('修刃')<0 && name.indexOf('打蜡')>=0 ){
-                productId = that.data.productList[i].id
-                price = that.data.productList[i].sale_price
+                productId = that.data.productList[j].id
+                price = that.data.productList[j].sale_price
                 break
               }
             }
@@ -465,7 +465,6 @@ Page({
       if (degree==undefined){
         degree = 89
       }
-      var items = []
       
       var item = {
         id: 0,

@@ -58,6 +58,9 @@ Page({
             icon: 'none',
             complete:(res)=>{
               that.setData({order: order})
+              wx.navigateTo({
+                url: 'task_list',
+              })
             }
           })
         }
