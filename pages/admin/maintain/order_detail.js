@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    qrCodeUrl: ''
   },
 
   /**
@@ -27,7 +27,8 @@ Page({
             var orderDate = new Date(order.order.create_date)
             order.date = util.formatDate(orderDate)
             order.time = util.formatTimeStr(orderDate)
-            that.setData({order: order, tasks: order.items})
+            var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=confirm_maintain_' + orderId)
+            that.setData({order: order, tasks: order.items, qrCodeUrl: qrCodeUrl})
           }
         },
         fail:(res)=>{

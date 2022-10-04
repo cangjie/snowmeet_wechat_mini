@@ -65,6 +65,13 @@
           "query": "",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "bind maintain order",
+          "pathName": "pages/mine/maintain/bind_maintain_order",
+          "query": "id=2222",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

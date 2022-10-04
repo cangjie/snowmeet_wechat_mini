@@ -1,14 +1,30 @@
 // components/auth/auth.js
 const app = getApp()
 function init(app, that) {
+  //var that = this
   //const app = getApp()
-  if (app.globalData.sessionKey != '' && app.globalData.userInfo == null) {
-    var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+  if (app.globalData.sessionKey != undefined && app.globalData.sessionKey != '' && app.globalData.userInfo == null) {
+    var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: url,
       success: (res) => {
         if (res.data.status == 0 && res.data.count > 0){
+          that.setData({miniUser: res.data.mini_users[0]})
+          if (that.properties.validType == 'cell') {
+            if (that.data.miniUser.cell_number == ''){
+              var title = '需要您授权获取手机号'
+              if (res.data.number != '') {
+                title = '需要您重新授权获取手机号'
+              }
+              that.setData({show: true, validType: 'cell', title: title})
+            }
+          }
+
+          
+          /*
           if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '' || res.data.mini_users[0].nick == '微信用户') {
+
+        
             wx.getUserInfo({
               success: (res) => {
                 if (res.userInfo != null) {
@@ -35,10 +51,12 @@ function init(app, that) {
                 console.log(res)
               }
             })
+          
           }
           else {
             app.globalData.userInfo = {avatarUrl: res.data.mini_users[0].head_image, nickName: res.data.mini_users[0].nick, gender: res.data.mini_users[0].gender}
           }
+          */
         }
       }
     })
@@ -81,6 +99,7 @@ function init(app, that) {
     }
   }
   else if (that.properties.validType == 'cell') {
+    /*
     var url = 'https://' + app.globalData.domainName + '/api/cell_number_used_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: url,
@@ -106,6 +125,7 @@ function init(app, that) {
         }
       }
     })
+    */
   }
 }
 Component({
@@ -151,9 +171,10 @@ Component({
     getPhoneNumber: function(res) {
       if(res.detail.errMsg=='getPhoneNumber:ok')
       {
-        var url = 'https://' + app.globalData.domainName + '/api/cell_number_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)+'&encdata='+encodeURIComponent(res.detail.encryptedData)+'&iv='+encodeURIComponent(res.detail.iv)
+        var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateUserInfo?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&encData='+encodeURIComponent(res.detail.encryptedData)+'&iv='+encodeURIComponent(res.detail.iv)
         wx.request({
           url: url,
+          method: 'GET',
           success: res => {
             this.setData({show: false})
             app.globalData.cellNumber = res.data.phoneNumber
