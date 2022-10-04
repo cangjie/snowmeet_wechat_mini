@@ -69,7 +69,7 @@
         {
           "name": "bind maintain order",
           "pathName": "pages/mine/maintain/bind_maintain_order",
-          "query": "id=2222",
+          "query": "id=24670",
           "launchMode": "default",
           "scene": null
         }

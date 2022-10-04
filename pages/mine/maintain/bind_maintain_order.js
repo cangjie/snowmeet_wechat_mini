@@ -1,4 +1,5 @@
 // pages/mine/maintain/bind_maintain_order.js
+const app = getApp()
 Page({
 
   /**
@@ -8,15 +9,26 @@ Page({
 
   },
 
-  binded(){
-    console.log('binded')
+  updated(){
+    //console.log('binded')
+    var that = this
+    var bindUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/BindNewMember/' +  that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: bindUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('order binded', res)
+        that.setData({order: res.data})
+      }
+
+    })
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    this.setData({id: options.id})
   },
 
   /**

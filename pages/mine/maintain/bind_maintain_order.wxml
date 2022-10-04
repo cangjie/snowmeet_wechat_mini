@@ -1,1 +1,1 @@
-<auth bindUpdateSuccess="binded" validType="info" ></auth>
+<auth bindUpdateSuccess="updated" validType="cell" ></auth>
