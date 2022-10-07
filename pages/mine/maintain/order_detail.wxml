@@ -1,0 +1,63 @@
+<view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >订单号：</view>
+    <view class="right-column" >{{order.orderId}}</view>
+    <view class="left-column" >任务数：</view>
+    <view class="right-column" >{{order.items.length}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >日期：</view>
+    <view class="right-column" >{{order.dateStr}}</view>
+    <view class="left-column" >时间：</view>
+    <view class="right-column" >{{order.timeStr}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >总金额：</view>
+    <view class="right-column" >¥{{order.order.order_price}}</view>
+    <view class="left-column" >优惠券：</view>
+    <view class="right-column" >{{(order.order.ticket_code != '')?order.ticket.name+'('+order.ticket.code+')':'未使用'}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >优惠金额：</view>
+    <view class="right-column" >¥{{order.order.ticket_amount}}</view>
+    <view class="left-column" >额外减免：</view>
+    <view class="right-column" >¥{{order.order.other_discount}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >应付：</view>
+    <view class="right-column" >¥{{order.order.final_price}}</view>
+    <view class="left-column" >支付方式：</view>
+    <view class="right-column" >{{order.order.pay_method}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >支付选项：</view>
+    <view class="right-column" >{{order.order.pay_memo}}</view>
+    <view class="left-column" >预计龙珠：</view>
+    <view class="right-column" >{{order.order.generate_score}}</view>
+  </view>
+  <mp-cells>
+    <mp-cell wx:for="{{order.items}}" >
+      <view class="table" >
+        <view style="width:50%" >
+          <view>{{item.confirmed_brand + ' ' + item.confirmed_scale}}</view>
+          <view class="table" wx:if="{{item.confirmed_edge == 1}}" >
+            <view class="left-column" >修刃：</view>
+            <view class="right-column" >{{item.edgeStatus}}</view>
+          </view>
+          <view class="table" wx:if="{{item.confirmed_candle == 1}}">
+            <view class="left-column" >打蜡：</view>
+            <view class="right-column" >{{item.waxStatus}}</view>
+          </view>
+          <view class="table"  wx:if="{{item.confirmed_candle == 1}}" >
+            <view class="left-column" >刮蜡：</view>
+            <view class="right-column" >{{item.unWaxStatus}}</view>
+          </view>
+          <view>{{item.finalStatus}}</view>
+        </view>
+        <view style="width:50%; text-align: center;" >
+          <image style="width: 200rpx; height: 200rpx;" src="{{item.qrcodeUrl}}" mode="aspectFit" />
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

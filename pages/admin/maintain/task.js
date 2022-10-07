@@ -14,13 +14,21 @@ Page({
     galleryIndex: -1,
     edgeMemo: '',
     waxMemo:'',
-    moreMemo: ''
+    unWaxMemo: '',
+    moreMemo: '',
+    finish: false,
+    isClosed: false
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
+    if (options.q != undefined){
+      var urlArr = decodeURIComponent(options.q).split('/')
+      options.id = urlArr[urlArr.length - 1]
+
+    }
     var that = this
     app.loginPromiseNew.then(function(resolve){
       var getInfoUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTask/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -30,6 +38,8 @@ Page({
         success:(res)=>{
           console.log('task info', res)
           var task = res.data
+         
+
           task.images = []
           var idDiff = that.data.idDiff
           if (task.confirmed_images != ''){
@@ -83,6 +93,7 @@ Page({
                   var stepEdge = undefined
                   var stepWax = undefined
                   var stepMore = undefined
+                  var stepUnWax = undefined
                   for(var i = 0; i < res.data.length; i++){
                     switch(res.data[i].step_name){
                       case '安全检查':
@@ -107,13 +118,47 @@ Page({
                         break
                       case '打蜡':
                         stepWax = res.data[i]
+                        var start = new Date(stepWax.start_time)
+                        var end = new Date(stepWax.end_time)
+                        if (start!=undefined){
+                          stepWax.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
+                        }
+                        else{
+                          stepWax.start_time_str = ''
+                        }
+                        if (end!=undefined && end.getFullYear() > 1970){
+                          stepWax.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
+                        }
+                        else{
+                          stepWax.end_time_str = ''
+                        }
+                        break
+                      case '刮蜡':
+                        stepUnWax = res.data[i]
+                        var start = new Date(stepUnWax.start_time)
+                        var end = new Date(stepUnWax.end_time)
+                        if (start!=undefined){
+                          stepUnWax.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
+                        }
+                        else{
+                          stepUnWax.start_time_str = ''
+                        }
+                        if (end!=undefined && end.getFullYear() > 1970){
+                          stepUnWax.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
+                        }
+                        else{
+                          stepUnWax.end_time_str = ''
+                        }
                         break
                       default:
                         stepMore = res.data[i]
                         break
                     }
                   }
-                  that.setData({stepSafe: stepSafe, stepEdge: stepEdge, stepWax: stepWax, stepMore: stepMore})
+                  that.setData({stepEdge: stepEdge, stepWax: stepWax, stepUnWax: stepUnWax, stepMore: stepMore})
+
+
+                  that.getStatus()
                 }
               })
               that.setData({task: task, serialList: serialList, serialSelectedIndex: serialSelectedIndex, yearListSelectedIndex: yearIndex, idDiff: idDiff})
@@ -137,6 +182,42 @@ Page({
     else{
       that.setData({idDiff: false})
     }
+  },
+
+  terminate(e){
+    var that = this
+    wx.showModal({
+      title: '确认用户中途索回，此操作不可逆。',
+      confirmText: '确认',
+      cancelText: '取消',
+      showCancel: true,
+      success:(res)=>{
+        console.log(res)
+        if (res.confirm){
+          that.setData({isClosed: true})
+          that.logStep('强行索回')
+        }
+        
+      }
+    })
+  },
+
+  finish(){
+    var that = this
+    wx.showModal({
+      title: '核对无误，发板给用户。',
+      confirmText: '确认',
+      cancelText: '取消',
+      showCancel: true,
+      success:(res)=>{
+        console.log(res)
+        if (res.confirm){
+          that.setData({isClosed: true})
+          that.logStep('发板')
+        }
+        
+      }
+    })
   },
 
   mod(e){
@@ -199,14 +280,20 @@ Page({
         console.log('task updated', res)
         wx.showToast({
           title: '保存成功',
-          icon: 'none'
+          icon: 'none',
+          complete:(e)=>{
+            that.getStatus()
+          }
         })
       }
     })
   },
   safeCheck(){
+    this.logStep('安全检查')
+  },
+  logStep(stepName){
     var that = this
-    var startSafeCheck = 'https://' + app.globalData.domainName + '/core/MaintainLogs/StartStep/' + that.data.task.id + '?stepName=' + encodeURIComponent('安全检查') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var startSafeCheck = 'https://' + app.globalData.domainName + '/core/MaintainLogs/StartStep/' + that.data.task.id + '?stepName=' + encodeURIComponent(stepName) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: startSafeCheck,
       method:'GET',
@@ -221,8 +308,11 @@ Page({
               stepSafe = res.data
               that.setData({stepSafe: stepSafe})
               wx.showToast({
-                title: '安全检查完成',
+                title: stepName+'完成',
                 icon: 'none',
+                complete:()=>{
+                  that.getStatus()
+                }
                 
               })
             }
@@ -241,6 +331,9 @@ Page({
         break
       case 'wax':
         stepName = '打蜡'
+        break
+      case 'unWax':
+        stepName = '刮蜡'
         break
       default:
         stepName = '维修'
@@ -273,6 +366,8 @@ Page({
           case '打蜡':
             that.setData({stepWax: ret})
             break
+          case '刮蜡':
+            that.setData({stepUnWax: ret})
           default:
             that.setData({stepMore: ret})
             break
@@ -293,6 +388,9 @@ Page({
         break
       case 'wax':
         memo = that.data.waxMemo
+        break
+      case "unWax":
+        memo = that.data.unWaxMemo
         break
       default:
         memo = that.data.moreMemo
@@ -326,14 +424,58 @@ Page({
           case '打蜡':
             that.setData({stepWax: ret})
             break
+          case '刮蜡':
+            that.setData({stepUnWax: ret})
+            break
           default:
             that.setData({stepMore: ret})
             break
         }
+        that.getStatus()
       }
     })
 
   },
+
+  getStatus(){
+    var status = '未开始'
+    var that = this
+    var stepSafe = that.data.stepSafe
+    var stepEdge = that.data.stepEdge
+    var stepWax = that.data.stepWax
+    var stepUnWax = that.data.stepUnWax
+    var task = that.data.task
+
+    if (stepSafe != undefined){
+      status = "完成安全检查"
+      if (task.confirmed_edge == 1){
+        if (stepEdge != undefined){
+          status = '修刃'+stepEdge.status
+        }
+      }
+      if (task.confirmed_candle == 1){
+        if  (stepWax!=undefined ){
+          status = '打蜡' + stepWax.status
+        }
+        if ((status == '打蜡已完成' || status == '打蜡强行终止') && stepUnWax != undefined){
+          status = '刮蜡'+ stepUnWax.status
+        }
+      }
+      if (task.confirmed_more != '' && stepMore != undefined){
+        status = '维修'+stepMore.status
+      }
+    }
+
+    var finish = true
+    if ((task.confirmed_edge == 1 && (stepEdge == undefined || (stepEdge.status != '已完成' && stepEdge.status != '强行终止' )))
+      || (task.confirmed_candle == 1 && ( stepWax == undefined || (stepWax.status != '已完成'  && stepWax.status != '强行终止')))
+      || (task.confirmed_candle == 1 && ( stepUnWax == undefined || (stepUnWax.status != '已完成'  && stepUnWax.status != '强行终止')))
+      || (task.confirmed_more != '' && ( stepMore == undefined || (stepMore.status != '已完成'  && stepMore.status != '强行终止')))){
+        finish = false
+    }
+    that.setData({status: status, finish: finish})
+  },
+
   /**
    * Lifecycle function--Called when page is initially rendered
    */

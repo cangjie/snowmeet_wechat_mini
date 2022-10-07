@@ -72,6 +72,20 @@
           "query": "id=24670",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/mine/maintain/order_list",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/admin/maintain/task",
+          "query": "3527",
+          "launchMode": "default",
+          "scene": 1011
         }
       ]
     }

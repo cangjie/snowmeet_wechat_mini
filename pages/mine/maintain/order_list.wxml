@@ -1,0 +1,16 @@
+<!--pages/mine/maintain/order_list.wxml-->
+<mp-cells id="{{item.order.id}}" wx:for="{{orders}}" title="订单号：{{item.order.id}} 日期：{{item.date}} 时间：{{item.time}}" bindtap="gotoDetail" >
+  <mp-cell wx:for="{{item.items}}" >
+    <view class="table" >
+      <view style="width: 50%; text-align: left;font-size: 10pt;" >
+        {{item.confirmed_brand + ' ' + item.confirmed_scale}}：
+      </view>
+      <view style="width: 50%; text-align: left;font-size: 10pt;">
+        {{item.confirmed_urgent == 1? '加急 ' : ' '}}
+        {{(item.confirmed_edge==1)?('修刃 ' + item.confirmed_degree+'度  '):''}}
+        {{(item.confirmed_candle==1)?'打蜡 ':' '}}
+        {{item.confirmed_more}}
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>

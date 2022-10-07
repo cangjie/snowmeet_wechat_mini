@@ -150,13 +150,15 @@
     </view>
   </mp-cell>
   <mp-cell>
-    <view class="view-table-scale" >
-      <button id="edge" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{stepEdge!=undefined}}" > 开 始 </button> 
+    <view class="view-table-scale" wx:if="{{!isClosed}}" >
+      <button id="edge" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{stepSafe==undefined || stepEdge != undefined}}" > 开 始 </button> 
       <button id="{{stepEdge==undefined?'edge':(stepEdge.id+'_edge')}}" bindtap="endStep" style="width:150rpx;font-size: 10pt;" disabled="{{stepEdge==undefined || !stepEdge.isMine || stepEdge.status == '已完成' || stepEdge.status == '强行终止' }}"> 完 成 </button>
       <button id="{{stepEdge==undefined?'edge':(stepEdge.id+'_edge')}}" bindtap="endStep" style="width: 300rpx;font-size: 10pt;"  disabled="{{stepEdge==undefined || stepEdge.isMine || stepEdge.status == '已完成' || stepEdge.status == '强行终止'}}" >强行终止</button>
     </view>
   </mp-cell>
 </mp-cells>
+
+
 <mp-cells title="打蜡" wx:if="{{task.confirmed_candle == 1}}" >
   <mp-cell>
     <view class="view-table-scale" >
@@ -179,13 +181,47 @@
         <block wx:else >{{stepWax!=undefined?stepWax.memo:''}}</block>
   </mp-cell>
   <mp-cell>
-    <view class="view-table-scale" >
-      <button id="wax" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{stepWax!=undefined}}" > 开 始 </button> 
+    <view class="view-table-scale" wx:if="{{!isClosed}}" >
+      <button id="wax" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{!((task.confirmed_edge == 1 && (status == '修刃已完成'|| status == '修刃强行终止')) || (stepSafe != undefined && task.confirmed_edge == 0)  )}}" > 开 始 </button> 
       <button id="{{stepWax==undefined?'wax':(stepWax.id+'_wax')}}" bindtap="endStep" style="width:150rpx;font-size: 10pt;" disabled="{{stepWax==undefined || !stepWax.isMine || stepWax.status == '已完成' || stepWax.status == '强行终止' }}"> 完 成 </button>
       <button id="{{stepWax==undefined?'wax':(stepWax.id+'_wax')}}" bindtap="endStep" style="width: 300rpx;font-size: 10pt;"  disabled="{{stepWax==undefined || stepWax.isMine || stepWax.status == '已完成' || stepWax.status == '强行终止'}}" >强行终止</button>
     </view>
   </mp-cell>
 </mp-cells>
+
+<mp-cells title="刮蜡" wx:if="{{task.confirmed_candle == 1}}" >
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >状态：</view>
+      <view class="right-column" >{{stepUnWax==undefined?'未开始':stepUnWax.status}}</view>
+      <view class="left-column" >技师：</view>
+      <view class="right-column" >{{stepUnWax!=undefined?stepUnWax.staffName:''}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-table-scale" >
+      <view class="left-column" >开始：</view>
+      <view class="right-column" >{{stepWax!=undefined?stepUnWax.start_time_str:''}}</view>
+      <view class="left-column" >完成：</view>
+      <view class="right-column" >{{stepWax!=undefined?stepUnWax.end_time_str:''}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <input wx:if="{{stepUnWax!=undefined && stepWax.status == '已开始'}}"  placeholder="填写备注" id="unWax_memo" bindinput="mod"   />
+        <block wx:else >{{stepUnWax!=undefined?stepUnWax.memo:''}}</block>
+  </mp-cell>
+  <mp-cell >
+    <view class="view-table-scale" wx:if="{{!isClosed}}" >
+      <button id="unWax" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{status != '打蜡已完成' && status != '打蜡强行终止'}}" > 开 始 </button> 
+      <button id="{{stepUnWax==undefined?'unWax':(stepUnWax.id+'_umWax')}}" bindtap="endStep" style="width:150rpx;font-size: 10pt;" disabled="{{stepUnWax==undefined || !stepUnWax.isMine || stepUnWax.status == '已完成' || stepUnWax.status == '强行终止' }}"> 完 成 </button>
+      <button id="{{stepUnWax==undefined?'unWax':(stepUnWax.id+'_unWax')}}" bindtap="endStep" style="width: 300rpx;font-size: 10pt;"  disabled="{{stepUnWax==undefined || stepUnWax.isMine || stepUnWax.status == '已完成' || stepUnWax.status == '强行终止'}}" >强行终止</button>
+    </view>
+  </mp-cell>
+</mp-cells>
+
+
+
+
 <mp-cells title="维修" wx:if="{{task.confirmed_more != ''}}" >
   <mp-cell>
     <view class="view-table-scale" >
@@ -207,9 +243,15 @@
     <input placeholder="填写备注" />
   </mp-cell>
   <mp-cell>问题拍照</mp-cell>
-  <mp-cell>
-    <view class="view-table-scale" >
+  <mp-cell >
+    <view class="view-table-scale" wx:if="{{!isClosed}}" >
       <button style="width: 150rpx; font-size: 10pt;"> 开 始 </button> <button style="width:150rpx;font-size: 10pt;"> 完 成 </button><button style="width: 300rpx;font-size: 10pt;" >强制结束</button>
     </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="发板" >
+  <mp-cell>
+    <button wx:if="{{finish}}" bindtap="finish" > 用 户 取 走 确 认 </button>
+    <button id="terminate" wx:else bindtap="terminate" > 用 户 强 行 索 回 </button>
   </mp-cell>
 </mp-cells>
