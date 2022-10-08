@@ -35,7 +35,7 @@ Page({
               var finalStatus = ''
               for(var j = 0; j < currentItem.taskLog.length; j++){
                 var log = currentItem.taskLog[j]
-                switch(log.status){
+                switch(log.step_name){
                   case '修刃':
                     edgeStatus = log.status
                     break

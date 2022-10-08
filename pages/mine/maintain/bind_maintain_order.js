@@ -19,6 +19,15 @@ Page({
       success:(res)=>{
         console.log('order binded', res)
         that.setData({order: res.data})
+        wx.showToast({
+          title: '欢迎加入易龙雪聚',
+          icon: 'none',
+          success:(res)=>{
+            wx.redirectTo({
+              url: 'order_list',
+            })
+          }
+        })
       }
 
     })

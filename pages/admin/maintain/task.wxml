@@ -182,7 +182,7 @@
   </mp-cell>
   <mp-cell>
     <view class="view-table-scale" wx:if="{{!isClosed}}" >
-      <button id="wax" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{!((task.confirmed_edge == 1 && (status == '修刃已完成'|| status == '修刃强行终止')) || (stepSafe != undefined && task.confirmed_edge == 0)  )}}" > 开 始 </button> 
+      <button id="wax" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{!((task.confirmed_edge == 1 && (status == '修刃已完成'|| status == '修刃强行终止')) || (stepSafe != undefined && task.confirmed_edge == 0)  ) || stepWax != undefined}}" > 开 始 </button> 
       <button id="{{stepWax==undefined?'wax':(stepWax.id+'_wax')}}" bindtap="endStep" style="width:150rpx;font-size: 10pt;" disabled="{{stepWax==undefined || !stepWax.isMine || stepWax.status == '已完成' || stepWax.status == '强行终止' }}"> 完 成 </button>
       <button id="{{stepWax==undefined?'wax':(stepWax.id+'_wax')}}" bindtap="endStep" style="width: 300rpx;font-size: 10pt;"  disabled="{{stepWax==undefined || stepWax.isMine || stepWax.status == '已完成' || stepWax.status == '强行终止'}}" >强行终止</button>
     </view>
@@ -212,7 +212,7 @@
   </mp-cell>
   <mp-cell >
     <view class="view-table-scale" wx:if="{{!isClosed}}" >
-      <button id="unWax" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{status != '打蜡已完成' && status != '打蜡强行终止'}}" > 开 始 </button> 
+      <button id="unWax" bindtap="startStep" style="width: 150rpx; font-size: 10pt;" disabled="{{(status != '打蜡已完成' && status != '打蜡强行终止') || stepUnWax != undefined}}" > 开 始 </button> 
       <button id="{{stepUnWax==undefined?'unWax':(stepUnWax.id+'_umWax')}}" bindtap="endStep" style="width:150rpx;font-size: 10pt;" disabled="{{stepUnWax==undefined || !stepUnWax.isMine || stepUnWax.status == '已完成' || stepUnWax.status == '强行终止' }}"> 完 成 </button>
       <button id="{{stepUnWax==undefined?'unWax':(stepUnWax.id+'_unWax')}}" bindtap="endStep" style="width: 300rpx;font-size: 10pt;"  disabled="{{stepUnWax==undefined || stepUnWax.isMine || stepUnWax.status == '已完成' || stepUnWax.status == '强行终止'}}" >强行终止</button>
     </view>
