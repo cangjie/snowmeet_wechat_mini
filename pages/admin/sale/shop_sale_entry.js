@@ -134,7 +134,7 @@ Page({
     var that = this
     clearInterval(that.data.interVal)
     wx.navigateTo({
-      url: 'shop_sale?cell=' + that.data.cell,
+      url: 'shop_sale?cell=' + that.data.cell + (that.data.mi7OrderStr!=''? ('&mi7OrderStr=' + that.data.mi7OrderStr): ''),
     })
   },
   scan(){

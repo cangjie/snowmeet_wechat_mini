@@ -2,6 +2,7 @@
 <view wx:if="{{role=='staff'}}" >
   <mp-cells ext-class="my-cells" title="扫码" >
     <mp-cell value="扫一扫" bindtap="gotoScan" ></mp-cell>
+    <mp-cell value="登录后台" bindtap="gotoBackground" ></mp-cell>
   </mp-cells> 
   <mp-cells ext-class="my-cells" title="店铺销售" >
     <mp-cell id="shopSale" bindtap="gotoSale" >店销现货</mp-cell>

@@ -187,5 +187,22 @@ Page({
     wx.redirectTo({
       url: '/pages/admin/maintain/recept',
     })
+  },
+  gotoBackground(){
+    wx.scanCode({
+      onlyFromCamera: true,
+      success:(res)=>{
+        console.log(res)
+        var timeStamp = res.result
+        var setSessionUrl = 'https://' + app.globalData.domainName + '/core/BackgroundLoginSession/SetSessionKey/' + timeStamp + '?sessionKey=' + app.globalData.sessionKey
+        wx.request({
+          url: setSessionUrl,
+          method: 'GET',
+          success:(res)=>{
+            console.log(res)
+          }
+        })
+      }
+    })
   }
 })

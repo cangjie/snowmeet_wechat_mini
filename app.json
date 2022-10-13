@@ -62,7 +62,8 @@
     "pages/admin/maintain/task_list",
     "pages/mine/maintain/bind_maintain_order",
     "pages/mine/maintain/order_detail",
-    "pages/mine/maintain/order_list"
+    "pages/mine/maintain/order_list",
+    "pages/admin/background/set_session_key"
   ],
   "window": {
     "backgroundTextStyle": "light",

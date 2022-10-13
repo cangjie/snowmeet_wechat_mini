@@ -1,0 +1,5 @@
+<view>
+  <view style="text-align: center;">
+    <button> 请 点 击 此 按 钮 扫 描 屏 幕 二 维 码 登 录 后 台 </button>
+  </view>
+</view>
