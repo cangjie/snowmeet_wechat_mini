@@ -5,9 +5,9 @@
     </mp-cell>
     <mp-cell>
       <view style="display:flex; flex-direction: row;">
-        <view class="left-column" >智慧商贸单号：</view>
+        <view class="left-column" >七色米单号：</view>
         <view class="right-column" style="display: flex; flex-direction: row;">
-          <view><input id="mi7OrderNo_{{index}}" value="{{item.mi7OrderNo}}" disabled="{{item.mi7OrderNo=='紧急开单'}}"  placeholder="填写智慧商贸订单号" bindinput="modMi7Order" /></view>
+          <view><input id="mi7OrderNo_{{index}}" value="{{item.mi7OrderNo}}" disabled="{{item.mi7OrderNo=='紧急开单'}}"  placeholder="填写七色米订单号" bindinput="modMi7Order" /></view>
           <view>
             <switch id="switch_{{index}}" checked="{{item.mi7OrderNo=='紧急开单'}}" bindchange="modMi7Order" >紧急开单</switch>
           </view>
