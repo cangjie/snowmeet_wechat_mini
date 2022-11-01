@@ -173,7 +173,7 @@
             </view>
           </view>
         </mp-cell>
-        <mp-cell>
+        <mp-cell wx:if="{{payMethod != '微信支付'}}" > 
           <button bindtap="setPaymentSucess" > 确 认 收 款 </button>
         </mp-cell>
       </block>

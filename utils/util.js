@@ -35,9 +35,17 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+const showAmount = n => {
+  var amount = parseFloat(n)
+  amount = Math.round(amount * 100)/100
+  var amountStrArr = amount.toString().split('.')
+  return '¥' + amountStrArr[0] + '.' + (amountStrArr.length == 2 ? (amountStrArr[1].length == 1 ? amountStrArr[1] + '0' : amountStrArr[1] ) : '00' )
+
+}
+
 module.exports = {
   formatTime: formatTime,
   formatDate: formatDate,
-  formatTimeStr: formatTimeStr
-
+  formatTimeStr: formatTimeStr,
+  showAmount: showAmount
 }

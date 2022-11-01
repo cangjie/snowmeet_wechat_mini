@@ -87,7 +87,7 @@ Page({
       }
     })
 
-
+/*
     wx.request({
       url: 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor',
       method: 'GET',
@@ -100,7 +100,7 @@ Page({
         }
         this.setData({instructors: instructors, instructorNames: instructorNames})
       }
-    })
+    })*/
   },
   /**
    * Lifecycle function--Called when page is initially rendered

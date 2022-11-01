@@ -17,15 +17,17 @@ Component({
     payMethodList:['微信支付', '支付宝转账', '微信转账','京东收银', 'POS刷卡', '现金'],
     payMethodSelectedIndex: 0
   },
-
+  lifetimes:{
+    ready: function(){
+      var that = this
+      this.triggerEvent('PayMethodSelected', {payMethod: that.properties.payMethod})
+    }
+  },
   /**
    * Component methods
    */
   methods: {
-    ready: function(){
-      var that = this
-      this.triggerEvent('PayMethodSelected', {payMethod: that.properties.payMethod})
-    },
+    
     selectChanged: function(e){
       var that = this
       that.setData({payMethodSelectedIndex: e.detail.value})

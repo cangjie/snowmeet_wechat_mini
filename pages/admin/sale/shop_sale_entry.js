@@ -68,6 +68,7 @@ Page({
             }
             wx.showToast({
               title: word,
+              duration: 2000
             })
             if (needJump){
               clearInterval(that.data.interVal)

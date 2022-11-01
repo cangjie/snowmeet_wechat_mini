@@ -52,7 +52,7 @@ App({
             console.log(res)
             app.globalData.sessionKey = res.data.session_key
             //var url = 'https://' + app.globalData.domainName + '/api/mini_user_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-            url = url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+            url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
               url: url,
               method: 'GET',
@@ -111,6 +111,9 @@ App({
             console.log('request fail', res)
           }
         })
+      },
+      fail:(res)=>{
+        console.log(res)
       }
     })
     

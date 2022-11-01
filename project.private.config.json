@@ -46,13 +46,6 @@
           "scene": null
         },
         {
-          "name": "shop sale",
-          "pathName": "pages/admin/sale/shop_sale",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
           "name": "shop landing",
           "pathName": "/pages/shop_sale/shop_landing",
           "query": "q=https%3A%2F%2Fmini.snowmeet.top%2Fmapp%2Fsale_entry%3Fid%3D123&scancode_time=1658128984",
@@ -74,18 +67,11 @@
           "scene": null
         },
         {
-          "name": "",
-          "pathName": "pages/mine/maintain/order_list",
-          "query": "",
+          "name": "shop sale order payment",
+          "pathName": "pages/shop_sale/order_info",
+          "query": "paymentId=91",
           "launchMode": "default",
           "scene": null
-        },
-        {
-          "name": "",
-          "pathName": "pages/admin/maintain/task",
-          "query": "3527",
-          "launchMode": "default",
-          "scene": 1011
         }
       ]
     }

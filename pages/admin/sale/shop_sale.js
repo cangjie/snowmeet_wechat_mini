@@ -379,7 +379,10 @@ Page({
       data: order,
       success:(res)=>{
         console.log('submit order', res)
-        var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_order_id_' + res.data.id)
+        var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=confirm_order_id_' + res.data.id)
+        if (res.data.payments.length > 0 && res.data.payments[0].pay_method == '微信支付'){
+          qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + res.data.payments[0].id)
+        }
         that.setData({orderId: res.data.id, submitedOrder: res.data, qrCodeUrl: qrCodeUrl})
         if (order.ticket_code != undefined && order.ticket_code != null && order.ticket_code != ''){
           var ticketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + order.ticket_code

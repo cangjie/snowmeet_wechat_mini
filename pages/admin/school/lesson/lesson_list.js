@@ -25,6 +25,7 @@ Page({
     app.loginPromiseNew.then(function(r){
       sessionKey = app.globalData.sessionKey
       role = app.globalData.role
+      /*
       var getInstructorUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor'
       wx.request({
         url: getInstructorUrl,
@@ -33,6 +34,7 @@ Page({
           resolve({sessionKey: r.sessionKey, role: r.role, instructors: res.data})
         }
       })
+      */
     })
   }),
   onLoad: function (options) {

@@ -46,6 +46,7 @@ Component({
 
             }
           //that.setData({school_lesson: res.data})
+          /*
             var getInstrucorUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff/getinstructor'
             wx.request({
               url: getInstrucorUrl,
@@ -60,6 +61,7 @@ Component({
                 that.setData({school_lesson: school_lesson})
               }
             })
+            */
           }
         })
       })
