@@ -1,0 +1,1 @@
+<auth wx:if="{{needAuth}}" validType="cell" bindUpdateSuccess="jump"  ></auth>

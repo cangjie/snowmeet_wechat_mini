@@ -3,6 +3,7 @@ const app = getApp()
 function init(that) {
   var role = app.globalData.role
   var isSchoolStaff = false
+  /*
   var ajaxUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff?sessionkey=' +  encodeURIComponent(app.globalData.sessionKey)
   wx.request({
     url: ajaxUrl,
@@ -16,6 +17,7 @@ function init(that) {
 
     }
   })
+  */
   that.setData({role: app.globalData.role})
   
 }

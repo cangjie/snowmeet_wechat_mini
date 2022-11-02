@@ -60,8 +60,18 @@ Component({
               console.log('user info:', res.data)
               //that.triggerEvent('UserFound', {user_found: true, user_info: res.data})
               //that.setData({user_info: res.data, user_found: true})
-              that.setData({userFind: true, userInfo: res.data, role: app.globalData.role})
+              if (res.statusCode == 200){
+                that.setData({userFind: true, userInfo: res.data, role: app.globalData.role})
               that.getScore()
+              }
+              else{
+                if (that.properties.cell != undefined && that.properties.cell != '')
+                var userInfo = {}
+                userInfo.cell_number = that.properties.cell
+                that.setData({userInfo: userInfo})
+              }
+
+              
             },
             fail:(res)=>{
               that.triggerEvent('UserFound', {user_found: false, user_info: res.data})

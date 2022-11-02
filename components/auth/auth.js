@@ -102,11 +102,23 @@ function init(app, that) {
     }
   }
   else if (that.properties.validType == 'cell') {
-    /*
-    var url = 'https://' + app.globalData.domainName + '/api/cell_number_used_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+    
+    var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: url,
-      success: res => {
+      success: (res) => {
+        if (res.statusCode == 200 && res.data.mini_users.length == 1){
+          var miniUser = res.data.mini_users[0]
+          if (miniUser.cell_number.length != 11){
+            var title = '需要您授权获取手机号'
+            that.setData({show: true, validType: 'cell', title: title})
+          }
+          else{
+            console.log('auth success')
+            that.triggerEvent("UpdateSuccess", {})
+          }
+        }
+        /*
         if (res.data.status == 0){
           if (res.data.need_update==1) {
             var title = '需要您授权获取手机号'
@@ -126,9 +138,10 @@ function init(app, that) {
         else{
           
         }
+        */
       }
     })
-    */
+    
   }
 }
 Component({
@@ -169,6 +182,7 @@ Component({
   methods: {
     getUserInfo: function(res) {
       app.globalData.userInfo = res.detail.userInfo
+      console.log('auth success')
       this.setData({show: false})
     },
     getPhoneNumber: function(res) {
@@ -181,7 +195,8 @@ Component({
           success: res => {
             this.setData({show: false})
             app.globalData.cellNumber = res.data.phoneNumber
-            console.log('Auth UpdateSuccess', res)
+            //console.log('Auth UpdateSuccess', res)
+            console.log('auth success')
             this.triggerEvent("UpdateSuccess", {})
           }
         })

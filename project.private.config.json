@@ -1,5 +1,7 @@
 {
-  "setting": {},
+  "setting": {
+    "preloadBackgroundData": false
+  },
   "condition": {
     "miniprogram": {
       "list": [
@@ -53,23 +55,9 @@
           "scene": 1011
         },
         {
-          "name": "maintain order detail",
-          "pathName": "pages/admin/maintain/order_list",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "bind maintain order",
-          "pathName": "pages/mine/maintain/bind_maintain_order",
-          "query": "id=24681",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "shop sale order payment",
-          "pathName": "pages/shop_sale/order_info",
-          "query": "paymentId=91",
+          "name": "",
+          "pathName": "pages/payment/pay_hub",
+          "query": "orderId=24727",
           "launchMode": "default",
           "scene": null
         }

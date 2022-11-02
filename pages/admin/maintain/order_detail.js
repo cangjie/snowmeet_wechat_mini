@@ -28,6 +28,9 @@ Page({
             order.date = util.formatDate(orderDate)
             order.time = util.formatTimeStr(orderDate)
             var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=confirm_maintain_' + orderId)
+            if (order.pay_method == '微信支付'){
+              var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + order.payments[0].id)
+            }
             that.setData({order: order, tasks: order.items, qrCodeUrl: qrCodeUrl})
           }
         },
