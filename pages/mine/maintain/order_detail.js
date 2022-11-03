@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    needPay: false
   },
 
   /**
@@ -67,11 +67,47 @@ Page({
               currentItem.qrcodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_qrcode.aspx?qrcodetext=') + encodeURIComponent('https://mini.snowmeet.top/mapp/admin/maintain/task/' + currentItem.id)
 
             }
-            that.setData({order: order})
+            var needPay = false
+            if (options.paymentId!=undefined && order.order.pay_method == '微信支付' && order.order.payments != null && order.order.payments[0].status == '待支付'){
+              needPay = true
+            }
+            that.setData({order: order, needPay: needPay, paymentId: options.paymentId})
           }
         }
       })
 
+    })
+  },
+
+  pay(){
+    var that = this
+    var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/TenpayRequest/' + that.data.paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: paymentUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log(res)
+        wx.requestPayment({
+          nonceStr: res.data.nonce,
+          package: 'prepay_id=' + res.data.prepay_id,
+          paySign: res.data.sign,
+          timeStamp: res.data.timeStamp,
+          signType: 'MD5',
+          success:(res)=>{
+            console.log(res)
+            wx.showToast({
+              title: '支付完成',
+              icon: 'none',
+              success:(res)=>{
+                that.setData({needPay: false})
+              }
+            })
+          },
+          fail:(res)=>{
+            console.log(res)
+          }
+        })
+      }
     })
   },
 

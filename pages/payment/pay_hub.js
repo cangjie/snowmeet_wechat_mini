@@ -39,27 +39,45 @@ Page({
       method: 'GET',
       success:(res)=>{
         if (res.statusCode == 200){
+
           var jumpUrl = ''
           var order = res.data
-          switch(order.type){
-            case '店销现货':
-              jumpUrl = '../shop_sale/order_info'
-              break;
-            case '服务':
-              jumpUrl = '../maintain/maintain_info'
-              break;
-            default:
-              break;
-          }
-          if (that.data.paymentId != undefined){
-            jumpUrl = jumpUrl + '?paymentId=' + that.data.paymentId
-          }
-          if (that.data.orderId != undefined){
-            jumpUrl = jumpUrl + '?orderId=' + that.data.orderId
-          }
-          wx.redirectTo({
-            url: jumpUrl
+
+          var bindUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/BindUser/' + order.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+
+          wx.request({
+            url: bindUrl,
+            method: 'GET',
+            success:(res)=>{
+
+            },
+            complete:(res)=>{
+
+              switch(order.type){
+                case '店销现货':
+                  jumpUrl = '../shop_sale/order_info'
+                  break;
+                case '服务':
+                  jumpUrl = '../mine/maintain/order_detail'
+                  break;
+                default:
+                  break;
+              }
+              if (that.data.paymentId != undefined){
+                jumpUrl = jumpUrl + '?paymentId=' + that.data.paymentId + '&id=' + order.id
+              }
+              if (that.data.orderId != undefined){
+                jumpUrl = jumpUrl + '?orderId=' + that.data.orderId
+              }
+              wx.redirectTo({
+                url: jumpUrl
+              })
+
+            }
           })
+
+
+          
         }
       }
     })

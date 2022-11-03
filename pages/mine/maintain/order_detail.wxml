@@ -60,4 +60,7 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <view wx:if="{{needPay}}" >
+    <button bindtap="pay"> 确 认 支 付 </button>
+  </view>
 </view>

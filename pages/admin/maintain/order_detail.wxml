@@ -73,8 +73,8 @@
     </view>
   </mp-cell>
 </mp-cells>
-<view wx:if="{{order.order.pay_method == '微信支付'}}" >
-  <image mode="aspectFit" style="width: 300rpx;" src="{{qrCodeUrl}}" ></image>
+<view wx:if="{{order.order.pay_method == '微信支付'}}" style="text-align: center;" >
+  <image mode="aspectFit" style="text-align: center;width: 450rpx;" src="{{qrCodeUrl}}" ></image>
 </view>
 <view wx:else  >
   <view wx:if="{{order.order.status == '待支付'}}" style="text-align: center;"><button   bindtap="confirmPaid" > 确 认 收 款 </button></view>
