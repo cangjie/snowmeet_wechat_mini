@@ -450,7 +450,7 @@ Page({
       payOption: that.data.payOptionList[that.data.payOptionSelectedIndex],
       summaryPrice: that.data.totalSummary,
       ticketDiscount: that.data.ticketDiscount,
-      discount: that.data.discount,
+      discount: that.data.othersDiscount,
       ticketCode: that.data.ticketCode,
       orderId: 0,
       customerOpenId: openId,
