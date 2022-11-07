@@ -60,6 +60,8 @@ Page({
                 case '服务':
                   jumpUrl = '../mine/maintain/order_detail'
                   break;
+                case '押金':
+                  jumpUrl = '../experience/pay_temp'
                 default:
                   break;
               }

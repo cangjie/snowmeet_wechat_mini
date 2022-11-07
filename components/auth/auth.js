@@ -19,7 +19,7 @@ function init(app, that) {
               that.setData({show: true, validType: 'cell', title: title})
             }
             else {
-              that.triggerEvent("UpdateSuccess", {})
+              //that.triggerEvent("UpdateSuccess", {})
             }
           }
 

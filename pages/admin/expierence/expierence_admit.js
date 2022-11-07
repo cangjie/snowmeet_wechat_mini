@@ -40,6 +40,7 @@ Page({
     filledAdmitInfo.start_time = startTimeStr
     filledAdmitInfo.end_time = endTimeStr
     this.setData({filledAdmitInfo: filledAdmitInfo})
+    
     wx.getFuzzyLocation({
       type: 'wgs84',
       success:(res)=>{
@@ -196,16 +197,18 @@ Page({
     }
   },
   submit: function(e) {
-    var submitUrl = 'https://' + app.globalData.domainName + '/api/expierence_admit.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/Experience/PlaceOrder?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     var filledAdmitInfo = this.data.filledAdmitInfo
     wx.request({
       url: submitUrl,
       method: 'POST',
       data: filledAdmitInfo,
       success: (res) => {
+        console.log(res)
         var responseData = res.data
-        var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_expierence_guarantee_cash_' + responseData.expierence_list_id
-        this.setData({currentExpierenceId: responseData.expierence_list_id, wxaCodeUrl: wxaCodeUrl})
+        var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + responseData.order.payments[0].id
+        //this.setData({currentExpierenceId: responseData.expierence_list_id, wxaCodeUrl: wxaCodeUrl})
+        this.setData({currentExpierenceId: responseData.id, wxaCodeUrl: wxaCodeUrl})
         var intervalId = setInterval(() => {
           var getInfoUrl = 'https://' + app.globalData.domainName + '/api/expierence_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)+'&id='+responseData.expierence_list_id
           wx.request({

@@ -15,16 +15,16 @@ Page({
   onLoad: function (options) {
     var that = this
     app.loginPromiseNew.then(function (resolve) {
-      var getListUrl = 'https://' + app.globalData.domainName + '/api/expierence_list_get_action_list.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      var getListUrl = 'https://' + app.globalData.domainName + '/core/Experience/GetExperiencesTemp?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: getListUrl,
         success: (res) => {
-          var expierenceListArr = res.data.expierence_list_arr
+          var expierenceListArr = res.data
           for(var i = 0; i < expierenceListArr.length; i++) {
             var endTime = new Date(expierenceListArr[i].end_time)
             expierenceListArr[i].endTimeStr = endTime.getFullYear().toString() + '-' + (endTime.getMonth()+1).toString() + '-' + endTime.getDate().toString() + ' ' + endTime.getHours().toString() + ':' + endTime.getMinutes().toString()
           }
-          that.setData({role: app.globalData.role, expierence_list_arr: res.data.expierence_list_arr})
+          that.setData({role: app.globalData.role, expierence_list_arr: res.data})
         }
       })
     })

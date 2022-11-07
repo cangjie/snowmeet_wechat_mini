@@ -57,12 +57,13 @@
         {
           "name": "",
           "pathName": "pages/payment/pay_hub",
-          "query": "paymentId=96",
+          "query": "paymentId=122",
           "launchMode": "default",
           "scene": null
         }
       ]
     }
   },
-  "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html"
+  "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
+  "libVersion": "2.27.1"
 }

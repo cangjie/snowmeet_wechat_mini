@@ -70,6 +70,16 @@ App({
                       success: (res) => {
                         console.log('get user detail info success')
                         console.log(res)
+                        var updateUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateUserInfo?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&encData=' + encodeURIComponent(res.encryptedData) + '&iv=' + encodeURIComponent(res.iv)
+                        wx.request({
+                          url: updateUrl,
+                          method: 'GET',
+                          success:(res)=>{
+                            console.log('user data updated', res)
+                            resolve(app.globalData)
+                          }
+                        })
+                        /*
                         if (res.userInfo != null) {
                           app.globalData.userInfo = res.userInfo
                           var gender = ''
@@ -93,6 +103,7 @@ App({
                           })
                           resolve(app.globalData)
                         }
+                        */
                       },
                       fail: (res) => {
                         console.log(res)
