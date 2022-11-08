@@ -30,6 +30,16 @@ const formatDate = date => {
   return date.getFullYear().toString() + '-' + '00'.substr(0, 2-monthStr.length) + monthStr + '-' + '00'.substr(0, 2 - dayStr.length) + dayStr
 }
 
+const formatDateString = dateString =>{
+  var dateTime = new Date(dateString)
+  var monthStr = dateTime.getMonth()<9 ? ('0' + (dateTime.getMonth() + 1).toString()):dateTime.getMonth().toString()
+  var dateStr = dateTime.getDate() < 10 ? '0' + dateTime.getDate().toString() : dateTime.getDate().toString()
+  var hourStr = dateTime.getHours() < 10 ? '0' + dateTime.getHours().toString() : dateTime.getHours().toString()
+  var minStr = dateTime.getMinutes() < 10 ? '0' + dateTime.getMinutes().toString() : dateTime.getMinutes().toString()
+  dateString = dateTime.getFullYear().toString() + '-' + monthStr + '-' + dateStr + 'T' + hourStr + ':' + minStr + ':00.000Z' 
+  return dateString
+}
+
 const formatNumber = n => {
   n = n.toString()
   return n[1] ? n : '0' + n
@@ -47,5 +57,6 @@ module.exports = {
   formatTime: formatTime,
   formatDate: formatDate,
   formatTimeStr: formatTimeStr,
-  showAmount: showAmount
+  showAmount: showAmount,
+  formatDateString: formatDateString
 }

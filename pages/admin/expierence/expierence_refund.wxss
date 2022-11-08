@@ -1,1 +1,4 @@
-/* pages/admin/expierence/expierence_refund.wxss */
+.left-column{
+  width:200rpx;
+  text-align: right;
+}

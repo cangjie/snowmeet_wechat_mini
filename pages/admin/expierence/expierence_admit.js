@@ -1,5 +1,6 @@
 // pages/admin/expierence/expierence_admit.js
 const app = getApp()
+const util = require('../../../utils/util.js')
 Page({
 
   /**
@@ -197,8 +198,11 @@ Page({
     }
   },
   submit: function(e) {
+    var that = this
     var submitUrl = 'https://' + app.globalData.domainName + '/core/Experience/PlaceOrder?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     var filledAdmitInfo = this.data.filledAdmitInfo
+    filledAdmitInfo.start_time = util.formatDateString(filledAdmitInfo.start_time)
+    filledAdmitInfo.end_time = util.formatDateString(filledAdmitInfo.end_time)
     wx.request({
       url: submitUrl,
       method: 'POST',
@@ -210,12 +214,13 @@ Page({
         //this.setData({currentExpierenceId: responseData.expierence_list_id, wxaCodeUrl: wxaCodeUrl})
         this.setData({currentExpierenceId: responseData.id, wxaCodeUrl: wxaCodeUrl})
         var intervalId = setInterval(() => {
-          var getInfoUrl = 'https://' + app.globalData.domainName + '/api/expierence_get.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)+'&id='+responseData.expierence_list_id
+          var getInfoUrl = 'https://' + app.globalData.domainName + '/core/Experience/GetExperienceTemp/' + responseData.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
           wx.request({
             url: getInfoUrl,
             success: (res) => {
-              if (res.data.status == 0 && res.data.count > 0) {
-                if (res.data.expierence_list_arr[0].guarantee_order_id > 0 && res.data.expierence_list_arr[0].pay_state == 1) {
+              if (res.statusCode == 200) {
+                var exp = res.data
+                if (exp.order != null && exp.order.payments != null && exp.order.payments.length > 0 && exp.order.payments[0].status == '支付成功') {
                   clearInterval(intervalId)
                   this.setData({paid: true})
                 }

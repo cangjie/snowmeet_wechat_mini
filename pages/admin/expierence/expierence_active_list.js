@@ -81,7 +81,7 @@ Page({
   gotoRefund: function(e) {
     var id = e.currentTarget.id
     wx.navigateTo({
-      url: ' expierence_refund?id=' + id
+      url: 'expierence_refund?id=' + id
     })
   }
 })
