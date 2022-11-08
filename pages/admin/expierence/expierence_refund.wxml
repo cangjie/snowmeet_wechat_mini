@@ -33,6 +33,12 @@
   </mp-cell>
   <mp-cell>
     <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
+        <view class="left-column" >押金：</view>
+        <view><input id="refund_amount" style="width:100rpx" bindinput="changeInput" value="{{expierence_info.guarantee_cash}}" /></view>
+      </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >退款金额：</view>
         <view><input id="refund_amount" style="width:100rpx" bindinput="changeInput" value="{{refundAmount}}" /></view>
       </view>
