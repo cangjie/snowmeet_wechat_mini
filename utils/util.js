@@ -52,11 +52,20 @@ const showAmount = n => {
   return '¥' + amountStrArr[0] + '.' + (amountStrArr.length == 2 ? (amountStrArr[1].length == 1 ? amountStrArr[1] + '0' : amountStrArr[1] ) : '00' )
 
 }
+const exists = n => {
+  if (n != null && n != undefined){
+    return isNaN(n)
+  }
+  else{
+    return false
+  }
+}
 
 module.exports = {
   formatTime: formatTime,
   formatDate: formatDate,
   formatTimeStr: formatTimeStr,
   showAmount: showAmount,
-  formatDateString: formatDateString
+  formatDateString: formatDateString,
+  exists: exists
 }

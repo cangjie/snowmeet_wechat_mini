@@ -1,3 +1,5 @@
+const util = require("../../../utils/util")
+
 // pages/admin/expierence/ expierence_refund.js
 const app = getApp()
 Page({
@@ -114,7 +116,7 @@ Page({
   submit: function(e) {
     var that = this
     var refundPromise = new Promise(function(resolve) {
-      var refundUrl = 'https://' + app.globalData.domainName + '/api/expierence_refund.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&amount=' + that.data.refundAmount.toString() + '&id=' + that.data.id + '&memo=' + encodeURIComponent(that.data.memo)
+      var refundUrl = 'https://' + app.globalData.domainName + '/core/experience/refund/' + that.data.id + '?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&amount=' + that.data.refundAmount.toString() + '&memo=' + encodeURIComponent(that.data.memo)
       wx.request({
         url: refundUrl,
         success: (res) => {
@@ -123,8 +125,15 @@ Page({
       })
     })
     refundPromise.then(function(resolve){
-      if (resolve.status == 0) {
-        if (resolve.refund_status == 1){
+      if (util.exists(resolve.order) && util.exists(resolve.order.refunds)) {
+        var refund = false
+        for(var i = 0; i < resolve.order.refunds.length; i++){
+          if (resolve.order.refunds[i].state == 1){
+            refund = true
+            break
+          }
+        }
+        if (refund){
           that.setData({refund: true, message: '退款成功'})
 
         }
@@ -132,6 +141,7 @@ Page({
           that.setData({refund: true, message: '退款失败'})
         }
       }
+      /*
       else {
         //that.setData({refund: true, message: resolve.error_message})
         var getNewUrl = 'https://' + app.globalData.domainName + '/core/Experience/GetExperience/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -163,6 +173,7 @@ Page({
           }
         })
       }
+      */
     })
   }
 })

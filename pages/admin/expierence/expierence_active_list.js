@@ -1,5 +1,6 @@
 // pages/admin/expierence/expierence_active_list.js
 const app = getApp()
+const util = require('../../../utils/util.js')
 Page({
 
   /**
@@ -21,8 +22,24 @@ Page({
         success: (res) => {
           var expierenceListArr = res.data
           for(var i = 0; i < expierenceListArr.length; i++) {
-            var endTime = new Date(expierenceListArr[i].end_time)
-            expierenceListArr[i].endTimeStr = endTime.getFullYear().toString() + '-' + (endTime.getMonth()+1).toString() + '-' + endTime.getDate().toString() + ' ' + endTime.getHours().toString() + ':' + endTime.getMinutes().toString()
+            var refund = false
+            var exp = expierenceListArr[i]
+            if (util.exists(exp) && util.exists(exp.order) && util.exists(exp.order.refunds)){
+              for(var i = 0; i < exp.order.refunds.length; i++){
+                if (exp.order.refunds[i].state == 1){
+                  refund = true
+                  break
+                }
+              }
+            }
+            if (refund){
+              expierenceListArr.splice(i, 1)
+              i--
+            }
+            else {
+              var endTime = new Date(expierenceListArr[i].end_time)
+              expierenceListArr[i].endTimeStr = endTime.getFullYear().toString() + '-' + (endTime.getMonth()+1).toString() + '-' + endTime.getDate().toString() + ' ' + endTime.getHours().toString() + ':' + endTime.getMinutes().toString()
+            }
           }
           that.setData({role: app.globalData.role, expierence_list_arr: res.data})
         }
