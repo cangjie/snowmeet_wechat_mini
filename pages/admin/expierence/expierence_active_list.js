@@ -25,8 +25,8 @@ Page({
             var refund = false
             var exp = expierenceListArr[i]
             if (util.exists(exp) && util.exists(exp.order) && util.exists(exp.order.refunds)){
-              for(var i = 0; i < exp.order.refunds.length; i++){
-                if (exp.order.refunds[i].state == 1){
+              for(var j = 0; j < exp.order.refunds.length; j++){
+                if (exp.order.refunds[j].state == 1){
                   refund = true
                   break
                 }

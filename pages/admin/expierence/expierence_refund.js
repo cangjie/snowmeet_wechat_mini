@@ -128,7 +128,7 @@ Page({
       if (util.exists(resolve.order) && util.exists(resolve.order.refunds)) {
         var refund = false
         for(var i = 0; i < resolve.order.refunds.length; i++){
-          if (resolve.order.refunds[i].state == 1){
+          if (util.exists(resolve.order.refunds[i].refund_id) && resolve.order.refunds[i].refund_id != ''){
             refund = true
             break
           }

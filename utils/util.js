@@ -54,7 +54,7 @@ const showAmount = n => {
 }
 const exists = n => {
   if (n != null && n != undefined){
-    return isNaN(n)
+    return true
   }
   else{
     return false
