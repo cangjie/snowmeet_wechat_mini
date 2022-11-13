@@ -67,7 +67,8 @@
     "pages/shop_sale/order_info",
     "pages/payment/pay_hub",
     "pages/maintain/maintain_info",
-    "pages/experience/pay_temp"
+    "pages/experience/pay_temp",
+    "pages/admin/maintain/print_label"
   ],
   "window": {
     "backgroundTextStyle": "light",

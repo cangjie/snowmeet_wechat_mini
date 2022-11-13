@@ -366,6 +366,12 @@ Page({
     this.logStep('安全检查')
     this.getCurrentStep()
   },
+  gotoPrint(){
+    var that = this
+    wx.navigateTo({
+      url: 'print_label?id=' + that.data.task.id,
+    })
+  },
   logStep(stepName){
     var that = this
     var startSafeCheck = 'https://' + app.globalData.domainName + '/core/MaintainLogs/StartStep/' + that.data.task.id + '?stepName=' + encodeURIComponent(stepName) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)

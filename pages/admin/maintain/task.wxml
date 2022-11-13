@@ -2,7 +2,7 @@
   <mp-cell>
     <view class="view-table-scale" >
       <view class="left-column" >姓名：</view>
-      <view class="right-column" >{{task.confirmed_name}}{{task.confirmed_gender=='男'?'先生':''}}{{task.confirmed_gender=='女'?'先生':''}}</view>
+      <view class="right-column" >{{task.confirmed_name}}{{task.confirmed_gender=='男'?'先生':''}}{{task.confirmed_gender=='女'?'女士':''}}</view>
       <view class="left-column" >电话：</view>
       <view class="right-column" >{{task.confirmed_cell}}</view>
     </view>
@@ -82,6 +82,9 @@
     <mp-gallery show="{{showGallery}}" showDelete="{{false}}" imgUrls="{{task.images}}" current="{{galleryIndex}}"  ></mp-gallery>
   </mp-cell>
   <mp-cell><button bindtap="updateTask"> 保 存 修 改 </button></mp-cell>
+  <mp-cell>
+    <button bindtap="gotoPrint" > 打 印 标 签 </button>
+  </mp-cell>
 </mp-cells>
 
 <mp-cells title="安全检查信息" >
@@ -119,6 +122,7 @@
   <mp-cell>
     <button disabled="{{!(currentStep == '安全检查' && stepSafe == undefined)}}" bindtap="safeCheck" > 确 认 安 全 </button>
   </mp-cell>
+  
 </mp-cells>
 
 <mp-cells title="修刃" wx:if="{{task.confirmed_edge == 1}}" >
