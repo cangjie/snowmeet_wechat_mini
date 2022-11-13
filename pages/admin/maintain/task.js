@@ -17,7 +17,8 @@ Page({
     unWaxMemo: '',
     moreMemo: '',
     finish: false,
-    isClosed: false
+    isClosed: false,
+    currentStep: "安全检查"
   },
 
   /**
@@ -38,7 +39,7 @@ Page({
         success:(res)=>{
           console.log('task info', res)
           var task = res.data
-         
+          
 
           task.images = []
           var idDiff = that.data.idDiff
@@ -83,85 +84,10 @@ Page({
                   serialSelectedIndex = i
                 }
               }
-              var getStepsUrl = 'https://' + app.globalData.domainName + '/core/MaintainLogs/GetStepsByStaff/' + task.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-              wx.request({
-                url: getStepsUrl,
-                method: 'GET',
-                success:(res)=>{
-                  console.log('steps', res)
-                  var stepSafe = undefined
-                  var stepEdge = undefined
-                  var stepWax = undefined
-                  var stepMore = undefined
-                  var stepUnWax = undefined
-                  for(var i = 0; i < res.data.length; i++){
-                    switch(res.data[i].step_name){
-                      case '安全检查':
-                        stepSafe = res.data[i]
-                        break
-                      case '修刃':
-                        stepEdge = res.data[i]
-                        var start = new Date(stepEdge.start_time)
-                        var end = new Date(stepEdge.end_time)
-                        if (start!=undefined){
-                          stepEdge.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
-                        }
-                        else{
-                          stepEdge.start_time_str = ''
-                        }
-                        if (end!=undefined && end.getFullYear() > 1970){
-                          stepEdge.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
-                        }
-                        else{
-                          stepEdge.end_time_str = ''
-                        }
-                        break
-                      case '打蜡':
-                        stepWax = res.data[i]
-                        var start = new Date(stepWax.start_time)
-                        var end = new Date(stepWax.end_time)
-                        if (start!=undefined){
-                          stepWax.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
-                        }
-                        else{
-                          stepWax.start_time_str = ''
-                        }
-                        if (end!=undefined && end.getFullYear() > 1970){
-                          stepWax.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
-                        }
-                        else{
-                          stepWax.end_time_str = ''
-                        }
-                        break
-                      case '刮蜡':
-                        stepUnWax = res.data[i]
-                        var start = new Date(stepUnWax.start_time)
-                        var end = new Date(stepUnWax.end_time)
-                        if (start!=undefined){
-                          stepUnWax.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
-                        }
-                        else{
-                          stepUnWax.start_time_str = ''
-                        }
-                        if (end!=undefined && end.getFullYear() > 1970){
-                          stepUnWax.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
-                        }
-                        else{
-                          stepUnWax.end_time_str = ''
-                        }
-                        break
-                      default:
-                        stepMore = res.data[i]
-                        break
-                    }
-                  }
-                  that.setData({stepEdge: stepEdge, stepWax: stepWax, stepUnWax: stepUnWax, stepMore: stepMore})
-
-
-                  that.getStatus()
-                }
-              })
+         
               that.setData({task: task, serialList: serialList, serialSelectedIndex: serialSelectedIndex, yearListSelectedIndex: yearIndex, idDiff: idDiff})
+              that.getCurrentStep()
+              
             }
           })
           
@@ -169,6 +95,154 @@ Page({
       })
     })
   },
+
+
+  getCurrentStep(){
+    var that = this
+    var getStepsUrl = 'https://' + app.globalData.domainName + '/core/MaintainLogs/GetStepsByStaff/' + that.data.task.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getStepsUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('steps', res)
+        var currentStep = '安全检查'
+        var stepSafe = undefined
+        var stepEdge = undefined
+        var stepWax = undefined
+        var stepMore = undefined
+        var stepUnWax = undefined
+        for(var i = 0; i < res.data.length; i++){
+          switch(res.data[i].step_name){
+            case '安全检查':
+              stepSafe = res.data[i]
+              break
+            case '修刃':
+              stepEdge = res.data[i]
+              var start = new Date(stepEdge.start_time)
+              var end = new Date(stepEdge.end_time)
+              if (start!=undefined){
+                stepEdge.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
+              }
+              else{
+                stepEdge.start_time_str = ''
+              }
+              if (end!=undefined && end.getFullYear() > 1970){
+                stepEdge.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
+              }
+              else{
+                stepEdge.end_time_str = ''
+              }
+              break
+            case '打蜡':
+              stepWax = res.data[i]
+              var start = new Date(stepWax.start_time)
+              var end = new Date(stepWax.end_time)
+              if (start!=undefined){
+                stepWax.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
+              }
+              else{
+                stepWax.start_time_str = ''
+              }
+              if (end!=undefined && end.getFullYear() > 1970){
+                stepWax.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
+              }
+              else{
+                stepWax.end_time_str = ''
+              }
+              break
+            case '刮蜡':
+              stepUnWax = res.data[i]
+              var start = new Date(stepUnWax.start_time)
+              var end = new Date(stepUnWax.end_time)
+              if (start!=undefined){
+                stepUnWax.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
+              }
+              else{
+                stepUnWax.start_time_str = ''
+              }
+              if (end!=undefined && end.getFullYear() > 1970){
+                stepUnWax.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
+              }
+              else{
+                stepUnWax.end_time_str = ''
+              }
+              break
+            
+            default:
+              stepMore = res.data[i]
+              var start = new Date(stepMore.start_time)
+              var end = new Date(stepMore.end_time)
+              if (start!=undefined){
+                stepMore.start_time_str = util.formatDate(start) + ' ' + util.formatTimeStr(start)
+              }
+              else{
+                stepMore.start_time_str = ''
+              }
+              if (end!=undefined && end.getFullYear() > 1970){
+                stepMore.end_time_str = util.formatDate(end) + ' ' + util.formatTimeStr(end)
+              }
+              else{
+                stepMore.end_time_str = ''
+              }
+              break
+          }
+        }
+        var task = that.data.task
+        switch(currentStep){
+          case '安全检查':
+            if (stepSafe!=undefined){
+              if (task.confirmed_edge == 1){
+                currentStep = '修刃'
+              }
+              else if (task.confirmed_more != undefined && task.confirmed_more != ''){
+                currentStep = '维修'
+              }
+              else if (task.confirmed_candle == 1){
+                currentStep = '打蜡'
+              }
+              else {
+                currentStep  = '完成'
+              }
+            }
+          case '修刃':
+            if (currentStep == '修刃' && stepEdge != undefined && stepEdge.end_time_str !=''){
+              if (task.confirmed_more != undefined && task.confirmed_more != ''){
+                currentStep = '维修'
+              }
+              else if (task.confirmed_candle == 1){
+                currentStep = '打蜡'
+              }
+              else {
+                currentStep  = '完成'
+              }
+            }
+          case '维修':
+            if (currentStep == '维修' && stepMore != undefined &&  stepMore.end_time_str != ''){
+              if (task.confirmed_candle == 1){
+                currentStep = '打蜡'
+              }
+              else {
+                currentStep  = '完成'
+              }
+            }
+          case '打蜡':
+            if (currentStep == '打蜡' &&  stepWax != undefined && stepWax.end_time_str != ''){
+              currentStep = '刮蜡'
+            }
+          case '刮蜡':
+            if (currentStep == '刮蜡' && stepUnWax!=undefined && stepUnWax.end_time_str != ''){
+              currentStep  = '完成'
+            }
+          default:
+            break
+        }
+        that.setData({currentStep: currentStep, stepSafe: stepSafe, stepEdge: stepEdge, stepMore: stepMore, stepWax: stepWax, stepUnWax: stepUnWax})
+
+      }
+    })
+
+  },
+
   showGallery(e){
     var id = e.currentTarget.id
     var that = this
@@ -282,7 +356,7 @@ Page({
           title: '保存成功',
           icon: 'none',
           complete:(e)=>{
-            that.getStatus()
+            //that.getStatus()
           }
         })
       }
@@ -290,6 +364,7 @@ Page({
   },
   safeCheck(){
     this.logStep('安全检查')
+    this.getCurrentStep()
   },
   logStep(stepName){
     var that = this
@@ -300,7 +375,8 @@ Page({
       success:(res)=>{
         var stepSafe = res.data
         if (stepSafe.id > 0){
-          var endSafeCheck = 'https://' + app.globalData.domainName + '/core/MaintainLogs/EndStep/' + stepSafe.id + '?memo=' + encodeURIComponent(that.data.safeMemo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          var memo = that.data.safeMemo == undefined? '': that.data.safeMemo
+          var endSafeCheck = 'https://' + app.globalData.domainName + '/core/MaintainLogs/EndStep/' + stepSafe.id + '?memo=' + encodeURIComponent(memo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
           wx.request({
             url: endSafeCheck,
             method: 'GET',
@@ -311,7 +387,7 @@ Page({
                 title: stepName+'完成',
                 icon: 'none',
                 complete:()=>{
-                  that.getStatus()
+                  //that.getStatus()
                 }
                 
               })
@@ -373,6 +449,7 @@ Page({
             break
         }
         //that.setData({stepEdge: res.data})
+        that.getCurrentStep()
 
       }
     })
@@ -431,12 +508,14 @@ Page({
             that.setData({stepMore: ret})
             break
         }
-        that.getStatus()
+        //that.getStatus()
+        that.getCurrentStep()
       }
     })
 
   },
 
+  /*
   getStatus(){
     var status = '未开始'
     var that = this
@@ -475,7 +554,7 @@ Page({
     }
     that.setData({status: status, finish: finish})
   },
-
+*/
   /**
    * Lifecycle function--Called when page is initially rendered
    */
