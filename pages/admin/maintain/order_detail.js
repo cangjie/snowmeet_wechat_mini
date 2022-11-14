@@ -31,6 +31,10 @@ Page({
             if (order.order.pay_method == '微信支付'){
               qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + order.order.payments[0].id)
             }
+            order.order.order_price_str = util.showAmount(order.order.order_price)
+            order.order.other_discount_str = util.showAmount(order.order.other_discount)
+            order.order.ticket_amount_str = util.showAmount(order.order.ticket_amount)
+            order.order.final_price_str = util.showAmount(order.order.final_price)
             that.setData({order: order, tasks: order.items, qrCodeUrl: qrCodeUrl})
           }
         },
