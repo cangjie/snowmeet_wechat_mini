@@ -513,7 +513,12 @@ Page({
         if (res.data.orderId == 0){ 
           wx.showToast({
             title: '无需付款，任务已添加。',
-            icon: 'none'
+            icon: 'none',
+            success:(res)=>{
+              wx.navigateTo({
+                url: 'task_list',
+              })
+            }
           })
         }
         else{
