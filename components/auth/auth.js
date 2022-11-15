@@ -71,7 +71,7 @@ function init(app, that) {
         success: res => {
           if (res.authSetting['scope.userInfo']) {
             wx.getUserInfo({
-              success: res => {
+              success: (res) => {
                 var gender = ''
                 switch(res.userInfo.gender) {
                   case 1:
@@ -84,6 +84,7 @@ function init(app, that) {
                     break
                 }
                 app.globalData.userInfo = res.userInfo
+                console.log('auth mini user update', res)
                 var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(res.userInfo.nickName) + '&headimage=' + encodeURIComponent(res.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
                 wx.request({
                   url: updateUrl
