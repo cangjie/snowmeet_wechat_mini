@@ -50,10 +50,11 @@ Page({
     wx.request({
       url: checkScanUrl,
       success:(res)=>{
-        if (res.statusCode != '200'){
+        if (res.statusCode != 200 && res.statusCode != 404){
           clearInterval(that.data.interVal)
         }
-        else{
+        else if (res.statusCode == 200){
+          clearInterval(that.data.interVal)
           var scan = res.data
           var needJump = false
           if (scan.scan ==1){
@@ -73,7 +74,7 @@ Page({
             if (needJump){
               clearInterval(that.data.interVal)
               var jumpUrl = 'shop_sale?openid=' + res.data.miniAppUser.open_id + (that.data.mi7OrderStr!=''? '&mi7OrderStr=' + that.data.mi7OrderStr: '')
-              wx.navigateTo({
+              wx.redirectTo({
                 url: jumpUrl,
               })
             }
