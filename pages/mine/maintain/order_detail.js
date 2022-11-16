@@ -71,6 +71,10 @@ Page({
             if (options.paymentId!=undefined && order.order.pay_method == '微信支付' && order.order.payments != null && order.order.payments[0].status == '待支付'){
               needPay = true
             }
+            order.order.order_price_str = util.showAmount(order.order.order_price)
+            order.order.ticket_amount_str = util.showAmount(order.order.ticket_amount)
+            order.order.ticket_amount_str = util.showAmount(order.order.ticket_amount)
+            order.order.final_price_str = util.showAmount(order.order.final_price)
             that.setData({order: order, needPay: needPay, paymentId: options.paymentId})
           }
         }
