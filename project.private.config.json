@@ -2,7 +2,18 @@
   "setting": {
     "preloadBackgroundData": false
   },
+  "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
+  "libVersion": "2.27.1",
   "condition": {
+    "plugin": {
+      "list": []
+    },
+    "game": {
+      "list": []
+    },
+    "gamePlugin": {
+      "list": []
+    },
     "miniprogram": {
       "list": [
         {
@@ -51,19 +62,15 @@
           "name": "shop landing",
           "pathName": "/pages/shop_sale/shop_landing",
           "query": "q=https%3A%2F%2Fmini.snowmeet.top%2Fmapp%2Fsale_entry%3Fid%3D123&scancode_time=1658128984",
-          "launchMode": "default",
           "scene": 1011
         },
         {
           "name": "pay",
           "pathName": "pages/payment/pay_hub",
-          "query": "paymentId=136",
-          "launchMode": "default",
+          "query": "paymentId=906",
           "scene": null
         }
       ]
     }
-  },
-  "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
-  "libVersion": "2.27.1"
+  }
 }

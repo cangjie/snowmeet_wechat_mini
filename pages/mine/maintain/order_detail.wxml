@@ -13,19 +13,19 @@
   </view>
   <view style="display: flex;flex-direction: row;">
     <view class="left-column" >总金额：</view>
-    <view class="right-column" >¥{{order.order.order_price}}</view>
+    <view class="right-column" >{{order.order.order_price_str}}</view>
     <view class="left-column" >优惠券：</view>
     <view class="right-column" >{{(order.order.ticket_code != '')?order.ticket.name+'('+order.ticket.code+')':'未使用'}}</view>
   </view>
   <view style="display: flex;flex-direction: row;">
     <view class="left-column" >优惠金额：</view>
-    <view class="right-column" >¥{{order.order.ticket_amount}}</view>
+    <view class="right-column" >{{order.order.ticket_amount_str}}</view>
     <view class="left-column" >额外减免：</view>
-    <view class="right-column" >¥{{order.order.other_discount}}</view>
+    <view class="right-column" >{{order.order.other_discount_str}}</view>
   </view>
   <view style="display: flex;flex-direction: row;">
     <view class="left-column" >应付：</view>
-    <view class="right-column" >¥{{order.order.final_price}}</view>
+    <view class="right-column" >{{order.order.final_price_str}}</view>
     <view class="left-column" >支付方式：</view>
     <view class="right-column" >{{order.order.pay_method}}</view>
   </view>
