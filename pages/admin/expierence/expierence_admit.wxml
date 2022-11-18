@@ -1,32 +1,7 @@
 <block wx:if="{{role=='staff'}}" >
   <view wx:if="{{currentExpierenceId==0}}">
-    <mp-cells title="当前店铺" >
-    <mp-cell>
-      <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
-        <view class="left-column" >店铺：</view>
-        <view>
-          <radio-group id="shopName" bindchange="changeInfo" >
-
-            <radio wx:if="{{filledAdmitInfo.shop=='八易'}}" checked="true" value="八易" >八易</radio>
-            <radio wx:else  value="八易" >八易</radio> 
-
-            <radio wx:if="{{filledAdmitInfo.shop=='南山'}}" checked="true" value="南山" >南山</radio>
-            <radio wx:else  value="南山" >南山</radio> 
-
-            <radio wx:if="{{filledAdmitInfo.shop=='万龙'}}" checked="true" value="万龙" >万龙</radio>
-            <radio wx:else value="万龙" >万龙</radio> 
-
-            <radio wx:if="{{filledAdmitInfo.shop=='渔阳'}}" checked="true" value="渔阳" >渔阳</radio>
-            <radio wx:else value="渔阳" >渔阳</radio> 
-
-            <radio wx:if="{{filledAdmitInfo.shop=='怀北'}}" checked="true" value="怀北" >怀北</radio>
-            <radio wx:else value="怀北" >怀北</radio> 
-
-          </radio-group>
-        </view>
-      </view>
-    </mp-cell>
-    </mp-cells>
+ 
+    <shop-selector bindShopSelected="shopSelected" ></shop-selector>
     <mp-cells title="确认需要体验的装备信息" >
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
