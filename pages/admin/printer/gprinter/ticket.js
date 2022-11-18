@@ -26,7 +26,7 @@ Page({
         return
       }
       that.setData({tickets: JSON.parse(options.tickets)})
-      //that.drawTickets()
+      that.drawTickets()
       console.log('Get tickets:', that.data.tickets)
       var msg = that.data.msg
       msg.push('获取到' + that.data.tickets.length + '张优惠券。')
@@ -219,8 +219,10 @@ Page({
       var context = wx.createCanvasContext('img', this)
       context.fillStyle = '#FFFFFF'
       context.fillRect(0,0,570,380)
-      var qrCodeUrl = 'https://' + app.globalData.domainName + '/show_image.aspx?img='  
-      + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + ticket.code)
+      //var qrCodeUrl = 'https://' + app.globalData.domainName + '/show_image.aspx?img='  
+      //+ encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + ticket.code)
+      //var qrCodeUrl = 'http://weixin.snowmeet.top/show_static_scene_qrcode.aspx?scene=' + encodeURIComponent/////('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + ticket.code)
+      var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_static_scene_qrcode.aspx?scene=oper_ticket_code_' + ticket.code)
       wx.getImageInfo({
         src: qrCodeUrl,
         success:(res)=>{
