@@ -115,6 +115,12 @@ Page({
   onShareAppMessage: function () {
 
   },
+  shopSelected(e){
+    var that = this
+    var info = that.data.filledAdmitInfo
+    info.shop = e.detail.shop
+    that.setData({filledAdmitInfo: info})
+  },
   changeInfo: function(e) {
     var value = e.detail.value
     switch(e.currentTarget.id) {
