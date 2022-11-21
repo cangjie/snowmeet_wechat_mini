@@ -68,7 +68,8 @@
     "pages/payment/pay_hub",
     "pages/maintain/maintain_info",
     "pages/experience/pay_temp",
-    "pages/admin/maintain/print_label"
+    "pages/admin/maintain/print_label",
+    "pages/tickets/ticket_seletor"
   ],
   "window": {
     "backgroundTextStyle": "light",

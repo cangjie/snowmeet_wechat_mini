@@ -60,6 +60,13 @@
           "pathName": "pages/payment/pay_hub",
           "query": "paymentId=906",
           "scene": null
+        },
+        {
+          "name": "ticket_selector",
+          "pathName": "pages/tickets/ticket_seletor",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "mp-tabs": "/components/tabs/index"
+  },
+  "navigationBarTitleText": "雪票预定"
+}
