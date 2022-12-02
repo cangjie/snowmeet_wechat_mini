@@ -34,37 +34,18 @@ Page({
       that.setData({role: app.globalData.role})
     })
     var nowTime = new Date()
-    var startTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
+    //var startTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
+    //nowTime.setHours(nowTime.getHours()+2)
+    var startTimeStr = util.formatDate(nowTime) + ' ' + util.formatTimeStr(nowTime)
     nowTime.setHours(nowTime.getHours()+2)
-    var endTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
+
+    //var endTimeStr = nowTime.getFullYear().toString() + '-' + (nowTime.getMonth() + 1).toString() + '-' + nowTime.getDate().toString() + ' ' + nowTime.getHours().toString() + ':' + nowTime.getMinutes().toString()
+    var endTimeStr = util.formatDate(nowTime) + ' ' + util.formatTimeStr(nowTime)
     var filledAdmitInfo = this.data.filledAdmitInfo
     filledAdmitInfo.start_time = startTimeStr
     filledAdmitInfo.end_time = endTimeStr
     this.setData({filledAdmitInfo: filledAdmitInfo})
     
-    wx.getFuzzyLocation({
-      type: 'wgs84',
-      success:(res)=>{
-        var latitude = res.latitude
-        var longitude = res.longitude
-        if (longitude < 116.1){
-          filledAdmitInfo.shop = '万龙'
-        }
-        else if (longitude < 116.75){
-          filledAdmitInfo.shop = '怀北'
-        }
-        else if (longitude < 117 ){
-          filledAdmitInfo.shop = '南山'
-        }
-        else{
-          filledAdmitInfo.shop = '渔阳'
-        }
-        that.setData({filledAdmitInfo: filledAdmitInfo})
-      },
-      fail:(res)=>{
-        console.log('get location', res)
-      }
-    })
   },
 
   /**

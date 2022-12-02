@@ -58,7 +58,8 @@
         {
           "name": "pay",
           "pathName": "pages/payment/pay_hub",
-          "query": "paymentId=906",
+          "query": "paymentId=1109",
+          "launchMode": "default",
           "scene": null
         },
         {

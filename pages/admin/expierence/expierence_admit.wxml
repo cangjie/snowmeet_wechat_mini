@@ -12,7 +12,7 @@
     <mp-cell>
       <view class="flex-wrp" style="flex-direction:row;margin-top:0rpx" >
         <view class="left-column" >尺寸：</view>
-        <view><input id="scale" maxlength="3" type="number" style="width:50rpx" bindchange="changeInfo" /></view>
+        <view><input id="scale" maxlength="3" type="number" style="width:100rpx" bindchange="changeInfo" /></view>
       </view>
     </mp-cell>
     <mp-cell>

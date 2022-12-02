@@ -13,9 +13,12 @@ const formatTime = date => {
 
 const formatTimeStr = date => {
 
+  /*
   const year = date.getFullYear()
   const month = date.getMonth() + 1
   const day = date.getDate()
+  */
+
   const hour = date.getHours()
   const minute = date.getMinutes()
   const second = date.getSeconds()
@@ -31,6 +34,7 @@ const formatDate = date => {
 }
 
 const formatDateString = dateString =>{
+  //dateString = dateString.replace(' ', 'T')
   var dateTime = new Date(dateString)
   var monthStr = dateTime.getMonth()<9 ? ('0' + (dateTime.getMonth() + 1).toString()):(dateTime.getMonth() + 1).toString()
   var dateStr = dateTime.getDate() < 10 ? '0' + dateTime.getDate().toString() : dateTime.getDate().toString()

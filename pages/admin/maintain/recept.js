@@ -527,7 +527,7 @@ Page({
             title: '订单已生成，请顾客确认。',
             icon: 'none',
             success:(res)=>{
-              wx.redirectTo({
+              wx.navigateTo({
                 url: 'order_detail?orderId=' + orderId,
               })
             }
