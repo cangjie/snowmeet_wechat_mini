@@ -1,1 +1,5 @@
-<auth wx:if="{{needAuth}}" validType="cell" bindUpdateSuccess="jump"  ></auth>
+<mp-dialog title="需要您提供手机号" show="{{needAuth}}" >
+  <view>
+    <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" > 授 权 </button>
+  </view>
+</mp-dialog>

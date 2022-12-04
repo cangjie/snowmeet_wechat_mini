@@ -21,7 +21,13 @@ Page({
       that.setData({orderId: options.orderId})
     }
     app.loginPromiseNew.then(function(resolve){
-      that.setData({needAuth: true})
+      if (app.globalData.cellNumber != undefined && app.globalData.cellNumber != null && app.globalData.cellNumber.length == 11){
+        that.setData({needAuth: false})
+        that.jump()
+      }
+      else{
+        that.setData({needAuth: true})
+      }
     })
   },
 
@@ -83,6 +89,27 @@ Page({
         }
       }
     })
+  },
+
+  getPhoneNumber: function(res) {
+    var that = this
+    if(res.detail.errMsg=='getPhoneNumber:ok')
+    {
+      var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateUserInfo?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&encData='+encodeURIComponent(res.detail.encryptedData)+'&iv='+encodeURIComponent(res.detail.iv)
+      wx.request({
+        url: url,
+        method: 'GET',
+        success: res => {
+         // this.setData({show: false})
+          app.globalData.cellNumber = res.data.phoneNumber
+          //console.log('Auth UpdateSuccess', res)
+          console.log('auth success')
+          that.setData({needAuth: false})
+          that.jump()
+          //this.triggerEvent("UpdateSuccess", {})
+        }
+      })
+    }
   },
 
   /**
