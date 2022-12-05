@@ -100,6 +100,7 @@ Page({
         url: url,
         method: 'GET',
         success: res => {
+          
          // this.setData({show: false})
           app.globalData.cellNumber = res.data.phoneNumber
           //console.log('Auth UpdateSuccess', res)
