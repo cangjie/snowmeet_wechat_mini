@@ -175,6 +175,15 @@ Page({
               timeStamp: res.data.timeStamp,
               signType: 'MD5',
               success:(res)=>{
+                wx.showToast({
+                  title: '支付成功。',
+                  icon: 'success',
+                  success:()=>{
+                    wx.redirectTo({
+                      url: '../mine/my_ski_pass/my_ski_pass',
+                    })
+                  }
+                })
               }
             })
           }
