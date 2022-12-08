@@ -76,7 +76,7 @@ Page({
 
   },
   tabSwitch: function(e) {
-    wx.navigateTo({
+    wx.redirectTo({
       url: e.detail.item.pagePath
     })
   },

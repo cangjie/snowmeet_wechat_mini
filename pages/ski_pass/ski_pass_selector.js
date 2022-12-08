@@ -12,7 +12,8 @@ Page({
     reserveDate: util.formatDate(new Date()),
     productList: [],
     desc: '<p style="color:red" >test</p>',
-    skiPassDescNanashanRent: util.skiPassDescNanashanRent
+    skiPassDescNanashanRent: util.skiPassDescNanashanRent,
+    nowTime: util.formatTimeStr(new Date())
   },
 
   /**
@@ -95,6 +96,10 @@ Page({
         var productList = res.data
         for(var i = 0; i < productList.length; i++){
           var prod = productList[i]
+          if (prod.end_sale_time <= that.data.nowTime  && util.formatDate(new Date()) == util.formatDate(new Date(that.data.reserveDate))){
+            productList.pop(prod)
+            i--
+          }
           if (prod.name.indexOf('租')>=0){
             prod.desc = util.skiPassDescNanashanRent
           }
@@ -113,6 +118,11 @@ Page({
     var id = e.currentTarget.id
     wx.navigateTo({
       url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate,
+    })
+  },
+  tabSwitch: function(e) {
+    wx.redirectTo({
+      url: e.detail.item.pagePath
     })
   },
   /**

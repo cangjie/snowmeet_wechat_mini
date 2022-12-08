@@ -184,7 +184,11 @@ Page({
     //console.log(submitUrl)
 
   },
-
+  tabSwitch: function(e) {
+    wx.redirectTo({
+      url: e.detail.item.pagePath
+    })
+  },
   /**
    * Lifecycle function--Called when page is initially rendered
    */
