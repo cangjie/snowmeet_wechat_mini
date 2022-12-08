@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "auth": "../../components/auth/auth",
+    "mp-tabbar": "weui-miniprogram/tabbar/tabbar"
+  },
+  "navigationBarTitleText": "雪票预定"
+}

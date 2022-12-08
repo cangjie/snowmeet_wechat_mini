@@ -69,7 +69,9 @@
     "pages/maintain/maintain_info",
     "pages/experience/pay_temp",
     "pages/admin/maintain/print_label",
-    "pages/tickets/ticket_seletor"
+    "pages/tickets/ticket_seletor",
+    "pages/ski_pass/ski_pass_selector",
+    "pages/ski_pass/ski_pass_reserve"
   ],
   "window": {
     "backgroundTextStyle": "light",

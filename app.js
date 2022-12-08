@@ -171,14 +171,14 @@ App({
         "iconPath": "/images/equip.jpg",
         "selectedIconPath": "/images/equip.jpg"
       },
-      /*
+      
       {
-        "pagePath": "/pages/skipass/skipass",
+        "pagePath": "/pages/ski_pass/ski_pass_selector",
         "text": "雪票",
         "iconPath": "/images/book-3-line.png",
         "selectedIconPath": "/images/book-3-line-hl.png"
       },
-      */
+      
       {
         "pagePath": "/pages/mine/mine",
         "text": "我的",

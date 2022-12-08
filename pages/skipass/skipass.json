@@ -1,7 +1,0 @@
-{
-  "usingComponents": {
-    "mp-tabbar": "weui-miniprogram/tabbar/tabbar",
-    "auth": "../../components/auth/auth"
-  },
-  "navigationBarTitleText": "易龙雪聚"
-}

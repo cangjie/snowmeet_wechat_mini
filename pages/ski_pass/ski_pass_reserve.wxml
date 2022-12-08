@@ -1,0 +1,42 @@
+<auth wx:if="{{needAuth}}" validType="cell" bindUpdateSuccess="AuthFinish" ></auth>
+<view>
+  <view  class="ski-pass-scale" bindtap="reserve" >
+    <view class="ski-pass-title"><b>{{item.name}}</b></view>
+    <rich-text  nodes="{{item.desc}}"   ></rich-text>
+  </view>
+  <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
+    <view class="left-column" >预定日期：</view>
+    <view class="right-column" >{{date}}</view>
+  </view>
+  <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
+    <view class="left-column" >联系电话：</view>
+    <view class="right-column" ><input id="cell" value="{{cell}}" style="width: 300rpx;" bindinput="input" /></view>
+  </view>
+  <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
+    <view class="left-column" >姓名：</view>
+    <view class="right-column" ><input id="name" value="{{name}}" placeholder="{{name.length==0?'请填写姓名':''}}" bindinput="input" /></view>
+  </view>
+  <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
+    <view class="left-column" >单价：</view>
+    <view class="right-column" >{{item.sale_price_str}}</view>
+  </view>
+  <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
+    <view class="left-column" >单价押金：</view>
+    <view class="right-column" >{{item.deposit_str}}</view>
+  </view>
+  <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
+    <view class="left-column" >数量：</view>
+    <view class="right-column" ><input type="number" value="1" id="count" bindinput="input" /></view>
+  </view>
+  <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
+    <view class="left-column" >总计：</view>
+    <view class="right-column" >{{total}}</view>
+  </view>
+  <view class="ski-pass-scale" style="border-width: 0rpx;text-align: center;margin-bottom: 0rpx;margin-top: 0rpx;" >
+    <view wx:if="{{avaliableCount >= count}}" >
+      <button bindtap="submit" > 立 即 支 付 </button>
+    </view>
+    <view wx:else > 预定数量超过当日限制 </view>
+  </view>
+</view>
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

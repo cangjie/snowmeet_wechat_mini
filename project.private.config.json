@@ -64,7 +64,7 @@
         },
         {
           "name": "ticket_selector",
-          "pathName": "pages/tickets/ticket_seletor",
+          "pathName": "pages/ski_pass/ski_pass_selector",
           "query": "",
           "launchMode": "default",
           "scene": null

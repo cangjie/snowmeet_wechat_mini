@@ -1,11 +1,2 @@
 <!--pages/skipass/fill_certificate_no.wxml-->
-<view style="text-align: center;height: 30rpx;"></view>
-<view style="text-align: center;">疫情防控，必须实名制。</view>
-<view style="text-align: center;height: 30rpx;"></view>
-<view style="text-align: center;">天津雪友，敬请绕行！</view>
-<view style="text-align: center;height: 30rpx;"></view>
-<view style="display:flex;justify-content: center;">
-  <input type="idcard" style="width: 40%;" placeholder="请如实填写身份证号码" bindinput="inputChanged" />
-</view>
-<view style="text-align: center;height: 30rpx;"></view>
-<view><button bindtap="submitCertNo"> 提 交 </button></view>
+<text>pages/skipass/fill_certificate_no.wxml</text>

@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "mp-tabbar": "weui-miniprogram/tabbar/tabbar",
+    "mp-tabs": "/components/tabs/index"
+  },
+  "navigationBarTitleText": "雪票预定"
+}

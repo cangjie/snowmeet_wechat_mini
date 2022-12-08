@@ -1,82 +1,66 @@
 // pages/skipass/skipass.js
-var wxloginModule = require('../../utils/wxlogin.js')
-const app = getApp()
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    needValidCell: true
+
   },
 
   /**
    * Lifecycle function--Called when page load
    */
-  onLoad: function (options) {
-    //wxloginModule.wxlogin()
-    //if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
-    var that = this
-    app.loginPromiseNew.then(function(resovle){
-      that.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey),  tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1})
-    })
-    //}
-    /*
-    else {
-      this.setData({sessionKey: encodeURIComponent(app.globalData.sessionKey),  tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1})
-    }
-    */
+  onLoad(options) {
+
   },
 
   /**
    * Lifecycle function--Called when page is initially rendered
    */
-  onReady: function () {
+  onReady() {
 
   },
 
   /**
    * Lifecycle function--Called when page show
    */
-  onShow: function () {
-    
+  onShow() {
+
   },
 
   /**
    * Lifecycle function--Called when page hide
    */
-  onHide: function () {
+  onHide() {
 
   },
 
   /**
    * Lifecycle function--Called when page unload
    */
-  onUnload: function () {
+  onUnload() {
 
   },
 
   /**
    * Page event handler function--Called when user drop down
    */
-  onPullDownRefresh: function () {
+  onPullDownRefresh() {
 
   },
 
   /**
    * Called when page reach bottom
    */
-  onReachBottom: function () {
+  onReachBottom() {
 
   },
 
   /**
    * Called when user click on the top right corner to share
    */
-  onShareAppMessage: function () {
+  onShareAppMessage() {
 
-  },
-  onUpdateSuccess: function() {
-    this.setData({needValidCell: false})
   }
 })

@@ -1,0 +1,48 @@
+<mp-tabs 
+  tabs="{{tabs}}" 
+  activeTab="{{activeTab}}" 
+  swiperClass="weui-tabs-swiper"
+  bindtabclick="onTabCLick"
+  bindchange="onChange"
+  activeClass="tab-bar-title__selected"
+>
+  <block wx:for="{{tabs}}" wx:key="title">
+    <view class="tab-content" slot="tab-content-{{index}}"   >
+      <view wx:if="{{item.title == '南山'}}" >
+        <view style="display: flex; flex-direction: row;" >
+          <view>选择日期：</view>
+          <picker mode="date"   start="{{startDate}}" end="{{endDate}}" bindchange="DateChanged" >
+            {{reserveDate}}
+          </picker>
+          <radio-group style="margin-left: 20rpx;" bindchange="TagsChange">
+            <radio style="margin-left: 10rpx;" value="自带板" >自带板</radio>
+            <radio style="margin-left: 10rpx;" value="租板"  >租板</radio>
+          </radio-group>
+        </view>
+        
+        <!--view style="margin-top: 10rpx;">
+          <view wx:for="{{productList}}" style="margin-top: 5rpx; margin-bottom: 5rpx;">
+            <view>{{item.name}}</view>
+          </view>
+        </view-->
+      </view>
+      <view wx:if="{{item.title == '万龙'}}" >
+        敬请期待…… 
+      </view>
+    </view>
+  </block>
+</mp-tabs>
+<view >
+  <view wx:for="{{productList}}" class="ski-pass-scale" bindtap="reserve" id="{{item.id}}" >
+    <view class="ski-pass-title"><b>{{item.name}}</b></view>
+    <view style="margin-left: 10rpx;display: flex; flex-direction: row;" >
+      <view style="width: 50%;">票价：{{item.sale_price_str}}</view> 
+      <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
+    </view>
+    
+    <rich-text  nodes="{{item.desc}}"   ></rich-text>
+    
+  </view>
+</view>
+<view style="height: 200rpx;"></view>
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
