@@ -1,0 +1,30 @@
+<!--pages/admin/sale/mod_mi7_order_no.wxml-->
+<mp-cells title="七色米订单信息" >
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;">
+      <view class="left-column" >七色米订单号：</view>
+      <view class="right-column" >{{order.mi7_order_id}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;">
+      <view class="left-column" >新订单号：</view>
+      <view class="right-column" ><input style="width: 300rpx;" bindinput="input" value="{{newOrderNum}}" /></view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;">
+      <view class="left-column" >零售价：</view>
+      <view class="right-column" >{{order.sale_price_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;">
+      <view class="left-column" >零售价：</view>
+      <view class="right-column" >{{order.real_charge_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <button bindtap="submit" > 确 认 修 改 </button>
+  </mp-cell>
+</mp-cells>

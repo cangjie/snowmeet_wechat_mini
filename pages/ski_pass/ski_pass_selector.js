@@ -42,7 +42,13 @@ Page({
       var endDate = new Date()
       endDate.setDate(endDate.getDate() + 5)
 
-      reserveDate.setDate(reserveDate.getDate() + 1)
+      if (util.formatTimeStr(new Date()) > '16:00:00'){
+        reserveDate.setDate(reserveDate.getDate() + 1)
+      }
+      else{
+        reserveDate.setDate(reserveDate.getDate())
+      }
+      
       
       that.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1, 
         role: app.globalData.role, canGetInfo: true, reserveDate: util.formatDate(reserveDate),
@@ -97,7 +103,7 @@ Page({
         for(var i = 0; i < productList.length; i++){
           var prod = productList[i]
           if (prod.end_sale_time <= that.data.nowTime  && util.formatDate(new Date()) == util.formatDate(new Date(that.data.reserveDate))){
-            productList.pop(prod)
+            productList.splice(i, 1)
             i--
           }
           if (prod.name.indexOf('租')>=0){

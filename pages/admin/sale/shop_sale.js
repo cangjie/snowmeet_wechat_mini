@@ -383,7 +383,13 @@ Page({
         if (res.data.payments.length > 0 && res.data.payments[0].pay_method == '微信支付'){
           qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + res.data.payments[0].id)
         }
+        
+        //var intervalId = setInterval(that.checkPayment, 1000)
         that.setData({orderId: res.data.id, submitedOrder: res.data, qrCodeUrl: qrCodeUrl})
+        if (res.data.pay_method == '微信支付' && res.data.pay_memo != '无需付款'){
+          var intervalId = setInterval(that.checkPayment, 1000)
+          that.setData({intervalId: intervalId})
+        }
         if (order.ticket_code != undefined && order.ticket_code != null && order.ticket_code != ''){
           var ticketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + order.ticket_code
           wx.request({
@@ -391,6 +397,31 @@ Page({
             method: 'GET',
             success:(res)=>{
               that.setData({orderTicket: res.data})
+            }
+          })
+        }
+      }
+    })
+  },
+  checkPayment(){
+    var that = this
+    var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetWholeOrderByStaff/' + that.data.orderId + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getOrderUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('check order payment info', res)
+        var order = res.data
+        if (order.payments[0].status == '支付成功'){
+          wx.showToast({
+            title: '顾客支付完成',
+            icon: 'success',
+            success:(res)=>{
+              clearInterval(that.data.intervalId)
+              that.data.intervalId = 0
+              wx.redirectTo({
+                url: 'order_list',
+              })
             }
           })
         }

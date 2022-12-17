@@ -40,6 +40,14 @@ Page({
     })
   },
 
+  modMi7OrderNo(e){
+    var id = e.currentTarget.id
+    console.log('mi7 order id', e)
+    wx.navigateTo({
+      url: 'mod_mi7_order_no?id=' + id,
+    })
+  },
+
   /**
    * Lifecycle function--Called when page is initially rendered
    */

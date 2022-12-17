@@ -94,7 +94,7 @@
   </mp-cells>
   <user-info wx:if="{{isOrderInfoReady}}" open_id="{{order.open_id}}" ></user-info>
   <mp-cells title="订单明细" >
-    <mp-cell wx:for="{{order.mi7Orders}}" >
+    <mp-cell wx:for="{{order.mi7Orders}}" id="{{item.id}}" bindtap="modMi7OrderNo" >
       <view style="display: flex;flex-direction: row;" >
         <view style="font-size: 10pt;text-align: right;width: 180rpx;" >智慧商贸编号：</view>
         <view style="font-size: 10pt;text-align: left;width: 180rpx;" >{{item.mi7_order_id}}</view>

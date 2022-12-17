@@ -31,10 +31,16 @@ Page({
   onReady() {
 
   },
+  shopSelected(e){
+    console.log('shop selected', e)
+    var that = this
+    that.setData({shop: e.detail.shop})
+    that.getData()
+  },
 
   getData(){
     var that = this
-    var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + ((that.data.shop == '')? '' : '&shop=' + encodeURIComponent(that.data.shop))
     wx.request({
       url: getTaskUrl,
       method: 'GET',
