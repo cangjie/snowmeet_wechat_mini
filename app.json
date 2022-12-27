@@ -7,7 +7,6 @@
     "pages/test/pay/pay",
     "pages/test/upload/upload",
     "pages/mine/mine",
-    "pages/payment/payment",
     "pages/mine/my_ski_pass/my_ski_pass",
     "pages/admin/admin",
     "pages/mine/my_maintain/my_maintain",
@@ -31,14 +30,11 @@
     "pages/test/upload/choose_video_upload",
     "pages/admin/school/lesson/lesson_list",
     "pages/admin/school/lesson/upload_lesson_remark_videos",
-    "pages/payment/pay_temp_order",
-    "pages/payment/confirm_payment",
     "pages/admin/printer/gprinter/test_print_tickets",
     "pages/admin/printer/gprinter/ticket",
     "pages/admin/ticket/ticket_template_list",
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
-    "pages/payment/order_payment",
     "pages/blt/open_lock",
     "pages/summer_maintain/fill_info",
     "pages/summer_maintain/summer_maintain_pay_success",
@@ -46,10 +42,8 @@
     "pages/admin/equip_maintain/summer/summer_recept",
     "pages/admin/equip_maintain/summer/summer_list",
     "pages/admin/equip_maintain/summer/summer_recept_pay",
-    "pages/payment/view_payment",
     "pages/admin/sale/shop_sale",
     "pages/admin/sale/shop_sale_entry",
-    "pages/shop_sale/shop_landing",
     "pages/admin/sale/order_list",
     "pages/admin/sale/order_detail",
     "pages/admin/maintain/recept",
@@ -57,19 +51,15 @@
     "pages/admin/maintain/task",
     "pages/admin/maintain/order_detail",
     "pages/admin/maintain/task_list",
-    "pages/mine/maintain/bind_maintain_order",
-    "pages/mine/maintain/order_detail",
-    "pages/mine/maintain/order_list",
     "pages/admin/background/set_session_key",
-    "pages/shop_sale/order_info",
-    "pages/payment/pay_hub",
     "pages/maintain/maintain_info",
-    "pages/experience/pay_temp",
     "pages/admin/maintain/print_label",
     "pages/tickets/ticket_seletor",
     "pages/ski_pass/ski_pass_selector",
     "pages/ski_pass/ski_pass_reserve",
-    "pages/admin/sale/mod_mi7_order_no"
+    "pages/admin/sale/mod_mi7_order_no",
+    "pages/mine/ticket/ticket_detail",
+    "pages/mine/ticket/ticket_share"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -100,5 +90,38 @@
   },
   "requiredPrivateInfos": [
     "getFuzzyLocation"
+  ],
+  "subPackages": [
+    {
+      "root": "pages/payment",
+      "name": "pay",
+      "pages": [
+        "pay_hub"
+      ]
+    },
+    {
+      "root": "pages/mine/maintain/",
+      "name": "maintain_payment",
+      "pages": [
+        "order_detail",
+        "bind_maintain_order",
+        "order_list"
+      ]
+    },
+    {
+      "root": "pages/shop_sale",
+      "name": "sale_payment",
+      "pages": [
+        "order_info",
+        "shop_landing"
+      ]
+    },
+    {
+      "root": "pages/experience",
+      "name": "experience_payment",
+      "pages": [
+        "pay_temp"
+      ]
+    }
   ]
 }
