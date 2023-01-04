@@ -90,6 +90,7 @@
     </mp-cell>
     </mp-cells>
     <button disabled="{{!infoIsValid}}" bindtap="submit" > 提 交 </button>
+    <view style="height: 100rpx;" ></view>
   </view>
   <block wx:else >
     <view wx:if="{{!paid}}" >

@@ -13,7 +13,8 @@ Page({
     productList: [],
     desc: '<p style="color:red" >test</p>',
     skiPassDescNanashanRent: util.skiPassDescNanashanRent,
-    nowTime: util.formatTimeStr(new Date())
+    nowTime: util.formatTimeStr(new Date()),
+    reserveDateDesc: '明天'
   },
 
   /**
@@ -60,7 +61,59 @@ Page({
   DateChanged(e){
     console.log('date change', e.detail.value)
     var that = this
-    that.setData({reserveDate: e.detail.value})
+    var reserveDate = e.detail.value
+    var reserveDateValue = new Date(reserveDate)
+    var reserveDateDesc = '明天'
+    //that.setData({reserveDate: reserveDate})
+    var now = new Date()
+    switch(reserveDateValue.getDate() - now.getDate()){
+      case 0:
+        reserveDateDesc = '今天'
+        break
+      case 1:
+        reserveDateDesc = '明天'
+        break
+      case 2:
+        reserveDateDesc = '后天'
+        break
+      case 3:
+        reserveDateDesc = '大后天'
+        break
+      default:
+        switch(reserveDateValue.getDay()){
+          case 0:
+            reserveDateDesc = '周日'
+            break
+          case 1:
+            reserveDateDesc = '周一'
+            break
+          case 2:
+            reserveDateDesc = '周二'
+            break
+          case 3:
+            reserveDateDesc = '周三'
+            break
+          case 4:
+            reserveDateDesc = '周四'
+            break
+          case 5:
+            reserveDateDesc = '周五'
+            break
+          case 6:
+            reserveDateDesc = '周六'
+            break
+          default:
+            break
+
+        }
+        break
+    }
+    that.setData({reserveDate: reserveDate, reserveDateDesc: reserveDateDesc})
+
+
+    if (now.getDate() == reserveDate.getDate()){
+
+    }
     that.GetData()
   },
   TagsChange(e){
@@ -106,12 +159,25 @@ Page({
             productList.splice(i, 1)
             i--
           }
-          if (prod.name.indexOf('租')>=0){
-            prod.desc = util.skiPassDescNanashanRent
+          var desc = '<ul><li>出票后不支持退换！</li><li>出票前可申请免费退换</li><li>出票当日自动出票</li><more/></ul>'
+          if (prod.name.indexOf('日场') >= 0){
+            var subDesc = '<li>日场营业时间 9:00-17:00</li>'
+            desc = desc.replace('<more/>', subDesc)
           }
-          else{
-            prod.desc = util.skiPassDescNanashanCommon
+          else if (prod.name.indexOf('上午场') >= 0){
+            var subDesc = '<li>上午场滑雪时间：9:00-13:00</li>'
+            desc = desc.replace('<more/>', subDesc)
           }
+          else if (prod.name.indexOf('下午') >= 0){
+            var subDesc = '<li>下午加夜场时间：限当日14:30后使用</li>'
+            desc = desc.replace('<more/>', subDesc)
+          }
+          else if (prod.name.indexOf('夜场') >= 0) {
+            var subDesc = '<li>夜场营业时间18:00-22:00（除夕、初一仅开放日场）</li>'
+            desc = desc.replace('<more/>', subDesc)
+          }
+          prod.desc = desc
+         
           prod.sale_price_str = util.showAmount(prod.sale_price)
           prod.deposit_str = util.showAmount(prod.deposit)
         }

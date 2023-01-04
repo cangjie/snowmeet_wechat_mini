@@ -54,12 +54,12 @@
     "pages/admin/background/set_session_key",
     "pages/maintain/maintain_info",
     "pages/admin/maintain/print_label",
-    "pages/tickets/ticket_seletor",
     "pages/ski_pass/ski_pass_selector",
     "pages/ski_pass/ski_pass_reserve",
     "pages/admin/sale/mod_mi7_order_no",
     "pages/mine/ticket/ticket_detail",
-    "pages/mine/ticket/ticket_share"
+    "pages/mine/ticket/ticket_share",
+    "pages/tickets/tickets_get"
   ],
   "window": {
     "backgroundTextStyle": "light",

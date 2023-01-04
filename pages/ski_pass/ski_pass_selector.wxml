@@ -10,9 +10,9 @@
     <view class="tab-content" slot="tab-content-{{index}}"   >
       <view wx:if="{{item.title == '南山'}}" >
         <view style="display: flex; flex-direction: row;" >
-          <view>选择日期：</view>
+          <view>日期：</view>
           <picker mode="date"   start="{{startDate}}" end="{{endDate}}" bindchange="DateChanged" >
-            {{reserveDate}}
+            {{reserveDate}} {{reserveDateDesc}}
           </picker>
           <radio-group style="margin-left: 20rpx;" bindchange="TagsChange">
             <radio style="margin-left: 10rpx;" value="自带板" >自带板</radio>

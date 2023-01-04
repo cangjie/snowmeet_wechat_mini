@@ -62,7 +62,14 @@
         },
         {
           "name": "mine",
-          "pathName": "pages/mine/maintain/order_list",
+          "pathName": "pages/mine/ticket/ticket_list",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "get ticket",
+          "pathName": "pages/tickets/tickets_get",
           "query": "",
           "launchMode": "default",
           "scene": null

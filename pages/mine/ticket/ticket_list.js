@@ -32,7 +32,7 @@ Page({
         success: (res)=>{
           var tickets = res.data
           for(var i = 0; i < tickets.length; i++){
-            tickets[i]. usage = tickets[i].memo.split(';')
+            tickets[i].usage = tickets[i].memo.split(';')
           }
           that.setData({ticketArr: tickets})
         }
@@ -94,8 +94,15 @@ Page({
       return
     }
     var code = source.currentTarget.id
+
+    wx.navigateTo({
+      url: 'ticket_detail?code=' + code,
+    })
+
+
     //var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code
 
+    /*
 
     var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' 
     //+ encodeURIComponent('show_qrcode.aspx?qrcodetext=' + code)
@@ -104,7 +111,7 @@ Page({
 
     this.setData({currentQrUrl: qrCodeUrl, currentX: 200,currentY:source.detail.y, showCover: 'block', opacity: 0.8 })
    
-    
+    */
   },
   hideDetail: function(){
     this.setData({showCover: 'none', opacity: 0})

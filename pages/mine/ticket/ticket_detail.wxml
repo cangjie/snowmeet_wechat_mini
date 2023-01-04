@@ -1,2 +1,17 @@
 <!--pages/mine/ticket/ticket_detail.wxml-->
-<button open-type="share" > 分 享 </button>
+<official-account></official-account>
+<view>
+  <view style="height: 1rpx;" ></view>
+  <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;" >
+    <view style="width: 100rpx;"></view>
+    <view id="{{ticket.code}}" style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;" >
+      <view style="background-color:{{titleColor}};text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><b>{{ticket.name}}</b></view>
+      <view wx:for="{{ticket.usage}}" style="margin-left: 50rpx;">
+        *{{item}}
+      </view>
+    </view>
+    <view style="width: 100rpx;"></view>
+  </view>
+  <view style="height: 1rpx;" ></view>
+</view>
+<button open-type="share"  wx:if="{{ticket.used==0}}" > 分 享 </button>
