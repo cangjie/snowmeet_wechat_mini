@@ -1,0 +1,138 @@
+<view wx:if="{{scene == 0}}">
+  <shop-selector ></shop-selector>
+  <user-info ></user-info>
+</view>
+<view wx:if="{{scene == 1}}" >
+  <mp-cells title="租赁物品" >
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >编码：</view>
+        <view class="right-column" style="display: flex; flex-direction: row;width: 100%;" >
+          <input type="text" style="width: 180rpx;" /> 
+          <button style="width: 150rpx;font-size: 8pt;">扫一扫</button>
+          <checkbox style="font-size:8pt">无码物品</checkbox> 
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column">物品名称：</view>
+        <view class="right-column" ><input style="width: 350rpx;" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column">押金：</view>
+        <view class="right-column" ><input style="width: 350rpx;" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column">租金：</view>
+        <view class="right-column" ><input style="width: 350rpx;" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <multi-uploader></multi-uploader>
+    </mp-cell>
+    <mp-cell>
+      <button> 添 加 更 多 </button>
+    </mp-cell>
+  </mp-cells>
+</view>
+<view wx:if="{{scene == 2}}" >
+  <mp-cells title="确定订单" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >押金合计：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >租金合计：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >抵押物品：</view>
+        <view class="right-column" >
+          <radio-group>
+            <radio>无</radio>
+            <radio>有</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >抵押物拍照：</view>
+        <view class="right-column"><multi-uploader ></multi-uploader></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <ticket-selector open_id="oHdTn5W8g2KOGPYOYFQyXaW46EVo" ></ticket-selector>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >押金减免：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >租金减免：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >支付金额：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>
+<view wx:if="{{scene==3}}" >
+  <mp-cells title="最终确认" >
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >归还时间：</view>
+        <view class="right-column" style="display: flex;flex-direction: row;" >
+          <picker>
+            <picker-view>1小时</picker-view>
+          </picker>
+          <checkbox checked="{{true}}" >当日归还</checkbox>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >结算方式：</view>
+        <view class="right-column" >
+          <radio-group>
+            <radio checked="{{true}}" >微信支付</radio>
+            <radio>次卡支付</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >需要支付：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      扫描二维码支付
+    </mp-cell>
+  </mp-cells>
+</view>
+<view>
+  <view style="display: flex; flex-direction: row;" >
+    <button disabled="{{scene <= 0}}" bindtap="prev" > 上 一 步 </button> 
+    <button  wx:if="{{scene <= 1}}" bindtap="next" > 下 一 步 </button>
+    <button wx:if="{{scene == 2}}" bindtap="next" > 确 认 支 付 </button>
+  </view>
+</view>

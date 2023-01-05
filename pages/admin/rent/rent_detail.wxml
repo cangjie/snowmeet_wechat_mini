@@ -1,0 +1,120 @@
+<view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">订单号：</view>
+    <view class="right-column">xxxxx</view>
+    <view class="left-column">支付单号：</view>
+    <view class="right-column">yyyyy</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">店铺：</view>
+    <view class="right-column">南山</view>
+    <view class="left-column">姓名：</view>
+    <view class="right-column">x先生</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">手机：</view>
+    <view class="right-column">13501177897</view>
+    <view class="left-column">抵押物：</view>
+    <view class="right-column">有</view>
+  </view>
+  <view style="text-align: center;height: 100rpx;margin-top: 30rpx;">抵押物照片</view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">押金总计：</view>
+    <view class="right-column"></view>
+    <view class="left-column">租金总计：</view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">押金减免：</view>
+    <view class="right-column"></view>
+    <view class="left-column">租金减免：</view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">支付金额：</view>
+    <view class="right-column"></view>
+    <view class="left-column">支付时间：</view>
+    <view class="right-column">2023-01-01 09:30:00</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">退款金额：</view>
+    <view class="right-column"></view>
+    <view class="left-column">订单余额：</view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">优惠券：</view>
+    <view class="right-column">xxxxxxxxx(yy券)</view>
+    <view class="left-column">订单状态：</view>
+    <view class="right-column"></view>
+  </view>
+  <mp-cells title="租赁明细" >
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">编号：</view>
+        <view class="right-column">xxxxxxxxx</view>
+        <view class="left-column">名称：</view>
+        <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">归还时间：</view>
+        <view class="right-column">2023-02-01 12:00</view>
+        <view class="left-column">状态：</view>
+        <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">租金：</view>
+        <view class="right-column"></view>
+        <view class="left-column">押金：</view>
+        <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">应退金额：</view>
+        <view class="right-column"></view>
+        <view class="left-column"></view>
+        <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <button> 归 还 </button> <button> 更 换 </button>
+      </view>
+      <view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">编号：</view>
+        <view class="right-column">xxxxxxxxx</view>
+        <view class="left-column">名称：</view>
+        <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">归还时间：</view>
+        <view class="right-column">2023-02-01 12:00</view>
+        <view class="left-column">状态：</view>
+        <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">租金：</view>
+        <view class="right-column"></view>
+        <view class="left-column">押金：</view>
+        <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">应退金额：</view>
+        <view class="right-column"></view>
+        <view class="left-column"></view>
+        <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <button> 归 还 </button> <button> 更 换 </button>
+      </view>
+      <view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view>
+    </mp-cell>
+  </mp-cells>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">应退金额：</view>
+    <view class="right-column"><input placeholder="100" /></view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view><button> 确 认 退 款 </button></view>
+</view>

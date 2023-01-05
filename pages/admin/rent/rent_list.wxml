@@ -1,0 +1,38 @@
+<view>
+  <shop-selector></shop-selector>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >开始：</view>
+    <view class="right-column" >2023-1-1</view>
+    <view class="left-column" >结束：</view>
+    <view class="right-column" >2023-1-1</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >状态：</view>
+    <view class="right-column" >租赁中</view>
+  </view>
+  <view><button> 查 询 </button></view>
+  <view>
+    <mp-cells title="列表" >
+      <mp-cell bindtap="gotoDetail">
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column">订单号：</view>
+          <view class="right-column" >xxxx</view>
+          <view class="left-column">支付流水号：</view>
+          <view class="right-column" >xxxx</view>
+        </view>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column">姓名：</view>
+          <view class="right-column" >x先生</view>
+          <view class="left-column">电话：</view>
+          <view class="right-column" >13501177897</view>
+        </view>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column">支付时间：</view>
+          <view class="right-column" >2023-01-01 09:30:00</view>
+          <view class="left-column">租赁件数：</view>
+          <view class="right-column" >5</view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+</view>
