@@ -22,7 +22,7 @@
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column"  >优惠券减免：</view>
-          <view class="right-column" >¥{{totalChargePrice - ticketDiscount}}</view>
+          <view class="right-column" >¥{{ticketDiscount}}</view>
         </view>
       </mp-cell>
       <mp-cell>
