@@ -30,7 +30,7 @@ Page({
           if (res.statusCode == 200) {
             var expierenceInfo = res.data
             var endTime = new Date(expierenceInfo.end_time)
-            expierenceInfo.endTimeStr = endTime.getFullYear().toString() + '-' + (endTime.getMonth() + 1).toString() + '-' + endTime.getDay().toString() + ' ' + endTime.getHours().toString() + ':' + endTime.getMinutes().toString()
+            expierenceInfo.endTimeStr = util.formatDate(endTime) + ' ' + util.formatTimeStr(endTime)
             var assetPhotosArr = []
             if (expierenceInfo.asset_photos != '') {
               assetPhotosArr = expierenceInfo.asset_photos.split(',')

@@ -144,6 +144,7 @@ Page({
   },
   checkValid: function() {
     var filledAdmitInfo = this.data.filledAdmitInfo
+    /*
     var valid = true
     if (filledAdmitInfo.asset_name != '' && filledAdmitInfo.asset_scale != '' 
     && (filledAdmitInfo.guarantee_credentail_photos != '' || (filledAdmitInfo.guarantee_credential_type != '' && filledAdmitInfo.guarantee_credential_no != '') ) && filledAdmitInfo.cell_number != '' && filledAdmitInfo.guarantee_cash != '' && this.data.hourLength != '' && filledAdmitInfo.shop != '') {
@@ -162,6 +163,24 @@ Page({
     }
     else {
       valid = false
+    }
+    */
+    var valid = false
+    if (filledAdmitInfo.asset_name != '' && filledAdmitInfo.asset_scale != ''  && filledAdmitInfo.cell_number.length == 11 && filledAdmitInfo.guarantee_cash != '' && this.data.hourLength != '' && filledAdmitInfo.shop != ''){
+      try{
+        parseInt(filledAdmitInfo.guarantee_cash)
+        valid = true
+      }
+      catch(err){
+        valid = false
+      }
+      try{
+        parseInt(this.data.hourLength)
+        valid = true
+      }
+      catch(err){
+        valid = false
+      }
     }
     this.setData({infoIsValid: valid})
   },
