@@ -21,13 +21,7 @@
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">押金总计：</view>
     <view class="right-column"></view>
-    <view class="left-column">租金总计：</view>
-    <view class="right-column"></view>
-  </view>
-  <view style="display: flex; flex-direction: row;">
     <view class="left-column">押金减免：</view>
-    <view class="right-column"></view>
-    <view class="left-column">租金减免：</view>
     <view class="right-column"></view>
   </view>
   <view style="display: flex; flex-direction: row;">
@@ -35,12 +29,6 @@
     <view class="right-column"></view>
     <view class="left-column">支付时间：</view>
     <view class="right-column">2023-01-01 09:30:00</view>
-  </view>
-  <view style="display: flex; flex-direction: row;">
-    <view class="left-column">退款金额：</view>
-    <view class="right-column"></view>
-    <view class="left-column">订单余额：</view>
-    <view class="right-column"></view>
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">优惠券：</view>
@@ -57,14 +45,20 @@
         <view class="right-column"></view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column">归还时间：</view>
+        <view class="left-column">计划归还：</view>
         <view class="right-column">2023-02-01 12:00</view>
         <view class="left-column">状态：</view>
         <view class="right-column"></view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column">租金：</view>
+        <view class="left-column">租赁单价：</view>
+        <view class="right-column">¥100.00</view>
+        <view class="left-column">租用时间：</view>
         <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">租金：</view>
+        <view class="right-column"><input placeholder="100.00" /></view>
         <view class="left-column">押金：</view>
         <view class="right-column"></view>
       </view>
@@ -73,6 +67,9 @@
         <view class="right-column"></view>
         <view class="left-column"></view>
         <view class="right-column"></view>
+      </view>
+      <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
+        <input style="width: 100%;" placeholder="填写备注" />
       </view>
       <view style="display: flex; flex-direction: row;">
         <button> 归 还 </button> <button> 更 换 </button>
@@ -87,14 +84,20 @@
         <view class="right-column"></view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column">归还时间：</view>
+        <view class="left-column">计划归还：</view>
         <view class="right-column">2023-02-01 12:00</view>
         <view class="left-column">状态：</view>
         <view class="right-column"></view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column">租金：</view>
+        <view class="left-column">租赁单价：</view>
+        <view class="right-column">¥100.00</view>
+        <view class="left-column">租用时间：</view>
         <view class="right-column"></view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">租金：</view>
+        <view class="right-column"><input placeholder="100.00" /></view>
         <view class="left-column">押金：</view>
         <view class="right-column"></view>
       </view>
@@ -104,6 +107,9 @@
         <view class="left-column"></view>
         <view class="right-column"></view>
       </view>
+      <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
+        <input style="width: 100%;" placeholder="填写备注" />
+      </view>
       <view style="display: flex; flex-direction: row;">
         <button> 归 还 </button> <button> 更 换 </button>
       </view>
@@ -111,10 +117,31 @@
     </mp-cell>
   </mp-cells>
   <view style="display: flex; flex-direction: row;">
+    <view class="left-column">租金合计：</view>
+    <view class="right-column">¥100.00</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">租金减免：</view>
+    <view class="right-column"><input placeholder="100.00" /></view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">优惠券减免：</view>
+    <view class="right-column"><input placeholder="100.00" /></view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
     <view class="left-column">应退金额：</view>
     <view class="right-column"><input placeholder="100" /></view>
     <view class="left-column"></view>
     <view class="right-column"></view>
+  </view>
+  <view style="margin-left: 100rpx; margin-right: 100rpx;margin-top: 50rpx;margin-bottom: 50rpx;"  >
+    <input placeholder="订单备注" />
   </view>
   <view><button> 确 认 退 款 </button></view>
 </view>
