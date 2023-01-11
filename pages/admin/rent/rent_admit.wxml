@@ -17,19 +17,25 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column">物品名称：</view>
-        <view class="right-column" ><input style="width: 350rpx;" /></view>
+        <view class="right-column" ><input style="width: 350rpx;" placeholder="测试物品" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column">押金：</view>
-        <view class="right-column" ><input style="width: 350rpx;" /></view>
+        <view class="right-column" ><input style="width: 350rpx;" placeholder="5000" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column">租金：</view>
-        <view class="right-column" ><input style="width: 350rpx;" /></view>
+        <view class="right-column" ><input style="width: 350rpx;" placeholder="300" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column">备注：</view>
+        <view class="right-column" ><input style="width: 350rpx;" placeholder="填写备注" /></view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -77,13 +83,13 @@
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >押金减免：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" ><input placeholder="0" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >租金减免：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" ><input placeholder="0" /></view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -112,11 +118,14 @@
         <view class="left-column" >结算方式：</view>
         <view class="right-column" >
           <radio-group>
-            <radio checked="{{true}}" >微信支付</radio>
+            <radio checked="{{true}}" >现金支付</radio>
             <radio>次卡支付</radio>
           </radio-group>
         </view>
       </view>
+    </mp-cell>
+    <mp-cell>
+      <pay_method></pay_method>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
