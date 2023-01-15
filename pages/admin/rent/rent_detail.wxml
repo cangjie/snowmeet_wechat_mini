@@ -97,9 +97,9 @@
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">租金：</view>
-        <view class="right-column"><input placeholder="100.00" /></view>
-        <view class="left-column">押金：</view>
-        <view class="right-column"></view>
+        <view class="right-column">¥100.00</view>
+        <view class="left-column">租金减免：</view>
+        <view class="right-column"><input placeholder="0" /></view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">应退金额：</view>
@@ -116,6 +116,12 @@
       <view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view>
     </mp-cell>
   </mp-cells>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">押金合计：</view>
+    <view class="right-column">¥100.00</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">租金合计：</view>
     <view class="right-column">¥100.00</view>
@@ -136,6 +142,12 @@
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">应退金额：</view>
+    <view class="right-column">¥1000.00</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">实退金额：</view>
     <view class="right-column"><input placeholder="100" /></view>
     <view class="left-column"></view>
     <view class="right-column"></view>

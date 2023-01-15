@@ -1,101 +1,110 @@
 <view wx:if="{{scene == 0}}">
-  <shop-selector ></shop-selector>
-  <user-info ></user-info>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <user-info bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" open_id="{{openId}}" ></user-info>
 </view>
 <view wx:if="{{scene == 1}}" >
-  <mp-cells title="租赁物品" >
-    <mp-cell>
+  <mp-cells wx:for="{{rentItemList}}" title="租赁物品{{index+1}}" >
+    <mp-cell  >
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" >编码：</view>
         <view class="right-column" style="display: flex; flex-direction: row;width: 100%;" >
-          <input type="text" style="width: 180rpx;" /> 
-          <button style="width: 150rpx;font-size: 8pt;">扫一扫</button>
-          <checkbox style="font-size:8pt">无码物品</checkbox> 
+          <input type="text" style="width: 180rpx;" value="{{item.code}}" id="code_{{index}}" bindinput="modItem" /> 
+          <button id="scan_{{index}}" style="width: 150rpx;font-size: 8pt;" bindtap="scan" >扫一扫</button>
+          <switch id="nocode_{{index}}" checked="{{item.noCode}}" bindchange="modItem" >无码物品</switch>
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column">物品名称：</view>
-        <view class="right-column" ><input style="width: 350rpx;" placeholder="测试物品" /></view>
+        <view class="right-column" ><input id="name_{{index}}" style="width: 350rpx;" placeholder="{{item.name}}" bindinput="modItem" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column">押金：</view>
-        <view class="right-column" ><input style="width: 350rpx;" placeholder="5000" /></view>
+        <view class="right-column" ><input id="deposit_{{index}}" style="width: 350rpx;" placeholder="{{item.deposit}}" bindinput="modItem"  /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
-        <view class="left-column">租金：</view>
-        <view class="right-column" ><input style="width: 350rpx;" placeholder="300" /></view>
+        <view class="left-column">租金单价：</view>
+        <view class="right-column" ><input id="rental_{{index}}" style="width: 350rpx;" placeholder="{{item.rental}}" bindinput="modItem"  /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column">备注：</view>
-        <view class="right-column" ><input style="width: 350rpx;" placeholder="填写备注" /></view>
+        <view class="right-column" ><input id="memo_{{index}}" style="width: 350rpx;" placeholder="{{item.memo}}" bindinput="modItem"  /></view>
       </view>
     </mp-cell>
     <mp-cell>
-      <multi-uploader></multi-uploader>
+      <multi-uploader id="uploader_{{index}}"  title="有瑕疵则需要拍照" image_count="3" detail_id="0" bindUploaded="uploadItemImages" uploaded_files="{{item.images}}" ></multi-uploader>
     </mp-cell>
-    <mp-cell>
-      <button> 添 加 更 多 </button>
-    </mp-cell>
+    <mp-cell><button id="del_{{index}}" bindtap="delItem" > 删 除 </button></mp-cell>
   </mp-cells>
+  <view>
+    <button bindtap="addMore"> 添 加 更 多 </button>
+  </view>
 </view>
 <view wx:if="{{scene == 2}}" >
   <mp-cells title="确定订单" >
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >押金合计：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{totalDepositStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >租金合计：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{totalRentalStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >抵押物品：</view>
         <view class="right-column" >
-          <radio-group>
-            <radio>无</radio>
-            <radio>有</radio>
+          <radio-group bindchange="setCredit">
+            <radio checked="{{!haveCredit}}" value="0" >无</radio>
+            <radio checked="{{haveCredit}}" value="1" >有</radio>
           </radio-group>
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >实收押金：</view>
+        <view class="right-column" ><input placeholder="{{totalDepositReal}}" bindinput="setTotalDepositReal" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:if="{{haveCredit}}" >
+      <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >抵押物拍照：</view>
-        <view class="right-column"><multi-uploader ></multi-uploader></view>
+        <view class="right-column">
+          <multi-uploader  title="抵押证件需要拍照" image_count="3"  bindUploaded="uploadCreditImages" uploaded_files="{{creditImages}}" ></multi-uploader>
+        </view>
       </view>
     </mp-cell>
     <mp-cell>
-      <ticket-selector open_id="oHdTn5W8g2KOGPYOYFQyXaW46EVo" ></ticket-selector>
+      <ticket-selector open_id="{{openId}}" bindTicketSelected="setTicketCode" ></ticket-selector>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >押金减免：</view>
-        <view class="right-column" ><input placeholder="0" /></view>
+        <view class="right-column" ><input placeholder="{{depositReduce}}" bindinput="setDepositReduce" /></view>
       </view>
     </mp-cell>
-    <mp-cell>
+    <!--mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >租金减免：</view>
         <view class="right-column" ><input placeholder="0" /></view>
       </view>
-    </mp-cell>
+    </mp-cell-->
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >支付金额：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{finalPayStr}}</view>
       </view>
     </mp-cell>
   </mp-cells>
@@ -105,11 +114,15 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" >归还时间：</view>
-        <view class="right-column" style="display: flex;flex-direction: row;" >
-          <picker>
-            <picker-view>1小时</picker-view>
-          </picker>
-          <checkbox checked="{{true}}" >当日归还</checkbox>
+        <view class="right-column" wx:if="{{shop == '南山'}}" style="display: flex;flex-direction: row;" >
+          <radio-group>
+            <radio>日场结束</radio>
+            <radio>夜场结束</radio>
+          </radio-group>
+        </view>
+        <view class="right-column" wx:else style="display: flex;flex-direction: row;" >
+          <slider style="width: 300rpx;" min="0" max="10" step="1" value="{{rentDays}}" show-value="{{true}}" bindchange="setDueEndTime" ></slider>
+          <view style="height: 10rpx;margin-top: 15rpx;">天</view>
         </view>
       </view>
     </mp-cell>
@@ -117,9 +130,10 @@
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" >结算方式：</view>
         <view class="right-column" >
-          <radio-group>
-            <radio checked="{{true}}" >现金支付</radio>
-            <radio>次卡支付</radio>
+          <radio-group bindchange="setPayOption">
+            <radio checked="{{payOption == '现场支付'}}" value="现场支付" >现场支付</radio>
+            <radio checked="{{payOption == '次卡支付'}}" value="次卡支付" >次卡支付</radio>
+            <radio checked="{{payOption == '招待'}}" value="招待" >招待</radio>
           </radio-group>
         </view>
       </view>
@@ -130,18 +144,15 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" >需要支付：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{finalPayStr}}</view>
       </view>
-    </mp-cell>
-    <mp-cell>
-      扫描二维码支付
     </mp-cell>
   </mp-cells>
 </view>
 <view>
   <view style="display: flex; flex-direction: row;" >
     <button disabled="{{scene <= 0}}" bindtap="prev" > 上 一 步 </button> 
-    <button  wx:if="{{scene <= 1}}" bindtap="next" > 下 一 步 </button>
-    <button wx:if="{{scene == 2}}" bindtap="next" > 确 认 支 付 </button>
+    <button  wx:if="{{scene <= 2}}" disabled="{{!isValid}}" bindtap="next" > 下 一 步 </button>
+    <button wx:if="{{scene == 3}}" bindtap="next" > 提 交 </button>
   </view>
 </view>
