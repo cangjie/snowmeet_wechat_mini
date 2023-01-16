@@ -26,7 +26,10 @@ Page({
     finalPayStr: '',
     payOption: '现场支付',
     rentDays: 1,
-    ticketCode: ''
+    ticketCode: '',
+    memo: '',
+    payOption: '现场支付',
+    payMethod: '微信支付'
   },
   
   setCredit(e){
@@ -290,18 +293,97 @@ Page({
   setPayOption(e){
     var that = this
     var v = e.dtail.value
-    that.setData({setPayOption: v})
+    that.setData({payOption: v})
   },
   setTicketCode(e){
     var that = this
     var code = e.detail.code
     that.setData({ticketCode: code})
   },
+  setMemo(e){
+    var that = this
+    that.setData({memo: e.detail.value})
+  }, 
+  submit(){
+    var that = this
+    var scene = that.data.scene
+    scene++
+    that.setData({scene: scene, isValid: false})
+    var rentOrder = {
+      id: 0,
+      open_id: that.data.openId,
+      cell_number: that.data.cell,
+      real_name: that.data.name,
+      shop: that.data.shop,
+      order_id: 0,
+      deposit: that.data.totalDeposit,
+      deposit_real: that.data.totalDepositReal,
+      deposit_reduce: that.data.depositReduce,
+      deposit_reduce_ticket: 0,
+      deposit_final: that.data.totalDepositReal - that.data.depositReduce,
+      start_date: util.formatDateString(new Date()),
+      due_end_date: util.formatDateString(that.data.dueEndDate),
+      rental: 0,
+      rental_real: 0,
+      rental_reduce: 0,
+      rental_reduce_ticket: 0,
+      rental_final: 0,
+      ticket_code: that.data.ticketCode,
+      has_guarantee_credit: (that.data.haveCredit? 1 : 0),
+      guarantee_credit_photos: that.data.creditImages,
+      memo: that.data.memo,
+      pay_option: that.data.payOption,
+      payMethod: that.data.payMethod
+    }
+    var rentDetails = []
+    var rentItemList = that.data.rentItemList
+    for(var i = 0; i < rentItemList.length; i++){
+      var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, 
+        rent_item_code: rentItemList[i].code, deposit: rentItemList[i].deposit,
+        unit_rental: rentItemList[i].rental, memo: ''}
+        rentDetails.push(item)
+    }
+    rentOrder.details = rentDetails
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/Rent/Recept?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: submitUrl,
+      method: 'POST',
+      data: rentOrder,
+      success:(res)=>{
+        console.log('rent order', res)
+        var rentOrder = res.data
+        var order = res.data.order
+        if (order == null){
+          that.setData({needPay: false, rentOrder: rentOrder})
+        }
+        else{
+          if (order.payments != null && order.payments.length > 0){
+            var payment = order.payments[0]
+            if (payment.pay_method == '微信支付'){
+              var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + payment.id
+              that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl})
+            }
+            else{
+              that.setData({needPay: true, rentOrder: rentOrder})
+            }
+          }
+        }
+      }
+    })
+    console.log('rent order', rentOrder)
+  },
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
+    var nowDate = new Date()
+    var dueEndDate = nowDate
+    dueEndDate.setDate(dueEndDate.getDate() + 1)
+    var that = this
+    that.setData({dueEndDate: dueEndDate})
+    app.loginPromiseNew.then(function (resolve){
 
+    })
   },
 
   /**

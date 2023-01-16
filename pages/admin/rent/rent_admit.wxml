@@ -147,12 +147,30 @@
         <view class="right-column" >{{finalPayStr}}</view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <input value="{{memo}}" style="width: 500rpx;" bindinput="setMemo" placeholder="填写备注" />
+     
+    </mp-cell>
   </mp-cells>
+</view>
+<view wx:if="{{scene == 4}}" >
+  <view wx:if="{{needPay}}" >
+    <view wx:if="{{payMethod == '微信支付'}}" style="text-align: center;margin-top: 50rpx;">
+      <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:400rpx;height:400rpx" ></image>
+    </view>
+    <view wx:else style="text-align: center;" >
+      <button > 点 击 确 认 收 款 </button>
+    </view>
+  </view>
+  <view style="text-align: center;" wx:else >
+    此订单为招待订单
+  </view>
 </view>
 <view>
   <view style="display: flex; flex-direction: row;" >
-    <button disabled="{{scene <= 0}}" bindtap="prev" > 上 一 步 </button> 
+    <button wx:if="{{scene < 4}}" disabled="{{scene <= 0}}" bindtap="prev" > 上 一 步 </button> 
     <button  wx:if="{{scene <= 2}}" disabled="{{!isValid}}" bindtap="next" > 下 一 步 </button>
-    <button wx:if="{{scene == 3}}" bindtap="next" > 提 交 </button>
+    <button wx:if="{{scene == 3}}" bindtap="submit" > 提 交 </button>
   </view>
 </view>
+<view style="height: 100rpx;" ></view>

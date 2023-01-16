@@ -1,36 +1,48 @@
 <view>
-  <shop-selector></shop-selector>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
   <view style="display: flex;flex-direction: row;">
     <view class="left-column" >开始：</view>
-    <view class="right-column" >2023-1-1</view>
+    <view class="right-column" >
+      <picker mode="date" id="start" bindchange="setDate" >
+        <picker-view>{{startDate}}</picker-view>
+      </picker>
+    </view>
     <view class="left-column" >结束：</view>
-    <view class="right-column" >2023-1-1</view>
+    <view class="right-column" >
+      <picker id="end" mode="date" bindchange="setDate"  >
+        <picker-view>{{endDate}}</picker-view>
+      </picker>
+    </view>
   </view>
   <view style="display: flex;flex-direction: row;">
     <view class="left-column" >状态：</view>
-    <view class="right-column" >租赁中</view>
+    <view class="right-column" >
+      <picker mode="selector"  range="{{statusList}}" bindchange="setStatus" >
+        <picker-view>{{statusList[statusSelectedIndex]}}</picker-view>
+      </picker>
+    </view>
   </view>
-  <view><button> 查 询 </button></view>
+  <view><button bindtap="getData"> 查 询 </button></view>
   <view>
-    <mp-cells title="列表" >
-      <mp-cell bindtap="gotoDetail">
+    <mp-cells title="列表 共{{orders.length}}" >
+      <mp-cell id="{{item.id}}" wx:for="{{orders}}" bindtap="gotoDetail">
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column">订单号：</view>
-          <view class="right-column" >xxxx</view>
-          <view class="left-column">支付流水号：</view>
-          <view class="right-column" >xxxx</view>
+          <view class="right-column" >{{item.id}}</view>
+          <view class="left-column">状态：</view>
+          <view class="right-column" >{{item.status}}</view>
         </view>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column">姓名：</view>
-          <view class="right-column" >x先生</view>
+          <view class="right-column" >{{item.real_name}}</view>
           <view class="left-column">电话：</view>
-          <view class="right-column" >13501177897</view>
+          <view class="right-column" >{{item.cell_number}}</view>
         </view>
         <view style="display: flex;flex-direction: row;" >
-          <view class="left-column">支付时间：</view>
-          <view class="right-column" >2023-01-01 09:30:00</view>
+          <view class="left-column">预计归还时间：</view>
+          <view class="right-column" >{{item.due_end_date_str}}</view>
           <view class="left-column">租赁件数：</view>
-          <view class="right-column" >5</view>
+          <view class="right-column" >{{item.details.length}}</view>
         </view>
       </mp-cell>
     </mp-cells>
