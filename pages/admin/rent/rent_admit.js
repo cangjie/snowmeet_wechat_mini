@@ -29,7 +29,8 @@ Page({
     ticketCode: '',
     memo: '',
     payOption: '现场支付',
-    payMethod: '微信支付'
+    payMethod: '微信支付',
+    checkInterval: 0
   },
   
   setCredit(e){
@@ -338,9 +339,17 @@ Page({
     var rentDetails = []
     var rentItemList = that.data.rentItemList
     for(var i = 0; i < rentItemList.length; i++){
+      var memo = rentItemList[i].memo
+      if (memo == undefined || memo == ''){
+        memo = ''
+      }
+      var images = rentItemList[i].images
+      if (images == undefined || images == ''){
+        images = ''
+      }
       var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, 
         rent_item_code: rentItemList[i].code, deposit: rentItemList[i].deposit,
-        unit_rental: rentItemList[i].rental, memo: ''}
+        unit_rental: rentItemList[i].rental, memo: memo, images: images}
         rentDetails.push(item)
     }
     rentOrder.details = rentDetails
@@ -362,6 +371,10 @@ Page({
             if (payment.pay_method == '微信支付'){
               var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + payment.id
               that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl})
+              var interval = setInterval(() => {
+                that.checkOrderPaymentStatus()
+              }, 1000);
+              that.setData({interval: interval})
             }
             else{
               that.setData({needPay: true, rentOrder: rentOrder})
@@ -372,6 +385,34 @@ Page({
     })
     console.log('rent order', rentOrder)
   },
+
+  checkOrderPaymentStatus(){
+    var that = this
+    var orderId = that.data.rentOrder.id
+    var getUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrder/' + orderId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          var rentOrder = res.data
+          if (rentOrder.order_id > 0 && rentOrder.order != undefined && rentOrder.order != null && rentOrder.order.pay_state == 1){
+            clearInterval(that.data.interval)
+            wx.showToast({
+              title: '支付成功',
+              icon: 'success',
+              success:()=>{
+                wx.redirectTo({
+                url: '../admin'
+                })
+              }
+            })
+          }
+        }
+      }
+    })
+  },
+
   /**
    * Lifecycle function--Called when page load
    */
