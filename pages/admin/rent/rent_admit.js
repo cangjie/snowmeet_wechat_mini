@@ -74,13 +74,13 @@ Page({
     }
     var totalDepositStr = util.showAmount(totalDeposit)
     var totalRentalStr = util.showAmount(totalRental)
-    var totalDepositReal = that.data.totalDepositReal
+    var totalDepositReal = that.data.totalDepositReal == 0? totalDeposit : that.data.totalDepositReal
     var depositReduce = that.data.depositReduce
     var finalPayStr = util.showAmount(totalDepositReal - depositReduce)
 
     that.setData({totalDeposit: totalDeposit, totalDepositStr: totalDepositStr, 
       totalRental: totalRental, totalRentalStr: totalRentalStr,
-      totalDepositReal: totalDeposit, finalPayStr: finalPayStr})
+      totalDepositReal: totalDepositReal, finalPayStr: finalPayStr})
   },
 
   checkValid(){
@@ -268,7 +268,7 @@ Page({
   },
   setTotalDepositReal(e){
     var that = this
-    var value = e.detail.value
+    var value = parseFloat(e.detail.value)
     if (!isNaN(value)){
       var d = parseFloat(value)
       that.setData({totalDepositReal: d})
@@ -277,7 +277,7 @@ Page({
   },
   setDepositReduce(e){
     var that = this
-    var value = e.detail.value
+    var value = parseFloat(e.detail.value)
     if (!isNaN(value)){
       var d = parseFloat(value)
       that.setData({depositReduce: d})
@@ -377,7 +377,11 @@ Page({
               that.setData({interval: interval})
             }
             else{
-              that.setData({needPay: true, rentOrder: rentOrder})
+              if (rentOrder.open_id == ''){
+                var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=bind_rent_id_' + rentOrder.id
+                that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl})
+              }
+              
             }
           }
         }
@@ -412,7 +416,33 @@ Page({
       }
     })
   },
-
+  setPayMethod(e){
+    var that = this
+    console.log('pay method changed', e)
+    that.setData({payMethod: e.detail.payMethod})
+  },
+  setPaid(){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetPaid/' + rentOrder.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success',
+            success:()=>{
+              wx.redirectTo({
+                url: '../admin',
+              })
+            }
+          })
+        }
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */

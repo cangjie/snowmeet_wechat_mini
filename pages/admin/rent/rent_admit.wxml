@@ -139,7 +139,7 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <pay_method></pay_method>
+      <pay_method bindPayMethodSelected="setPayMethod"  ></pay_method>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
@@ -158,8 +158,14 @@
     <view wx:if="{{payMethod == '微信支付'}}" style="text-align: center;margin-top: 50rpx;">
       <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:400rpx;height:400rpx" ></image>
     </view>
-    <view wx:else style="text-align: center;" >
-      <button > 点 击 确 认 收 款 </button>
+    <view wx:else style="text-align: center;" style="margin-top: 100rpx;text-align: center;">
+      <view wx:if="{{rentOrder.open_id == ''}}"  >
+        <view>请用户先扫描此二维码注册成为会员</view>
+        <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:400rpx;height:400rpx" ></image>
+      </view>
+      
+      
+      <button bindtap="setPaid" > 点 击 确 认 收 款 </button>
     </view>
   </view>
   <view style="text-align: center;" wx:else >
