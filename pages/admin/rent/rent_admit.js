@@ -378,7 +378,7 @@ Page({
             }
             else{
               if (rentOrder.open_id == ''){
-                var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=bind_rent_id_' + rentOrder.id
+                var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=bind_rent_' + rentOrder.id
                 that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl})
               }
               
