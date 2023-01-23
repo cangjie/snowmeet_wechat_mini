@@ -188,8 +188,11 @@ Page({
     var that = this
     var submitUrl = 'https://' + app.globalData.domainName + '/core/Experience/PlaceOrder?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
     var filledAdmitInfo = this.data.filledAdmitInfo
-    filledAdmitInfo.start_time = util.formatDateString(filledAdmitInfo.start_time)
-    filledAdmitInfo.end_time = util.formatDateString(filledAdmitInfo.end_time)
+    var nowDate = new Date()
+    filledAdmitInfo.start_time = util.formatDateString(nowDate.toString())
+    var endDate = nowDate
+    endDate.setHours(nowDate.getHours() + parseInt(that.data.hourLength))
+    filledAdmitInfo.end_time = util.formatDateString(endDate.toString())
     wx.request({
       url: submitUrl,
       method: 'POST',

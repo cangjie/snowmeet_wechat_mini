@@ -47,6 +47,8 @@ Page({
 
   getData(){
     var that = this
+    var totalPaid = 0
+    var totalRefund = 0
     var qUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrderListByStaff?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
      + '&start=' + encodeURIComponent(that.data.startDate) + '&end=' + encodeURIComponent(that.data.endDate) 
      + (that.data.shop == ''? '' : '&shop=' + encodeURIComponent(that.data.shop))
@@ -61,8 +63,12 @@ Page({
           for(var i = 0; i < orders.length; i++){
             var dueEndDate = new Date(orders[i].due_end_date)
             orders[i].due_end_date_str = util.formatDate(dueEndDate) + ' ' + util.formatTimeStr(dueEndDate)
+            orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
+            totalPaid = totalPaid + orders[i].deposit_final
+            totalRefund = totalRefund + orders[i].refund
           }
-          that.setData({orders: res.data})
+          that.setData({orders: orders, totalPaidStr: util.showAmount(totalPaid), 
+            totalRefundStr: util.showAmount(totalRefund)})
         }
       }
     })

@@ -158,14 +158,15 @@
     <view wx:if="{{payMethod == '微信支付'}}" style="text-align: center;margin-top: 50rpx;">
       <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:400rpx;height:400rpx" ></image>
     </view>
-    <view wx:else style="text-align: center;" style="margin-top: 100rpx;text-align: center;">
-      <view wx:if="{{rentOrder.open_id == ''}}"  >
+    <view wx:else >
+      <view wx:if="{{rentOrder.open_id == ''}}" style="text-align: center;"  >
         <view>请用户先扫描此二维码注册成为会员</view>
         <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:400rpx;height:400rpx" ></image>
+        <button bindtap="setPaid" > 点 击 确 认 收 款 </button>
       </view>
-      
-      
-      <button bindtap="setPaid" > 点 击 确 认 收 款 </button>
+      <view wx:else >
+        该用户已经是会员，支付完成即可。
+      </view>
     </view>
   </view>
   <view style="text-align: center;" wx:else >

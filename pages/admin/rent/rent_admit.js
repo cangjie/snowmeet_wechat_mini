@@ -381,6 +381,9 @@ Page({
                 var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=bind_rent_' + rentOrder.id
                 that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl})
               }
+              else{
+                that.setData({needPay: true, rentOrder: rentOrder})
+              }
               
             }
           }
