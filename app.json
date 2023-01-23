@@ -59,7 +59,11 @@
     "pages/admin/sale/mod_mi7_order_no",
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
-    "pages/tickets/tickets_get"
+    "pages/tickets/tickets_get",
+    "pages/admin/rent/rent_admit",
+    "pages/admin/rent/rent_list",
+    "pages/admin/rent/rent_detail",
+    "pages/rent/bind_rent_order"
   ],
   "window": {
     "backgroundTextStyle": "light",

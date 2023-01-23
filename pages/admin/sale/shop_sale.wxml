@@ -15,7 +15,7 @@
     <mp-cells title="结算信息" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
-          <view class="left-column"  >应付金额：</view>
+          <view class="left-column"  >订单金额：</view>
           <view class="right-column" >¥{{totalSalePrice}}</view>
         </view>
       </mp-cell>

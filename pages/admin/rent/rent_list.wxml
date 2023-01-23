@@ -1,0 +1,56 @@
+<view>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >开始：</view>
+    <view class="right-column" >
+      <picker mode="date" id="start" bindchange="setDate" >
+        <picker-view>{{startDate}}</picker-view>
+      </picker>
+    </view>
+    <view class="left-column" >结束：</view>
+    <view class="right-column" >
+      <picker id="end" mode="date" bindchange="setDate"  >
+        <picker-view>{{endDate}}</picker-view>
+      </picker>
+    </view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >状态：</view>
+    <view class="right-column" >
+      <picker mode="selector"  range="{{statusList}}" bindchange="setStatus" >
+        <picker-view>{{statusList[statusSelectedIndex]}}</picker-view>
+      </picker>
+    </view>
+  </view>
+  <view><button bindtap="getData"> 查 询 </button></view>
+  <view>
+    <mp-cells title="列表 共{{orders.length}} 总押金：{{totalPaidStr}} 总退款：{{totalRefundStr}}" >
+      <mp-cell id="{{item.id}}" wx:for="{{orders}}" bindtap="gotoDetail">
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column">订单号：</view>
+          <view class="right-column" >{{item.id}}</view>
+          <view class="left-column">状态：</view>
+          <view class="right-column" >{{item.status}}</view>
+        </view>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column">姓名：</view>
+          <view class="right-column" >{{item.real_name}}</view>
+          <view class="left-column">电话：</view>
+          <view class="right-column" >{{item.cell_number}}</view>
+        </view>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column">预计归还时间：</view>
+          <view class="right-column" >{{item.due_end_date_str}}</view>
+          <view class="left-column">租赁件数：</view>
+          <view class="right-column" >{{item.details.length}}</view>
+        </view>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column">店员：</view>
+          <view class="right-column" >{{item.staff_name}}</view>
+          <view class="left-column">支付押金：</view>
+          <view class="right-column" >{{item.deposit_final_str}}</view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+</view>

@@ -146,6 +146,12 @@ Page({
       case 'ticket_print':
         path = '/pages/admin/ticket/ticket_template_list'
         break
+      case 'rend_admit':
+        path = 'rent/rent_admit'
+        break
+      case 'rent_list':
+        path = 'rent/rent_list'
+        break
       default:
         break
     }
