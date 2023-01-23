@@ -62,11 +62,14 @@ Page({
             detail.deposit_str = util.showAmount(detail.deposit)
             detail.refund_str = util.showAmount(detail.deposit - detail.real_rental)
             detail.imageArr = detail.images.split(',')
+            detail.reparationStr = util.showAmount(detail.reparation)
             detail.showGallery = false
             rentOrder.details[i] = detail
 
           }
-          that.setData({rentOrder: rentOrder})
+          that.setData({rentOrder: rentOrder, 
+            rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
+            rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket)})
           that.computeTotal()
         }
       }
@@ -83,11 +86,28 @@ Page({
       detail.real_rental = detail.suggestRental
       detail.filled_rental = ''
     }
+    
     else {
       detail.filled_rental = value
       detail.real_rental = value
     }
-    detail.refund_str = util.showAmount(detail.deposit - detail.filled_rental)
+    
+    detail.refund_str = util.showAmount(detail.deposit - value - detail.reparation)
+    that.setData({rentOrder: rentOrder})
+    that.computeTotal()
+  },
+
+  setReparation(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id.split('_')[1])
+    var value = parseFloat(e.detail.value)
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+
+    if (!isNaN(value)){
+      detail.reparation = value
+    }
+    detail.refund_str = util.showAmount(detail.deposit - detail.filled_rental - value)
     that.setData({rentOrder: rentOrder})
     that.computeTotal()
   },
@@ -114,6 +134,7 @@ Page({
     var that = this
     var rentOrder = that.data.rentOrder
     var totalRental = 0
+    var totalReparation = 0
     for(var i = 0; i < rentOrder.details.length; i++){
       var rental = 0
       var detail = rentOrder.details[i]
@@ -125,10 +146,11 @@ Page({
         rental = filledRental
       }
       totalRental = totalRental + rental
+      totalReparation = totalReparation + detail.reparation
     }
-    var refundAmount = that.data.rentOrder.deposit_final - totalRental - that.data.rentalReduce - that.data.rentalReduceTicket
+    var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
-      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental)})
+      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation)})
   },
   setReturn(e){
     var id = parseInt(e.currentTarget.id.split('_')[1])
@@ -139,11 +161,13 @@ Page({
     var detail = that.data.rentOrder.details[id]
     var nowDate = util.formatDateString(new Date())
     var realRental = parseFloat(detail.filled_rental)
+    var reparation = parseFloat(detail.reparation)
     if (isNaN(realRental)){
       realRental = parseFloat(detail.suggestRental)
     }
     var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetReturn/' + detail.id
-      + '?rental=' + encodeURIComponent(realRental) + '&returnDate=' + encodeURIComponent(nowDate)
+      + '?rental=' + encodeURIComponent(realRental) 
+      + '&returnDate=' + encodeURIComponent(nowDate) + '&reparation=' + encodeURIComponent(reparation)
       + '&memo=' + encodeURIComponent(detail.memo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: setUrl,
@@ -185,6 +209,8 @@ Page({
     var that = this
     var refundUrl = 'https://' + app.globalData.domainName + '/core/Rent/Refund/' + that.data.rentOrder.id 
     + '?amount=' + encodeURIComponent(that.data.refundAmount) + '&memo=' + encodeURIComponent(that.data.rentOrder.memo)
+    + '&rentalReduce=' + encodeURIComponent(that.data.rentalReduce) 
+    + '&rentalReduceTicket=' + encodeURIComponent(that.data.rentalReduceTicket)
     + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: refundUrl,

@@ -74,7 +74,7 @@ Page({
     }
     var totalDepositStr = util.showAmount(totalDeposit)
     var totalRentalStr = util.showAmount(totalRental)
-    var totalDepositReal = that.data.totalDepositReal == 0? totalDeposit : that.data.totalDepositReal
+    var totalDepositReal = totalDeposit//that.data.totalDepositReal == 0? totalDeposit : that.data.totalDepositReal
     var depositReduce = that.data.depositReduce
     var finalPayStr = util.showAmount(totalDepositReal - depositReduce)
 
