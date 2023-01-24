@@ -75,7 +75,15 @@
         <view class="right-column">{{item.deposit_str}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        
+        <view class="left-column">超时：</view>
+        <view class="right-column">{{(item.overTime)? '是' : '否'}}</view>
+        <view class="left-column">超时费：</view>
+        <view class="right-column">
+          <view wx:if="{{item.status == '已归还'}}" >{{item.overtime_charge_str}}</view>
+          <input wx:else id="{{index}}" bindinput="setOvertimeCharge" />
+        </view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
         <view class="left-column">损坏赔偿：</view>
         <view class="right-column">
           <input wx:if="{{item.status == '未归还'}}" type="digit" id="reparation_{{index}}" placeholder="{{item.reparation}}" bindinput="setReparation" /> 
@@ -109,6 +117,12 @@
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">租金合计：</view>
     <view class="right-column">{{totalRentalStr}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">超时合计：</view>
+    <view class="right-column">{{totalOvertimeChargeStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>

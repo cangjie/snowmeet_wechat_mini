@@ -28,7 +28,17 @@ Page({
       method: 'GET',
       success:(res)=>{
         if (res.statusCode == 200){
+
           var rentOrder = res.data
+          console.log('rent order', rentOrder)
+
+          var startDate = new Date(rentOrder.start_date)
+          var currentTime = new Date()
+
+          if (rentOrder.end_date != null){
+            currentTime = new Date(rentOrder.end_date)
+          }
+
           rentOrder.guarantee_credit_photos_arr = rentOrder.guarantee_credit_photos.split(',')
           
           rentOrder.deposit_real_str = util.showAmount(rentOrder.deposit_real)
@@ -60,10 +70,23 @@ Page({
             totalRental = totalRental + detail.real_rental
             detail.unit_rental_str = util.showAmount(detail.unit_rental)
             detail.deposit_str = util.showAmount(detail.deposit)
-            detail.refund_str = util.showAmount(detail.deposit - detail.real_rental)
+            detail.refund_str = util.showAmount(detail.deposit - detail.real_rental - detail.overtime_charge - detail.reparation)
             detail.imageArr = detail.images.split(',')
             detail.reparationStr = util.showAmount(detail.reparation)
             detail.showGallery = false
+            detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
+
+            /*
+            if (startDate.getHours() >= 16 && currentTime.getDate() == startDate.getDate()){
+              detail.overTime = false
+            }
+            else if (currentTime.getHours()>=11){
+              detail.overTime = true
+            }
+            else{
+              detail.overTime = false
+            }
+            */
             rentOrder.details[i] = detail
 
           }
@@ -92,7 +115,7 @@ Page({
       detail.real_rental = value
     }
     
-    detail.refund_str = util.showAmount(detail.deposit - value - detail.reparation)
+    detail.refund_str = util.showAmount(detail.deposit - detail.filled_rental - detail.reparation - detail.overtime_charge)
     that.setData({rentOrder: rentOrder})
     that.computeTotal()
   },
@@ -107,7 +130,7 @@ Page({
     if (!isNaN(value)){
       detail.reparation = value
     }
-    detail.refund_str = util.showAmount(detail.deposit - detail.filled_rental - value)
+    detail.refund_str = util.showAmount(detail.deposit - detail.filled_rental - detail.reparation - detail.overtime_charge)
     that.setData({rentOrder: rentOrder})
     that.computeTotal()
   },
@@ -135,6 +158,7 @@ Page({
     var rentOrder = that.data.rentOrder
     var totalRental = 0
     var totalReparation = 0
+    var totalOvertimeCharge = 0
     for(var i = 0; i < rentOrder.details.length; i++){
       var rental = 0
       var detail = rentOrder.details[i]
@@ -147,16 +171,18 @@ Page({
       }
       totalRental = totalRental + rental
       totalReparation = totalReparation + detail.reparation
+      totalOvertimeCharge = totalOvertimeCharge + detail.overtime_charge
     }
-    var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation
+    var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation - totalOvertimeCharge
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
-      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation)})
+      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge)})
   },
   setReturn(e){
     var id = parseInt(e.currentTarget.id.split('_')[1])
     if (isNaN(id)){
       return 
     }
+
     var that = this
     var detail = that.data.rentOrder.details[id]
     var nowDate = util.formatDateString(new Date())
@@ -165,10 +191,20 @@ Page({
     if (isNaN(realRental)){
       realRental = parseFloat(detail.suggestRental)
     }
+    var filledOvertimeCharge = parseFloat(detail.filled_overtime_charge)
+    if (detail.overTime && isNaN(filledOvertimeCharge)){
+      wx.showToast({
+        title: '装备归还超时，请确认超时费用。',
+        icon: 'error'
+
+      })
+      return
+    }
     var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetReturn/' + detail.id
       + '?rental=' + encodeURIComponent(realRental) 
       + '&returnDate=' + encodeURIComponent(nowDate) + '&reparation=' + encodeURIComponent(reparation)
       + '&memo=' + encodeURIComponent(detail.memo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      + '&overTimeCharge=' + encodeURIComponent(detail.overtime_charge)
     wx.request({
       url: setUrl,
       method: 'GET',
@@ -232,6 +268,23 @@ Page({
     rentOrder.details[id].showGallery = true
     that.setData({rentOrder: rentOrder})
     rentOrder.details[id].showGallery = false
+  },
+  setOvertimeCharge(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    
+    var value = parseFloat(e.detail.value)
+    if (isNaN(value)){
+      return
+    }
+    detail.filled_overtime_charge = value
+    detail.overtime_charge = value
+    detail.refund_str = util.showAmount(detail.deposit - detail.real_rental - detail.reparation - detail.overtime_charge)
+    that.setData({rentOrder: rentOrder})
+    that.computeTotal()
+
   },
   /**
    * Lifecycle function--Called when page load
