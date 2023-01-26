@@ -1,0 +1,39 @@
+<!--pages/admin/rent/rent_report.wxml-->
+<view style="text-align: center; margin-top: 10rpx;margin-left: 100rpx;">
+  <picker mode="date" start="{{startDate}}" end="{{endDate}}" bindchange="changeDate" >
+    <picker-view>{{currentDate}}</picker-view>
+  </picker>
+</view>
+<view>
+  <view style="color:gray">营业前</view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" style="width: 50%;" >待退押金：</view>
+    <view class="right-column" style="width: 50%;" >{{unRefundDepositStr}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" style="width: 50%;" >待结算租金：</view>
+    <view class="right-column" style="width: 50%;" >{{unSettledRentalStr}}</view>
+  </view>
+  <view style="color:gray">营业中</view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" style="width: 50%;" >非当日租赁退押金：</view>
+    <view class="right-column" style="width: 50%;" >{{currentDayRefundPlacedBeforeStr}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" style="width: 50%;" >当日完结租金：</view>
+    <view class="right-column" style="width: 50%;" >{{sameDaySettledRentalStr}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" style="width: 50%;" >当日收入总押金：</view>
+    <view class="right-column" style="width: 50%;" >{{currentTotalDepositStr}}</view>
+  </view>
+  
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" style="width: 50%;" >当日已退押金：</view>
+    <view class="right-column" style="width: 50%;" >{{sameDayRefundDepositStr}}</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" style="width: 50%;" >当日未退押金：</view>
+    <view class="right-column" style="width: 50%;" >{{currentDateUnRefundDepositStr}}</view>
+  </view>
+</view>

@@ -152,6 +152,9 @@ Page({
       case 'rent_list':
         path = 'rent/rent_list'
         break
+      case 'rent_report':
+        path = 'rent/rent_report'
+        break
       default:
         break
     }
