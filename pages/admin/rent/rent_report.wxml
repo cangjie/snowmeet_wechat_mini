@@ -8,7 +8,7 @@
     <view style="color:gray">营业前</view>
     <view id="1" style="display: flex;flex-direction: row;"  bindtap="showDetail">
       <view class="left-column" style="width: 50%;" >待退押金：</view>
-      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{unRefundDepositStr}}</view>
+      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;color:red" >{{unRefundDepositStr}}</view>
     </view>
     <view id="1" style="display: flex;flex-direction: row;" bindtap="showDetail">
       <view class="left-column" style="width: 50%;" >待结算租金：</view>
@@ -23,33 +23,34 @@
       <view class="left-column" style="width: 50%;"  >非当日租赁结算租金：</view>
       <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{settledBeforeRentalStr}}</view>
     </view>
-    <view style="display: flex;flex-direction: row;">
-      <view class="left-column" style="width: 50%;" >当日完结租金：</view>
+    <view style="color:gray">日租日结</view>
+    <view style="display: flex;flex-direction: row;" id="3" bindtap="showDetail"  >
+      <view class="left-column" style="width: 50%;" >日租日结已结算租金：</view>
       <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{sameDaySettledRentalStr}}</view>
     </view>
-    <view style="display: flex;flex-direction: row;">
+    <view style="display: flex;flex-direction: row;" id="3" bindtap="showDetail" >
+      <view class="left-column" style="width: 50%;" >日租日结退押金：</view>
+      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{sameDayRefundDepositStr}}</view>
+    </view>
+    <view style="color:gray">当日收入押金情况</view>
+    <view style="display: flex;flex-direction: row;" id="4" bindtap="showDetail" >
       <view class="left-column" style="width: 50%;" >当日收入总押金：</view>
       <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{currentTotalDepositStr}}</view>
     </view>
-    
-    <view style="display: flex;flex-direction: row;">
-      <view class="left-column" style="width: 50%;" >当日已退押金：</view>
-      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{sameDayRefundDepositStr}}</view>
-    </view>
-    <view style="display: flex;flex-direction: row;">
+    <view style="display: flex;flex-direction: row;" id="4" bindtap="showDetail" >
       <view class="left-column" style="width: 50%;" >当日未退押金：</view>
-      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{currentDateUnRefundDepositStr}}</view>
+      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;color:red" >{{currentDateUnRefundDepositStr}}</view>
     </view>
-
-    <view style="display: flex;flex-direction: row;">
+    <view style="color:gray">当日产出租金</view>
+    <view style="display: flex;flex-direction: row;" id="5" bindtap="showDetail"  >
       <view class="left-column" style="width: 50%;" >今日业务总租金：</view>
       <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{currentBusinessRentalStr}}</view>
     </view>
-    <view style="display: flex;flex-direction: row;">
+    <view style="display: flex;flex-direction: row;" id="5" bindtap="showDetail"  >
       <view class="left-column" style="width: 50%;" >今日业务已结算租金：</view>
       <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{currentBusinessRentalSettledStr}}</view>
     </view>
-    <view style="display: flex;flex-direction: row;">
+    <view style="display: flex;flex-direction: row;" id="5" bindtap="showDetail"  >
       <view class="left-column" style="width: 50%;" >今日业务待结算租金：</view>
       <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{currentBusinessRentalUnSettledStr}}</view>
     </view>
@@ -102,6 +103,84 @@
         <view class="right-column" >{{item.deposit_final_str}}</view>
         <view class="left-column">租金：</view>
         <view class="right-column" >{{item.orderRentalStr}}</view>
+      </view>
+    </mp-cell>
+    
+  </mp-cells>
+  <button bindtap="goBack"> 返 回 </button>
+</view>
+<view wx:if="{{scene==3}}" >
+  <mp-cells title="日租日结订单 共{{CurrentSameDaySettledSet.length}}笔  退押金：{{sameDayRefundDepositStr}} 结算租金：{{sameDaySettledRentalStr}}" >
+    <mp-cell wx:for="{{CurrentSameDaySettledSet}}" >
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">订单号：</view>
+        <view class="right-column" >{{item.id}}</view>
+        <view class="left-column">店员：</view>
+        <view class="right-column" >{{item.staff_name}}</view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">日期：</view>
+        <view class="right-column" >{{item.create_date_str}}</view>
+        <view class="left-column">时间：</view>
+        <view class="right-column" >{{item.create_time_str}}</view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">押金：</view>
+        <view class="right-column" >{{item.deposit_final_str}}</view>
+        <view class="left-column">租金：</view>
+        <view class="right-column" >{{item.orderRentalStr}}</view>
+      </view>
+    </mp-cell>
+    
+  </mp-cells>
+  <button bindtap="goBack"> 返 回 </button>
+</view>
+<view wx:if="{{scene==4}}" >
+  <mp-cells title="今日开单订单 共{{CurrentDayPlacedSet.length}}笔  当日收入押金：{{currentTotalDepositStr}} 当日未退：{{currentDateUnRefundDepositStr}}" >
+    <mp-cell wx:for="{{CurrentDayPlacedSet}}" >
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">订单号：</view>
+        <view class="right-column" >{{item.id}}</view>
+        <view class="left-column">店员：</view>
+        <view class="right-column" >{{item.staff_name}}</view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">日期：</view>
+        <view class="right-column" >{{item.create_date_str}}</view>
+        <view class="left-column">时间：</view>
+        <view class="right-column" >{{item.create_time_str}}</view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">押金：</view>
+        <view class="right-column" >{{item.deposit_final_str}}</view>
+        <view class="left-column">当时状态：</view>
+        <view class="right-column" >{{item.currentStatus}}</view>
+      </view>
+    </mp-cell>
+    
+  </mp-cells>
+  <button bindtap="goBack"> 返 回 </button>
+</view>
+<view wx:if="{{scene==5}}" >
+  <mp-cells title="今日业务租金 共{{CurrentIncomdeOrderSet.length}}笔  今日业务总租金：{{currentBusinessRentalStr}} 已结算：{{currentBusinessRentalSettledStr}} 未结算：{{currentBusinessRentalUnSettledStr}}" >
+    <mp-cell wx:for="{{CurrentIncomdeOrderSet}}" >
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">订单号：</view>
+        <view class="right-column" >{{item.id}}</view>
+        <view class="left-column">店员：</view>
+        <view class="right-column" >{{item.staff_name}}</view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">日期：</view>
+        <view class="right-column" >{{item.create_date_str}}</view>
+        <view class="left-column">时间：</view>
+        <view class="right-column" >{{item.create_time_str}}</view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column">未结算：</view>
+        <view class="right-column" >{{item.currentDayRentalUnSettledStr}}</view>
+        <view class="left-column">已结算</view>
+        <view class="right-column" >{{item.currentDayRentalSettledStr}}</view>
       </view>
     </mp-cell>
     

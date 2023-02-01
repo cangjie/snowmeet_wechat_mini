@@ -1,7 +1,6 @@
 // pages/admin/rent/rent_report.js
 const app = getApp()
 const util = require('../../../utils/util.js')
-const utile = require('../../../utils/util.js')
 Page({
 
   /**
@@ -46,18 +45,31 @@ Page({
 
         var orders = res.data.orders
 
+        var currentIncomeOrders = []
 
+        var sameDaySettled = that.data.CurrentSameDaySettledSet
+
+         
 
         var currentBusinessRental = that.data.currentBusinessRental
         var currentBusinessRentalSettled = that.data.currentBusinessRentalSettled
         var currentBusinessRentalUnSettled = that.data.currentBusinessRentalUnSettled
+        
         for(var i = 0; orders != null && i < orders.length; i++){
+
+          
           var createDate = new Date(orders[i].create_date)
           orders[i].create_date_str = util.formatDate(createDate)
           orders[i].create_time_str = util.formatTimeStr(createDate)
           orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
+          orders[i].currentStatus = '已结算'
+
+          orders[i].currentDayRentalSettled = 0
+          orders[i].currentDayRentalUnSettled = 0
+
           var orderRental = 0
           var rentalList = orders[i].rentalDetails
+          var haveCurrentDayIncome = false
           for(var j = 0; rentalList != null && j < rentalList.length; j++){
             var rental = rentalList[j]
             var currentDate = new Date(that.data.currentDate.toString()+'T00:00:00')
@@ -65,19 +77,24 @@ Page({
             var rentalAmount = parseFloat(rental.rental)
             
             
+
             if (currentDate.getFullYear() == rentalDate.getFullYear()
               && currentDate.getMonth() == rentalDate.getMonth()
               && currentDate.getDate() == rentalDate.getDate()){
               
               if (!isNaN(rentalAmount)){
+                haveCurrentDayIncome = true
                 currentBusinessRental = currentBusinessRental + rentalAmount
+                
                 if (rental.type != ''){
+
                   currentBusinessRentalSettled = currentBusinessRentalSettled + rentalAmount
-                  
+                  orders[i].currentDayRentalSettled += rentalAmount
                 }
                 else{
-                  currentBusinessRentalUnSettled += rentalAmount
                   
+                  currentBusinessRentalUnSettled += rentalAmount
+                  orders[i].currentDayRentalUnSettled += rentalAmount
                 }
               }
               
@@ -87,10 +104,15 @@ Page({
             }
           }
           orders[i].orderRentalStr = util.showAmount(orderRental)
+          orders[i].currentDayRentalSettledStr = util.showAmount(orders[i].currentDayRentalSettled)
+          orders[i].currentDayRentalUnSettledStr = util.showAmount(orders[i].currentDayRentalUnSettled)
+          if (haveCurrentDayIncome){
+            currentIncomeOrders.push(orders[i])
+          }
         }
 
         that.setData({unRefundDeposit: res.data.unRefundDeposit, unRefundDepositStr: util.showAmount(res.data.unRefundDeposit), unSettledReantal: res.data.unSettledRental, unSettledRentalStr: util.showAmount(res.data.unSettledRental), currentBusinessRental: currentBusinessRental,
-          currentBusinessRentalStr: util.showAmount(currentBusinessRental), currentBusinessRentalSettled: currentBusinessRentalSettled, currentBusinessRentalSettledStr: util.showAmount(currentBusinessRentalSettled), currentBusinessRentalUnSettled: currentBusinessRentalUnSettled, currentBusinessRentalUnSettledStr: util.showAmount(currentBusinessRentalUnSettled), UnSettledOrderBeforeSet: orders})
+          currentBusinessRentalStr: util.showAmount(currentBusinessRental), currentBusinessRentalSettled: currentBusinessRentalSettled, currentBusinessRentalSettledStr: util.showAmount(currentBusinessRentalSettled), currentBusinessRentalUnSettled: currentBusinessRentalUnSettled, currentBusinessRentalUnSettledStr: util.showAmount(currentBusinessRentalUnSettled), UnSettledOrderBeforeSet: orders, CurrentIncomdeOrderSet: currentIncomeOrders})
         wx.request({
           url: getCurrentDayPlacedUrl,
           method: 'GET',
@@ -100,8 +122,19 @@ Page({
             var currentBusinessRental = that.data.currentBusinessRental
             var currentBusinessRentalSettled = that.data.currentBusinessRentalSettled
             var currentBusinessRentalUnSettled = that.data.currentBusinessRentalUnSettled
+            var currentIncomeOrders = that.data.CurrentIncomdeOrderSet
             for(var i = 0; orders != null && i < orders.length; i++){
               var rentalList = orders[i].rentalDetails
+              orders[i].currentStatus = '已结算'
+              var createDate = new Date(orders[i].create_date)
+              orders[i].create_date_str = util.formatDate(createDate)
+              orders[i].create_time_str = util.formatTimeStr(createDate)
+              orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
+              orders[i].currentDayRentalSettled = 0
+              orders[i].currentDayRentalUnSettled = 0
+              var orderDisplayedRental = 0
+              var haveCurrentIncome = false
+              
               for(var j = 0; rentalList != null && j < rentalList.length; j++){
                 var rental = rentalList[j]
                 var currentDate = new Date(that.data.currentDate.toString()+'T00:00:00')
@@ -109,32 +142,79 @@ Page({
                 if (currentDate.getFullYear() == rentalDate.getFullYear()
                   && currentDate.getMonth() == rentalDate.getMonth()
                   && currentDate.getDate() == rentalDate.getDate()){
+
+                  haveCurrentIncome = true
                   var rentalAmount = parseFloat(rental.rental)
                   
                   if (!isNaN(rentalAmount)){
                     currentBusinessRental = currentBusinessRental + rentalAmount
+                    orderDisplayedRental = rentalAmount
                     if (rental.type != ''){
                       currentBusinessRentalSettled = currentBusinessRentalSettled + rentalAmount
+                      orders[i].currentDayRentalSettled += rentalAmount
                     }
                     else {
                       currentBusinessRentalUnSettled += rentalAmount
+                      orders[i].currentDayRentalUnSettled += rentalAmount
                     }
                   }
                   
                 }
+              }
+
+              
+              orders[i].currentDayRentalSettledStr = util.showAmount(orders[i].currentDayRentalSettled)
+              orders[i].currentDayRentalUnSettledStr = util.showAmount(orders[i].currentDayRentalUnSettled)
+              orders[i].orderRentalStr = util.showAmount(orderDisplayedRental)
+              if (haveCurrentIncome){
+                currentIncomeOrders.push(orders[i])
+
               }
             }
 
 
 
 
-            that.setData({currentTotalDeposit: res.data.totalDeposit, currentTotalDepositStr: util.showAmount(res.data.totalDeposit), currentBusinessRental: currentBusinessRental, currentBusinessRentalStr: util.showAmount(currentBusinessRental), currentBusinessRentalSettled: currentBusinessRentalSettled, currentBusinessRentalSettledStr: util.showAmount(currentBusinessRentalSettled), currentBusinessRentalSettled: currentBusinessRentalSettled, currentBusinessRentalSettledStr: util.showAmount(currentBusinessRentalSettled), currentBusinessRentalUnSettled: currentBusinessRentalUnSettled, currentBusinessRentalUnSettledStr: util.showAmount(currentBusinessRentalUnSettled), CurrentDayPlacedSet: res.data})
+            that.setData({currentTotalDeposit: res.data.totalDeposit, currentTotalDepositStr: util.showAmount(res.data.totalDeposit), currentBusinessRental: currentBusinessRental, currentBusinessRentalStr: util.showAmount(currentBusinessRental), currentBusinessRentalSettled: currentBusinessRentalSettled, currentBusinessRentalSettledStr: util.showAmount(currentBusinessRentalSettled), currentBusinessRentalSettled: currentBusinessRentalSettled, currentBusinessRentalSettledStr: util.showAmount(currentBusinessRentalSettled), currentBusinessRentalUnSettled: currentBusinessRentalUnSettled, currentBusinessRentalUnSettledStr: util.showAmount(currentBusinessRentalUnSettled), CurrentDayPlacedSet: orders, CurrentIncomdeOrderSet: currentIncomeOrders})
             wx.request({
               url: getCurrentSameDaySettledUrl,
               method:'GET',
               success:(res)=>{
                 console.log('today settled', res)
-                that.setData({sameDaySettledRental: res.data.totalRental, sameDaySettledRentalStr: util.showAmount(res.data.totalRental), sameDayRefundDeposit: res.data.totalDeposit, sameDayRefundDepositStr: util.showAmount(res.data.totalDeposit), CurrentSameDaySettledSet: res.data})
+
+
+                var orders = res.data.orders
+
+                var currentDatePlacedOrders = that.data.CurrentDayPlacedSet
+
+
+                for(var i = 0; i < orders.length; i++){
+                  var createDate = new Date(orders[i].create_date)
+                  orders[i].create_date_str = util.formatDate(createDate)
+                  orders[i].create_time_str = util.formatTimeStr(createDate)
+                  orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
+                  var details = orders[i].details
+                  var rental = 0;
+                  for(var j = 0; details != null && j < details.length; j++){
+                    var amount = parseFloat(details[j].real_rental)
+                    if (!isNaN(amount)){
+                      rental += amount
+                    }
+                  }
+                  orders[i].orderRentalStr = util.showAmount(rental)
+
+                  for(var j = 0; j < currentDatePlacedOrders.length; j++){
+                    
+                    if (orders[i].id == currentDatePlacedOrders[j].id){
+                      currentDatePlacedOrders[j].currentStatus = '已结算'
+                      break
+                    }
+                  }
+
+                }
+
+
+                that.setData({sameDaySettledRental: res.data.totalRental, sameDaySettledRentalStr: util.showAmount(res.data.totalRental), sameDayRefundDeposit: res.data.totalDeposit, sameDayRefundDepositStr: util.showAmount(res.data.totalDeposit), CurrentSameDaySettledSet: orders, CurrentDayPlacedSet: currentDatePlacedOrders})
                 wx.request({
                   url: getCurrentDaySettledPlacedBeforeUrl,
                   method:'GET',
@@ -148,16 +228,12 @@ Page({
                     
 
 
+
                     for(var i = 0; orders != null && i < orders.length; i++){
                       var details = orders[i].details
                       var orderRental = 0
 
-                      var createDate = new Date(orders[i].create_date)
-
-                      orders[i].create_date_str = util.formatDate(createDate)
-                      orders[i].create_time_str = util.formatTimeStr(createDate)
-                      orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
-
+                      
 
                       for(var j = 0; details != null && j < details.length; j++){
                         var detail = details[j]
@@ -169,6 +245,11 @@ Page({
                         }
                       }
                       orders[i].orderRentalStr = util.showAmount(orderRental)
+
+                      
+
+
+
                     }
 
 
