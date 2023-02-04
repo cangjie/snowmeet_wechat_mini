@@ -64,7 +64,8 @@
     "pages/admin/rent/rent_list",
     "pages/admin/rent/rent_detail",
     "pages/rent/bind_rent_order",
-    "pages/admin/rent/rent_report"
+    "pages/admin/rent/rent_report",
+    "pages/admin/rent/rent_admit_easy"
   ],
   "window": {
     "backgroundTextStyle": "light",
