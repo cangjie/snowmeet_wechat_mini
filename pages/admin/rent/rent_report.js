@@ -224,14 +224,16 @@ Page({
 
                     var settledBeforeRental = that.data.settledBeforeRental
                     var orders = res.data.orders
-
                     
-
 
 
                     for(var i = 0; orders != null && i < orders.length; i++){
                       var details = orders[i].details
                       var orderRental = 0
+                      var createDate = new Date(orders[i].create_date)
+                      orders[i].create_date_str = util.formatDate(createDate)
+                      orders[i].create_time_str = util.formatTimeStr(createDate)
+                      orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
 
                       
 
@@ -278,7 +280,12 @@ Page({
     var that = this
     that.setData({scene: parseInt(id)})
   },
-
+  gotoDetail(e){
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'rent_detail?id=' + id,
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */

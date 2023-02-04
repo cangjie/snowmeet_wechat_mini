@@ -30,7 +30,8 @@
           <view class="left-column">订单号：</view>
           <view class="right-column" >{{item.id}}</view>
           <view class="left-column">状态：</view>
-          <view class="right-column" >{{item.status}}</view>
+          <view class="right-column" wx:if="{{item.status=='已退款'}}" style="color:red" >{{item.status}}</view>
+          <view class="right-column" wx:else >{{item.status}}</view>
         </view>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column">姓名：</view>

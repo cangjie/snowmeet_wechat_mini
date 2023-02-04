@@ -59,7 +59,7 @@
 </view>
 <view wx:if="{{scene==1}}" >
   <mp-cells title="日前未结算订单 共{{UnSettledOrderBeforeSet.length}}笔  待退押金：{{unRefundDepositStr}} 待结算租金：{{unSettledRentalStr}}" >
-    <mp-cell wx:for="{{UnSettledOrderBeforeSet}}" >
+    <mp-cell wx:for="{{UnSettledOrderBeforeSet}}" id="{{item.id}}" bindtap="gotoDetail" >
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column">订单号：</view>
         <view class="right-column" >{{item.id}}</view>
@@ -85,7 +85,7 @@
 </view>
 <view wx:if="{{scene==2}}" >
   <mp-cells title="日前结算之前订单 共{{CurrentDaySettledPlacedBeforeSet.length}}笔  退押金：{{currentDayRefundPlacedBeforeStr}} 结算租金：{{settledBeforeRentalStr}}" >
-    <mp-cell wx:for="{{CurrentDaySettledPlacedBeforeSet}}" >
+    <mp-cell wx:for="{{CurrentDaySettledPlacedBeforeSet}}" id="{{item.id}}" bindtap="gotoDetail" >
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column">订单号：</view>
         <view class="right-column" >{{item.id}}</view>
@@ -111,8 +111,8 @@
 </view>
 <view wx:if="{{scene==3}}" >
   <mp-cells title="日租日结订单 共{{CurrentSameDaySettledSet.length}}笔  退押金：{{sameDayRefundDepositStr}} 结算租金：{{sameDaySettledRentalStr}}" >
-    <mp-cell wx:for="{{CurrentSameDaySettledSet}}" >
-      <view style="display: flex;flex-direction: row;" >
+    <mp-cell wx:for="{{CurrentSameDaySettledSet}}" id="{{item.id}}" bindtap="gotoDetail" >
+      <view style="display: flex;flex-direction: row;" id="{{item.id}}" bindtap="gotoDetail" >
         <view class="left-column">订单号：</view>
         <view class="right-column" >{{item.id}}</view>
         <view class="left-column">店员：</view>
@@ -137,8 +137,8 @@
 </view>
 <view wx:if="{{scene==4}}" >
   <mp-cells title="今日开单订单 共{{CurrentDayPlacedSet.length}}笔  当日收入押金：{{currentTotalDepositStr}} 当日未退：{{currentDateUnRefundDepositStr}}" >
-    <mp-cell wx:for="{{CurrentDayPlacedSet}}" >
-      <view style="display: flex;flex-direction: row;" >
+    <mp-cell wx:for="{{CurrentDayPlacedSet}}" id="{{item.id}}" bindtap="gotoDetail" >
+      <view style="display: flex;flex-direction: row;"  >
         <view class="left-column">订单号：</view>
         <view class="right-column" >{{item.id}}</view>
         <view class="left-column">店员：</view>
@@ -163,7 +163,7 @@
 </view>
 <view wx:if="{{scene==5}}" >
   <mp-cells title="今日业务租金 共{{CurrentIncomdeOrderSet.length}}笔  今日业务总租金：{{currentBusinessRentalStr}} 已结算：{{currentBusinessRentalSettledStr}} 未结算：{{currentBusinessRentalUnSettledStr}}" >
-    <mp-cell wx:for="{{CurrentIncomdeOrderSet}}" >
+    <mp-cell wx:for="{{CurrentIncomdeOrderSet}}"  id="{{item.id}}" bindtap="gotoDetail" >
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column">订单号：</view>
         <view class="right-column" >{{item.id}}</view>
