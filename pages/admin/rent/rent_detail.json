@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "mp-gallery": "weui-miniprogram/gallery/gallery"
+  },
+  "navigationBarTitleText": "租赁详情"
+}

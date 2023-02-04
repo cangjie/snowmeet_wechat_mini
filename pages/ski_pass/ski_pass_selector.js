@@ -110,10 +110,11 @@ Page({
     }
     that.setData({reserveDate: reserveDate, reserveDateDesc: reserveDateDesc})
 
-
+/*
     if (now.getDate() == reserveDate.getDate()){
 
     }
+    */
     that.GetData()
   },
   TagsChange(e){

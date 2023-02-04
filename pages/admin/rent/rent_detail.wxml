@@ -1,0 +1,170 @@
+<view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">订单号：</view>
+    <view class="right-column">{{rentOrder.id}}</view>
+    <view class="left-column">店铺：</view>
+    <view class="right-column">{{rentOrder.shop}}</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">手机：</view>
+    <view class="right-column">{{rentOrder.cell_number}}</view>
+    <view class="left-column">姓名：</view>
+    <view class="right-column">{{rentOrder.real_name}}</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">优惠券：</view>
+    <view class="right-column">无</view>
+    <view class="left-column">抵押物：</view>
+    <view class="right-column"  wx:if="{{rentOrder.has_guarantee_credit == 1}}" >有</view>
+    <view class="right-column"  wx:else >无</view>
+  </view>
+  <view wx:if="{{rentOrder.guarantee_credit_photos_arr.length > 0}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;">
+    <image id="credit_{{index}}" bindtap="showGallery" wx:for="{{rentOrder.guarantee_credit_photos_arr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
+    
+  </view>
+  <mp-gallery show="{{showCreditGallery}}" showDelete="{{false}}" imgUrls="{{rentOrder.guarantee_credit_photos_arr}}" current="{{0}}"  ></mp-gallery>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">押金总计：</view>
+    <view class="right-column">{{rentOrder.deposit_real_str}}</view>
+    <view class="left-column">押金减免：</view>
+    <view class="right-column">{{rentOrder.deposit_reduce_str}}</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">支付金额：</view>
+    <view class="right-column">{{rentOrder.deposit_final_str}}</view>
+    <view class="left-column">订单状态：</view>
+    <view class="right-column">{{rentOrder.status}}</view>
+    
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">支付单号：</view>
+    <view class="right-column" style="width: 400rpx;">{{rentOrder.outTradeNo}}</view>
+    
+  </view>
+  <view style="display: flex; flex-direction: row;" >
+    <view class="left-column">支付时间：</view>
+    <view class="right-column" style="width:400rpx" >{{rentOrder.paidTimeStr}}</view>
+  </view>
+  <mp-cells title="租赁明细 {{rentOrder.details.length}}" >
+    <mp-cell wx:for="{{rentOrder.details}}">
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">编号：</view>
+        <view class="right-column">{{item.rent_item_code}}</view>
+        <view class="left-column">名称：</view>
+        <view class="right-column">{{item.rent_item_name}}</view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">计划归还：</view>
+        <view class="right-column">{{rentOrder.due_end_time_str}}</view>
+        <view class="left-column">状态：</view>
+        <view class="right-column">{{item.status}}</view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">租赁单价：</view>
+        <view class="right-column">{{item.unit_rental_str}}</view>
+        <view class="left-column">租用时间：</view>
+        <view class="right-column">{{item.timeLength}}</view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">租金：</view>
+        <view class="right-column">
+          <input  wx:if="{{item.status == '未归还'}}" type="digit" id="rental_{{index}}" placeholder="{{item.suggestRental}}"  bindinput="setRental"   />
+          <block wx:else>{{item.real_rental_str}}</block>
+        </view>
+        <view class="left-column">押金：</view>
+        <view class="right-column">{{item.deposit_str}}</view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">超时：</view>
+        <view class="right-column">{{(item.overTime)? '是' : '否'}}</view>
+        <view class="left-column">超时费：</view>
+        <view class="right-column">
+          <view wx:if="{{item.status == '已归还'}}" >{{item.overtime_charge_str}}</view>
+          <input wx:else id="{{index}}" bindinput="setOvertimeCharge" />
+        </view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">损坏赔偿：</view>
+        <view class="right-column">
+          <input wx:if="{{item.status == '未归还'}}" type="digit" id="reparation_{{index}}" placeholder="{{item.reparation}}" bindinput="setReparation" /> 
+          <block wx:else>{{item.reparationStr}}</block>
+        </view>
+        <view class="left-column">应退金额：</view>
+        <view class="right-column">{{item.refund_str}}</view>
+      </view>
+      <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
+        <input wx:if="{{item.status == '未归还'}}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" />
+        <block wx:else >{{item.memo}}</block>
+      </view>
+      <view wx:if="{{item.imageArr.length > 0}}" id="{{index}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;" bindtap="showDetailGallery" >
+        <image id="credit_{{index}}"  wx:for="{{item.imageArr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
+      </view>
+      <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery>
+  
+      <view style="display: flex; flex-direction: row;">
+        <button id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> <!--button> 更 换 </button-->
+      </view>
+      <!--view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view-->
+    </mp-cell>
+   
+  </mp-cells>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">已付押金：</view>
+    <view class="right-column">{{rentOrder.deposit_final_str}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">租金合计：</view>
+    <view class="right-column">{{totalRentalStr}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">超时合计：</view>
+    <view class="right-column">{{totalOvertimeChargeStr}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">赔偿合计：</view>
+    <view class="right-column">{{totalReparationStr}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">租金减免：</view>
+    <view class="right-column">
+      <view wx:if="{{rentOrder.status == '已退款'}}" >{{rentalReduceStr}}</view>
+      <input wx:else type="digit" placeholder="0" bindinput="setRentalReduce" placeholder="{{rentOrder.rental_reduce}}" />
+    </view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">优惠券减免：</view>
+    <view class="right-column">
+      <view wx:if="{{rentOrder.status == '已退款'}}" >{{rentalReduceTicketStr}}</view>
+      <input wx:else type="digit" placeholder="0" bindinput="setRentalReduceTicket" placeholder="{{rentOrder.rental_reduce_ticket}}" />
+    </view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">应退金额：</view>
+    <view class="right-column">{{refundAmountStr}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <!--view style="display: flex; flex-direction: row;">
+    <view class="left-column">实退金额：</view>
+    <view class="right-column"><input value="{{refundAmount}}"  bindinput="setRefundAmount" /></view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view-->
+  <view  style="margin-left: 100rpx; margin-right: 100rpx;margin-top: 50rpx;margin-bottom: 50rpx;"  >
+    <input wx:if="{{rentOrder.status == '全部归还'}}" value="{{rentOrder.memo}}" bindinput="setOrderMemo" placeholder="填写订单备注" />
+    <block wx:else >{{rentOrder.memo}}</block>
+  </view>
+  <view><button disabled="{{rentOrder.status != '全部归还'}}" bindtap="refund" > 确 认 退 款 </button></view>
+</view>

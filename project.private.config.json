@@ -73,6 +73,13 @@
           "query": "",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/rent/bind_rent_order",
+          "query": "id=7",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

@@ -15,6 +15,11 @@
     <!--mp-cell id="SummerMaintainRecept" value="非雪季养护收板" bindtap="gotoSummerMaintain" ></mp-cell>
     <mp-cell id="SummerMaintainList" value="非雪季养护列表" bindtap="gotoSummerMaintain" ></mp-cell-->
   </mp-cells>
+  <mp-cells ext-class="my-cells" title="租赁" >
+    <mp-cell id="rend_admit" value="租赁收押金" bindtap="nav" ></mp-cell>
+    <mp-cell id="rent_list" value="查看租赁订单" bindtap="nav" ></mp-cell>
+    <mp-cell id="rent_report" value="租赁报表" bindtap="nav" ></mp-cell>
+  </mp-cells>
   <mp-cells ext-class="my-cells" title="试滑" >
     <mp-cell id="expierence_admit" value="试滑收押金" bindtap="nav" ></mp-cell>
     <mp-cell id="expierence_active_list" value="当前试滑列表" bindtap="nav" ></mp-cell>
