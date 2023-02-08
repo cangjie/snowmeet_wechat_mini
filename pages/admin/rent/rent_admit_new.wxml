@@ -1,0 +1,3 @@
+<view>
+  <button bindtap="goBack"> 返 回 旧 版 </button>
+</view>
