@@ -380,7 +380,7 @@ Page({
       success:(res)=>{
         console.log('submit order', res)
         var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=confirm_order_id_' + res.data.id)
-        if (res.data.payments.length > 0 && res.data.payments[0].pay_method == '微信支付'){
+        if (res.data.payments != null && res.data.payments.length > 0 && res.data.payments[0].pay_method == '微信支付'){
           qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + res.data.payments[0].id)
         }
         

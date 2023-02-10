@@ -1,0 +1,59 @@
+<view>
+  <view wx:if="{{scene==0}}" >
+    <button bindtap="goBack"> 返 回 旧 版 </button>
+    <mp-cells title="租赁列表" style="height: 900rpx;" >
+      <mp-cell> 
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 25%;text-align: center;" ><b>编号</b></view>
+          <view style="width: 25%;text-align: center;" ><b>类别</b></view>
+          <view style="width: 25%;text-align: center;" ><b>名称</b></view>
+          <view style="width: 25%;text-align: center;" ><b>押金</b></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <view style="background-color:#eeeeee;">
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;margin-top: 0rpx;text-align: right;" class="op-cell" >
+          编码：
+        </view>
+        <view style="width: 40%;margin-top: 0rpx;margin-left: 0rpx;" class="op-cell" >
+          <input class="input" />
+        </view>
+        <view style="width: 40%;margin-top: 0rpx;margin-left: 0rpx;display: flex;flex-direction: row;" class="op-cell" >
+          <view style="margin-left: 20rpx;"> </view>
+          <image src="../../../images/scan.jpeg" style="width: 50rpx; height: 50rpx;" />
+          <view style="margin-left: 20rpx;font-size: 10pt;">
+            <switch style="height: 60rpx;">无码物品</switch>
+          </view>
+        </view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;text-align: right;" class="op-cell" >类别：</view>
+        <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
+          <picker range="{{classList}}" mode="selector" >
+            <picker-view>{{classList[classSelectIndex]}}</picker-view>
+          </picker>
+        </view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;text-align: right;" class="op-cell" >名称：</view>
+        <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
+          <input style="width: 80%;" class="input" />
+        </view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;text-align: right;" class="op-cell" >租金：</view>
+        <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
+          <input style="width: 80%;" class="input" />
+        </view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;text-align: right;" class="op-cell" >押金：</view>
+        <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
+          <input style="width: 80%;" class="input" />
+        </view>
+      </view>
+      
+    </view>
+  </view>
+</view>

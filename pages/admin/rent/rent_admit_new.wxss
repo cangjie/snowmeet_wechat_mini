@@ -1,0 +1,9 @@
+/* pages/admin/rent/rent_admit_new.wxss */
+.op-cell{
+  height: 70rpx;
+  padding-top: 20rpx;
+  padding-left: 1rpx;
+  margin-top: 1rpx;
+  margin-left: 1rpx;
+  background-color: #ffffff;
+}
