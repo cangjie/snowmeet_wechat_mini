@@ -102,12 +102,17 @@
       <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery>
   
       <view style="display: flex; flex-direction: row;">
-        <button id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> <!--button> 更 换 </button-->
+        <button style="width: 200rpx;">起租</button>
+        <button style="width: 200rpx;" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" >归还</button> <!--button> 更 换 </button-->
+        <button style="width: 200rpx;" >修改</button>
       </view>
       <!--view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view-->
     </mp-cell>
    
   </mp-cells>
+  <view>
+    <button> 追 加 租 赁 物 </button>
+  </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">已付押金：</view>
     <view class="right-column">{{rentOrder.deposit_final_str}}</view>
