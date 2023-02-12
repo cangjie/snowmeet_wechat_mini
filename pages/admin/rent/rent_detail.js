@@ -130,7 +130,11 @@ Page({
     if (!isNaN(value)){
       detail.reparation = value
     }
-    detail.refund_str = util.showAmount(detail.deposit - detail.filled_rental - detail.reparation - detail.overtime_charge)
+    var filledRental = parseFloat(detail.filled_rental)
+    if (isNaN(filledRental)){
+      filledRental = detail.real_rental
+    }
+    detail.refund_str = util.showAmount(detail.deposit - filledRental - detail.reparation - detail.overtime_charge)
     that.setData({rentOrder: rentOrder})
     that.computeTotal()
   },
@@ -286,6 +290,66 @@ Page({
     that.computeTotal()
 
   },
+
+  setMod(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var rentOrder = that.data.rentOrder
+    rentOrder.details[id].isEdit = true
+    that.setData({rentOrder: rentOrder})
+  },
+
+  setSave(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var detail = that.data.rentOrder.details[id]
+
+    var realRental = parseFloat(detail.filled_rental)
+    var reparation = parseFloat(detail.reparation)
+    if (isNaN(realRental)){
+      realRental = parseFloat(detail.real_rental)
+    }
+    
+
+    var modUrl = 'https://' + app.globalData.domainName + '/core/Rent/ModItemInfo/' + detail.id
+      + '?rental=' + encodeURIComponent(realRental) 
+      + '&reparation=' + encodeURIComponent(reparation)
+      + '&memo=' + encodeURIComponent(detail.memo) 
+      + '&overTimeCharge=' + encodeURIComponent(detail.overtime_charge)
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    console.log('modurl', modUrl)
+  
+    wx.request({
+      url: modUrl,
+      method:'GET',
+      success:(res)=>{
+        if (res.statusCode == 200)
+        {
+          wx.showToast({
+            title: '修改成功',
+            icon: 'success',
+            success:()=>{
+              var rentOrder = that.data.rentOrder
+              rentOrder.details[id].isEdit = false
+              that.setData({rentOrder: rentOrder})
+            }
+
+          })
+        
+        }
+      }
+    })
+
+
+    
+  },
+
   /**
    * Lifecycle function--Called when page load
    */
