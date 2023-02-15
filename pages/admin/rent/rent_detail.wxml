@@ -68,7 +68,7 @@
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">租金：</view>
         <view class="right-column">
-          <input  wx:if="{{item.status == '未归还'}}" type="digit" id="rental_{{index}}" placeholder="{{item.suggestRental}}"  bindinput="setRental"   />
+          <input  wx:if="{{item.status == '未归还' || item.isEdit == true }}" type="digit" id="rental_{{index}}" placeholder="{{item.suggestRental}}"  bindinput="setRental"   />
           <block wx:else>{{item.real_rental_str}}</block>
         </view>
         <view class="left-column">押金：</view>
@@ -79,21 +79,21 @@
         <view class="right-column">{{(item.overTime)? '是' : '否'}}</view>
         <view class="left-column">超时费：</view>
         <view class="right-column">
-          <view wx:if="{{item.status == '已归还'}}" >{{item.overtime_charge_str}}</view>
+          <view wx:if="{{item.status == '已归还' && item.isEdit != true}}" >{{item.overtime_charge_str}}</view>
           <input wx:else id="{{index}}" bindinput="setOvertimeCharge" />
         </view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">损坏赔偿：</view>
         <view class="right-column">
-          <input wx:if="{{item.status == '未归还'}}" type="digit" id="reparation_{{index}}" placeholder="{{item.reparation}}" bindinput="setReparation" /> 
+          <input wx:if="{{item.status == '未归还' || item.isEdit == true }}" type="digit" id="reparation_{{index}}" placeholder="{{item.reparation}}" bindinput="setReparation" /> 
           <block wx:else>{{item.reparationStr}}</block>
         </view>
-        <view class="left-column">应退金额：</view>
+        <view class="left-column">应退金额：</view>
         <view class="right-column">{{item.refund_str}}</view>
       </view>
       <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
-        <input wx:if="{{item.status == '未归还'}}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" />
+        <input wx:if="{{item.status == '未归还' && item.isEdit != true }}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" />
         <block wx:else >{{item.memo}}</block>
       </view>
       <view wx:if="{{item.imageArr.length > 0}}" id="{{index}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;" bindtap="showDetailGallery" >
@@ -102,7 +102,9 @@
       <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery>
   
       <view style="display: flex; flex-direction: row;">
-        <button id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> <!--button> 更 换 </button-->
+        <button style="width:30%" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> 
+        <button style="width:30%" wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款'}}" bindtap="setMod" > 修 改 </button>
+        <button style="width:30%" wx:if="{{item.isEdit == true}}" id="{{index}}" bindtap="setSave" > 保 存 </button>
       </view>
       <!--view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view-->
     </mp-cell>
