@@ -102,14 +102,23 @@
       <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery>
   
       <view style="display: flex; flex-direction: row;">
+<<<<<<< HEAD
         <button style="width:30%" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> 
         <button style="width:30%" wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款'}}" bindtap="setMod" > 修 改 </button>
         <button style="width:30%" wx:if="{{item.isEdit == true}}" id="{{index}}" bindtap="setSave" > 保 存 </button>
+=======
+        <button style="width: 200rpx;">起租</button>
+        <button style="width: 200rpx;" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" >归还</button> <!--button> 更 换 </button-->
+        <button style="width: 200rpx;" >修改</button>
+>>>>>>> 1a7957d2c62b224d9133e8474b018b109aef7ed0
       </view>
       <!--view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view-->
     </mp-cell>
    
   </mp-cells>
+  <view>
+    <button> 追 加 租 赁 物 </button>
+  </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">已付押金：</view>
     <view class="right-column">{{rentOrder.deposit_final_str}}</view>
