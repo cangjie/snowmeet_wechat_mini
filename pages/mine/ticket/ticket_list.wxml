@@ -26,3 +26,4 @@
 
 </cover-view>
 </view>
+<auth wx:if="{{needAuth}}" validType="cell" bindUpdateSuccess="AuthFinish" ></auth>

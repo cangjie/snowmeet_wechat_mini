@@ -19,6 +19,12 @@ Page({
     
     var that = this
     var channel = ((options.channel == undefined)? '' : options.channel.trim())
+    if (options.q != undefined){
+      var url = decodeURIComponent(options.q)
+      console.log('scan url', url)
+      var urlArr = url.split('?')
+      channel = urlArr[urlArr.length - 1]
+    }
     app.loginPromiseNew.then(function(resolve){
       var getTemplateUrl = 'https://'  + app.globalData.domainName + '/core/Ticket/GetTemplateList'
       wx.request({
@@ -41,7 +47,7 @@ Page({
                 ticketTemplateArr[i].enable = true
                 for(var j = 0; j < myTickets.length; j++){
                   if (myTickets[j].template_id == ticketTemplateArr[i].id){
-                    ticketTemplateArr[i].enable = true
+                    ticketTemplateArr[i].enable = false
                     break
                   }
                 }
