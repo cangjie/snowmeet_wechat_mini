@@ -41,12 +41,12 @@ Page({
                 ticketTemplateArr[i].enable = true
                 for(var j = 0; j < myTickets.length; j++){
                   if (myTickets[j].template_id == ticketTemplateArr[i].id){
-                    ticketTemplateArr[i].enable = false
+                    ticketTemplateArr[i].enable = true
                     break
                   }
                 }
               }
-              that.setData({ticketTemplateArr: ticketTemplateArr, channle: channel})
+              that.setData({ticketTemplateArr: ticketTemplateArr, channel: channel})
               
             }
           })
