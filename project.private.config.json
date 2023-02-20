@@ -80,6 +80,13 @@
           "query": "id=7",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "maintain_code",
+          "pathName": "pages/admin/rent/rent_admit",
+          "query": "ticketCode=935056232",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

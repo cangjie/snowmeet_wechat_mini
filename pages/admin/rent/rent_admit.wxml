@@ -1,6 +1,7 @@
 <view wx:if="{{scene == 0}}">
   <shop-selector bindShopSelected="shopSelected" ></shop-selector>
-  <user-info bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" open_id="{{openId}}" ></user-info>
+  <user-info wx:if="{{ticketCode == ''}}" bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" open_id="{{openId}}" ></user-info>
+  <user-info wx:else bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" code="{{ticketCode}}" ></user-info>
 </view>
 <view wx:if="{{scene == 1}}" >
   <mp-cells wx:for="{{rentItemList}}" title="租赁物品{{index+1}}" >
