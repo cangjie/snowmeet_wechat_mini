@@ -14,9 +14,29 @@ Page({
     ticketArr:[],
     currentQrUrl :'',
     currentY: 0,
-    opacity: 0
+    opacity: 0,
+    needAuth: false
+  },
+  AuthFinish(){
+    var that = this
+    that.GetRealName()
   },
 
+  GetRealName(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res) => {
+        if (res.data.mini_users.length > 0){
+          that.setData({name: res.data.mini_users[0].real_name, cell: res.data.mini_users[0].cell_number})
+          app.globalData.cellNumber = that.data.cell
+        }
+        
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */
@@ -26,6 +46,9 @@ Page({
       this.setData({showUsed: true, usedColor: 'red', unUsedColor: 'gray', ticketTitleColor:'gray'})
     }
     app.loginPromiseNew.then(function(resolve){
+      if (app.globalData.cellNumber==undefined || app.globalData.cellNumber==null || app.globalData.cellNumber==''){
+        that.setData({needAuth: true})
+      }
       var getTicketsUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetMyTickets/' + (!that.data.showUsed? '0' :'1') + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: getTicketsUrl,

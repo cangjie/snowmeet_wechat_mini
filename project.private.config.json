@@ -70,7 +70,7 @@
         {
           "name": "get ticket",
           "pathName": "pages/tickets/tickets_get",
-          "query": "",
+          "query": "channel=test",
           "launchMode": "default",
           "scene": null
         },
