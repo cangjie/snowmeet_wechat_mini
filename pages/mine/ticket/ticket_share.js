@@ -9,7 +9,27 @@ Page({
   data: {
 
   },
-
+  accept(){
+    var that = this
+    var acceptUrl = 'https://' + app.globalData.domainName + '/core/Ticket/AcceptTicket/' + that.data.ticket.code + '?memo=' + encodeURIComponent('分享获得') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: acceptUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          wx.showToast({
+            title: '优惠券已经入账。',
+            icon:'success',
+            success:()=>{
+              wx.navigateTo({
+                url: './ticket_list',
+              })
+            }
+          })
+        }
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */

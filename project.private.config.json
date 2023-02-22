@@ -55,7 +55,7 @@
         },
         {
           "name": "ticket share",
-          "pathName": "pages/mine/ticket/ticket_detail",
+          "pathName": "pages/tickets/tickets_get",
           "query": "",
           "launchMode": "default",
           "scene": null

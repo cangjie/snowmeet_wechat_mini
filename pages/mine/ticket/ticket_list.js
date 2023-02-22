@@ -46,9 +46,11 @@ Page({
       this.setData({showUsed: true, usedColor: 'red', unUsedColor: 'gray', ticketTitleColor:'gray'})
     }
     app.loginPromiseNew.then(function(resolve){
+      /*
       if (app.globalData.cellNumber==undefined || app.globalData.cellNumber==null || app.globalData.cellNumber==''){
         that.setData({needAuth: true})
       }
+      */
       var getTicketsUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetMyTickets/' + (!that.data.showUsed? '0' :'1') + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: getTicketsUrl,

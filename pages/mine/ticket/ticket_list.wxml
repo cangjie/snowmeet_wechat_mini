@@ -1,7 +1,8 @@
 <view>
 <view class="btn-area flex-wrp" style="margin-top: 25rpx;flex-direction:row; text-align: center;">
-  <navigator style="width: 50%;text-align: center;color:{{unUsedColor}};" url="ticket_list?used=0" open-type="redirect" hover-class="other-navigator-hover" >未使用</navigator>
-  <navigator style="width: 50%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >已使用</navigator>
+  <navigator style="width: 33%;text-align: center;color:{{unUsedColor}};" url="ticket_list?used=0" open-type="redirect" hover-class="other-navigator-hover" >未使用</navigator>
+  <navigator style="width: 33%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >已使用</navigator>
+  <navigator style="width: 33%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >分享中</navigator>
 </view>
 <view style="height: 1rpx; background-color:#c0c0c0;"></view>
 <view wx:for="{{ticketArr}}" >
