@@ -3,6 +3,7 @@
 <mp-cells ext-class="my-cells" >
   <mp-cell value="我的雪票" footer="" bindtap="gotoSkipass"></mp-cell>
   <mp-cell value="我的优惠券" footer="" bindtap="gotoTicket"></mp-cell>
+  <!--mp-cell value="我的养护" footer="" bindtap="gotoMaintain"></mp-cell-->
   <!--mp-cell value="我的非雪季养护" footer="" bindtap="gotoSummerMaintain"></mp-cell-->
   <!--mp-cell value="我的订单" footer="" bindtap="gotoOrders" ></mp-cell-->
   <mp-cell wx:if="{{role=='staff'}}" value="我是管理员" footer="" bindtap="gotoAdmin" ></mp-cell>

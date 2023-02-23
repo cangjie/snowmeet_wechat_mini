@@ -105,5 +105,11 @@ Page({
     wx.navigateTo({
       url: '/pages/summer_maintain/my_summer_maintain',
     })
+  },
+  gotoMaintain(){
+    wx.navigateTo({
+      url: '/pages/mine/maintain/order_list',
+    })
   }
+
 })
