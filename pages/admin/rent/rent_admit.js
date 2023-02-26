@@ -145,7 +145,7 @@ Page({
     var that = this
     var cell = ''
     var name = ''
-    var openId = ''
+    var openId = that.data.openId
     if (e.detail.user_info != null){
       if (e.detail.user_info.cell_number != undefined){
         cell = e.detail.user_info.cell_number
@@ -454,6 +454,11 @@ Page({
     var dueEndDate = nowDate
     dueEndDate.setDate(dueEndDate.getDate() + 1)
     var that = this
+
+    if (options.ticketCode != undefined){
+      that.setData({ticketCode: options.ticketCode})
+    }
+
     that.setData({dueEndDate: dueEndDate})
     app.loginPromiseNew.then(function (resolve){
 

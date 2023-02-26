@@ -10,7 +10,10 @@
     </view>
     <view style="width: 100rpx;"></view>
   </view>
-  <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;margin-top: 100rpx;" >
+  <view>
+    <button bindtap="accept" > 接 受 </button>
+  </view>
+  <!--view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;margin-top: 100rpx;" >
     <view style="width: 100rpx;"></view>
     <view style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;" >
       <view><b>长按识别以下二维码关注“易龙雪聚体验中心”微信公众号，优惠券才能进入个人账户。</b></view>
@@ -19,5 +22,5 @@
       </view>
     </view>
     <view style="width: 100rpx;"></view>
-  </view>
+  </view-->
 </view>

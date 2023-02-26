@@ -7,15 +7,35 @@ Page({
    * Page initial data
    */
   data: {
-
+    needAuth: false
+  },
+  AuthFinish(){
+    var that = this
+    that.GetRealName()
   },
 
+  GetRealName(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res) => {
+        if (res.data.mini_users.length > 0){
+          that.setData({name: res.data.mini_users[0].real_name, cell: res.data.mini_users[0].cell_number})
+          app.globalData.cellNumber = that.data.cell
+        }
+        
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
     var code = options.code
     var that = this
+    that.setData({code: code})
     app.loginPromiseNew.then(function(resolve){
       var getTicketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + code
       wx.request({
@@ -31,6 +51,9 @@ Page({
             }
             var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code)
             that.setData({ticket: ticket, titleColor: titleColor, qrCodeUrl: qrCodeUrl})
+            if (app.globalData.cellNumber==undefined || app.globalData.cellNumber==null || app.globalData.cellNumber==''){
+              that.setData({needAuth: true})
+            }
           }
         }
       })

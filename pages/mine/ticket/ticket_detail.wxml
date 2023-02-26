@@ -15,3 +15,8 @@
   <view style="height: 1rpx;" ></view>
 </view>
 <button open-type="share"  wx:if="{{ticket.used==0}}" > 分 享 </button>
+<view style="text-align: center;margin-top: 100rpx;" >
+  <view style="text-align: center;">{{code}}</view>
+  <image style="text-align: center;width: 350rpx;" src="{{qrCodeUrl}}" mode="heightFix" ></image>
+</view>
+<auth wx:if="{{needAuth}}" validType="cell" bindUpdateSuccess="AuthFinish" ></auth>

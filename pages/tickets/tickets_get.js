@@ -8,8 +8,7 @@ Page({
   data: {
     ticketTemplateArr:[],
     channelArr:[],
-    channelIndex:0,
-    channelName:''
+    channelIndex:0
   },
 
   /**
@@ -47,7 +46,13 @@ Page({
                 ticketTemplateArr[i].enable = true
                 for(var j = 0; j < myTickets.length; j++){
                   if (myTickets[j].template_id == ticketTemplateArr[i].id){
-                    ticketTemplateArr[i].enable = false
+                    if (channel == ''){
+                      ticketTemplateArr[i].enable = false
+                    }
+                    else {
+                      ticketTemplateArr[i].enable = true
+                    }
+                    
                     break
                   }
                 }

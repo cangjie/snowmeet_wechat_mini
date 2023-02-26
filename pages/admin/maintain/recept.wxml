@@ -1,6 +1,7 @@
 <block>
   <view wx:if="{{scene=='查看用户基本信息'}}" >
-    <user-info bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" ></user-info>
+    <user-info wx:if="{{ticketCode == ''}}" bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" ></user-info>
+    <user-info wx:else bindUserFound="userInfoUpdate" bindUserInfoUpdate="userInfoUpdate" code="{{ticketCode}}" ></user-info>
     <mp-cells wx:if="{{maintainLogArr.length > 0}}" title="最近养护记录" >
       <mp-cell wx:for="{{maintainLogArr}}" >
         <view style="display:flex; flex-direction: row;">
@@ -227,7 +228,10 @@
         </view>
       </mp-cell>
     </mp-cells>
-    <ticket-selector wx:if="{{userInfo != undefined && userInfo.open_id != undefined && userInfo.open_id != ''}}" open_id="{{userInfo.open_id}}"  ></ticket-selector>
+    <ticket-selector wx:if="{{userInfo != undefined && userInfo.open_id != undefined && userInfo.open_id != '' }}" open_id="{{userInfo.open_id}}" bindTicketSelected="setTicketCode"  ></ticket-selector>
+    <block wx:else >
+      <ticket-selector wx:if="{{ticketCode != ''}}"  ticket_code_arr="{{ticketCode}}" selected_card_no="{{ticketCode}}" ></ticket-selector>
+    </block>
     <view style="display: flex;flex-direction: row;" >
       <view class="left-column">优惠券减免：</view>
       <view class="right-column" style="display: flex;flex-direction: row;">¥<input type="text" bindinput="setTicketDiscount"  /></view>

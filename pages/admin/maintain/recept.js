@@ -17,7 +17,9 @@ Page({
     payOptionSelectedIndex: 0,
     othersDiscount: 0,
     ticketDiscount: 0,
-    payMethod: '微信支付'
+    payMethod: '微信支付',
+    ticketCode: '',
+    ticketName: '',
   },
 
   
@@ -99,6 +101,9 @@ Page({
   onLoad(options) {
     var that = this
     var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('双板')
+    if (options.ticketCode != undefined){
+      that.setData({ticketCode: options.ticketCode})
+    }
     wx.request({
       url: getBrandUrl,
       method: 'GET',
@@ -541,5 +546,9 @@ Page({
     console.log('set pay method', e)
     var that = this
     that.setData({payMethod: e.detail.payMethod})
+  },
+  setTicketCode(e){
+    var that = this
+    that.setData({ticketCode: e.detail.code})
   }
 })
