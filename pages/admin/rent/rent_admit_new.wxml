@@ -228,6 +228,7 @@
   </view>
   <view wx:if="{{scene == 4}}" >
     <view wx:if="{{needPay}}" >
+      <pay_method wx:if="{{payMethod != undefined && payMethod != '' }}" bindPayMethodSelected="modPayMethod" payMethod="{{payMethod}}"  ></pay_method>
       <view wx:if="{{payMethod == '微信支付'}}" style="text-align: center;margin-top: 50rpx;">
         <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:400rpx;height:400rpx" ></image>
       </view>
@@ -238,7 +239,10 @@
           <button bindtap="setPaid" > 点 击 确 认 收 款 </button>
         </view>
         <view wx:else >
-          该用户已经是会员，支付完成即可。
+          <view>
+            该用户已经是会员，支付完成后点击确认收款即可。
+          </view>
+          <button bindtap="setPaid" > 点 击 确 认 收 款 </button>
         </view>
       </view>
     </view>

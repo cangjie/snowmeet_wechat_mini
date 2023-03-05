@@ -123,10 +123,13 @@ Page({
     var that = this
     var currentRentItem = that.data.currentRentItem
     currentRentItem.depositType = e.detail.value
-    currentRentItem.name = ''
-    currentRentItem.code = ''
-    currentRentItem.rental = 0
-    currentRentItem.isNoCode = false
+    if (currentRentItem.depositType == '预付押金'){
+      currentRentItem.name = ''
+      currentRentItem.code = ''
+      currentRentItem.rental = 0
+      currentRentItem.isNoCode = false
+    }
+    
     that.setData({currentRentItem: currentRentItem})
   },
 
@@ -147,14 +150,18 @@ Page({
     var message = ''
     if (fieldName!=''){
       var amount = parseFloat(e.detail.value)
+      var currentRentItem = that.data.currentRentItem
       if (!isNaN(amount)){
-        var currentRentItem = that.data.currentRentItem
+        var displayedValue = amount
+        if (amount.toString() != e.detail.value){
+          displayedValue = e.detail.value
+        }
         switch(fieldName){
           case '租金':
-            currentRentItem.rental = amount
+            currentRentItem.rental = displayedValue
             break
           case '押金':
-            currentRentItem.deposit = amount
+            currentRentItem.deposit = displayedValue
             break
           default:
             break
@@ -165,7 +172,20 @@ Page({
         message = '请填正确' + fieldName
         wx.showToast({
           title: message,
-          icon: 'error'
+          icon: 'error',
+          success:(res)=>{
+            switch(fieldName){
+              case '租金':
+                currentRentItem.rental = e.detail.value
+                break
+              case '押金':
+                currentRentItem.deposit = e.detail.value
+                break
+              default:
+                break
+            }
+            that.setData({currentRentItem: currentRentItem})
+          }
         })
       }
     }
@@ -430,6 +450,27 @@ Page({
     that.setData({payMethod: e.detail.payMethod})
   },
 
+  modPayMethod(e){
+    var that = this
+    var payMethod = e.detail.payMethod
+    that.setData({payMethod: payMethod})
+    var rentOrder = that.data.rentOrder
+    var payment = rentOrder.order.payments[0]
+    
+    if (payment != undefined && payment.status == '待支付'){
+      var modPayMethodUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/ModPayMethod/' + payment.id + '?paymethod=' + encodeURIComponent(payMethod) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: modPayMethodUrl,
+        method: 'GET',
+        success:(res)=>{
+          that.setData({payMethod: payMethod})
+        }
+      })
+    }
+    
+    console.log('rent order', rentOrder)
+  },
+
   submit(){
     var that = this
     var scene = that.data.scene
@@ -472,8 +513,8 @@ Page({
       if (images == undefined || images == ''){
         images = ''
       }
-      var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, 
-        rent_item_code: rentItemList[i].code, deposit: rentItemList[i].deposit,
+      var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, rent_item_class: rentItemList[i].class, 
+        rent_item_code: rentItemList[i].code, deposit: rentItemList[i].deposit, deposit_type: rentItemList[i].depositType,
         unit_rental: rentItemList[i].rental, memo: memo, images: images}
         rentDetails.push(item)
     }
@@ -518,7 +559,56 @@ Page({
     console.log('rent order', rentOrder)
   },
 
-
+  checkOrderPaymentStatus(){
+    var that = this
+    var orderId = that.data.rentOrder.id
+    var getUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrder/' + orderId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          var rentOrder = res.data
+          if (rentOrder.order_id > 0 && rentOrder.order != undefined && rentOrder.order != null && rentOrder.order.pay_state == 1){
+            clearInterval(that.data.interval)
+            wx.showToast({
+              title: '支付成功',
+              icon: 'success',
+              duration: 1000,
+              success:()=>{
+                wx.redirectTo({
+                url: '../admin'
+                })
+              }
+            })
+          }
+        }
+      }
+    })
+  },
+  setPaid(){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetPaid/' + rentOrder.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success',
+            duration: 1000,
+            success:()=>{
+              wx.redirectTo({
+                url: '../admin',
+              })
+            }
+          })
+        }
+      }
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */

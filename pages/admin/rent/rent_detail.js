@@ -220,6 +220,36 @@ Page({
     })
  
   },
+
+  setRentStart(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var detail = that.data.rentOrder.details[id]
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetRentStart/' + detail.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          detail = res.data
+          var rentOrder = that.data.rentOrder
+          rentOrder.details[id] = detail
+          
+          wx.showToast({
+            title: '租赁开始',
+            icon: 'success',
+            duration: 1000,
+            success:()=>{
+              that.setData({rentOrder: rentOrder})
+            }
+          })
+        }
+      }
+    })
+  },
   setMemo(e){
     var id = parseInt(e.currentTarget.id.split('_')[1])
     if (isNaN(id)){

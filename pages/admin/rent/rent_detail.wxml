@@ -18,11 +18,7 @@
     <view class="right-column"  wx:if="{{rentOrder.has_guarantee_credit == 1}}" >有</view>
     <view class="right-column"  wx:else >无</view>
   </view>
-  <view wx:if="{{rentOrder.guarantee_credit_photos_arr.length > 0}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;">
-    <image id="credit_{{index}}" bindtap="showGallery" wx:for="{{rentOrder.guarantee_credit_photos_arr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
-    
-  </view>
-  <mp-gallery show="{{showCreditGallery}}" showDelete="{{false}}" imgUrls="{{rentOrder.guarantee_credit_photos_arr}}" current="{{0}}"  ></mp-gallery>
+
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">押金总计：</view>
     <view class="right-column">{{rentOrder.deposit_real_str}}</view>
@@ -45,6 +41,10 @@
     <view class="left-column">支付时间：</view>
     <view class="right-column" style="width:400rpx" >{{rentOrder.paidTimeStr}}</view>
   </view>
+  <view wx:if="{{rentOrder.guarantee_credit_photos_arr.length > 0}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;">
+    <image id="credit_{{index}}" bindtap="showGallery" wx:for="{{rentOrder.guarantee_credit_photos_arr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
+  </view>
+  <mp-gallery show="{{showCreditGallery}}" showDelete="{{false}}" imgUrls="{{rentOrder.guarantee_credit_photos_arr}}" current="{{0}}"  ></mp-gallery>
   <mp-cells title="租赁明细 {{rentOrder.details.length}}" >
     <mp-cell wx:for="{{rentOrder.details}}">
       <view style="display: flex; flex-direction: row;">
@@ -54,10 +54,17 @@
         <view class="right-column">{{item.rent_item_name}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column">计划归还：</view>
-        <view class="right-column">{{rentOrder.due_end_time_str}}</view>
+        <view class="left-column">分类：</view>
+        <view class="right-column">{{item.rent_item_class}}</view>
         <view class="left-column">状态：</view>
         <view class="right-column">{{item.status}}</view>
+      </view>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column" style="width: 25%;" >押金类型：</view>
+        <view class="right-column" style="width: 15%;" >{{item.deposit_type}}</view>
+        <view class="left-column" style="width: 25%;" >计划归还：</view>
+        <view class="right-column" style="width: 35%;" >{{rentOrder.due_end_time_str}}</view>
+        
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">租赁单价：</view>
@@ -93,16 +100,17 @@
         <view class="right-column">{{item.refund_str}}</view>
       </view>
       <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
-        <input wx:if="{{item.status == '未归还' && item.isEdit != true }}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" />
+        <input wx:if="{{item.isEdit}}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" />
         <block wx:else >{{item.memo}}</block>
       </view>
-      <view wx:if="{{item.imageArr.length > 0}}" id="{{index}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;" bindtap="showDetailGallery" >
+      <!--view wx:if="{{item.imageArr.length > 0}}" id="{{index}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;" bindtap="showDetailGallery" >
         <image id="credit_{{index}}"  wx:for="{{item.imageArr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
       </view>
-      <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery>
+      <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery-->
   
       <view style="display: flex; flex-direction: row;">
-        <button style="width:30%" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> 
+        <button wx:if="{{item.status == '未领取' && item.deposit_type == '预约租赁'}}" id="{{index}}" bindtap="setRentStart"  > 领 取 </button>
+        <button  wx:if="{{item.status == '已领取' || item.status == '已归还' }}" style="width:30%" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> 
         <button style="width:30%" wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款'}}" bindtap="setMod" > 修 改 </button>
         <button style="width:30%" wx:if="{{item.isEdit == true}}" id="{{index}}" bindtap="setSave" > 保 存 </button>
 
