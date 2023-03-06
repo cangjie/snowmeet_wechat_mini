@@ -532,6 +532,9 @@ Page({
           that.setData({needPay: false, rentOrder: rentOrder})
         }
         else{
+          wx.redirectTo({
+            url: 'rent_pay?id=' + rentOrder.id,
+          })
           if (order.payments != null && order.payments.length > 0){
             var payment = order.payments[0]
             if (payment.pay_method == '微信支付'){

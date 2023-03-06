@@ -29,13 +29,18 @@
     <view class="left-column">支付金额：</view>
     <view class="right-column">{{rentOrder.deposit_final_str}}</view>
     <view class="left-column">订单状态：</view>
-    <view class="right-column">{{rentOrder.status}}</view>
-    
+    <view class="right-column" >
+      <block wx:if="{{rentOrder.status != '未支付'}}"  >
+        {{rentOrder.status}}
+      </block>
+      <button wx:else bindtap="gotoPay" style="width: 150rpx;height: 30rpx; font-size: 9pt;font-family: inherit; font-style: normal;margin: 0rpx;padding: 0rpx" >未支付</button>
+    </view>
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">支付单号：</view>
-    <view class="right-column" style="width: 400rpx;">{{rentOrder.outTradeNo}}</view>
-    
+    <view class="right-column" style="width: 300rpx;" >{{rentOrder.outTradeNo}}</view>
+    <view class="left-column">支付方式：</view>
+    <view class="right-column" >{{rentOrder.order.payments[0].pay_method}}</view>
   </view>
   <view style="display: flex; flex-direction: row;" >
     <view class="left-column">支付时间：</view>

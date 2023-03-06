@@ -380,6 +380,14 @@ Page({
     
   },
 
+  gotoPay(){
+    var that = this
+    wx.navigateTo({
+      url: 'rent_pay?id=' + that.data.id,
+    })
+  },
+  
+
   /**
    * Lifecycle function--Called when page load
    */
