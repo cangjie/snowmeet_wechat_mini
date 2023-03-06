@@ -329,6 +329,50 @@ Page({
     var that = this
     var rentOrder = that.data.rentOrder
     rentOrder.details[id].isEdit = true
+    var classStr = rentOrder.details[id].rent_item_class
+    var classId = 0
+    var classList = that.data.classList
+    for(var i = 0; i < classList.length; i++){
+      if (classList[i] == classStr){
+        classId = i
+        break
+      }
+    }
+    rentOrder.details[id].classIndex = classId
+    that.setData({rentOrder: rentOrder})
+  },
+
+  setTextValue(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var id = parseInt(idArr[1])
+    var name = idArr[0]
+    var rentOrder = that.data.rentOrder
+    var v = e.detail.value
+    var detail = rentOrder.details[id]
+    switch(name){
+      case 'name':
+        detail.rent_item_name = v
+        break
+      case 'code':
+        detail.rent_item_code = v
+        break
+      default:
+        break
+    }
+    that.setData({rentOrder: rentOrder})
+  },
+
+  selectClass(e){
+    var that = this
+    var id = e.currentTarget.id
+    var v = parseInt(e.detail.value)
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var classList = that.data.classList
+    var className = classList[v]
+    detail.classIndex = v
+    detail.rent_item_class = className
     that.setData({rentOrder: rentOrder})
   },
 
@@ -386,7 +430,84 @@ Page({
       url: 'rent_pay?id=' + that.data.id,
     })
   },
-  
+
+  scan(e){
+    var id = e.currentTarget.id
+    var that = this
+    wx.scanCode({
+      onlyFromCamera: false,
+      success:(res)=>{
+        console.log('scan result', res)
+        var code = res.result
+
+        //var currentRentItem = that.data.currentRentItem
+        //currentRentItem.code = code
+        that.getItemInfo(code, id)
+      }
+    })
+  },
+  getItemInfo(code, index){
+    var that = this
+    var currentRentItem = that.data.currentRentItem
+    var classList = that.data.classList
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[index]
+    var getItemUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentItem/' + code + '?shop=' + encodeURIComponent('万龙')
+    wx.request({
+      url: getItemUrl,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          detail.rent_item_name = res.data.name
+          detail.rent_item_class = res.data.class
+          detail.rent_item_code = code
+          detail.classIndex = 0
+          for(var i = 0; i < classList.length; i++){
+            if (classList[i] == detail.rent_item_class){
+              detail.classIndex = i
+              break;
+            }
+          }
+          detail.unit_rental = res.data.rental
+          //detail.deposit = res.data.deposit
+          that.setData({rentOrder: rentOrder})
+        
+        }
+      }
+    })
+  },
+
+  addMore(){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = {
+      rent_item_code: '',
+      rent_item_name: '',
+      rent_item_class: '',
+      classIndex: 0,
+      status: '未领取',
+      deposit_type: '立即租赁',
+      due_end_time_str: util.formatDateString(new Date()),
+      unit_rental: 0,
+      unit_rental_str: '¥0.00',
+      timeLength: '1天',
+      deposit: 0,
+      deposit_str: '¥0.00',
+      real_rental: 0,
+      real_rental_str: '¥0.00',
+      overTime: false,
+      overtime_charge: 0,
+      overtime_charge_str: '¥0.00',
+      reparation: 0,
+      reparationStr: '¥0.00',
+      refund: 0,
+      refund_str: '¥0.00',
+      newItem: true,
+      isEdit: true
+
+    }
+    rentOrder.details.push(detail)
+    that.setData({rentOrder: rentOrder})
+  },
 
   /**
    * Lifecycle function--Called when page load
@@ -396,7 +517,24 @@ Page({
     var id = options.id
     that.setData({id: id})
     app.loginPromiseNew.then(function(resolve){
-      that.getData()
+      var getClassUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetClassList'
+      wx.request({
+        url: getClassUrl,
+        method: 'GET',
+        success:(res)=>{
+          if (res.statusCode != 200){
+            return
+          }
+          var classList = []
+          for(var i = 0; i < res.data.length; i++){
+            classList.push(res.data[i])
+          }
+          that.setData({classList: classList})
+          that.getData()
+        }
+      })
+      
+
     })
   },
   

@@ -59,7 +59,29 @@ Page({
       }
     })
   },
-
+  setPaid(){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetPaid/' + rentOrder.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success',
+            duration: 1000,
+            success:()=>{
+              wx.redirectTo({
+                url: '../admin',
+              })
+            }
+          })
+        }
+      }
+    })
+  },
 
   /**
    * Lifecycle function--Called when page load

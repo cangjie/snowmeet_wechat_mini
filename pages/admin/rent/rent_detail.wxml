@@ -54,13 +54,27 @@
     <mp-cell wx:for="{{rentOrder.details}}">
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">编号：</view>
-        <view class="right-column">{{item.rent_item_code}}</view>
+        <view wx:if="{{item.isEdit}}" class="right-column" style="display: flex; flex-direction: row;"  >
+          <input id="code_{{index}}" style="width: 220rpx;" value="{{item.rent_item_code}}" bindtap="setTextValue" />
+          <button id="{{index}}" style="padding: 0rpx; width:55rpx; height:55rpx" bindtap="scan" >
+            <image src="../../../images/scan.jpeg" style="width: 50rpx; height: 50rpx;" />
+          </button>
+        </view>
+        <view wx:else class="right-column">{{item.rent_item_code}}</view>
         <view class="left-column">名称：</view>
-        <view class="right-column">{{item.rent_item_name}}</view>
+        <view wx:if="{{item.isEdit}}" >
+          <input style="width: 275rpx;font-size: 9pt;" value="{{item.rent_item_name}}" id="name_{{index}}"  bindtap="setTextValue" />
+        </view>
+        <view wx:else class="right-column">{{item.rent_item_name}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">分类：</view>
-        <view class="right-column">{{item.rent_item_class}}</view>
+        <view wx:if="{{item.isEdit}}" >
+          <picker mode="selector" range="{{classList}}" bindchange="selectClass"  id="{{index}}" >
+            <picker-view style="font-size: 9pt" >{{classList[item.classIndex]}}</picker-view>
+          </picker>
+        </view>
+        <view wx:else class="right-column">{{item.rent_item_class}}</view>
         <view class="left-column">状态：</view>
         <view class="right-column">{{item.status}}</view>
       </view>
@@ -125,7 +139,7 @@
    
   </mp-cells>
   <view>
-    <button> 追 加 租 赁 物 </button>
+    <button bindtap="addMore" > 追 加 租 赁 物 </button>
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">已付押金：</view>
