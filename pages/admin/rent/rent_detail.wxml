@@ -131,15 +131,18 @@
         <button wx:if="{{item.status == '未领取' && item.deposit_type == '预约租赁'}}" id="{{index}}" bindtap="setRentStart"  > 领 取 </button>
         <button  wx:if="{{item.status == '已领取' || item.status == '已归还' }}" style="width:30%" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> 
         <button style="width:30%" wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款'}}" bindtap="setMod" > 修 改 </button>
-        <button style="width:30%" wx:if="{{item.isEdit == true}}" id="{{index}}" bindtap="setSave" > 保 存 </button>
+        <button  style="width:30%" wx:if="{{item.isEdit == true && status == '已领取'}}" id="{{index}}" bindtap="setCharge" > 保 存 </button>
+        <button wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '立即租赁'}}" id="{{index}}" bindtap="setAppend" > 确认追加 </button>
+        <button wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '预付押金'}}" id="{{index}}" bindtap="setAppend" > 确认租赁 </button>
 
       </view>
       <!--view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view-->
     </mp-cell>
    
   </mp-cells>
-  <view>
+  <view style="display:flex; flex-direction: row;">
     <button bindtap="addMore" > 追 加 租 赁 物 </button>
+    <button bindtap="restore" > 取 消 </button>
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">已付押金：</view>

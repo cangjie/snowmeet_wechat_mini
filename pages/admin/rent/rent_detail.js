@@ -376,7 +376,7 @@ Page({
     that.setData({rentOrder: rentOrder})
   },
 
-  setSave(e){
+  setCharge(e){
     var id = parseInt(e.currentTarget.id)
     if (isNaN(id)){
       return 
@@ -501,11 +501,20 @@ Page({
       reparationStr: '¥0.00',
       refund: 0,
       refund_str: '¥0.00',
-      newItem: true,
+      id: 0,
       isEdit: true
 
     }
     rentOrder.details.push(detail)
+    that.setData({rentOrder: rentOrder})
+  },
+
+  restore(){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    for(var i = 0; i < rentOrder.details.length; i++){
+      rentOrder.details[i].isEdit = false
+    }
     that.setData({rentOrder: rentOrder})
   },
 
