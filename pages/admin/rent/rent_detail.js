@@ -483,6 +483,7 @@ Page({
       rent_item_code: '',
       rent_item_name: '',
       rent_item_class: '',
+      rent_list_id: rentOrder.id,
       classIndex: 0,
       status: '未领取',
       deposit_type: '立即租赁',
@@ -502,7 +503,9 @@ Page({
       refund: 0,
       refund_str: '¥0.00',
       id: 0,
-      isEdit: true
+      isEdit: true,
+      images: '',
+      memo: ''
 
     }
     rentOrder.details.push(detail)
@@ -516,6 +519,51 @@ Page({
       rentOrder.details[i].isEdit = false
     }
     that.setData({rentOrder: rentOrder})
+  },
+
+  setInstance(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: detail,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          console.log('update detail', res)
+          that.setRentStart(e)
+        }
+      }
+    })
+  },
+  setAppend(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    if (detail.id != 0){
+      return
+    }
+    //detail.images = ''
+    
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/AppendDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: detail,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          console.log('append detail', res)
+          detail = res.data
+          rentOrder.details[id] = detail
+          that.setData({rentOrder: rentOrder})
+          that.setRentStart(e)
+        }
+      }
+    })
   },
 
   /**
