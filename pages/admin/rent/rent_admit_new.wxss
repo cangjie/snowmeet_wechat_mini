@@ -19,3 +19,14 @@
   font-size: 10pt;
   margin-top:20rpx;
 }
+.scroll-view_H{
+  white-space: nowrap;
+}
+.scroll-view-item_H{
+  display: inline-block;
+  width: 100%;
+}
+.item-list{
+  text-align: center;
+  font-size: 10pt;
+}

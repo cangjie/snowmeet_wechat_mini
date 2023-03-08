@@ -252,6 +252,7 @@ Page({
 
 
     currentRentItem.depositStr = util.showAmount(parseFloat(currentRentItem.deposit))
+    currentRentItem.rentalStr = util.showAmount(parseFloat(currentRentItem.rental))
     if (currentRentItem.index == -1){
       currentRentItem.index = rentItemList.length
       rentItemList.push(currentRentItem)
@@ -686,5 +687,8 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  scroll(e){
+    console.log(e)
   }
 })

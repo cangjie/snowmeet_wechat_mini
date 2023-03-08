@@ -1,7 +1,57 @@
 <view>
   <view wx:if="{{scene==0}}" >
     <button bindtap="goBack"> 返 回 旧 版 </button>
-    <mp-cells title="租赁列表" style="height: 900rpx;" >
+    <view>租赁列表</view>
+    <scroll-view class="scroll-view_H" scroll-x="true" bindscroll="scroll" style="width: 100%">
+      <view  class="scroll-view-item_H"   >
+        <view style="display: flex;flex-direction: row;" >
+          <view style="width: 100rpx;" class="item-list" ><b>类别</b></view>
+          <view style="width: 175rpx;" class="item-list" ><b>编码</b></view>
+          <view style="width: 325rpx;" class="item-list" ><b>名称</b></view>
+          <view style="width: 150rpx;" class="item-list" ><b>租赁形式</b></view>
+        </view>
+        <block wx:for="{{rentItemList}}" id="{{index}}"  >
+          <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
+          <view style="display: flex;flex-direction: row;height: 60rpx;" bindtap="selectItem"  id="{{index}}" >
+            <view style="width: 100rpx;" class="item-list" >{{item.class}}</view>
+            <view style="width: 175rpx;" class="item-list" >{{item.code}}</view>
+            <view style="width: 325rpx;" class="item-list" >{{item.name}}</view>
+            <view style="width: 150rpx;" class="item-list" >{{item.depositType}}</view>
+          </view>
+        </block>
+      </view>
+      <view  class="scroll-view-item_H"   >
+        <view style="display: flex;flex-direction: row;" >
+          <view style="width: 200rpx;" class="item-list" ><b>起租日</b></view>
+          <view style="width: 125rpx;" class="item-list" ><b>押金</b></view>
+          <view style="width: 125rpx;" class="item-list" ><b>租金</b></view>
+          <view style="width: 300rpx;" class="item-list" ><b>备注</b></view>
+        </view>
+        <block wx:for="{{rentItemList}}" id="{{index}}" bindtap="selectItem"  id="{{index}}" >
+          <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
+          <view style="display: flex;flex-direction: row;height: 60rpx;" bindtap="selectItem"  id="{{index}}" >
+            <view style="width: 200rpx;" class="item-list" >{{item.startDate}}</view>
+            <view style="width: 125rpx;" class="item-list" >{{item.rentalStr}}</view>
+            <view style="width: 125rpx;" class="item-list" >{{item.depositStr}}</view>
+            <view style="width: 300rpx;" class="item-list" >{{item.memo}}</view>
+          </view>
+        </block>
+      </view>
+      
+    </scroll-view>
+    <!--scroll-view class="scroll-view_H" scroll-x="true" style="width: 100%;" >
+      <view class="scroll-view-item_H" style="display: flex; flex-direction: row;" >
+        <view style="width: 250rpx;text-align: center;" ><b>租赁形式</b></view>
+        <view style="width: 250rpx;text-align: center;" ><b>类别</b></view>
+        <view style="width: 250rpx;text-align: center;" ><b>编码</b></view>
+      </view>
+      <view class="scroll-view-item_H"  style="display: flex; flex-direction: row;" >
+        <view style="width: 250rpx;text-align: center;" ><b>名称</b></view>
+        <view style="width: 250rpx;text-align: center;" ><b>押金</b></view>
+        <view style="width: 250rpx;text-align: center;" ><b>租金</b></view>
+      </view>
+    </scroll-view-->
+    <!--mp-cells title="租赁列表" style="height: 900rpx;" >
       <mp-cell> 
         <view style="display: flex; flex-direction: row;" >
           <view style="width: 25%;text-align: center;" ><b>编码</b></view>
@@ -18,7 +68,7 @@
           <view style="width: 25%;text-align: center;text-align: right;font-size: 9pt;" >{{item.depositStr}}</view>
         </view>
       </mp-cell>
-    </mp-cells>
+    </mp-cells-->
     <view style="height: 50rpx;text-align: center;margin-top: 10rpx;" ></view>
     <view style="background-color:#eeeeee;font-size: 11pt;">
       <view style="display: flex;flex-direction: row;" >
