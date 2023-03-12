@@ -53,24 +53,24 @@
   <mp-cells title="租赁明细 {{rentOrder.details.length}}" >
     <mp-cell wx:for="{{rentOrder.details}}">
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column">编号：</view>
-        <view wx:if="{{item.isEdit}}" class="right-column" style="display: flex; flex-direction: row;"  >
-          <input id="code_{{index}}" style="width: 220rpx;" value="{{item.rent_item_code}}" bindtap="setTextValue" />
+        <view class="left-column" style="width: 100rpx;">编号：</view>
+        <view wx:if="{{item.isEdit && item.editType != '暂存' }}" class="right-column" style="display: flex; flex-direction: row;width: 275rpx;"  >
+          <input id="code_{{index}}" style="width: 200rpx;" value="{{item.rent_item_code}}" bindinput="setTextValue" class="input" type="text" /> 
           <button id="{{index}}" style="padding: 0rpx; width:55rpx; height:55rpx" bindtap="scan" >
-            <image src="../../../images/scan.jpeg" style="width: 50rpx; height: 50rpx;" />
+            <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 60rpx;" />
           </button>
         </view>
-        <view wx:else class="right-column">{{item.rent_item_code}}</view>
-        <view class="left-column">名称：</view>
-        <view wx:if="{{item.isEdit}}" >
-          <input style="width: 275rpx;font-size: 9pt;" value="{{item.rent_item_name}}" id="name_{{index}}"  bindtap="setTextValue" />
+        <view wx:else class="right-column" style="width: 275rpx;" >{{item.rent_item_code}}</view>
+        <view class="left-column" style="width: 100rpx;">名称：</view>
+        <view wx:if="{{item.isEdit && item.editType != '暂存'}}" style="width: 275rpx;" class="right-column"  >
+          <input style="width: 200rpx;" value="{{item.rent_item_name}}" id="name_{{index}}"  bindinput="setTextValue" type="text" class="input" />
         </view>
-        <view wx:else class="right-column">{{item.rent_item_name}}</view>
+        <view wx:else class="right-column" style="width: 300rpx;" >{{item.rent_item_name}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">分类：</view>
-        <view wx:if="{{item.isEdit}}" >
-          <picker mode="selector" range="{{classList}}" bindchange="selectClass"  id="{{index}}" >
+        <view wx:if="{{item.isEdit && item.editType != '暂存'}}" class="right-column" >
+          <picker mode="selector" range="{{classList}}" bindchange="selectClass"  id="{{index}}" class="input" style="width: 100rpx">
             <picker-view style="font-size: 9pt" >{{classList[item.classIndex]}}</picker-view>
           </picker>
         </view>
@@ -87,14 +87,17 @@
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">租赁单价：</view>
-        <view class="right-column">{{item.unit_rental_str}}</view>
+        <view class="right-column" wx:if="{{item.isEdit && item.editType != '暂存' }}"  >
+          <input  type="digit" id="{{index}}" placeholder="{{item.unit_rental}}"  bindinput="setUnitRental" class="input"  style="width: 150rpx;" />
+        </view>
+        <view class="right-column" wx:else >{{item.unit_rental_str}}</view>
         <view class="left-column">租用时间：</view>
         <view class="right-column">{{item.timeLength}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">租金：</view>
         <view class="right-column">
-          <input  wx:if="{{item.status == '未归还' || item.isEdit == true }}" type="digit" id="rental_{{index}}" placeholder="{{item.suggestRental}}"  bindinput="setRental"   />
+          <input  wx:if="{{item.status == '未归还' || item.isEdit == true }}" type="digit" id="rental_{{index}}" placeholder="{{item.real_rental == 0 ? item.suggestRental : item.real_rental}}"   bindinput="setRental" class="input" style="width: 150rpx;"  />
           <block wx:else>{{item.real_rental_str}}</block>
         </view>
         <view class="left-column">押金：</view>
@@ -105,21 +108,22 @@
         <view class="right-column">{{(item.overTime)? '是' : '否'}}</view>
         <view class="left-column">超时费：</view>
         <view class="right-column">
-          <view wx:if="{{item.status == '已归还' && item.isEdit != true}}" >{{item.overtime_charge_str}}</view>
-          <input wx:else id="{{index}}" bindinput="setOvertimeCharge" />
+          <input wx:if="{{item.isEdit && item.editType != '暂存'}}" id="{{index}}" bindinput="setOvertimeCharge" class="input" style="width: 150rpx;" />
+          <view wx:else >{{item.overtime_charge_str}}</view>
+          
         </view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">损坏赔偿：</view>
         <view class="right-column">
-          <input wx:if="{{item.status == '未归还' || item.isEdit == true }}" type="digit" id="reparation_{{index}}" placeholder="{{item.reparation}}" bindinput="setReparation" /> 
+          <input wx:if="{{(item.status == '未归还' || item.isEdit == true) && item.editType != '暂存' }}" type="digit" id="reparation_{{index}}" placeholder="{{item.reparation}}" bindinput="setReparation" class="input" style="width: 150rpx;" /> 
           <block wx:else>{{item.reparationStr}}</block>
         </view>
         <view class="left-column">应退金额：</view>
         <view class="right-column">{{item.refund_str}}</view>
       </view>
       <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
-        <input wx:if="{{item.isEdit}}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" />
+        <input wx:if="{{item.isEdit && item.editType != '暂存' }}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" class="input" />
         <block wx:else >{{item.memo}}</block>
       </view>
       <!--view wx:if="{{item.imageArr.length > 0}}" id="{{index}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;" bindtap="showDetailGallery" >
@@ -127,21 +131,25 @@
       </view>
       <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery-->
   
-      <view style="display: flex; flex-direction: row;">
-        <button wx:if="{{item.status == '未领取' && item.deposit_type == '预约租赁'}}" id="{{index}}" bindtap="setRentStart"  > 领 取 </button>
-        <button  wx:if="{{item.status == '已领取' || item.status == '已归还' }}" style="width:30%" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}" > 归 还 </button> 
-        <button style="width:30%" wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款'}}" bindtap="setMod" > 修 改 </button>
-        <button  style="width:30%" wx:if="{{item.isEdit == true && status == '已领取'}}" id="{{index}}" bindtap="setCharge" > 保 存 </button>
-        <button wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '立即租赁'}}" id="{{index}}" bindtap="setAppend" > 确认追加 </button>
-        <button wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '预付押金'}}" id="{{index}}" bindtap="setInstance" > 确认租赁 </button>
+      <view style="display: flex; flex-direction: row; margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx">
+        <button wx:if="{{item.status == '未领取' && item.deposit_type == '预约租赁' && !item.isEdit}}" id="{{index}}" bindtap="setRentStart" style="font-size: 9pt;" size="mini"  >领取</button>
+        <button  wx:if="{{(item.status == '已领取' || item.status == '已归还') && !item.isEdit }}" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}"  size="mini" style="font-size: 9pt;" size="mini" >归还</button> 
+        <button size="mini"  wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款'}}" bindtap="setMod" style="font-size: 9pt;" >修改</button>
+        <button size="mini" wx:if="{{item.isEdit == true && item.id != 0 }}" id="{{index}}" bindtap="save" style="font-size: 9pt;"  >保存</button>
+        <button size="mini" wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '立即租赁'}}" id="{{index}}" bindtap="setAppend" style="font-size: 9pt;"  >确认追加</button>
+        <button size="mini" wx:if="{{!item.isEdit && item.status == '未领取' && item.deposit_type == '预付押金'}}" id="{{index}}" bindtap="setInstance" style="font-size: 9pt;"  >确认租赁</button>
+        <button size="mini" wx:if="{{!item.isEdit && item.status == '已领取'}}" id="reserveMore_{{index}}" bindtap="reserveMore" style="font-size: 9pt;"  >转预约</button>
+        <!--button size="mini" wx:if="{{!item.isEdit && item.status == '已领取'}}" id="{{index}}" bindtap="setInstance" style="font-size: 9pt;"  >更换</button-->
 
+        <!--button id="{{index}}" wx:if="{{item.status == '已领取' && item.isEdit}}" id="{{index}}" bindtap="change" style="width: 130rpx;font-size: 9pt;"  >更换</button-->
+        <!--button size="mini" id="{{index}}" wx:if="{{item.status == '已领取' }}" id="{{index}}" bindtap="setKeep" style="width: 140rpx;font-size: 9pt;" >暂存</button>
+        <button size="mini" id="{{index}}" wx:if="{{item.status == '已领取' && item.isEdit }}" id="{{index}}" bindtap="comfirmKeep" style="width: 140rpx;font-size: 9pt;" >暂存确认</button-->
       </view>
-      <!--view style="height: 100rpx;margin-top: 30rpx;text-align: center;" >有照片则显示</view-->
     </mp-cell>
    
   </mp-cells>
   <view style="display:flex; flex-direction: row;">
-    <button bindtap="addMore" > 追 加 租 赁 物 </button>
+    <button bindtap="addMore" disabled="{{rentOrder.status == '已退款'}}" > 追 加 租 赁 物 </button>
     <button bindtap="restore" > 取 消 </button>
   </view>
   <view style="display: flex; flex-direction: row;">
@@ -192,12 +200,6 @@
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <!--view style="display: flex; flex-direction: row;">
-    <view class="left-column">实退金额：</view>
-    <view class="right-column"><input value="{{refundAmount}}"  bindinput="setRefundAmount" /></view>
-    <view class="left-column"></view>
-    <view class="right-column"></view>
-  </view-->
   <view  style="margin-left: 100rpx; margin-right: 100rpx;margin-top: 50rpx;margin-bottom: 50rpx;"  >
     <input wx:if="{{rentOrder.status == '全部归还'}}" value="{{rentOrder.memo}}" bindinput="setOrderMemo" placeholder="填写订单备注" />
     <block wx:else >{{rentOrder.memo}}</block>

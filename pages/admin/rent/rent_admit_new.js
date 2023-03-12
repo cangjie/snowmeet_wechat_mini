@@ -225,19 +225,25 @@ Page({
       valid = false
     }
     else{
-      
       message = ''
       valid = true
     }
     if (currentRentItem.depositType == '预付押金'){
-      if (currentRentItem.deposit > 0){
-        message = ''
-        valid = true
-      }
-      else{
+      var deposit = parseFloat(currentRentItem.deposit)
+      if (isNaN(deposit) || deposit <= 0){
         message = '预付押金不为0'
         valid = false
       }
+      else if (currentRentItem.class == '' || currentRentItem.classSelectedIndex == 0){
+        message = '请选择分类'
+        valid = false
+      }
+      else {
+        message = ''
+        valid = true
+      }
+
+
       
     }
     if (!valid){
@@ -419,7 +425,7 @@ Page({
     }
     var totalDepositStr = util.showAmount(totalDeposit)
     var totalRentalStr = util.showAmount(totalRental)
-    var totalDepositReal = totalDeposit//that.data.totalDepositReal == 0? totalDeposit : that.data.totalDepositReal
+    var totalDepositReal = that.data.totalDepositReal == 0? totalDeposit : that.data.totalDepositReal
     var depositReduce = that.data.depositReduce
     var finalPayStr = util.showAmount(totalDepositReal - depositReduce)
 
@@ -613,6 +619,17 @@ Page({
       }
     })
   },
+
+  setDepositReduce(e){
+    var that = this
+    var value = parseFloat(e.detail.value)
+    if (!isNaN(value)){
+      var d = parseFloat(value)
+      that.setData({depositReduce: d})
+      that.computeTotal()
+    }
+  },
+  
   /**
    * Lifecycle function--Called when page load
    */

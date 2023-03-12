@@ -23,8 +23,8 @@
       <view  class="scroll-view-item_H"   >
         <view style="display: flex;flex-direction: row;" >
           <view style="width: 200rpx;" class="item-list" ><b>起租日</b></view>
-          <view style="width: 125rpx;" class="item-list" ><b>押金</b></view>
           <view style="width: 125rpx;" class="item-list" ><b>租金</b></view>
+          <view style="width: 125rpx;" class="item-list" ><b>押金</b></view>
           <view style="width: 300rpx;" class="item-list" ><b>备注</b></view>
         </view>
         <block wx:for="{{rentItemList}}" id="{{index}}" bindtap="selectItem"  id="{{index}}" >
@@ -37,38 +37,7 @@
           </view>
         </block>
       </view>
-      
     </scroll-view>
-    <!--scroll-view class="scroll-view_H" scroll-x="true" style="width: 100%;" >
-      <view class="scroll-view-item_H" style="display: flex; flex-direction: row;" >
-        <view style="width: 250rpx;text-align: center;" ><b>租赁形式</b></view>
-        <view style="width: 250rpx;text-align: center;" ><b>类别</b></view>
-        <view style="width: 250rpx;text-align: center;" ><b>编码</b></view>
-      </view>
-      <view class="scroll-view-item_H"  style="display: flex; flex-direction: row;" >
-        <view style="width: 250rpx;text-align: center;" ><b>名称</b></view>
-        <view style="width: 250rpx;text-align: center;" ><b>押金</b></view>
-        <view style="width: 250rpx;text-align: center;" ><b>租金</b></view>
-      </view>
-    </scroll-view-->
-    <!--mp-cells title="租赁列表" style="height: 900rpx;" >
-      <mp-cell> 
-        <view style="display: flex; flex-direction: row;" >
-          <view style="width: 25%;text-align: center;" ><b>编码</b></view>
-          <view style="width: 25%;text-align: center;" ><b>类别</b></view>
-          <view style="width: 25%;text-align: center;" ><b>名称</b></view>
-          <view style="width: 25%;text-align: center;" ><b>押金</b></view>
-        </view>
-      </mp-cell>
-      <mp-cell wx:for="{{rentItemList}}" id="{{index}}" bindtap="selectItem" > 
-        <view style="display: flex; flex-direction: row;" >
-          <view style="width: 25%;text-align: center;font-size: 9pt;" >{{item.code}}</view>
-          <view style="width: 25%;text-align: center;font-size: 9pt;" >{{item.class}}</view>
-          <view style="width: 25%;text-align: center;font-size: 9pt;" >{{item.name}}</view>
-          <view style="width: 25%;text-align: center;text-align: right;font-size: 9pt;" >{{item.depositStr}}</view>
-        </view>
-      </mp-cell>
-    </mp-cells-->
     <view style="height: 50rpx;text-align: center;margin-top: 10rpx;" ></view>
     <view style="background-color:#eeeeee;font-size: 11pt;">
       <view style="display: flex;flex-direction: row;" >
@@ -130,8 +99,6 @@
           <input id="deposit" style="width: 80%;" class="input" value="{{currentRentItem.deposit}}" bindinput="setNumber" />
         </view>
       </view>
-      
-      
       <view style="display: flex;flex-direction: row;" >
         <view style="width: 20%;text-align: right;" class="op-cell" >备注：</view>
         <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
@@ -139,13 +106,10 @@
         </view>
       </view>
       <view class="op-cell" style="padding-bottom: 50rpx;display: flex;flex-direction: row;text-align: center;">
-        <!--button style="width: 200rpx;" disabled="{{currentRentItem.index == -1}}" > 新 增 </button>
-        <view style="width: 50rpx;"></view-->
         <button style="width: 200rpx;" bindtap="save" > 确 认 </button>
         <view style="width: 50rpx;"></view>
         <button style="width: 200rpx;" disabled="{{currentRentItem.index == -1}}" bindtap="del" > 删 除 </button>
       </view>
-      
     </view>
     <view>
       <button disabled="{{rentItemList.length == 0 }}" bindtap="gotoNext" > 下 一 步 </button>
@@ -161,6 +125,42 @@
     </view>
   </view>
   <view wx:if="{{scene == 2}}" >
+    <scroll-view class="scroll-view_H" scroll-x="true" bindscroll="scroll" style="width: 100%">
+      <view  class="scroll-view-item_H"   >
+        <view style="display: flex;flex-direction: row;" >
+          <view style="width: 100rpx;" class="item-list" ><b>类别</b></view>
+          <view style="width: 175rpx;" class="item-list" ><b>编码</b></view>
+          <view style="width: 325rpx;" class="item-list" ><b>名称</b></view>
+          <view style="width: 150rpx;" class="item-list" ><b>租赁形式</b></view>
+        </view>
+        <block wx:for="{{rentItemList}}" id="{{index}}"  >
+          <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
+          <view style="display: flex;flex-direction: row;height: 60rpx;" id="{{index}}" >
+            <view style="width: 100rpx;" class="item-list" >{{item.class}}</view>
+            <view style="width: 175rpx;" class="item-list" >{{item.code}}</view>
+            <view style="width: 325rpx;" class="item-list" >{{item.name}}</view>
+            <view style="width: 150rpx;" class="item-list" >{{item.depositType}}</view>
+          </view>
+        </block>
+      </view>
+      <view  class="scroll-view-item_H"   >
+        <view style="display: flex;flex-direction: row;" >
+          <view style="width: 200rpx;" class="item-list" ><b>起租日</b></view>
+          <view style="width: 125rpx;" class="item-list" ><b>租金</b></view>
+          <view style="width: 125rpx;" class="item-list" ><b>押金</b></view>
+          <view style="width: 300rpx;" class="item-list" ><b>备注</b></view>
+        </view>
+        <block wx:for="{{rentItemList}}" id="{{index}}" bindtap="selectItem"  id="{{index}}" >
+          <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
+          <view style="display: flex;flex-direction: row;height: 60rpx;" id="{{index}}" >
+            <view style="width: 200rpx;" class="item-list" >{{item.startDate}}</view>
+            <view style="width: 125rpx;" class="item-list" >{{item.rentalStr}}</view>
+            <view style="width: 125rpx;" class="item-list" >{{item.depositStr}}</view>
+            <view style="width: 300rpx;" class="item-list" >{{item.memo}}</view>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
     <mp-cells title="确定订单" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
@@ -188,7 +188,7 @@
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column" >实收押金：</view>
-          <view class="right-column" ><input placeholder="{{totalDepositReal}}" bindinput="setTotalDepositReal" /></view>
+          <view class="right-column" ><input placeholder="{{totalDepositReal}}" bindinput="setTotalDepositReal" class="input" style="width: 200rpx;" /></view>
         </view>
       </mp-cell>
       <mp-cell wx:if="{{haveCredit}}" >
@@ -205,7 +205,7 @@
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column" >押金减免：</view>
-          <view class="right-column" ><input placeholder="{{depositReduce}}" bindinput="setDepositReduce" /></view>
+          <view class="right-column" ><input placeholder="{{depositReduce}}" bindinput="setDepositReduce" class="input" style="width: 200rpx;" /></view>
         </view>
       </mp-cell>
     <!--mp-cell>
@@ -266,7 +266,7 @@
         </view>
       </mp-cell>
       <mp-cell>
-        <input value="{{memo}}" style="width: 500rpx;" bindinput="setMemo" placeholder="填写备注" />
+        <input value="{{memo}}" style="width: 500rpx;" bindinput="setMemo" placeholder="填写备注" class="input" />
       
       </mp-cell>
     </mp-cells>

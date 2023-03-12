@@ -90,6 +90,7 @@ Page({
             rentOrder.details[i] = detail
 
           }
+          rentOrder = that.computeAmount(rentOrder)
           that.setData({rentOrder: rentOrder, 
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket)})
@@ -99,6 +100,7 @@ Page({
     })
   },
   setRental(e){
+    console.log('input rental', e)
     var that = this
     var id = parseInt(e.currentTarget.id.split('_')[1])
     var value = parseFloat(e.detail.value)
@@ -181,45 +183,57 @@ Page({
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
       totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge)})
   },
-  setReturn(e){
-    var id = parseInt(e.currentTarget.id.split('_')[1])
-    if (isNaN(id)){
-      return 
-    }
-
-    var that = this
-    var detail = that.data.rentOrder.details[id]
-    var nowDate = util.formatDateString(new Date())
-    var realRental = parseFloat(detail.filled_rental)
-    var reparation = parseFloat(detail.reparation)
-    if (isNaN(realRental)){
-      realRental = parseFloat(detail.suggestRental)
-    }
-    var filledOvertimeCharge = parseFloat(detail.filled_overtime_charge)
-    if (detail.overTime && isNaN(filledOvertimeCharge)){
-      wx.showToast({
-        title: '装备归还超时，请确认超时费用。',
-        icon: 'error'
-
-      })
-      return
-    }
-    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetReturn/' + detail.id
-      + '?rental=' + encodeURIComponent(realRental) 
-      + '&returnDate=' + encodeURIComponent(nowDate) + '&reparation=' + encodeURIComponent(reparation)
-      + '&memo=' + encodeURIComponent(detail.memo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      + '&overTimeCharge=' + encodeURIComponent(detail.overtime_charge)
-    wx.request({
-      url: setUrl,
-      method: 'GET',
-      success:(res) => {
-        if (res.statusCode == 200){
-          that.getData()
-        }
+  
+//////set buttons/////////////
+  computeAmount(rentOrder){
+    var details = rentOrder.details
+    for(var i = 0; i < details.length; i++){
+      var unit_rental = parseFloat(details[i].unit_rental)
+      var real_rental = parseFloat(details[i].real_rental)
+      var deposit = parseFloat(details[i].deposit)
+      var overtime_charge = parseFloat(details[i].overtime_charge)
+      var reparation = parseFloat(details[i].reparation)
+      var refund = parseFloat(details[i].refund)
+      if (isNaN(unit_rental)){
+        details[i].unit_rental_str = "¥0.00"
       }
-    })
- 
+      else{
+        details[i].unit_rental_str = util.showAmount(unit_rental)
+      }
+      if (isNaN(real_rental)){
+        details[i].real_rental_str = "¥0.00"
+      }
+      else {
+        details[i].real_rental_str = util.showAmount(real_rental)
+      }
+      if (isNaN(deposit)){
+        details[i].deposit_str = "¥0.00"
+      }
+      else{
+        details[i].deposit_str = util.showAmount(deposit)
+      }
+      if (isNaN(overtime_charge)){
+        details[i].overtime_charge_str = "¥0.00"
+      }
+      else{
+        var overtime_charge_str = util.showAmount(overtime_charge)
+        details[i].overtime_charge_str = overtime_charge_str
+      }
+      if (isNaN(reparation)){
+        details[i].reparationStr = "¥0.00"
+      }
+      else{
+        details[i].reparationStr = util.showAmount(reparation)
+      }
+      refund = deposit - overtime_charge - reparation - real_rental
+      
+      details[i].refund_str = util.showAmount(refund)
+      details[i].refund = refund
+      
+    }
+    return rentOrder
   },
+
 
   setRentStart(e){
     var id = parseInt(e.currentTarget.id)
@@ -243,13 +257,163 @@ Page({
             icon: 'success',
             duration: 1000,
             success:()=>{
+              rentOrder = that.computeAmount(rentOrder)
               that.setData({rentOrder: rentOrder})
+              that.getData()
             }
           })
         }
       }
     })
   },
+
+
+  setReturn(e){
+    var id = parseInt(e.currentTarget.id.split('_')[1])
+    if (isNaN(id)){
+      return 
+    }
+
+    var that = this
+    var detail = that.data.rentOrder.details[id]
+    var nowDate = util.formatDateString(new Date())
+    var realRental = parseFloat(detail.filled_rental)
+    var reparation = parseFloat(detail.reparation)
+    if (isNaN(realRental)){
+      realRental = parseFloat(detail.suggestRental)
+    }
+    var filledOvertimeCharge = parseFloat(detail.filled_overtime_charge)
+    if (detail.overTime && isNaN(filledOvertimeCharge)){
+      wx.showToast({
+        title: '装备归还超时，请确认超时费用。',
+        icon: 'error'
+
+      })
+      return false
+    }
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetReturn/' + detail.id
+      + '?rental=' + encodeURIComponent(realRental) 
+      + '&returnDate=' + encodeURIComponent(nowDate) + '&reparation=' + encodeURIComponent(reparation)
+      + '&memo=' + encodeURIComponent(detail.memo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      + '&overTimeCharge=' + encodeURIComponent(detail.overtime_charge)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res) => {
+        if (res.statusCode == 200){
+          that.getData()
+        }
+      }
+    })
+    return true
+  },
+  setMod(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var rentOrder = that.data.rentOrder
+    rentOrder.details[id].isEdit = true
+    var classStr = rentOrder.details[id].rent_item_class
+    var classId = 0
+    var classList = that.data.classList
+    for(var i = 0; i < classList.length; i++){
+      if (classList[i] == classStr){
+        classId = i
+        break
+      }
+    }
+    rentOrder.details[id].classIndex = classId
+    rentOrder = that.computeAmount(rentOrder)
+    that.setData({rentOrder: rentOrder})
+  },
+  setAppend(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    if (detail.id != 0){
+      return
+    }
+    //detail.images = ''
+    if (!that.checkValid(detail)){
+      return
+    }
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/AppendDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: detail,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          console.log('append detail', res)
+          detail = res.data
+          rentOrder.details[id] = detail
+          rentOrder = that.computeAmount(rentOrder)
+          that.setData({rentOrder: rentOrder})
+          that.setRentStart(e)
+        }
+      }
+    })
+  },
+  setInstance(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    if (!that.checkValid(detail)){
+      return
+    }
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: detail,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          console.log('update detail', res)
+          that.setRentStart(e)
+        }
+      }
+    })
+  },
+  setKeep(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    detail.editType = '暂存'
+    detail.isEdit = true
+    detail.unit_rental_str = util.showAmount(detail.unit_rental)
+    rentOrder.details[id] = detail
+
+    that.setData({rentOrder: rentOrder})
+  },
+
+  reserveMore(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id.split('_')[1])
+    
+    var detail = that.data.rentOrder.details[id]
+    if (that.setReturn(e)){
+      var reserveUrl = 'https://' + app.globalData.domainName + '/core/Rent/ReserveMore/' + detail.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: reserveUrl,
+        method: 'GET',
+        success:(res)=>{
+          if (res.statusCode == 200){
+            that.getData()
+          }
+        }
+      })
+    }
+
+  },
+
+////set buttons end/////
+
+
   setMemo(e){
     var id = parseInt(e.currentTarget.id.split('_')[1])
     if (isNaN(id)){
@@ -321,25 +485,10 @@ Page({
 
   },
 
-  setMod(e){
-    var id = parseInt(e.currentTarget.id)
-    if (isNaN(id)){
-      return 
-    }
-    var that = this
-    var rentOrder = that.data.rentOrder
-    rentOrder.details[id].isEdit = true
-    var classStr = rentOrder.details[id].rent_item_class
-    var classId = 0
-    var classList = that.data.classList
-    for(var i = 0; i < classList.length; i++){
-      if (classList[i] == classStr){
-        classId = i
-        break
-      }
-    }
-    rentOrder.details[id].classIndex = classId
-    that.setData({rentOrder: rentOrder})
+  
+
+  setCode(e){
+    console.log('input code', e)
   },
 
   setTextValue(e){
@@ -521,10 +670,26 @@ Page({
     that.setData({rentOrder: rentOrder})
   },
 
-  setInstance(e){
+  
+
+
+  setUnitRental(e){
+    var that = this
     var id = parseInt(e.currentTarget.id)
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var v = parseFloat(e.detail.value)
+    if (!isNaN(v)){
+      detail.unit_rental = v
+      detail.unit_rental_str = util.showAmount(v)
+      that.setData({rentOrder: rentOrder})
+    }
+  },
+
+  save(e){
     var that = this
     var rentOrder = that.data.rentOrder
+    var id = parseInt(e.currentTarget.id)
     var detail = rentOrder.details[id]
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
@@ -533,37 +698,46 @@ Page({
       data: detail,
       success:(res)=>{
         if (res.statusCode == 200){
-          console.log('update detail', res)
-          that.setRentStart(e)
+          detail.isEdit = false
+          rentOrder.details[id] = detail
+          that.computeAmount(rentOrder)
+          that.setData({rentOrder: rentOrder})
         }
       }
     })
   },
-  setAppend(e){
-    var id = parseInt(e.currentTarget.id)
+
+  checkValid(detail){
+    var msg = ''
+    if (detail.rent_item_name == ''){
+      msg = '请填写名称'
+    }
+    else if (detail.rent_item_class == ''){
+      msg = '请选择分类'
+    }
+    if (msg != ''){
+      wx.showToast({
+        title: msg,
+        duration: 1000,
+        success: (res)=>{
+
+        }
+      })
+      return false
+    }
+    else{
+      return true
+    }
+  },
+
+  change(e){
     var that = this
+    var id = e.currentTarget.id
     var rentOrder = that.data.rentOrder
     var detail = rentOrder.details[id]
-    if (detail.id != 0){
-      return
-    }
-    //detail.images = ''
-    
-    var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/AppendDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: updateUrl,
-      method: 'POST',
-      data: detail,
-      success:(res)=>{
-        if (res.statusCode == 200){
-          console.log('append detail', res)
-          detail = res.data
-          rentOrder.details[id] = detail
-          that.setData({rentOrder: rentOrder})
-          that.setRentStart(e)
-        }
-      }
-    })
+    var detailId = detail.id
+
+
   },
 
   /**

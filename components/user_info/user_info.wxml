@@ -8,7 +8,7 @@
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" >手机号：</view>
       <view class="right-column"  style="display: flex;flex-direction: row;">
-        <input id="cell" value="{{userInfo.cell_number}}" placeholder="输入手机号" bindinput="userInfoChanged" style="width: 250rpx;" />
+        <input id="cell" value="{{userInfo.cell_number}}" placeholder="输入手机号" bindinput="userInfoChanged" style="width: 250rpx;" class="input" />
         <button style="width: 200rpx;" bindtap="call" >拨打</button>
       </view>
     </view>
@@ -23,7 +23,7 @@
     <view style="display: flex;flex-direction: row;"  >
       <view class="left-column" >顾客称呼：</view>
       <view class="right-column" style="display: flex;" >
-        <input style="width: 150rpx;" id="real_name" placeholder="您贵姓？" bindinput="userInfoChanged" value="{{userInfo.real_name}}" />
+        <input style="width: 150rpx;" id="real_name" placeholder="您贵姓？" bindinput="userInfoChanged" value="{{userInfo.real_name}}" class="input" />
         <radio-group id="gender" bindchange="userInfoChanged" >
           <radio checked="{{userInfo.gender=='男'}}" value="男" >先生</radio><radio checked="{{userInfo.gender=='女'}}" value="女" >女士</radio>
         </radio-group>
