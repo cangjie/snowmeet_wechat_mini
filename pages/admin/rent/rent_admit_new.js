@@ -7,6 +7,7 @@ Page({
    * Page initial data
    */
   data: {
+    isToday: true,
     scene: 0,
     classSelectIndex: 0,
     rentItemList:[],
@@ -32,7 +33,7 @@ Page({
     totalDepositReal: 0,
     depositReduce: 0,
     payOption: '现场支付',
-    rentDays: 2,
+    rentDays: 1,
     ticketCode: '',
     creditImages: '',
     memo: ''
@@ -285,7 +286,7 @@ Page({
       startDate: util.formatDate(new Date()),
       memo: ''
     }
-    that.setData({rentItemList: rentItemList, currentRentItem: currentRentItem})
+    that.setData({rentItemList: rentItemList, currentRentItem: currentRentItem, isToday: true})
   },
 
   selectItem(e){
@@ -293,7 +294,13 @@ Page({
     var id = e.currentTarget.id
     var rentItemList = that.data.rentItemList
     var currentRentItem = rentItemList[parseInt(id)]
-    that.setData({currentRentItem: currentRentItem})
+    var isToday = false
+    var now = new Date()
+    var startDate = new Date(currentRentItem.startDate)
+    if (now.getFullYear() == startDate.getFullYear() && now.getMonth() == startDate.getMonth() && startDate.getDate() == now.getDate()){
+      isToday = true
+    }
+    that.setData({currentRentItem: currentRentItem, isToday: isToday})
   },
 
   del(){
@@ -522,7 +529,7 @@ Page({
       }
       var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, rent_item_class: rentItemList[i].class, 
         rent_item_code: rentItemList[i].code, deposit: rentItemList[i].deposit, deposit_type: rentItemList[i].depositType,
-        unit_rental: rentItemList[i].rental, memo: memo, images: images}
+        unit_rental: rentItemList[i].rental, memo: memo, images: images, start_date: util.formatDate(new Date(rentItemList[i].startDate))}
         rentDetails.push(item)
     }
     rentOrder.details = rentDetails
@@ -629,6 +636,20 @@ Page({
       that.computeTotal()
     }
   },
+
+  setStartDate(e){
+    console.log('set start date', e)
+    var that = this
+    var currentRentItem = that.data.currentRentItem
+    var now = new Date()
+    var selectedDate = new Date(e.detail.value)
+    var isToday = false
+    if (selectedDate.getFullYear() == now.getFullYear() && selectedDate.getMonth() == now.getMonth() && selectedDate.getDate() == now.getDate()){
+      isToday = true
+    }
+    currentRentItem.startDate = util.formatDate(selectedDate)
+    that.setData({currentRentItem: currentRentItem, isToday: isToday})
+  },
   
   /**
    * Lifecycle function--Called when page load
@@ -636,7 +657,7 @@ Page({
   onLoad(options) {
     var that = this
     var nowDate = new Date()
-    var days = 2
+    var days = 1
     nowDate.setDate(nowDate.getDate() + days)
     that.setData({dueEndDate: nowDate, rentDays: days})
     app.loginPromiseNew.then(function (resolve){

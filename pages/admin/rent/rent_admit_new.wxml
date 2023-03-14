@@ -75,8 +75,9 @@
         <view style="width: 20%;text-align: right;" class="op-cell">起租日：</view>
         <view style="width: 30%;text-align: right;margin-left: 0rpx;" class="op-cell">
           <view style="text-align: left;" wx:if="{{currentRentItem.depositType == '预付押金'}}" >--</view>
-          <picker wx:else mode="date"  >
-            <picker-view>2023-2-10</picker-view>
+          <picker wx:else mode="date" bindchange="setStartDate" start="{{currentRentItem.startDate}}"  >
+            <picker-view wx:if="{{isToday}}"   >{{currentRentItem.startDate}}</picker-view>
+            <picker-view wx:else style="color: red;"  >{{currentRentItem.startDate}}</picker-view>
           </picker>
         </view>   
       </view>
