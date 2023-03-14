@@ -1,0 +1,32 @@
+/* pages/admin/rent/rent_admit_new.wxss */
+.op-cell{
+  height: 70rpx;
+  padding-top: 20rpx;
+  padding-left: 1rpx;
+  margin-top: 1rpx;
+  margin-left: 1rpx;
+  background-color: #ffffff;
+}
+.left-column{
+  width:25%;
+  text-align: right;
+  font-size: 10pt;
+  margin-top:20rpx;
+}
+.right-column{
+  width:75%;
+  text-align: left;
+  font-size: 10pt;
+  margin-top:20rpx;
+}
+.scroll-view_H{
+  white-space: nowrap;
+}
+.scroll-view-item_H{
+  display: inline-block;
+  width: 100%;
+}
+.item-list{
+  text-align: center;
+  font-size: 10pt;
+}

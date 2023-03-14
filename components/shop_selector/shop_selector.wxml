@@ -6,7 +6,7 @@
         店铺：
       </view>
       <vie class="right-column" >
-        <picker mode="selector" range="{{name_list}}" bindchange="selectChanged" >
+        <picker mode="selector" range="{{name_list}}" bindchange="selectChanged" class="input" style="width: 200rpx;" >
           <picker-view>{{name_list[currentSelectedIndex]}}</picker-view>
         </picker>
       </vie>

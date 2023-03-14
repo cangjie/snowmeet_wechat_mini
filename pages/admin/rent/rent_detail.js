@@ -90,6 +90,7 @@ Page({
             rentOrder.details[i] = detail
 
           }
+          rentOrder = that.computeAmount(rentOrder)
           that.setData({rentOrder: rentOrder, 
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket)})
@@ -99,6 +100,7 @@ Page({
     })
   },
   setRental(e){
+    console.log('input rental', e)
     var that = this
     var id = parseInt(e.currentTarget.id.split('_')[1])
     var value = parseFloat(e.detail.value)
@@ -181,6 +183,91 @@ Page({
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
       totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge)})
   },
+  
+//////set buttons/////////////
+  computeAmount(rentOrder){
+    var details = rentOrder.details
+    for(var i = 0; i < details.length; i++){
+      var unit_rental = parseFloat(details[i].unit_rental)
+      var real_rental = parseFloat(details[i].real_rental)
+      var deposit = parseFloat(details[i].deposit)
+      var overtime_charge = parseFloat(details[i].overtime_charge)
+      var reparation = parseFloat(details[i].reparation)
+      var refund = parseFloat(details[i].refund)
+      if (isNaN(unit_rental)){
+        details[i].unit_rental_str = "¥0.00"
+      }
+      else{
+        details[i].unit_rental_str = util.showAmount(unit_rental)
+      }
+      if (isNaN(real_rental)){
+        details[i].real_rental_str = "¥0.00"
+      }
+      else {
+        details[i].real_rental_str = util.showAmount(real_rental)
+      }
+      if (isNaN(deposit)){
+        details[i].deposit_str = "¥0.00"
+      }
+      else{
+        details[i].deposit_str = util.showAmount(deposit)
+      }
+      if (isNaN(overtime_charge)){
+        details[i].overtime_charge_str = "¥0.00"
+      }
+      else{
+        var overtime_charge_str = util.showAmount(overtime_charge)
+        details[i].overtime_charge_str = overtime_charge_str
+      }
+      if (isNaN(reparation)){
+        details[i].reparationStr = "¥0.00"
+      }
+      else{
+        details[i].reparationStr = util.showAmount(reparation)
+      }
+      refund = deposit - overtime_charge - reparation - real_rental
+      
+      details[i].refund_str = util.showAmount(refund)
+      details[i].refund = refund
+      
+    }
+    return rentOrder
+  },
+
+
+  setRentStart(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var detail = that.data.rentOrder.details[id]
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetRentStart/' + detail.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          detail = res.data
+          var rentOrder = that.data.rentOrder
+          rentOrder.details[id] = detail
+          
+          wx.showToast({
+            title: '租赁开始',
+            icon: 'success',
+            duration: 1000,
+            success:()=>{
+              rentOrder = that.computeAmount(rentOrder)
+              that.setData({rentOrder: rentOrder})
+              that.getData()
+            }
+          })
+        }
+      }
+    })
+  },
+
+
   setReturn(e){
     var id = parseInt(e.currentTarget.id.split('_')[1])
     if (isNaN(id)){
@@ -202,7 +289,7 @@ Page({
         icon: 'error'
 
       })
-      return
+      return false
     }
     var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetReturn/' + detail.id
       + '?rental=' + encodeURIComponent(realRental) 
@@ -218,8 +305,115 @@ Page({
         }
       }
     })
- 
+    return true
   },
+  setMod(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var rentOrder = that.data.rentOrder
+    rentOrder.details[id].isEdit = true
+    var classStr = rentOrder.details[id].rent_item_class
+    var classId = 0
+    var classList = that.data.classList
+    for(var i = 0; i < classList.length; i++){
+      if (classList[i] == classStr){
+        classId = i
+        break
+      }
+    }
+    rentOrder.details[id].classIndex = classId
+    rentOrder = that.computeAmount(rentOrder)
+    that.setData({rentOrder: rentOrder})
+  },
+  setAppend(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    if (detail.id != 0){
+      return
+    }
+    //detail.images = ''
+    if (!that.checkValid(detail)){
+      return
+    }
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/AppendDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: detail,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          console.log('append detail', res)
+          detail = res.data
+          rentOrder.details[id] = detail
+          rentOrder = that.computeAmount(rentOrder)
+          that.setData({rentOrder: rentOrder})
+          that.setRentStart(e)
+        }
+      }
+    })
+  },
+  setInstance(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    if (!that.checkValid(detail)){
+      return
+    }
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: detail,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          console.log('update detail', res)
+          that.setRentStart(e)
+        }
+      }
+    })
+  },
+  setKeep(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    detail.editType = '暂存'
+    detail.isEdit = true
+    detail.unit_rental_str = util.showAmount(detail.unit_rental)
+    rentOrder.details[id] = detail
+
+    that.setData({rentOrder: rentOrder})
+  },
+
+  reserveMore(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id.split('_')[1])
+    
+    var detail = that.data.rentOrder.details[id]
+    if (that.setReturn(e)){
+      var reserveUrl = 'https://' + app.globalData.domainName + '/core/Rent/ReserveMore/' + detail.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: reserveUrl,
+        method: 'GET',
+        success:(res)=>{
+          if (res.statusCode == 200){
+            that.getData()
+          }
+        }
+      })
+    }
+
+  },
+
+////set buttons end/////
+
+
   setMemo(e){
     var id = parseInt(e.currentTarget.id.split('_')[1])
     if (isNaN(id)){
@@ -291,18 +485,47 @@ Page({
 
   },
 
-  setMod(e){
-    var id = parseInt(e.currentTarget.id)
-    if (isNaN(id)){
-      return 
-    }
+  
+
+  setCode(e){
+    console.log('input code', e)
+  },
+
+  setTextValue(e){
     var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var id = parseInt(idArr[1])
+    var name = idArr[0]
     var rentOrder = that.data.rentOrder
-    rentOrder.details[id].isEdit = true
+    var v = e.detail.value
+    var detail = rentOrder.details[id]
+    switch(name){
+      case 'name':
+        detail.rent_item_name = v
+        break
+      case 'code':
+        detail.rent_item_code = v
+        break
+      default:
+        break
+    }
     that.setData({rentOrder: rentOrder})
   },
 
-  setSave(e){
+  selectClass(e){
+    var that = this
+    var id = e.currentTarget.id
+    var v = parseInt(e.detail.value)
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var classList = that.data.classList
+    var className = classList[v]
+    detail.classIndex = v
+    detail.rent_item_class = className
+    that.setData({rentOrder: rentOrder})
+  },
+
+  setCharge(e){
     var id = parseInt(e.currentTarget.id)
     if (isNaN(id)){
       return 
@@ -350,6 +573,173 @@ Page({
     
   },
 
+  gotoPay(){
+    var that = this
+    wx.navigateTo({
+      url: 'rent_pay?id=' + that.data.id,
+    })
+  },
+
+  scan(e){
+    var id = e.currentTarget.id
+    var that = this
+    wx.scanCode({
+      onlyFromCamera: false,
+      success:(res)=>{
+        console.log('scan result', res)
+        var code = res.result
+
+        //var currentRentItem = that.data.currentRentItem
+        //currentRentItem.code = code
+        that.getItemInfo(code, id)
+      }
+    })
+  },
+  getItemInfo(code, index){
+    var that = this
+    var currentRentItem = that.data.currentRentItem
+    var classList = that.data.classList
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[index]
+    var getItemUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentItem/' + code + '?shop=' + encodeURIComponent('万龙')
+    wx.request({
+      url: getItemUrl,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          detail.rent_item_name = res.data.name
+          detail.rent_item_class = res.data.class
+          detail.rent_item_code = code
+          detail.classIndex = 0
+          for(var i = 0; i < classList.length; i++){
+            if (classList[i] == detail.rent_item_class){
+              detail.classIndex = i
+              break;
+            }
+          }
+          detail.unit_rental = res.data.rental
+          //detail.deposit = res.data.deposit
+          that.setData({rentOrder: rentOrder})
+        
+        }
+      }
+    })
+  },
+
+  addMore(){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = {
+      rent_item_code: '',
+      rent_item_name: '',
+      rent_item_class: '',
+      rent_list_id: rentOrder.id,
+      classIndex: 0,
+      status: '未领取',
+      deposit_type: '立即租赁',
+      due_end_time_str: util.formatDateString(new Date()),
+      unit_rental: 0,
+      unit_rental_str: '¥0.00',
+      timeLength: '1天',
+      deposit: 0,
+      deposit_str: '¥0.00',
+      real_rental: 0,
+      real_rental_str: '¥0.00',
+      overTime: false,
+      overtime_charge: 0,
+      overtime_charge_str: '¥0.00',
+      reparation: 0,
+      reparationStr: '¥0.00',
+      refund: 0,
+      refund_str: '¥0.00',
+      id: 0,
+      isEdit: true,
+      images: '',
+      memo: ''
+
+    }
+    rentOrder.details.push(detail)
+    that.setData({rentOrder: rentOrder})
+  },
+
+  restore(){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    for(var i = 0; i < rentOrder.details.length; i++){
+      rentOrder.details[i].isEdit = false
+    }
+    that.setData({rentOrder: rentOrder})
+  },
+
+  
+
+
+  setUnitRental(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var v = parseFloat(e.detail.value)
+    if (!isNaN(v)){
+      detail.unit_rental = v
+      detail.unit_rental_str = util.showAmount(v)
+      that.setData({rentOrder: rentOrder})
+    }
+  },
+
+  save(e){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var id = parseInt(e.currentTarget.id)
+    var detail = rentOrder.details[id]
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: detail,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          detail.isEdit = false
+          rentOrder.details[id] = detail
+          that.computeAmount(rentOrder)
+          that.setData({rentOrder: rentOrder})
+        }
+      }
+    })
+  },
+
+  checkValid(detail){
+    var msg = ''
+    if (detail.rent_item_name == ''){
+      msg = '请填写名称'
+    }
+    else if (detail.rent_item_class == ''){
+      msg = '请选择分类'
+    }
+    if (msg != ''){
+      wx.showToast({
+        title: msg,
+        duration: 1000,
+        success: (res)=>{
+
+        }
+      })
+      return false
+    }
+    else{
+      return true
+    }
+  },
+
+  change(e){
+    var that = this
+    var id = e.currentTarget.id
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var detailId = detail.id
+
+
+  },
+
   /**
    * Lifecycle function--Called when page load
    */
@@ -358,7 +748,24 @@ Page({
     var id = options.id
     that.setData({id: id})
     app.loginPromiseNew.then(function(resolve){
-      that.getData()
+      var getClassUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetClassList'
+      wx.request({
+        url: getClassUrl,
+        method: 'GET',
+        success:(res)=>{
+          if (res.statusCode != 200){
+            return
+          }
+          var classList = []
+          for(var i = 0; i < res.data.length; i++){
+            classList.push(res.data[i])
+          }
+          that.setData({classList: classList})
+          that.getData()
+        }
+      })
+      
+
     })
   },
   

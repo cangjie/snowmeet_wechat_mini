@@ -20,6 +20,16 @@ Component({
   lifetimes:{
     ready: function(){
       var that = this
+      var payMethodList = that.data.payMethodList
+      var selectedIndex = that.data.payMethodSelectedIndex
+      var payMethod = that.properties.payMethod
+      for(var i = 0; i < payMethodList.length; i++){
+        if (payMethod == payMethodList[i]){
+          selectedIndex = i
+          break
+        }
+      }
+      that.setData({payMethodSelectedIndex: i})
       this.triggerEvent('PayMethodSelected', {payMethod: that.properties.payMethod})
     }
   },

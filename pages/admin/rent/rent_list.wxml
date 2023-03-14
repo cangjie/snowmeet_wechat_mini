@@ -42,8 +42,8 @@
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column">预计归还时间：</view>
           <view class="right-column" >{{item.due_end_date_str}}</view>
-          <view class="left-column">租赁件数：</view>
-          <view class="right-column" >{{item.details.length}}</view>
+          <view class="left-column">支付方式：</view>
+          <view class="right-column" >{{item.order.payments[0].pay_method}}</view>
         </view>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column">店员：</view>
