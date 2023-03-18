@@ -62,7 +62,7 @@
     </checkbox-group>
     <shop-selector bindShopSelected="shopSelected" ></shop-selector>
     <view style="text-align:center;">
-      <button bindtap="gotoPlaceOrder" disabled="{{shop == undefined || shop == ''}}" > 下 一 步 </button>
+      <button bindtap="gotoPlaceOrder" disabled="{{shop == undefined || shop == '' || cell == '' || realName == '' || gender == '' }}" > 下 一 步 </button>
     </view>
   </view>
   <view wx:if="{{scene=='确定养护项目'}}">
