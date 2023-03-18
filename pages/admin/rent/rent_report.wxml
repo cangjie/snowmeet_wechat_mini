@@ -4,6 +4,7 @@
       <picker-view>{{currentDate}}</picker-view>
     </picker>
   </view>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
   <view>
     <view style="color:gray">营业前</view>
     <view id="1" style="display: flex;flex-direction: row;"  bindtap="showDetail">

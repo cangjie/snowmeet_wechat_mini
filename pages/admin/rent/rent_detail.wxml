@@ -43,6 +43,10 @@
     <view class="right-column" >{{rentOrder.order.payments[0].pay_method}}</view>
   </view>
   <view style="display: flex; flex-direction: row;" >
+    <view class="left-column">订单时间：</view>
+    <view class="right-column" style="width:400rpx" >{{rentOrder.create_date_str}}</view>
+  </view>
+  <view style="display: flex; flex-direction: row;" >
     <view class="left-column">支付时间：</view>
     <view class="right-column" style="width:400rpx" >{{rentOrder.paidTimeStr}}</view>
   </view>

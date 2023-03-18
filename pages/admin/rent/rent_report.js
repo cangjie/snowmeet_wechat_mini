@@ -20,7 +20,8 @@ Page({
     currentBusinessRentalSettled:0,
     currentBusinessRentalUnSettled:0,
     settledBeforeRental: 0,
-    scene: 0
+    scene: 0,
+    shop: ''
   },
 
   changeDate(e){
@@ -33,10 +34,10 @@ Page({
   getData(){
     var that = this
     that.setData({unRefundDeposit:0, unSettledRental: 0, sameDaySettledRental: 0, currentTotalDeposit: 0, currentDayRefundPlacedBefore: 0, currentBusinessRental: 0, currentBusinessRentalSettled: 0, currentBusinessRentalUnSettled: 0, settledBeforeRental: 0})
-    var getUnSettledOrderBeforeUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetUnSettledOrderBefore?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    var getCurrentSameDaySettledUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetCurrentSameDaySettled?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    var getCurrentDayPlacedUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetCurrentDayPlaced?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    var getCurrentDaySettledPlacedBeforeUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetCurrentDaySettledPlacedBefore?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var getUnSettledOrderBeforeUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetUnSettledOrderBefore?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
+    var getCurrentSameDaySettledUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetCurrentSameDaySettled?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
+    var getCurrentDayPlacedUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetCurrentDayPlaced?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
+    var getCurrentDaySettledPlacedBeforeUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetCurrentDaySettledPlacedBefore?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
     wx.request({
       url: getUnSettledOrderBeforeUrl,
       method: 'GET',
@@ -286,13 +287,18 @@ Page({
       url: 'rent_detail?id=' + id,
     })
   },
+  shopSelected(e){
+    var that = this
+    that.setData({shop: e.detail.shop})
+    that.getData()
+  },
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
     var that = this
     app.loginPromiseNew.then(function(resolve){
-      that.getData()
+      //that.getData()
     })
   },
 

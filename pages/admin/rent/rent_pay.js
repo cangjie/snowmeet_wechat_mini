@@ -8,7 +8,8 @@ Page({
    */
   data: {
     needPay: true,
-    payMethod: ''
+    payMethod: '',
+    orderGetted: false
   },
   modPayMethod(e){
     var that = this
@@ -96,6 +97,7 @@ Page({
         method: 'GET',
         success:(res)=>{
           if (res.statusCode == 200){
+            that.setData({orderGetted: true})
             var rentOrder = res.data
             var needPay = true
             var payMethod = ''

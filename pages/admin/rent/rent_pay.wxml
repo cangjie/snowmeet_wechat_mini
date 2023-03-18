@@ -1,5 +1,5 @@
 <view>
-  <view>
+  <view wx:if="{{orderGetted}}">
     <view wx:if="{{needPay}}" >
       <pay_method wx:if="{{payMethod != undefined && payMethod != '' }}" bindPayMethodSelected="modPayMethod" payMethod="{{payMethod}}"  ></pay_method>
       <view wx:if="{{payMethod == '微信支付'}}" style="text-align: center;margin-top: 50rpx;">
@@ -23,4 +23,8 @@
       此订单为招待订单
     </view>
   </view>
+  <view wx:else style="text-align: center;" >
+    请等待重新获取订单信息。
+  </view>
+  
 </view>

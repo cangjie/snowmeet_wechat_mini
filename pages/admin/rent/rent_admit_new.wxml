@@ -277,8 +277,10 @@
       <button bindtap="submit" > 提 交 订 单 </button>
     </view>
   </view>
-  <view wx:if="{{scene == 4}}" >
-    <view wx:if="{{needPay}}" >
+  <view wx:if="{{scene == 4}}" style="text-align: center;" >
+    请等待订单最终确认，确认后页面自动跳转。。。
+
+    <!--view wx:if="{{needPay}}" >
       <pay_method wx:if="{{payMethod != undefined && payMethod != '' }}" bindPayMethodSelected="modPayMethod" payMethod="{{payMethod}}"  ></pay_method>
       <view wx:if="{{payMethod == '微信支付'}}" style="text-align: center;margin-top: 50rpx;">
         <image src="{{wxaCodeUrl}}" mode="scaleToFill" style="width:400rpx;height:400rpx" ></image>
@@ -299,6 +301,6 @@
     </view>
     <view style="text-align: center;" wx:else >
       此订单为招待订单
-    </view>
+    </view-->
   </view>
 </view>
