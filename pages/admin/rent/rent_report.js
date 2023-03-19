@@ -33,6 +33,7 @@ Page({
 
   getData(){
     var that = this
+    
     that.setData({unRefundDeposit:0, unSettledRental: 0, sameDaySettledRental: 0, currentTotalDeposit: 0, currentDayRefundPlacedBefore: 0, currentBusinessRental: 0, currentBusinessRentalSettled: 0, currentBusinessRentalUnSettled: 0, settledBeforeRental: 0})
     var getUnSettledOrderBeforeUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetUnSettledOrderBefore?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
     var getCurrentSameDaySettledUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetCurrentSameDaySettled?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
@@ -290,8 +291,15 @@ Page({
   shopSelected(e){
     var that = this
     that.setData({shop: e.detail.shop})
+    //that.getData()
+  },
+
+  query(){
+    var that = this
     that.getData()
   },
+
+
   /**
    * Lifecycle function--Called when page load
    */

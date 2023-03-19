@@ -47,7 +47,9 @@ Page({
           var dueEndTime = new Date(rentOrder.due_end_date)
           rentOrder.due_end_time_str = util.formatDate(dueEndTime) + ' ' + util.formatTimeStr(dueEndTime)
           if (rentOrder.order_id > 0){
-            var payTime = new Date(rentOrder.order.payments[0].create_date)
+            var payTime = rentOrder.order.pay_time == null ? 
+              new Date(rentOrder.order.payments[0].create_date) 
+              : new Date(rentOrder.order.pay_time) 
             var orderDate = new Date(rentOrder.create_date)
             rentOrder.paidTimeStr = util.formatDate(payTime) + ' ' + util.formatTimeStr(payTime)
             rentOrder.outTradeNo = rentOrder.order.payments[0].out_trade_no
