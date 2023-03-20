@@ -122,7 +122,7 @@
     <view style="display: flex; flex-direction: row;">
       <button bindtap="gotoPrev" > 上 一 步 </button>
       <view style="width: 50rpx;"> </view>
-      <button disabled="{{name == '' || cell == '' || shop == ''  }}" bindtap="gotoNext" > 下 一 步 </button>
+      <button disabled="{{realName == '' || gender == '' || cell == '' || shop == ''  }}" bindtap="gotoNext" > 下 一 步 </button>
     </view>
   </view>
   <view wx:if="{{scene == 2}}" >

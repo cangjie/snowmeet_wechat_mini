@@ -23,8 +23,11 @@ Page({
       deposit: 0,
       depositType:'立即租赁',
       startDate: util.formatDate(new Date()),
-      memo: ''
+      memo: '',
+      
     },
+    realName: '',
+    gender: '',
     openId: '',
     name: '',
     shop: '',
@@ -342,25 +345,30 @@ Page({
     var cell = ''
     var name = ''
     var openId = that.data.openId
+    var realName = ''
+    var gender = ''
     if (e.detail.user_info != null){
       if (e.detail.user_info.cell_number != undefined){
         cell = e.detail.user_info.cell_number
       }
       if (e.detail.user_info.real_name != undefined){
         name = e.detail.user_info.real_name
+        realName = name
       }
       if (e.detail.user_info.gender != undefined){
         if (e.detail.user_info.gender == '男'){
           name = name + ' 先生'
+          gender = '先生'
         }
         else if (e.detail.user_info.gender == '女'){
           name = name + ' 女士'
+          gender = '女士'
         }
       }
       if (e.detail.user_found != undefined && e.detail.user_found == true){
         openId = e.detail.user_info.open_id
       }
-      that.setData({cell: cell, name: name, openId: openId})
+      that.setData({cell: cell, name: name, openId: openId, gender: gender, realName: realName})
     }
   },
 
