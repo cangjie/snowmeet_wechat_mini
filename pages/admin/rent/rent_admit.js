@@ -30,7 +30,8 @@ Page({
     memo: '',
     payOption: '现场支付',
     payMethod: '微信支付',
-    checkInterval: 0
+    checkInterval: 0,
+    realName: ''
   },
   
   setCredit(e){
@@ -87,7 +88,7 @@ Page({
     var that = this
     switch(that.data.scene){
       case 0:
-        if (that.data.shop != '' && that.data.cell != '' && that.data.name != ''){
+        if (that.data.shop != '' && that.data.cell != '' && that.data.name != '' && that.data.realName != ''){
           that.setData({isValid: true})
         }
         break
@@ -146,12 +147,14 @@ Page({
     var cell = ''
     var name = ''
     var openId = that.data.openId
+    var realName = ''
     if (e.detail.user_info != null){
       if (e.detail.user_info.cell_number != undefined){
         cell = e.detail.user_info.cell_number
       }
       if (e.detail.user_info.real_name != undefined){
         name = e.detail.user_info.real_name
+        realName = e.detail.user_info.real_name
       }
       if (e.detail.user_info.gender != undefined){
         if (e.detail.user_info.gender == '男'){
@@ -164,7 +167,7 @@ Page({
       if (e.detail.user_found != undefined && e.detail.user_found == true){
         openId = e.detail.user_info.open_id
       }
-      that.setData({cell: cell, name: name, openId: openId})
+      that.setData({cell: cell, name: name, openId: openId, realName: realName})
     }
     that.checkValid()
   },

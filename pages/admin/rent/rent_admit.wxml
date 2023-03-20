@@ -166,7 +166,7 @@
         <button bindtap="setPaid" > 点 击 确 认 收 款 </button>
       </view>
       <view wx:else >
-        该用户已经是会员，支付完成后请确认。
+        该用户已经是会员，支付完成即可。
         <button bindtap="setPaid" > 点 击 确 认 收 款 </button>
       </view>
     </view>

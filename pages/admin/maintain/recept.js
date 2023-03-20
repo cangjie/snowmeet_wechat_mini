@@ -20,6 +20,9 @@ Page({
     payMethod: '微信支付',
     ticketCode: '',
     ticketName: '',
+    cell: '',
+    realName: '',
+    gender: ''
   },
 
   
@@ -28,7 +31,10 @@ Page({
     console.log('user info update', e)
     var that = this
     var userInfo = e.detail.user_info
-    that.setData({userInfo: userInfo})
+    var cell = userInfo.cell_number
+    var realName = userInfo.real_name
+    var gender = userInfo.gender
+    that.setData({userInfo: userInfo, cell: cell, realName: realName, gender: gender})
     if (userInfo != null && e.detail.user_found){
       var equipArr = []
       var maintainLogArr = []
