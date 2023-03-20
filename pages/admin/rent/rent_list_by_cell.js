@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    cell: ''
   },
 
   shopSelected(e){
@@ -36,6 +36,11 @@ Page({
           that.setData({orders: res.data})
         }
       }
+    })
+  },
+  gotoDetail(e){
+    wx.navigateTo({
+      url: 'rent_detail?id=' + e.currentTarget.id,
     })
   },
   /**
