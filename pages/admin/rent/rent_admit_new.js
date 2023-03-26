@@ -21,7 +21,7 @@ Page({
       name: '',
       rental: 0,
       deposit: 0,
-      depositType:'立即租赁',
+      depositType:'',
       startDate: util.formatDate(new Date()),
       memo: '',
       
@@ -228,6 +228,10 @@ Page({
       message = '请选择分类'
       valid = false
     }
+    else if (currentRentItem.depositType == ''){
+      message = '请选择押金类型'
+      valid = false
+    }
     else{
       message = ''
       valid = true
@@ -242,6 +246,7 @@ Page({
         message = '请选择分类'
         valid = false
       }
+  
       else {
         message = ''
         valid = true
@@ -285,7 +290,7 @@ Page({
       name: '',
       rental: 0,
       deposit: 0,
-      depositType:'立即租赁',
+      depositType:'',
       startDate: util.formatDate(new Date()),
       memo: ''
     }
