@@ -153,8 +153,9 @@
    
   </mp-cells>
   <view style="display:flex; flex-direction: row;">
-    <button bindtap="addMore" disabled="{{rentOrder.status == '已退款'}}" > 追 加 租 赁 物 </button>
-    <button bindtap="restore" > 取 消 </button>
+    <button bindtap="addMore" disabled="{{rentOrder.status == '已退款'}}" size="mini" >追加</button>
+    <button bindtap="restore" size="mini" >取消</button>
+    <button bindtap="restore" disabled="{{rentOrder.status != '未支付'}}" size="mini" bindtap="close" >关闭</button>
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">已付押金：</view>

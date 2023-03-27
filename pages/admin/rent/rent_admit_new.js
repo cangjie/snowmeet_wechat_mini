@@ -562,27 +562,7 @@ Page({
           wx.redirectTo({
             url: 'rent_pay?id=' + rentOrder.id,
           })
-          if (order.payments != null && order.payments.length > 0){
-            var payment = order.payments[0]
-            if (payment.pay_method == '微信支付'){
-              var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + payment.id
-              that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl})
-              var interval = setInterval(() => {
-                that.checkOrderPaymentStatus()
-              }, 1000);
-              that.setData({interval: interval})
-            }
-            else{
-              if (rentOrder.open_id == ''){
-                var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=bind_rent_' + rentOrder.id
-                that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl})
-              }
-              else{
-                that.setData({needPay: true, rentOrder: rentOrder})
-              }
-              
-            }
-          }
+          
         }
       }
     })

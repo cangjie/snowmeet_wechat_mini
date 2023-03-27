@@ -566,15 +566,10 @@ Page({
               rentOrder.details[id].isEdit = false
               that.setData({rentOrder: rentOrder})
             }
-
           })
-        
         }
       }
     })
-
-
-    
   },
 
   gotoPay(){
@@ -583,7 +578,6 @@ Page({
       url: 'rent_pay?id=' + that.data.id,
     })
   },
-
   scan(e){
     var id = e.currentTarget.id
     var that = this
@@ -742,6 +736,22 @@ Page({
     var detailId = detail.id
 
 
+  },
+
+  close(){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var closeUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetClose/' + rentOrder.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: closeUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200){
+          rentOrder = res.data
+          that.setData({rentOrder: rentOrder})
+        }
+      }
+    })
   },
 
   /**
