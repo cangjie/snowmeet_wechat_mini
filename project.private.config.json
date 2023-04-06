@@ -87,6 +87,13 @@
           "query": "ticketCode=935056232",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/rent/rent_detail",
+          "query": "id=1833",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

@@ -138,7 +138,7 @@
       <view style="display: flex; flex-direction: row; margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx">
         <button wx:if="{{item.status == '未领取' && item.deposit_type == '预约租赁' && !item.isEdit}}" id="{{index}}" bindtap="setRentStart" style="font-size: 9pt;" size="mini"  >领取</button>
         <button  wx:if="{{(item.status == '已领取' || item.status == '已归还') && !item.isEdit }}" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}"  size="mini" style="font-size: 9pt;" size="mini" >归还</button> 
-        <button size="mini"  wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款'}}" bindtap="setMod" style="font-size: 9pt;" >修改</button>
+        <button size="mini"  wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款' && rentOrder.payMethod == '微信支付'}}" bindtap="setMod" style="font-size: 9pt;" >修改</button>
         <button size="mini" wx:if="{{item.isEdit == true && item.id != 0 }}" id="{{index}}" bindtap="save" style="font-size: 9pt;"  >保存</button>
         <button size="mini" wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '立即租赁'}}" id="{{index}}" bindtap="setAppend" style="font-size: 9pt;"  >确认追加</button>
         <button size="mini" wx:if="{{!item.isEdit && item.status == '未领取' && item.deposit_type == '预付押金'}}" id="{{index}}" bindtap="setInstance" style="font-size: 9pt;"  >确认租赁</button>

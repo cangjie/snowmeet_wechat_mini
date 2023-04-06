@@ -132,6 +132,10 @@ Page({
       currentRentItem.code = ''
       currentRentItem.rental = 0
       currentRentItem.isNoCode = false
+      currentRentItem.startDate = null
+    }
+    else if (currentRentItem.depositType == '预约租赁'){
+      currentRentItem.startDate = null
     }
     
     that.setData({currentRentItem: currentRentItem})
@@ -540,9 +544,20 @@ Page({
       if (images == undefined || images == ''){
         images = ''
       }
+     
+      var startDate = util.formatDate(new Date())
+      if (rentItemList[i].startDate == null){
+        startDate = null
+      }
+      else{
+        startDate = util.formatDate(new Date(rentItemList[i].startDate))
+      }
+
+
+
       var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, rent_item_class: rentItemList[i].class, 
         rent_item_code: rentItemList[i].code, deposit: rentItemList[i].deposit, deposit_type: rentItemList[i].depositType,
-        unit_rental: rentItemList[i].rental, memo: memo, images: images, start_date: util.formatDate(new Date(rentItemList[i].startDate))}
+        unit_rental: rentItemList[i].rental, memo: memo, images: images, start_date: startDate}
         rentDetails.push(item)
     }
     rentOrder.details = rentDetails
