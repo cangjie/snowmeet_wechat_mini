@@ -271,6 +271,24 @@ Page({
     })
   },
 
+  setUnReturn(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id.split('_')[1])
+    if (isNaN(id)){
+      return 
+    }
+    var detail = that.data.rentOrder.details[id]
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetUnReturn/' + detail.id
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      success:(res)=>{
+        if (res.statusCode == 200){
+          that.getData()
+        }
+      }
+    })
+  },
 
   setReturn(e){
     var id = parseInt(e.currentTarget.id.split('_')[1])
@@ -751,6 +769,13 @@ Page({
           that.setData({rentOrder: rentOrder})
         }
       }
+    })
+  },
+
+  call(e){
+    var cell = e.currentTarget.id
+    wx.makePhoneCall({
+      phoneNumber: cell,
     })
   },
 

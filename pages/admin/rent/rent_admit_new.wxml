@@ -1,6 +1,5 @@
 <view>
   <view wx:if="{{scene==0}}" >
-    <button bindtap="goBack"> 返 回 旧 版 </button>
     <view>租赁列表</view>
     <scroll-view class="scroll-view_H" scroll-x="true" bindscroll="scroll" style="width: 100%">
       <view  class="scroll-view-item_H"   >
@@ -59,9 +58,9 @@
       </view>
       
       <view style="display: flex;flex-direction: row;" >
-        <view style="width: 20%;text-align: right;" class="op-cell" >名称：</view>
+        <view style="width: 20%;text-align: right;" class="op-cell"  >名称：</view>
         <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
-          <input style="width: 80%;" class="input" value="{{currentRentItem.name}}" bindinput="setName" />
+          <input style="width: 80%;" class="input" disabled="{{!currentRentItem.isNoCode}}" value="{{currentRentItem.name}}" bindinput="setName" />
         </view>
       </view>
       
@@ -103,7 +102,7 @@
       <view style="display: flex;flex-direction: row;" >
         <view style="width: 20%;text-align: right;" class="op-cell" >备注：</view>
         <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
-          <input style="width: 80%;" class="input" bindinput="setMemo" />
+          <input style="width: 80%;" class="input" bindinput="setMemo"  />
         </view>
       </view>
       <view class="op-cell" style="padding-bottom: 50rpx;display: flex;flex-direction: row;text-align: center;">

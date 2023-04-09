@@ -7,7 +7,7 @@
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">手机：</view>
-    <view class="right-column">{{rentOrder.cell_number}}</view>
+    <view class="right-column"><button bindtap="call" id="{{rentOrder.cell_number}}" class="input" size="mini" style="font-size: 9pt;width: 200rpx;height: 45rpx;"  >{{rentOrder.cell_number}}</button></view>
     <view class="left-column">姓名：</view>
     <view class="right-column">{{rentOrder.real_name}}</view>
   </view>
@@ -127,8 +127,8 @@
         <view class="right-column">{{item.refund_str}}</view>
       </view>
       <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
-        <input wx:if="{{item.isEdit && item.editType != '暂存' }}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" class="input" />
-        <block wx:else >{{item.memo}}</block>
+        <input wx:if="{{item.isEdit && item.editType != '暂存' }}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" class="input" style="color:red" />
+        <view wx:else style="color:red" >{{item.memo}}</view>
       </view>
       <!--view wx:if="{{item.imageArr.length > 0}}" id="{{index}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;" bindtap="showDetailGallery" >
         <image id="credit_{{index}}"  wx:for="{{item.imageArr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
@@ -137,7 +137,11 @@
   
       <view style="display: flex; flex-direction: row; margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx">
         <button wx:if="{{item.status == '未领取' && item.deposit_type == '预约租赁' && !item.isEdit}}" id="{{index}}" bindtap="setRentStart" style="font-size: 9pt;" size="mini"  >领取</button>
-        <button  wx:if="{{(item.status == '已领取' || item.status == '已归还') && !item.isEdit }}" id="return_{{index}}" bindtap="setReturn" disabled="{{item.status == '已归还' }}"  size="mini" style="font-size: 9pt;" size="mini" >归还</button> 
+        <button  wx:if="{{(item.status == '已领取') && !item.isEdit }}" id="return_{{index}}" bindtap="setReturn"   size="mini" style="font-size: 9pt;" size="mini" >归还</button> 
+
+        <button  wx:if="{{(item.status == '已归还') && !item.isEdit }}" id="return_{{index}}" bindtap="setUnReturn"  size="mini" style="font-size: 9pt;" size="mini" >设置为未归还</button>
+
+
         <button size="mini"  wx:if="{{item.isEdit != true}}" id="{{index}}" disabled="{{rentOrder.status=='已退款' && rentOrder.payMethod == '微信支付'}}" bindtap="setMod" style="font-size: 9pt;" >修改</button>
         <button size="mini" wx:if="{{item.isEdit == true && item.id != 0 }}" id="{{index}}" bindtap="save" style="font-size: 9pt;"  >保存</button>
         <button size="mini" wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '立即租赁'}}" id="{{index}}" bindtap="setAppend" style="font-size: 9pt;"  >确认追加</button>
