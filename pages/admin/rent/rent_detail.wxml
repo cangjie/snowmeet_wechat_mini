@@ -126,6 +126,21 @@
         <view class="left-column">应退金额：</view>
         <view class="right-column">{{item.refund_str}}</view>
       </view>
+
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">发放：</view>
+        <view class="right-column">
+          <view wx:if="{{item.status == '已领取' || item.status == '已归还'}}" >{{item.rentStaff.real_name}}</view>
+          <view wx:else >————</view>
+        </view>
+        <view class="left-column">归还：</view>
+        <view class="right-column">
+          <view wx:if="{{item.status == '已归还'}}" >{{item.returnStaff.real_name}}</view>
+          <view wx:else >————</view>
+        </view>
+      </view>
+
+
       <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
         <input wx:if="{{item.isEdit && item.editType != '暂存' }}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" class="input" style="color:red" />
         <view wx:else style="color:red" >{{item.memo}}</view>
