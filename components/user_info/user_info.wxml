@@ -36,7 +36,7 @@
       <view class="right-column" >yyyy-mm-dd 养护</view>
     </view>
   </mp-cell-->
-  <mp-cell>
+  <!--mp-cell>
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" >现有龙珠：</view>
       <view class="right-column" >{{totalPoints}}颗</view>
@@ -47,5 +47,5 @@
       <view class="left-column" >总共获得龙珠：</view>
       <view class="right-column" >{{earnedPoints}}颗</view>
     </view>
-  </mp-cell>
+  </mp-cell-->
 </mp-cells>

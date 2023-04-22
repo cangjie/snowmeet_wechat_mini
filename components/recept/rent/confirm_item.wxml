@@ -1,0 +1,113 @@
+  <view  >
+    <view>租赁列表</view>
+    <scroll-view class="scroll-view_H" scroll-x="true" bindscroll="scroll" style="width: 100%">
+      <view  class="scroll-view-item_H"   >
+        <view style="display: flex;flex-direction: row;" >
+          <view style="width: 100rpx;" class="item-list" ><b>类别</b></view>
+          <view style="width: 175rpx;" class="item-list" ><b>编码</b></view>
+          <view style="width: 325rpx;" class="item-list" ><b>名称</b></view>
+          <view style="width: 150rpx;" class="item-list" ><b>租赁形式</b></view>
+        </view>
+        <block wx:for="{{rentItemList}}" id="{{index}}"  >
+          <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
+          <view style="display: flex;flex-direction: row;height: 60rpx;" bindtap="selectItem"  id="{{index}}" >
+            <view style="width: 100rpx;" class="item-list" >{{item.class}}</view>
+            <view style="width: 175rpx;" class="item-list" >{{item.code}}</view>
+            <view style="width: 325rpx;" class="item-list" >{{item.name}}</view>
+            <view style="width: 150rpx;" class="item-list" >{{item.depositType}}</view>
+          </view>
+        </block>
+      </view>
+      <view  class="scroll-view-item_H"   >
+        <view style="display: flex;flex-direction: row;" >
+          <view style="width: 200rpx;" class="item-list" ><b>起租日</b></view>
+          <view style="width: 125rpx;" class="item-list" ><b>租金</b></view>
+          <view style="width: 125rpx;" class="item-list" ><b>押金</b></view>
+          <view style="width: 300rpx;" class="item-list" ><b>备注</b></view>
+        </view>
+        <block wx:for="{{rentItemList}}" id="{{index}}" bindtap="selectItem"  id="{{index}}" >
+          <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
+          <view style="display: flex;flex-direction: row;height: 60rpx;" bindtap="selectItem"  id="{{index}}" >
+            <view style="width: 200rpx;" class="item-list" >{{item.startDate}}</view>
+            <view style="width: 125rpx;" class="item-list" >{{item.rentalStr}}</view>
+            <view style="width: 125rpx;" class="item-list" >{{item.depositStr}}</view>
+            <view style="width: 300rpx;" class="item-list" >{{item.memo}}</view>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+    <view style="height: 50rpx;text-align: center;margin-top: 10rpx;" ></view>
+    <view style="background-color:#eeeeee;font-size: 11pt;">
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;margin-top: 0rpx;text-align: right;" class="op-cell" >
+          编码：
+        </view>
+        <view style="width: 40%;margin-top: 0rpx;margin-left: 0rpx;" class="op-cell" >
+          <input class="input" disabled="{{currentRentItem.isNoCode}}" bindinput="inputCode" value="{{currentRentItem.code}}" />
+        </view>
+        <view style="width: 40%;margin-top: 0rpx;margin-left: 0rpx;display: flex;flex-direction: row;" class="op-cell" >
+          <view style="margin-left: 20rpx;"> </view>
+          <button style="padding: 0rpx; width:50rpx; height:50rpx" bindtap="scan" >
+            <image src="../../../images/scan.jpeg" style="width: 50rpx; height: 50rpx;" />
+          </button>
+          <view style="margin-left: 10rpx;font-size: 10pt;">
+            <switch style="height: 60rpx;" checked="{{currentRentItem.isNoCode}}" bindchange="changeNoCode"  >无码物品</switch>
+          </view>
+        </view>
+      </view>
+      
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;text-align: right;" class="op-cell"  >名称：</view>
+        <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
+          <input style="width: 80%;" class="input" disabled="{{!currentRentItem.isNoCode}}" value="{{currentRentItem.name}}" bindinput="setName" />
+        </view>
+      </view>
+      
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;text-align: right;" class="op-cell">类别：</view>
+        <view style="width: 30%;text-align: right;margin-left: 0rpx;" class="op-cell">
+          <picker mode="selector" range="{{classList}}" bindchange="selectClass" >
+            <picker-view>{{classList[currentRentItem.classSelectedIndex]}}</picker-view>
+          </picker>
+        </view>
+        <view style="width: 20%;text-align: right;" class="op-cell">起租日：</view>
+        <view style="width: 30%;text-align: right;margin-left: 0rpx;" class="op-cell">
+          <view style="text-align: left;" wx:if="{{currentRentItem.depositType == '预付押金'}}" >--</view>
+          <picker wx:else mode="date" bindchange="setStartDate" start="{{currentRentItem.startDate}}"  >
+            <picker-view wx:if="{{isToday}}"   >{{currentRentItem.startDate}}</picker-view>
+            <picker-view wx:else style="color: red;"  >{{currentRentItem.startDate}}</picker-view>
+          </picker>
+        </view>   
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="op-cell" style="width:100%" >
+          <radio-group style="text-align: center;" bindchange="setDepositType" >
+            <radio style="margin-left: 10rpx;" value="立即租赁" checked="{{currentRentItem.depositType == '立即租赁'}}" >立即租赁</radio>
+            <radio style="margin-left: 10rpx;" value="预约租赁" checked="{{currentRentItem.depositType == '预约租赁'}}" >预约租赁</radio>
+            <radio style="margin-left: 10rpx;" value="预付押金" checked="{{currentRentItem.depositType == '预付押金'}}" >预付押金</radio>
+          </radio-group>
+        </view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;text-align: right;" class="op-cell" >租金：</view>
+        <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
+          <input id="rental" style="width: 80%;" class="input" value="{{currentRentItem.rental}}" bindinput="setNumber" />
+        </view>
+        <view style="width: 20%;text-align: right;" class="op-cell" >押金：</view>
+        <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
+          <input id="deposit" style="width: 80%;" class="input" value="{{currentRentItem.deposit}}" bindinput="setNumber" />
+        </view>
+      </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 20%;text-align: right;" class="op-cell" >备注：</view>
+        <view style="width: 80%;margin-left: 0rpx;" class="op-cell" >
+          <input style="width: 80%;" class="input" bindinput="setMemo"  />
+        </view>
+      </view>
+      <view class="op-cell" style="padding-bottom: 50rpx;display: flex;flex-direction: row;text-align: center;">
+        <button style="width: 200rpx;" bindtap="save" > 确 认 </button>
+        <view style="width: 50rpx;"></view>
+        <button style="width: 200rpx;" disabled="{{currentRentItem.index == -1}}" bindtap="del" > 删 除 </button>
+      </view>
+    </view>
+  </view>

@@ -1,0 +1,9 @@
+<view wx:if="{{scene == 'rent'}}" style="text-align: center;" > 租 赁 下 单 </view>
+<shop-selector bindShopSelected="shopSelected" ></shop-selector>
+<view style="margin-top: 50rpx;text-align: center;">
+  <image style="width: 400rpx;" src="https://mini.snowmeet.top/core/MediaHelper/ShowImageFromOfficialAccount?img=show_wechat_temp_qrcode.aspx%3Fscene%3Dshop_sale_interact_id_2653" mode="heightFix" ></image>
+</view>
+<user-info></user-info>
+<view>
+  <button bindtap="start"> 开 始 </button>
+</view>

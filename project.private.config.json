@@ -34,15 +34,9 @@
           "scene": null
         },
         {
-          "name": "shop landing",
-          "pathName": "/pages/shop_sale/shop_landing",
-          "query": "q=https%3A%2F%2Fmini.snowmeet.top%2Fmapp%2Fsale_entry%3Fid%3D123&scancode_time=1658128984",
-          "scene": 1011
-        },
-        {
-          "name": "pay",
-          "pathName": "pages/payment/pay_hub",
-          "query": "paymentId=1254",
+          "name": "recept",
+          "pathName": "pages/admin/recept/customer_identity",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },
