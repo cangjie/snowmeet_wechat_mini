@@ -5,7 +5,7 @@
     "bigPackageSizeSupport": true
   },
   "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
-  "libVersion": "2.28.1",
+  "libVersion": "2.31.0",
   "condition": {
     "miniprogram": {
       "list": [

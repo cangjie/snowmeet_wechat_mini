@@ -6,7 +6,7 @@ Component({
    * Component properties
    */
   properties: {
-
+    receptId: Number
   },
 
   /**
@@ -53,12 +53,18 @@ Component({
         }
       })
     })
+    that.checkValid()
   },
-
+  
   /**
    * Component methods
    */
   methods: {
+    checkValid(){
+      var that = this
+      var isValid = true
+      that.triggerEvent('CheckValid', {Goon: isValid, submitData: null})
+    },
     inputCode(e){
       var code = e.detail.value
       var that = this
@@ -272,5 +278,6 @@ Component({
       
       that.setData({currentRentItem: currentRentItem})
     },
+    
   }
 })

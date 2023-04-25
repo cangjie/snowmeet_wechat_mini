@@ -70,7 +70,8 @@
     "pages/admin/rent/rent_list_by_cell",
     "pages/rent/rent_detail",
     "pages/admin/recept/customer_identity",
-    "pages/admin/recept/common/step1"
+    "pages/admin/recept/common/step1",
+    "pages/admin/recept/recept_main"
   ],
   "window": {
     "backgroundTextStyle": "light",

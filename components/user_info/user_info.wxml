@@ -9,7 +9,7 @@
       <view class="left-column" >手机号：</view>
       <view class="right-column"  style="display: flex;flex-direction: row;">
         <input id="cell" value="{{userInfo.cell_number}}" placeholder="输入手机号" bindinput="userInfoChanged" style="width: 250rpx;" class="input" />
-        <button style="width: 200rpx;" bindtap="call" >拨打</button>
+        <button size="mini" bindtap="call" >拨打</button>
       </view>
     </view>
   </mp-cell>
