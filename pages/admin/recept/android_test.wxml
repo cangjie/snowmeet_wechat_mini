@@ -1,0 +1,2 @@
+<!--pages/admin/recept/android_test.wxml-->
+<text>{{iCan}}</text>
