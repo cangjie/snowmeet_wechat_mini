@@ -69,29 +69,36 @@ Page({
     var currentStepIndex = that.data.currentStepIndex
     var recept = that.data.recept
     var jumpUrl = 'recept_main?id=' + recept.id + '&stepIndex=' + (parseInt(currentStepIndex) + 1)
-    wx.redirectTo({
+    wx.navigateTo({
       url: jumpUrl
     })
   },
   prev(){
+    wx.navigateBack()
+    /*
     var that = this
     var currentStepIndex = that.data.currentStepIndex
+
     var recept = that.data.recept
     var jumpUrl = 'recept_main?id=' + recept.id + '&stepIndex=' + (parseInt(currentStepIndex) - 1)
     wx.redirectTo({
       url: jumpUrl
     })
+    */
   },
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
     var that = this
+    /*
     var winInfo = wx.getWindowInfo()
     that.setData({id: options.id, currentStepIndex: options.stepIndex,
       windowHeight: winInfo.windowHeight - winInfo.statusBarHeight})
+    */
+
     app.loginPromiseNew.then(function (resolve){
-      var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + that.data.id + '?sessionKey=' + app.globalData.sessionKey
+      var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + options.id + '?sessionKey=' + app.globalData.sessionKey
       wx.request({
         url: getUrl,
         success:(res)=>{
@@ -99,7 +106,18 @@ Page({
             return
           }
           var recept = res.data
-          that.setData({recept: recept})
+          var windowHeight = 0
+          if (app.globalData.systemInfo.safeArea != null){
+            windowHeight = app.globalData.systemInfo.safeArea.height
+          }
+          else{
+            windowHeight = app.globalData.systemInfo.windowHeight 
+          }
+          var stepIndex = options.stepIndex
+          if (stepIndex == undefined){
+            stepIndex = 0
+          }
+          that.setData({recept: recept, windowHeight: windowHeight, id: options.id, currentStepIndex: stepIndex})
           that.setSteps()
         }
       })

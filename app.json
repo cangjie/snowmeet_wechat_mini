@@ -71,7 +71,8 @@
     "pages/rent/rent_detail",
     "pages/admin/recept/customer_identity",
     "pages/admin/recept/common/step1",
-    "pages/admin/recept/recept_main"
+    "pages/admin/recept/recept_main",
+    "pages/admin/recept/android_test"
   ],
   "window": {
     "backgroundTextStyle": "light",

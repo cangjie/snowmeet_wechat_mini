@@ -35,7 +35,7 @@ Page({
     var that = this
     if (e.detail.user_found){
       that.setData({openId: e.detail.user_info.open_id})
-      
+      console.log('check global data', app.globalData)
     }
   },
   shopSelected(e){

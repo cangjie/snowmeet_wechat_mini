@@ -76,34 +76,15 @@ App({
                           method: 'GET',
                           success:(res)=>{
                             console.log('user data updated', res)
-                            resolve(app.globalData)
+                            wx.getSystemInfoAsync({
+                              success:(res)=>{
+                                app.globalData.systemInfo = res
+                                resolve(app.globalData)
+                              }
+                            })
+                            
                           }
                         })
-                        /*
-                        if (res.userInfo != null) {
-                          app.globalData.userInfo = res.userInfo
-                          var gender = ''
-                          switch(res.userInfo.gender) {
-                            case 1:
-                              gender = '男'
-                              break
-                            case 2:
-                              gender = '女'
-                              break
-                            default:
-                              break
-                          }
-                          app.globalData.userInfo.gender = gender  
-                          var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(app.globalData.userInfo.nickName) + '&headimage=' + encodeURIComponent(app.globalData.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
-                          wx.request({
-                            url: updateUrl,
-                            success: (res) =>{
-                              console.log('update user info success')
-                            }
-                          })
-                          resolve(app.globalData)
-                        }
-                        */
                       },
                       fail: (res) => {
                         console.log(res)
@@ -112,7 +93,13 @@ App({
                     })
                   }
                   else{
-                    resolve(app.globalData)
+                    //resolve(app.globalData)
+                    wx.getSystemInfoAsync({
+                      success:(res)=>{
+                        app.globalData.systemInfo = res
+                        resolve(app.globalData)
+                      }
+                    })
                   }
                 }
               }

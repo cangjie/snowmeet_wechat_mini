@@ -155,9 +155,12 @@ Page({
       case 'rent_report':
         path = 'rent/rent_report'
         break
-        case 'rent_list_cell':
-          path = 'rent/rent_list_by_cell'
-          break
+      case 'rent_list_cell':
+        path = 'rent/rent_list_by_cell'
+        break
+      case 'test':
+        path = '/pages/admin/recept/customer_identity'
+        break 
       default:
         break
     }
