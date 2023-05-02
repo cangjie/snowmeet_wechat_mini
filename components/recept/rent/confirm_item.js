@@ -50,6 +50,36 @@ Component({
             classList.push(res.data[i])
           }
           that.setData({classList: classList})
+          var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + that.properties.receptId + '?sessionKey=' + app.globalData.sessionKey
+          wx.request({
+            url: getUrl,
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+              var recept = res.data
+              var rentItemList = []
+              if (recept != null && recept.rentOrder != null && recept.rentOrder.details != null){
+                for(var i = 0; i < recept.rentOrder.details.length; i++){
+                  var detail = recept.rentOrder.details[i]
+                  var classIndex = 0
+                  var classList = that.data.classList
+                  for(var j = 0; j < classList.length; j++){
+                    if (classList[j] == detail.rent_item_class){
+                      classIndex = j
+                      break
+                    }
+                  }
+                  var startDate = util.formatDate(new Date(detail.start_date))
+                  var item = {index: i, code: detail.rent_item_code, isNoCode: (detail.rent_item_code == ''), class: detail.rent_item_class, classSelectedIndex: classIndex, name: detail.rent_item_name, rental: detail.unit_rental, deposit: detail.deposit, depositType: detail.deposit_type, startDate: startDate, memo: detail.memo, rentalStr: util.showAmount(detail.unit_rental), depositStr: util.showAmount(detail.deposit)}
+                  rentItemList.push(item)
+                }
+              }
+              that.setData({recept: recept, rentItemList: rentItemList})
+              console.log('confirm_item', recept)
+              that.checkValid()
+            }
+          })
         }
       })
     })
@@ -60,10 +90,69 @@ Component({
    * Component methods
    */
   methods: {
+    selectClass(e){
+      var that = this
+      var currentRentItem = that.data.currentRentItem
+      var currentClass = that.data.classList[e.detail.value]
+      currentRentItem.class = currentClass
+      currentRentItem.classSelectedIndex = e.detail.value
+      that.setData({currentRentItem: currentRentItem})
+    },
     checkValid(){
       var that = this
       var isValid = true
-      that.triggerEvent('CheckValid', {Goon: isValid, submitData: null})
+      var recept = that.data.recept
+      if (recept == undefined || recept.rentOrder == undefined ){
+        isValid = false
+        return
+      }
+      var rentItemList = that.data.rentItemList
+      var rentDetails = []
+      for(var i = 0; i < rentItemList.length; i++){
+        var memo = rentItemList[i].memo
+        if (memo == undefined || memo == ''){
+          memo = ''
+        }
+        var images = rentItemList[i].images
+        if (images == undefined || images == ''){
+          images = ''
+        }
+       
+        var startDate = util.formatDate(new Date())
+        if (rentItemList[i].startDate == null){
+          startDate = null
+        }
+        else{
+          startDate = util.formatDate(new Date(rentItemList[i].startDate))
+        }
+  
+  
+  
+        var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, rent_item_class: rentItemList[i].class, 
+          rent_item_code: rentItemList[i].code, deposit: rentItemList[i].deposit, deposit_type: rentItemList[i].depositType,
+          unit_rental: rentItemList[i].rental, memo: memo, images: images, start_date: startDate}
+          rentDetails.push(item)
+
+          var rentItem = rentItemList[i]
+          if (rentItem.name == '' || (!rentItem.isNoCode  && rentItem.code == '') || rentItem.class == ''
+          || rentItem.rental == 0 || rentItem.deposit == 0){
+            isValid = false
+          }
+
+
+      }
+      recept.rentOrder.details = rentDetails
+      recept.submit_data = ''
+
+      if (rentItemList.length == 0){
+        isValid = false
+        
+        
+      }
+      that.triggerEvent('CheckValid', {Goon: isValid, recept: recept})
+      
+
+      
     },
     inputCode(e){
       var code = e.detail.value
@@ -174,6 +263,7 @@ Component({
         else {
           message = ''
           valid = true
+          
         }
   
   
@@ -186,6 +276,7 @@ Component({
         })
         return
       }
+      
   
   
   
@@ -219,6 +310,7 @@ Component({
         memo: ''
       }
       that.setData({rentItemList: rentItemList, currentRentItem: currentRentItem, isToday: true})
+      that.checkValid()
     },
     selectItem(e){
       var that = this
@@ -260,6 +352,7 @@ Component({
         memo: ''
       }
       that.setData({currentRentItem: currentRentItem, rentItemList: rentItemListNew})
+      that.checkValid()
     },
     setDepositType(e){
       var that = this
@@ -278,6 +371,73 @@ Component({
       
       that.setData({currentRentItem: currentRentItem})
     },
-    
+    setNumber(e){
+      var that = this
+      var fieldName = ''
+      switch(e.currentTarget.id){
+        case 'rental':
+          fieldName = '租金'
+          break
+        case 'deposit':
+          fieldName = '押金'
+          break
+        default:
+          break
+      }
+      var message = ''
+      if (fieldName!=''){
+        var amount = parseFloat(e.detail.value)
+        var currentRentItem = that.data.currentRentItem
+        if (!isNaN(amount)){
+          var displayedValue = amount
+          if (amount.toString() != e.detail.value){
+            displayedValue = e.detail.value
+          }
+          switch(fieldName){
+            case '租金':
+              currentRentItem.rental = displayedValue
+              break
+            case '押金':
+              currentRentItem.deposit = displayedValue
+              break
+            default:
+              break
+          }
+          that.setData({currentRentItem: currentRentItem})
+        }
+        else{
+          message = '请填正确' + fieldName
+          wx.showToast({
+            title: message,
+            icon: 'error',
+            success:(res)=>{
+              switch(fieldName){
+                case '租金':
+                  currentRentItem.rental = e.detail.value
+                  break
+                case '押金':
+                  currentRentItem.deposit = e.detail.value
+                  break
+                default:
+                  break
+              }
+              that.setData({currentRentItem: currentRentItem})
+            }
+          })
+        }
+      }
+    },
+    setMemo(e){
+      var that = this
+      var currentRentItem = that.data.currentRentItem
+      currentRentItem.memo = e.detail.value
+      that.setData({currentRentItem: currentRentItem})
+    },
+    setName(e){
+      var that = this
+      var currentRentItem = that.data.currentRentItem
+      currentRentItem.name = e.detail.value
+      that.setData({currentRentItem: currentRentItem})
+    },
   }
 })

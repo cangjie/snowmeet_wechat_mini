@@ -61,17 +61,34 @@ Page({
     console.log('main check valid', e)
     var that = this
     if (e.detail.Goon){
-      that.setData({nextDisable: false})
+      that.setData({nextDisable: false, recept: e.detail.recept})
+    }
+    else{
+      that.setData({nextDisable: true})
     }
   },
   next(){
     var that = this
     var currentStepIndex = that.data.currentStepIndex
     var recept = that.data.recept
-    var jumpUrl = 'recept_main?id=' + recept.id + '&stepIndex=' + (parseInt(currentStepIndex) + 1)
-    wx.navigateTo({
-      url: jumpUrl
+    recept.current_step = that.data.currentStepList[that.data.currentStepIndex].component
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateRecept/' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: recept,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var jumpUrl = 'recept_main?id=' + recept.id + '&stepIndex=' + (parseInt(currentStepIndex) + 1)
+        wx.navigateTo({
+          url: jumpUrl
+        })
+      }
     })
+ 
+    
   },
   prev(){
     wx.navigateBack()
@@ -113,11 +130,16 @@ Page({
           else{
             windowHeight = app.globalData.systemInfo.windowHeight 
           }
+
+          /*
           var stepIndex = options.stepIndex
           if (stepIndex == undefined){
+            var currentStep = recept.current_step
+
             stepIndex = 0
           }
-          that.setData({recept: recept, windowHeight: windowHeight, id: options.id, currentStepIndex: stepIndex})
+          */
+          that.setData({recept: recept, windowHeight: windowHeight, id: options.id, currentStepIndex: options.stepIndex})
           that.setSteps()
         }
       })

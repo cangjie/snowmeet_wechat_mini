@@ -48,7 +48,7 @@
         <view style="width: 40%;margin-top: 0rpx;margin-left: 0rpx;display: flex;flex-direction: row;" class="op-cell" >
           <view style="margin-left: 20rpx;"> </view>
           <button style="padding: 0rpx; width:50rpx; height:50rpx" bindtap="scan" >
-            <image src="../../../images/scan.jpeg" style="width: 50rpx; height: 50rpx;" />
+            <image src="../../../images/scan.jpeg" style="width: 50rpx; height: 50rpx;margin-top: -3px; margin-left: -3px;" />
           </button>
           <view style="margin-left: 10rpx;font-size: 10pt;">
             <switch style="height: 60rpx;" checked="{{currentRentItem.isNoCode}}" bindchange="changeNoCode"  >无码物品</switch>

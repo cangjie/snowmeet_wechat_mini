@@ -35,8 +35,8 @@
         },
         {
           "name": "recept",
-          "pathName": "pages/admin/recept/customer_identity",
-          "query": "",
+          "pathName": "pages/admin/recept/recept_main",
+          "query": "id=95",
           "launchMode": "default",
           "scene": null
         },
