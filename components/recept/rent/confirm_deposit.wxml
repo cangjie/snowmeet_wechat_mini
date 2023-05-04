@@ -1,2 +1,93 @@
-<!--components/recept/rent/confirm_deposit.wxml-->
-<text>components/recept/rent/confirm_deposit.wxml</text>
+<view>
+  <scroll-view class="scroll-view_H" scroll-x="true" bindscroll="scroll" style="width: 100%">
+    <view  class="scroll-view-item_H"   >
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 100rpx;" class="item-list" ><b>类别</b></view>
+        <view style="width: 175rpx;" class="item-list" ><b>编码</b></view>
+        <view style="width: 325rpx;" class="item-list" ><b>名称</b></view>
+        <view style="width: 150rpx;" class="item-list" ><b>租赁形式</b></view>
+      </view>
+      <block wx:for="{{rentItemList}}" id="{{index}}"  >
+        <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
+        <view style="display: flex;flex-direction: row;height: 60rpx;" id="{{index}}" >
+          <view style="width: 100rpx;" class="item-list" >{{item.class}}</view>
+          <view style="width: 175rpx;" class="item-list" >{{item.code}}</view>
+          <view style="width: 325rpx;" class="item-list" >{{item.name}}</view>
+          <view style="width: 150rpx;" class="item-list" >{{item.depositType}}</view>
+        </view>
+      </block>
+    </view>
+    <view  class="scroll-view-item_H"   >
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 200rpx;" class="item-list" ><b>起租日</b></view>
+        <view style="width: 125rpx;" class="item-list" ><b>租金</b></view>
+        <view style="width: 125rpx;" class="item-list" ><b>押金</b></view>
+        <view style="width: 300rpx;" class="item-list" ><b>备注</b></view>
+      </view>
+      <block wx:for="{{rentItemList}}" id="{{index}}" bindtap="selectItem"  id="{{index}}" >
+        <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
+        <view style="display: flex;flex-direction: row;height: 60rpx;" id="{{index}}" >
+          <view style="width: 200rpx;" class="item-list" >{{item.startDate}}</view>
+          <view style="width: 125rpx;" class="item-list" >{{item.rentalStr}}</view>
+          <view style="width: 125rpx;" class="item-list" >{{item.depositStr}}</view>
+          <view style="width: 300rpx;" class="item-list" >{{item.memo}}</view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+  <mp-cells title="确定订单" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >押金合计：</view>
+        <view class="right-column" >{{totalDepositStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >租金合计：</view>
+        <view class="right-column" >{{totalRentalStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >抵押物品：</view>
+        <view class="right-column" >
+          <radio-group bindchange="setCredit">
+            <radio checked="{{!haveCredit}}" value="0" >无</radio>
+            <radio checked="{{haveCredit}}" value="1" >有</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <ticket-selector wx:if="{{openId != ''}}" open_id="{{openId}}" bindTicketSelected="setTicketCode" ></ticket-selector>
+    </mp-cell>
+    <mp-cell wx:if="{{haveCredit}}" >
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >抵押物拍照：</view>
+        <view class="right-column">
+          <multi-uploader  title="抵押证件需要拍照" image_count="3"  bindUploaded="uploadCreditImages" uploaded_files="{{creditImages}}" ></multi-uploader>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >实收押金：</view>
+        <view class="right-column" ><input placeholder="{{totalDepositReal}}" bindinput="setTotalDepositReal" class="input" style="width: 200rpx;" placeholder="{{recept.rentOrder.deposit_real==0? '必填': recept.rentOrder.deposit_real}}" /></view>
+      </view>
+    </mp-cell>
+    
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >押金减免：</view>
+        <view class="right-column" ><input placeholder="{{depositReduce}}" bindinput="setDepositReduce" class="input" style="width: 200rpx;" placeholder="{{recept.rentOrder.deposit_reduce==0? '非必填，默认为0': recept.rentOrder.deposit_reduce}}" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >支付金额：</view>
+        <view class="right-column" >{{totalPayStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

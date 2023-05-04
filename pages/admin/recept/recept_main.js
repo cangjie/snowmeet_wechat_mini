@@ -10,7 +10,8 @@ Page({
     bottomFrameHeight: 50,
     rentSteps:[
       {component: 'confirm_item', title: '确认租赁物品'},
-      {component: 'confirm_deposit', title: '确认押金'}
+      {component: 'confirm_deposit', title: '确认押金'},
+      {component: 'confirm_final', title: '确认支付方式'},
     ],
     currentStepIndex: undefined,
     currentStepList: [],
@@ -70,6 +71,7 @@ Page({
   next(){
     var that = this
     var currentStepIndex = that.data.currentStepIndex
+    var currentStepList = that.data.currentStepList
     var recept = that.data.recept
     recept.current_step = that.data.currentStepList[that.data.currentStepIndex].component
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateRecept/' + encodeURIComponent(app.globalData.sessionKey)
@@ -81,17 +83,39 @@ Page({
         if (res.statusCode != 200){
           return
         }
-        var jumpUrl = 'recept_main?id=' + recept.id + '&stepIndex=' + (parseInt(currentStepIndex) + 1)
-        wx.navigateTo({
-          url: jumpUrl
-        })
+        if (currentStepIndex < currentStepList.length - 1){
+          var jumpUrl = 'recept_main?id=' + recept.id + '&stepIndex=' + (parseInt(currentStepIndex) + 1)
+          wx.navigateTo({
+            url: jumpUrl
+          })
+        }
+        else{
+          that.submit()
+        }
+        
       }
     })
  
     
   },
+
+  submit(){
+    console.log('submit')
+  },
+
   prev(){
-    wx.navigateBack()
+    wx.navigateBack({
+      fail:(res)=>{
+        console.log('back fail')
+        var that = this
+        var currentStepIndex = that.data.currentStepIndex
+        var recept = that.data.recept
+        var jumpUrl = 'recept_main?id=' + recept.id + '&stepIndex=' + (parseInt(currentStepIndex) - 1)
+          wx.navigateTo({
+            url: jumpUrl
+          })
+      }
+    })
     /*
     var that = this
     var currentStepIndex = that.data.currentStepIndex

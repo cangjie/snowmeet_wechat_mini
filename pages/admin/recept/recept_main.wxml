@@ -14,7 +14,8 @@
 </view>
 <scroll-view style="height:{{windowHeight - topFrameHeight - bottomFrameHeight}}px" scroll-x="false" scroll-y="true">
   <rent_confirm_item wx:if="{{currentStepList[currentStepIndex].component == 'confirm_item'}}" onCheckValid="checkValid" receptId="{{id}}"  ></rent_confirm_item>
-  <rent_confirm_deposit wx:if="{{currentStepList[currentStepIndex].component == 'confirm_deposit'}}" receptId="{{id}}" ></rent_confirm_deposit>
+  <rent_confirm_deposit wx:if="{{currentStepList[currentStepIndex].component == 'confirm_deposit'}}" receptId="{{id}}" onCheckValid="checkValid" ></rent_confirm_deposit>
+  <rent_confirm_final wx:if="{{currentStepList[currentStepIndex].component == 'confirm_final'}}" receptId="{{id}}" onCheckValid="checkValid" ></rent_confirm_final>
 </scroll-view>
 <view style="height: {{bottomFrameHeight}}px;display: flex; flex-direction: row;text-align: center;">
   <button disabled="{{prevDisable}}" bindtap="prev" > 上 一 步 </button>

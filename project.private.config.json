@@ -36,7 +36,7 @@
         {
           "name": "recept",
           "pathName": "pages/admin/recept/recept_main",
-          "query": "id=95",
+          "query": "id=96",
           "launchMode": "default",
           "scene": null
         },

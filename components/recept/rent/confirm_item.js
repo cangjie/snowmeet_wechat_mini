@@ -134,7 +134,7 @@ Component({
           rentDetails.push(item)
 
           var rentItem = rentItemList[i]
-          if (rentItem.name == '' || (!rentItem.isNoCode  && rentItem.code == '') || rentItem.class == ''
+          if ( (  rentItem.depositType != '预付押金' && (  rentItem.name == '' || (!rentItem.isNoCode  && rentItem.code == '') || rentItem.class == '' ))
           || rentItem.rental == 0 || rentItem.deposit == 0){
             isValid = false
           }
