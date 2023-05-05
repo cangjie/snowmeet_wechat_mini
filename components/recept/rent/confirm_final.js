@@ -28,10 +28,19 @@ Component({
             }
             var recept = res.data
             var rentOrder = recept.rentOrder
-            var rentDays = 1
-            if (rentOrder.rentDays != undefined && !isNaN(entOrder.rentDays)){
-              rentDays = parseInt(rentOrder.rentDays)
+            var startDate = new Date(rentOrder.start_date)
+            var endDate = new Date(rentOrder.due_end_date)
+            var rentDays = endDate.getDate() - startDate.getDate()
+            if (rentDays < 1){
+              rentDays = 1
             }
+            if (startDate.getFullYear()< 2000){
+              startDate = new Date()
+              endDate = new Date()
+              endDate.setDate(startDate.getDate() + rentDays - 1)
+            }
+            rentOrder.start_date = util.formatDate(startDate)
+            rentOrder.due_end_date = util.formatDate(endDate)
             //var payMethod = rentOrder.pay_method
             var payOption = rentOrder.pay_option
             var payMethod = rentOrder.payMethod
@@ -47,11 +56,28 @@ Component({
    */
   methods: {
     setDueEndTime(e){
-      var nowDate = new Date()
+      
       var days = parseInt(e.detail.value)
-      nowDate.setDate(nowDate.getDate() + days)
+      
       var that = this
-      that.setData({dueEndDate: nowDate, rentDays: days})
+      var recept = that.data.recept
+      var rentOrder = recept.rentOrder
+      var startDate = new Date(rentOrder.start_date)
+      var endDate = new Date(rentOrder.due_end_date)
+      if (startDate.getFullYear() < 2000){
+        startDate = new Date()
+        endDate = new Date()
+       
+      }
+      else{
+        startDate = new Date(rentOrder.start_date)
+        endDate = new Date(rentOrder.due_end_date)
+
+      }
+      endDate.setDate(endDate.getDate() + days - 1)
+      rentOrder.start_date = util.formatDate(startDate)
+      rentOrder.due_end_date = util.formatDate(endDate)
+      that.setData({rentDays: days, recept: recept})
     },
     setPayOption(e){
       var that = this
