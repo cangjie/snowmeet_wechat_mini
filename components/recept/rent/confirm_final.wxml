@@ -33,7 +33,7 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" >需要支付：</view>
-        <view class="right-column" >{{finalPayStr}}</view>
+        <view class="right-column" >{{payAmount}}</view>
       </view>
     </mp-cell>
     <mp-cell>
