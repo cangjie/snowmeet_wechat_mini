@@ -1,4 +1,4 @@
-<view style="height: {{topFrameHeight}}px; background-color: #c0c0c0">
+<view style="height: {{topFrameHeight}}px; background-color: #c0c0c0" bindtap="changeTopSize">
   <view style="display: flex; flex-direction: row;">
     <view class="left-column" >称呼：</view>
     <view class="right-column" >张先生</view>

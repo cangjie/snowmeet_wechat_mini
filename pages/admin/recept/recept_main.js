@@ -1,5 +1,7 @@
 // pages/admin/recept/recept_main.js
 const app = getApp()
+const topFrameHeightMax = 360
+const topFrameHeightMin = 60
 Page({
 
   /**
@@ -7,6 +9,8 @@ Page({
    */
   data: {
     topFrameHeight: 60,
+    topFrameHeightMin: 60,
+    topFrameHeightMax: 360,
     bottomFrameHeight: 50,
     rentSteps:[
       {component: 'confirm_item', title: '确认租赁物品'},
@@ -127,6 +131,44 @@ Page({
     })
     */
   },
+  changeTopSize(e){
+    var that = this
+    var topHeight = parseInt(that.data.topFrameHeight)
+    if (topHeight == topFrameHeightMin){
+      that.topBigger()
+    }
+    else{
+      that.topSmaller()
+    }
+  },
+
+  topBigger(){
+    var that = this
+    var topHeight = parseInt(that.data.topFrameHeight)
+    if (topHeight < topFrameHeightMax){
+      topHeight += 10
+      that.setData({topFrameHeight: topHeight})
+      setTimeout(() => {that.topBigger()}, 10)
+    }
+    else{
+      that.setData({topFrameHeight: topHeight})
+    }
+  },
+
+  topSmaller(){
+    var that = this
+    var topHeight = parseInt(that.data.topFrameHeight)
+    if (topHeight > topFrameHeightMin){
+      topHeight -= 10
+      that.setData({topFrameHeight: topHeight})
+      setTimeout(()=>{that.topSmaller()}, 10)
+    }
+    else{
+      that.setData({topFrameHeight: topHeight})
+    }
+  },
+
+
   /**
    * Lifecycle function--Called when page load
    */
