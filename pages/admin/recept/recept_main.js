@@ -9,9 +9,7 @@ Page({
    */
   data: {
     topFrameHeight: 60,
-    topFrameHeightMin: 60,
-    topFrameHeightMax: 360,
-    bottomFrameHeight: 50,
+    bottomFrameHeight: 80,
     rentSteps:[
       {component: 'confirm_item', title: '确认租赁物品'},
       {component: 'confirm_deposit', title: '确认押金'},

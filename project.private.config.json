@@ -5,7 +5,7 @@
     "bigPackageSizeSupport": true
   },
   "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
-  "libVersion": "2.31.0",
+  "libVersion": "2.28.1",
   "condition": {
     "miniprogram": {
       "list": [
@@ -36,7 +36,7 @@
         {
           "name": "recept",
           "pathName": "pages/admin/recept/recept_main",
-          "query": "id=96",
+          "query": "id=103",
           "launchMode": "default",
           "scene": null
         },
