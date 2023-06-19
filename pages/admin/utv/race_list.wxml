@@ -1,0 +1,24 @@
+<view>
+  <mp-cells>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view style="width: 200rpx;font-size: 9pt;">日期</view>
+        <view style="width: 130rpx;font-size: 9pt;" >时间</view>
+        <view style="text-align:right;width: 100rpx;font-size: 9pt;">当日圈数</view>
+        <view style="text-align:right;width: 100rpx;font-size: 9pt;">车辆数</view>
+        <view style="text-align:right;width:130rpx;font-size: 9pt;">负责人</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" bindtap="gotoArrive">
+        <view style="width: 200rpx;">2023-07-01</view>
+        <view style="width: 130rpx;" >10:00</view>
+        <view style="text-align:right;width: 100rpx;">1</view>
+        <view style="text-align:right;width: 100rpx;">5</view>
+        <view style="text-align:right;width:130rpx">家琪</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view style="height: 50rpx;" ></view>
+  <button bindtap="newRace" > 新 增 发 车 </button>
+</view>

@@ -1,0 +1,154 @@
+<view>
+  <mp-cells title="车辆1" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view>出发：</view>
+        <view><checkbox></checkbox></view>
+        <view>公里数：</view>
+        <view><input /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view>领队：</view>
+        <view><checkbox></checkbox></view>
+        <view>收队：</view>
+        <view><checkbox></checkbox></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <view>
+          性质：
+        </view>
+        <view>
+          <radio-group>
+            <radio>顾客</radio>
+            <radio>招待</radio>
+            <radio>服务</radio>
+            <radio>养护</radio>
+            <radio>其他</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view>随车物品：</view>
+        <view>
+          <checkbox-group>
+            <checkbox>头盔</checkbox>
+            <checkbox>护网</checkbox>
+            <checkbox>对讲</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 50%;">司机</view>
+        <view style="width: 50%;">乘客</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 25%;">姓名</view>
+        <view style="width: 25%;"><input /></view>
+        <view style="width: 25%;">姓名</view>
+        <view style="width: 25%;"><input/></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 25%;">电话</view>
+        <view style="width: 25%;"><input /></view>
+        <view style="width: 25%;">电话</view>
+        <view style="width: 25%;"><input/></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 25%;">保险</view>
+        <view style="width: 25%;"><checkbox></checkbox></view>
+        <view style="width: 25%;">保险</view>
+        <view style="width: 25%;"><checkbox></checkbox></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="车辆1" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view>出发：</view>
+        <view><checkbox></checkbox></view>
+        <view>公里数：</view>
+        <view><input /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view>领队：</view>
+        <view><checkbox></checkbox></view>
+        <view>收队：</view>
+        <view><checkbox></checkbox></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <view>
+          性质：
+        </view>
+        <view>
+          <radio-group>
+            <radio>顾客</radio>
+            <radio>招待</radio>
+            <radio>服务</radio>
+            <radio>养护</radio>
+            <radio>其他</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view>随车物品：</view>
+        <view>
+          <checkbox-group>
+            <checkbox>头盔</checkbox>
+            <checkbox>护网</checkbox>
+            <checkbox>对讲</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 50%;">司机</view>
+        <view style="width: 50%;">乘客</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 25%;">姓名</view>
+        <view style="width: 25%;"><input /></view>
+        <view style="width: 25%;">姓名</view>
+        <view style="width: 25%;"><input/></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 25%;">电话</view>
+        <view style="width: 25%;"><input /></view>
+        <view style="width: 25%;">电话</view>
+        <view style="width: 25%;"><input/></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width: 25%;">保险</view>
+        <view style="width: 25%;"><checkbox></checkbox></view>
+        <view style="width: 25%;">保险</view>
+        <view style="width: 25%;"><checkbox></checkbox></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>
