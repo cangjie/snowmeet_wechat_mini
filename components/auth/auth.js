@@ -24,42 +24,7 @@ function init(app, that) {
           }
 
           
-          /*
-          if (res.data.mini_users[0].nick == '' || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '' || res.data.mini_users[0].nick == '微信用户') {
-
-        
-            wx.getUserInfo({
-              success: (res) => {
-                if (res.userInfo != null) {
-                  app.globalData.userInfo = res.userInfo
-                  var gender = ''
-                  switch(res.userInfo.gender) {
-                    case 1:
-                      gender = '男'
-                      break
-                    case 2:
-                      gender = '女'
-                      break
-                    default:
-                      break
-                  }
-                  app.globalData.userInfo.gender = gender
-                  var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(app.globalData.userInfo.nickName) + '&headimage=' + encodeURIComponent(app.globalData.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
-                  wx.request({
-                    url: updateUrl
-                  })
-                }
-              },
-              fail: (res) => {
-                console.log(res)
-              }
-            })
-          
-          }
-          else {
-            app.globalData.userInfo = {avatarUrl: res.data.mini_users[0].head_image, nickName: res.data.mini_users[0].nick, gender: res.data.mini_users[0].gender}
-          }
-          */
+         
         }
       }
     })

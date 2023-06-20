@@ -36,7 +36,6 @@
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
     "pages/blt/open_lock",
-    "pages/summer_maintain/fill_info",
     "pages/summer_maintain/summer_maintain_pay_success",
     "pages/summer_maintain/my_summer_maintain",
     "pages/admin/equip_maintain/summer/summer_recept",

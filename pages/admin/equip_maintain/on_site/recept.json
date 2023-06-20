@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell",
-    "multi-uploader": "/components/uploader/multi-uploader"
-  },
-  "navigationBarTitleText": "现场养护下单"
-}

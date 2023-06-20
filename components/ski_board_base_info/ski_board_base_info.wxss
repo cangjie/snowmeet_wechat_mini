@@ -1,6 +1,0 @@
-/* components/ski_board_base_info/ski_board_base_info.wxss */
-@import '/app.wxss';
-.picker{
-  padding: 13px;
-  background-color: #FFFFFF;
-}

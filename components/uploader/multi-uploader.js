@@ -56,7 +56,7 @@ Component({
     },
     uploadFile: function(files) {
       console.log('upload files', files)
-      //var uploadUrl = 'https://' + app.globalData.domainName + '/upload.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+      
       var uploadUrl = 'https://' + app.globalData.domainName + '/core/UploadFile/Upload/' + encodeURIComponent(app.globalData.sessionKey)
       // 文件上传的函数，返回一个promise
       return new Promise((resolve, reject) => {

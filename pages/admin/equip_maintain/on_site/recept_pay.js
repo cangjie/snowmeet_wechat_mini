@@ -1,244 +1,66 @@
 // pages/admin/equip_maintain/on_site/recept_pay.js
-const app = getApp()
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    id: 0,
-    batchId: 0,
-    paid: false,
-    qrCodeUrl: '',
-    orderId: 0,
-    paymentTimeOut: false
+
   },
-  getBatchOrderId: function() {
-    var getBatchOrderUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_batch.aspx?batchid=' + this.data.batchId + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
-    wx.request({
-      url: getBatchOrderUrl,
-      success: (res) => {
-        if (res.data.status == 0 && res.data.count > 0) {
-          this.data.id = res.data.maintain_in_shop_request[0].id
-          this.getOrderId()
-        }
-      }
-    })
-  },
-  getOrderId: function(){
-    var getOrderIdUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get.aspx?id=' + this.data.id + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
-    wx.request({
-      url: getOrderIdUrl,
-      success: (res) => {
-        if (res.data.status == 0){
-          console.log(res.data)
-          this.setData({orderId: res.data.maintain_in_shop_request.order_id})
-          if (this.data.orderId > 0){
-            this.getOrderInfo()
-          }
-        }
-      },
-      fail:(res)=>{
-        this.setData({orderId: -1})
-      }
-    })
-  },
-  getOrderInfo: function() {
-    var orderInfoUrl = 'https://' + app.globalData.domainName + '/api/order_info_get.aspx?orderid=' + this.data.orderId + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
-    wx.request({
-      url: orderInfoUrl,
-      success: (res) => {
-        if (res.data.status == 0) {
-          if (res.data.order_online.pay_state == '1') {
-            this.setData({paid: true})
-            
-          }
-          else {
-            var orderTime = new Date(res.data.order_online.create_date.toString())
-            var nowTime = new Date()
-            console.log(nowTime - orderTime)
-            if (nowTime - orderTime > 600000){
-              this.setData({paymentTimeOut: true})
-            }
-          }
-        }
-        else{
-          this.data.paymentTimeOut = true
-        }
-      },
-      fail:(res) =>{
-        this.data.paymentTimeOut = true
-      }
-    })
-    if (!this.data.paymentTimeOut && !this.data.paid) {
-      setTimeout(() => {
-        this.getOrderInfo()
-      }, 1000);
-      
-    }
-  },
-  gotoList: function() {
-    wx.navigateTo({
-      url: 'recept_list',
-    })
-  },
+
   /**
    * Lifecycle function--Called when page load
    */
-  onLoad: function (options) {
-    var qrCodeUrl = ''
-    if (options.id != undefined) {
-      this.data.id = options.id
-    }
-    if (options.batchId != undefined) {
-      this.setData({batchId: options.batchId})
-    }
-    if (this.data.batchId > 0) {
-      qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_in_shop_maintain_batch_id_' + this.data.batchId
-    }
-    if (this.data.id > 0){
-      qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_in_shop_maintain_id_' + this.data.id
-    }
-    var that = this
-    app.loginPromiseNew.then(function (resolve) {
-      that.data.sessionKey = resolve.sessionKey
-      that.setData({qrCodeUrl: qrCodeUrl})
-      if (that.data.id == 0) {
-        var getBatchOrderUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_get_batch.aspx?batchid=' 
-        + that.data.batchId + '&sessionkey=' + encodeURIComponent(that.data.sessionKey)
-        wx.request({
-          url: getBatchOrderUrl,
-          success: (res) => {
-            if (res.data.status == 0 && res.data.count > 0) {
-              console.log(res.data)
-              that.data.id = res.data.maintain_in_shop_request[0].id
-              if (res.data.maintain_in_shop_request[0].pay_method == '微信'){
-                
-                that.refreshPayStatus()
-              }
-              else{
+  onLoad(options) {
 
-                ///////////////////////////////////////
-                //Insert a blank order
-                ///////////////
-                var blankOrderUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/PlaceBlankOrderBatch/' + that.data.batchId + '?sessionKey=' + encodeURIComponent(that.data.sessionKey)
-                wx.request({
-                  url: blankOrderUrl,
-                  success:(res)=>{
-                    if(res.data.id > 0){
-                      var allocateTaskFlowNumUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_allocate_flow_num.aspx?id=' 
-                      + that.data.id + '&sessionkey=' + encodeURIComponent(that.data.sessionKey)
-                      wx.request({
-                        url: allocateTaskFlowNumUrl,
-                        success: (res) => {
-                          var toastTitle = ''
-                          that.setData({paid: true})
-                          if (res.data.status == 0) {
-                            toastTitle = '支付成功，流水号：' + res.data.task_flow_num
-            
-                          }
-                          else {
-                            toastTitle = '支付成功，流水号未分配'
-                          }
-                          wx.showToast({
-                            title: toastTitle
-                          })
-                        }
-                      })
-                    }
-                    
-                  }
-                })
-                
-              }
-            }
-          }
-        })
-      }
-      else {
-        that.refreshPayStatus()
-      }
-    })
-    
   },
-  refreshPayStatus: function(){
-    if (!this.data.paid && !this.data.paymentTimeOut) {
-      this.getOrderId()
-      setTimeout(() => {
-        this.refreshPayStatus()
-      }, 1000);
-    }
-    else {
-      var allocateTaskFlowNumUrl = 'https://' + app.globalData.domainName + '/api/maintain_task_request_in_shop_allocate_flow_num.aspx?id=' + this.data.id + '&sessionkey=' + encodeURIComponent(this.data.sessionKey)
-      wx.request({
-        url: allocateTaskFlowNumUrl,
-        success: (res) => {
-          var toastTitle = ''
-          if (res.data.status == 0) {
-            toastTitle = '支付成功，流水号：' + res.data.task_flow_num
-            
-          }
-          else {
-            toastTitle = '支付成功，流水号未分配'
-          }
-          wx.showToast({
-            title: toastTitle
-          })
-        }
-      })
-    }
-  },
-  gotoPrint: function() {
-    wx.navigateTo({
-      url: 'print_label_new?id=' + this.data.id
-    })
-  },
+
   /**
    * Lifecycle function--Called when page is initially rendered
    */
-  onReady: function () {
+  onReady() {
 
   },
 
   /**
    * Lifecycle function--Called when page show
    */
-  onShow: function () {
+  onShow() {
 
   },
 
   /**
    * Lifecycle function--Called when page hide
    */
-  onHide: function () {
+  onHide() {
 
   },
 
   /**
    * Lifecycle function--Called when page unload
    */
-  onUnload: function () {
+  onUnload() {
 
   },
 
   /**
    * Page event handler function--Called when user drop down
    */
-  onPullDownRefresh: function () {
+  onPullDownRefresh() {
 
   },
 
   /**
    * Called when page reach bottom
    */
-  onReachBottom: function () {
+  onReachBottom() {
 
   },
 
   /**
    * Called when user click on the top right corner to share
    */
-  onShareAppMessage: function () {
+  onShareAppMessage() {
 
   }
 })
