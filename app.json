@@ -77,7 +77,8 @@
     "pages/admin/utv/depart",
     "pages/admin/utv/arrive",
     "pages/admin/utv/trip_list",
-    "pages/admin/utv/trip_add"
+    "pages/admin/utv/trip_add",
+    "pages/admin/utv/customer_add"
   ],
   "window": {
     "backgroundTextStyle": "light",

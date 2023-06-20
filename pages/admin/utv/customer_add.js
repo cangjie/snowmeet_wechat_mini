@@ -1,18 +1,27 @@
-// pages/admin/utv/trip_add.js
+// pages/admin/utv/customer_add.js
 Page({
 
   /**
    * Page initial data
    */
   data: {
-
+    scene: 0
   },
 
-  addNewCustomer(){
-    wx.navigateTo({
-      url: 'customer_add',
-    })
+  next(){
+    var that = this
+    var scene = that.data.scene
+    scene++
+    that.setData({scene: scene})
   },
+
+  prve(){
+    var that = this
+    var scene = that.data.scene
+    scene--
+    that.setData({scene: scene})
+  },
+
   /**
    * Lifecycle function--Called when page load
    */

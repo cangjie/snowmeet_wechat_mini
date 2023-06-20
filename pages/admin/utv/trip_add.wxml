@@ -20,6 +20,12 @@
           <view class="left-column" >车数：</view>
           <view class="right-column" >2</view>
         </view>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" >顾客信息：</view>
+          <view class="right-column" >未完善</view>
+          <view class="left-column" >支付状态：</view>
+          <view class="right-column" >已支付</view>
+        </view>
       </mp-cell>
       <mp-cell >
         <view style="display: flex;flex-direction: row;" >
@@ -34,9 +40,15 @@
           <view class="left-column" >车数：</view>
           <view class="right-column" >2</view>
         </view>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" >顾客信息：</view>
+          <view class="right-column" >已填</view>
+          <view class="left-column" >支付状态：</view>
+          <view class="right-column" >已支付</view>
+        </view>
       </mp-cell>
     </mp-cells>
-    <view><button> 添 加 新 顾 客 </button></view>
+    <view><button bindtap="addNewCustomer"> 添 加 新 顾 客 </button></view>
     <view style="height:50rpx;" ></view>
     <view style="margin-left: 50rpx;">服务人员：</view>
     <view style="margin-left: 50rpx;">

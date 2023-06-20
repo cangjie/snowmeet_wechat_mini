@@ -1,0 +1,127 @@
+<view>
+  <view wx:if="{{scene == 0}}">
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >车次：</view>
+      <view class="right-column" style="width: 400rpx;" >2023-07-01第1次发车</view>
+    </view>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >人数：</view>
+      <view class="right-column" ><input type="digit" class="input" placeholder="3" /></view>
+    </view>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >车数：</view>
+      <view class="right-column" ><input type="digit" class="input" placeholder="2" /></view>
+    </view>
+    <user-info></user-info>
+    <ticket-selector></ticket-selector>
+  </view>
+  <view wx:if="{{scene == 1}}" >
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >车次：</view>
+      <view class="right-column" style="width: 400rpx;" >2023-07-01第1次发车</view>
+    </view>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >车数：</view>
+      <view class="right-column" >2</view>
+    </view>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >押金：</view>
+      <view class="right-column" ><input placeholder="6000" class="input" /></view>
+    </view>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >押金减免：</view>
+      <view class="right-column" ><input placeholder="0" class="input" /></view>
+    </view>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >优惠券：</view>
+      <view class="right-column" >xxx-xxx-xxx</view>
+    </view>
+    <view style="display: flex;flex-direction: row;" >
+      <view class="left-column" >收款：</view>
+      <view class="right-column" >¥6000.00</view>
+    </view>
+    
+  </view>
+  <view wx:if="{{scene == 2}}">
+    <pay_method></pay_method>
+  </view>
+  <view wx:if="{{scene == 3}}" >
+    <view>填写驾驶员乘客信息</view>
+    <mp-cells title="车辆1">
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;" >
+          <view style="width: 50%;">司机</view>
+          <view style="width: 50%;">乘客</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;" >
+          <view class="left-column" style="width: 15%;" >姓名：</view>
+          <view class="right-column"><input class="input" /></view>
+          <view class="left-column">姓名：</view>
+          <view class="right-column"><input class="input" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;" >
+          <view class="left-column" style="width: 15%;" >电话：</view>
+          <view class="right-column"><input class="input" /></view>
+          <view class="left-column">电话：</view>
+          <view class="right-column"><input class="input" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;" >
+          <view class="left-column" style="display: flex; flex-direction: row;width: 15%;text-align: right;align-self: flex-end;">
+            <span style="color: red;width: 10rpx;">*</span>驾照：
+          </view>
+          <view class="right-column"><input class="input" /></view>
+          <view class="left-column">驾照：</view>
+          <view class="right-column"><input class="input" /></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="车辆2">
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;" >
+          <view style="width: 50%;">司机</view>
+          <view style="width: 50%;">乘客</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;" >
+          <view class="left-column" style="width: 15%;" >姓名：</view>
+          <view class="right-column"><input class="input" /></view>
+          <view class="left-column">姓名：</view>
+          <view class="right-column"><input class="input" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;" >
+          <view class="left-column" style="width: 15%;" >电话：</view>
+          <view class="right-column"><input class="input" /></view>
+          <view class="left-column">电话：</view>
+          <view class="right-column"><input class="input" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display:flex; flex-direction: row;" >
+          <view class="left-column" style="display: flex; flex-direction: row;width: 15%;text-align: right;align-self: flex-end;">
+            <span style="color: red;width: 10rpx;">*</span>驾照：
+          </view>
+          <view class="right-column"><input class="input" /></view>
+          <view class="left-column">驾照：</view>
+          <view class="right-column"><input class="input" /></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view style="width: 50%;margin-left: 10rpx;align-items:flex-start;">
+      <button bindtap="prev"> 上 一 步 </button>
+    </view>
+    <view style="width: 50%;margin-right: 10rpx;align-items: flex-end;">
+      <button bindtap="next"> 下 一 步 </button>
+    </view>
+  </view>
+</view>
