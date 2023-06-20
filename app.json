@@ -73,7 +73,10 @@
     "pages/admin/recept/common/step1",
     "pages/admin/recept/recept_main",
     "pages/admin/recept/android_test",
-    "pages/admin/recept/float"
+    "pages/admin/recept/float",
+    "pages/admin/utv/depart",
+    "pages/admin/utv/arrive",
+    "pages/admin/utv/race_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

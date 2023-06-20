@@ -1,0 +1,52 @@
+<view>
+  <mp-cells title="车辆1" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"> 
+        <view>公里数：</view>
+        <view><input /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view>随车物品：</view>
+        <view>
+          <checkbox-group>
+            <checkbox>头盔</checkbox>
+            <checkbox>护网</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"> 
+        <view>备注：</view>
+        <view><input /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="车辆2" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"> 
+        <view>公里数：</view>
+        <view><input /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view>随车物品：</view>
+        <view>
+          <checkbox-group>
+            <checkbox>头盔</checkbox>
+            <checkbox>护网</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;"> 
+        <view>备注：</view>
+        <view><input /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>
