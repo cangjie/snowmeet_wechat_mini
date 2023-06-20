@@ -74,6 +74,13 @@
           "query": "",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "get cell number",
+          "pathName": "pages/payment/pay_hub",
+          "query": "id=3931",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }
