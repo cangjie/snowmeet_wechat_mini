@@ -1,4 +1,4 @@
-// pages/admin/utv/race_list.js
+// pages/admin/utv/trip_list.js
 Page({
 
   /**
@@ -8,17 +8,12 @@ Page({
 
   },
 
-  newRace(){
-    wx.redirectTo({
-      url: 'depart',
+  newTrip(){
+    wx.navigateTo({
+      url: 'trip_add',
     })
   },
 
-  gotoArrive(){
-    wx.redirectTo({
-      url: 'arrive',
-    })
-  },
   /**
    * Lifecycle function--Called when page load
    */
