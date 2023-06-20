@@ -1,4 +1,4 @@
-<view style="height: {{topFrameHeight}}px; background-color: #c0c0c0">
+<view style="height: {{topFrameHeight}}px; background-color: #c0c0c0" bindtap="changeTopSize">
   <view style="display: flex; flex-direction: row;">
     <view class="left-column" >称呼：</view>
     <view class="right-column" >张先生</view>
@@ -17,8 +17,18 @@
   <rent_confirm_deposit wx:if="{{currentStepList[currentStepIndex].component == 'confirm_deposit'}}" receptId="{{id}}" onCheckValid="checkValid" ></rent_confirm_deposit>
   <rent_confirm_final wx:if="{{currentStepList[currentStepIndex].component == 'confirm_final'}}" receptId="{{id}}" onCheckValid="checkValid" ></rent_confirm_final>
 </scroll-view>
-<view style="height: {{bottomFrameHeight}}px;display: flex; flex-direction: row;text-align: center;">
-  <button disabled="{{prevDisable}}" bindtap="prev" > 上 一 步 </button>
-  <view style="width: 200px;"></view>
-  <button disabled="{{nextDisable}}" bindtap="next"> 下 一 步 </button>
+<view style="height: {{bottomFrameHeight}}px;text-align: center;">
+  
+  <view style="display: flex; flex-direction: row;" >
+    <button disabled="{{prevDisable}}" bindtap="prev" > 上 一 步 </button>
+    <view style="width: 200px;"></view>
+    <button disabled="{{nextDisable}}" bindtap="next"> 下 一 步 </button>
+  </view>
+  <view style="height: 50rpx;" ></view>
+  <view id="cart" style="display: flex;flex-direction: row;" >
+    <view style="width: 150rpx;height:150rpx;margin-left: 10rpx;background-image: url('/images/cart.png');background-size: 105rpx 150rpx;background-repeat: no-repeat;"  >
+      <view style="border-radius: 20rpx;background-color: red;color:white;width: 45rpx;" >1</view>
+    </view>
+    <view></view>
+  </view>
 </view>

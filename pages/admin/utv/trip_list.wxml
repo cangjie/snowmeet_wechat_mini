@@ -1,0 +1,23 @@
+<view>
+  <mp-cells>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view style="width: 400rpx;">车次</view>
+        <view style="text-align:center;width: 100rpx;" >人数</view>
+        <view style="text-align:center;width: 100rpx;">车数</view>
+        <view style="text-align:center;width: 140rpx;">状态</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" bindtap="gotoArrive">
+        <view style="width: 400rpx;">2023-07-01第1次发车</view>
+        <view style="text-align:center;width: 100rpx;" >10</view>
+        <view style="text-align:center;width: 100rpx;">5</view>
+        <view style="text-align:center;width: 140rpx;">已返回</view>
+        
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view style="height: 50rpx;" ></view>
+  <button bindtap="newTrip" > 新 增 发 车 </button>
+</view>

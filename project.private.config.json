@@ -70,22 +70,15 @@
         },
         {
           "name": "",
-          "pathName": "pages/rent/bind_rent_order",
-          "query": "id=7",
+          "pathName": "pages/admin/recept/float",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "maintain_code",
-          "pathName": "pages/admin/rent/rent_admit",
-          "query": "ticketCode=935056232",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "",
-          "pathName": "pages/rent/rent_detail",
-          "query": "id=1833",
+          "name": "get cell number",
+          "pathName": "pages/payment/pay_hub",
+          "query": "id=3931",
           "launchMode": "default",
           "scene": null
         }

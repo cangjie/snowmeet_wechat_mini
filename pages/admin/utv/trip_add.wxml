@@ -1,0 +1,61 @@
+<view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >车次：</view>
+    <view class="right-column" >
+      <input class="input" placeholder="2023-07-01第1次发车" style="width: 400rpx;" />
+    </view>
+  </view>
+  <view style="height: 50rpx;" ></view>
+  <mp-cells title="顾客信息">
+      <mp-cell >
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column" >姓名：</view>
+          <view class="right-column" >张三</view>
+          <view class="left-column" >电话：</view>
+          <view class="right-column" >19500000000</view>
+        </view>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column" >人数：</view>
+          <view class="right-column" >4</view>
+          <view class="left-column" >车数：</view>
+          <view class="right-column" >2</view>
+        </view>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" >顾客信息：</view>
+          <view class="right-column" >未完善</view>
+          <view class="left-column" >支付状态：</view>
+          <view class="right-column" >已支付</view>
+        </view>
+      </mp-cell>
+      <mp-cell >
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column" >姓名：</view>
+          <view class="right-column" >李四</view>
+          <view class="left-column" >电话：</view>
+          <view class="right-column" >18600000000</view>
+        </view>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column" >人数：</view>
+          <view class="right-column" >3</view>
+          <view class="left-column" >车数：</view>
+          <view class="right-column" >2</view>
+        </view>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" >顾客信息：</view>
+          <view class="right-column" >已填</view>
+          <view class="left-column" >支付状态：</view>
+          <view class="right-column" >已支付</view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <view><button bindtap="addNewCustomer"> 添 加 新 顾 客 </button></view>
+    <view style="height:50rpx;" ></view>
+    <view style="margin-left: 50rpx;">服务人员：</view>
+    <view style="margin-left: 50rpx;">
+      <checkbox-group>
+        <checkbox>崔洋</checkbox>
+        <checkbox>嘉琪</checkbox>
+        <checkbox>不认识的</checkbox>
+      </checkbox-group>
+    </view>
+</view>

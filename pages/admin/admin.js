@@ -161,6 +161,9 @@ Page({
       case 'test':
         path = '/pages/admin/recept/customer_identity'
         break 
+      case'utv_race_list':
+        path = '/pages/admin/utv/trip_list'
+        break 
       default:
         break
     }

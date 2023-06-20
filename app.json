@@ -71,7 +71,13 @@
     "pages/admin/recept/customer_identity",
     "pages/admin/recept/common/step1",
     "pages/admin/recept/recept_main",
-    "pages/admin/recept/android_test"
+    "pages/admin/recept/android_test",
+    "pages/admin/recept/float",
+    "pages/admin/utv/depart",
+    "pages/admin/utv/arrive",
+    "pages/admin/utv/trip_list",
+    "pages/admin/utv/trip_add",
+    "pages/admin/utv/customer_add"
   ],
   "window": {
     "backgroundTextStyle": "light",
