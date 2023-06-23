@@ -5,6 +5,15 @@
       <input class="input" placeholder="2023-07-01第1次发车" style="width: 400rpx;" />
     </view>
   </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >类型：</view>
+    <view class="right-column" >
+      <radio-group style="display: flex;flex-direction: row;width: 400rpx;">
+        <radio>正常</radio>
+        <radio>体验</radio>
+      </radio-group>
+    </view>
+  </view>
   <view style="height: 50rpx;" ></view>
   <mp-cells title="顾客信息">
       <mp-cell >
