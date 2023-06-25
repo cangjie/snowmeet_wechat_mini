@@ -1,0 +1,183 @@
+<view>
+  <view wx:if="{{scene == 0}}">
+    <mp-cells title="选择日期" >
+      <mp-cell style="display: grid;place-items: center;">
+        <picker class="input fill-item"  mode="date" start="2023-6-25" end="2023-10-15" >
+          <picker-view>2023-6-25</picker-view>
+        </picker>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="选择场次" >
+      <mp-cell style="display: grid;place-items: center;">
+        <picker class="input fill-item"  start="2023-6-25" end="2023-10-15" >
+          <picker-view>第一场10：00</picker-view>
+        </picker>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="预定车辆数" >
+      <mp-cell style="display: grid;place-items: center;">
+        <picker class="input fill-item"  start="2023-6-25" end="2023-10-15" >
+          <picker-view>1</picker-view>
+        </picker>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="线路" >
+      <mp-cell style="display: grid;place-items: center;">
+        <radio-group style="display: flex;flex-direction: row;">
+          <radio style="width: 200rpx;">长线</radio>
+          <radio style="width: 200rpx;">短线</radio>
+        </radio-group>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="联系人姓名" >
+      <mp-cell style="display: grid;place-items: center;">
+        <input class="input" />
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="联系人电话" >
+      <mp-cell style="display: grid;place-items: center;">
+        <input class="input" />
+      </mp-cell>
+    </mp-cells>
+  </view>
+  <view wx:if="{{scene == 1}}" >
+    <view>填写各预约车辆主副驾驶员信息：</view>
+    <mp-cells title="车辆1" class="cell-nth">
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view style="width: 50%;" >司机</view>
+          <view style="width: 50%;" >乘客</view>
+        </view>
+      </mp-cell>
+      <mp-cell style="height: 10rpx;margin-top: 0rpx;margin-bottom: 0rpx;"  >
+        <view class="input-title" style="display: flex;flex-direction: row;">
+          <view class="cell-item">姓名</view>
+          <viewm style="background-color: white;width: 10rpx;"></viewm>
+          <view class="cell-item">姓名</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 50%;display: grid;place-items: center;" >
+            <input style="width: 300rpx; " class="input" />
+          </view>
+          <view style="width: 50%; display: grid;place-items: center;" >
+            <input style="width: 300rpx;" class="input" />
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell style="height: 10rpx;margin-top: 0rpx;margin-bottom: 0rpx;"  >
+        <view class="input-title" style="display: flex;flex-direction: row;">
+          <view class="cell-item">性别</view>
+          <viewm style="background-color: white;width: 10rpx;"></viewm>
+          <view class="cell-item">性别</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 50%;display: grid;place-items: center;" >
+            <radio-group style="display: flex;flex-direction: row;" >
+              <radio>男</radio>
+              <radio>女</radio>
+            </radio-group>
+          </view>
+          <view style="width: 50%; display: grid;place-items: center;" >
+            <radio-group style="display: flex;flex-direction: row;" >
+              <radio>男</radio>
+              <radio>女</radio>
+            </radio-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell style="height: 10rpx;margin-top: 0rpx;margin-bottom: 0rpx;"  >
+        <view class="input-title" style="display: flex;flex-direction: row;">
+          <view class="cell-item">电话</view>
+          <viewm style="background-color: white;width: 10rpx;"></viewm>
+          <view class="cell-item">电话</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 50%;display: grid;place-items: center;" >
+            <input style="width: 300rpx; " class="input" />
+          </view>
+          <view style="width: 50%; display: grid;place-items: center;" >
+            <input style="width: 300rpx;" class="input" />
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell style="height: 10rpx;margin-top: 0rpx;margin-bottom: 0rpx;"  >
+        <view class="input-title" style="display: flex;flex-direction: row;">
+          <view class="cell-item">驾照</view>
+          <viewm style="background-color: white;width: 10rpx;"></viewm>
+          <view class="cell-item">驾照</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 50%;display: grid;place-items: center;" >
+            <input style="width: 300rpx; " class="input" />
+          </view>
+          <view style="width: 50%; display: grid;place-items: center;" >
+            <input style="width: 300rpx;" class="input" />
+          </view>
+        </view>
+      </mp-cell>
+      <!--
+      <mp-cell style="height: 10rpx;margin-top: 0rpx;margin-bottom: 0rpx;"  >
+        <view class="input-title" style="display: flex;flex-direction: row;">
+          <view class="cell-item">保险</view>
+          <viewm style="background-color: white;width: 10rpx;"></viewm>
+          <view class="cell-item">保险</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 50%;display: grid;place-items: center;" >
+            <input style="width: 300rpx; " class="input" />
+          </view>
+          <view style="width: 50%; display: grid;place-items: center;" >
+            <input style="width: 300rpx;" class="input" />
+          </view>
+        </view>
+      </mp-cell>
+      -->
+      <mp-cell style="height: 10rpx;margin-top: 0rpx;margin-bottom: 0rpx;"  >
+        <view class="input-title" style="display: flex;flex-direction: row;">
+          <view class="cell-item" style="width: 100%;">紧急联系人姓名</view>
+          
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 50%;display: grid;place-items: center;" >
+            <input style="width: 300rpx; " class="input" />
+          </view>
+          
+        </view>
+      </mp-cell>
+      <mp-cell style="height: 10rpx;margin-top: 0rpx;margin-bottom: 0rpx;"  >
+        <view class="input-title" style="display: flex;flex-direction: row;">
+          <view class="cell-item" style="width: 100%;">紧急联系人电话</view>
+          
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 50%;display: grid;place-items: center;" >
+            <input style="width: 300rpx; " class="input" />
+          </view>
+          
+        </view>
+      </mp-cell>
+    </mp-cells>
+    
+  </view>
+  <view wx:if="{{scene == 2}}" >
+    您的预约已经提交，稍后我们的工作人员会和你做最终确认，请保持手机畅通并耐心等待。
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <button class="input" style="align-items: flex-start;" bindtap="prev" > 上 一 步 </button>
+    <button class="input" style="align-items: flex-end;" bindtap="next" > 下 一 步 </button>
+  </view>
+</view>

@@ -1,0 +1,17 @@
+/* pages/UTV/reserve.wxss */
+.fill-item{
+  width: 300rpx;
+}
+.input-title{
+
+  height:40rpx;
+  font-size: 13pt;
+  background-color: #e0e0e0;
+
+}
+.cell-item{
+  width:45%;
+  font-size: 9pt;
+  color:gray;
+  margin-left: 10rpx;
+}

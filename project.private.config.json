@@ -81,6 +81,13 @@
           "query": "id=3931",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "UTV Reserve",
+          "pathName": "pages/UTV/reserve",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }
