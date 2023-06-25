@@ -1,0 +1,52 @@
+<view>
+  <view style="display: flex;flex-direction: row;" >
+    <view style="width:140rpx;font-size: 10pt; text-align: center;">日期</view>
+    <view style="width:190rpx;font-size: 10pt;text-align: center;">场次</view>
+    <view style="width: 55rpx;text-align: center;font-size: 10pt;" >数量</view>
+    <view style="width: 80rpx;text-align: center;font-size: 10pt;" >姓名</view>
+    <view style="width: 170rpx;text-align: center;font-size: 10pt;" >电话</view>
+    <view style="width: 120rpx;text-align: center;font-size: 10pt;" >状态</view>
+  </view>
+  <view style="height: 1rpx;background-color: gray;" ></view>
+  <view style="height: 50rpx;" ></view>
+  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
+    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
+    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
+    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
+    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
+    <view style="width: 170rpx; text-align: center;">13501177897</view>
+    <view style="width:120rpx;text-align: right;">待确认</view>
+  </view>
+  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
+    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
+    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
+    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
+    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
+    <view style="width: 170rpx; text-align: center;">13501177897</view>
+    <view style="width:120rpx;text-align: right;">待付押金</view>
+  </view>
+  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
+    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
+    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
+    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
+    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
+    <view style="width: 170rpx; text-align: center;">13501177897</view>
+    <view style="width:120rpx;text-align: right;">信息不全</view>
+  </view>
+  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
+    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
+    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
+    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
+    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
+    <view style="width: 170rpx; text-align: center;">13501177897</view>
+    <view style="width:120rpx;text-align: right;">已确认</view>
+  </view>
+  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
+    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
+    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
+    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
+    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
+    <view style="width: 170rpx; text-align: center;">13501177897</view>
+    <view style="width:120rpx;text-align: right;">已关闭</view>
+  </view>
+</view>

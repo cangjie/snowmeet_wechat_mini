@@ -78,7 +78,9 @@
     "pages/admin/utv/trip_list",
     "pages/admin/utv/trip_add",
     "pages/admin/utv/customer_add",
-    "pages/UTV/reserve"
+    "pages/UTV/reserve",
+    "pages/admin/utv/reserve_list",
+    "pages/admin/utv/reserve_info"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,0 +1,37 @@
+<view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column"  style="width:25%" >日期：</view>
+    <view class="right-column" style="width:25%" >
+      2023-6-30
+    </view>
+    <view class="left-column"  style="width:25%" >场次：</view>
+    <view class="right-column" style="width:25%" >
+      [上午场]10:00
+    </view>
+  </view>
+  <view style="text-align: center;font-size: 10pt;">
+
+      (总共:7 已锁:3 待付:3 可订:1)
+ 
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column"  style="width:25%" >姓名：</view>
+    <view class="right-column" style="width:25%" >
+      李四民
+    </view>
+    <view class="left-column"  style="width:25%" >电话：</view>
+    <view class="right-column" style="width:25%" >
+      13601111111
+    </view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column"  style="width:25%" >预定车辆：</view>
+    <view class="right-column" style="width:25%" >
+      2
+    </view>
+    <view class="left-column"  style="width:25%" >预定状态：</view>
+    <view class="right-column" style="width:25%" >
+      待确认
+    </view>
+  </view>
+</view>

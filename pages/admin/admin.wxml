@@ -6,6 +6,7 @@
     <mp-cell value="测试" bindtap="nav" id="test" ></mp-cell>
   </mp-cells> 
   <mp-cells  ext-class="my-cells" title="UTV" >
+    <mp-cell id="utv_reserve_list" bindtap="nav">预约列表</mp-cell>
     <mp-cell id="utv_race_list" bindtap="nav" >UTV发车列表</mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="店铺销售" >

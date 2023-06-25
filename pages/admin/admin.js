@@ -164,6 +164,9 @@ Page({
       case'utv_race_list':
         path = '/pages/admin/utv/trip_list'
         break 
+      case 'utv_reserve_list':
+        path = '/pages/admin/utv/reserve_list'
+        break
       default:
         break
     }
