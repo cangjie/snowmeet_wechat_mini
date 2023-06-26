@@ -13,6 +13,11 @@ Page({
       url: 'trip_add',
     })
   },
+  gotoArrive(){
+    wx.navigateTo({
+      url: 'trip_info',
+    })
+  },
 
   /**
    * Lifecycle function--Called when page load

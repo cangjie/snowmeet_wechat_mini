@@ -1,22 +1,11 @@
-// pages/admin/utv/reserve_info.js
+// pages/admin/utv/trip_info.js
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    isEditing: 0
-  },
-  gotoEdit(){
-    var that = this
-    var isEditing = that.data.isEditing
-    if (isEditing == 0){
-      isEditing = 1
-    }
-    else{
-      isEditing = 0
-    }
-    that.setData({isEditing: isEditing})
+
   },
 
   /**

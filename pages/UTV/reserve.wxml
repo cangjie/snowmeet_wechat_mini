@@ -40,7 +40,7 @@
       </mp-cell>
     </mp-cells>
   </view>
-  <view wx:if="{{scene == 1}}" >
+  <view wx:if="{{scene == 2}}" >
     <view>填写各预约车辆主副驾驶员信息：</view>
     <mp-cells title="车辆1" class="cell-nth">
       <mp-cell>
@@ -173,7 +173,7 @@
     </mp-cells>
     
   </view>
-  <view wx:if="{{scene == 2}}" >
+  <view wx:if="{{scene == 1}}" >
     您的预约已经提交，稍后我们的工作人员会和你做最终确认，请保持手机畅通并耐心等待。
   </view>
   <view style="display: flex;flex-direction: row;">

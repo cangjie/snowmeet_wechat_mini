@@ -1,22 +1,24 @@
-// pages/admin/utv/reserve_info.js
+// pages/UTV/deposit_confirm.js
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    isEditing: 0
+    scene: 0
   },
-  gotoEdit(){
+  prev(){
     var that = this
-    var isEditing = that.data.isEditing
-    if (isEditing == 0){
-      isEditing = 1
-    }
-    else{
-      isEditing = 0
-    }
-    that.setData({isEditing: isEditing})
+    var scene = that.data.scene
+    scene--
+    that.setData({scene: scene})
+  },
+
+  next(){
+    var that = this
+    var scene = that.data.scene
+    scene++
+    that.setData({scene: scene})
   },
 
   /**

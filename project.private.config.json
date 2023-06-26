@@ -88,6 +88,20 @@
           "query": "",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "UTV Deposit",
+          "pathName": "pages/UTV/deposit_confirm",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "UTV Fill Info",
+          "pathName": "pages/UTV/fill_info",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

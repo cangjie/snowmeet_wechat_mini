@@ -1,0 +1,74 @@
+<view>
+  <view style="display: flex; flex-direction: row;">
+    <view style="width: 130rpx;" class="left-column">日期：</view>
+    <view class="left-column" >2023-06-30</view>
+    <view style="width: 130rpx;" class="left-column">场次：</view>
+    <view class="left-column" >[上午场]10:00</view>
+  </view>
+  <mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view class="left-column" style="width: 130rpx;">押金：</view>
+        <view class="right-column" >¥3000.00</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >主驾姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >副驾姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >性别：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >性别：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >保险：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >保险：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      紧急联系人信息：
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <button size="mini" > 保 存 </button>
+        <view style="width: 10rpx;" ></view>
+        <button size="mini" > 取消，退押金 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

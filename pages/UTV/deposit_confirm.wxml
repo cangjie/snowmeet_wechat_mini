@@ -1,0 +1,53 @@
+<view>
+  <view wx:if="{{scene == 0}}">
+    <view>
+      您的预约已经确认，请尽快支付押金锁定车辆。
+    </view>
+    <view>
+      由于预约火爆，您预约的2辆车，目前只能锁定1辆，另外1辆作为预约候补。候补失败，则全额退还押金。
+    </view>
+    <mp-cells title="选择日期" >
+      <mp-cell style="display: grid;place-items: center;">
+        2023-6-25
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="选择场次" >
+      <mp-cell style="display: grid;place-items: center;">
+        第一场10：00
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="预定车辆数" >
+      <mp-cell style="display: grid;place-items: center;">
+        2
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="线路" >
+      <mp-cell style="display: grid;place-items: center;">
+        长线
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="联系人姓名" >
+      <mp-cell style="display: grid;place-items: center;">
+        王二麻子
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="联系人电话" >
+      <mp-cell style="display: grid;place-items: center;">
+        18600000000
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="需付押金" >
+      <mp-cell style="display: grid;place-items: center;">
+        ¥6000.00
+      </mp-cell>
+    </mp-cells>
+  </view>
+  <view wx:if="{{scene == 1}}">
+    <view>您的押金支付成功，已经为您锁定1辆车，另外还有1辆车作为候补。</view>
+    <view>出于安全考虑，需要您和同行的朋友提供一些必要的个人资料，您可以将如下二维码分享给您的朋友，邀请他们一起填写。至于您本人，可以直接点击下一步按钮，直接进入填写资料的页面。</view>
+  </view>
+  <view style="display: flex;flex-direction: row;">
+    <button class="input" style="align-items: flex-start;" bindtap="prev" > 上 一 步 </button>
+    <button class="input" style="align-items: flex-end;" bindtap="next" > 下 一 步 </button>
+  </view>
+</view>

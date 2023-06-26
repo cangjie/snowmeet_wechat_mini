@@ -1,37 +1,145 @@
 <view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column"  style="width:25%" >日期：</view>
-    <view class="right-column" style="width:25%" >
+    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
       2023-6-30
     </view>
+    <view wx:else class="right-column" style="width:25%" >
+      <input class="input" placeholder="2023-6-30" />
+    </view>
     <view class="left-column"  style="width:25%" >场次：</view>
-    <view class="right-column" style="width:25%" >
+    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
       [上午场]10:00
+    </view>
+    <view wx:if="{{isEditing == 1}}" class="right-column" style="width:25%" >
+      <input class="input" placeholder="[上午场]10:00" />
     </view>
   </view>
   <view style="text-align: center;font-size: 10pt;">
-
-      (总共:7 已锁:3 待付:3 可订:1)
- 
+      (总共:7 已锁:3 预约:3 可订:1)
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column"  style="width:25%" >姓名：</view>
-    <view class="right-column" style="width:25%" >
+    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
       李四民
     </view>
+    <view wx:else class="right-column" style="width:25%" >
+      <input class="input" placeholder="李四民" />
+    </view>
     <view class="left-column"  style="width:25%" >电话：</view>
-    <view class="right-column" style="width:25%" >
+    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
       13601111111
+    </view>
+    <view wx:else class="right-column" style="width:25%" >
+      <input class="input" placeholder="13601111111" />
     </view>
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column"  style="width:25%" >预定车辆：</view>
-    <view class="right-column" style="width:25%" >
+    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
       2
     </view>
+    <view wx:else class="right-column" style="width:25%" >
+      <input class="input" placeholder="2" />
+    </view>
+    <view class="left-column"  style="width:25%" >线路：</view>
+    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
+      长线
+    </view>
+    <view wx:else class="right-column" style="width:25%" >
+      <input class="input" placeholder="长线" />
+    </view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column"  style="width:25%" >押金总计：</view>
+    <view class="right-column" style="width:25%" >¥3000.00</view>
     <view class="left-column"  style="width:25%" >预定状态：</view>
     <view class="right-column" style="width:25%" >
       待确认
     </view>
   </view>
+  <mp-cells title="填写备注">
+    <mp-cell style="display: grid;place-items: center;">
+      <textarea style="width: 600rpx;height: 100rpx;" class="input"  ></textarea>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="操作" >
+    <mp-cell style="display: grid;place-items: center;">
+      <view style="display: flex;flex-direction: row;" >
+        <button size="mini" bindtap="gotoEdit"> 修 改 预 约 </button>
+        <view style="width: 10rpx;" ></view>
+        <button size="mini"> 允 许 支 付 押 金 </button>
+        <view style="width: 10rpx;" ></view>
+        <button size="mini"> 关 闭 预 约 </button>
+      </view>
+      
+    </mp-cell>
+  </mp-cells>
+  <view>车辆信息，需提示用户填写。</view>
+  <mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
+   <mp-cell>
+    <view style="display: flex;flex-direction: row;">
+      <view class="left-column" style="width: 130rpx;">押金：</view>
+      <view class="right-column" ><input class="input" placeholder="3000" /></view>
+      <view class="left-column" style="width: 130rpx;">车号：</view>
+      <view class="right-column" ><input class="input" placeholder="3" /></view>
+    </view>
+   </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >主驾姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >副驾姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >性别：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >性别：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >保险：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >保险：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      紧急联系人信息：
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: grid; place-items: center;">
+        <button size="mini" > 取 消 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
 </view>
