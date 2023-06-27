@@ -1,0 +1,119 @@
+<view>
+  <view class="view-row">
+    <view class="left-column"  style="width:135rpx" >日期：</view>
+    <view  class="right-column" >
+      2023-6-30
+    </view>
+    <view class="left-column"  style="width:135rpx" >场次：</view>
+    <view  class="right-column" >
+      [上午场]10:00
+    </view>
+  </view>
+  <mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
+   <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+
+        <view class="left-column" style="width: 130rpx;">车号：</view>
+        <view class="right-column" ><input class="input" placeholder="3" /></view>
+        <view class="left-column" style="width: 130rpx;">线路：</view>
+        <view class="right-column" ><input class="input" placeholder="长线" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view class="left-column" style="width: 130rpx;">押金：</view>
+        <view class="right-column" ><input class="input" placeholder="3000" /></view>
+        <view class="left-column" style="width: 130rpx;">收费：</view>
+        <view class="right-column" ><input class="input" placeholder="1280" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view class="left-column" style="width: 130rpx;">减免：</view>
+        <view class="right-column" ><input class="input" placeholder="0" /></view>
+        <view class="left-column" style="width: 130rpx;">优惠券：</view>
+        <view class="right-column" ><input class="input" placeholder="无" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view class="left-column" style="width: 130rpx; ">优惠金额：</view>
+        <view class="right-column" ><input class="input" placeholder="0" /></view>
+        <view class="left-column" style="width: 130rpx;">实收：</view>
+        <view class="right-column" ><input class="input" placeholder="1280" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >主驾姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >副驾姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >性别：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >性别：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >保险：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >保险：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >租赁：</view>
+        <view class="right-column" >
+          <checkbox-group>
+            <checkbox>头盔</checkbox>
+            <checkbox>衣服</checkbox>
+          </checkbox-group>
+        </view>
+        <view class="left-column" style="width: 130rpx;" >租赁：</view>
+        <view class="right-column" >
+          <checkbox-group>
+            <checkbox>头盔</checkbox>
+            <checkbox>衣服</checkbox>
+            <checkbox>手台</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      紧急联系人信息：
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >姓名：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    
+  </mp-cells>
+</view>

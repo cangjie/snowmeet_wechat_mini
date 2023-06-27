@@ -18,15 +18,18 @@
     <view class="right-column">(游客/领队/保障)</view>
   </view>
   <view class="view-row">
+    <view class="left-column" style="width: 135rpx;" >发车里程</view>
+    <view class="right-column"><input class="input" placeholder="1000" /></view>
+    <view class="left-column" style="width: 135rpx;" >收车里程</view>
+    <view class="right-column"><input class="input" placeholder="1000" /></view>
+  </view>
+  <view class="view-row">
     <view class="left-column" style="width: 135rpx;" >安全检查:</view>
     <view class="right-column"><input class="input" placeholder="完成" /></view>
     <view class="left-column" style="width: 135rpx;" ></view>
     <view class="right-column"></view>
   </view>
   <mp-cells title="驾驶员信息" >
- 
-
- 
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" style="width: 130rpx;" >主驾姓名：</view>
