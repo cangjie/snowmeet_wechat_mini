@@ -83,7 +83,8 @@
     "pages/admin/utv/reserve_info",
     "pages/UTV/deposit_confirm",
     "pages/UTV/fill_info",
-    "pages/admin/utv/trip_info"
+    "pages/admin/utv/trip_info",
+    "pages/admin/utv/trip_info_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -78,13 +78,39 @@
   <view>车辆信息，需提示用户填写。</view>
   <mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
    <mp-cell>
-    <view style="display: flex;flex-direction: row;">
-      <view class="left-column" style="width: 130rpx;">押金：</view>
-      <view class="right-column" ><input class="input" placeholder="3000" /></view>
-      <view class="left-column" style="width: 130rpx;">车号：</view>
-      <view class="right-column" ><input class="input" placeholder="3" /></view>
-    </view>
-   </mp-cell>
+      <view style="display: flex;flex-direction: row;">
+
+        
+        <view class="left-column" style="width: 130rpx;">车号：</view>
+        <view class="right-column" ><input class="input" placeholder="3" /></view>
+        <view class="left-column" style="width: 130rpx;">线路：</view>
+        <view class="right-column" ><input class="input" placeholder="长线" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view class="left-column" style="width: 130rpx;">押金：</view>
+        <view class="right-column" ><input class="input" placeholder="3000" /></view>
+        <view class="left-column" style="width: 130rpx;">收费：</view>
+        <view class="right-column" ><input class="input" placeholder="1280" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view class="left-column" style="width: 130rpx;">减免：</view>
+        <view class="right-column" ><input class="input" placeholder="0" /></view>
+        <view class="left-column" style="width: 130rpx;">优惠券：</view>
+        <view class="right-column" ><input class="input" placeholder="无" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;">
+        <view class="left-column" style="width: 130rpx; ">优惠金额：</view>
+        <view class="right-column" ><input class="input" placeholder="0" /></view>
+        <view class="left-column" style="width: 130rpx;">实收：</view>
+        <view class="right-column" ><input class="input" placeholder="1280" /></view>
+      </view>
+    </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" style="width: 130rpx;" >主驾姓名：</view>
@@ -93,6 +119,7 @@
         <view class="right-column" ><input class="input" /></view>
       </view>
     </mp-cell>
+    
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" style="width: 130rpx;" >性别：</view>

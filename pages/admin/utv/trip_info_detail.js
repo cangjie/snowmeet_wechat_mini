@@ -1,4 +1,4 @@
-// pages/admin/utv/trip_info.js
+// pages/admin/utv/trip_info_detail.js
 Page({
 
   /**
@@ -6,12 +6,6 @@ Page({
    */
   data: {
 
-  },
-
-  gotoDetail(){
-    wx.navigateTo({
-      url: 'trip_info_detail',
-    })
   },
 
   /**

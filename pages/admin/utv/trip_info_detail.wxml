@@ -1,0 +1,69 @@
+<view>
+  <view class="view-row">
+    <view class="left-column" style="width: 135rpx;" >车号:</view>
+    <view class="right-column">2</view>
+    <view class="left-column" style="width: 135rpx;" ></view>
+    <view class="right-column"></view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" style="width: 135rpx;" >日期:</view>
+    <view class="right-column">2023-06-30</view>
+    <view class="left-column" style="width: 135rpx;" >场次:</view>
+    <view class="right-column">[上午场]10:00</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" style="width: 135rpx;" >线路:</view>
+    <view class="right-column">长线</view>
+    <view class="left-column" style="width: 135rpx;" >角色:</view>
+    <view class="right-column">(游客/领队/保障)</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" style="width: 135rpx;" >安全检查:</view>
+    <view class="right-column"><input class="input" placeholder="完成" /></view>
+    <view class="left-column" style="width: 135rpx;" ></view>
+    <view class="right-column"></view>
+  </view>
+  <mp-cells title="驾驶员信息" >
+ 
+
+ 
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >主驾姓名：</view>
+        <view class="right-column" >刘麻子</view>
+        <view class="left-column" style="width: 130rpx;" >副驾姓名：</view>
+        <view class="right-column" >小丁宝</view>
+      </view>
+    </mp-cell>
+  
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" >1300000000</view>
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" >1860000000</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="right-column" >有</view>
+        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="right-column" >有</view>
+      </view>
+    </mp-cell>
+    
+    <mp-cell>
+      紧急联系人信息：
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="width: 130rpx;" >姓名：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    
+  </mp-cells>
+</view>
