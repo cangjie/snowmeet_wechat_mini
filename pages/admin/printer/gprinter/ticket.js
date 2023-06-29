@@ -31,6 +31,9 @@ Page({
       var msg = that.data.msg
       msg.push('获取到' + that.data.tickets.length + '张优惠券。')
       that.setData({msg: msg})
+
+
+      /*
       that.getDeviceNameListPromise.then(function(resolve){
         var onlineDeviceList = resolve
         var msg = that.data.msg
@@ -77,7 +80,14 @@ Page({
           })
         })
       })
+
+      */
     })
+
+    
+
+
+
   },
 
   connectDevice: function(){
@@ -350,6 +360,7 @@ Page({
   }, 25)
   },
 
+  /*
   prepareBLEAdapterPromise: new Promise(function(resolve){
     console.log('尝试打开蓝牙适配器。')
     wx.openBluetoothAdapter({
@@ -386,7 +397,7 @@ Page({
       }
     })
   }),
-  
+  */
   getDeviceNameListPromise: new Promise(function(resolve){
     var deviceScene = 'maintain_on_site_label_print'
     var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/blt_device.htm'

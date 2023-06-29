@@ -2,22 +2,22 @@
   <view wx:if="{{scene == 0}}">
     <mp-cells title="选择日期" >
       <mp-cell style="display: grid;place-items: center;">
-        <picker class="input fill-item"  mode="date" start="2023-6-25" end="2023-10-15" >
-          <picker-view>2023-6-25</picker-view>
+        <picker class="input fill-item"   mode="date" start="{{reserveStartDate}}" end="{{reserveEndDate}}" bindchange="selectDate" >
+          <picker-view style="display:grid;place-items: center">{{reserveDate}}</picker-view>
         </picker>
       </mp-cell>
     </mp-cells>
     <mp-cells title="选择场次" >
       <mp-cell style="display: grid;place-items: center;">
-        <picker class="input fill-item"  start="2023-6-25" end="2023-10-15" >
-          <picker-view>第一场10：00</picker-view>
+        <picker class="input fill-item" range="{{tripListRange}}" bindchange="selectTrip" >
+          <picker-view style="display:grid;place-items: center" >{{tripListRange[tripIndex]}}</picker-view>
         </picker>
       </mp-cell>
     </mp-cells>
     <mp-cells title="预定车辆数" >
       <mp-cell style="display: grid;place-items: center;">
-        <picker class="input fill-item"  start="2023-6-25" end="2023-10-15" >
-          <picker-view>1</picker-view>
+        <picker class="input fill-item"  range="{{availableRange}}" bindchange="selectNum" >
+          <picker-view style="display:grid;place-items: center" >{{vehicleNum}}</picker-view>
         </picker>
       </mp-cell>
     </mp-cells>
