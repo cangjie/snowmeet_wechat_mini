@@ -8,7 +8,23 @@ Page({
    */
   data: {
     scene: 0,
+    lineType: '',
+    cell: '',
+    name: '',
+    valid: false,
+    tripId: 0,
+    vehicleNum: 0
 
+  },
+
+  checkValid(){
+    var that = this
+    if (that.data.tripId == 0 || that.data.vehicleNum == 0 || that.data.lineType == '' || that.data.cell == '' || that.data.name == ''){
+      that.setData({valid: false})
+    }
+    else{
+      that.setData({valid: true})
+    }
   },
 
   prev(){
@@ -43,7 +59,7 @@ Page({
         for(var i = 0; i < tripList.length; i++){
           tripListRange.push(tripList[i].trip_name)
         }
-        that.setData({tripList: tripList, tripListRange: tripListRange, tripIndex: 0})
+        that.setData({tripList: tripList, tripListRange: tripListRange, tripIndex: 0, tripId: tripList[0].id})
         that.getVechicleNum()
       }
     })
@@ -54,7 +70,8 @@ Page({
   selectTrip(e){
     console.log('trip selected', e)
     var that = this
-    that.setData({tripIndex: parseInt(e.detail.value)})
+    var tripList = that.data.tripList
+    that.setData({tripIndex: parseInt(e.detail.value), tripId: tripList[e.detail.value]})
     that.getVechicleNum()
   },
 
@@ -83,6 +100,37 @@ Page({
     vehicleNum++
     that.setData({vehicleNum: vehicleNum})
   },
+  selectLine(e){
+    console.log('select line', e.detail.value)
+    var that = this
+    that.setData({lineType: e.detail.value})
+    that.checkValid()
+  },
+
+  getCell(e){
+    console.log('get cell', e)
+    var that = this
+    if(e.detail.errMsg=='getPhoneNumber:ok')
+    {
+      var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateUserInfo?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&encData='+encodeURIComponent(e.detail.encryptedData)+'&iv='+encodeURIComponent(e.detail.iv)
+      wx.request({
+        url: url,
+        method: 'GET',
+        success: (res) => {
+          console.log('get phone number', res)
+          that.setData({cell: res.data.cell_number})
+          that.checkValid()
+          
+        }
+      })
+    }
+  },
+
+  inputName(e){
+    var that = this
+    that.setData({name: e.detail.value})
+    that.checkValid()
+  },
 
   /**
    * Lifecycle function--Called when page load
@@ -95,11 +143,12 @@ Page({
     that.setData({reserveStartDate: util.formatDate(reserveStartDate), 
       reserveEndDate: util.formatDate(reserveEndDate), reserveDate: util.formatDate(reserveStartDate)})
     that.getTrips()
-    
     console.log('date', util.formatDate(reserveStartDate))
+    app.loginPromiseNew.then(function(resolve){
+      that.setData({cell: app.globalData.userInfo.cell_number, name: app.globalData.userInfo.real_name})
+      
+    })
   },
-
-
 
   /**
    * Lifecycle function--Called when page is initially rendered

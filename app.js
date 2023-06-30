@@ -76,6 +76,7 @@ App({
                           method: 'GET',
                           success:(res)=>{
                             console.log('user data updated', res)
+                            app.globalData.userInfo = res.data
                             wx.getSystemInfoAsync({
                               success:(res)=>{
                                 app.globalData.systemInfo = res

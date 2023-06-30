@@ -23,22 +23,30 @@
     </mp-cells>
     <mp-cells title="线路" >
       <mp-cell style="display: grid;place-items: center;">
-        <radio-group style="display: flex;flex-direction: row;">
-          <radio style="width: 200rpx;">长线</radio>
-          <radio style="width: 200rpx;">短线</radio>
+        <radio-group style="display: flex;flex-direction: row;" bindchange="selectLine" >
+          <radio style="width: 200rpx;" value="长线" >长线</radio>
+          <radio style="width: 200rpx;" value="短线" >短线</radio>
         </radio-group>
-      </mp-cell>
-    </mp-cells>
-    <mp-cells title="联系人姓名" >
-      <mp-cell style="display: grid;place-items: center;">
-        <input class="input" />
       </mp-cell>
     </mp-cells>
     <mp-cells title="联系人电话" >
       <mp-cell style="display: grid;place-items: center;">
-        <input class="input" />
+        <view style="display: flex;flex-direction: row;" >
+          <view>{{cell}}</view>
+          <view style="width: 10rpx;" ></view>
+          <button open-type="getPhoneNumber" size="mini" style="font-size: 9pt;height: 60rpx;" bindgetphonenumber="getCell" >重新获取</button>
+        </view>
       </mp-cell>
     </mp-cells>
+    <mp-cells title="联系人姓名" >
+      <mp-cell style="display: grid;place-items: center;">
+        <input style="text-align: center;" class="input" placeholder="{{name}}" bindinput="inputName" />
+      </mp-cell>
+    </mp-cells>
+    <view style="height: 50rpx;"></view>
+    <view style="display: grid;place-items: center;">
+      <button style="height: 80rpx;" disabled="{{!valid}}"> 提 交 预 约 </button>
+    </view>
   </view>
   <view wx:if="{{scene == 2}}" >
     <view>填写各预约车辆主副驾驶员信息：</view>
@@ -176,8 +184,8 @@
   <view wx:if="{{scene == 1}}" >
     您的预约已经提交，稍后我们的工作人员会和你做最终确认，请保持手机畅通并耐心等待。
   </view>
-  <view style="display: flex;flex-direction: row;">
+  <!--view style="display: flex;flex-direction: row;">
     <button class="input" style="align-items: flex-start;" bindtap="prev" > 上 一 步 </button>
     <button class="input" style="align-items: flex-end;" bindtap="next" > 下 一 步 </button>
-  </view>
+  </view-->
 </view>
