@@ -1,4 +1,23 @@
 <view>
+  <view style="display: flex; flex-direction: row; margin-top: 20rpx; margin-left: 20rpx;">
+    <view>选择日期：</view>
+    <picker class="input" mode="date" start="2023-06-20" end="2023-11-01" id="start" bindchange="setDate" >
+      <picker-view>{{startDate}}</picker-view>
+    </picker>
+    <view style="width: 50rpx;text-align: center;">-</view>
+    <picker class="input" mode="date" start="{{startDate}}" end="2023-11-01" id="end" bindchange="setDate" >
+      <picker-view>{{endDate}}</picker-view>
+    </picker>
+  </view>
+  <view style="display: flex; flex-direction: row;margin-top: 20rpx; margin-left: 20rpx;">
+    <view>选择状态：</view>
+    <picker class="input" mode="selector" style="width: 150rpx;" range="{{statusList}}" bindchange="selectStatus"  >
+      <picker-view style="display: grid; place-content: center;">{{statusList[statusSelectIndex]}}</picker-view>
+    </picker>
+  </view>
+  <view style="margin-top: 20rpx;margin-bottom: 20rpx;">
+    <button> 查 询 </button>
+  </view>
   <view style="display: flex;flex-direction: row;" >
     <view style="width:140rpx;font-size: 10pt; text-align: center;">日期</view>
     <view style="width:190rpx;font-size: 10pt;text-align: center;">场次</view>
@@ -9,44 +28,12 @@
   </view>
   <view style="height: 1rpx;background-color: gray;" ></view>
   <view style="height: 50rpx;" ></view>
-  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
-    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
-    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
-    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
-    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
-    <view style="width: 170rpx; text-align: center;">13501177897</view>
-    <view style="width:120rpx;text-align: right;">待确认</view>
-  </view>
-  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
-    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
-    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
-    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
-    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
-    <view style="width: 170rpx; text-align: center;">13501177897</view>
-    <view style="width:120rpx;text-align: right;">待付押金</view>
-  </view>
-  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
-    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
-    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
-    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
-    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
-    <view style="width: 170rpx; text-align: center;">13501177897</view>
-    <view style="width:120rpx;text-align: right;">信息不全</view>
-  </view>
-  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
-    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
-    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
-    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
-    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
-    <view style="width: 170rpx; text-align: center;">13501177897</view>
-    <view style="width:120rpx;text-align: right;">已确认</view>
-  </view>
-  <view style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail" >
-    <view style="width: 140rpx;text-align: left;font-size: 10pt;">2023-06-30</view>
-    <view style="width: 190rpx;text-align: center;font-size: 10pt;">[上午场]10:00</view>
-    <view style="width: 50rpx;text-align: center;font-size: 10pt;">2</view>
-    <view style="width: 80rpx;text-align: left;font-size: 10pt;">张三丰</view>
-    <view style="width: 170rpx; text-align: center;">13501177897</view>
-    <view style="width:120rpx;text-align: right;">已关闭</view>
+  <view wx:for="{{reserveList}}" id="{{item.id}}" style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail"  >
+    <view style="width: 140rpx;text-align: left;font-size: 10pt;">{{item.trip_date_str}}</view>
+    <view style="width: 190rpx;text-align: center;font-size: 10pt;">{{item.trip_name}}</view>
+    <view style="width: 50rpx;text-align: center;font-size: 10pt;">{{item.vehicle_num}}</view>
+    <view style="width: 80rpx;text-align: left;font-size: 10pt;">{{item.real_name}}</view>
+    <view style="width: 170rpx; text-align: center;">{{item.cell}}</view>
+    <view style="width:120rpx;text-align: right;">{{item.status}}</view>
   </view>
 </view>

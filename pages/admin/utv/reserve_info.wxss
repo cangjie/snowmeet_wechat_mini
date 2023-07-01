@@ -1,1 +1,11 @@
 /* pages/admin/utv/reserve_info.wxss */
+.left-column{
+  width: 150rpx;
+}
+picker-view{
+  display: grid; 
+  place-content: center;
+}
+.input{
+  text-align: center;
+}

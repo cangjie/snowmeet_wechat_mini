@@ -14,7 +14,6 @@ Page({
     valid: false,
     tripId: 0,
     vehicleNum: 0
-
   },
 
   checkValid(){
@@ -130,6 +129,23 @@ Page({
     var that = this
     that.setData({name: e.detail.value})
     that.checkValid()
+  },
+
+  submit(){
+    var that = this
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/UTV/Reserve/' + that.data.tripId 
+      + '?lineType=' + encodeURIComponent(that.data.lineType) + '&vehicleNum=' + that.data.vehicleNum
+      + '&cell=' + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&source=wechat'
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: submitUrl,
+      success:(res)=>{
+        if (res.statusCode == 200 && parseInt(res.data)){
+          console.log('reserve success', res)
+          that.setData({scene: 1})
+        }
+      }
+    })
   },
 
   /**

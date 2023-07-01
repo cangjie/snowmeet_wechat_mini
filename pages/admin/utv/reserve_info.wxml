@@ -1,66 +1,79 @@
 <view>
-  <view style="display: flex; flex-direction: row;">
-    <view class="left-column"  style="width:25%" >日期：</view>
-    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
-      2023-6-30
-    </view>
-    <view wx:else class="right-column" style="width:25%" >
-      <input class="input" placeholder="2023-6-30" />
-    </view>
-    <view class="left-column"  style="width:25%" >场次：</view>
-    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
-      [上午场]10:00
-    </view>
-    <view wx:if="{{isEditing == 1}}" class="right-column" style="width:25%" >
-      <input class="input" placeholder="[上午场]10:00" />
-    </view>
-  </view>
   <view style="text-align: center;font-size: 10pt;">
-      (总共:7 已锁:3 预约:3 可订:1)
+      (总共:{{totalNum}} 已锁:{{lockedNum}} 待付:{{unPaidNum}} 可订:{{availNum}})
   </view>
   <view style="display: flex; flex-direction: row;">
-    <view class="left-column"  style="width:25%" >姓名：</view>
-    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
-      李四民
+    <view class="left-column"   >日期：</view>
+    <view wx:if="{{isEditing == 0}}" class="right-column"  >
+      {{reserve.trip_date_str}}
     </view>
-    <view wx:else class="right-column" style="width:25%" >
-      <input class="input" placeholder="李四民" />
+    <view wx:else class="right-column"  >
+      <picker class="input" mode="date" start="2023-07-01" end="2023-11-01" bindchange="changeDate" >
+        <picker-view>{{reserve.trip_date_str}}</picker-view>
+      </picker>
     </view>
-    <view class="left-column"  style="width:25%" >电话：</view>
-    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
-      13601111111
+    <view class="left-column"   >场次：</view>
+    <view wx:if="{{isEditing == 0}}" class="right-column"  >
+      {{reserve.trip_name}}
     </view>
-    <view wx:else class="right-column" style="width:25%" >
-      <input class="input" placeholder="13601111111" />
+    <view wx:if="{{isEditing == 1}}" class="right-column"  >
+      <picker class="input" mode="selector" range="{{tripListRange}}" bindchange="changeTrip" >
+        <picker-view>{{tripListRange[tripIndex]}}</picker-view>
+      </picker>
+    </view>
+  </view>
+
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column"   >姓名：</view>
+    <view wx:if="{{isEditing == 0}}" class="right-column"  >
+      {{reserve.real_name}}
+    </view>
+    <view wx:else class="right-column"  >
+      <input class="input" placeholder="{{reserve.real_name}}" id="name" bindinput="setInput" />
+    </view>
+    <view class="left-column"   >电话：</view>
+    <view wx:if="{{isEditing == 0}}" class="right-column"  >
+      {{reserve.cell}}
+    </view>
+    <view wx:else class="right-column"  >
+      <input class="input" placeholder="{{reserve.cell}}" id="cell" bindinput="setInput" />
     </view>
   </view>
   <view style="display: flex; flex-direction: row;">
-    <view class="left-column"  style="width:25%" >预定车辆：</view>
-    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
-      2
+    <view class="left-column"   >预定车辆：</view>
+    <view wx:if="{{isEditing == 0}}" class="right-column"  >
+      {{reserve.vehicle_num}}
     </view>
-    <view wx:else class="right-column" style="width:25%" >
-      <input class="input" placeholder="2" />
+    <view wx:else class="right-column"  >
+      <picker range="{{numPickerList}}" bindchange="setVehicleNum" class="input">
+        <picker-view>{{numPickerList[reserve.vehicle_num - 1]}}</picker-view>
+      </picker>
     </view>
-    <view class="left-column"  style="width:25%" >线路：</view>
-    <view wx:if="{{isEditing == 0}}" class="right-column" style="width:25%" >
-      长线
+    <view class="left-column"   >线路：</view>
+    <view wx:if="{{isEditing == 0}}" class="right-column"  >
+      {{reserve.line_type}}
     </view>
-    <view wx:else class="right-column" style="width:25%" >
-      <input class="input" placeholder="长线" />
+    <view wx:else class="right-column" style="width:220rpx" >
+      <radio-group class="view-row" style="width:220rpx" bindchange="setInput" id="lineType" >
+        <radio value="长线" checked="{{reserve.line_type == '长线'}}" >长线</radio>
+        <radio value="短线" checked="{{reserve.line_type == '短线'}}" >短线</radio>
+      </radio-group>
     </view>
   </view>
   <view style="display: flex; flex-direction: row;">
-    <view class="left-column"  style="width:25%" >押金总计：</view>
-    <view class="right-column" style="width:25%" >¥3000.00</view>
-    <view class="left-column"  style="width:25%" >预定状态：</view>
-    <view class="right-column" style="width:25%" >
-      待确认
+    <view class="left-column"   >押金总计：</view>
+    <view class="right-column"  >{{totalDepositStr}}</view>
+    <view class="left-column"   >预定状态：</view>
+    <view class="right-column"  >
+      {{reserve.status}}
     </view>
   </view>
   <mp-cells title="填写备注">
     <mp-cell style="display: grid;place-items: center;">
-      <textarea style="width: 600rpx;height: 100rpx;" class="input"  ></textarea>
+      <view wx:if="{{isEditing == 0}}"  style="width: 600rpx;height: 100rpx;border-style:dashed;border-width: 1px;border-color: #c0c0c0;" >
+        <text decode="{{false}}" >{{reserve.memo}}</text>
+      </view>
+      <textarea wx:else  style="width: 600rpx;height: 100rpx;text-align: left;" class="input" value="{{reserve.memo}}" id="memo" bindinput="setInput"  ></textarea>
     </mp-cell>
   </mp-cells>
   <mp-cells title="操作" >

@@ -1,1 +1,11 @@
 /* pages/admin/utv/reserve_list.wxss */
+view{
+  font-size: 10pt;
+}
+picker{
+  width: 150rpx;
+}
+picker-view{
+  display: grid; 
+  place-content: center;
+}
