@@ -5,14 +5,21 @@ Page({
    * Page initial data
    */
   data: {
+    tabs: [{title: '押金收费'}, {title: '司乘信息'}, {title: '驾照保险'}, {title: '安全检查'},{title: '归还退费'}],
+    tabIndex: 0
+  },
 
+  onChange(e){
+    console.log('tab change', e)
+    var that = this
+    that.setData({tabIndex: e.detail.index})
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    
   },
 
   /**

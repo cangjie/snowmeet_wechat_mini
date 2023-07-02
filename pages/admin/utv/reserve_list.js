@@ -14,6 +14,11 @@ Page({
     reserveList:[]
   },
 
+  query(){
+    var that = this
+    that.getData()
+  },
+
   getData(){
     var that = this
     var start = that.data.startDate

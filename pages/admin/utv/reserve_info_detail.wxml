@@ -9,7 +9,128 @@
       [上午场]10:00
     </view>
   </view>
-  <mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
+  <mp-tabs 
+  tabs="{{tabs}}" 
+  activeTab="{{activeTab}}" 
+  swiperClass="weui-tabs-swiper"
+  bindtabclick="onTabCLick"
+  bindchange="onChange"
+  activeClass="tab-bar-title__selected" 
+  style="height: 1000rpx;"
+  ></mp-tabs>
+  <view wx:if="{{tabIndex == 0}}" >
+    <mp-cells title="押金" >
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">押金：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;">减免：</view>
+          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">应付：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;"></view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="收费" >
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">线路：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;">金额：</view>
+          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">优惠券：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;">说明：</view>
+          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">优惠减免：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;">额外减免：</view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">小计：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;"></view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+  <view wx:if="{{tabIndex == 1}}" >
+    <mp-cells title="分配车辆" >
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">选择车号：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;"></view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="主驾" >
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">姓名：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;">性别：</view>
+          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">电话：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;"></view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="副驾">
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">姓名：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>  
+          <view class="left-column" style="width: 130rpx;">性别：</view>
+          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">电话：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;"></view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="紧急联系人">
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column" style="width: 130rpx;">姓名：</view>
+          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="left-column" style="width: 130rpx;">电话：</view>
+          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+  <!--mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
    <mp-cell>
       <view style="display: flex;flex-direction: row;">
 
@@ -115,5 +236,5 @@
       </view>
     </mp-cell>
     
-  </mp-cells>
+  </mp-cells-->
 </view>

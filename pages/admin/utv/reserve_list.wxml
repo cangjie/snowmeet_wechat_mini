@@ -16,7 +16,7 @@
     </picker>
   </view>
   <view style="margin-top: 20rpx;margin-bottom: 20rpx;">
-    <button> 查 询 </button>
+    <button bindtap="query" > 查 询 </button>
   </view>
   <view style="display: flex;flex-direction: row;" >
     <view style="width:140rpx;font-size: 10pt; text-align: center;">日期</view>

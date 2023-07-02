@@ -15,7 +15,109 @@ Page({
     availNum: 10,
     tripVehicleList: [],
     reserveVehicleList: [],
-    unitDeposit: 3000
+    unitDeposit: 3000,
+    scheduleList: []
+  },
+
+  apply(){
+    var that = this
+    var id = that.data.reserve.id
+    var applyUrl = 'https://' + app.globalData.domainName +'/core/UTV/ApplyReserve/' 
+      + id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: applyUrl,
+      method: 'GET',
+      success: (res)=>{
+        console.log('apply reserve', res)
+        if (res.statusCode != 200){
+          return
+        }
+        var scheduleList = res.data
+        that.setData({scheduleList: scheduleList})
+        that.getReserve(id)
+      }
+    })
+  },
+
+  close() {
+
+
+  },
+
+  getSchedule(){
+    var that = this
+    var reserve = that.data.reserve
+    var getUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetScheduleForReserve/' 
+      + reserve.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      success:(res)=>{
+        console.log('get schedule', res.data)
+        if (res.statusCode != 200){
+          return
+        }
+        var scheduleList = res.data
+        var depositTotal = 0;
+        for(var i = 0; i < scheduleList.length; i++){
+          var s = scheduleList[i]
+          s.car_no = s.car_no == '' ? '未分配' : ''
+          if (s.driver_insurance == '' && s.passenger_insurance == ''){
+            s.insurance = '无'
+          }
+          else if (s.driver_insurance == '' || s.passenger_insurance == ''){
+            s.insurance = '不全'
+          }
+          else{
+            s.insurance = '有'
+          }
+          if (s.driver_user_id == 0 && s.passenger_user_id == 0){
+            s.info = '无'
+          }
+          else if (s.driver_user_id == 0 || s.driver_user_id == 0){
+            s.info = '不全'
+          }
+          else{
+            s.info = '有'
+          }
+          s.depositStr = util.showAmount(s.deposit)
+          s.deposit_discountStr = util.showAmount(s.deposit_discount)
+          s.depositFinal = s.deposit - s.deposit_discount
+          s.depositFinalStr = util.showAmount(s.depositFinal)
+          depositTotal += s.depositFinal
+          s.chargeStr = util.showAmount(s.charge)
+          s.charge_discountStr = util.showAmount(s.charge_discount)
+          s.ticket_discountStr = util.showAmount(s.ticket_discount)
+          s.chargeFinal = s.charge - s.charge_discount - s.ticket_discount
+          s.chargeFinalStr = util.showAmount(s.chargeFinal)
+        }
+        that.setData({scheduleList: scheduleList, totalDeposit: depositTotal, totalDepositStr: util.showAmount(depositTotal)})
+      }
+    })
+  },
+
+  call(){
+    var that = this
+    wx.makePhoneCall({
+      phoneNumber: that.data.reserve.cell,
+    })
+  },
+
+  save(){
+    var that = this
+    var reserve = that.data.reserve
+    var saveUrl = 'https://' + app.globalData.domainName + '/core/UTV/UpdateReserve/' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: saveUrl,
+      method: 'POST',
+      data: reserve,
+      success:(res)=>{
+        console.log('reserve update', res)
+        if (res.statusCode != 200){
+          return
+        }
+        that.setData({isEditing: 0})
+      }
+    })
   },
 
   setVehicleNum(e){
@@ -186,9 +288,31 @@ Page({
     that.getTrips(that.data.reserve.trip_date)
   },
 
-  gotoDetail(){
+  gotoDetail(e){
+    var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'reserve_info_detail',
+      url: 'reserve_info_detail?id=' + id,
+    })
+  },
+
+  getReserve(id){
+    var that = this
+    var getReserveUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetReserve/' + id.toString() 
+    + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getReserveUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('get reserve', res)
+        if (res.statusCode != 200){
+          return
+        }
+        var reserve = res.data
+        reserve.trip_date_str = util.formatDate(new Date(reserve.trip_date))
+        that.setData({reserve: reserve})
+        that.getTripVehicle()
+        setTimeout(that.getSchedule, 500)
+      }
     })
   },
 
@@ -199,22 +323,8 @@ Page({
     var id = parseInt(options.id)
     var that = this
     app.loginPromiseNew.then(function(resolve){
-      var getReserveUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetReserve/' + id.toString() 
-        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: getReserveUrl,
-        method: 'GET',
-        success:(res)=>{
-          console.log('get reserve', res)
-          if (res.statusCode != 200){
-            return
-          }
-          var reserve = res.data
-          reserve.trip_date_str = util.formatDate(new Date(reserve.trip_date))
-          that.setData({reserve: reserve})
-          that.getTripVehicle()
-        }
-      })
+      that.getReserve(id)
+     
     })
   },
 

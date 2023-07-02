@@ -9,3 +9,6 @@ picker-view{
 .input{
   text-align: center;
 }
+view{
+  font-size: 10pt
+}

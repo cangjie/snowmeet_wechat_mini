@@ -32,8 +32,9 @@
       <input class="input" placeholder="{{reserve.real_name}}" id="name" bindinput="setInput" />
     </view>
     <view class="left-column"   >电话：</view>
-    <view wx:if="{{isEditing == 0}}" class="right-column"  >
-      {{reserve.cell}}
+    <view wx:if="{{isEditing == 0}}" class="right-column view-row" style="width: 270rpx;"  >
+      <view>{{reserve.cell}}</view>
+      <button class="input" style="font-size: 8pt;height: 45rpx;" size="mini" bindtap="call" >拨打</button>
     </view>
     <view wx:else class="right-column"  >
       <input class="input" placeholder="{{reserve.cell}}" id="cell" bindinput="setInput" />
@@ -71,25 +72,61 @@
   <mp-cells title="填写备注">
     <mp-cell style="display: grid;place-items: center;">
       <view wx:if="{{isEditing == 0}}"  style="width: 600rpx;height: 100rpx;border-style:dashed;border-width: 1px;border-color: #c0c0c0;" >
-        <text decode="{{false}}" >{{reserve.memo}}</text>
+        <text decode="{{false}}" style="text-align: left;" >{{reserve.memo}}</text>
       </view>
       <textarea wx:else  style="width: 600rpx;height: 100rpx;text-align: left;" class="input" value="{{reserve.memo}}" id="memo" bindinput="setInput"  ></textarea>
     </mp-cell>
   </mp-cells>
   <mp-cells title="操作" >
     <mp-cell style="display: grid;place-items: center;">
-      <view style="display: flex;flex-direction: row;" >
+      <view wx:if="{{isEditing == 0}}" style="display: flex;flex-direction: row;" >
         <button size="mini" bindtap="gotoEdit"> 修 改 预 约 </button>
         <view style="width: 10rpx;" ></view>
-        <button size="mini"> 允 许 支 付 押 金 </button>
+        <button size="mini" bindtap="apply" disabled="{{reserve.status != '待确认'}}" > 开 放 支 付 押 金 </button>
         <view style="width: 10rpx;" ></view>
-        <button size="mini"> 关 闭 预 约 </button>
+        <button size="mini" bindtap="close" > 关 闭 预 约 </button>
+      </view>
+      <view wx:else >
+        <button bindtap="save" > 保 存 </button>
       </view>
       
     </mp-cell>
   </mp-cells>
-  <view>预约车辆</view>
-  <mp-cells title="车辆1" bindtap="gotoDetail" >
+  <mp-cells id="{{item.id}}" wx:for="{{scheduleList}}" title="车辆{{index + 1}}" bindtap="gotoDetail" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 135rpx;" >预约状态：</view>
+        <view class="right-column" >{{item.status}}</view>
+        <view class="left-column" style="width: 135rpx;" >车号：</view>
+        <view class="right-column" >{{item.car_no}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 135rpx;" >信息：</view>
+        <view class="right-column" >{{item.info}}</view>
+        <view class="left-column" style="width: 135rpx;" >保险：</view>
+        <view class="right-column" >{{item.insurance}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 135rpx;" >押金：</view>
+        <view class="right-column" >{{item.depositStr}}</view>
+        <view class="left-column" style="width: 135rpx;" >押金减免：</view>
+        <view class="right-column" >{{item.deposit_discountStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 135rpx;" >应付押金：</view>
+        <view class="right-column" >{{item.depositFinalStr}}</view>
+        <view class="left-column" style="width: 135rpx;" >线路：</view>
+        <view class="right-column" >{{item.line_type}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <!--mp-cells title="车辆1" bindtap="gotoDetail" >
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" style="width: 135rpx;" >预约状态：</view>
@@ -122,6 +159,6 @@
         <view class="right-column" >待发车/已发车/已收车/已退押金</view>
       </view>
     </mp-cell>
-  </mp-cells>
+  </mp-cells-->
 
 </view>

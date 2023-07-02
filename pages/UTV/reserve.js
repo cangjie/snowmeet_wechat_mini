@@ -70,7 +70,7 @@ Page({
     console.log('trip selected', e)
     var that = this
     var tripList = that.data.tripList
-    that.setData({tripIndex: parseInt(e.detail.value), tripId: tripList[e.detail.value]})
+    that.setData({tripIndex: parseInt(e.detail.value), tripId: tripList[e.detail.value].id})
     that.getVechicleNum()
   },
 
