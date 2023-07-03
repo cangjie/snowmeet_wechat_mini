@@ -3,5 +3,6 @@
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
     "mp-tabs": "/components/tabs/index"
-  }
+  },
+  "navigationBarTitleText": "车辆场次详情"
 }

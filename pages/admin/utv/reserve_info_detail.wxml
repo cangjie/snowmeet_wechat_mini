@@ -2,11 +2,21 @@
   <view class="view-row">
     <view class="left-column"  style="width:135rpx" >日期：</view>
     <view  class="right-column" >
-      2023-6-30
+      {{reserve.trip_dateStr}}
     </view>
     <view class="left-column"  style="width:135rpx" >场次：</view>
     <view  class="right-column" >
-      [上午场]10:00
+      {{reserve.trip_name}}
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column"  style="width:135rpx" >预约姓名：</view>
+    <view  class="right-column" >
+      {{reserve.real_name}}
+    </view>
+    <view class="left-column"  style="width:135rpx" >电话：</view>
+    <view  class="right-column" >
+      {{reserve.cell}}
     </view>
   </view>
   <mp-tabs 
@@ -23,15 +33,17 @@
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
           <view class="left-column" style="width: 130rpx;">押金：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="right-column" >{{schedule.depositStr}}</view>
           <view class="left-column" style="width: 130rpx;">减免：</view>
-          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+          <view class="right-column" >
+            <input placeholder="{{schedule.deposit_discount}}" class="input" bindinput="modFloatValue" id="deposit_discount" />
+          </view>
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
           <view class="left-column" style="width: 130rpx;">应付：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="right-column" >{{schedule.deposit_finalStr}}</view>
           <view class="left-column" style="width: 130rpx;"></view>
           <view class="right-column" ></view>
         </view>
@@ -41,9 +53,14 @@
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
           <view class="left-column" style="width: 130rpx;">线路：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="right-column" >
+            <radio-group class="view-row" style="width: 250rpx;" >
+              <radio value="长线" checked="{{schedule.line_type == '长线'}}" >长线</radio>
+              <radio value="长线" checked="{{schedule.line_type == '短线'}}" >短线</radio>
+            </radio-group>
+          </view>
           <view class="left-column" style="width: 130rpx;">金额：</view>
-          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+          <view class="right-column" ><input class="input" placeholder="{{schedule.charge}}" /></view>
         </view>
       </mp-cell>
       <mp-cell>
@@ -57,15 +74,15 @@
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
           <view class="left-column" style="width: 130rpx;">优惠减免：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="right-column" ><input class="input" placeholder="{{schedule.ticket_discount}}" /></view>
           <view class="left-column" style="width: 130rpx;">额外减免：</view>
-          <view class="right-column" ></view>
+          <view class="right-column" ><input class="input" placeholder="{{schedule.charge_discount}}" /></view>
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
           <view class="left-column" style="width: 130rpx;">小计：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
+          <view class="right-column" >{{schedule.charge_finalStr}}</view>
           <view class="left-column" style="width: 130rpx;"></view>
           <view class="right-column" ></view>
         </view>
@@ -129,6 +146,9 @@
         </view>
       </mp-cell>
     </mp-cells>
+  </view>
+  <view>
+    <button bindtap="updateSchedule" > 保 存 </button>
   </view>
   <!--mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
    <mp-cell>

@@ -161,7 +161,16 @@ Page({
     that.getTrips()
     console.log('date', util.formatDate(reserveStartDate))
     app.loginPromiseNew.then(function(resolve){
-      that.setData({cell: app.globalData.userInfo.cell_number, name: app.globalData.userInfo.real_name})
+      var cell = ''
+      var name = ''
+      if (app.globalData != null && app.globalData.cellNumber != null){
+        cell = app.globalData.cellNumber
+        if (app.globalData.userInfo != null && app.globalData.userInfo.real_name != null){
+          name = app.globalData.userInfo.real_name
+        }
+      }
+      that.setData({cell: cell, name: name})
+      
       
     })
   },
