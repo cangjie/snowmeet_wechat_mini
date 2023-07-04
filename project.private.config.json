@@ -102,6 +102,13 @@
           "query": "",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "UTV Reserve list",
+          "pathName": "pages/UTV/my_reserve_list",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

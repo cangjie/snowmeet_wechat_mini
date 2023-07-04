@@ -1,0 +1,42 @@
+<vie>
+  <view class="view-row" style="margin-top: 20rpx;">
+    <view class="left-column" >日期：</view>
+    <view class="right-column" >{{reserve.trip_dateStr}}</view>
+    <view class="left-column" >场次：</view>
+    <view class="right-column" >{{reserve.trip_name}}</view>
+  </view>
+  <view class="view-row" style="margin-top: 20rpx;">
+    <view class="left-column" >车辆数：</view>
+    <view class="right-column" >{{reserve.vehicle_num}}</view>
+    <view class="left-column" >状态：</view>
+    <view class="right-column" >{{reserve.status}}</view>
+  </view>
+  <view class="view-row" style="margin-top: 20rpx;">
+    <view class="left-column" >押金：</view>
+    <view class="right-column" >{{depositTotalStr}}</view>
+    <view class="left-column" >押金减免：</view>
+    <view class="right-column" >{{depositTotalDiscountStr}}</view>
+  </view>
+  <view class="view-row" style="margin-top: 20rpx;">
+    <view class="left-column" >待付押金：</view>
+    <view class="right-column" >{{depositTotalFinalStr}}</view>
+    <view class="left-column" ></view>
+    <view class="right-column" ></view>
+  </view>
+  <view wx:if="{{reserve.status == '待付押金'}}" style="margin-top: 20rpx;margin-left: 20rpx;margin-right: 20rpx;" >
+    <text decode="{{true}}" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您所预约的场次，还有{{totalNum - lockedNum}}辆未锁定。请尽快支付押金锁定车辆，否则，您预约的车辆将有可能成为候补。</text>
+  </view>
+  <view style="display: flex;flex-direction: row;margin-top: 50rpx;" >
+    <view style="width:187rpx;font-size: 10pt; text-align: center;">序号</view>
+    <view style="width:187rpx;font-size: 10pt;text-align: center;">押金</view>
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;" >减免</view>
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;" >应付</view>
+  </view>
+  <view style="height: 1rpx;background-color: gray;" ></view>
+  <view wx:for="{{schedule}}"  style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;"  >
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;margin-left: 20rpx;">{{(index + 1)}}</view>
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.depositStr}}</view>
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.deposit_discountStr}}</view>
+    <view style="width:187rpx;text-align: center;">{{item.deposit_finalStr}}</view>
+  </view>
+</vie>

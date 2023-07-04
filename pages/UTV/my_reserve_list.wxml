@@ -1,0 +1,17 @@
+<view>
+  
+  <view style="display: flex;flex-direction: row;margin-top: 50rpx;" >
+    <view style="width:187rpx;font-size: 10pt; text-align: center;">日期</view>
+    <view style="width:187rpx;font-size: 10pt;text-align: center;">场次</view>
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;" >数量</view>
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;" >状态</view>
+  </view>
+  <view style="height: 1rpx;background-color: gray;" ></view>
+  <view style="height: 50rpx;" ></view>
+  <view wx:for="{{reserveList}}" id="{{item.id}}" style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="showDetail"  >
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;margin-left: 20rpx;">{{item.trip_date_str}}</view>
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.trip_name}}</view>
+    <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.vehicle_num}}</view>
+    <view style="width:187rpx;text-align: center;">{{item.status}}</view>
+  </view>
+</view>
