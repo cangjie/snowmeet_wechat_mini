@@ -39,4 +39,7 @@
     <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.deposit_discountStr}}</view>
     <view style="width:187rpx;text-align: center;">{{item.deposit_finalStr}}</view>
   </view>
+  <view style="margin-top: 50rpx;" >
+    <button bindtap="pay" > 支 付 押 金 </button>
+  </view>
 </vie>

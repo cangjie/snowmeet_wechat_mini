@@ -105,6 +105,34 @@ Page({
     
   },
 
+  pay(){
+    var that = this
+    var reserve = that.data.reserve
+    var payUrl = 'https://' + app.globalData.domainName + '/core/UTV/PayDepositByTencent/' + reserve.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: payUrl,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var nonce = res.data.nonce
+        var prepay_id = res.data.prepay_id
+        var sign = res.data.sign
+        var timeStamp = res.data.timeStamp
+        wx.requestPayment({
+          nonceStr: nonce,
+          package: 'prepay_id=' + prepay_id,
+          paySign: sign,
+          timeStamp: timeStamp,
+          signType: 'MD5',
+          success:(res)=>{
+            console.log('pay', res)
+          }
+        })
+      }
+    })
+    
+  },
 
   /**
    * Lifecycle function--Called when page load
