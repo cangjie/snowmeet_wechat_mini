@@ -1,0 +1,108 @@
+<view>
+  <view class="view-row" >
+    <view class="left-column"  >日期：</view>
+    <view class="right-column" >{{trip.trip_dateStr}}</view>
+    <view class="left-column"  >场次：</view>
+    <view class="right-column"  >{{trip.trip_name}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column"  >车号：</view>
+    <view class="right-column" >{{vehicleSchedule.car_noStr}}</view>
+    <view class="left-column"  >线路：</view>
+    <view class="right-column"  >{{vehicleSchedule.line_type}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column"  >状态：</view>
+    <view class="right-column" >{{vehicleSchedule.status}}</view>
+    <view class="left-column"  ></view>
+    <view class="right-column"  ></view>
+  </view>
+  <view style="height: 1rpx;background-color: gray;" ></view>
+  <mp-tabs 
+  tabs="{{tabs}}" 
+  activeTab="{{activeTab}}" 
+  swiperClass="weui-tabs-swiper"
+  bindchange="tabChange"
+  activeClass="tab-bar-title__selected" 
+  style="height: 1000rpx;"
+  ></mp-tabs>
+  <view wx:if="{{tabIndex == 0}}" >
+    <mp-cells title="司机信息" >
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column"  >姓名：</view>
+          <view class="right-column" >
+            <input class="input" placeholder="{{}}" />
+          </view>
+          <view class="left-column"  >性别：</view>
+          <view class="right-column" >
+            <radio-group class="view-row">
+              <radio value="男" >男</radio>
+              <radio value="女" >女</radio>
+            </radio-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column"  >电话：</view>
+          <view class="right-column" >
+            <input class="input" placeholder="{{}}" />
+          </view>
+          <view class="left-column"  >成年：</view>
+          <view class="right-column" >
+            <switch checked="{{true}}" >是</switch>
+          </view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="乘客信息" >
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column"  >姓名：</view>
+          <view class="right-column" ></view>
+          <view class="left-column"  >性别：</view>
+          <view class="right-column" >
+            <radio-group class="view-row">
+              <radio value="男" >男</radio>
+              <radio value="女" >女</radio>
+            </radio-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column"  >电话：</view>
+          <view class="right-column" ></view>
+          <view class="left-column"  >成年：</view>
+          <view class="right-column" >
+            <switch checked="{{true}}" >是</switch>
+          </view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="紧急联系人信息" >
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column"  >姓名：</view>
+          <view class="right-column" ></view>
+          <view class="left-column"  >电话：</view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+      
+    </mp-cells>
+  </view>
+  <view wx:if="{{tabIndex == 1}}" >
+    <mp-cells title="司机驾照" >
+      <mp-cell>
+        <multi-uploader  title="司机驾照" image_count="1"  bindUploaded="uploadCreditImages" uploaded_files="{{creditImages}}" ></multi-uploader>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="乘客驾照，如果想换着开，乘客也需要上传驾照！" >
+      <mp-cell>
+        <multi-uploader  title="非必需" image_count="1"  bindUploaded="uploadCreditImages" uploaded_files="{{creditImages}}" ></multi-uploader>
+      </mp-cell>
+    </mp-cells>
+  </view>
+</view>

@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+   
   },
 
   getReserve(id){
@@ -127,11 +127,27 @@ Page({
           signType: 'MD5',
           success:(res)=>{
             console.log('pay', res)
+            var reserve = that.data.reserve
+            reserve.stauts = '已付押金'
+            that.setData({reserve: reserve})
+            that.getSchedule()
+            wx.showToast({
+              title: '支付成功，请填写乘客信息。',
+              icon: 'success',
+            })
           }
         })
       }
     })
     
+  },
+
+  fillInfo(e){
+    
+    var id = e.currentTarget.id
+    wx.redirectTo({
+      url: 'fill_vehicle_info?id=' + id,
+    })
   },
 
   /**

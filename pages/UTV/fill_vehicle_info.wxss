@@ -1,0 +1,13 @@
+/* pages/UTV/fill_vehicle_info.wxss */
+page{
+  font-size: 10pt;
+}
+.left-column{
+  width: 150rpx;
+}
+.wx-switch-input {
+  transform: scale(.6);
+}
+.wx-switch-radio {
+  transform: scale(.6);
+}

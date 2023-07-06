@@ -23,23 +23,43 @@
     <view class="left-column" ></view>
     <view class="right-column" ></view>
   </view>
-  <view wx:if="{{reserve.status == '待付押金'}}" style="margin-top: 20rpx;margin-left: 20rpx;margin-right: 20rpx;" >
-    <text decode="{{true}}" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您所预约的场次，还有{{totalNum - lockedNum}}辆未锁定。请尽快支付押金锁定车辆，否则，您预约的车辆将有可能成为候补。</text>
+  <view wx:if="{{reserve.status == '待付押金'}}" >
+    <view  style="margin-top: 20rpx;margin-left: 20rpx;margin-right: 20rpx;" >
+      <text decode="{{true}}" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您所预约的场次，还有{{totalNum - lockedNum}}辆未锁定。请尽快支付押金锁定车辆，否则，您预约的车辆将有可能成为候补。</text>
+    </view>
+    <view style="display: flex;flex-direction: row;margin-top: 50rpx;" >
+      <view style="width:187rpx;font-size: 10pt; text-align: center;">序号</view>
+      <view style="width:187rpx;font-size: 10pt;text-align: center;">押金</view>
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;" >减免</view>
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;" >应付</view>
+    </view>
+    <view style="height: 1rpx;background-color: gray;" ></view>
+    <view wx:for="{{schedule}}"  style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;"  >
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;margin-left: 20rpx;">{{(index + 1)}}</view>
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.depositStr}}</view>
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.deposit_discountStr}}</view>
+      <view style="width:187rpx;text-align: center;">{{item.deposit_finalStr}}</view>
+    </view>
+    <view style="margin-top: 50rpx;" >
+      <button bindtap="pay" > 支 付 押 金 </button>
+    </view>
   </view>
-  <view style="display: flex;flex-direction: row;margin-top: 50rpx;" >
-    <view style="width:187rpx;font-size: 10pt; text-align: center;">序号</view>
-    <view style="width:187rpx;font-size: 10pt;text-align: center;">押金</view>
-    <view style="width: 187rpx;text-align: center;font-size: 10pt;" >减免</view>
-    <view style="width: 187rpx;text-align: center;font-size: 10pt;" >应付</view>
+  <view wx:if="{{reserve.status == '已付押金'}}" >
+    <view style="display: flex;flex-direction: row;margin-top: 50rpx;" >
+      <view style="width:187rpx;font-size: 10pt; text-align: center;">车辆序号</view>
+      <view style="width:187rpx;font-size: 10pt;text-align: center;">状态</view>
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;" >线路</view>
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;" >操作</view>
+    </view>
+    <view style="height: 1rpx;background-color: gray;" ></view>
+    <view wx:for="{{schedule}}"  style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;" bindtap="fillInfo" id="{{item.id}}"  >
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;margin-left: 20rpx;">{{(index + 1)}}</view>
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.status}}</view>
+      <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.line_type}}</view>
+      <view style="width:187rpx;text-align: center;">点击完善信息</view>
+    </view>
   </view>
-  <view style="height: 1rpx;background-color: gray;" ></view>
-  <view wx:for="{{schedule}}"  style="display: flex;flex-direction: row;font-size: 10pt;height: 100rpx;"  >
-    <view style="width: 187rpx;text-align: center;font-size: 10pt;margin-left: 20rpx;">{{(index + 1)}}</view>
-    <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.depositStr}}</view>
-    <view style="width: 187rpx;text-align: center;font-size: 10pt;">{{item.deposit_discountStr}}</view>
-    <view style="width:187rpx;text-align: center;">{{item.deposit_finalStr}}</view>
-  </view>
-  <view style="margin-top: 50rpx;" >
-    <button bindtap="pay" > 支 付 押 金 </button>
+  <view wx:if="{{reserve.status == '待确认'}}" >
+    请等待运营人员和您电话联系。
   </view>
 </vie>
