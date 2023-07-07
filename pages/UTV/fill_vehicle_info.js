@@ -11,31 +11,48 @@ Page({
     tabIndex: 0
   },
 
-  getUser(id){
-    //var that = this
+  uploadLisenceImages(e){
+    console.log('upload lisence', e)
+    var that = this
+    var driver = that.data.driver
+    var passenger = that.data.passenger
+    var id = e.currentTarget.id
+    //var user = {}
+    if (id=='driver'){
+      driver.driver_license = e.detail.files[0].url
+      //user = driver
+      that.setData({driver: driver})
+    }
+    else{
+      passenger.driver_license = e.detail.files[0].url
+      that.setData({passenger: passenger})
+      //user = passenger;
+    }
+    that.saveTextInfo()
+
+  },
+
+  getUser(id, role){
+    var that = this
     var getUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetUTVUserById/' 
       + id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    var getUserPromise = new Promise(function(resolve){
-      wx.request({
-        url: getUrl,
-        success:(res)=>{
-          if (res.statusCode != 200){
-            resolve({id: 0})
-          }
-          else{
-            resolve(res.data)
-          }
+    
+    wx.request({
+      url: getUrl,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
         }
-      })
-    })
-    getUserPromise.then(function(resolve){
-      if (resolve.id == 0){
-        return null
+        var user = res.data
+        if (role == 'driver'){
+          that.setData({driver: user})
+        }
+        else {
+          that.setData({passenger: user})
+        }
       }
-      else{
-        return resolve
-      }
     })
+
 
   },
 
@@ -117,13 +134,16 @@ Page({
                 }
                 var vehicleSchedule = res.data
                 that.setData({vehicleSchedule: vehicleSchedule})
-                wx.showToast({
-                  title: '保存成功，请继续上传驾照。',
-                  icon: 'success',
-                  success:()=>{
-                    that.setData({tabIndex: 1})
-                  }
-                })
+                if (driver.driver_license == ''){
+                  wx.showToast({
+                    title: '保存成功，请继续上传驾照。',
+                    icon: 'success',
+                    success:()=>{
+                      that.setData({tabIndex: 1})
+                    }
+                  })
+                }
+                
               }
             })
             
@@ -213,8 +233,8 @@ Page({
           that.setData({driver: driver})
         }
         else{
-          var driver = that.getUser(vehicleSchedule.driver_user_id)
-          console.log('get user driver', driver)
+          that.getUser(vehicleSchedule.driver_user_id, 'driver')
+          
         }
         if (vehicleSchedule.passenger_user_id == 0){
           var passenger = {
@@ -230,6 +250,9 @@ Page({
             contact_cell: ''
           }
           that.setData({passenger: passenger})
+        }
+        else{
+          that.getUser(vehicleSchedule.passenger_user_id, 'passenger')
         }
         that.setData({vehicleSchedule: vehicleSchedule})
         that.getTrip(vehicleSchedule.trip_id)

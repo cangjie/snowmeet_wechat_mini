@@ -107,12 +107,12 @@
   <view wx:if="{{tabIndex == 1}}" >
     <mp-cells title="司机驾照" >
       <mp-cell>
-        <multi-uploader  title="司机驾照" image_count="1"  bindUploaded="uploadCreditImages" uploaded_files="{{creditImages}}" ></multi-uploader>
+        <multi-uploader  title="司机驾照" image_count="1"  bindUploaded="uploadLisenceImages" uploaded_files="{{driver.driver_license}}" id="driver" ></multi-uploader>
       </mp-cell>
     </mp-cells>
     <mp-cells title="乘客驾照，如果想换着开，乘客也需要上传驾照！" >
       <mp-cell>
-        <multi-uploader  title="非必需" image_count="1"  bindUploaded="uploadCreditImages" uploaded_files="{{creditImages}}" ></multi-uploader>
+        <multi-uploader  title="非必需" image_count="1"  bindUploaded="uploadLisenceImages" uploaded_files="{{passenger.driver_license}}" id="passenger" ></multi-uploader>
       </mp-cell>
     </mp-cells>
   </view>
