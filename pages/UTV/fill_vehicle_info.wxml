@@ -32,13 +32,13 @@
         <view class="view-row" >
           <view class="left-column"  >姓名：</view>
           <view class="right-column" >
-            <input class="input" placeholder="{{}}" />
+            <input id="driver_name" bindinput="input" class="input" placeholder="{{driver.real_name}}" />
           </view>
           <view class="left-column"  >性别：</view>
           <view class="right-column" >
-            <radio-group class="view-row">
-              <radio value="男" >男</radio>
-              <radio value="女" >女</radio>
+            <radio-group class="view-row" id="driver_gender" bindchange="input" >
+              <radio value="男" checked="{{driver.gender == '男'}}" >男</radio>
+              <radio value="女" checked="{{driver.gender == '女'}}" >女</radio>
             </radio-group>
           </view>
         </view>
@@ -47,11 +47,11 @@
         <view class="view-row" >
           <view class="left-column"  >电话：</view>
           <view class="right-column" >
-            <input class="input" placeholder="{{}}" />
+            <input id="driver_cell" bindinput="input" class="input" placeholder="{{driver.cell}}" />
           </view>
           <view class="left-column"  >成年：</view>
           <view class="right-column" >
-            <switch checked="{{true}}" >是</switch>
+            <switch id="driver_adult" bindchange="input" checked="{{driver.is_adult == 1}}" >{{driver.is_adult == 1?'是':'否'}}</switch>
           </view>
         </view>
       </mp-cell>
@@ -60,12 +60,14 @@
       <mp-cell>
         <view class="view-row" >
           <view class="left-column"  >姓名：</view>
-          <view class="right-column" ></view>
+          <view class="right-column" >
+            <input class="input" placeholder="{{passenger.real_name}}" id="passenger_name" bindinput="input" />
+          </view>
           <view class="left-column"  >性别：</view>
           <view class="right-column" >
-            <radio-group class="view-row">
-              <radio value="男" >男</radio>
-              <radio value="女" >女</radio>
+            <radio-group class="view-row" id="passenger_gender" bindchange="input" >
+              <radio value="男" checked="{{passenger.gender == '男'}}" >男</radio>
+              <radio value="女" checked="{{passenger.gender == '女'}}" >女</radio>
             </radio-group>
           </view>
         </view>
@@ -73,10 +75,12 @@
       <mp-cell>
         <view class="view-row" >
           <view class="left-column"  >电话：</view>
-          <view class="right-column" ></view>
+          <view class="right-column" >
+            <input class="input" placeholder="{{passenger.cell}}" id="passenger_cell" bindinput="input" />
+          </view>
           <view class="left-column"  >成年：</view>
           <view class="right-column" >
-            <switch checked="{{true}}" >是</switch>
+            <switch id="passenger_adult" bindchange="input" checked="{{passenger.is_adult == 1}}" >{{passenger.is_adult == 1?'是':'否'}}</switch>
           </view>
         </view>
       </mp-cell>
@@ -85,13 +89,20 @@
       <mp-cell>
         <view class="view-row" >
           <view class="left-column"  >姓名：</view>
-          <view class="right-column" ></view>
+          <view class="right-column" >
+            <input id="contact_name" class="input" bindinput="input" placeholder="{{driver.contact_name}}" />
+          </view>
           <view class="left-column"  >电话：</view>
-          <view class="right-column" ></view>
+          <view class="right-column" >
+            <input id="contact_cell" class="input" bindinput="input" placeholder="{{driver.contact_cell}}" />
+          </view>
         </view>
       </mp-cell>
-      
     </mp-cells>
+    <view style="margin-top: 30rpx;" >
+      <button class="input" bindtap="saveTextInfo" style="padding-top: 20rpx;" > 保 存 </button>
+    </view>
+    <view style="height: 50rpx;" ></view>
   </view>
   <view wx:if="{{tabIndex == 1}}" >
     <mp-cells title="司机驾照" >
