@@ -1,4 +1,7 @@
 /* pages/admin/utv/reserve_info.wxss */
+page{
+  font-size: 10pt;
+}
 .left-column{
   width: 150rpx;
 }

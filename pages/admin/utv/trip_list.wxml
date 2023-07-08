@@ -1,15 +1,32 @@
 <view>
+  <view class="view-row" >
+    <button size="mini" bindtap="gotoYesterday" >前一天</button>
+    <text>日期：</text>
+    <picker mode="date" bindchange="gotoAnyDay" >
+      <picker-view>{{currentDate}}</picker-view>
+    </picker>
+    <button  size="mini" bindtap="gotoTomorrow" >后一天</button>
+  </view>
   <mp-cells>
     <mp-cell>
-      <view style="display: flex;flex-direction: row;">
+      <view class="view-row">
         <view style="width: 320rpx;">车次</view>
-        <view style="text-align:center;width: 100rpx;" >人数</view>
-        <view style="text-align:center;width: 100rpx;">车数</view>
-        <view style="text-align:center;width: 80rpx;">类型</view>
+        <view style="text-align:center;width: 100rpx;" >预约</view>
+        <view style="text-align:center;width: 100rpx;">锁定</view>
+        <view style="text-align:center;width: 80rpx;">候补</view>
         <view style="text-align:center;width: 140rpx;">状态</view>
       </view>
     </mp-cell>
-    <mp-cell>
+    <mp-cell wx:for="{{trips}}" >
+      <view class="view-row" bindtap="gotoDetail" id="{{item.id}}" >
+        <view style="width: 320rpx;">{{item.trip_name}}</view>
+        <view style="text-align:center;width: 100rpx;" >{{item.total}}</view>
+        <view style="text-align:center;width: 100rpx;">{{item.locked}}</view>
+        <view style="text-align:center;width: 80rpx;">{{item.waiting}}</view>
+        <view style="text-align:center;width: 140rpx;">{{item.status}}</view>  
+      </view>
+    </mp-cell>
+    <!--mp-cell>
       <view style="display: flex;flex-direction: row;" bindtap="gotoArrive">
         <view style="width: 320rpx;">2023-07-01第1次</view>
         <view style="text-align:center;width: 100rpx;" >10</view>
@@ -18,8 +35,8 @@
         <view style="text-align:center;width: 140rpx;">已返回</view>
         
       </view>
-    </mp-cell>
+    </mp-cell-->
   </mp-cells>
   <view style="height: 50rpx;" ></view>
-  <button bindtap="newTrip" > 新 增 发 车 </button>
+  <!--button bindtap="newTrip" > 新 增 发 车 </button-->
 </view>

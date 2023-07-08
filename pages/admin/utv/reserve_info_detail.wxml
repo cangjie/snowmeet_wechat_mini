@@ -32,9 +32,9 @@
     <mp-cells title="押金" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">押金：</view>
+          <view class="left-column" >押金：</view>
           <view class="right-column" >{{schedule.depositStr}}</view>
-          <view class="left-column" style="width: 130rpx;">减免：</view>
+          <view class="left-column" >减免：</view>
           <view class="right-column" >
             <input placeholder="{{schedule.deposit_discount}}" class="input" bindinput="modFloatValue" id="deposit_discount" />
           </view>
@@ -42,9 +42,9 @@
       </mp-cell>
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">应付：</view>
+          <view class="left-column" >应付：</view>
           <view class="right-column" >{{schedule.deposit_finalStr}}</view>
-          <view class="left-column" style="width: 130rpx;"></view>
+          <view class="left-column" ></view>
           <view class="right-column" ></view>
         </view>
       </mp-cell>
@@ -52,50 +52,55 @@
     <mp-cells title="收费" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">线路：</view>
+          <view class="left-column" >线路：</view>
           <view class="right-column" >
-            <radio-group class="view-row" style="width: 250rpx;" >
+            <radio-group class="view-row" style="width: 250rpx;" bindchange="changeLineType" >
               <radio value="长线" checked="{{schedule.line_type == '长线'}}" >长线</radio>
-              <radio value="长线" checked="{{schedule.line_type == '短线'}}" >短线</radio>
+              <radio value="短线" checked="{{schedule.line_type == '短线'}}" >短线</radio>
             </radio-group>
           </view>
-          <view class="left-column" style="width: 130rpx;">金额：</view>
-          <view class="right-column" ><input class="input" placeholder="{{schedule.charge}}" /></view>
+          <view class="left-column" >金额：</view>
+          <view class="right-column" ><input disabled="{{true}}" class="input" placeholder="{{schedule.charge}}" /></view>
         </view>
       </mp-cell>
-      <mp-cell>
+      <!--mp-cell>
         <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">优惠券：</view>
+          <view class="left-column" >优惠券：</view>
           <view class="right-column" ><input class="input" placeholder="3" /></view>
-          <view class="left-column" style="width: 130rpx;">说明：</view>
+          <view class="left-column" >说明：</view>
           <view class="right-column" ><input class="input" placeholder="长线" /></view>
         </view>
-      </mp-cell>
-      <mp-cell>
+      </mp-cell-->
+      <mp-cell  >
         <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">优惠减免：</view>
-          <view class="right-column" ><input class="input" placeholder="{{schedule.ticket_discount}}" /></view>
-          <view class="left-column" style="width: 130rpx;">额外减免：</view>
-          <view class="right-column" ><input class="input" placeholder="{{schedule.charge_discount}}" /></view>
+          <view class="left-column" >优惠券减免：</view>
+          <view class="right-column" ><input class="input" disabled="{{true}}" placeholder="{{schedule.ticket_discount}}" /></view>
+          <view class="left-column" >额外减免：</view>
+          <view class="right-column" ><input class="input" placeholder="{{schedule.charge_discount}}" bindinput="modFloatValue" id="charge_discount" /></view>
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">小计：</view>
+          <view class="left-column" >小计：</view>
           <view class="right-column" >{{schedule.charge_finalStr}}</view>
-          <view class="left-column" style="width: 130rpx;"></view>
+          <view class="left-column" ></view>
           <view class="right-column" ></view>
         </view>
       </mp-cell>
     </mp-cells>
+    <view>
+      <button bindtap="updateSchedule" > 保 存 </button>
+    </view>
   </view>
   <view wx:if="{{tabIndex == 1}}" >
     <mp-cells title="分配车辆" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">选择车号：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
-          <view class="left-column" style="width: 130rpx;"></view>
+          <view class="left-column" >选择车号：</view>
+          <view class="right-column" >
+            <input class="input" placeholder="{{schedule.car_no}}" id="car_no" bindinput="input" />
+          </view>
+          <view class="left-column" ></view>
           <view class="right-column" ></view>
         </view>
       </mp-cell>
@@ -103,76 +108,114 @@
     <mp-cells title="主驾" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">姓名：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
-          <view class="left-column" style="width: 130rpx;">性别：</view>
-          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+          <view class="left-column" >姓名：</view>
+          <view class="right-column" >
+            <input id="driver_name" bindinput="input" class="input" placeholder="{{driver.real_name}}" />
+          </view>
+          <view class="left-column" >性别：</view>
+          <view class="right-column" >
+            <radio-group class="view-row" id="driver_gender" bindchange="input" >
+              <radio value="男" checked="{{driver.gender == '男'}}" >男</radio>
+              <radio value="女" checked="{{driver.gender == '女'}}" >女</radio>
+            </radio-group>
+          </view>
         </view>
       </mp-cell>
       <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">电话：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
-          <view class="left-column" style="width: 130rpx;"></view>
-          <view class="right-column" ></view>
+        <view class="view-row" >
+          <view class="left-column"  >电话：</view>
+          <view class="right-column" >
+            <input id="driver_cell" bindinput="input" class="input" placeholder="{{driver.cell}}" />
+          </view>
+          <view class="left-column"  >成年：</view>
+          <view class="right-column" >
+            <switch id="driver_adult" bindchange="input" checked="{{driver.is_adult == 1}}" >{{driver.is_adult == 1?'是':'否'}}</switch>
+          </view>
         </view>
       </mp-cell>
     </mp-cells>
     <mp-cells title="副驾">
       <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">姓名：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>  
-          <view class="left-column" style="width: 130rpx;">性别：</view>
-          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+        <view class="view-row" >
+          <view class="left-column"  >姓名：</view>
+          <view class="right-column" >
+            <input class="input" placeholder="{{passenger.real_name}}" id="passenger_name" bindinput="input" />
+          </view>
+          <view class="left-column"  >性别：</view>
+          <view class="right-column" >
+            <radio-group class="view-row" id="passenger_gender" bindchange="input" >
+              <radio value="男" checked="{{passenger.gender == '男'}}" >男</radio>
+              <radio value="女" checked="{{passenger.gender == '女'}}" >女</radio>
+            </radio-group>
+          </view>
         </view>
       </mp-cell>
       <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">电话：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
-          <view class="left-column" style="width: 130rpx;"></view>
-          <view class="right-column" ></view>
+        <view class="view-row" >
+          <view class="left-column"  >电话：</view>
+          <view class="right-column" >
+            <input class="input" placeholder="{{passenger.cell}}" id="passenger_cell" bindinput="input" />
+          </view>
+          <view class="left-column"  >成年：</view>
+          <view class="right-column" >
+            <switch id="passenger_adult" bindchange="input" checked="{{passenger.is_adult == 1}}" >{{passenger.is_adult == 1?'是':'否'}}</switch>
+          </view>
         </view>
       </mp-cell>
     </mp-cells>
     <mp-cells title="紧急联系人">
       <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column" style="width: 130rpx;">姓名：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
-          <view class="left-column" style="width: 130rpx;">电话：</view>
-          <view class="right-column" ><input class="input" placeholder="长线" /></view>
+        <view class="view-row" >
+          <view class="left-column"  >姓名：</view>
+          <view class="right-column" >
+            <input id="contact_name" class="input" bindinput="input" placeholder="{{driver.contact_name}}" />
+          </view>
+          <view class="left-column"  >电话：</view>
+          <view class="right-column" >
+            <input id="contact_cell" class="input" bindinput="input" placeholder="{{driver.contact_cell}}" />
+          </view>
         </view>
       </mp-cell>
     </mp-cells>
+    <view>
+      <button bindtap="updateContactAndSchedule" > 保 存 </button>
+    </view>
   </view>
-  <view>
-    <button bindtap="updateSchedule" > 保 存 </button>
+  <view wx:if="{{tabIndex == 2}}" >
+    <mp-cells title="司机驾照" >
+      <mp-cell>
+        <multi-uploader  title="司机驾照" image_count="1"  bindUploaded="uploadLisenceImages" uploaded_files="{{driver.driver_license}}" id="driver" ></multi-uploader>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="乘客驾照，如果想换着开，乘客也需要上传驾照！" >
+      <mp-cell>
+        <multi-uploader  title="非必需" image_count="1"  bindUploaded="uploadLisenceImages" uploaded_files="{{passenger.driver_license}}" id="passenger" ></multi-uploader>
+      </mp-cell>
+    </mp-cells>
   </view>
   <!--mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
    <mp-cell>
       <view style="display: flex;flex-direction: row;">
 
-        <view class="left-column" style="width: 130rpx;">车号：</view>
+        <view class="left-column" >车号：</view>
         <view class="right-column" ><input class="input" placeholder="3" /></view>
-        <view class="left-column" style="width: 130rpx;">线路：</view>
+        <view class="left-column" >线路：</view>
         <view class="right-column" ><input class="input" placeholder="长线" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;">
-        <view class="left-column" style="width: 130rpx;">押金：</view>
+        <view class="left-column" >押金：</view>
         <view class="right-column" ><input class="input" placeholder="3000" /></view>
-        <view class="left-column" style="width: 130rpx;">收费：</view>
+        <view class="left-column" >收费：</view>
         <view class="right-column" ><input class="input" placeholder="1280" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;">
-        <view class="left-column" style="width: 130rpx;">减免：</view>
+        <view class="left-column" >减免：</view>
         <view class="right-column" ><input class="input" placeholder="0" /></view>
-        <view class="left-column" style="width: 130rpx;">优惠券：</view>
+        <view class="left-column" >优惠券：</view>
         <view class="right-column" ><input class="input" placeholder="无" /></view>
       </view>
     </mp-cell>
@@ -180,61 +223,61 @@
       <view style="display: flex;flex-direction: row;">
         <view class="left-column" style="width: 130rpx; ">优惠金额：</view>
         <view class="right-column" ><input class="input" placeholder="0" /></view>
-        <view class="left-column" style="width: 130rpx;">实收：</view>
+        <view class="left-column" >实收：</view>
         <view class="right-column" ><input class="input" placeholder="1280" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" style="width: 130rpx;" >主驾姓名：</view>
+        <view class="left-column"  >主驾姓名：</view>
         <view class="right-column" ><input class="input" /></view>
-        <view class="left-column" style="width: 130rpx;" >副驾姓名：</view>
+        <view class="left-column"  >副驾姓名：</view>
         <view class="right-column" ><input class="input" /></view>
       </view>
     </mp-cell>
     
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" style="width: 130rpx;" >性别：</view>
+        <view class="left-column"  >性别：</view>
         <view class="right-column" ><input class="input" /></view>
-        <view class="left-column" style="width: 130rpx;" >性别：</view>
-        <view class="right-column" ><input class="input" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" style="width: 130rpx;" >电话：</view>
-        <view class="right-column" ><input class="input" /></view>
-        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="left-column"  >性别：</view>
         <view class="right-column" ><input class="input" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" style="width: 130rpx;" >驾照：</view>
+        <view class="left-column"  >电话：</view>
         <view class="right-column" ><input class="input" /></view>
-        <view class="left-column" style="width: 130rpx;" >驾照：</view>
-        <view class="right-column" ><input class="input" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" style="width: 130rpx;" >保险：</view>
-        <view class="right-column" ><input class="input" /></view>
-        <view class="left-column" style="width: 130rpx;" >保险：</view>
+        <view class="left-column"  >电话：</view>
         <view class="right-column" ><input class="input" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" style="width: 130rpx;" >租赁：</view>
+        <view class="left-column"  >驾照：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column"  >驾照：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column"  >保险：</view>
+        <view class="right-column" ><input class="input" /></view>
+        <view class="left-column"  >保险：</view>
+        <view class="right-column" ><input class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column"  >租赁：</view>
         <view class="right-column" >
           <checkbox-group>
             <checkbox>头盔</checkbox>
             <checkbox>衣服</checkbox>
           </checkbox-group>
         </view>
-        <view class="left-column" style="width: 130rpx;" >租赁：</view>
+        <view class="left-column"  >租赁：</view>
         <view class="right-column" >
           <checkbox-group>
             <checkbox>头盔</checkbox>
@@ -249,9 +292,9 @@
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" style="width: 130rpx;" >姓名：</view>
+        <view class="left-column"  >姓名：</view>
         <view class="right-column" ><input class="input" /></view>
-        <view class="left-column" style="width: 130rpx;" >电话：</view>
+        <view class="left-column"  >电话：</view>
         <view class="right-column" ><input class="input" /></view>
       </view>
     </mp-cell>

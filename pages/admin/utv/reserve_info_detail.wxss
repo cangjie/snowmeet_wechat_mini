@@ -4,7 +4,9 @@ page{
     background-color: #FFFFFF;
     height: 100%;
 }
-
+.left-column{
+  width: 160rpx;
+}
 .weui-tabs-bar__wrp {
     border-bottom: 1px solid #eee;
     margin-top: 10px;

@@ -80,11 +80,11 @@
   <mp-cells title="操作" >
     <mp-cell style="display: grid;place-items: center;">
       <view wx:if="{{isEditing == 0}}" style="display: flex;flex-direction: row;" >
-        <button size="mini" bindtap="gotoEdit"> 修 改 预 约 </button>
+        <button size="mini" bindtap="gotoEdit" style="font-size: 10pt;" > 修 改 预 约 </button>
         <view style="width: 10rpx;" ></view>
-        <button size="mini" bindtap="apply" disabled="{{reserve.status != '待确认'}}" > 开 放 支 付 押 金 </button>
+        <button size="mini" bindtap="apply" disabled="{{reserve.status != '待确认'}}" style="font-size: 10pt;" > 开 放 支 付 押 金 </button>
         <view style="width: 10rpx;" ></view>
-        <button size="mini" bindtap="close" > 关 闭 预 约 </button>
+        <button size="mini" bindtap="close" style="font-size: 10pt;" > 关 闭 预 约 </button>
       </view>
       <view wx:else >
         <button bindtap="save" > 保 存 </button>

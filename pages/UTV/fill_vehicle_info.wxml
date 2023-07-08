@@ -56,7 +56,7 @@
         </view>
       </mp-cell>
     </mp-cells>
-    <mp-cells title="乘客信息" >
+    <mp-cells title="附驾信息" >
       <mp-cell>
         <view class="view-row" >
           <view class="left-column"  >姓名：</view>
@@ -113,6 +113,23 @@
     <mp-cells title="乘客驾照，如果想换着开，乘客也需要上传驾照！" >
       <mp-cell>
         <multi-uploader  title="非必需" image_count="1"  bindUploaded="uploadLisenceImages" uploaded_files="{{passenger.driver_license}}" id="passenger" ></multi-uploader>
+      </mp-cell>
+    </mp-cells>
+  </view>
+  <view wx:if="{{tabIndex == 2}}" >
+    <view>
+      <text decode="{{true}}" style="margin-top: 20rpx;" >
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保险需要在当天现场购买，请在工作人员的指导下完成。并且在此上传保单截图。
+      </text>
+    </view>
+    <mp-cells title="司机保单" >
+      <mp-cell>
+        <multi-uploader  title="司机保单" image_count="1"  bindUploaded="uploadInsImages" uploaded_files="{{vehicleSchedule.driver_insurance}}" id="driver_ins" ></multi-uploader>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="附驾保单" >
+      <mp-cell>
+        <multi-uploader  title="没有附驾，可不用上传" image_count="1"  bindUploaded="uploadInsImages" uploaded_files="{{vehicleSchedule.passenger_license}}" id="passenger_ins" ></multi-uploader>
       </mp-cell>
     </mp-cells>
   </view>

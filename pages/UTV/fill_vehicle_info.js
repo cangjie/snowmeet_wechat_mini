@@ -32,6 +32,26 @@ Page({
 
   },
 
+  uploadInsImages(e){
+    console.log('upload insurance', e)
+    var that = this
+    var id = e.currentTarget.id
+    var value = e.detail.files[0].url
+    var vehicleSchedule = that.data.vehicleSchedule
+    switch(id){
+      case 'driver_ins':
+        vehicleSchedule.driver_insurance = value
+        break
+      case 'passenger_ins':
+        vehicleSchedule.passenger_insurance = value
+        break
+      default:
+        break
+    }
+    that.setData({vehicleSchedule: vehicleSchedule})
+    that.saveTextInfo()
+  },
+
   getUser(id, role){
     var that = this
     var getUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetUTVUserById/' 
