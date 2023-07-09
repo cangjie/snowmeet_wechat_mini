@@ -129,7 +129,7 @@
     </mp-cells>
     <mp-cells title="附驾保单" >
       <mp-cell>
-        <multi-uploader  title="没有附驾，可不用上传" image_count="1"  bindUploaded="uploadInsImages" uploaded_files="{{vehicleSchedule.passenger_license}}" id="passenger_ins" ></multi-uploader>
+        <multi-uploader  title="没有附驾，可不用上传" image_count="1"  bindUploaded="uploadInsImages" uploaded_files="{{vehicleSchedule.passenger_insurance}}" id="passenger_ins" ></multi-uploader>
       </mp-cell>
     </mp-cells>
   </view>

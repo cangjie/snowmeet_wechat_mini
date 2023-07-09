@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-    tabs: [{title: '押金收费'}, {title: '司乘信息'}, {title: '驾照保险'}, {title: '安全检查'},{title: '归还退费'}],
+    tabs: [{title: '押金收费'}, {title: '司乘信息'}, {title: '驾照'}, {title: '保险'}, {title: '安全检查'},{title: '归还退费'}],
     tabIndex: 0,
     driver:{
       id: 0,
@@ -34,6 +34,26 @@ Page({
       contact_cell: ''
     }
   },
+  uploadInsImages(e){
+    console.log('upload insurance', e)
+    var that = this
+    var id = e.currentTarget.id
+    var value = e.detail.files[0].url
+    var schedule = that.data.schedule
+    switch(id){
+      case 'driver_ins':
+        schedule.driver_insurance = value
+        break
+      case 'passenger_ins':
+        schedule.passenger_insurance = value
+        break
+      default:
+        break
+    }
+    that.setData({schedule: schedule})
+    that.updateContactAndSchedule()
+  },
+
   uploadLisenceImages(e){
     console.log('upload lisence', e)
     var that = this

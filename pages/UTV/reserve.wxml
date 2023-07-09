@@ -34,7 +34,7 @@
         <view style="display: flex;flex-direction: row;" >
           <view>{{cell}}</view>
           <view style="width: 10rpx;" ></view>
-          <button open-type="getPhoneNumber" size="mini" style="font-size: 9pt;height: 60rpx;" bindgetphonenumber="getCell" >重新获取</button>
+          <button open-type="getPhoneNumber" size="mini" style="font-size: 9pt;height: 60rpx;" bindgetphonenumber="getCell" >{{cell==''? '点击获取' : '重新获取'}}</button>
         </view>
       </mp-cell>
     </mp-cells>

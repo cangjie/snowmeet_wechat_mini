@@ -193,6 +193,18 @@
       </mp-cell>
     </mp-cells>
   </view>
+  <view wx:if="{{tabIndex == 3}}" >
+    <mp-cells title="司机保险" >
+      <mp-cell>
+        <multi-uploader  title="司机保险" image_count="1"  bindUploaded="uploadInsImages" uploaded_files="{{schedule.driver_insurance}}" id="driver_ins" ></multi-uploader>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="附驾保险" >
+      <mp-cell>
+        <multi-uploader  title="非必需" image_count="1"  bindUploaded="uploadInsImages" uploaded_files="{{schedule.passenger_insurance}}" id="passenger_ins" ></multi-uploader>
+      </mp-cell>
+    </mp-cells>
+  </view>
   <!--mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
    <mp-cell>
       <view style="display: flex;flex-direction: row;">
