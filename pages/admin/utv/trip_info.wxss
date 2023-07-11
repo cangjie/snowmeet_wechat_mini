@@ -2,3 +2,9 @@
 .left-column{
   width: 160rpx;
 }
+.tab-bar-title__selected{
+  font-size: 10pt;
+}
+.tab-bartitle{
+  font-size: 10pt;
+}

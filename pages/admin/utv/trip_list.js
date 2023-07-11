@@ -90,7 +90,6 @@ Page({
         that.setData({trips: trips})
       }
     })
-
   },
 
   /**

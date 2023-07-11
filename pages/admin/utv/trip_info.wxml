@@ -5,11 +5,80 @@
     <view class="left-column" >场次：</view>
     <view class="right-column" >{{trip.trip_name}}</view>
   </view>
+  <view style="display: flex;flex-direction: row;">
+    <view class="left-column" >排序：</view>
+    <view class="right-column" style="width: 500rpx;" >
+      <radio-group bindchange="changeSort" class="view-row" >
+        <radio checked="{{sort=='reserve'}}" value="reserve"  >按预约</radio>
+        <radio checked="{{sort=='car_no'}}" value="car_no" >按车号</radio>
+      </radio-group>
+    </view>
+  </view>
   <view style="height: 20rpx;"></view>
+  <mp-tabs 
+  tabs="{{tabs}}" 
+  activeTab="{{activeTab}}" 
+  swiperClass="weui-tabs-swiper"
+  bindtabclick="onTabCLick"
+  bindchange="onChange"
+  activeClass="tab-bar-title__selected" 
+  style="height: 1000rpx;"
+  ></mp-tabs>
   <view>
     <!--bindtap="gotoDetail"-->
-    <mp-cells wx:for="{{schedules}}" id="{{item.id}}" title="车号：{{item.car_no}}"  > 
+    <mp-cells wx:for="{{schedules}}" id="{{item.id}}"   > 
       <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view  class="left-column" >预约：</view>
+          <view class="right-column" >张三丰</view>
+          <view  class="left-column" >状态：</view>
+          <view class="right-column" >{{item.status}}</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view  class="left-column" >线路：</view>
+          <view class="right-column" >{{item.line_type}}</view>
+          <view  class="left-column" >发车：</view>
+          <view class="right-column" >{{item.canGo?'🟢可':'🔴不可'}}</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view  class="left-column" >司机：</view>
+          <view class="right-column" >李四民</view>
+          <view  class="left-column" >性别：</view>
+          <view class="right-column" >男</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view  class="left-column" >驾照：</view>
+          <view class="right-column" >{{item.licenseStatus}}</view>
+          <view  class="left-column" >保险：</view>
+          <view class="right-column" >{{item.insuranceStatus}}</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view  class="left-column" >副驾：</view>
+          <view class="right-column" >有</view>
+          <view  class="left-column" >分配车号：</view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view  class="left-column" >起始公里数：</view>
+          <view class="right-column" ></view>
+          <view  class="left-column" >返回公里数：</view>
+          <view class="right-column" ></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <button class="input" style="width: 600rpx;" > 保 存 当 前 车 辆 信 息 </button>
+      </mp-cell>
+      <!--mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >线路：</view>
           <view class="right-column" >{{item.line_type}}</view>
@@ -60,7 +129,7 @@
             <input class="input" />
           </view>
         </view>
-      </mp-cell>
+      </mp-cell-->
     </mp-cells>
     <!--mp-cells title="车号：2" >
       <mp-cell>
