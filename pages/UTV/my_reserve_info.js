@@ -128,12 +128,13 @@ Page({
           success:(res)=>{
             console.log('pay', res)
             var reserve = that.data.reserve
-            reserve.stauts = '已付押金'
+            reserve.status = '已付押金'
             that.setData({reserve: reserve})
             that.getSchedule(reserve.id)
             wx.showToast({
               title: '支付成功，请填写乘客信息。',
               icon: 'success',
+              
             })
           }
         })

@@ -7,7 +7,8 @@
   </view>
   <view style="height: 20rpx;"></view>
   <view>
-    <mp-cells wx:for="{{schedules}}" id="{{item.id}}" title="车号：{{item.car_no}}" bindtap="gotoDetail" >
+    <!--bindtap="gotoDetail"-->
+    <mp-cells wx:for="{{schedules}}" id="{{item.id}}" title="车号：{{item.car_no}}"  > 
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >线路：</view>
@@ -36,8 +37,28 @@
         <view style="display: flex;flex-direction: row;">
           <view class="left-column"  >发车：</view>
           <view class="right-column">{{item.canGo? '可' : '不可'}}</view>
-          <view class="left-column"></view>
-          <view class="right-column"></view>
+          <view class="left-column">车号：</view>
+          <view class="right-column"><input class="input" /></view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column"  >预约人：</view>
+          <view class="right-column">张三</view>
+          <view class="left-column">司机：</view>
+          <view class="right-column">李四民</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;">
+          <view class="left-column"  >发车公里：</view>
+          <view class="right-column">
+            <input class="input"  />
+          </view>
+          <view class="left-column">收车公里：</view>
+          <view class="right-column">
+            <input class="input" />
+          </view>
         </view>
       </mp-cell>
     </mp-cells>

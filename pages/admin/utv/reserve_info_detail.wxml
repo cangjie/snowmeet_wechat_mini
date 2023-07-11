@@ -205,6 +205,72 @@
       </mp-cell>
     </mp-cells>
   </view>
+  <view wx:if="{{tabIndex == 4}}" >
+    <view class="view-row" >
+      <view class="left-column" >公里数：</view>
+      <view class="right-column" >
+        <input class="input" />
+      </view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >租赁物：</view>
+      <view class="right-column" >
+        <checkbox-group >
+          <checkbox>头盔</checkbox>
+          <checkbox>手台</checkbox>
+          <checkbox>衣服</checkbox>
+          <checkbox>耳机</checkbox>
+        </checkbox-group>
+      </view>
+    </view>
+    <view>
+      <button> 确 认 安 全 </button>
+    </view>
+  </view>
+  <view wx:if="{{tabIndex == 5}}" >
+    <view class="view-row" >
+      <view class="left-column" >公里数：</view>
+      <view class="right-column" >
+        <input class="input" />
+      </view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >租赁物：</view>
+      <view class="right-column" >
+        <checkbox-group >
+          <checkbox>头盔</checkbox>
+          <checkbox>手台</checkbox>
+          <checkbox>衣服</checkbox>
+          <checkbox>耳机</checkbox>
+          <checkbox>车钥匙</checkbox>
+        </checkbox-group>
+      </view>
+    </view>
+    <view>
+      <button> 确 认 归 还 无 误 </button>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >已付押金：</view>
+      <view class="right-column" >￥3000.00</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >消费金额：</view>
+      <view class="right-column" >￥1280.00</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >优惠减免：</view>
+      <view class="right-column" >
+        <input class="input" placeholder="100" />
+      </view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >应退金额：</view>
+      <view class="right-column" >￥1720.00</view>
+    </view>
+    <view>
+      <button> 退 款 </button>
+    </view>
+  </view>
   <!--mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
    <mp-cell>
       <view style="display: flex;flex-direction: row;">

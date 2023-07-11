@@ -71,7 +71,7 @@ Page({
                 else{
                   canGo = false
                 }
-                if (driver.driver_license != ''){
+                if (driver != null && driver.driver_license != null && driver.driver_license != ''){
                   licenseStatus = '完整'
                 }
                 else{
