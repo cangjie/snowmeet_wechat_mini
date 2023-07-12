@@ -11,6 +11,128 @@ Page({
     tabs:[{title:'tab1🟢'}, {title:'tab2🔴'}]
   },
 
+  changeSort(e){
+    var that = this
+    var value = e.detail.value
+    that.setData({sort: value})
+    var trip = that.data.trip
+    if (trip != null){
+      that.getData(trip.id, that.data.sort)
+    }
+  },
+
+  inputKm(e){
+    var id = e.currentTarget.id.toString().split('_')[1]
+    var type = e.currentTarget.id.toString().split('_')[0]
+    var that = this
+    var value = e.detail.value
+    if (isNaN(value)) {
+      wx.showToast({
+        title: '请输入正确的公里数。',
+        icon:'error'
+      })
+      return
+    }
+    var schedules = that.data.schedules
+    for(var i = 0; i < schedules.length; i++){
+      if (schedules[i].id == parseInt(id)){
+        var s = schedules[i]
+        if (type == 'departkm'){
+          s.start_mile = value
+        }
+        if (type == 'arrivekm'){
+          s.end_mile = value
+        }
+        var postUrl = 'https://' + app.globalData.domainName + '/core/UTV/UpdateSchedule/' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: postUrl,
+          method: 'POST',
+          data: s,
+          success:(res)=>{
+            console.log('schedule updated', res)
+            var trip = that.data.trip
+            that.getData(trip.id, that.data.sort)
+          }
+        })
+      }
+    }
+    
+  },
+
+  gotoVehicleSchedule(id){
+    var id = id.currentTarget.id
+    wx.navigateTo({
+      url: 'reserve_info_detail?id=' + id
+    })
+  },
+
+  gotoReserve(id){
+    var id = id.currentTarget.id
+    wx.navigateTo({
+      url: 'reserve_info?id=' + id ,
+    })
+  },
+
+  setCarNo(e){
+    var that = this
+    var id = e.currentTarget.id.toString()
+    var value = that.data.carNoArr[e.detail.value]
+    var schedules = that.data.schedules
+    if (value == '未分配'){
+      value = ''
+    }
+    var s = {}
+    for(var i = 0; i < schedules.length; i++){
+      if (schedules[i].id == parseInt(id)){
+        schedules[i].car_no = value
+        s = schedules[i]
+        break
+      }
+    }
+    that.setData({schedules: schedules})
+    that.getAvaliableVehicles(schedules)
+    var postUrl = 'https://' + app.globalData.domainName + '/core/UTV/UpdateSchedule/' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: postUrl,
+      method: 'POST',
+      data: s,
+      success:(res)=>{
+        console.log('schedule updated', res)
+        var trip = that.data.trip
+        that.getData(trip.id, that.data.sort)
+      }
+    })
+  },
+
+  getAvaliableVehicles(schedules){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetAvailableVehicles'
+    wx.request({
+      url: getUrl,
+      success:(res)=>{
+        console.log('get vehicles', res)
+        if (res.statusCode != 200){
+          return
+        }
+        var carNoArr = ['未分配']
+        for(var i = 0; i < res.data.length; i++){
+          var exists = false
+          var carNo = res.data[i].name
+          for(var j = 0; j < schedules.length; j++){
+            if (schedules[j].car_no == carNo){
+              exists = true
+              break;
+            }
+          }
+          if (!exists){
+            carNoArr.push(res.data[i].name)
+          }
+        }
+        that.setData({carNoArr: carNoArr})
+      }
+    })
+  },
+
   gotoDetail(e){
     wx.navigateTo({
       url: 'reserve_info_detail?id=' + e.currentTarget.id,
@@ -32,65 +154,19 @@ Page({
         var tabs = []
         for(var i = 0; i < schedules.length; i++){
           var s = schedules[i]
-          var driver = schedules[i].driver
-          var passenger = schedules[i].passenger
-          var driverInfoStatus = '不全'
-          var passengerInfoStatus = '不全'
-          var licenseStatus = '不全'
-          var insuranceStatus = '不全'
-          var canGo = true
-          if (driver != null 
-            && driver.real_name != ''
-            && driver.cell != ''
-            && driver.gender != ''){
-            driverInfoStatus = '完整'
-          }
-          else{
-            canGo = false
-          }
-          if (passenger == null){
-            passengerInfoStatus = '--'
-          }
-          else if (passenger.real_name != ''
-          && passenger.cell != ''
-          && passenger.gender != ''  ){
-            passengerInfoStatus = '完整'
-          }
-          else{
-            canGo = false
-          }
-          if (driver != null && driver.driver_license != null && driver.driver_license != ''){
-            licenseStatus = '完整'
-          }
-          else{
-            canGo = false
-          }
-          if (s.driver_insurance != '' 
-          && (passenger == null || (passenger != null && s.passenger_insurance != '') )){
-            insuranceStatus = '完整'
-          }
-          else{
-            canGo = false
-          }
-          s.canGo = canGo
-          s.driverInfoStatus = driverInfoStatus
-          s.passengerInfoStatus = passengerInfoStatus
-          s.licenseStatus = licenseStatus
-          s.insuranceStatus = insuranceStatus
-          s.canGo = canGo
-          if (!canGo){
+          if (!s.canGo){
             canDepart = false
           }
           if (s.car_no == ''){
             s.car_no = '未分配'
           }
 
-          var title = '车号:' + ((s.car_no == '') ? '未分配' : s.car_no).trim()
-            + (canGo?'🟢':'🔴')
+          var title = (s.canGo?'🟢':'🔴') + '车号:' + ((s.car_no == '') ? '未分配' : s.car_no).trim()
           tabs.push({title: title})
 
         }
         that.setData({schedules: schedules, canDepart: canDepart, tabs: tabs, activeTab: 0})
+        that.getAvaliableVehicles(schedules)
       }
     })
   },
@@ -111,7 +187,7 @@ Page({
           var trip = res.data
           trip.trip_dateStr = util.formatDate(new Date(trip.trip_date))
           that.setData({trip: trip})
-          that.getData(options.id, that.data.sort)
+          that.getData(trip.id, that.data.sort)
         }
       })
     })
@@ -121,14 +197,19 @@ Page({
    * Lifecycle function--Called when page is initially rendered
    */
   onReady() {
-
+    console.log('onReady')
   },
 
   /**
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    console.log('onShow')
+    var that = this
+    var trip = that.data.trip
+    if (trip != null){
+      that.getData(trip.id, that.data.sort)
+    }
   },
 
   /**

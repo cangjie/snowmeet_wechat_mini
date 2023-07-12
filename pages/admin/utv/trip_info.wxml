@@ -27,15 +27,15 @@
   <view>
     <!--bindtap="gotoDetail"-->
     <mp-cells wx:for="{{schedules}}" id="{{item.id}}"   > 
-      <mp-cell>
+      <mp-cell id="{{item.reserve_id}}" bindtap="gotoReserve">
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >预约：</view>
-          <view class="right-column" >张三丰</view>
+          <view class="right-column" >{{item.reserve.real_name}}</view>
           <view  class="left-column" >状态：</view>
           <view class="right-column" >{{item.status}}</view>
         </view>
       </mp-cell>
-      <mp-cell>
+      <mp-cell id="{{item.id}}" bindtap="gotoVehicleSchedule" >
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >线路：</view>
           <view class="right-column" >{{item.line_type}}</view>
@@ -43,41 +43,51 @@
           <view class="right-column" >{{item.canGo?'🟢可':'🔴不可'}}</view>
         </view>
       </mp-cell>
-      <mp-cell>
+      <mp-cell id="{{item.id}}" bindtap="gotoVehicleSchedule" >
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >司机：</view>
-          <view class="right-column" >李四民</view>
+          <view class="right-column" >{{item.driver.real_name}}</view>
           <view  class="left-column" >性别：</view>
-          <view class="right-column" >男</view>
+          <view class="right-column" >{{item.driver.gender}}</view>
         </view>
       </mp-cell>
-      <mp-cell>
+      <mp-cell id="{{item.id}}" bindtap="gotoVehicleSchedule" >
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >驾照：</view>
-          <view class="right-column" >{{item.licenseStatus}}</view>
+          <view class="right-column" >{{item.haveDriverLicense?'有':'无'}}</view>
           <view  class="left-column" >保险：</view>
-          <view class="right-column" >{{item.insuranceStatus}}</view>
+          <view class="right-column" >
+            {{(item.haveDriverInsurance && item.havePassengerInsurance)?'完整':'不完整'}}
+          </view>
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >副驾：</view>
-          <view class="right-column" >有</view>
+          <view class="right-column" >
+            {{(item.passenger_user_id == 0)? '无':'有'}}
+          </view>
           <view  class="left-column" >分配车号：</view>
-          <view class="right-column" ></view>
+          <view class="right-column" >
+            <picker id="{{item.id}}" range="{{carNoArr}}" class="input" bindchange="setCarNo" >
+              <picker-view>{{(item.car_no == '')?'未分配':item.car_no}}</picker-view>
+            </picker>
+          </view>
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >起始公里数：</view>
-          <view class="right-column" ></view>
+          <view class="right-column" >
+            <input class="input" disabled="{{trip.status != '未发车'}}" id="departkm_{{item.id}}" bindinput="inputKm" placeholder="{{item.start_mile}}"  />
+          </view>
           <view  class="left-column" >返回公里数：</view>
-          <view class="right-column" ></view>
+          <view class="right-column" >
+            <input class="input" disabled="{{trip.status == '未发车'}}"  id="arrive_{{item.id}}" bindinput="inputKm" />
+          </view>
         </view>
       </mp-cell>
-      <mp-cell>
-        <button class="input" style="width: 600rpx;" > 保 存 当 前 车 辆 信 息 </button>
-      </mp-cell>
+      
       <!--mp-cell>
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >线路：</view>
