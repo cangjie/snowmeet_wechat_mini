@@ -7,8 +7,15 @@ Page({
    * Page initial data
    */
   data: {
+    activeTab: 0,
     sort:'reserve',
     tabs:[{title:'tab1🟢'}, {title:'tab2🔴'}]
+  },
+
+  onChange(e){
+    var that = this
+    
+    that.setData({activeTab: e.detail.index})
   },
 
   changeSort(e){
@@ -165,7 +172,7 @@ Page({
           tabs.push({title: title})
 
         }
-        that.setData({schedules: schedules, canDepart: canDepart, tabs: tabs, activeTab: 0})
+        that.setData({schedules: schedules, canDepart: canDepart, tabs: tabs})
         that.getAvaliableVehicles(schedules)
       }
     })

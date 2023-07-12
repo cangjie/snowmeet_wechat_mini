@@ -23,10 +23,11 @@
   bindchange="onChange"
   activeClass="tab-bar-title__selected" 
   style="height: 1000rpx;"
+  
   ></mp-tabs>
   <view>
     <!--bindtap="gotoDetail"-->
-    <mp-cells wx:for="{{schedules}}" id="{{item.id}}"   > 
+    <mp-cells wx:for="{{schedules}}" id="{{item.id}}" wx:if="{{activeTab==index}}"  > 
       <mp-cell id="{{item.reserve_id}}" bindtap="gotoReserve">
         <view style="display: flex;flex-direction: row;" >
           <view  class="left-column" >预约：</view>
