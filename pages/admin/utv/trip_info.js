@@ -69,7 +69,7 @@ Page({
   gotoVehicleSchedule(id){
     var id = id.currentTarget.id
     wx.navigateTo({
-      url: 'reserve_info_detail?id=' + id
+      url: 'reserve_info_detail?id=' + id + '&tabIndex=3'
     })
   },
 

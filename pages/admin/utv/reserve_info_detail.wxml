@@ -28,7 +28,7 @@
   activeClass="tab-bar-title__selected" 
   style="height: 1000rpx;"
   ></mp-tabs>
-  <view wx:if="{{tabIndex == 0}}" >
+  <view wx:if="{{activeTab == 0}}" >
     <mp-cells title="押金" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
@@ -92,7 +92,7 @@
       <button bindtap="updateSchedule" > 保 存 </button>
     </view>
   </view>
-  <view wx:if="{{tabIndex == 1}}" >
+  <view wx:if="{{activeTab == 1}}" >
     <mp-cells title="分配车辆" >
       <mp-cell>
         <view style="display: flex;flex-direction: row;">
@@ -181,7 +181,7 @@
       <button bindtap="updateContactAndSchedule" > 保 存 </button>
     </view>
   </view>
-  <view wx:if="{{tabIndex == 2}}" >
+  <view wx:if="{{activeTab == 2}}" >
     <mp-cells title="司机驾照" >
       <mp-cell>
         <multi-uploader  title="司机驾照" image_count="1"  bindUploaded="uploadLisenceImages" uploaded_files="{{driver.driver_license}}" id="driver" ></multi-uploader>
@@ -193,7 +193,7 @@
       </mp-cell>
     </mp-cells>
   </view>
-  <view wx:if="{{tabIndex == 3}}" >
+  <view wx:if="{{activeTab == 3}}" >
     <mp-cells title="司机保险" >
       <mp-cell>
         <multi-uploader  title="司机保险" image_count="1"  bindUploaded="uploadInsImages" uploaded_files="{{schedule.driver_insurance}}" id="driver_ins" ></multi-uploader>
@@ -205,29 +205,31 @@
       </mp-cell>
     </mp-cells>
   </view>
-  <view wx:if="{{tabIndex == 4}}" >
+  <view wx:if="{{activeTab == 4}}" >
+
     <view class="view-row" >
-      <view class="left-column" >公里数：</view>
-      <view class="right-column" >
-        <input class="input" />
-      </view>
-    </view>
-    <view class="view-row" >
-      <view class="left-column" >租赁物：</view>
-      <view class="right-column" >
-        <checkbox-group >
-          <checkbox>头盔</checkbox>
-          <checkbox>手台</checkbox>
-          <checkbox>衣服</checkbox>
-          <checkbox>耳机</checkbox>
+      <view class="left-column" style="width: 150rpx;" >租赁物：</view>
+      <view class="right-column" style="width: 600rpx;" >
+        <checkbox-group  >
+          <view wx:for="{{rentItems}}" class="view-row" style="height:  90rpx;" >
+            <checkbox 
+              id="{{item.name}}_{{item.confirm_rent}}" 
+              value="{{item.name}}" 
+              style="width: 200rpx;" 
+              bindtap="rentItemDetail" 
+              disabled="{{item.returned==1?true:false}}"
+              checked="{{item.confirm_rent==1?true:false}}" >
+              {{item.name}}
+            </checkbox>
+            <view style="width: 50rpx;" ></view>
+            <switch id="{{item.id}}" disabled="{{item.id == 0}}" checked="{{item.returned==1?true:false}}" style="width:200rpx" bindchange="setReturn" >归还</switch>
+          </view>
         </checkbox-group>
       </view>
     </view>
-    <view>
-      <button> 确 认 安 全 </button>
-    </view>
+    
   </view>
-  <view wx:if="{{tabIndex == 5}}" >
+  <view wx:if="{{activeTab == 5}}" >
     <view class="view-row" >
       <view class="left-column" >公里数：</view>
       <view class="right-column" >
@@ -271,111 +273,5 @@
       <button> 退 款 </button>
     </view>
   </view>
-  <!--mp-cells title="车辆1 锁定 (预约/锁定/候补/候补失败/取消/支付中)" >
-   <mp-cell>
-      <view style="display: flex;flex-direction: row;">
-
-        <view class="left-column" >车号：</view>
-        <view class="right-column" ><input class="input" placeholder="3" /></view>
-        <view class="left-column" >线路：</view>
-        <view class="right-column" ><input class="input" placeholder="长线" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;">
-        <view class="left-column" >押金：</view>
-        <view class="right-column" ><input class="input" placeholder="3000" /></view>
-        <view class="left-column" >收费：</view>
-        <view class="right-column" ><input class="input" placeholder="1280" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;">
-        <view class="left-column" >减免：</view>
-        <view class="right-column" ><input class="input" placeholder="0" /></view>
-        <view class="left-column" >优惠券：</view>
-        <view class="right-column" ><input class="input" placeholder="无" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;">
-        <view class="left-column" style="width: 130rpx; ">优惠金额：</view>
-        <view class="right-column" ><input class="input" placeholder="0" /></view>
-        <view class="left-column" >实收：</view>
-        <view class="right-column" ><input class="input" placeholder="1280" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column"  >主驾姓名：</view>
-        <view class="right-column" ><input class="input" /></view>
-        <view class="left-column"  >副驾姓名：</view>
-        <view class="right-column" ><input class="input" /></view>
-      </view>
-    </mp-cell>
-    
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column"  >性别：</view>
-        <view class="right-column" ><input class="input" /></view>
-        <view class="left-column"  >性别：</view>
-        <view class="right-column" ><input class="input" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column"  >电话：</view>
-        <view class="right-column" ><input class="input" /></view>
-        <view class="left-column"  >电话：</view>
-        <view class="right-column" ><input class="input" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column"  >驾照：</view>
-        <view class="right-column" ><input class="input" /></view>
-        <view class="left-column"  >驾照：</view>
-        <view class="right-column" ><input class="input" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column"  >保险：</view>
-        <view class="right-column" ><input class="input" /></view>
-        <view class="left-column"  >保险：</view>
-        <view class="right-column" ><input class="input" /></view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column"  >租赁：</view>
-        <view class="right-column" >
-          <checkbox-group>
-            <checkbox>头盔</checkbox>
-            <checkbox>衣服</checkbox>
-          </checkbox-group>
-        </view>
-        <view class="left-column"  >租赁：</view>
-        <view class="right-column" >
-          <checkbox-group>
-            <checkbox>头盔</checkbox>
-            <checkbox>衣服</checkbox>
-            <checkbox>手台</checkbox>
-          </checkbox-group>
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      紧急联系人信息：
-    </mp-cell>
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="left-column"  >姓名：</view>
-        <view class="right-column" ><input class="input" /></view>
-        <view class="left-column"  >电话：</view>
-        <view class="right-column" ><input class="input" /></view>
-      </view>
-    </mp-cell>
-    
-  </mp-cells-->
+  
 </view>

@@ -7,8 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    tabs: [{title: '押金收费'}, {title: '司乘信息'}, {title: '驾照'}, {title: '保险'}, {title: '安全检查'},{title: '归还退费'}],
-    tabIndex: 0,
+    tabs: [{title: '押金收费'}, {title: '司乘信息'}, {title: '驾照'}, {title: '保险'}, {title: '租赁'},{title: '退费'}],
+    activeTab: 0,
     driver:{
       id: 0,
       user_id: 0,
@@ -34,6 +34,89 @@ Page({
       contact_cell: ''
     }
   },
+
+  setReturn(e){
+    console.log('return', e)
+    var id = e.currentTarget.id
+    var that = this
+    if (parseInt(id)==0){
+      return
+    }
+    var value = e.detail.value
+    var setUrl = 'https://' + app.globalData.domainName + '/core/UTV/ReturnItem/' + id.toString() + '?isReturn=' + (value? '1':'0')
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.getRentItem()
+      }
+    })
+  },
+
+  rentItemDetail(e){
+    console.log('rent item detail', e)
+    var that = this
+    var schedule = that.data.schedule
+    var id = e.currentTarget.id.split('_')
+    var name = id[0]
+    var rented = parseInt(id[1])
+    var modUrl = 'https://' + app.globalData.domainName + '/core/UTV/'
+    if (rented == 0){
+      modUrl += 'SetRent'
+    }
+    else{
+      modUrl += 'ResetRentItem'
+    }
+    modUrl += '/' + schedule.id + '/?name=' + encodeURIComponent(name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: modUrl,
+      success:(res) => {
+        if (res.statusCode != 200){
+          return
+        }
+        that.getRentItem()
+      }
+    })
+  },
+  getRentItem(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetRentItem'
+    wx.request({
+      url: getUrl,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var rentItems = res.data
+        getUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetRentItems/' + that.data.schedule.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: getUrl,
+          success:(res)=>{
+            if (res.statusCode != 200){
+              return
+            }
+            var myRents = res.data
+            for(var i = 0; i < rentItems.length; i++){
+              var r = rentItems[i]
+              for(var j = 0; j < myRents.length; j++){
+                if (myRents[j].name == r.name){
+                  r.id = myRents[j].id
+                  r.confirm_rent = myRents[j].confirm_rent
+                  r.returned = myRents[j].returned
+                  break
+                }
+              }
+            }
+            that.setData({rentItems: rentItems})
+          }
+        })
+      }
+    })
+  },
+
   uploadInsImages(e){
     console.log('upload insurance', e)
     var that = this
@@ -323,7 +406,7 @@ Page({
   onChange(e){
     console.log('tab change', e)
     var that = this
-    that.setData({tabIndex: e.detail.index})
+    that.setData({activeTab: e.detail.index})
   },
 
   /**
@@ -334,6 +417,21 @@ Page({
     console.log('id', options.id)
     app.loginPromiseNew.then(function(resolve){
       that.getSchedule(options.id)
+      var getUrl = 'https://' + app.globalData.domainName + '/core/UTV/GetRentItem'
+      wx.request({
+        url: getUrl,
+        success:(res)=>{
+          if (res.statusCode != 200){
+            return
+          }
+          var tabIndex = 0
+          if (options.tabIndex != undefined && options.tabIndex != null){
+            tabIndex = parseInt(options.tabIndex)
+          }
+          that.setData({rentItems: res.data, activeTab: tabIndex})
+          that.getRentItem()
+        }
+      })
     })
   },
 

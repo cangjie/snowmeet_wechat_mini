@@ -291,7 +291,7 @@ Page({
   gotoDetail(e){
     var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'reserve_info_detail?id=' + id,
+      url: 'reserve_info_detail?id=' + id ,
     })
   },
 
