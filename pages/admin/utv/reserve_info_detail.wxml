@@ -63,14 +63,6 @@
           <view class="right-column" ><input disabled="{{true}}" class="input" placeholder="{{schedule.charge}}" /></view>
         </view>
       </mp-cell>
-      <!--mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column" >优惠券：</view>
-          <view class="right-column" ><input class="input" placeholder="3" /></view>
-          <view class="left-column" >说明：</view>
-          <view class="right-column" ><input class="input" placeholder="长线" /></view>
-        </view>
-      </mp-cell-->
       <mp-cell  >
         <view style="display: flex;flex-direction: row;">
           <view class="left-column" >优惠券减免：</view>
@@ -86,6 +78,11 @@
           <view class="left-column" ></view>
           <view class="right-column" ></view>
         </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="备注" >
+      <mp-cell>
+        <textarea style="width: 700rpx;height:200rpx" class="input" ></textarea>
       </mp-cell>
     </mp-cells>
     <view>
@@ -230,47 +227,55 @@
     
   </view>
   <view wx:if="{{activeTab == 5}}" >
+    
+    
     <view class="view-row" >
-      <view class="left-column" >公里数：</view>
-      <view class="right-column" >
-        <input class="input" />
-      </view>
+      <view class="left-column" >租赁：</view>
+      <view class="right-column" >{{schedule.rentReturned?'归还':'未归还'}}</view>
     </view>
     <view class="view-row" >
-      <view class="left-column" >租赁物：</view>
-      <view class="right-column" >
-        <checkbox-group >
-          <checkbox>头盔</checkbox>
-          <checkbox>手台</checkbox>
-          <checkbox>衣服</checkbox>
-          <checkbox>耳机</checkbox>
-          <checkbox>车钥匙</checkbox>
-        </checkbox-group>
-      </view>
-    </view>
-    <view>
-      <button> 确 认 归 还 无 误 </button>
+      <view class="left-column" >押金：</view>
+      <view class="right-column" style="width:150rpx;text-align:right" >{{schedule.deposit_discountStr}}</view>
     </view>
     <view class="view-row" >
-      <view class="left-column" >已付押金：</view>
-      <view class="right-column" >￥3000.00</view>
+      <view class="left-column" >押金减免：</view>
+      <view class="right-column" style="width:150rpx;text-align:right"  >{{schedule.deposit_discountStr}}</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >实付押金：</view>
+      <view class="right-column" style="width:150rpx;text-align:right"  >{{schedule.deposit_finalStr}}</view>
+    </view>
+
+    <view class="view-row" >
+      <view class="left-column" >线路：</view>
+      <view class="right-column" style="width:150rpx;text-align:right" >{{schedule.line_type}}</view>
     </view>
     <view class="view-row" >
       <view class="left-column" >消费金额：</view>
-      <view class="right-column" >￥1280.00</view>
+      <view class="right-column" style="width:150rpx;text-align:right"  >{{schedule.chargeStr }}</view>
     </view>
     <view class="view-row" >
       <view class="left-column" >优惠减免：</view>
-      <view class="right-column" >
-        <input class="input" placeholder="100" />
+      <view class="right-column" style="width:150rpx;">
+        <input class="input" placeholder="{{schedule.charge_discount}}" style="text-align: right;" bindinput="setChargeDiscount" />
       </view>
     </view>
     <view class="view-row" >
-      <view class="left-column" >应退金额：</view>
-      <view class="right-column" >￥1720.00</view>
+      <view class="left-column" >实收金额：</view>
+      <view class="right-column" style="width:150rpx;text-align:right" >{{schedule.charge_finalStr}}</view>
     </view>
-    <view>
-      <button> 退 款 </button>
+    <view class="view-row" >
+      <view class="left-column" >应退金额：</view>
+      <view class="right-column" style="width:150rpx;text-align:right" >{{schedule.refundStr}}</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >备注：</view>
+      <view class="right-column" >
+        <textarea style="width: 500rpx;height: 200rpx;" class="input" ></textarea>
+      </view>
+    </view>
+    <view style="margin-top: 50rpx;" >
+      <button style="margin-top: 10rpx;padding-top: 10rpx;" > 退 款 </button>
     </view>
   </view>
   

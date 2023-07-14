@@ -35,6 +35,21 @@ Page({
     }
   },
 
+  setChargeDiscount(e){
+    var value = 0
+    try{
+      value = parseFloat(e.detail.value)
+    }
+    catch{
+
+    }
+    var that = this
+    var schedule = that.data.schedule
+    schedule.charge_discount = value
+    that.computeSchedule(schedule)
+    that.setData({schedule: schedule})
+  },
+
   setReturn(e){
     console.log('return', e)
     var id = e.currentTarget.id
@@ -376,10 +391,15 @@ Page({
 
   computeSchedule(schedule){
     schedule.depositStr = util.showAmount(schedule.deposit)
+    schedule.deposit_discountStr = util.showAmount(schedule.deposit_discount)
     schedule.deposit_final = schedule.deposit - schedule.deposit_discount
     schedule.deposit_finalStr = util.showAmount(schedule.deposit_final)
+    schedule.chargeStr = util.showAmount(schedule.charge)
     schedule.charge_final = schedule.charge - schedule.charge_discount - schedule.ticket_discount
+    schedule.charge_discountStr = util.showAmount(schedule.charge_discount)
     schedule.charge_finalStr = util.showAmount(schedule.charge_final)
+    schedule.refund = schedule.deposit_final - schedule.charge_final
+    schedule.refundStr = util.showAmount(schedule.refund)
   },
 
   getReserve(id){
