@@ -62,7 +62,9 @@ Page({
           var orders = res.data
           for(var i = 0; i < orders.length; i++){
             var dueEndDate = new Date(orders[i].due_end_date)
+            var createDate = new Date(orders[i].create_date)
             orders[i].due_end_date_str = util.formatDate(dueEndDate) + ' ' + util.formatTimeStr(dueEndDate)
+            orders[i].create_dateStr = util.formatDate(createDate) + ' ' + util.formatTimeStr(createDate)
             orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
             totalPaid = totalPaid + orders[i].deposit_final
             totalRefund = totalRefund + orders[i].refund

@@ -40,8 +40,8 @@
           <view class="right-column" >{{item.cell_number}}</view>
         </view>
         <view style="display: flex;flex-direction: row;" >
-          <view class="left-column">预计归还时间：</view>
-          <view class="right-column" >{{item.due_end_date_str}}</view>
+          <view class="left-column">订单时间：</view>
+          <view class="right-column" >{{item.create_dateStr}}</view>
           <view class="left-column">支付方式：</view>
           <view class="right-column" >{{item.order.payments[0].pay_method}}</view>
         </view>
