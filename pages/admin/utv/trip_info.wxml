@@ -84,119 +84,14 @@
           </view>
           <view  class="left-column" >返回公里数：</view>
           <view class="right-column" >
-            <input class="input" disabled="{{trip.status == '未发车'}}"  id="arrive_{{item.id}}" bindinput="inputKm" />
+            <input class="input" disabled="{{trip.status == '未发车'}}"  id="arrivekm_{{item.id}}" bindinput="inputKm" placeholder="{{item.end_mile}}" />
           </view>
-        </view>
-      </mp-cell>
-      
-      <!--mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view  class="left-column" >线路：</view>
-          <view class="right-column" >{{item.line_type}}</view>
-          <view  class="left-column" >状态：</view>
-          <view class="right-column" >{{item.status}}</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view  class="left-column" >司机信息：</view>
-          <view class="right-column" >{{item.driverInfoStatus}}</view>
-          <view  class="left-column" >附驾信息：</view>
-          <view class="right-column" >{{item.passengerInfoStatus}}</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view  class="left-column" >驾照：</view>
-          <view class="right-column" >{{item.licenseStatus}}</view>
-          <view  class="left-column" >保险：</view>
-          <view class="right-column" >{{item.insuranceStatus}}</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column"  >发车：</view>
-          <view class="right-column">{{item.canGo? '可' : '不可'}}</view>
-          <view class="left-column">车号：</view>
-          <view class="right-column"><input class="input" /></view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column"  >预约人：</view>
-          <view class="right-column">张三</view>
-          <view class="left-column">司机：</view>
-          <view class="right-column">李四民</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column"  >发车公里：</view>
-          <view class="right-column">
-            <input class="input"  />
-          </view>
-          <view class="left-column">收车公里：</view>
-          <view class="right-column">
-            <input class="input" />
-          </view>
-        </view>
-      </mp-cell-->
-    </mp-cells>
-    <!--mp-cells title="车号：2" >
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view  class="left-column" >线路:</view>
-          <view class="right-column" >长线</view>
-          <view  class="left-column" >角色:</view>
-          <view class="right-column" >游客</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view  class="left-column" >安全检查:</view>
-          <view class="right-column" >完成</view>
-          <view  class="left-column" >必带物品:</view>
-          <view class="right-column" >已检查</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column"  >发车:</view>
-          <view class="right-column">可</view>
-          <view class="left-column">状体：</view>
-          <view class="right-column">(等待发车/已发车/已收车)</view>
         </view>
       </mp-cell>
     </mp-cells>
-    <mp-cells title="车号：10" >
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view  class="left-column" >线路:</view>
-          <view class="right-column" >长线</view>
-          <view  class="left-column" >角色:</view>
-          <view class="right-column" >保障</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;" >
-          <view  class="left-column" >乘客:</view>
-          <view class="right-column" >有</view>
-          <view  class="left-column" >租赁:</view>
-          <view class="right-column" >有</view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view style="display: flex;flex-direction: row;">
-          <view class="left-column"  >发车:</view>
-          <view class="right-column">可</view>
-          <view class="left-column">状体：</view>
-          <view class="right-column">(等待发车/已发车/已收车)</view>
-        </view>
-      </mp-cell>
-    </mp-cells-->
   </view>
-  <view style="display: flex;flex-direction: row;">
-    <button size="mini" disabled="{{!canDepart}}" > 发 车 </button>
-    <button size="mini" > 添 加 车 辆 </button>
+  <view style="margin-top: 20rpx;" class="view-row" >
+    <button size="mini" disabled="{{!canDepart || trip.status != '未发车' }}" bindtap="depart" > 发 车 </button>
+    <button size="mini" disabled="{{true}}" > 添 加 车 辆 </button>
   </view>
 </view>

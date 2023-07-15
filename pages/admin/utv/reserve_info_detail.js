@@ -32,7 +32,68 @@ Page({
       gender: '',
       contact_name: '',
       contact_cell: ''
+    },
+    refunded: false
+  },
+
+  setMemo(e){
+    var that = this
+    var schedule = that.data.schedule
+    schedule.memo = e.detail.value
+    that.setData({schedule: schedule})
+  },
+
+  refund(){
+    var that = this
+    var order = that.data.order
+    var schedule = that.data.schedule
+    var paymentId = 0
+    for(var i = 0; i < order.payments.length; i++){
+      if (order.payments[i].status == '支付成功'){
+        paymentId = order.payments[i].id
+        break
+      }
     }
+    if (paymentId == 0){
+      return
+    }
+    var amount = parseFloat(schedule.refund)
+    var refundUrl = 'https://' + app.globalData.domainName + '/core/UTV/Refund/' + schedule.id.toString()
+      + '?amount=' + schedule.refund + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: refundUrl,
+      success:(res)=>{
+        console.log('refund', res)
+        if (res.statusCode != 200){
+          return
+        }
+        that.getOrder()
+      }
+    })
+  },
+
+  getOrder(){
+    var that = this
+    var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetWholeOrderByStaff/' 
+      + that.data.reserve.order_id + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getOrderUrl,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        console.log('order', res)
+        var order = res.data
+        var schedule = that.data.schedule
+        that.setData({order: order})
+        for(var i = 0; i < order.refunds.length; i++){
+          var refund = order.refunds[i]
+          if (refund.memo == schedule.id.toString()){
+            that.setData({refunded: true})
+          }
+        }
+      }
+    })
   },
 
   setChargeDiscount(e){
@@ -322,6 +383,7 @@ Page({
             if (schedule.passenger_user_id > 0){
               that.getUser(schedule.passenger_user_id, 'passenger')
             }
+            
           }
         })
       }
@@ -385,6 +447,7 @@ Page({
 
         that.setData({schedule: schedule})
         that.getReserve(schedule.reserve_id)
+        
       }
     })
   },
@@ -417,6 +480,7 @@ Page({
         var reserve = res.data
         reserve.trip_dateStr = util.formatDate(new Date(reserve.trip_date))
         that.setData({reserve: res.data})
+        that.getOrder()
         that.getPrice()
       }
     })

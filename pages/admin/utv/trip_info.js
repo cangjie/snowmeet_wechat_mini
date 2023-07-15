@@ -12,6 +12,24 @@ Page({
     tabs:[{title:'tab1🟢'}, {title:'tab2🔴'}]
   },
 
+  depart(){
+    var that = this
+    var trip = that.data.trip
+    trip.status = '已发车'
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/UTV/UpdateTrip?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: trip,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.getData(trip.id, '')
+      }
+    })
+  }, 
+
   onChange(e){
     var that = this
     

@@ -20,7 +20,7 @@
   <view style="height: 1rpx;background-color: gray;" ></view>
   <mp-tabs 
   tabs="{{tabs}}" 
-  activeTab="{{activeTab}}" 
+  activeTab="{{tabIndex}}" 
   swiperClass="weui-tabs-swiper"
   bindchange="tabChange"
   activeClass="tab-bar-title__selected" 

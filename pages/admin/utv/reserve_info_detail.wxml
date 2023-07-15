@@ -82,7 +82,7 @@
     </mp-cells>
     <mp-cells title="备注" >
       <mp-cell>
-        <textarea style="width: 700rpx;height:200rpx" class="input" ></textarea>
+        <textarea style="width: 700rpx;height:200rpx" class="input" value="{{schedule.memo}}" bindinput="setMemo" ></textarea>
       </mp-cell>
     </mp-cells>
     <view>
@@ -271,11 +271,11 @@
     <view class="view-row" >
       <view class="left-column" >备注：</view>
       <view class="right-column" >
-        <textarea style="width: 500rpx;height: 200rpx;" class="input" ></textarea>
+        <textarea style="width: 500rpx;height: 200rpx;" class="input" value="{{schedule.memo}}" bindinput="setMemo" ></textarea>
       </view>
     </view>
     <view style="margin-top: 50rpx;" >
-      <button style="margin-top: 10rpx;padding-top: 10rpx;" > 退 款 </button>
+      <button style="margin-top: 10rpx;padding-top: 10rpx;" bindtap="refund" disabled="{{refunded}}" > 退 款 </button>
     </view>
   </view>
   
