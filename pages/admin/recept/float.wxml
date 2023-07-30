@@ -1,25 +1,17 @@
 <view>
   <view style="background-color: gray;position: fixed;top: 10px; left:10px;width: {{windowWidth - 20}}px;opacity: 0.5;height: {{topFrameHeight}}px;">aaa</view>
   <view>
-    <view style="height: {{topFrameHeight+50}}px;">1</view>
-    <view style="height: 100rpx;">2</view>
-    <view style="height: 100rpx;">3</view>
-    <view style="height: 100rpx;">4</view>
-    <view style="height: 100rpx;">5</view>
-    <view style="height: 100rpx;">6</view>
-    <view style="height: 100rpx;">7</view>
-    <view style="height: 100rpx;">8</view>
-    <view style="height: 100rpx;">9</view>
-    <view style="height: 100rpx;">10</view>
-    <view style="height: 100rpx;">11</view>
-    <view style="height: 100rpx;">12</view>
-    <view style="height: 100rpx;">13</view>
-    <view style="height: 100rpx;">14</view>
-    <view style="height: 100rpx;">15</view>
-    <view style="height: 100rpx;">16</view>
-    <view style="height: 100rpx;">17</view>
-    <view style="height: 100rpx;">18</view>
-    <view style="height: 100rpx;">19</view>
+    <view style="height: {{topFrameHeight+50}}px;">
+      <test1 wx:if="{{scene == 1}}" ></test1>
+      <test2 wx:if="{{scene == 2}}" ></test2>
+    </view>
+   
   </view>
-  <view style="background-color: gray;position: fixed;top: {{windowHeight - bottomFrameHeight - 50}}px; left:10px;width: {{windowWidth - 20}}px;opacity: 0.5;height: {{bottomFrameHeight}}px;">bbb</view>
+  <view style="background-color: gray;position: fixed;top: {{windowHeight - bottomFrameHeight - 50}}px; left:10px;width: {{windowWidth - 20}}px;opacity: 0.5;height: {{bottomFrameHeight}}px;">
+    <button size="mini" bindtap="prev" >Prev</button>
+    <button size="mini" bindtap="next" >Next</button>
+    <button size="mini" bindtap="goon" >Goon</button>
+    <button size="mini" bindtap="back" >Back</button>
+    <button size="mini" bindtap="jump" >Jump</button>
+  </view>
 </view>

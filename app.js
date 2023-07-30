@@ -81,6 +81,16 @@ App({
                               success:(res)=>{
                                 app.globalData.systemInfo = res
                                 resolve(app.globalData)
+                              },
+                              fail:(res)=>{
+                                console.log('get sys info fail, try sync', res)
+                                try{
+                                  app.globalData.systemInfo = wx.getSystemInfoSync()
+                                }
+                                catch(err){
+                                  console.log('get sys info sync fail', err)
+                                }
+                                resolve(app.globalData)
                               }
                             })
                             
@@ -88,16 +98,30 @@ App({
                         })
                       },
                       fail: (res) => {
-                        console.log(res)
+                        console.log('get sys info fail, try sync', res)
+                        try{
+                          app.globalData.systemInfo = wx.getSystemInfoSync()
+                        }
+                        catch(err){
+                          console.log('get sys info sync fail', err)
+                        }
                         resolve(app.globalData)
                       }
                     })
                   }
                   else{
                     //resolve(app.globalData)
+
+
+
                     wx.getSystemInfoAsync({
                       success:(res)=>{
                         app.globalData.systemInfo = res
+                        resolve(app.globalData)
+                      },
+                      fail:(res)=>{
+                        console.log('get sys info fail', res)
+                        app.globalData.systemInfo = wx.getSystemInfoSync()
                         resolve(app.globalData)
                       }
                     })

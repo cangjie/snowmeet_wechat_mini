@@ -109,6 +109,13 @@
           "query": "",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/admin/recept/common/step1",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }
