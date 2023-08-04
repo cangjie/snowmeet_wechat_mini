@@ -87,7 +87,9 @@
     "pages/admin/utv/reserve_info_detail",
     "pages/UTV/my_reserve_list",
     "pages/UTV/my_reserve_info",
-    "pages/UTV/fill_vehicle_info"
+    "pages/UTV/fill_vehicle_info",
+    "pages/admin/recept/recept_entry",
+    "pages/admin/recept/recept_member_info"
   ],
   "window": {
     "backgroundTextStyle": "light",

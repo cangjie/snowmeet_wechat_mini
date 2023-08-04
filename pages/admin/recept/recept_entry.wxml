@@ -1,0 +1,28 @@
+<view wx:if="{{role=='staff'}}" >
+  <mp-cells title="顾客扫码验证身份" >
+    <mp-cell style="text-align: center;">
+      <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="通过手机号" >
+    <mp-cell>
+      <view style="display:flex; flex-direction: row;">
+        <view class="left-column" style="display:flex;width: 500rpx;text-align: center;justify-content: center;align-items: center;" >
+          <input placeholder="填写手机号" style="width: 300rpx;height: 50rpx;" class="input" bindinput="cellChanged" />
+        </view>
+        <view class="right-column" style="width: 250rpx;" >
+          <button style="width: 180rpx;height: 65rpx;padding-top: 0rpx;margin-top: 0rpx;" bindtap="gotoShopSale" size="mini" >确认</button>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <!--mp-cells title="扫描优惠券" >
+    <mp-cell><!--button bindtap="scan"> 扫 一 扫 </button>请打开微信“扫一扫”，扫描优惠券。</mp-cell>
+  </mp-cells-->
+  <!--mp-cells title="刷脸" >
+    <mp-cell style="text-align: center;"><button disabled="true" >Still to come.</button> </mp-cell>
+  </mp-cells-->
+  <mp-cells title="散客" >
+    <mp-cell><button bindtap="gotoShopSaleDirectly" > 直 接 进 入 </button></mp-cell>
+  </mp-cells>
+</view>
