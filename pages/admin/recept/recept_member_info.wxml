@@ -1,0 +1,3 @@
+<view>
+  <user-info open_id="{{openId}}" bindUserInfoUpdate="userInfoUpdate" ></user-info>
+</view>
