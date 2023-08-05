@@ -6,11 +6,106 @@ Page({
    * Page initial data
    */
   data: {
-
+    needUpdate: false,
+    score: 0,
+    totalScore: 0,
+    shop: ''
   },
 
   userInfoUpdate(e){
     console.log('user info update', e)
+    var that = this
+    var userInfo = e.detail.user_info
+    that.setData({needUpdate: true, userInfo: userInfo})
+  },
+
+  updateUserInfo(){
+    var that = this
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateMiniUser?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: that.data.userInfo,
+      success:(res)=>{
+        console.log('mini user info update', res)
+        if (res.statusCode != 200){
+          return;
+        }
+        wx.showToast({
+          title: '更新成功。',
+          icon: 'success'
+        })
+      }
+    })
+  },
+
+  getScore(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsSummary?openId=' + that.data.openId + '&openIdType=snowmeet_mini'
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200) {
+          return
+        }
+        that.setData({score: res.data})
+        getUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsTotalEarned?openId=' + that.data.openId + '&openIdType=snowmeet_mini'
+        wx.request({
+          url: getUrl,
+          method: 'GET',
+          success:(res)=>{
+            if (res.statusCode != 200){
+              return
+            }
+            that.setData({totalScore: res.data})
+          }
+        })
+      }
+    })
+  },
+
+  shopSelected(e){
+    console.log('shop selected', e)
+    var that = this
+    that.setData({shop: e.detail.shop})
+  },
+
+  gotoFlow(e){
+    var that = this
+    var id = e.currentTarget.id
+    var scene = ''
+    switch(id)
+    {
+      case 'sale':
+        scene = '店销现货'
+        break
+      case 'rent':
+        scene = '租赁下单'
+        break
+      case 'maintain':
+        scene = '养护下单'
+        break
+      default:
+        break
+
+    }
+    var newReceptUrl = 'https://' + app.globalData.domainName + '/core/Recept/NewRecept?openId=' + encodeURIComponent(that.data.openId) 
+    + '&scene=' + encodeURIComponent(scene) + '&shop=' + encodeURIComponent(that.data.shop) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: newReceptUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('new recept', e)
+        if (res.statusCode != 200){
+          return
+        }
+        wx.redirectTo({ 
+          url: 'recept?id=' + res.data.id,
+        })
+      }
+    })
+   
   },
 
   /**
@@ -24,11 +119,12 @@ Page({
     if (options.code != undefined){
       that.setData({code: options.code})
     }
-    that.onShow()
+    that.getScore()
   },
 
   onShow(){
-
+    var that = this
+    that.getScore()
   },
 
   /**

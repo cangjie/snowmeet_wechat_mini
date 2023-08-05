@@ -2,7 +2,9 @@
   "usingComponents": {
     "user-info": "/components/user_info/user_info",
     "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell"
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "ticket": "/components/ticket_selector/ticket_selector",
+    "shop-selector": "/components/shop_selector/shop_selector"
   },
   "navigationBarTitleText": "确认用户信息"
 }

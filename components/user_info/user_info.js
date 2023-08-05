@@ -137,6 +137,9 @@ Component({
         case 'real_name':
           userInfo.real_name = value
           break
+        case 'wechatId':
+          userInfo.wechat_id = value
+          break
         case 'cell':
           userInfo.cell_number = value
           if (value.length == 11){

@@ -15,6 +15,14 @@
   </mp-cell>
   <mp-cell>
     <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" >微信号：</view>
+      <view class="right-column" >
+        <input id="wechatId" value="{{userInfo.wechat_id}}" placeholder="" bindinput="userInfoChanged" style="width: 250rpx;" class="input" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display: flex; flex-direction: row;" >
       <view class="left-column" >昵称：</view>
       <view class="right-column" >{{userInfo.nick}}</view>
     </view>
