@@ -70,7 +70,7 @@ Page({
             if (needJump){
               clearInterval(that.data.interVal)
               var jumpUrl = 'recept_member_info?openId=' + res.data.miniAppUser.open_id
-              wx.navigateTo({
+              wx.redirectTo({
                 url: jumpUrl,
               })
             }

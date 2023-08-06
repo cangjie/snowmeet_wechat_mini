@@ -1,18 +1,117 @@
 // pages/admin/recept/recept.js
+const app = getApp()
+const topFrameHeightMax = 360
+const topFrameHeightMin = 60
+const bottomFrameHeightMax = 360
+const bottomFrameHeightMin = 60
+const rentStep = ['confirm_item', 'confirm_deposit', 'confirm_final']
 Page({
 
   /**
    * Page initial data
    */
   data: {
+    topFrameHeight: topFrameHeightMin,
+    bottomFrameHeight: bottomFrameHeightMin,
+    ticketCode: '',
+    ticketName: '',
+    bottomShowDetail: false,
+  },
+  getInnerData(e){
+    console.log('get data', e)
+    var that = this
+    var recept = that.data.recept
+    switch(recept.recept_type){
+      case '租赁下单' :
+        if (!e.detail.Goon){
+          return
+        }
+        if (e.recept.rentOrder!=null){
+          var rentOrder = e.recept.rentOrder
+          if (rentOrder.details != null){
+            var deposit = 0
+            for(var i = 0; i < rentOrder.details.length; i++){
+              deposit += rentOrder.details[i].deposit
+            }
+            rentOrder.deposit = deposit
+          }
+          recept.rentOrder = rentOrder
+        }
+        break
+      default:
+        break
+    }
+    that.setData({recept: recept})
+  },
 
+  changeBottom(e){
+    var that = this
+    console.log('bottom tapped', e)
+    var bottomShowDetail = that.data.bottomShowDetail
+    bottomShowDetail = !bottomShowDetail
+    that.setData({bottomShowDetail: bottomShowDetail})
+    var oriBottomFrameHeight = that.data.bottomFrameHeight
+    
+    var targetBottomFrameHeight = that.data.windowHeight - 100
+    if (!bottomShowDetail){
+      targetBottomFrameHeight = that.data.oriBottomFrameHeight
+    }
+    that.setData({oriBottomFrameHeight: oriBottomFrameHeight, targetBottomFrameHeight: targetBottomFrameHeight})
+    that.resizeBottom()
+  },
+
+  resizeBottom(){
+    var that = this
+    var bottomShowDetail = that.data.bottomShowDetail
+    var bottomFrameHeight = that.data.bottomFrameHeight
+    var target = that.data.targetBottomFrameHeight
+    var stop = false
+    if (bottomShowDetail){
+      bottomFrameHeight+=10
+      if (bottomFrameHeight >= target ){
+        stop = true
+      }
+    }
+    else{
+      bottomFrameHeight-=10
+      if (bottomFrameHeight <= target){
+        stop = true
+      }
+    }
+    that.setData({bottomFrameHeight: bottomFrameHeight})
+    if (!stop){
+      setTimeout(()=>{this.resizeBottom()}, 1)
+    }
+    
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    var that = this
+   
+    var stepIndex = 0
+    if (options.stepIndex != undefined){
+      stepIndex = parseInt(option.stepIndex)
+    }
+    that.setData({id: options.id, stepIndex: stepIndex})
+    app.loginPromiseNew.then(function (resolve){
+      console.log('page resolve', resolve)
+      var windowHeight = 0
+      var windowWidth = 0
+      if (app.globalData.systemInfo.safeArea != null){  
+        windowHeight = app.globalData.systemInfo.safeArea.height  * 0.95
+        windowWidth = app.globalData.systemInfo.safeArea.width
+        console.log('safeArea', windowWidth)
+      }
+      else{
+        windowHeight = app.globalData.systemInfo.windowHeight
+        windowWidth = app.globalData.systemInfo.windowWidth
+        console.log('unsafeArea', windowWidth)
+      }
+      that.setData({windowHeight: windowHeight, windowWidth: windowWidth})
+    })
   },
 
   /**
@@ -26,7 +125,63 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    app.loginPromiseNew.then(function (resolve){
+      console.log('recept on onShow')
+      var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + that.data.id 
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getUrl,
+        method: 'GET',
+        success:(res)=>{
+          console.log('get recept', res)
+          if (res.statusCode != 200){
+            return
+          }
+          var recept = res.data
+          var stepIndex = parseInt(recept.current_step)
+          if (isNaN(stepIndex)){
+            stepIndex = 0
+          }
+          switch(recept.recept_type){
+            case '租赁下单':
+              that.setData({steps: rentStep, stepIndex: stepIndex})
+              break
+            default:
+              break
+          }
+          that.setData({recept: recept})
+          wx.setNavigationBarTitle({
+            title: recept.recept_type + '-' + recept.shop
+          })
+          var getUserUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniAppUser?openId=' + encodeURIComponent(recept.open_id)
+          + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: getUserUrl,
+            method:'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+              that.setData({user: res.data})
+              if (recept.code != ''){
+                var getTicketUrl = 'https://' + app.globalData.domainName + '/core/GetTicket/' + recept.code
+                wx.request({
+                  url: getTicketUrl,
+                  method: 'GET',
+                  success:(res)=>{
+                    if (res.statusCode != 200){
+                      return
+                    }
+                    that.setData({ticketCode: recept.code, ticketName: res.data.name})
+                  }
+                })
+              }
+            }
+          })
+        }
+      })
+    })
   },
 
   /**

@@ -100,7 +100,7 @@ Page({
         if (res.statusCode != 200){
           return
         }
-        wx.redirectTo({ 
+        wx.navigateTo({ 
           url: 'recept?id=' + res.data.id,
         })
       }

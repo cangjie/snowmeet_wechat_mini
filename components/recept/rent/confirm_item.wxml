@@ -47,7 +47,7 @@
         </view>
         <view style="width: 40%;margin-top: 0rpx;margin-left: 0rpx;display: flex;flex-direction: row;" class="op-cell" >
           <view style="margin-left: 20rpx;"> </view>
-          <button style="padding: 0rpx; width:50rpx; height:50rpx" bindtap="scan" >
+          <button style="padding: 0rpx; width:50rpx; height:50rpx" bindtap="scan" size="mini" >
             <image src="../../../images/scan.jpeg" style="width: 50rpx; height: 50rpx;margin-top: -3px; margin-left: -3px;" />
           </button>
           <view style="margin-left: 10rpx;font-size: 10pt;">
@@ -105,9 +105,9 @@
         </view>
       </view>
       <view class="op-cell" style="padding-bottom: 50rpx;display: flex;flex-direction: row;text-align: center;">
-        <button style="width: 200rpx;" bindtap="save" > 确 认 </button>
+        <button style="width: 200rpx;" bindtap="save" size="mini" > 确 认 </button>
         <view style="width: 50rpx;"></view>
-        <button style="width: 200rpx;" disabled="{{currentRentItem.index == -1}}" bindtap="del" > 删 除 </button>
+        <button style="width: 200rpx;" disabled="{{currentRentItem.index == -1}}" bindtap="del" size="mini" > 删 除 </button>
       </view>
     </view>
   </view>

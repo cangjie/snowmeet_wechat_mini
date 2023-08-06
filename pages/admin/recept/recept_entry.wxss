@@ -1,3 +1,6 @@
 /* pages/admin/recept/recept_entry.wxss */
 @import '/app.wxss';
 @import '/common.wxss';
+button{
+  font-size: 12pt;
+}

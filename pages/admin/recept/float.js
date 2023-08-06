@@ -58,8 +58,6 @@ Page({
         console.log('unsafeArea', windowWidth)
       }
       that.setData({windowHeight: windowHeight, windowWidth: windowWidth})
-
-
     })
   },
   onShow(){

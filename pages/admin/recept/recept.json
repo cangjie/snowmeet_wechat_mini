@@ -1,3 +1,5 @@
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "rent-confirm-item" : "/components/recept/rent/confirm_item"
+  }
 }
