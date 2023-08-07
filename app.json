@@ -85,7 +85,8 @@
     "pages/UTV/fill_vehicle_info",
     "pages/admin/recept/recept_entry",
     "pages/admin/recept/recept_member_info",
-    "pages/admin/recept/recept"
+    "pages/admin/recept/recept",
+    "pages/admin/recept/recept_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -5,6 +5,10 @@
     <mp-cell value="登录后台" bindtap="gotoBackground" ></mp-cell>
     <mp-cell value="测试" bindtap="nav" id="test" ></mp-cell>
   </mp-cells> 
+  <mp-cells title="实体店铺接待" >
+    <mp-cell id="recept" bindtap="nav">店铺接待</mp-cell>
+    <mp-cell id="recept_list" bindtap="nav" >未完成的接待</mp-cell>
+  </mp-cells>
   <mp-cells  ext-class="my-cells" title="UTV" >
     <mp-cell id="utv_reserve_list" bindtap="nav">预约列表</mp-cell>
     <mp-cell id="utv_race_list" bindtap="nav" >UTV发车列表</mp-cell>

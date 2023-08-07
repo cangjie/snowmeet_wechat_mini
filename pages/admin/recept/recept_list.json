@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "shop-selector": "/components/shop_selector/shop_selector"
+  },
+  "navigationBarTitleText": "今日未完成的店铺接待"
+}

@@ -1,0 +1,7 @@
+/* pages/admin/recept/recept_list.wxss */
+.left-column{
+  width: 100rpx;
+}
+.right-column{
+  width: 275rpx;
+}

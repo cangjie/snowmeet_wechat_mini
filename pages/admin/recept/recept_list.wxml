@@ -1,0 +1,26 @@
+<view>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <mp-cells title="共{{receptList.length}}条" >
+    <mp-cell wx:for="{{receptList}}" >
+      <view class="view-row" >
+        <view class="left-column"  >日期：</view>
+        <view class="right-column" >{{item.create_date_dateStr}}</view>
+        <view class="left-column" >时间：</view>
+        <view class="right-column" >{{item.create_date_timeStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >{{item.real_name}}</view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >{{item.cell}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >店铺：</view>
+        <view class="right-column" >{{item.shop}}</view>
+        <view class="left-column" >类型：</view>
+        <view class="right-column" >{{item.recept_type}}</view>
+      </view>
+    </mp-cell>
+    
+  </mp-cells>
+</view>

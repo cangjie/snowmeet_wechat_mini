@@ -167,6 +167,12 @@ Page({
       case 'utv_reserve_list':
         path = '/pages/admin/utv/reserve_list'
         break
+      case 'recept':
+        path = '/pages/admin/recept/recept_entry'
+        break
+      case 'recept_list':
+        path = '/pages/admin/recept/recept_list'
+        break
       default:
         break
     }
