@@ -68,10 +68,6 @@
     "pages/admin/rent/rent_pay",
     "pages/admin/rent/rent_list_by_cell",
     "pages/rent/rent_detail",
-    "pages/admin/recept/common/step1",
-    "pages/admin/recept/recept_main",
-    "pages/admin/recept/android_test",
-    "pages/admin/recept/float",
     "pages/admin/utv/depart",
     "pages/admin/utv/arrive",
     "pages/admin/utv/trip_list",
@@ -87,7 +83,6 @@
     "pages/UTV/my_reserve_list",
     "pages/UTV/my_reserve_info",
     "pages/UTV/fill_vehicle_info",
-    "pages/admin/recept/float2",
     "pages/admin/recept/recept_entry",
     "pages/admin/recept/recept_member_info",
     "pages/admin/recept/recept"
