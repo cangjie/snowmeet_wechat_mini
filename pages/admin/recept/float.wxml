@@ -1,17 +1,2 @@
-<view>
-  <view style="background-color: gray;position: fixed;top: 10px; left:10px;width: {{windowWidth - 20}}px;opacity: 0.5;height: {{topFrameHeight}}px;">aaa</view>
-  <view>
-    <view style="height: {{topFrameHeight+50}}px;">
-      <test1 wx:if="{{scene == 1}}" ></test1>
-      <test2 wx:if="{{scene == 2}}" ></test2>
-    </view>
-   
-  </view>
-  <view style="background-color: gray;position: fixed;top: {{windowHeight - bottomFrameHeight - 50}}px; left:10px;width: {{windowWidth - 20}}px;opacity: 0.5;height: {{bottomFrameHeight}}px;">
-    <button size="mini" bindtap="prev" >Prev</button>
-    <button size="mini" bindtap="next" >Next</button>
-    <button size="mini" bindtap="goon" >Goon</button>
-    <button size="mini" bindtap="back" >Back</button>
-    <button size="mini" bindtap="jump" >Jump</button>
-  </view>
-</view>
+<!--pages/admin/recept/float.wxml-->
+<text>pages/admin/recept/float.wxml</text>

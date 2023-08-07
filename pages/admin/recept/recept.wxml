@@ -15,16 +15,18 @@
       <view class="right-column" >{{ ticketCode == ''? '--' : ticketCode }}</view>
     </view>
   </view>
-  <view style="margin-top: {{topFrameHeight+10}}px" >
+  <view style="margin-top: {{topFrameHeight+30}}px" >
     <view>
-      <rent-confirm-item wx:if="{{steps[stepIndex] == 'confirm_item'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-item>
+      <rent-confirm-item wx:if="{{steps[stepIndex].name == 'confirm_item'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-item>
+      <rent-confirm-deposit wx:if="{{steps[stepIndex].name == 'confirm_deposit'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-deposit>
+      <rent-confirm-final wx:if="{{steps[stepIndex].name == 'confirm_final'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-final>
     </view>
     <view style="height: {{bottomFrameHeight+50}}px;" ></view>
   </view>
   <view  style="background-color:{{bottomShowDetail?'white':'gray'}};position: fixed;top: {{windowHeight - bottomFrameHeight - 50}}px; left:10px;width: {{windowWidth - 20}}px;opacity: {{!bottomShowDetail? '0.5': '1'}};height: {{bottomFrameHeight}}px;z-index: 100;">
     <view wx:if="{{!bottomShowDetail}}" style="display: flex; flex-direction: row;" >
       <view style="width: 100rpx;height: {{bottomFrameHeight}}px;margin-top:{{bottomFrameHeight/2-17}}px;"  >
-        <button size="mini" style="font-size: 7pt;padding-top: 10rpx;" >上一步</button>
+        <button id="prev" size="mini" style="font-size: 7pt;padding-top: 10rpx;" disabled="{{!gotoPrev}}" bindtap="saveJump" >上一步</button>
       </view>
       <view style="width: 550rpx;height: {{bottomFrameHeight}}px;" bindtap="changeBottom">
         <view class="view-row" >
@@ -41,7 +43,8 @@
         </view>
       </view>
       <view style="width: 100rpx;height: {{bottomFrameHeight}}px;margin-top:{{bottomFrameHeight/2-17}}px;text-align: right;" >
-        <button size="mini" style="font-size: 7pt;padding-top: 10rpx;" >下一步</button>
+        <button wx:if="{{stepIndex < steps.length - 1}}" id="next" size="mini" style="font-size: 7pt;padding-top: 10rpx;" disabled="{{!gotoNext}}" bindtap="saveJump" >下一步</button>
+        <button wx:else id="next" size="mini" style="font-size: 7pt;padding-top: 10rpx;" disabled="{{!gotoNext}}" bindtap="confirm" >确认</button>
       </view>
     </view>
     <view wx:else bindtap="changeBottom" style="height: {{bottomFrameHeight}}px;" >aaaaa</view>

@@ -1,7 +1,0 @@
-{
-  "usingComponents": {
-    "rent_confirm_item": "/components/recept/rent/confirm_item",
-    "rent_confirm_deposit": "/components/recept/rent/confirm_deposit",
-    "rent_confirm_final": "/components/recept/rent/confirm_final"
-  }
-}

@@ -5,30 +5,15 @@ Page({
    * Page initial data
    */
   data: {
-    topFrameHeight: 60,
-    bottomFrameHeight: 50
-  },
 
-  next(){
-    wx.navigateTo({
-      url: 'step1?step=rent_confirm_deposit',
-    })
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    var winInfo = wx.getWindowInfo()
-    var step = 'rent_confirm_item'
-    if (options.step != undefined){
-      step = options.step
-    }
-    this.setData({windowHeight: winInfo.windowHeight - winInfo.statusBarHeight,
-      step: step})
-    
-  },
 
+  },
 
   /**
    * Lifecycle function--Called when page is initially rendered

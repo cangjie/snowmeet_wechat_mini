@@ -5,19 +5,14 @@ Page({
    * Page initial data
    */
   data: {
-    iCan: false
+
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    //wx.getWindowInfo()
-    wx.getSystemInfoAsync({
-      success:(res)=>{
-        console.log('sys info', res)
-      }
-    })
+
   },
 
   /**

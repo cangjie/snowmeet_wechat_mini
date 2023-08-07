@@ -112,8 +112,8 @@
         },
         {
           "name": "",
-          "pathName": "pages/admin/recept/common/step1",
-          "query": "",
+          "pathName": "pages/admin/recept/recept",
+          "query": "id=198",
           "launchMode": "default",
           "scene": null
         }

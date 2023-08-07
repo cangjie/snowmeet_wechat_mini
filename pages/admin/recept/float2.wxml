@@ -1,8 +1,2 @@
-<view>
-  
-  <test1></test1>
-
-   
-  
-  <button size="mini" bindtap="back" >Back</button>
-</view>
+<!--pages/admin/recept/float2.wxml-->
+<text>pages/admin/recept/float2.wxml</text>

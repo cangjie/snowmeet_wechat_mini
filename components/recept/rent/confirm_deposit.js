@@ -33,6 +33,12 @@ Component({
     creditImages: '',
     totalPayStr: '¥0.00'
   },
+  pageLifetimes:{
+    show(){
+      var that = this
+      this.lifetimes.ready()
+    }
+  },
   lifetimes:{
     ready(){
       var that = this
@@ -120,17 +126,60 @@ Component({
         
       }
     },
+    setDepositReduceTicket(e){
+      var that = this
+      var value = parseFloat(e.detail.value)
+      if (!isNaN(value)){
+        
+        var recept = that.data.recept
+        var rentOrder = recept.rentOrder
+        rentOrder.deposit_reduce_ticket= value
+        that.setData({recept: recept})
+        that.checkValid()
+        
+      }
+    },
+    setPayOption(e){
+      var that = this
+      
+      that.setData({payOption: e.detail.value})
+      if (that.data.recept != undefined && that.data.recept != null
+        && that.data.recept.rentOrder != undefined && that.data.recept.rentOrder != null){
+          that.checkValid()
+      }
+    },
+    setDueEndTime(e){
+      
+      var days = parseInt(e.detail.value)
+      var that = this
+      var recept = that.data.recept
+      var rentOrder = recept.rentOrder
+      var startDate = new Date(rentOrder.start_date)
+      var endDate = new Date(rentOrder.due_end_date)
+      if (startDate.getFullYear() < 2000){
+        startDate = new Date()
+        endDate = new Date()
+       
+      }
+      else{
+        startDate = new Date(rentOrder.start_date)
+        endDate = new Date(rentOrder.due_end_date)
+
+      }
+      endDate.setDate(endDate.getDate() + days - 1)
+      rentOrder.start_date = util.formatDate(startDate)
+      rentOrder.due_end_date = util.formatDate(endDate)
+      that.setData({rentDays: days, recept: recept})
+      that.checkValid()
+    },
     checkValid(){
       var that = this
       var recept = that.data.recept
       var rentOrder = recept.rentOrder
-      if (rentOrder.deposit_real != 0){
-        var totalPay = rentOrder.deposit_real - rentOrder.deposit_reduce
-        rentOrder.deposit_final = totalPay
-        that.setData({totalPayStr: util.showAmount(totalPay)})
-        that.triggerEvent('CheckValid', {Goon: true, recept: recept})
-
-      }
+      var totalPay = rentOrder.deposit - rentOrder.deposit_reduce - rentOrder.deposit_reduce_ticket
+      rentOrder.deposit_final = totalPay
+      that.setData({totalPayStr: util.showAmount(totalPay)})
+      that.triggerEvent('CheckValid', {Goon: true, recept: recept})
     }
   }
 })

@@ -1,23 +1,2 @@
-<view style="height: {{topFrameHeight}}px; background-color: #c0c0c0">
-  <view style="display: flex; flex-direction: row;">
-    <view class="left-column" >称呼：</view>
-    <view class="right-column" >张先生</view>
-    <view class="left-column" >手机：</view>
-    <view class="right-column" >13501177897</view>
-  </view>
-  <view style="display: flex; flex-direction: row;">
-    <view class="left-column" >现有龙珠：</view>
-    <view class="right-column" >123</view>
-    <view class="left-column" >总共获得：</view>
-    <view class="right-column" >12300</view>
-  </view>
-</view>
-<scroll-view style="height:{{windowHeight - topFrameHeight - bottomFrameHeight}}px" scroll-x="false" scroll-y="true">
-  <rent_confirm_item wx:if="{{step == 'rent_confirm_item'}}" ></rent_confirm_item>
-  <rent_confirm_deposit wx:if="{{step == 'rent_confirm_deposit'}}" ></rent_confirm_deposit>
-</scroll-view>
-<view style="height: {{bottomFrameHeight}}px;display: flex; flex-direction: row;text-align: center;">
-  <button> 上 一 步 </button>
-  <view style="width: 200px;"></view>
-  <button bindtap="next"> 下 一 步 </button>
-</view>
+<!--pages/admin/recept/common/step1.wxml-->
+<text>pages/admin/recept/common/step1.wxml</text>

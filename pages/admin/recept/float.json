@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "test1": "/components/refresh_test/test1",
-    "test2": "/components/refresh_test/test2"
-  }
-}

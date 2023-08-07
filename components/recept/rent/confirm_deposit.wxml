@@ -1,41 +1,20 @@
 <view>
-  <scroll-view class="scroll-view_H" scroll-x="true" bindscroll="scroll" style="width: 100%">
-    <view  class="scroll-view-item_H"   >
-      <view style="display: flex;flex-direction: row;" >
-        <view style="width: 100rpx;" class="item-list" ><b>类别</b></view>
-        <view style="width: 175rpx;" class="item-list" ><b>编码</b></view>
-        <view style="width: 325rpx;" class="item-list" ><b>名称</b></view>
-        <view style="width: 150rpx;" class="item-list" ><b>租赁形式</b></view>
-      </view>
-      <block wx:for="{{rentItemList}}" id="{{index}}"  >
-        <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
-        <view style="display: flex;flex-direction: row;height: 60rpx;" id="{{index}}" >
-          <view style="width: 100rpx;" class="item-list" >{{item.class}}</view>
-          <view style="width: 175rpx;" class="item-list" >{{item.code}}</view>
-          <view style="width: 325rpx;" class="item-list" >{{item.name}}</view>
-          <view style="width: 150rpx;" class="item-list" >{{item.depositType}}</view>
+  <mp-cells title="支付信息确认" >
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >归还时间：</view>
+        <view class="right-column" wx:if="{{shop == '南山'}}" style="display: flex;flex-direction: row;" >
+          <radio-group>
+            <radio>日场结束</radio>
+            <radio>夜场结束</radio>
+          </radio-group>
         </view>
-      </block>
-    </view>
-    <view  class="scroll-view-item_H"   >
-      <view style="display: flex;flex-direction: row;" >
-        <view style="width: 200rpx;" class="item-list" ><b>起租日</b></view>
-        <view style="width: 125rpx;" class="item-list" ><b>租金</b></view>
-        <view style="width: 125rpx;" class="item-list" ><b>押金</b></view>
-        <view style="width: 300rpx;" class="item-list" ><b>备注</b></view>
-      </view>
-      <block wx:for="{{rentItemList}}" id="{{index}}" bindtap="selectItem"  id="{{index}}" >
-        <view style="background-color: #e0e0e0;height: 1rpx;" ></view>
-        <view style="display: flex;flex-direction: row;height: 60rpx;" id="{{index}}" >
-          <view style="width: 200rpx;" class="item-list" >{{item.startDate}}</view>
-          <view style="width: 125rpx;" class="item-list" >{{item.rentalStr}}</view>
-          <view style="width: 125rpx;" class="item-list" >{{item.depositStr}}</view>
-          <view style="width: 300rpx;" class="item-list" >{{item.memo}}</view>
+        <view class="right-column" wx:else style="display: flex;flex-direction: row;" >
+          <slider style="width: 300rpx;" min="0" max="10" step="1" value="{{rentDays}}" show-value="{{true}}" bindchange="setDueEndTime" ></slider>
+          <view style="height: 10rpx;margin-top: 15rpx;">天</view>
         </view>
-      </block>
-    </view>
-  </scroll-view>
-  <mp-cells title="确定订单" >
+      </view>
+    </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >押金合计：</view>
@@ -72,22 +51,35 @@
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
-        <view class="left-column" >实收押金：</view>
-        <view class="right-column" ><input placeholder="{{totalDepositReal}}" bindinput="setTotalDepositReal" class="input" style="width: 200rpx;" placeholder="{{recept.rentOrder.deposit_real==0? '必填': recept.rentOrder.deposit_real}}" /></view>
-      </view>
-    </mp-cell>
-    
-    <mp-cell>
-      <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >押金减免：</view>
         <view class="right-column" ><input placeholder="{{depositReduce}}" bindinput="setDepositReduce" class="input" style="width: 200rpx;" placeholder="{{recept.rentOrder.deposit_reduce==0? '非必填，默认为0': recept.rentOrder.deposit_reduce}}" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" >优惠券减免：</view>
+        <view class="right-column" ><input  bindinput="setDepositReduceTicket" class="input" style="width: 200rpx;" placeholder="{{recept.rentOrder.deposit_reduce_ticket==0? '非必填，默认为0': recept.rentOrder.deposit_reduce_tiket}}" /></view>
+      </view>
+    </mp-cell>
+
+    <mp-cell>
+      <view style="display: flex;flex-direction: row;" >
         <view class="left-column" >支付金额：</view>
         <view class="right-column" >{{totalPayStr}}</view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >结算方式：</view>
+        <view class="right-column" >
+          <radio-group bindchange="setPayOption">
+            <radio checked="{{payOption == '现场支付'}}" value="现场支付" >现场支付</radio>
+            <radio checked="{{payOption == '次卡支付'}}" value="次卡支付" >次卡支付</radio>
+            <radio checked="{{payOption == '招待'}}" value="招待" >招待</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
   </mp-cells>
 </view>
+<view style="height: 200rpx;" ></view>

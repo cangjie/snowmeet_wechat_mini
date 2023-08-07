@@ -7,9 +7,7 @@ Page({
   data: {
 
   },
-  back(){
-    wx.navigateBack()
-  },
+
   /**
    * Lifecycle function--Called when page load
    */

@@ -4,7 +4,7 @@ const topFrameHeightMax = 360
 const topFrameHeightMin = 60
 const bottomFrameHeightMax = 360
 const bottomFrameHeightMin = 60
-const rentStep = ['confirm_item', 'confirm_deposit', 'confirm_final']
+const rentStep = [{name:'confirm_item', title:'选择租赁物品'}, {name: 'confirm_deposit', title:'确认支付押金'}]
 Page({
 
   /**
@@ -16,6 +16,8 @@ Page({
     ticketCode: '',
     ticketName: '',
     bottomShowDetail: false,
+    gotoNext: false,
+    gotoPrev:false
   },
   getInnerData(e){
     console.log('get data', e)
@@ -26,8 +28,8 @@ Page({
         if (!e.detail.Goon){
           return
         }
-        if (e.recept.rentOrder!=null){
-          var rentOrder = e.recept.rentOrder
+        if (e.detail.recept.rentOrder!=null){
+          var rentOrder = e.detail.recept.rentOrder
           if (rentOrder.details != null){
             var deposit = 0
             for(var i = 0; i < rentOrder.details.length; i++){
@@ -41,7 +43,7 @@ Page({
       default:
         break
     }
-    that.setData({recept: recept})
+    that.setData({recept: recept, gotoNext: e.detail.Goon})
   },
 
   changeBottom(e){
@@ -83,6 +85,40 @@ Page({
       setTimeout(()=>{this.resizeBottom()}, 1)
     }
     
+  },
+
+  saveJump(e){
+    var id = e.currentTarget.id
+    var that = this
+    var recept = that.data.recept
+    switch(id){
+      case 'prev':
+        recept.current_step--
+        break
+      case 'next':
+        recept.current_step++
+        break
+      default:
+        break
+    }
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateRecept/' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method:'POST',
+      data: recept,
+      success:(res)=>{
+        console.log('recept update', res)
+        if (res.statusCode != 200){
+          return
+        }
+        wx.navigateTo({
+          url: 'recept?id=' + recept.id
+        })
+      }
+    })
+  },
+  confirm(){
+
   },
 
   /**
@@ -150,9 +186,10 @@ Page({
             default:
               break
           }
-          that.setData({recept: recept})
+          recept.deposit_real = recept.deposit
+          that.setData({recept: recept, gotoPrev: stepIndex > 0})
           wx.setNavigationBarTitle({
-            title: recept.recept_type + '-' + recept.shop
+            title: recept.shop + '-' + recept.recept_type + '-' + that.data.steps[that.data.stepIndex].title
           })
           var getUserUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniAppUser?openId=' + encodeURIComponent(recept.open_id)
           + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
