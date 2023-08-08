@@ -9,6 +9,12 @@ Page({
   data: {
     shop: ''
   },
+  gotoDetail(e){
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'recept?id=' + id,
+    })
+  },
   shopSelected(e){
     console.log('shop selected', e)
     var that = this

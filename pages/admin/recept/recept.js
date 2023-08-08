@@ -118,6 +118,25 @@ Page({
     })
   },
   confirm(){
+    var that = this
+    var recept = that.data.recept
+    var updateUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateRecept/' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: updateUrl,
+      method:'POST',
+      data: recept,
+      success:(res)=>{
+        console.log('recept update', res)
+        if (res.statusCode != 200){
+          wx.showToast({
+            title: '系统出错',
+            icon: 'error'
+          })
+          return
+        }
+        
+      }
+    })
 
   },
 

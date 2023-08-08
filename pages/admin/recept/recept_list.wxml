@@ -1,7 +1,7 @@
 <view>
   <shop-selector bindShopSelected="shopSelected" ></shop-selector>
   <mp-cells title="共{{receptList.length}}条" >
-    <mp-cell wx:for="{{receptList}}" >
+    <mp-cell id="{{item.id}}" wx:for="{{receptList}}" bindtap="gotoDetail" >
       <view class="view-row" >
         <view class="left-column"  >日期：</view>
         <view class="right-column" >{{item.create_date_dateStr}}</view>

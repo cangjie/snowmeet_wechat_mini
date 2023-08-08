@@ -141,8 +141,9 @@ Component({
     },
     setPayOption(e){
       var that = this
-      
-      that.setData({payOption: e.detail.value})
+      var recept = that.data.recept
+      recept.rentOrder.pay_option = e.detail.value
+      that.setData({recept: recept})
       if (that.data.recept != undefined && that.data.recept != null
         && that.data.recept.rentOrder != undefined && that.data.recept.rentOrder != null){
           that.checkValid()
@@ -179,7 +180,13 @@ Component({
       var totalPay = rentOrder.deposit - rentOrder.deposit_reduce - rentOrder.deposit_reduce_ticket
       rentOrder.deposit_final = totalPay
       that.setData({totalPayStr: util.showAmount(totalPay)})
-      that.triggerEvent('CheckValid', {Goon: true, recept: recept})
+      var goon = true
+      if (recept.rentOrder.pay_option == undefined 
+        || recept.rentOrder.pay_option == null 
+        || recept.rentOrder.pay_option == ''){
+          goon = false
+        }
+      that.triggerEvent('CheckValid', {Goon: goon, recept: recept})
     }
   }
 })

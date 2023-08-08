@@ -73,9 +73,9 @@
         <view class="left-column" >结算方式：</view>
         <view class="right-column" >
           <radio-group bindchange="setPayOption">
-            <radio checked="{{payOption == '现场支付'}}" value="现场支付" >现场支付</radio>
-            <radio checked="{{payOption == '次卡支付'}}" value="次卡支付" >次卡支付</radio>
-            <radio checked="{{payOption == '招待'}}" value="招待" >招待</radio>
+            <radio checked="{{recept.rentOrder.pay_option == '现场支付'}}" value="现场支付" >现场支付</radio>
+            <radio checked="{{recept.rentOrder.pay_option == '次卡支付'}}" value="次卡支付" >次卡支付</radio>
+            <radio checked="{{recept.rentOrder.pay_option == '招待'}}" value="招待" >招待</radio>
           </radio-group>
         </view>
       </view>
