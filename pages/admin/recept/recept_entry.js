@@ -82,6 +82,14 @@ Page({
       }
     })
   },
+  goDirectly(){
+    var that = this
+    var interval = that.data.interVal
+    clearInterval(interval)
+    wx.navigateTo({
+      url: 'select_shop_business',
+    })
+  },
 
   /**
    * Lifecycle function--Called when page is initially rendered

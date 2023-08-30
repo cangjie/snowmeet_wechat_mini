@@ -1,0 +1,14 @@
+<view>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <mp-cells title="选择业务" >
+    <mp-cell style="text-align: center;">
+      <view style="display: flex;flex-direction: row;" >
+        <button size="mini" disabled="{{shop == ''}}" bindtap="gotoFlow" id="sale" > 店 销 现 货 </button>
+        <view style="width: 20rpx;"></view>
+        <button size="mini" disabled="{{ shop == '' || openId == '' }}" bindtap="gotoFlow" id="maintain"  > 养 护 </button>
+        <view style="width: 20rpx;"></view>
+        <button size="mini" disabled="{{ shop == '' || openId == '' }}" bindtap="gotoFlow" id="rent" > 租 赁 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

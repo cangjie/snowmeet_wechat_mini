@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "shop-selector": "/components/shop_selector/shop_selector"
+  },
+  "navigationBarTitleText": "散客或招待等无需身份识别进入业务流程"
+}

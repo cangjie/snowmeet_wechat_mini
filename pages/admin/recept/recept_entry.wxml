@@ -23,6 +23,6 @@
     <mp-cell style="text-align: center;"><button disabled="true" >Still to come.</button> </mp-cell>
   </mp-cells-->
   <mp-cells title="散客" >
-    <mp-cell><button bindtap="gotoShopSaleDirectly" > 直 接 进 入 </button></mp-cell>
+    <mp-cell><button bindtap="goDirectly" > 直 接 进 入 </button></mp-cell>
   </mp-cells>
 </view>
