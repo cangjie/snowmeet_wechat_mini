@@ -1,0 +1,33 @@
+<mp-cells >
+    <mp-cell>
+        <view class="view-row" >
+            <view class="left-column" >编码：</view>
+            <view class="right-column" ></view>
+            <view class="left-column" >名称：</view>
+            <view class="right-column" ></view>
+        </view>
+        <view class="view-row" >
+            <view class="left-column" >类别：</view>
+            <view class="right-column" ></view>
+            <view class="left-column" >起租日：</view>
+            <view class="right-column" ></view>
+        </view>
+        <view class="view-row" >
+            <view class="left-column" >租赁类型：</view>
+            <view class="right-column" ></view>
+            <view class="left-column" ></view>
+            <view class="right-column" ></view>
+        </view>
+        <view class="view-row" >
+            <view class="left-column" >租金：</view>
+            <view class="right-column" ></view>
+            <view class="left-column" >押金：</view>
+            <view class="right-column" ></view>
+        </view>
+        <view class="view-row" >
+            <view class="left-column" >备注：</view>
+            <view class="right-column" ></view>
+            
+        </view>
+    </mp-cell>
+</mp-cells>

@@ -87,7 +87,8 @@
     "pages/admin/recept/recept_member_info",
     "pages/admin/recept/recept",
     "pages/admin/recept/recept_list",
-    "pages/admin/recept/select_shop_business"
+    "pages/admin/recept/select_shop_business",
+    "pages/admin/recept/recept_summary"
   ],
   "window": {
     "backgroundTextStyle": "light",

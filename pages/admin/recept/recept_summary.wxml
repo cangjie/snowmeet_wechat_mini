@@ -1,0 +1,14 @@
+<view>
+    <mp-cells title="用户信息" >
+        <mp-cell>
+            <view wx:if="{{recept.open_id == ''}}" style="text-align: center;" >
+                <view style="text-align: center;">匿名用户，若注册请扫描下面二维码。</view>
+                <view style="margin-top: 10rpx;text-align: center;" ></view>
+            </view>
+            <view wx:else >
+                <user-info open_id="{{openId}}" bindUserInfoUpdate="userInfoUpdate" ></user-info>
+            </view>
+        </mp-cell>
+    </mp-cells>
+    <rent-summary></rent-summary>
+</view>

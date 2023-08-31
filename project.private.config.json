@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "",
+          "pathName": "pages/admin/recept/recept_summary",
+          "query": "id=211",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "index",
           "pathName": "pages/index/index",
           "query": "",
@@ -107,13 +114,6 @@
           "name": "UTV Reserve list",
           "pathName": "pages/UTV/my_reserve_list",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "",
-          "pathName": "pages/admin/recept/recept",
-          "query": "id=198",
           "launchMode": "default",
           "scene": null
         }

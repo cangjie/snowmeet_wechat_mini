@@ -134,7 +134,22 @@ Page({
           })
           return
         }
-        
+        var id = res.data.id
+        var placeOrderUrl = 'https://' + app.globalData.domainName + '/core/Recept/PlaceOrder/' + id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: placeOrderUrl,
+          method: 'GET',
+          success:(res)=>{
+              if (res.statusCode != 200){
+                wx.showToast({
+                    title: '系统出错',
+                    icon: 'error'
+                  })
+                  return
+              }
+              
+          }
+        })
       }
     })
 
