@@ -3,12 +3,25 @@
         <mp-cell>
             <view wx:if="{{recept.open_id == ''}}" style="text-align: center;" >
                 <view style="text-align: center;">匿名用户，若注册请扫描下面二维码。</view>
-                <view style="margin-top: 10rpx;text-align: center;" ></view>
+                <view style="margin-top: 10rpx;text-align: center;" >
+                  <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>
+                </view>
             </view>
             <view wx:else >
-                <user-info open_id="{{openId}}" bindUserInfoUpdate="userInfoUpdate" ></user-info>
+                <user-info wx:if="{{recept != undefined}}" open_id="{{recept.open_id}}" bindUserInfoUpdate="userInfoUpdate" ></user-info>
             </view>
         </mp-cell>
     </mp-cells>
     <rent-summary wx:if="{{recept != undefined}}" rentId="{{recept.submit_return_id}}" ></rent-summary>
+    <view wx:if="{{needPay && !zeroPay}}" >
+      <pay-method></pay-method>
+    </view>
+    <view wx:else >
+      <view wx:if="{{!needPay}}" style="margin-top: 50rpx; text-align: center;" >
+        招待订单，无需支付。
+      </view>
+      <view wx:else style="margin-top: 50rpx; text-align: center;" >
+        0元订单，无需支付。
+      </view>
+    </view>
 </view>

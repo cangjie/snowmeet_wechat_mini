@@ -3,6 +3,7 @@
     "user-info": "/components/user_info/user_info",
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
-    "rent-summary" : "/components/recept/rent/rent_summary"
+    "rent-summary" : "/components/recept/rent/rent_summary",
+    "pay-method": "/components/pay_method/pay_method"
   }
 }
