@@ -1,33 +1,59 @@
-<mp-cells >
-    <mp-cell>
+<mp-cells title="租赁明细" >
+    <mp-cell wx:for="{{rentOrder.details}}">
         <view class="view-row" >
             <view class="left-column" >编码：</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.rent_item_code}}</view>
             <view class="left-column" >名称：</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.rent_item_name}}</view>
         </view>
         <view class="view-row" >
             <view class="left-column" >类别：</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.rent_item_class}}</view>
             <view class="left-column" >起租日：</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.start_date_str}}</view>
         </view>
         <view class="view-row" >
             <view class="left-column" >租赁类型：</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.deposit_type}}</view>
             <view class="left-column" ></view>
             <view class="right-column" ></view>
         </view>
         <view class="view-row" >
             <view class="left-column" >租金：</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.unit_rental_str}}</view>
             <view class="left-column" >押金：</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.deposit_str}}</view>
         </view>
         <view class="view-row" >
             <view class="left-column" >备注：</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.memo}}</view>
             
         </view>
     </mp-cell>
+</mp-cells>
+<mp-cells title="支付押金">
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >押金总计：</view>
+      <view class="right-column" style="width: 200rpx;text-align: right;" >{{rentOrder.deposit_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >优惠券减免：</view>
+      <view class="right-column" style="width: 200rpx;text-align: right;" >{{rentOrder.deposit_reduce_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >其他减免：</view>
+      <view class="right-column" style="width: 200rpx;text-align: right;" >{{rentOrder.deposit_reduce_ticket_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >实际应付：</view>
+      <view class="right-column" style="width: 200rpx;text-align: right;" >{{rentOrder.deposit_final_str}}</view>
+    </view>
+  </mp-cell>
 </mp-cells>

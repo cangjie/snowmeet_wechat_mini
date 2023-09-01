@@ -10,5 +10,5 @@
             </view>
         </mp-cell>
     </mp-cells>
-    <rent-summary></rent-summary>
+    <rent-summary wx:if="{{recept != undefined}}" rentId="{{recept.submit_return_id}}" ></rent-summary>
 </view>
