@@ -62,7 +62,7 @@ Page({
    */
   onShow() {
     var that = this
-    app.loginPromistNew.then(function (resolve){
+    app.loginPromiseNew.then(function (resolve){
       //that.getData()
     })
   },

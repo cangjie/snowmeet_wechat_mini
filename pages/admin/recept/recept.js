@@ -5,6 +5,7 @@ const topFrameHeightMin = 60
 const bottomFrameHeightMax = 360
 const bottomFrameHeightMin = 60
 const rentStep = [{name:'confirm_item', title:'选择租赁物品'}, {name: 'confirm_deposit', title:'确认支付押金'}]
+const maintainStep = [{name: 'maintain_log', title:'养护记录'}, {name: 'maintain_item', title:'添加装备并拍照'}, {name: 'maintain_charge', title:'添加装备并拍照'}]
 Page({
 
   /**
@@ -216,8 +217,11 @@ Page({
           }
           switch(recept.recept_type){
             case '租赁下单':
-              that.setData({steps: rentStep, stepIndex: stepIndex})
-              break
+                that.setData({steps: rentStep, stepIndex: stepIndex})
+                break
+            case '养护下单':
+                that.setData({steps: maintainStep, stepIndex: stepIndex})
+                break
             default:
               break
           }

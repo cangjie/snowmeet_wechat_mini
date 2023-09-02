@@ -22,7 +22,7 @@
     <view>
       <rent-confirm-item wx:if="{{steps[stepIndex].name == 'confirm_item'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-item>
       <rent-confirm-deposit wx:if="{{steps[stepIndex].name == 'confirm_deposit'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-deposit>
-      <rent-confirm-final wx:if="{{steps[stepIndex].name == 'confirm_final'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-final>
+      
     </view>
     <view style="height: {{bottomFrameHeight+50}}px;" ></view>
   </view>
