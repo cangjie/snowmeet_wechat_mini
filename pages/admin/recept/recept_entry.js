@@ -9,6 +9,34 @@ Page({
 
   },
 
+  searchUser(){
+    var that = this
+    var cell = that.data.cell
+    var getUserUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetUserByCell/' + cell + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUserUrl,
+      method: 'GET',
+      success:(res)=>{
+          if (res.statusCode != 200){
+              return
+          }
+          var openId = res.data.open_id
+          var interval = that.data.interVal
+          clearInterval(interval)
+          wx.navigateTo({
+            url: 'recept_member_info?openId=' + openId,
+          })
+      }
+    })
+  },
+
+  cellChanged(e){
+    console.log('cell changed', e)
+    var that = this
+    var cell = e.detail.value
+    that.setData({cell: cell})
+  },
+
   /**
    * Lifecycle function--Called when page load
    */

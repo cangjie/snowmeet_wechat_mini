@@ -14,7 +14,11 @@
     </mp-cells>
     <rent-summary wx:if="{{recept != undefined}}" rentId="{{recept.submit_return_id}}" ></rent-summary>
     <view wx:if="{{needPay && !zeroPay}}" >
-      <pay-method></pay-method>
+      <pay-method bindPayMethodSelected="setPayMethod" ></pay-method>
+      <view style="margin-top: 20rpx; margin-bottom: 50rpx; text-align: center;">
+        <image wx:if="{{payQrCode != undefined && payQrCode != ''}}" style="width: 300rpx;height: 300rpx;" src="{{payQrCode}}" ></image>
+        <button wx:else bindtap="setPaid" > 点 击 确 认 收 款 </button>
+      </view>
     </view>
     <view wx:else >
       <view wx:if="{{!needPay}}" style="margin-top: 50rpx; text-align: center;" >
@@ -25,3 +29,4 @@
       </view>
     </view>
 </view>
+<view style="height: 50rpx;"></view>

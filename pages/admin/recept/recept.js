@@ -147,12 +147,13 @@ Page({
                   })
                   return
               }
-              
+              wx.navigateTo({
+                url: 'recept_summary?id=' + res.data.id,
+              })
           }
         })
       }
     })
-
   },
 
   /**

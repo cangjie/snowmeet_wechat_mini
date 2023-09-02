@@ -5,5 +5,6 @@
     "mp-cell": "weui-miniprogram/cell/cell",
     "rent-summary" : "/components/recept/rent/rent_summary",
     "pay-method": "/components/pay_method/pay_method"
-  }
+  },
+  "navigationBarTitleText": "支付确认"
 }
