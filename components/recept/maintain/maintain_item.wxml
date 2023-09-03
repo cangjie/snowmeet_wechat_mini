@@ -1,2 +1,194 @@
-<!--components/recept/maintain/maintain_item.wxml-->
-<text>components/recept/maintain/maintain_item.wxml</text>
+<view>
+    <scroll-view class="scroll-view_H" scroll-x="true" bindscroll="scroll" style="width: 100%">
+        <view  class="scroll-view-item_H"   >
+            <view class="view-row" >
+                <view>
+                    <image style="height: 100rpx; width: 100rpx; border-style: solid;border-width: 1rpx;"  ></image>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;" >品牌：Capita</view>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                </view>
+            </view>
+            <view style="background-color: gray;height: 1rpx;margin-bottom: 5rpx;"></view>
+            <view class="view-row" >
+                <view>
+                    <image style="height: 100rpx; width: 100rpx; border-style: solid;border-width: 1rpx;"  ></image>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;" >品牌：Capita</view>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                </view>
+                <view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                </view>
+            </view>
+            <view style="background-color: gray;height: 1rpx;"></view>
+        </view>
+        
+    </scroll-view>
+    <mp-cells>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 100rpx;text-align: right;font-size: 10pt;">类型：</view>
+          <view style="width: 250rpx;">
+            <radio-group id="type_{{index}}" style="display: flex; flex-direction: row;" bindchange="itemTypeChanged" >
+              <radio checked="{{item.confirmed_equip_type == '双板'}}" value="双板" style="font-size: 10pt;" >双板</radio>
+              <radio checked="{{item.confirmed_equip_type == '单板'}}" value="单板" style="font-size: 10pt;" >单板</radio>
+            </radio-group>
+          </view>
+          <view style="width: 100rpx;text-align: right;font-size: 10pt;">品牌：</view>
+          <view style="width: 250rpx;">
+            <picker id="brand_{{index}}" wx:if="{{item.confirmed_equip_type=='单板'}}" mode="selector" range="{{boardBrands}}" bindchange="itemBrandChanged"  >
+              <picker-view style="font-size: 10pt;" >{{((item.confirmed_brand == '' || item.confirmed_brand == undefined)?'请选择...':item.confirmed_brand)}}</picker-view>
+            </picker>
+            <picker id="brand_{{index}}" wx:if="{{item.confirmed_equip_type=='双板'}}" mode="selector" range="{{skiBrands}}" bindchange="itemBrandChanged" >
+              <picker-view style="font-size: 10pt;" >{{((item.confirmed_brand == ''||item.confirmed_brand == undefined)?'请选择...':item.confirmed_brand)}}</picker-view>
+            </picker>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">长度：</view>
+          <view style="width: 175rpx;font-size: 10pt;"><input id="scale_{{index}}" placeholder="填写长度" value="{{item.scale}}" bindinput="changed" /></view>
+          <block wx:if="{{item.confirmed_equip_type=='单板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">前脚：</view>
+            <view style="width: 175rpx;font-size: 10pt;">
+              <radio-group id="front_{{index}}" bindchange="changed" >
+                <radio style="font-size: 10pt;" checked="{{item.front=='左'}}" value="左" >左</radio>
+                <radio style="font-size: 10pt;" checked="{{item.front=='右'}}" value="右" >右</radio>
+              </radio-group>
+            </view>
+          </block>
+          <block wx:if="{{item.confirmed_equip_type=='双板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">鞋长：</view>
+            <view style="width: 175rpx;font-size: 10pt;"><input id="footLength_{{index}}" placeholder="鞋长" value="{{item.footLength}}" bindinput="changed" /></view>
+          </block>  
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">身高：</view>
+          <view style="width: 175rpx;font-size: 10pt;"><input id="height_{{index}}" placeholder="填写身高" value="{{item.height}}" bindinput="changed" /></view>
+          <block wx:if="{{item.confirmed_equip_type == '单板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">间距：</view>
+            <view style="width: 175rpx;font-size: 10pt;"><input id="binderGap_{{index}}" bindinput="changed" value="{{item.binderGap}}" /></view>
+          </block>
+          <block wx:if="{{item.confirmed_equip_type == '双板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">体重：</view>
+            <view style="width: 175rpx;font-size: 10pt;"><input id="weight_{{index}}" placeholder="填写体重" value="{{item.weight}}" bindinput="changed" value="{{item.weight}}" /></view>
+          </block> 
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <block wx:if="{{item.confirmed_equip_type == '单板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">角度：</view>
+            <view style="width: 175rpx;font-size: 10pt;display: flex;flex-direction: row;"  >
+              左<input id="binderAngleLeft_{{index}}" style="width: 100rpx;" placeholder="填写" value="{{item.leftAngle}}" bindinput="changed" />
+              右<input id="binderAngleRight_{{index}}" style="width: 100rpx;" placeholder="填写" value="{{item.rightAngle}}" bindinput="changed" />
+            </view>
+          </block>
+          <block wx:if="{{item.confirmed_equip_type == '双板'}}" >
+            <view style="width: 175rpx;text-align: right;font-size: 10pt;">DIN：</view>
+            <view style="width: 175rpx;font-size: 10pt;display: flex; flex-direction: row;" >
+              前：<input id="dinFront_{{index}}" style="width: 50rpx;" placeholder="3" value="{{item.dinFront}}" bindinput="changed" /> 后：<input id="dinRear_{{index}}" style="width: 50rpx;" placeholder="4" value="{{item.dinRear}}" bindinput="changed" />
+            </view>
+          </block>
+          
+          <view style="width: 175rpx;text-align: right;font-size: 10pt;">关系：</view>
+          <view style="width: 175rpx;font-size: 10pt;">
+            <picker id="relation_{{index}}" mode="selector" range="{{relationItems}}" bindchange="changed" >
+              <picker-view>{{((item.relation=='' || item.relation == undefined)?relationItems[0]:item.relation)}}</picker-view>
+            </picker>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <multi-uploader id="uploader_{{index}}" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="changed" uploaded_files="{{photoFiles}}" ></multi-uploader>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" style="width:15%"  >项目：</view>
+          <view class="right-column" style="width: 85%; display: flex;flex-direction: row;" >
+            <checkbox-group id="item_{{index}}" bindchange="changed" >
+              <checkbox value='打蜡' >打蜡 </checkbox>
+              <checkbox value='修刃' >修刃 </checkbox>
+            </checkbox-group>
+            <input id="degree_{{index}}" placeholder="89" style="width: 100rpx;" bindinput="changed" value="{{item.degree}}" />度
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" style="width:15%"  >加急：</view>
+          <view>
+            <checkbox-group id="urgent_{{index}}" bindchange="changed" >
+              <checkbox style="font-size: 10pt;" value="1"  checked="{{item.urgent=='1'}}" >加急</checkbox>
+            </checkbox-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" style="width:15%"  >杂项：</view>
+          <view class="right-column" style="width: 85%; display: flex;flex-direction: row;" >
+            <checkbox-group id="others_{{index}}" bindchange="changed">
+              <checkbox  value="补板底"  >补板底</checkbox>
+              <checkbox  value="修底刃" >修底刃</checkbox>
+              <checkbox value="粘板面"  >粘板面</checkbox>
+              <checkbox value="雪杖等附件寄存" >雪杖等附件寄存</checkbox>
+              <checkbox value="其它"  >其它...</checkbox>
+            </checkbox-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" style="width:15%"  >备注：</view>
+          <view class="right-column" style="width: 85%; display: flex;flex-direction: row;" >
+            <input id="memo_{{index}}" style="width: 85%;" bindinput="changed" />
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column"  >额外费用：</view>
+          <view class="right-column"  style="display: flex;flex-direction: row;"  >
+            ¥<input  id="othersCharge_{{index}}" style="width: 100rpx;" bindinput="changed" />
+          </view>
+        </view>
+      </mp-cell>
+    
+    </mp-cells>
+</view>

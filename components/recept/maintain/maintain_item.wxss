@@ -1,1 +1,12 @@
 /* components/recept/maintain/maintain_item.wxss */
+@import '/app.wxss';
+@import '/common.wxss';
+@import '/weui.wxss';
+
+.scroll-view_H{
+    white-space: nowrap;
+}
+.scroll-view-item_H{
+    display: inline-block;
+    width: 100%;
+}

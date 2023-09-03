@@ -1,2 +1,25 @@
-<!--components/recept/maintain/maintain_log.wxml-->
-<text>components/recept/maintain/maintain_log.wxml</text>
+<view>
+    <checkbox-group bindchange="checkEquip" >
+      <mp-cells wx:if="{{equipArr.length > 0}}" title="养护过的装备">
+        <mp-cell wx:for="{{equipArr}}" >
+          <view style="display: flex; flex-direction: row;">
+            <view><checkbox value="{{index}}" /></view>
+            <view>
+              <view style="font-size: 10pt;">{{item.type}} {{item.brand}} {{item.scale}}</view>
+            </view>
+          </view>
+        </mp-cell>
+        
+      </mp-cells>
+    </checkbox-group>
+    <mp-cells wx:if="{{maintainLogArr.length > 0}}" title="最近养护记录" >
+      <mp-cell wx:for="{{maintainLogArr}}" >
+        <view style="display:flex; flex-direction: row;">
+          <view style="text-align: left;" class="left-column">{{item.date}}</view>
+          <view class="right-column" >{{item.desc}}</view>
+        </view>
+      </mp-cell>
+      
+    </mp-cells>
+
+</view>

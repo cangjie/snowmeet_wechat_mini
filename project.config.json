@@ -1,9 +1,5 @@
 {
   "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
-  "packOptions": {
-    "ignore": [],
-    "include": []
-  },
   "setting": {
     "urlCheck": true,
     "es6": true,
@@ -23,8 +19,6 @@
     "uploadWithSourceMap": true,
     "compileHotReLoad": false,
     "useMultiFrameRuntime": true,
-    "useApiHook": true,
-    "useApiHostProcess": true,
     "babelSetting": {
       "ignore": [],
       "disablePlugins": [],
@@ -44,9 +38,6 @@
     "condition": false
   },
   "compileType": "miniprogram",
-  "libVersion": "2.11.3",
-  "appid": "wxd1310896f2aa68bb",
-  "projectname": "snowmeet",
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
   "editorSetting": {
@@ -139,5 +130,11 @@
         }
       ]
     }
-  }
+  },
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "appid": "wxd1310896f2aa68bb",
+  "projectname": "snowmeet"
 }

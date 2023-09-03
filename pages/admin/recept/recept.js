@@ -41,6 +41,9 @@ Page({
           recept.rentOrder = rentOrder
         }
         break
+      case '养护下单':
+        recept.maintainOrder = e.detail.recept.maintainOrder
+        break
       default:
         break
     }

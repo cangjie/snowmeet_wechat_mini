@@ -22,7 +22,8 @@
     <view>
       <rent-confirm-item wx:if="{{steps[stepIndex].name == 'confirm_item'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-item>
       <rent-confirm-deposit wx:if="{{steps[stepIndex].name == 'confirm_deposit'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></rent-confirm-deposit>
-      
+      <maintain-log wx:if="{{steps[stepIndex].name == 'maintain_log'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></maintain-log>
+      <maintain-item wx:if="{{steps[stepIndex].name == 'maintain_item'}}" receptId="{{id}}" bindCheckValid="getInnerData" ></maintain-item>
     </view>
     <view style="height: {{bottomFrameHeight+50}}px;" ></view>
   </view>
