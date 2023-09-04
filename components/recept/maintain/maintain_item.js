@@ -12,7 +12,9 @@ Component({
    * Component initial data
    */
   data: {
-    relationItems:['本人', '配偶', '朋友', '长辈']
+    relationItems:['本人', '配偶', '朋友', '长辈'],
+    currentItemIndex: -1,
+    currentItemValid: false
   },
   ready(){
     var that = this
@@ -26,6 +28,68 @@ Component({
    * Component methods
    */
   methods: {
+
+    fixItems(){
+      var that = this
+      var items = that.data.recept.maintainOrder.items
+      for(var i = 0; i < items.length; i++){
+        var serviceDesc = ''
+        var item = items[i]
+        if (item.confirmed_edge == 1){
+          serviceDesc += ' 修刃'
+        }
+        if (item.confirmed_candle == 1){
+          serviceDesc += ' 打蜡'
+        }
+        item.serviceDesc = serviceDesc
+        if (item.confirmed_relation == ''){
+          item.confirmed_relation = '本人'
+        }
+        var images = item.confirmed_images
+        if (images != '' && images != undefined && images != null){
+          item.headImage = images.split(',')[0]
+        }
+        else{
+          item.headImage = ''
+        }
+      }
+      that.setData({recept: recept})
+    },
+
+
+    checkCurrentItem(){
+      var valid = true
+      var that = this
+      var item = that.data.item
+      if (item.confirmed_equip_type == ''){
+        valid = false
+      }
+      else if (item.confirmed_brand == ''){
+        valid = false
+      }
+      else if (item.confirmed_scale == ''){
+        valid = false
+      }
+      else if (item.confirmed_images == '' || item.confirmed_images == undefined || item.confirmed_images == null){
+        valid = false
+      }
+      else if (item.confirmed_edge != 1 && item.confirmed_candle != 1 
+        && ( item.confirmed_more == '' || item.confirmed_more == undefined || item.confirmed_more == null) ){
+        valid = false    
+      }
+
+    },
+
+    save(){
+      var that = this
+      var item = that.data.item
+      var recept = that.data.recept
+      var maintainOrder = recept.maintainOrder
+      var items = maintainOrder.items
+      items.push(item)
+      item = {confirmed_equip_type: '双板'}
+      that.setData({currentItem: item, currentItemIndex: -1, recept: recept})
+    },
     
     getData(){
         var that = this
@@ -41,23 +105,28 @@ Component({
               var maintainOrder = recept.maintainOrder
               var items = maintainOrder.items
               var currentItem = {}
+              var currentItemIndex = -1
               if (items.length > 0){
                   currentItem = items[0]
                   if (currentItem.confirmed_equip_type != '双板' && currentItem.confirmed_equip_type != '单板'){
                     currentItem.confirmed_equip_type = '双板'
                   }
+                  currentItemIndex = 0
               }
               else{
                   currentItem = {confirmed_equip_type:'双板'}
               }
               that.getBoardBrands()
               that.getSkiBrands()
-              that.setData({recept: res.data, item: currentItem})
+              that.setData({recept: res.data, item: currentItem, currentItemIndex: currentItemIndex})
+              that.fixItems()
               //that.getBrands(currentItem.confirmed_equip_type)
               //that.getMaintainLog()
           }
         })
     },
+
+
 
     getBoardBrands(){
         var that = this

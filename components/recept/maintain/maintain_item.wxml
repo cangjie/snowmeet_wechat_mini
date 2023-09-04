@@ -1,58 +1,27 @@
 <view>
     <scroll-view class="scroll-view_H" scroll-x="true" bindscroll="scroll" style="width: 100%">
         <view  class="scroll-view-item_H"   >
+          <block wx:for="{{recept.maintainOrder.items}}" wx:for-item="i" >
             <view class="view-row" >
-                <view>
+                <view >
                     <image style="height: 100rpx; width: 100rpx; border-style: solid;border-width: 1rpx;"  ></image>
                 </view>
                 <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：{{i.confirmed_equip_type}}</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：{{i.confirmed_brand}}</view>
                 </view>
                 <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >长度：{{i.confirmed_scale==''?'未知': i.confirmed_scale}}</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >项目：</view>
                 </view>
                 <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;" >品牌：Capita</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >关系：本人</view>
+                    <view style="height: 50rpx;margin-left: 5rpx;" >加急：否</view>
                 </view>
-                <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
-                </view>
-                <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
-                </view>
+                
             </view>
             <view style="background-color: gray;height: 1rpx;margin-bottom: 5rpx;"></view>
-            <view class="view-row" >
-                <view>
-                    <image style="height: 100rpx; width: 100rpx; border-style: solid;border-width: 1rpx;"  ></image>
-                </view>
-                <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
-                </view>
-                <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
-                </view>
-                <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;" >品牌：Capita</view>
-                </view>
-                <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
-                </view>
-                <view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >类型：单板</view>
-                    <view style="height: 50rpx;margin-left: 5rpx;" >品牌：Capita</view>
-                </view>
-            </view>
-            <view style="background-color: gray;height: 1rpx;"></view>
+          </block>
         </view>
         
     </scroll-view>
@@ -189,6 +158,15 @@
           </view>
         </view>
       </mp-cell>
-    
+      <mp-cell>
+        <view class="view-row" style="text-align: center;" >
+          <button size="mini" bindtap="save" disabled="{{!currentItemValid}}" > 保 存 </button>
+          <view style="width: 100rpx;"></view>
+          <button size="mini" bindtap="delete" disabled="{{currentItemIndex==-1}}" > 删 除 </button>
+          <view style="width: 100rpx;"></view>
+          <button size="mini" disabled="{{currentItemIndex == -1 || !currentItemValid}}" bindtap="add" > 新 增 </button>
+        </view>
+      </mp-cell>
     </mp-cells>
+    <view style="height: 100rpx;" ></view>
 </view>
