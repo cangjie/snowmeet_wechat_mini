@@ -29,9 +29,17 @@ Component({
    */
   methods: {
 
+    selectItem(e){
+      var that = this
+      var index = parseInt(e.currentTarget.id)
+      var item = that.data.recept.maintainOrder.items[index]
+      that.setData({currentItemIndex: index, item: item})
+    },
+
     fixItems(){
       var that = this
-      var items = that.data.recept.maintainOrder.items
+      var recept = that.data.recept
+      var items = recept.maintainOrder.items
       for(var i = 0; i < items.length; i++){
         var serviceDesc = ''
         var item = items[i]
