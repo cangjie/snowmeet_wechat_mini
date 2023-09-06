@@ -1,2 +1,5 @@
 /* components/uploader/multi-uploader.wxss */
-@import '/app.wxss'
+
+.weui-gallery {
+  visibility:unset
+}

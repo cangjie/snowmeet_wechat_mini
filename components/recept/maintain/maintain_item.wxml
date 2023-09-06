@@ -4,7 +4,8 @@
           <block wx:for="{{recept.maintainOrder.items}}" wx:for-item="i" >
             <view class="view-row" style="background-color: {{(index==currentItemIndex)?'#F0F0F0':'#FFFFFF'}};"  id="{{index}}" bindtap="selectItem"  >
                 <view    >
-                    <image style="height: 100rpx; width: 100rpx; border-style: solid;border-width: 1rpx;"  ></image>
+                    <image wx:if="{{i.headImage != undefined && i.headImage != '' }}" src="{{i.headImage}}" style="height: 100rpx; width: 100rpx; "  ></image>
+                    <view wx:else style="height: 100rpx; width: 100rpx;border-style: solid;border-width: 1rpx; " ></view>
                 </view>
                 <view    >
                     <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >类型：{{i.confirmed_equip_type}}</view>
@@ -15,8 +16,8 @@
                     <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >项目：{{i.serviceDesc}}</view>
                 </view>
                 <view    >
-                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >关系：本人</view>
-                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >加急：否</view>
+                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >关系：{{i.confirmed_relation}}</view>
+                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >加急：{{i.confirmed_urgent == 1? '是':'否'}}</view>
                 </view>
                 
             </view>
@@ -104,7 +105,7 @@
         </view>
       </mp-cell>
       <mp-cell>
-        <multi-uploader id="uploader_{{index}}" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="changed" uploaded_files="{{photoFiles}}" ></multi-uploader>
+        <multi-uploader wx:if="{{displayUploader}}" id="uploader_{{index}}" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="changed" uploaded_files="{{item.confirmed_images}}" ></multi-uploader>
       </mp-cell>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
@@ -133,11 +134,11 @@
           <view class="left-column" style="width:15%"  >杂项：</view>
           <view class="right-column" style="width: 85%; display: flex;flex-direction: row;" >
             <checkbox-group id="others_{{index}}" bindchange="changed">
-              <checkbox  value="补板底" checked="{{item.confirmed_more.indexOf('补板底')>=0}}" >补板底</checkbox>
-              <checkbox  value="修底刃" checked="{{item.confirmed_more.indexOf('修底刃')>=0}}" >修底刃</checkbox>
-              <checkbox value="粘板面"  checked="{{item.confirmed_more.indexOf('粘板面')>=0}}" >粘板面</checkbox>
-              <checkbox value="雪杖等附件寄存" checked="{{item.confirmed_more.indexOf('雪杖等附件寄存')>=0}}" >雪杖等附件寄存</checkbox>
-              <checkbox value="其它"  checked="{{item.confirmed_more.indexOf('其它')>=0}}" >其它...</checkbox>
+              <checkbox  value="补板底" checked="{{item.bu_ban_di}}" >补板底</checkbox>
+              <checkbox  value="修底刃" checked="{{item.xiu_di_ren}}" >修底刃</checkbox>
+              <checkbox value="粘板面"  checked="{{item.zhan_ban_mian}}" >粘板面</checkbox>
+              <checkbox value="雪杖等附件寄存" checked="{{item.fu_jian_ji_cun}}" >雪杖等附件寄存</checkbox>
+              <checkbox value="其它"  checked="{{item.qi_ta}}" >其它...</checkbox>
             </checkbox-group>
           </view>
         </view>
@@ -160,11 +161,9 @@
       </mp-cell>
       <mp-cell>
         <view class="view-row" style="text-align: center;" >
-          <button size="mini" bindtap="save" disabled="{{!currentItemValid}}" > 保 存 </button>
+          <button size="mini" disabled="{{currentItemIndex == -1 || !currentItemValid}}" bindtap="addItem" > 新 增 </button>
           <view style="width: 100rpx;"></view>
-          <button size="mini" bindtap="delete" disabled="{{currentItemIndex==-1}}" > 删 除 </button>
-          <view style="width: 100rpx;"></view>
-          <button size="mini" disabled="{{currentItemIndex == -1 || !currentItemValid}}" bindtap="add" > 新 增 </button>
+          <button size="mini" bindtap="deleteItem" disabled="{{currentItemIndex==-1}}" > 删 除 </button>
         </view>
       </mp-cell>
     </mp-cells>

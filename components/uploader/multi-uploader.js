@@ -30,26 +30,36 @@ Component({
   },
   pageLifetimes: {
     show: function() {
+      
       this.setData({
         selectFile: this.selectFile.bind(this),
         uploadFile: this.uploadFile.bind(this)
       })
     }
   },
-  ready: function (){
-    var uploadedFilesArr = this.properties.uploaded_files.split(',')
-    var files = this.data.files
-    for(var i = 0; i < uploadedFilesArr.length; i++) {
-      if (uploadedFilesArr[i].trim() != '') {
-        files.push({url: uploadedFilesArr[i].trim()})
+
+  lifetimes:{
+    ready(){
+      console.log('uploader ready')
+      var uploadedFilesArr = this.properties.uploaded_files.split(',')
+      var files = this.data.files
+      for(var i = 0; i < uploadedFilesArr.length; i++) {
+        if (uploadedFilesArr[i].trim() != '') {
+          files.push({url: uploadedFilesArr[i].trim()})
+        }
       }
+      this.setData({files: files})
     }
-    this.setData({files: files})
   },
+
+
   /**
    * Component methods
    */
   methods: {
+    click(e){
+      console.log('click', e)
+    },
     selectFile: function(files) {
       console.log('files', files)
       // 返回false可以阻止某次文件上传
