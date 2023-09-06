@@ -39,8 +39,33 @@ Component({
       var recept = that.data.recept
       recept.maintainOrder.items.push(item)
       var currentItemIndex = recept.maintainOrder.items.length - 1
+      that.setData({displayUploader: false})
       that.setData({recept: recept, currentItemIndex: currentItemIndex, item: item})
+      
       that.fixItems()
+      that.checkCurrentItem()
+      that.setData({displayUploader: true})
+    },
+
+    deleteItem(){
+      var that = this
+      var recept = that.data.recept
+      var currentItemIndex = that.data.currentItemIndex
+      var items = recept.maintainOrder.items
+      var newItems = []
+      for(var i = 0; i < items.length; i++){
+        if (i != currentItemIndex){
+          newItems.push(item[i])
+        }
+      }
+      if (newItems.length == 0){
+        newItems.push({confirmed_equip_type: '双板'})
+        currentItemIndex = 0
+      }
+      recept.maintainOrder.items = newItems
+      that.setData({displayUploader: false})
+      that.setData({recept: recept, currentItemIndex: currentItemIndex})
+      that.setData({displayUploader: true})
     },
 
     changed(e){
