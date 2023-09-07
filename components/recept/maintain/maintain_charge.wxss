@@ -1,1 +1,2 @@
 /* components/recept/maintain/maintain_charge.wxss */
+@import '/app.wxss'

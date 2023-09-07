@@ -1,2 +1,40 @@
-<!--components/recept/maintain/maintain_charge.wxml-->
-<text>components/recept/maintain/maintain_charge.wxml</text>
+<view>
+  <mp-cells title="确认养护订单" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >数量：</view>
+        <view class="right-column" >{{recept.maintainOrder.items.length}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >总金额：</view>
+        <view class="right-column" >{{totalChargeStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >优惠券：</view>
+        <view class="right-column" >--</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >优惠券减免：</view>
+        <view class="right-column" ><input id="ticket_discount" value="{{recept.maintainOrder.ticketDiscount}}" class="input" bindinput="setDiscount" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >额外减免：</view>
+        <view class="right-column" ><input id="discount" value="{{recept.maintainOrder.discount}}" class="input" bindinput="setDiscount" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >应付金额：</view>
+        <view class="right-column" >{{totalChargeRealStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

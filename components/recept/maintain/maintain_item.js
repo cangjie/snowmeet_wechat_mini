@@ -55,8 +55,15 @@ Component({
         confirmed_images : ''
       }
       var recept = that.data.recept
-      recept.maintainOrder.items.push(item)
-      var currentItemIndex = recept.maintainOrder.items.length - 1
+      var items = recept.maintainOrder.items
+      if (items == undefined || items == null){
+        items = []
+      }
+
+      items.push(item)
+
+      var currentItemIndex = items.length - 1
+      recept.maintainOrder.items = items
       that.setData({displayUploader: false})
       that.setData({recept: recept, currentItemIndex: currentItemIndex, item: item})
       
@@ -117,7 +124,6 @@ Component({
         case 'binderGap':
           currentEquip.confirmed_binder_gap = value
           break
-        
         case 'dinFront':
           currentEquip.confirmed_front_din = value
           break
@@ -378,28 +384,33 @@ Component({
               }
               var recept = res.data
               var maintainOrder = recept.maintainOrder
-              var items = maintainOrder.items
+              
               var currentItem = {}
               var currentItemIndex = -1
-              if (items.length > 0){
+
+              
+              
+              that.getBoardBrands()
+              that.getSkiBrands()
+              var recept = res.data
+              
+              that.setData({recept: res.data, item: currentItem, currentItemIndex: currentItemIndex})
+              var items = maintainOrder.items
+              if (items != undefined && items != null && items.length > 0){
                   currentItem = items[0]
                   if (currentItem.confirmed_equip_type != '双板' && currentItem.confirmed_equip_type != '单板'){
                     currentItem.confirmed_equip_type = '双板'
                   }
                   currentItemIndex = 0
+                  that.setData({currentItemIndex: currentItemIndex, item: currentItem})
               }
               else{
-                  currentItem = {confirmed_equip_type:'双板'}
+                  //currentItem = {confirmed_equip_type:'双板'}
+                that.addItem()
               }
-              
-              that.getBoardBrands()
-              that.getSkiBrands()
-              var recept = res.data
-              if (recept.maintainOrder != undefined && recept.maintainOrder.items.length > 0){
-                var item = recept.maintainOrder.items[0]
-                that.setData({currentItemIndex: 0, item: item})
-              }
-              that.setData({recept: res.data, item: currentItem, currentItemIndex: currentItemIndex})
+
+
+
               that.getProductList()
               
               that.checkCurrentItem()
