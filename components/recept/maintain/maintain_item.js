@@ -1,5 +1,6 @@
 // components/recept/maintain/maintain_item.js
 const app = getApp()
+const util = require('../../../utils/util.js')
 Component({
   /**
    * Component properties
@@ -21,6 +22,7 @@ Component({
     var that = this
     app.loginPromiseNew.then(function(resovle){
         that.getData()
+        
     })
 
   },
@@ -29,6 +31,22 @@ Component({
    * Component methods
    */
   methods: {
+
+    getProductList(){
+      var that = this
+      var recept = that.data.recept
+      var shop = recept.shop
+      var getProductUrl = 'https://' + app.globalData.domainName + '/core/Product/GetMaintainProduct?shop=' + encodeURIComponent(shop)
+      wx.request({
+        url: getProductUrl,
+        method:'GET',
+        success:(res)=>{
+          console.log('maintian products', res)
+          that.setData({productList: res.data})
+          that.fixItems()
+        }
+      })
+    },
 
     addItem(){
       var that = this
@@ -55,7 +73,7 @@ Component({
       var newItems = []
       for(var i = 0; i < items.length; i++){
         if (i != currentItemIndex){
-          newItems.push(item[i])
+          newItems.push(items[i])
         }
       }
       if (newItems.length == 0){
@@ -66,6 +84,7 @@ Component({
       that.setData({displayUploader: false})
       that.setData({recept: recept, currentItemIndex: currentItemIndex})
       that.setData({displayUploader: true})
+      that.checkCurrentItem()
     },
 
     changed(e){
@@ -168,12 +187,14 @@ Component({
           break
       }
       that.setData({item: currentEquip})
-      
+      that.getCharge(currentEquip)
       that.checkCurrentItem()
       that.fixItems()
+
     },
 
     setOthersValue(item){
+      var that = this
       var others = item.confirmed_more
       if (others.indexOf('补板底') >= 0){
         item.bu_ban_di = true
@@ -205,6 +226,7 @@ Component({
       else {
         item.qi_ta = false
       }
+      that.setData({item: item})
       return item
     },
 
@@ -247,6 +269,47 @@ Component({
       that.setData({recept: recept})
     },
 
+    getCharge(item){
+      var that = this
+      var additionalCharge = 0
+      if (!isNaN(item.confirmed_additional_fee))
+        additionalCharge = parseFloat(item.confirmed_additional_fee)
+      var charge = 0
+      var pid = 0
+      if (item.confirmed_urgent == 0){
+        if (item.confirmed_edge == 1 && item.confirmed_candle == 1){
+          pid = 139
+        }
+        else if (item.confirmed_edge == 1){
+          pid = 140
+        }
+        else if (item.confirmed_candle == 1){
+          pid = 143
+        }
+      }
+      else{
+        if (item.confirmed_edge == 1 && item.confirmed_candle == 1){
+          pid = 137
+        }
+        else if (item.confirmed_edge == 1){
+          pid = 138
+        }
+        else if (item.confirmed_candle == 1){
+          pid = 142
+        }
+      }
+      if (pid > 0){
+        var prodList = that.data.productList
+        for(var i = 0; i < prodList.length; i++){
+          if (pid == prodList[i].id){
+            charge = prodList[i].sale_price
+            break
+          }
+        }
+      }
+      item.charge = additionalCharge + charge
+      item.chargeStr = util.showAmount(item.charge)
+    },
 
     checkCurrentItem(){
       var valid = true
@@ -268,22 +331,39 @@ Component({
         && ( item.confirmed_more == '' || item.confirmed_more == undefined || item.confirmed_more == null) ){
         valid = false    
       }
+      else if (item.confirmed_more != '' && item.confirmed_more != undefined && item.confirmed_more != null){
+        that.setOthersValue(item)
+      }
       that.setData({currentItemValid: valid})
+      if (valid){
+          that.save()
+          that.triggerEvent('CheckValid', {Goon: true, recept: that.data.recept})
+      }
     },
+
+
 
     save(){
       var that = this
 
-      var itemIndex = that.data.currentItemIndex
-      var item = that.data.item
-      if (itemIndex > -1){
-        var recept = that.data.recept
-        var maintainOrder = recept.maintainOrder
-        maintainOrder.items[itemIndex] = item
-        that.setData({recept: recept})
-        that.fixItems()
-      }
+      var recept = that.data.recept
 
+      var updateUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateRecept/' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: updateUrl,
+        method:'POST',
+        data: recept,
+        success:(res)=>{
+          console.log('recept update', res)
+          if (res.statusCode != 200){
+            return
+          }
+          wx.showToast({
+            title: '保存成功',
+            icon:'success'
+          })
+        }
+      })
     },
     
     getData(){
@@ -311,10 +391,18 @@ Component({
               else{
                   currentItem = {confirmed_equip_type:'双板'}
               }
+              
               that.getBoardBrands()
               that.getSkiBrands()
+              var recept = res.data
+              if (recept.maintainOrder != undefined && recept.maintainOrder.items.length > 0){
+                var item = recept.maintainOrder.items[0]
+                that.setData({currentItemIndex: 0, item: item})
+              }
               that.setData({recept: res.data, item: currentItem, currentItemIndex: currentItemIndex})
-              that.fixItems()
+              that.getProductList()
+              
+              that.checkCurrentItem()
              
           }
         })

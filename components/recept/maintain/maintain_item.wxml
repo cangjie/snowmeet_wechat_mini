@@ -9,15 +9,17 @@
                 </view>
                 <view    >
                     <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >类型：{{i.confirmed_equip_type}}</view>
-                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >品牌：{{i.confirmed_brand}}</view>
+                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >长度：{{i.confirmed_scale==''?'未知': i.confirmed_scale}}</view>
+                    
                 </view>
                 <view    >
-                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >长度：{{i.confirmed_scale==''?'未知': i.confirmed_scale}}</view>
+                  <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >品牌：{{i.confirmed_brand}}</view>
                     <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >项目：{{i.serviceDesc}}</view>
                 </view>
                 <view    >
-                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >关系：{{i.confirmed_relation}}</view>
+                    
                     <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >加急：{{i.confirmed_urgent == 1? '是':'否'}}</view>
+                    <view style="height: 50rpx;margin-left: 15rpx;font-size: 10pt;" >费用：{{i.chargeStr == undefined? '--':i.chargeStr}}</view>
                 </view>
                 
             </view>
