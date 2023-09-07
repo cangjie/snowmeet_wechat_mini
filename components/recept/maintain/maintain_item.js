@@ -313,6 +313,7 @@ Component({
           }
         }
       }
+      item.confirmed_product_id = pid
       item.charge = additionalCharge + charge
       item.chargeStr = util.showAmount(item.charge)
     },

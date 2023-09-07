@@ -117,6 +117,7 @@ Component({
       if (isNaN(maintainOrder.ticketDiscount)){
         maintainOrder.ticketDiscount = 0
       }
+      maintainOrder.summaryPrice = totalCharge
       var totalChargeReal = totalCharge - maintainOrder.discount - maintainOrder.ticketDiscount
       that.setData({totalCharge: totalCharge, totalChargeStr: util.showAmount(totalCharge), 
         totalChargeReal: totalChargeReal, totalChargeRealStr: util.showAmount(totalChargeReal)})
