@@ -12,7 +12,10 @@
             </view>
         </mp-cell>
     </mp-cells>
-    <rent-summary wx:if="{{recept != undefined}}" rentId="{{recept.submit_return_id}}" ></rent-summary>
+    <rent-summary wx:if="{{recept != undefined && recept.recept_type == '租赁下单'}}" 
+    rentId="{{recept.submit_return_id}}" ></rent-summary>
+    <maintain-summary wx:if="{{recept != undefined && recept.recept_type == '养护下单'}}" 
+    receptId="{{recept.id}}" ></maintain-summary>
     <view wx:if="{{needPay && !zeroPay}}" >
       <pay-method bindPayMethodSelected="setPayMethod" ></pay-method>
       <view style="margin-top: 20rpx; margin-bottom: 50rpx; text-align: center;">

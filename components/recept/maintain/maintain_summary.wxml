@@ -1,0 +1,50 @@
+<view>
+  <mp-cells title="养护列表">
+    <mp-cell wx:for="{{recept.maintainOrder.items}}" >
+      <view class="view-row" >
+        <view class="left-column" >类型：</view>
+        <view class="right-column" >{{item.confirmed_equip_type}}</view>
+        <view class="left-column" >品牌：</view>
+        <view class="right-column" >{{item.confirmed_brand}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >长度：</view>
+        <view class="right-column" >{{item.confirmed_scale}}</view>
+        <view class="left-column" >项目：</view>
+        <view class="right-column" >{{item.serviceDesc}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="支付和减免" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >应付金额：</view>
+        <view class="right-column" >{{recept.maintainOrder.summaryPriceStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >优惠券：</view>
+        <view class="right-column" >--</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >优惠券减免：</view>
+        <view class="right-column" >{{recept.maintainOrder.ticketDiscountStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >额外减免：</view>
+        <view class="right-column" >{{recept.maintainOrder.discountStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >实付金额：</view>
+        <view class="right-column" >{{recept.maintainOrder.realPayAmountStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

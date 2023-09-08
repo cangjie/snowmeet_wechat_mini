@@ -282,18 +282,7 @@ Component({
         additionalCharge = parseFloat(item.confirmed_additional_fee)
       var charge = 0
       var pid = 0
-      if (item.confirmed_urgent == 0){
-        if (item.confirmed_edge == 1 && item.confirmed_candle == 1){
-          pid = 139
-        }
-        else if (item.confirmed_edge == 1){
-          pid = 140
-        }
-        else if (item.confirmed_candle == 1){
-          pid = 143
-        }
-      }
-      else{
+      if (item.confirmed_urgent == 1){
         if (item.confirmed_edge == 1 && item.confirmed_candle == 1){
           pid = 137
         }
@@ -303,6 +292,20 @@ Component({
         else if (item.confirmed_candle == 1){
           pid = 142
         }
+      }
+      else{
+        if (item.confirmed_edge == 1 && item.confirmed_candle == 1){
+          pid = 139
+        }
+        else if (item.confirmed_edge == 1){
+          pid = 140
+        }
+        else if (item.confirmed_candle == 1){
+          pid = 143
+        }
+
+
+       
       }
       if (pid > 0){
         var prodList = that.data.productList

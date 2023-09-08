@@ -5,5 +5,6 @@
     "maintain-log": "/components/recept/maintain/maintain_log",
     "maintain-item": "/components/recept/maintain/maintain_item",
     "maintain-charge": "/components/recept/maintain/maintain_charge"
+    
   }
 }
