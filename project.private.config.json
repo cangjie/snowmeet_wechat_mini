@@ -12,7 +12,7 @@
         {
           "name": "",
           "pathName": "pages/admin/recept/recept_summary",
-          "query": "id=260",
+          "query": "id=276",
           "launchMode": "default",
           "scene": null
         },

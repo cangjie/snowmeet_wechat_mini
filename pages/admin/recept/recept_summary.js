@@ -11,14 +11,46 @@ Page({
   setPaid(){
     var that = this
     var recept = that.data.recept
-    switch(recept.recept_type){
-        case '租赁下单':
-            this.setRentPaid(recept.submit_return_id)
-            break
-        default:
-            break
-    }
+
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Recept/SetPaidManual/' + recept.id.toString() + '?payMethod=' + encodeURIComponent(that.data.payMethod) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        wx.showToast({
+          title: '支付成功',
+          icon: 'success',
+          success:(res)=>{
+            switch(recept.recept_type){
+              case '租赁下单':
+                  //this.setRentPaid(recept.submit_return_id)
+                  wx.redirectTo({
+                    url: '../rent/rent_list',
+                  })
+                  break
+              case '养护下单':
+                wx.redirectTo({
+                  url: '../maintain/task_list',
+                })
+                break
+              default:
+                  break
+            }
+          }
+        })
+
+      }
+    })
+
+
+    
   },
+
+  /*
   setRentPaid(rentOrderId){
     var that = this
     var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetPaidManual/' + rentOrderId + '?payMethod=' + encodeURIComponent(that.data.payMethod) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -36,6 +68,8 @@ Page({
       }
     })
   },
+*/
+
   setPayMethod(e){
     console.log('pay method selected', e)
     var that = this
