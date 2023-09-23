@@ -21,19 +21,31 @@
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >优惠券减免：</view>
-        <view class="right-column" ><input id="ticket_discount" value="{{recept.maintainOrder.ticketDiscount}}" class="input" bindinput="setDiscount" /></view>
+        <view class="right-column" ><input id="ticket_discount" value="{{recept.maintainOrder.ticketDiscount}}" class="input" bindinput="setDiscount" style="width: 150rpx;" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >额外减免：</view>
-        <view class="right-column" ><input id="discount" value="{{recept.maintainOrder.discount}}" class="input" bindinput="setDiscount" /></view>
+        <view class="right-column" ><input id="discount" value="{{recept.maintainOrder.discount}}" class="input" bindinput="setDiscount" style="width: 150rpx;" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >应付金额：</view>
         <view class="right-column" >{{totalChargeRealStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >结算方式：</view>
+        <view class="right-column" >
+          <radio-group bindchange="setPayOption">
+            <radio checked="{{recept.maintainOrder.payOption == '现场支付'}}" value="现场支付" >现场支付</radio>
+            <radio checked="{{recept.maintainOrder.payOption == '次卡支付'}}" value="次卡支付" >次卡支付</radio>
+            <radio checked="{{recept.maintainOrder.payOption == '招待'}}" value="招待" >招待</radio>
+          </radio-group>
+        </view>
       </view>
     </mp-cell>
   </mp-cells>

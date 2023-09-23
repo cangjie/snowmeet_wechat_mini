@@ -35,6 +35,7 @@
       </view>
       <view style="width: 550rpx;height: {{bottomFrameHeight}}px;" bindtap="changeBottom">
         <rent_foot_summary wx:if="{{recept.recept_type == '租赁下单'}}" receptId="{{recept.id}}" ></rent_foot_summary>
+        <maintain_foot_summary wx:if="{{recept.recept_type == '养护下单'}}" receptId="{{recept.id}}" ></maintain_foot_summary>
         <!--view class="view-row" >
           <view class="left-column" style="width: 150rpx;" >押金:</view>
           <view class="right-column" >￥10000.00</view>

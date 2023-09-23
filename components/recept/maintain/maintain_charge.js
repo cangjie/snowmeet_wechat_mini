@@ -33,6 +33,13 @@ Component({
    * Component methods
    */
   methods: {
+    setPayOption(e){
+      var that = this
+      var recept = that.data.recept
+      recept.maintainOrder.payOption = e.detail.value
+      that.setData({recept: recept})
+      that.computeCharge()
+    },
     setDiscount(e){
       var that = this
       var value = isNaN(e.detail.value)? 0 : parseFloat(e.detail.value)
@@ -76,7 +83,11 @@ Component({
             return
           }
           var recept = res.data
+          if (recept.maintainOrder != undefined && recept.maintainOrder != null){
+            recept.maintainOrder.pay_option = "现场支付"
+          }
           that.setData({recept: recept})
+
           that.getProductList()
         }
       })

@@ -5,7 +5,7 @@
     "maintain-log": "/components/recept/maintain/maintain_log",
     "maintain-item": "/components/recept/maintain/maintain_item",
     "maintain-charge": "/components/recept/maintain/maintain_charge",
-    "rent_foot_summary": "/components/recept/rent/rent_foot_summary"
-    
+    "rent_foot_summary": "/components/recept/rent/rent_foot_summary",
+    "maintain_foot_summary": "/components/recept/maintain/maintain_foot_summary"
   }
 }

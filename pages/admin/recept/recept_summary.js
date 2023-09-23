@@ -175,6 +175,14 @@ Page({
                   zeroPay = true 
                 }
                 break
+              case '养护下单':
+                if (recept.maintainOrder.payOption == '招待'){
+                  needPay = false
+                }
+                else if (recept.maintainOrder.order_id == 0){
+                  zeroPay = true 
+                }
+                break
               default:
                 break
             }
