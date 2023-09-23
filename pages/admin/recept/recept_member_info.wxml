@@ -3,7 +3,7 @@
   <view style="text-align: center; margin-top: 10rpx;">
     <button size="mini" bindtap="updateUserInfo" disabled="{{!needUpdate}}" > 更 新</button>
   </view>
-  <ticket wx:if="{{openId!=undefined}}" open_id="{{openId}}" ></ticket>
+  <ticket wx:if="{{openId!=undefined}}" open_id="{{openId}}" bindTicketSelected="selectTicket" ></ticket>
   <view style="margin-left: 20rpox; margin-top: 20rpx;display: flex;flex-direction: row;">
     <view style="text-align: right; width: 200rpx;font-size: 10pt;" >现有龙珠：</view>
     <view style="text-align: left;" >{{score}}</view>

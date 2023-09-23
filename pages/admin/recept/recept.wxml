@@ -9,13 +9,13 @@
         --
       </view>
       <view class="left-column"  style="width: 150rpx;" >电话：</view>
-      <view class="right-column" >--</view>
+      <view class="right-column" >{{user.cell_number}}</view>
     </view>
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" style="width: 150rpx;" >优惠券：</view>
-      <view class="right-column" >{{ ticketCode == ''? '--' : ticketName }}</view>
+      <view class="right-column" >{{ (ticketCode == '' || ticketCode == undefined) ? '--' : ticketName }}</view>
       <view class="left-column" style="width: 150rpx;" >编号：</view>
-      <view class="right-column" >{{ ticketCode == ''? '--' : ticketCode }}</view>
+      <view class="right-column" >{{ (ticketCode == '' || ticketCode == undefined)? '--' : ticketCode }}</view>
     </view>
   </view>
   <view style="margin-top: {{topFrameHeight+30}}px" >

@@ -91,7 +91,8 @@ Page({
 
     }
     var newReceptUrl = 'https://' + app.globalData.domainName + '/core/Recept/NewRecept?openId=' + encodeURIComponent(that.data.openId) 
-    + '&scene=' + encodeURIComponent(scene) + '&shop=' + encodeURIComponent(that.data.shop) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    + '&scene=' + encodeURIComponent(scene) + '&shop=' + encodeURIComponent(that.data.shop) 
+    + ((that.data.ticketCode != undefined)? ('&code=' + that.data.ticketCode) : '') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: newReceptUrl,
       method: 'GET',
@@ -106,6 +107,13 @@ Page({
       }
     })
    
+  },
+
+  selectTicket(e){
+    console.log('select ticket', e)
+    var code = e.detail.code
+    var that = this
+    that.setData({ticketCode: code})
   },
 
   /**

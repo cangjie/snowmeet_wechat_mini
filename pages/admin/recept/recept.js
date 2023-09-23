@@ -244,7 +244,7 @@ Page({
               }
               that.setData({user: res.data})
               if (recept.code != ''){
-                var getTicketUrl = 'https://' + app.globalData.domainName + '/core/GetTicket/' + recept.code
+                var getTicketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + recept.code
                 wx.request({
                   url: getTicketUrl,
                   method: 'GET',
