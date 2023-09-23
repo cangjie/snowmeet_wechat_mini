@@ -4,7 +4,8 @@
     "rent-confirm-deposit": "/components/recept/rent/confirm_deposit",
     "maintain-log": "/components/recept/maintain/maintain_log",
     "maintain-item": "/components/recept/maintain/maintain_item",
-    "maintain-charge": "/components/recept/maintain/maintain_charge"
+    "maintain-charge": "/components/recept/maintain/maintain_charge",
+    "rent_foot_summary": "/components/recept/rent/rent_foot_summary"
     
   }
 }

@@ -1,0 +1,13 @@
+<!--components/recept/rent/rent_foot_summary.wxml-->
+<view class="view-row" >
+  <view class="left-column" style="width: 250rpx;" >押金:</view>
+  <view class="right-column" >{{totalDepositStr}}</view>
+  <view class="left-column" style="width: 250rpx;" >减免:</view>
+  <view class="right-column" >{{othersDiscountStr}}</view>
+</view>
+<view class="view-row" >
+  <view class="left-column" style="width: 250rpx;" >券减免:</view>
+  <view class="right-column" >{{ticketDiscountStr}}</view>
+  <view class="left-column" style="width: 250rpx;" >应付押金:</view>
+  <view class="right-column" >{{realPayStr}}</view>
+</view>
