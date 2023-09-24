@@ -83,8 +83,9 @@ Component({
             return
           }
           var recept = res.data
-          if (recept.maintainOrder != undefined && recept.maintainOrder != null){
-            recept.maintainOrder.pay_option = "现场支付"
+          if (recept.maintainOrder != undefined && recept.maintainOrder != null
+            && util.isBlank(recept.maintainOrder.payOption)){
+            recept.maintainOrder.payOption = "现场支付"
           }
           that.setData({recept: recept})
 

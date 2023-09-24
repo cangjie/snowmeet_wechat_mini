@@ -1,6 +1,6 @@
 <!--components/recept/rent/rent_foot_summary.wxml-->
 <view class="view-row" >
-  <view class="left-column" >押金:</view>
+  <view class="left-column" >总金额:</view>
   <view class="right-column" >{{totalStr}}</view>
   <view class="left-column" >减免:</view>
   <view class="right-column"  >{{othersDiscountStr}}</view>
@@ -8,6 +8,6 @@
 <view class="view-row" >
   <view class="left-column" >券减免:</view>
   <view class="right-column" >{{ticketDiscountStr}}</view>
-  <view class="left-column"  >应付押金:</view>
+  <view class="left-column"  >应付金额:</view>
   <view class="right-column"  >{{realPayStr}}</view>
 </view>

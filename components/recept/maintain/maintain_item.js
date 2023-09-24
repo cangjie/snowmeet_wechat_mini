@@ -20,18 +20,16 @@ Component({
   },
   ready(){
     var that = this
+    that.getBoardBrands()
+    that.getSkiBrands()
     app.loginPromiseNew.then(function(resovle){
-        that.getData()
-        
+        that.getData()  
     })
-
   },
-
   /**
    * Component methods
    */
   methods: {
-
     getProductList(){
       var that = this
       var recept = that.data.recept
@@ -43,7 +41,7 @@ Component({
         success:(res)=>{
           console.log('maintian products', res)
           that.setData({productList: res.data})
-          that.fixItems()
+          that.checkCurrentItem()
         }
       })
     },
@@ -67,7 +65,7 @@ Component({
       that.setData({displayUploader: false})
       that.setData({recept: recept, currentItemIndex: currentItemIndex, item: item})
       
-      that.fixItems()
+      //that.fixItems()
       that.checkCurrentItem()
       that.setData({displayUploader: true})
     },
@@ -193,15 +191,19 @@ Component({
           break
       }
       that.setData({item: currentEquip})
-      that.getCharge(currentEquip)
+      //that.getCharge(currentEquip)
       that.checkCurrentItem()
-      that.fixItems()
+      //that.fixItems()
 
     },
 
     setOthersValue(item){
       var that = this
       var others = item.confirmed_more
+      if (util.isBlank(others)){
+        others = ''
+        item.confirmed_more = ''
+      }
       if (others.indexOf('补板底') >= 0){
         item.bu_ban_di = true
       }
@@ -253,10 +255,15 @@ Component({
       for(var i = 0; i < items.length; i++){
         var serviceDesc = ''
         var item = items[i]
-        if (item.confirmed_edge == 1){
+        if (item == null || item == undefined){
+          items.splice(i, 1)
+          i--
+          continue
+        }
+        if (item.confirmed_edge != undefined && item.confirmed_edge == 1){
           serviceDesc += ' 修刃'
         }
-        if (item.confirmed_candle == 1){
+        if (item.confirmed_candle != undefined &&  item.confirmed_candle == 1){
           serviceDesc += ' 打蜡'
         }
         
@@ -271,6 +278,9 @@ Component({
         else{
           item.headImage = ''
         }
+        item = that.getCharge(item)
+        //item.chargeStr = '0'//util.showAmount(item.charge)
+        
       }
       that.setData({recept: recept})
     },
@@ -278,7 +288,7 @@ Component({
     getCharge(item){
       var that = this
       var additionalCharge = 0
-      if (!isNaN(item.confirmed_additional_fee))
+      if (item.confirmed_additional_fee != undefined && !isNaN(item.confirmed_additional_fee))
         additionalCharge = parseFloat(item.confirmed_additional_fee)
       var charge = 0
       var pid = 0
@@ -303,11 +313,8 @@ Component({
         else if (item.confirmed_candle == 1){
           pid = 143
         }
-
-
-       
       }
-      if (pid > 0){
+      if (pid > 0 && that.data.productList != undefined){
         var prodList = that.data.productList
         for(var i = 0; i < prodList.length; i++){
           if (pid == prodList[i].id){
@@ -319,32 +326,50 @@ Component({
       item.confirmed_product_id = pid
       item.charge = additionalCharge + charge
       item.chargeStr = util.showAmount(item.charge)
+      return item
     },
 
     checkCurrentItem(){
       var valid = true
       var that = this
       var item = that.data.item
-      if (item.confirmed_equip_type == ''){
+      if (util.isBlank(item.confirmed_equip_type)){
         valid = false
       }
-      else if (item.confirmed_brand == ''){
+      else if (util.isBlank(item.confirmed_brand)){
         valid = false
       }
-      else if (item.confirmed_scale == ''){
+      else if (util.isBlank(item.confirmed_scale)){
         valid = false
       }
-      else if (item.confirmed_images == '' || item.confirmed_images == undefined || item.confirmed_images == null){
+      else if (util.isBlank(item.confirmed_images)){
         valid = false
       }
       else if (item.confirmed_edge != 1 && item.confirmed_candle != 1 
-        && ( item.confirmed_more == '' || item.confirmed_more == undefined || item.confirmed_more == null) ){
+        && ( util.isBlank(item.confirmed_more) ) ){
         valid = false    
       }
-      else if (item.confirmed_more != '' && item.confirmed_more != undefined && item.confirmed_more != null){
+      else if (util.isBlank(item.confirmed_more)){
         that.setOthersValue(item)
       }
       that.setData({currentItemValid: valid})
+      that.fixItems()
+
+      
+      var items = that.data.recept.maintainOrder.items
+      var totalCharge = 0;
+
+      for(var i = 0; i < items.length; i++){
+        //items[i] = that.getCharge(items[i])
+        if (!isNaN(items[i].charge)){
+          totalCharge += item.charge
+        }
+      }
+      
+      var recept = that.data.recept
+      recept.maintainOrder.summaryPrice = totalCharge
+      recept.maintainOrder.summaryPriceStr = util.showAmount(recept.maintainOrder.summaryPrice)
+      that.setData({recept: recept})
       if (valid){
           that.save()
           that.triggerEvent('CheckValid', {Goon: true, recept: that.data.recept})
@@ -388,17 +413,11 @@ Component({
               }
               var recept = res.data
               var maintainOrder = recept.maintainOrder
-              
               var currentItem = {}
               var currentItemIndex = -1
-
-              
-              
-              that.getBoardBrands()
-              that.getSkiBrands()
               var recept = res.data
-              
               that.setData({recept: res.data, item: currentItem, currentItemIndex: currentItemIndex})
+              that.getProductList()
               var items = maintainOrder.items
               if (items != undefined && items != null && items.length > 0){
                   currentItem = items[0]
@@ -409,22 +428,12 @@ Component({
                   that.setData({currentItemIndex: currentItemIndex, item: currentItem})
               }
               else{
-                  //currentItem = {confirmed_equip_type:'双板'}
                 that.addItem()
               }
-
-
-
-              that.getProductList()
-              
               that.checkCurrentItem()
-             
           }
         })
     },
-
-
-
     getBoardBrands(){
         var that = this
         var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('单板')
@@ -469,7 +478,7 @@ Component({
           var item = that.data.item
           item.confirmed_equip_type = e.detail.value
           that.setData({item: item})
-          that.fixItems()
+          that.checkCurrentItem()
       },
       itemBrandChanged(e){
         var that = this
@@ -481,7 +490,7 @@ Component({
         
         item.confirmed_brand  = brandList[parseInt(e.detail.value)]
         that.setData({item: item})
-        that.fixItems()
+        that.checkCurrentItem()
       }
     
     }

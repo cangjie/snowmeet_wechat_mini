@@ -398,6 +398,7 @@ Page({
     })
   }),
   */
+ /*
   getDeviceNameListPromise: new Promise(function(resolve){
     var deviceScene = 'maintain_on_site_label_print'
     var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/blt_device.htm'
@@ -420,6 +421,7 @@ Page({
       }
     })
   }),
+  */
   /**
    * Lifecycle function--Called when page is initially rendered
    */

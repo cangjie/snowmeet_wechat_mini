@@ -105,6 +105,12 @@ Page({
       default:
         break
     }
+    if (recept.current_step < 0){
+      recept.current_step = 0
+    }
+    if (recept.current_step >= that.data.steps.length){
+      recept.current_step = that.data.steps.length - 1
+    }
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateRecept/' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: updateUrl,
@@ -215,6 +221,8 @@ Page({
           }
           var recept = res.data
           var stepIndex = parseInt(recept.current_step)
+          
+          
           if (isNaN(stepIndex)){
             stepIndex = 0
           }
@@ -228,6 +236,13 @@ Page({
             default:
               break
           }
+          if (stepIndex < 0){
+            stepIndex = 0
+          }
+          if (stepIndex >= that.data.steps.length){
+            stepIndex = that.data.steps.length - 1
+          }
+          that.setData({stepIndex: stepIndex})
           recept.deposit_real = recept.deposit
           that.setData({recept: recept, gotoPrev: stepIndex > 0})
           wx.setNavigationBarTitle({

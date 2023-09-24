@@ -36,24 +36,15 @@
       <view style="width: 550rpx;height: {{bottomFrameHeight}}px;" bindtap="changeBottom">
         <rent_foot_summary wx:if="{{recept.recept_type == '租赁下单'}}" receptId="{{recept.id}}" ></rent_foot_summary>
         <maintain_foot_summary wx:if="{{recept.recept_type == '养护下单'}}" receptId="{{recept.id}}" ></maintain_foot_summary>
-        <!--view class="view-row" >
-          <view class="left-column" style="width: 150rpx;" >押金:</view>
-          <view class="right-column" >￥10000.00</view>
-          <view class="left-column" style="width: 150rpx;" >减免:</view>
-          <view class="right-column" ></view>
-        </view>
-        <view class="view-row" >
-          <view class="left-column" style="width: 150rpx;" >券减免:</view>
-          <view class="right-column" ></view>
-          <view class="left-column" style="width: 150rpx;" >应付押金:</view>
-          <view class="right-column" ></view>
-        </view-->
       </view>
       <view style="width: 100rpx;height: {{bottomFrameHeight}}px;margin-top:{{bottomFrameHeight/2-17}}px;text-align: right;" >
         <button wx:if="{{stepIndex < steps.length - 1}}" id="next" size="mini" style="font-size: 7pt;padding-top: 10rpx;" disabled="{{!gotoNext}}" bindtap="saveJump" >下一步</button>
         <button wx:else id="next" size="mini" style="font-size: 7pt;padding-top: 10rpx;" disabled="{{!gotoNext}}" bindtap="confirm" >确认</button>
       </view>
     </view>
-    <view wx:else bindtap="changeBottom" style="height: {{bottomFrameHeight}}px;" ></view>
+    <view wx:else bindtap="changeBottom" style="height: {{bottomFrameHeight}}px;" >
+      <maintain_detail wx:if="{{recept.recept_type == '养护下单'}}" receptId="{{recept.id}}" ></maintain_detail>
+      <rent_detail wx:if="{{recept.recept_type == '租赁下单'}}" receptId="{{recept.id}}" ></rent_detail>
+    </view>
   </view>
 </view>

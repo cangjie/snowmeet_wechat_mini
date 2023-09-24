@@ -179,7 +179,7 @@ Page({
                 if (recept.maintainOrder.payOption == '招待'){
                   needPay = false
                 }
-                else if (recept.maintainOrder.order_id == 0){
+                else if (recept.maintainOrder.orderId == 0){
                   zeroPay = true 
                 }
                 break

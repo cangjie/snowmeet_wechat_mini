@@ -1,0 +1,35 @@
+<view>
+  <mp-cells title="{{detailTitle}}" >
+    <mp-cell wx:for="{{recept.maintainOrder.items}}" >
+      <view class="view-row" >
+        <view style="width: 45%;text-align: center;" >
+          <image src="{{item.headImage}}" style="width: 80%;" mode="widthFix" ></image>
+        </view>
+        <view style="width: 45%;">
+          <view>
+            <view class="view-row" >
+              <view class="left-column" >品牌：</view>
+              <view class="right-column" >{{item.confirmed_brand}}</view>
+            </view>
+            <view class="view-row" >
+              <view class="left-column" >长度：</view>
+              <view class="right-column" >{{item.confirmed_scale}}</view>
+            </view>
+            <view class="view-row" >
+              <view class="left-column" >项目：</view>
+              <view class="right-column" >{{item.serviceDesc}}</view>
+            </view>
+            <view class="view-row" >
+              <view class="left-column" >小计：</view>
+              <view class="right-column" >{{item.chargeStr}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view>总计金额：{{recept.maintainOrder.summaryPriceStr}}</view>
+    </mp-cell>
+  </mp-cells>
+  
+</view>
