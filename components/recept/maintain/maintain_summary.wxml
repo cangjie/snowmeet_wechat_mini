@@ -25,7 +25,7 @@
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >优惠券：</view>
-        <view class="right-column" >--</view>
+        <view class="right-column" style="width: 350rpx;" >{{ticketDesc}}</view>
       </view>
     </mp-cell>
     <mp-cell>

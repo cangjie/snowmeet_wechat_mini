@@ -13,7 +13,7 @@ Component({
    * Component initial data
    */
   data: {
-
+    ticketDesc: '--'
   },
 
   lifetimes:{
@@ -29,6 +29,20 @@ Component({
    * Component methods
    */
   methods: {
+    getTicket(code){
+      var that = this
+      var getTicketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + code
+      wx.request({
+        url: getTicketUrl,
+        success:(res)=>{
+          if (res.statusCode != 200){
+            return
+          }
+          var ticketDesc = res.data.name + '(' + res.data.code + ')' + (res.data.used == 1 ? '已核销':'')
+          that.setData({ticketDesc: ticketDesc})
+        }
+      })
+    },
     getData(){
       var that = this
       var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + that.properties.receptId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -60,6 +74,9 @@ Component({
             }
           
           that.setData({recept: recept})
+          if (!util.isBlank(recept.code)){
+            that.getTicket(recept.code)
+          }
         }
       })
     }
