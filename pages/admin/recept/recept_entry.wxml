@@ -8,7 +8,7 @@
     <mp-cell>
       <view style="display:flex; flex-direction: row;">
         <view class="left-column" style="display:flex;width: 500rpx;text-align: center;justify-content: center;align-items: center;" >
-          <input  placeholder="填写手机号" style="width: 300rpx;height: 50rpx;" class="input" bindinput="cellChanged" />
+          <input  placeholder="填写手机号" style="width: 300rpx;height: 50rpx;" class="input" bindinput="cellChanged" type="digit" />
         </view>
         <view class="right-column" style="width: 250rpx;" >
           <button disabled="{{cell == undefined || cell.length != 11}}" style="width: 180rpx;height: 65rpx;padding-top: 0rpx;margin-top: 0rpx;" bindtap="searchUser" size="mini" >确认</button>
