@@ -385,7 +385,7 @@ Component({
         && ( util.isBlank(item.confirmed_more) ) ){
         valid = false    
       }
-      else if (item.confirmed_id == undefined || item.confirm_id == null || item.confirmed_id == ''){
+      else if (item.confirmed_id == undefined || item.confirmed_id == null || item.confirmed_id == ''){
         valid = false
       }
       else if (util.isBlank(item.confirmed_more)){

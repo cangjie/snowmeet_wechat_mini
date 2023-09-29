@@ -41,11 +41,11 @@
               <radio checked="{{item.confirmed_equip_type == '单板'}}" value="单板" style="font-size: 10pt;" >单板</radio>
             </radio-group>
           </view>
-          <view style="width: 100rpx;text-align: right;font-size: 10pt;" class="view-row" >
-            <view class="must-fill-red-dot" >*</view>
-            <view>品牌：</view>
+          <view style="width: 100rpx;text-align: right;font-size: 10pt;align-content: flex-end; " class="view-row" >
+            <view class="must-fill-red-dot" style="width: 40rpx;text-align: right;align-content: flex-end;" >*</view>
+            <view style="width: 180rpx;" >品牌：</view>
           </view>
-          <view style="width: 250rpx;">
+          <view style="width: 200rpx;">
             <picker id="brand_{{index}}" wx:if="{{item.confirmed_equip_type=='单板'}}" mode="selector" range="{{boardBrands}}" bindchange="itemBrandChanged"  >
               <picker-view style="font-size: 10pt;" >{{((item.confirmed_brand == '' || item.confirmed_brand == undefined)?'请选择...':item.confirmed_brand)}}</picker-view>
             </picker>
@@ -63,8 +63,8 @@
           </view>
           <view style="width: 175rpx;font-size: 10pt;"><input id="scale_{{index}}" placeholder="填写长度" value="{{item.confirmed_scale}}" bindinput="changed" /></view>
           <block wx:if="{{item.confirmed_equip_type=='单板'}}" >
-            <view style="width: 175rpx;text-align: right;font-size: 10pt;">前脚：</view>
-            <view style="width: 175rpx;font-size: 10pt;">
+            <view style="width: 155rpx;text-align: right;font-size: 10pt;">前脚：</view>
+            <view style="width: 200rpx;font-size: 10pt;">
               <radio-group id="front_{{index}}" bindchange="changed" >
                 <radio style="font-size: 10pt;" checked="{{item.confirmed_front=='左'}}" value="左" >左</radio>
                 <radio style="font-size: 10pt;" checked="{{item.confirmed_front=='右'}}" value="右" >右</radio>
