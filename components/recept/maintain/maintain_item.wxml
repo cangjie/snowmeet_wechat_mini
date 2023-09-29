@@ -58,8 +58,8 @@
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view class="view-row" style="width: 175rpx;font-size: 10pt;justify-content: flex-end;align-items: flex-end;">
-            <view class="must-fill-red-dot" style="align-self: flex-end;" >*</view>
-            <view style="width: 75rpx;text-align: right;align-self: flex-end;">长度：</view>
+            <view class="must-fill-red-dot" style="align-self: flex-end;width: 5rpx;margin-right: 0rpx;padding-right: 0rpx;" >*</view>
+            <view style="width: 85rpx;text-align: right;align-self: flex-end;margin-left: 0rpx;padding-left: 0rpx;">长度：</view>
           </view>
           <view style="width: 175rpx;font-size: 10pt;"><input id="scale_{{index}}" placeholder="填写长度" value="{{item.confirmed_scale}}" bindinput="changed" /></view>
           <block wx:if="{{item.confirmed_equip_type=='单板'}}" >
@@ -117,9 +117,9 @@
       </mp-cell>
       <mp-cell style="padding-left: 0rpx; margin-left: 0rpx;">
         <view class="view-row" >
-          <view class="left-column view-row" style="width: 115rpx;padding-left: 0rpx;margin-left: 0rpx;" >
-            <view style="color: red;margin-left: 0rpx; padding-left: 0rpx;" >*</view>
-            <view style="margin-left: 0rpx; padding-left: 0rpx;width: 100rpx;" >序列号：</view>
+          <view class="left-column view-row" style="width: 120rpx;padding-left: 0rpx;margin-left: 0rpx;" >
+            <view style="color: red;margin-left: 0rpx; padding-left: 0rpx;width: 5rpx;" >*</view>
+            <view style="margin-left: 0rpx; padding-left: 0rpx;width: 115rpx;" >序列号：</view>
           </view>
           <view class="right-column" style="width: 560rpx;"  wx:if="{{item.confirmed_equip_type == '单板' }}" >
             <input id="serial" style="width: 250rpx;" class="input" bindinput="changed"  value="{{item.confirmed_id}}" />
@@ -134,7 +134,7 @@
               <input id="serialRight" style="width: 185rpx;" class="input" bindinput="changed" value="{{item.confirmed_id_right}}"  />
             </view>
             
-            <switch  style="width: 180rpx;height:10rpx;font-size: 9pt;" checked="{{item.confirmed_idDiff}}" bindchange="checkSerial" >分左右</switch>
+            <switch  style="width: 180rpx;height:10rpx;font-size: 8pt;" checked="{{item.confirmed_idDiff}}" bindchange="checkSerial" >分左右</switch>
           </view>
         </view>
       </mp-cell>
@@ -147,7 +147,7 @@
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view class="left-column view-row" style="width:15%"  >
-            <view style="width: 10px;color:red">*</view>
+            <view style="width: 5px;color:red">*</view>
             <view>
               项目：
             </view>
