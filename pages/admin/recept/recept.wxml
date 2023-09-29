@@ -31,14 +31,14 @@
   <view  style="background-color:{{bottomShowDetail?'white':'gray'}};position: fixed;top: {{windowHeight - bottomFrameHeight - 50}}px; left:10px;width: {{windowWidth - 20}}px;opacity: {{!bottomShowDetail? '0.5': '1'}};height: {{bottomFrameHeight}}px;z-index: 100;">
     <view wx:if="{{!bottomShowDetail}}" style="display: flex; flex-direction: row;" >
       <view style="width: 100rpx;height: {{bottomFrameHeight}}px;margin-top:{{bottomFrameHeight/2-17}}px;"  >
-        <button id="prev" size="mini" style="font-size: 7pt;padding-top: 10rpx;" disabled="{{!gotoPrev}}" bindtap="saveJump" >上一步</button>
+        <button id="prev" size="mini" style="font-size: 7pt;padding-top: 10rpx;padding-left: 1rpx;padding-right: 1rpx;" disabled="{{!gotoPrev}}" bindtap="saveJump" >上一步</button>
       </view>
       <view style="width: 550rpx;height: {{bottomFrameHeight}}px;" bindtap="changeBottom">
         <rent_foot_summary wx:if="{{recept.recept_type == '租赁下单'}}" receptId="{{recept.id}}" ></rent_foot_summary>
         <maintain_foot_summary wx:if="{{recept.recept_type == '养护下单'}}" receptId="{{recept.id}}" ></maintain_foot_summary>
       </view>
       <view style="width: 100rpx;height: {{bottomFrameHeight}}px;margin-top:{{bottomFrameHeight/2-17}}px;text-align: right;" >
-        <button wx:if="{{stepIndex < steps.length - 1}}" id="next" size="mini" style="font-size: 7pt;padding-top: 10rpx;" disabled="{{!gotoNext}}" bindtap="saveJump" >下一步</button>
+        <button wx:if="{{stepIndex < steps.length - 1}}" id="next" size="mini" style="font-size: 7pt;padding-top: 10rpx;padding-left: 1rpx;padding-right: 1rpx;" disabled="{{!gotoNext}}" bindtap="saveJump" >下一步</button>
         <button wx:else id="next" size="mini" style="font-size: 7pt;padding-top: 10rpx;" disabled="{{!gotoNext}}" bindtap="confirm" >确认</button>
       </view>
     </view>

@@ -2,7 +2,7 @@
   <mp-cell>
     <view style="display: flex;flex-direction: row;"  >
       <view class="left-column"  >已选优惠券：</view>
-      <view class="right-column" style="display: flex;" >{{ticket_list[current_selected_index].name}} 编号：{{ticket_list[current_selected_index].code}} <button style="width:200rpx" bindtap="cancel" size="mini">取消</button></view>
+      <view class="right-column" style="display: flex;" >{{ticket_list[current_selected_index].name}} 编号：{{ticket_list[current_selected_index].code}} <button style="width:100rpx; font-size: 8pt;height: 60rpx;" bindtap="cancel" size="mini">取消</button></view>
     </view>
   </mp-cell>
   <mp-cell>
