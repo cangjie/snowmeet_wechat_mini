@@ -102,6 +102,10 @@ button {
   font-size: 20px;
   font-weight: bold;
 }
+.must-fill-red-dot{
+  width: 10rpx;
+  color: red;
+}
 button{
   height: 65rpx;
   padding-top: 10rpx;

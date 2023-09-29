@@ -30,6 +30,13 @@ Component({
    * Component methods
    */
   methods: {
+    checkSerial(e){
+      console.log('checked', e)
+      var that = this
+      var item = that.data.item
+      item.confirmed_idDiff = e.detail.value
+      that.setData({item: item})
+    },
     getProductList(){
       var that = this
       var recept = that.data.recept
@@ -131,6 +138,25 @@ Component({
         case 'relation':
           var relation = that.data.relationItems[parseInt(value)]
           currentEquip.confirmed_relation = relation
+          break
+        case 'serial':
+          currentEquip.confirmed_id = value
+          currentEquip.confirmed_id_left = ''
+          currentEquip.confirmed_id_right = ''
+          break
+        case 'serialLeft':
+          if (currentEquip.confirmed_id_right == undefined || currentEquip.confirmed_id_right == null){
+            currentEquip.confirmed_id_right = ''
+          }
+          currentEquip.confirmed_id_left = value
+          currentEquip.confirmed_id = currentEquip.confirmed_id_left + '~' + currentEquip.confirmed_id_right
+          break
+        case 'serialRight':
+          if (currentEquip.confirmed_id_left == undefined || currentEquip.confirmed_id_left == null){
+            currentEquip.confirmed_id_left = ''
+          }
+          currentEquip.confirmed_id_right = value
+          currentEquip.confirmed_id = currentEquip.confirmed_id_left + '~' + currentEquip.confirmed_id_right
           break
         case 'item':
           var edge = 0
@@ -266,8 +292,18 @@ Component({
         if (item.confirmed_candle != undefined &&  item.confirmed_candle == 1){
           serviceDesc += ' 打蜡'
         }
-        
         item.serviceDesc = serviceDesc + ' ' + (item.confirmed_more == undefined? '' : item.confirmed_more)
+
+        item.confirmed_id_left = ''
+        item.confirmed_id_right = ''
+        if (item.confirmed_id != undefined && item.confirmed_id != null  && item.confirmed_id.indexOf('~') >= 0){
+          var idArr = item.confirmed_id.split('~')
+          item.confirmed_id_left = idArr[0]
+          item.confirmed_id_right = idArr[1]
+        }
+
+
+
         if (item.confirmed_relation == ''){
           item.confirmed_relation = '本人'
         }
@@ -348,6 +384,9 @@ Component({
       else if (item.confirmed_edge != 1 && item.confirmed_candle != 1 
         && ( util.isBlank(item.confirmed_more) ) ){
         valid = false    
+      }
+      else if (item.confirmed_id == undefined || item.confirm_id == null || item.confirmed_id == ''){
+        valid = false
       }
       else if (util.isBlank(item.confirmed_more)){
         that.setOthersValue(item)

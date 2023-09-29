@@ -31,14 +31,20 @@
     <mp-cells>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
-          <view style="width: 100rpx;text-align: right;font-size: 10pt;">类型：</view>
+          <view style="width: 100rpx;text-align: right;font-size: 10pt;" class="view-row" >
+            <view class="must-fill-red-dot" >*</view>
+            <view>类型：</view>
+          </view>
           <view style="width: 250rpx;">
             <radio-group id="type_{{index}}" style="display: flex; flex-direction: row;" bindchange="itemTypeChanged" >
               <radio checked="{{item.confirmed_equip_type == '双板'}}" value="双板" style="font-size: 10pt;" >双板</radio>
               <radio checked="{{item.confirmed_equip_type == '单板'}}" value="单板" style="font-size: 10pt;" >单板</radio>
             </radio-group>
           </view>
-          <view style="width: 100rpx;text-align: right;font-size: 10pt;">品牌：</view>
+          <view style="width: 100rpx;text-align: right;font-size: 10pt;" class="view-row" >
+            <view class="must-fill-red-dot" >*</view>
+            <view>品牌：</view>
+          </view>
           <view style="width: 250rpx;">
             <picker id="brand_{{index}}" wx:if="{{item.confirmed_equip_type=='单板'}}" mode="selector" range="{{boardBrands}}" bindchange="itemBrandChanged"  >
               <picker-view style="font-size: 10pt;" >{{((item.confirmed_brand == '' || item.confirmed_brand == undefined)?'请选择...':item.confirmed_brand)}}</picker-view>
@@ -51,7 +57,10 @@
       </mp-cell>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
-          <view style="width: 175rpx;text-align: right;font-size: 10pt;">长度：</view>
+          <view class="view-row" style="width: 175rpx;font-size: 10pt;justify-content: flex-end;align-items: flex-end;">
+            <view class="must-fill-red-dot" style="align-self: flex-end;" >*</view>
+            <view style="width: 75rpx;text-align: right;align-self: flex-end;">长度：</view>
+          </view>
           <view style="width: 175rpx;font-size: 10pt;"><input id="scale_{{index}}" placeholder="填写长度" value="{{item.confirmed_scale}}" bindinput="changed" /></view>
           <block wx:if="{{item.confirmed_equip_type=='单板'}}" >
             <view style="width: 175rpx;text-align: right;font-size: 10pt;">前脚：</view>
@@ -106,12 +115,43 @@
           </view>
         </view>
       </mp-cell>
+      <mp-cell style="padding-left: 0rpx; margin-left: 0rpx;">
+        <view class="view-row" >
+          <view class="left-column view-row" style="width: 115rpx;padding-left: 0rpx;margin-left: 0rpx;" >
+            <view style="color: red;margin-left: 0rpx; padding-left: 0rpx;" >*</view>
+            <view style="margin-left: 0rpx; padding-left: 0rpx;width: 100rpx;" >序列号：</view>
+          </view>
+          <view class="right-column" style="width: 560rpx;"  wx:if="{{item.confirmed_equip_type == '单板' }}" >
+            <input id="serial" style="width: 250rpx;" class="input" bindinput="changed"  value="{{item.confirmed_id}}" />
+          </view>
+          <view class="view-row" style="width: 560rpx;" wx:else  >
+            <view wx:if="{{item.confirmed_idDiff==undefined || !item.confirmed_idDiff}}" style="width: 380rpx;" >
+              <input id="serial" style="width: 250rpx;" class="input" bindinput="changed" value="{{item.confirmed_id}}" />
+            </view>
+            <view wx:else class="view-row" style="width: 380rpx;" >
+              <input id="serialLeft" style="width: 185rpx;" class="input" bindinput="changed" value="{{item.confirmed_id_left}}" />
+              /
+              <input id="serialRight" style="width: 185rpx;" class="input" bindinput="changed" value="{{item.confirmed_id_right}}"  />
+            </view>
+            
+            <switch  style="width: 180rpx;height:10rpx;font-size: 9pt;" checked="{{item.confirmed_idDiff}}" bindchange="checkSerial" >分左右</switch>
+          </view>
+        </view>
+      </mp-cell>
       <mp-cell>
-        <multi-uploader wx:if="{{displayUploader}}" id="uploader_{{index}}" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="changed" uploaded_files="{{item.confirmed_images}}" ></multi-uploader>
+        <view class="view-row" >
+          <view style="width: 10rpx;color: red;" >*</view>
+          <multi-uploader wx:if="{{displayUploader}}" id="uploader_{{index}}" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="changed" uploaded_files="{{item.confirmed_images}}" ></multi-uploader>
+        </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
-          <view class="left-column" style="width:15%"  >项目：</view>
+          <view class="left-column view-row" style="width:15%"  >
+            <view style="width: 10px;color:red">*</view>
+            <view>
+              项目：
+            </view>
+          </view>
           <view class="right-column" style="width: 85%; display: flex;flex-direction: row;" >
             <checkbox-group id="item_{{index}}" bindchange="changed" >
               <checkbox value='打蜡' checked="{{item.confirmed_candle == 1}}" >打蜡 </checkbox>
