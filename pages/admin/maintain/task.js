@@ -54,10 +54,8 @@ Page({
               var idRight = id.split('~')[1]
               task.id_left = idLeft
               task.id_right = idRight
+              //task.idDesc = '左：' + idLeft + ' 右：' + idRight 
               
-            }
-            else{
-
             }
           }
           var yearIndex = 0

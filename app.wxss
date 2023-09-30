@@ -111,3 +111,9 @@ button{
   padding-top: 10rpx;
   margin-top: 0rpx;
 }
+.no-margin{
+  margin: 0rpx;
+}
+.no-padding{
+  padding: 0rpx;
+}
