@@ -186,6 +186,7 @@ Page({
           }
         }
         var task = that.data.task
+        
         switch(currentStep){
           case '安全检查':
             if (stepSafe!=undefined){
@@ -234,7 +235,12 @@ Page({
           default:
             break
         }
-        that.setData({currentStep: currentStep, stepSafe: stepSafe, stepEdge: stepEdge, stepMore: stepMore, stepWax: stepWax, stepUnWax: stepUnWax})
+        console.log('current step', currentStep)
+        var finish = false
+        if (currentStep=='完成'){
+          finish = true
+        }
+        that.setData({currentStep: currentStep, stepSafe: stepSafe, stepEdge: stepEdge, stepMore: stepMore, stepWax: stepWax, stepUnWax: stepUnWax, finish: finish})
 
       }
     })
@@ -498,6 +504,7 @@ Page({
           ret.end_time_str = ''
         }
         var stepName = ret.step_name
+        //console.log('step name', stepName)
         switch(stepName){
           case '修刃':
             that.setData({stepEdge: ret})
