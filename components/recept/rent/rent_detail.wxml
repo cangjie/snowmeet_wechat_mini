@@ -1,2 +1,25 @@
 <!--components/recept/rent/rent_detail.wxml-->
-<text>components/recept/rent/rent_detail.wxml</text>
+<mp-cells>
+  <mp-cell wx:for="{{recept.rentOrder.details}}" >
+    <view class="view-row" >
+      <view style="display: flex;flex-direction: column;">
+        <image style="height: 300rpx;width: 300rpx;" mode="aspectFit" src="{{item.item.showImage}}"  ></image>
+      </view>
+      <view>
+        <view>{{item.rent_item_name}}</view>
+        <view class="view-row">
+          <view>分类：</view>
+          <view>{{item.item.class}}</view>
+        </view>
+        <view class="view-row">
+          <view>编码：</view>
+          <view>{{item.rent_item_code}}</view>
+        </view>
+        <view class="view-row">
+          <view>押金：</view>
+          <view>{{item.depositStr}}</view>
+        </view>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
