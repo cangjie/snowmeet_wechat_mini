@@ -77,8 +77,8 @@
         },
         {
           "name": "",
-          "pathName": "pages/admin/recept/recept_summary",
-          "query": "id=292",
+          "pathName": "pages/register/register",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },

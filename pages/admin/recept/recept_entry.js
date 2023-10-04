@@ -78,7 +78,7 @@ Page({
           clearInterval(that.data.interVal)
         }
         else if (res.statusCode == 200){
-          clearInterval(that.data.interVal)
+          //clearInterval(that.data.interVal)
           var scan = res.data
           var needJump = false
           if (scan.scan ==1){

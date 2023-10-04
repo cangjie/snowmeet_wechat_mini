@@ -1,0 +1,6 @@
+<!--pages/register/register.wxml-->
+<view>
+  <view>欢迎注册成为易龙雪聚会员</view>
+  <view>点击下方按钮，授权手机号，即可注册成为会员</view>
+  <view><button open-type="getPhoneNumber" bindgetphonenumber="getCell" > 授 权 </button></view>
+</view>
