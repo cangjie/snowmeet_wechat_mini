@@ -11,11 +11,15 @@ Page({
     buttons: [{text: '取消'}, {text: '确定'}],
     dialogShow: false,
     uploadFileArray:[],
-    stepId:['2','7','9'],
+    stepId:['2'],
     uploadIndex:0,
     fileArray:[]
   },
-
+  selectFile: function(files) {
+    console.log('files', files)
+    return true
+    // 返回false可以阻止某次文件上传
+  },
   /**
    * Lifecycle function--Called when page load
    */
@@ -62,7 +66,10 @@ Page({
    * Lifecycle function--Called when page unload
    */
   onUnload: function () {
-
+    this.setData({
+      selectFile: this.selectFile.bind(this),
+      uploadFile: this.uploadFile.bind(this)
+    })
   },
 
   /**
@@ -87,6 +94,7 @@ Page({
   },
   selectFile(files) {
     console.log('files', files)
+    return true
     // 返回false可以阻止某次文件上传
   },
   uploadFile(files) {

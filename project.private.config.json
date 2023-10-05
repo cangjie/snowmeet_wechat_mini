@@ -30,8 +30,9 @@
         },
         {
           "name": "upload_big_file",
-          "pathName": "pages/test/upload/choose_video_upload",
+          "pathName": "pages/test/upload/upload",
           "query": "",
+          "launchMode": "default",
           "scene": null
         },
         {
