@@ -25,7 +25,7 @@
         <view class="left-column" >日期：</view>
         <view class="right-column" >{{item.date}}</view>
         <view class="left-column" >状态：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.status}}</view>
       </view>
     </mp-cell>
   </mp-cells>

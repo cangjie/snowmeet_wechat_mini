@@ -84,9 +84,9 @@
           "scene": null
         },
         {
-          "name": "get cell number",
-          "pathName": "pages/payment/pay_hub",
-          "query": "id=3931",
+          "name": "pay",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=348",
           "launchMode": "default",
           "scene": null
         },

@@ -126,7 +126,8 @@
       "root": "pages/payment",
       "name": "pay",
       "pages": [
-        "pay_hub"
+        "pay_hub",
+        "pay_recept"
       ]
     },
     {
