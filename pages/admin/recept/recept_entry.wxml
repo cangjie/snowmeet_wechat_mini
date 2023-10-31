@@ -11,7 +11,7 @@
           <input  placeholder="填写手机号" style="width: 300rpx;height: 50rpx;" class="input" bindinput="cellChanged" type="digit" />
         </view>
         <view class="right-column" style="width: 250rpx;" >
-          <button disabled="{{cell == undefined || cell.length != 11}}" style="width: 180rpx;height: 65rpx;padding-top: 0rpx;margin-top: 0rpx;" bindtap="searchUser" size="mini" >确认</button>
+          <button disabled="{{cell == undefined || cell.length != 11}}" style="width: 180rpx;height: 65rpx;padding-top: 0rpx;margin-top: 0rpx;" bindtap="searchUser" size="mini" class="input" >确认</button>
         </view>
       </view>
     </mp-cell>
@@ -23,6 +23,6 @@
     <mp-cell style="text-align: center;"><button disabled="true" >Still to come.</button> </mp-cell>
   </mp-cells-->
   <mp-cells title="散客" >
-    <mp-cell><button bindtap="goDirectly" > 直 接 进 入 </button></mp-cell>
+    <mp-cell><button bindtap="goDirectly" class="input" > 直 接 进 入 </button></mp-cell>
   </mp-cells>
 </view>

@@ -9,23 +9,23 @@
     <mp-cell id="recept" bindtap="nav">店铺接待</mp-cell>
     <mp-cell id="recept_list" bindtap="nav" >未完成的接待</mp-cell>
   </mp-cells>
-  <mp-cells  ext-class="my-cells" title="UTV" >
+  <!--mp-cells  ext-class="my-cells" title="UTV" >
     <mp-cell id="utv_reserve_list" bindtap="nav">预约列表</mp-cell>
     <mp-cell id="utv_race_list" bindtap="nav" >UTV发车列表</mp-cell>
-  </mp-cells>
+  </mp-cells-->
   <mp-cells ext-class="my-cells" title="店铺销售" >
     <mp-cell id="shopSale" bindtap="gotoSale" >店销现货</mp-cell>
     <mp-cell id="shopSaleList" bindtap="gotoSale" >订单列表</mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="养护相关" >
-    <mp-cell value="现场雪具养护收款" bindtap="goToMaintainRecept" ></mp-cell>
+    <!--mp-cell value="现场雪具养护收款" bindtap="goToMaintainRecept" ></mp-cell-->
     <!--mp-cell value="现场雪具养护批量收款" bindtap="goToMaintainInShopQuickBatch" ></mp-cell-->
     <mp-cell value="现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
     <!--mp-cell id="SummerMaintainRecept" value="非雪季养护收板" bindtap="gotoSummerMaintain" ></mp-cell>
     <mp-cell id="SummerMaintainList" value="非雪季养护列表" bindtap="gotoSummerMaintain" ></mp-cell-->
   </mp-cells>
   <mp-cells ext-class="my-cells" title="租赁" >
-    <mp-cell id="rend_admit" value="租赁收押金" bindtap="nav" ></mp-cell>
+    <!--mp-cell id="rend_admit" value="租赁收押金" bindtap="nav" ></mp-cell-->
     <mp-cell id="rent_list" value="查看租赁订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_list_cell" value="快速查找订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_report" value="租赁报表" bindtap="nav" ></mp-cell>

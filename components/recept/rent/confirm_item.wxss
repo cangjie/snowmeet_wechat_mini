@@ -1,4 +1,5 @@
 /* components/recept/rent/confirm_item.wxss */
+@import '/app.wxss';
 .op-cell{
   height: 70rpx;
   padding-top: 20rpx;
