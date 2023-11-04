@@ -14,30 +14,41 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({paymentId: options.paymentId})
-    app.loginPromiseNew.then(function(resolve){
-      var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/TenpayRequest/' + that.data.paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: paymentUrl,
-        method: 'GET',
-        success:(res)=>{
-          wx.requestPayment({
-            nonceStr: res.data.nonce,
-            package: 'prepay_id=' + res.data.prepay_id,
-            paySign: res.data.sign,
-            timeStamp: res.data.timeStamp,
-            signType: 'MD5',
-            success:(res)=>{
-              wx.showToast({
-                title: '支付成功。',
-                icon: 'none'
-              })
-            }
-          })
+    that.setData({orderId: options.id})
+    var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/CreatePayment/' + that.data.orderId + '?payMethod=' + encodeURIComponent('微信支付') + '&amount=0'
+    wx.request({
+      url: paymentUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
         }
-      })
-
+        that.setData({paymentId: res.data.id})
+        //that.pay()
+        var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/TenpayRequest/' + that.data.paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: paymentUrl,
+          method: 'GET',
+          success:(res)=>{
+            wx.requestPayment({
+              nonceStr: res.data.nonce,
+              package: 'prepay_id=' + res.data.prepay_id,
+              paySign: res.data.sign,
+              timeStamp: res.data.timeStamp,
+              signType: 'MD5',
+              success:(res)=>{
+                wx.showToast({
+                  title: '支付成功。',
+                  icon: 'none'
+                })
+              }
+            })
+          }
+        })
+      }
     })
+    
+    
   },
 
   /**

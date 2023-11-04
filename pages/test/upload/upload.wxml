@@ -1,5 +1,6 @@
 <!--pages/test/upload/upload.wxml-->
 <!--text>pages/test/upload/upload.wxml</text-->
+<mp-uploader   bindfail="uploadError" bindsuccess="uploadSuccess" select="{{selectFile}}" upload="{{uploadFile}}" files="{{files}}" max-count="3" title="" max-size="1024*1024*1024"   ></mp-uploader>
 <block wx:for="{{stepId}}" >
   <multi-uploader id="{{item}}" image_count="5" bindUploadEvent="uploaded" ></multi-uploader>
 </block>

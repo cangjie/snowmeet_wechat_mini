@@ -10,8 +10,15 @@
     "miniprogram": {
       "list": [
         {
+          "name": "pay",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=697",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "",
-          "pathName": "pages/admin/recept/recept_summary",
+          "pathName": "pages/mine/mine",
           "query": "id=309",
           "launchMode": "default",
           "scene": null
@@ -30,8 +37,9 @@
         },
         {
           "name": "upload_big_file",
-          "pathName": "pages/test/upload/choose_video_upload",
+          "pathName": "pages/test/upload/upload",
           "query": "",
+          "launchMode": "default",
           "scene": null
         },
         {
@@ -77,15 +85,8 @@
         },
         {
           "name": "",
-          "pathName": "pages/admin/recept/recept_summary",
-          "query": "id=292",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "get cell number",
-          "pathName": "pages/payment/pay_hub",
-          "query": "id=3931",
+          "pathName": "pages/register/register",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },

@@ -1,1 +1,1 @@
-<mp-uploader  bindfail="uploadError" bindsuccess="uploadSuccess" select="{{selectFile}}" upload="{{uploadFile}}" files="{{files}}" max-count="3" title="{{title}}" binddelete="delete" delete="true"  ></mp-uploader>
+<mp-uploader  bindfail="uploadError" bindsuccess="uploadSuccess" select="{{selectFile}}" upload="{{uploadFile}}" files="{{files}}" max-count="3" title="{{title}}" binddelete="delete" delete="true" max-size="{{1024*1024*1024}}"  ></mp-uploader>

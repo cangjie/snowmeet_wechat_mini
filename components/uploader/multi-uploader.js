@@ -62,6 +62,7 @@ Component({
     },
     selectFile: function(files) {
       console.log('files', files)
+      return true
       // 返回false可以阻止某次文件上传
     },
     uploadFile: function(files) {

@@ -23,6 +23,7 @@ Page({
         method: 'GET',
         success:(res)=>{
           if (res.statusCode == 200){
+            console.log('get maintian order', res)
             var order = res.data
             order.dateStr = util.formatDate(new Date(order.orderDate))
             order.timeStr = util.formatTimeStr(new Date(order.orderDate))
@@ -68,7 +69,12 @@ Page({
 
             }
             var needPay = false
+            /*
             if (options.paymentId!=undefined && order.order.pay_method == '微信支付' && order.order.payments != null && order.order.payments[0].status == '待支付'){
+              needPay = true
+            }
+            */
+            if (order.order != null && order.order.final_price * 100 > 0 && order.order.pay_state == 0){
               needPay = true
             }
             order.order.order_price_str = util.showAmount(order.order.order_price)
@@ -80,6 +86,22 @@ Page({
         }
       })
 
+    })
+  },
+
+  payOrder(){
+    var that = this
+    var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/CreatePayment/' + that.data.order.order.id + '?payMethod=' + encodeURIComponent('微信支付') + '&amount=0'
+    wx.request({
+      url: paymentUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.setData({paymentId: res.data.id})
+        that.pay()
+      }
     })
   },
 

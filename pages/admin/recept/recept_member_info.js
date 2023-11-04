@@ -93,15 +93,20 @@ Page({
     var newReceptUrl = 'https://' + app.globalData.domainName + '/core/Recept/NewRecept?openId=' + encodeURIComponent(that.data.openId) 
     + '&scene=' + encodeURIComponent(scene) + '&shop=' + encodeURIComponent(that.data.shop) 
     + ((that.data.ticketCode != undefined)? ('&code=' + that.data.ticketCode) : '') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    console.log('new recept url', newReceptUrl)
     wx.request({
       url: newReceptUrl,
       method: 'GET',
       success:(res)=>{
         console.log('new recept', e)
         if (res.statusCode != 200){
+          wx.showToast({
+            title: '系统故障',
+            icon:'error'
+          })
           return
         }
-        wx.navigateTo({ 
+        wx.redirectTo({ 
           url: 'recept?id=' + res.data.id,
         })
       }
