@@ -79,18 +79,6 @@ Page({
             detail.reparationStr = util.showAmount(detail.reparation)
             detail.showGallery = false
             detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
-
-            /*
-            if (startDate.getHours() >= 16 && currentTime.getDate() == startDate.getDate()){
-              detail.overTime = false
-            }
-            else if (currentTime.getHours()>=11){
-              detail.overTime = true
-            }
-            else{
-              detail.overTime = false
-            }
-            */
             rentOrder.details[i] = detail
 
           }
@@ -136,11 +124,8 @@ Page({
     if (!isNaN(value)){
       detail.reparation = value
     }
-    var filledRental = parseFloat(detail.filled_rental)
-    if (isNaN(filledRental)){
-      filledRental = detail.real_rental
-    }
-    detail.refund_str = util.showAmount(detail.deposit - filledRental - detail.reparation - detail.overtime_charge)
+    
+    detail.refund_str = util.showAmount(detail.deposit - detail.real_rental - detail.reparation - detail.overtime_charge)
     that.setData({rentOrder: rentOrder})
     that.computeTotal()
   },
@@ -170,26 +155,44 @@ Page({
     var totalReparation = 0
     var totalOvertimeCharge = 0
     for(var i = 0; i < rentOrder.details.length; i++){
-      var rental = 0
+      
       var detail = rentOrder.details[i]
+      if (detail.rental_discount == undefined || isNaN(detail.rental_discount)){
+        detail.rental_discount = 0
+      }
+      detail.rental_discountStr = util.showAmount(detail.rental_discount)
+      if (detail.rental_ticket_discount == undefined || isNaN(detail.rental_ticket_discount)){
+        detail.rental_ticket_discount = 0
+      }
+      detail.rental_ticket_discountStr = util.showAmount(detail.rental_ticket_discount)
+      var rental = detail.suggestRental - detail.rental_ticket_discount - detail.rental_discount
+      detail.real_rental = rental
+      detail.real_rental_str = util.showAmount(rental)
+      detail.refund_str = util.showAmount(detail.deposit - detail.real_rental - detail.reparation - detail.overtime_charge)
+      detail.paySummary = rental + detail.reparation + detail.overtime_charge
+      detail.paySummaryStr = util.showAmount(detail.paySummary)
+      /*
       var filledRental = parseFloat(detail.filled_rental)
       if (isNaN(filledRental)){
         rental = parseFloat(detail.real_rental)
       }
+      
       else {
         rental = filledRental
       }
+      */
       totalRental = totalRental + rental
       totalReparation = totalReparation + detail.reparation
       totalOvertimeCharge = totalOvertimeCharge + detail.overtime_charge
     }
     var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation - totalOvertimeCharge
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
-      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge)})
+      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder})
   },
   
 //////set buttons/////////////
   computeAmount(rentOrder){
+    var that = this
     var details = rentOrder.details
     for(var i = 0; i < details.length; i++){
       var unit_rental = parseFloat(details[i].unit_rental)
@@ -229,12 +232,14 @@ Page({
       else{
         details[i].reparationStr = util.showAmount(reparation)
       }
+      details[i].real_rental_str = util.showAmount(details[i].real_rental)
       refund = deposit - overtime_charge - reparation - real_rental
       
       details[i].refund_str = util.showAmount(refund)
       details[i].refund = refund
       
     }
+    that.setData({rentOrder: rentOrder})
     return rentOrder
   },
 
@@ -505,6 +510,34 @@ Page({
     that.setData({rentOrder: rentOrder})
     that.computeTotal()
 
+  },
+
+  setDiscount(e){
+    var id = parseInt(e.currentTarget.id.split('_')[1])
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var value = parseFloat(e.detail.value)
+    if (isNaN(value)){
+      return
+    }
+    detail.rental_discount = value
+    that.setData({rentOrder: rentOrder})
+    that.computeTotal()
+  },
+
+  setTicketDiscount(e){
+    var id = parseInt(e.currentTarget.id.split('_')[2])
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var value = parseFloat(e.detail.value)
+    if (isNaN(value)){
+      return
+    }
+    detail.rental_ticket_discount = value
+    that.setData({rentOrder: rentOrder})
+    that.computeTotal()
   },
 
   

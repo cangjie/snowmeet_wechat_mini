@@ -37,10 +37,14 @@
     </view>
   </view>
   <view style="display: flex; flex-direction: row;">
-    <view class="left-column">支付单号：</view>
-    <view class="right-column" style="width: 300rpx;" >{{rentOrder.outTradeNo}}</view>
+    
     <view class="left-column">支付方式：</view>
     <view class="right-column" >{{rentOrder.order.payments[0].pay_method}}</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">支付单号：</view>
+    <view class="right-column">{{rentOrder.outTradeNo}}</view>
+    
   </view>
   <view style="display: flex; flex-direction: row;" >
     <view class="left-column">订单时间：</view>
@@ -55,21 +59,19 @@
   </view>
   <mp-gallery show="{{showCreditGallery}}" showDelete="{{false}}" imgUrls="{{rentOrder.guarantee_credit_photos_arr}}" current="{{0}}"  ></mp-gallery>
   <mp-cells title="租赁明细 {{rentOrder.details.length}}" >
-    <mp-cell wx:for="{{rentOrder.details}}">
+    <mp-cell wx:for="{{rentOrder.details}}" style="margin-left: 0rpx;">
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column" style="width: 100rpx;">编号：</view>
-        <view wx:if="{{item.isEdit && item.editType != '暂存' }}" class="right-column" style="display: flex; flex-direction: row;width: 275rpx;"  >
+        <view class="left-column" >编号：</view>
+        <view wx:if="{{item.isEdit && item.editType != '暂存' }}" class="right-column" style="display: flex; flex-direction: row;"  >
           <input id="code_{{index}}" style="width: 200rpx;" value="{{item.rent_item_code}}" bindinput="setTextValue" class="input" type="text" /> 
-          <button id="{{index}}" style="padding: 0rpx; width:55rpx; height:55rpx" bindtap="scan" >
-            <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 60rpx;" />
-          </button>
+          
         </view>
-        <view wx:else class="right-column" style="width: 275rpx;" >{{item.rent_item_code}}</view>
-        <view class="left-column" style="width: 100rpx;">名称：</view>
-        <view wx:if="{{item.isEdit && item.editType != '暂存'}}" style="width: 275rpx;" class="right-column"  >
+        <view wx:else class="right-column"  >{{item.rent_item_code}}</view>
+        <view class="left-column" >名称：</view>
+        <view wx:if="{{item.isEdit && item.editType != '暂存'}}"  class="right-column"  >
           <input style="width: 200rpx;" value="{{item.rent_item_name}}" id="name_{{index}}"  bindinput="setTextValue" type="text" class="input" />
         </view>
-        <view wx:else class="right-column" style="width: 300rpx;" >{{item.rent_item_name}}</view>
+        <view wx:else class="right-column"  >{{item.rent_item_name}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">分类：</view>
@@ -83,10 +85,10 @@
         <view class="right-column">{{item.status}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column" style="width: 25%;" >押金类型：</view>
-        <view class="right-column" style="width: 15%;" >{{item.deposit_type}}</view>
-        <view class="left-column" style="width: 25%;" >计划归还：</view>
-        <view class="right-column" style="width: 35%;" >{{rentOrder.due_end_time_str}}</view>
+        <view class="left-column"  >押金类型：</view>
+        <view class="right-column"  >{{item.deposit_type}}</view>
+        <view class="left-column"  >计划归还：</view>
+        <view class="right-column" style="font-size: 9pt;"  >{{rentOrder.due_end_time_str}}</view>
         
       </view>
       <view style="display: flex; flex-direction: row;">
@@ -99,20 +101,31 @@
         <view class="right-column">{{item.timeLength}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column">租金：</view>
+        <view class="left-column">租金小计：</view>
         <view class="right-column">
-          <input  wx:if="{{item.status == '未归还' || item.isEdit == true }}" type="digit" id="rental_{{index}}" placeholder="{{item.real_rental == 0 ? item.suggestRental : item.real_rental}}"   bindinput="setRental" class="input" style="width: 150rpx;"  />
-          <block wx:else>{{item.real_rental_str}}</block>
+          {{item.suggestRental_str}}
         </view>
-        <view class="left-column">押金：</view>
-        <view class="right-column">{{item.deposit_str}}</view>
+        <view class="left-column">租金减免：</view>
+        <view class="right-column">
+          <input wx:if="{{(item.status == '未归还' || item.isEdit == true) && item.editType != '暂存' }}" type="digit" id="discount_{{index}}" placeholder="{{item.rental_discount}}" bindinput="setDiscount" class="input" style="width: 150rpx;" /> 
+          <block wx:else>{{item.rental_discountStr}}</block>
+        </view>
+      </view>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >优惠券减免：</view>
+        <view class="right-column">
+          <input wx:if="{{(item.status == '未归还' || item.isEdit == true) && item.editType != '暂存' }}" type="digit" id="ticket_discount_{{index}}" placeholder="{{item.rental_ticket_discount}}" bindinput="setTicketDiscount" class="input" style="width: 150rpx;" /> 
+          <block wx:else>{{item.rental_ticket_discountStr}}</block>
+        </view>
+        <view class="left-column">应付租金：</view>
+        <view class="right-column">{{item.real_rental_str}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">超时：</view>
         <view class="right-column">{{(item.overTime)? '是' : '否'}}</view>
         <view class="left-column">超时费：</view>
         <view class="right-column">
-          <input wx:if="{{item.isEdit && item.editType != '暂存'}}" id="{{index}}" bindinput="setOvertimeCharge" class="input" style="width: 150rpx;" />
+          <input wx:if="{{item.isEdit && item.editType != '暂存'}}" id="{{index}}" bindinput="setOvertimeCharge" class="input" style="width: 150rpx;" placeholder="{{item.overtime_charge}}" />
           <view wx:else >{{item.overtime_charge_str}}</view>
           
         </view>
@@ -123,6 +136,12 @@
           <input wx:if="{{(item.status == '未归还' || item.isEdit == true) && item.editType != '暂存' }}" type="digit" id="reparation_{{index}}" placeholder="{{item.reparation}}" bindinput="setReparation" class="input" style="width: 150rpx;" /> 
           <block wx:else>{{item.reparationStr}}</block>
         </view>
+        <view class="left-column">应付总计：</view>
+        <view class="right-column">{{item.paySummaryStr}}</view>
+      </view>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column">已付押金：</view>
+        <view class="right-column">{{item.deposit_str}}</view>
         <view class="left-column">应退金额：</view>
         <view class="right-column">{{item.refund_str}}</view>
       </view>

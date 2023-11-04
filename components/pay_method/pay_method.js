@@ -14,7 +14,7 @@ Component({
    * Component initial data
    */
   data: {
-    payMethodList:['微信支付', '支付宝支付', '支付宝转账', '微信转账','京东收银', 'POS刷卡', '现金'],
+    payMethodList:['微信支付', '支付宝转账', '微信转账','京东收银', 'POS刷卡', '现金'],
     payMethodSelectedIndex: 0
   },
   lifetimes:{
