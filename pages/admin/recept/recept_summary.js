@@ -79,16 +79,75 @@ Page({
     switch(payMethod){
         case '微信支付':
             payQrCode = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_recept_id_' + recept.id
+            var interVal = setInterval(that.checkPaid, 1000)
+            that.setData({interVal: interVal})
             break
         case '支付宝支付':
             payQrCode = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_recept_id_' + recept.id
             break
         default:
+            clearInterval(that.data.interVal)
             break
     }
     that.setData({payQrCode: payQrCode, payMethod: payMethod})
   },
 
+  checkPaid(){
+    var that = this
+    var recept = that.data.recept
+    var orderId = 0
+    var jumpUrl = ''
+    switch(recept.recept_type){
+      case '租赁下单':
+        orderId = recept.rentOrder.order_id
+        jumpUrl = '../rent/rent_list'
+        break
+      case '养护下单':
+        orderId = recept.maintainOrder.order.id
+        jumpUrl = '/pages/admin/maintain/task_list'
+        break
+      default:
+        break
+    }
+    if (orderId == 0){
+      clearInterval(that.data.interVal)
+      return
+    }
+    var getUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrderOnline/' 
+      + orderId.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('get order', res.data)
+        if (res.data.pay_state == 1){
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success',
+            duration: 2000
+          })
+          clearInterval(that.data.interVal)
+          setTimeout(
+            wx.redirectTo({
+              url: jumpUrl
+            })
+          , 2000)
+
+        }
+      },
+      fail:(res)=>{
+        wx.showToast({
+          title: '网络错误',
+          icon:'error'
+        })
+        clearInterval(that.data.interVal)
+      }
+    })
+  },
+
+
+
+/*
   checkScan(){
     var that = this
     var checkScanUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetScanInfo/' + that.data.actId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -130,7 +189,7 @@ Page({
       }
     })
   },
-
+*/
   /**
    * Lifecycle function--Called when page load
    */
@@ -186,7 +245,7 @@ Page({
               default:
                 break
             }
-            
+            /*
             if (recept.open_id == ''){
             
                 var getScanIdUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetInterviewId?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -208,6 +267,7 @@ Page({
                 })
                 
             }
+            */
             that.setData({recept: recept, needPay: needPay, zeroPay: zeroPay})
             
           }

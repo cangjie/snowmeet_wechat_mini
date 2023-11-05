@@ -10,7 +10,7 @@
           </radio-group>
         </view>
         <view class="right-column" wx:else style="display: flex;flex-direction: row;" >
-          <slider style="width: 300rpx;" min="0" max="10" step="1" value="{{rentDays}}" show-value="{{true}}" bindchange="setDueEndTime" ></slider>
+          <slider style="width: 300rpx;" min="1" max="10" step="1" value="{{rentDays}}" show-value="{{true}}" bindchange="setDueEndTime" ></slider>
           <view style="height: 10rpx;margin-top: 15rpx;">天</view>
         </view>
       </view>

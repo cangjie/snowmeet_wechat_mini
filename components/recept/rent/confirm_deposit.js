@@ -31,7 +31,8 @@ Component({
     totalDepositStr: '¥0.00',
     totalRentalStr: '¥0.00',
     creditImages: '',
-    totalPayStr: '¥0.00'
+    totalPayStr: '¥0.00',
+    rentDays: 1
   },
   pageLifetimes:{
     show(){
@@ -61,6 +62,11 @@ Component({
                 var detail = recept.rentOrder.details[i]
                 
                 var startDate = util.formatDate(new Date(detail.start_date))
+                var orderStartDate = new Date(recept.rentOrder.start_date)
+                if (orderStartDate.getFullYear()==1){
+                  recept.rentOrder.start_date = startDate
+                  recept.rentOrder.due_end_date = startDate
+                }
                 var item = {index: i, code: detail.rent_item_code, isNoCode: (detail.rent_item_code == ''), class: detail.rent_item_class, name: detail.rent_item_name, rental: detail.unit_rental, deposit: detail.deposit, depositType: detail.deposit_type, startDate: startDate, memo: detail.memo, rentalStr: util.showAmount(detail.unit_rental), depositStr: util.showAmount(detail.deposit)}
                 totalDeposit += detail.deposit
                 totalRental += detail.unit_rental
