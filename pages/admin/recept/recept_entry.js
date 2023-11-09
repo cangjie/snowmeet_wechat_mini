@@ -137,14 +137,18 @@ Page({
    * Lifecycle function--Called when page hide
    */
   onHide() {
-
+    console.log('hide')
   },
 
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload() {
-
+    console.log('unload')
+    var that = this
+    if (that.data.interVal != undefined && that.data.interVal > 0){
+      clearInterval(that.data.interVal)
+    }
   },
 
   /**
