@@ -12,7 +12,14 @@
         {
           "name": "pay",
           "pathName": "pages/payment/pay_recept",
-          "query": "id=697",
+          "query": "id=771",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "mine",
+          "pathName": "pages/mine/mine",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },
@@ -65,13 +72,6 @@
         {
           "name": "ticket share",
           "pathName": "pages/tickets/tickets_get",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "mine",
-          "pathName": "pages/mine/ticket/ticket_list",
           "query": "",
           "launchMode": "default",
           "scene": null

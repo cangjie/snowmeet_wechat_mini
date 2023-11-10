@@ -26,8 +26,8 @@
     <view class="right-column">{{rentOrder.deposit_reduce_str}}</view>
   </view>
   <view style="display: flex; flex-direction: row;">
-    <view class="left-column">支付金额：</view>
-    <view class="right-column">{{rentOrder.deposit_final_str}}</view>
+    <view class="left-column">实付押金：</view>
+    <view class="right-column" style="color: red;">{{rentOrder.deposit_final_str}}</view>
     <view class="left-column">订单状态：</view>
     <view class="right-column" >
       <block wx:if="{{rentOrder.status != '未支付'}}"  >
@@ -117,8 +117,8 @@
           <input wx:if="{{(item.status == '未归还' || item.isEdit == true) && item.editType != '暂存' }}" type="digit" id="ticket_discount_{{index}}" placeholder="{{item.rental_ticket_discount}}" bindinput="setTicketDiscount" class="input" style="width: 150rpx;" /> 
           <block wx:else>{{item.rental_ticket_discountStr}}</block>
         </view>
-        <view class="left-column">应付租金：</view>
-        <view class="right-column">{{item.real_rental_str}}</view>
+        <view class="left-column">实付租金：</view>
+        <view class="right-column" style="color: red;">{{item.real_rental_str}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
         <view class="left-column">超时：</view>
@@ -196,14 +196,14 @@
     <button bindtap="restore" disabled="{{rentOrder.status != '未支付'}}" size="mini" bindtap="close" >关闭</button>
   </view>
   <view style="display: flex; flex-direction: row;">
-    <view class="left-column">已付押金：</view>
-    <view class="right-column">{{rentOrder.deposit_final_str}}</view>
+    <view class="left-column">实付押金：</view>
+    <view class="right-column" style="color: red;">{{rentOrder.deposit_final_str}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
   <view style="display: flex; flex-direction: row;">
-    <view class="left-column">租金合计：</view>
-    <view class="right-column">{{totalRentalStr}}</view>
+    <view class="left-column" >租金合计：</view>
+    <view class="right-column" style="color: red;" >{{totalRentalStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>

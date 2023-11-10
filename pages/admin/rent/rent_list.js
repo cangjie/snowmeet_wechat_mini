@@ -68,7 +68,24 @@ Page({
             orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
             totalPaid = totalPaid + orders[i].deposit_final
             totalRefund = totalRefund + orders[i].refund
+            if (orders[i].discount > 0 || orders[i].ticketDiscount > 0
+              || orders[i].noDeposit){
+              orders[i].textColor = '#FF0000'
+            }
+            else if (orders[i].status == '已关闭'){
+              orders[i].textColor = '#C0C0C0'
+            }
+            else {
+              orders[i].textColor = ''
+            }
+            if (orders[i].pay_option == '招待'){
+              orders[i].backColor = 'yellow'
+            }
+            else {
+              orders[i].backColor = ''
+            }
           }
+          console.log('get orders', orders)
           that.setData({orders: orders, totalPaidStr: util.showAmount(totalPaid), 
             totalRefundStr: util.showAmount(totalRefund)})
         }
