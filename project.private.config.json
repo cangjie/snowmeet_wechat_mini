@@ -12,7 +12,7 @@
         {
           "name": "pay",
           "pathName": "pages/payment/pay_recept",
-          "query": "id=771",
+          "query": "id=794",
           "launchMode": "default",
           "scene": null
         },

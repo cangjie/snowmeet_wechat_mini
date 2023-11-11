@@ -1,2 +1,4 @@
-<!--pages/payment/pay_recept.wxml-->
-<text>pages/payment/pay_recept.wxml</text>
+<view wx:if="{{!netWorkError}}" >正在确认您的支付信息。。。</view>
+<view wx:else >
+  <button bindtap="retry" >网络繁忙，请点击重试。</button>
+</view>

@@ -6,14 +6,22 @@ Page({
    * Page initial data
    */
   data: {
-
+    netWorkError: false
   },
 
+  retry(){
+    var that = this
+    wx.reLaunch({
+      url: '/pages/payment/pay_recept?id=' + that.data.id,
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
     var id = options.id
+    var that = this
+    that.setData({id: id})
     app.loginPromiseNew.then(function (resolve){
       var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + id.toString() 
       + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -35,10 +43,17 @@ Page({
           }
 
           if (jumpUrl!=''){
-            wx.redirectTo({
+            wx.navigateTo({
               url: jumpUrl
             })
           }
+        },
+        faile:(res)=>{
+          wx.showToast({
+            title: '网络有点慢，请稍候。',
+            icon: 'loading'
+          })
+          that.setData({netWorkError: true})
         }
       })
     })
