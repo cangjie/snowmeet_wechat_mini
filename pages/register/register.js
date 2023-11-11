@@ -6,7 +6,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    isLogin: false
   },
 
   getCell(e){
@@ -41,8 +41,9 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
+    var that = this
     app.loginPromiseNew.then(function(resolve){
-
+      that.setData({isLogin: true})
     })
   },
 
