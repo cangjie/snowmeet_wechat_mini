@@ -6,7 +6,8 @@ Page({
    * Page initial data
    */
   data: {
-    netWorkError: false
+    netWorkError: false,
+    state: 0
   },
 
   retry(){
@@ -21,8 +22,9 @@ Page({
   onLoad(options) {
     var id = options.id
     var that = this
-    that.setData({id: id})
+    
     app.loginPromiseNew.then(function (resolve){
+      that.setData({state: 1})
       var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + id.toString() 
       + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
@@ -41,7 +43,7 @@ Page({
           if (recept.rentOrder != null){
             jumpUrl = '../experience/pay_temp?id=' + recept.rentOrder.order_id 
           }
-
+          that.setData({state: 2})
           if (jumpUrl!=''){
             wx.navigateTo({
               url: jumpUrl

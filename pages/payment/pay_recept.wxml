@@ -1,4 +1,14 @@
-<view wx:if="{{!netWorkError}}" >正在确认您的支付信息。。。</view>
+<view wx:if="{{!netWorkError}}" >
+  <view wx:if="{{state == 0}}" >
+    请稍候，等待小程序启动。
+  </view>
+  <view wx:if="{{state == 1}}" >
+    小程序启动成功。
+  </view>
+  <view wx:if="{{state == 2}}" >
+    已经确认您的支付信息，即将完成安全加密。
+  </view>
+</view>
 <view wx:else >
   <button bindtap="retry" >网络繁忙，请点击重试。</button>
 </view>
