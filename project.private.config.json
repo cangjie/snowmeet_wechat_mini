@@ -12,7 +12,7 @@
         {
           "name": "pay",
           "pathName": "pages/payment/pay_recept",
-          "query": "id=794",
+          "query": "id=804",
           "launchMode": "default",
           "scene": null
         },
@@ -24,9 +24,9 @@
           "scene": null
         },
         {
-          "name": "",
-          "pathName": "pages/mine/mine",
-          "query": "id=309",
+          "name": "reg",
+          "pathName": "pages/register/register",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },

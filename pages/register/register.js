@@ -16,6 +16,13 @@ Page({
       url: url,
       success:(res)=>{
         if (res.statusCode != 200){
+          wx.showToast({
+            title: '网络繁忙，请稍候再试。',
+            icon: 'error',
+            success: (res) => {},
+            fail: (res) => {},
+            complete: (res) => {},
+          })
           return
         }
         wx.showToast({
@@ -25,6 +32,7 @@ Page({
           fail: (res) => {},
           complete: (res) => {},
         })
+        
       }
     })
   },
