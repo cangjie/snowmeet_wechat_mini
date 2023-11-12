@@ -3,7 +3,7 @@ const app = getApp()
 Page({
 
   data: {
-
+    haveSentMsg: false
   },
   setPaid(){
     var that = this
@@ -47,25 +47,6 @@ Page({
     
   },
 
-  /*
-  setRentPaid(rentOrderId){
-    var that = this
-    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetPaidManual/' + rentOrderId + '?payMethod=' + encodeURIComponent(that.data.payMethod) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: setUrl,
-      method: 'GET',
-      success:(res)=>{
-          if (res.statusCode != 200){
-              return
-          }
-          wx.showToast({
-            title: '支付成功',
-            icon: 'success'
-          })
-      }
-    })
-  },
-*/
 
   setPayMethod(e){
     console.log('pay method selected', e)
@@ -85,7 +66,16 @@ Page({
               url: getQRUrl,
               method: 'GET',
               success:(res)=>{
-                that.setData({payQrCode: res.data})
+                
+                var sentUrl = 'https://' + app.globalData.domainName + '/core/Recept/SendPaymentOAMessage/' 
+                + recept.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+                if (!that.data.haveSentMsg){
+                  wx.request({
+                    url: sentUrl,
+                    method: 'GET'
+                  })
+                }
+                that.setData({payQrCode: res.data, haveSentMsg: true})
               }
             })
             var interVal = setInterval(that.checkPaid, 1000)
@@ -156,49 +146,6 @@ Page({
 
 
 
-/*
-  checkScan(){
-    var that = this
-    var checkScanUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetScanInfo/' + that.data.actId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: checkScanUrl,
-      success:(res)=>{
-        console.log('check scan', res)
-        if (res.statusCode != 200 && res.statusCode != 404){
-          clearInterval(that.data.interVal)
-        }
-        else if (res.statusCode == 200){
-          clearInterval(that.data.interVal)
-          var scan = res.data
-          var needJump = false
-          if (scan.scan ==1){
-
-            var openId = res.data.miniAppUser.open_id
-            var recept = that.data.recept
-            var setUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateReceptOpenId/' + recept.id + '?openId=' + encodeURIComponent(openId) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-
-            wx.request({
-              url: setUrl,
-              method: 'GET',
-              success:(res)=>{
-                  console.log('recept open id update', res)
-                  if (res.statusCode != 200){
-                      return
-                  }
-                  var recept = res.data
-                  that.setData({recept: recept})
-              }
-            })
-
-          }
-        }
-      },
-      fail:(res)=>{
-        clearInterval(that.data.interVal)
-      }
-    })
-  },
-*/
   /**
    * Lifecycle function--Called when page load
    */
@@ -254,29 +201,7 @@ Page({
               default:
                 break
             }
-            /*
-            if (recept.open_id == ''){
             
-                var getScanIdUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetInterviewId?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-                wx.request({
-                  url: getScanIdUrl,
-                  method: 'GET',
-                  success:(res)=>{
-                    if (res.statusCode != 200){
-                        return
-                      }
-                      var id = res.data
-                      if (id <= 0){
-                        return
-                      }
-                      var interVal = setInterval(that.checkScan, 1000)
-                      var qrcodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=recept_interact_id_' + id)
-                      that.setData({qrcodeUrl: qrcodeUrl, interVal: interVal, actId: id})
-                  }
-                })
-                
-            }
-            */
             that.setData({recept: recept, needPay: needPay, zeroPay: zeroPay})
             
           }
