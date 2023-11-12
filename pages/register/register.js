@@ -32,6 +32,16 @@ Page({
           fail: (res) => {},
           complete: (res) => {},
         })
+        setTimeout(()=>{
+          wx.exitMiniProgram(
+          {
+            success:(res)=>{
+              console.log('exit', res)
+            }
+          }
+
+        )}, 2000)
+        
         
       }
     })
