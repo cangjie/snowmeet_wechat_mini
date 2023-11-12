@@ -61,8 +61,18 @@ Page({
             return
           }
           var interVal = setInterval(that.checkScan, 1000)
-          var qrcodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=recept_interact_id_' + id)
-          that.setData({qrcodeUrl: qrcodeUrl, interVal: interVal, actId: id})
+          var scene = 'recept_interact_id_' + id
+          var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scene
+          wx.request({
+            url: getQRUrl,
+            method: 'GET',
+            success:(res)=>{
+              console.log('get qrcode', res)
+              that.setData({qrcodeUrl: res.data})
+            }
+          })
+          //var qrcodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=recept_interact_id_' + id)
+          that.setData({interVal: interVal, actId: id})
         }
       })
     })

@@ -78,7 +78,16 @@ Page({
     }
     switch(payMethod){
         case '微信支付':
-            payQrCode = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_recept_id_' + recept.id
+            var scene = 'pay_recept_id_' + recept.id
+            //payQrCode = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_recept_id_' + recept.id
+            var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scene
+            wx.request({
+              url: getQRUrl,
+              method: 'GET',
+              success:(res)=>{
+                that.setData({payQrCode: res.data})
+              }
+            })
             var interVal = setInterval(that.checkPaid, 1000)
             that.setData({interVal: interVal})
             break
