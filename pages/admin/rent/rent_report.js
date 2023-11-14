@@ -296,6 +296,13 @@ Page({
 
   query(){
     var that = this
+    that.setData({currentDayRefundPlacedBefore: 0, 
+        currentDayRefundPlacedBeforeStr: "￥0.00",
+        currentDateUnRefundDeposit: 0, 
+        currentDateUnRefundDepositStr:  "￥0.00", 
+        settledBeforeRental: 0,
+        settledBeforeRentalStr:  "￥0.00", 
+        CurrentDaySettledPlacedBeforeSet: []})
     that.getData()
   },
 
