@@ -118,7 +118,7 @@
       <mp-cell style="padding-left: 0rpx; margin-left: 0rpx;">
         <view class="view-row" >
           <view class="left-column view-row" style="width: 120rpx;padding-left: 0rpx;margin-left: 0rpx;" >
-            <view style="color: red;margin-left: 0rpx; padding-left: 0rpx;width: 5rpx;" >*</view>
+            <view style="color: red;margin-left: 0rpx; padding-left: 0rpx;width: 5rpx;" ></view>
             <view style="margin-left: 0rpx; padding-left: 0rpx;width: 115rpx;" >序列号：</view>
           </view>
           <view class="right-column" style="width: 560rpx;"  wx:if="{{item.confirmed_equip_type == '单板' }}" >
@@ -140,14 +140,14 @@
       </mp-cell>
       <mp-cell>
         <view class="view-row" >
-          <view style="width: 10rpx;color: red;" >*</view>
+          <view style="width: 10rpx;color: red;" ></view>
           <multi-uploader wx:if="{{displayUploader}}" id="uploader_{{index}}" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="changed" uploaded_files="{{item.confirmed_images}}" ></multi-uploader>
         </view>
       </mp-cell>
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view class="left-column view-row" style="width:15%"  >
-            <view style="width: 5px;color:red">*</view>
+            <view style="width: 5px;color:red"></view>
             <view>
               项目：
             </view>
