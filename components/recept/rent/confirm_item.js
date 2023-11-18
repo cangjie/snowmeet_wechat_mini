@@ -119,13 +119,19 @@ Component({
         }
        
         var startDate = util.formatDate(new Date())
+
+        /*
         if (rentItemList[i].startDate == null){
           startDate = null
         }
         else{
           startDate = util.formatDate(new Date(rentItemList[i].startDate))
         }
-  
+        */
+       if (rentItemList[i].startDate != null){
+        startDate = util.formatDate(new Date(rentItemList[i].startDate))
+       }
+
   
   
         var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, rent_item_class: rentItemList[i].class, 
@@ -146,14 +152,10 @@ Component({
 
       if (rentItemList.length == 0){
         isValid = false
-        
-        
       }
       that.triggerEvent('CheckValid', {Goon: isValid, recept: recept})
-      
-
-      
     },
+
     inputCode(e){
       var code = e.detail.value
       var that = this
@@ -173,6 +175,15 @@ Component({
           that.getItemInfo(code)
         }
       })
+    },
+    setStartDate(e){
+      console.log('selet start date', e)
+      var that = this
+      var currentRentItem = that.data.currentRentItem
+      currentRentItem.startDate = e.detail.value
+      that.setData({currentRentItem: currentRentItem})
+      that.checkValid()
+
     },
     changeNoCode(e){
       var that = this
@@ -366,7 +377,7 @@ Component({
         currentRentItem.startDate = null
       }
       else if (currentRentItem.depositType == '预约租赁'){
-        currentRentItem.startDate = null
+        currentRentItem.startDate = util.formatDate(new Date())
       }
       
       that.setData({currentRentItem: currentRentItem})
