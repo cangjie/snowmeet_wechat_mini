@@ -203,7 +203,7 @@ Page({
             }
             
             that.setData({recept: recept, needPay: needPay, zeroPay: zeroPay})
-            if (!needPay){
+            if (!needPay || zeroPay){
               that.setPaid()
             }
             

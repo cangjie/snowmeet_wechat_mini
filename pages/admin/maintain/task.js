@@ -18,7 +18,47 @@ Page({
     moreMemo: '',
     finish: false,
     isClosed: false,
-    currentStep: "安全检查"
+    currentStep: "安全检查",
+    showUploader: true
+  },
+
+  getBoardBrands(){
+    var that = this
+    var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('单板')
+    wx.request({
+      url: getBrandUrl,
+      method: 'GET',
+      success:(res)=>{
+        var boardBrands = []
+        for(var i = 0; i < res.data.length; i++){
+          var brand = res.data[i].brand_name.trim()
+          if (res.data[i].chinese_name.trim()!=''){
+            brand = brand + '/' + res.data[i].chinese_name.trim()
+          }
+          boardBrands.push(brand)
+        }
+        that.setData({brands: boardBrands})
+      }
+    })
+  },
+  getSkiBrands(){
+    var that = this
+    var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('双板')
+    wx.request({
+      url: getBrandUrl,
+      method: 'GET',
+      success:(res)=>{
+        var boardBrands = []
+        for(var i = 0; i < res.data.length; i++){
+          var brand = res.data[i].brand_name.trim()
+          if (res.data[i].chinese_name.trim()!=''){
+            brand = brand + '/' + res.data[i].chinese_name.trim()
+          }
+          boardBrands.push(brand)
+        }
+        that.setData({brands: boardBrands})
+      }
+    })
   },
 
   /**
@@ -39,7 +79,15 @@ Page({
         success:(res)=>{
           console.log('task info', res)
           var task = res.data
+          that.setData({showUploader: false})
+          //console.log('images', task.confirmed_images)
           
+          if (task.confirmed_equip_type == '单板'){
+            that.getBoardBrands()
+          }
+          else{
+            that.getSkiBrands()
+          }
 
           task.images = []
           var idDiff = that.data.idDiff
@@ -83,7 +131,7 @@ Page({
                 }
               }
          
-              that.setData({task: task, serialList: serialList, serialSelectedIndex: serialSelectedIndex, yearListSelectedIndex: yearIndex, idDiff: idDiff})
+              that.setData({task: task, serialList: serialList, serialSelectedIndex: serialSelectedIndex, yearListSelectedIndex: yearIndex, idDiff: idDiff, showUploader: true})
               that.getCurrentStep()
               
             }
@@ -336,6 +384,20 @@ Page({
         break
       case 'edge_memo':
         that.setData({edgeMemo: value})
+        break
+      case 'brand':
+        var brand = that.data.brands[value]
+        task.confirmed_brand = brand
+        that.setData({task: task})
+        break
+      case 'uploader':
+        var filesStr = ''
+        var fileArr = e.detail.files
+        for(var i = 0; i < fileArr.length; i++){
+          filesStr += ((i!=0)? ',' : '') + fileArr[i].url
+        }
+        task.confirmed_images = filesStr
+        that.setData({task: task})
         break
       default:
         break
