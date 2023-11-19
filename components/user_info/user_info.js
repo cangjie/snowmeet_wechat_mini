@@ -62,7 +62,8 @@ Component({
               //that.setData({user_info: res.data, user_found: true})
               if (res.statusCode == 200){
                 that.setData({userFind: true, userInfo: res.data, role: app.globalData.role})
-              that.getScore()
+                that.getScore()
+                that.triggerEvent('UserFound', {user_found: true, user_info: res.data})
               }
               else{
                 if (that.properties.cell != undefined && that.properties.cell != '')

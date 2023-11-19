@@ -9,14 +9,23 @@ Page({
     needUpdate: false,
     score: 0,
     totalScore: 0,
-    shop: ''
+    shop: '',
+    valid: false
   },
 
   userInfoUpdate(e){
     console.log('user info update', e)
     var that = this
     var userInfo = e.detail.user_info
-    that.setData({needUpdate: true, userInfo: userInfo})
+    var valid = that.data.valid
+    if (userInfo.gender == undefined || userInfo.gender == '' || userInfo.real_name == undefined || userInfo.real_name == ''){
+      valid = false
+    }
+    else{
+      valid = true
+    }
+    that.setData({needUpdate: true, userInfo: userInfo, valid: valid})
+    that.updateUserInfo()
   },
 
   updateUserInfo(){
