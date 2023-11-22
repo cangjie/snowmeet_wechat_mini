@@ -15,7 +15,7 @@
       <view class="right-column" >{{task.confirmed_equip_type}}</view>
       <view class="left-column" >品牌：</view>
       <view class="right-column" >
-        <picker id="brand" bindchange="mod" mode="selector" range="{{brands}}" >
+        <picker id="brand" bindchange="mod" mode="selector" range="{{brands}}" class="input" >
           <picker-view>{{task.confirmed_brand}}</picker-view>
         </picker>
       </view>
@@ -25,15 +25,15 @@
     <view class="view-table-scale" >
       <view class="left-column" >系列：</view>
       <view class="right-column" style="display: flex; flex-direction: row;" >
-        <picker id="serial_picker" mode="selector" range="{{serialList}}" bindchange="mod" >
+        <picker id="serial_picker" mode="selector" range="{{serialList}}" bindchange="mod" class="input" >
           <picker-view>{{serialList[serialSelectedIndex]}}</picker-view>
         </picker>
-        <input id="serial_input" style="width: 100rpx;" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='新增'}}" bindinput="mod" />
+        <input id="serial_input" style="width: 100rpx;" class="input" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='新增'}}" bindinput="mod" />
       </view>
       <view class="left-column" >年款：</view>
       <text decode="true" > &nbsp; </text>
       <view class="right-column" >
-        <picker id="year_picker" mode="selector" range="{{yearList}}" bindchange="mod" >
+        <picker id="year_picker" mode="selector" range="{{yearList}}" bindchange="mod" class="input" >
           <picker-view>{{yearList[yearListSelectedIndex]}}</picker-view>
         </picker>
       </view>
@@ -64,10 +64,10 @@
       <view class="left-column" style="width: 110rpx;" >序列号：</view>
       <view class="right-column" style="display: flex; flex-direction: row;align-content: flex-end;width: 540rpx;margin-left: 0rpx;padding-left: 0rpx;"  >
         <view wx:if="{{idDiff}}" style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" class="view-row" >
-          左<input id="id_left" style="width: 175rpx;" value="{{task.id_left}}" bindinput="mod" />右<input id="id_right" style="width: 175rpx;" bindinput="mod"  value="{{task.id_right}}" />
+          左<input class="input" id="id_left" style="width: 175rpx;" value="{{task.id_left}}" bindinput="mod" />右<input id="id_right" style="width: 175rpx;" bindinput="mod" class="input"  value="{{task.id_right}}" />
         </view>
         <view wx:else style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" >
-          <input id="id_no" style="width:200rpx" value="{{task.confirmed_id}}" bindinput="mod" />
+          <input id="id_no" style="width:200rpx" value="{{task.confirmed_id}}" bindinput="mod" class="input" />
         </view>
         <checkbox-group bindchange="setIdDiff" >
           <checkbox style="font-size: 8pt;width: 130rpx;margin-left: 0rpx;padding-left: 0rpx;" checked="{{idDiff}}" value="id_diff">分左右</checkbox>
@@ -79,7 +79,7 @@
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" >序列号：</view>
       <view class="right-column" >
-        <input id="id_no" style="width: 200rpx;" bindinput="mod" value="{{task.confirmed_id}}" />
+        <input id="id_no" style="width: 200rpx;" class="input" bindinput="mod" value="{{task.confirmed_id}}" />
       </view>
     </view>
   </mp-cell>
@@ -120,7 +120,7 @@
       </block>
       <view class="left-column"  >备注：</view>
       <view class="right-column" >
-        <input wx:if="{{stepSafe==undefined}}" bindinput="mod" id="safe_memo" />
+        <input wx:if="{{stepSafe==undefined}}" bindinput="mod" id="safe_memo" class="input" />
         <block wx:else >{{stepSafe.memo}}</block>
       </view>
     </view>
@@ -186,7 +186,7 @@
     </view>
   </mp-cell>
   <mp-cell>
-    <input wx:if="{{stepMore!=undefined && stepMore.status == '已开始'}}"  placeholder="填写备注" id="more_memo" bindinput="mod"   />
+    <input class="input" wx:if="{{stepMore!=undefined && stepMore.status == '已开始'}}"  placeholder="填写备注" id="more_memo" bindinput="mod"   />
         <block wx:else >{{stepMore!=undefined?stepMore.memo:''}}</block>
   </mp-cell>
   <mp-cell>
