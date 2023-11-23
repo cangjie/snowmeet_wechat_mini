@@ -33,7 +33,7 @@ Page({
         url: getOrderUrl,
         method: 'GET',
         success:(res)=>{
-          console.log(res)
+          console.log('get order', res)
           var scene = ''
           var order = res.data
           order.final_price_str = util.showAmount(order.final_price)
@@ -45,6 +45,9 @@ Page({
           if (order.status == '待支付'){
             scene = 'payment'
             title = '确认支付'
+            if (that.data.paymentId == undefined && order.payments.length > 0){
+              that.setData({paymentId: order.payments[0].id})
+            }
           }
           that.setData({order: order, scene: scene, title: title, needAuth: true})
         }
