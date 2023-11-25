@@ -174,7 +174,7 @@ Page({
             desc = desc.replace('<more/>', subDesc)
           }
           else if (prod.name.indexOf('夜场') >= 0) {
-            var subDesc = '<li>夜场营业时间18:00-22:00（除夕、初一仅开放日场）</li>'
+            var subDesc = '<li>夜场营业时间18:30-22:00（除夕、初一仅开放日场）</li>'
             desc = desc.replace('<more/>', subDesc)
           }
           prod.desc = desc
