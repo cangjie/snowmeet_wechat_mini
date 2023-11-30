@@ -14,7 +14,7 @@ Page({
     desc: '<p style="color:red" >test</p>',
     skiPassDescNanashanRent: util.skiPassDescNanashanRent,
     nowTime: util.formatTimeStr(new Date()),
-    reserveDateDesc: '明天'
+    reserveDateDesc: '今天'
   },
 
   /**
@@ -39,6 +39,8 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve) {
       var reserveDate = new Date(that.data.reserveDate)
+      var nowDate = new Date()
+
       var startDate = util.formatDate(reserveDate)
       var endDate = new Date()
       endDate.setDate(endDate.getDate() + 5)
@@ -49,11 +51,30 @@ Page({
       else{
         reserveDate.setDate(reserveDate.getDate())
       }
+      var reserveDateDesc = ''
+      switch(reserveDate.getDate() - nowDate.getDate()){
+        case 0:
+          reserveDateDesc = '今天'
+          break
+        case 1:
+          reserveDateDesc = '明天'
+          break
+        case 2:
+          reserveDateDesc = '后天'
+          break
+        case 3:
+          reserveDateDesc = '大后天'
+          break
+        default:
+          break
+      }
+
+
       
       
       that.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1, 
         role: app.globalData.role, canGetInfo: true, reserveDate: util.formatDate(reserveDate),
-        startDate: startDate, endDate: util.formatDate(endDate)})
+        startDate: startDate, endDate: util.formatDate(endDate), reserveDateDesc: reserveDateDesc})
       that.GetData()
     })
   },
@@ -63,7 +84,7 @@ Page({
     var that = this
     var reserveDate = e.detail.value
     var reserveDateValue = new Date(reserveDate)
-    var reserveDateDesc = '明天'
+    var reserveDateDesc = ''
     //that.setData({reserveDate: reserveDate})
     var now = new Date()
     switch(reserveDateValue.getDate() - now.getDate()){
@@ -80,33 +101,34 @@ Page({
         reserveDateDesc = '大后天'
         break
       default:
-        switch(reserveDateValue.getDay()){
-          case 0:
-            reserveDateDesc = '周日'
-            break
-          case 1:
-            reserveDateDesc = '周一'
-            break
-          case 2:
-            reserveDateDesc = '周二'
-            break
-          case 3:
-            reserveDateDesc = '周三'
-            break
-          case 4:
-            reserveDateDesc = '周四'
-            break
-          case 5:
-            reserveDateDesc = '周五'
-            break
-          case 6:
-            reserveDateDesc = '周六'
-            break
-          default:
-            break
-
-        }
+        
         break
+    }
+    switch(reserveDateValue.getDay()){
+      case 0:
+        reserveDateDesc += '周日'
+        break
+      case 1:
+        reserveDateDesc += '周一'
+        break
+      case 2:
+        reserveDateDesc += '周二'
+        break
+      case 3:
+        reserveDateDesc += '周三'
+        break
+      case 4:
+        reserveDateDesc += '周四'
+        break
+      case 5:
+        reserveDateDesc += '周五'
+        break
+      case 6:
+        reserveDateDesc += '周六'
+        break
+      default:
+        break
+
     }
     that.setData({reserveDate: reserveDate, reserveDateDesc: reserveDateDesc})
 

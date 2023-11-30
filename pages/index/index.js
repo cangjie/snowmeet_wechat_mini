@@ -22,6 +22,10 @@ Page({
       url: '/pages/maintain/in_shop_request/in_shop_request',
     })
     */
+
+    wx.redirectTo({
+      url: '../ski_pass/ski_pass_selector',
+    })
     
   },
   onShow: function(e) {
