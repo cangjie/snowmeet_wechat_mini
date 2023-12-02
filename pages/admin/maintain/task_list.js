@@ -54,6 +54,14 @@ Page({
           if (task.confirmed_equip_type == '双板' && task.confirmed_serial == ''){
             task.memo = '信息不全'
           }
+          if (task.order != undefined && task.order != null 
+            && task.order.final_price != undefined && task.order.final_price != null){
+              task.orderPriceStr = util.showAmount(task.order.final_price)
+          }
+          else {
+            task.orderPriceStr = '---'
+          }
+          
         }
         that.setData({tasks: tasks})
       }

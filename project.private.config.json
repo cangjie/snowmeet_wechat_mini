@@ -12,7 +12,7 @@
         {
           "name": "pay",
           "pathName": "pages/payment/pay_hub",
-          "query": "orderId=33444",
+          "query": "paymentId=8746",
           "launchMode": "default",
           "scene": null
         },

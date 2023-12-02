@@ -27,7 +27,12 @@
         </view-->
       </view>
       <view wx:if="{{item.title == '万龙'}}" >
-        敬请期待…… 
+        <view style="display: flex; flex-direction: row;" >
+          <view style="font-size: 11pt;"  >日期：</view>
+          <picker mode="date"   start="{{startDate}}" end="{{endDate}}" bindchange="DateChanged" >
+            <picker-view style="font-size: 11pt;" >{{reserveDate}} {{reserveDateDesc}}</picker-view>
+          </picker>
+        </view>
       </view>
     </view>
   </block>

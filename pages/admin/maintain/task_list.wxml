@@ -27,6 +27,12 @@
         <view class="left-column" >状态：</view>
         <view class="right-column" >{{item.status}}</view>
       </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="margin-left: 0rpx;" >订单：</view>
+        <view class="right-column" >{{item.order_id}}</view>
+        <view class="left-column" >金额：</view>
+        <view class="right-column" >{{item.orderPriceStr}}</view>
+      </view>
     </mp-cell>
   </mp-cells>
 </view>

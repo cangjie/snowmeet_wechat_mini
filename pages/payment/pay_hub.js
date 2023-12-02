@@ -77,10 +77,16 @@ Page({
               if (that.data.orderId != undefined){
                 jumpUrl = jumpUrl + '?orderId=' + that.data.orderId
               }
+              
               wx.redirectTo({
-                url: jumpUrl
+                url: jumpUrl,
+                fail:(res)=>{
+                  wx.navigateTo({
+                    url: jumpUrl,
+                  })
+                }
               })
-
+              
             }
           })
 

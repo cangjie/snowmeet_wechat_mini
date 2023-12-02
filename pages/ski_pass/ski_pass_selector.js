@@ -17,6 +17,23 @@ Page({
     reserveDateDesc: '今天'
   },
 
+  onChange(e){
+    console.log('tab change', e)
+    var that = this
+    var value = e.detail.index
+    that.setData({productList:[]})
+    switch(value){
+      case 1:
+        that.setData({resort: '万龙'})
+        break
+      default:
+        that.setData({resort: '南山'})
+        //that.GetData()
+        break
+    }
+    that.GetData()
+  },
+
   /**
    * Lifecycle function--Called when page load
    */
@@ -143,10 +160,51 @@ Page({
     console.log('tags change', e)
     var that = this
     that.setData({tags: e.detail.value})
+    switch(e.detail.value){
+      case 1:
+        that.setData({resort: '万龙'})
+        break
+      default:
+        that.setData({resort: '南山'})
+        break
+    }
     that.GetData()
+  },
+  GetWanLongProduct() {
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/WanlongZiwoyouHelper/GetProductList'
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        console.log('get wanlong product', res)
+        if (res.statusCode != 200 || res.data.state != 1 
+          || res.data.data.results == undefined || res.data.data.results == null){
+          return
+        }
+        var productList = []
+        for(var i = 0; i < res.data.data.results.length; i++ ){
+          var item = res.data.data.results[i]
+          var product = {
+            id: item.productNo,
+            name: item.productName,
+            sale_price_str: util.showAmount(parseFloat(item.settlementPrice)),
+            deposit_str: util.showAmount(0),
+            desc: item.orderDesc
+          }
+          productList.push(product)
+        }
+        //that.setData({productList: productList})
+      }
+    })
   },
   GetData(){
     var that = this
+    that.setData({productList:[]})
+    if (that.data.resort == '万龙'){
+      that.GetWanLongProduct()
+      return
+    }
     var resort = encodeURIComponent(that.data.resort)
     var date = that.data.reserveDate
     var tags = that.data.tags
