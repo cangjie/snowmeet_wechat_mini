@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "auth": "../../components/auth/auth",
+    "mp-tabbar": "weui-miniprogram/tabbar/tabbar"
+  }
+}

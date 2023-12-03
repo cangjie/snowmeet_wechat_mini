@@ -45,7 +45,7 @@
       <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
     </view>
     
-    <rich-text  nodes="{{item.desc}}"   ></rich-text>
+    <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  ></rich-text>
     
   </view>
 </view>

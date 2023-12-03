@@ -194,7 +194,7 @@ Page({
           }
           productList.push(product)
         }
-        //that.setData({productList: productList})
+        that.setData({productList: productList})
       }
     })
   },
@@ -269,9 +269,22 @@ Page({
   reserve(e){
     var that = this
     var id = e.currentTarget.id
-    wx.navigateTo({
-      url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate,
-    })
+    var resort = that.data.resort
+    switch(resort){
+      case '南山':
+        wx.navigateTo({
+          url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate,
+        })
+        break
+      case '万龙':
+        wx.navigateTo({
+          url: 'ski_pass_reserve_common?id=' + id + '&date=' + that.data.reserveDate,
+        })
+        break
+      default:
+        break
+    }
+
   },
   tabSwitch: function(e) {
     wx.redirectTo({

@@ -89,7 +89,8 @@
     "pages/admin/recept/recept_list",
     "pages/admin/recept/select_shop_business",
     "pages/admin/recept/recept_summary",
-    "pages/register/register"
+    "pages/register/register",
+    "pages/ski_pass/ski_pass_reserve_common"
   ],
   "window": {
     "backgroundTextStyle": "light",
