@@ -7,7 +7,9 @@ Page({
    * Page initial data
    */
   data: {
-
+    orderList:[],
+    totalAmount: 0,
+    totalAmountStr: '¥0.00'
   },
 
   /**
@@ -41,6 +43,7 @@ Page({
   getData(){
     var that = this
     var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + ((that.data.shop == '')? '' : '&shop=' + encodeURIComponent(that.data.shop))
+    var orderList = []
     wx.request({
       url: getTaskUrl,
       method: 'GET',
@@ -61,9 +64,26 @@ Page({
           else {
             task.orderPriceStr = '---'
           }
-          
+          if (task.order_id > 0){
+            var exists = false
+            for(var j = 0; j < orderList.length; j++){
+              if (orderList[j].id == task.order_id){
+                exists = true
+                break
+              }
+            }
+            if (!exists ){
+              orderList.push(task.order)
+            }
+          }
         }
-        that.setData({tasks: tasks})
+        var totalAmount = 0
+        for(var i = 0; i < orderList.length; i++){
+          totalAmount += orderList[i].final_price
+        }
+        var totalAmountStr = util.showAmount(totalAmount)
+
+        that.setData({tasks: tasks, orderList: orderList, totalAmount: totalAmount, totalAmountStr: totalAmountStr})
       }
     })
   },

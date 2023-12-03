@@ -1,6 +1,8 @@
 <view>
   <date-selector bindDateSelected="dateSelected"/>
   <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <view>订单数：{{orderList.length}}</view>
+  <view>总金额：{{totalAmountStr}}</view>
   <mp-cells title="共{{tasks.length}}个任务">
     <mp-cell wx:for="{{tasks}}" id="{{item.id}}" bindtap="gotoDetail" >
       <view style="display: flex;flex-direction: row;" >
