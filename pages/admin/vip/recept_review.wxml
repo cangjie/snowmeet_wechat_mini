@@ -1,0 +1,47 @@
+<view>
+  <mp-cells title="VIP信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >手机：</view>
+        <view class="right-column" >{{vip.cell}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >{{vip.name}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >备注：</view>
+        <view class="right-column" >{{vip.memo}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view wx:if="{{recept.recept_type == '养护招待'}}" >
+    <mp-cells title="养护招待 总共{{recept.maintainOrder.items.length}}" >
+      <mp-cell wx:for="{{recept.maintainOrder.items}}" >
+        <view class="view-row">
+          <view class="left-column">品牌：</view>
+          <view class="right-column" >{{item.confirmed_brand}}</view>
+        </view>
+        <view class="view-row">
+          <view class="left-column">长度：</view>
+          <view class="right-column" >{{item.confirmed_scale}}</view>
+        </view>
+        <view class="view-row">
+          <view class="left-column">项目：</view>
+          <view class="right-column" >{{item.desc}}</view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+  <view wx:if="{{recept.recept_type == '租赁招待'}}" >
+    租赁招待
+  </view>
+</view>
+<view style="height: 50rpx;"></view>
+<view>
+  <button class="input" bindtap="confirm" > 确 认 下 单 </button>
+</view>

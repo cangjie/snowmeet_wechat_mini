@@ -1,0 +1,6 @@
+@import '/app.wxss';
+@import '/common.wxss';
+@import '/weui.wxss';
+.right-column{
+  width: 450rpx;
+}

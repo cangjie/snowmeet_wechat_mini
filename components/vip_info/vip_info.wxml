@@ -1,0 +1,26 @@
+<mp-cells title="VIP 身份信息" >
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >手机：</view>
+      <view class="right-column">
+        <input placeholder="填写手机号码" value="{{cell}}" class="input" id="cell" bindinput="inputCell" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >姓名：</view>
+      <view class="right-column">
+        <input placeholder="填写姓名" value="{{name}}" class="input" id="name" bindinput="input" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >备注：</view>
+      <view class="right-column">
+        <input placeholder="填写备注" value="{{memo}}" class="input" id="memo" bindinput="input" style="width: 450rpx;" />
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>

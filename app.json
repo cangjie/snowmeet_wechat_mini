@@ -90,7 +90,9 @@
     "pages/admin/recept/select_shop_business",
     "pages/admin/recept/recept_summary",
     "pages/register/register",
-    "pages/ski_pass/ski_pass_reserve_common"
+    "pages/ski_pass/ski_pass_reserve_common",
+    "pages/admin/vip/maintain_recept",
+    "pages/admin/vip/recept_review"
   ],
   "window": {
     "backgroundTextStyle": "light",
