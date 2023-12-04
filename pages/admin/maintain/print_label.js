@@ -1,5 +1,6 @@
 // pages/admin/equip_maintain/on_site/print_label_new.js
 const app = getApp()
+const util = require('../../../utils/util.js')
 var tsc = require("../../../utils/ble_label_printer/tsc.js")
 Page({
 
@@ -280,6 +281,7 @@ Page({
         wx.request({
           url: getInfoUrl,
           success: (res) => {
+            console.log('get task', res)
             that.data.maintain_in_shop_request = res.data
             var showedMsg = that.data.showedMsg
             showedMsg.push('准备获取设备列表')
@@ -390,15 +392,26 @@ Page({
     command.setText(20, 20, "TSS24.BF2", 0, 1, 1, (urgent?'(急)':'') + orderNum + "   " + maskedName + "   " + maskedCell)
     command.setText(20, 20 + 40, "TSS24.BF2", 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)
     if (edge.toString() == '1') {
-      command.setText(20, 20 + 40 + 65, "TSS24.BF2", 0, 1, 1, "修刃 " + degree + "：")
+      command.setText(20, 20 + 40 + 55, "TSS24.BF2", 0, 1, 1, "修刃 " + degree + "：")
     }
     if (more!='') {
-      command.setText(320, 20 + 40 + 65, "TSS24.BF2", 0, 1, 1, "其他：" + more)
+      command.setText(300, 20 + 40 + 55, "TSS24.BF2", 0, 1, 1, "其他：" + more)
      }
     if (candle.toString()=='1') {
-      command.setText(20, 20 + 40 + 65 + 65, "TSS24.BF2", 0, 1, 1, "打蜡：")
-      command.setText(20, 20 + 40 + 65 + 65 + 65, "TSS24.BF2", 0, 1, 1, "刮蜡：")
+      command.setText(20, 20 + 40 + 55 + 55, "TSS24.BF2", 0, 1, 1, "打蜡：")
+      command.setText(20, 20 + 40 + 55 + 55 + 55, "TSS24.BF2", 0, 1, 1, "刮蜡：")
     }
+    var orderInfoStr = ''
+    var priceStr = ''
+    if (this.data.maintain_in_shop_request.order == null){
+      orderInfoStr = this.data.maintain_in_shop_request.pay_memo
+    }
+    else{
+      orderInfoStr = '订单号：' + this.data.maintain_in_shop_request.order.id 
+      priceStr = '金额：' + this.data.maintain_in_shop_request.order.final_price.toString()
+    }
+    command.setText(20, 20 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
+    command.setText(20, 20 + 40 + 55 + 55 + 55 + 50 + 40, "TSS24.BF2", 0, 1, 1, priceStr)
     command.setQrcode(320, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)
     command.setText(20, 350, "TSS24.BF2", 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
     command.setText(320, 350, "TSS24.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
