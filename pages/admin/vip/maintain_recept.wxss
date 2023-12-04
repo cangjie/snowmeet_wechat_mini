@@ -1,0 +1,3 @@
+/* pages/admin/vip/maintain_recept.wxss */
+@import '/app.wxss';
+@import '/common.wxss'

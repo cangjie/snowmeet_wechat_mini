@@ -1,0 +1,10 @@
+<view>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <vip bindVipInfo="getVipInfo" cell="" ></vip>
+  <view style="height: 20rpx;" ></view>
+  <maintain-item wx:if="{{recept != undefined && recept != null}}" receptId="{{recept.id}}" bindCheckValid="getInnerData" ></maintain-item>
+  <view style="height: 50rpx;"></view>
+  <view style="text-align: center;">
+    <button class="input" disabled="{{!valid}}" bindtap="save" > 保 存 </button> 
+  </view>
+</view>

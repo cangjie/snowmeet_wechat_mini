@@ -173,6 +173,9 @@ Page({
       case 'recept_list':
         path = '/pages/admin/recept/recept_list'
         break
+      case 'vip_maintain':
+        path = '/pages/admin/vip/maintain_recept'
+        break
       default:
         break
     }
