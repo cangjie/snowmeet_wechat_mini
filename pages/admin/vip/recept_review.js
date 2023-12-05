@@ -9,6 +9,32 @@ Page({
 
   },
 
+  confirm(){
+    var that = this
+    var recept = that.data.recept
+    var confirmUrl = 'https://' + app.globalData.domainName + '/core/Recept/ConfirmServe/' + recept.id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: confirmUrl,
+      method:'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        switch(recept.recept_type){
+          case '养护招待':
+            wx.navigateTo({
+              url: '../maintain/task_list'
+            })
+            break
+          case '租赁招待':
+            break
+          default:
+            break
+        }
+      }
+    })
+  },
+
   /**
    * Lifecycle function--Called when page load
    */
