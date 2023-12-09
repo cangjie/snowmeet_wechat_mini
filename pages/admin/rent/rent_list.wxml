@@ -30,7 +30,7 @@
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >订单号：</view>
           <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.id}}</view>
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >状态：</view>
-          <view class="right-column"  style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.status}}</view>
+          <view class="right-column"  style="{{(item.textColor!=='')? 'color:' + item.textColor + ';' : ''}}{{(item.statusTextColor!=='')? 'color:' + item.statusTextColor + ';' : ''}}" >{{item.status}}</view>
         </view>
         <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}" >
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >姓名：</view>

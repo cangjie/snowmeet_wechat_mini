@@ -84,6 +84,9 @@ Page({
             else {
               orders[i].backColor = ''
             }
+            if (orders[i].status == '未支付'){
+              orders[i].statusTextColor = '#FF0000'
+            }
           }
           console.log('get orders', orders)
           that.setData({orders: orders, totalPaidStr: util.showAmount(totalPaid), 

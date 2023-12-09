@@ -367,6 +367,7 @@ Page({
     var degree = this.data.maintain_in_shop_request.confirmed_degree
     var type = this.data.maintain_in_shop_request.confirmed_equip_type
     var more = this.data.maintain_in_shop_request.confirmed_more
+    var memo = this.data.maintain_in_shop_request.confirmed_memo
     var pole = (more.indexOf('杖') >= 0)? '含杖':''
     var orderDate = new Date(this.data.maintain_in_shop_request.create_date)
     var orderDateStr = (orderDate.getMonth() + 1).toString() + '-' + orderDate.getDate().toString()
@@ -396,7 +397,11 @@ Page({
     }
     if (more!='') {
       command.setText(300, 20 + 40 + 55, "TSS24.BF2", 0, 1, 1, "其他：" + more)
-     }
+    }
+    if (memo != undefined && memo != ''){
+      command.setText(250, 20 + 40 + 55 + 35, "TSS24.BF2", 0, 1, 1, "注：" + memo)
+    }
+
     if (candle.toString()=='1') {
       command.setText(20, 20 + 40 + 55 + 55, "TSS24.BF2", 0, 1, 1, "打蜡：")
       command.setText(20, 20 + 40 + 55 + 55 + 55, "TSS24.BF2", 0, 1, 1, "刮蜡：")
@@ -412,7 +417,7 @@ Page({
     }
     command.setText(20, 20 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
     command.setText(20, 20 + 40 + 55 + 55 + 55 + 50 + 40, "TSS24.BF2", 0, 1, 1, priceStr)
-    command.setQrcode(320, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)
+    command.setQrcode(400, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)
     command.setText(20, 350, "TSS24.BF2", 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
     command.setText(320, 350, "TSS24.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
     command.setPagePrint()
