@@ -161,16 +161,7 @@
           </view>
         </view>
       </mp-cell>
-      <mp-cell>
-        <view style="display: flex; flex-direction: row;" >
-          <view class="left-column" style="width:15%"  >加急：</view>
-          <view>
-            <checkbox-group id="urgent_{{index}}" bindchange="changed" >
-              <checkbox style="font-size: 10pt;" value="1"  checked="{{item.confirmed_urgent==1}}" >加急</checkbox>
-            </checkbox-group>
-          </view>
-        </view>
-      </mp-cell>
+      
       <mp-cell>
         <view style="display: flex; flex-direction: row;" >
           <view class="left-column" style="width:15%"  >杂项：</view>
@@ -179,8 +170,12 @@
               <checkbox  value="补板底" checked="{{item.bu_ban_di}}" >补板底</checkbox>
               <checkbox  value="修底刃" checked="{{item.xiu_di_ren}}" >修底刃</checkbox>
               <checkbox value="粘板面"  checked="{{item.zhan_ban_mian}}" >粘板面</checkbox>
+              <checkbox value="绑带" checked="{{item.bang_dai}}" >绑带</checkbox>
+              <checkbox value="扒扣" checked="{{item.ba_kou}}" >扒扣</checkbox>
+              <checkbox value="螺丝" checked="{{item.luo_si}}" >螺丝</checkbox>
+              <checkbox value="双板固定器" checked="{{item.shuang_ban_binder}}" >双板固定器</checkbox>
               <checkbox value="雪杖等附件寄存" checked="{{item.fu_jian_ji_cun}}" >雪杖等附件寄存</checkbox>
-              <checkbox value="其它"  checked="{{item.qi_ta}}" >其它...</checkbox>
+              <checkbox value="其它"  checked="{{item.qi_ta}}" >其它</checkbox>
             </checkbox-group>
           </view>
         </view>
@@ -198,6 +193,26 @@
           <view class="left-column"  >额外费用：</view>
           <view class="right-column"  style="display: flex;flex-direction: row;"  >
             ¥<input  id="othersCharge_{{index}}" style="width: 100rpx;" bindinput="changed" />
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" style="width:15%"  >加急：</view>
+          <view>
+            <checkbox-group id="urgent_{{index}}" bindchange="changed" >
+              <checkbox style="font-size: 10pt;" value="1"  checked="{{item.confirmed_urgent==1}}" >加急</checkbox>
+            </checkbox-group>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex; flex-direction: row;" >
+          <view class="left-column" style="width:15%"  >取板：</view>
+          <view class="right-column" >
+            <picker mode="date" id="pick_{{index}}" bindchange="changed" >
+              <picker-view >{{item.confirmed_pick_date}}</picker-view>
+            </picker>
           </view>
         </view>
       </mp-cell>

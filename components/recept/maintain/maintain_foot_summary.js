@@ -88,7 +88,7 @@ Component({
           var discount = 0
           var ticketDiscount = 0
           if (recept.maintainOrder != undefined && recept.maintainOrder != null){
-            for(var i = 0; i < recept.maintainOrder.items.length; i++){
+            for(var i = 0; recept.maintainOrder.items != null && i < recept.maintainOrder.items.length; i++){
               var item = recept.maintainOrder.items[i]
               item = that.getCharge(item)
               total += item.charge

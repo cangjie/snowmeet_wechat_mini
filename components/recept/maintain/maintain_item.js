@@ -55,9 +55,13 @@ Component({
 
     addItem(){
       var that = this
+      var nowDate = new Date()
+      nowDate.setDate(nowDate.getDate() + 1)
+      
       var item = {
         confirmed_equip_type : '双板',
-        confirmed_images : ''
+        confirmed_images : '',
+        confirmed_pick_date: util.formatDate(nowDate)
       }
       var recept = that.data.recept
       var items = recept.maintainOrder.items
@@ -198,6 +202,14 @@ Component({
           break
         case 'urgent':
           currentEquip.confirmed_urgent = value.length.toString()
+          var pickDate = new Date(currentEquip.confirmed_pick_date)
+          if (currentEquip.confirmed_urgent == '1'){
+            pickDate.setDate(pickDate.getDate() - 1)
+          }
+          else {
+            pickDate.setDate(pickDate.getDate() + 1)
+          }
+          currentEquip.confirmed_pick_date = util.formatDate(pickDate)
           break
         case 'binderAngleLeft':
           currentEquip.confirmed_left_angle = value
@@ -212,6 +224,9 @@ Component({
             images += ((i!=0)?',':'' + fileArr[i].url)
           }
           currentEquip.confirmed_images = images;
+          break
+        case 'pick':
+          currentEquip.confirmed_pick_date = value
           break
         default:
           break
@@ -260,6 +275,35 @@ Component({
       else {
         item.qi_ta = false
       }
+
+      if (others.indexOf('绑带') >= 0){
+        item.bang_dai = true
+      }
+      else {
+        item.bang_dai = false
+      }
+
+      if (others.indexOf('扒扣') >= 0){
+        item.ba_kou = true
+      }
+      else {
+        item.ba_kou = false
+      }
+
+      if (others.indexOf('螺丝') >= 0){
+        item.luo_si = true
+      }
+      else {
+        item.luo_si = false
+      }
+
+      if (others.indexOf('双板固定器') >= 0){
+        item.shuang_ban_binder = true
+      }
+      else {
+        item.shuang_ban_binder = false
+      }
+
       that.setData({item: item})
       return item
     },
@@ -315,6 +359,7 @@ Component({
           item.headImage = ''
         }
         item = that.getCharge(item)
+        
         //item.chargeStr = '0'//util.showAmount(item.charge)
         
       }
@@ -369,6 +414,7 @@ Component({
       var valid = true
       var that = this
       var item = that.data.item
+      
       if (util.isBlank(item.confirmed_equip_type)){
         valid = false
       }
@@ -451,6 +497,7 @@ Component({
           url: getUrl,
           method: 'GET',
           success:(res)=>{
+              console.log('init maintain order', res)
               if (res.statusCode != 200){
                   return
               }
@@ -462,6 +509,23 @@ Component({
               that.setData({recept: res.data, item: currentItem, currentItemIndex: currentItemIndex})
               that.getProductList()
               var items = maintainOrder.items
+              for(var i = 0; items != undefined && items != null && i < items.length; i++){
+                try{
+                  var pickDate = new Date(items[i].confirmed_pick_date)
+                  items[i].confirmed_pick_date = util.formatDate(pickDate)
+                  var nowDate = util.formatDate(new Date())
+                  if (items[i].confirmed_urgent == '0' && nowDate == items[i].confirmed_pick_date){
+                    pickDate = new Date(nowDate)
+                    pickDate.setDate(pickDate.getDate() + 1)
+                    items[i].confirmed_pick_date = util.formatDate(pickDate)
+                  }
+ 
+                }
+                catch{
+
+                }
+
+              }
               if (items != undefined && items != null && items.length > 0){
                   currentItem = items[0]
                   if (currentItem.confirmed_equip_type != '双板' && currentItem.confirmed_equip_type != '单板'){
@@ -473,6 +537,7 @@ Component({
               else{
                 that.addItem()
               }
+
               that.checkCurrentItem()
           }
         })
