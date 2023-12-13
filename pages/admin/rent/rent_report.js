@@ -198,7 +198,7 @@ Page({
                   var details = orders[i].details
                   var rental = 0;
                   for(var j = 0; details != null && j < details.length; j++){
-                    var amount = parseFloat(details[j].real_rental)
+                    var amount = parseFloat(details[j].real_rental - details[j].rental_discount - details[j].rental_ticket_discount )
                     if (!isNaN(amount)){
                       rental += amount
                     }
@@ -240,9 +240,9 @@ Page({
                       
 
                       for(var j = 0; details != null && j < details.length; j++){
-                        var detail = details[j]
+                        //var detail = details[j]
                         
-                        var amount = parseFloat(details[j].real_rental)
+                        var amount = parseFloat(details[j].real_rental - details[j].rental_discount - details[j].rental_ticket_discount)
                         if (!isNaN(amount)){
                           settledBeforeRental += amount
                           orderRental += amount
