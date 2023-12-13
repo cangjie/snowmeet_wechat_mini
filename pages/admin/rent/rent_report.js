@@ -195,6 +195,7 @@ Page({
                   orders[i].create_date_str = util.formatDate(createDate)
                   orders[i].create_time_str = util.formatTimeStr(createDate)
                   orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
+<<<<<<< HEAD
 
                   /*
                   var details = orders[i].details
@@ -209,6 +210,11 @@ Page({
                   var details = orders[i].rentalDetails
                   var rental = 0;
                   for(var j = 0; details != null && j < details.length; j++){
+=======
+                  var details = orders[i].rentalDetails
+                  var rental = 0;
+                  for(var j = 0; details != null && j < details.length; j++){
+>>>>>>> b6c547dfacc9f174b5f2b523f41b5ecc5bb962b1
                     var amount = parseFloat(details[j].rental)
                     if (!isNaN(amount)){
                       rental += amount
@@ -241,7 +247,11 @@ Page({
 
 
                     for(var i = 0; orders != null && i < orders.length; i++){
+<<<<<<< HEAD
                       
+=======
+                      var details = orders[i].rentalDetails
+>>>>>>> b6c547dfacc9f174b5f2b523f41b5ecc5bb962b1
                       var orderRental = 0
                       var createDate = new Date(orders[i].create_date)
                       orders[i].create_date_str = util.formatDate(createDate)
@@ -253,6 +263,7 @@ Page({
                       for(var j = 0; details != null && j < details.length; j++){
                         //var detail = details[j]
                         
+<<<<<<< HEAD
                         var amount = parseFloat(details[j].real_rental - details[j].rental_discount - details[j].rental_ticket_discount)
                         if (!isNaN(amount)){
                           settledBeforeRental += amount
@@ -263,6 +274,9 @@ Page({
                       var details = orders[i].rentalDetails
                       for(var j = 0; details != null && j < details.length; j++){
                         var amount = parseFloat(details[j].rental)
+=======
+                        var amount = parseFloat(detail.rental)
+>>>>>>> b6c547dfacc9f174b5f2b523f41b5ecc5bb962b1
                         if (!isNaN(amount)){
                           settledBeforeRental += amount
                           orderRental += amount
