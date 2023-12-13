@@ -23,7 +23,7 @@ Page({
     var value = e.detail.index
     that.setData({productList:[]})
     switch(value){
-      case 1:
+      case 10:
         that.setData({resort: '万龙'})
         break
       default:
@@ -161,7 +161,7 @@ Page({
     var that = this
     that.setData({tags: e.detail.value})
     switch(e.detail.value){
-      case 1:
+      case 10:
         that.setData({resort: '万龙'})
         break
       default:

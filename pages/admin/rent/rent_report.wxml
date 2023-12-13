@@ -23,12 +23,12 @@
     </view>
     <view style="display: flex;flex-direction: row;" id="2" bindtap="showDetail" >
       <view class="left-column" style="width: 50%;"  >非当日租赁结算租金：</view>
-      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{settledBeforeRentalStr}}</view>
+      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;color: green" >{{settledBeforeRentalStr}}</view>
     </view>
     <view style="color:gray">日租日结 {{CurrentSameDaySettledSet.length}}笔</view>
     <view style="display: flex;flex-direction: row;" id="3" bindtap="showDetail"  >
       <view class="left-column" style="width: 50%;" >日租日结已结算租金：</view>
-      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{sameDaySettledRentalStr}}</view>
+      <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;color: green" >{{sameDaySettledRentalStr}}</view>
     </view>
     <view style="display: flex;flex-direction: row;" id="3" bindtap="showDetail" >
       <view class="left-column" style="width: 50%;" >日租日结退押金：</view>
