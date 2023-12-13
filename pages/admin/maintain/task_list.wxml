@@ -35,6 +35,10 @@
         <view class="left-column" >金额：</view>
         <view class="right-column" >{{item.orderPriceStr}}</view>
       </view>
+      <view style="display: flex;flex-direction: row;" >
+        <view class="left-column" style="margin-left: 0rpx;width:13%" >项目：</view>
+        <view class="right-column" >{{item.description}}</view>
+      </view>
     </mp-cell>
   </mp-cells>
 </view>
