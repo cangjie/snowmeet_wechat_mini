@@ -141,7 +141,7 @@ Component({
 
           var rentItem = rentItemList[i]
           if ( (  rentItem.depositType != '预付押金' && (  rentItem.name == '' || (!rentItem.isNoCode  && rentItem.code == '') || rentItem.class == '' ))
-          || rentItem.rental == 0 || rentItem.deposit == 0){
+          || isNaN(rentItem.rental)|| isNaN(rentItem.deposit)){
             isValid = false
           }
 
