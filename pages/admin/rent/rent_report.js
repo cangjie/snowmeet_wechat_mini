@@ -195,10 +195,10 @@ Page({
                   orders[i].create_date_str = util.formatDate(createDate)
                   orders[i].create_time_str = util.formatTimeStr(createDate)
                   orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
-                  var details = orders[i].details
+                  var details = orders[i].rentalDetails
                   var rental = 0;
                   for(var j = 0; details != null && j < details.length; j++){
-                    var amount = parseFloat(details[j].real_rental)
+                    var amount = parseFloat(details[j].rental)
                     if (!isNaN(amount)){
                       rental += amount
                     }
@@ -230,7 +230,7 @@ Page({
 
 
                     for(var i = 0; orders != null && i < orders.length; i++){
-                      var details = orders[i].details
+                      var details = orders[i].rentalDetails
                       var orderRental = 0
                       var createDate = new Date(orders[i].create_date)
                       orders[i].create_date_str = util.formatDate(createDate)
@@ -242,7 +242,7 @@ Page({
                       for(var j = 0; details != null && j < details.length; j++){
                         var detail = details[j]
                         
-                        var amount = parseFloat(details[j].real_rental)
+                        var amount = parseFloat(detail.rental)
                         if (!isNaN(amount)){
                           settledBeforeRental += amount
                           orderRental += amount
