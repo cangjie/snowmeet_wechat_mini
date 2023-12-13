@@ -65,6 +65,14 @@ Page({
             var createDate = new Date(orders[i].create_date)
             orders[i].due_end_date_str = util.formatDate(dueEndDate) + ' ' + util.formatTimeStr(dueEndDate)
             orders[i].create_dateStr = util.formatDate(createDate) + ' ' + util.formatTimeStr(createDate)
+            if (orders[i].end_date != null){
+              var endDate = new Date(orders[i].end_date)
+              orders[i].end_dateStr = util.formatDate(endDate) + ' ' + util.formatTimeStr(endDate)
+            }
+            else {
+              orders[i].end_dateStr = '--'
+            }
+            
             orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
             totalPaid = totalPaid + orders[i].deposit_final
             totalRefund = totalRefund + orders[i].refund

@@ -41,14 +41,19 @@
         <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}" >
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >订单时间：</view>
           <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.create_dateStr}}</view>
+          <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >退款时间：</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.end_dateStr}}</view>
+        </view>
+        <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}" >
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >支付方式：</view>
           <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.order.payments[0].pay_method}}</view>
+          <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >支付押金：</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.deposit_final_str}}</view>
         </view>
         <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}" >
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >店员：</view>
           <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.staff_name}}</view>
-          <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >支付押金：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.deposit_final_str}}</view>
+          
         </view>
       </mp-cell>
     </mp-cells>
