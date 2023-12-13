@@ -67,13 +67,6 @@
           
         </view>
         <view wx:else class="right-column"  >{{item.rent_item_code}}</view>
-        <view class="left-column" >名称：</view>
-        <view wx:if="{{item.isEdit && item.editType != '暂存'}}"  class="right-column"  >
-          <input style="width: 200rpx;" value="{{item.rent_item_name}}" id="name_{{index}}"  bindinput="setTextValue" type="text" class="input" />
-        </view>
-        <view wx:else class="right-column"  >{{item.rent_item_name}}</view>
-      </view>
-      <view style="display: flex; flex-direction: row;">
         <view class="left-column">分类：</view>
         <view wx:if="{{item.isEdit && item.editType != '暂存'}}" class="right-column" >
           <picker mode="selector" range="{{classList}}" bindchange="selectClass"  id="{{index}}" class="input" style="width: 100rpx">
@@ -81,13 +74,27 @@
           </picker>
         </view>
         <view wx:else class="right-column">{{item.rent_item_class}}</view>
+        
+      </view>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >名称：</view>
+        <view wx:if="{{item.isEdit && item.editType != '暂存'}}"  class="right-column" style="width: 70%;"  >
+          <input style="width: 200rpx;" value="{{item.rent_item_name}}" id="name_{{index}}"  bindinput="setTextValue" type="text" class="input" />
+        </view>
+        <view wx:else class="right-column"  style="width: 70%;" >{{item.rent_item_name}}</view>
+      </view>
+
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column"  >押金类型：</view>
+        <view class="right-column"  >{{item.deposit_type}}</view>
         <view class="left-column">状态：</view>
         <view class="right-column">{{item.status}}</view>
       </view>
       <view style="display: flex; flex-direction: row;">
-        <view class="left-column"  >押金类型：</view>
-        <view class="right-column"  >{{item.deposit_type}}</view>
+        
         <view class="left-column"  >计划归还：</view>
+        <view class="right-column" style="font-size: 9pt;"  >{{rentOrder.due_end_time_str}}</view>
+        <view class="left-column"  >实际归还：</view>
         <view class="right-column" style="font-size: 9pt;"  >{{rentOrder.due_end_time_str}}</view>
         
       </view>

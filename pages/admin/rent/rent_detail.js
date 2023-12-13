@@ -71,6 +71,13 @@ Page({
             else{
               detail.real_rental_str = util.showAmount(detail.real_rental)
             }
+            if (detail.end_date == null){
+              detail.end_dateStr = '--'
+            }
+            else {
+              var endDate = new Date(detail.end_date)
+              detail.end_dateStr = til.formatDate(endDate) + ' ' + util.formatTimeStr(endDate)
+            }
             totalRental = totalRental + detail.real_rental
             detail.unit_rental_str = util.showAmount(detail.unit_rental)
             detail.deposit_str = util.showAmount(detail.deposit)
