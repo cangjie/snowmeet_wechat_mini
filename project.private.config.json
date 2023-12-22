@@ -11,8 +11,8 @@
       "list": [
         {
           "name": "pay",
-          "pathName": "pages/payment/pay_hub",
-          "query": "paymentId=8746",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=2346",
           "launchMode": "default",
           "scene": null
         },

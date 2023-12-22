@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    needPay: false
+    needPay: false,
+    paying: false
   },
 
   /**
@@ -91,28 +92,47 @@ Page({
 
   payOrder(){
     var that = this
+    that.setData({paying: true})
     var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/CreatePayment/' + that.data.order.order.id + '?payMethod=' + encodeURIComponent('微信支付') + '&amount=0'
     wx.request({
       url: paymentUrl,
       method: 'GET',
       success:(res)=>{
         if (res.statusCode != 200){
+          wx.showToast({
+            title: '系统忙，请稍候。',
+            icon: 'error'
+          })
           return
         }
         that.setData({paymentId: res.data.id})
         that.pay()
+      },
+      fail:(res)=>{
+        wx.showToast({
+          title: '请关闭小程序重试',
+          icon: 'error'
+        })
       }
     })
   },
 
   pay(){
     var that = this
+    that.setData({paying: true})
     var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/TenpayRequest/' + that.data.paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: paymentUrl,
       method: 'GET',
       success:(res)=>{
         console.log(res)
+        if (res.statusCode != 200){
+          wx.showToast({
+            title: '微信支付繁忙，请稍候。',
+            icon:'error'
+          })
+          return
+        }
         wx.requestPayment({
           nonceStr: res.data.nonce,
           package: 'prepay_id=' + res.data.prepay_id,
@@ -132,6 +152,12 @@ Page({
           fail:(res)=>{
             console.log(res)
           }
+        })
+      },
+      fail:(res)=>{
+        wx.showToast({
+          title: '请重启小程序重试',
+          icon: 'error'
         })
       }
     })

@@ -61,7 +61,7 @@
     </mp-cell>
   </mp-cells>
   <view wx:if="{{needPay}}" style="text-align: center;" >
-    <button wx:if="{{paymentId != undefined}}" bindtap="pay"> 确 认 支 付 </button>
-    <button wx:else bindtap="payOrder"  class="input"> 确 认 支 付 </button>
+    <button wx:if="{{paymentId != undefined}}" bindtap="pay" disabled="{{paying}}" > 确 认 支 付 </button>
+    <button wx:else bindtap="payOrder" disabled="{{paying}}"  class="input"> 确 认 支 付 </button>
   </view>
 </view>

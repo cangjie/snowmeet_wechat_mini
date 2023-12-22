@@ -18,7 +18,8 @@ Page({
     ticketName: '',
     bottomShowDetail: false,
     gotoNext: false,
-    gotoPrev:false
+    gotoPrev:false,
+    confirming:false
   },
   getInnerData(e){
     console.log('get data', e)
@@ -129,6 +130,11 @@ Page({
   },
   confirm(){
     var that = this
+    that.setData({confirming: true})
+    wx.showToast({
+      title: '请稍后，系统下单，网络问题无需重试。',
+      icon:'loading'
+    })
     var recept = that.data.recept
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateRecept/' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
