@@ -11,7 +11,11 @@ Page({
     totalAmount: 0,
     totalAmountStr: '¥0.00'
   },
-
+  GoBack(){
+    wx.redirectTo({
+      url: '../admin',
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */

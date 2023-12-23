@@ -44,6 +44,12 @@ Page({
     var that = this
     that.setData({shop: e.detail.shop})
   },
+  GoBack(){
+    wx.redirectTo({
+      url: '../admin',
+    })
+  },
+
 
   getData(){
     var that = this

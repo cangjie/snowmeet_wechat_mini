@@ -42,3 +42,4 @@
     </mp-cell>
   </mp-cells>
 </view>
+<view style="text-align: center;margin-top: 50rpx;"> <button bindtap="GoBack" class=" input "> 返 回 首 页 </button> </view>
