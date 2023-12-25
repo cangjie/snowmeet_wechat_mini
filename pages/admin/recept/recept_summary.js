@@ -9,6 +9,10 @@ Page({
     var that = this
     var recept = that.data.recept
 
+    if (that.data.payMethod == '微信支付' || that.data.payMethod == undefined || that.data.payMethod == null){
+      return
+    }
+
     var setUrl = 'https://' + app.globalData.domainName + '/core/Recept/SetPaidManual/' + recept.id.toString() + '?payMethod=' + encodeURIComponent(that.data.payMethod) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
 
     wx.request({
@@ -54,7 +58,7 @@ Page({
     var payMethod = e.detail.payMethod
     var payQrCode = ''
     var recept = that.data.recept
-    if (recept == undefined){
+    if (recept == undefined || recept == null){
         return null
     }
     switch(payMethod){
@@ -85,7 +89,7 @@ Page({
             payQrCode = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_recept_id_' + recept.id
             break
         default:
-            clearInterval(that.data.interVal)
+            //clearInterval(that.data.interVal)
             break
     }
     that.setData({payQrCode: payQrCode, payMethod: payMethod})
@@ -94,6 +98,9 @@ Page({
   checkPaid(){
     var that = this
     var recept = that.data.recept
+    if (recept == undefined || recept == null){
+      return
+    }
     var orderId = 0
     var jumpUrl = ''
     switch(recept.recept_type){
@@ -119,7 +126,24 @@ Page({
       method: 'GET',
       success:(res)=>{
         console.log('get order', res.data)
-        if (res.data.pay_state == 1){
+        if (res.statusCode != 200){
+          return
+        }
+        var order = res.data
+        var paySuc = false
+        if (order.pay_state == 1 && order.payments != undefined
+          && order.payments != null && order.payments.length > 0){
+            for(var j = 0; j < order.payments.length; j++){
+              var payment = order.payments[j]
+              if (payment.status == '支付成功' && payment.out_trade_no != undefined
+              && payment.out_trade_no != null){
+                paySuc = true
+              }
+            }
+        }
+        
+      
+        if (paySuc){
           wx.showToast({
             title: '支付成功',
             icon: 'success',
@@ -201,7 +225,6 @@ Page({
               default:
                 break
             }
-            
             that.setData({recept: recept, needPay: needPay, zeroPay: zeroPay})
             if (!needPay || zeroPay){
               that.setPaid()
