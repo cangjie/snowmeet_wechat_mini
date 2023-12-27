@@ -53,10 +53,32 @@ Component({
    * Component methods
    */
   methods: {
+    scan(e){
+      var that = this
+      console.log('scan', e)
+      var id = e.currentTarget.id
+      wx.scanCode({
+        onlyFromCamera: false,
+        success:(res)=>{
+          console.log('scan result', res)
+          var code = res.result
+          var mi7Orders = that.data.mi7Orders
+          var order = mi7Orders[parseInt(id)]
+          order.barCode = code
+          that.setData({mi7Orders: mi7Orders})
+
+          /*
+          var currentRentItem = that.data.currentRentItem
+          currentRentItem.code = code
+          that.getItemInfo(code)
+          */
+        }
+      })
+    },
     addNew(){
       var that = this
       var mi7Orders = that.data.mi7Orders
-      mi7Orders.push({mi7OrderNo: null, mi7SalePrice: null, mi7ChargePrice: null})
+      mi7Orders.push({mi7OrderNo: null, mi7SalePrice: null, mi7ChargePrice: null, barCode: null})
       that.setData({mi7Orders: mi7Orders})
     },
     modMi7Order(e){
@@ -118,6 +140,9 @@ Component({
             mi7Orders[index].mi7OrderNo = ''
           }
           break
+        case 'mi7OrderBarCode':
+          mi7Orders[index].barCode = value
+          break
         default:
           break
       }
@@ -136,9 +161,20 @@ Component({
           item = mi7Orders[i].mi7OrderNo+',' 
           + (!isNaN(salePrice)? salePrice : chargePrice).toString() + ',' + chargePrice.toString()
         }
+        var barCode = mi7Orders[i].barCode
+        if (barCode == undefined || barCode == null){
+          item = item + ',' 
+        }
+        else{
+          item = item + ',' +  barCode
+        }
+
         if (item != ''){
           mi7OrderStr = ((mi7OrderStr!='')?';':'') + item
         }
+
+        
+
         
       }
       that.setData({mi7Orders: mi7Orders, totalChargePrice: totalChargePrice, totalSalePrice: totalSalePrice})

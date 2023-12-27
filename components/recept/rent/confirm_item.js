@@ -163,7 +163,8 @@ Component({
       currentRentItem.code = code
       that.getItemInfo(code)
     },
-    scan(){
+    scan(e){
+      console.log('scan', e)
       var that = this
       wx.scanCode({
         onlyFromCamera: false,

@@ -1,4 +1,5 @@
 /* components/mi7_order/mi7_order.wxss */
+@import '/app.wxss';
 .left-column{
   width:25%;
   text-align: right;

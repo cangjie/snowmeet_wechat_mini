@@ -7,7 +7,7 @@
       <view style="display:flex; flex-direction: row;">
         <view class="left-column" >七色米单号：</view>
         <view class="right-column" style="display: flex; flex-direction: row;">
-          <view><input id="mi7OrderNo_{{index}}" value="{{item.mi7OrderNo}}" disabled="{{item.mi7OrderNo=='紧急开单'}}"  placeholder="填写七色米订单号" bindinput="modMi7Order" /></view>
+          <view><input id="mi7OrderNo_{{index}}" value="{{item.mi7OrderNo}}" disabled="{{item.mi7OrderNo=='紧急开单'}}"  placeholder="填写七色米订单号" bindinput="modMi7Order" style="width: 260rpx;" /></view>
           <view>
             <switch id="switch_{{index}}" checked="{{item.mi7OrderNo=='紧急开单'}}" bindchange="modMi7Order" >紧急开单</switch>
           </view>
@@ -24,6 +24,17 @@
       <view style="display:flex; flex-direction: row;">
         <view class="left-column" >成交价：</view>
         <view class="right-column" ><input id="mi7OrderChargePrice_{{index}}" value="{{item.mi7ChargePrice}}"   placeholder="填写成交总价" bindinput="modMi7Order"  /></view>
+      </view>
+    </mp-cell> 
+    <mp-cell>
+      <view style="display:flex; flex-direction: row;">
+        <view class="left-column" >条码：</view>
+        <view class="right-column view-row" >
+          <input id="mi7OrderBarCode_{{index}}" value="{{item.barCode}}"   placeholder="" style="width: 400rpx;" bindinput="modMi7Order"  />
+          <button id="{{index}}" style="padding: 0rpx; width:42rpx; height:42rpx" bindtap="scan" size="mini" class="input" >
+            <image src="../../images/scan.jpeg" style="width: 50rpx; height: 50rpx;margin-top: -3px; margin-left: -3px;"  />
+          </button>
+        </view>
       </view>
     </mp-cell> 
   </block>
