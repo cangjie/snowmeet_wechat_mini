@@ -37,6 +37,7 @@ Component({
           if (!isNaN(chargePrice)){
             totalChargePrice = totalChargePrice + chargePrice
           }
+          item.barCode = fields[3]
           mi7Orders.push(item)
         }
       }
@@ -66,7 +67,7 @@ Component({
           var order = mi7Orders[parseInt(id)]
           order.barCode = code
           that.setData({mi7Orders: mi7Orders})
-
+          that.change()
           /*
           var currentRentItem = that.data.currentRentItem
           currentRentItem.code = code
@@ -113,11 +114,10 @@ Component({
               title: '请填写正确格式的价格。',
               icon: 'none'
             })
-            mi7Orders[index].mi7SalePrice = null
+            
           }
-          else{
-            mi7Orders[index].mi7SalePrice = salePrice.toString()
-          }
+          
+          mi7Orders[index].mi7SalePrice = e.detail.value
           break
         case 'mi7OrderChargePrice':
           var chargePrice = parseFloat(e.detail.value)
@@ -126,11 +126,9 @@ Component({
               title: '请填写正确格式的价格。',
               icon:'none'
             })
-            mi7Orders[index].mi7ChargePrice = null
+            //mi7Orders[index].mi7ChargePrice = null
           }
-          else{
-            mi7Orders[index].mi7ChargePrice = chargePrice.toString()
-          } 
+          mi7Orders[index].mi7ChargePrice = e.detail.value
           break
         case 'switch':
           if (e.detail.value){
@@ -141,11 +139,18 @@ Component({
           }
           break
         case 'mi7OrderBarCode':
-          mi7Orders[index].barCode = value
+          mi7Orders[index].barCode = e.detail.value
           break
         default:
           break
       }
+      that.setData({mi7Orders: mi7Orders})
+      that.change()
+    },
+
+    change(){
+      var that = this
+      var mi7Orders = that.data.mi7Orders
       var totalSalePrice = 0
       var totalChargePrice = 0
       var mi7OrderStr = ''
@@ -170,7 +175,7 @@ Component({
         }
 
         if (item != ''){
-          mi7OrderStr = ((mi7OrderStr!='')?';':'') + item
+          mi7OrderStr += ((mi7OrderStr!='')?';':'') + item
         }
 
         

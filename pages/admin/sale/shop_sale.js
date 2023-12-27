@@ -369,6 +369,7 @@ Page({
       mi7.mi7_order_id = mi7Orders[i].mi7OrderNo
       mi7.sale_price = mi7Orders[i].mi7SalePrice
       mi7.real_charge = mi7Orders[i].mi7ChargePrice
+      mi7.barCode = mi7Orders[i].barCode
       order.mi7Orders.push(mi7)
     }
     order.user = that.data.user_info

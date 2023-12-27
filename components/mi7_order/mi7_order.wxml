@@ -17,13 +17,13 @@
     <mp-cell>
       <view style="display:flex; flex-direction: row;">
         <view class="left-column" >零售价：</view>
-        <view class="right-column" ><input id="mi7OrderSalePrice_{{index}}"  value="{{item.mi7SalePrice}}"   placeholder="填写零售总价" bindinput="modMi7Order" /></view>
+        <view class="right-column" ><input id="mi7OrderSalePrice_{{index}}"  value="{{item.mi7SalePrice}}"   placeholder="填写零售总价" bindinput="modMi7Order"  type="digit" /></view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display:flex; flex-direction: row;">
         <view class="left-column" >成交价：</view>
-        <view class="right-column" ><input id="mi7OrderChargePrice_{{index}}" value="{{item.mi7ChargePrice}}"   placeholder="填写成交总价" bindinput="modMi7Order"  /></view>
+        <view class="right-column" ><input id="mi7OrderChargePrice_{{index}}" value="{{item.mi7ChargePrice}}"   placeholder="填写成交总价" bindinput="modMi7Order" type="digit" /></view>
       </view>
     </mp-cell> 
     <mp-cell>
