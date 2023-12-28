@@ -1,1 +1,4 @@
 /* pages/admin/maintain/print_label.wxss */
+button{
+  height: 80rpx;
+}

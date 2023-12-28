@@ -31,8 +31,19 @@ Page({
       url: getDeviceNameUrl,
       success: (res) => {
         if (res.data.status == 0) {
+          if (that.data.color != undefined){
+            for(var i = 0; i < res.data.blt_devices.length; i++) {
+              if (res.data.blt_devices[i].scene == that.data.deviceScene
+                && that.data.color == res.data.blt_devices[i].color) {
+                  deviceName.push(res.data.blt_devices[i].device_name)
+              }
+            }
+          }
           for(var i = 0; i < res.data.blt_devices.length; i++) {
-            if (res.data.blt_devices[i].scene == that.data.deviceScene) {
+            if (res.data.blt_devices[i].scene == that.data.deviceScene
+              && (res.data.blt_devices[i].color == undefined
+                || res.data.blt_devices[i].color == null
+                || res.data.blt_devices[i].color == '' )) {
               deviceName.push(res.data.blt_devices[i].device_name)
             }
           }
@@ -274,6 +285,10 @@ Page({
     }
     this.data.id = options.id
     var that = this
+    if (options.color != undefined){
+      that.setData({color: options.color})
+    }
+    
     app.loginPromiseNew.then(function(resolve) {
       if (app.globalData.role == 'staff') {
         that.data.sessionKey = resolve.sessionKey
@@ -309,10 +324,31 @@ Page({
       this.data.reConnecting = false
     }
   },
+
+  printColor(e){
+    var that = this
+    var id = e.currentTarget.id
+    var color = ''
+    switch(id){
+      case 'invoice':
+        color = 'blue'
+        break
+      case 'label_color':
+        color = 'yellow'
+        break
+      default:
+        break
+    }
+    that.setData({color: color})
+    that.print()
+  },
+
+
   print: function(e){
     if (!this.data.readyForPrint) {
       if (!this.data.reConnecting){
-        this.getDeviceNameListInRange()
+        //this.getDeviceNameListInRange()
+        this.getDeviceNameList()
         this.data.reConnecting = true
       }
       if (this.data.reConnectTimes < 100)
