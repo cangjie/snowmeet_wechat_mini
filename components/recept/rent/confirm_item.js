@@ -23,12 +23,14 @@ Component({
       name: '',
       rental: 0,
       deposit: 0,
-      depositType:'',
+      depositType:'立即租赁',
       startDate: util.formatDate(new Date()),
-      memo: '',
-      
-    }
+      memo: ''
+    },
+    nowDate: util.formatDate(new Date())
   },
+
+
 
   ready(){
     var that = this
@@ -58,10 +60,12 @@ Component({
                 return
               }
               var recept = res.data
+              that.getUser(recept.open_id)
               var rentItemList = []
               if (recept != null && recept.rentOrder != null && recept.rentOrder.details != null){
                 for(var i = 0; i < recept.rentOrder.details.length; i++){
                   var detail = recept.rentOrder.details[i]
+                  console.log('detail', detail)
                   var classIndex = 0
                   var classList = that.data.classList
                   for(var j = 0; j < classList.length; j++){
@@ -90,6 +94,21 @@ Component({
    * Component methods
    */
   methods: {
+    getUser(openId){
+      var that = this
+      var getUserUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniAppUser?openId=' + encodeURIComponent(openId)
+            + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getUserUrl,
+        method: 'GET',
+        success:(res)=>{
+          if (res.statusCode != 200){
+            return
+          }
+          that.setData({customUser: res.data})
+        }
+      })
+    },
     selectClass(e){
       var that = this
       var currentRentItem = that.data.currentRentItem
@@ -180,8 +199,23 @@ Component({
     setStartDate(e){
       console.log('selet start date', e)
       var that = this
+      var user = that.data.customUser
       var currentRentItem = that.data.currentRentItem
       currentRentItem.startDate = e.detail.value
+
+      if (util.formatDate(new Date()) == util.formatDate(new Date(currentRentItem.startDate)) ){
+        currentRentItem.depositType = '立即租赁'
+        if (user.isMember && !isNaN(currentRentItem.rentalMember)){
+          currentRentItem.rental = currentRentItem.rentalMember
+        }
+      }
+      else {
+        currentRentItem.depositType = '预约租赁'
+        if (!isNaN(currentRentItem.rentalReserve)){
+          currentRentItem.rental = currentRentItem.rentalReserve
+        }
+      }
+
       that.setData({currentRentItem: currentRentItem})
       that.checkValid()
 
@@ -200,11 +234,27 @@ Component({
       var that = this
       var currentRentItem = that.data.currentRentItem
       var classList = that.data.classList
+      var customUser = that.data.customUser
       var getItemUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentItem/' + code + '?shop=' + encodeURIComponent('万龙')
       wx.request({
         url: getItemUrl,
         success:(res)=>{
           if (res.statusCode == 200){
+            var startDate = new Date()
+            if (currentRentItem.start_date != undefined){
+              startDate = new Date(currentRentItem.start_date)
+              if (util.formatDate(startDate) == util.formatDate(new Date())){
+                currentRentItem.depositType = '立即租赁'
+              }
+              else{
+                currentRentItem.depositType = '预约租赁'
+              }
+            }
+            else{
+              currentRentItem.depositType = '立即租赁'
+              currentRentItem.start_date = startDate
+            }
+
             currentRentItem.name = res.data.name
             currentRentItem.class = res.data.class
             currentRentItem.classSelectIndex = 0
@@ -215,6 +265,19 @@ Component({
               }
             }
             currentRentItem.rental = res.data.rental
+            if (customUser.isMember){
+              currentRentItem.rental = res.data.rental_member
+            }
+
+            if (currentRentItem.depositType == '预约租赁'){
+              currentRentItem.rental = res.data.rental_reserve
+            }
+
+            currentRentItem.rentalOrigin = res.data.rental
+            currentRentItem.rentalMember = res.data.rental_member
+            currentRentItem.rentalReserve = res.data.rental_reserve
+
+            
             currentRentItem.deposit = res.data.deposit
             that.setData({currentRentItem: currentRentItem})
             /*
@@ -377,10 +440,25 @@ Component({
         currentRentItem.isNoCode = false
         currentRentItem.startDate = null
       }
-      else if (currentRentItem.depositType == '预约租赁'){
-        currentRentItem.startDate = util.formatDate(new Date())
+      else {
+        if (currentRentItem.start_date != undefined){
+          var startDate = new Date(currentRentItem.startDate)
+          if (util.formatDate(startDate) == that.data.nowDate){
+            currentRentItem.depositType = '立即租赁'
+            if (!isNaN(currentRentItem.rentalOrigin)){
+              currentRentItem.rental = currentRentItem.rentalOrigin
+            }
+          }
+          else{
+            currentRentItem.depositType = '预约租赁'
+            if (!isNaN(currentRentItem.rentalReserve)){
+              currentRentItem.rental = currentRentItem.rentalReserve
+            }
+          }
+        }
+        
       }
-      
+
       that.setData({currentRentItem: currentRentItem})
     },
     setNumber(e){

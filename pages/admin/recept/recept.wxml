@@ -2,8 +2,11 @@
   <view style="background-color: gray;position: fixed;top: 10px; left:10px;width: {{windowWidth - 20}}px;opacity: 0.5;height: {{topFrameHeight}}px; padding-bottom: 10rpx;">
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" style="width: 150rpx;" >姓名：</view>
-      <view class="right-column" wx:if="{{user.real_name != undefined}}" >
-        {{user.real_name + ' ' + ((user.gender == '男') ? '先生' :  ( (user.gender ==  '女')? '女士' : user.gender) )}}
+      <view class="right-column view-row" wx:if="{{user.real_name != undefined}}" >
+        <view>
+          {{user.real_name + ' ' + ((user.gender == '男') ? '先生' :  ( (user.gender ==  '女')? '女士' : user.gender) )}}
+        </view>
+        <view wx:if="{{user.isMember}}" style="color: red;">会员</view>
       </view>
       <view class="right-column" wx:else >
         --
