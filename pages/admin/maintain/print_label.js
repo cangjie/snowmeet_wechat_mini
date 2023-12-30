@@ -24,29 +24,26 @@ Page({
     reConnectTimes: 0
   },
   getDeviceNameList: function() {
-    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/blt_device.htm'
     var that = this
+    var task = that.data.maintain_in_shop_request
+    var color = that.data.color
+    if (color == undefined){
+      color = 'white'
+    }
+    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/core/Printer/GetPrinters?shop=' + encodeURIComponent(task.shop) + '&color=' + color + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    
     var deviceName = []
     wx.request({
       url: getDeviceNameUrl,
       success: (res) => {
-        if (res.data.status == 0) {
+        if (res.statusCode == 200) {
           if (that.data.color != undefined){
-            for(var i = 0; i < res.data.blt_devices.length; i++) {
-              if (res.data.blt_devices[i].scene == that.data.deviceScene
-                && that.data.color == res.data.blt_devices[i].color) {
-                  deviceName.push(res.data.blt_devices[i].device_name)
-              }
+            for(var i = 0; i < res.data.length; i++) {
+              deviceName.push(res.data[i].name)
+              
             }
           }
-          for(var i = 0; i < res.data.blt_devices.length; i++) {
-            if (res.data.blt_devices[i].scene == that.data.deviceScene
-              && (res.data.blt_devices[i].color == undefined
-                || res.data.blt_devices[i].color == null
-                || res.data.blt_devices[i].color == '' )) {
-              deviceName.push(res.data.blt_devices[i].device_name)
-            }
-          }
+          
           that.data.deviceName = deviceName
           this.getDeviceNameListInRange()
         }
@@ -301,7 +298,7 @@ Page({
             var showedMsg = that.data.showedMsg
             showedMsg.push('准备获取设备列表')
             that.setData({showedMsg: showedMsg})
-            that.getDeviceNameList()
+            //that.getDeviceNameList()
           }
         })
         
@@ -330,17 +327,21 @@ Page({
     var id = e.currentTarget.id
     var color = ''
     switch(id){
-      case 'invoice':
-        color = 'blue'
-        break
-      case 'label_color':
+      case 'label':
         color = 'yellow'
+        var now = new Date()
+        var task = that.data.maintain_in_shop_request
+        if (util.formatDate(now) == util.formatDate(new Date(task.confirmed_pick_date))){
+          color = 'red'
+        }
         break
       default:
+        color = id
         break
     }
     that.setData({color: color})
-    that.print()
+    
+    that.print(e)
   },
 
 
@@ -390,10 +391,10 @@ Page({
     if (name.length > 0) {
       maskedName = name.substring(0,1) + title
     }
-    if (printType=='invoice') {
+    if (printType!='label') {
       maskedName = name
       maskedCell = cell
-      this.data.copies = 2
+      this.data.copies = 1
     }
     else{
       this.data.copies = 1
@@ -555,7 +556,8 @@ Page({
                 wx.showToast({
                   title: '打印完毕，蓝牙打印机断开。',
                 })
-                that.data.readyForPrint = false
+                //that.data.readyForPrint = false
+                that.setData({readyForPrint: false})
               }
             })
           } else {

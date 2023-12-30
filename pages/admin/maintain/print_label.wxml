@@ -1,10 +1,10 @@
 <view>
   
-  <button id="invoice" bindtap="printColor" class="input" disabled="{{!readyForPrint}}" >打印客户小票</button>
+  <button id="blue" bindtap="printColor" class="input" disabled="{{readyForPrint}}" >打印客户小票</button>
   <view style="height: 20rpx;" ></view>
-  <button id="label_color" bindtap="printColor" class="input" disabled="{{!readyForPrint}}" >打印标签</button>
+  <button id="label" bindtap="printColor" class="input" disabled="{{readyForPrint}}" >打印标签</button>
   <view style="height: 20rpx;" ></view>
-  <button id="label_white" bindtap="printColor" class="input" disabled="{{!readyForPrint}}" >打印贴本小票</button>
+  <button id="white" bindtap="printColor" class="input" disabled="{{readyForPrint}}" >打印贴本小票</button>
   <view style="height: 20rpx;" ></view>
   <scroll-view scroll-y="true" style="width: 100%;">
     <view wx:for="{{showedMsg}}" >{{item}}</view>
