@@ -95,7 +95,15 @@
         <view class="left-column"  >起租：</view>
         <view class="right-column" style="font-size: 9pt;"  >{{item.start_dateStr}}</view>
         <view class="left-column"  >退租：</view>
-        <view class="right-column" style="font-size: 9pt;"  >{{item.real_end_dateStr}}</view>
+        <view class="right-column" wx:if="{{item.status != '已归还'  }}" >
+          <picker mode="date" class="input" id="{{index}}" bindchange="setReturnDate" >
+            <picker-view>{{item.pickedDateStr}}</picker-view>
+          </picker>
+          <picker mode="time" class="input" bindchange="setReturnTime"  id="{{index}}" >
+            <picker-view>{{item.pickedTimeStr}}</picker-view>
+          </picker>
+        </view>
+        <view class="right-column" style="font-size: 9pt;" wx:else >{{item.real_end_dateStr}}</view>
         
       </view>
       <view style="display: flex; flex-direction: row;">
@@ -229,8 +237,7 @@
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">租金减免：</view>
     <view class="right-column">
-      <view wx:if="{{rentOrder.status == '已退款'}}" >{{rentalReduceStr}}</view>
-      <input wx:else type="digit" placeholder="0" bindinput="setRentalReduce" placeholder="{{rentOrder.rental_reduce}}" />
+      <view  >{{rentalReduceStr}}</view>
     </view>
     <view class="left-column"></view>
     <view class="right-column"></view>
@@ -238,8 +245,8 @@
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">优惠券减免：</view>
     <view class="right-column">
-      <view wx:if="{{rentOrder.status == '已退款'}}" >{{rentalReduceTicketStr}}</view>
-      <input wx:else type="digit" placeholder="0" bindinput="setRentalReduceTicket" placeholder="{{rentOrder.rental_reduce_ticket}}" />
+      <view  >{{rentalReduceTicketStr}}</view>
+      
     </view>
     <view class="left-column"></view>
     <view class="right-column"></view>
@@ -258,9 +265,11 @@
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">未退金额：</view>
-    <view class="right-column">{{realTotalRefundStr}}</view>
+    <view class="right-column">{{unRefundStr}}</view>
     <view class="left-column"></view>
-    <view class="right-column"></view>
+    <view class="right-column">
+      <button disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" bindtap="refundConfirm" size="mini" style="font-size: 10pt;" >确认退款</button>
+    </view>
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column">订单结余：</view>
@@ -288,5 +297,5 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view><button disabled="{{rentOrder.status != '全部归还'}}" bindtap="refund" > 确 认 退 款 </button></view>
+  <view></view>
 </view>

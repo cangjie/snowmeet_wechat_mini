@@ -21,9 +21,9 @@ const formatTimeStr = date => {
 
   const hour = date.getHours()
   const minute = date.getMinutes()
-  const second = date.getSeconds()
+  //const second = date.getSeconds()
 
-  return [hour, minute, second].map(formatNumber).join(':')
+  return [hour, minute].map(formatNumber).join(':')
   
 }
 

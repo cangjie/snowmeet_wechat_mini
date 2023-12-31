@@ -9,7 +9,27 @@ Page({
   data: {
     showCreditGallery: false,
     rentalReduce: 0,
-    rentalReduceTicket: 0
+    rentalReduceTicket: 0,
+    currentDateStr: util.formatDate(new Date()),
+    currentTimeStr: util.formatTimeStr(new Date()),
+    refunding: false
+  },
+
+  setReturnDate(e){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var index = parseInt(e.currentTarget.id)
+    var detail = rentOrder.details[index]
+    detail.pickedDateStr = e.detail.value
+    that.setData({rentOrder: rentOrder})
+  },
+  setReturnTime(e){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var index = parseInt(e.currentTarget.id)
+    var detail = rentOrder.details[index]
+    detail.pickedTimeStr = e.detail.value
+    that.setData({rentOrder: rentOrder})
   },
 
   showGallery(e){
@@ -93,6 +113,10 @@ Page({
             detail.reparationStr = util.showAmount(detail.reparation)
             detail.showGallery = false
             detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
+
+            detail.pickedDateStr = that.data.currentDateStr
+            detail.pickedTimeStr = that.data.currentTimeStr
+
 
 
 
@@ -355,9 +379,10 @@ Page({
       })
       return false
     }
+    var returnDate = detail.pickedDateStr + ' ' + detail.pickedTimeStr
     var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetReturn/' + detail.id
       + '?rental=' + encodeURIComponent(realRental) 
-      + '&returnDate=' + encodeURIComponent(nowDate) + '&reparation=' + encodeURIComponent(reparation)
+      + '&returnDate=' + encodeURIComponent(returnDate) + '&reparation=' + encodeURIComponent(reparation)
       + '&memo=' + encodeURIComponent(detail.memo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       + '&overTimeCharge=' + encodeURIComponent(detail.overtime_charge)
     wx.request({
@@ -503,10 +528,33 @@ Page({
     }
     that.setData({refundAmount: value})
   },
-  refund(){
+  refundConfirm(){
+    var that = this
+    that.setData({refunding: true})
+    var unRefund = that.data.unRefund
+    var unRefundStr = that.data.unRefundStr
+    var paid = that.data.rentOrder.deposit_final_str
+    var rental = that.data.totalRentalStr
+    var refunded = that.data.realTotalRefundStr
+    
+    wx.showModal({
+      title: '退款确认',
+      content: '已付押金：' + paid + '  租金：' + rental + '  已退：'+refunded + '  本次退款：'+ unRefundStr,
+      complete: (res) => {
+        if (res.cancel) {
+          that.setData({refunding: false})
+        }
+    
+        if (res.confirm) {
+          that.refund(unRefund)
+        }
+      }
+    })
+  },
+  refund(amount){
     var that = this
     var refundUrl = 'https://' + app.globalData.domainName + '/core/Rent/Refund/' + that.data.rentOrder.id 
-    + '?amount=' + encodeURIComponent(that.data.refundAmount) + '&memo=' + encodeURIComponent(that.data.rentOrder.memo)
+    + '?amount=' + encodeURIComponent(amount) + '&memo=' + encodeURIComponent(that.data.rentOrder.memo)
     + '&rentalReduce=' + encodeURIComponent(that.data.rentalReduce) 
     + '&rentalReduceTicket=' + encodeURIComponent(that.data.rentalReduceTicket)
     + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -517,6 +565,9 @@ Page({
         if (res.statusCode == 200){
           that.getData()
         }
+      },
+      complete:(res)=>{
+        that.setData({refunding: false})
       }
     })
   },
