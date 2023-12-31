@@ -1,4 +1,4 @@
-const formatTime = date => {
+const formatDateTime = date => {
 
   const year = date.getFullYear()
   const month = date.getMonth() + 1
@@ -7,7 +7,7 @@ const formatTime = date => {
   const minute = date.getMinutes()
   const second = date.getSeconds()
 
-  return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+  return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
   
 }
 
@@ -82,7 +82,7 @@ const skiPassDescNanashanCommon = '<ul><li>票前可申请免费退换</li><li>�
 
 
 module.exports = {
-  formatTime: formatTime,
+  formatDateTime: formatDateTime,
   formatDate: formatDate,
   formatTimeStr: formatTimeStr,
   showAmount: showAmount,

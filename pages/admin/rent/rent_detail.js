@@ -64,6 +64,13 @@ Page({
           {
             var detail = rentOrder.details[i]
             detail.suggestRental_str = util.showAmount(detail.suggestRental)
+            detail.start_dateStr = util.formatDateTime(new Date(detail.start_date))
+            if (detail.real_end_date == undefined || detail.real_end_date == null){
+              detail.real_end_dateStr = '--'
+            }
+            else{
+              detail.real_end_dateStr = util.formatDateTime(new Date(detail.real_end_date))
+            }
             if (detail.status == '未归还'){
               detail.real_rental = detail.suggestRental
               detail.real_rental_str = util.showAmount(detail.real_rental)
@@ -86,13 +93,32 @@ Page({
             detail.reparationStr = util.showAmount(detail.reparation)
             detail.showGallery = false
             detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
+
+
+
             rentOrder.details[i] = detail
 
           }
           rentOrder = that.computeAmount(rentOrder)
+
+          var realTotalRefund = 0;
+          var refunds = []
+          for(var j = 0; j < rentOrder.order.refunds.length; j++){
+            var r = rentOrder.order.refunds[j];
+            if (r.refundSuccess){
+              r.create_dateStr = util.formatDateTime(new Date(r.create_date))
+              r.amountStr = util.showAmount(r.amount)
+              refunds.push(r)
+              realTotalRefund += r.amount
+            }
+          }
+          var realTotalRefundStr = util.showAmount(realTotalRefund)
+          var bonus = rentOrder.deposit_final - realTotalRefund
+          
           that.setData({rentOrder: rentOrder, 
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
-            rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket)})
+            rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
+              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, refunds: refunds, bonus: bonus, bonusStr: util.showAmount(bonus)})
           that.computeTotal()
         }
       }
@@ -193,8 +219,12 @@ Page({
       totalOvertimeCharge = totalOvertimeCharge + detail.overtime_charge
     }
     var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation - totalOvertimeCharge
+
+    var unRefund = refundAmount - that.data.realTotalRefund;
+    var unRefundStr = util.showAmount(unRefund)
+
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
-      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder})
+      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder, unRefund: unRefund, unRefundStr: unRefundStr})
   },
   
 //////set buttons/////////////

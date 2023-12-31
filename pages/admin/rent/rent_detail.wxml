@@ -92,10 +92,10 @@
       </view>
       <view style="display: flex; flex-direction: row;">
         
-        <view class="left-column"  >计划归还：</view>
-        <view class="right-column" style="font-size: 9pt;"  >{{rentOrder.due_end_time_str}}</view>
-        <view class="left-column"  >实际归还：</view>
-        <view class="right-column" style="font-size: 9pt;"  >{{rentOrder.due_end_time_str}}</view>
+        <view class="left-column"  >起租：</view>
+        <view class="right-column" style="font-size: 9pt;"  >{{item.start_dateStr}}</view>
+        <view class="left-column"  >退租：</view>
+        <view class="right-column" style="font-size: 9pt;"  >{{item.real_end_dateStr}}</view>
         
       </view>
       <view style="display: flex; flex-direction: row;">
@@ -250,9 +250,43 @@
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">已退金额：</view>
+    <view class="right-column">{{realTotalRefundStr}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">未退金额：</view>
+    <view class="right-column">{{realTotalRefundStr}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">订单结余：</view>
+    <view class="right-column">{{bonusStr}}</view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
   <view  style="margin-left: 100rpx; margin-right: 100rpx;margin-top: 50rpx;margin-bottom: 50rpx;"  >
     <input wx:if="{{rentOrder.status == '全部归还'}}" value="{{rentOrder.memo}}" bindinput="setOrderMemo" placeholder="填写订单备注" />
     <block wx:else >{{rentOrder.memo}}</block>
   </view>
+  <mp-cells title="退款明细{{refunds.length}}" >
+    <mp-cell>
+      <view class="view-row" >
+        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >时间</view>
+        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >金额</view>
+        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >备注</view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:for="{{refunds}}" >
+      <view class="view-row" >
+        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >{{item.create_dateStr}}</view>
+        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >{{item.amountStr}}</view>
+        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >{{item.memo}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <view><button disabled="{{rentOrder.status != '全部归还'}}" bindtap="refund" > 确 认 退 款 </button></view>
 </view>
