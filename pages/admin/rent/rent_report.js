@@ -21,19 +21,20 @@ Page({
     currentBusinessRentalUnSettled:0,
     settledBeforeRental: 0,
     scene: 0,
-    shop: ''
+    shop: '',
+    isQuerying: false
   },
 
   changeDate(e){
     var that = this
     var value = e.detail.value
     that.setData({currentDate: value})
-    that.getData()
+    //that.getData()
   },
 
   getData(){
     var that = this
-    
+    that.setData({isQuerying: true})
     that.setData({unRefundDeposit:0, unSettledRental: 0, sameDaySettledRental: 0, currentTotalDeposit: 0, currentDayRefundPlacedBefore: 0, currentBusinessRental: 0, currentBusinessRentalSettled: 0, currentBusinessRentalUnSettled: 0, settledBeforeRental: 0})
     var getUnSettledOrderBeforeUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetUnSettledOrderBefore?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
     var getCurrentSameDaySettledUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetCurrentSameDaySettled?date=' + encodeURIComponent(that.data.currentDate) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
@@ -262,7 +263,7 @@ Page({
                       currentDayRefundPlacedBeforeStr: util.showAmount(res.data.totalDeposit),
                       currentDateUnRefundDeposit: currentDateUnRefundDeposit, 
                       currentDateUnRefundDepositStr: util.showAmount(currentDateUnRefundDeposit), settledBeforeRental: settledBeforeRental,
-                      settledBeforeRentalStr: util.showAmount(settledBeforeRental), CurrentDaySettledPlacedBeforeSet: orders})
+                      settledBeforeRentalStr: util.showAmount(settledBeforeRental), CurrentDaySettledPlacedBeforeSet: orders, isQuerying: false})
                   }
                 })
               }
