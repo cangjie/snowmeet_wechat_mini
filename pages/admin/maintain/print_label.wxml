@@ -9,5 +9,4 @@
   <scroll-view scroll-y="true" style="width: 100%;">
     <view wx:for="{{showedMsg}}" >{{item}}</view>
   </scroll-view>
-  
 </view>
