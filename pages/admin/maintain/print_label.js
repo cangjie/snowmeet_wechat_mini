@@ -12,6 +12,7 @@ Page({
     deviceName: [],
     deviceInRange: [],
     readyForPrint: false,
+    finish: true,
     currentDevice: {
       deviceId: '', services: [],
       readServiceId: '', readCharacterUuid: '', 
@@ -24,23 +25,32 @@ Page({
     reConnectTimes: 0
   },
   getDeviceNameList: function() {
-    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/blt_device.htm'
     var that = this
+    var task = that.data.maintain_in_shop_request
+    var color = that.data.color
+    if (color == undefined){
+      color = 'white'
+    }
+    var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/core/Printer/GetPrinters?shop=' + encodeURIComponent(task.shop) + '&color=' + color + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    
     var deviceName = []
     wx.request({
       url: getDeviceNameUrl,
       success: (res) => {
-        if (res.data.status == 0) {
-          for(var i = 0; i < res.data.blt_devices.length; i++) {
-            if (res.data.blt_devices[i].scene == that.data.deviceScene) {
-              deviceName.push(res.data.blt_devices[i].device_name)
+        if (res.statusCode == 200) {
+          if (that.data.color != undefined){
+            for(var i = 0; i < res.data.length; i++) {
+              deviceName.push(res.data[i].name)
+              
             }
           }
+          
           that.data.deviceName = deviceName
           this.getDeviceNameListInRange()
         }
       },
       fail: (res)=>{
+        that.setData({finish: true})
         console.log(res)
       }
     })
@@ -61,6 +71,7 @@ Page({
                   },
                   fail: (res) => {
                     var showedMsg = that.data.showedMsg
+                    that.setData({finish: true})
                     showedMsg.push('手机蓝牙无法停止搜索其他设备。')
                     that.setData({showedMsg: showedMsg})
                   }
@@ -74,19 +85,23 @@ Page({
               var showedMsg = that.data.showedMsg
               showedMsg.push('手机蓝牙设备不可用。')
               that.setData({showedMsg: showedMsg})
+              that.setData({finish: true, reConnecting: false})
             }
           },
           fail: (res) => {
             var showedMsg = that.data.showedMsg
             showedMsg.push('获取蓝牙设备状态失败。')
             that.setData({showedMsg: showedMsg})
+            that.setData({finish: true, reConnecting: false})
           }
         })
       },
       fail: (res) => {
         var showedMsg = that.data.showedMsg
+        that.setData({finish: true})
         showedMsg.push('请打开蓝牙，返回后重试。')
         that.setData({showedMsg: showedMsg})
+        
       }
     })
   },
@@ -117,20 +132,24 @@ Page({
               else {
                 showedMsg.push('获取在线设备失败。')
                 this.setData({showedMsg: showedMsg})
+                that.setData({finish: true, reConnecting: false})
               }
               
             },
             fail: (res) => { 
               showedMsg.push('获取设备在线列表失败。')
               this.setData({showedMsg: showedMsg})
+              that.setData({finish: true, reConnecting: false})
             }
           })
         }, 5000);
       },
       fail: (res) => {
         showedMsg = that.data.showedMsg
+        that.setData({finish: true, reConnecting: false})
         showedMsg.push('扫描设备列表失败。')
         this.setData({showedMsg: showedMsg})
+        that.setData({finish: true})
       }
     })
   },
@@ -146,6 +165,7 @@ Page({
         var showedMsg = this.data.showedMsg
         showedMsg.push('所有设备连接失败。')
         this.setData({showedMsg: showedMsg})
+        that.setData({finish: true, reConnecting: false})
       }
     }
   },
@@ -185,6 +205,7 @@ Page({
       },
       fail: (res) => {
         showedMsg.push('设备' + this.data.currentDeviceIndex + '连接失败。')
+        that.setData({finish: true})
         this.setData({showedMsg: showedMsg})
         this.data.currentDeviceIndex++
         this.tryConnectDevice()
@@ -258,6 +279,7 @@ Page({
       },
       fail: (res) => {
         showedMsg.push('开始获取特性列表失败。')
+        that.setData({finish: true})
         this.setData({showedMsg: showedMsg})
         this.data.currentDeviceIndex++
         this.tryConnectDevice()
@@ -274,6 +296,10 @@ Page({
     }
     this.data.id = options.id
     var that = this
+    if (options.color != undefined){
+      that.setData({color: options.color})
+    }
+    
     app.loginPromiseNew.then(function(resolve) {
       if (app.globalData.role == 'staff') {
         that.data.sessionKey = resolve.sessionKey
@@ -286,7 +312,7 @@ Page({
             var showedMsg = that.data.showedMsg
             showedMsg.push('准备获取设备列表')
             that.setData({showedMsg: showedMsg})
-            that.getDeviceNameList()
+            //that.getDeviceNameList()
           }
         })
         
@@ -309,10 +335,37 @@ Page({
       this.data.reConnecting = false
     }
   },
+
+  printColor(e){
+    var that = this
+    that.setData({finish: false})
+    var id = e.currentTarget.id
+    var color = ''
+    switch(id){
+      case 'label':
+        color = 'yellow'
+        var now = new Date()
+        var task = that.data.maintain_in_shop_request
+        if (util.formatDate(now) == util.formatDate(new Date(task.confirmed_pick_date))){
+          color = 'red'
+        }
+        break
+      default:
+        color = id
+        break
+    }
+    that.setData({color: color})
+    
+    that.print(e)
+  },
+
+
   print: function(e){
     if (!this.data.readyForPrint) {
       if (!this.data.reConnecting){
-        this.getDeviceNameListInRange()
+        //this.setData({readyForPrint: true})
+        //this.getDeviceNameListInRange()
+        this.getDeviceNameList()
         this.data.reConnecting = true
       }
       if (this.data.reConnectTimes < 100)
@@ -354,10 +407,10 @@ Page({
     if (name.length > 0) {
       maskedName = name.substring(0,1) + title
     }
-    if (printType=='invoice') {
+    if (printType!='label') {
       maskedName = name
       maskedCell = cell
-      this.data.copies = 2
+      this.data.copies = 1
     }
     else{
       this.data.copies = 1
@@ -479,7 +532,7 @@ Page({
           wx.showToast({
             title: '已打印第' + currentPrint + '张成功',
           })
-          that.setData({nowPrinting: false})
+          that.setData({nowPrinting: false, finish: true})
         }
         //console.log(res)
       },
@@ -488,12 +541,13 @@ Page({
           title: '打印第' + currentPrint + '张失败',
           icon: 'none',
         })
-
+        that.setData({finish: true})
         //console.log(e)
       },
       complete: function () {
         currentTime++
         console.log(currentTime)
+        that.setData({finish: true})
         if (currentTime <= loopTime) {
           that.setData({
             currentTime: currentTime
@@ -519,7 +573,8 @@ Page({
                 wx.showToast({
                   title: '打印完毕，蓝牙打印机断开。',
                 })
-                that.data.readyForPrint = false
+                //that.data.readyForPrint = false
+                that.setData({readyForPrint: false})
               }
             })
           } else {
