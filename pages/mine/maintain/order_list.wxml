@@ -1,4 +1,33 @@
 <!--pages/mine/maintain/order_list.wxml-->
+<mp-cells >
+  <mp-cell>
+    <view class="view-row" >
+      <view style="width: 50%;display: flex; justify-content: center;">
+        <image style="width: 300rpx;height: 300rpx;" mode="heightFix" src="https://mini.snowmeet.top/upload/20231109/1699519312006.jpg" ></image>
+      </view>
+      <view style="width: 50%;">
+        <view>编号：240123-00001</view>
+        <view>品牌：xxx</view>
+        <view>长度：xxx</view>
+        <view>项目：xxx</view>
+        <view>状态：未取板</view>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view style="width: 50%;display: flex; justify-content: center;">
+        <image style="width: 300rpx;height: 300rpx;" mode="heightFix" src="https://mini.snowmeet.top/upload/20231109/1699519312006.jpg" ></image>
+      </view>
+      <view style="width: 50%;">
+        <view>品牌：xxx</view>
+        <view>长度：xxx</view>
+        <view>项目：xxx</view>
+        <view>状态：未取板</view>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
 <mp-cells id="{{item.order.id}}" wx:for="{{orders}}" title="订单号：{{item.order.id}} 日期：{{item.date}} 时间：{{item.time}}" bindtap="gotoDetail" >
   <mp-cell wx:for="{{item.items}}" >
     <view class="table" >
