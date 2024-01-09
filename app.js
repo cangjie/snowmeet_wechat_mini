@@ -63,6 +63,12 @@ App({
                   if (res.data.mini_users[0].is_admin == '1') {
                     app.globalData.role = 'staff'
                   }
+                  if (res.data.mini_users[0].is_manager == '1') {
+                    app.globalData.is_manager = true
+                  }
+                  else{
+                    app.globalData.is_manager = false
+                  }
                   app.globalData.cellNumber = res.data.mini_users[0].cell_number
                   app.globalData.userInfo = res.data.mini_users[0]
                   if (res.data.mini_users[0].nick == ''  || res.data.mini_users[0].nick == '微信用户'  || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {

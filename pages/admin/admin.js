@@ -3,6 +3,10 @@ const app = getApp()
 function init(that) {
   var role = app.globalData.role
   var isSchoolStaff = false
+  var isManager = false
+  if (app.globalData.is_manager){
+    isManager = true
+  }
   /*
   var ajaxUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff?sessionkey=' +  encodeURIComponent(app.globalData.sessionKey)
   wx.request({
@@ -18,7 +22,7 @@ function init(that) {
     }
   })
   */
-  that.setData({role: app.globalData.role})
+  that.setData({role: app.globalData.role, isManager: isManager})
   
 }
 Page({
@@ -28,22 +32,20 @@ Page({
    */
   data: {
     role: '',
-    isSchoolStaff: false
+    isSchoolStaff: false,
+    isManager: true
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-    if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
-      var that = this
-      app.loginPromiseNew.then(function(resolve) {
-        init(that)
-      })
-    }
-    else {
-      init(this)
-    }
+
+    var that = this
+    app.loginPromiseNew.then(function(resolve) {
+      init(that)
+    })
+
   },
 
   /**
@@ -175,6 +177,9 @@ Page({
         break
       case 'vip_maintain':
         path = '/pages/admin/vip/maintain_recept'
+        break
+      case 'staff_list':
+        path = '/pages/admin/user/staff_list'
         break
       default:
         break
