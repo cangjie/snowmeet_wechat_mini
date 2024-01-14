@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "staffcheckin",
+          "pathName": "pages/register/staff_check_in",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "",
           "pathName": "pages/mine/maintain/order_list",
           "query": "",

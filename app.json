@@ -93,7 +93,8 @@
     "pages/ski_pass/ski_pass_reserve_common",
     "pages/admin/vip/maintain_recept",
     "pages/admin/vip/recept_review",
-    "pages/admin/user/staff_list"
+    "pages/admin/user/staff_list",
+    "pages/register/staff_check_in"
   ],
   "window": {
     "backgroundTextStyle": "light",
