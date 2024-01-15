@@ -1,2 +1,19 @@
-<!--pages/register/staff_check_in.wxml-->
-<text>pages/register/staff_check_in.wxml</text>
+<mp-cells title="确认姓名电话">
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column">姓名：</view>
+      <view class="right-column">{{realName}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column">电话：</view>
+      <view class="right-column">
+        <input class="input" bindinput="setCell" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <button class="input" disabled="{{disabled}}" bindtap="confirm"  > 成 为 管 理 员 </button>
+  </mp-cell>
+</mp-cells>

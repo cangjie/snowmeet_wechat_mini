@@ -6,15 +6,55 @@ Page({
    * Page initial data
    */
   data: {
-
+    realName: '',
+    cell: '',
+    disabled : true
   },
-
+  setCell(e){
+    var that = this
+    var cell = e.detail.value
+    var disabled = true
+    if (cell.length == 11){
+      disabled = false
+    }
+    that.setData({cell: e.detail.value, disabled: disabled})
+  },
+  confirm(){
+    var that = this
+    that.setData({disabled: true})
+    var confirmUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/StaffCheckIn/' + that.data.cell + '?name=' + encodeURIComponent(that.data.realName) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: confirmUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        wx.showToast({
+          title: '你已经成为管理员。',
+          icon: 'success'
+        })
+      }
+    }) 
+  },
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
+    var that = this
     app.loginPromiseNew.then(function(resovle){
 
+      var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetNewStaffName?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getUrl,
+        method: 'GET',
+        success:(res)=>{
+          if (res.statusCode != 200){
+            return
+          }
+          that.setData({realName: res.data})
+        }
+      })
       
     })
   },
