@@ -14,7 +14,7 @@ Page({
     var that = this
     var cell = e.detail.value
     var disabled = true
-    if (cell.length == 11){
+    if (cell.length == 11 && that.data.realName != ''){
       disabled = false
     }
     that.setData({cell: e.detail.value, disabled: disabled})
@@ -34,6 +34,10 @@ Page({
           title: '你已经成为管理员。',
           icon: 'success'
         })
+        wx.reLaunch({
+          url: '/pages/admin/admin',
+        })
+       
       }
     }) 
   },
