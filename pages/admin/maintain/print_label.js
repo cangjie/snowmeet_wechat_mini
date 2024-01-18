@@ -23,6 +23,7 @@ Page({
     showedMsg: [],
     reConnecting: false,
     reConnectTimes: 0
+    
   },
   getDeviceNameList: function() {
     var that = this
@@ -30,6 +31,7 @@ Page({
     var color = that.data.color
     if (color == undefined){
       color = 'white'
+      that.setData({color: color})
     }
     var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/core/Printer/GetPrinters?shop=' + encodeURIComponent(task.shop) + '&color=' + color + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     
@@ -107,6 +109,7 @@ Page({
   },
   
   searchInRangedBluetoothDevices: function() {
+    var that = this
     var showedMsg = this.data.showedMsg
     showedMsg.push('开始扫描蓝牙设备。')
     this.setData({showedMsg: showedMsg, deviceInRange: []})
@@ -359,35 +362,7 @@ Page({
     that.print(e)
   },
 
-
-  print: function(e){
-    if (!this.data.readyForPrint) {
-      if (!this.data.reConnecting){
-        //this.setData({readyForPrint: true})
-        //this.getDeviceNameListInRange()
-        this.getDeviceNameList()
-        this.data.reConnecting = true
-      }
-      if (this.data.reConnectTimes < 100)
-      {
-        this.data.reConnectTimes++
-        setTimeout(() => {
-          this.print(e)
-        }, 1000)
-      }
-      return
-    }
-    this.data.reConnectTimes = 0
-    this.data.reConnecting = false
-    var showedMsg = this.data.showedMsg
-    var printType = e.currentTarget.id
-    if (this.data.maintain_in_shop_request == undefined) {
-      showedMsg.push('未获取到订单信息。')
-      this.setData({showedMsg: showedMsg, readyForPrint: false})
-      return
-    }
-    showedMsg.push('开始打印')
-    this.setData({showedMsg: showedMsg, readyForPrint: false})
+  getCommand(labelType){
     var brand = this.data.maintain_in_shop_request.confirmed_brand
     var orderNum = this.data.maintain_in_shop_request.task_flow_num
     var name = this.data.maintain_in_shop_request.confirmed_name
@@ -407,7 +382,7 @@ Page({
     if (name.length > 0) {
       maskedName = name.substring(0,1) + title
     }
-    if (printType!='label') {
+    if (labelType == '【客户联】' || labelType == '【存根】' ) {
       maskedName = name
       maskedCell = cell
       this.data.copies = 1
@@ -468,13 +443,52 @@ Page({
       orderInfoStr = '订单号：' + this.data.maintain_in_shop_request.order.id 
       priceStr = '金额：' + this.data.maintain_in_shop_request.order.final_price.toString()
     }
-    command.setText(20, 20 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
+    command.setText(20, 20 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr + ' ' + labelType)
     command.setText(20, 20 + 40 + 55 + 55 + 55 + 50 + 40, "TSS24.BF2", 0, 1, 1, priceStr)
     command.setQrcode(400, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)
     command.setText(20, 350, "TSS24.BF2", 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
     command.setText(320, 350, "TSS24.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
     command.setPagePrint()
-    this.prepareSend(command.getData())
+    return command.getData()
+  },
+  
+
+
+  print: function(e){
+    if (!this.data.readyForPrint) {
+      if (!this.data.reConnecting){
+        //this.setData({readyForPrint: true})
+        //this.getDeviceNameListInRange()
+        this.getDeviceNameList()
+        this.data.reConnecting = true
+      }
+      if (this.data.reConnectTimes < 100)
+      {
+        this.data.reConnectTimes++
+        setTimeout(() => {
+          this.print(e)
+        }, 1000)
+      }
+      return
+    }
+    this.data.reConnectTimes = 0
+    this.data.reConnecting = false
+    var showedMsg = this.data.showedMsg
+    var printType = e.currentTarget.id
+    if (this.data.maintain_in_shop_request == undefined) {
+      showedMsg.push('未获取到订单信息。')
+      this.setData({showedMsg: showedMsg, readyForPrint: false})
+      return
+    }
+    showedMsg.push('开始打印')
+    this.setData({showedMsg: showedMsg, readyForPrint: false})
+
+    var buff1 = this.getCommand('【客户联】')
+    var buff2 = this.getCommand('【雪板标签】')
+    var buff3 = this.getCommand('【存根】')
+    var newBuff = [...buff1, ...buff2, ...buff3]
+    console.log('buff', newBuff)
+    this.prepareSend(newBuff)
   },
   prepareSend: function(buff){
     var that = this
