@@ -140,7 +140,7 @@
         <view class="right-column">{{(item.overTime)? '是' : '否'}}</view>
         <view class="left-column">超时费：</view>
         <view class="right-column">
-          <input wx:if="{{item.isEdit && item.editType != '暂存'}}" id="{{index}}" bindinput="setOvertimeCharge" class="input" style="width: 150rpx;" placeholder="{{item.overtime_charge}}" />
+          <input wx:if="{{item.isEdit && item.editType != '暂存'}}" type="digit" id="{{index}}" bindinput="setOvertimeCharge" class="input" style="width: 150rpx;" placeholder="{{item.overtime_charge}}" />
           <view wx:else >{{item.overtime_charge_str}}</view>
           
         </view>
