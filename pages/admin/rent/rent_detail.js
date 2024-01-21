@@ -139,7 +139,7 @@ Page({
             detail.showGallery = false
             detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
 
-            detail.pickedDateStr = that.data.currentDateStr
+            detail.pickedDateStr = util.formatDate(new Date(detail.start_date))
             detail.pickedTimeStr = that.data.currentTimeStr
 
 
@@ -471,6 +471,17 @@ Page({
       }
     })
   },
+  setOrderMemo(e){
+    console.log('set memo', e)
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var value = e.detail.value
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetMemo/' + rentOrder.id + '?memo=' + encodeURIComponent(value) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method: 'GET'
+    })
+  },
   setInstance(e){
     var id = parseInt(e.currentTarget.id)
     var that = this
@@ -539,12 +550,15 @@ Page({
     detail.memo = e.detail.value
     that.setData({rentOrder: rentOrder})
   },
+
+  /*
   setOrderMemo(e){
     var that = this
     var rentOrder = that.data.rentOrder
     rentOrder.memo = e.detail.value
     that.setData({rentOrder: rentOrder})
   },
+  */
   setRefundAmount(e){
     var value = parseFloat(e.detail.value)
     var that = this
@@ -635,6 +649,7 @@ Page({
       return
     }
     detail.rental_discount = value
+    that.computeDetail(detail)
     that.setData({rentOrder: rentOrder})
     that.computeTotal()
   },
@@ -649,7 +664,9 @@ Page({
       return
     }
     detail.rental_ticket_discount = value
+    that.computeDetail(detail)
     that.setData({rentOrder: rentOrder})
+
     that.computeTotal()
   },
 
@@ -816,11 +833,51 @@ Page({
       id: 0,
       isEdit: true,
       images: '',
-      memo: ''
-
+      memo: '',
+      rental_discount: 0,
+      rental_discountStr: '¥0.00',
+      rental_ticket_discount: 0,
+      rental_ticket_discountStr: '¥0.00',
+      suggestRental_str: '¥0.00'
     }
+
     rentOrder.details.push(detail)
     that.setData({rentOrder: rentOrder})
+  },
+
+  computeDetail(detail){
+
+    var count = parseInt(detail.timeLength.replace('天', ''))
+    if (isNaN(count)){
+      count = 1
+    }
+    if (isNaN(detail.unit_rental)){
+      detail.unit_rental = 0
+    }
+    detail.suggestRental = detail.unit_rental * count
+
+    if (isNaN(detail.rental_discount)){
+      detail.rental_discount = 0
+    }
+    if (isNaN(detail.rental_ticket_discount)){
+      detail.rental_ticket_discount = 0
+    }
+    if (isNaN(detail.overtime_charge)){
+      detail.overtime_charge = 0
+    }
+    if (isNaN(detail.reparation)){
+      detail.reparation = 0
+    }
+    detail.paySummary = detail.suggestRental - detail.rental_discount - detail.rental_ticket_discount
+
+    detail.suggestRental_str = util.showAmount(detail.suggestRental)
+    detail.unit_rental_str = util.showAmount(detail.unit_rental_)
+    detail.rental_discountStr = util.showAmount(detail.rental_discount)
+    detail.rental_ticket_discountStr = util.showAmount(detail.rental_ticket_discount)
+    detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
+    detail.reparationStr = util.showAmount(detail.reparation)
+    detail.paySummaryStr = util.showAmount(detail.paySummary)
+    return detail
   },
 
   restore(){
@@ -844,6 +901,7 @@ Page({
     if (!isNaN(v)){
       detail.unit_rental = v
       detail.unit_rental_str = util.showAmount(v)
+      that.computeDetail(detail)
       that.setData({rentOrder: rentOrder})
     }
   },

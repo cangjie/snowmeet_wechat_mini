@@ -96,7 +96,7 @@
         <view class="right-column" style="font-size: 9pt;"  >{{item.start_dateStr}}</view>
         <view class="left-column"  >退租：</view>
         <view class="right-column" wx:if="{{item.status != '已归还'  }}" >
-          <picker mode="date" class="input" id="{{index}}" bindchange="setReturnDate" >
+          <picker mode="date" class="input" id="{{index}}" bindchange="setReturnDate" start="{{item.start_dateStr}}" >
             <picker-view>{{item.pickedDateStr}}</picker-view>
           </picker>
           <picker mode="time" class="input" bindchange="setReturnTime"  id="{{index}}" >
@@ -277,10 +277,17 @@
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view  style="margin-left: 100rpx; margin-right: 100rpx;margin-top: 50rpx;margin-bottom: 50rpx;"  >
+  <view style="display: flex; flex-direction: row;">
+    <view class="left-column">订单备注：</view>
+    <view class="right-column" style="width: 450rpx;">
+      <textarea type="text" class="input" style="width:440rpx;height:200rpx"  bindinput="setOrderMemo"  >{{rentOrder.memo}}</textarea>
+    </view>
+    
+  </view>
+  <!--view  style="margin-left: 100rpx; margin-right: 100rpx;margin-top: 50rpx;margin-bottom: 50rpx;"  >
     <input wx:if="{{rentOrder.status == '全部归还'}}" value="{{rentOrder.memo}}" bindinput="setOrderMemo" placeholder="填写订单备注" />
     <block wx:else >{{rentOrder.memo}}</block>
-  </view>
+  </view-->
   <mp-cells title="退款明细{{refunds.length}}" >
     <mp-cell>
       <view class="view-row" >
