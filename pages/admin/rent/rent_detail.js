@@ -329,6 +329,48 @@ Page({
     return rentOrder
   },
 
+  setKeep(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var detail = that.data.rentOrder.details[id]
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetDetailLog/' + detail.id + '?status=' + encodeURIComponent('已暂存') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        wx.showToast({
+          icon:'success',
+          title: '已暂存。',
+        })
+        that.getData()
+      }
+    })
+  },
+
+  setUnKeep(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var detail = that.data.rentOrder.details[id]
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetDetailLog/' + detail.id + '?status=' + encodeURIComponent('已发放') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        wx.showToast({
+          icon:'success',
+          title: '已提取。',
+        })
+        that.getData()
+      }
+    })
+  },
+
 
   setRentStart(e){
     var id = parseInt(e.currentTarget.id)
@@ -502,18 +544,6 @@ Page({
         }
       }
     })
-  },
-  setKeep(e){
-    var id = parseInt(e.currentTarget.id)
-    var that = this
-    var rentOrder = that.data.rentOrder
-    var detail = rentOrder.details[id]
-    detail.editType = '暂存'
-    detail.isEdit = true
-    detail.unit_rental_str = util.showAmount(detail.unit_rental)
-    rentOrder.details[id] = detail
-
-    that.setData({rentOrder: rentOrder})
   },
 
   reserveMore(e){
