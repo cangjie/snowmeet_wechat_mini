@@ -52,7 +52,7 @@ Component({
             classList.push(res.data[i])
           }
           that.setData({classList: classList})
-          var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + that.properties.receptId + '?sessionKey=' + app.globalData.sessionKey
+          var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + that.properties.receptId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
           wx.request({
             url: getUrl,
             success:(res)=>{
@@ -265,7 +265,7 @@ Component({
               }
             }
             currentRentItem.rental = res.data.rental
-            if (customUser.isMember){
+            if (customUser.isMember != undefined && customUser.isMember != null  &&  customUser.isMember){
               currentRentItem.rental = res.data.rental_member
             }
 
