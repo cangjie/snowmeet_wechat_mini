@@ -1,32 +1,19 @@
 <!--pages/mine/maintain/order_list.wxml-->
 <mp-cells >
-  <mp-cell>
-    <view class="view-row" >
+  <mp-cell wx:for="{{items}}"  >
+    <view class="view-row" id="{{item.order_id}}" bindtap="gotoDetail" >
       <view style="width: 50%;display: flex; justify-content: center;">
-        <image style="width: 300rpx;height: 300rpx;" mode="heightFix" src="https://mini.snowmeet.top/upload/20231109/1699519312006.jpg" ></image>
+        <image wx:if="{{item.image!=''}}" style="width: 300rpx;height: 300rpx;" mode="heightFix" src="{{item.image}}" ></image>
       </view>
       <view style="width: 50%;">
-        <view>编号：240123-00001</view>
-        <view>品牌：xxx</view>
-        <view>长度：xxx</view>
-        <view>项目：xxx</view>
-        <view>状态：未取板</view>
+        <view style="font-size: 11pt;">编号：{{item.task_flow_num}}</view>
+        <view style="font-size: 11pt;">品牌：{{item.confirmed_brand}}</view>
+        <view style="font-size: 11pt;">长度：{{item.confirmed_scale}}</view>
+        <view style="font-size: 11pt;">状态：未取板</view>
       </view>
     </view>
   </mp-cell>
-  <mp-cell>
-    <view class="view-row" >
-      <view style="width: 50%;display: flex; justify-content: center;">
-        <image style="width: 300rpx;height: 300rpx;" mode="heightFix" src="https://mini.snowmeet.top/upload/20231109/1699519312006.jpg" ></image>
-      </view>
-      <view style="width: 50%;">
-        <view>品牌：xxx</view>
-        <view>长度：xxx</view>
-        <view>项目：xxx</view>
-        <view>状态：未取板</view>
-      </view>
-    </view>
-  </mp-cell>
+  
 </mp-cells>
 <mp-cells id="{{item.order.id}}" wx:for="{{orders}}" title="订单号：{{item.order.id}} 日期：{{item.date}} 时间：{{item.time}}" bindtap="gotoDetail" >
   <mp-cell wx:for="{{item.items}}" >
