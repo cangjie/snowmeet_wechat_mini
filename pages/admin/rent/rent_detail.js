@@ -139,7 +139,7 @@ Page({
             detail.showGallery = false
             detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
 
-            detail.pickedDateStr = util.formatDate(new Date(detail.start_date))
+            detail.pickedDateStr = detail.end_dateStr//util.formatDate(new Date(detail.start_date))
             detail.pickedTimeStr = that.data.currentTimeStr
 
 
@@ -431,6 +431,15 @@ Page({
 
     var that = this
     var detail = that.data.rentOrder.details[id]
+
+    if (detail.pickedDateStr == '--'){
+      wx.showToast({
+        title: '请选择归还日期。',
+        icon: 'error'
+      })
+      return
+    }
+
     var nowDate = util.formatDateString(new Date())
     var realRental = parseFloat(detail.filled_rental)
     var reparation = parseFloat(detail.reparation)
