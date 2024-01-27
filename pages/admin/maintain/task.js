@@ -322,6 +322,9 @@ Page({
         if (res.confirm){
           that.setData({isClosed: true})
           that.logStep('强行索回')
+          var task = that.data.task
+          task.outStatus = '强行索回'
+          that.setData({task: task})
         }
         
       }
@@ -340,6 +343,9 @@ Page({
         if (res.confirm){
           that.setData({isClosed: true})
           that.logStep('发板')
+          var task = that.data.task
+          task.outStatus = '发板'
+          that.setData({task: task})
         }
         
       }

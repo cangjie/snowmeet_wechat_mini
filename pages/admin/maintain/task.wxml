@@ -264,8 +264,8 @@
 <mp-cells title="发板" >
   <mp-cell>
     <view class="view-row" style="align-content: center;" >
-      <button wx:if="{{finish}}" bindtap="finish" class="no-padding" size="mini" style="font-size: 10pt;" > 用 户 取 走 确 认 </button>
-      <button id="terminate" wx:else bindtap="terminate" class="no-padding" size="mini" style="font-size: 10pt;" > 用 户 强 行 索 回 </button>
+      <button wx:if="{{finish}}" bindtap="finish" class="no-padding" size="mini" style="font-size: 10pt;"  disabled="{{task.outStatus == '发板'}}"> 用 户 取 走 确 认 </button>
+      <button id="terminate" wx:else bindtap="terminate" class="no-padding" size="mini" style="font-size: 10pt;" disabled="{{task.outStatus == '强行索回'}}" > 用 户 强 行 索 回 </button>
     </view>
   </mp-cell>
 </mp-cells>
