@@ -141,7 +141,8 @@
       "pages": [
         "order_detail",
         "bind_maintain_order",
-        "order_list"
+        "order_list",
+        "task"
       ]
     },
     {

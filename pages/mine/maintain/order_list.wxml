@@ -1,15 +1,17 @@
 <!--pages/mine/maintain/order_list.wxml-->
 <mp-cells >
   <mp-cell wx:for="{{items}}"  >
-    <view class="view-row" id="{{item.order_id}}" bindtap="gotoDetail" >
+    <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
       <view style="width: 50%;display: flex; justify-content: center;">
         <image wx:if="{{item.image!=''}}" style="width: 300rpx;height: 300rpx;" mode="heightFix" src="{{item.image}}" ></image>
       </view>
       <view style="width: 50%;">
+        <view style="font-size: 11pt;">订单：{{item.order_idStr}}</view>
+        <view style="font-size: 11pt;">金额：{{item.final_priceStr}}</view>
         <view style="font-size: 11pt;">编号：{{item.task_flow_num}}</view>
         <view style="font-size: 11pt;">品牌：{{item.confirmed_brand}}</view>
         <view style="font-size: 11pt;">长度：{{item.confirmed_scale}}</view>
-        <view style="font-size: 11pt;">状态：未取板</view>
+        <view style="font-size: 11pt;">状态：{{item.outStatus}}</view>
       </view>
     </view>
   </mp-cell>

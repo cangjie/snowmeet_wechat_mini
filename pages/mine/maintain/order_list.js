@@ -12,12 +12,12 @@ Page({
 
   gotoDetail(e){
     wx.navigateTo({
-      url: 'order_detail?id=' + e.currentTarget.id,
+      url: 'task?id=' + e.currentTarget.id,
     })
   },
   getData(){
     var that = this
-    var getOrdersUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetMyMaintainOrders?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var getOrdersUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetMyMaintainTask?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: getOrdersUrl,
       method: 'GET',
@@ -26,19 +26,16 @@ Page({
         if (res.statusCode != 200){
           return
         }
-        var orders = res.data
+        var tasks = res.data
         var items = []
-        for(var i = 0; i < orders.length && items.length < 5; i++){
-          for(var j = 0; j < orders[i].items.length; j++){
-            var item = orders[i].items[j]
-            //item.order = orders[i]
-            item.order_id = orders[i].orderId
-            item.final_price = orders[i].final_price
-            item.image = item.confirmed_images.split(',')[0]
-            if (item.task_flow_num != undefined && item.task_flow_num != null && item.task_flow_num != ''){
-              items.push(item)
-            }
-            
+        for(var i = 0; i < tasks.length && i < 20; i++){
+          var item = tasks[i]
+          item.order_idStr = item.order==null? '招待' : item.order_id
+          item.final_price = (item.order==null)? 0 : item.order.final_price
+          item.image = item.confirmed_images.split(',')[0]
+          item.final_priceStr = util.showAmount(item.final_price)
+          if (item.task_flow_num != undefined && item.task_flow_num != null && item.task_flow_num != ''){
+            items.push(item)
           }
         }
         that.setData({items: items})
