@@ -72,6 +72,8 @@ Page({
     }
     var that = this
     app.loginPromiseNew.then(function(resolve){
+      console.log('user info', app.globalData.userInfo)
+      that.setData({userInfo: app.globalData.userInfo})
       var getInfoUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTask/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: getInfoUrl,
