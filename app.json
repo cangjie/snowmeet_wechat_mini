@@ -96,7 +96,8 @@
     "pages/admin/user/staff_list",
     "pages/register/staff_check_in",
     "pages/admin/maintain/return_entry",
-    "pages/admin/maintain/task_list_for_user"
+    "pages/admin/maintain/task_list_for_user",
+    "pages/admin/maintain/user_task_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

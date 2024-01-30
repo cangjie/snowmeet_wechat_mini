@@ -1,2 +1,4 @@
 <!--pages/admin/maintain/return_entry.wxml-->
-<text>pages/admin/maintain/return_entry.wxml</text>
+<view style="text-align: center;" >
+  <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>
+</view>
