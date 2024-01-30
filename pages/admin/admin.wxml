@@ -21,6 +21,7 @@
     <!--mp-cell value="现场雪具养护收款" bindtap="goToMaintainRecept" ></mp-cell-->
     <!--mp-cell value="现场雪具养护批量收款" bindtap="goToMaintainInShopQuickBatch" ></mp-cell-->
     <mp-cell value="现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
+    <mp-cell id="maintain_return" value="养护取板" bindtap="nav" ></mp-cell>
     <!--mp-cell id="SummerMaintainRecept" value="非雪季养护收板" bindtap="gotoSummerMaintain" ></mp-cell>
     <mp-cell id="SummerMaintainList" value="非雪季养护列表" bindtap="gotoSummerMaintain" ></mp-cell-->
   </mp-cells>

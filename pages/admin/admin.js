@@ -181,6 +181,9 @@ Page({
       case 'staff_list':
         path = '/pages/admin/user/staff_list'
         break
+      case 'maintain_return':
+        path = '/pages/admin/maintain/return_entry'
+        break
       default:
         break
     }

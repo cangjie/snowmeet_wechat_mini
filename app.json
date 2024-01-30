@@ -94,7 +94,9 @@
     "pages/admin/vip/maintain_recept",
     "pages/admin/vip/recept_review",
     "pages/admin/user/staff_list",
-    "pages/register/staff_check_in"
+    "pages/register/staff_check_in",
+    "pages/admin/maintain/return_entry",
+    "pages/admin/maintain/task_list_for_user"
   ],
   "window": {
     "backgroundTextStyle": "light",
