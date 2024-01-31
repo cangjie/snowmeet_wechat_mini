@@ -418,7 +418,7 @@ Page({
     command.setSize(75, 50)//设置标签大小，单位mm.具体参数请用尺子量一下
     command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
     command.setCls()//清除缓冲区
-    command.setText(20, 20, "TSS24.BF2", 0, 1, 1, (urgent?'(急)':'') + orderNum + "   " + maskedName + "   " + maskedCell)
+    command.setText(20, 20, "TSS24.BF2", 0, 1, 1, (urgent?'(急)':'') + orderNum + "  " + maskedName + " " + maskedCell + ' ' + labelType)
     command.setText(20, 20 + 40, "TSS24.BF2", 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)
     if (edge.toString() == '1') {
       command.setText(20, 20 + 40 + 55, "TSS24.BF2", 0, 1, 1, "修刃 " + degree + "：")
@@ -444,7 +444,7 @@ Page({
       priceStr = '金额：' + this.data.maintain_in_shop_request.order.final_price.toString()
     }
     var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/maintain/task/' + this.data.id
-    command.setText(20, 20 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr + ' ' + labelType)
+    command.setText(20, 20 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
     command.setText(20, 20 + 40 + 55 + 55 + 55 + 50 + 40, "TSS24.BF2", 0, 1, 1, priceStr)
     //command.setQrcode(400, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)
     command.setQrcode(350, 20 + 40 + 65 + 25, "H", 4, "A", qrCodeText)
@@ -452,6 +452,44 @@ Page({
     command.setText(320, 350, "TSS24.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
     command.setPagePrint()
     return command.getData()
+  },
+
+  printCustomLabel: function(e){
+    if (!this.data.readyForPrint) {
+      if (!this.data.reConnecting){
+        //this.setData({readyForPrint: true})
+        //this.getDeviceNameListInRange()
+        this.getDeviceNameList()
+        this.data.reConnecting = true
+      }
+      if (this.data.reConnectTimes < 100)
+      {
+        this.data.reConnectTimes++
+        setTimeout(() => {
+          this.printCustomLabel(e)
+        }, 1000)
+      }
+      return
+    }
+    this.data.reConnectTimes = 0
+    this.data.reConnecting = false
+    var showedMsg = this.data.showedMsg
+    var printType = e.currentTarget.id
+    if (this.data.maintain_in_shop_request == undefined) {
+      showedMsg.push('未获取到订单信息。')
+      this.setData({showedMsg: showedMsg, readyForPrint: false})
+      return
+    }
+    showedMsg.push('开始打印')
+    this.setData({showedMsg: showedMsg, readyForPrint: false})
+
+    var buff1 = this.getCommand('【客户联】')
+    //var buff2 = this.getCommand('【雪板标签】')
+    //var buff3 = this.getCommand('【存根】')
+    //var newBuff = [...buff1, ...buff2, ...buff3]
+    var newBuff = [...buff1]
+    console.log('buff', newBuff)
+    this.prepareSend(newBuff)
   },
   
 
@@ -485,10 +523,11 @@ Page({
     showedMsg.push('开始打印')
     this.setData({showedMsg: showedMsg, readyForPrint: false})
 
-    var buff1 = this.getCommand('【客户联】')
+    //var buff1 = this.getCommand('【客户联】')
     var buff2 = this.getCommand('【雪板标签】')
     var buff3 = this.getCommand('【存根】')
-    var newBuff = [...buff1, ...buff2, ...buff3]
+    //var newBuff = [...buff1, ...buff2, ...buff3]
+    var newBuff = [...buff2, ...buff3]
     console.log('buff', newBuff)
     this.prepareSend(newBuff)
   },
