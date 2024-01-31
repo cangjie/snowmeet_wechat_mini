@@ -456,9 +456,7 @@ Component({
             }
           }
         }
-        
       }
-
       that.setData({currentRentItem: currentRentItem})
     },
     setNumber(e){
