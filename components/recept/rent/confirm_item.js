@@ -323,6 +323,12 @@ Component({
         message = '请选择押金类型'
         valid = false
       }
+      else if ((currentRentItem.class == '单板' || currentRentItem.class == '单板鞋'
+      || currentRentItem.class == '双板' || currentRentItem.class == '双板鞋') 
+      && (currentRentItem.isNoCode || currentRentItem.code == '')){
+        message = '板鞋类物品必须填码。'
+        valid = false
+      }
       else{
         message = ''
         valid = true
