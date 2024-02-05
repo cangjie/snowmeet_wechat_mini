@@ -204,7 +204,10 @@ Component({
       currentRentItem.startDate = e.detail.value
 
       if (util.formatDate(new Date()) == util.formatDate(new Date(currentRentItem.startDate)) ){
-        currentRentItem.depositType = '立即租赁'
+        if (currentRentItem.depositType != '立即租赁' && currentRentItem.depositType != '先租后取'){
+          currentRentItem.depositType = '立即租赁'
+        }
+
         if (user.isMember && !isNaN(currentRentItem.rentalMember)){
           currentRentItem.rental = currentRentItem.rentalMember
         }
@@ -441,10 +444,23 @@ Component({
         currentRentItem.startDate = null
       }
       else {
+        console.log('current item', currentRentItem)
+        if (currentRentItem.depositType == '立即租赁' || currentRentItem.depositType == '先租后取'){
+          currentRentItem.startDate =  util.formatDate(new Date())
+        }
+        if (currentRentItem.depositType == '预约租赁' 
+        && util.formatDate(new Date(currentRentItem.startDate)) == util.formatDate(new Date())  ){
+          var nowDate = new Date()
+          nowDate.setDate(nowDate.getDate() + 1)
+          currentRentItem.startDate = util.formatDate(nowDate)
+        }
+        /*
         if (currentRentItem.start_date != undefined){
           var startDate = new Date(currentRentItem.startDate)
           if (util.formatDate(startDate) == that.data.nowDate){
-            currentRentItem.depositType = '立即租赁'
+            if (currentRentItem.depositType != '立即租赁' && currentRentItem.depositType != '先租后取') {
+              currentRentItem.depositType = '立即租赁'
+            }
             if (!isNaN(currentRentItem.rentalOrigin)){
               currentRentItem.rental = currentRentItem.rentalOrigin
             }
@@ -456,6 +472,7 @@ Component({
             }
           }
         }
+        */
       }
       that.setData({currentRentItem: currentRentItem})
     },

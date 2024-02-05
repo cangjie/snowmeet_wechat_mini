@@ -83,7 +83,7 @@
         <view class="op-cell" style="width:100%" >
           <radio-group style="text-align: center;" bindchange="setDepositType" >
             <radio style="margin-left: 10rpx;" value="立即租赁" checked="{{currentRentItem.depositType == '立即租赁'}}" >立即租赁</radio>
-            <radio style="margin-left: 10rpx;" value="立即租赁" checked="{{currentRentItem.depositType == '先租后取'}}" >先租后取</radio>
+            <radio style="margin-left: 10rpx;" value="先租后取" checked="{{currentRentItem.depositType == '先租后取'}}" >先租后取</radio>
             <radio style="margin-left: 10rpx;" value="预约租赁" checked="{{currentRentItem.depositType == '预约租赁'}}" >预约租赁</radio>
             <radio style="margin-left: 10rpx;" value="预付押金" checked="{{currentRentItem.depositType == '预付押金'}}" >预付押金</radio>
           </radio-group>
@@ -92,11 +92,11 @@
       <view style="display: flex;flex-direction: row;" >
         <view style="width: 20%;text-align: right;" class="op-cell" >租金：</view>
         <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
-          <input id="rental" style="width: 80%;" class="input" value="{{currentRentItem.rental}}" bindinput="setNumber" />
+          <input id="rental" style="width: 80%;" type="number" class="input" value="{{currentRentItem.rental}}" bindinput="setNumber" />
         </view>
         <view style="width: 20%;text-align: right;" class="op-cell" >押金：</view>
         <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
-          <input id="deposit" style="width: 80%;" class="input" value="{{currentRentItem.deposit}}" bindinput="setNumber" />
+          <input id="deposit" style="width: 80%;" type="number" class="input" value="{{currentRentItem.deposit}}" bindinput="setNumber" />
         </view>
       </view>
       <view style="display: flex;flex-direction: row;" >
