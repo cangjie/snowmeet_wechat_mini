@@ -26,11 +26,12 @@ Page({
           title: '支付成功',
           icon: 'success',
           success:(res)=>{
+            var submitId = recept.submit_return_id
             switch(recept.recept_type){
               case '租赁下单':
                   //this.setRentPaid(recept.submit_return_id)
                   wx.redirectTo({
-                    url: '../rent/rent_list',
+                    url: '../rent/rent_detail?id=' + submitId.toString(),
                   })
                   break
               case '养护下单':

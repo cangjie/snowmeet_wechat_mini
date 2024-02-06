@@ -167,7 +167,7 @@ Page({
           that.setData({rentOrder: rentOrder, 
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
-              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, refunds: refunds, bonus: bonus, bonusStr: util.showAmount(bonus)})
+              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, refunds: refunds, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor})
           that.computeTotal()
         }
       }
