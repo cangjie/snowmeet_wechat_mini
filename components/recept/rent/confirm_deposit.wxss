@@ -1,3 +1,5 @@
+@import '/app.wxss';
+@import '/common.wxss';
 .op-cell{
   height: 70rpx;
   padding-top: 20rpx;

@@ -80,6 +80,14 @@
         </view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >填写备注：</view>
+        <view class="right-column" >
+          <textarea style="width: 450rpx; height: 200rpx;" class="input" bindinput="setMemo" ></textarea>
+        </view>
+      </view>
+    </mp-cell>
   </mp-cells>
 </view>
 <view style="height: 200rpx;" ></view>

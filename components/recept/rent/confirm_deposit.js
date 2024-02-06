@@ -155,6 +155,14 @@ Component({
           that.checkValid()
       }
     },
+
+    setMemo(e){
+      var that = this
+      var recept = that.data.recept
+      recept.rentOrder.memo = e.detail.value
+      that.setData({recept: recept})
+    },
+
     setDueEndTime(e){
       
       var days = parseInt(e.detail.value)
