@@ -185,7 +185,7 @@
       <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery-->
   
       <view style="display: flex; flex-direction: row; margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx">
-        <button wx:if="{{item.status == '未领取' && item.deposit_type == '预约租赁' && !item.isEdit}}" id="{{index}}" bindtap="setRentStart" style="font-size: 9pt;" size="mini"  >领取</button>
+        <button wx:if="{{item.status == '未领取' && (item.deposit_type == '预约租赁'  || item.deposit_type == '先租后取') && !item.isEdit}}" id="{{index}}" bindtap="setRentStart" style="font-size: 9pt;" size="mini"  >领取</button>
         <button  wx:if="{{(item.status == '已发放') && !item.isEdit }}" id="return_{{index}}" bindtap="setReturn"   size="mini" style="font-size: 9pt;" size="mini" >归还</button> 
 
         <button  wx:if="{{(item.status == '已归还') && !item.isEdit }}" id="return_{{index}}" bindtap="setUnReturn"  size="mini" style="font-size: 9pt;" size="mini" >设置为未归还</button>
