@@ -104,10 +104,11 @@ Page({
     }
     var orderId = 0
     var jumpUrl = ''
+    var submitId = recept.submit_return_id
     switch(recept.recept_type){
       case '租赁下单':
         orderId = recept.rentOrder.order_id
-        jumpUrl = '../rent/rent_list'
+        jumpUrl = '../rent/rent_detail?id=' + submitId.toString()
         break
       case '养护下单':
         orderId = recept.maintainOrder.order.id
