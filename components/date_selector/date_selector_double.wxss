@@ -1,3 +1,4 @@
+@import '/app.wxss';
 .left-column{
   width:25%;
   text-align: right;

@@ -9,7 +9,8 @@ Page({
   data: {
     orderList:[],
     totalAmount: 0,
-    totalAmountStr: '¥0.00'
+    totalAmountStr: '¥0.00',
+    querying: false
   },
   GoBack(){
     wx.redirectTo({
@@ -27,7 +28,7 @@ Page({
     that.setData({start: util.formatDate(start), end: util.formatDate(end)})
     app.loginPromiseNew.then(function (resolve){
 
-      that.getData()
+      //that.getData()
     })
   },
 
@@ -41,11 +42,12 @@ Page({
     console.log('shop selected', e)
     var that = this
     that.setData({shop: e.detail.shop})
-    that.getData()
+    //that.getData()
   },
 
   getData(){
     var that = this
+    that.setData({querying: true})
     var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + ((that.data.shop == '')? '' : '&shop=' + encodeURIComponent(that.data.shop))
     var orderList = []
     wx.request({
@@ -87,7 +89,7 @@ Page({
         }
         var totalAmountStr = util.showAmount(totalAmount)
 
-        that.setData({tasks: tasks, orderList: orderList, totalAmount: totalAmount, totalAmountStr: totalAmountStr})
+        that.setData({tasks: tasks, orderList: orderList, totalAmount: totalAmount, totalAmountStr: totalAmountStr, querying: false})
       }
     })
   },
@@ -137,7 +139,7 @@ Page({
     console.log('date selected', e)
     var that = this
     that.setData({start: e.detail.start, end: e.detail.end})
-    that.getData()
+    //that.getData()
   },
   gotoDetail(e){
     wx.navigateTo({
