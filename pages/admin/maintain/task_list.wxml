@@ -4,7 +4,7 @@
       <date-selector bindDateSelected="dateSelected"/>
     </mp-cell>
   </mp-cells>
-  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <shop-selector bindShopSelected="shopSelected" defaultShop="万龙服务中心" ></shop-selector>
   <mp-cells>
     <mp-cell>
       <view style="text-align: center;">
