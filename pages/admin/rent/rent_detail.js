@@ -15,21 +15,117 @@ Page({
     refunding: false
   },
 
+  setStartDate(e){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var index = parseInt(e.currentTarget.id)
+    var detail = rentOrder.details[index]
+    var oriStartDateTime = new Date(detail.start_date)
+    var newStartDate = e.detail.value
+    var newStartDateTimeStr = newStartDate + ' ' + util.formatTimeStr(oriStartDateTime)
+    var msg = detail.rent_item_name + ' 起租时间 从 ' + util.formatDateTime(oriStartDateTime) + ' 修改为 ' + newStartDateTimeStr 
+    wx.showModal({
+      title: '起租时间修改确认',
+      content: msg,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          detail.start_date = newStartDateTimeStr.replace(' ', 'T')
+          detail.pickStart_dateStr = newStartDate
+          detail.pickStart_timeStr = util.formatTimeStr(oriStartDateTime)
+          that.setData({rentOrder: rentOrder})
+          that.save(e)
+        }
+      }
+    })
+  },
+
+  setStartTime(e){
+    var that = this
+    var rentOrder = that.data.rentOrder
+    var index = parseInt(e.currentTarget.id)
+    var detail = rentOrder.details[index]
+    var oriStartDateTime = new Date(detail.start_date)
+    var newStartTime = e.detail.value
+    var newStartDateTimeStr = util.formatDate(oriStartDateTime) + ' ' + newStartTime
+    var msg = detail.rent_item_name + ' 起租时间 从 ' + util.formatDateTime(oriStartDateTime) + ' 修改为 ' + newStartDateTimeStr 
+    wx.showModal({
+      title: '起租时间修改确认',
+      content: msg,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          detail.start_date = newStartDateTimeStr.replace(' ', 'T')
+          detail.pickStart_dateStr = util.formatDate(oriStartDateTime)
+          detail.pickStart_timeStr = newStartTime
+          that.setData({rentOrder: rentOrder})
+          that.save(e)
+        }
+      }
+    })
+  },
+
   setReturnDate(e){
     var that = this
     var rentOrder = that.data.rentOrder
     var index = parseInt(e.currentTarget.id)
     var detail = rentOrder.details[index]
-    detail.pickedDateStr = e.detail.value
-    that.setData({rentOrder: rentOrder})
+    var oriEndDateTime = new Date(detail.real_end_date)
+    var newEndDate = e.detail.value
+    var newEndDateTimeStr = newEndDate + ' ' + util.formatTimeStr(oriEndDateTime)
+    var msg = detail.rent_item_name + ' 退租时间 从 ' + util.formatDateTime(oriEndDateTime) + ' 修改为 ' + newEndDateTimeStr 
+    wx.showModal({
+      title: '起租时间修改确认',
+      content: msg,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          detail.real_end_date = newEndDateTimeStr.replace(' ', 'T')
+          detail.pickEnd_dateStr = newEndDate
+          detail.pickEnd_timeStr = util.formatTimeStr(oriEndDateTime)
+          that.setData({rentOrder: rentOrder})
+          that.save(e)
+        }
+      }
+    })
+
   },
   setReturnTime(e){
     var that = this
     var rentOrder = that.data.rentOrder
     var index = parseInt(e.currentTarget.id)
     var detail = rentOrder.details[index]
-    detail.pickedTimeStr = e.detail.value
-    that.setData({rentOrder: rentOrder})
+    var oriEndDateTime = new Date(detail.real_end_date)
+    var newEndTime = e.detail.value
+    var newEndDateTimeStr = util.formatDate(oriEndDateTime) + ' ' + newEndTime
+    var msg = detail.rent_item_name + ' 退租时间 从 ' + util.formatDateTime(oriEndDateTime) + ' 修改为 ' + newEndDateTimeStr 
+    wx.showModal({
+      title: '起租时间修改确认',
+      content: msg,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          detail.real_end_date = newEndDateTimeStr.replace(' ', 'T')
+          detail.pickEnd_dateStr = util.formatDate(oriEndDateTime)
+          detail.pickEnd_timeStr = newEndTime
+          that.setData({rentOrder: rentOrder})
+          that.save(e)
+          //that.getData()
+        }
+      }
+    })
   },
 
   showGallery(e){
@@ -109,7 +205,22 @@ Page({
           {
             var detail = rentOrder.details[i]
             detail.suggestRental_str = util.showAmount(detail.suggestRental)
-            detail.start_dateStr = util.formatDateTime(new Date(detail.start_date))
+            var startDate = new Date(detail.start_date)
+            detail.start_dateStr = util.formatDateTime(startDate)
+
+            detail.pickStart_dateStr = util.formatDate(startDate)
+            detail.pickStart_timeStr = util.formatTimeStr(startDate)
+            if (detail.pickStart_timeStr == '00:00:00'){
+              detail.pickStart_timeStr = '-'
+            }
+
+            if (detail.real_end_date != null){
+              var endDate = new Date(detail.real_end_date)
+              detail.pickEnd_dateStr = util.formatDate(endDate)
+              detail.pickEnd_timeStr = util.formatTimeStr(endDate)
+            }
+
+
             if (detail.real_end_date == undefined || detail.real_end_date == null){
               detail.real_end_dateStr = '--'
             }
@@ -152,7 +263,7 @@ Page({
 
           var realTotalRefund = 0;
           var refunds = []
-          for(var j = 0; j < rentOrder.order.refunds.length; j++){
+          for(var j = 0; rentOrder.order != null && rentOrder.order.refunds != null && j < rentOrder.order.refunds.length; j++){
             var r = rentOrder.order.refunds[j];
             if (r.refundSuccess){
               r.create_dateStr = util.formatDateTime(new Date(r.create_date))
@@ -432,13 +543,7 @@ Page({
     var that = this
     var detail = that.data.rentOrder.details[id]
 
-    if (detail.pickedDateStr == '--'){
-      wx.showToast({
-        title: '请选择归还日期。',
-        icon: 'error'
-      })
-      return
-    }
+    
 
     var nowDate = util.formatDateString(new Date())
     var realRental = parseFloat(detail.filled_rental)
@@ -458,7 +563,7 @@ Page({
     var returnDate = detail.pickedDateStr + ' ' + detail.pickedTimeStr
     var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetReturn/' + detail.id
       + '?rental=' + encodeURIComponent(realRental) 
-      + '&returnDate=' + encodeURIComponent(returnDate) + '&reparation=' + encodeURIComponent(reparation)
+      + '&returnDate=' + encodeURIComponent(nowDate) + '&reparation=' + encodeURIComponent(reparation)
       + '&memo=' + encodeURIComponent(detail.memo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       + '&overTimeCharge=' + encodeURIComponent(detail.overtime_charge)
     wx.request({
@@ -950,6 +1055,21 @@ Page({
     var rentOrder = that.data.rentOrder
     var id = parseInt(e.currentTarget.id)
     var detail = rentOrder.details[id]
+    that.computeAmount(rentOrder)
+    if (rentOrder.deposit_final < that.data.refundAmount){
+      wx.showToast({
+        title: '应退金额>押金',
+        icon: 'error'
+      })
+      return
+    }
+    if (Math.round(that.data.unRefund, 2) < 0){
+      wx.showToast({
+        title: '未退金额<0',
+        icon: 'error'
+      })
+      return
+    }
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: updateUrl,
@@ -961,6 +1081,7 @@ Page({
           rentOrder.details[id] = detail
           that.computeAmount(rentOrder)
           that.setData({rentOrder: rentOrder})
+          that.getData()
         }
       }
     })
@@ -1030,6 +1151,7 @@ Page({
     var id = options.id
     that.setData({id: id})
     app.loginPromiseNew.then(function(resolve){
+      that.setData({isManager: app.globalData.userInfo.is_manager})
       var getClassUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetClassList'
       wx.request({
         url: getClassUrl,
