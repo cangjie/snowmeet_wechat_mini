@@ -30,6 +30,7 @@
     <mp-cell id="rent_list" value="查看租赁订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_list_cell" value="快速查找订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_report" value="租赁报表" bindtap="nav" ></mp-cell>
+    <mp-cell id="rent_unreturned" value="未归还列表" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="VIP" >
     <mp-cell id="vip_maintain" value="养护招待" bindtap="nav" ></mp-cell>

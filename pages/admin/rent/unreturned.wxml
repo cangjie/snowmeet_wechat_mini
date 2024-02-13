@@ -1,0 +1,46 @@
+<view>
+  <view>
+    <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  </view>
+  <view style="height: 100rpx;">
+    <button class="input" style="height: 70rpx;" disabled="{{querying}}" bindtap="getData" > 查 询 </button>
+  </view>
+  <view>
+    <view wx:for="{{classList}}" class="view-row" >
+      <view class="left-column" >{{item.class}}：</view>
+      <view class="right-column" >{{item.count}}</view>
+    </view>
+  </view>
+  <view>
+    <mp-cells>
+      <mp-cell wx:for="{{rentItems}}"  >
+        <view class="view-row" id="{{item.rent_list_id}}" bindtap="gotoDetail" > 
+          <view class="left-column" >编号：</view>
+          <view class="right-column">{{item.rent_item_code}}</view>
+          <view class="left-column">租赁单号：</view>
+          <view class="right-column">{{item.rent_list_id}}</view>
+        </view>
+        <view class="view-row" id="{{item.rent_list_id}}" bindtap="gotoDetail" >
+          <view class="left-column" >名称：</view>
+          <view class="right-column">{{item.rent_item_name}}</view>
+          <view class="left-column">分类：</view>
+          <view class="right-column">{{item.rent_item_class}}</view>
+        </view>
+        <view class="view-row" id="{{item.rent_list_id}}" bindtap="gotoDetail" >
+          <view class="left-column" >起租日期：</view>
+          <view class="right-column">{{item.startDateStr}}</view>
+          <view class="left-column" >起租时间：</view>
+          <view class="right-column">{{item.startTimeStr}}</view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" id="{{item.rent_list_id}}" bindtap="gotoDetail" >姓名：</view>
+          <view class="right-column" id="{{item.rent_list_id}}" bindtap="gotoDetail" >{{item.real_name}}</view>
+          <view class="left-column" id="{{item.rent_list_id}}" bindtap="gotoDetail" >电话：</view>
+          <view class="right-column">
+            <button size="mini" style="font-size: 8pt;font-style: normal; height: 50rpx;" class="input" id="{{item.cell_number}}" bindtap="call" >{{item.cell_number}}</button>
+          </view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+</view>

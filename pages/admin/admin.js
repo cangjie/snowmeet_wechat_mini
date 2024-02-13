@@ -184,6 +184,9 @@ Page({
       case 'maintain_return':
         path = '/pages/admin/maintain/return_entry'
         break
+      case 'rent_unreturned':
+        path = '/pages/admin/rent/unreturned'
+        break
       default:
         break
     }
