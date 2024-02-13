@@ -551,6 +551,7 @@ Page({
     if (isNaN(realRental)){
       realRental = parseFloat(detail.suggestRental)
     }
+    /*
     var filledOvertimeCharge = parseFloat(detail.filled_overtime_charge)
     if (detail.overTime && isNaN(filledOvertimeCharge)){
       wx.showToast({
@@ -560,6 +561,7 @@ Page({
       })
       return false
     }
+    */
     var returnDate = detail.pickedDateStr + ' ' + detail.pickedTimeStr
     var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetReturn/' + detail.id
       + '?rental=' + encodeURIComponent(realRental) 
