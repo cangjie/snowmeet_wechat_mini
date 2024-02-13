@@ -1056,18 +1056,21 @@ Page({
     var id = parseInt(e.currentTarget.id)
     var detail = rentOrder.details[id]
     that.computeAmount(rentOrder)
+    that.computeTotal()
     if (rentOrder.deposit_final < that.data.refundAmount){
       wx.showToast({
         title: '应退金额>押金',
         icon: 'error'
       })
+      that.getData()
       return
     }
-    if (Math.round(that.data.unRefund, 2) < 0){
+    if (Math.round(that.data.unRefund*100) < 0){
       wx.showToast({
         title: '未退金额<0',
         icon: 'error'
       })
+      that.getData()
       return
     }
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -1080,6 +1083,7 @@ Page({
           detail.isEdit = false
           rentOrder.details[id] = detail
           that.computeAmount(rentOrder)
+          that.computeTotal()
           that.setData({rentOrder: rentOrder})
           that.getData()
         }

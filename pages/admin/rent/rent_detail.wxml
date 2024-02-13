@@ -108,7 +108,7 @@
         </view>
         <view class="right-column" style="font-size: 9pt;color:{{textColor}}" wx:else >{{item.start_dateStr}}</view>
         <view class="left-column" style="color:{{textColor}}" >退租：</view>
-        <view class="right-column" wx:if="{{item.status == '已归还'  }}" wx:if="{{isManager == 1}}"  >
+        <view class="right-column" wx:if="{{item.status == '已归还'  }}" wx:if="{{isManager == 1}}" style="color:{{textColor}}" >
           
           <picker mode="date" class="input" id="{{index}}" bindchange="setReturnDate" start="{{item.start_dateStr}}" >
             <picker-view>{{item.pickEnd_dateStr}}</picker-view>
