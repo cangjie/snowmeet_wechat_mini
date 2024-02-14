@@ -37,9 +37,10 @@
     </view>
   </view>
   <view style="display: flex; flex-direction: row;">
-    
     <view class="left-column" style="color:{{textColor}}"  >支付方式：</view>
     <view class="right-column" style="color:{{textColor}}"   >{{rentOrder.order.payments[0].pay_method}}</view>
+    <view class="left-column" style="color:{{textColor}}"  >店员：</view>
+    <view class="right-column" style="color:{{textColor}}"   >{{rentOrder.staff_name}}</view>
   </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column" style="color:{{textColor}}"  >支付单号：</view>
