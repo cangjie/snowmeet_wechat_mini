@@ -52,7 +52,7 @@
         <view class="left-column" >生效：</view>
         <view class="right-column" >
           <checkbox-group>
-            <checkbox>生效</checkbox>
+            <switch>生效</switch>
           </checkbox-group>
         </view>
       </view>
