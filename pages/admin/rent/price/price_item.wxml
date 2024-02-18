@@ -1,0 +1,125 @@
+<view>
+  
+  <mp-cells>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >分类：</view>
+        <view class="right-column" >
+          <input class="input" value="双板" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >名称：</view>
+        <view class="right-column" >
+          <input class="input" value="高级双板" ></input>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="【店铺1】崇礼旗舰店" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >生效：</view>
+        <view class="right-column" >
+          <checkbox-group>
+            <checkbox>生效</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >押金：</view>
+        <view class="right-column" >
+          <input class="input" value="500" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >价格1：</view>
+        <view class="right-column" >
+          <input class="input" value="500" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >价格2：</view>
+        <view class="right-column" >
+          <input class="input" value="300" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >价格3：</view>
+        <view class="right-column" >
+          <input class="input" value="200" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >价格4：</view>
+        <view class="right-column" >
+          <input class="input" value="100" ></input>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="【店铺2】万龙体验中心" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >生效：</view>
+        <view class="right-column" >
+          <checkbox-group>
+            <checkbox>生效</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >押金：</view>
+        <view class="right-column" >
+          <input class="input" value="500" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >价格1：</view>
+        <view class="right-column" >
+          <input class="input" value="500" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >价格2：</view>
+        <view class="right-column" >
+          <input class="input" value="300" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >价格3：</view>
+        <view class="right-column" >
+          <input class="input" value="200" ></input>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >价格4：</view>
+        <view class="right-column" >
+          <input class="input" value="100" ></input>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

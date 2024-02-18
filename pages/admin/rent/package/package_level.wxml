@@ -1,0 +1,28 @@
+<view>
+  <mp-cells>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column"  >名称</view>
+        <view class="right-column"  >等级</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column"  >基础套餐</view>
+        <view class="right-column"  >0</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column"  >进阶套餐</view>
+        <view class="right-column"  >1</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column"  >顶级套餐</view>
+        <view class="right-column"  >2</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

@@ -184,6 +184,15 @@ Page({
       case 'maintain_return':
         path = '/pages/admin/maintain/return_entry'
         break
+      case 'rent_package_level':
+        path = '/pages/admin/rent/package/package_level'
+        break
+      case 'rent_package_add':
+        path = '/pages/admin/rent/package/package_setting'
+        break
+      case 'rent_price_list':
+        path = '/pages/admin/rent/price/price_item'
+        break
       default:
         break
     }

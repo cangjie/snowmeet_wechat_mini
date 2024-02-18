@@ -31,6 +31,11 @@
     <mp-cell id="rent_list_cell" value="快速查找订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_report" value="租赁报表" bindtap="nav" ></mp-cell>
   </mp-cells>
+  <mp-cells title="租赁套餐设置" >
+    <mp-cell id="rent_package_level" value="套餐等级" bindtap="nav" ></mp-cell>
+    <mp-cell id="rent_package_add" value="添加套餐" bindtap="nav" ></mp-cell>
+    <mp-cell id="rent_price_list" value="价格" bindtap="nav" ></mp-cell>
+  </mp-cells>
   <mp-cells ext-class="my-cells" title="VIP" >
     <mp-cell id="vip_maintain" value="养护招待" bindtap="nav" ></mp-cell>
   </mp-cells>

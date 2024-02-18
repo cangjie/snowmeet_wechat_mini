@@ -1,0 +1,11 @@
+@import '/app.wxss';
+@import '/common.wxss';
+@import '/weui.wxss';
+.left-column{
+  width:375rpx;
+  text-align: left;
+}
+.right-column{
+  width: 375rpx;
+  text-align: center;
+}
