@@ -45,12 +45,12 @@
   <!--mp-cells ext-class="my-cells" title="试滑" >
     <mp-cell id="expierence_admit" value="试滑收押金" bindtap="nav" ></mp-cell>
     <mp-cell id="expierence_active_list" value="当前试滑列表" bindtap="nav" ></mp-cell>
-  </mp-cells>
+  </mp-cells-->
   <mp-cells ext-class="my-cells" title="滑雪学校" >
     <mp-cell id="reserve_instructor" value="课程预约" bindtap="nav" ></mp-cell>
     <mp-cell id="reserve_instructor_list" value="预约列表" bindtap="nav" ></mp-cell>
   </mp-cells>
-   <mp-cells ext-class="my-cells" title="优惠券" >
+  <!--mp-cells ext-class="my-cells" title="优惠券" >
     <mp-cell id="ticket_print" value="打印" bindtap="nav" ></mp-cell>
   </mp-cells--> 
   <!--mp-cells ext-class="my-cells" title="测试" >
