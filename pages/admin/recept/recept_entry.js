@@ -97,14 +97,16 @@ Page({
               word = '顾客不是会员。'
             }
             else {
-              word = '顾客是会员。'
+              word = ''
               clearInterval(that.data.interVal)
               needJump = true
             }
-            wx.showToast({
-              title: word,
-              duration: 2000
-            })
+            if (word != ''){
+              wx.showToast({
+                title: word,
+                duration: 2000
+              })
+            }
             if (needJump){
               clearInterval(that.data.interVal)
               var jumpUrl = 'recept_member_info?openId=' + res.data.miniAppUser.open_id

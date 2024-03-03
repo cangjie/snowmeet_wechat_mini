@@ -40,10 +40,12 @@ Page({
         if (res.statusCode != 200){
           return;
         }
+        /*
         wx.showToast({
           title: '更新成功。',
           icon: 'success'
         })
+        */
       }
     })
   },
