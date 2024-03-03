@@ -5,7 +5,10 @@ Component({
    * Component properties
    */
   properties: {
-
+    defaultShop: {
+      type: String,
+      value: ''
+    }
   },
 
   /**
@@ -29,24 +32,34 @@ Component({
               name_list.push(res.data[i].name)
             }
             that.setData({shop_list: res.data, name_list: name_list})
-            that.triggerEvent('ShopSelected', {shop: ''})
-            wx.getFuzzyLocation({
-              type: 'wgs84',
-              success:(res)=>{
-                var lat = parseFloat(res.latitude)
-                var lon = parseFloat(res.longitude)
-                var shopList = that.data.shop_list
-                for(var i = 0; i < shopList.length; i++){
-                  var currentShop = shopList[i]
-                  if (parseFloat(currentShop.lat_from) < lat && parseFloat(currentShop.lat_to) > lat
-                    && parseFloat(currentShop.long_from) < lon && parseFloat(currentShop.long_to) > lon){
-                      that.setData({currentSelectedIndex: i + 1})
-                      that.triggerEvent('ShopSelected', {shop: currentShop.name})
-                      break
-                    }
+            that.triggerEvent('ShopSelected', {shop: that.properties.defaultShop})
+
+            if (that.properties.defaultShop == undefined || that.properties.defaultShop == null || that.properties.defaultShop == ''){
+              wx.getFuzzyLocation({
+                type: 'wgs84',
+                success:(res)=>{
+                  var lat = parseFloat(res.latitude)
+                  var lon = parseFloat(res.longitude)
+                  var shopList = that.data.shop_list
+                  for(var i = 0; i < shopList.length; i++){
+                    var currentShop = shopList[i]
+                    if (parseFloat(currentShop.lat_from) < lat && parseFloat(currentShop.lat_to) > lat
+                      && parseFloat(currentShop.long_from) < lon && parseFloat(currentShop.long_to) > lon){
+                        that.setData({currentSelectedIndex: i + 1})
+                        that.triggerEvent('ShopSelected', {shop: currentShop.name})
+                        break
+                      }
+                  }
+                }
+              })
+            }
+            else{
+              for(var i = 0; i < name_list.length; i++){
+                if (name_list[i]==that.properties.defaultShop){
+                  that.setData({currentSelectedIndex: i})
                 }
               }
-            })
+            }
           }
         })
       })

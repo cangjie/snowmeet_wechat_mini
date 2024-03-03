@@ -1,19 +1,10 @@
 <view>
-  <mp-cells>
-    <mp-cell>
-      <date-selector bindDateSelected="dateSelected"/>
-    </mp-cell>
-  </mp-cells>
-  <shop-selector bindShopSelected="shopSelected" defaultShop="万龙服务中心" ></shop-selector>
-  <mp-cells>
-    <mp-cell>
-      <view style="text-align: center;">
-        <button disabled="{{querying}}" bindtap="getData" > 查 询 </button>
-      </view>
-    </mp-cell>
-  </mp-cells>
-  <view>订单数：{{orderList.length}}</view>
-  <view>总金额：{{totalAmountStr}}</view>
+  <view>
+    <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  </view>
+  <view style="height: 100rpx;">
+    <button class="input" style="height: 70rpx;" disabled="{{querying}}" bindtap="getData" > 查 询 </button>
+  </view>
   <mp-cells title="共{{tasks.length}}个任务">
     <mp-cell wx:for="{{tasks}}" id="{{item.id}}" bindtap="gotoDetail" >
       <view style="display: flex;flex-direction: row;" >
@@ -53,4 +44,3 @@
     </mp-cell>
   </mp-cells>
 </view>
-<view style="text-align: center;margin-top: 50rpx;"> <button bindtap="GoBack" class=" input "> 返 回 首 页 </button> </view>

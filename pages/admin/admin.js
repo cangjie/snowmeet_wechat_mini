@@ -192,6 +192,11 @@ Page({
         break
       case 'rent_price_list':
         path = '/pages/admin/rent/price/price_item'
+      case 'rent_unreturned':
+        path = '/pages/admin/rent/unreturned'
+        break
+      case 'maintain_in_stock':
+        path = '/pages/admin/maintain/maintain_in_stock'
         break
       default:
         break

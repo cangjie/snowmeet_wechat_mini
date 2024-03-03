@@ -62,7 +62,7 @@
     </mp-cell>
     <mp-cell wx:if="{{task.confirmed_equip_type == '双板'}}" >
       <view style="display: flex; flex-direction: row;" >
-        <view class="left-column" style="width: 110rpx;" >序列号：</view>
+        <view class="left-column" style="width: 115rpx;" >序列号：</view>
         <view class="right-column" style="display: flex; flex-direction: row;align-content: flex-end;width: 540rpx;margin-left: 0rpx;padding-left: 0rpx;"  >
           <view wx:if="{{idDiff}}" style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" class="view-row" >
             左<input class="input" id="id_left" style="width: 175rpx;" value="{{task.id_left}}" bindinput="mod" />右<input id="id_right" style="width: 175rpx;" bindinput="mod" class="input"  value="{{task.id_right}}" />

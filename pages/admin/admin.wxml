@@ -22,6 +22,7 @@
     <!--mp-cell value="现场雪具养护批量收款" bindtap="goToMaintainInShopQuickBatch" ></mp-cell-->
     <mp-cell value="现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
     <mp-cell id="maintain_return" value="养护取板" bindtap="nav" ></mp-cell>
+    <mp-cell id="maintain_in_stock" value="需盘点的" bindtap="nav" ></mp-cell>
     <!--mp-cell id="SummerMaintainRecept" value="非雪季养护收板" bindtap="gotoSummerMaintain" ></mp-cell>
     <mp-cell id="SummerMaintainList" value="非雪季养护列表" bindtap="gotoSummerMaintain" ></mp-cell-->
   </mp-cells>
@@ -30,6 +31,7 @@
     <mp-cell id="rent_list" value="查看租赁订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_list_cell" value="快速查找订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_report" value="租赁报表" bindtap="nav" ></mp-cell>
+    <mp-cell id="rent_unreturned" value="未归还列表" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells title="租赁套餐设置" >
     <mp-cell id="rent_package_level" value="套餐等级" bindtap="nav" ></mp-cell>
