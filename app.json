@@ -98,7 +98,6 @@
     "pages/admin/maintain/return_entry",
     "pages/admin/maintain/task_list_for_user",
     "pages/admin/maintain/user_task_list",
-    "pages/admin/rent/package/package_level",
     "pages/admin/rent/package/package_setting",
     "pages/admin/rent/price/price_item"
   ],
