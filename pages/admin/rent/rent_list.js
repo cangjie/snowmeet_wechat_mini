@@ -11,7 +11,8 @@ Page({
     endDate: util.formatDate(new Date()),
     statusList: ['全部', '已付押金', '全部归还', '已退款', '免押金'],
     statusSelectedIndex: 0,
-    shop: ''
+    shop: '',
+    querying: false
   },
 
   gotoDetail(e){

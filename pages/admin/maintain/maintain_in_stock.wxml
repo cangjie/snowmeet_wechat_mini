@@ -3,7 +3,7 @@
     <shop-selector bindShopSelected="shopSelected" ></shop-selector>
   </view>
   <view style="height: 100rpx;">
-    <button class="input" style="height: 70rpx;" disabled="{{querying}}" bindtap="getData" > 查 询 </button>
+    <button class="input" style="height: 70rpx;" disabled="{{querying}}" bindtap="getData" > {{querying? '查询中……' : '查 询'}} </button>
   </view>
   <mp-cells title="共{{tasks.length}}个任务">
     <mp-cell wx:for="{{tasks}}" id="{{item.id}}" bindtap="gotoDetail" >

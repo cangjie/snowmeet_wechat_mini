@@ -15,6 +15,12 @@ Page({
     refunding: false
   },
 
+  goHome(e){
+    wx.redirectTo({
+      url: '../admin',
+    })
+  },
+
   setStartDate(e){
     var that = this
     var rentOrder = that.data.rentOrder

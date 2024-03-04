@@ -13,7 +13,8 @@ Page({
     nowDateStr: '',
     statusList:['全部', '待支付', '部分支付', '暂缓支付', '支付完成', '订单关闭'],
     orderList:[],
-    totalAmount: 0
+    totalAmount: 0,
+    isQuerying: false
   },
 
   statusSelected(e){
@@ -29,6 +30,7 @@ Page({
 
   search(){
     var that = this
+    that.setData({isQuerying: true})
     var searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=' 
       + that.data.startDate + '&endDate=' + that.data.endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     if (that.data.statusSelectedIndex>0){
@@ -56,6 +58,9 @@ Page({
           orderList[i].time = orderDateTime.getHours().toString() + ':' + orderDateTime.getMinutes().toString()
         }
         that.setData({orderList: orderList, totalAmount: totalAmount})
+      },
+      complete:()=>{
+        that.setData({isQuerying: false})
       }
     })
   },

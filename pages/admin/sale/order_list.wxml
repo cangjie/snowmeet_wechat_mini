@@ -30,7 +30,9 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view style="text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><button bindtap="search" > 查 询 </button></view>
+  <view style="text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;">
+    <button bindtap="search" disabled="{{isQuerying}}" class="input" > {{isQuerying? '查询中……' : '查 询 '}}</button>
+  </view>
   <mp-cells title="订单列表 共有订单{{orderList.length}}个，总金额：￥{{totalAmount}}"  >
     <mp-cell wx:for="{{orderList}}" id="{{item.id}}" bindtap="gotoDetail">
       <view style="display: flex; flex-direction: row;" >

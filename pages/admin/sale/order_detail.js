@@ -12,7 +12,11 @@ Page({
     chargeAmount: 0,
     showModal: false
   },
-
+  goHome(){
+    wx.redirectTo({
+      url: '../admin',
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */

@@ -327,5 +327,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view></view>
+  <view>
+    <button bindtap="goHome" class="input" > 返 回 首 页 </button>
+  </view>
 </view>

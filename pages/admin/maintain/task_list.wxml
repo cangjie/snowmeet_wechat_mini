@@ -8,7 +8,7 @@
   <mp-cells>
     <mp-cell>
       <view style="text-align: center;">
-        <button disabled="{{querying}}" bindtap="getData" > 查 询 </button>
+        <button disabled="{{querying}}" class="input" bindtap="getData" > {{querying? '查询中……' : '查 询'}} </button>
       </view>
     </mp-cell>
   </mp-cells>

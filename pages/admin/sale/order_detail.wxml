@@ -159,6 +159,9 @@
     <mp-cell>
       <button disabled="{{order.paidAmount <= 0 || order.status == '订单关闭' || order.status == '支付完成'}}" bindtap="charge" > 追 加 收 款 </button>
     </mp-cell>
+    <mp-cell>
+      <button bindtap="goHome" class="input" > 返 回 首 页 </button>
+    </mp-cell>
   </mp-cells>
   
   

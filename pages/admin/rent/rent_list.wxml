@@ -22,7 +22,7 @@
       </picker>
     </view>
   </view>
-  <view><button bindtap="getData"> 查 询 </button></view>
+  <view><button bindtap="getData" disabled="{{querying}}" class="input" > {{querying? '查询中……' : '查 询'}} </button></view>
   <view>
     <mp-cells title="列表 共{{orders.length}} 总押金：{{totalPaidStr}} 总退款：{{totalRefundStr}}" >
       <mp-cell id="{{item.id}}" wx:for="{{orders}}" bindtap="gotoDetail"  >

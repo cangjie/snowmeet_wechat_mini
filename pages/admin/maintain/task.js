@@ -22,6 +22,13 @@ Page({
     showUploader: true
   },
 
+  goHome(){
+    wx.redirectTo({
+      url: '../admin',
+    })
+
+  },
+
   getBoardBrands(){
     var that = this
     var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('单板')

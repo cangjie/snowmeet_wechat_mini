@@ -5,7 +5,9 @@
     </picker>
   </view>
   <shop-selector bindShopSelected="shopSelected" ></shop-selector>
-  <view style="text-align: center;"><button bindtap="query" disabled="{{isQuerying}}" > 查 询 </button></view>
+  <view style="text-align: center;">
+    <button bindtap="query" disabled="{{isQuerying}}" class="input" > {{isQuerying? '查询中……' : '查 询'}} </button>
+  </view>
   <view>
     <view style="color:gray">营业前 {{UnSettledOrderBeforeSet.length}}笔</view>
     <view id="1" style="display: flex;flex-direction: row;"  bindtap="showDetail">
