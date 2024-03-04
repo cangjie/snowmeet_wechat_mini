@@ -27,7 +27,7 @@ Component({
           method: 'GET',
           success:(res)=>{
             console.log('get shop list:', res)
-            var name_list = ['选择店铺...']
+            var name_list = ['全部店铺']
             for(var i = 0; i < res.data.length; i++){
               name_list.push(res.data[i].name)
             }
@@ -69,6 +69,7 @@ Component({
    * Component methods
    */
   methods: {
+    
     selectChanged:function(e){
       console.log('shop select changed:', e)
       var that = this

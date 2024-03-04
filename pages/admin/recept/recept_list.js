@@ -7,7 +7,13 @@ Page({
    * Page initial data
    */
   data: {
-    shop: ''
+    shop: '',
+    isQuerying: false
+  },
+  query(e){
+    var that = this
+    that.setData({isQuerying: true})
+    that.getData()
   },
   gotoDetail(e){
     var id = e.currentTarget.id
@@ -19,7 +25,7 @@ Page({
     console.log('shop selected', e)
     var that = this
     that.setData({shop: e.detail.shop})
-    that.getData()
+    //that.getData()
   },
   getData(){
     var that = this
@@ -39,7 +45,7 @@ Page({
           recept.create_date_dateStr = util.formatDate(rDate)
           recept.create_date_timeStr = util.formatTimeStr(rDate)
         }
-        that.setData({receptList: receptList})
+        that.setData({receptList: receptList, isQuerying: false})
       }
     })
   },

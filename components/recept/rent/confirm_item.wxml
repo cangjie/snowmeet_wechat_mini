@@ -104,9 +104,9 @@
         <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
           <input id="overtime_charge" style="width: 80%;" type="number" class="input" value="{{currentRentItem.overtime_charge}}" bindinput="setNumber" />
         </view>
-        <view style="width: 20%;text-align: right;" class="op-cell" ></view>
+        <view style="width: 20%;text-align: right;" class="op-cell" >租金减免：</view>
         <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
-          
+          <input id="discount" style="width: 80%;" type="number" class="input" value="{{currentRentItem.rental_discount}}" bindinput="setNumber" />
         </view>
       </view>
       <view style="display: flex;flex-direction: row;" >

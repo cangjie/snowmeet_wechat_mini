@@ -23,6 +23,7 @@ Component({
       name: '',
       rental: 0,
       deposit: 0,
+      rental_discount: 0,
       overtime_charge: 0,
       depositType:'立即租赁',
       startDate: util.formatDate(new Date()),
@@ -156,7 +157,7 @@ Component({
   
         var item = {id: 0, rent_list_id: 0, rent_item_name: rentItemList[i].name, rent_item_class: rentItemList[i].class, 
           rent_item_code: rentItemList[i].code, deposit: rentItemList[i].deposit, deposit_type: rentItemList[i].depositType,
-          unit_rental: rentItemList[i].rental, memo: memo, images: images, start_date: startDate, overtime_charge: rentItemList[i].overtime_charge}
+          unit_rental: rentItemList[i].rental, memo: memo, images: images, start_date: startDate, overtime_charge: rentItemList[i].overtime_charge, rental_discount: rentItemList[i].rental_discount}
           rentDetails.push(item)
 
           var rentItem = rentItemList[i]
@@ -392,6 +393,7 @@ Component({
         rental: 0,
         deposit: 0,
         overtime_charge: 0,
+        rental_discount: 0,
         depositType:'',
         startDate: util.formatDate(new Date()),
         memo: ''
@@ -434,6 +436,7 @@ Component({
         name: '',
         rental: 0,
         deposit: 0,
+        rental_discount: 0,
         depositType:'立即租赁',
         startDate: util.formatDate(new Date()),
         memo: ''
@@ -498,6 +501,9 @@ Component({
         case 'overtime_charge':
           fieldName = '超时费'
           break
+        case 'discount':
+          fieldName = '租金减免'
+          break
         default:
           break
       }
@@ -520,6 +526,9 @@ Component({
             case '超时费':
               currentRentItem.overtime_charge = displayedValue
               break
+            case '租金减免':
+              currentRentItem.rental_discount = displayedValue
+              break
             default:
               break
           }
@@ -537,6 +546,12 @@ Component({
                   break
                 case '押金':
                   currentRentItem.deposit = e.detail.value
+                  break
+                case '超时费':
+                  currentRentItem.overtime_charge = e.detail.value
+                  break
+                case '租金减免':
+                  currentRentItem.rental_discount = e.detail.value
                   break
                 default:
                   break

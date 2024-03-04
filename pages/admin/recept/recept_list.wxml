@@ -1,5 +1,10 @@
 <view>
   <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+
+  <view style="text-align: center;" >
+    <button class="input" disabled="{{isQuerying}}" bindtap="query"  > {{ isQuerying? '查 询 中 ……' : '查 询' }}</button>
+  </view>
+
   <mp-cells title="共{{receptList.length}}条" >
     <mp-cell id="{{item.id}}" wx:for="{{receptList}}" bindtap="gotoDetail" >
       <view class="view-row" >
