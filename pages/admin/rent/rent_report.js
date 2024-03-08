@@ -113,9 +113,10 @@ Page({
             currentIncomeOrders.push(orders[i])
           }
         }
+        var unsettledDepositToRefundStr =  util.showAmount(res.data.unRefundDeposit - res.data.unSettledRental)
 
         that.setData({unRefundDeposit: res.data.unRefundDeposit, unRefundDepositStr: util.showAmount(res.data.unRefundDeposit), unSettledReantal: res.data.unSettledRental, unSettledRentalStr: util.showAmount(res.data.unSettledRental), currentBusinessRental: currentBusinessRental,
-          currentBusinessRentalStr: util.showAmount(currentBusinessRental), currentBusinessRentalSettled: currentBusinessRentalSettled, currentBusinessRentalSettledStr: util.showAmount(currentBusinessRentalSettled), currentBusinessRentalUnSettled: currentBusinessRentalUnSettled, currentBusinessRentalUnSettledStr: util.showAmount(currentBusinessRentalUnSettled), UnSettledOrderBeforeSet: orders, CurrentIncomdeOrderSet: currentIncomeOrders})
+          currentBusinessRentalStr: util.showAmount(currentBusinessRental), currentBusinessRentalSettled: currentBusinessRentalSettled, currentBusinessRentalSettledStr: util.showAmount(currentBusinessRentalSettled), currentBusinessRentalUnSettled: currentBusinessRentalUnSettled, currentBusinessRentalUnSettledStr: util.showAmount(currentBusinessRentalUnSettled), UnSettledOrderBeforeSet: orders, CurrentIncomdeOrderSet: currentIncomeOrders,unsettledDepositToRefundStr: unsettledDepositToRefundStr})
         wx.request({
           url: getCurrentDayPlacedUrl,
           method: 'GET',
