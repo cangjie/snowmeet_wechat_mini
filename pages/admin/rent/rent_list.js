@@ -54,6 +54,7 @@ Page({
 
   getData(){
     var that = this
+    that.setData({querying: true})
     var totalPaid = 0
     var totalRefund = 0
     var qUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrderListByStaff?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -107,6 +108,9 @@ Page({
           that.setData({orders: orders, totalPaidStr: util.showAmount(totalPaid), 
             totalRefundStr: util.showAmount(totalRefund)})
         }
+      },
+      complete:(res)=>{
+        that.setData({querying: false})
       }
     })
   },

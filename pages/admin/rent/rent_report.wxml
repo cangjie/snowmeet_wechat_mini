@@ -29,7 +29,7 @@
       <view class="right-column" style="width: 50%;margin-right: 200rpx; text-align: right;" >{{unsettledDepositToRefundStr}}</view>
     </view>
 
-
+<!--
     <view style="color:gray">营业中</view>
     <view style="display: flex;flex-direction: row;" id="1" bindtap="showDetail" >
       <view class="left-column" style="width: 50%;"  >非当日订单数：</view>
@@ -58,7 +58,7 @@
     <view style="height: 70rpx;text-align: center;"></view>
     <view style="height: 70rpx;text-align: center;">-----------------------------------------</view>
     <view style="height: 70rpx;text-align: center;"></view>
-
+-->
 
     <view style="color:gray">营业中 {{CurrentDaySettledPlacedBeforeSet.length}}笔</view>
     <view style="display: flex;flex-direction: row;" id="2" bindtap="showDetail" >
