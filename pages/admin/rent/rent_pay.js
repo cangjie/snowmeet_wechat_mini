@@ -108,7 +108,8 @@ Page({
               payMethod = rentOrder.order.payments[0].pay_method
             }
             if (payMethod == '微信支付'){
-              var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + rentOrder.order.payments[0].id
+              //var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + rentOrder.order.payments[0].id
+              var wxaCodeUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=pay_payment_id_' + rentOrder.order.payments[0].id
               that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl, payMethod: payMethod})
               var interval = setInterval(() => {
                 that.checkOrderPaymentStatus()
@@ -117,7 +118,8 @@ Page({
             }
             else{
               if (rentOrder.open_id == ''){
-                var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=bind_rent_' + rentOrder.id
+                //var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=bind_rent_' + rentOrder.id
+                var wxaCodeUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=bind_rent_' + rentOrder.id
                 that.setData({needPay: true, rentOrder: rentOrder, wxaCodeUrl: wxaCodeUrl, payMethod: payMethod})
               }
               else{

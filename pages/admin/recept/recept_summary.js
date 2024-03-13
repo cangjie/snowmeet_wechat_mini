@@ -87,7 +87,8 @@ Page({
             that.setData({interVal: interVal})
             break
         case '支付宝支付':
-            payQrCode = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_recept_id_' + recept.id
+            //payQrCode = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_recept_id_' + recept.id
+            payQrCode = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=pay_recept_id_' + recept.id
             break
         default:
             //clearInterval(that.data.interVal)

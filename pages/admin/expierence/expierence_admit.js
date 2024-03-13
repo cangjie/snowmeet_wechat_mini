@@ -219,7 +219,9 @@ Page({
       success: (res) => {
         console.log(res)
         var responseData = res.data
-        var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + responseData.order.payments[0].id
+        //var wxaCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=pay_payment_id_' + responseData.order.payments[0].id
+
+        var wxaCodeUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=pay_payment_id_' + responseData.order.payments[0].id
         //this.setData({currentExpierenceId: responseData.expierence_list_id, wxaCodeUrl: wxaCodeUrl})
         this.setData({currentExpierenceId: responseData.id, wxaCodeUrl: wxaCodeUrl})
         var intervalId = setInterval(() => {
