@@ -44,7 +44,7 @@ Component({
     ready(){
       var that = this
       app.loginPromiseNew.then(function (resolve){
-        var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + that.properties.receptId + '?sessionKey=' + app.globalData.sessionKey
+        var getUrl = 'https://' + app.globalData.domainName + '/core/Recept/GetRecept/' + that.properties.receptId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: getUrl,
           success:(res)=>{
