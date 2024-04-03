@@ -48,5 +48,13 @@
         </view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >备注：</view>
+        <view class="right-column" >
+          <textarea id="memo" value="{{recept.maintainOrder.memo}}" class="input" bindinput="setMemo" style="width: 430rpx;height: 150rpx;" />
+        </view>
+      </view>
+    </mp-cell>
   </mp-cells>
 </view>

@@ -193,6 +193,14 @@ Component({
 
       return charge
 
+    },
+    setMemo(e){
+      var that = this
+      var memo = e.detail.value
+      var recept = that.data.recept
+      recept.maintainOrder.memo = memo
+      that.setData(recept)
+      that.computeCharge()
     }
 
 

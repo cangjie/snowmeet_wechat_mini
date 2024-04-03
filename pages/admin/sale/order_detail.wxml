@@ -91,6 +91,14 @@
         <view class="right-column" >¥{{order.final_price - order.paidAmount}}</view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >备注：</view>
+        <view class="right-column" >
+          <textarea id="memo" style="width: 430rpx;height: 150rpx;" class="input" bindinput="setMemo" value="{{order.memo}}" ></textarea>
+        </view>
+      </view>
+    </mp-cell>
   </mp-cells>
   <user-info wx:if="{{isOrderInfoReady}}" open_id="{{order.open_id}}" ></user-info>
   <mp-cells title="订单明细" >

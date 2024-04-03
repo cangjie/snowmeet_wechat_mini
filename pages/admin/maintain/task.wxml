@@ -87,7 +87,14 @@
     <mp-cell>
       <multi-uploader wx:if="{{showUploader}}" id="uploader" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="mod" uploaded_files="{{task.confirmed_images}}" ></multi-uploader>
     </mp-cell>
-    
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" >备注：</view>
+        <view class="right-column" >
+          <textarea style="width: 430rpx;height: 150rpx;" id="memo"  class="input" bindinput="setMemo" value="{{task.order.memo}}" />
+        </view>
+      </view>
+    </mp-cell>
     <mp-cell><button bindtap="updateTask" class="no-padding"> 保 存 修 改 </button></mp-cell>
     <mp-cell>
       <button bindtap="gotoPrint" class="no-padding" > 打 印 标 签 </button>

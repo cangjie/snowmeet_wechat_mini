@@ -26,7 +26,8 @@ Page({
     soreRate: 0,
     score:0,
     orderId: 0,
-    isGiveUpScore: false
+    isGiveUpScore: false,
+    memo: ''
   },
 
   computeScore(){
@@ -362,6 +363,7 @@ Page({
     }
     var mi7Orders = that.data.mi7Orders
     order.mi7Orders = []
+    order.memo = that.data.memo
     for(var i = 0; i < mi7Orders.length; i++){
       var mi7 = {}
       mi7.id = 0
@@ -485,6 +487,11 @@ Page({
         }
       }
     })
+  },
+  setMemo(e){
+    var that = this
+    var memo = e.detail.value
+    that.setData({memo: memo})
   },
   confirmNonPaidOrder(){
     var that = this

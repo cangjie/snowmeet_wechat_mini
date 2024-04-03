@@ -414,6 +414,7 @@ Page({
         task.confirmed_images = filesStr
         that.setData({task: task})
         break
+      
       default:
         break
     }
@@ -602,6 +603,20 @@ Page({
     })
 
   },
+
+  setMemo(e){
+    var that = this
+    var task = that.data.task
+    var order  = task.order
+    order.memo = e.detail.value
+    that.setData({task: task})
+    var setUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/SetOrderMemo/' + order.id + '?sessionKey=' +  encodeURIComponent(app.globalData.sessionKey) + '&memo=' + encodeURIComponent(e.detail.value)
+    wx.request({
+      url: setUrl,
+      method: 'GET'
+    })
+  },
+
 
   /*
   getStatus(){

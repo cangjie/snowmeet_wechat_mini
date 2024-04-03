@@ -54,7 +54,7 @@
       </mp-cell>
       <mp-cell >
         <view style="display: flex;flex-direction: row;" >
-          <view class="left-column"  >本次支付金额：</view>
+          <view class="left-column"  >本次支付：</view>
           <view class="right-column" >
             <view wx:if="{{payOptionSelectedIndex!=1}}" >¥{{totalChargePrice - ticketDiscount - othersDiscount}}</view>
             <view wx:else style="display: flex; flex-direction: row;">¥<input placeholder="填写支付金额" bindinput="setCurrentCharge" /></view>
@@ -78,6 +78,14 @@
           <view class="left-column"  >放弃龙珠：</view>
           <view class="right-column" >
             <switch checked="{{isGiveUpScore}}" bindchange="giveUpScore" ></switch>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view style="display: flex;flex-direction: row;" >
+          <view class="left-column"  >备注：</view>
+          <view class="right-column" >
+            <textarea id="memo" style="width: 430rpx;height: 150rpx;" class="input" bindinput="setMemo" value="{{memo}}"  />
           </view>
         </view>
       </mp-cell>

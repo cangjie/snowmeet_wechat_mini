@@ -171,5 +171,24 @@ Page({
   },
   hideModal(){
     this.setData({showModal: false})
+  },
+  setMemo(e){
+    var that = this
+    var order = that.data.order
+    order.memo = e.detail.value
+    that.setData({order: order})
+    var setUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/SetOrderMemo/' + order.id + '?sessionKey=' +  encodeURIComponent(app.globalData.sessionKey) + '&memo=' + encodeURIComponent(e.detail.value)
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+
+      },
+      complete:(res)=>{
+        
+      }
+      
+    })
+
   }
 })
