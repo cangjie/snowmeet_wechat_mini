@@ -303,7 +303,7 @@
   <view style="display: flex; flex-direction: row;">
     <view class="left-column" style="color:{{textColor}}" >订单备注：</view>
     <view class="right-column" style="width: 450rpx;">
-      <textarea type="text" class="input" style="width:440rpx;height:200rpx"  bindinput="setOrderMemo"  >{{rentOrder.memo}}</textarea>
+      <textarea type="text" class="input" style="width:440rpx;height:200rpx"  bindinput="setOrderMemo" value="{{rentOrder.memo}}" ></textarea>
     </view>
     
   </view>
