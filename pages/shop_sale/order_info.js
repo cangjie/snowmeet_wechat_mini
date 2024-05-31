@@ -60,7 +60,7 @@ Page({
 
   submitPayment(){
     var that = this
-    var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/TenpayRequest/' + that.data.paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Pay/' + that.data.paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: paymentUrl,
       method: 'GET',
@@ -70,7 +70,7 @@ Page({
           nonceStr: res.data.nonce,
           package: 'prepay_id=' + res.data.prepay_id,
           paySign: res.data.sign,
-          timeStamp: res.data.timeStamp,
+          timeStamp: res.data.timestamp,
           signType: 'MD5',
           success:(res)=>{
             console.log(res)

@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "pay",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=7418",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "staffcheckin",
           "pathName": "pages/register/staff_check_in",
           "query": "",
@@ -20,13 +27,6 @@
           "name": "",
           "pathName": "pages/mine/maintain/order_list",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pay",
-          "pathName": "pages/payment/pay_recept",
-          "query": "id=2346",
           "launchMode": "default",
           "scene": null
         },
