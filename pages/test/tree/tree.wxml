@@ -1,0 +1,8 @@
+<!--pages/test/tree/tree.wxml-->
+<tree
+    dataTree="{{dataTree}}"
+    selectKey="{{selectKey}}"
+    bind:select="handleSelect"
+    isSelectLastNode="true"
+    isOpenAll="true"
+  ></tree>

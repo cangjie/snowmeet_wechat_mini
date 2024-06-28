@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "tree",
+          "pathName": "/pages/test/tree/tree",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "pay",
           "pathName": "pages/payment/pay_recept",
           "query": "id=7418",
