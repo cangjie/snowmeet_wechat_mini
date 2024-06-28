@@ -6,3 +6,8 @@
     isSelectLastNode="true"
     isOpenAll="true"
   ></tree>
+  <view>
+    <view>{{selectedId}} {{selectedName}}</view>
+    <button bind:tap="add" >添加分类</button>
+    <button bind:tap="addSub" >添加子分类</button>
+  </view>

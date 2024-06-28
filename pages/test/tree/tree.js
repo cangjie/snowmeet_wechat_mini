@@ -5,6 +5,8 @@ Page({
    * Page initial data
    */
   data: {
+    selectedId : 0,
+    selectedName: '',
     dataTree: [
       {
         id: 1,
@@ -44,9 +46,25 @@ Page({
       console.log('必须选择到最后一个节点')
     } else {
       this.setData({
-        selectKey: e.detail.item.id
+        selectKey: e.detail.item.id,
+        selectedId: e.detail.item.id,
+        selectedName: e.detail.item.name
       })
     }
+  },
+  add(){
+    var that = this
+    var dataTree = that.data.dataTree
+    
+    dataTree.push({id: 3, name: '一级C', children:[]})
+    that.setData({dataTree: dataTree})
+  },
+  addSub(){
+    var that = this
+    var dataTree = that.data.dataTree
+    var dataTreeSub = dataTree[2].children
+    dataTreeSub.push({id:31, name:'二级C-a', children:[]})
+    that.setData({dataTree: dataTree})
   },
   /**
    * Lifecycle function--Called when page load
