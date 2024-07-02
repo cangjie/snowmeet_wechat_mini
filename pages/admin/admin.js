@@ -4,8 +4,21 @@ function init(that) {
   var role = app.globalData.role
   var isSchoolStaff = false
   var isManager = false
+  var isAdmin = false
   if (app.globalData.is_manager){
     isManager = true
+  }
+  if (app.globalData.memberInfo != undefined && app.globalData.memberInfo != null){
+    var member = app.globalData.memberInfo
+    if (member.is_staff == 1){
+      role = 'staff'
+    }
+    if (member.is_manager == 1){
+      isManager = true
+    }
+    if (member.is_admin == 1){
+      isAdmin = true
+    }
   }
   /*
   var ajaxUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff?sessionkey=' +  encodeURIComponent(app.globalData.sessionKey)
@@ -22,7 +35,7 @@ function init(that) {
     }
   })
   */
-  that.setData({role: app.globalData.role, isManager: isManager})
+  that.setData({role: app.globalData.role, isManager: isManager, isAdmin: isAdmin})
   
 }
 Page({
@@ -33,7 +46,8 @@ Page({
   data: {
     role: '',
     isSchoolStaff: false,
-    isManager: true
+    isManager: true,
+    isAdmin: false
   },
 
   /**
@@ -189,6 +203,9 @@ Page({
         break
       case 'maintain_in_stock':
         path = '/pages/admin/maintain/maintain_in_stock'
+        break
+      case 'category_tree':
+        path = '/pages/admin/rent/settings/category_tree'
         break
       default:
         break

@@ -7,7 +7,7 @@
       <view class="tree-item-onOff" wx:else>
       </view>
       <view class="tree-item-name {{selectKey == item.id ? 'tree-item-name-select' : '' }}" bindtap="select" data-item="{{item}}" data-index="{{index}}">
-        <view class="name">{{item.name}}</view>
+        <view class="name">{{item.id}} {{item.name}}</view>
         <view class="img">
           <!-- <image wx:if="{{selectKey == item.id }}" src="/assets/icon/u435.svg"></image> -->
         </view>

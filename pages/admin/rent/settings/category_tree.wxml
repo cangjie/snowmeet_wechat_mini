@@ -1,0 +1,33 @@
+<view wx:if="{{isAdmin}}">
+  <tree
+    dataTree="{{dataTree}}"
+    selectKey="{{selectedCode}}"
+    bind:select="handleSelect"
+    isSelectLastNode="true"
+    isOpenAll="true"
+  ></tree>
+  <mp-cells title="当前分类" >
+    <mp-cell>
+      <view class="view-row">
+        <view wx:if="{{selectedCode==''}}" >顶级</view>
+        <view wx:else>{{selectedCode}} {{selectedName}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="添加分类" >
+    <mp-cell >
+      <view style="display: flex; flex-direction: row; width: 100%;" >
+        <input style="width: 300rpx;" value="{{newName}}"  placeholder="填写分类名称" bindinput="setNewCategoryName"  />
+        <checkbox-group bindchange="checkSameLevel">
+          <checkbox disabled="{{selectedCode==''}}" checked="{{isSameLevel}}">同级</checkbox>
+        </checkbox-group>
+        <button size="mini" class="input" bind:tap="add" disabled="{{nowAdding}}" > 添 加 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="删除分类">
+    <mp-cell>
+      <button disabled="{{ (selectedCategory.children != undefined  && selectedCategory.children != null) || selectedCategory == undefined}}" class="input" bind:tap="metionDelete" > 删 除 </button>
+    </mp-cell>
+  </mp-cells>
+</view>

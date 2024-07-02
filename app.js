@@ -51,8 +51,18 @@ App({
             console.log('get seesionkey success')
             console.log(res)
             app.globalData.sessionKey = res.data.session_key
-            
-            url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
+
+            url = 'https://' + app.globalData.domainName + '/core/Member/GetMemberInfoSimple?sessionkey=' +     encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+
+            wx.request({
+              url: url,
+              method: 'GET',
+              success:(res)=>{
+                if (res.statusCode == 200){
+                  app.globalData.memberInfo = res.data
+                  //resolve(app.globalData)
+
+                  url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
               url: url,
               method: 'GET',
@@ -87,7 +97,8 @@ App({
                             wx.getSystemInfoAsync({
                               success:(res)=>{
                                 app.globalData.systemInfo = res
-                                resolve(app.globalData)
+                                
+                                
                               },
                               fail:(res)=>{
                                 console.log('get sys info fail, try sync', res)
@@ -118,9 +129,6 @@ App({
                   }
                   else{
                     //resolve(app.globalData)
-
-
-
                     wx.getSystemInfoAsync({
                       success:(res)=>{
                         app.globalData.systemInfo = res
@@ -136,6 +144,18 @@ App({
                 }
               }
             })
+
+
+
+                }
+              }
+            })
+
+
+            
+
+
+            ///////////////////
           },
           fail:(res)=>{
             console.log('request fail', res)

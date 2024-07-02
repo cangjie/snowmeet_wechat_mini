@@ -100,7 +100,8 @@
     "pages/admin/maintain/user_task_list",
     "pages/admin/rent/unreturned",
     "pages/admin/maintain/maintain_in_stock",
-    "pages/test/tree/tree"
+    "pages/test/tree/tree",
+    "pages/admin/rent/settings/category_tree"
   ],
   "window": {
     "backgroundTextStyle": "light",
