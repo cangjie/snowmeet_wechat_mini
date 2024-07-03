@@ -13,7 +13,33 @@ Page({
     isSameLevel: false,
     nowAdding: false,
     selectedCategory:undefined,
-    canDelete: false
+    canDelete: false,
+    shops:[
+      {
+        title: '通用',
+        title2: '',
+        img: '',
+        desc: ''
+      },
+      {
+        title: '万龙',
+        title2: '',
+        img: '',
+        desc: ''
+      },
+      {
+        title: '旗舰',
+        title2: '',
+        img: '',
+        desc: ''
+      },
+      {
+        title: '南山',
+        title2: '',
+        img: '',
+        desc: ''
+      }
+    ]
   },
 
   getData(){

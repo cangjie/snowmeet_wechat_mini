@@ -25,6 +25,57 @@
       </view>
     </mp-cell>
   </mp-cells>
+
+  <mp-cells title="价格设定" >
+    <mp-cell style="height: 5000rpx;">
+      <view style="height: 5000rpx;">
+        <mp-tabs
+        tabs="{{shops}}" 
+        activeTab="{{'旗舰'}}" 
+        swiperClass="weui-tabs-swiper"
+        bindtabclick="onTabCLick"
+        bindchange="onChange"
+        activeClass="tab-bar-title__selected"    
+        style="height: 5000rpx;"
+        >
+
+          <block wx:for="{{shops}}" wx:key="title" style="height: 5000rpx;"  >
+            <view class="tab-content" slot="tab-content-{{index}}" style="height: 320rpx;"  >
+              <view style="margin-left: 0rpx;"  >
+                <view class="view-row">
+                  <view style="width:100rpx; text-align: center;" >-</view>
+                  <view style="width:140rpx; text-align: center;" >门市</view>
+                  <view style="width:140rpx; text-align: center;" >预约</view>
+                  <view style="width:140rpx; text-align: center;" >会员</view>
+                </view>
+                <view class="view-row">
+                  <view style="width:100rpx; text-align: center;" >平日</view>
+                  <view style="width:140rpx; text-align: center;" ></view>
+                  <view style="width:140rpx; text-align: center;" ></view>
+                  <view style="width:140rpx; text-align: center;" ></view>
+                </view>
+                <view class="view-row">
+                  <view style="width:100rpx; text-align: center;" >周末</view>
+                  <view style="width:140rpx; text-align: center;" ></view>
+                  <view style="width:140rpx; text-align: center;" ></view>
+                  <view style="width:140rpx" ></view>
+                </view>
+                <view class="view-row">
+                  <view style="width:100rpx; text-align: center;" >节假日</view>
+                  <view style="width:140rpx; text-align: center;" ></view>
+                  <view style="width:140rpx; text-align: center;" ></view>
+                  <view style="width:140rpx; text-align: center;" ></view>
+                </view>
+              </view>
+            </view>
+          </block>
+
+        </mp-tabs>
+      </view>
+     
+      
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="删除分类">
     <mp-cell>
       <button disabled="{{ (selectedCategory.children != undefined  && selectedCategory.children != null) || selectedCategory == undefined}}" class="input" bind:tap="metionDelete" > 删 除 </button>
