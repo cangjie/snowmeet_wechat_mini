@@ -23,6 +23,7 @@ page{
     align-items: center;
     box-sizing: border-box;
     padding: 40rpx;
+    font-size: 9pt;
 }
 
 .weui-tabs-bar__title {
