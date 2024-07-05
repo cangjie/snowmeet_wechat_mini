@@ -27,7 +27,7 @@
   </mp-cells>
   <mp-cells title="押金设定" >
     <view style="display:flex;justify-content: center;" >
-      <input class="input" style="width: 150rpx;" />
+      <input class="input" style="width: 150rpx; text-align: center;" value="{{selectedCategory.deposit}}" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" />
     </view>
   </mp-cells>
   <mp-cells title="价格设定" >
@@ -53,21 +53,21 @@
                 </view>
                 <view class="view-row">
                   <view style="width:100rpx; text-align: center;width: 120rpx;text-align: left;" >平日</view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[0][0]}}" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[0][1]}}" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[0][2]}}" /></view>
                 </view>
                 <view class="view-row">
                   <view style="width:100rpx; text-align: center;width: 120rpx;text-align: left;" >周末</view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[1][0]}}" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[1][1]}}" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[1][2]}}" /></view>
                 </view>
                 <view class="view-row">
                   <view style="width:100rpx; text-align: center; width: 120rpx;text-align: left;" >节假日</view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[2][0]}}" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[2][1]}}" /></view>
+                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{priceArr[2][2]}}" /></view>
                 </view>
               </view>
             </view>

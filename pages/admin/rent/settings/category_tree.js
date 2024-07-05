@@ -39,7 +39,8 @@ Page({
         img: '',
         desc: ''
       }
-    ]
+    ],
+    priceArr:[['-','-','-'],['-','-','-'],['-','-','-']]
   },
 
   getData(){
@@ -73,11 +74,67 @@ Page({
         if (res.statusCode != 200){
           return
         }
+        var cat = res.data
+        if (cat.children != null){
+          cat.deposit = '-'
+        }
         //selectedCategory = res.data
-        that.setData({selectedCategory: res.data})
+        that.setData({selectedCategory: cat})
+        if (cat.children == undefined || cat.children == null || cat.priceList.length > 0){
+          that.setPriceArr()
+        }
         
       }
     })
+  },
+
+  setPriceArr(){
+    var that = this
+    var priceArr = that.data.priceArr
+    var cat = thayt.data.selectedCategory
+    priceArr = [['','',''],['','',''],['','','']]
+    for(var i = 0; i < cat.priceList.length; i++){
+      var price = cat.priceList[i]
+      var dayType = price.day_type
+      var scene = price.scene
+      
+      if (dayType == '平日' && scene == '门市'){
+        priceArr[0][0] = price.price
+      }
+
+      if (dayType == '平日' && scene == '预约'){
+        priceArr[0][1] = price.price
+      }
+
+      if (dayType == '平日' && scene == '会员'){
+        priceArr[0][2] = price.price
+      }
+
+      if (dayType == '周末' && scene == '门市'){
+        priceArr[1][0] = price.price
+      }
+
+      if (dayType == '周末' && scene == '预约'){
+        priceArr[1][1] = price.price
+      }
+
+      if (dayType == '周末' && scene == '会员'){
+        priceArr[1][2] = price.price
+      }
+
+      if (dayType == '节假日' && scene == '门市'){
+        priceArr[2][0] = price.price
+      }
+
+      if (dayType == '节假日' && scene == '预约'){
+        priceArr[2][1] = price.price
+      }
+
+      if (dayType == '节假日' && scene == '会员'){
+        priceArr[2][2] = price.price
+      }
+      that.setData({priceArr: priceArr})
+    }
   },
 
   convertDataTree(data){
@@ -136,12 +193,13 @@ Page({
       }
     })
   },
+  
   handleSelect(e){
     var that = this
     var select = e.detail.item
     that.setData({selectedCode: select.id, selectedName: select.name})
     that.getSingleCategory(select.id)
-
+    //that.getSingleCategory(select.id)
   },
   checkSameLevel(e){
     var that = this
