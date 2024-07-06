@@ -80,7 +80,8 @@ Page({
         //selectedCategory = res.data
         that.setData({selectedCategory: cat})
         that.checkValid()
-        if (cat.children == undefined || cat.children == null || cat.priceList.length > 0){
+        if (cat.children == undefined || cat.children == null || 
+            (  cat.priceList != undefined && cat.priceList != null && cat.priceList.length > 0 )){
           that.setPriceArr()
         }
         
