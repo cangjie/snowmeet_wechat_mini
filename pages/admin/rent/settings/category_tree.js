@@ -15,12 +15,7 @@ Page({
     selectedCategory:undefined,
     canDelete: false,
     shops:[
-      {
-        title: '通用',
-        title2: '',
-        img: '',
-        desc: ''
-      },
+
       {
         title: '万龙',
         title2: '',
@@ -40,7 +35,9 @@ Page({
         desc: ''
       }
     ],
-    priceArr:[['-','-','-'],['-','-','-'],['-','-','-']]
+    priceArr:[['-','-','-'],['-','-','-'],['-','-','-']],
+    canSave: false,
+    canSaveMsg: '租金押金必须设置在最终一级的分类上。'
   },
 
   getData(){
@@ -75,11 +72,14 @@ Page({
           return
         }
         var cat = res.data
+
         if (cat.children != null){
           cat.deposit = '-'
         }
+
         //selectedCategory = res.data
         that.setData({selectedCategory: cat})
+        that.checkValid()
         if (cat.children == undefined || cat.children == null || cat.priceList.length > 0){
           that.setPriceArr()
         }
@@ -91,7 +91,7 @@ Page({
   setPriceArr(){
     var that = this
     var priceArr = that.data.priceArr
-    var cat = thayt.data.selectedCategory
+    var cat = that.data.selectedCategory
     priceArr = [['','',''],['','',''],['','','']]
     for(var i = 0; i < cat.priceList.length; i++){
       var price = cat.priceList[i]
@@ -134,6 +134,7 @@ Page({
         priceArr[2][2] = price.price
       }
       that.setData({priceArr: priceArr})
+      that.checkValid()
     }
   },
 
@@ -237,6 +238,72 @@ Page({
         }
       }
     })
+  },
+
+  checkValid(){
+    var that = this
+    var canSave = that.data.canSave
+    var canSaveMsg = that.data.canSaveMsg
+    var cat = that.data.selectedCategory
+    if (cat == null || cat == undefined || cat.children != null || cat.children != undefined){
+        canSave = false
+        canSaveMsg = '租金押金必须设置在最终一级的分类上。'
+    }
+    else if (isNaN(cat.deposit) || cat.deposit.toString() == '' || parseFloat(cat.deposit) == 0) {
+        canSave = false
+        canSaveMsg = '必须填写押金，且不能为0。'
+
+    }
+    else{
+        var priceValid = true
+        var priceArr = that.data.priceArr
+        try{
+            for(var i = 0; i < priceArr.length; i++){
+                for(var j = 0; j < priceArr[i].length; j++){
+                    if (isNaN(priceArr[i][j]) || priceArr[i][j] != '' ){
+                    
+                        priceValid = false
+                    }
+                }
+            }
+            if (!priceValid){
+                canSave = false
+                canSaveMsg = '9个价格必须逐一填写完整！'
+            }
+            else{
+                canSave = true
+                canSaveMsg = ''
+            }
+        }
+        
+        catch(exp){
+            canSave = false
+            canSaveMsg = '系统出错。'
+        }
+    }
+    that.setData({canSave: canSave, canSaveMsg: canSaveMsg})
+  },
+
+  setNumber(e){
+    var that = this
+    var cat = that.data.selectedCategory
+    var priceArr = that.data.priceArr
+    var id = e.currentTarget.id
+    if (id == 'deposit'){
+        cat.deposit = e.detail.value
+        that.checkValid()
+        
+    }
+    else if (id.indexOf('price_')==0){
+        for(var i = 0; i < priceArr.length; i++){
+            for(var j = 0; j < priceArr[i].length; j++){
+                if (id == 'price_' + i.toString() + '_' + j.toString()){
+                    priceArr[i][j] = e.detail.value
+                }
+            }
+        }
+        that.checkValid()
+    }
   },
 
   /**
