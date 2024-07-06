@@ -38,7 +38,7 @@
         activeTab="{{'旗舰'}}" 
         swiperClass="weui-tabs-swiper"
         bindtabclick="onTabCLick"
-        bindchange="onChange"
+        bindchange="onTabChange"
         activeClass="tab-bar-title__selected"   
         >
 

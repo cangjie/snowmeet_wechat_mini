@@ -37,7 +37,8 @@ Page({
     ],
     priceArr:[['-','-','-'],['-','-','-'],['-','-','-']],
     canSave: false,
-    canSaveMsg: '租金押金必须设置在最终一级的分类上。'
+    canSaveMsg: '租金押金必须设置在最终一级的分类上。',
+    currentShop: '万龙体验中心'
   },
 
   getData(){
@@ -82,14 +83,15 @@ Page({
         that.checkValid()
         if (cat.children == undefined || cat.children == null || 
             (  cat.priceList != undefined && cat.priceList != null && cat.priceList.length > 0 )){
-          that.setPriceArr()
+          that.setPriceArr(that.data.currentShop)
         }
         
       }
     })
   },
 
-  setPriceArr(){
+  setPriceArr(shop){
+   
     var that = this
     var priceArr = that.data.priceArr
     var cat = that.data.selectedCategory
@@ -98,40 +100,39 @@ Page({
       var price = cat.priceList[i]
       var dayType = price.day_type
       var scene = price.scene
-      
-      if (dayType == '平日' && scene == '门市'){
+      if (price.shop == shop && dayType == '平日' && scene == '门市'){
         priceArr[0][0] = price.price
       }
 
-      if (dayType == '平日' && scene == '预约'){
+      if (price.shop == shop && dayType == '平日' && scene == '预约'){
         priceArr[0][1] = price.price
       }
 
-      if (dayType == '平日' && scene == '会员'){
+      if (price.shop == shop && dayType == '平日' && scene == '会员'){
         priceArr[0][2] = price.price
       }
 
-      if (dayType == '周末' && scene == '门市'){
+      if (price.shop == shop && dayType == '周末' && scene == '门市'){
         priceArr[1][0] = price.price
       }
 
-      if (dayType == '周末' && scene == '预约'){
+      if (price.shop == shop && dayType == '周末' && scene == '预约'){
         priceArr[1][1] = price.price
       }
 
-      if (dayType == '周末' && scene == '会员'){
+      if (price.shop == shop && dayType == '周末' && scene == '会员'){
         priceArr[1][2] = price.price
       }
 
-      if (dayType == '节假日' && scene == '门市'){
+      if (price.shop == shop &&  dayType == '节假日' && scene == '门市'){
         priceArr[2][0] = price.price
       }
 
-      if (dayType == '节假日' && scene == '预约'){
+      if (price.shop == shop && dayType == '节假日' && scene == '预约'){
         priceArr[2][1] = price.price
       }
 
-      if (dayType == '节假日' && scene == '会员'){
+      if (price.shop == shop && dayType == '节假日' && scene == '会员'){
         priceArr[2][2] = price.price
       }
       that.setData({priceArr: priceArr})
@@ -203,6 +204,24 @@ Page({
     that.getSingleCategory(select.id)
     //that.getSingleCategory(select.id)
   },
+  onTabChange(e){
+    var that = this
+    switch(e.detail.index){
+        case 0:
+            that.setData({shop: '万龙体验中心'})
+            break
+        case 1:
+            that.setData({shop: '崇礼旗舰店'})
+            break
+        case 2:
+            that.setData({shop: '南山'})
+            break
+        default:
+            break
+    }
+    that.setPriceArr(that.data.shop)
+    console.log('tab change', e)
+  },
   checkSameLevel(e){
     var that = this
     if (e.detail.value.length == 1){
@@ -261,8 +280,7 @@ Page({
         try{
             for(var i = 0; i < priceArr.length; i++){
                 for(var j = 0; j < priceArr[i].length; j++){
-                    if (isNaN(priceArr[i][j]) || priceArr[i][j] != '' ){
-                    
+                    if (isNaN(priceArr[i][j]) || priceArr[i][j].toString() == '' ){
                         priceValid = false
                     }
                 }
@@ -292,6 +310,7 @@ Page({
     var id = e.currentTarget.id
     if (id == 'deposit'){
         cat.deposit = e.detail.value
+        that.setData({selectedCategory: cat})
         that.checkValid()
         
     }
@@ -303,6 +322,7 @@ Page({
                 }
             }
         }
+        that.setData({priceArr: priceArr})
         that.checkValid()
     }
   },
