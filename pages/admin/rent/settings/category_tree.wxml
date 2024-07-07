@@ -82,7 +82,7 @@
     <mp-cell>
         <view style="color: red;">{{canSave? '': canSaveMsg}}</view>
     </mp-cell>
-    <mp-cell><button class="input" disabled="{{!canSave}}"> 保 存 </button></mp-cell>
+    <mp-cell><button class="input" disabled="{{!canSave || isSaving}}" bind:tap="save" > 保 存 </button></mp-cell>
   </mp-cells>
   <mp-cells title="删除分类">
     <mp-cell>

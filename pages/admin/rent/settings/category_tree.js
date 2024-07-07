@@ -43,7 +43,8 @@ Page({
     canSaveMsg: '租金押金必须设置在最终一级的分类上。',
     currentShop: '万龙体验中心',
     currentShopIndex: 0,
-    needSave: false
+    depositChanged: false,
+    isSaving: false
   },
 
   getData(){
@@ -285,8 +286,9 @@ Page({
     }
     else{
         var priceValid = true
-        var priceArr = that.data.shopPriceArr[that.data.currentShopIndex]
+        
         try{
+            var priceArr = that.data.shopPriceArr[that.data.currentShopIndex]
             for(var i = 0; i < priceArr.length; i++){
                 for(var j = 0; j < priceArr[i].length; j++){
                     if (isNaN(priceArr[i][j]) || priceArr[i][j].toString() == '' ){
@@ -321,9 +323,8 @@ Page({
     var id = e.currentTarget.id
     if (id == 'deposit'){
         cat.deposit = e.detail.value
-        that.setData({selectedCategory: cat, needSave: true})
+        that.setData({selectedCategory: cat, depositChanged: true})
         that.checkValid()
-        
     }
     else if (id.indexOf('price_')==0){
         for(var i = 0; i < priceArr.length; i++){
@@ -336,6 +337,90 @@ Page({
         shopPriceArr[shopIndex] = priceArr
         that.setData({shopPriceArr: shopPriceArr, needSave: true})
         that.checkValid()
+    }
+  },
+
+  save(){
+    var that = this
+    that.setData({isSaving: true})
+    var cat = that.data.selectedCategory
+    if (that.data.depositChanged){
+        var saveDepositUrl = 'https://' +  app.globalData.domainName 
+        + '/core/RentSetting/UpdateCategory/' + cat.code + '?name=' 
+        + encodeURIComponent(cat.name) + '&deposit=' + cat.deposit.toString()
+        + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
+        + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+        wx.request({
+          url: saveDepositUrl,
+          method:'GET',
+          success:(res)=>{
+              if(res.statusCode == 200){
+                wx.showToast({
+                  title: '押金保存成功',
+                  icon: 'success'
+                })
+              }
+              
+          }
+        })
+    }
+    var shopName = that.data.shops[that.data.currentShopIndex].shop.trim()
+    var priceArr = that.data.shopPriceArr[that.data.currentShopIndex]
+    that.setData({saveNum: 0})
+    for(var i = 0; i < priceArr.length; i++){
+        var dayType = ''
+        switch(i){
+            case 0:
+                dayType = '平日'
+                break
+            case 1:
+                dayType = '周末'
+                break
+            case 2:
+                dayType = '节假日'
+                break
+            default:
+                break
+        }
+        for(var j = 0; j < priceArr[i].length; j++){
+            //var dayType = ''
+            var scene = ''
+            switch(j){
+                case 0:
+                    scene = '门市'
+                    break
+                case 1:
+                    scene = '预约'
+                    break
+                case 2:
+                    scene = '会员'
+                    break
+                default:
+                    break
+            }
+            var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetShopCategoryRentPrice/'
+            + cat.code + '?shop=' + encodeURIComponent(shopName) + '&dayType=' + encodeURIComponent(dayType)
+            + '&scene=' + encodeURIComponent(scene) + '&price=' + parseFloat(priceArr[i][j]).toString()
+            + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+            wx.request({
+              url: saveUrl,
+              method: 'GET',
+              success:(res)=>{
+                  if (res.statusCode == 200){
+                      var saveNum = that.data.saveNum
+                      saveNum++
+                      if (saveNum==9){
+                          that.setData({saveNum: 0, isSaving: false})
+                      }
+                      else{
+                          that.setData({saveNum: saveNum})
+                      }
+                  }
+              }
+            })
+
+
+        }
     }
   },
 
