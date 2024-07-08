@@ -91,6 +91,13 @@ Page({
             (  cat.priceList != undefined && cat.priceList != null && cat.priceList.length > 0 )){
           that.setCategoryPriceArr()
         }
+        else{
+            var shopPriceArr = [ [['-','-','-'],['-','-','-'],['-','-','-']],
+            [['-','-','-'],['-','-','-'],['-','-','-']],[['-','-','-'],['-','-','-'],['-','-','-']],]
+            cat.deposit = '-'
+
+            that.setData({selectedCategory: cat, shopPriceArr})
+        }
         
       }
     })
@@ -145,6 +152,7 @@ Page({
       }
     }
     that.setData({shopPriceArr: shopPriceArr})
+    that.checkValid()
   },
 
   getShopIndex(shopName){
@@ -230,6 +238,7 @@ Page({
   onTabChange(e){
     var that = this
     that.setData({currentShopIndex: e.detail.index})
+    that.getSingleCategory(that.data.selectedCategory.code)
     console.log('tab change', e)
   },
   checkSameLevel(e){
