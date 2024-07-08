@@ -368,6 +368,7 @@ Page({
                   title: '押金保存成功',
                   icon: 'success'
                 })
+                that.setData({depositChanged: false})
               }
               
           }
@@ -420,6 +421,10 @@ Page({
                       saveNum++
                       if (saveNum==9){
                           that.setData({saveNum: 0, isSaving: false})
+                          wx.showToast({
+                            title: '租金保存成功。',
+                            icon:'success'
+                          })
                       }
                       else{
                           that.setData({saveNum: saveNum})
