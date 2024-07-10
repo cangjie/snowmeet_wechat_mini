@@ -4,7 +4,8 @@
     selectKey="{{selectedCode}}"
     bind:select="handleSelect"
     isSelectLastNode="true"
-    isOpenAll="true"
+    isOpenAll="{{false}}"
+    checkBox="{{false}}"
   ></tree>
   <mp-cells title="当前分类" >
     <mp-cell>

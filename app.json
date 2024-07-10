@@ -101,7 +101,9 @@
     "pages/admin/rent/unreturned",
     "pages/admin/maintain/maintain_in_stock",
     "pages/test/tree/tree",
-    "pages/admin/rent/settings/category_tree"
+    "pages/admin/rent/settings/category_tree",
+    "pages/admin/rent/settings/rent_package",
+    "pages/admin/rent/settings/rent_package_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

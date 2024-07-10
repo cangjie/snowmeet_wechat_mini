@@ -207,6 +207,8 @@ Page({
       case 'category_tree':
         path = '/pages/admin/rent/settings/category_tree'
         break
+      case 'rent_package':
+        path = '/pages/admin/rent/settings/rent_package'
       default:
         break
     }

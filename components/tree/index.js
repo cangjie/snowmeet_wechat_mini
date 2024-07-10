@@ -29,6 +29,10 @@
     isOpenAll: { //是否展开全部节点
       type: Boolean,
       value: false
+    },
+    checkBox:{
+      type: Boolean,
+      value: true
     }
   },
   observers: {
@@ -47,11 +51,18 @@
   data: {
     tree: []
   },
+  lifetimes:{
+    ready(){
+      var that = this
+      that.setData({checkBox: that.properties.checkBox})
+    }
+  },
 
   /**
    * 组件的方法列表
    */
   methods: {
+    
     isOpen(e) {
       const open = 'tree[' + e.currentTarget.dataset.index + '].open'
       this.setData({
