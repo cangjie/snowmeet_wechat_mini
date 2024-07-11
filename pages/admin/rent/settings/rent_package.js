@@ -9,6 +9,13 @@ Page({
     selectedCode:['0101', '0202']
   },
 
+  handleSelect(e){
+    console.log('select', e)
+  },
+  handleCheck(e){
+    console.log('check', e)
+  },
+
   getDataTree(){
     var that = this
     var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetAllCategories'

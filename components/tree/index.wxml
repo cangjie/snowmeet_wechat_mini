@@ -9,7 +9,9 @@
       <view class="tree-item-name {{selectKey == item.id ? 'tree-item-name-select' : '' }}" bindtap="select" data-item="{{item}}" data-index="{{index}}">
         <view class="name" style="display: flex;flex-direction: row;">
           <view style="width: 450rpx;">
-            <checkbox wx:if="{{checkBox}}" disabled="{{item.children || item.children.length > 0  }}" checked="{{item.checked}}" value="{{item.id}}">{{item.id}} {{item.name}}</checkbox>
+            <checkbox-group wx:if="{{checkBox}}" bindchange="checkChange" id="{{item.id}}" >
+              <checkbox disabled="{{item.children || item.children.length > 0  }}"  checked="{{item.checked}}" value="{{item.id}}">{{item.id}} {{item.name}}</checkbox>
+            </checkbox-group>
             <block wx:else >{{item.id}} {{item.name}}</block></view>
           
         </view>

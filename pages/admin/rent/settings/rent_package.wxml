@@ -6,5 +6,6 @@
     isSelectLastNode="true"
     isOpenAll="{{false}}"
     checkBox="{{true}}"
+    bind:check="handleCheck"
   ></tree>
 </view>

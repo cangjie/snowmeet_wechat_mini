@@ -64,7 +64,16 @@
    * 组件的方法列表
    */
   methods: {
-    
+    checkChange(e){
+      console.log(e)
+      var that = this
+      var id = e.currentTarget.id
+      var checked = true
+      if (e.detail.value.length == 0){
+        checked = false
+      }
+      that.triggerEvent('check', {id: id, checked: checked}, { bubbles: true, composed: true })
+    },
     isOpen(e) {
       const open = 'tree[' + e.currentTarget.dataset.index + '].open'
       this.setData({
