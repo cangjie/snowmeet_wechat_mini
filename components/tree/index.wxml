@@ -8,7 +8,9 @@
       </view>
       <view class="tree-item-name {{selectKey == item.id ? 'tree-item-name-select' : '' }}" bindtap="select" data-item="{{item}}" data-index="{{index}}">
         <view class="name" style="display: flex;flex-direction: row;">
-          <view style="width: 450rpx;"><checkbox wx:if="{{checkBox}}" disabled="{{item.children && item.children.length > 0 && item.open }}" checked="{{true}}" value="{{item.id}}">{{item.name}}</checkbox><block wx:else >{{item.name}}</block></view>
+          <view style="width: 450rpx;">
+            <checkbox wx:if="{{checkBox}}" disabled="{{item.children || item.children.length > 0  }}" checked="{{item.checked}}" value="{{item.id}}">{{item.id}} {{item.name}}</checkbox>
+            <block wx:else >{{item.id}} {{item.name}}</block></view>
           
         </view>
         <view class="img">
@@ -21,7 +23,7 @@
       dataTree='{{ item.children }}'
       selectKey="{{selectKey}}"
       isSelectLastNode="{{isSelectLastNode}}"
-      isOpenAll="{{isOpenAll}}"
+      isOpenAll="{{item.open}}"
       checkBox="{{checkBox}}"
     >
     </c-tree>

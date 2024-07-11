@@ -1,2 +1,10 @@
-<!--pages/admin/rent/settings/rent_package.wxml-->
-<text>pages/admin/rent/settings/rent_package.wxml</text>
+<view>
+  <tree
+    dataTree="{{dataTree}}"
+    selectKey="{{selectedCode}}"
+    bind:select="handleSelect"
+    isSelectLastNode="true"
+    isOpenAll="{{false}}"
+    checkBox="{{true}}"
+  ></tree>
+</view>

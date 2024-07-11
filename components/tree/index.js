@@ -38,7 +38,9 @@
   observers: {
     'dataTree': function(params) {
       params.forEach(v => {
-        v.open = this.properties.isOpenAll // 是否展开
+        if (this.properties.isOpenAll){
+          v.open = this.properties.isOpenAll // 是否展开
+        }
       })
       this.setData({
         tree: params
