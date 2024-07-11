@@ -1,5 +1,6 @@
 {
   "usingComponents": {
     "tree": "/components/tree/index"
-  }
+  },
+  "navigationBarTitleText": "套餐详情"
 }

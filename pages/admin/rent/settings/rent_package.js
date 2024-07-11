@@ -6,7 +6,7 @@ Page({
    * Page initial data
    */
   data: {
-    selectedCode:['0101', '0202', '0302']
+    selectedCode:[]
   },
 
   handleSelect(e){
@@ -61,7 +61,36 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.getDataTree()
+    var id = options.id
+    that.setData({id: id})
+    app.loginPromiseNew.then(function(resolve){
+      that.getPackage()
+      //that.getDataTree()
+
+    })
+    
+  },
+
+  getPackage(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetRentPackage/' + that.data.id
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var rentPackage = res.data
+        var selectedCode = []
+        for(var i = 0; i < rentPackage.rentPackageCategoryList.length; i++){
+          selectedCode.push(rentPackage.rentPackageCategoryList[i].category_code)
+        }
+        rentPackage.need_save = false
+        that.setData({rentPackage: rentPackage, selectedCode: selectedCode})
+        that.getDataTree()
+      }
+    })
   },
 
   /**
