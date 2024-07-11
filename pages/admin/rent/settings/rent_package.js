@@ -6,7 +6,7 @@ Page({
    * Page initial data
    */
   data: {
-    selectedCode:['0101', '0202']
+    selectedCode:['0101', '0202', '0302']
   },
 
   handleSelect(e){
