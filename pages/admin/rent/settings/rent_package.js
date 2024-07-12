@@ -113,6 +113,61 @@ Page({
     })
   },
 
+  keyInput(e){
+    var that = this
+    var v = e.detail.value
+    var id = e.currentTarget.id
+    var rentPackage = that.data.rentPackage
+    switch(id){
+      case 'name':
+        rentPackage.name = v
+        rentPackage.need_save = true
+        break
+      case 'description':
+        rentPackage.description = v
+        rentPackage.need_save = true
+        break
+      case 'deposit':
+        rentPackage.deposit = v
+        if (isNaN(v) || v.toString().trim() == ''){
+          rentPackage.need_save = false
+          wx.showToast({
+            title: '押金必须是数字。',
+            icon: 'error'
+          })
+        }
+        else {
+          rentPackage.deposit = parseFloat(v)
+          rentPackage.need_save = true
+        }
+        break
+      default:
+        break
+    }
+    that.setData({rentPackage: rentPackage})
+  },
+  saveBaseInfo(){
+    var that = this
+    var pack = that.data.rentPackage
+    var saveUrl = 'https://' + app.globalData.domainName 
+    + '/core/RentSetting/UpdateRentPackageBaseInfo/'
+    + pack.id.toString() + '?name=' + encodeURIComponent(pack.name) 
+    + '&description=' + encodeURIComponent(pack.description)
+    + '&deposit=' + encodeURIComponent(pack.deposit.toString())
+    + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: saveUrl,
+      method:'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.getPackage()
+      }
+    })
+  },
+
   /**
    * Lifecycle function--Called when page is initially rendered
    */

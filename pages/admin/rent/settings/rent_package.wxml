@@ -2,16 +2,26 @@
   <mp-cells title="套餐名称" >
     <mp-cell>
       <view>
-        <input  style="width:400rpx;" class="input item-center" value="{{rentPackage.name}}"/>
+        <input id="name" bindinput="keyInput" style="width:400rpx;" class="input item-center" value="{{rentPackage.name}}"/>
       </view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="套餐简介" >
     <mp-cell>
       <view>
-        <textarea class="input item-center" style="width: 400rpx;height: 200rpx; " value="{{rentPackage.description}}" ></textarea> 
+        <textarea id="description" bindinput="keyInput" class="input item-center" style="width: 400rpx;height: 200rpx; " value="{{rentPackage.description}}" ></textarea> 
       </view>
     </mp-cell>
+  </mp-cells>
+  <mp-cells title="设置押金" >
+    <mp-cell>
+      <view>
+        <input id="deposit" bindinput="keyInput" class="input item-center" style="width:200rpx; text-align: center;" value="{{rentPackage.deposit}}" />
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="" >
+    <mp-cell><button class="input" disabled="{{!rentPackage.need_save}}" bind:tap="saveBaseInfo"> 保 存 </button></mp-cell>
   </mp-cells>
   <mp-cells title="选择分类">
     <mp-cell>
