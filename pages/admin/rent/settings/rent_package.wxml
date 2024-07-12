@@ -23,6 +23,7 @@
   <mp-cells title="" >
     <mp-cell><button class="input" disabled="{{!rentPackage.need_save}}" bind:tap="saveBaseInfo"> 保 存 </button></mp-cell>
   </mp-cells>
+
   <mp-cells title="选择分类">
     <mp-cell>
       <tree
@@ -34,6 +35,9 @@
         bind:check="handleCheck"
       ></tree>
     </mp-cell>
+  </mp-cells>
+  <mp-cells title="价格设定" >
+    <mp-cell><price-matrix></price-matrix></mp-cell>
   </mp-cells>
   
 </view>

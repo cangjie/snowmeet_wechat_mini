@@ -6,7 +6,8 @@ Page({
    * Page initial data
    */
   data: {
-    selectedCode:[]
+    selectedCode:[],
+    
   },
 
   handleSelect(e){
@@ -163,6 +164,10 @@ Page({
         if (res.statusCode != 200){
           return
         }
+        wx.showToast({
+          title: '保存成功',
+          icon: 'success'
+        })
         that.getPackage()
       }
     })

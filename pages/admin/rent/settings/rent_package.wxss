@@ -1,1 +1,3 @@
 /* pages/admin/rent/settings/rent_package.wxss */
+@import '/common.wxss';
+@import '/components/price_matrix/price_matrix.wxss'

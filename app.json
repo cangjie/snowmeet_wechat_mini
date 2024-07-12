@@ -103,7 +103,8 @@
     "pages/test/tree/tree",
     "pages/admin/rent/settings/category_tree",
     "pages/admin/rent/settings/rent_package",
-    "pages/admin/rent/settings/rent_package_list"
+    "pages/admin/rent/settings/rent_package_list",
+    "pages/test/price_matrix/price_matrix"
   ],
   "window": {
     "backgroundTextStyle": "light",

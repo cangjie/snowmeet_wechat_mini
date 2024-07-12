@@ -15,7 +15,6 @@ Page({
     selectedCategory:undefined,
     canDelete: false,
     shops:[
-
       {
         title: '万龙',
         title2: '',

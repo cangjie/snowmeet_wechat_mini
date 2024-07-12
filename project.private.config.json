@@ -11,7 +11,7 @@
       "list": [
         {
           "name": "tree",
-          "pathName": "/pages/test/tree/tree",
+          "pathName": "/pages/test/price_matrix/price_matrix",
           "query": "",
           "launchMode": "default",
           "scene": null

@@ -1,0 +1,30 @@
+<mp-tabs
+  tabs="{{shops}}" 
+  swiperClass="weui-tabs-swiper"
+  bindtabclick="onTabCLick"
+  bindchange="onTabChange"
+  activeClass="tab-bar-title__selected"   
+>
+  <block wx:for="{{shops}}" wx:key="title" >  
+    <view class="tab-content" slot="tab-content-{{index}}" style="display: flex;flex-direction: column;"  >
+      <view style="display: flex;flex-direction: row;" >
+        <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;" >-</view>
+        <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+      </view>
+      
+      <view wx:for="{{fieldsY}}" style="display: flex;flex-direction: row;" >
+        <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;" >{{item}}</view>
+        <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" ></view>
+      </view>
+    </view>
+    <!--view style="margin-left: 0rpx;"  -->
+      
+      <!--
+      <view class="view-row">
+        <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;" >-</view>
+        <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+      </view>
+      -->
+    <!--/view-->
+  </block>
+</mp-tabs>
