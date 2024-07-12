@@ -14,6 +14,26 @@ Page({
   },
   handleCheck(e){
     console.log('check', e)
+    var act = e.detail.checked? 'Add' : 'Del'
+    var that = this
+    var setUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/RentPackageCategory' 
+    + act + '/' + that.data.rentPackage.id + '?code=' + e.detail.id 
+    + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
+    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: setUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          wx.showToast({
+            title: '报错失败',
+            icon:'error'
+          })
+          return
+        }
+        that.getPackage()
+      }
+    })
   },
 
   getDataTree(){

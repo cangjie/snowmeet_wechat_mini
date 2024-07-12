@@ -121,3 +121,7 @@ button{
 .no-padding{
   padding: 0rpx;
 }
+.item-center{
+  margin-left: auto;
+  margin-right: auto;
+}
