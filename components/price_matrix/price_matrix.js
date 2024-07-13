@@ -24,39 +24,20 @@ Component({
    * Component initial data
    */
   data: {
-    shops:[]
+    shops:[],
+    currentShopIndex: 0
   },
   lifetimes:{
     ready(){
       var that = this
       var matrix = that.properties.priceMatrix
       var shops = []
-      if (matrix.length == 0){
-        shops = [
-          {
-            title: '万龙',
-            title2: '',
-            img: '',
-            desc: '',
-            shop: '万龙体验中心'
-          },
-          {
-            title: '旗舰',
-            title2: '',
-            img: '',
-            desc: '',
-            shop: '崇礼旗舰店'
-          },
-          {
-            title: '南山',
-            title2: '',
-            img: '',
-            desc: '',
-            shop: '南山'
-          }
-        ]
+
+      for(var i = 0; i < matrix.length; i++){
+        shops.push({title: matrix[i].shop, title2: '', img: '', desc: ''})
       }
-      that.setData({shops: shops, fieldsX: that.properties.fieldsX})
+      that.setData({shops: shops, fieldsX: that.properties.fieldsX, fieldsY: that.properties.fieldsY, priceMatrix: that.properties.priceMatrix})
+      this.triggerEvent('TabChange', {index: 0})
     }
   },
 
@@ -64,6 +45,21 @@ Component({
    * Component methods
    */
   methods: {
-
+    onTabChange(e){
+      var that = this
+      that.setData({currentShopIndex: e.detail.index})
+      this.triggerEvent('TabChange', {index: e.detail.index})
+    },
+    setNumber(e){
+      var that = this
+      var currentShopIndex = that.data.currentShopIndex
+      var id = e.currentTarget.id
+      var x = parseInt(id.split('_')[1])
+      var y = parseInt(id.split('_')[2])
+      var matrix = that.data.priceMatrix
+      matrix[currentShopIndex].matrix[x][y] = e.detail.value
+      that.setData({priceMatrix: matrix})
+      this.triggerEvent('mod', {currentShopIndex: currentShopIndex, x: x, y: y, value: e.detail.value})
+    }
   }
 })

@@ -21,7 +21,7 @@
     </mp-cell>
   </mp-cells>
   <mp-cells title="" >
-    <mp-cell><button class="input" disabled="{{!rentPackage.need_save}}" bind:tap="saveBaseInfo"> 保 存 </button></mp-cell>
+    <mp-cell><button class="input" disabled="{{!rentPackage.need_save}}" bind:tap="saveBaseInfo">保存基本信息</button></mp-cell>
   </mp-cells>
 
   <mp-cells title="选择分类">
@@ -37,7 +37,16 @@
     </mp-cell>
   </mp-cells>
   <mp-cells title="价格设定" >
-    <mp-cell><price-matrix></price-matrix></mp-cell>
+    <mp-cell><price-matrix 
+      priceMatrix="{{priceArr}}" 
+      fieldX="{{['门市', '预约', '会员']}}" 
+      fieldY="{{['平日','周末','节假日']}}" 
+      bindmod="modPrice"
+      bindTabChange="tabChange"
+      ></price-matrix></mp-cell>
+    <mp-cell>
+      <button disabled="{{!priceArrayValid || priceSaving}}" class="input" bindtap="savePriceArr" >保存价目表</button>
+    </mp-cell>
   </mp-cells>
   
 </view>

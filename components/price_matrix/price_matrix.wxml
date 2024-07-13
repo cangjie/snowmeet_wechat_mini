@@ -1,7 +1,6 @@
 <mp-tabs
   tabs="{{shops}}" 
   swiperClass="weui-tabs-swiper"
-  bindtabclick="onTabCLick"
   bindchange="onTabChange"
   activeClass="tab-bar-title__selected"   
 >
@@ -12,10 +11,12 @@
         <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
       </view>
       
-      <view wx:for="{{fieldsY}}" style="display: flex;flex-direction: row;" wx:for-index="indexY" >
+      <view wx:for="{{fieldsY}}" style="display: flex;flex-direction: row;" wx:for-index="indexX" >
         <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;" >{{item}}</view>
-        <view style="text-align: center;width: 150rpx;margin: 1rpx"   wx:for="{{fieldsX}}" wx:for-index="indexX" >
-          <input id="price_{{indexX}}_{{indexY}}" bindinput="setNumber" class="input" style="margin:1rpx" />
+        <view style="text-align: center;width: 150rpx;margin: 1rpx"   wx:for="{{fieldsY}}" wx:for-index="indexY" >
+          <input id="price_{{indexX}}_{{indexY}}" bindinput="setNumber" class="input" style="margin:1rpx"
+          value="{{priceMatrix[currentShopIndex].matrix[indexX][indexY]}}"
+          disabled="{{priceMatrix[currentShopIndex].matrix[indexX][indexY]=='-'}}" />
         </view>
       </view>
     </view>
