@@ -208,7 +208,9 @@ Page({
         path = '/pages/admin/rent/settings/category_tree'
         break
       case 'rent_package':
-        path = '/pages/admin/rent/settings/rent_package?id=1' 
+        //path = '/pages/admin/rent/settings/rent_package?id=1' 
+        path = '/pages/admin/rent/settings/rent_package_list' 
+        break
       default:
         break
     }

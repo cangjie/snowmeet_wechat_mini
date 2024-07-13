@@ -1,2 +1,20 @@
-<!--pages/admin/rent/settings/rent_package_list.wxml-->
-<text>pages/admin/rent/settings/rent_package_list.wxml</text>
+<view>
+  <mp-cells title="" >
+    <mp-cell wx:for="{{packageList}}" >
+      <view id="{{item.id}}" bindtap="gotoDetail" >{{item.name}}</view>
+    </mp-cell>
+  </mp-cells>
+  <view style="height: 100rpx;" ></view>
+  <mp-cells title="添加新套餐-填写名称" >
+    <mp-cell>
+      <view>
+        <input style="width: 300rpx;text-align: center;" class="input item-center" bindinput="setNewName" />
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view>
+        <button class="input item-center" disabled="{{newName == ''}}" bindtap="addNew" >添加新套餐</button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

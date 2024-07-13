@@ -1,18 +1,82 @@
 // pages/admin/rent/settings/rent_package_list.js
+const app = getApp()
 Page({
 
   /**
    * Page initial data
    */
   data: {
+    newName: ''
+  },
+
+  getData(){
+    var that = this
+    var getList = 'https://' + app.globalData.domainName + '/core/RentSetting/GetRentPackageList'
+    wx.request({
+      url: getList,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.setData({packageList: res.data})
+      }
+    })
+  },
+  gotoDetail(e){
+    wx.navigateTo({
+      url: 'rent_package?id=' + e.currentTarget.id,
+    })
+  },
+
+  setNewName(e){
+    var that = this
+    that.setData({newName: e.detail.value})
 
   },
+
+  addNew(e){
+    var that = this
+    wx.showModal({
+      title: '即将添加新套餐',
+      content: '套餐名称：' + that.data.newName  ,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/AddRentPackage?'
+          + 'name=' + encodeURIComponent(that.data.newName) + '&description='
+          + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+          wx.request({
+            url: addUrl,
+            method: 'GET',
+            success:(res)=>{
+              wx.showToast({
+                title: '添加成功，进入详情页填写详细信息。',
+                icon: 'success'
+              })
+              wx.navigateTo({
+                url: 'rent_package?id=' + res.data.id
+              })
+            }
+          })
+        }
+      }
+    })
+  },
+ 
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.getData()
+    })
   },
 
   /**
