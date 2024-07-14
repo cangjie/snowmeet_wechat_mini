@@ -12,7 +12,7 @@
             <checkbox-group wx:if="{{checkBox}}" bindchange="checkChange" id="{{item.id}}" >
               <checkbox disabled="{{item.children || item.children.length > 0  }}"  checked="{{item.checked}}" value="{{item.id}}">{{item.id}} {{item.name}}</checkbox>
             </checkbox-group>
-            <block wx:else >{{item.id}} {{item.name}}</block></view>
+            <block wx:else >{{item.displayedCode}} {{item.name}}</block></view>
           
         </view>
         <view class="img">

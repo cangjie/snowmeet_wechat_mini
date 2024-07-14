@@ -1,4 +1,5 @@
 // pages/common/comTree/index.js
+const util = require('../../utils/util')
 /**
  value = [
    {
@@ -38,6 +39,9 @@
   observers: {
     'dataTree': function(params) {
       params.forEach(v => {
+        var code = v.id
+        v.displayedCode = util.getDisplayedCode(code)
+        
         if (this.properties.isOpenAll){
           v.open = this.properties.isOpenAll // 是否展开
         }

@@ -11,11 +11,28 @@
     <mp-cell>
       <view class="view-row">
         <view wx:if="{{selectedCode==''}}" >顶级</view>
-        <view wx:else>{{selectedCode}} {{selectedName}}</view>
+        <view wx:else>{{selectedDisplayedCode}} {{selectedName}}</view>
       </view>
     </mp-cell>
   </mp-cells>
+
   <mp-cells title="添加分类" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >分类序号：</view>
+        <view class="right-column" class="view-row">
+          <view>{{fatherDisplayedCode}}</view>
+          <input class="input" style="width: 50rpx;"  /></view>
+          <view style="width: 50rpx;"></view>
+          <switch bindchange="checkSameLevel" >同级</switch>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >分类名称：</view>
+        <view class="right-column"><input class="input" style="width: 200rpx;"  /></view>
+      </view>
+    </mp-cell>
     <mp-cell >
       <view style="display: flex; flex-direction: row; width: 100%;" >
         <input style="width: 300rpx;" value="{{newName}}"  placeholder="填写分类名称" bindinput="setNewCategoryName"  />

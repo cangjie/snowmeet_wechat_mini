@@ -1,5 +1,6 @@
 // pages/admin/rent/settings/category_tree.js
 const app = getApp()
+const util = require('../../../../utils/util')
 Page({
 
   /**
@@ -227,7 +228,15 @@ Page({
   handleSelect(e){
     var that = this
     var select = e.detail.item
-    that.setData({selectedCode: select.id, selectedName: select.name})
+    var selectedDisplayedCode = util.getDisplayedCode(select.id)
+    var isSameLevel = that.data.isSameLevel
+    var fatherCode = isSameLevel ? select.id.substr(0, select.id.length - 2) : select.id
+    var fatherDisplayedCode = util.getDisplayedCode(fatherCode) 
+    if (fatherDisplayedCode != ''){
+      fatherDisplayedCode = fatherDisplayedCode + '-'
+    }
+    that.setData({selectedCode: select.id, selectedDisplayedCode: selectedDisplayedCode, selectedName: select.name,
+    fatherDisplayedCode: fatherDisplayedCode})
     that.getSingleCategory(select.id)
     //that.getSingleCategory(select.id)
   },
@@ -241,13 +250,17 @@ Page({
     console.log('tab change', e)
   },
   checkSameLevel(e){
+    console.log('check same level', e)
     var that = this
-    if (e.detail.value.length == 1){
-      that.setData({isSameLevel: true})
+    var isSameLevel = e.detail.value
+    var fatherCode = isSameLevel ?  
+      that.data.selectedCategory.code.substr(0, that.data.selectedCategory.code.length - 2) 
+      : that.data.selectedCategory.code
+    var fatherDisplayedCode = util.getDisplayedCode(fatherCode) 
+    if (fatherDisplayedCode != ''){
+      fatherDisplayedCode = fatherDisplayedCode + '-'
     }
-    else{
-      that.setData({isSameLevel: false})
-    }
+    that.setData({isSameLevel: isSameLevel, fatherDisplayedCode: fatherDisplayedCode})
   },
 
   metionDelete(){
