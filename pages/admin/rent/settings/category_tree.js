@@ -15,6 +15,8 @@ Page({
     nowAdding: false,
     selectedCategory:undefined,
     canDelete: false,
+    newSeq: '',
+    newName: '',
     shops:[
       {
         title: '万龙',
@@ -44,7 +46,8 @@ Page({
     currentShop: '万龙体验中心',
     currentShopIndex: 0,
     depositChanged: false,
-    isSaving: false
+    isSaving: false,
+    modName: ''
   },
 
   getData(){
@@ -185,7 +188,102 @@ Page({
     var that = this
     that.setData({newName: newName})
   },
+  addCategory(){
+    var that = this
+    var newSeq = that.data.newSeq.trim()
+    var newName = that.data.newName
+    var msg = ''
+    if (isNaN(newSeq) || newSeq.trim() == ''){
+      msg = '序号必须是两位数字。'
+    }
+    else if (newName.trim() == ''){
+      msg = '必须填写名称'
+    }
+    newSeq = newSeq.length >= 2? newSeq : '0' + newSeq
+    var fatherCode = that.data.selectedCategory.code
+    if (that.data.isSameLevel){
+      fatherCode = fatherCode.substr(0, fatherCode.length - 2)
+    }
+    var newCode = fatherCode + newSeq
+    var sameLevelLeaf = []
+    var codeDup = false
+    var nameDup = false
+    if (fatherCode==''){
+      sameLevelLeaf = that.data.dataTree
+    }
+    else{
+      var fatherNode = that.getCategoryFromDataTree(fatherCode, that.data.dataTree)
+      if (fatherNode == null || fatherNode == undefined 
+        || fatherNode.children == null || fatherNode.children == undefined){
+        sameLevelLeaf = []
+      }
+      else{
+        sameLevelLeaf = fatherNode.children
+      }
+    }
+    for(var i = 0; i < sameLevelLeaf.length; i++){
+      if (sameLevelLeaf[i].id == newCode){
+        codeDup = true
+        break
+      }
+      if (sameLevelLeaf[i].name == newName){
+        nameDup = true
+        break
+      }
+    }
+    if (codeDup){
+      msg = '序号重复'
+    }
+    if (nameDup){
+      msg = '名称重复'
+    }
+    console.log('father', fatherCode)
+    if (msg != ''){
+      wx.showToast({
+        title: msg,
+        icon: 'error'
+      })
+      return
+    }
+    var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/AddCategoryManual/' + newCode
+      + '?name=' + encodeURIComponent(newName) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: addUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        wx.showToast({
+          title: '新分类添加成功',
+          icon:'success'
+        })
+        that.setData({newName: '', newSeq: ''})
+        that.getData()
+        
+      },
+      complete:()=>{
+        that.setData({newName: '', nowAdding: false})
+      }
+    })
+  },
 
+  getCategoryFromDataTree(code, dataTree){
+    var that = this
+    that.setData({nowAdding: true})
+    //var dataTree = that.data.dataTree
+    for(var i = 0; i < dataTree.length; i++){
+      if (code.indexOf(dataTree[i].id) == 0){
+        if (code == dataTree[i].id){
+          return dataTree[i]
+        }
+        else {
+          that.getCategoryFromDataTree(code, dataTree[i])
+        }
+      }
+    }
+  },
   add(){
     var that = this
     var newName = that.data.newName
@@ -220,7 +318,7 @@ Page({
         
       },
       complete:()=>{
-        that.setData({newName: '', nowAdding: false})
+        that.setData({newName: '',newSeq: '', nowAdding: false})
       }
     })
   },
@@ -236,7 +334,7 @@ Page({
       fatherDisplayedCode = fatherDisplayedCode + '-'
     }
     that.setData({selectedCode: select.id, selectedDisplayedCode: selectedDisplayedCode, selectedName: select.name,
-    fatherDisplayedCode: fatherDisplayedCode})
+    fatherDisplayedCode: fatherDisplayedCode, modName: select.name})
     that.getSingleCategory(select.id)
     //that.getSingleCategory(select.id)
   },
@@ -448,6 +546,55 @@ Page({
 
         }
     }
+  },
+
+  setNewCategory(e){
+    var that = this
+    var v = e.detail.value
+    switch(e.currentTarget.id){
+      case 'newSeq':
+        
+        that.setData({newSeq: v})
+        break
+      case 'newSeqName':
+        that.setData({newName: v})
+        break
+      default:
+        break
+    }
+  },
+  setModName(e){
+    var that = this
+    that.setData({modName: e.detail.value})
+  },
+  modCategoryName(e){
+    var that = this
+    var selectedCategory = that.data.selectedCategory
+    var modName = that.data.modName.trim()
+    if (modName == undefined || modName == null || modName == ''){
+      wx.showToast({
+        title: '分类名称必须填写',
+        icon: 'error'
+      })
+      return
+    }
+    var modUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/ModCategory/' + selectedCategory.code 
+    + '?name=' + encodeURIComponent(modName) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: modUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        wx.showToast({
+          title: '修改成功',
+          icon: 'success'
+        })
+        that.getData()
+      }
+    })
   },
 
   /**

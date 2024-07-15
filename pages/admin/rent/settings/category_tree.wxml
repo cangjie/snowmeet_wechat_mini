@@ -15,6 +15,19 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <mp-cells title="修改分类名称" >
+    <mp-cell>
+      <view class="view-row" style="display: flex; justify-content: center;margin: 10rpx" >
+        <input class="input" style="width: 350rpx;height: 60rpx; text-align: center;" 
+        placeholder="{{selectedCategory.name}}" 
+        disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}" 
+        bindinput="setModName" />
+       <view style="width: 50rpx;"></view>
+        <button size="mini" class="input" style="margin: 5rpx" 
+        disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}"  bind:tap="modCategoryName" >确认</button>
+      </view>
+    </mp-cell>
+  </mp-cells>
 
   <mp-cells title="添加分类" >
     <mp-cell>
@@ -22,25 +35,21 @@
         <view class="left-column" >分类序号：</view>
         <view class="right-column" class="view-row">
           <view>{{fatherDisplayedCode}}</view>
-          <input class="input" style="width: 50rpx;"  /></view>
+          <input id="newSeq" bindinput="setNewCategory" class="input" style="width: 50rpx;" disabled="{{selectedCategory == undefined}}" value="{{newSeq}}" /></view>
           <view style="width: 50rpx;"></view>
-          <switch bindchange="checkSameLevel" >同级</switch>
+          <switch bindchange="checkSameLevel" disabled="{{selectedCategory == undefined}}" checked="{{isSameLevel}}"  >同级</switch>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >分类名称：</view>
-        <view class="right-column"><input class="input" style="width: 200rpx;"  /></view>
+        <view class="right-column">
+          <input id="newSeqName" bindinput="setNewCategory" class="input" style="width: 200rpx;" disabled="{{selectedCategory == undefined}}"  value="{{newName}}" />
+        </view>
       </view>
     </mp-cell>
-    <mp-cell >
-      <view style="display: flex; flex-direction: row; width: 100%;" >
-        <input style="width: 300rpx;" value="{{newName}}"  placeholder="填写分类名称" bindinput="setNewCategoryName"  />
-        <checkbox-group bindchange="checkSameLevel">
-          <checkbox disabled="{{selectedCode==''}}" checked="{{isSameLevel}}">同级</checkbox>
-        </checkbox-group>
-        <button size="mini" class="input" bind:tap="add" disabled="{{nowAdding}}" > 添 加 </button>
-      </view>
+    <mp-cell>
+      <button class="input" disabled="{{selectedCategory == undefined}}" bind:tap="addCategory"  > 添 加 分 类 </button>
     </mp-cell>
   </mp-cells>
   <mp-cells title="押金设定" >
