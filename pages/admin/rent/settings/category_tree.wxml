@@ -1,7 +1,7 @@
 <view wx:if="{{isAdmin}}">
   <tree
     dataTree="{{dataTree}}"
-    selectKey="{{selectedCode}}"
+    selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
     bind:select="handleSelect"
     isSelectLastNode="true"
     isOpenAll="{{false}}"
@@ -15,18 +15,28 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="修改分类名称" >
+  <mp-cells title="修改分类" >
     <mp-cell>
-      <view class="view-row" style="display: flex; justify-content: center;margin: 10rpx" >
-        <input class="input" style="width: 350rpx;height: 60rpx; text-align: center;" 
-        placeholder="{{selectedCategory.name}}" 
-        disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}" 
-        bindinput="setModName" />
-       <view style="width: 50rpx;"></view>
-        <button size="mini" class="input" style="margin: 5rpx" 
-        disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}"  bind:tap="modCategoryName" >确认</button>
+      <view class="view-row" style="margin: 10rpx" >
+        <view class="left-column" style="width: 250rpx;display: flex;flex-direction: row;" >
+          <view style="margin-top: 7rpx;width: 200rpx;">01-02-</view>
+          <input value="03" style="width: 50rpx; text-align: center;" class="input" />
+        </view>
+        <view class="right-column" style="width: 450rpx;" >
+          <input class="input" style="margin-left: auto; margin-right: auto;text-align: center; width: 200rpx;" 
+            placeholder="{{selectedCategory.name}}" 
+            disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}" 
+            bindinput="setModName" />
+        </view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <button  class="input" style="margin-left: auto; margin-right: auto;" 
+        disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}"  bind:tap="modCategoryName" > 确 认 修 改 </button>
+      </view>
+    </mp-cell>
+
   </mp-cells>
 
   <mp-cells title="添加分类" >

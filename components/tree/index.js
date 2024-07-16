@@ -39,7 +39,7 @@ const util = require('../../utils/util')
   observers: {
     'dataTree': function(params) {
       params.forEach(v => {
-        var code = v.id
+        var code = v.code
         v.displayedCode = util.getDisplayedCode(code)
         
         if (this.properties.isOpenAll){

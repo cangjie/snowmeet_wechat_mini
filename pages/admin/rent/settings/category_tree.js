@@ -174,7 +174,7 @@ Page({
   convertDataTree(data){
     var dataArr = []
     for(var i = 0; i < data.length; i++){
-      var leaf = {id: data[i].code, name: data[i].name}
+      var leaf = {id: data[i].id, code: data[i].code, name: data[i].name}
       if (data[i].children != undefined && data[i].children != null){
         leaf.children = this.convertDataTree(data[i].children)
       }
@@ -222,7 +222,7 @@ Page({
       }
     }
     for(var i = 0; i < sameLevelLeaf.length; i++){
-      if (sameLevelLeaf[i].id == newCode){
+      if (sameLevelLeaf[i].code == newCode){
         codeDup = true
         break
       }
@@ -274,8 +274,8 @@ Page({
     that.setData({nowAdding: true})
     //var dataTree = that.data.dataTree
     for(var i = 0; i < dataTree.length; i++){
-      if (code.indexOf(dataTree[i].id) == 0){
-        if (code == dataTree[i].id){
+      if (code.indexOf(dataTree[i].code) == 0){
+        if (code == dataTree[i].code){
           return dataTree[i]
         }
         else {
@@ -326,16 +326,16 @@ Page({
   handleSelect(e){
     var that = this
     var select = e.detail.item
-    var selectedDisplayedCode = util.getDisplayedCode(select.id)
+    var selectedDisplayedCode = util.getDisplayedCode(select.code)
     var isSameLevel = that.data.isSameLevel
-    var fatherCode = isSameLevel ? select.id.substr(0, select.id.length - 2) : select.id
+    var fatherCode = isSameLevel ? select.code.substr(0, select.code.length - 2) : select.code
     var fatherDisplayedCode = util.getDisplayedCode(fatherCode) 
     if (fatherDisplayedCode != ''){
       fatherDisplayedCode = fatherDisplayedCode + '-'
     }
-    that.setData({selectedCode: select.id, selectedDisplayedCode: selectedDisplayedCode, selectedName: select.name,
+    that.setData({selectedCategory: select, selectedDisplayedCode: selectedDisplayedCode, 
     fatherDisplayedCode: fatherDisplayedCode, modName: select.name})
-    that.getSingleCategory(select.id)
+    that.getSingleCategory(select.code)
     //that.getSingleCategory(select.id)
   },
   onTabCLick(e){
@@ -363,8 +363,8 @@ Page({
 
   metionDelete(){
     var that = this
-    var selectedCode = that.data.selectedCode
-    var selectedName = that.data.selectedName
+    var selectedCode = that.data.selectedCategory.code
+    var selectedName = that.data.selectedCategory.name
     wx.showModal({
       title: '确认删除分类：' + selectedCode + ' ' + selectedName ,
       content: '',
