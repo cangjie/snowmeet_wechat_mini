@@ -17,37 +17,27 @@ Page({
     canDelete: false,
     newSeq: '',
     newName: '',
-    shops:[
-      {
-        title: '万龙',
-        title2: '',
-        img: '',
-        desc: '',
-        shop: '万龙体验中心'
-      },
-      {
-        title: '旗舰',
-        title2: '',
-        img: '',
-        desc: '',
-        shop: '崇礼旗舰店'
-      },
-      {
-        title: '南山',
-        title2: '',
-        img: '',
-        desc: '',
-        shop: '南山'
-      }
-    ],
-    priceArr:[['-','-','-'],['-','-','-'],['-','-','-']],
     canSave: false,
     canSaveMsg: '租金押金必须设置在最终一级的分类上。',
     currentShop: '万龙体验中心',
     currentShopIndex: 0,
     depositChanged: false,
     isSaving: false,
-    modName: ''
+    modName: '',
+    priceArr:[
+      {
+        shop: '万龙',
+        matrix:[['','',''],['','',''],['','','']]
+      },
+      {
+        shop: '旗舰',
+        matrix:[['','',''],['','',''],['','','']]
+      },
+      {
+        shop: '南山',
+        matrix:[['','',''],['','',''],['','','']]
+      }
+    ]
   },
 
   getData(){
@@ -95,17 +85,95 @@ Page({
           that.setCategoryPriceArr()
         }
         else{
-            var shopPriceArr = [ [['-','-','-'],['-','-','-'],['-','-','-']],
-            [['-','-','-'],['-','-','-'],['-','-','-']],[['-','-','-'],['-','-','-'],['-','-','-']],]
+            var shopPriceArr = [ ['-','-','-'],['-','-','-'],['-','-','-']]
             cat.deposit = '-'
+            var priceArr = that.data.priceArr
+            for(var i = 0; i < priceArr.length; i++){
+              priceArr[i].matrix = shopPriceArr
+            }
 
-            that.setData({selectedCategory: cat, shopPriceArr})
+
+            that.setData({selectedCategory: cat, priceArr: priceArr})
         }
         
       }
     })
   },
+  setCategoryPriceArr(){
+    var that = this
+    var priceArr = that.data.priceArr
+    var cat = that.data.selectedCategory
+    for(var i = 0; i < priceArr.length; i++){
+      priceArr[i].matrix = [['','',''],['','',''],['','','']]
+    }
+    for(var i = 0; i < cat.priceList.length; i++){
+      var price = cat.priceList[i]
+      var shop = ''
+      switch(price.shop){
+        case '万龙体验中心':
+          shop = '万龙'
+          break
+        case '崇礼旗舰店':
+           shop = '旗舰'
+           break
+        case '南山':
+          shop = '南山'
+          break
+        default:
+          break   
+      }
+      var matrix = undefined
+      for(var j = 0; j < priceArr.length; j++){
+        if (priceArr[j].shop == shop){
+          matrix = priceArr[j].matrix
+          break
+        }
+      }
+      if (matrix == undefined){
+        continue
+      }
+      var rowIndex = -1
+      var colIndex = -1
+      switch(price.scene)
+      {
+        case '门市':
+          colIndex = 0
+          break
+        case '预约':
+          colIndex = 1
+          break
+        case '会员':
+          colIndex = 2
+          break
+        default:
+          break
+      }
+      switch(price.day_type)
+      {
+        case '平日':
+          rowIndex = 0
+          break
+        case '周末':
+          rowIndex = 1
+          break
+        case '节假日':
+          rowIndex = 2
+          break
+        default:
+          break
+      }
+      matrix[rowIndex][colIndex] = price.price
+    }
+    that.setData({priceArr: priceArr})
+  },
+  tabChange(e){
+    console.log('tab change', e)
+  },
+  modPrice(e){
+    console.log('mod price', e)
+  },
 
+/*
   setCategoryPriceArr(){
     var that = this
     var shopPriceArr = [[['','',''],['','',''],['','','']],
@@ -157,7 +225,7 @@ Page({
     that.setData({shopPriceArr: shopPriceArr})
     that.checkValid()
   },
-
+*/
   getShopIndex(shopName){
     var that = this
     var shops = that.data.shops
@@ -329,12 +397,16 @@ Page({
     var selectedDisplayedCode = util.getDisplayedCode(select.code)
     var isSameLevel = that.data.isSameLevel
     var fatherCode = isSameLevel ? select.code.substr(0, select.code.length - 2) : select.code
+    var grandpaCode = select.code.substr(0, select.code.length - 2)
     var fatherDisplayedCode = util.getDisplayedCode(fatherCode) 
+    var grandpaDisplayedCode = util.getDisplayedCode(grandpaCode)
+    grandpaDisplayedCode = grandpaDisplayedCode != '' ? grandpaDisplayedCode + '-' : grandpaDisplayedCode
     if (fatherDisplayedCode != ''){
       fatherDisplayedCode = fatherDisplayedCode + '-'
     }
+    var seq = select.code.substr(select.code.length - 2, 2)
     that.setData({selectedCategory: select, selectedDisplayedCode: selectedDisplayedCode, 
-    fatherDisplayedCode: fatherDisplayedCode, modName: select.name})
+    fatherDisplayedCode: fatherDisplayedCode, modName: select.name, grandpaDisplayedCode: grandpaDisplayedCode, seq: seq})
     that.getSingleCategory(select.code)
     //that.getSingleCategory(select.id)
   },
@@ -565,7 +637,18 @@ Page({
   },
   setModName(e){
     var that = this
-    that.setData({modName: e.detail.value})
+    var id = e.currentTarget.id
+    switch(id){
+      case 'modName':
+        that.setData({modName: e.detail.value})
+        break
+      case 'modSeq':
+        that.setData({seq: e.detail.value})
+        break
+      default:
+        break
+    }
+    
   },
   modCategoryName(e){
     var that = this
@@ -578,8 +661,11 @@ Page({
       })
       return
     }
-    var modUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/ModCategory/' + selectedCategory.code 
-    + '?name=' + encodeURIComponent(modName) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var newCode = that.data.selectedCategory.code
+    newCode = newCode.substr(0, newCode.length - 2) + that.data.seq
+
+    var modUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/ModCategory/' + selectedCategory.id.toString() + '?code=' + newCode + '&name=' + encodeURIComponent(modName) 
+    + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: modUrl,

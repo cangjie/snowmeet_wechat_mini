@@ -11,7 +11,7 @@
     <mp-cell>
       <view class="view-row">
         <view wx:if="{{selectedCode==''}}" >顶级</view>
-        <view wx:else>{{selectedDisplayedCode}} {{selectedName}}</view>
+        <view wx:else>{{selectedDisplayedCode}} {{selectedCategory.name}}</view>
       </view>
     </mp-cell>
   </mp-cells>
@@ -19,14 +19,20 @@
     <mp-cell>
       <view class="view-row" style="margin: 10rpx" >
         <view class="left-column" style="width: 250rpx;display: flex;flex-direction: row;" >
-          <view style="margin-top: 7rpx;width: 200rpx;">01-02-</view>
-          <input value="03" style="width: 50rpx; text-align: center;" class="input" />
+          <view style="margin-top: 7rpx;width: 200rpx;">{{grandpaDisplayedCode}}</view>
+          <input id="modSeq" value="" style="width: 50rpx; text-align: center;" class="input" 
+            disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == ''}}"
+            placeholder="{{seq}}"
+            bindinput="setModName"
+            value="{{seq}}"
+          />
         </view>
         <view class="right-column" style="width: 450rpx;" >
-          <input class="input" style="margin-left: auto; margin-right: auto;text-align: center; width: 200rpx;" 
+          <input id="modName" class="input" style="margin-left: auto; margin-right: auto;text-align: center; width: 260rpx;" 
             placeholder="{{selectedCategory.name}}" 
-            disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}" 
-            bindinput="setModName" />
+            disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == ''}}" 
+            bindinput="setModName" 
+            value="{{modName}}" />
         </view>
       </view>
     </mp-cell>
@@ -69,48 +75,13 @@
   </mp-cells>
   <mp-cells title="价格设定" >
     <mp-cell>
-      <view>
-        <mp-tabs
-        tabs="{{shops}}" 
-        swiperClass="weui-tabs-swiper"
-        bindtabclick="onTabCLick"
-        bindchange="onTabChange"
-        activeClass="tab-bar-title__selected"   
-        >
-
-          <block wx:for="{{shops}}" wx:key="title" >
-            <view class="tab-content" slot="tab-content-{{index}}"  >
-              <view style="margin-left: 0rpx;"  >
-                <view class="view-row">
-                  <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;" >-</view>
-                  <view style="text-align: center;width: 150rpx;" >门市</view>
-                  <view style="text-align: center;width: 150rpx;" >预约</view>
-                  <view style="text-align: center;width: 150rpx;" >会员</view>
-                </view>
-                <view class="view-row">
-                  <view style="width:100rpx; text-align: center;width: 120rpx;text-align: left;" >平日</view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_0_0" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][0][0]}}" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_0_1" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][0][1]}}" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_0_2" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][0][2]}}" /></view>
-                </view>
-                <view class="view-row">
-                  <view style="width:100rpx; text-align: center;width: 120rpx;text-align: left;" >周末</view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_1_0" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][1][0]}}" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_1_1" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][1][1]}}" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_1_2" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][1][2]}}" /></view>
-                </view>
-                <view class="view-row">
-                  <view style="width:100rpx; text-align: center; width: 120rpx;text-align: left;" >节假日</view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_2_0" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][2][0]}}" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_2_1" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][2][1]}}" /></view>
-                  <view style="text-align: center;width: 150rpx;margin:1rpx" ><input id="price_2_2" bindinput="setNumber" class="input" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" value="{{shopPriceArr[currentShopIndex][2][2]}}" /></view>
-                </view>
-              </view>
-            </view>
-          </block>
-
-        </mp-tabs>
-      </view>
+      <price-matrix 
+      priceMatrix="{{priceArr}}" 
+      fieldX="{{['门市', '预约', '会员']}}" 
+      fieldY="{{['平日','周末','节假日']}}" 
+      bindmod="modPrice"
+      bindTabChange="tabChange"
+      ></price-matrix>
      
       
     </mp-cell>

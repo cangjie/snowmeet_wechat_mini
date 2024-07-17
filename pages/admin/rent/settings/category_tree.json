@@ -3,7 +3,8 @@
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
     "mp-tabs": "/components/tabs/index",
-    "tree": "/components/tree/index"
+    "tree": "/components/tree/index",
+    "price-matrix": "/components/price_matrix/price_matrix"
   },
   "navigationBarTitleText": "租赁分类维护"
 }
