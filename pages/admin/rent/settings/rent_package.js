@@ -35,7 +35,7 @@ Page({
     var act = e.detail.checked? 'Add' : 'Del'
     var that = this
     var setUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/RentPackageCategory' 
-    + act + '/' + that.data.rentPackage.id + '?code=' + e.detail.id 
+    + act + '/' + that.data.rentPackage.id + '?categoryId=' + e.detail.id 
     + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
@@ -77,11 +77,11 @@ Page({
     var dataArr = []
     
     for(var i = 0; i < data.length; i++){
-      var leaf = {id: data[i].code, name: data[i].name, checked: false, open: false}
+      var leaf = {id: data[i].id, code: data[i].code, name: data[i].name, checked: false, open: false}
       //var childSelected = false
       for(var j = 0; j < that.data.selectedCode.length; j++){
         var currentCode = that.data.selectedCode[j]
-        if (currentCode.startsWith(leaf.id)){
+        if (currentCode.startsWith(leaf.code)){    
           leaf.open = true
           leaf.checked = true
         }
