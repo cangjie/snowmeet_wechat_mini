@@ -77,10 +77,11 @@
     <mp-cell>
       <price-matrix 
       priceMatrix="{{priceArr}}" 
-      fieldX="{{['门市', '预约', '会员']}}" 
-      fieldY="{{['平日','周末','节假日']}}" 
+      fieldRow="{{['门市', '预约', '会员']}}" 
+      fieldCol="{{['平日','周末','节假日']}}" 
       bindmod="modPrice"
       bindTabChange="tabChange"
+      disabled="{{matrixDisabled}}"
       ></price-matrix>
      
       

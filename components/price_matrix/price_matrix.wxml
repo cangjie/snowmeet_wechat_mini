@@ -16,7 +16,7 @@
         <view style="text-align: center;width: 150rpx;margin: 1rpx"   wx:for="{{fieldsY}}" wx:for-index="indexY" >
           <input id="price_{{indexX}}_{{indexY}}" bindinput="setNumber" class="input" style="margin:1rpx"
           value="{{priceMatrix[currentShopIndex].matrix[indexX][indexY]}}"
-          disabled="{{priceMatrix[currentShopIndex].matrix[indexX][indexY]=='-'}}" />
+          disabled="{{disabled}}" />
         </view>
       </view>
     </view>

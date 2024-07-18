@@ -5,11 +5,11 @@ Component({
    * Component properties
    */
   properties: {
-    fieldsX:{
+    fieldsRow:{
       type: Array,
       value:['门市', '预约', '会员']
     },
-    fieldsY:{
+    fieldsCol:{
       type: Array,
       value: ['平日', '周末', '节假日']
     },
@@ -17,6 +17,10 @@ Component({
     priceMatrix:{
       type: Array,
       value:[]
+    },
+    disabled: {
+      type: Boolean,
+      value: false
     }
   },
 
@@ -36,7 +40,7 @@ Component({
       for(var i = 0; i < matrix.length; i++){
         shops.push({title: matrix[i].shop, title2: '', img: '', desc: ''})
       }
-      that.setData({shops: shops, fieldsX: that.properties.fieldsX, fieldsY: that.properties.fieldsY, priceMatrix: that.properties.priceMatrix})
+      that.setData({shops: shops, fieldsX: that.properties.fieldsCol, fieldsY: that.properties.fieldsRow, priceMatrix: that.properties.priceMatrix})
       this.triggerEvent('TabChange', {index: 0})
     }
   },
@@ -59,7 +63,7 @@ Component({
       var matrix = that.data.priceMatrix
       matrix[currentShopIndex].matrix[x][y] = e.detail.value
       that.setData({priceMatrix: matrix})
-      this.triggerEvent('mod', {currentShopIndex: currentShopIndex, x: x, y: y, value: e.detail.value})
+      this.triggerEvent('mod', {currentShopIndex: currentShopIndex, row: x, col: y, value: e.detail.value})
     }
   }
 })

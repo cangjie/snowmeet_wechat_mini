@@ -37,7 +37,8 @@ Page({
         shop: '南山',
         matrix:[['','',''],['','',''],['','','']]
       }
-    ]
+    ],
+    matrixDisabled: true
   },
 
   getData(){
@@ -83,6 +84,7 @@ Page({
         if (cat.children == undefined || cat.children == null || 
             (  cat.priceList != undefined && cat.priceList != null && cat.priceList.length > 0 )){
           that.setCategoryPriceArr()
+          that.setData({matrixDisabled: false})
         }
         else{
             var shopPriceArr = [ ['-','-','-'],['-','-','-'],['-','-','-']]
@@ -93,7 +95,7 @@ Page({
             }
 
 
-            that.setData({selectedCategory: cat, priceArr: priceArr})
+            that.setData({selectedCategory: cat, priceArr: priceArr, matrixDisabled: true})
         }
         
       }
@@ -162,15 +164,26 @@ Page({
         default:
           break
       }
-      matrix[rowIndex][colIndex] = price.price
+      matrix[rowIndex][colIndex] = ((price.price == null)? '-' : price.price.toString())
     }
     that.setData({priceArr: priceArr})
   },
   tabChange(e){
     console.log('tab change', e)
+    var that = this
+    that.setData({currentShopIndex: e.detail.index})
   },
   modPrice(e){
     console.log('mod price', e)
+    var shopIndex = e.detail.currentShopIndex
+    var rowIndex = e.detail.row
+    var colIndex = e.detail.col
+    var price = e.detail.value
+    var that = this
+    var priceArr = that.data.priceArr
+    priceArr[shopIndex].matrix[rowIndex][colIndex] = price
+    that.setData({priceArr: priceArr})
+    that.checkValid()
   },
 
 /*
@@ -479,12 +492,13 @@ Page({
         var priceValid = true
         
         try{
-            var priceArr = that.data.shopPriceArr[that.data.currentShopIndex]
+            var priceArr = that.data.priceArr[that.data.currentShopIndex].matrix
             for(var i = 0; i < priceArr.length; i++){
                 for(var j = 0; j < priceArr[i].length; j++){
-                    if (isNaN(priceArr[i][j]) || priceArr[i][j].toString() == '' ){
-                        priceValid = false
-                    }
+                  var p = priceArr[i][j]
+                  if (p != '-' && ((isNaN(priceArr[i][j]) || priceArr[i][j].toString() == '' ))){
+                    priceValid = false
+                  }
                 }
             }
             if (!priceValid){
@@ -509,7 +523,7 @@ Page({
     var that = this
     var cat = that.data.selectedCategory
     var shopIndex = that.data.currentShopIndex
-    var shopPriceArr = that.data.shopPriceArr
+    var shopPriceArr = that.data.priceArr
     var priceArr = shopPriceArr[that.data.currentShopIndex]
     var id = e.currentTarget.id
     if (id == 'deposit'){
@@ -556,8 +570,18 @@ Page({
           }
         })
     }
-    var shopName = that.data.shops[that.data.currentShopIndex].shop.trim()
-    var priceArr = that.data.shopPriceArr[that.data.currentShopIndex]
+    var shopName = that.data.priceArr[that.data.currentShopIndex].shop.trim()
+    switch(shopName){
+      case '万龙':
+        shopName = '万龙体验中心'
+        break
+      case '旗舰':
+        shopName = '崇礼旗舰店'
+        break
+      default:
+        break
+    }
+    var priceArr = that.data.priceArr[that.data.currentShopIndex].matrix
     that.setData({saveNum: 0})
     for(var i = 0; i < priceArr.length; i++){
         var dayType = ''
@@ -591,9 +615,10 @@ Page({
                     break
             }
             var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetShopCategoryRentPrice/'
-            + cat.code + '?shop=' + encodeURIComponent(shopName) + '&dayType=' + encodeURIComponent(dayType)
-            + '&scene=' + encodeURIComponent(scene) + '&price=' + parseFloat(priceArr[i][j]).toString()
-            + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+            + cat.id.toString() + '?shop=' + encodeURIComponent(shopName) + '&dayType=' + encodeURIComponent(dayType)
+            + '&scene=' + encodeURIComponent(scene) + '&price=' + priceArr[i][j].toString()
+            + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' 
+            + encodeURIComponent('wechat_mini_openid')
             wx.request({
               url: saveUrl,
               method: 'GET',
