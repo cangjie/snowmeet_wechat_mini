@@ -38,7 +38,8 @@ Page({
         matrix:[['','',''],['','',''],['','','']]
       }
     ],
-    matrixDisabled: true
+    matrixDisabled: true,
+    newFieldName: ''
   },
 
   getData(){
@@ -707,7 +708,175 @@ Page({
       }
     })
   },
+  setNewFieldName(e){
+    var that = this
+    that.setData({newFieldName: e.detail.value})
+  },
+  addNewField(e){
+    var that = this
+    var infoFieldList = that.data.selectedCategory.infoFields
+    var sort = 1
+    if (infoFieldList.length > 0){
+      sort = infoFieldList[infoFieldList.length - 1].sort
+      sort++
+    }
+    var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/CategoryInfoFieldAdd/' + that.data.selectedCategory.id.toString() + '?fieldName=' + encodeURIComponent(that.data.newFieldName) + '&sort=' + sort.toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: addUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          wx.showToast({
+            title: '添加失败',
+            icon: 'error'
+          })
+          return
+        }
+        that.setData({newFieldName: ''})
+        that.getSingleCategory(that.data.selectedCategory.code)
+        wx.showToast({
+          title: '添加成功',
+          icon: 'success'
+        })
+      }
+    })
+  },
+  modFields(e){
+    var that = this
+    var id = e.currentTarget.id
+    var act = id.split('_')[0]
+    id = id.split('_')[1]
+    var fieldSet = that.getFieldsById(parseInt(id))
+    var currentField = fieldSet.currentField
+    var nextField = fieldSet.nextField
+    var prevField = fieldSet.prevField
+    
+    switch(act){
+      case 'del':
+        wx.showModal({
+          title: '确认删除字段：' + currentField.field_name+ '?',
+          content: '',
+          complete: (res) => {
+            if (res.cancel) {
+              return
+            }
+        
+            if (res.confirm) {
+              currentField.is_delete = 1
+              that.saveField(currentField)
+            }
+          }
+        })
+        
+        break
+      case 'name':
+        currentField.mod = false
+        that.saveField(currentField)
+        break
+      case 'up':
+        if (prevField != undefined){
+          var sort = currentField.sort
+          currentField.sort = prevField.sort
+          prevField.sort = sort
+          that.saveField(currentField)
+          
+          setTimeout(()=>{
+            that.saveField(prevField)
+          }, 100)
+        }
+        break
+      case 'down':
+        if (nextField != undefined){
+          var sort = currentField.sort
+          currentField.sort = nextField.sort
+          nextField.sort = sort
+          that.saveField(currentField)
+        
+          setTimeout(()=>{
+            that.saveField(nextField)
+          }, 100)
+        }
+        break
+      default:
+        break
+    }
+  },
+  saveField(field){
+    var that = this
+    var categoryId = that.data.selectedCategory.id
+    var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/CategoryInfoFieldMod/' + field.id.toString() + '?fieldName=' + encodeURIComponent(field.field_name) + '&sort=' + field.sort.toString() + '&delete=' + (field.is_delete == 1 ? 'True' : 'False') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: saveUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          wx.showToast({
+            title: '保存失败',
+            icon: 'success'
+          })
+          return
+        }
+        that.getSingleCategory(that.data.selectedCategory.code)
+      }
+    })
+  },
+  setFieldName(e){
+    var id = e.currentTarget.id
+    var v = e.detail.value
+    var that = this
+    var currentField = that.getFieldsById(parseInt(id.toString())).currentField
+    currentField.field_name = v
+    currentField.mod = true
+    /*
+    var fieldList = that.data.selectedCategory.infoFields
+    for(var i = 0; i < fieldList.length; i++){
+      if (fieldList[i].id == currentField.id){
+        fieldList[i] = currentField
+        break
+      }
+    }
+    */
+    that.setData({selectedCategory: that.data.selectedCategory})
+  },
+  getFieldsById(id){
+    var that = this
+    var fieldList = that.data.selectedCategory.infoFields
+    var currentIndex = -1
+    var prevIndex = -1
+    var nextIndex = -1
+    for(var i = 0; i < fieldList.length; i++){
+      if (fieldList[i].id==id){
+        currentIndex = i
+        break
+      }
+    }
+    for(var i = currentIndex - 1; i >= 0; i--){
+      if (fieldList[i].is_delete==0){
+        prevIndex = i
+        break
+      }
+    }
+    for(var i = currentIndex + 1; i < fieldList.length; i++){
+      if (fieldList[i].is_delete==0){
+        nextIndex = i
+        break
+      }
+    }
+    var currentField = undefined
+    var nextField = undefined
+    var prevField = undefined
+    if (currentIndex>=0){
+      currentField = fieldList[currentIndex]
+    }
+    if (nextIndex>=0){
+      nextField = fieldList[nextIndex]
+    }
+    if (prevIndex>=0){
+      prevField = fieldList[prevIndex]
+    }
 
+    return {currentField: currentField, prevField: prevField, nextField: nextField} 
+  },
   /**
    * Lifecycle function--Called when page load
    */

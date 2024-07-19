@@ -97,25 +97,51 @@
     <mp-cell>
       <view class="view-row" >
         <view style="width:400rpx; text-align:  center;">字段名称</view>
-        <view style="width:150rpx; text-align:  center;">排序</view>
-        <view style="width:100rpx; text-align:  center;">删除</view>
+        <view style="text-align: center;display: flex;margin: auto;">操作</view>
+      </view>
+      <view class="view-row" style="height: 80rpx;" wx:for="{{selectedCategory.infoFields}}" wx:if="{{item.is_delete==0}}" >
+
+        <view style="width:400rpx; text-align:  center;">
+          <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" value="{{item.field_name}}" bindinput="setFieldName" id="{{item.id}}" />
+        </view>
+
+        <view class="view-row" style="width:150rpx; text-align:  center;">
+          <view style="margin-left:10rpx;margin-right:10rpx">
+            <button id="name_{{item.id}}" bind:tap="modFields"
+            style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx" 
+            disabled="{{selectedCategory.code.length != 2 || item.mod!=true}}" class="input" >💾</button>
+          </view>
+          
+          <view style="margin-left:10rpx;margin-right:10rpx">
+            <button id="up_{{item.id}}" bind:tap="modFields"
+            style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx" 
+            disabled="{{selectedCategory.code.length != 2}}" class="input" >⬆️</button>
+          </view>
+         
+          <view style="margin-left:10rpx;margin-right:10rpx">
+            <button id="down_{{item.id}}" bind:tap="modFields"
+            style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  
+            disabled="{{selectedCategory.code.length != 2}}" class="input" >⬇️</button>
+          </view>
+
+          <view style="margin-left:10rpx;margin-right:10rpx">
+            <button  id="del_{{item.id}}" bind:tap="modFields"
+            style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  
+            disabled="{{selectedCategory.code.length != 2}}" class="input" >🗑️</button>
+          </view>
+
+        </view>
       </view>
       <view class="view-row" >
         <view style="width:400rpx; text-align:  center;">
-          <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" placeholder="添加新字段" />
+          <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" value="{{newFieldName}}" placeholder="添加新字段" bindinput="setNewFieldName" />
         </view>
-        <view class="view-row" style="width:150rpx; text-align:  center;">
-          <view style="margin-left:auto;margin-right:auto">
-            <button style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  class="input" >⬆️</button>
-          </view>
-          <!--view style="margin-left:auto;margin-right:auto;width: 10rpx;" ></view-->
-          <view style="margin-left:auto;margin-right:auto">
-            <button style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  class="input" >⬇️</button>
-          </view>
+        <view class="view-row" style=" text-align:  center;">
+          <button style="width: 260rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx" 
+          disabled="{{newFieldName == '' || selectedCategory.code.length != 2}}" 
+          class="input" bind:tap="addNewField" > 添 加 新 字 段 </button>
         </view>
-        <view style="margin-left:auto;margin-right:auto">
-          <button style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  class="input" >🗑️</button>
-        </view>
+        
       </view>
     </mp-cell>
   </mp-cells>
