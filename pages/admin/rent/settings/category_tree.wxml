@@ -93,6 +93,32 @@
     </mp-cell>
     <mp-cell><button class="input" disabled="{{!canSave || isSaving}}" bind:tap="save" > 保 存 </button></mp-cell>
   </mp-cells>
+  <mp-cells title="租赁商品信息字段设定" >
+    <mp-cell>
+      <view class="view-row" >
+        <view style="width:400rpx; text-align:  center;">字段名称</view>
+        <view style="width:150rpx; text-align:  center;">排序</view>
+        <view style="width:100rpx; text-align:  center;">删除</view>
+      </view>
+      <view class="view-row" >
+        <view style="width:400rpx; text-align:  center;">
+          <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" placeholder="添加新字段" />
+        </view>
+        <view class="view-row" style="width:150rpx; text-align:  center;">
+          <view style="margin-left:auto;margin-right:auto">
+            <button style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  class="input" >⬆️</button>
+          </view>
+          <!--view style="margin-left:auto;margin-right:auto;width: 10rpx;" ></view-->
+          <view style="margin-left:auto;margin-right:auto">
+            <button style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  class="input" >⬇️</button>
+          </view>
+        </view>
+        <view style="margin-left:auto;margin-right:auto">
+          <button style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  class="input" >🗑️</button>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="删除分类">
     <mp-cell>
       <button disabled="{{ (selectedCategory.children != undefined  && selectedCategory.children != null) || selectedCategory == undefined}}" class="input" bind:tap="metionDelete" > 删 除 </button>
