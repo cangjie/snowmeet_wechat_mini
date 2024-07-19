@@ -359,6 +359,10 @@ Page({
             that.setData({saveNum: saveNum})
             if (saveNum == matrix.length * matrix[0].length){
               that.setData({priceSaving: false})
+              wx.showToast({
+                title: '保存成功',
+                icon:'success'
+              })
             }
           }
         })
