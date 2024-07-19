@@ -122,7 +122,7 @@ Page({
         var rentPackage = res.data
         var selectedCode = []
         for(var i = 0; i < rentPackage.rentPackageCategoryList.length; i++){
-          selectedCode.push(rentPackage.rentPackageCategoryList[i].category_code)
+          selectedCode.push(rentPackage.rentPackageCategoryList[i].rentCategory.code)
         }
         rentPackage.need_save = false
         that.setData({rentPackage: rentPackage, selectedCode: selectedCode})
@@ -195,8 +195,8 @@ Page({
     var that = this
     var priceArr = that.data.priceArr
     var shopIndex = e.detail.currentShopIndex
-    var x = e.detail.x
-    var y = e.detail.y
+    var x = e.detail.row
+    var y = e.detail.col
     var v = e.detail.value
     priceArr[shopIndex].matrix[x][y] = v
     that.setData({priceArr: priceArr})
@@ -257,7 +257,7 @@ Page({
           break
       }
       if (shopIndex != -1 && x != -1 && y != -1){
-        matrix[shopIndex].matrix[x][y] = price.price
+        matrix[shopIndex].matrix[x][y] = price.price==null? '-':price.price
       }
     }
     that.setData({priceArr: matrix})
@@ -276,7 +276,7 @@ Page({
     for(var i = 0; i < matrix.length; i++){
       for(var j = 0; j < matrix[i].length; j++){
         var v = matrix[i][j]
-        if (isNaN(v) || v.toString().trim() == ''){
+        if ((isNaN(v) || v.toString().trim() == '') && v != '-'){
           valid = false
           break
         }
