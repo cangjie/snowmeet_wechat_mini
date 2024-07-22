@@ -211,6 +211,9 @@ Page({
         //path = '/pages/admin/rent/settings/rent_package?id=1' 
         path = '/pages/admin/rent/settings/rent_package_list' 
         break
+      case 'rent_product_list':
+        path = '/pages/admin/rent/settings/rent_product_list'
+        break
       default:
         break
     }

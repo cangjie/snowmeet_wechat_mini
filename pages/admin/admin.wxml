@@ -34,6 +34,8 @@
     <mp-cell id="rent_unreturned" value="未归还列表" bindtap="nav" ></mp-cell>
     <mp-cell wx:if="{{isAdmin}}" id="category_tree" value="租赁分类维护" bindtap="nav" ></mp-cell>
     <mp-cell wx:if="{{isAdmin}}" id="rent_package" value="租赁套餐设置" bindtap="nav" ></mp-cell>
+    
+    <mp-cell  id="rent_product_list" value="租赁商品列表" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="VIP" >
     <mp-cell id="vip_maintain" value="养护招待" bindtap="nav" ></mp-cell>
