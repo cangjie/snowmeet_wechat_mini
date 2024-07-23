@@ -1,2 +1,80 @@
-<!--pages/admin/rent/settings/rent_product.wxml-->
-<text>pages/admin/rent/settings/rent_product.wxml</text>
+<shop-selector></shop-selector>
+<mp-cells title="基本信息" >
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >名称：</view>
+      <view class="right-column" style="width: 75%; " >
+        <input class="input" style="width: 400rpx;" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >品牌：</view>
+      <view class="right-column" >
+        <input class="input" />
+      </view>
+      <view class="left-column" >产权：</view>
+      <view class="right-column" >
+        <input class="input" placeholder="自有" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >开放租赁：</view>
+      <view class="right-column" >
+        <switch checked="{{true}}" ></switch>
+      </view>
+      <view class="left-column" >在线租赁：</view>
+      <view class="right-column" >
+        <switch checked="{{true}}"></switch>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >条码：</view>
+      <view class="right-column" >
+        <input class="input" />
+      </view>
+      <view class="left-column" >数量：</view>
+      <view class="right-column"  >
+        <input class="input" placeholder="1" style="text-align: center;width: 50px;"  />
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
+
+
+<mp-tabs tabs="{{infoTabs}}" >
+  <block wx:for="{{infoTabs}}" wx:key="title" >  
+    <view  wx:if="{{index == 0}}" class="tab-content-tree" style="height:auto;" slot="tab-content-{{index}}" style="display: flex;flex-direction: column;"  >
+      <tree
+        dataTree="{{dataTree}}"
+        selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
+        bind:select="handleSelect"
+        isSelectLastNode="true"
+        isOpenAll="{{false}}"
+        checkBox="{{false}}"
+      ></tree>
+    </view>
+    <view  wx:if="{{index == 1}}" class="tab-content-tree" slot="tab-content-{{index}}" style="display: flex;flex-direction: column;"  >
+          
+      2222
+    </view>
+  </block>
+</mp-tabs>
+  
+<mp-cells title="价格信息" >
+  <mp-cell>
+    <price-matrix 
+      priceMatrix="{{priceArr}}" 
+      fieldRow="{{['门市', '预约', '会员']}}" 
+      fieldCol="{{['平日','周末','节假日']}}" 
+      bindmod="modPrice"
+      bindTabChange="tabChange"
+      disabled="{{false}}"
+      ></price-matrix>
+  </mp-cell>
+</mp-cells>

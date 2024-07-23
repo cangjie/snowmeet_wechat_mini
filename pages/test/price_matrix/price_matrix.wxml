@@ -1,16 +1,43 @@
-<price-matrix></price-matrix>
 <mp-tabs
   tabs="{{shops}}" 
   swiperClass="weui-tabs-swiper"
   bindtabclick="onTabCLick"
   bindchange="onTabChange"
-  activeClass="tab-bar-title__selected"   
+  activeClass="tab-bar-title__selected" 
+  style="height: 1000rpx;"  
 >
   <block wx:for="{{shops}}" wx:key="title" >  
-    <view class="tab-content view-row" slot="tab-content-{{index}}"  >
-      <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;" >-</view>
-      <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+    <view class="tab-content" slot="tab-content-{{index}}" style="border: solid 1rpx red;"  >
+      <view>
+        <view class="view-row" >
+          <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;"  >-</view>
+          <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+        </view>
+        <view class="view-row" >
+          <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;"  >-</view>
+          <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+        </view>
+        <view class="view-row" >
+          <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;"  >-</view>
+          <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+        </view>
+        <view class="view-row" >
+          <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;"  >-</view>
+          <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+        </view>
+        <view class="view-row" >
+          <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;"  >-</view>
+          <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+        </view>
+        <view class="view-row" >
+          <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;"  >-</view>
+          <view style="text-align: center;width: 150rpx;" wx:for="{{fieldsX}}" >{{item}}</view>
+        </view>
+      </view>
+      
+
     </view>
+    
     <!--view style="margin-left: 0rpx;"  -->
       
       <!--

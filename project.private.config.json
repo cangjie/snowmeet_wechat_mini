@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "mp-tab",
+          "pathName": "pages/test/price_matrix/price_matrix",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "tree",
           "pathName": "/pages/test/price_matrix/price_matrix",
           "query": "",

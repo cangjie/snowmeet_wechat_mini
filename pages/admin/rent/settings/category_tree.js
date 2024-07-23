@@ -53,7 +53,7 @@ Page({
           that.setData({dataTree: [], selectedName: '', selectedCode: ''})
           return
         }
-        var dataTree = this.convertDataTree(res.data)
+        var dataTree = that.convertDataTree(res.data)
         that.setData({dataTree: dataTree})
       }
     })

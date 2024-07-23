@@ -1,1 +1,12 @@
-/* pages/admin/rent/settings/rent_product.wxss */
+@import '/common.wxss';
+@import '/components/price_matrix/price_matrix.wxss';
+.tab-content-tree {
+  height: 100px;
+  width: 100%;
+  display: flex;
+  justify-content:left;
+  align-items:flex-start;
+  box-sizing: border-box;
+  padding: 0rpx;
+  padding-top:30rpx
+}

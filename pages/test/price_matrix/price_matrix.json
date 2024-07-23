@@ -1,6 +1,5 @@
 {
   "usingComponents": {
-    "price-matrix": "/components/price_matrix/price_matrix",
     "mp-tabs": "/components/tabs"
   }
 }
