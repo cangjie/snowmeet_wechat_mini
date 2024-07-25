@@ -73,20 +73,17 @@
       <input class="input" id="deposit" bindinput="setNumber" style="width: 150rpx; text-align: center;" value="{{selectedCategory.deposit}}" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" />
     </view>
   </mp-cells>
-  <mp-cells title="价格设定" >
-    <mp-cell>
-      <price-matrix 
-      priceMatrix="{{priceArr}}" 
-      fieldRow="{{['门市', '预约', '会员']}}" 
-      fieldCol="{{['平日','周末','节假日']}}" 
-      bindmod="modPrice"
-      bindTabChange="tabChange"
-      disabled="{{matrixDisabled}}"
-      ></price-matrix>
+
+  <price-matrix 
+    priceMatrix="{{priceArr}}" 
+    fieldRow="{{['门市', '预约', '会员']}}" 
+    fieldCol="{{['平日','周末','节假日']}}" 
+    bindmod="modPrice"
+    bindTabChange="tabChange"
+    disabled="{{matrixDisabled}}"
+  ></price-matrix>
      
       
-    </mp-cell>
-  </mp-cells>
   <mp-cells title="保存租金押金设置">
     <mp-cell>
         <view style="color: red;">{{canSave? '': canSaveMsg}}</view>

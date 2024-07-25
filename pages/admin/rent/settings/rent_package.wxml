@@ -36,14 +36,14 @@
       ></tree>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="价格设定" >
-    <mp-cell><price-matrix 
-      priceMatrix="{{priceArr}}" 
-      fieldsRow="{{['门市', '预约', '会员']}}" 
-      fieldsCol="{{['平日','周末','节假日']}}" 
-      bindmod="modPrice"
-      bindTabChange="tabChange"
-      ></price-matrix></mp-cell>
+  <price-matrix 
+    priceMatrix="{{priceArr}}" 
+    fieldsRow="{{['门市', '预约', '会员']}}" 
+    fieldsCol="{{['平日','周末','节假日']}}" 
+    bindmod="modPrice"
+    bindTabChange="tabChange"
+  ></price-matrix>
+  <mp-cells>
     <mp-cell>
       <button disabled="{{!priceArrayValid || priceSaving}}" class="input" bindtap="savePriceArr" >保存价目表</button>
     </mp-cell>
