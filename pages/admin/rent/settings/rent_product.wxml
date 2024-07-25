@@ -63,7 +63,7 @@
 </mp-cells>
 <mp-tabs 
   tabs="{{infoTabs}}" 
-  swiperClass="weui-tabs-swiper"
+  swiperClass="weui-tabs-swiper-long"
   bindtabclick="onTabCLick"
   bindchange="onTabChange"
   activeClass="tab-bar-title__selected" 
@@ -83,6 +83,52 @@
     </view>
     <view  wx:if="{{index == 1}}" class="tab-content" slot="tab-content-{{index}}" style="display: flex;flex-direction: column;"  >
       <editor id="editor" class="ql-container" placeholder="{{'请输入。。。'}}" bindstatuschange="onStatusChange" bindready="onEditorReady"></editor>
+    </view>
+    <view wx:if="{{index == 2}}" class="tab-content" slot="tab-content-{{index}}" style="display: flex;flex-direction: column;" >
+      <scroll-view scroll-y="true" style="height: 300rpx;"  scroll-top="{{0}}">
+        <view class="view-row" >
+          <view class="left-column" >长度：</view>
+          <view class="right-column" style="width: 75%;">
+            <input style="width: 400rpx;" class="input" />
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >系列：</view>
+          <view class="right-column" style="width: 75%;">
+            <input style="width: 400rpx;" class="input" />
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >三围：</view>
+          <view class="right-column" style="width: 75%;">
+            <input style="width: 400rpx;" class="input" />
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >适用年龄：</view>
+          <view class="right-column" style="width: 75%;">
+            <input style="width: 400rpx;" class="input" />
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >适用性别：</view>
+          <view class="right-column" style="width: 75%;">
+            <input style="width: 400rpx;" class="input" />
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >等级：</view>
+          <view class="right-column" style="width: 75%;">
+            <input style="width: 400rpx;" class="input" />
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >序列号：</view>
+          <view class="right-column" style="width: 75%;">
+            <input style="width: 400rpx;" class="input" />
+          </view>
+        </view>
+      </scroll-view>
     </view>
   </block>
 </mp-tabs>
