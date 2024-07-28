@@ -56,10 +56,11 @@ Component({
     },
     setNumber(e){
       var that = this
-      var currentShopIndex = that.data.currentShopIndex
+      
       var id = e.currentTarget.id
       var x = parseInt(id.split('_')[1])
       var y = parseInt(id.split('_')[2])
+      var currentShopIndex = parseInt(id.split('_')[3])
       var matrix = that.data.priceMatrix
       matrix[currentShopIndex].matrix[x][y] = e.detail.value
       that.setData({priceMatrix: matrix})

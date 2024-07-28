@@ -1,5 +1,5 @@
 <mp-cells title="价格设定">
-<mp-cell wx:for="{{shops}}" wx:for-item="shop" > 
+<mp-cell wx:for="{{shops}}" wx:for-item="shop" wx:for-index="shopIndex"  > 
    
     <view style="display: flex;flex-direction: column;"  >
       <view style="display: flex;flex-direction: row;" >
@@ -10,8 +10,8 @@
       <view wx:for="{{fieldsY}}" style="display: flex;flex-direction: row;" wx:for-index="indexX" >
         <view style="width:100rpx; text-align: center;width: 120rpx;text-align: center;font-size: 10pt;" >{{shop.title}}{{item}}</view>
         <view style="text-align: center;width: 150rpx;margin: 1rpx"   wx:for="{{fieldsY}}" wx:for-index="indexY" >
-          <input id="price_{{indexX}}_{{indexY}}" bindinput="setNumber" class="input" style="margin:1rpx"
-          value="{{priceMatrix[currentShopIndex].matrix[indexX][indexY]}}"
+          <input id="price_{{indexX}}_{{indexY}}_{{shopIndex}}" bindinput="setNumber" class="input" style="margin:1rpx"
+          value="{{priceMatrix[shopIndex].matrix[indexX][indexY]}}"
           disabled="{{disabled}}" />
         </view>
       </view>

@@ -45,11 +45,6 @@
     </view>
   </mp-cell>
 </mp-cells>
-
-
-
-  
-
   <price-matrix 
     priceMatrix="{{priceArr}}" 
      fieldRow="{{['门市', '预约', '会员']}}" 

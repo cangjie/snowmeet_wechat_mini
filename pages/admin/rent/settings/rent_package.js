@@ -292,83 +292,86 @@ Page({
     var that = this
     that.setData({priceSaving: true, saveNum: 0})
     var tabIndex = that.data.currentTabIndex
-    var shop = ''
-    switch(tabIndex){
-      case 0:
-        shop = '万龙体验中心'
-        break
-      case 1:
-        shop = '崇礼旗舰店'
-        break
-      case 2:
-        shop = '南山'
-        break
-      default:
-        break
-    }
+    
     var priceArr = that.data.priceArr
-    var matrix = priceArr[tabIndex].matrix
-    for(var i = 0; i < matrix.length; i++){
-      for(var j = 0; j < matrix[i].length; j++){
-        var scene = ''
-        var dayType = ''
-        var v = matrix[i][j]
-        switch(i){
-          case 0:
-            dayType = '平日'
-            break
-          case 1:
-            dayType = '周末'
-            break
-          case 2:
-            dayType = '节假日'
-            break
-          default:
-            break
-        }
-        switch(j){
-          case 0:
-            scene = '门市'
-            break
-          case 1:
-            scene = '预约'
-            break
-          case 2:
-            scene = '会员'
-            break
-          default:
-            break
-        }
-        var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetPackageRentPrice/' 
-        + that.data.rentPackage.id.toString() + '?shop=' + encodeURIComponent(shop) 
-        + '&dayType=' + encodeURIComponent(dayType) + '&scene=' + encodeURIComponent(scene)
-        + '&price=' + encodeURIComponent(v) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-        + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-        wx.request({
-          url: saveUrl,
-          method: 'GET',
-          success:(res)=>{
-            if (res.statusCode != 200){
-              wx.showToast({
-                title: '价格保存失败',
-                icon: 'error'
-              })
-            }
-            var saveNum = that.data.saveNum
-            saveNum++
-            that.setData({saveNum: saveNum})
-            if (saveNum == matrix.length * matrix[0].length){
-              that.setData({priceSaving: false})
-              wx.showToast({
-                title: '保存成功',
-                icon:'success'
-              })
-            }
+    for(var k = 0; k < that.data.priceArr.length; k++)
+    {
+      var shop = ''
+      switch(k){
+        case 0:
+          shop = '万龙体验中心'
+          break
+        case 1:
+          shop = '崇礼旗舰店'
+          break
+        case 2:
+          shop = '南山'
+          break
+        default:
+          break
+      }
+      var matrix = priceArr[k].matrix
+      for(var i = 0; i < matrix.length; i++){
+        for(var j = 0; j < matrix[i].length; j++){
+          var scene = ''
+          var dayType = ''
+          var v = matrix[i][j]
+          switch(i){
+            case 0:
+              dayType = '平日'
+              break
+            case 1:
+              dayType = '周末'
+              break
+            case 2:
+              dayType = '节假日'
+              break
+            default:
+              break
           }
-        })
+          switch(j){
+            case 0:
+              scene = '门市'
+              break
+            case 1:
+              scene = '预约'
+              break
+            case 2:
+              scene = '会员'
+              break
+            default:
+              break
+          }
+          var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetPackageRentPrice/' 
+          + that.data.rentPackage.id.toString() + '?shop=' + encodeURIComponent(shop) 
+          + '&dayType=' + encodeURIComponent(dayType) + '&scene=' + encodeURIComponent(scene)
+          + '&price=' + encodeURIComponent(v) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+          wx.request({
+            url: saveUrl,
+            method: 'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                wx.showToast({
+                  title: '价格保存失败',
+                  icon: 'error'
+                })
+              }
+              var saveNum = that.data.saveNum
+              saveNum++
+              that.setData({saveNum: saveNum})
+              if (saveNum == matrix.length * matrix[0].length){
+                that.setData({priceSaving: false})
+                wx.showToast({
+                  title: '保存成功',
+                  icon:'success'
+                })
+              }
+            }
+          })
+        }
       }
     }
-
   },
 
   /**

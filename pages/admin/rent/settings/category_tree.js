@@ -493,7 +493,9 @@ Page({
         var priceValid = true
         
         try{
-            var priceArr = that.data.priceArr[that.data.currentShopIndex].matrix
+          for(var k = 0; k < that.data.priceArr.length; k++)
+          {
+            var priceArr = that.data.priceArr[k].matrix
             for(var i = 0; i < priceArr.length; i++){
                 for(var j = 0; j < priceArr[i].length; j++){
                   var p = priceArr[i][j]
@@ -504,12 +506,13 @@ Page({
             }
             if (!priceValid){
                 canSave = false
-                canSaveMsg = '9个价格必须逐一填写完整！'
+                canSaveMsg = '27个价格必须逐一填写完整！'
             }
             else{
                 canSave = true
                 canSaveMsg = ''
             }
+          }
         }
         
         catch(exp){
@@ -571,78 +574,83 @@ Page({
           }
         })
     }
-    var shopName = that.data.priceArr[that.data.currentShopIndex].shop.trim()
-    switch(shopName){
-      case '万龙':
-        shopName = '万龙体验中心'
-        break
-      case '旗舰':
-        shopName = '崇礼旗舰店'
-        break
-      default:
-        break
-    }
-    var priceArr = that.data.priceArr[that.data.currentShopIndex].matrix
-    that.setData({saveNum: 0})
-    for(var i = 0; i < priceArr.length; i++){
-        var dayType = ''
-        switch(i){
-            case 0:
-                dayType = '平日'
-                break
-            case 1:
-                dayType = '周末'
-                break
-            case 2:
-                dayType = '节假日'
-                break
-            default:
-                break
-        }
-        for(var j = 0; j < priceArr[i].length; j++){
-            //var dayType = ''
-            var scene = ''
-            switch(j){
-                case 0:
-                    scene = '门市'
-                    break
-                case 1:
-                    scene = '预约'
-                    break
-                case 2:
-                    scene = '会员'
-                    break
-                default:
-                    break
-            }
-            var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetShopCategoryRentPrice/'
-            + cat.id.toString() + '?shop=' + encodeURIComponent(shopName) + '&dayType=' + encodeURIComponent(dayType)
-            + '&scene=' + encodeURIComponent(scene) + '&price=' + priceArr[i][j].toString()
-            + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' 
-            + encodeURIComponent('wechat_mini_openid')
-            wx.request({
-              url: saveUrl,
-              method: 'GET',
-              success:(res)=>{
-                  if (res.statusCode == 200){
-                      var saveNum = that.data.saveNum
-                      saveNum++
-                      if (saveNum==9){
-                          that.setData({saveNum: 0, isSaving: false})
-                          wx.showToast({
-                            title: '租金保存成功。',
-                            icon:'success'
-                          })
-                      }
-                      else{
-                          that.setData({saveNum: saveNum})
-                      }
-                  }
+    
+    
+    for(var k = 0; k < that.data.priceArr.length; k++)
+    {
+      var shopName = that.data.priceArr[k].shop.trim()
+      switch(shopName){
+        case '万龙':
+          shopName = '万龙体验中心'
+          break
+        case '旗舰':
+          shopName = '崇礼旗舰店'
+          break
+        default:
+          break
+      }
+      var priceArr = that.data.priceArr[k].matrix
+      that.setData({saveNum: 0})
+      for(var i = 0; i < priceArr.length; i++){
+          var dayType = ''
+          switch(i){
+              case 0:
+                  dayType = '平日'
+                  break
+              case 1:
+                  dayType = '周末'
+                  break
+              case 2:
+                  dayType = '节假日'
+                  break
+              default:
+                  break
+          }
+          for(var j = 0; j < priceArr[i].length; j++){
+              //var dayType = ''
+              var scene = ''
+              switch(j){
+                  case 0:
+                      scene = '门市'
+                      break
+                  case 1:
+                      scene = '预约'
+                      break
+                  case 2:
+                      scene = '会员'
+                      break
+                  default:
+                      break
               }
-            })
+              var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetShopCategoryRentPrice/'
+              + cat.id.toString() + '?shop=' + encodeURIComponent(shopName) + '&dayType=' + encodeURIComponent(dayType)
+              + '&scene=' + encodeURIComponent(scene) + '&price=' + priceArr[i][j].toString()
+              + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' 
+              + encodeURIComponent('wechat_mini_openid')
+              wx.request({
+                url: saveUrl,
+                method: 'GET',
+                success:(res)=>{
+                    if (res.statusCode == 200){
+                        var saveNum = that.data.saveNum
+                        saveNum++
+                        if (saveNum==27){
+                            that.setData({saveNum: 0, isSaving: false})
+                            wx.showToast({
+                              title: '租金保存成功。',
+                              icon:'success'
+                            })
+                        }
+                        else{
+                            that.setData({saveNum: saveNum})
+                        }
+                    }
+                }
+              })
 
 
-        }
+          }
+      }
     }
   },
 
