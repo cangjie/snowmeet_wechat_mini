@@ -4,7 +4,6 @@
   bindtabclick="onTabCLick"
   bindchange="onTabChange"
   activeClass="tab-bar-title__selected" 
-  style="height: 1000rpx;"  
 >
   <block wx:for="{{shops}}" wx:key="title" >  
     <view class="tab-content" slot="tab-content-{{index}}" style="border: solid 1rpx red;"  >
