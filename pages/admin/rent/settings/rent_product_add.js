@@ -6,7 +6,19 @@ Page({
    * Page initial data
    */
   data: {
-
+    inStock: true,
+    currentShop: '',
+    productName: '',
+    category: undefined,
+    canSubmit: false
+  },
+  setStock(e){
+    var that = this
+    var inStock = that.data.inStock
+    inStock = e.detail.value
+    that.setData({inStock: inStock})
+    that.checkValid()
+    console.log('set stock', e)
   },
   getCategories(){
     var that = this
@@ -57,6 +69,87 @@ Page({
     }
     tree.productCount = pCount
     tree.name = tree.name + '(' + pCount.toString() + ')'
+  },
+  checkValid(){
+    var that = this
+    var category = that.data.category
+    if (that.data.inStock && that.data.currentShop == ''){
+      that.setData({canSubmit: false})
+    }
+    else if (that.data.productName == ''){
+      that.setData({canSubmit: false})
+    }
+    else if (category == undefined){
+      that.setData({canSubmit: false})
+    }
+    else{
+      that.setData({canSubmit: true})
+    }
+  },
+  selectShop(e){
+    var that = this
+    console.log('shop select', e)
+    var shopName = e.detail.shop
+    that.setData({currentShop: shopName})
+    that.checkValid()
+  },
+  setProductName(e){
+    var that = this
+    var productName = e.detail.value
+    that.setData({productName: productName})
+    that.checkValid()
+  },
+  handleSelect(e){
+    var that = this
+    var cate = e.detail.item
+    that.setData({category: cate})
+    var dataTree = that.checkCategory(that.data.dataTree)
+    that.checkValid()
+    that.setData({dataTree: dataTree})
+    console.log('select category', e)
+  },
+  checkCategory(dataTree){
+    var that = this
+    var cate = that.data.category
+    for(var i = 0; i < dataTree.length; i++){
+      if (dataTree[i].children != null && dataTree[i].children != undefined 
+        && dataTree[i].children.length > 0){
+          dataTree[i].checked = false
+          that.checkCategory(dataTree[i].children)
+      }
+      else if (dataTree[i].id == cate.id){
+        dataTree[i].checked = true
+      }
+      else{
+        dataTree[i].checked = false
+      }
+    }
+    return dataTree
+  },
+  submit(e){
+    var that = this
+    var category = that.data.category
+    var productName = that.data.productName
+    var inStock = that.data.inStock
+    var shop = that.data.currentShop
+    if (!inStock){
+      shop = ''
+    }
+    var msg = '名称：' + productName + ' 店铺：' + (inStock?shop:'未入库') + ' 分类：' + category.displayedCode + ' ' + category.name
+    that.setData({canSubmit: false})
+    wx.showModal({
+      title: '添加租赁商品',
+      content: msg,
+      complete: (res) => {
+        if (res.cancel) {
+          that.setData({canSubmit: true})
+        }
+    
+        if (res.confirm) {
+          
+        }
+      }
+    })
   },
   /**
    * Lifecycle function--Called when page load

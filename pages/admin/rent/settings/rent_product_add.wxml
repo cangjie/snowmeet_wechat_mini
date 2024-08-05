@@ -1,10 +1,20 @@
-<shop-selector></shop-selector>
+<mp-cells title="入库状态" >
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >是否入库：</view>
+      <view class="right-column" >
+        <switch bindchange="setStock" checked="{{inStock}}">是</switch>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<shop-selector wx:if="{{inStock}}" bindShopSelected="selectShop" ></shop-selector>
 <mp-cells title="填写租赁商品名称" >
   <mp-cell>
     <view class="view-row" >
       <view class="left-column" >名称：</view>
       <view class="right-column" >
-        <input class="input" style="width: 400rpx;" />
+        <input class="input" style="width: 400rpx;" bindinput="setProductName" />
       </view>
     </view>
   </mp-cell>
@@ -16,13 +26,13 @@
       selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
       bind:select="handleSelect"
       isSelectLastNode="true"
-      isOpenAll="{{false}}"
+      isOpenAll="{{true}}"
       checkBox="{{true}}"
     ></tree>
   </mp-cell>
 </mp-cells>
 <mp-cells>
   <mp-cell>
-    <button class="input" > 确 认 添 加 </button>
+    <button class="input" disabled="{{!canSubmit}}" bindtap="submit"  > 确 认 添 加 </button>
   </mp-cell>
 </mp-cells>
