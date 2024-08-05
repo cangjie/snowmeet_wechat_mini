@@ -36,7 +36,7 @@ Page({
 
   getCategories(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetAllCategories'
+    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategory/01'
     wx.request({
       url: url,
       method:'GET',
@@ -45,7 +45,7 @@ Page({
           that.setData({dataTree: [], selectedName: '', selectedCode: ''})
           return
         }
-        var dataTree = this.convertCategoryTree(res.data)
+        var dataTree = this.convertCategoryTree(res.data.children)
         that.setData({dataTree: dataTree})
       }
     })

@@ -214,6 +214,9 @@ Page({
       case 'rent_product_list':
         path = '/pages/admin/rent/settings/rent_product_list'
         break
+      case 'rent_product_add':
+        path = '/pages/admin/rent/settings/rent_product_add'
+        break
       default:
         break
     }

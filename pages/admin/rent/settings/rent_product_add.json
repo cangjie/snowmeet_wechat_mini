@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "shop-selector": "/components/shop_selector/shop_selector",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "tree": "/components/tree/index"
+  },
+  "navigationBarTitleText": "添加租赁商品"
+}

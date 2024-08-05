@@ -1,5 +1,14 @@
-<shop-selector></shop-selector>
 <mp-cells title="基本信息" >
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >店铺：</view>
+      <view class="right-column view-row" style="width: 75%; " >
+        <view>万龙</view>
+        <view style="width: 20rpx;" ></view>
+        <button class="input" size="mini" > 调 拨 </button>
+      </view>
+    </view>
+  </mp-cell>
   <mp-cell>
     <view class="view-row" >
       <view class="left-column" >名称：</view>
@@ -44,6 +53,110 @@
       </view>
     </view>
   </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <button class="input" size="mini" > 编 辑 </button>
+      <button class="input" size="mini" > 保 存 </button>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="上传图片" >
+  <mp-cell>
+    <multi-uploader ></multi-uploader>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="详细参数">
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >长度：</view>
+      <view class="right-column" style="width: 75%;">
+        <input style="width: 400rpx;" class="input" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >系列：</view>
+      <view class="right-column" style="width: 75%;">
+        <input style="width: 400rpx;" class="input" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >三围：</view>
+      <view class="right-column" style="width: 75%;">
+        <input style="width: 400rpx;" class="input" />
+      </view>
+    </view>
+  </mp-cell> 
+  <mp-cell>  
+    <view class="view-row" >
+      <view class="left-column" >适用年龄：</view>
+      <view class="right-column" style="width: 75%;">
+        <input style="width: 400rpx;" class="input" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >适用性别：</view>
+        <view class="right-column" style="width: 75%;">
+          <input style="width: 400rpx;" class="input" />
+        </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >等级：</view>
+      <view class="right-column" style="width: 75%;">
+        <input style="width: 400rpx;" class="input" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >序列号：</view>
+      <view class="right-column" style="width: 75%;">
+        <input style="width: 400rpx;" class="input" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <button size="mini" class="input" > 编 辑 </button>
+      <button size="mini" class="input" > 保 存 </button>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="编写简介" >
+  <mp-cell>
+    <editor id="editor" class="ql-container" placeholder="{{'请输入。。。'}}" bindstatuschange="onStatusChange" bindready="onEditorReady"></editor>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <button size="mini" class="input" > 编 辑 </button>
+      <button size="mini" class="input" > 保 存 </button>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="分类设定" >
+  <mp-cell>
+    <tree
+      dataTree="{{dataTree}}"
+      selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
+      bind:select="handleSelect"
+      isSelectLastNode="true"
+      isOpenAll="{{false}}"
+      checkBox="{{false}}"
+    ></tree>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <button size="mini" class="input" > 编 辑 </button>
+      <button size="mini" class="input" > 保 存 </button>
+    </view>
+  </mp-cell>
 </mp-cells>
   <price-matrix 
     priceMatrix="{{priceArr}}" 
@@ -53,78 +166,6 @@
     bindTabChange="tabChange"
     disabled="{{false}}"
   ></price-matrix>
-  
-<mp-tabs 
-  tabs="{{infoTabs}}" 
-  swiperClass="weui-tabs-swiper-long"
-  bindtabclick="onTabCLick"
-  bindchange="onTabChange"
-  activeClass="tab-bar-title__selected" 
-  >
-  <block wx:for="{{infoTabs}}" wx:key="title" >  
-    <view  wx:if="{{index == 0}}" class="tab-content" style="height:auto;" slot="tab-content-{{index}}" style="display: flex;flex-direction: column;"  >
-      <scroll-view scroll-y="true" style="height: 300rpx;"  scroll-top="{{0}}">
-        <tree
-          dataTree="{{dataTree}}"
-          selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
-          bind:select="handleSelect"
-          isSelectLastNode="true"
-          isOpenAll="{{false}}"
-          checkBox="{{false}}"
-        ></tree>
-      </scroll-view>
-    </view>
-    <view  wx:if="{{index == 1}}" class="tab-content" slot="tab-content-{{index}}" style="display: flex;flex-direction: column;"  >
-      <editor id="editor" class="ql-container" placeholder="{{'请输入。。。'}}" bindstatuschange="onStatusChange" bindready="onEditorReady"></editor>
-    </view>
-    <view wx:if="{{index == 2}}" class="tab-content" slot="tab-content-{{index}}" style="display: flex;flex-direction: column;" >
-      <scroll-view scroll-y="true" style="height: 300rpx;"  scroll-top="{{0}}">
-        <view class="view-row" >
-          <view class="left-column" >长度：</view>
-          <view class="right-column" style="width: 75%;">
-            <input style="width: 400rpx;" class="input" />
-          </view>
-        </view>
-        <view class="view-row" >
-          <view class="left-column" >系列：</view>
-          <view class="right-column" style="width: 75%;">
-            <input style="width: 400rpx;" class="input" />
-          </view>
-        </view>
-        <view class="view-row" >
-          <view class="left-column" >三围：</view>
-          <view class="right-column" style="width: 75%;">
-            <input style="width: 400rpx;" class="input" />
-          </view>
-        </view>
-        <view class="view-row" >
-          <view class="left-column" >适用年龄：</view>
-          <view class="right-column" style="width: 75%;">
-            <input style="width: 400rpx;" class="input" />
-          </view>
-        </view>
-        <view class="view-row" >
-          <view class="left-column" >适用性别：</view>
-          <view class="right-column" style="width: 75%;">
-            <input style="width: 400rpx;" class="input" />
-          </view>
-        </view>
-        <view class="view-row" >
-          <view class="left-column" >等级：</view>
-          <view class="right-column" style="width: 75%;">
-            <input style="width: 400rpx;" class="input" />
-          </view>
-        </view>
-        <view class="view-row" >
-          <view class="left-column" >序列号：</view>
-          <view class="right-column" style="width: 75%;">
-            <input style="width: 400rpx;" class="input" />
-          </view>
-        </view>
-      </scroll-view>
-    </view>
-  </block>
-</mp-tabs>
 <view style="height: 500rpx;" ></view>
 <view class="toolbar" catchtouchend="format" hidden="{{keyboardHeight > 0 ? false : true}}" style="bottom: {{isIOS ? editorHeight-200 : 0}}px">
   <i class="iconfont icon-charutupian" catchtouchend="insertImage"></i>
