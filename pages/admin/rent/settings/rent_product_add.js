@@ -144,10 +144,39 @@ Page({
         if (res.cancel) {
           that.setData({canSubmit: true})
         }
-    
         if (res.confirm) {
-          
+          that.save()
         }
+      }
+    })
+  },
+  save(){
+    var that = this
+    var category = that.data.category
+    var productName = that.data.productName
+    var inStock = that.data.inStock
+    var shop = that.data.currentShop
+    if (!inStock){
+      shop = null
+    }
+    var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/AddRentProduct/' + category.id + '?shop='
+    + encodeURIComponent(shop) + '&name=' + encodeURIComponent(productName) + '&sessionKey=' 
+    + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: addUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          that.setData({canSubmit: true})
+          return
+        }
+        wx.showToast({
+          title: '添加成功,即将进入详情页。',
+          icon: 'success'
+        })
+        wx.redirectTo({
+          url: 'rent_product?id=' + res.data.id,
+        })
       }
     })
   },

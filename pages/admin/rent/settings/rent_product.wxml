@@ -1,19 +1,25 @@
+<block wx:if="{{product.shop == 'null'}}" >
+  <shop-selector></shop-selector>
+  <view class="view-row" >
+    <button class="input" > 指 派 店 铺 </button>
+  </view>
+</block>
 <mp-cells title="基本信息" >
-  <mp-cell>
-    <view class="view-row" >
+  <mp-cell >
+    <view class="view-row"  >
       <view class="left-column" >店铺：</view>
       <view class="right-column view-row" style="width: 75%; " >
-        <view>万龙</view>
+        <view>{{(product.shop=='null')?'未指派':product.shop}}</view>
         <view style="width: 20rpx;" ></view>
-        <button class="input" size="mini" > 调 拨 </button>
+        <button class="input" size="mini" disabled="{{product.shop == 'null'}}" > 调 拨 </button>
       </view>
-    </view>
+    </view> 
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
       <view class="left-column" >名称：</view>
       <view class="right-column" style="width: 75%; " >
-        <input class="input" style="width: 400rpx;" />
+        <input id="name" bindinput="inputBaseInfo" class="input" style="width: 400rpx;" value="{{product.name}}" disabled="{{!isBaseInfoEditing}}" />
       </view>
     </view>
   </mp-cell>
@@ -21,11 +27,11 @@
     <view class="view-row" >
       <view class="left-column" >品牌：</view>
       <view class="right-column" >
-        <input class="input" />
+        <input id="brand" bindinput="inputBaseInfo" class="input" value="{{product.brand}}" disabled="{{!isBaseInfoEditing}}"  />
       </view>
       <view class="left-column" >产权：</view>
       <view class="right-column" >
-        <input class="input" placeholder="自有" />
+        <input id="owner" bindinput="inputBaseInfo" class="input" placeholder="自有" value="{{product.owner}}" disabled="{{!isBaseInfoEditing}}" />
       </view>
     </view>
   </mp-cell>
@@ -33,11 +39,11 @@
     <view class="view-row" >
       <view class="left-column" >开放租赁：</view>
       <view class="right-column" >
-        <switch checked="{{true}}" ></switch>
+        <switch id="isValid" bindchange="inputBaseInfo" checked="{{product.is_valid == 1}}" disabled="{{!isBaseInfoEditing}}" ></switch>
       </view>
       <view class="left-column" >在线租赁：</view>
       <view class="right-column" >
-        <switch checked="{{true}}"></switch>
+        <switch id="isOnline" bindchange="inputBaseInfo" checked="{{product.is_online == 1}}" disabled="{{!isBaseInfoEditing}}" ></switch>
       </view>
     </view>
   </mp-cell>
@@ -45,18 +51,20 @@
     <view class="view-row" >
       <view class="left-column" >条码：</view>
       <view class="right-column" >
-        <input class="input" />
+        <input id="barcode" bindinput="inputBaseInfo" class="input" value="{{product.barcode}}" disabled="{{!isBaseInfoEditing}}"  />
       </view>
       <view class="left-column" >数量：</view>
       <view class="right-column"  >
-        <input class="input" placeholder="1" style="text-align: center;width: 50px;"  />
+        <input id="count" class="input"  style="text-align: center;width: 50px;" 
+        value="{{product.count}}" bindinput="inputBaseInfo" disabled="{{!isBaseInfoEditing}}"  />
       </view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
-      <button class="input" size="mini" > 编 辑 </button>
-      <button class="input" size="mini" > 保 存 </button>
+      <button id="baseInfo" class="input" size="mini" disabled="{{isBaseInfoEditing}}" bindtap="edit"  > 编 辑 </button>
+      <button id="baseInfo" class="input" size="mini" disabled="{{!isBaseInfoEditing}}" bindtap="save" > 保 存 </button>
+      <button id="baseInfo" class="input" size="mini" disabled="{{!isBaseInfoEditing}}" bindtap="cancel" > 取 消 </button>
     </view>
   </mp-cell>
 </mp-cells>
@@ -124,8 +132,9 @@
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
-      <button size="mini" class="input" > 编 辑 </button>
-      <button size="mini" class="input" > 保 存 </button>
+      <button id="parameter" class="input" size="mini" disabled="{{isParameterEditing}}" bindtap="edit" > 编 辑 </button>
+      <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" > 保 存 </button>
+      <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" > 取 消 </button>
     </view>
   </mp-cell>
 </mp-cells>
@@ -135,8 +144,9 @@
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
-      <button size="mini" class="input" > 编 辑 </button>
-      <button size="mini" class="input" > 保 存 </button>
+      <button id="desc" class="input" size="mini" disabled="{{isDescEditing}}" bindtap="edit"> 编 辑 </button>
+      <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" > 保 存 </button>
+      <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" > 取 消 </button>
     </view>
   </mp-cell>
 </mp-cells>
@@ -153,8 +163,9 @@
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
-      <button size="mini" class="input" > 编 辑 </button>
-      <button size="mini" class="input" > 保 存 </button>
+      <button id="category" class="input" size="mini" disabled="{{isCategoryEditing}}"  bindtap="edit" > 编 辑 </button>
+      <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" > 保 存 </button>
+      <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" bindtap="cancel" > 取 消 </button>
     </view>
   </mp-cell>
 </mp-cells>

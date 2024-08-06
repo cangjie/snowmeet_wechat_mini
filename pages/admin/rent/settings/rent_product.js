@@ -6,12 +6,7 @@ Page({
    * Page initial data
    */
   data: {
-    infoTabs:[
-      {title: '分类', title2: '', img: '', desc: ''},
-      {title: '简介', title2: '', img: '', desc: ''},
-      {title: '参数', title2: '', img: '', desc: ''},
-      {title: '图片', title2: '', img: '', desc: ''}
-    ],
+
     priceArr:[
       {
         shop: '万龙',
@@ -31,7 +26,11 @@ Page({
     placeholder: '开始输入...',
     editorHeight: 300,
     keyboardHeight: 0,
-    isIOS: false
+    isIOS: false,
+    isBaseInfoEditing: false,
+    isParameterEditing: false,
+    isDescEditing: false,
+    isCategoryEditing: false
   },
 
   getCategories(){
@@ -64,15 +63,163 @@ Page({
     }
     return dataArr
   },
+  getProduct(){
+    var that = this
+    var id = that.data.id
+    var getUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetRentProduct/' + id.toString()
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.setData({product: res.data, oriProduct: Object.assign({}, res.data)})
+      }
+    })
+  },
+  edit(e){
+    var id = e.currentTarget.id
+    var that = this
+    switch(id){
+      case 'baseInfo':
+        that.setData({isBaseInfoEditing: true})
+        break
+      case 'parameter':
+        that.setData({isParameterEditing: true})
+        break
+      case 'desc':
+        that.setData({isDescEditing: true})
+        break
+      case 'category':
+        that.setData({isCategoryEditing: true})
+        break
+      default:
+        break
+    }
+  },
+  cancel(e){
+    var that = this
+    var id = e.currentTarget.id
+    var oriProduct = that.data.oriProduct
+    var product = that.data.product
+    switch(id){
+      case 'baseInfo':
+        product.name = oriProduct.name
+        product.brand = oriProduct.brand
+        product.owner = oriProduct.owner
+        product.is_valid = oriProduct.is_valid
+        product.is_online = oriProduct.is_online
+        product.barcode = oriProduct.barcode
+        product.count = oriProduct.count
+        that.setData({isBaseInfoEditing: false, product: product})
+        break
+      case 'parameter':
+        that.setData({isParameterEditing: true})
+        break
+      case 'desc':
+        that.setData({isDescEditing: true})
+        break
+      case 'category':
+        that.setData({isCategoryEditing: true})
+        break
+      default:
+        break
+    }
+  },
+  save(e){
+    var that = this
+    var id = e.currentTarget.id
+    //var product = that.data.product
+    switch(id){
+      case 'baseInfo':
+        that.setData({isBaseInfoEditing: false})
+        that.saveBaseInfo()
+        break
+      case 'parameter':
+        that.setData({isParameterEditing: true})
+        break
+      case 'desc':
+        that.setData({isDescEditing: true})
+        break
+      case 'category':
+        that.setData({isCategoryEditing: true})
+        break
+      default:
+        break
+    }
+  },
+  inputBaseInfo(e){
+    var that = this
+    var product = that.data.product
+    var id = e.currentTarget.id
+    console.log('input', e)
+    switch(id){
+      case 'name':
+        product.name = e.detail.value
+        break
+      case 'brand':
+        product.brand = e.detail.value
+        break
+      case 'owner':
+        product.owner = e.detail.value
+        break
+      case 'isValid':
+        product.is_valid = e.detail.value?1:0
+        break
+      case 'isOnline':
+        product.is_online = e.detail.value?1:0
+        break
+      case 'barcode':
+        product.barcode = e.detail.value
+        break
+      case 'count':
+        if (isNaN(e.detail.value)){
+          wx.showToast({
+            title: '只能填写数字',
+            icon: 'error'
+          })
+        }
+        else{
+          product.count = parseInt(e.detail.value)
+        }
+        break
+      default:
+        break
+    }
+    that.setData({product: product})
+  },
+  saveBaseInfo(){
+    var that = this
+    var product = that.data.product
+    if (isNaN(product.count) || product.count == null || product.count == ''){
+      product.count = 1
+    }
+    var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/ModRentProduct?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: saveUrl,
+      method: 'POST',
+      data: product,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.getProduct()
+      }
+
+    })
+  },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
     var that = this
+    var id = options.id
+    
     const platform = wx.getSystemInfoSync().platform
     const isIOS = platform === 'ios'
-    this.setData({ isIOS})
+    this.setData({ isIOS, id})
    
     //this.updatePosition(0)
     let keyboardHeight = 0
@@ -84,6 +231,7 @@ Page({
       that.editorCtx.scrollIntoView()
     })
     that.getCategories()
+    that.getProduct()
   },
 
   /**
