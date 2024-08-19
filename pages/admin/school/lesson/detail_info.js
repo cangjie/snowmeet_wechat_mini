@@ -9,8 +9,8 @@ Page({
   data: {
     id: 0,
     videoThumbs: [],
-    instructors:[{open_id: '', name: '请选择……', head_image: '/images/unknown_person.png'}],
-    instructorNames: ['请选择……'],
+    instructors:[{open_id: '', name: '请选择……', head_image: '/images/unknown_person.png'}, {open_id: 'oHdTn5W8g2KOGPYOYFQyXaW46EVo', name: '无名测试', head_image: '/images/unknown_person.png'}],
+    instructorNames: ['请选择……','无名测试'],
     instructorSelectedIndex: 0,
     formInvalidMessage: '',
     role: '',
