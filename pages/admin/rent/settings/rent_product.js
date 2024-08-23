@@ -30,7 +30,8 @@ Page({
     isBaseInfoEditing: false,
     isParameterEditing: false,
     isDescEditing: false,
-    isCategoryEditing: false
+    isCategoryEditing: false,
+    html: ''
   },
 
   getCategories(){
@@ -74,7 +75,11 @@ Page({
         if (res.statusCode != 200){
           return
         }
-        that.setData({product: res.data, oriProduct: Object.assign({}, res.data)})
+        if (that.editorCtx != undefined && that.editorCtx != null){
+          that.editorCtx.setContents({html: res.data.description})
+        }
+        //that.editorCtx.setContents({html: res.data.description})
+        that.setData({product: res.data, html: res.data.description, oriProduct: Object.assign({}, res.data)})
       }
     })
   },
@@ -90,6 +95,12 @@ Page({
         break
       case 'desc':
         that.setData({isDescEditing: true})
+        //e.currentTarget.setContent({html:that.data.product.description})
+        var editor = that.selectComponent('#editor')
+        console.log('editor', editor)
+        //.setContents({html: that.data.product.description})
+        
+        
         break
       case 'category':
         that.setData({isCategoryEditing: true})
@@ -118,7 +129,8 @@ Page({
         that.setData({isParameterEditing: true})
         break
       case 'desc':
-        that.setData({isDescEditing: true})
+        that.editorCtx.setContents({html: that.data.product.description})
+        that.setData({isDescEditing: false, html: product.description})
         break
       case 'category':
         that.setData({isCategoryEditing: true})
@@ -130,7 +142,7 @@ Page({
   save(e){
     var that = this
     var id = e.currentTarget.id
-    //var product = that.data.product
+    var product = that.data.product
     switch(id){
       case 'baseInfo':
         that.setData({isBaseInfoEditing: false})
@@ -140,7 +152,9 @@ Page({
         that.setData({isParameterEditing: true})
         break
       case 'desc':
-        that.setData({isDescEditing: true})
+        product.description = that.data.html
+        that.setData({isDescEditing: false})
+        that.saveBaseInfo()
         break
       case 'category':
         that.setData({isCategoryEditing: true})
@@ -208,6 +222,13 @@ Page({
       }
 
     })
+  },
+  inputHtml(e){
+    console.log('input html', e)
+    var that = this
+    var html = that.data.html
+    html = e.detail.html
+    that.setData({html: html})
   },
 
   /**
@@ -299,6 +320,10 @@ Page({
     const that = this
     wx.createSelectorQuery().select('#editor').context(function (res) {
       that.editorCtx = res.context
+      if (that.data.product != null && that.data.product != undefined){
+        that.editorCtx.setContents({html: that.data.product.description})
+      }
+      
     }).exec()
   },
   blur() {

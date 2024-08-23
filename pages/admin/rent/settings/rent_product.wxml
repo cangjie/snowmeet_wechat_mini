@@ -140,13 +140,14 @@
 </mp-cells>
 <mp-cells title="编写简介" >
   <mp-cell>
-    <editor id="editor" class="ql-container" placeholder="{{'请输入。。。'}}" bindstatuschange="onStatusChange" bindready="onEditorReady"></editor>
+    <editor id="editor"  read-only="{{!isDescEditing}}" id="editor" class="ql-container"  bindstatuschange="onStatusChange" bindready="onEditorReady" bindinput="inputHtml" value="{{html}}" ></editor>
+    
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
       <button id="desc" class="input" size="mini" disabled="{{isDescEditing}}" bindtap="edit"> 编 辑 </button>
-      <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" > 保 存 </button>
-      <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" > 取 消 </button>
+      <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" bindtap="save" > 保 存 </button>
+      <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" bindtap="cancel" > 取 消 </button>
     </view>
   </mp-cell>
 </mp-cells>
