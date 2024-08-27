@@ -74,67 +74,19 @@
   </mp-cell>
 </mp-cells>
 <mp-cells title="详细参数">
-  <mp-cell>
+  <mp-cell wx:for="{{product.detailInfo}}" >
     <view class="view-row" >
-      <view class="left-column" >长度：</view>
+      <view class="left-column" >{{item.field.field_name}}：</view>
       <view class="right-column" style="width: 75%;">
-        <input style="width: 400rpx;" class="input" />
-      </view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >系列：</view>
-      <view class="right-column" style="width: 75%;">
-        <input style="width: 400rpx;" class="input" />
-      </view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >三围：</view>
-      <view class="right-column" style="width: 75%;">
-        <input style="width: 400rpx;" class="input" />
-      </view>
-    </view>
-  </mp-cell> 
-  <mp-cell>  
-    <view class="view-row" >
-      <view class="left-column" >适用年龄：</view>
-      <view class="right-column" style="width: 75%;">
-        <input style="width: 400rpx;" class="input" />
-      </view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >适用性别：</view>
-        <view class="right-column" style="width: 75%;">
-          <input style="width: 400rpx;" class="input" />
-        </view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >等级：</view>
-      <view class="right-column" style="width: 75%;">
-        <input style="width: 400rpx;" class="input" />
-      </view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >序列号：</view>
-      <view class="right-column" style="width: 75%;">
-        <input style="width: 400rpx;" class="input" />
+        <input id="{{item.field_id}}" style="width: 350rpx;" class="input" disabled="{{!isParameterEditing}}" bindinput="inputDetail" value="{{item.info}}" />
       </view>
     </view>
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
       <button id="parameter" class="input" size="mini" disabled="{{isParameterEditing}}" bindtap="edit" > 编 辑 </button>
-      <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" > 保 存 </button>
-      <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" > 取 消 </button>
+      <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" bindtap="save" > 保 存 </button>
+      <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" bindtap="cancel" > 取 消 </button>
     </view>
   </mp-cell>
 </mp-cells>

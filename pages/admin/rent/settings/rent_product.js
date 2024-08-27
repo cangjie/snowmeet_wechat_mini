@@ -80,6 +80,22 @@ Page({
         }
         //that.editorCtx.setContents({html: res.data.description})
         that.setData({product: res.data, html: res.data.description, oriProduct: Object.assign({}, res.data)})
+        that.getProductCategoryInfo()
+      }
+    })
+  },
+  getProductCategoryInfo(){
+    var that = this
+    var product = that.data.product
+    var getUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategoryById/' + product.category_id.toString()
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.setData({category: res.data})
       }
     })
   },
@@ -126,7 +142,8 @@ Page({
         that.setData({isBaseInfoEditing: false, product: product})
         break
       case 'parameter':
-        that.setData({isParameterEditing: true})
+        
+        that.setData({isParameterEditing: false, product: product})
         break
       case 'desc':
         that.editorCtx.setContents({html: that.data.product.description})
@@ -149,7 +166,26 @@ Page({
         that.saveBaseInfo()
         break
       case 'parameter':
-        that.setData({isParameterEditing: true})
+        var postUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/UpdateRentProductDetailInfo/'
+          + product.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+        var infos = []
+        for(var i = 0; i < that.data.category.infoFields.length; i++){
+          infos.push({product_id: product.id, field_id: that.data.category.infoFields[i].id, 
+            info: that.data.category.infoFields[i].info})
+        }
+        wx.request({
+          url: postUrl,
+          method: 'POST',
+          data: infos,
+          success:(res) => {
+            if (res.statusCode != 200){
+              return
+            }
+            product = res.data
+            that.setData({product: product})
+          }
+        })
+        that.setData({isParameterEditing: false})
         break
       case 'desc':
         product.description = that.data.html
@@ -229,6 +265,21 @@ Page({
     var html = that.data.html
     html = e.detail.html
     that.setData({html: html})
+  },
+  inputDetail(e){
+    var that = this
+    var id = e.currentTarget.id
+    var product = that.data.product
+    var value = e.detail.value
+    var category = that.data.category
+    var infoFields = category.infoFields
+    for(var i = 0; i < infoFields.length; i++){
+      if (infoFields[i].id == id){
+        infoFields[i].info = value
+        break
+      }
+    }
+
   },
 
   /**
