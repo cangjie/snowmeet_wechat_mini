@@ -1,7 +1,7 @@
 <block wx:if="{{product.shop == 'null'}}" >
-  <shop-selector></shop-selector>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
   <view class="view-row" >
-    <button class="input" > 指 派 店 铺 </button>
+    <button class="input" bindtap="setShop" > 指 派 店 铺 </button>
   </view>
 </block>
 <mp-cells title="基本信息" >

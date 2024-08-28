@@ -223,7 +223,7 @@ Page({
       case 'category':
         product.category_id = that.data.selectedCategory.id
         that.saveBaseInfo()
-        
+
         that.setData({isCategoryEditing: false})
         break
       default:
@@ -318,6 +318,18 @@ Page({
     if (that.data.isCategoryEditing){
       that.setData({selectedCategory: e.detail.item})
     }
+  },
+  shopSelected(e){
+    console.log('shop selected', e)
+    var that = this
+    that.setData({selectedShop: e.detail.shop})
+  },
+  setShop(){
+    var that = this
+    var product = that.data.product
+    product.shop = that.data.selectedShop
+    that.saveBaseInfo()
+    that.setData({product: product})
   },
 
   /**
