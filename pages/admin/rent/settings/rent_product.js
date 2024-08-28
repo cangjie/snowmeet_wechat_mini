@@ -36,17 +36,33 @@ Page({
 
   getCategories(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategory/01'
+    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategoryById/' + that.data.product.category_id
     wx.request({
       url: url,
       method:'GET',
       success:(res)=>{
         if (res.statusCode != 200){
-          that.setData({dataTree: [], selectedName: '', selectedCode: ''})
+          //that.setData({dataTree: [], selectedName: '', selectedCode: ''})
           return
         }
-        var dataTree = this.convertCategoryTree(res.data.children)
-        that.setData({dataTree: dataTree})
+        var categoryCode = res.data.code
+        that.setData({selectedCategory: res.data})
+        categoryCode = categoryCode.substr(0, categoryCode.length - 2)
+        url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategory/' + categoryCode
+        wx.request({
+          url: url,
+          method:'GET',
+          success:(res)=>{
+            if (res.statusCode != 200){
+              that.setData({dataTree: [], selectedName: '', selectedCode: ''})
+              return
+            }
+            var dataTree = this.convertCategoryTree(res.data.children)
+            that.setData({dataTree: dataTree})
+          }
+        })
+
+        
       }
     })
     
@@ -75,12 +91,14 @@ Page({
         if (res.statusCode != 200){
           return
         }
+        
         if (that.editorCtx != undefined && that.editorCtx != null){
           that.editorCtx.setContents({html: res.data.description})
         }
         //that.editorCtx.setContents({html: res.data.description})
         that.setData({product: res.data, html: res.data.description, oriProduct: Object.assign({}, res.data)})
         that.getProductCategoryInfo()
+        that.getCategories()
       }
     })
   },
@@ -102,6 +120,7 @@ Page({
   edit(e){
     var id = e.currentTarget.id
     var that = this
+    var product = that.data.product
     switch(id){
       case 'baseInfo':
         that.setData({isBaseInfoEditing: true})
@@ -119,7 +138,15 @@ Page({
         
         break
       case 'category':
-        that.setData({isCategoryEditing: true})
+        var dataTree = that.data.dataTree
+        var selectedCategory = undefined
+        for(var i = 0; i < dataTree.length; i++){
+          if (dataTree[i].id == product.category_id){
+            selectedCategory = dataTree[i]
+            break
+          }
+        }
+        that.setData({isCategoryEditing: true, selectedCategory: selectedCategory})
         break
       default:
         break
@@ -150,7 +177,8 @@ Page({
         that.setData({isDescEditing: false, html: product.description})
         break
       case 'category':
-        that.setData({isCategoryEditing: true})
+        that.getCategories()
+        that.setData({isCategoryEditing: false})
         break
       default:
         break
@@ -193,7 +221,10 @@ Page({
         that.saveBaseInfo()
         break
       case 'category':
-        that.setData({isCategoryEditing: true})
+        product.category_id = that.data.selectedCategory.id
+        that.saveBaseInfo()
+        
+        that.setData({isCategoryEditing: false})
         break
       default:
         break
@@ -281,6 +312,13 @@ Page({
     }
 
   },
+  handleSelect(e){
+    console.log('select category', e)
+    var that = this
+    if (that.data.isCategoryEditing){
+      that.setData({selectedCategory: e.detail.item})
+    }
+  },
 
   /**
    * Lifecycle function--Called when page load
@@ -302,7 +340,7 @@ Page({
       that.updatePosition(keyboardHeight)
       that.editorCtx.scrollIntoView()
     })
-    that.getCategories()
+    //that.getCategories()
     that.getProduct()
   },
 

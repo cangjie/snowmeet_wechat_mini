@@ -93,7 +93,6 @@
 <mp-cells title="编写简介" >
   <mp-cell>
     <editor id="editor"  read-only="{{!isDescEditing}}" id="editor" class="ql-container"  bindstatuschange="onStatusChange" bindready="onEditorReady" bindinput="inputHtml" value="{{html}}" ></editor>
-    
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
@@ -117,7 +116,7 @@
   <mp-cell>
     <view class="view-row" >
       <button id="category" class="input" size="mini" disabled="{{isCategoryEditing}}"  bindtap="edit" > 编 辑 </button>
-      <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" > 保 存 </button>
+      <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" bindtap="save" > 保 存 </button>
       <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" bindtap="cancel" > 取 消 </button>
     </view>
   </mp-cell>
