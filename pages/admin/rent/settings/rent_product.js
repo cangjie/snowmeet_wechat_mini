@@ -31,7 +31,8 @@ Page({
     isParameterEditing: false,
     isDescEditing: false,
     isCategoryEditing: false,
-    html: ''
+    html: '',
+    images: ''
   },
 
   getCategories(){
@@ -96,7 +97,12 @@ Page({
           that.editorCtx.setContents({html: res.data.description})
         }
         //that.editorCtx.setContents({html: res.data.description})
-        that.setData({product: res.data, html: res.data.description, oriProduct: Object.assign({}, res.data)})
+        var images = ''
+        for(var i = 0; i < res.data.images.length; i++){
+          images = images + ((i == 0)?'':',') + res.data.images[i].image_url
+        }
+
+        that.setData({product: res.data, html: res.data.description, oriProduct: Object.assign({}, res.data), images: images})
         that.getProductCategoryInfo()
         that.getCategories()
       }
@@ -330,6 +336,29 @@ Page({
     product.shop = that.data.selectedShop
     that.saveBaseInfo()
     that.setData({product: product})
+  },
+
+  uploaded(e){
+    console.log('upload file', e)
+    var imageUrlArr = []
+    for(var i = 0; i < e.detail.files.length; i++){
+      imageUrlArr.push(e.detail.files[i].url)
+    }
+    var that = this
+    var product = that.data.product
+    var postUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetRentProductImage/' + product.id.toString() 
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: postUrl,
+      method: 'POST',
+      data: imageUrlArr,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.getProduct()
+      }
+    })
   },
 
   /**

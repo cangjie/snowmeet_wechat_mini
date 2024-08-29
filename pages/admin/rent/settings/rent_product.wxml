@@ -70,7 +70,7 @@
 </mp-cells>
 <mp-cells title="上传图片" >
   <mp-cell>
-    <multi-uploader ></multi-uploader>
+    <multi-uploader  bindUploaded="uploaded" uploaded_files="{{images}}" ></multi-uploader>
   </mp-cell>
 </mp-cells>
 <mp-cells title="详细参数">
@@ -121,14 +121,14 @@
     </view>
   </mp-cell>
 </mp-cells>
-  <price-matrix 
+  <!--price-matrix 
     priceMatrix="{{priceArr}}" 
      fieldRow="{{['门市', '预约', '会员']}}" 
     fieldCol="{{['平日','周末','节假日']}}" 
     bindmod="modPrice"
     bindTabChange="tabChange"
     disabled="{{false}}"
-  ></price-matrix>
+  ></price-matrix-->
 <view style="height: 500rpx;" ></view>
 <view class="toolbar" catchtouchend="format" hidden="{{keyboardHeight > 0 ? false : true}}" style="bottom: {{isIOS ? editorHeight-200 : 0}}px">
   <i class="iconfont icon-charutupian" catchtouchend="insertImage"></i>
