@@ -121,6 +121,9 @@
     </view>
   </mp-cell>
 </mp-cells>
+<view style="height: 500rpx; margin-top: 100rpx;" >
+  <button bind:tap="del" class="input" > 删 除 </button>
+</view>
   <!--price-matrix 
     priceMatrix="{{priceArr}}" 
      fieldRow="{{['门市', '预约', '会员']}}" 

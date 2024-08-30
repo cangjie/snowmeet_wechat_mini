@@ -361,6 +361,26 @@ Page({
     })
   },
 
+  del(){
+    var that = this
+    var product = that.data.product
+    wx.showModal({
+      title: '确认删除？',
+      content: '此操作不可恢复。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          product.is_delete = 1
+          that.saveBaseInfo()
+          wx.navigateBack()
+        }
+      }
+    })
+  },
+
   /**
    * Lifecycle function--Called when page load
    */

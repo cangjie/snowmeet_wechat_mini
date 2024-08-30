@@ -93,7 +93,12 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    console.log('show')
+    var that = this
+    that.setData({selectedCategory: null})
+    
+    that.getCategories()
+    
   },
 
   /**
