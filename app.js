@@ -97,7 +97,7 @@ App({
                             wx.getSystemInfoAsync({
                               success:(res)=>{
                                 app.globalData.systemInfo = res
-                                
+                                resolve(app.globalData)
                                 
                               },
                               fail:(res)=>{
