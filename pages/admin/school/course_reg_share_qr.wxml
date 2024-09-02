@@ -1,0 +1,15 @@
+<view>
+  <mp-cells title="二维码" >
+    <mp-cell>
+      <view style="text-align: center;" >
+        <image src="/images/pic_160.png" style="width: 400rpx;height: 400rpx;" ></image>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view>用户不是易龙雪聚的会员，请将此二维码分享给用户，提示用户使用在此登记的顾客手机号注册。</view>
+    </mp-cell>
+    <mp-cell>
+      <view>用户已经是会员，提示用户扫描此二维码打开领取优惠券。</view>
+    </mp-cell>
+  </mp-cells>
+</view>

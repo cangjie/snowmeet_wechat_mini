@@ -1,0 +1,92 @@
+<!--pages/admin/school/course_reg.wxml-->
+<view>
+<mp-cells title="教练个人信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >王二麻子</view>
+        <view class="left-column" >类型：</view>
+        <view class="right-column" >万龙滑雪学校</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="课程信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >雪场：</view>
+        <view class="right-column" >
+          <input class="input" placeholder="万龙" />
+        </view>
+        <view class="left-column" >日期：</view>
+        <view class="right-column" >
+          <input class="input" placeholder="2024-12-5" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >时长：</view>
+        <view class="right-column" >
+          <input class="input" placeholder="4小时" />
+        </view>
+        <view class="left-column" >收费：</view>
+        <view class="right-column" >
+          <input class="input" placeholder="500" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 350rpx;" >万龙滑雪学校订单号：</view>
+        <view class="right-column" ><input placeholder="wlssjddjd8393jd" class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" ></view>
+        <view class="right-column" ></view>
+        <view class="left-column" ></view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="顾客信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" ><input class="input" placeholder="张三" /></view>
+        <view class="left-column" >性别：</view>
+        <view class="right-column" ><input class="input" placeholder="男" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >电话：</view>
+        <view class="right-column" ><input class="input" placeholder="13501177897" /></view>
+        <view class="left-column" >是否会员：</view>
+        <view class="right-column" >否</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="学员信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >关系：</view>
+        <view class="right-column" ><input class="input" placeholder="子女" /></view>
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" ><input class="input" placeholder="张三三" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >性别：</view>
+        <view class="right-column" ><input class="input" placeholder="女" /></view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" ><input class="input" placeholder="18501097897" /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view>
+    <button class="input" bindtap="reg" > 确 认 登 记 </button>
+  </view>
+</view>

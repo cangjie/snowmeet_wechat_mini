@@ -217,6 +217,9 @@ Page({
       case 'rent_product_add':
         path = '/pages/admin/rent/settings/rent_product_add'
         break
+      case 'wl_course_reg':
+        path = '/pages/admin/school/course_reg'
+        break
       default:
         break
     }
