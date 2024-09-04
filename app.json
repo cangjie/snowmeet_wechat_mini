@@ -109,7 +109,9 @@
     "pages/admin/rent/settings/rent_product",
     "pages/admin/rent/settings/rent_product_add",
     "pages/admin/school/course_reg",
-    "pages/admin/school/course_reg_share_qr"
+    "pages/admin/school/course_reg_share_qr",
+    "pages/admin/school/course_reg_list",
+    "pages/admin/school/course_reg_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

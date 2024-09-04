@@ -1,15 +1,4 @@
-<!--pages/admin/school/course_reg.wxml-->
 <view>
-  <mp-cells title="教练个人信息" >
-    <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >姓名：</view>
-        <view class="right-column" >王二麻子</view>
-        <view class="left-column" >类型：</view>
-        <view class="right-column" >万龙滑雪学校</view>
-      </view>
-    </mp-cell>
-  </mp-cells>
   <mp-cells title="课程信息" >
     <mp-cell>
       <view class="view-row" >
@@ -86,7 +75,34 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view>
-    <button class="input" bindtap="reg" > 确 认 登 记 </button>
-  </view>
+  <mp-cells title="课前视频" >
+    <mp-cell>
+      <view style="height: 300rpx;"></view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="上次课情况" >
+    <mp-cell>
+      <view style="height: 100rpx;">教学内容</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 300rpx;">上课视频</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 100rpx;">教练点评</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 100rpx;">学员心得</view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="消费返佣" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >租赁：</view>
+        <view class="right-column" >¥10.00</view>
+        <view class="left-column" >雪票：</view>
+        <view class="right-column" >¥1.00</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+
 </view>

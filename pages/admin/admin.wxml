@@ -51,6 +51,7 @@
     <!--mp-cell id="reserve_instructor" value="课程预约" bindtap="nav" ></mp-cell>
     <mp-cell id="reserve_instructor_list" value="预约列表" bindtap="nav" ></mp-cell-->
     <mp-cell id="wl_course_reg" value="课程登记" bindtap="nav" ></mp-cell>
+    <mp-cell id="wl_course_list" value="课程列表" bindtap="nav" ></mp-cell>
   </mp-cells>
   <!--mp-cells ext-class="my-cells" title="优惠券" >
     <mp-cell id="ticket_print" value="打印" bindtap="nav" ></mp-cell>

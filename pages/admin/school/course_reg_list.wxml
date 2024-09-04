@@ -1,0 +1,46 @@
+<view>
+  <mp-cells title="课程列表" >
+    <mp-cell>
+      <view class="view-row" bindtap="gotoDetail" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >张三</view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >13501177897</view>
+      </view>
+      <view class="view-row" bindtap="gotoDetail" >
+        <view class="left-column" >日期：</view>
+        <view class="right-column" >2024-12-12</view>
+        <view class="left-column" >状态：</view>
+        <view class="right-column" >--</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" bindtap="gotoDetail" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >张三</view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >13501177897</view>
+      </view>
+      <view class="view-row" bindtap="gotoDetail" >
+        <view class="left-column" >日期：</view>
+        <view class="right-column" >2024-12-12</view>
+        <view class="left-column" >状态：</view>
+        <view class="right-column" >--</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" bindtap="gotoDetail" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >张三</view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >13501177897</view>
+      </view>
+      <view class="view-row" bindtap="gotoDetail" >
+        <view class="left-column" >日期：</view>
+        <view class="right-column" >2024-12-12</view>
+        <view class="left-column" >状态：</view>
+        <view class="right-column" >--</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

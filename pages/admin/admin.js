@@ -220,6 +220,8 @@ Page({
       case 'wl_course_reg':
         path = '/pages/admin/school/course_reg'
         break
+      case 'wl_course_list':
+        path = '/pages/admin/school/course_reg_list'
       default:
         break
     }
