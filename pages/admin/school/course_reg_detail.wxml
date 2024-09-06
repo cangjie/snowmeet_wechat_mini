@@ -57,6 +57,11 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <view style="text-align: center;margin-top: 30rpx;">
+    <radio-group>
+      <radio checked="{{true}}">学员1</radio><radio>学员2</radio><radio>学员3</radio>
+    </radio-group>
+  </view>
   <mp-cells title="学员信息" >
     <mp-cell>
       <view class="view-row" >
@@ -74,27 +79,78 @@
         <view class="right-column" ><input class="input" placeholder="18501097897" /></view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >上次课日期：</view>
+        <view class="right-column" >2024-12-1</view>
+        <view class="left-column" >累计次数：</view>
+        <view class="right-column" >2</view>
+       
+      </view>
+    </mp-cell>
+
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 35%;" >紧急联系人姓名：</view>
+        <view class="right-column" style="width: 50%;" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 35%;" >紧急联系人电话：</view>
+        <view class="right-column" style="width: 50%;" ></view>
+      </view>
+    </mp-cell>
   </mp-cells>
-  <mp-cells title="课前视频" >
+  <mp-cells title="学员自拍视频" >
     <mp-cell>
       <view style="height: 300rpx;"></view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="上次课情况" >
     <mp-cell>
-      <view style="height: 100rpx;">教学内容</view>
+      <view style="height: 100rpx;">课程名称（单板）</view>
     </mp-cell>
     <mp-cell>
-      <view style="height: 300rpx;">上课视频</view>
+      <view style="height: 100rpx;">教练信息</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 100rpx;">教学大纲</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 300rpx;">教学视频</view>
     </mp-cell>
     <mp-cell>
       <view style="height: 100rpx;">教练点评</view>
     </mp-cell>
     <mp-cell>
+      <view style="height: 100rpx;">学员点评</view>
+    </mp-cell>
+    <mp-cell>
       <view style="height: 100rpx;">学员心得</view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="消费返佣" >
+  <mp-cells title="本次课情况" >
+    <mp-cell>
+      <view style="height: 100rpx;">课程名称（双板）</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 100rpx;">教学大纲</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 300rpx;">教学视频</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 100rpx;">教练点评</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 100rpx;">学员点评</view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 100rpx;">学员心得</view>
+    </mp-cell>
+  </mp-cells>
+  <!--mp-cells title="消费返佣" >
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >租赁：</view>
@@ -103,6 +159,6 @@
         <view class="right-column" >¥1.00</view>
       </view>
     </mp-cell>
-  </mp-cells>
+  </mp-cells-->
 
 </view>

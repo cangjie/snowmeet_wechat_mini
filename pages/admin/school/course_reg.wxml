@@ -34,11 +34,38 @@
           <input class="input" placeholder="500" />
         </view>
       </view>
+
+    </mp-cell>
+    
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column"  >课程名称：</view>
+        <view class="right-column" style="width: 75%;" >
+          <input style="width: 400rpx;" class="input" />
+        </view>
+      </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
-        <view class="left-column" style="width: 350rpx;" >万龙滑雪学校订单号：</view>
+        <view class="left-column" >教学大纲：</view>
+        <view class="right-column" style="width: 75%;"  >
+          <textarea style="width: 400rpx; height: 200rpx;" class="input"></textarea>
+        </view>
+       
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 300rpx;" >万龙滑雪学校订单号：</view>
         <view class="right-column" ><input placeholder="wlssjddjd8393jd" class="input" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="text-align: center;">
+        <radio-group class="view-row" style="text-align: center;" >
+          <radio>双板</radio>
+          <radio>单板</radio>
+        </radio-group>
       </view>
     </mp-cell>
     <mp-cell>
@@ -68,7 +95,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="学员信息" >
+  <mp-cells title="学员1 新学员" >
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >关系：</view>
@@ -83,6 +110,78 @@
         <view class="right-column" ><input class="input" placeholder="女" /></view>
         <view class="left-column" >电话：</view>
         <view class="right-column" ><input class="input" placeholder="18501097897" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width:50%" >紧急联系人姓名：</view>
+        <view class="right-column" style="width:50%"  ><input class="input" style="width: 150rpx;" placeholder="张三爸爸" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width:50%"  >紧急联系人电话：</view>
+        <view class="right-column" style="width:50%" ><input class="input" style="width: 200rpx;" placeholder="18501097897" /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="学员2 老学员 上次课时间 2024-12-1 总次数：2" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >关系：</view>
+        <view class="right-column" ><input class="input" placeholder="子女" /></view>
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" ><input class="input" placeholder="张三三" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >性别：</view>
+        <view class="right-column" ><input class="input" placeholder="女" /></view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" ><input class="input" placeholder="18501097897" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width:50%" >紧急联系人姓名：</view>
+        <view class="right-column" style="width:50%"  ><input class="input" style="width: 150rpx;" placeholder="张三爸爸" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width:50%"  >紧急联系人电话：</view>
+        <view class="right-column" style="width:50%" ><input class="input" style="width: 200rpx;" placeholder="18501097897" /></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="学员3 新学员" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >关系：</view>
+        <view class="right-column" ><input class="input" placeholder="子女" /></view>
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" ><input class="input" placeholder="张三三" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >性别：</view>
+        <view class="right-column" ><input class="input" placeholder="女" /></view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" ><input class="input" placeholder="18501097897" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width:50%" >紧急联系人姓名：</view>
+        <view class="right-column" style="width:50%"  ><input class="input" style="width: 150rpx;" placeholder="张三爸爸" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width:50%"  >紧急联系人电话：</view>
+        <view class="right-column" style="width:50%" ><input class="input" style="width: 200rpx;" placeholder="18501097897" /></view>
       </view>
     </mp-cell>
   </mp-cells>
