@@ -42,6 +42,7 @@
   </mp-cells>
   <mp-cells ext-class="my-cells" title="用户管理" >
     <mp-cell id="staff_list" value="员工列表" bindtap="nav" wx:if="{{isManager}}" ></mp-cell>
+    <mp-cell id="staff_list_new" value="员工列表" bindtap="nav" wx:if="{{isAdmin}}" ></mp-cell>
   </mp-cells>
   <!--mp-cells ext-class="my-cells" title="试滑" >
     <mp-cell id="expierence_admit" value="试滑收押金" bindtap="nav" ></mp-cell>

@@ -111,7 +111,10 @@
     "pages/admin/school/course_reg",
     "pages/admin/school/course_reg_share_qr",
     "pages/admin/school/course_reg_list",
-    "pages/admin/school/course_reg_detail"
+    "pages/admin/school/course_reg_detail",
+    "pages/admin/staff_reg",
+    "pages/admin/staff/staff_list",
+    "pages/admin/staff/staff_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,0 +1,33 @@
+<view>
+  <mp-cells title="按照手机号查询">
+    <mp-cell>
+      <view class="view-row" >
+        <view>手机号：</view>
+        <input style="width: 220rpx;" class="input" bindinput="setInput" />
+        <button size="mini" class="input" bindtap="query" > 查 询 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="员工列表" >
+    <mp-cell wx:for="{{members}}"  >
+      <view class="view-row" id="{{item.id}}" bindtap="jumpDetail"  >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >{{item.real_name}}</view>
+        <view class="left-column" >性别：</view>
+        <view class="right-column" >{{item.gender}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="jumpDetail" >
+        <view class="left-column" >管理员：</view>
+        <view class="right-column" >{{item.is_admin == 1 ? '是' : '否'}}</view>
+        <view class="left-column" >店长：</view>
+        <view class="right-column" >{{item.is_manager == 1 ? '是' : '否'}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="jumpDetail" >
+        <view class="left-column" >店员：</view>
+        <view class="right-column" >{{item.is_staff == 1 ? '是' : '否'}}</view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >{{item.cell}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

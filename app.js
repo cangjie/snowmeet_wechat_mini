@@ -41,16 +41,64 @@ App({
     wx.login({
       success:(res)=>{
         const app = getApp()
-        console.log('weixin log in success.')
-        console.log(res)
-        var url = 'https://' + app.globalData.domainName + '/core/MiniAppHelper/Login?code=' + res.code
+        console.log('weixin log in success.', res)
+        var url = 'https://' + app.globalData.domainName + '/core/MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
         wx.request({
           url: url,
           method: 'GET',
           success: (res) => {
-            console.log('get seesionkey success')
-            console.log(res)
+            console.log('get seesionkey success', res)
             app.globalData.sessionKey = res.data.session_key
+            var member = res.data.member
+            var cell = ''
+            for (var msa in member.memberSocialAccounts){
+              if (msa.type == 'cell'){
+                cell = msa.num
+                break
+              }
+            }
+            var userInfo = {open_id: '', union_id: '', cell_number: cell, real_name: member.real_name, gender: member.gender, nick: member.real_name, is_admin: member.is_admin, is_manager: member.is_manager, is_staff: member.is_staff}
+            app.globalData.memberInfo = member
+            app.globalData.userInfo = userInfo
+            app.globalData.is_admin = member.is_admin
+            app.globalData.is_manager = member.is_manager
+            app.globalData.is_staff = member.is_staff
+            if (member.is_admin || member.is_manager || member.is_staff){
+              app.globalData.role = 'staff'
+            }
+            else{
+              app.globalData.role = ''
+            }
+            wx.getSystemInfoAsync({
+              success:(res)=>{
+                app.globalData.systemInfo = res
+                resolve(app.globalData)
+                
+              },
+              fail:(res)=>{
+                console.log('get sys info fail, try sync', res)
+                try{
+                  app.globalData.systemInfo = wx.getSystemInfoSync()
+                }
+                catch(err){
+                  console.log('get sys info sync fail', err)
+                }
+                resolve(app.globalData)
+              }
+            })
+            
+
+
+
+
+
+
+
+
+/*
+
+
+
 
             url = 'https://' + app.globalData.domainName + '/core/Member/GetMemberInfoSimple?sessionkey=' +     encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
 
@@ -59,8 +107,28 @@ App({
               method: 'GET',
               success:(res)=>{
                 if (res.statusCode == 200){
+                  console.log('get member info', res)
                   app.globalData.memberInfo = res.data
-                  //resolve(app.globalData)
+                  wx.getSystemInfoAsync({
+                    success:(res)=>{
+                      app.globalData.systemInfo = res
+                      resolve(app.globalData)
+                      
+                    },
+                    fail:(res)=>{
+                      console.log('get sys info fail, try sync', res)
+                      try{
+                        app.globalData.systemInfo = wx.getSystemInfoSync()
+                      }
+                      catch(err){
+                        console.log('get sys info sync fail', err)
+                      }
+                      resolve(app.globalData)
+                    }
+                  })
+
+
+
 
                   url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
@@ -151,7 +219,7 @@ App({
               }
             })
 
-
+*/
             
 
 

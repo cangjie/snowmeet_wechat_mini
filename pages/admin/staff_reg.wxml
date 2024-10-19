@@ -1,0 +1,25 @@
+<view>
+  <view style="text-align: center; margin-top: 50rpx;">新员工注册</view>
+  <mp-cells title="填写个人信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" ><input class="input" value="{{name}}" bindinput="setName" /></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >性别：</view>
+        <view class="right-column" >
+          <radio-group bindchange="setGender" >
+            <radio checked="{{gender=='男'}}" value="男" >男</radio>
+            <radio checked="{{gender=='女'}}" value="女" >女</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <button open-type="getPhoneNumber" class="input" bindgetphonenumber="submit" > 授 权 手 机 号 </button>
+    </mp-cell>
+  </mp-cells>
+</view>
