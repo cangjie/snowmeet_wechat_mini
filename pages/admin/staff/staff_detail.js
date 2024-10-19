@@ -12,13 +12,13 @@ Page({
   submit(){
     var that = this
     var member = that.data.member
-    var url = 'https://' + app.globalData.domainName + '/core/Member/SetStaffInfo/' + that.data.memberId.toString() + '?name=' + encodeURIComponent(member.real_name) + '&gender=' + encodeURIComponent(member.gender) + '&cell=' + member.cell + '&isAdmin=' + member.is_admin + '&isManager=' + member.is_manager + '&isStaff=' + member.is_staff + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    var url = 'https://' + app.globalData.domainName + '/core/Member/SetStaffInfo/' + that.data.memberId.toString() + '?name=' + encodeURIComponent(member.real_name) + '&gender=' + encodeURIComponent(member.gender) + '&cell=' + member.cell + '&isAdmin=' + member.is_admin + '&isManager=' + member.is_manager + '&isStaff=' + member.is_staff + '&inStaffList=1&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: url,
       method: 'GET',
       success:(res)=>{
         console.log('member info update', res)
-        
+
       }
     })
   },
