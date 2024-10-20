@@ -52,6 +52,15 @@ Page({
           return
         }
         var members = res.data
+        for(var i = 0; i < members.length; i++){
+          var member = members[i]
+          if (member.is_admin == 0 && member.is_manager == 0 && member.is_staff == 0){
+            member.color = 'red'
+          }
+          else{
+            member.color = 'black'
+          }
+        }
         that.setData({members})
       }
     })

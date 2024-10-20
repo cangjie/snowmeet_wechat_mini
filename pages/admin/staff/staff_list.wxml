@@ -11,22 +11,22 @@
   <mp-cells title="员工列表" >
     <mp-cell wx:for="{{members}}"  >
       <view class="view-row" id="{{item.id}}" bindtap="jumpDetail"  >
-        <view class="left-column" >姓名：</view>
-        <view class="right-column" >{{item.real_name}}</view>
-        <view class="left-column" >性别：</view>
-        <view class="right-column" >{{item.gender}}</view>
+        <view class="left-column" style="color: {{item.color}};" >姓名：</view>
+        <view class="right-column" style="color: {{item.color}};" >{{item.real_name}}</view>
+        <view class="left-column" style="color: {{item.color}};" >性别：</view>
+        <view class="right-column" style="color: {{item.color}};" >{{item.gender}}</view>
       </view>
       <view class="view-row" id="{{item.id}}" bindtap="jumpDetail" >
-        <view class="left-column" >管理员：</view>
-        <view class="right-column" >{{item.is_admin == 1 ? '是' : '否'}}</view>
-        <view class="left-column" >店长：</view>
-        <view class="right-column" >{{item.is_manager == 1 ? '是' : '否'}}</view>
+        <view class="left-column" style="color: {{item.color}};" >管理员：</view>
+        <view class="right-column" style="color: {{item.color}};" >{{item.is_admin == 1 ? '是' : '否'}}</view>
+        <view class="left-column" style="color: {{item.color}};" >店长：</view>
+        <view class="right-column" style="color: {{item.color}};" >{{item.is_manager == 1 ? '是' : '否'}}</view>
       </view>
       <view class="view-row" id="{{item.id}}" bindtap="jumpDetail" >
-        <view class="left-column" >店员：</view>
-        <view class="right-column" >{{item.is_staff == 1 ? '是' : '否'}}</view>
-        <view class="left-column" >电话：</view>
-        <view class="right-column" >{{item.cell}}</view>
+        <view class="left-column" style="color: {{item.color}};" >店员：</view>
+        <view class="right-column" style="color: {{item.color}};" >{{item.is_staff == 1 ? '是' : '否'}}</view>
+        <view class="left-column" style="color: {{item.color}};" >电话：</view>
+        <view class="right-column" style="color: {{item.color}};" >{{item.cell}}</view>
       </view>
     </mp-cell>
   </mp-cells>

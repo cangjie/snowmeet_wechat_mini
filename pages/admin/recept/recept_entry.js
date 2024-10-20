@@ -12,11 +12,12 @@ Page({
   searchUser(){
     var that = this
     var cell = that.data.cell
-    var getUserUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetUserByCell/' + cell + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var getUserUrl = 'https://' + app.globalData.domainName + '/core/Member/GetMemberByCell/' + cell + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: getUserUrl,
       method: 'GET',
       success:(res)=>{
+          console.log('get user', res)
           if (res.statusCode != 200){
               return
           }
