@@ -18,7 +18,47 @@ Page({
       method: 'GET',
       success:(res)=>{
         console.log('member info update', res)
+        if (res.statusCode != 200){
+          return
+        }
+        wx.showToast({
+          title: '修改成功',
+          icon: 'success'
+        })
+      }
+    })
+  },
 
+  delete(){
+    wx.showModal({
+      title: '确认删除？',
+      content: '删除后将会取消此人所有的权限。',
+      complete: (res) => {
+        if (res.cancel) {
+          return
+        }
+    
+        if (res.confirm) {
+          var that = this
+          var url = 'https://' + app.globalData.domainName + '/core/Member/SetStaffInfo/' + that.data.memberId.toString() + '?name=&gender=&cell=&isAdmin=0&isManager=0&isStaff=0&inStaffList=0&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+          wx.request({
+            url: url,
+            method:'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+              wx.showToast({
+                title: '删除成功',
+                icon: 'success',
+                duration: 3000,
+                success:()=>{
+                  wx.navigateBack()
+                }
+              })
+            }
+          })
+        }
       }
     })
   },
