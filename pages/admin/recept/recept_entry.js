@@ -1,5 +1,6 @@
 // pages/admin/recept/recept_entry.js
 const app = getApp()
+const util = require('../../../utils/util.js')
 Page({
 
   /**
@@ -21,7 +22,9 @@ Page({
           if (res.statusCode != 200){
               return
           }
-          var openId = res.data.open_id
+          var member = res.data
+          
+          var openId = util.getMemberInfo(member, 'wechat_mini_openid')
           var interval = that.data.interVal
           clearInterval(interval)
           wx.navigateTo({

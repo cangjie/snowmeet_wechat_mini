@@ -1,3 +1,14 @@
+const getMemberInfo = (member, infoType) =>{
+    var num = ''
+    for(var i = 0; i < member.memberSocialAccounts.length; i++){
+      var msa = member.memberSocialAccounts[i]
+      if (msa.type == infoType && msa.valid == 1){
+        num = msa.num
+        break
+      }
+    }
+    return num
+}
 const formatDateTime = date => {
 
   const year = date.getFullYear()
@@ -106,6 +117,7 @@ module.exports = {
   skiPassDescNanashanRentAll: skiPassDescNanashanRentAll,
   skiPassDescNanashanCommon: skiPassDescNanashanCommon,
   isBlank: isBlank,
-  getDisplayedCode: getDisplayedCode
+  getDisplayedCode: getDisplayedCode,
+  getMemberInfo: getMemberInfo
   
 }
