@@ -20,6 +20,10 @@ Page({
       success:(res)=>{
           console.log('get user', res)
           if (res.statusCode != 200){
+              wx.showToast({
+                title: '不是会员请扫码注册。',
+                icon: 'error'
+              })
               return
           }
           var member = res.data
@@ -98,7 +102,7 @@ Page({
           if (scan.scan ==1){
             var word = '顾客已扫码。'
             if (scan.miniAppUser == null || scan.miniAppUser.cell_number == ''){
-              word = '顾客不是会员。'
+              word = '顾客不是会员，必须填写手机号。'
             }
             else {
               word = ''
