@@ -6,12 +6,14 @@ Page({
    * Page initial data
    */
   data: {
-    isLogin: false
+    isLogin: false,
+    isSuc: false
   },
 
   getCell(e){
     console.log('get cell', e)
-    var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateUserInfo?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&encData='+encodeURIComponent(e.detail.encryptedData)+'&iv='+encodeURIComponent(e.detail.iv)
+    var that = this
+    var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateWechatMemberCell?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&encData='+encodeURIComponent(e.detail.encryptedData)+'&iv='+encodeURIComponent(e.detail.iv)
     wx.request({
       url: url,
       success:(res)=>{
@@ -30,7 +32,9 @@ Page({
           icon: 'success',
           success: (res) => {},
           fail: (res) => {},
-          complete: (res) => {},
+          complete: (res) => {
+            that.setData({isSuc: true})
+          },
         })
         setTimeout(()=>{
           wx.exitMiniProgram(
