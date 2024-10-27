@@ -101,7 +101,7 @@ Page({
           var needJump = false
           if (scan.scan ==1){
             var word = '顾客已扫码。'
-            if (scan.miniAppUser == null || scan.miniAppUser.cell_number == ''){
+            if (scan.member == null || scan.member.cell == ''){
               word = '顾客不是会员，必须填写手机号。'
             }
             else {
@@ -117,7 +117,7 @@ Page({
             }
             if (needJump){
               clearInterval(that.data.interVal)
-              var jumpUrl = 'recept_member_info?openId=' + res.data.miniAppUser.open_id
+              var jumpUrl = 'recept_member_info?openId=' + res.data.member.wechatMiniOpenId
               wx.redirectTo({
                 url: jumpUrl,
               })

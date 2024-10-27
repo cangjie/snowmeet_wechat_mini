@@ -143,6 +143,7 @@ Component({
           break
         case 'cell':
           userInfo.cell_number = value
+          /*
           if (value.length == 11){
             var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetUserByCell/' + value + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
@@ -161,6 +162,7 @@ Component({
               }
             })
           }
+          */
           break
         case 'gender':
           userInfo.gender = value
