@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "share",
+          "pathName": "pages/test/share/share",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "pay",
           "pathName": "pages/payment/pay_recept",
           "query": "id=7465",

@@ -225,6 +225,10 @@ Page({
         break
       case 'wl_course_list':
         path = '/pages/admin/school/course_reg_list'
+        break
+      case 'staff_reg':
+        path = '/pages/admin/staff_reg_qrcode'
+        break
       default:
         break
     }
@@ -267,6 +271,11 @@ Page({
   goToMaintainRecept(){
     wx.redirectTo({
       url: '/pages/admin/maintain/recept',
+    })
+  },
+  reload(){
+    wx.redirectTo({
+      url: '/pages/admin/admin',
     })
   },
   gotoBackground(){

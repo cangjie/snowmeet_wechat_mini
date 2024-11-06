@@ -114,7 +114,9 @@
     "pages/admin/school/course_reg_detail",
     "pages/admin/staff_reg",
     "pages/admin/staff/staff_list",
-    "pages/admin/staff/staff_detail"
+    "pages/admin/staff/staff_detail",
+    "pages/test/share/share",
+    "pages/admin/staff_reg_qrcode"
   ],
   "window": {
     "backgroundTextStyle": "light",

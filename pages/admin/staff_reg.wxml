@@ -1,4 +1,4 @@
-<view>
+<view wx:if="{{!isReg}}">
   <view style="text-align: center; margin-top: 50rpx;">新员工注册</view>
   <mp-cells title="填写个人信息" >
     <mp-cell>
@@ -22,4 +22,7 @@
       <button open-type="getPhoneNumber" class="input" bindgetphonenumber="submit" > 授 权 手 机 号 </button>
     </mp-cell>
   </mp-cells>
+</view>
+<view wx:else style="margin-top: 200rpx;">
+  <button bindtap="reload" class="input" >授权后点击重新进入小程序</button>
 </view>

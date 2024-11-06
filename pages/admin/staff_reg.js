@@ -71,17 +71,14 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
+    var that = this
     app.loginPromiseNew.then(function(resovle){
       if (app.globalData.memberInfo.in_staff_list){
+        that.setData({isReg: true})
         wx.showToast({
-          title: '您已经完成注册，请联系管理员添加权限。',
+          title: '您已经完成注册，请联系管理员添加权限后，重新进入小程序。',
           icon:'success',
-          duration: 3000,
-          success:()=>{
-            wx.redirectTo({
-              url: 'admin',
-            })
-          }
+          duration: 3000
         })
       }
     })

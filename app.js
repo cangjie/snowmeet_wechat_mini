@@ -73,7 +73,11 @@ App({
               success:(res)=>{
                 app.globalData.systemInfo = res
                 resolve(app.globalData)
-                
+                if (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1){
+                  wx.redirectTo({
+                    url: '/pages/admin/admin',
+                  })
+                }
               },
               fail:(res)=>{
                 console.log('get sys info fail, try sync', res)
@@ -84,6 +88,14 @@ App({
                   console.log('get sys info sync fail', err)
                 }
                 resolve(app.globalData)
+                if (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1){
+                  wx.redirectTo({
+                    url: '/pages/admin/admin',
+                  })
+                }
+              },
+              complete:(res)=>{
+                
               }
             })
             

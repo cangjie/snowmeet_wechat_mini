@@ -22,10 +22,20 @@ Page({
       url: '/pages/maintain/in_shop_request/in_shop_request',
     })
     */
-
-    wx.redirectTo({
-      url: '../ski_pass/ski_pass_selector',
+    app.loginPromiseNew.then(function(resolve){
+      if (app.globalData.jumped == undefined && (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1)){
+        app.globalData.jumped = true
+        wx.navigateTo({
+          url: '/admin/admin',
+        })
+      }
+      else{
+        wx.navigateTo({
+          url: '../ski_pass/ski_pass_selector',
+        })
+      }
     })
+    
     
   },
   onShow: function(e) {
