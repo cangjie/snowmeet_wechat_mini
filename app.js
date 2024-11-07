@@ -69,6 +69,7 @@ App({
             else{
               app.globalData.role = ''
             }
+            console.log('app data', app.globalData)
             wx.getSystemInfoAsync({
               success:(res)=>{
                 app.globalData.systemInfo = res
