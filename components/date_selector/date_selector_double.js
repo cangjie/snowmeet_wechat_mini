@@ -11,7 +11,7 @@ Component({
     },
     rangeEnd: {
       type: String,
-      value: '2024-6-1'
+      value: '2025-6-1'
     }
   },
 

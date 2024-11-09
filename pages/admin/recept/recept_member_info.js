@@ -84,6 +84,7 @@ Page({
 
   gotoFlow(e){
     var that = this
+    that.updateUserInfo()
     var id = e.currentTarget.id
     var scene = ''
     switch(id)
