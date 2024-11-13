@@ -116,7 +116,8 @@
     "pages/admin/staff/staff_list",
     "pages/admin/staff/staff_detail",
     "pages/test/share/share",
-    "pages/admin/staff_reg_qrcode"
+    "pages/admin/staff_reg_qrcode",
+    "pages/register/out_reg"
   ],
   "window": {
     "backgroundTextStyle": "light",
