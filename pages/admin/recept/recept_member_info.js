@@ -25,7 +25,7 @@ Page({
       valid = true
     }
     that.setData({needUpdate: true, userInfo: userInfo, valid: valid})
-    that.updateUserInfo()
+    //that.updateUserInfo()
   },
 
   updateUserInfo(){
