@@ -1,0 +1,6 @@
+<view>
+  <view>{{msg}}</view>
+  <view>
+    <button bindtap="goBack" > 返 回 </button>
+  </view>
+</view>

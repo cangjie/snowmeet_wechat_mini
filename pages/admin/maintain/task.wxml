@@ -1,4 +1,4 @@
-<view wx:if="{{userInfo.is_admin == 1}}" >
+<view wx:if="{{userInfo.is_staff == 1 || userInfo.is_admin == 1}}" >
   <mp-cells title="用户联系信息" >
     <mp-cell>
       <view class="view-table-scale" >

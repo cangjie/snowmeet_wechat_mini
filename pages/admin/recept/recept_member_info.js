@@ -40,12 +40,12 @@ Page({
         if (res.statusCode != 200){
           return;
         }
-        /*
+        
         wx.showToast({
           title: '更新成功。',
           icon: 'success'
         })
-        */
+        
       }
     })
   },
@@ -84,6 +84,7 @@ Page({
 
   gotoFlow(e){
     var that = this
+    that.updateUserInfo()
     var id = e.currentTarget.id
     var scene = ''
     switch(id)

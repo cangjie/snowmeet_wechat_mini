@@ -10,6 +10,20 @@
     "miniprogram": {
       "list": [
         {
+          "name": "share",
+          "pathName": "pages/test/share/share",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "pay",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=7465",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "staffreg",
           "pathName": "pages/admin/staff_reg",
           "query": "",
@@ -27,13 +41,6 @@
           "name": "tree",
           "pathName": "/pages/test/price_matrix/price_matrix",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pay",
-          "pathName": "pages/payment/pay_recept",
-          "query": "id=7418",
           "launchMode": "default",
           "scene": null
         },
@@ -121,34 +128,6 @@
         {
           "name": "",
           "pathName": "pages/register/register",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "UTV Reserve",
-          "pathName": "pages/UTV/reserve",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "UTV Deposit",
-          "pathName": "pages/UTV/deposit_confirm",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "UTV Fill Info",
-          "pathName": "pages/UTV/fill_info",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "UTV Reserve list",
-          "pathName": "pages/UTV/my_reserve_list",
           "query": "",
           "launchMode": "default",
           "scene": null
