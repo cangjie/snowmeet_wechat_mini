@@ -1,0 +1,24 @@
+<!--pages/admin/ticket/ticket_template_list.wxml-->
+<view>
+
+  <view style="height: 50rpx;" ></view>
+  <view  >
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;" >
+      <view style="width: 100rpx;" ></view>
+      <view style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;">
+        <view style="background-color: greenyellow;text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;">
+          <b>{{template.name}}</b></view>
+          <view wx:for="{{template.usage}}" >*{{item}}</view>
+          <view wx:if="{{!haveJoin}}" class="flex-wrp"  style="flex-direction:row" >
+            <button wx:if="{{isMember}}" class="input" bindtap="pickTicket" > 点 击 领 取 </button>
+            <button wx:if="{{!isMember}}" open-type="getPhoneNumber" class="input"  bindgetphonenumber="getCell" > 授权手机号领取</button>
+          </view>
+          <view wx:else class="flex-wrp" style="text-align: center;" >
+            您已经领取，无需重复领取。
+          </view>
+        </view>
+      <view style="width: 100rpx;" ></view>
+    </view>
+    <view style="height: 50rpx;" ></view>
+  </view>
+</view>

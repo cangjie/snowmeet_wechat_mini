@@ -54,9 +54,9 @@
     <mp-cell id="wl_course_reg" value="课程登记" bindtap="nav" ></mp-cell>
     <mp-cell id="wl_course_list" value="课程列表" bindtap="nav" ></mp-cell>
   </mp-cells>
-  <!--mp-cells ext-class="my-cells" title="优惠券" >
+  <mp-cells ext-class="my-cells" title="优惠券" >
     <mp-cell id="ticket_print" value="打印" bindtap="nav" ></mp-cell>
-  </mp-cells--> 
+  </mp-cells> 
   <!--mp-cells ext-class="my-cells" title="测试" >
     <mp-cell id="test_upload" value="上传视频" bindtap="nav" ></mp-cell>
   </mp-cells-->

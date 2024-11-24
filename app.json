@@ -117,7 +117,8 @@
     "pages/admin/staff/staff_detail",
     "pages/test/share/share",
     "pages/admin/staff_reg_qrcode",
-    "pages/register/out_reg"
+    "pages/register/out_reg",
+    "pages/tickets/get_ticket_from_channel"
   ],
   "window": {
     "backgroundTextStyle": "light",

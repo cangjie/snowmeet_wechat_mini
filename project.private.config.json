@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "get ticket",
+          "pathName": "pages/tickets/get_ticket_from_channel",
+          "query": "id=11&source=common",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "share",
           "pathName": "pages/test/share/share",
           "query": "",
@@ -115,13 +122,6 @@
           "name": "ticket share",
           "pathName": "pages/tickets/tickets_get",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "get ticket",
-          "pathName": "pages/tickets/tickets_get",
-          "query": "channel=test",
           "launchMode": "default",
           "scene": null
         },
