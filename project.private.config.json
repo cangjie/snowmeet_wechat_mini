@@ -12,7 +12,7 @@
         {
           "name": "get ticket",
           "pathName": "pages/tickets/get_ticket_from_channel",
-          "query": "id=11&source=common",
+          "query": "id=14&source=common",
           "launchMode": "default",
           "scene": null
         },

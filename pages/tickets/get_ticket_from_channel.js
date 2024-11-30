@@ -7,7 +7,8 @@ Page({
    */
   data: {
     isMember: false,
-    haveJoin: false
+    haveJoin: false,
+    piking: false
   },
 
   getTicketTemplate(){
@@ -91,15 +92,18 @@ Page({
 
   pickTicket(e){
     var that = this
+    that.setData({piking: true})
     var source = that.data.source == 'common' ? '' : that.data.source
     var url = 'https://' + app.globalData.domainName + '/core/Ticket/GenerateTicketsByUser/' + that.data.templateId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&source=' + encodeURIComponent(source)
     wx.request({
       url: url,
       method: 'GET',
       success:(res)=>{
+
         if (res.statusCode != 200){
           return
         }
+        that.setData({piking: false})
         console.log('pick ticket success', res.data)
         wx.showToast({
           title: '领取成功。',
