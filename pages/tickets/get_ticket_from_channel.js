@@ -92,7 +92,7 @@ Page({
   pickTicket(e){
     var that = this
     var source = that.data.source == 'common' ? '' : that.data.source
-    var url = 'https://' + app.globalData.domainName + '/core/Ticket/GenerateTicketsByUser/' + that.data.templateId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&source=' + encodeURIComponent(source)
+    var url = 'https://' + app.globalData.domainName + '/core/Ticket/GenerateTicketsByUser/' + that.data.templateId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&channel=' + encodeURIComponent(source)
     wx.request({
       url: url,
       method: 'GET',
