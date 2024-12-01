@@ -10,8 +10,8 @@
           <b>{{template.name}}</b></view>
           <view wx:for="{{template.usage}}" >*{{item}}</view>
           <view wx:if="{{!haveJoin}}" class="flex-wrp"  style="flex-direction:row" >
-            <button wx:if="{{isMember}}" class="input" bindtap="pickTicket" > 点 击 领 取 </button>
-            <button wx:if="{{!isMember}}" open-type="getPhoneNumber" class="input"  bindgetphonenumber="getCell" > 授权手机号领取</button>
+            <button wx:if="{{isMember}}" class="input" bindtap="pickTicket" disabled="{{picking}}" > 点 击 领 取 </button>
+            <button wx:if="{{!isMember}}" open-type="getPhoneNumber" class="input"  bindgetphonenumber="getCell" disabled="{{picking}}" > 授权手机号领取</button>
           </view>
           <view wx:else class="flex-wrp" style="text-align: center;" >
             您已经领取，无需重复领取。

@@ -45,15 +45,6 @@
     "tabSize": 2
   },
   "condition": {
-    "plugin": {
-      "list": []
-    },
-    "game": {
-      "list": []
-    },
-    "gamePlugin": {
-      "list": []
-    },
     "miniprogram": {
       "list": [
         {
@@ -136,5 +127,6 @@
     "include": []
   },
   "projectname": "snowmeet",
-  "appid": "wxd1310896f2aa68bb"
+  "appid": "wxd1310896f2aa68bb",
+  "libVersion": "3.5.0"
 }
