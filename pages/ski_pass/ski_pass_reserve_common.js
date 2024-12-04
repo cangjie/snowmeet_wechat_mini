@@ -71,8 +71,8 @@ Page({
           var product = {
             id: item.productNo,
             name: item.productName,
-            sale_price_str: util.showAmount(parseFloat(item.settlementPrice)),
-            sale_price: item.settlementPrice,
+            sale_price_str: util.showAmount(parseFloat(item.salePrice)),
+            sale_price: item.salePrice,
             deposit_str: util.showAmount(0),
             desc: item.orderDesc
           }

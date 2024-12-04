@@ -23,12 +23,13 @@ Page({
     var value = e.detail.index
     that.setData({productList:[]})
     switch(value){
-      case 10:
+      case 1:
         that.setData({resort: '万龙'})
+        that.GetData()
         break
       default:
         that.setData({resort: '南山'})
-        //that.GetData()
+        that.GetData()
         break
     }
     that.GetData()

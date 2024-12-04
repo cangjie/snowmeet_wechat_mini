@@ -6,7 +6,7 @@
   </view>
   <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >预定日期：</view>
-    <view class="right-column" >{{date}}</view>
+    <view class="right-column" style="width: 400rpx;" >{{date}}</view>
   </view>
   <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >联系电话：</view>
@@ -26,7 +26,7 @@
   </view>
   <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >数量：</view>
-    <view class="right-column" ><input type="number" value="1" id="count" bindinput="input" /></view>
+    <view class="right-column" ><input type="number" class="input" style="width: 50rpx;" value="1" id="count" bindinput="input" /></view>
   </view>
   <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >总计：</view>
