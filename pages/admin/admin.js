@@ -229,6 +229,9 @@ Page({
       case 'staff_reg':
         path = '/pages/admin/staff_reg_qrcode'
         break
+      case 'ns_ski_pass_reserve':
+        path = '/pages/admin/ski_pass/nanshan_reserve'
+        break
       default:
         break
     }

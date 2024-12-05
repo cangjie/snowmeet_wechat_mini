@@ -119,7 +119,8 @@
     "pages/admin/staff_reg_qrcode",
     "pages/register/out_reg",
     "pages/tickets/get_ticket_from_channel",
-    "pages/test/ocr/ocr"
+    "pages/test/ocr/ocr",
+    "pages/admin/ski_pass/nanshan_reserve"
   ],
   "window": {
     "backgroundTextStyle": "light",
