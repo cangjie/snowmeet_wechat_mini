@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "OCR",
+          "pathName": "pages/test/ocr/ocr",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "get ticket",
           "pathName": "pages/tickets/get_ticket_from_channel",
           "query": "id=13&source=cangjie",

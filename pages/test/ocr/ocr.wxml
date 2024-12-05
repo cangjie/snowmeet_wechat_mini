@@ -1,0 +1,5 @@
+<view>
+  <camera wx:if="{{openCamera}}" device-position="back" flash="off" binderror="error" style="width: 100%; height: 300px;"></camera>
+  <button bindtap="openCam" wx:if="{{!openCamera}}" >OCR</button>
+  <button bindtap="takePhoto" wx:if="{{openCamera}}" >OCR</button>
+</view>

@@ -118,7 +118,8 @@
     "pages/test/share/share",
     "pages/admin/staff_reg_qrcode",
     "pages/register/out_reg",
-    "pages/tickets/get_ticket_from_channel"
+    "pages/tickets/get_ticket_from_channel",
+    "pages/test/ocr/ocr"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -132,6 +133,11 @@
     "mini-shop-plugin": {
       "version": "1.8.13",
       "provider": "wx34345ae5855f892d"
+    },
+    "ocr-plugin": {
+      "version": "2.0.1",
+      "provider": "wxe567a849ff4f3f53",
+      "export": "exportToOcrPlugin.js"
     }
   },
   "useExtendedLib": {
