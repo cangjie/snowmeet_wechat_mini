@@ -7,7 +7,11 @@ Page({
   data: {
 
   },
-
+  gotoDetail(){
+    wx.navigateTo({
+      url: 'nanshan_reserve_detail',
+    })
+  },
   /**
    * Lifecycle function--Called when page load
    */

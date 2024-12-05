@@ -1,2 +1,81 @@
-<!--pages/admin/ski_pass/nanshan_reserve_detail.wxml-->
-<text>pages/admin/ski_pass/nanshan_reserve_detail.wxml</text>
+<view>
+  <view class="view-row" >
+    <view class="left-column" >日期：</view>
+    <view class="right-column" >2024-12-01</view>
+    <view class="left-column" >名称：</view>
+    <view class="right-column" >平日夜场</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >人数：</view>
+    <view class="right-column" >xxxx</view>
+    <view class="left-column" >张数：</view>
+    <view class="right-column" >xx</view>
+  </view>
+  <view>
+    <view>
+      <mp-cells title="【姓名：张三】 【电话：13810000001】【张数：2】" >
+        <mp-cell>
+          <view class="view-row">
+            <view class="left-column" >票号：</view>
+            <view class="right-column" >xxxxxxx</view>
+            <view class="left-column" >
+              <button class="input" size="mini" >识别</button>
+            </view>
+          </view>
+          <view class="view-row">
+            <view class="left-column" >状态：</view>
+            <view class="right-column" >已取</view>
+            <view class="left-column" >
+             <button disabled="{{true}}" class="input" size="mini" >退款</button>
+            </view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row">
+            <view class="left-column" >票号：</view>
+            <view class="right-column" >xxxxxxx</view>
+            <view class="left-column" >
+              <button class="input" size="mini" >识别</button>
+            </view>
+          </view>
+          <view class="view-row">
+            <view class="left-column" >状态：</view>
+            <view class="right-column" >已取</view>
+            <view class="left-column" >
+             <button disabled="{{true}}" class="input" size="mini" >退款</button>
+            </view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view>
+            <button class="input" > 打 印 </button>
+          </view>
+        </mp-cell>
+      </mp-cells>
+      <mp-cells title="【姓名：李四】 【电话：13810000002】【张数：1】" >
+        <mp-cell>
+          <view class="view-row">
+            <view class="left-column" >票号：</view>
+            <view class="right-column" >xxxxxxx</view>
+            <view class="left-column" >
+              <button class="input" size="mini" >识别</button>
+            </view>
+          </view>
+          <view class="view-row">
+            <view class="left-column" >状态：</view>
+            <view class="right-column" >已取</view>
+            <view class="left-column" >
+             <button disabled="{{true}}" class="input" size="mini" >退款</button>
+            </view>
+          </view>
+        </mp-cell>
+       
+        <mp-cell>
+          <view>
+            <button class="input" > 打 印 </button>
+          </view>
+        </mp-cell>
+      </mp-cells>
+    </view>
+  </view>
+</view>
