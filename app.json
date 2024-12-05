@@ -120,7 +120,9 @@
     "pages/register/out_reg",
     "pages/tickets/get_ticket_from_channel",
     "pages/test/ocr/ocr",
-    "pages/admin/ski_pass/nanshan_reserve"
+    "pages/admin/ski_pass/nanshan_reserve",
+    "pages/admin/ski_pass/nanshan_reserve_detail",
+    "pages/admin/ski_pass/nanshan_verify"
   ],
   "window": {
     "backgroundTextStyle": "light",
