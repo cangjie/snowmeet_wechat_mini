@@ -1,0 +1,73 @@
+<view>
+  <view class="view-row">
+    <view style="text-align: right;width: 250rpx;" >
+      <button class="input"  size="mini" >《 上一日</button>
+    </view>
+    <view style="width: 250rpx;text-align: center;margin-left: 50rpx;">
+      <picker mode="date" style="text-align: center;" >
+        <picker-view style="text-align: center;" >2024-12-01</picker-view>
+      </picker>
+    </view>
+    <view style="width:250rpx">
+      <button class="input" size="mini" >下一日》</button>
+    </view>
+  </view>
+  <view>
+    <mp-cells title="平日全天" >
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column" >发卡：</view>
+          <view class="right-column" >xxx</view>
+          <view class="left-column" >收卡：</view>
+          <view class="right-column" >xxx</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column" >应退：</view>
+          <view class="right-column" >xxx</view>
+          <view class="left-column" >已退：</view>
+          <view class="right-column" >xxx</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column" >未退：</view>
+          <view class="right-column" >xxx</view>
+          
+          <view  >
+            <button class="input" size="mini" > 退 款 </button>
+          </view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+    <mp-cells title="平日夜场" >
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column" >发卡：</view>
+          <view class="right-column" >xxx</view>
+          <view class="left-column" >收卡：</view>
+          <view class="right-column" >xxx</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column" >应退：</view>
+          <view class="right-column" >xxx</view>
+          <view class="left-column" >已退：</view>
+          <view class="right-column" >xxx</view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column" >未退：</view>
+          <view class="right-column" >xxx</view>
+          
+          <view  >
+            <button class="input" size="mini" > 退 款 </button>
+          </view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+</view>

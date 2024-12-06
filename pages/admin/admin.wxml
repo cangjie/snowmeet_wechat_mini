@@ -9,7 +9,7 @@
     <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >南山预定</mp-cell>
     <mp-cell id="ns_ski_pass_veri" bindtap="nav" >南山验票</mp-cell>
     <mp-cell id="ns_ski_pass_fee" bindtap="nav" >南山消费</mp-cell>
-    <mp-cell id="ns_ski_pass_deposit" bindtap="nav" >南山退押金</mp-cell>
+    <mp-cell id="ns_ski_pass_refund" bindtap="nav" >南山退押金</mp-cell>
     
   </mp-cells>
   <mp-cells title="实体店铺接待" >
