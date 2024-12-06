@@ -1,1 +1,4 @@
 /* pages/admin/ski_pass/nanshan_card_search.wxss */
+.left-column{
+  width: 130rpx;
+}

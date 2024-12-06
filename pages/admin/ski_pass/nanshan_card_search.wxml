@@ -1,2 +1,37 @@
-<!--pages/admin/ski_pass/nanshan_card_search.wxml-->
-<text>pages/admin/ski_pass/nanshan_card_search.wxml</text>
+<view>
+  <view class="view-row" style="text-align: center; margin-left: 40rpx;">
+    <input style="width: 400rpx;" class="input" placeholder="输入卡号手机号姓名模糊匹配" />
+    <view style="width: 10rpx;" />
+    <button class="input" size="mini" >搜索</button>
+  </view>
+  <view>
+    <mp-cells title="【日期：2024-12-10】【雪票：平日全天】【姓名：张三】【手机：18611010000】" >
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column" >票号：</view>
+          <view class="right-column" >xxxxxxxx</view>
+          <view class="left-column" >消费金额：</view>
+          <view class="right-column view-row" >
+            <input class="input" style="width: 75rpx;" placeholder="0" />元
+            <view style="width:20rpx;" ></view>
+            <button class="input" size="mini"
+            style="font-size: 8pt;width:100rpx;height:50rpx" >确认</button>
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="view-row" >
+          <view class="left-column" >票号：</view>
+          <view class="right-column" >xxxxxxxx</view>
+          <view class="left-column" >消费金额：</view>
+          <view class="right-column view-row" >
+            <input class="input" style="width: 75rpx;" placeholder="0" />元
+            <view style="width:20rpx;" ></view>
+            <button class="input" size="mini"
+            style="font-size: 8pt;width:100rpx;height:50rpx" >确认</button>
+          </view>
+        </view>
+      </mp-cell>
+    </mp-cells>
+  </view>
+</view>
