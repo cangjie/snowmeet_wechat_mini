@@ -1,1 +1,4 @@
 /* pages/admin/ski_pass/nanshan_verify.wxss */
+.left-column{
+  width: 100rpx;
+}
