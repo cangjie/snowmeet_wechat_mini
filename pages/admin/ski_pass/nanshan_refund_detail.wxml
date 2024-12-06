@@ -1,0 +1,50 @@
+<view>
+  <mp-cells title="【姓名：张三】【电话：18600000001】【数量：2】" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >卡号：</view>
+        <view class="right-column" >xxxxxx</view>
+        <view class="left-column" >状态：</view>
+        <view class="right-column" >已还卡</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >押金：</view>
+        <view class="right-column" >¥xxx.xx</view>
+        <view class="left-column" >票价：</view>
+        <view class="right-column" >¥xxx.xx</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >消费：</view>
+        <view class="right-column" >¥xxx.xx</view>
+        <view class="left-column" >应退：</view>
+        <view class="right-column" >¥xxx.xx</view>
+      </view>
+      <view>
+        <button class="input" > 退 款 </button>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >卡号：</view>
+        <view class="right-column" >xxxxxx</view>
+        <view class="left-column" >状态：</view>
+        <view class="right-column" >已还卡</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >押金：</view>
+        <view class="right-column" >¥xxx.xx</view>
+        <view class="left-column" >票价：</view>
+        <view class="right-column" >¥xxx.xx</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >消费：</view>
+        <view class="right-column" >¥xxx.xx</view>
+        <view class="left-column" >应退：</view>
+        <view class="right-column" >¥xxx.xx</view>
+      </view>
+      <view>
+        <button class="input" > 退 款 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

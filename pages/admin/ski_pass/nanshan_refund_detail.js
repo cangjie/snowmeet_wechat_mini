@@ -1,4 +1,4 @@
-// pages/admin/ski_pass/nanshan_refund.js
+// pages/admin/ski_pass/nanshan_refund_detail.js
 Page({
 
   /**
@@ -6,12 +6,6 @@ Page({
    */
   data: {
 
-  },
-
-  gotoDetail(){
-    wx.navigateTo({
-      url: 'nanshan_refund_detail',
-    })
   },
 
   /**

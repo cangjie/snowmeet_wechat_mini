@@ -15,7 +15,7 @@
   <view>
     <mp-cells title="平日全天" >
       <mp-cell>
-        <view class="view-row" >
+        <view class="view-row" bindtap="gotoDetail" >
           <view class="left-column" >发卡：</view>
           <view class="right-column" >xxx</view>
           <view class="left-column" >收卡：</view>
