@@ -235,6 +235,9 @@ Page({
       case 'ns_ski_pass_veri':
         path = '/pages/admin/ski_pass/nanshan_verify'
         break
+      case 'ns_ski_pass_fee':
+        path = '/pages/admin/ski_pass/nanshan_card_search'
+        break
       default:
         break
     }

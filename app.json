@@ -123,8 +123,7 @@
     "pages/admin/ski_pass/nanshan_reserve",
     "pages/admin/ski_pass/nanshan_reserve_detail",
     "pages/admin/ski_pass/nanshan_verify",
-    "pages/admin/ski_pass/nanshan_card_search",
-    "pages/admin/ski_pass/nanshan_card_search_result"
+    "pages/admin/ski_pass/nanshan_card_search"
   ],
   "window": {
     "backgroundTextStyle": "light",
