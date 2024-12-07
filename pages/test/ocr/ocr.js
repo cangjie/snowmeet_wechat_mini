@@ -1,4 +1,5 @@
 // pages/test/ocr/ocr.js
+const app = getApp()
 Page({
 
   /**
@@ -29,6 +30,35 @@ Page({
           }
         })
         
+      }
+    })
+  },
+
+  chooseFile(){
+    wx.chooseMedia({
+      mediaType:['image'],
+      count: 1,
+      sizeType:['original'],
+      success:(res)=>{
+        console.log('choose media', res)
+        var path = res.tempFiles[0].tempFilePath
+        var fs = wx.getFileSystemManager()
+        fs.readFile({
+          filePath: path,
+          encoding: 'base64',
+          success:(res)=>{
+            console.log('read file', res)
+            var url = 'https://' + app.globalData.domainName + '/core/Ocr/GeneralBasicOCR?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            wx.request({
+              url: url,
+              method: 'POST',
+              data: res.data,
+              success:(res)=>{
+                console.log('ocr result', res)
+              }
+            })
+          }
+        })
       }
     })
   },
