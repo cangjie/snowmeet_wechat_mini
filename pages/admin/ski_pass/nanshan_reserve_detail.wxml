@@ -1,81 +1,66 @@
 <view>
   <view class="view-row" >
-    <view class="left-column" >日期：</view>
-    <view class="right-column" >2024-12-01</view>
-    <view class="left-column" >名称：</view>
-    <view class="right-column" >平日夜场</view>
+    <view class="left-column" style="width: 100rpx;" >日期：</view>
+    <view class="right-column" style="width: 135rpx;" >{{productReserveList.reserveDateStr}}</view>
+    <view class="left-column" style="width: 100rpx;" >名称：</view>
+    <view class="right-column" style="width: 410rpx;"  >{{productReserveList.product_name}}</view>
   </view>
   <view class="view-row" >
-    <view class="left-column" >人数：</view>
-    <view class="right-column" >xxxx</view>
-    <view class="left-column" >张数：</view>
-    <view class="right-column" >xx</view>
+    <view class="left-column" style="width: 100rpx;" >人数：</view>
+    <view class="right-column" style="width: 135rpx;" >{{productReserveList.memberList.length}}</view>
+    <view class="left-column" style="width: 100rpx;" >张数：</view>
+    <view class="right-column" >{{productReserveList.skiPassCount}}</view>
   </view>
   <view>
     <view>
-      <mp-cells title="【姓名：张三】 【电话：13810000001】【张数：2】" >
-        <mp-cell>
-          <view class="view-row">
-            <view class="left-column" >票号：</view>
-            <view class="right-column" >xxxxxxx</view>
-            <view class="left-column" >
-              <button class="input" size="mini" >识别</button>
+      <mp-cells wx:for="{{productReserveList.memberList}}"  wx:for-index="memberIdx" wx:for-item="member"  title="{{memberIdx+1}}.【姓名：{{member.name}}】 【电话：{{member.cell}}】【张数：{{member.skiPasses.length}}】" >
+        <mp-cell wx:for="{{member.skiPasses}}" >
+
+          <view class="view-row" wx:if="{{item.status == 'edit'}}" >
+            <view class="left-column" style="width: 80rpx;" >票号：</view>
+            <view class="right-column view-row" style="width: 260rpx;"  >
+              No.<input class="input" style="width: 180rpx;" value="{{item.card_no_filled? item.card_no_filled: (item.card_no? item.card_no : '')}}" id="{{item.id}}" bindinput="inputCardNo" />
+            </view>
+            <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
+              <button id="{{item.id}}" class="input" style="width: 115rpx;" size="mini" bindtap="ocr" >识别</button>
+              <view style="width: 5rpx;" ></view>
+              <button id="{{item.id}}" class="input" tyle="width: 115rpx;" size="mini" bindtap="setCardNo" >确定</button>
             </view>
           </view>
-          <view class="view-row">
-            <view class="left-column" >状态：</view>
-            <view class="right-column" >已取</view>
-            <view class="left-column" >
-             <button disabled="{{true}}" class="input" size="mini" >退款</button>
+          <view class="view-row" wx:else >
+            <view class="left-column" style="width: 80rpx;" >票号：</view>
+            <view class="right-column" style="width: 260rpx;" bindtap="showCard" id="{{item.id}}" >{{item.card_no == null? '未填':item.card_no}}</view>
+            <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
+              <button id="{{item.id}}" class="input" size="mini" bindtap="setEdit" style="width: 115rpx;" >填写</button>
             </view>
           </view>
-        </mp-cell>
-        <mp-cell>
+
+
+
           <view class="view-row">
-            <view class="left-column" >票号：</view>
-            <view class="right-column" >xxxxxxx</view>
-            <view class="left-column" >
-              <button class="input" size="mini" >识别</button>
-            </view>
-          </view>
-          <view class="view-row">
-            <view class="left-column" >状态：</view>
-            <view class="right-column" >已取</view>
-            <view class="left-column" >
-             <button disabled="{{true}}" class="input" size="mini" >退款</button>
-            </view>
-          </view>
-        </mp-cell>
-        <mp-cell>
-          <view>
-            <button class="input" > 打 印 </button>
-          </view>
-        </mp-cell>
-      </mp-cells>
-      <mp-cells title="【姓名：李四】 【电话：13810000002】【张数：1】" >
-        <mp-cell>
-          <view class="view-row">
-            <view class="left-column" >票号：</view>
-            <view class="right-column" >xxxxxxx</view>
-            <view class="left-column" >
-              <button class="input" size="mini" >识别</button>
-            </view>
-          </view>
-          <view class="view-row">
-            <view class="left-column" >状态：</view>
-            <view class="right-column" >已取</view>
-            <view class="left-column" >
-             <button disabled="{{true}}" class="input" size="mini" >退款</button>
+            <view class="left-column" style="width: 80rpx;" >状态：</view>
+            <view class="right-column" style="width: 260rpx;" >{{item.card_member_pick_time == null? '未取' : '已取'}}</view>
+            <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
+              <button id="{{item.id}}" class="input" size="mini" bindtap="setEdit" style="width: 115rpx;" disabled="{{true}}" >退款</button>
             </view>
           </view>
         </mp-cell>
-       
+        
         <mp-cell>
           <view>
             <button class="input" > 打 印 </button>
           </view>
         </mp-cell>
       </mp-cells>
+     
     </view>
   </view>
+  <page-container 
+    show="{{showCard}}"
+    position="top"
+  >
+    <view style="margin-top: 100rpx;text-align: center;" >
+      <image src="{{imgUrl}}" mode="aspectFill" style="width: 725rpx;"  ></image>
+    </view>
+  </page-container>
 </view>
