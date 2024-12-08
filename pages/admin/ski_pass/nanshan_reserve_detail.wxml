@@ -48,7 +48,7 @@
         
         <mp-cell>
           <view>
-            <button class="input" > 打 印 </button>
+            <button id="{{memberIdx}}" class="input" disabled="{{!finish}}" bindtap="preparePrint" > 打 印 </button>
           </view>
         </mp-cell>
       </mp-cells>
