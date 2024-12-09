@@ -6,17 +6,23 @@ Page({
    * Page initial data
    */
   data: {
-
+    qrCodeRetryTimes: 0
   },
 
   getQrCode(){
     var that = this
     var getQrUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetInterviewIdByScene?scene=nanshanskipass&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    that.data.qrCodeRetryTimes = that.data.qrCodeRetryTimes + 1
     wx.request({
       url: getQrUrl,
       method: 'GET',
       success:(res)=>{
         if (res.statusCode != 200){
+          if (that.data.qrCodeRetryTimes < 3){
+            setTimeout(() => {
+              that.getQrCode()
+            }, 1000);
+          }
           return
         }
         var id = parseInt(res.data)
@@ -46,33 +52,20 @@ Page({
           clearInterval(that.data.interVal)
         }
         else if (res.statusCode == 200){
-          //clearInterval(that.data.interVal)
+          clearInterval(that.data.interVal)
           var scan = res.data
-          var needJump = false
-          if (scan.scan ==1){
-            var word = '顾客已扫码。'
-            if (scan.member == null || scan.member.cell == null || scan.member.cell == '' ){
-              word = '顾客不是会员，必须填写手机号。'
-            }
-            else {
-              word = ''
-              clearInterval(that.data.interVal)
-              needJump = true
-            }
-            if (word != ''){
-              wx.showToast({
-                title: word,
-                duration: 2000
-              })
-            }
-            if (needJump){
-              clearInterval(that.data.interVal)
-              var jumpUrl = 'recept_member_info?openId=' + res.data.member.wechatMiniOpenId
-              wx.redirectTo({
-                url: jumpUrl,
-              })
+          var jumpUrl = ''
+          if (scan && scan.member){
+            jumpUrl = 'nanshan_verify?memberId=' + scan.member.id.toString()
+            if (scan.member.wechatMiniOpenId){
+              jumpUrl += '&openId=' + encodeURIComponent(scan.member.wechatMiniOpenId)
             }
           }
+          wx.redirectTo({
+            url: jumpUrl,
+          })
+          
+
         }
       },
       fail:(res)=>{

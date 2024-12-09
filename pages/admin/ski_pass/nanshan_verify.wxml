@@ -1,87 +1,46 @@
 <view>
   <view class="view-row" >
     <view class="left-column" >姓名：</view>
-    <view class="right-column" style="width: 150rpx;" >张三</view>
+    <view class="right-column" style="width: 150rpx;" >{{name}}</view>
     <view class="left-column" >电话：</view>
-    <view class="right-column" >18611010001</view>
+    <view class="right-column" >{{cell}}</view>
   </view>
   <view>
-    <mp-cells title="2024-12-10 平日全天" >
-      <mp-cell>
-        <view class="view-row" >
-          <view class="left-column" >票号：</view>
-          <view class="right-column" >xxxxxxx</view>
-          <view class="left-column" >取卡：</view>
-          <view class="right-column" >
-            <checkbox checked="{{true}}"></checkbox>
+    <mp-cells wx:for="{{cardList}}" wx:for-index="prodIdx" wx:for-item="prod" title="{{prod.reserveDateStr}} {{prod.product_name}}" >
+      <checkbox-group id="{{prod.product_id}}_{{prod.reserveDateStr}}" bindchange="checkPickAndReturn"  >
+        <mp-cell wx:for="{{prod.skiPasses}}" >
+          <view class="view-row" >
+            <view class="left-column"   >票号：</view>
+            <view class="right-column" style="width: 100rpx;" >{{item.card_no?item.card_no:'未填'}}</view>
+            <view class="left-column" >取卡：</view>
+            <view class="right-column" >
+              <checkbox id="pick_{{item.id}}" value="pick_{{item.id}}"   disabled="{{(item.card_member_pick_time!=null)?true:false}}"  checked="{{(item.card_member_pick_time!=null)?true:false}}"  ></checkbox>
+            </view>
+            <radio-group class="view-row" id="{{item.id}}" bindchange="setReturn" >
+              <view class="left-column" >退卡：</view>
+              <view class="right-column" >
+                <radio value="0" disabled="{{(item.card_member_return_time!=null || item.card_member_pick_time == null)?true:false}}" 
+                checked="{{item.card_lost == 0}}" ></radio>
+              </view>
+              <view class="left-column" style="width: 130rpx;" >无卡结算：</view>
+              <view class="right-column" >
+                <radio value="1" disabled="{{(item.card_member_return_time!=null || item.card_member_pick_time == null)?true:false}}" checked="{{item.card_lost == 1}}" ></radio>
+              </view>
+            </radio-group>
           </view>
-          <view class="left-column" >退卡：</view>
-          <view class="right-column" >
-            <checkbox checked="{{false}}"></checkbox>
-          </view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view class="view-row" >
-          <view class="left-column"  >票号：</view>
-          <view class="right-column" >xxxxxxx</view>
-          <view class="left-column" >取卡：</view>
-          <view class="right-column" >
-            <checkbox checked="{{true}}"></checkbox>
-          </view>
-          <view class="left-column" >退卡：</view>
-          <view class="right-column" >
-            <checkbox checked="{{false}}"></checkbox>
-          </view>
-        </view>
-      </mp-cell>
+        </mp-cell>
+      </checkbox-group>
       <mp-cell>
         <view class="view-row">
-          <button class="input" size="mini" >确认取卡</button>
+          <button class="input" size="mini" id="{{prod.product_id}}_{{prod.reserveDateStr}}" bindtap="setPick" >确认取卡</button>
           <view style="width: 50rpx;" ></view>
-          <button class="input" size="mini" >确认退卡</button>
+          <button class="input" size="mini" id="{{prod.product_id}}_{{prod.reserveDateStr}}" bindtap="saveReturn" >确认退卡</button>
         </view>
       </mp-cell>
     </mp-cells>
-    <mp-cells title="2024-12-10 平日半天" >
-      <mp-cell>
-        <view class="view-row" >
-          <view class="left-column" >票号：</view>
-          <view class="right-column" >xxxxxxx</view>
-          <view class="left-column" >取卡：</view>
-          <view class="right-column" >
-            <checkbox checked="{{true}}"></checkbox>
-          </view>
-          <view class="left-column" >退卡：</view>
-          <view class="right-column" >
-            <checkbox checked="{{false}}"></checkbox>
-          </view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view class="view-row" >
-          <view class="left-column" >票号：</view>
-          <view class="right-column" >xxxxxxx</view>
-          <view class="left-column" >取卡：</view>
-          <view class="right-column" >
-            <checkbox checked="{{true}}"></checkbox>
-          </view>
-          <view class="left-column" >退卡：</view>
-          <view class="right-column" >
-            <checkbox checked="{{false}}"></checkbox>
-          </view>
-        </view>
-      </mp-cell>
-      <mp-cell>
-        <view class="view-row">
-          <button class="input" size="mini" >确认取卡</button>
-          <view style="width: 50rpx;" ></view>
-          <button class="input" size="mini" >确认退卡</button>
-        </view>
-      </mp-cell>
-    </mp-cells>
+   
   </view>
-  <view>
+  <!--view>
     勾选取卡后，点击“确认取卡”按钮，表示卡已经发放给客人。完成此操作后，取卡的checkbox变灰，不可更改。取卡后，退卡的checkbox才由灰变为可用。
-  </view>
+  </view-->
 </view>
