@@ -51,7 +51,10 @@ Page({
   },
 
   GetAvaliableCount(){
+
+    
     var that = this
+    /*
     var url = 'https://' + app.globalData.domainName + '/core/SkiPass/CheckNanshanReserveAvaliabelCount/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date))
     wx.request({
       url: url,
@@ -60,6 +63,8 @@ Page({
         that.setData({avaliableCount: parseInt(res.data)})
       }
     })
+    */
+    that.setData({avaliableCount:99999})
   },
 
   input(e){
@@ -155,7 +160,7 @@ Page({
     if (!valid){
       return
     }
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date)) + '&count=' + that.data.count + '&cell='  + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/ReserveSkiPass/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date)) + '&count=' + that.data.count + '&cell='  + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: submitUrl,
       method: 'GET',

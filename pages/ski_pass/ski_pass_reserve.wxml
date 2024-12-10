@@ -10,11 +10,11 @@
   </view>
   <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >联系电话：</view>
-    <view class="right-column" ><input id="cell" value="{{cell}}" style="width: 300rpx;" bindinput="input" /></view>
+    <view class="right-column" ><input id="cell"  class="input" value="{{cell}}" style="width: 300rpx;" bindinput="input" /></view>
   </view>
   <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >姓名：</view>
-    <view class="right-column" ><input id="name" value="{{name}}" placeholder="{{name.length==0?'请填写姓名':''}}" bindinput="input" /></view>
+    <view class="right-column" ><input id="name" class="input" value="{{name}}" placeholder="{{name.length==0?'请填写姓名':''}}" bindinput="input" /></view>
   </view>
   <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >单价：</view>
@@ -34,7 +34,7 @@
   </view>
   <view class="ski-pass-scale" style="border-width: 0rpx;text-align: center;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view wx:if="{{avaliableCount >= count}}" >
-      <button bindtap="submit" > 立 即 支 付 </button>
+      <button bindtap="submit" class="input" > 立 即 支 付 </button>
     </view>
     <view wx:else > 预定数量超过当日限制 </view>
   </view>
