@@ -95,7 +95,7 @@ Page({
 
   getData(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/GetReserveProductDetail/255?reserveDate=2024-12-08&sessionKey=fq4lJZZkw1yRISEnJgH67Q%3D%3D'
+    var url = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/GetReserveProductDetail/' + that.data.productId + '?reserveDate=' + that.data.date + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: url,
       method: 'GET',
@@ -737,7 +737,11 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
+    console.log('options', options)
     var that = this
+    var productId = options.productId
+    var date = decodeURIComponent(options.date)
+    that.setData({productId, date})
     app.loginPromiseNew.then(function(resolve){
       that.getData()
     })

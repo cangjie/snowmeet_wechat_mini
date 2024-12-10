@@ -1,1 +1,7 @@
 /* pages/admin/ski_pass/nanshan_reserve.wxss */
+.left-column{
+  width: 100rpx;
+}
+.right-column{
+  width: 100rpx;
+}
