@@ -286,13 +286,14 @@ App({
       }
     ],
     userTabBarItem: [
+      /*
       {
         "pagePath": "/pages/index/index",
         "text": "装备",
         "iconPath": "/images/equip.jpg",
         "selectedIconPath": "/images/equip.jpg"
       },
-      
+      */
       {
         "pagePath": "/pages/ski_pass/ski_pass_selector",
         "text": "雪票",

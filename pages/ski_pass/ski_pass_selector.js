@@ -14,7 +14,8 @@ Page({
     desc: '<p style="color:red" >test</p>',
     skiPassDescNanashanRent: util.skiPassDescNanashanRent,
     nowTime: util.formatTimeStr(new Date()),
-    reserveDateDesc: '今天'
+    reserveDateDesc: '今天',
+    tabIndex: 0
   },
 
   onChange(e){
@@ -90,7 +91,7 @@ Page({
 
       
       
-      that.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1, 
+      that.setData({tabbarItemList: app.globalData.userTabBarItem, 
         role: app.globalData.role, canGetInfo: true, reserveDate: util.formatDate(reserveDate),
         startDate: startDate, endDate: util.formatDate(endDate), reserveDateDesc: reserveDateDesc})
       that.GetData()

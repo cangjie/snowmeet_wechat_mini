@@ -7,7 +7,8 @@ Page({
    */
   data: {
     role: '',
-    canGetInfo: false
+    canGetInfo: false,
+    tabIndex: 1
   },
 
   /**
@@ -18,11 +19,11 @@ Page({
     if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
       var that = this
       app.loginPromiseNew.then(function(resolve) {
-        that.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role, canGetInfo: true})
+        that.setData({tabbarItemList: app.globalData.userTabBarItem, role: app.globalData.role, canGetInfo: true})
       })
     }
     else {
-      this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 2, role: app.globalData.role, canGetInfo: true})
+      this.setData({tabbarItemList: app.globalData.userTabBarItem, role: app.globalData.role, canGetInfo: true})
     }
     
   },
