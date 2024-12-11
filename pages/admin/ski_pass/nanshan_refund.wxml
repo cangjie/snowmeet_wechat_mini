@@ -18,7 +18,7 @@
       <mp-cell>
         <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >发卡：</view>
-          <view class="right-column" >{{item.pickCount}}</view>
+          <view class="right-column" >{{item.memberPickCount}}</view>
           <view class="left-column" >收卡：</view>
           <view class="right-column" >{{item.returnCount}}</view>
         </view>

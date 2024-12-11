@@ -107,6 +107,7 @@ Page({
         if (res.statusCode != 200){
           return
         }
+        console.log('list', res.data)
         var tempList = res.data
         var dayLight = []
         var night = []

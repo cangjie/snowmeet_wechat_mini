@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    refunding: false
   },
 
   /**
@@ -103,6 +103,48 @@ Page({
         }
         that.setData({list})
         console.log('get list', list)
+      }
+    })
+  },
+  getSkipass(id){
+    var that = this
+    for(var i = 0; i < that.data.list.memberList.length; i++){
+      for(var j = 0; j < that.data.list.memberList[i].skiPasses.length; j++){
+        if (that.data.list.memberList[i].skiPasses[j].id == parseInt(id)){
+          return that.data.list.memberList[i].skiPasses[j]
+        }
+      }
+    }
+  },
+  refund(e){
+    var that = this
+    var id = e.currentTarget.id
+    var skipass = that.getSkipass(parseInt(id))
+    
+    var content = that.data.list.product_name + ' 消费：' + skipass.feeStr + ' 卡工本费：' + skipass.cardFeeStr + ' 退押金：' + skipass.needRefundStr
+    wx.showModal({
+      title: '确认退押金',
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          that.setData({refunding: true})
+          var url = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/SkipassRefundDeposit/' + id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: url,
+            method: 'GET',
+            success: (res)=>{
+              
+            },
+            complete:(res)=>{
+              that.getData()
+              that.setData({refunding: false})
+            }
+          })
+        }
       }
     })
   }

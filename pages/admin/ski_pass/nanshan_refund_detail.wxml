@@ -26,7 +26,7 @@
         <view class="right-column" >{{skipass.refund_amount?skipass.refund_amountStr:'——'}}</view>
       </view>
       <view style="margin-top: 20rpx;">
-        <button class="input" disabled="{{skipass.status!='已还卡'}}" > 退 款 </button>
+        <button class="input" disabled="{{skipass.status!='已还卡' || refunding}}" id="{{skipass.id}}" bind:tap="refund" > 退 款 </button>
       </view>
     </mp-cell>
     
