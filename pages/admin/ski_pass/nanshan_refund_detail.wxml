@@ -1,50 +1,34 @@
 <view>
-  <mp-cells title="【姓名：张三】【电话：18600000001】【数量：2】" >
-    <mp-cell>
+  <mp-cells wx:for="{{list.memberList}}" title="【姓名：{{item.name}}】【电话：{{item.cell}}】【数量：{{item.skiPasses.length}}】" >
+    <mp-cell wx:for="{{item.skiPasses}}" wx:for-item="skipass" >
       <view class="view-row" >
         <view class="left-column" >卡号：</view>
-        <view class="right-column" >xxxxxx</view>
+        <view class="right-column" >{{skipass.card_no?skipass.card_no:'未填'}}</view>
         <view class="left-column" >状态：</view>
-        <view class="right-column" >已还卡</view>
+        <view class="right-column" >{{skipass.status}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >押金：</view>
-        <view class="right-column" >¥xxx.xx</view>
+        <view class="right-column" >{{skipass.depositStr}}</view>
         <view class="left-column" >票价：</view>
-        <view class="right-column" >¥xxx.xx</view>
+        <view class="right-column" >{{skipass.ticket_priceStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >消费：</view>
-        <view class="right-column" >¥xxx.xx</view>
-        <view class="left-column" >应退：</view>
-        <view class="right-column" >¥xxx.xx</view>
+        <view class="right-column" >{{skipass.feeStr}}</view>
+        <view class="left-column" >卡工本费：</view>
+        <view class="right-column" >{{skipass.cardFeeStr}}</view>
       </view>
-      <view>
-        <button class="input" > 退 款 </button>
+      <view class="view-row" >
+        <view class="left-column" >应退金额：</view>
+        <view class="right-column" >{{skipass.needRefundStr}}</view>
+        <view class="left-column" >已退金额：</view>
+        <view class="right-column" >{{skipass.refund_amount?skipass.refund_amountStr:'——'}}</view>
+      </view>
+      <view style="margin-top: 20rpx;">
+        <button class="input" disabled="{{skipass.status!='已还卡'}}" > 退 款 </button>
       </view>
     </mp-cell>
-    <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >卡号：</view>
-        <view class="right-column" >xxxxxx</view>
-        <view class="left-column" >状态：</view>
-        <view class="right-column" >已还卡</view>
-      </view>
-      <view class="view-row" >
-        <view class="left-column" >押金：</view>
-        <view class="right-column" >¥xxx.xx</view>
-        <view class="left-column" >票价：</view>
-        <view class="right-column" >¥xxx.xx</view>
-      </view>
-      <view class="view-row" >
-        <view class="left-column" >消费：</view>
-        <view class="right-column" >¥xxx.xx</view>
-        <view class="left-column" >应退：</view>
-        <view class="right-column" >¥xxx.xx</view>
-      </view>
-      <view>
-        <button class="input" > 退 款 </button>
-      </view>
-    </mp-cell>
+    
   </mp-cells>
 </view>

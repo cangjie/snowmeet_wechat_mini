@@ -6,8 +6,8 @@ Page({
   /**
    * Page initial data
    */
-  data: {
-
+   data: {
+     
   },
   gotoDetail(e){
     var that = this

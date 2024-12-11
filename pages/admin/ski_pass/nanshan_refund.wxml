@@ -1,37 +1,39 @@
 <view>
   <view class="view-row">
     <view style="text-align: right;width: 250rpx;" >
-      <button class="input"  size="mini" >《 上一日</button>
+      <button class="input"  size="mini" bind:tap="gotoPrev" >《 上一日</button>
     </view>
     <view style="width: 250rpx;text-align: center;margin-left: 50rpx;">
       <picker mode="date" style="text-align: center;" >
-        <picker-view style="text-align: center;" >2024-12-01</picker-view>
+        <picker-view style="text-align: center;" >{{currentDate}}</picker-view>
       </picker>
     </view>
     <view style="width:250rpx">
-      <button class="input" size="mini" >下一日》</button>
+      <button class="input" size="mini" bind:tap="gotoNext" >下一日》</button>
     </view>
   </view>
   <view>
-    <mp-cells title="平日全天" >
+    <view class="time-label">日场</view>
+    <mp-cells wx:for="{{dayLight}}" title="{{item.product_name}}" >
       <mp-cell>
-        <view class="view-row" bindtap="gotoDetail" >
+        <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >发卡：</view>
-          <view class="right-column" >xxx</view>
+          <view class="right-column" >{{item.pickCount}}</view>
           <view class="left-column" >收卡：</view>
-          <view class="right-column" >xxx</view>
+          <view class="right-column" >{{item.returnCount}}</view>
         </view>
       </mp-cell>
       <mp-cell>
-        <view class="view-row" >
+        <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >应退：</view>
-          <view class="right-column" >xxx</view>
+          <view class="right-column" >{{item.sumNeedRefundStr}}</view>
           <view class="left-column" >已退：</view>
-          <view class="right-column" >xxx</view>
+          <view class="right-column" >{{item.sumRefundedStr}}</view>
         </view>
       </mp-cell>
+      <!--
       <mp-cell>
-        <view class="view-row" >
+        <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >未退：</view>
           <view class="right-column" >xxx</view>
           
@@ -40,10 +42,12 @@
           </view>
         </view>
       </mp-cell>
+      -->
     </mp-cells>
-    <mp-cells title="平日夜场" >
+    <view class="time-label">夜场</view>
+    <mp-cells wx:for="{{night}}"  title="{{item.product_name}}"  >
       <mp-cell>
-        <view class="view-row" >
+        <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >发卡：</view>
           <view class="right-column" >xxx</view>
           <view class="left-column" >收卡：</view>
@@ -51,7 +55,7 @@
         </view>
       </mp-cell>
       <mp-cell>
-        <view class="view-row" >
+        <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >应退：</view>
           <view class="right-column" >xxx</view>
           <view class="left-column" >已退：</view>
@@ -59,7 +63,7 @@
         </view>
       </mp-cell>
       <mp-cell>
-        <view class="view-row" >
+        <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >未退：</view>
           <view class="right-column" >xxx</view>
           
