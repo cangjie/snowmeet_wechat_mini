@@ -88,7 +88,7 @@ Page({
   },
   gotoSkipass: function(e) {
     wx.navigateTo({
-      url: '/pages/mine/my_ski_pass/my_ski_pass',
+      url: '/pages/mine/skipass/my_skipass',
     })
   },
   gotoAdmin: function(e) {

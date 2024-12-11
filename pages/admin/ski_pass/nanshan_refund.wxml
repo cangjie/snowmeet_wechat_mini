@@ -44,34 +44,40 @@
       </mp-cell>
       -->
     </mp-cells>
+    <mp-cells title="总计" >
+      <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
+          <view class="left-column" >应退：</view>
+          <view class="right-column" >{{dayNeedRefundStr}}</view>
+          <view class="left-column" ></view>
+          <view class="right-column" ></view>
+        </view>
+    </mp-cells>
     <view class="time-label">夜场</view>
     <mp-cells wx:for="{{night}}"  title="{{item.product_name}}"  >
       <mp-cell>
         <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >发卡：</view>
-          <view class="right-column" >xxx</view>
+          <view class="right-column" >{{item.memberPickCount}}</view>
           <view class="left-column" >收卡：</view>
-          <view class="right-column" >xxx</view>
+          <view class="right-column" >{{item.returnCount}}</view>
         </view>
       </mp-cell>
       <mp-cell>
         <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
           <view class="left-column" >应退：</view>
-          <view class="right-column" >xxx</view>
+          <view class="right-column" >{{item.sumNeedRefundStr}}</view>
           <view class="left-column" >已退：</view>
-          <view class="right-column" >xxx</view>
+          <view class="right-column" >{{item.sumRefundedStr}}</view>
         </view>
       </mp-cell>
-      <mp-cell>
-        <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
-          <view class="left-column" >未退：</view>
-          <view class="right-column" >xxx</view>
-          
-          <view  >
-            <button class="input" size="mini" > 退 款 </button>
-          </view>
+    </mp-cells>
+    <mp-cells title="总计" >
+      <view class="view-row" id="{{item.product_id}}_{{currentDate}}" bind:tap="gotoDetail" >
+          <view class="left-column" >应退：</view>
+          <view class="right-column" >{{nightNeedRefundStr}}</view>
+          <view class="left-column" ></view>
+          <view class="right-column" ></view>
         </view>
-      </mp-cell>
     </mp-cells>
   </view>
 </view>

@@ -7,7 +7,10 @@ Page({
    * Page initial data
    */
   data: {
-
+    dayNeedRefund: 0,
+    nightNeedRefund: 0,
+    dayNeedRefundStr: '',
+    nightNeedRefundStr: ''
   },
 
 
@@ -20,6 +23,9 @@ Page({
     var currentDate = util.formatDate(new Date())
     console.log('current date', currentDate)
     that.setData({currentDate})
+    var dayNeedRefundStr = util.showAmount(that.data.dayNeedRefund)
+    var nightNeedRefundStr = util.showAmount(that.data.nightNeedRefund)
+    that.setData({dayNeedRefundStr, nightNeedRefundStr})
     app.loginPromiseNew.then(function(resovle){
       that.getData()
     })
@@ -111,17 +117,21 @@ Page({
         var tempList = res.data
         var dayLight = []
         var night = []
+        var dayRefundSum = 0
+        var nightRefundSum = 0
         for (var i = 0; i < tempList.length; i++){
           tempList[i].sumRefundedStr = util.showAmount(tempList[i].sumRefunded)
           tempList[i].sumNeedRefundStr = util.showAmount(tempList[i].sumNeedRefund)
           if (tempList[i].isDaylight){
+            dayRefundSum += tempList[i].sumNeedRefund 
             dayLight.push(tempList[i])
           }
           else{
+            nightRefundSum += tempList[i].sumNeedRefund
             night.push(tempList[i])
           }
         }
-        that.setData({dayLight, night})
+        that.setData({dayLight, night, nightNeedRefundStr: util.showAmount(nightRefundSum), dayNeedRefundStr: util.showAmount(dayRefundSum)})
 
       }
     })

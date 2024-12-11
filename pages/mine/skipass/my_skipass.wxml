@@ -1,0 +1,17 @@
+<view>
+  <view wx:for="{{list}}" class="ski-pass-scale" bindtap="reserve" id="{{item.id}}" >
+    <view class="ski-pass-title" style="{{item.color?('background-color:' + item.color):''}}" ><b>{{item.product_name}}</b></view>
+    <view style="margin-left: 10rpx;display: flex; flex-direction: row;" >
+      <view style="width: 50%;">日期：{{item.reserve_dateStr}}</view> 
+      <view style="width: 50%;">状态：{{item.status}}</view> 
+    </view>
+    
+    <view style="margin-left: 10rpx;display: flex; flex-direction: row;" >
+      <view style="width: 50%;">票价：{{item.sale_price_str}}</view> 
+      <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
+    </view>
+    
+    <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  ></rich-text>
+    
+  </view>
+</view>
