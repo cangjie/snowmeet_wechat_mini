@@ -8,9 +8,13 @@
     <view class="left-column" >预定日期：</view>
     <view class="right-column" style="width: 400rpx;" >{{date}}</view>
   </view>
-  <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
+  <view class="ski-pass-scale" style="height: 80rpx; display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >联系电话：</view>
-    <view class="right-column" ><input id="cell"  class="input" value="{{cell}}" style="width: 300rpx;" bindinput="input" /></view>
+    <view class="right-column view-row" style="width: 450rpx;" >
+      <input id="cell"  class="input" value="{{cell}}" style="width: 180rpx;" bindinput="input" />
+      <view style="width: 20rpx;"></view>
+      <button size="mini" class="input" open-type="getPhoneNumber" bindgetphonenumber="getCell" >自动获取</button>
+    </view>
   </view>
   <view class="ski-pass-scale" style="display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >姓名：</view>

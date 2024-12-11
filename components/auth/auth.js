@@ -75,7 +75,7 @@ function init(app, that) {
       success: (res) => {
         if (res.statusCode == 200 && res.data.mini_users.length == 1){
           var miniUser = res.data.mini_users[0]
-          if (miniUser.cell_number.length != 11){
+          if (miniUser.cell_number && miniUser.cell_number.length != 11){
             var title = '需要您授权获取手机号'
             that.setData({show: true, validType: 'cell', title: title})
           }

@@ -15,7 +15,7 @@ Page({
     cell: '',
     total: '',
     avaliableCount:0,
-    tabIndex: 1
+    tabIndex: 0
   },
 
   GetSkiPassDetailInfo(){
@@ -250,5 +250,20 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  getCell(e){
+    var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateWechatMemberCell?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&encData='+encodeURIComponent(e.detail.encryptedData)+'&iv='+encodeURIComponent(e.detail.iv)
+    wx.request({
+      url: url,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var member = res.data
+        console.log('get member', member)
+        that.setData({cell: member.cell})
+      }
+    })
   }
 })
