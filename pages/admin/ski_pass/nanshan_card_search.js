@@ -39,6 +39,116 @@ Page({
     var that = this
     that.setData({searching: true})
     that.getData()
+    
+  },
+  getSkipass(id){
+    var that = this
+    var list = that.data.list
+    var ret = undefined
+    for(var i = 0; i < list.length; i++){
+      for(var j = 0; j < list[i].skipasses.length; j++){
+        if (list[i].skipasses[j].id == id){
+          ret = list[i].skipasses[j]
+          break
+        }
+      }
+    }
+    return ret
+  },
+  setFee(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var value = parseInt(e.detail.value)
+    var skipass = that.getSkipass(id)
+    skipass.feeFilled = value
+    /*
+    var content = '卡号：' + skipass.card_no?skipass.card_no:'未填' + ' 姓名：' + skipass.contact_name + ' 电话：' + skipass.contact_cell + ' 消费金额：' + value.toString() + '元'
+    wx.showModal({
+      title: '确认消费',
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          
+        }
+      }
+    })
+    */
+  },
+  confirmFee(e){
+    
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var value = parseInt(e.detail.value)
+    var skipass = that.getSkipass(id)
+    if (!skipass.feeFilled){
+      return
+    }
+    var content = '卡号：' + (skipass.card_no?skipass.card_no:'未填') + ' 姓名：' + skipass.contact_name + ' 电话：' + skipass.contact_cell + ' 消费金额：' + skipass.feeFilled.toString() + '元'
+    wx.showModal({
+      title: '确认消费金额',
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          skipass.fee = skipass.feeFilled
+          that.updateSkipass(skipass)
+        }
+      }
+    })
+    
+    
+    
+    
+    
+    wx.showModal({
+      title: '确认消费金额',
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          
+        }
+      }
+    })
+  },
+  updateSkipass(skipass){
+    var that = this
+    var modUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/UpdateSkiPass?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: modUrl,
+      method: 'POST',
+      data: skipass,
+      success:(res)=>{
+        if (res.statusCode != 200){
+          if (res.statusCode == 204){
+            wx.showToast({
+              title: '卡号重复',
+              icon: 'error',
+            })
+            return
+          }
+          wx.showToast({
+            title: '更新失败',
+            icon: 'error',
+          })
+          return
+        }
+        skipass.status = undefined
+        var list = that.data.list
+        that.setData({list})
+        console.log('ski pass updated', res)
+      }
+    })
   },
   /**
    * Lifecycle function--Called when page load

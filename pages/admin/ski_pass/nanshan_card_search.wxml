@@ -12,10 +12,10 @@
           <view class="right-column" >{{((item.card_no)?item.card_no: '未填')}}</view>
           <view class="left-column" >消费金额：</view>
           <view class="right-column view-row" >
-            <input class="input" style="width: 75rpx;" placeholder="{{((item.fee)?'item.fee':'0')}}" value="{{((item.fee)?'item.fee':'')}}"  />元
+            <input class="input" id="{{item.id}}" bindinput="setFee" style="width: 75rpx;" placeholder="{{((item.fee)?'item.fee':'0')}}" value="{{((item.fee)?item.fee:'')}}"  />元
             <view style="width:20rpx;" ></view>
             <button class="input" size="mini"
-            style="font-size: 8pt;width:100rpx;height:50rpx" >确认</button>
+            style="font-size: 8pt;width:100rpx;height:50rpx" id="{{item.id}}" bind:tap="confirmFee" >确认</button>
           </view>
         </view>
       </mp-cell>
