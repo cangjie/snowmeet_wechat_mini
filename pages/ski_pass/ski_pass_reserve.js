@@ -252,6 +252,7 @@ Page({
 
   },
   getCell(e){
+    var that = this
     var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateWechatMemberCell?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&encData='+encodeURIComponent(e.detail.encryptedData)+'&iv='+encodeURIComponent(e.detail.iv)
     wx.request({
       url: url,
