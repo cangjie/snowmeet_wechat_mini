@@ -159,6 +159,41 @@
   "requiredPrivateInfos": [
     "getFuzzyLocation"
   ],
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "subPackages": [
+    {
+      "root": "pages/payment",
+      "name": "pay",
+      "pages": [
+        "pay_hub",
+        "pay_recept"
+      ]
+    },
+    {
+      "root": "pages/mine/maintain/",
+      "name": "maintain_payment",
+      "pages": [
+        "order_detail",
+        "bind_maintain_order",
+        "order_list",
+        "task"
+      ]
+    },
+    {
+      "root": "pages/shop_sale",
+      "name": "sale_payment",
+      "pages": [
+        "order_info",
+        "shop_landing"
+      ]
+    },
+    {
+      "root": "pages/experience",
+      "name": "experience_payment",
+      "pages": [
+        "pay_temp"
+      ]
+    }
+  ]
   
 }
