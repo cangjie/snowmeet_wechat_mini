@@ -135,6 +135,7 @@ Page({
           return
         }
         skipass.card_image_url = fileName
+        skipass.status = 'edit'
         that.updateSkipass(skipass)
         //var updateUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/'
 
@@ -212,6 +213,7 @@ Page({
               return
             }
             skipass.card_no_filled = cardNo
+            skipass.status = 'edit'
             var productReserveList = that.data.productReserveList
             that.setData({productReserveList})
           }
