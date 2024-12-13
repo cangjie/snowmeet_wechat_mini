@@ -8,8 +8,8 @@
     <mp-cells wx:for="{{list}}" wx:for-item="reserve" wx:for-index="idx" title="【日期：{{reserve.reserveDateStr}}】【雪票：{{reserve.product_name}}】【姓名：{{reserve.name}}】【手机：{{reserve.cell}}】" >
       <mp-cell wx:for="{{reserve.skipasses}}" >
         <view class="view-row" id="{{item.id}}" >
-          <view class="left-column" >票号：</view>
-          <view class="right-column" >{{((item.card_no)?item.card_no: '未填')}}</view>
+          <view class="left-column" id="{{reserve.memberId}}_{{reserve.wechatMiniOpenId}}" bindtap="gotoVeri" >票号：</view>
+          <view class="right-column"  id="{{reserve.memberId}}_{{reserve.wechatMiniOpenId}}" bindtap="gotoVeri" >{{((item.card_no)?item.card_no: '未填')}}</view>
           <view class="left-column" >消费金额：</view>
           <view class="right-column view-row" >
             <input class="input" id="{{item.id}}" bindinput="setFee" style="width: 75rpx;" placeholder="{{((item.fee)?'item.fee':'0')}}" value="{{((item.fee)?item.fee:'')}}"  />元

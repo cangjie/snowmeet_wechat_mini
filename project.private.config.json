@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "veri",
+          "pathName": "/pages/admin/ski_pass/nanshan_verify",
+          "query": "memberId=15506&openId=oHdTn5Wlwy37YA6kmJP6zE9AoTlI",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "OCR",
           "pathName": "pages/test/ocr/ocr",
           "query": "",
@@ -40,13 +47,6 @@
         {
           "name": "staffreg",
           "pathName": "pages/admin/staff_reg",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "mp-tab",
-          "pathName": "pages/test/price_matrix/price_matrix",
           "query": "",
           "launchMode": "default",
           "scene": null

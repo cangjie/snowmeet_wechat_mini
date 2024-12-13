@@ -10,6 +10,17 @@ Page({
     keyword: '',
     searching: false
   },
+  gotoVeri(e){
+    var that = this
+    console.log('goto', e)
+    var idArr = e.currentTarget.id.split('_')
+    var url =  'nanshan_verify?memberId=' + idArr[0] + '&openId=' + idArr[1]
+    wx.navigateTo({
+      url: url
+    })
+    
+   
+  },
   setKeyword(e){
     var that = this
     var v = e.detail.value
