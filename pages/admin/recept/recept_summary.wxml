@@ -25,7 +25,9 @@
     </view>
     <view wx:else >
       <view wx:if="{{!needPay}}" style="margin-top: 50rpx; text-align: center;" >
-        招待订单，无需支付。
+        <view>招待订单，无需支付。</view>
+        <button class="input" wx:if="{{recept.recept_type=='养护下单'}}"  bindtap="gotoMaintainTask" > 点 击 进 入 详 情 </button>
+        <view style="height: 300rpx;" ></view>
       </view>
       <view wx:else style="margin-top: 50rpx; text-align: center;" >
         0元订单，无需支付。

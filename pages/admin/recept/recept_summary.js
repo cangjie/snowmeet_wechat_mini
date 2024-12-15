@@ -204,6 +204,7 @@ Page({
             if (res.statusCode != 200){
                 return
             }
+            console.log('get recept', res.data)
             var recept = res.data
             console.log('recept', recept)
             var needPay = true
@@ -271,5 +272,21 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  gotoMaintainTask(){
+    var that = this
+    var url = 'https://' + app.globalData.domainName + '/core/Recept/GetFirstMaintainId?receptId=' + that.data.recept.id
+    wx.request({
+      url: url,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        wx.navigateTo({
+          url: '../maintain/task?id=' + res.data,
+        })
+      }
+    })
   }
 })
