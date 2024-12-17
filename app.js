@@ -9,6 +9,8 @@ App({
       console.log(res.hasUpdate)
     })
 
+    console.log('current version', __wxConfig.envVersion)
+
     updateManager.onUpdateReady(function () {
       wx.showModal({
         title: '更新提示',

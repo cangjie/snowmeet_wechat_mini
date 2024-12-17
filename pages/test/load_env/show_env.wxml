@@ -1,0 +1,2 @@
+<!--pages/test/load_env/show_env.wxml-->
+<text>{{version}}</text>

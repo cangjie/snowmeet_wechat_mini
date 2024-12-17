@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "getcurrentversion",
+          "pathName": "pages/test/load_env/show_env",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "veri",
           "pathName": "/pages/admin/ski_pass/nanshan_verify",
           "query": "memberId=15506&openId=oHdTn5Wlwy37YA6kmJP6zE9AoTlI",
