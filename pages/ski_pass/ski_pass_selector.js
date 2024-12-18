@@ -331,5 +331,12 @@ Page({
     wx.navigateTo({
       url: 'nanshan_overtime_reserve?id=' + id,
     })
+  },
+  gotoDetail(e){
+    var that = this
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'skipass_detail?id=' + id,
+    })
   }
 })

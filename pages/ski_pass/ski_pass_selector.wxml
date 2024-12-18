@@ -62,7 +62,7 @@
         <view style="width: 350rpx;">{{item.name}}</view>
         <view style="width: 150rpx;margin-top: 50rpx;text-align: right;">{{item.sale_price_str}}</view>
         <view style="margin-left: 20rpx;margin-top: 40rpx;">
-          <button size="mini" class="input">预定</button>
+          <button id="{{item.id}}" size="mini" class="input" bind:tap="gotoDetail">预定</button>
         </view>
       </view>
     </mp-cell>

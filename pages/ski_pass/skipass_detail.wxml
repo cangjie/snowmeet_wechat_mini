@@ -1,0 +1,29 @@
+<view>
+  <view style="margin-left: 20rpx;margin-right: 20rpx;" >
+    <view style="margin-top: 50rpx;">
+      {{product.name}}
+    </view>
+    <view class="view-row">
+      <view class="left-column" >门市价：</view>
+      <view class="right-column"  >{{product.market_price_str}}</view>
+      <view class="left-column" >会员价：</view>
+      <view class="right-column"  >{{product.sale_price_str}}</view>
+    </view>
+    <view class="view-row">
+      <view class="left-column" >数量：</view>
+      <view class="right-column"  >
+        <input placeholder="1"  style="width: 50rpx;" class="input" />
+      </view>
+      <view class="left-column" >总计：</view>
+      <view class="right-column"  >{{product.sale_price_str}}</view>
+    </view>
+    <view style="margin-top: 50rpx;">
+      <button class="input" > 确 认 支 付 </button>
+    </view>
+  </view>
+  
+  <view style="margin-left: 50rpx;margin-right: 50rpx;">
+    <rich-text nodes="{{product.rules}}" style="margin-left: 40rpx; margin-right: 40rpx; margin-top: 50rpx" >
+    </rich-text>
+  </view>
+</view>
