@@ -15,24 +15,15 @@ Page({
     skiPassDescNanashanRent: util.skiPassDescNanashanRent,
     nowTime: util.formatTimeStr(new Date()),
     reserveDateDesc: '今天',
-    tabIndex: 0
+    tabIndex: 0,
+    resortArr:['万龙', '南山', '云顶', '太舞', '富龙', '翠云山']
   },
 
   onChange(e){
     console.log('tab change', e)
     var that = this
     var value = e.detail.index
-    that.setData({productList:[]})
-    switch(value){
-      case 1:
-        that.setData({resort: '万龙'})
-        that.GetData()
-        break
-      default:
-        that.setData({resort: '南山'})
-        that.GetData()
-        break
-    }
+    that.setData({productList:[], resort: that.data.resortArr[value]})
     that.GetData()
   },
 
@@ -40,21 +31,13 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    const tabs = [
-      {
-        title: '南山',
-        title2: '',
-        img: '',
-        desc: '本视频系列课程，由腾讯课堂NEXT学院与微信团队联合出品，通过实战案例，深入浅出地进行讲解。',
-      },
-      {
-        title: '万龙',
-        title2: '',
-        img: '',
-        desc: '微信小程序直播系列课程持续更新中，帮助大家更好地理解、应用微信小程序直播功能。',
-      }
-    ]
-    this.setData({ tabs })
+    var tabs = []
+    var that = this
+    for(var i = 0; i < that.data.resortArr.length; i++){
+      tabs.push({title: that.data.resortArr[i], title2:'', img: '', desc: ''})
+    }
+
+    this.setData({ tabs, resort: that.data.resortArr[0] })
     var that = this
     app.loginPromiseNew.then(function(resolve) {
       var reserveDate = new Date(that.data.reserveDate)
@@ -203,7 +186,7 @@ Page({
   GetData(){
     var that = this
     that.setData({productList:[]})
-    if (that.data.resort == '万龙'){
+    if (that.data.resort != '南山'){
       that.GetWanLongProduct()
       return
     }
