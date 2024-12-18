@@ -16,7 +16,7 @@ Page({
     nowTime: util.formatTimeStr(new Date()),
     reserveDateDesc: '今天',
     tabIndex: 0,
-    resortArr:['万龙', '南山', '云顶', '太舞', '富龙', '翠云山']
+    resortArr:['万龙', '南山', '云顶', '太舞', '富龙']
   },
 
   onChange(e){
@@ -157,29 +157,30 @@ Page({
   },
   GetWanLongProduct() {
     var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/WanlongZiwoyouHelper/GetProductList'
+    var getUrl = 'https://' + app.globalData.domainName + '/core/WanlongZiwoyouHelper/GetProductsByResort?resort=' + encodeURIComponent(that.data.resort)
     wx.request({
       url: getUrl,
       method: 'GET',
       success:(res)=>{
-        console.log('get wanlong product', res)
-        if (res.statusCode != 200 || res.data.state != 1 
-          || res.data.data.results == undefined || res.data.data.results == null){
+        
+        if (res.statusCode != 200 ){
           return
         }
         var productList = []
-        for(var i = 0; i < res.data.data.results.length; i++ ){
-          var item = res.data.data.results[i]
+        for(var i = 0; i < res.data.length; i++ ){
+          var item = res.data[i]
           var product = {
-            id: item.productNo,
-            name: item.productName,
-            sale_price_str: util.showAmount(parseFloat(item.settlementPrice)),
+            id: item.product_id,
+            name: item.name,
+            sale_price_str: util.showAmount(parseFloat(item.sale_price)),
+            market_price_str: util.showAmount(parseFloat(item.market_price)),
             deposit_str: util.showAmount(0),
-            desc: item.orderDesc
+            desc: item.rules
           }
           productList.push(product)
         }
         that.setData({productList: productList})
+        console.log('get resort product', productList)
       }
     })
   },
