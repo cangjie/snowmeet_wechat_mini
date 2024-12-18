@@ -1,0 +1,4 @@
+/* pages/ski_pass/nanshan_overtime_reserve.wxss */
+.right-column {
+  width: 500rpx
+}

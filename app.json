@@ -126,7 +126,8 @@
     "pages/admin/ski_pass/nanshan_refund",
     "pages/admin/ski_pass/nanshan_refund_detail",
     "pages/admin/ski_pass/nanshan_pick_card_scan",
-    "pages/mine/skipass/my_skipass"
+    "pages/mine/skipass/my_skipass",
+    "pages/ski_pass/nanshan_overtime_reserve"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -195,5 +196,4 @@
       ]
     }
   ]
-  
 }

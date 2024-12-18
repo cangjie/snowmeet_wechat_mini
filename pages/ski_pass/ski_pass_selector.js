@@ -340,5 +340,12 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  showTempQr(e){
+    var that = this
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'nanshan_overtime_reserve?id=' + id,
+    })
   }
 })

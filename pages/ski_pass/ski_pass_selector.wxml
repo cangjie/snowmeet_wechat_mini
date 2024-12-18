@@ -44,9 +44,11 @@
       <view style="width: 50%;">票价：{{item.sale_price_str}}</view> 
       <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
     </view>
-    
     <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  ></rich-text>
-    
+    <view wx:if="{{role=='staff'}}">
+      <button class="input" id="{{item.id}}" bind:tap="showTempQr">临时加票二维码</button>
+    </view>
+
   </view>
 </view>
 <view style="height: 200rpx;"></view>
