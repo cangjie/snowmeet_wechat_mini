@@ -266,6 +266,9 @@ Page({
         that.setData({cell: member.cell})
       }
     })
+  },
+  submit(){
+    
   }
 
 })
