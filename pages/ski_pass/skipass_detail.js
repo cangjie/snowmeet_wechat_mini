@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    count: 1
   },
 
   /**
@@ -17,7 +17,9 @@ Page({
     var that = this
     that.setData({id: options.id})
     that.getData()
+    app.loginPromiseNew.then(function(resolve){
 
+    })
   },
 
   /**
@@ -81,12 +83,41 @@ Page({
         var product = res.data
         product.sale_price_str = util.showAmount(parseFloat(product.sale_price)),
         product.market_price_str = util.showAmount(parseFloat(product.market_price))
-        that.setData({product})
+        
+        that.setData({product, summaryStr: util.showAmount(that.data.count * product.sale_price)})
+        console.log('get product', product)
         var title = product.resort + ' 雪票预定'
         wx.setNavigationBarTitle({
           title: title,
         })
+        that.GetRealName()
       }
     })
+  },
+  GetRealName(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res) => {
+        if (res.data.mini_users.length > 0){
+          that.setData({name: res.data.mini_users[0].real_name, cell: res.data.mini_users[0].cell_number})
+        }
+        
+      }
+    })
+  },
+  setCount(e){
+    var that = this
+    var product = that.data.product
+    var count = parseInt(e.detail.value)
+    if (isNaN(count))
+    {
+      return
+    }
+    var summary = product.sale_price * count
+    that.setData({count: count, summaryStr: util.showAmount(summary)})
   }
+
 })
