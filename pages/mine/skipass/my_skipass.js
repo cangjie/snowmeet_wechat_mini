@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    canelling: false
   },
 
   /**
@@ -70,7 +70,7 @@ Page({
   },
   getData(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/GetMySkipass?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var url = 'https://' + app.globalData.domainName + '/core/SkiPass/GetMySkipass?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: url,
       method: 'GET',
@@ -104,7 +104,7 @@ Page({
           prod.sale_price_str = util.showAmount(prod.ticket_price)
           prod.deposit_str = util.showAmount(prod.deposit)
           prod.reserve_dateStr = util.formatDate(new Date(prod.reserve_date))
-
+          prod.deal_priceStr = util.showAmount(prod.deal_price)
           switch(prod.status){
             case '已退押金':
               prod.color = 'gray'
@@ -123,8 +123,36 @@ Page({
           }
 
         }
-        that.setData({list})
+        that.setData({list, canelling: false})
         console.log('ski pass list', list)
+      }
+    })
+  },
+  cancel(e){
+    var that = this
+    that.setData({cancelling: true})
+    var id = e.currentTarget.id
+    var cancelUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/Cancel/' + id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: cancelUrl,
+      success:(res)=>{
+        console.log('cancel result', res)
+        //that.setData({cancelling: false})
+        that.getData()
+      }
+    })
+  },
+  refund(e){
+    var that = this
+    that.setData({cancelling: true})
+    var id = e.currentTarget.id
+    var cancelUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/Refund?skipassId=' + id + '&reason=' + encodeURIComponent('确认取消成功后退款') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: cancelUrl,
+      success:(res)=>{
+        console.log('cancel result', res)
+        //that.setData({cancelling: false})
+        that.getData()
       }
     })
   }

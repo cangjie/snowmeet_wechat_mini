@@ -15,7 +15,8 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({id: options.id})
+
+    that.setData({id: options.id, currentDate: util.formatDate(new Date())})
     that.getData()
     app.loginPromiseNew.then(function(resolve){
 
@@ -118,6 +119,81 @@ Page({
     }
     var summary = product.sale_price * count
     that.setData({count: count, summaryStr: util.showAmount(summary)})
+  },
+
+  submit(){
+    var that = this
+    var cell = that.data.cell
+    var name = that.data.name
+    var idNo = that.data.idNo
+    var product = that.data.product
+    var msg = ''
+    if (!cell || cell.length != 11){
+      msg = '请正确填写手机号。'
+    }
+    else if (!name){
+      msg = '请填写姓名。'
+    }
+    else if (product.resort == '太舞' && !idNo){
+      msg = '请填写身份证号码。'
+    }
+    if (!idNo){
+      idNo = ''
+    }
+    if (msg != ''){
+      wx.showToast({
+        title: msg,
+        icon: 'error'
+      })
+      return
+    }
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + product.product_id + '?date=' + that.data.currentDate + '&count=' + that.data.count + '&cell=' + cell + '&name=' + encodeURIComponent(name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&idNo=' + idNo
+    wx.request({
+      url: submitUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        console.log('skipass booked', res)
+        var order = res.data
+        var paymentId = order.payments[0].id
+        var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/TenpayRequest/' + paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        wx.request({
+          url: paymentUrl,
+          method: 'GET',
+          success:(res) => {
+            wx.requestPayment({
+              nonceStr: res.data.nonce,
+              package: 'prepay_id=' + res.data.prepay_id,
+              paySign: res.data.sign,
+              timeStamp: res.data.timeStamp,
+              signType: 'MD5',
+              success:(res)=>{
+                wx.showToast({
+                  title: '支付成功。',
+                  icon: 'success',
+                  complete:()=>{
+                    wx.redirectTo({
+                      url: '../mine/skipass/my_skipass',
+                    })
+                  }
+                })
+              }
+            })
+          }
+        })
+      }
+    })
+  },
+  inputIdNo(e){
+    var that = this
+    that.setData({idNo: e.detail.value})
+  },
+  setDate(e){
+    var that = this
+    var date = new Date(e.detail.value)
+    that.setData({currentDate: util.formatDate(date)})
   }
 
 })

@@ -16,7 +16,7 @@ Page({
     nowTime: util.formatTimeStr(new Date()),
     reserveDateDesc: '今天',
     tabIndex: 0,
-    resortArr:['万龙', '南山', '云顶', '太舞', '富龙']
+    resortArr:[]
   },
 
   onChange(e){
@@ -31,13 +31,11 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    var tabs = []
+    
     var that = this
-    for(var i = 0; i < that.data.resortArr.length; i++){
-      tabs.push({title: that.data.resortArr[i], title2:'', img: '', desc: ''})
-    }
+    
 
-    this.setData({ tabs, resort: that.data.resortArr[0] })
+    
     var that = this
     app.loginPromiseNew.then(function(resolve) {
       var reserveDate = new Date(that.data.reserveDate)
@@ -77,7 +75,8 @@ Page({
       that.setData({tabbarItemList: app.globalData.userTabBarItem, 
         role: app.globalData.role, canGetInfo: true, reserveDate: util.formatDate(reserveDate),
         startDate: startDate, endDate: util.formatDate(endDate), reserveDateDesc: reserveDateDesc})
-      that.GetData()
+      that.getResortArr()
+      
     })
   },
 
@@ -157,7 +156,7 @@ Page({
   },
   GetWanLongProduct() {
     var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/WanlongZiwoyouHelper/GetProductsByResort?resort=' + encodeURIComponent(that.data.resort)
+    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?resort=' + encodeURIComponent(that.data.resort)
     wx.request({
       url: getUrl,
       method: 'GET',
@@ -337,6 +336,30 @@ Page({
     var id = e.currentTarget.id
     wx.navigateTo({
       url: 'skipass_detail?id=' + id,
+    })
+  },
+  getResortArr(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetResorts'
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        var resortArr = []
+        if (res.statusCode != 200){
+          resortArr = ['万龙', '南山', '云顶', '太舞']
+        }
+        else{
+          resortArr = res.data
+        }
+        var tabs = []
+        for(var i = 0; i < resortArr.length; i++){
+          tabs.push({title: resortArr[i], title2:'', img: '', desc: ''})
+        }
+    
+        this.setData({ tabs, resort: resortArr[0], resortArr })
+        that.GetData()
+      }
     })
   }
 })

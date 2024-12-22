@@ -185,7 +185,7 @@ Page({
                   icon: 'success',
                   success:()=>{
                     wx.redirectTo({
-                      url: '../mine/my_ski_pass/my_ski_pass',
+                      url: '../mine/skipass/my_skipass',
                     })
                   }
                 })

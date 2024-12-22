@@ -12,7 +12,7 @@
     <view class="view-row">
       <view class="left-column" >数量：</view>
       <view class="right-column"  >
-        <input value="{{count}}" bindinput="setCount"  type="number" style="width: 50rpx;text-align: center;" class="input" />
+        <input value="{{count}}" bindinput="setCount"  type="number" style="width: 50rpx;text-align: center;" class="input" disabled="{{product.resort=='太舞'}}" />
       </view>
       <view class="left-column" >总计：</view>
       <view class="right-column"  >{{summaryStr}}</view>
@@ -20,6 +20,15 @@
     <view style="height: 50rpx;"></view>
     <view style="height: 1rpx;background-color: gray;" ></view>
     <view style="height: 50rpx;"></view>
+    <view class="view-row" >
+      <view class="left-column" >日期：</view>
+      <view class="right-column" style="width: 200rpx;" >
+        <picker class="input" mode="date" bindchange="setDate" >
+          <picker-view>{{currentDate}}</picker-view>
+        </picker>
+      </view>
+     
+    </view>
     <view class="view-row" >
       <view class="left-column" >电话：</view>
       <view class="right-column" >
@@ -36,14 +45,14 @@
         <input id="name" class="input" style="width: 150rpx;" value="{{name}}" placeholder="{{name.length==0?'请填写姓名':''}}" bindinput="input" />
       </view>
     </view>
-    <view wx:if="{{product.resort == '太舞'}}" class="view-row">
+    <view wx:if="{{product.resort == '太舞' || product.resort == '富龙'}}" class="view-row">
       <view class="left-column" >身份证：</view>
       <view class="right-column" >
-        <input id="id_no" class="input" style="width: 300rpx;" value="{{name}}" placeholder="{{name.length==0?'请填写身份证号码':''}}" bindinput="input" />
+        <input id="id_no" class="input" style="width: 300rpx;" value="{{idNo}}" placeholder="{{name.length==0?'请填写身份证号码':''}}" bindinput="inputIdNo" />
       </view>
     </view>
     <view style="margin-top: 50rpx;">
-      <button class="input" > 确 认 支 付 </button>
+      <button class="input" bind:tap="submit" > 确 认 支 付 </button>
     </view>
   </view>
   <view style="height: 50rpx;"></view>

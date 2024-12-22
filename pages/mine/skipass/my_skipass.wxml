@@ -5,13 +5,35 @@
       <view style="width: 50%;">日期：{{item.reserve_dateStr}}</view> 
       <view style="width: 50%;">状态：{{item.status}}</view> 
     </view>
-    
     <view style="margin-left: 10rpx;display: flex; flex-direction: row;" >
-      <view style="width: 50%;">票价：{{item.sale_price_str}}</view> 
-      <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
+      <view style="width: 50%;">数量：{{item.count}}</view> 
+      <view style="width: 50%;">金额：{{item.deal_priceStr}}</view> 
     </view>
-    
-    <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  ></rich-text>
-    
+    <block wx:if="{{item.resort=='南山'}}" >
+      <view style="margin-left: 10rpx;display: flex; flex-direction: row;" >
+        <view style="width: 50%;">票价：{{item.sale_price_str}}</view> 
+        <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
+      </view>
+      
+      <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  ></rich-text>
+    </block>
+    <block wx:else >
+      <view wx:if="{{item.qr_code_url}}" style="margin-top: 50rpx;text-align: center;" >
+        <image style="width: 300rpx;height: 300rpx;" src="{{item.qr_code_url}}" ></image>
+      </view>
+      <view wx:if="{{item.card_no}}" style="margin-top: 50rpx;text-align: center;" >
+        {{item.card_no}}
+      </view>
+      <view wx:if="{{item.send_content}}" style="margin-top: 50rpx;text-align: left;margin-left: 25rpx;" >
+        {{item.send_content}}
+      </view>
+      <view wx:if="{{item.memo.trim() != ''}}" style="margin-top: 50rpx;text-align: left;margin-left: 25rpx;" >
+        {{item.memo}}
+      </view>
+      <view style="margin-top: 50rpx;text-align: center;" >
+        <button   wx:if="{{item.status == '已取消'}}" size="mini" disabled="{{cancelling}}"  id="{{item.id}}" bind:tap="refund" class="input" >申请退款</button>
+        <button wx:else size="mini" id="{{item.id}}" bind:tap="cancel" class="input" disabled="{{cancelling || (item.status != '已出票' && item.status != '出票失败')}}" >申请取消</button>
+      </view>
+    </block>
   </view>
 </view>
