@@ -82,18 +82,37 @@ Page({
           return
         }
         var product = res.data
-        product.sale_price_str = util.showAmount(parseFloat(product.sale_price)),
-        product.market_price_str = util.showAmount(parseFloat(product.market_price))
         
-        that.setData({product, summaryStr: util.showAmount(that.data.count * product.sale_price)})
+        //product.sale_price_str = util.showAmount(parseFloat(product.sale_price)),
+        //product.market_price_str = util.showAmount(parseFloat(product.market_price))
+        
+        that.setData({product})
         console.log('get product', product)
         var title = product.resort + ' 雪票预定'
         wx.setNavigationBarTitle({
           title: title,
         })
+
         that.GetRealName()
+        that.getDailyPrice()
+        that.setData({summaryStr: util.showAmount(that.data.count * that.data.dailyPrice.deal_price)})
       }
     })
+  },
+  getDailyPrice(){
+    var that = this
+    var product = that.data.product
+    var currentDate = util.formatDate(new Date(that.data.currentDate))
+    for(var i = 0; i < product.dailyPrice.length; i++){
+      var pDate = util.formatDate(new Date(product.dailyPrice[i].reserve_date))
+      if (pDate == currentDate){
+        var dailyPrice = product.dailyPrice[i]
+        dailyPrice.deal_priceStr = util.showAmount(parseFloat(dailyPrice.deal_price))
+        dailyPrice.marketPriceStr = util.showAmount(parseFloat(dailyPrice.marketPrice))
+        that.setData({dailyPrice: dailyPrice})
+        break
+      }
+    }
   },
   GetRealName(){
     var that = this
@@ -111,13 +130,12 @@ Page({
   },
   setCount(e){
     var that = this
-    var product = that.data.product
     var count = parseInt(e.detail.value)
     if (isNaN(count))
     {
       return
     }
-    var summary = product.sale_price * count
+    var summary = that.data.dailyPrice.deal_price * count
     that.setData({count: count, summaryStr: util.showAmount(summary)})
   },
 
@@ -194,6 +212,11 @@ Page({
     var that = this
     var date = new Date(e.detail.value)
     that.setData({currentDate: util.formatDate(date)})
+    that.getDailyPrice()
+    var dealPrice = that.data.dailyPrice.deal_price
+    var count = that.data.count
+    var summary = dealPrice * count
+    that.setData({summaryStr: util.showAmount(summary)})
   }
 
 })

@@ -5,9 +5,9 @@
     </view>
     <view class="view-row">
       <view class="left-column" >门市价：</view>
-      <view class="right-column"  >{{product.market_price_str}}</view>
+      <view class="right-column"  >{{dailyPrice.marketPriceStr}}</view>
       <view class="left-column" >会员价：</view>
-      <view class="right-column"  >{{product.sale_price_str}}</view>
+      <view class="right-column"  >{{dailyPrice.deal_priceStr}}</view>
     </view>
     <view class="view-row">
       <view class="left-column" >数量：</view>
