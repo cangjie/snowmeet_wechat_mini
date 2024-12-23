@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    haveInit: false
   },
 
   /**
@@ -16,6 +16,7 @@ Page({
   onLoad(options) {
     var that = this
     app.loginPromiseNew.then(function(resovle){
+      that.data.haveInit = true
       that.getResortArr()
     })
   },
@@ -31,7 +32,10 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    if (that.data.haveInit)
+      that.getResortArr()
+  
   },
 
   /**
@@ -82,8 +86,6 @@ Page({
         else{
           resortArr = res.data
         }
-        
-    
         this.setData({resort: resortArr[0], resortArr })
         that.getData()
       }
@@ -121,5 +123,11 @@ Page({
     var resort = e.detail.value
     that.setData({resort})
     that.getData()
+  },
+  gotoDetail(e){
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'common_skipass_detail?id=' + id,
+    })
   }
 })

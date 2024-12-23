@@ -129,7 +129,8 @@
     "pages/mine/skipass/my_skipass",
     "pages/ski_pass/nanshan_overtime_reserve",
     "pages/ski_pass/skipass_detail",
-    "pages/admin/ski_pass/common_skipass_list"
+    "pages/admin/ski_pass/common_skipass_list",
+    "pages/admin/ski_pass/common_skipass_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

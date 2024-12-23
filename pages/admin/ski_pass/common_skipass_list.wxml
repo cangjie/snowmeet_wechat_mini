@@ -6,11 +6,11 @@
   </view>
   <mp-cells title="共：{{list.length}}" >
     <mp-cell wx:for="{{list}}" >
-      <view class="view-row" >
+      <view id="{{item.product_id}}" bind:tap="gotoDetail" class="view-row" >
         <view class="left-column" style="color:{{item.color}}"  >名称：</view>
         <view class="right-column" style="width: 660rpx;color:{{item.color}}" >{{item.name}}</view>
       </view>
-      <view class="view-row" >
+      <view id="{{item.product_id}}"  bind:tap="gotoDetail" class="view-row" >
         <view class="left-column" style="width: 100rpx;color:{{item.color}}" >平日：</view>
         <view class="right-column" style="color:{{item.color}}" >{{item.commonDayDealPriceStr}}</view>
         <view class="left-column" style="color:{{item.color}}" >周末：</view>
