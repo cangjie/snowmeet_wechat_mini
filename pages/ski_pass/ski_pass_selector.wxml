@@ -59,8 +59,8 @@
   <mp-cells>
     <mp-cell wx:for="{{productList}}" >
       <view class="view-row" >
-        <view style="width: 350rpx;">{{item.name}}</view>
-        <view style="width: 150rpx;margin-top: 50rpx;text-align: right;">{{item.sale_price_str}}</view>
+        <view style="width: 330rpx;">{{item.name}}</view>
+        <view style="width: 180rpx;margin-top: 50rpx;text-align: right;">{{item.commonDayDealPriceStr}}起</view>
         <view style="margin-left: 20rpx;margin-top: 40rpx;">
           <button id="{{item.id}}" size="mini" class="input" bind:tap="gotoDetail">预定</button>
         </view>

@@ -174,6 +174,7 @@ Page({
             sale_price_str: util.showAmount(parseFloat(item.sale_price)),
             market_price_str: util.showAmount(parseFloat(item.market_price)),
             deposit_str: util.showAmount(0),
+            commonDayDealPriceStr: util.showAmount(item.commonDayDealPrice),
             desc: item.rules
           }
           productList.push(product)
