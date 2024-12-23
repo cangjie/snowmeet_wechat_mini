@@ -247,7 +247,9 @@ Page({
       case 'ns_ski_pass_veri':
         path = '/pages/admin/ski_pass/nanshan_pick_card_scan'
         break
-        
+      case 'ziwoyou':
+        path = '/pages/admin/ski_pass/common_skipass_list'
+        break
       default:
         break
     }

@@ -1,0 +1,23 @@
+<view>
+  <view style="margin-top: 50rpx;text-align: center;">
+    <radio-group class="view-row"  bindchange="changeResort" >
+      <radio disabled="{{querying}}" style="margin-left: 20rpx;" wx:for="{{resortArr}}" value="{{item}}" checked="{{item==resort}}" >{{item}}</radio>
+    </radio-group>
+  </view>
+  <mp-cells title="共：{{list.length}}" >
+    <mp-cell wx:for="{{list}}" >
+      <view class="view-row" >
+        <view class="left-column" style="color:{{item.color}}"  >名称：</view>
+        <view class="right-column" style="width: 660rpx;color:{{item.color}}" >{{item.name}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" style="width: 100rpx;color:{{item.color}}" >平日：</view>
+        <view class="right-column" style="color:{{item.color}}" >{{item.commonDayDealPriceStr}}</view>
+        <view class="left-column" style="color:{{item.color}}" >周末：</view>
+        <view class="right-column" style="color:{{item.color}}" >{{item.weekendDealPriceStr}}</view>
+        <view class="left-column" style="color:{{item.color}}" >状态：</view>
+        <view class="right-column" style="color:{{item.color}}" >{{item.hidden==1?'下架':'上架'}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

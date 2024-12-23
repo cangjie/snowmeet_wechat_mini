@@ -1,13 +1,13 @@
 <view>
   <view class="view-row" >
     <view class="left-column" style="width: 100rpx;" >日期：</view>
-    <view class="right-column" style="width: 135rpx;" >{{productReserveList.reserveDateStr}}</view>
+    <view class="right-column" style="width: 145rpx;" >{{productReserveList.reserveDateStr}}</view>
     <view class="left-column" style="width: 100rpx;" >名称：</view>
     <view class="right-column" style="width: 410rpx;"  >{{productReserveList.product_name}}</view>
   </view>
   <view class="view-row" >
     <view class="left-column" style="width: 100rpx;" >人数：</view>
-    <view class="right-column" style="width: 135rpx;" >{{productReserveList.memberList.length}}</view>
+    <view class="right-column" style="width: 145rpx;" >{{productReserveList.memberList.length}}</view>
     <view class="left-column" style="width: 100rpx;" >张数：</view>
     <view class="right-column" >{{productReserveList.skiPassCount}}</view>
   </view>
@@ -17,31 +17,31 @@
         <mp-cell wx:for="{{member.skiPasses}}" >
 
           <view class="view-row" wx:if="{{item.status == 'edit'}}" >
-            <view class="left-column" style="width: 80rpx;" >票号：</view>
+            <view class="left-column" style="width: 90rpx;" >票号：</view>
             <view class="right-column view-row" style="width: 260rpx;"  >
-              No.<input class="input" style="width: 180rpx;" value="{{item.card_no_filled? item.card_no_filled: (item.card_no? item.card_no : '')}}" id="{{item.id}}" bindinput="inputCardNo" />
+              <input class="input" style="width: 180rpx;" value="{{item.card_no_filled? item.card_no_filled: (item.card_no? item.card_no : '')}}" id="{{item.id}}" bindinput="inputCardNo" />
             </view>
             <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
-              <button id="{{item.id}}" class="input" style="width: 115rpx;" size="mini" bindtap="ocr" >识别</button>
+              <button id="{{item.id}}" class="input" style="width: 125rpx;" size="mini" bindtap="ocr" >识别</button>
               <view style="width: 5rpx;" ></view>
-              <button id="{{item.id}}" class="input" tyle="width: 115rpx;" size="mini" bindtap="setCardNo" >确定</button>
+              <button id="{{item.id}}" class="input" tyle="width: 125rpx;" size="mini" bindtap="setCardNo" >确定</button>
             </view>
           </view>
           <view class="view-row" wx:else >
-            <view class="left-column" style="width: 80rpx;" >票号：</view>
+            <view class="left-column" style="width: 90rpx;" >票号：</view>
             <view class="right-column" style="width: 260rpx;" bindtap="showCard" id="{{item.id}}" >{{item.card_no == null? '未填':item.card_no}}</view>
             <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
-              <button id="{{item.id}}" class="input" size="mini" bindtap="setEdit" style="width: 115rpx;" >填写</button>
+              <button id="{{item.id}}" class="input" size="mini" bindtap="setEdit" style="width: 125rpx;" >填写</button>
             </view>
           </view>
 
 
 
           <view class="view-row">
-            <view class="left-column" style="width: 80rpx;" >状态：</view>
+            <view class="left-column" style="width: 90rpx;" >状态：</view>
             <view class="right-column" style="width: 260rpx;" >{{item.card_member_pick_time == null? '未取' : '已取'}}</view>
             <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
-              <button id="{{item.id}}" class="input" size="mini" bindtap="setEdit" style="width: 115rpx;" disabled="{{true}}" >退款</button>
+              <button id="{{item.id}}" class="input" size="mini" bindtap="setEdit" style="width: 125rpx;" disabled="{{true}}" >退款</button>
             </view>
           </view>
         </mp-cell>

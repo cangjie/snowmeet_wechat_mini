@@ -1,0 +1,4 @@
+/* pages/admin/ski_pass/common_skipass_list.wxss */
+.left-column{
+  width: 100rpx;
+}

@@ -20,8 +20,8 @@
       </view>
       <view class="view-row" bindtap="gotoDetail" id="{{item.product_id}}_{{currentDate}}" >
         <view class="left-column" >张数：</view>
-        <view class="right-column" >{{item.count}}</view>
-        <view class="left-column" style="width: 130rpx;" >总计金额：</view>
+        <view class="right-column" style="width: 50rpx;" >{{item.count}}</view>
+        <view class="left-column" style="width: 180rpx;" >总计金额：</view>
         <view class="right-column" >{{item.sumDealPriceStr}}</view>
         <view class="left-column" >已出：</view>
         <view class="right-column" >{{item.pickCount}}</view>
