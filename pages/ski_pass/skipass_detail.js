@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    count: 1
+    count: 1,
+    paying: false
   },
 
   /**
@@ -146,6 +147,7 @@ Page({
     var idNo = that.data.idNo
     var product = that.data.product
     var msg = ''
+    that.setData({paying: true})
     if (!cell || cell.length != 11){
       msg = '请正确填写手机号。'
     }

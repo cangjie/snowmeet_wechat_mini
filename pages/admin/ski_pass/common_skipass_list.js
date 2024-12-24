@@ -86,7 +86,11 @@ Page({
         else{
           resortArr = res.data
         }
-        this.setData({resort: resortArr[0], resortArr })
+        var resort = that.data.resort
+        if (resort == undefined || resort == ''){
+          resort = resortArr[0]
+        }
+        this.setData({resort, resortArr })
         that.getData()
       }
     })
