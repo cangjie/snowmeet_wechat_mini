@@ -8,17 +8,26 @@
   <mp-cell>
     <scroll-view style="height: 300rpx;" scroll-y="true">
       <view wx:for="{{ticket_list}}" style="margin-top: 15rpx;border-width: 1rpx; border-color: #c0c0c0;border-style: solid;">
-        <view style="background-color: green; text-align: center;color: #FFFFFF;" >{{item.name}}</view>      
-        <view id="{{index}}" wx:if="{{index==current_selected_index}}" style="margin-left: 20rpx; background-color: #c0c0c0;" bindtap="select" >
-          <text  decode="{{true}}" style="font-size: 9pt; " >
-            {{item.usage}}
-          </text>
-        </view>
-        <view  id="{{index}}" wx:else  bindtap="select" style="margin-left: 20rpx;" >
-          <text  decode="{{true}}" style="font-size: 9pt; margin-left: 20rpx;" >              
-            {{item.usage}}
-          </text>
-        </view>
+        <view style="background-color:{{item.is_active==1?'green':'gray'}}; text-align: center;color: #FFFFFF;" >{{item.name}} {{item.is_active==1?'':'【未激活】'}}</view>      
+        <block wx:if="{{item.is_active == 1}}" >
+          <view id="{{index}}" wx:if="{{index==current_selected_index}}" style="margin-left: 20rpx; background-color: #c0c0c0;" bindtap="select" >
+            <text  decode="{{true}}" style="font-size: 9pt; " >
+              {{item.usage}}
+            </text>
+          </view>
+          <view  id="{{index}}" wx:else  bindtap="select" style="margin-left: 20rpx;" >
+            <text  decode="{{true}}" style="font-size: 9pt; margin-left: 20rpx;" >              
+              {{item.usage}}
+            </text>
+          </view>
+        </block>
+        <block wx:else >
+          <view  id="{{index}}"    style="margin-left: 20rpx;" >
+            <text  decode="{{true}}" style="font-size: 9pt; margin-left: 20rpx;" >              
+              {{item.usage}}
+            </text>
+          </view>
+        </block>
         <view style="height: 15rpx;"></view>
       </view>
       <view style="height: 15rpx;"></view>  
