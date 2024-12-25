@@ -131,6 +131,7 @@ Page({
   },
 
   submit(){
+    console.log('reserve')
     var valid = true
     var that = this
     var name = that.data.name
@@ -266,9 +267,6 @@ Page({
         that.setData({cell: member.cell})
       }
     })
-  },
-  submit(){
-    
   }
 
 })
