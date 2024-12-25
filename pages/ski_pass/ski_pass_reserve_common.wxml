@@ -45,7 +45,7 @@
       <view class="right-column" >{{totalAmountStr}}</view>
     </view>
     <view class="ski-pass-scale" style="border-width: 0rpx;text-align: center;margin-bottom: 0rpx;margin-top: 0rpx;" >
-      <view  >
+      <view>
         <button bindtap="submit" class="input" > 立 即 支 付 </button>
       </view>
     
