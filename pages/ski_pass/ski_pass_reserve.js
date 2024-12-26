@@ -113,7 +113,8 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({id: options.id, date: options.date, tabbarItemList: app.globalData.userTabBarItem})
+    var memberId = options.memberId
+    that.setData({id: options.id, date: options.date, tabbarItemList: app.globalData.userTabBarItem, memberId})
     app.loginPromiseNew.then(function(resolve){
       if (app.globalData.cellNumber==undefined || app.globalData.cellNumber==null || app.globalData.cellNumber==''){
         that.setData({needAuth: true})
@@ -161,7 +162,7 @@ Page({
     if (!valid){
       return
     }
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/ReserveSkiPass/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date)) + '&count=' + that.data.count + '&cell='  + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/ReserveSkiPass/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date)) + '&count=' + that.data.count + '&cell='  + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + (that.data.memberId?'&refereeMemberId=' + that.data.memberId: '')
     wx.request({
       url: submitUrl,
       method: 'GET',

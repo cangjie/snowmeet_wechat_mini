@@ -17,7 +17,8 @@ Page({
   onLoad(options) {
     var that = this
 
-    that.setData({id: options.id, currentDate: util.formatDate(new Date())})
+    that.setData({id: options.id, currentDate: util.formatDate(new Date()),
+    memberId: options.memberId})
     that.getData()
     app.loginPromiseNew.then(function(resolve){
 
@@ -167,7 +168,7 @@ Page({
       })
       return
     }
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + product.product_id + '?date=' + that.data.currentDate + '&count=' + that.data.count + '&cell=' + cell + '&name=' + encodeURIComponent(name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&idNo=' + idNo
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + product.product_id + '?date=' + that.data.currentDate + '&count=' + that.data.count + '&cell=' + cell + '&name=' + encodeURIComponent(name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&idNo=' + idNo + (that.data.memberId? '&refereeMemberId=' + that.data.memberId: '')
     wx.request({
       url: submitUrl,
       method: 'GET',

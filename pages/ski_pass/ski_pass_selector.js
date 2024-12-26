@@ -33,6 +33,10 @@ Page({
   onLoad(options) {
     var that = this
     var resort = decodeURIComponent(options.resort)
+    var memberId = options.memberId
+    if (memberId){
+      that.setData({memberId})
+    }
     that.setData({resort})
     app.loginPromiseNew.then(function(resolve) {
       var reserveDate = new Date(that.data.reserveDate)
@@ -249,17 +253,20 @@ Page({
     var that = this
     var id = e.currentTarget.id
     var resort = that.data.resort
+    var memberId = that.data.memberId
     switch(resort){
       case '南山':
         wx.navigateTo({
-          url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate,
+          url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate + (that.data.memberId?'&memberId=' + that.data.memberId : ''),
         })
         break
+      /*
       case '万龙':
         wx.navigateTo({
           url: 'ski_pass_reserve_common?id=' + id + '&date=' + that.data.reserveDate,
         })
-        break
+        
+        */
       default:
         break
     }
@@ -329,7 +336,7 @@ Page({
     var that = this
     var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'skipass_detail?id=' + id,
+      url: 'skipass_detail?id=' + id + (that.data.memberId?'&memberId=' + that.data.memberId : ''),
     })
   },
   getResortArr(){

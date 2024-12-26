@@ -12,7 +12,7 @@
         {
           "name": "index",
           "pathName": "pages/ski_pass/ski_pass_selector",
-          "query": "resort=南山",
+          "query": "resort=万龙&memberId=15506",
           "launchMode": "default",
           "scene": null
         },
