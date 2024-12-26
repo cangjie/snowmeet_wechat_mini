@@ -250,6 +250,9 @@ Page({
       case 'ziwoyou':
         path = '/pages/admin/ski_pass/common_skipass_list'
         break
+      case 'skipassqr':
+        path = '/pages/admin/ski_pass/reserve_qrcode'
+        break
       default:
         break
     }
