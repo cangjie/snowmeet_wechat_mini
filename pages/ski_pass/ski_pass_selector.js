@@ -31,12 +31,9 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    
     var that = this
-    
-
-    
-    var that = this
+    var resort = decodeURIComponent(options.resort)
+    that.setData({resort})
     app.loginPromiseNew.then(function(resolve) {
       var reserveDate = new Date(that.data.reserveDate)
       var nowDate = new Date()
@@ -68,10 +65,6 @@ Page({
         default:
           break
       }
-
-
-      
-      
       that.setData({tabbarItemList: app.globalData.userTabBarItem, 
         role: app.globalData.role, canGetInfo: true, reserveDate: util.formatDate(reserveDate),
         startDate: startDate, endDate: util.formatDate(endDate), reserveDateDesc: reserveDateDesc})
@@ -354,11 +347,16 @@ Page({
           resortArr = res.data
         }
         var tabs = []
+        var activeTab = 0
+        var resort = that.data.resort
         for(var i = 0; i < resortArr.length; i++){
           tabs.push({title: resortArr[i], title2:'', img: '', desc: ''})
+          if (resort == resortArr[i]){
+            activeTab = i
+          }
         }
     
-        this.setData({ tabs, resort: resortArr[0], resortArr })
+        this.setData({ tabs,  resortArr, activeTab })
         that.GetData()
       }
     })

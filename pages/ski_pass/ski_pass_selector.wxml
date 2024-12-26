@@ -2,7 +2,6 @@
   tabs="{{tabs}}" 
   activeTab="{{activeTab}}" 
   swiperClass="weui-tabs-swiper"
-  bindtabclick="onTabCLick"
   bindchange="onChange"
   activeClass="tab-bar-title__selected"
 >

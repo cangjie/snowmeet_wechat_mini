@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "index",
+          "pathName": "pages/ski_pass/ski_pass_selector",
+          "query": "resort=南山",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "veri",
           "pathName": "/pages/admin/ski_pass/nanshan_verify",
           "query": "memberId=15506&openId=oHdTn5Wlwy37YA6kmJP6zE9AoTlI",
@@ -84,12 +91,6 @@
           "pathName": "pages/register/register",
           "query": "",
           "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "index",
-          "pathName": "pages/index/index",
-          "query": "",
           "scene": null
         },
         {
