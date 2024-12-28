@@ -179,7 +179,7 @@ Page({
         console.log('skipass booked', res)
         var order = res.data
         var paymentId = order.payments[0].id
-        var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/TenpayRequest/' + paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Pay/' + paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: paymentUrl,
           method: 'GET',
@@ -188,7 +188,7 @@ Page({
               nonceStr: res.data.nonce,
               package: 'prepay_id=' + res.data.prepay_id,
               paySign: res.data.sign,
-              timeStamp: res.data.timeStamp,
+              timeStamp: res.data.timestamp,
               signType: 'MD5',
               success:(res)=>{
                 wx.showToast({

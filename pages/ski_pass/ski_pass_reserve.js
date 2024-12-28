@@ -170,16 +170,20 @@ Page({
         console.log('reserve order create', res)
         var order = res.data
         var paymentId = order.payments[0].id
-        var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/TenpayRequest/' + paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Pay/' + paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: paymentUrl,
           method: 'GET',
           success:(res) => {
+            var nonce = res.data.nonce
+            var prepayId = res.data.prepay_id
+            var timestamp = res.data.timestamp
+            var sign = res.data.sign
             wx.requestPayment({
-              nonceStr: res.data.nonce,
-              package: 'prepay_id=' + res.data.prepay_id,
-              paySign: res.data.sign,
-              timeStamp: res.data.timeStamp,
+              nonceStr: nonce,
+              package: 'prepay_id=' + prepayId,
+              paySign: sign,
+              timeStamp: timestamp,
               signType: 'MD5',
               success:(res)=>{
                 wx.showToast({
@@ -191,6 +195,9 @@ Page({
                     })
                   }
                 })
+              },
+              fail:(res)=>{
+                console.log('pay fail', res)
               }
             })
           }
