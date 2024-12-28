@@ -8,7 +8,8 @@ Page({
    */
   data: {
     count: 1,
-    paying: false
+    paying: false,
+    canReserve: true
   },
 
   /**
@@ -16,7 +17,7 @@ Page({
    */
   onLoad(options) {
     var that = this
-
+    that.getBalance()
     that.setData({id: options.id, currentDate: util.formatDate(new Date()),
     memberId: options.memberId})
     that.getData()
@@ -97,7 +98,12 @@ Page({
 
         that.GetRealName()
         that.getDailyPrice()
-        that.setData({summaryStr: util.showAmount(that.data.count * that.data.dailyPrice.deal_price)})
+        var summary = that.data.count * that.data.dailyPrice.deal_price
+        var canReserve = true
+        if (isNaN(that.data.balance) || summary >= that.data.balance){
+          canReserve = false
+        }
+        that.setData({canReserve, summaryStr: util.showAmount(that.data.count * that.data.dailyPrice.deal_price)})
       }
     })
   },
@@ -138,7 +144,11 @@ Page({
       return
     }
     var summary = that.data.dailyPrice.deal_price * count
-    that.setData({count: count, summaryStr: util.showAmount(summary)})
+    var canReserve = true
+    if (isNaN(that.data.balance) || summary >= that.data.balance ){
+      canReserve = false
+    }
+    that.setData({count: count, canReserve,summaryStr: util.showAmount(summary)})
   },
 
   submit(){
@@ -219,7 +229,31 @@ Page({
     var dealPrice = that.data.dailyPrice.deal_price
     var count = that.data.count
     var summary = dealPrice * count
-    that.setData({summaryStr: util.showAmount(summary)})
+    var canReserve = true
+    if (isNaN(that.data.balance ) || summary >= that.data.balance){
+      canReserve = false
+    }
+    that.setData({summaryStr: util.showAmount(summary), canReserve})
+  },
+  getBalance(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/WanlongZiwoyouHelper/GetBalance'
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          that.setData({canReserve: false})
+        }
+        try{
+          var balance = parseFloat(res.data)
+          that.setData({balance})
+        }
+        catch{
+          that.setData({canReserve: false})
+        }
+      }
+    })
   }
 
 })

@@ -10,6 +10,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "pay",
+          "pathName": "/pages/payment/pay_recept",
+          "query": "id=10586",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "index",
           "pathName": "pages/ski_pass/ski_pass_selector",
           "query": "resort=万龙&memberId=17141",
@@ -41,13 +48,6 @@
           "name": "share",
           "pathName": "pages/test/share/share",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pay",
-          "pathName": "pages/payment/pay_recept",
-          "query": "id=7465",
           "launchMode": "default",
           "scene": null
         },
