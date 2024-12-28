@@ -73,7 +73,7 @@ App({
             wx.getSystemInfoAsync({
               success:(res)=>{
                 app.globalData.systemInfo = res
-                resolve(app.globalData)
+                //resolve(app.globalData)
                 if (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1){
                   wx.redirectTo({
                     url: '/pages/admin/admin',
@@ -88,7 +88,7 @@ App({
                 catch(err){
                   console.log('get sys info sync fail', err)
                 }
-                resolve(app.globalData)
+                //resolve(app.globalData)
                 if (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1){
                   wx.redirectTo({
                     url: '/pages/admin/admin',
@@ -96,7 +96,17 @@ App({
                 }
               },
               complete:(res)=>{
-                
+                const accountInfo = wx.getAccountInfoSync()
+                app.globalData.accountInfo = accountInfo
+                switch(accountInfo.miniProgram.envVersion){
+                  case 'develop':
+                    //app.globalData.domainName = 'snowmeet.wanlonghuaxue.com'
+                    app.globalData.domainName = 'mini.snowmeet.top'
+                    break
+                  default:
+                    break
+                }
+                resolve(app.globalData)
               }
             })
             

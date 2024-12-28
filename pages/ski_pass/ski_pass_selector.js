@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-    resort: '南山',
+    resort: '万龙',
     tags:'',
     reserveDate: util.formatDate(new Date()),
     productList: [],
@@ -36,6 +36,9 @@ Page({
     var memberId = options.memberId
     if (memberId){
       that.setData({memberId})
+    }
+    if (!resort){
+      resort = '万龙'
     }
     that.setData({resort})
     app.loginPromiseNew.then(function(resolve) {

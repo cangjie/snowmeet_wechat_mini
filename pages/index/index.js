@@ -32,7 +32,7 @@ Page({
       }
       else{
         wx.redirectTo({
-          url: '../ski_pass/ski_pass_selector',
+          url: '../ski_pass/ski_pass_selector?resort=' + encodeURIComponent('万龙'),
         })
       }
     })
