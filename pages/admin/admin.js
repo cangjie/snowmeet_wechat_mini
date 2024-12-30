@@ -47,7 +47,8 @@ Page({
     role: '',
     isSchoolStaff: false,
     isManager: true,
-    isAdmin: false
+    isAdmin: false,
+    
   },
 
   /**
@@ -58,6 +59,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve) {
       init(that)
+      that.setData({env: app.globalData.env})
     })
 
   },
@@ -253,6 +255,8 @@ Page({
       case 'skipassqr':
         path = '/pages/admin/ski_pass/reserve_qrcode'
         break
+      case 'env':
+        path = '/pages/admin/env'
       default:
         break
     }

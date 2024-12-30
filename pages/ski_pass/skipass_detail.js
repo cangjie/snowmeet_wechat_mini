@@ -103,7 +103,8 @@ Page({
         if (isNaN(that.data.balance) || summary >= that.data.balance){
           canReserve = false
         }
-        that.setData({canReserve, summaryStr: util.showAmount(that.data.count * that.data.dailyPrice.deal_price)})
+        var summary = that.data.count * that.data.dailyPrice.deal_price
+        that.setData({canReserve, summary,  summaryStr: util.showAmount(summary)})
       }
     })
   },
@@ -148,7 +149,7 @@ Page({
     if (isNaN(that.data.balance) || summary >= that.data.balance ){
       canReserve = false
     }
-    that.setData({count: count, canReserve,summaryStr: util.showAmount(summary)})
+    that.setData({count: count, canReserve,summary, summaryStr: util.showAmount(summary)})
   },
 
   submit(){
@@ -233,7 +234,7 @@ Page({
     if (isNaN(that.data.balance ) || summary >= that.data.balance){
       canReserve = false
     }
-    that.setData({summaryStr: util.showAmount(summary), canReserve})
+    that.setData({summary, summaryStr: util.showAmount(summary), canReserve})
   },
   getBalance(){
     var that = this
@@ -247,7 +248,12 @@ Page({
         }
         try{
           var balance = parseFloat(res.data)
-          that.setData({balance})
+          var canReserve = true
+          if (balance <= that.data.summary){
+            canReserve = false
+          }
+          that.setData({balance, canReserve})
+
         }
         catch{
           that.setData({canReserve: false})

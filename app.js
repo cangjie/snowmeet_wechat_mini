@@ -73,7 +73,7 @@ App({
             wx.getSystemInfoAsync({
               success:(res)=>{
                 app.globalData.systemInfo = res
-                resolve(app.globalData)
+                //resolve(app.globalData)
                 if (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1){
                   wx.redirectTo({
                     url: '/pages/admin/admin',
@@ -88,7 +88,7 @@ App({
                 catch(err){
                   console.log('get sys info sync fail', err)
                 }
-                resolve(app.globalData)
+                //resolve(app.globalData)
                 if (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1){
                   wx.redirectTo({
                     url: '/pages/admin/admin',
@@ -96,147 +96,21 @@ App({
                 }
               },
               complete:(res)=>{
-                
-              }
-            })
-            
-
-
-
-
-
-
-
-
-/*
-
-
-
-
-            url = 'https://' + app.globalData.domainName + '/core/Member/GetMemberInfoSimple?sessionkey=' +     encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-
-            wx.request({
-              url: url,
-              method: 'GET',
-              success:(res)=>{
-                if (res.statusCode == 200){
-                  console.log('get member info', res)
-                  app.globalData.memberInfo = res.data
-                  wx.getSystemInfoAsync({
-                    success:(res)=>{
-                      app.globalData.systemInfo = res
-                      resolve(app.globalData)
-                      
-                    },
-                    fail:(res)=>{
-                      console.log('get sys info fail, try sync', res)
-                      try{
-                        app.globalData.systemInfo = wx.getSystemInfoSync()
-                      }
-                      catch(err){
-                        console.log('get sys info sync fail', err)
-                      }
-                      resolve(app.globalData)
-                    }
-                  })
-
-
-
-
-                  url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionkey=' + encodeURIComponent(app.globalData.sessionKey)
-            wx.request({
-              url: url,
-              method: 'GET',
-              success: (res) => {
-                console.log('get user info success')
-                console.log(res)
-                if (res.data.status == 0 && res.data.count > 0){
-                  if (res.data.mini_users[0].is_admin == '1') {
-                    app.globalData.role = 'staff'
-                  }
-                  if (res.data.mini_users[0].is_manager == '1') {
-                    app.globalData.is_manager = true
-                  }
-                  else{
-                    app.globalData.is_manager = false
-                  }
-                  app.globalData.cellNumber = res.data.mini_users[0].cell_number
-                  app.globalData.userInfo = res.data.mini_users[0]
-                  if (res.data.mini_users[0].nick == ''  || res.data.mini_users[0].nick == '微信用户'  || res.data.mini_users[0].head_image == '' || res.data.mini_users[0].gender == '') {
-                    console.log('get user detail info')
-                    wx.getUserInfo({
-                      success: (res) => {
-                        console.log('get user detail info success')
-                        console.log(res)
-                        var updateUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateUserInfo?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&encData=' + encodeURIComponent(res.encryptedData) + '&iv=' + encodeURIComponent(res.iv)
-                        wx.request({
-                          url: updateUrl,
-                          method: 'GET',
-                          success:(res)=>{
-                            console.log('user data updated', res)
-                            app.globalData.userInfo = res.data
-                            wx.getSystemInfoAsync({
-                              success:(res)=>{
-                                app.globalData.systemInfo = res
-                                resolve(app.globalData)
-                                
-                              },
-                              fail:(res)=>{
-                                console.log('get sys info fail, try sync', res)
-                                try{
-                                  app.globalData.systemInfo = wx.getSystemInfoSync()
-                                }
-                                catch(err){
-                                  console.log('get sys info sync fail', err)
-                                }
-                                resolve(app.globalData)
-                              }
-                            })
-                            
-                          }
-                        })
-                      },
-                      fail: (res) => {
-                        console.log('get sys info fail, try sync', res)
-                        try{
-                          app.globalData.systemInfo = wx.getSystemInfoSync()
-                        }
-                        catch(err){
-                          console.log('get sys info sync fail', err)
-                        }
-                        resolve(app.globalData)
-                      }
-                    })
-                  }
-                  else{
-                    //resolve(app.globalData)
-                    wx.getSystemInfoAsync({
-                      success:(res)=>{
-                        app.globalData.systemInfo = res
-                        resolve(app.globalData)
-                      },
-                      fail:(res)=>{
-                        console.log('get sys info fail', res)
-                        app.globalData.systemInfo = wx.getSystemInfoSync()
-                        resolve(app.globalData)
-                      }
-                    })
-                  }
+                const env = wx.getAccountInfoSync()
+                app.globalData.env = env.miniProgram.envVersion
+                switch(app.globalData.env){
+                  case 'trail':
+                  case 'develop':
+                    app.globalData.domainName = app.getDomain()
+                    break
+                  default:
+                    break
                 }
+                //app.globalData.domainName = 'snowmeet.wanlonghuaxue.com'
+                resolve(app.globalData)
+                console.log('env', env)
               }
             })
-
-
-
-                }
-              }
-            })
-
-*/
-            
-
-
-            ///////////////////
           },
           fail:(res)=>{
             console.log('request fail', res)
@@ -249,6 +123,28 @@ App({
     })
     
   }),
+
+  getDomain(){
+    const fileManager = wx.getFileSystemManager();
+    console.log('path', wx.env.USER_DATA_PATH)
+    var domainName = ''
+    try{
+      fileManager.accessSync(wx.env.USER_DATA_PATH + '/domain.txt')
+      domainName = fileManager.readFileSync(wx.env.USER_DATA_PATH + '/domain.txt', 'utf-8', 0)
+    }
+    catch{
+      domainName = 'snowmeet.wanlonghuaxue.com'
+      fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domainName, 'utf-8')
+      //fileManager.closeSync()
+    }
+    return domainName
+  },
+
+  setDomain(domain){
+    const fileManager = wx.getFileSystemManager();
+    fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domain, 'utf-8')
+    this.domainName = domain
+  },
 
   globalData: {
     appId:'wxd1310896f2aa68bb',
