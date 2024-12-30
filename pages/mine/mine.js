@@ -19,11 +19,13 @@ Page({
     if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
       var that = this
       app.loginPromiseNew.then(function(resolve) {
-        that.setData({tabbarItemList: app.globalData.userTabBarItem, role: app.globalData.role, canGetInfo: true})
+        that.setData({tabbarItemList: app.globalData.userTabBarItem, 
+          role: app.globalData.role, canGetInfo: true, env: app.globalData.env})
       })
     }
     else {
-      this.setData({tabbarItemList: app.globalData.userTabBarItem, role: app.globalData.role, canGetInfo: true})
+      this.setData({tabbarItemList: app.globalData.userTabBarItem, role: app.globalData.role, 
+        canGetInfo: true, env: app.globalData.env})
     }
     
   },
@@ -110,6 +112,19 @@ Page({
   gotoMaintain(){
     wx.navigateTo({
       url: '/pages/mine/maintain/order_list',
+    })
+  },
+  nav(e){
+    var path = '/pages/index/index'
+    var id = e.currentTarget.id
+    switch(id) {
+      case 'env':
+        path = '/pages/admin/env'
+      default:
+        break
+    }
+    wx.navigateTo({
+      url: path
     })
   }
 

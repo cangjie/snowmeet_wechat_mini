@@ -96,6 +96,7 @@ App({
                 }
               },
               complete:(res)=>{
+<<<<<<< HEAD
                 const accountInfo = wx.getAccountInfoSync()
                 app.globalData.accountInfo = accountInfo
                 switch(accountInfo.miniProgram.envVersion){
@@ -238,15 +239,23 @@ App({
 
 
 
+=======
+                const env = wx.getAccountInfoSync()
+                app.globalData.env = env.miniProgram.envVersion
+                switch(app.globalData.env){
+                  case 'trail':
+                  case 'develop':
+                    app.globalData.domainName = app.getDomain()
+                    break
+                  default:
+                    break
+>>>>>>> dev
                 }
+                //app.globalData.domainName = 'snowmeet.wanlonghuaxue.com'
+                resolve(app.globalData)
+                console.log('env', env)
               }
             })
-
-*/
-            
-
-
-            ///////////////////
           },
           fail:(res)=>{
             console.log('request fail', res)
@@ -259,6 +268,28 @@ App({
     })
     
   }),
+
+  getDomain(){
+    const fileManager = wx.getFileSystemManager();
+    console.log('path', wx.env.USER_DATA_PATH)
+    var domainName = ''
+    try{
+      fileManager.accessSync(wx.env.USER_DATA_PATH + '/domain.txt')
+      domainName = fileManager.readFileSync(wx.env.USER_DATA_PATH + '/domain.txt', 'utf-8', 0)
+    }
+    catch{
+      domainName = 'snowmeet.wanlonghuaxue.com'
+      fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domainName, 'utf-8')
+      //fileManager.closeSync()
+    }
+    return domainName
+  },
+
+  setDomain(domain){
+    const fileManager = wx.getFileSystemManager();
+    fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domain, 'utf-8')
+    this.domainName = domain
+  },
 
   globalData: {
     appId:'wxd1310896f2aa68bb',
