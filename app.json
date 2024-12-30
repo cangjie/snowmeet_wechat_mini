@@ -45,7 +45,6 @@
     "pages/admin/sale/order_list",
     "pages/admin/sale/order_detail",
     "pages/admin/maintain/recept",
-    "pages/admin/maintain/order_list",
     "pages/admin/maintain/task",
     "pages/admin/maintain/order_detail",
     "pages/admin/maintain/task_list",

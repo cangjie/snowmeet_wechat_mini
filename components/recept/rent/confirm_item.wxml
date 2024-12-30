@@ -92,21 +92,29 @@
       <view style="display: flex;flex-direction: row;" >
         <view style="width: 20%;text-align: right;" class="op-cell" >租金：</view>
         <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
-          <input id="rental" style="width: 80%;" type="number" class="input" value="{{currentRentItem.rental}}" bindinput="setNumber" />
+          <input id="rental" style="width: 80%;" type="number" class="input" 
+          placeholder="{{currentRentItem.rental}}" 
+          value="{{currentRentItem.rental==0?'':currentRentItem.rental}}" bindinput="setNumber" />
         </view>
         <view style="width: 20%;text-align: right;" class="op-cell" >押金：</view>
         <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
-          <input id="deposit" style="width: 80%;" type="number" class="input" value="{{currentRentItem.deposit}}" bindinput="setNumber" />
+          <input id="deposit" style="width: 80%;" type="number" class="input" 
+            placeholder="{{currentRentItem.deposit}}" 
+            value="{{currentRentItem.deposit==0?'':currentRentItem.deposit}}" bindinput="setNumber" />
         </view>
       </view>
       <view style="display: flex;flex-direction: row;" >
         <view style="width: 20%;text-align: right;" class="op-cell" >超时费：</view>
         <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
-          <input id="overtime_charge" style="width: 80%;" type="number" class="input" value="{{currentRentItem.overtime_charge}}" bindinput="setNumber" />
+          <input id="overtime_charge" style="width: 80%;" type="number" class="input" 
+          placeholder="{{currentRentItem.overtime_charge}}"
+          value="{{currentRentItem.overtime_charge==0?'':currentRentItem.overtime_charge}}" bindinput="setNumber" />
         </view>
         <view style="width: 20%;text-align: right;" class="op-cell" >租金减免：</view>
         <view style="width: 30%;margin-left: 0rpx;" class="op-cell" >
-          <input id="discount" style="width: 80%;" type="number" class="input" value="{{currentRentItem.rental_discount}}" bindinput="setNumber" />
+          <input id="discount" style="width: 80%;" type="number" class="input" 
+          placeholder="{{currentRentItem.rental_discount}}"
+          value="{{currentRentItem.rental_discount==0?'':currentRentItem.rental_discount}}" bindinput="setNumber" />
         </view>
       </view>
       <view style="display: flex;flex-direction: row;" >
