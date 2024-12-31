@@ -12,7 +12,7 @@
     <view class="view-row">
       <view class="left-column" >数量：</view>
       <view class="right-column"  >
-        <input value="{{count}}" bindinput="setCount"  type="number" style="width: 50rpx;text-align: center;" class="input" disabled="{{product.resort=='太舞'}}" />
+        <input value="{{count}}" bindinput="setCount"  type="number" style="width: 50rpx;text-align: center;" class="input" disabled="{{product.id == 300 || product.id == 312 || product.id == 317 || product.resort=='太舞'}}" />
       </view>
       <view class="left-column" >总计：</view>
       <view class="right-column"  >{{summaryStr}}</view>
@@ -45,7 +45,7 @@
         <input id="name" class="input" style="width: 150rpx;" value="{{name}}" placeholder="{{name.length==0?'请填写姓名':''}}" bindinput="input" />
       </view>
     </view>
-    <view wx:if="{{product.resort == '太舞' || product.resort == '富龙'}}" class="view-row">
+    <view wx:if="{{product.product_id == 300 || product.product_id == 312 || product.product_id == 317 ||  product.resort == '太舞' || product.resort == '富龙'}}" class="view-row">
       <view class="left-column" >身份证：</view>
       <view class="right-column" >
         <input id="id_no" class="input" style="width: 300rpx;" value="{{idNo}}" placeholder="{{name.length==0?'请填写身份证号码':''}}" bindinput="inputIdNo" />
