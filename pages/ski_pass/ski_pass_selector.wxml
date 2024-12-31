@@ -32,9 +32,9 @@
   </block>
 </mp-tabs>
 <view wx:if="{{resort == '南山'}}" >
-  <view  wx:for="{{productList}}" class="ski-pass-scale" bindtap="reserve" id="{{item.id}}" >
-    <view class="ski-pass-title"><b>{{item.name}}</b></view>
-    <view style="margin-left: 10rpx;display: flex; flex-direction: row;" >
+  <view  wx:for="{{productList}}" class="ski-pass-scale" >
+    <view class="ski-pass-title" bindtap="reserve" id="{{item.id}}"  ><b>{{item.name}}</b></view>
+    <view style="margin-left: 10rpx;display: flex; flex-direction: row;" bindtap="reserve" id="{{item.id}}"  >
       <block wx:if="{{resort=='南山'}}" >
         <view style="width: 50%;">票价：{{item.sale_price_str}}</view> 
         <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
@@ -44,7 +44,7 @@
         <view style="width: 50%;">门市价：{{item.market_price_str}}</view> 
       </block>
     </view>
-    <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  ></rich-text>
+    <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  bindtap="reserve" id="{{item.id}}"  ></rich-text>
     <view wx:if="{{role=='staff' && resort=='南山'}}">
       <button class="input" id="{{item.id}}" bind:tap="showTempQr">临时加票二维码</button>
     </view>

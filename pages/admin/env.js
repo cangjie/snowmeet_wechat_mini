@@ -73,5 +73,8 @@ Page({
     var domain = e.detail.value
     app.setDomain(domain)
     app.globalData.domainName = domain
+    wx.reLaunch({
+      url: '/pages/index/index',
+    })
   }
 })

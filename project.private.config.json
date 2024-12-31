@@ -10,16 +10,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "index",
-          "pathName": "pages/index/index",
-          "query": "",
+          "name": "pay",
+          "pathName": "/pages/payment/pay_recept",
+          "query": "id=10866",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "pay",
-          "pathName": "/pages/payment/pay_recept",
-          "query": "id=10586",
+          "name": "index",
+          "pathName": "pages/index/index",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },
