@@ -58,7 +58,7 @@ Page({
   },
   gotoDetail(e){
     wx.navigateTo({
-      url: 'task?id=' + e.currentTarget.id,
+      url: 'task?id=' + e.currentTarget.id + '&isConfirm=1',
     })
   },
   /**
