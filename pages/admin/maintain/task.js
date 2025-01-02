@@ -19,7 +19,10 @@ Page({
     finish: false,
     isClosed: false,
     currentStep: "安全检查",
-    showUploader: true
+    showUploader: true,
+    isManager: 0,
+    showQrCode: false,
+    userConfirmed: false
   },
 
   goHome(){
@@ -81,6 +84,12 @@ Page({
     app.loginPromiseNew.then(function(resolve){
       console.log('user info', app.globalData.userInfo)
       that.setData({userInfo: app.globalData.userInfo})
+      var isManager = 0
+      if (app.globalData.is_admin == 1 || app.globalData.is_manager == 1){
+        isManager = 1
+        that.setData({isManager})
+      }
+      that.setData({id: options.id})
       var getInfoUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTask/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: getInfoUrl,
@@ -705,5 +714,33 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  showQrCode(){
+    var that = this
+    var getQrUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetInterviewIdByScene?scene=' + encodeURIComponent('发板') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&bizId='+that.data.id
+    wx.request({
+      url: getQrUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        //that.setData({showQrCode: true})
+        var interActId = parseInt(res.data)
+        that.setData({interActId})
+        var scene = 'maintainreturn_interact_id_' + interActId.toString()
+        var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scene
+        wx.request({
+          url: getQRUrl,
+          method: 'GET',
+          success:(res)=>{
+            if (res.statusCode != 200){
+              return
+            }
+            that.setData({qrcodeUrl: res.data, showQrCode: true})
+          }
+        })
+      }
+    })
   }
 })
