@@ -156,7 +156,12 @@ Page({
   },
   GetWanLongProduct() {
     var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?resort=' + encodeURIComponent(that.data.resort)
+    var resort = that.data.resort
+    if (!resort || resort == undefined || resort == 'undefined'){
+      resort = '万龙'
+      that.setData({resort})
+    }
+    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?resort=' + encodeURIComponent(resort)
     wx.request({
       url: getUrl,
       method: 'GET',

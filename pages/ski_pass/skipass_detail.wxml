@@ -32,7 +32,7 @@
     <view class="view-row" >
       <view class="left-column" >电话：</view>
       <view class="right-column" >
-        <input id="cell" class="input" value="{{cell}}" style="width: 180rpx;"  />
+        <input id="cell" class="input" value="{{cell}}" style="width: 180rpx;" bindinput="input" />
       </view>
       <view class="left-column" ></view>
       <view class="right-column" >
