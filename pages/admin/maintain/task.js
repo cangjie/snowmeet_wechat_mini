@@ -19,8 +19,7 @@ Page({
     finish: false,
     isClosed: false,
     currentStep: "安全检查",
-    showUploader: true,
-    isConfirm: 0
+    showUploader: true
   },
 
   goHome(){
@@ -73,25 +72,16 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    var that = this
     if (options.q != undefined){
       var urlArr = decodeURIComponent(options.q).split('/')
       options.id = urlArr[urlArr.length - 1]
 
     }
-    if (options.isConfirm == 1){
-      that.setData({isConfirm: 1})
-    }
-    
+    var that = this
     app.loginPromiseNew.then(function(resolve){
       console.log('user info', app.globalData.userInfo)
       that.setData({userInfo: app.globalData.userInfo})
       var getInfoUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTask/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      if (that.data.isConfirm != 1){
-        if (app.globalData.is_admin == 1 || app.globalData.is_manager == 1){
-          that.setData({isConfirm: 1})
-        }
-      }
       wx.request({
         url: getInfoUrl,
         method: 'GET',
