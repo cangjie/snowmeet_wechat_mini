@@ -2,7 +2,9 @@
   "setting": {
     "preloadBackgroundData": false,
     "compileHotReLoad": true,
-    "bigPackageSizeSupport": true
+    "bigPackageSizeSupport": true,
+    "skylineRenderEnable": true,
+    "urlCheck": false
   },
   "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
   "libVersion": "3.5.0",

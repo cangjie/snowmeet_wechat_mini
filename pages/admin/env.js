@@ -16,7 +16,11 @@ Page({
   onLoad(options) {
     var that = this
     app.loginPromiseNew.then(function(resovle){
-      that.setData({env: app.globalData.env, domain: app.globalData.domainName})
+      var domain = app.globalData.domainName
+      if (domain.indexOf('local') >= 0){
+        domain = 'local'
+      }
+      that.setData({env: app.globalData.env, domain})
     })
   },
 
@@ -71,6 +75,7 @@ Page({
   change(e){
     var that = this
     var domain = e.detail.value
+    domain += ':47234'
     app.setDomain(domain)
     app.globalData.domainName = domain
     wx.reLaunch({
