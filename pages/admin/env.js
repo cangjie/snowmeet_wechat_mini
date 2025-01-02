@@ -18,7 +18,10 @@ Page({
     app.loginPromiseNew.then(function(resovle){
       var domain = app.globalData.domainName
       if (domain.indexOf('localhost') >= 0){
-        domain = 'localhost:' + that.data.port
+        //domain = 'localhost'// + that.data.port
+        var port = domain.split(':')[1]
+        that.setData({port})
+        domain = 'localhost'
       }
       that.setData({env: app.globalData.env, domain})
     })
@@ -88,6 +91,7 @@ Page({
     var domain = app.globalData.domainName.split(':')[0]
     domain = domain + ':' + port.toString()
     app.globalData.domainName = domain
+    app.setDomain(domain)
     that.setData({port, domain})
   }
 })
