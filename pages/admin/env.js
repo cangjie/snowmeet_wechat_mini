@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    port: '5000'
   },
 
   /**
@@ -17,8 +17,8 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resovle){
       var domain = app.globalData.domainName
-      if (domain.indexOf('local') >= 0){
-        domain = 'local'
+      if (domain.indexOf('localhost') >= 0){
+        domain = 'localhost:' + that.data.port
       }
       that.setData({env: app.globalData.env, domain})
     })
@@ -75,11 +75,19 @@ Page({
   change(e){
     var that = this
     var domain = e.detail.value
-    domain += ':44314'
+    domain += ':' + that.data.port.toString()
     app.setDomain(domain)
     app.globalData.domainName = domain
     wx.reLaunch({
       url: '/pages/index/index',
     })
+  },
+  input(e){
+    var that = this
+    var port = e.detail.value
+    var domain = app.globalData.domainName.split(':')[0]
+    domain = domain + ':' + port.toString()
+    app.globalData.domainName = domain
+    that.setData({port, domain})
   }
 })
