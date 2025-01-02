@@ -75,7 +75,7 @@ Page({
   change(e){
     var that = this
     var domain = e.detail.value
-    domain += ':47234'
+    domain += ':44314'
     app.setDomain(domain)
     app.globalData.domainName = domain
     wx.reLaunch({
