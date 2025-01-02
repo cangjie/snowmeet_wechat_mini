@@ -260,6 +260,40 @@ Page({
         }
       }
     })
+  },
+  getCell(e){
+    var that = this
+    var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateWechatMemberCell?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)+'&encData='+encodeURIComponent(e.detail.encryptedData)+'&iv='+encodeURIComponent(e.detail.iv)
+    wx.request({
+      url: url,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var member = res.data
+        console.log('get member', member)
+        that.setData({cell: member.cell})
+      }
+    })
+  },
+  input(e){
+    var that = this
+    var id = e.currentTarget.id
+    var value = e.detail.value
+    switch(id){
+      case 'cell':
+        if (value && value.length == 11 && value.indexOf('1')==0){
+          that.setData({cell: value})
+        }
+        
+        break
+      case 'name':
+        that.setData({name: value})
+        break
+      default:
+        break
+    }
   }
 
 })
