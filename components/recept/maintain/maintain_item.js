@@ -424,15 +424,16 @@ Component({
       else if (util.isBlank(item.confirmed_scale)){
         valid = false
       }
-      /*
+      
       else if (util.isBlank(item.confirmed_images)){
         valid = false
       }
-      */
+      
       else if (item.confirmed_edge != 1 && item.confirmed_candle != 1 
         && ( util.isBlank(item.confirmed_more) ) ){
         valid = false    
       }
+     
       /*
       else if (item.confirmed_id == undefined || item.confirmed_id == null || item.confirmed_id == ''){
         valid = false
