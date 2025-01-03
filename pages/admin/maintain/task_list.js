@@ -99,7 +99,13 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
+    var that = this
+    try{
+      that.getData()
+    }
+    catch{
 
+    }
   },
 
   /**

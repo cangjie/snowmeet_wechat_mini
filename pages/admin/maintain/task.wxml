@@ -264,7 +264,7 @@
     <mp-cell >
       
       <view wx:if="{{!showQrCode}}" class="view-row" style="align-content: center;" >
-        <button class="input" bind:tap="showQrCode" disabled="{{task.outStatus == '发板'}}" > 发板确认二维码 </button>
+        <button class="input" bind:tap="showQrCode" disabled="{{task.outStatus == '发板' || task.outStatus == '强行索回'}}" > 发板确认二维码 </button>
       </view>
       <view wx:else style="text-align: center;" >
         <image style="width: 400rpx;height: 400rpx;" src="{{qrcodeUrl}}" ></image>
@@ -274,7 +274,8 @@
       <view class="view-row" style="align-content: center;" >
         <button wx:if="{{finish}}" class="input" bindtap="finish" class="no-padding" size="mini" style="font-size: 10pt;"  
         disabled="{{task.outStatus == '发板'}}"> 用 户 取 走 确 认 </button>
-        <button id="terminate" wx:else   bindtap="terminate" class="input no-padding" size="mini" style="font-size: 10pt;" disabled="{{task.outStatus == '强行索回'}}" > 用 户 强 行 索 回 </button>
+        <button id="terminate" wx:else   bindtap="terminate" class="input no-padding" size="mini" style="font-size: 10pt;" 
+        disabled="{{task.outStatus == '强行索回'}}" > 用 户 强 行 索 回 </button>
       </view>
     </mp-cell>
     

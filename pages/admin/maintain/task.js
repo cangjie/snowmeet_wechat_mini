@@ -627,46 +627,7 @@ Page({
   },
 
 
-  /*
-  getStatus(){
-    var status = '未开始'
-    var that = this
-    var stepSafe = that.data.stepSafe
-    var stepEdge = that.data.stepEdge
-    var stepWax = that.data.stepWax
-    var stepUnWax = that.data.stepUnWax
-    var task = that.data.task
-
-    if (stepSafe != undefined){
-      status = "完成安全检查"
-      if (task.confirmed_edge == 1){
-        if (stepEdge != undefined){
-          status = '修刃'+stepEdge.status
-        }
-      }
-      if (task.confirmed_candle == 1){
-        if  (stepWax!=undefined ){
-          status = '打蜡' + stepWax.status
-        }
-        if ((status == '打蜡已完成' || status == '打蜡强行终止') && stepUnWax != undefined){
-          status = '刮蜡'+ stepUnWax.status
-        }
-      }
-      if (task.confirmed_more != '' && stepMore != undefined){
-        status = '维修'+stepMore.status
-      }
-    }
-
-    var finish = true
-    if ((task.confirmed_edge == 1 && (stepEdge == undefined || (stepEdge.status != '已完成' && stepEdge.status != '强行终止' )))
-      || (task.confirmed_candle == 1 && ( stepWax == undefined || (stepWax.status != '已完成'  && stepWax.status != '强行终止')))
-      || (task.confirmed_candle == 1 && ( stepUnWax == undefined || (stepUnWax.status != '已完成'  && stepUnWax.status != '强行终止')))
-      || (task.confirmed_more != '' && ( stepMore == undefined || (stepMore.status != '已完成'  && stepMore.status != '强行终止')))){
-        finish = false
-    }
-    that.setData({status: status, finish: finish})
-  },
-*/
+  
   /**
    * Lifecycle function--Called when page is initially rendered
    */
@@ -685,14 +646,16 @@ Page({
    * Lifecycle function--Called when page hide
    */
   onHide() {
-
+    
   },
 
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload() {
-
+    var that = this
+    clearInterval(that.data.interval)
+    that.setData({showQrCode: false, userConfirmed: false})
   },
 
   /**
@@ -738,8 +701,80 @@ Page({
               return
             }
             that.setData({qrcodeUrl: res.data, showQrCode: true})
+            var interval = setInterval(that.checkScan, 1000);
+            that.setData({interval})
           }
         })
+      }
+    })
+  },
+  checkScan(){
+    var that = this
+    var checkScanUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetScanInfo/' + that.data.interActId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: checkScanUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        clearInterval(that.data.interval)
+        var confirmUrl = 'https://' + app.globalData.domainName + '/core/MaintainLogs/CheckReturnScan/' + that.data.interActId + '?taskId=' + that.data.id
+        wx.request({
+          url: confirmUrl,
+          method: 'GET',
+          success:(res)=>{
+            console.log('check scan user', res)
+            if (res.statusCode != 200){
+              that.setData({showQrCode: false})
+              wx.showToast({
+                icon: 'error',
+                title: '用户身份未确认。'
+              })
+              return
+            }
+            if (res.data){
+              var msg = that.data.finish ? '养护完成，取板用户身份确认，可以发板。' : '养护未完成，取板用户身份确认，发板中止服务。'
+              wx.showModal({
+                title: '确认发板',
+                content: msg,
+                complete: (res) => {
+                  that.setData({showQrCode: false})
+                  if (res.cancel) {
+                    
+                  }
+              
+                  if (res.confirm) {
+                    if (that.data.finish){
+                      that.data.safeMemo = '本人扫码取板'
+                      that.setData({isClosed: true})
+                      that.logStep('发板')
+                      var task = that.data.task
+                      task.outStatus = '发板'
+                      that.setData({task})
+                    }
+                    else{
+                      that.data.safeMemo = '本人扫码取板'
+                      that.setData({isClosed: true})
+                      that.logStep('强行索回')
+                      var task = that.data.task
+                      task.outStatus = '强行索回'
+                      that.setData({task})
+                    }
+                  }
+                }
+              })
+            }
+            else {
+              that.setData({showQrCode: false})
+              wx.showToast({
+                icon: 'error',
+                content: '用户身份未确认。'
+              })
+            }
+          }
+        })
+        //that.setData({userConfirmed: true})
       }
     })
   }
