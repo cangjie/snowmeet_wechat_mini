@@ -227,7 +227,8 @@ Page({
         var productList = res.data
         for(var i = 0; i < productList.length; i++){
           var prod = productList[i]
-          if (prod.end_sale_time <= that.data.nowTime  && util.formatDate(new Date()) == util.formatDate(new Date(that.data.reserveDate))){
+          if ((prod.end_sale_time <= that.data.nowTime  && util.formatDate(new Date()) == util.formatDate(new Date(that.data.reserveDate)))
+          && app.globalData.role != 'staff'){
             productList.splice(i, 1)
             i--
           }

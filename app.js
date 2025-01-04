@@ -118,6 +118,9 @@ App({
           },
           fail:(res)=>{
             console.log('request fail', res)
+          },
+          complete:()=>{
+            resolve(app.globalData)
           }
         })
       },

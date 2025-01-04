@@ -78,7 +78,9 @@ Page({
   change(e){
     var that = this
     var domain = e.detail.value
-    domain += ':' + that.data.port.toString()
+    if (domain == 'localhost'){
+      domain += ':' + that.data.port.toString()
+    }
     app.setDomain(domain)
     app.globalData.domainName = domain
     wx.reLaunch({

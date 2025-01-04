@@ -16,17 +16,24 @@ Page({
    */
   onLoad: function (options) {
     //wxloginModule.wxlogin()
-    if (app.globalData.sessionKey == null || app.globalData.sessionKey == '') {
+    
+    
       var that = this
       app.loginPromiseNew.then(function(resolve) {
+        const env = wx.getAccountInfoSync()
+        app.globalData.env = env.miniProgram.envVersion
+        switch(app.globalData.env){
+          case 'trail':
+          case 'develop':
+            app.globalData.domainName = app.getDomain()
+            break
+          default:
+            break
+        }
         that.setData({tabbarItemList: app.globalData.userTabBarItem, 
           role: app.globalData.role, canGetInfo: true, env: app.globalData.env})
       })
-    }
-    else {
-      this.setData({tabbarItemList: app.globalData.userTabBarItem, role: app.globalData.role, 
-        canGetInfo: true, env: app.globalData.env})
-    }
+    
     
   },
 
