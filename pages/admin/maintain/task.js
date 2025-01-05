@@ -23,7 +23,8 @@ Page({
     isManager: 0,
     showQrCode: false,
     userConfirmed: false,
-    status: 'view'
+    status: 'view',
+    relationArr: ['本人', '配偶', '子女', '长辈', '朋友']
   },
 
   goHome(){
@@ -778,5 +779,9 @@ Page({
         //that.setData({userConfirmed: true})
       }
     })
+  },
+  modBaseInfo(){
+    var that = this
+    that.setData({status: 'edit_equip_info'})
   }
 })
