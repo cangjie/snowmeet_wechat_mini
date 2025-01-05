@@ -22,7 +22,8 @@ Page({
     showUploader: true,
     isManager: 0,
     showQrCode: false,
-    userConfirmed: false
+    userConfirmed: false,
+    status: 'view'
   },
 
   goHome(){
