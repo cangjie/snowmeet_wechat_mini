@@ -16,9 +16,17 @@
         <view class="right-column" >{{task.confirmed_equip_type}}</view>
         <view class="left-column" >品牌：</view>
         <view class="right-column" >
-          <picker id="brand" bindchange="mod" mode="selector" range="{{brands}}" class="input" >
-            <picker-view>{{task.confirmed_brand}}</picker-view>
-          </picker>
+          <view  wx:if="{{status == 'edit_equip_info'}}"  >
+            <picker id="brand" bindchange="mod" mode="selector" range="{{brands}}" class="input" style="width: 230rpx;" >
+              <picker-view>{{task.confirmed_brand}}</picker-view>
+            </picker>
+            <view class="view-row" wx:if="{{brandSelectedIndex == brands.length - 1}}" >
+              <input id="brand_name"  class="input" bindinput="mod" style="margin-top: 10rpx;width: 105rpx;" placeholder="英文名称" />
+              <view style="margin-left: 5rpx;margin-right: 5rpx;margin-top: 10rpx;" >/</view>
+              <input id="brand_chinese_name" bindinput="mod" class="input" style="margin-top: 10rpx;width: 105rpx" placeholder="中文名称"  />
+            </view>
+          </view>
+          <view wx:else >{{task.confirmed_brand}}</view>
         </view>
       </view>
     </mp-cell>
@@ -26,78 +34,141 @@
       <view class="view-table-scale" >
         <view class="left-column" >系列：</view>
         <view class="right-column" style="display: flex; flex-direction: row;" >
-          <picker id="serial_picker" mode="selector" range="{{serialList}}" bindchange="mod" class="input" >
-            <picker-view>{{serialList[serialSelectedIndex]}}</picker-view>
-          </picker>
-          <input id="serial_input" style="width: 100rpx;" class="input" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='新增'}}" bindinput="mod" />
+          <view wx:if="{{status == 'edit_equip_info'}}"  >
+            <picker style="width: 180rpx;" id="serial_picker" mode="selector" range="{{serialList}}" bindchange="mod" class="input" >
+              <picker-view>{{(!task.confirmed_serial || task.confirmed_serial == '')? serialList[serialList.length - 2]: task.confirmed_serial}}</picker-view>
+            </picker>
+            <input id="serial_input" style="width: 180rpx;margin-top: 10rpx;" class="input" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='新增'}}" bindinput="mod" />
+          </view>
+          <view wx:else >{{task.confirmed_serial}}</view>
         </view>
         <view class="left-column" >年款：</view>
         <text decode="true" > &nbsp; </text>
         <view class="right-column" >
-          <picker id="year_picker" mode="selector" range="{{yearList}}" bindchange="mod" class="input" >
-            <picker-view>{{yearList[yearListSelectedIndex]}}</picker-view>
-          </picker>
+          <view class="view-row" wx:if="{{status == 'edit_equip_info'}}" >
+            <picker id="year_picker" mode="selector" range="{{yearList}}" bindchange="mod" class="input" style="width: 180rpx;" >
+              <picker-view>{{yearList[yearListSelectedIndex]}}</picker-view>
+            </picker>
+          </view>
+          <view wx:else >{{yearList[yearListSelectedIndex]}}</view>
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" >长度：</view>
-        <view class="right-column" >{{task.confirmed_scale}}</view>
+        <view class="right-column" >
+          <view wx:if="{{status == 'edit_equip_info'}}" >
+            <input style="width:75rpx" id="scale" bindinput="mod" class="input" value="{{task.confirmed_scale}}" /> 
+          </view>
+          <view wx:else >{{task.confirmed_scale}}</view>
+        </view>
         <block wx:if="{{task.confirmed_equip_type=='双板'}}" >
           <view class="left-column" >鞋长：</view>
-          <view class="right-column" >{{task.confirmed_foot_length}}</view>
+          <view class="right-column" >
+            <view wx:if="{{status == 'edit_equip_info'}}" >
+              <input id="foot_length" bindinput="mod" style="width:75rpx" value="{{task.confirmed_foot_length}}" class="input" /> 
+            </view>
+            <view wx:else>{{task.confirmed_foot_length}}</view>
+          </view>
         </block>
         <block wx:if="{{task.confirmed_equip_type=='单板'}}" >
           <view class="left-column" >前脚：</view>
-          <view class="right-column" >{{task.confirmed_front}}</view>
+          <view class="right-column" >
+            <view wx:if="{{status == 'edit_equip_info'}}" >
+              <radio-group id="front" bindchange="mod" >
+                <radio style="width: 100rpx" value="左" checked="{{task.confirmed_front=='左'}}" >左</radio>
+                <radio style="width: 100rpx" value="右" checked="{{task.confirmed_front=='右'}}" >右</radio>
+              </radio-group>
+            </view>
+            <view wx:else>{{task.confirmed_front}}</view>
+          </view>
         </block>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" style="width: 94rpx;" >关系：</view>
-        <view class="right-column" >{{task.confirmed_relation==''?'本人':confirmed_relation}}</view>
+        <view class="right-column" >
+          <view wx:if="{{status == 'edit_equip_info'}}" >
+            <!--
+            <picker mode="selector"  range="{{relationArr}}" class="input" style="width: 100rpx;" >
+              <picker-view>{{(task.confirmed_relation || task.confirmed_relation=='')?'本人':confirmed_relation}}</picker-view>
+            </picker>
+            -->
+            <radio-group id="relation" bindchange="mod">
+              <radio wx:for="{{relationArr}}" style="width: 130rpx;margin-top: 15rpx;" value="{{item}}"
+              checked="{{((!task.confirmed_relation || task.confirmed_relation=='')?'本人':task.confirmed_relation)==item}}"  >{{item}}</radio>
+            </radio-group>
+          </view>
+          <view wx:else >{{(!task.confirmed_relation || task.confirmed_relation=='')?'本人':task.confirmed_relation}}</view>
+          
+        </view>
       </view>
     </mp-cell>
     <mp-cell wx:if="{{task.confirmed_equip_type == '双板'}}" >
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" style="width: 115rpx;" >序列号：</view>
         <view class="right-column" style="display: flex; flex-direction: row;align-content: flex-end;width: 540rpx;margin-left: 0rpx;padding-left: 0rpx;"  >
-          <view wx:if="{{idDiff}}" style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" class="view-row" >
+          <view wx:if="{{status == 'edit_equip_info'}}" class="view-row" >
+            <view wx:if="{{idDiff}}" style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" class="view-row" >
             左<input class="input" id="id_left" style="width: 175rpx;" value="{{task.id_left}}" bindinput="mod" />右<input id="id_right" style="width: 175rpx;" bindinput="mod" class="input"  value="{{task.id_right}}" />
+            </view>
+            <view wx:else style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" >
+              <input id="id_no" style="width:200rpx" value="{{task.confirmed_id}}" bindinput="mod" class="input" />
+            </view>
+            <checkbox-group bindchange="setIdDiff" >
+              <checkbox style="font-size: 8pt;width: 130rpx;margin-left: 0rpx;padding-left: 0rpx;" checked="{{idDiff}}" value="id_diff">分左右</checkbox>
+            </checkbox-group>
+          </view> 
+          <view wx:else >
+            <view wx:if="{{idDiff}}" style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" class="view-row" >
+              左：{{task.id_left}} 右：{{task.id_right}}
+            </view>
+            <view wx:else style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" >
+              {{task.confirmed_id}}
+            </view>
           </view>
-          <view wx:else style="width: 400rpx;margin-left: 0rpx;padding-left: 0rpx;" >
-            <input id="id_no" style="width:200rpx" value="{{task.confirmed_id}}" bindinput="mod" class="input" />
-          </view>
-          <checkbox-group bindchange="setIdDiff" >
-            <checkbox style="font-size: 8pt;width: 130rpx;margin-left: 0rpx;padding-left: 0rpx;" checked="{{idDiff}}" value="id_diff">分左右</checkbox>
-          </checkbox-group>
         </view>
       </view>
     </mp-cell>
     <mp-cell wx:else >
       <view style="display: flex; flex-direction: row;" >
-        <view class="left-column" >序列号：</view>
+        <view class="left-column" style="width: 115rpx;" >序列号：</view>
         <view class="right-column" >
-          <input id="id_no" style="width: 200rpx;" class="input" bindinput="mod" value="{{task.confirmed_id}}" />
+          <view wx:if="{{status == 'edit_equip_info'}}" >
+            <input id="id_no" style="width: 200rpx;" class="input" bindinput="mod" value="{{task.confirmed_id}}" />
+          </view>
+          <view wx:else >{{task.confirmed_id}}</view>
         </view>
       </view>
     </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;" >
+        <view class="left-column" style="width: 100rpx;" >备注：</view>
+        <view class="right-column" >
+          
+          <textarea wx:if="{{status == 'edit_equip_info'}}" style="width: 480rpx;height: 150rpx;" id="memo"  class="input" bindinput="mod" 
+          value="{{task.confirmed_memo}}" />
+          <rich-text wx:else style="width: 480rpx;height: 150rpx;" id="memo" nodes="{{task.confirmed_memo}}" ></rich-text>
+        </view>
+      </view>
+    </mp-cell>
+    
     <mp-cell>
       <multi-uploader wx:if="{{showUploader}}" id="uploader" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="mod" uploaded_files="{{task.confirmed_images}}" ></multi-uploader>
     </mp-cell>
     <mp-cell>
-      <view style="display: flex; flex-direction: row;" >
-        <view class="left-column" >备注：</view>
-        <view class="right-column" >
-          <textarea style="width: 430rpx;height: 150rpx;" id="memo"  class="input" bindinput="setMemo" value="{{task.order.memo}}" />
-        </view>
+      <view class="view-row" wx:if="{{status == 'edit_equip_info'}}" >
+        <button bindtap="updateTaskConfirm" class="no-padding" size="mini" class="input" > 保 存 </button>
+        <button bindtap="updateTaskCancel" class="no-padding" size="mini" class="input" > 取 消 </button>
+      </view>
+      <view wx:else >
+        <button bindtap="modBaseInfo" class="no-padding"  class="input" > 修 改 </button>
       </view>
     </mp-cell>
-    <mp-cell><button bindtap="updateTask" class="no-padding"> 保 存 修 改 </button></mp-cell>
     <mp-cell>
-      <button bindtap="gotoPrint" class="no-padding" > 打 印 标 签 </button>
+      <button bindtap="gotoPrint" class="no-padding" class="input" > 打 印 标 签 </button>
     </mp-cell>
   </mp-cells>
   <mp-cells title="安全检查信息" >

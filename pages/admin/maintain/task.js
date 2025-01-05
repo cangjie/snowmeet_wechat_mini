@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-    yearList: ['未知', '2012','2013','2014','2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+    yearList: ['未知', '2012','2013','2014','2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023','2024','2025'],
     yearListSelectedIndex: 0,
     idDiff: false,
     showGallery: false,
@@ -22,7 +22,12 @@ Page({
     showUploader: true,
     isManager: 0,
     showQrCode: false,
-    userConfirmed: false
+    userConfirmed: false,
+    status: 'view',
+    relationArr: ['本人', '配偶', '子女', '长辈', '朋友'],
+    needUpdateSerial: false,
+    needUpdateBrand: false,
+    brandSelectedIndex: 0
   },
 
   goHome(){
@@ -32,6 +37,8 @@ Page({
 
   },
 
+
+  /*
   getBoardBrands(){
     var that = this
     var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('单板')
@@ -70,6 +77,28 @@ Page({
       }
     })
   },
+  */
+
+  getBrands(type){
+    var that = this
+    var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent(type)
+    wx.request({
+      url: getBrandUrl,
+      method: 'GET',
+      success:(res)=>{
+        var boardBrands = []
+        for(var i = 0; i < res.data.length; i++){
+          var brand = res.data[i].brand_name.trim()
+          if (res.data[i].chinese_name.trim()!=''){
+            brand = brand + '/' + res.data[i].chinese_name.trim()
+          }
+          boardBrands.push(brand)
+        }
+        boardBrands.push('新增品牌')
+        that.setData({brands: boardBrands, brandSelectedIndex: 0})
+      }
+    })
+  },
 
   /**
    * Lifecycle function--Called when page load
@@ -99,14 +128,16 @@ Page({
           var task = res.data
           that.setData({showUploader: false})
           //console.log('images', task.confirmed_images)
-          
+          that.getBrands(task.confirmed_equip_type)
+          that.getSerial(task.confirmed_brand.split('/')[0], task.confirmed_equip_type)
+          /*
           if (task.confirmed_equip_type == '单板'){
             that.getBoardBrands()
           }
           else{
             that.getSkiBrands()
           }
-
+          */
           task.images = []
           var idDiff = that.data.idDiff
           if (task.confirmed_images != ''){
@@ -131,30 +162,12 @@ Page({
               break
             }
           }
-          var getSerialUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetSerials?brand=' + encodeURIComponent(task.confirmed_brand) + '&type=' + encodeURIComponent(task.confirmed_equip_type)
-          wx.request({
-            url: getSerialUrl,
-            method: 'GET',
-            success:(res)=>{
-              var serialList = []
-              for(var i = 0; i < res.data.length; i++){
-                serialList.push(res.data[i].serial_name)
-              }
-              serialList.push('未知')
-              serialList.push('新增')
-              var serialSelectedIndex = serialList.length - 2
-              for(var i = 0; i < serialList.length; i++){
-                if (task.confirmed_serial == serialList[i]){
-                  serialSelectedIndex = i
-                }
-              }
-         
-              that.setData({task: task, serialList: serialList, serialSelectedIndex: serialSelectedIndex, yearListSelectedIndex: yearIndex, idDiff: idDiff, showUploader: true})
-              that.getCurrentStep()
-              
-            }
-          })
-          
+          that.getSerial(task.confirmed_brand, task.confirmed_equip_type)
+          if (!task.confirmed_memo || task.confirmed_memo == ''){
+            task.confirmed_memo = task.order.memo
+          }
+          that.setData({task: task,  yearListSelectedIndex: yearIndex, idDiff: idDiff, showUploader: true})
+          that.getCurrentStep()
         }
       })
     })
@@ -376,6 +389,18 @@ Page({
     var value = e.detail.value
     var task = that.data.task
     switch(e.currentTarget.id){
+      case 'brand_name':
+        var brandArr = task.confirmed_brand.split('/')
+        var brand = value + '/' + (brandArr.length == 2? brandArr[1]: '')
+        task.confirmed_brand = brand
+        that.setData({needUpdateBrand: true})
+        break
+      case 'brand_chinese_name':
+        var brand = task.confirmed_brand
+        brand = brand.split('/')[0] + '/' + value
+        task.confirmed_brand = brand
+        that.setData({needUpdateBrand: true})
+        break
       case 'serial_picker':
         var serial = that.data.serialList[value]
         task.confirmed_serial = serial
@@ -383,7 +408,7 @@ Page({
         break
       case 'serial_input':
         task.confirmed_serial = value
-        that.setData({serialSelectedIndex: that.data.serialList.length - 1})
+        that.setData({needUpdateSerial: true, serialSelectedIndex: that.data.serialList.length - 1})
         break
       case 'year_picker':
         task.confirmed_year = that.data.yearList[value]
@@ -412,7 +437,9 @@ Page({
       case 'brand':
         var brand = that.data.brands[value]
         task.confirmed_brand = brand
-        that.setData({task: task})
+        var brandSelectedIndex = value
+        that.getSerial(brand, task.confirmed_equip_type)
+        that.setData({task: task, brandSelectedIndex})
         break
       case 'uploader':
         var filesStr = ''
@@ -423,10 +450,44 @@ Page({
         task.confirmed_images = filesStr
         that.setData({task: task})
         break
+      case 'front':
+        task.confirmed_front = value
+        break
+      case 'scale':
+        task.confirmed_scale = value
+        break
+      case 'memo':
+        task.confirmed_memo = value
+        break
+      case 'relation':
+        task.confirmed_relation = value
+        break
       
+      case 'foot_length':
+        task.confirmed_foot_length = value
+        break
       default:
         break
     }
+    that.setData({task})
+    console.log('task mod', that.data.task)
+  },
+  updateTaskConfirm(){
+    var that = this
+    wx.showModal({
+      title: '确认修改',
+      content: '',
+      complete: (res) => {
+        if (res.cancel) {
+          that.setData({status: ''})
+        }
+    
+        if (res.confirm) {
+          that.updateTask()
+          that.setData({status: ''})
+        }
+      }
+    })
   },
 
   updateTask(){
@@ -443,11 +504,14 @@ Page({
       data: that.data.task,
       success:(res)=>{
         console.log('task updated', res)
+        var task = res.data
         wx.showToast({
           title: '保存成功',
           icon: 'none',
           complete:(e)=>{
             //that.getStatus()
+            that.getBrands(task.confirmed_equip_type)
+            that.getSerial(task.confirmed_brand, task.confirmed_equip_type)
           }
         })
       }
@@ -777,5 +841,50 @@ Page({
         //that.setData({userConfirmed: true})
       }
     })
+  },
+  modBaseInfo(){
+    var that = this
+    var task = that.data.task
+    var brands = that.data.brands
+    var serialList = that.data.serialList
+    var selectedBrandIndex = 0
+    for(var i = 0; i < brands.length; i++){
+      var brand = brands[i].split('/')[0]
+      if (task.confirmed_brand.indexOf(brand)==0){
+        selectedBrandIndex = i
+        break
+      }
+    }
+    var selectedSerialIndex  = 0
+    for(var i = 0; i < serialList.length; i++){
+      if (serialList[i]==task.confirmed_serial){
+        selectedSerialIndex = i
+        break
+      }
+    }
+    that.setData({status: 'edit_equip_info', brandSelectedIndex: selectedBrandIndex, selectedSerialIndex})
+  },
+  getSerial(brand, type){
+    var that = this
+    brand = brand.split('/')[0]
+    var getSerialUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetSerials?brand=' + encodeURIComponent(brand) + '&type=' + encodeURIComponent(type)
+    wx.request({
+      url: getSerialUrl,
+      method: 'GET',
+      success:(res)=>{
+        var serialList = []
+        for(var i = 0; i < res.data.length; i++){
+          serialList.push(res.data[i].serial_name)
+        }
+        serialList.push('未知')
+        serialList.push('新增')
+        that.setData({serialList, serialSelectedIndex: 0})
+        
+      }
+    })
+  },
+  updateTaskCancel(){
+    var that = this
+    that.setData({status: ''})
   }
 })
