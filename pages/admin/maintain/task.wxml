@@ -16,10 +16,15 @@
         <view class="right-column" >{{task.confirmed_equip_type}}</view>
         <view class="left-column" >品牌：</view>
         <view class="right-column" >
-          <view class="view-row" wx:if="{{status == 'edit_equip_info'}}"  >
+          <view  wx:if="{{status == 'edit_equip_info'}}"  >
             <picker id="brand" bindchange="mod" mode="selector" range="{{brands}}" class="input" style="width: 230rpx;" >
               <picker-view>{{task.confirmed_brand}}</picker-view>
             </picker>
+            <view class="view-row" wx:if="{{task.brandSelectedIndex == brands.length - 1}}" >
+              <input  class="input" style="margin-top: 10rpx;width: 105rpx;"  />
+              <view style="margin-left: 5rpx;margin-right: 5rpx;margin-top: 10rpx;" >/</view>
+              <input  class="input" style="margin-top: 10rpx;width: 105rpx"  />
+            </view>
           </view>
           <view wx:else >{{task.confirmed_brand}}</view>
         </view>
@@ -29,11 +34,11 @@
       <view class="view-table-scale" >
         <view class="left-column" >系列：</view>
         <view class="right-column" style="display: flex; flex-direction: row;" >
-          <view class="view-row" wx:if="{{status == 'edit_equip_info'}}"  >
+          <view wx:if="{{status == 'edit_equip_info'}}"  >
             <picker style="width: 180rpx;" id="serial_picker" mode="selector" range="{{serialList}}" bindchange="mod" class="input" >
               <picker-view>{{serialList[serialSelectedIndex]}}</picker-view>
             </picker>
-            <input id="serial_input" style="width: 100rpx;" class="input" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='新增'}}" bindinput="mod" />
+            <input id="serial_input" style="width: 180rpx;margin-top: 10rpx;" class="input" placeholder="手动输入" wx:if="{{serialList[serialSelectedIndex]=='新增'}}" bindinput="mod" />
           </view>
           <view wx:else >{{serialList[serialSelectedIndex]}}</view>
         </view>
@@ -83,9 +88,15 @@
         <view class="left-column" style="width: 94rpx;" >关系：</view>
         <view class="right-column" >
           <view wx:if="{{status == 'edit_equip_info'}}" >
+            <!--
             <picker mode="selector"  range="{{relationArr}}" class="input" style="width: 100rpx;" >
               <picker-view>{{(task.confirmed_relation || task.confirmed_relation=='')?'本人':confirmed_relation}}</picker-view>
             </picker>
+            -->
+            <radio-group>
+              <radio wx:for="{{relationArr}}" style="width: 130rpx;margin-top: 15rpx;"
+              checked="{{((task.confirmed_relation || task.confirmed_relation=='')?'本人':confirmed_relation)==item}}"  >{{item}}</radio>
+            </radio-group>
           </view>
           <view wx:else >{{(task.confirmed_relation || task.confirmed_relation=='')?'本人':confirmed_relation}}</view>
           
@@ -130,15 +141,12 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <multi-uploader wx:if="{{showUploader}}" id="uploader" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="mod" uploaded_files="{{task.confirmed_images}}" ></multi-uploader>
-    </mp-cell>
-    <mp-cell>
       <view style="display: flex; flex-direction: row;" >
-        <view class="left-column" >备注：</view>
+        <view class="left-column" style="width: 100rpx;" >备注：</view>
         <view class="right-column" >
           
-          <textarea wx:if="{{status == 'edit_equip_info'}}" style="width: 430rpx;height: 150rpx;" id="memo"  class="input" bindinput="setMemo" value="{{task.order.memo}}" />
-          <rich-text wx:else style="width: 430rpx;height: 150rpx;" id="memo" nodes="{{task.order.memo}}" ></rich-text>
+          <textarea wx:if="{{status == 'edit_equip_info'}}" style="width: 480rpx;height: 150rpx;" id="memo"  class="input" bindinput="setMemo" value="{{task.order.memo}}" />
+          <rich-text wx:else style="width: 480rpx;height: 150rpx;" id="memo" nodes="{{task.order.memo}}" ></rich-text>
         </view>
       </view>
     </mp-cell>
@@ -152,6 +160,10 @@
       </view>
       
     </mp-cell>
+    <mp-cell>
+      <multi-uploader wx:if="{{showUploader}}" id="uploader" title="雪板及附件" style="font-size: 10pt;" image_count="3" detail_id="0" bindUploaded="mod" uploaded_files="{{task.confirmed_images}}" ></multi-uploader>
+    </mp-cell>
+    
     <mp-cell>
       <button bindtap="gotoPrint" class="no-padding" class="input" > 打 印 标 签 </button>
     </mp-cell>

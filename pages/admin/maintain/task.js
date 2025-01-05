@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-    yearList: ['未知', '2012','2013','2014','2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+    yearList: ['未知', '2012','2013','2014','2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023','2024','2025'],
     yearListSelectedIndex: 0,
     idDiff: false,
     showGallery: false,
@@ -34,6 +34,8 @@ Page({
 
   },
 
+
+  /*
   getBoardBrands(){
     var that = this
     var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent('单板')
@@ -72,6 +74,28 @@ Page({
       }
     })
   },
+  */
+
+  getBrands(type){
+    var that = this
+    var getBrandUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetBrand?type=' + encodeURIComponent(type)
+    wx.request({
+      url: getBrandUrl,
+      method: 'GET',
+      success:(res)=>{
+        var boardBrands = []
+        for(var i = 0; i < res.data.length; i++){
+          var brand = res.data[i].brand_name.trim()
+          if (res.data[i].chinese_name.trim()!=''){
+            brand = brand + '/' + res.data[i].chinese_name.trim()
+          }
+          boardBrands.push(brand)
+        }
+        boardBrands.push('新增品牌')
+        that.setData({brands: boardBrands})
+      }
+    })
+  },
 
   /**
    * Lifecycle function--Called when page load
@@ -101,14 +125,15 @@ Page({
           var task = res.data
           that.setData({showUploader: false})
           //console.log('images', task.confirmed_images)
-          
+          that.getBrands(task.confirmed_equip_type)
+          /*
           if (task.confirmed_equip_type == '单板'){
             that.getBoardBrands()
           }
           else{
             that.getSkiBrands()
           }
-
+          */
           task.images = []
           var idDiff = that.data.idDiff
           if (task.confirmed_images != ''){
@@ -414,6 +439,7 @@ Page({
       case 'brand':
         var brand = that.data.brands[value]
         task.confirmed_brand = brand
+        task.brandSelectedIndex = value
         that.setData({task: task})
         break
       case 'uploader':
