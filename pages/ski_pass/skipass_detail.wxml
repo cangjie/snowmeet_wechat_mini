@@ -52,7 +52,7 @@
       </view>
     </view>
     <view style="margin-top: 50rpx;">
-      <button class="input" bind:tap="submit" disabled="{{paying || !canReserve}}" > 确 认 支 付 </button>
+      <button class="input" bind:tap="submit" disabled="{{paying || !canReserve || !dailyPrice}}" > 确 认 支 付 </button>
     </view>
   </view>
   <view style="height: 50rpx;"></view>

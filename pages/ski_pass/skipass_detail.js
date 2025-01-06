@@ -112,15 +112,20 @@ Page({
     var that = this
     var product = that.data.product
     var currentDate = util.formatDate(new Date(that.data.currentDate))
+    var find = false
     for(var i = 0; i < product.dailyPrice.length; i++){
       var pDate = util.formatDate(new Date(product.dailyPrice[i].reserve_date))
       if (pDate == currentDate){
+        find = true
         var dailyPrice = product.dailyPrice[i]
         dailyPrice.deal_priceStr = util.showAmount(parseFloat(dailyPrice.deal_price))
         dailyPrice.marketPriceStr = util.showAmount(parseFloat(dailyPrice.marketPrice))
         that.setData({dailyPrice: dailyPrice})
         break
       }
+    }
+    if (!find){
+      that.setData({dailyPrice: undefined})
     }
   },
   GetRealName(){
@@ -227,14 +232,19 @@ Page({
     var date = new Date(e.detail.value)
     that.setData({currentDate: util.formatDate(date)})
     that.getDailyPrice()
-    var dealPrice = that.data.dailyPrice.deal_price
-    var count = that.data.count
-    var summary = dealPrice * count
-    var canReserve = true
-    if (isNaN(that.data.balance ) || summary >= that.data.balance){
-      canReserve = false
+    if (that.data.dailyPrice){
+      var dealPrice = that.data.dailyPrice.deal_price
+      var count = that.data.count
+      var summary = dealPrice * count
+      var canReserve = true
+      if (isNaN(that.data.balance ) || summary >= that.data.balance){
+        canReserve = false
+      }
+      that.setData({summary, summaryStr: util.showAmount(summary), canReserve})
     }
-    that.setData({summary, summaryStr: util.showAmount(summary), canReserve})
+    else {
+      that.setData({summary: 0, summaryStr: util.showAmount(0), canReserve: false})
+    }
   },
   getBalance(){
     var that = this
