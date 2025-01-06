@@ -6,7 +6,6 @@
       <view class="left-column" >手机号：</view>
       <view class="right-column" ><input bindinput="setCell" style="width: 200rpx;" class="input"  /></view>
     </view>
-    
   </mp-cell>
 </mp-cells>
 <view>

@@ -257,6 +257,10 @@ Page({
         break
       case 'env':
         path = '/pages/admin/env'
+        break
+      case 'maintainSerchQuick':
+        path = '/pages/admin/maintain/search_quick'
+        break
       default:
         break
     }

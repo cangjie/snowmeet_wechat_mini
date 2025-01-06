@@ -130,7 +130,8 @@
     "pages/admin/ski_pass/common_skipass_list",
     "pages/admin/ski_pass/common_skipass_detail",
     "pages/admin/ski_pass/reserve_qrcode",
-    "pages/admin/env"
+    "pages/admin/env",
+    "pages/admin/maintain/search_quick"
   ],
   "window": {
     "backgroundTextStyle": "light",
