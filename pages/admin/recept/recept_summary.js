@@ -36,7 +36,7 @@ Page({
                   break
               case '养护下单':
                 wx.redirectTo({
-                  url: '../maintain/task_list',
+                  url: '../maintain/search_quick?orderId=' + submitId.toString() + '&gotoDeail=true',
                 })
                 break
               default:
@@ -113,7 +113,7 @@ Page({
         break
       case '养护下单':
         orderId = recept.maintainOrder.order.id
-        jumpUrl = '/pages/admin/maintain/task_list'
+        jumpUrl = '/pages/admin/maintain/search_quick?orderId=' + submitId.toString() + '&gotoDetail=true'
         break
       default:
         break

@@ -17,8 +17,17 @@ Page({
     var that = this
     that.data.loading = true
     console.log('load')
+    if (options.gotoDetail){
+      that.setData({gotoDetail: true})
+    }
+    if (options.orderId){
+      that.data.cell = options.orderId
+    }
     app.loginPromiseNew.then(function(resolve){
       that.data.loading = false
+      if (that.data.cell){
+        that.getData()
+      }
     })
   },
 
@@ -89,6 +98,9 @@ Page({
       return
     }
     var getUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasksQuick/' + cell + '?shop=' + encodeURIComponent(shop) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    if (that.data.gotoDetail){
+      getUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasksQuick/' + cell + '?shop=&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    }
     var orderList = []
     wx.request({
       url: getUrl,
@@ -133,6 +145,11 @@ Page({
         var totalAmountStr = util.showAmount(totalAmount)
 
         that.setData({tasks: tasks, orderList: orderList, totalAmount: totalAmount, totalAmountStr: totalAmountStr, querying: false})
+        if (tasks.length == 1 && that.data.gotoDetail){
+          wx.navigateTo({
+            url: 'task?id=' + tasks[0].id.toString(),
+          })
+        }
         //that.setData({tasks})
       }
     })
