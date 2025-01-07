@@ -61,6 +61,7 @@ Page({
           task.memo = ''
           task.date = util.formatDate(new Date(task.create_date))
           task.time = util.formatTimeStr(new Date(task.create_date))
+
           if (task.confirmed_equip_type == '双板' && task.confirmed_serial == ''){
             task.memo = '信息不全'
           }
@@ -82,6 +83,9 @@ Page({
             if (!exists ){
               orderList.push(task.order)
             }
+          }
+          if (task.confirmed_urgent == 1){
+            task.backColor = 'yellow'
           }
         }
         var totalAmount = 0
