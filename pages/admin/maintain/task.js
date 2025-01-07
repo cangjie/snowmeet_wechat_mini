@@ -163,7 +163,7 @@ Page({
             }
           }
           that.getSerial(task.confirmed_brand, task.confirmed_equip_type)
-          if (!task.confirmed_memo || task.confirmed_memo == ''){
+          if (task.order && (!task.confirmed_memo || task.confirmed_memo == '')){
             task.confirmed_memo = task.order.memo
           }
           that.setData({task: task,  yearListSelectedIndex: yearIndex, idDiff: idDiff, showUploader: true})
