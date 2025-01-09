@@ -1,16 +1,24 @@
 {
   "setting": {
     "preloadBackgroundData": false,
-    "compileHotReLoad": true,
+    "compileHotReLoad": false,
     "bigPackageSizeSupport": true,
     "skylineRenderEnable": true,
-    "urlCheck": false
+    "urlCheck": false,
+    "lazyloadPlaceholderEnable": true
   },
   "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
   "libVersion": "3.5.0",
   "condition": {
     "miniprogram": {
       "list": [
+        {
+          "name": "rent_detail",
+          "pathName": "pages/admin/rent/rent_detail",
+          "query": "id=6400",
+          "launchMode": "default",
+          "scene": null
+        },
         {
           "name": "maitainSearchQuick",
           "pathName": "pages/admin/maintain/search_quick",

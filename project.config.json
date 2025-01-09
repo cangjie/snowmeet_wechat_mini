@@ -2,8 +2,8 @@
   "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
   "setting": {
     "urlCheck": true,
-    "es6": true,
-    "enhance": true,
+    "es6": false,
+    "enhance": false,
     "postcss": true,
     "preloadBackgroundData": false,
     "minified": true,
@@ -35,7 +35,7 @@
     "useCompilerPlugins": false,
     "minifyWXML": true,
     "ignoreUploadUnusedFiles": true,
-    "condition": false
+    "condition": true
   },
   "compileType": "miniprogram",
   "simulatorType": "wechat",
