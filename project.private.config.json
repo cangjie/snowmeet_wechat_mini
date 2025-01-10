@@ -12,16 +12,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "maitainSearchQuick",
-          "pathName": "pages/admin/maintain/search_quick",
-          "query": "orderId=44564&gotoDetail=true",
+          "name": "pay",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=11218",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "pay",
-          "pathName": "/pages/payment/pay_recept",
-          "query": "id=10866",
+          "name": "maitainSearchQuick",
+          "pathName": "pages/admin/maintain/search_quick",
+          "query": "orderId=44564&gotoDetail=true",
           "launchMode": "default",
           "scene": null
         },
