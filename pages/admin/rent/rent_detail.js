@@ -170,12 +170,7 @@ Page({
           rentOrder.due_end_time_str = util.formatDate(dueEndTime) + ' ' + util.formatTimeStr(dueEndTime)
           if (rentOrder.order_id > 0){
 
-            /*
-            var payTime = rentOrder.order.pay_time == null ? 
-              new Date(rentOrder.order.payments[0].create_date) 
-              : new Date(rentOrder.order.pay_time) 
-            */
-
+       
             var payTime =  undefined
             if (rentOrder.order.pay_time != null){
               payTime = new Date(rentOrder.order.pay_time) 
@@ -267,7 +262,10 @@ Page({
           }
           rentOrder = that.computeAmount(rentOrder)
 
-          var realTotalRefund = 0;
+          var realTotalAmount = 0
+          
+          var realTotalRefund = 0
+          /*
           var refunds = []
           for(var j = 0; rentOrder.order != null && rentOrder.order.refunds != null && j < rentOrder.order.refunds.length; j++){
             var r = rentOrder.order.refunds[j];
@@ -278,13 +276,59 @@ Page({
               realTotalRefund += r.amount
             }
           }
+          */
+
+          var balance = []
+
+          for(var j = 0; rentOrder.order != null && rentOrder.order.refunds != null && j < rentOrder.order.refunds.length; j++){
+            var r = rentOrder.order.refunds[j];
+            var balanceItem = {}
+            if (r.refundSuccess){
+              balanceItem.outTradeNo = r.out_refund_no
+              balanceItem.payMethod = '——'
+              balanceItem.create_date = new Date(r.create_date)
+              balanceItem.create_dateStr = util.formatDateTime(new Date(r.create_date))
+              balanceItem.create_timeStr = util.formatTimeStr(new Date(r.create_date))
+              balanceItem.amount = -1 * r.amount 
+              realTotalRefund += r.amount
+              balanceItem.amountStr = util.showAmount(balanceItem.amount)
+              balanceItem.memo = (r.memo == ''? '退款': r.memo)
+              balance.push(balanceItem)
+              realTotalAmount += balanceItem.amount
+            }
+          }
+
+          for(var j = 0; rentOrder.order != null && rentOrder.order.payments != null && j < rentOrder.order.payments.length; j++){
+            var r = rentOrder.order.payments[j]
+            var balanceItem = {}
+            if (r.status == '支付成功'){
+              balanceItem.outTradeNo = r.out_trade_no
+              balanceItem.create_date = new Date(r.create_date)
+              balanceItem.create_dateStr = util.formatDateTime(new Date(r.create_date))
+              balanceItem.create_timeStr = util.formatTimeStr(new Date(r.create_date))
+              balanceItem.amount = r.amount 
+              balanceItem.amountStr = util.showAmount(balanceItem.amount)
+              balanceItem.memo = '押金'
+              balanceItem.payMethod = r.pay_method
+              balance.push(balanceItem)
+              realTotalAmount += balanceItem.amount
+            }
+          }
+          balance.sort((a,b) => (a.create_date - b.create_date))
+          console.log('balance', balance)
+          
+
+
+
+
+
           var realTotalRefundStr = util.showAmount(realTotalRefund)
           var bonus = rentOrder.deposit_final - realTotalRefund
           
           that.setData({rentOrder: rentOrder, 
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
-              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, refunds: refunds, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor})
+              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, balance})
           that.computeTotal()
         }
       }

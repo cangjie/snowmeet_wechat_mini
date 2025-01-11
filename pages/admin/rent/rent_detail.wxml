@@ -37,58 +37,29 @@
     <view class="left-column" style="color:{{textColor}}"  >店员：</view>
     <view class="right-column" style="color:{{textColor}}"   >{{rentOrder.staff_name}}</view>
   </view>
-  <view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;" ></view>
-  <view class="view-row" style="margin-top: 10rpx;" >
-    <view style="width: 350rpx; text-align: center;" >支付单号</view>
-    <view style="width: 200rpx; text-align: center;" >支付方式</view>
-    <view style="width: 150rpx; text-align: center;" >金额</view>
-  </view>
-  <view class="view-row" style="margin-top: 10rpx;" >
-    <view style="width: 350rpx; text-align: center;" >{{rentOrder.outTradeNo}}</view>
-    <view style="width: 200rpx; text-align: center;" >{{rentOrder.payMethod}}</view>
-    <view style="width: 150rpx; text-align: right;" >{{rentOrder.deposit_final_str}}</view>
-  </view>
-  <view class="view-row" style="margin-top: 10rpx;" >
-    <view style="width: 350rpx; text-align: center;" >实付押金</view>
-    <view style="width: 200rpx; text-align: center;" ></view>
-    <view style="width: 150rpx;color: red;text-align: right;" >{{rentOrder.deposit_final_str}}</view>
-  </view>
-  <view style="margin-top: 50rpx;">
-    <button class="input" > 追 加 押 金 </button>
-  </view>
-  <view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;margin-bottom: 50rpx;" ></view>
+  <mp-cells title="收支列表 {{balance.length}}笔" >
+    <mp-cell>
+      <view class="view-row" style="background-color: {{backColor}};">
+        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >时间</view>
+        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >金额</view>
+        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >备注</view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:for="{{balance}}" >
+      <view class="view-row" style="background-color: {{backColor}};" >
+        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >{{item.create_dateStr}}</view>
+        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >{{item.amountStr}}</view>
+        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >{{item.memo}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  
 
-
-  <!--view style="display: flex; flex-direction: row;">
-    <view class="left-column" style="color:{{textColor}}"  >实付押金：</view>
-    <view class="right-column" style="color: red;">{{rentOrder.deposit_final_str}}</view>
-    <view class="left-column" style="color:{{textColor}}"  >订单状态：</view>
-    <view class="right-column" >
-      <block wx:if="{{rentOrder.status != '未支付'}}"  >
-        {{rentOrder.status}}
-      </block>
-      <button wx:else bindtap="gotoPay" style="width: 150rpx;height: 30rpx; font-size: 9pt;font-family: inherit; font-style: normal;margin: 0rpx;padding: 0rpx" >未支付</button>
-    </view>
-  </view-->
-  <!--view style="display: flex; flex-direction: row;">
-    <view class="left-column" style="color:{{textColor}}"  >支付方式：</view>
-    <view class="right-column" style="color:{{textColor}}"   >{{rentOrder.payMethod}}</view>
-    <view class="left-column" style="color:{{textColor}}"  >店员：</view>
-    <view class="right-column" style="color:{{textColor}}"   >{{rentOrder.staff_name}}</view>
-  </view>
-  <view style="display: flex; flex-direction: row;">
-    <view class="left-column" style="color:{{textColor}}"  >支付单号：</view>
-    <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.outTradeNo}}</view>
-    
-  </view-->
   <view style="display: flex; flex-direction: row;" >
     <view class="left-column" style="color:{{textColor}}"  >订单时间：</view>
     <view class="right-column" style="width:400rpx;color:{{textColor}}" >{{rentOrder.create_date_str}}</view>
   </view>
-  <!--view style="display: flex; flex-direction: row;" >
-    <view class="left-column" style="color:{{textColor}}" >支付时间：</view>
-    <view class="right-column" style="width:400rpx;color:{{textColor}}" >{{rentOrder.paidTimeStr}}</view>
-  </view-->
+
   <view wx:if="{{rentOrder.guarantee_credit_photos_arr.length > 0}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;">
     <image id="credit_{{index}}" bindtap="showGallery" wx:for="{{rentOrder.guarantee_credit_photos_arr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
   </view>
@@ -253,11 +224,6 @@
         <button size="mini" wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '立即租赁'}}" id="{{index}}" bindtap="setAppend" style="font-size: 9pt;"  >确认追加</button>
         <button size="mini" wx:if="{{!item.isEdit && item.status == '未领取' && item.deposit_type == '预付押金'}}" id="{{index}}" bindtap="setInstance" style="font-size: 9pt;"  >确认租赁</button>
         <button size="mini" wx:if="{{!item.isEdit && item.status == '已领取'}}" id="reserveMore_{{index}}" bindtap="reserveMore" style="font-size: 9pt;"  >转预约</button>
-        <!--button size="mini" wx:if="{{!item.isEdit && item.status == '已领取'}}" id="{{index}}" bindtap="setInstance" style="font-size: 9pt;"  >更换</button-->
-
-        <!--button id="{{index}}" wx:if="{{item.status == '已领取' && item.isEdit}}" id="{{index}}" bindtap="change" style="width: 130rpx;font-size: 9pt;"  >更换</button-->
-        <!--button size="mini" id="{{index}}" wx:if="{{item.status == '已领取' }}" id="{{index}}" bindtap="setKeep" style="width: 140rpx;font-size: 9pt;" >暂存</button>
-        <button size="mini" id="{{index}}" wx:if="{{item.status == '已领取' && item.isEdit }}" id="{{index}}" bindtap="comfirmKeep" style="width: 140rpx;font-size: 9pt;" >暂存确认</button-->
       </view>
     </mp-cell>
    
@@ -341,26 +307,48 @@
     </view>
     
   </view>
-  <!--view  style="margin-left: 100rpx; margin-right: 100rpx;margin-top: 50rpx;margin-bottom: 50rpx;"  >
-    <input wx:if="{{rentOrder.status == '全部归还'}}" value="{{rentOrder.memo}}" bindinput="setOrderMemo" placeholder="填写订单备注" />
-    <block wx:else >{{rentOrder.memo}}</block>
-  </view-->
-  <mp-cells title="退款明细{{refunds.length}}" >
-    <mp-cell>
-      <view class="view-row" style="background-color: {{backColor}};">
-        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >时间</view>
-        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >金额</view>
-        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >备注</view>
+  <mp-cells title="收支详细 {{balance.length}}笔" >
+
+    <mp-cell wx:for="{{balance}}" >
+      <view class="view-row"  >
+        <view class="left-column" >单号：</view>
+        <view class="right-column" >{{item.outTradeNo}}</view>
       </view>
-    </mp-cell>
-    <mp-cell wx:for="{{refunds}}" >
-      <view class="view-row" style="background-color: {{backColor}};" >
-        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >{{item.create_dateStr}}</view>
-        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >{{item.amountStr}}</view>
-        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >{{item.memo}}</view>
+      <view class="view-row"  >
+        <view class="left-column" >支付方式：</view>
+        <view class="right-column" >{{item.payMethod}}</view>
+        <view class="left-column" >备注：</view>
+        <view class="right-column" >{{item.memo}}</view>
+      </view>
+      <view class="view-row"  >
+        <view class="left-column" >时间：</view>
+        <view class="right-column" >{{item.create_timeStr}}</view>
+        <view class="left-column" >金额：</view>
+        <view class="right-column" >{{item.amountStr}}</view>
       </view>
     </mp-cell>
   </mp-cells>
+  <!--view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;" ></view>
+  <view class="view-row" style="margin-top: 10rpx;" >
+    <view style="width: 350rpx; text-align: center;" >支付单号</view>
+    <view style="width: 200rpx; text-align: center;" >支付方式</view>
+    <view style="width: 150rpx; text-align: center;" >金额</view>
+  </view>
+  <view class="view-row" style="margin-top: 10rpx;" >
+    <view style="width: 350rpx; text-align: center;" >{{rentOrder.outTradeNo}}</view>
+    <view style="width: 200rpx; text-align: center;" >{{rentOrder.payMethod}}</view>
+    <view style="width: 150rpx; text-align: right;" >{{rentOrder.deposit_final_str}}</view>
+  </view>
+  <view class="view-row" style="margin-top: 10rpx;" >
+    <view style="width: 350rpx; text-align: center;" >实付押金</view>
+    <view style="width: 200rpx; text-align: center;" ></view>
+    <view style="width: 150rpx;color: red;text-align: right;" >{{rentOrder.deposit_final_str}}</view>
+  </view>
+  <view style="margin-top: 50rpx;">
+    <button class="input" > 追 加 押 金 </button>
+  </view-->
+  <view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;margin-bottom: 50rpx;" ></view>
+
   <view>
     <button bindtap="goHome" class="input" > 返 回 首 页 </button>
   </view>
