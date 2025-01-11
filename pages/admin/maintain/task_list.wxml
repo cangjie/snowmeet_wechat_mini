@@ -7,6 +7,19 @@
   <shop-selector bindShopSelected="shopSelected" defaultShop="万龙服务中心" ></shop-selector>
   <mp-cells>
     <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >支付场景：</view>
+        <view class="right-column" >
+          <radio-group style="display: flex;flex-direction: column;" bindchange="changePayOption" >
+            <radio style="margin-top: 10rpx;" value="" checked="{{payOption == ''}}" >全部</radio>
+            <radio style="margin-top: 10rpx;" value="现场支付" checked="{{payOption == '现场支付'}}" >现场支付</radio>
+            <radio style="margin-top: 10rpx;" value="招待" checked="{{payOption == '招待'}}" >招待</radio>
+            <radio style="margin-top: 10rpx;" value="万龙质保" checked="{{payOption == '万龙质保'}}" >万龙质保</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
       <view style="text-align: center;">
         <button disabled="{{querying}}" class="input" bindtap="getData" > {{querying? '查询中…' : '查 询'}} </button>
       </view>

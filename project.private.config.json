@@ -13,9 +13,9 @@
     "miniprogram": {
       "list": [
         {
-          "name": "rent_detail",
-          "pathName": "pages/admin/rent/rent_detail",
-          "query": "id=6400",
+          "name": "pay",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=11517",
           "launchMode": "default",
           "scene": null
         },
@@ -23,13 +23,6 @@
           "name": "maitainSearchQuick",
           "pathName": "pages/admin/maintain/search_quick",
           "query": "orderId=44564&gotoDetail=true",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pay",
-          "pathName": "/pages/payment/pay_recept",
-          "query": "id=10866",
           "launchMode": "default",
           "scene": null
         },

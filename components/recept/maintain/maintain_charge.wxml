@@ -40,10 +40,13 @@
       <view style="display: flex; flex-direction: row;" >
         <view class="left-column" >结算方式：</view>
         <view class="right-column" >
-          <radio-group bindchange="setPayOption">
-            <radio checked="{{recept.maintainOrder.payOption == '现场支付'}}" value="现场支付" >现场支付</radio>
-            <radio checked="{{recept.maintainOrder.payOption == '次卡支付'}}" value="次卡支付" >次卡支付</radio>
-            <radio checked="{{recept.maintainOrder.payOption == '招待'}}" value="招待" >招待</radio>
+          <radio-group bindchange="setPayOption" style="display:flex; flex-direction: column;">
+            <radio style="margin-top: 10rpx;" 
+              checked="{{recept.maintainOrder.payOption == '现场支付'}}" value="现场支付" >现场支付</radio>
+            <radio style="margin-top: 10rpx;"
+              checked="{{recept.maintainOrder.payOption == '招待'}}" value="招待" >招待</radio>
+              <radio style="margin-top: 10rpx;"
+              checked="{{recept.maintainOrder.payOption == '万龙质保'}}" value="万龙质保" >万龙质保</radio>
           </radio-group>
         </view>
       </view>

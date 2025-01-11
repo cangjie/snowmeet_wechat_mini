@@ -10,7 +10,8 @@ Page({
     orderList:[],
     totalAmount: 0,
     totalAmountStr: '¥0.00',
-    querying: false
+    querying: false,
+    payOption: ''
   },
   GoBack(){
     wx.redirectTo({
@@ -48,7 +49,7 @@ Page({
   getData(){
     var that = this
     that.setData({querying: true})
-    var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + ((that.data.shop == '')? '' : '&shop=' + encodeURIComponent(that.data.shop))
+    var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + ((that.data.shop == '')? '' : '&shop=' + encodeURIComponent(that.data.shop))+'&payOption=' + encodeURIComponent(that.data.payOption)
     var orderList = []
     wx.request({
       url: getTaskUrl,
@@ -156,5 +157,10 @@ Page({
     wx.navigateTo({
       url: 'task?id=' + e.currentTarget.id,
     })
+  },
+  changePayOption(e){
+    var that = this
+    that.setData({payOption: e.detail.value})
+    //that.data.payOption = e.detail.value
   }
 })
