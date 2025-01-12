@@ -172,7 +172,8 @@
       "name": "pay",
       "pages": [
         "pay_hub",
-        "pay_recept"
+        "pay_recept",
+        "rent_pay_add"
       ]
     },
     {

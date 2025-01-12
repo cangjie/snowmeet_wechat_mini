@@ -3,7 +3,7 @@
     "preloadBackgroundData": false,
     "compileHotReLoad": true,
     "bigPackageSizeSupport": true,
-    "skylineRenderEnable": true,
+    "skylineRenderEnable": false,
     "urlCheck": false,
     "lazyloadPlaceholderEnable": false,
     "autoAudits": true
@@ -15,8 +15,8 @@
       "list": [
         {
           "name": "pay",
-          "pathName": "pages/payment/pay_recept",
-          "query": "id=11517",
+          "pathName": "pages/payment/rent_pay_add",
+          "query": "id=10",
           "launchMode": "default",
           "scene": null
         },

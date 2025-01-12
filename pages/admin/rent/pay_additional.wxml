@@ -2,19 +2,19 @@
   <view class="view-row" style="margin-top: 50rpx;" >
     <view class="left-column" >金额：</view>
     <view class="right-column view-row" >
-      ¥<input class="input" style="width: 100rpx;" bindinput="setAmount" />
+      ¥<input class="input" style="width: 100rpx;" bindinput="setAmount" disabled="{{paying}}" value="{{amount}}"  />
     </view>
   </view>
   <view class="view-row" style="margin-top: 50rpx;" >
     <view class="left-column" >原因：</view>
     <view class="right-column" style="width: 500rpx;" >
-      <radio-group style="display: flex;flex-direction: column;" bindchange="setReason" >
-        <radio value="追加押金" checked="{{reason=='追加押金'}}" >追加押金</radio>
-        <radio value="补收租金"  checked="{{reason=='补收租金'}}" >补收租金</radio>
+      <radio-group style="display: flex;flex-direction: column;" bindchange="setReason" disabled="{{paying}}" >
+        <radio value="追加押金" checked="{{reason=='追加押金'}}" disabled="{{paying}}"  >追加押金</radio>
+        <radio value="补收租金"  checked="{{reason=='补收租金'}}" disabled="{{paying}}"  >补收租金</radio>
         <view class="view-row" >
-          <radio value="其他" checked="{{reason !='' && reason != '追加押金' && reason != '补收租金'}}" >其他</radio>
+          <radio value="其他" checked="{{reason !='' && reason != '追加押金' && reason != '补收租金'}}" disabled="{{paying}}"  >其他</radio>
           <view style="margin-top: 25rpx;margin-left: 20rpx;">
-            <input disabled="{{reason=='追加押金' || reason=='补收租金' || reason == ''}}"  
+            <input disabled="{{reason=='追加押金' || reason=='补收租金' || reason == '' || paying}}"  
             value="{{(reason != '追加押金' && reason != '补收租金' && reason != '其他')? reason : ''}}" 
             class="input" style="width: 300rpx;" bindinput="inputReason" />
           </view>
@@ -23,8 +23,17 @@
       </radio-group>
     </view>
   </view>
-  <pay-method bindPayMethodSelected="setPayMethod" ></pay-method>
   <view style="margin-top: 50rpx;margin-bottom: 50rpx;">
-    <button class="input" bind:tap="confirmPay" > 确 认 收 款 </button>
+    <button class="input" bind:tap="confirmPay" disabled="{{!valid || paying}}" > 确 认 收 款 </button>
   </view>
+  <view wx:if="{{paying}}" >
+    <pay-method bindPayMethodSelected="setPayMethod" ></pay-method>
+    <view style="text-align:center">
+      <image style="width: 400rpx; height: 400rpx;" src="{{qrcodeUrl}}" ></image>
+    </view>
+    <view style="margin-top: 20rpx;">
+      <button class="input" bind:tap="back" > 重 填 </button>
+    </view>
+  </view>
+  
 </view>

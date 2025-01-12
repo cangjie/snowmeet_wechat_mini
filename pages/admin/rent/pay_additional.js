@@ -1,4 +1,6 @@
 // pages/admin/rent/pay_additional.js
+const app = getApp()
+const util = require('../../../utils/util.js')
 Page({
 
   /**
@@ -6,8 +8,10 @@ Page({
    */
   data: {
     payMethod: '',
-    amount: 0,
-    reason: ''
+    amount: '',
+    reason: '',
+    valid: false,
+    paying: false
   },
 
   /**
@@ -72,18 +76,81 @@ Page({
     var payMethod = e.detail.payMethod
     that.setData({payMethod})
   },
-  checkValid(){
-    var that = this
-    var amount = that.data.amount
-    var reason = that.data.reason
-    
-  },
+  
   setReason(e){
     var that = this
     that.setData({reason: e.detail.value})
+    that.checkValid()
   },
   inputReason(e){
     var that = this
     that.setData({reason: e.detail.value})
+    that.checkValid()
+  },
+  setAmount(e){
+    var that = this
+    var value = e.detail.value
+    that.setData({amount: value})
+    that.checkValid()
+  },
+  checkValid(){
+    var that = this
+    var amount = parseFloat(that.data.amount)
+    if (!isNaN(amount) && amount > 0 && that.data.reason != '' && that.data.reason != '其他' ){
+      that.setData({valid: true})
+    }
+    else {
+      that.setData({valid: false})
+    }
+  },
+  confirmPay(){
+    var that = this
+    wx.showModal({
+      title: '确认追加收款',
+      content: '金额：' + util.showAmount(that.data.amount) + ' 原因：' + that.data.reason,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+        if (res.confirm) {
+          var url = 'https://' + app.globalData.domainName + '/core/Rent/CreateAdditionalPayment/' + that.data.id + '?amount=' + that.data.amount + '&reason=' + encodeURIComponent(that.data.reason) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: url,
+            method: 'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+              console.log('add pay', res.data)
+              that.setData({paying: true})
+              var addPay = res.data
+              that.setData({addPay})
+              that.getQrCode() 
+            }
+          })
+        }
+      }
+    })
+  },
+  back(){
+    var that = this
+    that.setData({paying: false, amount: '', reason: ''})
+    that.checkValid()
+  },
+  getQrCode(){
+    var that = this
+    var addPay = that.data.addPay
+    var scene = 'pay_rent_add_' + addPay.id.toString()
+    var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scene
+    wx.request({
+      url: getQRUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        that.setData({qrcodeUrl: res.data})
+      }
+    })
   }
 })
