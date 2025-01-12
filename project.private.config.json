@@ -1,6 +1,6 @@
 {
   "setting": {
-    "preloadBackgroundData": true,
+    "preloadBackgroundData": false,
     "compileHotReLoad": true,
     "bigPackageSizeSupport": true,
     "skylineRenderEnable": true,

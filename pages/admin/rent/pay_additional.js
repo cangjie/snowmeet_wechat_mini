@@ -77,5 +77,13 @@ Page({
     var amount = that.data.amount
     var reason = that.data.reason
     
+  },
+  setReason(e){
+    var that = this
+    that.setData({reason: e.detail.value})
+  },
+  inputReason(e){
+    var that = this
+    that.setData({reason: e.detail.value})
   }
 })
