@@ -1,0 +1,23 @@
+<view>
+  <view class="view-row" style="margin-top: 50rpx;" >
+    <view class="left-column" >金额：</view>
+    <view class="right-column view-row" >
+      ¥<input class="input" style="width: 100rpx;" bindinput="setAmount" />
+    </view>
+  </view>
+  <view class="view-row" style="margin-top: 50rpx;" >
+    <view class="left-column" >原因：</view>
+    <view class="right-column" >
+      <radio-group style="display: flex;flex-direction: column;" bindchange="setReason" >
+        <radio value="追加押金" checked="{{reason=='追加押金'}}" >追加押金</radio>
+        <radio value="补收租金"  checked="{{reason=='追加押金'}}" >补收租金</radio>
+        <radio checked="{{reason !='' && reason=='追加押金'}}" >其他</radio>
+        <input value="{{reason}}" class="input" style="width: 300rpx;" bindinput="inputReason" />
+      </radio-group>
+    </view>
+  </view>
+  <pay-method bindPayMethodSelected="setPayMethod" ></pay-method>
+  <view style="margin-top: 50rpx;">
+    <button class="input" bind:tap="confirmPay" > 确 认 收 款 </button>
+  </view>
+</view>

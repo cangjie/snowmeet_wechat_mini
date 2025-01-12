@@ -131,7 +131,8 @@
     "pages/admin/ski_pass/common_skipass_detail",
     "pages/admin/ski_pass/reserve_qrcode",
     "pages/admin/env",
-    "pages/admin/maintain/search_quick"
+    "pages/admin/maintain/search_quick",
+    "pages/admin/rent/pay_additional"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -328,6 +328,9 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <view style="margin-top: 50rpx;">
+    <button class="input" bind:tap="payAdditional" > 追 加 收 款 </button>
+  </view>
   <!--view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;" ></view>
   <view class="view-row" style="margin-top: 10rpx;" >
     <view style="width: 350rpx; text-align: center;" >支付单号</view>

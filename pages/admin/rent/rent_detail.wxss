@@ -6,7 +6,7 @@ view{
   width: 140rpx;font-size: 9pt;margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx
 }
 .left-column{
-  width: 135rpx;
+  width: 160rpx;
   margin-left: 0rpx;
 }
 .right-column{

@@ -1240,7 +1240,8 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    that.getData()
   },
 
   /**
@@ -1276,5 +1277,12 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  payAdditional(){
+    var that = this
+    var id = that.data.id
+    wx.navigateTo({
+      url: 'pay_additional?id=' + id,
+    })
   }
 })
