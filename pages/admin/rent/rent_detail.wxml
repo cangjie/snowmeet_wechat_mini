@@ -32,7 +32,10 @@
       <block wx:if="{{rentOrder.status != '未支付'}}"  >
         {{rentOrder.status}}
       </block>
-      <button wx:else bindtap="gotoPay" style="width: 150rpx;height: 30rpx; font-size: 9pt;font-family: inherit; font-style: normal;margin: 0rpx;padding: 0rpx" >未支付</button>
+      <button wx:else 
+      bindtap="gotoPay" 
+      disabled="{{rentOrder.status == '已完成'}}" class="input"
+      style="width: 150rpx;height: 30rpx; font-size: 9pt;font-family: inherit; font-style: normal;margin: 0rpx;padding: 0rpx" >未支付</button>
     </view>
     <view class="left-column" style="color:{{textColor}}"  >店员：</view>
     <view class="right-column" style="color:{{textColor}}"   >{{rentOrder.staff_name}}</view>
@@ -116,7 +119,7 @@
         
         <view class="left-column" style="color:{{textColor}}" >起租：</view>
         <view class="right-column" style="font-size: 9pt;color:{{textColor}}" wx:if="{{isManager == 1}}" >
-          <view wx:if="{{item.status == '未领取'}}" >
+          <view wx:if="{{item.status == '未领取' || rentOrder.status == '已完成'}}" >
             {{item.start_dateStr}}
           </view>
           <view wx:else >
@@ -130,7 +133,7 @@
         </view>
         <view class="right-column" style="font-size: 9pt;color:{{textColor}}" wx:else >{{item.start_dateStr}}</view>
         <view class="left-column" style="color:{{textColor}}" >退租：</view>
-        <view class="right-column" wx:if="{{item.status == '已归还'  }}" wx:if="{{isManager == 1}}" style="color:{{textColor}}" >
+        <view class="right-column" wx:if="{{item.status == '已归还' && isManager == 1 && rentOrder.status != '已完成' }}"  style="color:{{textColor}}" >
           
           <picker mode="date" class="input" id="{{index}}" bindchange="setReturnDate" start="{{item.start_dateStr}}" >
             <picker-view>{{item.pickEnd_dateStr}}</picker-view>
@@ -222,32 +225,42 @@
       <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery-->
   
       <view style="display: flex; flex-direction: row; margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx">
-        <button wx:if="{{item.status == '未领取' && (item.deposit_type == '预约租赁'  || item.deposit_type == '先租后取') && !item.isEdit}}" id="{{index}}" bindtap="setRentStart" style="font-size: 9pt;" size="mini"  >领取</button>
-        <button  wx:if="{{(item.status == '已发放') && !item.isEdit }}" id="return_{{index}}" bindtap="setReturn"  size="mini" style="font-size: 9pt;" size="mini" >归还</button> 
+        <button wx:if="{{item.status == '未领取' && (item.deposit_type == '预约租赁'  || item.deposit_type == '先租后取') && !item.isEdit}}" class="input"  id="{{index}}" bindtap="setRentStart" style="font-size: 9pt;" size="mini"  
+        disabled="{{rentOrder.status == '已完成'}}"
+        >领取</button>
+        <button  wx:if="{{(item.status == '已发放') && !item.isEdit }}" id="return_{{index}}" bindtap="setReturn"  class="input" size="mini" style="font-size: 9pt;" size="mini"
+        disabled="{{rentOrder.status == '已完成'}}"
+         >归还</button> 
 
-        <button  wx:if="{{(item.status == '已归还') && !item.isEdit }}" id="return_{{index}}" bindtap="setUnReturn"  size="mini" style="font-size: 9pt;" size="mini" disabled="{{isManager == 0}}"  >设置为未归还</button>
-
-
-        <button size="mini"  wx:if="{{item.isEdit != true}}" id="{{index}}"  bindtap="setMod" style="font-size: 9pt;" >修改</button>
-
-        <button size="mini"  wx:if="{{item.isEdit != true && item.status == '已发放'}}" id="{{index}}" disabled="{{rentOrder.status=='已退款' && rentOrder.payMethod == '微信支付'}}" bindtap="setKeep" style="font-size: 9pt;" >暂存</button>
-
-        <button size="mini"  wx:if="{{item.isEdit != true && item.status == '已暂存'}}" id="{{index}}" disabled="{{rentOrder.status=='已退款' && rentOrder.payMethod == '微信支付'}}" bindtap="setUnKeep" style="font-size: 9pt;" >提取</button>
+        <button  wx:if="{{(item.status == '已归还') && !item.isEdit }}" id="return_{{index}}" bindtap="setUnReturn"  size="mini" class="input"  style="font-size: 9pt;" size="mini" disabled="{{isManager == 0 || rentOrder.status == '已完成'}}"  >设置为未归还</button>
 
 
+        <button size="mini"  wx:if="{{item.isEdit != true}}" id="{{index}}"  bindtap="setMod"  class="input" 
+        disabled="{{rentOrder.status == '已完成'}}"
+        style="font-size: 9pt;" >修改</button>
 
-        <button size="mini" wx:if="{{item.isEdit == true && item.id != 0 }}" id="{{index}}" bindtap="save" style="font-size: 9pt;"  >保存</button>
-        <button size="mini" wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '立即租赁'}}" id="{{index}}" bindtap="setAppend" style="font-size: 9pt;"  >确认追加</button>
-        <button size="mini" wx:if="{{!item.isEdit && item.status == '未领取' && item.deposit_type == '预付押金'}}" id="{{index}}" bindtap="setInstance" style="font-size: 9pt;"  >确认租赁</button>
-        <button size="mini" wx:if="{{!item.isEdit && item.status == '已领取'}}" id="reserveMore_{{index}}" bindtap="reserveMore" style="font-size: 9pt;"  >转预约</button>
+        <button size="mini"  wx:if="{{item.isEdit != true && item.status == '已发放'}}" id="{{index}}" disabled="{{rentOrder.status=='已退款' && rentOrder.payMethod == '微信支付' ||  rentOrder.status == '已完成'}}" class="input" bindtap="setKeep" style="font-size: 9pt;" >暂存</button>
+
+        <button size="mini"  wx:if="{{item.isEdit != true && item.status == '已暂存'}}" id="{{index}}" disabled="{{rentOrder.status=='已退款' && rentOrder.payMethod == '微信支付' || rentOrder.status == '已完成'}}" class="input" bindtap="setUnKeep" style="font-size: 9pt;" >提取</button>
+
+
+
+        <button size="mini" wx:if="{{item.isEdit == true && item.id != 0 }}" id="{{index}}" bindtap="save" style="font-size: 9pt;" class="input" 
+        disabled="{{rentOrder.status == '已完成'}}"
+          >保存</button>
+        <button size="mini" wx:if="{{item.isEdit == true && item.status == '未领取' && item.deposit_type == '立即租赁'}}" id="{{index}}" bindtap="setAppend" class="input" style="font-size: 9pt;" disabled="{{rentOrder.status == '已完成'}}"  >确认追加</button>
+        <button size="mini" wx:if="{{!item.isEdit && item.status == '未领取' && item.deposit_type == '预付押金'}}" id="{{index}}" bindtap="setInstance"  class="input" style="font-size: 9pt;"  disabled="{{rentOrder.status == '已完成'}}">确认租赁</button>
+        <button size="mini" wx:if="{{!item.isEdit && item.status == '已领取'}}" id="reserveMore_{{index}}" bindtap="reserveMore" style="font-size: 9pt;" 
+        disabled="{{rentOrder.status == '已完成'}}" class="input"
+         >转预约</button>
       </view>
     </mp-cell>
    
   </mp-cells>
   <view style="display:flex; flex-direction: row; background-color: {{backColor}};">
-    <button bindtap="addMore" disabled="{{rentOrder.status == '已退款'}}" size="mini" >追加</button>
-    <button bindtap="restore" size="mini" >取消</button>
-    <button bindtap="restore" disabled="{{rentOrder.status != '未支付'}}" size="mini" bindtap="close" >关闭</button>
+    <button bindtap="addMore" disabled="{{rentOrder.status == '已退款' || rentOrder.status == '已完成'}}" size="mini" class="input" >追加</button>
+    <button class="input" bindtap="restore" size="mini" disabled="{{rentOrder.status == '已完成'}}"  >取消</button>
+    <button bindtap="restore" disabled="{{rentOrder.status != '未支付' || rentOrder.status == '已完成'}}" size="mini" class="input" bindtap="close" >关闭</button>
   </view>
   <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}" >实付押金：</view>
@@ -307,7 +320,7 @@
     <view class="right-column" style="color:{{textColor}}" >{{unRefundStr}}</view>
     <view class="left-column"></view>
     <view class="right-column">
-      <button disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" bindtap="refundConfirm" size="mini" style="font-size: 10pt;" >确认退款</button>
+      <button disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" bindtap="refundConfirm" size="mini" style="font-size: 10pt;" class="input" >确认退款</button>
     </view>
   </view>
   <view style="display: flex; flex-direction: row;">
@@ -365,7 +378,7 @@
     </mp-cell>
   </mp-cells>
   <view style="margin-top: 50rpx;">
-    <button class="input" bind:tap="payAdditional" > 追 加 收 款 </button>
+    <button class="input" bind:tap="payAdditional" disabled="{{true}}" > 追 加 收 款 </button>
   </view>
   <!--view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;" ></view>
   <view class="view-row" style="margin-top: 10rpx;" >

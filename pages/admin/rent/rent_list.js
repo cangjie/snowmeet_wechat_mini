@@ -85,7 +85,8 @@ Page({
             totalPaid = totalPaid + orders[i].deposit_final
             totalRefund = totalRefund + orders[i].refund
             if (orders[i].discount > 0 || orders[i].ticketDiscount > 0
-              || orders[i].noDeposit ||  orders[i].status == '已退款'){
+              || orders[i].noDeposit ||  orders[i].status == '已退款'
+              ||  orders[i].status == '已完成' ){
               orders[i].textColor = '#FF0000'
             }
             else if (orders[i].status == '已关闭'){
