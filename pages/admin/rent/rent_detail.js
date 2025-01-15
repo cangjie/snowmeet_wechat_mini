@@ -250,20 +250,12 @@ Page({
             detail.reparationStr = util.showAmount(detail.reparation)
             detail.showGallery = false
             detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
-
-            detail.pickedDateStr = detail.end_dateStr//util.formatDate(new Date(detail.start_date))
+            detail.pickedDateStr = detail.end_dateStr
             detail.pickedTimeStr = that.data.currentTimeStr
-
-
-
-
             rentOrder.details[i] = detail
-
           }
           rentOrder = that.computeAmount(rentOrder)
-
           var realTotalAmount = 0
-          
           var realTotalRefund = 0
           /*
           var refunds = []
@@ -278,7 +270,7 @@ Page({
           }
           */
 
-          var balance = []
+          var refunds = []
 
           for(var j = 0; rentOrder.order != null && rentOrder.order.refunds != null && j < rentOrder.order.refunds.length; j++){
             var r = rentOrder.order.refunds[j];
@@ -293,11 +285,11 @@ Page({
               realTotalRefund += r.amount
               balanceItem.amountStr = util.showAmount(balanceItem.amount)
               balanceItem.memo = (r.memo == ''? '退款': r.memo)
-              balance.push(balanceItem)
+              refunds.push(balanceItem)
               realTotalAmount += balanceItem.amount
             }
           }
-
+          var incomes = []
           for(var j = 0; rentOrder.order != null && rentOrder.order.payments != null && j < rentOrder.order.payments.length; j++){
             var r = rentOrder.order.payments[j]
             var balanceItem = {}
@@ -310,12 +302,14 @@ Page({
               balanceItem.amountStr = util.showAmount(balanceItem.amount)
               balanceItem.memo = '押金'
               balanceItem.payMethod = r.pay_method
-              balance.push(balanceItem)
+              incomes.push(balanceItem)
               realTotalAmount += balanceItem.amount
             }
           }
-          balance.sort((a,b) => (a.create_date - b.create_date))
-          console.log('balance', balance)
+          incomes.sort((a,b) => (a.create_date - b.create_date))
+          refunds.sort((a,b) => (a.create_date - b.create_date))
+          console.log('incomes', incomes)
+          console.log('refunds', refunds)
           
 
 
@@ -328,7 +322,7 @@ Page({
           that.setData({rentOrder: rentOrder, 
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
-              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, balance})
+              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, incomes, refunds})
           that.computeTotal()
         }
       }
