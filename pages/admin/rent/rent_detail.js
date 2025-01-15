@@ -1278,5 +1278,59 @@ Page({
     wx.navigateTo({
       url: 'pay_additional?id=' + id,
     })
+  },
+  reopen(){
+    var that = this
+    wx.showModal({
+      title: '重新打开订单',
+      content: '此操作会导致报表变化，而且会留下操作记录，是否继续？',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var url = 'https://' + app.globalData.domainName + '/core/Rent/SetFinish/' + that.data.rentOrder.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: url,
+            method:'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+              that.getData()
+            }
+          })
+        }
+      }
+    })
+  },
+  setFinish(){
+    var that = this
+    wx.showModal({
+      title: '设置订单完成',
+      content: '此操作不可逆，执行后该订单会显示在财务报表中，是否确认？',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          //var finishDate = util.formatDate(new Date()) + ' ' + util.formatTimeStr(new Date())
+          var finishDate = util.formatDateTime(new Date())
+          var url = 'https://' + app.globalData.domainName + '/core/Rent/SetFinish/' + that.data.rentOrder.id + '?finishDate=' + finishDate + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: url,
+            method:'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+              that.getData()
+            }
+          })
+        }
+      }
+    })
   }
 })
