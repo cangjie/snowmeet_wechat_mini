@@ -12,7 +12,8 @@ Page({
     rentalReduceTicket: 0,
     currentDateStr: util.formatDate(new Date()),
     currentTimeStr: util.formatTimeStr(new Date()),
-    refunding: false
+    refunding: false,
+    logs:[]
   },
 
   goHome(e){
@@ -141,9 +142,66 @@ Page({
       that.setData({showCreditGallery: true})
     }
   },
+  getLog(){
+    var that = this
+    var url = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrderLogs/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: url,
+      method:'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var logs = res.data
+        var incomes = that.data.incomes
+        for(var i = 0; i < incomes.length; i++){
+          var log = {}
+          var income = incomes[i]
+          log.create_date = income.create_date
+          log.memo = '收款'
+          log.amount = income.amount
+          logs.push(log)
+        }
+        var refunds = that.data.refunds
 
+        for(var i = 0; i < refunds.length; i++){
+          var log = {}
+          var refund = refunds[i]
+          log.create_date = refund.create_date
+          log.memo = '退款'
+          log.amount = -1 * refund.amount
+          logs.push(log)
+        }
+
+
+        for(var i = 0; i < logs.length; i++){
+          var log = logs[i]
+          switch(log.memo){
+            case '收款':
+              log.amountStr = util.showAmount(log.amount)
+              break
+            case '退款':
+              log.amountStr = util.showAmount(log.amount)
+              break
+            case '订单完成':
+              log.amountStr = '——'
+              break
+            case '订单重开':
+              log.amountStr = '——'
+              break
+            default:
+              break
+          }
+          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+        }
+        logs.sort((a, b) => (new Date(b.create_date) - new Date(a.create_date)))
+        that.setData({logs})
+      }
+    })
+  },
   getData(){
     var that = this
+    
     var getUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrder/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: getUrl,
@@ -324,6 +382,7 @@ Page({
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
               realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, incomes, refunds})
           that.computeTotal()
+          that.getLog()
         }
       }
     })

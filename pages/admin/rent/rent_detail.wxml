@@ -389,6 +389,24 @@
       bindtap="setFinish"
     > 设 置 订 单 完 成 </button>
   </view>
+  <mp-cells title="操作日志" >
+    <mp-cell>
+      <view class="view-row" style="background-color: {{backColor}};">
+        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >时间</view>
+        <view style="width: 150rpx;text-align: center;font-size: 9pt;" >操作</view>
+        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >金额</view>
+        <view style="width: 150rpx;text-align: center;font-size: 9pt;" >操作人</view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:for="{{logs}}" >
+      <view class="view-row" style="background-color:  {{backColor}};" >
+        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >{{item.create_dateStr}}</view>
+        <view style="width: 150rpx;text-align: center;font-size: 9pt;" >{{item.memo}}</view>
+        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >{{item.amountStr}}</view>
+        <view style="width: 150rpx;text-align: center;font-size: 9pt;" >{{item.member?item.member.real_name:''}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <!--view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;" ></view>
   <view class="view-row" style="margin-top: 10rpx;" >
     <view style="width: 350rpx; text-align: center;" >支付单号</view>
