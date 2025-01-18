@@ -271,7 +271,7 @@ Page({
           */
 
           var refunds = []
-
+          var totalRefund = 0
           for(var j = 0; rentOrder.order != null && rentOrder.order.refunds != null && j < rentOrder.order.refunds.length; j++){
             var r = rentOrder.order.refunds[j];
             var balanceItem = {}
@@ -288,10 +288,12 @@ Page({
               balanceItem.staffName = r.msa.member.real_name
               //balanceItem.msa = rentOrder.order.msa
               refunds.push(balanceItem)
+              totalRefund += r.amount
               realTotalAmount += balanceItem.amount
             }
           }
           var incomes = []
+          var totalIncome = 0
           for(var j = 0; rentOrder.order != null && rentOrder.order.payments != null && j < rentOrder.order.payments.length; j++){
             var r = rentOrder.order.payments[j]
             var balanceItem = {}
@@ -307,6 +309,7 @@ Page({
               balanceItem.staffName = rentOrder.order.msa.member.real_name
               //balanceItem.msa = 
               incomes.push(balanceItem)
+              totalIncome += r.amount
               realTotalAmount += balanceItem.amount
             }
           }
@@ -326,7 +329,8 @@ Page({
           that.setData({rentOrder: rentOrder, 
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
-              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, incomes, refunds})
+              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, incomes, refunds, 
+              totalIncome, totalIncomeStr: util.showAmount(totalIncome), totalRefund, totalRefundStr: util.showAmount(totalRefund)})
           that.computeTotal()
           that.getLog()
         }
