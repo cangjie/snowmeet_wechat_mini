@@ -82,7 +82,7 @@ Page({
         for(var i = 0; i < list.length; i++){
           var prod = list[i]
           
-          var desc = '<ul><li>出票后不支持退换！</li><li>出票前可申请免费退换</li><li>出票当日自动出票</li><more/></ul>'
+          var desc = '<ul><li>出票后不支持退换！</li><li>出票前可申请免费退换。</li><li>客服电话：17800191050。</li><li>出票当日自动出票。</li><more/></ul>'
           if (prod.product_name.indexOf('日场') >= 0){
             var subDesc = '<li>日场营业时间 9:00-17:00</li>'
             desc = desc.replace('<more/>', subDesc)
