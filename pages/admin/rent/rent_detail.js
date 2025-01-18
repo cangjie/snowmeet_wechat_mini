@@ -285,6 +285,8 @@ Page({
               realTotalRefund += r.amount
               balanceItem.amountStr = util.showAmount(balanceItem.amount)
               balanceItem.memo = (r.memo == ''? '退款': r.memo)
+              balanceItem.staffName = r.msa.member.real_name
+              //balanceItem.msa = rentOrder.order.msa
               refunds.push(balanceItem)
               realTotalAmount += balanceItem.amount
             }
@@ -302,6 +304,8 @@ Page({
               balanceItem.amountStr = util.showAmount(balanceItem.amount)
               balanceItem.memo = '押金'
               balanceItem.payMethod = r.pay_method
+              balanceItem.staffName = rentOrder.order.msa.member.real_name
+              //balanceItem.msa = 
               incomes.push(balanceItem)
               realTotalAmount += balanceItem.amount
             }
@@ -324,6 +328,7 @@ Page({
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
               realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, incomes, refunds})
           that.computeTotal()
+          that.getLog()
         }
       }
     })
@@ -1330,6 +1335,70 @@ Page({
             }
           })
         }
+      }
+    })
+  },
+  getLog(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrderLogs/' + that.data.rentOrder.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res) => {
+        if (res.statusCode != 200){
+          return
+        }
+        var logs = res.data
+        for(var i = 0; i < logs.length; i++){
+          var log = logs[i]
+          log.amountStr = '——'
+          log.staffName = log.member? log.member.real_name : ''
+          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+          switch(log.memo){
+            case '订单完成':
+              log.color = 'white'
+              log.back = '#0000FF'
+              break
+            case '订单重开':
+              log.color = 'black'
+              log.back = '#FFFF00'
+              break
+            default:
+              log.color = 'black'
+              log.back = 'white'
+          }
+        }
+        var incomes = that.data.incomes
+        for(var i = 0; i < incomes.length; i++){
+          var income = incomes[i]
+          var log = {}
+          log.create_date = income.create_date
+          log.amount = income.amount
+          log.memo = '收款'
+          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+          log.amountStr = util.showAmount(log.amount)
+          log.staffName = income.staffName
+          log.color = '#FF0000'
+          log.back = 'white'
+          logs.push(log)
+        }
+        var refunds = that.data.refunds
+        for(var i = 0; i < refunds.length; i++){
+          var refund = refunds[i]
+          var log = {}
+          log.create_date = refund.create_date
+          log.amount = -1 * refund.amount
+          log.memo = '退款'
+          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+          log.amountStr = util.showAmount(log.amount)
+          log.staffName = refund.staffName
+          log.color = '#00FF00'
+          log.back = 'white'
+          logs.push(log)
+        }
+        logs.sort((a, b) => (b.create_date - a.create_date))
+        console.log('log', logs)
+        that.setData({logs})
       }
     })
   }
