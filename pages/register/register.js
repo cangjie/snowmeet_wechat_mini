@@ -7,7 +7,8 @@ Page({
    */
   data: {
     isLogin: false,
-    isSuc: false
+    isSuc: false,
+    haveSessionKey: false
   },
 
   getCell(e){
@@ -58,6 +59,9 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve){
       that.setData({isLogin: true})
+      if (app.globalData.sessionKey && app.globalData.sessionKey != ''){
+        that.setData({haveSessionKey: true})
+      }
     })
   },
 

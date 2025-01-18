@@ -3,7 +3,7 @@
   <block wx:if="{{!isSuc}}" >
     <view>欢迎注册成为易龙雪聚会员</view>
     <view>点击下方按钮，授权手机号，即可注册成为会员</view>
-    <view><button open-type="getPhoneNumber" bindgetphonenumber="getCell" > 授 权 </button></view>
+    <view><button open-type="getPhoneNumber" bindgetphonenumber="getCell" disabled="{{!haveSessionKey}}" > 授 权 </button></view>
   </block>
   <block wx:else >
     <view>恭喜您成为易龙雪聚会员，请联系店员为您宣讲会员福利并开单。</view>
