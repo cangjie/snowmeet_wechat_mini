@@ -150,7 +150,14 @@ Page({
           return
         }
         that.setData({qrcodeUrl: res.data})
+        var interval = setInterval(() => {
+          that.checkPaid()
+        }, 1000)
+        that.setData({interval})
       }
     })
+  },
+  checkPaid(){
+
   }
 })

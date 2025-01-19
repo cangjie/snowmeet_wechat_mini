@@ -345,7 +345,7 @@
 
 
   <view style="margin-top: 50rpx;">
-    <button class="input" bind:tap="payAdditional" disabled="{{true}}" > 追 加 收 款 </button>
+    <button class="input" bind:tap="payAdditional" > 追 加 收 款 </button>
     <button class="input" style="margin-top: 50rpx;" 
       wx:if="{{rentOrder.status == '已完成' }}" 
       bindtap="reopen"
