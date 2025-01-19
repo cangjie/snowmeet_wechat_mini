@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    retryTimes: 0
   },
 
   searchUser(){
@@ -93,9 +93,19 @@ Page({
       success:(res)=>{
         console.log('check scan', res)
         if (res.statusCode != 200 && res.statusCode != 404){
-          clearInterval(that.data.interVal)
+          if (that.data.retryTimes >= 10){
+            clearInterval(that.data.interVal)
+            wx.showToast({
+              title: '网络不通',
+              icon: 'error'
+            })
+          }
+          else{
+            that.data.retryTimes++
+          }
         }
         else if (res.statusCode == 200){
+          that.data.retryTimes = 0
           //clearInterval(that.data.interVal)
           var scan = res.data
           var needJump = false
@@ -124,9 +134,16 @@ Page({
             }
           }
         }
+        else{
+          that.data.retryTimes = 0
+        }
       },
       fail:(res)=>{
         clearInterval(that.data.interVal)
+        wx.showToast({
+          title: '手机硬件故障',
+          icon: 'error'
+        })
       }
     })
   },
