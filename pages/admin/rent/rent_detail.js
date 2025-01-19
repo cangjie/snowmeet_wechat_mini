@@ -166,6 +166,9 @@ Page({
           rentOrder.deposit_real_str = util.showAmount(rentOrder.deposit_real)
           rentOrder.deposit_reduce_str = util.showAmount(rentOrder.deposit_reduce)
           rentOrder.deposit_final_str = util.showAmount(rentOrder.deposit_final)
+          rentOrder.additionalAmountStr = util.showAmount(rentOrder.additionalPaidAmount)
+          rentOrder.depositPaid = rentOrder.deposit_real + rentOrder.additionalPaidAmount - rentOrder.deposit_reduce
+          rentOrder.depositPaidStr = util.showAmount(rentOrder.depositPaid)
           var dueEndTime = new Date(rentOrder.due_end_date)
           rentOrder.due_end_time_str = util.formatDate(dueEndTime) + ' ' + util.formatTimeStr(dueEndTime)
           if (rentOrder.order_id > 0){
@@ -324,7 +327,7 @@ Page({
 
 
           var realTotalRefundStr = util.showAmount(realTotalRefund)
-          var bonus = rentOrder.deposit_final - realTotalRefund
+          var bonus = rentOrder.deposit_final - realTotalRefund + that.data.rentOrder.additionalPaidAmount
           
           that.setData({rentOrder: rentOrder, 
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
@@ -431,7 +434,7 @@ Page({
       totalReparation = totalReparation + detail.reparation
       totalOvertimeCharge = totalOvertimeCharge + detail.overtime_charge
     }
-    var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation - totalOvertimeCharge
+    var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation - totalOvertimeCharge + that.data.rentOrder.additionalPaidAmount
 
     var unRefund = refundAmount - that.data.realTotalRefund;
     var unRefundStr = util.showAmount(unRefund)
@@ -1386,6 +1389,23 @@ Page({
           log.back = 'white'
           logs.push(log)
         }
+        var addPays = that.data.rentOrder.additionalPayments
+        for(var i = 0; i < addPays.length; i++){
+          var addPay = addPays[i]
+          if (addPay.is_paid != 1){
+            continue
+          }
+          var log = {}
+          log.create_date = addPay.create_date
+          log.amount = addPay.amount
+          log.memo = addPay.reason
+          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+          log.amountStr = util.showAmount(log.amount)
+          log.staffName = addPay.staffMember.real_name
+          log.color = '#FF0000'
+          log.back = 'white'
+          logs.push(log)
+        }
         var refunds = that.data.refunds
         for(var i = 0; i < refunds.length; i++){
           var refund = refunds[i]
@@ -1400,8 +1420,8 @@ Page({
           log.back = 'white'
           logs.push(log)
         }
-        logs.sort((a, b) => (b.create_date - a.create_date))
-        console.log('log', logs)
+        logs.reverse((a, b) => (b.create_date - a.create_date))
+        //console.log('log', logs)
         that.setData({logs})
       }
     })

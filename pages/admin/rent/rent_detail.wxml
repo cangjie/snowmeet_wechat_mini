@@ -22,8 +22,15 @@
   <view style="display: flex; flex-direction: row;">
     <view class="left-column" style="color:{{textColor}}" >押金总计：</view>
     <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.deposit_real_str}}</view>
+    <view class="left-column" style="color:{{textColor}}"  >押金追加：</view>
+    <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.additionalAmountStr}}</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
     <view class="left-column" style="color:{{textColor}}"  >押金减免：</view>
     <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.deposit_reduce_str}}</view>
+    <view class="left-column" style="color:{{textColor}}" >押金实付：</view>
+    <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.depositPaidStr}}</view>
+    
   </view>
 
   <view style="display: flex; flex-direction: row;">
@@ -270,7 +277,7 @@
   </view>
   <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}" >实付押金：</view>
-    <view class="right-column" style="color: red;">{{rentOrder.deposit_final_str}}</view>
+    <view class="right-column" style="color: red;">{{rentOrder.depositPaidStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
