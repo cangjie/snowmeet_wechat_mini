@@ -16,14 +16,14 @@
         {
           "name": "payrentadd",
           "pathName": "pages/payment/rent_pay_add",
-          "query": "id=16",
+          "query": "id=19",
           "launchMode": "default",
           "scene": null
         },
         {
           "name": "pay_recept",
           "pathName": "pages/payment/pay_recept",
-          "query": "id=11720",
+          "query": "id=11723",
           "launchMode": "default",
           "scene": null
         },

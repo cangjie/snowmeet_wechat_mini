@@ -47,41 +47,35 @@
     <view class="left-column" style="color:{{textColor}}"  >店员：</view>
     <view class="right-column" style="color:{{textColor}}"   >{{rentOrder.staff_name}}</view>
   </view>
-  <mp-cells title="收款详细 {{incomes.length}}笔 总计：{{totalIncomeStr}}" >
-    <mp-cell wx:for="{{incomes}}" >
+  <mp-cells title="收款详细 {{rentOrder.payments.length}}笔 总计：{{rentOrder.totalChargeStr}}" >
+    <mp-cell wx:for="{{rentOrder.payments}}" >
       <view class="view-row"  >
         <view class="left-column" >单号：</view>
-        <view class="right-column" >{{item.outTradeNo}}</view>
+        <view class="right-column" >{{item.out_trade_no}}</view>
       </view>
       <view class="view-row"  >
         <view class="left-column" >支付方式：</view>
-        <view class="right-column" >{{item.payMethod}}</view>
+        <view class="right-column" >{{item.pay_method}}</view>
         <view class="left-column" >备注：</view>
         <view class="right-column" >{{item.memo}}</view>
       </view>
       <view class="view-row"  >
         <view class="left-column" >时间：</view>
-        <view class="right-column" >{{item.create_timeStr}}</view>
+        <view class="right-column" >{{item.create_dateStr}}</view>
         <view class="left-column" >金额：</view>
         <view class="right-column" >{{item.amountStr}}</view>
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="退款详细 {{refunds.length}}笔 总计：{{totalRefundStr}}" >
-    <mp-cell wx:for="{{refunds}}" >
+  <mp-cells title="退款详细 {{rentOrder.refunds.length}}笔 总计：{{rentOrder.totalRefundStr}}" >
+    <mp-cell wx:for="{{rentOrder.refunds}}" >
       <view class="view-row"  >
         <view class="left-column" >单号：</view>
-        <view class="right-column" >{{item.outTradeNo}}</view>
-      </view>
-      <view class="view-row"  >
-        <view class="left-column" >支付方式：</view>
-        <view class="right-column" >{{item.payMethod}}</view>
-        <view class="left-column" >备注：</view>
-        <view class="right-column" >{{item.memo}}</view>
+        <view class="right-column" >{{item.out_refund_no}}</view>
       </view>
       <view class="view-row"  >
         <view class="left-column" >时间：</view>
-        <view class="right-column" >{{item.create_timeStr}}</view>
+        <view class="right-column" >{{item.create_dateStr}}</view>
         <view class="left-column" >金额：</view>
         <view class="right-column" >{{item.amountStr}}</view>
       </view>
@@ -352,7 +346,7 @@
 
 
   <view style="margin-top: 50rpx;">
-    <button class="input" bind:tap="payAdditional" > 追 加 收 款 </button>
+    <button class="input" bind:tap="payAdditional" disabled="{{rentOrder.status == '已完成'}}"  > 追 加 收 款 </button>
     <button class="input" style="margin-top: 50rpx;" 
       wx:if="{{rentOrder.status == '已完成' }}" 
       bindtap="reopen"

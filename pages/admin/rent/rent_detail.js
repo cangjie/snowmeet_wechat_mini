@@ -285,13 +285,13 @@ Page({
               balanceItem.create_dateStr = util.formatDateTime(new Date(r.create_date))
               balanceItem.create_timeStr = util.formatTimeStr(new Date(r.create_date))
               balanceItem.amount = -1 * r.amount 
-              realTotalRefund += r.amount
+              //realTotalRefund += r.amount
               balanceItem.amountStr = util.showAmount(balanceItem.amount)
               balanceItem.memo = (r.memo == ''? '退款': r.memo)
               balanceItem.staffName = r.msa.member.real_name
               //balanceItem.msa = rentOrder.order.msa
               refunds.push(balanceItem)
-              totalRefund += r.amount
+              //totalRefund += r.amount
               realTotalAmount += balanceItem.amount
             }
           }
@@ -326,7 +326,7 @@ Page({
 
 
 
-          var realTotalRefundStr = util.showAmount(realTotalRefund)
+          var realTotalRefundStr = util.showAmount(rentOrder.totalRefund)
           var bonus = rentOrder.deposit_final - realTotalRefund + that.data.rentOrder.additionalPaidAmount
           
           that.setData({rentOrder: rentOrder, 
@@ -436,7 +436,7 @@ Page({
     }
     var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation - totalOvertimeCharge + that.data.rentOrder.additionalPaidAmount
 
-    var unRefund = refundAmount - that.data.realTotalRefund;
+    var unRefund = refundAmount - rentOrder.totalRefund;
     var unRefundStr = util.showAmount(unRefund)
 
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
@@ -492,6 +492,24 @@ Page({
       details[i].refund = refund
       
     }
+    for(var i = 0; i < rentOrder.payments.length; i++){
+      var p = rentOrder.payments[i]
+      p.amountStr = util.showAmount(p.amount)
+      p.create_dateStr = util.formatDateTime(new Date(p.create_date))
+      p.memo = '押金'
+      for(var j = 0; j < rentOrder.additionalPayments.length; j++){
+        if (p.order_id == rentOrder.additionalPayments[j].order_id){
+          p.memo = rentOrder.additionalPayments[j].reason
+        }
+      }
+    }
+    for(var i = 0; i < rentOrder.refunds.length; i++){
+      var r = rentOrder.refunds[i]
+      r.create_dateStr = util.formatDateTime(new Date(r.create_date))
+      r.amountStr = util.showAmount(r.amount)
+    }
+    rentOrder.totalChargeStr = util.showAmount(rentOrder.totalCharge)
+    rentOrder.totalRefundStr = util.showAmount(rentOrder.totalRefund)
     that.setData({rentOrder: rentOrder})
     return rentOrder
   },
@@ -805,6 +823,7 @@ Page({
       success: (res) => {
         if (res.statusCode == 200){
           that.getData()
+          that.close()
         }
       },
       complete:(res)=>{
@@ -1115,7 +1134,7 @@ Page({
     var detail = rentOrder.details[id]
     that.computeAmount(rentOrder)
     that.computeTotal()
-    if (rentOrder.deposit_final < that.data.refundAmount){
+    if (rentOrder.depositPaid < that.data.refundAmount){
       wx.showToast({
         title: '应退金额>押金',
         icon: 'error'
@@ -1360,7 +1379,8 @@ Page({
           var log = logs[i]
           log.amountStr = '——'
           log.staffName = log.member? log.member.real_name : ''
-          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+          log.create_date = new Date(log.create_date)
+          log.create_dateStr = util.formatDateTime(log.create_date)
           switch(log.memo){
             case '订单完成':
               log.color = 'white'
@@ -1382,7 +1402,8 @@ Page({
           log.create_date = income.create_date
           log.amount = income.amount
           log.memo = '收款'
-          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+          log.create_date = new Date(log.create_date)
+          log.create_dateStr = util.formatDateTime(log.create_date)
           log.amountStr = util.showAmount(log.amount)
           log.staffName = income.staffName
           log.color = '#FF0000'
@@ -1396,17 +1417,17 @@ Page({
             continue
           }
           var log = {}
-          log.create_date = addPay.create_date
+          log.create_date = new Date(addPay.create_date)
           log.amount = addPay.amount
           log.memo = addPay.reason
-          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+          log.create_dateStr = util.formatDateTime(log.create_date)
           log.amountStr = util.showAmount(log.amount)
           log.staffName = addPay.staffMember.real_name
           log.color = '#FF0000'
           log.back = 'white'
           logs.push(log)
         }
-        var refunds = that.data.refunds
+        var refunds = that.data.rentOrder.refunds
         for(var i = 0; i < refunds.length; i++){
           var refund = refunds[i]
           var log = {}
@@ -1415,12 +1436,12 @@ Page({
           log.memo = '退款'
           log.create_dateStr = util.formatDateTime(new Date(log.create_date))
           log.amountStr = util.showAmount(log.amount)
-          log.staffName = refund.staffName
+          log.staffName = refund.msa.member.real_name
           log.color = '#00FF00'
           log.back = 'white'
           logs.push(log)
         }
-        logs.reverse((a, b) => (b.create_date - a.create_date))
+        logs.sort((a, b) => (new Date(b.create_dateStr) - new Date(a.create_dateStr)))
         //console.log('log', logs)
         that.setData({logs})
       }
