@@ -1,4 +1,6 @@
 // pages/tickets/me_pick.js
+const app = getApp()
+const util = require('../../utils/util')
 Page({
 
   /**
@@ -12,7 +14,11 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    var that = this
+    that.setData({templateId: options.templateId, channel: options.channel})
+    app.loginPromiseNew.then(function(resolve){
+      that.getTickets()
+    })
   },
 
   /**
@@ -62,5 +68,41 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  getTickets(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/Ticket/MeGetTickListByMember/' + that.data.templateId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var tickets = res.data
+        if (tickets.length == 0){
+          that.pickTicket()
+        }
+        that.setData({tickets})
+      }
+    })
+  },
+  pickTicket(){
+    var that = this
+    var pickUrl = 'https://' + app.globalData.domainName + '/core/Ticket/MePickTicket/' + that.data.templateId + '?channel=' + encodeURIComponent(that.data.channel) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: pickUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        wx.showToast({
+          title: '领取成功',
+          icon: 'success'
+        })
+        that.getTickets()
+      }
+    })
   }
 })
