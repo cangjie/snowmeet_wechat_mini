@@ -14,9 +14,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pay",
+          "name": "payrentadd",
           "pathName": "pages/payment/rent_pay_add",
-          "query": "id=10",
+          "query": "id=19",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "pay_recept",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=11723",
           "launchMode": "default",
           "scene": null
         },

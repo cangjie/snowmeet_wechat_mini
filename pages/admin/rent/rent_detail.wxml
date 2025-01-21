@@ -22,8 +22,15 @@
   <view style="display: flex; flex-direction: row;">
     <view class="left-column" style="color:{{textColor}}" >押金总计：</view>
     <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.deposit_real_str}}</view>
+    <view class="left-column" style="color:{{textColor}}"  >押金追加：</view>
+    <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.additionalAmountStr}}</view>
+  </view>
+  <view style="display: flex; flex-direction: row;">
     <view class="left-column" style="color:{{textColor}}"  >押金减免：</view>
     <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.deposit_reduce_str}}</view>
+    <view class="left-column" style="color:{{textColor}}" >押金实付：</view>
+    <view class="right-column" style="color:{{textColor}}"  >{{rentOrder.depositPaidStr}}</view>
+    
   </view>
 
   <view style="display: flex; flex-direction: row;">
@@ -40,40 +47,40 @@
     <view class="left-column" style="color:{{textColor}}"  >店员：</view>
     <view class="right-column" style="color:{{textColor}}"   >{{rentOrder.staff_name}}</view>
   </view>
-  <mp-cells title="收款列表 {{incomes.length}}笔" >
-    <mp-cell>
-      <view class="view-row" style="background-color: {{backColor}};">
-        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >时间</view>
-        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >金额</view>
-        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >备注</view>
+  <mp-cells title="收款详细 {{rentOrder.payments.length}}笔 总计：{{rentOrder.totalChargeStr}}" >
+    <mp-cell wx:for="{{rentOrder.payments}}" >
+      <view class="view-row"  >
+        <view class="left-column" >单号：</view>
+        <view class="right-column" >{{item.out_trade_no}}</view>
       </view>
-    </mp-cell>
-    <mp-cell wx:for="{{incomes}}" >
-      <view class="view-row" style="background-color: {{backColor}};" >
-        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >{{item.create_dateStr}}</view>
-        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >{{item.amountStr}}</view>
-        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >{{item.memo}}</view>
+      <view class="view-row"  >
+        <view class="left-column" >支付方式：</view>
+        <view class="right-column" >{{item.pay_method}}</view>
+        <view class="left-column" >备注：</view>
+        <view class="right-column" >{{item.memo}}</view>
       </view>
-    </mp-cell>
-  </mp-cells>
-  <mp-cells title="退款列表 {{refunds.length}}笔" >
-    <mp-cell>
-      <view class="view-row" style="background-color: {{backColor}};">
-        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >时间</view>
-        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >金额</view>
-        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >备注</view>
-      </view>
-    </mp-cell>
-    <mp-cell wx:for="{{refunds}}" >
-      <view class="view-row" style="background-color: {{backColor}};" >
-        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >{{item.create_dateStr}}</view>
-        <view style="width: 100rpx;text-align: right;font-size: 9pt;" >{{item.amountStr}}</view>
-        <view style="width: 350rpx;text-align: center;font-size: 9pt;" >{{item.memo}}</view>
+      <view class="view-row"  >
+        <view class="left-column" >时间：</view>
+        <view class="right-column" >{{item.create_dateStr}}</view>
+        <view class="left-column" >金额：</view>
+        <view class="right-column" >{{item.amountStr}}</view>
       </view>
     </mp-cell>
   </mp-cells>
-  
-
+  <mp-cells title="退款详细 {{rentOrder.refunds.length}}笔 总计：{{rentOrder.totalRefundStr}}" >
+    <mp-cell wx:for="{{rentOrder.refunds}}" >
+      <view class="view-row"  >
+        <view class="left-column" >单号：</view>
+        <view class="right-column" >{{item.out_refund_no}}</view>
+      </view>
+      <view class="view-row"  >
+        <view class="left-column" >时间：</view>
+        <view class="right-column" >{{item.create_dateStr}}</view>
+        <view class="left-column" >金额：</view>
+        <view class="right-column" >{{item.amountStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <view style="display: flex; flex-direction: row;" >
     <view class="left-column" style="color:{{textColor}}"  >订单时间：</view>
     <view class="right-column" style="width:400rpx;color:{{textColor}}" >{{rentOrder.create_date_str}}</view>
@@ -83,7 +90,7 @@
     <image id="credit_{{index}}" bindtap="showGallery" wx:for="{{rentOrder.guarantee_credit_photos_arr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
   </view>
   <mp-gallery show="{{showCreditGallery}}" showDelete="{{false}}" imgUrls="{{rentOrder.guarantee_credit_photos_arr}}" current="{{0}}"  ></mp-gallery>
-  <mp-cells title="租赁明细 {{rentOrder.details.length}}" style="background-color: {{backColor}};" >
+  <mp-cells title="租赁明细 总计：{{rentOrder.details.length}}" style="background-color: {{backColor}};" >
     <mp-cell wx:for="{{rentOrder.details}}" style="margin-left: 0rpx;">
       <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
         <view class="left-column" style="color:{{textColor}}" >编号：</view>
@@ -264,7 +271,7 @@
   </view>
   <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}" >实付押金：</view>
-    <view class="right-column" style="color: red;">{{rentOrder.deposit_final_str}}</view>
+    <view class="right-column" style="color: red;">{{rentOrder.depositPaidStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
@@ -336,49 +343,10 @@
     </view>
     
   </view>
-  <mp-cells title="收款详细 {{incomes.length}}笔" >
 
-    <mp-cell wx:for="{{incomes}}" >
-      <view class="view-row"  >
-        <view class="left-column" >单号：</view>
-        <view class="right-column" >{{item.outTradeNo}}</view>
-      </view>
-      <view class="view-row"  >
-        <view class="left-column" >支付方式：</view>
-        <view class="right-column" >{{item.payMethod}}</view>
-        <view class="left-column" >备注：</view>
-        <view class="right-column" >{{item.memo}}</view>
-      </view>
-      <view class="view-row"  >
-        <view class="left-column" >时间：</view>
-        <view class="right-column" >{{item.create_timeStr}}</view>
-        <view class="left-column" >金额：</view>
-        <view class="right-column" >{{item.amountStr}}</view>
-      </view>
-    </mp-cell>
-  </mp-cells>
-  <mp-cells title="退款详细 {{refunds.length}}笔" >
-    <mp-cell wx:for="{{refunds}}" >
-      <view class="view-row"  >
-        <view class="left-column" >单号：</view>
-        <view class="right-column" >{{item.outTradeNo}}</view>
-      </view>
-      <view class="view-row"  >
-        <view class="left-column" >支付方式：</view>
-        <view class="right-column" >{{item.payMethod}}</view>
-        <view class="left-column" >备注：</view>
-        <view class="right-column" >{{item.memo}}</view>
-      </view>
-      <view class="view-row"  >
-        <view class="left-column" >时间：</view>
-        <view class="right-column" >{{item.create_timeStr}}</view>
-        <view class="left-column" >金额：</view>
-        <view class="right-column" >{{item.amountStr}}</view>
-      </view>
-    </mp-cell>
-  </mp-cells>
+
   <view style="margin-top: 50rpx;">
-    <button class="input" bind:tap="payAdditional" disabled="{{true}}" > 追 加 收 款 </button>
+    <button class="input" bind:tap="payAdditional" disabled="{{rentOrder.status == '已完成'}}"  > 追 加 收 款 </button>
     <button class="input" style="margin-top: 50rpx;" 
       wx:if="{{rentOrder.status == '已完成' }}" 
       bindtap="reopen"
@@ -427,7 +395,24 @@
     <button class="input" > 追 加 押 金 </button>
   </view-->
   <view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;margin-bottom: 50rpx;" ></view>
-
+  <mp-cells title="订单操作记录" >
+    <mp-cell>
+      <view class="view-row" style="background-color: {{backColor}};">
+        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >时间</view>
+        <view style="width: 150rpx;text-align: center;font-size: 9pt;" >操作</view>
+        <view style="width: 150rpx;text-align: right;font-size: 9pt;" >金额</view>
+        <view style="width: 250rpx;text-align: center;font-size: 9pt;" >负责人</view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:for="{{logs}}" >
+      <view class="view-row" style="{{item.color? 'color:' + item.color: ''}};{{item.back? 'background-color:' + item.back : ''}}" >
+        <view style="width: 300rpx;text-align: left;font-size: 9pt;" >{{item.create_dateStr}}</view>
+        <view style="width: 150rpx;text-align: center;font-size: 9pt;" >{{item.memo}}</view>
+        <view style="width: 150rpx;text-align: right;font-size: 9pt;" >{{item.amountStr}}</view>
+        <view style="width: 250rpx;text-align: center;font-size: 9pt;" >{{item.staffName}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <view>
     <button bindtap="goHome" class="input" > 返 回 首 页 </button>
   </view>
