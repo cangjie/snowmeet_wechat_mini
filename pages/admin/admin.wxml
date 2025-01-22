@@ -64,6 +64,7 @@
     <mp-cell id="wl_course_list" value="课程列表" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="优惠券" >
+    <mp-cell id="ticket_use" value="核销" bindtap="nav" ></mp-cell>
     <mp-cell id="ticket_print" value="打印" bindtap="nav" ></mp-cell>
   </mp-cells> 
 

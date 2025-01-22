@@ -261,6 +261,9 @@ Page({
       case 'maintainSerchQuick':
         path = '/pages/admin/maintain/search_quick'
         break
+      case 'ticket_use':
+        path = '/pages/admin/ticket/use_entry'
+        break
       default:
         break
     }

@@ -132,7 +132,9 @@
     "pages/admin/ski_pass/reserve_qrcode",
     "pages/admin/env",
     "pages/admin/maintain/search_quick",
-    "pages/tickets/me_pick"
+    "pages/tickets/me_pick",
+    "pages/admin/ticket/use_entry",
+    "pages/admin/ticket/ticket_unuse_list"
   ],
   "window": {
     "backgroundTextStyle": "light",
