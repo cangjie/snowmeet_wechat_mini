@@ -80,6 +80,16 @@ Page({
           return
         }
         var tickets = res.data
+        for (var i = 0; i < tickets.length; i++){
+          var memo = tickets[i].memo
+          if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
+            tickets[i].rich = true
+          }
+          else{
+            tickets[i].rich = false
+            tickets[i].usage = memo.split(';')
+          }
+        }
         if (tickets.length == 0){
           that.pickTicket()
         }
