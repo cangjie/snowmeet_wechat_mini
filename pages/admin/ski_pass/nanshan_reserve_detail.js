@@ -25,7 +25,8 @@ Page({
     showedMsg: [],
     reConnecting: false,
     reConnectTimes: 0,
-    copies: 1
+    copies: 1,
+    canceling: false
   },
 
   getSkiPass(id){
@@ -289,9 +290,6 @@ Page({
     if (readyForPrint){
       that.setData({readyForPrint: false})
       var buff1 = that.getCommand(that.data.productReserveList, that.data.currentIndex)
-      //var buff2 = this.getCommand('【雪板标签】')
-      //var buff3 = this.getCommand('【存根】')
-      //var newBuff = [...buff1, ...buff2, ...buff3]
       var newBuff = [...buff1]
       console.log('buff', newBuff)
       that.prepareSend(newBuff)
@@ -797,5 +795,56 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  cancel(e){
+    var that = this
+    var id = e.currentTarget.id
+    var productReserveList = that.data.productReserveList
+    var skipass = undefined
+    for(var i = 0; i < productReserveList.memberList.length; i++){
+      for(var j = 0; j < productReserveList.memberList[i].skiPasses.length; j++){
+        if (productReserveList.memberList[i].skiPasses[j].id == parseInt(id)){
+          skipass = productReserveList.memberList[i].skiPasses[j]
+        }
+      }
+    }
+    if (!skipass){
+      return
+    }
+    var title = skipass.product_name + ' 退票'
+    var content = '姓名：' + skipass.contact_name + ' \r\n电话：' + skipass.contact_cell + ' 预订日期：' + util.formatDate(new Date(skipass.reserve_date))
+    that.setData({canceling: true})
+    wx.showModal({
+      title: title,
+      content: content,
+      confirmText: '退票',
+      cancelText: '取消',
+      complete: (res) => {
+        if (res.cancel) {
+          that.setData({canceling: false})
+        }
+        if (res.confirm) {
+          var cancelUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/CancelByStaff/' + skipass.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: cancelUrl,
+            method: 'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                that.showErr('退票失败')
+              }
+              that.getData()
+            }
+          })
+        }
+      }
+    })
+    
+
+  },
+  showErr(msg){
+    wx.showToast({
+      title: msg,
+      icon: 'error'
+    })
   }
 })

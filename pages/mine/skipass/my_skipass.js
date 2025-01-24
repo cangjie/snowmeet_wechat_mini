@@ -99,8 +99,8 @@ Page({
             var subDesc = '<li>夜场营业时间18:30-22:00（除夕、初一仅开放日场）</li>'
             desc = desc.replace('<more/>', subDesc)
           }
+          
           prod.desc = desc
-         
           prod.sale_price_str = util.showAmount(prod.ticket_price)
           prod.deposit_str = util.showAmount(prod.deposit)
           prod.reserve_dateStr = util.formatDate(new Date(prod.reserve_date))
@@ -117,6 +117,9 @@ Page({
               break
             case '已出票':
               prod.color = 'red'
+              break
+            case '已退票':
+              prod.color = '#C0C0C0'
               break
             default:
               break
