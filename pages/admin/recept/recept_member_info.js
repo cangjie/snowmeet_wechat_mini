@@ -10,7 +10,8 @@ Page({
     score: 0,
     totalScore: 0,
     shop: '',
-    valid: false
+    valid: false,
+    invalid: true
   },
 
   userInfoUpdate(e){
@@ -79,7 +80,12 @@ Page({
   shopSelected(e){
     console.log('shop selected', e)
     var that = this
-    that.setData({shop: e.detail.shop})
+    var shop = e.detail.shop
+    var invalid = false
+    if (shop == ''){
+      invalid = true
+    }
+    that.setData({shop: e.detail.shop, invalid})
   },
 
   gotoFlow(e){

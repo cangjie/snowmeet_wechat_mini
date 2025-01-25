@@ -16,9 +16,9 @@
       <view style="display: flex;flex-direction: row;" >
         <!--button size="mini" disabled="{{shop == ''}}" bindtap="gotoFlow" id="sale" > 店 销 现 货 </button>
         <view style="width: 20rpx;"></view-->
-        <button size="mini" disabled="{{ shop == '' || openId == '' }}" bindtap="gotoFlow" id="maintain" class="input" disabled="{{!valid}}"  > 养 护 </button>
+        <button size="mini" disabled="{{ shop == '' || openId == '' || invalid }}" bindtap="gotoFlow" id="maintain" class="input"   > 养 护 </button>
         <view style="width: 20rpx;"></view>
-        <button size="mini" disabled="{{ shop == '' || openId == '' }}" bindtap="gotoFlow" id="rent" class="input" disabled="{{!valid}}" > 租 赁 </button>
+        <button size="mini" disabled="{{ shop == '' || openId == '' || invalid }}" bindtap="gotoFlow" id="rent" class="input"  > 租 赁 </button>
       </view>
     </mp-cell>
   </mp-cells>

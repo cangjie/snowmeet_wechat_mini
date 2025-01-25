@@ -32,6 +32,7 @@
             <view class="right-column" style="width: 260rpx;" bindtap="showCard" id="{{item.id}}" >{{item.card_no == null? '未填':item.card_no}}</view>
             <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
               <button id="{{item.id}}" class="input" size="mini" bindtap="setEdit" style="width: 125rpx;" >填写</button>
+              <button disabled="{{canceling || !item.canRefund }}" id="{{item.id}}" class="input" size="mini" bindtap="cancel"  style="width: 125rpx;" >退票</button>
             </view>
           </view>
 
