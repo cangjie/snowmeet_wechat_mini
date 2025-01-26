@@ -264,6 +264,9 @@ Page({
       case 'ticket_use':
         path = '/pages/admin/ticket/use_entry'
         break
+      case 'ziwoyou_order':
+        path = '/pages/admin/ski_pass/dhhs_skipass_order'
+        break
       default:
         break
     }

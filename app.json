@@ -134,7 +134,8 @@
     "pages/admin/maintain/search_quick",
     "pages/tickets/me_pick",
     "pages/admin/ticket/use_entry",
-    "pages/admin/ticket/ticket_unuse_list"
+    "pages/admin/ticket/ticket_unuse_list",
+    "pages/admin/ski_pass/dhhs_skipass_order"
   ],
   "window": {
     "backgroundTextStyle": "light",
