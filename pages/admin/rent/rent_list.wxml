@@ -14,6 +14,18 @@
       </picker>
     </view>
   </view>
+  <!--view style="text-align: center;">
+    <radio-group>
+      <radio checked="{{true}}">按开单时间</radio>
+      <radio>按操作时间</radio>
+    </radio-group>
+  </view>
+  <view style="text-align: center;">
+    <radio-group>
+      <radio checked="{{true}}">倒序</radio>
+      <radio>正序</radio>
+    </radio-group>
+  </view-->
   <view style="display: flex;flex-direction: row;">
     <view class="left-column" >状态：</view>
     <view class="right-column" >

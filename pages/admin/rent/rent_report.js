@@ -43,33 +43,23 @@ Page({
     wx.request({
       url: getUnSettledOrderBeforeUrl,
       method: 'GET',
+      timeout: 3600000,
       success:(res)=>{
         console.log('unsettled before', res)
-
         var orders = res.data.orders
-
         var currentIncomeOrders = []
-
         var sameDaySettled = that.data.CurrentSameDaySettledSet
-
-         
-
         var currentBusinessRental = that.data.currentBusinessRental
         var currentBusinessRentalSettled = that.data.currentBusinessRentalSettled
-        var currentBusinessRentalUnSettled = that.data.currentBusinessRentalUnSettled
-        
-        for(var i = 0; orders != null && i < orders.length; i++){
-
-          
+        var currentBusinessRentalUnSettled = that.data.currentBusinessRentalUnSettled 
+        for(var i = 0; orders != null && i < orders.length; i++){ 
           var createDate = new Date(orders[i].create_date)
           orders[i].create_date_str = util.formatDate(createDate)
           orders[i].create_time_str = util.formatTimeStr(createDate)
           orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
           orders[i].currentStatus = '已结算'
-
           orders[i].currentDayRentalSettled = 0
           orders[i].currentDayRentalUnSettled = 0
-
           var orderRental = 0
           var rentalList = orders[i].rentalDetails
           var haveCurrentDayIncome = false
@@ -78,17 +68,12 @@ Page({
             var currentDate = new Date(that.data.currentDate.toString()+'T00:00:00')
             var rentalDate = new Date(rental.date)
             var rentalAmount = parseFloat(rental.rental)
-            
-            
-
             if (currentDate.getFullYear() == rentalDate.getFullYear()
               && currentDate.getMonth() == rentalDate.getMonth()
               && currentDate.getDate() == rentalDate.getDate()){
-              
               if (!isNaN(rentalAmount)){
                 haveCurrentDayIncome = true
                 currentBusinessRental = currentBusinessRental + rentalAmount
-                
                 if (rental.type != ''){
 
                   currentBusinessRentalSettled = currentBusinessRentalSettled + rentalAmount
