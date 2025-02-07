@@ -42,6 +42,11 @@ Component({
                 var ticketList = res.data
                 for(var i = 0; i < ticketList.length; i++){
                   ticketList[i].usage = ticketList[i].memo.toString().replace(/;/g,'\r\n')
+                  if (ticketList[i].usage.indexOf('<') >= 0 
+                    && ticketList[i].usage.indexOf('>') >= 0 ){
+                      ticketList[i].usage = undefined
+                  }
+                  
                 }
                 that.setData({ticket_list: ticketList})
 
@@ -61,11 +66,12 @@ Component({
             var ticketList = res.data
             
             for(var i = 0; i < ticketList.length; i++){
-              //ticketList[i].usage = ticketList[i].memo.split(';')
               ticketList[i].usage = ticketList[i].memo.toString().replace(/;/g,'\r\n')
+              if (ticketList[i].usage.indexOf('<') >= 0 
+                    && ticketList[i].usage.indexOf('>') >= 0 ){
+                ticketList[i].usage = undefined
+              }
             }
-            
-            
             that.setData({ticket_list: ticketList})
           }
         })

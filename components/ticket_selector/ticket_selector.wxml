@@ -16,16 +16,18 @@
             </text>
           </view>
           <view  id="{{index}}" wx:else  bindtap="select" style="margin-left: 20rpx;" >
-            <text  decode="{{true}}" style="font-size: 9pt; margin-left: 20rpx;" >              
+            <text wx:if="{{item.usage}}"  decode="{{true}}" style="font-size: 9pt; margin-left: 20rpx;" >              
               {{item.usage}}
             </text>
+            <rich-text wx:else style="text-align: left;"  nodes="{{item.memo}}" ></rich-text>
           </view>
         </block>
         <block wx:else >
           <view  id="{{index}}"    style="margin-left: 20rpx;" >
-            <text  decode="{{true}}" style="font-size: 9pt; margin-left: 20rpx;" >              
+            <text  wx:if="{{item.usage}}" decode="{{true}}" style="font-size: 9pt; margin-left: 20rpx;" >              
               {{item.usage}}
             </text>
+            <rich-text wx:else style="text-align: left;"  nodes="{{item.memo}}" ></rich-text>
           </view>
         </block>
         <view style="height: 15rpx;"></view>
