@@ -225,6 +225,13 @@
         <!--button size="mini" id="{{index}}" wx:if="{{item.status == '已领取' }}" id="{{index}}" bindtap="setKeep" style="width: 140rpx;font-size: 9pt;" >暂存</button>
         <button size="mini" id="{{index}}" wx:if="{{item.status == '已领取' && item.isEdit }}" id="{{index}}" bindtap="comfirmKeep" style="width: 140rpx;font-size: 9pt;" >暂存确认</button-->
       </view>
+      <view wx:if="{{item.log && item.log.length > 0}}" style="font-size: 9pt; color: #0c0c0c;margin-top: 10rpx;" >
+        <view wx:for="{{item.log}}" class="view-row" >
+          <view style="width: 260rpx;" >{{item.dateStr}}</view>
+          <view style="width: 220rpx;" >{{item.timeStr}}</view>
+          <view style="width: 125rpx;" >{{item.status}}</view>
+        </view>
+      </view>
     </mp-cell>
    
   </mp-cells>

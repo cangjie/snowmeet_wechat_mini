@@ -258,11 +258,27 @@ Page({
 
             detail.pickedDateStr = detail.end_dateStr//util.formatDate(new Date(detail.start_date))
             detail.pickedTimeStr = that.data.currentTimeStr
-
-
-
-
+            if (detail.log){
+              var logs = detail.log.sort((a, b) => {
+                var timeA = new Date(a.create_date)
+                var timeB = new Date(b.create_date)
+                if (timeA < timeB){
+                  return -1
+                }
+                else{
+                  return 1
+                }
+              })
+              
+              for(var k = 0; k < logs.length; k++){
+                var log = logs[k]
+                var logDate = new Date(log.create_date)
+                log.dateStr = util.formatDate(logDate)
+                log.timeStr = util.formatTimeStr(logDate)
+              }
+            }
             rentOrder.details[i] = detail
+
 
           }
           rentOrder = that.computeAmount(rentOrder)
