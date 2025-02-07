@@ -58,6 +58,9 @@ Page({
           var tickets = res.data
           for(var i = 0; i < tickets.length; i++){
             tickets[i].usage = tickets[i].memo.split(';')
+            if (tickets[i].usage.length >= 10){
+              tickets[i].usage = undefined
+            }
           }
           that.setData({ticketArr: tickets})
         }
