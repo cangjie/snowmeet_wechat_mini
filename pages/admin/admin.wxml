@@ -13,6 +13,9 @@
     <mp-cell id="shopSale" bindtap="gotoSale" >
       <view style="background-color: #FF7777">【零售】店销现货</view>
     </mp-cell>
+    <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >
+      <view style="background-color: #999999">【雪票】南山预定</view>
+    </mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="扫码" >
     <!--mp-cell value="扫一扫" bindtap="gotoScan" ></mp-cell-->
