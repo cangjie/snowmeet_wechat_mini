@@ -7,8 +7,8 @@
     <mp-cell id="rent_list_cell" bindtap="nav" >
       <view style="background-color: #9FFF0F" >【租赁】快速查找订单</view>
     </mp-cell>
-    <mp-cell id="maintain_return" bindtap="nav" >
-      <view style="background-color: orange" >【养护】养护取板</view>
+    <mp-cell id="maintainSerchQuick" bindtap="nav" >
+      <view style="background-color: orange" >【养护】快速查询</view>
     </mp-cell>
     <mp-cell id="shopSale" bindtap="gotoSale" >
       <view style="background-color: #FF7777">【零售】店销现货</view>
@@ -47,7 +47,7 @@
   <mp-cells ext-class="my-cells" title="养护相关" >
     <!--mp-cell value="现场雪具养护收款" bindtap="goToMaintainRecept" ></mp-cell-->
     <!--mp-cell value="现场雪具养护批量收款" bindtap="goToMaintainInShopQuickBatch" ></mp-cell-->
-    <mp-cell value="现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
+    <mp-cell value="【养护】现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
     <mp-cell value="【养护】快速查询" id="maintainSerchQuick" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_return" value="【养护】养护取板" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_in_stock" value="【养护】需盘点的" bindtap="nav" ></mp-cell>
