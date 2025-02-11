@@ -112,6 +112,7 @@ Page({
     if (recept.current_step >= that.data.steps.length){
       recept.current_step = that.data.steps.length - 1
     }
+    recept.submit_data = ''
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Recept/UpdateRecept/' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: updateUrl,

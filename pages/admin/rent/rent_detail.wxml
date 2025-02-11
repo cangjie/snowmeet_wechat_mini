@@ -277,20 +277,20 @@
   </view>
   <view class="view-row">
     <view class="left-column" style="color:{{textColor}}" >储值余额：</view>
-    <view class="right-column" style="color:{{textColor}}" >¥1000.00</view>
+    <view class="right-column" style="color:{{textColor}}" >{{depositAmountStr}}</view>
     <view class="right-column" style="width: 300rpx;" >
-      <checkbox-group>
-        <checkbox>支付租金及超时费</checkbox>
+      <checkbox-group bindchange="setPaywithDeposit" >
+        <checkbox checked="{{payWithDeposit}}" disabled="{{!depositPayEnabled}}" value=""  >支付租金及超时费</checkbox>
       </checkbox-group>
     </view>
   </view>
   <view class="view-row">
     <view class="left-column" style="color:{{textColor}}" >储值需支付：</view>
-    <view class="right-column" style="color:{{textColor}}" >¥1000.00</view>
+    <view class="right-column" style="color:{{textColor}}" >{{depositPayAmountStr}}</view>
   </view>
   <view class="view-row">
     <view class="left-column" style="color:{{textColor}}" >现金需支付：</view>
-    <view class="right-column" style="color:{{textColor}}" >¥0.00</view>
+    <view class="right-column" style="color:{{textColor}}" >{{cashPayAmountStr}}</view>
   </view>
   <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}" >实付押金：</view>
