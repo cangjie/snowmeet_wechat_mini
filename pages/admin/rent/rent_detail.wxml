@@ -280,7 +280,7 @@
     <view class="right-column" style="color:{{textColor}}" >{{depositAmountStr}}</view>
     <view class="right-column" style="width: 300rpx;" >
       <checkbox-group bindchange="setPaywithDeposit" >
-        <checkbox checked="{{payWithDeposit}}" disabled="{{!depositPayEnabled}}" value=""  >支付租金及超时费</checkbox>
+        <checkbox checked="{{payWithDeposit || rentOrder.isDepositPaid}}" disabled="{{!depositPayEnabled || rentOrder.isDepositPaid}}" value=""  >支付租金及超时费</checkbox>
       </checkbox-group>
     </view>
   </view>
