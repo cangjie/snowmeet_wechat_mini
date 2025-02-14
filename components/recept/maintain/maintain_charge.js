@@ -24,6 +24,7 @@ Component({
       var that = this
       app.loginPromiseNew.then(function(resolve){
         that.getData()
+        
       })
     }
 
@@ -104,6 +105,7 @@ Component({
           that.setData({recept: recept})
 
           that.getProductList()
+          that.getDepositAmount()
           if (!util.isBlank(recept.code)){
             that.getTicket(recept.code)
           }
@@ -201,10 +203,29 @@ Component({
       recept.maintainOrder.memo = memo
       that.setData(recept)
       that.computeCharge()
+    },
+    getDepositAmount(){
+      var that = this
+      var memberId = that.data.recept.member.id
+      var getDepositUrl = 'https://' + app.globalData.domainName + '/core/Deposit/GetMemberAvaliableAmount/' + memberId + '?depositType=&depositSubType=&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      wx.request({
+        url: getDepositUrl,
+        method: 'GET',
+        success:(res)=>{
+          if (res.statusCode != 200){
+            return
+          }
+          var deposit = parseFloat(res.data)
+          var deopsitStr = util.showAmount(deposit)
+          //that.computeTotal()
+          var depositPayEnabled = true
+          if (that.data.totalChargeReal > deposit){
+            depositPayEnabled = false
+          }
+          that.setData({depositAmount: deposit, depositAmountStr: deopsitStr, depositPayEnabled})
+        }
+      })
     }
-
-
-
-
-  }
+  },
+  
 })
