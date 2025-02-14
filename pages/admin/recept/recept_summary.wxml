@@ -25,7 +25,7 @@
     </view>
     <view wx:else >
       <view wx:if="{{!needPay}}" style="margin-top: 50rpx; text-align: center;" >
-        <view>招待订单，无需支付。</view>
+        <view wx:if="{{recept.maintainOrder.order.pay_memo != '储值支付'}}" >招待订单，无需支付。</view>
         <button class="input" wx:if="{{recept.recept_type=='养护下单'}}"  bindtap="gotoMaintainTask" > 点 击 进 入 详 情 </button>
         <view style="height: 300rpx;" ></view>
       </view>

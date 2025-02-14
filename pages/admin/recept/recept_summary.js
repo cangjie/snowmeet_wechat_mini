@@ -225,6 +225,9 @@ Page({
                 else if (recept.maintainOrder.orderId == 0){
                   zeroPay = true 
                 }
+                else if (recept.maintainOrder.order.pay_state == 1){
+                  needPay = false
+                }
                 break
               default:
                 break
