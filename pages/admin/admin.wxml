@@ -47,7 +47,7 @@
   <mp-cells ext-class="my-cells" title="养护相关" >
     <!--mp-cell value="现场雪具养护收款" bindtap="goToMaintainRecept" ></mp-cell-->
     <!--mp-cell value="现场雪具养护批量收款" bindtap="goToMaintainInShopQuickBatch" ></mp-cell-->
-    <mp-cell value="现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
+    <mp-cell value="【养护】现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
     <mp-cell value="【养护】快速查询" id="maintainSerchQuick" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_return" value="【养护】养护取板" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_in_stock" value="【养护】需盘点的" bindtap="nav" ></mp-cell>

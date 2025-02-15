@@ -12,16 +12,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "get ticket",
-          "pathName": "pages/tickets/me_pick",
-          "query": "templateId=15&channel=test",
+          "name": "pay",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=14766",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "pay",
-          "pathName": "pages/payment/pay_recept",
-          "query": "id=11517",
+          "name": "get ticket",
+          "pathName": "pages/tickets/me_pick",
+          "query": "templateId=15&channel=test",
           "launchMode": "default",
           "scene": null
         },

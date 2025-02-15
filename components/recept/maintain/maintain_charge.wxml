@@ -47,6 +47,8 @@
               checked="{{recept.maintainOrder.payOption == '招待'}}" value="招待" >招待</radio>
               <radio style="margin-top: 10rpx;"
               checked="{{recept.maintainOrder.payOption == '万龙质保'}}" value="万龙质保" >万龙质保</radio>
+              <radio style="margin-top: 10rpx;" disabled="{{!depositPayEnabled}}"
+              checked="{{recept.maintainOrder.payOption == '储值支付'}}" value="储值支付" >储值支付（余额：{{depositAmountStr}}）</radio>
           </radio-group>
         </view>
       </view>

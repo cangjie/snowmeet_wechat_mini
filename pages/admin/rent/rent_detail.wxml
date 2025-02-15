@@ -240,12 +240,7 @@
     <button bindtap="restore" size="mini" >取消</button>
     <button bindtap="restore" disabled="{{rentOrder.status != '未支付'}}" size="mini" bindtap="close" >关闭</button>
   </view>
-  <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
-    <view class="left-column" style="color:{{textColor}}" >实付押金：</view>
-    <view class="right-column" style="color: red;">{{rentOrder.deposit_final_str}}</view>
-    <view class="left-column"></view>
-    <view class="right-column"></view>
-  </view>
+  
   <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}" >租金合计：</view>
     <view class="right-column" style="color: red;" >{{totalRentalStr}}</view>
@@ -276,8 +271,30 @@
     <view class="left-column" style="color:{{textColor}}" >优惠券减免：</view>
     <view class="right-column" style="color:{{textColor}}" >
       <view  >{{rentalReduceTicketStr}}</view>
-      
     </view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" style="color:{{textColor}}" >储值余额：</view>
+    <view class="right-column" style="color:{{textColor}}" >{{depositAmountStr}}</view>
+    <view class="right-column" style="width: 300rpx;" >
+      <checkbox-group bindchange="setPaywithDeposit" >
+        <checkbox checked="{{payWithDeposit || rentOrder.isDepositPaid}}" disabled="{{!depositPayEnabled || rentOrder.isDepositPaid}}" value=""  >支付租金及超时费</checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" style="color:{{textColor}}" >储值需支付：</view>
+    <view class="right-column" style="color:{{textColor}}" >{{depositPayAmountStr}}</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" style="color:{{textColor}}" >现金需支付：</view>
+    <view class="right-column" style="color:{{textColor}}" >{{cashPayAmountStr}}</view>
+  </view>
+  <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
+    <view class="left-column" style="color:{{textColor}}" >实付押金：</view>
+    <view class="right-column" style="color: red;">{{rentOrder.deposit_final_str}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
