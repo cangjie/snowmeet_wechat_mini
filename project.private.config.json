@@ -3,8 +3,10 @@
     "preloadBackgroundData": false,
     "compileHotReLoad": true,
     "bigPackageSizeSupport": true,
-    "skylineRenderEnable": true,
-    "urlCheck": false
+    "skylineRenderEnable": false,
+    "urlCheck": false,
+    "lazyloadPlaceholderEnable": false,
+    "autoAudits": true
   },
   "description": "Project configuration file, more information: https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
   "libVersion": "3.5.0",
@@ -12,8 +14,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pay",
+          "name": "payrentadd",
+          "pathName": "pages/payment/rent_pay_add",
+          "query": "id=19",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "pay_recept",
           "pathName": "pages/payment/pay_recept",
+<<<<<<< HEAD
           "query": "id=14766",
           "launchMode": "default",
           "scene": null
@@ -22,6 +32,9 @@
           "name": "get ticket",
           "pathName": "pages/tickets/me_pick",
           "query": "templateId=15&channel=test",
+=======
+          "query": "id=11723",
+>>>>>>> pay_additional
           "launchMode": "default",
           "scene": null
         },

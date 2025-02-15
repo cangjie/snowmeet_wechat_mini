@@ -19,7 +19,9 @@ Page({
     depositPayAmount: 0,
     depositPayAmountStr: "¥0.00",
     cashPayAmount: 0,
-    cashPayAmountStr: "¥0.00"
+    cashPayAmountStr: "¥0.00",
+    logs:[]
+
   },
 
   goHome(e){
@@ -148,9 +150,10 @@ Page({
       that.setData({showCreditGallery: true})
     }
   },
-
+ 
   getData(){
     var that = this
+    
     var getUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrder/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: getUrl,
@@ -173,9 +176,13 @@ Page({
           rentOrder.deposit_real_str = util.showAmount(rentOrder.deposit_real)
           rentOrder.deposit_reduce_str = util.showAmount(rentOrder.deposit_reduce)
           rentOrder.deposit_final_str = util.showAmount(rentOrder.deposit_final)
+          rentOrder.additionalAmountStr = util.showAmount(rentOrder.additionalPaidAmount)
+          rentOrder.depositPaid = rentOrder.deposit_real + rentOrder.additionalPaidAmount - rentOrder.deposit_reduce
+          rentOrder.depositPaidStr = util.showAmount(rentOrder.depositPaid)
           var dueEndTime = new Date(rentOrder.due_end_date)
           rentOrder.due_end_time_str = util.formatDate(dueEndTime) + ' ' + util.formatTimeStr(dueEndTime)
           if (rentOrder.order_id > 0){
+
             var payTime =  undefined
             if (rentOrder.order.pay_time != null){
               payTime = new Date(rentOrder.order.pay_time) 
@@ -255,9 +262,9 @@ Page({
             detail.reparationStr = util.showAmount(detail.reparation)
             detail.showGallery = false
             detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
-
-            detail.pickedDateStr = detail.end_dateStr//util.formatDate(new Date(detail.start_date))
+            detail.pickedDateStr = detail.end_dateStr
             detail.pickedTimeStr = that.data.currentTimeStr
+
             if (detail.log){
               var logs = detail.log.sort((a, b) => {
                 var timeA = new Date(a.create_date)
@@ -280,10 +287,12 @@ Page({
             rentOrder.details[i] = detail
 
 
+
           }
           rentOrder = that.computeAmount(rentOrder)
-
-          var realTotalRefund = 0;
+          var realTotalAmount = 0
+          var realTotalRefund = 0
+          /*
           var refunds = []
           for(var j = 0; rentOrder.order != null && rentOrder.order.refunds != null && j < rentOrder.order.refunds.length; j++){
             var r = rentOrder.order.refunds[j];
@@ -294,15 +303,72 @@ Page({
               realTotalRefund += r.amount
             }
           }
-          var realTotalRefundStr = util.showAmount(realTotalRefund)
-          var bonus = rentOrder.deposit_final - realTotalRefund
+          */
+
+          var refunds = []
+          var totalRefund = 0
+          for(var j = 0; rentOrder.order != null && rentOrder.order.refunds != null && j < rentOrder.order.refunds.length; j++){
+            var r = rentOrder.order.refunds[j];
+            var balanceItem = {}
+            if (r.refundSuccess){
+              balanceItem.outTradeNo = r.out_refund_no
+              balanceItem.payMethod = '——'
+              balanceItem.create_date = new Date(r.create_date)
+              balanceItem.create_dateStr = util.formatDateTime(new Date(r.create_date))
+              balanceItem.create_timeStr = util.formatTimeStr(new Date(r.create_date))
+              balanceItem.amount = -1 * r.amount 
+              //realTotalRefund += r.amount
+              balanceItem.amountStr = util.showAmount(balanceItem.amount)
+              balanceItem.memo = (r.memo == ''? '退款': r.memo)
+              balanceItem.staffName = r.msa.member.real_name
+              //balanceItem.msa = rentOrder.order.msa
+              refunds.push(balanceItem)
+              //totalRefund += r.amount
+              realTotalAmount += balanceItem.amount
+            }
+          }
+          var incomes = []
+          var totalIncome = 0
+          for(var j = 0; rentOrder.order != null && rentOrder.order.payments != null && j < rentOrder.order.payments.length; j++){
+            var r = rentOrder.order.payments[j]
+            var balanceItem = {}
+            if (r.status == '支付成功'){
+              balanceItem.outTradeNo = r.out_trade_no
+              balanceItem.create_date = new Date(r.create_date)
+              balanceItem.create_dateStr = util.formatDateTime(new Date(r.create_date))
+              balanceItem.create_timeStr = util.formatTimeStr(new Date(r.create_date))
+              balanceItem.amount = r.amount 
+              balanceItem.amountStr = util.showAmount(balanceItem.amount)
+              balanceItem.memo = '押金'
+              balanceItem.payMethod = r.pay_method
+              balanceItem.staffName = rentOrder.order.msa.member.real_name
+              //balanceItem.msa = 
+              incomes.push(balanceItem)
+              totalIncome += r.amount
+              realTotalAmount += balanceItem.amount
+            }
+          }
+          incomes.sort((a,b) => (a.create_date - b.create_date))
+          refunds.sort((a,b) => (a.create_date - b.create_date))
+          console.log('incomes', incomes)
+          console.log('refunds', refunds)
+          
+
+
+
+
+
+          var realTotalRefundStr = util.showAmount(rentOrder.totalRefund)
+          var bonus = rentOrder.deposit_final - realTotalRefund + that.data.rentOrder.additionalPaidAmount
           
           that.setData({rentOrder: rentOrder, payWithDeposit: rentOrder.isDepositPaid,
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
-              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, refunds: refunds, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor})
+              realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, incomes, refunds, 
+              totalIncome, totalIncomeStr: util.showAmount(totalIncome), totalRefund, totalRefundStr: util.showAmount(totalRefund)})
           that.computeTotal()
           that.getDepositAmount()
+          that.getLog()
         }
       }
     })
@@ -402,6 +468,7 @@ Page({
       refundAmount += depositPayAmount
     }
     var unRefund = refundAmount - that.data.realTotalRefund;
+
     var unRefundStr = util.showAmount(unRefund)
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
       totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparation, totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder, unRefund: unRefund, unRefundStr: unRefundStr, depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount), cashPayAmount, cashPayAmountStr: util.showAmount(cashPayAmount)})
@@ -456,6 +523,24 @@ Page({
       details[i].refund = refund
       
     }
+    for(var i = 0; i < rentOrder.payments.length; i++){
+      var p = rentOrder.payments[i]
+      p.amountStr = util.showAmount(p.amount)
+      p.create_dateStr = util.formatDateTime(new Date(p.create_date))
+      p.memo = '押金'
+      for(var j = 0; j < rentOrder.additionalPayments.length; j++){
+        if (p.order_id == rentOrder.additionalPayments[j].order_id){
+          p.memo = rentOrder.additionalPayments[j].reason
+        }
+      }
+    }
+    for(var i = 0; i < rentOrder.refunds.length; i++){
+      var r = rentOrder.refunds[i]
+      r.create_dateStr = util.formatDateTime(new Date(r.create_date))
+      r.amountStr = util.showAmount(r.amount)
+    }
+    rentOrder.totalChargeStr = util.showAmount(rentOrder.totalCharge)
+    rentOrder.totalRefundStr = util.showAmount(rentOrder.totalRefund)
     that.setData({rentOrder: rentOrder})
     return rentOrder
   },
@@ -760,6 +845,7 @@ Page({
       success: (res) => {
         if (res.statusCode == 200){
           that.getData()
+          that.close()
         }
       },
       complete:(res)=>{
@@ -1069,7 +1155,7 @@ Page({
     var detail = rentOrder.details[id]
     that.computeAmount(rentOrder)
     that.computeTotal()
-    if (rentOrder.deposit_final < that.data.refundAmount){
+    if (rentOrder.depositPaid < that.data.refundAmount){
       wx.showToast({
         title: '应退金额>押金',
         icon: 'error'
@@ -1200,7 +1286,8 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    that.getData()
   },
 
   /**
@@ -1274,6 +1361,150 @@ Page({
     wx.request({
       url: payUrl,
       method: 'GET'
+    })
+  },
+  payAdditional(){
+    var that = this
+    var id = that.data.id
+    wx.navigateTo({
+      url: 'pay_additional?id=' + id,
+    })
+  },
+  reopen(){
+    var that = this
+    wx.showModal({
+      title: '重新打开订单',
+      content: '此操作会导致报表变化，而且会留下操作记录，是否继续？',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var url = 'https://' + app.globalData.domainName + '/core/Rent/SetFinish/' + that.data.rentOrder.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: url,
+            method:'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+              that.getData()
+            }
+          })
+        }
+      }
+    })
+  },
+  setFinish(){
+    var that = this
+    wx.showModal({
+      title: '设置订单完成',
+      content: '此操作不可逆，执行后该订单会显示在财务报表中，是否确认？',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          //var finishDate = util.formatDate(new Date()) + ' ' + util.formatTimeStr(new Date())
+          var finishDate = util.formatDateTime(new Date())
+          var url = 'https://' + app.globalData.domainName + '/core/Rent/SetFinish/' + that.data.rentOrder.id + '?finishDate=' + finishDate + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: url,
+            method:'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+              that.getData()
+            }
+          })
+        }
+      }
+    })
+  },
+  getLog(){
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetRentOrderLogs/' + that.data.rentOrder.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res) => {
+        if (res.statusCode != 200){
+          return
+        }
+        var logs = res.data
+        for(var i = 0; i < logs.length; i++){
+          var log = logs[i]
+          log.amountStr = '——'
+          log.staffName = log.member? log.member.real_name : ''
+          log.create_date = new Date(log.create_date)
+          log.create_dateStr = util.formatDateTime(log.create_date)
+          switch(log.memo){
+            case '订单完成':
+              log.color = 'white'
+              log.back = '#0000FF'
+              break
+            case '订单重开':
+              log.color = 'black'
+              log.back = '#FFFF00'
+              break
+            default:
+              log.color = 'black'
+              log.back = 'white'
+          }
+        }
+        var incomes = that.data.incomes
+        for(var i = 0; i < incomes.length; i++){
+          var income = incomes[i]
+          var log = {}
+          log.create_date = income.create_date
+          log.amount = income.amount
+          log.memo = '收款'
+          log.create_date = new Date(log.create_date)
+          log.create_dateStr = util.formatDateTime(log.create_date)
+          log.amountStr = util.showAmount(log.amount)
+          log.staffName = income.staffName
+          log.color = '#FF0000'
+          log.back = 'white'
+          logs.push(log)
+        }
+        var addPays = that.data.rentOrder.additionalPayments
+        for(var i = 0; i < addPays.length; i++){
+          var addPay = addPays[i]
+          if (addPay.is_paid != 1){
+            continue
+          }
+          var log = {}
+          log.create_date = new Date(addPay.create_date)
+          log.amount = addPay.amount
+          log.memo = addPay.reason
+          log.create_dateStr = util.formatDateTime(log.create_date)
+          log.amountStr = util.showAmount(log.amount)
+          log.staffName = addPay.staffMember.real_name
+          log.color = '#FF0000'
+          log.back = 'white'
+          logs.push(log)
+        }
+        var refunds = that.data.rentOrder.refunds
+        for(var i = 0; i < refunds.length; i++){
+          var refund = refunds[i]
+          var log = {}
+          log.create_date = refund.create_date
+          log.amount = -1 * refund.amount
+          log.memo = '退款'
+          log.create_dateStr = util.formatDateTime(new Date(log.create_date))
+          log.amountStr = util.showAmount(log.amount)
+          log.staffName = refund.msa.member.real_name
+          log.color = '#00FF00'
+          log.back = 'white'
+          logs.push(log)
+        }
+        logs.sort((a, b) => (new Date(a.create_dateStr) - new Date(b.create_dateStr)))
+        //console.log('log', logs)
+        that.setData({logs})
+      }
     })
   }
 })

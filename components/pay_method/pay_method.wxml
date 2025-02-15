@@ -1,8 +1,8 @@
 <view style="display: flex; flex-direction: row;">
   <view class="left-column" >支付方式：</view>
   <view class="right-column" >
-    <picker mode="selector" range="{{payMethodList}}" bindchange="selectChanged" >
-      <picker-view>{{payMethodList[payMethodSelectedIndex]}}</picker-view>
+    <picker mode="selector" style="width: 200rpx;" range="{{payMethodList}}" bindchange="selectChanged" class="input" >
+      <picker-view  >{{payMethodList[payMethodSelectedIndex]}}</picker-view>
     </picker>
   </view>
 </view>

@@ -1,8 +1,8 @@
 <view>
 <view class="btn-area flex-wrp" style="margin-top: 25rpx;flex-direction:row; text-align: center;">
-  <navigator style="width: 33%;text-align: center;color:{{unUsedColor}};" url="ticket_list?used=0" open-type="redirect" hover-class="other-navigator-hover" >未使用</navigator>
-  <navigator style="width: 33%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >已使用</navigator>
-  <navigator style="width: 33%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >分享中</navigator>
+  <navigator style="width: 50%;text-align: center;color:{{unUsedColor}};" url="ticket_list?used=0" open-type="redirect" hover-class="other-navigator-hover" >未使用</navigator>
+  <navigator style="width: 50%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >已使用</navigator>
+  <!--navigator style="width: 33%;text-align: center;color:{{usedColor}}" url="ticket_list?used=1" open-type="redirect" hover-class="other-navigator-hover" >分享中</navigator-->
 </view>
 <view style="height: 1rpx; background-color:#c0c0c0;"></view>
 <view wx:for="{{ticketArr}}" >
@@ -11,13 +11,10 @@
     <view style="width: 100rpx;"></view>
     <view id="{{item.code}}" style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;" bindtap="showDetail">
       <view style="background-color:{{ticketTitleColor}};text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><b>{{item.name}}</b></view>
-      <block wx:if="{{item.usage}}" >
-        <view  wx:for="{{item.usage}}" style="margin-left: 50rpx;">
-          *{{item}}
-        </view>
-      </block>
-      <view wx:else style="margin-left: 10rpx;margin-right: 10rpx;" >
-        <rich-text style="text-align: left;"  nodes="{{item.memo}}" ></rich-text>
+
+      <rich-text style="text-align: left;" wx:if="{{item.rich}}" nodes="{{item.memo}}" ></rich-text>
+      <view wx:for="{{item.usage}}"  decode="{{true}}" style="text-align: left;" >
+        *{{item}}
       </view>
     </view>
     <view style="width: 100rpx;"></view>
