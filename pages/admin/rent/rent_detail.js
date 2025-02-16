@@ -188,7 +188,7 @@ Page({
               payTime = new Date(rentOrder.order.pay_time) 
             }
             else{
-              if (rentOrder.order.payments.length > 0){
+              if (rentOrder.order.payments != null && rentOrder.order.payments.length > 0){
                 payTime = new Date(rentOrder.order.payments[0].create_date) 
               }
             }
@@ -201,7 +201,7 @@ Page({
             else{
               rentOrder.paidTimeStr = '——'
             }
-            if (rentOrder.order.payments.length > 0){
+            if (rentOrder.order.payments != null && rentOrder.order.payments.length > 0){
               rentOrder.outTradeNo = rentOrder.order.payments[0].out_trade_no
             }
             else{
