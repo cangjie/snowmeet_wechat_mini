@@ -467,7 +467,7 @@ Page({
       cashPayAmount = totalReparation
       refundAmount += depositPayAmount
     }
-    var unRefund = refundAmount - that.data.realTotalRefund;
+    var unRefund = refundAmount - that.data.rentOrder.totalRefund
 
     var unRefundStr = util.showAmount(unRefund)
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
@@ -1326,6 +1326,9 @@ Page({
   },
   getDepositAmount(){
     var that = this
+    if (!that.data.rentOrder.order){
+      return
+    }
     var memberId = that.data.rentOrder.order.member.id
     if (memberId == undefined || isNaN(memberId)){
       return
