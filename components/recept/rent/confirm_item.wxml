@@ -70,23 +70,39 @@
             <picker-view>{{classList[currentRentItem.classSelectedIndex]}}</picker-view>
           </picker>
         </view>
-        <view style="width: 20%;text-align: right;" class="op-cell">起租日：</view>
+        <view style="width: 20%;text-align: right;" class="op-cell"></view>
         <view style="width: 30%;text-align: right;margin-left: 0rpx;" class="op-cell">
-          <view style="text-align: left;" wx:if="{{currentRentItem.depositType == '预付押金'}}" >--</view>
-          <picker wx:else mode="date" bindchange="setStartDate" start="{{nowDate}}" class="input" style="width: 200rpx;" >
-            <picker-view wx:if="{{isToday}}"   >{{currentRentItem.startDate}}</picker-view>
-            <picker-view wx:else style="color: red;"  >{{currentRentItem.startDate}}</picker-view>
-          </picker>
+          
         </view>   
       </view>
-      <view style="display: flex;flex-direction: row;" >
-        <view class="op-cell" style="width:100%" >
-          <radio-group style="text-align: center;" bindchange="setDepositType" >
-            <radio style="margin-left: 10rpx;" value="立即租赁" checked="{{currentRentItem.depositType == '立即租赁'}}" >立即租赁</radio>
-            <radio style="margin-left: 10rpx;" value="先租后取" checked="{{currentRentItem.depositType == '先租后取'}}" >先租后取</radio>
-            <radio style="margin-left: 10rpx;" value="预约租赁" checked="{{currentRentItem.depositType == '预约租赁'}}" >预约租赁</radio>
-            <radio style="margin-left: 10rpx;" value="预付押金" checked="{{currentRentItem.depositType == '预付押金'}}" >预付押金</radio>
+      <view style="display: flex;flex-direction: row" >
+        <view class="op-cell" style="width:50%; height: 300rpx; display: flex; flex-direction: column" >
+          <radio-group style="text-align: center; margin-left: 20rpx;" bindchange="setDepositType" >
+            <radio style="margin-left: 10rpx;margin-top: 10rpx;" value="立即租赁" 
+            checked="{{currentRentItem.depositType == '立即租赁'}}" >立即租赁</radio>
+            <radio style="margin-left: 10rpx;margin-top: 10rpx;" value="延时租赁" 
+            checked="{{currentRentItem.depositType == '延时租赁'}}" >延时租赁</radio>
+            <radio style="margin-left: 10rpx;margin-top: 10rpx;" value="先租后取" 
+            checked="{{currentRentItem.depositType == '先租后取'}}" >先租后取</radio>
+            <radio style="margin-left: 10rpx;margin-top: 10rpx;" value="预约租赁" 
+            checked="{{currentRentItem.depositType == '预约租赁'}}" >预约租赁</radio>
+            <radio style="margin-left: 10rpx;margin-top: 10rpx;" value="预付押金" 
+            checked="{{currentRentItem.depositType == '预付押金'}}" disabled="{{true}}" >预付押金</radio>
           </radio-group>
+        </view>
+        <view class="op-cell" style="width: 15%;height: 300rpx;" >起租日：</view>
+        <view class="op-cell" style="width: 35%;height: 300rpx" >
+          <block 
+          wx:if="{{currentRentItem.depositType == '立即租赁' || currentRentItem.depositType == '先租后取' }}" 
+          >{{nowDate}}（今天）</block>
+          <block 
+          wx:if="{{currentRentItem.depositType == '延时租赁' || currentRentItem.depositType == '预约租赁' }}" 
+          >
+            <picker  mode="date" bindchange="setStartDate" start="{{nowDate}}" class="input" style="width: 200rpx;" >
+              <picker-view >{{currentRentItem.startDate}}</picker-view>
+            </picker>
+            <view>{{currentRentItem.startDateType}}</view>
+          </block>
         </view>
       </view>
       <view style="display: flex;flex-direction: row;" >

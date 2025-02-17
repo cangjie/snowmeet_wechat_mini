@@ -203,8 +203,27 @@ Component({
       var that = this
       var user = that.data.customUser
       var currentRentItem = that.data.currentRentItem
-      currentRentItem.startDate = e.detail.value
+      var startDate = new Date(e.detail.value)
+      var nowDate = new Date()
 
+      currentRentItem.startDate = util.formatDate(startDate)
+      
+      if (util.formatDate(nowDate) == currentRentItem.startDate){
+        currentRentItem.startDateType = '今天'
+      }
+      else if (util.formatDate(new Date(nowDate.setDate(nowDate.getDate() + 1))) == currentRentItem.startDate){
+        currentRentItem.startDateType = '明天'
+      }
+      else if (util.formatDate(new Date(nowDate.setDate(nowDate.getDate() + 1))) == currentRentItem.startDate){
+        currentRentItem.startDateType = '后天'
+      }
+      else if (util.formatDate(new Date(nowDate.setDate(nowDate.getDate() + 1))) == currentRentItem.startDate){
+        currentRentItem.startDateType = '大后天'
+      }
+      else {
+        currentRentItem.startDateType = ''
+      }
+      /*
       if (util.formatDate(new Date()) == util.formatDate(new Date(currentRentItem.startDate)) ){
         if (currentRentItem.depositType != '立即租赁' && currentRentItem.depositType != '先租后取'){
           currentRentItem.depositType = '立即租赁'
@@ -220,6 +239,7 @@ Component({
           currentRentItem.rental = currentRentItem.rentalReserve
         }
       }
+      */
 
       that.setData({currentRentItem: currentRentItem})
       that.checkValid()
@@ -459,12 +479,13 @@ Component({
         console.log('current item', currentRentItem)
         if (currentRentItem.depositType == '立即租赁' || currentRentItem.depositType == '先租后取'){
           currentRentItem.startDate =  util.formatDate(new Date())
+          currentRentItem.startDateType = '今天'
         }
-        if (currentRentItem.depositType == '预约租赁' 
-        && util.formatDate(new Date(currentRentItem.startDate)) == util.formatDate(new Date())  ){
+        if (currentRentItem.depositType == '预约租赁' || currentRentItem.depositType == '延时租赁'){
           var nowDate = new Date()
           nowDate.setDate(nowDate.getDate() + 1)
           currentRentItem.startDate = util.formatDate(nowDate)
+          currentRentItem.startDateType = '明天'
         }
         /*
         if (currentRentItem.start_date != undefined){
