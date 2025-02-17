@@ -62,7 +62,6 @@
     "pages/admin/rent/rent_detail",
     "pages/rent/bind_rent_order",
     "pages/admin/rent/rent_report",
-    "pages/admin/rent/rent_admit_new",
     "pages/admin/rent/rent_pay",
     "pages/admin/rent/rent_list_by_cell",
     "pages/rent/rent_detail",
