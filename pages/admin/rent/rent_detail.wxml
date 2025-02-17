@@ -125,7 +125,7 @@
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
         
         <view class="left-column" style="color:{{textColor}}" >起租：</view>
-        <view class="right-column" style="font-size: 9pt;color:{{textColor}}" wx:if="{{isManager == 1}}" >
+        <view class="right-column" style="font-size: 9pt;color:{{textColor}}" >
           <view wx:if="{{item.status == '未领取' || rentOrder.status == '已完成'}}" >
             {{item.start_dateStr}}
           </view>
@@ -138,7 +138,7 @@
           </picker>
           </view>
         </view>
-        <view class="right-column" style="font-size: 9pt;color:{{textColor}}" wx:else >{{item.start_dateStr}}</view>
+        
         <view class="left-column" style="color:{{textColor}}" >退租：</view>
         <view class="right-column" wx:if="{{item.status == '已归还' && isManager == 1 && rentOrder.status != '已完成' }}"  style="color:{{textColor}}" >
           
@@ -226,10 +226,6 @@
         <input wx:if="{{item.isEdit && item.editType != '暂存' }}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" class="input" style="color:red" />
         <view wx:else style="color:red" >{{item.memo}}</view>
       </view>
-      <!--view wx:if="{{item.imageArr.length > 0}}" id="{{index}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;" bindtap="showDetailGallery" >
-        <image id="credit_{{index}}"  wx:for="{{item.imageArr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}" ></image>
-      </view>
-      <mp-gallery show="{{item.showGallery}}" showDelete="{{false}}" imgUrls="{{item.imageArr}}" current="{{0}}"  ></mp-gallery-->
   
       <view style="display: flex; flex-direction: row; margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx">
         <button wx:if="{{item.status == '未领取' && (item.deposit_type == '预约租赁'  || item.deposit_type == '先租后取') && !item.isEdit}}" class="input"  id="{{index}}" bindtap="setPick" style="font-size: 9pt;" size="mini"  
