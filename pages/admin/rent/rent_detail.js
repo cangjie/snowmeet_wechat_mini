@@ -586,6 +586,54 @@ Page({
       }
     })
   },
+  setPick(e){
+    var that = this
+    wx.showModal({
+      title: '确认发放装备',
+      content: '点确认之前，请先和顾客确认装备是否有误或损坏。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          that.setPcikConfirm()
+        }
+      }
+    })
+  },
+  setPcikConfirm(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var detail = that.data.rentOrder.details[id]
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetPick/' + detail.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method:'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        detail = res.data
+        var rentOrder = that.data.rentOrder
+        rentOrder.details[id] = detail
+      
+        wx.showToast({
+          title: '装备已发放',
+          icon: 'success',
+          duration: 1000,
+          success:()=>{
+            rentOrder = that.computeAmount(rentOrder)
+            that.setData({rentOrder: rentOrder})
+            that.getData()
+          }
+        })
+      }
+    })
+  },
 
 
   setRentStart(e){
