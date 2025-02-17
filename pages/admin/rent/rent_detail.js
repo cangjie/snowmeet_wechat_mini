@@ -597,7 +597,7 @@ Page({
         }
     
         if (res.confirm) {
-          that.setPcikConfirm()
+          that.setPcikConfirm(e)
         }
       }
     })
@@ -609,7 +609,7 @@ Page({
     }
     var that = this
     var detail = that.data.rentOrder.details[id]
-    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetPick/' + detail.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetDetailLog/' + detail.id + '?status=' + encodeURIComponent('已发放') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: setUrl,
       method:'GET',
