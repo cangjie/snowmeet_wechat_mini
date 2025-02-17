@@ -192,7 +192,7 @@
         <view style="display: flex; flex-direction: row;" >
           <view class="left-column"  >额外费用：</view>
           <view class="right-column"  style="display: flex;flex-direction: row;"  >
-            ¥<input  id="othersCharge_{{index}}" style="width: 100rpx;" bindinput="changed" />
+            ¥<input  id="othersCharge_{{index}}" style="width: 100rpx;" bindinput="changed" class="input" />
           </view>
         </view>
       </mp-cell>

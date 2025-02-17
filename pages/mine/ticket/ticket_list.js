@@ -57,10 +57,16 @@ Page({
         success: (res)=>{
           var tickets = res.data
           for(var i = 0; i < tickets.length; i++){
-            tickets[i].usage = tickets[i].memo.split(';')
-            if (tickets[i].usage.length >= 10){
-              tickets[i].usage = undefined
+
+            var memo = tickets[i].memo
+            if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
+              tickets[i].rich = true
             }
+            else{
+              tickets[i].rich = false
+              tickets[i].usage = memo.split(';')
+            }
+            //tickets[i].usage = tickets[i].memo.split(';')
           }
           that.setData({ticketArr: tickets})
         }
