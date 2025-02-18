@@ -371,7 +371,7 @@ Page({
 
 
           var realTotalRefundStr = util.showAmount(rentOrder.totalRefund)
-          var bonus = rentOrder.deposit_final - realTotalRefund + that.data.rentOrder.additionalPaidAmount
+          var bonus = rentOrder.deposit_final - rentOrder.totalRefund + that.data.rentOrder.additionalPaidAmount
           
           that.setData({rentOrder: rentOrder, payWithDeposit: rentOrder.isDepositPaid,
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
@@ -474,16 +474,26 @@ Page({
     var payWithDeposit = that.data.payWithDeposit
     var cashPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket + totalReparation
     var depositPayAmount = 0
+
     if (payWithDeposit){
       depositPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket
       cashPayAmount = totalReparation
       refundAmount += depositPayAmount
     }
+    else{
+      depositPayAmount = that.data.depositPayAmount
+    }
+    cashPayAmount = cashPayAmount - depositPayAmount
+    var rentalSettleAmount = totalRental + totalOvertimeCharge - that.data.rentalReduce - that.data.rentalReduceTicket
+    
+    var cashTotal = cashPayAmount + totalReparation 
+    refundAmount = rentOrder.depositPaid - cashTotal
     var unRefund = refundAmount - that.data.rentOrder.totalRefund
 
     var unRefundStr = util.showAmount(unRefund)
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
-      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparation, totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder, unRefund: unRefund, unRefundStr: unRefundStr, depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount), cashPayAmount, cashPayAmountStr: util.showAmount(cashPayAmount)})
+      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparation, totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder, unRefund: unRefund, unRefundStr: unRefundStr, depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount), cashPayAmount, cashPayAmountStr: util.showAmount(cashPayAmount), rentalSettleAmount, rentalSettleAmountStr: util.showAmount(rentalSettleAmount),
+      cashTotal, cashTotalStr: util.showAmount(cashTotal)})
   },
   
 //////set buttons/////////////
@@ -885,7 +895,7 @@ Page({
     
         if (res.confirm) {
           that.refund(unRefund)
-          if (that.data.payWithDeposit){
+          if (that.data.depositPayAmount > 0){
             that.payWithDeposit()
           }
         }
@@ -1640,5 +1650,14 @@ Page({
         }
       }
     })
+  },
+  setDepositPayAmount(e){
+    var that = this
+    var value = e.detail.value
+    if (!isNaN(value)){
+      var depositPayAmount = parseFloat(value)
+      that.setData({depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount)})
+    }
+    that.computeTotal()
   }
 })
