@@ -265,6 +265,18 @@ Page({
             detail.pickedDateStr = detail.end_dateStr
             detail.pickedTimeStr = that.data.currentTimeStr
 
+            if (detail.pick_date){
+              var pickDate = new Date(detail.pick_date)
+              detail.pick_dateDateStr = util.formatDate(pickDate)
+              detail.pick_dateTimeStr = util.formatTimeStr(pickDate)
+            }
+            if (detail.return_date){
+              var returnDate = new Date(detail.pick_date)
+              detail.return_dateDateStr = util.formatDate(returnDate)
+              detail.return_dateTimeStr = util.formatTimeStr(returnDate)
+            }
+
+
             if (detail.log){
               var logs = detail.log.sort((a, b) => {
                 var timeA = new Date(a.create_date)
@@ -1548,13 +1560,84 @@ Page({
           log.create_dateStr = util.formatDateTime(new Date(log.create_date))
           log.amountStr = util.showAmount(log.amount)
           log.staffName = refund.msa.member.real_name
-          log.color = '#00FF00'
+          log.color = '#009000'
           log.back = 'white'
           logs.push(log)
         }
         logs.sort((a, b) => (new Date(a.create_dateStr) - new Date(b.create_dateStr)))
         //console.log('log', logs)
         that.setData({logs})
+      }
+      
+    })
+  },
+  setDateTime(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var id = parseInt(idArr[2])
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var value = e.detail.value
+    console.log('set date time', e)
+    var oriDate = undefined
+    var oriTime = undefined
+    var newDate = undefined
+    var newTime = undefined
+    var oriDateTime = undefined
+    if (idArr[0] == 'pick'){
+      oriDateTime = new Date(detail.pick_date)
+    }
+    if (idArr[0] == 'return'){
+      oriDateTime = new Date(detail.return_date)
+    }
+    oriDate = util.formatDate(oriDateTime)
+    oriTime = util.formatTimeStr(oriDateTime)
+    if (idArr[1] == 'date'){
+      newDate = value
+      newTime = oriTime
+    }
+    if (idArr[1] = 'time'){
+      newDate = oriDate
+      newTime = value
+    }
+    var title = '修改' + ((idArr[0] == 'pick') ? ' 发放 ' : ' 归还 ') + '时间'
+    var content = '从 ' + oriDate + ' ' + oriTime + ' 修改成 ' + newDate + ' ' + newTime
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+        if (res.confirm) {
+          console.log('now detail', detail)
+          if (idArr[0] == 'pick'){
+            detail.pick_date = newDate + 'T' + newTime
+          }
+          if(idArr[1] == 'return'){
+            detail.return_date = newDate + 'T' + newTime
+          }
+          //that.setData({rentOrder})
+          //that.save(e)
+          var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: updateUrl,
+            method: 'POST',
+            data: detail,
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+          
+              rentOrder.details[id] = detail
+              that.computeAmount(rentOrder)
+              that.computeTotal()
+              that.setData({rentOrder: rentOrder})
+              that.getData()
+        
+            }
+          })
+        }
       }
     })
   }
