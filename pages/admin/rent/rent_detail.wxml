@@ -324,7 +324,7 @@
     <view class="right-column"></view>
   </view>
   <view style="display: flex; flex-direction: row;">
-    <view class="left-column" style="width: 200rpx;color:{{textColor}}">待结金额：</view>
+    <view class="left-column" style="width: 200rpx;color:{{textColor}}">应结金额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{rentalSettleAmountStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>

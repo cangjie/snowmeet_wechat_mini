@@ -373,7 +373,7 @@ Page({
           var realTotalRefundStr = util.showAmount(rentOrder.totalRefund)
           var bonus = rentOrder.deposit_final - rentOrder.totalRefund + that.data.rentOrder.additionalPaidAmount
           
-          that.setData({rentOrder: rentOrder, payWithDeposit: rentOrder.isDepositPaid,
+          that.setData({rentOrder: rentOrder, payWithDeposit: (rentOrder.totalDepositPaidAmount==0? false: true),
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
               realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, incomes, refunds, 
@@ -473,8 +473,10 @@ Page({
     
     var payWithDeposit = that.data.payWithDeposit
     var cashPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket + totalReparation
-    var depositPayAmount = 0
+    var depositPayAmount = that.data.depositPayAmountMod? 
+      that.data.depositPayAmount : rentOrder.totalDepositPaidAmount
 
+    /*
     if (payWithDeposit){
       depositPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket
       cashPayAmount = totalReparation
@@ -483,6 +485,7 @@ Page({
     else{
       depositPayAmount = that.data.depositPayAmount
     }
+    */
     cashPayAmount = cashPayAmount - depositPayAmount
     var rentalSettleAmount = totalRental + totalOvertimeCharge - that.data.rentalReduce - that.data.rentalReduceTicket
     
@@ -914,12 +917,12 @@ Page({
       method: 'GET',
       success: (res) => {
         if (res.statusCode == 200){
-          that.getData()
           that.close()
         }
       },
       complete:(res)=>{
         that.setData({refunding: false})
+        that.getData()
       }
     })
   },
@@ -1430,10 +1433,22 @@ Page({
   },
   payWithDeposit(){
     var that = this
-    var payUrl = 'https://' + app.globalData.domainName + '/core/Deposit/RentOderPay/' + that.data.rentOrder.id + '?amount=' + that.data.depositPayAmount.toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var rentOrder = that.data.rentOrder
+    if (isNaN(that.data.depositPayAmount)){
+      wx.showToast({
+        title: '请填写正确的储值支付金额',
+        icon: 'error'
+      })
+      return
+    }
+    var depositPayAmount = parseFloat(that.data.depositPayAmount) - rentOrder.totalDepositPaidAmount 
+    var payUrl = 'https://' + app.globalData.domainName + '/core/Deposit/RentOderPay/' + that.data.rentOrder.id + '?amount=' + depositPayAmount.toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: payUrl,
-      method: 'GET'
+      method: 'GET',
+      success: (res)=>{
+        that.getData()
+      }
     })
   },
   payAdditional(){
@@ -1656,8 +1671,10 @@ Page({
     var value = e.detail.value
     if (!isNaN(value)){
       var depositPayAmount = parseFloat(value)
-      that.setData({depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount)})
+      that.setData({depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount),
+        depositPayAmountMod: true})
+      that.computeTotal()
     }
-    that.computeTotal()
+    
   }
 })
