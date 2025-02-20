@@ -923,6 +923,7 @@ Page({
       complete:(res)=>{
         that.setData({refunding: false})
         that.getData()
+        that.computeTotal()
       }
     })
   },
@@ -1448,6 +1449,7 @@ Page({
       method: 'GET',
       success: (res)=>{
         that.getData()
+        that.computeTotal()
       }
     })
   },
