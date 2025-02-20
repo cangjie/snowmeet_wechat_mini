@@ -1,0 +1,19 @@
+<view>
+  <view>
+    <view class="view-row" >
+      <view class="left-column" >账户类型：</view>
+      <view class="right-column" >服务储值</view>
+      <view class="left-column" >账户余额：</view>
+      <view class="right-column" ></view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >收入：</view>
+      <view class="right-column" ></view>
+      <view class="left-column" >支出：</view>
+      <view class="right-column" ></view>
+    </view>
+  </view>
+  <mp-cells title="收支明细" >
+  
+  </mp-cells>
+</view>
