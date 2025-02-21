@@ -136,7 +136,8 @@
     "pages/admin/ticket/ticket_unuse_list",
     "pages/admin/ski_pass/dhhs_skipass_order",
     "pages/admin/rent/pay_additional",
-    "pages/mine/deposit/deposit_list"
+    "pages/mine/deposit/deposit_list",
+    "pages/admin/deposit/deposit_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

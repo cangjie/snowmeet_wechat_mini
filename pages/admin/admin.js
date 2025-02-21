@@ -265,6 +265,9 @@ Page({
       case 'ziwoyou_order':
         path = '/pages/admin/ski_pass/dhhs_skipass_order'
         break
+      case 'deposit_list':
+        path = '/pages/admin/deposit/deposit_list'
+        break
       default:
         break
     }
