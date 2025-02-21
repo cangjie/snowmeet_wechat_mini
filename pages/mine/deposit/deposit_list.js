@@ -80,6 +80,31 @@ Page({
           return
         }
         console.log('accounts', res)
+        var accounts = res.data
+        for(var i = 0; i < accounts.length; i++){
+          var a = accounts[i]
+          a.avaliableAmountStr = util.showAmount(a.avaliableAmount)
+          a.income_amountStr = util.showAmount(a.income_amount)
+          a.consume_amountStr = util.showAmount(a.consume_amount)
+          for(var j = 0; j < a.balances.length; j++){
+            var b = a.balances[j]
+            var createDate = new Date(b.create_date)
+            b.dateStr = util.formatDate(createDate)
+            b.timeStr = util.formatTimeStr(createDate)
+            b.type = b.amount > 0 ? '收入' : '消费'
+            
+            
+            if (b.order != null){
+              b.orderType = ((b.order.type == '服务')? '养护' : '租赁')
+              b.amount = -1 * b.amount
+            }
+            else {
+              b.orderType = '——'
+            }
+            b.amountStr = util.showAmount(b.amount)
+          }
+        }
+        that.setData({accounts})
       }
     }) 
   }

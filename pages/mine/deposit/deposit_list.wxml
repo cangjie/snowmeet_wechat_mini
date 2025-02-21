@@ -1,19 +1,32 @@
-<view>
+<view wx:for="{{accounts}}">
   <view>
     <view class="view-row" >
       <view class="left-column" >账户类型：</view>
-      <view class="right-column" >服务储值</view>
+      <view class="right-column" style="text-align: right; margin-right: 50rpx;" >{{item.type}}</view>
       <view class="left-column" >账户余额：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" style="text-align: right;margin-right: 50rpx;" >{{item.avaliableAmountStr}}</view>
     </view>
     <view class="view-row" >
       <view class="left-column" >收入：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" style="text-align: right;margin-right: 50rpx;" >{{item.income_amountStr}}</view>
       <view class="left-column" >支出：</view>
-      <view class="right-column" ></view>
+      <view class="right-column" style="text-align: right;margin-right: 50rpx;" >{{item.consume_amountStr}}</view>
     </view>
   </view>
   <mp-cells title="收支明细" >
-  
+    <mp-cell wx:for="{{item.balances}}" wx:for-item="b" >
+      <view class="view-row" >
+        <view class="left-column" >日期：</view>
+        <view class="right-column" >{{b.dateStr}}</view>
+        <view class="left-column" >时间：</view>
+        <view class="right-column" >{{b.timeStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >{{b.type}}：</view>
+        <view class="right-column" style="width: 140rpx; text-align: right; margin-right: 10rpx;" >{{b.amountStr}}</view>
+        <view class="left-column" style="width: 190rpx;" >订单类型：</view>
+        <view class="right-column" >{{b.orderType}}</view>
+      </view>
+    </mp-cell>
   </mp-cells>
 </view>

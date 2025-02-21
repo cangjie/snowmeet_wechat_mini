@@ -1,6 +1,10 @@
 {
   "setting": {
-    "urlCheck": false
+    "urlCheck": false,
+    "preloadBackgroundData": false,
+    "compileHotReLoad": true,
+    "skylineRenderEnable": true,
+    "lazyloadPlaceholderEnable": false
   },
   "condition": {
     "miniprogram": {
