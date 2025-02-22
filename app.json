@@ -137,7 +137,10 @@
     "pages/admin/ski_pass/dhhs_skipass_order",
     "pages/admin/rent/pay_additional",
     "pages/mine/deposit/deposit_list",
-    "pages/admin/deposit/deposit_list"
+    "pages/admin/deposit/deposit_list",
+    "pages/admin/deposit/deposit_detail",
+    "pages/admin/deposit/deposit_charge",
+    "pages/admin/deposit/deposit_charge_search"
   ],
   "window": {
     "backgroundTextStyle": "light",

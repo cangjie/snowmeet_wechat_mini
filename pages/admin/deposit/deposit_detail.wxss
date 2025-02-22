@@ -1,0 +1,7 @@
+/* pages/admin/deposit/deposit_detail.wxss */
+.left-column{
+  width: 110rpx;
+}
+.right-column{
+  width: 240rpx;
+}

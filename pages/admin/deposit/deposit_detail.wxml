@@ -1,0 +1,40 @@
+<view>
+  <view class="view-row" >
+    <view class="left-column"  >姓名：</view>
+    <view class="right-column" >
+      {{account.member.real_name}}
+      {{(account.member.gender == '男')? '先生' : ''}}
+      {{(account.member.gender == '女')? '女士' : ''}}
+    </view>
+    <view class="left-column"  >电话：</view>
+    <view class="right-column" >{{account.member.cell}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column"  >日期：</view>
+    <view class="right-column" >{{account.dateStr}}</view>
+    <view class="left-column"  >时间：</view>
+    <view class="right-column" >{{account.timeStr}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column"  >储值：</view>
+    <view class="right-column" >{{account.income_amountStr}}</view>
+    <view class="left-column"  >消费：</view>
+    <view class="right-column" >{{account.consume_amountStr}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column"  >余额：</view>
+    <view class="right-column" >{{account.avaliableAmountStr}}</view>
+    <view class="left-column"  >订单号：</view>
+    <view class="right-column" >
+      <input class="input" value="{{account.biz_id? account.biz_id: ''}}" bindinput="setInput" id="bizId" />
+    </view>
+  </view>
+  <view class="view-row" style="margin-bottom: 40rpx;" >
+    <view class="left-column"  >备注：</view>
+    <view class="right-column" style="width: 590rpx;" >
+      <input class="input" value="{{account.memo}}" bindinput="setInput" id="memo" />
+    </view>
+  </view>
+
+  <button class="input" disabled="{{dealing}}" bindtap="mod" > 修 改 </button>
+</view>

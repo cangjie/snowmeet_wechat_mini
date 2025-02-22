@@ -7,13 +7,13 @@
   </view>
   <mp-cells title="共{{accounts.length}}条 总计 储值：{{totalIncomeStr}} 消费：{{totalConsumeStr}}">
     <mp-cell wx:for="{{accounts}}">
-      <view class="view-row" >
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
         <view class="left-column" >创建日期：</view>
         <view class="right-column">{{item.dateStr}}</view>
         <view class="left-column" >创建时间：</view>
         <view class="right-column">{{item.timeStr}}</view>
       </view>
-      <view class="view-row" >
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
         <view class="left-column" >姓名：</view>
         <view class="right-column">
           {{item.member.real_name}} 
@@ -23,19 +23,19 @@
         <view class="left-column" >电话：</view>
         <view class="right-column">{{item.member.cell}}</view>
       </view>
-      <view class="view-row" >
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
         <view class="left-column" >储值：</view>
         <view class="right-column">{{item.income_amountStr}}</view>
         <view class="left-column" >消费：</view>
         <view class="right-column">{{item.consume_amountStr}}</view>
       </view>
-      <view class="view-row" >
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
         <view class="left-column" >订单号：</view>
         <view class="right-column">{{item.biz_id}}</view>
         <view class="left-column" >余额：</view>
         <view class="right-column">{{item.avaliableAmountStr}}</view>
       </view>
-      <view class="view-row" >
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
         <view class="left-column" >备注：</view>
         <view class="right-column">{{item.memo}}</view>
         

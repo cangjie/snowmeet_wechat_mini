@@ -108,5 +108,11 @@ Page({
   setKey(e){
     var that = this
     that.setData({key: e.detail.value})
+  },
+  gotoDetail(e){
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'deposit_detail?id=' + id.toString(),
+    })
   }
 })

@@ -67,6 +67,7 @@
   </mp-cells>
   <mp-cells ext-class="my-cells" title="储值管理" >
     <mp-cell id="deposit_list" value="【储值】账户列表" bindtap="nav" ></mp-cell>
+    <mp-cell id="deposit_add" value="【储值】新增储值" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="VIP" >
     <mp-cell id="vip_maintain" value="【招待】养护招待" bindtap="nav" ></mp-cell>

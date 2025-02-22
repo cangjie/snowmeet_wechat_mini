@@ -268,6 +268,9 @@ Page({
       case 'deposit_list':
         path = '/pages/admin/deposit/deposit_list'
         break
+      case 'deposit_add':
+        path = '/pages/admin/deposit/deposit_charge_search'
+        break
       default:
         break
     }

@@ -1,0 +1,7 @@
+.left-column{
+  width: 140rpx;
+  margin-left: 10rpx;
+}
+.right-column{
+  width: 210rpx;
+}
