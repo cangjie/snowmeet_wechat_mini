@@ -405,7 +405,7 @@ Component({
         item.packageCode = packageCode
         if (item.index == -1){
           if (!item.noNeed){
-            item.index = currentRentItem.index + i
+            item.index = currentRentItem.index == -1? i : (currentRentItem.index + i)
             rentItemList.push(item)
           }
         }
@@ -446,7 +446,7 @@ Component({
       var that = this
       var rentItemList = that.data.rentItemList
       var currentRentItem = that.data.currentRentItem
-      if (currentRentItem.subItem){
+      if (currentRentItem.subItem && currentRentItem.index == -1){
         that.saveSub()
         return
       }
