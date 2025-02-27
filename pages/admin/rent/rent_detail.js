@@ -221,7 +221,7 @@ Page({
             var detail = rentOrder.details[i]
             if (detail.package_code != null && lastPackage != detail.package_code){
               if (txtColor == '#73703A'){
-                txtColor = '#823943'
+                txtColor = '#00007F'
               }
               else{
                 txtColor = '#73703A'
