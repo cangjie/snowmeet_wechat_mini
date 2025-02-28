@@ -634,6 +634,17 @@ Page({
   },
   setPick(e){
     var that = this
+    var id = parseInt(e.currentTarget.id)
+    var detail = that.data.rentOrder.details[id]
+    if ((detail.rent_item_class == '单板' || detail.rent_item_class == '单板鞋' 
+      || detail.rent_item_class == '双板' || detail.rent_item_class == '双板鞋')
+      && detail.rent_item_code == ''){
+        wx.showToast({
+          title: '板鞋类必填编号。',
+          icon: 'error'
+        })
+        return
+      }
     wx.showModal({
       title: '确认发放装备',
       content: '点确认之前，请先和顾客确认装备是否有误或损坏。',
