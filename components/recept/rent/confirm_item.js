@@ -222,7 +222,8 @@ Component({
         rentDetails.push(item)
 
         var rentItem = rentItemList[i]
-        if ((rentItem.depositType != '预付押金' && (rentItem.name == '' || (!rentItem.isNoCode && rentItem.code == '') || rentItem.class == ''))
+        if ((rentItem.depositType != '预付押金' && rentItem.depositType != '预约租赁' && rentItem.depositType != '先租后取' 
+          && (rentItem.name == '' || (!rentItem.isNoCode && rentItem.code == '') || rentItem.class == ''))
           || isNaN(rentItem.rental) || isNaN(rentItem.deposit)) {
           isValid = false
         }
@@ -376,7 +377,8 @@ Component({
         var message = ''
         if ((item.class == '单板' || item.class == '单板鞋'
         || item.class == '双板' || item.class == '双板鞋')
-        && (item.isNoCode || item.code == '')) {
+        && (item.isNoCode || item.code == '') 
+        && (item.depositType == '立即租赁' || item.depositType == '延时租赁')) {
           message = '板鞋类物品必须填码。'
           valid = false
         }
