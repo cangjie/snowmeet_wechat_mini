@@ -62,7 +62,6 @@
     "pages/admin/rent/rent_detail",
     "pages/rent/bind_rent_order",
     "pages/admin/rent/rent_report",
-    "pages/admin/rent/rent_admit_new",
     "pages/admin/rent/rent_pay",
     "pages/admin/rent/rent_list_by_cell",
     "pages/rent/rent_detail",
@@ -136,7 +135,12 @@
     "pages/admin/ticket/use_entry",
     "pages/admin/ticket/ticket_unuse_list",
     "pages/admin/ski_pass/dhhs_skipass_order",
-    "pages/admin/rent/pay_additional"
+    "pages/admin/rent/pay_additional",
+    "pages/mine/deposit/deposit_list",
+    "pages/admin/deposit/deposit_list",
+    "pages/admin/deposit/deposit_detail",
+    "pages/admin/deposit/deposit_charge",
+    "pages/admin/deposit/deposit_charge_search"
   ],
   "window": {
     "backgroundTextStyle": "light",

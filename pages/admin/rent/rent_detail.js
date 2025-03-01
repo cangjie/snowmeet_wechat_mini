@@ -214,9 +214,35 @@ Page({
             rentOrder.outTradeNo = '-'
           }
           var totalRental = 0
+          var txtColor = '#73703A'
+          var lastPackage = null
           for(var i = 0; i < rentOrder.details.length; i++)
           {
             var detail = rentOrder.details[i]
+            if (detail.package_code != null && lastPackage != detail.package_code){
+              if (txtColor == '#73703A'){
+                txtColor = '#00007F'
+              }
+              else{
+                txtColor = '#73703A'
+              }
+              if (detail.package_code != null){
+                lastPackage = detail.package_code
+              }
+            }
+
+
+
+
+
+
+            if (detail.package_code == null){
+              detail.txtColor = '#000000'
+            }
+            else{
+              detail.txtColor = txtColor
+            }
+
             detail.suggestRental_str = util.showAmount(detail.suggestRental)
             var startDate = new Date(detail.start_date)
             detail.start_dateStr = util.formatDateTime(startDate)
@@ -264,6 +290,18 @@ Page({
             detail.overtime_charge_str = util.showAmount(detail.overtime_charge)
             detail.pickedDateStr = detail.end_dateStr
             detail.pickedTimeStr = that.data.currentTimeStr
+
+            if (detail.pick_date){
+              var pickDate = new Date(detail.pick_date)
+              detail.pick_dateDateStr = util.formatDate(pickDate)
+              detail.pick_dateTimeStr = util.formatTimeStr(pickDate)
+            }
+            if (detail.return_date){
+              var returnDate = new Date(detail.pick_date)
+              detail.return_dateDateStr = util.formatDate(returnDate)
+              detail.return_dateTimeStr = util.formatTimeStr(returnDate)
+            }
+
 
             if (detail.log){
               var logs = detail.log.sort((a, b) => {
@@ -352,16 +390,11 @@ Page({
           refunds.sort((a,b) => (a.create_date - b.create_date))
           console.log('incomes', incomes)
           console.log('refunds', refunds)
-          
-
-
-
-
-
+        
           var realTotalRefundStr = util.showAmount(rentOrder.totalRefund)
-          var bonus = rentOrder.deposit_final - realTotalRefund + that.data.rentOrder.additionalPaidAmount
+          var bonus = rentOrder.deposit_final - rentOrder.totalRefund + that.data.rentOrder.additionalPaidAmount
           
-          that.setData({rentOrder: rentOrder, payWithDeposit: rentOrder.isDepositPaid,
+          that.setData({rentOrder: rentOrder, payWithDeposit: (rentOrder.totalDepositPaidAmount==0? false: true),
             rentalReduce: rentOrder.rental_reduce, rentalReduceStr: util.showAmount(rentOrder.rental_reduce),
             rentalReduceTicket: rentOrder.rental_reduce_ticket, rentalReduceTicketStr: util.showAmount(rentOrder.rental_reduce_ticket),
               realTotalRefund: realTotalRefund, realTotalRefundStr: realTotalRefundStr, bonus: bonus, bonusStr: util.showAmount(bonus), textColor: rentOrder.textColor, backColor: rentOrder.backColor, realTotalAmount, incomes, refunds, 
@@ -461,17 +494,30 @@ Page({
     
     var payWithDeposit = that.data.payWithDeposit
     var cashPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket + totalReparation
-    var depositPayAmount = 0
+    var depositPayAmount = that.data.depositPayAmountMod? 
+      that.data.depositPayAmount : rentOrder.totalDepositPaidAmount
+
+    /*
     if (payWithDeposit){
       depositPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket
       cashPayAmount = totalReparation
       refundAmount += depositPayAmount
     }
+    else{
+      depositPayAmount = that.data.depositPayAmount
+    }
+    */
+    cashPayAmount = cashPayAmount - depositPayAmount
+    var rentalSettleAmount = totalRental + totalOvertimeCharge - that.data.rentalReduce - that.data.rentalReduceTicket
+    
+    var cashTotal = cashPayAmount + totalReparation 
+    refundAmount = rentOrder.depositPaid - cashTotal
     var unRefund = refundAmount - that.data.rentOrder.totalRefund
 
     var unRefundStr = util.showAmount(unRefund)
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
-      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparation, totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder, unRefund: unRefund, unRefundStr: unRefundStr, depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount), cashPayAmount, cashPayAmountStr: util.showAmount(cashPayAmount)})
+      totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparation, totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder, unRefund: unRefund, unRefundStr: unRefundStr, depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount), cashPayAmount, cashPayAmountStr: util.showAmount(cashPayAmount), rentalSettleAmount, rentalSettleAmountStr: util.showAmount(rentalSettleAmount),
+      cashTotal, cashTotalStr: util.showAmount(cashTotal)})
   },
   
 //////set buttons/////////////
@@ -583,6 +629,65 @@ Page({
           title: '已提取。',
         })
         that.getData()
+      }
+    })
+  },
+  setPick(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var detail = that.data.rentOrder.details[id]
+    if ((detail.rent_item_class == '单板' || detail.rent_item_class == '单板鞋' 
+      || detail.rent_item_class == '双板' || detail.rent_item_class == '双板鞋')
+      && detail.rent_item_code == ''){
+        wx.showToast({
+          title: '板鞋类必填编号。',
+          icon: 'error'
+        })
+        return
+      }
+    wx.showModal({
+      title: '确认发放装备',
+      content: '点确认之前，请先和顾客确认装备是否有误或损坏。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          that.setPcikConfirm(e)
+        }
+      }
+    })
+  },
+  setPcikConfirm(e){
+    var id = parseInt(e.currentTarget.id)
+    if (isNaN(id)){
+      return 
+    }
+    var that = this
+    var detail = that.data.rentOrder.details[id]
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetDetailLog/' + detail.id + '?status=' + encodeURIComponent('已发放') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: setUrl,
+      method:'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        detail = res.data
+        var rentOrder = that.data.rentOrder
+        rentOrder.details[id] = detail
+      
+        wx.showToast({
+          title: '装备已发放',
+          icon: 'success',
+          duration: 1000,
+          success:()=>{
+            rentOrder = that.computeAmount(rentOrder)
+            that.setData({rentOrder: rentOrder})
+            that.getData()
+          }
+        })
       }
     })
   },
@@ -825,7 +930,7 @@ Page({
     
         if (res.confirm) {
           that.refund(unRefund)
-          if (that.data.payWithDeposit){
+          if (that.data.depositPayAmount > 0){
             that.payWithDeposit()
           }
         }
@@ -844,12 +949,13 @@ Page({
       method: 'GET',
       success: (res) => {
         if (res.statusCode == 200){
-          that.getData()
           that.close()
         }
       },
       complete:(res)=>{
         that.setData({refunding: false})
+        that.getData()
+        that.computeTotal()
       }
     })
   },
@@ -1360,10 +1466,23 @@ Page({
   },
   payWithDeposit(){
     var that = this
-    var payUrl = 'https://' + app.globalData.domainName + '/core/Deposit/RentOderPay/' + that.data.rentOrder.id + '?amount=' + that.data.depositPayAmount.toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var rentOrder = that.data.rentOrder
+    if (isNaN(that.data.depositPayAmount)){
+      wx.showToast({
+        title: '请填写正确的储值支付金额',
+        icon: 'error'
+      })
+      return
+    }
+    var depositPayAmount = parseFloat(that.data.depositPayAmount) - rentOrder.totalDepositPaidAmount 
+    var payUrl = 'https://' + app.globalData.domainName + '/core/Deposit/RentOderPay/' + that.data.rentOrder.id + '?amount=' + depositPayAmount.toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: payUrl,
-      method: 'GET'
+      method: 'GET',
+      success: (res)=>{
+        that.getData()
+        that.computeTotal()
+      }
     })
   },
   payAdditional(){
@@ -1500,7 +1619,7 @@ Page({
           log.create_dateStr = util.formatDateTime(new Date(log.create_date))
           log.amountStr = util.showAmount(log.amount)
           log.staffName = refund.msa.member.real_name
-          log.color = '#00FF00'
+          log.color = '#009000'
           log.back = 'white'
           logs.push(log)
         }
@@ -1508,6 +1627,88 @@ Page({
         //console.log('log', logs)
         that.setData({logs})
       }
+      
     })
+  },
+  setDateTime(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var id = parseInt(idArr[2])
+    var rentOrder = that.data.rentOrder
+    var detail = rentOrder.details[id]
+    var value = e.detail.value
+    console.log('set date time', e)
+    var oriDate = undefined
+    var oriTime = undefined
+    var newDate = undefined
+    var newTime = undefined
+    var oriDateTime = undefined
+    if (idArr[0] == 'pick'){
+      oriDateTime = new Date(detail.pick_date)
+    }
+    if (idArr[0] == 'return'){
+      oriDateTime = new Date(detail.return_date)
+    }
+    oriDate = util.formatDate(oriDateTime)
+    oriTime = util.formatTimeStr(oriDateTime)
+    if (idArr[1] == 'date'){
+      newDate = value
+      newTime = oriTime
+    }
+    if (idArr[1] = 'time'){
+      newDate = oriDate
+      newTime = value
+    }
+    var title = '修改' + ((idArr[0] == 'pick') ? ' 发放 ' : ' 归还 ') + '时间'
+    var content = '从 ' + oriDate + ' ' + oriTime + ' 修改成 ' + newDate + ' ' + newTime
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+        if (res.confirm) {
+          console.log('now detail', detail)
+          if (idArr[0] == 'pick'){
+            detail.pick_date = newDate + 'T' + newTime
+          }
+          if(idArr[1] == 'return'){
+            detail.return_date = newDate + 'T' + newTime
+          }
+          //that.setData({rentOrder})
+          //that.save(e)
+          var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          wx.request({
+            url: updateUrl,
+            method: 'POST',
+            data: detail,
+            success:(res)=>{
+              if (res.statusCode != 200){
+                return
+              }
+          
+              rentOrder.details[id] = detail
+              that.computeAmount(rentOrder)
+              that.computeTotal()
+              that.setData({rentOrder: rentOrder})
+              that.getData()
+        
+            }
+          })
+        }
+      }
+    })
+  },
+  setDepositPayAmount(e){
+    var that = this
+    var value = e.detail.value
+    if (!isNaN(value)){
+      var depositPayAmount = parseFloat(value)
+      that.setData({depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount),
+        depositPayAmountMod: true})
+      that.computeTotal()
+    }
+    
   }
 })

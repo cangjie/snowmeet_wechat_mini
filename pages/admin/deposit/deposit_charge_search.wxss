@@ -1,0 +1,6 @@
+.left-column{
+  width: 150rpx;
+}
+.right-column{
+  width: 200rpx;
+}

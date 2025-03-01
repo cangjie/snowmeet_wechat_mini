@@ -164,9 +164,7 @@ Page({
       case 'ticket_print':
         path = '/pages/admin/ticket/ticket_template_list'
         break
-      case 'rend_admit':
-        path = 'rent/rent_admit_new'
-        break
+      
       case 'rent_list':
         path = 'rent/rent_list'
         break
@@ -266,6 +264,12 @@ Page({
         break
       case 'ziwoyou_order':
         path = '/pages/admin/ski_pass/dhhs_skipass_order'
+        break
+      case 'deposit_list':
+        path = '/pages/admin/deposit/deposit_list'
+        break
+      case 'deposit_add':
+        path = '/pages/admin/deposit/deposit_charge_search'
         break
       default:
         break

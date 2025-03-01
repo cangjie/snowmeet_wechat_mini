@@ -1,0 +1,45 @@
+<view>
+  <view class="view-row" style="text-align: center;" >
+    <view style="margin-left: 100rpx;margin-top: 10rpx;width: 300rpx;">
+      <input class="input" placeholder="输入姓名或手机号后四位" style="width: 350rpx;" bindinput="setKey" />
+    </view>
+    <button class="input" size="mini" disabled="{{dealing}}" bindtap="getData" > 查 询 </button>
+  </view>
+  <mp-cells title="共{{accounts.length}}条 总计 储值：{{totalIncomeStr}} 消费：{{totalConsumeStr}}">
+    <mp-cell wx:for="{{accounts}}">
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+        <view class="left-column" >创建日期：</view>
+        <view class="right-column">{{item.dateStr}}</view>
+        <view class="left-column" >创建时间：</view>
+        <view class="right-column">{{item.timeStr}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column">
+          {{item.member.real_name}} 
+          {{(item.member.gender == '男')? '先生' : ''}}
+          {{(item.member.gender == '女')? '女士' : ''}}
+        </view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column">{{item.member.cell}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+        <view class="left-column" >储值：</view>
+        <view class="right-column">{{item.income_amountStr}}</view>
+        <view class="left-column" >消费：</view>
+        <view class="right-column">{{item.consume_amountStr}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+        <view class="left-column" >订单号：</view>
+        <view class="right-column">{{item.biz_id}}</view>
+        <view class="left-column" >余额：</view>
+        <view class="right-column">{{item.avaliableAmountStr}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+        <view class="left-column" >备注：</view>
+        <view class="right-column">{{item.memo}}</view>
+        
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

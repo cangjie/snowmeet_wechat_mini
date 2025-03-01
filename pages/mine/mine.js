@@ -121,6 +121,11 @@ Page({
       url: '/pages/mine/maintain/order_list',
     })
   },
+  gotoDeposit(){
+    wx.navigateTo({
+      url: '/pages/mine/deposit/deposit_list',
+    })
+  },
   nav(e){
     var path = '/pages/index/index'
     var id = e.currentTarget.id
