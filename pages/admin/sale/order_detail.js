@@ -10,7 +10,8 @@ Page({
     isOrderInfoReady: false,
     payMethod: '微信支付',
     chargeAmount: 0,
-    showModal: false
+    showModal: false,
+    refunding: false
   },
   goHome(){
     wx.redirectTo({
@@ -22,26 +23,9 @@ Page({
    */
   onLoad(options) {
     var that = this
-    app.loginPromiseNew.then(function(resolve){
-      that.setData({role: app.globalData.role})
-      var orderId = parseInt(options.id)
-      var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetWholeOrderByStaff/' + orderId + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: getOrderUrl,
-        method: 'GET',
-        success:(res)=>{
-          var order = res.data
-          order.date = util.formatDate(new Date(order.create_date))
-          order.time = util.formatTimeStr(new Date(order.create_date))
-          for(var i = 0; i < order.payments.length; i++){
-            var payment = order.payments[i]
-            payment.date = util.formatDate(new Date(payment.create_date))
-            payment.time = util.formatTimeStr(new Date(payment.create_date))
-          }
-          that.setData({order: order, isOrderInfoReady: true})
-        }
-      })
-    })
+    var orderId = parseInt(options.id)
+    that.setData({orderId})
+    
   },
 
   modMi7OrderNo(e){
@@ -63,7 +47,11 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.setData({role: app.globalData.role})
+      that.getData()
+    })
   },
 
   /**
@@ -190,5 +178,93 @@ Page({
       
     })
 
+  },
+  getData(){
+    var that = this
+    var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetWholeOrderByStaff/' + that.data.orderId + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getOrderUrl,
+      method: 'GET',
+      success:(res)=>{
+        var order = res.data
+        order.date = util.formatDate(new Date(order.create_date))
+        order.time = util.formatTimeStr(new Date(order.create_date))
+        for(var i = 0; i < order.payments.length; i++){
+          var payment = order.payments[i]
+          payment.date = util.formatDate(new Date(payment.create_date))
+          payment.time = util.formatTimeStr(new Date(payment.create_date))
+          payment.amountStr = util.showAmount(payment.amount)
+          payment.refundStr = util.showAmount(payment.refundedAmount)
+        }
+        that.setData({order: order, isOrderInfoReady: true})
+      }
+    })
+  },
+  refundInput(e){
+    var that = this
+    var id = e.currentTarget.id
+    var value = e.detail.value
+    switch(id){
+      case 'reason':
+        that.setData({reason: value})
+        break
+      case 'refundAmount':
+        that.setData({refundAmount: value})
+        break
+      default:
+        break
+    }
+  },
+  refund(e){
+    var id = e.currentTarget.id
+    var that = this
+    var msg = ''
+    if (!that.data.reason || that.data.reason == ''){
+      msg = '必须填写退款原因'
+    }
+    if (!that.data.refundAmount || isNaN(that.data.refundAmount)){
+      msg = '退款金额是数字'
+    }
+    if (msg != ''){
+      wx.showToast({
+        title: msg,
+        icon: 'error'
+      })
+      return
+    }
+    that.setData({refunding: true})
+    wx.showModal({
+      title: '确认退款',
+      content: '该操作不可逆，且店长以下操作会失败。是否确认？',
+      complete: (res) => {
+        if (res.cancel) {
+          that.setData({refunding: false})
+        }
+    
+        if (res.confirm) {
+          var refundUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Refund/' + id + '?amount=' + that.data.refundAmount + '&reason=' + encodeURIComponent(that.data.reason) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+          wx.request({
+            url: refundUrl,
+            method: 'GET',
+            success:(res)=>{
+              if (res.statusCode != 200){
+                wx.showToast({
+                  title: '退款失败',
+                  icon: 'error'
+                })
+              }
+              wx.showToast({
+                title: '退款成功',
+                icon: 'success'
+              })
+            },
+            complete:(res)=>{
+              that.setData({refunding: false})
+              that.getData()
+            }
+          })
+        }
+      }
+    })
   }
 })
