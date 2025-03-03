@@ -10,16 +10,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "deposit",
-          "pathName": "pages/mine/deposit/deposit_list",
-          "query": "",
+          "name": "pay temp order",
+          "pathName": "pages/payment/rent_pay_add",
+          "query": "id=1003",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "pay temp order",
-          "pathName": "pages/payment/pay_recept",
-          "query": "id=15053",
+          "name": "deposit",
+          "pathName": "pages/mine/deposit/deposit_list",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },
