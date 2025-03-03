@@ -398,6 +398,29 @@
       <button disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" bindtap="refundConfirm" size="mini" style="font-size: 10pt;" class="input">确认退款</button>
     </view>
   </view>
+  <view style="display: flex; flex-direction: row;" >
+    <checkbox-group >
+      <view style="display: flex; flex-direction: row;" >
+        <view style="margin-left: 10rpx;width: 75rpx;"></view>
+        <view style="width: 130rpx; text-align: center;">日期</view>
+        <view style="width: 75rpx; text-align: center;" >时间</view>
+        <view style="width: 110rpx; text-align: center;" >支付方式</view>
+        <view style="width: 120rpx; text-align: center;" >金额</view>
+        <view style="width: 150rpx; text-align: center;" >退款</view>
+      </view>
+      <view wx:for="{{rentOrder.payments}}" style="display: flex; flex-direction: row;margin-top: 20rpx;" >
+        <view style="margin-left: 10rpx;width: 75rpx;" ><checkbox value="{{item.id}}" /></view>
+        <view style="width: 130rpx; text-align: center;" >2025-03-01</view>
+        <view style="width: 75rpx; text-align: center;" >18:20</view>
+        <view style="width: 110rpx; text-align: center;" >微信支付</view>
+        <view style="width: 120rpx; text-align: right;" >¥10000.00</view>
+        <view style="width: 150rpx; margin-left: 30rpx;" ><input class="input" style="width: 100rpx;"  /></view>
+      </view>
+    </checkbox-group>
+  </view>
+  <view style="display: flex; flex-direction: row;margin-top: 20rpx;" >
+    <button class="input" > 确 认 退 款 </button>
+  </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">订单结余：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{bonusStr}}</view>
