@@ -214,9 +214,35 @@ Page({
             rentOrder.outTradeNo = '-'
           }
           var totalRental = 0
+          var txtColor = '#73703A'
+          var lastPackage = null
           for(var i = 0; i < rentOrder.details.length; i++)
           {
             var detail = rentOrder.details[i]
+            if (detail.package_code != null && lastPackage != detail.package_code){
+              if (txtColor == '#73703A'){
+                txtColor = '#00007F'
+              }
+              else{
+                txtColor = '#73703A'
+              }
+              if (detail.package_code != null){
+                lastPackage = detail.package_code
+              }
+            }
+
+
+
+
+
+
+            if (detail.package_code == null){
+              detail.txtColor = '#000000'
+            }
+            else{
+              detail.txtColor = txtColor
+            }
+
             detail.suggestRental_str = util.showAmount(detail.suggestRental)
             var startDate = new Date(detail.start_date)
             detail.start_dateStr = util.formatDateTime(startDate)
@@ -364,12 +390,7 @@ Page({
           refunds.sort((a,b) => (a.create_date - b.create_date))
           console.log('incomes', incomes)
           console.log('refunds', refunds)
-          
-
-
-
-
-
+        
           var realTotalRefundStr = util.showAmount(rentOrder.totalRefund)
           var bonus = rentOrder.deposit_final - rentOrder.totalRefund + that.data.rentOrder.additionalPaidAmount
           
@@ -613,6 +634,17 @@ Page({
   },
   setPick(e){
     var that = this
+    var id = parseInt(e.currentTarget.id)
+    var detail = that.data.rentOrder.details[id]
+    if ((detail.rent_item_class == '单板' || detail.rent_item_class == '单板鞋' 
+      || detail.rent_item_class == '双板' || detail.rent_item_class == '双板鞋')
+      && detail.rent_item_code == ''){
+        wx.showToast({
+          title: '板鞋类必填编号。',
+          icon: 'error'
+        })
+        return
+      }
     wx.showModal({
       title: '确认发放装备',
       content: '点确认之前，请先和顾客确认装备是否有误或损坏。',

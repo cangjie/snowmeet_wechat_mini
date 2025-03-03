@@ -90,19 +90,19 @@
   <mp-cells title="租赁明细 总计：{{rentOrder.details.length}}" style="background-color: {{backColor}};">
     <mp-cell wx:for="{{rentOrder.details}}" style="margin-left: 0rpx;">
       <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">编号：</view>
-        <view wx:if="{{item.isEdit && item.editType != '暂存' }}" class="right-column" style="display: flex; flex-direction: row;color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">编号：</view>
+        <view wx:if="{{item.isEdit && item.editType != '暂存' }}" class="right-column" style="display: flex; flex-direction: row;color:{{item.txtColor}}">
           <input id="code_{{index}}" style="width: 200rpx;" value="{{item.rent_item_code}}" bindinput="setTextValue" class="input" type="text" />
 
         </view>
-        <view wx:else class="right-column" style="color:{{textColor}};background-color: {{backColor}};">{{item.rent_item_code}}</view>
-        <view class="left-column" style="color:{{textColor}};background-color: {{backColor}};">分类：</view>
+        <view wx:else class="right-column" style="color:{{item.txtColor}};background-color: {{backColor}};">{{item.rent_item_code}}</view>
+        <view class="left-column" style="color:{{item.txtColor}};background-color: {{backColor}};">分类：</view>
         <view wx:if="{{item.isEdit && item.editType != '暂存'}}" class="right-column" style="background-color: {{backColor}};">
           <picker mode="selector" range="{{classList}}" bindchange="selectClass" id="{{index}}" class="input" style="width: 100rpx">
             <picker-view style="font-size: 9pt">{{classList[item.classIndex]}}</picker-view>
           </picker>
         </view>
-        <view wx:else class="right-column" style="color:{{textColor}}">{{item.rent_item_class}}</view>
+        <view wx:else class="right-column" style="color:{{item.txtColor}}">{{item.rent_item_class}}</view>
 
       </view>
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
@@ -114,15 +114,15 @@
       </view>
 
       <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">押金类型：</view>
-        <view class="right-column" style="color:{{textColor}}">{{item.deposit_type}}</view>
-        <view class="left-column" style="color:{{textColor}}">状态：</view>
-        <view class="right-column" style="color:{{textColor}}">{{item.status}}</view>
+        <view class="left-column" style="color:{{item.txtColor}}">押金类型：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">{{item.deposit_type}}</view>
+        <view class="left-column" style="color:{{item.txtColor}}">状态：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">{{item.status}}</view>
       </view>
 
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">发放：</view>
-        <view class="right-column" style="font-size: 9pt;color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">发放：</view>
+        <view class="right-column" style="font-size: 9pt;color:{{item.txtColor}}">
           <view wx:if="{{!item.pick_date}}">
             --
           </view>
@@ -135,8 +135,8 @@
             </picker>
           </view>
         </view>
-        <view class="left-column" style="color:{{textColor}}">归还：</view>
-        <view class="right-column"  style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">归还：</view>
+        <view class="right-column"  style="color:{{item.txtColor}}">
           <view wx:if="{{!item.return_date}}">
             --
           </view>
@@ -155,7 +155,7 @@
 
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
 
-        <view class="left-column" style="color:{{textColor}}">起租：</view>
+        <view class="left-column" style="color:{{item.txtColor}}">起租：</view>
         <view class="right-column" style="font-size: 9pt;color:{{textColor}}">
           <view wx:if="{{item.status == '未领取' || rentOrder.status == '已完成'}}">
             {{item.start_dateStr}}
@@ -170,8 +170,8 @@
           </view>
         </view>
 
-        <view class="left-column" style="color:{{textColor}}">退租：</view>
-        <view class="right-column" wx:if="{{item.status == '已归还' && isManager == 1 && rentOrder.status != '已完成' }}" style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">退租：</view>
+        <view class="right-column" wx:if="{{item.status == '已归还' && isManager == 1 && rentOrder.status != '已完成' }}" style="color:{{item.txtColor}}">
 
           <picker mode="date" class="input" id="{{index}}" bindchange="setReturnDate" start="{{item.start_dateStr}}">
             <picker-view>{{item.pickEnd_dateStr}}</picker-view>
@@ -181,72 +181,72 @@
           </picker>
 
         </view>
-        <view class="right-column" style="font-size: 9pt;color:{{textColor}}" wx:else>{{item.real_end_dateStr}}</view>
+        <view class="right-column" style="font-size: 9pt;color:{{item.txtColor}}" wx:else>{{item.real_end_dateStr}}</view>
 
       </view>
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">租赁单价：</view>
-        <view class="right-column" wx:if="{{item.isEdit && item.editType != '暂存' }}" style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">租赁单价：</view>
+        <view class="right-column" wx:if="{{item.isEdit && item.editType != '暂存' }}" style="color:{{item.txtColor}}">
           <input type="digit" id="{{index}}" placeholder="{{item.unit_rental}}" bindinput="setUnitRental" class="input" style="width: 150rpx;" />
         </view>
-        <view class="right-column" wx:else style="color:{{textColor}}">{{item.unit_rental_str}}</view>
-        <view class="left-column" style="color:{{textColor}}">租用时间：</view>
-        <view class="right-column" style="color:{{textColor}}">{{item.timeLength}}</view>
+        <view class="right-column" wx:else style="color:{{item.txtColor}}">{{item.unit_rental_str}}</view>
+        <view class="left-column" style="color:{{item.txtColor}}">租用时间：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">{{item.timeLength}}</view>
       </view>
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">租金小计：</view>
-        <view class="right-column" style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">租金小计：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">
           {{item.suggestRental_str}}
         </view>
-        <view class="left-column" style="color:{{textColor}}">租金减免：</view>
+        <view class="left-column" style="color:{{item.txtColor}}">租金减免：</view>
         <view class="right-column">
           <input wx:if="{{(item.status == '未归还' || item.isEdit == true) && item.editType != '暂存' }}" type="digit" id="discount_{{index}}" placeholder="{{item.rental_discount}}" bindinput="setDiscount" class="input" style="width: 150rpx;" />
-          <block wx:else style="color:{{textColor}}">{{item.rental_discountStr}}</block>
+          <block wx:else style="color:{{item.txtColor}}">{{item.rental_discountStr}}</block>
         </view>
       </view>
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">优惠券减免：</view>
-        <view class="right-column" style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">优惠券减免：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">
           <input wx:if="{{(item.status == '未归还' || item.isEdit == true) && item.editType != '暂存' }}" type="digit" id="ticket_discount_{{index}}" placeholder="{{item.rental_ticket_discount}}" bindinput="setTicketDiscount" class="input" style="width: 150rpx;" />
-          <block wx:else style="color:{{textColor}}">{{item.rental_ticket_discountStr}}</block>
+          <block wx:else style="color:{{item.txtColor}}">{{item.rental_ticket_discountStr}}</block>
         </view>
-        <view class="left-column" style="color:{{textColor}}">实付租金：</view>
+        <view class="left-column" style="color:{{item.txtColor}}">实付租金：</view>
         <view class="right-column" style="color: red;">{{item.real_rental_str}}</view>
       </view>
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">超时：</view>
-        <view class="right-column" style="color:{{textColor}}">{{(item.overTime)? '是' : '否'}}</view>
-        <view class="left-column" style="color:{{textColor}}">超时费：</view>
-        <view class="right-column" style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">超时：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">{{(item.overTime)? '是' : '否'}}</view>
+        <view class="left-column" style="color:{{item.txtColor}}">超时费：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">
           <input wx:if="{{item.isEdit && item.editType != '暂存'}}" type="digit" id="{{index}}" bindinput="setOvertimeCharge" class="input" style="width: 150rpx;" placeholder="{{item.overtime_charge}}" />
           <view wx:else>{{item.overtime_charge_str}}</view>
 
         </view>
       </view>
       <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">损坏赔偿：</view>
-        <view class="right-column" style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">损坏赔偿：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">
           <input wx:if="{{(item.status == '未归还' || item.isEdit == true) && item.editType != '暂存' }}" type="digit" id="reparation_{{index}}" placeholder="{{item.reparation}}" bindinput="setReparation" class="input" style="width: 150rpx;" />
           <block wx:else>{{item.reparationStr}}</block>
         </view>
-        <view class="left-column" style="color:{{textColor}}">应付总计：</view>
-        <view class="right-column" style="color:{{textColor}}">{{item.paySummaryStr}}</view>
+        <view class="left-column" style="color:{{item.txtColor}}">应付总计：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">{{item.paySummaryStr}}</view>
       </view>
       <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">已付押金：</view>
-        <view class="right-column" style="color:{{textColor}}">{{item.deposit_str}}</view>
-        <view class="left-column" style="color:{{textColor}}">应退金额：</view>
-        <view class="right-column" style="color:{{textColor}}">{{item.refund_str}}</view>
+        <view class="left-column" style="color:{{item.txtColor}}">已付押金：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">{{item.deposit_str}}</view>
+        <view class="left-column" style="color:{{item.txtColor}}">应退金额：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">{{item.refund_str}}</view>
       </view>
 
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
-        <view class="left-column" style="color:{{textColor}}">发放：</view>
-        <view class="right-column" style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">发放：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">
           <view wx:if="{{item.status == '已发放' || item.status == '已归还'}}">{{item.rentStaff.real_name}}</view>
           <view wx:else>————</view>
         </view>
-        <view class="left-column" style="color:{{textColor}}">归还：</view>
-        <view class="right-column" style="color:{{textColor}}">
+        <view class="left-column" style="color:{{item.txtColor}}">归还：</view>
+        <view class="right-column" style="color:{{item.txtColor}}">
           <view wx:if="{{item.status == '已归还'}}">{{item.returnStaff.real_name}}</view>
           <view wx:else>————</view>
         </view>

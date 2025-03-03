@@ -1,2 +1,0 @@
-<!--components/refresh_test/test1.wxml-->
-<view>test1:{{word}}</view>
