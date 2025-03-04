@@ -395,7 +395,7 @@
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{unRefundStr}}</view>
     <view class="left-column"></view>
     <view class="right-column">
-      <button disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" bindtap="refundConfirm" size="mini" style="font-size: 10pt;" class="input">确认退款</button>
+      <!--button disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" bindtap="refundConfirm" size="mini" style="font-size: 10pt;" class="input">确认退款</button-->
     </view>
   </view>
   <view style="display: flex; flex-direction: row;" >
@@ -441,6 +441,9 @@
       <textarea type="text" class="input" style="width:440rpx;height:200rpx" bindinput="setOrderMemo" value="{{rentOrder.memo}}"></textarea>
     </view>
 
+  </view>
+  <view style="text-align: center; margin-top: 20rpx;">
+    <button disabled="{{!orderMemo}}" bindtap="saveOrderMemo" size="mini" class="input" > 保 存 </button>
   </view>
 
 

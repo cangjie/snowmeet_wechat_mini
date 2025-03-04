@@ -835,14 +835,30 @@ Page({
     })
   },
   setOrderMemo(e){
+    var that = this
+    var value = e.detail.value
+    that.setData({orderMemo: value})
+  },
+  saveOrderMemo(e){
     console.log('set memo', e)
     var that = this
     var rentOrder = that.data.rentOrder
-    var value = e.detail.value
-    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetMemo/' + rentOrder.id + '?memo=' + encodeURIComponent(value) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    //var value = e.detail.value
+    var setUrl = 'https://' + app.globalData.domainName + '/core/Rent/SetMemo/' + rentOrder.id + '?memo=' + encodeURIComponent(that.data.orderMemo) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: setUrl,
-      method: 'GET'
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        wx.showToast({
+          title: '修改成功',
+          icon: 'success'
+        })
+        that.setData({orderMemo: ''})
+        that.getData()
+      }
     })
   },
   setInstance(e){
