@@ -1,0 +1,46 @@
+<view>
+  <mp-cells title="租赁订单信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column"></view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column"></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >日期：</view>
+        <view class="right-column"></view>
+        <view class="left-column" >可抵扣金额：</view>
+        <view class="right-column"></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="设置抵扣金额" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 200rpx;" >七色米订单号：</view>
+        <view></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 200rpx;" >订单金额：</view>
+        <view></view>
+      </view>
+    </mp-cell>
+  
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 200rpx;" >抵扣金额：</view>
+        <view>
+          <input class="input" style="width: 120rpx;" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <button class="input" > 保 存 </button>
+    </mp-cell>
+  </mp-cells>
+</view>

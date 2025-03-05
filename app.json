@@ -140,7 +140,8 @@
     "pages/admin/deposit/deposit_list",
     "pages/admin/deposit/deposit_detail",
     "pages/admin/deposit/deposit_charge",
-    "pages/admin/deposit/deposit_charge_search"
+    "pages/admin/deposit/deposit_charge_search",
+    "pages/admin/rent/set_award"
   ],
   "window": {
     "backgroundTextStyle": "light",

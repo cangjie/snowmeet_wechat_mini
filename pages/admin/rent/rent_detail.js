@@ -1824,6 +1824,12 @@ Page({
         that.setData({refunding: false})
       }
     })
+  },
+  setAward(e){
+    var that = this
+    wx.navigateTo({
+      url: 'set_award?id=' + that.data.rentOrder.id,
+    })
   }
   
 })

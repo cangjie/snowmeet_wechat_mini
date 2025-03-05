@@ -346,6 +346,11 @@
     <view class="left-column" style="width: 200rpx; color:{{textColor}}">现金消费金额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{cashPayAmountStr}}</view>
   </view>
+  <view class="view-row">
+    <view class="left-column" style="width: 200rpx; color:{{textColor}}">消费抵扣：</view>
+    <view class="right-column" style="width: 200rpx;color:{{textColor}}">¥0.00</view>
+    <view><button size="mini" class="input" bindtap="setAward" >设置抵扣金额</button></view>
+  </view>
   <view style="display: flex; flex-direction: row;">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">赔偿合计：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{totalReparationStr}}</view>
