@@ -1796,8 +1796,8 @@ Page({
         refundSum += filledRefundAmount
       }
     }
-    if (refundSum != parseFloat(that.data.refundAmount)){
-      msg = '逐笔退款金额总和与未退金额不符。'
+    if (refundSum > parseFloat(that.data.unRefund)){
+      msg = '逐笔退款金额总不大于未退金额。'
     }
     if (msg != ''){
       wx.showToast({
