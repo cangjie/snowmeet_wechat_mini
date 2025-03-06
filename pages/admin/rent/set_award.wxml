@@ -26,6 +26,12 @@
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
+        <view class="left-column" style="width: 200rpx;" >订单日期：</view>
+        <view></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
         <view class="left-column" style="width: 200rpx;" >订单金额：</view>
         <view></view>
       </view>
@@ -63,6 +69,7 @@
         <view class="right-column" >2025-03-01</view>
       </view>
     </mp-cell>
+    
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" style="width: 200rpx;" >订单金额：</view>
