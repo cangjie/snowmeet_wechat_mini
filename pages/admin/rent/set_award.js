@@ -79,7 +79,35 @@ Page({
         if (res.statusCode != 200){
           return
         }
+        var rentOrder = res.data
+        rentOrder.create_dateStr = util.formatDate(new Date(rentOrder.create_date))
+        rentOrder.unRefundedAmount = rentOrder.totalCharge - rentOrder.totalRefund
+        rentOrder.unRefundedAmountStr = util.showAmount(rentOrder.unRefundedAmount)
+        for(var i = 0; i < rentOrder.payments.length; i++){
+          var p = rentOrder.payments[i]
+          p.create_dateStr = util.formatDate(new Date(p.create_date))
+          p.unRefundedAmountStr = util.showAmount(p.unRefundedAmount)
+        }
+        that.setData({rentOrder})
       }
     })
-  }
+  },
+  selectRefundItem(e){
+    var that = this
+    console.log('set refund', e)
+    var rentOrder = that.data.rentOrder
+    
+    var payments = rentOrder.payments
+    for(var i = 0; payments && i < payments.length; i++){
+      var payment = payments[i]
+      payment.checked = false
+      for(var j = 0; j < e.detail.value.length; j++){
+        if (payment.id == parseInt(e.detail.value[j])){
+          payment.checked = true
+          break
+        }
+      }
+    }
+    that.setData({rentOrder})
+  },
 })
