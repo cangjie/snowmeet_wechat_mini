@@ -297,7 +297,7 @@ Page({
               detail.pick_dateTimeStr = util.formatTimeStr(pickDate)
             }
             if (detail.return_date){
-              var returnDate = new Date(detail.pick_date)
+              var returnDate = new Date(detail.return_date)
               detail.return_dateDateStr = util.formatDate(returnDate)
               detail.return_dateTimeStr = util.formatTimeStr(returnDate)
             }
@@ -1675,11 +1675,10 @@ Page({
           if (idArr[0] == 'pick'){
             detail.pick_date = newDate + 'T' + newTime
           }
-          if(idArr[1] == 'return'){
+          if(idArr[0] == 'return'){
             detail.return_date = newDate + 'T' + newTime
           }
-          //that.setData({rentOrder})
-          //that.save(e)
+          
           var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
           wx.request({
             url: updateUrl,
