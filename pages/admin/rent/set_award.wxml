@@ -23,7 +23,7 @@
         <view class="left-column" style="width: 200rpx;">七色米订单号：</view>
         <view style="margin-top: 15rpx;"><input style="width: 260rpx;" class="input" /></view>
         <view style="margin-left: 10rpx;">
-          <switch style="font-size: 11pt;" checked="{{false}}">无需</switch>
+          <switch style="font-size: 11pt;" checked="{{noM7OrderId}}" bindchange="setNoMi7OrderId" >无需</switch>
         </view>
       </view>
     </mp-cell>

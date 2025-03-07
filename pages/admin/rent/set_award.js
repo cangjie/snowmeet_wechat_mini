@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    noM7OrderId: false
   },
 
   /**
@@ -110,4 +110,8 @@ Page({
     }
     that.setData({rentOrder})
   },
+  setNoMi7OrderId(e){
+    var that = this
+    
+  }
 })
