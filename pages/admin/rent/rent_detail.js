@@ -1261,6 +1261,7 @@ Page({
     var detail = rentOrder.details[id]
     that.computeAmount(rentOrder)
     that.computeTotal()
+    /*
     if (rentOrder.depositPaid < that.data.refundAmount){
       wx.showToast({
         title: '应退金额>押金',
@@ -1277,6 +1278,7 @@ Page({
       that.getData()
       return
     }
+    */
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: updateUrl,
@@ -1655,7 +1657,7 @@ Page({
       newDate = value
       newTime = oriTime
     }
-    if (idArr[1] = 'time'){
+    if (idArr[1] == 'time'){
       newDate = oriDate
       newTime = value
     }
