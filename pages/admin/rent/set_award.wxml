@@ -21,7 +21,9 @@
     <mp-cell>
       <view class="view-row">
         <view class="left-column" style="width: 200rpx;">七色米订单号：</view>
-        <view style="margin-top: 15rpx;"><input style="width: 260rpx;" class="input" /></view>
+        <view style="margin-top: 15rpx;">
+          <input style="width: 260rpx;font-size: 10pt;"  class="input" bindinput="inputMi7OrderId" disabled="{{noM7OrderId}}" />
+        </view>
         <view style="margin-left: 10rpx;">
           <switch style="font-size: 11pt;" checked="{{noM7OrderId}}" bindchange="setNoMi7OrderId" >无需</switch>
         </view>
@@ -30,15 +32,18 @@
     <mp-cell>
       <view class="view-row">
         <view class="left-column" style="width: 200rpx;">订单日期：</view>
-        <view></view>
+        <view style="font-size: 10pt;margin-top: 20rpx;">{{mi7Order.order.pay_timeStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row">
         <view class="left-column" style="width: 200rpx;">订单金额：</view>
-        <view></view>
+        <view style="font-size: 10pt;margin-top: 20rpx;">{{mi7Order.real_chargeStr}}</view>
       </view>
     </mp-cell>
+    <mp-cell wx:if="{{!isMyOwnMi7Order}}" >
+        <view  style="font-size: 12pt;color: red; text-align: center;" > 非 本 人 订 单 </view>
+      </mp-cell>
     <block wx:if="{{rentOrder.payments.length > 1}}">
       <mp-cell>
         <view style="display: flex; flex-direction: row; font-size: 10pt;">
@@ -58,19 +63,20 @@
               <view style="width: 140rpx; text-align: center;">{{item.pay_method}}</view>
               <view style="width: 150rpx; text-align: right;">{{item.unRefundedAmountStr}}</view>
               <view style="width: 150rpx; margin-left: 30rpx;">
-                <input class="input" style="width: 100rpx;height: 10rpx;" id="{{item.id}}" disabled="{{!item.checked}}" value="{{item.filledRefundAmount}}" bindinput="setRefundAmount" />
+                <input class="input" style="width: 100rpx;height: 10rpx;" id="{{index}}" disabled="{{!item.checked}}" value="{{item.filledRefundAmount}}" bindinput="setSubRefundAmount" />
               </view>
             </view>
           </checkbox-group>
         </view>
       </mp-cell>
+      
       <mp-cell >
       <view class="view-row">
         <view class="left-column view-row" style="width: 200rpx;">
           <view class="left-column" style="color: red;width: 10rpx;margin-top: 0rpx;margin-bottom: 0rpx;">*</view>
           <view class="left-column" style="width: 190rpx;margin-top: 0rpx;margin-bottom: 0rpx;">抵扣金额：</view>
         </view>
-        <view style="margin-top: 15rpx;">¥0.00</view>
+        <view style="margin-top: 15rpx;">{{refundAmountStr}}</view>
       </view>
     </mp-cell>
     </block>
@@ -81,7 +87,7 @@
           <view class="left-column" style="width: 190rpx;margin-top: 0rpx;margin-bottom: 0rpx;">抵扣金额：</view>
         </view>
         <view style="margin-top: 15rpx;">
-          <input class="input" style="width: 120rpx;" />
+          <input class="input" style="width: 120rpx;font-size: 10pt;" bindinput="setRefundAmount" />
         </view>
       </view>
     </mp-cell>
@@ -89,40 +95,42 @@
       <view class="view-row">
         <view class="left-column;" style="width: 200rpx;">备注：</view>
         <view class="right-column">
-          <textarea style="width: 400rpx;height: 200rpx;" class="input"></textarea>
+          <textarea style="width: 400rpx;height: 200rpx;" class="input" bindinput="setMemo"></textarea>
         </view>
       </view>
     </mp-cell>
     <mp-cell>
-      <button class="input"> 保 存 </button>
+      <button class="input" bindtap="save" > 保 存 </button>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="抵扣历史记录 总计x笔 共抵扣¥0.00元">
+  <mp-cells title="抵扣历史记录 总计{{rentOrder.rewards.length}}笔 共抵扣{{totalRewardAmountStr}}元">
+    <block wx:for="{{rentOrder.rewards}}">
     <mp-cell>
       <view class="view-row">
-        <view class="left-column" style="width: 200rpx;">七色米订单号：</view>
-        <view class="right-column">XD3484743374</view>
+        <view class="left-column"  style="width: 200rpx;">七色米订单号：</view>
+        <view class="right-column" style="width:200rpx">{{item.mi7_order_id}}</view>
         <view class="left-column" style="width: 110rpx;">日期：</view>
-        <view class="right-column">2025-03-01</view>
+        <view class="right-column">{{item.create_dateStr}}</view>
       </view>
     </mp-cell>
 
     <mp-cell>
       <view class="view-row">
         <view class="left-column" style="width: 200rpx;">订单金额：</view>
-        <view class="right-column"></view>
+        <view class="right-column" style="width: 200rpx;" >{{item.mi7Order.real_chargeStr}}</view>
         <view class="left-column" style="width: 110rpx;">抵扣：</view>
-        <view class="right-column">2025-03-01</view>
+        <view class="right-column">{{item.totalRefundAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row">
         <view class="left-column" style="width: 200rpx;">备注：</view>
         <view class="right-column" style="width: 500rpx;">
-          <rich-text>fadfsdsfd</rich-text>
+          <rich-text nodes="{{item.memo}}" ></rich-text>
         </view>
-
       </view>
     </mp-cell>
+    <mp-cell/>
+  </block>
   </mp-cells>
 </view>

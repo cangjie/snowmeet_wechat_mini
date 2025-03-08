@@ -8,8 +8,8 @@
       "list": [
         {
           "name": "pay temp order",
-          "pathName": "pages/payment/rent_pay_add",
-          "query": "id=1006",
+          "pathName": "pages/payment/pay_hub",
+          "query": "paymentId=25348",
           "launchMode": "default",
           "scene": null
         },

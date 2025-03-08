@@ -518,12 +518,16 @@ Page({
     
     var cashTotal = cashPayAmount + totalReparation 
     refundAmount = rentOrder.depositPaid - cashTotal
-    var unRefund = refundAmount - that.data.rentOrder.totalRefund
+    var rewardRefundAmount = rentOrder.totalRewardAmount
+    var unRefund = refundAmount - that.data.rentOrder.totalRefund + rewardRefundAmount
 
     var unRefundStr = util.showAmount(unRefund)
+
+    
+
     that.setData({refundAmount: refundAmount, refundAmountStr: util.showAmount(refundAmount),
       totalRental: totalRental, totalRentalStr: util.showAmount(totalRental), totalReparation, totalReparationStr: util.showAmount(totalReparation), totalOvertimeCharge: totalOvertimeCharge, totalOvertimeChargeStr: util.showAmount(totalOvertimeCharge), rentOrder: rentOrder, unRefund: unRefund, unRefundStr: unRefundStr, depositPayAmount, depositPayAmountStr: util.showAmount(depositPayAmount), cashPayAmount, cashPayAmountStr: util.showAmount(cashPayAmount), rentalSettleAmount, rentalSettleAmountStr: util.showAmount(rentalSettleAmount),
-      cashTotal, cashTotalStr: util.showAmount(cashTotal)})
+      cashTotal, cashTotalStr: util.showAmount(cashTotal), rewardRefundAmount, rewardRefundAmountStr: util.showAmount(rewardRefundAmount)})
   },
   
 //////set buttons/////////////
