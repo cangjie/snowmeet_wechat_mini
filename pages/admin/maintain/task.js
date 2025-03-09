@@ -392,7 +392,8 @@ Page({
           filesStr += ((i != 0) ? ',' : '') + fileArr[i].url
         }
         task.confirmed_images = filesStr
-        that.setData({ task: task })
+        that.setData({ task: task, showUploader: false })
+        that.setData({showUploader: true})
         break
       case 'front':
         task.confirmed_front = value
