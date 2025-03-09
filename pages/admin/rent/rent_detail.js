@@ -297,7 +297,7 @@ Page({
               detail.pick_dateTimeStr = util.formatTimeStr(pickDate)
             }
             if (detail.return_date){
-              var returnDate = new Date(detail.pick_date)
+              var returnDate = new Date(detail.return_date)
               detail.return_dateDateStr = util.formatDate(returnDate)
               detail.return_dateTimeStr = util.formatTimeStr(returnDate)
             }
@@ -499,7 +499,7 @@ Page({
     var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation - totalOvertimeCharge
     
     var payWithDeposit = that.data.payWithDeposit
-    var cashPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket + totalReparation
+    var cashPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket //+ totalReparation
     var depositPayAmount = that.data.depositPayAmountMod? 
       that.data.depositPayAmount : rentOrder.totalDepositPaidAmount
 
@@ -1287,6 +1287,7 @@ Page({
     var detail = rentOrder.details[id]
     that.computeAmount(rentOrder)
     that.computeTotal()
+    /*
     if (rentOrder.depositPaid < that.data.refundAmount){
       wx.showToast({
         title: '应退金额>押金',
@@ -1303,6 +1304,7 @@ Page({
       that.getData()
       return
     }
+    */
     var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: updateUrl,
@@ -1681,7 +1683,7 @@ Page({
       newDate = value
       newTime = oriTime
     }
-    if (idArr[1] = 'time'){
+    if (idArr[1] == 'time'){
       newDate = oriDate
       newTime = value
     }
@@ -1699,11 +1701,10 @@ Page({
           if (idArr[0] == 'pick'){
             detail.pick_date = newDate + 'T' + newTime
           }
-          if(idArr[1] == 'return'){
+          if(idArr[0] == 'return'){
             detail.return_date = newDate + 'T' + newTime
           }
-          //that.setData({rentOrder})
-          //that.save(e)
+          
           var updateUrl = 'https://' + app.globalData.domainName + '/core/Rent/UpdateDetail?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
           wx.request({
             url: updateUrl,
