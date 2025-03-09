@@ -109,8 +109,6 @@ Component({
       var targetIdArr = e.currentTarget.id.split('_')
       var targetType = targetIdArr[0]
       var targetId = parseInt(targetIdArr[1])
-      //var selectedEquipArr = that.data.selectedEquipArr
-      //var currentEquip = selectedEquipArr[targetId]
       var currentEquip = that.data.item
       var value = e.detail.value
       switch(targetType){
@@ -221,9 +219,10 @@ Component({
           var images = ''
           var fileArr = e.detail.files
           for(var i = 0; i < fileArr.length; i++){
-            images += ((i!=0)?',':'' + fileArr[i].url)
+            images += (((i!=0)?',':'') + fileArr[i].url)
           }
           currentEquip.confirmed_images = images;
+          that.setData({displayUploader: false})
           break
         case 'pick':
           currentEquip.confirmed_pick_date = value
@@ -232,6 +231,7 @@ Component({
           break
       }
       that.setData({item: currentEquip})
+      that.setData({displayUploader: true})
       //that.getCharge(currentEquip)
       that.checkCurrentItem()
       //that.fixItems()
