@@ -10,7 +10,8 @@ Page({
     noM7OrderId: false,
     isMyOwnMi7Order: true,
     refundAmount: 0,
-    refundAmountStr: '¥0.00'
+    refundAmountStr: '¥0.00',
+    dealing: false
   },
 
   /**
@@ -94,7 +95,10 @@ Page({
         var totalRewardAmount = rentOrder.totalRewardAmount
         for(var i = 0; rentOrder.rewards && i < rentOrder.rewards.length; i++){
           rentOrder.rewards[i].create_dateStr = util.formatDate(new Date(rentOrder.rewards[i].create_date))
-          rentOrder.rewards[i].mi7Order.real_chargeStr = util.showAmount(rentOrder.rewards[i].mi7Order.real_charge)
+          if (rentOrder.rewards[i].mi7Order != null){
+            rentOrder.rewards[i].mi7Order.real_chargeStr = util.showAmount(rentOrder.rewards[i].mi7Order.real_charge)
+          }
+          
           rentOrder.rewards[i].totalRefundAmountStr = util.showAmount(rentOrder.rewards[i].totalRefundAmount)
         }
         that.setData({rentOrder, totalRewardAmount, 
@@ -242,6 +246,7 @@ Page({
       
     }
     rentReward.rentRewardRefunds = rentRewardRefunds
+    that.setData({dealing: true})
     var url = 'https://' + app.globalData.domainName + '/core/Rent/RewardRefund?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: url,
@@ -251,6 +256,26 @@ Page({
         if (res.statusCode != 200){
           return
         }
+        var reward = res.data
+        var content = '退款金额：' + util.showAmount(reward.totalRefundAmount)
+        wx.showModal({
+          title: '抵扣成功',
+          content: content,
+          confirmText:'返回',
+          cancelText: '取消',
+          complete: (res) => {
+            if (res.cancel) {
+              
+            }
+        
+            if (res.confirm) {
+              wx.navigateBack()
+            }
+          }
+        })
+      },
+      complete:(res)=>{
+        that.setData({dealing: false})
       }
     })
   }

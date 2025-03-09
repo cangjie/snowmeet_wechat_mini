@@ -498,21 +498,10 @@ Page({
     }
     var refundAmount = that.data.rentOrder.deposit_final - totalRental + that.data.rentalReduce + that.data.rentalReduceTicket - totalReparation - totalOvertimeCharge
     
-    var payWithDeposit = that.data.payWithDeposit
-    var cashPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket //+ totalReparation
+    var cashPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket 
     var depositPayAmount = that.data.depositPayAmountMod? 
       that.data.depositPayAmount : rentOrder.totalDepositPaidAmount
 
-    /*
-    if (payWithDeposit){
-      depositPayAmount = totalRental + totalOvertimeCharge  - that.data.rentalReduce - that.data.rentalReduceTicket
-      cashPayAmount = totalReparation
-      refundAmount += depositPayAmount
-    }
-    else{
-      depositPayAmount = that.data.depositPayAmount
-    }
-    */
     cashPayAmount = cashPayAmount - depositPayAmount
     var rentalSettleAmount = totalRental + totalOvertimeCharge - that.data.rentalReduce - that.data.rentalReduceTicket
     

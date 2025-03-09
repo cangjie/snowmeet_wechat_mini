@@ -100,7 +100,7 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <button class="input" bindtap="save" > 保 存 </button>
+      <button class="input" bindtap="save" disabled="{{dealing}}" > 保 存 </button>
     </mp-cell>
   </mp-cells>
   <mp-cells title="抵扣历史记录 总计{{rentOrder.rewards.length}}笔 共抵扣{{totalRewardAmountStr}}元">
@@ -108,7 +108,7 @@
     <mp-cell>
       <view class="view-row">
         <view class="left-column"  style="width: 200rpx;">七色米订单号：</view>
-        <view class="right-column" style="width:200rpx">{{item.mi7_order_id}}</view>
+        <view class="right-column" style="width:200rpx">{{item.mi7_order_id?item.mi7_order_id:'——'}}</view>
         <view class="left-column" style="width: 110rpx;">日期：</view>
         <view class="right-column">{{item.create_dateStr}}</view>
       </view>
@@ -117,7 +117,7 @@
     <mp-cell>
       <view class="view-row">
         <view class="left-column" style="width: 200rpx;">订单金额：</view>
-        <view class="right-column" style="width: 200rpx;" >{{item.mi7Order.real_chargeStr}}</view>
+        <view class="right-column" style="width: 200rpx;" >{{item.mi7Order? item.mi7Order.real_chargeStr : '——'}}</view>
         <view class="left-column" style="width: 110rpx;">抵扣：</view>
         <view class="right-column">{{item.totalRefundAmountStr}}</view>
       </view>

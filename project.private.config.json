@@ -2,5 +2,84 @@
   "setting": {
     "urlCheck": false,
     "compileHotReLoad": true
+  },
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "pay temp order",
+          "pathName": "pages/payment/rent_pay_add",
+          "query": "id=1007",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "index",
+          "pathName": "pages/index/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "scan test",
+          "pathName": "pages/test/scan/scan",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "school_lesson_detail",
+          "pathName": "pages/admin/school/lesson/detail_info",
+          "query": "id=107",
+          "scene": null
+        },
+        {
+          "name": "lesson_detail_confirm_order",
+          "pathName": "pages/admin/school/lesson/detail_confirm_order",
+          "query": "id=73",
+          "scene": null
+        },
+        {
+          "name": "custom_training_plan_confirm",
+          "pathName": "pages/mine/school/lesson/lesson_detail",
+          "query": "id=73",
+          "scene": null
+        },
+        {
+          "name": "upload_big_file",
+          "pathName": "pages/test/upload/choose_video_upload",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "admin_index",
+          "pathName": "pages/admin/admin",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "detail info",
+          "pathName": "pages/admin/school/lesson/detail_info",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "lesson list",
+          "pathName": "pages/admin/school/lesson/lesson_list",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "lesson_custom_detail",
+          "pathName": "pages/mine/school/lesson/lesson_detail",
+          "query": "id=107",
+          "scene": 1000
+        },
+        {
+          "name": "pages/admin/equip_maintain/on_site/print_label_new",
+          "pathName": "pages/admin/equip_maintain/on_site/print_label_new",
+          "query": "id=788",
+          "scene": null
+        }
+      ]
+    }
   }
 }
