@@ -1,9 +1,8 @@
 <!--pages/admin/rent/rent_list_by_cell.wxml-->
-<shop-selector bindShopSelected="shopSelected" ></shop-selector>
-<mp-cells title="填写完整手机号或后四位" >
+<mp-cells title="填写完整手机号或后四位或订单号" >
   <mp-cell style="text-align: center;">
     <view style="display: flex; flex-direction: row;" >
-      <view class="left-column" >手机号：</view>
+      <view class="left-column" style="width: 240rpx;" >手机号/订单号：</view>
       <view class="right-column" ><input bindinput="setCell" style="width: 200rpx;" class="input"  /></view>
     </view>
   </mp-cell>
