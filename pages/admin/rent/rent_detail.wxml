@@ -468,7 +468,7 @@
       </view>
     </mp-cell>
     <mp-cell wx:for="{{logs}}">
-      <view class="view-row" style="{{item.color? 'color:' + item.color: ''}};{{item.back? 'background-color:' + item.back : ''}};background-color: {{backColor}};">
+      <view class="view-row" style="background-color: {{backColor}};{{item.color? 'color:' + item.color: ''}};{{item.back? 'background-color:' + item.back : ''}}">
         <view style="width: 300rpx;text-align: left;font-size: 9pt;">{{item.create_dateStr}}</view>
         <view style="width: 150rpx;text-align: center;font-size: 9pt;">{{item.memo}}</view>
         <view style="width: 150rpx;text-align: right;font-size: 9pt;">{{item.amountStr}}</view>
@@ -476,7 +476,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view style="background-color: {{backColor}};" >
+  <view style="background-color: {{backColor}}" >
     <button bindtap="goHome" class="input"> 返 回 首 页 </button>
   </view>
 </view>

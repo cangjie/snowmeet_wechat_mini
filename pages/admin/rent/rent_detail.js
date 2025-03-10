@@ -1812,6 +1812,7 @@ Page({
           title: '退款成功',
           icon: 'success'
         })
+        that.setFinish()
         that.getData()
       },
       complete:(res)=>{
