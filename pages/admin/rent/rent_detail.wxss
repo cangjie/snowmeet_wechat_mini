@@ -1,10 +1,13 @@
 /* pages/admin/rent/rent_detail.wxss */
+
 view{
   font-size: 9pt;
 }
+
 .op-button{
   width: 140rpx;font-size: 9pt;margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx
 }
+
 .left-column{
   width: 160rpx;
   margin-left: 0rpx;

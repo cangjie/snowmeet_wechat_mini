@@ -1,17 +1,17 @@
-<view style="background-color: {{backColor}};">
-  <view style="display: flex; flex-direction: row;">
+<view >
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}">订单号：</view>
     <view class="right-column" style="color:{{textColor}}">{{rentOrder.id}}</view>
     <view class="left-column" style="color:{{textColor}}">店铺：</view>
     <view class="right-column" style="color:{{textColor}}">{{rentOrder.shop}}</view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}">手机：</view>
     <view class="right-column"><button bindtap="call" id="{{rentOrder.cell_number}}" class="input" size="mini" style="font-size: 9pt;width: 200rpx;height: 45rpx;">{{rentOrder.cell_number}}</button></view>
     <view class="left-column" style="color:{{textColor}}">姓名：</view>
     <view class="right-column" style="color:{{textColor}}">{{rentOrder.real_name}}</view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}">优惠券：</view>
     <view class="right-column" style="color:{{textColor}}">无</view>
     <view class="left-column" style="color:{{textColor}}">抵押物：</view>
@@ -19,13 +19,13 @@
     <view class="right-column" wx:else style="color:{{textColor}}">无</view>
   </view>
 
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}">押金总计：</view>
     <view class="right-column" style="color:{{textColor}}">{{rentOrder.deposit_real_str}}</view>
     <view class="left-column" style="color:{{textColor}}">押金追加：</view>
     <view class="right-column" style="color:{{textColor}}">{{rentOrder.additionalAmountStr}}</view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}">押金减免：</view>
     <view class="right-column" style="color:{{textColor}}">{{rentOrder.deposit_reduce_str}}</view>
     <view class="left-column" style="color:{{textColor}}">押金实付：</view>
@@ -33,7 +33,7 @@
 
   </view>
 
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}">订单状态：</view>
     <view class="right-column">
       <block wx:if="{{rentOrder.status != '未支付'}}">
@@ -46,17 +46,17 @@
   </view>
   <mp-cells title="收款详细 {{rentOrder.payments.length}}笔 总计：{{rentOrder.totalChargeStr}}">
     <mp-cell wx:for="{{rentOrder.payments}}">
-      <view class="view-row">
+      <view class="view-row" style="background-color: {{backColor}};">
         <view class="left-column">单号：</view>
         <view class="right-column">{{item.out_trade_no}}</view>
       </view>
-      <view class="view-row">
+      <view class="view-row" style="background-color: {{backColor}};" >
         <view class="left-column">支付方式：</view>
         <view class="right-column">{{item.pay_method}}</view>
         <view class="left-column">备注：</view>
         <view class="right-column">{{item.memo}}</view>
       </view>
-      <view class="view-row">
+      <view class="view-row" style="background-color: {{backColor}};" >
         <view class="left-column">时间：</view>
         <view class="right-column">{{item.create_dateStr}}</view>
         <view class="left-column">金额：</view>
@@ -66,11 +66,11 @@
   </mp-cells>
   <mp-cells title="退款详细 {{rentOrder.refunds.length}}笔 总计：{{rentOrder.totalRefundStr}}">
     <mp-cell wx:for="{{rentOrder.refunds}}">
-      <view class="view-row">
+      <view class="view-row" style="background-color: {{backColor}};">
         <view class="left-column">单号：</view>
         <view class="right-column">{{item.out_refund_no}}</view>
       </view>
-      <view class="view-row">
+      <view class="view-row" style="background-color: {{backColor}};" >
         <view class="left-column">时间：</view>
         <view class="right-column">{{item.create_dateStr}}</view>
         <view class="left-column">金额：</view>
@@ -78,12 +78,12 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};" >
     <view class="left-column" style="color:{{textColor}}">订单时间：</view>
     <view class="right-column" style="width:400rpx;color:{{textColor}}">{{rentOrder.create_date_str}}</view>
   </view>
 
-  <view wx:if="{{rentOrder.guarantee_credit_photos_arr.length > 0}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;">
+  <view wx:if="{{rentOrder.guarantee_credit_photos_arr.length > 0}}" style="text-align: center;height: 220rpx;margin-top: 30rpx;display: flex;flex-direction: row;background-color: {{backColor}};">
     <image id="credit_{{index}}" bindtap="showGallery" wx:for="{{rentOrder.guarantee_credit_photos_arr}}" style="width: 200rpx;height: 200rpx;" src="{{item}}"></image>
   </view>
   <mp-gallery show="{{showCreditGallery}}" showDelete="{{false}}" imgUrls="{{rentOrder.guarantee_credit_photos_arr}}" current="{{0}}"></mp-gallery>
@@ -121,8 +121,8 @@
       </view>
 
       <view style="display: flex; flex-direction: row; background-color: {{backColor}};">
-        <view class="left-column" style="color:{{item.txtColor}}">发放：</view>
-        <view class="right-column" style="font-size: 9pt;color:{{item.txtColor}}">
+        <view class="left-column" style="color:{{item.txtColor}};background-color: {{backColor}};">发放：</view>
+        <view class="right-column" style="font-size: 9pt;color:{{item.txtColor}};background-color: {{backColor}};">
           <view wx:if="{{!item.pick_date}}">
             --
           </view>
@@ -253,12 +253,12 @@
       </view>
 
 
-      <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;">
+      <view style="margin-top: 20rpx; margin-left: 50rpx;margin-right: 50rpx; margin-bottom: 20rpx;background-color: {{backColor}};">
         <input wx:if="{{item.isEdit && item.editType != '暂存' }}" style="width: 100%;" placeholder="填写备注" id="memo_{{index}}" value="{{item.memo}}" bindinput="setMemo" class="input" style="color:red" />
         <view wx:else style="color:red">{{item.memo}}</view>
       </view>
 
-      <view style="display: flex; flex-direction: row; margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx">
+      <view style="display: flex; flex-direction: row; margin-left: 0rpx; margin-right: 0rpx;padding-left: 0rpx; padding-right: 0rpx;background-color: {{backColor}};">
         <button wx:if="{{item.status == '未领取' && (item.deposit_type == '预约租赁'  || item.deposit_type == '先租后取') && !item.isEdit}}" class="input" id="{{index}}" bindtap="setPick" style="font-size: 9pt;" size="mini" disabled="{{rentOrder.status == '已完成'}}">领取</button>
         <button wx:if="{{(item.status == '已发放') && !item.isEdit }}" id="return_{{index}}" bindtap="setReturn" class="input" size="mini" style="font-size: 9pt;" size="mini" disabled="{{rentOrder.status == '已完成'}}">归还</button>
 
@@ -278,7 +278,7 @@
         <button size="mini" wx:if="{{!item.isEdit && item.status == '未领取' && item.deposit_type == '预付押金'}}" id="{{index}}" bindtap="setInstance" class="input" style="font-size: 9pt;" disabled="{{rentOrder.status == '已完成'}}">确认租赁</button>
         <button size="mini" wx:if="{{!item.isEdit && item.status == '已领取'}}" id="reserveMore_{{index}}" bindtap="reserveMore" style="font-size: 9pt;" disabled="{{rentOrder.status == '已完成'}}" class="input">转预约</button>
       </view>
-      <view wx:if="{{item.log && item.log.length > 0}}" style="font-size: 9pt; color: #0c0c0c;margin-top: 10rpx;">
+      <view wx:if="{{item.log && item.log.length > 0}}" style="font-size: 9pt; color: #0c0c0c;margin-top: 10rpx;background-color: {{backColor}};">
         <view wx:for="{{item.log}}" class="view-row">
           <view style="width: 260rpx;">{{item.dateStr}}</view>
           <view style="width: 220rpx;">{{item.timeStr}}</view>
@@ -301,7 +301,7 @@
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">租金减免：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">
       <view>{{rentalReduceStr}}</view>
@@ -309,7 +309,7 @@
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">优惠券减免：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">
       <view>{{rentalReduceTicketStr}}</view>
@@ -317,47 +317,47 @@
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">超时合计：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{totalOvertimeChargeStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">应结金额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{rentalSettleAmountStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view class="view-row">
+  <view class="view-row" style="background-color: {{backColor}};" >
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">当前储值余额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{depositAmountStr}}</view>
     <view class="right-column" style="width: 300rpx;">
     </view>
   </view>
-  <view class="view-row">
+  <view class="view-row" style="background-color: {{backColor}};" >
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">储值消费金额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}};display: flex;flex-direction: row;">
       ¥<input class="input" style="width: 100rpx;" placeholder="{{depositPayAmount}}" bindinput="setDepositPayAmount" />
     </view>
     <view class="right-column" style="width: 300rpx;"></view>
   </view>
-  <view class="view-row">
+  <view class="view-row" style="background-color: {{backColor}};" >
     <view class="left-column" style="width: 200rpx; color:{{textColor}}">现金消费金额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{cashPayAmountStr}}</view>
   </view>
-  <view class="view-row">
+  <view class="view-row" style="background-color: {{backColor}};" >
     <view class="left-column" style="width: 200rpx; color:{{textColor}}">消费抵扣：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{rewardRefundAmountStr}}</view>
     <view><button size="mini" class="input" bindtap="setAward" >设置抵扣金额</button></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">赔偿合计：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{totalReparationStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">现金支付合计：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{cashTotalStr}}</view>
     <view class="left-column"></view>
@@ -383,19 +383,19 @@
 
   
 
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">应退金额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{refundAmountStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">已退金额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{realTotalRefundStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">未退金额：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{unRefundStr}}</view>
     <view class="left-column"></view>
@@ -403,7 +403,7 @@
       <!--button disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" bindtap="refundConfirm" size="mini" style="font-size: 10pt;" class="input">确认退款</button-->
     </view>
   </view>
-  <view style="display: flex; flex-direction: row;" >
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};" >
     <checkbox-group  bindchange="selectRefundItem" >
       <view style="display: flex; flex-direction: row;" >
         <view style="margin-left: 10rpx;width: 75rpx;"></view>
@@ -428,36 +428,36 @@
       </view>
     </checkbox-group>
   </view>
-  <view style="display: flex; flex-direction: row;margin-top: 20rpx;" >
+  <view style="display: flex; flex-direction: row;margin-top: 20rpx;background-color: {{backColor}};" >
     <button class="input" 
       disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" 
       bindtap="refundMulti"
       > 确 认 退 款 </button>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="width: 200rpx;color:{{textColor}}">订单结余：</view>
     <view class="right-column" style="width: 200rpx;color:{{textColor}}">{{bonusStr}}</view>
     <view class="left-column"></view>
     <view class="right-column"></view>
   </view>
-  <view style="display: flex; flex-direction: row;">
+  <view style="display: flex; flex-direction: row;background-color: {{backColor}};">
     <view class="left-column" style="color:{{textColor}}">订单备注：</view>
     <view class="right-column" style="width: 450rpx;">
       <textarea type="text" class="input" style="width:440rpx;height:200rpx" bindinput="setOrderMemo" value="{{rentOrder.memo}}"></textarea>
     </view>
 
   </view>
-  <view style="text-align: center; margin-top: 20rpx;">
+  <view style="text-align: center; margin-top: 20rpx;background-color: {{backColor}};">
     <button disabled="{{!orderMemo}}" bindtap="saveOrderMemo" size="mini" class="input" > 保 存 </button>
   </view>
 
 
-  <view style="margin-top: 50rpx;">
+  <view style="margin-top: 50rpx;background-color: {{backColor}};">
     <button class="input" bind:tap="payAdditional" disabled="{{rentOrder.status == '已完成'}}"> 追 加 收 款 </button>
     <button class="input" style="margin-top: 50rpx;" wx:if="{{rentOrder.status == '已完成' }}" bindtap="reopen"> 重 开 订 单 </button>
     <button class="input" style="margin-top: 50rpx;" wx:if="{{rentOrder.status != '已完成' }}" disabled="{{rentOrder.status != '全部归还' && rentOrder.status != '已退款'}}" bindtap="setFinish"> 设 置 订 单 完 成 </button>
   </view>
-  <view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;margin-bottom: 50rpx;"></view>
+  <view style="margin-top:30rpx;height: 1rpx; background-color: gray;width: 750rpx;margin-bottom: 50rpx;background-color: {{backColor}};"></view>
   <mp-cells title="订单操作记录">
     <mp-cell>
       <view class="view-row" style="background-color: {{backColor}};">
@@ -468,7 +468,7 @@
       </view>
     </mp-cell>
     <mp-cell wx:for="{{logs}}">
-      <view class="view-row" style="{{item.color? 'color:' + item.color: ''}};{{item.back? 'background-color:' + item.back : ''}}">
+      <view class="view-row" style="{{item.color? 'color:' + item.color: ''}};{{item.back? 'background-color:' + item.back : ''}};background-color: {{backColor}};">
         <view style="width: 300rpx;text-align: left;font-size: 9pt;">{{item.create_dateStr}}</view>
         <view style="width: 150rpx;text-align: center;font-size: 9pt;">{{item.memo}}</view>
         <view style="width: 150rpx;text-align: right;font-size: 9pt;">{{item.amountStr}}</view>
@@ -476,7 +476,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view>
+  <view style="background-color: {{backColor}};" >
     <button bindtap="goHome" class="input"> 返 回 首 页 </button>
   </view>
 </view>
