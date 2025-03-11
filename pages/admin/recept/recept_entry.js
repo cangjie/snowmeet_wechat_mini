@@ -122,7 +122,6 @@ Page({
         }
         else if (res.statusCode == 200) {
           that.data.retryTimes = 0
-          //clearInterval(that.data.interVal)
           var scan = res.data
           var needJump = false
           if (scan.scan == 1) {
