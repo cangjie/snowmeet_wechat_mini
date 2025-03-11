@@ -141,7 +141,8 @@
     "pages/admin/deposit/deposit_detail",
     "pages/admin/deposit/deposit_charge",
     "pages/admin/deposit/deposit_charge_search",
-    "pages/admin/rent/set_award"
+    "pages/admin/rent/set_award",
+    "pages/admin/recept/recept_auth_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

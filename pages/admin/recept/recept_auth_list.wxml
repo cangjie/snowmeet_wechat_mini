@@ -1,0 +1,33 @@
+<view wx:if="{{isManager}}" >
+  <mp-cells >
+    <mp-cell wx:for="{{authList}}">
+      <view class="view-row" >
+        <view class="left-column" >日期：</view>
+        <view class="right-column" >{{item.create_dateStr}}</view>
+        <view class="left-column" >时间：</view>
+        <view class="right-column" >{{item.create_timeStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >{{item.scanMember.real_name}}</view>
+        <view class="left-column" >性别：</view>
+        <view class="right-column" >{{item.scanMember.gender}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >手机：</view>
+        <view class="right-column" >{{item.cell}}</view>
+        <view class="left-column" >状态：</view>
+        <view class="right-column" >{{item.haveAuthed?'已授权':'未授权'}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >店员：</view>
+        <view class="right-column" >{{item.staffMember.real_name}}</view>
+        <view class="left-column" ></view>
+        <view class="right-column" ></view>
+      </view>
+      <view  style="text-align: center" >
+        <button id="{{item.id}}" size="mini" class="input" disabled="{{item.haveAuthed}}" bindtap="auth" > 授 权 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

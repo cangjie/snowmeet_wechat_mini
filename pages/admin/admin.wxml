@@ -16,6 +16,9 @@
     <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >
       <view style="background-color: #999999">【雪票】南山预定</view>
     </mp-cell>
+    <mp-cell id="recept_auth" bindtap="nav" >
+      <view style="background-color:#00FFFF">【接待】接待授权</view>
+    </mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="扫码" >
     <!--mp-cell value="扫一扫" bindtap="gotoScan" ></mp-cell-->
@@ -35,6 +38,7 @@
   <mp-cells title="实体店铺接待" >
     <mp-cell id="recept" bindtap="nav">【接待】店铺接待</mp-cell>
     <mp-cell id="recept_list" bindtap="nav" >【接待】未完成的接待</mp-cell>
+    <mp-cell id="recept_auth" bindtap="nav" >【接待】接待授权</mp-cell>
   </mp-cells>
   <!--mp-cells  ext-class="my-cells" title="UTV" >
     <mp-cell id="utv_reserve_list" bindtap="nav">预约列表</mp-cell>
@@ -51,11 +55,8 @@
     <mp-cell value="【养护】快速查询" id="maintainSerchQuick" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_return" value="【养护】养护取板" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_in_stock" value="【养护】需盘点的" bindtap="nav" ></mp-cell>
-    <!--mp-cell id="SummerMaintainRecept" value="非雪季养护收板" bindtap="gotoSummerMaintain" ></mp-cell>
-    <mp-cell id="SummerMaintainList" value="非雪季养护列表" bindtap="gotoSummerMaintain" ></mp-cell-->
   </mp-cells>
   <mp-cells ext-class="my-cells" title="租赁" >
-    <!--mp-cell id="rend_admit" value="租赁收押金" bindtap="nav" ></mp-cell-->
     <mp-cell id="rent_list" value="【租赁】查看租赁订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_list_cell" value="【租赁】快速查找订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_report" value="【租赁】租赁报表" bindtap="nav" ></mp-cell>
