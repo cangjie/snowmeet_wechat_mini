@@ -142,7 +142,8 @@
     "pages/admin/deposit/deposit_charge",
     "pages/admin/deposit/deposit_charge_search",
     "pages/admin/rent/set_award",
-    "pages/admin/recept/recept_auth_list"
+    "pages/admin/recept/recept_auth_list",
+    "pages/message/book_message"
   ],
   "window": {
     "backgroundTextStyle": "light",

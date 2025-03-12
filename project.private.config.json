@@ -7,6 +7,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "bookmessage",
+          "pathName": "pages/message/book_message",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "pay temp order",
           "pathName": "pages/payment/pay_recept",
           "query": "id=17169",
