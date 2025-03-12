@@ -41,6 +41,10 @@ Component({
   lifetimes:{
     ready(){
       console.log('uploader ready')
+      this.setData({
+        selectFile: this.selectFile.bind(this),
+        uploadFile: this.uploadFile.bind(this)
+      })
       var uploadedFilesArr = this.properties.uploaded_files.split(',')
       var files = this.data.files
       for(var i = 0; i < uploadedFilesArr.length; i++) {
