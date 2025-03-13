@@ -143,11 +143,7 @@
     "pages/admin/deposit/deposit_charge_search",
     "pages/admin/rent/set_award",
     "pages/admin/recept/recept_auth_list",
-<<<<<<< HEAD
     "pages/test/message/pop_up"
-=======
-    "pages/message/book_message"
->>>>>>> 7f6071d18f8bd4464c2af9b1088a522b4090a942
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,3 +1,0 @@
-<button bindtap="book" class="input"> 订 阅 消 息 </button>
-<button open-type="liveActivity" activity-type="1001" bindcreateliveactivity="onLiveActivityCreate"
-class="input" >立即呼叫</button>
