@@ -1812,6 +1812,9 @@ Page({
           title: '退款成功',
           icon: 'success'
         })
+        if (that.data.depositPayAmount > 0){
+          that.payWithDeposit()
+        }
         that.setFinish()
         that.getData()
       },
