@@ -1,8 +1,8 @@
 <view>
   <view style="background-color: gray;position: fixed;top: 10px; left:10px;width: {{windowWidth - 20}}px;opacity: 0.5;height: {{topFrameHeight}}px; padding-bottom: 10rpx;">
     <view style="display: flex; flex-direction: row;" >
-      <view class="left-column" style="width: 150rpx;" >姓名：</view>
-      <view class="right-column view-row" wx:if="{{user.real_name != undefined}}" >
+      <view class="left-column" style="width: 100rpx;" >姓名：</view>
+      <view class="right-column view-row" style="width: 300rpx;" wx:if="{{user.real_name != undefined}}" >
         <view>
           {{user.real_name + ' ' + ((user.gender == '男') ? '先生' :  ( (user.gender ==  '女')? '女士' : user.gender) )}}
         </view>
@@ -11,14 +11,26 @@
       <view class="right-column" wx:else >
         --
       </view>
-      <view class="left-column"  style="width: 150rpx;" >电话：</view>
+      <view class="left-column"  style="width: 120rpx;" >电话：</view>
       <view class="right-column" >{{user.cell_number}}</view>
     </view>
-    <view style="display: flex; flex-direction: row;" >
+    <!--view style="display: flex; flex-direction: row;" >
       <view class="left-column" style="width: 150rpx;" >优惠券：</view>
       <view class="right-column" >{{ (ticketCode == '' || ticketCode == undefined) ? '--' : ticketName }}</view>
       <view class="left-column" style="width: 150rpx;" >编号：</view>
       <view class="right-column" >{{ (ticketCode == '' || ticketCode == undefined)? '--' : ticketCode }}</view>
+    </view-->
+    <view style="display: flex; flex-direction: row;" >
+      <view class="left-column" style="width: 100rpx;" >储值：</view>
+      <view class="right-column" style="width: 300rpx;" >
+        <view wx:if="{{user.depositAvaliableAmountStr == '——'}}" >——</view>
+        <view wx:else style="color: red">{{user.depositAvaliableAmountStr}}</view>
+      </view>
+      <view class="left-column" style="width: 120rpx;" >优惠券：</view>
+      <view class="right-column" >
+        {{ (ticketCode == '' || ticketCode == undefined) ? '--' : ticketName }}
+        {{ (ticketCode == '' || ticketCode == undefined)? '--' : ticketCode }}
+      </view>
     </view>
   </view>
   <view style="margin-top: {{topFrameHeight+30}}px" >

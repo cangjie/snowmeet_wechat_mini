@@ -6,6 +6,7 @@ const bottomFrameHeightMax = 360
 const bottomFrameHeightMin = 60
 const rentStep = [{name:'confirm_item', title:'选择租赁物品'}, {name: 'confirm_deposit', title:'确认支付押金'}]
 const maintainStep = [{name: 'maintain_log', title:'养护记录'}, {name: 'maintain_item', title:'添加装备并拍照'}, {name: 'maintain_charge', title:'添加装备并拍照'}]
+const util = require('../../../utils/util')
 Page({
 
   /**
@@ -264,7 +265,11 @@ Page({
               if (res.statusCode != 200){
                 return
               }
-              that.setData({user: res.data})
+              var user = res.data
+              user.depositAvaliableAmountStr = 
+                user.serviceDepositAccount == null ? '——' 
+                  : util.showAmount(user.serviceDepositAccount.avaliableAmount)
+              that.setData({user: user})
               if (recept.code != ''){
                 var getTicketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + recept.code
                 wx.request({

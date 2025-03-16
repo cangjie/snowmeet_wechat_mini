@@ -9,7 +9,7 @@
         {
           "name": "pay temp order",
           "pathName": "pages/payment/pay_recept",
-          "query": "id=17169",
+          "query": "id=17178",
           "launchMode": "default",
           "scene": null
         },
