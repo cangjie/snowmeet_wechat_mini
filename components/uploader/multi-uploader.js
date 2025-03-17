@@ -71,13 +71,12 @@ Component({
     },
     uploadFile: function(files) {
       console.log('upload files', files)
-      
       var uploadUrl = 'https://' + app.globalData.domainName + '/core/UploadFile/Upload/' + encodeURIComponent(app.globalData.sessionKey)
       // 文件上传的函数，返回一个promise
       return new Promise((resolve, reject) => {
         for(var i = 0; i < files.tempFilePaths.length; i++)
         {
-          
+        
           wx.uploadFile({
             filePath: files.tempFilePaths[i],
             name: 'file',

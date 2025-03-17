@@ -1813,6 +1813,9 @@ Page({
           icon: 'loading',
           duration: 5000
         })
+        if (that.data.depositPayAmount > 0){
+          that.payWithDeposit()
+        }
         setTimeout(()=>{
           that.setFinish()
           that.getData()

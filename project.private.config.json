@@ -1,29 +1,11 @@
 {
-  "setting": {
-    "urlCheck": false,
-    "compileHotReLoad": true
-  },
   "condition": {
     "miniprogram": {
       "list": [
         {
           "name": "pay temp order",
           "pathName": "pages/payment/rent_pay_add",
-          "query": "id=1010",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "bookmessage",
-          "pathName": "pages/message/book_message",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "submessage",
-          "pathName": "pages/test/message/pop_up",
-          "query": "",
+          "query": "id=1012",
           "launchMode": "default",
           "scene": null
         },
