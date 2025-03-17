@@ -7,16 +7,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "bookmessage",
-          "pathName": "pages/message/book_message",
-          "query": "",
+          "name": "pay temp order",
+          "pathName": "pages/payment/rent_pay_add",
+          "query": "id=1010",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "pay temp order",
-          "pathName": "pages/payment/pay_recept",
-          "query": "id=17172",
+          "name": "bookmessage",
+          "pathName": "pages/message/book_message",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },

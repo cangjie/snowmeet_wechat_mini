@@ -1809,11 +1809,15 @@ Page({
       success: (res)=>{
         console.log('refund suc', res)
         wx.showToast({
-          title: '退款成功',
-          icon: 'success'
+          title: '请稍等正在退款',
+          icon: 'loading',
+          duration: 5000
         })
-        that.setFinish()
-        that.getData()
+        setTimeout(()=>{
+          that.setFinish()
+          that.getData()
+        }, 7000)
+        
       },
       complete:(res)=>{
         that.setData({refunding: false})
