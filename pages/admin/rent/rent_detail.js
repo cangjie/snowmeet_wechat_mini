@@ -822,7 +822,7 @@ Page({
           rentOrder.details[id] = detail
           rentOrder = that.computeAmount(rentOrder)
           that.setData({rentOrder: rentOrder})
-          that.setRentStart(e)
+          //that.setRentStart(e)
         }
       }
     })

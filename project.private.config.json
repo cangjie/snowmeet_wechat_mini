@@ -4,8 +4,8 @@
       "list": [
         {
           "name": "pay temp order",
-          "pathName": "pages/payment/rent_pay_add",
-          "query": "id=1012",
+          "pathName": "pages/payment/pay_recept",
+          "query": "id=19259",
           "launchMode": "default",
           "scene": null
         },
@@ -77,5 +77,8 @@
         }
       ]
     }
+  },
+  "setting": {
+    "urlCheck": false
   }
 }
