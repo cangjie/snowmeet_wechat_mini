@@ -28,7 +28,9 @@ Page({
     needUpdateSerial: false,
     needUpdateBrand: false,
     brandSelectedIndex: 0,
-    refunding: false
+    refunding: false,
+    veriCode: '',
+    veried: false
   },
 
   goHome() {
@@ -114,7 +116,7 @@ Page({
     that.setData({ id: options.id })
 
 
-    
+
   },
 
 
@@ -393,7 +395,7 @@ Page({
         }
         task.confirmed_images = filesStr
         that.setData({ task: task, showUploader: false })
-        that.setData({showUploader: true})
+        that.setData({ showUploader: true })
         break
       case 'front':
         task.confirmed_front = value
@@ -757,43 +759,17 @@ Page({
               return
             }
             if (res.data) {
-              var msg = that.data.finish ? '养护完成，取板用户身份确认，可以发板。' : '养护未完成，取板用户身份确认，发板中止服务。'
-              wx.showModal({
-                title: '确认发板',
-                content: msg,
-                complete: (res) => {
-                  that.setData({ showQrCode: false })
-                  if (res.cancel) {
-
-                  }
-
-                  if (res.confirm) {
-                    if (that.data.finish) {
-                      that.data.safeMemo = '本人扫码取板'
-                      that.setData({ isClosed: true })
-                      that.logStep('发板')
-                      var task = that.data.task
-                      task.outStatus = '发板'
-                      that.setData({ task })
-                    }
-                    else {
-                      that.data.safeMemo = '本人扫码取板'
-                      that.setData({ isClosed: true })
-                      that.logStep('强行索回')
-                      var task = that.data.task
-                      task.outStatus = '强行索回'
-                      that.setData({ task })
-                    }
-                  }
-                }
-              })
+              that.userPick()
             }
             else {
-              that.setData({ showQrCode: false })
+              that.setData({ showQrCode: false, showVerifyCode: true })
+
+              /*
               wx.showToast({
                 icon: 'error',
                 content: '用户身份未确认。'
               })
+              */
             }
           }
         })
@@ -895,7 +871,7 @@ Page({
         if (task.order && (!task.confirmed_memo || task.confirmed_memo == '')) {
           task.confirmed_memo = task.order.memo
         }
-        if(task.order){
+        if (task.order) {
           task.order.paidAmountStr = util.showAmount(task.order.paidAmount)
           task.order.refundAmountStr = util.showAmount(task.order.refundAmount)
           task.order.earnStr = util.showAmount(task.order.paidAmount - task.order.refundAmount)
@@ -905,38 +881,38 @@ Page({
       }
     })
   },
-  refundInput(e){
+  refundInput(e) {
     var that = this
     var id = e.currentTarget.id
     var value = e.detail.value
-    switch(id){
+    switch (id) {
       case 'reason':
-        that.setData({reason: value})
+        that.setData({ reason: value })
         break
       case 'refundAmount':
-        that.setData({refundAmount: value})
+        that.setData({ refundAmount: value })
         break
       default:
         break
     }
   },
-  refund(e){
+  refund(e) {
     //var id = e.currentTarget.id
-    
+
     var that = this
     var task = that.data.task
 
     var msg = ''
-    if (!that.data.reason || that.data.reason == ''){
+    if (!that.data.reason || that.data.reason == '') {
       msg = '必须填写退款原因'
     }
-    if (!that.data.refundAmount || isNaN(that.data.refundAmount)){
+    if (!that.data.refundAmount || isNaN(that.data.refundAmount)) {
       msg = '退款金额是数字'
     }
-    if (!task.order || task.order.paidAmount <= 0){
+    if (!task.order || task.order.paidAmount <= 0) {
       msg = '为支付订单不能退款'
     }
-    if (msg != ''){
+    if (msg != '') {
       wx.showToast({
         title: msg,
         icon: 'error'
@@ -944,23 +920,23 @@ Page({
       return
     }
     var id = task.order.paymentList[0].id
-    
-    that.setData({refunding: true})
+
+    that.setData({ refunding: true })
     wx.showModal({
       title: '确认退款',
       content: '该操作不可逆，且店长以下操作会失败。是否确认？',
       complete: (res) => {
         if (res.cancel) {
-          that.setData({refunding: false})
+          that.setData({ refunding: false })
         }
-    
+
         if (res.confirm) {
           var refundUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Refund/' + id + '?amount=' + that.data.refundAmount + '&reason=' + encodeURIComponent(that.data.reason) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
           wx.request({
             url: refundUrl,
             method: 'GET',
-            success:(res)=>{
-              if (res.statusCode != 200){
+            success: (res) => {
+              if (res.statusCode != 200) {
                 wx.showToast({
                   title: '退款失败',
                   icon: 'error'
@@ -971,13 +947,78 @@ Page({
                 icon: 'success'
               })
             },
-            complete:(res)=>{
-              that.setData({refunding: false})
+            complete: (res) => {
+              that.setData({ refunding: false })
               that.getData()
             }
           })
         }
       }
     })
+  },
+  userPick() {
+    var that = this
+    var msg = that.data.finish ? '养护完成，取板用户身份确认，可以发板。' : '养护未完成，取板用户身份确认，发板中止服务。'
+    wx.showModal({
+      title: '确认发板',
+      content: msg,
+      complete: (res) => {
+        that.setData({ showQrCode: false })
+        if (res.cancel) {
+
+        }
+
+        if (res.confirm) {
+          if (that.data.finish) {
+            that.data.safeMemo = '本人扫码取板'
+            that.setData({ isClosed: true })
+            that.logStep('发板')
+            var task = that.data.task
+            task.outStatus = '发板'
+            that.setData({ task })
+          }
+          else {
+            that.data.safeMemo = '本人扫码取板'
+            that.setData({ isClosed: true })
+            that.logStep('强行索回')
+            var task = that.data.task
+            task.outStatus = '强行索回'
+            that.setData({ task })
+          }
+        }
+      }
+    })
+  },
+  veri(){
+    var that = this
+    var veriUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/VeriPickCode/' + that.data.task.id + '?code=' + that.data.veriCode
+    wx.request({
+      url: veriUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        if (res.data){
+          wx.showToast({
+            title: '验证成功',
+            icon:'success',
+            duration: 3000
+          })
+          that.setData({veried: true})
+          that.userPick()
+        }
+        else{
+          wx.showToast({
+            title: '验证失败',
+            icon: 'error'
+          })
+        }
+      }
+    })
+  },
+  setVeriCode(e){
+    var that = this
+    that.setData({veriCode: e.detail.value})
   }
 })

@@ -132,11 +132,6 @@
         <view class="left-column" style="width: 94rpx;" >关系：</view>
         <view class="right-column" >
           <view wx:if="{{status == 'edit_equip_info'}}" >
-            <!--
-            <picker mode="selector"  range="{{relationArr}}" class="input" style="width: 100rpx;" >
-              <picker-view>{{(task.confirmed_relation || task.confirmed_relation=='')?'本人':confirmed_relation}}</picker-view>
-            </picker>
-            -->
             <radio-group id="relation" bindchange="mod">
               <radio wx:for="{{relationArr}}" style="width: 130rpx;margin-top: 15rpx;" value="{{item}}"
               checked="{{((!task.confirmed_relation || task.confirmed_relation=='')?'本人':task.confirmed_relation)==item}}"  >{{item}}</radio>
@@ -376,7 +371,12 @@
     <mp-cell >
       
       <view wx:if="{{!showQrCode}}" class="view-row" style="align-content: center;" >
-        <button class="input" bind:tap="showQrCode" disabled="{{task.outStatus == '发板' || task.outStatus == '强行索回'}}" > 发板确认二维码 </button>
+        <button wx:if="{{!showVerifyCode}}" class="input" 
+          bind:tap="showQrCode" disabled="{{task.outStatus == '发板' || task.outStatus == '强行索回'}}" > 发板确认二维码 </button>
+        <view wx:else style="width: 100%;" >
+          <view ><input style="margin: 0 auto; text-align: center;width: 260rpx;" class="input" type="number" placeholder="填写6位验证码" maxlength="6" bindinput="setVeriCode" disabled="{{veried}}" /></view>
+          <view style="margin-top: 20rpx;" ><button class="input" bindtap="veri" disabled="{{veriCode.length != 6 || veried}}" > 确 认 </button></view>
+        </view>
       </view>
       <view wx:else style="text-align: center;" >
         <image style="width: 400rpx;height: 400rpx;" src="{{qrcodeUrl}}" ></image>
