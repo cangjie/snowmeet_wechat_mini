@@ -158,6 +158,28 @@ Page({
     })
   },
   checkPaid(){
-
+    var that = this
+    var url = 'https://' + app.globalData.domainName + '/core/Rent/GetAdditionalPayment/' + that.data.addPay.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: url,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var payment = res.data
+        if (payment.is_paid == 1){
+          clearInterval(that.data.interval)
+          wx.showToast({
+            title: '支付成功',
+            icon:'success',
+            duration: 3000
+          })
+          wx.navigateTo({
+            url: 'rent_detail?id=' + payment.rent_list_id,
+          })
+        }
+      }
+    })
   }
 })

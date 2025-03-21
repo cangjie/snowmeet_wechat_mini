@@ -25,16 +25,16 @@
           <view class="right-column" >{{item.cell_number}}</view>
         </view>
         <view style="display: flex;flex-direction: row;" >
-          <view class="left-column">预计归还时间：</view>
-          <view class="right-column" >{{item.due_end_date_str}}</view>
+          <view class="left-column">门店：</view>
+          <view class="right-column" >{{item.shop}}</view>
           <view class="left-column">支付方式：</view>
           <view class="right-column" >{{item.payMethod}}</view>
         </view>
         <view style="display: flex;flex-direction: row;" >
           <view class="left-column">店员：</view>
           <view class="right-column" >{{item.staff_name}}</view>
-          <view class="left-column">支付押金：</view>
-          <view class="right-column" >{{item.deposit_final_str}}</view>
+          <view class="left-column">日期：</view>
+          <view class="right-column" >{{item.create_dateStr}}</view>
         </view>
       </mp-cell>
     </mp-cells>

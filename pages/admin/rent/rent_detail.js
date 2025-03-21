@@ -1817,14 +1817,15 @@ Page({
           that.payWithDeposit()
         }
         that.setFinish()
+        var delayTime = that.data.refundArr.length * 10000
         wx.showToast({
           title: '正在更新数据',
           icon: 'loading',
-          duration: 10000
+          duration: delayTime
         })
         setTimeout(()=>{
           that.getData()
-        }, 10000)
+        }, delayTime)
         
       },
       complete:(res)=>{

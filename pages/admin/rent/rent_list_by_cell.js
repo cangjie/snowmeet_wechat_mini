@@ -33,6 +33,10 @@ Page({
       method: 'GET',
       success:(res)=>{
         if (res.statusCode == 200){
+          var orderList = res.data
+          for(var i = 0; i < orderList.length; i++){
+            orderList[i].create_dateStr = util.formatDate(new Date(orderList[i].create_date))
+          }
           that.setData({orders: res.data})
         }
       }
