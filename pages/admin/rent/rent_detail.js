@@ -1809,17 +1809,22 @@ Page({
       success: (res)=>{
         console.log('refund suc', res)
         wx.showToast({
-          title: '请稍等正在退款',
+          title: '正在退款',
           icon: 'loading',
           duration: 5000
         })
         if (that.data.depositPayAmount > 0){
           that.payWithDeposit()
         }
+        that.setFinish()
+        wx.showToast({
+          title: '正在更新数据',
+          icon: 'loading',
+          duration: 10000
+        })
         setTimeout(()=>{
-          that.setFinish()
           that.getData()
-        }, 7000)
+        }, 10000)
         
       },
       complete:(res)=>{

@@ -430,7 +430,7 @@
   </view>
   <view style="display: flex; flex-direction: row;margin-top: 20rpx;background-color: {{backColor}};" >
     <button class="input" 
-      disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund > 0.0099 && !refunding)  }}" 
+      disabled="{{!((rentOrder.status == '全部归还' || rentOrder.status == '已退款' ) && unRefund >= 0.0099 && !refunding)  }}" 
       bindtap="refundMulti"
       > 确 认 退 款 </button>
   </view>
