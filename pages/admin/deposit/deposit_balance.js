@@ -9,7 +9,7 @@ Page({
   data: {
     cell: '',
     dealing: false,
-    type: ''
+    type: 'all'
   },
 
   /**
@@ -147,6 +147,48 @@ Page({
     })
   },
   getBalance(){
+    var that = this
+    that.setData({dealing: true, members: undefined})
+    var getUrl = 'https://' + app.globalData.domainName + '/core/Deposit/GetAllBalance/' + that.data.type + '?start=' + that.data.start + '&end=' + that.data.end + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        console.log('get balance', res.data)
+        var bArr = res.data
+        for(var i = 0; i < bArr.length; i++){
+          var b = bArr[i]
+          var member = b.depositAccount.member
+          b.name = member.real_name + (member.gender == '男'? '(先生)':(member.gender == '女'? '(女士)': ''))
+          b.cell = member.cell
+          b.type = b.amount < 0? '消费' : '储值'
+          if (b.type == '消费'){
+            b.biz_id = ''
+            b.biz_type = ''
+            if (b.order && b.order.maintainList && b.order.maintainList.length > 0){
+              b.biz_type = '养护'
+              b.biz_id = b.order.maintainList[0].task_flow_num
+            }
+            if (b.order && b.order.rentOrderList && b.order.rentOrderList.length > 0){
+              b.biz_type = '租赁'
+              b.biz_id = b.order.rentOrderList[0].id
+            }
+          }
+          b.amountStr = util.showAmount(Math.abs(b.amount))
+          var createDate = new Date(b.create_date)
+          b.date = util.formatDate(createDate)
+          b.time = util.formatTimeStr(createDate)
+        }
+        that.setData({balances: bArr})
+      },
+      complete:()=>{
+        that.setData({dealing: false})
+      }
+    })
+
 
   },
   setType(e){
@@ -160,5 +202,20 @@ Page({
     wx.redirectTo({
       url: 'deposit_detail?id=' + id,
     })
+  },
+  setDate(e){
+    var that = this
+    var value = util.formatDate(new Date(e.detail.value))
+    var id = e.currentTarget.id
+    switch(id){
+      case 'start':
+        that.setData({start: value})
+        break
+      case 'end':
+        that.setData({end: value})
+        break
+      default:
+        break
+    }
   }
 })

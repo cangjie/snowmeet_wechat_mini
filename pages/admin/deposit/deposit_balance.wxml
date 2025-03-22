@@ -3,14 +3,14 @@
     <view class="left-column" style="width: 100rpx;">日期：</view>
     <view class="right-column view-row" style="width: 550rpx;">
       <view style="margin-left: 30rpx;margin-right: 30rpx;" >
-        <picker mode="date" disabled="{{cell != ''}}" >
-          <picker-view>{{'2025-03-22'}}</picker-view>
+        <picker mode="date" disabled="{{cell != ''}}" bindchange="setDate" id="start" >
+          <picker-view>{{start}}</picker-view>
         </picker>
       </view>
       <view style="margin-left: 30rpx;margin-right: 30rpx;">-</view>
       <view style="margin-left: 30rpx;margin-right: 30rpx;">
-        <picker mode="date" disabled="{{cell != ''}}" >
-          <picker-view>{{'2025-03-22'}}</picker-view>
+        <picker mode="date" disabled="{{cell != ''}}" bindchange="setDate" id="end" >
+          <picker-view>{{end}}</picker-view>
         </picker>
       </view>
     </view>
@@ -19,7 +19,7 @@
     <view class="left-column" style="width: 100rpx;">筛选：</view>
     <view class="right-column" style="width: 550rpx;margin-left: 50rpx;" >
       <radio-group class="view-row" bindchange="setType"  >
-        <radio disabled="{{cell != ''}}" checked="{{true}}" style="margin-right: 20rpx;" value="" > 全 部 </radio>
+        <radio disabled="{{cell != ''}}" checked="{{true}}" style="margin-right: 20rpx;" value="all" > 全 部 </radio>
         <radio disabled="{{cell != ''}}" style="margin-right: 20rpx;" value="income" > 充 值 </radio>
         <radio disabled="{{cell != ''}}" style="margin-right: 20rpx;" value="consume" > 消 费 </radio>
       </radio-group>
@@ -35,30 +35,30 @@
     <button class="input" disabled="{{dealing}}" bindtap="getData" >{{dealing?' 查 询 中 …':' 查 询 '}}</button>
   </view>
   <mp-cells wx:if="{{cell == '' && !members  }}" title="总计 xxx笔 充值：¥xxxxx.xx 消费：¥xxxx.xx" >
-    <mp-cell>
+    <mp-cell wx:for="{{balances}}" >
       <view class="view-row" bind:tap="gotoDetail" >
-        <view class="left-column" >姓名：</view>
-        <view class="right-column" ></view>
-        <view class="left-column" >电话：</view>
-        <view class="right-column" ></view>
+        <view class="left-column" style="width: 100rpx;" >姓名：</view>
+        <view class="right-column" >{{item.name}}</view>
+        <view class="left-column" style="width: 120rpx;" >电话：</view>
+        <view class="right-column" >{{item.cell}}</view>
       </view>
       <view class="view-row" bind:tap="gotoDetail" >
-        <view class="left-column" >类型：</view>
-        <view class="right-column" >充值/消费</view>
-        <view class="left-column" >业务：</view>
-        <view class="right-column" ></view>
+        <view class="left-column" style="width: 100rpx;" >类型：</view>
+        <view class="right-column" >{{item.type}}</view>
+        <view class="left-column" style="width: 120rpx;" >业务：</view>
+        <view class="right-column" >{{item.biz_type}}</view>
       </view>
       <view class="view-row" bind:tap="gotoDetail" >
-        <view class="left-column" >金额：</view>
-        <view class="right-column" ></view>
-        <view class="left-column" >订单号：</view>
-        <view class="right-column" ></view>
+        <view class="left-column" style="width: 100rpx;" >金额：</view>
+        <view class="right-column" >{{item.amountStr}}</view>
+        <view class="left-column" style="width: 120rpx;" >订单号：</view>
+        <view class="right-column" style="width: 220rpx;" >{{item.biz_id}}</view>
       </view>
       <view class="view-row" bind:tap="gotoDetail" >
-        <view class="left-column" >日期：</view>
-        <view class="right-column" ></view>
-        <view class="left-column" >时间：</view>
-        <view class="right-column" ></view>
+        <view class="left-column" style="width: 100rpx;" >日期：</view>
+        <view class="right-column" >{{item.date}}</view>
+        <view class="left-column" style="width: 120rpx;" >时间：</view>
+        <view class="right-column" >{{item.time}}</view>
       </view>
     </mp-cell>
   </mp-cells>
