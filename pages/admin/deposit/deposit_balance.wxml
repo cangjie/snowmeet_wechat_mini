@@ -1,0 +1,91 @@
+<view>
+  <view class="view-row">
+    <view class="left-column" style="width: 100rpx;">日期：</view>
+    <view class="right-column view-row" style="width: 550rpx;">
+      <view style="margin-left: 30rpx;margin-right: 30rpx;" >
+        <picker mode="date" disabled="{{cell != ''}}" >
+          <picker-view>{{'2025-03-22'}}</picker-view>
+        </picker>
+      </view>
+      <view style="margin-left: 30rpx;margin-right: 30rpx;">-</view>
+      <view style="margin-left: 30rpx;margin-right: 30rpx;">
+        <picker mode="date" disabled="{{cell != ''}}" >
+          <picker-view>{{'2025-03-22'}}</picker-view>
+        </picker>
+      </view>
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" style="width: 100rpx;">筛选：</view>
+    <view class="right-column" style="width: 550rpx;margin-left: 50rpx;" >
+      <radio-group class="view-row" bindchange="setType"  >
+        <radio disabled="{{cell != ''}}" checked="{{true}}" style="margin-right: 20rpx;" value="" > 全 部 </radio>
+        <radio disabled="{{cell != ''}}" style="margin-right: 20rpx;" value="income" > 充 值 </radio>
+        <radio disabled="{{cell != ''}}" style="margin-right: 20rpx;" value="consume" > 消 费 </radio>
+      </radio-group>
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" style="width: 100rpx;">手机：</view>
+    <view class="right-column" style="width: 500rpx;margin-left: 30rpx;" >
+      <input class="input" style="width: 270rpx;text-align: center;" placeholder="11位手机号或后4位" bindinput="setCell" />
+    </view>
+  </view>
+  <view class="view-row" style="margin-top: 40rpx;margin-bottom: 50rpx;" >
+    <button class="input" disabled="{{dealing}}" bindtap="getData" >{{dealing?' 查 询 中 …':' 查 询 '}}</button>
+  </view>
+  <mp-cells wx:if="{{cell == '' && !members  }}" title="总计 xxx笔 充值：¥xxxxx.xx 消费：¥xxxx.xx" >
+    <mp-cell>
+      <view class="view-row" bind:tap="gotoDetail" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" bind:tap="gotoDetail" >
+        <view class="left-column" >类型：</view>
+        <view class="right-column" >充值/消费</view>
+        <view class="left-column" >业务：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" bind:tap="gotoDetail" >
+        <view class="left-column" >金额：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >订单号：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" bind:tap="gotoDetail" >
+        <view class="left-column" >日期：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >时间：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells wx:else title="总共{{members.length}}">
+    <mp-cell wx:for="{{members}}" >
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >
+          {{item.real_name}}
+          {{(item.gender == '男')? '先生' : ''}}
+          {{(item.gender == '女')? '女士' : ''}}
+        </view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >{{item.cell}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+        <view class="left-column" >创建日期：</view>
+        <view class="right-column" style="text-align:right;" >{{item.depositAccounts[0].create_dateStr}}</view>
+        <view class="left-column" >当前余额：</view>
+        <view class="right-column" style="text-align: right;" >{{item.depositAccounts[0].avaliableAmountStr}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+        <view class="left-column" >总计储值：</view>
+        <view class="right-column" style="text-align: right;" >{{item.depositAccounts[0].income_amountStr}}</view>
+        <view class="left-column" >总计消费：</view>
+        <view class="right-column" style="text-align: right;" >{{item.depositAccounts[0].consume_amountStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

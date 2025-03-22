@@ -274,6 +274,9 @@ Page({
       case 'recept_auth':
         path = '/pages/admin/recept/recept_auth_list'
         break
+      case 'deposit_balance':
+        path = '/pages/admin/deposit/deposit_balance'
+        break
       default:
         break
     }
