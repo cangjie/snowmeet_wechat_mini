@@ -84,6 +84,7 @@ Page({
     var that = this
     var cell = that.data.cell
     if (cell == ''){
+      that.setData({members: undefined})
       that.getBalance()
     }
     else{
@@ -112,6 +113,8 @@ Page({
         console.log('get members', res.data)
         var members = res.data
         var newMembers = []
+        var totalIncome = 0
+        var totalConsume = 0
         for(var i = 0; i < members.length; i++){
           var member = members[i]
           var order = undefined
@@ -132,13 +135,18 @@ Page({
             member.depositAccounts[0].consume_amountStr = util.showAmount(member.depositAccounts[0].consume_amount)
             member.depositAccounts[0].income_amountStr = util.showAmount(member.depositAccounts[0].income_amount)
             newMembers.push(member)
+            totalIncome += member.depositAccounts[0].income_amount
+            totalConsume += member.depositAccounts[0].consume_amount
           }
           else{
             member.haveDeposit = '无'
             member.depositAmountStr = '——'
           }
         }
-        that.setData({members: newMembers})
+        that.setData({members: newMembers,
+          totalConsume, totalIncome,
+          totalIncomeStr: util.showAmount(totalIncome),
+          totalConsumeStr: util.showAmount(totalConsume) })
 
       },
       complete:(res)=>{
@@ -159,6 +167,8 @@ Page({
         }
         console.log('get balance', res.data)
         var bArr = res.data
+        var totalConsume = 0
+        var totalIncome = 0
         for(var i = 0; i < bArr.length; i++){
           var b = bArr[i]
           var member = b.depositAccount.member
@@ -168,6 +178,7 @@ Page({
           if (b.type == '消费'){
             b.biz_id = ''
             b.biz_type = ''
+            totalConsume += -1 * b.amount
             if (b.order && b.order.maintainList && b.order.maintainList.length > 0){
               b.biz_type = '养护'
               b.biz_id = b.order.maintainList[0].task_flow_num
@@ -177,12 +188,17 @@ Page({
               b.biz_id = b.order.rentOrderList[0].id
             }
           }
+          else {
+            totalIncome += b.amount
+          }
           b.amountStr = util.showAmount(Math.abs(b.amount))
           var createDate = new Date(b.create_date)
           b.date = util.formatDate(createDate)
           b.time = util.formatTimeStr(createDate)
         }
-        that.setData({balances: bArr})
+        that.setData({balances: bArr, totalConsume, totalIncome,
+          totalIncomeStr: util.showAmount(totalIncome),
+          totalConsumeStr: util.showAmount(totalConsume)})
       },
       complete:()=>{
         that.setData({dealing: false})

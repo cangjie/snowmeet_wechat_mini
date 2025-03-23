@@ -20,7 +20,7 @@
     <view class="right-column" style="width: 550rpx;margin-left: 50rpx;" >
       <radio-group class="view-row" bindchange="setType"  >
         <radio disabled="{{cell != ''}}" checked="{{true}}" style="margin-right: 20rpx;" value="all" > 全 部 </radio>
-        <radio disabled="{{cell != ''}}" style="margin-right: 20rpx;" value="income" > 充 值 </radio>
+        <radio disabled="{{cell != ''}}" style="margin-right: 20rpx;" value="income" > 储 值 </radio>
         <radio disabled="{{cell != ''}}" style="margin-right: 20rpx;" value="consume" > 消 费 </radio>
       </radio-group>
     </view>
@@ -34,7 +34,7 @@
   <view class="view-row" style="margin-top: 40rpx;margin-bottom: 50rpx;" >
     <button class="input" disabled="{{dealing}}" bindtap="getData" >{{dealing?' 查 询 中 …':' 查 询 '}}</button>
   </view>
-  <mp-cells wx:if="{{cell == '' && !members  }}" title="总计 xxx笔 充值：¥xxxxx.xx 消费：¥xxxx.xx" >
+  <mp-cells wx:if="{{cell == '' && members == undefined  }}" title="总计 {{balances.length}}笔 充值：{{totalIncomeStr}} 消费：{{totalConsumeStr}}" >
     <mp-cell wx:for="{{balances}}" >
       <view class="view-row" bind:tap="gotoDetail" >
         <view class="left-column" style="width: 100rpx;" >姓名：</view>
@@ -62,7 +62,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells wx:else title="总共{{members.length}}">
+  <mp-cells wx:else title="总计{{members.length}}账户 储值：{{totalIncomeStr}} 消费：{{totalConsumeStr}}">
     <mp-cell wx:for="{{members}}" >
       <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
         <view class="left-column" >姓名：</view>
