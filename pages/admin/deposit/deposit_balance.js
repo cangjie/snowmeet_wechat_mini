@@ -84,7 +84,9 @@ Page({
     var that = this
     var cell = that.data.cell
     if (cell == ''){
-      that.setData({members: undefined})
+      var members = that.data.members
+      members = []
+      that.setData({members})
       that.getBalance()
     }
     else{
@@ -233,5 +235,21 @@ Page({
       default:
         break
     }
+  },
+  gotoBalanceDetail(e){
+    var that = this
+    var balanceId = e.currentTarget.id
+    var balances = that.data.balances
+    var id = undefined
+    for(var i = 0; i < balances.length; i++){
+      var b = balances[i]
+      if (b.id == balanceId){
+        id = b.deposit_id
+        break
+      }
+    }
+    wx.navigateTo({
+      url: 'deposit_detail?id=' + id + '&balanceId=' + balanceId,
+    })
   }
 })

@@ -53,32 +53,35 @@
   <button class="input" disabled="{{dealing}}" bindtap="mod" > 修 改 </button>
   -->
   </view>
-  <mp-cells title="总计：xxx " >
-    <mp-cell>
+  <mp-cells title="总计：{{balances.length}}笔" >
+    <mp-cell wx:for="{{balances}}" >
       <view class="view-row" >
         <view class="left-column" >类型：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.type}}</view>
         <view class="left-column" >业务：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.biz_type}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >订单号：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.biz_id}}</view>
         <view class="left-column" >交易金额：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.amountStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >前余额：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.preDepositStr}}</view>
         <view class="left-column" >现余额：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.currentDepositStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >日期：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.dateStr}}</view>
         <view class="left-column" >时间：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.timeStr}}</view>
       </view>
     </mp-cell>
   </mp-cells>
+  <view wx:if="{{balanceId}}" >
+    <button class="input" bindtap="setShow" > {{showAll? '显示当前记录':'显示全部'}} </button>
+  </view>
 </view>

@@ -9,16 +9,21 @@ Page({
   data: {
     dealing: false,
     newBizId: undefined,
-    newMemo: undefined
+    newMemo: undefined,
+    id: undefined,
+    balanceId: undefined,
+    showAll: false
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    var id = options.id
     var that = this
-    that.setData({id})
+    that.setData({id: options.id})
+    if (options.balanceId != undefined){
+      that.setData({balanceId: options.balanceId})
+    }
   },
 
   /**
@@ -74,6 +79,11 @@ Page({
   },
   getData(){
     var that = this
+    this.getAccount()
+
+  },
+  getAccount(){
+    var that = this
     var url = 'https://' + app.globalData.domainName + '/core/deposit/GetAccount/' + that.data.id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: url,
@@ -82,6 +92,7 @@ Page({
         if (res.statusCode != 200){
           return
         }
+        console.log('get account', res.data)
         var account = res.data
         var createDate = new Date(account.create_date)
         account.dateStr = util.formatDate(createDate)
@@ -89,7 +100,25 @@ Page({
         account.income_amountStr = util.showAmount(account.income_amount)
         account.consume_amountStr = util.showAmount(account.consume_amount)
         account.avaliableAmountStr = util.showAmount(account.avaliableAmount)
+        var balances = account.balances
+        var preDeposit = 0
+        var currentDeposit = 0
+        for(var i = balances.length - 1; i >= 0; i--){
+          if (i == balances.length - 1){
+            preDeposit = 0
+            currentDeposit = balances[balances.length - 1].amount
+          }
+          else{
+            preDeposit = balances[i + 1].currentDeposit
+            currentDeposit = preDeposit + balances[i].amount
+          }
+          balances[i].preDeposit = preDeposit
+          balances[i].currentDeposit = currentDeposit
+          balances[i].preDepositStr = util.showAmount(preDeposit)
+          balances[i].currentDepositStr = util.showAmount(currentDeposit)
+        }
         that.setData({account})
+        that.getBalance()
       }
     })
   },
@@ -159,5 +188,49 @@ Page({
         }
       }
     })
+  },
+  getBalance(){
+    var that = this
+    var account = that.data.account
+    var balances = account.balances
+    if (!isNaN(that.data.balanceId)){
+      balances = []
+      for(var i = 0; i < account.balances.length; i++){
+        if (that.data.showAll || that.data.balanceId == account.balances[i].id)
+        balances.push(account.balances[i])
+      }
+    }
+    for(var i = 0; i < balances.length; i++){
+      var b = balances[i]
+      if (b.amount <= 0){
+        b.type = '消费'
+      }
+      else {
+        b.type = '储值'
+      }
+      if (b.type == '消费'){
+        b.biz_type = ''
+        b.biz_id = ''
+        if (b.order && b.order.maintainList && b.order.maintainList.length > 0){
+          b.biz_type = '养护'
+          b.biz_id = b.order.maintainList[0].task_flow_num
+        }
+        if (b.order && b.order.rentOrderList && b.order.rentOrderList.length > 0){
+          b.biz_type = '租赁'
+          b.biz_id = b.order.rentOrderList[0].id
+        }
+      }
+      b.amountStr = util.showAmount(Math.abs(b.amount))
+      var createDate = new Date(b.create_date)
+      b.dateStr = util.formatDate(createDate)
+      b.timeStr = util.formatTimeStr(createDate)
+    }
+    that.setData({balances: balances})
+  },
+  setShow(){
+    var that = this
+    var showAll = !that.data.showAll
+    that.setData({showAll})
+    that.getBalance()
   }
 })

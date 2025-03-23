@@ -34,27 +34,27 @@
   <view class="view-row" style="margin-top: 40rpx;margin-bottom: 50rpx;" >
     <button class="input" disabled="{{dealing}}" bindtap="getData" >{{dealing?' 查 询 中 …':' 查 询 '}}</button>
   </view>
-  <mp-cells wx:if="{{cell == '' && members == undefined  }}" title="总计 {{balances.length}}笔 充值：{{totalIncomeStr}} 消费：{{totalConsumeStr}}" >
+  <mp-cells wx:if="{{cell == '' && (members == undefined || members.length == 0 || members == null)  }}" title="总计 {{balances.length}}笔 充值：{{totalIncomeStr}} 消费：{{totalConsumeStr}}" >
     <mp-cell wx:for="{{balances}}" >
-      <view class="view-row" bind:tap="gotoDetail" >
+      <view class="view-row" bind:tap="gotoBalanceDetail" id="{{item.id}}" >
         <view class="left-column" style="width: 100rpx;" >姓名：</view>
         <view class="right-column" >{{item.name}}</view>
         <view class="left-column" style="width: 120rpx;" >电话：</view>
         <view class="right-column" >{{item.cell}}</view>
       </view>
-      <view class="view-row" bind:tap="gotoDetail" >
+      <view class="view-row" bind:tap="gotoBalanceDetail" id="{{item.id}}" >
         <view class="left-column" style="width: 100rpx;" >类型：</view>
         <view class="right-column" >{{item.type}}</view>
         <view class="left-column" style="width: 120rpx;" >业务：</view>
         <view class="right-column" >{{item.biz_type}}</view>
       </view>
-      <view class="view-row" bind:tap="gotoDetail" >
+      <view class="view-row" bind:tap="gotoBalanceDetail" id="{{item.id}}" >
         <view class="left-column" style="width: 100rpx;" >金额：</view>
         <view class="right-column" >{{item.amountStr}}</view>
         <view class="left-column" style="width: 120rpx;" >订单号：</view>
         <view class="right-column" style="width: 220rpx;" >{{item.biz_id}}</view>
       </view>
-      <view class="view-row" bind:tap="gotoDetail" >
+      <view class="view-row" bind:tap="gotoBalanceDetail" id="{{item.id}}" >
         <view class="left-column" style="width: 100rpx;" >日期：</view>
         <view class="right-column" >{{item.date}}</view>
         <view class="left-column" style="width: 120rpx;" >时间：</view>
@@ -64,7 +64,7 @@
   </mp-cells>
   <mp-cells wx:else title="总计{{members.length}}账户 储值：{{totalIncomeStr}} 消费：{{totalConsumeStr}}">
     <mp-cell wx:for="{{members}}" >
-      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+      <view class="view-row" id="{{item.depositAccounts[0].id}}" bindtap="gotoDetail" >
         <view class="left-column" >姓名：</view>
         <view class="right-column" >
           {{item.real_name}}
@@ -74,13 +74,13 @@
         <view class="left-column" >电话：</view>
         <view class="right-column" >{{item.cell}}</view>
       </view>
-      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+      <view class="view-row" id="{{item.depositAccounts[0].id}}" bindtap="gotoDetail" >
         <view class="left-column" >创建日期：</view>
         <view class="right-column" style="text-align:right;" >{{item.depositAccounts[0].create_dateStr}}</view>
         <view class="left-column" >当前余额：</view>
         <view class="right-column" style="text-align: right;" >{{item.depositAccounts[0].avaliableAmountStr}}</view>
       </view>
-      <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
+      <view class="view-row" id="{{item.depositAccounts[0].id}}" bindtap="gotoDetail" >
         <view class="left-column" >总计储值：</view>
         <view class="right-column" style="text-align: right;" >{{item.depositAccounts[0].income_amountStr}}</view>
         <view class="left-column" >总计消费：</view>

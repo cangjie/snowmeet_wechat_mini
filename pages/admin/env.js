@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-    port: '44314'
+    port: '5000'
   },
 
   /**
