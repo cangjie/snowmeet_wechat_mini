@@ -121,6 +121,9 @@ Page({
       case 'amount':
         that.setData({amount: value})
         break
+      case 'bizType':
+        that.setData({bizType: value})
+        break
       default:
         break
     }
@@ -133,6 +136,13 @@ Page({
     if (isNaN(amount)){
       wx.showToast({
         title: '金额必须是数字',
+        icon: 'error'
+      })
+      return false
+    }
+    else if (!that.data.bizType) {
+      wx.showToast({
+        title: '必须选择类型',
         icon: 'error'
       })
       return false
@@ -162,7 +172,7 @@ Page({
     
         if (res.confirm) {
           that.setData({dealing: true})
-          var chargeUrl = 'https://' + app.globalData.domainName + '/core/deposit/DepositCharge/' + that.data.member.id.toString() + '?accountId=' +  accountId.toString() + '&chargeAmount=' + that.data.amount + '&expireDate=2027-03-31 &sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&type=' + encodeURIComponent('服务储值') + '&subType=&mi7OrderId=' + that.data.bizId + '&memo=' + encodeURIComponent(that.data.memo)
+          var chargeUrl = 'https://' + app.globalData.domainName + '/core/deposit/DepositCharge/' + that.data.member.id.toString() + '?accountId=' +  accountId.toString() + '&chargeAmount=' + that.data.amount + '&expireDate=2027-03-31 &sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&type=' + encodeURIComponent('服务储值') + '&subType=&mi7OrderId=' + that.data.bizId  + '&bizType=' + encodeURIComponent(that.data.bizType) + '&memo=' + encodeURIComponent(that.data.memo) 
           wx.request({
             url: chargeUrl,
             method: 'GET',

@@ -24,24 +24,44 @@
   <mp-cells title="储值账户充值" >
     <mp-cell>
       <view class="view-row" >
-        <view class="left-column" style="width: 200rpx;" >订单号：</view>
-        <view class="right-column" style="width: 200rpx;" >
+        <view class="left-column" style="width: 230rpx;" >七色米订单号：</view>
+        <view class="right-column" style="width: 500rpx;" >
           <input style="width: 400rpx;" class="input" id="bizId" bindinput="input" />
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
-        <view class="left-column" style="width: 200rpx;" >备注：</view>
-        <view class="right-column" style="width: 200rpx;" >
+        <view class="left-column" style="width: 230rpx;" >充值类型：</view>
+        <view class="right-column" style="width: 500rpx;" >
+          <radio-group id="bizType" bindchange="input" >
+            <view class="view-row" >
+              <view style="width: 200rpx;" ><radio value="储值送装备" >储值送装备</radio></view>
+              <view style="width: 200rpx;margin-left: 20rpx;" ><radio value="二手回收" >二手回收</radio></view>
+            </view>
+            <view class="view-row" style="margin-top: 20rpx;">
+              <view style="width: 200rpx;" ><radio value="零售赠送" >零售赠送</radio></view>
+              <view style="width: 200rpx;margin-left: 20rpx;" ><radio value="预定" >预定</radio></view>
+            </view>
+            <view class="view-row" style="margin-top: 20rpx;">
+              <view style="width: 200rpx;" ><radio value="其它赠送" >其它赠送</radio></view>
+            </view>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 230rpx;" >备注：</view>
+        <view class="right-column" style="width: 500rpx;" >
           <input style="width: 400rpx;" class="input" id="memo" bindinput="input" />
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
-        <view class="left-column" style="width: 200rpx;" >金额：</view>
-        <view class="right-column" style="width: 200rpx;" >
+        <view class="left-column" style="width: 230rpx;" >金额：</view>
+        <view class="right-column" style="width: 500rpx;" >
           <input style="width: 150rpx;" class="input" id="amount" bindinput="input" />
         </view>
       </view>
