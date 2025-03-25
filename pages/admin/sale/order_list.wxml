@@ -30,6 +30,17 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <mp-cells title="填写了七色米订单号" >
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;justify-content: center; font-size: 10pt;height: 50rpx;">
+        <radio-group bindchange="setMi7Num" >
+          <radio value="" checked="{{true}}" > 全 部 </radio>
+          <radio value="已填" style="margin-left: 30rpx;" > 已 填 </radio>
+          <radio value="未填" style="margin-left: 30rpx;" > 未 填 </radio>
+        </radio-group>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <view style="text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;">
     <button bindtap="search" disabled="{{isQuerying}}" class="input" > {{isQuerying? '查询中……' : '查 询 '}}</button>
   </view>
@@ -39,7 +50,7 @@
         <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
         <view style="width: 187rpx;" class="list" >{{item.id}}</view>
         <view style="width: 187rpx;padding-left: 10rpx; text-align: right;" class="list" >订单金额：</view>
-        <view class="list" >¥{{item.final_price}}</view>
+        <view style="width: 187rpx;" class="list" >¥{{item.final_price}}</view>
       </view>
       <view style="display: flex; flex-direction: row;" >
         <view style="width: 187rpx; text-align: right;" class="list" >订单日期：</view>

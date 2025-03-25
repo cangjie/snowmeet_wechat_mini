@@ -14,7 +14,8 @@ Page({
     statusList:['全部', '待支付', '部分支付', '暂缓支付', '支付完成', '订单关闭'],
     orderList:[],
     totalAmount: 0,
-    isQuerying: false
+    isQuerying: false,
+    mi7Num:''
   },
 
   statusSelected(e){
@@ -39,6 +40,7 @@ Page({
     if (that.data.shop!=''){
       searchUrl = searchUrl + '&shop=' + encodeURIComponent(that.data.shop)
     }
+    searchUrl += '&mi7Num=' + encodeURIComponent(that.data.mi7Num)
     wx.request({
       url: searchUrl,
       method: 'GET',
@@ -143,5 +145,9 @@ Page({
     wx.navigateTo({
       url: 'order_detail?id=' + id,
     })
+  },
+  setMi7Num(e){
+    var that = this
+    that.setData({mi7Num: e.detail.value})
   }
 })
