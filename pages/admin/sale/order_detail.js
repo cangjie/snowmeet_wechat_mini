@@ -196,6 +196,17 @@ Page({
           payment.amountStr = util.showAmount(payment.amount)
           payment.refundStr = util.showAmount(payment.refundedAmount)
         }
+        for(var i = 0; order.refunds && i < order.refunds.length; i++){
+          var r = order.refunds[i]
+          var createDate = new Date(r.create_date)
+          r.dateStr = util.formatDate(createDate)
+          r.timeStr = util.formatTimeStr(createDate)
+          r.staffName = '——'
+          r.amountStr = util.showAmount(r.amount)
+          if (r.msa && r.msa.member){
+            r.staffName = r.msa.member.real_name
+          }
+        }
         that.setData({order: order, isOrderInfoReady: true})
       }
     })
