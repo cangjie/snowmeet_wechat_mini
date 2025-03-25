@@ -104,22 +104,23 @@
   <mp-cells title="订单明细">
     <mp-cell wx:for="{{order.mi7Orders}}" id="{{item.id}}" bindtap="modMi7OrderNo">
       <view style="display: flex;flex-direction: row;">
-        <view style="font-size: 10pt;text-align: right;width: 180rpx;">七色米编号：</view>
-        <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.mi7_order_id}}</view>
-        <view style="font-size: 10pt;text-align: right;width: 180rpx;">名称：</view>
-        <view style="font-size: 10pt;text-align: left;width: 180rpx;">--</view>
+        <view style="font-size: 10pt;text-align: right;width: 200rpx;">七色米订单号：</view>
+        <view style="font-size: 10pt;text-align: left;width: 500rpx;">{{item.mi7_order_id}}</view>
+        <!--view style="font-size: 10pt;text-align: right;width: 180rpx;">名称：</view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;">--</view-->
       </view>
       <view style="display: flex;flex-direction: row;">
-        <view style="font-size: 10pt;text-align: right;width: 180rpx;">零售价：</view>
-        <view style="font-size: 10pt;text-align: left;width: 180rpx;">¥{{item.sale_price}}</view>
-        <view style="font-size: 10pt;text-align: right;width: 180rpx;">成交价：</view>
-        <view style="font-size: 10pt;text-align: left;width: 180rpx;">¥{{item.real_charge}}</view>
+        <view style="font-size: 10pt;text-align: right;width: 200rpx;">零售价：</view>
+        <view style="font-size: 10pt;text-align: left;width: 160rpx;">¥{{item.sale_price}}</view>
+        <view style="font-size: 10pt;text-align: right;width: 200rpx;">成交价：</view>
+        <view style="font-size: 10pt;text-align: left;width: 160rpx;">¥{{item.real_charge}}</view>
       </view>
       <view style="display: flex;flex-direction: row;">
-        <view style="font-size: 10pt;text-align: right;width: 180rpx;">条码：</view>
+        <!--view style="font-size: 10pt;text-align: right;width: 180rpx;">条码：</view>
         <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.barCode}}</view>
         <view style="font-size: 10pt;text-align: right;width: 180rpx;"></view>
-        <view style="font-size: 10pt;text-align: left;width: 180rpx;"></view>
+        <view style="font-size: 10pt;text-align: left;width: 180rpx;"></view-->
+        <button class="input" style="margin-top: 20rpx;" size="mini" id="{{item.id}}" bindtap="modMi7OrderNo" > 修 改 </button>
       </view>
     </mp-cell>
   </mp-cells>

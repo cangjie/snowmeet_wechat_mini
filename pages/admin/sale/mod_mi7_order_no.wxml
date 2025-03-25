@@ -1,30 +1,46 @@
 <!--pages/admin/sale/mod_mi7_order_no.wxml-->
-<mp-cells title="七色米订单信息" >
-  <mp-cell>
-    <view style="display: flex; flex-direction: row;">
-      <view class="left-column" >七色米订单号：</view>
-      <view class="right-column" >{{order.mi7_order_id}}</view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view style="display: flex; flex-direction: row;">
-      <view class="left-column" >新订单号：</view>
-      <view class="right-column" ><input style="width: 300rpx;" bindinput="input" value="{{newOrderNum}}" /></view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view style="display: flex; flex-direction: row;">
-      <view class="left-column" >零售价：</view>
-      <view class="right-column" >{{order.sale_price_str}}</view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view style="display: flex; flex-direction: row;">
-      <view class="left-column" >零售价：</view>
-      <view class="right-column" >{{order.real_charge_str}}</view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <button bindtap="submit" > 确 认 修 改 </button>
-  </mp-cell>
-</mp-cells>
+<view>
+  <mp-cells title="七色米订单信息">
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">七色米订单号：</view>
+        <view class="right-column">{{order.mi7_order_id}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">新订单号：</view>
+        <view class="right-column">
+          <input style="width: 300rpx;" bindinput="input" value="{{newOrderNum}}" class="input" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">零售价：</view>
+        <view class="right-column">{{order.sale_price_str}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
+        <view class="left-column">零售价：</view>
+        <view class="right-column">{{order.real_charge_str}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <button bindtap="submit" class="input"> 确 认 修 改 </button>
+    </mp-cell>
+  </mp-cells>
+  <view class="view-row" style="margin-top: 30rpx;font-size: 11pt;">
+    <view style="width: 180rpx;text-align: center;" >日期</view>
+    <view style="width: 80rpx;text-align: center;" >时间</view>
+    <view style="width: 260rpx;text-align: center;" >操作</view>
+    <view style="width: 180rpx;text-align: center;" >店员</view>
+  </view>
+  <view wx:for="{{logs}}" class="view-row" style="margin-top: 30rpx;font-size: 11pt;" >
+    <view style="width: 180rpx;text-align: center;" >{{item.dateStr}}</view>
+    <view style="width: 80rpx;text-align: center;" >{{item.timeStr}}</view>
+    <view style="width: 260rpx;text-align: center;" >{{item.scene}}</view>
+    <view style="width: 180rpx;text-align: center;" >{{item.staffMember.real_name}}</view>
+  </view>
+</view>

@@ -43,21 +43,7 @@ Page({
    */
   onLoad(options) {
     var that = this
-    app.loginPromiseNew.then(function (resolve){
-      
-      var getMi7OrderUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/GetMi7Order/' + options.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: getMi7OrderUrl,
-        method: 'GET',
-        success:(res)=>{
-          var order = res.data
-          order.sale_price_str = util.showAmount(order.sale_price)
-          order.real_charge_str = util.showAmount(order.real_charge)
-          that.setData({order: res.data})
-
-        }
-      })
-    })
+    that.setData({id: options.id})
   },
 
   /**
@@ -71,7 +57,10 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    app.loginPromiseNew.then(function (resolve){
+      that.getData()
+    })
   },
 
   /**
@@ -107,5 +96,42 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  getData(){
+    var that = this
+    var getMi7OrderUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/GetMi7OrderById/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getMi7OrderUrl,
+      method: 'GET',
+      success:(res)=>{
+        var order = res.data
+        order.sale_price_str = util.showAmount(order.sale_price)
+        order.real_charge_str = util.showAmount(order.real_charge)
+        that.setData({order: res.data})
+      }
+    })
+    that.getLogs()
+  },
+  getLogs(){
+    var that = this
+    var getLogUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/GetLogs/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: getLogUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          return
+        }
+        var logs = res.data
+        for(var i = 0; i < logs.length; i++){
+          var log = logs[i]
+          var createDate = new Date(log.create_date)
+          log.dateStr = util.formatDate(createDate)
+          log.timeStr = util.formatTimeStr(createDate)
+
+        }
+        that.setData({logs})
+      }
+    })
   }
 })
