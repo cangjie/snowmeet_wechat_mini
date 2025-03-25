@@ -1,5 +1,6 @@
 // pages/admin/sale/order_list.js
 const app = getApp()
+const util = require('../../../utils/util.js')
 Page({
 
   /**
@@ -49,11 +50,15 @@ Page({
         var orderList = res.data
         var totalAmount = 0
         for(var i = 0; i < orderList.length; i++){
+          var order = orderList[i]
+          order.paidAmountStr = util.showAmount(order.paidAmount)
+          order.refundAmountStr = util.showAmount(order.refundAmount)
           if (orderList[i].type.toString().indexOf('店销') < 0){
             orderList.splice(i, 1)
             i--
             continue
           }
+
           totalAmount = totalAmount + orderList[i].final_price
           var orderDateTime = new Date(orderList[i].create_date)
           orderList[i].date = orderDateTime.getFullYear().toString() + '-' + (orderDateTime.getMonth() + 1).toString() + '-' + orderDateTime.getDate().toString()
