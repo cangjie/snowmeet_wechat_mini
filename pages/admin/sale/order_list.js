@@ -8,7 +8,7 @@ Page({
    */
   data: {
     shop: '',
-    statusSelectedIndex: 0,
+    statusSelectedIndex: 4,
     startDate: new Date(),
     endDate: new Date(),
     nowDateStr: '',
@@ -16,7 +16,8 @@ Page({
     orderList:[],
     totalAmount: 0,
     isQuerying: false,
-    mi7Num:''
+    mi7Num:'',
+    urgent: false
   },
 
   statusSelected(e){
@@ -33,8 +34,14 @@ Page({
   search(){
     var that = this
     that.setData({isQuerying: true})
+    var startDate = that.data.startDate
+    var endDate = that.data.endDate
+    if (that.data.urgent){
+      startDate = '2020-01-01'
+      endDate = '2050-01-01'
+    }
     var searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=' 
-      + that.data.startDate + '&endDate=' + that.data.endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      + startDate + '&endDate=' + endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     if (that.data.statusSelectedIndex>0){
       searchUrl = searchUrl + '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex])
     }
@@ -63,6 +70,12 @@ Page({
           var orderDateTime = new Date(orderList[i].create_date)
           orderList[i].date = orderDateTime.getFullYear().toString() + '-' + (orderDateTime.getMonth() + 1).toString() + '-' + orderDateTime.getDate().toString()
           orderList[i].time = orderDateTime.getHours().toString() + ':' + orderDateTime.getMinutes().toString()
+          if (orderList[i].mi7Orders && orderList[i].mi7Orders.length > 0 && orderList[i].mi7Orders[0].mi7_order_id.indexOf('XSD') == 0){
+            orderList[i].textColor = ''
+          }
+          else{
+            orderList[i].textColor = 'red'
+          }
         }
         that.setData({orderList: orderList, totalAmount: totalAmount})
       },
@@ -154,5 +167,11 @@ Page({
   setMi7Num(e){
     var that = this
     that.setData({mi7Num: e.detail.value})
+  },
+  setOnlyUrgent(e){
+    var that = this
+    console.log('urgent', e)
+    var urgent = e.detail.value.length == 0? false:true
+    that.setData({urgent, mi7Num:'紧急开单'})
   }
 })
