@@ -11,7 +11,8 @@ Page({
     payMethod: '微信支付',
     chargeAmount: 0,
     showModal: false,
-    refunding: false
+    refunding: false,
+    refundAmount: 0
   },
   goHome(){
     wx.redirectTo({
@@ -270,7 +271,7 @@ Page({
               })
             },
             complete:(res)=>{
-              that.setData({refunding: false})
+              that.setData({refunding: false, refundAmount: 0})
               that.getData()
             }
           })

@@ -120,7 +120,7 @@
         <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.barCode}}</view>
         <view style="font-size: 10pt;text-align: right;width: 180rpx;"></view>
         <view style="font-size: 10pt;text-align: left;width: 180rpx;"></view-->
-        <button class="input" style="margin-top: 20rpx;" size="mini" id="{{item.id}}" bindtap="modMi7OrderNo" > 修 改 </button>
+        <button class="input" style="margin-top: 20rpx;" size="mini" id="{{item.id}}" bindtap="modMi7OrderNo"> 修 改 </button>
       </view>
     </mp-cell>
   </mp-cells>
@@ -166,49 +166,48 @@
           <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.refundStr}}</view>
         </view>
       </view>
+      <view style="display: flex;flex-direction: row;margin-top:20rpx">
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;">申请退款：</view>
+        <view style="font-size: 10pt;text-align: left;width: 550rpx;">
+          <input style="width: 150rpx;" value="{{refundAmount}}" class="input" id="refundAmount" bindinput="refundInput" />
+        </view>
+
+      </view>
+      <view style="display: flex;flex-direction: row;margin-top:20rpx">
+        <view style="font-size: 10pt;text-align: right;width: 180rpx;">退款原因：</view>
+        <view style="font-size: 10pt;text-align: left;width: 550rpx;">
+          <input style="width: 450rpx;" placeholder="必须填写退款原因" class="input" bindinput="refundInput" id="reason" />
+        </view>
+      </view>
+      <view style="margin-top:20rpx;text-align:center">
+        <button id="{{item.id}}" class="input" size="mini" style="margin-left: 100rpx;" bind:tap="refund" disabled="{{refunding}}">确认退款</button>
+      </view>
     </mp-cell>
   </mp-cells>
   <view style="margin-top: 20rpx; margin-bottom: 20rpx;">
-    <button disabled="{{order.paidAmount <= 0 || order.status == '订单关闭' || order.status == '支付完成'}}"          class="input"   bindtap="charge"> 追 加 收 款 </button>
+    <button disabled="{{order.paidAmount <= 0 || order.status == '订单关闭' || order.status == '支付完成'}}" class="input" bindtap="charge"> 追 加 收 款 </button>
   </view>
-  <mp-cells wx:if="{{order.refunds.length > 0}}" title="退款记录" >
-    <mp-cell wx:for="{{order.refunds}}" >
-      <view class="view-row" >
-        <view class="left-column" >日期：</view>
-        <view class="right-column" >{{item.dateStr}}</view>
-        <view class="left-column" >时间：</view>
-        <view class="right-column" >{{item.timeStr}}</view>
-      </view>
-      <view class="view-row" >
-        <view class="left-column" >金额：</view>
-        <view class="right-column" >{{item.amountStr}}</view>
-        <view class="left-column" >店员：</view>
-        <view class="right-column" >{{item.staffName}}</view>
+  <mp-cells wx:if="{{order.refunds.length > 0}}" title="退款记录">
+    <mp-cell wx:for="{{order.refunds}}">
+      <view class="view-row">
+        <view class="left-column">日期：</view>
+        <view class="right-column">{{item.dateStr}}</view>
+        <view class="left-column">时间：</view>
+        <view class="right-column">{{item.timeStr}}</view>
       </view>
       <view class="view-row">
-        <view class="left-column" style="width: 80rpx;" >原因：</view>
-        <view class="right-column" style="width:550rpx"  >{{item.reason}}</view>
+        <view class="left-column">金额：</view>
+        <view class="right-column">{{item.amountStr}}</view>
+        <view class="left-column">店员：</view>
+        <view class="right-column">{{item.staffName}}</view>
+      </view>
+      <view class="view-row">
+        <view class="left-column" style="width: 80rpx;">原因：</view>
+        <view class="right-column" style="width:550rpx">{{item.reason}}</view>
       </view>
     </mp-cell>
   </mp-cells>
-  <view style="display: flex;flex-direction: row;margin-top:20rpx">
-    <view style="font-size: 10pt;text-align: right;width: 180rpx;">申请退款：</view>
-    <view style="font-size: 10pt;text-align: left;width: 180rpx;">
-      <input placeholder="填写退款金额" class="input" id="refundAmount" bindinput="refundInput" />
-    </view>
-    <view style="font-size: 10pt;text-align: left;width: 360rpx;">
 
-    </view>
-  </view>
-  <view style="display: flex;flex-direction: row;margin-top:20rpx">
-    <view style="font-size: 10pt;text-align: right;width: 180rpx;">退款原因：</view>
-    <view style="font-size: 10pt;text-align: left;width: 550rpx;">
-      <input style="width: 450rpx;" placeholder="必须填写退款原因" class="input" bindinput="refundInput" id="reason" />
-    </view>
-  </view>
-  <view style="margin-top:20rpx;text-align:center">
-    <button id="{{item.id}}" class="input" size="mini" style="margin-left: 100rpx;" bind:tap="refund" disabled="{{refunding}}">确认退款</button>
-  </view>
   <view>
     <button bindtap="goHome" class="input"> 返 回 首 页 </button>
   </view>

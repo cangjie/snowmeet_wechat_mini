@@ -47,7 +47,7 @@
   <view style="text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;">
     <button bindtap="search" disabled="{{isQuerying}}" class="input" > {{isQuerying? '查询中……' : '查 询 '}}</button>
   </view>
-  <mp-cells title="订单列表 共有订单{{orderList.length}}个，总金额：￥{{totalAmount}}"  >
+  <mp-cells title="订单列表 共有订单{{orderList.length}}个，总金额：{{totalAmountStr}}"  >
     <mp-cell wx:for="{{orderList}}" id="{{item.id}}" bindtap="gotoDetail">
       <view style="display: flex; flex-direction: row;{{item.textColor==''?'':'color:' + item.textColor}}"  >
         <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
@@ -70,7 +70,7 @@
       <view style="display: flex; flex-direction: row;{{item.textColor==''?'':'color:' + item.textColor}}" >
         <view style="width: 187rpx; text-align: right;" class="list" >支付金额：</view>
         <view style="width:187rpx" class="list" >{{item.paidAmountStr}}</view>
-        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >状态：</view>
+        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >退款：</view>
         <view style="width: 187rpx;" class="list" >{{item.refundAmountStr}}</view>
       </view>
     </mp-cell>

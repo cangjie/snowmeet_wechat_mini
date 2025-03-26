@@ -77,7 +77,7 @@ Page({
             orderList[i].textColor = 'red'
           }
         }
-        that.setData({orderList: orderList, totalAmount: totalAmount})
+        that.setData({orderList: orderList, totalAmount: totalAmount, totalAmountStr: util.showAmount(totalAmount)})
       },
       complete:()=>{
         that.setData({isQuerying: false})
