@@ -38,8 +38,18 @@
           <radio value="已填" style="margin-left: 30rpx;" disabled="{{urgent}}" > 已 填 </radio>
           <radio value="未填" style="margin-left: 30rpx;" disabled="{{urgent}}" > 未 填 </radio>
         </radio-group>
+        
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="更多筛选">
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;justify-content: center; font-size: 10pt;height: 50rpx;" >
         <checkbox-group style="margin-left: 10rpx;" bindchange="setOnlyUrgent" >
           <checkbox>只看紧急开单</checkbox>
+        </checkbox-group>
+        <checkbox-group style="margin-left: 50rpx;" bindchange="setOnlyMine" >
+          <checkbox>只看我自己的</checkbox>
         </checkbox-group>
       </view>
     </mp-cell>

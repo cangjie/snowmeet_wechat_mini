@@ -17,7 +17,8 @@ Page({
     totalAmount: 0,
     isQuerying: false,
     mi7Num:'',
-    urgent: false
+    urgent: false,
+    onlyMine: false
   },
 
   statusSelected(e){
@@ -49,6 +50,12 @@ Page({
       searchUrl = searchUrl + '&shop=' + encodeURIComponent(that.data.shop)
     }
     searchUrl += '&mi7Num=' + encodeURIComponent(that.data.mi7Num)
+    if (that.data.onlyMine){
+      searchUrl += '&onlyMine=true'
+    }
+    else{
+      searchUrl += '&onlyMine=false'
+    }
     wx.request({
       url: searchUrl,
       method: 'GET',
@@ -172,6 +179,13 @@ Page({
     var that = this
     console.log('urgent', e)
     var urgent = e.detail.value.length == 0? false:true
-    that.setData({urgent, mi7Num:'紧急开单'})
-  }
+    that.setData({urgent, mi7Num:'紧急开单', onlyMine: false})
+  },
+  setOnlyMine(e){
+    var that = this
+    console.log('urgent', e)
+    var onlyMine = e.detail.value.length == 0? false:true
+    that.setData({onlyMine})
+  },
+
 })
