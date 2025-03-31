@@ -29,6 +29,7 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
+    var that = this
     app.loginPromiseNew.then(function(resovle){
       that.getData()
     })

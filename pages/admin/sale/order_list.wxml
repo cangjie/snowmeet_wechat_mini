@@ -5,7 +5,7 @@
       <view style="display: flex; flex-direction: row;height: 50rpx;" >
         <view class="left-column"  >订单状态：</view>
         <view class="right-column" >
-          <picker mode="selector" range="{{statusList}}" bindchange="statusSelected" disabled="{{urgent}}" >
+          <picker mode="selector" range="{{statusList}}" bindchange="statusSelected"  >
             <view>{{statusList[statusSelectedIndex]}}</view>
           </picker>
         </view>
@@ -17,13 +17,13 @@
       <view style="display: flex; flex-direction: row;font-size: 10pt;height: 50rpx;">
         <view style="padding-left: 20rpx;height: 50rpx;width:100rpx">开始：</view>
         <view style="width: 250rpx;">
-          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" bindchange="startDateSelected" disabled="{{urgent}}" >
+          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" bindchange="startDateSelected" disabled="{{urgent  || cell!= '' }}" >
             <view class="picker" >{{startDate}}</view>
           </picker>
         </view>
         <view style="padding-left: 20rpx;width:100rpx" >结束：</view>
         <view style="width: 250rpx;">
-          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" bindchange="endDateSelected" disabled="{{urgent}}" >
+          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" bindchange="endDateSelected" disabled="{{urgent  || cell!= ''  }}" >
             <view class="picker" >{{endDate}}</view>
           </picker>
         </view>
@@ -34,9 +34,9 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;justify-content: center; font-size: 10pt;height: 50rpx;">
         <radio-group bindchange="setMi7Num" >
-          <radio value="" checked="{{true}}" disabled="{{urgent}}" > 全 部 </radio>
-          <radio value="已填" style="margin-left: 30rpx;" disabled="{{urgent}}" > 已 填 </radio>
-          <radio value="未填" style="margin-left: 30rpx;" disabled="{{urgent}}" > 未 填 </radio>
+          <radio value="" checked="{{true}}" disabled="{{urgent || cell!= '' }}" > 全 部 </radio>
+          <radio value="已填" style="margin-left: 30rpx;" disabled="{{urgent || cell!= '' }}" > 已 填 </radio>
+          <radio value="未填" style="margin-left: 30rpx;" disabled="{{urgent || cell!= '' }}" > 未 填 </radio>
         </radio-group>
         
       </view>
@@ -46,11 +46,18 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;justify-content: center; font-size: 10pt;height: 50rpx;" >
         <checkbox-group style="margin-left: 10rpx;" bindchange="setOnlyUrgent" >
-          <checkbox>只看紧急开单</checkbox>
+          <checkbox disabled="{{cell != ''}}" >只看紧急开单</checkbox>
         </checkbox-group>
         <checkbox-group style="margin-left: 50rpx;" bindchange="setOnlyMine" >
-          <checkbox>只看我自己的</checkbox>
+          <checkbox disabled="{{cell != ''}}" >只看我自己的</checkbox>
         </checkbox-group>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="按照顾客手机号查询" >
+    <mp-cell >
+      <view style="display: flex;justify-content: center;" >
+        <input style="text-align: center;" placeholder="输入完整手机号或后四位"  bindinput="setCell" />
       </view>
     </mp-cell>
   </mp-cells>

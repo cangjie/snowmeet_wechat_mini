@@ -18,7 +18,8 @@ Page({
     isQuerying: false,
     mi7Num:'',
     urgent: false,
-    onlyMine: false
+    onlyMine: false,
+    cell:''
   },
 
   statusSelected(e){
@@ -55,6 +56,22 @@ Page({
     }
     else{
       searchUrl += '&onlyMine=false'
+    }
+    var cell = that.data.cell
+    if (cell != ''){
+      if (cell.length < 4){
+        wx.showToast({
+          title: '手机号不小于4位。',
+          icon: 'error'
+        })
+        that.setData({isQuerying: false})
+        return
+      }
+      var searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      if (that.data.statusSelectedIndex>0){
+        searchUrl = searchUrl + '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex])
+      }
+      searchUrl += ('&cell=' + cell)
     }
     wx.request({
       url: searchUrl,
@@ -187,5 +204,8 @@ Page({
     var onlyMine = e.detail.value.length == 0? false:true
     that.setData({onlyMine})
   },
-
+  setCell(e){
+    var that = this
+    that.setData({cell: e.detail.value})
+  }
 })
