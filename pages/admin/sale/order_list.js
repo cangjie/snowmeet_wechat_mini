@@ -19,7 +19,9 @@ Page({
     mi7Num:'',
     urgent: false,
     onlyMine: false,
-    cell:''
+    cell:'',
+    mi7OrderId: 'XSD',
+    orderId: ''
   },
 
   statusSelected(e){
@@ -67,11 +69,23 @@ Page({
         that.setData({isQuerying: false})
         return
       }
-      var searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      if (that.data.statusSelectedIndex>0){
-        searchUrl = searchUrl + '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex])
-      }
+      searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      
+
       searchUrl += ('&cell=' + cell)
+    }
+    var orderId = that.data.orderId
+    if (!isNaN(orderId) && orderId != ''){
+      searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      searchUrl += '&orderId=' + orderId
+    }
+    else{
+      searchUrl += '&orderId=0'
+    }
+    var mi7OrderId = that.data.mi7OrderId
+    if (mi7OrderId != 'XSD' && mi7OrderId != ''){
+      searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      searchUrl += '&mi7OrderId=' + mi7OrderId
     }
     wx.request({
       url: searchUrl,
@@ -207,5 +221,21 @@ Page({
   setCell(e){
     var that = this
     that.setData({cell: e.detail.value})
+  },
+  setOrderId(e){
+    var that = this
+    var value = e.detail.value
+    if (isNaN(value)){
+       wx.showToast({
+         title: '订单号必须是数字',
+         icon: 'error'
+       })
+    }
+    that.setData({orderId: e.detail.value})
+  },
+  setMi7OrderId(e){
+    var that = this
+    var value = e.detail.value
+    that.setData({mi7OrderId: value, orderId: '', cell: ''})
   }
 })
