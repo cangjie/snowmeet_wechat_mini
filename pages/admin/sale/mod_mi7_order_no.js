@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    newOrderNum: ''
+    newOrderNum: '',
+    newType: ''
   },
 
   input(e){
@@ -19,14 +20,14 @@ Page({
     var that = this
     var value = that.data.newOrderNum
     var order = that.data.order
-    if (value!=''){
-      var updateUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/ModMi7Order/' + order.id + '?orderNum=' + encodeURIComponent(value) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    if (value!='' || that.data.newType != ''){
+      var updateUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/ModMi7Order/' + order.id + '?orderNum=' + encodeURIComponent(value) + '&orderType=' + encodeURIComponent(that.data.newType) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: updateUrl,
         method: 'GET',
         success:(res)=>{
           wx.showToast({
-            title: '七色米订单号已经修改',
+            title: '修改成功',
             success:(res)=>{
               wx.navigateTo({
                 url: 'order_detail?id=' + order.order_id,
@@ -133,5 +134,11 @@ Page({
         that.setData({logs})
       }
     })
+  },
+  setType(e){
+    var that = this
+    var value = e.detail.value
+    
+    that.setData({newType: value})
   }
 })

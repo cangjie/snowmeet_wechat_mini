@@ -124,6 +124,12 @@
         <view style="font-size: 10pt;text-align: left;width: 160rpx;">¥{{item.real_charge}}</view>
       </view>
       <view style="display: flex;flex-direction: row;">
+        <view style="font-size: 10pt;text-align: right;width: 200rpx;">订单类型：</view>
+        <view style="font-size: 10pt;text-align: left;width: 160rpx;">{{item.order_type}}</view>
+        <view style="font-size: 10pt;text-align: right;width: 200rpx;"></view>
+        <view style="font-size: 10pt;text-align: left;width: 160rpx;"></view>
+      </view>
+      <view style="display: flex;flex-direction: row;">
         <!--view style="font-size: 10pt;text-align: right;width: 180rpx;">条码：</view>
         <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.barCode}}</view>
         <view style="font-size: 10pt;text-align: right;width: 180rpx;"></view>

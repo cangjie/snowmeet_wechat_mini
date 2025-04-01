@@ -1,4 +1,4 @@
 /* pages/admin/sale/mod_mi7_order_no.wxss */
 .left-column{
-  width: 280rpx;
+  width: 190rpx;
 }

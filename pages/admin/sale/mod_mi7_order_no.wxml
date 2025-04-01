@@ -17,6 +17,19 @@
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;">
+        <view class="left-column">订单类型：</view>
+        <view class="right-column" style="width: 500rpx;">
+          <radio-group class="view-row" bindchange="setType">
+            <radio value="普通" checked="{{order.order_type == '普通'}}" value="普通" >普通</radio>
+            <radio value="招待" checked="{{order.order_type == '招待'}}" style="margin-left: 5rpx;" value="招待" >招待</radio>
+            <radio value="内购" checked="{{order.order_type == '内购'}}" style="margin-left: 5rpx;" value="内购" >内购</radio>
+            <radio value="特殊" checked="{{order.order_type == '特殊'}}" style="margin-left: 5rpx;" value="特殊" >特殊</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;">
         <view class="left-column">零售价：</view>
         <view class="right-column">{{order.sale_price_str}}</view>
       </view>
