@@ -1,13 +1,11 @@
 <view wx:if="{{role=='staff'}}">
-  <shop-selector style="height: 10rpx;" bindShopSelected="shopSelected" ></shop-selector>
+  <shop-selector style="height: 10rpx;" bindShopSelected="shopSelected" defaultShop="全部" ></shop-selector>
   <mp-cells title="选择订单状态" >
     <mp-cell>
       <view style="display: flex; flex-direction: row;height: 50rpx;" >
         <view class="left-column"  >订单状态：</view>
         <view class="right-column" >
-          <picker mode="selector" range="{{statusList}}" bindchange="statusSelected"  
-          disabled="{{urgent  || cell!= '' || orderId != '' || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}"
-          >
+          <picker mode="selector" range="{{statusList}}" bindchange="statusSelected"  >
             <view>{{statusList[statusSelectedIndex]}}</view>
           </picker>
         </view>
@@ -17,17 +15,21 @@
   <mp-cells title="查询起止时间" >
     <mp-cell>
       <view style="display: flex; flex-direction: row;font-size: 10pt;height: 50rpx;">
+        <view>
+          <checkbox-group id="date" bindchange="setUse" >
+            <checkbox checked="{{useDate}}" ></checkbox>
+          </checkbox-group>
+        </view>
         <view style="padding-left: 20rpx;height: 50rpx;width:100rpx">开始：</view>
-        <view style="width: 250rpx;">
-          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" bindchange="startDateSelected" 
-            disabled="{{urgent  || cell!= '' || orderId != ''  || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}" >
+        <view style="width: 220rpx;">
+          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" disabled="{{!useDate || urgent}}" bindchange="startDateSelected" >
             <view class="picker" >{{startDate}}</view>
           </picker>
         </view>
         <view style="padding-left: 20rpx;width:100rpx" >结束：</view>
-        <view style="width: 250rpx;">
-          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" bindchange="endDateSelected" 
-            disabled="{{urgent  || cell!= '' || orderId != ''  || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}" >
+        <view style="width: 220rpx;">
+          <picker mode="date" start="2000-1-1" end="{{nowDateStr}}" 
+          disabled="{{!useDate || urgent}}"  bindchange="endDateSelected" >
             <view class="picker" >{{endDate}}</view>
           </picker>
         </view>
@@ -38,14 +40,12 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;justify-content: center; font-size: 10pt;height: 50rpx;">
         <radio-group bindchange="setMi7Num" >
-          <radio value="" checked="{{true}}" 
-            disabled="{{urgent || cell!= '' || orderId != '' || orderId != '' || (mi7OrderId!= 'XSD' && mi7OrderId != '')}}" 
-            > 全 部 </radio>
+          <radio value="" checked="{{true}}" > 全 部 </radio>
           <radio value="已填" style="margin-left: 30rpx;" 
-          disabled="{{urgent || cell!= '' || orderId != '' || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}" 
+          disabled="{{urgent }}" 
           > 已 填 </radio>
           <radio value="未填" style="margin-left: 30rpx;" 
-          disabled="{{urgent || cell!= '' || orderId != '' || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}" 
+          disabled="{{urgent }}" 
           > 未 填 </radio>
         </radio-group>
         
@@ -56,11 +56,10 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;justify-content: center; font-size: 10pt;height: 50rpx;" >
         <checkbox-group style="margin-left: 10rpx;" bindchange="setOnlyUrgent" >
-          <checkbox 
-            disabled="{{urgent || cell != '' || orderId != '' || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}" >只看紧急开单</checkbox>
+          <checkbox  >只看紧急开单</checkbox>
         </checkbox-group>
         <checkbox-group style="margin-left: 50rpx;" bindchange="setOnlyMine" >
-          <checkbox disabled="{{cell != '' || orderId != '' || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}" >只看我自己的</checkbox>
+          <checkbox >只看我自己的</checkbox>
         </checkbox-group>
       </view>
     </mp-cell>
@@ -68,24 +67,45 @@
   <mp-cells title="按照顾客手机号查询" >
     <mp-cell >
       <view style="display: flex;justify-content: center;" >
-        <input disabled="{{ urgent || orderId != '' || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}"
+        <view style="width: 100rpx;">
+          <checkbox-group id="cell" bindchange="setUse" >
+            <checkbox checked="{{useCell}}" ></checkbox>
+          </checkbox-group>
+        </view>
+        <view style="width: 600rpx;">
+          <input disabled="{{!useCell}}"
           style="text-align: center;" placeholder="输入完整手机号或后四位"  bindinput="setCell" />
+        </view>
       </view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="按照订单号查询" >
     <mp-cell >
       <view style="display: flex;justify-content: center;" >
-        <input disabled="{{ urgent || cell != '' || (mi7OrderId!= 'XSD' && mi7OrderId != '') }}"
-        style="text-align: center;" placeholder="输入订单号"  bindinput="setOrderId" />
+        <view style="width: 100rpx;">
+          <checkbox-group id="orderId" bindchange="setUse" >
+            <checkbox checked="{{useOrderId}}" ></checkbox>
+          </checkbox-group>
+        </view>
+        <view style="width: 600rpx;" >
+          <input disabled="{{!useOrderId }}"
+          style="text-align: center;" placeholder="输入订单号"  bindinput="setOrderId" />
+        </view>
       </view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="按照七色米订单号查询" >
     <mp-cell >
       <view style="display: flex;justify-content: center;" >
-        <input disabled="{{urgent || cell != '' || orderId != '' }}"
-        style="text-align: center;" value="{{mi7OrderId}}"  bindinput="setMi7OrderId" />
+        <view style="width: 100rpx;">
+          <checkbox-group id="mi7" bindchange="setUse" >
+            <checkbox checked="{{useMi7Id}}" ></checkbox>
+          </checkbox-group>
+        </view>
+        <view style="width: 600rpx;">
+          <input disabled="{{!useMi7Id }}"
+          style="text-align: center;" value="{{mi7OrderId}}"  bindinput="setMi7OrderId" />
+        </view>
       </view>
     </mp-cell>
   </mp-cells>

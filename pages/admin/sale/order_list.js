@@ -21,7 +21,11 @@ Page({
     onlyMine: false,
     cell:'',
     mi7OrderId: 'XSD',
-    orderId: ''
+    orderId: '',
+    useDate: true,
+    useCell: false,
+    useOrderId: false,
+    useMi7Id: false
   },
 
   statusSelected(e){
@@ -40,16 +44,17 @@ Page({
     that.setData({isQuerying: true})
     var startDate = that.data.startDate
     var endDate = that.data.endDate
-    if (that.data.urgent){
+    if (that.data.urgent || !that.data.useDate){
       startDate = '2020-01-01'
       endDate = '2050-01-01'
     }
+
     var searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=' 
       + startDate + '&endDate=' + endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     if (that.data.statusSelectedIndex>0){
       searchUrl = searchUrl + '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex])
     }
-    if (that.data.shop!=''){
+    if (that.data.shop!='' && that.data.shop != '全部'){
       searchUrl = searchUrl + '&shop=' + encodeURIComponent(that.data.shop)
     }
     searchUrl += '&mi7Num=' + encodeURIComponent(that.data.mi7Num)
@@ -60,7 +65,7 @@ Page({
       searchUrl += '&onlyMine=false'
     }
     var cell = that.data.cell
-    if (cell != ''){
+    if (that.data.useCell){
       if (cell.length < 4){
         wx.showToast({
           title: '手机号不小于4位。',
@@ -69,11 +74,24 @@ Page({
         that.setData({isQuerying: false})
         return
       }
+      /*
       searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      
+      */
 
       searchUrl += ('&cell=' + cell)
     }
+    if (that.data.useOrderId){
+
+      searchUrl += '&orderId=' +  that.data.orderId
+    }
+    else{
+      searchUrl += '&orderId=0'
+    }
+    if (that.data.useMi7Id){
+      searchUrl += '&mi7OrderId=' + that.data.mi7OrderId
+    }
+
+    /*
     var orderId = that.data.orderId
     if (!isNaN(orderId) && orderId != ''){
       searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -87,6 +105,8 @@ Page({
       searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       searchUrl += '&mi7OrderId=' + mi7OrderId
     }
+    */
+
     wx.request({
       url: searchUrl,
       method: 'GET',
@@ -210,7 +230,14 @@ Page({
     var that = this
     console.log('urgent', e)
     var urgent = e.detail.value.length == 0? false:true
-    that.setData({urgent, mi7Num:'紧急开单', onlyMine: false})
+    if (urgent){
+      that.setData({urgent, mi7Num:'紧急开单', onlyMine: false,
+      useDate: false, useCell: false, useOrderId: false, useMi7Id: false})
+    }
+    else{
+      that.setData({urgent, mi7Num:'', onlyMine: false, useDate: true})
+    }
+    
   },
   setOnlyMine(e){
     var that = this
@@ -237,5 +264,27 @@ Page({
     var that = this
     var value = e.detail.value
     that.setData({mi7OrderId: value, orderId: '', cell: ''})
+  },
+  setUse(e){
+    var that = this
+    var id = e.currentTarget.id
+    var value = e.detail.value.length
+    var r = value == 1? true: false
+    switch(id){
+      case 'date':
+        that.setData({useDate: r})
+        break
+      case 'cell':
+        that.setData({useDate: false, useCell: r})
+        break
+      case 'orderId':
+        that.setData({useDate: false, useOrderId: r})
+        break
+      case 'mi7':
+        that.setData({useDate: false, useMi7Id: r})
+        break
+      default:
+        break
+    }
   }
 })
