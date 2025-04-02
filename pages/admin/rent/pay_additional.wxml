@@ -28,10 +28,13 @@
   </view>
   <view wx:if="{{paying}}" >
     <pay-method bindPayMethodSelected="setPayMethod" ></pay-method>
-    <view style="text-align:center">
+    <view wx:if="{{payMethod == '微信支付'}}" style="text-align:center">
       <image style="width: 400rpx; height: 400rpx;" src="{{qrcodeUrl}}" ></image>
     </view>
-    <view style="margin-top: 20rpx;">
+    <view wx:else style="margin-top: 100rpx;" >
+      <button class="input" bindtap="setConfirmPay" > 确 认 支 付 成 功 </button>
+    </view>
+    <view style="margin-top: 100rpx;">
       <button class="input" bind:tap="back" > 重 填 </button>
     </view>
   </view>

@@ -181,5 +181,14 @@ Page({
         }
       }
     })
+  },
+  setConfirmPay(e){
+    var that = this
+    var addPay = that.data.addPay
+    var url = 'https://' + app.globalData.domainName + '/core/Rent/ConfirmAdditionPayment/' + addPay.id + '?payMethod=' + encodeURIComponent(that.data.payMethod) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: url,
+      method: 'GET'
+    })
   }
 })
