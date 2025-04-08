@@ -13,7 +13,8 @@ Page({
     showModal: false,
     refunding: false,
     refundAmount: 0,
-    backColor: ''
+    backColor: '',
+    modding: false
   },
   goHome(){
     wx.redirectTo({
@@ -189,8 +190,10 @@ Page({
       method: 'GET',
       success:(res)=>{
         var order = res.data
-        order.date = util.formatDate(new Date(order.create_date))
-        order.time = util.formatTimeStr(new Date(order.create_date))
+        order.date = util.formatDate(new Date(order.biz_date))
+
+        order.time = util.formatTimeStr(new Date(order.biz_date))
+        that.setData({newBizDate: order.date, newBizTime: order.time})
         for(var i = 0; i < order.payments.length; i++){
           var payment = order.payments[i]
           payment.date = util.formatDate(new Date(payment.create_date))
@@ -283,5 +286,33 @@ Page({
         }
       }
     })
+  },
+  setModding(){
+    var that = this
+
+    that.setData({modding: true})
+  },
+  cancelMod(){
+    var that = this
+    that.setData({modding: false})
+  },
+  setBizDateTime(e){
+    var that = this
+    var id = e.currentTarget.id
+    switch(id){
+      case 'date':
+        that.setData({newBizDate: e.detail.value, newBizTime: that.data.order.time})
+        break
+      case 'time':
+        that.setData({newBizTime: e.detail.value, newBizDate: that.data.order.date})
+        break
+      default:
+        break
+    }
+  },
+  setBizDate(e){
+    var that = this
+    var newBizDateTime = new Date(that.data.newBizDate + ' ' + that.data.newBizTime)
+    console.log('new biz date', util.formatDateTime(newBizDateTime))
   }
 })

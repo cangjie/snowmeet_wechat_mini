@@ -109,7 +109,7 @@ Page({
           }
 
           totalAmount = totalAmount + orderList[i].final_price
-          var orderDateTime = new Date(orderList[i].create_date)
+          var orderDateTime = new Date(orderList[i].biz_date)
           orderList[i].date = orderDateTime.getFullYear().toString() + '-' + (orderDateTime.getMonth() + 1).toString() + '-' + orderDateTime.getDate().toString()
           orderList[i].time = util.formatTimeStr(orderDateTime)  //orderDateTime.getHours().toString() + ':' + orderDateTime.getMinutes().toString()
           if (orderList[i].mi7Orders && orderList[i].mi7Orders.length > 0 && orderList[i].mi7Orders[0].mi7_order_id.indexOf('XSD') == 0){

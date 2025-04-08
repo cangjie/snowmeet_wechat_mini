@@ -14,14 +14,32 @@
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
-        <view class="left-column">订单日期：</view>
-        <view class="right-column">{{order.date}}</view>
+        <view class="left-column">业务日期：</view>
+        <view class="right-column" wx:if="{{modding}}" >
+          <picker id="date" mode="date" class="input" style="width: 240rpx;" bindchange="setBizDateTime" >
+            <picker-view>{{newBizDate}}</picker-view>
+          </picker>
+        </view>
+        <view class="right-column" wx:else >{{order.date}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
-        <view class="left-column">订单时间：</view>
-        <view class="right-column">{{order.time}}</view>
+        <view class="left-column">业务时间：</view>
+        <view class="right-column" wx:if="{{modding}}" >
+          <picker id="time" mode="time" class="input" style="width: 240rpx;" bindchange="setBizDateTime" >
+            <picker-view>{{newBizTime}}</picker-view>
+          </picker>
+        </view>
+        <view class="right-column" wx:else >{{order.time}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view wx:if="{{modding}}" style="display: flex;justify-content: center;" class="view-row" >
+        <button class="input" size="mini" bindtap="setBizDate" > 确 认 </button> <button class="input" size="mini" bindtap="cancelMod"  > 取 消 </button>
+      </view>
+      <view wx:else style="display: flex;justify-content: center;" >
+        <button size="mini" class="input" bindtap="setModding" >修改业务日期时间</button>
       </view>
     </mp-cell>
     <mp-cell>
