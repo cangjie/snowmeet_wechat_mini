@@ -1,0 +1,89 @@
+<view>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <mp-cells  >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column view-row" style="justify-content: flex-end;" >
+          <view style="color: red;" >*</view>
+          <view >手机：</view>
+        </view>
+        <view class="right-column" >
+          <input id="cell" bindinput="input" class="input" placeholder="填写11位手机号" style="width: 260rpx;" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column view-row" style="justify-content: flex-end;" >
+          <view style="color: red;" >*</view>
+          <view >姓名：</view>
+        </view>
+        <view class="right-column" >
+          <input id="name" bindinput="input" class="input" placeholder="填写真实姓名" style="width: 200rpx;" value="{{name}}" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column view-row" style="justify-content: flex-end;" >
+          <view style="color: red;" >*</view>
+          <view >性别：</view>
+        </view>
+        <view class="right-column view-row" >
+          <radio-group class="view-row" id="gender" bindchange="input" >
+            <radio style="margin-left: 10rpx;" value="男" checked="{{gender=='男'}}" >男</radio>
+            <radio style="margin-left: 100rpx;" value="女" checked="{{gender=='女'}}" >女</radio>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column view-row" style="justify-content: flex-end;" >
+          <view style="color: red;" >*</view>
+          <view >业务日期：</view>
+        </view>
+        <view class="right-column" >
+          <picker mode="date" id="date" bindchange="input" class="input" >
+            <picker-view>{{date}}</picker-view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column view-row" style="justify-content: flex-end;" >
+          <view style="color: red;" >*</view>
+          <view >业务时间：</view>
+        </view>
+        <view class="right-column" >
+          <picker mode="time" id="time" bindchange="input" class="input" >
+            <picker-view>{{time}}</picker-view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column view-row" style="justify-content: flex-end;" >
+          <view style="color: red;" >*</view>
+          <view >七色米：</view>
+        </view>
+        <view class="right-column" >
+          <input id="mi7" bindinput="input" class="input" value="XSD" style="width: 270rpx;" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >零售价：</view>
+        <view class="right-column" >
+          <input id="price" bindinput="input" class="input" style="width: 100rpx;" />
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view style="margin-top: 50rpx;">
+    <button class="input" bindtap="submit" > 确 认 招 待 </button>
+  </view>
+</view>

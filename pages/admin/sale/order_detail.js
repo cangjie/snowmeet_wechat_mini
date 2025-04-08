@@ -12,7 +12,8 @@ Page({
     chargeAmount: 0,
     showModal: false,
     refunding: false,
-    refundAmount: 0
+    refundAmount: 0,
+    backColor: ''
   },
   goHome(){
     wx.redirectTo({
@@ -208,7 +209,11 @@ Page({
             r.staffName = r.msa.member.real_name
           }
         }
-        that.setData({order: order, isOrderInfoReady: true})
+        var backColor = ''
+        if (order.isEnterain){
+          backColor = 'yellow'
+        }
+        that.setData({order: order, isOrderInfoReady: true, backColor})
       }
     })
   },

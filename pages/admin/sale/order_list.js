@@ -74,9 +74,7 @@ Page({
         that.setData({isQuerying: false})
         return
       }
-      /*
-      searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      */
+
 
       searchUrl += ('&cell=' + cell)
     }
@@ -91,21 +89,7 @@ Page({
       searchUrl += '&mi7OrderId=' + that.data.mi7OrderId
     }
 
-    /*
-    var orderId = that.data.orderId
-    if (!isNaN(orderId) && orderId != ''){
-      searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      searchUrl += '&orderId=' + orderId
-    }
-    else{
-      searchUrl += '&orderId=0'
-    }
-    var mi7OrderId = that.data.mi7OrderId
-    if (mi7OrderId != 'XSD' && mi7OrderId != ''){
-      searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=2020-01-01&endDate=2030-01-01&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      searchUrl += '&mi7OrderId=' + mi7OrderId
-    }
-    */
+    
 
     wx.request({
       url: searchUrl,
@@ -127,12 +111,18 @@ Page({
           totalAmount = totalAmount + orderList[i].final_price
           var orderDateTime = new Date(orderList[i].create_date)
           orderList[i].date = orderDateTime.getFullYear().toString() + '-' + (orderDateTime.getMonth() + 1).toString() + '-' + orderDateTime.getDate().toString()
-          orderList[i].time = orderDateTime.getHours().toString() + ':' + orderDateTime.getMinutes().toString()
+          orderList[i].time = util.formatTimeStr(orderDateTime)  //orderDateTime.getHours().toString() + ':' + orderDateTime.getMinutes().toString()
           if (orderList[i].mi7Orders && orderList[i].mi7Orders.length > 0 && orderList[i].mi7Orders[0].mi7_order_id.indexOf('XSD') == 0){
             orderList[i].textColor = ''
           }
           else{
             orderList[i].textColor = 'red'
+          }
+          if (orderList[i].isEnterain){
+            orderList[i].backColor = 'yellow'
+          }
+          else{
+            orderList[i].backColor = ''
           }
         }
         that.setData({orderList: orderList, totalAmount: totalAmount, totalAmountStr: util.showAmount(totalAmount)})

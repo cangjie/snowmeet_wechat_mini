@@ -232,11 +232,6 @@ Page({
       case 'ns_ski_pass_reserve':
         path = '/pages/admin/ski_pass/nanshan_reserve'
         break
-      /*
-      case 'ns_ski_pass_veri':
-        path = '/pages/admin/ski_pass/nanshan_verify'
-        break
-      */
       case 'ns_ski_pass_fee':
         path = '/pages/admin/ski_pass/nanshan_card_search'
         break
@@ -276,6 +271,9 @@ Page({
         break
       case 'deposit_balance':
         path = '/pages/admin/deposit/deposit_balance'
+        break
+      case 'enterain_form':
+        path = '/pages/admin/sale/enterain_form'
         break
       default:
         break
