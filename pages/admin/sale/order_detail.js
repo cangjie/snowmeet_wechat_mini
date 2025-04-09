@@ -311,9 +311,24 @@ Page({
         break
     }
   },
-  setBizDate(e){
+  saveBizDate(e){
     var that = this
-    var newBizDateTime = new Date(that.data.newBizDate + ' ' + that.data.newBizTime)
+    var newBizDateTime = that.data.newBizDate + 'T' + that.data.newBizTime
+    var saveUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/UpdateOrderBizDate/' + that.data.order.id + '?bizDate=' + encodeURIComponent(newBizDateTime) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
+    wx.request({
+      url: saveUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode != 200){
+          wx.showToast({
+            title: '更新失败',
+            icon: 'error'
+          })
+        }
+        that.setData({modding: false})
+        that.getData()
+      }
+    })
     console.log('new biz date', util.formatDateTime(newBizDateTime))
   }
 })
