@@ -20,7 +20,7 @@
             <picker-view>{{newBizDate}}</picker-view>
           </picker>
         </view>
-        <view class="right-column" wx:else >{{order.date}}</view>
+        <view class="right-column" wx:else >{{newBizDate}}</view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -31,7 +31,7 @@
             <picker-view>{{newBizTime}}</picker-view>
           </picker>
         </view>
-        <view class="right-column" wx:else >{{order.time}}</view>
+        <view class="right-column" wx:else >{{newBizTime}}</view>
       </view>
     </mp-cell>
     <mp-cell>

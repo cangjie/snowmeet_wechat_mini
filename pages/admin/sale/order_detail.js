@@ -294,17 +294,18 @@ Page({
   },
   cancelMod(){
     var that = this
-    that.setData({modding: false})
+    var order = that.data.order
+    that.setData({modding: false, newBizDate: order.date, newBizTime: order.time})
   },
   setBizDateTime(e){
     var that = this
     var id = e.currentTarget.id
     switch(id){
       case 'date':
-        that.setData({newBizDate: e.detail.value, newBizTime: that.data.order.time})
+        that.setData({newBizDate: e.detail.value})
         break
       case 'time':
-        that.setData({newBizTime: e.detail.value, newBizDate: that.data.order.date})
+        that.setData({newBizTime: e.detail.value})
         break
       default:
         break
