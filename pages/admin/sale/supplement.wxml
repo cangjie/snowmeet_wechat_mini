@@ -1,16 +1,17 @@
 <view>
   <shop-selector></shop-selector>
-  <user-info></user-info>
+  <user-info bindUserInfoUpdate="userInfoUpdate" bindUserFound="userInfoUpdate" ></user-info>
   <mp-cells title="七色米信息" >
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >七色米订单号：</view>
-        <view class="right-column" >
-          <input class="input" value="XSD" style="width: 300rpx;" />
+        <view class="right-column view-row" style="width: 540rpx;" >
+          <input disabled="{{urgent}}" class="input" value="{{mi7No}}" style="width: 240rpx;" />
+          <switch style="height: 30rpx;margin-left: 15rpx;" bindchange="setUrgent">紧急开单</switch>
         </view>
       </view>
     </mp-cell>
-    <mp-cell>
+    <!--mp-cell>
       <view class="view-row" >
         <view class="left-column" >七色米制单日期：</view>
         <view class="right-column" >
@@ -29,23 +30,23 @@
           </picker>
         </view>
       </view>
-    </mp-cell>
+    </mp-cell-->
     <mp-cell>
       <view class="view-row" >
-        <view class="left-column" >七色业务日期：</view>
+        <view class="left-column" >业务日期：</view>
         <view class="right-column" >
-          <picker class="input">
-            <picker-view>2025-04-15</picker-view>
+          <picker class="input" disabled="{{!urgent}}" mode="date">
+            <picker-view>{{bizDate}}</picker-view>
           </picker>
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
-        <view class="left-column" >七色米业务时间：</view>
+        <view class="left-column" >业务时间：</view>
         <view class="right-column" >
-          <picker class="input">
-            <picker-view>20:00</picker-view>
+          <picker class="input" disabled="{{!urgent}}" mode="time" >
+            <picker-view>{{bizTime}}</picker-view>
           </picker>
         </view>
       </view>
@@ -83,8 +84,8 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <view>
+  <view style="margin-top: 20rpx;">
     <button class="input"> 确 认 补 单 </button>
   </view>
-  <view style="height: 500rpx;" ></view>
+  <view style="height: 100rpx;" ></view>
 </view>

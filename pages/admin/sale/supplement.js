@@ -1,11 +1,16 @@
 // pages/admin/sale/supplement.js
+const app = getApp()
+const util = require('../../../utils/util.js')
 Page({
 
   /**
    * Page initial data
    */
   data: {
-
+    urgent: false,
+    bizDate: '——',
+    bizTime: '——',
+    mi7No: 'XSD'
   },
 
   /**
@@ -62,5 +67,27 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  userInfoUpdate(e){
+    console.log('user info trig', e)
+  },
+  setUrgent(e){
+    var that = this
+    var urgent = e.detail.value
+    var mi7No = ''
+    var bizDate = '——'
+    var bizTime = '——'
+    if (urgent){
+      mi7No = ''
+      bizDate = util.formatDate(new Date())
+      bizTime = util.formatTimeStr(new Date())
+    }
+    else{
+      mi7No = 'XSD'
+      bizDate = '——'
+      bizTime = '——'
+    }
+    that.setData({bizDate, bizTime, mi7No, urgent})
+    console.log('urgent', e)
   }
 })

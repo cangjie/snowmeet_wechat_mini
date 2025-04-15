@@ -13,7 +13,7 @@
       </view>
     </view>
   </mp-cell>
-  <mp-cell>
+  <!--mp-cell>
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" >微信号：</view>
       <view class="right-column" >
@@ -26,7 +26,7 @@
       <view class="left-column" >昵称：</view>
       <view class="right-column" >{{userInfo.nick}}</view>
     </view>
-  </mp-cell>
+  </mp-cell-->
   <mp-cell>
     <view style="display: flex;flex-direction: row;"  >
       <view class="left-column" >顾客称呼：</view>

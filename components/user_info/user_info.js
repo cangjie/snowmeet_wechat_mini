@@ -143,9 +143,9 @@ Component({
           break
         case 'cell':
           userInfo.cell_number = value
-          /*
+          
           if (value.length == 11){
-            var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetUserByCell/' + value + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/Member/GetMemberByCell/' + value + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
               url: getUserInfoUrl,
               method: 'GET',
@@ -153,7 +153,10 @@ Component({
                 console.log('user info found', res)
                 //that.triggerEvent('UserFound', {user_info: res.data})
                 if (res.statusCode == 200){
-                  that.setData({userInfo: res.data, userFind: true})
+                  var member = res.data
+                  var userInfo = member.miniAppUser
+                  userInfo.gender = member.gender
+                  that.setData({userInfo, userFind: true})
                   that.getScore()
                 }
                 else{
@@ -162,7 +165,7 @@ Component({
               }
             })
           }
-          */
+          
           break
         case 'gender':
           userInfo.gender = value
