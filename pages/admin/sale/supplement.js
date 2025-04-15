@@ -10,7 +10,8 @@ Page({
     urgent: false,
     bizDate: '——',
     bizTime: '——',
-    mi7No: 'XSD'
+    mi7No: 'XSD',
+    shop: ''
   },
 
   /**
@@ -89,5 +90,23 @@ Page({
     }
     that.setData({bizDate, bizTime, mi7No, urgent})
     console.log('urgent', e)
+  },
+  shopSelected(e){
+    console.log('shop selected', e)
+    var that = this
+    that.setData({shop: e.detail.value})
+  },
+  checkValid(){
+    var that = this
+    var msg = ''
+    if (that.data.shop == ''){
+      msg = '必须选择店铺'
+    }
+    else if (urgent){
+      if (that.data.bizDate == '——' || that.data.bizDate == ''
+      || that.data.bizTime == '——' || that.data.bizTime == ''){
+        msg = '紧急开单必须选择业务日期'
+      }
+    }
   }
 })

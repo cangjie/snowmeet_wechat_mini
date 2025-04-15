@@ -1,5 +1,5 @@
 <view>
-  <shop-selector></shop-selector>
+  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
   <user-info bindUserInfoUpdate="userInfoUpdate" bindUserFound="userInfoUpdate" ></user-info>
   <mp-cells title="七色米信息" >
     <mp-cell>
@@ -57,7 +57,7 @@
       <view class="view-row" >
         <view class="left-column" >零售价：</view>
         <view class="right-column" >
-          <input class="input"  />
+          <input class="input" type="digit"  />
         </view>
       </view>
     </mp-cell>
@@ -65,7 +65,7 @@
       <view class="view-row" >
         <view class="left-column" >成交价：</view>
         <view class="right-column" >
-          <input class="input"  />
+          <input class="input" type="digit"  />
         </view>
       </view>
     </mp-cell>
