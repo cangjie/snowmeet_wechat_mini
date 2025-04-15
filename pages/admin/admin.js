@@ -275,6 +275,9 @@ Page({
       case 'enterain_form':
         path = '/pages/admin/sale/enterain_form'
         break
+      case 'supplement':
+        path = '/pages/admin/sale/supplement'
+        break
       default:
         break
     }

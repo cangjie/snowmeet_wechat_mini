@@ -145,7 +145,8 @@
     "pages/admin/recept/recept_auth_list",
     "pages/test/message/pop_up",
     "pages/admin/deposit/deposit_balance",
-    "pages/admin/sale/enterain_form"
+    "pages/admin/sale/enterain_form",
+    "pages/admin/sale/supplement"
   ],
   "window": {
     "backgroundTextStyle": "light",

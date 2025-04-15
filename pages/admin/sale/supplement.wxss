@@ -1,0 +1,7 @@
+/* pages/admin/sale/supplement.wxss */
+.left-column{
+  width: 200rpx;
+}
+radio{
+  width: 150rpx;
+}

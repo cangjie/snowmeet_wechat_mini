@@ -1,0 +1,90 @@
+<view>
+  <shop-selector></shop-selector>
+  <user-info></user-info>
+  <mp-cells title="七色米信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >七色米订单号：</view>
+        <view class="right-column" >
+          <input class="input" value="XSD" style="width: 300rpx;" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >七色米制单日期：</view>
+        <view class="right-column" >
+          <picker class="input">
+            <picker-view>2025-04-15</picker-view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >七色米制单时间：</view>
+        <view class="right-column" >
+          <picker class="input">
+            <picker-view>20:00</picker-view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >七色业务日期：</view>
+        <view class="right-column" >
+          <picker class="input">
+            <picker-view>2025-04-15</picker-view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >七色米业务时间：</view>
+        <view class="right-column" >
+          <picker class="input">
+            <picker-view>20:00</picker-view>
+          </picker>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="价格信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >零售价：</view>
+        <view class="right-column" >
+          <input class="input"  />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >成交价：</view>
+        <view class="right-column" >
+          <input class="input"  />
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <pay_method></pay_method>
+  <mp-cells >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >付款人：</view>
+        <View class="right-column view-row" >
+          <radio-group class="view-row" style="width: 400rpx;" >
+            <radio checked="{{true}}">本人</radio>
+            <radio>顾客</radio>
+          </radio-group>
+        </View>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view>
+    <button class="input"> 确 认 补 单 </button>
+  </view>
+  <view style="height: 500rpx;" ></view>
+</view>
