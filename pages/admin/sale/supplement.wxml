@@ -6,7 +6,7 @@
       <view class="view-row" >
         <view class="left-column" >七色米订单号：</view>
         <view class="right-column view-row" style="width: 540rpx;" >
-          <input disabled="{{urgent}}" class="input" value="{{mi7No}}" style="width: 240rpx;" />
+          <input disabled="{{urgent}}" class="input" value="{{mi7No}}" style="width: 240rpx;" id="mi7No" bindinput="input" />
           <switch style="height: 30rpx;margin-left: 15rpx;" bindchange="setUrgent">紧急开单</switch>
         </view>
       </view>
@@ -35,7 +35,7 @@
       <view class="view-row" >
         <view class="left-column" >业务日期：</view>
         <view class="right-column" >
-          <picker class="input" disabled="{{!urgent}}" mode="date">
+          <picker id="date" class="input" disabled="{{!urgent}}" mode="date" bindchange="input" >
             <picker-view>{{bizDate}}</picker-view>
           </picker>
         </view>
@@ -45,7 +45,7 @@
       <view class="view-row" >
         <view class="left-column" >业务时间：</view>
         <view class="right-column" >
-          <picker class="input" disabled="{{!urgent}}" mode="time" >
+          <picker id="time" bindchange="input" class="input" disabled="{{!urgent}}" mode="time" >
             <picker-view>{{bizTime}}</picker-view>
           </picker>
         </view>
@@ -57,7 +57,7 @@
       <view class="view-row" >
         <view class="left-column" >零售价：</view>
         <view class="right-column" >
-          <input class="input" type="digit"  />
+          <input class="input" type="digit" id="sale" bindinput="input"  />
         </view>
       </view>
     </mp-cell>
@@ -65,27 +65,27 @@
       <view class="view-row" >
         <view class="left-column" >成交价：</view>
         <view class="right-column" >
-          <input class="input" type="digit"  />
+          <input class="input" type="digit" id="deal" bindinput="input"  />
         </view>
       </view>
     </mp-cell>
   </mp-cells>
-  <pay_method></pay_method>
+  <pay_method bindPayMethodSelected="modPayMethod"  ></pay_method>
   <mp-cells >
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >付款人：</view>
         <View class="right-column view-row" >
-          <radio-group class="view-row" style="width: 400rpx;" >
-            <radio checked="{{true}}">本人</radio>
-            <radio>顾客</radio>
+          <radio-group id="payer" bindchange="input" class="view-row" style="width: 400rpx;" >
+            <radio checked="{{true}}" value="顾客本人" >本人</radio>
+            <radio value="店员代付" >顾客</radio>
           </radio-group>
         </View>
       </view>
     </mp-cell>
   </mp-cells>
   <view style="margin-top: 20rpx;">
-    <button class="input"> 确 认 补 单 </button>
+    <button class="input" bindtap="submit"> 确 认 补 单 </button>
   </view>
   <view style="height: 100rpx;" ></view>
 </view>
