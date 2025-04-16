@@ -116,7 +116,7 @@ Page({
   shopSelected(e){
     console.log('shop selected', e)
     var that = this
-    that.setData({shop: e.detail.value})
+    that.setData({shop: e.detail.shop})
   },
   checkValid(){
     var that = this
@@ -220,7 +220,54 @@ Page({
     })
   },
   invokeApi(){
-
+    var that = this
+    var shop = that.data.shop
+    var openId = that.data.openId
+    var cell = that.data.cell
+    var name = that.data.name
+    var gender = that.data.gender
+    var urgent = that.data.urgent
+    var mi7No = that.data.mi7No
+    var bizDate = that.data.bizDate
+    var bizTime = that.data.bizTime
+    var payMethod = that.data.payMethod
+    var sale = that.data.sale
+    var deal = that.data.deal
+    var payer = that.data.payer
+    if (bizDate && bizTime){
+      bizDate = util.formatDateString(bizDate + ' ' + bizTime)
+    }
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/AddSupplementOrder?shop=' + encodeURIComponent(shop)
+    + ((openId && openId != '')? '&openId=' + openId : '')
+    + ((cell && cell != '')? '&cell=' + cell : '')
+    + ((gender && gender != '')? '&gender=' + gender : '')
+    + ((payer && payer != '')? '&payer=' + encodeURIComponent(payer) : '')
+    + ((name && name != '')? '&name=' + encodeURIComponent(name) : '')
+    + '&urgent=' + (urgent? 'true' : 'false')
+    + ((mi7No && mi7No != '')? '&mi7No=' + mi7No : '')
+    + ((bizDate && bizDate != '')? '&bizDate=' + bizDate : '')
+    + ((payMethod && payMethod != '')? '&payMethod=' + encodeURIComponent(payMethod) : '')
+    + '&salePrice=' + sale.toString() + '&dealPrice=' + deal.toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    wx.request({
+      url: submitUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 404){
+          wx.showToast({
+            title: '七色米单号重复',
+            icon: 'error'
+          })
+          return
+        }
+        if (res.statusCode != 200){
+          return
+        }
+        wx.showToast({
+          title: '补单成功',
+          icon: 'success'
+        })
+      }
+    })
   },
   modPayMethod(e){
     var that = this
