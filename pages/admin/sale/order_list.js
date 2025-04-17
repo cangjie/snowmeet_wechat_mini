@@ -107,12 +107,20 @@ Page({
             i--
             continue
           }
+          var supplement = false
+          for(var j = 0; j < order.mi7Orders.length; j++){
+            if (order.mi7Orders[j].supplement == 1){
+              supplement = true
+              break
+            }
+          }
+          order.supplement = supplement
 
           totalAmount = totalAmount + orderList[i].final_price
           var orderDateTime = new Date(orderList[i].biz_date)
           orderList[i].date = orderDateTime.getFullYear().toString() + '-' + (orderDateTime.getMonth() + 1).toString() + '-' + orderDateTime.getDate().toString()
           orderList[i].time = util.formatTimeStr(orderDateTime)  //orderDateTime.getHours().toString() + ':' + orderDateTime.getMinutes().toString()
-          if (orderList[i].mi7Orders && orderList[i].mi7Orders.length > 0 && orderList[i].mi7Orders[0].mi7_order_id.indexOf('XSD') == 0){
+          if (orderList[i].mi7Orders && orderList[i].mi7Orders.length > 0 && (orderList[i].mi7Orders[0].mi7_order_id && orderList[i].mi7Orders[0].mi7_order_id.indexOf('XSD') == 0)){
             orderList[i].textColor = ''
           }
           else{

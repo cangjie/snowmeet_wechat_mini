@@ -138,6 +138,12 @@
         <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >退款：</view>
         <view style="width: 187rpx;" class="list" >{{item.refundAmountStr}}</view>
       </view>
+      <view style="display: flex; flex-direction: row;{{item.textColor==''?'':'color:' + item.textColor}}{{(item.backColor == '')? '': ('background-color: ' + item.backColor) }}" >
+        <view style="width: 187rpx; text-align: right;" class="list" >补单：</view>
+        <view style="width:187rpx" class="list" >{{item.supplement? '是': '否'}}</view>
+        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" ></view>
+        <view style="width: 187rpx;" class="list" ></view>
+      </view>
     </mp-cell>
     <mp-cell wx:if="{{orderList.length > 0}}">
       <view style="text-align: center;padding-top: 50rpx;" >——————列表结束——————</view>

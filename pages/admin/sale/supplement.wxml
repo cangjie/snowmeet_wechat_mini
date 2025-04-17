@@ -77,8 +77,8 @@
         <view class="left-column" >付款人：</view>
         <View class="right-column view-row" >
           <radio-group id="payer" bindchange="input" class="view-row" style="width: 400rpx;" >
-            <radio checked="{{true}}" value="顾客本人" >本人</radio>
-            <radio value="店员代付" >顾客</radio>
+            <radio  disabled="{{payMethod == '微信支付'}}" value="顾客本人" >顾客</radio>
+            <radio checked="{{true}}" value="店员代付" >本人</radio>
           </radio-group>
         </View>
       </view>
