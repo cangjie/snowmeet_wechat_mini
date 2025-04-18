@@ -263,29 +263,32 @@ Page({
           return
         }
         if (payMethod != '微信支付') {
-          wx.showModal({
-            title: '补单成功',
-            content: '',
-            cancelText: '查看列表',
-            confirmText: '继续补单',
-            complete: (res) => {
-              if (res.cancel) {
-                wx.navigateTo({
-                  url: 'order_list',
-                })
-              }
-
-              if (res.confirm) {
-                wx.navigateTo({
-                  url: 'supplement',
-                })
-              }
-            }
-          })
+          that.showSuccessModal('补单成功', '', '继续补单', '查看列表')
         }
         else{
           that.setData({order: res.data})
           that.pay()
+        }
+      }
+    })
+  },
+  showSuccessModal(title, content, confirmText, cancelText){
+    wx.showModal({
+      title: title,
+      content: content,
+      cancelText: cancelText,
+      confirmText: confirmText,
+      complete: (res) => {
+        if (res.cancel) {
+          wx.navigateTo({
+            url: 'order_list',
+          })
+        }
+
+        if (res.confirm) {
+          wx.navigateTo({
+            url: 'supplement',
+          })
         }
       }
     })
@@ -305,6 +308,16 @@ Page({
       method: 'GET',
       success: (res)=> {
         console.log('pay info', res)
+        wx.requestPayment({
+          nonceStr: res.data.nonce,
+          package: 'prepay_id=' + res.data.prepay_id,
+          paySign: res.data.sign,
+          timeStamp: res.data.timestamp,
+          signType: 'MD5',
+          success:()=>{
+            that.showSuccessModal('支付成功', '补单已经生效', '继续补单', '查看列表')
+          }
+        })
       }
     })
   }
