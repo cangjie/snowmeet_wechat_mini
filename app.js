@@ -1,5 +1,6 @@
 //app.js
 var crypto  = require('/utils/crypt.js')
+var util = require('./utils/util.js')
 App({
   onLaunch: function (res) {
     const updateManager = wx.getUpdateManager()
@@ -55,14 +56,22 @@ App({
 
 
         console.log('weixin log in success.', res)
-        var url = 'https://' + app.globalData.domainName + '/core/MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
+        var url = 'https://' + app.globalData.domainName + '/api/MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
+        util.performWebRequest(url, undefined).then(function(resolveData){
+          var session = resolveData
+          app.globalData.sessionKey = encodeURIComponent(session.sessionKey)
+          app.globalData.member = session.member
+          app.globalData.staff = session.staff
+          resolve({})
+        })
+        /*
         wx.request({
           url: url,
           method: 'GET',
           success: (res) => {
             console.log('get seesionkey success', res)
-            app.globalData.sessionKey = res.data.session_key
-            var member = res.data.member
+            app.globalData.sessionKey = res.data.data.session_key
+            var member = res.data.data.member
             var cell = ''
             for (var msa in member.memberSocialAccounts){
               if (msa.type == 'cell'){
@@ -123,6 +132,7 @@ App({
             resolve(app.globalData)
           }
         })
+        */
       },
       fail:(res)=>{
         console.log(res)
@@ -151,11 +161,13 @@ App({
     const fileManager = wx.getFileSystemManager();
     fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domain, 'utf-8')
     this.domainName = domain
+    this.requestPrefix = 'https://' + this.domainName + '/api/'
   },
 
   globalData: {
     appId:'wxd1310896f2aa68bb',
     domainName:'mini.snowmeet.top',
+    requestPrefix: 'https://mini.snowmeet.top/api/',
     uploadDomain: 'xuexiaotupian.wanlonghuaxue.com',
     userInfo: null,
     sessionKey:'',

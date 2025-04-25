@@ -8,15 +8,16 @@ function init(that) {
   if (app.globalData.is_manager){
     isManager = true
   }
-  if (app.globalData.memberInfo != undefined && app.globalData.memberInfo != null){
-    var member = app.globalData.memberInfo
-    if (member.is_staff == 1){
-      role = 'staff'
+  if (app.globalData.staff){
+    role = 'staff'
+    var staff = app.globalData.staff
+    if (staff.title_level <= 100){
+      isStaff = true
     }
-    if (member.is_manager == 1){
+    else if (staff.title_level <= 200){
       isManager = true
     }
-    if (member.is_admin == 1){
+    else {
       isAdmin = true
     }
   }
@@ -35,7 +36,7 @@ function init(that) {
     }
   })
   */
-  that.setData({role: app.globalData.role, isManager: isManager, isAdmin: isAdmin})
+  that.setData({role: role, isManager: isManager, isAdmin: isAdmin})
   
 }
 Page({

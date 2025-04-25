@@ -106,6 +106,43 @@ const skiPassDescNanashanRentAll =  '<ul><li>出票前可申请免费退换</li>
 const skiPassDescNanashanCommon = '<ul><li>票前可申请免费退换</li><li>出票当日自动出票</li><li style="color:red" >出票后不支持退换！</li><li>日场营业时间 9:00-17:00</li><li>夜场营业时间 18:00-22:00(除夕、初一仅开放日场）</li><li>上午场时间：当日13:00均前可使用</li><li>下午加夜场时间：限当日14:30后使用</li></ul>'
 
 
+const performWebRequest = function (url, data){
+  return new Promise(function (resolve){
+    var method = data == undefined? 'GET': 'POST'
+    wx.request({
+      url: url,
+      data: data,
+      method: method,
+      success:(res)=>{
+        console.log('web request', res)
+        if (res.statusCode != 200){
+          wx.showToast({
+            title: res.statusCode.toString(),
+            icon:'error'
+          })
+          return
+        }
+        if (res.data.code != 0){
+          if (res.data.message != ''){
+            wx.showToast({
+              title: res.data.message,
+              icon: 'none'
+            })
+          }
+        }
+        resolve(res.data.data)
+      },
+      fail:(res)=>{
+        wx.showToast({
+          title: '网络不通',
+          icon:'error'
+        })
+      }
+    })
+  })
+}
+
+
 module.exports = {
   formatDateTime: formatDateTime,
   formatDate: formatDate,
@@ -118,6 +155,6 @@ module.exports = {
   skiPassDescNanashanCommon: skiPassDescNanashanCommon,
   isBlank: isBlank,
   getDisplayedCode: getDisplayedCode,
-  getMemberInfo: getMemberInfo
-  
+  getMemberInfo: getMemberInfo,
+  performWebRequest: performWebRequest,
 }
