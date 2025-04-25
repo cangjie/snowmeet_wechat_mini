@@ -7,7 +7,7 @@
   <!--mp-cell value="我的养护" footer="" bindtap="gotoMaintain"></mp-cell-->
   <!--mp-cell value="我的非雪季养护" footer="" bindtap="gotoSummerMaintain"></mp-cell-->
   <!--mp-cell value="我的订单" footer="" bindtap="gotoOrders" ></mp-cell-->
-  <mp-cell wx:if="{{role=='staff'}}" value="我是管理员" footer="" bindtap="gotoAdmin" ></mp-cell>
+  <mp-cell wx:if="{{staff}}" value="我是管理员" footer="" bindtap="gotoAdmin" ></mp-cell>
   <mp-cells wx:if="{{env=='develop' || env == 'trial'}}" title="环境选项" >
     <mp-cell id="env" bindtap="nav" value="选择环境" ></mp-cell>
   </mp-cells>

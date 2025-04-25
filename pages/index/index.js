@@ -24,7 +24,7 @@ Page({
     })
     */
     app.loginPromiseNew.then(function(resolve){
-      if (app.globalData.jumped == undefined && (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1)){
+      if (app.globalData.jumped == undefined && app.globalData.staff){
         app.globalData.jumped = true
         wx.navigateTo({
           url: '/admin/admin',

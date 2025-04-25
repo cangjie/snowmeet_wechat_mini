@@ -31,7 +31,7 @@ Page({
             break
         }
         that.setData({tabbarItemList: app.globalData.userTabBarItem, 
-          role: app.globalData.role, canGetInfo: true, env: app.globalData.env})
+          staff: app.globalData.staff, canGetInfo: true, env: app.globalData.env})
       })
     
     

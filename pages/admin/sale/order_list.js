@@ -150,8 +150,8 @@ Page({
     that.setData({startDate: nowDateStr, endDate: nowDateStr, nowDate: nowDateStr})
     console.log('now date', nowDate)
     app.loginPromiseNew.then(function(resolve) {
-      that.setData({role: app.globalData.role})
-      that.search()
+      that.setData({staff: app.globalData.staff})
+      //that.search()
     })
   },
 

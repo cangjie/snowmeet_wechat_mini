@@ -50,10 +50,7 @@ function init(app, that) {
                 }
                 app.globalData.userInfo = res.userInfo
                 console.log('auth mini user update', res)
-                var updateUrl = 'https://' +  app.globalData.domainName + '/api/mini_user_update.aspx?sessionkey=' + encodeURIComponent(app.globalData.sessionKey) + '&nick=' + encodeURIComponent(res.userInfo.nickName) + '&headimage=' + encodeURIComponent(res.userInfo.avatarUrl) + '&gender=' + encodeURIComponent(gender)
-                wx.request({
-                  url: updateUrl
-                })
+                
               }
             })
           }

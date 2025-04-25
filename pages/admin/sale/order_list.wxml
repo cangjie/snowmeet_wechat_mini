@@ -1,4 +1,4 @@
-<view wx:if="{{role=='staff'}}">
+<view wx:if="{{staff}}">
   <shop-selector style="height: 10rpx;" bindShopSelected="shopSelected" defaultShop="全部" ></shop-selector>
   <mp-cells title="选择订单状态" >
     <mp-cell>
