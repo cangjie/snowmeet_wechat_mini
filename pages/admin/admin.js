@@ -5,6 +5,7 @@ function init(that) {
   var isSchoolStaff = false
   var isManager = false
   var isAdmin = false
+  var isStaff = false
   if (app.globalData.is_manager){
     isManager = true
   }
@@ -21,23 +22,7 @@ function init(that) {
       isAdmin = true
     }
   }
-  /*
-  var ajaxUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff?sessionkey=' +  encodeURIComponent(app.globalData.sessionKey)
-  wx.request({
-    url: ajaxUrl,
-    method: 'GET',
-    success: (res) => {
-      if (res.data.status == undefined) {
-        that.setData({isSchoolStaff: true})
-      }
-    },
-    fail: (res) => {
-
-    }
-  })
-  */
   that.setData({role: role, isManager: isManager, isAdmin: isAdmin})
-  
 }
 Page({
 

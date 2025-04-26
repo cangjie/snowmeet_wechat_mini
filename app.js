@@ -103,6 +103,7 @@ App({
       fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domainName, 'utf-8')
       //fileManager.closeSync()
     }
+    this.globalData.requestPrefix = 'https://' + domainName + '/api/'
     return domainName
   },
 

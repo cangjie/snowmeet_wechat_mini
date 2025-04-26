@@ -19,19 +19,20 @@ Page({
     
     
       var that = this
+      const env = wx.getAccountInfoSync()
+      app.globalData.env = env.miniProgram.envVersion
+      switch(app.globalData.env){
+        case 'trail':
+        case 'develop':
+          app.globalData.domainName = app.getDomain()
+          break
+        default:
+          break
+      }
+      that.setData({env: app.globalData.env})
       app.loginPromiseNew.then(function(resolve) {
-        const env = wx.getAccountInfoSync()
-        app.globalData.env = env.miniProgram.envVersion
-        switch(app.globalData.env){
-          case 'trail':
-          case 'develop':
-            app.globalData.domainName = app.getDomain()
-            break
-          default:
-            break
-        }
         that.setData({tabbarItemList: app.globalData.userTabBarItem, 
-          staff: app.globalData.staff, canGetInfo: true, env: app.globalData.env})
+          staff: app.globalData.staff, canGetInfo: true})
       })
     
     

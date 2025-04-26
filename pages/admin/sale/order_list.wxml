@@ -1,5 +1,15 @@
 <view wx:if="{{staff}}">
-  <shop-selector style="height: 10rpx;" bindShopSelected="shopSelected" defaultShop="全部" ></shop-selector>
+  <mp-cells title="选择店铺" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column"  >店铺：</view>
+        <view class="right-column" >
+          <shop-selector style="height: 10rpx;" bindShopSelected="shopSelected" defaultShop="全部" ></shop-selector>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  
   <mp-cells title="选择订单状态" >
     <mp-cell>
       <view style="display: flex; flex-direction: row;height: 50rpx;" >
