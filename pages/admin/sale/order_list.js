@@ -52,8 +52,14 @@ Page({
     var searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=' 
       + startDate + '&endDate=' + endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     */
+   /*
     var searchUrl = app.globalData.requestPrefix + 'order/GetRetailOrders?startDate=' 
     + startDate + '&endDate=' + endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    */
+   var searchUrl = app.globalData.requestPrefix + 'order/GetRetailOrders?staffSessionKey=' + app.globalData.sessionKey
+   if (!that.data.urgent && that.data.useDate){
+     searchUrl = searchUrl + '&startDate=' + startDate + '&endDate=' + endDate
+   } 
     if (that.data.statusSelectedIndex>0){
       searchUrl = searchUrl + '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex])
     }
@@ -92,6 +98,7 @@ Page({
     util.performWebRequest(searchUrl, undefined).then((resolve)=>{
       console.log('search result', resolve)
       var orderList = resolve
+      var totalAmount = 0
       for(var i = 0; orderList && i < orderList.length; i++){
         var order = orderList[i]
         var bizDate = new Date(order.biz_date)
@@ -99,8 +106,9 @@ Page({
         order.time = util.formatTimeStr(bizDate)
         order.paidAmountStr = util.showAmount(order.paidAmount)
         order.refundAmountStr = util.showAmount(order.refundAmount)
+        totalAmount += order.surplusAmount
       }
-      that.setData({orderList, isQuerying: false})
+      that.setData({orderList, isQuerying: false, totalAmountStr: util.showAmount(totalAmount)})
     })
     
     /*
