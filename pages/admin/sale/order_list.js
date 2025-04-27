@@ -48,9 +48,12 @@ Page({
       startDate = '2020-01-01'
       endDate = '2050-01-01'
     }
-
+    /*
     var searchUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetOrdersBystaff?startDate=' 
       + startDate + '&endDate=' + endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    */
+    var searchUrl = app.globalData.requestPrefix + 'order/GetRetailOrders?startDate=' 
+    + startDate + '&endDate=' + endDate + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     if (that.data.statusSelectedIndex>0){
       searchUrl = searchUrl + '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex])
     }
@@ -82,15 +85,25 @@ Page({
 
       searchUrl += '&orderId=' +  that.data.orderId
     }
-    else{
-      searchUrl += '&orderId=0'
-    }
+    
     if (that.data.useMi7Id){
       searchUrl += '&mi7OrderId=' + that.data.mi7OrderId
     }
-
+    util.performWebRequest(searchUrl, undefined).then((resolve)=>{
+      console.log('search result', resolve)
+      var orderList = resolve
+      for(var i = 0; orderList && i < orderList.length; i++){
+        var order = orderList[i]
+        var bizDate = new Date(order.biz_date)
+        order.date = util.formatDate(bizDate)
+        order.time = util.formatTimeStr(bizDate)
+        order.paidAmountStr = util.showAmount(order.paidAmount)
+        order.refundAmountStr = util.showAmount(order.refundAmount)
+      }
+      that.setData({orderList, isQuerying: false})
+    })
     
-
+    /*
     wx.request({
       url: searchUrl,
       method: 'GET',
@@ -139,6 +152,7 @@ Page({
         that.setData({isQuerying: false})
       }
     })
+    */
   },
   /**
    * Lifecycle function--Called when page load

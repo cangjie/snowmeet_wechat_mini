@@ -16,7 +16,8 @@ Page({
     name: '',
     gender: '',
     openId: '',
-    payMethod: '微信支付'
+    payMethod: '微信支付',
+    payer: '店员代付'
   },
 
   /**

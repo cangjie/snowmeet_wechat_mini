@@ -49,7 +49,7 @@ App({
         //var url = app.globalData.requestPrefix + 'MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
         util.performWebRequest(url, undefined).then(function (resolveData) {
           var session = resolveData
-          app.globalData.sessionKey = encodeURIComponent(session.sessionKey)
+          app.globalData.sessionKey = encodeURIComponent(session.session_key)
           app.globalData.member = session.member
           app.globalData.staff = session.staff
           wx.getSystemInfoAsync({

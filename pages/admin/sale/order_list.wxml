@@ -125,10 +125,15 @@
   <mp-cells title="订单列表 共有订单{{orderList.length}}个，总金额：{{totalAmountStr}}"  >
     <mp-cell wx:for="{{orderList}}" id="{{item.id}}" bindtap="gotoDetail">
       <view style="display: flex; flex-direction: row;{{item.textColor==''?'':'color:' + item.textColor}}{{(item.backColor == '')? '': ('background-color: ' + item.backColor) }}"  >
-        <view style="width: 187rpx; text-align: right;" class="list"  >订单号：</view>
-        <view style="width: 187rpx;" class="list" >{{item.id}}</view>
+        <view style="width: 175rpx; text-align: right;" class="list"  >订单号：</view>
+        <view style="width: 387rpx;" class="list" >{{item.code}}</view>
+        
+      </view>
+      <view style="display: flex; flex-direction: row;{{item.textColor==''?'':'color:' + item.textColor}}{{(item.backColor == '')? '': ('background-color: ' + item.backColor) }}"  >
         <view style="width: 187rpx;padding-left: 10rpx; text-align: right;" class="list" >店员：</view>
-        <view style="width: 187rpx;" class="list" >{{item.msa.member.real_name}}</view>
+        <view style="width: 187rpx;" class="list" >{{item.staff.name}}</view>
+        <view style="width: 187rpx; text-align: right;" class="list" >补单：</view>
+        <view style="width:187rpx" class="list" >{{item.supplement? '是': '否'}}</view>
       </view>
       <view style="display: flex; flex-direction: row;{{item.textColor==''?'':'color:' + item.textColor}}{{(item.backColor == '')? '': ('background-color: ' + item.backColor) }}" >
         <view style="width: 187rpx; text-align: right;" class="list" >订单日期：</view>
@@ -140,7 +145,7 @@
         <view style="width: 187rpx; text-align: right;" class="list" >店铺：</view>
         <view style="width:187rpx" class="list" >{{item.shop}}</view>
         <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >状态：</view>
-        <view style="width: 187rpx;" class="list" >{{item.status}}</view>
+        <view style="width: 187rpx;" class="list" >{{item.paymentStatus}}</view>
       </view>
       <view style="display: flex; flex-direction: row;{{item.textColor==''?'':'color:' + item.textColor}}{{(item.backColor == '')? '': ('background-color: ' + item.backColor) }}" >
         <view style="width: 187rpx; text-align: right;" class="list" >支付金额：</view>
@@ -148,12 +153,7 @@
         <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" >退款：</view>
         <view style="width: 187rpx;" class="list" >{{item.refundAmountStr}}</view>
       </view>
-      <view style="display: flex; flex-direction: row;{{item.textColor==''?'':'color:' + item.textColor}}{{(item.backColor == '')? '': ('background-color: ' + item.backColor) }}" >
-        <view style="width: 187rpx; text-align: right;" class="list" >补单：</view>
-        <view style="width:187rpx" class="list" >{{item.supplement? '是': '否'}}</view>
-        <view style="width: 187rpx; padding-left: 10rpx; text-align: right;" class="list" ></view>
-        <view style="width: 187rpx;" class="list" ></view>
-      </view>
+
     </mp-cell>
     <mp-cell wx:if="{{orderList.length > 0}}">
       <view style="text-align: center;padding-top: 50rpx;" >——————列表结束——————</view>
