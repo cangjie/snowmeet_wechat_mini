@@ -96,6 +96,7 @@ Page({
       searchUrl += '&mi7OrderId=' + that.data.mi7OrderId
     }
     util.performWebRequest(searchUrl, undefined).then((resolve)=>{
+      //console.log('reject', reject)
       console.log('search result', resolve)
       var orderList = resolve
       var totalAmount = 0
@@ -109,6 +110,9 @@ Page({
         totalAmount += order.surplusAmount
       }
       that.setData({orderList, isQuerying: false, totalAmountStr: util.showAmount(totalAmount)})
+    }).catch((reject)=>{
+      console.log('reject', reject)
+      that.setData({isQuerying: false})
     })
     
     /*

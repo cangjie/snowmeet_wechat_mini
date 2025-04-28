@@ -1,4 +1,4 @@
-<mp-cells title="顾客基本信息"  wx:if="{{role=='staff'}}"  >
+<mp-cells title="顾客基本信息"   >
   <mp-cell>
     <radio-group style="text-align: center;"  >
       <radio class="left-column" checked="{{userFind}}"> 会员 </radio><radio class="right-column" checked="{{!userFind}}"> 散客 </radio>
@@ -8,7 +8,7 @@
     <view style="display: flex; flex-direction: row;" >
       <view class="left-column" >手机号：</view>
       <view class="right-column"  style="display: flex;flex-direction: row;">
-        <input id="cell" value="{{userInfo.cell_number}}" placeholder="输入手机号" bindinput="userInfoChanged" style="width: 250rpx;" class="input" />
+        <input id="cell" value="{{userInfo.cell}}" placeholder="输入手机号" bindinput="userInfoChanged" style="width: 250rpx;" class="input" />
         <button size="mini" bindtap="call" class="input" >拨打</button>
       </view>
     </view>

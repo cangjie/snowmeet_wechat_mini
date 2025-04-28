@@ -3,13 +3,13 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">订单号：</view>
-        <view class="right-column">{{order.id}}</view>
+        <view class="right-column">{{order.code}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">订单状态：</view>
-        <view class="right-column">{{order.status}}</view>
+        <view class="right-column">{{order.paymentStatus}}</view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -51,62 +51,67 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">店员：</view>
-        <view class="right-column">{{order.staffName}}</view>
+        <view class="right-column">{{order.staff.name}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">零售总价：</view>
-        <view class="right-column">¥{{order.order_price}}</view>
+        <view class="right-column">{{order.retailSaleAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">成交总价：</view>
-        <view class="right-column">¥{{order.order_real_pay_price}}</view>
+        <view class="right-column">{{order.retailDealAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">优惠券：</view>
-        <view class="right-column" wx:if="{{order.tickets.length == 0}}">无</view>
-        <view class="right-column" wx:else>{{order.tickets[0].code}} {{order.tickets[0].name}}</view>
+        <view class="right-column" >无</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">优惠减免：</view>
-        <view class="right-column">¥{{order.ticket_amount}}</view>
+        <view class="right-column">{{order.ticketDiscountAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">额外减免：</view>
-        <view class="right-column">¥{{order.other_discount}}</view>
+        <view class="right-column">{{order.discountAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">订单金额：</view>
-        <view class="right-column">¥{{order.final_price}}</view>
+        <view class="right-column">{{order.finalChargeAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">支付选项：</view>
-        <view class="right-column">{{order.pay_memo}}</view>
+        <view class="right-column">{{order.pay_option}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">已付金额：</view>
-        <view class="right-column">¥{{order.paidAmount}}</view>
+        <view class="right-column">{{order.paidAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">订单欠款：</view>
-        <view class="right-column">¥{{order.final_price - order.paidAmount}}</view>
+        <view class="right-column">{{order.owingAmountStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
+        <view class="left-column">订单退款：</view>
+        <view class="right-column">{{order.refundAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -118,7 +123,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <user-info wx:if="{{isOrderInfoReady && !order.isEnterain}}" open_id="{{order.open_id}}"></user-info>
+  <user-info wx:if="{{order && !order.isEnterain && order.open_id}}" open_id="{{order.open_id}}"></user-info>
   <mp-cells wx:if="{{order.isEnterain}}" title="被招待人信息">
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
@@ -143,23 +148,23 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view class="left-column">开单手机号：</view>
-        <view class="right-column">{{order.cell_number}}</view>
+        <view class="right-column">{{order.cell==null?'——':order.cell}}</view>
       </view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="订单明细">
-    <mp-cell wx:for="{{order.mi7Orders}}" id="{{item.id}}" bindtap="modMi7OrderNo">
+    <mp-cell wx:for="{{order.retails}}" id="{{item.id}}" bindtap="modMi7OrderNo">
       <view style="display: flex;flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view style="font-size: 10pt;text-align: right;width: 200rpx;">七色米订单号：</view>
-        <view style="font-size: 10pt;text-align: left;width: 500rpx;">{{item.mi7_order_id}}</view>
+        <view style="font-size: 10pt;text-align: left;width: 500rpx;">{{item.mi7_code==null?'紧急开单':item.mi7_code}}</view>
         <!--view style="font-size: 10pt;text-align: right;width: 180rpx;">名称：</view>
         <view style="font-size: 10pt;text-align: left;width: 180rpx;">--</view-->
       </view>
       <view style="display: flex;flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view style="font-size: 10pt;text-align: right;width: 200rpx;">零售价：</view>
-        <view style="font-size: 10pt;text-align: left;width: 160rpx;">¥{{item.sale_price}}</view>
+        <view style="font-size: 10pt;text-align: left;width: 160rpx;">{{item.sale_priceStr}}</view>
         <view style="font-size: 10pt;text-align: right;width: 200rpx;">成交价：</view>
-        <view style="font-size: 10pt;text-align: left;width: 160rpx;">¥{{item.real_charge}}</view>
+        <view style="font-size: 10pt;text-align: left;width: 160rpx;">{{item.deal_priceStr}}</view>
       </view>
       <view style="display: flex;flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
         <view style="font-size: 10pt;text-align: right;width: 200rpx;">订单类型：</view>
@@ -201,13 +206,13 @@
         </view>
         <view style="display: flex;flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
           <view style="font-size: 10pt;text-align: right;width: 180rpx;">日期：</view>
-          <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.date}}</view>
+          <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.dateStr}}</view>
           <view style="font-size: 10pt;text-align: right;width: 180rpx;">时间：</view>
-          <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.time}}</view>
+          <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.timeStr}}</view>
         </view>
         <view style="display: flex;flex-direction: row;{{backColor == ''? '': 'background-color:' + backColor+';'}}">
           <view style="font-size: 10pt;text-align: right;width: 180rpx;">店员：</view>
-          <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.staffName}}</view>
+          <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.staff.name}}</view>
           <view style="font-size: 10pt;text-align: right;width: 180rpx;">状态：</view>
           <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.status}}</view>
         </view>
@@ -215,7 +220,7 @@
           <view style="font-size: 10pt;text-align: right;width: 180rpx;">金额：</view>
           <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.amountStr}}</view>
           <view style="font-size: 10pt;text-align: right;width: 180rpx;">退款：</view>
-          <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.refundStr}}</view>
+          <view style="font-size: 10pt;text-align: left;width: 180rpx;">{{item.refundedAmountStr}}</view>
         </view>
       </view>
       <view style="display: flex;flex-direction: row;margin-top:20rpx;{{backColor == ''? '': 'background-color:' + backColor+';'}}">

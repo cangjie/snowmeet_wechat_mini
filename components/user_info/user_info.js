@@ -1,3 +1,5 @@
+const util = require("../../utils/util")
+
 // components/user_info/user_info.js
 const app = getApp()
 Component({
@@ -37,11 +39,11 @@ Component({
       var that = this
       app.loginPromiseNew.then(function(resolve){
         that.setData({role: app.globalData.role})
-        var getInfoUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/'
+        var getInfoUrl = app.globalData.requestPrefix +  'member/GetMemberByNum?sessionKey=' + app.globalData.sessionKey
         if (that.properties.open_id.trim() != ''){
-          getInfoUrl = getInfoUrl + 'GetMiniAppUser?openId=' + that.properties.open_id
-          + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          getInfoUrl += '&num=' + that.properties.open_id + '&type=wechat_mini_openid'
         }
+        /*
         else if (that.properties.cell.trim() != ''){
           getInfoUrl = getInfoUrl + 'GetUserByCell/' + that.properties.cell 
           + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -53,7 +55,17 @@ Component({
         else {
           getInfoUrl = ''
         }
+        */
         if (getInfoUrl.trim()!=''){
+
+          util.performWebRequest(getInfoUrl, undefined).then((resolve)=>{
+            var member = resolve
+            that.setData({userFind: true, userInfo: member})
+            //that.getScore()
+            that.triggerEvent('UserFound', {user_found: true, user_info: member})
+          })
+
+          /*
           wx.request({
             url: getInfoUrl,
             success:(res)=>{
@@ -80,10 +92,12 @@ Component({
             }
             
           })
+          */
+
         }
         else{
           that.triggerEvent('UserFound', {user_found: false, user_info: null})
-          that.setData({userFind: false, userInfo: null, role: app.globalData.role})
+          that.setData({userFind: false, userInfo: null})
         }
       })
     }

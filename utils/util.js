@@ -107,7 +107,7 @@ const skiPassDescNanashanCommon = '<ul><li>票前可申请免费退换</li><li>�
 
 
 const performWebRequest = function (url, data){
-  return new Promise(function (resolve){
+  return new Promise(function (resolve, reject){
     var method = data == undefined? 'GET': 'POST'
     wx.request({
       url: url,
@@ -137,6 +137,7 @@ const performWebRequest = function (url, data){
           title: '网络不通',
           icon:'error'
         })
+        reject({})
       }
     })
   })

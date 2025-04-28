@@ -16,7 +16,7 @@ Page({
     backColor: '',
     modding: false
   },
-  goHome(){
+  goHome() {
     wx.redirectTo({
       url: '../admin',
     })
@@ -27,11 +27,11 @@ Page({
   onLoad(options) {
     var that = this
     var orderId = parseInt(options.id)
-    that.setData({orderId})
-    
+    that.setData({ orderId })
+
   },
 
-  modMi7OrderNo(e){
+  modMi7OrderNo(e) {
     var id = e.currentTarget.id
     console.log('mi7 order id', e)
     wx.navigateTo({
@@ -51,8 +51,8 @@ Page({
    */
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function(resolve){
-      that.setData({role: app.globalData.role})
+    app.loginPromiseNew.then(function (resolve) {
+      that.setData({ role: app.globalData.staff? 'staff': '' })
       that.getData()
     })
   },
@@ -91,183 +91,217 @@ Page({
   onShareAppMessage() {
 
   },
-  charge(){
+  charge() {
     var that = this
-    
+
     wx.pageScrollTo({
       duration: 0,
       scrollTop: 100000
     })
-    
-    that.setData({showModal: true})
+
+    that.setData({ showModal: true })
   },
-  confirmCharge(){
+  confirmCharge() {
     var that = this
     var amount = that.data.chargeAmount
     var order = that.data.order
-    if (amount==0){
+    if (amount == 0) {
       amount = order.final_price - order.paidAmount
     }
-    var title = '确认已经收到用户通过' + that.data.payMethod + '支付的¥' + amount + '了吗？' 
-    if (that.data.payMethod == '微信支付'){
+    var title = '确认已经收到用户通过' + that.data.payMethod + '支付的¥' + amount + '了吗？'
+    if (that.data.payMethod == '微信支付') {
       title = '请用户扫描下方二维码，支付¥' + amount
     }
     wx.showModal({
       cancelColor: 'cancelColor',
       title: title,
-      success:(res)=>{
+      success: (res) => {
         console.log('confirm payment', res)
-        if (res.cancel){
-          that.setData({showModal: false})
+        if (res.cancel) {
+          that.setData({ showModal: false })
         }
-        if (res.confirm){
+        if (res.confirm) {
           var rechargeUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/OrderChargeByStaff/' + order.id + '?amount=' + encodeURIComponent(amount) + '&payMethod=' + encodeURIComponent(that.data.payMethod) + '&staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
           wx.request({
             url: rechargeUrl,
             method: 'GET',
-            success:(res)=>{
+            success: (res) => {
               var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetWholeOrderByStaff/' + order.id + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
               wx.request({
                 url: getOrderUrl,
                 method: 'GET',
-                success:(res)=>{
-                  that.setData({showModal: false, order: res.data})
-                  
+                success: (res) => {
+                  that.setData({ showModal: false, order: res.data })
+
                 }
               })
             }
           })
-          
+
         }
       }
     })
 
   },
-  payMethodChanged(e){
+  payMethodChanged(e) {
     var that = this
-    that.setData({payMethod: e.detail.payMethod})
+    that.setData({ payMethod: e.detail.payMethod })
   },
-  setChargeAmount(e){
+  setChargeAmount(e) {
     var that = this
     var amount = parseFloat(e.detail.value)
-    if (isNaN(amount)){
+    if (isNaN(amount)) {
       wx.showToast({
         title: '请填写正确的支付金额',
         icon: 'none'
       })
     }
-    else{
-      that.setData({chargeAmount: amount})
+    else {
+      that.setData({ chargeAmount: amount })
     }
   },
-  hideModal(){
-    this.setData({showModal: false})
+  hideModal() {
+    this.setData({ showModal: false })
   },
-  setMemo(e){
+  setMemo(e) {
     var that = this
     var order = that.data.order
     order.memo = e.detail.value
-    that.setData({order: order})
-    var setUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/SetOrderMemo/' + order.id + '?sessionKey=' +  encodeURIComponent(app.globalData.sessionKey) + '&memo=' + encodeURIComponent(e.detail.value)
+    that.setData({ order: order })
+    var setUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/SetOrderMemo/' + order.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&memo=' + encodeURIComponent(e.detail.value)
     wx.request({
       url: setUrl,
       method: 'GET',
-      success:(res)=>{
+      success: (res) => {
 
       },
-      complete:(res)=>{
+      complete: (res) => {
+
+      }
+
+    })
+
+  },
+  getData() {
+    var that = this
+    var getOrderUrl = app.globalData.requestPrefix + 'Order/GetRetailOrder/' + that.data.orderId + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getOrderUrl, undefined).then((resolve) => {
+      var order = resolve
+      console.log('get order', order)
+      
+      order.date = util.formatDate(new Date(order.biz_date))
+      order.time = util.formatTimeStr(new Date(order.biz_date))
+      
+      var orderRetailSaleAmount = 0
+      var orderRetailDealAmount = 0
+      for(var i = 0; i < order.retails.length; i++){
+        var retail = order.retails[i]
+        retail.sale_priceStr = util.showAmount(retail.sale_price)
+        retail.deal_priceStr = util.showAmount(retail.deal_price)
+        orderRetailSaleAmount += retail.sale_price
+        orderRetailDealAmount += retail.deal_price
+
+      }
+      order.retailSaleAmount = orderRetailSaleAmount
+      order.retailDealAmount = orderRetailDealAmount
+      order.retailSaleAmountStr = util.showAmount(orderRetailSaleAmount)
+      order.retailDealAmountStr = util.showAmount(order.retailDealAmount)
+      order.ticketDiscountAmountStr = "¥0.00"
+      order.discountAmountStr = "¥0.00"
+      order.paidAmountStr = util.showAmount(order.paidAmount)
+      order.finalChargeAmount = order.total_amount - order.discount - order.ticket_discount
+      order.finalChargeAmountStr = util.showAmount(order.finalChargeAmount)
+      order.owingAmount = order.finalChargeAmount - order.paidAmount + order.refundAmount
+      order.owingAmountStr = util.showAmount(order.owingAmount)
+      order.refundAmountStr = util.showAmount(order.refundAmount)
+      order.isEnterain = order.pay_option == '招待' ? true: false
+      if (order.member != null){
+        order.open_id = order.member.wechatMiniOpenId
+      }
+      for(var i = 0; i < order.payments.length; i++){
+        var payment = order.payments[i]
+        var date = new Date(payment.create_date)
+        payment.dateStr = util.formatDate(date)
+        payment.timeStr = util.formatTimeStr(date)
+        payment.amountStr = util.showAmount(payment.amount)
+        payment.refundedAmountStr = util.showAmount(payment.refundedAmount)
+      }
+      that.setData({ newBizDate: order.date, newBizTime: order.time })
+      /*
+      for (var i = 0; i < order.payments.length; i++) {
+        var payment = order.payments[i]
+        payment.date = util.formatDate(new Date(payment.create_date))
+        payment.time = util.formatTimeStr(new Date(payment.create_date))
+        payment.amountStr = util.showAmount(payment.amount)
+        payment.refundStr = util.showAmount(payment.refundedAmount)
+      }
+      for (var i = 0; order.refunds && i < order.refunds.length; i++) {
+        var r = order.refunds[i]
+        var createDate = new Date(r.create_date)
+        r.dateStr = util.formatDate(createDate)
+        r.timeStr = util.formatTimeStr(createDate)
+        r.staffName = '——'
+        r.amountStr = util.showAmount(r.amount)
+        if (r.msa && r.msa.member) {
+          r.staffName = r.msa.member.real_name
+        }
         
       }
-      
+      */
+      that.setData({ order: order})
+    }).catch((reject) => {
+
     })
 
   },
-  getData(){
-    var that = this
-    var getOrderUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/GetWholeOrderByStaff/' + that.data.orderId + '?staffSessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getOrderUrl,
-      method: 'GET',
-      success:(res)=>{
-        var order = res.data
-        order.date = util.formatDate(new Date(order.biz_date))
-
-        order.time = util.formatTimeStr(new Date(order.biz_date))
-        that.setData({newBizDate: order.date, newBizTime: order.time})
-        for(var i = 0; i < order.payments.length; i++){
-          var payment = order.payments[i]
-          payment.date = util.formatDate(new Date(payment.create_date))
-          payment.time = util.formatTimeStr(new Date(payment.create_date))
-          payment.amountStr = util.showAmount(payment.amount)
-          payment.refundStr = util.showAmount(payment.refundedAmount)
-        }
-        for(var i = 0; order.refunds && i < order.refunds.length; i++){
-          var r = order.refunds[i]
-          var createDate = new Date(r.create_date)
-          r.dateStr = util.formatDate(createDate)
-          r.timeStr = util.formatTimeStr(createDate)
-          r.staffName = '——'
-          r.amountStr = util.showAmount(r.amount)
-          if (r.msa && r.msa.member){
-            r.staffName = r.msa.member.real_name
-          }
-        }
-        var backColor = ''
-        if (order.isEnterain){
-          backColor = 'yellow'
-        }
-        that.setData({order: order, isOrderInfoReady: true, backColor})
-      }
-    })
-  },
-  refundInput(e){
+  refundInput(e) {
     var that = this
     var id = e.currentTarget.id
     var value = e.detail.value
-    switch(id){
+    switch (id) {
       case 'reason':
-        that.setData({reason: value})
+        that.setData({ reason: value })
         break
       case 'refundAmount':
-        that.setData({refundAmount: value})
+        that.setData({ refundAmount: value })
         break
       default:
         break
     }
   },
-  refund(e){
+  refund(e) {
     var id = e.currentTarget.id
     var that = this
     var msg = ''
-    if (!that.data.reason || that.data.reason == ''){
+    if (!that.data.reason || that.data.reason == '') {
       msg = '必须填写退款原因'
     }
-    if (!that.data.refundAmount || isNaN(that.data.refundAmount)){
+    if (!that.data.refundAmount || isNaN(that.data.refundAmount)) {
       msg = '退款金额是数字'
     }
-    if (msg != ''){
+    if (msg != '') {
       wx.showToast({
         title: msg,
         icon: 'error'
       })
       return
     }
-    that.setData({refunding: true})
+    that.setData({ refunding: true })
     wx.showModal({
       title: '确认退款',
       content: '该操作不可逆，且店长以下操作会失败。是否确认？',
       complete: (res) => {
         if (res.cancel) {
-          that.setData({refunding: false})
+          that.setData({ refunding: false })
         }
-    
+
         if (res.confirm) {
           var refundUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Refund/' + id + '?amount=' + that.data.refundAmount + '&reason=' + encodeURIComponent(that.data.reason) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
           wx.request({
             url: refundUrl,
             method: 'GET',
-            success:(res)=>{
-              if (res.statusCode != 200){
+            success: (res) => {
+              if (res.statusCode != 200) {
                 wx.showToast({
                   title: '退款失败',
                   icon: 'error'
@@ -278,8 +312,8 @@ Page({
                 icon: 'success'
               })
             },
-            complete:(res)=>{
-              that.setData({refunding: false, refundAmount: 0})
+            complete: (res) => {
+              that.setData({ refunding: false, refundAmount: 0 })
               that.getData()
             }
           })
@@ -287,45 +321,45 @@ Page({
       }
     })
   },
-  setModding(){
+  setModding() {
     var that = this
 
-    that.setData({modding: true})
+    that.setData({ modding: true })
   },
-  cancelMod(){
+  cancelMod() {
     var that = this
     var order = that.data.order
-    that.setData({modding: false, newBizDate: order.date, newBizTime: order.time})
+    that.setData({ modding: false, newBizDate: order.date, newBizTime: order.time })
   },
-  setBizDateTime(e){
+  setBizDateTime(e) {
     var that = this
     var id = e.currentTarget.id
-    switch(id){
+    switch (id) {
       case 'date':
-        that.setData({newBizDate: e.detail.value})
+        that.setData({ newBizDate: e.detail.value })
         break
       case 'time':
-        that.setData({newBizTime: e.detail.value})
+        that.setData({ newBizTime: e.detail.value })
         break
       default:
         break
     }
   },
-  saveBizDate(e){
+  saveBizDate(e) {
     var that = this
     var newBizDateTime = that.data.newBizDate + 'T' + that.data.newBizTime
-    var saveUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/UpdateOrderBizDate/' + that.data.order.id + '?bizDate=' + encodeURIComponent(newBizDateTime) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
+    var saveUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/UpdateOrderBizDate/' + that.data.order.id + '?bizDate=' + encodeURIComponent(newBizDateTime) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: saveUrl,
       method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
+      success: (res) => {
+        if (res.statusCode != 200) {
           wx.showToast({
             title: '更新失败',
             icon: 'error'
           })
         }
-        that.setData({modding: false})
+        that.setData({ modding: false })
         that.getData()
       }
     })
