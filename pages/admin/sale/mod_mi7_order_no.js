@@ -13,15 +13,28 @@ Page({
 
   input(e){
     var that = this
-    that.setData({newOrderNum: e.detail.value})
+    var order = that.data.order
+    order.mi7_code = e.detail.value
+    that.setData({order})
+  },
+  submit(){
+    var that = this
+    var order = that.data.order
+    var url = app.globalData.requestPrefix + 'order/UpdateRetail?sessionKey=' + app.globalData.sessionKey + '&scene=' + encodeURIComponent('修改七色米订单信息')
+    util.performWebRequest(url, order).then((resolve)=>{
+      var order = resolve
+      //that.setData({order})
+      that.getData()
+    })
   },
 
-  submit(){
+  submit1(){
     var that = this
     var value = that.data.newOrderNum
     var order = that.data.order
     if (value!='' || that.data.newType != ''){
       var updateUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/ModMi7Order/' + order.id + '?orderNum=' + encodeURIComponent(value) + '&orderType=' + encodeURIComponent(that.data.newType) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+
       wx.request({
         url: updateUrl,
         method: 'GET',
@@ -100,7 +113,22 @@ Page({
   },
   getData(){
     var that = this
-    var getMi7OrderUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/GetMi7OrderById/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    //var getMi7OrderUrl = 'https://' + app.globalData.domainName + '/core/Mi7Order/GetMi7OrderById/' + that.data.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var getUrl = app.globalData.requestPrefix + 'Order/GetRetailDetail/' + that.data.id + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getUrl, undefined).then((resolve)=>{
+      var order = resolve
+      order.sale_priceStr = util.showAmount(order.sale_price)
+      order.deal_priceStr = util.showAmount(order.deal_price)
+      for(var i = 0; order.logs && i < order.logs.length; i++){
+        var log = order.logs[i]
+        var logDate = new Date(log.create_date)
+        log.date = util.formatDate(logDate)
+        log.time = util.formatTimeStr(logDate)
+        
+      }
+      that.setData({order})
+    })
+    /*
     wx.request({
       url: getMi7OrderUrl,
       method: 'GET',
@@ -112,6 +140,7 @@ Page({
       }
     })
     that.getLogs()
+    */
   },
   getLogs(){
     var that = this
@@ -138,7 +167,8 @@ Page({
   setType(e){
     var that = this
     var value = e.detail.value
-    
-    that.setData({newType: value})
+    var order = that.data.order
+    order.order_type = value
+    that.setData({order})
   }
 })

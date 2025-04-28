@@ -215,6 +215,9 @@ Page({
       order.owingAmountStr = util.showAmount(order.owingAmount)
       order.refundAmountStr = util.showAmount(order.refundAmount)
       order.isEnterain = order.pay_option == '招待' ? true: false
+      var bizDate = new Date(order.biz_date)
+      order.bizDate = util.formatDate(bizDate)
+      order.bizTime = util.formatTimeStr(bizDate)
       if (order.member != null){
         order.open_id = order.member.wechatMiniOpenId
       }
@@ -226,7 +229,7 @@ Page({
         payment.amountStr = util.showAmount(payment.amount)
         payment.refundedAmountStr = util.showAmount(payment.refundedAmount)
       }
-      that.setData({ newBizDate: order.date, newBizTime: order.time })
+      //that.setData({ newBizDate: order.date, newBizTime: order.time })
       /*
       for (var i = 0; i < order.payments.length; i++) {
         var payment = order.payments[i]
@@ -334,19 +337,34 @@ Page({
   setBizDateTime(e) {
     var that = this
     var id = e.currentTarget.id
+    var order = that.data.order
     switch (id) {
       case 'date':
-        that.setData({ newBizDate: e.detail.value })
+        order.bizDate = e.detail.value
+        //that.setData({ newBizDate: e.detail.value })
         break
       case 'time':
-        that.setData({ newBizTime: e.detail.value })
+        order.bizTime = e.detail.value
+        //that.setData({ newBizTime: e.detail.value })
         break
       default:
         break
     }
+    that.setData({order})
   },
   saveBizDate(e) {
     var that = this
+    var order = that.data.order
+    order.biz_date = order.bizDate + 'T' + order.bizTime
+    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?sessionKey=' + app.globalData.sessionKey + '&scene=' + encodeURIComponent('订单详情页修改业务时间')
+    util.performWebRequest(updateUrl, order).then((resolve)=>{
+      console.log('order updated', resolve)
+      that.setData({ modding: false })
+      that.getData()
+    })
+
+
+    /*
     var newBizDateTime = that.data.newBizDate + 'T' + that.data.newBizTime
     var saveUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/UpdateOrderBizDate/' + that.data.order.id + '?bizDate=' + encodeURIComponent(newBizDateTime) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
@@ -364,5 +382,6 @@ Page({
       }
     })
     console.log('new biz date', util.formatDateTime(newBizDateTime))
+    */
   }
 })

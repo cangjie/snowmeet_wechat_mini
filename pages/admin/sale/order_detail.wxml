@@ -17,10 +17,10 @@
         <view class="left-column">业务日期：</view>
         <view class="right-column" wx:if="{{modding}}" >
           <picker id="date" mode="date" class="input" style="width: 240rpx;" bindchange="setBizDateTime" >
-            <picker-view>{{newBizDate}}</picker-view>
+            <picker-view>{{order.bizDate}}</picker-view>
           </picker>
         </view>
-        <view class="right-column" wx:else >{{newBizDate}}</view>
+        <view class="right-column" wx:else >{{order.bizDate}}</view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -28,10 +28,10 @@
         <view class="left-column">业务时间：</view>
         <view class="right-column" wx:if="{{modding}}" >
           <picker id="time" mode="time" class="input" style="width: 240rpx;" bindchange="setBizDateTime" >
-            <picker-view>{{newBizTime}}</picker-view>
+            <picker-view>{{order.bizTime}}</picker-view>
           </picker>
         </view>
-        <view class="right-column" wx:else >{{newBizTime}}</view>
+        <view class="right-column" wx:else >{{order.bizTime}}</view>
       </view>
     </mp-cell>
     <mp-cell>
