@@ -1,36 +1,33 @@
 <view>
-  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  
   <user-info bindUserInfoUpdate="userInfoUpdate" bindUserFound="userInfoUpdate" ></user-info>
+  <mp-cells title="选择店铺" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >店铺：</view>
+        <view class="right-column view-row" style="width: 540rpx;" >
+          <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="七色米信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" ></view>
+        <view class="right-column view-row" style="width: 540rpx; margin-bottom: 20rpx;" >
+          <switch style="height: 30rpx;margin-left: 10rpx;width: 230rpx;" bindchange="setUrgent">紧急开单</switch>
+        </view>
+      </view>
+    </mp-cell>
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >七色米订单号：</view>
         <view class="right-column view-row" style="width: 540rpx;" >
-          <input disabled="{{urgent}}" class="input" value="{{mi7No}}" style="width: 240rpx;" id="mi7No" bindinput="input" />
-          <switch style="height: 30rpx;margin-left: 15rpx;" bindchange="setUrgent">紧急开单</switch>
+          <input disabled="{{urgent}}" class="input" value="{{mi7No}}" style="width: 260rpx;" id="mi7No" bindinput="input" />
         </view>
       </view>
     </mp-cell>
-    <!--mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >七色米制单日期：</view>
-        <view class="right-column" >
-          <picker class="input">
-            <picker-view>2025-04-15</picker-view>
-          </picker>
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >七色米制单时间：</view>
-        <view class="right-column" >
-          <picker class="input">
-            <picker-view>20:00</picker-view>
-          </picker>
-        </view>
-      </view>
-    </mp-cell-->
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >业务日期：</view>
@@ -69,9 +66,14 @@
         </view>
       </view>
     </mp-cell>
-  </mp-cells>
-  <pay_method bindPayMethodSelected="modPayMethod"  ></pay_method>
-  <mp-cells >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >支付方式：</view>
+        <view class="right-column" >
+          <pay_method bindPayMethodSelected="modPayMethod"  ></pay_method>
+        </view>
+      </view>
+    </mp-cell>
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >付款人：</view>

@@ -1,6 +1,12 @@
 /* pages/admin/sale/supplement.wxss */
 .left-column{
-  width: 200rpx;
+  width: 220rpx;
+}
+.right-column{
+  width: 500rpx;
+}
+.input{
+  width: 150rpx
 }
 radio{
   width: 150rpx;
