@@ -31,7 +31,12 @@ Component({
     nick: '',
     userFind: false,
     totalPoints: 0,
-    earnedPoints:0
+    earnedPoints:0,
+    userInfo:{
+      cell: '',
+      real_name: '',
+      gender: ''
+    }
   },
 
   lifetimes:{
@@ -39,8 +44,9 @@ Component({
       var that = this
       app.loginPromiseNew.then(function(resolve){
         that.setData({role: app.globalData.role})
-        var getInfoUrl = app.globalData.requestPrefix +  'member/GetMemberByNum?sessionKey=' + app.globalData.sessionKey
+        var getInfoUrl = ''
         if (that.properties.open_id.trim() != ''){
+          var getInfoUrl = app.globalData.requestPrefix +  'member/GetMemberByNum?sessionKey=' + app.globalData.sessionKey
           getInfoUrl += '&num=' + that.properties.open_id + '&type=wechat_mini_openid'
         }
         /*
@@ -60,9 +66,22 @@ Component({
 
           util.performWebRequest(getInfoUrl, undefined).then((resolve)=>{
             var member = resolve
-            that.setData({userFind: true, userInfo: member})
-            //that.getScore()
-            that.triggerEvent('UserFound', {user_found: true, user_info: member})
+            if (member != null){
+              var userInfo = that.data.userInfo
+              userInfo.member = member
+              if (userInfo.cell == ''){
+                userInfo.cell = member.cell
+              }
+              if (userInfo.real_name == ''){
+                userInfo.real_name = member.real_name
+              }
+              if (userInfo.gender == ''){
+                userInfo.gender = member.gender
+              }
+              that.setData({userFind: true, user_info: userInfo})
+              //that.getScore()
+              that.triggerEvent('UserFound', {user_found: true, user_info: userInfo})
+            }
           })
 
           /*
@@ -95,10 +114,7 @@ Component({
           */
 
         }
-        else{
-          that.triggerEvent('UserFound', {user_found: false, user_info: null})
-          that.setData({userFind: false, userInfo: null})
-        }
+        
       })
     }
   },
@@ -144,9 +160,7 @@ Component({
       console.log('user info changed:', e)
       var that = this
       var userInfo = that.data.userInfo
-      if (userInfo == null){
-        userInfo = {}
-      }
+      
       var value = e.detail.value
       switch(e.currentTarget.id){
         case 'real_name':
@@ -156,10 +170,23 @@ Component({
           userInfo.wechat_id = value
           break
         case 'cell':
-          userInfo.cell_number = value
-          
+          userInfo.cell = value
           if (value.length == 11){
-            var getUserInfoUrl = 'https://' + app.globalData.domainName + '/core/Member/GetMemberByCell/' + value + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            var getUserInfoUrl = app.globalData.requestPrefix + 'Member/GetMemberByNum?num=' + value + '&type=cell&sessionKey=' + encodeURIComponent
+            (app.globalData.sessionKey)
+            util.performWebRequest(getUserInfoUrl, undefined).then((resolve) => {
+              var member = resolve
+              var userInfo = that.data.userInfo
+              userInfo.member = member
+              if (member != null){
+                userInfo.real_name = member.real_name
+                userInfo.gender = member.gender
+              }
+              that.setData({userInfo: userInfo})
+              that.triggerEvent('UserInfoUpdate', {user_info: userInfo})
+              //that.setData({userInfo, userFind: true})
+            })
+            /*
             wx.request({
               url: getUserInfoUrl,
               method: 'GET',
@@ -178,6 +205,7 @@ Component({
                 }
               }
             })
+            */
           }
           
           break
@@ -187,8 +215,9 @@ Component({
         default:
           break
       }
-      that.triggerEvent('UserInfoUpdate', {user_info: userInfo})
       that.setData({userInfo: userInfo})
+      that.triggerEvent('UserInfoUpdate', {user_info: userInfo})
+      
     },
     call(){
       wx.makePhoneCall({

@@ -1,7 +1,7 @@
 <mp-cells title="顾客基本信息"   >
   <mp-cell>
     <radio-group style="text-align: center;"  >
-      <radio class="left-column" checked="{{userFind}}"> 会员 </radio><radio class="right-column" checked="{{!userFind}}"> 散客 </radio>
+      <radio class="left-column" checked="{{userInfo && userInfo.member}}"> 会员 </radio><radio class="right-column" checked="{{!userInfo || !userInfo.member}}"> 散客 </radio>
     </radio-group>
   </mp-cell>
   <mp-cell>
