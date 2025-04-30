@@ -1,0 +1,3 @@
+<picker range="{{orderType}}" bindchange="change" class="input" style="width: 200rpx;" >
+  <picker-view>{{orderType[selectedIndex]}}</picker-view>
+</picker>

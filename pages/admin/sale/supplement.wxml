@@ -1,5 +1,4 @@
 <view>
-  
   <user-info bindUserInfoUpdate="userInfoUpdate" bindUserFound="userInfoUpdate" ></user-info>
   <mp-cells title="选择店铺" >
     <mp-cell>
@@ -7,6 +6,16 @@
         <view class="left-column" >店铺：</view>
         <view class="right-column view-row" style="width: 540rpx;" >
           <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="订单类型" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >类型：</view>
+        <view class="right-column view-row" style="width: 540rpx;" >
+          <order_type bindOrderTypeSelected="setOrderType" ></order_type>
         </view>
       </view>
     </mp-cell>
@@ -66,7 +75,7 @@
         </view>
       </view>
     </mp-cell>
-    <mp-cell>
+    <mp-cell wx:if="{{type=='普通'}}" >
       <view class="view-row" >
         <view class="left-column" >支付方式：</view>
         <view class="right-column" >
@@ -74,7 +83,7 @@
         </view>
       </view>
     </mp-cell>
-    <mp-cell>
+    <mp-cell wx:if="{{type=='普通'}}" >
       <view class="view-row" >
         <view class="left-column" >付款人：</view>
         <View class="right-column view-row" >

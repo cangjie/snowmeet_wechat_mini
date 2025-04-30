@@ -17,7 +17,8 @@ Page({
     gender: '',
     openId: '',
     payMethod: '微信支付',
-    payer: '店员代付'
+    payer: '店员代付',
+    type: '普通'
   },
 
   /**
@@ -82,8 +83,8 @@ Page({
     if (!userInfo) {
       return
     }
-    if (userInfo.cell_number) {
-      that.setData({ cell: userInfo.cell_number })
+    if (userInfo.cell) {
+      that.setData({ cell: userInfo.cell })
     }
     if (userInfo.real_name) {
       that.setData({ name: userInfo.real_name })
@@ -91,8 +92,8 @@ Page({
     if (userInfo.gender) {
       that.setData({ gender: userInfo.gender })
     }
-    if (userInfo.open_id) {
-      that.setData({ openId: userInfo.open_id })
+    if (userInfo.member) {
+      that.setData({ member: userInfo.member })
     }
   },
   setUrgent(e) {
@@ -193,18 +194,23 @@ Page({
       return
     }
     var content = ''
-    if (that.data.payMethod == '微信支付') {
-      //content = '微信支付订单，付款人'
-      if (that.data.payer == '顾客本人') {
-        content = '微信支付订单，顾客本人支付，提交后会显示支付二维码，请顾客扫码支付。'
+    if (that.data.type == '普通') {
+      if (that.data.payMethod == '微信支付') {
+        //content = '微信支付订单，付款人'
+        if (that.data.payer == '顾客本人') {
+          content = '微信支付订单，顾客本人支付，提交后会显示支付二维码，请顾客扫码支付。'
+        }
+        else {
+          content = '微信支付订单，店员代付，点击确定支付。'
+        }
+
       }
       else {
-        content = '微信支付订单，店员代付，点击确定支付。'
+        content = '非微信支付方式，提交后订单即刻生效。'
       }
-
     }
     else {
-      content = '非微信支付方式，提交后订单即刻生效。'
+      content = that.data.type + ' 订单，提交后即刻生效。'
     }
     wx.showModal({
       title: '确认提交',
@@ -221,6 +227,86 @@ Page({
     })
   },
   invokeApi() {
+    var that = this
+    var shop = that.data.shop
+    var cell = that.data.cell
+    var name = that.data.name
+    var gender = that.data.gender
+    var urgent = that.data.urgent
+    var mi7No = that.data.mi7No
+    var bizDate = that.data.bizDate
+    var bizTime = that.data.bizTime
+    var payMethod = that.data.payMethod
+    var sale = that.data.sale
+    var deal = that.data.deal
+    var payer = that.data.payer
+    var member = that.data.member
+    if (bizDate && bizTime) {
+      bizDate = util.formatDateString(bizDate + 'T' + bizTime)
+    }
+    var retail = {
+      id: 0,
+      order_id: 0,
+      mi7_code: mi7No,
+      sale_price: sale,
+      deal_price: deal,
+      order_type: that.data.type,
+      valid: 1
+    }
+    var payment = {
+      id: 0,
+      order_id: 0,
+      pay_method: payMethod,
+      amount: deal,
+      is_staff_paid: payer == '店员代付' ? 1 : 0,
+      status: payMethod == '微信支付' ? '待支付' : '支付完成'
+    }
+    if (payment.status == '支付完成') {
+      payment.pay_time = util.formatDateString(new Date())
+    }
+    var order = {
+      id: 0,
+      code: '',
+      shop: shop,
+      type: '零售',
+      sub_type: '现货',
+      is_package: 0,
+      pay_option: retail.order_type,
+      member_id: ((member != undefined && member != null) ? member.id : null),
+      name: name,
+      cell: cell,
+      gender: gender,
+      total_amount: deal,
+      supplement: 1,
+      valid: payment.status == '支付完成' ? 1 : 0,
+      closed: 1
+    }
+    order.retails = [retail]
+    if (order.order_type == '普通') {
+      order.payments = [payment]
+    }
+    else {
+      order.valid = 1
+      order.closed = 1
+      order.total_amount = 0
+    }
+    var submitUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(submitUrl, order).then((resolve) => {
+      console.log('place order', resolve)
+      if (!resolve) {
+        console.log('add order failed')
+        if (payMethod != '微信支付') {
+          that.showSuccessModal('补单成功', '', '继续补单', '查看列表')
+        }
+        else {
+          that.setData({ order: resovle })
+          that.pay()
+        }
+      }
+    })
+
+  },
+  invokeApi1() {
     var that = this
     var shop = that.data.shop
     var openId = that.data.openId
@@ -266,14 +352,14 @@ Page({
         if (payMethod != '微信支付') {
           that.showSuccessModal('补单成功', '', '继续补单', '查看列表')
         }
-        else{
-          that.setData({order: res.data})
+        else {
+          that.setData({ order: res.data })
           that.pay()
         }
       }
     })
   },
-  showSuccessModal(title, content, confirmText, cancelText){
+  showSuccessModal(title, content, confirmText, cancelText) {
     wx.showModal({
       title: title,
       content: content,
@@ -299,7 +385,7 @@ Page({
     var payMethod = e.detail.payMethod
     that.setData({ payMethod: payMethod })
   },
-  pay(){
+  pay() {
     var that = this
     var order = that.data.order
     console.log('order will be paid', order)
@@ -307,7 +393,7 @@ Page({
     wx.request({
       url: payUrl,
       method: 'GET',
-      success: (res)=> {
+      success: (res) => {
         console.log('pay info', res)
         wx.requestPayment({
           nonceStr: res.data.nonce,
@@ -315,11 +401,15 @@ Page({
           paySign: res.data.sign,
           timeStamp: res.data.timestamp,
           signType: 'MD5',
-          success:()=>{
+          success: () => {
             that.showSuccessModal('支付成功', '补单已经生效', '继续补单', '查看列表')
           }
         })
       }
     })
+  },
+  setOrderType(e) {
+    var that = this
+    that.setData({ type: e.detail.value })
   }
 })

@@ -4,7 +4,8 @@
     "mp-cell": "weui-miniprogram/cell/cell",
     "user-info": "/components/user_info/user_info",
     "shop-selector": "/components/shop_selector/shop_selector",
-    "pay_method": "/components/pay_method/pay_method"
+    "pay_method": "/components/pay_method/pay_method",
+    "order_type": "/components/order_type/order_type"
   },
   "navigationBarTitleText": "零售补单"
 }
