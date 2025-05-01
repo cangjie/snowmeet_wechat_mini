@@ -383,5 +383,29 @@ Page({
     })
     console.log('new biz date', util.formatDateTime(newBizDateTime))
     */
+  },
+  cancel(){
+    wx.showModal({
+      title: '确认作废？',
+      content: '此操作不可恢复，且会留下系统日志。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var that = this
+          var order = that.data.order
+          var cancelUrl = app.globalData.requestPrefix + 'Order/CancelOrder/' + order.id + '?scene=' + encodeURIComponent('订单详情页作废') + '&sessionKey=' + app.globalData.sessionKey
+          util.performWebRequest(cancelUrl, undefined).then((resolve)=>{
+            wx.showToast({
+              title: '订单已经取消',
+              icon: 'success'
+            })
+            that.setData({order: resolve})
+          })
+        }
+      }
+    })
   }
 })

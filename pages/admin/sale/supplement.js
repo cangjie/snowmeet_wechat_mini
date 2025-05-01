@@ -247,7 +247,7 @@ Page({
     var retail = {
       id: 0,
       order_id: 0,
-      mi7_code: mi7No,
+      mi7_code: (mi7No == undefined || mi7No == null || mi7No == '')? null: mi7No,
       sale_price: sale,
       deal_price: deal,
       order_type: that.data.type,
@@ -259,7 +259,7 @@ Page({
       pay_method: payMethod,
       amount: deal,
       is_staff_paid: payer == '店员代付' ? 1 : 0,
-      status: payMethod == '微信支付' ? '待支付' : '支付完成'
+      status: payMethod == '微信支付' ? '待支付' : '支付成功'
     }
     if (payment.status == '支付完成') {
       payment.pay_time = util.formatDateString(new Date())
@@ -282,7 +282,7 @@ Page({
       closed: 1
     }
     order.retails = [retail]
-    if (order.order_type == '普通') {
+    if (order.pay_option == '普通') {
       order.payments = [payment]
     }
     else {
@@ -295,13 +295,14 @@ Page({
       console.log('place order', resolve)
       if (!resolve) {
         console.log('add order failed')
-        if (payMethod != '微信支付') {
-          that.showSuccessModal('补单成功', '', '继续补单', '查看列表')
-        }
-        else {
-          that.setData({ order: resovle })
-          that.pay()
-        }
+        return
+      }
+      if (payMethod != '微信支付' || order.pay_option != '普通') {
+        that.showSuccessModal('补单成功', '', '继续补单', '查看列表')
+      }
+      else {
+        that.setData({ order: resolve })
+        that.pay()
       }
     })
 
