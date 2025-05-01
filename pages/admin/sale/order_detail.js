@@ -52,7 +52,7 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve) {
-      that.setData({ role: app.globalData.staff? 'staff': '' })
+      that.setData({ role: app.globalData.staff ? 'staff' : '' })
       that.getData()
     })
   },
@@ -167,6 +167,7 @@ Page({
     var that = this
     var order = that.data.order
     order.memo = e.detail.value
+    /*
     that.setData({ order: order })
     var setUrl = 'https://' + app.globalData.domainName + '/core/OrderOnlines/SetOrderMemo/' + order.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&memo=' + encodeURIComponent(e.detail.value)
     wx.request({
@@ -180,7 +181,7 @@ Page({
       }
 
     })
-
+    */
   },
   getData() {
     var that = this
@@ -188,13 +189,13 @@ Page({
     util.performWebRequest(getOrderUrl, undefined).then((resolve) => {
       var order = resolve
       console.log('get order', order)
-      
+
       order.date = util.formatDate(new Date(order.biz_date))
       order.time = util.formatTimeStr(new Date(order.biz_date))
-      
+
       var orderRetailSaleAmount = 0
       var orderRetailDealAmount = 0
-      for(var i = 0; i < order.retails.length; i++){
+      for (var i = 0; i < order.retails.length; i++) {
         var retail = order.retails[i]
         retail.sale_priceStr = util.showAmount(retail.sale_price)
         retail.deal_priceStr = util.showAmount(retail.deal_price)
@@ -214,14 +215,14 @@ Page({
       order.owingAmount = order.finalChargeAmount - order.paidAmount + order.refundAmount
       order.owingAmountStr = util.showAmount(order.owingAmount)
       order.refundAmountStr = util.showAmount(order.refundAmount)
-      order.isEnterain = order.pay_option == '招待' ? true: false
+      order.isEnterain = order.pay_option == '招待' ? true : false
       var bizDate = new Date(order.biz_date)
       order.bizDate = util.formatDate(bizDate)
       order.bizTime = util.formatTimeStr(bizDate)
-      if (order.member != null){
+      if (order.member != null) {
         order.open_id = order.member.wechatMiniOpenId
       }
-      for(var i = 0; i < order.payments.length; i++){
+      for (var i = 0; i < order.payments.length; i++) {
         var payment = order.payments[i]
         var date = new Date(payment.create_date)
         payment.dateStr = util.formatDate(date)
@@ -251,7 +252,7 @@ Page({
         
       }
       */
-      that.setData({ order: order})
+      that.setData({ order: order })
     }).catch((reject) => {
 
     })
@@ -350,14 +351,14 @@ Page({
       default:
         break
     }
-    that.setData({order})
+    that.setData({ order })
   },
   saveBizDate(e) {
     var that = this
     var order = that.data.order
     order.biz_date = order.bizDate + 'T' + order.bizTime
     var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?sessionKey=' + app.globalData.sessionKey + '&scene=' + encodeURIComponent('订单详情页修改业务时间')
-    util.performWebRequest(updateUrl, order).then((resolve)=>{
+    util.performWebRequest(updateUrl, order).then((resolve) => {
       console.log('order updated', resolve)
       that.setData({ modding: false })
       that.getData()
@@ -384,28 +385,58 @@ Page({
     console.log('new biz date', util.formatDateTime(newBizDateTime))
     */
   },
-  cancel(){
+  cancel() {
     wx.showModal({
       title: '确认作废？',
       content: '此操作不可恢复，且会留下系统日志。',
       complete: (res) => {
         if (res.cancel) {
-          
+
         }
-    
+
         if (res.confirm) {
           var that = this
           var order = that.data.order
           var cancelUrl = app.globalData.requestPrefix + 'Order/CancelOrder/' + order.id + '?scene=' + encodeURIComponent('订单详情页作废') + '&sessionKey=' + app.globalData.sessionKey
-          util.performWebRequest(cancelUrl, undefined).then((resolve)=>{
+          util.performWebRequest(cancelUrl, undefined).then((resolve) => {
             wx.showToast({
               title: '订单已经取消',
               icon: 'success'
             })
-            that.setData({order: resolve})
+            that.setData({ order: resolve })
           })
         }
       }
     })
+  },
+  saveOrder() {
+    var that = this
+    wx.showModal({
+      title: '确认修改备注？',
+      content: '',
+      complete: (res) => {
+        if (res.cancel) {
+
+        }
+
+        if (res.confirm) {
+          
+          var order = that.data.order
+          var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('零售订单详情页修改备注') + '&sessionKey=' + app.globalData.sessionKey
+          util.performWebRequest(updateUrl, order).then((resolve) => {
+            if (resolve) {
+              that.getData()
+            }
+            else {
+              wx.showToast({
+                title: '修改失败',
+                icon: 'error'
+              })
+            }
+          })
+        }
+      }
+    })
+
   }
 })
