@@ -9,7 +9,7 @@ Page({
   data: {
     shop: '',
     statusSelectedIndex: 4,
-    startDate: new Date(),
+    startDate: new Date('1900-1-1'),
     endDate: new Date(),
     nowDateStr: '',
     statusList:['全部', '待支付', '部分支付', '暂缓支付', '支付完成', '订单关闭'],
@@ -45,7 +45,7 @@ Page({
     var startDate = that.data.startDate
     var endDate = that.data.endDate
     if (that.data.urgent || !that.data.useDate){
-      startDate = '2020-01-01'
+      startDate = '1900-01-01'
       endDate = '2050-01-01'
     }
 
@@ -116,7 +116,7 @@ Page({
           }
           order.supplement = supplement
 
-          totalAmount = totalAmount + orderList[i].final_price
+          totalAmount = totalAmount + orderList[i].paidAmount - orderList[i].refundAmount
           var orderDateTime = new Date(orderList[i].biz_date)
           orderList[i].date = orderDateTime.getFullYear().toString() + '-' + (orderDateTime.getMonth() + 1).toString() + '-' + orderDateTime.getDate().toString()
           orderList[i].time = util.formatTimeStr(orderDateTime)  //orderDateTime.getHours().toString() + ':' + orderDateTime.getMinutes().toString()
