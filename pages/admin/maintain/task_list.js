@@ -45,102 +45,79 @@ Page({
     that.setData({shop: e.detail.shop})
     //that.getData()
   },
-
   getData(){
     var that = this
     that.setData({querying: true})
-    var getTaskUrl = 'https://' + app.globalData.domainName + '/core/MaintainLive/GetTasks?start=' + encodeURIComponent(that.data.start) + '&end=' + encodeURIComponent(that.data.end) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + ((that.data.shop == '')? '' : '&shop=' + encodeURIComponent(that.data.shop))+'&payOption=' + encodeURIComponent(that.data.payOption)
-    var orderList = []
-    wx.request({
-      url: getTaskUrl,
-      method: 'GET',
-      success:(res)=>{
-        console.log('get tasks', res)
-        var tasks = res.data
-        for(var i = 0; i < tasks.length; i++){
-          var task = tasks[i]
-          task.memo = ''
-          task.date = util.formatDate(new Date(task.create_date))
-          task.time = util.formatTimeStr(new Date(task.create_date))
-
-          if (task.confirmed_equip_type == '双板' && task.confirmed_serial == ''){
-            task.memo = '信息不全'
-          }
-          if (task.order != undefined && task.order != null 
-            && task.order.final_price != undefined && task.order.final_price != null){
-              task.orderPriceStr = util.showAmount(task.order.final_price)
-          }
-          else {
-            task.orderPriceStr = '---'
-          }
-          if (task.order_id > 0){
-            var exists = false
-            for(var j = 0; j < orderList.length; j++){
-              if (orderList[j].id == task.order_id){
-                exists = true
-                break
-              }
-            }
-            if (!exists ){
-              orderList.push(task.order)
-            }
-          }
-          if (task.confirmed_urgent == 1){
-            task.backColor = 'yellow'
-          }
+    var getTaskUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaff'
+      + '?type=' + encodeURIComponent('养护') 
+      + ((that.data.shop == undefined) ? '' :  ('&shop=' + encodeURIComponent(that.data.shop)))
+      + (that.data.payOption == ''? '' :  ('&payOption=' + encodeURIComponent(that.data.payOption)) )
+      + '&startDate=' + encodeURIComponent(that.data.start)  
+      + '&endDate=' + encodeURIComponent(that.data.end) 
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      
+    util.performWebRequest(getTaskUrl, undefined).then(function(resolve){
+      console.log('maintian orders', resolve)
+      that.setData({querying: false})
+      var orders = resolve
+      var totalTask = 0
+      var totalAmount = 0
+      for(var i = 0; i < orders.length; i++){
+        var order = orders[i]
+        totalAmount += order.paidAmount
+        order.total_amountStr = util.showAmount(order.total_amount)
+        order.discountStr = util.showAmount(order.discount)
+        order.ticket_discountStr = util.showAmount(order.ticket_discount)
+        order.paidAmountStr = util.showAmount(order.paidAmount)
+        order.bizDateStr = util.formatDate(new Date(order.biz_date))
+        order.bizTimeStr = util.formatTimeStr(new Date(order.biz_date))
+        totalTask += (order.cares == null)? 0 : order.cares.length
+        for(var j = 0; j < order.cares.length; j++){
+          var care = order.cares[j]
+          care.common_chargeStr = util.showAmount(care.common_charge)
+          care.repair_chargeStr = util.showAmount(care.repair_charge)
+          care.discountStr = util.showAmount(care.discount)
+          care.ticket_discountStr = util.showAmount(care.ticket_discount)
+          care.summary = care.common_charge + care.repair_charge - care.discount - care.ticket_discount
+          care.summaryStr = util.showAmount(care.summary)
         }
-        var totalAmount = 0
-        for(var i = 0; i < orderList.length; i++){
-          totalAmount += orderList[i].final_price
-        }
-        var totalAmountStr = util.showAmount(totalAmount)
-
-        that.setData({tasks: tasks, orderList: orderList, totalAmount: totalAmount, totalAmountStr: totalAmountStr, querying: false})
       }
+      that.setData({orders, totalTask, totalAmountStr: util.showAmount(totalAmount)})
+    }).catch(function(){
+      that.setData({querying: false})
     })
   },
-
   /**
    * Lifecycle function--Called when page show
    */
   onShow() {
     var that = this
-    try{
-      that.getData()
-    }
-    catch{
-
-    }
+    that.getData()
   },
-
   /**
    * Lifecycle function--Called when page hide
    */
   onHide() {
 
   },
-
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload() {
 
   },
-
   /**
    * Page event handler function--Called when user drop down
    */
   onPullDownRefresh() {
 
   },
-
   /**
    * Called when page reach bottom
    */
   onReachBottom() {
 
   },
-
   /**
    * Called when user click on the top right corner to share
    */
@@ -155,7 +132,7 @@ Page({
   },
   gotoDetail(e){
     wx.navigateTo({
-      url: 'task?id=' + e.currentTarget.id,
+      url: 'task_detail?id=' + e.currentTarget.id,
     })
   },
   changePayOption(e){

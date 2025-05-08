@@ -1,0 +1,29 @@
+<view>
+  <mp-cells title="用户联系信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >{{task.order.member.title}}</view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >{{task.order.member.cell}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="所属订单信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column"  >订单号：</view>
+        <view class="right-column" >{{task.order.code}}</view>
+        
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" > 
+        <view class="left-column" >支付：</view>
+        <view class="right-column" >{{task.order.paidAmountStr}}</view>
+        <view class="left-column" >退款：</view>
+        <view class="right-column" >{{task.order.refundAmountStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

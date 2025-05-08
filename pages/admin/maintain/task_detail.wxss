@@ -1,0 +1,2 @@
+/* pages/admin/maintain/task_detail.wxss */
+@import '/app.wxss';

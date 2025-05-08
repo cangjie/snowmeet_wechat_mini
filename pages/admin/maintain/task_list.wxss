@@ -1,5 +1,5 @@
 .left-column{
-  width:26%;
+  width:50%;
   text-align: right;
   font-size: 10pt;
   margin-top:20rpx;
@@ -7,7 +7,7 @@
   margin-right: 0rpx;
 }
 .right-column{
-  width:74%;
+  width:50%;
   text-align: left;
   font-size: 10pt;
   margin-top:20rpx;

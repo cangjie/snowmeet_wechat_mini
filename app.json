@@ -146,7 +146,8 @@
     "pages/test/message/pop_up",
     "pages/admin/deposit/deposit_balance",
     "pages/admin/sale/enterain_form",
-    "pages/admin/sale/supplement"
+    "pages/admin/sale/supplement",
+    "pages/admin/maintain/task_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",
