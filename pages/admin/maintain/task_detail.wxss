@@ -1,2 +1,8 @@
 /* pages/admin/maintain/task_detail.wxss */
 @import '/app.wxss';
+.left-column{
+  width: 110rpx;
+}
+.right-column{
+  width:260rpx;
+}
