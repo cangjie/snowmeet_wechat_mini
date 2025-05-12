@@ -44,7 +44,7 @@ Page({
 
   getData(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetAllCategories'
+    var url = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
     wx.request({
       url: url,
       method:'GET',
@@ -65,7 +65,7 @@ Page({
 
   getSingleCategory(code){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategory/' + code
+    var url = 'https://' + app.globalData.domainName + '/api/Rent/GetCategory/' + code
     wx.request({
       url: url,
       method:'GET',
@@ -187,59 +187,7 @@ Page({
     that.checkValid()
   },
 
-/*
-  setCategoryPriceArr(){
-    var that = this
-    var shopPriceArr = [[['','',''],['','',''],['','','']],
-    [['','',''],['','',''],['','','']],[['','',''],['','',''],['','','']]]
-    var cat = that.data.selectedCategory
-    var shop = that.data.shops[that.data.currentShopIndex].shop
-    for(var i = 0; cat != null && cat != undefined && cat.priceList != null && cat.priceList != undefined
-        && i < cat.priceList.length; i++ ){
-      var price = cat.priceList[i]
-      var shopIndex = that.data.currentShopIndex
-      var dayType = price.day_type
-      var scene = price.scene
-      if (price.shop == shop && dayType == '平日' && scene == '门市'){
-        shopPriceArr[shopIndex][0][0] = price.price
-      }
 
-      if (price.shop == shop && dayType == '平日' && scene == '预约'){
-        shopPriceArr[shopIndex][0][1] = price.price
-      }
-
-      if (price.shop == shop && dayType == '平日' && scene == '会员'){
-        shopPriceArr[shopIndex][0][2] = price.price
-      }
-
-      if (price.shop == shop && dayType == '周末' && scene == '门市'){
-        shopPriceArr[shopIndex][1][0] = price.price
-      }
-
-      if (price.shop == shop && dayType == '周末' && scene == '预约'){
-        shopPriceArr[shopIndex][1][1] = price.price
-      }
-
-      if (price.shop == shop && dayType == '周末' && scene == '会员'){
-        shopPriceArr[shopIndex][1][2] = price.price
-      }
-
-      if (price.shop == shop &&  dayType == '节假日' && scene == '门市'){
-        shopPriceArr[shopIndex][2][0] = price.price
-      }
-
-      if (price.shop == shop && dayType == '节假日' && scene == '预约'){
-        shopPriceArr[shopIndex][2][1] = price.price
-      }
-
-      if (price.shop == shop && dayType == '节假日' && scene == '会员'){
-        shopPriceArr[shopIndex][2][2] = price.price
-      }
-    }
-    that.setData({shopPriceArr: shopPriceArr})
-    that.checkValid()
-  },
-*/
   getShopIndex(shopName){
     var that = this
     var shops = that.data.shops
@@ -327,7 +275,7 @@ Page({
       })
       return
     }
-    var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/AddCategoryManual/' + newCode
+    var addUrl = 'https://' + app.globalData.domainName + '/api/Rent/AddCategoryManual/' + newCode
       + '?name=' + encodeURIComponent(newName) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
@@ -382,7 +330,7 @@ Page({
     if (that.data.isSameLevel){
       selectedCode = selectedCode.substring(0, selectedCode.length - 2)
     }
-    var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/AddCategory?code=' + selectedCode
+    var addUrl = 'https://' + app.globalData.domainName + '/api/Rent/AddCategory?code=' + selectedCode
       + '&name=' + encodeURIComponent(newName) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
@@ -460,7 +408,7 @@ Page({
         }
     
         if (res.confirm) {
-          var delUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/DeleteCategory/' 
+          var delUrl = 'https://' + app.globalData.domainName + '/api/Rent/DeleteCategory/' 
           + selectedCode + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
           + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
           wx.request({
@@ -555,7 +503,7 @@ Page({
     var cat = that.data.selectedCategory
     if (that.data.depositChanged){
         var saveDepositUrl = 'https://' +  app.globalData.domainName 
-        + '/core/RentSetting/UpdateCategory/' + cat.code + '?name=' 
+        + '/api/Rent/UpdateCategory/' + cat.code + '?name=' 
         + encodeURIComponent(cat.name) + '&deposit=' + cat.deposit.toString()
         + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
         + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
@@ -622,7 +570,7 @@ Page({
                   default:
                       break
               }
-              var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetShopCategoryRentPrice/'
+              var saveUrl = 'https://' + app.globalData.domainName + '/api/Rent/SetShopCategoryRentPrice/'
               + cat.id.toString() + '?shop=' + encodeURIComponent(shopName) + '&dayType=' + encodeURIComponent(dayType)
               + '&scene=' + encodeURIComponent(scene) + '&price=' + priceArr[i][j].toString()
               + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' 
@@ -698,7 +646,7 @@ Page({
     var newCode = that.data.selectedCategory.code
     newCode = newCode.substr(0, newCode.length - 2) + that.data.seq
 
-    var modUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/ModCategory/' + selectedCategory.id.toString() + '?code=' + newCode + '&name=' + encodeURIComponent(modName) 
+    var modUrl = 'https://' + app.globalData.domainName + '/api/Rent/ModCategory/' + selectedCategory.id.toString() + '?code=' + newCode + '&name=' + encodeURIComponent(modName) 
     + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
@@ -728,7 +676,7 @@ Page({
       sort = infoFieldList[infoFieldList.length - 1].sort
       sort++
     }
-    var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/CategoryInfoFieldAdd/' + that.data.selectedCategory.id.toString() + '?fieldName=' + encodeURIComponent(that.data.newFieldName) + '&sort=' + sort.toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    var addUrl = 'https://' + app.globalData.domainName + '/api/Rent/CategoryInfoFieldAdd/' + that.data.selectedCategory.id.toString() + '?fieldName=' + encodeURIComponent(that.data.newFieldName) + '&sort=' + sort.toString() + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: addUrl,
       method: 'GET',
@@ -812,7 +760,7 @@ Page({
   saveField(field){
     var that = this
     var categoryId = that.data.selectedCategory.id
-    var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/CategoryInfoFieldMod/' + field.id.toString() + '?fieldName=' + encodeURIComponent(field.field_name) + '&sort=' + field.sort.toString() + '&delete=' + (field.is_delete == 1 ? 'True' : 'False') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    var saveUrl = 'https://' + app.globalData.domainName + '/api/Rent/CategoryInfoFieldMod/' + field.id.toString() + '?fieldName=' + encodeURIComponent(field.field_name) + '&sort=' + field.sort.toString() + '&delete=' + (field.is_delete == 1 ? 'True' : 'False') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: saveUrl,
       method: 'GET',
@@ -891,7 +839,8 @@ Page({
   onLoad(options) {
     var that = this
     app.loginPromiseNew.then(function (resolve){
-      if (app.globalData.memberInfo.is_admin == 1){
+      var staff = app.globalData.staff
+      if (staff && staff.title_level >= 300){
         that.setData({isAdmin: true})
         that.getData()
       }

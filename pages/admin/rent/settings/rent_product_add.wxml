@@ -8,7 +8,16 @@
     </view>
   </mp-cell>
 </mp-cells>
-<shop-selector wx:if="{{inStock}}" bindShopSelected="selectShop" ></shop-selector>
+<mp-cells title="选择店铺" >
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" ></view>
+      <view class="right-column" >
+        <shop-selector wx:if="{{inStock}}" bindShopSelected="selectShop" ></shop-selector>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
 <mp-cells title="填写租赁商品名称" >
   <mp-cell>
     <view class="view-row" >

@@ -210,9 +210,9 @@ Page({
       order.ticketDiscountAmountStr = "¥0.00"
       order.discountAmountStr = "¥0.00"
       order.paidAmountStr = util.showAmount(order.paidAmount)
-      order.finalChargeAmount = order.total_amount - order.discount - order.ticket_discount
-      order.finalChargeAmountStr = util.showAmount(order.finalChargeAmount)
-      order.owingAmount = order.finalChargeAmount - order.paidAmount + order.refundAmount
+      order.totalChargeStr = util.showAmount(order.totalCharge)
+      //order.finalChargeAmountStr = util.showAmount(order.finalChargeAmount)
+      order.owingAmount = order.totalCharge - order.paidAmount + order.refundAmount
       order.owingAmountStr = util.showAmount(order.owingAmount)
       order.refundAmountStr = util.showAmount(order.refundAmount)
       order.isEnterain = order.pay_option == '招待' ? true : false

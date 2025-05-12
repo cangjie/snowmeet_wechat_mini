@@ -87,7 +87,7 @@
     <mp-cell>
       <view style="display: flex; flex-direction: row;background-color:{{order.backgroundColor}};color:{{order.textColor}}">
         <view class="left-column">订单金额：</view>
-        <view class="right-column">{{order.finalChargeAmountStr}}</view>
+        <view class="right-column">{{order.totalChargeStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>

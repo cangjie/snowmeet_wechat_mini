@@ -22,7 +22,7 @@ Page({
   },
   getCategories(){
     var that = this
-    var getCatUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetAllCategories'
+    var getCatUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
     wx.request({
       url: getCatUrl,
       method: 'GET',
@@ -159,7 +159,7 @@ Page({
     if (!inStock){
       shop = null
     }
-    var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/AddRentProduct/' + category.id + '?shop='
+    var addUrl = 'https://' + app.globalData.domainName + '/api/Rent/AddRentProduct/' + category.id + '?shop='
     + encodeURIComponent(shop) + '&name=' + encodeURIComponent(productName) + '&sessionKey=' 
     + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({

@@ -11,7 +11,7 @@ Page({
 
   getData(){
     var that = this
-    var getList = 'https://' + app.globalData.domainName + '/core/RentSetting/GetRentPackageList'
+    var getList = 'https://' + app.globalData.domainName + '/api/Rent/GetRentPackageList'
     wx.request({
       url: getList,
       method: 'GET',
@@ -46,7 +46,7 @@ Page({
         }
     
         if (res.confirm) {
-          var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/AddRentPackage?'
+          var addUrl = 'https://' + app.globalData.domainName + '/api/Rent/AddRentPackage?'
           + 'name=' + encodeURIComponent(that.data.newName) + '&description='
           + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
           + '&sessionType=' + encodeURIComponent('wechat_mini_openid')

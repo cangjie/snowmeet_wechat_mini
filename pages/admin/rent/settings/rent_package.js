@@ -34,7 +34,7 @@ Page({
     console.log('check', e)
     var act = e.detail.checked? 'Add' : 'Del'
     var that = this
-    var setUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/RentPackageCategory' 
+    var setUrl = 'https://' + app.globalData.domainName + '/api/Rent/RentPackageCategory' 
     + act + '/' + that.data.rentPackage.id + '?categoryId=' + e.detail.id 
     + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
@@ -56,7 +56,7 @@ Page({
 
   getDataTree(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetAllCategories'
+    var url = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
     wx.request({
       url: url,
       method: 'GET',
@@ -111,7 +111,7 @@ Page({
 
   getPackage(){
     var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetRentPackage/' + that.data.id
+    var getUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetRentPackage/' + that.data.id
     wx.request({
       url: getUrl,
       method: 'GET',
@@ -169,7 +169,7 @@ Page({
     var that = this
     var pack = that.data.rentPackage
     var saveUrl = 'https://' + app.globalData.domainName 
-    + '/core/RentSetting/UpdateRentPackageBaseInfo/'
+    + '/api/Rent/UpdateRentPackageBaseInfo/'
     + pack.id.toString() + '?name=' + encodeURIComponent(pack.name) 
     + '&description=' + encodeURIComponent(pack.description)
     + '&deposit=' + encodeURIComponent(pack.deposit.toString())
@@ -342,7 +342,7 @@ Page({
             default:
               break
           }
-          var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetPackageRentPrice/' 
+          var saveUrl = 'https://' + app.globalData.domainName + '/api/Rent/SetPackageRentPrice/' 
           + that.data.rentPackage.id.toString() + '?shop=' + encodeURIComponent(shop) 
           + '&dayType=' + encodeURIComponent(dayType) + '&scene=' + encodeURIComponent(scene)
           + '&price=' + encodeURIComponent(v) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)

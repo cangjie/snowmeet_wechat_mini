@@ -11,7 +11,7 @@ Page({
 
   getCategories(){
     var that = this
-    var getCatUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetAllCategories'
+    var getCatUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
     wx.request({
       url: getCatUrl,
       method: 'GET',
