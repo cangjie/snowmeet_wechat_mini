@@ -62,7 +62,30 @@ Page({
     console.log('q url', qUrl)
     util.performWebRequest(qUrl, undefined).then(function(resolve){
       console.log('get rent orders', resolve)
-      that.setData({querying: false})
+      var orders = resolve
+      for(var i = 0; i < orders.length; i++){
+        var order = orders[i]
+        if (order.biz_date){
+          var bizDate = new Date(order.biz_date)
+          order.biz_dateDateStr = util.formatDate(bizDate)
+          order.biz_dateTimeStr = util.formatTimeStr(bizDate)
+        }
+        else{
+          order.biz_dateDateStr = '——'
+          order.biz_dateTimeStr = '——'
+        }
+        if (order.rentalLastRefundDate){
+          var rDate = new Date(order.rentalLastRefundDate)
+          order.rentalLastRefundDateDateStr = util.formatDate(rDate)
+          order.rentalLastRefundDateTimeStr = util.formatTimeStr(rDate)
+        }
+        else {
+          order.rentalLastRefundDateDateStr = '——'
+          order.rentalLastRefundDateTimeStr = '——'
+        }
+        order.guarantyAmountStr = util.showAmount(order.guarantyAmount)
+      }
+      that.setData({querying: false, orders: orders})
     }).catch(function(){
       that.setData({querying: false})
     })

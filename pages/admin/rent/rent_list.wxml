@@ -37,32 +37,37 @@
       <mp-cell id="{{item.id}}" wx:for="{{orders}}" bindtap="gotoDetail">
         <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}">
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">订单号：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.id}}</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.code}}</view>
+        </view>
+        <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}">
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">状态：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor + ';' : ''}}{{(item.statusTextColor!=='')? 'color:' + item.statusTextColor + ';' : ''}}">{{item.status}}</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor + ';' : ''}}{{(item.statusTextColor!=='')? 'color:' + item.statusTextColor + ';' : ''}}">{{item.rentalStatus}}</view>
+          <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">店员：</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.staff.name}}</view>
         </view>
         <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}">
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">姓名：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.real_name}}</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.member.title}}</view>
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">电话：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.cell_number}}</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.member.cell}}</view>
+        </view>
+        <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}">
+          <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">订单日期：</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.biz_dateDateStr}}</view>
+          <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">退款日期：</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.rentalLastRefundDateDateStr}}</view>
         </view>
         <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}">
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">订单时间：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.create_dateStr}}</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.biz_dateTimeStr}}</view>
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">退款时间：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.end_dateStr}}</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.rentalLastRefundDateTimeStr}}</view>
         </view>
         <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}">
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">支付方式：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.order.payments[0].pay_method}}</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.payments[0].pay_method}}</view>
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">支付押金：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.totalChargeStr}}</view>
-        </view>
-        <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}">
-          <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">店员：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.staff_name}}</view>
-
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}">{{item.guarantyAmountStr}}</view>
         </view>
       </mp-cell>
     </mp-cells>
