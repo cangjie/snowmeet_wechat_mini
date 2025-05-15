@@ -50,9 +50,24 @@ Page({
       url: '../admin',
     })
   },
-
-
   getData(){
+    var that = this
+    that.setData({querying: true})
+    var totalPaid = 0
+    var totalRefund = 0
+    var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaff?type=' + encodeURIComponent('租赁') + '&sessionKey=' + app.globalData.sessionKey
+     + '&startDate=' + encodeURIComponent(that.data.startDate) + '&endDate=' + encodeURIComponent(that.data.endDate) 
+     + (that.data.shop == ''? '' : '&shop=' + encodeURIComponent(that.data.shop))
+     //+ (that.data.statusSelectedIndex == 0 ? '' : '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex]))
+    console.log('q url', qUrl)
+    util.performWebRequest(qUrl, undefined).then(function(resolve){
+      console.log('get rent orders', resolve)
+      that.setData({querying: false})
+    }).catch(function(){
+      that.setData({querying: false})
+    })
+  },
+  getData1(){
     var that = this
     that.setData({querying: true})
     var totalPaid = 0
