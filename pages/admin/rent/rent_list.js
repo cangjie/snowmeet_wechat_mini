@@ -84,8 +84,9 @@ Page({
           order.rentalLastRefundDateTimeStr = '——'
         }
         order.guarantyAmountStr = util.showAmount(order.guarantyAmount)
+        totalPaid += order.guarantyAmount
       }
-      that.setData({querying: false, orders: orders})
+      that.setData({querying: false, orders: orders, totalPaidStr: util.showAmount(totalPaid)})
     }).catch(function(){
       that.setData({querying: false})
     })
