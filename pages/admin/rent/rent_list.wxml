@@ -60,7 +60,7 @@
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >支付方式：</view>
           <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.order.payments[0].pay_method}}</view>
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >支付押金：</view>
-          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.totalChargeStr}}</view>
+          <view class="right-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >{{item.totalGuarantyAmountStr}}</view>
         </view>
         <view style="display: flex;flex-direction: row;{{item.backColor!=''? 'background-color:' + item.backColor : '' }}" >
           <view class="left-column" style="{{(item.textColor!=='')? 'color:' + item.textColor : ''}}" >店员：</view>

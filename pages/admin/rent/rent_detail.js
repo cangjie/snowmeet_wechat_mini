@@ -586,6 +586,7 @@ Page({
     }
     rentOrder.totalChargeStr = util.showAmount(rentOrder.totalCharge)
     rentOrder.totalRefundStr = util.showAmount(rentOrder.totalRefund)
+    rentOrder.totalGuarantyAmountStr = util.showAmount(rentOrder.totalGuarantyAmount)
     that.setData({rentOrder: rentOrder})
     return rentOrder
   },

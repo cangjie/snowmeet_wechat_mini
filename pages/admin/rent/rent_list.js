@@ -74,6 +74,7 @@ Page({
             orders[i].due_end_date_str = util.formatDate(dueEndDate) + ' ' + util.formatTimeStr(dueEndDate)
             orders[i].create_dateStr = util.formatDate(createDate) + ' ' + util.formatTimeStr(createDate)
             orders[i].totalChargeStr = util.showAmount(orders[i].totalCharge)
+            orders[i].totalGuarantyAmountStr = util.showAmount(orders[i].totalGuarantyAmount)
             if (orders[i].end_date != null){
               var endDate = new Date(orders[i].end_date)
               orders[i].end_dateStr = util.formatDate(endDate) + ' ' + util.formatTimeStr(endDate)
