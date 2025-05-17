@@ -17,7 +17,7 @@ Page({
 
   gotoDetail(e){
     wx.navigateTo({
-      url: 'rent_detail?id=' + e.currentTarget.id,
+      url: 'rent_details?id=' + e.currentTarget.id,
     })
   },
   setDate(e){

@@ -1,0 +1,151 @@
+<view>
+  <mp-cells title="订单信息" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >订单号：</view>
+        <view class="right-column" >{{order.code}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >店铺：</view>
+        <view class="right-column" >{{order.shop}}</view>
+        <view class="left-column" >类型：</view>
+        <view class="right-column" >{{order.pay_option}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >{{order.member.title}}</view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >{{order.member.cell}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >业务日期：</view>
+        <view class="right-column" >{{order.bizDateStr}}</view>
+        <view class="left-column" >业务时间：</view>
+        <view class="right-column" >{{order.bizTimeStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >总数量：</view>
+        <view class="right-column" >{{rentalNum}}</view>
+        <view class="left-column" >套餐数量：</view>
+        <view class="right-column" >{{packageNum}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="套餐1" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >名称：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >分类：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >编号：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放日期：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >归还日期：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放时间：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >归还时间：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放人：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >接受人：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >损坏赔偿：</view>
+        <view class="right-column" ></view>
+        
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >名称：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >分类：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >编号：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放日期：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >归还日期：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放时间：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >归还时间：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放人：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >接受人：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >损坏赔偿：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >押金：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >租金单价：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >起租日期：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >退租日期：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >起租时间：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >退租时间：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >租金小计：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >超时费：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >优惠券减免：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >额外减免：</view>
+        <view class="right-column" ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >赔偿总额：</view>
+        <view class="right-column" ></view>
+        <view class="left-column" >应付小计：</view>
+        <view class="right-column" ></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>
