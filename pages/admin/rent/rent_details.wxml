@@ -39,112 +39,152 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="套餐1" >
-    <mp-cell>
+  
+  <mp-cells wx:for="{{packages}}" wx:for-item="package" title="套餐-{{package.name}}" >
+    <mp-cell wx:for="{{package.rentItems}}" >
       <view class="view-row" >
         <view class="left-column" >名称：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.name}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >分类：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.class_name}}</view>
         <view class="left-column" >编号：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.code}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >发放日期：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.pick_dateDateStr}}</view>
         <view class="left-column" >归还日期：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.return_dateDateStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >发放时间：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.pick_dateTimeStr}}</view>
         <view class="left-column" >归还时间：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.return_dateTimeStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >发放人：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.pickStaff.name}}</view>
         <view class="left-column" >接受人：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.pickStaff.name}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >损坏赔偿：</view>
-        <view class="right-column" ></view>
-        
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >名称：</view>
-        <view class="right-column" ></view>
-      </view>
-      <view class="view-row" >
-        <view class="left-column" >分类：</view>
-        <view class="right-column" ></view>
-        <view class="left-column" >编号：</view>
-        <view class="right-column" ></view>
-      </view>
-      <view class="view-row" >
-        <view class="left-column" >发放日期：</view>
-        <view class="right-column" ></view>
-        <view class="left-column" >归还日期：</view>
-        <view class="right-column" ></view>
-      </view>
-      <view class="view-row" >
-        <view class="left-column" >发放时间：</view>
-        <view class="right-column" ></view>
-        <view class="left-column" >归还时间：</view>
-        <view class="right-column" ></view>
-      </view>
-      <view class="view-row" >
-        <view class="left-column" >发放人：</view>
-        <view class="right-column" ></view>
-        <view class="left-column" >接受人：</view>
-        <view class="right-column" ></view>
-      </view>
-      <view class="view-row" >
-        <view class="left-column" >损坏赔偿：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{item.repairationAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >押金：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.totalGuarantyAmountStr}}</view>
         <view class="left-column" >租金单价：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >——</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >起租日期：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.start_dateDateStr}}</view>
         <view class="left-column" >退租日期：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.end_dateDateStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >起租时间：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.start_dateTimeStr}}</view>
         <view class="left-column" >退租时间：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.end_dateTimeStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >租金小计：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.totalRentalAmountStr}}</view>
         <view class="left-column" >超时费：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.totalOvertimeAmountStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >优惠券减免：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.ticketDiscountAmountStr}}</view>
         <view class="left-column" >额外减免：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.othersDiscountAmountStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >赔偿总额：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.totalRepairationAmountStr}}</view>
         <view class="left-column" >应付小计：</view>
-        <view class="right-column" ></view>
+        <view class="right-column" >{{package.summaryStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells wx:for="{{rentals}}" wx:for-item="rental" title="单品-{{rental.name}}" >
+    <mp-cell wx:for="{{rental.rentItems}}" >
+      <view class="view-row" >
+        <view class="left-column" >名称：</view>
+        <view class="right-column" >{{item.name}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >分类：</view>
+        <view class="right-column" >{{item.class_name}}</view>
+        <view class="left-column" >编号：</view>
+        <view class="right-column" >{{item.code}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放日期：</view>
+        <view class="right-column" >{{item.pick_dateDateStr}}</view>
+        <view class="left-column" >归还日期：</view>
+        <view class="right-column" >{{item.return_dateDateStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放时间：</view>
+        <view class="right-column" >{{item.pick_dateTimeStr}}</view>
+        <view class="left-column" >归还时间：</view>
+        <view class="right-column" >{{item.return_dateTimeStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >发放人：</view>
+        <view class="right-column" >{{item.pickStaff.name}}</view>
+        <view class="left-column" >接受人：</view>
+        <view class="right-column" >{{item.pickStaff.name}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >损坏赔偿：</view>
+        <view class="right-column" >{{item.repairationAmountStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >押金：</view>
+        <view class="right-column" >{{rental.totalGuarantyAmountStr}}</view>
+        <view class="left-column" >租金单价：</view>
+        <view class="right-column" >——</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >起租日期：</view>
+        <view class="right-column" >{{rental.start_dateDateStr}}</view>
+        <view class="left-column" >退租日期：</view>
+        <view class="right-column" >{{rental.end_dateDateStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >起租时间：</view>
+        <view class="right-column" >{{rental.start_dateTimeStr}}</view>
+        <view class="left-column" >退租时间：</view>
+        <view class="right-column" >{{rental.end_dateTimeStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >租金小计：</view>
+        <view class="right-column" >{{rental.totalRentalAmountStr}}</view>
+        <view class="left-column" >超时费：</view>
+        <view class="right-column" >{{rental.totalOvertimeAmountStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >优惠券减免：</view>
+        <view class="right-column" >{{rental.ticketDiscountAmountStr}}</view>
+        <view class="left-column" >额外减免：</view>
+        <view class="right-column" >{{rental.othersDiscountAmountStr}}</view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" >赔偿总额：</view>
+        <view class="right-column" >{{rental.totalRepairationAmountStr}}</view>
+        <view class="left-column" >应付小计：</view>
+        <view class="right-column" >{{rental.summaryStr}}</view>
       </view>
     </mp-cell>
   </mp-cells>
