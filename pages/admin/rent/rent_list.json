@@ -2,7 +2,8 @@
   "usingComponents": {
     "shop-selector": "/components/shop_selector/shop_selector",
     "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell"
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "order-summary": "/components/rent/order_summary"
   },
   "navigationBarTitleText": "租赁列表"
 }
