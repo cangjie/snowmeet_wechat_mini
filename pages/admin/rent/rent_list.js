@@ -84,7 +84,7 @@ Page({
             }
             
             orders[i].deposit_final_str = util.showAmount(orders[i].deposit_final)
-            totalPaid = totalPaid + orders[i].totalCharge
+            totalPaid = totalPaid + orders[i].totalGuarantyAmount
             totalRefund = totalRefund + orders[i].refund
             if (orders[i].discount > 0 || orders[i].ticketDiscount > 0
               || orders[i].noDeposit ||  orders[i].status == '已退款'
