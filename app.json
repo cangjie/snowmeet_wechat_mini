@@ -148,7 +148,8 @@
     "pages/admin/sale/enterain_form",
     "pages/admin/sale/supplement",
     "pages/admin/maintain/task_detail",
-    "pages/admin/rent/rent_details"
+    "pages/admin/rent/rent_details",
+    "pages/test/firstUI/first_test"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -217,5 +218,10 @@
         "pay_temp"
       ]
     }
-  ]
+  ],
+  "usingComponents": {
+    "fui-button": "components/firstui/fui-button/fui-button",
+    "fui-collapse": "components/firstui/fui-collapse/fui-collapse",
+    "fui-collapse-item": "components/firstui/fui-collapse-item/fui-collapse-item"
+  }
 }

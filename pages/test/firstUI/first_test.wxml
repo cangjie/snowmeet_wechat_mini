@@ -1,0 +1,8 @@
+<fui-button text="默认按钮"></fui-button>
+<fui-collapse-item bindchange="change">
+  <view class="fui-item__box">
+	<image src="/static/images/common/logo.png" class="fui-logo"></image>
+	<text>First UI</text>
+  </view>
+  <view class="fui-descr" slot="content">First UI 是一套基于微信小程序开发的组件化、可复用、易扩展、低耦合的跨平台移动端UI 组件库。</view>
+</fui-collapse-item>

@@ -3,6 +3,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "firstUI",
+          "pathName": "pages/test/firstUI/first_test",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "pay temp order",
           "pathName": "pages/payment/pay_recept",
           "query": "id=19259",

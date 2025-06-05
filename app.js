@@ -1,6 +1,8 @@
+import fuiConfig from './components/firstui/fui-config/index'
 var util = require('./utils/util.js')
 App({
   onLaunch: function (res) {
+    wx.$fui = fuiConfig
     const updateManager = wx.getUpdateManager()
     this.globalData.scene = res.scene
     updateManager.onCheckForUpdate(function (res) {
@@ -113,7 +115,6 @@ App({
     this.domainName = domain
     this.requestPrefix = 'https://' + this.domainName + '/api/'
   },
-
   globalData: {
     appId: 'wxd1310896f2aa68bb',
     domainName: 'mini.snowmeet.top',
