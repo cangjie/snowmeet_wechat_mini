@@ -70,37 +70,44 @@ Page({
     app.loginPromiseNew.then(function (resolve) {
       that.setData({ role: app.globalData.role })
       if (that.data.role != 'staff') {
-        return
+        //return
       }
-      var getScanIdUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetInterviewId?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: getScanIdUrl,
-        method: 'GET',
-        success: (res) => {
-          console.log('get interview id', res)
-          if (res.statusCode != 200) {
-            return
+      var getQrUrl = app.globalData.requestPrefix + 'QrCode/CreateNewScanQrCodeByStaff?code=' + encodeURIComponent('recept_interact_id') + '&scene=' + encodeURIComponent('店铺接待') + '&purpose=' + encodeURIComponent('用户身份验证') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+      util.performWebRequest(getQrUrl, null).then(function (resolve){
+        console.log('resolve', resolve)
+        var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + resolve.code
+        wx.request({
+          url: getQRUrl,
+          method: 'GET',
+          success:(res)=>{
+            that.setData({ qrcodeUrl: res.data })
+            wx.connectSocket({
+              url: 'wss://' + app.globalData.domainName + '/ws',
+              header:{
+                'content-type': 'application/json'
+              }
+            })
+            wx.onSocketOpen((result) => {
+              console.log('socket open')
+              wx.sendSocketMessage({
+                data: 'test',
+              })
+              wx.onSocketMessage((result) => {
+                console.log('socket message', result)
+              })
+              wx.onSocketClose((result) => {
+                console.log('socket closed')
+              })
+            })
           }
-          var id = res.data
-          if (id <= 0) {
-            return
-          }
-          var interVal = setInterval(that.checkScan, 1000)
-          var scene = 'recept_interact_id_' + id
-          var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scene
-          wx.request({
-            url: getQRUrl,
-            method: 'GET',
-            success: (res) => {
-              console.log('get qrcode', res)
-              that.setData({ qrcodeUrl: res.data })
-            }
-          })
-          that.setData({ interVal: interVal, actId: id })
-        }
+        })
+      }).then(function(reject){
+
       })
+     
     })
   },
+  /*
   checkScan() {
     var that = this
     var checkScanUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetScanInfo/' + that.data.actId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -162,6 +169,7 @@ Page({
       }
     })
   },
+  */
   goDirectly() {
     var that = this
     var interval = that.data.interVal
@@ -190,6 +198,7 @@ Page({
    */
   onHide() {
     console.log('hide')
+    wx.closeSocket()
   },
 
   /**
@@ -197,10 +206,13 @@ Page({
    */
   onUnload() {
     console.log('unload')
+    wx.closeSocket()
+    /*
     var that = this
     if (that.data.interVal != undefined && that.data.interVal > 0) {
       clearInterval(that.data.interVal)
     }
+    */
   },
 
   /**
