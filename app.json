@@ -222,6 +222,9 @@
   "usingComponents": {
     "fui-button": "components/firstui/fui-button/fui-button",
     "fui-collapse": "components/firstui/fui-collapse/fui-collapse",
-    "fui-collapse-item": "components/firstui/fui-collapse-item/fui-collapse-item"
+    "fui-collapse-item": "components/firstui/fui-collapse-item/fui-collapse-item",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "shop-selector": "/components/shop_selector/shop_selector"
   }
 }
