@@ -103,7 +103,6 @@ App({
     catch {
       domainName = 'snowmeet.wanlonghuaxue.com'
       fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domainName, 'utf-8')
-      //fileManager.closeSync()
     }
     this.globalData.requestPrefix = 'https://' + domainName + '/api/'
     return domainName
@@ -124,6 +123,8 @@ App({
     sessionKey: '',
     cellNumber: '',
     role: '',
+    isWebsocketOpen: false,
+    //wssUrl: 'wss://' + domainName + '/ws',
     adminTabbarItem: [
       {
         "text": "养护",
@@ -152,21 +153,12 @@ App({
       }
     ],
     userTabBarItem: [
-      /*
-      {
-        "pagePath": "/pages/index/index",
-        "text": "装备",
-        "iconPath": "/images/equip.jpg",
-        "selectedIconPath": "/images/equip.jpg"
-      },
-      */
       {
         "pagePath": "/pages/ski_pass/ski_pass_selector",
         "text": "雪票",
         "iconPath": "/images/book-3-line.png",
         "selectedIconPath": "/images/book-3-line-hl.png"
       },
-
       {
         "pagePath": "/pages/mine/mine",
         "text": "我的",

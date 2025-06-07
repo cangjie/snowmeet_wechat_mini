@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    retryTimes: 0
+    retryTimes: 0,
+    
   },
 
   searchUser() {
@@ -68,44 +69,165 @@ Page({
   onLoad(options) {
     var that = this
     app.loginPromiseNew.then(function (resolve) {
-      that.setData({ role: app.globalData.role })
-      if (that.data.role != 'staff') {
-        //return
+      //that.setData({ role: app.globalData.role })
+      that.refreshQrCode()
+    })
+  },
+  refreshQrCode(){
+    var that = this
+    var getQrUrl = app.globalData.requestPrefix + 'QrCode/CreateNewScanQrCodeByStaff?code=' + encodeURIComponent('recept_interact_id') + '&scene=' + encodeURIComponent('店铺接待') + '&purpose=' + encodeURIComponent('用户身份验证') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    util.performWebRequest(getQrUrl, null).then(function (resolve){
+      var scanQrCode = resolve
+      console.log('scan code', scanQrCode)
+      that.setData({scanQrCode})
+      var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scanQrCode.code
+      wx.request({
+        url: getQRUrl,
+        method: 'GET',
+        success:(res)=>{
+          that.setData({ qrcodeUrl: res.data })
+          var socketTask = that.data.socketTask
+          if (socketTask == undefined){
+            that.startWebSocketQuery()
+          }
+          else{
+
+          }
+          /*
+          if (app.globalData.isWebsocketOpen){
+            wx.closeSocket()
+          }
+          setTimeout(that.startWebSocketQuery, 100)
+          */
+        }
+      })
+    }).catch(function (reject){
+
+    })
+  },
+  startWebSocketQuery(){
+    var that = this
+    if (app.globalData.isWebsocketOpen){
+      wx.closeSocket()
+    }
+    var socketTask = that.data.socketTask
+    if (socketTask == undefined){
+      socketTask = wx.connectSocket({
+        url: 'wss://' + app.globalData.domainName + '/ws',
+        header:{'content-type': 'application/json'}
+      })
+      that.setData({socketTask})
+    }
+    else{
+      console.log('new socket', socketTask)
+      socketTask = wx.connectSocket({
+        url: 'wss://' + app.globalData.domainName + '/ws',
+        header:{'content-type': 'application/json'}
+      })
+      that.setData({socketTask})
+    }
+    //that.setData({socketTask})
+    socketTask.onError((res)=>{
+      that.socketError()
+    })
+    socketTask.onMessage((res)=>{
+      that.socketMessage(res)
+    })
+    socketTask.onOpen((res)=>{
+      that.socketOpen(res)
+    })
+    socketTask.onClose((res)=>{
+      that.socketClose()
+    })
+    /*
+    wx.onSocketError((result) => {
+      that.socketError()
+    })
+    wx.onSocketOpen((result) => {
+      that.socketOpen(result)
+    }),
+    wx.onSocketMessage((result) => {
+      that.socketMessage(result)
+    }),
+    wx.onSocketClose(()=>{
+      that.socketClose()
+    })
+    */
+  },
+  socketError(res){
+
+  },
+  socketOpen(res){
+    var that = this
+    app.globalData.isWebsocketOpen = true
+    var socketTask = that.data.socketTask
+    var socketCmd = {
+      command: 'queryqrscan',
+      id: that.data.scanQrCode.id
+    }
+    var cmdStr = JSON.stringify(socketCmd)
+    socketTask.send({
+      data: cmdStr,
+      success:(res)=>{
+        console.log('send command', cmdStr)
       }
-      var getQrUrl = app.globalData.requestPrefix + 'QrCode/CreateNewScanQrCodeByStaff?code=' + encodeURIComponent('recept_interact_id') + '&scene=' + encodeURIComponent('店铺接待') + '&purpose=' + encodeURIComponent('用户身份验证') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-      util.performWebRequest(getQrUrl, null).then(function (resolve){
-        console.log('resolve', resolve)
-        var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + resolve.code
-        wx.request({
-          url: getQRUrl,
-          method: 'GET',
-          success:(res)=>{
-            that.setData({ qrcodeUrl: res.data })
-            wx.connectSocket({
-              url: 'wss://' + app.globalData.domainName + '/ws',
-              header:{
-                'content-type': 'application/json'
-              }
-            })
-            wx.onSocketOpen((result) => {
-              console.log('socket open')
-              wx.sendSocketMessage({
-                data: 'test',
+    })
+  },
+  socketMessage(res){
+    console.log('socket message', res)
+    var that = this
+    var msg = JSON.parse(res.data)
+    var scanQrCode = msg.data
+    wx.closeSocket()
+    if (msg.code == 1 || scanQrCode.scaned == 0){
+      if (msg.code == 1){
+        wx.showModal({
+          title: '二维码超过获取次数限制',
+          content: '点击确认，刷新二维码，让顾客重新扫码；点击取消返回上一页',
+          complete: (res) => {
+            wx.closeSocket()
+            if (res.cancel) {
+              wx.navigateBack()
+            }
+            if (res.confirm) {
+              wx.reLaunch({
+                url: 'recept_entry',
               })
-              wx.onSocketMessage((result) => {
-                console.log('socket message', result)
-              })
-              wx.onSocketClose((result) => {
-                console.log('socket closed')
-              })
-            })
+            }
           }
         })
-      }).then(function(reject){
-
+      }
+      else {
+        wx.showModal({
+          title: '二维码等待超时',
+          content: '点击确认，刷新二维码，让顾客重新扫码；点击取消返回上一页',
+          complete: (res) => {
+            if (res.cancel) {
+              wx.navigateBack()
+            }
+            if (res.confirm) {
+              that.refreshQrCode()
+            }
+          }
+        })
+      }
+    }
+    else{
+    }
+  },
+  socketClose(){
+    console.log('socket is closed')
+    /*
+    var that = this
+    app.globalData.isWebsocketOpen = false
+    setTimeout(() => {
+      wx.showToast({
+        title: '网络连接中断',
+        icon: 'none'
       })
-     
-    })
+      wx.navigateBack()
+    }, 1000);
+    */
   },
   /*
   checkScan() {
@@ -198,7 +320,24 @@ Page({
    */
   onHide() {
     console.log('hide')
-    wx.closeSocket()
+    var that = this
+    var socketTask = that.data.socketTask
+    if (socketTask){
+      socketTask.close({
+        success:()=>{
+          console.log('socket ready to close')
+        }
+      })
+    }
+    /*
+    if (app.globalData.isWebsocketOpen){
+      wx.closeSocket({
+        success:()=>{
+          console.log('socket closed')
+        }
+      })
+    }
+    */
   },
 
   /**
@@ -206,7 +345,15 @@ Page({
    */
   onUnload() {
     console.log('unload')
-    wx.closeSocket()
+    var that = this
+    var socketTask = that.data.socketTask
+    if (socketTask){
+      socketTask.close({
+        success:()=>{
+          console.log('socket ready to close')
+        }
+      })
+    }
     /*
     var that = this
     if (that.data.interVal != undefined && that.data.interVal > 0) {
