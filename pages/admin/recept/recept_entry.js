@@ -2,74 +2,34 @@
 const app = getApp()
 const util = require('../../../utils/util.js')
 Page({
-
-  /**
-   * Page initial data
-   */
   data: {
     retryTimes: 0,
-    
+    overTime: false
   },
-
-  searchUser() {
+  searchUser(){
     var that = this
     var cell = that.data.cell
-    var getUserUrl = 'https://' + app.globalData.domainName + '/core/Member/GetMemberByCell/' + cell + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getUserUrl,
-      method: 'GET',
-      success: (res) => {
-        console.log('get user', res)
-        if (res.statusCode != 200) {
-          wx.showToast({
-            title: '不是会员请扫码注册。',
-            icon: 'error'
-          })
-          return
-        }
-        var member = res.data
+    var scanQrCode = that.data.scanQrCode
+    var authUrl = app.globalData.requestPrefix + 'QrCode/QueryCell/' + scanQrCode.id.toString() + '?cell=' + cell + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(authUrl, null).then(function(resovle){
+      console.log('auth cell', resovle)
+      that.setData({scanQrcode: resolve})
+    }).catch(function(reject){
 
-        var openId = util.getMemberInfo(member, 'wechat_mini_openid')
-        if (app.globalData.userInfo.is_admin == 1 || app.globalData.userInfo.is_manager == 1) {
-          var interval = that.data.interVal
-          clearInterval(interval)
-          wx.navigateTo({
-            url: 'recept_member_info?openId=' + openId,
-          })
-        }
-        else{
-          wx.showToast({
-            title: '请等待店长授权',
-            icon: 'loading',
-            duration: 600000
-          })
-          var setUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/SetOpenIdByCell/' + that.data.actId + '?cell=' + that.data.cell + '&openId=' + openId + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-          wx.request({
-            url: setUrl,
-            method: 'GET'
-          })
-        }
-        /*
-        
-        */
-      }
     })
   },
-
   cellChanged(e) {
     console.log('cell changed', e)
     var that = this
     var cell = e.detail.value
     that.setData({ cell: cell })
   },
-
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
     var that = this
     app.loginPromiseNew.then(function (resolve) {
-      //that.setData({ role: app.globalData.role })
       that.refreshQrCode()
     })
   },
@@ -79,26 +39,14 @@ Page({
     util.performWebRequest(getQrUrl, null).then(function (resolve){
       var scanQrCode = resolve
       console.log('scan code', scanQrCode)
-      that.setData({scanQrCode})
+      that.setData({scanQrCode, cell: ''})
       var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scanQrCode.code
       wx.request({
         url: getQRUrl,
         method: 'GET',
         success:(res)=>{
           that.setData({ qrcodeUrl: res.data })
-          var socketTask = that.data.socketTask
-          if (socketTask == undefined){
-            that.startWebSocketQuery()
-          }
-          else{
-
-          }
-          /*
-          if (app.globalData.isWebsocketOpen){
-            wx.closeSocket()
-          }
-          setTimeout(that.startWebSocketQuery, 100)
-          */
+          that.startWebSocketQuery()
         }
       })
     }).catch(function (reject){
@@ -107,26 +55,13 @@ Page({
   },
   startWebSocketQuery(){
     var that = this
-    if (app.globalData.isWebsocketOpen){
-      wx.closeSocket()
-    }
     var socketTask = that.data.socketTask
-    if (socketTask == undefined){
-      socketTask = wx.connectSocket({
-        url: 'wss://' + app.globalData.domainName + '/ws',
-        header:{'content-type': 'application/json'}
-      })
-      that.setData({socketTask})
-    }
-    else{
-      console.log('new socket', socketTask)
-      socketTask = wx.connectSocket({
-        url: 'wss://' + app.globalData.domainName + '/ws',
-        header:{'content-type': 'application/json'}
-      })
-      that.setData({socketTask})
-    }
-    //that.setData({socketTask})
+    socketTask = wx.connectSocket({
+      url: 'wss://' + app.globalData.domainName + '/ws',
+      header:{'content-type': 'application/json'}
+    })
+    socketTask.isReplied = false
+    that.setData({socketTask})
     socketTask.onError((res)=>{
       that.socketError()
     })
@@ -134,28 +69,15 @@ Page({
       that.socketMessage(res)
     })
     socketTask.onOpen((res)=>{
+      console.log('socket open')
       that.socketOpen(res)
     })
     socketTask.onClose((res)=>{
-      that.socketClose()
+      that.socketClosed()
     })
-    /*
-    wx.onSocketError((result) => {
-      that.socketError()
-    })
-    wx.onSocketOpen((result) => {
-      that.socketOpen(result)
-    }),
-    wx.onSocketMessage((result) => {
-      that.socketMessage(result)
-    }),
-    wx.onSocketClose(()=>{
-      that.socketClose()
-    })
-    */
   },
   socketError(res){
-
+    console.log('socket error')
   },
   socketOpen(res){
     var that = this
@@ -178,56 +100,67 @@ Page({
     var that = this
     var msg = JSON.parse(res.data)
     var scanQrCode = msg.data
-    wx.closeSocket()
-    if (msg.code == 1 || scanQrCode.scaned == 0){
-      if (msg.code == 1){
-        wx.showModal({
-          title: '二维码超过获取次数限制',
-          content: '点击确认，刷新二维码，让顾客重新扫码；点击取消返回上一页',
-          complete: (res) => {
-            wx.closeSocket()
-            if (res.cancel) {
-              wx.navigateBack()
-            }
-            if (res.confirm) {
-              wx.reLaunch({
-                url: 'recept_entry',
-              })
-            }
-          }
-        })
+    var socketTask = that.data.socketTask
+    socketTask.isReplied = true
+    that.setData({scanQrCode, socketTask})
+    socketTask.close({
+      success:()=>{
+        console.log('socket will be closed')
       }
-      else {
-        wx.showModal({
-          title: '二维码等待超时',
-          content: '点击确认，刷新二维码，让顾客重新扫码；点击取消返回上一页',
-          complete: (res) => {
-            if (res.cancel) {
-              wx.navigateBack()
-            }
-            if (res.confirm) {
-              that.refreshQrCode()
-            }
-          }
-        })
-      }
-    }
-    else{
-    }
+    })
   },
-  socketClose(){
+  socketClosed(){
     console.log('socket is closed')
-    /*
     var that = this
-    app.globalData.isWebsocketOpen = false
-    setTimeout(() => {
-      wx.showToast({
-        title: '网络连接中断',
-        icon: 'none'
+    var socketTask = that.data.socketTask
+    var scanQrCode = that.data.scanQrCode
+    var title = undefined
+    var content = undefined
+    if (socketTask && !socketTask.isReplied){
+      title = '网络中断'
+      content = '点击确认重新连接，点击取消回到上一页。'
+    }
+    else if (scanQrCode && scanQrCode.scaned == 0 && scanQrCode.stoped == 0 && scanQrCode.authed == 0){
+      title = '二维码超时'
+      content = '点击确认刷新二维码，点击取消回到上一页。'
+    }
+    if (title && content){
+      wx.showModal({
+        title: title,
+        content: content,
+        complete: (res) => {
+          if (res.cancel) {
+            wx.navigateBack()
+          }
+          if (res.confirm) {
+            switch(title){
+              case '网络中断':
+                that.startWebSocketQuery()
+                break
+              case '二维码超时':
+                that.refreshQrCode()
+                break
+              default:
+                break
+            }
+          }
+        }
       })
-      wx.navigateBack()
-    }, 1000);
-    */
+      return
+    }
+
+
+
+
+
+  },
+  closeSocket(){
+    var that = this
+    var scanQrCode = that.data.scanQrCode
+    var closeUrl = app.globalData.requestPrefix + 'QrCode/StopQeryScan/' + scanQrCode.id.toString() + '?sessionKey=' + app.globalData.sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    util.performWebRequest(closeUrl, undefined).then(function(resolve){
+      console.log('socket will be closed', resolve)
+    })
   },
   /*
   checkScan() {
@@ -321,23 +254,7 @@ Page({
   onHide() {
     console.log('hide')
     var that = this
-    var socketTask = that.data.socketTask
-    if (socketTask){
-      socketTask.close({
-        success:()=>{
-          console.log('socket ready to close')
-        }
-      })
-    }
-    /*
-    if (app.globalData.isWebsocketOpen){
-      wx.closeSocket({
-        success:()=>{
-          console.log('socket closed')
-        }
-      })
-    }
-    */
+    that.closeSocket()
   },
 
   /**
@@ -346,20 +263,7 @@ Page({
   onUnload() {
     console.log('unload')
     var that = this
-    var socketTask = that.data.socketTask
-    if (socketTask){
-      socketTask.close({
-        success:()=>{
-          console.log('socket ready to close')
-        }
-      })
-    }
-    /*
-    var that = this
-    if (that.data.interVal != undefined && that.data.interVal > 0) {
-      clearInterval(that.data.interVal)
-    }
-    */
+    that.closeSocket()
   },
 
   /**
