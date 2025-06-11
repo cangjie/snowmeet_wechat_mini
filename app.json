@@ -225,6 +225,7 @@
     "fui-collapse-item": "components/firstui/fui-collapse-item/fui-collapse-item",
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
-    "shop-selector": "/components/shop_selector/shop_selector"
+    "shop-selector": "/components/shop_selector/shop_selector",
+    "member-info": "/components/user_info/member_info"
   }
 }

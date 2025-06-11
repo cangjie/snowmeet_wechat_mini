@@ -225,6 +225,11 @@ Component({
       })
     }
 
+  },
+  pageLifetimes:{
+    show(){
+      console.log('page component show')
+    }
   }
 
 })

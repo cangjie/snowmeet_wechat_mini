@@ -11,8 +11,15 @@ Page({
     var cell = that.data.cell
     var scanQrCode = that.data.scanQrCode
     var authUrl = app.globalData.requestPrefix + 'QrCode/QueryCell/' + scanQrCode.id.toString() + '?cell=' + cell + '&sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(authUrl, null).then(function(resovle){
-      console.log('auth cell', resovle)
+    util.performWebRequest(authUrl, null).then(function(resolve){
+      console.log('auth cell', resolve)
+      var scanQrCode = resolve
+      if (scanQrCode.authed == 0){
+        wx.showToast({
+          title: '需要店长授权',
+          icon: 'error'
+        })
+      }
       that.setData({scanQrcode: resolve})
     }).catch(function(reject){
 
@@ -28,10 +35,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    var that = this
-    app.loginPromiseNew.then(function (resolve) {
-      that.refreshQrCode()
-    })
+    
   },
   refreshQrCode(){
     var that = this
@@ -45,7 +49,7 @@ Page({
         url: getQRUrl,
         method: 'GET',
         success:(res)=>{
-          that.setData({ qrcodeUrl: res.data })
+          that.setData({ qrcodeUrl: res.data, cell: '' })
           that.startWebSocketQuery()
         }
       })
@@ -116,6 +120,11 @@ Page({
     var scanQrCode = that.data.scanQrCode
     var title = undefined
     var content = undefined
+    if (scanQrCode.scaner_member_id){
+      wx.navigateTo({
+        url: 'recept_member_info?memberId=' + scanQrCode.scaner_member_id.toString()
+      })
+    }
     if (socketTask && !socketTask.isReplied){
       title = '网络中断'
       content = '点击确认重新连接，点击取消回到上一页。'
@@ -245,7 +254,12 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    that.setData({cell: ''})
+    app.loginPromiseNew.then(function (resolve) {
+      that.refreshQrCode()
+      
+    })
   },
 
   /**

@@ -1,0 +1,44 @@
+<mp-cells title="顾客基本信息"   >
+  <mp-cell>
+    <radio-group style="text-align: center;"  >
+      <radio class="left-column" checked="{{member && member.id}}" disabled="{{true}}" > 会员 </radio>
+      <radio class="right-column" checked="{{!member || !member.id}}" disabled="{{true}}" > 散客 </radio>
+    </radio-group>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >手机号：</view>
+      <view class="right-column"  style="display: flex;flex-direction: row;">
+        <input id="cell" value="{{member.cell}}" placeholder="输入手机号" bindinput="userInfoChanged" style="width: 250rpx;" class="input" />
+        <button size="mini" bindtap="call" class="input" >拨打</button>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row"  >
+      <view class="left-column" >顾客称呼：</view>
+      <view class="right-column" style="display: flex;" >
+        <input style="width: 150rpx;" id="real_name" placeholder="您贵姓？" bindinput="userInfoChanged" value="{{member.real_name}}" class="input" />
+        <radio-group id="gender" bindchange="userInfoChanged" >
+          <radio checked="{{member.gender=='男'}}" value="男" >先生</radio><radio checked="{{member.gender=='女'}}" value="女" >女士</radio>
+        </radio-group>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row"  >
+      <view class="left-column" style="width: 190rpx;" >总计储值：</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.totalDepositStr}}</view>
+      <view class="left-column" style="width: 190rpx;" >可用储值：</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.avaliableDepositStr}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row"  >
+      <view class="left-column" style="width: 190rpx;" >总计龙珠：</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.totalPoints}}</view>
+      <view class="left-column" style="width: 190rpx;" >可用龙珠：</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.avaliablePoints}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>

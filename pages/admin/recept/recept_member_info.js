@@ -1,3 +1,5 @@
+const util = require("../../../utils/util")
+
 // pages/admin/recept/recept_member_info.js
 const app = getApp()
 Page({
@@ -13,7 +15,18 @@ Page({
     valid: false,
     invalid: true
   },
+  getMemberInfo(e){
+    console.log('get member info', e)
+  },
+  getUpdatedMemberInfo(e){
+    console.log('updated member info', e)
+    var that = this
+    var updatedMember = e.detail
+    that.setData({updatedMember, needUpdate: true})
+  },
 
+
+  /*
   userInfoUpdate(e){
     console.log('user info update', e)
     var that = this
@@ -28,8 +41,19 @@ Page({
     that.setData({needUpdate: true, userInfo: userInfo, valid: valid})
     //that.updateUserInfo()
   },
-
+  */
   updateUserInfo(){
+    var that = this
+    var updatedMember = that.data.updatedMember
+    var updateUrl = app.globalData.requestPrefix + 'Member/UpdateMemberInfo?scene=' + encodeURIComponent('开单') + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, updatedMember).then(function (resolve) {
+      console.log('member info updated', resolve)
+    }).catch(function(reject){
+
+    })
+
+  }, 
+  updateUserInfo1(){
     var that = this
     var updateUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateMiniUser?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
@@ -144,13 +168,15 @@ Page({
    */
   onLoad(options) {
     var that = this
-    if (options.openId != undefined){
-      that.setData({openId: options.openId})
+    if (options.memberId != undefined){
+      that.setData({memberId: options.memberId})
     }
+    /*
     if (options.code != undefined){
       that.setData({code: options.code})
     }
     that.getScore()
+    */
   },
 
   onShow(){
