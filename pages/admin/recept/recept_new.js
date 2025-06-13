@@ -1,4 +1,4 @@
-// pages/admin/recept/verify_items.js
+// pages/admin/recept/recept_new.js
 Page({
 
   /**
@@ -12,15 +12,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    var that = this
-    var type = options.type
-    var memberId = options.memberId
-    if (type){
-      that.setData({type})
-    }
-    if (memberId){
-      that.setData({memberId})
-    }
+
   },
 
   /**
@@ -70,11 +62,5 @@ Page({
    */
   onShareAppMessage() {
 
-  },
-  gotoNext(){
-    var that = this
-    wx.navigateTo({
-      url: 'recept_new?type=' + that.data.type + '&memberId=' + that.data.memberId,
-    })
   }
 })

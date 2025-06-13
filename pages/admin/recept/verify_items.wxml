@@ -56,6 +56,6 @@
     </mp-cell>
   </mp-cells>
   <view style="margin-top: 100rpx;" >
-    <button class="input" > 下 一 步 </button>
+    <button class="input" bindtap="gotoNext" > 下 一 步 </button>
   </view>
 </view>

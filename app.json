@@ -150,7 +150,8 @@
     "pages/admin/maintain/task_detail",
     "pages/admin/rent/rent_details",
     "pages/test/firstUI/first_test",
-    "pages/admin/recept/verify_items"
+    "pages/admin/recept/verify_items",
+    "pages/admin/recept/recept_new"
   ],
   "window": {
     "backgroundTextStyle": "light",
