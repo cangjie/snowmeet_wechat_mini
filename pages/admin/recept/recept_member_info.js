@@ -111,8 +111,18 @@ Page({
     }
     that.setData({shop: e.detail.shop, invalid})
   },
-
   gotoFlow(e){
+    var that = this
+    var id = e.currentTarget.id
+    var naviUrl = 'verify_items?memberId=' + that.data.memberId + '&type=' + id
+    if (id=='sale'){
+      naviUrl = 'recept_new?type=' + id +'&memberId=' + that.data.memberId
+    }
+    wx.navigateTo({
+      url: naviUrl,
+    })
+  },
+  gotoFlow1(e){
     var that = this
     that.updateUserInfo()
     var id = e.currentTarget.id

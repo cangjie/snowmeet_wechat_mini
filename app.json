@@ -149,7 +149,8 @@
     "pages/admin/sale/supplement",
     "pages/admin/maintain/task_detail",
     "pages/admin/rent/rent_details",
-    "pages/test/firstUI/first_test"
+    "pages/test/firstUI/first_test",
+    "pages/admin/recept/verify_items"
   ],
   "window": {
     "backgroundTextStyle": "light",

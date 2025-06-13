@@ -157,11 +157,6 @@ Page({
       })
       return
     }
-
-
-
-
-
   },
   closeSocket(){
     var that = this
@@ -171,85 +166,12 @@ Page({
       console.log('socket will be closed', resolve)
     })
   },
-  /*
-  checkScan() {
-    var that = this
-    var checkScanUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetScanInfo/' + that.data.actId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: checkScanUrl,
-      success: (res) => {
-        console.log('check scan', res)
-        if (res.statusCode != 200 && res.statusCode != 404) {
-          if (that.data.retryTimes >= 10) {
-            clearInterval(that.data.interVal)
-            wx.showToast({
-              title: '网络不通',
-              icon: 'error'
-            })
-          }
-          else {
-            that.data.retryTimes++
-          }
-        }
-        else if (res.statusCode == 200) {
-          that.data.retryTimes = 0
-          var scan = res.data
-          var needJump = false
-          if (scan.scan == 1) {
-            var word = '顾客已扫码。'
-            if (scan.member == null || scan.member.cell == null || scan.member.cell == '') {
-              word = '顾客不是会员，必须填写手机号。'
-            }
-            else {
-              word = ''
-              clearInterval(that.data.interVal)
-              needJump = true
-            }
-            if (word != '') {
-              wx.showToast({
-                title: word,
-                duration: 2000
-              })
-            }
-            if (needJump) {
-              clearInterval(that.data.interVal)
-              var jumpUrl = 'recept_member_info?openId=' + res.data.member.wechatMiniOpenId
-              wx.redirectTo({
-                url: jumpUrl,
-              })
-            }
-          }
-        }
-        else {
-          that.data.retryTimes = 0
-        }
-      },
-      fail: (res) => {
-        clearInterval(that.data.interVal)
-        wx.showToast({
-          title: '手机硬件故障',
-          icon: 'error'
-        })
-      }
-    })
-  },
-  */
-  goDirectly() {
-    var that = this
-    var interval = that.data.interVal
-    clearInterval(interval)
-    wx.navigateTo({
-      url: 'select_shop_business',
-    })
-  },
-
   /**
    * Lifecycle function--Called when page is initially rendered
    */
   onReady() {
 
   },
-
   /**
    * Lifecycle function--Called when page show
    */
@@ -258,10 +180,8 @@ Page({
     that.setData({cell: ''})
     app.loginPromiseNew.then(function (resolve) {
       that.refreshQrCode()
-      
     })
   },
-
   /**
    * Lifecycle function--Called when page hide
    */
@@ -286,18 +206,21 @@ Page({
   onPullDownRefresh() {
 
   },
-
   /**
    * Called when page reach bottom
    */
   onReachBottom() {
 
   },
-
   /**
    * Called when user click on the top right corner to share
    */
   onShareAppMessage() {
 
+  },
+  unRegGoDirect(){
+    wx.navigateTo({
+      url: 'recept_member_info',
+    })
   }
 })

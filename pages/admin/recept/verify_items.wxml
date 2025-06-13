@@ -1,0 +1,61 @@
+<view>
+  <mp-cells title="订单号：WL_YH_211204_16123 日期：2025-12-01">
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 75rpx;" >
+          <checkbox></checkbox>
+        </view>
+        <view class="right-column" style="width: 500rpx;" >
+          <view style="width: 500rpx;" >适用门店：万龙服务中心</view>
+          <view style="width: 500rpx;" >产品名称：万龙雪票送打蜡</view>
+          <view style="width: 500rpx;" >产品说明：现场打蜡立等可取</view>
+          <view style="width: 500rpx;" >使用期限：2025-12-01 -- 2026-01-15</view>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 75rpx;" >
+          <checkbox></checkbox>
+        </view>
+        <view class="right-column" style="width: 500rpx;" >
+          <view style="width: 500rpx;" >适用门店：万龙服务中心</view>
+          <view style="width: 500rpx;" >产品名称：万龙雪票送贴膜</view>
+          <view style="width: 500rpx;" >产品说明：现场贴膜立等可取</view>
+          <view style="width: 500rpx;" >使用期限：2025-12-01 -- 2026-01-15</view>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="订单号：NS_YH_211204_16123 日期：2025-12-01">
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 75rpx;" >
+          <checkbox></checkbox>
+        </view>
+        <view class="right-column" style="width: 500rpx;" >
+          <view style="width: 500rpx;" >适用门店：南山服务中心</view>
+          <view style="width: 500rpx;" >产品名称：南山雪票送打蜡</view>
+          <view style="width: 500rpx;" >产品说明：现场打蜡立等可取</view>
+          <view style="width: 500rpx;" >使用期限：2025-12-01 -- 2026-01-15</view>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 75rpx;" >
+          <checkbox></checkbox>
+        </view>
+        <view class="right-column" style="width: 500rpx;" >
+          <view style="width: 500rpx;" >适用门店：南山服务中心</view>
+          <view style="width: 500rpx;" >产品名称：南山雪票送贴膜</view>
+          <view style="width: 500rpx;" >产品说明：现场贴膜立等可取</view>
+          <view style="width: 500rpx;" >使用期限：2025-12-01 -- 2026-01-15</view>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view style="margin-top: 100rpx;" >
+    <button class="input" > 下 一 步 </button>
+  </view>
+</view>

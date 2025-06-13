@@ -1,25 +1,27 @@
 <view>
-  <!--user-info open_id="{{openId}}" bindUserInfoUpdate="userInfoUpdate" bindUserFound="userInfoUpdate" ></user-info-->
   <member-info wx:if="{{memberId}}" memberId="{{memberId}}" onGetMemberInfo="getMemberInfo" onUpdateMemberInfo="getUpdatedMemberInfo" ></member-info>
+  <member-info wx:else  onGetMemberInfo="getMemberInfo" onUpdateMemberInfo="getUpdatedMemberInfo" ></member-info>
   <view style="text-align: center; margin-top: 10rpx;">
     <button size="mini" bindtap="updateUserInfo" disabled="{{!needUpdate}}" class="input" > 更 新</button>
   </view>
-  <ticket wx:if="{{openId!=undefined}}" open_id="{{openId}}" bindTicketSelected="selectTicket" ></ticket>
-  <view style="margin-left: 20rpox; margin-top: 20rpx;display: flex;flex-direction: row;">
-    <view style="text-align: right; width: 200rpx;font-size: 10pt;" >现有龙珠：</view>
-    <view style="text-align: left;" >{{score}}</view>
-    <view style="text-align: right;width: 250rpx; font-size: 10pt;" >总共得到龙珠：</view>
-    <view style="text-align: left;" >{{totalScore}}</view>
-  </view>
-  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+  <mp-cells title="选择店铺" >
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column" ></view>
+        <view class="right-column" >
+          <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="选择业务" >
     <mp-cell style="text-align: center;">
       <view style="display: flex;flex-direction: row;" >
-        <!--button size="mini" disabled="{{shop == ''}}" bindtap="gotoFlow" id="sale" > 店 销 现 货 </button>
-        <view style="width: 20rpx;"></view-->
-        <button size="mini" disabled="{{ shop == '' || openId == '' || invalid }}" bindtap="gotoFlow" id="maintain" class="input"   > 养 护 </button>
+        <button size="mini" disabled="{{ shop == '' || invalid }}" bindtap="gotoFlow" id="sale" class="input" > 零 售 </button>
         <view style="width: 20rpx;"></view>
-        <button size="mini" disabled="{{ shop == '' || openId == '' || invalid }}" bindtap="gotoFlow" id="rent" class="input"  > 租 赁 </button>
+        <button size="mini" disabled="{{ shop == '' || !memberId || invalid }}" bindtap="gotoFlow" id="maintain" class="input" > 养 护 </button>
+        <view style="width: 20rpx;"></view>
+        <button size="mini" disabled="{{ shop == '' || !memberId || invalid }}" bindtap="gotoFlow" id="rent" class="input" > 租 赁 </button>
       </view>
     </mp-cell>
   </mp-cells>
