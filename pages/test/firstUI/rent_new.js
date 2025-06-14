@@ -62,5 +62,14 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  showBackdrop(e){
+    console.log('show back', e)
+    var that = this
+    that.setData({show: true})
+  },
+  close(){
+    var that = this
+    that.setData({show: false})
   }
 })

@@ -1,7 +1,7 @@
 <view style="margin-top: 50rpx;">
   <fui-section title="套餐" lineColor='#FF0000' isLine></fui-section>
   <view style="margin-top: 50rpx;" >
-    <fui-card padding="20rpx 32rpx" full  title="FIS双板套餐" tag="租金已付 待核销">
+    <fui-card padding="10rpx 10rpx" full  title="FIS双板套餐" tag="租金已付 待核销" id="1" bind:click="showBackdrop" >
       <view class="fui-card__content fui-padding view-row">
         <view class="left-column" >押金：</view>
         <view class="right-column" style="text-align: right;" >¥10000.00</view>
@@ -14,16 +14,82 @@
         <view class="left-column" >起租日：</view>
         <view class="right-column" >2025-06-15</view>
       </view>
-      
     </fui-card>
     <fui-collapse-item bindchange="change">
         <view class="fui-item__box">
 	        <image src="/static/images/common/logo.png" class="fui-logo"></image>
 	        <text> 查看详情</text>
         </view>
-        <view class="fui-descr" slot="content">可选：3 必选：2 已选：0</view>
+        <view class="fui-descr" slot="content">
+          <fui-card  title="FIS双板" tag="">
+	          <view class="fui-card__content view-row">
+              <view class="left-column" >编码：</view>
+              <view class="right-column" >001</view>
+              <view class="left-column" >发放：</view>
+              <view class="right-column" >先租后取</view>
+            </view>
+            <view class="fui-card__content view-row">
+              <view class="left-column" >名称：</view>
+              <view class="right-column" style="width: 500rpx;" >Fischer Fis的某板，长度200cm</view>
+            </view>
+          </fui-card>
+        </view>
+        <view class="fui-descr" slot="content">
+          <fui-card  title="高硬度双板鞋" tag="">
+	          <view class="fui-card__content view-row">
+              <view class="left-column" >编码：</view>
+              <view class="right-column" >101</view>
+              <view class="left-column" >发放：</view>
+              <view class="right-column" >已发放</view>
+            </view>
+            <view class="fui-card__content view-row">
+              <view class="left-column" >名称：</view>
+              <view class="right-column" style="width: 500rpx;" >鞋长1米的双板鞋</view>
+            </view>
+          </fui-card>
+        </view>
+        <view class="fui-descr" slot="content">
+          <fui-card  title="全碳纤维棍子" tag="确认不需要">
+	          <view class="fui-card__content view-row">
+              <view class="left-column" >编码：</view>
+              <view class="right-column" >201</view>
+              <view class="left-column" >发放：</view>
+              <view class="right-column" >已发放</view>
+            </view>
+            <view class="fui-card__content view-row">
+              <view class="left-column" >名称：</view>
+              <view class="right-column" style="width: 500rpx;" >自行车前叉改的</view>
+            </view>
+          </fui-card>
+        </view>
       </fui-collapse-item>
   </view>
+  <view style="height: 50rpx;" ></view>
   <fui-section title="单品" lineColor='#FFFF00' isLine></fui-section>
-
+  <view style="height: 50rpx;" ></view>
+  <fui-card padding="10rpx 10rpx" full  title="单板 > 高级单板" tag="租金已付 待核销">
+    <view class="fui-card__content fui-padding view-row">
+      <view class="left-column" >编号：</view>
+      <view class="right-column" style="text-align: right;" >805</view>
+      <view class="left-column" ></view>
+      <view class="right-column" ></view>
+    </view>  
+    <view class="fui-card__content fui-padding view-row">
+      <view class="left-column" >名称：</view>
+      <view class="right-column" style="width: 450rpx;" >COSONE汉人制造的切菜板</view>
+    </view>  
+    <view class="fui-card__content fui-padding view-row">
+      <view class="left-column" >押金：</view>
+      <view class="right-column" style="text-align: right;" >¥10000.00</view>
+      <view class="left-column" >类型：</view>
+      <view class="right-column" >预约租赁</view>
+    </view>
+    <view class="fui-card__content fui-padding view-row">
+      <view class="left-column" >租金：</view>
+      <view class="right-column" style="text-align: right;" >¥1000.00</view>
+      <view class="left-column" >起租日：</view>
+      <view class="right-column" >2025-06-15</view>
+    </view>
+  </fui-card>
 </view>
+<fui-backdrop show="{{show}}" closable bindclick="close"></fui-backdrop>
