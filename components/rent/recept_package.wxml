@@ -21,7 +21,7 @@
     </view>
   </view>
   <view style="height: 20rpx;" ></view>
-  <fui-segmented-control values="{{categories}}" size="20" ></fui-segmented-control>
+  <fui-segmented-control values="{{categories}}" size="20" type="text" activeColor="#C0C0C0" ></fui-segmented-control>
   <view style="height: 20rpx;" ></view>
   <view class="view-row" >
     <view class="left-column" >不需要：</view>

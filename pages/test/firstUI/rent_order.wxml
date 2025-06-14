@@ -1,0 +1,31 @@
+<view>
+  <view class="view-row" >
+    <view class="left-column" >订单号：</view>
+    <view class="right-column" style="width: 450rpx;" >WT_ZL_250620_98765</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >业务日期：</view>
+    <view class="right-column"  >2025-06-20</view>
+    <view class="left-column" >业务时间：</view>
+    <view class="right-column" >10:00:00</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >姓名：</view>
+    <view class="right-column"  >随便叫什么</view>
+    <view class="left-column" >电话：</view>
+    <view class="right-column" >19512345678</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >接待店员：</view>
+    <view class="right-column"  >不知名</view>
+    <view class="left-column" >状态：</view>
+    <view class="right-column" >进行中</view>
+  </view>
+  <fui-segmented-control values="{{menu}}" size="25" type="text" activeColor="#C0C0C0" bind:click="clickMenu" ></fui-segmented-control>  
+  <view wx:if="{{currentMenuIndex == 0}}" >
+    asadfasdf
+  </view>
+  <view wx:if="{{currentMenuIndex == 1}}" >
+    qqqq
+  </view>
+</view>

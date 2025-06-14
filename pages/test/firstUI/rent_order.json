@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "fui-segmented-control": "/components/firstui/fui-segmented-control/fui-segmented-control"
+  }
+}

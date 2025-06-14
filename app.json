@@ -152,7 +152,8 @@
     "pages/test/firstUI/first_test",
     "pages/admin/recept/verify_items",
     "pages/admin/recept/recept_new",
-    "pages/test/firstUI/rent_new"
+    "pages/test/firstUI/rent_new",
+    "pages/test/firstUI/rent_order"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -229,7 +230,7 @@
     "fui-section": "components/firstui/fui-section/fui-section",
     "fui-card": "components/firstui/fui-card/fui-card",
     "fui-backdrop": "components/firstui/fui-backdrop/fui-backdrop",
-    "fui-segmented-control": "/components/firstui/fui-segmented-control/fui-segmented-control",
+    "fui-segmented-control": "components/firstui/fui-segmented-control/fui-segmented-control",
     "rent-recept-package": "/components/rent/recept_package",
     "rent-recept-item": "/components/rent/recept_item",
     "mp-cells": "weui-miniprogram/cells/cells",

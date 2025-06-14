@@ -1,0 +1,2 @@
+/* pages/test/firstUI/rent_order.wxss */
+@import '/app.wxss';
