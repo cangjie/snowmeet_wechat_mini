@@ -1,4 +1,4 @@
-// pages/test/rent_demo/recept.js
+// pages/test/firstUI/rent_new.js
 Page({
 
   /**

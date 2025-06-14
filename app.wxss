@@ -1,6 +1,7 @@
 /**app.wxss**/
 @import '/weui.wxss';
 @import '/common.wxss';
+@import '/components/firstui/fui-css/firstui.wxss';
 .container {
   height: 100%;
   display: flex;
@@ -124,4 +125,178 @@ button{
 .item-center{
   margin-left: auto;
   margin-right: auto;
+}
+
+.fui-card__wrap[data-v-745c6b3e] {
+  flex: 1;
+  box-sizing: border-box;
+  overflow:hidden
+}
+
+.fui-card__full[data-v-745c6b3e] {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  border-radius:0 !important
+}
+
+.fui-card__full[data-v-745c6b3e]:after {
+  border-radius:0 !important
+}
+
+.fui-card__border[data-v-745c6b3e] {
+  position: relative;
+  box-shadow:none !important
+}
+
+.fui-card__border-radius[data-v-745c6b3e] {
+  border-radius:.5rem !important
+}
+
+.fui-card__border[data-v-745c6b3e]:after {
+  content: " ";
+  position: absolute;
+  height: 200%;
+  width: 200%;
+  border: 1px solid var(--fui-color-border, #EEEEEE);
+  transform-origin: 0 0;
+  -webkit-transform-origin: 0 0;
+  transform: scale(.5);
+  left: 0;
+  top: 0;
+  border-radius: 1rem;
+  box-sizing: border-box;
+  pointer-events:none
+}
+
+.fui-card__header[data-v-745c6b3e] {
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+  overflow: hidden;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  position:relative
+}
+
+.fui-card__header-left[data-v-745c6b3e] {
+  display: flex;
+  white-space: nowrap;
+  flex-direction: row;
+  align-items:center
+}
+
+.fui-card__header-line[data-v-745c6b3e] {
+  position:relative
+}
+
+.fui-card__header-line[data-v-745c6b3e]:after {
+  content: "";
+  position: absolute;
+  border-bottom: 1px solid var(--fui-color-border, #EEEEEE);
+  transform: scaleY(.5);
+  transform-origin: 0 100%;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  pointer-events:none
+}
+
+.fui-card__header-thumb[data-v-745c6b3e] {
+  vertical-align: middle;
+  margin-right: .625rem;
+  flex-shrink:0
+}
+
+.fui-card__header-title[data-v-745c6b3e] {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 11.875rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow:ellipsis
+}
+
+.fui-card__header-right[data-v-745c6b3e] {
+  text-align: right;
+  flex-shrink:0
+}
+
+.fui-card__body[data-v-745c6b3e], .fui-card__footer[data-v-745c6b3e] {
+  width: 100%;
+  box-sizing:border-box
+}
+
+uni-page-body {
+  font-weight:400
+}
+
+.fui-section__title {
+  margin-left:1rem
+}
+
+.fui-card__content {
+  font-size: .875rem;
+  
+  box-sizing:border-box
+}
+
+.fui-padding {
+  padding-left: 1rem;
+  padding-right:1rem
+}
+
+.fui-list__item{
+  width: 100%;
+  height: 12.03125rem;
+  position: relative;
+  background:#eee
+}
+
+.fui-cover{
+  width: 100%;
+  height: 12.03125rem;
+  display:block
+}
+
+.fui-list__title{
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  color: #fff;
+  font-weight: 500;
+  padding: .75rem .625rem;
+  box-sizing: border-box;
+  background:linear-gradient(to bottom, transparent, rgba(0, 0, 0, .6))
+}
+
+.fui-card__title{
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  font-weight: 500
+}
+.fui-item__box {
+	width: 100%;
+	padding: 26rpx 32rpx;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+}
+
+.fui-logo {
+	width: 48rpx;
+	height: 48rpx;
+	margin-right: 24rpx;
+	display: block;
+}
+
+.fui-descr {
+	width: 100%;
+	padding: 32rpx;
+	font-size: 28rpx;
+	line-height: 52rpx;
+	color: #7F7F7F;
+	word-break: break-all;
+	box-sizing: border-box;
 }

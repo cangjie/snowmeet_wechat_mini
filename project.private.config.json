@@ -3,8 +3,8 @@
     "miniprogram": {
       "list": [
         {
-          "name": "firstUI",
-          "pathName": "pages/test/firstUI/first_test",
+          "name": "rentNew",
+          "pathName": "pages/test/firstUI/rent_new",
           "query": "",
           "launchMode": "default",
           "scene": null
