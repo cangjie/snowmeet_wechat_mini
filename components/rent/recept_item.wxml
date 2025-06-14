@@ -1,0 +1,45 @@
+<view style="background-color: white; width: 700rpx;margin-top: 20rpx;padding-left: 20rpx;padding-top: 20rpx;">
+  <view>添加单品</view>
+  <view class="view-row" >
+    <view class="left-column" >所属分类：</view>
+    <view class="right-column" style="width: 400rpx;" >
+      双板 > 高级双板
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >押金：</view>
+    <view class="right-column" ><input class="input" value="100"/></view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >起租日：</view>
+    <view class="right-column" >
+      <picker mode="date" class="input" >
+        <picker-view>2025-06-20</picker-view>
+      </picker>
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >立即发放：</view>
+    <view class="right-column" >
+      <checkbox checked="{{true}}" ></checkbox>
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >编码：</view>
+    <view class="right-column" >
+      <input class="input" />
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >名称：</view>
+    <view class="right-column" >
+      <input class="input" />
+    </view>
+  </view>
+  <view style="height: 20rpx;" ></view>
+  <view class="view-row" >
+    <button size="mini" class="input" bindtap="save" > 保 存 </button>
+    <button size="mini" class="input" bindtap="save" > 取 消 </button>
+  </view>
+  <view style="height: 20rpx;" ></view>
+</view>
