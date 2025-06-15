@@ -231,6 +231,8 @@
     "fui-card": "components/firstui/fui-card/fui-card",
     "fui-backdrop": "components/firstui/fui-backdrop/fui-backdrop",
     "fui-segmented-control": "components/firstui/fui-segmented-control/fui-segmented-control",
+    "fui-list": "/components/firstui/fui-list/fui-list",
+	  "fui-list-cell": "/components/firstui/fui-list-cell/fui-list-cell",
     "rent-recept-package": "/components/rent/recept_package",
     "rent-recept-item": "/components/rent/recept_item",
     "mp-cells": "weui-miniprogram/cells/cells",

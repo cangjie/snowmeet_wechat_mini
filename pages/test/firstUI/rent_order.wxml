@@ -23,9 +23,156 @@
   </view>
   <fui-segmented-control values="{{menu}}" size="25" type="text" activeColor="#C0C0C0" bind:click="clickMenu" ></fui-segmented-control>  
   <view wx:if="{{currentMenuIndex == 0}}" >
-    asadfasdf
+    <view class="view-row" >
+      <view class="left-column" >套餐：</view>
+      <view class="right-column" style="text-align: right;" >1</view>
+      <view class="left-column" >单品：</view>
+      <view class="right-column" style="text-align: right;" >2</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >总计押金：</view>
+      <view class="right-column" style="text-align: right;" >¥10000.00</view>
+      <view class="left-column" >已付押金：</view>
+      <view class="right-column" style="text-align: right;" >¥8000.00</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >总计租金：</view>
+      <view class="right-column" style="text-align: right;" >¥1000.00</view>
+      <view class="left-column" >已结租金：</view>
+      <view class="right-column" style="text-align: right;" >¥800.00</view>
+    </view>
+    <fui-segmented-control values="{{itemState}}" size="25" activeColor="#C0C0C0" bind:click="clickState" ></fui-segmented-control>  
+    <view>
+      <view style="height: 20rpx;" ></view>
+      <fui-section title="套餐" lineColor='#FF0000' isLine></fui-section>
+      <view style="height: 20rpx;" ></view>
+      <fui-card padding="10rpx 10rpx" full  title="FIS双板套餐" tag="租金已付 待核销" id="1" bind:click="showBackdrop" >
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >押金：</view>
+        <view class="right-column" style="text-align: right;" >¥10000.00</view>
+        <view class="left-column" >类型：</view>
+        <view class="right-column" >预约租赁</view>
+      </view>
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >租金：</view>
+        <view class="right-column" style="text-align: right;" >¥1000.00</view>
+        <view class="left-column" >起租日：</view>
+        <view class="right-column" >2025-06-15</view>
+      </view>
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >超时费：</view>
+        <view class="right-column" style="text-align: right;" >¥0.00</view>
+        <view class="left-column" >优惠券减免：</view>
+        <view class="right-column" >¥0.00</view>
+      </view>
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >额外减免：</view>
+        <view class="right-column" style="text-align: right;" >¥0.00</view>
+        <view class="left-column" >小计：</view>
+        <view class="right-column" >¥0.00</view>
+      </view>
+      <view>
+        <fui-list bottomBorder title="FIS双板 001">
+          <fui-list-cell highlight="{{true}}" bottomBorder="{{false}}">
+            <view class="view-row" >
+              <view class="left-column" >状态：</view>
+              <view class="right-column" >已发放</view>
+              <view class="left-column" >赔偿：</view>
+              <view class="right-column" >¥0.00</view>
+            </view>
+          </fui-list-cell>
+          <fui-list-cell bottomBorder="{{false}}" highlight="{{true}}" >
+            <view class="view-row" style="text-align: center;" >
+              <view style="width: 100rpx;" ></view>
+              <button class="input" size="mini" >归还</button>
+              <view style="width: 100rpx;" ></view>
+              <button class="input" size="mini" >暂存</button>
+            </view>
+          </fui-list-cell>
+        </fui-list>
+        <fui-list bottomBorder title="牛逼的雪鞋 101">
+          <fui-list-cell highlight="{{true}}" bottomBorder="{{false}}">
+            <view class="view-row" >
+              <view class="left-column" >状态：</view>
+              <view class="right-column" >已发放</view>
+              <view class="left-column" >赔偿：</view>
+              <view class="right-column" >¥0.00</view>
+            </view>
+          </fui-list-cell>
+          <fui-list-cell bottomBorder="{{false}}" highlight="{{true}}" >
+            <view class="view-row" style="text-align: center;" >
+              <view style="width: 100rpx;" ></view>
+              <button class="input" size="mini" >归还</button>
+              <view style="width: 100rpx;" ></view>
+              <button class="input" size="mini" >暂存</button>
+            </view>
+          </fui-list-cell>
+        </fui-list>
+        <fui-list bottomBorder title="全碳的棍子">
+          <fui-list-cell highlight="{{true}}" bottomBorder="{{false}}">
+            <view class="view-row" >
+              <view class="left-column" >状态：</view>
+              <view class="right-column" >未发放</view>
+              <view class="left-column" >赔偿：</view>
+              <view class="right-column" >¥0.00</view>
+            </view>
+          </fui-list-cell>
+          <fui-list-cell bottomBorder="{{false}}" highlight="{{true}}" >
+            <view class="view-row" style="text-align: center;" >
+              <view style="width: 100rpx;" ></view>
+              <button class="input" size="mini" >发放</button>
+              <view style="width: 100rpx;" ></view>
+              <button class="input" size="mini" disabled="{{true}}" >暂存</button>
+            </view>
+          </fui-list-cell>
+        </fui-list>
+      </view>
+    </fui-card>
+    <view style="height: 50rpx" ></view>
+    <fui-section title="单品" lineColor='#FFFF00' isLine></fui-section>
+    <view style="height: 50rpx;" ></view>
+    <fui-card padding="10rpx 10rpx" full  title="手套" tag="租金已付 待核销" id="1" bind:click="showBackdrop" >
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >押金：</view>
+        <view class="right-column" style="text-align: right;" >¥10000.00</view>
+        <view class="left-column" >类型：</view>
+        <view class="right-column" >预约租赁</view>
+      </view>
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >租金：</view>
+        <view class="right-column" style="text-align: right;" >¥1000.00</view>
+        <view class="left-column" >起租日：</view>
+        <view class="right-column" >2025-06-15</view>
+      </view>
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >超时费：</view>
+        <view class="right-column" style="text-align: right;" >¥0.00</view>
+        <view class="left-column" >优惠券减免：</view>
+        <view class="right-column" >¥0.00</view>
+      </view>
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >额外减免：</view>
+        <view class="right-column" style="text-align: right;" >¥0.00</view>
+        <view class="left-column" >小计：</view>
+        <view class="right-column" >¥0.00</view>
+      </view>
+      <view class="fui-card__content fui-padding view-row">
+        <view class="left-column" >状态：</view>
+        <view class="right-column" style="text-align: right;" >已发放</view>
+        <view class="left-column" >赔偿：</view>
+        <view class="right-column" >¥0.00</view>
+      </view>
+      <view class="view-row" style="text-align: center;" >
+              <view style="width: 100rpx;" ></view>
+              <button class="input" size="mini" >发放</button>
+              <view style="width: 100rpx;" ></view>
+              <button class="input" size="mini" disabled="{{true}}" >暂存</button>
+            </view>
+    </fui-card>
+    </view>
   </view>
   <view wx:if="{{currentMenuIndex == 1}}" >
     qqqq
   </view>
+  <view style="height: 100rpx;" ></view>
 </view>

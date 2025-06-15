@@ -1,2 +1,9 @@
 /* pages/test/firstUI/rent_order.wxss */
 @import '/app.wxss';
+.left-column{
+  width: 170rpx;
+}
+.right-column{
+  width: 180rpx;
+  text-align: right;
+}

@@ -7,8 +7,9 @@ Page({
    */
   data: {
     //values:[{id: 1, name:'产品'},{id: 2, name:'收退款'},{id: 3, name:'小票'},{id: 4, name:'日志'}],
-    menu:['产品', '收退款', '租金明细', '结算', '日志'],
-    currentMenuIndex: 0
+    menu:['产品', '押金', '租金', '日志'],
+    currentMenuIndex: 0,
+    itemState: ['全部', '未发放', '已发放', '已归还', '暂存中']
   },
 
   /**
