@@ -72,5 +72,14 @@ Page({
     console.log('click menu', e)
     var that = this
     that.setData({currentMenuIndex: e.detail.index})
+  },
+  showDialog(e){
+    console.log('show dialog')
+    var that = this
+    that.setData({show: true})
+  },
+  onClose(){
+    var that = this
+    that.setData({show: false})
   }
 })
