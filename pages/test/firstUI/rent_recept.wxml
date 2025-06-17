@@ -1,0 +1,24 @@
+<view>
+  <fui-card title="新增租赁物" tag="">
+	  <view class="fui-card__content">
+      <radio-group>
+        <view class="view-row radio-item"  >
+          <radio>套餐</radio> 
+          <picker style="margin-left: 50rpx;" class="input">
+            <picker-view>套餐一</picker-view>
+          </picker>
+        </view>
+        <view class="view-row radio-item" style="margin-bottom: 20rpx;" >
+          <radio>单品</radio>
+          <picker style="margin-left: 50rpx;" class="input" mode="multiSelector" 
+          range="{{pickerCateArr}}" range-key="name" 
+          bindcolumnchange="selectCategory" bindchange="selectCategoryOk" >
+            <picker-view>头盔</picker-view>
+          </picker>
+          <view style="width:150rpx" ></view>
+          <button class="input" size="mini" > 新 增 </button>
+        </view>
+      </radio-group>
+    </view>
+  </fui-card>
+</view>

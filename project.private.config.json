@@ -3,15 +3,15 @@
     "miniprogram": {
       "list": [
         {
-          "name": "rentOrder",
-          "pathName": "pages/test/firstUI/rent_order",
+          "name": "rentNew",
+          "pathName": "pages/test/firstUI/rent_recept",
           "query": "",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "rentNew",
-          "pathName": "pages/test/firstUI/rent_new",
+          "name": "rentOrder",
+          "pathName": "pages/test/firstUI/rent_order",
           "query": "",
           "launchMode": "default",
           "scene": null

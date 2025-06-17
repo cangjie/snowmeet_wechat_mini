@@ -1,0 +1,7 @@
+@import '/app.wxss';
+.radio-item{
+  margin-top: 20rpx;
+}
+picker{
+  width:150rpx;
+}

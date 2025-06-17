@@ -236,9 +236,10 @@ uni-page-body {
 }
 
 .fui-card__content {
-  font-size: .875rem;
-  
-  box-sizing:border-box
+  margin-left: 10rpx;
+  margin-right: 10rpx;
+  font-size:medium;
+  color:#5F5F5F;
 }
 
 .fui-padding {
