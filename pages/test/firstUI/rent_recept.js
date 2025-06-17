@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    multiArray: [['无脊柱动物', '脊柱动物'], ['扁性动物', '线形动物', '环节动物', '软体动物', '节肢动物'], ['猪肉绦虫', '吸血虫']]
+    multiArray: [['无脊柱动物', '脊柱动物'], ['扁性动物', '线形动物', '环节动物', '软体动物', '节肢动物'], ['猪肉绦虫', '吸血虫']],
+    maxCategoryColIndex: 0
   },
 
   /**
@@ -30,7 +31,7 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve){
-      that.getAllCategories()
+      that.getCatagories()
     })
   },
 
@@ -72,60 +73,51 @@ Page({
   {
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Rent/GetAllCategoryList'
-
-    
-  },
-  getAllCategories1(){
-    var that = this
-    var getUrl = app.globalData.requestPrefix + 'Rent/GetAllCategoryList'
     util.performWebRequest(getUrl, null).then(function(resovle){
       var categories = resovle
       console.log('get categories', categories)
-      var catePickerList = [categories]
-
-
-
-
-
-
-      var pickerArr = []
-      var topArr = []
-      for(var i = 0; i < categories.length; i++){
-        topArr.push(categories[i])
-      }
-      pickerArr.push(topArr)
-      pickerArr.push([])
-      that.setData({categories, pickerCateArr: pickerArr})
-      that.setSubcatePicker(0)
+      var categoryPickerArr = []
+      categoryPickerArr.push(categories)
+      that.setData({categoryPickerArr, categories})
+      that.selCategory(0, 0)
     })
   },
-  setSubcatePicker(index){
+  selCategory(column, value){
     var that = this
-    var pickerCateArr = that.data.pickerCateArr
-    pickerCateArr.pop()
-    var subArr = []
+    that.data.maxCategoryColIndex = Math.max(column, that.data.maxCategoryColIndex)
     var categories = that.data.categories
-    var subcategories = categories[index].children
-    for(var i = 0; subcategories && i < subcategories.length; i++){
-      subArr.push(subcategories[i])
+    var categoryPickerArrOld = that.data.categoryPickerArr
+    var categoryPickerArr = []
+    for(var i = 0; i <= column; i++){
+      categoryPickerArr.push(categoryPickerArrOld[i])
     }
-    pickerCateArr.push(subArr)
-    that.setData({pickerCateArr})
+    var currentCategoryList = categoryPickerArr[column]
+    if (!currentCategoryList || currentCategoryList.length <= value){
+      value = 0
+    }
+    var currentCategory = currentCategoryList[value]
+    if (currentCategory.children){
+      categoryPickerArr.push(currentCategory.children)
+      that.data.categoryPickerArr = categoryPickerArr
+      that.selCategory(column + 1, 0)
+    }
+    else{
+      for(var i = column; i < that.data.maxCategoryColIndex; i++){
+        categoryPickerArr.push([])
+      }
+      that.setData({categoryPickerArr})
+      if (column == 0 && value == 13)
+        console.log('13')
+    }
   },
-  selectCategory(e){
-    console.log('sel cate', e)
+  catePickerColChange(e){
     var that = this
-    var column = e.detail.column
-    switch(column){
-      case 0:
-        that.setSubcatePicker(e.detail.value)
-        break
-      case 1:
-        break
-      default:
-        break
-    }
+    console.log('sel col change', e)
+    that.selCategory(e.detail.column, e.detail.value)
   },
+ 
+  
+ 
   selectCategoryOk(e){
     var that = this
     console.log('sel ok', e)
