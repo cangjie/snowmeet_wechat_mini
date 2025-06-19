@@ -8,7 +8,9 @@ Page({
    */
   data: {
     multiArray: [['无脊柱动物', '脊柱动物'], ['扁性动物', '线形动物', '环节动物', '软体动物', '节肢动物'], ['猪肉绦虫', '吸血虫']],
-    maxCategoryColIndex: 0
+    maxCategoryColIndex: 0,
+    categorySelectIndex: undefined,
+    categorySelectText: ''
   },
 
   /**
@@ -119,7 +121,20 @@ Page({
   
  
   selectCategoryOk(e){
-    var that = this
     console.log('sel ok', e)
+    var that = this
+    var categorySelectIndex = e.detail.value
+    var categorySelectText = ''
+    var categoryPickerArr = that.data.categoryPickerArr
+    for(var i = 0; i < categorySelectIndex.length; i++){
+      var txt = ''
+      if (i < categoryPickerArr.length && categorySelectIndex[i] < categoryPickerArr[i].length){
+        txt = categoryPickerArr[i][categorySelectIndex[i]].name
+      }
+      if (txt!=''){
+        categorySelectText += ((categorySelectText == '' ? '' : ' > ') + txt)
+      }
+    }
+    that.setData({categorySelectIndex, categorySelectText})
   }
 })
