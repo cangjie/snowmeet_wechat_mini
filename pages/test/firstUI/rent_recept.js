@@ -7,10 +7,11 @@ Page({
    * Page initial data
    */
   data: {
-    multiArray: [['无脊柱动物', '脊柱动物'], ['扁性动物', '线形动物', '环节动物', '软体动物', '节肢动物'], ['猪肉绦虫', '吸血虫']],
     maxCategoryColIndex: 0,
     categorySelectIndex: undefined,
-    categorySelectText: ''
+    categorySelectText: '',
+    packageSelectIndex: undefined
+
   },
 
   /**
@@ -34,6 +35,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function (resolve){
       that.getCatagories()
+      that.getPackageList()
     })
   },
 
@@ -136,5 +138,22 @@ Page({
       }
     }
     that.setData({categorySelectIndex, categorySelectText})
+  },
+  selectType(e){
+    console.log('sel type', e)
+    var that = this
+    that.setData({type: e.detail.value})
+  },
+  getPackageList(){
+    var that = this
+    var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList'
+    util.performWebRequest(getUrl, null).then(function(resolve){
+      console.log('get package list', resolve)
+      that.setData({packageList: resolve})
+    })
+  },
+  selectPackage(e){
+    var that = this
+    that.setData({packageSelectIndex: e.detail.value})
   }
 })

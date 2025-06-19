@@ -3,5 +3,32 @@
   margin-top: 20rpx;
 }
 picker{
-  width:150rpx;
+  font-size: 11pt;
+  margin-top: 10rpx;
+}
+.number-label{
+  margin-left: 10rpx;
+  text-align: left;
+  width: 50rpx;
+}
+.left-column{
+  width: 150rpx;
+}
+.right-column{
+  width: 300rpx
+}
+.right-column1{
+  width: 100rpx
+}
+.seperator{
+  width: 650rpx; 
+  background-color: #F0F0F0;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+}
+.seperator-line{
+  height: 5rpx; 
+  background-color: white;
+  width: 500rpx;
 }
