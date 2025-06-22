@@ -12,13 +12,13 @@ picker{
   width: 50rpx;
 }
 .left-column{
-  width: 150rpx;
+  width: 80rpx;
 }
 .right-column{
-  width: 300rpx
+  width: 240rpx
 }
 .right-column1{
-  width: 100rpx
+  width: 550rpx
 }
 .seperator{
   width: 650rpx; 

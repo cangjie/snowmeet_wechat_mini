@@ -119,9 +119,6 @@ Page({
     console.log('sel col change', e)
     that.selCategory(e.detail.column, e.detail.value)
   },
- 
-  
- 
   selectCategoryOk(e){
     console.log('sel ok', e)
     var that = this
@@ -166,15 +163,18 @@ Page({
         order_id: null,
         package_id: selectedPackage.id,
         name: selectedPackage.name,
-        valid: 0
+        valid: 0,
+        realDeposit: selectedPackage.deposit,
+        realDepositStr: util.showAmount(selectedPackage.deposit)
       }
       var items = []
       for(var i = 0; i < selectedPackage.categories.length; i++){
         var item = {
           id: 0,
           rental_id: 0,
-          class_name: selectedPackage.categories[i].name,
-          category_id:  selectedPackage.categories[i].id
+          categoryName: selectedPackage.categories[i].name,
+          name: null,
+          code: null
         }
         items.push(item)
       }
@@ -230,15 +230,18 @@ Page({
         order_id: null,
         package_id: null,
         name: rentProduct.name,
-        valid: 0
+        valid: 0,
+        realDeposit: rentProduct.realDeposit,
+        realDepositStr: util.showAmount(rentProduct.realDeposit)
       }
       var items = []
       var item = {
         id: 0,
         rental_id: 0,
-        class_name: rentProduct.category.name,
         category_id:  rentProduct.category.id,
-        name: rentProduct.name
+        name: rentProduct.name,
+        categoryName: rentProduct.category.name,
+        code: rentProduct.barcode,
       }
       items.push(item)
       rental.rentItems = items
