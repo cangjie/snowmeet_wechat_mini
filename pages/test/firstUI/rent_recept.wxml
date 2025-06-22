@@ -120,7 +120,7 @@
         <view wx:if="{{rental.package_id == null || rental.package_id == undefined}}" 
           class="view-row"  >
           <view class="number-label" style="margin-top: 100rpx;" >{{rental.rentItems[0].itemIndex}}. </view>
-          <view style="width: 650rpx; background-color: #F0F0F0;"  bindtap="showItem">
+          <view style="width: 650rpx; background-color: #F0F0F0;"  bindtap="showItem" id="{{index}}">
             <view class="view-row" >
               <view class="left-column" >名称：</view>
               <view class="right-column right-column1"  >{{rental.name}}</view>
@@ -146,7 +146,7 @@
         <block wx:else >
           <view class="view-row" >
             <view class="number-label" ></view>
-            <view style="width: 650rpx;background-color: #F0F0F0;" >
+            <view style="width: 650rpx;background-color: #F0F0F0;" bindtap="showPackage" id="{{index}}"  >
               <view class="view-row"  >
                 <view class="left-column" >名称：</view>
                 <view class="right-column right-column1" >{{rental.name}}</view>
@@ -168,16 +168,23 @@
             </view>
             <view class="view-row" >
               <view class="number-label" style="margin-top: 50rpx;" >{{item.itemIndex}}.</view>
-              <view style="width: 650rpx; background-color: #F0F0F0;" bindtap="showPackage" >
-                <view class="view-row"  >
-                  <view class="left-column" >名称：</view>
-                  <view class="right-column right-column1" >{{item.name?item.name:''}}</view>
+              <view style="width: 650rpx; background-color: #F0F0F0;" 
+              bindtap="showPackageItem" id="{{item.itemIndex}}"  >
+                <view class="view-row"   >
+                  <view class="left-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}" 
+                   >名称：</view>
+                  <view class="right-column right-column1" 
+                    style="color:{{item.textColor?item.textColor:defaultTextColor}}" >{{item.name?item.name:''}}</view>
                 </view>
                 <view class="view-row" style="margin-bottom: 20rpx;" >
-                  <view class="left-column" >编码：</view>
-                  <view class="right-column" >{{item.code?item.code:''}}</view>
-                  <view class="left-column" >品类：</view>
-                  <view class="right-column"  >{{item.categoryName}}</view>
+                  <view class="left-column" 
+                    style="color:{{item.textColor?item.textColor:defaultTextColor}}" >编码：</view>
+                  <view class="right-column" 
+                  style="color:{{item.textColor?item.textColor:defaultTextColor}}" >{{item.code?item.code:''}}</view>
+                  <view class="left-column" 
+                    style="color:{{item.textColor?item.textColor:defaultTextColor}}" >品类：</view>
+                  <view class="right-column"  
+                  style="color:{{item.textColor?item.textColor:defaultTextColor}}" >{{item.categoryName}}</view>
                 </view>
               </view>
             </view>
@@ -199,7 +206,7 @@
         </view>
         <view class="view-row radio-item" style="margin-bottom: 20rpx;margin-top:40rpx" >
           <radio value="单品" checked="{{type=='单品'}}" >单品</radio>
-          <input class="input" value="{{barcode}}" placeholder="直接输入" bindinput="inputBarcode"
+          <input class="input" value="{{barCode}}" placeholder="直接输入" bindinput="inputBarcode"
             style="margin-left: 50rpx; width: 200rpx;" disabled="{{type != '单品'}}"  />
           <button style="width:45rpx; height:45rpx; margin-left:20rpx; margin-right: 0rpx;" 
             bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
@@ -212,13 +219,233 @@
           bindcolumnchange="catePickerColChange" bindchange="selectCategoryOk" >
             <picker-view>{{categorySelectIndex == undefined ? '请选择': categorySelectText}}</picker-view>
           </picker-->
-          
         </view>
       </radio-group>
     </view>
   </fui-card>
 </view>
-<fui-backdrop show="{{show}}" closable >
-  <rent-recept-package wx:if="{{showPackage}}" bindKeep="close"></rent-recept-package>
-  <rent-recept-item wx:if="{{showItem}}" bindKeep="close"></rent-recept-item>
+<fui-backdrop show="{{showBackdrop}}" closable >
+  <block wx:if="{{action == 'packageItem'}}" >
+    <fui-card title="套餐名称：{{currentRental.name}}" tag="">
+      <view class="fui-card__content" style="width: 650rpx;" >
+        <view class="view-row" >
+          <view class="left-column" >品类：</view>
+          <view class="right-column" >{{currentItem.categoryName}}</view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >编码：</view>
+          <view class="right-column view-row" style="width: 550rpx;" >
+            <input class="input" style="width: 200rpx;" />
+            <button style="width:45rpx; height:45rpx; margin-left:20rpx; margin-right: 0rpx;" 
+            bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
+            <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 45rpx;margin-left: -15px;" />
+          </button>
+          <switch  style="margin-left: 10rpx;" checked="{{false}}" >无码物品</switch>
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >名称：</view>
+          <view class="right-column">
+            <input class="input" style="width: 350rpx;" />
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" ></view>
+          <view class="right-column" >
+            <switch checked="{{false}}" >不需要</switch>
+          </view>
+        </view>
+        <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;" >
+          <button class="input" size="mini" > 保 存 </button>
+          <button class="input" size="mini" bindtap="cancelBackdrop" > 取 消 </button>
+        </view>
+      </view>
+    </fui-card>
+  </block>
+  <block wx:if="{{action == 'package'}}" >
+    <fui-card title="套餐名称：{{currentRental.name}}" tag="共{{currentRental.rentItems.length}}件">
+      <view class="fui-card__content" style="width: 650rpx;" >
+        <view class="view-row" >
+          <view class="left-column" style="width: 200rpx;" >押金：</view>
+          <view class="right-column" >{{currentRental.realDepositStr}}</view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" style="width: 200rpx;" >押金减免：</view>
+          <view class="right-column" ><input style="width: 85rpx;" class="input" placeholder="0" /></view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" style="width: 200rpx;" >押金小计：</view>
+          <view class="right-column" >{{currentRental.realDepositStr}}</view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" style="width: 200rpx;" >起租日期：</view>
+          <view class="right-column view-row" >
+            <picker mode="date" class="input" style="height: 45rpx;">
+              <picker-view style="margin-left: 10rpx;margin-right: 10rpx;">2025-06-22</picker-view>
+            </picker>
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" style="width: 200rpx;" >预计租赁天数：</view>
+          <view class="right-column view-row" >
+            <input class="input" placeholder="1" style="width: 50rpx;text-align: center;" />天
+          </view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" style="width: 200rpx;" >租金试算：</view>
+          <view class="right-column view-row" ></view>
+        </view>
+        <view>
+          <fui-row style="margin-top:10rpx" >
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >日期</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >类型</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >价格</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >减免</view></fui-col>
+            <fui-col span="4" ><view class="fui-col-view" style="text-align:center;" >小计</view></fui-col>
+          </fui-row>
+          <fui-row style="margin-top:10rpx" >
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >06-22</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >周末门市价</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align: right;" >¥200.00</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" 
+              style="margin-left: 30rpx;text-align: center;display: flex;" >
+              <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0"/>
+            </view></fui-col>
+            <fui-col span="4" ><view class="fui-col-view" style="text-align: right;" >¥200.00</view></fui-col>
+          </fui-row>
+          <fui-row style="margin-top:10rpx">
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >06-23</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >平日会员价</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align: right;" >¥150.00</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" 
+              style="margin-left: 30rpx;text-align: center;display: flex;" >
+              <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0"/>
+            </view></fui-col>
+            <fui-col span="4" ><view class="fui-col-view" style="text-align: right;" >¥150.00</view></fui-col>
+          </fui-row>
+          <fui-row style="margin-top:10rpx">
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >总计：</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >2天</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" style="text-align: right;" >¥350.00</view></fui-col>
+            <fui-col span="5" ><view class="fui-col-view" 
+              style="margin-left: 30rpx;text-align: center;display: flex;" >
+              ¥0.00
+            </view></fui-col>
+            <fui-col span="4" ><view class="fui-col-view" style="text-align: right;" >¥350.00</view></fui-col>
+          </fui-row>
+        </view>
+        <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;" >
+          <button class="input" size="mini" > 保 存 </button>
+          <button class="input" size="mini" bindtap="cancelBackdrop" > 取 消 </button>
+        </view>
+      </view>
+    </fui-card>
+  </block>
+  <block wx:if="{{action == 'item'}}" >
+    <view style="width: 650rpx;background-color: white;" >
+      <view style="height: 50rpx;" ></view>
+      <fui-section title="基本信息" isLine></fui-section>
+      <view class="view-row" >
+        <view class="left-column" style="width: 150rpx;" >品类：</view>
+        <view class="right-column" style="width: 500rpx;" >
+          <picker style="width: 480rpx" class="input" mode="multiSelector" 
+          range="{{categoryPickerArr}}" range-key="name" disabled="{{type == '套餐'}}"
+          bindcolumnchange="catePickerColChange" bindchange="selectCategoryOk" >
+            <picker-view>{{categorySelectIndex == undefined ? '请选择': categorySelectText}}</picker-view>
+          </picker>
+        </view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" style="width: 150rpx;" >编码：</view>
+        <view class="right-column view-row" style="width: 500rpx;" >
+          <input class="input" style="width: 150rpx;" />
+            <button style="width:45rpx; height:45rpx; margin-left:20rpx; margin-right: 0rpx;" 
+            bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
+            <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 45rpx;margin-left: -15px;" />
+          </button>
+          <switch  style="margin-left: 10rpx;" checked="{{false}}" >无码物品</switch>
+        </view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column" style="width: 150rpx;" >名称：</view>
+        <view class="right-column" style="width: 500rpx;" >
+          <input class="input" style="width: 480rpx;" />
+        </view>
+      </view>
+      <view class="view-row"  >
+        <view class="left-column" style="width: 150rpx;" >押金：</view>
+        <view class="right-column" style="width: 500rpx;" >{{currentRental.realDepositStr}}</view>
+      </view>
+      <view class="view-row"  >
+        <view class="left-column" style="width: 150rpx;" >押金减免：</view>
+        <view class="right-column view-row" style="width: 500rpx;" >
+          <input style="width: 85rpx;" class="input" placeholder="0" />
+          <switch checked="{{false}}" style="margin-left: 50rpx;" >免押金</switch>
+        </view>
+      </view>
+      <view class="view-row"  >
+        <view class="left-column" style="width: 150rpx;" >押金小计：</view>
+        <view class="right-column" style="width: 500rpx;" >{{currentRental.realDepositStr}}</view>
+      </view>
+      <view style="height: 50rpx;" ></view>
+      <fui-section title="租金试算" isLine></fui-section>
+      <view class="view-row" >
+        <view class="left-column"  style="width: 200rpx;" >预计租赁天数：</view>
+        <view class="right-column"   ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column"  style="width: 200rpx;" >起租日期：</view>
+        <view class="right-column"   ></view>
+      </view>
+      <view class="view-row" >
+        <view class="left-column"  style="width: 200rpx;" >招待：</view>
+        <view class="right-column"   ><switch checked="{{false}}" ></switch></view>
+      </view>
+      <view>
+        <fui-row style="margin-top:10rpx" >
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >日期</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >类型</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >价格</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >减免</view></fui-col>
+          <fui-col span="4" ><view class="fui-col-view" style="text-align:center;" >小计</view></fui-col>
+        </fui-row>
+        <fui-row style="margin-top:10rpx" >
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >06-22</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >周末门市价</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align: right;" >¥200.00</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" 
+            style="margin-left: 30rpx;text-align: center;display: flex;" >
+            <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0"/>
+          </view></fui-col>
+          <fui-col span="4" ><view class="fui-col-view" style="text-align: right;" >¥200.00</view></fui-col>
+        </fui-row>
+        <fui-row style="margin-top:10rpx">
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >06-23</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >平日会员价</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align: right;" >¥150.00</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" 
+            style="margin-left: 30rpx;text-align: center;display: flex;" >
+            <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0"/>
+          </view></fui-col>
+          <fui-col span="4" ><view class="fui-col-view" style="text-align: right;" >¥150.00</view></fui-col>
+        </fui-row>
+        
+        <fui-row style="margin-top:10rpx">
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >总计：</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align:center;" >2天</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" style="text-align: right;" >¥350.00</view></fui-col>
+          <fui-col span="5" ><view class="fui-col-view" 
+            style="margin-left: 30rpx;text-align: center;display: flex;" >
+            ¥0.00
+          </view></fui-col>
+          <fui-col span="4" ><view class="fui-col-view" style="text-align: right;" >¥350.00</view></fui-col>
+        </fui-row>
+      </view>
+      <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;" >
+          <button class="input" size="mini" > 保 存 </button>
+          <button class="input" size="mini" bindtap="cancelBackdrop" > 取 消 </button>
+        </view>
+    </view>
+    
+  </block>
 </fui-backdrop>

@@ -32,3 +32,6 @@ picker{
   background-color: white;
   width: 500rpx;
 }
+.fui-col-view{
+  font-size: 10pt;
+}

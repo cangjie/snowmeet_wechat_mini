@@ -11,7 +11,10 @@ Page({
     categorySelectIndex: undefined,
     categorySelectText: '',
     packageSelectIndex: undefined,
-    rentals:[]
+    rentals:[],
+    defaultTextColor: '#000000',
+    showBackdrop: false,
+    action: ''
   },
 
   /**
@@ -174,7 +177,8 @@ Page({
           rental_id: 0,
           categoryName: selectedPackage.categories[i].name,
           name: null,
-          code: null
+          code: null,
+          rent_product_id: null
         }
         items.push(item)
       }
@@ -190,14 +194,8 @@ Page({
     var that = this
     console.log('del click', e)
   },
-  showPackage(e){
-    var that = this
-    that.setData({show: true, showPackage: true})
-  },
-  showItem(e){
-    var that = this
-    that.setData({show: true, showItem: true})
-  },
+
+
   inputBarcode(e){
     var that = this
     var barCode = e.detail.value
@@ -242,6 +240,7 @@ Page({
         name: rentProduct.name,
         categoryName: rentProduct.category.name,
         code: rentProduct.barcode,
+        rent_product_id: rentProduct.id
       }
       items.push(item)
       rental.rentItems = items
@@ -276,8 +275,56 @@ Page({
         item.itemIndex = itemIndex
         itemIndex++
         item.textColor = itemCommonColor
+        if (!item.rent_product_id){
+          item.textColor = 'red'
+        }
       }
     }
+    console.log('render rentals', rentals)
     that.setData({rentals})
+  },
+  showPackageItem(e){
+    var that = this
+    var id = e.currentTarget.id
+    var rentals = that.data.rentals
+    var currentRental = null
+    var currentItem = null
+    for(var i = 0; i < rentals.length; i++){
+      var rental = rentals[i]
+      for(var j = 0; j < rental.rentItems.length; j++){
+        var item = rental.rentItems[j];
+        if (parseInt(id)==item.itemIndex){
+          currentItem = item
+          currentRental = rental
+          break
+        }
+      }
+    }
+    if (currentRental != null && currentItem != null){
+      that.setData({currentRental, currentItem, showBackdrop: true, action: 'packageItem'})
+    }
+  },
+  showPackage(e){
+    var that = this
+    var id = e.currentTarget.id
+    var rentals = that.data.rentals
+    var currentRental = rentals[parseInt(id)]
+    if (currentRental != null){
+      that.setData({currentRental, showBackdrop: true, action: 'package'})
+    }
+
+  },
+  showItem(e){
+    var that = this
+    var id = e.currentTarget.id
+    var rentals = that.data.rentals
+    var currentRental = rentals[parseInt(id)]
+    if (currentRental != null){
+      that.setData({currentRental, showBackdrop: true, action: 'item'})
+    }
+  },
+  cancelBackdrop(e){
+    var that = this
+    that.setData({showBackdrop: false, action: null, currentRental: null, currentItem: null})
   }
 })
