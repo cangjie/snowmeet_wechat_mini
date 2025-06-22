@@ -10,8 +10,8 @@ Page({
     maxCategoryColIndex: 0,
     categorySelectIndex: undefined,
     categorySelectText: '',
-    packageSelectIndex: undefined
-
+    packageSelectIndex: undefined,
+    rentals:[]
   },
 
   /**
@@ -155,5 +155,126 @@ Page({
   selectPackage(e){
     var that = this
     that.setData({packageSelectIndex: e.detail.value})
+    var packageList = that.data.packageList
+    var selectedPackage = packageList[that.data.packageSelectIndex]
+    var getPackageUrl = app.globalData.requestPrefix + 'Rent/GetRentPackage/' + selectedPackage.id
+    util.performWebRequest(getPackageUrl, null).then(function (resovle){
+      selectedPackage = resovle
+      console.log('package to add', selectedPackage)
+      var rental = {
+        id: 0,
+        order_id: null,
+        package_id: selectedPackage.id,
+        name: selectedPackage.name,
+        valid: 0
+      }
+      var items = []
+      for(var i = 0; i < selectedPackage.categories.length; i++){
+        var item = {
+          id: 0,
+          rental_id: 0,
+          class_name: selectedPackage.categories[i].name,
+          category_id:  selectedPackage.categories[i].id
+        }
+        items.push(item)
+      }
+      rental.rentItems = items
+      var rentals = that.data.rentals
+      rentals.push(rental)
+      console.log('rentals', rentals)
+      that.setData({type: null, packageSelectIndex: null})
+      that.renderData(rentals)
+    })
+  },
+  del(e){
+    var that = this
+    console.log('del click', e)
+  },
+  showPackage(e){
+    var that = this
+    that.setData({show: true, showPackage: true})
+  },
+  showItem(e){
+    var that = this
+    that.setData({show: true, showItem: true})
+  },
+  inputBarcode(e){
+    var that = this
+    var barCode = e.detail.value
+    that.setData({barCode, barCodeInputing: true, lastInputBarCodeTime: new Date()})
+    if (barCode.length >= 3){
+      setTimeout(()=>{
+        var now = new Date()
+        var ts = now - that.data.lastInputBarCodeTime 
+        console.log('ts', ts)
+        if (ts >= 1900 && ts <= 2100){
+          //console.log('barcode', barCode)
+          that.searchBarcode()
+        }
+        
+      }, 2000)
+      that.setData({barCode, lastInputBarCodeTime: new Date()})
+    }
+  },
+  searchBarcode(){
+    var that = this
+    console.log('bar code is: ', that.data.barCode)
+    var barCode = that.data.barCode
+    var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByBarcode/' + barCode
+    util.performWebRequest(searchUrl, null).then(function (resolve){
+      var rentProduct = resolve
+      console.log('rent product', rentProduct)
+      that.setData({barCodeInputing: false})
+      var rental = {
+        id: 0,
+        order_id: null,
+        package_id: null,
+        name: rentProduct.name,
+        valid: 0
+      }
+      var items = []
+      var item = {
+        id: 0,
+        rental_id: 0,
+        class_name: rentProduct.category.name,
+        category_id:  rentProduct.category.id,
+        name: rentProduct.name
+      }
+      items.push(item)
+      rental.rentItems = items
+      var rentals = that.data.rentals
+      rentals.push(rental)
+      console.log('rentals', rentals)
+      that.setData({type: null, packageSelectIndex: null, barCodeInputing: false, barCode: null})
+      that.renderData(rentals)
+    }).catch(function(reject){
+      that.setData({barCodeInputing: false})
+    })
+  },
+  renderData(rentals){
+    var that = this
+    //var rentals = that.data.rentals
+    var packageCommonBackgroud = '#F0F0F0'
+    var productCommonBackgroud = '#F0F0F0'
+    var packageCommonTextColor = '#000000'
+    var itemCommonColor = '#000000'
+    var itemIndex = 1
+    for(var i = 0; i < rentals.length; i++){
+      var rental = rentals[i]
+      if (rental.package_id){
+        rental.backgroundColor = packageCommonBackgroud
+        rental.textColor = packageCommonTextColor
+      }
+      else{
+        rental.backgroundColor = productCommonBackgroud
+      }
+      for(var j = 0; j < rental.rentItems.length; j++){
+        var item = rental.rentItems[j]
+        item.itemIndex = itemIndex
+        itemIndex++
+        item.textColor = itemCommonColor
+      }
+    }
+    that.setData({rentals})
   }
 })
