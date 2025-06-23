@@ -15,7 +15,8 @@ Page({
     defaultTextColor: '#000000',
     showBackdrop: false,
     action: '',
-    itemSegs: ['押金', '租金']
+    itemSegs: ['押金', '租金'],
+    displayRental: false
   },
 
   /**
@@ -327,5 +328,15 @@ Page({
   cancelBackdrop(e){
     var that = this
     that.setData({showBackdrop: false, action: null, currentRental: null, currentItem: null})
+  },
+  switchGuarantyRental(e){
+    var that = this
+    console.log('switch', e)
+    if (e.detail.index == 0){
+      that.setData({displayRental: false})
+    }
+    else {
+      that.setData({displayRental: true})
+    }
   }
 })
