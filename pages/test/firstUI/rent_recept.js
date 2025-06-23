@@ -14,7 +14,8 @@ Page({
     rentals:[],
     defaultTextColor: '#000000',
     showBackdrop: false,
-    action: ''
+    action: '',
+    itemSegs: ['押金', '租金']
   },
 
   /**

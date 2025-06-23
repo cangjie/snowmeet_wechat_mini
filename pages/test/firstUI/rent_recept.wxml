@@ -344,7 +344,7 @@
   <block wx:if="{{action == 'item'}}" >
     <view style="width: 650rpx;background-color: white;" >
       <view style="height: 50rpx;" ></view>
-      <fui-section title="基本信息" isLine></fui-section>
+      
       <view class="view-row" >
         <view class="left-column" style="width: 150rpx;" >品类：</view>
         <view class="right-column" style="width: 500rpx;" >
@@ -372,6 +372,14 @@
           <input class="input" style="width: 480rpx;" />
         </view>
       </view>
+      <view>
+        <view style="width: 100rpx;" ></view>
+        <view style="width: 450rpx;" >
+          <fui-segmented-control values="{{itemSegs}}" style="width: 550rpx;"></fui-segmented-control>
+        </view>
+        <view style="width: 100rpx;" ></view>
+      </view>
+      
       <view class="view-row"  >
         <view class="left-column" style="width: 150rpx;" >押金：</view>
         <view class="right-column" style="width: 500rpx;" >{{currentRental.realDepositStr}}</view>
