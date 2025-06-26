@@ -65,8 +65,14 @@
                 <view class="view-row" style="margin-bottom: 20rpx;" >
                   <view class="left-column" 
                     style="color:{{item.textColor?item.textColor:defaultTextColor}}" >编码：</view>
-                  <view class="right-column" 
-                  style="color:{{item.textColor?item.textColor:defaultTextColor}}" >{{item.code?item.code:''}}</view>
+                  <view class="right-column view-row" 
+                  style="color:{{item.textColor?item.textColor:defaultTextColor}};margin-right: 10rpx;" >
+                    <view style="width: 150rpx;">{{item.code?item.code:''}}</view>
+                    <button style="width:45rpx; height:50rpx; margin-left:20rpx; margin-right: 0rpx;" 
+                      bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
+                      <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 45rpx;margin-left: -15px;" />
+                    </button>
+                  </view>
                   <view class="left-column" 
                     style="color:{{item.textColor?item.textColor:defaultTextColor}}" >品类：</view>
                   <view class="right-column"  
@@ -91,15 +97,25 @@
           </picker>  
         </view>
         <view class="view-row radio-item" style="margin-bottom: 20rpx;margin-top:40rpx" >
-          <radio value="单品" checked="{{type=='单品'}}" >单品</radio>
-          <input class="input" value="{{barCode}}" placeholder="直接输入" bindinput="inputBarcode"
-            style="margin-left: 50rpx; width: 200rpx;" disabled="{{type != '单品'}}"  />
-          <button style="width:45rpx; height:45rpx; margin-left:20rpx; margin-right: 0rpx;" 
-            bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
-            <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 45rpx;margin-left: -15px;" />
-          </button>
-          <button class="input" size="mini" disabled="{{type != '单品' || barCodeInputing}}"
-            style="height:55rpx;font-size: 9pt;" >直接新增</button>
+          <view style="width: 125rpx;" >
+            <radio value="单品" checked="{{type=='单品'}}" >单品</radio>
+          </view>
+          <view style="width: 550rpx;">
+            <view class="view-row" >
+              <input class="input" value="{{barCode}}" placeholder="可直接输入" bindinput="inputBarcode"
+                style="margin-left: 50rpx; width: 200rpx;" disabled="{{type != '单品'}}"  /> 
+              <button class="input" size="mini" 
+                style="width: 100rpx; height: 50rpx; font-size: 9pt;margin-left:20rpx; margin-right: 10rpx; " > 确 定 </button>
+              <button style="width:45rpx; height:50rpx; margin-left:20rpx; margin-right: 0rpx;" 
+                bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
+                <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 45rpx;margin-left: -15px;" />
+              </button>
+            </view>
+            <view style="margin-top: 20rpx; display: flex;justify-content: center;">
+              <button class="input"  disabled="{{type != '单品' || barCodeInputing}}"
+                style="height:55rpx;font-size: 9pt;" > 直 接 新 增 单 品 </button>
+            </view>
+          </view>
           <!--picker style="margin-left: 50rpx;width: 480rpx" class="input" mode="multiSelector" 
           range="{{categoryPickerArr}}" range-key="name" disabled="{{type == '套餐'}}"
           bindcolumnchange="catePickerColChange" bindchange="selectCategoryOk" >
@@ -150,6 +166,11 @@
   </block>
   <block wx:if="{{action == 'package'}}" >
     <fui-card title="套餐名称：{{currentRental.name}}" tag="共{{currentRental.rentItems.length}}件">
+      <view class="fui-card__content" style="width: 650rpx; margin-top:50rpx" >
+        <rent_charge></rent_charge>
+      </view>
+      
+      <!--
       <view class="fui-card__content" style="width: 650rpx;" >
         <view class="view-row" >
           <view class="left-column" style="width: 200rpx;" >押金：</view>
@@ -220,12 +241,15 @@
             <fui-col span="4" ><view class="fui-col-view" style="text-align: right;" >¥350.00</view></fui-col>
           </fui-row>
         </view>
-        <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;" >
+       
+      </view>
+      -->
+      <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;" >
           <button class="input" size="mini" > 保 存 </button>
           <button class="input" size="mini" bindtap="cancelBackdrop" > 取 消 </button>
         </view>
-      </view>
     </fui-card>
+    
   </block>
   <block wx:if="{{action == 'item'}}" >
     <view style="width: 650rpx;background-color: white;" >
@@ -263,6 +287,9 @@
           <input class="input" style="width: 480rpx;" />
         </view>
       </view>
+      <view style="height: 50rpx;" ></view>
+      <rent_charge></rent_charge>
+      <!--
       <view class="view-row" style="margin-top: 50rpx;">
         <view style="width: 10rpx;" ></view>
         <view style="width: 620rpx;" >
@@ -352,6 +379,7 @@
           </fui-row>
         </view>
       </block>
+      -->
       <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;" >
           <button class="input" size="mini" > 保 存 </button>
           <button class="input" size="mini" bindtap="cancelBackdrop" > 取 消 </button>

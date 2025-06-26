@@ -1,0 +1,5 @@
+/* components/rent/rent_charge.wxss */
+@import '/app.wxss';
+.fui-col-view{
+  font-size: 10pt;
+}
