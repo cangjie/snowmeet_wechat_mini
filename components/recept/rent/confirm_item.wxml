@@ -176,16 +176,6 @@
         <input id="deposit" style="width: 80%;" type="number" class="input" placeholder="{{currentRentItem.deposit}}" value="{{currentRentItem.deposit==0?'':currentRentItem.deposit}}" bindinput="setNumber" />
       </view>
     </view>
-    <!--view style="display: flex;flex-direction: row;">
-      <view style="width: 20%;text-align: right;" class="op-cell">超时费：</view>
-      <view style="width: 30%;margin-left: 0rpx;" class="op-cell">
-        <input id="overtime_charge" style="width: 80%;" type="number" class="input" placeholder="{{currentRentItem.overtime_charge}}" value="{{currentRentItem.overtime_charge==0?'':currentRentItem.overtime_charge}}" bindinput="setNumber" />
-      </view>
-      <view style="width: 20%;text-align: right;" class="op-cell">租金减免：</view>
-      <view style="width: 30%;margin-left: 0rpx;" class="op-cell">
-        <input id="discount" style="width: 80%;" type="number" class="input" placeholder="{{currentRentItem.rental_discount}}" value="{{currentRentItem.rental_discount==0?'':currentRentItem.rental_discount}}" bindinput="setNumber" />
-      </view>
-    </view-->
     <view style="display: flex;flex-direction: row;">
       <view style="width: 20%;text-align: right;" class="op-cell">备注：</view>
       <view style="width: 80%;margin-left: 0rpx;" class="op-cell">
