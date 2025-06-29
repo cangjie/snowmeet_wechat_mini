@@ -54,6 +54,9 @@ App({
           app.globalData.sessionKey = encodeURIComponent(session.session_key)
           app.globalData.member = session.member
           app.globalData.staff = session.staff
+          app.globalData.deviceInfo = wx.getDeviceInfo()
+          app.globalData.windowInfo = wx.getWindowInfo()
+          app.globalData.appBaseInfo = wx.getAppBaseInfo()
           wx.getSystemInfoAsync({
             success: (res) => {
               app.globalData.systemInfo = res
@@ -79,6 +82,7 @@ App({
               }
             },
             complete: (res) => {
+              console.log('global data', app.globalData)
               resolve({})
               console.log('env', env)
             }

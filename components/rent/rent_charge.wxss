@@ -3,3 +3,13 @@
 .fui-col-view{
   font-size: 10pt;
 }
+.charge-block{
+  margin-left: 10rpx; 
+  margin-right: 10rpx; 
+  background-color: #F0F0F0; 
+  padding-top: 20rpx;
+  border-top-left-radius: 16rpx;
+  border-top-right-radius: 16rpx;
+  border-bottom-left-radius: 16rpx;
+  border-bottom-right-radius: 16rpx
+}

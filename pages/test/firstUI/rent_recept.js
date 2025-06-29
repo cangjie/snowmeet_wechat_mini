@@ -41,6 +41,7 @@ Page({
     app.loginPromiseNew.then(function (resolve){
       that.getCatagories()
       that.getPackageList()
+      that.setData({windowHeight: app.globalData.windowInfo.screenHeight})
     })
   },
 
@@ -338,5 +339,8 @@ Page({
     else {
       that.setData({displayRental: true})
     }
+  },
+  scroll(e){
+    console.log('scroll')
   }
 })

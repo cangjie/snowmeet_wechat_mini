@@ -3,6 +3,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "scrolltest",
+          "pathName": "pages/test/firstUI/scroll_test",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "rentNew",
           "pathName": "pages/test/firstUI/rent_recept",
           "query": "",
