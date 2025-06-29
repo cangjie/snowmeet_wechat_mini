@@ -324,6 +324,8 @@ Page({
       }
     }
     if (currentRental != null && currentItem != null){
+      currentRental.menu = that.getRentalItemMenus(currentRental)
+      currentRental.currentMenuIndex = 0
       that.setData({currentRental, currentItem, showBackdrop: true, action: 'packageItem'})
     }
   },
@@ -333,9 +335,24 @@ Page({
     var rentals = that.data.rentals
     var currentRental = rentals[parseInt(id)]
     if (currentRental != null){
+      
       that.setData({currentRental, showBackdrop: true, action: 'package'})
     }
 
+  },
+  getRentalItemMenus(rental){
+    var items = rental.rentItems
+    var menu = []
+    for(var i = 0; i < items.length; i++){
+      var item = items[i]
+      var menuItem = {
+        id: i,
+        name: item.categoryName,
+        badge: (item.name || item.code)? 0 : 1
+      }
+      menu.push(menuItem)
+    }
+    return menu
   },
   showItem(e){
     var that = this

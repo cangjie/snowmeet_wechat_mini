@@ -129,34 +129,36 @@
 <fui-backdrop show="{{showBackdrop}}" closable >
   <block wx:if="{{action == 'packageItem'}}" >
     <fui-card title="套餐名称：{{currentRental.name}}" tag="aaa">
-      
       <view class="fui-card__content" style="width: 650rpx;" >
-        <fui-tabs tabs="{{values1}}" isDot scroll alignLeft current="{{-1}}" ></fui-tabs>
-        <view class="view-row" >
+        <fui-tabs tabs="{{currentRental.menu}}" isDot scroll alignLeft size="22" current="{{currentRental.currentMenuIndex}}" ></fui-tabs>
+        <!--0view class="view-row" >
           <view class="left-column" >品类：</view>
           <view class="right-column" >{{currentItem.categoryName}}</view>
+        </view-->
+        <view class="view-row" >
+          <view class="left-column" style="width: 150rpx;" >无码物品：</view>
+          <view class="right-column" style="width: 500rpx;" ><switch  style="margin-left: 10rpx;" checked="{{false}}" >无码物品</switch></view>
         </view>
         <view class="view-row" >
-          <view class="left-column" >编码：</view>
-          <view class="right-column view-row" style="width: 550rpx;" >
+          <view class="left-column" style="width: 150rpx;" >编码：</view>
+          <view class="right-column view-row" style="width: 500rpx;" >
             <input class="input" style="width: 200rpx;" />
             <button style="width:45rpx; height:45rpx; margin-left:20rpx; margin-right: 0rpx;" 
-            bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
-            <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 45rpx;margin-left: -15px;" />
-          </button>
-          <switch  style="margin-left: 10rpx;" checked="{{false}}" >无码物品</switch>
+              bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
+              <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 45rpx;margin-left: -15px;" />
+            </button>
           </view>
         </view>
         <view class="view-row" >
-          <view class="left-column" >名称：</view>
-          <view class="right-column">
+          <view class="left-column" style="width: 150rpx;" >名称：</view>
+          <view class="right-column" style="width: 500rpx;" >
             <input class="input" style="width: 350rpx;" />
           </view>
         </view>
         <view class="view-row" >
-          <view class="left-column" ></view>
-          <view class="right-column" >
-            <switch checked="{{false}}" >不需要</switch>
+          <view class="left-column" style="width: 150rpx;" >不需要：</view>
+          <view class="right-column" style="width: 500rpx;" >
+            <switch checked="{{false}}" ></switch>
           </view>
         </view>
         <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;" >
