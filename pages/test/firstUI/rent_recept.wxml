@@ -128,8 +128,10 @@
 </view>
 <fui-backdrop show="{{showBackdrop}}" closable >
   <block wx:if="{{action == 'packageItem'}}" >
-    <fui-card title="套餐名称：{{currentRental.name}}" tag="">
+    <fui-card title="套餐名称：{{currentRental.name}}" tag="aaa">
+      
       <view class="fui-card__content" style="width: 650rpx;" >
+        <fui-tabs tabs="{{values1}}" isDot scroll alignLeft current="{{-1}}" ></fui-tabs>
         <view class="view-row" >
           <view class="left-column" >品类：</view>
           <view class="right-column" >{{currentItem.categoryName}}</view>
@@ -221,6 +223,5 @@
         <button class="input" size="mini" bindtap="cancelBackdrop" > 取 消 </button>
       </view>
     </view>
-    
   </block>
 </fui-backdrop>

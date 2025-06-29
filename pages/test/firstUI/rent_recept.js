@@ -16,7 +16,27 @@ Page({
     showBackdrop: false,
     action: '',
     itemSegs: ['押金', '租金'],
-    displayRental: false
+    displayRental: false,
+    values1: [{
+      id: 1,
+      name: 'segmented1',
+      badge: 1
+    }, {
+      id: 2,
+      name: 'segmented2'
+    }, {
+      id: 3,
+      name: 'segmented3'
+    }, {
+      id: 4,
+      name: 'segmented4'
+    }, {
+      id: 5,
+      name: 'segmented5'
+    }, {
+      id: 6,
+      name: 'segmented6'
+    }]
   },
 
   /**

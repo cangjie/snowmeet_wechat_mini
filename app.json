@@ -239,6 +239,7 @@
     "fui-swipe-action": "/components/firstui/fui-swipe-action/fui-swipe-action",
     "fui-row": "/components/firstui/fui-row/fui-row",
     "fui-col": "/components/firstui/fui-col/fui-col",
+    "fui-tabs": "/components/firstui/fui-tabs/fui-tabs",
     "rent-recept-package": "/components/rent/recept_package",
     "rent-recept-item": "/components/rent/recept_item",
     "mp-cells": "weui-miniprogram/cells/cells",
