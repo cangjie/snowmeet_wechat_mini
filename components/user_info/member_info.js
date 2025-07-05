@@ -20,7 +20,8 @@ Component({
    */
   data: {
     member: undefined,
-    memberId: undefined
+    memberId: undefined,
+    inputContactNum: false
   },
   /**
    * Component methods
@@ -47,6 +48,7 @@ Component({
         var member = resolve
         member.totalDepositStr = util.showAmount(member.totalDeposit)
         member.avaliableDepositStr = util.showAmount(member.avaliableDeposit)
+        member.contactNums.push({id: 0, num:'新增'})
         that.setData({member})
         that.triggerEvent('GetMemberInfo', member)
       }).catch(function (reject){
@@ -81,6 +83,31 @@ Component({
       if (updated){
         that.triggerEvent('UpdateMemberInfo', member)
       }
+    },
+    selectNum(e){
+      console.log('contact num', e)
+      var that = this
+      var index = parseInt(e.detail.value)
+      var member = that.data.member
+      var nums = that.data.member.contactNums
+      if (index == nums.length - 1){
+        that.setData({inputContactNum: true})
+      }
+      else{
+        member.currentNum = member.contactNums[index].num
+        that.setData({member})
+        that.triggerEvent('UpdateMemberInfo', member)
+      }
+    },
+    setContactNum(e){
+      var that = this
+      var value = e.detail.value
+      var member = that.data.member
+      if (value.length == 11){
+        member.currentNum = value
+        that.triggerEvent('UpdateMemberInfo', member)
+      }
+      that.setData({member})
     }
   }
 })

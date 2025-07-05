@@ -7,10 +7,31 @@
   </mp-cell>
   <mp-cell>
     <view class="view-row" >
-      <view class="left-column" >手机号：</view>
-      <view class="right-column"  style="display: flex;flex-direction: row;">
+      <view class="left-column" >绑定手机号：</view>
+      <!--view class="right-column"  style="display: flex;flex-direction: row;">
         <input id="cell" value="{{member.cell}}" placeholder="输入手机号" bindinput="userInfoChanged" style="width: 250rpx;" class="input" />
         <button size="mini" bindtap="call" class="input" >拨打</button>
+      </view-->
+      <view class="right-column"  style="display: flex;flex-direction: row;">
+        {{member.cell? member.cell:'未绑定手机'}}
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >联系手机号：</view>
+      <!--view class="right-column"  style="display: flex;flex-direction: row;">
+        <input id="cell" value="{{member.cell}}" placeholder="输入手机号" bindinput="userInfoChanged" style="width: 250rpx;" class="input" />
+        <button size="mini" bindtap="call" class="input" >拨打</button>
+      </view-->
+      <view class="right-column"  style="display: flex;flex-direction: row;">
+        <picker class="input" range="{{member.contactNums}}"range-key="num" bindchange="selectNum" style="width: 240rpx;" >
+          <picker-view style="width: 240rpx;" >
+            <input wx:if="{{inputContactNum}}" bindinput="setContactNum" 
+              placeholder="直接输入联系手机号" style="width: 240rpx;" />
+            <view wx:else style="width: 240rpx;" >{{member.currentNum? member.currentNum : '请选择……'}}</view>
+          </picker-view>
+        </picker>
       </view>
     </view>
   </mp-cell>
