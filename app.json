@@ -245,6 +245,8 @@
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
     "shop-selector": "/components/shop_selector/shop_selector",
-    "member-info": "/components/user_info/member_info"
+    "member-info": "/components/user_info/member_info",
+    "fui-top-popup":"components/firstui/fui-top-popup/fui-top-popup",
+    "fui-icon": "components/firstui/fui-icon/fui-icon"
   }
 }

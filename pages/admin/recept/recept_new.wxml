@@ -1,2 +1,36 @@
-<!--pages/admin/recept/recept_new.wxml-->
-<text>pages/admin/recept/recept_new.wxml</text>
+<view>
+  <view style="height: 20rpx;" ></view>
+  <fui-card  title="王麻子 先生 13501177897" tag="会员" bindtap="showUserInfo"></fui-card>
+  <view style="height: 20rpx;" ></view>
+  <scroll-view scroll-y class="fui-scroll__view" style="height: {{scrollHeight}}rpx">
+    <view style="height: 100rpx;" >aaaaa</view>
+    <view style="height: 100rpx;" >bbbbc</view>
+    <view style="height: 100rpx;" >ccccc</view>
+    <view style="height: 100rpx;" >ddddd</view>
+    <view style="height: 100rpx;" >eeeee</view>
+    <view style="height: 100rpx;" >fffff</view>
+    <view style="height: 100rpx;" >ggggg</view>
+    <view style="height: 100rpx;" >hhhhh</view>
+    <view style="height: 100rpx;" >iiiii</view>
+    <view style="height: 100rpx;" >jjjjj</view>
+  </scroll-view>
+  <view>bottom</view>
+  <fui-top-popup show="{{showUserInfo}}" bindclose="closePopup">
+    <view class="fui-scroll__wrap">
+      <view class="fui-title fui-title__pb">用户信息</view>
+      <scroll-view scroll-y class="fui-scroll__view">
+        <view>aaaaa</view>
+        <view>aaaaa</view>
+        <view>aaaaa</view>
+        <view>aaaaa</view>
+        <view>aaaaa</view>
+        <view>aaaaa</view>
+        <view>aaaaa</view>
+      </scroll-view>
+      <view class="fui-icon__close" bindtap="closeUserInfo">
+        <fui-icon name="close" size="{{48}}"></fui-icon>
+      </view>
+    </view>
+  </fui-top-popup>
+
+</view>

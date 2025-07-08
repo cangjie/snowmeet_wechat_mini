@@ -301,3 +301,31 @@ uni-page-body {
 	word-break: break-all;
 	box-sizing: border-box;
 }
+.fui-custom__wrap {
+	width: 100%;
+	height: 520rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.fui-scroll__wrap {
+	padding-top: 30rpx;
+	padding-bottom: 24rpx;
+	position: relative;
+}
+.fui-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	text-align: center;
+	padding-bottom: 24rpx;
+}
+.fui-icon__close {
+	position: absolute;
+	top: 24rpx;
+	left: 24rpx;
+}
+
+.fui-scroll__view {
+	width: 100%;
+	height: 600rpx;
+}

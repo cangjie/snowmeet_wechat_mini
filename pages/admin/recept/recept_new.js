@@ -1,18 +1,22 @@
 // pages/admin/recept/recept_new.js
+const app = getApp()
 Page({
 
   /**
    * Page initial data
    */
   data: {
-
+    showUserInfo: false
   },
 
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    var that = this
+    app.loginPromiseNew.then(function (resolve){
+      that.setData({scrollHeight: app.globalData.windowInfo.windowHeight * 2-220})
+    })
   },
 
   /**
@@ -62,5 +66,13 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  showUserInfo(){
+    var that = this
+    that.setData({showUserInfo: true})
+  },
+  closeUserInfo(e){
+    var that = this
+    that.setData({showUserInfo: false})
   }
 })

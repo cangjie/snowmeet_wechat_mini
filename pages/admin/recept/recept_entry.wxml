@@ -16,7 +16,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="散客零售" >
+  <mp-cells title="散客" >
     <mp-cell>
       <button class="input" bind:tap="unRegGoDirect" > 直 接 进 入 </button>
     </mp-cell>

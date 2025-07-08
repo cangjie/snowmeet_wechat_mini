@@ -76,6 +76,12 @@ Component({
             updated = true
           }
           break
+        case 'contact_num':
+          member.contact_num = value
+          if (member.contact_num.length == 11){
+            updated = true
+          }
+          break
         default:
           break
       }
@@ -94,8 +100,8 @@ Component({
         that.setData({inputContactNum: true})
       }
       else{
-        member.currentNum = member.contactNums[index].num
-        that.setData({member})
+        member.currentContactNum = member.contactNums[index].num
+        that.setData({member, contactNum: member.currentContactNum})
         that.triggerEvent('UpdateMemberInfo', member)
       }
     },
@@ -104,7 +110,7 @@ Component({
       var value = e.detail.value
       var member = that.data.member
       if (value.length == 11){
-        member.currentNum = value
+        member.currentContackNum = value
         that.triggerEvent('UpdateMemberInfo', member)
       }
       that.setData({member})

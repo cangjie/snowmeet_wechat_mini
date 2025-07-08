@@ -125,6 +125,11 @@ Page({
         url: 'recept_member_info?memberId=' + scanQrCode.scaner_member_id.toString()
       })
     }
+    if (scanQrCode.no_scan == 1){
+      wx.navigateTo({
+        url: 'recept_member_info'
+      })
+    }
     if (socketTask && !socketTask.isReplied){
       title = '网络中断'
       content = '点击确认重新连接，点击取消回到上一页。'
@@ -219,8 +224,16 @@ Page({
 
   },
   unRegGoDirect(){
+    var that = this
+    var scanQrCode = that.data.scanQrCode
+    var goDirectUrl = app.globalData.requestPrefix + 'QrCode/StartReceptWithoutScan/' + scanQrCode.id + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(goDirectUrl, undefined).then(function(resolve){
+
+    }).catch()
+    /*
     wx.navigateTo({
       url: 'recept_member_info',
     })
+    */
   }
 })

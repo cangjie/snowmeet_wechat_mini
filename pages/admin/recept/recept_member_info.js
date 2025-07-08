@@ -22,7 +22,23 @@ Page({
     console.log('updated member info', e)
     var that = this
     var updatedMember = e.detail
-    that.setData({ updatedMember, needUpdate: true })
+    var memberId = null
+    var contactNum = null
+    var real_name = null
+    var gender = null
+    if (updatedMember.id){
+      memberId = e.detail.id
+    }
+    if (updatedMember.real_name){
+      real_name = updatedMember.real_name
+    }
+    if (updatedMember.gender){
+      gender = updatedMember.gender
+    }
+    if (updatedMember.currentContactNum){
+      contactNum = updatedMember.currentContactNum
+    }
+    that.setData({ updatedMember, needUpdate: true, memberId, real_name, gender, contactNum })
   },
   updateUserInfo() {
     wx.showModal({
@@ -32,7 +48,6 @@ Page({
         if (res.cancel) {
 
         }
-
         if (res.confirm) {
           var that = this
           var updatedMember = that.data.updatedMember
@@ -101,7 +116,6 @@ Page({
     var that = this
     that.setData({ ticketCode: code })
   },
-
   /**
    * Lifecycle function--Called when page load
    */
@@ -110,33 +124,23 @@ Page({
     if (options.memberId != undefined) {
       that.setData({ memberId: options.memberId })
     }
-    /*
-    if (options.code != undefined){
-      that.setData({code: options.code})
-    }
-    that.getScore()
-    */
   },
-
   onShow() {
     var that = this
     that.getScore()
   },
-
   /**
    * Lifecycle function--Called when page is initially rendered
    */
   onReady() {
 
   },
-
   /**
    * Lifecycle function--Called when page show
    */
   onShow() {
 
   },
-
   /**
    * Lifecycle function--Called when page hide
    */
