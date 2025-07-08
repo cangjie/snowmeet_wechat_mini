@@ -14,7 +14,15 @@
     <view style="height: 100rpx;" >iiiii</view>
     <view style="height: 100rpx;" >jjjjj</view>
   </scroll-view>
-  <view>bottom</view>
+  <view class="view-row">
+    <view style="width: 175rpx;" >
+      <button class="input" size="mini" >上一步</button>
+    </view>
+    <view style="width: 400rpx;" ></view>
+    <view style="width: 175rpx;" >
+      <button class="input" size="mini" >下一步</button>
+    </view>
+  </view>
   <fui-top-popup show="{{showUserInfo}}" bindclose="closePopup">
     <view class="fui-scroll__wrap">
       <view class="fui-title fui-title__pb">用户信息</view>

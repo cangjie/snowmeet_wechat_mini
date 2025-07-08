@@ -6,7 +6,10 @@ Page({
    * Page initial data
    */
   data: {
-    showUserInfo: false
+    showUserInfo: false,
+    bizType:'sale',
+    receptId: null,
+    showSummary: false
   },
 
   /**
@@ -14,6 +17,12 @@ Page({
    */
   onLoad(options) {
     var that = this
+    that.setData({bizType: options.bizType? options.bizType: 'sale',
+      receptId: options.receptId? options.receptId : null,
+      contactNum: options.contactNum? options.contactNum : null,
+      name: options.name? options.name : null,
+      gender: options.gender? options.gender : null,
+      memberId: options.memberId? options.memberId : null})
     app.loginPromiseNew.then(function (resolve){
       that.setData({scrollHeight: app.globalData.windowInfo.windowHeight * 2-220})
     })
