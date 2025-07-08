@@ -54,6 +54,19 @@
       </view>
     </fui-list-cell>
   </fui-list>
+  <fui-section title="活动" lineColor="pink" isLine lineWidth="10rpx" ></fui-section>
+  <fui-list>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >选择活动：</view>
+        <view class="right-column" >
+          <picker class="input" style="width: 250rpx;" >
+            <picker-view >不参加活动</picker-view>
+          </picker>
+        </view>
+      </view>
+    </fui-list-cell>
+  </fui-list>
   <fui-section title="龙珠" lineColor="orange" isLine lineWidth="10rpx" ></fui-section>
   <fui-list>
     <fui-list-cell>
