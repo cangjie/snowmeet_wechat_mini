@@ -1,0 +1,84 @@
+<view>
+  <fui-section title="七色米订单信息" isLine lineWidth="10rpx" ></fui-section>
+  <fui-list>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >七色米订单号：</view>
+        <view class="right-column" >
+          <input class="input" style="width: 260rpx;" placeholder="填写七色米订单号" />
+        </view>
+      </view>
+    </fui-list-cell>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >紧急开单：</view>
+        <view class="right-column" >
+          <switch></switch>
+        </view>
+      </view>
+    </fui-list-cell>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >零售价：</view>
+        <view class="right-column" >
+          <input class="input" />
+        </view>
+      </view>
+    </fui-list-cell>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >成交价：</view>
+        <view class="right-column" >
+          <input class="input" />
+        </view>
+      </view>
+    </fui-list-cell>
+  </fui-list>
+  <block wx:if="{{false}}" >
+    <fui-section title="优惠券" lineColor="red" isLine lineWidth="10rpx" ></fui-section>
+  </block>
+  <fui-section title="额外减免" lineColor="purple" isLine lineWidth="10rpx" ></fui-section>
+  <fui-list>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >小计：</view>
+        <view class="right-column" >¥102.90</view>
+      </view>
+    </fui-list-cell>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >额外减免：</view>
+        <view class="right-column" >
+          <input class="input" />
+        </view>
+      </view>
+    </fui-list-cell>
+  </fui-list>
+  <fui-section title="龙珠" lineColor="orange" isLine lineWidth="10rpx" ></fui-section>
+  <fui-list>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >龙珠系数：</view>
+        <view class="right-column" >0.618</view>
+      </view>
+    </fui-list-cell>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >获得龙珠：</view>
+        <view class="right-column" >618</view>
+      </view>
+    </fui-list-cell>
+    <fui-list-cell>
+      <view class="view-row" >
+        <view class="left-column" >放弃龙珠：</view>
+        <view class="right-column" ><switch></switch></view>
+      </view>
+    </fui-list-cell>
+  </fui-list>
+  <fui-section title="备注" lineColor="green" isLine lineWidth="10rpx" ></fui-section>
+  <fui-list-cell>
+    <view style="margin-left: 50rpx;margin-right: 50rpx;" >
+      <textarea class="input" style="width: 600rpx;height: 300rpx;" ></textarea>
+    </view>
+  </fui-list-cell>
+</view>

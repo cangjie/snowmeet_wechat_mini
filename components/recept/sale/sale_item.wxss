@@ -1,0 +1,5 @@
+/* components/recept/sale/sale_item.wxss */
+@import '/app.wxss';
+.left-column{
+  width: 260rpx;
+}

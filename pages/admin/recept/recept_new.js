@@ -22,7 +22,9 @@ Page({
       contactNum: options.contactNum? options.contactNum : null,
       name: options.name? options.name : null,
       gender: options.gender? options.gender : null,
-      memberId: options.memberId? options.memberId : null})
+      memberId: options.memberId? options.memberId : null,
+      shop: options.shop,
+      showSummary: false})
     app.loginPromiseNew.then(function (resolve){
       that.setData({scrollHeight: app.globalData.windowInfo.windowHeight * 2-220})
     })

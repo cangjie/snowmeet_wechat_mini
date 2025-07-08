@@ -3,16 +3,10 @@
   <fui-card  title="王麻子 先生 13501177897" tag="会员" bindtap="showUserInfo"></fui-card>
   <view style="height: 20rpx;" ></view>
   <scroll-view scroll-y class="fui-scroll__view" style="height: {{scrollHeight}}rpx">
-    <view style="height: 100rpx;" >aaaaa</view>
-    <view style="height: 100rpx;" >bbbbc</view>
-    <view style="height: 100rpx;" >ccccc</view>
-    <view style="height: 100rpx;" >ddddd</view>
-    <view style="height: 100rpx;" >eeeee</view>
-    <view style="height: 100rpx;" >fffff</view>
-    <view style="height: 100rpx;" >ggggg</view>
-    <view style="height: 100rpx;" >hhhhh</view>
-    <view style="height: 100rpx;" >iiiii</view>
-    <view style="height: 100rpx;" >jjjjj</view>
+    <view wx:if="{{bizType == 'sale'}}" >
+      <sale-item wx:if="{{!showSummary}}" ></sale-item>
+      <sale-summary wx:else ></sale-summary>
+    </view>
   </scroll-view>
   <view class="view-row">
     <view style="width: 175rpx;" >

@@ -1,3 +1,6 @@
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "sale-item" : "/components/recept/sale/sale_item",
+    "sale-summary" : "/components/recept/sale/sale_summary"
+  }
 }
