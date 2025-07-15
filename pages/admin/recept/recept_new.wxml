@@ -4,17 +4,17 @@
   <view style="height: 20rpx;" ></view>
   <scroll-view scroll-y class="fui-scroll__view" style="height: {{scrollHeight}}rpx">
     <view wx:if="{{bizType == 'sale'}}" >
-      <sale-item wx:if="{{!showSummary}}" ></sale-item>
+      <sale-item wx:if="{{!showSummary && showMainComponent }}" member="{{member}}" ></sale-item>
       <sale-summary wx:else ></sale-summary>
     </view>
   </scroll-view>
-  <view class="view-row">
-    <view style="width: 175rpx;" >
+  <view class="view-row" style="margin-top:15rpx">
+    <view style="width: 175rpx;margin-left: 10rpx;" >
       <button class="input" size="mini" >上一步</button>
     </view>
     <view style="width: 400rpx;" ></view>
-    <view style="width: 175rpx;" >
-      <button class="input" size="mini" >下一步</button>
+    <view style="width: 175rpx;display: flex;justify-content: flex-end;" >
+      <button class="input" size="mini"  >下一步</button>
     </view>
   </view>
   <fui-top-popup show="{{showUserInfo}}" bindclose="closePopup">

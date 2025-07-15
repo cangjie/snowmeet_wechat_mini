@@ -3,9 +3,23 @@
     "miniprogram": {
       "list": [
         {
+          "name": "scroll",
+          "pathName": "pages/test/vtabs/scroll",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
+          "name": "vtabs",
+          "pathName": "pages/test/vtabs/vtab",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "receptnew",
           "pathName": "pages/admin/recept/recept_new",
-          "query": "",
+          "query": "contactNum=13501177897&name=苍杰测试&gender=男&memberId=15506&shop=崇礼旗舰店",
           "launchMode": "default",
           "scene": null
         },

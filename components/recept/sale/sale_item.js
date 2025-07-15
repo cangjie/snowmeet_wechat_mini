@@ -5,7 +5,7 @@ Component({
    * Component properties
    */
   properties: {
-
+    member: Object
   },
 
   /**
@@ -19,6 +19,14 @@ Component({
    * Component methods
    */
   methods: {
-
+    
+  },
+  pageLifetimes:{
+    show(){
+      var that = this
+      if (that.properties.member){
+        that.setData({member: that.properties.member})
+      }
+    }
   }
 })

@@ -21,7 +21,7 @@
       <view class="view-row" >
         <view class="left-column" >零售价：</view>
         <view class="right-column" >
-          <input class="input" />
+          <input class="input" style="width: 150rpx;" />
         </view>
       </view>
     </fui-list-cell>
@@ -29,12 +29,15 @@
       <view class="view-row" >
         <view class="left-column" >成交价：</view>
         <view class="right-column" >
-          <input class="input" />
+          <input class="input" style="width: 150rpx;" />
         </view>
       </view>
     </fui-list-cell>
   </fui-list>
   <block wx:if="{{false}}" >
+    <fui-section title="优惠券" lineColor="red" isLine lineWidth="10rpx" ></fui-section>
+  </block>
+  <block wx:if="{{member && member.avaliableTickets && member.avaliableTickets.length > 0}}" >
     <fui-section title="优惠券" lineColor="red" isLine lineWidth="10rpx" ></fui-section>
   </block>
   <fui-section title="额外减免" lineColor="purple" isLine lineWidth="10rpx" ></fui-section>
@@ -49,7 +52,7 @@
       <view class="view-row" >
         <view class="left-column" >额外减免：</view>
         <view class="right-column" >
-          <input class="input" />
+          <input class="input" style="width: 150rpx;" />
         </view>
       </view>
     </fui-list-cell>

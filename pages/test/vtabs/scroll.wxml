@@ -1,0 +1,8 @@
+<view>
+  <view style="height: 100rpx;" >asdfasdfasdfasdf</view>
+  <scroll-view scroll-y style="height: 2000rpx;width: 300rpx;" show-scrollbar  >
+    <view style="height: 1000rpx" >aaa</view>
+    <view style="height: 1000rpx" >bbb</view>
+    <view style="height: 1000rpx" >ccc</view>
+  </scroll-view>
+</view>
