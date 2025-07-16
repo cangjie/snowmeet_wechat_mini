@@ -1,0 +1,61 @@
+<view>
+  <view class="view-row">
+    <view class="left-column">选择店铺：</view>
+    <view class="right-column">
+      <shop-selector bindShopSelected="shopSelected"></shop-selector>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">Socket状态：</view>
+    <view class="right-column">
+      <switch style="width: 250rpx;" checked="{{socket && socket.isOpen}}" bindchange="switchSocket" >{{(socket && socket.isOpen)? '已连接':'未连接'}}</switch>
+    </view>
+    <view class="left-column">未打印：</view>
+    <view class="right-column">10</view>
+  </view>
+  <view class="view-row" style="margin-top: 20rpx;">
+    <button class="input" disabled="{{!shop && refreshing}}" bindtap="refreshTask">刷新</button>
+  </view>
+  <fui-row isFlex="{{true}}" align="middle" marginTop="20rpx">
+    <fui-col span="6">
+      <view style="text-align: center">日期</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: center">时间</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center">类型</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center">状态</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: center">操作</view>
+    </fui-col>
+  </fui-row>
+  <scroll-view scroll-y 
+    style="height: {{scrollHeight-200}}rpx;border: gray; border-style: solid;border-width: 1rpx;" show-scrollbar>
+    <fui-row wx:for="{{tasks}}" isFlex="true" align="middle">
+      <fui-col span="6">
+        <view style="text-align: center;" class="cell-common">{{item.dateStr}}</view>
+      </fui-col>
+      <fui-col span="4">
+        <view style="text-align: center" class="cell-common">{{item.timeStr}}</view>
+      </fui-col>
+      <fui-col span="5">
+        <view style="text-align: center" class="cell-common">{{item.biz_type}}</view>
+      </fui-col>
+      <fui-col span="5">
+        <view style="text-align: center" class="cell-common">{{item.status}}</view>
+      </fui-col>
+      <fui-col span="4">
+        <view style="text-align: center" class="cell-right">
+          <button class="input" size="mini">打印</button>
+        </view>
+      </fui-col>
+    </fui-row>
+    <!--view style="height: 500rpx;" >aaa</view>
+    <view style="height: 500rpx;" >bbb</view>
+    <view style="height: 500rpx;" >ccc</view-->
+  </scroll-view>
+</view>

@@ -1,0 +1,21 @@
+/* pages/admin/printer/gprinter/print_task.wxss */
+@import '/app.wxss';
+.cell-common {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1rpx solid gray;
+  border-bottom: 1rpx solid gray;
+  height: 75rpx;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+.cell-right{
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  border-bottom: 1rpx solid gray;
+  height: 75rpx;
+  margin-top: auto;
+  margin-bottom: auto;
+}

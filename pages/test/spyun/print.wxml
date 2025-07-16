@@ -1,0 +1,2 @@
+<!--pages/test/spyun/print.wxml-->
+<button class="input" bindtap="print" > 测 试 打 印 </button>

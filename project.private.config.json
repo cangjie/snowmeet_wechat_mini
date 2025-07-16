@@ -3,11 +3,25 @@
     "miniprogram": {
       "list": [
         {
-          "name": "scroll",
-          "pathName": "pages/test/vtabs/scroll",
+          "name": "gprinter",
+          "pathName": "pages/admin/printer/gprinter/print_task",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "spyun",
+          "pathName": "pages/test/spyun/print",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "scroll",
+          "pathName": "pages/test/vtabs/scroll",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "vtabs",
