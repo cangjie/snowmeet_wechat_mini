@@ -1,0 +1,77 @@
+// pages/test/drag/drag.js
+Page({
+
+  /**
+   * Page initial data
+   */
+  data: {
+    list: ['111111', '22刷空间塑料袋封口机啊 阿斯利康的肌肤煞风景阿拉山口剪短发 史可法那杀伤力的咖啡机 asked是发动机数量的风景啊收到回复 阿时看到就回复水电费发2222', '333333333333333333333333333333333333333333', '444444', '555555', '六六六六六六六六六六', '七七七七七七七七七七七七', '88888888', 9999999999999, 101010101010, 20202020202002020,3030303030303030, 404040404040404040, 5050505050505050, 6060606060606060606, 70707070707070707070],
+  },
+  sortChange(e) {
+    console.log('sortChange', e)
+  },
+  posChange(e) {
+    
+    console.log('posChange', e)
+    wx.vibrateShort({
+       type: 'light'
+    })
+    
+  },
+
+  /**
+   * Lifecycle function--Called when page load
+   */
+  onLoad(options) {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page is initially rendered
+   */
+  onReady() {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page show
+   */
+  onShow() {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page hide
+   */
+  onHide() {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page unload
+   */
+  onUnload() {
+
+  },
+
+  /**
+   * Page event handler function--Called when user drop down
+   */
+  onPullDownRefresh() {
+
+  },
+
+  /**
+   * Called when page reach bottom
+   */
+  onReachBottom() {
+
+  },
+
+  /**
+   * Called when user click on the top right corner to share
+   */
+  onShareAppMessage() {
+
+  }
+})

@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "gprinter",
-          "pathName": "pages/admin/printer/gprinter/print_task",
+          "name": "drag",
+          "pathName": "pages/test/drag/drag",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "gprinter",
+          "pathName": "pages/admin/printer/gprinter/print_task",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "spyun",
