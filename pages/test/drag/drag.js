@@ -11,12 +11,10 @@ Page({
     console.log('sortChange', e)
   },
   posChange(e) {
-    
     console.log('posChange', e)
     wx.vibrateShort({
-       type: 'light'
+       type: 'heavy'
     })
-    
   },
 
   /**

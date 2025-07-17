@@ -122,7 +122,8 @@
     "pages/test/vtabs/scroll",
     "pages/test/spyun/print",
     "pages/admin/printer/gprinter/print_task",
-    "pages/test/drag/drag"
+    "pages/test/drag/drag",
+    "pages/admin/fd/fd_category"
   ],
   "window": {
     "backgroundTextStyle": "light",

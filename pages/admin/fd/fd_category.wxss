@@ -1,0 +1,3 @@
+/* pages/admin/fd/fd_category.wxss */
+@import "/app.wxss";
+@import "/drag.wxss";

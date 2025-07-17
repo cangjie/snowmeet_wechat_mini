@@ -21,9 +21,10 @@
     </mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="扫码" >
-    <!--mp-cell value="扫一扫" bindtap="gotoScan" ></mp-cell-->
     <mp-cell value="【扫码】登录后台" bindtap="gotoBackground" ></mp-cell>
-    <!--mp-cell value="测试" bindtap="nav" id="test" ></mp-cell-->
+  </mp-cells> 
+  <mp-cells ext-class="my-cells" title="餐饮" >
+    <mp-cell id="fd_category" value="【餐饮】类目管理" bindtap="nav" ></mp-cell>
   </mp-cells> 
   <mp-cells title="雪票" >
     <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >【雪票】南山预定</mp-cell>

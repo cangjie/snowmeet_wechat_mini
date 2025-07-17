@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "drag-to-sort": "/components/drag/drag-to-sort/index",
+    "drag-item": "/components/drag/drag-item/index"
+  },
+  "navigationBarTitleText": "【餐饮】类目管理"
+}

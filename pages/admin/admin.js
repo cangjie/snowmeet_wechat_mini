@@ -224,7 +224,6 @@ Page({
       case 'ns_ski_pass_refund':
         path = '/pages/admin/ski_pass/nanshan_refund'
         break
-        
       case 'ns_ski_pass_veri':
         path = '/pages/admin/ski_pass/nanshan_pick_card_scan'
         break
@@ -263,6 +262,9 @@ Page({
         break
       case 'supplement':
         path = '/pages/admin/sale/supplement'
+        break
+      case 'fd_category':
+        path = '/pages/admin/fd/fd_category'
         break
       default:
         break
