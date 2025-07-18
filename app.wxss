@@ -230,11 +230,9 @@ button{
 uni-page-body {
   font-weight:400
 }
-
 .fui-section__title {
   margin-left:1rem
 }
-
 .fui-card__content {
   margin-left: 10rpx;
   margin-right: 10rpx;
@@ -253,13 +251,11 @@ uni-page-body {
   position: relative;
   background:#eee
 }
-
 .fui-cover{
   width: 100%;
   height: 12.03125rem;
   display:block
 }
-
 .fui-list__title{
   position: absolute;
   left: 0;
@@ -291,7 +287,6 @@ uni-page-body {
 	margin-right: 24rpx;
 	display: block;
 }
-
 .fui-descr {
 	width: 100%;
 	padding: 32rpx;
@@ -324,8 +319,31 @@ uni-page-body {
 	top: 24rpx;
 	left: 24rpx;
 }
-
 .fui-scroll__view {
 	width: 100%;
 	height: 600rpx;
+}
+.fui-item__box {
+	width: 100%;
+	padding: 26rpx 32rpx;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+}
+
+.fui-logo {
+	width: 48rpx;
+	height: 48rpx;
+	margin-right: 24rpx;
+	display: block;
+}
+
+.fui-descr {
+	width: 100%;
+	padding: 32rpx;
+	font-size: 28rpx;
+	line-height: 52rpx;
+	color: #7F7F7F;
+	word-break: break-all;
+	box-sizing: border-box;
 }

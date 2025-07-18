@@ -1,13 +1,28 @@
 <view>
-  <drag-to-sort length="{{categories.length}}" drag-y bind:change="sortChange" bind:poschange="posChange">
-    <drag-item wx:for="{{categories}}" wx:key="*this" class="item" idx="{{index}}">
-      <view slot="body" class="body">{{item.name}}</view>
-      <view slot="btn" class="btn">
-        <view class="btn-sign"></view>
-      </view>
-    </drag-item>
-  </drag-to-sort>
-  <view style="height: 50rpx;" ></view>
+  <fui-swipeaction-group>
+    <drag-to-sort length="{{categories.length}}" drag-y bind:change="sortChange" bind:poschange="posChange">
+      <drag-item wx:for="{{categories}}" wx:key="*this" class="item" idx="{{index}}">
+        <view slot="body" class="body">
+          <fui-swipe-action bindclick="del" id="{{item.id}}" >
+            <fui-collapse-item bindchange="change">
+              <view class="fui-item__box">
+                <text>{{item.name}}</text>
+              </view>
+              <view class="fui-descr view-row" slot="content">
+                <input bindinput="setModName" class="input" id="{{item.id}}" value="{{item.modName}}"
+                  style="width: 200rpx;text-align: center;" placeholder="{{item.name}}" />
+                <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 改 名 " background="#2EA6D0" bind:click="saveMod" id="{{item.id}}" ></fui-button>
+              </view>
+            </fui-collapse-item>
+          </fui-swipe-action>
+        </view>
+        <view slot="btn" class="btn">
+          <view class="btn-sign"></view>
+        </view>
+      </drag-item>
+    </drag-to-sort>
+  </fui-swipeaction-group>
+  <view style="height: 50rpx;"></view>
   <view>
     <fui-card title="新增类目" tag="">
       <view class="fui-card__content view-row" style="margin-top: 50rpx; margin-left: 20rpx; margin-bottom: 50rpx;">
