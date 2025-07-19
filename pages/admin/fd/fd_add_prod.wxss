@@ -1,0 +1,6 @@
+/* pages/admin/fd/fd_add_prod.wxss */
+@import "/app.wxss";
+.view-row
+{
+  margin-top: 20rpx;
+}

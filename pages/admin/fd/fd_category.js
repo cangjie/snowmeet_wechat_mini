@@ -231,7 +231,6 @@ Page({
         if (res.cancel) {
           
         }
-    
         if (res.confirm) {
           category.name = category.modName
           that.updateCategory(category, '修改名称')

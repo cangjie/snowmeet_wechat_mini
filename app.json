@@ -123,7 +123,8 @@
     "pages/test/spyun/print",
     "pages/admin/printer/gprinter/print_task",
     "pages/test/drag/drag",
-    "pages/admin/fd/fd_category"
+    "pages/admin/fd/fd_category",
+    "pages/admin/fd/fd_add_prod"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -218,6 +219,7 @@
     "fui-top-popup": "components/firstui/fui-top-popup/fui-top-popup",
     "fui-icon": "components/firstui/fui-icon/fui-icon",
     "mp-vtabs": "@miniprogram-component-plus/vtabs",
-    "mp-vtabs-content": "@miniprogram-component-plus/vtabs-content"
+    "mp-vtabs-content": "@miniprogram-component-plus/vtabs-content",
+    "fui-textarea":"components/firstui/fui-textarea/fui-textarea"
   }
 }
