@@ -23,26 +23,27 @@
   </view>
   <view class="view-row" >
     <view class="left-column" >价格：</view>
-    <view class="right-column" ><input class="input" style="width: 100rpx;" id="price" type="number" /></view>
+    <view class="right-column" ><input class="input" style="width: 100rpx;" id="price" type="number" bindinput="input"  /></view>
   </view>
   <view class="view-row" >
     <view class="left-column" >库存：</view>
     <view class="right-column" style="display: flex; flex-direction: row;width: 75%;" >
-      <input class="input" style="width: 100rpx;" id="stock_num" type="number" />
-      <switch style="margin-left: 50rpx;">无需填写</switch>
+      <input class="input" style="width: 100rpx;" id="stock_num" type="number" bindinput="input"  />
+      <switch style="margin-left: 50rpx;" checked="{{product.need_no_stock == 1}}" bindchange="setNoStock" >无需填写</switch>
     </view>
   </view>
   <view class="view-row" style="height: 64rpx;align-items: center;" >
     <view class="left-column"   >上架：</view>
-    <view class="right-column" ><switch checked="{{true}}" ></switch></view>
+    <view class="right-column" ><switch checked="{{product.on_shelves == undefined || product.on_shelves == null || product.on_shelves == 1}}" bindchange="setOnShelves" ></switch></view>
   </view>
   <block wx:if="{{selectedCategory}}" >
     <view class="view-row" wx:for="{{selectedCategory.availableProperties}}" style="align-items: center;" >
       <view class="left-column" >{{item.property_name}}：</view>
       <view class="right-column" style="width: 75%; display: flex; align-items: center;" >
-        <radio-group wx:if="{{item.multi_selected == 0}}" style="display: flex; align-items: center;" >
+        <radio-group id="{{item.id}}" wx:if="{{item.multi_selected == 0}}" 
+        style="display: flex; align-items: center;" bindchange="setPropertyChange" >
           <radio wx:for="{{item.availableOptions}}" wx:for-item="option" wx:key="{{option.id}}" 
-          style="margin-right: 20rpx;margin-top: 20rpx;" >
+          style="margin-right: 20rpx;margin-top: 20rpx;" value="{{option.id}}" >
             {{option.option_value}}
           </radio>
         </radio-group>
@@ -54,7 +55,6 @@
     <view class="right-column" style="display: flex; align-items: center;flex-direction: column;"  >
       <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" 
       text=" 上 传 " background="#2EA6D0" bind:click="uploadImage"  ></fui-button>
-      
     </view>
   </view>
   <view class="view-row" style="align-items: center;" >
@@ -63,7 +63,6 @@
       <image mode="heightFix" wx:if="{{productImageUrl}}" style="height: 300rpx;" src="{{productImageUrl}}" ></image>
     </view>
   </view>
-
   <view style="margin-top: 50rpx;display: flex;width: 750rpx;justify-content: center;">
     <fui-button btnSize="medium" style="margin-left: 50rpx;" size="35rpx" 
       text=" 添 加 " background="#2EA6D0" bind:click="add"  ></fui-button>

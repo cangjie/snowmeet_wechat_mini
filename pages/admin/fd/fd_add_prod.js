@@ -129,7 +129,7 @@ Page({
           url: uploadUrl,
           success:(res)=>{
             console.log('file uploaded', res)
-            var upload = res.data
+            var upload = JSON.parse(res.data)
             var product = that.data.product
             product.images = [{
               id: 0, 
@@ -137,15 +137,130 @@ Page({
               upload_id: upload.id,
               valid: 1,
               is_head: 1,
-              uploadFile: JSON.parse(upload)
+              uploadFile: upload
             }]
             product.availableImages = product.images
             var productImageUrl = 'https://' + app.globalData.domainName + product.availableImages[0].uploadFile.file_path_name
             that.setData({product, productImageUrl})
-
           }
         })
       }
     })
+  },
+  setOnShelves(e){
+    var that = this
+    var product = that.data.product
+    product.on_shelves = e.detail.value? 1: 0
+    that.setData({product})
+  },
+  setNoStock(e){
+    var that = this
+    var product = that.data.product
+    product.need_no_stock = e.detail.value? 1: 0
+    if (product.need_no_stock){
+      product.stock_num = null
+    }
+    that.setData({product})
+  },
+  add(e){
+    var that = this
+    var msg = that.checkValid()
+    if (msg != ''){
+      wx.showToast({
+        title: msg,
+        icon: 'error'
+      })
+      return
+    }
+    console.log('add product', that.data.product)
+    var product = that.data.product
+    if (!product.images || product.images.length == 0){
+      wx.showModal({
+        title: '商品未上传图片',
+        content: '点击确认继续添加商品，点就取消可以继续上传图片',
+        complete: (res) => {
+          if (res.cancel) {  
+          }
+          if (res.confirm) {
+            that.submitAdd()
+          }
+        }
+      })
+      return
+    }
+    wx.showModal({
+      title: '确认添加商品？',
+      content: '',
+      complete: (res) => {
+        if (res.cancel) {  
+        }
+        if (res.confirm) {
+          that.submitAdd()
+        }
+      }
+    })
+  },
+  submitAdd(){
+    var that = this
+    var product = that.data.product
+    if (product.need_no_stock == 1){
+      product.stock_num = null
+    }
+    for(var i = 0; product.images && i < product.images.length; i++){
+      product.images[i].uploadFile = null
+    }
+    var addUrl = app.globalData.requestPrefix + 'Category/AddProduct?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(addUrl, product).then(function(resolve){
+      console.log('add product', resolve)
+    })
+  },
+  checkValid(){
+    var that = this
+    var product = that.data.product
+    var msg = ''
+    if (isNaN(product.category_id)){
+      msg = '未选分类'
+    }
+    if (product.name == null || product.name == undefined){
+      msg = '名称不正确'
+    }
+    if (isNaN(product.sale_price)){
+      msg = '价格必须是数字'
+    }
+    if (product.need_no_stock != 1 && isNaN(product.stock_num)){
+      msg = '库存不正确'
+    }
+    return msg
+  },
+  setPropertyChange(e){
+    console.log('property change', e)
+    var that = this
+    var product = that.data.product
+    var id = e.currentTarget.id
+    var value = e.detail.value
+    var productProperty = {
+      id: 0,
+      product_id: product.id,
+      category_property_id: id,
+      option_id: value,
+      text_value: null,
+      valid: 1,
+    }
+    var find = false
+    for(var i = 0; product.properties && i < product.properties.length; i++){
+      var curProperty = product.properties[i]
+      if (productProperty.category_property_id ==curProperty.category_property_id){
+        curProperty.option_id = value
+        find = true
+        break
+      }
+    }
+    if (!find){
+      if (!product.properties){
+        product.properties = []
+      }
+      product.properties.push(productProperty)
+    }
+    that.setData({product})
   }
 })
