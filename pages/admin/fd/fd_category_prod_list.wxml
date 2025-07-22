@@ -4,8 +4,11 @@
       <mp-vtabs-content tabIndex="{{index}}">
         <view class="vtabs-content-item" style="margin-top: 50rpx; margin-left: 5rpx;">
           <!--view>我是第{{index + 1}}项： {{item.title}}</view-->
+          <view style="margin-top:20rpx; margin-bottom: 20rpx;display: flex;flex-direction: row;justify-content: center;"  >
+              <fui-button btnSize="medium"  size="24"  text="修改 分类：【{{categories[index].name}}】下的商品" background="#2EA6D0" bind:click="add"></fui-button>
+            </view>
           <view wx:for="{{categories[index].products}}" wx:for-index="pIdx" wx:for-item="product">
-
+            
             <fui-card src="{{product.imageUrl}}" title="{{product.name}}" tag="库存：{{product.stock_numStr}}">
               <view class="fui-card__content fui-padding view-row">
                 <view class="view-row" wx:for="{{product.availableProperties}}" wx:for-item="property">
