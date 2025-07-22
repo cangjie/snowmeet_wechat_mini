@@ -77,6 +77,45 @@ Page({
       console.log('category', categories)
       console.log('vtab', vtabs)
       that.setData({categories, vtabs})
+      that.getProductList()
+    })
+  },
+  onChange(e){
+    console.log('tab change', e)
+  },
+  onTabCLick(e){
+    console.log('bind tab click', e)
+  },
+  getProductList(){
+    var that = this
+    var categories = that.data.categories
+    for(var i = 0; i < categories.length; i++){
+      that.getCategoryProductList(categories[i].id)
+    }
+  },
+  getCategoryProductList(categoryId){
+    var that = this
+    var getUrl = app.globalData.requestPrefix + 'Category/GetCategoryProducts/' + categoryId.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getUrl, null).then(function (resolve){
+      var categories = that.data.categories
+      var category = null
+      var products = resolve
+      for(var i = 0; products && i < products.length; i++){
+        var product = products[i]
+        product.sale_priceStr = util.showAmount(product.sale_priceStr)
+        product.stock_numStr = product.sock_num? product.sock_num.toString() : '——'
+        product.imageUrl = product.availableImages.length == 0? '' : 'https://' + app.globalData.domainName + product.availableImages[0].image_url
+      }
+      for(var i = 0; i < categories.length; i++){
+        if (categories[i].id == categoryId){
+          category = categories[i]
+          break
+        }
+      }
+      if (category != null){
+        category.products = resolve
+      }
+      that.setData({categories})
     })
   }
 })
