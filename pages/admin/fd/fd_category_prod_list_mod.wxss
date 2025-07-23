@@ -1,0 +1,10 @@
+@import "/app.wxss";
+@import "/drag.wxss";
+.left-column
+{
+  width: 120rpx
+}
+.right-column
+{
+  width: 350rpx;
+}

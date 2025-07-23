@@ -125,7 +125,8 @@
     "pages/test/drag/drag",
     "pages/admin/fd/fd_category",
     "pages/admin/fd/fd_add_prod",
-    "pages/admin/fd/fd_category_prod_list"
+    "pages/admin/fd/fd_category_prod_list",
+    "pages/admin/fd/fd_category_prod_list_mod"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -221,6 +222,7 @@
     "fui-icon": "components/firstui/fui-icon/fui-icon",
     "mp-vtabs": "@miniprogram-component-plus/vtabs",
     "mp-vtabs-content": "@miniprogram-component-plus/vtabs-content",
-    "fui-textarea": "components/firstui/fui-textarea/fui-textarea"
+    "fui-textarea": "components/firstui/fui-textarea/fui-textarea",
+    "fui-white-space": "components/firstui/fui-white-space/fui-white-space"
   }
 }

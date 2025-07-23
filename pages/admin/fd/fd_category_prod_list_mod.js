@@ -1,4 +1,4 @@
-// pages/admin/fd/fd_category_prod_list.js
+// pages/admin/fd/fd_category_prod_list_mod.js
 const app = getApp()
 const util = require('../../../utils/util.js')
 Page({
@@ -14,7 +14,10 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    var that = this
+    if (options.categoryId){
+      that.setData({categoryId: options.categoryId})
+    }
   },
 
   /**
@@ -29,7 +32,7 @@ Page({
    */
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function (resovle){
+    app.loginPromiseNew.then(function (resolve){
       that.getCategory()
     })
   },
@@ -73,56 +76,60 @@ Page({
     var getUrl = app.globalData.requestPrefix + 'Category/GetSingleLevelCategory?bizType=' + encodeURIComponent('餐饮')
     util.performWebRequest(getUrl, null).then(function (resolve){
       var categories = resolve
-      var vtabs = categories.map(item => ({title: item.name, id: item.id}))
       console.log('category', categories)
-      console.log('vtab', vtabs)
-      that.setData({categories, vtabs})
-      that.getProductList()
+      var selectedCategory = null
+      if (that.data.categoryId){
+        for(var i = 0; categories && i < categories.length; i++){
+          if (categories[i].id == that.data.categoryId){
+            selectedCategory = categories[i]
+            break
+          }
+        }
+      }
+      that.setData({categories, selectedCategory})
+      if (selectedCategory){
+        that.getProductList(selectedCategory.id)
+      }
     })
   },
-  onChange(e){
-    console.log('tab change', e)
-  },
-  onTabCLick(e){
-    console.log('bind tab click', e)
-  },
-  getProductList(){
-    var that = this
-    var categories = that.data.categories
-    for(var i = 0; i < categories.length; i++){
-      that.getCategoryProductList(categories[i].id)
-    }
-  },
-  getCategoryProductList(categoryId){
+  getProductList(categoryId){
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Category/GetCategoryProducts/' + categoryId.toString() + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getUrl, null).then(function (resolve){
-      var categories = that.data.categories
-      var category = null
       var products = resolve
       for(var i = 0; products && i < products.length; i++){
         var product = products[i]
-        product.sale_priceStr = util.showAmount(product.sale_priceStr)
+        product.sale_priceStr = util.showAmount(product.sale_price)
         product.stock_numStr = product.stock_num? product.stock_num.toString() : '——'
         product.imageUrl = product.availableImages.length == 0? '' : 'https://' + app.globalData.domainName + product.availableImages[0].image_url
       }
-      for(var i = 0; i < categories.length; i++){
-        if (categories[i].id == categoryId){
-          category = categories[i]
-          break
-        }
-      }
-      if (category != null){
-        category.products = resolve
-      }
-      that.setData({categories})
+      that.setData({products})
     })
   },
-  modProdlist(e){
+  addNew(e){
+    var that = this
+    var category = that.data.selectedCategory
+    var url = 'fd_add_prod'
+    if (category){
+      url = url + '?categoryId=' + category.id
+    }
+    wx.navigateTo({
+      url: url,
+    })
+  },
+  gotoDetail(e){
     var that = this
     var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'fd_category_prod_list_mod?categoryId=' + id
+      url: 'fd_add_prod?productId=' + id,
     })
+  },
+  selectCategory(e){
+    var that = this
+    console.log('select category', e)
+    var categories = that.data.categories
+    var selectedCategory = categories[parseInt(e.detail.value)]
+    that.setData({selectedCategory})
+    that.getProductList(selectedCategory.id)
   }
 })
