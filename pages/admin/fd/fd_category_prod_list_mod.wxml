@@ -21,15 +21,19 @@
       <drag-item wx:for="{{products}}" wx:key="*this" class="item" idx="{{index}}">
         <view slot="body" class="body">
           <fui-swipe-action bindclick="del" id="{{item.id}}">
-            <fui-card id="{{item.id}}" bind:clikc="gotoDetail" title="{{item.name}}" tag="库存：{{item.stock_numStr}}">
+            <fui-card id="{{item.id}}" bind:click="gotoDetail" title="{{item.name}}" tag="库存：{{item.stock_numStr}}">
               <view class="fui-card__content fui-padding">
                 <view class="view-row">
-                  <view class="left-column">价格：</view>
-                  <view class="right-column">{{item.sale_priceStr}}</view>
+                  <view class="left-column {{item.on_shelves != 1? 'off-shelves': ''}}">价格：</view>
+                  <view class="right-column {{item.on_shelves != 1? 'off-shelves': ''}}">{{item.sale_priceStr}}</view>
+                </view>
+                <view class="view-row">
+                  <view class="left-column {{item.on_shelves != 1? 'off-shelves': ''}}">上架：</view>
+                  <view class="right-column {{item.on_shelves != 1? 'off-shelves': ''}}">{{item.on_shelves == 1 ? '是' : '否'}}</view>
                 </view>
                 <view class="view-row" wx:for="{{item.availableProperties}}" wx:for-item="property">
-                  <view class="left-column">{{property.title}}：</view>
-                  <view class="right-column">{{property.value}}</view>
+                  <view class="left-column {{item.on_shelves != 1? 'off-shelves': ''}} ">{{property.title}}：</view>
+                  <view class="right-column {{item.on_shelves != 1? 'off-shelves': ''}} ">{{property.value}}</view>
                 </view>
               </view>
             </fui-card>
