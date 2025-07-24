@@ -319,5 +319,13 @@ Page({
     util.performWebRequest(updateUrl, product).then(function (resolve){
       console.log('product updated', product)
     }) 
+  },
+  showAddStock(e){
+    var that = this
+    that.setData({addingStock: true})
+  },
+  cancelAddStock(e){
+    var that = this
+    that.setData({addingStock: false})
   }
 })
