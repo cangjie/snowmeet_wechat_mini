@@ -143,10 +143,21 @@ Page({
           url: uploadUrl,
           success:(res)=>{
             console.log('file uploaded', res)
+            if (res.statusCode != 200){
+              wx.showToast({
+                title: '上传失败' + res.statusCode.toString(),
+                icon: 'error'
+              })
+              return
+            }
             var upload = JSON.parse(res.data)
             var product = that.data.product
+            var imgId = 0
+            if (product.images && product.images.length > 0){
+              imgId = product.images[0].id
+            }
             product.images = [{
-              id: 0, 
+              id: imgId, 
               product_id: product.id,
               upload_id: upload.id,
               valid: 1,
@@ -246,11 +257,11 @@ Page({
     }
     return msg
   },
-  setPropertyChange(e){
+  setPropertyRadioChange(e){
     console.log('property change', e)
     var that = this
     var product = that.data.product
-    var id = e.currentTarget.id
+    var id = parseInt(e.currentTarget.id)
     var value = e.detail.value
     var productProperty = {
       id: 0,
@@ -300,5 +311,13 @@ Page({
       }
       that.setData({product, selectedCategory: product.category, productImageUrl})
     })
+  },
+  mod(e){
+    var that = this
+    var product = that.data.product
+    var updateUrl = app.globalData.requestPrefix + 'Category/ModProduct?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, product).then(function (resolve){
+      console.log('product updated', product)
+    }) 
   }
 })

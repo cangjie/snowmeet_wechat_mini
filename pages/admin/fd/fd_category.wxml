@@ -3,15 +3,19 @@
     <drag-to-sort length="{{categories.length}}" drag-y bind:change="sortChange" bind:poschange="posChange">
       <drag-item wx:for="{{categories}}" wx:key="*this" class="item" idx="{{index}}">
         <view slot="body" class="body">
-          <fui-swipe-action bindclick="del" id="{{item.id}}" >
+          <fui-swipe-action bindclick="del" id="{{item.id}}">
             <fui-collapse-item bindchange="change">
               <view class="fui-item__box">
                 <text>{{item.name}}</text>
               </view>
-              <view class="fui-descr view-row" slot="content">
-                <input bindinput="setModName" class="input" id="{{item.id}}" value="{{item.modName}}"
-                  style="width: 200rpx;text-align: center;" placeholder="{{item.name}}" />
-                <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 改 名 " background="#2EA6D0" bind:click="saveMod" id="{{item.id}}" ></fui-button>
+              <view class="fui-descr" slot="content">
+                <view class="view-row">
+                  <input bindinput="setModName" class="input" id="{{item.id}}" value="{{item.modName}}" style="width: 200rpx;text-align: center;" placeholder="{{item.name}}" />
+                  <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 改 名 " background="#2EA6D0" bind:click="saveMod" id="{{item.id}}"></fui-button>
+                </view>
+                <view class="view-row" >
+                  <switch id="{{item.id}}" checked="{{item.hide == 1}}" bindchange="hiddenChange" > 隐 藏 </switch>
+                </view>
               </view>
             </fui-collapse-item>
           </fui-swipe-action>

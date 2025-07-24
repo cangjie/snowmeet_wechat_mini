@@ -241,5 +241,34 @@ Page({
         }
       }
     })
+  },
+  hiddenChange(e){
+    var that = this
+    console.log('hidden', e)
+    var id = parseInt(e.currentTarget.id)
+    var value = e.detail.value
+    var category = null
+    var categories = that.data.categories
+    for(var i = 0; categories && i < categories.length; i++){
+      if (categories[i].id == id){
+        category = categories[i]
+        break
+      }
+    }
+    var title = '设置分类隐藏'
+    var content = '分类：' + category.name + ' 设置为 ' + (value?'隐藏':'正常') + ' 分类。'
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          that.getData()
+        }
+        if (res.confirm) {
+          category.hide = value? 1: 0
+          that.updateCategory(category, '修改分类是否隐藏')
+        }
+      }
+    })
   }
 })
