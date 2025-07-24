@@ -29,10 +29,17 @@
       <input class="input" style="width: 100rpx;text-align: center;" id="price" type="number" bindinput="input" value="{{product.sale_price}}"  />
     </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >库存：</view>
-    <view class="right-column" style="display: flex; flex-direction: row;width: 75%;" >
-      <input class="input" style="width: 100rpx;" id="stock_num" type="number" bindinput="input" disabled="{{product.need_no_stock == 1}}" value="{{product.stock_num}}"  />
+  <view class="view-row" style="height: 90rpx;align-items: center;"  >
+    <view class="left-column"   >库存：</view>
+    <view class="right-column" style="display: flex; flex-direction: row;width: 75%;align-items:center" >
+      <input wx:if="{{product.id == 0}}" class="input" style="width: 100rpx;" id="stock_num" type="number" bindinput="input" disabled="{{product.need_no_stock == 1}}" value="{{product.stock_num}}"  />
+      <view wx:else class="view-row" style="align-items: center;" >
+        <view>
+          {{product.need_no_stock == 1? '——':(product.stock_num==null?'——':product.stock_num)}}
+        </view>
+        <fui-button wx:if="{{product.need_no_stock != 1}}" btnSize="mini" style="margin-left: 50rpx;" size="30" 
+          text="增加库存" background="#2EA6D0" bind:click="uploadImage"  ></fui-button>
+      </view>
       <switch style="margin-left: 50rpx;" checked="{{product.need_no_stock == 1}}" bindchange="setNoStock" >无需填写</switch>
     </view>
   </view>
@@ -68,7 +75,7 @@
     </view>
   </view>
   <view style="margin-top: 50rpx;display: flex;width: 750rpx;justify-content: center;">
-    <fui-button wx:if="{{product.id == 1}}" btnSize="medium" style="margin-left: 50rpx;" size="35rpx" 
+    <fui-button wx:if="{{product.id == 0}}" btnSize="medium" style="margin-left: 50rpx;" size="35rpx" 
       text=" 添 加 " background="#2EA6D0" bind:click="add"  ></fui-button>
       <fui-button wx:else btnSize="medium" style="margin-left: 50rpx;" size="35rpx" 
       text=" 修 改 " background="#2EA6D0" bind:click="mod"  ></fui-button>

@@ -84,6 +84,7 @@ Page({
             selectedCategory = categories[i]
             break
           }
+          
         }
       }
       that.setData({categories, selectedCategory})

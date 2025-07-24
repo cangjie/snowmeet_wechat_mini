@@ -73,6 +73,11 @@ Page({
     var getUrl = app.globalData.requestPrefix + 'Category/GetSingleLevelCategory?bizType=' + encodeURIComponent('餐饮')
     util.performWebRequest(getUrl, null).then(function (resolve){
       var categories = resolve
+      for (var i = 0; categories && i < categories.length; i++){
+        if (categories[i].hide == 1){
+          categories[i].name = '【隐】'+categories[i].name
+        }
+      }
       var vtabs = categories.map(item => ({title: item.name, id: item.id}))
       console.log('category', categories)
       console.log('vtab', vtabs)
