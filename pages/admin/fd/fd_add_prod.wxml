@@ -74,18 +74,18 @@
   </view>
   <view style="margin-top: 50rpx;display: flex;width: 750rpx;justify-content: center;">
     <fui-button wx:if="{{product.id == 0}}" btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 添 加 " background="#2EA6D0" bind:click="add"></fui-button>
-    <fui-button wx:else btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 修 改 " background="#2EA6D0" bind:click="mod"></fui-button>
+    <fui-button wx:else btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 保 存 " background="#2EA6D0" bind:click="mod"></fui-button>
   </view>
   <view style="height:100rpx"></view>
   <fui-backdrop show="{{addingStock}}">
     <view style="display:flex; flex-direction:column; background-color: white; width: 560rpx;" >
       <view style="height: 100rpx;" ></view>
       <view style="align-self: center;">
-        <input style="width: 200rpx;" class="input" placeholder="添加库存数量" />
+        <input style="width: 200rpx;" class="input" placeholder="添加库存数量" bindinput="input" id="delta_stock_num" />
       </view>
       <view class="view-row" style="background-color: white;align-self: center;">
         <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 取 消 " background="#2EA6D0" bind:click="cancelAddStock"></fui-button>
-        <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 确 认 " background="#2EA6D0" ></fui-button>
+        <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 确 认 " background="#2EA6D0" bind:click="confirmAddStock" ></fui-button>
       </view>
       <view style="height: 100rpx;" ></view>
     </view>

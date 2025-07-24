@@ -122,6 +122,9 @@ Page({
       case 'stock_num':
         product.stock_num = value
         break
+      case 'delta_stock_num':
+        product.delta_stock_num = value  
+      break
       default:
         break
     }
@@ -327,5 +330,38 @@ Page({
   cancelAddStock(e){
     var that = this
     that.setData({addingStock: false})
+  },
+  confirmAddStock(e){
+    var that = this
+    var product = that.data.product
+    if (isNaN(product.delta_stock_num)){
+      wx.showToast({
+        title: '必须是数字',
+        icon: 'error'
+      })
+      return
+    }
+    var deltaStockNum = parseInt(product.delta_stock_num)
+    var stockNum = product.stock_num == null? 0 : parseInt(product.stock_num)
+    var title = '确认增加库存'
+    var content = '原有库存：' + stockNum.toString() + ' 增加库存：' + deltaStockNum.toString() + ' 增加后库存：' + (deltaStockNum + stockNum).toString() + ' 点击确认立即生效。'
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) { 
+        }
+        if (res.confirm) {
+          //product.stock_num = deltaStockNum + stockNum
+          //that.setData({product})
+          var updateUrl = app.globalData.requestPrefix + 'Category/UpdateProductStock/' + product.id.toString() + '?delta=' + deltaStockNum.toString() + '&scene=' + encodeURIComponent('界面增加库存') + '&sessionKey=' + app.globalData.sessionKey
+          util.performWebRequest(updateUrl, null).then(function (resolve){
+            var newProduct = resolve
+            product.stock_num = newProduct.stock_num
+            that.setData({product, addingStock: false})
+          })
+        }
+      }
+    }) 
   }
 })
