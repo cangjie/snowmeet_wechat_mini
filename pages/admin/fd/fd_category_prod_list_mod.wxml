@@ -1,0 +1,49 @@
+<view>
+  <view class="view-row">
+    <view class="left-column" style="width: 200rpx;">选择分类：</view>
+    <view class="right-column view-row" style="width: 500rpx;">
+      <picker class="input" range="{{categories}}" range-key="name" style="width: 300rpx;" bindchange="selectCategory" >
+        <picker-view>
+          <view style="margin-left: auto; margin-right: auto;">{{selectedCategory ? selectedCategory.name : '请选择……'}}</view>
+        </picker-view>
+      </picker>
+      <view style="margin-left: 20rpx;">共：{{products?products.length:0}}件商品</view>
+    </view>
+  </view>
+  <fui-white-space size="large"></fui-white-space>
+  <view style="display: flex;flex-direction: row; justify-content: center;">
+    <fui-button btnSize="medium" size="35" text=" 新 增 商 品 " background="#2EA6D0" bind:click="addNew" id="{{categories[index].id}}">
+    </fui-button>
+  </view>
+  <fui-white-space size="large"></fui-white-space>
+  <fui-swipeaction-group>
+    <drag-to-sort length="{{products.length}}" drag-y bind:change="sortChange" bind:poschange="posChange">
+      <drag-item wx:for="{{products}}" wx:key="*this" class="item" idx="{{index}}">
+        <view slot="body" class="body">
+          <fui-swipe-action bindclick="del" id="{{item.id}}">
+            <fui-card id="{{item.id}}" bind:click="gotoDetail" title="{{item.name}}" tag="库存：{{item.stock_numStr}}">
+              <view class="fui-card__content fui-padding">
+                <view class="view-row">
+                  <view class="left-column {{item.on_shelves != 1? 'off-shelves': ''}}">价格：</view>
+                  <view class="right-column {{item.on_shelves != 1? 'off-shelves': ''}}">{{item.sale_priceStr}}</view>
+                </view>
+                <view class="view-row">
+                  <view class="left-column {{item.on_shelves != 1? 'off-shelves': ''}}">上架：</view>
+                  <view class="right-column {{item.on_shelves != 1? 'off-shelves': ''}}">{{item.on_shelves == 1 ? '是' : '否'}}</view>
+                </view>
+                <view class="view-row" wx:for="{{item.availableProperties}}" wx:for-item="property">
+                  <view class="left-column {{item.on_shelves != 1? 'off-shelves': ''}} ">{{property.title}}：</view>
+                  <view class="right-column {{item.on_shelves != 1? 'off-shelves': ''}} ">{{property.value}}</view>
+                </view>
+              </view>
+            </fui-card>
+            <fui-white-space size="small"></fui-white-space>
+          </fui-swipe-action>
+        </view>
+        <view slot="btn" class="btn">
+          <view class="btn-sign"></view>
+        </view>
+      </drag-item>
+    </drag-to-sort>
+  </fui-swipeaction-group>
+</view>

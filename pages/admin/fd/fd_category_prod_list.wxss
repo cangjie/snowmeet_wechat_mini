@@ -1,0 +1,15 @@
+@import '/app.wxss';
+@import '/vtab.wxss';
+@import "/drag.wxss";
+.view-row
+{
+  width: 700rpx;
+}
+.right-column
+{
+  width: 470rpx;
+}
+.left-column
+{
+  width: 80rpx
+}

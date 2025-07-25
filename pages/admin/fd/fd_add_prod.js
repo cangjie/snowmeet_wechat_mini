@@ -7,7 +7,9 @@ Page({
    * Page initial data
    */
   data: {
-    product:{}
+    product:{
+      id: 0
+    }
   },
 
   /**
@@ -15,11 +17,15 @@ Page({
    */
   onLoad(options) {
     var that = this
-    if (options.id){
-      that.setData({id: options.id})
-      thatwx.setNavigationBarTitle({
+    if (options.productId){
+      that.setData({productId: options.productId})
+      wx.setNavigationBarTitle({
         title: '【餐饮】修改商品信息',
       })
+      that.getProudct(options.productId)
+    }
+    else if (options.categoryId){
+      that.setData({categoryId: options.categoryId})
     }
   },
 
@@ -79,6 +85,14 @@ Page({
     var url = app.globalData.requestPrefix + 'Category/GetSingleLevelCategory?bizType=' + encodeURIComponent('餐饮')
     util.performWebRequest(url, null).then(function(resolve){
       var categories = resolve
+      if (that.data.categoryId){
+        for(var i = 0; categories && i < categories.length; i++){
+          if (categories[i].id == that.data.categoryId){
+            that.setData({selectedCategory: categories[i]})
+            break
+          }
+        }
+      }
       that.setData({categories})
     })
   },
@@ -108,6 +122,9 @@ Page({
       case 'stock_num':
         product.stock_num = value
         break
+      case 'delta_stock_num':
+        product.delta_stock_num = value  
+      break
       default:
         break
     }
@@ -129,10 +146,21 @@ Page({
           url: uploadUrl,
           success:(res)=>{
             console.log('file uploaded', res)
+            if (res.statusCode != 200){
+              wx.showToast({
+                title: '上传失败' + res.statusCode.toString(),
+                icon: 'error'
+              })
+              return
+            }
             var upload = JSON.parse(res.data)
             var product = that.data.product
+            var imgId = 0
+            if (product.images && product.images.length > 0){
+              imgId = product.images[0].id
+            }
             product.images = [{
-              id: 0, 
+              id: imgId, 
               product_id: product.id,
               upload_id: upload.id,
               valid: 1,
@@ -232,11 +260,11 @@ Page({
     }
     return msg
   },
-  setPropertyChange(e){
+  setPropertyRadioChange(e){
     console.log('property change', e)
     var that = this
     var product = that.data.product
-    var id = e.currentTarget.id
+    var id = parseInt(e.currentTarget.id)
     var value = e.detail.value
     var productProperty = {
       id: 0,
@@ -262,5 +290,78 @@ Page({
       product.properties.push(productProperty)
     }
     that.setData({product})
+  },
+  getProudct(id){
+    var that = this
+    var getUrl = app.globalData.requestPrefix + 'Category/GetProduct/' + id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getUrl, null).then(function (resolve){
+      var product = resolve
+      product.sale_priceStr = util.showAmount(product.sale_price)
+      if (product.stock_num==null){
+        product.need_no_stock = 1
+      }
+      else{
+        product.need_no_stock = 0
+      }
+      product.stock_numStr = product.stock_num? product.stock_num.toString() : '——'
+      //product.imageUrl = product.availableImages.length == 0? '' : 'https://' + app.globalData.domainName + product.availableImages[0].image_url
+      var productImageUrl = null
+      try{
+        productImageUrl = 'https://' + app.globalData.domainName + product.availableImages[0].uploadFile.file_path_name
+      }
+      catch{
+
+      }
+      that.setData({product, selectedCategory: product.category, productImageUrl})
+    })
+  },
+  mod(e){
+    var that = this
+    var product = that.data.product
+    var updateUrl = app.globalData.requestPrefix + 'Category/ModProduct?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, product).then(function (resolve){
+      console.log('product updated', product)
+    }) 
+  },
+  showAddStock(e){
+    var that = this
+    that.setData({addingStock: true})
+  },
+  cancelAddStock(e){
+    var that = this
+    that.setData({addingStock: false})
+  },
+  confirmAddStock(e){
+    var that = this
+    var product = that.data.product
+    if (isNaN(product.delta_stock_num)){
+      wx.showToast({
+        title: '必须是数字',
+        icon: 'error'
+      })
+      return
+    }
+    var deltaStockNum = parseInt(product.delta_stock_num)
+    var stockNum = product.stock_num == null? 0 : parseInt(product.stock_num)
+    var title = '确认增加库存'
+    var content = '原有库存：' + stockNum.toString() + ' 增加库存：' + deltaStockNum.toString() + ' 增加后库存：' + (deltaStockNum + stockNum).toString() + ' 点击确认立即生效。'
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) { 
+        }
+        if (res.confirm) {
+          //product.stock_num = deltaStockNum + stockNum
+          //that.setData({product})
+          var updateUrl = app.globalData.requestPrefix + 'Category/UpdateProductStock/' + product.id.toString() + '?delta=' + deltaStockNum.toString() + '&scene=' + encodeURIComponent('界面增加库存') + '&sessionKey=' + app.globalData.sessionKey
+          util.performWebRequest(updateUrl, null).then(function (resolve){
+            var newProduct = resolve
+            product.stock_num = newProduct.stock_num
+            that.setData({product, addingStock: false})
+          })
+        }
+      }
+    }) 
   }
 })

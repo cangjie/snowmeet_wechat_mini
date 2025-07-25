@@ -269,6 +269,9 @@ Page({
       case 'fd_add_prod':
         path = '/pages/admin/fd/fd_add_prod'
         break
+      case 'fd_prod_list':
+        path = '/pages/admin/fd/fd_category_prod_list'
+        break
       default:
         break
     }

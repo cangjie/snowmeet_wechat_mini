@@ -22,7 +22,7 @@
   </view>
   <view style="height: 20rpx;" ></view>
   <view class="charge-block" >
-    <fui-section title="计划及租金单价" isLine></fui-section>
+    <fui-section title="【租金单价】" isLine></fui-section>
     <view class="view-row" >
       <view class="left-column"  style="width: 200rpx;" >起租日期：</view>
       <view class="right-column"   >
@@ -55,7 +55,7 @@
   </view>
   <view style="height: 20rpx;" ></view>
   <view class="charge-block" >
-    <fui-section title="租金减免" isLine></fui-section>
+    <fui-section title="【租金明细】" isLine></fui-section>
     <view class="view-row" >
       <view class="left-column"  style="width: 200rpx;" >租金一口价：</view>
       <view class="right-column"   ><input class="input" style="width: 100rpx;" /></view>
