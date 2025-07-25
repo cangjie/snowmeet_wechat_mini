@@ -6,8 +6,8 @@
           "name": "drag",
           "pathName": "pages/test/drag/drag",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "gprinter",
