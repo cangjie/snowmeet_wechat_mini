@@ -44,8 +44,13 @@
   </view>
   <view class="view-row" style="height: 64rpx;align-items: center;">
     <view class="left-column">上架：</view>
-    <view class="right-column">
-      <switch checked="{{product.on_shelves == undefined || product.on_shelves == null || product.on_shelves == 1}}" bindchange="setOnShelves"></switch>
+    <view class="right-column" style="width: 500rpx;">
+      <checkbox-group class="view-row" bindchange="setCheckbox">
+        <checkbox value="hidden" checked="{{product.hidden==1}}" >顾客端隐藏</checkbox>
+        <checkbox value="no_entrain" checked="{{product.no_entrain == 1}}" >不可招待</checkbox>
+        <checkbox value="on_shelves" checked="{{product.on_shelves == 0}}" >不可售卖</checkbox>
+      </checkbox-group>
+      <!--switch checked="{{product.on_shelves == undefined || product.on_shelves == null || product.on_shelves == 1}}" bindchange="setOnShelves"></switch-->
     </view>
   </view>
   <block wx:if="{{selectedCategory}}">

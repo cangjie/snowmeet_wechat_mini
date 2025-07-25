@@ -363,5 +363,32 @@ Page({
         }
       }
     }) 
+  },
+  setCheckbox(e){
+    var that = this
+    var product = that.data.product
+    var optionArr = e.detail.value
+    var hide = 0
+    var no_entrain = 0
+    var on_shelves = 1
+    for(var i = 0; i < optionArr.length; i++){
+      switch(optionArr[i]){
+        case 'hidden':
+          hide = 1
+          break
+        case 'no_entrain':
+          no_entrain = 1
+          break
+        case 'on_shelves':
+          on_shelves = 0
+          break
+        default:
+          break
+      }
+    }
+    product.hidden = hide
+    product.no_entrain = no_entrain
+    product.on_shelves = on_shelves
+    that.setData({product})
   }
 })
