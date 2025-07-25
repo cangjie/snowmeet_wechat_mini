@@ -8,7 +8,11 @@ Page({
    */
   data: {
     product:{
-      id: 0
+      id: 0,
+      valid: 1,
+      on_shelves: 1,
+      no_entrain: 0,
+      hidden: 0
     }
   },
 
@@ -82,13 +86,15 @@ Page({
   },
   getCategory(){
     var that = this
+    var product = that.data.product
     var url = app.globalData.requestPrefix + 'Category/GetSingleLevelCategory?bizType=' + encodeURIComponent('餐饮')
     util.performWebRequest(url, null).then(function(resolve){
       var categories = resolve
       if (that.data.categoryId){
         for(var i = 0; categories && i < categories.length; i++){
           if (categories[i].id == that.data.categoryId){
-            that.setData({selectedCategory: categories[i]})
+            product.category_id = categories[i].id
+            that.setData({selectedCategory: categories[i], product})
             break
           }
         }

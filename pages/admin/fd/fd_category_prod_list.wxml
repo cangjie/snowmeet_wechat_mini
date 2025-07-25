@@ -26,9 +26,12 @@
                   <view class="left-column">类型：</view>
                   <view class="right-column">
                     <radio-group>
-                      <radio checked="true">正常</radio>
-                      <radio>招待</radio>
-                      <radio>出库</radio>
+                      <radio 
+                        disabled="{{product.on_shelves != 1 || categories[index].on_shelves !=1}}" 
+                        checked="true">正常</radio>
+                      <radio 
+                        disabled="{{product.no_entrain == 1 || categories[index].no_entrain == 1}}">招待</radio>
+                      <radio  >出库</radio>
                     </radio-group>
                   </view>
                 </view>

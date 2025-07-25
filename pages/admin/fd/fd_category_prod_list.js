@@ -129,5 +129,6 @@ Page({
     wx.navigateTo({
       url: 'fd_category_prod_list_mod?categoryId=' + id
     })
-  }
+  },
+  
 })

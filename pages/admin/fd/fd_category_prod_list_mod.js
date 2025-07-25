@@ -132,5 +132,60 @@ Page({
     var selectedCategory = categories[parseInt(e.detail.value)]
     that.setData({selectedCategory})
     that.getProductList(selectedCategory.id)
+  },
+  sortChange(e) {
+    console.log('sortChange', e)
+    //return
+    var that = this
+    var sort = e.detail.sort
+    var products = that.data.products
+    var maxSort = products.length * 100
+    for(var i = 0; i < products.length; i++){
+      var product = products[i]
+      product.sort = maxSort - sort[i] * 100 + 100
+    }
+    var newProducts = products.sort((a, b)=>b.sort - a.sort)
+    for(var i = 0; i < newProducts.length; i++){
+      that.updateProduct(newProducts[i])
+    }
+    that.setData({products: newProducts})
+  },
+  posChange(e) {
+    console.log('posChange', e)
+    wx.vibrateShort({
+       type: 'heavy'
+    })
+  },
+  updateProduct(product){
+    var that = this
+    //var product = that.data.product
+    var updateUrl = app.globalData.requestPrefix + 'Category/ModProduct?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, product).then(function (resolve){
+      console.log('product updated', product)
+      that.getProductList(that.data.selectedCategory.id)
+    })
+  },
+  del(e){
+    console.log('del', e)
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var product = that.getProduct(id)
+    if (!product){
+      return
+    }
+    product.valid = 0
+    that.updateProduct(product)
+  },
+  getProduct(id){
+    var that = this
+    var product = null
+    var products = that.data.products
+    for(var i = 0; products && i < products.length; i++){
+      if (products[i].id == id){
+        product = products[i]
+        break
+      }
+    }
+    return product
   }
 })
