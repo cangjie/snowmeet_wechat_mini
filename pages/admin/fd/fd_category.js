@@ -247,14 +247,7 @@ Page({
     console.log('hidden', e)
     var id = parseInt(e.currentTarget.id)
     var value = e.detail.value
-    var category = null
-    var categories = that.data.categories
-    for(var i = 0; categories && i < categories.length; i++){
-      if (categories[i].id == id){
-        category = categories[i]
-        break
-      }
-    }
+    var category = that.getCategoryById(id)
     var title = '设置分类隐藏'
     var content = '分类：' + category.name + ' 设置为 ' + (value?'隐藏':'正常') + ' 分类。'
     wx.showModal({
@@ -270,5 +263,60 @@ Page({
         }
       }
     })
+  },
+  optionChange(e){
+    console.log('option change', e)
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var optionArr = e.detail.value
+    var category = that.getCategoryById(id)
+    var title = '修改当前分类属性'
+    var hide = 0
+    var no_entrain = 0
+    var on_shelves = 1
+    for(var i = 0; i < optionArr.length; i++){
+      switch(optionArr[i]){
+        case 'hide':
+          hide = 1
+          break
+        case 'no_entrain':
+          no_entrain = 1
+          break
+        case 'on_shelves':
+          on_shelves = 0
+          break
+        default:
+          break
+      }
+    }
+    var content = '分类：' + category.name +  ' 隐藏：顾客端' + (hide == 1? '不' : '') + '可见 \r\n招待：' + (no_entrain == 1? '不':'') + '可以 \r\n售卖：' + (on_shelves == 1 ? '': '不') + '可以'
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          category.hide = hide
+          category.no_entrain = no_entrain
+          category.on_shelves = on_shelves
+          that.updateCategory(category, '修改属性')
+        }
+      }
+    })
+  },
+  getCategoryById(id){
+    var that = this
+    var category = null
+    var categories = that.data.categories
+    for(var i = 0; categories && i < categories.length; i++){
+      if (categories[i].id == id){
+        category = categories[i]
+        break
+      }
+    }
+    return category
   }
 })

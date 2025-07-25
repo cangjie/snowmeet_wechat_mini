@@ -1,3 +1,8 @@
 /* pages/admin/fd/fd_category.wxss */
 @import "/app.wxss";
 @import "/drag.wxss";
+checkbox
+{
+  margin-left: 15rpx;
+  margin-top: 15rpx
+}
