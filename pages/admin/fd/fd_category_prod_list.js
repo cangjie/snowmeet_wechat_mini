@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    showVtabs: true
   },
 
   /**
@@ -109,7 +109,7 @@ Page({
         var product = products[i]
         product.sale_priceStr = util.showAmount(product.sale_priceStr)
         product.stock_numStr = product.stock_num? product.stock_num.toString() : '——'
-        product.imageUrl = product.availableImages.length == 0? '' : 'https://' + app.globalData.domainName + product.availableImages[0].image_url
+        product.imageUrl = product.availableImages.length == 0? '' : 'https://' + app.globalData.domainName + product.availableImages[0].imageUrl
       }
       for(var i = 0; i < categories.length; i++){
         if (categories[i].id == categoryId){
@@ -120,7 +120,8 @@ Page({
       if (category != null){
         category.products = resolve
       }
-      that.setData({categories})
+      that.setData({categories, showVtabs: false})
+      that.setData({showVtabs: true})
     })
   },
   modProdlist(e){

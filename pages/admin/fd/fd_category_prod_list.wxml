@@ -1,9 +1,9 @@
 <view>
-  <mp-vtabs vtabs="{{vtabs}}" activeTab="{{activeTab}}" bindtabclick="onTabCLick" bindchange="onChange" class="test">
+  <mp-vtabs wx:if="{{showVtabs}}" vtabs="{{vtabs}}" activeTab="{{activeTab}}" bindtabclick="onTabCLick" bindchange="onChange" class="test">
     <block wx:for="{{vtabs}}" wx:key="title">
       <mp-vtabs-content tabIndex="{{index}}">
-        <view class="vtabs-content-item" style="height:{{categories[index].products.length * 600 + 50}}rpx;margin-left: 5rpx;margin-top: 10rpx;">
-          <!--0view>我是第{{index + 1}}项： {{item.title}}</view-->
+        <view class="vtabs-content-item" style="height:{{categories[index].products.length * 580 + 50}}rpx;margin-left: 5rpx;margin-top: 10rpx;">
+          <!--view>我是第{{index + 1}}项： {{categories[index].products.length}}</view-->
           <!--view style="margin-top:10rpx; margin-bottom: 10rpx;display: flex;flex-direction: row;justify-content: center;">
             <fui-button btnSize="medium" size="24" text="修改 分类【{{categories[index].name}}】下的商品" background="#2EA6D0" 
               bind:click="modProdlist" id="{{categories[index].id}}" >
@@ -11,7 +11,7 @@
           </view-->
           
           <view wx:for="{{categories[index].products}}" wx:for-index="pIdx" wx:for-item="product">
-            <fui-card src="{{product.imageUrl}}" title="{{product.name}}" tag="库存：{{product.stock_numStr}}">
+            <fui-card  title="{{product.name}}" tag="库存：{{product.stock_numStr}}">
               <view class="fui-card__content fui-padding view-row">
                 <view class="view-row" wx:for="{{product.availableProperties}}" wx:for-item="property">
                   <view class="left-column">{{property.title}}：</view>
