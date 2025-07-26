@@ -110,7 +110,7 @@ Component({
         tabActiveBgColor: { type: String, value: '#ffffff' },
         activeTab: { type: Number, value: 0 },
         animation: { type: Boolean, value: true },
-        height: { type: Number, value: 1000 }
+        height: { type: Number, value: 1200 }
     },
     data: {
         currentView: 0,

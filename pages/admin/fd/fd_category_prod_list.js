@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    showVtabs: true
+    showVtabs: true,
+    vtabHeight: 1000
   },
 
   /**
@@ -31,6 +32,9 @@ Page({
     var that = this
     app.loginPromiseNew.then(function (resovle){
       that.getCategory()
+      var vtabHeight = app.globalData.systemInfo.pixelRatio * app.globalData.systemInfo.screenHeight * 0.8
+      that.setData({vtabHeight, showVtabs: false})
+      that.setData({showVtabs: true})
     })
   },
 
