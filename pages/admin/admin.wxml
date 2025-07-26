@@ -24,12 +24,8 @@
     <mp-cell value="【扫码】登录后台" bindtap="gotoBackground" ></mp-cell>
   </mp-cells> 
   <mp-cells ext-class="my-cells" title="餐饮" >
-  
     <mp-cell id="fd_category" value="【餐饮】类目管理" bindtap="nav" ></mp-cell>
-  
-    <mp-cell id="fd_add_prod" value="【餐饮】添加商品" bindtap="nav" ></mp-cell>
     <mp-cell id="fd_prod_list" value="【餐饮】商品列表" bindtap="nav" ></mp-cell>
-  
     <mp-cell id="fd_prod_mod" value="【餐饮】商品信息修改" bindtap="nav" ></mp-cell>
   </mp-cells> 
   <mp-cells title="雪票" >

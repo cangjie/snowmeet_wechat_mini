@@ -12,7 +12,8 @@ Page({
       valid: 1,
       on_shelves: 1,
       no_entrain: 0,
-      hidden: 0
+      hidden: 0,
+      stock_num: 0
     }
   },
 
@@ -191,8 +192,11 @@ Page({
     var that = this
     var product = that.data.product
     product.need_no_stock = e.detail.value? 1: 0
-    if (product.need_no_stock){
+    if (product.need_no_stock == 1){
       product.stock_num = null
+    }
+    else{
+      product.stock_num = 0
     }
     that.setData({product})
   },
@@ -246,6 +250,25 @@ Page({
     var addUrl = app.globalData.requestPrefix + 'Category/AddProduct?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(addUrl, product).then(function(resolve){
       console.log('add product', resolve)
+      wx.showModal({
+        title: '添加商品成功',
+        content: '',
+        cancelText:'返回分类',
+        confirmText: '继续添加',
+        complete: (res) => {
+          if (res.cancel) {
+            wx.navigateTo({
+              url: 'fd_category_prod_list_mod?categoryId=' + that.data.product.category_id,
+            })
+          }
+      
+          if (res.confirm) {
+            wx.navigateTo({
+              url: 'fd_add_prod?categoryId=' + that.data.product.category_id,
+            })
+          }
+        }
+      })
     })
   },
   checkValid(){
@@ -261,9 +284,7 @@ Page({
     if (isNaN(product.sale_price)){
       msg = '价格必须是数字'
     }
-    if (product.need_no_stock != 1 && isNaN(product.stock_num)){
-      msg = '库存不正确'
-    }
+    
     return msg
   },
   setPropertyRadioChange(e){
@@ -327,6 +348,21 @@ Page({
     var updateUrl = app.globalData.requestPrefix + 'Category/ModProduct?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(updateUrl, product).then(function (resolve){
       console.log('product updated', product)
+      wx.showModal({
+        title: '商品信息已经更新',
+        content: '',
+        cancelText:'留在该页',
+        confirmText:'返回列表',
+        complete: (res) => {
+          if (res.cancel) {
+            
+          }
+      
+          if (res.confirm) {
+            wx.navigateBack()
+          }
+        }
+      })
     }) 
   },
   showAddStock(e){

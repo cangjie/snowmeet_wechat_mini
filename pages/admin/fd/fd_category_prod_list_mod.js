@@ -103,7 +103,7 @@ Page({
       for(var i = 0; products && i < products.length; i++){
         var product = products[i]
         product.sale_priceStr = util.showAmount(product.sale_price)
-        product.stock_numStr = product.stock_num? product.stock_num.toString() : '——'
+        product.stock_numStr = product.stock_num == null ? '——' : product.stock_num.toString()
         product.imageUrl = product.availableImages.length == 0? '' : 'https://' + app.globalData.domainName + product.availableImages[0].image_url
       }
       that.setData({products})

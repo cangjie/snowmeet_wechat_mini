@@ -32,14 +32,16 @@
   <view class="view-row" style="height: 90rpx;align-items: center;">
     <view class="left-column">库存：</view>
     <view class="right-column" style="display: flex; flex-direction: row;width: 75%;align-items:center">
-      
-      <view  class="view-row" style="align-items: center;">
-        <view>
-          {{product.need_no_stock == 1? '——':(product.stock_num==null?'——':product.stock_num)}}
+      <switch wx:if="{{product.id == 0}}" style="margin-left: 50rpx;" checked="{{product.need_no_stock == 1}}" bindchange="setNoStock">无需库存管理</switch>
+      <view wx:else class="view-row" style="align-items: center;">
+        <view wx:if="{{product.need_no_stock==1}}" >
+          ——
         </view>
-        <fui-button wx:if="{{product.need_no_stock != 1}}" btnSize="mini" style="margin-left: 50rpx;" size="30" text="增加库存" background="#2EA6D0" bind:click="showAddStock"></fui-button>
+        <view wx:else class="view-row" >
+          {{product.need_no_stock == 1? '——':(product.stock_num==null?'——':product.stock_num)}}
+          <fui-button wx:if="{{product.need_no_stock != 1}}" btnSize="mini" style="margin-left: 50rpx;" size="30" text="增加库存" background="#2EA6D0" bind:click="showAddStock"></fui-button>
+        </view>
       </view>
-      <switch style="margin-left: 50rpx;" checked="{{product.need_no_stock == 1}}" bindchange="setNoStock">无需填写</switch>
     </view>
   </view>
   <view class="view-row" style="height: 64rpx;align-items: center;">
