@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    titleLevel: 0
   },
 
   /**
@@ -32,7 +32,9 @@ Page({
    */
   onShow() {
     var that = this
+    console.log('selected category', that.data.selectedCategory)
     app.loginPromiseNew.then(function (resolve){
+      that.setData({titleLevel: app.globalData.staff.title_level})
       that.getCategory()
     })
   },
@@ -77,7 +79,7 @@ Page({
     util.performWebRequest(getUrl, null).then(function (resolve){
       var categories = resolve
       console.log('category', categories)
-      var selectedCategory = null
+      var selectedCategory = that.data.selectedCategory?that.data.selectedCategory:null
       if (that.data.categoryId){
         for(var i = 0; categories && i < categories.length; i++){
           if (categories[i].id == that.data.categoryId){

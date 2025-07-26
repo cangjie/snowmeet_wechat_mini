@@ -1,4 +1,4 @@
-<view>
+<view wx:if="{{titleLevel >= 200}}" >
   <view class="view-row">
     <view class="left-column" style="width: 200rpx;">选择分类：</view>
     <view class="right-column view-row" style="width: 500rpx;">
@@ -46,4 +46,7 @@
       </drag-item>
     </drag-to-sort>
   </fui-swipeaction-group>
+</view>
+<view wx:else >
+  没有权限
 </view>

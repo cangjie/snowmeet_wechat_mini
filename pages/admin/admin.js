@@ -272,6 +272,9 @@ Page({
       case 'fd_prod_list':
         path = '/pages/admin/fd/fd_category_prod_list'
         break
+      case 'fd_prod_mod':
+        path = '/pages/admin/fd/fd_category_prod_list_mod'
+        break
       default:
         break
     }

@@ -32,8 +32,8 @@
   <view class="view-row" style="height: 90rpx;align-items: center;">
     <view class="left-column">库存：</view>
     <view class="right-column" style="display: flex; flex-direction: row;width: 75%;align-items:center">
-      <input wx:if="{{product.id == 0}}" class="input" style="width: 100rpx;" id="stock_num" type="number" bindinput="input" disabled="{{product.need_no_stock == 1}}" value="{{product.stock_num}}" />
-      <view wx:else class="view-row" style="align-items: center;">
+      
+      <view  class="view-row" style="align-items: center;">
         <view>
           {{product.need_no_stock == 1? '——':(product.stock_num==null?'——':product.stock_num)}}
         </view>
@@ -46,9 +46,10 @@
     <view class="left-column">上架：</view>
     <view class="right-column" style="width: 500rpx;">
       <checkbox-group class="view-row" bindchange="setCheckbox">
-        <checkbox value="hidden" checked="{{product.hidden==1}}" >顾客端隐藏</checkbox>
-        <checkbox value="no_entrain" checked="{{product.no_entrain == 1}}" >不可招待</checkbox>
-        <checkbox value="on_shelves" checked="{{product.on_shelves == 0}}" >不可售卖</checkbox>
+        <checkbox value="hidden" checked="{{product.hidden==0}}" >自助</checkbox>
+        <checkbox value="on_shelves" checked="{{product.on_shelves == 1}}" >零售</checkbox>
+        <checkbox value="no_entrain" checked="{{product.no_entrain == 0}}" >招待</checkbox>
+        
       </checkbox-group>
       <!--switch checked="{{product.on_shelves == undefined || product.on_shelves == null || product.on_shelves == 1}}" bindchange="setOnShelves"></switch-->
     </view>

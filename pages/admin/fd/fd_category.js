@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    newName: null
+    newName: null,
+    titleLevel: 0
   },
 
   /**
@@ -30,6 +31,7 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve){
+      that.setData({titleLevel: app.globalData.staff.title_level})
       that.getData()
     })
   },
@@ -242,28 +244,7 @@ Page({
       }
     })
   },
-  hiddenChange(e){
-    var that = this
-    console.log('hidden', e)
-    var id = parseInt(e.currentTarget.id)
-    var value = e.detail.value
-    var category = that.getCategoryById(id)
-    var title = '设置分类隐藏'
-    var content = '分类：' + category.name + ' 设置为 ' + (value?'隐藏':'正常') + ' 分类。'
-    wx.showModal({
-      title: title,
-      content: content,
-      complete: (res) => {
-        if (res.cancel) {
-          that.getData()
-        }
-        if (res.confirm) {
-          category.hide = value? 1: 0
-          that.updateCategory(category, '修改分类是否隐藏')
-        }
-      }
-    })
-  },
+
   optionChange(e){
     console.log('option change', e)
     var that = this
@@ -271,25 +252,25 @@ Page({
     var optionArr = e.detail.value
     var category = that.getCategoryById(id)
     var title = '修改当前分类属性'
-    var hide = 0
-    var no_entrain = 0
-    var on_shelves = 1
+    var hide = 1
+    var no_entrain = 1
+    var on_shelves = 0
     for(var i = 0; i < optionArr.length; i++){
       switch(optionArr[i]){
         case 'hide':
-          hide = 1
+          hide = 0
           break
         case 'no_entrain':
-          no_entrain = 1
+          no_entrain = 0
           break
         case 'on_shelves':
-          on_shelves = 0
+          on_shelves = 1
           break
         default:
           break
       }
     }
-    var content = '分类：' + category.name +  ' 隐藏：顾客端' + (hide == 1? '不' : '') + '可见 \r\n招待：' + (no_entrain == 1? '不':'') + '可以 \r\n售卖：' + (on_shelves == 1 ? '': '不') + '可以'
+    var content = '分类：' + category.name +  ' 自助：' + (hide == 1? '不' : '') + '可 \r\n招待：' + (no_entrain == 1? '不':'') + '可 \r\n零售：' + (on_shelves == 1 ? '': '不') + '可'
     wx.showModal({
       title: title,
       content: content,

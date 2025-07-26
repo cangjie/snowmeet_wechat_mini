@@ -2,13 +2,13 @@
   <mp-vtabs vtabs="{{vtabs}}" activeTab="{{activeTab}}" bindtabclick="onTabCLick" bindchange="onChange" class="test">
     <block wx:for="{{vtabs}}" wx:key="title">
       <mp-vtabs-content tabIndex="{{index}}">
-        <view class="vtabs-content-item" style="margin-left: 5rpx;">
+        <view class="vtabs-content-item" style="margin-left: 5rpx;margin-top: 10rpx;">
           <!--view>我是第{{index + 1}}项： {{item.title}}</view-->
-          <view style="margin-top:10rpx; margin-bottom: 10rpx;display: flex;flex-direction: row;justify-content: center;">
+          <!--view style="margin-top:10rpx; margin-bottom: 10rpx;display: flex;flex-direction: row;justify-content: center;">
             <fui-button btnSize="medium" size="24" text="修改 分类【{{categories[index].name}}】下的商品" background="#2EA6D0" 
               bind:click="modProdlist" id="{{categories[index].id}}" >
             </fui-button>
-          </view>
+          </view-->
           <view wx:for="{{categories[index].products}}" wx:for-index="pIdx" wx:for-item="product">
             <fui-card src="{{product.imageUrl}}" title="{{product.name}}" tag="库存：{{product.stock_numStr}}">
               <view class="fui-card__content fui-padding view-row">
@@ -27,11 +27,11 @@
                   <view class="right-column">
                     <radio-group>
                       <radio 
-                        disabled="{{product.on_shelves != 1 || categories[index].on_shelves !=1}}" 
-                        checked="true">正常</radio>
+                        disabled="{{product.on_shelves == 0 || categories[index].on_shelves == 0}}" 
+                        checked="{{product.on_shelves != 0 && categories[index].on_shelves != 0}}">零售</radio>
                       <radio 
                         disabled="{{product.no_entrain == 1 || categories[index].no_entrain == 1}}">招待</radio>
-                      <radio  >出库</radio>
+                      <radio>出库</radio>
                     </radio-group>
                   </view>
                 </view>
