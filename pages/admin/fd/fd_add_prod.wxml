@@ -51,7 +51,7 @@
         <checkbox value="hidden" checked="{{product.hidden==0}}" >自助</checkbox>
         <checkbox value="on_shelves" checked="{{product.on_shelves == 1}}" >零售</checkbox>
         <checkbox value="no_entrain" checked="{{product.no_entrain == 0}}" >招待</checkbox>
-        
+        <checkbox value="sell_out" checked="{{product.sell_out == 1}}" >售罄</checkbox>
       </checkbox-group>
       <!--switch checked="{{product.on_shelves == undefined || product.on_shelves == null || product.on_shelves == 1}}" bindchange="setOnShelves"></switch-->
     </view>

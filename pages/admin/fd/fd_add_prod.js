@@ -413,6 +413,7 @@ Page({
     var hide = 1
     var no_entrain = 1
     var on_shelves = 0
+    var sell_out = 0
     for(var i = 0; i < optionArr.length; i++){
       switch(optionArr[i]){
         case 'hidden':
@@ -424,6 +425,9 @@ Page({
         case 'on_shelves':
           on_shelves = 1
           break
+        case 'sell_out':
+          sell_out = 1
+          break
         default:
           break
       }
@@ -431,6 +435,7 @@ Page({
     product.hidden = hide
     product.no_entrain = no_entrain
     product.on_shelves = on_shelves
+    product.sell_out = sell_out
     that.setData({product})
   }
 })
