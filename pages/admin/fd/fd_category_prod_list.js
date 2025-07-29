@@ -117,10 +117,11 @@ Page({
       var products = resolve
       for (var i = 0; products && i < products.length; i++) {
         var product = products[i]
-        product.sale_priceStr = util.showAmount(product.sale_priceStr)
+        product.sale_priceStr = util.showAmount(product.sale_price)
         product.stock_numStr = product.stock_num ? product.stock_num.toString() : '——'
         product.imageUrl = product.availableImages.length == 0 ? '' : 'https://' + app.globalData.domainName + product.availableImages[0].imageUrl
         product.count = 1
+
       }
       for (var i = 0; i < categories.length; i++) {
         if (categories[i].id == categoryId) {
@@ -185,8 +186,8 @@ Page({
     }
     product.count = 1
     product.cartMemo = ''
-    that.countCart()
     that.setData({cart, categories})
+    that.countCart()
   },
   countCart(){
     var that = this
@@ -198,13 +199,13 @@ Page({
       
       if (cart[i].cartType == '零售'){
       cart[i].summaryStr = util.showAmount(cart[i].sale_price * cart[i].count)
-      totalPrice = cart[i].sale_price * cart[i].count
+      totalPrice = totalPrice + cart[i].sale_price * cart[i].count
       }
       else{
         cart[i].summaryStr = '¥0.00'
       }
     }
-    that.setData({cartCount: count, totalPriceStr: util.showAmount(totalPrice), cart})
+    that.setData({cartCount: count, totalPrice, totalPriceStr: util.showAmount(totalPrice), cart})
   },
   setCartMemo(e){
     var that = this
@@ -305,5 +306,57 @@ Page({
     }
     that.setData({cart: newCart})
     that.countCart()
+  },
+  placeOrder(){
+    var that = this
+    var cart = that.data.cart
+    var order = {
+      id: 0,
+      shop: '崇礼旗舰店',
+      type: '餐饮',
+      total_amount: that.data.totalPrice,
+      single_payment: 1
+    }
+    var fdOrders = []
+    var isOutStockOrder = true
+    for(var i = 0; cart &&i < cart.length; i++){
+      var fdOrder = {
+        id: 0,
+        order_id: order.id,
+        product_id: cart[i].id,
+        product_name: cart[i].name,
+        unit_price: cart[i].sale_price,
+        order_type: cart[i].cartType,
+        count: cart[i].count,
+        memo: cart[i].cartMemo?  cart[i].cartMemo : ''
+      }
+      if (cart[i].cartType!='出库'){
+        isOutStockOrder = false
+      }
+      fdOrders.push(fdOrder)
+    }
+    if(!fdOrders || fdOrders.length <= 0){
+      wx.showToast({
+        title: '不允许空订单',
+        icon: 'error'
+      })
+      return
+    }
+    order.fdOrders = fdOrders
+    if (isOutStockOrder){
+      order.sub_type = '出库订单'
+    }
+    else{
+      order.sub_type = ''
+    }
+    console.log('place order', order)
+    var placeUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(placeUrl, order).then(function (resolve){
+      console.log('order', resolve)
+      var order = resolve
+      wx.redirectTo({
+        url: 'fd_order_confirm?orderId=' + order.id.toString(),
+      })
+    })
   }
 })

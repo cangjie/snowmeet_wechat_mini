@@ -1,0 +1,7 @@
+/* pages/admin/fd/fd_order_confirm.wxss */
+view{
+  margin-top: 20rpx;
+}
+radio {
+  margin-left: 10rpx;
+}

@@ -1,0 +1,66 @@
+<view style="margin-top: 50rpx;">
+  <view wx:if="{{staff && staff.title_level >= 100}}"  >
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">订单金额：</view>
+      </fui-col>
+      <fui-col span="4">
+        <view class="fui-right-column" style="text-align: right;">¥100.00</view>
+      </fui-col>
+      <fui-col span="8">
+        
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">订单减免：</view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column">
+          <input type="number" placeholder="0" class="input" style="width: 100rpx;text-align: center;" />
+        </view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">实付金额：</view>
+      </fui-col>
+      <fui-col span="4">
+        <view class="fui-right-column" style="text-align: right;">¥100.00</view>
+      </fui-col>
+      <fui-col span="8">
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">后付费：</view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column">
+          <switch></switch>
+        </view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">支付方式：</view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column">
+          <radio-group class="view-row" >
+            <radio >微信</radio>
+            <radio >支付宝</radio>
+            <radio >其他</radio>
+          </radio-group>
+        </view>
+      </fui-col>
+    </fui-row>
+    
+    <view style="display: flex;justify-content: center; align-items: center;height: 400rpx;" >
+      <view style="text-align: center;" >显示二维码</view>
+    </view>
+  </view>
+  <view wx:else >
+    没有权限
+  </view>
+</view>

@@ -40,6 +40,13 @@
   margin-left: 0rpx;
   margin-right: 0rpx;
 }
+
+.fui-left-column{
+  text-align: right;
+}
+.fui-right-column{
+  text-align: left;
+}
 .right-column{
   width:25%;
   text-align: left;
