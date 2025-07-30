@@ -5,10 +5,9 @@
         <view class="fui-left-column">订单金额：</view>
       </fui-col>
       <fui-col span="4">
-        <view class="fui-right-column" style="text-align: right;">¥100.00</view>
+        <view class="fui-right-column" style="text-align: right;">{{order.total_amountStr}}</view>
       </fui-col>
       <fui-col span="8">
-        
       </fui-col>
     </fui-row>
     <fui-row>
@@ -23,10 +22,20 @@
     </fui-row>
     <fui-row>
       <fui-col span="6">
+        <view class="fui-left-column">订单备注：</view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column">
+          <input  class="input" style="width: 450rpx;text-align: center;" />
+        </view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
         <view class="fui-left-column">实付金额：</view>
       </fui-col>
       <fui-col span="4">
-        <view class="fui-right-column" style="text-align: right;">¥100.00</view>
+        <view class="fui-right-column" style="text-align: right;">{{order.totalChargeStr}}</view>
       </fui-col>
       <fui-col span="8">
       </fui-col>

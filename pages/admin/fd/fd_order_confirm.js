@@ -74,10 +74,11 @@ Page({
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + that.data.orderId + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getUrl, null).then(function(resolve){
-      console.log('order', resovle)
+      console.log('order', resolve)
       var order = resolve
       order.total_amountStr = util.showAmount(order.total_amount)
-      
+      order.totalChargeStr = util.showAmount(order.totalCharge)
+      that.setData({order})
     })
   }
 })
