@@ -80,5 +80,64 @@ Page({
       order.totalChargeStr = util.showAmount(order.totalCharge)
       that.setData({order})
     })
+  },
+  fillDiscount(e){
+    var that = this
+    var value = e.detail.value
+    that.setData({filledDiscount: value})
+  },
+  setDiscount(e){
+    var that = this
+    var filledDiscount = that.data.filledDiscount
+    if (isNaN(filledDiscount)){
+      wx.showToast({
+        title: '减免必须是数字',
+        icon: 'error'
+      })
+      return
+    }
+    var setUrl = app.globalData.requestPrefix + 'Order/SetDiscount/' + that.data.order.id + '?discountAmount=' + that.data.filledDiscount + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(setUrl, null).then(function (resolve){
+      var discounts = resolve
+      if (discounts == null){
+        wx.showToast({
+          title: '设置失败',
+          icon: 'error'
+        })
+        return
+      }
+      wx.showToast({
+        title: '设置成功',
+        icon: 'success'
+      })
+      that.getData()
+    })
+  },
+  setMemo(e){
+    var that = this
+    var memo = e.detail.value
+    var order = that.data.order
+    order.memo = memo
+    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改订单备注') + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, order).then(function(resolve){
+      var order = resolve
+      console.log('order memo', order.memo)
+    })
+  },
+  setPayMethod(e){
+    var that = this
+    var paymethod = e.detail.value
+    var order = that.data.order
+    var getUrl = app.globalData.requestPrefix + 'Order/'
+    switch(paymethod){
+      case '支付宝':
+        getUrl += 'GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+        break
+      default:
+        break
+    }
+    util.performWebRequest(getUrl, null).then(function(resolve){
+      console.log('get ali qr', resolve)
+    })
   }
 })

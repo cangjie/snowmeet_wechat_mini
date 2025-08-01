@@ -11,12 +11,16 @@
       </fui-col>
     </fui-row>
     <fui-row>
-      <fui-col span="6">
-        <view class="fui-left-column">订单减免：</view>
+      <fui-col span="6" >
+        <view class="fui-left-column" 
+          style="display: flex;height: 70rpx;align-items: center;justify-content:flex-end;" >
+          <view style="text-align: right;" >订单减免：</view>
+        </view>
       </fui-col>
       <fui-col span="18">
-        <view class="fui-right-column">
-          <input type="number" placeholder="0" class="input" style="width: 100rpx;text-align: center;" />
+        <view class="fui-right-column view-row" style="height: 70rpx;align-items: center;">
+          <input type="number" placeholder="0" class="input" bindinput="fillDiscount" style="width: 100rpx;text-align: center;" />
+          <fui-button id="{{product.id}}" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 设 置 减 免 " background="#2EA6D0" bind:click="setDiscount"></fui-button>
         </view>
       </fui-col>
     </fui-row>
@@ -26,7 +30,7 @@
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <input  class="input" style="width: 450rpx;text-align: center;" />
+          <input class="input" style="width: 450rpx;text-align: left;" bindinput="setMemo" />
         </view>
       </fui-col>
     </fui-row>
@@ -56,10 +60,10 @@
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <radio-group class="view-row" >
-            <radio >微信</radio>
-            <radio >支付宝</radio>
-            <radio >其他</radio>
+          <radio-group class="view-row" bindchange="setPayMethod" >
+            <radio value="微信支付" >微信</radio>
+            <radio value="支付宝" >支付宝</radio>
+            <radio value="其他" >其他</radio>
           </radio-group>
         </view>
       </fui-col>
