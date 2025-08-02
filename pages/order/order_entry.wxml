@@ -80,7 +80,7 @@
         <fui-col span="14"></fui-col>
       </fui-row>
       <view class="view-row" style="justify-content: center;margin-top: 40rpx;" >
-      <fui-button btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 敬 请 支 付 " background="#2EA6D0" bind:click="uploadImage"></fui-button>
+      <fui-button btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 敬 请 支 付 " background="#2EA6D0" bind:click="pay"></fui-button>
       </view>
     </view>
   </view>
