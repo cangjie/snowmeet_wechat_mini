@@ -15,7 +15,7 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({orderId: options.orderId})
+    that.setData({ orderId: options.orderId })
   },
 
   /**
@@ -30,8 +30,8 @@ Page({
    */
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function(resovle){
-      that.setData({staff: app.globalData.staff})
+    app.loginPromiseNew.then(function (resovle) {
+      that.setData({ staff: app.globalData.staff })
       that.getData()
     })
   },
@@ -40,14 +40,29 @@ Page({
    * Lifecycle function--Called when page hide
    */
   onHide() {
-
+    var that = this
+    that.closeSocket()
   },
+  closeSocket(){
+    var that = this
+    var socket = that.data.socket
+    try{
+      socket.close({
+        success:()=>{
+          console.log('socket will be closed')
+        }
+      })
+    }
+    catch{
 
+    }
+  },
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload() {
-
+    var that = this
+    that.closeSocket()
   },
 
   /**
@@ -70,26 +85,27 @@ Page({
   onShareAppMessage() {
 
   },
-  getData(){
+  getData() {
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + that.data.orderId + '?sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(getUrl, null).then(function(resolve){
+    util.performWebRequest(getUrl, null).then(function (resolve) {
       console.log('order', resolve)
       var order = resolve
       order.total_amountStr = util.showAmount(order.total_amount)
       order.totalChargeStr = util.showAmount(order.totalCharge)
-      that.setData({order})
+      that.setData({ order })
+      that.initWebSocket()
     })
   },
-  fillDiscount(e){
+  fillDiscount(e) {
     var that = this
     var value = e.detail.value
-    that.setData({filledDiscount: value})
+    that.setData({ filledDiscount: value })
   },
-  setDiscount(e){
+  setDiscount(e) {
     var that = this
     var filledDiscount = that.data.filledDiscount
-    if (isNaN(filledDiscount)){
+    if (isNaN(filledDiscount)) {
       wx.showToast({
         title: '减免必须是数字',
         icon: 'error'
@@ -97,9 +113,9 @@ Page({
       return
     }
     var setUrl = app.globalData.requestPrefix + 'Order/SetDiscount/' + that.data.order.id + '?discountAmount=' + that.data.filledDiscount + '&sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(setUrl, null).then(function (resolve){
+    util.performWebRequest(setUrl, null).then(function (resolve) {
       var discounts = resolve
-      if (discounts == null){
+      if (discounts == null) {
         wx.showToast({
           title: '设置失败',
           icon: 'error'
@@ -113,31 +129,131 @@ Page({
       that.getData()
     })
   },
-  setMemo(e){
+  setMemo(e) {
     var that = this
     var memo = e.detail.value
     var order = that.data.order
     order.memo = memo
     var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改订单备注') + '&sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(updateUrl, order).then(function(resolve){
+    util.performWebRequest(updateUrl, order).then(function (resolve) {
       var order = resolve
       console.log('order memo', order.memo)
     })
   },
-  setPayMethod(e){
+  setPayMethod(e) {
     var that = this
-    var paymethod = e.detail.value
+    var payMethod = e.detail.value
     var order = that.data.order
     var getUrl = app.globalData.requestPrefix + 'Order/'
-    switch(paymethod){
+    that.setData({qrCodeUrl: null})
+    switch (payMethod) {
       case '支付宝':
         getUrl += 'GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
         break
+      case '微信支付':
+        getUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + order.id.toString())
+        that.setData({ qrCodeUrl: getUrl, payMethod })
+        break
       default:
+        that.setData({payMethod})
         break
     }
-    util.performWebRequest(getUrl, null).then(function(resolve){
-      console.log('get ali qr', resolve)
+    if (payMethod == '支付宝') {
+      util.performWebRequest(getUrl, null).then(function (resolve) {
+        console.log('get ali qr', resolve)
+        var qrTxt = resolve
+        var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrTxt)
+        that.setData({qrCodeUrl, payMethod})
+      })
+    }
+  },
+  setPayLater(e) {
+    var that = this
+    console.log('pay later', e)
+    var order = that.data.order
+    order.payLater = e.detail.value
+    that.setData({ order, payMethod: null })
+  },
+  initWebSocket(){
+    var that = this
+    var socket = wx.connectSocket({
+      url: 'wss://' + app.globalData.domainName + '/ws',
+      header:{'content-type': 'application/json'}
     })
+    socket.isReplied = false
+    socket.onError((res)=>{
+      that.socketError()
+    })
+    socket.onMessage((res)=>{
+      that.socketMessage(res)
+    })
+    socket.onOpen((res)=>{
+      console.log('socket open')
+      that.socketOpen(res)
+    })
+    socket.onClose((res)=>{
+      that.socketClosed()
+    })
+    that.setData({socket})
+  },
+  socketOpen(res){
+    var that = this
+    app.globalData.isWebsocketOpen = true
+    var socket = that.data.socket
+    var socketCmd = {
+      command: 'orderpaid',
+      id: that.data.order.id
+    }
+    var cmdStr = JSON.stringify(socketCmd)
+    socket.send({
+      data: cmdStr,
+      success:(res)=>{
+        console.log('send command', cmdStr)
+      }
+    })
+  },
+  socketError(res){
+    console.log('socket error')
+  },
+  socketClosed(){
+    console.log('socket is closed')
+  },
+  socketMessage(res){
+    console.log('socket message', res)
+  },
+  placeUnneedPayOrder(e){
+    var that = this
+    var order = that.data.order
+    var payMethod = that.data.payMethod
+    if (payMethod == '微信支付' || payMethod == '支付宝' ){
+      wx.showToast({
+        title: payMethod + '必须顾客支付',
+        icon: 'error'
+      })
+      return
+    }
+    var subPayMethod = that.data.subPayMethod
+    if (!subPayMethod && order.payLater == false)
+    {
+      wx.showToast({
+        title: '必须选择支付方式',
+        icon: 'error'
+      })
+      return
+    }
+    var effectUrl = app.globalData.requestPrefix + 'Order/EffectUnpaidOrder/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    if (order.payLater == true){
+      effectUrl = effectUrl + '&payLater=true'
+    }
+    else{
+      effectUrl = effectUrl + '&payMethod=' + subPayMethod + '&payLater=false'
+    }
+    util.performWebRequest(effectUrl, null).then(function (resolve){
+      console.log('paid order', resolve)
+    })
+  },
+  setSubPayMethod(e){
+    var that = this
+    that.setData({subPayMethod: e.detail.value})
   }
 })

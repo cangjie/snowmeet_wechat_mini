@@ -15,7 +15,8 @@ Page({
    */
   onLoad(options) {
     var orderId = options.orderId
-
+    var that = this
+    that.setData({orderId})
   },
 
   /**
@@ -32,9 +33,20 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve){
       var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByCustomer/' + that.data.orderId.toString() + '?sessionKey=' + app.globalData.sessionKey
-      util.performWebRequest(getUrl, null).then(function (resovle){
+      util.performWebRequest(getUrl, null).then(function (resolve){
         var order = resolve
-        that.setData({order})
+        console.log('get order', order)
+        //that.setData({order})
+        switch(order.type){
+          case '餐饮':
+            wx.setNavigationBarTitle({
+              title: '请您确认订单并支付',
+            })
+            that.renderFdOrder(order)
+            break
+          default:
+            break
+        }
       })
     })
   },
@@ -72,5 +84,21 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  renderFdOrder(order){
+    var that = this
+    var total = 0
+    for(var i = 0; i < order.fdOrders.length; i++){
+      var fdOrder = order.fdOrders[i]
+      fdOrder.unit_priceStr = util.showAmount(fdOrder.unit_price)
+      fdOrder.summary = fdOrder.count * fdOrder.unit_price
+      total += fdOrder.summary
+      fdOrder.summaryStr = util.showAmount(fdOrder.summary)
+    }
+    order.total = total
+    order.totalStr = util.showAmount(total)
+    order.discountAmountStr = util.showAmount(order.discountAmount)
+    order.totalChargeStr = util.showAmount(order.totalCharge)
+    that.setData({order})
   }
 })
