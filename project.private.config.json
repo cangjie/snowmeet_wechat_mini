@@ -6,8 +6,8 @@
           "name": "OrderEntry",
           "pathName": "pages/order/order_entry",
           "query": "orderId=59828",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "drag",
