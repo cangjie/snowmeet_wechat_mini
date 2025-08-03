@@ -225,6 +225,25 @@ Page({
   socketMessage(res){
     console.log('socket message', res)
   },
+  payLater(e){
+    var that = this
+    wx.showModal({
+      title: '确认挂账',
+      content: '用户稍后支付，点击确认下单，点击取消提示用户立即支付订单。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var order = that.data.order
+          order.payLater = true
+          that.setData({order})
+          that.placeUnneedPayOrder(e)
+        }
+      }
+    })
+  },
   placeUnneedPayOrder(e){
     var that = this
     var order = that.data.order
@@ -254,6 +273,22 @@ Page({
     }
     util.performWebRequest(effectUrl, null).then(function (resolve){
       console.log('paid order', resolve)
+    })
+  },
+  placeUnneedPayOrderConfirm(e){
+    var that = this
+    wx.showModal({
+      title: '确认收款',
+      content: '确认顾客已经成功支付，避免逃单。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          that.placeUnneedPayOrder(e)
+        }
+      }
     })
   },
   setSubPayMethod(e){

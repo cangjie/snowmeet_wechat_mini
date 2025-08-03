@@ -88,12 +88,13 @@
         </view>
       </view>
       <view wx:else style="display: flex;justify-content: center;margin-top: 50rpx;">
-        <fui-button disabled="{{!subPayMethod}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款，下单" background="#2EA6D0" bind:click="placeUnneedPayOrder"></fui-button>
+        <fui-button id="othersPayMethod" disabled="{{!subPayMethod}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
       </view>
-      <view style="margin-top: 50rpx;display: flex;justify-content: center;">
-        <fui-button background="#FF0000" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="稍后支付，直接下单" bind:click="placeUnneedPayOrder"></fui-button>
-      </view>
+      
     </view>
+    <view style="margin-top: 50rpx;display: flex;justify-content: center;">
+        <fui-button id="payLater" background="#FF0000" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="稍后支付，直接下单" bind:click="payLater"></fui-button>
+      </view>
   </view>
   <view wx:else>
     没有权限
