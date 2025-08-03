@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-
+    discountChanged: false,
+    filledDiscount: 0
   },
 
   /**
@@ -94,13 +95,19 @@ Page({
       order.total_amountStr = util.showAmount(order.total_amount)
       order.totalChargeStr = util.showAmount(order.totalCharge)
       that.setData({ order })
-      that.initWebSocket()
+      if (that.data.socket == undefined){
+        that.initWebSocket()
+      }
     })
   },
   fillDiscount(e) {
     var that = this
     var value = e.detail.value
-    that.setData({ filledDiscount: value })
+    if (!isNaN(value)){
+      var filledDiscount = value
+      that.setData({ filledDiscount})
+      that.setDiscount(e)
+    }
   },
   setDiscount(e) {
     var that = this
@@ -117,15 +124,11 @@ Page({
       var discounts = resolve
       if (discounts == null) {
         wx.showToast({
-          title: '设置失败',
+          title: '减免设置失败',
           icon: 'error'
         })
         return
       }
-      wx.showToast({
-        title: '设置成功',
-        icon: 'success'
-      })
       that.getData()
     })
   },
@@ -149,10 +152,11 @@ Page({
     switch (payMethod) {
       case '支付宝':
         getUrl += 'GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+        that.setData({subPayMethod: null})
         break
       case '微信支付':
         getUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + order.id.toString())
-        that.setData({ qrCodeUrl: getUrl, payMethod })
+        that.setData({ qrCodeUrl: getUrl, payMethod, subPayMethod: null })
         break
       default:
         that.setData({payMethod})
