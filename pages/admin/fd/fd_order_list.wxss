@@ -1,0 +1,4 @@
+/* pages/admin/fd/fd_order_list.wxss */
+checkbox{
+  margin-left: 10rpx;
+}

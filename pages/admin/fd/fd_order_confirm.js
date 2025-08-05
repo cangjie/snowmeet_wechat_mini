@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-
+    discountChanged: false,
+    filledDiscount: 0
   },
 
   /**
@@ -94,13 +95,19 @@ Page({
       order.total_amountStr = util.showAmount(order.total_amount)
       order.totalChargeStr = util.showAmount(order.totalCharge)
       that.setData({ order })
-      that.initWebSocket()
+      if (that.data.socket == undefined){
+        that.initWebSocket()
+      }
     })
   },
   fillDiscount(e) {
     var that = this
     var value = e.detail.value
-    that.setData({ filledDiscount: value })
+    if (!isNaN(value)){
+      var filledDiscount = value
+      that.setData({ filledDiscount})
+      that.setDiscount(e)
+    }
   },
   setDiscount(e) {
     var that = this
@@ -117,15 +124,11 @@ Page({
       var discounts = resolve
       if (discounts == null) {
         wx.showToast({
-          title: '设置失败',
+          title: '减免设置失败',
           icon: 'error'
         })
         return
       }
-      wx.showToast({
-        title: '设置成功',
-        icon: 'success'
-      })
       that.getData()
     })
   },
@@ -149,10 +152,11 @@ Page({
     switch (payMethod) {
       case '支付宝':
         getUrl += 'GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+        that.setData({subPayMethod: null})
         break
       case '微信支付':
         getUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + order.id.toString())
-        that.setData({ qrCodeUrl: getUrl, payMethod })
+        that.setData({ qrCodeUrl: getUrl, payMethod, subPayMethod: null })
         break
       default:
         that.setData({payMethod})
@@ -221,6 +225,25 @@ Page({
   socketMessage(res){
     console.log('socket message', res)
   },
+  payLater(e){
+    var that = this
+    wx.showModal({
+      title: '确认挂账',
+      content: '用户稍后支付，点击确认下单，点击取消提示用户立即支付订单。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var order = that.data.order
+          order.payLater = true
+          that.setData({order})
+          that.placeUnneedPayOrder(e)
+        }
+      }
+    })
+  },
   placeUnneedPayOrder(e){
     var that = this
     var order = that.data.order
@@ -250,6 +273,22 @@ Page({
     }
     util.performWebRequest(effectUrl, null).then(function (resolve){
       console.log('paid order', resolve)
+    })
+  },
+  placeUnneedPayOrderConfirm(e){
+    var that = this
+    wx.showModal({
+      title: '确认收款',
+      content: '确认顾客已经成功支付，避免逃单。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          that.placeUnneedPayOrder(e)
+        }
+      }
     })
   },
   setSubPayMethod(e){

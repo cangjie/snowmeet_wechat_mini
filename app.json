@@ -128,7 +128,8 @@
     "pages/admin/fd/fd_category_prod_list",
     "pages/admin/fd/fd_category_prod_list_mod",
     "pages/admin/fd/fd_order_confirm",
-    "pages/order/order_entry"
+    "pages/order/order_entry",
+    "pages/admin/fd/fd_order_list"
   ],
   "window": {
     "backgroundTextStyle": "light",

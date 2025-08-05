@@ -1,5 +1,5 @@
 <view style="margin-top: 50rpx;">
-  <view wx:if="{{staff && staff.title_level >= 100}}"  >
+  <view wx:if="{{staff && staff.title_level >= 100}}">
     <fui-row>
       <fui-col span="6">
         <view class="fui-left-column">订单金额：</view>
@@ -11,29 +11,18 @@
       </fui-col>
     </fui-row>
     <fui-row>
-      <fui-col span="6" >
-        <view class="fui-left-column" 
-          style="display: flex;height: 70rpx;align-items: center;justify-content:flex-end;" >
-          <view style="text-align: right;" >订单减免：</view>
+      <fui-col span="6">
+        <view class="fui-left-column" style="display: flex;height: 70rpx;align-items: center;justify-content:flex-end;">
+          <view style="text-align: right;">订单减免：</view>
         </view>
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column view-row" style="height: 70rpx;align-items: center;">
           <input type="number" placeholder="{{order.discountAmount}}" class="input" bindinput="fillDiscount" style="width: 100rpx;text-align: center;" />
-          <fui-button id="{{product.id}}" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 设 置 减 免 " background="#2EA6D0" bind:click="setDiscount"></fui-button>
         </view>
       </fui-col>
     </fui-row>
-    <fui-row>
-      <fui-col span="6">
-        <view class="fui-left-column">订单备注：</view>
-      </fui-col>
-      <fui-col span="18">
-        <view class="fui-right-column">
-          <input class="input" style="width: 450rpx;text-align: left;" bindinput="setMemo" />
-        </view>
-      </fui-col>
-    </fui-row>
+    
     <fui-row>
       <fui-col span="6">
         <view class="fui-left-column">实付金额：</view>
@@ -46,53 +35,68 @@
     </fui-row>
     <fui-row>
       <fui-col span="6">
+        <view class="fui-left-column">订单备注：</view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column">
+          <input class="input" style="width: 450rpx;text-align: left;" bindinput="setMemo" />
+        </view>
+      </fui-col>
+    </fui-row>
+    <!--fui-row>
+      <fui-col span="6">
         <view class="fui-left-column">后付费：</view>
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <switch checked="{{order.payLater}}" bindchange="setPayLater" ></switch>
+          <switch checked="{{order.payLater}}" bindchange="setPayLater"></switch>
         </view>
       </fui-col>
-    </fui-row>
+    </fui-row-->
     <fui-row>
       <fui-col span="6">
         <view class="fui-left-column">支付方式：</view>
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <radio-group class="view-row" bindchange="setPayMethod" >
-            <radio value="微信支付" disabled="{{order.payLater}}" checked="{{payMethod == '微信支付'}}" >微信</radio>
-            <radio value="支付宝" disabled="{{order.payLater}}" checked="{{payMethod == '支付宝'}}" >支付宝</radio>
-            <radio value="其他" disabled="{{order.payLater}}" checked="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付'}}"  >其他</radio>
+          <radio-group class="view-row" bindchange="setPayMethod">
+            <radio value="微信支付" disabled="{{order.payLater}}" checked="{{payMethod == '微信支付'}}">微信</radio>
+            <radio value="支付宝" disabled="{{order.payLater}}" checked="{{payMethod == '支付宝'}}">支付宝</radio>
+            <radio value="其他" disabled="{{order.payLater}}" checked="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付'}}">其他</radio>
           </radio-group>
         </view>
       </fui-col>
     </fui-row>
-    <fui-row wx:if="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付'}}" >
+    <fui-row wx:if="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付'}}">
       <fui-col span="6">
         <view class="fui-left-column"></view>
       </fui-col>
-      <fui-col span="18" >
+      <fui-col span="18">
         <view class="fui-right-column">
-          <radio-group class="view-row" bindchange="setSubPayMethod" >
-            <radio value="京东收银" disabled="{{order.payLater}}" checked="{{subPayMethod == '京东收银'}}" >京东收银</radio>
-            <radio value="POS机刷卡" disabled="{{order.payLater}}" checked="{{subPayMethod == 'POS机刷卡'}}" >POS刷卡</radio>
-            <radio value="现金" disabled="{{order.payLater}}" checked="{{subPayMethod == '现金'}}"  >现金</radio>
+          <radio-group class="view-row" bindchange="setSubPayMethod">
+            <radio value="京东收银" disabled="{{order.payLater}}" checked="{{subPayMethod == '京东收银'}}">京东收银</radio>
+            <radio value="POS机刷卡" disabled="{{order.payLater}}" checked="{{subPayMethod == 'POS机刷卡'}}">POS刷卡</radio>
+            <radio value="现金" disabled="{{order.payLater}}" checked="{{subPayMethod == '现金'}}">现金</radio>
           </radio-group>
         </view>
       </fui-col>
     </fui-row>
-    <view wx:if="{{order.payLater || (payMethod != '微信支付' && payMethod != '支付宝')}}" class="view-row" style="justify-content: center; align-items: center;margin-top: 40rpx;" >
-      <fui-button id="{{product.id}}" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 确 认 下 单 " background="#2EA6D0" bind:click="placeUnneedPayOrder" ></fui-button>
-    </view>
-    <view wx:else style="display: flex;justify-content: center; align-items: center;height: 400rpx;" >
-      <view style="text-align: center;" >
-        <image wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" mode="aspectFill" 
-          style="width: 300rpx;height: 300rpx;" src="{{qrCodeUrl}}" ></image>
+    <view wx:if="{{payMethod}}">
+      <view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" style="display: flex;justify-content: center; align-items: center;height: 400rpx;flex-direction: column;margin-top: 50rpx;">
+        <view style="text-align: center;">
+          <image mode="aspectFill" style="width: 300rpx;height: 300rpx;" src="{{qrCodeUrl}}"></image>
+        </view>
       </view>
+      <view wx:else style="display: flex;justify-content: center;margin-top: 50rpx;">
+        <fui-button id="othersPayMethod" disabled="{{!subPayMethod}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
+      </view>
+      
     </view>
+    <view style="margin-top: 50rpx;display: flex;justify-content: center;">
+        <fui-button id="payLater" background="#FF0000" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="稍后支付，直接下单" bind:click="payLater"></fui-button>
+      </view>
   </view>
-  <view wx:else >
+  <view wx:else>
     没有权限
   </view>
 </view>

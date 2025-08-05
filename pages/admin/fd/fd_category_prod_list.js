@@ -43,28 +43,24 @@ Page({
       that.setData({ showVtabs: true })
     })
   },
-
   /**
    * Lifecycle function--Called when page hide
    */
   onHide() {
 
   },
-
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload() {
 
   },
-
   /**
    * Page event handler function--Called when user drop down
    */
   onPullDownRefresh() {
 
   },
-
   /**
    * Called when page reach bottom
    */
