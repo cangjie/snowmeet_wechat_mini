@@ -100,5 +100,30 @@ Page({
     order.discountAmountStr = util.showAmount(order.discountAmount)
     order.totalChargeStr = util.showAmount(order.totalCharge)
     that.setData({order})
+  },
+  pay(){
+    var that = this
+    var order = that.data.order
+    var payUrl = app.globalData.requestPrefix + 'Order/WechatPay/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(payUrl, null).then(function (resolve){
+      console.log('payment', resolve)
+      var payment = resolve
+      wx.requestPayment({
+        nonceStr: payment.nonce,
+        package: 'prepay_id=' + payment.prepay_id,
+        paySign: payment.sign,
+        timeStamp: payment.timestamp,
+        signType: 'MD5',
+        success:(res)=>{
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success'
+          })
+        },
+        fail:(res)=>{
+          console.log('payment fail', res)
+        }
+      })
+    })
   }
 })
