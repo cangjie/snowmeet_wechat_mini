@@ -1,0 +1,60 @@
+<view>
+  <view wx:if="{{staff && staff.title_level >= 100}}" style="margin-top: 50rpx;">
+    <block wx:for="{{order.fdOrders}}" >
+    <fui-row   >
+      <fui-col span="1" >
+        <view style="display:flex;margin-left: 10rpx;align-items: center;height: 200rpx;" >{{index+1}}.</view> 
+      </fui-col>
+      <fui-col span="1"  >
+        <view style="display:flex;margin-left: 10rpx;align-items: center;height: 200rpx;">
+          <view>{{item.order_type == '招待' ? '招' : '零'}}</view>
+        </view> 
+      </fui-col>
+      <fui-col span="22" >
+        <fui-card title="{{item.product_name}}" tag="单价：{{item.unit_priceStr}}" >
+          <fui-row>
+            <fui-col span="4" >
+              <view class="fui-left-column" >数量：</view>
+            </fui-col>
+            <fui-col span="4" >
+              <view class="fui-right-column">
+                <input id="count_{{index}}"  class="input"  placeholder="{{item.count}}"
+                style="width: 50rpx;text-align: center;" bindinput="mod" type="number" />
+              </view>
+            </fui-col>
+            <fui-col span="4" >
+              <view class="fui-left-column">减免：</view>
+            </fui-col>
+            <fui-col span="4" >
+              <view class="fui-right-column">
+                <input id="discount_{{index}}" style="width: 75rpx;text-align: center;" class="input" 
+                placeholder="{{item.discountAmount}}" bindinput="mod" type="number" />
+              </view>
+            </fui-col>
+            <fui-col span="4" >
+              <view class="fui-left-column">小计：</view>
+            </fui-col>
+            <fui-col span="4" >
+              <view class="fui-right-column">
+                {{item.summaryStr}}
+              </view>
+            </fui-col>
+          </fui-row>
+          <fui-row>
+            <fui-col span="4" >
+              <view class="fui-left-column" >备注：</view>
+            </fui-col>
+            <fui-col span="20" >
+              <view class="fui-left-column" >
+                <input id="memo_{{index}}" class="input" style="width: 500rpx;text-align: left;" value="{{item.memo}}" bindinput="mod" />
+              </view>
+            </fui-col>
+          </fui-row>
+          <view style="height: 25rpx;" ></view>
+        </fui-card>
+      </fui-col>
+    </fui-row>
+    <view style="height: 50rpx;" ></view>
+  </block>
+  </view>
+</view>

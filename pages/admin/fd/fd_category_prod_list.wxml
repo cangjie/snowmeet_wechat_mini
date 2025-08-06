@@ -2,7 +2,7 @@
   <mp-vtabs height="{{vtabHeight}}" wx:if="{{showVtabs}}" vtabs="{{vtabs}}" activeTab="{{activeTab}}" bindtabclick="onTabCLick" bindchange="onChange" class="test">
     <block wx:for="{{vtabs}}" wx:key="title">
       <mp-vtabs-content tabIndex="{{index}}">
-        <view class="vtabs-content-item" style="height:{{categories[index].products.length * 655}}rpx;margin-left: 5rpx;margin-top: 10rpx;">
+        <view class="vtabs-content-item" style="height:{{categories[index].products.length * 550}}rpx;margin-left: 5rpx;margin-top: 10rpx;">
           <view wx:for="{{categories[index].products}}" wx:for-index="pIdx" wx:for-item="product">
             <fui-card title="{{product.name}}" tag="库存：{{product.stock_numStr}}">
               <view class="fui-card__content fui-padding">
@@ -28,14 +28,15 @@
                     <radio-group id="{{product.id}}" bindchange="setCartType">
                       <radio value="零售" disabled="{{product.on_shelves == 0 || categories[index].on_shelves == 0 || product.sell_out == 1}}" checked="{{product.cartType=='零售'}}">零售</radio>
                       <radio value="招待" disabled="{{product.no_entrain == 1 || categories[index].no_entrain == 1 || product.sell_out == 1 }}">招待</radio>
-                      <radio value="出库" checked="{{product.cartType=='出库' }}" disabled="{{product.sell_out == 1}}">出库</radio>
+                      <!--radio value="出库" checked="{{product.cartType=='出库' }}" disabled="{{product.sell_out == 1}}">出库</radio-->
                     </radio-group>
                   </view>
                 </view>
                 <view class="view-row" style="margin-bottom: 20rpx;">
                   <view class="left-column">备注：</view>
                   <view class="right-column">
-                    <textarea id="{{product.id}}" bindinput="setCartMemo" style="width: 300rpx; height: 150rpx;" class="input"></textarea>
+                    <input class="input" style="width: 300rpx;" id="{{product.id}}" bindinput="setCartMemo" />
+                    
                   </view>
                 </view>
                 <view style="display: flex;flex-direction: row; justify-content: center; margin-bottom: 20rpx;">
@@ -51,9 +52,9 @@
   </mp-vtabs>
   <view class="view-row">
     <view style="margin-top: 20rpx;">
-      <image bindtap="popCart" src="{{cartUrl}}" mode="scaleToFill" style="width: 100rpx;height: 100rpx;"></image>
+      <image bindtap="placeOrder" src="{{cartUrl}}" mode="scaleToFill" style="width: 100rpx;height: 100rpx;"></image>
     </view>
-    <view style="margin-top: 20rpx; margin-left: 20rpx;" class="view-row">
+    <view style="margin-top: 20rpx; margin-left: 20rpx;" class="view-row" bindtap="popCart" >
       <view class="left-column" style="width: 140rpx;">商品：</view>
       <view class="right-column" style="width: 130rpx;">{{cartCount}}件</view>
       <view class="left-column" style="width: 140rpx;">总计金额：</view>
@@ -116,7 +117,7 @@
         </fui-swipe-action>
       </fui-row>
       <view class="view-row" style="justify-content: center;">
-        <fui-button id="{{product.id}}" btnSize="medium" size="35rpx" text=" 下 单 " background="#2EA6D0" bind:click="placeOrder" ></fui-button>
+        <fui-button id="{{product.id}}" btnSize="medium" size="35rpx" text=" 确 认 " background="#2EA6D0" bind:click="placeOrder" ></fui-button>
       </view>
       <view class="fui-icon__close" bindtap="closePopup">
         <fui-icon name="close" size="{{48}}"></fui-icon>

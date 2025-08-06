@@ -1,0 +1,9 @@
+/* pages/admin/fd/fd_cart.wxss */
+.fui-left-column
+{
+  margin-top: 10rpx;
+}
+.fui-right-column
+{
+  margin-top: 10rpx;
+}

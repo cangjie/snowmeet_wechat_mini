@@ -22,7 +22,6 @@
         </view>
       </fui-col>
     </fui-row>
-    
     <fui-row>
       <fui-col span="6">
         <view class="fui-left-column">实付金额：</view>
@@ -43,16 +42,9 @@
         </view>
       </fui-col>
     </fui-row>
-    <!--fui-row>
-      <fui-col span="6">
-        <view class="fui-left-column">后付费：</view>
-      </fui-col>
-      <fui-col span="18">
-        <view class="fui-right-column">
-          <switch checked="{{order.payLater}}" bindchange="setPayLater"></switch>
-        </view>
-      </fui-col>
-    </fui-row-->
+    <view style="margin-top: 50rpx;display: flex;justify-content: center;">
+      <fui-button id="payLater" background="#FF0000" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="下单" bind:click="payLater"></fui-button>
+    </view>
     <fui-row>
       <fui-col span="6">
         <view class="fui-left-column">支付方式：</view>
@@ -90,11 +82,9 @@
       <view wx:else style="display: flex;justify-content: center;margin-top: 50rpx;">
         <fui-button id="othersPayMethod" disabled="{{!subPayMethod}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
       </view>
-      
+
     </view>
-    <view style="margin-top: 50rpx;display: flex;justify-content: center;">
-        <fui-button id="payLater" background="#FF0000" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="稍后支付，直接下单" bind:click="payLater"></fui-button>
-      </view>
+    
   </view>
   <view wx:else>
     没有权限

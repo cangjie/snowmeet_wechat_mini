@@ -345,13 +345,14 @@ Page({
     else{
       order.sub_type = ''
     }
+    order.valid = 0
     console.log('place order', order)
     var placeUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(placeUrl, order).then(function (resolve){
       console.log('order', resolve)
       var order = resolve
-      wx.redirectTo({
-        url: 'fd_order_confirm?orderId=' + order.id.toString(),
+      wx.navigateTo({
+        url: 'fd_cart?orderId=' + order.id.toString(),
       })
     })
   }
