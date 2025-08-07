@@ -28,14 +28,14 @@
             <fui-col span="4" >
               <view class="fui-right-column">
                 <input id="discount_{{index}}" style="width: 75rpx;text-align: center;" class="input" 
-                placeholder="{{item.discountAmount}}" bindinput="mod" type="number" />
+                placeholder="{{item.discountAmount}}" bindinput="mod" type="number" disabled="{{item.order_type == '招待'}}" />
               </view>
             </fui-col>
             <fui-col span="4" >
               <view class="fui-left-column">小计：</view>
             </fui-col>
             <fui-col span="4" >
-              <view class="fui-right-column">
+              <view class="fui-right-column" style="text-align: right;">
                 {{item.summaryStr}}
               </view>
             </fui-col>
