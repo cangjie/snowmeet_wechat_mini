@@ -9,7 +9,11 @@ Page({
   data: {
     discountChanged: false,
     filledDiscount: 0,
-    paying: false
+    paying: false,
+    editingDiscount: false,
+    editedDiscount: 0,
+    editingMemo: false,
+    editedMemo: ''
   },
 
   /**
@@ -118,6 +122,8 @@ Page({
       var productDiscountAmount = 0
       var orderDiscountAmount = 0
       var totalCharge = 0
+      var editedMemo = order.memo
+      
       for (var i = 0; i < order.fdOrders.length; i++) {
         var fdOrder = order.fdOrders[i]
         totalAmount += fdOrder.order_type == '招待' ? 0 : (fdOrder.unit_price * fdOrder.count)
@@ -134,12 +140,13 @@ Page({
           orderDiscountAmount += discount.amount
         }
       }
+      var editedDiscount = orderDiscountAmount
       totalCharge = totalAmount - orderDiscountAmount - productDiscountAmount
       that.setData({
         order, productDiscountAmountStr: util.showAmount(productDiscountAmount),
         orderDiscountAmount, orderDiscountAmountStr: util.showAmount(orderDiscountAmount),
         totalAmount, totalAmountStr: util.showAmount(totalAmount), totalChargeStr: util.showAmount(totalCharge),
-        totalCharge
+        totalCharge, editedDiscount, editedMemo
       })
       if (that.data.socket == undefined) {
         that.initWebSocket()

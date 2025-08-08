@@ -26,9 +26,17 @@
           <view style="text-align: right;">订单减免：</view>
         </view>
       </fui-col>
-      <fui-col span="18">
+      <fui-col span="6">
         <view class="fui-right-column view-row" style="height: 70rpx;align-items: center;">
           <input type="number" placeholder="{{orderDiscountAmount}}" class="input" bindinput="fillDiscount" style="width: 100rpx;text-align: center;" disabled="{{paying}}" />
+        </view>
+      </fui-col>
+      <fui-col span="12" >
+        <view class="view-row" >
+          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.count_editing}}" ></fui-button>
+          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#2EA6D0" disabled="{{!item.count_editing}}" bind:click="confirmMod" ></fui-button>
+          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  
+            text=" 取 消 " background="#2EA6D0" disabled="{{!item.count_editing}}" bind:click="cancel"  ></fui-button>
         </view>
       </fui-col>
     </fui-row>

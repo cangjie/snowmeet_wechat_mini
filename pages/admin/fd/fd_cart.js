@@ -117,65 +117,6 @@ Page({
       default:
         break
     }
-    //that.setData({order})
-  },
-  mod_bak(e) {
-    var that = this
-    var idArr = e.currentTarget.id.split('_')
-    var value = e.detail.value
-    var order = that.data.order
-    var index = parseInt(idArr[1])
-    var fdOrder = order.fdOrders[index]
-    switch (idArr[0]) {
-      case 'memo':
-        fdOrder.memo = value
-        break
-      case 'count':
-        if (value == null || value == '' || isNaN(value)) {
-          return
-        }
-        else {
-          fdOrder.count = parseInt(value)
-        }
-        break
-      case 'discount':
-        if (value == null || value == '' || isNaN(value)) {
-          return
-        }
-        else {
-          var setUrl = app.globalData.requestPrefix + 'Order/SetDiscount/' + order.id + '?bizId=' + fdOrder.id.toString() + '&bizType=' + encodeURIComponent('餐饮') + '&discountAmount=' + value.toString() + '&sessionKey=' + app.globalData.sessionKey
-          util.performWebRequest(setUrl, null).then(function (resolve) {
-            that.getData()
-          })
-          return
-        }
-        break
-      default:
-        break
-    }
-    if (fdOrder.count == 0) {
-      wx.showModal({
-        title: '确认从购物车中删除',
-        content: '商品名称：' + fdOrder.product_name,
-        complete: (res) => {
-          if (res.cancel) {
-            that.getData()
-          }
-          if (res.confirm) {
-            fdOrder.valid = 0
-            var delUrl = app.globalData.requestPrefix + 'Order/UpdateFdOrderByStaff?scene=' + encodeURIComponent('修改购物车') + '&sessionKey=' + app.globalData.sessionKey
-            util.performWebRequest(delUrl, fdOrder).then(function (resolve) {
-              that.getData()
-            })
-          }
-        }
-      })
-      return
-    }
-    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateFdOrderByStaff?scene=' + encodeURIComponent('修改购物车') + '&sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(updateUrl, fdOrder).then(function (resolve) {
-      that.getData()
-    })
   },
   del(e) {
     console.log('del', e)
@@ -225,15 +166,6 @@ Page({
       console.log('set discount', resolve)
     })
   },
-  /*
-  placeOrder(e){
-    var that = this
-    var order = that.data.order
-    wx.navigateTo({
-      url: 'fd_order_confirm?orderId=' + order.id.toString(),
-    })
-  },
-  */
   edit(e){
     var that = this
     that.changeCellEditStatus(e, true)
@@ -263,7 +195,6 @@ Page({
         break
     }
     that.renderOrder(order)
-    //that.setData({order})
   },
   confirmMod(e){
     var that = this
@@ -299,7 +230,7 @@ Page({
         break
     }
     if (message == ''){
-      that.setData({order})
+      //that.setData({order})
       that.renderOrder(order)
     }
     else{

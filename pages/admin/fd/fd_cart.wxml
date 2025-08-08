@@ -21,7 +21,9 @@
                         <view class="fui-left-column">数量：</view>
                       </fui-col>
                       <fui-col span="3">
-                        <view><input id="count_{{index}}" class="input" value="{{item.count}}" style="width: 50rpx;text-align: center;" bindinput="mod" type="number" disabled="{{!item.count_editing}}" /></view>
+                        <view class="fui-right-column" >
+                          <input id="count_{{index}}" class="input" value="{{item.count}}" style="width: 50rpx;text-align: center;" bindinput="mod" type="number" disabled="{{!item.count_editing}}" />
+                        </view>
                       </fui-col>
                       <fui-col span="4">
                         <view class="view-row" >
@@ -45,17 +47,17 @@
                     </fui-row>
                     <fui-row wx:if="{{item.count_editing || item.discount_editing }}" >
                       <fui-col span="6" ><view class="button-cell" >
-                        <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#2EA6D0" disabled="{{!item.count_editing}}" bind:click="confirmMod" ></fui-button>
+                        <fui-button wx:if="{{item.count_editing}}" id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#00AA00" disabled="{{!item.count_editing}}" bind:click="confirmMod" ></fui-button>
                       </view></fui-col>
                       <fui-col span="6" ><view class="button-cell" >
-                        <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  
-                        text=" 取 消 " background="#2EA6D0" disabled="{{!item.count_editing}}" bind:click="cancel"  ></fui-button>
+                        <fui-button wx:if="{{item.count_editing}}" id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  
+                        text=" 取 消 " background="#DD0000" disabled="{{!item.count_editing}}" bind:click="cancel"  ></fui-button>
                       </view></fui-col>
                       <fui-col span="6" ><view class="button-cell" >
-                        <fui-button id="discount_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#2EA6D0" disabled="{{!item.discount_editing}}" bind:click="confirmMod"  ></fui-button>
+                        <fui-button wx:if="{{item.discount_editing}}" id="discount_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#00AA00" disabled="{{!item.discount_editing}}" bind:click="confirmMod"  ></fui-button>
                       </view></fui-col>
                       <fui-col span="6" ><view class="button-cell" >
-                        <fui-button id="discount_{{index}}"  margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 取 消 " background="#2EA6D0" disabled="{{!item.discount_editing}}" bind:click="cancel"  ></fui-button>
+                        <fui-button wx:if="{{item.discount_editing}}" id="discount_{{index}}"  margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 取 消 " background="#DD0000" disabled="{{!item.discount_editing}}" bind:click="cancel"  ></fui-button>
                       </view></fui-col>
                     </fui-row>
                     <fui-row>
@@ -84,10 +86,10 @@
                     </fui-row>
                     <fui-row wx:if="{{item.memo_editing}}" >
                       <fui-col span="12" ><view class="button-cell" >
-                        <fui-button margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#2EA6D0" disabled="{{!item.memo_editing}}" ></fui-button>
+                        <fui-button id="memo_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#00AA00" disabled="{{!item.memo_editing}}" bind:click="confirmMod" ></fui-button>
                       </view></fui-col>
                       <fui-col span="12" ><view class="button-cell" >
-                        <fui-button id="memo_{{index}}"  margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 取 消 " background="#2EA6D0" disabled="{{!item.memo_editing}}" bind:click="cancel"  ></fui-button>
+                        <fui-button id="memo_{{index}}"  margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 取 消 " background="#DD0000" disabled="{{!item.memo_editing}}" bind:click="cancel"  ></fui-button>
                       </view></fui-col>
                     </fui-row>
                     <view style="height: 25rpx;"></view>
