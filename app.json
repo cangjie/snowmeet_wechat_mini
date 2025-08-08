@@ -228,6 +228,7 @@
     "mp-vtabs-content": "@miniprogram-component-plus/vtabs-content",
     "fui-textarea": "components/firstui/fui-textarea/fui-textarea",
     "fui-white-space": "components/firstui/fui-white-space/fui-white-space",
-    "fui-bottom-popup": "components/firstui/fui-bottom-popup/fui-bottom-popup"
+    "fui-bottom-popup": "components/firstui/fui-bottom-popup/fui-bottom-popup",
+    "fui-divider": "components/firstui/fui-divider/fui-divider"
   }
 }

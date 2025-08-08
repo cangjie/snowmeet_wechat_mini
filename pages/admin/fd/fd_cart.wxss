@@ -2,8 +2,17 @@
 .fui-left-column
 {
   margin-top: 10rpx;
+  font-size: 10pt;
 }
 .fui-right-column
 {
   margin-top: 10rpx;
+  font-size: 10pt;
+}
+.button-cell
+{
+  margin-top: 20rpx;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20rpx;
 }

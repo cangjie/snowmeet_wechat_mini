@@ -4,7 +4,7 @@
       <mp-vtabs-content tabIndex="{{index}}">
         <view class="vtabs-content-item" style="height:{{categories[index].products.length * 550}}rpx;margin-left: 5rpx;margin-top: 10rpx;">
           <view wx:for="{{categories[index].products}}" wx:for-index="pIdx" wx:for-item="product">
-            <fui-card title="{{product.name}}" tag="库存：{{product.stock_numStr}}">
+            <fui-card title="{{product.name}}" tag="库存：{{product.stock_numStr}}" background="{{product.inCart? '#EEEEEE': '#FFFFFF'}}">
               <view class="fui-card__content fui-padding">
                 <view class="view-row">
                   <view class="left-column">单价：</view>
@@ -20,7 +20,10 @@
               <view class="fui-card__content fui-padding">
                 <view class="view-row">
                   <view class="left-column">数量：</view>
-                  <view class="right-column"><input type="number" id="{{product.id}}" class="input" style="width: 50rpx;text-align: center;" value="{{product.count == 1? null: product.count}}" placeholder="{{product.count}}" bindinput="setCount" /></view>
+                  <view class="right-column">
+                    <input wx:if="{{product.inCart}}" type="number" id="{{product.id}}" class="input" style="width: 50rpx;text-align: center;color:red" value="{{product.count}}"   bindinput="setCount" />
+                    <input wx:else type="number" id="{{product.id}}" class="input" style="width: 50rpx;text-align: center;" value="{{product.count == 1? null: product.count}}" placeholder="{{product.count}}" bindinput="setCount" />
+                  </view>
                 </view>
                 <view class="view-row">
                   <view class="left-column">类型：</view>
@@ -28,7 +31,6 @@
                     <radio-group id="{{product.id}}" bindchange="setCartType">
                       <radio value="零售" disabled="{{product.on_shelves == 0 || categories[index].on_shelves == 0 || product.sell_out == 1}}" checked="{{product.cartType=='零售'}}">零售</radio>
                       <radio value="招待" disabled="{{product.no_entrain == 1 || categories[index].no_entrain == 1 || product.sell_out == 1 }}">招待</radio>
-                      <!--radio value="出库" checked="{{product.cartType=='出库' }}" disabled="{{product.sell_out == 1}}">出库</radio-->
                     </radio-group>
                   </view>
                 </view>

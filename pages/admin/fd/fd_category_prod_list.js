@@ -176,6 +176,7 @@ Page({
     if (cartItem == null){
       cartItem = Object.assign({}, product)
       cart.push(cartItem)
+      product.inCart = true
     }
     else{
       cartItem.count = cartItem.count + product.count
