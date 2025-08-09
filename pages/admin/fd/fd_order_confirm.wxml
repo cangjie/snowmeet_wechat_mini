@@ -22,21 +22,26 @@
     </fui-row>
     <fui-row>
       <fui-col span="6">
-        <view class="fui-left-column" style="display: flex;height: 70rpx;align-items: center;justify-content:flex-end;">
-          <view style="text-align: right;">订单减免：</view>
+        <view class="fui-left-column" 
+          style="display: flex;align-items: center;justify-content:flex-end;" >
+          <view style="text-align: right;margin-top: 0rpx;">订单减免：</view>
         </view>
       </fui-col>
       <fui-col span="6">
-        <view class="fui-right-column view-row" style="height: 70rpx;align-items: center;">
-          <input type="number" placeholder="{{orderDiscountAmount}}" class="input" bindinput="fillDiscount" style="width: 100rpx;text-align: center;" disabled="{{paying}}" />
+        <view class="fui-right-column" style="align-items: center;">
+          <input id="discount" type="number" value="{{filledDiscount}}"  placeholder="{{filledDiscount}}" class="input" bindinput="modInput" style="width: 100rpx;text-align: center;" disabled="{{!editingDiscount}}" />
         </view>
       </fui-col>
-      <fui-col span="12" >
-        <view class="view-row" >
-          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.count_editing}}" ></fui-button>
-          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#2EA6D0" disabled="{{!item.count_editing}}" bind:click="confirmMod" ></fui-button>
-          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  
-            text=" 取 消 " background="#2EA6D0" disabled="{{!item.count_editing}}" bind:click="cancel"  ></fui-button>
+      <fui-col span="12">
+        <view class="fui-right-column view-row">
+          <block wx:if="{{editingDiscount}}">
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00"  bind:click="confirmMod"></fui-button>
+            <view style="width: 50rpx;" ></view>
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000"  bind:click="cancel"></fui-button>
+          </block>
+          <block wx:else>
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" ></fui-button>
+          </block>
         </view>
       </fui-col>
     </fui-row>
@@ -56,12 +61,33 @@
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <input class="input" style="width: 450rpx;text-align: left;" bindinput="setMemo" value="{{order.memo}}" />
+          <input id="memo" disabled="{{!editingMemo}}" class="input" style="width: 450rpx;text-align: left;" bindinput="modInput" value="{{order.memo}}" />
         </view>
       </fui-col>
     </fui-row>
+    <fui-row>
+      <block wx:if="{{!editingMemo}}" >
+        <fui-col span="24" >
+          <view style="display: flex;justify-content: center;">
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" ></fui-button>
+          </view>
+        </fui-col>
+      </block>
+      <block wx:else >
+        <fui-col span="12" >
+          <view style="display: flex;justify-content: center;">
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00" bind:click="confirmMod" ></fui-button>
+          </view>
+        </fui-col>
+        <fui-col span="12" >
+          <view style="display: flex;justify-content: center;">
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000" bind:click="cancel" ></fui-button>
+          </view>
+        </fui-col>
+      </block>
+    </fui-row>
     <view style="margin-top: 50rpx;display: flex;justify-content: center;">
-      
+
     </view>
     <fui-row>
       <fui-col span="6">
@@ -94,8 +120,7 @@
     <fui-row>
       <fui-col span="4"></fui-col>
       <fui-col span="6">
-        <fui-button id="payLater" background="#DD0000" btnSize="small" style="margin-left: 20rpx;" 
-        size="35rpx" text=" 下 单 " bind:click="payLater" disabled="{{paying}}"  ></fui-button>
+        <fui-button id="payLater" background="#DD0000" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 下 单 " bind:click="payLater" disabled="{{paying}}"></fui-button>
       </fui-col>
       <fui-col span="4"></fui-col>
       <fui-col span="6">

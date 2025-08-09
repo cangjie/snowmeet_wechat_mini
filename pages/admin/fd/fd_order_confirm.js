@@ -140,27 +140,18 @@ Page({
           orderDiscountAmount += discount.amount
         }
       }
-      var editedDiscount = orderDiscountAmount
+      
       totalCharge = totalAmount - orderDiscountAmount - productDiscountAmount
       that.setData({
         order, productDiscountAmountStr: util.showAmount(productDiscountAmount),
-        orderDiscountAmount, orderDiscountAmountStr: util.showAmount(orderDiscountAmount),
+        orderDiscountAmount, orderDiscountAmountStr: util.showAmount(orderDiscountAmount), filledDiscount: orderDiscountAmount,
         totalAmount, totalAmountStr: util.showAmount(totalAmount), totalChargeStr: util.showAmount(totalCharge),
-        totalCharge, editedDiscount, editedMemo
+        totalCharge
       })
       if (that.data.socket == undefined) {
         that.initWebSocket()
       }
     })
-  },
-  fillDiscount(e) {
-    var that = this
-    var value = e.detail.value
-    if (!isNaN(value)) {
-      var filledDiscount = value
-      that.setData({ filledDiscount })
-      that.setDiscount(e)
-    }
   },
   setDiscount(e) {
     var that = this
@@ -185,16 +176,55 @@ Page({
       that.getData()
     })
   },
-  setMemo(e) {
+  modInput(e){
     var that = this
-    var memo = e.detail.value
+    var id = e.currentTarget.id
+    var value = e.detail.value
+    switch(id){
+      case 'memo':
+        //editedMemo = value
+        that.setData({editedMemo: value})
+        break
+      case 'discount':
+        //editedDiscount = value
+        that.setData({editedDiscount: value})
+        break
+      default:
+        break
+    }
+    //that.setData({editedMemo, editedDiscount})
+  },
+  confirmMod(e){
+    var that = this
+    var id = e.currentTarget.id
     var order = that.data.order
-    order.memo = memo
-    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改订单备注') + '&sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(updateUrl, order).then(function (resolve) {
-      var order = resolve
-      console.log('order memo', order.memo)
-    })
+    var value = e.detail.value
+    var message = ''
+    switch(id){
+      case 'discount':
+        if (isNaN(that.data.editedDiscount)){
+          message = '必须是数字'
+        }
+        else {
+          that.setData({filledDiscount: parseFloat(that.data.editedDiscount)})
+        }
+        break
+      case 'memo':
+        order.memo = that.data.editedMemo
+        that.setData({order})
+        break
+      default:
+        break
+    }
+    if (message != ''){
+      wx.showToast({
+        title: message,
+        icon: 'error'
+      })
+    }
+    else{
+      that.setEditStatus(e, false)
+    }
   },
   displayQrCode(e) {
     var that = this
@@ -223,8 +253,6 @@ Page({
         that.setData({ qrCodeUrl, payMethod })
       })
     }
-
-    //that.setData({qrCodeUrl: null})
   },
   setPayMethod(e) {
     var that = this
@@ -239,7 +267,6 @@ Page({
     console.log('pay later', e)
     var order = that.data.order
     order.payLater = e.detail.value
-    //order.total_charge = that.data.totalCharge
     that.setData({ order, payMethod: null })
   },
   initWebSocket() {
@@ -416,5 +443,28 @@ Page({
       })
 
     }
+  },
+  setEditStatus(e, status){
+    var id = e.currentTarget.id
+    var that = this
+    switch(id){
+      case 'memo':
+        that.setData({editingMemo: status})
+        break
+      case 'discount':
+        that.setData({editingDiscount: status})
+        break
+      default:
+        break
+    }
+  },
+  edit(e){
+    var that = this
+    that.setEditStatus(e, true)
+  },
+  cancel(e){
+    var that = this
+    that.setData({filledDiscount: that.data.orderDiscountAmount, order: that.data.order})
+    that.setEditStatus(e, false)
   }
 })
