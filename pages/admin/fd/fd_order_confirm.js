@@ -204,9 +204,14 @@ Page({
         if (isNaN(that.data.editedDiscount)){
           message = '必须是数字'
         }
+        else if (order.total_amount - order.discountAmount + that.data.orderDiscountAmount < that.data.editedDiscount){
+          message = '减免后金额不能为负'
+        }
         else {
-          that.setData({filledDiscount: parseFloat(that.data.editedDiscount)})
+          //that.setData({filledDiscount: parseFloat(that.data.editedDiscount)})
+          that.data.filledDiscount = parseFloat(that.data.editedDiscount)
           that.renderOrder(order)
+          that.setDiscount()
         }
         break
       case 'memo':
@@ -346,9 +351,15 @@ Page({
   payLater(e) {
     var that = this
     that.setDiscount()
+    var title = '确认挂账'
+    var content = '用户稍后支付，点击确认下单，点击取消提示用户立即支付订单。'
+    if (that.data.totalCharge <= 0){
+      content = '订单金额已经全部减免！'
+      title = '0元订单'
+    }
     wx.showModal({
-      title: '确认挂账',
-      content: '用户稍后支付，点击确认下单，点击取消提示用户立即支付订单。',
+      title: title,
+      content: content,
       complete: (res) => {
         if (res.cancel) {
 
@@ -466,14 +477,13 @@ Page({
   },
   cancel(e){
     var that = this
-    //that.setData({filledDiscount: that.data.orderDiscountAmount, order: that.data.order})
     that.setEditStatus(e, false)
   },
   renderOrder(order){
     var that = this
     var order = that.data.order
     var orderDiscount = parseFloat(that.data.editedDiscount)
-    var realCharge = order.total_amount - orderDiscount - order.discountAmount
-    that.setData({totalChargeStr: util.showAmount(realCharge)})
+    var realCharge = order.total_amount - orderDiscount - order.discountAmount + that.data.orderDiscountAmount
+    that.setData({totalCharge: realCharge ,totalChargeStr: util.showAmount(realCharge)})
   }
 })

@@ -99,9 +99,9 @@
       <fui-col span="18">
         <view class="fui-right-column">
           <radio-group class="view-row" bindchange="setPayMethod">
-            <radio value="微信支付" disabled="{{order.payLater}}" checked="{{payMethod == '微信支付'}}">微信</radio>
-            <radio value="支付宝" disabled="{{order.payLater}}" checked="{{payMethod == '支付宝'}}">支付宝</radio>
-            <radio value="其他" disabled="{{order.payLater}}" checked="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付'}}">其他</radio>
+            <radio value="微信支付" disabled="{{order.payLater || totalCharge <= 0}}" checked="{{payMethod == '微信支付'}}">微信</radio>
+            <radio value="支付宝" disabled="{{order.payLater || totalCharge <= 0}}" checked="{{payMethod == '支付宝'}}">支付宝</radio>
+            <radio value="其他" disabled="{{order.payLater || totalCharge <= 0 }}" checked="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付'}}">其他</radio>
           </radio-group>
         </view>
       </fui-col>
@@ -113,9 +113,9 @@
       <fui-col span="18">
         <view class="fui-right-column">
           <radio-group class="view-row" bindchange="setSubPayMethod">
-            <radio value="京东收银" disabled="{{order.payLater}}" checked="{{subPayMethod == '京东收银'}}">京东收银</radio>
-            <radio value="POS机刷卡" disabled="{{order.payLater}}" checked="{{subPayMethod == 'POS机刷卡'}}">POS刷卡</radio>
-            <radio value="现金" disabled="{{order.payLater}}" checked="{{subPayMethod == '现金'}}">现金</radio>
+            <radio value="京东收银" disabled="{{order.payLater || totalCharge <= 0}}" checked="{{subPayMethod == '京东收银'}}">京东收银</radio>
+            <radio value="POS机刷卡" disabled="{{order.payLater || totalCharge <= 0 }}" checked="{{subPayMethod == 'POS机刷卡'}}">POS刷卡</radio>
+            <radio value="现金" disabled="{{order.payLater || totalCharge <= 0}}" checked="{{subPayMethod == '现金'}}">现金</radio>
           </radio-group>
         </view>
       </fui-col>
@@ -127,7 +127,7 @@
       </fui-col>
       <fui-col span="4"></fui-col>
       <fui-col span="6">
-        <fui-button id="payLater" background="#00AA00" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 支 付 " bind:click="showQrCode"></fui-button>
+        <fui-button id="payLater" background="#00AA00" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 支 付 " bind:click="showQrCode" disabled="{{totalCharge <= 0}}"  ></fui-button>
       </fui-col>
       <fui-col span="4"></fui-col>
     </fui-row>

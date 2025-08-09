@@ -202,6 +202,7 @@ Page({
     var id = parseInt(idArr[1])
     var order = that.data.order
     var fdOrder = order.fdOrders[id]
+    var summary = fdOrder.unit_price * fdOrder.count
     var message = ''
     switch(idArr[0]){
       case 'count':
@@ -216,6 +217,9 @@ Page({
       case 'discount':
         if (isNaN(fdOrder.edited_discount)){
           message = '必须是数字'
+        }
+        else if (summary < fdOrder.edited_discount){
+          message = '减免后金额不能为负'
         }
         else{
           fdOrder.discountAmount = parseFloat(fdOrder.edited_discount)
@@ -232,6 +236,7 @@ Page({
     if (message == ''){
       //that.setData({order})
       that.renderOrder(order)
+      that.cancel(e)
     }
     else{
       wx.showToast({
@@ -239,6 +244,6 @@ Page({
         icon: 'error'
       })
     }
-    that.cancel(e)
+    
   }
 })
