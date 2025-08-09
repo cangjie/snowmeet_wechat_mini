@@ -22,7 +22,10 @@
                       </fui-col>
                       <fui-col span="3">
                         <view class="fui-right-column" >
-                          <input id="count_{{index}}" class="input" value="{{item.count}}" style="width: 50rpx;text-align: center;" bindinput="mod" type="number" disabled="{{!item.count_editing}}" />
+                          <input id="count_{{index}}" class="input"   style="width: 50rpx;text-align: center;"  
+                          placeholder="{{item.count_editing? item.count : null}}" 
+                          value="{{item.count_editing? null : item.count}}"
+                          bindinput="mod" type="number" disabled="{{!item.count_editing}}" />
                         </view>
                       </fui-col>
                       <fui-col span="4">
@@ -36,7 +39,9 @@
                       <fui-col span="3">
                         <view class="fui-right-column">
                           <input disabled="{{!item.discount_editing || item.order_type == '招待'}}" id="discount_{{index}}" style="width:50rpx;text-align: center;" class="input" 
-                          value="{{item.discountAmount}}" bindinput="mod" type="number" />
+                          value="{{item.discount_editing?null:item.discountAmount}}" 
+                          placeholder="{{item.discount_editing?item.discountAmount:null}}"
+                          bindinput="mod" type="number" />
                         </view>
                       </fui-col>
                       <fui-col span="4">

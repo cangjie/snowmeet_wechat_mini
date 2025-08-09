@@ -29,7 +29,10 @@
       </fui-col>
       <fui-col span="6">
         <view class="fui-right-column" style="align-items: center;">
-          <input id="discount" type="number" value="{{filledDiscount}}"  placeholder="{{filledDiscount}}" class="input" bindinput="modInput" style="width: 100rpx;text-align: center;" disabled="{{!editingDiscount}}" />
+          <input id="discount" type="number" value="{{filledDiscount}}"  
+          placeholder="{{editingDiscount?filledDiscount:null}}" 
+          value="{{editingDiscount?null:filledDiscount}}"
+          class="input" bindinput="modInput" style="width: 100rpx;text-align: center;" disabled="{{!editingDiscount}}" />
         </view>
       </fui-col>
       <fui-col span="12">

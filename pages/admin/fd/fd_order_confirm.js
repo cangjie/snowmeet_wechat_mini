@@ -198,7 +198,6 @@ Page({
     var that = this
     var id = e.currentTarget.id
     var order = that.data.order
-    var value = e.detail.value
     var message = ''
     switch(id){
       case 'discount':
@@ -207,6 +206,7 @@ Page({
         }
         else {
           that.setData({filledDiscount: parseFloat(that.data.editedDiscount)})
+          that.renderOrder(order)
         }
         break
       case 'memo':
@@ -345,6 +345,7 @@ Page({
   },
   payLater(e) {
     var that = this
+    that.setDiscount()
     wx.showModal({
       title: '确认挂账',
       content: '用户稍后支付，点击确认下单，点击取消提示用户立即支付订单。',
@@ -415,6 +416,7 @@ Page({
   },
   showQrCode(e) {
     var that = this
+    that.setDiscount()
     var payMethod = that.data.payMethod
     var subPayMethod = that.data.subPayMethod
     var valid = true
@@ -464,7 +466,14 @@ Page({
   },
   cancel(e){
     var that = this
-    that.setData({filledDiscount: that.data.orderDiscountAmount, order: that.data.order})
+    //that.setData({filledDiscount: that.data.orderDiscountAmount, order: that.data.order})
     that.setEditStatus(e, false)
+  },
+  renderOrder(order){
+    var that = this
+    var order = that.data.order
+    var orderDiscount = parseFloat(that.data.editedDiscount)
+    var realCharge = order.total_amount - orderDiscount - order.discountAmount
+    that.setData({totalChargeStr: util.showAmount(realCharge)})
   }
 })
