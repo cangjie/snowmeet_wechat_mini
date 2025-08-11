@@ -43,7 +43,7 @@
             <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000"  bind:click="cancel"></fui-button>
           </block>
           <block wx:else>
-            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" ></fui-button>
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{paying}}" ></fui-button>
           </block>
         </view>
       </fui-col>
@@ -72,7 +72,7 @@
       <block wx:if="{{!editingMemo}}" >
         <fui-col span="24" >
           <view style="display: flex;justify-content: center;">
-            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" ></fui-button>
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{paying}}" ></fui-button>
           </view>
         </fui-col>
       </block>
@@ -123,11 +123,11 @@
     <fui-row>
       <fui-col span="4"></fui-col>
       <fui-col span="6">
-        <fui-button id="payLater" background="#DD0000" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 下 单 " bind:click="payLater" disabled="{{paying}}"></fui-button>
+        <fui-button id="payLater" background="#DD0000" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 下 单 " bind:click="payLater" disabled="{{paying || editing}}" ></fui-button>
       </fui-col>
       <fui-col span="4"></fui-col>
       <fui-col span="6">
-        <fui-button id="payLater" background="#00AA00" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 支 付 " bind:click="showQrCode" disabled="{{totalCharge <= 0}}"  ></fui-button>
+        <fui-button id="payLater" background="#00AA00" btnSize="small" style="margin-left: 20rpx;" size="35rpx" text=" 支 付 " bind:click="showQrCode" disabled="{{paying || totalCharge <= 0 || editing}}"  ></fui-button>
       </fui-col>
       <fui-col span="4"></fui-col>
     </fui-row>

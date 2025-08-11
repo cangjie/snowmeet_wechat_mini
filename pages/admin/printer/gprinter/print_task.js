@@ -2,17 +2,12 @@
 const app = getApp()
 const util = require('../../../../utils/util')
 Page({
-
-  /**
-   * Page initial data
-   */
   data: {
     scrollHeight: 1000,
     logs: [],
     tasks: [],
     refreshing: false
   },
-
   /**
    * Lifecycle function--Called when page load
    */
@@ -100,7 +95,23 @@ Page({
       task.timeStr = util.formatTimeStr(date)
       task.status = task.printed == 0 ? '未打印' : '已打印'
     }
+    tasks = tasks.sort((a, b) => (b.id - a.id))
     that.setData({tasks})
+  },
+  appendTask(task){
+    var that = this
+    var tasks = that.data.tasks
+    var exists = false
+    for(var i = 0; tasks && i < tasks.length; i++){
+      if (tasks[i].id == task.id){
+        exists = true
+        break
+      }
+    }
+    if (!exists){
+      tasks.push(task)
+    }
+    that.renderTasks(tasks)
   },
   initWebSocket(){
     var that = this
@@ -132,6 +143,12 @@ Page({
     var that = this
     var socket = that.data.socket
     socket.isOpen = true
+    socket.isReplied = false
+    that.sendCommand()
+  },
+  sendCommand(){
+    var that = this
+    var socket = that.data.socket
     var socketCmd = {
       command: 'getprinttask',
       data:{
@@ -153,12 +170,26 @@ Page({
     })
   },
   socketMessage(res){
-    console.log('socket message', res)
     var that = this
     var msg = JSON.parse(res.data)
+    console.log('socket message', msg)
+    for(var i = 0; msg && msg.data && i < msg.data.length; i++){
+      var task = msg.data[i]
+      that.appendTask(task)
+      that.replyFetched(task.id)
+    }
     var socket = that.data.socket
     socket.isReplied = true
     that.setData({socket})
+  },
+  replyFetched(id){
+    var that = this
+    var replyUrl = app.globalData.requestPrefix + 'Printer/ReplyFetched/' + id.toString()
+    util.performWebRequest(replyUrl, null).then(function (resolve){
+      that.sendCommand()
+    }).catch(function(rejct){
+      that.sendCommand()
+    })
   },
   socketClosed(){
     console.log('socket is closed')

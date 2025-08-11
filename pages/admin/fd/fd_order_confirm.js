@@ -212,11 +212,13 @@ Page({
           that.data.filledDiscount = parseFloat(that.data.editedDiscount)
           that.renderOrder(order)
           that.setDiscount()
+          //that.setData({editing: false})
         }
         break
       case 'memo':
         order.memo = that.data.editedMemo
         that.setData({order})
+        //that.setData({editing: false})
         break
       default:
         break
@@ -228,6 +230,7 @@ Page({
       })
     }
     else{
+      that.setData({editing: false})
       that.setEditStatus(e, false)
     }
   },
@@ -350,6 +353,7 @@ Page({
   },
   payLater(e) {
     var that = this
+    that.setData({paying: true})
     that.setDiscount()
     var title = '确认挂账'
     var content = '用户稍后支付，点击确认下单，点击取消提示用户立即支付订单。'
@@ -362,7 +366,7 @@ Page({
       content: content,
       complete: (res) => {
         if (res.cancel) {
-
+          that.setData({paying: false})
         }
 
         if (res.confirm) {
@@ -379,13 +383,6 @@ Page({
     var that = this
     var order = that.data.order
     var payMethod = that.data.payMethod
-    if (payMethod == '微信支付' || payMethod == '支付宝') {
-      wx.showToast({
-        title: payMethod + '必须顾客支付',
-        icon: 'error'
-      })
-      return
-    }
     var subPayMethod = that.data.subPayMethod
     if (!subPayMethod && order.payLater == false) {
       wx.showToast({
@@ -403,6 +400,7 @@ Page({
     }
     util.performWebRequest(effectUrl, null).then(function (resolve) {
       console.log('paid order', resolve)
+      that.setData({paying: false})
     })
   },
   placeUnneedPayOrderConfirm(e) {
@@ -414,7 +412,6 @@ Page({
         if (res.cancel) {
 
         }
-
         if (res.confirm) {
           that.placeUnneedPayOrder(e)
         }
@@ -447,8 +444,10 @@ Page({
       })
     }
     else {
+      that.setData({paying: true})
       var order = that.data.order
       order.valid = 1
+      order.waiting_for_pay = 1
       var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('准备支付') + '&sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(updateUrl, order).then(function (resolve) {
         that.setData({ paying: true })
@@ -462,10 +461,10 @@ Page({
     var that = this
     switch(id){
       case 'memo':
-        that.setData({editingMemo: status})
+        that.setData({editingMemo: status, editing: status})
         break
       case 'discount':
-        that.setData({editingDiscount: status})
+        that.setData({editingDiscount: status, editing: status})
         break
       default:
         break
@@ -478,6 +477,7 @@ Page({
   cancel(e){
     var that = this
     that.setEditStatus(e, false)
+    that.setData({editing: false})
   },
   renderOrder(order){
     var that = this

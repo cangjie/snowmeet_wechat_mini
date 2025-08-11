@@ -1,93 +1,152 @@
 <view>
   <view wx:if="{{staff && staff.title_level >= 100}}" style="margin-top: 50rpx;">
     <fui-row>
-      <fui-col span="6" >
-        <view class="fui-left-column" >选择店铺：</view>
+      <fui-col span="6">
+        <view class="fui-left-column">【店铺】</view>
       </fui-col>
-      <fui-col span="18" >
-        <view class="fui-right-column" >
-          <shop-selector defaultShop="崇礼旗舰店" ></shop-selector>
+      <fui-col span="18">
+        <view class="fui-right-column">
+          <shop-selector bindShopSelected="shopSelected" defaultShop="崇礼旗舰店"></shop-selector>
         </view>
       </fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6" >
-        <view class="fui-left-column" >日期：</view>
+      <fui-col span="6">
+        <view class="fui-left-column">【日期】</view>
       </fui-col>
-      <fui-col span="18" >
-        <view class="fui-right-column view-row" >
-          <picker mode="date" class="input" style="margin-right:20rpx;" >
-            <picker-view>{{currentDate}}</picker-view>
+      <fui-col span="18">
+        <view class="fui-right-column view-row">
+          <picker id="start" mode="date" class="input" style="margin-right:20rpx;" disabled="{{querying}}" bindchange="setDate">
+            <picker-view>{{startDate}}</picker-view>
           </picker>
           -
-          <picker mode="date" class="input" style="margin-left:20rpx;" >
-            <picker-view>{{currentDate}}</picker-view>
+          <picker id="end" mode="date" class="input" style="margin-left:20rpx;" disabled="{{querying}}" bindchange="setDate">
+            <picker-view>{{endDate}}</picker-view>
           </picker>
         </view>
       </fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6" >
-        <view class="fui-left-column" >订单状态：</view>
+      <fui-col span="6">
+        <view class="fui-left-column">【类型】</view>
       </fui-col>
-      <fui-col span="18" >
-        <checkbox-group>
-          <checkbox>全部</checkbox>
-          <checkbox>支付中</checkbox>
-          <checkbox>已完成</checkbox>
-          <checkbox>挂账</checkbox>
-          <checkbox>未支付</checkbox>
-          <checkbox>含招待</checkbox>
-          <checkbox>出库</checkbox>
-          <checkbox>有减免</checkbox>
-        </checkbox-group>
+      <fui-col span="18">
+        <radio-group>
+          <radio checked="{{true}}">营业</radio>
+          <radio>测试</radio>
+          <radio>全部</radio>
+        </radio-group>
       </fui-col>
     </fui-row>
-    <view class="view-row" style="margin-top: 20rpx;justify-content: center;" >
-      <fui-button btnSize="medium" background="#2EA6D0"  disabledBackground="#CCCCCC" > 查 询 </fui-button>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="6">
+        <view class="fui-left-column">【招待】</view>
+      </fui-col>
+      <fui-col span="18">
+        <radio-group>
+          <radio checked="{{true}}">正常</radio>
+          <radio>招待</radio>
+          <radio>全部</radio>
+        </radio-group>
+      </fui-col>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="6">
+        <view class="fui-left-column">【类型】</view>
+      </fui-col>
+      <fui-col span="18">
+        <radio-group>
+          <radio checked="{{true}}">单店</radio>
+          <radio>套餐</radio>
+          <radio>全部</radio>
+        </radio-group>
+      </fui-col>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="6">
+        <view class="fui-left-column">【挂账】</view>
+      </fui-col>
+      <fui-col span="18">
+        <radio-group>
+          <radio checked="{{true}}">正常</radio>
+          <radio>挂账</radio>
+
+          <radio>全部</radio>
+        </radio-group>
+      </fui-col>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="6">
+        <view class="fui-left-column">【减免】</view>
+      </fui-col>
+      <fui-col span="18">
+        <radio-group>
+          <radio checked="{{true}}">全部</radio>
+          <radio>包含</radio>
+          <radio>不含</radio>
+        </radio-group>
+      </fui-col>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="6">
+        <view class="fui-left-column">【状态】</view>
+      </fui-col>
+      <fui-col span="18">
+        <radio-group>
+          <radio checked="{{true}}">已支付</radio>
+          <radio>待生成</radio>
+          <radio>待支付</radio>
+          <radio>已关闭</radio>
+          <radio>全部</radio>
+        </radio-group>
+      </fui-col>
+    </fui-row>
+
+    <view class="view-row" style="margin-top: 20rpx;justify-content: center;">
+      <fui-button disabled="{{querying}}" btnSize="medium" background="#2EA6D0" bind:click="getData"> 查 询 </fui-button>
     </view>
     <view style="height: 20rpx"></view>
     <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成">
       <fui-row>
-        <fui-col span="8" >
-          <view class="fui-left-column" >订单金额：</view>
+        <fui-col span="8">
+          <view class="fui-left-column">订单金额：</view>
         </fui-col>
-        <fui-col span="4" >
-          <view class="fui-right-column" style="text-align: right;" >¥80.00</view>
+        <fui-col span="4">
+          <view class="fui-right-column" style="text-align: right;">¥80.00</view>
         </fui-col>
-        <fui-col span="6" >
-          <view class="fui-left-column" >商品数：</view>
+        <fui-col span="6">
+          <view class="fui-left-column">商品数：</view>
         </fui-col>
-        <fui-col span="6" >
-          <view class="fui-right-column" >3</view>
+        <fui-col span="6">
+          <view class="fui-right-column">3</view>
         </fui-col>
       </fui-row>
       <fui-row>
-        <fui-col span="8" >
-          <view class="fui-left-column" >减免：</view>
+        <fui-col span="8">
+          <view class="fui-left-column">减免：</view>
         </fui-col>
-        <fui-col span="4" >
+        <fui-col span="4">
           <view class="fui-right-column" style="text-align: right;">¥79.99</view>
         </fui-col>
-        <fui-col span="6" >
-          <view class="fui-left-column" >日期：</view>
+        <fui-col span="6">
+          <view class="fui-left-column">日期：</view>
         </fui-col>
-        <fui-col span="6" >
-          <view class="fui-right-column" >2025-12-24</view>
+        <fui-col span="6">
+          <view class="fui-right-column">2025-12-24</view>
         </fui-col>
       </fui-row>
       <fui-row>
-        <fui-col span="8" >
-          <view class="fui-left-column" >实际支付：</view>
+        <fui-col span="8">
+          <view class="fui-left-column">实际支付：</view>
         </fui-col>
-        <fui-col span="4" >
-          <view class="fui-right-column" style="text-align: right;" >¥0.01</view>
+        <fui-col span="4">
+          <view class="fui-right-column" style="text-align: right;">¥0.01</view>
         </fui-col>
-        <fui-col span="6" >
-          <view class="fui-left-column" >时间：</view>
+        <fui-col span="6">
+          <view class="fui-left-column">时间：</view>
         </fui-col>
-        <fui-col span="6" >
-          <view class="fui-right-column" >23:23:59</view>
+        <fui-col span="6">
+          <view class="fui-right-column">23:23:59</view>
         </fui-col>
       </fui-row>
     </fui-card>

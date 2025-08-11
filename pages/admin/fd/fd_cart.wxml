@@ -30,7 +30,8 @@
                       </fui-col>
                       <fui-col span="4">
                         <view class="view-row" >
-                          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.count_editing}}" ></fui-button>
+                          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit" disabled="{{item.count_editing}}" ></fui-button>
+                          <!--utton class="input" size="mini" style="height: 50rpx;width: 100rpx;margin-left: 0rpx; margin-right: 0rpx;margin-top: 0rpx;"  > 修 改 </button-->
                         </view>
                       </fui-col>
                       <fui-col span="5">
@@ -46,7 +47,7 @@
                       </fui-col>
                       <fui-col span="4">
                         <view class="view-row">
-                          <fui-button id="discount_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.order_type=='招待' || item.discount_editing}}" ></fui-button>
+                          <fui-button id="discount_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.order_type=='招待' || item.discount_editing}}" color="#000000" background="#C0C0C0" ></fui-button>
                         </view>
                       </fui-col>
                     </fui-row>
@@ -85,7 +86,7 @@
                       </fui-col>
                       <fui-col span="4">
                         <view class="view-row">
-                          <fui-button id="memo_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.memo_editing}}" ></fui-button>
+                          <fui-button id="memo_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.memo_editing}}" color="#000000" background="#C0C0C0" ></fui-button>
                         </view>
                       </fui-col>
                     </fui-row>
