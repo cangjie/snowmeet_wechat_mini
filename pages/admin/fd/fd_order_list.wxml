@@ -31,16 +31,16 @@
         <view class="fui-left-column">【类型】</view>
       </fui-col>
       <radio-group>
-        <fui-col span="4">
+        <fui-col span="6">
           <radio checked="{{true}}">营业</radio>
         </fui-col>
-        <fui-col span="5">
+        <fui-col span="6">
           <radio>测试</radio>
         </fui-col>
-        <fui-col span="5">
+        <fui-col span="7">
           <radio>全部</radio>
         </fui-col>
-        <fui-col span="5"></fui-col>
+        
       </radio-group>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
@@ -48,16 +48,15 @@
         <view class="fui-left-column">【招待】</view>
       </fui-col>
       <radio-group>
-        <fui-col span="4">
+        <fui-col span="6">
           <radio checked="{{true}}">正常</radio>
         </fui-col>
-        <fui-col span="5">
+        <fui-col span="6">
           <radio>招待</radio>
         </fui-col>
-        <fui-col span="5">
+        <fui-col span="7">
           <radio>全部</radio>
         </fui-col>
-        <fui-col span="5"></fui-col>
       </radio-group>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
@@ -65,60 +64,83 @@
         <view class="fui-left-column">【类型】</view>
       </fui-col>
       <radio-group>
-        <fui-col span="4">
+        <fui-col span="6">
           <radio checked="{{true}}">单店</radio>
         </fui-col>
-        <fui-col span="5">
+        <fui-col span="6">
           <radio>套餐</radio>
         </fui-col>
-        <fui-col span="5">
+        <fui-col span="7">
           <radio>全部</radio>
         </fui-col>
-        <fui-col span="5"></fui-col>
+        
       </radio-group>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
         <view class="fui-left-column">【挂账】</view>
       </fui-col>
-      <fui-col span="18">
-        <radio-group>
+      <radio-group>
+        <fui-col span="6">
           <radio checked="{{true}}">正常</radio>
+        </fui-col>
+        <fui-col span="6">
           <radio>挂账</radio>
+        </fui-col>
+        <fui-col span="7">
           <radio>全部</radio>
-        </radio-group>
-      </fui-col>
+        </fui-col>
+      </radio-group>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
         <view class="fui-left-column">【减免】</view>
       </fui-col>
-      <fui-col span="18">
-        <radio-group>
+      <radio-group>
+        <fui-col span="6">
           <radio checked="{{true}}">全部</radio>
+        </fui-col>
+        <fui-col span="6">
           <radio>包含</radio>
+        </fui-col>
+        <fui-col span="7">
           <radio>不含</radio>
-        </radio-group>
-      </fui-col>
+        </fui-col>
+      </radio-group>
     </fui-row>
+    <radio-group>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
         <view class="fui-left-column">【状态】</view>
       </fui-col>
-      <fui-col span="18">
-        <radio-group>
-          <radio checked="{{true}}">已完成</radio>
-          <radio>已支付</radio>
-          <radio>待生成</radio>
-          <radio>待支付</radio>
-          <radio>已关闭</radio>
-          <radio>全额退款</radio>
-          <radio>部分退款</radio>
-          <radio>退款失败</radio>
-          <radio>全部</radio>
-        </radio-group>
-      </fui-col>
+      <fui-col span="6" ><radio checked="{{true}}">已完成</radio></fui-col>
+      <fui-col span="6" ><radio>已支付</radio></fui-col>
+      <fui-col span="7" ><radio>待生成</radio></fui-col>
+        
+          
+          
+          
+          
+          
+          
+          
+          
+          
+        
+      
     </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="6" offset="5" ><radio>待支付</radio></fui-col>
+      <fui-col span="6"><radio>已关闭</radio></fui-col>
+      <fui-col span="7"><radio>全额退款</radio></fui-col>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      
+      <fui-col span="6" offset="5" ><radio>部分退款</radio></fui-col>
+      <fui-col span="6"><radio>退款失败</radio></fui-col>
+      <fui-col span="7"><radio>全部</radio></fui-col>
+      </fui-row>
+  </radio-group>
     <view class="view-row" style="margin-top: 20rpx;justify-content: center;">
       <fui-button disabled="{{querying}}" btnSize="medium" background="#2EA6D0" bind:click="getData"> 查 询 </fui-button>
     </view>
