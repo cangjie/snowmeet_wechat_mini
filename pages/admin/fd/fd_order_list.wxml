@@ -64,13 +64,18 @@
       <fui-col span="5">
         <view class="fui-left-column">【类型】</view>
       </fui-col>
-      <fui-col span="18">
-        <radio-group>
+      <radio-group>
+        <fui-col span="4">
           <radio checked="{{true}}">单店</radio>
+        </fui-col>
+        <fui-col span="5">
           <radio>套餐</radio>
+        </fui-col>
+        <fui-col span="5">
           <radio>全部</radio>
-        </radio-group>
-      </fui-col>
+        </fui-col>
+        <fui-col span="5"></fui-col>
+      </radio-group>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
