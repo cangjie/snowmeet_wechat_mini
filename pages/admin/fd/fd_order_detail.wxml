@@ -1,68 +1,71 @@
 <view>
-  <fui-row>
-    <fui-col span="6">
-      <view>【订单号】</view>
-    </fui-col>
-    <fui-col span="18">
-      <view>QJ_CY_250812_00007</view>
-    </fui-col>
-  </fui-row>
-  <fui-row>
-    <fui-col span="5">
-      <view>【日期】</view>
-    </fui-col>
-    <fui-col span="7">
-      <view>2025-09-29</view>
-    </fui-col>
-    <fui-col span="5">
-      <view>【时间】</view>
-    </fui-col>
-    <fui-col span="7">
-      <view>18:59:36</view>
-    </fui-col>
-  </fui-row>
-  <fui-row>
-    <fui-col span="5">
-      <view>【类型】</view>
-    </fui-col>
-    <fui-col span="7">
-      <view>营业</view>
-    </fui-col>
-    <fui-col span="5">
-      <view>【招待】</view>
-    </fui-col>
-    <fui-col span="7">
-      <view>否</view>
-    </fui-col>
-  </fui-row>
-  <fui-row>
-    <fui-col span="5">
-      <view>【套餐】</view>
-    </fui-col>
-    <fui-col span="7">
-      <view>否</view>
-    </fui-col>
-    <fui-col span="5">
-      <view>【挂账】</view>
-    </fui-col>
-    <fui-col span="7">
-      <view>2025-12-31前</view>
-    </fui-col>
-  </fui-row>
-  <fui-row>
-    <fui-col span="5">
-      <view>【减免】</view>
-    </fui-col>
-    <fui-col span="7">
-      <view>包含</view>
-    </fui-col>
-    <fui-col span="5">
-      <view>【状态】</view>
-    </fui-col>
-    <fui-col span="7">
-      <view>全部退款</view>
-    </fui-col>
-  </fui-row>
+  <view style="height: 50rpx;" ></view>
+  <fui-card full >
+    <fui-row>
+      <fui-col span="6">
+        <view>【订单号】</view>
+      </fui-col>
+      <fui-col span="18">
+        <view>QJ_CY_250812_00007</view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="5">
+        <view>【日期】</view>
+      </fui-col>
+      <fui-col span="7">
+        <view>2025-09-29</view>
+      </fui-col>
+      <fui-col span="5">
+        <view>【时间】</view>
+      </fui-col>
+      <fui-col span="7">
+        <view>18:59:36</view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="5">
+        <view>【类型】</view>
+      </fui-col>
+      <fui-col span="7">
+        <view>营业</view>
+      </fui-col>
+      <fui-col span="5">
+        <view>【招待】</view>
+      </fui-col>
+      <fui-col span="7">
+        <view>否</view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="5">
+        <view>【套餐】</view>
+      </fui-col>
+      <fui-col span="7">
+        <view>否</view>
+      </fui-col>
+      <fui-col span="5">
+        <view>【挂账】</view>
+      </fui-col>
+      <fui-col span="7">
+        <view>2025-12-31止</view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="5">
+        <view>【减免】</view>
+      </fui-col>
+      <fui-col span="7">
+        <view>包含</view>
+      </fui-col>
+      <fui-col span="5">
+        <view>【状态】</view>
+      </fui-col>
+      <fui-col span="7">
+        <view>全部退款</view>
+      </fui-col>
+    </fui-row>
+  </fui-card>
   <!--fui-row>
     <fui-col span="6">
       <view>【订单状态】</view>
@@ -74,6 +77,7 @@
   </fui-row-->
 
   <view style="height: 50rpx;"></view>
+  <fui-card full >
   <view>【订单明细】</view>
   <view style="height: 50rpx;"></view>
   <fui-row>
@@ -112,6 +116,16 @@
     </fui-col>
   </fui-row>
   <view>【备注】少冰 加浓</view>
+  <view class="view-row" >
+    <view style="width: 187rpx;" ></view>
+    <view class="view-row" style="width: 188rpx;justify-content: center;" >
+      <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+    </view>
+    <view class="view-row" style="width: 188rpx;justify-content: center;" >
+      <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+    </view>
+    <view style="width: 187rpx;" ></view>
+  </view>
   <view style="height: 50rpx;"></view>
   <fui-row>
     <fui-col span="12">
@@ -131,10 +145,34 @@
     </fui-col>
   </fui-row>
   <view>【备注】少冰 招待</view>
+  <view class="view-row" >
+    <view style="width: 187rpx;" ></view>
+    <view class="view-row" style="width: 188rpx;justify-content: center;" >
+      <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+    </view>
+    <view class="view-row" style="width: 188rpx;justify-content: center;" >
+      <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+    </view>
+    <view style="width: 187rpx;" ></view>
+  </view>
+  </fui-card>
   <view style="height: 50rpx;"></view>
   <!--有历史记录的需要历史按钮，需哟修改按钮-->
+  <fui-card full >
   <view bind:tap="displayMemo">【订单备注】备注备注备注备注备注备注备注备注</view>
+  <view class="view-row" >
+    <view style="width: 187rpx;" ></view>
+    <view class="view-row" style="width: 188rpx;justify-content: center;" >
+      <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+    </view>
+    <view class="view-row" style="width: 188rpx;justify-content: center;" >
+      <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+    </view>
+    <view style="width: 187rpx;" ></view>
+  </view>
+  </fui-card>
   <view style="height: 50rpx;"></view>
+  <fui-card full >
   <fui-row>
     <fui-col span="7">
       <view>【总计】</view>
@@ -173,7 +211,7 @@
   </fui-row>
   <fui-row>
     <fui-col span="7">
-      <view>【需要支付】</view>
+      <view>【结算金额】</view>
     </fui-col>
     <fui-col span="4">
       <view style="text-align: right;">¥10.00</view>
@@ -182,11 +220,34 @@
   </fui-row>
   <fui-row>
     <fui-col span="7">
+      <view>【挂账类型】</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: right;">整单挂账</view>
+    </fui-col>
+    <fui-col span="10"></fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="7">
+      <view>【挂账金额】</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: right;">¥100.00</view>
+    </fui-col>
+    <fui-col span="11">
+      <view style="margin-left: 50rpx;" >
+      <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 补 收 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+    </view>
+    </fui-col>
+  </fui-row>
+  <!--fui-row>
+    <fui-col span="7">
       <view>【支付记录】</view>
     </fui-col>
     <fui-col span="17"></fui-col>
-  </fui-row>
-  <fui-row>
+  </fui-row-->
+  </fui-card>
+  <!--fui-row>
     <fui-col span="5">
       <view style="text-align: center;">日期</view>
     </fui-col>
@@ -236,7 +297,7 @@
     <fui-col span="4">
       <view style="text-align: center;">¥10000.00</view>
     </fui-col>
-  </fui-row>
+  </fui-row-->
   <fui-bottom-popup show="{{showMemo}}" bindclose="closeMemo">
     <view class="fui-scroll__wrap">
       <view class="fui-title fui-title__pb">备注修改历史</view>
