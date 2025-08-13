@@ -86,7 +86,8 @@
                       </fui-col>
                       <fui-col span="4">
                         <view class="view-row">
-                          <fui-button id="memo_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.memo_editing}}" color="#000000" background="#C0C0C0" ></fui-button>
+                          <fui-button id="memo_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 "  bind:click="edit" disabled="{{item.memo_editing}}" 
+                          color="#000000" background="#C0C0C0" ></fui-button>
                         </view>
                       </fui-col>
                     </fui-row>

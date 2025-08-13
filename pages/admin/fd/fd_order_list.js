@@ -9,6 +9,7 @@ Page({
   data: {
     querying: false,
     searchTags: [],
+    /*
     checkBoxes:[
       {title: '全部', value: '', checked: true},
       {title: '支付中', value: '支付中', checked: false},
@@ -17,6 +18,8 @@ Page({
       {title: '减免', value: '减免', checked: false},
       {title: '已完成', value: '已完成', checked: false}
     ]
+    */
+   sortType: ['时间倒序','时间正序','金额倒序','金额正序']
   },
 
   /**

@@ -1,7 +1,7 @@
 <view>
   <view wx:if="{{staff && staff.title_level >= 100}}" style="margin-top: 50rpx;">
     <fui-row>
-      <fui-col span="6">
+      <fui-col span="5">
         <view class="fui-left-column">【店铺】</view>
       </fui-col>
       <fui-col span="18">
@@ -11,7 +11,7 @@
       </fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6">
+      <fui-col span="5">
         <view class="fui-left-column">【日期】</view>
       </fui-col>
       <fui-col span="18">
@@ -27,19 +27,24 @@
       </fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6">
+      <fui-col span="5">
         <view class="fui-left-column">【类型】</view>
       </fui-col>
-      <fui-col span="18">
-        <radio-group>
+      <radio-group>
+        <fui-col span="4">
           <radio checked="{{true}}">营业</radio>
+        </fui-col>
+        <fui-col span="5">
           <radio>测试</radio>
+        </fui-col>
+        <fui-col span="5">
           <radio>全部</radio>
-        </radio-group>
-      </fui-col>
+        </fui-col>
+        <fui-col span="5"></fui-col>
+      </radio-group>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6">
+      <fui-col span="5">
         <view class="fui-left-column">【招待】</view>
       </fui-col>
       <fui-col span="18">
@@ -51,7 +56,7 @@
       </fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6">
+      <fui-col span="5">
         <view class="fui-left-column">【类型】</view>
       </fui-col>
       <fui-col span="18">
@@ -63,20 +68,19 @@
       </fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6">
+      <fui-col span="5">
         <view class="fui-left-column">【挂账】</view>
       </fui-col>
       <fui-col span="18">
         <radio-group>
           <radio checked="{{true}}">正常</radio>
           <radio>挂账</radio>
-
           <radio>全部</radio>
         </radio-group>
       </fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6">
+      <fui-col span="5">
         <view class="fui-left-column">【减免】</view>
       </fui-col>
       <fui-col span="18">
@@ -88,67 +92,171 @@
       </fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      <fui-col span="6">
+      <fui-col span="5">
         <view class="fui-left-column">【状态】</view>
       </fui-col>
       <fui-col span="18">
         <radio-group>
-          <radio checked="{{true}}">已支付</radio>
+          <radio checked="{{true}}">已完成</radio>
+          <radio>已支付</radio>
           <radio>待生成</radio>
           <radio>待支付</radio>
           <radio>已关闭</radio>
+          <radio>全额退款</radio>
+          <radio>部分退款</radio>
+          <radio>退款失败</radio>
           <radio>全部</radio>
         </radio-group>
       </fui-col>
     </fui-row>
-
     <view class="view-row" style="margin-top: 20rpx;justify-content: center;">
       <fui-button disabled="{{querying}}" btnSize="medium" background="#2EA6D0" bind:click="getData"> 查 询 </fui-button>
     </view>
     <view style="height: 20rpx"></view>
-    <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成">
-      <fui-row>
-        <fui-col span="8">
-          <view class="fui-left-column">订单金额：</view>
-        </fui-col>
-        <fui-col span="4">
-          <view class="fui-right-column" style="text-align: right;">¥80.00</view>
-        </fui-col>
-        <fui-col span="6">
-          <view class="fui-left-column">商品数：</view>
-        </fui-col>
-        <fui-col span="6">
-          <view class="fui-right-column">3</view>
-        </fui-col>
-      </fui-row>
-      <fui-row>
-        <fui-col span="8">
-          <view class="fui-left-column">减免：</view>
-        </fui-col>
-        <fui-col span="4">
-          <view class="fui-right-column" style="text-align: right;">¥79.99</view>
-        </fui-col>
-        <fui-col span="6">
-          <view class="fui-left-column">日期：</view>
-        </fui-col>
-        <fui-col span="6">
-          <view class="fui-right-column">2025-12-24</view>
-        </fui-col>
-      </fui-row>
-      <fui-row>
-        <fui-col span="8">
-          <view class="fui-left-column">实际支付：</view>
-        </fui-col>
-        <fui-col span="4">
-          <view class="fui-right-column" style="text-align: right;">¥0.01</view>
-        </fui-col>
-        <fui-col span="6">
-          <view class="fui-left-column">时间：</view>
-        </fui-col>
-        <fui-col span="6">
-          <view class="fui-right-column">23:23:59</view>
-        </fui-col>
-      </fui-row>
-    </fui-card>
+    <view class="view-row">
+      <view>【排序】</view>
+      <picker class="input" style="width:150rpx" range="{{sortType}}">
+        <picker-view>
+          <view style="width: 150rpx;text-align: center;">时间倒序</view>
+        </picker-view>
+      </picker>
+    </view>
+    <view style="height: 20rpx"></view>
+    <block>
+      <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" full>
+        <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
+          <view style="width: 50rpx; margin-left: 2rpx;">
+            <view>【测】</view>
+            <view>【招】</view>
+            <view>【单】</view>
+            <view>【挂】</view>
+          </view>
+          <view>
+            <view class="view-row">
+              <view class="left-column">【日期】</view>
+              <view class="right-column">2025-09-08</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【时间】</view>
+              <view class="right-column">09:59:59</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【支付金额】</view>
+              <view class="right-column" style="width: 120rpx; text-align: right;">¥198.78</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【支付类型】</view>
+              <view class="right-column">整单</view>
+            </view>
+          </view>
+        </view>
+      </fui-card>
+      <view style="height: 20rpx;"></view>
+    </block>
+    <block>
+      <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" full>
+        <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
+          <view style="width: 50rpx; margin-left: 2rpx;">
+            <view>【测】</view>
+            <view>【招】</view>
+            <view>【单】</view>
+            <view>【挂】</view>
+          </view>
+          <view>
+            <view class="view-row">
+              <view class="left-column">【日期】</view>
+              <view class="right-column">2025-09-08</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【时间】</view>
+              <view class="right-column">09:59:59</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【支付金额】</view>
+              <view class="right-column" style="width: 120rpx; text-align: right;">¥198.78</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【支付类型】</view>
+              <view class="right-column">整单</view>
+            </view>
+          </view>
+        </view>
+      </fui-card>
+      <view style="height: 20rpx;"></view>
+    </block>
+
+
+
+
+
+
+    <view style="height: 200rpx"></view>
+    <view class="view-row">
+      <view>
+        <view>【测】</view>
+        <view>【招】</view>
+        <view>【单】</view>
+        <view>【挂】</view>
+      </view>
+      <view>
+        <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成">
+          <fui-row>
+            <fui-col span="11">
+              <view class="fui-left-column">【日期】</view>
+            </fui-col>
+            <fui-col span="13">
+              <view class="fui-right-column" style="text-align: right;">2025-08-03</view>
+            </fui-col>
+          </fui-row>
+          <fui-row>
+            <fui-col span="11">
+              <view class="fui-left-column">【时间】</view>
+            </fui-col>
+            <fui-col span="13">
+              <view class="fui-right-column">16:00.05</view>
+            </fui-col>
+          </fui-row>
+          <fui-row>
+            <fui-col span="11">
+              <view class="fui-left-column">【支付金额】</view>
+            </fui-col>
+            <fui-col span="13">
+              <view class="fui-right-column" style="text-align: right;">¥79.99</view>
+            </fui-col>
+          </fui-row>
+          <fui-row>
+            <fui-col span="11">
+              <view class="fui-left-column">【支付类型】</view>
+            </fui-col>
+            <fui-col span="13">
+              <view class="fui-right-column" style="text-align: right;">整单/分付</view>
+            </fui-col>
+          </fui-row>
+          <fui-row>
+            <fui-col span="6">
+              <view class="fui-left-column"></view>
+            </fui-col>
+            <fui-col span="6">
+              <view class="fui-right-column"></view>
+            </fui-col>
+          </fui-row>
+          <fui-row>
+            <fui-col span="8">
+              <view class="fui-left-column"></view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-right-column" style="text-align: right;"></view>
+            </fui-col>
+            <fui-col span="6">
+              <view class="fui-left-column"></view>
+            </fui-col>
+            <fui-col span="6">
+              <view class="fui-right-column"></view>
+            </fui-col>
+          </fui-row>
+        </fui-card>
+      </view>
+    </view>
+
   </view>
 </view>

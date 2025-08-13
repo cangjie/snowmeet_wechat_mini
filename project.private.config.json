@@ -3,9 +3,16 @@
     "miniprogram": {
       "list": [
         {
+          "name": "fd_order_detail",
+          "pathName": "pages/admin/fd/fd_order_detail",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "OrderEntry",
           "pathName": "pages/order/order_entry",
-          "query": "orderId=59845",
+          "query": "orderId=59977",
           "scene": null,
           "launchMode": "default"
         },

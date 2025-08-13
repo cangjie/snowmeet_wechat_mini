@@ -1,0 +1,83 @@
+<view>
+  <fui-row>
+    <fui-col span="6">
+      <view>【订单号】</view>
+    </fui-col>
+    <fui-col span="18">
+      <view>QJ_CY_250812_00007</view>
+    </fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="6">
+      <view>【订单状态】</view>
+    </fui-col>
+    <fui-col span="18">
+      <view>需要变更记录：状态、备注、（支付记录：生成二维码时间、支付时间、支付方式）挂账需要有补收截止日期，修改需要记录</view>
+    </fui-col>
+  </fui-row>
+  <view style="height: 50rpx;" ></view>
+  <view>【订单明细】</view>
+  <view style="height: 50rpx;" ></view>
+  <fui-row>
+    <fui-col span="5" >
+      <view>名称</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>单价</view>
+    </fui-col>
+    <fui-col span="4" >
+      <view>数量</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>减免</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>小计</view>
+    </fui-col>
+  </fui-row>
+  <view style="height: 50rpx;" ></view>
+  <fui-row>
+    <fui-col span="5" >
+      <view>冰摩卡</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>¥19.00</view>
+    </fui-col>
+    <fui-col span="4" >
+      <view>1</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>¥9.00</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>¥10.00</view>
+    </fui-col>
+  </fui-row>
+  <view>【备注】少冰 加浓</view>
+  <view style="height: 50rpx;" ></view>
+  <fui-row>
+    <fui-col span="5" >
+      <view>冰摩卡</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>¥19.00</view>
+    </fui-col>
+    <fui-col span="4" >
+      <view>1</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>¥0.00</view>
+    </fui-col>
+    <fui-col span="5" >
+      <view>¥0.00</view>
+    </fui-col>
+  </fui-row>
+  <view>【备注】少冰 招待</view>
+  <view style="height: 50rpx;" ></view>
+  <view>【订单备注】备注备注备注备注备注备注备注备注</view>
+  <view style="height: 50rpx;" ></view>
+  <view>【总计】  ¥38.00</view>
+  <view>【招待金额】  ¥19.00</view>
+  <view>【商品减免】  ¥9.00</view>
+  <view>【订单减免】  ¥9.00</view>
+</view>
