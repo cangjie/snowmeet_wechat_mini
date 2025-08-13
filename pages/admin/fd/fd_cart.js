@@ -145,7 +145,8 @@ Page({
     }
     order.valid = 1
     order.total_amount = that.data.totalSummary
-    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('餐饮确认购物车') + '&sessionKey=' + app.globalData.sessionKey
+    order.pay_flow_status = '待生成'
+    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('新订单') + '&sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(updateUrl, order).then(function (resolve) {
       var order = resolve
       console.log('order', order)

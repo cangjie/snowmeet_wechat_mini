@@ -7,7 +7,7 @@ checkbox{
   width: 200rpx;
   font-size: 12pt;
   text-align: left;
-  margin-left: 70rpx;
+  margin-left: 5rpx;
 }
 .right-column
 {

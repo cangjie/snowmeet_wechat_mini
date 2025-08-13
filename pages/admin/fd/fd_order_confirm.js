@@ -447,8 +447,9 @@ Page({
       that.setData({paying: true})
       var order = that.data.order
       order.valid = 1
-      order.waiting_for_pay = 1
-      var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('准备支付') + '&sessionKey=' + app.globalData.sessionKey
+      order.pay_flow_status = '已生成'
+      //order.waiting_for_pay = 1
+      var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('生成支付二维码') + '&sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(updateUrl, order).then(function (resolve) {
         that.setData({ paying: true })
         that.displayQrCode()

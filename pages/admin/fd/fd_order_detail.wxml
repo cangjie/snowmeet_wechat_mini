@@ -72,6 +72,7 @@
       <view>整个订单系统，没有操作人员记录？</view>
     </fui-col>
   </fui-row-->
+
   <view style="height: 50rpx;"></view>
   <view>【订单明细】</view>
   <view style="height: 50rpx;"></view>
@@ -131,6 +132,7 @@
   </fui-row>
   <view>【备注】少冰 招待</view>
   <view style="height: 50rpx;"></view>
+  <!--有历史记录的需要历史按钮，需哟修改按钮-->
   <view bind:tap="displayMemo">【订单备注】备注备注备注备注备注备注备注备注</view>
   <view style="height: 50rpx;"></view>
   <fui-row>

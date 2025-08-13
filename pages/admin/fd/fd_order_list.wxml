@@ -28,7 +28,7 @@
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
-        <view class="fui-left-column">【类型】</view>
+        <view class="fui-left-column">【测试】</view>
       </fui-col>
       <radio-group>
         <fui-col span="6">
@@ -144,9 +144,9 @@
     <view style="margin-left: 50rpx;">总计：2单 总支付金额：¥397.56</view>
     <view style="height: 20rpx"></view>
     <block>
-      <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" full bind:click="gotoDetail">
+      <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" tagSize="10rpx" full bind:click="gotoDetail">
         <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
-          <view style="width: 50rpx; margin-left: 2rpx;">
+          <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;">
             <view>【测】</view>
             <view>【招】</view>
             <view>【单】</view>
@@ -154,11 +154,9 @@
           </view>
           <view>
             <view class="view-row">
-              <view class="left-column">【日期】</view>
-              <view class="right-column">2025-09-08</view>
-            </view>
-            <view class="view-row">
-              <view class="left-column">【时间】</view>
+              <view class="left-column" style="width: 130rpx;">【日期】</view>
+              <view class="right-column" style="width: 170rpx;margin-right: 0rpx;" >2025-09-08</view>
+              <view class="left-column" style="width: 130rpx;margin-left: 30rpx;" >【时间】</view>
               <view class="right-column">09:59:59</view>
             </view>
             <view class="view-row">
@@ -167,14 +165,14 @@
             </view>
             <view class="view-row">
               <view class="left-column">【支付类型】</view>
-              <view class="right-column">整单</view>
+              <view class="right-column">整单支付</view>
             </view>
           </view>
         </view>
       </fui-card>
       <view style="height: 20rpx;"></view>
     </block>
-    <block>
+    <!--block>
       <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" full bind:click="gotoDetail" >
         <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
           <view style="width: 50rpx; margin-left: 2rpx;">
@@ -204,7 +202,7 @@
         </view>
       </fui-card>
       <view style="height: 20rpx;"></view>
-    </block>
+    </block-->
 
 
 
