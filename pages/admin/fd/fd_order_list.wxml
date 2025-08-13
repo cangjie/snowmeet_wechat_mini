@@ -116,18 +116,6 @@
       <fui-col span="6" ><radio checked="{{true}}">已完成</radio></fui-col>
       <fui-col span="6" ><radio>已支付</radio></fui-col>
       <fui-col span="7" ><radio>待生成</radio></fui-col>
-        
-          
-          
-          
-          
-          
-          
-          
-          
-          
-        
-      
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="6" offset="5" ><radio>待支付</radio></fui-col>
@@ -135,7 +123,6 @@
       <fui-col span="7"><radio>全额退款</radio></fui-col>
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
-      
       <fui-col span="6" offset="5" ><radio>部分退款</radio></fui-col>
       <fui-col span="6"><radio>退款失败</radio></fui-col>
       <fui-col span="7"><radio>全部</radio></fui-col>
@@ -154,8 +141,10 @@
       </picker>
     </view>
     <view style="height: 20rpx"></view>
+    <view style="margin-left: 50rpx;">总计：2单 总支付金额：¥397.56</view>
+    <view style="height: 20rpx"></view>
     <block>
-      <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" full>
+      <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" full bind:click="gotoDetail">
         <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
           <view style="width: 50rpx; margin-left: 2rpx;">
             <view>【测】</view>
@@ -186,7 +175,7 @@
       <view style="height: 20rpx;"></view>
     </block>
     <block>
-      <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" full>
+      <fui-card style="margin-top: 50rpx;" title="QJ_CY_250803_00004" tag="已完成" full bind:click="gotoDetail" >
         <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
           <view style="width: 50rpx; margin-left: 2rpx;">
             <view>【测】</view>

@@ -5,7 +5,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    showMemo: false
   },
 
   /**
@@ -62,5 +62,13 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  displayMemo(){
+    var that = this
+    that.setData({showMemo: true})
+  },
+  closeMemo(){
+    var that = this
+    that.setData({showMemo: false})
   }
 })

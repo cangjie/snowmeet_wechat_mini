@@ -8,76 +8,275 @@
     </fui-col>
   </fui-row>
   <fui-row>
+    <fui-col span="5">
+      <view>【日期】</view>
+    </fui-col>
+    <fui-col span="7">
+      <view>2025-09-29</view>
+    </fui-col>
+    <fui-col span="5">
+      <view>【时间】</view>
+    </fui-col>
+    <fui-col span="7">
+      <view>18:59:36</view>
+    </fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="5">
+      <view>【类型】</view>
+    </fui-col>
+    <fui-col span="7">
+      <view>营业</view>
+    </fui-col>
+    <fui-col span="5">
+      <view>【招待】</view>
+    </fui-col>
+    <fui-col span="7">
+      <view>否</view>
+    </fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="5">
+      <view>【套餐】</view>
+    </fui-col>
+    <fui-col span="7">
+      <view>否</view>
+    </fui-col>
+    <fui-col span="5">
+      <view>【挂账】</view>
+    </fui-col>
+    <fui-col span="7">
+      <view>2025-12-31前</view>
+    </fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="5">
+      <view>【减免】</view>
+    </fui-col>
+    <fui-col span="7">
+      <view>包含</view>
+    </fui-col>
+    <fui-col span="5">
+      <view>【状态】</view>
+    </fui-col>
+    <fui-col span="7">
+      <view>全部退款</view>
+    </fui-col>
+  </fui-row>
+  <!--fui-row>
     <fui-col span="6">
       <view>【订单状态】</view>
     </fui-col>
     <fui-col span="18">
       <view>需要变更记录：状态、备注、（支付记录：生成二维码时间、支付时间、支付方式）挂账需要有补收截止日期，修改需要记录</view>
+      <view>整个订单系统，没有操作人员记录？</view>
     </fui-col>
-  </fui-row>
-  <view style="height: 50rpx;" ></view>
+  </fui-row-->
+  <view style="height: 50rpx;"></view>
   <view>【订单明细】</view>
-  <view style="height: 50rpx;" ></view>
+  <view style="height: 50rpx;"></view>
   <fui-row>
-    <fui-col span="5" >
-      <view>名称</view>
+    <fui-col span="12">
+      <view class="view-detail">名称</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>单价</view>
+    <fui-col span="3">
+      <view class="view-detail">单价</view>
     </fui-col>
-    <fui-col span="4" >
-      <view>数量</view>
+    <fui-col span="3">
+      <view class="view-detail">数量</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>减免</view>
+    <fui-col span="3">
+      <view class="view-detail">减免</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>小计</view>
+    <fui-col span="3">
+      <view class="view-detail">小计</view>
     </fui-col>
   </fui-row>
-  <view style="height: 50rpx;" ></view>
+  <view style="height: 50rpx;"></view>
   <fui-row>
-    <fui-col span="5" >
-      <view>冰摩卡</view>
+    <fui-col span="12">
+      <view class="view-detail">冰摩卡</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>¥19.00</view>
+    <fui-col span="3">
+      <view class="view-detail" style="text-align: right;">¥19.00</view>
     </fui-col>
-    <fui-col span="4" >
-      <view>1</view>
+    <fui-col span="2">
+      <view class="view-detail">1</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>¥9.00</view>
+    <fui-col span="3">
+      <view class="view-detail" style="text-align: right;margin-left:10rpx">¥9.00</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>¥10.00</view>
+    <fui-col span="3">
+      <view class="view-detail" style="text-align: right;margin-left: 10rpx;">¥100.00</view>
     </fui-col>
   </fui-row>
   <view>【备注】少冰 加浓</view>
-  <view style="height: 50rpx;" ></view>
+  <view style="height: 50rpx;"></view>
   <fui-row>
-    <fui-col span="5" >
-      <view>冰摩卡</view>
+    <fui-col span="12">
+      <view class="view-detail">冰摩卡</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>¥19.00</view>
+    <fui-col span="3">
+      <view class="view-detail" style="text-align: right;">¥19.00</view>
     </fui-col>
-    <fui-col span="4" >
-      <view>1</view>
+    <fui-col span="2">
+      <view class="view-detail">1</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>¥0.00</view>
+    <fui-col span="3">
+      <view class="view-detail" style="text-align: right;margin-left:10rpx">¥9.00</view>
     </fui-col>
-    <fui-col span="5" >
-      <view>¥0.00</view>
+    <fui-col span="3">
+      <view class="view-detail" style="text-align: right;margin-left: 10rpx;">¥100.00</view>
     </fui-col>
   </fui-row>
   <view>【备注】少冰 招待</view>
-  <view style="height: 50rpx;" ></view>
-  <view>【订单备注】备注备注备注备注备注备注备注备注</view>
-  <view style="height: 50rpx;" ></view>
-  <view>【总计】  ¥38.00</view>
-  <view>【招待金额】  ¥19.00</view>
-  <view>【商品减免】  ¥9.00</view>
-  <view>【订单减免】  ¥9.00</view>
+  <view style="height: 50rpx;"></view>
+  <view bind:tap="displayMemo">【订单备注】备注备注备注备注备注备注备注备注</view>
+  <view style="height: 50rpx;"></view>
+  <fui-row>
+    <fui-col span="7">
+      <view>【总计】</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: right;">¥38.00</view>
+    </fui-col>
+    <fui-col span="11"></fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="7">
+      <view>【招待金额】</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: right;">¥19.00</view>
+    </fui-col>
+    <fui-col span="11"></fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="7">
+      <view>【商品减免】</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: right;">¥9.00</view>
+    </fui-col>
+    <fui-col span="11"></fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="7">
+      <view>【订单减免】</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: right;">¥9.00</view>
+    </fui-col>
+    <fui-col span="11"></fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="7">
+      <view>【需要支付】</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: right;">¥10.00</view>
+    </fui-col>
+    <fui-col span="11"></fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="7">
+      <view>【支付记录】</view>
+    </fui-col>
+    <fui-col span="17"></fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="5">
+      <view style="text-align: center;">日期</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center;">时间</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: center;">方式</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center;">操作</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center;">金额</view>
+    </fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="5">
+      <view style="text-align: center;">25-08-31</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center;">18:59:59</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: center;">支付宝</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center;">支付完成</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: center;">¥10000.00</view>
+    </fui-col>
+  </fui-row>
+  <fui-row>
+    <fui-col span="5">
+      <view style="text-align: center;">25-08-31</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center;">18:58:09</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: center;">支付宝</view>
+    </fui-col>
+    <fui-col span="5">
+      <view style="text-align: center;">生成</view>
+    </fui-col>
+    <fui-col span="4">
+      <view style="text-align: center;">¥10000.00</view>
+    </fui-col>
+  </fui-row>
+  <fui-bottom-popup show="{{showMemo}}" bindclose="closeMemo">
+    <view class="fui-scroll__wrap">
+      <view class="fui-title fui-title__pb">备注修改历史</view>
+      <scroll-view scroll-y class="fui-scroll__view">
+        <fui-row>
+          <fui-col span="6">
+            <view style="text-align: center;">日期</view>
+          </fui-col>
+          <fui-col span="5">
+            <view style="text-align: center;">时间</view>
+          </fui-col>
+          <fui-col span="13">
+            <view style="text-align: center;">内容</view>
+          </fui-col>
+        </fui-row>
+        <fui-row>
+          <fui-col span="6">
+            <view style="text-align: center;">2025-08-31</view>
+          </fui-col>
+          <fui-col span="5">
+            <view style="text-align: center;">19:23:45</view>
+          </fui-col>
+          <fui-col span="13">
+            <view style="text-align: center;">加浓加冰</view>
+          </fui-col>
+        </fui-row>
+        <fui-row>
+          <fui-col span="6">
+            <view style="text-align: center;">2025-08-31</view>
+          </fui-col>
+          <fui-col span="5">
+            <view style="text-align: center;">19:20:45</view>
+          </fui-col>
+          <fui-col span="13">
+            <view style="text-align: center;">要常温的</view>
+          </fui-col>
+        </fui-row>
+        <!--fui-list-cell wx:for="{{itemList}}" wx:key="index">item{{index+1}}</fui-list-cell-->
+      </scroll-view>
+      <view class="fui-icon__close" bindtap="closeMemo">
+        <fui-icon name="close" size="{{48}}"></fui-icon>
+      </view>
+    </view>
+  </fui-bottom-popup>
 </view>

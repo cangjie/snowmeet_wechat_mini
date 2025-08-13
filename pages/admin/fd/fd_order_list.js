@@ -153,5 +153,10 @@ Page({
       }
     }
     that.setData({checkBoxes})
+  },
+  gotoDetail(e){
+    wx.navigateTo({
+      url: 'fd_order_detail',
+    })
   }
 })
