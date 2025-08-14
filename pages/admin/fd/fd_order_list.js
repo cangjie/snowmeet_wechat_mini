@@ -19,7 +19,16 @@ Page({
       {title: '已完成', value: '已完成', checked: false}
     ]
     */
-   sortType: ['时间倒序','时间正序','金额倒序','金额正序']
+   sortType: ['时间倒序','时间正序','应付金额倒序','应付金额正序'],
+   currentSortType: '时间倒序',
+   queryOptions:[
+    {key: 'isTest', value: false},
+    {key: 'isEnterain', value: false},
+    {key: 'isPackage', value: false},
+    {key: 'isOnCredit', value: false},
+    {key: 'haveDiscount', value: null},
+    {key: 'status', value: '已完成'}
+    ]
   },
 
   /**
@@ -85,15 +94,58 @@ Page({
   getData(){
     var that = this
     var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaff?shop=' + encodeURIComponent(that.data.shop) + '&type=' + encodeURIComponent('餐饮') + '&startDate=' + util.formatDateString(that.data.startDate) + '&endDate=' + util.formatDateString(that.data.endDate) + '&sessionKey=' + app.globalData.sessionKey
+    var subQuery = ''
+    var queryOptions = that.data.queryOptions
+    for(var i = 0; i < queryOptions.length; i++){
+      if (queryOptions[i].value != null){
+        subQuery += '&' + queryOptions[i].key + '=' + queryOptions[i].value
+      }
+    }
+    qUrl = qUrl + subQuery
     that.setData({querying: true})
     console.log('query url', qUrl)
     util.performWebRequest(qUrl, null).then(function (resolve){
       var orders = resolve
       console.log('get orders', orders)
+      that.renderOrders(resolve)
       that.setData({querying: false})
     }).catch(function (reject){
       that.setData({querying: false})
     })
+  },
+  renderOrders(orders){
+    var that = this
+    if (orders == null){
+      orders = that.data.orders
+    }
+    var sort = that.data.currentSortType
+    switch(sort){
+      case '时间倒序':
+        orders = orders.sort((a, b)=>{b.id - a.id})
+        break
+      case '时间正序':
+        orders = orders.sort((a, b) => {a.id - b.id})
+        break
+      case '应付金额倒序':
+        orders = order.sort((a, b)=> {b.totalCharge - a.totalCharge})
+        break
+      case '应付金额正序':
+        orders = order.sort((a, b)=> {a.totalCharge - b.totalCharge})
+        break
+      default:
+        break
+    }
+    var totalAmount = 0
+    for(var i = 0; orders && i < orders.length; i++){
+      var order = orders[i]
+      var bizDate = new Date(order.biz_date)
+      order.dateStr = util.formatDate(bizDate)
+      order.timeStr = util.formatTimeStr(bizDate)
+      totalAmount += order.totalCharge
+      order.totalChargeStr = util.showAmount(order.totalCharge)
+    }
+
+    that.setData({orders, totalAmount, totalAmountStr: util.showAmount(totalAmount)})
   },
   shopSelected(e){
     var that = this
@@ -158,5 +210,40 @@ Page({
     wx.navigateTo({
       url: 'fd_order_detail',
     })
+  },
+  setQueryOptions(e){
+    var that = this
+    var id = e.currentTarget.id
+    that.setQueryOptionValue(id, e.detail.value)
+  },
+  setQueryOptionValue(key, value){
+    var that = this
+    var queryOptions = that.data.queryOptions
+    for(var i = 0; i < queryOptions.length; i++){
+      if (queryOptions[i].key == key){
+        switch(value){
+          case 'null':
+            queryOptions[i].value = null
+            break
+          case 'true':
+            queryOptions[i].value = true
+            break
+          case 'false':
+            queryOptions[i].value = false
+            break
+          default:
+            queryOptions[i].value = value
+            break
+        }
+      }
+    }
+    console.log('set query options', queryOptions)
+  },
+  setSortType(e){
+    var that = this
+    that.setData({currentSortType: that.data.sortType[e.detail.value]})
+    if (that.data.orders){
+      that.renderOrders()
+    }
   }
 })

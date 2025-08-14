@@ -97,11 +97,11 @@ Page({
     util.performWebRequest(getUrl, null).then(function (resolve) {
       console.log('order', resolve)
       var order = resolve
-      if (order.dealed == 1){
+      if (order.dealed == 1) {
         wx.showModal({
           title: '无效订单',
           content: '该订单已经支付过',
-          cancelText:'重新开单',
+          cancelText: '重新开单',
           confirmText: '查看列表',
           complete: (res) => {
             if (res.cancel) {
@@ -109,7 +109,7 @@ Page({
                 url: 'fd_category_prod_list',
               })
             }
-        
+
             if (res.confirm) {
               wx.redirectTo({
                 url: 'fd_order_list',
@@ -123,7 +123,7 @@ Page({
       var orderDiscountAmount = 0
       var totalCharge = 0
       var editedMemo = order.memo
-      
+
       for (var i = 0; i < order.fdOrders.length; i++) {
         var fdOrder = order.fdOrders[i]
         totalAmount += fdOrder.order_type == '招待' ? 0 : (fdOrder.unit_price * fdOrder.count)
@@ -140,7 +140,7 @@ Page({
           orderDiscountAmount += discount.amount
         }
       }
-      
+
       totalCharge = totalAmount - orderDiscountAmount - productDiscountAmount
       that.setData({
         order, productDiscountAmountStr: util.showAmount(productDiscountAmount),
@@ -176,35 +176,35 @@ Page({
       that.getData()
     })
   },
-  modInput(e){
+  modInput(e) {
     var that = this
     var id = e.currentTarget.id
     var value = e.detail.value
-    switch(id){
+    switch (id) {
       case 'memo':
         //editedMemo = value
-        that.setData({editedMemo: value})
+        that.setData({ editedMemo: value })
         break
       case 'discount':
         //editedDiscount = value
-        that.setData({editedDiscount: value})
+        that.setData({ editedDiscount: value })
         break
       default:
         break
     }
     //that.setData({editedMemo, editedDiscount})
   },
-  confirmMod(e){
+  confirmMod(e) {
     var that = this
     var id = e.currentTarget.id
     var order = that.data.order
     var message = ''
-    switch(id){
+    switch (id) {
       case 'discount':
-        if (isNaN(that.data.editedDiscount)){
+        if (isNaN(that.data.editedDiscount)) {
           message = '必须是数字'
         }
-        else if (order.total_amount - order.discountAmount + that.data.orderDiscountAmount < that.data.editedDiscount){
+        else if (order.total_amount - order.discountAmount + that.data.orderDiscountAmount < that.data.editedDiscount) {
           message = '减免后金额不能为负'
         }
         else {
@@ -217,20 +217,20 @@ Page({
         break
       case 'memo':
         order.memo = that.data.editedMemo
-        that.setData({order})
+        that.setData({ order })
         //that.setData({editing: false})
         break
       default:
         break
     }
-    if (message != ''){
+    if (message != '') {
       wx.showToast({
         title: message,
         icon: 'error'
       })
     }
-    else{
-      that.setData({editing: false})
+    else {
+      that.setData({ editing: false })
       that.setEditStatus(e, false)
     }
   },
@@ -240,6 +240,7 @@ Page({
     var getUrl = app.globalData.requestPrefix + 'Order/'
     var payMethod = that.data.payMethod
     that.setData({ qrCodeUrl: null })
+
     switch (payMethod) {
       case '支付宝':
         getUrl += 'GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
@@ -265,6 +266,15 @@ Page({
   setPayMethod(e) {
     var that = this
     var payMethod = e.detail.value
+    if (payMethod != '其他') {
+      var order = that.data.order
+      order.current_pay_method = payMethod
+      var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改支付方式') + '&sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(updateUrl, order).then(function (resovle) {
+        console.log('pay method changed', resovle)
+      })
+    }
+
     that.setData({ payMethod })
     if (that.data.paying) {
       that.displayQrCode()
@@ -324,23 +334,23 @@ Page({
   socketMessage(res) {
     console.log('message', res)
     var ret = JSON.parse(res.data)
-    if (ret.code == 0){
+    if (ret.code == 0) {
       var order = ret.data
       console.log('paid order', order)
-      var title = order.paidAmount == 0? '下单成功' : '支付成功'
-      if (order.dealed ==1){
+      var title = order.paidAmount == 0 ? '下单成功' : '支付成功'
+      if (order.dealed == 1) {
         wx.showModal({
           title: title,
           content: '',
-          confirmText:'查看详情',
-          cancelText:'下一订单',
+          confirmText: '查看详情',
+          cancelText: '下一订单',
           complete: (res) => {
             if (res.cancel) {
               wx.redirectTo({
                 url: 'fd_category_prod_list',
               })
             }
-        
+
             if (res.confirm) {
               wx.redirectTo({
                 url: 'fd_order_detail?orderId=' + that.data.orderId,
@@ -353,11 +363,11 @@ Page({
   },
   payLater(e) {
     var that = this
-    that.setData({paying: true})
+    that.setData({ paying: true })
     that.setDiscount()
     var title = '确认挂账'
     var content = '用户稍后支付，点击确认下单，点击取消提示用户立即支付订单。'
-    if (that.data.totalCharge <= 0){
+    if (that.data.totalCharge <= 0) {
       content = '订单金额已经全部减免！'
       title = '0元订单'
     }
@@ -366,7 +376,7 @@ Page({
       content: content,
       complete: (res) => {
         if (res.cancel) {
-          that.setData({paying: false})
+          that.setData({ paying: false })
         }
 
         if (res.confirm) {
@@ -400,7 +410,7 @@ Page({
     }
     util.performWebRequest(effectUrl, null).then(function (resolve) {
       console.log('paid order', resolve)
-      that.setData({paying: false})
+      that.setData({ paying: false })
     })
   },
   placeUnneedPayOrderConfirm(e) {
@@ -420,6 +430,12 @@ Page({
   },
   setSubPayMethod(e) {
     var that = this
+    var order = that.data.order
+    order.current_pay_method = e.detail.value
+    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改支付方式') + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, order).then(function (resovle) {
+      console.log('pay method changed', resovle)
+    })
     that.setData({ subPayMethod: e.detail.value })
   },
   showQrCode(e) {
@@ -444,7 +460,7 @@ Page({
       })
     }
     else {
-      that.setData({paying: true})
+      that.setData({ paying: true })
       var order = that.data.order
       order.valid = 1
       order.pay_flow_status = '已生成'
@@ -457,34 +473,34 @@ Page({
 
     }
   },
-  setEditStatus(e, status){
+  setEditStatus(e, status) {
     var id = e.currentTarget.id
     var that = this
-    switch(id){
+    switch (id) {
       case 'memo':
-        that.setData({editingMemo: status, editing: status})
+        that.setData({ editingMemo: status, editing: status })
         break
       case 'discount':
-        that.setData({editingDiscount: status, editing: status})
+        that.setData({ editingDiscount: status, editing: status })
         break
       default:
         break
     }
   },
-  edit(e){
+  edit(e) {
     var that = this
     that.setEditStatus(e, true)
   },
-  cancel(e){
+  cancel(e) {
     var that = this
     that.setEditStatus(e, false)
-    that.setData({editing: false})
+    that.setData({ editing: false })
   },
-  renderOrder(order){
+  renderOrder(order) {
     var that = this
     var order = that.data.order
     var orderDiscount = parseFloat(that.data.editedDiscount)
     var realCharge = order.total_amount - orderDiscount - order.discountAmount + that.data.orderDiscountAmount
-    that.setData({totalCharge: realCharge ,totalChargeStr: util.showAmount(realCharge)})
+    that.setData({ totalCharge: realCharge, totalChargeStr: util.showAmount(realCharge) })
   }
 })
