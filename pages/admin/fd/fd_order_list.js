@@ -121,16 +121,16 @@ Page({
     var sort = that.data.currentSortType
     switch(sort){
       case '时间倒序':
-        orders = orders.sort((a, b)=>{b.id - a.id})
+        orders = orders.sort((a, b)=> (b.id - a.id))
         break
       case '时间正序':
-        orders = orders.sort((a, b) => {a.id - b.id})
+        orders = orders.sort((a, b) => (a.id - b.id))
         break
       case '应付金额倒序':
-        orders = order.sort((a, b)=> {b.totalCharge - a.totalCharge})
+        orders = orders.sort((a, b)=> (b.totalCharge - a.totalCharge))
         break
       case '应付金额正序':
-        orders = order.sort((a, b)=> {a.totalCharge - b.totalCharge})
+        orders = orders.sort((a, b)=> (a.totalCharge - b.totalCharge))
         break
       default:
         break

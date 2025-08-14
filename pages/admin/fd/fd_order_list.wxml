@@ -178,7 +178,6 @@
       <fui-col span="19">
         <view>{{orders? orders.length: 0}}单 总支付金额：{{totalAmountStr?totalAmountStr: '¥0.00'}}</view>
       </fui-col>
-      
     </fui-row>
     <view style="height: 20rpx"></view>
     <block wx:for="{{orders}}">
