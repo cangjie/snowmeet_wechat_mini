@@ -505,7 +505,37 @@ Page({
       subPayMethod: that.data.othersPayMethods[e.detail.value], 
       disabledConfirmPaidButton: disable})
   },
-  showQrCode(e) {
+  showQrCode(){
+    var that = this
+    var payMethod = that.data.payMethod
+    wx.showModal({
+      title: '确认支付方式',
+      content: '支付方式：' + that.data.payMethod + ' 支付金额：' + that.data.totalChargeStr ,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          if (payMethod == '微信支付'){
+            that.showWepayQrCode()
+          }
+        }
+      }
+    })
+  },
+  showWepayQrCode(){
+    var that = this
+    var order = that.data.order
+    order.valid = 1
+    order.current_pay_method = that.data.payMethod
+    that.updateOrderPromise('确认支付方式').then(function (resolve){
+      console.log('confirm pay method', resolve)
+      var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + order.id.toString())
+        that.setData({ qrCodeUrl, subPayMethod: null, paying: true })
+    }).catch(function (reject){})
+  },
+  showQrCode_bak(e) {
     var that = this
     that.setDiscount()
     var payMethod = that.data.payMethod
