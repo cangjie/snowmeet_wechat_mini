@@ -202,7 +202,11 @@
             </view>
             <view class="view-row">
               <view class="left-column">【支付类型】</view>
-              <view class="right-column">{{item.single_payment == 1 ? '整单支付' : '逐笔支付'}}</view>
+              <view class="right-column">{{ item.availablePayments.length == 0 ? '未支付' : ( item.availablePayments.length==1 ? '整单支付' : '分付') }}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【开单人】</view>
+              <view class="right-column">{{item.staff.name}}</view>
             </view>
           </view>
         </view>

@@ -13,7 +13,10 @@ Page({
     editingDiscount: false,
     editedDiscount: 0,
     editingMemo: false,
-    editedMemo: ''
+    editedMemo: '',
+    haveDisplayedQr: false,
+    othersPayMethods: ['京东收银', 'POS机刷卡', '现金', '手工填写'],
+    disabledConfirmPaidButton: true
   },
 
   /**
@@ -265,10 +268,30 @@ Page({
   },
   setPayMethod(e) {
     var that = this
+    console.log('set pay method', e.detail.value)
     var payMethod = e.detail.value
+    that.setData({payMethod})
+/*
+    var order = that.data.order
     if (payMethod != '其他') {
-      var order = that.data.order
+
       order.current_pay_method = payMethod
+      if (payMethod == '微信支付' || payMethod == '支付宝') {
+        if (that.data.haveDisplayedQr) {
+          order.pay_flow_status = '已生成'
+        }
+      }
+      else {
+        order.pay_flow_status = '待生成'
+      }
+
+      var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改支付方式') + '&sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(updateUrl, order).then(function (resovle) {
+        console.log('pay method changed', resovle)
+      })
+    }
+    else {
+      order.pay_flow_status = '待生成'
       var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改支付方式') + '&sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(updateUrl, order).then(function (resovle) {
         console.log('pay method changed', resovle)
@@ -279,12 +302,14 @@ Page({
     if (that.data.paying) {
       that.displayQrCode()
     }
+    */
   },
   setPayLater(e) {
     var that = this
     console.log('pay later', e)
     var order = that.data.order
     order.payLater = e.detail.value
+    order.pay_flow_status = null
     that.setData({ order, payMethod: null })
   },
   initWebSocket() {
@@ -361,6 +386,46 @@ Page({
       }
     }
   },
+  updateOrderPromise(scene){
+    var that = this
+    var order = that.data.order
+    return new Promise(function (resolve){
+      var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(updateUrl, order).then(function (resovle) {
+        console.log('pay method changed', resovle)
+        resolve(resolve)
+      }).catch(function (reject){
+        reject()
+      })
+    })
+  },
+  placeRestaurantOrder() {
+    wx.showModal({
+      title: '确认下单',
+      content: '点击确定，可以请顾客稍后付款；点击取消，可以继续选择支付方式，请顾客立即付款。',
+      complete: (res) => {
+        if (res.cancel) {
+
+        }
+        if (res.confirm) {
+          var that = this
+          var order = that.data.order
+          order.valid = 1
+          order.dealed = 1
+          order.pay_flow_status = null
+          that.updateOrderPromise('餐厅下单').then(function(resovle){
+            console.log('restaurant', resovle)
+          })
+        }
+      }
+    })
+    var that = this
+    var order = that.data.order
+    order.valid = 1
+    order.dealed = 1
+    order.pay_flow_status = null
+
+  },
   payLater(e) {
     var that = this
     that.setData({ paying: true })
@@ -430,19 +495,30 @@ Page({
   },
   setSubPayMethod(e) {
     var that = this
-    var order = that.data.order
-    order.current_pay_method = e.detail.value
-    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改支付方式') + '&sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(updateUrl, order).then(function (resovle) {
-      console.log('pay method changed', resovle)
-    })
-    that.setData({ subPayMethod: e.detail.value })
+    var disable = e.detail.value == that.data.othersPayMethods.length - 1
+    if (disable){
+      if (that.data.inputedPayMethod){
+        disable = false
+      }
+    }
+    that.setData({ subPayMethodIndex: e.detail.value, 
+      subPayMethod: that.data.othersPayMethods[e.detail.value], 
+      disabledConfirmPaidButton: disable})
   },
   showQrCode(e) {
     var that = this
     that.setDiscount()
     var payMethod = that.data.payMethod
     var subPayMethod = that.data.subPayMethod
+    var order = that.data.order
+    /*
+    if (order.current_pay_method == '微信支付' || order.current_pay_method == '支付宝'){
+      order.pay_flow_status = '已生成'
+    }
+    else{
+      order.pay_flow_status = '待生成'
+    }
+*/
     var valid = true
     if (!payMethod) {
       valid = false
@@ -461,13 +537,18 @@ Page({
     }
     else {
       that.setData({ paying: true })
-      var order = that.data.order
-      order.valid = 1
-      order.pay_flow_status = '已生成'
-      //order.waiting_for_pay = 1
+      if (payMethod == '微信支付' || payMethod == '支付宝') {
+        order.valid = 1
+        order.pay_flow_status = '已生成'
+      }
+      else {
+        order.pay_flow_status = '待生成'
+      }
+
+
       var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('生成支付二维码') + '&sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(updateUrl, order).then(function (resolve) {
-        that.setData({ paying: true })
+        that.setData({ paying: true, haveDisplayedQr: true })
         that.displayQrCode()
       })
 
@@ -502,5 +583,13 @@ Page({
     var orderDiscount = parseFloat(that.data.editedDiscount)
     var realCharge = order.total_amount - orderDiscount - order.discountAmount + that.data.orderDiscountAmount
     that.setData({ totalCharge: realCharge, totalChargeStr: util.showAmount(realCharge) })
+  },
+  cancelPayMethodInput(e){
+    var that = this
+    that.setData({subPayMethodIndex: null, disabledConfirmPaidButton: true})
+  },
+  inputPayMethod(e){
+    var that = this
+    that.setData({inputedPayMethod: e.detail.value, disabledConfirmPaidButton: e.detail.value == ''})
   }
 })
