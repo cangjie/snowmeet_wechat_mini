@@ -43,7 +43,7 @@
             <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000"  bind:click="cancel"></fui-button>
           </block>
           <block wx:else>
-            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit" disabled="{{paying}}" ></fui-button>
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
           </block>
         </view>
       </fui-col>
@@ -72,7 +72,7 @@
       <block wx:if="{{!editingMemo}}" >
         <fui-col span="24" >
           <view style="display: flex;justify-content: center;">
-            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit" disabled="{{paying}}" ></fui-button>
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
           </view>
         </fui-col>
       </block>
@@ -90,7 +90,7 @@
       </block>
     </fui-row>
     <view style="margin-top: 50rpx;display: flex;justify-content: center;">
-      <fui-button id="payLater" background="#DD0000" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text=" 下 单 " bind:click="placeRestaurantOrder" disabled="{{paying || editing}}" ></fui-button>
+      <fui-button id="payLater" background="#DD0000" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text=" 下 单 " bind:click="placeRestaurantOrder" disabled="{{paying || editingDiscount || editingMemo || payMethod }}" ></fui-button>
     </view>
     <view style="height: 50rpx;"></view>
     <fui-row>
@@ -100,9 +100,9 @@
       <fui-col span="18">
         <view class="fui-right-column">
           <radio-group class="view-row" bindchange="setPayMethod" >
-            <radio value="微信支付"  checked="{{payMethod == '微信支付'}}" disabled="{{paying}}" >微信</radio>
-            <radio value="支付宝"  checked="{{payMethod == '支付宝'}}" disabled="{{paying}}" >支付宝</radio>
-            <radio value="其它" checked="{{payMethod == '其它'}}" disabled="{{paying}}" >其它</radio>
+            <radio value="微信支付"  checked="{{payMethod == '微信支付'}}" disabled="{{paying || editingDiscount}}" >微信</radio>
+            <radio value="支付宝"  checked="{{payMethod == '支付宝'}}" disabled="{{paying || editingDiscount }}" >支付宝</radio>
+            <radio value="其它" checked="{{payMethod == '其它'}}" disabled="{{paying || editingDiscount }}" >其它</radio>
             <radio value="挂账" checked="{{payMethod == '挂账'}}" disabled="{{true}}" >挂账</radio>
           </radio-group>
         </view>
@@ -132,18 +132,27 @@
         </view>
       </fui-col>
     </fui-row>
+    <view class="view-row" style="justify-content: center;" >
+      <fui-button  wx:if="{{(payMethod == '微信支付' || payMethod == '支付宝') && paying}}"   id="payMethod" margin="5rpx" width="100rpx" height="50rpx" size="29" text="重选" color="#000000" background="#C0C0C0" bind:click="edit" disabled="{{!paying}}" ></fui-button>
+    </view>
     <view style="height: 50rpx;"></view>
     <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
-      <fui-button wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" id="payLater" background="#00AA00" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="获取支付二维码" bind:click="showQrCode"  disabled="{{paying || totalCharge <= 0 || editing}}"  ></fui-button>
+      <!--fui-button wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" id="payLater" background="#00AA00" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="获取支付二维码" bind:click="showQrCode"  disabled="{{paying || totalCharge <= 0 || editing}}"  ></fui-button-->
       <fui-button wx:if="{{payMethod == '其它'}}" id="othersPayMethod" disabled="{{disabledConfirmPaidButton}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
     </view>
     <view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" >
-      <view  style="display: flex;justify-content: center; align-items: center;height: 400rpx;flex-direction: column;margin-top: 50rpx;">
+      <view  style="display: flex;justify-content: center; align-items: center;height: 300rpx;flex-direction: column;margin-top: 0rpx;">
         <view style="text-align: center;">
           <image mode="aspectFill" style="width: 300rpx;height: 300rpx;" src="{{qrCodeUrl}}"></image>
         </view>
       </view>
     </view>
+    <!--view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" >
+      <view  style="display: flex;justify-content: center; align-items: center;height: 100rpx;flex-direction: column;margin-top: 50rpx;">
+        <fui-button wx:if="{{(payMethod == '微信支付' || payMethod == '支付宝') && paying }}" id="othersPayMethod"  btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="修改订单" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
+      </view>
+    </view-->
+    <view style="height: 100rpx;" ></view>
   </view>
   <view wx:else>
     没有权限
