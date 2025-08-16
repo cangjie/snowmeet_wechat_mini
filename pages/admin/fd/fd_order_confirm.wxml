@@ -99,10 +99,10 @@
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <radio-group class="view-row" bindchange="setPayMethod">
-            <radio value="微信支付"  checked="{{payMethod == '微信支付'}}">微信</radio>
-            <radio value="支付宝"  checked="{{payMethod == '支付宝'}}">支付宝</radio>
-            <radio value="其它" checked="{{payMethod == '其它'}}" >其它</radio>
+          <radio-group class="view-row" bindchange="setPayMethod" >
+            <radio value="微信支付"  checked="{{payMethod == '微信支付'}}" disabled="{{paying}}" >微信</radio>
+            <radio value="支付宝"  checked="{{payMethod == '支付宝'}}" disabled="{{paying}}" >支付宝</radio>
+            <radio value="其它" checked="{{payMethod == '其它'}}" disabled="{{paying}}" >其它</radio>
             <radio value="挂账" checked="{{payMethod == '挂账'}}" disabled="{{true}}" >挂账</radio>
           </radio-group>
         </view>
@@ -137,16 +137,13 @@
       <fui-button wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" id="payLater" background="#00AA00" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="获取支付二维码" bind:click="showQrCode"  disabled="{{paying || totalCharge <= 0 || editing}}"  ></fui-button>
       <fui-button wx:if="{{payMethod == '其它'}}" id="othersPayMethod" disabled="{{disabledConfirmPaidButton}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
     </view>
-    <!--view wx:if="{{payMethod && paying}}">
-      <view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" style="display: flex;justify-content: center; align-items: center;height: 400rpx;flex-direction: column;margin-top: 50rpx;">
+    <view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" >
+      <view  style="display: flex;justify-content: center; align-items: center;height: 400rpx;flex-direction: column;margin-top: 50rpx;">
         <view style="text-align: center;">
           <image mode="aspectFill" style="width: 300rpx;height: 300rpx;" src="{{qrCodeUrl}}"></image>
         </view>
       </view>
-      <view wx:else style="display: flex;justify-content: center;margin-top: 50rpx;">
-        <fui-button id="othersPayMethod" disabled="{{disabledConfirmPaidButton}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
-      </view>
-    </view-->
+    </view>
   </view>
   <view wx:else>
     没有权限

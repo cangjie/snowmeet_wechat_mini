@@ -185,17 +185,14 @@ Page({
     var value = e.detail.value
     switch (id) {
       case 'memo':
-        //editedMemo = value
         that.setData({ editedMemo: value })
         break
       case 'discount':
-        //editedDiscount = value
         that.setData({ editedDiscount: value })
         break
       default:
         break
     }
-    //that.setData({editedMemo, editedDiscount})
   },
   confirmMod(e) {
     var that = this
@@ -237,80 +234,11 @@ Page({
       that.setEditStatus(e, false)
     }
   },
-  displayQrCode(e) {
-    var that = this
-    var order = that.data.order
-    var getUrl = app.globalData.requestPrefix + 'Order/'
-    var payMethod = that.data.payMethod
-    that.setData({ qrCodeUrl: null })
-
-    switch (payMethod) {
-      case '支付宝':
-        getUrl += 'GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
-        that.setData({ subPayMethod: null })
-        break
-      case '微信支付':
-        getUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + order.id.toString())
-        that.setData({ qrCodeUrl: getUrl, subPayMethod: null })
-        break
-      default:
-        that.setData({ payMethod })
-        break
-    }
-    if (payMethod == '支付宝') {
-      util.performWebRequest(getUrl, null).then(function (resolve) {
-        console.log('get ali qr', resolve)
-        var qrTxt = resolve
-        var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrTxt)
-        that.setData({ qrCodeUrl, payMethod })
-      })
-    }
-  },
   setPayMethod(e) {
     var that = this
     console.log('set pay method', e.detail.value)
     var payMethod = e.detail.value
     that.setData({payMethod})
-/*
-    var order = that.data.order
-    if (payMethod != '其他') {
-
-      order.current_pay_method = payMethod
-      if (payMethod == '微信支付' || payMethod == '支付宝') {
-        if (that.data.haveDisplayedQr) {
-          order.pay_flow_status = '已生成'
-        }
-      }
-      else {
-        order.pay_flow_status = '待生成'
-      }
-
-      var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改支付方式') + '&sessionKey=' + app.globalData.sessionKey
-      util.performWebRequest(updateUrl, order).then(function (resovle) {
-        console.log('pay method changed', resovle)
-      })
-    }
-    else {
-      order.pay_flow_status = '待生成'
-      var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('修改支付方式') + '&sessionKey=' + app.globalData.sessionKey
-      util.performWebRequest(updateUrl, order).then(function (resovle) {
-        console.log('pay method changed', resovle)
-      })
-    }
-
-    that.setData({ payMethod })
-    if (that.data.paying) {
-      that.displayQrCode()
-    }
-    */
-  },
-  setPayLater(e) {
-    var that = this
-    console.log('pay later', e)
-    var order = that.data.order
-    order.payLater = e.detail.value
-    order.pay_flow_status = null
-    that.setData({ order, payMethod: null })
   },
   initWebSocket() {
     var that = this
@@ -515,10 +443,12 @@ Page({
         if (res.cancel) {
           
         }
-    
         if (res.confirm) {
           if (payMethod == '微信支付'){
             that.showWepayQrCode()
+          }
+          if (payMethod == '支付宝'){
+            that.showAlipayQrCode()
           }
         }
       }
@@ -526,63 +456,28 @@ Page({
   },
   showWepayQrCode(){
     var that = this
+    that.setData({paying: true})
     var order = that.data.order
     order.valid = 1
     order.current_pay_method = that.data.payMethod
     that.updateOrderPromise('确认支付方式').then(function (resolve){
       console.log('confirm pay method', resolve)
       var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + order.id.toString())
-        that.setData({ qrCodeUrl, subPayMethod: null, paying: true })
+        that.setData({ qrCodeUrl, subPayMethod: null })
     }).catch(function (reject){})
   },
-  showQrCode_bak(e) {
+  showAlipayQrCode(){
     var that = this
-    that.setDiscount()
-    var payMethod = that.data.payMethod
-    var subPayMethod = that.data.subPayMethod
+    that.setData({paying: true})
     var order = that.data.order
-    /*
-    if (order.current_pay_method == '微信支付' || order.current_pay_method == '支付宝'){
-      order.pay_flow_status = '已生成'
-    }
-    else{
-      order.pay_flow_status = '待生成'
-    }
-*/
-    var valid = true
-    if (!payMethod) {
-      valid = false
-    }
-    else if (payMethod != '微信支付' && payMethod != '支付宝' && !subPayMethod) {
-      valid = false
-    }
-    else {
-      valid = true
-    }
-    if (!valid) {
-      wx.showToast({
-        title: '必须选择支付方式',
-        icon: 'error'
-      })
-    }
-    else {
-      that.setData({ paying: true })
-      if (payMethod == '微信支付' || payMethod == '支付宝') {
-        order.valid = 1
-        order.pay_flow_status = '已生成'
-      }
-      else {
-        order.pay_flow_status = '待生成'
-      }
+    var getUrl = app.globalData.requestPrefix + 'Order/GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getUrl, null).then(function (resolve){
+      console.log('get ali qr', resolve)
+      var qrTxt = resolve
+      var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrTxt)
+      that.setData({ qrCodeUrl, subPayMethod: null})
+    })
 
-
-      var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent('生成支付二维码') + '&sessionKey=' + app.globalData.sessionKey
-      util.performWebRequest(updateUrl, order).then(function (resolve) {
-        that.setData({ paying: true, haveDisplayedQr: true })
-        that.displayQrCode()
-      })
-
-    }
   },
   setEditStatus(e, status) {
     var id = e.currentTarget.id
