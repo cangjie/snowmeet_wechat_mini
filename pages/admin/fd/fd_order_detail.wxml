@@ -65,6 +65,11 @@
         <view>{{order.orderStatus}}</view>
       </fui-col>
     </fui-row>
+    <fui-row wx:if="{{orderStatusLog.length > 1}}" >
+      <fui-col span="7" offset="17" >
+        <fui-button id="orderStatus" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="showLogs"  ></fui-button>
+      </fui-col>
+    </fui-row>
   </fui-card>
   <!--fui-row>
     <fui-col span="6">
@@ -300,8 +305,9 @@
   </fui-row-->
   <fui-bottom-popup show="{{showMemo}}" bindclose="closeMemo">
     <view class="fui-scroll__wrap">
-      <view class="fui-title fui-title__pb">备注修改历史</view>
+      <view class="fui-title fui-title__pb">{{memoTitle}}</view>
       <scroll-view scroll-y class="fui-scroll__view">
+        <block wx:if="{{showOrderStatusLog}}" >
         <fui-row>
           <fui-col span="6">
             <view style="text-align: center;">日期</view>
@@ -309,24 +315,30 @@
           <fui-col span="5">
             <view style="text-align: center;">时间</view>
           </fui-col>
-          <fui-col span="13">
-            <view style="text-align: center;">内容</view>
+          <fui-col span="6">
+            <view style="text-align: center;">状态</view>
+          </fui-col>
+          <fui-col span="7">
+            <view style="text-align: center;">店员</view>
           </fui-col>
         </fui-row>
-        <fui-row>
+        <fui-row wx:for="{{orderStatusLog}}" >
           <fui-col span="6">
-            <view style="text-align: center;">2025-08-31</view>
+            <view style="text-align: center;">{{item.dateStr}}</view>
           </fui-col>
           <fui-col span="5">
-            <view style="text-align: center;">19:23:45</view>
+            <view style="text-align: center;">{{item.timeStr}}</view>
           </fui-col>
-          <fui-col span="13">
-            <view style="text-align: center;">加浓加冰</view>
+          <fui-col span="6" >
+            <view style="text-align: center;">{{item.current_value}}</view>
+          </fui-col>
+          <fui-col span="7">
+            <view style="text-align: center;">{{item.staffName}}</view>
           </fui-col>
         </fui-row>
-        <fui-row>
+        <!--fui-row>
           <fui-col span="6">
-            <view style="text-align: center;">2025-08-31</view>
+            <view style="text-align: center;">{{item.staffName}}</view>
           </fui-col>
           <fui-col span="5">
             <view style="text-align: center;">19:20:45</view>
@@ -334,7 +346,8 @@
           <fui-col span="13">
             <view style="text-align: center;">要常温的</view>
           </fui-col>
-        </fui-row>
+        </fui-row-->
+      </block>
         <!--fui-list-cell wx:for="{{itemList}}" wx:key="index">item{{index+1}}</fui-list-cell-->
       </scroll-view>
       <view class="fui-icon__close" bindtap="closeMemo">

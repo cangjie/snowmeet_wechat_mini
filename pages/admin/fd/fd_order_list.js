@@ -27,7 +27,7 @@ Page({
     {key: 'isPackage', value: false},
     {key: 'isOnCredit', value: false},
     {key: 'haveDiscount', value: null},
-    {key: 'status', value: '已完成'}
+    {key: 'status', value: '支付成功'}
     ]
   },
 
