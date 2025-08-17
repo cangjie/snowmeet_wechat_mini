@@ -144,9 +144,9 @@ Page({
       totalAmount += order.totalCharge
       order.totalChargeStr = util.showAmount(order.totalCharge)
     }
-
     that.setData({orders, totalAmount, totalAmountStr: util.showAmount(totalAmount)})
   },
+  
   shopSelected(e){
     var that = this
     console.log('shop selected', e)
@@ -207,8 +207,9 @@ Page({
     that.setData({checkBoxes})
   },
   gotoDetail(e){
+    var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'fd_order_detail',
+      url: 'fd_order_detail?orderId=' + id,
     })
   },
   setQueryOptions(e){

@@ -181,7 +181,7 @@
     </fui-row>
     <view style="height: 20rpx"></view>
     <block wx:for="{{orders}}">
-      <fui-card style="margin-top: 50rpx;" title="{{item.code}}" tag="{{item.orderStatus}}" tagSize="10rpx" full bind:click="gotoDetail">
+      <fui-card id="{{item.id}}" style="margin-top: 50rpx;" title="{{item.code}}" tag="{{item.orderStatus}}" tagSize="10rpx" full bind:click="gotoDetail">
         <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
           <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;">
             <view wx:if="{{item.is_test == 1}}">【测】</view>
@@ -202,7 +202,7 @@
             </view>
             <view class="view-row">
               <view class="left-column">【支付类型】</view>
-              <view class="right-column">{{ item.availablePayments.length == 0 ? '未支付' : ( item.availablePayments.length==1 ? '整单支付' : '分付') }}</view>
+              <view class="right-column">{{ item.payType }}</view>
             </view>
             <view class="view-row">
               <view class="left-column">【开单人】</view>
