@@ -369,9 +369,14 @@ Page({
     })
   },
   placeRestaurantOrder() {
+    var content = '点击确定，可以请顾客稍后付款；点击取消，可以继续选择支付方式，请顾客立即付款。'
+    var that = this
+    if (that.data.totalCharge == 0){
+      content = '0元订单，确认下单？'
+    }
     wx.showModal({
       title: '确认下单',
-      content: '点击确定，可以请顾客稍后付款；点击取消，可以继续选择支付方式，请顾客立即付款。',
+      content: content,
       complete: (res) => {
         if (res.cancel) {
 
