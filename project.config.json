@@ -1,6 +1,11 @@
 {
   "setting": {
     "enhance": true,
-    "es6": true
+    "es6": true,
+    "compileWorklet": true,
+    "swc": true,
+    "disableSWC": false,
+    "minified": true,
+    "postcss": true
   }
 }

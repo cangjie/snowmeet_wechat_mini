@@ -43,6 +43,16 @@ Page({
     app.loginPromiseNew.then(function (resovle) {
       that.setData({ staff: app.globalData.staff })
       that.getData()
+      var getPayMethodUrl = app.globalData.requestPrefix + 'Order/GetUnCommonPayMethod'
+      util.performWebRequest(getPayMethodUrl, null).then(function (resolve){
+        var inputedPayMethodList = resolve
+        var othersPayMethods = ['京东收银', 'POS机刷卡', '现金']
+        for(var i = 0; i < inputedPayMethodList.length; i++){
+          othersPayMethods.push(inputedPayMethodList[i])
+        }
+        othersPayMethods.push('手工填写')
+        that.setData({othersPayMethods})
+      })
     })
   },
 
@@ -413,12 +423,31 @@ Page({
       }
     })
   },
+  getPayMethod(e){
+    var that = this
+    var payMethod = that.data.payMethod
+    if (payMethod == '其它'){
+      var subPayMethod = that.data.subPayMethod
+      var subPayMethodIndex = that.data.subPayMethodIndex
+      if (subPayMethodIndex == that.data.othersPayMethods.length - 1){
+        return that.data.inputedPayMethod
+      }
+      else{
+        return subPayMethod
+      }
+      
+    }
+    else {
+      return payMethod
+    }
+  },
   placeUnneedPayOrder(e) {
     var that = this
     var order = that.data.order
-    var payMethod = that.data.payMethod
-    var subPayMethod = that.data.subPayMethod
-    if (!subPayMethod && order.payLater == false) {
+    var payMethod = that.getPayMethod()
+    console.log('pay method', payMethod)
+    
+    if (!payMethod) {
       wx.showToast({
         title: '必须选择支付方式',
         icon: 'error'
@@ -426,12 +455,7 @@ Page({
       return
     }
     var effectUrl = app.globalData.requestPrefix + 'Order/EffectUnpaidOrder/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
-    if (order.payLater == true) {
-      effectUrl = effectUrl + '&payLater=true'
-    }
-    else {
-      effectUrl = effectUrl + '&payMethod=' + subPayMethod + '&payLater=false'
-    }
+    effectUrl = effectUrl + '&payMethod=' + payMethod + '&payLater=false'
     util.performWebRequest(effectUrl, null).then(function (resolve) {
       console.log('paid order', resolve)
       that.setData({ paying: false })
@@ -441,7 +465,7 @@ Page({
     var that = this
     wx.showModal({
       title: '确认收款',
-      content: '确认顾客已经成功支付，避免逃单。',
+      content: '确认顾客已经成功支付。',
       complete: (res) => {
         if (res.cancel) {
 
