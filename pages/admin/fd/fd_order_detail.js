@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    showMemo: false
+    showMemo: false,
+    editingOrderMemo: false
   },
 
   /**
@@ -38,6 +39,9 @@ Page({
       that.getOrderStatusLogPromise(that.data.orderId).then(function (resolve) {
         console.log('get logs', resolve)
         that.renderOrderStatusLog(resolve)
+      })
+      that.getOrderMemoLogPromise(that.data.orderId).then(function (resolve){
+        that.renderOrderMemoLog(resolve)
       })
     })
   },
@@ -82,7 +86,7 @@ Page({
   },
   closeMemo() {
     var that = this
-    that.setData({ showMemo: false })
+    that.setData({ showMemo: false, showOrderStatusLog: false })
   },
   getOrderPromise(id) {
     var that = this
@@ -117,7 +121,7 @@ Page({
       })
     })
   },
-  renderOrderStatusLog(logs) {
+  renderLog(logs) {
     var that = this
     for (var i = 0; i < logs.length; i++) {
       var log = logs[i]
@@ -126,7 +130,15 @@ Page({
       log.timeStr = util.formatTimeStr(date)
       log.staffName = log.staff ? log.staff.name : ' ——'
     }
-    that.setData({ orderStatusLog: logs })
+    return logs
+  },
+  renderOrderStatusLog(logs){
+    var that = this
+    that.setData({orderStatusLog: that.renderLog(logs)})
+  },
+  renderOrderMemoLog(logs){
+    var that = this
+    that.setData({orderMemoLog: that.renderLog(logs)})
   },
   showLogs(e){
     var that = this
@@ -135,9 +147,75 @@ Page({
       case 'orderStatus':
         that.setData({showMemo: true, showOrderStatusLog: true, memoTitle: '订单状态历史'})
         break
+      case 'orderMemo':
+        that.setData({showMemo: true, showOrderMemoLog: true, memoTitle: '订单备注历史'})
       default:
         break
     }
+  },
+  edit(e){
+    var that = this
+    var id = e.currentTarget.id
+    switch(id){
+      case 'orderMemo':
+        that.setData({editingOrderMemo: true})
+        break
+      default:
+        break
+    }
+  },
+  cancelMemo(e){
+    var that = this
+    var id = e.currentTarget.id
+    if (id == 'orderMemo'){
+      var order = that.data.order
+      order.inputedMemo = null
+      that.setData({editingOrderMemo: false})
+    }
+  },
+  inputMemo(e){
+    var that = this
+    var value = e.detail.value
+    var id = e.currentTarget.id
+    if (id == 'orderMemo'){
+      var order = that.data.order
+      order.inputedMemo = value
+    }
+  },
+  confirmMemo(e){
+    var that = this
+    var value = e.detail.value
+    var id = e.currentTarget.id
+    if (id == 'orderMemo'){
+      var order = that.data.order
+      if (order.inputedMemo){
+        order.memo = order.inputedMemo
+        that.updateOrderPromise(order, '修改订单备注').then(function (resolve){
+          that.cancelMemo(e)
+          that.renderOrder(resolve)
+        })
+      }
+      
+    }
+  },
+  updateOrderPromise(order, scene){
+    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + app.globalData.sessionKey
+    return new Promise(function (resolve, reject){
+      util.performWebRequest(updateUrl, order).then(function(order){
+        resolve(order)
+      }).catch(function (reject){
+        reject(reject)
+      })
+    })
+  },
+  getOrderMemoLogPromise(orderId){
+    var getUrl = app.globalData.requestPrefix + 'Order/GetOrderMemoLog/' + orderId.toString()
+    return new Promise(function(resolve, reject){
+      util.performWebRequest(getUrl, null).then(function(logs){
+        resolve(logs)
+      }).catch(function (reject){
+        reject(reject)
+      })
+    })
   }
-
 })
