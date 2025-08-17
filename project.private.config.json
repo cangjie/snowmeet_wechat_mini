@@ -5,7 +5,7 @@
         {
           "name": "OrderEntry",
           "pathName": "pages/order/order_entry",
-          "query": "orderId=60029",
+          "query": "orderId=60037",
           "scene": null,
           "launchMode": "default"
         },
@@ -13,8 +13,8 @@
           "name": "fd_order_detail",
           "pathName": "pages/admin/fd/fd_order_detail",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "drag",

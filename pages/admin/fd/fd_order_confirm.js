@@ -348,7 +348,7 @@ Page({
   updateOrderPromise(scene) {
     var that = this
     var order = that.data.order
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
       var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(updateUrl, order).then(function (resovle) {
         console.log('pay method changed', resovle)
@@ -584,7 +584,7 @@ Page({
   cancelPayingPromise() {
     var that = this
     var order = that.data.order
-    return new Promise(function (resolve){
+    return new Promise(function (resolve, reject){
       var cancelUrl = app.globalData.requestPrefix + 'Order/CancelPaying/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(cancelUrl, null).then(function (resovle){
         if (resolve == null){

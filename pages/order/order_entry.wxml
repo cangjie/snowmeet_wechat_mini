@@ -80,7 +80,7 @@
         <fui-col span="14"></fui-col>
       </fui-row>
       <view class="view-row" style="justify-content: center;margin-top: 40rpx;" >
-      <fui-button btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 敬 请 支 付 " background="#2EA6D0" bind:click="pay"></fui-button>
+      <fui-button btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 敬 请 支 付 " background="#2EA6D0" bind:click="pay" disabled="{{order.current_pay_method != '微信支付' || (order.pay_flow_status != '已生成' && order.pay_flow_status != '待支付')}}" ></fui-button>
       </view>
     </view>
   </view>
