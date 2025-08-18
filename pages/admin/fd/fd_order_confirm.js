@@ -332,7 +332,7 @@ Page({
       var order = ret.data
       console.log('paid order', order)
       var title = order.paidAmount == 0 ? '下单成功' : '支付成功'
-      if (order.dealed == 1) {
+      if (order) {
         wx.showModal({
           title: title,
           content: '',
@@ -504,25 +504,7 @@ Page({
     if (payMethod == '支付宝') {
       that.showAlipayQrCode()
     }
-    /*
-    wx.showModal({
-      title: '确认支付方式',
-      content: '支付方式：' + that.data.payMethod + ' 支付金额：' + that.data.totalChargeStr,
-      complete: (res) => {
-        if (res.cancel) {
-
-        }
-        if (res.confirm) {
-          if (payMethod == '微信支付') {
-            that.showWepayQrCode()
-          }
-          if (payMethod == '支付宝') {
-            that.showAlipayQrCode()
-          }
-        }
-      }
-    })
-    */
+ 
   },
   showWepayQrCode() {
     var that = this
