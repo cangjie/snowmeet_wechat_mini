@@ -517,6 +517,8 @@ Page({
       console.log('confirm pay method', resolve)
       var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + order.id.toString())
       that.setData({ qrCodeUrl, subPayMethod: null })
+      var setStatusUrl = app.globalData.requestPrefix + 'Order/LogShowWechatQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(setStatusUrl, null)
     }).catch(function (reject) { })
   },
   showAlipayQrCode() {
