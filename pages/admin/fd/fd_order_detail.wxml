@@ -102,36 +102,58 @@
         <view class="view-detail">小计</view>
       </fui-col>
     </fui-row>
-    <view style="height: 50rpx;"></view>
-    <fui-row>
-      <fui-col span="12">
-        <view class="view-detail">冰摩卡</view>
-      </fui-col>
-      <fui-col span="3">
-        <view class="view-detail" style="text-align: right;">¥19.00</view>
-      </fui-col>
-      <fui-col span="2">
-        <view class="view-detail">1</view>
-      </fui-col>
-      <fui-col span="3">
-        <view class="view-detail" style="text-align: right;margin-left:10rpx">¥9.00</view>
-      </fui-col>
-      <fui-col span="3">
-        <view class="view-detail" style="text-align: right;margin-left: 10rpx;">¥100.00</view>
-      </fui-col>
-    </fui-row>
-    <view>【备注】少冰 加浓</view>
-    <view class="view-row">
-      <view style="width: 187rpx;"></view>
-      <view class="view-row" style="width: 188rpx;justify-content: center;">
-        <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+
+
+    <block wx:for="{{order.fdOrders}}">
+      <view style="height: 50rpx;"></view>
+      <fui-row>
+        <fui-col span="12">
+          <view class="view-detail">{{item.product_name}}</view>
+        </fui-col>
+        <fui-col span="3">
+          <view class="view-detail" style="text-align: right;">{{item.unit_priceStr}}</view>
+        </fui-col>
+        <fui-col span="2">
+          <view class="view-detail">{{item.count}}</view>
+        </fui-col>
+        <fui-col span="3">
+          <view class="view-detail" style="text-align: right;margin-left:10rpx">{{item.discountAmountStr}}</view>
+        </fui-col>
+        <fui-col span="3">
+          <view class="view-detail" style="text-align: right;margin-left: 10rpx;">{{item.summaryStr}}</view>
+        </fui-col>
+      </fui-row>
+      <view class="view-row">
+        <view>【备注】</view>
+        <view>
+          <input id="{{index}}" class="input"  bindinput="inputMemo" disabled="{{!item.editing}}" style="width: 560rpx;" placeholder="{{item.memo}}" value="{{item.editing? null : item.memo}}" />
+        </view>
       </view>
-      <view class="view-row" style="width: 188rpx;justify-content: center;">
-        <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+      <view class="view-row" wx:if="{{item.editing}}">
+        <view style="width: 187rpx;"></view>
+        <view class="view-row" style="width: 188rpx;justify-content: center;">
+          <fui-button id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00" bind:click="confirmMemo"></fui-button>
+        </view>
+        <view class="view-row" style="width: 188rpx;justify-content: center;">
+          <fui-button id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000" bind:click="cancelMemo"></fui-button>
+        </view>
+        <view style="width: 187rpx;"></view>
       </view>
-      <view style="width: 187rpx;"></view>
-    </view>
-    <view style="height: 50rpx;"></view>
+      <view class="view-row" wx:else>
+        <view style="width: 187rpx;"></view>
+        <view class="view-row" style="width: 188rpx;justify-content: center;">
+          <fui-button id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+        </view>
+        <view class="view-row" style="width: 188rpx;justify-content: center;">
+          <fui-button wx:if="{{item.logs.length > 1}}" id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="showLogs" ></fui-button>
+        </view>
+        <view style="width: 187rpx;"></view>
+      </view>
+    </block>
+
+
+
+    <!--view style="height: 50rpx;"></view>
     <fui-row>
       <fui-col span="12">
         <view class="view-detail">冰摩卡</view>
@@ -159,7 +181,10 @@
         <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="showLogs"></fui-button>
       </view>
       <view style="width: 187rpx;"></view>
-    </view>
+    </view-->
+
+
+
   </fui-card>
   <view style="height: 50rpx;"></view>
   <!--有历史记录的需要历史按钮，需哟修改按钮-->
@@ -175,10 +200,10 @@
     <view class="view-row" wx:if="{{editingOrderMemo}}">
       <view style="width: 187rpx;"></view>
       <view class="view-row" style="width: 188rpx;justify-content: center;">
-        <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00" bind:click="confirmMemo" ></fui-button>
+        <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00" bind:click="confirmMemo"></fui-button>
       </view>
       <view class="view-row" style="width: 188rpx;justify-content: center;">
-        <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000" bind:click="cancelMemo" ></fui-button>
+        <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000" bind:click="cancelMemo"></fui-button>
       </view>
       <view style="width: 187rpx;"></view>
     </view>
@@ -353,17 +378,6 @@
               <view style="text-align: center;">{{item.staffName}}</view>
             </fui-col>
           </fui-row>
-          <!--fui-row>
-          <fui-col span="6">
-            <view style="text-align: center;">{{item.staffName}}</view>
-          </fui-col>
-          <fui-col span="5">
-            <view style="text-align: center;">19:20:45</view>
-          </fui-col>
-          <fui-col span="13">
-            <view style="text-align: center;">要常温的</view>
-          </fui-col>
-        </fui-row-->
         </block>
         <block wx:if="{{showOrderMemoLog}}">
           <fui-row>
@@ -387,19 +401,31 @@
             <fui-col span="13">
               <view style="text-align: center;">{{item.current_value}}</view>
             </fui-col>
-           
           </fui-row>
-          <!--fui-row>
-          <fui-col span="6">
-            <view style="text-align: center;">{{item.staffName}}</view>
-          </fui-col>
-          <fui-col span="5">
-            <view style="text-align: center;">19:20:45</view>
-          </fui-col>
-          <fui-col span="13">
-            <view style="text-align: center;">要常温的</view>
-          </fui-col>
-        </fui-row-->
+        </block>
+        <block wx:if="{{showFdMemoLog}}">
+          <fui-row>
+            <fui-col span="6">
+              <view style="text-align: center;">日期</view>
+            </fui-col>
+            <fui-col span="5">
+              <view style="text-align: center;">时间</view>
+            </fui-col>
+            <fui-col span="13">
+              <view style="text-align: center;">历史备注</view>
+            </fui-col>
+          </fui-row>
+          <fui-row wx:for="{{fdMemoLog}}">
+            <fui-col span="6">
+              <view style="text-align: center;">{{item.dateStr}}</view>
+            </fui-col>
+            <fui-col span="5">
+              <view style="text-align: center;">{{item.timeStr}}</view>
+            </fui-col>
+            <fui-col span="13">
+              <view style="text-align: center;">{{item.current_value}}</view>
+            </fui-col>
+          </fui-row>
         </block>
         <!--fui-list-cell wx:for="{{itemList}}" wx:key="index">item{{index+1}}</fui-list-cell-->
       </scroll-view>

@@ -19,30 +19,35 @@ Page({
     var orderId = options.orderId
     that.setData({ orderId })
   },
-
-  /**
-   * Lifecycle function--Called when page is initially rendered
-   */
   onReady() {
 
   },
-
-  /**
-   * Lifecycle function--Called when page show
-   */
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve) {
       that.getOrderPromise(that.data.orderId).then(function (resolve) {
         that.renderOrder(resolve)
       })
+      /*
       that.getOrderStatusLogPromise(that.data.orderId).then(function (resolve) {
         console.log('get logs', resolve)
         that.renderOrderStatusLog(resolve)
       })
-      that.getOrderMemoLogPromise(that.data.orderId).then(function (resolve){
+      */
+      that.getLogsPromise('order', 'orderstate', that.data.orderId).then(function (resolve){
+        console.log('get logs', resolve)
+        that.renderOrderStatusLog(resolve)
+      })
+      /*
+      that.getOrderMemoLogPromise(that.data.orderId).then(function (resolve) {
         that.renderOrderMemoLog(resolve)
       })
+      */
+     that.getLogsPromise('order', 'memo', that.data.orderId).then(function (resolve){
+      console.log('get logs', resolve)
+      that.renderOrderMemoLog(resolve)
+    })
+
     })
   },
 
@@ -86,7 +91,7 @@ Page({
   },
   closeMemo() {
     var that = this
-    that.setData({ showMemo: false, showOrderStatusLog: false })
+    that.setData({ showMemo: false, showOrderStatusLog: false, showOrderMemoLog: false, showFdMemoLog: false })
   },
   getOrderPromise(id) {
     var that = this
@@ -94,9 +99,7 @@ Page({
       var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + id.toString() + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       util.performWebRequest(getUrl, null).then(function (order) {
         resolve(order)
-      }).catch(function (reject) {
-
-      })
+      }).catch(function (reject) { })
     })
   },
   renderOrder(order) {
@@ -109,14 +112,45 @@ Page({
     order.is_packageStr = order.is_package == 1 ? '是' : '否'
     order.creditInfo = order.haveOnCredit ? '是' : '否'
     order.haveDiscountStr = order.haveDiscount ? '包含' : '不含'
+    for (var i = 0; i < order.fdOrders.length; i++) {
+      var fdOrder = order.fdOrders[i]
+      fdOrder.unit_priceStr = util.showAmount(parseFloat(fdOrder.unit_price))
+      fdOrder.discountAmountStr = util.showAmount(fdOrder.discountAmount)
+      fdOrder.summary = fdOrder.unit_price * fdOrder.count - fdOrder.discountAmount
+      fdOrder.summaryStr = util.showAmount(fdOrder.summary)
+      if (fdOrder.editing == undefined) {
+        fdOrder.editing = false
+      }
+      fdOrder.inputedMemo = null
+      that.getLogsPromise('fdorder', 'memo', fdOrder.id).then(function (resolve){
+        var logs = that.renderLog(resolve)
+        fdOrder.logs = logs
+        that.setData({order})
+      }).catch(function (reject){
+        reject(reject)
+      })
+    }
     that.setData({ order })
   },
+  /*
   getOrderStatusLogPromise(orderId) {
-    var getUrl = app.globalData.requestPrefix + 'Order/GetOrderStatusLog/' + orderId.toString()
+    //var getUrl = app.globalData.requestPrefix + 'Order/GetOrderStatusLog/' + orderId.toString()
+    var getUrl = app.globalData.requestPrefix + 'Order/LoadLogs/' + orderId.toString() + '?tableName=order&fieldName=orderstate'
     return new Promise(function (resolve, reject) {
       util.performWebRequest(getUrl, null).then(function (logs) {
         resolve(logs)
-      }).catch(function (reject) { 
+      }).catch(function (reject) {
+        reject(reject)
+      })
+    })
+  },
+  */
+  getLogsPromise(tableName, fieldName, key){
+    var getUrl = app.globalData.requestPrefix + 'Order/LoadLogs/' + key.toString() + '?tableName=' + tableName + '&fieldName=' + fieldName
+    return new Promise(function (resolve, reject) {
+      util.performWebRequest(getUrl, null).then(function (logs) {
+        resolve(logs)
+      }).catch(function (reject) {
         reject(reject)
       })
     })
@@ -132,94 +166,135 @@ Page({
     }
     return logs
   },
-  renderOrderStatusLog(logs){
+  renderOrderStatusLog(logs) {
     var that = this
-    that.setData({orderStatusLog: that.renderLog(logs)})
+    that.setData({ orderStatusLog: that.renderLog(logs) })
   },
-  renderOrderMemoLog(logs){
+  renderOrderMemoLog(logs) {
     var that = this
     var logs = that.renderLog(logs)
-    that.setData({orderMemoLog: logs})
+    that.setData({ orderMemoLog: logs })
   },
-  showLogs(e){
+  showLogs(e) {
     var that = this
     var id = e.currentTarget.id
-    switch(id){
+    switch (id) {
       case 'orderStatus':
-        that.setData({showMemo: true, showOrderStatusLog: true, memoTitle: '订单状态历史'})
+        that.setData({ showMemo: true, showOrderStatusLog: true, memoTitle: '订单状态历史' })
         break
       case 'orderMemo':
-        that.setData({showMemo: true, showOrderMemoLog: true, memoTitle: '订单备注历史'})
+        that.setData({ showMemo: true, showOrderMemoLog: true, memoTitle: '订单备注历史' })
       default:
+        if (!isNaN(id)){
+          var fdOrder = that.data.order.fdOrders[parseInt(id)]
+          that.setData({fdMemoLog: fdOrder.logs, showMemo: true, showFdMemoLog: true, memoTitle: '订单明细备注历史' })
+        }
         break
     }
   },
-  edit(e){
+  edit(e) {
     var that = this
     var id = e.currentTarget.id
-    switch(id){
+    switch (id) {
       case 'orderMemo':
-        that.setData({editingOrderMemo: true})
+        that.setData({ editingOrderMemo: true })
         break
       default:
+        if (!isNaN(id)) {
+          var order = that.data.order
+          var fdOrder = order.fdOrders[parseInt(id)]
+          fdOrder.editing = true
+          that.renderOrder(order)
+        }
         break
     }
   },
-  cancelMemo(e){
+  cancelMemo(e) {
     var that = this
     var id = e.currentTarget.id
-    if (id == 'orderMemo'){
+    if (id == 'orderMemo') {
       var order = that.data.order
       order.inputedMemo = null
-      that.setData({editingOrderMemo: false})
+      that.setData({ editingOrderMemo: false })
+    }
+    else if (!isNaN(id)) {
+      var order = that.data.order
+      var fdOrder = order.fdOrders[parseInt(id)]
+      fdOrder.editing = false
+      that.renderOrder(order)
     }
   },
-  inputMemo(e){
+  inputMemo(e) {
     var that = this
     var value = e.detail.value
     var id = e.currentTarget.id
-    if (id == 'orderMemo'){
-      var order = that.data.order
+    var order = that.data.order
+    if (id == 'orderMemo') {
       order.inputedMemo = value
     }
+    else if (!isNaN(id)){
+      var fdOrder = order.fdOrders[parseInt(id)]
+      fdOrder.inputedMemo = value
+    }
   },
-  confirmMemo(e){
+  confirmMemo(e) {
     var that = this
-    var value = e.detail.value
     var id = e.currentTarget.id
-    if (id == 'orderMemo'){
-      var order = that.data.order
-      if (order.inputedMemo){
+    var order = that.data.order
+    if (id == 'orderMemo') {
+      if (order.inputedMemo) {
         order.memo = order.inputedMemo
-        that.updateOrderPromise(order, '修改订单备注').then(function (resolve){
+        that.updateOrderPromise(order, '修改订单备注').then(function (resolve) {
           that.cancelMemo(e)
           that.renderOrder(resolve)
-          that.getOrderMemoLogPromise(order.id).then(function (logs){
+          that.getLogsPromise('order', 'memo', order.id).then(function (logs) {
             that.renderOrderMemoLog(logs)
           })
         })
       }
-      
+    }
+    else if (!isNaN(id)){
+      var fdOrder = order.fdOrders[parseInt(id)]
+      fdOrder.memo = fdOrder.inputedMemo
+      that.updateFdOrderPromise(fdOrder, '修改订单明细备注').then(function(fdOrder){
+        that.cancelMemo(e)
+        that.getLogsPromise('fdorder', 'memo', fdOrder.id).then(function (resolve){
+          fdOrder.logs = that.renderLog(resolve)
+          that.setData({order})
+        })
+      }).catch(function (reject){})
     }
   },
-  updateOrderPromise(order, scene){
+  updateOrderPromise(order, scene) {
     var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + app.globalData.sessionKey
-    return new Promise(function (resolve, reject){
-      util.performWebRequest(updateUrl, order).then(function(order){
+    return new Promise(function (resolve, reject) {
+      util.performWebRequest(updateUrl, order).then(function (order) {
         resolve(order)
-      }).catch(function (reject){
+      }).catch(function (reject) {
         reject(reject)
       })
     })
   },
-  getOrderMemoLogPromise(orderId){
+  updateFdOrderPromise(fdOrder, scene){
+    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateFdOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + app.globalData.sessionKey
+    return new Promise(function (resolve, reject){
+      util.performWebRequest(updateUrl, fdOrder).then(function (fdOrder) {
+        resolve(fdOrder)
+      }).catch(function (obj){
+        reject(obj)
+      })
+    })
+  },
+  /*
+  getOrderMemoLogPromise(orderId) {
     var getUrl = app.globalData.requestPrefix + 'Order/GetOrderMemoLog/' + orderId.toString()
-    return new Promise(function(resolve, reject){
-      util.performWebRequest(getUrl, null).then(function(logs){
+    return new Promise(function (resolve, reject) {
+      util.performWebRequest(getUrl, null).then(function (logs) {
         resolve(logs)
-      }).catch(function (reject){
+      }).catch(function (reject) {
         reject(reject)
       })
     })
   }
+  */
 })
