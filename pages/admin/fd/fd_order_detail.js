@@ -138,7 +138,8 @@ Page({
   },
   renderOrderMemoLog(logs){
     var that = this
-    that.setData({orderMemoLog: that.renderLog(logs)})
+    var logs = that.renderLog(logs)
+    that.setData({orderMemoLog: logs})
   },
   showLogs(e){
     var that = this
@@ -193,6 +194,9 @@ Page({
         that.updateOrderPromise(order, '修改订单备注').then(function (resolve){
           that.cancelMemo(e)
           that.renderOrder(resolve)
+          that.getOrderMemoLogPromise(order.id).then(function (logs){
+            that.renderOrderMemoLog(logs)
+          })
         })
       }
       
