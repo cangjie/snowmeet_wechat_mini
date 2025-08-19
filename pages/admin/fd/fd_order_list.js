@@ -27,7 +27,7 @@ Page({
     {key: 'isPackage', value: false},
     {key: 'isOnCredit', value: false},
     {key: 'haveDiscount', value: null},
-    {key: 'status', value: '已完成'}
+    {key: 'status', value: '支付成功'}
     ]
   },
 
@@ -144,9 +144,9 @@ Page({
       totalAmount += order.totalCharge
       order.totalChargeStr = util.showAmount(order.totalCharge)
     }
-
     that.setData({orders, totalAmount, totalAmountStr: util.showAmount(totalAmount)})
   },
+  
   shopSelected(e){
     var that = this
     console.log('shop selected', e)
@@ -207,8 +207,9 @@ Page({
     that.setData({checkBoxes})
   },
   gotoDetail(e){
+    var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'fd_order_detail',
+      url: 'fd_order_detail?orderId=' + id,
     })
   },
   setQueryOptions(e){

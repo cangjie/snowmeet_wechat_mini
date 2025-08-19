@@ -184,10 +184,14 @@ Page({
     var fdOrder = order.fdOrders[id]
     switch(idArr[0].trim()){
       case 'count':
-        fdOrder.count_editing = status
+        that.cancelPayingPromise().then(function(resolve){
+          fdOrder.count_editing = status
+        })
         break
       case 'discount':
-        fdOrder.discount_editing = status
+        that.cancelPayingPromise().then(function(resolve){
+          fdOrder.discount_editing = status
+        })
         break
       case 'memo':
         fdOrder.memo_editing = status
@@ -246,5 +250,22 @@ Page({
       })
     }
     
+  },
+  cancelPayingPromise() {
+    var that = this
+    var order = that.data.order
+    return new Promise(function (resolve, reject){
+      var cancelUrl = app.globalData.requestPrefix + 'Order/CancelPaying/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(cancelUrl, null).then(function (resovle){
+        if (resolve == null){
+          reject()
+        }
+        else{
+          resolve(resolve)
+        }
+      }).catch(function (reject){
+        reject(reject)
+      })
+    })
   }
 })

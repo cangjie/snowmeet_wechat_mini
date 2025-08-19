@@ -1,33 +1,88 @@
 {
-  "projectname": "snowmeet_wechat_mini",
-  "setting": {
-    "compileHotReLoad": true,
-    "urlCheck": false,
-    "coverView": false,
-    "lazyloadPlaceholderEnable": false,
-    "skylineRenderEnable": false,
-    "preloadBackgroundData": false,
-    "autoAudits": false,
-    "useApiHook": true,
-    "useApiHostProcess": true,
-    "showShadowRootInWxmlPanel": false,
-    "useStaticServer": false,
-    "useLanDebug": false,
-    "showES6CompileOption": false,
-    "checkInvalidKey": true,
-    "ignoreDevUnusedFiles": true,
-    "bigPackageSizeSupport": false
-  },
-  "libVersion": "3.8.10",
   "condition": {
     "miniprogram": {
       "list": [
         {
+          "name": "OrderEntry",
+          "pathName": "pages/order/order_entry",
+          "query": "orderId=60091",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
+          "name": "fd_order_detail",
+          "pathName": "pages/admin/fd/fd_order_detail",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "drag",
+          "pathName": "pages/test/drag/drag",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "gprinter",
+          "pathName": "pages/admin/printer/gprinter/print_task",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "spyun",
+          "pathName": "pages/test/spyun/print",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "scroll",
+          "pathName": "pages/test/vtabs/scroll",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "vtabs",
+          "pathName": "pages/test/vtabs/vtab",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "receptnew",
+          "pathName": "pages/admin/recept/recept_new",
+          "query": "contactNum=13501177897&name=苍杰测试&gender=男&memberId=15506&shop=崇礼旗舰店",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "rentNew",
+          "pathName": "pages/test/firstUI/rent_recept",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "rentOrder",
+          "pathName": "pages/test/firstUI/rent_order",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "upload_big_file",
+          "pathName": "pages/test/upload/choose_video_upload",
+          "query": "",
+          "scene": null
+        },
+        {
           "name": "admin_index",
           "pathName": "pages/admin/admin",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "scene": null
         }
       ]
     }

@@ -16,7 +16,7 @@ Page({
   onLoad(options) {
     var orderId = options.orderId
     var that = this
-    that.setData({orderId})
+    that.setData({ orderId })
   },
 
   /**
@@ -31,7 +31,23 @@ Page({
    */
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function(resolve){
+    app.loginPromiseNew.then(function (resolve) {
+      that.getDataPromise(that.data.orderId).then(function (resolve) {
+        var order = resolve
+        switch (order.type) {
+          case '餐饮':
+            wx.setNavigationBarTitle({
+              title: '请您确认订单并支付',
+            })
+            that.renderFdOrder(order)
+            break
+          default:
+            break
+        }
+      }).catch(function (reject) {
+        console.log('get data error')
+      })
+      /*
       var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByCustomer/' + that.data.orderId.toString() + '?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(getUrl, null).then(function (resolve){
         var order = resolve
@@ -48,6 +64,9 @@ Page({
             break
         }
       })
+      */
+
+
     })
   },
 
@@ -85,10 +104,10 @@ Page({
   onShareAppMessage() {
 
   },
-  renderFdOrder(order){
+  renderFdOrder(order) {
     var that = this
     var total = 0
-    for(var i = 0; i < order.fdOrders.length; i++){
+    for (var i = 0; i < order.fdOrders.length; i++) {
       var fdOrder = order.fdOrders[i]
       fdOrder.unit_priceStr = util.showAmount(fdOrder.unit_price)
       fdOrder.summary = fdOrder.count * fdOrder.unit_price
@@ -99,30 +118,60 @@ Page({
     order.totalStr = util.showAmount(total)
     order.discountAmountStr = util.showAmount(order.discountAmount)
     order.totalChargeStr = util.showAmount(order.totalCharge)
-    that.setData({order})
+    that.setData({ order })
   },
-  pay(){
+  pay() {
     var that = this
-    var order = that.data.order
-    var payUrl = app.globalData.requestPrefix + 'Order/WechatPay/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(payUrl, null).then(function (resolve){
-      console.log('payment', resolve)
-      var payment = resolve
-      wx.requestPayment({
-        nonceStr: payment.nonce,
-        package: 'prepay_id=' + payment.prepay_id,
-        paySign: payment.sign,
-        timeStamp: payment.timestamp,
-        signType: 'MD5',
-        success:(res)=>{
-          wx.showToast({
-            title: '支付成功',
-            icon: 'success'
+    that.getDataPromise(that.data.orderId).then(function (order) {
+      if (order.current_pay_method == '微信支付' && (order.pay_flow_status == '已生成' || order.pay_flow_status == '待支付')) {
+        var payUrl = app.globalData.requestPrefix + 'Order/WechatPay/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+        util.performWebRequest(payUrl, null).then(function (resolve) {
+          console.log('payment', resolve)
+          var payment = resolve
+          wx.requestPayment({
+            nonceStr: payment.nonce,
+            package: 'prepay_id=' + payment.prepay_id,
+            paySign: payment.sign,
+            timeStamp: payment.timestamp,
+            signType: 'MD5',
+            success: (res) => {
+              wx.showToast({
+                title: '支付成功',
+                icon: 'success'
+              })
+            },
+            fail: (res) => {
+              console.log('payment fail', res)
+            }
           })
-        },
-        fail:(res)=>{
-          console.log('payment fail', res)
-        }
+        })
+      }
+      else {
+        wx.showToast({
+          title: '订单已修改',
+          icon: 'error'
+        })
+        that.renderFdOrder(order)
+        //that.setData({ order })
+      }
+    }).catch(function (reject) {
+      wx.showToast({
+        title: '订单已修改',
+        icon: 'error'
+      })
+    })
+
+
+  },
+  getDataPromise(orderId) {
+    var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByCustomer/' + orderId.toString() + '?sessionKey=' + app.globalData.sessionKey
+    return new Promise(function (resolve, reject) {
+      util.performWebRequest(getUrl, null).then(function (order) {
+        //var order = resolve
+        resolve(order)
+      }).catch(function (reject) {
+        //console.log('get data error')
+        reject()
       })
     })
   }

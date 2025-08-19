@@ -43,6 +43,16 @@ Page({
     app.loginPromiseNew.then(function (resovle) {
       that.setData({ staff: app.globalData.staff })
       that.getData()
+      var getPayMethodUrl = app.globalData.requestPrefix + 'Order/GetUnCommonPayMethod'
+      util.performWebRequest(getPayMethodUrl, null).then(function (resolve){
+        var inputedPayMethodList = resolve
+        var othersPayMethods = ['京东收银', 'POS机刷卡', '现金']
+        for(var i = 0; i < inputedPayMethodList.length; i++){
+          othersPayMethods.push(inputedPayMethodList[i])
+        }
+        othersPayMethods.push('手工填写')
+        that.setData({othersPayMethods})
+      })
     })
   },
 
@@ -322,7 +332,7 @@ Page({
       var order = ret.data
       console.log('paid order', order)
       var title = order.paidAmount == 0 ? '下单成功' : '支付成功'
-      if (order.dealed == 1) {
+      if (order) {
         wx.showModal({
           title: title,
           content: '',
@@ -348,7 +358,7 @@ Page({
   updateOrderPromise(scene) {
     var that = this
     var order = that.data.order
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
       var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(updateUrl, order).then(function (resovle) {
         console.log('pay method changed', resovle)
@@ -359,9 +369,14 @@ Page({
     })
   },
   placeRestaurantOrder() {
+    var content = '点击确定，可以请顾客稍后付款；点击取消，可以继续选择支付方式，请顾客立即付款。'
+    var that = this
+    if (that.data.totalCharge == 0){
+      content = '0元订单，确认下单？'
+    }
     wx.showModal({
       title: '确认下单',
-      content: '点击确定，可以请顾客稍后付款；点击取消，可以继续选择支付方式，请顾客立即付款。',
+      content: content,
       complete: (res) => {
         if (res.cancel) {
 
@@ -413,12 +428,31 @@ Page({
       }
     })
   },
+  getPayMethod(e){
+    var that = this
+    var payMethod = that.data.payMethod
+    if (payMethod == '其它'){
+      var subPayMethod = that.data.subPayMethod
+      var subPayMethodIndex = that.data.subPayMethodIndex
+      if (subPayMethodIndex == that.data.othersPayMethods.length - 1){
+        return that.data.inputedPayMethod
+      }
+      else{
+        return subPayMethod
+      }
+      
+    }
+    else {
+      return payMethod
+    }
+  },
   placeUnneedPayOrder(e) {
     var that = this
     var order = that.data.order
-    var payMethod = that.data.payMethod
-    var subPayMethod = that.data.subPayMethod
-    if (!subPayMethod && order.payLater == false) {
+    var payMethod = that.getPayMethod()
+    console.log('pay method', payMethod)
+    
+    if (!payMethod) {
       wx.showToast({
         title: '必须选择支付方式',
         icon: 'error'
@@ -426,12 +460,7 @@ Page({
       return
     }
     var effectUrl = app.globalData.requestPrefix + 'Order/EffectUnpaidOrder/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
-    if (order.payLater == true) {
-      effectUrl = effectUrl + '&payLater=true'
-    }
-    else {
-      effectUrl = effectUrl + '&payMethod=' + subPayMethod + '&payLater=false'
-    }
+    effectUrl = effectUrl + '&payMethod=' + payMethod + '&payLater=false'
     util.performWebRequest(effectUrl, null).then(function (resolve) {
       console.log('paid order', resolve)
       that.setData({ paying: false })
@@ -441,7 +470,7 @@ Page({
     var that = this
     wx.showModal({
       title: '确认收款',
-      content: '确认顾客已经成功支付，避免逃单。',
+      content: '确认顾客已经成功支付。',
       complete: (res) => {
         if (res.cancel) {
 
@@ -475,25 +504,7 @@ Page({
     if (payMethod == '支付宝') {
       that.showAlipayQrCode()
     }
-    /*
-    wx.showModal({
-      title: '确认支付方式',
-      content: '支付方式：' + that.data.payMethod + ' 支付金额：' + that.data.totalChargeStr,
-      complete: (res) => {
-        if (res.cancel) {
-
-        }
-        if (res.confirm) {
-          if (payMethod == '微信支付') {
-            that.showWepayQrCode()
-          }
-          if (payMethod == '支付宝') {
-            that.showAlipayQrCode()
-          }
-        }
-      }
-    })
-    */
+ 
   },
   showWepayQrCode() {
     var that = this
@@ -584,7 +595,7 @@ Page({
   cancelPayingPromise() {
     var that = this
     var order = that.data.order
-    return new Promise(function (resolve){
+    return new Promise(function (resolve, reject){
       var cancelUrl = app.globalData.requestPrefix + 'Order/CancelPaying/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(cancelUrl, null).then(function (resovle){
         if (resolve == null){
