@@ -8,7 +8,10 @@ Page({
    */
   data: {
     showMemo: false,
-    editingOrderMemo: false
+    editingOrderMemo: false,
+    showCharge: false,
+    customerPayType: '整单支付',
+    refundType: '全额退款'
   },
 
   /**
@@ -112,6 +115,16 @@ Page({
     order.is_packageStr = order.is_package == 1 ? '是' : '否'
     order.creditInfo = order.haveOnCredit ? '是' : '否'
     order.haveDiscountStr = order.haveDiscount ? '包含' : '不含'
+    order.total_amountStr = util.showAmount(order.total_amount)
+    order.entrainAmountStr = util.showAmount(order.entrainAmount)
+    order.itemDiscountAmountStr = util.showAmount(order.itemDiscountAmount)
+    order.orderDiscountAmountStr = util.showAmount(order.orderDiscountAmount)
+    order.discountAmountStr = util.showAmount(order.discountAmount)
+    order.totalChargeStr = util.showAmount(order.totalCharge)
+    order.paidAmountStr = util.showAmount(order.paidAmount)
+    order.refundAmountStr = util.showAmount(order.refundAmount)
+    order.remainingsum = order.paidAmount - order.refundAmount
+    order.remainingsumStr = util.showAmount(order.remainingsum)
     for (var i = 0; i < order.fdOrders.length; i++) {
       var fdOrder = order.fdOrders[i]
       fdOrder.unit_priceStr = util.showAmount(parseFloat(fdOrder.unit_price))
@@ -130,21 +143,46 @@ Page({
         reject(reject)
       })
     }
+    for(var i = 0; i < order.availablePayments.length; i++){
+      var payment = order.availablePayments[i]
+      if (payment.paid_date == null){
+        payment.paid_date = payment.create_date
+      }
+      var paidDate = new Date(payment.paid_date)
+      payment.paid_dateDate = util.formatDate(paidDate)
+      payment.paid_dateTime = util.formatTimeStr(paidDate)
+      payment.amountStr = util.showAmount(payment.amount)
+      var balances = []
+      for(var i = 0; i < order.availablePayments.length; i++){
+        var payment = order.availablePayments[i]
+        var balance = {
+          type: '收款',
+          date: new Date(payment.paid_date? payment.paid_date: payment.create_date),
+          amount: payment.amount,
+          amountStr: util.showAmount(payment.amount),
+          payMethod: payment.pay_method
+        }
+        balance.dateStr = util.formatDate(balance.date)
+        balance.timeStr = util.formatTimeStr(balance.date)
+        balances.push(balance)
+      }
+      for(var i = 0; i < order.refunds.length; i++){
+        var refund = order.refunds[i]
+        var balance = {
+          type: '退款',
+          date: new Date(refund.create_date),
+          amount: refund.amount,
+          amountStr: util.showAmount(refund.amount),
+          payMethod: '——'
+        }
+        balance.dateStr = util.formatDate(balance.date)
+        balance.timeStr = util.formatTimeStr(balance.date)
+        balances.push(balance)
+      }
+      order.balances = balances.sort((a, b) => (b.date - a.date))
+    }
     that.setData({ order })
   },
-  /*
-  getOrderStatusLogPromise(orderId) {
-    //var getUrl = app.globalData.requestPrefix + 'Order/GetOrderStatusLog/' + orderId.toString()
-    var getUrl = app.globalData.requestPrefix + 'Order/LoadLogs/' + orderId.toString() + '?tableName=order&fieldName=orderstate'
-    return new Promise(function (resolve, reject) {
-      util.performWebRequest(getUrl, null).then(function (logs) {
-        resolve(logs)
-      }).catch(function (reject) {
-        reject(reject)
-      })
-    })
-  },
-  */
   getLogsPromise(tableName, fieldName, key){
     var getUrl = app.globalData.requestPrefix + 'Order/LoadLogs/' + key.toString() + '?tableName=' + tableName + '&fieldName=' + fieldName
     return new Promise(function (resolve, reject) {
@@ -285,16 +323,37 @@ Page({
       })
     })
   },
-  /*
-  getOrderMemoLogPromise(orderId) {
-    var getUrl = app.globalData.requestPrefix + 'Order/GetOrderMemoLog/' + orderId.toString()
-    return new Promise(function (resolve, reject) {
-      util.performWebRequest(getUrl, null).then(function (logs) {
-        resolve(logs)
-      }).catch(function (reject) {
-        reject(reject)
-      })
-    })
+  showCharge(){
+    var that = this
+    that.setData({showCharge: true})
+  },
+  closeCharge(){
+    var that = this
+    that.setData({showCharge: false})
+  },
+  setPayType(e){
+    var that = this
+    that.setData({customerPayType: e.detail.value})
+  },
+  showRefund(){
+    var that = this
+    that.setData({showRefund: true})
+  },
+  closeRefund(){
+    var that = this
+    that.setData({showRefund: false})
+  },
+  changeRefundType(e){
+    var that = this
+    that.setData({refundType: e.detail.value})
+  },
+  showBalance(){
+    var that = this
+    that.setData({showBalance: true})
+  },
+  closeBalance(){
+    var that = this
+    that.setData({showBalance: false})
   }
-  */
+  
 })
