@@ -152,15 +152,14 @@
           <fui-col span="6" offset="5">
             <radio value="null">全部</radio>
           </fui-col>
-          <fui-col span="13">
-           
-          </fui-col>
-          
+          <fui-col span="13"></fui-col>
         </fui-row>
       </radio-group>
     </fui-card>
     <view class="view-row" style="margin-top: 20rpx;justify-content: center;">
-      <fui-button disabled="{{querying}}" btnSize="medium" background="#2EA6D0" bind:click="getData"> 查 询 </fui-button>
+      <fui-button disabled="{{querying}}" btnSize="medium" background="#2EA6D0" bind:click="getData">
+        {{querying? ' 查 询 中 … ': ' 查 询 '}}
+      </fui-button>
     </view>
     <view style="height: 20rpx"></view>
     <fui-row style="margin-top: 20rpx;">

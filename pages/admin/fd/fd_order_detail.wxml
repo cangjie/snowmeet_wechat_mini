@@ -102,36 +102,58 @@
         <view class="view-detail">小计</view>
       </fui-col>
     </fui-row>
-    <view style="height: 50rpx;"></view>
-    <fui-row>
-      <fui-col span="12">
-        <view class="view-detail">冰摩卡</view>
-      </fui-col>
-      <fui-col span="3">
-        <view class="view-detail" style="text-align: right;">¥19.00</view>
-      </fui-col>
-      <fui-col span="2">
-        <view class="view-detail">1</view>
-      </fui-col>
-      <fui-col span="3">
-        <view class="view-detail" style="text-align: right;margin-left:10rpx">¥9.00</view>
-      </fui-col>
-      <fui-col span="3">
-        <view class="view-detail" style="text-align: right;margin-left: 10rpx;">¥100.00</view>
-      </fui-col>
-    </fui-row>
-    <view>【备注】少冰 加浓</view>
-    <view class="view-row">
-      <view style="width: 187rpx;"></view>
-      <view class="view-row" style="width: 188rpx;justify-content: center;">
-        <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+
+
+    <block wx:for="{{order.fdOrders}}">
+      <view style="height: 50rpx;"></view>
+      <fui-row>
+        <fui-col span="12">
+          <view class="view-detail">{{item.product_name}}</view>
+        </fui-col>
+        <fui-col span="3">
+          <view class="view-detail" style="text-align: right;">{{item.unit_priceStr}}</view>
+        </fui-col>
+        <fui-col span="2">
+          <view class="view-detail">{{item.count}}</view>
+        </fui-col>
+        <fui-col span="3">
+          <view class="view-detail" style="text-align: right;margin-left:10rpx">{{item.discountAmountStr}}</view>
+        </fui-col>
+        <fui-col span="3">
+          <view class="view-detail" style="text-align: right;margin-left: 10rpx;">{{item.summaryStr}}</view>
+        </fui-col>
+      </fui-row>
+      <view class="view-row">
+        <view>【备注】</view>
+        <view>
+          <input id="{{index}}" class="input" bindinput="inputMemo" disabled="{{!item.editing}}" style="width: 560rpx;" placeholder="{{item.memo}}" value="{{item.editing? null : item.memo}}" />
+        </view>
       </view>
-      <view class="view-row" style="width: 188rpx;justify-content: center;">
-        <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+      <view class="view-row" wx:if="{{item.editing}}">
+        <view style="width: 187rpx;"></view>
+        <view class="view-row" style="width: 188rpx;justify-content: center;">
+          <fui-button id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00" bind:click="confirmMemo"></fui-button>
+        </view>
+        <view class="view-row" style="width: 188rpx;justify-content: center;">
+          <fui-button id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000" bind:click="cancelMemo"></fui-button>
+        </view>
+        <view style="width: 187rpx;"></view>
       </view>
-      <view style="width: 187rpx;"></view>
-    </view>
-    <view style="height: 50rpx;"></view>
+      <view class="view-row" wx:else>
+        <view style="width: 187rpx;"></view>
+        <view class="view-row" style="width: 188rpx;justify-content: center;">
+          <fui-button id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+        </view>
+        <view class="view-row" style="width: 188rpx;justify-content: center;">
+          <fui-button wx:if="{{item.logs.length > 1}}" id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="showLogs"></fui-button>
+        </view>
+        <view style="width: 187rpx;"></view>
+      </view>
+    </block>
+
+
+
+    <!--view style="height: 50rpx;"></view>
     <fui-row>
       <fui-col span="12">
         <view class="view-detail">冰摩卡</view>
@@ -159,7 +181,10 @@
         <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="showLogs"></fui-button>
       </view>
       <view style="width: 187rpx;"></view>
-    </view>
+    </view-->
+
+
+
   </fui-card>
   <view style="height: 50rpx;"></view>
   <!--有历史记录的需要历史按钮，需哟修改按钮-->
@@ -175,10 +200,10 @@
     <view class="view-row" wx:if="{{editingOrderMemo}}">
       <view style="width: 187rpx;"></view>
       <view class="view-row" style="width: 188rpx;justify-content: center;">
-        <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00" bind:click="confirmMemo" ></fui-button>
+        <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00" bind:click="confirmMemo"></fui-button>
       </view>
       <view class="view-row" style="width: 188rpx;justify-content: center;">
-        <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000" bind:click="cancelMemo" ></fui-button>
+        <fui-button id="orderMemo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000" bind:click="cancelMemo"></fui-button>
       </view>
       <view style="width: 187rpx;"></view>
     </view>
@@ -200,7 +225,7 @@
         <view>【总计】</view>
       </fui-col>
       <fui-col span="4">
-        <view style="text-align: right;">¥38.00</view>
+        <view style="text-align: right;">{{order.total_amountStr}}</view>
       </fui-col>
       <fui-col span="11"></fui-col>
     </fui-row>
@@ -209,7 +234,7 @@
         <view>【招待金额】</view>
       </fui-col>
       <fui-col span="4">
-        <view style="text-align: right;">¥19.00</view>
+        <view style="text-align: right;">{{order.entrainAmountStr}}</view>
       </fui-col>
       <fui-col span="11"></fui-col>
     </fui-row>
@@ -218,7 +243,7 @@
         <view>【商品减免】</view>
       </fui-col>
       <fui-col span="4">
-        <view style="text-align: right;">¥9.00</view>
+        <view style="text-align: right;">{{order.itemDiscountAmountStr}}</view>
       </fui-col>
       <fui-col span="11"></fui-col>
     </fui-row>
@@ -227,7 +252,16 @@
         <view>【订单减免】</view>
       </fui-col>
       <fui-col span="4">
-        <view style="text-align: right;">¥9.00</view>
+        <view style="text-align: right;">{{order.orderDiscountAmountStr}}</view>
+      </fui-col>
+      <fui-col span="11"></fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="7">
+        <view>【减免总计】</view>
+      </fui-col>
+      <fui-col span="4">
+        <view style="text-align: right;">{{order.discountAmountStr}}</view>
       </fui-col>
       <fui-col span="11"></fui-col>
     </fui-row>
@@ -236,32 +270,59 @@
         <view>【结算金额】</view>
       </fui-col>
       <fui-col span="4">
-        <view style="text-align: right;">¥10.00</view>
+        <view style="text-align: right;">{{order.totalChargeStr}}</view>
       </fui-col>
       <fui-col span="11"></fui-col>
     </fui-row>
     <fui-row>
       <fui-col span="7">
-        <view>【挂账类型】</view>
-      </fui-col>
-      <fui-col span="5">
-        <view style="text-align: right;">整单挂账</view>
-      </fui-col>
-      <fui-col span="10"></fui-col>
-    </fui-row>
-    <fui-row>
-      <fui-col span="7">
-        <view>【挂账金额】</view>
+        <view>【已付金额】</view>
       </fui-col>
       <fui-col span="4">
-        <view style="text-align: right;">¥100.00</view>
+        <view style="text-align: right;">{{order.paidAmountStr}}</view>
       </fui-col>
       <fui-col span="11">
-        <view style="margin-left: 50rpx;">
-          <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 补 收 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+        <view class="view-row">
+          <view style="width: 50rpx;"></view>
+          <view class="view-row" style="width: 150rpx;justify-content: center;">
+            <fui-button wx:if="{{order.totalCharge > order.paidAmount}}" id="paidHistory" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 收 款 " color="#000000" background="#C0C0C0" bind:click="showCharge"></fui-button>
+          </view>
+          <view class="view-row" style="width: 150rpx;justify-content: center;">
+            <fui-button wx:if="{{order.paidAmount > 0}}" id="paidHistory" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 退 款 " color="#000000" background="#C0C0C0" bind:click="showRefund"></fui-button>
+          </view>
+          <view>
+            <fui-button wx:if="{{order.paidAmount > 0}}" id="paidHistory" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="showBalance"></fui-button>
+          </view>
         </view>
+
+
       </fui-col>
     </fui-row>
+    <block wx:if="{{order.haveOnCredit}}">
+      <fui-row>
+        <fui-col span="7">
+          <view>【挂账类型】</view>
+        </fui-col>
+        <fui-col span="5">
+          <view style="text-align: right;">整单挂账</view>
+        </fui-col>
+        <fui-col span="10"></fui-col>
+      </fui-row>
+      <fui-row>
+        <fui-col span="7">
+          <view>【挂账金额】</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: right;">¥100.00</view>
+        </fui-col>
+        <fui-col span="11">
+          <view style="margin-left: 50rpx;">
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 补 收 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+          </view>
+        </fui-col>
+      </fui-row>
+    </block>
+
     <!--fui-row>
     <fui-col span="7">
       <view>【支付记录】</view>
@@ -353,17 +414,6 @@
               <view style="text-align: center;">{{item.staffName}}</view>
             </fui-col>
           </fui-row>
-          <!--fui-row>
-          <fui-col span="6">
-            <view style="text-align: center;">{{item.staffName}}</view>
-          </fui-col>
-          <fui-col span="5">
-            <view style="text-align: center;">19:20:45</view>
-          </fui-col>
-          <fui-col span="13">
-            <view style="text-align: center;">要常温的</view>
-          </fui-col>
-        </fui-row-->
         </block>
         <block wx:if="{{showOrderMemoLog}}">
           <fui-row>
@@ -387,25 +437,260 @@
             <fui-col span="13">
               <view style="text-align: center;">{{item.current_value}}</view>
             </fui-col>
-           
           </fui-row>
-          <!--fui-row>
-          <fui-col span="6">
-            <view style="text-align: center;">{{item.staffName}}</view>
-          </fui-col>
-          <fui-col span="5">
-            <view style="text-align: center;">19:20:45</view>
-          </fui-col>
-          <fui-col span="13">
-            <view style="text-align: center;">要常温的</view>
-          </fui-col>
-        </fui-row-->
+        </block>
+        <block wx:if="{{showFdMemoLog}}">
+          <fui-row>
+            <fui-col span="6">
+              <view style="text-align: center;">日期</view>
+            </fui-col>
+            <fui-col span="5">
+              <view style="text-align: center;">时间</view>
+            </fui-col>
+            <fui-col span="13">
+              <view style="text-align: center;">历史备注</view>
+            </fui-col>
+          </fui-row>
+          <fui-row wx:for="{{fdMemoLog}}">
+            <fui-col span="6">
+              <view style="text-align: center;">{{item.dateStr}}</view>
+            </fui-col>
+            <fui-col span="5">
+              <view style="text-align: center;">{{item.timeStr}}</view>
+            </fui-col>
+            <fui-col span="13">
+              <view style="text-align: center;">{{item.current_value}}</view>
+            </fui-col>
+          </fui-row>
         </block>
         <!--fui-list-cell wx:for="{{itemList}}" wx:key="index">item{{index+1}}</fui-list-cell-->
       </scroll-view>
       <view class="fui-icon__close" bindtap="closeMemo">
         <fui-icon name="close" size="{{48}}"></fui-icon>
       </view>
+    </view>
+  </fui-bottom-popup>
+  <fui-bottom-popup show="{{showCharge}}" bindclose="closeCharge">
+    <view class="fui-scroll__wrap">
+      <view class="fui-title fui-title__pb">订单收款</view>
+      <fui-row>
+        <fui-col span="7">
+          <view>【结算金额】</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: right;">{{order.totalChargeStr}}</view>
+        </fui-col>
+        <fui-col span="11"></fui-col>
+      </fui-row>
+      <fui-row wx:if="{{order.paidAmount>0}}">
+        <fui-col span="7">
+          <view>【已付金额】</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: right;">{{order.paidAmountStr}}</view>
+        </fui-col>
+        <fui-col span="11"></fui-col>
+      </fui-row>
+      <fui-row>
+        <fui-col span="7">
+          <view>【收款类型】</view>
+        </fui-col>
+        <fui-col span="17">
+          <view class="view-row">
+            <radio-group bindchange="setPayType">
+              <radio value="整单支付" checked="{{customerPayType == '整单支付'}}">整单支付</radio>
+              <radio value="分付" style="margin-left: 50rpx;" checked="{{customerPayType == '分付'}}">分付</radio>
+            </radio-group>
+          </view>
+        </fui-col>
+      </fui-row>
+
+      <block wx:if="{{customerPayType == '分付'}}">
+        <view style="height: 20rpx;"></view>
+        <fui-row>
+          <fui-col span="7">
+            <view>【支付金额】</view>
+          </fui-col>
+          <fui-col span="17">
+            <input class="input" style="width: 100rpx;" />
+          </fui-col>
+        </fui-row>
+        <view style="height: 20rpx;"></view>
+        <fui-row>
+          <fui-col span="7">
+            <view>【支付备注】</view>
+          </fui-col>
+          <fui-col span="17">
+            <input class="input" style="width: 400rpx;" />
+          </fui-col>
+        </fui-row>
+      </block>
+      <view style="height: 20rpx;"></view>
+      <fui-row>
+        <fui-col span="7">
+          <view>【支付方式】</view>
+        </fui-col>
+        <fui-col span="17">
+          <radio-group class="view-row" bindchange="setPayMethod">
+            <radio value="微信支付" checked="{{payMethod == '微信支付'}}" disabled="{{paying || editingDiscount || totalCharge == 0}}">微信</radio>
+            <radio value="支付宝" checked="{{payMethod == '支付宝'}}" disabled="{{paying || editingDiscount || totalCharge == 0 }}">支付宝</radio>
+            <radio value="其它" checked="{{payMethod == '其它'}}" disabled="{{paying || editingDiscount || totalCharge == 0 }}">其它</radio>
+            <radio value="挂账" checked="{{payMethod == '挂账'}}" disabled="{{true}}">挂账</radio>
+          </radio-group>
+        </fui-col>
+      </fui-row>
+      <view style="height:  400rpx;"></view>
+      <view class="fui-icon__close" bindtap="closeCharge">
+        <fui-icon name="close" size="{{48}}"></fui-icon>
+      </view>
+    </view>
+  </fui-bottom-popup>
+  <fui-bottom-popup show="{{showRefund}}" bindclose="closeRefund">
+    <view class="fui-scroll__wrap">
+      <view class="fui-title fui-title__pb">订单退款</view>
+    </view>
+    <fui-row>
+      <fui-col span="7">
+        <view>【结算金额】</view>
+      </fui-col>
+      <fui-col span="4">
+        <view style="text-align: right;">{{order.totalChargeStr}}</view>
+      </fui-col>
+      <fui-col span="11"></fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="7">
+        <view>【已退金额】</view>
+      </fui-col>
+      <fui-col span="4">
+        <view style="text-align: right;">{{order.refundAmountStr}}</view>
+      </fui-col>
+      <fui-col span="11"></fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="7">
+        <view>【退款类型】</view>
+      </fui-col>
+      <fui-col span="17">
+        <radio-group bindchange="changeRefundType">
+          <radio value="全额退款" checked="{{refundType == '全额退款'}}">全额退款</radio>
+          <radio style="margin-left: 50rpx;" value="部分退款" checked="{{refundType == '部分退款'}}">部分退款</radio>
+        </radio-group>
+      </fui-col>
+    </fui-row>
+    <block wx:if="{{refundType == '全额退款'}}">
+      <fui-row>
+        <fui-col span="7">
+          <view>【退款金额】</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: right;">{{order.remainingsumStr}}</view>
+        </fui-col>
+        <fui-col span="11"></fui-col>
+      </fui-row>
+    </block>
+    <block wx:else>
+      <view style="height: 50rpx;"></view>
+      <checkbox-group>
+        <fui-row>
+          <fui-col offset="2" span="6">
+            <view style="text-align: center;">日期</view>
+          </fui-col>
+          <fui-col span="5">
+            <view style="text-align: center;">时间</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: center;">方式</view>
+          </fui-col>
+          <fui-col span="3">
+            <view style="text-align: center;">可退</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: center;">退款</view>
+          </fui-col>
+        </fui-row>
+        <view style="height: 25rpx;"></view>
+        <fui-row wx:for="{{order.availablePayments}}">
+          <fui-col span="2">
+            <checkbox></checkbox>
+          </fui-col>
+          <fui-col span="6">
+            <view style="text-align: center;">{{item.paid_dateDate}}</view>
+          </fui-col>
+          <fui-col span="5">
+            <view style="text-align: center;">{{item.paid_dateTime}}</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: center;">{{item.pay_method}}</view>
+          </fui-col>
+          <fui-col span="3">
+            <view style="text-align: right;">{{item.amountStr}}</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: center;margin-left: 5rpx;"><input class="input" style="width: 100rpx;" /></view>
+          </fui-col>
+        </fui-row>
+      </checkbox-group>
+      <fui-row>
+        <fui-col span="7">
+          <view>【退款金额】</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: right;">¥nn.nn</view>
+        </fui-col>
+        <fui-col span="11"></fui-col>
+      </fui-row>
+    </block>
+    <view style="height: 50rpx;"></view>
+    <view class="view-row" style="align-items: center;justify-content: center;">
+      <fui-button btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text=" 确 认 退 款 " background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
+    </view>
+    <view class="fui-icon__close" bindtap="closeRefund">
+      <fui-icon name="close" size="{{48}}"></fui-icon>
+    </view>
+  </fui-bottom-popup>
+  <fui-bottom-popup show="{{showBalance}}" bindclose="closeBalance">
+    <view class="fui-scroll__wrap">
+      <view class="fui-title fui-title__pb">订单流水记录</view>
+      <view style="height:50rpx"></view>
+      <fui-row>
+        <fui-col span="6">
+          <view style="text-align: center;">日期</view>
+        </fui-col>
+        <fui-col span="5">
+          <view style="text-align: center;">时间</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: center;">类型</view>
+        </fui-col>
+        <fui-col span="5">
+          <view style="text-align: center;">支付方式</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: center;">金额</view>
+        </fui-col>
+      </fui-row>
+      <fui-row wx:for="{{order.balances}}" >
+        <fui-col span="6">
+          <view style="text-align: center;">{{item.dateStr}}</view>
+        </fui-col>
+        <fui-col span="5">
+          <view style="text-align: center;">{{item.timeStr}}</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: center;">{{item.type}}</view>
+        </fui-col>
+        <fui-col span="5">
+          <view style="text-align: center;" >{{item.payMethod}}</view>
+        </fui-col>
+        <fui-col span="4">
+          <view style="text-align: center;">{{item.amountStr}}</view>
+        </fui-col>
+      </fui-row>
+    </view>
+
+    <view class="fui-icon__close" bindtap="closeBalance">
+      <fui-icon name="close" size="{{48}}"></fui-icon>
     </view>
   </fui-bottom-popup>
 </view>
