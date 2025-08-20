@@ -11,7 +11,13 @@ Page({
     editingOrderMemo: false,
     showCharge: false,
     customerPayType: '整单支付',
-    refundType: '全额退款'
+    refundType: '全额退款',
+    paylistValid: false,
+    payList: [
+      { amount: null, payMethod: null, OrderStatus: '待生成' },
+      { amount: null, payMethod: null, OrderStatus: '待生成' }
+    ],
+    paying: false
   },
 
   /**
@@ -37,7 +43,7 @@ Page({
         that.renderOrderStatusLog(resolve)
       })
       */
-      that.getLogsPromise('order', 'orderstate', that.data.orderId).then(function (resolve){
+      that.getLogsPromise('order', 'orderstate', that.data.orderId).then(function (resolve) {
         console.log('get logs', resolve)
         that.renderOrderStatusLog(resolve)
       })
@@ -46,10 +52,10 @@ Page({
         that.renderOrderMemoLog(resolve)
       })
       */
-     that.getLogsPromise('order', 'memo', that.data.orderId).then(function (resolve){
-      console.log('get logs', resolve)
-      that.renderOrderMemoLog(resolve)
-    })
+      that.getLogsPromise('order', 'memo', that.data.orderId).then(function (resolve) {
+        console.log('get logs', resolve)
+        that.renderOrderMemoLog(resolve)
+      })
 
     })
   },
@@ -125,6 +131,12 @@ Page({
     order.refundAmountStr = util.showAmount(order.refundAmount)
     order.remainingsum = order.paidAmount - order.refundAmount
     order.remainingsumStr = util.showAmount(order.remainingsum)
+    order.unpaidAmount = order.totalCharge - order.paidAmount
+    order.unpaidAmountStr = util.showAmount(order.unpaidAmount)
+    order.currentPaidAmount = 0
+    order.currentPaidAmountStr = util.showAmount(order.currentPaidAmount)
+    order.remainUnPaidAmount = order.unpaidAmount - order.currentPaidAmount
+    order.remainUnPaidAmountStr = util.showAmount(order.remainUnPaidAmount)
     for (var i = 0; i < order.fdOrders.length; i++) {
       var fdOrder = order.fdOrders[i]
       fdOrder.unit_priceStr = util.showAmount(parseFloat(fdOrder.unit_price))
@@ -135,17 +147,17 @@ Page({
         fdOrder.editing = false
       }
       fdOrder.inputedMemo = null
-      that.getLogsPromise('fdorder', 'memo', fdOrder.id).then(function (resolve){
+      that.getLogsPromise('fdorder', 'memo', fdOrder.id).then(function (resolve) {
         var logs = that.renderLog(resolve)
         fdOrder.logs = logs
-        that.setData({order})
-      }).catch(function (reject){
+        that.setData({ order })
+      }).catch(function (reject) {
         reject(reject)
       })
     }
-    for(var i = 0; i < order.availablePayments.length; i++){
+    for (var i = 0; i < order.availablePayments.length; i++) {
       var payment = order.availablePayments[i]
-      if (payment.paid_date == null){
+      if (payment.paid_date == null) {
         payment.paid_date = payment.create_date
       }
       var paidDate = new Date(payment.paid_date)
@@ -153,11 +165,11 @@ Page({
       payment.paid_dateTime = util.formatTimeStr(paidDate)
       payment.amountStr = util.showAmount(payment.amount)
       var balances = []
-      for(var i = 0; i < order.availablePayments.length; i++){
+      for (var i = 0; i < order.availablePayments.length; i++) {
         var payment = order.availablePayments[i]
         var balance = {
           type: '收款',
-          date: new Date(payment.paid_date? payment.paid_date: payment.create_date),
+          date: new Date(payment.paid_date ? payment.paid_date : payment.create_date),
           amount: payment.amount,
           amountStr: util.showAmount(payment.amount),
           payMethod: payment.pay_method
@@ -166,7 +178,7 @@ Page({
         balance.timeStr = util.formatTimeStr(balance.date)
         balances.push(balance)
       }
-      for(var i = 0; i < order.refunds.length; i++){
+      for (var i = 0; i < order.refunds.length; i++) {
         var refund = order.refunds[i]
         var balance = {
           type: '退款',
@@ -183,7 +195,7 @@ Page({
     }
     that.setData({ order })
   },
-  getLogsPromise(tableName, fieldName, key){
+  getLogsPromise(tableName, fieldName, key) {
     var getUrl = app.globalData.requestPrefix + 'Order/LoadLogs/' + key.toString() + '?tableName=' + tableName + '&fieldName=' + fieldName
     return new Promise(function (resolve, reject) {
       util.performWebRequest(getUrl, null).then(function (logs) {
@@ -223,9 +235,9 @@ Page({
       case 'orderMemo':
         that.setData({ showMemo: true, showOrderMemoLog: true, memoTitle: '订单备注历史' })
       default:
-        if (!isNaN(id)){
+        if (!isNaN(id)) {
           var fdOrder = that.data.order.fdOrders[parseInt(id)]
-          that.setData({fdMemoLog: fdOrder.logs, showMemo: true, showFdMemoLog: true, memoTitle: '订单明细备注历史' })
+          that.setData({ fdMemoLog: fdOrder.logs, showMemo: true, showFdMemoLog: true, memoTitle: '订单明细备注历史' })
         }
         break
     }
@@ -270,7 +282,7 @@ Page({
     if (id == 'orderMemo') {
       order.inputedMemo = value
     }
-    else if (!isNaN(id)){
+    else if (!isNaN(id)) {
       var fdOrder = order.fdOrders[parseInt(id)]
       fdOrder.inputedMemo = value
     }
@@ -291,16 +303,16 @@ Page({
         })
       }
     }
-    else if (!isNaN(id)){
+    else if (!isNaN(id)) {
       var fdOrder = order.fdOrders[parseInt(id)]
       fdOrder.memo = fdOrder.inputedMemo
-      that.updateFdOrderPromise(fdOrder, '修改订单明细备注').then(function(fdOrder){
+      that.updateFdOrderPromise(fdOrder, '修改订单明细备注').then(function (fdOrder) {
         that.cancelMemo(e)
-        that.getLogsPromise('fdorder', 'memo', fdOrder.id).then(function (resolve){
+        that.getLogsPromise('fdorder', 'memo', fdOrder.id).then(function (resolve) {
           fdOrder.logs = that.renderLog(resolve)
-          that.setData({order})
+          that.setData({ order })
         })
-      }).catch(function (reject){})
+      }).catch(function (reject) { })
     }
   },
   updateOrderPromise(order, scene) {
@@ -313,47 +325,123 @@ Page({
       })
     })
   },
-  updateFdOrderPromise(fdOrder, scene){
+  updateFdOrderPromise(fdOrder, scene) {
     var updateUrl = app.globalData.requestPrefix + 'Order/UpdateFdOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + app.globalData.sessionKey
-    return new Promise(function (resolve, reject){
+    return new Promise(function (resolve, reject) {
       util.performWebRequest(updateUrl, fdOrder).then(function (fdOrder) {
         resolve(fdOrder)
-      }).catch(function (obj){
+      }).catch(function (obj) {
         reject(obj)
       })
     })
   },
-  showCharge(){
+  showCharge() {
     var that = this
-    that.setData({showCharge: true})
+    that.setData({ showCharge: true })
   },
-  closeCharge(){
+  closeCharge() {
     var that = this
-    that.setData({showCharge: false})
+    that.setData({ showCharge: false })
   },
-  setPayType(e){
+  setPayType(e) {
     var that = this
-    that.setData({customerPayType: e.detail.value})
+    that.setData({ customerPayType: e.detail.value })
   },
-  showRefund(){
+  showRefund() {
     var that = this
-    that.setData({showRefund: true})
+    that.setData({ showRefund: true })
   },
-  closeRefund(){
+  closeRefund() {
     var that = this
-    that.setData({showRefund: false})
+    that.setData({ showRefund: false })
   },
-  changeRefundType(e){
+  changeRefundType(e) {
     var that = this
-    that.setData({refundType: e.detail.value})
+    that.setData({ refundType: e.detail.value })
   },
-  showBalance(){
+  showBalance() {
     var that = this
-    that.setData({showBalance: true})
+    that.setData({ showBalance: true })
   },
-  closeBalance(){
+  closeBalance() {
     var that = this
-    that.setData({showBalance: false})
+    that.setData({ showBalance: false })
+  },
+  setPayListAmount(e){
+    var that = this
+    var amount =  isNaN(e.detail.value)? null : parseFloat(e.detail.value)
+    var id = parseInt(e.currentTarget.id)
+    var payList = that.data.payList
+    var pay = payList[id]
+    if (amount != null){
+      pay.amount = amount
+      that.renderPayList()
+    }
+  },
+  renderPayList(){
+    var that = this
+    var payList = that.data.payList
+    var order = that.data.order
+    var unpaidAmount = order.unpaidAmount
+    var currentPaidAmount = 0
+    var inValid = false
+    for(var i = 0; i < payList.length; i++){
+      var pay = payList[i]
+      if (pay.amount){
+        if (i < payList.length - 1){
+          currentPaidAmount += parseFloat(pay.amount)
+        }
+      }
+      else{
+        inValid = true
+      }
+      if (pay.payMethod == null){
+        inValid = true
+      }
+
+    }
+    payList[payList.length - 1].amount = 
+      payList[payList.length - 2].amount == null ? null : unpaidAmount - currentPaidAmount
+    order.currentPaidAmount = currentPaidAmount
+    order.remainUnPaidAmount = order.unpaidAmount - currentPaidAmount
+    order.currentPaidAmountStr = util.showAmount(order.currentPaidAmount)
+    order.remainUnPaidAmountStr = util.showAmount(order.remainUnPaidAmount)
+    that.setData({payList, order, paylistValid: !inValid})
+  },
+  addNewPayList(){
+    var that = this
+    var payList = that.data.payList
+    payList[payList.length - 1].amount = null
+    payList.push( { amount: null, payMethod: null, OrderStatus: '待生成' })
+    that.renderPayList()
+    //that.setData({payList})
+  },
+  setPayMethodList(e){
+    var that = this
+    var value = e.detail.value
+    var id = parseInt(e.currentTarget.id)
+    var payList = that.data.payList
+    var pay = payList[id]
+    pay.payMethod = value
+    that.renderPayList()
+  },
+  confirmPayList(){
+    var that = this
+    var payList = that.data.payList
+    for(var i = 0; i < payList.length; i++){
+      payList[i].OrderStatus = '待支付'
+    }
+    that.setData({paying: true})
+    that.renderPayList()
+  },
+  cancelPayList(){
+    var that = this
+    var payList = that.data.payList
+    for(var i = 0; i < payList.length; i++){
+      payList[i].OrderStatus = '待生成'
+    }
+    that.setData({paying: false})
+    that.renderPayList()
   }
-  
+
 })
