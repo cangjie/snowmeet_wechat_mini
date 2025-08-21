@@ -466,6 +466,11 @@ Page({
     }
     that.data.payList = newPayList
     that.renderPayList(newPayList)
+  },
+  addNew(){
+    wx.navigateTo({
+      url: 'fd_category_prod_list',
+    })
   }
 
 })

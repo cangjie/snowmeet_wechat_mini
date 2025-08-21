@@ -124,6 +124,12 @@
         </fui-col>
       </fui-row>
       <view class="view-row">
+        <view>【桌号】</view>
+        <view>
+          ——
+        </view>
+      </view>
+      <view class="view-row">
         <view>【备注】</view>
         <view>
           <input id="{{index}}" class="input" bindinput="inputMemo" disabled="{{!item.editing}}" style="width: 560rpx;" placeholder="{{item.memo}}" value="{{item.editing? null : item.memo}}" />
@@ -182,11 +188,13 @@
       </view>
       <view style="width: 187rpx;"></view>
     </view-->
-
-
-
   </fui-card>
   <view style="height: 50rpx;"></view>
+  <view class="view-row" style="justify-content: center;" >
+    <fui-button  btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="添加商品" background="#2EA6D0" bind:click="addNew"></fui-button>
+  </view>
+  <view style="height: 50rpx;"></view>
+
   <!--有历史记录的需要历史按钮，需哟修改按钮-->
   <fui-card full>
     <view class="view-row">
@@ -667,7 +675,7 @@
         <view style="height: 25rpx;"></view>
         <fui-row wx:for="{{order.availablePayments}}">
           <fui-col span="2">
-            <checkbox></checkbox>
+            <checkbox checked="{{index == 0 && order.availablePayments.length == 1}}"></checkbox>
           </fui-col>
           <fui-col span="6">
             <view style="text-align: center;">{{item.paid_dateDate}}</view>
