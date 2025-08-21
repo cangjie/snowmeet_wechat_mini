@@ -388,9 +388,13 @@ Page({
     for(var i = 0; i < payList.length; i++){
       var pay = payList[i]
       if (pay.amount){
+        pay.amountStr = util.showAmount(pay.amount)
+        
         if (i < payList.length - 1){
           currentPaidAmount += parseFloat(pay.amount)
         }
+        
+       //currentPaidAmount += parseFloat(pay.amount)
       }
       else{
         inValid = true
@@ -402,9 +406,16 @@ Page({
     }
     payList[payList.length - 1].amount = 
       payList[payList.length - 2].amount == null ? null : unpaidAmount - currentPaidAmount
-    order.currentPaidAmount = currentPaidAmount
-    order.remainUnPaidAmount = order.unpaidAmount - currentPaidAmount
+    payList[payList.length - 1].amountStr = util.showAmount(payList[payList.length - 1].amount)
+    order.currentPaidAmount = unpaidAmount
+    var sum = 0
+    for(var i = 0; i < payList.length; i++){
+      var pay = payList[i]
+      sum += pay.amount > 0? pay.amount : 0
+    }
+    order.remainUnPaidAmount = unpaidAmount - sum
     order.currentPaidAmountStr = util.showAmount(order.currentPaidAmount)
+    
     order.remainUnPaidAmountStr = util.showAmount(order.remainUnPaidAmount)
     that.setData({payList, order, paylistValid: !inValid})
   },
@@ -442,6 +453,19 @@ Page({
     }
     that.setData({paying: false})
     that.renderPayList()
+  },
+  delPayList(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var payList = that.data.payList
+    var newPayList = []
+    for(var i = 0; i < payList.length; i++){
+      if (i != id){
+        newPayList.push(payList[i])
+      }
+    }
+    that.data.payList = newPayList
+    that.renderPayList(newPayList)
   }
 
 })
