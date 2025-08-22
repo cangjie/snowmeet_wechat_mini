@@ -7,6 +7,7 @@ Page({
    * Page initial data
    */
   data: {
+    currentRentalNum: 0,
     maxCategoryColIndex: 0,
     categorySelectIndex: undefined,
     categorySelectText: '',
@@ -17,6 +18,7 @@ Page({
     action: '',
     itemSegs: ['押金', '租金'],
     displayRental: false,
+    querying: false,
     values1: [{
       id: 1,
       name: 'segmented1',
@@ -36,7 +38,10 @@ Page({
     }, {
       id: 6,
       name: 'segmented6'
-    }]
+    }],
+    propertyObj:{
+      a: 1, b: 'aaa'
+    }
   },
 
   /**
@@ -254,9 +259,18 @@ Page({
     var that = this
     console.log('bar code is: ', that.data.barCode)
     var barCode = that.data.barCode
+    if (that.checkCodeDup(barCode)){
+      wx.showToast({
+        title: '编码不可重复',
+        icon: 'error'
+      })
+      return
+    }
+    that.setData({querying: true})
     var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByBarcode/' + barCode
     util.performWebRequest(searchUrl, null).then(function (resolve){
       var rentProduct = resolve
+      
       console.log('rent product', rentProduct)
       that.setData({barCodeInputing: false})
       var rental = {
@@ -283,10 +297,10 @@ Page({
       var rentals = that.data.rentals
       rentals.push(rental)
       console.log('rentals', rentals)
-      that.setData({type: null, packageSelectIndex: null, barCodeInputing: false, barCode: null})
+      that.setData({type: null, packageSelectIndex: null, barCodeInputing: false, barCode: null, querying:false})
       that.renderData(rentals)
     }).catch(function(reject){
-      
+      that.setData({querying: false})
     })
   },
   
@@ -349,10 +363,8 @@ Page({
     var rentals = that.data.rentals
     var currentRental = rentals[parseInt(id)]
     if (currentRental != null){
-      
       that.setData({currentRental, showBackdrop: true, action: 'package'})
     }
-
   },
   getRentalItemMenus(rental){
     var items = rental.rentItems
@@ -373,9 +385,7 @@ Page({
     var id = e.currentTarget.id
     var rentals = that.data.rentals
     var currentRental = rentals[parseInt(id)]
-    if (currentRental != null){
-      that.setData({currentRental, showBackdrop: true, action: 'item'})
-    }
+    that.setData({currentRental, showBackdrop: true, action: 'item', currentRentalNum: 100})
   },
   cancelBackdrop(e){
     var that = this
@@ -393,5 +403,24 @@ Page({
   },
   scroll(e){
     console.log('scroll')
+  },
+  checkCodeDup(code){
+    var dup = false
+    var that = this
+    var rentals = that.data.rentals
+    for(var i = 0; rentals && i < rentals.length; i++){
+      var rental = rentals[i]
+      for(var j = 0; j < rental.rentItems.length; j++){
+        var item = rental.rentItems[j]
+        if (item.code == code){
+          dup = true
+          break
+        }
+      }
+      if (dup){
+        break
+      }
+    }
+    return dup
   }
 })
