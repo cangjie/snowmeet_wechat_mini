@@ -48,7 +48,9 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    var that = this
+    var startDate = util.formatDate(new Date())
+    that.setData({startDate})
   },
 
   /**
