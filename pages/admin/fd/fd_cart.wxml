@@ -111,8 +111,21 @@
     </fui-swipeaction-group>
     <fui-divider width="750rpx" text=""></fui-divider>
     <fui-row>
+      <fui-col span="5">
+        <view style="text-align: right;">【桌号】</view>
+      </fui-col>
+      <fui-col span="5">
+        <picker range="{{tableList}}" class="input">
+          <picker-view ><view sstyle="text-align: center;" >外带</view></picker-view>
+        </picker>
+      </fui-col>
+      <fui-col span="14">
+        <view style="text-align: right;margin-right: 25rpx;"></view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
       <fui-col span="19">
-        <view style="text-align: right;">总计商品数：</view>
+        <view style="text-align: right;">【总计商品数】</view>
       </fui-col>
       <fui-col span="5">
         <view style="text-align: right;margin-right: 25rpx;">{{totalCount}}</view>
@@ -120,7 +133,7 @@
     </fui-row>
     <fui-row>
       <fui-col span="19">
-        <view style="text-align: right;">总计金额：</view>
+        <view style="text-align: right;">【总计金额】</view>
       </fui-col>
       <fui-col span="5">
         <view style="text-align: right;margin-right: 25rpx;">{{totalSummaryStr}}</view>
@@ -128,7 +141,7 @@
     </fui-row>
     <fui-row>
       <fui-col span="19">
-        <view style="text-align: right;">总计减免：</view>
+        <view style="text-align: right;">【总计减免】</view>
       </fui-col>
       <fui-col span="5">
         <view style="text-align: right;margin-right: 25rpx;">{{totalDiscountStr}}</view>
@@ -136,7 +149,7 @@
     </fui-row>
     <fui-row>
       <fui-col span="19">
-        <view style="text-align: right;">需要支付：</view>
+        <view style="text-align: right;">【需要支付】</view>
       </fui-col>
       <fui-col span="5">
         <view style="text-align: right;margin-right: 25rpx;">{{totalChargeStr}}</view>

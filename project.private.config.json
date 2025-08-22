@@ -3,11 +3,24 @@
     "miniprogram": {
       "list": [
         {
+          "name": "collapse",
+          "pathName": "pages/test/collapse/collapse",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "OrderEntry",
           "pathName": "pages/order/order_entry",
+<<<<<<< HEAD
           "query": "orderId=60091",
           "scene": null,
           "launchMode": "default"
+=======
+          "query": "orderId=60037",
+          "launchMode": "default",
+          "scene": null
+>>>>>>> 52af3d671f5de867fd9c0378f7f5370aaa224bda
         },
         {
           "name": "fd_order_detail",

@@ -102,8 +102,6 @@
         <view class="view-detail">小计</view>
       </fui-col>
     </fui-row>
-
-
     <block wx:for="{{order.fdOrders}}">
       <view style="height: 50rpx;"></view>
       <fui-row>
@@ -124,6 +122,12 @@
         </fui-col>
       </fui-row>
       <view class="view-row">
+        <view>【桌号】</view>
+        <view>
+          ——
+        </view>
+      </view>
+      <view class="view-row">
         <view>【备注】</view>
         <view>
           <input id="{{index}}" class="input" bindinput="inputMemo" disabled="{{!item.editing}}" style="width: 560rpx;" placeholder="{{item.memo}}" value="{{item.editing? null : item.memo}}" />
@@ -143,6 +147,8 @@
         <view style="width: 187rpx;"></view>
         <view class="view-row" style="width: 188rpx;justify-content: center;">
           <fui-button id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+          <view style="margin-left: 50rpx;" ></view>
+          <fui-button margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 减 免 " color="#000000" background="#C0C0C0" ></fui-button>
         </view>
         <view class="view-row" style="width: 188rpx;justify-content: center;">
           <fui-button wx:if="{{item.logs.length > 1}}" id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="showLogs"></fui-button>
@@ -182,11 +188,13 @@
       </view>
       <view style="width: 187rpx;"></view>
     </view-->
-
-
-
   </fui-card>
   <view style="height: 50rpx;"></view>
+  <view class="view-row" style="justify-content: center;" >
+    <fui-button  btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="添加商品" background="#2EA6D0" bind:click="addNew"></fui-button>
+  </view>
+  <view style="height: 50rpx;"></view>
+
   <!--有历史记录的需要历史按钮，需哟修改按钮-->
   <fui-card full>
     <view class="view-row">
@@ -254,7 +262,7 @@
       <fui-col span="4">
         <view style="text-align: right;">{{order.orderDiscountAmountStr}}</view>
       </fui-col>
-      <fui-col span="11"></fui-col>
+      <fui-col span="11"><fui-button margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" ></fui-button></fui-col>
     </fui-row>
     <fui-row>
       <fui-col span="7">
@@ -463,7 +471,6 @@
             </fui-col>
           </fui-row>
         </block>
-        <!--fui-list-cell wx:for="{{itemList}}" wx:key="index">item{{index+1}}</fui-list-cell-->
       </scroll-view>
       <view class="fui-icon__close" bindtap="closeMemo">
         <fui-icon name="close" size="{{48}}"></fui-icon>
@@ -473,73 +480,129 @@
   <fui-bottom-popup show="{{showCharge}}" bindclose="closeCharge">
     <view class="fui-scroll__wrap">
       <view class="fui-title fui-title__pb">订单收款</view>
-      <fui-row>
-        <fui-col span="7">
-          <view>【结算金额】</view>
-        </fui-col>
-        <fui-col span="4">
-          <view style="text-align: right;">{{order.totalChargeStr}}</view>
-        </fui-col>
-        <fui-col span="11"></fui-col>
-      </fui-row>
-      <fui-row wx:if="{{order.paidAmount>0}}">
-        <fui-col span="7">
-          <view>【已付金额】</view>
-        </fui-col>
-        <fui-col span="4">
-          <view style="text-align: right;">{{order.paidAmountStr}}</view>
-        </fui-col>
-        <fui-col span="11"></fui-col>
-      </fui-row>
-      <fui-row>
-        <fui-col span="7">
-          <view>【收款类型】</view>
-        </fui-col>
-        <fui-col span="17">
-          <view class="view-row">
-            <radio-group bindchange="setPayType">
-              <radio value="整单支付" checked="{{customerPayType == '整单支付'}}">整单支付</radio>
-              <radio value="分付" style="margin-left: 50rpx;" checked="{{customerPayType == '分付'}}">分付</radio>
-            </radio-group>
+      <scroll-view scroll-y class="fui-scroll__view" style="height: 1000rpx;">
+        <fui-row>
+          <fui-col span="7">
+            <view>【结算金额】</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: right;">{{order.totalChargeStr}}</view>
+          </fui-col>
+          <fui-col span="11"></fui-col>
+        </fui-row>
+        <fui-row>
+          <fui-col span="7">
+            <view>【已付金额】</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: right;">{{order.paidAmountStr}}</view>
+          </fui-col>
+          <fui-col span="11"></fui-col>
+        </fui-row>
+        <fui-row>
+          <fui-col span="7">
+            <view>【还需支付】</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: right;">{{order.unpaidAmountStr}}</view>
+          </fui-col>
+          <fui-col span="11"></fui-col>
+        </fui-row>
+        <!--fui-row>
+          <fui-col span="7">
+            <view>【本次支付】</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: right;">{{order.currentPaidAmountStr}}</view>
+          </fui-col>
+          <fui-col span="11"></fui-col>
+        </fui-row-->
+        <fui-row>
+          <fui-col span="7">
+            <view>【剩余未付】</view>
+          </fui-col>
+          <fui-col span="4">
+            <view style="text-align: right;">{{order.remainUnPaidAmountStr}}</view>
+          </fui-col>
+          <fui-col span="11"></fui-col>
+        </fui-row>
+        <fui-row>
+          <fui-col span="7">
+            <view>【收款类型】</view>
+          </fui-col>
+          <fui-col span="17">
+            <view class="view-row">
+              <radio-group bindchange="setPayType">
+                <radio value="整单支付" checked="{{customerPayType == '整单支付'}}" disabled="{{paying}}">整单支付</radio>
+                <radio value="分付" style="margin-left: 50rpx;" checked="{{customerPayType == '分付'}}" disabled="{{paying}}">分付</radio>
+              </radio-group>
+            </view>
+          </fui-col>
+        </fui-row>
+        <block wx:if="{{customerPayType == '分付'}}">
+          <fui-swipeaction-group>
+            <fui-swipe-action id="{{index}}" bindclick="delPayList" wx:for="{{payList}}" disabled="{{index == payList.length - 1 || payList.length <= 2}}" >
+              <fui-card title="【支付{{index+1}}】" tag="{{item.OrderStatus}}">
+                <fui-row>
+                  <fui-col span="6">
+                    <view>支付金额</view>
+                  </fui-col>
+                  <fui-col span="17">
+                    <input wx:if="{{index < payList.length - 1}}" id="{{index}}" type="number" 
+                    bindinput="setPayListAmount" class="input" style="width: 100rpx;text-align: center;" 
+                    disabled="{{paying}}" value="{{item.amount}}" />
+                    <view wx:else>
+                      <view>{{item.amount == null? '' : (item.amount <= 0 ? '¥0.00' : item.amountStr)  }}</view>
+                    </view>
+                  </fui-col>
+                </fui-row>
+                <view style="height: 20rpx;"></view>
+                <fui-row>
+                  <fui-col span="6">
+                    <view>支付方式</view>
+                  </fui-col>
+                  <fui-col span="18">
+                    <radio-group id="{{index}}" class="view-row" bindchange="setPayMethodList">
+                      <radio value="微信支付" checked="{{item.payMethod == '微信支付'}}" style="font-size: 10pt;" disabled="{{paying || item.amount == null || item.amount <= 0}}">微信</radio>
+                      <radio value="支付宝" checked="{{item.payMethod == '支付宝'}}" style="font-size: 10pt;" disabled="{{paying || item.amount == null || item.amount <= 0 }}">支付宝</radio>
+                      <radio value="其它" checked="{{item.payMethod == '其它'}}" style="font-size: 10pt;" disabled="{{paying || item.amount == null || item.amount <= 0 }}">其它</radio>
+                      <radio value="挂账" checked="{{item.payMethod == '挂账'}}" disabled="{{true}}" style="font-size: 10pt;" disabled="{{paying || item.amount == null || item.amount <= 0 }}">挂账</radio>
+                    </radio-group>
+                  </fui-col>
+                </fui-row>
+                <view class="view-row" wx:if="{{item.OrderStatus == '待支付'}}" style="justify-content: center;margin-top: 10rpx;margin-bottom: 10rpx;">
+                  <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text="查看二维码" color="#000000" background="#C0C0C0" bind:click="addNewPayList" btnSize="medium" wx:if="{{paylistValid}}"></fui-button>
+                </view>
+              </fui-card>
+              </fui-swipe-action>
+          </fui-swipeaction-group>
+          <view style="height: 20rpx;"></view>
+          <view class="view-row" style="justify-content: center;">
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 新 增 " color="#000000" background="#C0C0C0" bind:click="addNewPayList" wx:if="{{paylistValid && !paying}}"></fui-button>
           </view>
-        </fui-col>
-      </fui-row>
-
-      <block wx:if="{{customerPayType == '分付'}}">
-        <view style="height: 20rpx;"></view>
-        <fui-row>
-          <fui-col span="7">
-            <view>【支付金额】</view>
-          </fui-col>
-          <fui-col span="17">
-            <input class="input" style="width: 100rpx;" />
-          </fui-col>
-        </fui-row>
-        <view style="height: 20rpx;"></view>
-        <fui-row>
-          <fui-col span="7">
-            <view>【支付备注】</view>
-          </fui-col>
-          <fui-col span="17">
-            <input class="input" style="width: 400rpx;" />
-          </fui-col>
-        </fui-row>
-      </block>
-      <view style="height: 20rpx;"></view>
-      <fui-row>
-        <fui-col span="7">
-          <view>【支付方式】</view>
-        </fui-col>
-        <fui-col span="17">
-          <radio-group class="view-row" bindchange="setPayMethod">
-            <radio value="微信支付" checked="{{payMethod == '微信支付'}}" disabled="{{paying || editingDiscount || totalCharge == 0}}">微信</radio>
-            <radio value="支付宝" checked="{{payMethod == '支付宝'}}" disabled="{{paying || editingDiscount || totalCharge == 0 }}">支付宝</radio>
-            <radio value="其它" checked="{{payMethod == '其它'}}" disabled="{{paying || editingDiscount || totalCharge == 0 }}">其它</radio>
-            <radio value="挂账" checked="{{payMethod == '挂账'}}" disabled="{{true}}">挂账</radio>
-          </radio-group>
-        </fui-col>
-      </fui-row>
-      <view style="height:  400rpx;"></view>
+          <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
+            <fui-button wx:if="{{paylistValid && !paying}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="confirmPayList"></fui-button>
+            <fui-button wx:if="{{paying}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="重新选择" color="#000000" background="#C0C0C0" bind:click="cancelPayList"></fui-button>
+          </view>
+        </block>
+        <block wx:else>
+          <view style="height: 20rpx;"></view>
+          <fui-row>
+            <fui-col span="7">
+              <view>【支付方式】</view>
+            </fui-col>
+            <fui-col span="17">
+              <radio-group class="view-row" bindchange="setPayMethod">
+                <radio value="微信支付" checked="{{payMethod == '微信支付'}}" disabled="{{paying || editingDiscount || totalCharge == 0}}">微信</radio>
+                <radio value="支付宝" checked="{{payMethod == '支付宝'}}" disabled="{{paying || editingDiscount || totalCharge == 0 }}">支付宝</radio>
+                <radio value="其它" checked="{{payMethod == '其它'}}" disabled="{{paying || editingDiscount || totalCharge == 0 }}">其它</radio>
+                <radio value="挂账" checked="{{payMethod == '挂账'}}" disabled="{{true}}">挂账</radio>
+              </radio-group>
+            </fui-col>
+          </fui-row>
+        </block>
+        <view style="height:  400rpx;"></view>
+      </scroll-view>
       <view class="fui-icon__close" bindtap="closeCharge">
         <fui-icon name="close" size="{{48}}"></fui-icon>
       </view>
@@ -612,7 +675,7 @@
         <view style="height: 25rpx;"></view>
         <fui-row wx:for="{{order.availablePayments}}">
           <fui-col span="2">
-            <checkbox></checkbox>
+            <checkbox checked="{{index == 0 && order.availablePayments.length == 1}}"></checkbox>
           </fui-col>
           <fui-col span="6">
             <view style="text-align: center;">{{item.paid_dateDate}}</view>
@@ -670,7 +733,7 @@
           <view style="text-align: center;">金额</view>
         </fui-col>
       </fui-row>
-      <fui-row wx:for="{{order.balances}}" >
+      <fui-row wx:for="{{order.balances}}">
         <fui-col span="6">
           <view style="text-align: center;">{{item.dateStr}}</view>
         </fui-col>
@@ -681,14 +744,13 @@
           <view style="text-align: center;">{{item.type}}</view>
         </fui-col>
         <fui-col span="5">
-          <view style="text-align: center;" >{{item.payMethod}}</view>
+          <view style="text-align: center;">{{item.payMethod}}</view>
         </fui-col>
         <fui-col span="4">
           <view style="text-align: center;">{{item.amountStr}}</view>
         </fui-col>
       </fui-row>
     </view>
-
     <view class="fui-icon__close" bindtap="closeBalance">
       <fui-icon name="close" size="{{48}}"></fui-icon>
     </view>

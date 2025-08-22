@@ -122,7 +122,6 @@
                 style="text-align: center;height: 50rpx;margin-top: 0rpx;width: 300rpx;" >
                 {{subPayMethodIndex? othersPayMethods[subPayMethodIndex] : '请选择…'}}
               </view>
-              <!--input wx:else class="input" placeholder="请填写支付方式" /-->
             </picker-view>
           </picker>
           <view wx:if="{{subPayMethodIndex && subPayMethodIndex == othersPayMethods.length - 1}}" class="view-row" >
@@ -137,7 +136,6 @@
     </view>
     <view style="height: 50rpx;"></view>
     <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
-      <!--fui-button wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" id="payLater" background="#00AA00" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="获取支付二维码" bind:click="showQrCode"  disabled="{{paying || totalCharge <= 0 || editing}}"  ></fui-button-->
       <fui-button wx:if="{{payMethod == '其它'}}" id="othersPayMethod" disabled="{{disabledConfirmPaidButton}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
     </view>
     <view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" >
@@ -147,11 +145,6 @@
         </view>
       </view>
     </view>
-    <!--view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" >
-      <view  style="display: flex;justify-content: center; align-items: center;height: 100rpx;flex-direction: column;margin-top: 50rpx;">
-        <fui-button wx:if="{{(payMethod == '微信支付' || payMethod == '支付宝') && paying }}" id="othersPayMethod"  btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="修改订单" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
-      </view>
-    </view-->
     <view style="height: 100rpx;" ></view>
   </view>
   <view wx:else>
