@@ -3,6 +3,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "collapse",
+          "pathName": "pages/test/collapse/collapse",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "OrderEntry",
           "pathName": "pages/order/order_entry",
           "query": "orderId=60037",

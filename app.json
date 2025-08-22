@@ -131,7 +131,8 @@
     "pages/order/order_entry",
     "pages/admin/fd/fd_order_list",
     "pages/admin/fd/fd_cart",
-    "pages/admin/fd/fd_order_detail"
+    "pages/admin/fd/fd_order_detail",
+    "pages/test/collapse/collapse"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -203,20 +204,16 @@
   ],
   "usingComponents": {
     "fui-button": "components/firstui/fui-button/fui-button",
-    "fui-collapse": "components/firstui/fui-collapse/fui-collapse",
-    "fui-collapse-item": "components/firstui/fui-collapse-item/fui-collapse-item",
     "fui-section": "components/firstui/fui-section/fui-section",
     "fui-card": "components/firstui/fui-card/fui-card",
     "fui-backdrop": "components/firstui/fui-backdrop/fui-backdrop",
     "fui-segmented-control": "components/firstui/fui-segmented-control/fui-segmented-control",
-    "fui-dialog": "components/firstui/fui-dialog/fui-dialog",
     "fui-list": "/components/firstui/fui-list/fui-list",
     "fui-list-cell": "/components/firstui/fui-list-cell/fui-list-cell",
     "fui-swipeaction-group": "/components/firstui/fui-swipeaction-group/fui-swipeaction-group",
     "fui-swipe-action": "/components/firstui/fui-swipe-action/fui-swipe-action",
     "fui-row": "/components/firstui/fui-row/fui-row",
     "fui-col": "/components/firstui/fui-col/fui-col",
-    "fui-tabs": "/components/firstui/fui-tabs/fui-tabs",
     "rent-recept-package": "/components/rent/recept_package",
     "rent-recept-item": "/components/rent/recept_item",
     "mp-cells": "weui-miniprogram/cells/cells",
@@ -227,9 +224,10 @@
     "fui-icon": "components/firstui/fui-icon/fui-icon",
     "mp-vtabs": "@miniprogram-component-plus/vtabs",
     "mp-vtabs-content": "@miniprogram-component-plus/vtabs-content",
-    "fui-textarea": "components/firstui/fui-textarea/fui-textarea",
     "fui-white-space": "components/firstui/fui-white-space/fui-white-space",
     "fui-bottom-popup": "components/firstui/fui-bottom-popup/fui-bottom-popup",
-    "fui-divider": "components/firstui/fui-divider/fui-divider"
+    "fui-divider": "components/firstui/fui-divider/fui-divider",
+    "van-collapse" : "@vant/weapp/collapse/index",
+    "van-collapse-item" : "@vant/weapp/collapse-item/index"
   }
 }
