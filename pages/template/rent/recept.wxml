@@ -46,7 +46,7 @@
               <view class="right-column"></view>
             </view>
             <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
-              <van-button plain type="primary" bind:click="showPackage" id="{{index}}">
+              <van-button plain type="primary" bind:click="showItem" id="{{index}}">
                 设置 押金 租金 起租时间等
               </van-button>
             </view>
@@ -77,7 +77,7 @@
                 <view class="right-column"></view>
               </view>
               <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
-                <van-button plain type="primary" bind:click="showItem" id="{{index}}">设置 押金 租金 起租时间等 </van-button>
+                <van-button plain type="primary" bind:click="showPackage" id="{{index}}">设置 押金 租金 起租时间等 </van-button>
               </view>
             </view>
           </view>
@@ -168,10 +168,7 @@
     <fui-card title="套餐名称：{{currentRental.name}}" tag="aaa">
       <view class="fui-card__content" style="width: 650rpx;">
         <fui-tabs tabs="{{currentRental.menu}}" isDot scroll alignLeft size="22" current="{{currentRental.currentMenuIndex}}"></fui-tabs>
-        <!--view class="view-row" >
-          <view class="left-column" >品类：</view>
-          <view class="right-column" >{{currentItem.categoryName}}</view>
-        </view-->
+       
         <view class="view-row">
           <view class="left-column" style="width: 150rpx;">无码物品：</view>
           <view class="right-column" style="width: 500rpx;">
