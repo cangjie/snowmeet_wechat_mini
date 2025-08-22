@@ -109,15 +109,13 @@ Component({
         tabInactiveBgColor: { type: String, value: '#eeeeee' },
         tabActiveBgColor: { type: String, value: '#ffffff' },
         activeTab: { type: Number, value: 0 },
-        animation: { type: Boolean, value: true },
-        height: { type: Number, value: 1200 }
+        animation: { type: Boolean, value: true }
     },
     data: {
         currentView: 0,
         contentScrollTop: 0,
         _heightRecords: [],
-        _contentHeight: {},
-        height: 1000
+        _contentHeight: {}
     },
     observers: {
         activeTab: function activeTab(_activeTab) {
@@ -146,10 +144,7 @@ Component({
         }
     },
     lifetimes: {
-        attached: function attached() {
-          var that = this
-          that.setData({height: that.properties.height})
-        }
+        attached: function attached() {}
     },
     methods: {
         calcHeight: function calcHeight() {

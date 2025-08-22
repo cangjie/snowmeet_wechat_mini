@@ -3,6 +3,20 @@
     "miniprogram": {
       "list": [
         {
+          "name": "租赁接待",
+          "pathName": "pages/template/rent/recept",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
+          "name": "collapse",
+          "pathName": "pages/test/collapse/collapse",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "OrderEntry",
           "pathName": "pages/order/order_entry",
           "query": "orderId=60037",

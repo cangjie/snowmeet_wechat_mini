@@ -131,7 +131,9 @@
     "pages/order/order_entry",
     "pages/admin/fd/fd_order_list",
     "pages/admin/fd/fd_cart",
-    "pages/admin/fd/fd_order_detail"
+    "pages/admin/fd/fd_order_detail",
+    "pages/test/collapse/collapse",
+    "pages/template/rent/recept"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -139,7 +141,6 @@
     "navigationBarTitleText": "WeChat",
     "navigationBarTextStyle": "black"
   },
-  "style": "v2",
   "sitemapLocation": "sitemap.json",
   "plugins": {
     "ocr-plugin": {
@@ -230,6 +231,10 @@
     "fui-textarea": "components/firstui/fui-textarea/fui-textarea",
     "fui-white-space": "components/firstui/fui-white-space/fui-white-space",
     "fui-bottom-popup": "components/firstui/fui-bottom-popup/fui-bottom-popup",
-    "fui-divider": "components/firstui/fui-divider/fui-divider"
+    "fui-divider": "components/firstui/fui-divider/fui-divider",
+    "van-collapse": "@vant/weapp/collapse/index",
+    "van-collapse-item": "@vant/weapp/collapse-item/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "@vant/weapp/icon/index"
   }
 }

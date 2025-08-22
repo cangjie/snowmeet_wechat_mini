@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "rent_charge": "/components/rent/rent_charge"
+  }
+}

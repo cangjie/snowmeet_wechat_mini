@@ -4,7 +4,6 @@
       scroll-y
       class="weui-vtabs-bar__scrollview"
       scroll-into-view="weui-vtabs-item__{{currentView}}"
-      style="height: {{height}}rpx;"
     >
       <view class="weui-vtabs-bar__content">
         <block wx:for="{{vtabs}}" wx:key="title">
@@ -30,7 +29,6 @@
       scroll-top="{{contentScrollTop}}"
       scroll-with-animation="{{animation}}"
       bindscroll="handleContentScroll"
-      style="height: {{height}}rpx;"
     >
       <view class="weui-vtabs-content">
         <slot ></slot>
