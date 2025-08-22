@@ -102,8 +102,6 @@
         <view class="view-detail">小计</view>
       </fui-col>
     </fui-row>
-
-
     <block wx:for="{{order.fdOrders}}">
       <view style="height: 50rpx;"></view>
       <fui-row>
@@ -149,6 +147,8 @@
         <view style="width: 187rpx;"></view>
         <view class="view-row" style="width: 188rpx;justify-content: center;">
           <fui-button id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"></fui-button>
+          <view style="margin-left: 50rpx;" ></view>
+          <fui-button margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 减 免 " color="#000000" background="#C0C0C0" ></fui-button>
         </view>
         <view class="view-row" style="width: 188rpx;justify-content: center;">
           <fui-button wx:if="{{item.logs.length > 1}}" id="{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 历 史 " color="#000000" background="#C0C0C0" bind:click="showLogs"></fui-button>
@@ -262,7 +262,7 @@
       <fui-col span="4">
         <view style="text-align: right;">{{order.orderDiscountAmountStr}}</view>
       </fui-col>
-      <fui-col span="11"></fui-col>
+      <fui-col span="11"><fui-button margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" ></fui-button></fui-col>
     </fui-row>
     <fui-row>
       <fui-col span="7">

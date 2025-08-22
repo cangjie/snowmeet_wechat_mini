@@ -6,7 +6,8 @@ Page({
    * Page initial data
    */
   data: {
-    editing: false
+    editing: false,
+    tableList:['1', '2','3','4']
   },
   /**
    * Lifecycle function--Called when page load

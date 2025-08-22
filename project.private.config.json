@@ -6,8 +6,8 @@
           "name": "OrderEntry",
           "pathName": "pages/order/order_entry",
           "query": "orderId=60037",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "fd_order_detail",
