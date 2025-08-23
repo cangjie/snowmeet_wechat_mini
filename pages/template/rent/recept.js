@@ -12,7 +12,7 @@ Page({
     categorySelectIndex: undefined,
     categorySelectText: '',
     packageSelectIndex: undefined,
-    rentals:[],
+    rentals: [],
     defaultTextColor: '#000000',
     showBackdrop: false,
     action: '',
@@ -39,7 +39,7 @@ Page({
       id: 6,
       name: 'segmented6'
     }],
-    propertyObj:{
+    propertyObj: {
       a: 1, b: 'aaa'
     }
   },
@@ -50,7 +50,7 @@ Page({
   onLoad(options) {
     var that = this
     var startDate = util.formatDate(new Date())
-    that.setData({startDate})
+    that.setData({ startDate })
   },
 
   /**
@@ -65,10 +65,10 @@ Page({
    */
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function (resolve){
+    app.loginPromiseNew.then(function (resolve) {
       that.getCatagories()
       that.getPackageList()
-      that.setData({windowHeight: app.globalData.windowInfo.screenHeight})
+      that.setData({ windowHeight: app.globalData.windowInfo.screenHeight })
     })
   },
 
@@ -106,89 +106,88 @@ Page({
   onShareAppMessage() {
 
   },
-  getCatagories()
-  {
+  getCatagories() {
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Rent/GetAllCategoryList'
-    util.performWebRequest(getUrl, null).then(function(resovle){
+    util.performWebRequest(getUrl, null).then(function (resovle) {
       var categories = resovle
       console.log('get categories', categories)
       var categoryPickerArr = []
       categoryPickerArr.push(categories)
-      that.setData({categoryPickerArr, categories})
+      that.setData({ categoryPickerArr, categories })
       that.selCategory(0, 0)
     })
   },
-  selCategory(column, value){
+  selCategory(column, value) {
     var that = this
     that.data.maxCategoryColIndex = Math.max(column, that.data.maxCategoryColIndex)
     var categories = that.data.categories
     var categoryPickerArrOld = that.data.categoryPickerArr
     var categoryPickerArr = []
-    for(var i = 0; i <= column; i++){
+    for (var i = 0; i <= column; i++) {
       categoryPickerArr.push(categoryPickerArrOld[i])
     }
     var currentCategoryList = categoryPickerArr[column]
-    if (!currentCategoryList || currentCategoryList.length <= value){
+    if (!currentCategoryList || currentCategoryList.length <= value) {
       value = 0
     }
     var currentCategory = currentCategoryList[value]
-    if (currentCategory.children){
+    if (currentCategory.children) {
       categoryPickerArr.push(currentCategory.children)
       that.data.categoryPickerArr = categoryPickerArr
       that.selCategory(column + 1, 0)
     }
-    else{
-      for(var i = column; i < that.data.maxCategoryColIndex; i++){
+    else {
+      for (var i = column; i < that.data.maxCategoryColIndex; i++) {
         categoryPickerArr.push([])
       }
-      that.setData({categoryPickerArr})
+      that.setData({ categoryPickerArr })
       if (column == 0 && value == 13)
         console.log('13')
     }
   },
-  catePickerColChange(e){
+  catePickerColChange(e) {
     var that = this
     console.log('sel col change', e)
     that.selCategory(e.detail.column, e.detail.value)
   },
-  selectCategoryOk(e){
+  selectCategoryOk(e) {
     console.log('sel ok', e)
     var that = this
     var categorySelectIndex = e.detail.value
     var categorySelectText = ''
     var categoryPickerArr = that.data.categoryPickerArr
-    for(var i = 0; i < categorySelectIndex.length; i++){
+    for (var i = 0; i < categorySelectIndex.length; i++) {
       var txt = ''
-      if (i < categoryPickerArr.length && categorySelectIndex[i] < categoryPickerArr[i].length){
+      if (i < categoryPickerArr.length && categorySelectIndex[i] < categoryPickerArr[i].length) {
         txt = categoryPickerArr[i][categorySelectIndex[i]].name
       }
-      if (txt!=''){
+      if (txt != '') {
         categorySelectText += ((categorySelectText == '' ? '' : ' > ') + txt)
       }
     }
-    that.setData({categorySelectIndex, categorySelectText})
+    that.setData({ categorySelectIndex, categorySelectText })
   },
-  selectType(e){
+  selectType(e) {
     console.log('sel type', e)
     var that = this
-    that.setData({type: e.detail.value})
+    that.setData({ type: e.detail.value })
   },
-  getPackageList(){
+  getPackageList() {
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList'
-    util.performWebRequest(getUrl, null).then(function(resolve){
+    util.performWebRequest(getUrl, null).then(function (resolve) {
       console.log('get package list', resolve)
-      that.setData({packageList: resolve})
+      that.setData({ packageList: resolve })
     })
   },
-  selectPackage(e){
+  selectPackage(e) {
     var that = this
-    that.setData({packageSelectIndex: e.detail.value})
+    that.setData({ packageSelectIndex: e.detail.value })
     var packageList = that.data.packageList
     var selectedPackage = packageList[that.data.packageSelectIndex]
     var getPackageUrl = app.globalData.requestPrefix + 'Rent/GetRentPackage/' + selectedPackage.id
-    util.performWebRequest(getPackageUrl, null).then(function (resovle){
+    util.performWebRequest(getPackageUrl, null).then(function (resovle) {
       selectedPackage = resovle
       console.log('package to add', selectedPackage)
       var rental = {
@@ -201,10 +200,11 @@ Page({
         realDepositStr: util.showAmount(selectedPackage.deposit)
       }
       var items = []
-      for(var i = 0; i < selectedPackage.categories.length; i++){
+      for (var i = 0; i < selectedPackage.categories.length; i++) {
         var item = {
           id: 0,
           rental_id: 0,
+          noCode: false,
           categoryName: selectedPackage.categories[i].name,
           name: null,
           code: null,
@@ -216,29 +216,29 @@ Page({
       var rentals = that.data.rentals
       rentals.push(rental)
       console.log('rentals', rentals)
-      that.setData({type: null, packageSelectIndex: null})
+      that.setData({ type: null, packageSelectIndex: null })
       that.renderData(rentals)
     })
   },
-  del(e){
+  del(e) {
     var that = this
     console.log('del click', e)
     var id = parseInt(e.currentTarget.id)
     var rentals = that.data.rentals
     var newRentals = []
-    for(var i = 0; i < rentals.length; i++){
-      if (i != id){
+    for (var i = 0; i < rentals.length; i++) {
+      if (i != id) {
         newRentals.push(rentals[i])
       }
     }
-    that.setData({rentals: newRentals})
+    that.setData({ rentals: newRentals })
   },
 
 
-  inputBarcode(e){
+  inputBarcode(e) {
     var that = this
     var barCode = e.detail.value
-    that.setData({barCode})
+    that.setData({ barCode })
     /*
     if (barCode.length >= 3){
       setTimeout(()=>{
@@ -255,26 +255,53 @@ Page({
     }
     */
   },
-  
-  
-  searchBarcode(){
+  addNewBlank() {
+    var that = this
+    var rental = {
+      id: 0,
+      order_id: null,
+      package_id: null,
+      name: '',
+      valid: 0,
+      realDeposit: 0,
+      realDepositStr: '——'
+    }
+    var items = []
+    var item = {
+      id: 0,
+      noCode: false,
+      rental_id: 0,
+      category_id: null,
+      name: '',
+      categoryName: '',
+      code: '',
+      rent_product_id: null
+    }
+    items.push(item)
+    rental.rentItems = items
+    var rentals = that.data.rentals
+    rentals.push(rental)
+    that.renderData(rentals)
+  },
+
+  searchBarcode() {
     var that = this
     console.log('bar code is: ', that.data.barCode)
     var barCode = that.data.barCode
-    if (that.checkCodeDup(barCode)){
+    if (that.checkCodeDup(barCode)) {
       wx.showToast({
         title: '编码不可重复',
         icon: 'error'
       })
       return
     }
-    that.setData({querying: true})
+    that.setData({ querying: true })
     var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByBarcode/' + barCode
-    util.performWebRequest(searchUrl, null).then(function (resolve){
+    util.performWebRequest(searchUrl, null).then(function (resolve) {
       var rentProduct = resolve
-      
+
       console.log('rent product', rentProduct)
-      that.setData({barCodeInputing: false})
+      that.setData({ barCodeInputing: false })
       var rental = {
         id: 0,
         order_id: null,
@@ -288,7 +315,8 @@ Page({
       var item = {
         id: 0,
         rental_id: 0,
-        category_id:  rentProduct.category.id,
+        noCode: false,
+        category_id: rentProduct.category.id,
         name: rentProduct.name,
         categoryName: rentProduct.category.name,
         code: rentProduct.barcode,
@@ -299,14 +327,14 @@ Page({
       var rentals = that.data.rentals
       rentals.push(rental)
       console.log('rentals', rentals)
-      that.setData({type: null, packageSelectIndex: null, barCodeInputing: false, barCode: null, querying:false})
+      that.setData({ type: null, packageSelectIndex: null, barCodeInputing: false, barCode: null, querying: false })
       that.renderData(rentals)
-    }).catch(function(reject){
-      that.setData({querying: false})
+    }).catch(function (reject) {
+      that.setData({ querying: false })
     })
   },
-  
-  renderData(rentals){
+
+  renderData(rentals) {
     var that = this
     //var rentals = that.data.rentals
     var packageCommonBackgroud = '#F0F0F0'
@@ -314,115 +342,139 @@ Page({
     var packageCommonTextColor = '#000000'
     var itemCommonColor = '#000000'
     var itemIndex = 1
-    for(var i = 0; i < rentals.length; i++){
+    for (var i = 0; i < rentals.length; i++) {
       var rental = rentals[i]
-      if (rental.package_id){
+      if (rental.package_id) {
         rental.backgroundColor = packageCommonBackgroud
         rental.textColor = packageCommonTextColor
       }
-      else{
+      else {
         rental.backgroundColor = productCommonBackgroud
       }
-      for(var j = 0; j < rental.rentItems.length; j++){
+      for (var j = 0; j < rental.rentItems.length; j++) {
         var item = rental.rentItems[j]
         item.itemIndex = itemIndex
         itemIndex++
         item.textColor = itemCommonColor
-        if (!item.rent_product_id){
+        if (!item.rent_product_id) {
           item.textColor = 'red'
         }
       }
     }
     console.log('render rentals', rentals)
-    that.setData({rentals})
+    that.setData({ rentals })
   },
-  showPackageItem(e){
+  showPackageItem(e) {
     var that = this
     var id = e.currentTarget.id
     var rentals = that.data.rentals
     var currentRental = null
     var currentItem = null
-    for(var i = 0; i < rentals.length; i++){
+    for (var i = 0; i < rentals.length; i++) {
       var rental = rentals[i]
-      for(var j = 0; j < rental.rentItems.length; j++){
+      for (var j = 0; j < rental.rentItems.length; j++) {
         var item = rental.rentItems[j];
-        if (parseInt(id)==item.itemIndex){
+        if (parseInt(id) == item.itemIndex) {
           currentItem = item
           currentRental = rental
           break
         }
       }
     }
-    if (currentRental != null && currentItem != null){
+    if (currentRental != null && currentItem != null) {
       currentRental.menu = that.getRentalItemMenus(currentRental)
       currentRental.currentMenuIndex = 0
-      that.setData({currentRental, currentItem, showBackdrop: true, action: 'packageItem'})
+      that.setData({ currentRental, currentItem, showBackdrop: true, action: 'packageItem' })
     }
   },
-  showPackage(e){
+  showPackage(e) {
     var that = this
     var id = e.currentTarget.id
     var rentals = that.data.rentals
     var currentRental = rentals[parseInt(id)]
-    if (currentRental != null){
-      that.setData({currentRental, showBackdrop: true, action: 'package'})
+    if (currentRental != null) {
+      that.setData({ currentRental, showBackdrop: true, action: 'package' })
     }
   },
-  getRentalItemMenus(rental){
+  getRentalItemMenus(rental) {
     var items = rental.rentItems
     var menu = []
-    for(var i = 0; i < items.length; i++){
+    for (var i = 0; i < items.length; i++) {
       var item = items[i]
       var menuItem = {
         id: i,
         name: item.categoryName,
-        badge: (item.name || item.code)? 0 : 1
+        badge: (item.name || item.code) ? 0 : 1
       }
       menu.push(menuItem)
     }
     return menu
   },
-  showItem(e){
+  showItem(e) {
     var that = this
     var id = e.currentTarget.id
     var rentals = that.data.rentals
     var currentRental = rentals[parseInt(id)]
-    that.setData({currentRental, showBackdrop: true, action: 'item', currentRentalNum: 100})
+    that.setData({ currentRental, showBackdrop: true, action: 'item', currentRentalNum: 100 })
   },
-  cancelBackdrop(e){
+  cancelBackdrop(e) {
     var that = this
-    that.setData({showBackdrop: false, action: null, currentRental: null, currentItem: null})
+    that.setData({ showBackdrop: false, action: null, currentRental: null, currentItem: null })
   },
-  switchGuarantyRental(e){
+  switchGuarantyRental(e) {
     var that = this
     console.log('switch', e)
-    if (e.detail.index == 0){
-      that.setData({displayRental: false})
+    if (e.detail.index == 0) {
+      that.setData({ displayRental: false })
     }
     else {
-      that.setData({displayRental: true})
+      that.setData({ displayRental: true })
     }
   },
-  scroll(e){
+  scroll(e) {
     console.log('scroll')
   },
-  checkCodeDup(code){
+  checkCodeDup(code) {
     var dup = false
     var that = this
     var rentals = that.data.rentals
-    for(var i = 0; rentals && i < rentals.length; i++){
+    for (var i = 0; rentals && i < rentals.length; i++) {
       var rental = rentals[i]
-      for(var j = 0; j < rental.rentItems.length; j++){
+      for (var j = 0; j < rental.rentItems.length; j++) {
         var item = rental.rentItems[j]
-        if (item.code == code){
+        if (item.code == code) {
           dup = true
           break
         }
       }
-      if (dup){
+      if (dup) {
         break
       }
     }
     return dup
+  },
+  getItemByIndex(index) {
+    var that = this
+    var rentals = that.data.rentals
+    var returnItem = null
+    for (var i = 0; returnItem == null && i < rentals.length; i++) {
+      var rental = rentals[i]
+      var returnItem = null
+      for (var j = 0; returnItem == null && j < rental.rentItems.length; j++) {
+        var item = rental.rentItems[j]
+        if (index == item.itemIndex) {
+          returnItem = item
+        }
+      }
+    }
+    return returnItem
+  },
+  setNoCode(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var item = that.getItemByIndex(id)
+    item.noCode = e.detail.value.length == 0? false: true
+    that.setData({rentals: that.data.rentals})
+    console.log('get item', item)
   }
 })

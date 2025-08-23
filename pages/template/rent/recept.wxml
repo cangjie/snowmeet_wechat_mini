@@ -5,21 +5,28 @@
         <view style="height: 50rpx;"></view>
         <view wx:if="{{rental.package_id == null || rental.package_id == undefined}}" class="view-row">
           <view class="number-label" style="margin-top: 100rpx;font-size: 9pt;">【{{rental.rentItems[0].itemIndex}}】</view>
-          <view style="width: 650rpx; background-color: #F0F0F0;">
+          <view style="width: 650rpx; background-color: #FFF0F0;">
             <view class="view-row">
               <view class="left-column">【编码】</view>
-              <view class="right-column">{{rental.rentItems[0].code}}</view>
+              <view class="right-column view-row">
+                <view style="width: 155rpx;"   ></view>
+                <view style="width: 155rpx;"   >
+                  {{rental.rentItems[0].code}}
+                </view>
+                <view style="width: 10rpx;" >
+                <van-icon name="scan" size="19px" />
+              </view>
+              </view>
               <view class="left-column">【无编码】</view>
               <view class="right-column">
-                <checkbox-group id="index">
-                  <checkbox checked="{{item.noCode}}">是</checkbox>
+                <checkbox-group id="{{rental.rentItems[0].itemIndex}}" bindchange="setNoCode">
+                  <checkbox checked="{{rental.rentItems[0].noCode}}" value="1" >是</checkbox>
                 </checkbox-group>
               </view>
             </view>
             <view class="view-row">
               <view class="left-column">【品类】</view>
               <view class="right-column right-column1">{{rental.rentItems[0].categoryName}}</view>
-
             </view>
             <view class="view-row">
               <view class="left-column">【名称】</view>
@@ -67,7 +74,7 @@
             </view>
 
             <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
-              <van-button plain type="primary" bind:click="showItem" id="{{index}}">
+              <van-button plain type="primary" disabled="{{rental.rentItems[0].category_id == null}}" bind:click="showItem" id="{{index}}">
                 设置 押金 租金 起租时间等
               </van-button>
             </view>
@@ -76,9 +83,9 @@
         <block wx:else>
           <view class="view-row">
             <view class="number-label"></view>
-            <view style="width: 650rpx;background-color: #F0F0F0;">
+            <view style="width: 650rpx;background-color: #F0FFF0;">
               <view class="view-row">
-                <view class="left-column">【名称】</view>
+                <view class="left-column">【套餐】</view>
                 <view class="right-column right-column1">{{rental.name}}</view>
               </view>
               <view class="view-row" style="margin-bottom: 20rpx;">
@@ -121,7 +128,7 @@
             </view>
             <view class="view-row">
               <view class="number-label" style="margin-top: 50rpx;font-size: 9pt;">【{{item.itemIndex}}】</view>
-              <view style="width: 650rpx; background-color: #F0F0F0;" bindtap="showPackageItem" id="{{item.itemIndex}}">
+              <view style="width: 650rpx; background-color: #F0FFF0;"  id="{{item.itemIndex}}">
                 <view class="view-row" style="margin-bottom: 20rpx;">
                   <view class="left-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">【编码】</view>
                   <view class="right-column view-row" style="color:{{item.textColor?item.textColor:defaultTextColor}};margin-right: 10rpx;">
@@ -130,8 +137,8 @@
                   </view>
                   <view class="left-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">【无编码】</view>
                   <view class="right-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">
-                    <checkbox-group id="index">
-                      <checkbox checked="{{item.noCode}}">是</checkbox>
+                    <checkbox-group id="index" id="{{item.itemIndex}}" bindchange="setNoCode" >
+                      <checkbox checked="{{item.noCode}}" value="1" >是</checkbox>
                     </checkbox-group>
                   </view>
                 </view>
@@ -186,15 +193,9 @@
             </view>
             <view style="margin-top: 20rpx; display: flex;justify-content: center;">
               <van-button type="primary" disabled="{{!barCode || barCode.length == 0 || querying}}" bind:click="searchBarcode"> 确 认 </van-button>
-              <van-button type="info" style="margin-left: 50rpx;">添加无码单品</van-button>
-              <!--button class="input" style="padding-top: 0rpx;height: 100rpx;"  disabled="{{type != '单品' || barCodeInputing}}" >直接新增单品</button-->
+              <van-button type="info" style="margin-left: 50rpx;" bind:click="addNewBlank">添加无码单品</van-button>
             </view>
           </view>
-          <!--picker style="margin-left: 50rpx;width: 480rpx" class="input" mode="multiSelector" 
-          range="{{categoryPickerArr}}" range-key="name" disabled="{{type == '套餐'}}"
-          bindcolumnchange="catePickerColChange" bindchange="selectCategoryOk" >
-            <picker-view>{{categorySelectIndex == undefined ? '请选择': categorySelectText}}</picker-view>
-          </picker-->
         </view>
       </radio-group>
     </view>
@@ -205,7 +206,6 @@
     <fui-card title="套餐名称：{{currentRental.name}}" tag="aaa">
       <view class="fui-card__content" style="width: 650rpx;">
         <fui-tabs tabs="{{currentRental.menu}}" isDot scroll alignLeft size="22" current="{{currentRental.currentMenuIndex}}"></fui-tabs>
-
         <view class="view-row">
           <view class="left-column" style="width: 150rpx;">无码物品：</view>
           <view class="right-column" style="width: 500rpx;">
