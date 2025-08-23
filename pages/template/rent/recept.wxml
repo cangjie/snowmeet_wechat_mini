@@ -9,27 +9,36 @@
             <view class="view-row">
               <view class="left-column">【编码】</view>
               <view class="right-column view-row">
-                <view style="width: 150rpx;"   >
-                  {{rental.rentItems[0].code}}
-                </view>
-                <view style="width: 10rpx;" >
-                <van-icon name="scan" size="19px" />
-              </view>
+                <view style="width: 150rpx;" wx:if="{{rental.rentItems[0].noCode}}">——</view>
+                <block wx:else>
+                  <view style="width: 150rpx;">
+                    <input class="input" style="width: 145rpx;" value="{{rental.rentItems[0].code==null?'':rental.rentItems[0].code}}" />
+                  </view>
+                  <van-icon name="scan" size="19px" />
+                </block>
               </view>
               <view class="left-column">【无编码】</view>
               <view class="right-column">
                 <checkbox-group id="{{rental.rentItems[0].itemIndex}}" bindchange="setNoCode">
-                  <checkbox checked="{{rental.rentItems[0].noCode}}" value="1" >是</checkbox>
+                  <checkbox checked="{{rental.rentItems[0].noCode}}" value="1">是</checkbox>
                 </checkbox-group>
               </view>
             </view>
             <view class="view-row">
               <view class="left-column">【品类】</view>
-              <view class="right-column right-column1">{{rental.rentItems[0].categoryName}}</view>
+              <view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
+                <picker style="width: 480rpx" class="input" mode="multiSelector" range="{{categoryPickerArr}}" range-key="name" disabled="{{type == '套餐'}}" bindcolumnchange="catePickerColChange" bindchange="selectCategoryOk">
+                  <picker-view>{{categorySelectIndex == undefined ? '请选择': categorySelectText}}</picker-view>
+                </picker>
+              </view>
+              <view class="right-column right-column1" wx:else>{{rental.rentItems[0].categoryName}}</view>
             </view>
             <view class="view-row">
               <view class="left-column">【名称】</view>
-              <view class="right-column right-column1">{{rental.name}}</view>
+              <view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
+                <input class="input" style="width: 450rpx;" value="{{rental.rentItems[0].name == null? '' : rental.rentItems[0].name}}" />
+              </view>
+              <view class="right-column right-column1" wx:else>{{rental.rentItems[0].name}}</view>
             </view>
             <view class="view-row">
               <view class="left-column"></view>
@@ -119,26 +128,33 @@
             </view>
           </view>
           <block wx:for="{{rental.rentItems}}">
-            <view class="view-row">
+            <!--view class="view-row">
               <view class="number-label"></view>
               <view class="seperator">
                 <view class="seperator-line"></view>
               </view>
-            </view>
+            </view-->
+
             <view class="view-row">
               <view class="number-label" style="margin-top: 50rpx;font-size: 9pt;">【{{item.itemIndex}}】</view>
-              <view style="width: 650rpx; background-color: #F0FFF0;"  id="{{item.itemIndex}}">
+
+              <view style="width: 650rpx; background-color: #F0FFF0;" id="{{item.itemIndex}}">
                 <view class="view-row" style="margin-bottom: 20rpx;">
+
                   <view class="left-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">【编码】</view>
                   <view class="right-column view-row" style="color:{{item.textColor?item.textColor:defaultTextColor}};margin-right: 10rpx;">
-                    
-                    <view style="width: 150rpx;">{{item.code?item.code:''}}</view>
-                    <van-icon name="scan" size="19px" />
+                    <view style="width: 150rpx;" wx:if="{{item.noCode}}">——</view>
+                    <block wx:else>
+                      <view style="width: 150rpx;">
+                        <input class="input" style="width: 145rpx;" value="{{item.code?item.code:''}}" />
+                      </view>
+                      <van-icon name="scan" size="19px" />
+                    </block>
                   </view>
                   <view class="left-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">【无编码】</view>
                   <view class="right-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">
-                    <checkbox-group id="index" id="{{item.itemIndex}}" bindchange="setNoCode" >
-                      <checkbox checked="{{item.noCode}}" value="1" >是</checkbox>
+                    <checkbox-group id="index" id="{{item.itemIndex}}" bindchange="setNoCode">
+                      <checkbox checked="{{item.noCode}}" value="1">是</checkbox>
                     </checkbox-group>
                   </view>
                 </view>
@@ -148,7 +164,10 @@
                 </view>
                 <view class="view-row">
                   <view class="left-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">【名称】</view>
-                  <view class="right-column right-column1" style="color:{{item.textColor?item.textColor:defaultTextColor}}">{{item.name?item.name:''}}</view>
+                  <view class="right-column right-column1" wx:if="{{item.noCode}}">
+                    <input class="input" style="width: 450rpx;" value="{{item.name == null? '' : item.name}}" />
+                  </view>
+                  <view class="right-column right-column1" wx:else>{{item.name == null? '' : item.name}}</view>
                 </view>
                 <view class="view-row" style="margin-bottom: 10rpx;">
                   <view class="left-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">【不需要】</view>
@@ -165,7 +184,10 @@
                     </checkbox-group>
                   </view>
                 </view>
+                <van-divider hairline  customStyle="color: #1989fa; border-color: #1989fa; font-size: 18px;"></van-divider>
+
               </view>
+
             </view>
           </block>
         </block>

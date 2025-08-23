@@ -269,7 +269,7 @@ Page({
     var items = []
     var item = {
       id: 0,
-      noCode: false,
+      noCode: true,
       rental_id: 0,
       category_id: null,
       name: '',
