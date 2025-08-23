@@ -9,8 +9,7 @@
             <view class="view-row">
               <view class="left-column">【编码】</view>
               <view class="right-column view-row">
-                <view style="width: 155rpx;"   ></view>
-                <view style="width: 155rpx;"   >
+                <view style="width: 150rpx;"   >
                   {{rental.rentItems[0].code}}
                 </view>
                 <view style="width: 10rpx;" >
@@ -132,6 +131,7 @@
                 <view class="view-row" style="margin-bottom: 20rpx;">
                   <view class="left-column" style="color:{{item.textColor?item.textColor:defaultTextColor}}">【编码】</view>
                   <view class="right-column view-row" style="color:{{item.textColor?item.textColor:defaultTextColor}};margin-right: 10rpx;">
+                    
                     <view style="width: 150rpx;">{{item.code?item.code:''}}</view>
                     <van-icon name="scan" size="19px" />
                   </view>
