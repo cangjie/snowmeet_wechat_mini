@@ -3,7 +3,7 @@ Component({
     rentItem: Object
   },
   data: {
-    activeNames: ['1']
+    activeNames: ['1', '2', '3']
   },
   lifetimes:{
     ready(){

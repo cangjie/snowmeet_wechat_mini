@@ -1,80 +1,68 @@
 <view style="width: 650rpx;margin-left: 0rpx; margin-right: 0rpx;">
   <van-collapse value="{{ activeNames }}" bind:change="onChange">
-    <van-collapse-item title="标题1" name="1">
-      代码是写出来给人看的，附带能在机器上运行
-    </van-collapse-item>
-    <van-collapse-item title="标题2" name="2">
-      代码是写出来给人看的，附带能在机器上运行
-    </van-collapse-item>
-    <van-collapse-item title="标题3" name="3" disabled>
-      代码是写出来给人看的，附带能在机器上运行
-    </van-collapse-item>
-  </van-collapse>
-  <view class="charge-block">
-    <fui-section title="押金" isLine></fui-section>
-    <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">押金：</view>
-      <view class="right-column">¥1000.00</view>
-    </view>
-    <view class="view-row">
-      <view class="left-column" style="width: 150rpx;"></view>
-      <view class="right-column" style="width: 500rpx">
-        <switch checked="{{false}}">免押金</switch>
+    <van-collapse-item title="【押金】¥1000.00" name="1">
+      <view class="view-row">
+      <view class="left-column" style="width: 200rpx;">【免押金】</view>
+      <view class="right-column" >
+        <checkbox-group><checkbox></checkbox></checkbox-group>
       </view>
     </view>
+      <view class="view-row">
+      <view class="left-column" style="width: 200rpx;">【押金】</view>
+      <view class="right-column">¥1000.00</view>
+    </view>
+    
     <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">押金减免：</view>
+      <view class="left-column" style="width: 200rpx;">【押金减免】</view>
       <view class="right-column"><input style="width: 85rpx;" class="input" placeholder="0" /></view>
     </view>
     <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">押金小计：</view>
+      <view class="left-column" style="width: 200rpx;">【押金小计】</view>
       <view class="right-column">¥1000.00</view>
     </view>
-  </view>
-  <view style="height: 20rpx;"></view>
-  <view class="charge-block">
-    <fui-section title="【租金单价】" isLine></fui-section>
-    <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">起租日期：</view>
-      <view class="right-column">
+
+    </van-collapse-item>
+    <van-collapse-item title="【租金单价】3天" name="2">
+      <view class="view-row">
+      <view class="left-column" style="width: 220rpx;">【起租日期】</view>
+      <view class="right-column" style="width: 190rpx;" >
         <picker mode="date" class="input">
           <picker-view>2025-06-26</picker-view>
         </picker>
       </view>
     </view>
     <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">预计租赁天数：</view>
+      <view class="left-column" style="width: 220rpx;">【预计租赁天数】</view>
       <view class="right-column"><input class="input" style="width: 50rpx;text-align: center;" placeholder="3" /></view>
     </view>
     <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">预计归还日期：</view>
+      <view class="left-column" style="width: 220rpx;">【预计归还日期】</view>
       <view class="right-column">2025-06-28</view>
     </view>
 
     <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">平日门市价：</view>
+      <view class="left-column" style="width: 220rpx;">【平日门市价】</view>
       <view class="right-column">¥150.00</view>
     </view>
     <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">平日会员价：</view>
+      <view class="left-column" style="width: 220rpx;">【平日会员价】</view>
       <view class="right-column">¥120.00</view>
     </view>
     <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">周末会员价：</view>
+      <view class="left-column" style="width: 220rpx;">【周末会员价】</view>
       <view class="right-column">¥140.00</view>
     </view>
-  </view>
-  <view style="height: 20rpx;"></view>
-  <view class="charge-block">
-    <fui-section title="【租金明细】" isLine></fui-section>
-    <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">租金一口价：</view>
+
+    </van-collapse-item>
+    <van-collapse-item title="【租金明细】共：¥300.00" name="3" >
+      <view class="view-row">
+      <view class="left-column" style="width: 200rpx;">【租金一口价】</view>
       <view class="right-column"><input class="input" style="width: 100rpx;" /></view>
     </view>
     <view class="view-row">
-      <view class="left-column" style="width: 200rpx;">招待：</view>
+      <view class="left-column" style="width: 200rpx;">【招待】</view>
       <view class="right-column">
-        <switch></switch>
+        <checkbox-group><checkbox></checkbox></checkbox-group>
       </view>
     </view>
     <view>
@@ -172,5 +160,6 @@
         </fui-col>
       </fui-row>
     </view>
-  </view>
+    </van-collapse-item>
+  </van-collapse>
 </view>
