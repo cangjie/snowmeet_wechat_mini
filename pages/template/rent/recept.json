@@ -1,5 +1,7 @@
 {
   "usingComponents": {
-    "rent_charge": "/components/rent/rent_charge"
-  }
+    "rent_charge": "/components/rent/rent_charge",
+    "package_selector": "/components/rent/package_selector"
+  },
+  "navigationBarTitleText": "租赁接待"
 }

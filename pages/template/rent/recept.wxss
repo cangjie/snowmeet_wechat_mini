@@ -14,6 +14,7 @@ picker{
 }
 .left-column{
   width: 140rpx;
+  text-align: left;
 }
 .right-column{
   width: 195rpx
@@ -35,4 +36,7 @@ picker{
 }
 .fui-col-view{
   font-size: 10pt;
+}
+.package-item{
+  background-color: white;
 }

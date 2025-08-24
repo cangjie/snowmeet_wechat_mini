@@ -168,11 +168,13 @@ Page({
     }
     that.setData({ categorySelectIndex, categorySelectText })
   },
+  /*
   selectType(e) {
     console.log('sel type', e)
     var that = this
     that.setData({ type: e.detail.value })
   },
+  */
   getPackageList() {
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList'
@@ -476,5 +478,47 @@ Page({
     item.noCode = e.detail.value.length == 0? false: true
     that.setData({rentals: that.data.rentals})
     console.log('get item', item)
+  },
+  showAddPackageDialog(){
+    var that = this
+    that.setData({showPopUp: true, popUpContent: 'packageSelector'})
+  },
+  cancelPopUp(){
+    var that = this
+    that.setData({showPopUp: false, popUpContent: null})
+  },
+  selectPackageConfirm(e){
+    var that = this
+    that.cancelPopUp()
+    console.log('select package', e)
+    var selectedPackage = e.detail
+    var rental = {
+      id: 0,
+      order_id: null,
+      package_id: selectedPackage.id,
+      name: selectedPackage.name,
+      valid: 0,
+      realDeposit: selectedPackage.deposit,
+      realDepositStr: util.showAmount(selectedPackage.deposit)
+    }
+    var items = []
+    for (var i = 0; i < selectedPackage.categories.length; i++) {
+      var item = {
+        id: 0,
+        rental_id: 0,
+        noCode: false,
+        categoryName: selectedPackage.categories[i].name,
+        name: null,
+        code: null,
+        rent_product_id: null
+      }
+      items.push(item)
+    }
+    rental.rentItems = items
+    var rentals = that.data.rentals
+    rentals.push(rental)
+    console.log('rentals', rentals)
+    //that.setData({ type: null, packageSelectIndex: null })
+    that.renderData(rentals)
   }
 })
