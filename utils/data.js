@@ -36,7 +36,7 @@ const searchBarCodePromise = function (code) {
 }
 //模糊查询租赁物
 const searchBarCodeFuzzyPromise = function (code, categoryId) {
-  var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByBarcode/' + code
+  var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByBarcodeFuzzy/' + code
   if (categoryId != null) {
     searchUrl += '?categoryId=' + categoryId.toString()
   }

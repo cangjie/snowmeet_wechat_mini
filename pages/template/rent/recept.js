@@ -39,9 +39,7 @@ Page({
       id: 6,
       name: 'segmented6'
     }],
-    propertyObj: {
-      a: 1, b: 'aaa'
-    }
+    searchCategoryId: null
   },
 
   /**
