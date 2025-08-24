@@ -520,5 +520,10 @@ Page({
     console.log('rentals', rentals)
     //that.setData({ type: null, packageSelectIndex: null })
     that.renderData(rentals)
+  },
+  searchBarcodeFuzzy(e){
+    var that = this
+    var categoryId = e.currentTarget.id
+    that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', categoryId})
   }
 })
