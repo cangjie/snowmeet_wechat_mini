@@ -598,5 +598,13 @@ Page({
     var that = this
     var id = parseInt(e.currentTarget.id)
     that.setData({showPopUp: true, popUpContent: 'categorySelector', currentItemIndex: id})
+  },
+  confirmCategory(e){
+    var that = this
+    console.log('confirm cate', e)
+    that.setData({showPopUp: false, popUpContent: null})
+    var item = that.getItemByIndex(that.data.currentItemIndex)
+    item.category = e.detail
+    that.renderData(that.data.rentals)
   }
 })

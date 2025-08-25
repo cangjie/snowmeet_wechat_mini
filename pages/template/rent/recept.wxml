@@ -26,17 +26,17 @@
             </view>
             <view class="view-row">
               <view class="left-column">【品类】</view>
-              <view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
+              <!--view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
                 <picker style="width: 480rpx" class="input" mode="multiSelector" range="{{categoryPickerArr}}" range-key="name" disabled="{{type == '套餐'}}" bindcolumnchange="catePickerColChange" bindchange="selectCategoryOk">
                   <picker-view>{{categorySelectIndex == undefined ? '请选择': categorySelectText}}</picker-view>
                 </picker>
-              </view>
-              <view class="right-column right-column1" wx:else>{{rental.rentItems[0].categoryName}}</view>
+              </view-->
+              <view class="right-column right-column1" >{{rental.rentItems[0].category.name}}</view>
             </view>
             <view class="view-row">
               <view class="left-column"></view>
               <view class="right-column right-column1" >
-                <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{item.itemIndex}}" bind:click="selectCategory" >选择</van-button>
+                <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory" >选择</van-button>
                 <!---------->
               </view>
             </view>
