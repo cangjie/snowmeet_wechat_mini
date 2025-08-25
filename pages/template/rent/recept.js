@@ -523,5 +523,43 @@ Page({
     var that = this
     var categoryId = e.currentTarget.id
     that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', categoryId})
+  },
+  selectProduct(e){
+    var that = this
+    var rentProduct = e.detail
+    if (that.checkCodeDup(rentProduct.barcode)){
+      wx.showToast({
+        title: '编码不可重复',
+        icon: 'error'
+      })
+      returm
+    }
+    console.log('select product', e)
+    var rental = {
+      id: 0,
+      order_id: null,
+      package_id: null,
+      name: rentProduct.name,
+      valid: 0,
+      realDeposit: rentProduct.realDeposit,
+      realDepositStr: util.showAmount(rentProduct.realDeposit)
+    }
+    var items = []
+    var item = {
+      id: 0,
+      rental_id: 0,
+      noCode: false,
+      category_id: rentProduct.category.id,
+      name: rentProduct.name,
+      categoryName: rentProduct.category.name,
+      code: rentProduct.barcode,
+      rent_product_id: rentProduct.id
+    }
+    items.push(item)
+    rental.rentItems = items
+    var rentals = that.data.rentals
+    rentals.push(rental)
+    that.setData({showPopUp: false, popUpContent: null})
+    that.renderData(rentals)
   }
 })

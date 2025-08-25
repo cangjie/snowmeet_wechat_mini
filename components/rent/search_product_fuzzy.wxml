@@ -1,12 +1,22 @@
 <fui-card title="选择租赁产品" full tag="总计：{{products.length}}">
-  <radio-group>
+  
     <scroll-view scroll-y >
+      <radio-group bindchange="selectItem">
       <view class="view-row" wx:for="{{products}}">
-
-  </view>
+        <view style="display:flex; width: 100rpx; align-items: center;justify-content: center;" >
+          <radio checked="{{products.length == 1}}" value="{{index}}" ></radio>
+        </view>
+        <view style="background-color: #EEEEEE; width: 550rpx;" >
+          <view style="margin-left: 10rpx;">{{item.category.name}}</view>
+          <view>{{item.name}}</view>
+          <view style="height: 10rpx; background-color: white;" ></view>
+        </view>
+        
+      </view>
+    </radio-group>
     </scroll-view>
     
-  </radio-group>
+  
   <view class="view-row" style="margin-top: 50rpx;justify-content: center;margin-bottom: 50rpx;">
     <view>
       <van-button round type="primary" bind:click="confirm"> 确 认 </van-button>
