@@ -237,6 +237,7 @@
     "van-button": "@vant/weapp/button/index",
     "van-icon": "@vant/weapp/icon/index",
     "van-divider": "@vant/weapp/divider/index",
-    "van-popup": "@vant/weapp/popup/index"
+    "van-popup": "@vant/weapp/popup/index",
+    "van-tree-select": "@vant/weapp/tree-select/index"
   }
 }

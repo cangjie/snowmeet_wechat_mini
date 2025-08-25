@@ -48,10 +48,43 @@ const searchBarCodeFuzzyPromise = function (code, categoryId) {
     })
   })
 }
+const getAllRentCategoriesPromise = function(){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetAllRentCategories'
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (categories) {
+      resolve(categories)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const getTopCategoriesPromise = function (){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetTopRentCategories'
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (categories) {
+      resolve(categories)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const getSubCategoriesPromise = function (fatherId){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetSubRentCategories/' + fatherId.toString()
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (categories) {
+      resolve(categories)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
   searchBarCodePromise: searchBarCodePromise,
-  searchBarCodeFuzzyPromise: searchBarCodeFuzzyPromise
+  searchBarCodeFuzzyPromise: searchBarCodeFuzzyPromise,
+  getAllRentCategoriesPromise: getAllRentCategoriesPromise,
+  getTopCategoriesPromise: getTopCategoriesPromise,
+  getSubCategoriesPromise: getSubCategoriesPromise
 }

@@ -40,3 +40,9 @@ picker{
 .package-item{
   background-color: white;
 }
+.van-sidebar-item{
+  width: 200rpx;
+}
+.van-ellipsis{
+  width: 300rpx;
+}

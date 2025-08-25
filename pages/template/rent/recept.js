@@ -238,7 +238,7 @@ Page({
   inputBarcode(e) {
     var that = this
     var barCode = e.detail.value
-    that.setData({ barCode })
+    that.setData({ searchBarCode: barCode })
     /*
     if (barCode.length >= 3){
       setTimeout(()=>{
@@ -508,7 +508,8 @@ Page({
         categoryName: selectedPackage.categories[i].name,
         name: null,
         code: null,
-        rent_product_id: null
+        rent_product_id: null,
+        category_id: selectedPackage.categories[i].id
       }
       items.push(item)
     }
@@ -522,7 +523,32 @@ Page({
   searchBarcodeFuzzy(e){
     var that = this
     var categoryId = e.currentTarget.id
-    that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', categoryId})
+    that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', categoryId })
+  },
+  searchListBarcodeFuzzy(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var item = that.getItemByIndex(id)
+    console.log('query item', item)
+    that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchBarCode: item.inputedBarcode, searchCategoryId: item.category_id, currentItemIndex: id})
+
+  },
+  confirmProduct(e){
+    var that = this
+    if (that.data.currentItemIndex){
+      var product = e.detail
+      var item = that.getItemByIndex(parseInt(that.data.currentItemIndex))
+      item.name = product.name
+      item.category_id = product.category_id
+      item.categoryName = product.category.name
+      item.code = product.barcode
+      var rentals = that.data.rentals
+      that.setData({showPopUp: false, popUpContent: null, currentItemIndex: null})
+      that.renderData(rentals)
+    }
+    else{
+      that.selectProduct(e)
+    }
   },
   selectProduct(e){
     var that = this
@@ -561,5 +587,16 @@ Page({
     rentals.push(rental)
     that.setData({showPopUp: false, popUpContent: null})
     that.renderData(rentals)
+  },
+  inputItemBarcode(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var item = that.getItemByIndex(id)
+    item.inputedBarcode = e.detail.value
+  },
+  selectCategory(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    that.setData({showPopUp: true, popUpContent: 'categorySelector', currentItemIndex: id})
   }
 })
