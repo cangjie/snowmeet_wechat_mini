@@ -31,12 +31,12 @@
                   <picker-view>{{categorySelectIndex == undefined ? '请选择': categorySelectText}}</picker-view>
                 </picker>
               </view-->
-              <view class="right-column right-column1" >{{rental.rentItems[0].category.name}}</view>
+              <view class="right-column right-column1">{{rental.rentItems[0].category.name}}</view>
             </view>
             <view class="view-row">
               <view class="left-column"></view>
-              <view class="right-column right-column1" >
-                <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory" >选择</van-button>
+              <view class="right-column right-column1">
+                <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
                 <!---------->
               </view>
             </view>
@@ -152,7 +152,7 @@
                   <view class="view-row" style="margin-bottom: 20rpx;">
                     <view class="left-column" style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【编码】</view>
                     <view class="right-column view-row" style="width:240rpx;color:{{item.textColor?item.textColor:defaultTextColor}};margin-right: 10rpx;">
-                      <input class="input" style="width: 175rpx;text-align: center;" value="{{item.noCode? '无' : (item.code?item.code:'')}}" disabled="{{item.noCode}}" bindinput="inputItemBarcode" id="{{item.itemIndex}}"  />
+                      <input class="input" style="width: 175rpx;text-align: center;" value="{{item.noCode? '无' : (item.code?item.code:'')}}" disabled="{{item.noCode}}" bindinput="inputItemBarcode" id="{{item.itemIndex}}" />
                       <van-icon name="scan" size="19px" />
                     </view>
                     <view class="left-column" style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【无编码】</view>
@@ -164,9 +164,9 @@
                   </view>
                   <view wx:if="{{!item.noCode}}" class="view-row" style="margin-bottom: 20rpx;">
                     <view class="left-column" style="width:110rpx; color:{{item.textColor?item.textColor:defaultTextColor}}"></view>
-                    <view class="view-row" >
-                      <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{item.itemIndex}}" >查询</van-button>
-                      <view style="width: 50rpx;" ></view>
+                    <view class="view-row">
+                      <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{item.itemIndex}}">查询</van-button>
+                      <view style="width: 50rpx;"></view>
                       <van-button type="warning" round size="mini">取消</van-button>
                     </view>
                   </view>
@@ -208,36 +208,40 @@
   <view style="height: 50rpx;"></view>
   <fui-card title="添加租赁商品" tag="">
     <view class="fui-card__content">
-      <radio-group bindchange="selectType">
-        <view class="view-row radio-item">
-          <view style="width: 140rpx;">
-            【套餐】
-          </view>
-          <view style="width: 535rpx;">
-            <van-button color="#7232dd" bind:click="showAddPackageDialog">添加套餐</van-button>
-          </view>
-          <!--picker style="margin-left: 50rpx;width: 350rpx;" range="{{packageList}}" range-key="name" class="input" bindchange="selectPackage" disabled="{{type!='套餐'}}">
+      <view class="view-row radio-item">
+        <view style="width: 140rpx;">
+          【套餐】
+        </view>
+        <view style="width: 535rpx;">
+          <van-button color="#7232dd" bind:click="showAddPackageDialog">添加套餐</van-button>
+        </view>
+        <!--picker style="margin-left: 50rpx;width: 350rpx;" range="{{packageList}}" range-key="name" class="input" bindchange="selectPackage" disabled="{{type!='套餐'}}">
             <picker-view>{{packageSelectIndex? packageList[packageSelectIndex].name: '请选择'}}</picker-view>
           </picker-->
+      </view>
+      <view class="view-row radio-item" style="margin-bottom: 20rpx;margin-top:40rpx">
+        <view style="width: 140rpx; text-align: left;">
+          【单品】
         </view>
-        <view class="view-row radio-item" style="margin-bottom: 20rpx;margin-top:40rpx">
-          <view style="width: 140rpx; text-align: left;">
-            【单品】
+        <view style="width: 535rpx;">
+          <view class="view-row">
+            <input class="input" value="{{barCode}}" placeholder="可手填输入" bindinput="inputBarcode" style="width: 300rpx;text-align: center;" />
+            <van-icon name="scan" size="25px" style="margin-left: 15rpx;" />
           </view>
-          <view style="width: 535rpx;">
-            <view class="view-row">
-              <input class="input" value="{{barCode}}" placeholder="可手填输入" bindinput="inputBarcode" style="width: 300rpx;text-align: center;" />
-              <van-icon name="scan" size="25px" style="margin-left: 15rpx;" />
-            </view>
-            <view class="view-row" style="margin-top: 30rpx;">
-              <van-button  type="primary" disabled="{{!searchBarCode || barCode.length == 0 || querying}}" bind:click="searchBarcodeFuzzy"> 确 认 </van-button>
-              <van-button type="info" style="margin-left: 50rpx;" bind:click="addNewBlank">添加无码单品</van-button>
-            </view>
+          <view class="view-row" style="margin-top: 30rpx;">
+            <van-button type="primary" disabled="{{!searchBarCode || barCode.length == 0 || querying}}" bind:click="searchBarcodeFuzzy"> 确 认 </van-button>
+            <van-button type="info" style="margin-left: 50rpx;" bind:click="addNewBlank">添加无码单品</van-button>
           </view>
         </view>
-      </radio-group>
+      </view>
     </view>
   </fui-card>
+  <view style="height: 150rpx;" ></view>
+  <van-goods-action>
+    <van-goods-action-icon  wx:if="{{rentals.length > 0}}" dot  icon="cart-o" text="购物车" bind:click="onClickCart" />
+      <van-goods-action-icon  wx:else   icon="cart-o" text="购物车" bind:click="onClickCart" />
+    <view>【租赁物】{{totalItemNum? totalItemNum : 0}}【总计押金】{{totalGuarantyAmountStr?totalGuarantyAmountStr:'¥0.00'}}</view>
+  </van-goods-action>
 </view>
 <fui-backdrop show="{{showBackdrop}}" closable>
   <block wx:if="{{action == 'packageItem'}}">
@@ -336,8 +340,7 @@
 </fui-backdrop>
 <van-popup show="{{ showPopUp }}" bind:close="onClose">
   <package_selector wx:if="{{popUpContent == 'packageSelector'}}" bindConfirm="selectPackageConfirm" bindCancel="cancelPopUp"></package_selector>
-  <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" barCode="{{searchBarCode}}" categoryId="{{searchCategoryId}}" bindCancel="cancelPopUp" bindConfirm="confirmProduct" ></search-product-fuzzy>
-  <category-selector wx:if="{{popUpContent == 'categorySelector'}}" 
-    bindCancel="cancelPopUp"  bindConfirm="confirmCategory"  >
+  <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" barCode="{{searchBarCode}}" categoryId="{{searchCategoryId}}" bindCancel="cancelPopUp" bindConfirm="confirmProduct"></search-product-fuzzy>
+  <category-selector wx:if="{{popUpContent == 'categorySelector'}}" bindCancel="cancelPopUp" bindConfirm="confirmCategory">
   </category-selector>
 </van-popup>

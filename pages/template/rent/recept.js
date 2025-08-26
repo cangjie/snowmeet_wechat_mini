@@ -342,6 +342,8 @@ Page({
     var packageCommonTextColor = '#000000'
     var itemCommonColor = '#000000'
     var itemIndex = 1
+    var totalItemNum = 0
+    var totalGuarantyAmount = 0
     for (var i = 0; i < rentals.length; i++) {
       var rental = rentals[i]
       if (rental.package_id) {
@@ -351,7 +353,12 @@ Page({
       else {
         rental.backgroundColor = productCommonBackgroud
       }
+      if (!isNaN(rental.realDeposit)){
+        totalGuarantyAmount += rental.realDeposit
+      }
+      //totalGuarantyAmount += rental
       for (var j = 0; j < rental.rentItems.length; j++) {
+        totalItemNum++
         var item = rental.rentItems[j]
         item.itemIndex = itemIndex
         itemIndex++
@@ -362,7 +369,8 @@ Page({
       }
     }
     console.log('render rentals', rentals)
-    that.setData({ rentals })
+    that.setData({ rentals, totalItemNum, totalGuarantyAmount, 
+      totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount) })
   },
   showPackageItem(e) {
     var that = this
@@ -606,5 +614,8 @@ Page({
     var item = that.getItemByIndex(that.data.currentItemIndex)
     item.category = e.detail
     that.renderData(that.data.rentals)
+  },
+  onClickCart(e){
+
   }
 })

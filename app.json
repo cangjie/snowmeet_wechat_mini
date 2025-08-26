@@ -238,6 +238,9 @@
     "van-icon": "@vant/weapp/icon/index",
     "van-divider": "@vant/weapp/divider/index",
     "van-popup": "@vant/weapp/popup/index",
-    "van-tree-select": "@vant/weapp/tree-select/index"
+    "van-tree-select": "@vant/weapp/tree-select/index",
+    "van-goods-action": "@vant/weapp/goods-action/index",
+    "van-goods-action-icon": "@vant/weapp/goods-action-icon/index",
+    "van-goods-action-button": "@vant/weapp/goods-action-button/index"
   }
 }
