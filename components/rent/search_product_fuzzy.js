@@ -7,8 +7,8 @@ Component({
    * Component properties
    */
   properties: {
-    barCode: String,
-    categoryId: Number
+    categoryId: Number,
+    barCode: String
   },
 
   /**
@@ -20,8 +20,57 @@ Component({
   lifetimes:{
     ready(){
       var that = this
-      coreData.searchBarCodeFuzzyPromise(that.properties.barCode, 
-        that.properties.categoryId==0?null:that.properties.categoryId)
+      if (that.properties.barCode){
+        that.setData({barCode: that.properties.barCode})
+        that.query()
+      }
+      if (that.properties.categoryId){
+        coreData.getRentCategoryPromise(that.properties.categoryId)
+          .then(function (category){
+            that.setData({category})
+          }).catch(function (resolve){
+
+          })
+      }
+    }
+  },
+  pageLifetimes:{
+    show(){
+      console.log('show')
+    }
+  },
+  /**
+   * Component methods
+   */
+  methods: {
+    close(){
+      var that = this
+      that.setData({barCode: null})
+      that.properties.barCode = null
+      that.triggerEvent('Cancel', {})
+    },
+    selectItem(e){
+      var that = this
+      var value = parseInt(e.detail.value)
+      that.data.selectedItem = that.data.products[value]
+    },
+    confirm(){
+      var that = this
+      that.setData({barCode: null})
+      that.properties.barCode = null
+      if (!that.data.selectedItem){
+        wx.showToast({
+          title: '未选择商品',
+          icon: 'error'
+        })
+        return
+      }
+      that.triggerEvent('Confirm', that.data.selectedItem)
+    },
+    query(){
+      var that = this
+      coreData.searchBarCodeFuzzyPromise(that.data.barCode, 
+        that.data.category? that.data.category.id : null)
         .then(function(resolve){
           console.log('get products', resolve)
           var products = resolve
@@ -33,31 +82,10 @@ Component({
         .catch(function (reject){
 
         })
-    }
-  },
-  /**
-   * Component methods
-   */
-  methods: {
-    close(){
-      var that = this
-      that.triggerEvent('Cancel', {})
     },
-    selectItem(e){
+    inputBarcode(e){
       var that = this
-      var value = parseInt(e.detail.value)
-      that.data.selectedItem = that.data.products[value]
-    },
-    confirm(){
-      var that = this
-      if (!that.data.selectedItem){
-        wx.showToast({
-          title: '未选择商品',
-          icon: 'error'
-        })
-        return
-      }
-      that.triggerEvent('Confirm', that.data.selectedItem)
+      that.data.barCode = e.detail.value
     }
   }
 })

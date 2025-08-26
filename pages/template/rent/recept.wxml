@@ -8,17 +8,19 @@
           <view style="width: 650rpx; background-color: #FFF0F0;">
             <view class="view-row">
               <view class="left-column">【编码】</view>
-              <view class="right-column view-row">
-                <view style="width: 150rpx;" wx:if="{{rental.rentItems[0].noCode}}">——</view>
-                <block wx:else>
-                  <view style="width: 150rpx;">
-                    <input class="input" style="width: 145rpx;" value="{{rental.rentItems[0].code==null?'':rental.rentItems[0].code}}" />
-                  </view>
+              <view class="right-column view-row" style="width: 240rpx;" >
+                <!--view style="width: 150rpx;" wx:if="{{rental.rentItems[0].noCode}}">——</view-->
+
+              
+                  <input bind:tap="searchListBarcodeFuzzy" class="input" style="width: 175rpx;text-align: center;" value="{{rental.rentItems[0].noCode? '无' : (rental.rentItems[0].code?rental.rentItems[0].code:'')}}" disabled="{{rental.rentItems[0].noCode}}" id="{{rental.rentItems[0].itemIndex}}" />
                   <van-icon name="scan" size="19px" />
-                </block>
+                  <!--input class="input" style="width: 145rpx;" value="{{rental.rentItems[0].code==null?'':rental.rentItems[0].code}}" /-->
+               
+                <!--van-icon name="scan" size="19px" /-->
+
               </view>
-              <view class="left-column">【无编码】</view>
-              <view class="right-column">
+              <view class="left-column" style="width: 160rpx;">【无编码】</view>
+              <view class="right-column" style="width: 75rpx;" >
                 <checkbox-group id="{{rental.rentItems[0].itemIndex}}" bindchange="setNoCode">
                   <checkbox checked="{{rental.rentItems[0].noCode}}" value="1"></checkbox>
                 </checkbox-group>
@@ -31,15 +33,25 @@
                   <picker-view>{{categorySelectIndex == undefined ? '请选择': categorySelectText}}</picker-view>
                 </picker>
               </view-->
-              <view class="right-column right-column1">{{rental.rentItems[0].category.name}}</view>
+              <view class="right-column right-column1 view-row" wx:if="{{rental.rentItems[0].category}}">
+                <view style="width: 350rpx;">
+                  {{rental.rentItems[0].category.name}}
+                </view>
+                <view>
+                  <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">重选</van-button>
+                </view>
+              </view>
+              <view class="right-column right-column1" wx:else>
+                <van-button wx:if="{{rental.rentItems[0].noCode}}"  type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
+              </view>
             </view>
-            <view class="view-row">
+            <!--view class="view-row">
               <view class="left-column"></view>
               <view class="right-column right-column1">
                 <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
                 <!---------->
-              </view>
-            </view>
+            <!--/view>
+            </view-->
             <view class="view-row">
               <view class="left-column">【名称】</view>
               <view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
@@ -152,7 +164,7 @@
                   <view class="view-row" style="margin-bottom: 20rpx;">
                     <view class="left-column" style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【编码】</view>
                     <view class="right-column view-row" style="width:240rpx;color:{{item.textColor?item.textColor:defaultTextColor}};margin-right: 10rpx;">
-                      <input class="input" style="width: 175rpx;text-align: center;" value="{{item.noCode? '无' : (item.code?item.code:'')}}" disabled="{{item.noCode}}" bindinput="inputItemBarcode" id="{{item.itemIndex}}" />
+                      <input bind:tap="searchListBarcodeFuzzy" class="input" style="width: 175rpx;text-align: center;" value="{{item.noCode? '无' : (item.code?item.code:'')}}" disabled="{{item.noCode}}" id="{{item.itemIndex}}" />
                       <van-icon name="scan" size="19px" />
                     </view>
                     <view class="left-column" style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【无编码】</view>
@@ -162,14 +174,14 @@
                       </checkbox-group>
                     </view>
                   </view>
-                  <view wx:if="{{!item.noCode}}" class="view-row" style="margin-bottom: 20rpx;">
+                  <!--view wx:if="{{!item.noCode}}" class="view-row" style="margin-bottom: 20rpx;">
                     <view class="left-column" style="width:110rpx; color:{{item.textColor?item.textColor:defaultTextColor}}"></view>
                     <view class="view-row">
                       <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{item.itemIndex}}">查询</van-button>
                       <view style="width: 50rpx;"></view>
                       <van-button type="warning" round size="mini">取消</van-button>
                     </view>
-                  </view>
+                  </view-->
                   <view class="view-row">
                     <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【品类】</view>
                     <view class="right-column right-column1" style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">{{item.categoryName}}</view>
@@ -236,10 +248,10 @@
       </view>
     </view>
   </fui-card>
-  <view style="height: 150rpx;" ></view>
+  <view style="height: 150rpx;"></view>
   <van-goods-action>
-    <van-goods-action-icon  wx:if="{{rentals.length > 0}}" dot  icon="cart-o" text="购物车" bind:click="onClickCart" />
-      <van-goods-action-icon  wx:else   icon="cart-o" text="购物车" bind:click="onClickCart" />
+    <van-goods-action-icon wx:if="{{rentals.length > 0}}" dot icon="cart-o" text="购物车" bind:click="onClickCart" />
+    <van-goods-action-icon wx:else icon="cart-o" text="购物车" bind:click="onClickCart" />
     <view>【租赁物】{{totalItemNum? totalItemNum : 0}}【总计押金】{{totalGuarantyAmountStr?totalGuarantyAmountStr:'¥0.00'}}</view>
   </van-goods-action>
 </view>
@@ -317,6 +329,7 @@
       <view class="view-row">
         <view class="left-column" style="width: 150rpx;">【编码】</view>
         <view class="right-column view-row" style="width: 500rpx;">
+          <!--input bind:tap="searchListBarcodeFuzzy" class="input" style="width: 175rpx;text-align: center;" value="{{currentRental.rentItems[0].noCode? '无' : (currentRental.rentItems[0].code?currentRental.rentItems[0].code:'')}}" disabled="{{currentRental.rentItems[0].noCode}}"  id="{{currentRental.rentItems[0].itemIndex}}" /-->
           <input class="input" style="width: 150rpx;" value="{{currentRental.rentItems[0].code? currentRental.rentItems[0].code : ''}}" />
           <van-icon name="scan" size="25px" style="margin-left: 15rpx;" />
         </view>
@@ -340,7 +353,7 @@
 </fui-backdrop>
 <van-popup show="{{ showPopUp }}" bind:close="onClose">
   <package_selector wx:if="{{popUpContent == 'packageSelector'}}" bindConfirm="selectPackageConfirm" bindCancel="cancelPopUp"></package_selector>
-  <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" barCode="{{searchBarCode}}" categoryId="{{searchCategoryId}}" bindCancel="cancelPopUp" bindConfirm="confirmProduct"></search-product-fuzzy>
+  <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" categoryId="{{searchCategoryId}}" bindCancel="cancelPopUp" barCode="{{searchBarCode}}" bindConfirm="confirmProduct"></search-product-fuzzy>
   <category-selector wx:if="{{popUpContent == 'categorySelector'}}" bindCancel="cancelPopUp" bindConfirm="confirmCategory">
   </category-selector>
 </van-popup>

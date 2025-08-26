@@ -78,6 +78,16 @@ const getSubCategoriesPromise = function (fatherId){
     })
   })
 }
+const getRentCategoryPromise = function (categoryId){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentCategory/' + categoryId.toString()
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (categories) {
+      resolve(categories)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -86,5 +96,6 @@ module.exports = {
   searchBarCodeFuzzyPromise: searchBarCodeFuzzyPromise,
   getAllRentCategoriesPromise: getAllRentCategoriesPromise,
   getTopCategoriesPromise: getTopCategoriesPromise,
-  getSubCategoriesPromise: getSubCategoriesPromise
+  getSubCategoriesPromise: getSubCategoriesPromise,
+  getRentCategoryPromise: getRentCategoryPromise
 }

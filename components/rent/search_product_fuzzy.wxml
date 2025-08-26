@@ -1,6 +1,21 @@
+<view class="view-row"  wx:if="{{category}}" >
+  <view class="left-column" >【当前分类】</view>
+  <view class="right-column" style="width: 400rpx" >{{category.name}}</view>
+</view>
+<view class="view-row" >
+      <view style="margin-top: 20rpx;margin-left: 20rpx;"  >
+        <input class="input" placeholder="输入编码" style="text-align: center;" bindinput="inputBarcode" 
+        value="{{barCode? barCode: null}}" />
+      </view>
+      <view style="margin-top: 20rpx;margin-left: 20rpx;" >
+        <van-button type="primary" round size="mini" 
+        bind:click="query" id="{{item.itemIndex}}" 
+        >查询</van-button>
+      </view>
+    </view>
 <fui-card title="选择租赁产品" full tag="总计：{{products.length}}">
   
-    <scroll-view scroll-y >
+    <scroll-view scroll-y style="height: 700rpx;" >
       <radio-group bindchange="selectItem">
       <view class="view-row" wx:for="{{products}}">
         <view style="display:flex; width: 100rpx; align-items: center;justify-content: center;" >

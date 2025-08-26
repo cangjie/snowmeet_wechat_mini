@@ -491,7 +491,9 @@ Page({
   },
   cancelPopUp(){
     var that = this
-    that.setData({showPopUp: false, popUpContent: null})
+    that.setData({showPopUp: false, popUpContent: null, searchBarCode: null, searchCategoryId: null,
+      currentItemIndex: null, barCode: null})
+    //that.setData({showPopUp: false, popUpContent: null, currentItemIndex: null, barCode: null})
   },
   selectPackageConfirm(e){
     var that = this
@@ -531,14 +533,14 @@ Page({
   searchBarcodeFuzzy(e){
     var that = this
     var categoryId = e.currentTarget.id
-    that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', categoryId })
+    that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', categoryId, searchBarCode: that.data.searchBarCode })
   },
   searchListBarcodeFuzzy(e){
     var that = this
     var id = parseInt(e.currentTarget.id)
     var item = that.getItemByIndex(id)
     console.log('query item', item)
-    that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchBarCode: item.inputedBarcode, searchCategoryId: item.category_id, currentItemIndex: id})
+    that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: item.category_id, currentItemIndex: id})
 
   },
   confirmProduct(e){
@@ -551,12 +553,12 @@ Page({
       item.categoryName = product.category.name
       item.code = product.barcode
       var rentals = that.data.rentals
-      that.setData({showPopUp: false, popUpContent: null, currentItemIndex: null})
       that.renderData(rentals)
     }
     else{
       that.selectProduct(e)
     }
+    that.setData({showPopUp: false, popUpContent: null, currentItemIndex: null, barCode: null})
   },
   selectProduct(e){
     var that = this
@@ -614,6 +616,7 @@ Page({
     var item = that.getItemByIndex(that.data.currentItemIndex)
     item.category = e.detail
     that.renderData(that.data.rentals)
+    that.setData({barCode: null, searchBarCode: null})
   },
   onClickCart(e){
 
