@@ -363,8 +363,14 @@ Page({
         item.itemIndex = itemIndex
         itemIndex++
         item.textColor = itemCommonColor
-        if (!item.rent_product_id) {
+        if (!item.noCode && !item.rent_product_id) {
           item.textColor = 'red'
+        }
+        else if (item.noCode && (!item.category  || !item.name) ){
+          item.textColor = 'red'
+        }
+        else{
+          item.textColor = that.data.defaultTextColor
         }
       }
     }
