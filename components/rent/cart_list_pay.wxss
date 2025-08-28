@@ -1,0 +1,13 @@
+/* components/rent/cart_list_pay.wxss */
+@import '/app.wxss';
+.left-column{
+  width: 120rpx;
+  text-align: left;
+}
+.right-column{
+  width:550rpx
+}
+.item{
+  width:95%;
+  background-color: #DDDDDD;
+}

@@ -378,6 +378,7 @@ Page({
     that.setData({ rentals, totalItemNum, totalGuarantyAmount, 
       totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount) })
   },
+  /*
   showPackageItem(e) {
     var that = this
     var id = e.currentTarget.id
@@ -401,6 +402,7 @@ Page({
       that.setData({ currentRental, currentItem, showBackdrop: true, action: 'packageItem' })
     }
   },
+  */
   showPackage(e) {
     var that = this
     var id = e.currentTarget.id
@@ -625,6 +627,16 @@ Page({
     that.setData({barCode: null, searchBarCode: null})
   },
   onClickCart(e){
-
+    wx.navigateTo({
+      url: 'recept_charge',
+    })
+  },
+  onShowCart(e){
+    var that = this
+    that.setData({showCart: true})
+  },
+  onBackDropClose(e){
+    var that = this
+    that.setData({showCart: false})
   }
 })

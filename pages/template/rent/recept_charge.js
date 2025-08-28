@@ -19,7 +19,7 @@ Page({
             category_id: 23,
             code: '01060002',
             id: 0,
-            iemIndex: 1,
+            itemIndex: 1,
             name: '【租赁双板-002】Head e-SL RD 158CM',
             noCode: false,
             rent_product_id: null,
@@ -72,7 +72,8 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-
+    var that = this
+    that.setData({rentals: that.data.mokRetals})
   },
 
   /**

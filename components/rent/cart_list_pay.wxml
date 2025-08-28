@@ -1,0 +1,33 @@
+<view>
+  <view style="width: 700rpx;" bindtap="onShowCart" style="margin-top: 50rpx;text-align: center; margin-bottom: 50rpx;">
+    【租赁商品】{{rentals? rentals.length : 0}}【总计押金】{{totalGuarantyAmountStr?totalGuarantyAmountStr:'¥0.00'}}
+  </view>
+  <scroll-view scroll-y style="height: 800rpx;">
+    <view wx:for="{{rentals}}" wx:for-item="rental" style="display: flex;justify-content: center;">
+      <view wx:if="{{rental.package_id}}" style="display: flex;justify-content: center;flex-direction: column;">
+        <view class="view-row item">
+          <view class="left-column">【套餐】</view>
+          <view class="right-column">{{rental.name}}</view>
+        </view>
+        <view class="view-row item">
+          <view class="left-column">【押金】</view>
+          <view class="right-column">{{rental.realDepositStr}}</view>
+        </view>
+
+        <view style="height: 20rpx;" ></view>
+      </view>
+      <view wx:else style="display: flex;justify-content: center;flex-direction: column;" >
+        <view class="view-row item">
+          <view class="left-column">【单品】</view>
+          <view class="right-column">{{rental.rentItems[0].name}}</view>
+        </view>
+        <view class="view-row item">
+          <view class="left-column">【押金】</view>
+          <view class="right-column">{{rental.realDepositStr}}</view>
+        </view>
+        <view style="height: 20rpx;" ></view>
+      </view>
+      
+    </view>
+  </scroll-view>
+</view>

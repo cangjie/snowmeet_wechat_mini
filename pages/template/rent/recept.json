@@ -3,7 +3,8 @@
     "rent_charge": "/components/rent/rent_charge",
     "package_selector": "/components/rent/package_selector",
     "search-product-fuzzy": "/components/rent/search_product_fuzzy",
-    "category-selector": "/components/rent/category_selector"
+    "category-selector": "/components/rent/category_selector",
+    "cart-list-pay" : "/components/rent/cart_list_pay"
   },
   "navigationBarTitleText": "租赁接待"
 }
