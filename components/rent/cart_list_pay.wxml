@@ -13,10 +13,16 @@
           <view class="left-column">【押金】</view>
           <view class="right-column">{{rental.realDepositStr}}</view>
         </view>
+        <view class="view-row item">
+          <view class="left-column" style="width: 240rpx;">【预计租赁天数】</view>
+          <view class="right-column" style="width: 60rpx;">1天</view>
+          <view class="left-column" style="width: 180rpx;">【预计租金】</view>
+          <view class="right-column" style="width: 100rpx;margin-right: 50rpx;">¥300.00</view>
+        </view>
 
-        <view style="height: 20rpx;" ></view>
+        <view style="height: 20rpx;"></view>
       </view>
-      <view wx:else style="display: flex;justify-content: center;flex-direction: column;" >
+      <view wx:else style="display: flex;justify-content: center;flex-direction: column;">
         <view class="view-row item">
           <view class="left-column">【单品】</view>
           <view class="right-column">{{rental.rentItems[0].name}}</view>
@@ -25,9 +31,25 @@
           <view class="left-column">【押金】</view>
           <view class="right-column">{{rental.realDepositStr}}</view>
         </view>
-        <view style="height: 20rpx;" ></view>
+        <view class="view-row item">
+          <view class="left-column" style="width: 240rpx;">【预计租赁天数】</view>
+          <view class="right-column" style="width: 60rpx;">1天</view>
+          <view class="left-column" style="width: 180rpx;">【预计租金】</view>
+          <view class="right-column" style="width: 100rpx;margin-right: 50rpx;">¥300.00</view>
+        </view>
+        <view style="height: 20rpx;"></view>
       </view>
-      
+
     </view>
-  </scroll-view>
+    <view class="view-row" style="justify-content: center;">
+      <view class="view-row">
+      <view class="view-row item" style="background-color: white;">
+        <view class="left-column" style="width: 180rpx;" >
+          【总计应付】
+        </view>
+        <view class="right-column" style="width: 490rpx;">¥1000.00</view>
+      </view>
+    </view>
+</view>
+</scroll-view>
 </view>
