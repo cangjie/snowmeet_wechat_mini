@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "rental-list": "/components/rent/rental_list"
+  },
   "navigationBarTitleText": "租赁订单明细"
 }
