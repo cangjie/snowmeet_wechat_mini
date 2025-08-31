@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "租赁接待",
-          "pathName": "pages/template/rent/recept",
+          "name": "租赁明细",
+          "pathName": "pages/template/rent/rent_detail",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "租赁接待",
+          "pathName": "pages/template/rent/recept",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "collapse",

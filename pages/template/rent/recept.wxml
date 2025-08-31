@@ -232,7 +232,7 @@
     <van-goods-action-icon wx:else icon="cart-o" text="支付押金" bind:click="onShowCart" />
   </van-goods-action>
 </view>
-<!--fui-backdrop show="{{showBackdrop}}" closable >
+<fui-backdrop show="{{showBackdrop}}" closable >
 
   <block wx:if="{{action == 'packageItem'}}">
     <fui-card title="套餐名称：{{currentRental.name}}" tag="aaa">
@@ -308,7 +308,7 @@
         <view class="left-column" style="width: 150rpx;">【编码】</view>
         <view class="right-column view-row" style="width: 500rpx;">
           <!--input bind:tap="searchListBarcodeFuzzy" class="input" style="width: 175rpx;text-align: center;" value="{{currentRental.rentItems[0].noCode? '无' : (currentRental.rentItems[0].code?currentRental.rentItems[0].code:'')}}" disabled="{{currentRental.rentItems[0].noCode}}"  id="{{currentRental.rentItems[0].itemIndex}}" /-->
-          <!--
+          
           <input class="input" style="width: 150rpx;" value="{{currentRental.rentItems[0].code? currentRental.rentItems[0].code : ''}}" />
           <van-icon name="scan" size="25px" style="margin-left: 15rpx;" />
         </view>
@@ -329,7 +329,7 @@
       </view>
     </view>
   </block>
-</fui-backdrop-->
+</fui-backdrop>
 <van-popup show="{{ showPopUp }}" >
   <package_selector wx:if="{{popUpContent == 'packageSelector'}}" bindConfirm="selectPackageConfirm" bindCancel="cancelPopUp"></package_selector>
   <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" categoryId="{{searchCategoryId}}" bindCancel="cancelPopUp" barCode="{{searchBarCode}}" bindConfirm="confirmProduct"></search-product-fuzzy>

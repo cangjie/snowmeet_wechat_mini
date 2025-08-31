@@ -133,7 +133,8 @@
     "pages/admin/fd/fd_order_detail",
     "pages/test/collapse/collapse",
     "pages/template/rent/recept",
-    "pages/template/rent/recept_charge"
+    "pages/template/rent/recept_charge",
+    "pages/template/rent/rent_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

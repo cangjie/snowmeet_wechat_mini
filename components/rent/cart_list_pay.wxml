@@ -43,13 +43,13 @@
     </view>
     <view class="view-row" style="justify-content: center;">
       <view class="view-row">
-      <view class="view-row item" style="background-color: white;">
-        <view class="left-column" style="width: 180rpx;" >
-          【总计应付】
+        <view class="view-row item" style="background-color: white;" wx:if="{{rentals.length > 0}}">
+          <view class="left-column" style="width: 180rpx;">
+            <image src="/images/payment.png" mode="widthFix" ></image>
+          </view>
+          <view class="right-column" style="width: 490rpx;">{{totalGuarantyAmountStr}}</view>
         </view>
-        <view class="right-column" style="width: 490rpx;">¥1000.00</view>
       </view>
     </view>
-</view>
-</scroll-view>
+  </scroll-view>
 </view>
