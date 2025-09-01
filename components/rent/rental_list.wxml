@@ -12,12 +12,12 @@
           <!--van-icon name="scan" size="19px" /-->
 
         </view>
-        <view class="left-column" style="width: 160rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">【无编码】</view>
+        <view class="left-column" style="width: 160rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">【品类】</view>
         <view class="right-column" style="width: 75rpx;">
-          {{rental.rentItems[0].noCode?'是': '否'}}
+          {{rental.rentItems[0].category.name}}
         </view>
       </view>
-      <view class="view-row">
+      <!--view class="view-row">
         <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">【品类】</view>
         <view class="right-column right-column1 view-row" wx:if="{{rental.rentItems[0].category}}">
           <view style="width: 350rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">
@@ -30,7 +30,7 @@
         <view class="right-column right-column1" wx:else>
           <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
         </view>
-      </view>
+      </view-->
       <view class="view-row">
         <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">【名称】</view>
         <view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
@@ -72,7 +72,13 @@
           已发放
         </view>
       </view>
-      <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
+      <view class="view-row" style="justify-content: center;margin-top: 20rpx;">
+        <van-button type="info" style="margin-left: 20rpx;">暂存</van-button>
+        <van-button type="warning" style="margin-left: 20rpx;">暂存</van-button>
+        <van-button type="primary" style="margin-left: 20rpx;">归还</van-button>
+        <van-button type="danger" style="margin-left: 20rpx;">丢失</van-button>
+      </view>
+      <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;margin-top: 20rpx;">
         <van-button plain type="primary" disabled="{{rental.rentItems[0].category_id == null}}" bind:click="showItem" id="{{index}}">
           查 看 租 金 明 细
         </van-button>
@@ -124,30 +130,17 @@
           <view style="width: 630rpx; background-color: #FFF0FF">
             <view class="view-row" style="margin-bottom: 20rpx;">
               <view class="left-column" style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【编码】</view>
-              <view class="right-column view-row" style="width:240rpx;color:{{item.textColor?item.textColor:defaultTextColor}};margin-right: 10rpx;">
+              <view class="right-column view-row" style="width:160rpx;color:{{item.textColor?item.textColor:defaultTextColor}};margin-right: 10rpx;">
                 {{item.noCode? '无' : (item.code?item.code:'')}}
               </view>
-              <view class="left-column" style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【无编码】</view>
-              <view class="right-column" style="width: 75rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">
-                {{item.noCode?'是':'否'}}
-               
+              <view class="left-column" style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【品类】</view>
+              <view class="right-column" style="width: 180rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">
+                {{item.categoryName}}
               </view>
-            </view>
-            <!--view wx:if="{{!item.noCode}}" class="view-row" style="margin-bottom: 20rpx;">
-                    <view class="left-column" style="width:110rpx; color:{{item.textColor?item.textColor:defaultTextColor}}"></view>
-                    <view class="view-row">
-                      <van-button type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{item.itemIndex}}">查询</van-button>
-                      <view style="width: 50rpx;"></view>
-                      <van-button type="warning" round size="mini">取消</van-button>
-                    </view>
-                  </view-->
-            <view class="view-row">
-              <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【品类】</view>
-              <view class="right-column right-column1" style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">{{item.categoryName}}</view>
             </view>
             <view class="view-row">
               <view class="left-column" style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【名称】</view>
-              <view class="right-column right-column1" >{{item.name == null? '' : item.name}}</view>
+              <view class="right-column right-column1">{{item.name == null? '' : item.name}}</view>
             </view>
             <view class="view-row" style="margin-bottom:20rpx">
               <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【不需要】</view>
@@ -159,6 +152,12 @@
               <view class="right-column" style="width: 95rpx;margin-left: 10rpx;">
                 已发放
               </view>
+            </view>
+            <view class="view-row" style="justify-content: center;margin-top: 20rpx;">
+              <van-button type="info" style="margin-left: 20rpx;">暂存</van-button>
+              <van-button type="warning" style="margin-left: 20rpx;">暂存</van-button>
+              <van-button type="primary" style="margin-left: 20rpx;">归还</van-button>
+              <van-button type="danger" style="margin-left: 20rpx;">丢失</van-button>
             </view>
             <view style="width: 630rpx;background-color: #F0FFF0;height: 10rpx;"></view>
           </view>
