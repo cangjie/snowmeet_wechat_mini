@@ -69,7 +69,9 @@
         <van-tab title="按商品">
           <rental-list rentals="{{rentals}}" ></rental-list>
         </van-tab>
-        <van-tab title="按品类">内容 2</van-tab>
+        <van-tab title="按品类">
+          <rent-item-list rentals="{{rentals}}" ></rent-item-list>
+        </van-tab>
       </van-tabs>
     </van-collapse-item>
 
