@@ -74,7 +74,7 @@
       </view>
       <view class="view-row" style="justify-content: center;margin-top: 20rpx;">
         <van-button type="info" style="margin-left: 20rpx;">暂存</van-button>
-        <van-button type="warning" style="margin-left: 20rpx;">暂存</van-button>
+        <van-button type="warning" style="margin-left: 20rpx;">更换</van-button>
         <van-button type="primary" style="margin-left: 20rpx;">归还</van-button>
         <van-button type="danger" style="margin-left: 20rpx;">丢失</van-button>
       </view>
@@ -155,7 +155,7 @@
             </view>
             <view class="view-row" style="justify-content: center;margin-top: 20rpx;">
               <van-button type="info" style="margin-left: 20rpx;">暂存</van-button>
-              <van-button type="warning" style="margin-left: 20rpx;">暂存</van-button>
+              <van-button type="warning" style="margin-left: 20rpx;">更换</van-button>
               <van-button type="primary" style="margin-left: 20rpx;">归还</van-button>
               <van-button type="danger" style="margin-left: 20rpx;">丢失</van-button>
             </view>

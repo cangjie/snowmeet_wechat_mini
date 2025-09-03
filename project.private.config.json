@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "OrderEntry",
+          "pathName": "pages/order/order_entry",
+          "query": "orderId=60105",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "租赁明细",
           "pathName": "pages/template/rent/rent_detail",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "租赁接待",
@@ -20,13 +27,6 @@
           "name": "collapse",
           "pathName": "pages/test/collapse/collapse",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "OrderEntry",
-          "pathName": "pages/order/order_entry",
-          "query": "orderId=60037",
           "launchMode": "default",
           "scene": null
         },
