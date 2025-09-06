@@ -1,4 +1,7 @@
-// pages/test/firstUI/first_test.js
+// pages/register/reg.js
+const app = getApp()
+const util = require('../../utils/util.js')
+const data = require('../../utils/data.js')
 Page({
 
   /**
@@ -26,7 +29,11 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    app.loginPromiseNew.then(function (resolve){
+      console.log('get member info', app.globalData)
+      that.setData({member: app.globalData.member})
+    })
   },
 
   /**
@@ -62,5 +69,25 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  verified(e){
+    var that = this
+    console.log('veri', e)
+    that.setData({verified: e.detail})
+    if (e.detail){
+      wx.showModal({
+        title: '注册成功',
+        content: '点击确定关闭窗口，等待店员开单。',
+        complete: (res) => {
+          if (res.cancel) {
+            
+          }
+      
+          if (res.confirm) {
+            wx.exitMiniProgram()
+          }
+        }
+      })
+    }
   }
 })

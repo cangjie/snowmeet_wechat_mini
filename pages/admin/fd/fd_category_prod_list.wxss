@@ -17,3 +17,7 @@
   text-align: center;
   height: 100rpx;
 }
+
+.weui-vtabs {
+ height: 500rpx;
+}

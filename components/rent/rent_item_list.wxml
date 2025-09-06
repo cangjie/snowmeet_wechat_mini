@@ -1,0 +1,41 @@
+<view>
+  <van-panel wx:for="{{categories}}" wx:for-item="category" title="{{category.name}}" desc="" status="{{category.rentItems.length}}">
+    <view class="view-row" style="background-color: #F0F0F0;" >
+      <view class="number-label" style="display:flex; align-items: center;">【1】</view>
+      <view >
+        <view class="view-row" >
+          <view class="left-column" >【编码】</view>
+          <view class="right-column" ></view>
+          <view class="left-column" >【品类】</view>
+          <view class="right-column" ></view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >【名称】</view>
+          <view class="right-column" ></view>
+        </view>
+        <view class="view-row" >
+          <view class="left-column" >【状态】</view>
+          <view class="right-column" >已发放</view>
+        </view>
+        <view class="view-row" style="justify-content: center;margin-top: 20rpx;" >
+          <van-button type="info"  style="margin-left: 20rpx;" >暂存</van-button>
+          <van-button type="warning" style="margin-left: 20rpx;"  >更换</van-button>
+          <van-button type="primary" style="margin-left: 20rpx;" >归还</van-button>
+          <van-button type="danger" style="margin-left: 20rpx;" >丢失</van-button>
+        </view>
+      </view>
+    </view>
+  </van-panel>
+  <view style="height: 50rpx;" ></view>
+  <!--van-panel title="雪杖" desc="" status="1">
+    <view class="view-row" >
+      <view class="number-label" >【1】</view>
+      <view>
+        <view class="view-row" >
+          <view class="left-column" ></view>
+          <view class="right-column" ></view>
+        </view>
+      </view>
+    </view>
+  </van-panel-->
+</view>

@@ -2,13 +2,13 @@
 /* pages/admin/sale/shop_sale.wxss */
 @import '/app.wxss';
 .left-column{
-  width:25%;
-  text-align: right;
+  width:30%;
+  text-align: left;
   font-size: 10pt;
   margin-top:20rpx;
 }
 .right-column{
-  width:75%;
+  width:70%;
   text-align: left;
   font-size: 10pt;
   margin-top:20rpx;

@@ -1,29 +1,26 @@
-// components/rent/rent_charge.js
 Component({
-
-  /**
-   * Component properties
-   */
   properties: {
-
+    rentItem: Object
   },
-
-  /**
-   * Component initial data
-   */
   data: {
-    itemSegs: ['押金', '计划及租金', '租金减免'],
-    segIndex: 0
+    activeNames: ['1', '2', '3']
   },
-
-  /**
-   * Component methods
-   */
-  methods: {
+  lifetimes:{
+    ready(){
+      var that = this
+      console.log('item', that.properties.rentItem)
+    }
+  },
+  methods: { 
     switchSeg(e){
       var that = this
       var segIndex = e.detail.index
       that.setData({segIndex})
-    }
-  }
+    },
+    onChange(event) {
+      this.setData({
+        activeNames: event.detail,
+      });
+    },
+  },
 })
