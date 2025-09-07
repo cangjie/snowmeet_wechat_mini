@@ -130,6 +130,8 @@ Page({
           var updateUrl = app.globalData.requestPrefix + 'Member/UpdateMemberInfo?scene=' + encodeURIComponent('开单') + '&sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(updateUrl, updatedMember).then(function (resolve) {
             console.log('member info updated', resolve)
+            that.setData({memberId: null})
+            that.setData({memberId: resolve.id})
           }).catch(function (reject) {
 
           })

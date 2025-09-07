@@ -25,12 +25,11 @@
         <button size="mini" bindtap="call" class="input" >拨打</button>
       </view-->
       <view class="right-column"  style="display: flex;flex-direction: row;">
-        <picker wx:if="{{member && member.id}}"  class="input" range="{{member.contactNums}}" 
+        <picker wx:if="{{member && member.id && member.contactNums.length > 1 && !inputContactNum}}"  
+        class="input" range="{{member.contactNums}}" 
           range-key="num" bindchange="selectNum" style="width: 240rpx;" >
           <picker-view style="width: 240rpx;" >
-            <input wx:if="{{inputContactNum}}" bindinput="setContactNum" 
-              placeholder="直接输入联系手机号" style="width: 240rpx;" />
-            <view wx:else style="width: 240rpx;" >{{member.currentContactNum? member.currentContactNum : '请选择……'}}</view>
+            <view style="width: 240rpx;" >{{member.currentContactNum? member.currentContactNum : '请选择……'}}</view>
           </picker-view>
         </picker>
         <input wx:else placeholder="输入联系手机号" class="input" id="contact_num" bindinput="userInfoChanged" />

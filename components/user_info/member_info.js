@@ -80,6 +80,7 @@ Component({
           member.contact_num = value
           if (member.contact_num.length == 11){
             updated = true
+            member.currentContactNum = member.contact_num
           }
           break
         default:
