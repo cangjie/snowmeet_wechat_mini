@@ -99,6 +99,16 @@ const verifyMemberCellPromise = function(sessionKey, enc, iv){
   })
   
 }
+const getMemberPromise = function (memberId, sessionKey){
+  var getUrl = app.globalData.requestPrefix + 'Member/GetMember/' + memberId.toString() + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (member){
+      resolve(member)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -109,5 +119,6 @@ module.exports = {
   getTopCategoriesPromise: getTopCategoriesPromise,
   getSubCategoriesPromise: getSubCategoriesPromise,
   getRentCategoryPromise: getRentCategoryPromise,
-  verifyMemberCellPromise
+  verifyMemberCellPromise,
+  getMemberPromise
 }

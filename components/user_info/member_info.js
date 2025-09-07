@@ -1,4 +1,5 @@
 const util = require("../../utils/util")
+const data = require('../../utils/data.js')
 const app = getApp()
 // components/user_info/member_info.js
 Component({
@@ -42,8 +43,7 @@ Component({
   methods: {
     getMemberInfo: function(){
       var that = this
-      var getUrl = app.globalData.requestPrefix + 'Member/GetMember/' + that.properties.memberId.toString() + '?sessionKey=' + app.globalData.sessionKey
-      util.performWebRequest(getUrl, undefined).then(function(resolve){
+      data.getMemberPromise(that.properties.memberId, app.globalData.sessionKey).then(function (resolve){
         console.log('get member info', resolve)
         var member = resolve
         member.totalDepositStr = util.showAmount(member.totalDeposit)
@@ -51,7 +51,7 @@ Component({
         member.contactNums.push({id: 0, num:'新增'})
         that.setData({member})
         that.triggerEvent('GetMemberInfo', member)
-      }).catch(function (reject){
+      }).catch(function (resolve){
 
       })
     },

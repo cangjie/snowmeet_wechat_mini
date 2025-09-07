@@ -13,10 +13,86 @@ Page({
     totalScore: 0,
     shop: '',
     valid: false,
-    invalid: true
+    invalid: true,
+    socket: null
   },
   getMemberInfo(e) {
     console.log('get member info', e)
+    var member = e.detail
+    var that = this
+    that.data.member = member
+    var socket = that.data.socket
+    if (member.cell == null){
+      socket = wx.connectSocket({
+        url: 'wss://' + app.globalData.domainName + '/ws',
+        header:{'content-type': 'application/json'}
+      })
+      socket.onError((res)=>{
+        that.socketError(res)
+      })
+      socket.onMessage((res)=>{
+        that.socketMessage(res)
+      })
+      socket.onOpen((res)=>{
+        console.log('socket open')
+        that.socketOpen(res)
+      })
+      socket.onClose((res)=>{
+        that.socketClosed()
+      })
+      that.data.socket = socket
+    }
+  },
+  socketOpen(e){
+    var that = this
+    var socket = that.data.socket
+    var socketCmd = {
+      command: 'querybindcell',
+      id: that.data.member.id,
+      sessionKey: decodeURIComponent(app.globalData.sessionKey)
+    }
+    var cmdStr = JSON.stringify(socketCmd)
+    socket.send({
+      data: cmdStr,
+      success:(res)=>{
+        console.log('send command', cmdStr)
+      }
+    })
+  },
+  socketClosed(e){
+
+  },
+  socketMessage(e){
+    console.log('socket message', e)
+    var that = this
+    var result = JSON.parse(e.data)
+    var member = result.data
+    if (member.cell == null){
+      wx.showToast({
+        title: '未绑定手机号',
+        icon: 'error'
+      })
+      return
+    }
+    that.setData({memberId: null})
+    that.setData({memberId: member.id})
+    that.closeSocket()
+    wx.showToast({
+      title: '绑定成功',
+      icon: 'success'
+    })
+  },
+  socketError(e){
+
+  },
+  closeSocket(){
+    var that = this
+    var socket = that.data.socket
+    socket.close({
+      success:()=>{
+        console.log('socket will be closed')
+      }
+    })
   },
   getUpdatedMemberInfo(e) {
     console.log('updated member info', e)
@@ -63,6 +139,7 @@ Page({
 
 
   },
+  /*
   getScore() {
     var that = this
     var getUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsSummary?openId=' + that.data.openId + '&openIdType=snowmeet_mini'
@@ -88,7 +165,7 @@ Page({
       }
     })
   },
-
+  */
   shopSelected(e) {
     console.log('shop selected', e)
     var that = this
@@ -126,8 +203,8 @@ Page({
     }
   },
   onShow() {
-    var that = this
-    that.getScore()
+    //var that = this
+    //that.getScore()
   },
   /**
    * Lifecycle function--Called when page is initially rendered
@@ -145,7 +222,8 @@ Page({
    * Lifecycle function--Called when page hide
    */
   onHide() {
-
+    var that = this
+    that.closeSocket()
   },
 
   /**
