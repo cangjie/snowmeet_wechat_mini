@@ -1,5 +1,5 @@
 const util = require("../../../utils/util")
-
+const data = require('../../../utils/data.js')
 // pages/admin/recept/recept_member_info.js
 const app = getApp()
 Page({
@@ -16,34 +16,8 @@ Page({
     invalid: true,
     socket: null
   },
-  getMemberInfo(e) {
-    console.log('get member info', e)
-    var member = e.detail
-    var that = this
-    that.data.member = member
-    var socket = that.data.socket
-    if (member.cell == null){
-      socket = wx.connectSocket({
-        url: 'wss://' + app.globalData.domainName + '/ws',
-        header:{'content-type': 'application/json'}
-      })
-      socket.onError((res)=>{
-        that.socketError(res)
-      })
-      socket.onMessage((res)=>{
-        that.socketMessage(res)
-      })
-      socket.onOpen((res)=>{
-        console.log('socket open')
-        that.socketOpen(res)
-      })
-      socket.onClose((res)=>{
-        that.socketClosed()
-      })
-      that.data.socket = socket
-    }
-  },
-  socketOpen(e){
+
+  socketOpen(e) {
     var that = this
     var socket = that.data.socket
     var socketCmd = {
@@ -54,39 +28,33 @@ Page({
     var cmdStr = JSON.stringify(socketCmd)
     socket.send({
       data: cmdStr,
-      success:(res)=>{
+      success: (res) => {
         console.log('send command', cmdStr)
       }
     })
   },
-  socketClosed(e){
+  socketClosed(e) {
 
   },
-  socketMessage(e){
+  socketMessage(e) {
     console.log('socket message', e)
     var that = this
     var result = JSON.parse(e.data)
     var member = result.data
-    if (member.cell == null){
+    if (member.cell == null) {
       wx.showToast({
         title: '未绑定手机号',
         icon: 'error'
       })
       return
     }
-    that.setData({memberId: null})
-    that.setData({memberId: member.id})
-    that.closeSocket()
+    that.setData({ memberId: null })
+    that.setData({ memberId: member.id })
+    //that.closeSocket()
     wx.showToast({
       title: '绑定成功',
       icon: 'success'
     })
-  },
-  socketError(e){
-
-  },
-  closeSocket(){
-    var that = this
     var socket = that.data.socket
     socket.close({
       success:()=>{
@@ -94,32 +62,106 @@ Page({
       }
     })
   },
+  socketError(e) {
+
+  },
+  closeSocket() {
+    var that = this
+    var member = that.data.member
+    var getUrl = app.globalData.requestPrefix + 'Member/StopQueryMemberBindCell/' + member.id.toString() + '?sessionKey=' + app.globalData.sessionKey 
+    util.performWebRequest(getUrl, null).then(function(resolve){
+
+    }).catch(function (reject){
+
+    })
+  },
+  getMemberInfo(e) {
+    console.log('get member info', e)
+    var member = e.detail
+    var that = this
+    that.data.member = member
+    data.getMemberPromise(member.id, app.globalData.sessionKey).then(function (oriMember) {
+      that.data.oriMember = oriMember
+    }).catch(function (reject) {
+
+    })
+    var socket = that.data.socket
+    console.log('socket', socket)
+
+    if (member.cell == null) {
+      if (socket == null) {
+        socket = wx.connectSocket({
+          url: 'wss://' + app.globalData.domainName + '/ws',
+          header: { 'content-type': 'application/json' }
+        })
+        socket.onError((res) => {
+          that.socketError(res)
+        })
+        socket.onMessage((res) => {
+          that.socketMessage(res)
+        })
+        socket.onOpen((res) => {
+          console.log('socket open')
+          that.socketOpen(res)
+        })
+        socket.onClose((res) => {
+          that.socketClosed()
+        })
+        that.data.socket = socket
+      }
+    }
+  },
   getUpdatedMemberInfo(e) {
     console.log('updated member info', e)
     var that = this
     var updatedMember = e.detail
+    var oriMember = that.data.oriMember
+    var needUpdate = that.data.needUpdate
     var memberId = null
-    var contactNum = null
+    var contactNum = that.data.contactNum
     var real_name = null
     var gender = null
-    if (updatedMember.id){
+    var modContent = ''
+    if (updatedMember.id) {
       memberId = e.detail.id
     }
-    if (updatedMember.real_name){
+    if (updatedMember.real_name) {
       real_name = updatedMember.real_name
+      if (real_name != oriMember.real_name) {
+        modContent += '  姓名改为：' + real_name
+        needUpdate = true
+      }
+
     }
-    if (updatedMember.gender){
+    if (updatedMember.gender) {
       gender = updatedMember.gender
+      if (gender != oriMember.gender) {
+        modContent += '  性别改为：' + gender
+        needUpdate = true
+      }
     }
-    if (updatedMember.currentContactNum){
-      contactNum = updatedMember.currentContactNum
+    if (updatedMember.currentContactNum) {
+      contactNum = updatedMember.currentContactNum ? updatedMember.currentContactNum : contactNum
+      var exists = false
+      for (var i = 0; i < oriMember.contactNums.length; i++) {
+        if (oriMember.contactNums[i].num == updatedMember.currentContactNum) {
+          exists = true
+          break
+        }
+      }
+      if (!exists) {
+        modContent += '  增加联系电话：' + updatedMember.currentContactNum
+        needUpdate = true
+      }
+
     }
-    that.setData({ updatedMember, needUpdate: true, memberId, real_name, gender, contactNum })
+    that.setData({ updatedMember, needUpdate, memberId, real_name, gender, contactNum, modContent })
   },
   updateUserInfo() {
+    var that = this
     wx.showModal({
       title: '确认更新',
-      content: '',
+      content: that.data.modContent,
       complete: (res) => {
         if (res.cancel) {
 
@@ -130,16 +172,19 @@ Page({
           var updateUrl = app.globalData.requestPrefix + 'Member/UpdateMemberInfo?scene=' + encodeURIComponent('开单') + '&sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(updateUrl, updatedMember).then(function (resolve) {
             console.log('member info updated', resolve)
-            that.setData({memberId: null})
-            that.setData({memberId: resolve.id})
+            that.setData({ memberId: null })
+            that.setData({ memberId: resolve.id, needUpdate: false })
+            data.getMemberPromise(member.id, app.globalData.sessionKey).then(function (oriMember) {
+              that.data.oriMember = oriMember
+            }).catch(function (reject) {
+
+            })
           }).catch(function (reject) {
 
           })
         }
       }
     })
-
-
   },
   /*
   getScore() {
@@ -232,7 +277,8 @@ Page({
    * Lifecycle function--Called when page unload
    */
   onUnload() {
-
+    var that = this
+    that.closeSocket()
   },
 
   /**

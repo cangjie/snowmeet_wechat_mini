@@ -97,7 +97,6 @@ const verifyMemberCellPromise = function(sessionKey, enc, iv){
       reject(exp)
     })
   })
-  
 }
 const getMemberPromise = function (memberId, sessionKey){
   var getUrl = app.globalData.requestPrefix + 'Member/GetMember/' + memberId.toString() + '?sessionKey=' + sessionKey

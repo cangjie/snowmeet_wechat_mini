@@ -14,7 +14,8 @@ Component({
     memberId:{
       type: Number,
       value: undefined
-    }
+    },
+    currentContactNum: String
   },
   /**
    * Component initial data
@@ -38,7 +39,7 @@ Component({
           that.setData({member: that.properties.member})
         }
       })
-    },
+    }
   },
   methods: {
     getMemberInfo: function(){
@@ -86,7 +87,7 @@ Component({
         default:
           break
       }
-      that.setData({member})
+      //that.setData({member})
       if (updated){
         that.triggerEvent('UpdateMemberInfo', member)
       }
@@ -115,6 +116,11 @@ Component({
         that.triggerEvent('UpdateMemberInfo', member)
       }
       that.setData({member})
+    },
+    backToPick(){
+      var that = this
+      that.setData({inputContactNum: false})
     }
-  }
+  },
+  
 })

@@ -1,5 +1,6 @@
 <view>
-  <member-info wx:if="{{memberId}}" memberId="{{memberId}}" onGetMemberInfo="getMemberInfo" onUpdateMemberInfo="getUpdatedMemberInfo" ></member-info>
+  <member-info wx:if="{{memberId}}" memberId="{{memberId}}"  currentContactNum="{{contactNum}}"
+  onGetMemberInfo="getMemberInfo" onUpdateMemberInfo="getUpdatedMemberInfo" ></member-info>
   <member-info wx:else  onGetMemberInfo="getMemberInfo" onUpdateMemberInfo="getUpdatedMemberInfo" ></member-info>
   <view style="text-align: center; margin-top: 10rpx;">
     <button wx:if="{{memberId}}" size="mini" bindtap="updateUserInfo" disabled="{{!needUpdate}}" class="input" > 更 新</button>
