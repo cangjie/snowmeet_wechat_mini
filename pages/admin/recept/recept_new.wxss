@@ -1,1 +1,4 @@
 /* pages/admin/recept/recept_new.wxss */
+.main-frame{
+  height: calc(100vh - 300rpx);
+}

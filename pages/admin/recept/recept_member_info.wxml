@@ -20,10 +20,10 @@
       <view style="display: flex;flex-direction: row;" >
         <button size="mini" disabled="{{ shop == '' || sale != 1 }}" bindtap="gotoFlow" id="sale" class="input" > 零 售 </button>
         <view style="width: 20rpx;"></view>
-        <button size="mini" disabled="{{ shop == '' || !wellFormed || care != 1  }}" bindtap="gotoFlow" id="maintain" class="input" > 养 护 </button>
+        <button size="mini" disabled="{{ shop == '' || !wellFormed || care != 1  }}" bindtap="gotoFlow" id="care" class="input" > 养 护 </button>
         <view style="width: 20rpx;"></view>
         <button size="mini" disabled="{{ shop == '' || !wellFormed || rent != 1 }}" bindtap="gotoFlow" id="rent" class="input" > 租 赁 </button>
-        <button size="mini" disabled="{{ shop == ''  || restuarant != 1 }}" bindtap="gotoFlow" id="rent" class="input" > 餐 饮 </button>
+        <button size="mini" disabled="{{ shop == ''  || restuarant != 1 }}" bindtap="gotoFlow" id="restuarant" class="input" > 餐 饮 </button>
       </view>
     </mp-cell>
   </mp-cells>

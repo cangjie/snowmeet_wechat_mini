@@ -85,6 +85,9 @@ Page({
   closeSocket() {
     var that = this
     var member = that.data.member
+    if(!member){
+      return
+    }
     var getUrl = app.globalData.requestPrefix + 'Member/StopQueryMemberBindCell/' + member.id.toString() + '?sessionKey=' + app.globalData.sessionKey 
     util.performWebRequest(getUrl, null).then(function(resolve){
 
@@ -240,6 +243,7 @@ Page({
     var restuarant = e.detail.restuarant
     that.setData({ shop: e.detail.shop, sale, care, rent, restuarant})
   },
+  /*
   gotoFlow(e) {
     var that = this
     var id = e.currentTarget.id
@@ -250,6 +254,33 @@ Page({
     wx.navigateTo({
       url: naviUrl,
     })
+  },
+  */
+  gotoFlow(e){
+    var that = this
+    var memberId = that.data.memberId
+    var realName = null
+    var cell = null
+    var gender = null
+    if (memberId){
+      realName = that.data.real_name
+      gender = that.data.gender
+      cell = that.data.contactNum
+    }
+    else{
+      realName = that.data.updatedMember.real_name
+      gender = that.data.updatedMember.gender
+      cell = that.data.updatedMember.currentContactNum
+    }
+    var url = 'recept_new?bizType=' + e.currentTarget.id
+      + (memberId? '&memberId=' + memberId.toString() : '')
+      + (realName? '&realName=' + realName : '')
+      + (cell? '&cell=' + cell : '')
+      + (gender? '&gender=' + gender : '')
+    wx.navigateTo({
+      url: url
+    })
+    
   },
   selectTicket(e) {
     console.log('select ticket', e)

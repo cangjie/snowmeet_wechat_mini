@@ -115,5 +115,9 @@ Page({
     }).catch(function(reject){
 
     })
+  },
+  onPopClose(){
+    var that = this
+    that.setData({showUserInfo:false})
   }
 })
