@@ -87,7 +87,7 @@ Component({
         default:
           break
       }
-      //that.setData({member})
+      that.setData({member})
       if (updated){
         that.triggerEvent('UpdateMemberInfo', member)
       }

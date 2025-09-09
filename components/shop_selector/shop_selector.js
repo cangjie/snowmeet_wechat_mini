@@ -30,7 +30,11 @@ Component({
             name_list.push(resovleData[i].name)
           }
           that.setData({shop_list: resovleData, name_list: name_list})
-          that.triggerEvent('ShopSelected', {shop: that.properties.defaultShop})
+          var shop = that.getShop(that.properties.defaultShop)
+          if (shop != null){
+            that.triggerEvent('ShopSelected', {shop: shop.name, sale: shop.sale, rent: shop.rent, care: shop.care, restuarant: shop.restuarant})
+          }
+          
 
           if (that.properties.defaultShop == undefined || that.properties.defaultShop == null || that.properties.defaultShop == ''){
             wx.getFuzzyLocation({
@@ -44,7 +48,9 @@ Component({
                   if (parseFloat(currentShop.lat_from) < lat && parseFloat(currentShop.lat_to) > lat
                     && parseFloat(currentShop.long_from) < lon && parseFloat(currentShop.long_to) > lon){
                       that.setData({currentSelectedIndex: i + 1})
-                      that.triggerEvent('ShopSelected', {shop: currentShop.name})
+                      that.triggerEvent('ShopSelected', {shop: currentShop.name, 
+                        sale: currentShop.sale, rent: currentShop.rent, 
+                        care: currentShop.care, restuarant: currentShop.restuarant})
                       break
                     }
                 }
@@ -73,12 +79,23 @@ Component({
       var that = this
       that.setData({currentSelectedIndex: e.detail.value})
       if (e.detail.value == 0){
-        that.triggerEvent('ShopSelected', {shop: ''})
+        that.triggerEvent('ShopSelected', {shop: '', sale: 0, care: 0, rent: 0, restuarant: 0})
       }
       else{
-        that.triggerEvent('ShopSelected', {shop: that.data.name_list[e.detail.value]})
+        var shop = that.getShop(that.data.name_list[e.detail.value])
+        that.triggerEvent('ShopSelected', {shop: shop.name, sale: shop.sale, care: shop.care, rent: shop.rent, restuarant: shop.restuarant})
       }
       
+    },
+    getShop(name){
+      var that = this
+      var shopList = that.data.shop_list
+      for(var i = 0; i < shopList.length; i++){
+        if (shopList[i].name == name){
+          return shopList[i]
+        }
+      }
+      return null
     }
   }
 })

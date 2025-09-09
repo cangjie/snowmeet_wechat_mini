@@ -14,9 +14,26 @@ Page({
     shop: '',
     valid: false,
     invalid: true,
-    socket: null
+    socket: null,
+    wellFormed: false
   },
-
+  checkWellFormed(){
+    var that = this
+    var member = that.data.oriMember
+    if (member == null || !member.id){
+      member = that.data.updatedMember
+    }
+    var wellFormed = false
+    if (
+        ((member.cell != null && member.cell.length == 11) 
+        || (that.data.contactNum != null && that.data.contactNum.length == 11 ) 
+        || (member.currentContactNum != null && member.currentContactNum.length == 11))
+        && member.real_name != null && member.real_name != '' && member.gender != null && member.gender != ''
+    ){
+      wellFormed = true
+    }
+    that.setData({wellFormed})
+  },
   socketOpen(e) {
     var that = this
     var socket = that.data.socket
@@ -82,6 +99,7 @@ Page({
     that.data.member = member
     data.getMemberPromise(member.id, app.globalData.sessionKey).then(function (oriMember) {
       that.data.oriMember = oriMember
+      that.checkWellFormed()
     }).catch(function (reject) {
 
     })
@@ -125,25 +143,24 @@ Page({
     if (updatedMember.id) {
       memberId = e.detail.id
     }
-    if (updatedMember.real_name) {
+    if (oriMember && updatedMember.real_name) {
       real_name = updatedMember.real_name
       if (real_name != oriMember.real_name) {
         modContent += '  姓名改为：' + real_name
         needUpdate = true
       }
-
     }
-    if (updatedMember.gender) {
+    if (oriMember && updatedMember.gender) {
       gender = updatedMember.gender
       if (gender != oriMember.gender) {
         modContent += '  性别改为：' + gender
         needUpdate = true
       }
     }
-    if (updatedMember.currentContactNum) {
+    if (oriMember && updatedMember.currentContactNum) {
       contactNum = updatedMember.currentContactNum ? updatedMember.currentContactNum : contactNum
       var exists = false
-      for (var i = 0; i < oriMember.contactNums.length; i++) {
+      for (var i = 0; oriMember && i < oriMember.contactNums.length; i++) {
         if (oriMember.contactNums[i].num == updatedMember.currentContactNum) {
           exists = true
           break
@@ -153,9 +170,9 @@ Page({
         modContent += '  增加联系电话：' + updatedMember.currentContactNum
         needUpdate = true
       }
-
     }
     that.setData({ updatedMember, needUpdate, memberId, real_name, gender, contactNum, modContent })
+    that.checkWellFormed()
   },
   updateUserInfo() {
     var that = this
@@ -217,11 +234,11 @@ Page({
     console.log('shop selected', e)
     var that = this
     var shop = e.detail.shop
-    var invalid = false
-    if (shop == '') {
-      invalid = true
-    }
-    that.setData({ shop: e.detail.shop, invalid })
+    var sale = e.detail.sale
+    var care = e.detail.care 
+    var rent = e.detail.rent
+    var restuarant = e.detail.restuarant
+    that.setData({ shop: e.detail.shop, sale, care, rent, restuarant})
   },
   gotoFlow(e) {
     var that = this
