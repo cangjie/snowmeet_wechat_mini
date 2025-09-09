@@ -20,15 +20,13 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({bizType: options.bizType? options.bizType: 'sale',
-      receptId: options.receptId? options.receptId : null,
-      contactNum: options.contactNum? options.contactNum : null,
-      name: options.name? options.name : null,
-      gender: options.gender? options.gender : null,
-      memberId: options.memberId? options.memberId : null,
+    that.setData({bizType: options.bizType,
       shop: options.shop,
-      receptId: options.receptId? options.receptId : null,
-      showSummary: false})
+      memberId: options.memberId? options.memberId : null,
+      realName: options.realName? options.realName: null,
+      gender: options.gender? options.gender : null,
+      cell: options.cell? options.cell: null,
+    })
     
   },
 
@@ -45,11 +43,13 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve){
+      /*
       that.setData({scrollHeight: app.globalData.windowInfo.windowHeight * 2-220})
       that.getData()
       if (that.data.memberId){
         that.getMember()
       }
+      */
     })
   },
 
@@ -95,6 +95,7 @@ Page({
     var that = this
     that.setData({showUserInfo: false})
   },
+  /*
   getData(){
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Recept/GetUnfinishedRecept?bizType=' + encodeURIComponent(that.data.bizType) + '&name=' + encodeURIComponent(that.data.name) + '&gender=' + encodeURIComponent(that.data.gender) 
@@ -116,6 +117,7 @@ Page({
 
     })
   },
+  */
   onPopClose(){
     var that = this
     that.setData({showUserInfo:false})

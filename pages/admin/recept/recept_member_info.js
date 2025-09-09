@@ -268,9 +268,9 @@ Page({
       cell = that.data.contactNum
     }
     else{
-      realName = that.data.updatedMember.real_name
-      gender = that.data.updatedMember.gender
-      cell = that.data.updatedMember.currentContactNum
+      realName = that.data.updatedMember? that.data.updatedMember.real_name : null
+      gender = that.data.updatedMember? that.data.updatedMember.gender : null
+      cell = that.data.updatedMember? that.data.updatedMember.currentContactNum : null
     }
     var url = 'recept_new?bizType=' + e.currentTarget.id
       + (memberId? '&memberId=' + memberId.toString() : '')

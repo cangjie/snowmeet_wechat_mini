@@ -108,6 +108,21 @@ const getMemberPromise = function (memberId, sessionKey){
     })
   })
 }
+const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, name, gender, sessionKey){
+  var placeUrl = app.globalData.requestPrefix + 'Order/PlaceBlankOrder/' + isPackage + '?type=' + encodeURIComponent(type) + '&shop=' + encodeURIComponent(shop) 
+    + memberId? '&memberId=' + memberId.toString(): ''
+    + cell? '&cell=' + cell : ''
+    + name? '&name=' + encodeURIComponent(name) : ''
+    + gender? '&gender=' + encodeURIComponent(gender) : ''
+    + '&sessonKey=' + sessionKey
+  return new Promose(function (resolve, reject){
+    util.performWebRequest(placeUrl, null).then(function (order){
+      resolve(order)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -119,5 +134,6 @@ module.exports = {
   getSubCategoriesPromise: getSubCategoriesPromise,
   getRentCategoryPromise: getRentCategoryPromise,
   verifyMemberCellPromise,
-  getMemberPromise
+  getMemberPromise,
+  placeBlankOrderPromise
 }
