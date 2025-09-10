@@ -38,7 +38,7 @@ const searchBarCodePromise = function (code) {
 const searchBarCodeFuzzyPromise = function (key, categoryId) {
   var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductFuzzy?key=' + key
   if (categoryId != null) {
-    searchUrl += '?categoryId=' + categoryId.toString()
+    searchUrl += '&categoryId=' + categoryId.toString()
   }
   return new Promise(function (resolve, reject) {
     util.performWebRequest(searchUrl, null).then(function (products) {

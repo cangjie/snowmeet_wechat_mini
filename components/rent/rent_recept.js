@@ -16,7 +16,8 @@ Component({
    * Component initial data
    */
   data: {
-    rentals: []
+    rentals: [],
+    defaultTextColor: 'black'
   },
 
   lifetimes:{
@@ -106,7 +107,7 @@ Component({
           if (!item.noCode && !item.rent_product_id) {
             item.textColor = 'red'
           }
-          else if (item.noCode && (!item.category  || !item.name) ){
+          else if (item.noCode && (!item.category_id  || !item.name) ){
             item.textColor = 'red'
           }
           else{
@@ -131,6 +132,7 @@ Component({
         item.category_id = product.category_id
         item.categoryName = product.category.name
         item.code = product.barcode
+        item.rent_product_id = product.id
         var rentals = that.data.rentals
         that.renderData(rentals)
       }
@@ -147,7 +149,7 @@ Component({
           title: '编码不可重复',
           icon: 'error'
         })
-        returm
+        return
       }
       console.log('select product', e)
       var rental = {
@@ -223,6 +225,60 @@ Component({
       var rentals = that.data.rentals
       rentals.push(rental)
       that.renderData(rentals)
+    },
+    searchListBarcodeFuzzy(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var item = that.getItemByIndex(id)
+      console.log('query item', item)
+      that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: item.category_id, currentItemIndex: id})
+  
+    },
+    getItemByIndex(index) {
+      var that = this
+      var rentals = that.data.rentals
+      var returnItem = null
+      for (var i = 0; returnItem == null && i < rentals.length; i++) {
+        var rental = rentals[i]
+        var returnItem = null
+        for (var j = 0; returnItem == null && j < rental.rentItems.length; j++) {
+          var item = rental.rentItems[j]
+          if (index == item.itemIndex) {
+            returnItem = item
+          }
+        }
+      }
+      return returnItem
+    },
+    setNoCode(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var item = that.getItemByIndex(id)
+      item.noCode = e.detail.value.length == 0? false: true
+      that.setData({rentals: that.data.rentals})
+      console.log('get item', item)
+    },
+    setItemName(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var item = that.getItemByIndex(id)
+      item.name = e.detail.value
+      that.renderData(that.data.rentals)
+    },
+    selectCategory(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      that.setData({showPopUp: true, popUpContent: 'categorySelector', currentItemIndex: id})
+    },
+    confirmCategory(e){
+      var that = this
+      console.log('confirm cate', e)
+      that.setData({showPopUp: false, popUpContent: null})
+      var item = that.getItemByIndex(that.data.currentItemIndex)
+      item.category = e.detail
+      item.category_id = item.category.id
+      that.renderData(that.data.rentals)
+      that.setData({barCode: null, searchBarCode: null})
     },
   }
 })

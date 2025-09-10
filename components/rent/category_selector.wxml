@@ -1,3 +1,4 @@
+<view style="width: 550rpx;" >
 <fui-card title="选择分类" full >
   <van-tree-select
     items="{{ items }}"
@@ -9,11 +10,13 @@
   />
   <view class="view-row" style="margin-top: 50rpx;justify-content: center;margin-bottom: 50rpx;">
     <view>
-      <van-button round type="primary" bind:click="confirm"> 确 认 </van-button>
+      <van-button round type="warning" bind:click="close"> 取 消 </van-button>
     </view>
     <view style="width:200rpx"></view>
     <view>
-      <van-button round type="warning" bind:click="close"> 取 消 </van-button>
+      <van-button round type="primary" bind:click="confirm"> 确 认 </van-button>
+      
     </view>
   </view>
 </fui-card>
+</view>
