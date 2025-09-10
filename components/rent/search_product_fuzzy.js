@@ -34,11 +34,6 @@ Component({
       }
     }
   },
-  pageLifetimes:{
-    show(){
-      console.log('show')
-    }
-  },
   /**
    * Component methods
    */
