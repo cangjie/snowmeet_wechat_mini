@@ -240,6 +240,7 @@
     "van-tab": "@vant/weapp/tab/index",
     "van-tabs": "@vant/weapp/tabs/index",
     "van-panel": "@vant/weapp/panel/index",
-    "member-auth": "/components/user_info/auth_cell"
+    "member-auth": "/components/user_info/auth_cell",
+    "rent-recept": "/components/rent/rent_recept"
   }
 }

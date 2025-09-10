@@ -48,7 +48,11 @@ Component({
                   if (parseFloat(currentShop.lat_from) < lat && parseFloat(currentShop.lat_to) > lat
                     && parseFloat(currentShop.long_from) < lon && parseFloat(currentShop.long_to) > lon){
                       that.setData({currentSelectedIndex: i + 1})
-                      that.triggerEvent('ShopSelected', {shop: currentShop.name, 
+                      var shop = currentShop.name
+                      if (shop.indexOf('万龙')>=0 && app.globalData.staff.shop && app.globalData.staff.shop.name.indexOf('万龙') >= 0){
+                        shop = app.globalData.staff.shop.name
+                      }
+                      that.triggerEvent('ShopSelected', {shop: shop, 
                         sale: currentShop.sale, rent: currentShop.rent, 
                         care: currentShop.care, restuarant: currentShop.restuarant})
                       break

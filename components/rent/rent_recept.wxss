@@ -1,0 +1,49 @@
+/* components/rent/rent_recept.wxss */
+@import '/app.wxss';
+@import '/vant.wxss';
+.radio-item{
+  margin-top: 20rpx;
+}
+picker{
+  font-size: 11pt;
+  margin-top: 10rpx;
+}
+.number-label{
+  margin-left: 10rpx;
+  text-align: left;
+  width: 50rpx;
+}
+.left-column{
+  width: 140rpx;
+  text-align: left;
+}
+.right-column{
+  width: 195rpx
+}
+.right-column1{
+  width: 500rpx
+}
+.seperator{
+  width: 650rpx; 
+  background-color: #F0F0F0;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+}
+.seperator-line{
+  height: 5rpx; 
+  background-color: white;
+  width: 500rpx;
+}
+.fui-col-view{
+  font-size: 10pt;
+}
+.package-item{
+  background-color: white;
+}
+.van-sidebar-item{
+  width: 200rpx;
+}
+.van-ellipsis{
+  width: 300rpx;
+}
