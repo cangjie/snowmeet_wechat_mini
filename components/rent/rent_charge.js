@@ -39,6 +39,7 @@ Component({
         rental.realDeposit = deposit - discount
         rental.realDepositStr = util.showAmount(rental.realDeposit)
         that.setData({rental})
+        that.triggerEvent('RentalChange', rental)
       }
     },
     computeEndDate(){
@@ -59,6 +60,18 @@ Component({
       var rental = that.data.rental
       rental.expectDays = days
       that.computeEndDate() 
+      that.triggerEvent('RentalChange', rental)
+    },
+    setFixedRental(e){
+      if (isNaN(e.detail.value)){
+        return
+      }
+      var amount = parseFloat(e.detail.value)
+      var that = this
+      var rental = that.data.rental
+      rental.fixedRental = amount
+      that.setData({rental})
+      that.triggerEvent('RentalChange', rental)
     }
 
   },

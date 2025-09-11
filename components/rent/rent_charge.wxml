@@ -61,7 +61,7 @@
     <van-collapse-item title="【租金明细】共：¥300.00" name="3">
       <view class="view-row">
         <view class="left-column">【租金一口价】</view>
-        <view class="right-column"><input class="input" style="width: 100rpx;" /></view>
+        <view class="right-column"><input class="input" style="width: 100rpx;" bindinput="setFixedRental" /></view>
       </view>
       <view class="view-row">
         <view class="left-column">【招待】</view>

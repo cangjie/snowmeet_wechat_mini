@@ -93,6 +93,13 @@ Component({
       var totalGuarantyAmount = 0
       for (var i = 0; i < rentals.length; i++) {
         var rental = rentals[i]
+        if (isNaN(rental.depositDiscount)){
+          rental.realDeposit = rental.deposit
+        }
+        else{
+          rental.realDeposit = rental.deposit - rental.depositDiscount
+        }
+        rental.realDepositStr = util.showAmount(rental.realDeposit)
         if (rental.package_id) {
           rental.backgroundColor = packageCommonBackgroud
           rental.textColor = packageCommonTextColor
@@ -320,6 +327,20 @@ Component({
       var rentals = that.data.rentals
       var rental = rentals[id]
       rental.noGuaranty = e.detail.value.length == 0 ? false : true
+      if(rental.noGuaranty){
+        rental.realDeposit = 0
+        rental.realDepositStr = util.showAmount(rental.realDeposit)
+      }
+      else{
+        if (isNaN(rental.depositDiscount)){
+          rental.realDeposit = rental.deposit
+          rental.realDepositStr = util.showAmount(rental.realDeposit)
+        }
+        else{
+          rental.realDeposit = rental.deposit - rental.depositDiscount
+          rental.realDepositStr = util.showAmount(rental.realDeposit)
+        }
+      }
       that.renderData(rentals)
     },
     setStartDate(e){
@@ -385,5 +406,24 @@ Component({
         that.setData({ currentRental, showBackdrop: true, action: 'package' })
       }
     },
+    onRentalChange(e){
+      console.log('rental change', e)
+      var that = this
+      that.setData({unSavedRental: e.detail})
+    },
+    saveUpdatedRental(){
+      var that = this
+      
+      if (that.data.unSavedRental){
+        var currentRental = that.data.currentRental
+        var unSavedRental = that.data.unSavedRental
+        currentRental.depositDiscount = unSavedRental.depositDiscount
+        currentRental.fixedRental = unSavedRental.fixedRental
+        currentRental.expectDays = unSavedRental.expectDays
+      }
+      that.renderData(that.data.rentals)
+      that.cancelBackdrop()
+      that.setData({unSavedRental: null})
+    }
   }
 })
