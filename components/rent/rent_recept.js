@@ -18,6 +18,7 @@ Component({
   data: {
     rentals: [],
     defaultTextColor: 'black',
+    noNeedTextColor: 'gray',
     startDate: util.formatDate(new Date())
   },
 
@@ -114,6 +115,10 @@ Component({
           else {
             item.textColor = that.data.defaultTextColor
           }
+          if (item.noNeed){
+            item.textColor = that.data.noNeedTextColor
+          }
+         
         }
       }
       console.log('render rentals', rentals)
@@ -234,7 +239,7 @@ Component({
       var id = parseInt(e.currentTarget.id)
       var item = that.getItemByIndex(id)
       console.log('query item', item)
-      if (item.noCode) {
+      if (item.noCode || item.noNeed) {
         return
       }
       else {
@@ -264,6 +269,19 @@ Component({
       item.noCode = e.detail.value.length == 0 ? false : true
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
+      that.renderData(that.data.rentals)
+    },
+    setNoNeed(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var item = that.getItemByIndex(id)
+      item.noNeed = e.detail.value.length == 0 ? false : true
+      that.setData({ rentals: that.data.rentals })
+      console.log('get item', item)
+      that.renderData(that.data.rentals)
+    },
+    setAtOnce(e){
+
     },
     setItemName(e) {
       var that = this

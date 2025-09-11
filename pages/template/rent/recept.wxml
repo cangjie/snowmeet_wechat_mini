@@ -233,7 +233,6 @@
   </van-goods-action>
 </view>
 <fui-backdrop show="{{showBackdrop}}" closable >
-
   <block wx:if="{{action == 'packageItem'}}">
     <fui-card title="套餐名称：{{currentRental.name}}" tag="aaa">
       <view class="fui-card__content" style="width: 650rpx;">
