@@ -175,7 +175,8 @@ Component({
         realDeposit: rentProduct.category.deposit,
         realDepositStr: util.showAmount(rentProduct.category.deposit),
         startDate: that.data.startDate,
-        expectDays: 1
+        expectDays: 1,
+        category: rentProduct.category
       }
       var items = []
       var item = {
@@ -186,7 +187,8 @@ Component({
         name: rentProduct.name,
         categoryName: rentProduct.category.name,
         code: rentProduct.barcode,
-        rent_product_id: rentProduct.id
+        rent_product_id: rentProduct.id,
+        category: rentProduct.category
       }
       items.push(item)
       rental.rentItems = items
