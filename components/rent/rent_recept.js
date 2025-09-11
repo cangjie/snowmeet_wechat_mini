@@ -17,12 +17,13 @@ Component({
    */
   data: {
     rentals: [],
-    defaultTextColor: 'black'
+    defaultTextColor: 'black',
+    startDate: util.formatDate(new Date())
   },
 
-  lifetimes:{
-    ready(){
-      app.loginPromiseNew.then(function(resolve){
+  lifetimes: {
+    ready() {
+      app.loginPromiseNew.then(function (resolve) {
 
       })
     }
@@ -32,15 +33,15 @@ Component({
    * Component methods
    */
   methods: {
-    addNewPackage(){
+    addNewPackage() {
       var that = this
-      that.setData({showPopUp: true, popUpContent: 'packageSelector'})
+      that.setData({ showPopUp: true, popUpContent: 'packageSelector' })
     },
-    cancelPopUp(){
+    cancelPopUp() {
       var that = this
-      that.setData({showPopUp: false, popUpContent: 'packageSelector'})
+      that.setData({ showPopUp: false, popUpContent: 'packageSelector' })
     },
-    selectPackageConfirm(e){
+    selectPackageConfirm(e) {
       var that = this
       that.cancelPopUp()
       console.log('select package', e)
@@ -94,7 +95,7 @@ Component({
         else {
           rental.backgroundColor = productCommonBackgroud
         }
-        if (!isNaN(rental.realDeposit)){
+        if (!isNaN(rental.realDeposit)) {
           totalGuarantyAmount += rental.realDeposit
         }
         //totalGuarantyAmount += rental
@@ -107,25 +108,27 @@ Component({
           if (!item.noCode && !item.rent_product_id) {
             item.textColor = 'red'
           }
-          else if (item.noCode && (!item.category_id  || !item.name) ){
+          else if (item.noCode && (!item.category_id || !item.name)) {
             item.textColor = 'red'
           }
-          else{
+          else {
             item.textColor = that.data.defaultTextColor
           }
         }
       }
       console.log('render rentals', rentals)
-      that.setData({ rentals, totalItemNum, totalGuarantyAmount, 
-        totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount) })
+      that.setData({
+        rentals, totalItemNum, totalGuarantyAmount,
+        totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount)
+      })
     },
-    searchBarcodeFuzzy(e){
+    searchBarcodeFuzzy(e) {
       var that = this
-      that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy'})
+      that.setData({ showPopUp: true, popUpContent: 'searchBarCodeFuzzy' })
     },
-    confirmProduct(e){
+    confirmProduct(e) {
       var that = this
-      if (that.data.currentItemIndex){
+      if (that.data.currentItemIndex) {
         var product = e.detail
         var item = that.getItemByIndex(parseInt(that.data.currentItemIndex))
         item.name = product.name
@@ -136,15 +139,15 @@ Component({
         var rentals = that.data.rentals
         that.renderData(rentals)
       }
-      else{
+      else {
         that.selectProduct(e)
       }
-      that.setData({showPopUp: false, popUpContent: null, currentItemIndex: null, barCode: null})
+      that.setData({ showPopUp: false, popUpContent: null, currentItemIndex: null, barCode: null })
     },
-    selectProduct(e){
+    selectProduct(e) {
       var that = this
       var rentProduct = e.detail
-      if (that.checkCodeDup(rentProduct.barcode)){
+      if (that.checkCodeDup(rentProduct.barcode)) {
         wx.showToast({
           title: '编码不可重复',
           icon: 'error'
@@ -176,7 +179,7 @@ Component({
       rental.rentItems = items
       var rentals = that.data.rentals
       rentals.push(rental)
-      that.setData({showPopUp: false, popUpContent: null})
+      that.setData({ showPopUp: false, popUpContent: null })
       that.renderData(rentals)
     },
     checkCodeDup(code) {
@@ -226,13 +229,17 @@ Component({
       rentals.push(rental)
       that.renderData(rentals)
     },
-    searchListBarcodeFuzzy(e){
+    searchListBarcodeFuzzy(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var item = that.getItemByIndex(id)
       console.log('query item', item)
-      that.setData({showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: item.category_id, currentItemIndex: id})
-  
+      if (item.noCode) {
+        return
+      }
+      else {
+        that.setData({ showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: item.category_id, currentItemIndex: id })
+      }
     },
     getItemByIndex(index) {
       var that = this
@@ -250,35 +257,55 @@ Component({
       }
       return returnItem
     },
-    setNoCode(e){
+    setNoCode(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var item = that.getItemByIndex(id)
-      item.noCode = e.detail.value.length == 0? false: true
-      that.setData({rentals: that.data.rentals})
+      item.noCode = e.detail.value.length == 0 ? false : true
+      that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
     },
-    setItemName(e){
+    setItemName(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var item = that.getItemByIndex(id)
       item.name = e.detail.value
       that.renderData(that.data.rentals)
     },
-    selectCategory(e){
+    selectCategory(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
-      that.setData({showPopUp: true, popUpContent: 'categorySelector', currentItemIndex: id})
+      that.setData({ showPopUp: true, popUpContent: 'categorySelector', currentItemIndex: id })
     },
-    confirmCategory(e){
+    confirmCategory(e) {
       var that = this
       console.log('confirm cate', e)
-      that.setData({showPopUp: false, popUpContent: null})
+      that.setData({ showPopUp: false, popUpContent: null })
       var item = that.getItemByIndex(that.data.currentItemIndex)
       item.category = e.detail
       item.category_id = item.category.id
       that.renderData(that.data.rentals)
-      that.setData({barCode: null, searchBarCode: null})
+      that.setData({ barCode: null, searchBarCode: null })
+    },
+    showItem(e) {
+      var that = this
+      var id = e.currentTarget.id
+      var rentals = that.data.rentals
+      var currentRental = rentals[parseInt(id)]
+      that.setData({ currentRental, showBackdrop: true, action: 'item', currentRentalNum: 100 })
+    },
+    cancelBackdrop(e) {
+      var that = this
+      that.setData({ showBackdrop: false, action: null, currentRental: null, currentItem: null })
+    },
+    showPackage(e) {
+      var that = this
+      var id = e.currentTarget.id
+      var rentals = that.data.rentals
+      var currentRental = rentals[parseInt(id)]
+      if (currentRental != null) {
+        that.setData({ currentRental, showBackdrop: true, action: 'package' })
+      }
     },
   }
 })
