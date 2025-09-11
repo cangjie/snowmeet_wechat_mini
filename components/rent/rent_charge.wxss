@@ -13,3 +13,11 @@
   border-bottom-left-radius: 16rpx;
   border-bottom-right-radius: 16rpx
 }
+.left-column{
+  width: 220rpx;
+  text-align: left;
+}
+.right-column{
+  width: 350rpx;
+  text-align: left;
+}

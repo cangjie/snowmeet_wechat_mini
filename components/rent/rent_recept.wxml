@@ -68,10 +68,11 @@
             </view>
           </view>
           <view class="view-row" style="margin-bottom: 20rpx;">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【起租日】</view>
+            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;margin-top:30rpx">【起租日】</view>
             <view class="right-column ">
-              <picker mode="date" class="input">
-                <picker-view style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">{{startDate}}</picker-view>
+              <picker mode="date" class="input" id="{{index}}" 
+              bindchange="setStartDate" start="{{rental.startDate}}" >
+                <picker-view style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">{{rental.startDate}}</picker-view>
               </picker>
             </view>
             <view class="left-column"></view>
@@ -117,10 +118,11 @@
 
             </view>
             <view class="view-row" style="margin-bottom: 20rpx;">
-              <view class="left-column">【起租日】</view>
+              <view class="left-column" style="margin-top:30rpx">【起租日】</view>
               <view class="right-column ">
-                <picker mode="date" class="input">
-                  <picker-view>{{startDate}}</picker-view>
+                <picker mode="date" class="input" id="{{index}}" 
+                bindchange="setStartDate" start="{{rental.startDate}}"  >
+                  <picker-view>{{rental.startDate}}</picker-view>
                 </picker>
               </view>
               <view class="left-column"></view>
@@ -216,47 +218,51 @@
       </fui-card>
     </block>
     <block wx:if="{{action == 'item'}}">
-      <view style="width: 650rpx;height: {{windowHeight*1.5}}rpx;background-color: white">
+      <view style="background-color: white;width:650rpx;margin-left: auto;margin-right: auto;">
         <view style="height: 10rpx;"></view>
         <view class="view-row">
           <view class="left-column" style="width: 150rpx;">【品类】</view>
           <view class="right-column" style="width: 500rpx;">
+          <!--
             <picker style="width: 480rpx" class="input" mode="multiSelector" range="{{categoryPickerArr}}" range-key="name" disabled="{{type == '套餐'}}" bindcolumnchange="catePickerColChange" bindchange="selectCategoryOk">
               <picker-view>{{currentRental.rentItems[0].categoryName}}</picker-view>
             </picker>
+          -->
+            {{currentRental.rentItems[0].category.name}}
           </view>
         </view>
-        <view class="view-row">
+        <!--view class="view-row">
           <view class="left-column" style="width: 150rpx;">【无编码】</view>
           <view class="right-column" style="width: 500rpx;">
             <checkbox-group>
               <checkbox checked="{{currentRental.rentItems[0].noCode}}"></checkbox>
             </checkbox-group>
           </view>
-        </view>
+        </view-->
         <view class="view-row">
           <view class="left-column" style="width: 150rpx;">【编码】</view>
           <view class="right-column view-row" style="width: 500rpx;">
-            <input class="input" style="width: 150rpx;" value="{{currentRental.rentItems[0].code? currentRental.rentItems[0].code : ''}}" />
-            <van-icon name="scan" size="25px" style="margin-left: 15rpx;" />
+            {{currentRental.rentItems[0].noCode? '【无】' : currentRental.rentItems[0].code}}
+            <!--input class="input" style="width: 150rpx;" value="{{currentRental.rentItems[0].code? currentRental.rentItems[0].code : ''}}" /-->
+            <!--van-icon name="scan" size="25px" style="margin-left: 15rpx;" /-->
           </view>
         </view>
         <view class="view-row">
           <view class="left-column" style="width: 150rpx;">【名称】</view>
           <view class="right-column" style="width: 500rpx;">
-            <input class="input" style="width: 480rpx;" value="{{currentRental.rentItems[0].name? currentRental.rentItems[0].name: ''}}" />
+            {{currentRental.rentItems[0].name? currentRental.rentItems[0].name: ''}}
+            <!--input class="input" style="width: 480rpx;" value="{{currentRental.rentItems[0].name? currentRental.rentItems[0].name: ''}}" /-->
           </view>
         </view>
         <view style="height: 20rpx;"></view>
-        <scroll-view scroll-y="{{true}}" style="height: {{windowHeight*0.8}}rpx;">
-          <rent_charge rentItem="{{currentRental}}"></rent_charge>
-        </scroll-view>
+        <rent_charge rentItem="{{currentRental}}"></rent_charge>
         <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
           <button class="input" size="mini" bindtap="cancelBackdrop"> 取 消 </button>
           <button class="input" size="mini"> 保 存 </button>
         </view>
+        <view style="height: 50rpx;" ></view>
       </view>
     </block>
-    <view style="height: 50rpx;">aaa</view>
+    
   </scroll-view>
 </fui-backdrop>

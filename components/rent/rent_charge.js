@@ -1,3 +1,4 @@
+const util = require('../../utils/util.js')
 Component({
   properties: {
     rentItem: Object
@@ -8,6 +9,10 @@ Component({
   lifetimes:{
     ready(){
       var that = this
+      var rental = that.properties.rentItem
+      
+      that.setData({rental})
+      that.computeEndDate()
       console.log('item', that.properties.rentItem)
     }
   },
@@ -22,5 +27,39 @@ Component({
         activeNames: event.detail,
       });
     },
+    setGuarantyDiscount(e){
+      var that = this
+      var value = e.detail.value
+      var rental = that.data.rental
+      if (!isNaN(value)){
+        var discount = parseFloat(value)
+        var deposit = rental.deposit
+        rental.depositDiscount = discount
+        rental.depositDiscountStr = util.showAmount(discount)
+        rental.realDeposit = deposit - discount
+        rental.realDepositStr = util.showAmount(rental.realDeposit)
+        that.setData({rental})
+      }
+    },
+    computeEndDate(){
+      var that = this
+      var rental = that.data.rental
+      var endDate = new Date(rental.startDate)
+      var expectDays = parseInt(rental.expectDays) - 1
+      endDate.setDate(endDate.getDate() + expectDays)
+      rental.endDate = util.formatDate(endDate)
+      that.setData({rental})
+    },
+    setExpectDays(e){
+      if (isNaN(e.detail.value)){
+        return
+      }
+      var that = this
+      var days = parseInt(e.detail.value)
+      var rental = that.data.rental
+      rental.expectDays = days
+      that.computeEndDate() 
+    }
+
   },
 })

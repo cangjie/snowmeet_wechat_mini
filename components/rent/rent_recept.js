@@ -53,8 +53,12 @@ Component({
         package_id: selectedPackage.id,
         name: selectedPackage.name,
         valid: 0,
+        expectDays: 1,
+        deposit: selectedPackage.deposit,
+        depositStr: util.showAmount(selectedPackage.deposit),
         realDeposit: selectedPackage.deposit,
-        realDepositStr: util.showAmount(selectedPackage.deposit)
+        realDepositStr: util.showAmount(selectedPackage.deposit),
+        startDate: that.data.startDate
       }
       var items = []
       for (var i = 0; i < selectedPackage.categories.length; i++) {
@@ -166,8 +170,12 @@ Component({
         package_id: null,
         name: rentProduct.name,
         valid: 0,
-        realDeposit: rentProduct.realDeposit,
-        realDepositStr: util.showAmount(rentProduct.realDeposit)
+        deposit: rentProduct.category.deposit,
+        depositStr: util.showAmount(rentProduct.category.deposit),
+        realDeposit: rentProduct.category.deposit,
+        realDepositStr: util.showAmount(rentProduct.category.deposit),
+        startDate: that.data.startDate,
+        expectDays: 1
       }
       var items = []
       var item = {
@@ -215,7 +223,9 @@ Component({
         name: '',
         valid: 0,
         realDeposit: 0,
-        realDepositStr: '——'
+        realDepositStr: '——',
+        startDate: that.data.startDate,
+        expectDays: 1
       }
       var items = []
       var item = {
@@ -262,6 +272,19 @@ Component({
       }
       return returnItem
     },
+    getRentenalByItemIndex(index){
+      var that = this
+      var rentals = that.data.rentals
+      var rental =  null
+      for(var i = 0; rental == null && i < rentals.length; i++){
+        for(var j = 0; rental == null && j < rentals[i].rentItems.length; j++){
+          if (index == rentals[i].rentItems[j].itemIndex){
+            rental = rentals[i]
+          }
+        }
+      }
+      return rental
+    },
     setNoCode(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
@@ -297,6 +320,15 @@ Component({
       rental.noGuaranty = e.detail.value.length == 0 ? false : true
       that.renderData(rentals)
     },
+    setStartDate(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var rentals = that.data.rentals
+      var rental = rentals[id]
+      rental.startDate = e.detail.value
+      that.renderData(rentals)
+      that.setData({rentals})
+    },
     setItemName(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
@@ -316,7 +348,19 @@ Component({
       var item = that.getItemByIndex(that.data.currentItemIndex)
       item.category = e.detail
       item.category_id = item.category.id
+      /*
+      item.deposit = e.detail.deposit
+      item.depositStr = util.showAmount(item.deposit)
+      item.realDeposit = item.deposit
+      item.realDepositStr = util.showAmount(item.realDeposit)
+      */
+      var rental = that.getRentenalByItemIndex(that.data.currentItemIndex)
+      rental.deposit = e.detail.deposit
+      rental.depositStr = util.showAmount(rental.deposit)
+      rental.realDeposit = rental.deposit
+      rental.realDepositStr = rental.depositStr
       that.renderData(that.data.rentals)
+
       that.setData({ barCode: null, searchBarCode: null })
     },
     showItem(e) {
