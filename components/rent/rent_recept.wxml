@@ -62,8 +62,8 @@
           <view class="view-row" style="margin-bottom: 20rpx;">
             <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【免押金】</view>
             <view class="right-column ">
-              <checkbox-group>
-                <checkbox></checkbox>
+              <checkbox-group  id="{{index}}" bindchange="setNoGuaranty"  >
+                <checkbox value="1" ></checkbox>
               </checkbox-group>
             </view>
           </view>
@@ -110,7 +110,7 @@
             <view class="view-row" style="margin-bottom: 20rpx;">
               <view class="left-column" style="width: 170rpx;">【免押金】</view>
               <view class="right-column">
-                <checkbox-group>
+                <checkbox-group bindchange="setNoGuaranty" id="{{index}}" >
                   <checkbox></checkbox>
                 </checkbox-group>
               </view>

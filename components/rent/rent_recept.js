@@ -281,7 +281,21 @@ Component({
       that.renderData(that.data.rentals)
     },
     setAtOnce(e){
-
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var item = that.getItemByIndex(id)
+      item.atOnce = e.detail.value.length == 0 ? false : true
+      that.setData({ rentals: that.data.rentals })
+      console.log('get item', item)
+      that.renderData(that.data.rentals)
+    },
+    setNoGuaranty(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var rentals = that.data.rentals
+      var rental = rentals[id]
+      rental.noGuaranty = e.detail.value.length == 0 ? false : true
+      that.renderData(rentals)
     },
     setItemName(e) {
       var that = this
