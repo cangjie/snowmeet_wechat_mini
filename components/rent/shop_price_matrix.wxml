@@ -1,0 +1,13 @@
+<view>
+  <van-tabs active="{{ active }}" bind:change="onChange">
+    <view style="display: flex;justify-content: center;margin-top: 20rpx;">
+      <radio-group bindchange="changeScene">
+        <radio wx:for="{{rentSceneTypeList}}" value="{{item}}" style="margin-left: 20rpx;margin-right: 20rpx;" 
+        checked="{{currentShop.scene == item}}">{{item}}</radio>
+      </radio-group>
+    </view>
+    <van-tab wx:for="{{shops}}" title="{{item.name}}">
+      <price-matrix wx:if="{{showMatrix}}" shopId="{{currentShop.id}}" priceType="{{priceType}}" id="{{id}}" scene="{{currentShop.scene}}" ></price-matrix>
+    </van-tab>
+  </van-tabs>
+</view>

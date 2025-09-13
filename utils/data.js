@@ -123,6 +123,29 @@ const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, 
     })
   })
 }
+const getEnumListPromise = function (type){
+  var getUrl = app.globalData.requestPrefix 
+  switch(type){
+    case 'RentType':
+      getUrl += 'Rent/GetRentType'
+      break
+    case 'GetDayType':
+      getUrl += 'Rent/GetDayType'
+      break
+    case 'RentSceneType':
+      getUrl += 'Rent/GetSceneType'
+      break
+    default:
+      break
+  }
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(list){
+      resolve(list)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+}
 
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -135,5 +158,6 @@ module.exports = {
   getRentCategoryPromise: getRentCategoryPromise,
   verifyMemberCellPromise,
   getMemberPromise,
-  placeBlankOrderPromise
+  placeBlankOrderPromise,
+  getEnumListPromise
 }

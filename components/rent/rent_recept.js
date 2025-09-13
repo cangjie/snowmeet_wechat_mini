@@ -29,10 +29,6 @@ Component({
       })
     }
   },
-
-  /**
-   * Component methods
-   */
   methods: {
     addNewPackage() {
       var that = this
@@ -110,7 +106,6 @@ Component({
         if (!isNaN(rental.realDeposit)) {
           totalGuarantyAmount += rental.realDeposit
         }
-        //totalGuarantyAmount += rental
         for (var j = 0; j < rental.rentItems.length; j++) {
           totalItemNum++
           var item = rental.rentItems[j]
@@ -371,19 +366,12 @@ Component({
       var item = that.getItemByIndex(that.data.currentItemIndex)
       item.category = e.detail
       item.category_id = item.category.id
-      /*
-      item.deposit = e.detail.deposit
-      item.depositStr = util.showAmount(item.deposit)
-      item.realDeposit = item.deposit
-      item.realDepositStr = util.showAmount(item.realDeposit)
-      */
       var rental = that.getRentenalByItemIndex(that.data.currentItemIndex)
       rental.deposit = e.detail.deposit
       rental.depositStr = util.showAmount(rental.deposit)
       rental.realDeposit = rental.deposit
       rental.realDepositStr = rental.depositStr
       that.renderData(that.data.rentals)
-
       that.setData({ barCode: null, searchBarCode: null })
     },
     showItem(e) {
@@ -413,7 +401,6 @@ Component({
     },
     saveUpdatedRental(){
       var that = this
-      
       if (that.data.unSavedRental){
         var currentRental = that.data.currentRental
         var unSavedRental = that.data.unSavedRental

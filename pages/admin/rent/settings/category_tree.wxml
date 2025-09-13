@@ -74,14 +74,16 @@
     </view>
   </mp-cells>
 
-  <price-matrix 
+  <!--price-matrix 
     priceMatrix="{{priceArr}}" 
     fieldRow="{{['门市', '预约', '会员']}}" 
     fieldCol="{{['平日','周末','节假日']}}" 
     bindmod="modPrice"
     bindTabChange="tabChange"
     disabled="{{matrixDisabled}}"
-  ></price-matrix>
+  ></price-matrix-->
+
+  <shop-price-matrix wx:if="{{showShopMatrix}}" id="{{selectedCategory.id}}" priceType="category" ></shop-price-matrix>
      
       
   <mp-cells title="保存租金押金设置">

@@ -73,6 +73,5 @@ Component({
       that.setData({rental})
       that.triggerEvent('RentalChange', rental)
     }
-
   },
 })

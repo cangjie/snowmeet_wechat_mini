@@ -172,6 +172,7 @@ Page({
   tabChange(e){
     console.log('tab change', e)
     var that = this
+    //that.setData({showShopMatrix: false})
     that.setData({currentShopIndex: e.detail.index})
   },
   modPrice(e){
@@ -362,6 +363,7 @@ Page({
     var grandpaCode = select.code.substr(0, select.code.length - 2)
     var fatherDisplayedCode = util.getDisplayedCode(fatherCode) 
     var grandpaDisplayedCode = util.getDisplayedCode(grandpaCode)
+    that.setData({showShopMatrix: false})
     grandpaDisplayedCode = grandpaDisplayedCode != '' ? grandpaDisplayedCode + '-' : grandpaDisplayedCode
     if (fatherDisplayedCode != ''){
       fatherDisplayedCode = fatherDisplayedCode + '-'
@@ -370,6 +372,7 @@ Page({
     that.setData({selectedCategory: select, selectedDisplayedCode: selectedDisplayedCode, 
     fatherDisplayedCode: fatherDisplayedCode, modName: select.name, grandpaDisplayedCode: grandpaDisplayedCode, seq: seq})
     that.getSingleCategory(select.code)
+    that.setData({showShopMatrix: true})
     //that.getSingleCategory(select.id)
   },
   onTabCLick(e){
