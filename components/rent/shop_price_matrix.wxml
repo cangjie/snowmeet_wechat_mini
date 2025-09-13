@@ -7,7 +7,7 @@
       </radio-group>
     </view>
     <van-tab wx:for="{{shops}}" title="{{item.name}}">
-      <price-matrix wx:if="{{showMatrix}}" shopId="{{currentShop.id}}" priceType="{{priceType}}" id="{{id}}" scene="{{currentShop.scene}}" ></price-matrix>
+      <price-matrix wx:if="{{showMatrix}}" shopId="{{currentShop.id}}" priceType="{{priceType}}" targetId="{{targetId}}" scene="{{currentShop.scene}}" ></price-matrix>
     </van-tab>
   </van-tabs>
 </view>

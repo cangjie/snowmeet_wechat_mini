@@ -9,7 +9,7 @@ Component({
    */
   properties: {
     priceType: String,
-    id: Number
+    targetId: Number
   },
 
   /**
@@ -35,7 +35,7 @@ Component({
         }).catch(function (reject){
 
         })
-        that.setData({priceType: that.properties.priceType, id: that.properties.id})
+        that.setData({priceType: that.properties.priceType, targetId: that.properties.targetId})
       })
       
     }

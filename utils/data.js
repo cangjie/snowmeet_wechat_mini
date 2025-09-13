@@ -156,7 +156,16 @@ const getRentPriceListPromise = function(shopId, type, id, scene){
     })
   })
 }
-
+const updateRentPricePromise = function(priceList, shopId, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentPrice/' + shopId.toString() + '?sessionKey=' + app.globalData.sessionKey
+  return new Promise(function (resovle, reject){
+    util.performWebRequest(updateUrl, priceList).then(function (list){
+      resovle(list)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -170,5 +179,6 @@ module.exports = {
   getMemberPromise,
   placeBlankOrderPromise,
   getEnumListPromise,
-  getRentPriceListPromise
+  getRentPriceListPromise,
+  updateRentPricePromise
 }
