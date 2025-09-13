@@ -146,6 +146,16 @@ const getEnumListPromise = function (type){
     })
   })
 }
+const getRentPriceListPromise = function(shopId, type, id, scene){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPriceList/' + shopId + '?type=' + encodeURIComponent(type) + '&id=' + id.toString() + '&scene=' + encodeURIComponent(scene)
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(list){
+      resolve(list)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -159,5 +169,6 @@ module.exports = {
   verifyMemberCellPromise,
   getMemberPromise,
   placeBlankOrderPromise,
-  getEnumListPromise
+  getEnumListPromise,
+  getRentPriceListPromise
 }

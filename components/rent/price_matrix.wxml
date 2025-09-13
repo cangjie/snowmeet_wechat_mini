@@ -5,13 +5,13 @@
     </van-col>
     <van-col wx:for="{{dayTypeList}}" span="{{colSpan}}" style="text-align: center;" >{{item}}</van-col>
   </van-row>
-  <van-row wx:for="{{rentTypeList}}" wx:for-item="rentType" s >
+  <van-row wx:for="{{rentTypeList}}" wx:for-item="rentType" wx:for-index="i" >
     <van-col span="{{colSpan}}"  >
       <view style="margin-left: 20rpx;margin-top: 20rpx;" >{{rentType}}</view>
     </van-col>
-    <van-col wx:for="{{dayTypeList}}" span="{{colSpan}}" >
+    <van-col wx:for="{{dayTypeList}}" span="{{colSpan}}" wx:for-index="j" >
       <view style="display: flex; justify-content: center;margin-top: 20rpx;">
-        <input class="input" style="width: 100rpx;text-align: center;"  />
+        <input class="input" style="width: 100rpx;text-align: center;" value="{{matrix[i][j].price}}"  />
       </view>
     </van-col>
   </van-row>

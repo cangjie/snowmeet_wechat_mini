@@ -83,7 +83,7 @@
     disabled="{{matrixDisabled}}"
   ></price-matrix-->
 
-  <shop-price-matrix wx:if="{{showShopMatrix}}" id="{{selectedCategory.id}}" priceType="category" ></shop-price-matrix>
+  <shop-price-matrix wx:if="{{showShopMatrix}}" id="{{selectedCategory.id}}" priceType="分类" ></shop-price-matrix>
      
       
   <mp-cells title="保存租金押金设置">
