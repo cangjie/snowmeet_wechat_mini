@@ -1,5 +1,4 @@
 @import '/common.wxss';
-@import '/components/price_matrix/price_matrix.wxss';
 
 .tab-content-tree {
   height: 100px;
