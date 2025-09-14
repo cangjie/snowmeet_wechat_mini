@@ -1,6 +1,7 @@
 // pages/admin/rent/settings/category_tree.js
 const app = getApp()
-const util = require('../../../../utils/util')
+const util = require('../../../../utils/util.js')
+const data = require('../../../../utils/data.js')
 Page({
 
   /**
@@ -44,18 +45,11 @@ Page({
 
   getData(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
-    wx.request({
-      url: url,
-      method:'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          that.setData({dataTree: [], selectedName: '', selectedCode: ''})
-          return
-        }
-        var dataTree = that.convertDataTree(res.data)
-        that.setData({dataTree: dataTree})
-      }
+    data.getAllRentCategoriesPromise().then(function(categories){
+      var dataTree = that.convertDataTree(categories)
+      that.setData({dataTree: dataTree})
+    }).catch(function (exp) {
+      that.setData({dataTree: [], selectedName: '', selectedCode: ''})
     })
     var selectedCode = that.data.selectedCode
     if (selectedCode != null  && selectedCode != ''){

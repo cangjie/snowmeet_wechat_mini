@@ -1,24 +1,25 @@
 // pages/admin/rent/settings/rent_package.js
 const app = getApp()
+const data = require('../../../../utils/data.js')
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    selectedCode:[],
-    priceArr:[ 
+    selectedCode: [],
+    priceArr: [
       {
         shop: '万龙',
-        matrix:[['1', '2', '3'], ['4', '5','6'], ['7', '8', '9']]
+        matrix: [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
       },
       {
         shop: '旗舰',
-        matrix:[['10', '20', '30'], ['40', '50','60'], ['70', '80', '90']]
+        matrix: [['10', '20', '30'], ['40', '50', '60'], ['70', '80', '90']]
       },
       {
         shop: '南山',
-        matrix:[['-', '-', '-'], ['-', '-','-'], ['-', '-', '-']]
+        matrix: [['-', '-', '-'], ['-', '-', '-'], ['-', '-', '-']]
       }
 
     ],
@@ -27,25 +28,25 @@ Page({
     priceSaving: false
   },
 
-  handleSelect(e){
+  handleSelect(e) {
     console.log('select', e)
   },
-  handleCheck(e){
+  handleCheck(e) {
     console.log('check', e)
-    var act = e.detail.checked? 'Add' : 'Del'
+    var act = e.detail.checked ? 'Add' : 'Del'
     var that = this
-    var setUrl = 'https://' + app.globalData.domainName + '/api/Rent/RentPackageCategory' 
-    + act + '/' + that.data.rentPackage.id + '?categoryId=' + e.detail.id 
-    + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
-    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    var setUrl = 'https://' + app.globalData.domainName + '/api/Rent/RentPackageCategory'
+      + act + '/' + that.data.rentPackage.id + '?categoryId=' + e.detail.id
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: setUrl,
       method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
+      success: (res) => {
+        if (res.statusCode != 200) {
           wx.showToast({
             title: '报错失败',
-            icon:'error'
+            icon: 'error'
           })
           return
         }
@@ -54,8 +55,13 @@ Page({
     })
   },
 
-  getDataTree(){
+  getDataTree() {
     var that = this
+    data.getAllRentCategoriesPromise().then(function (categories) {
+      var dataTree = that.convertDataTree(categories)
+      that.setData({ dataTree: dataTree })
+    })
+    /*
     var url = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
     wx.request({
       url: url,
@@ -68,25 +74,23 @@ Page({
         that.setData({dataTree: dataTree})
       }
     })
+    */
 
   },
-  convertDataTree(data){
-    
+  convertDataTree(data) {
     var that = this
-    
     var dataArr = []
-    
-    for(var i = 0; i < data.length; i++){
-      var leaf = {id: data[i].id, code: data[i].code, name: data[i].name, checked: false, open: false}
+    for (var i = 0; i < data.length; i++) {
+      var leaf = { id: data[i].id, code: data[i].code, name: data[i].name, checked: false, open: false }
       //var childSelected = false
-      for(var j = 0; j < that.data.selectedCode.length; j++){
+      for (var j = 0; j < that.data.selectedCode.length; j++) {
         var currentCode = that.data.selectedCode[j]
-        if (currentCode.startsWith(leaf.code)){    
+        if (currentCode.startsWith(leaf.code)) {
           leaf.open = true
           leaf.checked = true
         }
       }
-      if (data[i].children != undefined && data[i].children != null){
+      if (data[i].children != undefined && data[i].children != null) {
         leaf.children = this.convertDataTree(data[i].children)
       }
       dataArr.push(leaf)
@@ -100,17 +104,28 @@ Page({
   onLoad(options) {
     var that = this
     var id = options.id
-    that.setData({id: id})
-    app.loginPromiseNew.then(function(resolve){
+    that.setData({ id: id })
+    app.loginPromiseNew.then(function (resolve) {
       that.getPackage()
       //that.getDataTree()
 
     })
-    
+
   },
 
-  getPackage(){
+  getPackage() {
     var that = this
+    data.getPackagePromise(that.data.id).then(function (rentPackage){
+      var selectedCode = []
+      for(var i = 0; i < rentPackage.rentPackageCategoryList.length; i++){
+        selectedCode.push(rentPackage.rentPackageCategoryList[i].rentCategory.code)
+      }
+      rentPackage.need_save = false
+      that.setData({rentPackage: rentPackage, selectedCode: selectedCode})
+      //that.createPriceMatrix()
+      that.getDataTree()
+    })
+    /*
     var getUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetRentPackage/' + that.data.id
     wx.request({
       url: getUrl,
@@ -130,14 +145,16 @@ Page({
         that.getDataTree()
       }
     })
+    */
+    
   },
 
-  keyInput(e){
+  keyInput(e) {
     var that = this
     var v = e.detail.value
     var id = e.currentTarget.id
     var rentPackage = that.data.rentPackage
-    switch(id){
+    switch (id) {
       case 'name':
         rentPackage.name = v
         rentPackage.need_save = true
@@ -148,7 +165,7 @@ Page({
         break
       case 'deposit':
         rentPackage.deposit = v
-        if (isNaN(v) || v.toString().trim() == ''){
+        if (isNaN(v) || v.toString().trim() == '') {
           rentPackage.need_save = false
           wx.showToast({
             title: '押金必须是数字。',
@@ -163,23 +180,23 @@ Page({
       default:
         break
     }
-    that.setData({rentPackage: rentPackage})
+    that.setData({ rentPackage: rentPackage })
   },
-  saveBaseInfo(){
+  saveBaseInfo() {
     var that = this
     var pack = that.data.rentPackage
-    var saveUrl = 'https://' + app.globalData.domainName 
-    + '/api/Rent/UpdateRentPackageBaseInfo/'
-    + pack.id.toString() + '?name=' + encodeURIComponent(pack.name) 
-    + '&description=' + encodeURIComponent(pack.description)
-    + '&deposit=' + encodeURIComponent(pack.deposit.toString())
-    + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    var saveUrl = 'https://' + app.globalData.domainName
+      + '/api/Rent/UpdateRentPackageBaseInfo/'
+      + pack.id.toString() + '?name=' + encodeURIComponent(pack.name)
+      + '&description=' + encodeURIComponent(pack.description)
+      + '&deposit=' + encodeURIComponent(pack.deposit.toString())
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+      + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: saveUrl,
-      method:'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
+      method: 'GET',
+      success: (res) => {
+        if (res.statusCode != 200) {
           return
         }
         wx.showToast({
@@ -190,7 +207,7 @@ Page({
       }
     })
   },
-  modPrice(e){
+  modPrice(e) {
     console.log('mod price', e)
     var that = this
     var priceArr = that.data.priceArr
@@ -199,23 +216,23 @@ Page({
     var y = e.detail.col
     var v = e.detail.value
     priceArr[shopIndex].matrix[x][y] = v
-    that.setData({priceArr: priceArr})
+    that.setData({ priceArr: priceArr })
     that.checkPriceValid()
   },
-
-  createPriceMatrix(){
+/*
+  createPriceMatrix() {
     var that = this
     var rentPackage = that.data.rentPackage
     var priceList = rentPackage.rentPackagePriceList
     var matrix = [
-      {shop: '万龙', matrix:[['','',''],['','',''],['','','']]},
-      {shop: '旗舰', matrix:[['','',''],['','',''],['','','']]},
-      {shop: '南山', matrix:[['','',''],['','',''],['','','']]},
+      { shop: '万龙', matrix: [['', '', ''], ['', '', ''], ['', '', '']] },
+      { shop: '旗舰', matrix: [['', '', ''], ['', '', ''], ['', '', '']] },
+      { shop: '南山', matrix: [['', '', ''], ['', '', ''], ['', '', '']] },
     ]
-    for(var i = 0; i < priceList.length; i++){
+    for (var i = 0; i < priceList.length; i++) {
       var price = priceList[i]
       var shopIndex = -1
-      switch(price.shop){
+      switch (price.shop) {
         case '万龙体验中心':
           shopIndex = 0
           break
@@ -229,7 +246,7 @@ Page({
           break
       }
       var y = -1
-      switch(price.scene){
+      switch (price.scene) {
         case '门市':
           y = 0
           break
@@ -243,7 +260,7 @@ Page({
           break
       }
       var x = -1
-      switch(price.day_type){
+      switch (price.day_type) {
         case '平日':
           x = 0
           break
@@ -256,48 +273,48 @@ Page({
         default:
           break
       }
-      if (shopIndex != -1 && x != -1 && y != -1){
-        matrix[shopIndex].matrix[x][y] = price.price==null? '-':price.price
+      if (shopIndex != -1 && x != -1 && y != -1) {
+        matrix[shopIndex].matrix[x][y] = price.price == null ? '-' : price.price
       }
     }
-    that.setData({priceArr: matrix})
+    that.setData({ priceArr: matrix })
     that.checkPriceValid()
   },
-  tabChange(e){
+  */
+  tabChange(e) {
     console.log('tab change', e)
     var that = this
-    that.setData({currentTabIndex: e.detail.index})
+    that.setData({ currentTabIndex: e.detail.index })
     that.checkPriceValid()
   },
-  checkPriceValid(){
+  checkPriceValid() {
     var that = this
     var matrix = that.data.priceArr[that.data.currentTabIndex].matrix
     var valid = true
-    for(var i = 0; i < matrix.length; i++){
-      for(var j = 0; j < matrix[i].length; j++){
+    for (var i = 0; i < matrix.length; i++) {
+      for (var j = 0; j < matrix[i].length; j++) {
         var v = matrix[i][j]
-        if ((isNaN(v) || v.toString().trim() == '') && v != '-'){
+        if ((isNaN(v) || v.toString().trim() == '') && v != '-') {
           valid = false
           break
         }
       }
-      if (!valid){
+      if (!valid) {
         break
       }
     }
-    that.setData({priceArrayValid: valid})
+    that.setData({ priceArrayValid: valid })
   },
 
-  savePriceArr(){
+  savePriceArr() {
     var that = this
-    that.setData({priceSaving: true, saveNum: 0})
+    that.setData({ priceSaving: true, saveNum: 0 })
     var tabIndex = that.data.currentTabIndex
-    
+
     var priceArr = that.data.priceArr
-    for(var k = 0; k < that.data.priceArr.length; k++)
-    {
+    for (var k = 0; k < that.data.priceArr.length; k++) {
       var shop = ''
-      switch(k){
+      switch (k) {
         case 0:
           shop = '万龙体验中心'
           break
@@ -311,12 +328,12 @@ Page({
           break
       }
       var matrix = priceArr[k].matrix
-      for(var i = 0; i < matrix.length; i++){
-        for(var j = 0; j < matrix[i].length; j++){
+      for (var i = 0; i < matrix.length; i++) {
+        for (var j = 0; j < matrix[i].length; j++) {
           var scene = ''
           var dayType = ''
           var v = matrix[i][j]
-          switch(i){
+          switch (i) {
             case 0:
               dayType = '平日'
               break
@@ -329,7 +346,7 @@ Page({
             default:
               break
           }
-          switch(j){
+          switch (j) {
             case 0:
               scene = '门市'
               break
@@ -342,16 +359,16 @@ Page({
             default:
               break
           }
-          var saveUrl = 'https://' + app.globalData.domainName + '/api/Rent/SetPackageRentPrice/' 
-          + that.data.rentPackage.id.toString() + '?shop=' + encodeURIComponent(shop) 
-          + '&dayType=' + encodeURIComponent(dayType) + '&scene=' + encodeURIComponent(scene)
-          + '&price=' + encodeURIComponent(v) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-          + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+          var saveUrl = 'https://' + app.globalData.domainName + '/api/Rent/SetPackageRentPrice/'
+            + that.data.rentPackage.id.toString() + '?shop=' + encodeURIComponent(shop)
+            + '&dayType=' + encodeURIComponent(dayType) + '&scene=' + encodeURIComponent(scene)
+            + '&price=' + encodeURIComponent(v) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
           wx.request({
             url: saveUrl,
             method: 'GET',
-            success:(res)=>{
-              if (res.statusCode != 200){
+            success: (res) => {
+              if (res.statusCode != 200) {
                 wx.showToast({
                   title: '价格保存失败',
                   icon: 'error'
@@ -359,12 +376,12 @@ Page({
               }
               var saveNum = that.data.saveNum
               saveNum++
-              that.setData({saveNum: saveNum})
-              if (saveNum == matrix.length * matrix[0].length){
-                that.setData({priceSaving: false})
+              that.setData({ saveNum: saveNum })
+              if (saveNum == matrix.length * matrix[0].length) {
+                that.setData({ priceSaving: false })
                 wx.showToast({
                   title: '保存成功',
-                  icon:'success'
+                  icon: 'success'
                 })
               }
             }

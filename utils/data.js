@@ -49,7 +49,7 @@ const searchBarCodeFuzzyPromise = function (key, categoryId) {
   })
 }
 const getAllRentCategoriesPromise = function(){
-  var getUrl = app.globalData.requestPrefix + 'Rent/GetAllRentCategories'
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetAllCategories'
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (categories) {
       resolve(categories)
@@ -166,6 +166,19 @@ const updateRentPricePromise = function(priceList, shopId, sessionKey){
     })
   })
 }
+/*
+const getAllRentCategoriesPromise = function(){
+  var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
+  return new Promise(function (resovle, reject){
+    util.performWebRequest(updateUrl, priceList).then(function (categories){
+      resovle(categories)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+*/
+
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,

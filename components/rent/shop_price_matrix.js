@@ -40,20 +40,19 @@ Component({
       
     }
   },
-  /**
-   * Component methods
-   */
   methods: {
     onChange(e){
       var that = this
-      that.setData({currentShop: that.data.shops[e.detail.index]})
+      that.setData({showMatrix: false})
+      that.setData({currentShop: that.data.shops[e.detail.index], showMatrix: true})
       console.log('change tab', e)
     },
     changeScene(e){
       var that = this
       var currentShop = that.data.currentShop
       currentShop.scene = e.detail.value
-      that.setData({currentShop})
+      that.setData({showMatrix: false})
+      that.setData({currentShop, showMatrix: true})
     }
   }
 })

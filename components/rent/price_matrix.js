@@ -44,7 +44,6 @@ Component({
 
         })
 
-
       })
     }
   },
@@ -52,27 +51,55 @@ Component({
    * Component methods
    */
   methods: {
-    save(){
+    save() {
       var that = this
+      var valid = true
       var matrix = that.data.matrix
       var modList = []
-      for(var i = 0; i < matrix.length; i++){
-        for(var j = 0; j < matrix[i].length; j++){
+      for (var i = 0; i < matrix.length; i++) {
+        for (var j = 0; j < matrix[i].length; j++) {
           var price = matrix[i][j]
-          if (price.mod){
-            modList.push(price)
+          if (price.mod) {
+            if (isNaN(price.price) && price.price != '-') {
+              valid = false
+              break
+            }
+            else {
+              modList.push(price)
+            }
           }
         }
       }
-      data.updateRentPricePromise(modList, that.data.shopId, app.globalData.sessionKey).then(function(list){
-        console.log('update price', list)
-      })
+      if (valid) {
+        wx.showModal({
+          title: '确认更新',
+          content: '',
+          complete: (res) => {
+            if (res.cancel) {
+              that.setCancel()
+            }
+            if (res.confirm) {
+              data.updateRentPricePromise(modList, that.data.shopId, app.globalData.sessionKey).then(function (list) {
+                console.log('update price', list)
+                that.setCancel()
+              })
+            }
+          }
+        })
+      }
+      else{
+        wx.showToast({
+          title: '必须是数字或-',
+          icon:'error'
+        })
+        that.setCancel()
+      }
       console.log('mod list', modList)
     },
-    setPrice(e){
+    setPrice(e) {
       var value = e.detail.value
-      if (isNaN(value)){
-        if (value != '-'){
+      if (isNaN(value)) {
+        if (value != '-') {
           return
         }
       }
@@ -83,62 +110,64 @@ Component({
       var matrix = that.data.matrix
       var price = matrix[x][y]
       price.mod = true
-      if (value == '-'){
+      if (value == '-') {
         price.price = null
       }
-      else{
+      else {
         price.price = parseFloat(value)
       }
     },
-    setCancel(e){
+    setCancel(e) {
       var that = this
-      that.setData({mod: false})
+      that.setData({ mod: false })
       that.getData()
     },
-    setMod(e){
+    setMod(e) {
       var that = this
-      that.setData({mod: true})
+      that.setData({ mod: true })
     },
     getData() {
       var that = this
       data.getRentPriceListPromise(that.data.shopId, that.data.priceType, that.data.targetId, that.data.scene)
-      .then(function (list) {
-        var rentTypeList = that.data.rentTypeList
-        var dayTypeList = that.data.dayTypeList
-        var matrix = []
-        for(var i = 0; i < rentTypeList.length; i++){
-          var line = []
-          for(var j = 0; j < dayTypeList.length; j++){
-            var value = null
-            var priceId = 0
-            var find = false
-            var rentType = rentTypeList[i]
-            var dayType = dayTypeList[j]
-            for(var k = 0; k < list.length; k++){
-              if (list[k].day_type == dayType && list[k].rent_type == rentType){
-                find = true
-                value = list[k].price == null ? '-':list[k].price
-                priceId = list[k].id
-                break
+        .then(function (list) {
+          var rentTypeList = that.data.rentTypeList
+          var dayTypeList = that.data.dayTypeList
+          var matrix = []
+          for (var i = 0; i < rentTypeList.length; i++) {
+            var line = []
+            for (var j = 0; j < dayTypeList.length; j++) {
+              var value = null
+              var priceId = 0
+              var find = false
+              var rentType = rentTypeList[i]
+              var dayType = dayTypeList[j]
+              for (var k = 0; k < list.length; k++) {
+                if (list[k].day_type == dayType && list[k].rent_type == rentType) {
+                  find = true
+                  value = list[k].price == null ? '-' : list[k].price
+                  priceId = list[k].id
+                  break
+                }
               }
+              if (!find) {
+                value = ''
+              }
+              var priceObj = {
+                id: priceId, price: value, type: that.data.priceType, shop_id: that.data.shopId,
+                scene: that.data.scene, day_type: dayType, rent_type: rentType, mod: false
+              }
+              if (that.data.priceType == '分类') {
+                priceObj.category_id = that.data.targetId
+              }
+              else if (that.data.priceType == '套餐') {
+                priceObj.package_id = that.data.targetId
+              }
+              line.push(priceObj)
             }
-            if (!find){
-              value = ''
-            }
-            var priceObj = {id: priceId, price: value, type: that.data.priceType, shop_id: that.data.shopId,
-              scene: that.data.scene, day_type: dayType, rent_type: rentType, mod: false}
-            if (that.data.priceType == '分类'){
-              priceObj.category_id = that.data.targetId
-            }
-            else if (that.data.priceType == '套餐'){
-              priceObj.package_id = that.data.targetId
-            }
-            line.push(priceObj)
+            matrix.push(line)
           }
-          matrix.push(line)
-        }
-        that.setData({matrix})
-      })
+          that.setData({ matrix })
+        })
     }
   }
 })
