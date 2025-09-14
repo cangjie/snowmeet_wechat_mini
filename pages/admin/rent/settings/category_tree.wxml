@@ -86,12 +86,12 @@
   <shop-price-matrix wx:if="{{showShopMatrix}}" targetId="{{selectedCategory.id}}" priceType="分类" ></shop-price-matrix>
      
       
-  <mp-cells title="保存租金押金设置">
+  <!--mp-cells title="保存租金押金设置">
     <mp-cell>
         <view style="color: red;">{{canSave? '': canSaveMsg}}</view>
     </mp-cell>
     <mp-cell><button class="input" disabled="{{!canSave || isSaving}}" bind:tap="save" > 保 存 </button></mp-cell>
-  </mp-cells>
+  </mp-cells-->
   <mp-cells title="租赁商品信息字段设定" >
     <mp-cell>
       <view class="view-row" >

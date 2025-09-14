@@ -5,9 +5,7 @@ Page({
    * Page initial data
    */
   data: {
-    showPackage: false,
-    showItem: false,
-    show: false
+
   },
 
   /**
@@ -64,20 +62,5 @@ Page({
    */
   onShareAppMessage() {
 
-  },
-  showBackdrop(e){
-    console.log('show back', e)
-    var that = this
-    var id = e.currentTarget.id
-    if (id=='1'){
-      that.setData({showPackage: true, showItem: false, show: true})
-    }
-    else{
-      that.setData({showPackage: false, showItem: true, show: true})
-    }
-  },
-  close(){
-    var that = this
-    that.setData({show: false})
   }
 })
