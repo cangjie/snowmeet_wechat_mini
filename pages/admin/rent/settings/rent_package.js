@@ -25,7 +25,8 @@ Page({
     ],
     priceArrayValid: false,
     currentTabIndex: 0,
-    priceSaving: false
+    priceSaving: false,
+    showShopMatrix: true
   },
 
   handleSelect(e) {
@@ -125,27 +126,6 @@ Page({
       //that.createPriceMatrix()
       that.getDataTree()
     })
-    /*
-    var getUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetRentPackage/' + that.data.id
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        var rentPackage = res.data
-        var selectedCode = []
-        for(var i = 0; i < rentPackage.rentPackageCategoryList.length; i++){
-          selectedCode.push(rentPackage.rentPackageCategoryList[i].rentCategory.code)
-        }
-        rentPackage.need_save = false
-        that.setData({rentPackage: rentPackage, selectedCode: selectedCode})
-        that.createPriceMatrix()
-        that.getDataTree()
-      }
-    })
-    */
     
   },
 

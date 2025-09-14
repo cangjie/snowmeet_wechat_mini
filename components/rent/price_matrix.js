@@ -19,7 +19,7 @@ Component({
    * Component initial data
    */
   data: {
-
+    wellFormed: false
   },
   lifetimes: {
     ready() {
@@ -122,9 +122,47 @@ Component({
       that.setData({ mod: false })
       that.getData()
     },
-    setMod(e) {
+    setMod() {
       var that = this
       that.setData({ mod: true })
+    },
+    getStandardPrice(){
+      var that = this
+      data.getRentPriceListPromise(10, that.data.priceType, that.data.targetId, encodeURIComponent('门市'))
+        .then(function (standardPriceList){ 
+        if (standardPriceList.length >= that.data.rentTypeList.length * that.data.dayTypeList.length){
+          that.setData({standardPriceList, wellFormed: true})
+        }
+      })
+      
+    },
+    importPrice(){
+      var that = this
+      var standardPriceList = that.data.standardPriceList
+      if (!standardPriceList){
+        return
+      }
+      var matrix = that.data.matrix
+      for(var i = 0; i < standardPriceList.length; i++){
+        var cell = standardPriceList[i]
+        var price = that.getPriceObject(matrix, cell.day_type, cell.rent_type)
+        price.mod = true
+        price.price = cell.price
+      }
+      that.setData({matrix})
+      that.setMod()
+    },
+    getPriceObject(matrix, dayType, rentType){
+      for(var i = 0; i < matrix.length; i++){
+        var line = matrix[i]
+        for(var j = 0; j < line.length; j++){
+          var cell = line[j]
+          if (cell.rent_type == rentType && cell.day_type == dayType){
+            return cell
+          }
+        }
+      }
+      return null
     },
     getData() {
       var that = this
@@ -167,6 +205,7 @@ Component({
             matrix.push(line)
           }
           that.setData({ matrix })
+          that.getStandardPrice()
         })
     }
   }

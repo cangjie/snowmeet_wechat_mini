@@ -23,6 +23,10 @@
     </block>
     <block wx:else >
       <van-button plain type="primary" bind:click="setMod" > 修 改 </van-button>
+      <van-button plain type="warning" 
+      wx:if="{{(shopId != 10 || scene != '门市') && wellFormed}}" bind:click="importPrice" 
+      style="margin-left: 60rpx;"
+      >导入万龙门市价</van-button>
     </block>
   </view>
 </view>
