@@ -8,8 +8,12 @@ Component({
    * Component properties
    */
   properties: {
+    /*
     showPopUp: false,
-    popUpContent: ''
+    popUpContent: '',
+    */
+    memberId: Number,
+    shop: String
   },
 
   /**
@@ -19,11 +23,15 @@ Component({
     rentals: [],
     defaultTextColor: 'black',
     noNeedTextColor: 'gray',
-    startDate: util.formatDate(new Date())
+    startDate: util.formatDate(new Date()),
+    startDateIsWeekend: util.isWeekend(new Date()),
+    currentDate: new Date()
   },
 
   lifetimes: {
     ready() {
+      var that = this
+      that.setData({memberId: that.properties.memberId, shop: that.properties.shop})
       app.loginPromiseNew.then(function (resolve) {
 
       })
@@ -54,7 +62,8 @@ Component({
         depositStr: util.showAmount(selectedPackage.deposit),
         realDeposit: selectedPackage.deposit,
         realDepositStr: util.showAmount(selectedPackage.deposit),
-        startDate: that.data.startDate
+        startDate: that.data.startDate,
+        startDateIsWeekend: util.isWeekend(new Date(that.data.startDate))
       }
       var items = []
       for (var i = 0; i < selectedPackage.categories.length; i++) {
@@ -177,6 +186,7 @@ Component({
         realDeposit: rentProduct.category.deposit,
         realDepositStr: util.showAmount(rentProduct.category.deposit),
         startDate: that.data.startDate,
+        startDateIsWeekend: util.isWeekend(new Date(that.data.startDate)),
         expectDays: 1,
         category: rentProduct.category
       }
@@ -229,6 +239,7 @@ Component({
         realDeposit: 0,
         realDepositStr: '——',
         startDate: that.data.startDate,
+        startDateIsWeekend: util.isWeekend(new Date(that.data.startDate)),
         expectDays: 1
       }
       var items = []
@@ -343,7 +354,9 @@ Component({
       var id = parseInt(e.currentTarget.id)
       var rentals = that.data.rentals
       var rental = rentals[id]
+      var date = new Date(e.detail.value)
       rental.startDate = e.detail.value
+      rental.startDateIsWeekend = util.isWeekend(new Date(e.detail.value))
       that.renderData(rentals)
       that.setData({rentals})
     },
@@ -411,6 +424,17 @@ Component({
       that.renderData(that.data.rentals)
       that.cancelBackdrop()
       that.setData({unSavedRental: null})
-    }
+    },
+    showPriceList(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var shop = that.data.shop
+      var rental = that.data.rentals[id]
+      //var rental = rentals[id]
+      var targetId = rental.package_id? rental.package_id : rental.category.id
+      that.setData({showBackdrop: true, action: 'priceList', 
+        dayType: rental.startDateIsWeekend ? '周末' :'平日',
+        type: rental.package_id? '套餐' : '分类', shop, targetId })
+    },
   }
 })

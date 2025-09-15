@@ -75,7 +75,7 @@ Page({
         })
       }
       else{
-        that.setData({degree: '散客'})
+        that.setData({degree: '散客', memberId: null})
       }
     })
   },

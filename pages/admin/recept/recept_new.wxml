@@ -40,7 +40,7 @@
     <fui-card title="{{realName?realName:''}} {{gender=='男'? '先生': (gender=='女'?'女士':'')}} {{cell?cell:''}}" tag="{{degree}}" bindtap="showUserInfo"></fui-card>
   </view>
   <view class="main-frame" >
-    <rent-recept wx:if="{{bizType == 'rent'}}" ></rent-recept>
+    <rent-recept wx:if="{{bizType == 'rent'}}" memberId="{{memberId}}" shop="{{shop}}" ></rent-recept>
   </view>
   <view style="height: 200rpx;">
     <van-goods-action>

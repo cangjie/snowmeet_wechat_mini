@@ -166,6 +166,16 @@ const updateRentPricePromise = function(priceList, shopId, sessionKey){
     })
   })
 }
+const getShopByNamePromise = function(shopName){
+  var getUrl = app.globalData.requestPrefix + 'Shop/GetShopByName?shopName=' + encodeURIComponent(shopName)
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (shop){
+      resolve(shop)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 /*
 const getAllRentCategoriesPromise = function(){
   var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
@@ -193,5 +203,6 @@ module.exports = {
   placeBlankOrderPromise,
   getEnumListPromise,
   getRentPriceListPromise,
-  updateRentPricePromise
+  updateRentPricePromise,
+  getShopByNamePromise
 }

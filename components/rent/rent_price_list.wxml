@@ -1,0 +1,14 @@
+<view>
+  <view style="width: 90%;margin-left: auto;margin-right: auto; background-color: white;">
+    <view class="view-row">
+      <view class="left-column">【店铺】</view>
+      <view class="right-column"></view>
+    </view>
+    <view class="view-row">
+      <view class="left-column">【商品】</view>
+      <view class="right-column"></view>
+
+    </view>
+    
+  </view>
+</view>
