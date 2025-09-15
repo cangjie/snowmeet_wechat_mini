@@ -8,8 +8,28 @@
       <view class="left-column">【商品】</view>
       <view class="right-column">{{productName}}</view>
     </view>
+    <view style="height: 20rpx;"></view>
     <van-tabs active="{{currentTag}}" bind:change="onTabChange" >
-      <van-tab wx:for="{{RentSceneType}}" title="{{item}}"></van-tab>
+      <van-tab wx:for="{{RentSceneTypeList}}" title="{{item}}">
+        <view style="height: 20rpx;"></view>
+        <van-row style="margin-top: 20rpx;">
+          <van-col span="6"  >——</van-col>
+          <van-col span="6" wx:for="{{dayTypeList}}" >{{item}}</van-col>
+        </van-row>
+        <view style="height: 20rpx;"></view>
+
+        <van-row wx:for="{{rentTypeList}}" wx:for-index="i" >
+          <van-col span="6">
+            <view style="margin-top: 20rpx;" >{{rentTypeList[i]}}</view>
+          </van-col>
+          <van-col span="6" wx:for="{{dayTypeList}}" wx:for-index="j" >
+            <view style="margin-top: 20rpx;" >
+              {{matrix[i][j].priceStr}}
+            </view>
+          </van-col>
+        </van-row>
+
+      </van-tab>
     </van-tabs>
   </view>
 </view>
