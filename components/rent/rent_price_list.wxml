@@ -22,9 +22,9 @@
           <van-col span="6">
             <view style="margin-top: 20rpx;" >{{rentTypeList[i]}}</view>
           </van-col>
-          <van-col span="6" wx:for="{{dayTypeList}}" wx:for-index="j" >
-            <view style="margin-top: 20rpx;" >
-              {{matrix[i][j].priceStr}}
+          <van-col span="6" wx:for="{{dayTypeList}}" wx:for-index="j"  >
+            <view style="margin-top: 20rpx;{{dayTypeList[j] == dayType?'color:red;': ''}}" >
+             {{matrix[i][j].priceStr}}
             </view>
           </van-col>
         </van-row>

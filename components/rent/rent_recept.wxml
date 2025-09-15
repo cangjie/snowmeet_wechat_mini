@@ -272,7 +272,7 @@
       </view>
     </block>
     <block wx:if="{{action == 'priceList'}}">
-      <rent-price-list shopName="{{shop}}" type="{{type}}" dayType="{{dayType}}{" 
+      <rent-price-list shopName="{{shop}}" type="{{type}}" dayType="{{dayType}}" 
       targetId="{{targetId}}" memberId="{{memberId}}" ></rent-price-list>
       <view class="view-row" style="width: 90%;background-color: white;margin-left: auto;margin-right: auto;">
         <button class="input" size="mini" bindtap="cancelBackdrop" style="margin-top:50rpx;margin-bottom: 50rpx;" > 关 闭 </button>
