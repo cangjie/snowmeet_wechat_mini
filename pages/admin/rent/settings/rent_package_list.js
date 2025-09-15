@@ -1,5 +1,6 @@
 // pages/admin/rent/settings/rent_package_list.js
 const app = getApp()
+const data = require('../../../../utils/data.js')
 Page({
 
   /**
@@ -11,17 +12,9 @@ Page({
 
   getData(){
     var that = this
-    var getList = 'https://' + app.globalData.domainName + '/api/Rent/GetRentPackageList'
-    wx.request({
-      url: getList,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        that.setData({packageList: res.data})
-      }
-    })
+    data.getPackageListPromise().then(function (resovle) {
+      that.setData({packageList: resovle})
+    }).catch(function (exp) { })
   },
   gotoDetail(e){
     wx.navigateTo({

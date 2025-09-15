@@ -1,0 +1,6 @@
+<view wx:if="{{!verified}}" style="margin-top: 50rpx;" >
+  <member-auth wx:if="{{member && member.cell == null}}" bindVerified="verified" ></member-auth>
+</view>
+<view wx:else >
+欢迎新会员
+</view>

@@ -1,0 +1,18 @@
+/* pages/template/rent/rent_detail.wxss */
+.left-column{
+  width: 220rpx;
+  color:#000000;
+  text-align: left;
+  margin-left: 0rpx;
+}
+.right-column{
+  color: #000000;
+  
+}
+.right-column-sub{
+  width: 160rpx;
+}
+.amount{
+  text-align: right;
+  margin-right: 10rpx;
+}

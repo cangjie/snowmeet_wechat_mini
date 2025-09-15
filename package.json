@@ -2,6 +2,7 @@
   "dependencies": {
     "@miniprogram-component-plus/vtabs": "^1.0.0",
     "@miniprogram-component-plus/vtabs-content": "^1.0.0",
+
     "@vant/weapp": "^1.11.7"
   },
   "name": "snowmeet_wechat_mini",

@@ -1,6 +1,7 @@
 // pages/admin/rent/settings/category_tree.js
 const app = getApp()
-const util = require('../../../../utils/util')
+const util = require('../../../../utils/util.js')
+const data = require('../../../../utils/data.js')
 Page({
 
   /**
@@ -44,18 +45,11 @@ Page({
 
   getData(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
-    wx.request({
-      url: url,
-      method:'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          that.setData({dataTree: [], selectedName: '', selectedCode: ''})
-          return
-        }
-        var dataTree = that.convertDataTree(res.data)
-        that.setData({dataTree: dataTree})
-      }
+    data.getAllRentCategoriesPromise().then(function(categories){
+      var dataTree = that.convertDataTree(categories)
+      that.setData({dataTree: dataTree})
+    }).catch(function (exp) {
+      that.setData({dataTree: [], selectedName: '', selectedCode: ''})
     })
     var selectedCode = that.data.selectedCode
     if (selectedCode != null  && selectedCode != ''){
@@ -172,6 +166,7 @@ Page({
   tabChange(e){
     console.log('tab change', e)
     var that = this
+    //that.setData({showShopMatrix: false})
     that.setData({currentShopIndex: e.detail.index})
   },
   modPrice(e){
@@ -362,6 +357,7 @@ Page({
     var grandpaCode = select.code.substr(0, select.code.length - 2)
     var fatherDisplayedCode = util.getDisplayedCode(fatherCode) 
     var grandpaDisplayedCode = util.getDisplayedCode(grandpaCode)
+    that.setData({showShopMatrix: false})
     grandpaDisplayedCode = grandpaDisplayedCode != '' ? grandpaDisplayedCode + '-' : grandpaDisplayedCode
     if (fatherDisplayedCode != ''){
       fatherDisplayedCode = fatherDisplayedCode + '-'
@@ -370,6 +366,7 @@ Page({
     that.setData({selectedCategory: select, selectedDisplayedCode: selectedDisplayedCode, 
     fatherDisplayedCode: fatherDisplayedCode, modName: select.name, grandpaDisplayedCode: grandpaDisplayedCode, seq: seq})
     that.getSingleCategory(select.code)
+    that.setData({showShopMatrix: true})
     //that.getSingleCategory(select.id)
   },
   onTabCLick(e){

@@ -1,8 +1,10 @@
 <view>
-  <mp-vtabs height="{{vtabHeight}}" wx:if="{{showVtabs}}" vtabs="{{vtabs}}" activeTab="{{activeTab}}" bindtabclick="onTabCLick" bindchange="onChange" class="test">
+<view style="height:calc(100vh - 200rpx);"  >
+  <mp-vtabs height="{{vtabHeight}}" wx:if="{{showVtabs}}" vtabs="{{vtabs}}" activeTab="{{activeTab}}" bindtabclick="onTabCLick" bindchange="onChange"  >
     <block wx:for="{{vtabs}}" wx:key="title">
-      <mp-vtabs-content tabIndex="{{index}}">
-        <view class="vtabs-content-item" style="height:{{categories[index].products.length * 550}}rpx;margin-left: 5rpx;margin-top: 10rpx;">
+      <mp-vtabs-content tabIndex="{{index}}" >
+        <!--view class="vtabs-content-item" style="/*height:{{categories[index].products.length * 550}}rpx;*/margin-left: 5rpx;margin-top: 10rpx;"-->
+        <view class="vtabs-content-item" style="margin-left: 5rpx;margin-top: 10rpx;" >
           <view wx:for="{{categories[index].products}}" wx:for-index="pIdx" wx:for-item="product">
             <fui-card title="{{product.name}}" tag="库存：{{product.stock_numStr}}" background="{{product.inCart? '#EEEEEE': '#FFFFFF'}}">
               <view class="fui-card__content fui-padding">
@@ -52,6 +54,7 @@
       </mp-vtabs-content>
     </block>
   </mp-vtabs>
+</view>
   <view class="view-row">
     <view style="margin-top: 20rpx;">
       <image bindtap="placeOrder" src="{{cartUrl}}" mode="scaleToFill" style="width: 100rpx;height: 100rpx;"></image>

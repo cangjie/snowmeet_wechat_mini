@@ -1,4 +1,4 @@
-<view>
+<!--view>
   <view style="height: 20rpx;" ></view>
   <fui-card  title="王麻子 先生 13501177897" tag="会员" bindtap="showUserInfo"></fui-card>
   <view style="height: 20rpx;" ></view>
@@ -34,5 +34,21 @@
       </view>
     </view>
   </fui-top-popup>
-
+</view-->
+<view>
+  <view style="height: 100rpx;">
+    <fui-card title="{{realName?realName:''}} {{gender=='男'? '先生': (gender=='女'?'女士':'')}} {{cell?cell:''}}" tag="{{degree}}" bindtap="showUserInfo"></fui-card>
+  </view>
+  <view class="main-frame" >
+    <rent-recept wx:if="{{bizType == 'rent'}}" memberId="{{memberId}}" shop="{{shop}}" ></rent-recept>
+  </view>
+  <view style="height: 200rpx;">
+    <van-goods-action>
+      <van-goods-action-icon icon="chat-o" text="客服" bind:click="onClickIcon" />
+      <van-goods-action-icon icon="cart-o" text="购物车" bind:click="onClickIcon" />
+      <van-goods-action-button text="加入购物车" type="warning" bind:click="onClickButton" />
+      <van-goods-action-button text="立即购买" bind:click="onClickButton" />
+    </van-goods-action>
+  </view>
+  <van-popup show="{{ showUserInfo }}" position="top" custom-style="height: 20%;" bind:close="onPopClose" close-icon="close" />
 </view>

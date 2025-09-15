@@ -1,5 +1,6 @@
 // pages/admin/recept/recept_new.js
 const util = require("../../../utils/util")
+const data = require('../../../utils/data.js')
 const app = getApp()
 
 Page({
@@ -20,16 +21,31 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({bizType: options.bizType? options.bizType: 'sale',
-      receptId: options.receptId? options.receptId : null,
-      contactNum: options.contactNum? options.contactNum : null,
-      name: options.name? options.name : null,
-      gender: options.gender? options.gender : null,
-      memberId: options.memberId? options.memberId : null,
+    that.setData({bizType: options.bizType,
       shop: options.shop,
-      receptId: options.receptId? options.receptId : null,
-      showSummary: false})
-    
+      memberId: options.memberId? options.memberId : null,
+      realName: options.realName? options.realName: null,
+      gender: options.gender? options.gender : null,
+      cell: options.cell? options.cell: null,
+    })
+    var title = ''
+    switch(that.data.bizType)
+    {
+      case 'rent':
+        title = '租赁开单'
+        break
+      case 'care':
+        title = '养护开单'
+        break
+      case 'sale':
+        title = '零售开单'
+        break
+      defaut:
+        break
+    }
+    wx.setNavigationBarTitle({
+      title: title,
+    })
   },
 
   /**
@@ -39,16 +55,27 @@ Page({
 
   },
 
-  /**
-   * Lifecycle function--Called when page show
-   */
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve){
-      that.setData({scrollHeight: app.globalData.windowInfo.windowHeight * 2-220})
-      that.getData()
       if (that.data.memberId){
-        that.getMember()
+        data.getMemberPromise(that.data.memberId, app.globalData.sessionKey).then(function (member){
+          var degree = '会员'
+          if (member.following_wechat != 1){
+            degree += ' 取关'
+          }
+          var realName = that.data.realName? that.data.realName : member.real_name
+          var cell = that.data.cell ? that.data.cell : member.cell
+          var gender = that.data.gender? that.data.gender: member.gender
+         
+          
+          that.setData({member, degree, realName, cell, gender})
+        }).catch(function (reject){
+
+        })
+      }
+      else{
+        that.setData({degree: '散客', memberId: null})
       }
     })
   },
@@ -88,13 +115,17 @@ Page({
 
   },
   showUserInfo(){
+
     var that = this
-    that.setData({showUserInfo: true})
+    if (that.data.degree != '散客'){
+      that.setData({showUserInfo: true})
+    }
   },
   closeUserInfo(e){
     var that = this
     that.setData({showUserInfo: false})
   },
+  /*
   getData(){
     var that = this
     var getUrl = app.globalData.requestPrefix + 'Recept/GetUnfinishedRecept?bizType=' + encodeURIComponent(that.data.bizType) + '&name=' + encodeURIComponent(that.data.name) + '&gender=' + encodeURIComponent(that.data.gender) 
@@ -115,5 +146,10 @@ Page({
     }).catch(function(reject){
 
     })
+  },
+  */
+  onPopClose(){
+    var that = this
+    that.setData({showUserInfo:false})
   }
 })

@@ -49,9 +49,7 @@
     "pages/rent/rent_detail",
     "pages/admin/recept/recept_entry",
     "pages/admin/recept/recept_member_info",
-    "pages/admin/recept/recept",
     "pages/admin/recept/recept_list",
-    "pages/admin/recept/select_shop_business",
     "pages/admin/recept/recept_summary",
     "pages/register/register",
     "pages/admin/vip/maintain_recept",
@@ -112,8 +110,6 @@
     "pages/admin/sale/supplement",
     "pages/admin/maintain/task_detail",
     "pages/admin/rent/rent_details",
-    "pages/test/firstUI/first_test",
-    "pages/admin/recept/verify_items",
     "pages/admin/recept/recept_new",
     "pages/test/firstUI/rent_new",
     "pages/test/firstUI/rent_order",
@@ -132,15 +128,19 @@
     "pages/admin/fd/fd_order_list",
     "pages/admin/fd/fd_cart",
     "pages/admin/fd/fd_order_detail",
-    "pages/test/collapse/collapse"
+    "pages/test/collapse/collapse",
+    "pages/template/rent/recept",
+    "pages/template/rent/recept_charge",
+    "pages/template/rent/rent_detail",
+    "pages/register/reg"
   ],
+  "style:": "v2",
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "WeChat",
     "navigationBarTextStyle": "black"
   },
-  "style": "v2",
   "sitemapLocation": "sitemap.json",
   "plugins": {
     "ocr-plugin": {
@@ -215,7 +215,6 @@
     "fui-row": "/components/firstui/fui-row/fui-row",
     "fui-col": "/components/firstui/fui-col/fui-col",
     "rent-recept-package": "/components/rent/recept_package",
-    "rent-recept-item": "/components/rent/recept_item",
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
     "shop-selector": "/components/shop_selector/shop_selector",
@@ -227,7 +226,25 @@
     "fui-white-space": "components/firstui/fui-white-space/fui-white-space",
     "fui-bottom-popup": "components/firstui/fui-bottom-popup/fui-bottom-popup",
     "fui-divider": "components/firstui/fui-divider/fui-divider",
-    "van-collapse" : "@vant/weapp/collapse/index",
-    "van-collapse-item" : "@vant/weapp/collapse-item/index"
+    "van-collapse": "@vant/weapp/collapse/index",
+    "van-collapse-item": "@vant/weapp/collapse-item/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-divider": "@vant/weapp/divider/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-tree-select": "@vant/weapp/tree-select/index",
+    "van-goods-action": "@vant/weapp/goods-action/index",
+    "van-goods-action-icon": "@vant/weapp/goods-action-icon/index",
+    "van-goods-action-button": "@vant/weapp/goods-action-button/index",
+    "van-tab": "@vant/weapp/tab/index",
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-panel": "@vant/weapp/panel/index",
+    "member-auth": "/components/user_info/auth_cell",
+    "rent-recept": "/components/rent/rent_recept",
+    "van-grid": "@vant/weapp/grid/index",
+    "van-grid-item": "@vant/weapp/grid-item/index",
+    "van-row": "@vant/weapp/row/index",
+    "van-col": "@vant/weapp/col/index",
+    "rent-price-list": "/components/rent/rent_price_list"
   }
 }

@@ -124,7 +124,7 @@ Page({
     var that = this
     that.getDataPromise(that.data.orderId).then(function (order) {
       if (order.current_pay_method == '微信支付' && (order.pay_flow_status == '已生成' || order.pay_flow_status == '待支付')) {
-        var payUrl = app.globalData.requestPrefix + 'Order/WechatPay/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+        var payUrl = app.globalData.requestPrefix + 'Order/WechatPay/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey + '&needShare=true'
         util.performWebRequest(payUrl, null).then(function (resolve) {
           console.log('payment', resolve)
           var payment = resolve

@@ -9,6 +9,14 @@ const getMemberInfo = (member, infoType) =>{
     }
     return num
 }
+const isWeekend = (date) => {
+  if (date.getDay() == 0 || date.getDay() == 6){
+    return true
+  }
+  else{
+    return false
+  }
+}
 const formatDateTime = date => {
 
   const year = date.getFullYear()
@@ -17,9 +25,7 @@ const formatDateTime = date => {
   const hour = date.getHours()
   const minute = date.getMinutes()
   const second = date.getSeconds()
-
   return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
-  
 }
 
 const formatTimeStr = date => {
@@ -144,6 +150,8 @@ const performWebRequest = function (url, data){
 }
 
 
+
+
 module.exports = {
   formatDateTime: formatDateTime,
   formatDate: formatDate,
@@ -158,4 +166,5 @@ module.exports = {
   getDisplayedCode: getDisplayedCode,
   getMemberInfo: getMemberInfo,
   performWebRequest: performWebRequest,
+  isWeekend
 }

@@ -1,5 +1,6 @@
 // pages/admin/rent/settings/rent_product_list.js
 const app = getApp()
+const data = require('../../../../utils/data.js')
 Page({
 
   /**

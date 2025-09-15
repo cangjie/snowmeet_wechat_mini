@@ -5,8 +5,7 @@
     "multi-uploader": "/components/uploader/multi-uploader",
     "shop-selector": "/components/shop_selector/shop_selector",
     "mp-tabs": "/components/tabs/index",
-    "tree": "/components/tree/index",
-    "price-matrix": "/components/price_matrix/price_matrix"
+    "tree": "/components/tree/index"
   },
   "navigationBarTitleText": "租赁商品详细信息"
 }

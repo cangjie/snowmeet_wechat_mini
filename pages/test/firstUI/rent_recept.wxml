@@ -104,16 +104,14 @@
             <view class="view-row" >
               <input class="input" value="{{barCode}}" placeholder="可直接输入" bindinput="inputBarcode"
                 style="margin-left: 50rpx; width: 200rpx;" disabled="{{type != '单品'}}"  /> 
-              <button class="input" size="mini" 
-                style="width: 100rpx; height: 50rpx; font-size: 9pt;margin-left:20rpx; margin-right: 10rpx; " > 确 定 </button>
+              <button class="input" size="mini"  >确定</button>
               <button style="width:45rpx; height:50rpx; margin-left:20rpx; margin-right: 0rpx;" 
                 bindtap="scan" size="mini" class="input" disabled="{{type != '单品' || barCodeInputing}}" >
                 <image src="../../../images/scan.jpeg" style="width: 60rpx; height: 45rpx;margin-left: -15px;" />
               </button>
             </view>
             <view style="margin-top: 20rpx; display: flex;justify-content: center;">
-              <button class="input"  disabled="{{type != '单品' || barCodeInputing}}"
-                style="height:55rpx;font-size: 9pt;" > 直 接 新 增 单 品 </button>
+              <button class="input" style="padding-top: 0rpx;height: 100rpx;"  disabled="{{type != '单品' || barCodeInputing}}" >直接新增单品</button>
             </view>
           </view>
           <!--picker style="margin-left: 50rpx;width: 480rpx" class="input" mode="multiSelector" 

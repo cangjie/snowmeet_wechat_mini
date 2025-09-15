@@ -1,0 +1,208 @@
+const util = require('./util')
+const app = getApp()
+//获取租赁套餐列表
+const getPackageListPromise = function () {
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList'
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (packages) {
+      resolve(packages)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+//获取租赁套餐
+const getPackagePromise = function (packageId) {
+  var getPackageUrl = app.globalData.requestPrefix + 'Rent/GetRentPackage/' + packageId.toString()
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getPackageUrl, null).then(function (result) {
+      resolve(result)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+  //查询租赁物
+
+}
+const searchBarCodePromise = function (code) {
+  var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByBarcode/' + code
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(searchUrl, null).then(function (product) {
+      resolve(product)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+//模糊查询租赁物
+const searchBarCodeFuzzyPromise = function (key, categoryId) {
+  var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductFuzzy?key=' + key
+  if (categoryId != null) {
+    searchUrl += '&categoryId=' + categoryId.toString()
+  }
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(searchUrl, null).then(function (products) {
+      resolve(products)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const getAllRentCategoriesPromise = function(){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetAllCategories'
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (categories) {
+      resolve(categories)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const getTopCategoriesPromise = function (){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetTopRentCategories'
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (categories) {
+      resolve(categories)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const getSubCategoriesPromise = function (fatherId){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetSubRentCategories/' + fatherId.toString()
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (categories) {
+      resolve(categories)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const getRentCategoryPromise = function (categoryId){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentCategory/' + categoryId.toString()
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (categories) {
+      resolve(categories)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const verifyMemberCellPromise = function(sessionKey, enc, iv){
+  var veriUrl = app.globalData.requestPrefix + 'Member/VerifyCell?sessionKey=' + sessionKey + '&encData=' + encodeURIComponent(enc) + '&iv=' + encodeURIComponent(iv)
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(veriUrl, null).then(function(result){
+      resolve(result)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+}
+const getMemberPromise = function (memberId, sessionKey){
+  var getUrl = app.globalData.requestPrefix + 'Member/GetMember/' + memberId.toString() + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (member){
+      resolve(member)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, name, gender, sessionKey){
+  var placeUrl = app.globalData.requestPrefix + 'Order/PlaceBlankOrder/' + isPackage + '?type=' + encodeURIComponent(type) + '&shop=' + encodeURIComponent(shop) 
+    + memberId? '&memberId=' + memberId.toString(): ''
+    + cell? '&cell=' + cell : ''
+    + name? '&name=' + encodeURIComponent(name) : ''
+    + gender? '&gender=' + encodeURIComponent(gender) : ''
+    + '&sessonKey=' + sessionKey
+  return new Promose(function (resolve, reject){
+    util.performWebRequest(placeUrl, null).then(function (order){
+      resolve(order)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+const getEnumListPromise = function (type){
+  var getUrl = app.globalData.requestPrefix 
+  switch(type){
+    case 'RentType':
+      getUrl += 'Rent/GetRentType'
+      break
+    case 'GetDayType':
+      getUrl += 'Rent/GetDayType'
+      break
+    case 'RentSceneType':
+      getUrl += 'Rent/GetSceneType'
+      break
+    default:
+      break
+  }
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(list){
+      resolve(list)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+}
+const getRentPriceListPromise = function(shopId, type, id, scene){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPriceList/' + shopId + '?type=' + encodeURIComponent(type) + '&id=' + id.toString() + '&scene=' + encodeURIComponent(scene)
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(list){
+      resolve(list)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+const updateRentPricePromise = function(priceList, shopId, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentPrice/' + shopId.toString() + '?sessionKey=' + app.globalData.sessionKey
+  return new Promise(function (resovle, reject){
+    util.performWebRequest(updateUrl, priceList).then(function (list){
+      resovle(list)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+const getShopByNamePromise = function(shopName){
+  var getUrl = app.globalData.requestPrefix + 'Shop/GetShopByName?shopName=' + encodeURIComponent(shopName)
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (shop){
+      resolve(shop)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+/*
+const getAllRentCategoriesPromise = function(){
+  var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
+  return new Promise(function (resovle, reject){
+    util.performWebRequest(updateUrl, priceList).then(function (categories){
+      resovle(categories)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+*/
+
+module.exports = {
+  getPackageListPromise: getPackageListPromise,
+  getPackagePromise: getPackagePromise,
+  searchBarCodePromise: searchBarCodePromise,
+  searchBarCodeFuzzyPromise: searchBarCodeFuzzyPromise,
+  getAllRentCategoriesPromise: getAllRentCategoriesPromise,
+  getTopCategoriesPromise: getTopCategoriesPromise,
+  getSubCategoriesPromise: getSubCategoriesPromise,
+  getRentCategoryPromise: getRentCategoryPromise,
+  verifyMemberCellPromise,
+  getMemberPromise,
+  placeBlankOrderPromise,
+  getEnumListPromise,
+  getRentPriceListPromise,
+  updateRentPricePromise,
+  getShopByNamePromise
+}
