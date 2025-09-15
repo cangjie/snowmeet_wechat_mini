@@ -36,7 +36,7 @@ Component({
                 else{
                   that.setData({currentTag: 0})
                 }
-                var scene = that.data.RentSceneType[that.data.currentTag]
+                var scene = that.data.RentSceneTypeList[that.data.currentTag]
                 data.getRentPriceListPromise(that.data.shop.id, that.properties.type, that.properties.targetId, scene).then(function (priceList){
                   that.setData({priceist})
                   that.listToMatrix(priceList)
