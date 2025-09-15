@@ -36,6 +36,10 @@ Component({
                 else{
                   that.setData({currentTag: 0})
                 }
+                var scene = that.data.RentSceneType[that.data.currentTag]
+                data.getRentPriceListPromise(that.data.shop.id, that.properties.type, that.properties.targetId, scene).then(function (matrix){
+                  that.setData({matrix})
+                })
               })
             })
           })
@@ -62,6 +66,14 @@ Component({
           break
       }
     },
+    onTabChange(e){
+      var that = this
+      console.log('current tab', e)
+      var scene = e.detail.title
+      data.getRentPriceListPromise(that.data.shop.id, that.properties.type, that.properties.targetId, scene).then(function (matrix){
+        that.setData({matrix})
+      })
+    }
     
   }
 })
