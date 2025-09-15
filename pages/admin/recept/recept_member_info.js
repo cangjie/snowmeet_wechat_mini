@@ -262,6 +262,7 @@ Page({
     var realName = null
     var cell = null
     var gender = null
+    var shop = that.data.shop
     if (memberId){
       realName = that.data.real_name
       gender = that.data.gender
@@ -272,7 +273,7 @@ Page({
       gender = that.data.updatedMember? that.data.updatedMember.gender : null
       cell = that.data.updatedMember? that.data.updatedMember.currentContactNum : null
     }
-    var url = 'recept_new?bizType=' + e.currentTarget.id
+    var url = 'recept_new?bizType=' + e.currentTarget.id + '&shop=' + shop
       + (memberId? '&memberId=' + memberId.toString() : '')
       + (realName? '&realName=' + realName : '')
       + (cell? '&cell=' + cell : '')

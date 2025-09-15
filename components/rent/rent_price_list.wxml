@@ -2,13 +2,14 @@
   <view style="width: 90%;margin-left: auto;margin-right: auto; background-color: white;">
     <view class="view-row">
       <view class="left-column">【店铺】</view>
-      <view class="right-column"></view>
+      <view class="right-column">{{shop.name}}</view>
     </view>
     <view class="view-row">
       <view class="left-column">【商品】</view>
-      <view class="right-column"></view>
-
+      <view class="right-column">{{productName}}</view>
     </view>
-    
+    <van-tabs active="{{currentTag}}" bind:change="onTabChange" >
+      <van-tab wx:for="{{RentSceneType}}" title="{{item}}"></van-tab>
+    </van-tabs>
   </view>
 </view>
