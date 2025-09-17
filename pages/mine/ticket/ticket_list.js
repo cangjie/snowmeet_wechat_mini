@@ -1,5 +1,6 @@
 // pages/mine/ticket/ticket_list.js
 const app = getApp()
+const data = require('../../../utils/data.js')
 Page({
 
   /**
@@ -17,6 +18,7 @@ Page({
     opacity: 0,
     needAuth: false
   },
+  /*
   AuthFinish(){
     var that = this
     that.GetRealName()
@@ -37,6 +39,7 @@ Page({
       }
     })
   },
+  */
   /**
    * Lifecycle function--Called when page load
    */
@@ -46,11 +49,29 @@ Page({
       this.setData({showUsed: true, usedColor: 'red', unUsedColor: 'gray', ticketTitleColor:'gray'})
     }
     app.loginPromiseNew.then(function(resolve){
+      data.getMyTickets((!that.data.showUsed?0:1), app.globalData.sessionKey).then(function (tickets){
+        for(var i = 0; i < tickets.length; i++){
+
+          var memo = tickets[i].memo
+          if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
+            tickets[i].rich = true
+          }
+          else{
+            tickets[i].rich = false
+            tickets[i].usage = memo.split(';')
+          }
+          //tickets[i].usage = tickets[i].memo.split(';')
+        }
+        that.setData({ticketArr: tickets})
+      }).catch(function (exp){
+
+      })
       /*
       if (app.globalData.cellNumber==undefined || app.globalData.cellNumber==null || app.globalData.cellNumber==''){
         that.setData({needAuth: true})
       }
       */
+      /*
       var getTicketsUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetMyTickets/' + (!that.data.showUsed? '0' :'1') + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
       wx.request({
         url: getTicketsUrl,
@@ -71,6 +92,7 @@ Page({
           that.setData({ticketArr: tickets})
         }
       })
+      */
     })
   },
 

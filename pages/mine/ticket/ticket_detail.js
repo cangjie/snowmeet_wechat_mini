@@ -1,6 +1,7 @@
 // pages/mine/ticket/ticket_detail.js
 const app = getApp()
 const util = require('../../../utils/util.js')
+const data = require('../../../utils/data.js')
 Page({
 
   /**
@@ -9,6 +10,7 @@ Page({
   data: {
     needAuth: false
   },
+  /*
   AuthFinish(){
     var that = this
     that.GetRealName()
@@ -29,15 +31,27 @@ Page({
       }
     })
   },
+  */
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
     var code = options.code
     var that = this
-    that.setData({code: code})
-    app.loginPromiseNew.then(function(resolve){
-      var getTicketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + code
+    that.setData({ code: code })
+    app.loginPromiseNew.then(function (resolve) {
+      data.getTicket(code).then(function (ticket) {
+        //var ticket = res.data
+        ticket.usage = ticket.memo.split(';')
+        var titleColor = 'yellowgreen'
+        if (ticket.used == 1) {
+          titleColor = 'gray'
+        }
+        var qrCodeUrl = 'https://' + app.globalData.domainName + '/api/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code)
+        that.setData({ ticket: ticket, titleColor: titleColor, qrCodeUrl: qrCodeUrl })
+      })
+      /*
+      var getTicketUrl = 'https://' + app.globalData.domainName + '/api/Ticket/GetTicket/' + code
       wx.request({
         url: getTicketUrl,
         method: 'GET',
@@ -57,6 +71,7 @@ Page({
           }
         }
       })
+      */
     })
   },
 
@@ -112,13 +127,13 @@ Page({
     wx.request({
       url: shareUrl,
       method: 'GET',
-      success:(res)=>{
+      success: (res) => {
         return {
           title: '分享优惠券',
           path: '/pages/mine/ticket/ticket_share?code=' + that.data.ticket.code
         }
       },
-      complete:(res)=>{
+      complete: (res) => {
         return {
           title: '分享优惠券',
           path: '/pages/mine/ticket/ticket_share?code=' + that.data.ticket.code
@@ -129,7 +144,7 @@ Page({
       title: '分享优惠券',
       path: '/pages/mine/ticket/ticket_share?code=' + that.data.ticket.code
     }
-    
-    
+
+
   }
 })

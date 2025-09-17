@@ -134,7 +134,6 @@
     "pages/template/rent/rent_detail",
     "pages/register/reg"
   ],
-  "style:": "v2",
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",

@@ -3,49 +3,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "顾客_注册会员",
-          "pathName": "pages/register/reg",
+          "name": "个人优惠券",
+          "pathName": "pages/mine/ticket/ticket_list",
           "query": "",
           "scene": null,
           "launchMode": "default"
-        },
-        {
-          "name": "collapse",
-          "pathName": "pages/test/collapse/collapse",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
         },
         {
           "name": "OrderEntry",
           "pathName": "pages/order/order_entry",
-
-          "query": "orderId=60091",
-          "scene": null,
-          "launchMode": "default"
-
-          "query": "orderId=60105",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "租赁明细",
-          "pathName": "pages/template/rent/rent_detail",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "租赁接待",
-          "pathName": "pages/template/rent/recept",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "collapse",
-          "pathName": "pages/test/collapse/collapse",
-          "query": "",
+          "query": "orderId=60029",
           "launchMode": "default",
           "scene": null
         },

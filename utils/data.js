@@ -176,6 +176,26 @@ const getShopByNamePromise = function(shopName){
     })
   })
 }
+const getMyTickets = function (used, sessionKey){
+  var getUrl = app.globalData.requestPrefix + 'Ticket/GetMyTickets/' + used.toString() + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (tickets){
+      resolve(tickets)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+const getTicket = function (code){
+  var getUrl = app.globalData.requestPrefix + 'Ticket/GetTicket/' + code
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (ticket){
+      resolve(ticket)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 /*
 const getAllRentCategoriesPromise = function(){
   var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
@@ -204,5 +224,7 @@ module.exports = {
   getEnumListPromise,
   getRentPriceListPromise,
   updateRentPricePromise,
-  getShopByNamePromise
+  getShopByNamePromise,
+  getMyTickets,
+  getTicket
 }
