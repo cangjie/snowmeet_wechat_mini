@@ -23,7 +23,7 @@
         <view class="right-column">{{rental.realDepositStr}}</view>
       </view>
     </van-collapse-item>
-    <van-collapse-item title="【租金单价】{{rental.expectDays}}天" name="2">
+    <van-collapse-item title="【租金】{{rental.expectDays}}天" name="2">
       <view class="view-row">
         <view class="left-column">【预计租赁天数】</view>
         <view class="right-column">
@@ -40,11 +40,128 @@
       <view class="view-row">
         <view class="left-column">【预计归还日期】</view>
         <view class="right-column">
-          {{rental.endDate}}
+          {{rental.endDate}} 
         </view>
       </view>
 
-      <view class="view-row">
+      <block wx:if="{{rental.expectDays == 1}}">
+        <view class="view-row">
+          <view class="left-column view-row" style="align-items: center;">【场次】</view>
+          <view class="right-column view-row" >
+            <picker range="{{rentType}}" class="input" style="width: 100rpx" >
+              <picker-view>{{rentType[0]}}</picker-view>
+            </picker>
+            <view class="view-row" style="margin-left: 50rpx;align-items: center;">{{rental.startDateIsWeekend?'周末':'平日'}}</view>
+          </view>
+        </view>
+        <view>
+          <view class="view-row">
+            <view class="left-column">【租金】</view>
+            <view class="right-column">
+              {{price.priceStr}}
+            </view>
+          </view>
+        </view>
+      </block>
+      <block wx:else>
+        <view>
+          <fui-row style="margin-top:10rpx">
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align:center;">日期</view>
+            </fui-col>
+            <fui-col span="7">
+              <view class="fui-col-view" style="text-align:center;">类型</view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align:center;">价格</view>
+            </fui-col>
+            <fui-col span="5">
+              <view class="fui-col-view" style="text-align:center;">减免</view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align:center;">小计</view>
+            </fui-col>
+          </fui-row>
+          <fui-row style="margin-top:10rpx">
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align:center;">06-26</view>
+            </fui-col>
+            <fui-col span="7">
+              <view class="fui-col-view" style="text-align:center;">平日门市价</view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align: right;">¥150.00</view>
+            </fui-col>
+            <fui-col span="5">
+              <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
+                <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0" />
+              </view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align: right;">¥150.00</view>
+            </fui-col>
+          </fui-row>
+          <fui-row style="margin-top:10rpx">
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align:center;">06-27</view>
+            </fui-col>
+            <fui-col span="7">
+              <view class="fui-col-view" style="text-align:center;">平日会员价</view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align: right;">¥120.00</view>
+            </fui-col>
+            <fui-col span="5">
+              <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
+                <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0" />
+              </view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align: right;">¥120.00</view>
+            </fui-col>
+          </fui-row>
+          <fui-row style="margin-top:10rpx">
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align:center;">06-28</view>
+            </fui-col>
+            <fui-col span="7">
+              <view class="fui-col-view" style="text-align:center;">周末会员价</view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align: right;">¥140.00</view>
+            </fui-col>
+            <fui-col span="5">
+              <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
+                <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0" />
+              </view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align: right;">¥140.00</view>
+            </fui-col>
+          </fui-row>
+          <fui-row style="margin-top:10rpx">
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align:center;">总计：</view>
+            </fui-col>
+            <fui-col span="7">
+              <view class="fui-col-view" style="text-align:center;">3天</view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align: right;">¥410.00</view>
+            </fui-col>
+            <fui-col span="5">
+              <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
+                ¥0.00
+              </view>
+            </fui-col>
+            <fui-col span="4">
+              <view class="fui-col-view" style="text-align: right;">¥410.00</view>
+            </fui-col>
+          </fui-row>
+        </view>
+      </block>
+
+      <!--view class="view-row">
         <view class="left-column">【平日门市价】</view>
         <view class="right-column">¥150.00</view>
       </view>
@@ -55,14 +172,11 @@
       <view class="view-row">
         <view class="left-column">【周末会员价】</view>
         <view class="right-column">¥140.00</view>
-      </view>
+      </view-->
 
-    </van-collapse-item>
-    <van-collapse-item title="【租金明细】共：¥300.00" name="3">
-      <view class="view-row">
-        <view class="left-column">【租金一口价】</view>
-        <view class="right-column"><input class="input" style="width: 100rpx;" bindinput="setFixedRental" /></view>
-      </view>
+
+
+
       <view class="view-row">
         <view class="left-column">【招待】</view>
         <view class="right-column">
@@ -70,101 +184,6 @@
             <checkbox></checkbox>
           </checkbox-group>
         </view>
-      </view>
-      <view>
-        <fui-row style="margin-top:10rpx">
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align:center;">日期</view>
-          </fui-col>
-          <fui-col span="7">
-            <view class="fui-col-view" style="text-align:center;">类型</view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align:center;">价格</view>
-          </fui-col>
-          <fui-col span="5">
-            <view class="fui-col-view" style="text-align:center;">减免</view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align:center;">小计</view>
-          </fui-col>
-        </fui-row>
-        <fui-row style="margin-top:10rpx">
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align:center;">06-26</view>
-          </fui-col>
-          <fui-col span="7">
-            <view class="fui-col-view" style="text-align:center;">平日门市价</view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align: right;">¥150.00</view>
-          </fui-col>
-          <fui-col span="5">
-            <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
-              <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0" />
-            </view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align: right;">¥150.00</view>
-          </fui-col>
-        </fui-row>
-        <fui-row style="margin-top:10rpx">
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align:center;">06-27</view>
-          </fui-col>
-          <fui-col span="7">
-            <view class="fui-col-view" style="text-align:center;">平日会员价</view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align: right;">¥120.00</view>
-          </fui-col>
-          <fui-col span="5">
-            <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
-              <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0" />
-            </view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align: right;">¥120.00</view>
-          </fui-col>
-        </fui-row>
-        <fui-row style="margin-top:10rpx">
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align:center;">06-28</view>
-          </fui-col>
-          <fui-col span="7">
-            <view class="fui-col-view" style="text-align:center;">周末会员价</view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align: right;">¥140.00</view>
-          </fui-col>
-          <fui-col span="5">
-            <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
-              <input class="input" style="height: 50rpx; width: 50rpx;" placeholder="0" />
-            </view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align: right;">¥140.00</view>
-          </fui-col>
-        </fui-row>
-        <fui-row style="margin-top:10rpx">
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align:center;">总计：</view>
-          </fui-col>
-          <fui-col span="7">
-            <view class="fui-col-view" style="text-align:center;">3天</view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align: right;">¥410.00</view>
-          </fui-col>
-          <fui-col span="5">
-            <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
-              ¥0.00
-            </view>
-          </fui-col>
-          <fui-col span="4">
-            <view class="fui-col-view" style="text-align: right;">¥410.00</view>
-          </fui-col>
-        </fui-row>
       </view>
     </van-collapse-item>
   </van-collapse>

@@ -389,6 +389,7 @@ Component({
       rental.depositStr = util.showAmount(rental.deposit)
       rental.realDeposit = rental.deposit
       rental.realDepositStr = rental.depositStr
+      rental.category = e.detail
       that.renderData(that.data.rentals)
       that.setData({ barCode: null, searchBarCode: null })
     },

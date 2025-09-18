@@ -60,7 +60,8 @@
               </checkbox-group>
             </view>
             <view style="margin-left: 40rpx;">
-              <van-button size="small" type="info" id="{{index}}" bind:click="showPriceList">查看价目表</van-button>
+              <van-button size="small" type="info" id="{{index}}" bind:click="showPriceList" 
+              disabled="{{rental.rentItems[0].category_id == null}}" >查看价目表</van-button>
             </view>
           </view>
           <view class="view-row" style="margin-bottom: 20rpx;">
@@ -85,7 +86,7 @@
           <view class="view-row" style="margin-bottom: 20rpx;">
               <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;" >【备注】</view>
               <view class="right-column" style="width: 500rpx;" >
-                <input style="width: 450rpx;" class="input" />
+                <input style="width: 450rpx;" class="input" id="{{index}}" bindinput="setRentalMemo" />
               </view>
             </view>
           <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
@@ -137,7 +138,7 @@
             <view class="view-row" style="margin-bottom: 20rpx;">
               <view class="left-column" style="margin-top:20rpx">【备注】</view>
               <view class="right-column" style="width: 500rpx;" >
-                <input style="width: 450rpx;" class="input" />
+                <input style="width: 450rpx;" class="input" id="{{index}}" bindinput="setRentalMemo" />
               </view>
             </view>
             <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
@@ -194,7 +195,7 @@
                 <view class="view-row" style="margin-bottom:20rpx">
                   <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【备注】</view>
                   <view class="right-column" style="width:500rpx;color:{{item.textColor?item.textColor:defaultTextColor}};" >
-                    <input class="input" style="width: 450rpx;" />
+                    <input class="input" style="width: 450rpx;" id="{{item.itemIndex}}" bindinput="setItemMemo" />
                   </view>
                 </view>
                 <view style="width: 630rpx;background-color: #F0FFF0;height: 10rpx;"></view>
@@ -225,7 +226,7 @@
       <fui-card title="套餐名称：{{currentRental.name}}" tag="共{{currentRental.rentItems.length}}件">
         <view class="fui-card__content" style="width: 650rpx; margin-top:50rpx;height: {{windowHeight}}rpx">
           <scroll-view scroll-y="true" style="height: {{windowHeight }}rpx">
-            <rent_charge rentItem="{{currentRental}}" bindRentalChange="onRentalChange"></rent_charge>
+            <rent_charge rentItem="{{currentRental}}" bindRentalChange="onRentalChange" shop="{{shop}}" ></rent_charge>
           </scroll-view>
         </view>
         <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
@@ -256,7 +257,7 @@
           </view>
         </view>
         <view style="height: 20rpx;"></view>
-        <rent_charge rentItem="{{currentRental}}" bindRentalChange="onRentalChange"></rent_charge>
+        <rent_charge rentItem="{{currentRental}}" bindRentalChange="onRentalChange" shop="{{shop}}"  ></rent_charge>
         <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
           <button class="input" size="mini" bindtap="cancelBackdrop"> 取 消 </button>
           <button class="input" size="mini"> 保 存 </button>
