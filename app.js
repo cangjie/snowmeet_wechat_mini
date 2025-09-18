@@ -37,15 +37,28 @@ App({
         const app = getApp()
         const env = wx.getAccountInfoSync()
         app.globalData.env = env.miniProgram.envVersion
+        if (!app.globalData.env || app.globalData.env == ''){
+          app.globalData.env = 'trail'
+        }
+        
         switch (app.globalData.env) {
           case 'trail':
           case 'develop':
             app.globalData.domainName = app.getDomain()
             app.globalData.requestPrefix = 'https://' + app.globalData.domainName + '/api/'
+            /*
+            if (app.globalData.domainName == ''){
+              app.globalData.domainName = 'snowmeet.wanlonghuaxue.com'
+              app.globalData.requestPrefix = 'https://' + app.globalData.domainName + '/api/'
+            }
+            */
             break
           default:
             break
         }
+        
+        //app.globalData.domainName = 'snowmeet.wanlonghuaxue.com'
+        //app.globalData.requestPrefix = 'https://' + app.globalData.domainName + '/api/'
         console.log('weixin log in success.', res)
         var url = 'https://' + app.globalData.domainName + '/api/MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
         //var url = app.globalData.requestPrefix + 'MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')

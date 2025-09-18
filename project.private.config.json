@@ -3,16 +3,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "个人优惠券",
-          "pathName": "pages/mine/ticket/ticket_list",
+          "name": "散客接待",
+          "pathName": "pages/admin/recept/recept_member_info",
           "query": "",
           "scene": null,
           "launchMode": "default"
         },
         {
-          "name": "OrderEntry",
-          "pathName": "pages/order/order_entry",
-          "query": "orderId=60029",
+          "name": "个人优惠券",
+          "pathName": "pages/mine/ticket/ticket_list",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },

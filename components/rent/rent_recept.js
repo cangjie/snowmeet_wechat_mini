@@ -104,7 +104,12 @@ Component({
         else{
           rental.realDeposit = rental.deposit - rental.depositDiscount
         }
-        rental.realDepositStr = util.showAmount(rental.realDeposit)
+        if (!isNaN(rental.realDeposit)){
+          rental.realDepositStr = util.showAmount(rental.realDeposit)
+        }
+        else{
+          rental.realDepositStr = ''
+        }
         if (rental.package_id) {
           rental.backgroundColor = packageCommonBackgroud
           rental.textColor = packageCommonTextColor

@@ -23,6 +23,7 @@ Page({
         that.setData({port})
         domain = 'localhost'
       }
+      
       that.setData({env: app.globalData.env, domain})
     })
   },

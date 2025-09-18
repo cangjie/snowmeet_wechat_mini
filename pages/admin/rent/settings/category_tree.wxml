@@ -38,8 +38,9 @@
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
-        <button  class="input" style="margin-left: auto; margin-right: auto;" 
-        disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}"  bind:tap="modCategoryName" > 确 认 修 改 </button>
+        <button  class="input" style="margin-left: auto; margin-right: auto;" size="mini"
+        disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}"  
+        bind:tap="modCategoryName" > 确 认 修 改 </button>
       </view>
     </mp-cell>
 
@@ -65,13 +66,22 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <button class="input" disabled="{{selectedCategory == undefined}}" bind:tap="addCategory"  > 添 加 分 类 </button>
+      <view class="view-row" style="justify-content: center;" >
+      <button class="input" disabled="{{selectedCategory == undefined}}" bind:tap="addCategory" size="mini"  > 添 加 分 类 </button>
+    </view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="押金设定" >
+    <mp-cell>
     <view style="display:flex;justify-content: center;" >
       <input class="input" id="deposit" bindinput="setNumber" style="width: 150rpx; text-align: center;" value="{{selectedCategory.deposit}}" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" />
     </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" style="justify-content: center;" >
+      <button size="mini" >修改</button>
+    </view>
+  </mp-cell>
   </mp-cells>
 
   <!--price-matrix 
@@ -136,17 +146,18 @@
           <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" value="{{newFieldName}}" placeholder="添加新字段" bindinput="setNewFieldName" />
         </view>
         <view class="view-row" style=" text-align:  center;">
-          <button style="width: 260rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx" 
-          disabled="{{newFieldName == '' || selectedCategory.code.length != 2}}" 
+          <button 
+          disabled="{{newFieldName == '' || selectedCategory.code.length != 2}}"  size="mini"
           class="input" bind:tap="addNewField" > 添 加 新 字 段 </button>
         </view>
-        
       </view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="删除分类">
     <mp-cell>
-      <button disabled="{{ (selectedCategory.children != undefined  && selectedCategory.children != null) || selectedCategory == undefined}}" class="input" bind:tap="metionDelete" > 删 除 </button>
+      <view class="view-row" style="justify-content: center;" >
+      <button disabled="{{ (selectedCategory.children != undefined  && selectedCategory.children != null) || selectedCategory == undefined}}" class="input" bind:tap="metionDelete" size="mini" > 删 除 </button>
+    </view>
     </mp-cell>
   </mp-cells>
 </view>

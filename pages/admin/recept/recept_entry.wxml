@@ -18,7 +18,9 @@
   </mp-cells>
   <mp-cells title="散客" >
     <mp-cell>
-      <button class="input" bind:tap="unRegGoDirect" > 直 接 进 入 </button>
+      <view class="view-row" style="justify-content: center;" >
+      <button class="input" bind:tap="unRegGoDirect" size="mini" > 直 接 进 入 </button>
+    </view>
     </mp-cell>
   </mp-cells>
 </view>
