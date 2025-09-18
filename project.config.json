@@ -99,7 +99,7 @@
     "es6": true,
     "postcss": false,
     "compileWorklet": false,
-    "minified": false,
+    "minified": true,
     "uglifyFileName": false,
     "uploadWithSourceMap": true,
     "enhance": true,
@@ -110,7 +110,7 @@
     "localPlugins": false,
     "disableUseStrict": false,
     "useCompilerPlugins": false,
-    "condition": false,
+    "condition": true,
     "swc": false,
     "disableSWC": true
   },
@@ -126,5 +126,4 @@
     "tabSize": 2
   },
   "simulatorPluginLibVersion": {}
-
 }
