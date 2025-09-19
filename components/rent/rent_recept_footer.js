@@ -7,7 +7,7 @@ Component({
    * Component properties
    */
   properties: {
-    rentals:Object
+    rentals: Object
   },
 
   /**
@@ -16,36 +16,38 @@ Component({
   data: {
 
   },
-  lifetimes:{
-    ready(){
+  lifetimes: {
+    ready() {
       var that = this
       that.renderData()
     }
-},
+  },
 
   /**
    * Component methods
    */
   methods: {
-    renderData(){
+    renderData() {
       var that = this
       var rentals = that.properties.rentals
       var totalGuarantyAmount = 0
       var totalGuarantyDiscountAmount = 0
-      for(var i = 0; rentals && i < rentals.length; i++){
-        if (rentals[i].noGuaranty == true){
+      for (var i = 0; rentals && i < rentals.length; i++) {
+        if (rentals[i].noGuaranty == true) {
 
         }
-        else{
-        totalGuarantyAmount += rentals[i].deposit
-        if (!isNaN(rentals[i].depositDiscount)){
-          totalGuarantyDiscountAmount += rentals[i].depositDiscount
+        else {
+          totalGuarantyAmount += rentals[i].deposit
+          if (!isNaN(rentals[i].depositDiscount)) {
+            totalGuarantyDiscountAmount += rentals[i].depositDiscount
+          }
         }
       }
-      }
-      that.setData({totalGuarantyAmount, totalGuarantyDiscountAmount, totalGuarantyRealAmount: totalGuarantyAmount - totalGuarantyDiscountAmount,
-      totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount), totalGuarantyDiscountAmountStr: util.showAmount(totalGuarantyDiscountAmount),
-      totalGuarantyRealAmountStr: util.showAmount(totalGuarantyAmount - totalGuarantyDiscountAmount) })
+      that.setData({
+        totalGuarantyAmount, totalGuarantyDiscountAmount, totalGuarantyRealAmount: totalGuarantyAmount - totalGuarantyDiscountAmount,
+        totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount), totalGuarantyDiscountAmountStr: util.showAmount(totalGuarantyDiscountAmount),
+        totalGuarantyRealAmountStr: util.showAmount(totalGuarantyAmount - totalGuarantyDiscountAmount)
+      })
     }
   }
 })
