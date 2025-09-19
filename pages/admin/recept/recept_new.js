@@ -163,5 +163,26 @@ Page({
   rentalWellFormed(e){
     var that = this
     console.log('well formed', e)
+    that.setData({rentalWellFormed: e.detail})
+  },
+  onClickIcon(e){
+    var that = this
+    if (that.data.rentalWellFormed){
+
+    }
+    else {
+      var title = ''
+      switch(that.data.bizType){
+        case 'rent':
+          title = '租赁信息填写不完整'
+          break
+        default:
+          break
+      }
+      wx.showToast({
+        title: title,
+        icon: 'error'
+      })
+    }
   }
 })
