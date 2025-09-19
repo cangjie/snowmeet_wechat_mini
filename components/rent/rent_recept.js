@@ -110,7 +110,8 @@ Component({
               code: null,
               rent_product_id: null,
               category_id: selectedPackage.categories[i].id,
-              memo: ''
+              memo: '',
+              category: selectedPackage.categories[i]
             }
             items.push(item)
           }
@@ -247,6 +248,7 @@ Component({
             rental_id: 0,
             noCode: false,
             category_id: rentProduct.category.id,
+            category: rentProduct.category,
             name: rentProduct.name,
             categoryName: rentProduct.category.name,
             code: rentProduct.barcode,

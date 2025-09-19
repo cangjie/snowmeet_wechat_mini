@@ -159,5 +159,9 @@ Page({
     var rentals = e.detail
     that.setData({showFooter: false})
     that.setData({rentals, showFooter: true})
+  },
+  rentalWellFormed(e){
+    var that = this
+    console.log('well formed', e)
   }
 })

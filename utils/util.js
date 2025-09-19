@@ -216,7 +216,51 @@ const getRentPrice = function(priceList, date, rentType){
   }
   return commonPrice
 }
-
+const checkRentalsWellForm = function(rentals){
+  
+  if (!rentals){
+    return false
+  }
+  
+  var well = true
+  for(var i = 0; i < rentals.length; i++){
+    var rental = rentals[i]
+    if (!rental.totalAmount){
+      well = false
+      break
+    }
+    if (rental.noGuaranty != true && !rental.deposit){
+      well = false
+      break
+    }
+    if (rental.rentItems.length <= 0){
+      well = false
+      break
+    }
+    for(var j = 0; j < rental.rentItems.length ; j++){
+      var item = rental.rentItems[j]
+      if (!item.category){
+        well = false
+        break
+      }
+      if (item.noNeed != true){
+        if (item.noCode == true){
+          if (!item.name || item.name == ''){
+            well = false
+            break
+          }
+        }
+        else{
+          if (!item.code || item.code == '' || !item.name || item.name == ''){
+            well = false
+            break
+          }
+        }
+      }
+    }
+  }
+  return well
+}
 
 
 
@@ -236,5 +280,6 @@ module.exports = {
   performWebRequest: performWebRequest,
   isWeekend,
   createRentalDetal,
-  getRentPrice
+  getRentPrice,
+  checkRentalsWellForm
 }

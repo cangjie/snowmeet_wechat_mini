@@ -1,5 +1,4 @@
 // components/rent/rent_recept_footer.js
-const app = getApp()
 const util = require('../../utils/util.js')
 Component({
 
@@ -14,6 +13,7 @@ Component({
    * Component initial data
    */
   data: {
+    wellForm: false
 
   },
   lifetimes: {
@@ -48,6 +48,7 @@ Component({
         totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount), totalGuarantyDiscountAmountStr: util.showAmount(totalGuarantyDiscountAmount),
         totalGuarantyRealAmountStr: util.showAmount(totalGuarantyAmount - totalGuarantyDiscountAmount)
       })
+      that.triggerEvent('WellFormed', util.checkRentalsWellForm(rentals))
     }
   }
 })
