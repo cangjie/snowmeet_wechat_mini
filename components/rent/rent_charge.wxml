@@ -114,7 +114,7 @@
               </view>
             </fui-col>
             <fui-col span="4">
-              <view class="fui-col-view" style="text-align: right;">{{item.priceStr}}</view>
+              <view class="fui-col-view" style="text-align: right;">{{item.summaryStr}}</view>
             </fui-col>
           </fui-row>
           
@@ -142,8 +142,8 @@
       <view class="view-row">
         <view class="left-column">【招待】</view>
         <view class="right-column">
-          <checkbox-group>
-            <checkbox></checkbox>
+          <checkbox-group bindchange="setEntrain" >
+            <checkbox value="1" ></checkbox>
           </checkbox-group>
         </view>
       </view>

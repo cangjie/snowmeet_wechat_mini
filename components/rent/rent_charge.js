@@ -175,6 +175,8 @@ Component({
       var totalSummary = 0
       for(var i = 0; i < rental.details.length; i++){
         var detail = rental.details[i]
+        detail.summary = detail.price - detail.discount
+        detail.summaryStr = util.showAmount(detail.summary)
         totalAmount += detail.price
         totalDiscount += detail.discount
         totalSummary += (detail.price - detail.discount)
@@ -186,6 +188,18 @@ Component({
       rental.totalDiscountStr = util.showAmount(rental.totalDiscount)
       rental.totalSummaryStr = util.showAmount(rental.totalSummary)
       that.setData({rental})
+      that.triggerEvent('RentalUpdated', rental)
+    },
+    setEntrain(e){
+      var that = this
+      var rental = that.data.rental
+      if (e.detail.length == 0){
+        rental.entrain = false
+      }
+      else{
+        rental.entrain = true
+      }
+      that.computeRental()
     }
   }
 })

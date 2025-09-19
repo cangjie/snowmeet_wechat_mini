@@ -229,7 +229,7 @@
       <fui-card title="套餐名称：{{currentRental.name}}" tag="共{{currentRental.rentItems.length}}件">
         <view class="fui-card__content" style="width: 650rpx; margin-top:50rpx;height: {{windowHeight}}rpx">
           <scroll-view scroll-y="true" style="height: {{windowHeight }}rpx">
-            <rent_charge rentItem="{{currentRental}}" bindRentalChange="onRentalChange" shop="{{shopObj}}" ></rent_charge>
+            <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" shop="{{shopObj}}" ></rent_charge>
           </scroll-view>
         </view>
         <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
@@ -260,10 +260,10 @@
           </view>
         </view>
         <view style="height: 20rpx;"></view>
-        <rent_charge rentItem="{{currentRental}}" bindRentalChange="onRentalChange" shop="{{shopObj}}"  ></rent_charge>
+        <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" shop="{{shopObj}}"  ></rent_charge>
         <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
           <button class="input" size="mini" bindtap="cancelBackdrop"> 取 消 </button>
-          <button class="input" size="mini"> 保 存 </button>
+          <button class="input" size="mini" bindtap="saveUpdatedRental" > 保 存 </button>
         </view>
         <view style="height: 50rpx;"></view>
       </view>

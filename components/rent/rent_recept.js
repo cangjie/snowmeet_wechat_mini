@@ -445,10 +445,6 @@ Component({
           that.renderData(that.data.rentals)
           that.setData({ barCode: null, searchBarCode: null })
         }).catch(function (exp) { })
-
-
-
-
     },
     showItem(e) {
       var that = this
@@ -459,7 +455,7 @@ Component({
     },
     cancelBackdrop(e) {
       var that = this
-      that.setData({ showBackdrop: false, action: null, currentRental: null, currentItem: null })
+      that.setData({ showBackdrop: false, action: null, currentRental: null, currentItem: null, unSavedRental: null })
     },
     showPackage(e) {
       var that = this
@@ -471,18 +467,27 @@ Component({
       }
     },
     onRentalChange(e) {
-      console.log('rental change', e)
       var that = this
+      console.log('rental change', e)
+      console.log('rental change ori', that.data.rentals)
+      
       that.setData({ unSavedRental: e.detail })
     },
     saveUpdatedRental() {
       var that = this
+      //var rental = that.getRentenalByItemIndex(that.data.unSavedRental.rentItems[0].itemIndex)
+      
       if (that.data.unSavedRental) {
-        var currentRental = that.data.currentRental
-        var unSavedRental = that.data.unSavedRental
-        currentRental.depositDiscount = unSavedRental.depositDiscount
-        currentRental.fixedRental = unSavedRental.fixedRental
-        currentRental.expectDays = unSavedRental.expectDays
+        var itemIndex = that.data.unSavedRental.rentItems[0].itemIndex
+        var rentals = that.data.rentals
+        for(var i = 0; i < rentals.length; i++){
+          var rental = rentals[i]
+          for(var j = 0; j < rental.rentItems.length; j++){
+            if (rental.rentItems[j].itemIndex == itemIndex){
+              rentals[i] = that.data.unSavedRental
+            }
+          }
+        }
       }
       that.renderData(that.data.rentals)
       that.cancelBackdrop()
