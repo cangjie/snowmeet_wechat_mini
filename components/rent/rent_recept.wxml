@@ -86,7 +86,7 @@
           <view class="view-row" style="margin-bottom: 20rpx;">
               <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;" >【备注】</view>
               <view class="right-column" style="width: 500rpx;" >
-                <input style="width: 450rpx;" class="input" id="{{index}}" bindinput="setRentalMemo" />
+                <input style="width: 450rpx;" class="input" id="{{index}}" bindinput="setRentalMemo" value="{{rental.memo}}" />
               </view>
             </view>
           <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
@@ -141,7 +141,7 @@
             <view class="view-row" style="margin-bottom: 20rpx;">
               <view class="left-column" style="margin-top:20rpx">【备注】</view>
               <view class="right-column" style="width: 500rpx;" >
-                <input style="width: 450rpx;" class="input" id="{{index}}" bindinput="setRentalMemo" />
+                <input style="width: 450rpx;" class="input" id="{{index}}" bindinput="setRentalMemo" value="{{rental.memo}}" />
               </view>
             </view>
             <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
@@ -198,7 +198,7 @@
                 <view class="view-row" style="margin-bottom:20rpx">
                   <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【备注】</view>
                   <view class="right-column" style="width:500rpx;color:{{item.textColor?item.textColor:defaultTextColor}};" >
-                    <input class="input" style="width: 450rpx;" id="{{item.itemIndex}}" bindinput="setItemMemo" />
+                    <input class="input" style="width: 450rpx;" id="{{item.itemIndex}}" bindinput="setItemMemo" value="{{item.memo}}" />
                   </view>
                 </view>
                 <view style="width: 630rpx;background-color: #F0FFF0;height: 10rpx;"></view>

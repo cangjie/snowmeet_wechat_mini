@@ -1,5 +1,6 @@
 {
   "usingComponents": {
-    "sale-item" : "/components/recept/sale/sale_item"
+    "sale-item" : "/components/recept/sale/sale_item",
+    "rent-recept-footer": "/components/rent/rent_recept_footer"
   }
 }

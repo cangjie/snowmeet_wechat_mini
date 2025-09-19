@@ -13,7 +13,8 @@ Page({
     bizType:'sale',
     receptId: null,
     showSummary: false,
-    showMainComponent: true
+    showMainComponent: true,
+    showFooter: true
   },
 
   /**
@@ -151,5 +152,12 @@ Page({
   onPopClose(){
     var that = this
     that.setData({showUserInfo:false})
+  },
+  rentDataUpdated(e){
+    var that = this
+    console.log('rent data updated', e)
+    var rentals = e.detail
+    that.setData({showFooter: false})
+    that.setData({rentals, showFooter: true})
   }
 })

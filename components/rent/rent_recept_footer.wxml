@@ -1,0 +1,2 @@
+<!--components/rent/rent_recept_footer.wxml-->
+【押金总计】{{totalGuarantyAmountStr}}【押金减免】{{totalGuarantyDiscountAmountStr}}【应付押金】{{totalGuarantyRealAmountStr}}

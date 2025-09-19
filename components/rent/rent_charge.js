@@ -195,7 +195,7 @@ Component({
     setEntrain(e){
       var that = this
       var rental = that.data.rental
-      if (e.detail.length == 0){
+      if (e.detail.value.length == 0){
         rental.entrain = false
       }
       else{

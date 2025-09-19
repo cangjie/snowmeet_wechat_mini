@@ -143,7 +143,7 @@
         <view class="left-column">【招待】</view>
         <view class="right-column">
           <checkbox-group bindchange="setEntrain" >
-            <checkbox value="1" ></checkbox>
+            <checkbox value="1" checked="{{rental.entrain}}" ></checkbox>
           </checkbox-group>
         </view>
       </view>
