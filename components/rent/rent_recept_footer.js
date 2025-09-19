@@ -33,10 +33,15 @@ Component({
       var totalGuarantyAmount = 0
       var totalGuarantyDiscountAmount = 0
       for(var i = 0; rentals && i < rentals.length; i++){
+        if (rentals[i].noGuaranty == true){
+
+        }
+        else{
         totalGuarantyAmount += rentals[i].deposit
         if (!isNaN(rentals[i].depositDiscount)){
           totalGuarantyDiscountAmount += rentals[i].depositDiscount
         }
+      }
       }
       that.setData({totalGuarantyAmount, totalGuarantyDiscountAmount, totalGuarantyRealAmount: totalGuarantyAmount - totalGuarantyDiscountAmount,
       totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount), totalGuarantyDiscountAmountStr: util.showAmount(totalGuarantyDiscountAmount),

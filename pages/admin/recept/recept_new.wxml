@@ -44,8 +44,8 @@
   </view>
   <view style="height: 200rpx;">
     <van-goods-action>
-      <van-goods-action-icon icon="cart-o" text="购物车" bind:click="onClickIcon" />
-      <rent-recept-footer wx:if="{{showFooter}}" rentals="{{rentals}}" ></rent-recept-footer>
+      <van-goods-action-icon wx:if="{{bizType == 'rent'}}" info="{{rentals.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" />
+      <rent-recept-footer wx:if="{{showFooter && bizType == 'rent'}}" rentals="{{rentals}}" ></rent-recept-footer>
       <!--van-goods-action-icon icon="chat-o" text="客服" bind:click="onClickIcon" />
       <van-goods-action-button text="加入购物车" type="warning" bind:click="onClickButton" />
       <van-goods-action-button text="立即购买" bind:click="onClickButton" /-->
