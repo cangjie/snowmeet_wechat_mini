@@ -405,6 +405,8 @@ Component({
       var date = new Date(e.detail.value)
       rental.startDate = e.detail.value
       rental.startDateIsWeekend = util.isWeekend(new Date(e.detail.value))
+      rental.expectDays = 1
+      rental.endDate = e.detail.value
       util.createRentalDetal(rental, date, date)
       that.renderData(rentals)
       that.setData({ rentals })

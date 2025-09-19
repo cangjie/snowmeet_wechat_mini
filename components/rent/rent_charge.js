@@ -116,6 +116,7 @@ Component({
       }
       */
     },
+    /*
     setFixedRental(e) {
       if (isNaN(e.detail.value)) {
         return
@@ -128,6 +129,7 @@ Component({
       //that.setData({ rental })
       //that.triggerEvent('RentalChange', rental)
     },
+    */
     /*
     getPrice(dayType, rentType, scene) {
       var that = this

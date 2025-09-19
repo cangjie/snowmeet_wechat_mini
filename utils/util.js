@@ -154,7 +154,8 @@ const createRentalDetal = function(rental, startDate, endDate){
   var i = new Date(formatDate(startDate))
   for( ; i <= endDate; i.setDate(i.getDate() + 1)){
     var rentType = '日场'
-    if (formatDate(new Date(startDate)) == formatDate(new Date(endDate))){
+    if (formatDate(new Date(startDate)) == formatDate(new Date(endDate)) 
+      && formatDate(new Date(startDate)) == formatDate(new Date()) ){
       var currentDate = new Date()
       if (currentDate.getHours() >= 16){
         rentType = '夜场'
