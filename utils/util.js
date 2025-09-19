@@ -148,6 +148,60 @@ const performWebRequest = function (url, data){
     })
   })
 }
+const createRentalDetal = function(rental, startDate, endDate){
+  var details = []
+  var totalAmount = 0
+  var i = new Date(formatDate(startDate))
+  for( ; i <= endDate; i.setDate(i.getDate() + 1)){
+    var price = getRentPrice(rental.priceList, i)
+    if (price != null){
+      var detail = {
+        date: i,
+        dayType: price.day_type,
+        rentType: price.rent_type,
+        scene: price.scene,
+        price: price.price,
+        priceStr: showAmount(price.price),
+        discount: 0,
+        summary: price.price,
+        summaryStr: showAmount(price.price)
+      }
+      totalAmount += price.price
+      details.push(detail)
+    }
+  }
+  rental.totalAmount = totalAmount
+  rental.totalAmountStr = showAmount(totalAmount)
+  rental.details = details
+  return details
+}
+const getRentPrice = function(priceList, date){
+  var currentDate = new Date()
+  var rentType = '日场'
+  if (formatDate(date) == formatDate(currentDate)){
+    var hour = currentDate.getHours()
+    if (hour >= 13 && hour < 16){
+      rentType = '下午场'
+    }
+    else if (hour >= 16){
+      rentType = '夜场'
+    }
+  }
+  var weekend = isWeekend(date)
+  var commonPrice = null
+  for(var i = 0; i < priceList.length; i++){
+    var price = priceList[i]
+    if (price.rent_type == rentType 
+      && ((weekend && price.day_type == '周末') || (!weekend && price.day_type == '平日') ) ){
+      return price
+    }
+    if (price.rent_type == '日场'
+    && ((weekend && price.day_type == '周末') || (!weekend && price.day_type == '平日') )){
+      commonPrice = price
+    }
+  }
+  return commonPrice
+}
 
 
 
@@ -166,5 +220,7 @@ module.exports = {
   getDisplayedCode: getDisplayedCode,
   getMemberInfo: getMemberInfo,
   performWebRequest: performWebRequest,
-  isWeekend
+  isWeekend,
+  createRentalDetal,
+  getRentPrice
 }

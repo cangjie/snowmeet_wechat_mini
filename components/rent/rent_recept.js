@@ -31,9 +31,11 @@ Component({
   lifetimes: {
     ready() {
       var that = this
-      that.setData({memberId: that.properties.memberId, shop: that.properties.shop})
+      that.setData({ memberId: that.properties.memberId, shop: that.properties.shop })
       app.loginPromiseNew.then(function (resolve) {
-
+        data.getShopByNamePromise(that.data.shop).then(function (shopObj) {
+          that.setData({ shopObj })
+        })
       })
     }
   },
@@ -46,45 +48,79 @@ Component({
       var that = this
       that.setData({ showPopUp: false, popUpContent: 'packageSelector' })
     },
+    getPrice(priceList, date) {
+      var currentDate = new Date()
+      var rentType = '日场'
+      if (util.formatDate(date) == util.formatDate(currentDate)) {
+        var hour = currentDate.getHours()
+        if (hour >= 13 && hour < 16) {
+          rentType = '下午场'
+        }
+        else if (hour >= 16) {
+          rentType = '夜场'
+        }
+      }
+      var isWeekend = util.isWeekend(date)
+      var commonPrice = null
+      for (var i = 0; i < priceList.length; i++) {
+        var price = priceList[i]
+        if (price.rent_type == rentType
+          && ((isWeekend && price.day_type == '周末') || (!isWeekend && price.day_type == '平日'))) {
+          return price
+        }
+        if (price.rent_type == '日场'
+          && ((isWeekend && price.day_type == '周末') || (!isWeekend && price.day_type == '平日'))) {
+          commonPrice = price
+        }
+      }
+      return commonPrice
+    },
     selectPackageConfirm(e) {
       var that = this
       that.cancelPopUp()
       console.log('select package', e)
       var selectedPackage = e.detail
-      var rental = {
-        id: 0,
-        order_id: null,
-        package_id: selectedPackage.id,
-        name: selectedPackage.name,
-        valid: 0,
-        expectDays: 1,
-        deposit: selectedPackage.deposit,
-        depositStr: util.showAmount(selectedPackage.deposit),
-        realDeposit: selectedPackage.deposit,
-        realDepositStr: util.showAmount(selectedPackage.deposit),
-        startDate: that.data.startDate,
-        startDateIsWeekend: util.isWeekend(new Date(that.data.startDate))
-      }
-      var items = []
-      for (var i = 0; i < selectedPackage.categories.length; i++) {
-        var item = {
-          id: 0,
-          rental_id: 0,
-          noCode: false,
-          categoryName: selectedPackage.categories[i].name,
-          name: null,
-          code: null,
-          rent_product_id: null,
-          category_id: selectedPackage.categories[i].id
-        }
-        items.push(item)
-      }
-      rental.rentItems = items
-      var rentals = that.data.rentals
-      rentals.push(rental)
-      console.log('rentals', rentals)
-      //that.setData({ type: null, packageSelectIndex: null })
-      that.renderData(rentals)
+      data.getRentPriceListPromise(that.data.shopObj.id, '套餐', selectedPackage.id, that.properties.memberId ? '会员' : '门市')
+        .then(function (priceList) {
+          var rental = {
+            id: 0,
+            order_id: null,
+            package_id: selectedPackage.id,
+            name: selectedPackage.name,
+            valid: 0,
+            expectDays: 1,
+            deposit: selectedPackage.deposit,
+            depositStr: util.showAmount(selectedPackage.deposit),
+            realDeposit: selectedPackage.deposit,
+            realDepositStr: util.showAmount(selectedPackage.deposit),
+            startDate: that.data.startDate,
+            startDateIsWeekend: util.isWeekend(new Date(that.data.startDate)),
+            priceList: priceList
+          }
+          util.createRentalDetal(rental, new Date(rental.startDate), new Date(rental.startDate))
+          var items = []
+          for (var i = 0; i < selectedPackage.categories.length; i++) {
+            var item = {
+              id: 0,
+              rental_id: 0,
+              noCode: false,
+              categoryName: selectedPackage.categories[i].name,
+              name: null,
+              code: null,
+              rent_product_id: null,
+              category_id: selectedPackage.categories[i].id
+            }
+            items.push(item)
+          }
+          rental.rentItems = items
+          var rentals = that.data.rentals
+          rentals.push(rental)
+          console.log('rentals', rentals)
+          //that.setData({ type: null, packageSelectIndex: null })
+          that.renderData(rentals)
+        }).catch(function (exp) { })
+
+
     },
     renderData(rentals) {
       var that = this
@@ -98,16 +134,16 @@ Component({
       var totalGuarantyAmount = 0
       for (var i = 0; i < rentals.length; i++) {
         var rental = rentals[i]
-        if (isNaN(rental.depositDiscount)){
+        if (isNaN(rental.depositDiscount)) {
           rental.realDeposit = rental.deposit
         }
-        else{
+        else {
           rental.realDeposit = rental.deposit - rental.depositDiscount
         }
-        if (!isNaN(rental.realDeposit)){
+        if (!isNaN(rental.realDeposit)) {
           rental.realDepositStr = util.showAmount(rental.realDeposit)
         }
-        else{
+        else {
           rental.realDepositStr = ''
         }
         if (rental.package_id) {
@@ -135,10 +171,10 @@ Component({
           else {
             item.textColor = that.data.defaultTextColor
           }
-          if (item.noNeed){
+          if (item.noNeed) {
             item.textColor = that.data.noNeedTextColor
           }
-         
+
         }
       }
       console.log('render rentals', rentals)
@@ -180,39 +216,46 @@ Component({
         return
       }
       console.log('select product', e)
-      var rental = {
-        id: 0,
-        order_id: null,
-        package_id: null,
-        name: rentProduct.name,
-        valid: 0,
-        deposit: rentProduct.category.deposit,
-        depositStr: util.showAmount(rentProduct.category.deposit),
-        realDeposit: rentProduct.category.deposit,
-        realDepositStr: util.showAmount(rentProduct.category.deposit),
-        startDate: that.data.startDate,
-        startDateIsWeekend: util.isWeekend(new Date(that.data.startDate)),
-        expectDays: 1,
-        category: rentProduct.category
-      }
-      var items = []
-      var item = {
-        id: 0,
-        rental_id: 0,
-        noCode: false,
-        category_id: rentProduct.category.id,
-        name: rentProduct.name,
-        categoryName: rentProduct.category.name,
-        code: rentProduct.barcode,
-        rent_product_id: rentProduct.id,
-        category: rentProduct.category
-      }
-      items.push(item)
-      rental.rentItems = items
-      var rentals = that.data.rentals
-      rentals.push(rental)
-      that.setData({ showPopUp: false, popUpContent: null })
-      that.renderData(rentals)
+      data.getRentPriceListPromise(that.data.shopObj.id, '分类',
+        rentProduct.category.id, that.properties.memberId ? '会员' : '门市')
+        .then(function (priceList) {
+          var rental = {
+            id: 0,
+            order_id: null,
+            package_id: null,
+            name: rentProduct.name,
+            valid: 0,
+            deposit: rentProduct.category.deposit,
+            depositStr: util.showAmount(rentProduct.category.deposit),
+            realDeposit: rentProduct.category.deposit,
+            realDepositStr: util.showAmount(rentProduct.category.deposit),
+            startDate: that.data.startDate,
+            startDateIsWeekend: util.isWeekend(new Date(that.data.startDate)),
+            expectDays: 1,
+            category: rentProduct.category,
+            priceList: priceList
+          }
+          util.createRentalDetal(rental, new Date(rental.startDate), new Date(rental.startDate))
+          var items = []
+          var item = {
+            id: 0,
+            rental_id: 0,
+            noCode: false,
+            category_id: rentProduct.category.id,
+            name: rentProduct.name,
+            categoryName: rentProduct.category.name,
+            code: rentProduct.barcode,
+            rent_product_id: rentProduct.id,
+            category: rentProduct.category
+          }
+          items.push(item)
+          rental.rentItems = items
+          var rentals = that.data.rentals
+          rentals.push(rental)
+          that.setData({ showPopUp: false, popUpContent: null })
+          that.renderData(rentals)
+        })
+
     },
     checkCodeDup(code) {
       var dup = false
@@ -292,13 +335,13 @@ Component({
       }
       return returnItem
     },
-    getRentenalByItemIndex(index){
+    getRentenalByItemIndex(index) {
       var that = this
       var rentals = that.data.rentals
-      var rental =  null
-      for(var i = 0; rental == null && i < rentals.length; i++){
-        for(var j = 0; rental == null && j < rentals[i].rentItems.length; j++){
-          if (index == rentals[i].rentItems[j].itemIndex){
+      var rental = null
+      for (var i = 0; rental == null && i < rentals.length; i++) {
+        for (var j = 0; rental == null && j < rentals[i].rentItems.length; j++) {
+          if (index == rentals[i].rentItems[j].itemIndex) {
             rental = rentals[i]
           }
         }
@@ -314,7 +357,7 @@ Component({
       console.log('get item', item)
       that.renderData(that.data.rentals)
     },
-    setNoNeed(e){
+    setNoNeed(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var item = that.getItemByIndex(id)
@@ -323,7 +366,7 @@ Component({
       console.log('get item', item)
       that.renderData(that.data.rentals)
     },
-    setAtOnce(e){
+    setAtOnce(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var item = that.getItemByIndex(id)
@@ -332,29 +375,29 @@ Component({
       console.log('get item', item)
       that.renderData(that.data.rentals)
     },
-    setNoGuaranty(e){
+    setNoGuaranty(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var rentals = that.data.rentals
       var rental = rentals[id]
       rental.noGuaranty = e.detail.value.length == 0 ? false : true
-      if(rental.noGuaranty){
+      if (rental.noGuaranty) {
         rental.realDeposit = 0
         rental.realDepositStr = util.showAmount(rental.realDeposit)
       }
-      else{
-        if (isNaN(rental.depositDiscount)){
+      else {
+        if (isNaN(rental.depositDiscount)) {
           rental.realDeposit = rental.deposit
           rental.realDepositStr = util.showAmount(rental.realDeposit)
         }
-        else{
+        else {
           rental.realDeposit = rental.deposit - rental.depositDiscount
           rental.realDepositStr = util.showAmount(rental.realDeposit)
         }
       }
       that.renderData(rentals)
     },
-    setStartDate(e){
+    setStartDate(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var rentals = that.data.rentals
@@ -362,8 +405,9 @@ Component({
       var date = new Date(e.detail.value)
       rental.startDate = e.detail.value
       rental.startDateIsWeekend = util.isWeekend(new Date(e.detail.value))
+      util.createRentalDetal(rental, date, date)
       that.renderData(rentals)
-      that.setData({rentals})
+      that.setData({ rentals })
     },
     setItemName(e) {
       var that = this
@@ -385,13 +429,26 @@ Component({
       item.category = e.detail
       item.category_id = item.category.id
       var rental = that.getRentenalByItemIndex(that.data.currentItemIndex)
-      rental.deposit = e.detail.deposit
-      rental.depositStr = util.showAmount(rental.deposit)
-      rental.realDeposit = rental.deposit
-      rental.realDepositStr = rental.depositStr
-      rental.category = e.detail
-      that.renderData(that.data.rentals)
-      that.setData({ barCode: null, searchBarCode: null })
+      data.getRentPriceListPromise(that.data.shopObj.id, '分类',
+        item.category.id, that.properties.memberId ? '会员' : '门市')
+        .then(function (priceList) {
+          rental.deposit = e.detail.deposit
+          rental.depositStr = util.showAmount(rental.deposit)
+          rental.realDeposit = rental.deposit
+          rental.realDepositStr = rental.depositStr
+          rental.category = e.detail
+          rental.expectDays = 1
+          rental.startDate = that.data.startDate
+          rental.startDateIsWeekend = util.isWeekend(new Date(that.data.startDate))
+          rental.priceList = priceList
+          util.createRentalDetal(rental, new Date(rental.startDate), new Date(rental.startDate))
+          that.renderData(that.data.rentals)
+          that.setData({ barCode: null, searchBarCode: null })
+        }).catch(function (exp) { })
+
+
+
+
     },
     showItem(e) {
       var that = this
@@ -413,14 +470,14 @@ Component({
         that.setData({ currentRental, showBackdrop: true, action: 'package' })
       }
     },
-    onRentalChange(e){
+    onRentalChange(e) {
       console.log('rental change', e)
       var that = this
-      that.setData({unSavedRental: e.detail})
+      that.setData({ unSavedRental: e.detail })
     },
-    saveUpdatedRental(){
+    saveUpdatedRental() {
       var that = this
-      if (that.data.unSavedRental){
+      if (that.data.unSavedRental) {
         var currentRental = that.data.currentRental
         var unSavedRental = that.data.unSavedRental
         currentRental.depositDiscount = unSavedRental.depositDiscount
@@ -429,18 +486,20 @@ Component({
       }
       that.renderData(that.data.rentals)
       that.cancelBackdrop()
-      that.setData({unSavedRental: null})
+      that.setData({ unSavedRental: null })
     },
-    showPriceList(e){
+    showPriceList(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var shop = that.data.shop
       var rental = that.data.rentals[id]
       //var rental = rentals[id]
-      var targetId = rental.package_id? rental.package_id : rental.category.id
-      that.setData({showBackdrop: true, action: 'priceList', 
-        dayType: rental.startDateIsWeekend ? '周末' :'平日',
-        type: rental.package_id? '套餐' : '分类', shop, targetId })
+      var targetId = rental.package_id ? rental.package_id : rental.category.id
+      that.setData({
+        showBackdrop: true, action: 'priceList',
+        dayType: rental.startDateIsWeekend ? '周末' : '平日',
+        type: rental.package_id ? '套餐' : '分类', shop, targetId
+      })
     },
   }
 })

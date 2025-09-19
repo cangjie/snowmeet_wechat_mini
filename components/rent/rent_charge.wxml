@@ -62,6 +62,14 @@
             </view>
           </view>
         </view>
+        <view>
+          <view class="view-row">
+            <view class="left-column">【减免】</view>
+            <view class="right-column">
+              <input class="input" style="width: 75rpx;" />
+            </view>
+          </view>
+        </view>
       </block>
       <block wx:else>
         <view>
