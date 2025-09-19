@@ -153,14 +153,25 @@ const createRentalDetal = function(rental, startDate, endDate){
   var totalAmount = 0
   var i = new Date(formatDate(startDate))
   for( ; i <= endDate; i.setDate(i.getDate() + 1)){
-    var price = getRentPrice(rental.priceList, i)
+    var rentType = '日场'
+    if (formatDate(new Date(startDate)) == formatDate(new Date(endDate))){
+      var currentDate = new Date()
+      if (currentDate.getHours() >= 16){
+        rentType = '夜场'
+      }
+      else if (currentDate.getHours() >= 13) {
+        rentType = '下午场'
+      }
+    }
+    var price = getRentPrice(rental.priceList, i, rentType)
     if (price != null){
       var detail = {
-        date: i,
+        date: formatDate(i),
         dayType: price.day_type,
         rentType: price.rent_type,
         scene: price.scene,
         price: price.price,
+        discount: 0,
         priceStr: showAmount(price.price),
         discount: 0,
         summary: price.price,
@@ -175,9 +186,10 @@ const createRentalDetal = function(rental, startDate, endDate){
   rental.details = details
   return details
 }
-const getRentPrice = function(priceList, date){
-  var currentDate = new Date()
-  var rentType = '日场'
+const getRentPrice = function(priceList, date, rentType){
+  //var currentDate = new Date()
+  //var rentType = '日场'
+  /*
   if (formatDate(date) == formatDate(currentDate)){
     var hour = currentDate.getHours()
     if (hour >= 13 && hour < 16){
@@ -187,6 +199,7 @@ const getRentPrice = function(priceList, date){
       rentType = '夜场'
     }
   }
+  */
   var weekend = isWeekend(date)
   var commonPrice = null
   for(var i = 0; i < priceList.length; i++){
