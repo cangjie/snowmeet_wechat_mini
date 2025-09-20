@@ -189,7 +189,7 @@ Component({
     },
     searchBarcodeFuzzy(e) {
       var that = this
-      that.setData({ showPopUp: true, popUpContent: 'searchBarCodeFuzzy' })
+      that.setData({ showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: null })
     },
     confirmProduct(e) {
       var that = this
@@ -533,6 +533,18 @@ Component({
         }
       }
       that.renderData(that.data.rentals)
+    },
+    del(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var rentals = that.data.rentals
+      var newRentals = []
+      for(var i = 0; i< rentals.length; i++){
+        if (i != id){
+          newRentals.push(rentals[i])
+        }
+      }
+      that.renderData(newRentals)
     }
   }
 })
