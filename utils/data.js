@@ -196,6 +196,16 @@ const getTicket = function (code){
     })
   })
 }
+const updateRentCategoryPromise = function(code, name, guaranty, scene, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateCategory/' + code + '?name=' + encodeURIComponent(name) + '&guaranty=' + guaranty + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(updateUrl, null).then(function (category){
+      resolve(category)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 /*
 const getAllRentCategoriesPromise = function(){
   var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
@@ -226,5 +236,6 @@ module.exports = {
   updateRentPricePromise,
   getShopByNamePromise,
   getMyTickets,
-  getTicket
+  getTicket,
+  updateRentCategoryPromise
 }

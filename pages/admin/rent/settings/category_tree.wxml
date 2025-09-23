@@ -74,12 +74,20 @@
   <mp-cells title="押金设定" >
     <mp-cell>
     <view style="display:flex;justify-content: center;" >
-      <input class="input" id="deposit" bindinput="setNumber" style="width: 150rpx; text-align: center;" value="{{selectedCategory.deposit}}" disabled="{{selectedCategory == undefined || selectedCategory.children != null}}" />
+      <input  class="input" id="deposit"  style="width: 150rpx; text-align: center;" 
+      value="{{selectedCategory.deposit}}" 
+      disabled="{{selectedCategory == undefined || selectedCategory.children != null || !modGuaranty}}"
+      bindinput="inputGuarantAmount" />
+      
     </view>
   </mp-cell>
   <mp-cell>
-    <view class="view-row" style="justify-content: center;" >
-      <button size="mini" >修改</button>
+    <view class="view-row" style="justify-content: center;" wx:if="{{!modGuaranty}}"  >
+      <button size="mini" bind:tap="setModGuaranty" > 修 改 </button>
+    </view>
+    <view class="view-row" style="justify-content: center;" wx:else  >
+      <button size="mini" bind:tap="cancelModGuaranty" > 取 消 </button>
+      <button size="mini" bind:tap="confirmGuarantyAmount" > 确 认 </button>
     </view>
   </mp-cell>
   </mp-cells>

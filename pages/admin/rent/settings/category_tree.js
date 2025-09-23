@@ -8,6 +8,7 @@ Page({
    * Page initial data
    */
   data: {
+    modGuaranty: false,
     isAdmin: false,
     selectedName: '',
     dataTree:[],
@@ -71,6 +72,12 @@ Page({
 
         if (cat.children != null){
           cat.deposit = '-'
+        }
+        else if (!isNaN(cat.deposit)){
+          cat.depositStr = util.showAmount(parseFloat(cat.deposit))
+        }
+        else{
+          cat.depositStr = ''
         }
 
         //selectedCategory = res.data
@@ -351,6 +358,7 @@ Page({
   handleSelect(e){
     var that = this
     var select = e.detail.item
+    
     var selectedDisplayedCode = util.getDisplayedCode(select.code)
     var isSameLevel = that.data.isSameLevel
     var fatherCode = isSameLevel ? select.code.substr(0, select.code.length - 2) : select.code
@@ -467,7 +475,37 @@ Page({
     }
     that.setData({canSave: canSave, canSaveMsg: canSaveMsg})
   },
+  setModGuaranty(){
+    var that = this
+    that.setData({modGuaranty: true})
+  },
+  cancelModGuaranty(){
+    var that = this
+    that.setData({modGuaranty: false, modedGuaranty: null, selectedCategory: that.data.selectedCategory})
+  },
+  inputGuarantAmount(e){
+    var that = this
+    var value = e.detail.value
+    if (isNaN(value)){
+      return
+    }
+    that.setData({modedGuaranty: parseFloat(value)})
+  },
+  confirmGuarantyAmount(e){
+    var that = this
+    var selectedCategory = that.data.selectedCategory
+    selectedCategory.deposit = that.data.modedGuaranty
+    data.updateRentCategoryPromise(selectedCategory.code, selectedCategory.name, 
+      selectedCategory.deposit, 
+      encodeURIComponent('修改租赁分类名称或押金'),
+      app.globalData.sessionKey).then(function (category){
+      that.setData({selectedCategory: category, modGuaranty: false})
+    }).catch(function (exp){
+      that.setData({modGuaranty: false})
+    })
 
+  },
+/*
   setNumber(e){
     var that = this
     var cat = that.data.selectedCategory
@@ -493,7 +531,8 @@ Page({
         that.checkValid()
     }
   },
-
+*/
+/*
   save(){
     var that = this
     that.setData({isSaving: true})
@@ -598,7 +637,7 @@ Page({
       }
     }
   },
-
+*/
   setNewCategory(e){
     var that = this
     var v = e.detail.value
