@@ -12,8 +12,8 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <view>
-        <button class="input item-center" disabled="{{newName == ''}}" bindtap="addNew" >添加新套餐</button>
+      <view class="view-row" style="justify-content: center;">
+        <button class="input item-center" disabled="{{newName == ''}}" bindtap="addNew" size="mini" >添加新套餐</button>
       </view>
     </mp-cell>
   </mp-cells>

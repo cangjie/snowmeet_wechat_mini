@@ -135,8 +135,11 @@ const performWebRequest = function (url, data){
               icon: 'none'
             })
           }
+          reject(res.data.message)
         }
-        resolve(res.data.data)
+        else{
+          resolve(res.data.data)
+        }
       },
       fail:(res)=>{
         wx.showToast({

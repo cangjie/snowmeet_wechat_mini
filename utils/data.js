@@ -1,4 +1,4 @@
-const util = require('./util')
+const util = require('./util.js')
 const app = getApp()
 //获取租赁套餐列表
 const getPackageListPromise = function () {
@@ -206,6 +206,33 @@ const updateRentCategoryPromise = function(code, name, guaranty, scene, sessionK
     })
   })
 }
+const updateRentPackagePromise = function (id, name, description, guaranty, sessionKey) {
+  var saveUrl = app.globalData.requestPrefix + 'Rent/UpdateRentPackageBaseInfo/'
+      + id.toString() + '?name=' + encodeURIComponent(name)
+      + '&description=' + encodeURIComponent(description)
+      + '&deposit=' + encodeURIComponent(guaranty.toString())
+      + '&sessionKey=' + encodeURIComponent(sessionKey)
+      + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(saveUrl, null).then(function(rentPackage){
+      resolve(rentPackage)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+const modRentPackageCategory = function (packageId, categoryId, action, sessionKey){
+  var setUrl = app.globalData.requestPrefix + 'Rent/RentPackageCategory'
+      + action + '/' + packageId.toString() + '?categoryId=' + categoryId.toString()
+      + '&sessionKey=' + sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(setUrl, null).then(function(category){
+      resolve(category)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+}
 /*
 const getAllRentCategoriesPromise = function(){
   var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
@@ -237,5 +264,7 @@ module.exports = {
   getShopByNamePromise,
   getMyTickets,
   getTicket,
-  updateRentCategoryPromise
+  updateRentCategoryPromise,
+  updateRentPackagePromise,
+  modRentPackageCategory
 }

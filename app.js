@@ -133,8 +133,8 @@ App({
   },
   globalData: {
     appId: 'wxd1310896f2aa68bb',
-    domainName: 'snowmeet.wanlonghuaxue.com',
-    requestPrefix: 'https://snowmeet.wanlonghuaxue.com/api/',
+    domainName: 'mini.snowmeet.top',
+    requestPrefix: 'https://mini.snowmeet.top/api/',
     uploadDomain: 'xuexiaotupian.wanlonghuaxue.com',
     userInfo: null,
     sessionKey: '',
