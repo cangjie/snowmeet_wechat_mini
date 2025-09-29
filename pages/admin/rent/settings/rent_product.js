@@ -86,7 +86,22 @@ Page({
   getProduct(){
     var that = this
     var id = that.data.id
-    var getUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetRentProduct/' + id.toString()
+    var getUrl = app.globalData.requestPrefix + 'Rent/GetRentProduct/' + id.toString()
+    util.performWebRequest(getUrl, null).then(function (product){
+      if (that.editorCtx != undefined && that.editorCtx != null){
+        that.editorCtx.setContents({html: product.description})
+      }
+      //that.editorCtx.setContents({html: res.data.description})
+      var images = ''
+      for(var i = 0; i < product.images.length; i++){
+        images = images + ((i == 0)?'':',') + product.images[i].image_url
+      }
+
+      that.setData({product, html: product.description, oriProduct: Object.assign({}, product), images: images})
+      that.getProductCategoryInfo()
+      that.getCategories()
+    })
+    /*
     wx.request({
       url: getUrl,
       method: 'GET',
@@ -109,6 +124,7 @@ Page({
         that.getCategories()
       }
     })
+    */
   },
   getProductCategoryInfo(){
     var that = this
@@ -253,8 +269,8 @@ Page({
       case 'owner':
         product.owner = e.detail.value
         break
-      case 'isValid':
-        product.is_valid = e.detail.value?1:0
+      case 'available':
+        product.available = e.detail.value?1:0
         break
       case 'isOnline':
         product.is_online = e.detail.value?1:0
@@ -366,7 +382,7 @@ Page({
         }
     
         if (res.confirm) {
-          product.is_delete = 1
+          product.valid = 0
           that.saveBaseInfo()
           wx.navigateBack()
         }

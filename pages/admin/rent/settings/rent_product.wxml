@@ -1,130 +1,140 @@
-<block wx:if="{{product.shop == 'null'}}" >
-  <shop-selector bindShopSelected="shopSelected" ></shop-selector>
-  <view class="view-row" >
-    <button class="input" bindtap="setShop" > 指 派 店 铺 </button>
+<block wx:if="{{product.shop == 'null'}}">
+  <shop-selector bindShopSelected="shopSelected"></shop-selector>
+  <view class="view-row">
+    <button class="input" bindtap="setShop"> 指 派 店 铺 </button>
   </view>
 </block>
-<mp-cells title="基本信息" >
-  <mp-cell >
-    <view class="view-row"  >
-      <view class="left-column" >店铺：</view>
-      <view class="right-column view-row" style="width: 75%; " >
+<mp-cells title="基本信息">
+  <mp-cell>
+    <view class="view-row">
+      <view class="left-column">店铺：</view>
+      <view class="right-column view-row" style="width: 75%; ">
         <view>{{(product.shop=='null')?'未指派':product.shop}}</view>
-        <view style="width: 20rpx;" ></view>
+        <view style="width: 20rpx;"></view>
         <!--button class="input" size="mini" disabled="{{product.shop == 'null'}}" > 调 拨 </button-->
       </view>
-    </view> 
+    </view>
   </mp-cell>
   <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >名称：</view>
-      <view class="right-column" style="width: 75%; " >
+    <view class="view-row">
+      <view class="left-column">名称：</view>
+      <view class="right-column" style="width: 75%; ">
         <input id="name" bindinput="inputBaseInfo" class="input" style="width: 400rpx;" value="{{product.name}}" disabled="{{!isBaseInfoEditing}}" />
       </view>
     </view>
   </mp-cell>
   <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >品牌：</view>
-      <view class="right-column" >
-        <input id="brand" bindinput="inputBaseInfo" class="input" value="{{product.brand}}" disabled="{{!isBaseInfoEditing}}"  />
+    <view class="view-row">
+      <view class="left-column">品牌：</view>
+      <view class="right-column">
+        <input id="brand" bindinput="inputBaseInfo" class="input" value="{{product.brand}}" disabled="{{!isBaseInfoEditing}}" />
       </view>
-      <view class="left-column" >产权：</view>
-      <view class="right-column" >
+      <view class="left-column">产权：</view>
+      <view class="right-column">
         <input id="owner" bindinput="inputBaseInfo" class="input" placeholder="自有" value="{{product.owner}}" disabled="{{!isBaseInfoEditing}}" />
       </view>
     </view>
   </mp-cell>
   <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >开放租赁：</view>
-      <view class="right-column" >
-        <switch id="isValid" bindchange="inputBaseInfo" checked="{{product.is_valid == 1}}" disabled="{{!isBaseInfoEditing}}" ></switch>
+    <view class="view-row">
+      <view class="left-column">开放租赁：</view>
+      <view class="right-column">
+        <switch id="available" bindchange="inputBaseInfo" checked="{{product.available == 1}}" disabled="{{!isBaseInfoEditing}}"></switch>
       </view>
-      <view class="left-column" >在线租赁：</view>
-      <view class="right-column" >
-        <switch id="isOnline" bindchange="inputBaseInfo" checked="{{product.is_online == 1}}" disabled="{{!isBaseInfoEditing}}" ></switch>
-      </view>
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-row" >
-      <view class="left-column" >条码：</view>
-      <view class="right-column" >
-        <input id="barcode" bindinput="inputBaseInfo" class="input" value="{{product.barcode}}" disabled="{{!isBaseInfoEditing}}"  />
-      </view>
-      <view class="left-column" >数量：</view>
-      <view class="right-column"  >
-        <input id="count" class="input"  style="text-align: center;width: 50px;" 
-        value="{{product.count}}" bindinput="inputBaseInfo" disabled="{{!isBaseInfoEditing}}"  />
+      <view class="left-column">在线租赁：</view>
+      <view class="right-column">
+        <switch id="isOnline" bindchange="inputBaseInfo" checked="{{product.is_online == 1}}" disabled="{{!isBaseInfoEditing}}"></switch>
       </view>
     </view>
   </mp-cell>
   <mp-cell>
-    <view class="view-row" >
-      <button id="baseInfo" class="input" size="mini" disabled="{{isBaseInfoEditing}}" bindtap="edit"  > 编 辑 </button>
-      <button id="baseInfo" class="input" size="mini" disabled="{{!isBaseInfoEditing}}" bindtap="save" > 保 存 </button>
-      <button id="baseInfo" class="input" size="mini" disabled="{{!isBaseInfoEditing}}" bindtap="cancel" > 取 消 </button>
+    <view class="view-row">
+      <view class="left-column">条码：</view>
+      <view class="right-column">
+        <input id="barcode" bindinput="inputBaseInfo" class="input" value="{{product.barcode}}" disabled="{{!isBaseInfoEditing}}" />
+      </view>
+      <view class="left-column">数量：</view>
+      <view class="right-column">
+        <input id="count" class="input" style="text-align: center;width: 50px;" value="{{product.count}}" bindinput="inputBaseInfo" disabled="{{!isBaseInfoEditing}}" />
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row" style="justify-content: center;">
+      <block wx:if="{{isBaseInfoEditing}}">
+        <button id="baseInfo" class="input" size="mini" disabled="{{!isBaseInfoEditing}}" bindtap="save"> 保 存 </button>
+        <button id="baseInfo" class="input" size="mini" disabled="{{!isBaseInfoEditing}}" bindtap="cancel"> 取 消 </button>
+      </block>
+      <block wx:else>
+        <button id="baseInfo" class="input" size="mini" disabled="{{isBaseInfoEditing}}" bindtap="edit"> 编 辑 </button>
+      </block>
+
+
     </view>
   </mp-cell>
 </mp-cells>
-<mp-cells title="上传图片" >
+<mp-cells title="上传图片">
   <mp-cell>
-    <multi-uploader  bindUploaded="uploaded" uploaded_files="{{images}}" ></multi-uploader>
+    <multi-uploader bindUploaded="uploaded" uploaded_files="{{images}}"></multi-uploader>
   </mp-cell>
 </mp-cells>
 <mp-cells title="详细参数">
-  <mp-cell wx:for="{{product.detailInfo}}" >
-    <view class="view-row" >
-      <view class="left-column" >{{item.field.field_name}}：</view>
+  <mp-cell wx:for="{{product.detailInfo}}">
+    <view class="view-row">
+      <view class="left-column">{{item.field.field_name}}：</view>
       <view class="right-column" style="width: 75%;">
         <input id="{{item.field_id}}" style="width: 350rpx;" class="input" disabled="{{!isParameterEditing}}" bindinput="inputDetail" value="{{item.info}}" />
       </view>
     </view>
   </mp-cell>
   <mp-cell>
-    <view class="view-row" >
-      <button id="parameter" class="input" size="mini" disabled="{{isParameterEditing}}" bindtap="edit" > 编 辑 </button>
-      <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" bindtap="save" > 保 存 </button>
-      <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" bindtap="cancel" > 取 消 </button>
+    <view class="view-row" style="justify-content: center;">
+      <block wx:if="{{isParameterEditing}}">
+        <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" bindtap="save"> 保 存 </button>
+        <button id="parameter" class="input" size="mini" disabled="{{!isParameterEditing}}" bindtap="cancel"> 取 消 </button>
+      </block>
+      <block wx:else>
+        <button id="parameter" class="input" size="mini" disabled="{{isParameterEditing}}" bindtap="edit"> 编 辑 </button>
+      </block>
     </view>
   </mp-cell>
 </mp-cells>
-<mp-cells title="编写简介" >
+<mp-cells title="编写简介">
   <mp-cell>
-    <editor id="editor"  read-only="{{!isDescEditing}}" id="editor" class="ql-container"  bindstatuschange="onStatusChange" bindready="onEditorReady" bindinput="inputHtml" value="{{html}}" ></editor>
+    <editor id="editor" read-only="{{!isDescEditing}}" id="editor" class="ql-container" bindstatuschange="onStatusChange" bindready="onEditorReady" bindinput="inputHtml" value="{{html}}"></editor>
   </mp-cell>
   <mp-cell>
-    <view class="view-row" >
-      <button id="desc" class="input" size="mini" disabled="{{isDescEditing}}" bindtap="edit"> 编 辑 </button>
-      <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" bindtap="save" > 保 存 </button>
-      <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" bindtap="cancel" > 取 消 </button>
+    <view class="view-row" style="justify-content: center;">
+      <block wx:if="{{isDescEditing}}">
+        <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" bindtap="save"> 保 存 </button>
+        <button id="desc" class="input" size="mini" disabled="{{!isDescEditing}}" bindtap="cancel"> 取 消 </button>
+      </block>
+      <block wx:else>
+        <button id="desc" class="input" size="mini" disabled="{{isDescEditing}}" bindtap="edit"> 编 辑 </button>
+      </block>
     </view>
   </mp-cell>
 </mp-cells>
-<mp-cells title="分类设定" >
+<mp-cells title="分类设定">
   <mp-cell>
-    <tree
-      dataTree="{{dataTree}}"
-      selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
-      bind:select="handleSelect"
-      isSelectLastNode="true"
-      isOpenAll="{{false}}"
-      checkBox="{{false}}"
-    ></tree>
+    <tree dataTree="{{dataTree}}" selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}" bind:select="handleSelect" isSelectLastNode="true" isOpenAll="{{false}}" checkBox="{{false}}"></tree>
   </mp-cell>
   <mp-cell>
-    <view class="view-row" >
-      <button id="category" class="input" size="mini" disabled="{{isCategoryEditing}}"  bindtap="edit" > 编 辑 </button>
-      <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" bindtap="save" > 保 存 </button>
-      <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" bindtap="cancel" > 取 消 </button>
+    <view class="view-row" style="justify-content: center;">
+      <block wx:if="{{isCategoryEditing}}">
+        <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" bindtap="save"> 保 存 </button>
+        <button id="category" class="input" size="mini" disabled="{{!isCategoryEditing}}" bindtap="cancel"> 取 消 </button>
+      </block>
+      <block wx:else>
+        <button id="category" class="input" size="mini" disabled="{{isCategoryEditing}}" bindtap="edit"> 编 辑 </button>
+      </block>
     </view>
   </mp-cell>
 </mp-cells>
-<view style="height: 500rpx; margin-top: 100rpx;" >
-  <button bind:tap="del" class="input" > 删 除 </button>
+<view class="view-row" style="height: 500rpx; margin-top: 100rpx;justify-content: center;">
+  <button bind:tap="del" class="input" size="mini"> 删 除 </button>
 </view>
-  <!--price-matrix 
+<!--price-matrix 
     priceMatrix="{{priceArr}}" 
      fieldRow="{{['门市', '预约', '会员']}}" 
     fieldCol="{{['平日','周末','节假日']}}" 
@@ -132,7 +142,7 @@
     bindTabChange="tabChange"
     disabled="{{false}}"
   ></price-matrix-->
-<view style="height: 500rpx;" ></view>
+<view style="height: 500rpx;"></view>
 <view class="toolbar" catchtouchend="format" hidden="{{keyboardHeight > 0 ? false : true}}" style="bottom: {{isIOS ? editorHeight-200 : 0}}px">
   <i class="iconfont icon-charutupian" catchtouchend="insertImage"></i>
   <i class="iconfont icon-format-header-2 {{formats.header === 2 ? 'ql-active' : ''}}" data-name="header" data-value="{{2}}"></i>
