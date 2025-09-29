@@ -78,10 +78,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    var that = this
-    app.loginPromiseNew.then(function(resolve){
-      that.getData()
-    })
+    
   },
 
   /**
@@ -95,7 +92,10 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.getData()
+    })
   },
 
   /**
