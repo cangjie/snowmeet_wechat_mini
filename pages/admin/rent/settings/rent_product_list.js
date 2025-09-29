@@ -1,18 +1,27 @@
 // pages/admin/rent/settings/rent_product_list.js
 const app = getApp()
 const data = require('../../../../utils/data.js')
+const util = require('../../../../utils/util.js')
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    dataTree:[]
+    dataTree: []
   },
 
-  getCategories(){
+  getCategories() {
     var that = this
-    var getCatUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
+    var getCatUrl = app.globalData.requestPrefix + 'Rent/GetAllCategories'
+    util.performWebRequest(getCatUrl, null).then(function (trees) {
+      that.setData({ dataTree: trees })
+      for (var i = 0; i < trees.length; i++) {
+        var tree = trees[i]
+        that.countDataTree(tree)
+      }
+    })
+    /*
     wx.request({
       url: getCatUrl,
       method: 'GET',
@@ -27,48 +36,50 @@ Page({
         that.setData({dataTree: trees})
       }
     })
+    */
   },
 
-  countDataTree(tree){
+  countDataTree(tree) {
     var that = this
     var pCount = 0
     var pList = []
-    if (tree.productList != undefined && tree.productList != null){
-      pCount = tree.productList.length
-      for(var i = 0; i < tree.productList.length; i++){
-        var p = tree.productList[i]
-        p.cateName =  tree.name + '/' 
-          + ((p.cateName == null || p.cateName == undefined)? '' : p.cateName)
+    data.getRentCategoryProductsPromise(tree.id).then(function (products) {
+      tree.productList = products
+      tree.productCount = products.length
+      if (tree.productList != undefined && tree.productList != null) {
+        //data.getRentCategoryProductsPromise(t)
+        pCount = tree.productList.length
+        for (var i = 0; i < tree.productList.length; i++) {
+          var p = tree.productList[i]
+          p.cateName = tree.name + '/'
+            + ((p.cateName == null || p.cateName == undefined) ? '' : p.cateName)
+        }
+        pList = tree.productList
       }
-      pList = tree.productList
-    }
-    else{
-      tree.productList = pList
-    }
-    
-    if (tree.children != undefined && tree.children != null){
-      for(var i = 0; i < tree.children.length; i++){
-        that.countDataTree(tree.children[i])
-        pCount = pCount + tree.children[i].productCount
-        var childPList = tree.children[i].productList
-        if (childPList != undefined && childPList != null){
-          for(var j = 0; j < childPList.length; j++){
-            pList.push(childPList[j])
-          }
+      else {
+        tree.productList = pList
+      }
+
+      if (tree.children != undefined && tree.children != null) {
+        for (var i = 0; i < tree.children.length; i++) {
+          var leaf = tree.children[i]
+          that.countDataTree(leaf)
         }
       }
-    }
-    tree.productCount = pCount
-    tree.name = tree.name + '(' + pCount.toString() + ')'
+      tree.productCount = pCount
+      tree.name = tree.name + '(' + pCount.toString() + ')'
+      var dataTree = that.data.dataTree
+      that.setData({dataTree})
+    }).catch(function (exp) { })
   },
-  handleSelect(e){
+  handleSelect(e) {
     var that = this
     var select = e.detail.item
-    that.setData({selectedCategory: select})
+    that.setData({ selectedCategory: select })
     console.log('cat selected', select)
   },
 
-  gotoDetail(e){
+  gotoDetail(e) {
     var id = e.currentTarget.id
     wx.navigateTo({
       url: 'rent_product?id=' + id,
@@ -96,10 +107,10 @@ Page({
   onShow() {
     console.log('show')
     var that = this
-    that.setData({selectedCategory: null})
-    
+    that.setData({ selectedCategory: null })
+
     that.getCategories()
-    
+
   },
 
   /**

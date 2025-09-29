@@ -1,3 +1,5 @@
+const util = require("../../../../utils/util")
+
 // pages/admin/rent/settings/rent_product_add.js
 const app = getApp()
 Page({
@@ -22,7 +24,15 @@ Page({
   },
   getCategories(){
     var that = this
-    var getCatUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetAllCategories'
+    var getCatUrl = app.globalData.requestPrefix + 'Rent/GetAllCategories'
+    util.performWebRequest(getCatUrl, null).then(function (trees){
+      //var trees = res.data
+        for(var i = 0; i < trees.length; i++){
+          that.countDataTree(trees[i])
+        }
+        that.setData({dataTree: trees})
+    })
+    /*
     wx.request({
       url: getCatUrl,
       method: 'GET',
@@ -37,6 +47,7 @@ Page({
         that.setData({dataTree: trees})
       }
     })
+    */
   },
   countDataTree(tree){
     var that = this
@@ -162,6 +173,16 @@ Page({
     var addUrl = 'https://' + app.globalData.domainName + '/api/Rent/AddRentProduct/' + category.id + '?shop='
     + encodeURIComponent(shop) + '&name=' + encodeURIComponent(productName) + '&sessionKey=' 
     + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    util.performWebRequest(addUrl, null).then(function (rentProduct){      
+      wx.showToast({
+        title: '添加成功,即将进入详情页。',
+        icon: 'success'
+      })
+      wx.redirectTo({
+        url: 'rent_product?id=' + rentProduct.id,
+      })
+    }).catch(function(exp){})
+    /*
     wx.request({
       url: addUrl,
       method: 'GET',
@@ -179,6 +200,7 @@ Page({
         })
       }
     })
+    */
   },
   /**
    * Lifecycle function--Called when page load

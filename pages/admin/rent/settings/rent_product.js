@@ -1,3 +1,5 @@
+const util = require("../../../../utils/util")
+
 // pages/admin/rent/settings/rent_product.js
 const app = getApp()
 Page({
@@ -282,19 +284,10 @@ Page({
     if (isNaN(product.count) || product.count == null || product.count == ''){
       product.count = 1
     }
-    var saveUrl = 'https://' + app.globalData.domainName + '/api/Rent/ModRentProduct?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-    wx.request({
-      url: saveUrl,
-      method: 'POST',
-      data: product,
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        that.getProduct()
-      }
-
-    })
+    var saveUrl = app.globalData.requestPrefix + 'Rent/ModRentProduct?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    util.performWebRequest(saveUrl, product).then(function (rentProduct){
+      that.getProduct()
+    }).catch(function (exp){})
   },
   inputHtml(e){
     console.log('input html', e)

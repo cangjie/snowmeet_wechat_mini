@@ -1,6 +1,7 @@
 // pages/admin/rent/settings/rent_package_list.js
 const app = getApp()
 const data = require('../../../../utils/data.js')
+const util = require('../../../../utils/util.js')
 Page({
 
   /**
@@ -43,6 +44,16 @@ Page({
           + 'name=' + encodeURIComponent(that.data.newName) + '&description='
           + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
           + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+          util.performWebRequest(addUrl, null).then(function (rentPackage){
+            wx.showToast({
+              title: '添加成功，进入详情页填写详细信息。',
+              icon: 'success'
+            })
+            wx.navigateTo({
+              url: 'rent_package?id=' + rentPackage.id
+            })
+          })
+          /*
           wx.request({
             url: addUrl,
             method: 'GET',
@@ -56,6 +67,7 @@ Page({
               })
             }
           })
+          */
         }
       }
     })

@@ -233,6 +233,16 @@ const modRentPackageCategory = function (packageId, categoryId, action, sessionK
     })
   })
 }
+const getRentCategoryProductsPromise = function (categoryId){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByCategory/' + categoryId.toString()
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(products){
+      resolve(products)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 /*
 const getAllRentCategoriesPromise = function(){
   var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
@@ -266,5 +276,6 @@ module.exports = {
   getTicket,
   updateRentCategoryPromise,
   updateRentPackagePromise,
-  modRentPackageCategory
+  modRentPackageCategory,
+  getRentCategoryProductsPromise
 }

@@ -11,7 +11,7 @@
       <view class="right-column view-row" style="width: 75%; " >
         <view>{{(product.shop=='null')?'未指派':product.shop}}</view>
         <view style="width: 20rpx;" ></view>
-        <button class="input" size="mini" disabled="{{product.shop == 'null'}}" > 调 拨 </button>
+        <!--button class="input" size="mini" disabled="{{product.shop == 'null'}}" > 调 拨 </button-->
       </view>
     </view> 
   </mp-cell>
