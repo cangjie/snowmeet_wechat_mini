@@ -134,14 +134,6 @@
 <view class="view-row" style="height: 500rpx; margin-top: 100rpx;justify-content: center;">
   <button bind:tap="del" class="input" size="mini"> 删 除 </button>
 </view>
-<!--price-matrix 
-    priceMatrix="{{priceArr}}" 
-     fieldRow="{{['门市', '预约', '会员']}}" 
-    fieldCol="{{['平日','周末','节假日']}}" 
-    bindmod="modPrice"
-    bindTabChange="tabChange"
-    disabled="{{false}}"
-  ></price-matrix-->
 <view style="height: 500rpx;"></view>
 <view class="toolbar" catchtouchend="format" hidden="{{keyboardHeight > 0 ? false : true}}" style="bottom: {{isIOS ? editorHeight-200 : 0}}px">
   <i class="iconfont icon-charutupian" catchtouchend="insertImage"></i>

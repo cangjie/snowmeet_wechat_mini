@@ -91,7 +91,7 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.getCategories()
+    //that.getCategories()
   },
 
   /**
