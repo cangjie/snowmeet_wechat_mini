@@ -243,6 +243,16 @@ const getRentCategoryProductsPromise = function (categoryId){
     })
   })
 }
+const deleteRentPackagePromise = function(packageId, sessionKey){
+  var delUrl = app.globalData.requestPrefix + 'Rent/DeleteRentPackage/' + packageId.toString() + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(delUrl, null).then(function(rentPackage){
+      resolve(rentPackage)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 /*
 const getAllRentCategoriesPromise = function(){
   var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
@@ -277,5 +287,6 @@ module.exports = {
   updateRentCategoryPromise,
   updateRentPackagePromise,
   modRentPackageCategory,
-  getRentCategoryProductsPromise
+  getRentCategoryProductsPromise,
+  deleteRentPackagePromise
 }

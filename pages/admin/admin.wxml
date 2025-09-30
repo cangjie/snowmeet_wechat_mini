@@ -68,8 +68,8 @@
     <mp-cell id="rent_unreturned" value="【租赁】未归还列表" bindtap="nav" ></mp-cell>
     <mp-cell wx:if="{{isAdmin}}" id="category_tree" value="【租赁】租赁分类维护" bindtap="nav" ></mp-cell>
     <mp-cell wx:if="{{isAdmin}}" id="rent_package" value="【租赁】租赁套餐设置" bindtap="nav" ></mp-cell>
-    <mp-cell  id="rent_product_add" value="【租赁】添加租赁商品" bindtap="nav" ></mp-cell>
-    <mp-cell  id="rent_product_list" value="【租赁】租赁商品列表" bindtap="nav" ></mp-cell>
+    <mp-cell  id="rent_product_add" value="【租赁】添加租赁物" bindtap="nav" ></mp-cell>
+    <mp-cell  id="rent_product_list" value="【租赁】租赁物列表" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="储值管理" >
     <mp-cell id="deposit_list" value="【储值】账户列表" bindtap="nav" ></mp-cell>

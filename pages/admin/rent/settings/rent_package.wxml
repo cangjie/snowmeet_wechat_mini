@@ -62,4 +62,7 @@
   </mp-cells>
   <shop-price-matrix wx:if="{{showShopMatrix}}" targetId="{{id}}" priceType="套餐" ></shop-price-matrix>
   <view style="height: 100rpx;"></view> 
+  <view class="view-row" style="justify-content: center;" >
+    <van-button type="danger" bind:click="del" > 删 除 套 餐 </van-button>
+  </view>
 </view>

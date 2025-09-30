@@ -275,5 +275,23 @@ Page({
         that.setCancelModCategory(e)
       }).then(function (exp){})
     }
+  },
+  del(){
+    var that = this
+    wx.showModal({
+      title: '确认删除',
+      content: '此操作不可逆。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          data.deleteRentPackagePromise(that.data.id, app.globalData.sessionKey).then(function (rentPackage){
+            wx.navigateBack()
+          })
+        }
+      }
+    })
   }
 })
