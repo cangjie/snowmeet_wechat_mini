@@ -80,17 +80,9 @@ Page({
   onLoad(options) {
     
   },
-
-  /**
-   * Lifecycle function--Called when page is initially rendered
-   */
   onReady() {
 
   },
-
-  /**
-   * Lifecycle function--Called when page show
-   */
   onShow() {
     var that = this
     app.loginPromiseNew.then(function(resolve){
