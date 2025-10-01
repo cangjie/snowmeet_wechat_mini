@@ -13,7 +13,8 @@ Component({
     popUpContent: '',
     */
     memberId: Number,
-    shop: String
+    shop: String,
+    rentals: Array
   },
 
   /**
@@ -34,7 +35,13 @@ Component({
       that.setData({ memberId: that.properties.memberId, shop: that.properties.shop })
       app.loginPromiseNew.then(function (resolve) {
         data.getShopByNamePromise(that.data.shop).then(function (shopObj) {
+          if (that.properties.rentals){
+            var rentals = that.properties.rentals
+            //that.setData({rentals})
+            that.renderData(rentals)
+          }
           that.setData({ shopObj })
+
         })
       })
     }
@@ -185,7 +192,7 @@ Component({
         rentals, totalItemNum, totalGuarantyAmount,
         totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount)
       })
-      that.triggerEvent('SyncRentData', rentals)
+      //that.triggerEvent('SyncRentData', rentals)
     },
     searchBarcodeFuzzy(e) {
       var that = this
@@ -204,6 +211,7 @@ Component({
         item.memo = ''
         var rentals = that.data.rentals
         that.renderData(rentals)
+        that.triggerEvent('SyncRentData', rentals)
       }
       else {
         that.selectProduct(e)
@@ -262,6 +270,7 @@ Component({
           rentals.push(rental)
           that.setData({ showPopUp: false, popUpContent: null })
           that.renderData(rentals)
+          that.triggerEvent('SyncRentData', rentals)
         })
 
     },
@@ -314,6 +323,7 @@ Component({
       var rentals = that.data.rentals
       rentals.push(rental)
       that.renderData(rentals)
+      that.triggerEvent('SyncRentData', rentals)
     },
     searchListBarcodeFuzzy(e) {
       var that = this
@@ -364,6 +374,7 @@ Component({
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
+      that.triggerEvent('SyncRentData', that.data.rentals)
     },
     setNoNeed(e) {
       var that = this
@@ -373,6 +384,7 @@ Component({
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
+      that.triggerEvent('SyncRentData', that.data.rentals)
     },
     setAtOnce(e) {
       var that = this
@@ -382,6 +394,7 @@ Component({
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
+      that.triggerEvent('SyncRentData', that.data.rentals)
     },
     setNoGuaranty(e) {
       var that = this
@@ -404,6 +417,7 @@ Component({
         }
       }
       that.renderData(rentals)
+      that.triggerEvent('SyncRentData', rentals)
     },
     setStartDate(e) {
       var that = this
@@ -417,7 +431,8 @@ Component({
       rental.endDate = e.detail.value
       util.createRentalDetal(rental, date, date)
       that.renderData(rentals)
-      that.setData({ rentals })
+      //that.setData({ rentals })
+      that.triggerEvent('SyncRentData', rentals)
     },
     setItemName(e) {
       var that = this
@@ -425,6 +440,7 @@ Component({
       var item = that.getItemByIndex(id)
       item.name = e.detail.value
       that.renderData(that.data.rentals)
+      that.triggerEvent('SyncRentData', that.data.rentals)
     },
     selectCategory(e) {
       var that = this
@@ -453,6 +469,7 @@ Component({
           rental.priceList = priceList
           util.createRentalDetal(rental, new Date(rental.startDate), new Date(rental.startDate))
           that.renderData(that.data.rentals)
+          that.triggerEvent('SyncRentData', that.data.rentals)
           that.setData({ barCode: null, searchBarCode: null })
         }).catch(function (exp) { })
     },
@@ -497,6 +514,7 @@ Component({
         }
       }
       that.renderData(that.data.rentals)
+      that.triggerEvent('SyncRentData', that.data.rentals)
       that.cancelBackdrop()
       that.setData({ unSavedRental: null })
     },
@@ -518,6 +536,7 @@ Component({
       var rental = that.data.rentals[id]
       rental.memo = e.detail.value
       that.renderData(that.data.rentals)
+      that.triggerEvent('SyncRentData', that.data.rentals)
     },
     setItemMemo(e){
       var that = this
@@ -533,6 +552,7 @@ Component({
         }
       }
       that.renderData(that.data.rentals)
+      that.triggerEvent('SyncRentData', that.data.rentals)
     },
     del(e){
       var that = this
@@ -545,6 +565,7 @@ Component({
         }
       }
       that.renderData(newRentals)
+      that.triggerEvent('SyncRentData', newRentals)
     }
   }
 })

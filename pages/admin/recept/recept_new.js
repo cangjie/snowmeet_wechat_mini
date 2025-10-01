@@ -10,11 +10,12 @@ Page({
    */
   data: {
     showUserInfo: false,
-    bizType:'sale',
+    bizType: 'sale',
     receptId: null,
     showSummary: false,
     showMainComponent: true,
-    showFooter: true
+    showFooter: true,
+    rentals: null
   },
 
   /**
@@ -22,16 +23,16 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({bizType: options.bizType,
+    that.setData({
+      bizType: options.bizType,
       shop: options.shop,
-      memberId: options.memberId? options.memberId : null,
-      realName: options.realName? options.realName: null,
-      gender: options.gender? options.gender : null,
-      cell: options.cell? options.cell: null,
+      memberId: options.memberId ? options.memberId : null,
+      realName: options.realName ? options.realName : null,
+      gender: options.gender ? options.gender : null,
+      cell: options.cell ? options.cell : null,
     })
     var title = ''
-    switch(that.data.bizType)
-    {
+    switch (that.data.bizType) {
       case 'rent':
         title = '租赁开单'
         break
@@ -41,7 +42,7 @@ Page({
       case 'sale':
         title = '零售开单'
         break
-      defaut:
+        defaut:
         break
     }
     wx.setNavigationBarTitle({
@@ -58,25 +59,25 @@ Page({
 
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function (resolve){
-      if (that.data.memberId){
-        data.getMemberPromise(that.data.memberId, app.globalData.sessionKey).then(function (member){
+    app.loginPromiseNew.then(function (resolve) {
+      if (that.data.memberId) {
+        data.getMemberPromise(that.data.memberId, app.globalData.sessionKey).then(function (member) {
           var degree = '会员'
-          if (member.following_wechat != 1){
+          if (member.following_wechat != 1) {
             degree += ' 取关'
           }
-          var realName = that.data.realName? that.data.realName : member.real_name
+          var realName = that.data.realName ? that.data.realName : member.real_name
           var cell = that.data.cell ? that.data.cell : member.cell
-          var gender = that.data.gender? that.data.gender: member.gender
-         
-          
-          that.setData({member, degree, realName, cell, gender})
-        }).catch(function (reject){
+          var gender = that.data.gender ? that.data.gender : member.gender
+
+
+          that.setData({ member, degree, realName, cell, gender })
+        }).catch(function (reject) {
 
         })
       }
-      else{
-        that.setData({degree: '散客', memberId: null})
+      else {
+        that.setData({ degree: '散客', memberId: null })
       }
     })
   },
@@ -115,16 +116,16 @@ Page({
   onShareAppMessage() {
 
   },
-  showUserInfo(){
+  showUserInfo() {
 
     var that = this
-    if (that.data.degree != '散客'){
-      that.setData({showUserInfo: true})
+    if (that.data.degree != '散客') {
+      that.setData({ showUserInfo: true })
     }
   },
-  closeUserInfo(e){
+  closeUserInfo(e) {
     var that = this
-    that.setData({showUserInfo: false})
+    that.setData({ showUserInfo: false })
   },
   /*
   getData(){
@@ -149,30 +150,64 @@ Page({
     })
   },
   */
-  onPopClose(){
+  onPopClose() {
     var that = this
-    that.setData({showUserInfo:false})
+    that.setData({ showUserInfo: false })
   },
-  rentDataUpdated(e){
+  rentDataUpdated(e) {
     var that = this
     console.log('rent data updated', e)
     var rentals = e.detail
-    that.setData({showFooter: false})
-    that.setData({rentals, showFooter: true})
+    that.setData({ showFooter: false })
+    that.setData({ rentals, showFooter: true })
+    that.saveReceptOrder()
   },
-  rentalWellFormed(e){
+  saveReceptOrder() {
+    var that = this
+    var order = that.data.order
+    var shop = that.data.shop
+    if (!shop) {
+      wx.showToast({
+        title: '店铺不能为空',
+        icon: 'error'
+      })
+      return
+    }
+    if (!order) {
+      order = {
+        id: 0,
+        code: null,
+        shop: shop,
+        type: '租赁',
+        valid: 0,
+        rentals: that.data.rentals,
+        recepting: 1
+      }
+    }
+    else {
+      order = that.data.order
+      order.rentals = that.data.rentals
+    }
+    var submitUrl = app.globalData.requestPrefix + 'Rent/SaveRentRecept?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(submitUrl, order).then(function (submitedOrder) {
+      console.log('save order', submitedOrder)
+      that.setData({ order: submitedOrder, bizType: null })
+      that.setData({ rentals: submitedOrder.rentals, bizType: 'rent' })
+    })
+  },
+  rentalWellFormed(e) {
     var that = this
     console.log('well formed', e)
-    that.setData({rentalWellFormed: e.detail})
+    that.setData({ rentalWellFormed: e.detail })
   },
-  onClickIcon(e){
+  onClickIcon(e) {
     var that = this
-    if (that.data.rentalWellFormed){
+    if (that.data.rentalWellFormed) {
 
     }
     else {
       var title = ''
-      switch(that.data.bizType){
+      switch (that.data.bizType) {
         case 'rent':
           title = '租赁信息填写不完整'
           break
