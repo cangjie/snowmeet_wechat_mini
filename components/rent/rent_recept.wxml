@@ -56,7 +56,7 @@
             <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【免押金】</view>
             <view class="right-column ">
               <checkbox-group id="{{index}}" bindchange="setNoGuaranty">
-                <checkbox value="1"></checkbox>
+                <checkbox value="1"  checked="{{rental.noGuaranty}}" ></checkbox>
               </checkbox-group>
             </view>
             <view style="margin-left: 40rpx;">
@@ -119,7 +119,7 @@
               <view class="left-column" style="width: 170rpx;">【免押金】</view>
               <view class="right-column">
                 <checkbox-group bindchange="setNoGuaranty" id="{{index}}">
-                  <checkbox></checkbox>
+                  <checkbox checked="{{rental.noGuaranty}}" ></checkbox>
                 </checkbox-group>
               </view>
               <view style="margin-left: 40rpx;">
@@ -184,14 +184,14 @@
                   <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【不需要】</view>
                   <view class="right-column" style="width:240rpx;color:{{item.textColor?item.textColor:defaultTextColor}};">
                     <checkbox-group bindchange="setNoNeed" id="{{item.itemIndex}}">
-                      <checkbox></checkbox>
+                      <checkbox checked="{{item.noNeed}}" ></checkbox>
                     </checkbox-group>
                   </view>
                   <view class="left-column" style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【立即发放】
                   </view>
                   <view class="right-column" style="width: 50rpx;margin-left: 0rpx;">
                     <checkbox-group id="{{item.itemIndex}}" bindchange="setAtOnce">
-                      <checkbox disabled="{{item.noNeed}}" value="1"></checkbox>
+                      <checkbox disabled="{{item.noNeed}}" checked="{{item.atOnce}}" value="1"></checkbox>
                     </checkbox-group>
                   </view>
                 </view>

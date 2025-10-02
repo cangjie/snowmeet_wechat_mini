@@ -37,8 +37,46 @@ Component({
         data.getShopByNamePromise(that.data.shop).then(function (shopObj) {
           if (that.properties.rentals){
             var rentals = that.properties.rentals
+            for(var i = 0; i < rentals.length; i++){
+              var startDate = new Date()
+              if (rentals[i].start_date)
+              {
+                startDate = new Date(rentals[i].start_date)
+              }
+              var endDate = rentals[i].end_date
+              if (!endDate){
+                endDate = startDate
+              }
+              else{
+                endDate = new Date(endDate)
+              }
+              var rentType = rentals[i].package_id == null ? '分类' : '套餐';
+              var scene = that.data.memberId? '会员':'门市'
+              var rental = rentals[i]
+              var id = 0
+              switch(rentType){
+                case '分类':
+                  id = rental.category_id
+                  break
+                case '套餐':
+                  id = rental.package_id
+                  break;
+                default:
+                  break
+              }
+              data.getRentPriceListPromise(shopObj.id, rentType, id, scene)
+              .then(function(priceList){
+                rental.priceList = priceList
+                util.createRentalDetail(rental, startDate, endDate)
+                rentals = that.formatRentals(rentals)
+                that.renderData(rentals)
+              }).catch(function (exp){
+
+              })
+              
+            }
             //that.setData({rentals})
-            that.renderData(rentals)
+            
           }
           that.setData({ shopObj })
 
@@ -47,6 +85,33 @@ Component({
     }
   },
   methods: {
+    formatRentals(rentals){
+      for(var i = 0; i < rentals.length; i++){
+        var rental = rentals[i]
+        if (!isNaN(rental.guaranty)){
+          rental.deposit = parseFloat(rental.guaranty)
+        }
+        else{
+          rental.deposit = 0
+        }
+        if (!isNaN(rental.guaranty_discount)){
+          rental.depositDiscount = parseFloat(rental.guaranty_discount)
+        }
+        else{
+          rental.depositDiscount = 0
+        }
+        rental.realDeposit = rental.deposit - rental.depositDiscount
+        rental.realDepositStr = util.showAmount(rental.realDeposit)
+        if (rental.start_date){
+          rental.startDate = util.formatDate(new Date(rental.start_date))
+        }
+        else{
+          rental.startDate = util.formatDate(new Date())
+        }
+        //util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.end_date))
+      }
+      return rentals
+    },
     addNewPackage() {
       var that = this
       that.setData({ showPopUp: true, popUpContent: 'packageSelector' })
@@ -97,6 +162,7 @@ Component({
             valid: 0,
             expectDays: 1,
             deposit: selectedPackage.deposit,
+            guaranty: selectedPackage.deposit,
             depositStr: util.showAmount(selectedPackage.deposit),
             realDeposit: selectedPackage.deposit,
             realDepositStr: util.showAmount(selectedPackage.deposit),
@@ -105,7 +171,7 @@ Component({
             priceList: priceList,
             memo: ''
           }
-          util.createRentalDetal(rental, new Date(rental.startDate), new Date(rental.startDate))
+          util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.startDate))
           var items = []
           for (var i = 0; i < selectedPackage.categories.length; i++) {
             var item = {
@@ -211,7 +277,7 @@ Component({
         item.memo = ''
         var rentals = that.data.rentals
         that.renderData(rentals)
-        that.triggerEvent('SyncRentData', rentals)
+        that.triggerEvent('SyncRentData', {rentals: rentals, needUpdate: true})
       }
       else {
         that.selectProduct(e)
@@ -249,7 +315,7 @@ Component({
             priceList: priceList,
             memo: ''
           }
-          util.createRentalDetal(rental, new Date(rental.startDate), new Date(rental.startDate))
+          util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.startDate))
           var items = []
           var item = {
             id: 0,
@@ -270,7 +336,8 @@ Component({
           rentals.push(rental)
           that.setData({ showPopUp: false, popUpContent: null })
           that.renderData(rentals)
-          that.triggerEvent('SyncRentData', rentals)
+          //that.triggerEvent('SyncRentData', rentals)
+          that.triggerEvent('SyncRentData', {rentals: rentals, needUpdate: true})
         })
 
     },
@@ -323,7 +390,7 @@ Component({
       var rentals = that.data.rentals
       rentals.push(rental)
       that.renderData(rentals)
-      that.triggerEvent('SyncRentData', rentals)
+      //that.triggerEvent('SyncRentData', rentals)
     },
     searchListBarcodeFuzzy(e) {
       var that = this
@@ -374,7 +441,8 @@ Component({
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', that.data.rentals)
+      //that.triggerEvent('SyncRentData', that.data.rentals)
+      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
     },
     setNoNeed(e) {
       var that = this
@@ -384,7 +452,8 @@ Component({
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', that.data.rentals)
+      //Event('SyncRentData', that.data.rentals)
+      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
     },
     setAtOnce(e) {
       var that = this
@@ -394,7 +463,8 @@ Component({
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', that.data.rentals)
+      //that.triggerEvent('SyncRentData', that.data.rentals)
+      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
     },
     setNoGuaranty(e) {
       var that = this
@@ -417,7 +487,8 @@ Component({
         }
       }
       that.renderData(rentals)
-      that.triggerEvent('SyncRentData', rentals)
+      //that.triggerEvent('SyncRentData', rentals)
+      that.triggerEvent('SyncRentData', {rentals: rentals, needUpdate: true})
     },
     setStartDate(e) {
       var that = this
@@ -429,10 +500,11 @@ Component({
       rental.startDateIsWeekend = util.isWeekend(new Date(e.detail.value))
       rental.expectDays = 1
       rental.endDate = e.detail.value
-      util.createRentalDetal(rental, date, date)
+      util.createRentalDetail(rental, date, date)
       that.renderData(rentals)
       //that.setData({ rentals })
-      that.triggerEvent('SyncRentData', rentals)
+      //that.triggerEvent('SyncRentData', rentals)
+      that.triggerEvent('SyncRentData', {rentals: rentals, needUpdate: true})
     },
     setItemName(e) {
       var that = this
@@ -440,7 +512,8 @@ Component({
       var item = that.getItemByIndex(id)
       item.name = e.detail.value
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', that.data.rentals)
+      //that.triggerEvent('SyncRentData', that.data.rentals)
+      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: false})
     },
     selectCategory(e) {
       var that = this
@@ -462,14 +535,18 @@ Component({
           rental.depositStr = util.showAmount(rental.deposit)
           rental.realDeposit = rental.deposit
           rental.realDepositStr = rental.depositStr
+          rental.guaranty = rental.deposit 
+          rental.guarantyStr = rental.depositStr
+          
           rental.category = e.detail
           rental.expectDays = 1
           rental.startDate = that.data.startDate
           rental.startDateIsWeekend = util.isWeekend(new Date(that.data.startDate))
           rental.priceList = priceList
-          util.createRentalDetal(rental, new Date(rental.startDate), new Date(rental.startDate))
+          util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.startDate))
           that.renderData(that.data.rentals)
-          that.triggerEvent('SyncRentData', that.data.rentals)
+          //that.triggerEvent('SyncRentData', that.data.rentals)
+          that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
           that.setData({ barCode: null, searchBarCode: null })
         }).catch(function (exp) { })
     },
@@ -514,7 +591,8 @@ Component({
         }
       }
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', that.data.rentals)
+      //that.triggerEvent('SyncRentData', that.data.rentals)
+      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
       that.cancelBackdrop()
       that.setData({ unSavedRental: null })
     },
@@ -536,7 +614,7 @@ Component({
       var rental = that.data.rentals[id]
       rental.memo = e.detail.value
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', that.data.rentals)
+      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: false })
     },
     setItemMemo(e){
       var that = this
@@ -552,7 +630,7 @@ Component({
         }
       }
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', that.data.rentals)
+      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: false })
     },
     del(e){
       var that = this
@@ -565,7 +643,7 @@ Component({
         }
       }
       that.renderData(newRentals)
-      that.triggerEvent('SyncRentData', newRentals)
+      that.triggerEvent('SyncRentData', {rentals: newRentals, needUpdate: true})
     }
   }
 })

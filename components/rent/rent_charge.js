@@ -19,6 +19,8 @@ Component({
       data.getEnumListPromise('RentType').then(function (rentTypeList) {
         that.setData({ rentTypeList })
       })
+      //rental.deposit = rental.setGuaranty
+      rental.guarantyStr = util.showAmount(rental.guaranty)
       that.setData({ rental, shopObj: that.properties.shop })
       that.computeEndDate()
       console.log('get price list', rental.priceList)
@@ -50,6 +52,8 @@ Component({
         var discount = parseFloat(value)
         var deposit = rental.deposit
         rental.depositDiscount = discount
+        rental.guaranty_discount = discount
+        rental.guaranty_discountStr = util.showAmount(discount)
         rental.depositDiscountStr = util.showAmount(discount)
         rental.realDeposit = deposit - discount
         rental.realDepositStr = util.showAmount(rental.realDeposit)
@@ -64,6 +68,7 @@ Component({
       var expectDays = parseInt(rental.expectDays) - 1
       endDate.setDate(endDate.getDate() + expectDays)
       rental.endDate = util.formatDate(endDate)
+      rental.end_date = endDate
       that.setData({ rental })
     },
     /*
@@ -98,7 +103,7 @@ Component({
       var rental = that.data.rental
       rental.expectDays = days
       that.computeEndDate()
-      util.createRentalDetal(rental, new Date(rental.startDate), new Date(rental.endDate))
+      util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.endDate))
       console.log('new rental', rental)
       that.computeRental(rental)
       /*
@@ -175,7 +180,7 @@ Component({
       var totalAmount = 0
       var totalDiscount = 0
       var totalSummary = 0
-      for(var i = 0; i < rental.details.length; i++){
+      for(var i = 0; rental.details && i < rental.details.length; i++){
         var detail = rental.details[i]
         detail.summary = detail.price - detail.discount
         detail.summaryStr = util.showAmount(detail.summary)

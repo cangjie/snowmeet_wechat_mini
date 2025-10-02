@@ -9,13 +9,13 @@
       </view>
       <view class="view-row">
         <view class="left-column">【押金】</view>
-        <view class="right-column">{{rental.depositStr}}</view>
+        <view class="right-column">{{rental.guarantyStr}}</view>
       </view>
 
       <view class="view-row">
         <view class="left-column">【押金减免】</view>
         <view class="right-column">
-          <input style="width: 85rpx;text-align: center;" class="input" placeholder="0" bindinput="setGuarantyDiscount" />
+          <input style="width: 85rpx;text-align: center;" class="input" placeholder="{{rental.guaranty_discount?rental.guaranty_discount: 0}}" bindinput="setGuarantyDiscount" />
         </view>
       </view>
       <view class="view-row">

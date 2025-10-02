@@ -151,7 +151,9 @@ const performWebRequest = function (url, data){
     })
   })
 }
-const createRentalDetal = function(rental, startDate, endDate){
+const createRentalDetail = function(rental, startDate, endDate){
+  startDate = new Date(startDate)
+  endDate = new Date(endDate)
   var details = []
   var totalAmount = 0
   var i = new Date(formatDate(startDate))
@@ -282,7 +284,7 @@ module.exports = {
   getMemberInfo: getMemberInfo,
   performWebRequest: performWebRequest,
   isWeekend,
-  createRentalDetal,
+  createRentalDetail,
   getRentPrice,
   checkRentalsWellForm
 }

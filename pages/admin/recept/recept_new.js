@@ -127,29 +127,7 @@ Page({
     var that = this
     that.setData({ showUserInfo: false })
   },
-  /*
-  getData(){
-    var that = this
-    var getUrl = app.globalData.requestPrefix + 'Recept/GetUnfinishedRecept?bizType=' + encodeURIComponent(that.data.bizType) + '&name=' + encodeURIComponent(that.data.name) + '&gender=' + encodeURIComponent(that.data.gender) 
-    + '&num=' + that.data.contactNum + '&memberId=' + that.data.memberId + '&shop=' + encodeURIComponent(that.data.shop) + '&sessionKey=' + app.globalData.sessionKey
-    if (that.data.receptId){
-      getUrl = app.globalData.requestPrefix + 'Recept/'
-    }
-    console.log('get url', getUrl)    
-  },
-  getMember(){
-    var that = this
-    var getUrl = app.globalData.requestPrefix + 'Member/GetMember/' + that.data.memberId + '?sessionKey=' + app.globalData.sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-    util.performWebRequest(getUrl, null).then(function(resolve){
-      console.log('get member', resolve)
-      that.setData({showMainComponent: false})
-      that.setData({member: resolve})
-      that.setData({showMainComponent: true})
-    }).catch(function(reject){
-
-    })
-  },
-  */
+  
   onPopClose() {
     var that = this
     that.setData({ showUserInfo: false })
@@ -157,10 +135,12 @@ Page({
   rentDataUpdated(e) {
     var that = this
     console.log('rent data updated', e)
-    var rentals = e.detail
+    var rentals = e.detail.rentals
     that.setData({ showFooter: false })
     that.setData({ rentals, showFooter: true })
-    that.saveReceptOrder()
+    if (e.detail.needUpdate){
+      that.saveReceptOrder()
+    }
   },
   saveReceptOrder() {
     var that = this
@@ -188,11 +168,30 @@ Page({
       order = that.data.order
       order.rentals = that.data.rentals
     }
+    for(var i = 0; i < order.rentals.length; i++){
+      var rental = order.rentals
+      rental.guaranty = rental.deposit
+      //rental.noGuaranty = rental.
+    }
     var submitUrl = app.globalData.requestPrefix + 'Rent/SaveRentRecept?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(submitUrl, order).then(function (submitedOrder) {
       console.log('save order', submitedOrder)
       that.setData({ order: submitedOrder, bizType: null })
-      that.setData({ rentals: submitedOrder.rentals, bizType: 'rent' })
+      var rentals = submitedOrder.rentals
+      /*
+      for(var i = 0; i < rentals.length; i++){
+        var rental = rentals[i]
+        if (rental.start_date){
+          rental.startDate = util.formatDate(new Date(rental.start_date))
+        }
+        else{
+          rental.startDate = util.formatDate(new Date())
+        }
+        rental.deposit = rentail.guaranty
+        rental.depositStr = util.showAmount(rental.deposit)
+      }
+      */
+      that.setData({ rentals, bizType: 'rent' })
     })
   },
   rentalWellFormed(e) {
