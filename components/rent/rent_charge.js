@@ -106,48 +106,8 @@ Component({
       util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.endDate))
       console.log('new rental', rental)
       that.computeRental(rental)
-      /*
-      for(var i = 0; i < rental.details.length; i++){
-        rental.details[i].date = util.formatDate(rental.details[i].date)
-      }
-      */
-      //that.setData({rental})
       
-/*
-
-      that.triggerEvent('RentalChange', rental)
-      if (days > 1) {
-        that.computeRentalTable(new Date(rental.startDate), new Date(rental.endDate))
-      }
-      */
     },
-    /*
-    setFixedRental(e) {
-      if (isNaN(e.detail.value)) {
-        return
-      }
-      var amount = parseFloat(e.detail.value)
-      var that = this
-      var rental = that.data.rental
-      //rental.fixedRental = amount
-      that.computeRental(rental)
-      //that.setData({ rental })
-      //that.triggerEvent('RentalChange', rental)
-    },
-    */
-    /*
-    getPrice(dayType, rentType, scene) {
-      var that = this
-      var priceList = that.data.priceList
-      for (var i = 0; i < priceList.length; i++) {
-        var price = priceList[i]
-        if (price.day_type == dayType && price.scene == scene && rentType == price.rent_type) {
-          return price
-        }
-      }
-      return null
-    },
-    */
     setRentType(e){
       var that = this
       var rentType = that.data.rentTypeList[e.detail.value]

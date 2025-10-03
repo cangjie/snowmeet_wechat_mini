@@ -169,8 +169,37 @@ Page({
       order.rentals = that.data.rentals
     }
     for(var i = 0; i < order.rentals.length; i++){
-      var rental = order.rentals
+      var rental = order.rentals[i]
       rental.guaranty = rental.deposit
+      var startDate = rental.startDate
+      if (startDate){
+        startDate = util.formatDate(new Date(startDate))
+      }
+      else{
+        startDate = util.formatDate(new Date())
+      }
+      rental.pricePresets = []
+      for(var i = 0; i < rental.details.length; i++){
+        var detail = rental.details[i]
+        var id = detail.id ? detail.id : 0
+        var preset = {
+          id: 0,
+          rental_id: rental.id,
+          rent_type: detail.rentType,
+          rent_date: detail.date,
+          price: detail.price,
+          discount: detail.discount,
+          day_type: detail.dayType
+        }
+        rental.pricePresets.push(preset)
+        /*
+        var preset = {
+          id: 0
+        }
+        */
+      }
+      rental.start_date = startDate
+      rental.details = null
       //rental.noGuaranty = rental.
     }
     var submitUrl = app.globalData.requestPrefix + 'Rent/SaveRentRecept?sessionKey=' + app.globalData.sessionKey

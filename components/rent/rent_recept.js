@@ -36,6 +36,7 @@ Component({
       app.loginPromiseNew.then(function (resolve) {
         data.getShopByNamePromise(that.data.shop).then(function (shopObj) {
           if (that.properties.rentals){
+            console.log('save rentals', that.properties.rentals)
             var rentals = that.properties.rentals
             for(var i = 0; i < rentals.length; i++){
               var startDate = new Date()
@@ -67,6 +68,28 @@ Component({
               data.getRentPriceListPromise(shopObj.id, rentType, id, scene)
               .then(function(priceList){
                 rental.priceList = priceList
+                var startDate = rental.start_date
+                if (startDate){
+                  startDate = util.formatDate(new Date(startDate))
+                }
+                else{
+                  startDate = util.formatDate(new Date())
+                }
+                rental.startDate = startDate
+                var details = []
+                for(var i = 0; i < rental.pricePresets.length; i++){
+                  var preset = rental.pricePresets[i]
+                  var detail = {
+                    id: 0,
+                    rentType: preset.rentType,
+                    date: preset.rent_date,
+                    price: preset.price,
+                    discount: preset.discount,
+                    dayType: preset.day_type
+                  }
+                  details.push(detail)
+                }
+                rental.details = details
                 util.createRentalDetail(rental, startDate, endDate)
                 rentals = that.formatRentals(rentals)
                 that.renderData(rentals)
@@ -190,10 +213,18 @@ Component({
           }
           rental.rentItems = items
           var rentals = that.data.rentals
-          rentals.push(rental)
-          console.log('rentals', rentals)
+          var newRentals = []
+          newRentals.push(rental)
+          for(var i = 0; rentals && i < rentals.length; i++){
+            var oldRental = rentals[i]
+            newRentals.push(oldRental)
+          }
+          
+          console.log('rentals', newRentals)
           //that.setData({ type: null, packageSelectIndex: null })
-          that.renderData(rentals)
+          that.renderData(newRentals)
+          //that.triggerEvent()
+          that.triggerEvent('SyncRentData', {rentals: newRentals, needUpdate: true})
         }).catch(function (exp) { })
 
 
@@ -388,8 +419,14 @@ Component({
       items.push(item)
       rental.rentItems = items
       var rentals = that.data.rentals
-      rentals.push(rental)
-      that.renderData(rentals)
+      var newRentals = []
+      newRentals.push(rental)
+      for(var i = 0; rentals && i < rentals.length; i++){
+        newRentals.push(rentals[i])
+      }
+      //rentals.push(rental)
+      that.renderData(newRentals)
+      that.triggerEvent('SyncRentData', {rentals: newRentals, needUpdate: true})
       //that.triggerEvent('SyncRentData', rentals)
     },
     searchListBarcodeFuzzy(e) {
