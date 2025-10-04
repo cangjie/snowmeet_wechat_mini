@@ -35,27 +35,26 @@ Component({
       that.setData({ memberId: that.properties.memberId, shop: that.properties.shop })
       app.loginPromiseNew.then(function (resolve) {
         data.getShopByNamePromise(that.data.shop).then(function (shopObj) {
-          if (that.properties.rentals){
+          if (that.properties.rentals) {
             console.log('save rentals', that.properties.rentals)
             var rentals = that.properties.rentals
-            for(var i = 0; i < rentals.length; i++){
+            for (var i = 0; i < rentals.length; i++) {
               var startDate = new Date()
-              if (rentals[i].start_date)
-              {
+              if (rentals[i].start_date) {
                 startDate = new Date(rentals[i].start_date)
               }
               var endDate = rentals[i].end_date
-              if (!endDate){
+              if (!endDate) {
                 endDate = startDate
               }
-              else{
+              else {
                 endDate = new Date(endDate)
               }
               var rentType = rentals[i].package_id == null ? '分类' : '套餐';
-              var scene = that.data.memberId? '会员':'门市'
+              var scene = that.data.memberId ? '会员' : '门市'
               var rental = rentals[i]
               var id = 0
-              switch(rentType){
+              switch (rentType) {
                 case '分类':
                   id = rental.category_id
                   break
@@ -66,40 +65,59 @@ Component({
                   break
               }
               data.getRentPriceListPromise(shopObj.id, rentType, id, scene)
-              .then(function(priceList){
-                rental.priceList = priceList
-                var startDate = rental.start_date
-                if (startDate){
-                  startDate = util.formatDate(new Date(startDate))
-                }
-                else{
-                  startDate = util.formatDate(new Date())
-                }
-                rental.startDate = startDate
-                var details = []
-                for(var i = 0; i < rental.pricePresets.length; i++){
-                  var preset = rental.pricePresets[i]
-                  var detail = {
-                    id: 0,
-                    rentType: preset.rentType,
-                    date: preset.rent_date,
-                    price: preset.price,
-                    discount: preset.discount,
-                    dayType: preset.day_type
+                .then(function (priceList) {
+                  if (!priceList || priceList.length <= 0){
+                    return
                   }
-                  details.push(detail)
-                }
-                rental.details = details
-                util.createRentalDetail(rental, new Date(startDate), new Date(endDate))
-                rentals = that.formatRentals(rentals)
-                that.renderData(rentals)
-              }).catch(function (exp){
+                  var price = priceList[0]
+                  for (var i = 0; i < that.data.rentals.length; i++) {
+                    var rental = that.data.rentals[i]
+                    if (rental.priceList) {
+                      continue
+                    }
+                    var isThis = false
+                    if (rental.package_id == price.package_id 
+                      && rental.category_id == price.category_id) {
+                      isThis = true
+                    }
+                    if (!isThis) {
+                      continue
+                    }
+                    rental.priceList = priceList
+                    var startDate = rental.start_date
+                    if (startDate) {
+                      startDate = util.formatDate(new Date(startDate))
+                    }
+                    else {
+                      startDate = util.formatDate(new Date())
+                    }
+                    rental.startDate = startDate
+                    var details = []
+                    for (var j = 0; j < rental.pricePresets.length; j++) {
+                      var preset = rental.pricePresets[j]
+                      var detail = {
+                        id: 0,
+                        rentType: preset.rentType,
+                        date: preset.rent_date,
+                        price: preset.price,
+                        discount: preset.discount,
+                        dayType: preset.day_type
+                      }
+                      details.push(detail)
+                    }
+                    rental.details = details
+                    util.createRentalDetail(rental, new Date(startDate), new Date(endDate))
+                    rentals = that.formatRentals(rentals)
+                    that.renderData(rentals)
+                  }
 
-              })
-              
+                }).catch(function (exp) {
+
+                })
+
             }
             //that.setData({rentals})
-            
+
           }
           that.setData({ shopObj })
 
@@ -108,27 +126,27 @@ Component({
     }
   },
   methods: {
-    formatRentals(rentals){
-      for(var i = 0; i < rentals.length; i++){
+    formatRentals(rentals) {
+      for (var i = 0; i < rentals.length; i++) {
         var rental = rentals[i]
-        if (!isNaN(rental.guaranty)){
+        if (!isNaN(rental.guaranty)) {
           rental.deposit = parseFloat(rental.guaranty)
         }
-        else{
+        else {
           rental.deposit = 0
         }
-        if (!isNaN(rental.guaranty_discount)){
+        if (!isNaN(rental.guaranty_discount)) {
           rental.depositDiscount = parseFloat(rental.guaranty_discount)
         }
-        else{
+        else {
           rental.depositDiscount = 0
         }
         rental.realDeposit = rental.deposit - rental.depositDiscount
         rental.realDepositStr = util.showAmount(rental.realDeposit)
-        if (rental.start_date){
+        if (rental.start_date) {
           rental.startDate = util.formatDate(new Date(rental.start_date))
         }
-        else{
+        else {
           rental.startDate = util.formatDate(new Date())
         }
         //util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.end_date))
@@ -215,16 +233,16 @@ Component({
           var rentals = that.data.rentals
           var newRentals = []
           newRentals.push(rental)
-          for(var i = 0; rentals && i < rentals.length; i++){
+          for (var i = 0; rentals && i < rentals.length; i++) {
             var oldRental = rentals[i]
             newRentals.push(oldRental)
           }
-          
+
           console.log('rentals', newRentals)
           //that.setData({ type: null, packageSelectIndex: null })
           that.renderData(newRentals)
           //that.triggerEvent()
-          that.triggerEvent('SyncRentData', {rentals: newRentals, needUpdate: true})
+          that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
         }).catch(function (exp) { })
 
 
@@ -308,7 +326,7 @@ Component({
         item.memo = ''
         var rentals = that.data.rentals
         that.renderData(rentals)
-        that.triggerEvent('SyncRentData', {rentals: rentals, needUpdate: true})
+        that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
       }
       else {
         that.selectProduct(e)
@@ -368,7 +386,7 @@ Component({
           that.setData({ showPopUp: false, popUpContent: null })
           that.renderData(rentals)
           //that.triggerEvent('SyncRentData', rentals)
-          that.triggerEvent('SyncRentData', {rentals: rentals, needUpdate: true})
+          that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
         })
 
     },
@@ -421,12 +439,12 @@ Component({
       var rentals = that.data.rentals
       var newRentals = []
       newRentals.push(rental)
-      for(var i = 0; rentals && i < rentals.length; i++){
+      for (var i = 0; rentals && i < rentals.length; i++) {
         newRentals.push(rentals[i])
       }
       //rentals.push(rental)
       that.renderData(newRentals)
-      that.triggerEvent('SyncRentData', {rentals: newRentals, needUpdate: true})
+      that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
       //that.triggerEvent('SyncRentData', rentals)
     },
     searchListBarcodeFuzzy(e) {
@@ -479,7 +497,7 @@ Component({
       console.log('get item', item)
       that.renderData(that.data.rentals)
       //that.triggerEvent('SyncRentData', that.data.rentals)
-      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
+      that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: true })
     },
     setNoNeed(e) {
       var that = this
@@ -490,7 +508,7 @@ Component({
       console.log('get item', item)
       that.renderData(that.data.rentals)
       //Event('SyncRentData', that.data.rentals)
-      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
+      that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: true })
     },
     setAtOnce(e) {
       var that = this
@@ -501,7 +519,7 @@ Component({
       console.log('get item', item)
       that.renderData(that.data.rentals)
       //that.triggerEvent('SyncRentData', that.data.rentals)
-      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
+      that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: true })
     },
     setNoGuaranty(e) {
       var that = this
@@ -525,7 +543,7 @@ Component({
       }
       that.renderData(rentals)
       //that.triggerEvent('SyncRentData', rentals)
-      that.triggerEvent('SyncRentData', {rentals: rentals, needUpdate: true})
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
     },
     setStartDate(e) {
       var that = this
@@ -541,7 +559,7 @@ Component({
       that.renderData(rentals)
       //that.setData({ rentals })
       //that.triggerEvent('SyncRentData', rentals)
-      that.triggerEvent('SyncRentData', {rentals: rentals, needUpdate: true})
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
     },
     setItemName(e) {
       var that = this
@@ -550,7 +568,7 @@ Component({
       item.name = e.detail.value
       that.renderData(that.data.rentals)
       //that.triggerEvent('SyncRentData', that.data.rentals)
-      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: false})
+      that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
     selectCategory(e) {
       var that = this
@@ -572,9 +590,9 @@ Component({
           rental.depositStr = util.showAmount(rental.deposit)
           rental.realDeposit = rental.deposit
           rental.realDepositStr = rental.depositStr
-          rental.guaranty = rental.deposit 
+          rental.guaranty = rental.deposit
           rental.guarantyStr = rental.depositStr
-          
+
           rental.category = e.detail
           rental.expectDays = 1
           rental.startDate = that.data.startDate
@@ -583,7 +601,7 @@ Component({
           util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.startDate))
           that.renderData(that.data.rentals)
           //that.triggerEvent('SyncRentData', that.data.rentals)
-          that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
+          that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: true })
           that.setData({ barCode: null, searchBarCode: null })
         }).catch(function (exp) { })
     },
@@ -618,10 +636,10 @@ Component({
       if (that.data.unSavedRental) {
         var itemIndex = that.data.unSavedRental.rentItems[0].itemIndex
         var rentals = that.data.rentals
-        for(var i = 0; i < rentals.length; i++){
+        for (var i = 0; i < rentals.length; i++) {
           var rental = rentals[i]
-          for(var j = 0; j < rental.rentItems.length; j++){
-            if (rental.rentItems[j].itemIndex == itemIndex){
+          for (var j = 0; j < rental.rentItems.length; j++) {
+            if (rental.rentItems[j].itemIndex == itemIndex) {
               rentals[i] = that.data.unSavedRental
             }
           }
@@ -629,7 +647,7 @@ Component({
       }
       that.renderData(that.data.rentals)
       //that.triggerEvent('SyncRentData', that.data.rentals)
-      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: true})
+      that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: true })
       that.cancelBackdrop()
       that.setData({ unSavedRental: null })
     },
@@ -645,42 +663,42 @@ Component({
         type: rental.package_id ? '套餐' : '分类', shop, targetId
       })
     },
-    setRentalMemo(e){
+    setRentalMemo(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var rental = that.data.rentals[id]
       rental.memo = e.detail.value
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: false })
+      that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
-    setItemMemo(e){
+    setItemMemo(e) {
       var that = this
       var rentals = that.data.rentals
       var id = parseInt(e.currentTarget.id)
-      for(var i = 0; i < rentals.length; i++){
+      for (var i = 0; i < rentals.length; i++) {
         var rental = rentals[i]
-        for(var j = 0; j < rental.rentItems.length; j++){
-          if (rental.rentItems[j].itemIndex == id){
+        for (var j = 0; j < rental.rentItems.length; j++) {
+          if (rental.rentItems[j].itemIndex == id) {
             rental.rentItems[j].memo = e.detail.value
             break
           }
         }
       }
       that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', {rentals: that.data.rentals, needUpdate: false })
+      that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
-    del(e){
+    del(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
       var rentals = that.data.rentals
       var newRentals = []
-      for(var i = 0; i< rentals.length; i++){
-        if (i != id){
+      for (var i = 0; i < rentals.length; i++) {
+        if (i != id) {
           newRentals.push(rentals[i])
         }
       }
       that.renderData(newRentals)
-      that.triggerEvent('SyncRentData', {rentals: newRentals, needUpdate: true})
+      that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
     }
   }
 })
