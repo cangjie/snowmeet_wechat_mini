@@ -178,25 +178,9 @@ Page({
       else{
         startDate = util.formatDate(new Date())
       }
-      rental.pricePresets = []
-      for(var i = 0; i < rental.details.length; i++){
-        var detail = rental.details[i]
-        var id = detail.id ? detail.id : 0
-        var preset = {
-          id: 0,
-          rental_id: rental.id,
-          rent_type: detail.rentType,
-          rent_date: detail.date,
-          price: detail.price,
-          discount: detail.discount,
-          day_type: detail.dayType
-        }
-        rental.pricePresets.push(preset)
-        /*
-        var preset = {
-          id: 0
-        }
-        */
+     
+      for(var i = 0; rental.pricePresets && i < rental.pricePresets.length; i++){
+        rental.pricePresets[i].id = 0
       }
       rental.start_date = startDate
       rental.details = null

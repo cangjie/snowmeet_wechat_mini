@@ -172,9 +172,9 @@ const createRentalDetail = function(rental, startDate, endDate){
     var price = getRentPrice(rental.priceList, i, rentType)
     if (price != null){
       var detail = {
-        date: formatDate(i),
-        dayType: price.day_type,
-        rentType: price.rent_type,
+        rent_date: formatDate(i),
+        day_type: price.day_type,
+        rent_type: price.rent_type,
         scene: price.scene,
         price: price.price,
         discount: 0,
@@ -189,7 +189,7 @@ const createRentalDetail = function(rental, startDate, endDate){
   }
   rental.totalAmount = totalAmount
   rental.totalAmountStr = showAmount(totalAmount)
-  rental.details = details
+  rental.pricePresets = details
   return details
 }
 const getRentPrice = function(priceList, date, rentType){

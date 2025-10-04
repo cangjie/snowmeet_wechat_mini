@@ -44,14 +44,14 @@
         </view>
       </view>
 
-      <block wx:if="{{rental.details.length == 1}}">
+      <block wx:if="{{rental.pricePresets.length == 1}}">
         <view class="view-row">
           <view class="left-column view-row" style="align-items: center;">【场次】</view>
           <view class="right-column view-row" >
             <picker range="{{rentTypeList}}" class="input" style="width: 100rpx" bindchange="setRentType" >
-              <picker-view>{{rental.details[0].rentType}}</picker-view>
+              <picker-view>{{rental.pricePresets[0].rent_type}}</picker-view>
             </picker>
-            <view class="view-row" style="margin-left: 50rpx;align-items: center;">{{rental.details[0].dayType}}</view>
+            <view class="view-row" style="margin-left: 50rpx;align-items: center;">{{rental.pricePresets[0].day_type}}</view>
           </view>
         </view>
         <view>
@@ -66,7 +66,7 @@
           <view class="view-row">
             <view class="left-column">【减免】</view>
             <view class="right-column">
-              <input class="input" style="width: 75rpx;" id="0" bindinput="setRentalDiscount" value="{{rental.details[0].discount}}" />
+              <input class="input" style="width: 75rpx;" id="0" bindinput="setRentalDiscount" value="{{rental.pricePresets[0].discount}}" />
             </view>
           </view>
         </view>
@@ -98,12 +98,12 @@
               <view class="fui-col-view" style="text-align:center;margin-top: 20rpx;">小计</view>
             </fui-col>
           </fui-row>
-          <fui-row style="margin-top:10rpx" wx:for="{{rental.details}}">
+          <fui-row style="margin-top:10rpx" wx:for="{{rental.pricePresets}}">
             <fui-col span="6">
-              <view class="fui-col-view" style="text-align:center;">{{item.date}}</view>
+              <view class="fui-col-view" style="text-align:center;">{{item.rent_date}}</view>
             </fui-col>
             <fui-col span="5">
-              <view class="fui-col-view" style="text-align:center;">{{item.dayType}}</view>
+              <view class="fui-col-view" style="text-align:center;">{{item.day_type}}</view>
             </fui-col>
             <fui-col span="4">
               <view class="fui-col-view" style="text-align: right;">{{item.priceStr}}</view>

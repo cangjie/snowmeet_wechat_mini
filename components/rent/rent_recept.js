@@ -45,14 +45,23 @@ Component({
               }
               var endDate = rentals[i].end_date
               if (!endDate) {
-                endDate = startDate
+                endDate = new Date(startDate)
+                endDate.setDate(endDate.getDate() + rentals[i].expectDays-1)
               }
               else {
                 endDate = new Date(endDate)
               }
+              rentals[i].start_date = util.formatDate(startDate)
+              rentals[i].end_date = util.formatDate(endDate)
+              
               var rentType = rentals[i].package_id == null ? '分类' : '套餐';
               var scene = that.data.memberId ? '会员' : '门市'
               var rental = rentals[i]
+              rental.deposit = rental.guaranty
+              rental.depositStr = util.showAmount(rental.deposit)
+              rental.depositDiscount = rental.guaranty_discount
+              rental.realDeposit = rental.guaranty - rental.guaranty_discount
+              rental.realDepositStr = util.showAmount(rental.guaranty - rental.guaranty_discount)
               var id = 0
               switch (rentType) {
                 case '分类':
@@ -72,9 +81,12 @@ Component({
                   var price = priceList[0]
                   for (var i = 0; i < that.data.rentals.length; i++) {
                     var rental = that.data.rentals[i]
+                    /*
                     if (rental.priceList) {
+                      that.renderData(rentals)
                       continue
                     }
+                    */
                     var isThis = false
                     if (rental.package_id == price.package_id 
                       && rental.category_id == price.category_id) {
@@ -92,32 +104,15 @@ Component({
                       startDate = util.formatDate(new Date())
                     }
                     rental.startDate = startDate
-                    var details = []
-                    for (var j = 0; j < rental.pricePresets.length; j++) {
-                      var preset = rental.pricePresets[j]
-                      var detail = {
-                        id: 0,
-                        rentType: preset.rentType,
-                        date: preset.rent_date,
-                        price: preset.price,
-                        discount: preset.discount,
-                        dayType: preset.day_type
-                      }
-                      details.push(detail)
-                    }
-                    rental.details = details
-                    util.createRentalDetail(rental, new Date(startDate), new Date(endDate))
+                    util.createRentalDetail(rental, new Date(rental.start_date), new Date(rental.end_date))
                     rentals = that.formatRentals(rentals)
                     that.renderData(rentals)
                   }
-
                 }).catch(function (exp) {
 
                 })
 
             }
-            //that.setData({rentals})
-
           }
           that.setData({ shopObj })
 
