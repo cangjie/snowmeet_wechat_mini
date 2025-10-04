@@ -152,8 +152,8 @@ const performWebRequest = function (url, data){
   })
 }
 const createRentalDetail = function(rental, startDate, endDate){
-  startDate = new Date(startDate)
-  endDate = new Date(endDate)
+  startDate = new Date(formatDate(startDate))
+  endDate = new Date(formatDate(endDate))
   var details = []
   var totalAmount = 0
   var i = new Date(formatDate(startDate))

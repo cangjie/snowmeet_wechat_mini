@@ -90,7 +90,7 @@ Component({
                   details.push(detail)
                 }
                 rental.details = details
-                util.createRentalDetail(rental, startDate, endDate)
+                util.createRentalDetail(rental, new Date(startDate), new Date(endDate))
                 rentals = that.formatRentals(rentals)
                 that.renderData(rentals)
               }).catch(function (exp){
