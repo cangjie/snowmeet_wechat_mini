@@ -112,9 +112,9 @@ Component({
       var that = this
       var rentType = that.data.rentTypeList[e.detail.value]
       var rental = that.data.rental
-      var detail = rental.details[0]
+      var detail = rental.pricePresets[0]
       var price = util.getRentPrice(rental.priceList, new Date(detail.date), rentType)
-      detail.rentType = price.rent_type
+      detail.rent_type = price.rent_type
       detail.price = price.price
       detail.priceStr = util.showAmount(detail.price)
       rental.totalAmount = detail.price
@@ -130,7 +130,7 @@ Component({
       var discount = parseFloat(e.detail.value)
       var id = parseInt(e.currentTarget.id)
       var rental = that.data.rental
-      var detail = rental.details[id]
+      var detail = rental.pricePresets[id]
       detail.discount = discount
       that.computeRental(rental)
     },
@@ -140,8 +140,8 @@ Component({
       var totalAmount = 0
       var totalDiscount = 0
       var totalSummary = 0
-      for(var i = 0; rental.details && i < rental.details.length; i++){
-        var detail = rental.details[i]
+      for(var i = 0; rental.pricePresets && i < rental.pricePresets.length; i++){
+        var detail = rental.pricePresets[i]
         detail.summary = detail.price - detail.discount
         detail.summaryStr = util.showAmount(detail.summary)
         totalAmount += detail.price

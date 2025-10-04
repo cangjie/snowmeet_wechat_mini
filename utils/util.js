@@ -154,6 +154,7 @@ const performWebRequest = function (url, data){
 const createRentalDetail = function(rental, startDate, endDate){
   startDate = new Date(formatDate(startDate))
   endDate = new Date(formatDate(endDate))
+  var presets = rental.pricePresets
   var details = []
   var totalAmount = 0
   var i = new Date(formatDate(startDate))
@@ -171,17 +172,23 @@ const createRentalDetail = function(rental, startDate, endDate){
     }
     var price = getRentPrice(rental.priceList, i, rentType)
     if (price != null){
+      var discount = 0
+      var rentDate = formatDate(i)
+      for(var k = 0; presets && k < presets.length; k++){
+        if (formatDate(new Date(presets[k].rent_date)) == rentDate){
+          discount = presets[k].discount
+        }
+      }
       var detail = {
-        rent_date: formatDate(i),
+        rent_date: rentDate,
         day_type: price.day_type,
         rent_type: price.rent_type,
         scene: price.scene,
         price: price.price,
-        discount: 0,
+        discount: discount,
         priceStr: showAmount(price.price),
-        discount: 0,
-        summary: price.price,
-        summaryStr: showAmount(price.price)
+        summary: price.price - discount,
+        summaryStr: showAmount(price.price - discount)
       }
       totalAmount += price.price
       details.push(detail)

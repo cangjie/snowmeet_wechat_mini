@@ -58,7 +58,7 @@
           <view class="view-row">
             <view class="left-column">【租金】</view>
             <view class="right-column">
-              {{rental.totalAmountStr}}
+              {{rental.totalSummaryStr}}
             </view>
           </view>
         </view>
@@ -66,7 +66,7 @@
           <view class="view-row">
             <view class="left-column">【减免】</view>
             <view class="right-column">
-              <input class="input" style="width: 75rpx;" id="0" bindinput="setRentalDiscount" value="{{rental.pricePresets[0].discount}}" />
+              <input class="input" style="width: 75rpx;" id="0" bindinput="setRentalDiscount" value="{{rental.totalDiscount}}" />
             </view>
           </view>
         </view>
@@ -123,7 +123,7 @@
               <view class="fui-col-view" style="text-align:center;">总计：</view>
             </fui-col>
             <fui-col span="5">
-              <view class="fui-col-view" style="text-align:center;">{{rental.details.length}}天</view>
+              <view class="fui-col-view" style="text-align:center;">{{rental.pricePresets.length}}天</view>
             </fui-col>
             <fui-col span="4">
               <view class="fui-col-view" style="text-align: right;">{{rental.totalAmountStr}}</view>
