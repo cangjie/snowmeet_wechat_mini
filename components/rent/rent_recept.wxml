@@ -45,10 +45,12 @@
           </view>
           <view class="view-row" style="margin-bottom: 20rpx;">
             <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【押金】</view>
-            <view class="right-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 240rpx;">{{rental.realDepositStr}}</view>
+            <view class="right-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 240rpx;">
+              {{rental.realGuarantyStr}}{{rental.guaranty_discount>0?'减':''}}
+            </view>
             <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 140rpx;">【租金】</view>
             <view class="right-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}; width:130rpx">
-              {{rental.totalAmountStr}}
+              {{rental.totalSummaryStr}}{{(rental.totalDiscount && rental.totalDiscount > 0)?'减':''}}
             </view>
             <!--租金显示相关的周末价、平日价、节假日价-->
           </view>
@@ -75,10 +77,10 @@
             <view class="right-column"></view>
           </view>
           <view class="view-row" style="margin-bottom: 20rpx;">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【立即发放】
+            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;" id="{{rental.rentItems[0].itemIndex}}"  >【立即发放】
             </view>
             <view class="right-column" style="margin-left: 0rpx;">
-              <checkbox-group bindchange="setAtOnce" id="{{item.itemIndex}}">
+              <checkbox-group bindchange="setAtOnce" id="{{rental.rentItems[0].itemIndex}}">
                 <checkbox value="1"></checkbox>
               </checkbox-group>
             </view>
@@ -106,13 +108,15 @@
             </view>
             <view class="view-row" style="margin-bottom: 20rpx;">
               <view class="left-column">【押金】</view>
-              <view class="right-column" style="width: 260rpx;">{{rental.realDepositStr}}</view>
+              <view class="right-column" style="width: 260rpx;">
+                {{rental.realDepositStr}}{{rental.guaranty_discount>0?'减':''}}
+              </view>
               <view class="left-column">【租金】</view>
               <view class="right-column" style=" width:150rpx">
                 <!--
                 {{rental.startDateIsWeekend? '周末':'平日'}} {{memberId? '会员' : '门市'}}
                 -->
-                {{rental.totalAmountStr}}
+                {{rental.totalSummaryStr}}{{(rental.totalDiscount && rental.totalDiscount > 0)?'减':''}}
               </view>
             </view>
             <view class="view-row" style="margin-bottom: 20rpx;">

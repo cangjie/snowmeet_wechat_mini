@@ -58,11 +58,7 @@ Component({
               var rentType = rentals[i].package_id == null ? '分类' : '套餐';
               var scene = that.data.memberId ? '会员' : '门市'
               var rental = rentals[i]
-              rental.deposit = rental.guaranty
-              rental.depositStr = util.showAmount(rental.deposit)
-              rental.depositDiscount = rental.guaranty_discount
-              rental.realDeposit = rental.guaranty - rental.guaranty_discount
-              rental.realDepositStr = util.showAmount(rental.guaranty - rental.guaranty_discount)
+              
               var startDate = rental.start_date
               if (startDate) {
                 startDate = util.formatDate(new Date(startDate))
@@ -134,18 +130,34 @@ Component({
         }
         if (!isNaN(rental.guaranty_discount)) {
           rental.depositDiscount = parseFloat(rental.guaranty_discount)
+
         }
         else {
           rental.depositDiscount = 0
+          rental.guaranty_discount = 0
         }
         rental.realDeposit = rental.deposit - rental.depositDiscount
         rental.realDepositStr = util.showAmount(rental.realDeposit)
+        rental.realGuaranty = rental.guaranty - rental.guaranty_discount
+        rental.realGuarantyStr = util.showAmount(rental.realGuaranty)
         if (rental.start_date) {
           rental.startDate = util.formatDate(new Date(rental.start_date))
         }
         else {
           rental.startDate = util.formatDate(new Date())
         }
+        rental.totalAmount = 0
+        rental.totalSummary = 0
+        rental.totalDiscount = 0
+        var presets = rental.pricePresets
+        for(var j = 0; presets && j < presets.length; j++){
+          var preset = presets[j]
+          rental.totalAmount += preset.price
+          rental.totalDiscount += preset.discount
+          rental.totalSummary += (preset.price - preset.discount)
+        }
+        rental.totalAmountStr = util.showAmount(rental.totalAmount)
+        rental.totalSummaryStr = util.showAmount(rental.totalSummary)
         //util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.end_date))
       }
       return rentals
@@ -523,7 +535,7 @@ Component({
       var id = parseInt(e.currentTarget.id)
       var rentals = that.data.rentals
       var rental = rentals[id]
-      rental.noGuaranty = e.detail.value.length == 0 ? false : false
+      rental.noGuaranty = e.detail.value.length == 0 ? false : true
       if (rental.noGuaranty) {
         rental.realDeposit = 0
         rental.realDepositStr = util.showAmount(rental.realDeposit)
