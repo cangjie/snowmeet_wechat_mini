@@ -253,11 +253,21 @@ const deleteRentPackagePromise = function(packageId, sessionKey){
     })
   })
 }
-const getRentReceptingOrderPromise = function(shop, sessionKey){
-  var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrder?shop=' + encodeURIComponent(shop) + '&sessionKey=' + sessionKey
+const getRentReceptingOrdersPromise = function(shop, sessionKey){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrders?shop=' + encodeURIComponent(shop) + '&sessionKey=' + sessionKey
   return new Promise(function(resolve, reject){
     util.performWebRequest(getUrl, null).then(function(orders){
       resolve(orders)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+const getRentReceptingOrderPromise = function(id, sessionKey){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrder/' + id.toString() + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (order){
+      resolve(order)
     }).catch(function (exp){
       reject(exp)
     })
@@ -299,5 +309,6 @@ module.exports = {
   modRentPackageCategory,
   getRentCategoryProductsPromise,
   deleteRentPackagePromise,
+  getRentReceptingOrdersPromise,
   getRentReceptingOrderPromise
 }

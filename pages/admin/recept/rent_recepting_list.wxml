@@ -9,7 +9,7 @@
   </view>
   <view style="margin-top: 50rpx;" >
     <block wx:for="{{orders}}">
-      <view class="view-row" >
+      <view class="view-row" bind:tap="gotoRecept" id="{{item.id}}" >
         <view class="left-column" >【称呼】</view>
         <view class="right-column" >{{item.called_name}}</view>
         <view class="left-column" >【手机】</view>

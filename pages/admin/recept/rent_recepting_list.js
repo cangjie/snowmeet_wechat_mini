@@ -77,7 +77,7 @@ Page({
   getData() {
     var that = this
     that.setData({ querying: true })
-    data.getRentReceptingOrderPromise(that.data.shopName, app.globalData.sessionKey).then(function (orders) {
+    data.getRentReceptingOrdersPromise(that.data.shopName, app.globalData.sessionKey).then(function (orders) {
       for (var i = 0; orders && i < orders.length; i++) {
         var order = orders[i]
         order.timeStr = util.formatTimeStr(new Date(order.biz_date))
@@ -104,6 +104,13 @@ Page({
       that.setData({ querying: false, orders })
     }).catch(function (exp) {
       that.setData({ querying: false })
+    })
+  },
+  gotoRecept(e){
+    var that = this
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'recept_new?id=' + id
     })
   }
 })

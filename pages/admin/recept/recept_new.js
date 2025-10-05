@@ -1,6 +1,7 @@
 // pages/admin/recept/recept_new.js
 const util = require("../../../utils/util")
 const data = require('../../../utils/data.js')
+const { deleteRentPackagePromise } = require("../../../utils/data.js")
 const app = getApp()
 
 Page({
@@ -23,31 +24,38 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({
-      bizType: options.bizType,
-      shop: options.shop,
-      memberId: options.memberId ? options.memberId : null,
-      realName: options.realName ? options.realName : null,
-      gender: options.gender ? options.gender : null,
-      cell: options.cell ? options.cell : null,
-    })
-    var title = ''
-    switch (that.data.bizType) {
-      case 'rent':
-        title = '租赁开单'
-        break
-      case 'care':
-        title = '养护开单'
-        break
-      case 'sale':
-        title = '零售开单'
-        break
-        defaut:
-        break
+    var id = options.id
+    if (!id) {
+      that.setData({
+        bizType: options.bizType,
+        shop: options.shop,
+        memberId: options.memberId ? options.memberId : null,
+        realName: options.realName ? options.realName : null,
+        gender: options.gender ? options.gender : null,
+        cell: options.cell ? options.cell : null,
+
+      })
+      var title = ''
+      switch (that.data.bizType) {
+        case 'rent':
+          title = '租赁开单'
+          break
+        case 'care':
+          title = '养护开单'
+          break
+        case 'sale':
+          title = '零售开单'
+          break
+          defaut:
+          break
+      }
+      wx.setNavigationBarTitle({
+        title: title,
+      })
     }
-    wx.setNavigationBarTitle({
-      title: title,
-    })
+    else {
+      that.setData({ orderId: id })
+    }
   },
 
   /**
@@ -69,16 +77,49 @@ Page({
           var realName = that.data.realName ? that.data.realName : member.real_name
           var cell = that.data.cell ? that.data.cell : member.cell
           var gender = that.data.gender ? that.data.gender : member.gender
-
-
-          that.setData({ member, degree, realName, cell, gender })
+          that.setData({showFooter: false})
+          that.setData({ member, degree, realName, cell, gender, showFooter: true })
         }).catch(function (reject) {
 
         })
+
       }
       else {
-        that.setData({ degree: '散客', memberId: null })
+        if (that.data.orderId) {
+          data.getRentReceptingOrderPromise(that.data.orderId, app.globalData.sessionKey).then(function(order){
+            var bizType = null
+            var memberId = order.member_id
+            if (!memberId){
+              that.setData({ degree: '散客', memberId: null })
+            }
+            else{
+              that.setData({member: order.member, degree: '会员'})
+            }
+            var shop = order.shop
+            var realName = order.contact_name?order.contact_name : order.member.real_name
+            var gender = order.contact_gender?order.contact_gender: order.member.gender
+            var cell = order.contact_num?order.contact_num: order.member.cell
+
+            switch(order.type){
+              case '租赁':
+                bizType = 'rent'
+                wx.setNavigationBarTitle({
+                  title: '租赁开单',
+                })
+                break
+              default:
+                break
+            }
+            that.setData({rentals: order.rentals, bizType, memberId, realName, cell, gender,shop})
+
+          }).catch(function (exp){})
+        }
+        else {
+          that.setData({ degree: '散客', memberId: null })
+        }
+        
       }
+
     })
   },
 
@@ -117,7 +158,6 @@ Page({
 
   },
   showUserInfo() {
-
     var that = this
     if (that.data.degree != '散客') {
       that.setData({ showUserInfo: true })
@@ -127,7 +167,7 @@ Page({
     var that = this
     that.setData({ showUserInfo: false })
   },
-  
+
   onPopClose() {
     var that = this
     that.setData({ showUserInfo: false })
@@ -138,7 +178,7 @@ Page({
     var rentals = e.detail.rentals
     that.setData({ showFooter: false })
     that.setData({ rentals, showFooter: true })
-    if (e.detail.needUpdate){
+    if (e.detail.needUpdate) {
       that.saveReceptOrder()
     }
   },
@@ -153,7 +193,7 @@ Page({
       })
       return
     }
-    var memberId = that.data.memberId? that.data.memberId: null
+    var memberId = that.data.memberId ? that.data.memberId : null
     if (!order) {
       order = {
         id: 0,
@@ -170,42 +210,28 @@ Page({
       order = that.data.order
       order.rentals = that.data.rentals
     }
-    for(var i = 0; i < order.rentals.length; i++){
+    for (var i = 0; i < order.rentals.length; i++) {
       var rental = order.rentals[i]
       rental.guaranty = rental.deposit
       var startDate = rental.startDate
-      if (startDate){
+      if (startDate) {
         startDate = util.formatDate(new Date(startDate))
       }
-      else{
+      else {
         startDate = util.formatDate(new Date())
       }
-     
-      for(var i = 0; rental.pricePresets && i < rental.pricePresets.length; i++){
+
+      for (var i = 0; rental.pricePresets && i < rental.pricePresets.length; i++) {
         rental.pricePresets[i].id = 0
       }
       rental.start_date = startDate
       rental.details = null
-      //rental.noGuaranty = rental.
     }
     var submitUrl = app.globalData.requestPrefix + 'Rent/SaveRentRecept?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(submitUrl, order).then(function (submitedOrder) {
       console.log('save order', submitedOrder)
       that.setData({ order: submitedOrder, bizType: null })
       var rentals = submitedOrder.rentals
-      /*
-      for(var i = 0; i < rentals.length; i++){
-        var rental = rentals[i]
-        if (rental.start_date){
-          rental.startDate = util.formatDate(new Date(rental.start_date))
-        }
-        else{
-          rental.startDate = util.formatDate(new Date())
-        }
-        rental.deposit = rentail.guaranty
-        rental.depositStr = util.showAmount(rental.deposit)
-      }
-      */
       that.setData({ rentals, bizType: 'rent' })
     })
   },
