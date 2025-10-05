@@ -157,14 +157,14 @@ Component({
       that.setData({rental})
       that.triggerEvent('RentalUpdated', rental)
     },
-    setEntrain(e){
+    setEntertain(e){
       var that = this
       var rental = that.data.rental
       if (e.detail.value.length == 0){
-        rental.entrain = false
+        rental.entertain = false
       }
       else{
-        rental.entrain = true
+        rental.entertain = true
       }
       that.computeRental()
     }
