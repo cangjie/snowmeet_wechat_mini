@@ -277,6 +277,9 @@ Page({
       case 'fd_order_list':
         path = '/pages/admin/fd/fd_order_list'
         break
+      case 'rent_recepting':
+        path = '/pages/admin/recept/rent_recepting_list'
+        break
       default:
         break
     }

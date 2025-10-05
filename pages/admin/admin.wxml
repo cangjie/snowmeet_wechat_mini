@@ -43,10 +43,6 @@
     <mp-cell id="recept_list" bindtap="nav" >【接待】未完成的接待</mp-cell>
     <mp-cell id="recept_auth" bindtap="nav" >【接待】接待授权</mp-cell>
   </mp-cells>
-  <!--mp-cells  ext-class="my-cells" title="UTV" >
-    <mp-cell id="utv_reserve_list" bindtap="nav">预约列表</mp-cell>
-    <mp-cell id="utv_race_list" bindtap="nav" >UTV发车列表</mp-cell>
-  </mp-cells-->
   <mp-cells ext-class="my-cells" title="店铺销售" >
     <mp-cell id="shopSale" bindtap="gotoSale" >【零售】店销现货</mp-cell>
     <mp-cell id="shopSaleList" bindtap="gotoSale" >【零售】订单列表</mp-cell>
@@ -54,8 +50,6 @@
     <mp-cell id="supplement" bindtap="nav" >【零售】补单</mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="养护相关" >
-    <!--mp-cell value="现场雪具养护收款" bindtap="goToMaintainRecept" ></mp-cell-->
-    <!--mp-cell value="现场雪具养护批量收款" bindtap="goToMaintainInShopQuickBatch" ></mp-cell-->
     <mp-cell value="【养护】现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
     <mp-cell value="【养护】快速查询" id="maintainSerchQuick" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_return" value="【养护】养护取板" bindtap="nav" ></mp-cell>
@@ -70,6 +64,7 @@
     <mp-cell wx:if="{{isAdmin}}" id="rent_package" value="【租赁】租赁套餐设置" bindtap="nav" ></mp-cell>
     <mp-cell  id="rent_product_add" value="【租赁】添加租赁物" bindtap="nav" ></mp-cell>
     <mp-cell  id="rent_product_list" value="【租赁】租赁物列表" bindtap="nav" ></mp-cell>
+    <mp-cell  id="rent_recepting" value="【租赁】未完成的接待" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="储值管理" >
     <mp-cell id="deposit_list" value="【储值】账户列表" bindtap="nav" ></mp-cell>

@@ -153,6 +153,7 @@ Page({
       })
       return
     }
+    var memberId = that.data.memberId? that.data.memberId: null
     if (!order) {
       order = {
         id: 0,
@@ -161,7 +162,8 @@ Page({
         type: '租赁',
         valid: 0,
         rentals: that.data.rentals,
-        recepting: 1
+        recepting: 1,
+        member_id: memberId
       }
     }
     else {

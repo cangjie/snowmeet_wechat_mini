@@ -129,7 +129,8 @@
     "pages/template/rent/recept",
     "pages/template/rent/recept_charge",
     "pages/template/rent/rent_detail",
-    "pages/register/reg"
+    "pages/register/reg",
+    "pages/admin/recept/rent_recepting_list"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -241,6 +242,8 @@
     "van-grid-item": "@vant/weapp/grid-item/index",
     "van-row": "@vant/weapp/row/index",
     "van-col": "@vant/weapp/col/index",
-    "rent-price-list": "/components/rent/rent_price_list"
+    "rent-price-list": "/components/rent/rent_price_list",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index"
   }
 }
