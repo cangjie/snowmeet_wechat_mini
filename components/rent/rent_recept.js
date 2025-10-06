@@ -313,9 +313,11 @@ Component({
       }
       console.log('render rentals', rentals)
       that.setData({
-        rentals, totalItemNum, totalGuarantyAmount,
+        totalItemNum, totalGuarantyAmount,
         totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount)
       })
+      that.setData({rentals})
+      
       //that.triggerEvent('SyncRentData', rentals)
     },
     searchBarcodeFuzzy(e) {
@@ -371,7 +373,8 @@ Component({
             expectDays: 1,
             category: rentProduct.category,
             priceList: priceList,
-            memo: ''
+            memo: '',
+            timeStamp: (new Date()).getTime()
           }
           util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.startDate))
           var items = []
@@ -386,7 +389,8 @@ Component({
             code: rentProduct.barcode,
             rent_product_id: rentProduct.id,
             category: rentProduct.category,
-            memo: ''
+            memo: '',
+            timeStamp: (new Date()).getTime()
           }
           items.push(item)
           rental.rentItems = items
@@ -430,7 +434,8 @@ Component({
         realDepositStr: '——',
         startDate: that.data.startDate,
         startDateIsWeekend: util.isWeekend(new Date(that.data.startDate)),
-        expectDays: 1
+        expectDays: 1,
+        timeStamp: (new Date()).getTime()
       }
       var items = []
       var item = {
@@ -441,7 +446,8 @@ Component({
         name: '',
         categoryName: '',
         code: '',
-        rent_product_id: null
+        rent_product_id: null,
+        timeStamp: (new Date()).getTime()
       }
       items.push(item)
       rental.rentItems = items

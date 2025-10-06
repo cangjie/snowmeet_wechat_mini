@@ -15,13 +15,13 @@
         <view class="left-column" >【手机】</view>
         <view class="right-column" >{{item.contact_num}}</view>
       </view>
-      <view class="view-row" >
+      <view class="view-row" bind:tap="gotoRecept" id="{{item.id}}" >
         <view class="left-column" >【类型】</view>
         <view class="right-column" >{{(item.member && item.member.following_wechat == 1)? '会员' : '散客'}}</view>
         <view class="left-column" >【时间】</view>
         <view class="right-column" >{{item.timeStr}}</view>
       </view>
-      <view class="view-row" >
+      <view class="view-row" bind:tap="gotoRecept" id="{{item.id}}" >
         <view class="left-column" >【店员】</view>
         <view class="right-column" >{{item.staff.name}}</view>
         <view class="left-column" ></view>

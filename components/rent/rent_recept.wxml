@@ -1,6 +1,6 @@
 <scroll-view scroll-y style="height: 100%;">
   <fui-swipeaction-group>
-    <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" bind:click="del" id="{{index}}">
+    <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental"  bind:click="del" id="{{index}}">
       <view style="height: 50rpx;"></view>
       <view wx:if="{{rental.package_id == null || rental.package_id == undefined}}" class="view-row">
         <view class="number-label" style="margin-top: 100rpx;font-size: 9pt;">【{{rental.rentItems[0].itemIndex}}】</view>
