@@ -20,7 +20,7 @@
           </view>
           <view class="view-row">
             <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【品类】</view>
-            <view class="right-column right-column1 view-row" wx:if="{{rental.rentItems[0].category}}" style="width: 475rpx;">
+            <view class="right-column right-column1 view-row" wx:if="{{rental.name}}" style="width: 475rpx;">
               <view style="width: 350rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">
                 {{rental.rentItems[0].category.name}}
               </view>
