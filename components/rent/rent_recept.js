@@ -452,11 +452,13 @@ Component({
       items.push(item)
       rental.rentItems = items
       var rentals = that.data.rentals
+      
       var newRentals = []
       newRentals.push(rental)
       for (var i = 0; rentals && i < rentals.length; i++) {
         newRentals.push(rentals[i])
       }
+      
       //rentals.push(rental)
       that.renderData(newRentals)
       that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })

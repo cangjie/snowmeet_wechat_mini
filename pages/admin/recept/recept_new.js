@@ -1,7 +1,6 @@
 // pages/admin/recept/recept_new.js
 const util = require("../../../utils/util")
 const data = require('../../../utils/data.js')
-const { deleteRentPackagePromise } = require("../../../utils/data.js")
 const app = getApp()
 
 Page({
@@ -177,7 +176,8 @@ Page({
     console.log('rent data updated', e)
     var rentals = e.detail.rentals
     that.setData({ showFooter: false })
-    that.setData({ rentals, showFooter: true })
+    that.setData({ rentals})
+    that.setData({showFooter: true})
     if (e.detail.needUpdate) {
       that.saveReceptOrder()
     }
@@ -221,8 +221,8 @@ Page({
         startDate = util.formatDate(new Date())
       }
 
-      for (var i = 0; rental.pricePresets && i < rental.pricePresets.length; i++) {
-        rental.pricePresets[i].id = 0
+      for (var j = 0; rental.pricePresets && j < rental.pricePresets.length; j++) {
+        rental.pricePresets[j].id = 0
       }
       rental.start_date = startDate
       rental.details = null
@@ -232,7 +232,11 @@ Page({
       console.log('save order', submitedOrder)
       that.setData({ order: submitedOrder, bizType: null })
       var rentals = submitedOrder.rentals
-      that.setData({ rentals, bizType: 'rent' })
+      for(var i = 0; i < rentals.length; i++){
+        rentals[i].timeStamp = (new Date(rentals[i].create_date)).getTime()
+      }
+      that.setData({ rentals })
+      that.setData({bizType: 'rent'})
     })
   },
   rentalWellFormed(e) {
