@@ -110,7 +110,7 @@ Page({
               default:
                 break
             }
-            that.setData({rentals: order.rentals, bizType, memberId, realName, cell, gender,shop})
+            that.setData({order, rentals: order.rentals, bizType, memberId, realName, cell, gender,shop})
 
           }).catch(function (exp){})
         }
