@@ -226,6 +226,7 @@ Page({
       }
       rental.start_date = startDate
       rental.details = null
+      rental.category = null
     }
     var submitUrl = app.globalData.requestPrefix + 'Rent/SaveRentRecept?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(submitUrl, order).then(function (submitedOrder) {

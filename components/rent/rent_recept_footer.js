@@ -37,11 +37,11 @@ Component({
 
         }
         else {
-          if (!isNaN(rentals[i].deposit)){
-            totalGuarantyAmount += rentals[i].deposit
+          if (!isNaN(rentals[i].guaranty)){
+            totalGuarantyAmount += rentals[i].guaranty
           }
-          if (!isNaN(rentals[i].depositDiscount)) {
-            totalGuarantyDiscountAmount += rentals[i].depositDiscount
+          if (!isNaN(rentals[i].guaranty_discount)) {
+            totalGuarantyDiscountAmount += rentals[i].guaranty_discount
           }
         }
       }

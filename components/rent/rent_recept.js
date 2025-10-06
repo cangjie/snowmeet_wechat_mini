@@ -268,6 +268,10 @@ Component({
       var totalGuarantyAmount = 0
       for (var i = 0; i < rentals.length; i++) {
         var rental = rentals[i]
+        if (!rental.package_id && !rental.category_id && rental.rentItems && rental.rentItems.length > 0){
+          rental.category_id = rental.rentItems[0].category_id
+          //rental.name = rental.rentItems[0].cate
+        }
         if (isNaN(rental.depositDiscount)) {
           rental.realDeposit = rental.deposit
         }
@@ -362,7 +366,8 @@ Component({
             id: 0,
             order_id: null,
             package_id: null,
-            name: rentProduct.name,
+            category_id: rentProduct.category.id,
+            name: rentProduct.category.name,
             valid: 0,
             deposit: rentProduct.category.deposit,
             depositStr: util.showAmount(rentProduct.category.deposit),
@@ -388,18 +393,22 @@ Component({
             categoryName: rentProduct.category.name,
             code: rentProduct.barcode,
             rent_product_id: rentProduct.id,
-            category: rentProduct.category,
             memo: '',
             timeStamp: (new Date()).getTime()
           }
           items.push(item)
           rental.rentItems = items
           var rentals = that.data.rentals
-          rentals.push(rental)
+          var newRentals = []
+          newRentals.push(rental)
+          for(var i = 0; rentals && i < rentals.length; i++){
+            newRentals.push(rentals[i])
+          }
+          //rentals.push(rental)
           that.setData({ showPopUp: false, popUpContent: null })
-          that.renderData(rentals)
+          that.renderData(newRentals)
           //that.triggerEvent('SyncRentData', rentals)
-          that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
+          that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
         })
 
     },
@@ -609,12 +618,13 @@ Component({
           rental.realDepositStr = rental.depositStr
           rental.guaranty = rental.deposit
           rental.guarantyStr = rental.depositStr
-
           rental.category = e.detail
           rental.expectDays = 1
           rental.startDate = that.data.startDate
           rental.startDateIsWeekend = util.isWeekend(new Date(that.data.startDate))
           rental.priceList = priceList
+          rental.category_id = rental.category.id
+          rental.name = rental.category.name
           util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.startDate))
           that.renderData(that.data.rentals)
           that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: true })
@@ -672,7 +682,7 @@ Component({
       var id = parseInt(e.currentTarget.id)
       var shop = that.data.shop
       var rental = that.data.rentals[id]
-      var targetId = rental.package_id ? rental.package_id : rental.category.id
+      var targetId = rental.package_id ? rental.package_id : rental.category_id
       that.setData({
         showBackdrop: true, action: 'priceList',
         dayType: rental.startDateIsWeekend ? '周末' : '平日',
