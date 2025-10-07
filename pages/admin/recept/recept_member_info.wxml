@@ -18,7 +18,7 @@
   <mp-cells title="选择业务" >
     <mp-cell style="text-align: center;">
       <view style="display: flex;flex-direction: row;" >
-        <button size="mini" disabled="{{ shop == '' || sale != 1 }}" bindtap="gotoFlow" id="sale" class="input" > 零 售 </button>
+        <button size="mini" disabled="{{ shop == '' || sale != 1 }}" bindtap="gotoFlow" id="retail" class="input" > 零 售 </button>
         <view style="width: 20rpx;"></view>
         <button size="mini" disabled="{{ shop == '' || !wellFormed || care != 1  }}" bindtap="gotoFlow" id="care" class="input" > 养 护 </button>
         <view style="width: 20rpx;"></view>
