@@ -2,7 +2,7 @@
   "usingComponents": {
     "sale-item" : "/components/recept/sale/sale_item",
     "rent-recept-footer": "/components/rent/rent_recept_footer",
-    "retail-recept": "/components/recept/retail/retail_recept",
-    "retail-footer": "/components/recept/retail/retail_footer"
+    "retail-recept": "/components/retail/retail_recept",
+    "retail-footer": "/components/retail/retail_footer"
   }
 }

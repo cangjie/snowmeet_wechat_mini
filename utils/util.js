@@ -224,7 +224,6 @@ const checkRentalsWellForm = function(rentals){
   if (!rentals){
     return false
   }
-  
   var well = true
   for(var i = 0; i < rentals.length; i++){
     var rental = rentals[i]
@@ -264,9 +263,6 @@ const checkRentalsWellForm = function(rentals){
   }
   return well
 }
-
-
-
 module.exports = {
   formatDateTime: formatDateTime,
   formatDate: formatDate,

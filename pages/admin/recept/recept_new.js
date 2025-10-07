@@ -42,7 +42,7 @@ Page({
         case 'care':
           title = '养护开单'
           break
-        case 'sale':
+        case 'retail':
           title = '零售开单'
           break
           defaut:
@@ -264,5 +264,11 @@ Page({
         icon: 'error'
       })
     }
+  },
+  retailOrderUpdate(e){
+    console.log('retail order update', e)
+    var that = this
+    that.setData({order: e.detail, showFooter: false})
+    that.setData({showFooter: true})
   }
 })

@@ -4,18 +4,15 @@
   </view>
   <view class="main-frame" >
     <rent-recept wx:if="{{bizType == 'rent'}}" memberId="{{memberId}}" shop="{{shop}}" bindSyncRentData="rentDataUpdated" rentals="{{rentals}}"  ></rent-recept>
-    <retail-recept wx:if="{{bizType == 'retail' }}" ></retail-recept>
+    <retail-recept wx:if="{{bizType == 'retail' }}" memberId="{{memberId}}" 
+    shop="{{shop}}"  bindSyncRetailOrder="retailOrderUpdate" order="{{retailOrder}}" ></retail-recept>
   </view>
   <view style="height: 200rpx;">
     <van-goods-action>
       <van-goods-action-icon wx:if="{{bizType == 'rent'}}" info="{{rentals.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" />
       <rent-recept-footer wx:if="{{showFooter && bizType == 'rent'}}" rentals="{{rentals}}"
       bindWellFormed="rentalWellFormed" ></rent-recept-footer>
-      <retail-footer wx:if="{{showFooter && bizType == 'retail'}}" rentals="{{rentals}}"
-      bindWellFormed="rentalWellFormed" ></retail-footer>
-      <!--van-goods-action-icon icon="chat-o" text="客服" bind:click="onClickIcon" />
-      <van-goods-action-button text="加入购物车" type="warning" bind:click="onClickButton" />
-      <van-goods-action-button text="立即购买" bind:click="onClickButton" /-->
+      <retail-footer wx:if="{{showFooter && bizType == 'retail'}}" order="{{order}}" ></retail-footer>
     </van-goods-action>
   </view>
   <van-popup show="{{ showUserInfo }}" position="top" custom-style="height: 20%;" bind:close="onPopClose" close-icon="close" />

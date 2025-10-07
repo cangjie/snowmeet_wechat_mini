@@ -273,6 +273,16 @@ const getRentReceptingOrderPromise = function(id, sessionKey){
     })
   })
 }
+const getRetailOrderByMi7CodePromise = function(code, sessionKey){
+  var getUrl = app.globalData.requestPrefix + 'Retail/GetOrdersByMi7Code/' + code + '?sessionKey=' + encodeURIComponent(sessionKey)
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(orders){
+      resolve(orders)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+}
 /*
 const getAllRentCategoriesPromise = function(){
   var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
@@ -310,5 +320,7 @@ module.exports = {
   getRentCategoryProductsPromise,
   deleteRentPackagePromise,
   getRentReceptingOrdersPromise,
-  getRentReceptingOrderPromise
+  getRentReceptingOrderPromise,
+  getRetailOrderByMi7CodePromise
+
 }

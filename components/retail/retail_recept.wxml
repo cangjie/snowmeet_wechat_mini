@@ -1,0 +1,52 @@
+<view style="margin-top: 100rpx;">
+  <view class="view-row" >
+    <view class="left-column" >【支付金额】</view>
+    <view class="right-column" >
+      <input type="number" style="width: 100rpx;" class="input" 
+      value="{{order.retail.deal_price}}" id="deal_price" bindinput="setInput"  />
+    </view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row" >
+    <view class="left-column" >【紧急开单】</view>
+    <view class="right-column" >
+      <checkbox-group id="urgent" bindchange="checkChanged" id="urgent" >
+        <checkbox checked="{{order.retail.urgent==1}}"  ></checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row" >
+    <view class="left-column" >【七色米订单号】</view>
+    <view class="right-column" >
+      <input style="width: 300rpx;" class="input" value="{{order.retail.mi7_code}}"
+      id="mi7_code" bindinput="setInput"  disabled="{{order.retail.urgent==1}}"/>
+    </view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row" >
+    <view class="left-column" >【放弃龙珠】</view>
+    <view class="right-column" >
+      <checkbox-group bindchange="checkChanged" id="giveup" >
+        <checkbox checked="{{order.retail.giveup_score==1}}" disabled="{{isMember == 0}}" ></checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row" >
+    <view class="left-column" >【招待】</view>
+    <view class="right-column" >
+      <checkbox-group bindchange="checkChanged" id="entertain" >
+        <checkbox checked="{{order.retail.entertain==1}}" ></checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row" >
+    <view class="left-column" >【备注】</view>
+    <view class="right-column" >
+      <textarea class="input" style="width: 420rpx; height: 200rpx;" 
+      value="{{order.retail.memo}}" id="memo" bindinput="setInput" ></textarea>
+    </view>
+  </view>
+</view>
