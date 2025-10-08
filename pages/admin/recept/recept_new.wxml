@@ -12,8 +12,13 @@
       <van-goods-action-icon wx:if="{{bizType == 'rent'}}" info="{{rentals.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" />
       <rent-recept-footer wx:if="{{showFooter && bizType == 'rent'}}" rentals="{{rentals}}"
       bindWellFormed="rentalWellFormed" ></rent-recept-footer>
-      <retail-footer wx:if="{{showFooter && bizType == 'retail'}}" order="{{order}}" ></retail-footer>
+      <retail-footer wx:if="{{showFooter && bizType == 'retail'}}" order="{{order}}" bindPlaceOrderFinish="showRetailOrder" ></retail-footer>
     </van-goods-action>
   </view>
-  <van-popup show="{{ showUserInfo }}" position="top" custom-style="height: 20%;" bind:close="onPopClose" close-icon="close" />
+  <van-popup show="{{ showUserInfo }}" position="top" custom-style="height: 20%;" 
+  bind:close="onPopClose" close-icon="close" />
+  <van-popup show="{{ showOrderInfo }}" position="bottom" custom-style="height: 80%;" 
+  bind:close="onPopOrderInfoClose" close-icon="close" >
+    <retail-order-info wx:if="{{bizType=='retail' && order}}" order="{{order}}" ></retail-order-info>
+  </van-popup>
 </view>

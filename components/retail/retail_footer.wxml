@@ -1,2 +1,4 @@
-<!--components/retail/retail_footer.wxml-->
-<text>components/retail/retail_footer.wxml</text>
+<view class="view-row" style="width:750rpx;justify-content: center;margin-top: 50rpx;" >
+  <van-button wx:if="{{!order || !order.id || order.id == 0}}" type="primary" disabled="{{!wellForm || ordering}}" bind:tap="placeOrder" > 确 认 下 单 </van-button>
+  <van-button wx:else type="info" bind:tap="showOrder" > 查 看 订 单 </van-button>
+</view>

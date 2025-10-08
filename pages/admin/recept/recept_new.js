@@ -15,7 +15,8 @@ Page({
     showSummary: false,
     showMainComponent: true,
     showFooter: true,
-    rentals: null
+    rentals: null,
+    showOrderInfo: false
   },
 
   /**
@@ -268,7 +269,28 @@ Page({
   retailOrderUpdate(e){
     console.log('retail order update', e)
     var that = this
-    that.setData({order: e.detail, showFooter: false})
+    var order = e.detail
+    order.contact_name = that.data.realName
+    order.contact_gender = that.data.gender
+    order.contact_num = that.data.cell
+    order.member_id = that.data.memberId
+    order.shop = that.data.shop
+    var retails = order.retails
+    for(var i = 0; i < retails.length; i++){
+      var retail = retails[i]
+      if (retail.entertain == 1){
+        retail.order_type = '招待'
+      }
+      else {
+        retail.order_type = '普通'
+      }
+    }
+    that.setData({order, showFooter: false})
     that.setData({showFooter: true})
+  },
+  showRetailOrder(e){
+    var that = this
+    that.setData({bizType: null, order: e.detail})
+    that.setData({bizType: 'retail', showOrderInfo: true})
   }
 })

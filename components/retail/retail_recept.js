@@ -39,22 +39,24 @@ Component({
         var order = {
           member_id: that.properties.memberId,
           type: '零售',
-          retail: retail
+          retails: []
         }
+        order.retails.push(retail)
         that.setData({memberId: that.properties.memberId, order})
       }
       else{
         var order = {
           member_id: null,
           type: '零售',
-          retail: retail
+          retails: []
         }
+        order.retails.push(retail)
         that.setData({memberId: null, order})
       }
       app.loginPromiseNew.then(function (resovle){
         if (that.data.memberId){
           data.getMemberPromise(that.properties.memberId, app.globalData.sessionKey).then(function (member){
-            var retail = that.data.order.retail
+            var retail = that.data.order.retails[0]
             var isMember = 0
             if (member && member.following_wechat == 1){
               isMember = 1
@@ -67,7 +69,7 @@ Component({
           })
         }
         else{
-          var retail = that.data.order.retail
+          var retail = that.data.order.retails[0]
           retail.giveup_score = 1
           that.setData({isMember: 0, order})
         }
@@ -83,7 +85,7 @@ Component({
       var that = this
       var value = e.detail.value
       var order = that.data.order
-      var retail = order.retail
+      var retail = order.retails[0]
       var id = e.currentTarget.id
       switch(id){
         case 'deal_price':
@@ -108,7 +110,7 @@ Component({
       var id = e.currentTarget.id
       var value = e.detail.value.length
       var order = that.data.order
-      var retail = order.retail
+      var retail = order.retails[0]
       switch(id){
         case 'giveup':
           retail.giveup_score = value

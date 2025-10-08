@@ -1,1 +1,1 @@
-/* components/retail/retail_footer.wxss */
+@import '/app.wxss';

@@ -1,0 +1,23 @@
+<view>
+  <view  style="text-align: center;width: 750rpx;margin-top: 20rpx;" > 下 单 成 功 </view>
+  <view class="view-row" style="margin-top: 20rpx;" >
+    <view class="left-column" >【订单号】</view>
+    <view class="right-column" >{{order.code}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【七色米单号】</view>
+    <view class="right-column" >{{order.retails[0].mi7_code == null? '紧急开单' : order.retails[0].mi7_code}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【招待】</view>
+    <view class="right-column" >{{order.retails[0].order_type == '招待' ? '是' : '否'}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【应付金额】</view>
+    <view class="right-column" >{{order.totalAmountStr}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【备注】</view>
+    <view class="right-column" >{{order.retails[0].memo}}</view>
+  </view>
+</view>
