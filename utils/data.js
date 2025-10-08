@@ -283,6 +283,63 @@ const getRetailOrderByMi7CodePromise = function(code, sessionKey){
     })
   })
 }
+const getOrdersByStaffPromise = function(orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey){
+  var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaff?sessionKey=' + sessionKey
+  if (orderId){
+    qUrl += '&orderId=' + orderId
+  } 
+  if (shop){
+    qUrl += '&shop=' + encodeURIComponent(shop)
+  }
+  if (memberId){
+    qUrl += '&memberId=' + memberId.toString()
+  }
+  if (staffId){
+    qUrl += '&staffId=' + staffId.toString()
+  }
+  if (type){
+    qUrl += '&type=' + encodeURIComponent(type)
+  }
+  if (startDate){
+    qUrl += '&startDate=' + encodeURIComponent(util.formatDate(new Date(startDate)))
+  }
+  if (endDate){
+    qUrl += '&endDate=' + encodeURIComponent(util.formatDate(new Date(endDate)))
+  }
+  if (payOption){
+    qUrl += '&payOption=' + payOption
+  }
+  if (isTest){
+    qUrl += '&isTest=' + isTest
+  }
+  if (isEntertain){
+    qUrl += '&isEntertain=' + isEntertain
+  }
+  if (isPackage){
+    qUrl += '&isPackage=' + isPackage
+  }
+  if (isOnCredit){
+    qUrl += '&isOnCredit=' + isOnCredit
+  }
+  if (haveDiscount){
+    qUrl += '&haveDiscount=' + haveDiscount
+  }
+  if (status){
+    qUrl += '&status=' + status
+  }
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(qUrl, null).then(function (orders){
+      resolve(orders)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+  /*
+  ?shop=' + encodeURIComponent(that.data.shop) + '&type=' + encodeURIComponent('餐饮') + '&startDate=' + util.formatDateString(that.data.startDate) + '&endDate=' + util.formatDateString(that.data.endDate) + '&sessionKey=' + app.globalData.sessionKey
+  */
+
+}
+
 /*
 const getAllRentCategoriesPromise = function(){
   var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
@@ -321,6 +378,6 @@ module.exports = {
   deleteRentPackagePromise,
   getRentReceptingOrdersPromise,
   getRentReceptingOrderPromise,
-  getRetailOrderByMi7CodePromise
-
+  getRetailOrderByMi7CodePromise,
+  getOrdersByStaffPromise
 }

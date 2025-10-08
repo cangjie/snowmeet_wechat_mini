@@ -73,12 +73,21 @@ Component({
     placeOrder(){
       var that = this
       var order = that.data.order
+      var totalAmout = 0
       for(var i = 0; order && order.retails && i < order.retails.length; i++){
         var retail = order.retails[i]
         if (retail.urgent == 1){
           retail.mi7_code = null
         }
+        if (retail.entertain == 1)
+        {
+
+        }
+        else{
+          totalAmout += retail.deal_price
+        }
       }
+      order.total_amount = totalAmout
       that.setData({ordering: true})
       var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(postUrl, order).then(function (order){
