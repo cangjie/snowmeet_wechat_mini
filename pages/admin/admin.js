@@ -310,7 +310,8 @@ Page({
         navUrl = 'sale/shop_sale_entry'
         break
       case "shopSaleList":
-        navUrl = 'sale/order_list'
+        //navUrl = 'sale/order_list'
+        navUrl = 'retail/retail_order_list'
         break
       default:
         break
