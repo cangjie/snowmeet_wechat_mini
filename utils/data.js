@@ -334,25 +334,17 @@ const getOrdersByStaffPromise = function(orderId, shop, memberId, staffId, type,
       reject(exp)
     })
   })
-  /*
-  ?shop=' + encodeURIComponent(that.data.shop) + '&type=' + encodeURIComponent('餐饮') + '&startDate=' + util.formatDateString(that.data.startDate) + '&endDate=' + util.formatDateString(that.data.endDate) + '&sessionKey=' + app.globalData.sessionKey
-  */
-
 }
-
-/*
-const getAllRentCategoriesPromise = function(){
-  var url = 'https://' + app.globalData.domainName + 'Rent/GetAllCategories'
-  return new Promise(function (resovle, reject){
-    util.performWebRequest(updateUrl, priceList).then(function (categories){
-      resovle(categories)
+const getOrderByStaffPromise = function (orderId, sessionKey){
+  var qUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + orderId.toString() +  '?sessionKey=' + sessionKey 
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(qUrl, null).then(function(order){
+      resolve(order)
     }).catch(function (exp){
       reject(exp)
     })
   })
 }
-*/
-
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -379,5 +371,6 @@ module.exports = {
   getRentReceptingOrdersPromise,
   getRentReceptingOrderPromise,
   getRetailOrderByMi7CodePromise,
-  getOrdersByStaffPromise
+  getOrdersByStaffPromise,
+  getOrderByStaffPromise
 }

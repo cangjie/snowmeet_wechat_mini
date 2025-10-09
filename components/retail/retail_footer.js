@@ -88,6 +88,7 @@ Component({
         }
       }
       order.total_amount = totalAmout
+      order.paying_amount = totalAmout
       that.setData({ordering: true})
       var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(postUrl, order).then(function (order){

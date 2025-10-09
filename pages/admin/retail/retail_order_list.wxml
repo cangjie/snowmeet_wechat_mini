@@ -1,2 +1,49 @@
-<!--pages/admin/retail/retail_order_list.wxml-->
-<text>pages/admin/retail/retail_order_list.wxml</text>
+<view>
+  <block wx:for="{{orders}}">
+      <fui-card id="{{item.id}}" style="margin-top: 50rpx;" title="{{item.code}}" tag="{{item.orderStatus}}" tagSize="10rpx" full bind:click="gotoDetail">
+        <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
+          <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;">
+            <view wx:if="{{item.is_test == 1}}">【测】</view>
+            <view wx:if="{{item.haveEntertain}}">【招】</view>
+            <view wx:if="{{item.is_package == 0}}">【单】</view>
+            <view wx:if="{{item.haveOnCredit}}">【挂】</view>
+            <view>{{item.memberShip}}</view>
+          </view>
+          <view>
+            <view class="view-row">
+              <view class="left-column"  >【日期】</view>
+              <view class="right-column" style="width: 150rpx;" >{{item.dateStr}}</view>
+              <view class="left-column"  style="width: 120rpx;" >【时间】</view>
+              <view class="right-column" style="width: 120rpx;" >{{item.timeStr}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column" >【顾客称呼】</view>
+              <view class="right-column" style="width: 270rpx;margin-right: 0rpx;">{{item.calledName}}</view>
+              
+            </view>
+            <view class="view-row" >
+              <view class="left-column" >【手机】</view>
+              <view class="right-column">{{item.cell}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【七色米单号】</view>
+              <view class="right-column" >{{item.mi7_code}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【支付金额】</view>
+              <view class="right-column" >{{item.totalChargeStr}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【支付类型】</view>
+              <view class="right-column">{{ item.payType }}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【开单人】</view>
+              <view class="right-column">{{item.staff.name}}</view>
+            </view>
+          </view>
+        </view>
+      </fui-card>
+      <view style="height: 20rpx;"></view>
+    </block>
+</view>

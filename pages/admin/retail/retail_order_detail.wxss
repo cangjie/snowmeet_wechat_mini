@@ -1,1 +1,4 @@
-/* pages/admin/retail/retail_order_detail.wxss */
+.left-column{
+  text-align: left;
+  width: 190rpx;
+}

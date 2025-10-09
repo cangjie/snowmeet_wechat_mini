@@ -1,2 +1,93 @@
-<!--pages/admin/retail/retail_order_detail.wxml-->
-<text>pages/admin/retail/retail_order_detail.wxml</text>
+<view>
+  <mp-cells title="顾客下单信息" >
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" style="width: 140rpx;" >【姓名】</view>
+        <view class="right-column" style="width: 200rpx;" >
+          <input class="input" disabled="{{!moddingContactInfo}}" 
+            value="{{order.contact_name}}" style="width: 150rpx;text-align: center;" />
+        </view>
+        <view class="left-column" style="width: 140rpx;" >【状态】</view>
+        <view class="right-column" >{{order.memberShip}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" style="width: 140rpx;" >【性别】</view>
+        <view class="right-column view-row" style="width: 200rpx;" >
+          <radio-group>
+            <radio disabled="{{!moddingContactInfo}}" checked="{{order.contact_gender == '男'}}" >男</radio>
+            <radio disabled="{{!moddingContactInfo}}" checked="{{order.contact_gender == '女'}}" >女</radio>
+          </radio-group>
+        </view>
+        <view class="left-column" style="width: 140rpx;" >【手机号】</view>
+        <view class="right-column" >
+          <input class="input" disabled="{{!moddingContactInfo}}" 
+            value="{{order.contact_num}}" style="width: 160rpx;" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" style="justify-content: center;"  >
+        <van-button type="primary" size="small" > 修 改 </van-button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="订单信息" >
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" >【订单号】</view>
+        <view class="right-column" >{{order.code}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" >【七色米单号】</view>
+        <view class="right-column" >
+          <block wx:if="{{order.retails[0].mi7_code || moddingOrderInfo}}" >
+            <input class="input" style="width: 180rpx;" value="{{order.retails[0].mi7_code}}" />
+          </block>
+          <block wx:else >
+            紧急开单
+          </block>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" >【招待】</view>
+        <view class="right-column" >{{order.haveEntertain == 1? '是' : '否'}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" >【支付金额】</view>
+        <view class="right-column" >
+          <block wx:if="{{order.haveEntertain == 1}}" >
+            ¥0.00
+          </block>
+          <block wx:else >
+            <input class="input" style="width: 100rpx;text-align: center;" value="{{order.paying_amount}}" />
+          </block>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" >【备注】</view>
+        <view class="right-column" >{{order.retails[0].memo}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" >【订单状态】</view>
+        <view class="right-column" >{{order.orderStatus}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" style="justify-content: center;"  >
+        <van-button type="primary" size="small" > 修 改 </van-button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>
