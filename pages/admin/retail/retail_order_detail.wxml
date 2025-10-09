@@ -67,7 +67,8 @@
             ¥0.00
           </block>
           <block wx:else >
-            <input class="input" style="width: 100rpx;text-align: center;" value="{{order.paying_amount}}" />
+            <input class="input" style="width: 100rpx;text-align: center;" 
+            value="{{order.paying_amount}}" disabled="{{!moddingOrderInfo}}" />
           </block>
         </view>
       </view>
@@ -88,6 +89,11 @@
       <view class="view-row" style="justify-content: center;"  >
         <van-button type="primary" size="small" > 修 改 </van-button>
       </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="支付" wx:if="{{order.orderStatus == '待生成'}}" >
+    <mp-cell>
+      <payment orderId="{{order.id}}" ></payment>
     </mp-cell>
   </mp-cells>
 </view>

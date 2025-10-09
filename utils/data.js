@@ -48,7 +48,7 @@ const searchBarCodeFuzzyPromise = function (key, categoryId) {
     })
   })
 }
-const getAllRentCategoriesPromise = function(){
+const getAllRentCategoriesPromise = function () {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetAllCategories'
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (categories) {
@@ -58,7 +58,7 @@ const getAllRentCategoriesPromise = function(){
     })
   })
 }
-const getTopCategoriesPromise = function (){
+const getTopCategoriesPromise = function () {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetTopRentCategories'
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (categories) {
@@ -68,7 +68,7 @@ const getTopCategoriesPromise = function (){
     })
   })
 }
-const getSubCategoriesPromise = function (fatherId){
+const getSubCategoriesPromise = function (fatherId) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetSubRentCategories/' + fatherId.toString()
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (categories) {
@@ -78,7 +78,7 @@ const getSubCategoriesPromise = function (fatherId){
     })
   })
 }
-const getRentCategoryPromise = function (categoryId){
+const getRentCategoryPromise = function (categoryId) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetRentCategory/' + categoryId.toString()
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (categories) {
@@ -88,44 +88,44 @@ const getRentCategoryPromise = function (categoryId){
     })
   })
 }
-const verifyMemberCellPromise = function(sessionKey, enc, iv){
+const verifyMemberCellPromise = function (sessionKey, enc, iv) {
   var veriUrl = app.globalData.requestPrefix + 'Member/VerifyCell?sessionKey=' + sessionKey + '&encData=' + encodeURIComponent(enc) + '&iv=' + encodeURIComponent(iv)
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(veriUrl, null).then(function(result){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(veriUrl, null).then(function (result) {
       resolve(result)
-    }).catch(function(exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getMemberPromise = function (memberId, sessionKey){
+const getMemberPromise = function (memberId, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Member/GetMember/' + memberId.toString() + '?sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (member){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (member) {
       resolve(member)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, name, gender, sessionKey){
-  var placeUrl = app.globalData.requestPrefix + 'Order/PlaceBlankOrder/' + isPackage + '?type=' + encodeURIComponent(type) + '&shop=' + encodeURIComponent(shop) 
-    + memberId? '&memberId=' + memberId.toString(): ''
-    + cell? '&cell=' + cell : ''
-    + name? '&name=' + encodeURIComponent(name) : ''
-    + gender? '&gender=' + encodeURIComponent(gender) : ''
-    + '&sessonKey=' + sessionKey
-  return new Promose(function (resolve, reject){
-    util.performWebRequest(placeUrl, null).then(function (order){
+const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, name, gender, sessionKey) {
+  var placeUrl = app.globalData.requestPrefix + 'Order/PlaceBlankOrder/' + isPackage + '?type=' + encodeURIComponent(type) + '&shop=' + encodeURIComponent(shop)
+    + memberId ? '&memberId=' + memberId.toString() : ''
+      + cell ? '&cell=' + cell : ''
+        + name ? '&name=' + encodeURIComponent(name) : ''
+          + gender ? '&gender=' + encodeURIComponent(gender) : ''
+          + '&sessonKey=' + sessionKey
+  return new Promose(function (resolve, reject) {
+    util.performWebRequest(placeUrl, null).then(function (order) {
       resolve(order)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getEnumListPromise = function (type){
-  var getUrl = app.globalData.requestPrefix 
-  switch(type){
+const getEnumListPromise = function (type) {
+  var getUrl = app.globalData.requestPrefix
+  switch (type) {
     case 'RentType':
       getUrl += 'Rent/GetRentType'
       break
@@ -138,212 +138,229 @@ const getEnumListPromise = function (type){
     default:
       break
   }
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function(list){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (list) {
       resolve(list)
-    }).catch(function(exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getRentPriceListPromise = function(shopId, type, id, scene){
+const getRentPriceListPromise = function (shopId, type, id, scene) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPriceList/' + shopId + '?type=' + encodeURIComponent(type) + '&id=' + id.toString() + '&scene=' + encodeURIComponent(scene)
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(getUrl, null).then(function(list){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (list) {
       resolve(list)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const updateRentPricePromise = function(priceList, shopId, sessionKey){
+const updateRentPricePromise = function (priceList, shopId, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentPrice/' + shopId.toString() + '?sessionKey=' + app.globalData.sessionKey
-  return new Promise(function (resovle, reject){
-    util.performWebRequest(updateUrl, priceList).then(function (list){
+  return new Promise(function (resovle, reject) {
+    util.performWebRequest(updateUrl, priceList).then(function (list) {
       resovle(list)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getShopByNamePromise = function(shopName){
+const getShopByNamePromise = function (shopName) {
   var getUrl = app.globalData.requestPrefix + 'Shop/GetShopByName?shopName=' + encodeURIComponent(shopName)
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (shop){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (shop) {
       resolve(shop)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getMyTickets = function (used, sessionKey){
+const getMyTickets = function (used, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetMyTickets/' + used.toString() + '?sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (tickets){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (tickets) {
       resolve(tickets)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getTicket = function (code){
+const getTicket = function (code) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetTicket/' + code
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (ticket){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (ticket) {
       resolve(ticket)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const updateRentCategoryPromise = function(code, name, guaranty, scene, sessionKey){
+const updateRentCategoryPromise = function (code, name, guaranty, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateCategory/' + code + '?name=' + encodeURIComponent(name) + '&guaranty=' + guaranty + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(updateUrl, null).then(function (category){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(updateUrl, null).then(function (category) {
       resolve(category)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
 const updateRentPackagePromise = function (id, name, description, guaranty, sessionKey) {
   var saveUrl = app.globalData.requestPrefix + 'Rent/UpdateRentPackageBaseInfo/'
-      + id.toString() + '?name=' + encodeURIComponent(name)
-      + '&description=' + encodeURIComponent(description)
-      + '&deposit=' + encodeURIComponent(guaranty.toString())
-      + '&sessionKey=' + encodeURIComponent(sessionKey)
-      + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    + id.toString() + '?name=' + encodeURIComponent(name)
+    + '&description=' + encodeURIComponent(description)
+    + '&deposit=' + encodeURIComponent(guaranty.toString())
+    + '&sessionKey=' + encodeURIComponent(sessionKey)
+    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   return new Promise(function (resolve, reject) {
-    util.performWebRequest(saveUrl, null).then(function(rentPackage){
+    util.performWebRequest(saveUrl, null).then(function (rentPackage) {
       resolve(rentPackage)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const modRentPackageCategory = function (packageId, categoryId, action, sessionKey){
+const modRentPackageCategory = function (packageId, categoryId, action, sessionKey) {
   var setUrl = app.globalData.requestPrefix + 'Rent/RentPackageCategory'
-      + action + '/' + packageId.toString() + '?categoryId=' + categoryId.toString()
-      + '&sessionKey=' + sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(setUrl, null).then(function(category){
+    + action + '/' + packageId.toString() + '?categoryId=' + categoryId.toString()
+    + '&sessionKey=' + sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(setUrl, null).then(function (category) {
       resolve(category)
-    }).catch(function(exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getRentCategoryProductsPromise = function (categoryId){
+const getRentCategoryProductsPromise = function (categoryId) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByCategory/' + categoryId.toString()
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function(products){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (products) {
       resolve(products)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const deleteRentPackagePromise = function(packageId, sessionKey){
+const deleteRentPackagePromise = function (packageId, sessionKey) {
   var delUrl = app.globalData.requestPrefix + 'Rent/DeleteRentPackage/' + packageId.toString() + '?sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(delUrl, null).then(function(rentPackage){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(delUrl, null).then(function (rentPackage) {
       resolve(rentPackage)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getRentReceptingOrdersPromise = function(shop, sessionKey){
+const getRentReceptingOrdersPromise = function (shop, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrders?shop=' + encodeURIComponent(shop) + '&sessionKey=' + sessionKey
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(getUrl, null).then(function(orders){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (orders) {
       resolve(orders)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getRentReceptingOrderPromise = function(id, sessionKey){
+const getRentReceptingOrderPromise = function (id, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrder/' + id.toString() + '?sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (order){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (order) {
       resolve(order)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getRetailOrderByMi7CodePromise = function(code, sessionKey){
+const getRetailOrderByMi7CodePromise = function (code, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Retail/GetOrdersByMi7Code/' + code + '?sessionKey=' + encodeURIComponent(sessionKey)
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function(orders){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (orders) {
       resolve(orders)
-    }).catch(function(exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getOrdersByStaffPromise = function(orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey){
+const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey) {
   var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaff?sessionKey=' + sessionKey
-  if (orderId){
+  if (orderId) {
     qUrl += '&orderId=' + orderId
-  } 
-  if (shop){
+  }
+  if (shop) {
     qUrl += '&shop=' + encodeURIComponent(shop)
   }
-  if (memberId){
+  if (memberId) {
     qUrl += '&memberId=' + memberId.toString()
   }
-  if (staffId){
+  if (staffId) {
     qUrl += '&staffId=' + staffId.toString()
   }
-  if (type){
+  if (type) {
     qUrl += '&type=' + encodeURIComponent(type)
   }
-  if (startDate){
+  if (startDate) {
     qUrl += '&startDate=' + encodeURIComponent(util.formatDate(new Date(startDate)))
   }
-  if (endDate){
+  if (endDate) {
     qUrl += '&endDate=' + encodeURIComponent(util.formatDate(new Date(endDate)))
   }
-  if (payOption){
+  if (payOption) {
     qUrl += '&payOption=' + payOption
   }
-  if (isTest){
+  if (isTest) {
     qUrl += '&isTest=' + isTest
   }
-  if (isEntertain){
+  if (isEntertain) {
     qUrl += '&isEntertain=' + isEntertain
   }
-  if (isPackage){
+  if (isPackage) {
     qUrl += '&isPackage=' + isPackage
   }
-  if (isOnCredit){
+  if (isOnCredit) {
     qUrl += '&isOnCredit=' + isOnCredit
   }
-  if (haveDiscount){
+  if (haveDiscount) {
     qUrl += '&haveDiscount=' + haveDiscount
   }
-  if (status){
+  if (status) {
     qUrl += '&status=' + status
   }
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(qUrl, null).then(function (orders){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(qUrl, null).then(function (orders) {
       resolve(orders)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getOrderByStaffPromise = function (orderId, sessionKey){
-  var qUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + orderId.toString() +  '?sessionKey=' + sessionKey 
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(qUrl, null).then(function(order){
+const getOrderByStaffPromise = function (orderId, sessionKey) {
+  var qUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + orderId.toString() + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(qUrl, null).then(function (order) {
       resolve(order)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
+}
+const GetUnCommonPayMethodPromise = function () {
+  var getPayMethodUrl = app.globalData.requestPrefix + 'Order/GetUnCommonPayMethod'
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getPayMethodUrl, null).then(function (subPayMethods) {
+      var inputedPayMethodList = subPayMethods
+      var othersPayMethods = ['京东收银', 'POS机刷卡', '现金']
+      for (var i = 0; i < inputedPayMethodList.length; i++) {
+        othersPayMethods.push(inputedPayMethodList[i])
+      }
+      othersPayMethods.push('手工填写')
+      resolve(othersPayMethods)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+
 }
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -372,5 +389,6 @@ module.exports = {
   getRentReceptingOrderPromise,
   getRetailOrderByMi7CodePromise,
   getOrdersByStaffPromise,
-  getOrderByStaffPromise
+  getOrderByStaffPromise,
+  GetUnCommonPayMethodPromise
 }
