@@ -63,6 +63,9 @@ Component({
     },
     getData() {
       var that = this
+      if (that.data.orderId == 0){
+        return
+      }
       data.getOrderByStaffPromise(that.data.orderId, app.globalData.sessionKey).then(function (order) {
         console.log('order', order)
         var totalCharge = order.paying_amount
