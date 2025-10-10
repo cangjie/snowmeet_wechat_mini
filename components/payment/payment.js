@@ -35,6 +35,15 @@ Component({
           that.setData({ othersPayMethods })
         })
       })
+    },
+    detached(){
+      console.log('payment detached')
+      var that = this
+      data.getOrderByStaffPromise(that.data.orderId, app.globalData.sessionKey).then(function (order) {
+        if (order.orderStatus != '支付成功'){
+          data.cancelPayingPromise(order.id, app.globalData.sessionKey)
+        }
+      })
     }
   },
   methods: {
@@ -119,6 +128,7 @@ Component({
       if (payMethod == '支付宝') {
         that.showAlipayQrCode()
       }
+      //that.triggerEvent('Order')
     },
     showWepayQrCode() {
       var that = this
@@ -133,11 +143,12 @@ Component({
           that.setData({ qrCodeUrl, subPayMethod: null })
           var setStatusUrl = app.globalData.requestPrefix + 'Order/LogShowWechatQrCode/' + payment.order_id.toString() + '?sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(setStatusUrl, null)
+          that.triggerEvent('OrderStatusChanged', updatedOrder)
+          that.initWebSocket()
         })
 
       })
     },
-    
     showAlipayQrCode() {
       var that = this
       that.setData({ paying: true })
@@ -151,6 +162,8 @@ Component({
           var qrTxt = resolve
           var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrTxt)
           that.setData({ qrCodeUrl, subPayMethod: null })
+          that.triggerEvent('OrderStatusChanged', resolve)
+          that.initWebSocket()
         })
       })
     },
@@ -212,10 +225,78 @@ Component({
         else{
           return subPayMethod
         }
-        
       }
       else {
         return payMethod
+      }
+    },
+    initWebSocket() {
+      var that = this
+      var socket = wx.connectSocket({
+        url: 'wss://' + app.globalData.domainName + '/ws',
+        header: { 'content-type': 'application/json' }
+      })
+      socket.isReplied = false
+      socket.onError((res) => {
+        that.socketError()
+      })
+      socket.onMessage((res) => {
+        that.socketMessage(res)
+      })
+      socket.onOpen((res) => {
+        console.log('socket open')
+        that.socketOpen(res)
+      })
+      socket.onClose((res) => {
+        that.socketClosed()
+      })
+      that.setData({ socket })
+    },
+    socketOpen(res) {
+      var that = this
+      app.globalData.isWebsocketOpen = true
+      var socket = that.data.socket
+      var socketCmd = {
+        command: 'orderpaid',
+        id: that.data.order.id
+      }
+      var cmdStr = JSON.stringify(socketCmd)
+      socket.send({
+        data: cmdStr,
+        success: (res) => {
+          console.log('send command', cmdStr)
+        }
+      })
+    },
+    socketError(res) {
+      console.log('socket error')
+    },
+    socketClosed() {
+      console.log('socket is closed')
+    },
+    socketMessage(res) {
+      console.log('message', res)
+      var that = this
+      var ret = JSON.parse(res.data)
+      if (ret.code == 0) {
+        var order = ret.data
+        console.log('paid order', order)
+        that.triggerEvent('OrderPaid', order)
+        that.closeSocket()
+      }
+    },
+    closeSocket() {
+      var that = this
+      var socket = that.data.socket
+      try {
+        socket.close({
+          success: () => {
+            console.log('socket will be closed')
+          }
+        })
+      }
+      catch {
+  
       }
     },
   },

@@ -20,4 +20,5 @@
     <view class="left-column" >【备注】</view>
     <view class="right-column" >{{order.retails[0].memo}}</view>
   </view>
+  <payment orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChange" ></payment>
 </view>

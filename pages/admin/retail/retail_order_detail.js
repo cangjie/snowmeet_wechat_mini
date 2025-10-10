@@ -86,5 +86,9 @@ Page({
       order.memberShip = memberShip
       that.setData({order})
     })
+  },
+  orderStatusChanged(){
+    var that = this
+    that.getData()
   }
 })

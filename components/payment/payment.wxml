@@ -1,7 +1,5 @@
 <view>
-  <view class="view-row">
-    <view class="left-column">【支付方式】</view>
-    <view class="right-column">
+  <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
       <radio-group class="view-row" bindchange="setPayMethod">
         <radio value="微信支付" checked="{{payMethod == '微信支付'}}" 
           disabled="{{paying || order.paying_amount == 0 || payMethod != null}}">微信</radio>
@@ -11,7 +9,6 @@
           disabled="{{paying || order.paying_amount == 0 || payMethod != null}}">其它</radio>
         <radio value="挂账" checked="{{payMethod == '挂账'}}" disabled="{{true}}">挂账</radio>
       </radio-group>
-    </view>
   </view>
   <view class="view-row" wx:if="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付' && payMethod != '挂账'}}" >
     <view class="left-column"></view>
@@ -34,8 +31,7 @@
   </view>
   <view class="view-row" style="justify-content: center;" >
       <van-button type="warning"  size="small" bind:click="reselectPaymethod" id="payMethod"
-      wx:if="{{(payMethod == '其它' || paying)}}"      
-      disabled="{{!paying && payMethod != '其它'}}" > 重 选 </van-button>
+      wx:if="{{(payMethod  || paying)}}"    > 重 选 </van-button>
     </view>
     <view style="height: 50rpx;"></view>
     <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
