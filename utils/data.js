@@ -360,7 +360,33 @@ const GetUnCommonPayMethodPromise = function () {
       reject(exp)
     })
   })
-
+}
+const updateOrderPromise = function(updatedOrder, scene, sessionKey) {
+  return new Promise(function (resolve, reject) {
+    var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+    util.performWebRequest(updateUrl, updatedOrder).then(function (order) {
+      console.log('pay method changed', order)
+      resolve(order)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const cancelPayingPromise = function(orderId, sessionKey) {
+  
+  return new Promise(function (resolve, reject){
+    var cancelUrl = app.globalData.requestPrefix + 'Order/CancelPaying/' + orderId.toString() + '?sessionKey=' + sessionKey
+    util.performWebRequest(cancelUrl, null).then(function (resovle){
+      if (resolve == null){
+        reject()
+      }
+      else{
+        resolve(resolve)
+      }
+    }).catch(function (reject){
+      reject(reject)
+    })
+  })
 }
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -390,5 +416,7 @@ module.exports = {
   getRetailOrderByMi7CodePromise,
   getOrdersByStaffPromise,
   getOrderByStaffPromise,
-  GetUnCommonPayMethodPromise
+  GetUnCommonPayMethodPromise,
+  updateOrderPromise,
+  cancelPayingPromise
 }

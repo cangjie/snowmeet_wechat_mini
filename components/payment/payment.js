@@ -56,7 +56,28 @@ Component({
       var that = this
       data.getOrderByStaffPromise(that.data.orderId, app.globalData.sessionKey).then(function (order) {
         console.log('order', order)
-        that.setData({ order })
+        var totalCharge = order.paying_amount
+        var payMethod = order.payMethod == null ? that.data.payMethod : order.payMethod
+        that.setData({ order, totalCharge, totalChargeStr: util.showAmount(totalCharge), payMethod })
+        switch(payMethod){
+          case '微信支付':
+            var paymentId = null
+            for(var i = 0; i < order.payments.length; i++){
+              var payment = order.payments[i]
+              if (payment.pay_method == '微信支付' && payment.valid == 1 && payment.status == '待支付'){
+                paymentId = payment.id
+              }
+            }
+            if (paymentId){
+              var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + paymentId.toString())
+              that.setData({ qrCodeUrl, subPayMethod: null, payMethod, paying: true })
+            }
+            break
+          case '支付宝':
+            break
+          default:
+            break
+        }
       })
     },
     setPayMethod(e) {
@@ -85,5 +106,118 @@ Component({
           break
       }
     },
-  }
+    cancelPayMethodInput(e) {
+      var that = this
+      that.setData({ subPayMethodIndex: null, disabledConfirmPaidButton: true })
+    },
+    showQrCode() {
+      var that = this
+      var payMethod = that.data.payMethod
+      if (payMethod == '微信支付') {
+        that.showWepayQrCode()
+      }
+      if (payMethod == '支付宝') {
+        that.showAlipayQrCode()
+      }
+    },
+    showWepayQrCode() {
+      var that = this
+      that.setData({ paying: true })
+      var order = that.data.order
+      order.valid = 1
+      order.recepting = 0
+      data.updateOrderPromise(order, '确认支付方式', app.globalData.sessionKey).then(function (updatedOrder) {
+        var payUrl = app.globalData.requestPrefix + 'Order/GetWepayPayment/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+        util.performWebRequest(payUrl, null).then(function (payment) {
+          var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + payment.id.toString())
+          that.setData({ qrCodeUrl, subPayMethod: null })
+          var setStatusUrl = app.globalData.requestPrefix + 'Order/LogShowWechatQrCode/' + payment.order_id.toString() + '?sessionKey=' + app.globalData.sessionKey
+          util.performWebRequest(setStatusUrl, null)
+        })
+
+      })
+    },
+    
+    showAlipayQrCode() {
+      var that = this
+      that.setData({ paying: true })
+      var order = that.data.order
+      order.valid = 1
+      order.recepting = 0
+      data.updateOrderPromise(order, '确认支付方式', app.globalData.sessionKey).then(function (resolve) {
+        var getUrl = app.globalData.requestPrefix + 'Order/GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+        util.performWebRequest(getUrl, null).then(function (resolve) {
+          console.log('get ali qr', resolve)
+          var qrTxt = resolve
+          var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrTxt)
+          that.setData({ qrCodeUrl, subPayMethod: null })
+        })
+      })
+    },
+    reselectPaymethod(e){
+      var that = this
+      wx.showToast({
+        title: '请稍候…',
+        icon: 'loading'
+      })
+      data.cancelPayingPromise(that.data.order.id, app.globalData.sessionKey).then(function (order){
+        console.log('order canceled', order)
+        that.setData({paying: false, editingPayMethod: true, payMethod: null, subPayMethod: null, inputPayMethod: null, qrCodeUrl: null})
+      }).catch(function (exp){})
+    },
+    placeUnneedPayOrderConfirm(e){
+      var that = this
+      wx.showModal({
+        title: '确认收款',
+        content: '确认顾客已经成功支付。',
+        complete: (res) => {
+          if (res.cancel) {
+  
+          }
+          if (res.confirm) {
+            that.placeUnneedPayOrder(e)
+          }
+        }
+      })
+    },
+    placeUnneedPayOrder(e) {
+      var that = this
+      var order = that.data.order
+      var payMethod = that.getPayMethod()
+      console.log('pay method', payMethod)
+      
+      if (!payMethod) {
+        wx.showToast({
+          title: '必须选择支付方式',
+          icon: 'error'
+        })
+        return
+      }
+      var effectUrl = app.globalData.requestPrefix + 'Order/EffectUnpaidOrder/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+      effectUrl = effectUrl + '&payMethod=' + payMethod + '&payLater=false'
+      util.performWebRequest(effectUrl, null).then(function (resolve) {
+        console.log('paid order', resolve)
+        that.setData({ paying: false })
+      })
+    },
+    getPayMethod(e){
+      var that = this
+      var payMethod = that.data.payMethod
+      if (payMethod == '其它'){
+        var subPayMethod = that.data.subPayMethod
+        var subPayMethodIndex = that.data.subPayMethodIndex
+        if (subPayMethodIndex == that.data.othersPayMethods.length - 1){
+          return that.data.inputedPayMethod
+        }
+        else{
+          return subPayMethod
+        }
+        
+      }
+      else {
+        return payMethod
+      }
+    },
+  },
+  
 })

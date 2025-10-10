@@ -360,9 +360,9 @@ Page({
     var order = that.data.order
     return new Promise(function (resolve, reject) {
       var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + app.globalData.sessionKey
-      util.performWebRequest(updateUrl, order).then(function (resovle) {
+      util.performWebRequest(updateUrl, order).then(function (order) {
         console.log('pay method changed', resovle)
-        resolve(resolve)
+        resolve(order)
       }).catch(function (reject) {
         reject()
       })
@@ -504,7 +504,6 @@ Page({
     if (payMethod == '支付宝') {
       that.showAlipayQrCode()
     }
- 
   },
   showWepayQrCode() {
     var that = this
