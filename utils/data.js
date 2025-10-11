@@ -373,7 +373,6 @@ const updateOrderPromise = function(updatedOrder, scene, sessionKey) {
   })
 }
 const cancelPayingPromise = function(orderId, sessionKey) {
-  
   return new Promise(function (resolve, reject){
     var cancelUrl = app.globalData.requestPrefix + 'Order/CancelPaying/' + orderId.toString() + '?sessionKey=' + sessionKey
     util.performWebRequest(cancelUrl, null).then(function (resovle){

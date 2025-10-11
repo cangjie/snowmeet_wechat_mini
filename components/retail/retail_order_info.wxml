@@ -20,5 +20,6 @@
     <view class="left-column" >【备注】</view>
     <view class="right-column" >{{order.retails[0].memo}}</view>
   </view>
-  <payment wx:if="{{order.id > 0}}" orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChange" ></payment>
+  <payment wx:if="{{order.id > 0}}" orderId="{{order.id}}" 
+    bindOrderStatusChanged="orderStatusChange" bindOrderPaidResult="dealPaidResult" ></payment>
 </view>

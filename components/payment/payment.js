@@ -78,6 +78,7 @@ Component({
               var payment = order.payments[i]
               if (payment.pay_method == '微信支付' && payment.valid == 1 && payment.status == '待支付'){
                 paymentId = payment.id
+                break
               }
             }
             if (paymentId){
@@ -86,6 +87,19 @@ Component({
             }
             break
           case '支付宝':
+            var currentPayment = null
+            for(var i = 0; i < order.payments.length; i++){
+              var payment = order.payments[i]
+              if (payment.pay_method == '支付宝' && payment.valid == 1 && payment.status == '待支付'){
+                currentPayment = payment
+                break
+              }
+            }
+            if (paymentId){
+              var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' 
+                + encodeURIComponent(currentPayment.ali_qr_code)
+              that.setData({ qrCodeUrl, subPayMethod: null, payMethod, paying: true })
+            }
             break
           default:
             break
@@ -284,7 +298,7 @@ Component({
       if (ret.code == 0) {
         var order = ret.data
         console.log('paid order', order)
-        that.triggerEvent('OrderPaid', order)
+        that.triggerEvent('OrderPaidResult', order)
         that.closeSocket()
       }
     },

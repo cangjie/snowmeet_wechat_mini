@@ -80,7 +80,7 @@ Page({
       if (order.member && order.member.following_wechat == 1){
         memberShip = '会员'
       }
-      else if (member){
+      else if (order.member){
         memberShip = '散客(取关)'
       }
       order.memberShip = memberShip
@@ -90,5 +90,18 @@ Page({
   orderStatusChanged(){
     var that = this
     that.getData()
+  },
+  dealPaidResult(e){
+    var that = this
+    var order = e.detail
+    var paid = util.orderPaid(order)
+    if (paid){
+      wx.showToast({
+        title: '支付成功',
+        icon:'success'
+      })
+      that.getData()
+    }
+    console.log('paid', paid)
   }
 })

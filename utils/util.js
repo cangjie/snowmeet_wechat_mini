@@ -263,6 +263,14 @@ const checkRentalsWellForm = function(rentals){
   }
   return well
 }
+const orderPaid = function (order){
+  if (order.paidAmount > 0){
+    return true
+  }
+  else{
+    return false
+  }
+}
 module.exports = {
   formatDateTime: formatDateTime,
   formatDate: formatDate,
@@ -280,5 +288,6 @@ module.exports = {
   isWeekend,
   createRentalDetail,
   getRentPrice,
-  checkRentalsWellForm
+  checkRentalsWellForm,
+  orderPaid
 }

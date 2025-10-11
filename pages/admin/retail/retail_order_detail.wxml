@@ -93,7 +93,7 @@
   </mp-cells>
   <mp-cells title="支付" wx:if="{{order.orderStatus == '待生成' || order.orderStatus == '待支付'}}" >
     <mp-cell>
-      <payment orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChanged" ></payment>
+      <payment orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult" ></payment>
     </mp-cell>
   </mp-cells>
 </view>

@@ -40,6 +40,19 @@ Component({
    * Component methods
    */
   methods: {
-
+    dealPaidResult() {
+      var that = this
+      var order = e.detail
+      var paid = util.orderPaid(order)
+      if (paid) {
+        wx.showToast({
+          title: '支付成功',
+          icon: 'success'
+        })
+        wx.navigateTo({
+          url: '../../pages/admin/retail/retail_order_detail?id=' + order.id
+        })
+      }
+    }
   }
 })
