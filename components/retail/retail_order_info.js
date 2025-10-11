@@ -40,19 +40,20 @@ Component({
    * Component methods
    */
   methods: {
-    dealPaidResult() {
+    dealPaidResult(e) {
       var that = this
-      var order = e.detail
-      var paid = util.orderPaid(order)
-      if (paid) {
-        wx.showToast({
-          title: '支付成功',
-          icon: 'success'
-        })
-        wx.navigateTo({
-          url: '../../pages/admin/retail/retail_order_detail?id=' + order.id
-        })
-      }
+      var orderId = e.detail.id
+      data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
+        var paid = util.orderPaid(order)
+        if (paid) {
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success'
+          })
+          that.triggerEvent('Jump', { url: '/pages/admin/retail/retail_order_detail?id=' + order.id })
+        }
+      })
+
     }
   }
 })

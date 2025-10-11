@@ -19,6 +19,6 @@
   bind:close="onPopClose" close-icon="close" />
   <van-popup show="{{ showOrderInfo }}" position="bottom" custom-style="height: 80%;" 
   bind:close="onPopOrderInfoClose" close-icon="close" >
-    <retail-order-info wx:if="{{bizType=='retail' && order}}" order="{{order}}" ></retail-order-info>
+    <retail-order-info wx:if="{{bizType=='retail' && order}}" order="{{order}}" bindJump="jump" ></retail-order-info>
   </van-popup>
 </view>

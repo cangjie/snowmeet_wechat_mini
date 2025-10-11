@@ -223,11 +223,17 @@ Component({
         })
         return
       }
+      wx.showToast({
+        title: '请稍候',
+        icon:'loading'
+      })
+      that.setData({disabledConfirmPaidButton: true})
       var effectUrl = app.globalData.requestPrefix + 'Order/EffectUnpaidOrder/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
       effectUrl = effectUrl + '&payMethod=' + payMethod + '&payLater=false'
       util.performWebRequest(effectUrl, null).then(function (resolve) {
         console.log('paid order', resolve)
         that.setData({ paying: false })
+        that.triggerEvent('OrderPaidResult', resolve)
       })
     },
     getPayMethod(e){

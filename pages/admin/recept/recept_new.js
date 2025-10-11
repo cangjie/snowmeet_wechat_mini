@@ -292,5 +292,11 @@ Page({
     var that = this
     that.setData({bizType: null, order: e.detail})
     that.setData({bizType: 'retail', showOrderInfo: true})
+  },
+  jump(e){
+    var url = e.detail.url
+    wx.navigateTo({
+      url: url,
+    })
   }
 })

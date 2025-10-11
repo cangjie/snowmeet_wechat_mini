@@ -59,7 +59,7 @@
         <view class="right-column" >{{order.haveEntertain == 1? '是' : '否'}}</view>
       </view>
     </mp-cell>
-    <mp-cell>
+    <mp-cell wx:if="{{order.paying_amount}}" >
       <view class="view-row"  >
         <view class="left-column" >【支付金额】</view>
         <view class="right-column" >
@@ -73,6 +73,19 @@
         </view>
       </view>
     </mp-cell>
+    <mp-cell wx:else >
+      <view class="view-row"  >
+        <view class="left-column" >【订单金额】</view>
+        <view class="right-column" >
+          <block wx:if="{{order.haveEntertain == 1}}" >
+            ¥0.00
+          </block>
+          <block wx:else >
+            {{order.totalAmountStr}}
+          </block>
+        </view>
+      </view>
+    </mp-cell>
     <mp-cell>
       <view class="view-row"  >
         <view class="left-column" >【备注】</view>
@@ -80,7 +93,7 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="view-row"  >
+      <view class="view-row"   >
         <view class="left-column" >【订单状态】</view>
         <view class="right-column" >{{order.orderStatus}}</view>
       </view>

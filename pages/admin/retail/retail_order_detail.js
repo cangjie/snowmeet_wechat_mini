@@ -16,8 +16,8 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({id: options.id})
-    
+    that.setData({ id: options.id })
+
   },
 
   /**
@@ -32,7 +32,7 @@ Page({
    */
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function(resolve){
+    app.loginPromiseNew.then(function (resolve) {
       that.getData()
     })
   },
@@ -71,37 +71,39 @@ Page({
   onShareAppMessage() {
 
   },
-  getData(){
+  getData() {
     var that = this
     var orderId = that.data.id
-    data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order){
+    data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
       console.log('get order', order)
       var memberShip = '散客'
-      if (order.member && order.member.following_wechat == 1){
+      if (order.member && order.member.following_wechat == 1) {
         memberShip = '会员'
       }
-      else if (order.member){
+      else if (order.member) {
         memberShip = '散客(取关)'
       }
       order.memberShip = memberShip
-      that.setData({order})
+      order.totalAmountStr = util.showAmount(order.total_amount)
+      that.setData({ order })
     })
   },
-  orderStatusChanged(){
+  orderStatusChanged() {
     var that = this
     that.getData()
   },
-  dealPaidResult(e){
+  dealPaidResult(e) {
     var that = this
-    var order = e.detail
-    var paid = util.orderPaid(order)
-    if (paid){
-      wx.showToast({
-        title: '支付成功',
-        icon:'success'
-      })
-      that.getData()
-    }
-    console.log('paid', paid)
+    var orderId = e.detail.id
+    data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
+      var paid = util.orderPaid(order)
+      if (paid) {
+        wx.showToast({
+          title: '支付成功',
+          icon: 'success'
+        })
+        that.getData()
+      }
+    })
   }
 })
