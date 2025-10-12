@@ -5,7 +5,7 @@
         {
           "name": "顾客支付",
           "pathName": "pages/order/payment_entry",
-          "query": "paymentId=32579",
+          "query": "paymentId=32618",
           "scene": null,
           "launchMode": "default"
         },

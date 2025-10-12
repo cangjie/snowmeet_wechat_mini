@@ -83,7 +83,7 @@ Component({
             }
             if (paymentId){
               var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + paymentId.toString())
-              that.setData({ qrCodeUrl, subPayMethod: null, payMethod, paying: true })
+              that.setData({ qrCodeUrl, subPayMethod: null, payMethod, paying: true, paymentId })
             }
             break
           case '支付宝':
@@ -98,7 +98,7 @@ Component({
             if (paymentId){
               var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' 
                 + encodeURIComponent(currentPayment.ali_qr_code)
-              that.setData({ qrCodeUrl, subPayMethod: null, payMethod, paying: true })
+              that.setData({ qrCodeUrl, subPayMethod: null, payMethod, paying: true, paymentId })
             }
             break
           default:
@@ -156,12 +156,14 @@ Component({
       data.updateOrderPromise(order, '确认支付方式', app.globalData.sessionKey).then(function (updatedOrder) {
         var payUrl = app.globalData.requestPrefix + 'Order/GetWepayPayment/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
         util.performWebRequest(payUrl, null).then(function (payment) {
+          that.setData({paymentId: payment.id})
           var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/payment_entry?paymentId=' + payment.id.toString())
           that.setData({ qrCodeUrl, subPayMethod: null })
           var setStatusUrl = app.globalData.requestPrefix + 'Order/LogShowWechatQrCode/' + payment.order_id.toString() + '?sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(setStatusUrl, null)
           that.triggerEvent('OrderStatusChanged', updatedOrder)
           that.initWebSocket()
+
         })
 
       })
@@ -174,11 +176,11 @@ Component({
       order.recepting = 0
       data.updateOrderPromise(order, '确认支付方式', app.globalData.sessionKey).then(function (resolve) {
         var getUrl = app.globalData.requestPrefix + 'Order/GetAlipayPaymentQrCode/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
-        util.performWebRequest(getUrl, null).then(function (resolve) {
-          console.log('get ali qr', resolve)
-          var qrTxt = resolve
+        util.performWebRequest(getUrl, null).then(function (payment) {
+          console.log('get ali qr', payment)
+          var qrTxt = payment.ali_qr_code
           var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrTxt)
-          that.setData({ qrCodeUrl, subPayMethod: null })
+          that.setData({ qrCodeUrl, subPayMethod: null, paymentId: payment.id })
           that.triggerEvent('OrderStatusChanged', resolve)
           that.initWebSocket()
         })
@@ -280,8 +282,8 @@ Component({
       app.globalData.isWebsocketOpen = true
       var socket = that.data.socket
       var socketCmd = {
-        command: 'orderpaid',
-        id: that.data.order.id
+        command: 'paymentpaid',
+        id: that.data.paymentId
       }
       var cmdStr = JSON.stringify(socketCmd)
       socket.send({
