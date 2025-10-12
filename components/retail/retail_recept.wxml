@@ -2,7 +2,7 @@
   <view class="view-row" >
     <view class="left-column" >【支付金额】</view>
     <view class="right-column" >
-      <input type="number" style="width: 100rpx;" class="input" 
+      <input type="digit" style="width: 100rpx;" class="input" 
       value="{{order.retails[0].deal_price}}" id="deal_price" bindinput="setInput"  />
     </view>
   </view>

@@ -18,11 +18,15 @@ Page({
     var paymentId = options.paymentId
     var that = this
     that.setData({paymentId})
+    if (options.q != undefined){
+      var url = decodeURIComponent(options.q)
+      console.log('scan url', url)
+      var urlArr = url.split('?')
+      var queryStr = urlArr[urlArr.length - 1]
+      paymentId = parseInt(queryStr.replace('paymentId=', ''))
+      that.setData({paymentId})
+    }
   },
-
-  /**
-   * Lifecycle function--Called when page is initially rendered
-   */
   onReady() {
 
   },

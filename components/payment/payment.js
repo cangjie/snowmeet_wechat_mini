@@ -156,7 +156,7 @@ Component({
       data.updateOrderPromise(order, '确认支付方式', app.globalData.sessionKey).then(function (updatedOrder) {
         var payUrl = app.globalData.requestPrefix + 'Order/GetWepayPayment/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
         util.performWebRequest(payUrl, null).then(function (payment) {
-          var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/order_entry/' + payment.id.toString())
+          var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent('https://mini.snowmeet.top/mapp/order/payment_entry?paymentId=' + payment.id.toString())
           that.setData({ qrCodeUrl, subPayMethod: null })
           var setStatusUrl = app.globalData.requestPrefix + 'Order/LogShowWechatQrCode/' + payment.order_id.toString() + '?sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(setStatusUrl, null)
