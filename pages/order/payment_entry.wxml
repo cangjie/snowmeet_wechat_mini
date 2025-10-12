@@ -1,0 +1,37 @@
+<view>
+  <view wx:if="{{order}}" >
+    <view class="view-row" >
+      <view class="left-column" >【店铺】</view>
+      <view class="right-column" >{{order.shop}}</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >【订单号】</view>
+      <view class="right-column" >{{order.code}}</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >【日期】</view>
+      <view class="right-column" >{{order.dataStr}}</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >【时间】</view>
+      <view class="right-column" >{{order.timeStr}}</view>
+    </view>
+    <view class="view-row" >
+      <view class="left-column" >【订单号】</view>
+      <view class="right-column" >{{order.code}}</view>
+    </view>
+    <view class="view-row" wx:if="{{order.orderStatus != '支付成功'}}" >
+      <view class="left-column" >【支付金额】</view>
+      <view class="right-column" >{{order.paying_amountStr}}</view>
+    </view>
+    <view class="view-row" wx:else >
+      <view class="left-column" >【支付金额】</view>
+      <view class="right-column" >{{order.paidAmountStr}}</view>
+    </view>
+    <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
+      <van-button wx:if="{{payment.status=='待支付'}}" type="primary"  
+        bind:click="pay" disabled="{{!payment || paying}}" > 敬 请 支 付 </van-button>
+      <view wx:if="{{order.orderStatus=='支付成功'}}" style="text-align: center;font-size: 14pt;color: red" > 支 付 成 功 </view>
+    </view>
+  </view>
+</view>

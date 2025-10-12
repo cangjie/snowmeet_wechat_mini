@@ -132,7 +132,8 @@
     "pages/register/reg",
     "pages/admin/recept/rent_recepting_list",
     "pages/admin/retail/retail_order_list",
-    "pages/admin/retail/retail_order_detail"
+    "pages/admin/retail/retail_order_detail",
+    "pages/order/payment_entry"
   ],
   "window": {
     "backgroundTextStyle": "light",

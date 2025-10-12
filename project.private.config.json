@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "顾客支付",
+          "pathName": "pages/order/payment_entry",
+          "query": "paymentId=32579",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "散客接待",
           "pathName": "pages/admin/recept/recept_member_info",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "个人优惠券",
