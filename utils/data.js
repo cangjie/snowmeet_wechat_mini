@@ -397,6 +397,16 @@ const getOrderFromPaymentByCustomer = function (paymentId, sessionKey){
     })
   })
 }
+const updateOrderWithDetailPromise = function (order, scene, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderWithDetailByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(updateUrl, order).then(function (order){
+      resolve(order)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -428,5 +438,6 @@ module.exports = {
   GetUnCommonPayMethodPromise,
   updateOrderPromise,
   cancelPayingPromise,
-  getOrderFromPaymentByCustomer
+  getOrderFromPaymentByCustomer,
+  updateOrderWithDetailPromise
 }

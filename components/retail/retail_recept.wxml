@@ -33,7 +33,7 @@
     </view>
   </view>
   <van-divider></van-divider>
-  <view class="view-row" >
+  <!--view class="view-row" >
     <view class="left-column" >【招待】</view>
     <view class="right-column" >
       <checkbox-group bindchange="checkChanged" id="entertain" >
@@ -41,7 +41,7 @@
       </checkbox-group>
     </view>
   </view>
-  <van-divider></van-divider>
+  <van-divider></van-divider-->
   <view class="view-row" >
     <view class="left-column" >【备注】</view>
     <view class="right-column" >

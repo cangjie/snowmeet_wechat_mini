@@ -15,12 +15,7 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    var that = this
-    that.data.startDate = new Date("2025-10-1")
-    that.data.endDate = new Date("2026-12-31")
-    app.loginPromiseNew.then(function (resolve){
-      that.getData()
-    })
+    
 
   },
 
@@ -35,7 +30,12 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    var that = this
+    that.data.startDate = new Date("2025-10-1")
+    that.data.endDate = new Date("2026-12-31")
+    app.loginPromiseNew.then(function (resolve){
+      that.getData()
+    })
   },
 
   /**

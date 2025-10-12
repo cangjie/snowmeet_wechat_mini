@@ -105,5 +105,87 @@ Page({
         that.getData()
       }
     })
+  },
+  modContactInfo(e){
+    var that = this
+    that.setData({moddingContactInfo: true})
+  },
+  cancelModContactInfo(e){
+    var that = this
+    that.getData()
+    that.setData({moddingContactInfo: false})
+  },
+  inputContactInfo(e){
+    var that = this
+    var id = e.currentTarget.id
+    var order = that.data.order
+    var value = e.detail.value
+    switch(id){
+      case 'contact_name':
+        order.contact_name = value
+        break
+      case 'contact_gender':
+        order.contact_gender = value
+        break
+      case 'contact_num':
+        order.contact_num = value
+        break
+      default:
+        break
+    }
+  },
+  confirmModContactInfo(e){
+    var that = this
+    var order = that.data.order
+    data.updateOrderPromise(order, '零售详细页面修改订单', app.globalData.sessionKey).then(function (order){
+      that.setData({order})
+      that.cancelModContactInfo(e)
+    })
+  },
+  modOrderInfo(e){
+    var that = this
+    that.setData({moddingOrderInfo: true})
+  },
+  cancelModOrderInfo(e){
+    var that = this
+    that.getData()
+    that.setData({moddingOrderInfo: false})
+  },
+  inputOrderInfo(e){
+    var that = this
+    var id = e.currentTarget.id
+    var order = that.data.order
+    var value = e.detail.value
+    switch(id){
+      case 'paying_amount':
+        if (!isNaN(value)){
+          order.paying_amount = parseFloat(value)
+          order.total_amount = parseFloat(value)
+          order.retails[0].deal_price = parseFloat(value)
+        }
+        break
+      case 'memo':
+        order.retails[0].memo = value
+        break
+      case 'mi7_code':
+        if (value == ''){
+          order.retails[0].mi7_code = null
+        }
+        else{
+          order.retails[0].mi7_code = value
+        }
+        break
+      default:
+        break
+    }
+  },
+  confirmModOrderInfo(e){
+    var that = this
+    var order = that.data.order
+    data.updateOrderWithDetailPromise(order, '零售详情页修改', app.globalData.sessionKey).then(function (order){
+      console.log('order update', order)
+      that.cancelModOrderInfo(e)
+    })
   }
+
 })

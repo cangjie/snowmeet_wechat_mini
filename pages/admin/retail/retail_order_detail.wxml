@@ -4,7 +4,7 @@
       <view class="view-row"  >
         <view class="left-column" style="width: 140rpx;" >【姓名】</view>
         <view class="right-column" style="width: 200rpx;" >
-          <input class="input" disabled="{{!moddingContactInfo}}" 
+          <input class="input" disabled="{{!moddingContactInfo}}"  id="contact_name" bindinput="inputContactInfo"
             value="{{order.contact_name}}" style="width: 150rpx;text-align: center;" />
         </view>
         <view class="left-column" style="width: 140rpx;" >【状态】</view>
@@ -15,21 +15,29 @@
       <view class="view-row"  >
         <view class="left-column" style="width: 140rpx;" >【性别】</view>
         <view class="right-column view-row" style="width: 200rpx;" >
-          <radio-group>
-            <radio disabled="{{!moddingContactInfo}}" checked="{{order.contact_gender == '男'}}" >男</radio>
-            <radio disabled="{{!moddingContactInfo}}" checked="{{order.contact_gender == '女'}}" >女</radio>
+          <radio-group id="contact_gender" bindchange="inputContactInfo"  >
+            <radio disabled="{{!moddingContactInfo}}" 
+              checked="{{order.contact_gender == '男'}}" value="男" >男</radio>
+            <radio disabled="{{!moddingContactInfo}}" 
+              checked="{{order.contact_gender == '女'}}" value="女" >女</radio>
           </radio-group>
         </view>
         <view class="left-column" style="width: 140rpx;" >【手机号】</view>
         <view class="right-column" >
-          <input class="input" disabled="{{!moddingContactInfo}}" 
-            value="{{order.contact_num}}" style="width: 160rpx;" />
+          <input class="input" disabled="{{!moddingContactInfo}}" id="contact_num"
+            value="{{order.contact_num}}" style="width: 160rpx;" bindinput="inputContactInfo" />
         </view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" style="justify-content: center;"  >
-        <van-button type="primary" size="small" > 修 改 </van-button>
+        <block wx:if="{{moddingContactInfo}}" >
+          <van-button type="warning" size="small" bind:click="cancelModContactInfo" 
+            style="margin-right: 50rpx;" > 取 消 </van-button>
+          <van-button type="danger" size="small" bind:click="confirmModContactInfo"  
+            style="margin-left: 50rpx;" > 确 认 </van-button>
+        </block>
+        <van-button wx:else type="primary" size="small" bind:click="modContactInfo" > 修 改 </van-button>
       </view>
     </mp-cell>
   </mp-cells>
@@ -45,7 +53,8 @@
         <view class="left-column" >【七色米单号】</view>
         <view class="right-column" >
           <block wx:if="{{order.retails[0].mi7_code || moddingOrderInfo}}" >
-            <input class="input" style="width: 180rpx;" value="{{order.retails[0].mi7_code}}" />
+            <input class="input" style="width: 260rpx;text-align: center;" id="mi7_code" 
+            value="{{order.retails[0].mi7_code}}" bindinput="inputOrderInfo" disabled="{{!moddingOrderInfo}}" />
           </block>
           <block wx:else >
             紧急开单
@@ -67,8 +76,8 @@
             ¥0.00
           </block>
           <block wx:else >
-            <input class="input" style="width: 100rpx;text-align: center;" 
-            value="{{order.paying_amount}}" disabled="{{!moddingOrderInfo}}" />
+            <input class="input" style="width: 100rpx;text-align: center;" type="digit" bindinput="inputOrderInfo"
+            value="{{order.paying_amount}}" disabled="{{!moddingOrderInfo}}" id="paying_amount"  />
           </block>
         </view>
       </view>
@@ -89,7 +98,10 @@
     <mp-cell>
       <view class="view-row"  >
         <view class="left-column" >【备注】</view>
-        <view class="right-column" >{{order.retails[0].memo}}</view>
+        <view class="right-column" >
+          <textarea style="width: 400rpx;height: 200rpx;" class="input" disabled="{{!moddingOrderInfo}}"  
+          id="memo" bindinput="inputOrderInfo" value="{{order.retails[0].memo}}" ></textarea>
+        </view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -100,7 +112,13 @@
     </mp-cell>
     <mp-cell>
       <view class="view-row" style="justify-content: center;"  >
-        <van-button type="primary" size="small" > 修 改 </van-button>
+        <block wx:if="{{moddingOrderInfo}}" >
+          <van-button type="warning" size="small" bind:click="cancelModOrderInfo" 
+            style="margin-right: 50rpx;" > 取 消 </van-button>
+          <van-button type="danger" size="small" bind:click="confirmModOrderInfo"  
+            style="margin-left: 50rpx;" > 确 认 </van-button>
+        </block>
+        <van-button wx:else type="primary" size="small" bind:click="modOrderInfo" > 修 改 </van-button>
       </view>
     </mp-cell>
   </mp-cells>
