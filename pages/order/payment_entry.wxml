@@ -16,10 +16,6 @@
       <view class="left-column" >【时间】</view>
       <view class="right-column" >{{order.timeStr}}</view>
     </view>
-    <view class="view-row" >
-      <view class="left-column" >【订单号】</view>
-      <view class="right-column" >{{order.code}}</view>
-    </view>
     <view class="view-row" wx:if="{{order.orderStatus != '支付成功'}}" >
       <view class="left-column" >【支付金额】</view>
       <view class="right-column" >{{order.paying_amountStr}}</view>
