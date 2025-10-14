@@ -407,6 +407,16 @@ const updateOrderWithDetailPromise = function (order, scene, sessionKey){
     })
   })
 }
+const getEquipBrandsPromise = function(type){
+  var getUrl = app.globalData.requestPrefix + 'Care/GetBrands?type=' + encodeURIComponent(type)
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (brandList){
+      resolve(brandList)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -439,5 +449,6 @@ module.exports = {
   updateOrderPromise,
   cancelPayingPromise,
   getOrderFromPaymentByCustomer,
-  updateOrderWithDetailPromise
+  updateOrderWithDetailPromise,
+  getEquipBrandsPromise
 }

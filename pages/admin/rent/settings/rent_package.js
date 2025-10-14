@@ -41,28 +41,7 @@ Page({
     var changedCategories = that.data.changedCategories
     changedCategories.push(e.detail)
     that.setData({changedCategories})
-    /*
-    var act = e.detail.checked ? 'Add' : 'Del'
-    var that = this
-    var setUrl = 'https://' + app.globalData.domainName + '/api/Rent/RentPackageCategory'
-      + act + '/' + that.data.rentPackage.id + '?categoryId=' + e.detail.id
-      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-    wx.request({
-      url: setUrl,
-      method: 'GET',
-      success: (res) => {
-        if (res.statusCode != 200) {
-          wx.showToast({
-            title: '报错失败',
-            icon: 'error'
-          })
-          return
-        }
-        that.getPackage()
-      }
-    })
-    */
+    
   },
 
   getDataTree() {

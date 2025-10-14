@@ -206,33 +206,7 @@ Page({
       }
     })
   },
-  /*
-  getScore() {
-    var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsSummary?openId=' + that.data.openId + '&openIdType=snowmeet_mini'
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success: (res) => {
-        if (res.statusCode != 200) {
-          return
-        }
-        that.setData({ score: res.data })
-        getUrl = 'https://' + app.globalData.domainName + '/core/Point/GetUserPointsTotalEarned?openId=' + that.data.openId + '&openIdType=snowmeet_mini'
-        wx.request({
-          url: getUrl,
-          method: 'GET',
-          success: (res) => {
-            if (res.statusCode != 200) {
-              return
-            }
-            that.setData({ totalScore: res.data })
-          }
-        })
-      }
-    })
-  },
-  */
+  
   shopSelected(e) {
     console.log('shop selected', e)
     var that = this
@@ -241,21 +215,9 @@ Page({
     var care = e.detail.care 
     var rent = e.detail.rent
     var restuarant = e.detail.restuarant
-    that.setData({ shop: e.detail.shop, sale, care, rent, restuarant})
+    that.setData({ shop, sale, care, rent, restuarant})
   },
-  /*
-  gotoFlow(e) {
-    var that = this
-    var id = e.currentTarget.id
-    var naviUrl = 'verify_items?memberId=' + that.data.memberId + '&type=' + id
-    if (id == 'sale') {
-      naviUrl = 'recept_new?type=' + id + '&memberId=' + that.data.memberId
-    }
-    wx.navigateTo({
-      url: naviUrl,
-    })
-  },
-  */
+  
   gotoFlow(e){
     var that = this
     var memberId = that.data.memberId

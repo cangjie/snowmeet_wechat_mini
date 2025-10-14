@@ -6,6 +6,7 @@
     <rent-recept wx:if="{{bizType == 'rent'}}" memberId="{{memberId}}" shop="{{shop}}" bindSyncRentData="rentDataUpdated" rentals="{{rentals}}"  ></rent-recept>
     <retail-recept wx:if="{{bizType == 'retail' }}" memberId="{{memberId}}" 
     shop="{{shop}}"  bindSyncRetailOrder="retailOrderUpdate" order="{{retailOrder}}" ></retail-recept>
+    <care-recept wx:if="{{bizType == 'care'}}" order="{{careOrder}}" ></care-recept>
   </view>
   <view style="height: 200rpx;">
     <van-goods-action>

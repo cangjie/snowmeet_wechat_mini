@@ -1,0 +1,50 @@
+<view>
+  <view class="view-row" >
+    <view class="left-column" >【类型】</view>
+    <view class="right-column view-row" >
+      <radio-group class="view-row" bindchange="setValue" id="equipment" >
+        <radio value="双板" checked="{{care.equipment == '双板'}}" >双板</radio>
+        <radio value="单板" style="margin-left: 66rpx;" checked="{{care.equipment == '单板'}}" >单板</radio>
+      </radio-group>
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【照片】</view>
+    <view class="right-column" >
+      <van-uploader file-list="{{[]}}" bind:after-read="afterRead" />
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【品牌】</view>
+    <view class="right-column" ></view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【长度】</view>
+    <view class="right-column" ></view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【项目】</view>
+    <view class="right-column" ></view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【收费】</view>
+    <view class="right-column" ></view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【其它】</view>
+    <view class="right-column" ></view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【附加费】</view>
+    <view class="right-column" ></view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【总计】</view>
+    <view class="right-column" ></view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【备注】</view>
+    <view class="right-column" ></view>
+  </view>
+
+</view>
