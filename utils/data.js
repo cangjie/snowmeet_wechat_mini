@@ -417,6 +417,22 @@ const getEquipBrandsPromise = function(type){
     })
   })
 }
+const uploadFilePromise = function(filePath, purpose, type, sessionKey){
+  var uploadUrl = 'https://snowmeet.wanlonghuaxue.com/api/UploadFile/UploadFile?sessionKey=' + sessionKey + '&purpose=' + encodeURIComponent(purpose) + '&type=' + encodeURIComponent(type)
+  return new Promise(function (resolve, reject){
+    wx.uploadFile({
+      filePath: filePath,
+      name: type,
+      url: uploadUrl,
+      success:(res)=>{
+        console.log('upload success', res)
+      },
+      fail:(res)=>{
+        console.log('upload failed', res)
+      }
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -450,5 +466,6 @@ module.exports = {
   cancelPayingPromise,
   getOrderFromPaymentByCustomer,
   updateOrderWithDetailPromise,
-  getEquipBrandsPromise
+  getEquipBrandsPromise,
+  uploadFilePromise
 }
