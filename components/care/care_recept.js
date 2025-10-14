@@ -14,7 +14,9 @@ Component({
    * Component initial data
    */
   data: {
-    care:{}
+    care:{},
+    brandSelectIndex: null,
+    brandList: []
   },
   lifetimes:{
     ready(){
@@ -54,6 +56,18 @@ Component({
       switch(id){
         case 'equipment':
           care.equipment = value
+          var brandList = []
+          switch(value){
+            case '单板':
+              brandList = that.data.boardBrandList
+              break
+            case '双板':
+              brandList = that.data.skiBrandList
+              break
+            default:
+              break
+          }
+          that.setData({brandSelectIndex: null, brandList})
           break
       }
     },
@@ -84,14 +98,6 @@ Component({
           data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
             .then(function (uploadThumbFile){
               console.log('thumb uploaded', uploadThumbFile)
-              /*
-              var care = that.data.care
-              var images = care.careImages
-              for(var i = 0; i < images.length; i++){
-                var image = images[i]
-                if (image.tempFilePath == )
-              }
-              */
              image.url = uploadThumbFile.thumbUrl
              image.status = 'success'
              that.buildImages()
