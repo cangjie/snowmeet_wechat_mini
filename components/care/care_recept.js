@@ -25,6 +25,7 @@ Component({
       data.getEquipBrandsPromise('双板').then(function (list){
         that.setData({boardBrandList: list})
       })
+      
       if (that.properties.care){
         that.setData({care: that.properties.care})
       }
@@ -32,6 +33,9 @@ Component({
         that.setData({care: {}})
         that.buildImages()
       }
+      app.loginPromiseNew.then(function (resolve){
+        
+      })
     }
   },
 
@@ -74,6 +78,27 @@ Component({
       }
       images.push(image)
       that.buildImages()
+      data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey )
+        .then(function  (uploadedFile){
+          console.log('file uploaded', uploadedFile)
+          data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
+            .then(function (uploadThumbFile){
+              console.log('thumb uploaded', uploadThumbFile)
+              /*
+              var care = that.data.care
+              var images = care.careImages
+              for(var i = 0; i < images.length; i++){
+                var image = images[i]
+                if (image.tempFilePath == )
+              }
+              */
+             image.url = uploadThumbFile.thumbUrl
+             image.status = 'success'
+             that.buildImages()
+            }).catch(function (exp){
+
+            })
+        })
       //that.setData({fileList})
     },
     buildImages(){
