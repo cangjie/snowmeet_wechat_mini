@@ -28,6 +28,10 @@ Component({
       if (that.properties.care){
         that.setData({care: that.properties.care})
       }
+      else {
+        that.setData({care: {}})
+        that.buildImages()
+      }
     }
   },
 
@@ -48,6 +52,49 @@ Component({
           care.equipment = value
           break
       }
+    },
+    afterRead(e){
+      console.log('photo uploaded', e)
+      var that = this
+      var care = that.data.care
+      var uploadFile = e.detail.file
+      var images = care.careImages
+      var image = {
+        care_id: care.id,
+        image_id: 0,
+        status: 'uploading',
+        message: '上传中',
+        image:{
+          id: 0,
+          file_path_name: uploadFile.tempFilePath,
+          thumb: uploadFile.thumb,
+          thumbUrl: uploadFile.thumb,
+          file_type: uploadFile.type
+        }
+      }
+      images.push(image)
+      that.buildImages()
+      //that.setData({fileList})
+    },
+    buildImages(){
+      var that = this
+      var care = that.data.care
+      if (!care){
+        care = {}
+      }
+      if (!care.careImages){
+        care.careImages = []
+      }
+      for(var i = 0; i < care.careImages.length; i++){
+        var image = care.careImages[i]
+        if (image.image.thumbUrl.indexOf('http') == 0){
+          image.url = image.image.thumbUrl
+        }
+        else{
+          image.url = 'https://' + app.globalData.domainName + image.image.thumbUrl
+        }
+      }
+      that.setData({care})
     }
 
   }

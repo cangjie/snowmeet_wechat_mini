@@ -11,7 +11,7 @@
   <view class="view-row" >
     <view class="left-column" >【照片】</view>
     <view class="right-column" >
-      <van-uploader file-list="{{[]}}" bind:after-read="afterRead" />
+      <van-uploader file-list="{{care.careImages}}" bind:after-read="afterRead"  capture="['album', 'camera']" />
     </view>
   </view>
   <view class="view-row" >
