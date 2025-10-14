@@ -16,7 +16,12 @@
   </view>
   <view class="view-row" >
     <view class="left-column" >【品牌】</view>
-    <view class="right-column" ></view>
+    <view class="right-column" >
+      <picker disabled="{{!care.equipment}}" range="{{brandList}}" 
+      range-key="displayedName" id="brand" bindchange="setValue" >
+        <picker-view>{{brandSelectIndex? brandList[brandSelectIndex].displayedName: '请选择…'}}</picker-view>
+      </picker>
+    </view>
   </view>
   <view class="view-row" >
     <view class="left-column" >【长度】</view>

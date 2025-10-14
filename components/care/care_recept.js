@@ -21,10 +21,10 @@ Component({
   lifetimes:{
     ready(){
       var that = this
-      data.getEquipBrandsPromise('单板').then(function (list){
+      data.getEquipBrandsPromise('双板').then(function (list){
         that.setData({skiBrandList: list})
       })
-      data.getEquipBrandsPromise('双板').then(function (list){
+      data.getEquipBrandsPromise('单板').then(function (list){
         that.setData({boardBrandList: list})
       })
       
@@ -69,7 +69,16 @@ Component({
           }
           that.setData({brandSelectIndex: null, brandList})
           break
+        case 'brand':
+          var brandSelectIndex = e.detail.value
+          var selectedBrand = that.data.brandList[parseInt(brandSelectIndex)]
+          care.brand = selectedBrand.displayedName
+          that.setData({brandSelectIndex})
+          break
+        default:
+          break
       }
+      that.setData({care})
     },
     afterRead(e){
       console.log('photo uploaded', e)
