@@ -11,14 +11,21 @@
   <view class="view-row" >
     <view class="left-column" >【照片】</view>
     <view class="right-column" >
-      <van-uploader file-list="{{care.careImages}}" bind:after-read="afterRead"  capture="['album', 'camera']" />
+      <van-uploader file-list="{{care.careImages}}" bind:after-read="afterRead"  capture="['album', 'camera']" bind:delete="delImage" />
     </view>
   </view>
   <view class="view-row" >
     <view class="left-column" >【品牌】</view>
     <view class="right-column" >
-      <picker disabled="{{!care.equipment}}" range="{{brandList}}" 
-      range-key="displayedName" id="brand" bindchange="setValue" >
+      <view wx:if="{{addingNewBrand}}" class="view-row" >
+        <input class="input" placeholder="填写英文名称" style="width: 160rpx;" id="brandName" bindinput="setValue" />
+        <view style="margin-left: 10rpx; margin-right: 10rpx;">/</view>
+        <input class="input" placeholder="填写中文名称" style="width: 160rpx;" id="brandChineseName" bindinput="setValue"  />
+        <van-button size="mini" style="margin-left:10rpx" type="warning" bind:click="cancelAddBrand" >取消</van-button>
+        <van-button size="mini" style="margin-left:10rpx" type="primary" bind:click="confirmAddBrand"  >确定</van-button>
+      </view>
+      <picker wx:else  disabled="{{!care.equipment}}" range="{{brandList}}" class="input"
+        style="width: 300rpx;" range-key="displayedName" id="brand" bindchange="setValue" >
         <picker-view>{{brandSelectIndex? brandList[brandSelectIndex].displayedName: '请选择…'}}</picker-view>
       </picker>
     </view>
