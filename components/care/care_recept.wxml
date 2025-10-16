@@ -32,53 +32,69 @@
   <view class="view-row">
     <view class="left-column">【长度】</view>
     <view class="right-column view-row">
-      <input class="input" style="width: 100rpx;text-align: center;" />cm
+      <input class="input" style="width: 100rpx;text-align: center;" id="scale" bindinput="setValue" />cm
     </view>
   </view>
   <view class="view-row">
     <view class="left-column">【项目】</view>
     <view class="right-column view-row">
-      <checkbox-group class="view-row">
-        <checkbox>修刃</checkbox>
-        <input class="input" style="width: 50rpx;text-align: center;" placeholder="89" />度
-        <checkbox style="margin-left: 30rpx;">打蜡</checkbox>
+      <checkbox-group id="need_edge" bindchange="setValue" >
+        <checkbox checked="{{care.need_edge == 1}}">修刃</checkbox>
+      </checkbox-group>
+      <input class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1}}" />度
+      <checkbox-group id="need_vax" bindchange="setValue" >
+        <checkbox style="margin-left: 30rpx;" checked="{{care.need_vax == 1}}" >打蜡</checkbox>
+      </checkbox-group>
+      <checkbox-group id="need_unvax" bindchange="setValue" >
+        <checkbox style="margin-left: 30rpx;" checked="{{care.need_unvax == 1}}">刮蜡</checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【加急】</view>
+    <view class="right-column">
+      <checkbox-group id="urgent" bindchange="setValue" >
+        <checkbox checked="{{care.urgent == 1}}">是</checkbox>
       </checkbox-group>
     </view>
   </view>
   <view class="view-row">
     <view class="left-column">【收费】</view>
-    <view class="right-column"></view>
+    <view class="right-column">
+      {{product? product.sale_priceStr : '¥0.00'}}
+    </view>
   </view>
   <view class="view-row">
-    <view class="left-column">【其它】</view>
+    <view class="left-column view-row" style="align-items: center;">【其它】</view>
     <view class="right-column">
       <van-grid column-num="3">
-        <checkbox-group>
+        <checkbox-group id="othter_services" bindchange="setValue" >
           <van-grid-item wx:for="{{othersService}}" use-slot >
-            <checkbox value="{{item}}" >
-              <view style="font: 8pt" >{{item}}</view>
+            <checkbox value="{{item.name}}" checked="{{item.checked}}" >
+              <view style="font: 8pt" >{{item.name}}</view>
             </checkbox>
           </van-grid-item>
         </checkbox-group>
       </van-grid>
-      <input placeholder="其它项目" class="input" style="width: 570rpx;margin-top: 20rpx;" />
+      <input placeholder="其它项目" class="input" style="width: 570rpx;margin-top: 20rpx;" id="others_memo" bindinput="setValue" />
     </view>
   </view>
   <view class="view-row">
     <view class="left-column">【附加费】</view>
     <view class="right-column view-row">
-      <input class="input" placeholder="0" style="text-align: center;width: 75rpx;" />元
+      <input class="input" placeholder="0" style="text-align: center;width: 75rpx;" 
+        id="repair_charge" bindinput="setValue" bdisabled="{{!care.repair_memo || care.repair_memo == ''}}"  />元
     </view>
   </view>
   <view class="view-row">
     <view class="left-column">【减免】</view>
     <view class="right-column view-row">
-      <input class="input" placeholder="0" style="text-align: center;width: 75rpx;" />元
+      <input class="input" id="discount" bindinput="setValue" placeholder="0" style="text-align: center;width: 75rpx;" />元
     </view>
   </view>
   <view class="view-row">
     <view class="left-column">【总计】</view>
-    <view class="right-column"></view>
+    <view class="right-column">{{care.summaryStr}}</view>
   </view>
   <view class="view-row">
     <view class="left-column">【备注】</view>

@@ -459,6 +459,36 @@ const getCareOthersServicePromise = function(type){
     })
   })
 }
+const getCareProductPromise = function (shop, service, urgent){
+  var getUrl = app.globalData.requestPrefix + 'Care/GetProducts?shop=' + encodeURIComponent(shop)
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(productList){
+      //var product = null
+      for(var i = 0; i < productList.length; i++){
+        //product = productList[i]
+        if (productList[i].name.indexOf('修刃打蜡') >= 0 && service == '双项') {
+          if (productList[i].name.indexOf('次日') >= 0 && urgent != 1){
+            resolve(productList[i])
+          }
+          else if (urgent == 1 &&  productList[i].name.indexOf('立等') >= 0 ) {
+            resolve(productList[i])
+          }
+        }
+        if (service != '双项' && 　productList[i].name.indexOf(service) >= 0)  {
+          if (productList[i].name.indexOf('次日') >= 0 && urgent != 1){
+            resolve(productList[i])
+          }
+          else if (urgent == 1 &&  productList[i].name.indexOf('立等') >= 0 ) {
+            resolve(productList[i])
+          }
+        }
+      }
+      resolve(null)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -494,5 +524,6 @@ module.exports = {
   updateOrderWithDetailPromise,
   getEquipBrandsPromise,
   uploadFilePromise,
-  getCareOthersServicePromise
+  getCareOthersServicePromise,
+  getCareProductPromise
 }

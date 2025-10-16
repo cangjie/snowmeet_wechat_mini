@@ -8,7 +8,8 @@ Component({
    * Component properties
    */
   properties: {
-    care: Object
+    order: Object
+
   },
 
   /**
@@ -32,11 +33,21 @@ Component({
         that.setData({boardBrandList: list})
       })
       
-      if (that.properties.care){
-        that.setData({care: that.properties.care})
+      if (that.properties.order){
+        for(var i = 0; that.properties.order.cares && i < that.properties.order.cares.length; i++){
+          if (that.properties.order.cares[i].isCurrent == 1){
+            that.setData({care: that.properties.order.cares[i], currentCareIndex: i, 
+              shop: that.properties.order.shop, order: that.properties.order})
+            break
+          }
+        }
+        if (!that.data.care && that.data.order && that.data.order.cares && that.data.order.cares.length > 0){
+          that.setData({care: that.data.order.cares[0], currentCareIndex: 0,
+            shop: that.properties.order.shop, order: that.properties.order})
+        }
       }
       else {
-        that.setData({care: {}})
+        that.setData({care: {}, shop: '万龙服务中心'})
         that.buildImages()
       }
       app.loginPromiseNew.then(function (resolve){
@@ -61,7 +72,7 @@ Component({
         case 'equipment':
           care.equipment = value
           data.getCareOthersServicePromise(value).then(function (list){
-            that.setData({othersService: list})
+            that.setData({othersService: list.map((l) => {return {name: l, checked: false}})})
           })
           var brandList = []
           switch(value){
@@ -99,6 +110,51 @@ Component({
           break
         case 'brandChineseName':
           that.data.filledBrandChineseName = value
+          break
+        case 'scale':
+          care.scale = value
+          break
+        case 'need_edge':
+          care.need_edge = value.length
+          care.edge_degree = '89'
+          that.getProduct(care)
+          break
+        case 'need_vax':
+          care.need_vax = value.length
+          care.need_unvax = care.need_vax
+          that.getProduct(care)
+          break
+        case 'need_unvax':
+          care.need_unvax = value.length
+          break
+        case 'urgent':
+          care.urgent = value.length
+          that.getProduct(care)
+          break
+        case 'othter_services':
+          console.log('other services', value)
+          care.otherServicesArray = value
+          care.repair_memo = value.join(',')
+          break
+        case 'others_memo':
+          if (care.repair_memo == ''){
+            care.repair_memo = value
+          }
+          else{
+            care.repair_memo += ',' + value
+          }
+          break
+        case 'repair_charge':
+          if (!isNaN(value)){
+            care.repair_charge = parseFloat(value)
+            that.computeCharge(care)
+          }
+          break
+        case 'discount':
+          if (!isNaN(value)){
+            care.discount = parseFloat(value)
+            that.computeCharge(care)
+          }
           break
         default:
           break
@@ -244,6 +300,36 @@ Component({
         }
         that.setData({brandSelectIndex: i, addingNewBrand: false, brandList})
       })
+    },
+    getProduct(care){
+      var that = this
+      if (care.need_edge == 1 && care.need_vax == 1){
+        data.getCareProductPromise(that.data.shop, '双项', care.urgent).then(function(product){
+          product.sale_priceStr = util.showAmount(product.sale_price)
+          that.setData({product})
+          care.common_charge = product.sale_price
+          that.computeCharge(care)
+        })
+      }
+      else{
+        var  productName = care.need_vax == 1? '打蜡' : (care.need_edge == 1? '修刃' : '' )
+        data.getCareProductPromise(that.data.shop, productName, care.urgent).then(function(product){
+          product.sale_priceStr = util.showAmount(product.sale_price)
+          that.setData({product})
+          care.common_charge = product.sale_price
+          that.computeCharge(care)
+        })
+      }
+    },
+    computeCharge(care){
+      var that = this
+      var commonCharge = care.common_charge? care.common_charge : 0
+      var repairCharge = care.repair_charge? care.repair_charge : 0
+      var discount = care.discount? care.discount : 0
+      var summary = commonCharge + repairCharge - discount
+      care.summary = summary
+      care.summaryStr = util.showAmount(summary)
+      that.setData({care})
     }
   }
 })
