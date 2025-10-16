@@ -449,6 +449,16 @@ const uploadFilePromise = function(mainId, filePath, purpose, type, sessionKey){
     })
   })
 }
+const getCareOthersServicePromise = function(type){
+  var getUrl = app.globalData.requestPrefix + 'Care/GetOthersService?type=' + encodeURIComponent(type)
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(list){
+      resolve(list)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -483,5 +493,6 @@ module.exports = {
   getOrderFromPaymentByCustomer,
   updateOrderWithDetailPromise,
   getEquipBrandsPromise,
-  uploadFilePromise
+  uploadFilePromise,
+  getCareOthersServicePromise
 }

@@ -60,6 +60,9 @@ Component({
       switch(id){
         case 'equipment':
           care.equipment = value
+          data.getCareOthersServicePromise(value).then(function (list){
+            that.setData({othersService: list})
+          })
           var brandList = []
           switch(value){
             case '单板':

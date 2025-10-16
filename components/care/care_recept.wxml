@@ -1,62 +1,93 @@
-<view>
-  <view class="view-row" >
-    <view class="left-column" >【类型】</view>
-    <view class="right-column view-row" >
-      <radio-group class="view-row" bindchange="setValue" id="equipment" >
-        <radio value="双板" checked="{{care.equipment == '双板'}}" >双板</radio>
-        <radio value="单板" style="margin-left: 66rpx;" checked="{{care.equipment == '单板'}}" >单板</radio>
+<scroll-view scroll-y style="height: 105%;">
+  <view class="view-row">
+    <view class="left-column">【类型】</view>
+    <view class="right-column view-row">
+      <radio-group class="view-row" bindchange="setValue" id="equipment">
+        <radio value="双板" checked="{{care.equipment == '双板'}}">双板</radio>
+        <radio value="单板" style="margin-left: 66rpx;" checked="{{care.equipment == '单板'}}">单板</radio>
       </radio-group>
     </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【照片】</view>
-    <view class="right-column" >
-      <van-uploader file-list="{{care.careImages}}" bind:after-read="afterRead"  capture="['album', 'camera']" bind:delete="delImage" />
+  <view class="view-row">
+    <view class="left-column">【照片】</view>
+    <view class="right-column">
+      <van-uploader file-list="{{care.careImages}}" bind:after-read="afterRead" capture="['album', 'camera']" bind:delete="delImage" />
     </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【品牌】</view>
-    <view class="right-column" >
-      <view wx:if="{{addingNewBrand}}" class="view-row" >
+  <view class="view-row">
+    <view class="left-column view-row" style="align-items: center;">【品牌】</view>
+    <view class="right-column">
+      <view wx:if="{{addingNewBrand}}" class="view-row">
         <input class="input" placeholder="填写英文名称" style="width: 160rpx;" id="brandName" bindinput="setValue" />
         <view style="margin-left: 10rpx; margin-right: 10rpx;">/</view>
-        <input class="input" placeholder="填写中文名称" style="width: 160rpx;" id="brandChineseName" bindinput="setValue"  />
-        <van-button size="mini" style="margin-left:10rpx" type="warning" bind:click="cancelAddBrand" >取消</van-button>
-        <van-button size="mini" style="margin-left:10rpx" type="primary" bind:click="confirmAddBrand"  >确定</van-button>
+        <input class="input" placeholder="填写中文名称" style="width: 160rpx;" id="brandChineseName" bindinput="setValue" />
+        <van-button size="mini" style="margin-left:10rpx" type="warning" bind:click="cancelAddBrand">取消</van-button>
+        <van-button size="mini" style="margin-left:10rpx" type="primary" bind:click="confirmAddBrand">确定</van-button>
       </view>
-      <picker wx:else  disabled="{{!care.equipment}}" range="{{brandList}}" class="input"
-        style="width: 300rpx;" range-key="displayedName" id="brand" bindchange="setValue" >
+      <picker wx:else disabled="{{!care.equipment}}" range="{{brandList}}" class="input" style="width: 300rpx;" range-key="displayedName" id="brand" bindchange="setValue">
         <picker-view>{{brandSelectIndex? brandList[brandSelectIndex].displayedName: '请选择…'}}</picker-view>
       </picker>
     </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【长度】</view>
-    <view class="right-column" ></view>
+  <view class="view-row">
+    <view class="left-column">【长度】</view>
+    <view class="right-column view-row">
+      <input class="input" style="width: 100rpx;text-align: center;" />cm
+    </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【项目】</view>
-    <view class="right-column" ></view>
+  <view class="view-row">
+    <view class="left-column">【项目】</view>
+    <view class="right-column view-row">
+      <checkbox-group class="view-row">
+        <checkbox>修刃</checkbox>
+        <input class="input" style="width: 50rpx;text-align: center;" placeholder="89" />度
+        <checkbox style="margin-left: 30rpx;">打蜡</checkbox>
+      </checkbox-group>
+    </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【收费】</view>
-    <view class="right-column" ></view>
+  <view class="view-row">
+    <view class="left-column">【收费】</view>
+    <view class="right-column"></view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【其它】</view>
-    <view class="right-column" ></view>
+  <view class="view-row">
+    <view class="left-column">【其它】</view>
+    <view class="right-column">
+      <van-grid column-num="3">
+        <checkbox-group>
+          <van-grid-item wx:for="{{othersService}}" use-slot >
+            <checkbox value="{{item}}" >
+              <view style="font: 8pt" >{{item}}</view>
+            </checkbox>
+          </van-grid-item>
+        </checkbox-group>
+      </van-grid>
+      <input placeholder="其它项目" class="input" style="width: 570rpx;margin-top: 20rpx;" />
+    </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【附加费】</view>
-    <view class="right-column" ></view>
+  <view class="view-row">
+    <view class="left-column">【附加费】</view>
+    <view class="right-column view-row">
+      <input class="input" placeholder="0" style="text-align: center;width: 75rpx;" />元
+    </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【总计】</view>
-    <view class="right-column" ></view>
+  <view class="view-row">
+    <view class="left-column">【减免】</view>
+    <view class="right-column view-row">
+      <input class="input" placeholder="0" style="text-align: center;width: 75rpx;" />元
+    </view>
   </view>
-  <view class="view-row" >
-    <view class="left-column" >【备注】</view>
-    <view class="right-column" ></view>
+  <view class="view-row">
+    <view class="left-column">【总计】</view>
+    <view class="right-column"></view>
   </view>
-
-</view>
+  <view class="view-row">
+    <view class="left-column">【备注】</view>
+    <view class="right-column">
+      <textarea class="input" style="width: 450rpx;height: 150rpx;" ></textarea>
+    </view>
+  </view>
+  <view class="view-row" style="justify-content: center; margin-top: 50rpx;">
+    <van-button type="primary" size="small" style="margin-right: 50rpx;"> 保 存 </van-button>
+    <van-button type="info" size="small" style="margin-left: 50rpx;" > 下一件 </van-button>
+  </view>
+</scroll-view>
