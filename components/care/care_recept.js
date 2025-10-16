@@ -16,7 +16,7 @@ Component({
    * Component initial data
    */
   data: {
-    care:{},
+    care:null,
     brandSelectIndex: null,
     brandList: [],
     addingNewBrand: false,
@@ -26,16 +26,11 @@ Component({
   lifetimes:{
     ready(){
       var that = this
-      data.getEquipBrandsPromise('双板').then(function (list){
-        that.setData({skiBrandList: list})
-      })
-      data.getEquipBrandsPromise('单板').then(function (list){
-        that.setData({boardBrandList: list})
-      })
+      
       
       if (that.properties.order){
         for(var i = 0; that.properties.order.cares && i < that.properties.order.cares.length; i++){
-          if (that.properties.order.cares[i].isCurrent == 1){
+          if (that.properties.order.cares[i].current == 1){
             that.setData({care: that.properties.order.cares[i], currentCareIndex: i, 
               shop: that.properties.order.shop, order: that.properties.order})
             break
@@ -51,6 +46,30 @@ Component({
         that.buildImages()
       }
       app.loginPromiseNew.then(function (resolve){
+        var order = that.data.order
+        var currentCare = null
+        for(var i = 0; order && order.cares && i < order.cares.length; i++){
+          if (order.cares[i].current == 1){
+            currentCare = order.cares[i]
+          }
+        }
+        if (currentCare == null && order && order.cares && order.cares.length > 0){
+          currentCare = order.cares[0]
+        }
+        else {
+          if (currentCare == null){
+          currentCare = {}
+          }
+        }
+        //that.setData({care: currentCare})
+        data.getEquipBrandsPromise('双板').then(function (list){
+          that.setData({skiBrandList: list})
+          data.getEquipBrandsPromise('单板').then(function (list){
+            that.setData({boardBrandList: list})
+            that.loadData(currentCare)
+          })
+        })
+        
         
       })
     }
@@ -60,6 +79,26 @@ Component({
    * Component methods
    */
   methods: {
+    loadData(care){
+      var that = this
+      var brandList = null
+      if (care.equipment == '单板'){
+        brandList = that.data.boardBrandList
+        //that.setData({brandList: boardBrandList})
+      }
+      else{
+        brandList = that.data.skiBrandList
+        //that.setData({brandList: skiBrandList})
+      }
+      var brandSelectIndex = null
+      for(var i = 0; brandList && i < brandList.length; i++){
+        if (brandList[i].displayedName == care.brand){
+          brandSelectIndex = i
+          break
+        }
+      }
+      that.setData({brandList, brandSelectIndex, care})
+    },
     setValue(e){
       var that = this
       var id = e.currentTarget.id
@@ -306,6 +345,8 @@ Component({
     },
     getProduct(care){
       var that = this
+      that.setData({product: null})
+      care.common_charge = 0
       if (care.need_edge == 1 && care.need_vax == 1){
         data.getCareProductPromise(that.data.shop, '双项', care.urgent).then(function(product){
           product.sale_priceStr = util.showAmount(product.sale_price)
@@ -315,7 +356,7 @@ Component({
         })
       }
       else{
-        var  productName = care.need_vax == 1? '打蜡' : (care.need_edge == 1? '修刃' : '' )
+        var  productName = care.need_vax == 1? '打蜡' : (care.need_edge == 1? '修刃' : null)
         data.getCareProductPromise(that.data.shop, productName, care.urgent).then(function(product){
           product.sale_priceStr = util.showAmount(product.sale_price)
           that.setData({product})
@@ -335,6 +376,7 @@ Component({
       that.setData({care})
     },
     getWellFormMessage(care){
+      var that = this
       if (!care.equipment || care.equipment == ''){
         return '必须选择类型'
       }
@@ -342,11 +384,7 @@ Component({
       && (!care.brand || care.brand == '' || !care.scale || care.scale == '')){
         return '图片和品牌长度必填其一'
       }
-      var haveNoProduct = true
-      if (care.common_charge && care.common_charge > 0){
-        haveNoProduct = false
-      }
-      if (haveNoProduct && !care.repair_charge && care.repair_charge == 0){
+      if (!that.data.product && (!care.repair_charge || care.repair_charge == 0)){
         return '必须选择业务'
       }
       return ''
@@ -361,7 +399,29 @@ Component({
           icon: 'error'
         })
       }
-      
+      var order = that.data.order
+      if (!order || order == null){
+        order = {}
+      }
+      if (!order.cares || order.cares == null){
+        order.cares = []
+      }
+      var currentCare = null
+      for(var i = 0; i < order.cares.length; i++){
+        if (order.cares[i].current == 1){
+          currentCare = order.cares[i]
+          break
+        }
+      }
+      care.current = 1
+      if (currentCare == null){
+        order.cares.push(care)
+      }
+      else{
+        currentCare = care
+        currentCare.current = 1
+      }
+      that.triggerEvent('CareOrderUpdate', order)
     }
   }
 })

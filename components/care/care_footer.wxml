@@ -1,0 +1,1 @@
+<van-goods-action-icon  info="{{order.cares.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" />

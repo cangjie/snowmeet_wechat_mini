@@ -298,5 +298,13 @@ Page({
     wx.navigateTo({
       url: url,
     })
+  },
+  careOrderUpdate(e){
+    console.log('care order update', e)
+    var that = this
+    var order = e.detail
+    that.setData({bizType: null, order})
+    that.setData({bizType: 'care'})
+
   }
 })

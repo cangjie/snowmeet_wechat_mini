@@ -1,4 +1,4 @@
-<scroll-view scroll-y style="height: 105%;">
+<scroll-view scroll-y style="height: 95%;">
   <view class="view-row">
     <view class="left-column">【类型】</view>
     <view class="right-column view-row">
@@ -25,7 +25,7 @@
         <van-button size="mini" style="margin-left:10rpx" type="primary" bind:click="confirmAddBrand">确定</van-button>
       </view>
       <picker wx:else disabled="{{!care.equipment}}" range="{{brandList}}" class="input" style="width: 300rpx;" range-key="displayedName" id="brand" bindchange="setValue">
-        <picker-view>{{brandSelectIndex? brandList[brandSelectIndex].displayedName: '请选择…'}}</picker-view>
+        <picker-view>{{brandSelectIndex? brandList[brandSelectIndex].displayedName: (care.brand? care.brand: '请选择…')}}</picker-view>
       </picker>
     </view>
   </view>

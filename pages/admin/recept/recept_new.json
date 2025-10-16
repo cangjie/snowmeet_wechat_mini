@@ -5,6 +5,7 @@
     "retail-recept": "/components/retail/retail_recept",
     "retail-footer": "/components/retail/retail_footer",
     "retail-order-info": "/components/retail/retail_order_info",
-    "care-recept": "/components/care/care_recept"
+    "care-recept": "/components/care/care_recept",
+    "care-footer": "/components/care/care_footer"
   }
 }
