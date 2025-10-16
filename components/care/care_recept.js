@@ -156,6 +156,9 @@ Component({
             that.computeCharge(care)
           }
           break
+        case 'memo':
+          care.memo = value
+          break
         default:
           break
       }
@@ -330,6 +333,35 @@ Component({
       care.summary = summary
       care.summaryStr = util.showAmount(summary)
       that.setData({care})
+    },
+    getWellFormMessage(care){
+      if (!care.equipment || care.equipment == ''){
+        return '必须选择类型'
+      }
+      if ((!care.careImages || care.careImages.length == 0) 
+      && (!care.brand || care.brand == '' || !care.scale || care.scale == '')){
+        return '图片和品牌长度必填其一'
+      }
+      var haveNoProduct = true
+      if (care.common_charge && care.common_charge > 0){
+        haveNoProduct = false
+      }
+      if (haveNoProduct && !care.repair_charge && care.repair_charge == 0){
+        return '必须选择业务'
+      }
+      return ''
+    },
+    save(e){
+      var that = this
+      var care = that.data.care
+      var message = that.getWellFormMessage(care)
+      if (message!=''){
+        wx.showToast({
+          title: message,
+          icon: 'error'
+        })
+      }
+      
     }
   }
 })
