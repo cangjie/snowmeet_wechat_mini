@@ -105,7 +105,8 @@
     </view>
   </view>
   <view class="view-row" style="justify-content: center; margin-top: 50rpx;">
-    <van-button type="primary" size="small" style="margin-right: 50rpx;" bind:click="save"> 保 存 </van-button>
-    <van-button type="info" size="small" style="margin-left: 50rpx;" bind:click="addMore" > 下一件 </van-button>
+    <!--van-button type="primary" size="small" style="margin-right: 50rpx;" bind:click="save"> 保 存 </van-button-->
+    <van-button type="info" size="small" style="margin-left: 50rpx;" bind:click="addMore" 
+    disabled="{{!wellFormed}}" > 下一件 </van-button>
   </view>
 </scroll-view>

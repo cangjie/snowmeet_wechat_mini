@@ -21,13 +21,12 @@ Component({
     brandList: [],
     addingNewBrand: false,
     filledBrandName: null,
-    filledBrandChineseName: null
+    filledBrandChineseName: null,
+    wellFormed: false
   },
   lifetimes:{
     ready(){
       var that = this
-      
-      
       if (that.properties.order){
         for(var i = 0; that.properties.order.cares && i < that.properties.order.cares.length; i++){
           if (that.properties.order.cares[i].current == 1){
@@ -432,7 +431,7 @@ Component({
       var that = this
       var care = that.data.care
       var message = that.getWellFormMessage(care)
-      if (message!='' && e.displayErrorMessage){
+      if (message!='' && e && e.displayErrorMessage){
         wx.showToast({
           title: message,
           icon: 'error'
@@ -440,7 +439,12 @@ Component({
         that.setData({wellFormed: false})
       }
       else{
+        if (message!=''){
+          that.setData({wellFormed: false})
+        }
+        else{
         that.setData({wellFormed: true})
+        }
       }
       var order = that.data.order
       if (!order || order == null){
