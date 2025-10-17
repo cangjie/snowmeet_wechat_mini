@@ -32,7 +32,8 @@
   <view class="view-row">
     <view class="left-column">【长度】</view>
     <view class="right-column view-row">
-      <input class="input" style="width: 100rpx;text-align: center;" id="scale" bindinput="setValue" />cm
+      <input class="input" style="width: 100rpx;text-align: center;" id="scale" 
+      bindinput="setValue" value="{{care.scale}}" />cm
     </view>
   </view>
   <view class="view-row">
@@ -61,7 +62,7 @@
   <view class="view-row">
     <view class="left-column">【收费】</view>
     <view class="right-column">
-      {{product? product.sale_priceStr : '¥0.00'}}
+      {{care.product? care.product.sale_priceStr : '¥0.00'}}
     </view>
   </view>
   <view class="view-row">
@@ -105,6 +106,6 @@
   </view>
   <view class="view-row" style="justify-content: center; margin-top: 50rpx;">
     <van-button type="primary" size="small" style="margin-right: 50rpx;" bind:click="save"> 保 存 </van-button>
-    <van-button type="info" size="small" style="margin-left: 50rpx;" bind:click="next" > 下一件 </van-button>
+    <van-button type="info" size="small" style="margin-left: 50rpx;" bind:click="addMore" > 下一件 </van-button>
   </view>
 </scroll-view>

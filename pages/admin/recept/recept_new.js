@@ -77,7 +77,7 @@ Page({
           var realName = that.data.realName ? that.data.realName : member.real_name
           var cell = that.data.cell ? that.data.cell : member.cell
           var gender = that.data.gender ? that.data.gender : member.gender
-          that.setData({showFooter: false})
+          that.setData({ showFooter: false })
           that.setData({ member, degree, realName, cell, gender, showFooter: true })
         }).catch(function (reject) {
 
@@ -86,21 +86,21 @@ Page({
       }
       else {
         if (that.data.orderId) {
-          data.getRentReceptingOrderPromise(that.data.orderId, app.globalData.sessionKey).then(function(order){
+          data.getRentReceptingOrderPromise(that.data.orderId, app.globalData.sessionKey).then(function (order) {
             var bizType = null
             var memberId = order.member_id
-            if (!memberId){
+            if (!memberId) {
               that.setData({ degree: '散客', memberId: null })
             }
-            else{
-              that.setData({member: order.member, degree: '会员'})
+            else {
+              that.setData({ member: order.member, degree: '会员' })
             }
             var shop = order.shop
-            var realName = order.contact_name?order.contact_name : order.member.real_name
-            var gender = order.contact_gender?order.contact_gender: order.member.gender
-            var cell = order.contact_num?order.contact_num: order.member.cell
+            var realName = order.contact_name ? order.contact_name : order.member.real_name
+            var gender = order.contact_gender ? order.contact_gender : order.member.gender
+            var cell = order.contact_num ? order.contact_num : order.member.cell
 
-            switch(order.type){
+            switch (order.type) {
               case '租赁':
                 bizType = 'rent'
                 wx.setNavigationBarTitle({
@@ -110,14 +110,14 @@ Page({
               default:
                 break
             }
-            that.setData({order, rentals: order.rentals, bizType, memberId, realName, cell, gender,shop})
+            that.setData({ order, rentals: order.rentals, bizType, memberId, realName, cell, gender, shop })
 
-          }).catch(function (exp){})
+          }).catch(function (exp) { })
         }
         else {
           that.setData({ degree: '散客', memberId: null })
         }
-        
+
       }
 
     })
@@ -177,8 +177,8 @@ Page({
     console.log('rent data updated', e)
     var rentals = e.detail.rentals
     that.setData({ showFooter: false })
-    that.setData({ rentals})
-    that.setData({showFooter: true})
+    that.setData({ rentals })
+    that.setData({ showFooter: true })
     if (e.detail.needUpdate) {
       that.saveReceptOrder()
     }
@@ -234,11 +234,11 @@ Page({
       console.log('save order', submitedOrder)
       that.setData({ order: submitedOrder, bizType: null })
       var rentals = submitedOrder.rentals
-      for(var i = 0; i < rentals.length; i++){
+      for (var i = 0; i < rentals.length; i++) {
         rentals[i].timeStamp = (new Date(rentals[i].create_date)).getTime()
       }
       that.setData({ rentals })
-      that.setData({bizType: 'rent'})
+      that.setData({ bizType: 'rent' })
     })
   },
   rentalWellFormed(e) {
@@ -266,7 +266,7 @@ Page({
       })
     }
   },
-  retailOrderUpdate(e){
+  retailOrderUpdate(e) {
     console.log('retail order update', e)
     var that = this
     var order = e.detail
@@ -276,35 +276,42 @@ Page({
     order.member_id = that.data.memberId
     order.shop = that.data.shop
     var retails = order.retails
-    for(var i = 0; i < retails.length; i++){
+    for (var i = 0; i < retails.length; i++) {
       var retail = retails[i]
-      if (retail.entertain == 1){
+      if (retail.entertain == 1) {
         retail.order_type = '招待'
       }
       else {
         retail.order_type = '普通'
       }
     }
-    that.setData({order, showFooter: false})
-    that.setData({showFooter: true})
+    that.setData({ order, showFooter: false })
+    that.setData({ showFooter: true })
   },
-  showRetailOrder(e){
+  showRetailOrder(e) {
     var that = this
-    that.setData({bizType: null, order: e.detail})
-    that.setData({bizType: 'retail', showOrderInfo: true})
+    that.setData({ bizType: null, order: e.detail })
+    that.setData({ bizType: 'retail', showOrderInfo: true })
   },
-  jump(e){
+  jump(e) {
     var url = e.detail.url
     wx.navigateTo({
       url: url,
     })
   },
-  careOrderUpdate(e){
+  careOrderUpdate(e) {
     console.log('care order update', e)
     var that = this
-    var order = e.detail
-    that.setData({bizType: null, order})
-    that.setData({bizType: 'care'})
+    var order = e.detail.order
+    if (e.detail.refreshSelf) {
+      that.setData({ bizType: null, order })
+      that.setData({ bizType: 'care' })
+    }
+    else if (e.detail.refreshFooter){
+      that.setData({ order, showFooter: false })
+      that.setData({showFooter: true})
+    }
+
 
   }
 })

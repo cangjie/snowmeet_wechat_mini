@@ -1,1 +1,1 @@
-/* components/care/care_footer.wxss */
+@import '/app.wxss';

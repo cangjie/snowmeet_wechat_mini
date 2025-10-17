@@ -1,3 +1,5 @@
+const util = require("../../utils/util")
+
 // components/care/care_footer.js
 Component({
 
@@ -24,7 +26,14 @@ Component({
       if (!order.cares){
         order.cares = []
       }
-      that.setData({order})
+      var total = 0
+      for(var i = 0; i < order.cares.length; i++){
+        var care = order.cares[i]
+        if (!isNaN(care.summary)){
+          total += parseFloat(care.summary)
+        }
+      }
+      that.setData({order, total, totalStr: util.showAmount(total)})
     }
   },
 
