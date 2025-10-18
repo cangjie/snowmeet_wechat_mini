@@ -275,6 +275,14 @@ Component({
               console.log('thumb uploaded', uploadThumbFile)
              image.thumb = uploadThumbFile.thumbUrl
              image.status = 'success'
+             image.message = ''
+             var care = that.getCurrentCare()
+             for(var i = 0; i < care.careImages.length; i++){
+               if (care.careImages[i].status == 'uploading'){
+                care.careImages[i] = image
+                break
+               }
+             }
              that.buildImages()
             }).catch(function (exp){
 
@@ -284,7 +292,15 @@ Component({
     },
     buildImages(){
       var that = this
-      var care = that.data.care
+      var order = that.data.order
+      if (!order){
+        order = {
+          cares:[{current: 1}]
+        }
+      }
+      //that.setData({order})
+      that.data.order = order
+      var care = that.getCurrentCare()
       if (!care){
         care = {}
       }
@@ -307,7 +323,8 @@ Component({
           image.url = 'https://snowmeet.wanlonghuaxue.com' + image.file_path_name
         }
       }
-      that.setData({care})
+      that.setData({order, care})
+      that.triggerEvent('CareOrderUpdate', {order: that.data.order, refreshMain: false, refreshFooter: true})
     },
     delImage(e){
       console.log('del image', e)

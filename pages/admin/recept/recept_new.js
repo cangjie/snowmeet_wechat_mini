@@ -323,5 +323,11 @@ Page({
   onPopOrderInfoClose(e){
     var that = this
     that.setData({showOrderInfo: false})
+  },
+  updateCareCurrent(e){
+    var that = this
+    var order = e.detail.order
+    that.setData({order, bizType: null})
+    that.setData({bizType: 'care', showOrderInfo: false})
   }
 })

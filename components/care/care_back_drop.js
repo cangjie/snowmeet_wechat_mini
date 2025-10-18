@@ -62,6 +62,7 @@ Component({
         }
       }
       that.setData({order})
+      that.triggerEvent('UpdateCare', {order})
     }
   }
 })
