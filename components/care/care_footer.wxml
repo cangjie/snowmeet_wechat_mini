@@ -1,4 +1,6 @@
 <view class="view-row" >
   <van-goods-action-icon  info="{{order.cares.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" />
-  <view class="view-row" style="align-items: center;" >总计装备：{{order.cares.length}}件 总计金额：{{totalStr}}</view>
+  <view class="view-row" style="align-items: center;" bind:tap="onClickIcon" >
+    总计装备：{{order.cares.length}}件 总计金额：{{totalStr}}
+  </view>
 </view>

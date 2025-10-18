@@ -1,0 +1,20 @@
+@import '/app.wxss';
+.equip-image{
+  width: 260rpx;
+  height: 260rpx;
+  
+}
+.equip-main{
+  height: 260rpx;
+  margin-left: 10rpx;
+  width: 450rpx;
+  
+}
+.left-column{
+  width: 25%;
+  margin-top: 5rpx;
+}
+.right-column{
+  width: 75%;
+  margin-top: 5rpx;
+}

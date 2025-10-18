@@ -1,0 +1,31 @@
+<scroll-view scroll-y style="height: 95%;">
+  <view style="margin-top: 20rpx;margin-left: 20rpx;">
+    <view class="view-row" wx:for="{{order.cares}}" id="{{index}}" bind:tap="setCurrent" >
+      <view class="equip-image" style="{{item.current == 1? 'background-color: gray;':''}}">
+        <image src="{{item.careImages[0].thumb}}" style="width: 240rpx; height:240rpx; margin-left: 10rpx;margin-top: 10rpx" ></image>
+      </view>
+      <view class="equip-main" style="{{item.current == 1? 'background-color: gray;':''}}">
+        <view class="view-row">
+          <view class="left-column"  >【类型】</view>
+          <view class="right-column" >{{item.equipment}}</view>
+        </view>
+        <view class="view-row">
+          <view class="left-column"  >【品牌】</view>
+          <view class="right-column" >{{item.brand}}</view>
+        </view>
+        <view class="view-row">
+          <view class="left-column"  >【长度】</view>
+          <view class="right-column" >{{item.scale}}cm</view>
+        </view>
+        <view class="view-row">
+          <view class="left-column"  >【项目】</view>
+          <view class="right-column" >{{item.services}}</view>
+        </view>
+        <view class="view-row">
+          <view class="left-column"  >【金额】</view>
+          <view class="right-column" >{{item.summaryStr}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>

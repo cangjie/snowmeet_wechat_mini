@@ -313,5 +313,15 @@ Page({
     }
 
 
+  },
+  showCareBackDrop(e){
+    var that = this
+    var order = e.detail.order
+    that.setData({order, showOrderInfo: true})
+
+  },
+  onPopOrderInfoClose(e){
+    var that = this
+    that.setData({showOrderInfo: false})
   }
 })

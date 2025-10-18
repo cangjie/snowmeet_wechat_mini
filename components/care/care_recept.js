@@ -240,9 +240,15 @@ Component({
     afterRead(e){
       console.log('photo uploaded', e)
       var that = this
-      var care = that.data.care
+      //var care = that.data.care
+      //var order = that.data.order
+      var care = that.getCurrentCare()
       var uploadFile = e.detail.file
       var images = care.careImages
+      if (!care.careImages){
+        care.careImages = []
+        images = care.careImages
+      }
       var image = {
         care_id: care.id,
         image_id: 0,
@@ -499,6 +505,20 @@ Component({
       that.setData({order, care})
       console.log('new care', care)
       that.triggerEvent('CareOrderUpdate', {order: order})
+    },
+    getCurrentCare(){
+      var that = this
+      var order = that.data.order
+      var care = null
+      for(var i = 0; order && order.cares && i < order.cares.length; i++){
+        if (order.cares[i].current == 1){
+          care = order.cares[i]
+        }
+      }
+      if (care == null && order && order.cares && order.cares.length > 0){
+        care = order.cares[0]
+      }
+      return care
     }
   }
 })

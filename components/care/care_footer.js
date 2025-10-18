@@ -41,6 +41,9 @@ Component({
    * Component methods
    */
   methods: {
-
+    onClickIcon(e){
+      var that = this
+      that.triggerEvent('ShowCareBackDrop', {order: that.data.order})
+    }
   }
 })
