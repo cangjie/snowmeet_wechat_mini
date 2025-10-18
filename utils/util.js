@@ -271,6 +271,20 @@ const orderPaid = function (order){
     return false
   }
 }
+const getCareWellFormMessage = function(care) {
+  var that = this
+  if (!care.equipment || care.equipment == '') {
+    return '必须选择类型'
+  }
+  if ((!care.careImages || care.careImages.length == 0)
+    && (!care.brand || care.brand == '' || !care.scale || care.scale == '')) {
+    return '图片和品牌长度必填其一'
+  }
+  if (!care.product && (!care.repair_charge || care.repair_charge == 0)) {
+    return '必须选择业务'
+  }
+  return ''
+}
 module.exports = {
   formatDateTime: formatDateTime,
   formatDate: formatDate,
@@ -289,5 +303,6 @@ module.exports = {
   createRentalDetail,
   getRentPrice,
   checkRentalsWellForm,
-  orderPaid
+  orderPaid,
+  getCareWellFormMessage
 }

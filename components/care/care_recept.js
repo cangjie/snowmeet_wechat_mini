@@ -16,7 +16,7 @@ Component({
    * Component initial data
    */
   data: {
-    care:null,
+    care: null,
     brandSelectIndex: null,
     brandList: [],
     addingNewBrand: false,
@@ -24,25 +24,29 @@ Component({
     filledBrandChineseName: null,
     wellFormed: false
   },
-  lifetimes:{
-    ready(){
+  lifetimes: {
+    ready() {
       var that = this
-      if (that.properties.order){
-        for(var i = 0; that.properties.order.cares && i < that.properties.order.cares.length; i++){
-          if (that.properties.order.cares[i].current == 1){
-            that.setData({care: that.properties.order.cares[i], currentCareIndex: i, 
-              shop: that.properties.order.shop, order: that.properties.order})
+      if (that.properties.order) {
+        for (var i = 0; that.properties.order.cares && i < that.properties.order.cares.length; i++) {
+          if (that.properties.order.cares[i].current == 1) {
+            that.setData({
+              care: that.properties.order.cares[i], currentCareIndex: i,
+              shop: that.properties.order.shop, order: that.properties.order
+            })
             break
           }
         }
-        if (!that.data.care && that.data.order && that.data.order.cares && that.data.order.cares.length > 0){
+        if (!that.data.care && that.data.order && that.data.order.cares && that.data.order.cares.length > 0) {
           order.cares[0].current = 1
-          that.setData({care: that.data.order.cares[0], currentCareIndex: 0,
-            shop: that.properties.order.shop, order: that.properties.order})
+          that.setData({
+            care: that.data.order.cares[0], currentCareIndex: 0,
+            shop: that.properties.order.shop, order: that.properties.order
+          })
         }
       }
       else {
-        
+
         var order = {
           shop: '万龙服务中心',
           cares: []
@@ -51,22 +55,22 @@ Component({
           current: 1
         }
         order.cares.push(care)
-        that.setData({care, order, shop: '万龙服务中心'})
+        that.setData({ care, order, shop: '万龙服务中心' })
         that.buildImages()
       }
-      app.loginPromiseNew.then(function (resolve){
+      app.loginPromiseNew.then(function (resolve) {
         var order = that.data.order
         var currentCare = null
-        for(var i = 0; order && order.cares && i < order.cares.length; i++){
-          if (order.cares[i].current == 1){
+        for (var i = 0; order && order.cares && i < order.cares.length; i++) {
+          if (order.cares[i].current == 1) {
             currentCare = order.cares[i]
           }
         }
-        if (currentCare == null && order && order.cares && order.cares.length > 0){
+        if (currentCare == null && order && order.cares && order.cares.length > 0) {
           currentCare = order.cares[0]
         }
         else {
-          if (currentCare == null){
+          if (currentCare == null) {
             currentCare = {
               current: 1
             }
@@ -74,22 +78,22 @@ Component({
           }
         }
         //that.setData({care: currentCare})
-        data.getEquipBrandsPromise('双板').then(function (list){
-          that.setData({skiBrandList: list})
-          data.getEquipBrandsPromise('单板').then(function (list){
-            data.getCareOthersServicePromise('双板').then(function (list){
-              that.setData({skiOthersService: list.map((l) => {return {name: l, checked: false}})})
-              data.getCareOthersServicePromise('单板').then(function (list){
-                that.setData({boardOthersService: list.map((l) => {return {name: l, checked: false}})})
-                that.setData({boardBrandList: list})
+        data.getEquipBrandsPromise('双板').then(function (list) {
+          that.setData({ skiBrandList: list })
+          data.getEquipBrandsPromise('单板').then(function (list) {
+            that.setData({boardBrandList: list})
+            data.getCareOthersServicePromise('双板').then(function (list) {
+              that.setData({ skiOthersService: list.map((l) => { return { name: l, checked: false } }) })
+              data.getCareOthersServicePromise('单板').then(function (list) {
+                that.setData({othersService: [], boardOthersService: list.map((l) => { return { name: l, checked: false } }) })
                 that.loadData(currentCare)
               })
             })
-            
+
           })
         })
-        
-        
+
+
       })
     }
   },
@@ -98,60 +102,59 @@ Component({
    * Component methods
    */
   methods: {
-    loadData(care){
+    loadData(care) {
       var that = this
       var brandList = null
       var othersService = null
-      if (care.equipment == '单板'){
+      if (care.equipment == '单板') {
         brandList = that.data.boardBrandList
         othersService = that.data.boardOthersService
       }
-      else if (care.equipment == '双板'){
+      else if (care.equipment == '双板') {
         brandList = that.data.skiBrandList
         othersService = that.data.skiOthersService
       }
       var brandSelectIndex = null
-      for(var i = 0; brandList && i < brandList.length; i++){
-        if (brandList[i].displayedName == care.brand){
+      for (var i = 0; brandList && i < brandList.length; i++) {
+        if (brandList[i].displayedName == care.brand) {
           brandSelectIndex = i
           break
         }
       }
-      that.setData({brandList, brandSelectIndex, care, othersService})
+      if (care.repair_memo && care.repair_memo != '') {
+        var memoArr = care.repair_memo.split(',')
+        for (var i = 0; othersService && i < othersService.length; i++) {
+          for (var j = 0; j < memoArr.length; j++) {
+            if (othersService[i].name == memoArr[j]) {
+              othersService[i].checked = true
+            }
+          }
+        }
+      }
+      var message = util.getCareWellFormMessage(care)
+      that.setData({ brandList, brandSelectIndex, care, othersService, wellFormed: message == ''? true: false })
     },
-    setValue(e){
+    setValue(e) {
       var that = this
       var id = e.currentTarget.id
       var value = e.detail.value
       var care = that.data.care
-      if (!care){
+      if (!care) {
         care = {}
       }
-      switch(id){
+      
+      switch (id) {
         case 'equipment':
           care.equipment = value
-          switch(value){
-            case '单板':
-              that.setData({othersService: that.data.boardOthersService})
-              break
-            case '双板':
-              that.setData({othersService: that.data.skiOthersService})
-              break
-            default:
-              break
-          }
-          /*
-          data.getCareOthersServicePromise(value).then(function (list){
-            that.setData({othersService: list.map((l) => {return {name: l, checked: false}})})
-          })
-          */
           var brandList = []
-          switch(value){
+          switch (value) {
             case '单板':
               brandList = that.data.boardBrandList
+              that.setData({ othersService: that.data.boardOthersService })
               break
             case '双板':
               brandList = that.data.skiBrandList
+              that.setData({ othersService: that.data.skiOthersService })
               break
             default:
               break
@@ -164,17 +167,17 @@ Component({
             displayedName: '新增品牌'
           }
           brandList.push(unknownBrand)
-          that.setData({brandSelectIndex: null, brandList, addingNewBrand: false})
+          that.setData({ brandSelectIndex: null, brandList, addingNewBrand: false })
           break
         case 'brand':
           var brandSelectIndex = e.detail.value
           var selectedBrand = that.data.brandList[parseInt(brandSelectIndex)]
           care.brand = selectedBrand.displayedName
           var addingNewBrand = false
-          if (brandSelectIndex == that.data.brandList.length - 1){
+          if (brandSelectIndex == that.data.brandList.length - 1) {
             addingNewBrand = true
           }
-          that.setData({brandSelectIndex, addingNewBrand})
+          that.setData({ brandSelectIndex, addingNewBrand })
           break
         case 'brandName':
           that.data.filledBrandName = value
@@ -208,21 +211,21 @@ Component({
           care.repair_memo = value.join(',')
           break
         case 'others_memo':
-          if (care.repair_memo == ''){
+          if (care.repair_memo == '') {
             care.repair_memo = value
           }
-          else{
+          else {
             care.repair_memo += ',' + value
           }
           break
         case 'repair_charge':
-          if (!isNaN(value)){
+          if (!isNaN(value)) {
             care.repair_charge = parseFloat(value)
             that.computeCharge(care)
           }
           break
         case 'discount':
-          if (!isNaN(value)){
+          if (!isNaN(value)) {
             care.discount = parseFloat(value)
             that.computeCharge(care)
           }
@@ -233,19 +236,17 @@ Component({
         default:
           break
       }
-      that.setData({care})
+      that.setData({ care })
       e.displayErrorMessage = false
       that.save(e)
     },
-    afterRead(e){
+    afterRead(e) {
       console.log('photo uploaded', e)
       var that = this
-      //var care = that.data.care
-      //var order = that.data.order
       var care = that.getCurrentCare()
       var uploadFile = e.detail.file
       var images = care.careImages
-      if (!care.careImages){
+      if (!care.careImages) {
         care.careImages = []
         images = care.careImages
       }
@@ -254,7 +255,7 @@ Component({
         image_id: 0,
         status: 'uploading',
         message: '上传中',
-        image:{
+        image: {
           id: 0,
           file_path_name: uploadFile.tempFilePath,
           thumb: uploadFile.thumb,
@@ -264,92 +265,90 @@ Component({
       }
       images.push(image)
       that.buildImages()
-      data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey )
-        .then(function  (uploadedFile){
+      data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
+        .then(function (uploadedFile) {
           console.log('file uploaded', uploadedFile)
           image.url = uploadedFile.file_path_name
           image.thumb = uploadedFile.file_path_name
           image.type = uploadedFile.file_type
           data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
-            .then(function (uploadThumbFile){
+            .then(function (uploadThumbFile) {
               console.log('thumb uploaded', uploadThumbFile)
-             image.thumb = uploadThumbFile.thumbUrl
-             image.status = 'success'
-             image.message = ''
-             var care = that.getCurrentCare()
-             for(var i = 0; i < care.careImages.length; i++){
-               if (care.careImages[i].status == 'uploading'){
-                care.careImages[i] = image
-                break
-               }
-             }
-             that.buildImages()
-            }).catch(function (exp){
+              image.thumb = uploadThumbFile.thumbUrl
+              image.status = 'success'
+              image.message = ''
+              var care = that.getCurrentCare()
+              for (var i = 0; i < care.careImages.length; i++) {
+                if (care.careImages[i].status == 'uploading') {
+                  care.careImages[i] = image
+                  break
+                }
+              }
+              that.buildImages()
+            }).catch(function (exp) {
 
             })
         })
-      //that.setData({fileList})
     },
-    buildImages(){
+    buildImages() {
       var that = this
       var order = that.data.order
-      if (!order){
+      if (!order) {
         order = {
-          cares:[{current: 1}]
+          cares: [{ current: 1 }]
         }
       }
-      //that.setData({order})
       that.data.order = order
       var care = that.getCurrentCare()
-      if (!care){
+      if (!care) {
         care = {}
       }
-      if (!care.careImages){
+      if (!care.careImages) {
         care.careImages = []
       }
-      
-      for(var i = 0; i < care.careImages.length; i++){
+
+      for (var i = 0; i < care.careImages.length; i++) {
         var image = care.careImages[i]
-        if (image.image.thumb.indexOf('http') == 0){
+        if (image.image.thumb.indexOf('http') == 0) {
           image.thumb = image.image.thumb
         }
-        else{
+        else {
           image.thumb = 'https://snowmeet.wanlonghuaxue.com' + image.thumb
         }
-        if (image.image.file_path_name.indexOf('http') == 0){
+        if (image.image.file_path_name.indexOf('http') == 0) {
           image.url = image.image.file_path_name
         }
-        else{
+        else {
           image.url = 'https://snowmeet.wanlonghuaxue.com' + image.file_path_name
         }
       }
-      that.setData({order, care})
-      that.triggerEvent('CareOrderUpdate', {order: that.data.order, refreshMain: false, refreshFooter: true})
+      that.setData({ order, care })
+      that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
     },
-    delImage(e){
+    delImage(e) {
       console.log('del image', e)
       var that = this
       var index = e.detail.index
       var care = that.data.care
       var images = care.careImages
       var newImages = []
-      for(var i = 0; i < images.length; i++){
-        if (i != index){
+      for (var i = 0; i < images.length; i++) {
+        if (i != index) {
           newImages.push(images[i])
         }
       }
       care.careImages = newImages
-      that.setData({care})
+      that.setData({ care })
     },
-    cancelAddBrand(e){
+    cancelAddBrand(e) {
       var that = this
-      that.setData({addingNewBrand: false, brandSelectIndex: null})
+      that.setData({ addingNewBrand: false, brandSelectIndex: null })
     },
-    confirmAddBrand(e){
+    confirmAddBrand(e) {
       var that = this
       var brandName = that.data.filledBrandName
       var chineseName = that.data.filledBrandChineseName
-      if (!brandName){
+      if (!brandName) {
         wx.showToast({
           title: '必须填写英文名称',
           icon: 'error'
@@ -357,17 +356,17 @@ Component({
         return
       }
       var updateUrl = app.globalData.requestPrefix + 'Care/UpdateBrandByStaff?type=' + encodeURIComponent(that.data.care.equipment) + '&brandName=' + encodeURIComponent(brandName) + '&chineseName=' + encodeURIComponent(chineseName) + '&sessionKey=' + app.globalData.sessionKey
-      util.performWebRequest(updateUrl, null).then(function (brandList){
-        switch(that.data.care.equipment){
+      util.performWebRequest(updateUrl, null).then(function (brandList) {
+        switch (that.data.care.equipment) {
           case '单板':
             var boardBrandList = brandList
             var brandList = boardBrandList
-            that.setData({boardBrandList, brandList})
+            that.setData({ boardBrandList, brandList })
             break
           case '双板':
             var skiBrandList = brandList
             var brandList = brandList
-            that.setData({skiBrandList, brandList})
+            that.setData({ skiBrandList, brandList })
             break
           default:
             break
@@ -381,124 +380,102 @@ Component({
         }
         brandList.push(unknownBrand)
         var index = null
-        for(var i = 0; i < that.data.brandList.length; i++){
+        for (var i = 0; i < that.data.brandList.length; i++) {
           var brand = that.data.brandList[i]
-          if (brand.brand_name == that.data.filledBrandName){
+          if (brand.brand_name == that.data.filledBrandName) {
             index = i
             break
           }
         }
-        that.setData({brandSelectIndex: i, addingNewBrand: false, brandList})
+        that.setData({ brandSelectIndex: i, addingNewBrand: false, brandList })
       })
     },
-    getProduct(care){
+    getProduct(care) {
       var that = this
-      that.setData({product: null})
+      that.setData({ product: null })
       care.common_charge = 0
-      if (care.need_edge == 1 && care.need_vax == 1){
-        data.getCareProductPromise(that.data.shop, '双项', care.urgent).then(function(product){
+      if (care.need_edge == 1 && care.need_vax == 1) {
+        data.getCareProductPromise(that.data.shop, '双项', care.urgent).then(function (product) {
           product.sale_priceStr = util.showAmount(product.sale_price)
-          that.setData({product})
+          that.setData({ product })
           care.common_charge = product.sale_price
           care.product = product
           that.computeCharge(care)
           that.save()
-          that.triggerEvent('CareOrderUpdate', {order: that.data.order, refreshMain: false, refreshFooter: true})
+          that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
         })
       }
-      else if (care.need_edge == 1 || care.need_vax == 1){
-        var  productName = care.need_vax == 1? '打蜡' : (care.need_edge == 1? '修刃' : null)
-        data.getCareProductPromise(that.data.shop, productName, care.urgent).then(function(product){
+      else if (care.need_edge == 1 || care.need_vax == 1) {
+        var productName = care.need_vax == 1 ? '打蜡' : (care.need_edge == 1 ? '修刃' : null)
+        data.getCareProductPromise(that.data.shop, productName, care.urgent).then(function (product) {
           product.sale_priceStr = util.showAmount(product.sale_price)
-          that.setData({product})
+          that.setData({ product })
           care.common_charge = product.sale_price
           care.product = product
           that.computeCharge(care)
           that.save()
-          that.triggerEvent('CareOrderUpdate', {order: that.data.order, refreshMain: false, refreshFooter: true})
+          that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
         })
       }
-      else{
+      else {
         care.product = null
         care.common_charge = 0
         that.computeCharge(care)
         that.save()
-        that.triggerEvent('CareOrderUpdate', {order: that.data.order, refreshMain: false, refreshFooter: true})
+        that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
       }
     },
-    computeCharge(care){
+    computeCharge(care) {
       var that = this
-      var commonCharge = care.common_charge? care.common_charge : 0
-      var repairCharge = care.repair_charge? care.repair_charge : 0
-      var discount = care.discount? care.discount : 0
+      var commonCharge = care.common_charge ? care.common_charge : 0
+      var repairCharge = care.repair_charge ? care.repair_charge : 0
+      var discount = care.discount ? care.discount : 0
       var summary = commonCharge + repairCharge - discount
       care.summary = summary
       care.summaryStr = util.showAmount(summary)
-      that.setData({care})
+      that.setData({ care })
     },
-    getWellFormMessage(care){
-      var that = this
-      if (!care.equipment || care.equipment == ''){
-        return '必须选择类型'
-      }
-      if ((!care.careImages || care.careImages.length == 0) 
-      && (!care.brand || care.brand == '' || !care.scale || care.scale == '')){
-        return '图片和品牌长度必填其一'
-      }
-      if (!that.data.product && (!care.repair_charge || care.repair_charge == 0)){
-        return '必须选择业务'
-      }
-      return ''
-    },
-    save(e){
+    
+    save(e) {
       var that = this
       var care = that.data.care
-      var message = that.getWellFormMessage(care)
-      if (message!='' && e && e.displayErrorMessage){
+      var message = util.getCareWellFormMessage(care)
+      if (message != '' && e && e.displayErrorMessage) {
         wx.showToast({
           title: message,
           icon: 'error'
         })
-        that.setData({wellFormed: false})
+        that.setData({ wellFormed: false })
       }
-      else{
-        if (message!=''){
-          that.setData({wellFormed: false})
+      else {
+        if (message != '') {
+          that.setData({ wellFormed: false })
         }
-        else{
-        that.setData({wellFormed: true})
+        else {
+          that.setData({ wellFormed: true })
         }
       }
       var order = that.data.order
-      if (!order || order == null){
+      if (!order || order == null) {
         order = {}
       }
-      if (!order.cares || order.cares == null){
+      if (!order.cares || order.cares == null) {
         order.cares = []
       }
-      /*
-      var currentCare = null
-      for(var i = 0; i < order.cares.length; i++){
-        if (order.cares[i].current == 1){
-          currentCare = order.cares[i]
-          break
-        }
-      }
-      */
       care.current = 1
-      if (order.cares.length == 0){
+      if (order.cares.length == 0) {
         order.cares.push(care)
       }
-      else{
+      else {
         var find = false
-        for(var i = 0; i < order.cares.length; i++){
-          if (order.cares[i].current ==1){
+        for (var i = 0; i < order.cares.length; i++) {
+          if (order.cares[i].current == 1) {
             order.cares[i] = care
             find = true
             break
           }
         }
-        if (!find){
+        if (!find) {
           care.current = 1
           order.cares[0] = care
         }
@@ -506,33 +483,34 @@ Component({
         //currentCare.current = 1
       }
 
-      that.setData({order})
-      that.triggerEvent('CareOrderUpdate', {order: order, refreshMain: false, refreshFooter: true})
+      that.setData({ order })
+      that.triggerEvent('CareOrderUpdate', { order: order, refreshMain: false, refreshFooter: true })
     },
-    addMore(e){
+    addMore(e) {
       var that = this
       that.save(e)
       var order = that.data.order
-      for(var i = 0; order && order.cares && i < order.cares.length; i++){
+      for (var i = 0; order && order.cares && i < order.cares.length; i++) {
         order.cares[i].current = 0
       }
       var care = {}
       care.current = 1
       order.cares.push(care)
-      that.setData({order, care})
+      that.setData({ order, care , othersService:[], wellFormed: false})
       console.log('new care', care)
-      that.triggerEvent('CareOrderUpdate', {order: order})
+      that.loadData(care)
+      that.triggerEvent('CareOrderUpdate', { order: order })
     },
-    getCurrentCare(){
+    getCurrentCare() {
       var that = this
       var order = that.data.order
       var care = null
-      for(var i = 0; order && order.cares && i < order.cares.length; i++){
-        if (order.cares[i].current == 1){
+      for (var i = 0; order && order.cares && i < order.cares.length; i++) {
+        if (order.cares[i].current == 1) {
           care = order.cares[i]
         }
       }
-      if (care == null && order && order.cares && order.cares.length > 0){
+      if (care == null && order && order.cares && order.cares.length > 0) {
         care = order.cares[0]
       }
       return care

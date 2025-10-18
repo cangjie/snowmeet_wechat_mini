@@ -322,7 +322,8 @@ Page({
   },
   onPopOrderInfoClose(e){
     var that = this
-    that.setData({showOrderInfo: false})
+    console.log('close back drop', e)
+    //that.setData({showOrderInfo: false})
   },
   updateCareCurrent(e){
     var that = this

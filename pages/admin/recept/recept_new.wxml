@@ -21,7 +21,8 @@
   bind:close="onPopClose" close-icon="close" />
   <van-popup show="{{ showOrderInfo }}" position="bottom" custom-style="height: 80%;" 
   bind:close="onPopOrderInfoClose" close-icon="close" >
-    <retail-order-info wx:if="{{bizType=='retail' && order && showOrderInfo}}" order="{{order}}" bindJump="jump" ></retail-order-info>
+    <retail-order-info wx:if="{{bizType=='retail' && order && showOrderInfo}}" order="{{order}}" 
+    bindJump="jump" bindCareOrderUpdate="careOrderUpdate"   ></retail-order-info>
     <care-back-drop wx:if="{{bizType=='care' && order && showOrderInfo}}" order="{{order}}" 
     bindUpdateCare="updateCareCurrent" ></care-back-drop>
   </van-popup>

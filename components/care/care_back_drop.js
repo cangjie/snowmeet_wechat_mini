@@ -1,3 +1,5 @@
+const util = require("../../utils/util")
+
 // components/care/care_back_drop.js
 Component({
 
@@ -12,7 +14,7 @@ Component({
    * Component initial data
    */
   data: {
-
+    allWellFormed: false
   },
   lifetimes:{
     ready(){
@@ -30,6 +32,8 @@ Component({
       var that = this
       var order = that.data.order
       //var cares = order.cares
+      var total = 0
+      var allWellFormed = true
       for(var i = 0; i < order.cares.length; i++){
         var care = order.cares[i]
         var services = ''
@@ -45,9 +49,16 @@ Component({
         if (care.repair_memo && care.repair_memo != ''){
           services += care.repair_memo
         }
+        if (care.urgent == 1){
+          services += '加急'
+        }
         care.services = services
+        total += care.summary
+        if (util.getCareWellFormMessage(care) != ''){
+          allWellFormed = false
+        }
       }
-      that.setData({order})
+      that.setData({order, total, totalStr: util.showAmount(total), allWellFormed})
     },
     setCurrent(e){
       var that = this
@@ -63,6 +74,22 @@ Component({
       }
       that.setData({order})
       that.triggerEvent('UpdateCare', {order})
+    },
+    del(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var order = that.data.order
+      var newCares = []
+      for(var i = 0; order && order.cares && order.cares.length > 1 && i < order.cares.length; i++){
+        if (i != id){
+          newCares.push(order.cares[i])
+        }
+      }
+      if (newCares.length >= 1){
+        order.cares = newCares
+      }
+      that.setData({order})
+      that.triggerEvent('CareOrderUpdate', {order, refreshSelf: true})
     }
   }
 })

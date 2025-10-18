@@ -85,13 +85,15 @@
     <view class="left-column">【附加费】</view>
     <view class="right-column view-row">
       <input class="input" placeholder="0" style="text-align: center;width: 75rpx;" 
-        id="repair_charge" bindinput="setValue" disabled="{{!care.repair_memo || care.repair_memo == ''}}"  />元
+        id="repair_charge" bindinput="setValue" disabled="{{!care.repair_memo || care.repair_memo == ''}}" 
+        value="{{care.repair_charge? care.repair_charge : null}}" placeholder="0"  />元
     </view>
   </view>
   <view class="view-row">
     <view class="left-column">【减免】</view>
     <view class="right-column view-row">
-      <input class="input" id="discount" bindinput="setValue" placeholder="0" style="text-align: center;width: 75rpx;" />元
+      <input class="input" id="discount" bindinput="setValue" placeholder="0" 
+      style="text-align: center;width: 75rpx;" value="{{care.discount? care.discount:null}}" />元
     </view>
   </view>
   <view class="view-row">
@@ -105,7 +107,6 @@
     </view>
   </view>
   <view class="view-row" style="justify-content: center; margin-top: 50rpx;">
-    <!--van-button type="primary" size="small" style="margin-right: 50rpx;" bind:click="save"> 保 存 </van-button-->
     <van-button type="info" size="small" style="margin-left: 50rpx;" bind:click="addMore" 
     disabled="{{!wellFormed}}" > 下一件 </van-button>
   </view>
