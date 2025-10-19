@@ -1,5 +1,5 @@
+const app = getApp()
 const util = require("../../utils/util")
-
 // components/care/care_back_drop.js
 Component({
 
@@ -19,8 +19,10 @@ Component({
   lifetimes:{
     ready(){
       var that = this
-      that.setData({order: that.properties.order})
-      that.renderData()
+      app.loginPromiseNew.then(function(resolve){
+        that.setData({order: that.properties.order})
+        that.renderData()
+      })
     }
   },
 
@@ -90,6 +92,30 @@ Component({
       }
       that.setData({order})
       that.triggerEvent('CareOrderUpdate', {order, refreshSelf: true})
+    },
+    placeOrder(e){
+      var that = this
+      
+      var order = that.data.order
+      order.id = 0
+      order.valid = 1
+      for(var i = 0; order.cares && i < order.cares.length; i++){
+        order.cares[i].id = 0
+        order.cares[i].order_id = order.id
+        order.cares[i].valid = 1
+        for(var j = 0; order.cares[i].careImages && j < order.cares[i].careImages.length; j++){
+          order.cares[i].careImages[j].id = 0
+          order.cares[i].careImages[j].care_id = order.cares[i].id
+          order.cares[i].careImages[j].image_id = order.cares[i].careImages[j].image.id
+          order.cares[i].careImages[j].valid = true
+          order.cares[i].careImages[j].image = null
+        }
+      }
+      console.log('place order', that.data.order)
+      var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(postUrl, that.data.order).then(function (order){
+        console.log('order', order)
+      })
     }
   }
 })

@@ -36,7 +36,7 @@
   <block wx:if="{{totalStr != '¥NaN.00'}}" >
   <view >总计支付：{{totalStr}}</view>
   <view class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-    <van-button type="primary" disabled="{{!allWellFormed}}"  > 确 认 下 单 </van-button>
+    <van-button type="primary" disabled="{{!allWellFormed}}" bind:click="placeOrder"  > 确 认 下 单 </van-button>
   </view>
 </block>
 </scroll-view>

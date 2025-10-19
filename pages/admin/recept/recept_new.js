@@ -46,7 +46,7 @@ Page({
         case 'retail':
           title = '零售开单'
           break
-          defaut:
+        defaut:
           break
       }
       wx.setNavigationBarTitle({
@@ -303,6 +303,11 @@ Page({
     console.log('care order update', e)
     var that = this
     var order = e.detail.order
+    order.type = '养护'
+    order.contact_name = that.data.realName
+    order.contact_gender = that.data.gender
+    order.contact_num = that.data.cell
+    order.member_id = that.data.memberId
     if (e.detail.refreshSelf) {
       that.setData({ bizType: null, order })
       that.setData({ bizType: 'care' })
