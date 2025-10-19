@@ -139,6 +139,7 @@ Component({
       var id = e.currentTarget.id
       var value = e.detail.value
       var care = that.data.care
+      var needRender = true
       if (!care) {
         care = {}
       }
@@ -193,13 +194,13 @@ Component({
           care.edge_degree = '89'
           that.getProduct(care)
           break
-        case 'need_vax':
-          care.need_vax = value.length
-          care.need_unvax = care.need_vax
+        case 'need_wax':
+          care.need_wax = value.length
+          care.need_unwax = care.need_wax
           that.getProduct(care)
           break
-        case 'need_unvax':
-          care.need_unvax = value.length
+        case 'need_unwax':
+          care.need_unwax = value.length
           break
         case 'urgent':
           care.urgent = value.length
@@ -219,15 +220,23 @@ Component({
           }
           break
         case 'repair_charge':
-          if (!isNaN(value)) {
+          if (!isNaN(value) && value[value.length - 1]!='.' ) {
+            //needRender = false
             care.repair_charge = parseFloat(value)
             that.computeCharge(care)
           }
+          else{
+            needRender= false
+          }
           break
         case 'discount':
-          if (!isNaN(value)) {
+          if (!isNaN(value) && value[value.length - 1]!='.' ) {
+            //needRender = false
             care.discount = parseFloat(value)
             that.computeCharge(care)
+          }
+          else {
+            needRender = false
           }
           break
         case 'memo':
@@ -236,7 +245,10 @@ Component({
         default:
           break
       }
-      that.setData({ care })
+      if (needRender){
+        that.setData({ care })
+      }
+      e.needRender = needRender
       e.displayErrorMessage = false
       that.save(e)
     },
@@ -397,7 +409,7 @@ Component({
       var that = this
       that.setData({ product: null })
       care.common_charge = 0
-      if (care.need_edge == 1 && care.need_vax == 1) {
+      if (care.need_edge == 1 && care.need_wax == 1) {
         data.getCareProductPromise(that.data.shop, '双项', care.urgent).then(function (product) {
           product.sale_priceStr = util.showAmount(product.sale_price)
           that.setData({ product })
@@ -408,8 +420,8 @@ Component({
           that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
         })
       }
-      else if (care.need_edge == 1 || care.need_vax == 1) {
-        var productName = care.need_vax == 1 ? '打蜡' : (care.need_edge == 1 ? '修刃' : null)
+      else if (care.need_edge == 1 || care.need_wax == 1) {
+        var productName = care.need_wax == 1 ? '打蜡' : (care.need_edge == 1 ? '修刃' : null)
         data.getCareProductPromise(that.data.shop, productName, care.urgent).then(function (product) {
           product.sale_priceStr = util.showAmount(product.sale_price)
           that.setData({ product })
@@ -485,8 +497,9 @@ Component({
         //currentCare = care
         //currentCare.current = 1
       }
-
-      that.setData({ order })
+      if (!e || e.needRender == undefined || e.needRender == true){
+        that.setData({ order })
+      }
       that.triggerEvent('CareOrderUpdate', { order: order, refreshMain: false, refreshFooter: true })
     },
     addMore(e) {

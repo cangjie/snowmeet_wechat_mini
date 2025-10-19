@@ -1,4 +1,6 @@
-<scroll-view scroll-y style="height: 95%;">
+<payment orderId="{{order.id}}" wx:if="{{order && order.id && order.id > 0}}" 
+  bindOrderStatusChanged="orderStatusChange" bindOrderPaidResult="dealPaidResult" ></payment>
+<scroll-view scroll-y style="height: 95%;" wx:else >
   <view style="margin-top: 20rpx;margin-left: 20rpx;">
     <fui-swipeaction-group>
       <fui-swipe-action bind:click="del" id="{{index}}" wx:for="{{order.cares}}">
@@ -36,7 +38,7 @@
   <block wx:if="{{totalStr != '¥NaN.00'}}" >
   <view >总计支付：{{totalStr}}</view>
   <view class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-    <van-button type="primary" disabled="{{!allWellFormed}}" bind:click="placeOrder"  > 确 认 下 单 </van-button>
+    <van-button type="primary" disabled="{{!allWellFormed || paying}}" bind:click="placeOrder"  > 确 认 下 单 </van-button>
   </view>
 </block>
 </scroll-view>

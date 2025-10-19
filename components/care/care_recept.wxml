@@ -43,11 +43,11 @@
         <checkbox checked="{{care.need_edge == 1}}">修刃</checkbox>
       </checkbox-group>
       <input class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1}}" />度
-      <checkbox-group id="need_vax" bindchange="setValue" >
-        <checkbox style="margin-left: 30rpx;" checked="{{care.need_vax == 1}}" >打蜡</checkbox>
+      <checkbox-group id="need_wax" bindchange="setValue" >
+        <checkbox style="margin-left: 30rpx;" checked="{{care.need_wax == 1}}" >打蜡</checkbox>
       </checkbox-group>
-      <checkbox-group id="need_unvax" bindchange="setValue" >
-        <checkbox style="margin-left: 30rpx;" checked="{{care.need_unvax == 1}}">刮蜡</checkbox>
+      <checkbox-group id="need_unwax" bindchange="setValue" >
+        <checkbox style="margin-left: 30rpx;" checked="{{care.need_unwax == 1}}">刮蜡</checkbox>
       </checkbox-group>
     </view>
   </view>

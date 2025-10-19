@@ -1,5 +1,6 @@
 const app = getApp()
 const util = require("../../utils/util")
+const data = require('../../utils/data.js')
 // components/care/care_back_drop.js
 Component({
 
@@ -14,7 +15,8 @@ Component({
    * Component initial data
    */
   data: {
-    allWellFormed: false
+    allWellFormed: false,
+    paying: false
   },
   lifetimes:{
     ready(){
@@ -42,10 +44,10 @@ Component({
         if (care.need_edge == 1){
           services += (services==''?'':',') + '修刃' + care.edge_degree
         }
-        if (care.need_vax == 1){
+        if (care.need_wax == 1){
           services += (services==''?'':',') + '打蜡' 
         }
-        if (care.need_unvax == 1){
+        if (care.need_unwax == 1){
           services += (services==''?'':',') + '刮蜡' 
         }
         if (care.repair_memo && care.repair_memo != ''){
@@ -112,10 +114,27 @@ Component({
         }
       }
       console.log('place order', that.data.order)
+      that.setData({paying: true})
       var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(postUrl, that.data.order).then(function (order){
         console.log('order', order)
+        that.setData({order})
       })
+    },
+    dealPaidResult(e) {
+      var that = this
+      var orderId = e.detail.id
+      data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
+        var paid = util.orderPaid(order)
+        if (paid) {
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success'
+          })
+          that.triggerEvent('Jump', { url: '/pages/admin/care/care_order_detail?id=' + order.id })
+        }
+      })
+
     }
   }
 })
