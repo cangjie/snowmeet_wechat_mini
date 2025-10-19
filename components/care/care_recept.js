@@ -268,15 +268,18 @@ Component({
       data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
         .then(function (uploadedFile) {
           console.log('file uploaded', uploadedFile)
+          image.id = uploadedFile.id
           image.url = uploadedFile.file_path_name
           image.thumb = uploadedFile.file_path_name
           image.type = uploadedFile.file_type
           data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
             .then(function (uploadThumbFile) {
               console.log('thumb uploaded', uploadThumbFile)
+              image.id = uploadThumbFile.id
               image.thumb = uploadThumbFile.thumbUrl
               image.status = 'success'
               image.message = ''
+              image.image = uploadThumbFile
               var care = that.getCurrentCare()
               for (var i = 0; i < care.careImages.length; i++) {
                 if (care.careImages[i].status == 'uploading') {
@@ -313,13 +316,13 @@ Component({
           image.thumb = image.image.thumb
         }
         else {
-          image.thumb = 'https://snowmeet.wanlonghuaxue.com' + image.thumb
+          image.thumb = 'https://snowmeet.wanlonghuaxue.com' + image.image.thumb
         }
         if (image.image.file_path_name.indexOf('http') == 0) {
           image.url = image.image.file_path_name
         }
         else {
-          image.url = 'https://snowmeet.wanlonghuaxue.com' + image.file_path_name
+          image.url = 'https://snowmeet.wanlonghuaxue.com' + image.image.file_path_name
         }
       }
       that.setData({ order, care })
