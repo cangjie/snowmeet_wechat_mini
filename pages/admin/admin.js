@@ -157,7 +157,8 @@ Page({
         path = 'rent/rent_report'
         break
       case 'rent_list_cell':
-        path = 'rent/rent_list_by_cell'
+        //path = 'rent/rent_list_by_cell'
+        path = 'fire/fire_care_list?bizType=rent'
         break
       case 'test':
         path = '/pages/admin/recept/customer_identity'
@@ -236,7 +237,8 @@ Page({
         path = '/pages/admin/env'
         break
       case 'maintainSerchQuick':
-        path = '/pages/admin/maintain/search_quick'
+        //path = '/pages/admin/maintain/search_quick'
+        path = '/pages/admin/fire/fire_care_list?bizType=care'
         break
       case 'ticket_use':
         path = '/pages/admin/ticket/use_entry'
