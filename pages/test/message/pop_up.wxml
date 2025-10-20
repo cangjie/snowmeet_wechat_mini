@@ -1,3 +1,0 @@
-<view>
-  <button bindtap="request" > Subscribe </button>
-</view>

@@ -1,7 +1,0 @@
-{
-  "usingComponents": {
-    "multi-uploader": "/components/uploader/multi-uploader",
-    "mp-dialog": "weui-miniprogram/dialog/dialog",
-    "mp-uploader": "weui-miniprogram/uploader/uploader"
-  }
-}
