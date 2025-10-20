@@ -130,4 +130,12 @@ Page({
     }
     that.setData({orders, totalAmount})
   },
+  gotoDetail(e){
+    var that = this
+    if (that.data.orderType == '租赁'){
+      wx.navigateTo({
+        url: 'fire_order_detail?id=' + e.currentTarget.id,
+      })
+    }
+  }
 })

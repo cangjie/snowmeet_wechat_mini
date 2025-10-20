@@ -489,6 +489,17 @@ const getCareProductPromise = function (shop, service, urgent){
     })
   })
 }
+const refundPromise = function(orderId, refunds, sessionKey){
+  var refundUrl = app.globalData.requestPrefix + 'Order/Refund/' + orderId.toString() + '?sessionKey=' + sessionKey
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(refundUrl, refunds).then(function(order){
+      resolve(order)
+    }).catch(function(exp){
+      reject(exp)
+    })
+  })
+  
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -525,5 +536,6 @@ module.exports = {
   getEquipBrandsPromise,
   uploadFilePromise,
   getCareOthersServicePromise,
-  getCareProductPromise
+  getCareProductPromise,
+  refundPromise
 }

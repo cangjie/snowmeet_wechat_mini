@@ -134,7 +134,8 @@
     "pages/admin/retail/retail_order_list",
     "pages/admin/retail/retail_order_detail",
     "pages/order/payment_entry",
-    "pages/admin/fire/fire_care_list"
+    "pages/admin/fire/fire_care_list",
+    "pages/admin/fire/fire_order_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",
