@@ -23,7 +23,7 @@
             </view>
             <view class="view-row" >
               <view class="left-column" >【手机】</view>
-              <view class="right-column">{{item.cell}}</view>
+              <view class="right-column">{{item.customerCell}}</view>
             </view>
             
             <view class="view-row">
