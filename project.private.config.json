@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "雪票",
+          "pathName": "pages/index/index",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "顾客支付",
           "pathName": "pages/order/payment_entry",
           "query": "paymentId=32618",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "散客接待",
