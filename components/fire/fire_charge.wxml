@@ -12,8 +12,23 @@
       <textarea style="width: 450rpx;height: 200rpx;" class="input" bindinput="setMemo" ></textarea>
     </view>
   </view>
+  <view class="view-row" >
+    <view class="left-column" >【招待】</view>
+    <view class="right-column" >
+      <checkbox-group bindchange="setEntertain" >
+        <checkbox></checkbox>
+      </checkbox-group>
+    </view>
+  </view>
   <view class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-    <van-button type="primary" bind:click="placeOrder" disabled="{{!order.paying_amount}}" > 确 认 收 款 </van-button>
+    <van-button wx:if="{{order.entertain==1}}" type="primary" bind:click="placeEntertain" disabled="{{!order.paying_amount}}" > 
+    确 认 招 待 </van-button>
+    <van-button wx:else  type="primary" bind:click="placeOrder" disabled="{{!order.paying_amount}}" > 
+    确 认 收 款 </van-button>
   </view>
 </view>
-<payment wx:else orderId="{{order.id}}" bindOrderPaidResult="dealPaidResult" ></payment>
+<block wx:else >
+  <block wx:if="{{order.entertain == 1}}" >
+  </block>
+  <payment wx:else orderId="{{order.id}}" bindOrderPaidResult="dealPaidResult" ></payment>
+</block>

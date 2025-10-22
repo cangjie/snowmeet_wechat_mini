@@ -4,7 +4,7 @@
         <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
           <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;">
             <view wx:if="{{item.is_test == 1}}">【测】</view>
-            <view wx:if="{{item.haveEntertain}}">【招】</view>
+            <view wx:if="{{item.haveEntertain==true}}">【招】</view>
             <view wx:if="{{item.is_package == 0}}">【单】</view>
             <view wx:if="{{item.haveOnCredit}}">【挂】</view>
             <view>{{item.memberShip}}</view>

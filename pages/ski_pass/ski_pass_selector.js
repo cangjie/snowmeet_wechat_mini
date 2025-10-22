@@ -161,7 +161,7 @@ Page({
       resort = '万龙'
       that.setData({resort})
     }
-    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?resort=' + encodeURIComponent(resort)
+    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?showHidden=1&resort=' + encodeURIComponent(resort)
     wx.request({
       url: getUrl,
       method: 'GET',

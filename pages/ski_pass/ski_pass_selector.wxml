@@ -61,7 +61,8 @@
         <view style="width: 450rpx;">{{item.name}}</view>
         <!--view style="width: 180rpx;margin-top: 50rpx;text-align: right;">{{item.sale_price_str}}起</view-->
         <view style="margin-left: 20rpx;margin-top: 20rpx;">
-          <button id="{{item.id}}" size="mini" class="input" bind:tap="gotoDetail">预定</button>
+          <!--button id="{{item.id}}" size="mini" class="input" bind:tap="gotoDetail">预定</button-->
+          <van-button id="{{item.id}}" size="small" type="info" bind:click="gotoDetail" > 预 定 </van-button>
         </view>
       </view>
     </mp-cell>

@@ -78,8 +78,29 @@ Component({
       order.valid = 1
       var url = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(url, order).then(function(placedOrder){
+        console.log('place order', placedOrder)
         that.setData({order: placedOrder})
-
+        if (order.entertain == 1){
+          wx.showToast({
+            title: '招待成功',
+            icon: 'success'
+          })
+          var bizType = ''
+          switch(order.type){
+            case '养护':
+              bizType = 'care'
+              break
+            case '租赁':
+              bizType = 'rent'
+              break
+            default:
+              break
+          }
+          wx.navigateTo({
+            url: '/pages/admin/fire/fire_care_list?bizType=' + bizType ,
+          })
+          
+        }
       })
     },
     dealPaidResult(e){
@@ -96,6 +117,28 @@ Component({
         }
       })
 
+    },
+    setEntertain(e){
+      var that = this
+      var order = that.data.order
+      order.entertain = e.detail.value.length
+      that.setData({order})
+    },
+    placeEntertain(e){
+      var that = this
+      wx.showModal({
+        title: '确认招待',
+        content: '该订单是招待订单，无需收款。',
+        complete: (res) => {
+          if (res.cancel) {
+            
+          }
+      
+          if (res.confirm) {
+            that.placeOrder(e)
+          }
+        }
+      })
     }
   }
 })

@@ -72,6 +72,11 @@
         <view class="left-column" >接待：</view>
         <view class="right-column" >{{item.staff.name}}</view>
       </view>
+      <view class="view-row" style="{{item.backgroundColor != '' ? 'background-color:' + item.backgroundColor + ';' : ''}}{{item.textColor != '' ? 'color:' + item.textColor + ';' : ''}}" >
+        <view class="left-column" style="width: 165rpx;" >备注：</view>
+        <view class="right-column" style="width: 300rpx;" >{{item.memo}}</view>
+        
+      </view>
     </mp-cell>
     <mp-cell wx:for="{{item.cares}}" wx:for-item="care" id="{{care.id}}" bindtap="gotoDetail" >
       <view style="display: flex;flex-direction: row;{{item.backgroundColor != '' ? 'background-color:' + item.backgroundColor + ';' : ''}}{{item.textColor != '' ? 'color:' + item.textColor + ';' : ''}}" >
