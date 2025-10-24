@@ -10,9 +10,9 @@
   </view>
   <view style="height: 200rpx;">
     <van-goods-action>
-      <van-goods-action-icon wx:if="{{bizType == 'rent'}}" info="{{rentals.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" />
+      <!--van-goods-action-icon wx:if="{{bizType == 'rent'}}" info="{{rentals.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" /-->
       <rent-recept-footer wx:if="{{showFooter && bizType == 'rent'}}" rentals="{{rentals}}"
-      bindWellFormed="rentalWellFormed" ></rent-recept-footer>
+      bindWellFormed="rentalWellFormed" bindShowRentBackDrop="showRentBackDrop" ></rent-recept-footer>
       <retail-footer wx:if="{{showFooter && bizType == 'retail'}}" order="{{order}}" bindPlaceOrderFinish="showRetailOrder" ></retail-footer>
       <care-footer wx:if="{{showFooter && bizType == 'care'}}" order="{{order}}" bindShowCareBackDrop="showCareBackDrop" ></care-footer>
     </van-goods-action>
@@ -25,5 +25,6 @@
     bindJump="jump" bindCareOrderUpdate="careOrderUpdate"   ></retail-order-info>
     <care-back-drop wx:if="{{bizType=='care' && order && showOrderInfo}}" order="{{order}}" 
     bindUpdateCare="updateCareCurrent" ></care-back-drop>
+    <rent-back-drop wx:if="{{bizType=='rent' && showOrderInfo}}" rentals="{{rentals}}" ></rent-back-drop>
   </van-popup>
 </view>

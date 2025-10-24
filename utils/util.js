@@ -285,6 +285,7 @@ const getCareWellFormMessage = function(care) {
   }
   return ''
 }
+
 module.exports = {
   formatDateTime: formatDateTime,
   formatDate: formatDate,

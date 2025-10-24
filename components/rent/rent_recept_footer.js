@@ -51,6 +51,10 @@ Component({
         totalGuarantyRealAmountStr: util.showAmount(totalGuarantyAmount - totalGuarantyDiscountAmount)
       })
       that.triggerEvent('WellFormed', util.checkRentalsWellForm(rentals))
+    },
+    onClickIcon(e){
+      var that = this
+      that.triggerEvent('ShowRentBackDrop', {rentals: that.data.rentals})
     }
   }
 })

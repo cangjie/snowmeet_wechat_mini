@@ -325,9 +325,18 @@ Page({
     that.setData({order, showOrderInfo: true})
 
   },
+  showRentBackDrop(e){
+    var that = this
+    var rentals = e.detail.rentals
+    that.setData({showOrderInfo: true})
+
+  },
   onPopOrderInfoClose(e){
     var that = this
     console.log('close back drop', e)
+    if (that.data.bizType == 'rent'){
+      that.setData({showOrderInfo: false})
+    }
     //that.setData({showOrderInfo: false})
   },
   updateCareCurrent(e){

@@ -1,1 +1,1 @@
-/* components/rent/rent_recept_footer.wxss */
+@import '/app.wxss';
