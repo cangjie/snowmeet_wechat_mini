@@ -227,10 +227,12 @@ const checkRentalsWellForm = function(rentals){
   var well = true
   for(var i = 0; i < rentals.length; i++){
     var rental = rentals[i]
-    if (!rental.totalAmount){
+    /*
+    if (isNaN(rental.totalAmount)){
       well = false
       break
     }
+    */
     if (rental.noGuaranty != true && !rental.deposit){
       well = false
       break

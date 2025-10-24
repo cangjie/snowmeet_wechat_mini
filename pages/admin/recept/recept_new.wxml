@@ -25,6 +25,6 @@
     bindJump="jump" bindCareOrderUpdate="careOrderUpdate"   ></retail-order-info>
     <care-back-drop wx:if="{{bizType=='care' && order && showOrderInfo}}" order="{{order}}" 
     bindUpdateCare="updateCareCurrent" ></care-back-drop>
-    <rent-back-drop wx:if="{{bizType=='rent' && showOrderInfo}}" rentals="{{rentals}}" bindRentOrderPaying="setRentOrderPaying" ></rent-back-drop>
+    <rent-back-drop wx:if="{{bizType=='rent' && showOrderInfo}}" rentals="{{rentals}}" bindRentOrderPaying="setRentOrderPaying" bindJump="jump" ></rent-back-drop>
   </van-popup>
 </view>

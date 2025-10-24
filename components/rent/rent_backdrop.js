@@ -78,6 +78,25 @@ Component({
           that.setData({order: rentOrder})
         }
       })
+    },
+    orderStatusChange(e){
+      console.log('order status changed', e)
+    },
+    dealPaidResult(e) {
+      var that = this
+      var orderId = e.detail.id
+      data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
+        var paid = util.orderPaid(order)
+        if (paid) {
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success'
+          })
+          that.triggerEvent('Jump', { url: '/pages/admin/rent/rent_details?id=' + order.id })
+        }
+      })
+
     }
+   
   }
 })
