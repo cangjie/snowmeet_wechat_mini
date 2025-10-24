@@ -334,15 +334,18 @@ Page({
   onPopOrderInfoClose(e){
     var that = this
     console.log('close back drop', e)
-    if (that.data.bizType == 'rent'){
+    if (that.data.bizType == 'rent' && that.data.rentOrderPaying != true){
       that.setData({showOrderInfo: false})
     }
-    //that.setData({showOrderInfo: false})
   },
   updateCareCurrent(e){
     var that = this
     var order = e.detail.order
     that.setData({order, bizType: null})
     that.setData({bizType: 'care', showOrderInfo: false})
+  },
+  setRentOrderPaying(){
+    var that = this
+    that.setData({rentOrderPaying: true})
   }
 })

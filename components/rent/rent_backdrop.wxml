@@ -1,4 +1,4 @@
-<payment orderId="{{order && order.id && order.id > 0}}" wx:if="{{order && order.id && order.id > 0}}" 
+<payment orderId="{{order.id}}" wx:if="{{order && order.id && order.id > 0}}" 
   bindOrderStatusChanged="orderStatusChange" bindOrderPaidResult="dealPaidResult" ></payment>
 <scroll-view scroll-y style="height: 95%;" wx:else >
   <view style="margin-top: 50rpx;">
@@ -22,7 +22,7 @@
       <view class="right-column" >{{totalGuarantyStr}}</view>
     </view>
     <view class="view-row" style="justify-content: center;margin-top: 100rpx;">
-      <van-button type="primary" disabled="{{!wellFormed}}" > 确 认 下 单 </van-button>
+      <van-button type="primary" disabled="{{!wellFormed}}" bind:click="placeOrder" > 确 认 下 单 </van-button>
     </view>
     
   </view>

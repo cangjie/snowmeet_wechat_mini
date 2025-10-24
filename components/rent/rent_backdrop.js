@@ -54,11 +54,30 @@ Component({
         else {
           data.getRentCategoryPromise(rental.category_id).then(function(rentCategory){
             rental.name = rentCategory.name
+
           })
         }
 
       }
 
+    },
+    placeOrder(){
+      var that = this
+      var rentals = that.data.rentals
+      var orderId = null
+      for(var i = 0; rentals && i < rentals.length; i++){
+        if (rentals[i].order_id && rentals[i].order_id > 0){
+          orderId = rentals[i].order_id
+          break
+        }
+      }
+      var placeUrl = app.globalData.requestPrefix + 'Order/PlaceRentOrder/' + orderId + '?sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(placeUrl, null).then(function(rentOrder){
+        if (rentOrder.valid == 1){
+          that.triggerEvent('RentOrderPaying', {})
+          that.setData({order: rentOrder})
+        }
+      })
     }
   }
 })
