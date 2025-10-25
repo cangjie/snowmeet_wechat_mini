@@ -127,6 +127,11 @@ Page({
       order.calledName = calledName
       order.cell = cell
       order.memberShip = memberShip
+
+      for(var j = 0; order.availablePayments && j < order.availablePayments.length; j++){
+        order.payMethod = order.availablePayments[j].pay_method
+      }
+
     }
     that.setData({orders, totalAmount})
   },
