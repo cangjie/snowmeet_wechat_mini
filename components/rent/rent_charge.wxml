@@ -44,7 +44,7 @@
         </view>
       </view>
 
-      <block wx:if="{{rental.pricePresets.length == 1}}">
+      <block wx:if="{{rental.pricePresets.length <= 1}}">
         <view class="view-row">
           <view class="left-column view-row" style="align-items: center;">【场次】</view>
           <view class="right-column view-row" >
