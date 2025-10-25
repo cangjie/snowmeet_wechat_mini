@@ -142,5 +142,62 @@ Page({
         url: 'fire_order_detail?id=' + e.currentTarget.id,
       })
     }
+  },
+  getOrderById(id){
+    var that = this
+    //var id = parseInt(e.currentTarget.id)
+    var orders = that.data.orders
+    var order = null
+    for(var i = 0; i < orders.length; i++){
+      if (orders[i].id == id){
+        //[i].moddingMemo = true
+        order = orders[i]
+        break
+      }
+    }
+    return order
+  },
+  setModMemo(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.getOrderById(id)
+    order.moddingMemo = true
+    var orders = that.data.orders
+    that.setData({orders})
+  },
+  cancelModMemo(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.getOrderById(id)
+    order.moddingMemo = null
+    that.setData({orders: that.data.orders})
+  },
+  confirmModMemo(e){
+    wx.showModal({
+      title: '确认修改备注？',
+      content: '',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.getOrderById(id)
+    data.updateOrderPromise(order, '临时订单修改备注', app.globalData.sessionKey).then(function (modedOrder){
+      console.log('order updated', modedOrder)
+      that.cancelModMemo(e)
+    })
+        }
+      }
+    })
+    
+  },
+  setOrderMemo(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.getOrderById(id)
+    order.memo = e.detail.value
   }
 })
