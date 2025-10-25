@@ -338,7 +338,7 @@ Page({
       success:(res)=>{
         console.log(res)
         var timeStamp = res.result
-        var setSessionUrl = 'https://' + app.globalData.domainName + '/core/BackgroundLoginSession/SetSessionKey/' + timeStamp + '?sessionKey=' + app.globalData.sessionKey
+        var setSessionUrl = app.globalData.requestPrefix + 'BackgroundLoginSession/SetSessionKey/' + timeStamp + '?sessionKey=' + app.globalData.sessionKey
         wx.request({
           url: setSessionUrl,
           method: 'GET',
