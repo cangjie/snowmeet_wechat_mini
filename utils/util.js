@@ -233,7 +233,7 @@ const checkRentalsWellForm = function(rentals){
       break
     }
     */
-    if (rental.noGuaranty != true && !rental.deposit){
+    if (rental.noGuaranty != true && !rental.guaranty){
       well = false
       break
     }

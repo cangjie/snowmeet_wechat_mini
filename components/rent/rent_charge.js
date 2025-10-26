@@ -123,7 +123,9 @@ Component({
       that.computeRental(rental)
     },
     setRentalDiscount(e){
-      if (isNaN(e.detail.value)){
+      var value = e.detail.value
+      if (isNaN(value) || value[value.length-1]=='.' 
+        || value[value.length-1]=='0' ){
         return
       }
       var that = this
