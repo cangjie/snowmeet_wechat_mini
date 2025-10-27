@@ -39,9 +39,9 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <van-tabs active="{{ active }}" bind:change="onTabChange">
+  <van-tabs active="{{ activeTabIndex }}" bind:change="onTabChange">
     <van-tab title="按租赁商品">
-      <mp-cells wx:for="{{order.rentals}}" title="{{item.titleName}}">
+      <mp-cells wx:for="{{order.rentals}}" title="{{item.titleName}}" wx:key="{{rental}}">
         <mp-cell>
           <view class="view-row">
             <view class="left-column">【起租日期】</view>
@@ -83,11 +83,42 @@
         <mp-cell>
           <view class="view-row" style="justify-content: center;">
             <van-button type="info" size="small">租金明细</van-button>
-            <van-button type="primary" size="small" style="margin-left: 50rpx;">租金明细</van-button>
+            <van-button id="{{item.id}}" type="primary" size="small" style="margin-left: 50rpx;" bind:click="showRentItem">租赁物明细</van-button>
           </view>
         </mp-cell>
       </mp-cells>
     </van-tab>
-    <van-tab title="按租赁物">内容 2</van-tab>
+    <van-tab title="按租赁物">
+      <mp-cells wx:for="{{order.rentals}}" wx:for-item="rental" title="{{rental.titleName}}" 
+      wx:if="{{currentRentalId == null || (currentRentalId == rental.id) }}">
+       <block wx:for="{{rental.rentItems}}" >
+          <mp-cell>
+            <view class="view-row">
+              <view class="left-column">【名称】</view>
+              <view class="right-column" style="width: 500rpx;">{{item.name}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row">
+              <view class="left-column">【编码】</view>
+              <view class="right-column">{{item.code}}</view>
+              <view class="left-column">【分类】</view>
+              <view class="right-column"></view>
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row" style="justify-content: center;" >
+              <van-button type="primary" size="small"  >归还</van-button>
+              <van-button type="warning" size="small" style="margin-left: 50rpx;" >暂存</van-button>
+              <van-button type="danger" size="small" style="margin-left: 50rpx;" >赔偿</van-button>
+              <van-button type="info" size="small" style="margin-left: 50rpx;" >发还记录</van-button>
+            </view>
+          </mp-cell>
+        </block>
+      </mp-cells>
+      <view class="view-row" style="justify-content: center;" wx:if="{{currentRentalId != null}}">
+        <van-button type="info" bind:click="showAllRentItem"> 查 看 全 部 </van-button>
+      </view>
+    </van-tab>
   </van-tabs>
 </view>

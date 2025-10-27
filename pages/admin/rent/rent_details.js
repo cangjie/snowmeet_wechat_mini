@@ -7,7 +7,8 @@ Page({
    * Page initial data
    */
   data: {
-    activeTabIndex: 0
+    activeTabIndex: 0,
+    currentRentalId: null,
   },
 
   /**
@@ -152,5 +153,14 @@ Page({
     var that = this
     that.setData({activeTabIndex: e.detail.index})
 
+  },
+  showRentItem(e){
+    var that = this
+    var id = e.currentTarget.id
+    that.setData({activeTabIndex: 1, currentRentalId: id})
+  },
+  showAllRentItem(e){
+    var that = this
+    that.setData({currentRentalId: null})
   }
 })
