@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "租赁订单",
+          "pathName": "/pages/admin/rent/rent_details",
+          "query": "id=60799",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "雪票",
           "pathName": "pages/index/index",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "顾客支付",

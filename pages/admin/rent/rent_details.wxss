@@ -1,1 +1,4 @@
 /* pages/admin/rent/rent_details.wxss */
+.left-column{
+  text-align: left;
+}
