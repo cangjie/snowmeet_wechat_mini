@@ -356,12 +356,12 @@ const GetUnCommonPayMethodPromise = function () {
       }
       othersPayMethods.push('手工填写')
       resolve(othersPayMethods)
-    }).catch(function(exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const updateOrderPromise = function(updatedOrder, scene, sessionKey) {
+const updateOrderPromise = function (updatedOrder, scene, sessionKey) {
   return new Promise(function (resolve, reject) {
     var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
     util.performWebRequest(updateUrl, updatedOrder).then(function (order) {
@@ -372,122 +372,132 @@ const updateOrderPromise = function(updatedOrder, scene, sessionKey) {
     })
   })
 }
-const cancelPayingPromise = function(orderId, sessionKey) {
-  return new Promise(function (resolve, reject){
+const cancelPayingPromise = function (orderId, sessionKey) {
+  return new Promise(function (resolve, reject) {
     var cancelUrl = app.globalData.requestPrefix + 'Order/CancelPaying/' + orderId.toString() + '?sessionKey=' + sessionKey
-    util.performWebRequest(cancelUrl, null).then(function (resovle){
-      if (resolve == null){
+    util.performWebRequest(cancelUrl, null).then(function (resovle) {
+      if (resolve == null) {
         reject()
       }
-      else{
+      else {
         resolve(resolve)
       }
-    }).catch(function (reject){
+    }).catch(function (reject) {
       reject(reject)
     })
   })
 }
-const getOrderFromPaymentByCustomer = function (paymentId, sessionKey){
+const getOrderFromPaymentByCustomer = function (paymentId, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Order/GetOrderFromPaymentByCustomer/' + paymentId.toString() + '?sessionKey=' + sessionKey
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (order){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (order) {
       resolve(order)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const updateOrderWithDetailPromise = function (order, scene, sessionKey){
+const updateOrderWithDetailPromise = function (order, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderWithDetailByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(updateUrl, order).then(function (order){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(updateUrl, order).then(function (order) {
       resolve(order)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getEquipBrandsPromise = function(type){
+const getEquipBrandsPromise = function (type) {
   var getUrl = app.globalData.requestPrefix + 'Care/GetBrands?type=' + encodeURIComponent(type)
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (brandList){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (brandList) {
       resolve(brandList)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const uploadFilePromise = function(mainId, filePath, purpose, type, sessionKey){
-  var uploadUrl = 'https://snowmeet.wanlonghuaxue.com/api/UploadFile/UploadFileWithThumb?sessionKey=' + sessionKey 
+const uploadFilePromise = function (mainId, filePath, purpose, type, sessionKey) {
+  var uploadUrl = 'https://snowmeet.wanlonghuaxue.com/api/UploadFile/UploadFileWithThumb?sessionKey=' + sessionKey
   //+ '&purpose=' + encodeURIComponent(purpose) + '&fileType=' + encodeURIComponent(type)
-  if (mainId){
+  if (mainId) {
     uploadUrl += ('&mainId=' + mainId.toString())
   }
-  else
-  {
-    if (purpose){
+  else {
+    if (purpose) {
       uploadUrl += '&purpose=' + encodeURIComponent(purpose)
     }
-    if (type){
+    if (type) {
       uploadUrl += '&fileType=' + encodeURIComponent(type)
     }
   }
-  return new Promise(function (resolve, reject){
+  return new Promise(function (resolve, reject) {
     wx.uploadFile({
       filePath: filePath,
       name: 'file',
       url: uploadUrl,
-      success:(res)=>{
+      success: (res) => {
         console.log('upload success', res)
         resolve(JSON.parse(res.data))
 
       },
-      fail:(res)=>{
+      fail: (res) => {
         console.log('upload failed', res)
         reject(JSON.parse(res))
       }
     })
   })
 }
-const getCareOthersServicePromise = function(type){
+const getCareOthersServicePromise = function (type) {
   var getUrl = app.globalData.requestPrefix + 'Care/GetOthersService?type=' + encodeURIComponent(type)
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(getUrl, null).then(function(list){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (list) {
       resolve(list)
-    }).catch(function(exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getCareProductPromise = function (shop, service, urgent){
+const getCareProductPromise = function (shop, service, urgent) {
   var getUrl = app.globalData.requestPrefix + 'Care/GetProducts?shop=' + encodeURIComponent(shop)
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function(productList){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (productList) {
       //var product = null
-      for(var i = 0; i < productList.length; i++){
+      for (var i = 0; i < productList.length; i++) {
         //product = productList[i]
         if (productList[i].name.indexOf('修刃打蜡') >= 0 && service == '双项') {
-          if (productList[i].name.indexOf('次日') >= 0 && urgent != 1){
+          if (productList[i].name.indexOf('次日') >= 0 && urgent != 1) {
             resolve(productList[i])
           }
-          else if (urgent == 1 &&  productList[i].name.indexOf('立等') >= 0 ) {
+          else if (urgent == 1 && productList[i].name.indexOf('立等') >= 0) {
             resolve(productList[i])
           }
         }
-        if (service != '双项' && 　productList[i].name.indexOf(service) >= 0)  {
-          if (productList[i].name.indexOf('次日') >= 0 && urgent != 1){
+        if (service != '双项' && productList[i].name.indexOf(service) >= 0) {
+          if (productList[i].name.indexOf('次日') >= 0 && urgent != 1) {
             resolve(productList[i])
           }
-          else if (urgent == 1 &&  productList[i].name.indexOf('立等') >= 0 ) {
+          else if (urgent == 1 && productList[i].name.indexOf('立等') >= 0) {
             resolve(productList[i])
           }
         }
       }
       resolve(null)
-    }).catch(function(exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
+}
+const getRentalPromise = function (rentalId, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentalByStaff/' + rentalId + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (rental) {
+      resolve(rental)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+
 }
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -525,5 +535,6 @@ module.exports = {
   getEquipBrandsPromise,
   uploadFilePromise,
   getCareOthersServicePromise,
-  getCareProductPromise
+  getCareProductPromise,
+  getRentalPromise
 }

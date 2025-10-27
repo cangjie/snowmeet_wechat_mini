@@ -41,43 +41,43 @@
   </mp-cells>
   <van-tabs active="{{ activeTabIndex }}" bind:change="onTabChange">
     <van-tab title="按租赁商品">
-      <mp-cells wx:for="{{order.rentals}}" title="{{item.titleName}}" wx:key="{{rental}}">
+      <mp-cells wx:for="{{order.rentals}}" title="{{item.titleName}}" >
         <mp-cell>
           <view class="view-row">
             <view class="left-column">【起租日期】</view>
-            <view class="right-column"></view>
+            <view class="right-column">{{item.realStartDateStr}}</view>
             <view class="left-column">【退租日期】</view>
-            <view class="right-column"></view>
+            <view class="right-column">{{item.realEndDateStr}}</view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row">
             <view class="left-column">【押金】</view>
-            <view class="right-column"></view>
+            <view class="right-column">{{item.guarantyAmountStr}}</view>
             <view class="left-column">【状态】</view>
-            <view class="right-column"></view>
+            <view class="right-column">{{item.settled == 1? '已结算': '在租'}}</view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row">
             <view class="left-column">【租金】</view>
-            <view class="right-column"></view>
+            <view class="right-column" >{{item.totalRentalAmountStr}}</view>
             <view class="left-column">【减免】</view>
-            <view class="right-column"></view>
+            <view class="right-column">{{item.totalDiscountAmountStr}}</view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row">
             <view class="left-column">【赔偿】</view>
-            <view class="right-column"></view>
+            <view class="right-column">{{item.totalRepairationAmountStr}}</view>
             <view class="left-column">【超时】</view>
-            <view class="right-column"></view>
+            <view class="right-column">{{item.totalOvertimeAmountStr}}</view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row">
             <view class="left-column">【小计】</view>
-            <view class="right-column"></view>
+            <view class="right-column">{{item.summaryStr}}</view>
           </view>
         </mp-cell>
         <mp-cell>
@@ -101,9 +101,33 @@
           <mp-cell>
             <view class="view-row">
               <view class="left-column">【编码】</view>
-              <view class="right-column">{{item.code}}</view>
+              <view class="right-column">{{item.noCode == true? '无编码' : item.code}}</view>
               <view class="left-column">【分类】</view>
-              <view class="right-column"></view>
+              <view class="right-column">{{item.category.name}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row">
+              <view class="left-column">【发放日期】</view>
+              <view class="right-column">{{item.pickDateStr}}</view>
+              <view class="left-column">【发放时间】</view>
+              <view class="right-column">{{item.pickTimeStr}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row">
+              <view class="left-column">【归还日期】</view>
+              <view class="right-column">{{item.returnDateStr}}</view>
+              <view class="left-column">【归还时间】</view>
+              <view class="right-column">{{item.returnTimeStr}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row">
+              <view class="left-column">【状态】</view>
+              <view class="right-column">{{item.status}}</view>
+              <view class="left-column">【赔偿】</view>
+              <view class="right-column">{{item.totalRepairationAmountStr}}</view>
             </view>
           </mp-cell>
           <mp-cell>
