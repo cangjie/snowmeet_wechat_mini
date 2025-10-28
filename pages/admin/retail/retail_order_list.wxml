@@ -19,7 +19,6 @@
             <view class="view-row">
               <view class="left-column" >【顾客称呼】</view>
               <view class="right-column" style="width: 270rpx;margin-right: 0rpx;">{{item.calledName}}</view>
-              
             </view>
             <view class="view-row" >
               <view class="left-column" >【手机】</view>
@@ -44,6 +43,10 @@
             <view class="view-row">
               <view class="left-column">【开单人】</view>
               <view class="right-column">{{item.staff.name}}</view>
+            </view>
+            <view class="view-row" style="margin-left:200rpx;margin-top: 50rpx;" >
+
+              <van-button type="info" size="small" > 查 看 详 情 </van-button>
             </view>
           </view>
         </view>

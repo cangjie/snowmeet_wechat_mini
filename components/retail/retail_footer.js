@@ -94,7 +94,18 @@ Component({
       util.performWebRequest(postUrl, order).then(function (order){
         console.log('place order', order)
         that.setData({ordering: false, order})
-        that.triggerEvent('PlaceOrderFinish', order )
+        if(order.retails[0].order_type == '招待'){
+          wx.showToast({
+            title: '已确认招待',
+            icon: 'success'
+          })
+          wx.navigateTo({
+            url: '/pages/admin/retail/retail_order_detail?id=' + order.id.toString(),
+          })
+        }
+        else{
+          that.triggerEvent('PlaceOrderFinish', order )
+        }
       }).catch(function(exp){
         that.setData({ordering: false})
       })
@@ -103,6 +114,23 @@ Component({
       var that = this
       var order = that.data.order
       that.triggerEvent('PlaceOrderFinish', order)
+    },
+    placeEntertain(){
+      var that = this
+      wx.showModal({
+        title: '确认招待',
+        content: '',
+        complete: (res) => {
+          if (res.cancel) {
+            
+          }
+      
+          if (res.confirm) {
+            that.placeOrder()
+          }
+        }
+      })
     }
-  }
+  },
+  
 })

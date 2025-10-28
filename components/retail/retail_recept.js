@@ -121,12 +121,14 @@ Component({
         case 'urgent':
           retail.urgent = value
           break
+        case 'entertain':
+          retail.order_type = value == 1? '招待' : '普通'
+          break
         default:
           break
       }
       that.setData({order})
       that.triggerEvent('SyncRetailOrder', order)
     }
-  },
-  
+  }
 })
