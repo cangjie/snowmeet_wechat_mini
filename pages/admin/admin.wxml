@@ -10,9 +10,9 @@
     <mp-cell id="maintainSerchQuick" bindtap="nav" >
       <view style="background-color: orange" >【养护】临时查询</view>
     </mp-cell>
-    <!--mp-cell id="shopSale" bindtap="gotoSale" >
-      <view style="background-color: #FF7777">【零售】店销现货</view>
-    </mp-cell-->
+    <mp-cell  id="shopSaleList" bindtap="gotoSale"  >
+      <view style="background-color:#FF99FF" >【零售】临时查询</view>
+    </mp-cell>
     <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >
       <view style="background-color: #999999">【雪票】南山预定</view>
     </mp-cell>
@@ -46,8 +46,8 @@
   <mp-cells ext-class="my-cells" title="店铺销售" >
     <!--mp-cell id="shopSale" bindtap="gotoSale" >【零售】店销现货</mp-cell-->
     <mp-cell id="shopSaleList" bindtap="gotoSale" >【零售】订单列表</mp-cell>
-    <mp-cell id="enterain_form" bindtap="nav" >【零售】招待</mp-cell>
-    <mp-cell id="supplement" bindtap="nav" >【零售】补单</mp-cell>
+    <!--mp-cell id="enterain_form" bindtap="nav" >【零售】招待</mp-cell>
+    <mp-cell id="supplement" bindtap="nav" >【零售】补单</mp-cell-->
   </mp-cells>
   <mp-cells ext-class="my-cells" title="养护相关" >
     <mp-cell value="【养护】现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
