@@ -191,19 +191,6 @@ const createRentalDetail = function (rental, startDate, endDate) {
   return details
 }
 const getRentPrice = function (priceList, date, rentType) {
-  //var currentDate = new Date()
-  //var rentType = '日场'
-  /*
-  if (formatDate(date) == formatDate(currentDate)){
-    var hour = currentDate.getHours()
-    if (hour >= 13 && hour < 16){
-      rentType = '下午场'
-    }
-    else if (hour >= 16){
-      rentType = '夜场'
-    }
-  }
-  */
   var weekend = isWeekend(date)
   var commonPrice = null
   for (var i = 0; i < priceList.length; i++) {
@@ -220,19 +207,12 @@ const getRentPrice = function (priceList, date, rentType) {
   return commonPrice
 }
 const checkRentalsWellForm = function (rentals) {
-
   if (!rentals) {
     return false
   }
   var well = true
   for (var i = 0; i < rentals.length; i++) {
     var rental = rentals[i]
-    /*
-    if (isNaN(rental.totalAmount)){
-      well = false
-      break
-    }
-    */
     if (rental.noGuaranty != true && !rental.guaranty) {
       well = false
       break
