@@ -497,7 +497,17 @@ const getRentalPromise = function (rentalId, sessionKey) {
       reject(exp)
     })
   })
-
+}
+const setRentItemStatsPromise = function (rentItemId, status, sessionKey) {
+  var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemStatus/' + rentItemId.toString() + '?status=' +  encodeURIComponent(status) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(setUrl, null).then(function (rental){
+      resolve(rental)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+  
 }
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -536,5 +546,6 @@ module.exports = {
   uploadFilePromise,
   getCareOthersServicePromise,
   getCareProductPromise,
-  getRentalPromise
+  getRentalPromise,
+  setRentItemStatsPromise
 }

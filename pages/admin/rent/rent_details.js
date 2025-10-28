@@ -91,16 +91,16 @@ Page({
       rental.summary = rental.totalRentalAmount + rental.totalRepairationAmount + rental.totalOvertimeAmount
         - rental.ticketDiscountAmount - rental.othersDiscountAmount
       rental.summaryStr = util.showAmount(rental.summary)
-      if (rental.realStartDate == null){
+      if (rental.realStartDate == null) {
         rental.realStartDateStr = '--'
       }
-      else{
+      else {
         rental.realStartDateStr = util.formatDate(new Date(rental.realStartDate))
       }
-      if (rental.realEndDate == null){
+      if (rental.realEndDate == null) {
         rental.realEndDateStr = '--'
       }
-      else{
+      else {
         rental.realEndDateStr = util.formatDate(new Date(rental.realEndDate))
       }
       if (rental.isPackage) {
@@ -110,10 +110,10 @@ Page({
       else {
         rentals.push(rental)
       }
-      if (rental.noGuaranty == true){
+      if (rental.noGuaranty == true) {
         rental.guarantyAmountStr = '免押金'
       }
-      else{
+      else {
         rental.guarantyAmountStr = util.showAmount(rental.totalPaidGuarantyAmount)
       }
       if (rental.start_date) {
@@ -130,22 +130,22 @@ Page({
         rental.end_dateDateStr = util.formatDate(endDate)
         rental.end_dateTimeStr = util.formatTimeStr(endDate)
       }
-      for(var j = 0; j < rental.rentItems.length; j++){
+      for (var j = 0; j < rental.rentItems.length; j++) {
         var rentItem = rental.rentItems[j]
         rentItem.totalRepairationAmountStr = util.showAmount(rentItem.totalRepairationAmount)
-        if (rentItem.pickDate == null){
+        if (rentItem.pickDate == null) {
           rentItem.pickDateStr = '--'
           rentItem.pickTimeStr = '--'
         }
-        else{
+        else {
           rentItem.pickDateStr = util.formatDate(new Date(rentItem.pickDate))
           rentItem.pickTimeStr = util.formatTimeStr(new Date(rentItem.pickDate))
         }
-        if(rentItem.returnDate == null){
+        if (rentItem.returnDate == null) {
           rentItem.returnDateStr = '--'
           rentItem.returnTimeStr = '--'
         }
-        else{
+        else {
           rentItem.returnDateStr = util.formatDate(new Date(rentItem.returnDate))
           rentItem.returnTimeStr = util.formatTimeStr(new Date(rentItem.returnDate))
         }
@@ -182,18 +182,18 @@ Page({
     var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + id + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
-      for(var i = 0; order.rentals && i < order.rentals.length; i++){
-        data.getRentalPromise(order.rentals[i].id, app.globalData.sessionKey).then(function (newRental){
-          for(var j = 0; j < order.rentals.length; j++){
-            if (order.rentals[j].id == newRental.id){
+      for (var i = 0; order.rentals && i < order.rentals.length; i++) {
+        data.getRentalPromise(order.rentals[i].id, app.globalData.sessionKey).then(function (newRental) {
+          for (var j = 0; j < order.rentals.length; j++) {
+            if (order.rentals[j].id == newRental.id) {
               order.rentals[j] = newRental
               that.renderOrder(order)
-              that.setData({order})
+              that.setData({ order })
               break
             }
           }
-          
-        }).catch(function(exp){
+
+        }).catch(function (exp) {
 
         })
       }
@@ -203,19 +203,67 @@ Page({
 
     })
   },
-  onTabChange(e){
+  onTabChange(e) {
     console.log('tab changed', e)
     var that = this
-    that.setData({activeTabIndex: e.detail.index})
+    that.setData({ activeTabIndex: e.detail.index })
 
   },
-  showRentItem(e){
+  showRentItem(e) {
     var that = this
     var id = e.currentTarget.id
-    that.setData({activeTabIndex: 1, currentRentalId: id})
+    that.setData({ activeTabIndex: 1, currentRentalId: id })
   },
-  showAllRentItem(e){
+  showAllRentItem(e) {
     var that = this
-    that.setData({currentRentalId: null})
+    that.setData({ currentRentalId: null })
+  },
+  setPick(e) {
+    var that = this
+    var id = e.currentTarget.id
+    wx.showModal({
+      title: '确认发放',
+      content: '',
+      complete: (res) => {
+        if (res.cancel) {
+
+        }
+
+        if (res.confirm) {
+          data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
+            that.refreshStatus(newRental)
+          })
+        }
+      }
+    })
+  },
+  setReturn(e) {
+    var that = this
+    var id = e.currentTarget.id
+  },
+  setStore(e) {
+    var that = this
+    var id = e.currentTarget.id
+    wx.showModal({
+      title: '确认暂存',
+      content: '',
+      complete: (res) => {
+        if (res.cancel) {
+
+        }
+        if (res.confirm) {
+          data.setRentItemStatsPromise(id, '已暂存', app.globalData.sessionKey).then(function (newRental) {
+            that.refreshStatus(newRental)
+          })
+        }
+      }
+    })
+  },
+  refreshStatus(rental) {
+    var that = this
+    var order = that.data.order
+    var rentalIndex = util.getRentalIndexFromOder(rental.id, order)
+    order.rentals[rentalIndex] = rental
+    that.setData({ order })
   }
 })
