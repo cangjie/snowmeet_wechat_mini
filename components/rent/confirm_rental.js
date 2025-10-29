@@ -77,7 +77,7 @@ Component({
       var id = e.currentTarget.id
       var detailIndex = util.getRentalDetailIndexFromRental(id, rental)
       var detail = rental.details[detailIndex]
-      detail.valid = e.detail.value.length
+      detail.valid = e.detail.value.length==1?0:1
       detail.modified = true
     },
     setDiscount(e){

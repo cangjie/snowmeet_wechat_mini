@@ -265,7 +265,7 @@ Page({
     var order = that.data.order
     var message = ''
     var currentRental = null
-    //var currentItem = null
+    var currentItem = null
     for(var i = 0; order && order.rentals && i < order.rentals.length; i++){
       for(var j = 0; order.rentals[i].rentItems && j < order.rentals[i].rentItems.length; j++){
         if (order.rentals[i].rentItems[j].id == id){
