@@ -287,6 +287,26 @@ const getRentItemIndexFromRental = function (rentItemId, rental) {
   }
   return index
 }
+const getRentalDetailIndexFromRental = function(detailId, rental){
+  var index = null
+  for(var i = 0; rental && rental.details && i < rental.details.length; i++){
+    if (rental.details[i].id == detailId){
+      index = i;
+    }
+  }
+  return index
+}
+const canRenderNumber = function (number){
+  if (!number){
+    return false
+  }
+  if (number.indexOf('.') >= 0 && number[number.length - 1] == '0'){
+    return false
+  }
+  else{
+    return true
+  }
+}
 module.exports = {
   formatDateTime: formatDateTime,
   formatDate: formatDate,
@@ -308,5 +328,7 @@ module.exports = {
   orderPaid,
   getCareWellFormMessage,
   getRentalIndexFromOder,
-  getRentItemIndexFromRental
+  getRentItemIndexFromRental,
+  getRentalDetailIndexFromRental,
+  canRenderNumber
 }

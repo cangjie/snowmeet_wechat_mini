@@ -125,7 +125,7 @@ Component({
     setRentalDiscount(e){
       var value = e.detail.value
       if (isNaN(value) || value[value.length-1]=='.' 
-        || value[value.length-1]=='0' ){
+        || (value[value.length-1]=='0' && value.indexOf('.') > 0) ){
         return
       }
       var that = this

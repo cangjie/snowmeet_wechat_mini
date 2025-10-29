@@ -50,7 +50,7 @@
   <view style="height: 20rpx;" ></view>
   <view class="view-row" >
     <button size="mini" class="input" bindtap="save" > 保 存 </button>
-    <button size="mini" class="input" bindtap="save" > 取 消 </button>
+    <button size="mini" class="input" bindtap="cancel" > 取 消 </button>
   </view>
   <view style="height: 20rpx;" ></view>
 </view>

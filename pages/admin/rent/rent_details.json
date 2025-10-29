@@ -2,7 +2,8 @@
   "usingComponents": {
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
-    "mp-gallery": "weui-miniprogram/gallery/gallery"
+    "mp-gallery": "weui-miniprogram/gallery/gallery",
+    "confirm-rental": "/components/rent/confirm_rental"
   },
   "navigationBarTitleText": "租赁订单明细"
 }

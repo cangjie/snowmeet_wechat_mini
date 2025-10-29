@@ -10,6 +10,8 @@ Page({
   data: {
     activeTabIndex: 0,
     currentRentalId: null,
+    backDropType: 'null',
+    showBackdrop: false
   },
 
   /**
@@ -34,6 +36,8 @@ Page({
     var that = this
     app.loginPromiseNew.then(function (resovle) {
       that.getData()
+    }).catch(function (exp){
+      console.log('promise error', exp)
     })
   },
 
@@ -77,10 +81,19 @@ Page({
     var rentals = []
     order.bizDateStr = util.formatDate(bizDate)
     order.bizTimeStr = util.formatTimeStr(bizDate)
-
+    var unRelieveGuaranty = 0
+    var relieveGuaranty = 0
     var packageNum = 0
     for (var i = 0; i < order.rentals.length; i++) {
       var rental = order.rentals[i]
+      for(var j = 0; j < rental.guaranties.length; j++){
+        if (rental.guaranties[j].relieve == 0){
+          unRelieveGuaranty += rental.guaranties[j].amount
+        }
+        else {
+          relieveGuaranty += rental.guaranties[j].amount
+        }
+      }
       rental.titleName = rental.package_id ? ('套餐-' + rental.name) : ('单品-' + rental.name)
       rental.totalRentalAmountStr = util.showAmount(rental.totalRentalAmount)
       rental.totalRepairationAmountStr = util.showAmount(rental.totalRepairationAmount)
@@ -174,6 +187,11 @@ Page({
     }
     order.packageNum = packageNum
     order.categoryNum = order.rentals.length - packageNum
+    order.paidAmountStr = util.showAmount(order.paidAmount)
+    order.refundAmountStr = util.showAmount(order.refundAmount)
+    order.unRelieveGuaranty = unRelieveGuaranty
+    order.unRelieveGuarantyStr = util.showAmount(unRelieveGuaranty)
+    order.relieveGuarantyStr = util.showAmount(relieveGuaranty)
     return order
   },
   getData() {
@@ -183,6 +201,9 @@ Page({
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
       for (var i = 0; order.rentals && i < order.rentals.length; i++) {
+        if (order.rentals[i].id == 0){
+          continue
+        }
         data.getRentalPromise(order.rentals[i].id, app.globalData.sessionKey).then(function (newRental) {
           for (var j = 0; j < order.rentals.length; j++) {
             if (order.rentals[j].id == newRental.id) {
@@ -244,7 +265,7 @@ Page({
     var order = that.data.order
     var message = ''
     var currentRental = null
-    var currentItem = null
+    //var currentItem = null
     for(var i = 0; order && order.rentals && i < order.rentals.length; i++){
       for(var j = 0; order.rentals[i].rentItems && j < order.rentals[i].rentItems.length; j++){
         if (order.rentals[i].rentItems[j].id == id){
@@ -255,7 +276,8 @@ Page({
       }
     }
     for(var i = 0; currentRental && i < currentRental.rentItems.length; i++){
-      if (currentRental.rentItems[i].status != '已归还' && currentRental.rentItems[i].id != id){
+      if (currentRental.rentItems[i].status != '已归还' && currentRental.rentItems[i].status != '未发放'
+        && currentRental.rentItems[i].id != id){
         allReturned = false
       }
     }
@@ -310,5 +332,18 @@ Page({
     var rentalIndex = util.getRentalIndexFromOder(rental.id, order)
     order.rentals[rentalIndex] = rental
     that.setData({ order })
+  },
+  showRentalDetail(e){
+    var that = this
+    var id = e.currentTarget.id
+    that.setData({currentRentalId: id})
+    that.setData({showBackdrop: true, backDropType: 'confirm_rental'})
+  },
+  closeBackdrop(e){
+    var that = this
+    if (e.detail){
+
+    }
+    that.setData({backDropType: null, currentRentalId: null, showBackdrop: false})
   }
 })
