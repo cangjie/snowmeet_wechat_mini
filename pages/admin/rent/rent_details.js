@@ -392,9 +392,39 @@ Page({
         if (res.cancel) {
           
         }
-    
         if (res.confirm) {
           
+          var payment= null
+          var order = that.data.order
+          var refundAmount = parseFloat(that.data.refundAmount)
+          for(var i = 0; order && order.availablePayments && i < order.availablePayments.length; i++){
+            //console.log('refund amount', order.availablePayments[i].unRefundedAmount)
+            var paymentUnRefund = parseFloat(order.availablePayments[i].unRefundedAmount.toString())
+            if (order.availablePayments[i].status == '支付成功'
+              && paymentUnRefund >= refundAmount){
+              payment = order.availablePayments[i]
+              break
+            }
+          }
+          if (payment == null){
+            wx.showToast({
+              title: '无可退款支付记录',
+              icon:'error'
+            })
+            return
+          }
+          var refunds = [{
+            payment_id: payment.id,
+            amount: refundAmount,
+            reason: '租赁退押金'
+          }]
+          data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order){
+            that.getData()
+            wx.showToast({
+              title: '退款成功',
+              icon: 'success'
+            })
+          })
         }
       }
     })

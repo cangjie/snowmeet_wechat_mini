@@ -24,6 +24,7 @@ Page({
    */
   onLoad(options) {
     var that = this
+    that.setData({fire: options.fire? 1 : null})
     var id = options.id
     if (!id) {
       that.setData({
@@ -32,8 +33,7 @@ Page({
         memberId: options.memberId ? options.memberId : null,
         realName: options.realName ? options.realName : null,
         gender: options.gender ? options.gender : null,
-        cell: options.cell ? options.cell : null,
-
+        cell: options.cell ? options.cell : null
       })
       var title = ''
       switch (that.data.bizType) {

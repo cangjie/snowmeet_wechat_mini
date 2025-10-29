@@ -1,4 +1,9 @@
-<view class="view-row" style="width:750rpx;justify-content: center;margin-top: 50rpx;" >
-  <van-button wx:if="{{!order || !order.id || order.id == 0}}" type="primary" disabled="{{!wellForm || ordering}}" bind:tap="placeOrder" > 确 认 下 单 </van-button>
-  <van-button wx:else type="info" bind:tap="showOrder" > 查 看 订 单 </van-button>
+<view class="view-row" style="width:750rpx;justify-content: center;margin-top: 50rpx;">
+  <block wx:if="{{!order || !order.id || order.id == 0}}">
+    <van-button wx:if="{{order.retails && order.retails.length > 0 && order.retails[0].order_type != '招待'  }}" type="primary" disabled="{{!wellForm || ordering}}" bind:click="placeOrder"> 确 认 下 单 </van-button>
+    <van-button wx:if="{{order.retails && order.retails.length > 0 && order.retails[0].order_type == '招待'  }}" type="primary" disabled="{{!wellForm || ordering}}" bind:click="placeEntertain"> 确 认 招 待 </van-button>
+  </block>
+  <van-button wx:else type="info" bind:tap="showOrder"> 查 看 订 单 </van-button>
+
+
 </view>

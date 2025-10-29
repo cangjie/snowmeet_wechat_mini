@@ -240,6 +240,7 @@ Page({
       + (realName? '&realName=' + realName : '')
       + (cell? '&cell=' + cell : '')
       + (gender? '&gender=' + gender : '')
+      + (e.currentTarget.id != 'retail'? '' : '&fire=1')
     wx.navigateTo({
       url: url
     })

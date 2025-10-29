@@ -58,6 +58,12 @@ Component({
                       break
                     }
                 }
+              },
+              fail:(res)=>{
+                wx.showToast({
+                  title: '位置信息获取失败',
+                  icon: 'error'
+                })
               }
             })
           }

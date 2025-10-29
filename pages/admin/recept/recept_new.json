@@ -8,6 +8,7 @@
     "care-recept": "/components/care/care_recept",
     "care-footer": "/components/care/care_footer",
     "care-back-drop": "/components/care/care_back_drop",
-    "rent-back-drop": "/components/rent/rent_backdrop"
+    "rent-back-drop": "/components/rent/rent_backdrop",
+    "fire-charge": "/components/fire/fire_charge"
   }
 }

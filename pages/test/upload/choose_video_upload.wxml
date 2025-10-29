@@ -1,2 +1,0 @@
-<!--pages/test/upload/choose_video_upload.wxml-->
-<button bindtap="upload1"> 确 定 </button>

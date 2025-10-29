@@ -24,6 +24,13 @@
           "scene": null
         },
         {
+          "name": "顾客支付",
+          "pathName": "pages/order/payment_entry",
+          "query": "paymentId=32642",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "散客接待",
           "pathName": "pages/admin/recept/recept_member_info",
           "query": "",
