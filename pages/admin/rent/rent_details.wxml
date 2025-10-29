@@ -184,6 +184,28 @@
       </view>
     </van-tab>
   </van-tabs>
+  <mp-cells title="退款" wx:if="{{allSettled}}" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >【总计押金】</view>
+        <view class="right-column" >{{totalGuarantyAmountStr}}</view>
+        <view class="left-column" >【总计租金】</view>
+        <view class="right-column" >{{totalSummaryStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >【应退押金】</view>
+        <view class="right-column" >{{needToRefundStr}}</view>
+        <view class="left-column" >【实际退款】</view>
+        <view class="right-column" >
+          <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" />
+          <view style="height: 20rpx;" ></view>
+          <van-button type="danger" size="mini" style="margin-top: 20rpx;" bind:click="refund" >退款</van-button>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <fui-backdrop show="{{showBackdrop}}" closable >
     <confirm-rental wx:if="{{showBackdrop && backDropType == 'confirm_rental'}}" rentalId="{{currentRentalId}}" 
       bindCloseBackdrop="closeBackdrop" ></confirm-rental>

@@ -76,6 +76,7 @@ Page({
 
   },
   renderOrder(order) {
+    var that = this
     var bizDate = new Date(order.biz_date)
     var packages = []
     var rentals = []
@@ -84,9 +85,16 @@ Page({
     var unRelieveGuaranty = 0
     var relieveGuaranty = 0
     var packageNum = 0
+    var allSettled = true
+    var totalGuarantyAmount = 0
+    var totalSummary = 0
     for (var i = 0; i < order.rentals.length; i++) {
       var rental = order.rentals[i]
+      if (allSettled && rental.settled == 0){
+        allSettled = false
+      }
       for(var j = 0; j < rental.guaranties.length; j++){
+        totalGuarantyAmount += rental.guaranties[j].amount
         if (rental.guaranties[j].relieve == 0){
           unRelieveGuaranty += rental.guaranties[j].amount
         }
@@ -103,6 +111,7 @@ Page({
       rental.totalDiscountAmountStr = util.showAmount(rental.totalDiscountAmount)
       rental.summary = rental.totalRentalAmount + rental.totalRepairationAmount + rental.totalOvertimeAmount
         - rental.ticketDiscountAmount - rental.othersDiscountAmount
+      totalSummary += rental.summary
       rental.summaryStr = util.showAmount(rental.summary)
       if (rental.realStartDate == null) {
         rental.realStartDateStr = '--'
@@ -192,6 +201,11 @@ Page({
     order.unRelieveGuaranty = unRelieveGuaranty
     order.unRelieveGuarantyStr = util.showAmount(unRelieveGuaranty)
     order.relieveGuarantyStr = util.showAmount(relieveGuaranty)
+    that.setData({allSettled, totalGuarantyAmount, totalSummary, 
+      totalSummaryStr: util.showAmount(totalSummary), 
+      totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount),
+      needToRefund: totalGuarantyAmount - totalSummary, 
+      needToRefundStr: util.showAmount(totalGuarantyAmount - totalSummary)})
     return order
   },
   getData() {
@@ -354,5 +368,35 @@ Page({
       }
     }
     that.setData({backDropType: null, currentRentalId: null, showBackdrop: false})
+  },
+  setRefundAmount(e){
+    var that = this
+    var value = e.detail.value
+    if (!isNaN(value)){
+      that.setData({refundAmount: value})
+    }
+  },
+  refund(e){
+    var that = this
+    if (!that.data.refundAmount){
+      wx.showToast({
+        title: '退款金额必填',
+        icon: 'error'
+      })
+      return
+    }
+    wx.showModal({
+      title: '确认退款',
+      content: '退款金额：' + util.showAmount(that.data.refundAmount),
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          
+        }
+      }
+    })
   }
 })
