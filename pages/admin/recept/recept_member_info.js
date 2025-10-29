@@ -235,12 +235,19 @@ Page({
       gender = that.data.updatedMember? that.data.updatedMember.gender : null
       cell = that.data.updatedMember? that.data.updatedMember.currentContactNum : null
     }
-    var url = 'recept_new?bizType=' + e.currentTarget.id + '&shop=' + shop
+    var bizType = e.currentTarget.id 
+    var fire = null
+    if (bizType.indexOf('_temp') > 0){
+      fire = 1
+    }
+    bizType = bizType.replace('_temp', '')
+    var url = 'recept_new?bizType=' + bizType + '&shop=' + shop
       + (memberId? '&memberId=' + memberId.toString() : '')
       + (realName? '&realName=' + realName : '')
       + (cell? '&cell=' + cell : '')
       + (gender? '&gender=' + gender : '')
-      + (e.currentTarget.id != 'retail'? '' : '&fire=1')
+      + (fire == 1 ? '&fire=1' : '')
+      //+ (e.currentTarget.id != 'retail'? '' : '&fire=1')
     wx.navigateTo({
       url: url
     })
