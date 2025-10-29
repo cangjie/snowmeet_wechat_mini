@@ -507,7 +507,16 @@ const setRentItemStatsPromise = function (rentItemId, status, sessionKey) {
       reject(exp)
     })
   })
-  
+}
+const updateRentalDetailsPromise = function(details, scene, sessionKey) {
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalDetails?scene=' + encodeURIComponent(scene) + '&sessionKey='+ sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(updateUrl, details).then(function(rental){
+      resolve(rental)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
 }
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -547,5 +556,6 @@ module.exports = {
   getCareOthersServicePromise,
   getCareProductPromise,
   getRentalPromise,
-  setRentItemStatsPromise
+  setRentItemStatsPromise,
+  updateRentalDetailsPromise
 }

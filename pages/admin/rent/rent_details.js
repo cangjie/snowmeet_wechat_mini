@@ -342,7 +342,16 @@ Page({
   closeBackdrop(e){
     var that = this
     if (e.detail){
+      console.log('close back drop', e)
+      if (e.detail.rental){
+        var newRental = e.detail.rental
+        var order = that.data.order
+        var index = util.getRentalIndexFromOder(newRental.id, order)
+        order.rentals[index] = newRental
+        that.renderOrder(order)
+        that.setData({order})
 
+      }
     }
     that.setData({backDropType: null, currentRentalId: null, showBackdrop: false})
   }

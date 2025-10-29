@@ -91,6 +91,7 @@ Component({
       var detailIndex = util.getRentalDetailIndexFromRental(id, rental)
       var detail = rental.details[detailIndex]
       detail.discountTotalAmount = e.detail.value
+      detail.modified = true
       if (util.canRenderNumber(value)){
         that.renderRental(rental)
         that.setData({rental})
@@ -99,6 +100,28 @@ Component({
     cancel(){
       var that = this
       that.triggerEvent('CloseBackdrop', {})
+    },
+    save(){
+      var that = this
+      var rental = that.data.rental
+      var details = []
+      for(var i = 0; rental && rental.details && i < rental.details.length; i++){
+        if (rental.details[i].modified){
+          details.push(rental.details[i])
+          rental.details[i].modified = false
+        }
+      }
+      if (details.length == 0){
+        that.cancel()
+      }
+      data.updateRentalDetailsPromise(details, '租赁结算修改价格', app.globalData.sessionKey).then(function (details){
+        if (details && details.length > 0){
+          data.getRentalPromise(details[0].rental_id, app.globalData.sessionKey).then(function (rental){
+            that.triggerEvent('CloseBackdrop', {rental: rental})
+            that.cancel()
+          })
+        }
+      })
     }
   }
 })

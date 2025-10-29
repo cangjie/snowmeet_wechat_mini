@@ -131,6 +131,6 @@
   <view class="view-row" style="justify-content: center;height:120rpx">
     <van-button round type="warning" size="small" 
       style="margin-right: 50rpx;" bind:click="cancel" > 取 消 </van-button>
-    <van-button round type="primary" size="small" style="margin-left: 50rpx;"> 保 存 </van-button>
+    <van-button round type="primary" size="small" style="margin-left: 50rpx;" bind:click="save" > 保 存 </van-button>
   </view>
 </view>
