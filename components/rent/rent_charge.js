@@ -68,7 +68,7 @@ Component({
       var expectDays = parseInt(rental.expectDays) - 1
       endDate.setDate(endDate.getDate() + expectDays)
       rental.endDate = util.formatDate(endDate)
-      rental.end_date = endDate
+      rental.end_date = util.formatDate(endDate)
       that.setData({ rental })
     },
     /*

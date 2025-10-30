@@ -240,12 +240,15 @@ Component({
           }
           rental.rentItems = items
           var rentals = that.data.rentals
+
+
           var newRentals = []
-          newRentals.push(rental)
+          
           for (var i = 0; rentals && i < rentals.length; i++) {
             var oldRental = rentals[i]
             newRentals.push(oldRental)
           }
+          newRentals.push(rental)
 
           console.log('rentals', newRentals)
           //that.setData({ type: null, packageSelectIndex: null })
@@ -400,10 +403,11 @@ Component({
           rental.rentItems = items
           var rentals = that.data.rentals
           var newRentals = []
-          newRentals.push(rental)
+          
           for(var i = 0; rentals && i < rentals.length; i++){
             newRentals.push(rentals[i])
           }
+          newRentals.push(rental)
           //rentals.push(rental)
           that.setData({ showPopUp: false, popUpContent: null })
           that.renderData(newRentals)
@@ -463,10 +467,11 @@ Component({
       var rentals = that.data.rentals
       
       var newRentals = []
-      newRentals.push(rental)
+      
       for (var i = 0; rentals && i < rentals.length; i++) {
         newRentals.push(rentals[i])
       }
+      newRentals.push(rental)
       
       //rentals.push(rental)
       that.renderData(newRentals)

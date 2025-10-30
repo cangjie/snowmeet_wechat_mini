@@ -176,14 +176,19 @@ Page({
     var that = this
     console.log('rent data updated', e)
     var rentals = e.detail.rentals
+    var order = that.data.order
+    if (order) {
+      order.rentals = rentals
+    }
+    console.log('rent data updated', e)
     if (e.detail.needUpdate) {
       that.setData({ showFooter: false })
-      that.setData({ rentals })
+      that.setData({ rentals, order })
       that.setData({ showFooter: true })
     }
     else {
       that.data.rentals = rentals
-      if (that.data.order){
+      if (that.data.order) {
         that.data.order.rentals = rentals
       }
     }
@@ -239,14 +244,12 @@ Page({
       var submitUrl = app.globalData.requestPrefix + 'Rent/SaveRentRecept?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(submitUrl, order).then(function (submitedOrder) {
         console.log('save order', submitedOrder)
-        //that.setData({ order: submitedOrder, bizType: null })
         that.data.order = submitedOrder
         var rentals = submitedOrder.rentals
         for (var i = 0; i < rentals.length; i++) {
           rentals[i].timeStamp = (new Date(rentals[i].create_date)).getTime()
         }
-        //that.setData({ rentals })
-        //that.setData({ bizType: 'rent' })
+        that.data.order.rentals = rentals
       })
     }
   },
@@ -325,21 +328,18 @@ Page({
       that.setData({ order, showFooter: false })
       that.setData({ showFooter: true })
     }
-
-
   },
   showCareBackDrop(e) {
     var that = this
     var order = e.detail.order
     that.setData({ order, showOrderInfo: true })
-
   },
   showRentBackDrop(e) {
     var that = this
-    //var rentals = e.detail.rentals
-
-    that.setData({ showOrderInfo: true })
-
+    var rentals = that.data.order.rentals
+    var order = that.data.order
+    that.setData({bizType: null})
+    that.setData({ showOrderInfo: true, rentals, order, bizType: 'rent' })
   },
   onPopOrderInfoClose(e) {
     var that = this

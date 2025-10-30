@@ -213,6 +213,7 @@ const checkRentalsWellForm = function (rentals) {
   var well = true
   for (var i = 0; i < rentals.length; i++) {
     var rental = rentals[i]
+    
     if (rental.noGuaranty != true && !rental.guaranty) {
       well = false
       break
@@ -223,6 +224,9 @@ const checkRentalsWellForm = function (rentals) {
     }
     for (var j = 0; j < rental.rentItems.length; j++) {
       var item = rental.rentItems[j]
+      if (item.noNeed){
+        continue
+      }
       if (!item.category) {
         well = false
         break
