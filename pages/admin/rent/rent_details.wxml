@@ -107,13 +107,15 @@
         </mp-cell>
         <mp-cell>
           <view class="view-row">
+            <view class="left-column">【招待】</view>
+            <view class="right-column">{{item.entertain == true ? '是' : '否'}}</view>
             <view class="left-column">【小计】</view>
-            <view class="right-column">{{item.summaryStr}}</view>
+            <view class="right-column">{{item.totalSummaryStr}}</view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row" style="justify-content: center;">
-            <van-button type="info" size="small" id="{{item.id}}" bind:click="showRentalDetail" >租金明细</van-button>
+            <van-button type="info" size="small" id="{{item.id}}" bind:click="showRentalDetail" disabled="{{item.entertain}}" >租金明细</van-button>
             <van-button id="{{item.id}}" type="primary" size="small" style="margin-left: 50rpx;" bind:click="showRentItem">租赁物明细</van-button>
           </view>
         </mp-cell>
@@ -188,15 +190,21 @@
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >【总计押金】</view>
-        <view class="right-column" >{{totalGuarantyAmountStr}}</view>
+        <view class="right-column" >{{order.totalGuarantyAmountStr}}</view>
         <view class="left-column" >【总计租金】</view>
-        <view class="right-column" >{{totalSummaryStr}}</view>
+        <view class="right-column" >{{order.totalRentSummaryAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >【应退押金】</view>
-        <view class="right-column" >{{needToRefundStr}}</view>
+        <view class="right-column" >{{order.totalRentNeedToRefundAmountStr}}</view>
+        <view class="left-column" >【已退金额】</view>
+        <view class="right-column" >{{order.refundAmountStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
         <view class="left-column" >【实际退款】</view>
         <view class="right-column" >
           <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" />

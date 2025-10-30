@@ -24,7 +24,7 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({fire: options.fire? 1 : null})
+    that.setData({ fire: options.fire ? 1 : null })
     var id = options.id
     if (!id) {
       that.setData({
@@ -46,7 +46,7 @@ Page({
         case 'retail':
           title = '零售开单'
           break
-        defaut:
+          defaut:
           break
       }
       wx.setNavigationBarTitle({
@@ -176,12 +176,18 @@ Page({
     var that = this
     console.log('rent data updated', e)
     var rentals = e.detail.rentals
-    that.setData({ showFooter: false })
-    that.setData({ rentals })
-    that.setData({ showFooter: true })
     if (e.detail.needUpdate) {
-      that.saveReceptOrder()
+      that.setData({ showFooter: false })
+      that.setData({ rentals })
+      that.setData({ showFooter: true })
     }
+    else {
+      that.data.rentals = rentals
+      if (that.data.order){
+        that.data.order.rentals = rentals
+      }
+    }
+    that.saveReceptOrder()
   },
   saveReceptOrder() {
     var that = this
@@ -211,7 +217,7 @@ Page({
       order = that.data.order
       order.rentals = that.data.rentals
     }
-    for (var i = 0; i < order.rentals.length; i++) {
+    for (var i = 0; order.rentals && i < order.rentals.length; i++) {
       var rental = order.rentals[i]
       rental.guaranty = rental.deposit
       var startDate = rental.startDate
@@ -229,17 +235,20 @@ Page({
       rental.details = null
       rental.category = null
     }
-    var submitUrl = app.globalData.requestPrefix + 'Rent/SaveRentRecept?sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(submitUrl, order).then(function (submitedOrder) {
-      console.log('save order', submitedOrder)
-      that.setData({ order: submitedOrder, bizType: null })
-      var rentals = submitedOrder.rentals
-      for (var i = 0; i < rentals.length; i++) {
-        rentals[i].timeStamp = (new Date(rentals[i].create_date)).getTime()
-      }
-      that.setData({ rentals })
-      that.setData({ bizType: 'rent' })
-    })
+    if (order.rentals && order.rentals.length > 0) {
+      var submitUrl = app.globalData.requestPrefix + 'Rent/SaveRentRecept?sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(submitUrl, order).then(function (submitedOrder) {
+        console.log('save order', submitedOrder)
+        //that.setData({ order: submitedOrder, bizType: null })
+        that.data.order = submitedOrder
+        var rentals = submitedOrder.rentals
+        for (var i = 0; i < rentals.length; i++) {
+          rentals[i].timeStamp = (new Date(rentals[i].create_date)).getTime()
+        }
+        //that.setData({ rentals })
+        //that.setData({ bizType: 'rent' })
+      })
+    }
   },
   rentalWellFormed(e) {
     var that = this
@@ -312,40 +321,41 @@ Page({
       that.setData({ bizType: null, order })
       that.setData({ bizType: 'care' })
     }
-    else if (e.detail.refreshFooter){
+    else if (e.detail.refreshFooter) {
       that.setData({ order, showFooter: false })
-      that.setData({showFooter: true})
+      that.setData({ showFooter: true })
     }
 
 
   },
-  showCareBackDrop(e){
+  showCareBackDrop(e) {
     var that = this
     var order = e.detail.order
-    that.setData({order, showOrderInfo: true})
+    that.setData({ order, showOrderInfo: true })
 
   },
-  showRentBackDrop(e){
+  showRentBackDrop(e) {
     var that = this
-    var rentals = e.detail.rentals
-    that.setData({showOrderInfo: true})
+    //var rentals = e.detail.rentals
+
+    that.setData({ showOrderInfo: true })
 
   },
-  onPopOrderInfoClose(e){
+  onPopOrderInfoClose(e) {
     var that = this
     console.log('close back drop', e)
-    if (that.data.bizType == 'rent' && that.data.rentOrderPaying != true){
-      that.setData({showOrderInfo: false})
+    if (that.data.bizType == 'rent' && that.data.rentOrderPaying != true) {
+      that.setData({ showOrderInfo: false })
     }
   },
-  updateCareCurrent(e){
+  updateCareCurrent(e) {
     var that = this
     var order = e.detail.order
-    that.setData({order, bizType: null})
-    that.setData({bizType: 'care', showOrderInfo: false})
+    that.setData({ order, bizType: null })
+    that.setData({ bizType: 'care', showOrderInfo: false })
   },
-  setRentOrderPaying(){
+  setRentOrderPaying() {
     var that = this
-    that.setData({rentOrderPaying: true})
+    that.setData({ rentOrderPaying: true })
   }
 })

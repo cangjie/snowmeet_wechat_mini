@@ -106,13 +106,11 @@ Page({
       rental.totalRentalAmountStr = util.showAmount(rental.totalRentalAmount)
       rental.totalRepairationAmountStr = util.showAmount(rental.totalRepairationAmount)
       rental.totalOvertimeAmountStr = util.showAmount(rental.totalOvertimeAmount)
-      //rental.ticketDiscountAmountStr = util.showAmount(rental.ticketDiscountAmount)
-      //rental.othersDiscountAmountStr = util.showAmount(rental.othersDiscountAmount)
       rental.totalDiscountAmountStr = util.showAmount(rental.totalDiscountAmount)
       rental.summary = rental.totalRentalAmount + rental.totalRepairationAmount + rental.totalOvertimeAmount
         - rental.ticketDiscountAmount - rental.othersDiscountAmount
       totalSummary += rental.summary
-      rental.summaryStr = util.showAmount(rental.summary)
+      rental.totalSummaryStr = util.showAmount(rental.totalSummary)
       if (rental.realStartDate == null) {
         rental.realStartDateStr = '--'
       }
@@ -172,27 +170,7 @@ Page({
           rentItem.returnTimeStr = util.formatTimeStr(new Date(rentItem.returnDate))
         }
       }
-      /*
-      for (var j = 0; j < rental.rentItems.length; j++) {
-        var rentItem = rental.rentItems[j]
-        if (rentItem.pick_time) {
-          var pickDate = new Date(rentItem.pick_time)
-          rentItem.pick_dateDateStr = util.formatDate(pickDate)
-          rentItem.pick_dateTimeStr = util.formatTimeStr(pickDate)
-        }
-        else {
-          rentItem.pick_dateDateStr = '——'
-          rentItem.pick_dateTimeStr = '——'
-        }
-        if (rentItem.return_time) {
-          var retDate = new Date(rentItem.return_time)
-          rentItem.return_dateDateStr = util.formatDate(retDate)
-          rentItem.return_dateTimeStr = util.formatTimeStr(retDate)
-        }
-        rentItem.repairationAmount = rentItem.repairationCharge ? rentItem.repairationCharge.amount : 0
-        rentItem.repairationAmountStr = util.showAmount(rentItem.repairationAmount)
-      }
-      */
+      
     }
     order.packageNum = packageNum
     order.categoryNum = order.rentals.length - packageNum
@@ -201,6 +179,11 @@ Page({
     order.unRelieveGuaranty = unRelieveGuaranty
     order.unRelieveGuarantyStr = util.showAmount(unRelieveGuaranty)
     order.relieveGuarantyStr = util.showAmount(relieveGuaranty)
+
+    order.totalGuarantyAmountStr = util.showAmount(order.totalGuarantyAmount)
+    order.totalRentSummaryAmountStr = util.showAmount(order.totalRentSummaryAmount)
+    order.totalRentNeedToRefundAmountStr = util.showAmount(order.totalRentNeedToRefundAmount)
+
     that.setData({allSettled, totalGuarantyAmount, totalSummary, 
       totalSummaryStr: util.showAmount(totalSummary), 
       totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount),
@@ -345,6 +328,7 @@ Page({
     var order = that.data.order
     var rentalIndex = util.getRentalIndexFromOder(rental.id, order)
     order.rentals[rentalIndex] = rental
+    that.renderOrder(order)
     that.setData({ order })
   },
   showRentalDetail(e){
@@ -401,7 +385,7 @@ Page({
             //console.log('refund amount', order.availablePayments[i].unRefundedAmount)
             var paymentUnRefund = parseFloat(order.availablePayments[i].unRefundedAmount.toString())
             if (order.availablePayments[i].status == '支付成功'
-              && paymentUnRefund >= refundAmount){
+              &&  paymentUnRefund.toFixed(2) >= refundAmount.toFixed(2)){
               payment = order.availablePayments[i]
               break
             }
@@ -415,7 +399,7 @@ Page({
           }
           var refunds = [{
             payment_id: payment.id,
-            amount: refundAmount,
+            amount: refundAmount.toFixed(2),
             reason: '租赁退押金'
           }]
           data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order){

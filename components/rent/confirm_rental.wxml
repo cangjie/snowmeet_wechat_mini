@@ -21,7 +21,7 @@
         <view class="left-column">【减免】</view>
         <view class="right-column">
           <input id="{{item.id}}" class="input" style="width: 75rpx;text-align: center;" 
-            value="{{item.discountTotalAmount}}" bindinput="setDiscount" />
+            value="{{item.discountTotalAmount}}" bindinput="setDiscount" type="number" />
         </view>
       </view>
       <view class="view-row">
@@ -43,80 +43,7 @@
       </view-->
       <van-divider></van-divider>
     </block>
-    <!--block>
-      <view class="view-row">
-        <view class="left-column">【日期】</view>
-        <view class="right-column"></view>
-        <view class="left-column">【周末】</view>
-        <view class="right-column"></view>
-      </view>
-      <view class="view-row">
-        <view class="left-column">【场次】</view>
-        <view class="right-column"></view>
-        <view class="left-column">【类型】</view>
-        <view class="right-column"></view>
-      </view>
-      <view class="view-row">
-        <view class="left-column">【价格】</view>
-        <view class="right-column"></view>
-        <view class="left-column">【减免】</view>
-        <view class="right-column"></view>
-      </view>
-      <view class="view-row">
-        <view class="left-column">【小计】</view>
-        <view class="right-column"></view>
-        <view class="left-column">【取消】</view>
-        <view class="right-column">
-          <checkbox-group>
-            <checkbox></checkbox>
-          </checkbox-group>
-        </view>
-      </view>
-      <view class="view-row">
-        <view class="left-column">【备注】</view>
-        <view class="right-column"></view>
-        <view class="left-column"></view>
-        <view class="right-column"></view>
-      </view>
-      <van-divider></van-divider>
-    </block>
-    <block>
-      <view class="view-row">
-        <view class="left-column">【日期】</view>
-        <view class="right-column"></view>
-        <view class="left-column">【周末】</view>
-        <view class="right-column"></view>
-      </view>
-      <view class="view-row">
-        <view class="left-column">【场次】</view>
-        <view class="right-column"></view>
-        <view class="left-column">【类型】</view>
-        <view class="right-column"></view>
-      </view>
-      <view class="view-row">
-        <view class="left-column">【价格】</view>
-        <view class="right-column"></view>
-        <view class="left-column">【减免】</view>
-        <view class="right-column"></view>
-      </view>
-      <view class="view-row">
-        <view class="left-column">【小计】</view>
-        <view class="right-column"></view>
-        <view class="left-column">【取消】</view>
-        <view class="right-column">
-          <checkbox-group>
-            <checkbox></checkbox>
-          </checkbox-group>
-        </view>
-      </view>
-      <view class="view-row">
-        <view class="left-column">【备注】</view>
-        <view class="right-column"></view>
-        <view class="left-column"></view>
-        <view class="right-column"></view>
-      </view>
-      <van-divider></van-divider>
-    </block-->
+    
   </scroll-view>
   <view style="height: 50rpx;"></view>
   <!--view class="view-row" >
