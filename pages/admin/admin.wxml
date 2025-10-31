@@ -55,7 +55,7 @@
     <mp-cell id="maintain_in_stock" value="【养护】需盘点的" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells ext-class="my-cells" title="租赁" >
-    <mp-cell id="rent_list" value="【租赁】查看租赁订单" bindtap="nav" ></mp-cell>
+    <mp-cell id="rent_list" value="【租赁】订单列表" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_list_cell" value="【租赁】快速查找订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_report" value="【租赁】租赁报表" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_unreturned" value="【租赁】未归还列表" bindtap="nav" ></mp-cell>

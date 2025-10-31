@@ -151,7 +151,7 @@ Page({
         path = '/pages/admin/ticket/ticket_template_list'
         break
       case 'rent_list':
-        path = 'rent/rent_list'
+        path = 'rent/new_rent_list'
         break
       case 'rent_report':
         path = 'rent/rent_report'
