@@ -45,6 +45,7 @@ Page({
       console.log('scan code', scanQrCode)
       that.setData({scanQrCode, cell: ''})
       var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scanQrCode.code
+      //var getQRUrl = 'https://snowmeet.wanlonghuaxue.com/wxoa/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scanQrCode.code
       wx.request({
         url: getQRUrl,
         method: 'GET',

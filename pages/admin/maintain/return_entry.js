@@ -79,7 +79,8 @@ Page({
         }
         that.setData({interviewId: interviewId})
         var scene = 'recept_maintain_id_' + interviewId
-        var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scene
+        //var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scene
+        var getQRUrl = 'https://snowmeet.wanlonghuaxue.com/wxoa/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + scene
         wx.request({
           url: getQRUrl,
           method: 'GET',
