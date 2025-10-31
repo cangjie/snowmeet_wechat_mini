@@ -11,7 +11,8 @@ Page({
     activeTabIndex: 0,
     currentRentalId: null,
     backDropType: 'null',
-    showBackdrop: false
+    showBackdrop: false,
+    refunding: false
   },
 
   /**
@@ -346,8 +347,9 @@ Page({
         var order = that.data.order
         var index = util.getRentalIndexFromOder(newRental.id, order)
         order.rentals[index] = newRental
-        that.renderOrder(order)
-        that.setData({order})
+        that.getData()
+        //that.renderOrder(order)
+        //that.setData({order})
 
       }
     }
@@ -377,7 +379,7 @@ Page({
           
         }
         if (res.confirm) {
-          
+          that.setData({refunding: true})
           var payment= null
           var order = that.data.order
           var refundAmount = parseFloat(that.data.refundAmount)

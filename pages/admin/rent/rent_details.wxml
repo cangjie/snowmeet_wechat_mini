@@ -114,6 +114,12 @@
           </view>
         </mp-cell>
         <mp-cell>
+          <view class="view-row">
+            <view class="left-column">【备注】</view>
+            <view class="right-column" style="width: 75%;">{{item.memo}}</view>
+          </view>
+        </mp-cell>
+        <mp-cell>
           <view class="view-row" style="justify-content: center;">
             <van-button type="info" size="small" id="{{item.id}}" bind:click="showRentalDetail" disabled="{{item.entertain}}" >租金明细</van-button>
             <van-button id="{{item.id}}" type="primary" size="small" style="margin-left: 50rpx;" bind:click="showRentItem">租赁物明细</van-button>
@@ -209,7 +215,8 @@
         <view class="right-column" >
           <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" />
           <view style="height: 20rpx;" ></view>
-          <van-button type="danger" size="mini" style="margin-top: 20rpx;" bind:click="refund" >退款</van-button>
+          <van-button type="danger" size="mini" style="margin-top: 20rpx;" 
+            bind:click="refund" disabled="{{refunding}}" >退款</van-button>
         </view>
       </view>
     </mp-cell>

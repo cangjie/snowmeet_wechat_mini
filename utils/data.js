@@ -285,46 +285,46 @@ const getRetailOrderByMi7CodePromise = function (code, sessionKey) {
 }
 const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey) {
   var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaff?sessionKey=' + sessionKey
-  if (orderId) {
+  if (orderId != null) {
     qUrl += '&orderId=' + orderId
   }
-  if (shop) {
+  if (shop != null) {
     qUrl += '&shop=' + encodeURIComponent(shop)
   }
-  if (memberId) {
+  if (memberId != null) {
     qUrl += '&memberId=' + memberId.toString()
   }
-  if (staffId) {
+  if (staffId != null) {
     qUrl += '&staffId=' + staffId.toString()
   }
-  if (type) {
+  if (type != null) {
     qUrl += '&type=' + encodeURIComponent(type)
   }
-  if (startDate) {
+  if (startDate != null) {
     qUrl += '&startDate=' + encodeURIComponent(util.formatDate(new Date(startDate)))
   }
-  if (endDate) {
+  if (endDate != null) {
     qUrl += '&endDate=' + encodeURIComponent(util.formatDate(new Date(endDate)))
   }
-  if (payOption) {
+  if (payOption != null) {
     qUrl += '&payOption=' + payOption
   }
-  if (isTest) {
+  if (isTest != null) {
     qUrl += '&isTest=' + isTest
   }
-  if (isEntertain) {
+  if (isEntertain != null) {
     qUrl += '&isEntertain=' + isEntertain
   }
-  if (isPackage) {
+  if (isPackage != null) {
     qUrl += '&isPackage=' + isPackage
   }
-  if (isOnCredit) {
+  if (isOnCredit != null) {
     qUrl += '&isOnCredit=' + isOnCredit
   }
-  if (haveDiscount) {
+  if (haveDiscount != null) {
     qUrl += '&haveDiscount=' + haveDiscount
   }
-  if (status) {
+  if (status != null) {
     qUrl += '&status=' + status
   }
   return new Promise(function (resolve, reject) {
@@ -527,7 +527,16 @@ const refundPromise = function(orderId, refunds, sessionKey){
       reject(exp)
     })
   })
-  
+}
+const updateRentalPromise = function (rental, scene, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(updateUrl, rental).then(function (newRental){
+      resolve(newRental)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
 }
 module.exports = {
   getPackageListPromise: getPackageListPromise,
@@ -569,5 +578,6 @@ module.exports = {
   getRentalPromise,
   setRentItemStatsPromise,
   updateRentalDetailsPromise,
-  refundPromise
+  refundPromise,
+  updateRentalPromise
 }

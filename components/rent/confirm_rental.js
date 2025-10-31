@@ -15,7 +15,7 @@ Component({
    * Component initial data
    */
   data: {
-
+    rentalMod: false
   },
   lifetimes:{
     ready(){
@@ -43,8 +43,8 @@ Component({
     renderRental(rental){
       var that = this
       var totalRentalAmount = 0
-      for(var i = 0; i < rental.details.length; i++){
-        var detail = rental.details[i]
+      for(var i = 0; i < rental.availabelRentDetails.length; i++){
+        var detail = rental.availabelRentDetails[i]
         detail.amountStr = util.showAmount(detail.amount)
         if (detail.rentPrice){
           var price = detail.rentPrice
@@ -63,13 +63,18 @@ Component({
         else {
           detail.discount = 0
         }
+
         detail.discountStr = util.showAmount(detail.discount)
         detail.dateStr = util.formatDate(new Date(detail.rental_date))
         detail.summary = detail.amount - detail.discountTotalAmount
-        totalRentalAmount += detail.summary
         detail.summaryStr = util.showAmount(detail.summary)
+        if (rental.experience != true){
+          totalRentalAmount += detail.summary
+        }
       }
-      that.setData({totalRentalAmount, totalRentalAmountStr: util.showAmount(totalRentalAmount)})
+      //totalRentalAmount += rental.totalOvertimeAmount
+      that.setData({totalRentalAmount: totalRentalAmount, 
+        totalRentalAmountStr: util.showAmount(totalRentalAmount)})
     },
     setValid(e){
       var that = this
@@ -111,17 +116,59 @@ Component({
           rental.details[i].modified = false
         }
       }
-      if (details.length == 0){
-        that.cancel()
-      }
-      data.updateRentalDetailsPromise(details, '租赁结算修改价格', app.globalData.sessionKey).then(function (details){
-        if (details && details.length > 0){
-          data.getRentalPromise(details[0].rental_id, app.globalData.sessionKey).then(function (rental){
-            that.triggerEvent('CloseBackdrop', {rental: rental})
+
+      if (details.length > 0 && that.data.rentalMod)
+      {
+        data.updateRentalDetailsPromise(details, '租赁结算修改价格', app.globalData.sessionKey).then(function (details){
+          data.updateRentalPromise(rental, '租赁结算修改订单试滑超时费', app.globalData.sessionKey).then(function (newRental){
+            that.triggerEvent('CloseBackdrop', {rental: newRental})
             that.cancel()
           })
-        }
-      })
+        })
+      }
+      else if (details.length > 0){
+        data.updateRentalDetailsPromise(details, '租赁结算修改价格', app.globalData.sessionKey).then(function (details){
+          if (details && details.length > 0){
+            data.getRentalPromise(details[0].rental_id, app.globalData.sessionKey).then(function (rental){
+              that.triggerEvent('CloseBackdrop', {rental: rental})
+              that.cancel()
+            })
+          }
+        })
+      }
+      else if (that.data.rentalMod){
+        data.updateRentalPromise(rental, '租赁结算修改订单试滑超时费', app.globalData.sessionKey).then(function (newRental){
+          that.triggerEvent('CloseBackdrop', {rental: newRental})
+          that.cancel()
+        })
+      }
+      else {
+        that.cancel()
+      }
+    },
+    setExperience(e){
+      var that = this
+      var rental = that.data.rental
+      rental.experience = e.detail.value.length == 1? true: false
+      that.data.rentalMod = true
+      that.renderRental(rental)
+      that.setData({rental})
+    },
+    setOverTime(e){
+      var that = this
+      var value = e.detail.value
+      
+      if (isNaN(value)){
+        return
+      }
+      var rental = that.data.rental
+      if (util.canRenderNumber(value)){
+        that.data.rentalMod = true
+        rental.totalOvertimeAmount = parseFloat(value)
+        rental._filledOverTimeCharge = parseFloat(value)
+        that.renderRental(rental)
+        that.setData({rental})
+      }
     }
   }
 })

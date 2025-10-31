@@ -5,7 +5,7 @@
         {
           "name": "租赁订单",
           "pathName": "/pages/admin/rent/rent_details",
-          "query": "id=60897",
+          "query": "id=60991",
           "scene": null,
           "launchMode": "default"
         },
