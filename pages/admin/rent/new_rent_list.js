@@ -12,7 +12,8 @@ Page({
       {key: 'isTest', value: false},
       {key: 'isEntertain', value: false},
       {key: 'haveDiscount', value: null}
-      ]
+      ],
+    cell: null
   },
 
   /**
@@ -145,7 +146,7 @@ Page({
       }
     }
     data.getOrdersByStaffPromise(null, that.data.shop, null, null, '租赁', that.data.startDate, that.data.endDate, 
-      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey).then(function (orders){
+      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell).then(function (orders){
         console.log('get orders', orders)
         that.renderOrders(orders)
         that.setData({querying: false})
@@ -205,5 +206,9 @@ Page({
         url: '/pages/admin/rent/rent_details?id=' + order.id,
       })
     }
+  },
+  setCell(e){
+    var that = this
+    that.data.cell = e.detail.value
   }
 })

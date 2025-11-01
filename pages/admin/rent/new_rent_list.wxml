@@ -6,7 +6,7 @@
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <shop-selector bindShopSelected="shopSelected" defaultShop="崇礼旗舰店"></shop-selector>
+          <shop-selector bindShopSelected="shopSelected"></shop-selector>
         </view>
       </fui-col>
     </fui-row>
@@ -110,6 +110,14 @@
         </fui-col>
       </radio-group>
     </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="5">
+        <view class="fui-left-column">【手机】</view>
+      </fui-col>
+      <fui-col span="6">
+        <input class="input" bindblur="setCell" style="text-align: center;"  />
+      </fui-col>
+    </fui-row>
     <!--radio-group id="status" bindchange="setQueryOptions">
       <fui-row style="margin-top: 20rpx;">
         <fui-col span="5">
@@ -155,15 +163,13 @@
       </fui-row>
     </radio-group-->
   </fui-card>
-  <view class="view-row" style="justify-content: center;width: 750rpx;" >
-    <van-button  type="info" size="normal" style="margin-top: 20rpx;" 
-      bind:click="query" disabled="{{querying}}"  > 查 询 </van-button>
+  <view class="view-row" style="justify-content: center;width: 750rpx;">
+    <van-button type="info" size="normal" style="margin-top: 20rpx;" bind:click="query" disabled="{{querying}}"> 查 询 </van-button>
   </view>
   <block wx:for="{{orders}}">
     <fui-card style="margin-top: 50rpx;" title="{{item.code}}" tag="{{item.orderStatus}}" tagSize="10rpx" full>
       <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
-        <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;" 
-        id="{{index}}" bindtap="gotoDetail">
+        <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;" id="{{index}}" bindtap="gotoDetail">
           <view wx:if="{{item.is_test == 1}}">【测】</view>
           <view wx:if="{{item.haveEntertain==true}}">【招】</view>
           <view wx:if="{{item.is_package == 0}}">【单】</view>
@@ -203,18 +209,18 @@
             <view class="left-column">【开单人】</view>
             <view class="right-column">{{item.staff.name}}</view>
           </view>
-          
-          
-            <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-              <view class="left-column">【备注】</view>
-              <view class="right-column">{{item.memo}}</view>
+
+
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
+            <view class="left-column">【备注】</view>
+            <view class="right-column">{{item.memo}}</view>
+          </view>
+          <view class="view-row">
+            <view class="left-column"></view>
+            <view class="right-column">
+              <van-button size="small" type="primary" id="{{index}}" bind:click="gotoDetail"> 查 看 详 细 </van-button>
             </view>
-            <view class="view-row">
-              <view class="left-column"></view>
-              <view class="right-column">
-                <van-button size="small" type="primary" id="{{index}}" bind:click="gotoDetail" > 查 看 详 细 </van-button>
-              </view>
-            </view>
+          </view>
         </view>
       </view>
     </fui-card>
