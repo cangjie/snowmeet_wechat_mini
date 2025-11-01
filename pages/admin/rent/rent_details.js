@@ -414,5 +414,45 @@ Page({
         }
       }
     })
+  },
+  modMemo(e){
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.order
+    var rental = order.rentals[index]
+    rental.moddingMemo = true;
+    that.setData({order})
+  },
+  modMemoCancel(e){
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.order
+    var rental = order.rentals[index]
+    rental.moddingMemo = false;
+    that.setData({order})
+    that.getData()
+  },
+  setMemo(e){
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.order
+    var rental = order.rentals[index]
+    rental.memo = e.detail.value
+  },
+  modMemoConfirm(e){
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.order
+    var rental = order.rentals[index]
+    data.updateRentalPromise(rental, '租赁订单详细页修改备注', app.globalData.sessionKey)
+      .then(function (newRental){
+        wx.showToast({
+          title: '修改成功',
+          icon: 'success'
+        })
+        newRental.moddingMemo = false
+        order.rentals[index] = newRental
+        that.setData({order})
+      })
   }
 })

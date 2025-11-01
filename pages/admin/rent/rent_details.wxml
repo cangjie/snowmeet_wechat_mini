@@ -116,13 +116,24 @@
         <mp-cell>
           <view class="view-row">
             <view class="left-column">【备注】</view>
-            <view class="right-column" style="width: 75%;">{{item.memo}}</view>
+            <view  class="right-column" style="width: 75%;" >
+              <input class="input" disabled="{{item.moddingMemo!=true}}" 
+              id="{{index}}" value="{{item.memo}}" bindblur="setMemo" ></input>
+            </view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row" style="justify-content: center;">
-            <van-button type="info" size="small" id="{{item.id}}" bind:click="showRentalDetail" disabled="{{item.entertain}}" >租金明细</van-button>
-            <van-button id="{{item.id}}" type="primary" size="small" style="margin-left: 50rpx;" bind:click="showRentItem">租赁物明细</van-button>
+            <block wx:if="{{item.moddingMemo==true}}" >
+              <van-button  type="warning" size="small" id="{{index}}" 
+              bind:click="modMemoCancel" >取消</van-button>
+              <van-button  type="danger" size="small" id="{{index}}" 
+              bind:click="modMemoConfirm" style="margin-left: 30rpx;" >确认</van-button>
+            </block>
+            <van-button wx:else type="default" size="small" id="{{index}}" bind:click="modMemo" >修改备注</van-button>
+            <van-button type="info" size="small" id="{{item.id}}" bind:click="showRentalDetail" 
+            disabled="{{item.entertain}}" style="margin-left: 30rpx;" >租金明细</van-button>
+            <van-button id="{{item.id}}" type="primary" size="small" style="margin-left: 30rpx;" bind:click="showRentItem">租赁物明细</van-button>
           </view>
         </mp-cell>
       </mp-cells>
