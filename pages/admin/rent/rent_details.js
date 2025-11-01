@@ -180,11 +180,13 @@ Page({
     order.unRelieveGuaranty = unRelieveGuaranty
     order.unRelieveGuarantyStr = util.showAmount(unRelieveGuaranty)
     order.relieveGuarantyStr = util.showAmount(relieveGuaranty)
-
     order.totalGuarantyAmountStr = util.showAmount(order.totalGuarantyAmount)
     order.totalRentSummaryAmountStr = util.showAmount(order.totalRentSummaryAmount)
     order.totalRentNeedToRefundAmountStr = util.showAmount(order.totalRentNeedToRefundAmount)
-
+    order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
+    if (order.totalRentUnRefund < 0 && order.totalRentUnRefund > -0.001){
+      order.totalRentUnRefund = 0.001.toFixed(2) * -1
+    }
     that.setData({allSettled, totalGuarantyAmount, totalSummary, 
       totalSummaryStr: util.showAmount(totalSummary), 
       totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount),
@@ -365,6 +367,10 @@ Page({
   refund(e){
     var that = this
     if (!that.data.refundAmount){
+      var order = that.data.order
+      that.data.refundAmount = order.totalRentUnRefund
+    }
+    if (!that.data.refundAmount || isNaN(that.data.refundAmount) || that.data.refundAmount == 0 ){
       wx.showToast({
         title: '退款金额必填',
         icon: 'error'

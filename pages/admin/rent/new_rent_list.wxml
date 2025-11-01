@@ -195,7 +195,7 @@
 
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付金额】</view>
-            <view class="right-column">{{item.totalChargeStr}}</view>
+            <view class="right-column">{{item.paidAmountStr}}</view>
           </view>
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付类型】</view>
@@ -203,7 +203,7 @@
           </view>
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付方式】</view>
-            <view class="right-column">{{ item.payMethod }}</view>
+            <view class="right-column">{{ item.payMethod==null? '--' : item.payMethod }}</view>
           </view>
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【开单人】</view>

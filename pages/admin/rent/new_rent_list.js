@@ -186,6 +186,7 @@ Page({
       order.calledName = calledName
       order.cell = cell
       order.memberShip = memberShip
+      order.paidAmountStr = util.showAmount(order.paidAmount)
       for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
         order.payMethod = order.availablePayments[j].pay_method
       }

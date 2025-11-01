@@ -225,7 +225,7 @@
       <view class="view-row" >
         <view class="left-column" >【实际退款】</view>
         <view class="right-column" >
-          <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" />
+          <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" value="{{order.totalRentUnRefund}}" />
           <view style="height: 20rpx;" ></view>
           <van-button type="danger" size="mini" style="margin-top: 20rpx;" 
             bind:click="refund" disabled="{{refunding}}" >退款</van-button>
