@@ -43,8 +43,8 @@ Component({
     renderRental(rental){
       var that = this
       var totalRentalAmount = 0
-      for(var i = 0; i < rental.availabelRentDetails.length; i++){
-        var detail = rental.availabelRentDetails[i]
+      for(var i = 0; i < rental.details.length; i++){
+        var detail = rental.details[i]
         detail.amountStr = util.showAmount(detail.amount)
         if (detail.rentPrice){
           var price = detail.rentPrice

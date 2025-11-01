@@ -2,7 +2,7 @@
   <view class="view-row" style="justify-content: center;width: 700rpx;text-align: center;">租金明细</view>
   <view style="height:20rpx"></view>
   <scroll-view scroll-y style="width: 700rpx;height:700rpx;">
-    <block wx:for="{{rental.availabelRentDetails}}" wx:if="{{item.charge_type == '租金' || item.charge_type == '赔偿金'}}" >
+    <block wx:for="{{rental.details}}" wx:if="{{item.charge_type == '租金' || item.charge_type == '赔偿金'}}" >
       <!--block wx:if="{{item.charge_type == '租金' || item.charge_type == '赔偿金'}}"-->
         <view class="view-row">
           <view class="left-column">【日期】</view>

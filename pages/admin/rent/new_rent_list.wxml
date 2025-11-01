@@ -115,7 +115,7 @@
         <view class="fui-left-column">【手机】</view>
       </fui-col>
       <fui-col span="6">
-        <input class="input" bindblur="setCell" style="text-align: center;"  />
+        <input class="input" bindinput="setCell" style="text-align: center;"  />
       </fui-col>
     </fui-row>
     <!--radio-group id="status" bindchange="setQueryOptions">

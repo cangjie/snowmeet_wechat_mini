@@ -86,7 +86,8 @@
             <view class="left-column">【押金】</view>
             <view class="right-column">{{item.guarantyAmountStr}}</view>
             <view class="left-column">【状态】</view>
-            <view class="right-column">{{item.settled == 1? '已结算': '在租'}}</view>
+            <view class="right-column">
+            {{item.settled == 1 ?   ((item.realStartDate == null && item.realEndDate == null)? '已取消' :  '已结算' ) : '在租'}}</view>
           </view>
         </mp-cell>
         <mp-cell>
