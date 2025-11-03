@@ -1,5 +1,8 @@
-<payment orderId="{{order.id}}" wx:if="{{order && order.id && order.id > 0}}" 
+<block wx:if="{{order && order.id && order.id > 0}}"  >
+  <payment orderId="{{order.id}}" wx:if="{{order.paying_amount > 0}}"
   bindOrderStatusChanged="orderStatusChange" bindOrderPaidResult="dealPaidResult" ></payment>
+  <view wx:else style="text-align: center;" >下单成功，本单是招待单。</view>
+</block>
 <scroll-view scroll-y style="height: 95%;" wx:else >
   <view style="margin-top: 50rpx;">
     <view wx:for="{{rentals}}" >
@@ -26,5 +29,4 @@
     </view>
     
   </view>
-  
 </scroll-view>

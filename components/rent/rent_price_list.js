@@ -30,12 +30,15 @@ Component({
               that.setData({dayTypeList})
               data.getEnumListPromise('RentSceneType').then(function(RentSceneTypeList){
                 that.setData({RentSceneTypeList})
+                /*
                 if (that.properties.memberId){
                   that.setData({currentTag: 2})
                 }
                 else{
                   that.setData({currentTag: 0})
                 }
+                */
+                that.setData({currentTag: 0})
                 var scene = that.data.RentSceneTypeList[that.data.currentTag]
                 data.getRentPriceListPromise(that.data.shop.id, that.properties.type, that.properties.targetId, scene).then(function (priceList){
                   that.setData({priceList})

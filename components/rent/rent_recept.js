@@ -56,7 +56,8 @@ Component({
               rentals[i].end_date = util.formatDate(endDate)
 
               var rentType = rentals[i].package_id == null ? '分类' : '套餐';
-              var scene = that.data.memberId ? '会员' : '门市'
+              //var scene = that.data.memberId ? '会员' : '门市'
+              var scene = '门市'
               var rental = rentals[i]
               
               var startDate = rental.start_date
@@ -202,7 +203,7 @@ Component({
       that.cancelPopUp()
       console.log('select package', e)
       var selectedPackage = e.detail
-      data.getRentPriceListPromise(that.data.shopObj.id, '套餐', selectedPackage.id, that.properties.memberId ? '会员' : '门市')
+      data.getRentPriceListPromise(that.data.shopObj.id, '套餐', selectedPackage.id, '门市')
         .then(function (priceList) {
           var rental = {
             id: 0,
@@ -240,20 +241,14 @@ Component({
           }
           rental.rentItems = items
           var rentals = that.data.rentals
-
-
           var newRentals = []
-          
           for (var i = 0; rentals && i < rentals.length; i++) {
             var oldRental = rentals[i]
             newRentals.push(oldRental)
           }
           newRentals.push(rental)
-
           console.log('rentals', newRentals)
-          //that.setData({ type: null, packageSelectIndex: null })
           that.renderData(newRentals)
-          //that.triggerEvent()
           that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
         }).catch(function (exp) { })
 
@@ -363,7 +358,7 @@ Component({
       }
       console.log('select product', e)
       data.getRentPriceListPromise(that.data.shopObj.id, '分类',
-        rentProduct.category.id, that.properties.memberId ? '会员' : '门市')
+        rentProduct.category.id, '门市')
         .then(function (priceList) {
           var rental = {
             id: 0,
@@ -615,7 +610,7 @@ Component({
       item.category_id = item.category.id
       var rental = that.getRentenalByItemIndex(that.data.currentItemIndex)
       data.getRentPriceListPromise(that.data.shopObj.id, '分类',
-        item.category_id, that.properties.memberId ? '会员' : '门市')
+        item.category_id,  '门市')
         .then(function (priceList) {
           rental.deposit = e.detail.deposit
           rental.depositStr = util.showAmount(rental.deposit)
