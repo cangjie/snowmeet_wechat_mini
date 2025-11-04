@@ -308,6 +308,58 @@ Page({
       }
     })
   },
+  setUnReturn(e) {
+    var that = this
+    var id = e.currentTarget.id
+    var allReturned = true
+    var order = that.data.order
+    var message = ''
+    var currentRental = null
+    var currentItem = null
+    /*
+    for(var i = 0; order && order.rentals && i < order.rentals.length; i++){
+      for(var j = 0; order.rentals[i].rentItems && j < order.rentals[i].rentItems.length; j++){
+        if (order.rentals[i].rentItems[j].id == id){
+          currentRental = order.rentals[i]
+          currentItem = order.rentals[i].rentItems[j]
+          break
+        }
+      }
+    }
+    for(var i = 0; currentRental && i < currentRental.rentItems.length; i++){
+      if (currentRental.rentItems[i].status != '已归还' && currentRental.rentItems[i].status != '未发放'
+        && currentRental.rentItems[i].id != id){
+        allReturned = false
+      }
+    }
+    if (allReturned){
+      if (currentRental.package_id){
+        message = '套餐【' + currentRental.name + '】中的租赁物，即将全部归还，归还后套餐租金自动结算，此操作不可逆。'
+      }
+      else{
+        message = '即将归还【' + currentRental.name + '】，租金自动结算，此操作不可逆。'
+      }
+    }
+    else{
+      message = '此操作不可逆。'
+    }
+    */
+    wx.showModal({
+      title: '确认再次发放？',
+      content: '发放后，该租赁商品的已结算状态会自动取消。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
+            that.refreshStatus(newRental)
+          })
+        }
+      }
+    })
+  },
   setStore(e) {
     var that = this
     var id = e.currentTarget.id

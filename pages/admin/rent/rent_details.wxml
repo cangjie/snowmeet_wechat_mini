@@ -191,6 +191,7 @@
           <mp-cell wx:if="{{item.noNeed != true}}">
             <view class="view-row" style="justify-content: center;">
               <van-button type="primary" size="small" wx:if="{{item.status == '已发放' }}" id="{{item.id}}" bind:click="setReturn">归还</van-button>
+              <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}" bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}" >设置未归还</van-button>
               <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick" wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
               <van-button type="warning" size="small" style="margin-left: 50rpx;" id="{{item.id}}" wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
               <van-button type="danger" size="small" style="margin-left: 50rpx;" id="{{item.id}}">赔偿</van-button>
