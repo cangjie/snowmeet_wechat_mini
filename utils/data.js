@@ -541,6 +541,26 @@ const updateRentalPromise = function (rental, scene, sessionKey){
     })
   })
 }
+const getRentTypePromise = function(){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentType'
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (typeList){
+      resolve(typeList)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
+const getRentPriceByIdPromise = function (id){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPriceById/' + id.toString()
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function(price){
+      resolve(price)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -582,5 +602,7 @@ module.exports = {
   setRentItemStatsPromise,
   updateRentalDetailsPromise,
   refundPromise,
-  updateRentalPromise
+  updateRentalPromise,
+  getRentTypePromise,
+  getRentPriceByIdPromise
 }

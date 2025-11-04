@@ -3,7 +3,7 @@
   <view style="height:20rpx"></view>
   <scroll-view scroll-y style="width: 700rpx;height:700rpx;">
     <block wx:for="{{rental.details}}" wx:if="{{item.charge_type == '租金' || item.charge_type == '赔偿金'}}" >
-      <!--block wx:if="{{item.charge_type == '租金' || item.charge_type == '赔偿金'}}"-->
+      <block wx:if="{{item.charge_type == '租金' }}"  >
         <view class="view-row">
           <view class="left-column">【日期】</view>
           <view class="right-column">{{item.dateStr}}</view>
@@ -12,7 +12,12 @@
         </view>
         <view class="view-row">
           <view class="left-column">【场次】</view>
-          <view class="right-column">{{item.rent_type}}</view>
+          <view class="right-column">
+            <picker id="{{index}}" class="input" bindchange="setRentType"  
+            style="width: 100rpx;" range="{{rentType}}" >
+              <picker-view style="text-align: center;">{{item.rent_type}}</picker-view>
+            </picker>
+          </view>
           <view class="left-column">【类型】</view>
           <view class="right-column">{{item.scene}}</view>
         </view>
@@ -27,7 +32,7 @@
         <view class="view-row">
           <view class="left-column">【小计】</view>
           <view class="right-column">{{item.summaryStr}}</view>
-          <view class="left-column">【取消】</view>
+          <view class="left-column">【免除】</view>
           <view class="right-column">
             <checkbox-group id="{{item.id}}" bindchange="setValid">
               <checkbox checked="{{item.valid == 0}}"></checkbox>
@@ -42,7 +47,36 @@
         
       </view-->
         <van-divider></van-divider>
-      <!--/block-->
+      </block>
+      <block wx:else  >
+        <view class="view-row">
+          <view class="left-column">【日期】</view>
+          <view class="right-column">{{item.dateStr}}</view>
+          <view class="left-column">【类型】</view>
+          <view class="right-column">{{item.charge_type}}</view>
+        </view>
+   
+        <view class="view-row">
+          <view class="left-column">【金额】</view>
+          <view class="right-column">{{item.amountStr}}</view>
+          <view class="left-column">【取消】</view>
+          <view class="right-column">
+            <checkbox-group id="{{item.id}}" bindchange="setValid">
+              <checkbox checked="{{item.valid == 0}}"></checkbox>
+            </checkbox-group>
+          </view>
+        </view>
+        
+        <!--view class="view-row">
+        <view class="left-column">【备注】</view>
+        <view class="right-column">
+          <input class="input" 
+        </view>
+        
+      </view-->
+        <van-divider></van-divider>
+      
+      </block>
     </block>
 
   </scroll-view>

@@ -2,6 +2,7 @@
 const app = getApp()
 const util = require('../../utils/util.js')
 const data = require('../../utils/data.js')
+const { deleteRentPackagePromise } = require('../../utils/data.js')
 Component({
 
   /**
@@ -23,6 +24,9 @@ Component({
       if (!that.properties.rentalId || that.properties.rentalId == 0){
         return
       }
+      data.getRentTypePromise().then(function (typeList){
+        that.setData({rentType: typeList})
+      })
       that.setData({rentalId: that.properties.rentalId})
       that.getData()
     }
@@ -38,6 +42,7 @@ Component({
         .then(function (rental){
           that.renderRental(rental)
           that.setData({rental})
+          
         })
     },
     renderRental(rental){
@@ -68,9 +73,16 @@ Component({
         detail.dateStr = util.formatDate(new Date(detail.rental_date))
         detail.summary = detail.amount - detail.discountTotalAmount
         detail.summaryStr = util.showAmount(detail.summary)
-        if (rental.experience != true){
-          totalRentalAmount += detail.summary
+
+        if (detail.valid == 1){
+          if ((rental.experience == true && detail.charge_type != '租金' )
+          || rental.experience != true ){
+            totalRentalAmount += detail.summary  
+          }
         }
+      }
+      if (rental._filledOverTimeCharge != null && !isNaN(rental._filledOverTimeCharge)){
+        totalRentalAmount += rental._filledOverTimeCharge
       }
       //totalRentalAmount += rental.totalOvertimeAmount
       that.setData({totalRentalAmount: totalRentalAmount, 
@@ -84,6 +96,8 @@ Component({
       var detail = rental.details[detailIndex]
       detail.valid = e.detail.value.length==1?0:1
       detail.modified = true
+      that.renderRental(rental)
+      that.setData(rental)
     },
     setDiscount(e){
       var that = this
@@ -169,6 +183,42 @@ Component({
         that.renderRental(rental)
         that.setData({rental})
       }
+    },
+    setRentType(e){
+      var that = this
+      var rental = that.data.rental
+      var id = parseInt(e.currentTarget.id)
+      var detail = rental.details[id]
+      var index = e.detail.value
+      var rentType = that.data.rentType[index]
+      detail.rent_type = rentType
+      data.getRentPriceByIdPromise(detail.rent_price_id).then(function (currentPrice){
+        console.log('get price', currentPrice)
+        var type = rental.package_id == null ? '分类' : '套餐'
+        var id = null
+        if (type=='分类'){
+          id = rental.category_id
+        }
+        else{
+          id = rental.package_id
+        }
+        data.getRentPriceListPromise(currentPrice.shop_id, type, id, currentPrice.scene).then(function (priceList){
+          var newPrice = null
+          for(var i = 0; priceList && i < priceList.length; i++){
+            if (priceList[i].rent_type == detail.rent_type && priceList[i].scene == currentPrice.scene 
+              && priceList[i].day_type == currentPrice.day_type){
+              newPrice = priceList[i]
+              detail.rent_price_id = newPrice.id
+              detail.amount = newPrice.price
+              detail.rentPrice = newPrice
+              detail.modified = true
+              that.renderRental(rental)
+              that.setData({rental})
+            }
+          }
+        })
+      })
+     
     }
   }
 })
