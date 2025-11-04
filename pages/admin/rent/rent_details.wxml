@@ -176,16 +176,35 @@
             <view class="view-row">
               <view class="left-column">【状态】</view>
               <view class="right-column">{{item.noNeed == true ? '不需要'  : item.status}}</view>
-              <view class="left-column">【赔偿】</view>
-              <view class="right-column">{{item.noNeed == true ? '--' : item.totalRepairationAmountStr}}</view>
+              <view class="left-column"></view>
+              <view class="right-column"></view>
             </view>
           </mp-cell>
           <mp-cell>
             <view class="view-row">
               <view class="left-column">【发放人】</view>
               <view class="right-column">{{item.noNeed == true ? '' : (item.pickStaff? item.pickStaff.name: '--')}}</view>
-              <view class="left-column">【接受人】</view>
+              <view class="left-column">【接收人】</view>
               <view class="right-column">{{item.noNeed == true ? '' : (item.returnStaff? item.returnStaff.name: '--')}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row">
+              <view class="left-column">【赔偿】</view>
+              <view class="right-column">
+                <input class="input" id="{{item.id}}" bindblur="setRepairAmount" value="{{item.totalRepairationAmount}}"
+                disabled="{{item.setRepairing != true}}" type="number" style="text-align: center;" />
+              </view>
+              <view class="view-row" style="justify-content: center;align-items: center;" >
+                <van-button wx:if="{{item.setRepairing != true}}"  type="danger" size="small" style="margin-left: 50rpx;" 
+                  id="{{item.id}}" bind:click="setRepair" >赔偿</van-button>
+                <block wx:else >
+                  <van-button type="warning" size="small" style="margin-left: 50rpx;" 
+                  id="{{item.id}}" bind:click="setRepairCancel" >取消</van-button>
+                  <van-button type="danger" size="small" style="margin-left: 50rpx;" 
+                  id="{{item.id}}" bind:click="setRepairConfirm" >确认</van-button>
+                </block>
+              </view>
             </view>
           </mp-cell>
           <mp-cell wx:if="{{item.noNeed != true}}">
@@ -194,7 +213,7 @@
               <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}" bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}" >设置未归还</van-button>
               <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick" wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
               <van-button type="warning" size="small" style="margin-left: 50rpx;" id="{{item.id}}" wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
-              <van-button type="danger" size="small" style="margin-left: 50rpx;" id="{{item.id}}">赔偿</van-button>
+              
               <van-button type="info" size="small" style="margin-left: 50rpx;" id="{{item.id}}">发还记录</van-button>
             </view>
           </mp-cell>
@@ -212,6 +231,14 @@
         <view class="right-column" >{{order.totalGuarantyAmountStr}}</view>
         <view class="left-column" >【总计租金】</view>
         <view class="right-column" >{{order.totalRentSummaryAmountStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >【总计超时】</view>
+        <view class="right-column" >{{order.totalRentOverTimeAmountStr}}</view>
+        <view class="left-column" >【总计赔偿】</view>
+        <view class="right-column" >{{order.totalRentRepairationAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>

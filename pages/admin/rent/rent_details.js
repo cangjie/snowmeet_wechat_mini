@@ -37,7 +37,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function (resovle) {
       that.getData()
-    }).catch(function (exp){
+    }).catch(function (exp) {
       console.log('promise error', exp)
     })
   },
@@ -91,12 +91,12 @@ Page({
     var totalSummary = 0
     for (var i = 0; i < order.rentals.length; i++) {
       var rental = order.rentals[i]
-      if (allSettled && rental.settled == 0){
+      if (allSettled && rental.settled == 0) {
         allSettled = false
       }
-      for(var j = 0; j < rental.guaranties.length; j++){
+      for (var j = 0; j < rental.guaranties.length; j++) {
         totalGuarantyAmount += rental.guaranties[j].amount
-        if (rental.guaranties[j].relieve == 0){
+        if (rental.guaranties[j].relieve == 0) {
           unRelieveGuaranty += rental.guaranties[j].amount
         }
         else {
@@ -171,7 +171,7 @@ Page({
           rentItem.returnTimeStr = util.formatTimeStr(new Date(rentItem.returnDate))
         }
       }
-      
+
     }
     order.packageNum = packageNum
     order.categoryNum = order.rentals.length - packageNum
@@ -184,14 +184,18 @@ Page({
     order.totalRentSummaryAmountStr = util.showAmount(order.totalRentSummaryAmount)
     order.totalRentNeedToRefundAmountStr = util.showAmount(order.totalRentNeedToRefundAmount)
     order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
-    if (order.totalRentUnRefund < 0 && order.totalRentUnRefund > -0.001){
+    order.totalRentOverTimeAmountStr = util.showAmount(order.totalRentOverTimeAmount)
+    order.totalRentRepairationAmountStr = util.showAmount(order.totalRentRepairAmount)
+    if (order.totalRentUnRefund < 0 && order.totalRentUnRefund > -0.001) {
       order.totalRentUnRefund = 0.001.toFixed(2) * -1
     }
-    that.setData({allSettled, totalGuarantyAmount, totalSummary, 
-      totalSummaryStr: util.showAmount(totalSummary), 
+    that.setData({
+      allSettled, totalGuarantyAmount, totalSummary,
+      totalSummaryStr: util.showAmount(totalSummary),
       totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount),
-      needToRefund: totalGuarantyAmount - totalSummary, 
-      needToRefundStr: util.showAmount(totalGuarantyAmount - totalSummary)})
+      needToRefund: totalGuarantyAmount - totalSummary,
+      needToRefundStr: util.showAmount(totalGuarantyAmount - totalSummary)
+    })
     return order
   },
   getData() {
@@ -201,7 +205,7 @@ Page({
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
       for (var i = 0; order.rentals && i < order.rentals.length; i++) {
-        if (order.rentals[i].id == 0){
+        if (order.rentals[i].id == 0) {
           continue
         }
         data.getRentalPromise(order.rentals[i].id, app.globalData.sessionKey).then(function (newRental) {
@@ -266,30 +270,30 @@ Page({
     var message = ''
     var currentRental = null
     var currentItem = null
-    for(var i = 0; order && order.rentals && i < order.rentals.length; i++){
-      for(var j = 0; order.rentals[i].rentItems && j < order.rentals[i].rentItems.length; j++){
-        if (order.rentals[i].rentItems[j].id == id){
+    for (var i = 0; order && order.rentals && i < order.rentals.length; i++) {
+      for (var j = 0; order.rentals[i].rentItems && j < order.rentals[i].rentItems.length; j++) {
+        if (order.rentals[i].rentItems[j].id == id) {
           currentRental = order.rentals[i]
           currentItem = order.rentals[i].rentItems[j]
           break
         }
       }
     }
-    for(var i = 0; currentRental && i < currentRental.rentItems.length; i++){
+    for (var i = 0; currentRental && i < currentRental.rentItems.length; i++) {
       if (currentRental.rentItems[i].status != '已归还' && currentRental.rentItems[i].status != '未发放'
-        && currentRental.rentItems[i].id != id){
+        && currentRental.rentItems[i].id != id) {
         allReturned = false
       }
     }
-    if (allReturned){
-      if (currentRental.package_id){
+    if (allReturned) {
+      if (currentRental.package_id) {
         message = '套餐【' + currentRental.name + '】中的租赁物，即将全部归还，归还后套餐租金自动结算，此操作不可逆。'
       }
-      else{
+      else {
         message = '即将归还【' + currentRental.name + '】，租金自动结算，此操作不可逆。'
       }
     }
-    else{
+    else {
       message = '此操作不可逆。'
     }
     wx.showModal({
@@ -297,9 +301,9 @@ Page({
       content: message,
       complete: (res) => {
         if (res.cancel) {
-          
+
         }
-    
+
         if (res.confirm) {
           data.setRentItemStatsPromise(id, '已归还', app.globalData.sessionKey).then(function (newRental) {
             that.refreshStatus(newRental)
@@ -349,9 +353,9 @@ Page({
       content: '发放后，该租赁商品的已结算状态会自动取消。',
       complete: (res) => {
         if (res.cancel) {
-          
+
         }
-    
+
         if (res.confirm) {
           data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
             that.refreshStatus(newRental)
@@ -386,17 +390,17 @@ Page({
     that.renderOrder(order)
     that.setData({ order })
   },
-  showRentalDetail(e){
+  showRentalDetail(e) {
     var that = this
     var id = e.currentTarget.id
-    that.setData({currentRentalId: id})
-    that.setData({showBackdrop: true, backDropType: 'confirm_rental'})
+    that.setData({ currentRentalId: id })
+    that.setData({ showBackdrop: true, backDropType: 'confirm_rental' })
   },
-  closeBackdrop(e){
+  closeBackdrop(e) {
     var that = this
-    if (e.detail){
+    if (e.detail) {
       console.log('close back drop', e)
-      if (e.detail.rental){
+      if (e.detail.rental) {
         var newRental = e.detail.rental
         var order = that.data.order
         var index = util.getRentalIndexFromOder(newRental.id, order)
@@ -407,22 +411,22 @@ Page({
 
       }
     }
-    that.setData({backDropType: null, currentRentalId: null, showBackdrop: false})
+    that.setData({ backDropType: null, currentRentalId: null, showBackdrop: false })
   },
-  setRefundAmount(e){
+  setRefundAmount(e) {
     var that = this
     var value = e.detail.value
-    if (!isNaN(value)){
-      that.setData({refundAmount: value})
+    if (!isNaN(value)) {
+      that.setData({ refundAmount: value })
     }
   },
-  refund(e){
+  refund(e) {
     var that = this
-    if (!that.data.refundAmount){
+    if (!that.data.refundAmount) {
       var order = that.data.order
       that.data.refundAmount = order.totalRentUnRefund
     }
-    if (!that.data.refundAmount || isNaN(that.data.refundAmount) || that.data.refundAmount == 0 ){
+    if (!that.data.refundAmount || isNaN(that.data.refundAmount) || that.data.refundAmount == 0) {
       wx.showToast({
         title: '退款金额必填',
         icon: 'error'
@@ -434,26 +438,26 @@ Page({
       content: '退款金额：' + util.showAmount(that.data.refundAmount),
       complete: (res) => {
         if (res.cancel) {
-          
+
         }
         if (res.confirm) {
-          that.setData({refunding: true})
-          var payment= null
+          that.setData({ refunding: true })
+          var payment = null
           var order = that.data.order
           var refundAmount = parseFloat(that.data.refundAmount)
-          for(var i = 0; order && order.availablePayments && i < order.availablePayments.length; i++){
+          for (var i = 0; order && order.availablePayments && i < order.availablePayments.length; i++) {
             //console.log('refund amount', order.availablePayments[i].unRefundedAmount)
             var paymentUnRefund = parseFloat(order.availablePayments[i].unRefundedAmount.toString())
             if (order.availablePayments[i].status == '支付成功'
-              &&  paymentUnRefund.toFixed(2) >= refundAmount.toFixed(2)){
+              && paymentUnRefund.toFixed(2) >= refundAmount.toFixed(2)) {
               payment = order.availablePayments[i]
               break
             }
           }
-          if (payment == null){
+          if (payment == null) {
             wx.showToast({
               title: '无可退款支付记录',
-              icon:'error'
+              icon: 'error'
             })
             return
           }
@@ -462,7 +466,7 @@ Page({
             amount: refundAmount.toFixed(2),
             reason: '租赁退押金'
           }]
-          data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order){
+          data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order) {
             that.getData()
             wx.showToast({
               title: '退款成功',
@@ -473,44 +477,131 @@ Page({
       }
     })
   },
-  modMemo(e){
+  modMemo(e) {
     var that = this
     var index = e.currentTarget.id
     var order = that.data.order
     var rental = order.rentals[index]
     rental.moddingMemo = true;
-    that.setData({order})
+    that.setData({ order })
   },
-  modMemoCancel(e){
+  modMemoCancel(e) {
     var that = this
     var index = e.currentTarget.id
     var order = that.data.order
     var rental = order.rentals[index]
     rental.moddingMemo = false;
-    that.setData({order})
+    that.setData({ order })
     that.getData()
   },
-  setMemo(e){
+  setMemo(e) {
     var that = this
     var index = e.currentTarget.id
     var order = that.data.order
     var rental = order.rentals[index]
     rental.memo = e.detail.value
   },
-  modMemoConfirm(e){
+  modMemoConfirm(e) {
     var that = this
     var index = e.currentTarget.id
     var order = that.data.order
     var rental = order.rentals[index]
     data.updateRentalPromise(rental, '租赁订单详细页修改备注', app.globalData.sessionKey)
-      .then(function (newRental){
+      .then(function (newRental) {
         wx.showToast({
           title: '修改成功',
           icon: 'success'
         })
         newRental.moddingMemo = false
         order.rentals[index] = newRental
-        that.setData({order})
+        that.setData({ order })
       })
+  },
+  setRepair(e) {
+    var that = this
+    var order = that.data.order
+    var rentals = order.rentals
+    var rentItem = null
+    var id = e.currentTarget.id
+    for (var i = 0; rentals && rentItem == null && i < rentals.length; i++) {
+      var rentItemIndex = util.getRentItemIndexFromRental(id, rentals[i])
+      if (rentItemIndex != null) {
+        rentItem = rentals[i].rentItems[rentItemIndex]
+      }
+    }
+    if (rentItem == null) {
+      return
+    }
+    rentItem.setRepairing = true
+    that.setData({ order })
+  },
+  setRepairCancel(e) {
+    var that = this
+    var order = that.data.order
+    var rentals = order.rentals
+    var rentItem = null
+    var id = e.currentTarget.id
+    for (var i = 0; rentals && rentItem == null && i < rentals.length; i++) {
+      var rentItemIndex = util.getRentItemIndexFromRental(id, rentals[i])
+      if (rentItemIndex != null) {
+        rentItem = rentals[i].rentItems[rentItemIndex]
+      }
+    }
+    if (rentItem == null) {
+      return
+    }
+    rentItem.setRepairing = false
+    that.setData({ order })
+  },
+  setRepairAmount(e) {
+    var value = e.detail.value
+    if (isNaN(value)) {
+      return
+    }
+    var that = this
+    var order = that.data.order
+    var rentals = order.rentals
+    var rentItem = null
+    var id = e.currentTarget.id
+    var currentRental = null
+    for (var i = 0; rentals && rentItem == null && i < rentals.length; i++) {
+      var rentItemIndex = util.getRentItemIndexFromRental(id, rentals[i])
+      if (rentItemIndex != null) {
+        rentItem = rentals[i].rentItems[rentItemIndex]
+        currentRental = rentals[i]
+      }
+    }
+    if (rentItem == null) {
+      return
+    }
+    rentItem.totalRepairationAmount = parseFloat(value)
+
+
+  },
+  setRepairConfirm(e) {
+    var that = this
+    var order = that.data.order
+    var rentals = order.rentals
+    var rentItem = null
+    var id = e.currentTarget.id
+    var currentRental = null
+    for (var i = 0; rentals && rentItem == null && i < rentals.length; i++) {
+      var rentItemIndex = util.getRentItemIndexFromRental(id, rentals[i])
+      if (rentItemIndex != null) {
+        rentItem = rentals[i].rentItems[rentItemIndex]
+        currentRental = rentals[i]
+      }
+    }
+    if (rentItem == null) {
+      return
+    }
+    var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemRepairAmount/' + rentItem.id.toString() + '?amount=' + rentItem.totalRepairationAmount.toString() + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(setUrl, null).then(function (newRental) {
+      //currentRental = newRental
+      that.getData()
+      //that.renderOrder(order)
+      //that.setData({ order })
+      that.setRepairCancel(e)
+    })
   }
 })

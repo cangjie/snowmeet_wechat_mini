@@ -283,8 +283,9 @@ const getRentalIndexFromOder = function (rentalId, order) {
 }
 const getRentItemIndexFromRental = function (rentItemId, rental) {
   var index = null
-  for (var j = 0; rental && rental.rentItems && j < rental.rentItems.length; j++) {
-    if (rental.rentItems[j].id == rentItemId) {
+  var rentItems = rental.rentItems
+  for (var j = 0; rental && rentItems && j < rentItems.length; j++) {
+    if (rentItems[j].id == rentItemId) {
       index = j
       break
     }
