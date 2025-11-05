@@ -449,7 +449,7 @@ Page({
             //console.log('refund amount', order.availablePayments[i].unRefundedAmount)
             var paymentUnRefund = parseFloat(order.availablePayments[i].unRefundedAmount.toString())
             if (order.availablePayments[i].status == '支付成功'
-              && paymentUnRefund.toFixed(2) >= refundAmount.toFixed(2)) {
+              && parseFloat(paymentUnRefund.toFixed(2)) >= parseFloat(refundAmount.toFixed(2))) {
               payment = order.availablePayments[i]
               break
             }
