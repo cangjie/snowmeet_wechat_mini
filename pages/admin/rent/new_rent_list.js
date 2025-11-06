@@ -38,7 +38,8 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve){
-      that.setData({staff: app.globalData.staff})
+      that.setData({staff: app.globalData.staff, querying: true})
+      that.getData()
     })
   },
 
@@ -145,7 +146,19 @@ Page({
           break
       }
     }
-    data.getOrdersByStaffPromise(null, that.data.shop, null, null, '租赁', that.data.startDate, that.data.endDate, 
+    var shop = that.data.shop
+    var startDate = that.data.startDate
+    var endDate = that.data.endDate
+    var cell = that.data.cell
+    if(cell != null && cell != ''){
+      startDate = new Date('2025-10-15')
+      endDate = null
+      shop = null
+      isTest = null
+      isEntertain = null
+      haveDiscount = null
+    }
+    data.getOrdersByStaffPromise(null, shop, null, null, '租赁', startDate, endDate, 
       null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell).then(function (orders){
         console.log('get orders', orders)
         that.renderOrders(orders)
@@ -210,6 +223,8 @@ Page({
   },
   setCell(e){
     var that = this
-    that.data.cell = e.detail.value
+    //that.data.cell = e.detail.value
+    var cell = e.detail.value
+    that.setData({cell})
   }
 })
