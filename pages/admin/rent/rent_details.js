@@ -463,7 +463,7 @@ Page({
           }
           var refunds = [{
             payment_id: payment.id,
-            amount: refundAmount.toFixed(2),
+            amount: parseFloat(refundAmount.toFixed(2)),
             reason: '租赁退押金'
           }]
           data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order) {
