@@ -171,7 +171,8 @@
     <van-button type="info" size="normal" style="margin-top: 20rpx;" bind:click="query" disabled="{{querying}}"> 查 询 </van-button>
   </view>
   <block wx:for="{{orders}}">
-    <fui-card style="margin-top: 50rpx;" title="{{item.code}}" tag="{{item.orderStatus}}" tagSize="10rpx" full>
+    <fui-card style="margin-top: 50rpx;" title="{{item.code}}" 
+    tag="{{item.rentProperties == null? '临时订单' : (item.rentProperties.rentStatus == null ? '位置状态' :item.rentProperties.rentStatus )}}" tagSize="10rpx" full>
       <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
         <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;" id="{{index}}" bindtap="gotoDetail">
           <view wx:if="{{item.is_test == 1}}">【测】</view>
