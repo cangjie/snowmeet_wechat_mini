@@ -32,16 +32,79 @@
     </mp-cell>
     <mp-cell>
       <view class="view-row">
+        <view class="left-column">【支付金额】</view>
+        <view class="right-column">{{order.paidAmountStr}}</view>
         <view class="left-column">【装备数量】</view>
         <view class="right-column">{{order.cares.length}}</view>
-        <view class="left-column"></view>
-        <view class="right-column"></view>
       </view>
     </mp-cell>
   </mp-cells>
   <van-tabs active="{{ activeTabIndex }}" bind:change="onTabChange">
     <van-tab wx:for="{{order.cares}}" title="{{item.title}}" >
-    
+      <mp-cells title="装备信息" >
+        <mp-cell>
+          <view class="view-row" >
+            <view class="left-column" >【类型】</view>
+            <view class="right-column" ></view>
+            <view class="left-column" >【品牌】</view>
+            <view class="right-column" ></view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row" >
+            <view class="left-column" >【长度】</view>
+            <view class="right-column" ></view>
+            <view class="left-column" >【鞋长/前脚】</view>
+            <view class="right-column" ></view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row" >
+            <view class="left-column" >【附件】</view>
+            <view class="right-column" ></view>
+            <view>
+              <checkbox-group>
+                <checkbox style="font-size: 10pt;">雪杖</checkbox>
+              </checkbox-group>
+            </view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row" >
+            <view class="left-column" >【备注】</view>
+            <view class="right-column" ></view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row" >
+           
+          </view>
+        </mp-cell>
+      </mp-cells>
+      <mp-cells title="安全检查" >
+        <mp-cell>
+          <view class="view-row" >
+            <view class="left-column" >【身高】</view>
+            <view class="right-column" ></view>
+            <view class="left-column" >【体重/间距】</view>
+            <view class="right-column" ></view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row" >
+            <view class="left-column" >【脱落值/角度】</view>
+            <view class="right-column" ></view>
+            <view class="left-column" >【体重/间距】</view>
+            <view class="right-column" ></view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row" >
+            <view class="left-column" >【备注】</view>
+            <view class="right-column" ></view>
+          </view>
+        </mp-cell>
+      </mp-cells>
     </van-tab>
   </van-tabs>
 </view>

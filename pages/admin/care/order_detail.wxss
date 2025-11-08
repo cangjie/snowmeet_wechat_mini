@@ -1,8 +1,8 @@
 .left-column{
   text-align: left;
-  width: 190rpx;
+  width: 170rpx;
 }
 .right-column{
   text-align: left;
-  width: 135rpx;
+  width: 170rpx;
 }
