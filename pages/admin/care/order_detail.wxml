@@ -39,4 +39,9 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <van-tabs active="{{ activeTabIndex }}" bind:change="onTabChange">
+    <van-tab wx:for="{{order.cares}}" title="{{item.title}}" >
+    
+    </van-tab>
+  </van-tabs>
 </view>

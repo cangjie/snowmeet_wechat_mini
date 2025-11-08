@@ -8,7 +8,7 @@ Page({
    * Page initial data
    */
   data: {
-
+    activeTabIndex: 0
   },
 
   /**
@@ -95,6 +95,10 @@ Page({
     var bizDate = new Date(order.biz_date)
     order.bizDateStr = util.formatDate(bizDate)
     order.bizTimeStr = util.formatTimeStr(bizDate)
+    for(var i = 0; order.cares && i < order.cares.length; i++){
+      var care = order.cares[i]
+      care.title = care.brand + ' ' + care.scale
+    }
     return order
   },
 
