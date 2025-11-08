@@ -9,6 +9,9 @@
     <mp-cell id="rent_list_cell" bindtap="nav" >
       <view style="background-color: #9FFF0F" >【租赁】临时查询</view>
     </mp-cell>
+    <mp-cell id="careOrderList" bindtap="nav" >
+      <view style="background-color: orange" >【养护】订单列表</view>
+    </mp-cell>
     <mp-cell id="maintainSerchQuick" bindtap="nav" >
       <view style="background-color: orange" >【养护】临时查询</view>
     </mp-cell>

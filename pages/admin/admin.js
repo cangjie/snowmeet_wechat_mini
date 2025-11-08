@@ -282,6 +282,9 @@ Page({
       case 'rent_recepting':
         path = '/pages/admin/recept/rent_recepting_list'
         break
+      case 'careOrderList':
+        path = '/pages/admin/care/care_order_list'
+        break
       default:
         break
     }

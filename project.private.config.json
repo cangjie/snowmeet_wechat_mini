@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "养护订单",
+          "pathName": "pages/admin/care/care_order_list",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "租赁订单",
           "pathName": "/pages/admin/rent/rent_details",
           "query": "id=60991",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "雪票",

@@ -116,7 +116,8 @@
     "pages/order/payment_entry",
     "pages/admin/fire/fire_care_list",
     "pages/admin/fire/fire_order_detail",
-    "pages/admin/rent/new_rent_list"
+    "pages/admin/rent/new_rent_list",
+    "pages/admin/care/care_order_list"
   ],
   "window": {
     "backgroundTextStyle": "light",
