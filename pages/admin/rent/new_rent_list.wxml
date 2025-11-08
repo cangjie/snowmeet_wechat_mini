@@ -179,6 +179,7 @@
           <view wx:if="{{item.haveEntertain==true}}">【招】</view>
           <view wx:if="{{item.is_package == 0}}">【单】</view>
           <view wx:if="{{item.haveOnCredit}}">【挂】</view>
+          <view wx:if="{{item.haveDiscount}}">【减】</view>
           <view>{{item.memberShip}}</view>
         </view>
         <view>

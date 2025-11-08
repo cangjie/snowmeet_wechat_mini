@@ -1,1 +1,8 @@
-/* pages/admin/care/care_order_list.wxss */
+.left-column{
+  text-align: left;
+  width: 190rpx;
+}
+.right-column{
+  text-align: left;
+  width: 1350rpx;
+}
