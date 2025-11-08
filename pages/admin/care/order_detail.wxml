@@ -1,0 +1,42 @@
+<view>
+  <mp-cells title="订单信息">
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">【订单号】</view>
+        <view class="right-column">{{order.code}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">【店铺】</view>
+        <view class="right-column">{{order.shop}}</view>
+        <view class="left-column">【会员】</view>
+        <view class="right-column">{{order.member.following_wechat == 1 ? '会员' : '散客'}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">【姓名】</view>
+        <view class="right-column">{{order.member.title}}</view>
+        <view class="left-column">【电话】</view>
+        <view class="right-column">{{order.member.cell}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">【业务日期】</view>
+        <view class="right-column">{{order.bizDateStr}}</view>
+        <view class="left-column">【业务时间】</view>
+        <view class="right-column">{{order.bizTimeStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">【装备数量】</view>
+        <view class="right-column">{{order.cares.length}}</view>
+        <view class="left-column"></view>
+        <view class="right-column"></view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

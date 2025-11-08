@@ -1,0 +1,8 @@
+.left-column{
+  text-align: left;
+  width: 190rpx;
+}
+.right-column{
+  text-align: left;
+  width: 135rpx;
+}

@@ -212,6 +212,10 @@
             <view class="right-column">{{ item.payMethod==null? '--' : item.payMethod }}</view>
           </view>
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
+            <view class="left-column">【装备数量】</view>
+            <view class="right-column">{{ item.cares.length}}</view>
+          </view>
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【项目】</view>
             <view class="right-column">{{ item.careProperties.services }}</view>
           </view>
@@ -219,13 +223,7 @@
             <view class="left-column">【开单人】</view>
             <view class="right-column">{{item.staff.name}}</view>
           </view>
-
-
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【备注】</view>
-            <view class="right-column">{{item.memo}}</view>
-          </view>
-          <view class="view-row">
+          <view class="view-row" wx:if="{{item.careProperties.orderStatus != '临时订单'}}" >
             <view class="left-column"></view>
             <view class="right-column">
               <van-button size="small" type="primary" id="{{index}}" bind:click="gotoDetail"> 查 看 详 细 </van-button>

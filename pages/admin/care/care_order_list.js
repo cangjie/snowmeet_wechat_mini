@@ -196,5 +196,16 @@ Page({
     var that = this
     console.log('shop selected', e)
     that.setData({shop: e.detail.shop})
+  },
+  gotoDetail(e){
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.orders[index]
+    if (order != null && order.careProperties != null
+      && order.careProperties.orderStatus != '临时订单'){
+        wx.navigateTo({
+          url: 'order_detail?orderId=' + order.id,
+        })
+      }
   }
 })
