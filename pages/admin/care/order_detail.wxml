@@ -45,34 +45,57 @@
         <mp-cell>
           <view class="view-row" >
             <view class="left-column" >【类型】</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >{{item.equipment}}</view>
             <view class="left-column" >【品牌】</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >
+              <picker class="input" style="margin-top: 0rpx;margin-left: 0rpx;"  >
+                <picker-view >{{item.brand}}</picker-view>
+              </picker>
+            </view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row" >
             <view class="left-column" >【长度】</view>
-            <view class="right-column" ></view>
-            <view class="left-column" >【鞋长/前脚】</view>
-            <view class="right-column" ></view>
+            <view class="right-column view-row" >
+              <input class="input" value="{{item.scale}}" style="width: 75rpx;text-align: center;" />cm
+            </view>
+            <block wx:if="{{item.equipment == '双板'}}" >
+            <view class="left-column" >【鞋长】</view>
+            <view class="right-column" >
+              {{item.boot_length}}
+            </view>
+          </block>
+          <block wx:else >
+            <view class="left-column" >【前脚】</view>
+            <view class="right-column" >
+              {{item.board_front}}
+            </view>
+          </block>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row" >
+            <view class="left-column" >【序列号】</view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row" >
             <view class="left-column" >【附件】</view>
-            <view class="right-column" ></view>
-            <view>
-              <checkbox-group>
+            <view class="right-column view-row" style="width: 500rpx;" >
+              <checkbox-group wx:if="{{item.equipment == '双板'}}" style="margin-right: 20rpx;" >
                 <checkbox style="font-size: 10pt;">雪杖</checkbox>
               </checkbox-group>
+              <input placeholder="其他附件" class="input" style="width:350rpx" />
             </view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row" >
             <view class="left-column" >【备注】</view>
-            <view class="right-column" ></view>
+            <view class="right-column" style="width: 450rpx;" >
+              <input style="width: 480rpx;" class="input" />
+            </view>
           </view>
         </mp-cell>
         <mp-cell>
@@ -86,22 +109,42 @@
           <view class="view-row" >
             <view class="left-column" >【身高】</view>
             <view class="right-column" ></view>
-            <view class="left-column" >【体重/间距】</view>
+            <block wx:if="{{item.equipment == '双板'}}" >
+            <view class="left-column" >【体重】</view>
             <view class="right-column" ></view>
+          </block>
+          <block wx:else >
+            <view class="left-column" >【间距】</view>
+            <view class="right-column" ></view>
+          </block>
           </view>
         </mp-cell>
-        <mp-cell>
+        <mp-cell wx:if="{{item.equipment == '双板'}}" >
           <view class="view-row" >
-            <view class="left-column" >【脱落值/角度】</view>
-            <view class="right-column" ></view>
-            <view class="left-column" >【体重/间距】</view>
-            <view class="right-column" ></view>
+            <view class="left-column" >【脱落值】</view>
+            <view class="right-column view-row" style="width: 550rpx;align-items: center;" >
+              前：<input class="input" style="width: 75rpx;margin-right: 50rpx;" /> 
+              后：<input class="input" style="width: 75rpx;" /> 
+            </view>
+            
+          </view>
+        </mp-cell>
+        <mp-cell wx:else >
+          <view class="view-row" >
+            <view class="left-column" >【角度】</view>
+            <view class="right-column view-row" style="width: 550rpx;align-items: center;" >
+              左：<input class="input" style="width: 75rpx;margin-right: 50rpx;" /> 
+              右：<input class="input" style="width: 75rpx;" /> 
+            </view>
+            
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row" >
             <view class="left-column" >【备注】</view>
-            <view class="right-column" ></view>
+            <view class="right-column" >
+              <input style="width: 480rpx;" class="input" />
+            </view>
           </view>
         </mp-cell>
       </mp-cells>
