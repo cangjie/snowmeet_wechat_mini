@@ -46,7 +46,7 @@ Page({
    */
   onShow() {
     var that = this
-    that.data.startDate = new Date("2025-10-21")
+    that.data.startDate = new Date("2025-11-01")
     that.data.endDate = new Date("2026-12-31")
     app.loginPromiseNew.then(function (resolve) {
       that.getData()
@@ -89,7 +89,7 @@ Page({
   },
   getData() {
     var that = this
-    data.getOrdersByStaffPromise(null, null, null, null, that.data.orderType, '2025-10-01', '2026-12-31',
+    data.getOrdersByStaffPromise(null, null, null, null, that.data.orderType, '2025-11-01', '2026-12-31',
       null, null, null, null, null, null, null, app.globalData.sessionKey).then(function (orders) {
         console.log('get orders', orders)
         that.renderOrders(orders)
