@@ -4,10 +4,17 @@
       "list": [
         {
           "name": "养护订单",
-          "pathName": "pages/admin/care/care_order_list",
-          "query": "",
+          "pathName": "pages/admin/care/order_detail",
+          "query": "orderId=61508",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "养护订单",
+          "pathName": "pages/admin/care/care_order_list",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "租赁订单",

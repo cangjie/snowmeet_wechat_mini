@@ -48,9 +48,9 @@
             <view class="right-column" >{{item.equipment}}</view>
             <view class="left-column" >【品牌】</view>
             <view class="right-column" >
-              <picker class="input" style="margin-top: 0rpx;margin-left: 0rpx;" 
+              <picker class="input" style="margin-top: 0rpx;margin-left: 0rpx;" id="{{index}}"
               disabled="{{item.moddingBaseInfo==false}}" range="{{item.equipment=='双板'? skiBrandList:boardBrandList }}" 
-              range-key="displayedName" >
+              range-key="displayedName" bindchange="setBrand" >
                 <picker-view >{{item.brand}}</picker-view>
               </picker>
             </view>
@@ -61,23 +61,23 @@
             <view class="left-column" >【长度】</view>
             <view class="right-column view-row" >
               <input class="input" value="{{item.scale}}" style="width: 75rpx;text-align: center;" 
-              disabled="{{item.moddingBaseInfo == false}}" />cm
+              disabled="{{item.moddingBaseInfo == false}}" id="{{index}}" bindinput="setScale" />cm
             </view>
             <block wx:if="{{item.equipment == '双板'}}" >
             <view class="left-column" >【鞋长】</view>
             <view class="right-column view-row" >
               <input value="{{item.boot_length}}" disabled="{{item.moddingBaseInfo == false}}" 
-              class="input" style="width: 75rpx;" />cm
+              class="input" style="width: 75rpx;text-align: center;" id="{{index}}" bindinput="setBootLength" />cm
             </view>
           </block>
           <block wx:else >
             <view class="left-column" >【前脚】</view>
             <view class="right-column view-row" >
-              <radio-group class="view-row">
+              <radio-group class="view-row" id="{{index}}" bindchange="setBoardFront" >
                 <radio disabled="{{item.moddingBaseInfo == false}}" 
-                checked="{{item.board_front == '左'}}" >左</radio>
+                checked="{{item.board_front == '左'}}" value="左" >左</radio>
                 <radio disabled="{{item.moddingBaseInfo == false}}" 
-                checked="{{item.board_front == '左'}}" >右</radio>
+                checked="{{item.board_front == '右'}}" value="右" >右</radio>
               </radio-group>
             </view>
           </block>
@@ -88,16 +88,19 @@
             <view class="left-column" >【序列号】</view>
             <view class="right-column view-row" style="width: 500rpx;" >
               <input wx:if="{{item.equipment == '单板'}}" class="input" style="width: 500rpx;" 
-                disabled="{{item.moddingBaseInfo == false}}" />
+                disabled="{{item.moddingBaseInfo == false}}" id="{{index}}" bindinput="setSerial" value="{{item.serials}}" />
               <block wx:else>
                 <checkbox-group id="{{index}}" bindchange="setSerialDiff" style="margin-right: 10rpx;" >
                   <checkbox disabled="{{item.moddingBaseInfo == false}}" checked="{{item.diffSerial}}" >分左右</checkbox>
                 </checkbox-group>
                 <block wx:if="{{item.diffSerial==true}}" >
-                  左:<input class="input" style="width: 120rpx;" disabled="{{item.moddingBaseInfo == false}}" />
-                  右:<input class="input" style="width: 120rpx;" disabled="{{item.moddingBaseInfo == false}}" />
+                  左:<input class="input" style="width: 120rpx;" disabled="{{item.moddingBaseInfo == false}}" 
+                  id="{{index}}" bindinput="setLeftSerial" value="{{item.leftSerial}}" />
+                  右:<input class="input" style="width: 120rpx;" disabled="{{item.moddingBaseInfo == false}}" 
+                  id="{{index}}" bindinput="setRightSerial" value="{{item.rightSerial}}"  />
                 </block>
-                <input wx:else style="width: 300rpx;" class="input" disabled="{{item.moddingBaseInfo == false}}" />
+                <input wx:else style="width: 300rpx;" class="input" disabled="{{item.moddingBaseInfo == false}}" 
+                id="{{index}}" bindinput="setSerial" value="{{item.serials}}" />
               </block>
             </view>
           </view>
@@ -106,10 +109,13 @@
           <view class="view-row" >
             <view class="left-column" >【附件】</view>
             <view class="right-column view-row" style="width: 500rpx;" >
-              <checkbox-group wx:if="{{item.equipment == '双板'}}" style="margin-right: 20rpx;" >
-                <checkbox style="font-size: 10pt;" disabled="{{item.moddingBaseInfo == false}}" >雪杖</checkbox>
+              <checkbox-group wx:if="{{item.equipment == '双板'}}" style="margin-right: 20rpx;" 
+              id="{{index}}" bindchange="setWithPole" >
+                <checkbox style="font-size: 10pt;" checked="{{item.with_pole}}"
+                disabled="{{item.moddingBaseInfo == false}}" >雪杖</checkbox>
               </checkbox-group>
-              <input placeholder="其他附件" class="input" style="width:350rpx" disabled="{{item.moddingBaseInfo == false}}" />
+              <input placeholder="其他附件" class="input" style="width:350rpx" value="{{item.others_associates}}"
+              disabled="{{item.moddingBaseInfo == false}}" id="{{index}}" bindinput="setOthersAssociates" />
             </view>
           </view>
         </mp-cell>
@@ -117,7 +123,8 @@
           <view class="view-row" >
             <view class="left-column" >【备注】</view>
             <view class="right-column" style="width: 450rpx;" >
-              <input style="width: 480rpx;" class="input" disabled="{{item.moddingBaseInfo == false}}" />
+              <input style="width: 480rpx;" class="input" id="{{index}}" bindinput="setMemo"
+              disabled="{{item.moddingBaseInfo == false}}" value="{{item.memo}}" />
             </view>
           </view>
         </mp-cell>
@@ -132,7 +139,8 @@
             <van-button id="{{index}}" wx:if="{{!item.moddingBaseInfo}}" type="primary" size="small" bind:click="setModBaseInfo" > 修 改 </van-button>
             <block wx:else >
               <van-button id="{{index}}" type="warning" size="small" style="margin-right: 40rpx;" bind:click="setCancelModeBaseInfo" > 取 消 </van-button>
-              <van-button id="{{index}}" type="danger" size="small" style="margin-left: 40rpx;" > 确 认 </van-button>
+              <van-button id="{{index}}" type="danger" size="small" style="margin-left: 40rpx;" 
+              bind:click="setSaveBaseInfo" > 确 认 </van-button>
             </block>
           </view>
         </mp-cell>

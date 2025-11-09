@@ -26,7 +26,7 @@ Page({
       that.setData({ skiBrandList: list })
     })
     data.getEquipBrandsPromise('单板').then(function (list) {
-      that.setData({boardBrandList: list})
+      that.setData({ boardBrandList: list })
     })
   },
 
@@ -91,7 +91,7 @@ Page({
       console.log('get order', order)
       order = that.renderOrder(order)
       that.setData({ order })
-      
+
     }).catch(function () {
 
     })
@@ -102,10 +102,22 @@ Page({
     order.bizDateStr = util.formatDate(bizDate)
     order.bizTimeStr = util.formatTimeStr(bizDate)
     order.paidAmountStr = util.showAmount(order.paidAmount)
-    for(var i = 0; order.cares && i < order.cares.length; i++){
+    for (var i = 0; order.cares && i < order.cares.length; i++) {
       var care = order.cares[i]
       care.title = care.brand + ' ' + care.scale
       care.moddingBaseInfo = false
+
+      if (care.serials) {
+        care.diffSerial = care.serials.indexOf('|') >= 0
+        if (care.diffSerial) {
+          var serialArr = care.serials.split('|')
+          care.leftSerial = serialArr[0]
+          care.rightSerial = serialArr.length > 1 ? serialArr[1] : ''
+        }
+      }
+      else {
+        care.serials = ''
+      }
     }
     return order
   },
@@ -151,7 +163,7 @@ Page({
             image.status = 'success'
             image.message = ''
             image.image = uploadThumbFile
-            var care =  that.data.order.cares[index] //that.getCurrentCare()
+            var care = that.data.order.cares[index] //that.getCurrentCare()
             for (var i = 0; i < care.careImages.length; i++) {
               if (care.careImages[i].status == 'uploading') {
                 care.careImages[i] = image
@@ -167,7 +179,7 @@ Page({
   buildImages(index) {
     var that = this
     var order = that.data.order
-    
+
     var care = that.data.order.cares[index] //that.getCurrentCare()
     if (!care) {
       care = {}
@@ -194,28 +206,129 @@ Page({
     that.setData({ order, care })
     //that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
   },
-  setModBaseInfo(e){
+  setModBaseInfo(e) {
     var that = this
     var index = e.currentTarget.id
     var order = that.data.order
     var care = order.cares[index]
     care.moddingBaseInfo = true
-    that.setData({order})
+    that.setData({ order })
   },
-  setCancelModeBaseInfo(e){
+  setCancelModeBaseInfo(e) {
     var that = this
     var index = e.currentTarget.id
     var order = that.data.order
     var care = order.cares[index]
     care.moddingBaseInfo = false
-    that.setData({order})
+    that.setData({ order })
   },
-  setSerialDiff(e){
+  setSerialDiff(e) {
     var that = this
     var index = e.currentTarget.id
     var order = that.data.order
     var care = order.cares[index]
     care.diffSerial = e.detail.value.length == 1
-    that.setData({order})
+    care.serials = ''
+    care.leftSerial = ''
+    care.rightSerial = ''
+    that.setData({ order })
+  },
+  setBrand(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    //var brandName = null
+    if (care.equipment == '双板') {
+      care.brand = that.data.skiBrandList[parseInt(e.detail.value)].displayedName
+    }
+    else{
+      care.brand = that.data.boardBrandList[parseInt(e.detail.value)].displayedName
+    }
+    that.setData({ order })
+  },
+  setBootLength(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.boot_length = e.detail.value
+    that.setData({ order })
+  },
+  setSerial(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.serials = e.detail.value
+  },
+  setLeftSerial(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.leftSerial = e.detail.value
+  },
+  setRightSerial(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.rightSerial = e.detail.value
+  },
+  setWithPole(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.with_pole = e.detail.value.length == 1
+    //that.setData({order})
+  },
+  setOthersAssociates(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.others_associates = e.detail.value
+  },
+  setMemo(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.memo = e.detail.value
+  },
+  setBoardFront(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.board_front = e.detail.value
+  },
+  setScale(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.scale = e.detail.value
+  },
+  setSaveBaseInfo(e) {
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    if (care.diffSerial){
+      care.serials = care.leftSerial + '|' + care.rightSerial
+    }
+    data.updateCarePromise(care, '养护订单详情页修改装备信息', app.globalData.sessionKey).then(function (newCare) {
+      order.cares[index] = newCare
+      that.renderOrder(order)
+      order.cares[index].moddingBaseInfo = false
+      that.setData({ order })
+      wx.showToast({
+        title: '更新成功',
+        icon: 'success'
+      })
+    })
   }
 })

@@ -561,6 +561,16 @@ const getRentPriceByIdPromise = function (id){
     })
   })
 }
+const updateCarePromise = function (care, scene, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Care/UpdateCareByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(updateUrl, care).then(function(newCare){
+      resolve(newCare)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -604,5 +614,6 @@ module.exports = {
   refundPromise,
   updateRentalPromise,
   getRentTypePromise,
-  getRentPriceByIdPromise
+  getRentPriceByIdPromise,
+  updateCarePromise
 }
