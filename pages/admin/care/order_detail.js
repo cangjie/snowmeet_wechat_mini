@@ -8,7 +8,7 @@ Page({
    * Page initial data
    */
   data: {
-    activeTabIndex: 0
+    activeTabIndex: 0,
   },
 
   /**
@@ -22,6 +22,12 @@ Page({
     if (options.careId) {
       that.data.careId = options.careId
     }
+    data.getEquipBrandsPromise('双板').then(function (list) {
+      that.setData({ skiBrandList: list })
+    })
+    data.getEquipBrandsPromise('单板').then(function (list) {
+      that.setData({boardBrandList: list})
+    })
   },
 
   /**
@@ -99,8 +105,117 @@ Page({
     for(var i = 0; order.cares && i < order.cares.length; i++){
       var care = order.cares[i]
       care.title = care.brand + ' ' + care.scale
+      care.moddingBaseInfo = false
     }
     return order
   },
+  afterRead(e) {
+    console.log('photo uploaded', e)
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.order
+    var care = order.cares[index]
+    var uploadFile = e.detail.file
+    var images = care.careImages
+    if (!care.careImages) {
+      care.careImages = []
+      images = care.careImages
+    }
+    var image = {
+      care_id: care.id,
+      image_id: 0,
+      status: 'uploading',
+      message: '上传中',
+      image: {
+        id: 0,
+        file_path_name: uploadFile.tempFilePath,
+        thumb: uploadFile.thumb,
+        thumbUrl: uploadFile.thumb,
+        file_type: uploadFile.type
+      }
+    }
+    images.push(image)
+    that.buildImages(index)
+    data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
+      .then(function (uploadedFile) {
+        console.log('file uploaded', uploadedFile)
+        image.id = uploadedFile.id
+        image.url = uploadedFile.file_path_name
+        image.thumb = uploadedFile.file_path_name
+        image.type = uploadedFile.file_type
+        data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
+          .then(function (uploadThumbFile) {
+            console.log('thumb uploaded', uploadThumbFile)
+            image.id = uploadThumbFile.id
+            image.thumb = uploadThumbFile.thumbUrl
+            image.status = 'success'
+            image.message = ''
+            image.image = uploadThumbFile
+            var care =  that.data.order.cares[index] //that.getCurrentCare()
+            for (var i = 0; i < care.careImages.length; i++) {
+              if (care.careImages[i].status == 'uploading') {
+                care.careImages[i] = image
+                break
+              }
+            }
+            that.buildImages(index)
+          }).catch(function (exp) {
 
+          })
+      })
+  },
+  buildImages(index) {
+    var that = this
+    var order = that.data.order
+    
+    var care = that.data.order.cares[index] //that.getCurrentCare()
+    if (!care) {
+      care = {}
+    }
+    if (!care.careImages) {
+      care.careImages = []
+    }
+
+    for (var i = 0; i < care.careImages.length; i++) {
+      var image = care.careImages[i]
+      if (image.image.thumb.indexOf('http') == 0) {
+        image.thumb = image.image.thumb
+      }
+      else {
+        image.thumb = 'https://snowmeet.wanlonghuaxue.com' + image.image.thumb
+      }
+      if (image.image.file_path_name.indexOf('http') == 0) {
+        image.url = image.image.file_path_name
+      }
+      else {
+        image.url = 'https://snowmeet.wanlonghuaxue.com' + image.image.file_path_name
+      }
+    }
+    that.setData({ order, care })
+    //that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
+  },
+  setModBaseInfo(e){
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.order
+    var care = order.cares[index]
+    care.moddingBaseInfo = true
+    that.setData({order})
+  },
+  setCancelModeBaseInfo(e){
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.order
+    var care = order.cares[index]
+    care.moddingBaseInfo = false
+    that.setData({order})
+  },
+  setSerialDiff(e){
+    var that = this
+    var index = e.currentTarget.id
+    var order = that.data.order
+    var care = order.cares[index]
+    care.diffSerial = e.detail.value.length == 1
+    that.setData({order})
+  }
 })
