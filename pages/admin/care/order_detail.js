@@ -91,7 +91,6 @@ Page({
       console.log('get order', order)
       order = that.renderOrder(order)
       that.setData({ order })
-
     }).catch(function () {
 
     })
@@ -118,6 +117,7 @@ Page({
       else {
         care.serials = ''
       }
+      order = that.buildImages(order, i)
     }
     return order
   },
@@ -134,6 +134,7 @@ Page({
       images = care.careImages
     }
     var image = {
+      id: 0,
       care_id: care.id,
       image_id: 0,
       status: 'uploading',
@@ -143,22 +144,24 @@ Page({
         file_path_name: uploadFile.tempFilePath,
         thumb: uploadFile.thumb,
         thumbUrl: uploadFile.thumb,
-        file_type: uploadFile.type
+        file_type: uploadFile.type,
+        care_id: care.id
       }
     }
     images.push(image)
-    that.buildImages(index)
+    order = that.buildImages(order, index)
+    that.setData({order})
     data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
       .then(function (uploadedFile) {
         console.log('file uploaded', uploadedFile)
-        image.id = uploadedFile.id
+        image.image_id = uploadedFile.id
         image.url = uploadedFile.file_path_name
         image.thumb = uploadedFile.file_path_name
         image.type = uploadedFile.file_type
         data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
           .then(function (uploadThumbFile) {
             console.log('thumb uploaded', uploadThumbFile)
-            image.id = uploadThumbFile.id
+            image.image_id = uploadThumbFile.id
             image.thumb = uploadThumbFile.thumbUrl
             image.status = 'success'
             image.message = ''
@@ -170,17 +173,17 @@ Page({
                 break
               }
             }
-            that.buildImages(index)
+            order = that.buildImages(order, index)
+            that.setData({order})
           }).catch(function (exp) {
 
           })
       })
   },
-  buildImages(index) {
-    var that = this
-    var order = that.data.order
-
-    var care = that.data.order.cares[index] //that.getCurrentCare()
+  buildImages(order, index) {
+    //var that = this
+    //var order = that.data.order
+    var care = order.cares[index] //that.getCurrentCare()
     if (!care) {
       care = {}
     }
@@ -203,7 +206,8 @@ Page({
         image.url = 'https://snowmeet.wanlonghuaxue.com' + image.image.file_path_name
       }
     }
-    that.setData({ order, care })
+    return order
+    //that.setData({ order })
     //that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
   },
   setModBaseInfo(e) {
@@ -319,6 +323,13 @@ Page({
     var care = order.cares[index]
     if (care.diffSerial){
       care.serials = care.leftSerial + '|' + care.rightSerial
+    }
+    for(var i = 0; care.careImages && i < care.careImages.length; i++){
+      if (care.careImages[i].image){
+        var careImage = care.careImages[i]
+        careImage.image_id = careImage.image.id
+        careImage.care_id = care.id
+      }
     }
     data.updateCarePromise(care, '养护订单详情页修改装备信息', app.globalData.sessionKey).then(function (newCare) {
       order.cares[index] = newCare
