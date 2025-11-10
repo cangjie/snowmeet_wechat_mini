@@ -135,7 +135,7 @@
         <block wx:if="{{task.task_name=='安全检查'}}">
           <mp-cell>
             <view class="view-row">
-              <view class="left-column">【身高】</view>
+              <view class="left-column view-row">【身高】<view style="color: red;font-size: 15pt;" >*</view></view>
               <view class="right-column view-row">
                 <input class="input" style="width: 100rpx;"  
                 disabled="{{!item.safeChecking}}" />cm
@@ -157,10 +157,10 @@
           </mp-cell>
           <mp-cell wx:if="{{item.equipment == '双板'}}">
             <view class="view-row">
-              <view class="left-column">【脱落值】</view>
+              <view class="left-column view-row">【脱落值】</view>
               <view class="right-column view-row" style="width: 550rpx;align-items: center;">
-                前：<input class="input" style="width: 75rpx;margin-right: 50rpx;"  disabled="{{!item.safeChecking}}" />
-                后：<input class="input" style="width: 75rpx;"  disabled="{{!item.safeChecking}}" />
+                <view style="color: red;font-size: 15pt;" >*</view>前：<input class="input" style="width: 75rpx;margin-right: 50rpx;"  disabled="{{!item.safeChecking}}" />
+                <view style="color: red;font-size: 15pt;" >*</view>后：<input class="input" style="width: 75rpx;"  disabled="{{!item.safeChecking}}" />
               </view>
 
             </view>
@@ -169,9 +169,9 @@
             <view class="view-row">
               <view class="left-column">【角度】</view>
               <view class="right-column view-row" style="width: 550rpx;align-items: center;">
-                左：<input class="input" style="width: 75rpx;margin-right: 50rpx;"  
+                <view style="color: red;font-size: 15pt;" >*</view>左：<input class="input" style="width: 75rpx;margin-right: 50rpx;"  
                 disabled="{{item.safeChecking}}"  />
-                右：<input class="input" style="width: 75rpx;" disabled="{{!item.safeChecking}}" />
+                <view style="color: red;font-size: 15pt;" >*</view>右：<input class="input" style="width: 75rpx;" disabled="{{!item.safeChecking}}" />
               </view>
 
             </view>
