@@ -137,20 +137,20 @@
             <view class="view-row">
               <view class="left-column view-row">【身高】<view style="color: red;font-size: 15pt;" >*</view></view>
               <view class="right-column view-row">
-                <input class="input" style="width: 100rpx;"  
-                disabled="{{!item.safeChecking}}" />cm
+                <input class="input" style="width: 100rpx;text-align: center;" id="{{index}}" bindblur="setHeight" 
+                disabled="{{!item.safeChecking}}" value="{{item.height}}" />cm
               </view>
               <block wx:if="{{item.equipment == '双板'}}">
                 <view class="left-column">【体重】</view>
                 <view class="right-column view-row">
-                  <input class="input" style="width: 100rpx;"  
-                  disabled="{{!item.safeChecking }}" />kg
+                  <input class="input" style="width: 100rpx;text-align: center;" id="{{index}}" bindblur="setWeight"
+                  disabled="{{!item.safeChecking }}" value="{{item.weight}}" />kg
                 </view>
               </block>
               <block wx:else>
-                <view class="left-column">【间距】</view>
+                <view class="left-column view-row">【间距】</view>
                 <view class="right-column">
-                  <input class="input" style="width: 100rpx;"  disabled="{{!item.safeChecking}}" />
+                  <input class="input" style="width: 100rpx;text-align: center;"  disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setGap" value="{{item.gap}}" />
                 </view>
               </block>
             </view>
@@ -159,8 +159,8 @@
             <view class="view-row">
               <view class="left-column view-row">【脱落值】</view>
               <view class="right-column view-row" style="width: 550rpx;align-items: center;">
-                <view style="color: red;font-size: 15pt;" >*</view>前：<input class="input" style="width: 75rpx;margin-right: 50rpx;"  disabled="{{!item.safeChecking}}" />
-                <view style="color: red;font-size: 15pt;" >*</view>后：<input class="input" style="width: 75rpx;"  disabled="{{!item.safeChecking}}" />
+                <view style="color: red;font-size: 15pt;" >*</view>前：<input class="input" style="width: 75rpx;margin-right: 50rpx;text-align: center;"  disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setFrontDin" value="{{item.front_din}}" />
+                <view style="color: red;font-size: 15pt;text-align: center;" >*</view>后：<input class="input" style="width: 75rpx;text-align: center;"  disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setRearDin" value="{{item.rear_din}}" />
               </view>
 
             </view>
@@ -169,9 +169,9 @@
             <view class="view-row">
               <view class="left-column">【角度】</view>
               <view class="right-column view-row" style="width: 550rpx;align-items: center;">
-                <view style="color: red;font-size: 15pt;" >*</view>左：<input class="input" style="width: 75rpx;margin-right: 50rpx;"  
-                disabled="{{item.safeChecking}}"  />
-                <view style="color: red;font-size: 15pt;" >*</view>右：<input class="input" style="width: 75rpx;" disabled="{{!item.safeChecking}}" />
+                左：<input class="input" style="width: 75rpx;margin-right: 50rpx;"  id="{{index}}" bindblur="setLeftAngel"
+                disabled="{{item.safeChecking}}" value="{{item.left_angel}}" />
+                右：<input class="input" style="width: 75rpx;" disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setRightAngel" value="{{item.right_angel}}" />
               </view>
 
             </view>
@@ -179,22 +179,20 @@
           <mp-cell>
             <view class="view-row">
               <view class="left-column">【负责人】</view>
-              <view class="right-column">
-                
-              </view>
+              <view class="right-column">{{item.tasks[0].staff.name}}</view>
             </view>
           </mp-cell>
           <mp-cell>
             <view class="view-row">
               <view class="left-column">【备注】</view>
               <view class="right-column">
-                <input style="width: 480rpx;" class="input"  disabled="{{!item.safeChecking}}" />
+                <input style="width: 480rpx;" class="input"  disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setSafeMemo" value="{{item.tasks[0].memo}}" />
               </view>
             </view>
           </mp-cell>
           <mp-cell>
             <view class="view-row" style="justify-content: center;" >
-              <van-button type="primary" disabled="{{!item.safeChecking}}" > 确 认 安 全 </van-button>
+              <van-button type="primary" disabled="{{!item.safeChecking}}" bind:click="safeCheck" id="{{index}}" > 确 认 安 全 </van-button>
             </view>
           </mp-cell>
         </block>

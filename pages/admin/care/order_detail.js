@@ -382,5 +382,120 @@ Page({
     }
     care.careImages = newImages
     that.setData({order})
+  },
+  setHeight(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var value = e.detail.value
+    care.height = value
+  },
+  setWeight(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var value = e.detail.value
+    care.weight = value
+  },
+  setGap(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var value = e.detail.value
+    care.gap = value
+  },
+  setFrontDin(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var value = e.detail.value
+    care.front_din = value
+  },
+  setRearDin(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var value = e.detail.value
+    care.rear_din = value
+  },
+  setLeftAngel(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var value = e.detail.value
+    care.left_angel = value
+  },
+  setRightAngel(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var value = e.detail.value
+    care.right_angel = value
+  },
+  setSafeMemo(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var value = e.detail.value
+    care.tasks[0].memo = value
+  },
+  safeCheck(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    //var care = order.cares[index]
+    wx.showModal({
+      title: '安全检查确认',
+      content: '确认所填参数皆为真实准确的数值，您将成为顾客本次养护的安全负责人。',
+      complete: (res) => {
+        var order = that.data.order
+        var care = order.cares[index]
+        if (res.cancel) {
+          
+        }
+        if (res.confirm) {
+          var message = ''
+          if (!care.height || care.height == ''){
+            message = '身高必填'
+          }
+          else{
+            if (care.equipment == '双板'){
+              if (!care.front_din || care.front_din == ''){
+                message = '前脱落值必填'
+              }
+              else if (!care.rear_din || care.rear_din == ''){
+                message = '后脱落值必填'
+              }
+              else{
+                message = ''
+              }
+            }
+          }
+          if (message != ''){
+            wx.showToast({
+              title: message,
+              icon: 'error'
+            })
+            return
+          }
+          data.updateCarePromise(care, '安全检查', app.globalData.sessionKey).then(function (newCare){
+            data.updateCareTaskStatusPromise(care.tasks[0].id, '已完成', '养护详情页安全检查', app.globalData.sessionKey)
+            .then(function (newCare){
+              order.cares[index] = newCare
+              that.renderOrder(order)
+              that.setData({order})
+            })
+          })
+        }
+      }
+    })
   }
 })

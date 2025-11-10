@@ -571,6 +571,16 @@ const updateCarePromise = function (care, scene, sessionKey){
     })
   })
 }
+const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Care/SetTaskStatus/' + taskId.toString() + '?status=' + encodeURIComponent(status) + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function(resolve, reject){
+    util.performWebRequest(updateUrl, null).then(function (newCare){
+      resolve(newCare)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -615,5 +625,6 @@ module.exports = {
   updateRentalPromise,
   getRentTypePromise,
   getRentPriceByIdPromise,
-  updateCarePromise
+  updateCarePromise,
+  updateCareTaskStatusPromise
 }
