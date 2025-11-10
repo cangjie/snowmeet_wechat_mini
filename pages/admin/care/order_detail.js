@@ -124,7 +124,7 @@ Page({
   afterRead(e) {
     console.log('photo uploaded', e)
     var that = this
-    var index = e.currentTarget.id
+    var index = parseInt(e.currentTarget.id)
     var order = that.data.order
     var care = order.cares[index]
     var uploadFile = e.detail.file
@@ -149,11 +149,13 @@ Page({
       }
     }
     images.push(image)
+    var imageIndex = order.cares[index].careImages.length - 1
     order = that.buildImages(order, index)
     that.setData({order})
     data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
       .then(function (uploadedFile) {
         console.log('file uploaded', uploadedFile)
+        var image = order.cares[index].careImages[imageIndex]
         image.image_id = uploadedFile.id
         image.url = uploadedFile.file_path_name
         image.thumb = uploadedFile.file_path_name
@@ -161,18 +163,13 @@ Page({
         data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
           .then(function (uploadThumbFile) {
             console.log('thumb uploaded', uploadThumbFile)
+            var care = order.cares[index]
+            var image = care.careImages[imageIndex]
             image.image_id = uploadThumbFile.id
             image.thumb = uploadThumbFile.thumbUrl
             image.status = 'success'
             image.message = ''
             image.image = uploadThumbFile
-            var care = that.data.order.cares[index] //that.getCurrentCare()
-            for (var i = 0; i < care.careImages.length; i++) {
-              if (care.careImages[i].status == 'uploading') {
-                care.careImages[i] = image
-                break
-              }
-            }
             order = that.buildImages(order, index)
             that.setData({order})
           }).catch(function (exp) {
@@ -205,6 +202,7 @@ Page({
       else {
         image.url = 'https://snowmeet.wanlonghuaxue.com' + image.image.file_path_name
       }
+      //image.deleteable = care.moddingBaseInfo
     }
     return order
     //that.setData({ order })
@@ -341,5 +339,20 @@ Page({
         icon: 'success'
       })
     })
+  },
+  delImage(e){
+    var index = parseInt(e.currentTarget.id)
+    var imageIndex = e.detail.index
+    var that = this
+    var order = that.data.order
+    var care = order.cares[index]
+    var newImages = []
+    for(var i = 0; care.careImages && i < care.careImages.length; i++){
+      if (i != imageIndex){
+        newImages.push(care.careImages[i])
+      }
+    }
+    care.careImages = newImages
+    that.setData({order})
   }
 })

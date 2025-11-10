@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "shop-selector": "/components/shop_selector/shop_selector",
-    "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell"
-  },
-  "navigationBarTitleText": "订单查询"
-}

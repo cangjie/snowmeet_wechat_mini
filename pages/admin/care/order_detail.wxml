@@ -131,7 +131,8 @@
         <mp-cell>
           <view class="view-row" >
             <van-uploader file-list="{{item.careImages}}" bind:after-read="afterRead" 
-            capture="['album', 'camera']" bind:delete="delImage" id="{{index}}"  show-upload="{{item.moddingBaseInfo == true}}" />
+            capture="['album', 'camera']" bind:delete="delImage" id="{{index}}"  bind:delete="delImage"
+            show-upload="{{item.moddingBaseInfo == true}}" deletable="{{item.moddingBaseInfo == true}}"  />
           </view>
         </mp-cell>
         <mp-cell>

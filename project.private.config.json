@@ -3,16 +3,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "养护订单",
-          "pathName": "pages/admin/care/order_detail",
-          "query": "orderId=61508",
+          "name": "养护订单列表",
+          "pathName": "pages/admin/care/care_order_list",
+          "query": "",
           "scene": null,
           "launchMode": "default"
         },
         {
           "name": "养护订单",
-          "pathName": "pages/admin/care/care_order_list",
-          "query": "",
+          "pathName": "pages/admin/care/order_detail",
+          "query": "orderId=61508",
           "launchMode": "default",
           "scene": null
         },
