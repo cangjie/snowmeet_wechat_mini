@@ -103,7 +103,20 @@ Page({
     order.paidAmountStr = util.showAmount(order.paidAmount)
     for (var i = 0; order.cares && i < order.cares.length; i++) {
       var care = order.cares[i]
-      care.title = care.brand + ' ' + care.scale
+      if (care.brand && care.brand != '' && care.scale && care.scale != ''){
+        care.baseInfoWellFormed = true
+      }
+      else{
+        care.baseInfoWellFormed = false
+      }
+      if (care.baseInfoWellFormed && care.tasks[0].status != '已完成'){
+        care.safeChecking = true
+      }
+      else{
+        care.safeChecking = false
+      }
+      care.title = (care.brand==null?'未填': care.brand )+ ' ' + (care.scale==null?'未填':care.scale)
+
       care.moddingBaseInfo = false
 
       if (care.serials) {
@@ -116,6 +129,21 @@ Page({
       }
       else {
         care.serials = ''
+      }
+      for(var j = 0; care.tasks && j < care.tasks.length; j++){
+        var task = care.tasks[j]
+        switch(task.task_name){
+          case '修刃':
+            task.title = task.task_name + ' 角度：' + (care.edge_degree ? care.edge_degree : '89')
+            break
+          case '维修':
+            task.title = task.task_name  + ' ' + care.repair_memo
+            break
+          default:
+            task.title = task.task_name
+            break
+        }
+        
       }
       order = that.buildImages(order, i)
     }

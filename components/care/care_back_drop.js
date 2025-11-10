@@ -102,13 +102,19 @@ Component({
       order.id = 0
       order.valid = 1
       for(var i = 0; order.cares && i < order.cares.length; i++){
-        order.cares[i].id = 0
-        order.cares[i].order_id = order.id
-        order.cares[i].valid = 1
+        var care = order.cares[i]
+        care.id = 0
+        care.order_id = order.id
+        care.valid = 1
+        if ((care.repair_memo && care.repair_memo != '' ) || (care.repair_charge && care.repair_charge > 0)){
+          care.need_repair = 1
+        }
         for(var j = 0; order.cares[i].careImages && j < order.cares[i].careImages.length; j++){
           order.cares[i].careImages[j].id = 0
           order.cares[i].careImages[j].care_id = order.cares[i].id
-          order.cares[i].careImages[j].image_id = order.cares[i].careImages[j].image.id
+          if (order.cares[i].careImages[j].image){
+            order.cares[i].careImages[j].image_id = order.cares[i].careImages[j].image.id
+          }
           order.cares[i].careImages[j].valid = true
           order.cares[i].careImages[j].image = null
         }
