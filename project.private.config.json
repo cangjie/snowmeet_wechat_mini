@@ -5,7 +5,7 @@
         {
           "name": "养护订单",
           "pathName": "pages/admin/care/order_detail",
-          "query": "orderId=61542",
+          "query": "orderId=61537",
           "scene": null,
           "launchMode": "default"
         },

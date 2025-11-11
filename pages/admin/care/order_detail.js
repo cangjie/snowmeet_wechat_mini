@@ -626,22 +626,23 @@ Page({
     var care = order.cares[index]
     care.veriType = veriType
     if (veriType == '本人扫码'){
-      that.createQrCode()
+      that.createQrCode(care.id)
     }
     that.setData({order})
   },
-  createQrCode(){
+  createQrCode(id){
     var that = this
-    var getQrUrl = app.globalData.requestPrefix + 'QrCode/CreateNewScanQrCodeByStaff?code=' + encodeURIComponent('care_veri_id') + '&scene=' + encodeURIComponent('店铺接待') + '&purpose=' + encodeURIComponent('养护取板') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    var getQrUrl = app.globalData.requestPrefix + 'QrCode/CreateNewScanQrCodeByStaff?code=' + encodeURIComponent('care_veri_' + id.toString()) + '&scene=' + encodeURIComponent('店铺接待') + '&purpose=' + encodeURIComponent('养护取板') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     util.performWebRequest(getQrUrl, null).then(function (qrCode){
       console.log('qr code', qrCode)
+      that.setData({scanQrCode: qrCode})
       var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + qrCode.code
       wx.request({
         url: getQRUrl,
         method: 'GET',
         success:(res)=>{
           that.setData({ qrcodeUrl: res.data })
-          //that.startWebSocketQuery()
+          that.startWebSocketQuery()
         }
       })
     })
@@ -654,5 +655,154 @@ Page({
     var care = order.cares[index]
     care.veriType = null
     that.setData({order})
-  }
+    if (that.data.scanQrCode){
+      that.closeSocket()
+    }
+    
+  },
+  startWebSocketQuery(){
+    var that = this
+    var socketTask = that.data.socketTask
+    socketTask = wx.connectSocket({
+      url: 'wss://' + app.globalData.domainName + '/ws',
+      header:{'content-type': 'application/json'}
+    })
+    socketTask.isReplied = false
+    that.setData({socketTask})
+    socketTask.onError((res)=>{
+      that.socketError()
+    })
+    socketTask.onMessage((res)=>{
+      that.socketMessage(res)
+    })
+    socketTask.onOpen((res)=>{
+      console.log('socket open')
+      that.socketOpen(res)
+    })
+    socketTask.onClose((res)=>{
+      that.socketClosed()
+    })
+  },
+  socketOpen(res){
+    var that = this
+    app.globalData.isWebsocketOpen = true
+    var socketTask = that.data.socketTask
+    var socketCmd = {
+      command: 'queryqrscan',
+      id: that.data.scanQrCode.id
+    }
+    var cmdStr = JSON.stringify(socketCmd)
+    socketTask.send({
+      data: cmdStr,
+      success:(res)=>{
+        console.log('send command', cmdStr)
+      }
+    })
+  },
+  socketMessage(res){
+    var that = this
+    var msg = JSON.parse(res.data)
+    console.log('socket message', msg)
+    var scanQrCode = msg.data
+    var socketTask = that.data.socketTask
+    socketTask.isReplied = true
+    that.setData({scanQrCode, socketTask})
+
+    var order = that.data.order
+    if (order.member_id == scanQrCode.scaner_member_id){
+      var careId = parseInt(scanQrCode.code.split('_')[2])
+      for(var i = 0; i < order.cares.length; i++){
+        if (order.cares[i].id == careId){
+          var care = order.cares[i]
+          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '扫码取板', app.globalData.sessionKey).then(function (newCare){
+            for(var j = 0; order && order.cares[j] && j < order.cares[j].id; j++){
+              if (order.cares[j].id == careId){
+                order.cares[j] = newCare
+                that.setData({order})
+                wx.showToast({
+                  title: '顾客是本人发板',
+                  icon: 'success'
+                })
+              }
+            }
+          })
+        }
+        
+      }
+      
+    }
+    else{
+      wx.showToast({
+        title: '顾客非本人',
+        icon: 'error'
+      })
+    }
+
+
+    socketTask.close({
+      success:()=>{
+        console.log('socket will be closed')
+      }
+    })
+  },
+  socketClosed(){
+    console.log('socket is closed')
+    var that = this
+    var socketTask = that.data.socketTask
+    var scanQrCode = that.data.scanQrCode
+    var title = undefined
+    var content = undefined
+    /*
+    if (scanQrCode.scaner_member_id){
+      wx.navigateTo({
+        url: 'recept_member_info?memberId=' + scanQrCode.scaner_member_id.toString()
+      })
+    }
+    if (scanQrCode.no_scan == 1){
+      wx.navigateTo({
+        url: 'recept_member_info'
+      })
+    }
+    */
+    if (socketTask && !socketTask.isReplied){
+      title = '网络中断'
+      content = '点击确认重新连接，点击取消回到上一页。'
+    }
+    else if (scanQrCode && scanQrCode.scaned == 0 && scanQrCode.stoped == 0 && scanQrCode.authed == 0){
+      title = '二维码超时'
+      content = '点击确认刷新二维码，点击取消回到上一页。'
+    }
+    if (title && content){
+      wx.showModal({
+        title: title,
+        content: content,
+        complete: (res) => {
+          if (res.cancel) {
+            wx.navigateBack()
+          }
+          if (res.confirm) {
+            switch(title){
+              case '网络中断':
+                that.startWebSocketQuery()
+                break
+              case '二维码超时':
+                //that.refreshQrCode()
+                break
+              default:
+                break
+            }
+          }
+        }
+      })
+      return
+    }
+  },
+  closeSocket(){
+    var that = this
+    var scanQrCode = that.data.scanQrCode
+    var closeUrl = app.globalData.requestPrefix + 'QrCode/StopQeryScan/' + scanQrCode.id.toString() + '?sessionKey=' + app.globalData.sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    util.performWebRequest(closeUrl, undefined).then(function(resolve){
+      console.log('socket will be closed', resolve)
+    })
+  },
 })

@@ -242,13 +242,13 @@
                 checked="{{item.veriType == '店长确认'}}" >店长确认</radio>
               </radio-group>
             </view>
-            <view wx:if="{{veriType == '本人扫码'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+            <view wx:if="{{item.veriType == '本人扫码'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
               <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>
             </view>
-            <view wx:if="{{veriType == '凭证拍照'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+            <view wx:if="{{item.veriType == '凭证拍照'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
               bbb
             </view>
-            <view wx:if="{{veriType == '店长确认'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+            <view wx:if="{{item.veriType == '店长确认'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
               ccc
             </view>
           </mp-cell>
