@@ -143,7 +143,43 @@ Page({
             task.title = task.task_name
             break
         }
-        
+        if (task.start_time == null){
+          task.start_timeDateStr = '--'
+          task.start_timeTimeStr = '--'
+        }
+        else{
+          var startTime = new Date(task.start_time)
+          task.start_timeDateStr = util.formatDate(startTime)
+          task.start_timeTimeStr = util.formatTimeStr(startTime)
+        }
+        if (task.end_time == null){
+          task.end_timeDateStr = '--'
+          task.end_timeTimeStr = '--'
+        }
+        else {
+          var endTime = new Date(task.end_time)
+          task.end_timeDateStr = util.formatDate(endTime)
+          task.end_timeTimeStr = util.formatTimeStr(endTime)
+        }
+        if (j == 0){
+          if (task.status == '已完成'){
+            task.current = false
+          }
+          else {
+            task.current = true
+          }
+        }
+        else{
+          if (task.status == '未开始' && care.tasks[j-1].status == '已完成') {
+            task.current = true
+          }
+          else if (task.status == '已开始' ){
+            task.current = true
+          }
+          else {
+            task.current = false
+          }
+        }
       }
       order = that.buildImages(order, i)
     }
@@ -497,5 +533,60 @@ Page({
         }
       }
     })
+  },
+  setTaskStart(e){
+    var that = this
+    var taskId = parseInt(e.currentTarget.id)
+    wx.showModal({
+      title: '确认开始？',
+      content: '',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          
+          data.updateCareTaskStatusPromise(taskId, '已开始', '养护详情页', app.globalData.sessionKey)
+            .then(function (newCare){
+              var order = that.data.order
+              for(var i = 0; i < order.cares.length; i++){
+                if (order.cares[i].id == newCare.id){
+                  order.cares[i] == newCare
+                }
+              }
+              order = that.renderOrder(order)
+              that.setData({order})
+            })
+        }
+      }
+    })
+  },
+  setTaskEnd(e){
+    var that = this
+    var taskId = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var status = '已完成'
+    var task = null
+    for(var i = 0; i < order.cares.length; i++){
+      var care = order.cares[i]
+      for(var j = 0; j < care.tasks.length; j++){
+        if (care.tasks[j].id == taskId){
+          task = care.tasks[j]
+          if (task.id == taskId && task.staff_id != app.globalData.staff.id){
+            status = '强行中止'
+            //task = care.tasks[j]
+          }
+        }
+      }
+      if (task != null){
+        break
+      }
+    }
+    var startTimeStamp =new Date(task.start_time).valueOf()
+    var endTimeStamp = (new Date()).valueOf()
+    console.log('task length', endTimeStamp - startTimeStamp)
+
+
   }
 })

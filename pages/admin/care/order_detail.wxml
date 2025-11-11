@@ -196,29 +196,37 @@
             </view>
           </mp-cell>
         </block>
-        <block wx:else >
+        <block wx:if="{{task.task_name!='安全检查' && task.task_name!= '发板'}}" >
           <mp-cell>
             <view class="view-row" >
               <view class="left-column" >【技师】</view>
-              <view class="right-column" ></view>
+              <view class="right-column" >{{task.staff? task.staff.name : '--'}}</view>
               <view class="left-column" >【状态】</view>
-              <view class="right-column" ></view>
+              <view class="right-column" >{{task.status}}</view>
             </view>
           </mp-cell>
           <mp-cell>
             <view class="view-row" >
               <view class="left-column" >【开始日期】</view>
-              <view class="right-column" ></view>
+              <view class="right-column" >{{task.start_timeDateStr}}</view>
               <view class="left-column" >【开始时间】</view>
-              <view class="right-column" ></view>
+              <view class="right-column" >{{task.start_timeTimeStr}}</view>
             </view>
           </mp-cell>
           <mp-cell>
             <view class="view-row" >
               <view class="left-column" >【结束日期】</view>
-              <view class="right-column" ></view>
+              <view class="right-column" >{{task.end_timeDateStr}}</view>
               <view class="left-column" >【结束时间】</view>
-              <view class="right-column" ></view>
+              <view class="right-column" >{{task.end_timeTimeStr}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell wx:if="{{task.current==true}}"  >
+            <view class="view-row" style="justify-content: center;" >
+              <van-button wx:if="{{task.status == '未开始'}}" type="primary" id="{{task.id}}" 
+              bind:click="setTaskStart"  > 开 始 </van-button>
+              <van-button wx:if="{{task.status == '已开始'}}" type="danger" id="{{task.id}}" 
+              bind:click="setTaskEnd"  > 结 束 </van-button>
             </view>
           </mp-cell>
         </block>
