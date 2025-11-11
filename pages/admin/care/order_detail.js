@@ -537,6 +537,7 @@ Page({
   setTaskStart(e){
     var that = this
     var taskId = parseInt(e.currentTarget.id)
+    var order = that.data.order
     wx.showModal({
       title: '确认开始？',
       content: '',
@@ -549,10 +550,11 @@ Page({
           
           data.updateCareTaskStatusPromise(taskId, '已开始', '养护详情页', app.globalData.sessionKey)
             .then(function (newCare){
-              var order = that.data.order
+              
               for(var i = 0; i < order.cares.length; i++){
                 if (order.cares[i].id == newCare.id){
-                  order.cares[i] == newCare
+                  order.cares[i] = newCare
+                  break
                 }
               }
               order = that.renderOrder(order)
@@ -585,8 +587,72 @@ Page({
     }
     var startTimeStamp =new Date(task.start_time).valueOf()
     var endTimeStamp = (new Date()).valueOf()
-    console.log('task length', endTimeStamp - startTimeStamp)
-
-
+    var timeLength = parseFloat((endTimeStamp - startTimeStamp)/60000).toFixed(2)
+    var title = '确认任务结束'
+    var content = '本任务共耗时 ' + timeLength + ' 分钟'
+    if (status == '强行中止'){
+      title = '确认强行中止任务'
+      content = '本任务是 ' + task.staff.name + ' 在执行，确认强行中止吗？'
+    }
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+        if (res.confirm) {
+          data.updateCareTaskStatusPromise(taskId, status, '养护详情页', app.globalData.sessionKey)
+            .then(function (newCare){
+              for(var i = 0; i < order.cares.length; i++){
+                if (order.cares[i].id == newCare.id){
+                  order.cares[i] = newCare
+                  break
+                }
+              }
+              order = that.renderOrder(order)
+              that.setData({order})
+          })
+        }
+      }
+    })
+    //console.log('task length', parseFloat((endTimeStamp - startTimeStamp)/60000).toFixed(2))
+  },
+  setVeriType(e){
+    var that = this
+    var veriType = e.detail.value
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    care.veriType = veriType
+    if (veriType == '本人扫码'){
+      that.createQrCode()
+    }
+    that.setData({order})
+  },
+  createQrCode(){
+    var that = this
+    var getQrUrl = app.globalData.requestPrefix + 'QrCode/CreateNewScanQrCodeByStaff?code=' + encodeURIComponent('care_veri_id') + '&scene=' + encodeURIComponent('店铺接待') + '&purpose=' + encodeURIComponent('养护取板') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    util.performWebRequest(getQrUrl, null).then(function (qrCode){
+      console.log('qr code', qrCode)
+      var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + qrCode.code
+      wx.request({
+        url: getQRUrl,
+        method: 'GET',
+        success:(res)=>{
+          that.setData({ qrcodeUrl: res.data })
+          //that.startWebSocketQuery()
+        }
+      })
+    })
+  },
+  onTabChange(e){
+    var that = this
+    console.log('tab change', e)
+    var index = e.detail.index
+    var order = that.data.order
+    var care = order.cares[index]
+    care.veriType = null
+    that.setData({order})
   }
 })

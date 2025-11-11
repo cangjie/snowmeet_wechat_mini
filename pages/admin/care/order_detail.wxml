@@ -230,6 +230,29 @@
             </view>
           </mp-cell>
         </block>
+        <block wx:if="{{task.task_name == '发板'}}" >
+          <mp-cell wx:if="{{task.status == '未开始'}}" >
+            <view class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+              <radio-group bindchange="setVeriType" id="{{index}}" >
+                <radio value="本人扫码" disabled="{{task.current==false}}" 
+                  checked="{{item.veriType == '本人扫码'}}" >本人扫码</radio>
+                <radio style="margin-left:20rpx" value="凭证拍照" disabled="{{task.current==false}}" 
+                  checked="{{item.veriType == '凭证拍照'}}" >凭证拍照</radio>
+                <radio style="margin-left:20rpx" value="店长确认" disabled="{{task.current==false || app.globalData.staff.title_level < 200 }}" 
+                checked="{{item.veriType == '店长确认'}}" >店长确认</radio>
+              </radio-group>
+            </view>
+            <view wx:if="{{veriType == '本人扫码'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+              <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>
+            </view>
+            <view wx:if="{{veriType == '凭证拍照'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+              bbb
+            </view>
+            <view wx:if="{{veriType == '店长确认'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+              ccc
+            </view>
+          </mp-cell>
+        </block>
       </mp-cells>
       <!--
       <mp-cells title="安全检查" >
@@ -279,4 +302,5 @@
       -->
     </van-tab>
   </van-tabs>
+  <view style="height: 100rpx;" ></view>
 </view>
