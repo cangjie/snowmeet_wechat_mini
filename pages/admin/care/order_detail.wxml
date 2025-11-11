@@ -252,6 +252,25 @@
               ccc
             </view>
           </mp-cell>
+          <block wx:if="{{task.status == '已完成'}}" >
+            <mp-cell>
+              <view class="view-row" >
+                <view class="left-column" >【日期】</view>
+                <view class="right-column" >{{task.end_timeDateStr}}</view>
+                <view class="left-column" >【时间】</view>
+                <view class="right-column" >{{task.end_timeTimeStr}}</view>
+              </view>
+            </mp-cell>
+            <mp-cell>
+              <view class="view-row" >
+                <view class="left-column" >【负责人】</view>
+                <view class="right-column" >{{task.staff.name}}</view>
+                <view class="left-column" >【验证方式】</view>
+                <view class="right-column" >{{task.memo}}</view>
+              </view>
+            </mp-cell>
+          </block>
+          
         </block>
       </mp-cells>
       <!--
