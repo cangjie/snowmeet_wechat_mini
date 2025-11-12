@@ -135,9 +135,17 @@ Component({
         if (paid) {
           wx.showToast({
             title: '支付成功',
-            icon: 'success'
+            icon: 'success',
+            success:()=>{
+              /*
+              wx.navigateTo({
+                url: '/pages/admin/care/care_order_detail?id=' + order.id,
+              })
+              */
+              that.triggerEvent('Jump', { url: '/pages/admin/care/order_detail?orderId=' + order.id })
+            }
           })
-          that.triggerEvent('Jump', { url: '/pages/admin/care/care_order_detail?id=' + order.id })
+          
         }
       })
 

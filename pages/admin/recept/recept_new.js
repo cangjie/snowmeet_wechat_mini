@@ -306,9 +306,16 @@ Page({
     that.setData({ bizType: 'retail', showOrderInfo: true })
   },
   jump(e) {
+    console.log('jump', e)
     var url = e.detail.url
     wx.navigateTo({
       url: url,
+      success:(res)=>{
+        console.log('suc jump', res)
+      },
+      fail:(res)=>{
+        console.log('fail jump', res)
+      }
     })
   },
   careOrderUpdate(e) {
