@@ -207,5 +207,20 @@ Page({
           url: 'order_detail?orderId=' + order.id,
         })
       }
-  }
+  },
+  setDate(e){
+    var id = e.currentTarget.id
+    var that = this
+    console.log('select date', e)
+    switch(id){
+      case 'start':
+        that.setData({startDate: e.detail.value})
+        break
+      case 'end':
+        that.setData({endDate: e.detail.value})
+        break
+      default:
+        break
+    }
+  },
 })

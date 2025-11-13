@@ -8,11 +8,11 @@ Page({
    * Page initial data
    */
   data: {
-    queryOptions:[
-      {key: 'isTest', value: false},
-      {key: 'isEntertain', value: false},
-      {key: 'haveDiscount', value: null}
-      ],
+    queryOptions: [
+      { key: 'isTest', value: false },
+      { key: 'isEntertain', value: false },
+      { key: 'haveDiscount', value: null }
+    ],
     cell: null
   },
 
@@ -22,7 +22,7 @@ Page({
   onLoad(options) {
     var that = this
     var nowDate = new Date()
-    that.setData({startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate)})
+    that.setData({ startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate) })
   },
 
   /**
@@ -37,8 +37,8 @@ Page({
    */
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function (resolve){
-      that.setData({staff: app.globalData.staff, querying: true})
+    app.loginPromiseNew.then(function (resolve) {
+      that.setData({ staff: app.globalData.staff, querying: true })
       that.getData()
     })
   },
@@ -77,37 +77,37 @@ Page({
   onShareAppMessage() {
 
   },
-  shopSelected(e){
+  shopSelected(e) {
     var that = this
     console.log('shop selected', e)
-    that.setData({shop: e.detail.shop})
+    that.setData({ shop: e.detail.shop })
   },
-  setDate(e){
+  setDate(e) {
     var id = e.currentTarget.id
     var that = this
     console.log('select date', e)
-    switch(id){
+    switch (id) {
       case 'start':
-        that.setData({startDate: e.detail.value})
+        that.setData({ startDate: e.detail.value })
         break
       case 'end':
-        that.setData({endDate: e.detail.value})
+        that.setData({ endDate: e.detail.value })
         break
       default:
         break
     }
   },
-  setQueryOptions(e){
+  setQueryOptions(e) {
     var that = this
     var id = e.currentTarget.id
     that.setQueryOptionValue(id, e.detail.value)
   },
-  setQueryOptionValue(key, value){
+  setQueryOptionValue(key, value) {
     var that = this
     var queryOptions = that.data.queryOptions
-    for(var i = 0; i < queryOptions.length; i++){
-      if (queryOptions[i].key == key){
-        switch(value){
+    for (var i = 0; i < queryOptions.length; i++) {
+      if (queryOptions[i].key == key) {
+        switch (value) {
           case 'null':
             queryOptions[i].value = null
             break
@@ -125,14 +125,14 @@ Page({
     }
     console.log('set query options', queryOptions)
   },
-  getData(){
+  getData() {
     var that = this
     var isTest = null
     var isEntertain = null
     var haveDiscount = null
     var queryOptions = that.data.queryOptions
-    for(var i = 0; i < queryOptions.length; i++){
-      switch(queryOptions[i].key){
+    for (var i = 0; i < queryOptions.length; i++) {
+      switch (queryOptions[i].key) {
         case 'isTest':
           isTest = queryOptions[i].value
           break
@@ -150,7 +150,7 @@ Page({
     var startDate = that.data.startDate
     var endDate = that.data.endDate
     var cell = that.data.cell
-    if(cell != null && cell != ''){
+    if (cell != null && cell != '') {
       startDate = new Date('2025-10-15')
       endDate = null
       shop = null
@@ -158,21 +158,22 @@ Page({
       isEntertain = null
       haveDiscount = null
     }
-    data.getOrdersByStaffPromise(null, shop, null, null, '租赁', startDate, endDate, 
-      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell).then(function (orders){
+    data.getOrdersByStaffPromise(null, shop, null, null, '租赁', startDate, endDate,
+      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell).then(function (orders) {
         console.log('get orders', orders)
         that.renderOrders(orders)
-        that.setData({querying: false})
+        that.setData({ querying: false })
       })
   },
-  query(){
+  query() {
     var that = this
-    that.setData({querying: true})
+    that.setData({ querying: true })
     that.getData()
   },
   renderOrders(orders) {
     var that = this
     var totalAmount = 0
+    var totalRentalAmount = 0
     for (var i = 0; orders && i < orders.length; i++) {
       var order = orders[i]
       var bizDate = new Date(order.biz_date)
@@ -203,28 +204,44 @@ Page({
       for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
         order.payMethod = order.availablePayments[j].pay_method
       }
+      order.displayedRental = 0
+      for (var j = 0; order.rentals && order.rentProperties 
+        && order.rentProperties.rentStatus == '了结关闭'  && j < order.rentals.length; j++) {
+        var rental = order.rentals[j]
+        order.displayedRental += (rental.totalRentalAmount - rental.totalDiscountAmount)
+        totalRentalAmount += order.displayedRental
+        order.displayedRentalStr = util.showAmount(order.displayedRental)
+
+      }
+      if (order.rentals == null || order.rentals.length <= 0) {
+        if (order.refundAmount > 0) {
+          order.displayedRental = order.paidAmount - order.refundAmount
+          order.displayedRentalStr = util.showAmount(order.displayedRental)
+          totalRentalAmount += (order.paidAmount - order.refundAmount)
+        }
+      }
     }
-    that.setData({ orders, totalAmount })
+    that.setData({ orders, totalAmount, totalRentalAmount, totalRentalAmountStr: util.showAmount(totalRentalAmount) })
   },
-  gotoDetail(e){
+  gotoDetail(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.orders[index]
-    if (!order.rentals || order.rentals.length <= 0){
+    if (!order.rentals || order.rentals.length <= 0) {
       wx.navigateTo({
         url: '/pages/admin/fire/fire_order_detail?id=' + order.id,
       })
     }
-    else{
+    else {
       wx.navigateTo({
         url: '/pages/admin/rent/rent_details?id=' + order.id,
       })
     }
   },
-  setCell(e){
+  setCell(e) {
     var that = this
     //that.data.cell = e.detail.value
     var cell = e.detail.value
-    that.setData({cell})
+    that.setData({ cell })
   }
 })

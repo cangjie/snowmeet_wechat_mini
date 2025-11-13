@@ -170,9 +170,10 @@
   <view class="view-row" style="justify-content: center;width: 750rpx;">
     <van-button type="info" size="normal" style="margin-top: 20rpx;" bind:click="query" disabled="{{querying}}"> 查 询 </van-button>
   </view>
+  <view>总计单数：{{orders.length}} 总计租金：{{totalRentalAmountStr}}</view>
   <block wx:for="{{orders}}">
     <fui-card style="margin-top: 50rpx;" title="{{item.code}}" 
-    tag="{{item.rentProperties == null? '临时订单' : (item.rentProperties.rentStatus == null ? '位置状态' :item.rentProperties.rentStatus )}}" tagSize="10rpx" full>
+    tag="{{item.rentProperties == null? '临时订单' : (item.rentProperties.rentStatus == null ? '未知状态' :item.rentProperties.rentStatus )}}" tagSize="10rpx" full>
       <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
         <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;" id="{{index}}" bindtap="gotoDetail">
           <view wx:if="{{item.is_test == 1}}">【测】</view>
@@ -203,13 +204,17 @@
             <view class="left-column">【支付金额】</view>
             <view class="right-column">{{item.paidAmountStr}}</view>
           </view>
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
+          <!--view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付类型】</view>
             <view class="right-column">{{ item.payType }}</view>
-          </view>
+          </view-->
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付方式】</view>
             <view class="right-column">{{ item.payMethod==null? '--' : item.payMethod }}</view>
+          </view>
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
+            <view class="left-column">【总计租金】</view>
+            <view class="right-column">{{ item.displayedRentalStr}}</view>
           </view>
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【开单人】</view>
