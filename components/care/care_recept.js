@@ -242,6 +242,17 @@ Component({
         case 'memo':
           care.memo = value
           break
+        case 'special':
+          care.entertain = false
+          care.warranty = false
+          if (value == '招待'){
+            care.entertain = true
+          }
+          if (value == '质保'){
+            care.warranty = true
+          }
+          that.computeCharge(care)
+          break
         default:
           break
       }
@@ -447,7 +458,10 @@ Component({
       var discount = care.discount ? care.discount : 0
       var summary = commonCharge + repairCharge - discount
       care.summary = summary
-      care.summaryStr = util.showAmount(summary)
+      if (care.warranty == 1 || care.entertain == 1){
+        care.summary = 0
+      }
+      care.summaryStr = util.showAmount(care.summary)
       that.setData({ care })
     },
     

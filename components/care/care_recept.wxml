@@ -97,6 +97,16 @@
     </view>
   </view>
   <view class="view-row">
+    <view class="left-column">【特殊】</view>
+    <view class="right-column view-row">
+      <radio-group class="view-row" id="special" bindchange="setValue" >
+        <radio value="" checked="{{care.entertain != true && care.warranty != true}}" >普通</radio>
+        <radio value="招待" checked="{{care.entertain == true}}" style="margin-left: 20rpx;" >招待</radio>
+        <radio value="质保" checked="{{care.warranty == true}}" style="margin-left: 20rpx;" >质保</radio>
+      </radio-group>
+    </view>
+  </view>
+  <view class="view-row">
     <view class="left-column">【总计】</view>
     <view class="right-column">{{care.summaryStr}}</view>
   </view>

@@ -125,6 +125,11 @@ Component({
       util.performWebRequest(postUrl, that.data.order).then(function (order){
         console.log('order', order)
         that.setData({order})
+        if (order.paying_amount == 0){
+          wx.navigateTo({
+            url: '/pages/admin/care/order_detail?orderId=' + order.id,
+          })
+        }
       })
     },
     dealPaidResult(e) {
