@@ -25,7 +25,7 @@
   </view>
   <view class="view-row" >
     <view class="left-column" >【订单备注】</view>
-    <view class="right-column" >{{order.memo}}</view>
+    <view class="right-column" style="width:500rpx" >{{order.memo}}</view>
   </view>
   <view class="view-row" >
     <view class="left-column" >【支付方式】</view>

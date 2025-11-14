@@ -223,6 +223,10 @@
             <view class="left-column">【开单人】</view>
             <view class="right-column">{{item.staff.name}}</view>
           </view>
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
+            <view class="left-column">【备注】</view>
+            <view class="right-column">{{item.memo}}</view>
+          </view>
           <view class="view-row" wx:if="{{item.careProperties.orderStatus != '临时订单'}}" >
             <view class="left-column"></view>
             <view class="right-column">
