@@ -813,6 +813,7 @@ Page({
     var careToBePrinted = order.cares[id]
     careToBePrinted.customerName = order.member.title
     careToBePrinted.customerCell = order.member.cell
+    careToBePrinted.shop = order.shop
     that.setData({showPrint: true, careToBePrinted})
   },
   onPrinterClose(e){

@@ -213,7 +213,7 @@ const checkRentalsWellForm = function (rentals) {
   var well = true
   for (var i = 0; i < rentals.length; i++) {
     var rental = rentals[i]
-    
+
     if (rental.noGuaranty != true && !rental.guaranty) {
       well = false
       break
@@ -224,7 +224,7 @@ const checkRentalsWellForm = function (rentals) {
     }
     for (var j = 0; j < rental.rentItems.length; j++) {
       var item = rental.rentItems[j]
-      if (item.noNeed){
+      if (item.noNeed) {
         continue
       }
       if (!item.category) {
@@ -292,26 +292,202 @@ const getRentItemIndexFromRental = function (rentItemId, rental) {
   }
   return index
 }
-const getRentalDetailIndexFromRental = function(detailId, rental){
+const getRentalDetailIndexFromRental = function (detailId, rental) {
   var index = null
-  for(var i = 0; rental && rental.details && i < rental.details.length; i++){
-    if (rental.details[i].id == detailId){
+  for (var i = 0; rental && rental.details && i < rental.details.length; i++) {
+    if (rental.details[i].id == detailId) {
       index = i;
     }
   }
   return index
 }
-const canRenderNumber = function (number){
-  if (!number){
+const canRenderNumber = function (number) {
+  if (!number) {
     return false
   }
-  if (number.indexOf('.') >= 0 && number[number.length - 1] == '0'){
+  if (number.indexOf('.') >= 0 && number[number.length - 1] == '0') {
     return false
   }
-  else{
+  else {
     return true
   }
 }
+const getBLEDeviceNameListInRangePromise = function () {
+  return new Promise(function (resolve, reject) {
+    wx.openBluetoothAdapter({
+      success: (res) => {
+        wx.getBluetoothAdapterState({
+          success: (res) => {
+            if (res.available) {
+              if (res.discovering) {
+                wx.stopBluetoothDevicesDiscovery({
+                  success: (res) => {
+                    //searchInRangedBluetoothDevices()
+                    console.log('discovery finished', res)
+                    wx.startBluetoothDevicesDiscovery({
+                      success: (res) => {
+                        console.log(res)
+                        setTimeout(() => {
+                          wx.getBluetoothDevices({
+                            success: (res) => {
+                              console.log('get device', res)
+                              resolve(res)
+                            }
+                          })
+                        }, 5000)
+                      }
+                    })
+                  },
+                  fail: (res) => {
+                    reject('手机蓝牙无法停止搜索其他设备。')
+                  }
+                })
+              }
+              else {
+                wx.startBluetoothDevicesDiscovery({
+                  success: (res) => {
+                    console.log(res)
+                    setTimeout(() => {
+                      wx.getBluetoothDevices({
+                        success: (res) => {
+                          console.log('get device', res)
+                          resolve(res)
+                        }
+                      })
+                    }, 5000)
+                  }
+                })
+              }
+            }
+            else {
+              reject('手机蓝牙设备不可用。')
+            }
+          },
+          fail: (res) => {
+            reject('获取蓝牙设备状态失败。')
+          }
+        })
+      },
+      fail: (res) => {
+        reject('请打开蓝牙，返回后重试。')
+      }
+    })
+  })
+}
+/*
+const connectBLEDevicePromise = function (deviceId) {
+  return new Promise(function (resolve, reject) {
+    wx.createBLEConnection({
+      deviceId: deviceId,
+      success: (res) => {
+        resolve(res)
+      },
+      fail: () => {
+        reject('设备连接失败')
+      }
+    })
+  })
+}
+*/
+const connectBLEPromise = function (deviceId) {
+  return new Promise(function (resolve, reject) {
+    wx.createBLEConnection({
+      deviceId: deviceId,
+      success: (res) => {
+        console.log('connect ble device', res)
+        var device = res
+        device.deviceId = deviceId
+        wx.getBLEDeviceServices({
+          deviceId: deviceId,
+          success: (res) => {
+            console.log('get services', res)
+            device.services = res.services
+            device.correctServiceIndex = 0
+            getPrinterCharacteristicsPromise(device).then(function (device) {
+              console.log('find service', device)
+              resolve(device)
+            })
+          },
+          fail: () => {
+            reject()
+          }
+        })
+        //resolve(res)
+      },
+      fail: () => {
+        reject('链接失败')
+      }
+    })
+  })
+}
+const getPrinterCharacteristicsPromise = function (device) {
+  var index = device.correctServiceIndex
+  return new Promise(function (resolve, reject){
+    if (index > device.services.length){
+      reject('未找到服务')
+    }
+    else{
+      var service = device.services[index]
+      wx.getBLEDeviceCharacteristics({
+        deviceId: device.deviceId,
+        serviceId: service.uuid,
+        success:(res)=>{
+          console.log('get character', res)
+          var cArr = res.characteristics
+          for(var i = 0; i < cArr.length; i++){
+            var c = cArr[i]
+            var p = c.properties
+            if (!device.notifyUUID && p.notify){
+              device.notifyServiceId = service.uuid
+              device.notifyUUID = c.uuid
+            }
+            if (!device.readUUID && p.read){
+              device.readServiceId = service.uuid
+              device.readUUID = c.uuid
+            }
+            if (!device.writeUUID && p.write){
+              device.writeServiceId = service.uuid
+              device.writeUUID = c.uuid
+            }
+          }
+          if (device.notifyUUID && device.readUUID && device.writeUUID){
+            resolve(device)
+          }
+          else{
+            device.correctServiceIndex++
+            getPrinterCharacteristicsPromise(device).then(function (device){
+              resolve(device)
+            }).catch(function (){
+              reject()
+            })
+          }
+        }
+      })
+    }
+  })
+
+
+
+  if (index >= device.services.length)
+  {
+
+  }
+  var service = device.services[device.correctServiceIndex]
+
+  return new Promise(function (resolve, reject) {
+    wx.getBLEDeviceCharacteristics({
+      deviceId: device.deviceId,
+      serviceId: service.uuid,
+      success: (res) => {
+        console.log('get characters', res)
+      },
+      fail: () => {
+        reject()
+      }
+    })
+  })
+}
+
 module.exports = {
   formatDateTime: formatDateTime,
   formatDate: formatDate,
@@ -335,5 +511,8 @@ module.exports = {
   getRentalIndexFromOder,
   getRentItemIndexFromRental,
   getRentalDetailIndexFromRental,
-  canRenderNumber
+  canRenderNumber,
+  getBLEDeviceNameListInRangePromise,
+  connectBLEPromise,
+  getPrinterCharacteristicsPromise
 }

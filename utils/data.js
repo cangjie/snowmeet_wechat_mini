@@ -584,6 +584,28 @@ const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey)
     })
   })
 }
+const getPrinterListPromise = function(shop, color, sessionKey){
+  var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetPrinters?shop=' + encodeURIComponent(shop) + '&color=' + color + '&sessionKey=' + sessionKey
+  return new Promise(function(resolve, reject){
+    wx.request({
+      url: getDeviceNameUrl,
+      method: 'GET',
+      success:(res)=>{
+        if (res.statusCode == 200) {
+          var deviceName = []
+          for(var i = 0; i < res.data.length; i++) {
+            deviceName.push(res.data[i].name)
+          }
+          resolve(deviceName)
+        }
+        else{
+          reject()
+        }
+      }
+    })
+  })
+  
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -629,5 +651,6 @@ module.exports = {
   getRentTypePromise,
   getRentPriceByIdPromise,
   updateCarePromise,
-  updateCareTaskStatusPromise
+  updateCareTaskStatusPromise,
+  getPrinterListPromise
 }

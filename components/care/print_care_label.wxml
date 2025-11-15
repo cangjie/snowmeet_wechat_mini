@@ -32,7 +32,7 @@
     </radio-group>
   </view>
   <view class="view-row" style="justify-content: center;margin-top: 20rpx">
-    <van-button type="primary" > 打 印 </van-button>
+    <van-button type="primary" disabled="{{ready!=true}}" bind:click="print" > 打 印 </van-button>
   </view>
   <view class="view-row" style="justify-content:center;margin-top:20rpx" >
     <textarea class="input" value="" style="width: 700rpx; height:500rpx" ></textarea>
