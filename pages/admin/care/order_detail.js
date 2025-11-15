@@ -9,6 +9,7 @@ Page({
    */
   data: {
     activeTabIndex: 0,
+    showPrint: false
   },
 
   /**
@@ -109,7 +110,7 @@ Page({
       else{
         care.baseInfoWellFormed = false
       }
-      if (care.baseInfoWellFormed && care.tasks[0].status != '已完成'){
+      if (care.baseInfoWellFormed && care.tasks != null && care.tasks.length > 0 && care.tasks[0].status != '已完成'){
         care.safeChecking = true
       }
       else{
@@ -805,4 +806,17 @@ Page({
       console.log('socket will be closed', resolve)
     })
   },
+  showPrintBackDrop(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var careToBePrinted = order.cares[id]
+    careToBePrinted.customerName = order.member.title
+    careToBePrinted.customerCell = order.member.cell
+    that.setData({showPrint: true, careToBePrinted})
+  },
+  onPrinterClose(e){
+    var that = this
+    that.setData({showPrint: false})
+  }
 })

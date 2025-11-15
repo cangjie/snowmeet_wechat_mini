@@ -110,6 +110,15 @@
         </mp-cell>
         <mp-cell>
           <view class="view-row">
+            <view class="left-column">【特殊】</view>
+            <view class="right-column" style="width: 450rpx;">
+              {{item.entertain == true? '招待':''}}
+              {{item.warranty == true? '质保':''}}
+            </view>
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row">
             <view class="left-column">【备注】</view>
             <view class="right-column" style="width: 450rpx;">
               <input style="width: 480rpx;" class="input" id="{{index}}" bindinput="setMemo" disabled="{{item.moddingBaseInfo == false}}" value="{{item.memo}}" />
@@ -192,7 +201,12 @@
           </mp-cell>
           <mp-cell>
             <view class="view-row" style="justify-content: center;" >
-              <van-button type="primary" disabled="{{!item.safeChecking}}" bind:click="safeCheck" id="{{index}}" > 确 认 安 全 </van-button>
+              <van-button type="primary" disabled="{{!item.safeChecking}}" 
+              bind:click="safeCheck" id="{{index}}" > 确 认 安 全 </van-button>
+            </view>
+            <view class="view-row" style="justify-content: center;" >
+              <van-button type="info" 
+              bind:click="showPrintBackDrop" id="{{index}}" style="margin-top: 50rpx;" > 打 印 标 签 </van-button>
             </view>
           </mp-cell>
         </block>
@@ -322,4 +336,8 @@
     </van-tab>
   </van-tabs>
   <view style="height: 100rpx;" ></view>
+  <van-popup show="{{ showPrint }}" position="bottom" custom-style="height: 80%;" 
+  bind:close="onPrinterClose" close-icon="close" >
+    <print-care care="{{careToBePrinted}}" ></print-care>
+  </van-popup>
 </view>

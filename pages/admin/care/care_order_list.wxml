@@ -116,6 +116,22 @@
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
+        <view class="fui-left-column">【质保】</view>
+      </fui-col>
+      <radio-group id="haveWarranty" bindchange="setQueryOptions">
+        <fui-col span="6">
+          <radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || querying}}" >全部</radio>
+        </fui-col>
+        <fui-col span="6">
+          <radio value="true" disabled="{{(cell != null && cell != '') || querying}}" >包含</radio>
+        </fui-col>
+        <fui-col span="7">
+          <radio value="false" disabled="{{(cell != null && cell != '') || querying}}" >不含</radio>
+        </fui-col>
+      </radio-group>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="5">
         <view class="fui-left-column">【手机】</view>
       </fui-col>
       <fui-col span="6">
@@ -180,6 +196,7 @@
           <view wx:if="{{item.is_package == 0}}">【单】</view>
           <view wx:if="{{item.haveOnCredit}}">【挂】</view>
           <view wx:if="{{item.haveDiscount}}">【减】</view>
+          <view wx:if="{{item.haveWarranty==true}}">【质】</view>
           <view>{{item.memberShip}}</view>
         </view>
         <view>

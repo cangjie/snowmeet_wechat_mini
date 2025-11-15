@@ -1,0 +1,40 @@
+<view>
+  <view style="text-align: center;margin-top:  50rpx;font-weight: 1000;" >打印标签</view>
+  <view class="view-row" >
+    <view class="left-column" >【姓名】</view>
+    <view class="right-column" >{{care.customerName}}</view>
+    <view class="left-column" >【电话】</view>
+    <view class="right-column" >{{care.customerCell}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【品牌】</view>
+    <view class="right-column" >{{care.brand}}</view>
+    <view class="left-column" >【长度】</view>
+    <view class="right-column" >{{care.scale}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【项目】</view>
+    <view class="right-column" style="width: 500rpx;" >
+      {{care.need_edge == 1? '修刃 ' + care.edge_degree :' ' }}
+      {{care.need_wax == 1? '打蜡 ' :' ' }}
+      {{care.need_unwax == 1? '刮蜡 '  :' ' }}
+      {{care.repair_memo==null? '' : care.repair_memo}}
+    </view>
+   
+  </view>
+  <view class="view-row" style="justify-content: center;margin-top: 20rpx">
+    <radio-group bindchange="setPrintType">
+      <radio value="顾客小票" style="margin-left: 100rpx;" 
+        checked="{{printType == '顾客小票'}}" >顾客小票</radio>
+      <radio value="标签存根" style="margin-right: 100rpx;" 
+        checked="{{printType == '标签存根'}}" >标签存根</radio>
+      
+    </radio-group>
+  </view>
+  <view class="view-row" style="justify-content: center;margin-top: 20rpx">
+    <van-button type="primary" > 打 印 </van-button>
+  </view>
+  <view class="view-row" style="justify-content:center;margin-top:20rpx" >
+    <textarea class="input" value="" style="width: 700rpx; height:500rpx" ></textarea>
+  </view>
+</view>
