@@ -4,8 +4,8 @@
       "list": [
         {
           "name": "养护订单",
-          "pathName": "pages/admin/care/order_detail",
-          "query": "orderId=61598",
+          "pathName": "pages/admin/care/order_detail.html?scancode_time=1763292066&q=https://mini.snowmeet.top/mapp/admin/care/order_detail?careId=21286&orderId=61957",
+          "query": "",
           "scene": null,
           "launchMode": "default"
         },

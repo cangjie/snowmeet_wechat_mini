@@ -334,7 +334,7 @@ const getBLEDeviceNameListInRangePromise = function () {
                               resolve(res)
                             }
                           })
-                        }, 5000)
+                        }, 2000)
                       }
                     })
                   },
@@ -354,7 +354,7 @@ const getBLEDeviceNameListInRangePromise = function () {
                           resolve(res)
                         }
                       })
-                    }, 5000)
+                    }, 2000)
                   }
                 })
               }

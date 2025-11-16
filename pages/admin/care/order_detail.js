@@ -28,6 +28,7 @@ Page({
       if (careId){
         that.data.careId = careId
       }
+      that.setData({q})
     }
     else {
       if (options.orderId) {

@@ -1,4 +1,5 @@
 <view>
+  <!--input value="{{q}}" /-->
   <mp-cells title="订单信息">
     <mp-cell>
       <view class="view-row">
