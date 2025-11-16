@@ -9,7 +9,8 @@ Component({
    * Component properties
    */
   properties: {
-    care: Object
+    care: Object,
+    order: Object
     
   },
 
@@ -23,6 +24,7 @@ Component({
     ready(){
       var that = this
       console.log('care', that.properties.care)
+      that.setData({order: that.properties.order})
       data.getPrinterListPromise(that.properties.care.shop, 'white', app.globalData.sessionKey).then(function(printers){
         console.log('get printers', printers)
         that.data.printers = printers
@@ -127,7 +129,7 @@ Component({
       var that = this
       var care = that.properties.care
 
-      var brand = care.brand
+      var brand = care.brand == null? '未填' : care.brand
       var orderNum = care.task_flow_code
       var name = care.customerName==null? '':care.customerName
       var cell = care.customerCell==null?'':care.customerCell
@@ -159,7 +161,7 @@ Component({
       var orderDateStr = (orderDate.getMonth() + 1).toString() + '-' + orderDate.getDate().toString()
       var pickDate = new Date(orderDate.setDate(orderDate.getDate() + 1))
       var pickDateStr = (pickDate.getMonth()+1).toString() + '-' + pickDate.getDate().toString()
-      var scale = care.scale? care.scale: ''
+      var scale = care.scale? care.scale: '未填'
       var urgent = false
       if (care.urgent == 1){
         urgent = true
@@ -176,7 +178,7 @@ Component({
       command.setSize(75, 50)//设置标签大小，单位mm.具体参数请用尺子量一下
       command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
       command.setCls()//清除缓冲区
-      command.setText(20, 20, "TSS32.BF2", 0, 1, 1, (urgent?'(急)':'') + orderNum + "  " + labelType)
+      command.setText(20, 20, "TSS32.BF2", 0, 1, 1, labelType + ' ' + (urgent?'(急)':'') + orderNum )
       command.setText(20, 20 + 40, "TSS32.BF2", 0, 1, 1,  maskedName + " " + maskedCell )
       command.setText(20, 20 + 40 + 40, "TSS32.BF2", 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)
       if (edge.toString() == '1') {
@@ -186,7 +188,7 @@ Component({
         command.setText(300, 20 + 40 + 40 + 55, "TSS32.BF2", 0, 1, 1, "其他：" + more)
       }
       if (memo != undefined && memo != ''){
-        command.setText(250, 20 + 40 + 40 + 55 + 35, "TSS32.BF2", 0, 1, 1, "注：" + memo)
+        command.setText(200, 20 + 40 + 40 + 55 + 35, "TSS32.BF2", 0, 1, 1, "注：" + memo)
       }
   
       if (candle.toString()=='1') {
@@ -202,18 +204,18 @@ Component({
         orderInfoStr = '质保'
       }
       else{
-        //orderInfoStr = '订单号：' + this.data.maintain_in_shop_request.order.id 
-        //priceStr = '金额：' + this.data.maintain_in_shop_request.order.final_price.toString()
-        orderInfoStr = ''
-        priceStr = ''
+        orderInfoStr =  that.data.order.code
+        priceStr = '金额：' + parseFloat(that.data.order.paidAmount).toFixed(2)
+        //orderInfoStr = ''
+        //priceStr = ''
       }
-      var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/maintain/task/' + care.id
-      command.setText(20, 20 + 40 + 40 + 55 + 55 + 55 + 50, "TSS32.BF2", 0, 1, 1, orderInfoStr)
-      command.setText(20, 20 + 40 + 40 + 55 + 55 + 55 + 50 + 40, "TSS32.BF2", 0, 1, 1, priceStr)
+      var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/order_detail?careId=' + care.id.toString() + '&orderId=' + that.data.order.id.toString()
+      command.setText(290, 20 + 40 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
+      command.setText(20,  20 + 40 + 40 + 55 + 55 + 55 + 50 , "TSS32.BF2", 0, 1, 1, priceStr)
       //command.setQrcode(400, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)
-      command.setQrcode(350, 20 + 40 + 65 + 25, "H", 4, "A", qrCodeText)
+      command.setQrcode(400, 20 + 40 + 65 + 25, "H", 3, "A", qrCodeText)
       command.setText(20, 350, "TSS32.BF2", 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
-      command.setText(320, 350, "TSS32.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
+      command.setText(300, 350, "TSS32.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
       command.setPagePrint()
       return command.getData()
     },

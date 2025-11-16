@@ -17,11 +17,25 @@ Page({
    */
   onLoad(options) {
     var that = this
-    if (options.orderId) {
-      that.data.orderId = options.orderId
+    var q = options.q
+    //q = 'https%3A%2F%2Fmini.snowmeet.top%2Fmapp%2Fadmin%2Fcare%2Forder_detail%3FcareId%3D21286%26orderId%3D61957&scancode_time=1763283742'
+    if (q) {
+      var orderId = util.parseQuery(q, 'orderId')
+      var careId = util.parseQuery(q, 'careId')
+      if (orderId){
+        that.data.orderId = orderId
+      }
+      if (careId){
+        that.data.careId = careId
+      }
     }
-    if (options.careId) {
-      that.data.careId = options.careId
+    else {
+      if (options.orderId) {
+        that.data.orderId = options.orderId
+      }
+      if (options.careId) {
+        that.data.careId = options.careId
+      }
     }
     data.getEquipBrandsPromise('双板').then(function (list) {
       that.setData({ skiBrandList: list })
@@ -90,8 +104,17 @@ Page({
     var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + that.data.orderId + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
+      var activeTabIndex = 0
+      if (that.data.careId){
+        for(var i = 0; i < order.cares.length; i++){
+          if(order.cares[i].id == that.data.careId){
+            activeTabIndex = i
+            break
+          }
+        }
+      }
       order = that.renderOrder(order)
-      that.setData({ order })
+      that.setData({ order, activeTabIndex })
     }).catch(function () {
 
     })
@@ -104,19 +127,19 @@ Page({
     order.paidAmountStr = util.showAmount(order.paidAmount)
     for (var i = 0; order.cares && i < order.cares.length; i++) {
       var care = order.cares[i]
-      if (care.brand && care.brand != '' && care.scale && care.scale != ''){
+      if (care.brand && care.brand != '' && care.scale && care.scale != '') {
         care.baseInfoWellFormed = true
       }
-      else{
+      else {
         care.baseInfoWellFormed = false
       }
-      if (care.baseInfoWellFormed && care.tasks != null && care.tasks.length > 0 && care.tasks[0].status != '已完成'){
+      if (care.baseInfoWellFormed && care.tasks != null && care.tasks.length > 0 && care.tasks[0].status != '已完成') {
         care.safeChecking = true
       }
-      else{
+      else {
         care.safeChecking = false
       }
-      care.title = (care.brand==null?'未填': care.brand )+ ' ' + (care.scale==null?'未填':care.scale)
+      care.title = (care.brand == null ? '未填' : care.brand) + ' ' + (care.scale == null ? '未填' : care.scale)
 
       care.moddingBaseInfo = false
 
@@ -131,29 +154,29 @@ Page({
       else {
         care.serials = ''
       }
-      for(var j = 0; care.tasks && j < care.tasks.length; j++){
+      for (var j = 0; care.tasks && j < care.tasks.length; j++) {
         var task = care.tasks[j]
-        switch(task.task_name){
+        switch (task.task_name) {
           case '修刃':
             task.title = task.task_name + ' 角度：' + (care.edge_degree ? care.edge_degree : '89')
             break
           case '维修':
-            task.title = task.task_name  + ' ' + care.repair_memo
+            task.title = task.task_name + ' ' + care.repair_memo
             break
           default:
             task.title = task.task_name
             break
         }
-        if (task.start_time == null){
+        if (task.start_time == null) {
           task.start_timeDateStr = '--'
           task.start_timeTimeStr = '--'
         }
-        else{
+        else {
           var startTime = new Date(task.start_time)
           task.start_timeDateStr = util.formatDate(startTime)
           task.start_timeTimeStr = util.formatTimeStr(startTime)
         }
-        if (task.end_time == null){
+        if (task.end_time == null) {
           task.end_timeDateStr = '--'
           task.end_timeTimeStr = '--'
         }
@@ -162,19 +185,19 @@ Page({
           task.end_timeDateStr = util.formatDate(endTime)
           task.end_timeTimeStr = util.formatTimeStr(endTime)
         }
-        if (j == 0){
-          if (task.status == '已完成'){
+        if (j == 0) {
+          if (task.status == '已完成') {
             task.current = false
           }
           else {
             task.current = true
           }
         }
-        else{
-          if (task.status == '未开始' && care.tasks[j-1].status == '已完成') {
+        else {
+          if (task.status == '未开始' && care.tasks[j - 1].status == '已完成') {
             task.current = true
           }
-          else if (task.status == '已开始' ){
+          else if (task.status == '已开始') {
             task.current = true
           }
           else {
@@ -216,7 +239,7 @@ Page({
     images.push(image)
     var imageIndex = order.cares[index].careImages.length - 1
     order = that.buildImages(order, index)
-    that.setData({order})
+    that.setData({ order })
     data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
       .then(function (uploadedFile) {
         console.log('file uploaded', uploadedFile)
@@ -236,7 +259,7 @@ Page({
             image.message = ''
             image.image = uploadThumbFile
             order = that.buildImages(order, index)
-            that.setData({order})
+            that.setData({ order })
           }).catch(function (exp) {
 
           })
@@ -309,7 +332,7 @@ Page({
     if (care.equipment == '双板') {
       care.brand = that.data.skiBrandList[parseInt(e.detail.value)].displayedName
     }
-    else{
+    else {
       care.brand = that.data.boardBrandList[parseInt(e.detail.value)].displayedName
     }
     that.setData({ order })
@@ -372,7 +395,7 @@ Page({
     var care = order.cares[index]
     care.board_front = e.detail.value
   },
-  setScale(e){
+  setScale(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -384,11 +407,11 @@ Page({
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
     var care = order.cares[index]
-    if (care.diffSerial){
+    if (care.diffSerial) {
       care.serials = care.leftSerial + '|' + care.rightSerial
     }
-    for(var i = 0; care.careImages && i < care.careImages.length; i++){
-      if (care.careImages[i].image){
+    for (var i = 0; care.careImages && i < care.careImages.length; i++) {
+      if (care.careImages[i].image) {
         var careImage = care.careImages[i]
         careImage.image_id = careImage.image.id
         careImage.care_id = care.id
@@ -405,22 +428,22 @@ Page({
       })
     })
   },
-  delImage(e){
+  delImage(e) {
     var index = parseInt(e.currentTarget.id)
     var imageIndex = e.detail.index
     var that = this
     var order = that.data.order
     var care = order.cares[index]
     var newImages = []
-    for(var i = 0; care.careImages && i < care.careImages.length; i++){
-      if (i != imageIndex){
+    for (var i = 0; care.careImages && i < care.careImages.length; i++) {
+      if (i != imageIndex) {
         newImages.push(care.careImages[i])
       }
     }
     care.careImages = newImages
-    that.setData({order})
+    that.setData({ order })
   },
-  setHeight(e){
+  setHeight(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -428,7 +451,7 @@ Page({
     var value = e.detail.value
     care.height = value
   },
-  setWeight(e){
+  setWeight(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -436,7 +459,7 @@ Page({
     var value = e.detail.value
     care.weight = value
   },
-  setGap(e){
+  setGap(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -444,7 +467,7 @@ Page({
     var value = e.detail.value
     care.gap = value
   },
-  setFrontDin(e){
+  setFrontDin(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -452,7 +475,7 @@ Page({
     var value = e.detail.value
     care.front_din = value
   },
-  setRearDin(e){
+  setRearDin(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -460,7 +483,7 @@ Page({
     var value = e.detail.value
     care.rear_din = value
   },
-  setLeftAngel(e){
+  setLeftAngel(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -468,7 +491,7 @@ Page({
     var value = e.detail.value
     care.left_angel = value
   },
-  setRightAngel(e){
+  setRightAngel(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -476,7 +499,7 @@ Page({
     var value = e.detail.value
     care.right_angel = value
   },
-  setSafeMemo(e){
+  setSafeMemo(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -484,7 +507,7 @@ Page({
     var value = e.detail.value
     care.tasks[0].memo = value
   },
-  safeCheck(e){
+  safeCheck(e) {
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -496,46 +519,46 @@ Page({
         var order = that.data.order
         var care = order.cares[index]
         if (res.cancel) {
-          
+
         }
         if (res.confirm) {
           var message = ''
-          if (!care.height || care.height == ''){
+          if (!care.height || care.height == '') {
             message = '身高必填'
           }
-          else{
-            if (care.equipment == '双板'){
-              if (!care.front_din || care.front_din == ''){
+          else {
+            if (care.equipment == '双板') {
+              if (!care.front_din || care.front_din == '') {
                 message = '前脱落值必填'
               }
-              else if (!care.rear_din || care.rear_din == ''){
+              else if (!care.rear_din || care.rear_din == '') {
                 message = '后脱落值必填'
               }
-              else{
+              else {
                 message = ''
               }
             }
           }
-          if (message != ''){
+          if (message != '') {
             wx.showToast({
               title: message,
               icon: 'error'
             })
             return
           }
-          data.updateCarePromise(care, '安全检查', app.globalData.sessionKey).then(function (newCare){
+          data.updateCarePromise(care, '安全检查', app.globalData.sessionKey).then(function (newCare) {
             data.updateCareTaskStatusPromise(care.tasks[0].id, '已完成', '养护详情页安全检查', app.globalData.sessionKey)
-            .then(function (newCare){
-              order.cares[index] = newCare
-              that.renderOrder(order)
-              that.setData({order})
-            })
+              .then(function (newCare) {
+                order.cares[index] = newCare
+                that.renderOrder(order)
+                that.setData({ order })
+              })
           })
         }
       }
     })
   },
-  setTaskStart(e){
+  setTaskStart(e) {
     var that = this
     var taskId = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -544,54 +567,54 @@ Page({
       content: '',
       complete: (res) => {
         if (res.cancel) {
-          
+
         }
-    
+
         if (res.confirm) {
-          
+
           data.updateCareTaskStatusPromise(taskId, '已开始', '养护详情页', app.globalData.sessionKey)
-            .then(function (newCare){
-              
-              for(var i = 0; i < order.cares.length; i++){
-                if (order.cares[i].id == newCare.id){
+            .then(function (newCare) {
+
+              for (var i = 0; i < order.cares.length; i++) {
+                if (order.cares[i].id == newCare.id) {
                   order.cares[i] = newCare
                   break
                 }
               }
               order = that.renderOrder(order)
-              that.setData({order})
+              that.setData({ order })
             })
         }
       }
     })
   },
-  setTaskEnd(e){
+  setTaskEnd(e) {
     var that = this
     var taskId = parseInt(e.currentTarget.id)
     var order = that.data.order
     var status = '已完成'
     var task = null
-    for(var i = 0; i < order.cares.length; i++){
+    for (var i = 0; i < order.cares.length; i++) {
       var care = order.cares[i]
-      for(var j = 0; j < care.tasks.length; j++){
-        if (care.tasks[j].id == taskId){
+      for (var j = 0; j < care.tasks.length; j++) {
+        if (care.tasks[j].id == taskId) {
           task = care.tasks[j]
-          if (task.id == taskId && task.staff_id != app.globalData.staff.id){
+          if (task.id == taskId && task.staff_id != app.globalData.staff.id) {
             status = '强行中止'
             //task = care.tasks[j]
           }
         }
       }
-      if (task != null){
+      if (task != null) {
         break
       }
     }
-    var startTimeStamp =new Date(task.start_time).valueOf()
+    var startTimeStamp = new Date(task.start_time).valueOf()
     var endTimeStamp = (new Date()).valueOf()
-    var timeLength = parseFloat((endTimeStamp - startTimeStamp)/60000).toFixed(2)
+    var timeLength = parseFloat((endTimeStamp - startTimeStamp) / 60000).toFixed(2)
     var title = '确认任务结束'
     var content = '本任务共耗时 ' + timeLength + ' 分钟'
-    if (status == '强行中止'){
+    if (status == '强行中止') {
       title = '确认强行中止任务'
       content = '本任务是 ' + task.staff.name + ' 在执行，确认强行中止吗？'
     }
@@ -600,91 +623,91 @@ Page({
       content: content,
       complete: (res) => {
         if (res.cancel) {
-          
+
         }
         if (res.confirm) {
           data.updateCareTaskStatusPromise(taskId, status, '养护详情页', app.globalData.sessionKey)
-            .then(function (newCare){
-              for(var i = 0; i < order.cares.length; i++){
-                if (order.cares[i].id == newCare.id){
+            .then(function (newCare) {
+              for (var i = 0; i < order.cares.length; i++) {
+                if (order.cares[i].id == newCare.id) {
                   order.cares[i] = newCare
                   break
                 }
               }
               order = that.renderOrder(order)
-              that.setData({order})
-          })
+              that.setData({ order })
+            })
         }
       }
     })
     //console.log('task length', parseFloat((endTimeStamp - startTimeStamp)/60000).toFixed(2))
   },
-  setVeriType(e){
+  setVeriType(e) {
     var that = this
     var veriType = e.detail.value
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
     var care = order.cares[index]
     care.veriType = veriType
-    if (veriType == '本人扫码'){
+    if (veriType == '本人扫码') {
       that.createQrCode(care.id)
     }
-    that.setData({order})
+    that.setData({ order })
   },
-  createQrCode(id){
+  createQrCode(id) {
     var that = this
     var getQrUrl = app.globalData.requestPrefix + 'QrCode/CreateNewScanQrCodeByStaff?code=' + encodeURIComponent('care_veri_' + id.toString()) + '&scene=' + encodeURIComponent('店铺接待') + '&purpose=' + encodeURIComponent('养护取板') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-    util.performWebRequest(getQrUrl, null).then(function (qrCode){
+    util.performWebRequest(getQrUrl, null).then(function (qrCode) {
       console.log('qr code', qrCode)
-      that.setData({scanQrCode: qrCode})
+      that.setData({ scanQrCode: qrCode })
       var getQRUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + qrCode.code
       wx.request({
         url: getQRUrl,
         method: 'GET',
-        success:(res)=>{
+        success: (res) => {
           that.setData({ qrcodeUrl: res.data })
           that.startWebSocketQuery()
         }
       })
     })
   },
-  onTabChange(e){
+  onTabChange(e) {
     var that = this
     console.log('tab change', e)
     var index = e.detail.index
     var order = that.data.order
     var care = order.cares[index]
     care.veriType = null
-    that.setData({order})
-    if (that.data.scanQrCode){
+    that.setData({ order })
+    if (that.data.scanQrCode) {
       that.closeSocket()
     }
-    
+
   },
-  startWebSocketQuery(){
+  startWebSocketQuery() {
     var that = this
     var socketTask = that.data.socketTask
     socketTask = wx.connectSocket({
       url: 'wss://' + app.globalData.domainName + '/ws',
-      header:{'content-type': 'application/json'}
+      header: { 'content-type': 'application/json' }
     })
     socketTask.isReplied = false
-    that.setData({socketTask})
-    socketTask.onError((res)=>{
+    that.setData({ socketTask })
+    socketTask.onError((res) => {
       that.socketError()
     })
-    socketTask.onMessage((res)=>{
+    socketTask.onMessage((res) => {
       that.socketMessage(res)
     })
-    socketTask.onOpen((res)=>{
+    socketTask.onOpen((res) => {
       console.log('socket open')
       that.socketOpen(res)
     })
-    socketTask.onClose((res)=>{
+    socketTask.onClose((res) => {
       that.socketClosed()
     })
   },
-  socketOpen(res){
+  socketOpen(res) {
     var that = this
     app.globalData.isWebsocketOpen = true
     var socketTask = that.data.socketTask
@@ -695,31 +718,31 @@ Page({
     var cmdStr = JSON.stringify(socketCmd)
     socketTask.send({
       data: cmdStr,
-      success:(res)=>{
+      success: (res) => {
         console.log('send command', cmdStr)
       }
     })
   },
-  socketMessage(res){
+  socketMessage(res) {
     var that = this
     var msg = JSON.parse(res.data)
     console.log('socket message', msg)
     var scanQrCode = msg.data
     var socketTask = that.data.socketTask
     socketTask.isReplied = true
-    that.setData({scanQrCode, socketTask})
+    that.setData({ scanQrCode, socketTask })
 
     var order = that.data.order
-    if (order.member_id == scanQrCode.scaner_member_id){
+    if (order.member_id == scanQrCode.scaner_member_id) {
       var careId = parseInt(scanQrCode.code.split('_')[2])
-      for(var i = 0; i < order.cares.length; i++){
-        if (order.cares[i].id == careId){
+      for (var i = 0; i < order.cares.length; i++) {
+        if (order.cares[i].id == careId) {
           var care = order.cares[i]
-          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '扫码取板', app.globalData.sessionKey).then(function (newCare){
-            for(var j = 0; order && order.cares[j] && j < order.cares[j].id; j++){
-              if (order.cares[j].id == careId){
+          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '扫码取板', app.globalData.sessionKey).then(function (newCare) {
+            for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
+              if (order.cares[j].id == careId) {
                 order.cares[j] = newCare
-                that.setData({order})
+                that.setData({ order })
                 wx.showToast({
                   title: '顾客是本人发板',
                   icon: 'success'
@@ -728,11 +751,11 @@ Page({
             }
           })
         }
-        
+
       }
-      
+
     }
-    else{
+    else {
       wx.showToast({
         title: '顾客非本人',
         icon: 'error'
@@ -741,12 +764,12 @@ Page({
 
 
     socketTask.close({
-      success:()=>{
+      success: () => {
         console.log('socket will be closed')
       }
     })
   },
-  socketClosed(){
+  socketClosed() {
     console.log('socket is closed')
     var that = this
     var socketTask = that.data.socketTask
@@ -765,15 +788,15 @@ Page({
       })
     }
     */
-    if (socketTask && !socketTask.isReplied){
+    if (socketTask && !socketTask.isReplied) {
       title = '网络中断'
       content = '点击确认重新连接，点击取消回到上一页。'
     }
-    else if (scanQrCode && scanQrCode.scaned == 0 && scanQrCode.stoped == 0 && scanQrCode.authed == 0){
+    else if (scanQrCode && scanQrCode.scaned == 0 && scanQrCode.stoped == 0 && scanQrCode.authed == 0) {
       title = '二维码超时'
       content = '点击确认刷新二维码，点击取消回到上一页。'
     }
-    if (title && content){
+    if (title && content) {
       wx.showModal({
         title: title,
         content: content,
@@ -782,7 +805,7 @@ Page({
             wx.navigateBack()
           }
           if (res.confirm) {
-            switch(title){
+            switch (title) {
               case '网络中断':
                 that.startWebSocketQuery()
                 break
@@ -798,15 +821,15 @@ Page({
       return
     }
   },
-  closeSocket(){
+  closeSocket() {
     var that = this
     var scanQrCode = that.data.scanQrCode
     var closeUrl = app.globalData.requestPrefix + 'QrCode/StopQeryScan/' + scanQrCode.id.toString() + '?sessionKey=' + app.globalData.sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-    util.performWebRequest(closeUrl, undefined).then(function(resolve){
+    util.performWebRequest(closeUrl, undefined).then(function (resolve) {
       console.log('socket will be closed', resolve)
     })
   },
-  showPrintBackDrop(e){
+  showPrintBackDrop(e) {
     var that = this
     var id = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -814,10 +837,10 @@ Page({
     careToBePrinted.customerName = order.member.title
     careToBePrinted.customerCell = order.member.cell
     careToBePrinted.shop = order.shop
-    that.setData({showPrint: true, careToBePrinted})
+    that.setData({ showPrint: true, careToBePrinted })
   },
-  onPrinterClose(e){
+  onPrinterClose(e) {
     var that = this
-    that.setData({showPrint: false})
+    that.setData({ showPrint: false })
   }
 })

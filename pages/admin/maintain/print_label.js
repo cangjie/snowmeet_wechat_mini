@@ -443,7 +443,7 @@ Page({
       orderInfoStr = '订单号：' + this.data.maintain_in_shop_request.order.id 
       priceStr = '金额：' + this.data.maintain_in_shop_request.order.final_price.toString()
     }
-    var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/maintain/task/' + this.data.id
+    var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/order_detail?orderId=' + this.data.id
     command.setText(20, 20 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
     command.setText(20, 20 + 40 + 55 + 55 + 55 + 50 + 40, "TSS24.BF2", 0, 1, 1, priceStr)
     //command.setQrcode(400, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)

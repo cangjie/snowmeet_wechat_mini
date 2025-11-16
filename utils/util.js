@@ -487,6 +487,24 @@ const getPrinterCharacteristicsPromise = function (device) {
     })
   })
 }
+const parseQuery = function (url, para){
+  var v = null
+  url = decodeURIComponent(url)
+  if (url.indexOf('?') <  0){
+    return null
+  }
+  var query = url.split('?')[1]
+  var queryArr = query.split('&')
+  for(var i = 0; i < queryArr.length; i++){
+    var pairArr = queryArr[i].split('=')
+    if (pairArr[0]==para){
+      if (pairArr.length > 1){
+        v = pairArr[1]
+      }
+    }
+  }
+  return v
+}
 
 module.exports = {
   formatDateTime: formatDateTime,
@@ -514,5 +532,6 @@ module.exports = {
   canRenderNumber,
   getBLEDeviceNameListInRangePromise,
   connectBLEPromise,
-  getPrinterCharacteristicsPromise
+  getPrinterCharacteristicsPromise,
+  parseQuery
 }

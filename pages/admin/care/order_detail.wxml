@@ -338,6 +338,6 @@
   <view style="height: 100rpx;" ></view>
   <van-popup show="{{ showPrint }}" position="bottom" custom-style="height: 80%;" 
   bind:close="onPrinterClose" close-icon="close" >
-    <print-care wx:if="{{showPrint}}" care="{{careToBePrinted}}" ></print-care>
+    <print-care wx:if="{{showPrint}}" care="{{careToBePrinted}}" order="{{order}}" ></print-care>
   </van-popup>
 </view>
