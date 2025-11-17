@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "养护订单",
-          "pathName": "pages/admin/care/order_detail.html?scancode_time=1763292066&q=https://mini.snowmeet.top/mapp/admin/care/order_detail?careId=21286&orderId=61957",
+          "name": "会员注册",
+          "pathName": "pages/register/reg",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "养护订单",
+          "pathName": "pages/admin/care/order_detail.html?scancode_time=1763292066&q=https://mini.snowmeet.top/mapp/admin/care/order_detail?careId=21286&orderId=61957",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "养护订单列表",
