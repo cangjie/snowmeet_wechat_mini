@@ -56,6 +56,14 @@
             </view>
           </view>
         </mp-cell>
+        <mp-cell wx:if="{{addNewBrand==true}}"  >
+          <view class="view-row" style="justify-content: center;">
+            <input class="input" placeholder="英文名称" style="width: 200rpx;"  bindinput="setBrandName" />
+            /<input class="input" style="width:200rpx" placeholder="中文名称" bindinput="setBrandChineseName" /> 
+            <van-button type="warning" size="mini" style="margin-left: 10rpx;margin-right: 10rpx;" 
+            bind:click="cancelAddNewBrand" > 取 消 </van-button> <van-button type="danger" size="mini" style="margin-left:10rpx;" bind:click="confirmAddNewBrand" id="{{index}}" > 确 认 </van-button>
+          </view>
+        </mp-cell>
         <mp-cell>
           <view class="view-row">
             <view class="left-column view-row">【长度】<view style="color:red;font-size:15pt">*</view>
