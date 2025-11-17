@@ -38,9 +38,25 @@ Page({
       }
     }
     data.getEquipBrandsPromise('双板').then(function (list) {
+      var unknownBrand = {
+        brand_type: '双板',
+        brand_name: 'Add New',
+        chinese_name: '新增品牌',
+        origin: '',
+        displayedName: '新增品牌'
+      }
+      list.push(unknownBrand)
       that.setData({ skiBrandList: list })
     })
     data.getEquipBrandsPromise('单板').then(function (list) {
+      var unknownBrand = {
+        brand_type: '单板',
+        brand_name: 'Add New',
+        chinese_name: '新增品牌',
+        origin: '',
+        displayedName: '新增品牌'
+      }
+      list.push(unknownBrand)
       that.setData({ boardBrandList: list })
     })
   },
@@ -331,9 +347,29 @@ Page({
     //var brandName = null
     if (care.equipment == '双板') {
       care.brand = that.data.skiBrandList[parseInt(e.detail.value)].displayedName
+      if (parseInt(e.detail.value) == that.data.skiBrandList.length - 1){
+        //care.brand = that.data.skiBrandList[parseInt(e.detail.value)].displayedName
+        that.setData({addNewBrand: true})
+        //return
+      }
+      /*
+      else{
+        care.brand = that.data.skiBrandList[parseInt(e.detail.value)].displayedName
+      }
+      */
     }
     else {
       care.brand = that.data.boardBrandList[parseInt(e.detail.value)].displayedName
+      if (parseInt(e.detail.value) == that.data.boardBrandList.length - 1){
+
+        that.setData({addNewBrand: true})
+        //return
+      }
+      /*
+      else{
+        care.brand = that.data.boardBrandList[parseInt(e.detail.value)].displayedName
+      }
+      */
     }
     that.setData({ order })
   },
@@ -842,5 +878,81 @@ Page({
   onPrinterClose(e) {
     var that = this
     that.setData({ showPrint: false })
+  },
+  cancelAddNewBrand(e){
+    var that = this
+    that.setData({addNewBrand: false})
+    that.data.newBrandName = null
+    that.data.newBrandChineseName = null
+    that.getData()
+  },
+  confirmAddNewBrand(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[id]
+    var brandName = that.data.newBrandName
+    var chineseName = that.data.newBrandChineseName
+    if (!brandName) {
+      wx.showToast({
+        title: '必须填写英文名称',
+        icon: 'error'
+      })
+      return
+    }
+    var updateUrl = app.globalData.requestPrefix + 'Care/UpdateBrandByStaff?type=' + encodeURIComponent(care.equipment) + '&brandName=' + encodeURIComponent(brandName) + '&chineseName=' + encodeURIComponent(chineseName) + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, null).then(function (brandList) {
+      switch (care.equipment) {
+        case '单板':
+          var boardBrandList = brandList
+          var unknownBrand = {
+            brand_type: care.equipment,
+            brand_name: 'Add New',
+            chinese_name: '新增品牌',
+            origin: '',
+            displayedName: '新增品牌'
+          }
+          boardBrandList.push(unknownBrand)
+          for(var i = 0; i < boardBrandList.length; i++){
+            if (boardBrandList[i].brand_name == that.data.newBrandName){
+              care.brand = boardBrandList[i].displayedName
+            }
+          }
+          //var brandList = boardBrandList
+          order.cares[id]=care
+          that.setData({ boardBrandList, order, addNewBrand:false, newBrandName: null, newBrandChineseName: null })
+          break
+        case '双板':
+          var skiBrandList = brandList
+          //var brandList = brandList
+          var unknownBrand = {
+            brand_type: care.equipment,
+            brand_name: 'Add New',
+            chinese_name: '新增品牌',
+            origin: '',
+            displayedName: '新增品牌'
+          }
+          skiBrandList.push(unknownBrand)
+          for(var i = 0; i < skiBrandList.length; i++){
+            if (skiBrandList[i].brand_name == that.data.newBrandName){
+              care.brand = skiBrandList[i].displayedName
+            }
+          }
+          order.cares[id]=care
+          that.setData({ skiBrandList, order, addNewBrand:false, newBrandName: null, newBrandChineseName: null })
+          break
+        default:
+          break
+      }
+    })
+
+  },
+  setBrandName(e){
+    var that = this
+    that.data.newBrandName = e.detail.value
+  },
+  setBrandChineseName(e){
+    var that = this
+    that.data.newBrandChineseName = e.detail.value
   }
 })
