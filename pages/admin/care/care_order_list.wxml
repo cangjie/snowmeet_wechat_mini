@@ -186,6 +186,9 @@
   <view class="view-row" style="justify-content: center;width: 750rpx;">
     <van-button type="info" size="normal" style="margin-top: 20rpx;" bind:click="query" disabled="{{querying}}"> 查 询 </van-button>
   </view>
+  <view class="view-row" style="margin-top: 50rpx;" >
+    订单数：{{orders.length}} 总金额：{{totalAmountStr}}
+  </view>
   <block wx:for="{{orders}}">
     <fui-card style="margin-top: 50rpx;" title="{{item.code}}" 
     tag="{{item.careProperties.orderStatus }}" tagSize="10rpx" full>
@@ -216,10 +219,7 @@
             <view class="right-column">{{item.customerCell}}</view>
           </view>
 
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【支付金额】</view>
-            <view class="right-column">{{item.paidAmountStr}}</view>
-          </view>
+       
           <!--view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付类型】</view>
             <view class="right-column">{{ item.payType }}</view>
@@ -227,6 +227,16 @@
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付方式】</view>
             <view class="right-column">{{ item.payMethod==null? '--' : item.payMethod }}</view>
+          </view>
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
+            <view class="left-column">【支付金额】</view>
+            <view class="right-column" style="width: 100rpx;">{{item.paidAmountStr}}</view>
+            <view class="left-column">【退款金额】</view>
+            <view class="right-column">{{item.refundAmountStr}}</view>
+          </view>
+          <view class="view-row" >
+            <view class="left-column">【总计收款】</view>
+            <view class="right-column" style="width: 100rpx;">{{item.totalEarnAmountStr}}</view>
           </view>
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【装备数量】</view>
