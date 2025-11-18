@@ -324,6 +324,10 @@ Component({
   
       }
     },
+    inputPayMethod(e) {
+      var that = this
+      that.setData({ inputedPayMethod: e.detail.value, disabledConfirmPaidButton: e.detail.value == '' })
+    },
   },
   
 })
