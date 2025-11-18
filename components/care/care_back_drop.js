@@ -101,13 +101,28 @@ Component({
       var order = that.data.order
       order.id = 0
       order.valid = 1
+      var haveFreeRepair = false
       for(var i = 0; order.cares && i < order.cares.length; i++){
         var care = order.cares[i]
         care.id = 0
         care.order_id = order.id
         care.valid = 1
+        /*
+        if (care.repair_memo && care.repair_memo != ''){
+          care.need_repair = 1
+        }
+        if (care.need_repair == 1 && care.repair_charge <= 0){
+          haveFreeRepair = true
+        }
+        
         if ((care.repair_memo && care.repair_memo != '' ) || (care.repair_charge && care.repair_charge > 0)){
           care.need_repair = 1
+        }*/
+        if (care.repair_memo && care.repair_memo != ''){
+          care.need_repair = 1
+        }
+        if (care.need_repair == 1 && (!care.repair_charge || care.repair_charge == 0 )){
+          haveFreeRepair = true
         }
         for(var j = 0; order.cares[i].careImages && j < order.cares[i].careImages.length; j++){
           order.cares[i].careImages[j].id = 0
@@ -120,6 +135,28 @@ Component({
         }
       }
       console.log('place order', that.data.order)
+      if (haveFreeRepair){
+        wx.showModal({
+          title: '订单确认',
+          content: '当前订单包含了免费的维修项目，是否确认？',
+          complete: (res) => {
+            if (res.cancel) {
+              
+            }
+        
+            if (res.confirm) {
+              that.confirmOrder(e)
+            }
+          }
+        })
+      }
+      else{
+        that.confirmOrder(e)
+      }
+      
+    },
+    confirmOrder(e){
+      var that = this
       that.setData({paying: true})
       var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(postUrl, that.data.order).then(function (order){
