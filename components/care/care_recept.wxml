@@ -113,7 +113,7 @@
   <view class="view-row">
     <view class="left-column">【备注】</view>
     <view class="right-column">
-      <textarea class="input" style="width: 450rpx;height: 150rpx;" value="{{care.memo}}" ></textarea>
+      <textarea class="input" style="width: 450rpx;height: 150rpx;" value="{{care.memo}}" bindinput="setValue" id="memo" ></textarea>
     </view>
   </view>
   <view class="view-row" style="justify-content: center; margin-top: 50rpx;">
