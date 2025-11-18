@@ -131,7 +131,7 @@ Page({
       var bizDate = new Date(order.biz_date)
       order.dateStr = util.formatDate(bizDate)
       order.timeStr = util.formatTimeStr(bizDate)
-      totalAmount += order.totalCharge
+      totalAmount += order.totalEarnAmount
       order.totalChargeStr = util.showAmount(order.totalCharge)
       var calledName = ''
       var member = order.member
@@ -153,12 +153,12 @@ Page({
       order.memberShip = memberShip
       order.paidAmountStr = util.showAmount(order.paidAmount)
       order.refundAmountStr = util.showAmount(order.refundAmount)
-      order.earnAmountStr = util.showAmount(order.earnAmount)
+      order.totalEarnAmountStr = util.showAmount(order.totalEarnAmount)
       for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
         order.payMethod = order.availablePayments[j].pay_method
       }
     }
-    that.setData({ orders, totalAmount })
+    that.setData({ orders, totalAmount, totalAmountStr: util.showAmount(totalAmount) })
   },
   query(){
     var that = this
