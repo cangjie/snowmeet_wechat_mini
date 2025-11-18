@@ -152,6 +152,8 @@ Page({
       order.cell = cell
       order.memberShip = memberShip
       order.paidAmountStr = util.showAmount(order.paidAmount)
+      order.refundAmountStr = util.showAmount(order.refundAmount)
+      order.earnAmountStr = util.showAmount(order.earnAmount)
       for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
         order.payMethod = order.availablePayments[j].pay_method
       }
