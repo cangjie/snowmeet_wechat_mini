@@ -191,8 +191,13 @@ Component({
           break
         case 'need_edge':
           care.need_edge = value.length
-          care.edge_degree = '89'
+          if (care.edge_degree == undefined || care.edge_degree == null || care.edge_degree == ''){
+            care.edge_degree = '89'
+          }
           that.getProduct(care)
+          break
+        case 'edge_degree':
+          care.edge_degree = value
           break
         case 'need_wax':
           care.need_wax = value.length

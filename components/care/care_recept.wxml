@@ -42,7 +42,7 @@
       <checkbox-group id="need_edge" bindchange="setValue" >
         <checkbox checked="{{care.need_edge == 1}}">修刃</checkbox>
       </checkbox-group>
-      <input class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1}}" />度
+      <input id="edge_degree" bindinput="setValue" class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1}}" />度
       <checkbox-group id="need_wax" bindchange="setValue" >
         <checkbox style="margin-left: 30rpx;" checked="{{care.need_wax == 1}}" >打蜡</checkbox>
       </checkbox-group>
