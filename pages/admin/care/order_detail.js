@@ -211,7 +211,7 @@ Page({
           }
         }
         else {
-          if (task.status == '未开始' && care.tasks[j - 1].status == '已完成') {
+          if (task.status == '未开始' && (care.tasks[j - 1].status == '已完成' || care.tasks[j - 1].status == '强行中止' )) {
             task.current = true
           }
           else if (task.status == '已开始') {
@@ -955,5 +955,11 @@ Page({
   setBrandChineseName(e){
     var that = this
     that.data.newBrandChineseName = e.detail.value
+  },
+  call(e){
+    var cell = e.currentTarget.id
+    wx.makePhoneCall({
+      phoneNumber: cell,
+    })
   }
 })

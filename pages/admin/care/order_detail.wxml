@@ -20,7 +20,9 @@
         <view class="left-column">【姓名】</view>
         <view class="right-column">{{order.member.title}}</view>
         <view class="left-column">【电话】</view>
-        <view class="right-column">{{order.member.cell}}</view>
+        <view class="right-column">
+          <van-button size="small" id="{{order.member.cell}}" bind:click="call" type="info" >{{order.member.cell}}</van-button>
+        </view>
       </view>
     </mp-cell>
     <mp-cell>

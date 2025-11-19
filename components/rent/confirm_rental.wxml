@@ -26,7 +26,8 @@
           <view class="right-column">{{item.amountStr}}</view>
           <view class="left-column">【减免】</view>
           <view class="right-column">
-            <input id="{{item.id}}" class="input" style="width: 75rpx;text-align: center;" value="{{item.discountTotalAmount}}" bindinput="setDiscount" type="number" />
+            <input id="{{item.id}}" class="input" style="width: 75rpx;text-align: center;" 
+            value="{{item.discountTotalAmount==0?'':item.discountTotalAmount}}" placeholder="0" bindinput="setDiscount" type="number" />
           </view>
         </view>
         <view class="view-row">

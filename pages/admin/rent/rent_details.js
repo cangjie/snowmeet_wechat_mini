@@ -603,5 +603,11 @@ Page({
       //that.setData({ order })
       that.setRepairCancel(e)
     })
+  },
+  call(e){
+    var cell = e.currentTarget.id
+    wx.makePhoneCall({
+      phoneNumber: cell,
+    })
   }
 })
