@@ -606,6 +606,16 @@ const getPrinterListPromise = function(shop, color, sessionKey){
   })
   
 }
+const getMyInfo = function (sessionKey){
+  var getUrl = app.globalData.requestPrefix + 'Member/GetMyInfo?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (info){
+      resolve(info)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -652,5 +662,6 @@ module.exports = {
   getRentPriceByIdPromise,
   updateCarePromise,
   updateCareTaskStatusPromise,
-  getPrinterListPromise
+  getPrinterListPromise,
+  getMyInfo
 }

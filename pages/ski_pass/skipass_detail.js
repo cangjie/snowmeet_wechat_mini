@@ -1,6 +1,7 @@
 // pages/ski_pass/skipass_detail.js
 const app = getApp()
 const util = require('../../utils/util.js')
+const data = require('../../utils/data.js')
 Page({
 
   /**
@@ -130,6 +131,11 @@ Page({
   },
   GetRealName(){
     var that = this
+    data.getMyInfo(app.globalData.sessionKey).then(function (info){
+      that.setData({name: info.real_name, cell: info.cell})
+    })
+    /*
+    var that = this
     var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: getUrl,
@@ -141,6 +147,7 @@ Page({
         
       }
     })
+    */
   },
   setCount(e){
     var that = this
