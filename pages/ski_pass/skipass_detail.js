@@ -202,16 +202,16 @@ Page({
         console.log('skipass booked', res)
         var order = res.data
         var paymentId = order.payments[0].id
-        var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Pay/' + paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        var payUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + paymentId + '?sessionKey=' + app.globalData.sessionKey
         wx.request({
-          url: paymentUrl,
+          url: payUrl,
           method: 'GET',
           success:(res) => {
             wx.requestPayment({
-              nonceStr: res.data.nonce,
-              package: 'prepay_id=' + res.data.prepay_id,
-              paySign: res.data.sign,
-              timeStamp: res.data.timestamp,
+              nonceStr: res.data.data.nonce,
+              package: 'prepay_id=' + res.data.data.prepay_id,
+              paySign: res.data.data.sign,
+              timeStamp: res.data.data.timestamp,
               signType: 'MD5',
               success:(res)=>{
                 wx.showToast({
