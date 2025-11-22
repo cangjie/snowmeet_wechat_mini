@@ -34,8 +34,12 @@ Page({
     var that = this
     var resort = decodeURIComponent(options.resort)
     var memberId = options.memberId
+    var staffId = options.staffId
     if (memberId){
       that.setData({memberId})
+    }
+    if (staffId){
+      that.setData({staffId})
     }
     if (!resort){
       resort = '万龙'
@@ -266,7 +270,9 @@ Page({
     switch(resort){
       case '南山':
         wx.navigateTo({
-          url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate + (that.data.memberId?'&memberId=' + that.data.memberId : ''),
+          url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate 
+            + (that.data.memberId?'&memberId=' + that.data.memberId : '')
+            + (that.data.staffId?'&staffId=' + that.data.staffId : ''),
         })
         break
       /*
@@ -345,7 +351,9 @@ Page({
     var that = this
     var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'skipass_detail?id=' + id + (that.data.memberId?'&memberId=' + that.data.memberId : ''),
+      url: 'skipass_detail?id=' + id 
+      + (that.data.memberId?'&memberId=' + that.data.memberId : '')
+      + + (that.data.staffId?'&staffId=' + that.data.staffId : ''),
     })
   },
   getResortArr(){

@@ -191,7 +191,8 @@ Page({
       })
       return
     }
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + product.product_id + '?date=' + that.data.currentDate + '&count=' + that.data.count + '&cell=' + cell + '&name=' + encodeURIComponent(name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&idNo=' + idNo + (that.data.memberId? '&refereeMemberId=' + that.data.memberId: '')
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + product.product_id + '?date=' + that.data.currentDate + '&count=' + that.data.count + '&cell=' + cell + '&name=' + encodeURIComponent(name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&idNo=' + idNo + (that.data.memberId? '&refereeMemberId=' + that.data.memberId: '') 
+    + (that.data.staffId? '&staffId=' + that.data.staffId: '')
     wx.request({
       url: submitUrl,
       method: 'GET',

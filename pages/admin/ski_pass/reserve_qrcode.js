@@ -15,7 +15,8 @@ Page({
   onLoad(options) {
     var that = this
     app.loginPromiseNew.then(function(resolve){
-      that.getMemberId()
+      //that.getMemberId()
+      that.getQrCode()
     })
   },
 
@@ -87,8 +88,8 @@ Page({
   getQrCode(){
     var that = this
     var memberId = that.data.memberId
-    var scene = 'reserveskipass_' + memberId
-    var getUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + encodeURIComponent(scene)
+    var scene = 'reserveskipassbystaff_' + app.globalData.staff.id.toString()
+    var getUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOALimitQrCodeBySessionKey?content=' + encodeURIComponent(scene) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: getUrl,
       method: 'GET',
