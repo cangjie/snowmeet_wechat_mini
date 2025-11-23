@@ -16,7 +16,7 @@ Page({
       url: '../logs/logs'
     })
   },
-  onLoad: function () {
+  onLoad: function (options) {
     //wxloginModule.wxlogin()
     /*
     wx.navigateTo({
@@ -31,8 +31,12 @@ Page({
         })
       }
       else{
+        var url = '../ski_pass/ski_pass_selector?resort=' + encodeURIComponent('万龙')
+        var staffId = options.staffId
+        url += staffId? ('&staffId=' + staffId) : ''
         wx.redirectTo({
-          url: '../ski_pass/ski_pass_selector?resort=' + encodeURIComponent('万龙'),
+          
+          url: url,
         })
       }
     })

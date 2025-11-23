@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "会员注册",
-          "pathName": "pages/register/reg",
+          "name": "雪票",
+          "pathName": "pages/index/index",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "会员注册",
+          "pathName": "pages/register/reg",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "养护订单",
@@ -27,13 +34,6 @@
           "name": "租赁订单",
           "pathName": "/pages/admin/rent/rent_details",
           "query": "id=60991",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "雪票",
-          "pathName": "pages/index/index",
-          "query": "",
           "launchMode": "default",
           "scene": null
         },

@@ -20,7 +20,7 @@ Page({
     var that = this
     that.getBalance()
     that.setData({id: options.id, currentDate: util.formatDate(new Date()),
-    memberId: options.memberId})
+    memberId: options.memberId, staffId: options.staffId})
     that.getData()
     app.loginPromiseNew.then(function(resolve){
 
