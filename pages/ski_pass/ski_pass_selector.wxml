@@ -18,7 +18,6 @@
             <radio style="margin-left: 10rpx;font-size: 11pt;" value="租板"  >租板</radio>
           </radio-group>
         </view>
-        
         <!--view style="margin-top: 10rpx;">
           <view wx:for="{{productList}}" style="margin-top: 5rpx; margin-bottom: 5rpx;">
             <view>{{item.name}}</view>

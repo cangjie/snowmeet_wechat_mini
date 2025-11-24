@@ -77,7 +77,7 @@ Page({
           break
       }
       that.setData({tabbarItemList: app.globalData.userTabBarItem, 
-        role: app.globalData.role, canGetInfo: true, reserveDate: util.formatDate(reserveDate),
+        role: app.globalData.staff? 'staff': '', canGetInfo: true, reserveDate: util.formatDate(reserveDate),
         startDate: startDate, endDate: util.formatDate(endDate), reserveDateDesc: reserveDateDesc})
       that.getResortArr()
       
