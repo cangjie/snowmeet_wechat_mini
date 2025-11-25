@@ -340,5 +340,40 @@ Component({
       })    
     },
   },
-  
+  printCustLabel(e){
+    wx.showModal({
+      title: '打印确认',
+      content: '即将打印【顾客小票】',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var that = this
+          that.data.printType = '顾客小票'
+          that.print(e)
+        }
+      }
+    })
+    
+    //that.data.
+  },
+  printCommonLabel(e){
+    wx.showModal({
+      title: '打印确认',
+      content: '即将打印【标签存根】',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+        if (res.confirm) {
+          var that = this
+          that.data.printType = '标签存根'
+          that.print(e)
+        }
+      }
+    })
+    
+  }
 })

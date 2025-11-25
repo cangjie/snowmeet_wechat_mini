@@ -22,7 +22,7 @@
     </view>
    
   </view>
-  <view class="view-row" style="justify-content: center;margin-top: 20rpx">
+  <!--view class="view-row" style="justify-content: center;margin-top: 20rpx">
     <radio-group bindchange="setPrintType">
       <radio value="顾客小票" style="margin-left: 100rpx;" 
         checked="{{printType == '顾客小票'}}" >顾客小票</radio>
@@ -30,11 +30,15 @@
         checked="{{printType == '标签存根'}}" >标签存根</radio>
       
     </radio-group>
+  </view-->
+  <view class="view-row" style="justify-content: center;margin-top: 80rpx">
+    <van-button type="primary" disabled="{{ready!=true}}" bind:click="printCustLabel" 
+      style="margin-right: 50rpx;" >打印顾客小票</van-button>
+    <van-button type="info" disabled="{{ready!=true}}" bind:click="printCommonLabel" 
+      style="margin-right: 50rpx;" >打印标签存根</van-button>
+    <!--van-button type="primary" disabled="{{ready!=true}}" bind:click="print" > 打 印 </van-button-->
   </view>
-  <view class="view-row" style="justify-content: center;margin-top: 20rpx">
-    <van-button type="primary" disabled="{{ready!=true}}" bind:click="print" > 打 印 </van-button>
-  </view>
-  <view class="view-row" style="justify-content:center;margin-top:20rpx" >
+  <!--view class="view-row" style="justify-content:center;margin-top:20rpx" >
     <textarea class="input" value="" style="width: 700rpx; height:500rpx" ></textarea>
-  </view>
+  </view-->
 </view>
