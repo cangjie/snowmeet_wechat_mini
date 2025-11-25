@@ -74,7 +74,9 @@ App({
             success: (res) => {
               app.globalData.systemInfo = res
               //resolve(app.globalData)
-              if ((app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1) && app.globalData.env != 'develop' && app.globalData.env != 'trail') {
+
+
+              if (app.globalData.staff) {
                 wx.redirectTo({
                   url: '/pages/admin/admin',
                 })
