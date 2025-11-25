@@ -63,7 +63,7 @@
         <view class="left-column" style="width: 200rpx;">【在押押金】</view>
         <view class="right-column" style="width: 150rpx;">{{order.unRelieveGuarantyStr}}</view>
         <view class="left-column" style="width: 200rpx;">【解押押金】</view>
-        <view class="right-column" style="width: 150rpx;">{{order.relieveGuarantyStr}}</view>
+        <view class="right-column" style="width: 150rpx;">{{order.rentProperties.relieveGuarantyAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
@@ -230,7 +230,7 @@
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >【总计押金】</view>
-        <view class="right-column" >{{order.totalGuarantyAmountStr}}</view>
+        <view class="right-column" >{{order.rentProperties.totalPaidGuarantyAmountStr}}</view>
         <view class="left-column" >【总计租金】</view>
         <view class="right-column" >{{order.totalRentSummaryAmountStr}}</view>
       </view>

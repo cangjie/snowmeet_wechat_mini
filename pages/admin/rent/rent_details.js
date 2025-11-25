@@ -186,6 +186,8 @@ Page({
     order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
     order.totalRentOverTimeAmountStr = util.showAmount(order.totalRentOverTimeAmount)
     order.totalRentRepairationAmountStr = util.showAmount(order.totalRentRepairAmount)
+    order.rentProperties.totalPaidGuarantyAmountStr = util.showAmount(order.rentProperties.totalPaidGuarantyAmount)
+    order.rentProperties.relieveGuarantyAmountStr = util.showAmount(order.rentProperties.relieveGuarantyAmount)
     if (order.totalRentUnRefund < 0 && order.totalRentUnRefund > -0.001) {
       order.totalRentUnRefund = 0.001.toFixed(2) * -1
     }
