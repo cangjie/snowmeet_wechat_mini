@@ -40,7 +40,7 @@
     <mp-cell id="ns_ski_pass_fee" bindtap="nav" >【雪票】南山消费</mp-cell>
     <mp-cell id="ns_ski_pass_refund" bindtap="nav" >【雪票】南山退押金</mp-cell>
     <mp-cell id="ziwoyou" bindtap="nav" >【雪票】大好河山雪票管理</mp-cell>
-    <mp-cell id="ziwoyou_order" bindtap="nav" >【雪票】大好河山订单</mp-cell>
+    <mp-cell id="ziwoyou_order" bindtap="nav" >【雪票】自我游订单</mp-cell>
     <mp-cell id="skipassqr" bindtap="nav" >【雪票】订票二维码</mp-cell>
   </mp-cells>
   <mp-cells title="实体店铺接待" >
