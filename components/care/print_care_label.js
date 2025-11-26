@@ -162,20 +162,33 @@ Component({
       var memo = care.repair_memo? care.repair_memo: ''
       var pole = care.with_pole == true ? '含杖' : ''
       var orderDate = new Date(care.create_date)
+      
       var orderDateStr = (orderDate.getMonth() + 1).toString() + '-' + orderDate.getDate().toString()
-      var pickDate = new Date(orderDate.setDate(orderDate.getDate() + 1))
-      var pickDateStr = (pickDate.getMonth()+1).toString() + '-' + pickDate.getDate().toString()
-      var scale = care.scale? care.scale: '未填'
       var urgent = false
       if (care.urgent == 1){
         urgent = true
       }
+      var pickDate = new Date(orderDate)
+      if (care.member_pick_date != null){
+        pickDate = new Date(care.member_pick_date)
+      }
+      else{
+        if (!urgent){
+          pickDate = pickDate.setDate(pickData.getdate() + 1)
+        }
+      }
+      var pickDateStr = (pickDate.getMonth()+1).toString() + '-' + pickDate.getDate().toString()
+      var scale = care.scale? care.scale: '未填'
+      
       var pickDateTitle = '次日'
       if (pickDate.getDate() == orderDate.getDate()) {
         pickDateTitle = '当日'
       }
       else if (pickDate.getDate() - orderDate.getDate() != 1) {
         pickDateTitle = '多日'
+      }
+      else{
+        pickDateTitle = '次日'
       }
       var command = tsc.jpPrinter.createNew()
       command.setCls()//清除缓冲区，防止下一个没生效
@@ -210,8 +223,6 @@ Component({
       else{
         orderInfoStr =  that.data.order.code
         priceStr = '金额：' + parseFloat(that.data.order.paidAmount).toFixed(2)
-        //orderInfoStr = ''
-        //priceStr = ''
       }
       var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/order_detail?orderId=' + that.data.order.id.toString() + '&careId=' + care.id.toString() 
       command.setText(290, 20 + 40 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
