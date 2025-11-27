@@ -75,8 +75,9 @@ App({
               app.globalData.systemInfo = res
               //resolve(app.globalData)
 
-
-              if (app.globalData.staff) {
+              const env = wx.getAccountInfoSync()
+              app.globalData.env = env.miniProgram.envVersion
+              if (app.globalData.staff && app.globalData.env != 'develop') {
                 wx.redirectTo({
                   url: '/pages/admin/admin',
                 })

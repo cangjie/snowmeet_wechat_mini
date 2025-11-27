@@ -179,7 +179,6 @@ Component({
       }
       var pickDateStr = (pickDate.getMonth()+1).toString() + '-' + pickDate.getDate().toString()
       var scale = care.scale? care.scale: '未填'
-      
       var pickDateTitle = '次日'
       if (pickDate.getDate() == orderDate.getDate()) {
         pickDateTitle = '当日'
@@ -207,7 +206,6 @@ Component({
       if (memo != undefined && memo != ''){
         command.setText(200, 20 + 40 + 40 + 55 + 35, "TSS32.BF2", 0, 1, 1, "注：" + memo)
       }
-  
       if (candle.toString()=='1') {
         command.setText(20, 20 + 40 + 40 + 55 + 55, "TSS32.BF2", 0, 1, 1, "打蜡：")
         command.setText(20, 20 + 40 + 40 + 55 + 55 + 55, "TSS32.BF2", 0, 1, 1, "刮蜡：")
@@ -227,7 +225,6 @@ Component({
       var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/order_detail?orderId=' + that.data.order.id.toString() + '&careId=' + care.id.toString() 
       command.setText(290, 20 + 40 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
       command.setText(20,  20 + 40 + 40 + 55 + 55 + 55 + 50 , "TSS32.BF2", 0, 1, 1, priceStr)
-      //command.setQrcode(400, 20 + 40 + 65 + 65, "H", 4, "A", "maintain_in_shop_request_" + this.data.id)
       command.setQrcode(400, 20 + 40 + 65 + 25, "L", 3, "M", qrCodeText)
       command.setText(20, 350, "TSS32.BF2", 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
       command.setText(300, 350, "TSS32.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
