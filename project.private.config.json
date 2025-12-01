@@ -5,14 +5,21 @@
         {
           "name": "顾客支付",
           "pathName": "pages/order/payment_entry",
-          "query": "paymentId=34172",
+          "query": "paymentId=34365",
           "scene": null,
           "launchMode": "default"
         },
         {
           "name": "雪票",
-          "pathName": "pages/index/index",
-          "query": "",
+          "pathName": "pages/ski_pass/ski_pass_selector",
+          "query": "resort=%e4%b8%87%e9%be%99&staffId=22",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "顾客支付",
+          "pathName": "pages/order/payment_entry",
+          "query": "paymentId=34172",
           "launchMode": "default",
           "scene": null
         },
@@ -41,13 +48,6 @@
           "name": "租赁订单",
           "pathName": "/pages/admin/rent/rent_details",
           "query": "id=60991",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "顾客支付",
-          "pathName": "pages/order/payment_entry",
-          "query": "paymentId=32618",
           "launchMode": "default",
           "scene": null
         },

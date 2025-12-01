@@ -18,7 +18,7 @@ Page({
   onLoad: function (options) {
     var that = this
     app.loginPromiseNew.then(function(resolve){
-      var getTemplateUrl = 'https://'  + app.globalData.domainName + '/core/Ticket/GetTemplateList'
+      var getTemplateUrl = 'https://'  + app.globalData.domainName + '/api/Ticket/GetTemplateList'
       wx.request({
         url: getTemplateUrl,
         method: 'GET',
@@ -115,7 +115,7 @@ Page({
         content: msg,
         success:(res)=>{
           if (res.confirm){
-            var generateTicketsUrl = 'https://' + app.globalData.domainName + '/core/ticket/GenerateTickets/' + id + '?count=' + printNum + '&channel=' + that.data.channelName + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+            var generateTicketsUrl = 'https://' + app.globalData.domainName + '/api/ticket/GenerateTickets/' + id + '?count=' + printNum + '&channel=' + that.data.channelName + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
             wx.request({
               url: generateTicketsUrl,
               success:(res)=>{

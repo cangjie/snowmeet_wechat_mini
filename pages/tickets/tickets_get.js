@@ -25,7 +25,7 @@ Page({
       channel = urlArr[urlArr.length - 1]
     }
     app.loginPromiseNew.then(function(resolve){
-      var getTemplateUrl = 'https://'  + app.globalData.domainName + '/core/Ticket/GetTemplateList'
+      var getTemplateUrl = 'https://'  + app.globalData.domainName + '/api/Ticket/GetTemplateList'
       wx.request({
         url: getTemplateUrl,
         method: 'GET',
@@ -122,7 +122,7 @@ Page({
     console.log('get ticket', e.currentTarget.id)
     
     var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GenerateTicketsByUser/' + e.currentTarget.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&channel=' + encodeURIComponent(that.data.channel)
+    var getUrl = 'https://' + app.globalData.domainName + '/api/Ticket/GenerateTicketsByUser/' + e.currentTarget.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&channel=' + encodeURIComponent(that.data.channel)
     wx.request({
       url: getUrl,
       method: 'GET',
