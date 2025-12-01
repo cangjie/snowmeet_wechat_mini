@@ -74,7 +74,6 @@ App({
             success: (res) => {
               app.globalData.systemInfo = res
               //resolve(app.globalData)
-
               const env = wx.getAccountInfoSync()
               app.globalData.env = env.miniProgram.envVersion
               if (app.globalData.staff && app.globalData.env != 'develop') {
