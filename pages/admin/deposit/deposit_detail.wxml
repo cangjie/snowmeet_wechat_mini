@@ -58,14 +58,12 @@
       <view class="view-row" >
         <view class="left-column" >类型：</view>
         <view class="right-column" >{{item.type}}</view>
-        <view class="left-column" >业务：</view>
-        <view class="right-column" >{{item.biz_type}}</view>
+        <view class="left-column" >交易金额：</view>
+        <view class="right-column" >{{item.amountStr}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >订单号：</view>
-        <view class="right-column" >{{item.biz_id}}</view>
-        <view class="left-column" >交易金额：</view>
-        <view class="right-column" >{{item.amountStr}}</view>
+        <view class="right-column" style="width: 550rpx;" >{{item.type == '消费' ? item.order.code : item.biz_id}}</view>
       </view>
       <view class="view-row" >
         <view class="left-column" >前余额：</view>

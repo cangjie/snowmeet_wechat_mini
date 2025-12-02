@@ -1,7 +1,9 @@
 /* pages/admin/deposit/deposit_detail.wxss */
 .left-column{
-  width: 180rpx;
+  width: 190rpx;
+  text-align: left;
 }
 .right-column{
-  width: 240rpx;
+  width: 250rpx;
+  text-align: left;
 }

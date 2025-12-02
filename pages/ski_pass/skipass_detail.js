@@ -105,6 +105,7 @@ Page({
           if (currentDate.getHours() >= 20) {
             currentDate = new Date()
             currentDate = currentDate.setDate(currentDate.getDate() + 1)
+            currentDate = new Date(currentDate)
           }
         }
         else {
@@ -112,6 +113,7 @@ Page({
           if (currentDate.getHours() >= 14) {
             currentDate = new Date()
             currentDate = currentDate.setDate(currentDate.getDate() + 1)
+            currentDate = new Date(currentDate)
           }
         }
         that.setData({ currentDate: util.formatDate(currentDate) })
