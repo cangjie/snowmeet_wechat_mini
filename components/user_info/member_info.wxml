@@ -47,7 +47,7 @@
       <view class="left-column" style="width: 190rpx;" >【总计储值】</view>
       <view class="right-column" style="width: 140rpx;" >{{member.totalDepositStr}}</view>
       <view class="left-column" style="width: 190rpx;" >【可用储值】</view>
-      <view class="right-column" style="width: 140rpx;" >{{member.avaliableDepositStr}}</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.availableDepositStr}}</view>
     </view>
   </mp-cell>
   <mp-cell wx:if="{{member && member.id}}" >

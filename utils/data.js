@@ -616,6 +616,19 @@ const getMyInfo = function (sessionKey){
     })
   })
 }
+const payWithDepositPromise = function (orderId, sessionKey){
+  var payUrl = app.globalData.requestPrefix + 'Order/PayWithDeposit/' + orderId + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(payUrl, null).then(function (order){
+      resolve(order)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+  //util.performWebRequest(payUrl, null).then(function(order){
+
+  //})
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -663,5 +676,6 @@ module.exports = {
   updateCarePromise,
   updateCareTaskStatusPromise,
   getPrinterListPromise,
-  getMyInfo
+  getMyInfo,
+  payWithDepositPromise
 }

@@ -48,7 +48,7 @@ Component({
         console.log('get member info', resolve)
         var member = resolve
         member.totalDepositStr = util.showAmount(member.totalDeposit)
-        member.avaliableDepositStr = util.showAmount(member.avaliableDeposit)
+        member.availableDepositStr = util.showAmount(member.availableDeposit)
         member.contactNums.push({id: 0, num:'新增'})
         that.setData({member})
         that.triggerEvent('GetMemberInfo', member)

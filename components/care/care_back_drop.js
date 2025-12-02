@@ -16,13 +16,25 @@ Component({
    */
   data: {
     allWellFormed: false,
-    paying: false
+    paying: false,
+    useDeposit: false
   },
   lifetimes:{
     ready(){
       var that = this
       app.loginPromiseNew.then(function(resolve){
-        that.setData({order: that.properties.order})
+        var order = that.properties.order
+        //order.paying_amountStr = util.showAmount(order.paying_amount)
+        that.setData({order})
+        if (order.member_id){
+          data.getMemberPromise(order.member_id, app.globalData.sessionKey).then(function (member){
+            var availableDeposit = (member && member.availableDeposit && !isNaN(member.availableDeposit))? 
+              parseFloat(member.availableDeposit) : 0
+            that.setData({member, availableDeposit, availableDepositStr: util.showAmount(availableDeposit)})
+          })
+        }
+        
+        
         that.renderData()
       })
     }
@@ -162,6 +174,8 @@ Component({
       util.performWebRequest(postUrl, that.data.order).then(function (order){
         console.log('order', order)
         that.setData({order})
+        order.paying_amountStr = util.showAmount(order.paying_amount)
+        that.setData({order})
         if (order.paying_amount == 0){
           wx.navigateTo({
             url: '/pages/admin/care/order_detail?orderId=' + order.id,
@@ -191,6 +205,41 @@ Component({
         }
       })
 
+    },
+    setUseDeposit(e){
+      var that = this
+      if (e.detail.value.length > 0){
+        that.setData({useDeposit: true, paying: false})
+      }
+      else{
+        that.setData({useDeposit: false, paying: false})
+      }
+    },
+    payWithDeposit(e){
+      var that = this
+      var order = that.data.order
+      var title = '储值消费确认'
+      var content = '顾客现有可用储值' + that.data.availableDepositStr + '  本次消费' + that.data.order.paying_amountStr
+      wx.showModal({
+        title: title,
+        content: content,
+        complete: (res) => {
+          if (res.cancel) {
+            
+          }
+          if (res.confirm) {
+            that.setData({paying: true})
+            data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function (order){
+              wx.showToast({
+                title: '支付成功',
+              })
+              wx.redirectTo({
+                url: '/pages/admin/care/order_detail?orderId=' + order.id ,
+              })
+            })
+          }
+        }
+      })
     }
   }
 })
