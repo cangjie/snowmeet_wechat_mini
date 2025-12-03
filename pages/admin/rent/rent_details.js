@@ -191,6 +191,9 @@ Page({
     if (order.totalRentUnRefund < 0 && order.totalRentUnRefund > -0.001) {
       order.totalRentUnRefund = 0.001.toFixed(2) * -1
     }
+    if (order.member && order.member.availableDeposit){
+      order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
+    }
     that.setData({
       allSettled, totalGuarantyAmount, totalSummary,
       totalSummaryStr: util.showAmount(totalSummary),
@@ -206,6 +209,7 @@ Page({
     var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + id + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
+      
       for (var i = 0; order.rentals && i < order.rentals.length; i++) {
         if (order.rentals[i].id == 0) {
           continue
@@ -214,8 +218,18 @@ Page({
           for (var j = 0; j < order.rentals.length; j++) {
             if (order.rentals[j].id == newRental.id) {
               order.rentals[j] = newRental
-              that.renderOrder(order)
-              that.setData({ order })
+              //var member = null
+              if (!order.member_id){
+                that.renderOrder(order)
+                that.setData({ order })
+              }
+              else {
+                data.getMemberPromise(order.member_id, app.globalData.sessionKey).then(function (member){
+                  order.member = member
+                  that.renderOrder(order)
+                  that.setData({ order })
+                })
+              }
               break
             }
           }
