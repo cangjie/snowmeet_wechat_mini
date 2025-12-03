@@ -515,7 +515,9 @@ Page({
         }
     
         if (res.confirm) {
+          data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function(order){
             
+          })  
         }
       }
     })
