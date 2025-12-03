@@ -439,6 +439,10 @@ Page({
   },
   refund(e) {
     var that = this
+    if (that.data.payWithDeposit == true){
+      that.refundWithDeposit(e)
+      return;
+    }
     if (!that.data.refundAmount) {
       var order = that.data.order
       that.data.refundAmount = order.totalRentUnRefund
@@ -450,6 +454,7 @@ Page({
       })
       return
     }
+
     wx.showModal({
       title: '确认退款',
       content: '退款金额：' + util.showAmount(that.data.refundAmount),
@@ -490,6 +495,27 @@ Page({
               icon: 'success'
             })
           })
+        }
+      }
+    })
+  },
+  refundWithDeposit(e){
+    var that = this
+    var order = that.data.order
+    var title = '储值支付确认'
+    var payAmount = order.totalRentSummaryAmount
+    var refundAmount = order.totalRentUnRefund
+    var content = '储值支付租金' + util.showAmount(payAmount) + '，应退押金：' + util.showAmount(refundAmount)
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+            
         }
       }
     })
@@ -629,6 +655,16 @@ Page({
   },
   setPayWithDeposit(e){
     var that = this
-    that.setData({payWithDeposit: e.detail.value.length == 1? true: false})
+    var payWithDeposit = e.detail.value.length == 1? true: false
+    //that.setData({payWithDeposit: e.detail.value.length == 1? true: false})
+    var order = that.data.order
+    if (payWithDeposit){
+      order.totalRentUnRefund = order.totalRentUnRefund + order.totalRentSummaryAmount
+    }
+    else{
+      order.totalRentUnRefund = order.totalRentUnRefund - order.totalRentSummaryAmount
+    }
+    order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
+    that.setData({order, payWithDeposit})
   }
 })
