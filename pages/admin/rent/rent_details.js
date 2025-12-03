@@ -12,7 +12,8 @@ Page({
     currentRentalId: null,
     backDropType: 'null',
     showBackdrop: false,
-    refunding: false
+    refunding: false,
+    payWithDeposit: false
   },
 
   /**
@@ -625,5 +626,9 @@ Page({
     wx.makePhoneCall({
       phoneNumber: cell,
     })
+  },
+  setPayWithDeposit(e){
+    var that = this
+    that.setData({payWithDeposit: e.detail.value.length == 1? true: false})
   }
 })
