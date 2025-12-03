@@ -246,7 +246,7 @@ Page({
             desc = desc.replace('<more/>', subDesc)
           }
           else if (prod.name.indexOf('下午') >= 0){
-            var subDesc = '<li>下午加夜场时间：限当日14:30后使用</li>'
+            var subDesc = '<li>下午加夜场时间：限当日13:30后使用</li>'
             desc = desc.replace('<more/>', subDesc)
           }
           else if (prod.name.indexOf('夜场') >= 0) {
