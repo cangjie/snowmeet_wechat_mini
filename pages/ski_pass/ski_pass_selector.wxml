@@ -44,8 +44,8 @@
       </block>
     </view>
     <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  bindtap="reserve" id="{{item.id}}"  ></rich-text>
-    <view wx:if="{{role=='staff' && resort=='南山'}}">
-      <button class="input" id="{{item.id}}" bind:tap="showTempQr">临时加票二维码</button>
+    <view wx:if="{{role=='staff' && resort=='南山'}}" class="view-row" style="justify-content: center;">
+      <van-button type="info"  id="{{item.id}}" bind:click="showTempQr">临时加票二维码</van-button>
     </view>
 
   </view>

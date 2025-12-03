@@ -9,7 +9,7 @@ Page({
   data: {
     resort: '万龙',
     tags:'',
-    reserveDate: util.formatDate(new Date()),
+    reserveDate: util.formatDate(new Date('2025-12-04')),
     productList: [],
     desc: '<p style="color:red" >test</p>',
     skiPassDescNanashanRent: util.skiPassDescNanashanRent,
