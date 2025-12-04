@@ -251,6 +251,18 @@
         <view class="right-column" >{{order.refundAmountStr}}</view>
       </view>
     </mp-cell>
+    <mp-cell wx:if="{{order.member && order.member.availableDeposit && order.member.availableDeposit > 0}}"   >
+      <view class="view-row" >
+        <view class="left-column" >【可用储值】</view>
+        <view class="right-column" >{{order.member.availableDepositStr}}</view>
+        <view class="left-column" >【支付租金】</view>
+        <view class="right-column" >
+          <checkbox-group bindchange="setPayWithDeposit"  >
+            <checkbox checked="{{payWithDeposit}}" disabled="{{order.depositPaidAmount > 0}}" ></checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
     <mp-cell>
       <view class="view-row" >
         <view class="left-column" >【实际退款】</view>

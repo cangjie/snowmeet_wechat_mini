@@ -12,7 +12,8 @@ Page({
     currentRentalId: null,
     backDropType: 'null',
     showBackdrop: false,
-    refunding: false
+    refunding: false,
+    payWithDeposit: false
   },
 
   /**
@@ -191,12 +192,16 @@ Page({
     if (order.totalRentUnRefund < 0 && order.totalRentUnRefund > -0.001) {
       order.totalRentUnRefund = 0.001.toFixed(2) * -1
     }
+    if (order.member && order.member.availableDeposit){
+      order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
+    }
     that.setData({
       allSettled, totalGuarantyAmount, totalSummary,
       totalSummaryStr: util.showAmount(totalSummary),
       totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount),
       needToRefund: totalGuarantyAmount - totalSummary,
-      needToRefundStr: util.showAmount(totalGuarantyAmount - totalSummary)
+      needToRefundStr: util.showAmount(totalGuarantyAmount - totalSummary),
+      payWithDeposit: order.depositPaidAmount == 0? false: true
     })
     return order
   },
@@ -206,6 +211,7 @@ Page({
     var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + id + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
+      
       for (var i = 0; order.rentals && i < order.rentals.length; i++) {
         if (order.rentals[i].id == 0) {
           continue
@@ -214,8 +220,18 @@ Page({
           for (var j = 0; j < order.rentals.length; j++) {
             if (order.rentals[j].id == newRental.id) {
               order.rentals[j] = newRental
-              that.renderOrder(order)
-              that.setData({ order })
+              //var member = null
+              if (!order.member_id){
+                that.renderOrder(order)
+                that.setData({ order })
+              }
+              else {
+                data.getMemberPromise(order.member_id, app.globalData.sessionKey).then(function (member){
+                  order.member = member
+                  that.renderOrder(order)
+                  that.setData({ order })
+                })
+              }
               break
             }
           }
@@ -322,34 +338,6 @@ Page({
     var message = ''
     var currentRental = null
     var currentItem = null
-    /*
-    for(var i = 0; order && order.rentals && i < order.rentals.length; i++){
-      for(var j = 0; order.rentals[i].rentItems && j < order.rentals[i].rentItems.length; j++){
-        if (order.rentals[i].rentItems[j].id == id){
-          currentRental = order.rentals[i]
-          currentItem = order.rentals[i].rentItems[j]
-          break
-        }
-      }
-    }
-    for(var i = 0; currentRental && i < currentRental.rentItems.length; i++){
-      if (currentRental.rentItems[i].status != '已归还' && currentRental.rentItems[i].status != '未发放'
-        && currentRental.rentItems[i].id != id){
-        allReturned = false
-      }
-    }
-    if (allReturned){
-      if (currentRental.package_id){
-        message = '套餐【' + currentRental.name + '】中的租赁物，即将全部归还，归还后套餐租金自动结算，此操作不可逆。'
-      }
-      else{
-        message = '即将归还【' + currentRental.name + '】，租金自动结算，此操作不可逆。'
-      }
-    }
-    else{
-      message = '此操作不可逆。'
-    }
-    */
     wx.showModal({
       title: '确认再次发放？',
       content: '发放后，该租赁商品的已结算状态会自动取消。',
@@ -357,7 +345,6 @@ Page({
         if (res.cancel) {
 
         }
-
         if (res.confirm) {
           data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
             that.refreshStatus(newRental)
@@ -424,6 +411,10 @@ Page({
   },
   refund(e) {
     var that = this
+    if (that.data.payWithDeposit == true){
+      that.refundWithDeposit(e)
+      return;
+    }
     if (!that.data.refundAmount) {
       var order = that.data.order
       that.data.refundAmount = order.totalRentUnRefund
@@ -435,6 +426,7 @@ Page({
       })
       return
     }
+
     wx.showModal({
       title: '确认退款',
       content: '退款金额：' + util.showAmount(that.data.refundAmount),
@@ -448,7 +440,6 @@ Page({
           var order = that.data.order
           var refundAmount = parseFloat(that.data.refundAmount)
           for (var i = 0; order && order.availablePayments && i < order.availablePayments.length; i++) {
-            //console.log('refund amount', order.availablePayments[i].unRefundedAmount)
             var paymentUnRefund = parseFloat(order.availablePayments[i].unRefundedAmount.toString())
             if (order.availablePayments[i].status == '支付成功'
               && parseFloat(paymentUnRefund.toFixed(2)) >= parseFloat(refundAmount.toFixed(2))) {
@@ -475,6 +466,63 @@ Page({
               icon: 'success'
             })
           })
+        }
+      }
+    })
+  },
+  refundWithDeposit(e){
+    var that = this
+    var order = that.data.order
+    var title = '储值支付确认'
+    var payAmount = order.totalRentSummaryAmount
+    var refundAmount = order.totalRentUnRefund
+    var content = '储值支付租金' + util.showAmount(payAmount) + '，应退押金：' + util.showAmount(refundAmount)
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          that.setData({refunding: true})
+          data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function(paidOrder){
+            if (paidOrder == null){
+              return
+            }
+            console.log('paid order', paidOrder)
+            var refundAmount = paidOrder.totalRentUnRefund
+            var payment = null
+            for (var i = 0; order && order.availablePayments && i < order.availablePayments.length; i++) {
+              var paymentUnRefund = parseFloat(order.availablePayments[i].unRefundedAmount.toString())
+              if (order.availablePayments[i].status == '支付成功'
+                && parseFloat(paymentUnRefund.toFixed(2)) >= parseFloat(refundAmount.toFixed(2))) {
+                payment = order.availablePayments[i]
+                break
+              }
+            }
+            if (payment == null) {
+              wx.showToast({
+                title: '无可退款支付记录',
+                icon: 'error'
+              })
+              return
+            }
+            var refunds = [{
+              payment_id: payment.id,
+              amount: parseFloat(refundAmount.toFixed(2)),
+              reason: '租赁退押金'
+            }]
+            data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order) {
+              that.getData()
+              wx.showToast({
+                title: '退款成功',
+                icon: 'success'
+              })
+            })
+
+          })  
         }
       }
     })
@@ -611,5 +659,19 @@ Page({
     wx.makePhoneCall({
       phoneNumber: cell,
     })
+  },
+  setPayWithDeposit(e){
+    var that = this
+    var payWithDeposit = e.detail.value.length == 1? true: false
+    //that.setData({payWithDeposit: e.detail.value.length == 1? true: false})
+    var order = that.data.order
+    if (payWithDeposit){
+      order.totalRentUnRefund = order.totalRentUnRefund + order.totalRentSummaryAmount
+    }
+    else{
+      order.totalRentUnRefund = order.totalRentUnRefund - order.totalRentSummaryAmount
+    }
+    order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
+    that.setData({order, payWithDeposit})
   }
 })
