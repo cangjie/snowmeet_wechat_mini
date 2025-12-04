@@ -36,9 +36,9 @@
     <view class="left-column" >总计：</view>
     <view class="right-column" >{{total}}</view>
   </view>
-  <view class="ski-pass-scale" style="border-width: 0rpx;text-align: center;margin-bottom: 0rpx;margin-top: 0rpx;" >
+  <view class="ski-pass-scale" style="border-width: 0rpx;text-align: center;margin-bottom: 0rpx;margin-top: 30rpx;" >
     <view wx:if="{{avaliableCount >= count}}" >
-      <button bindtap="submit" class="input" > 立 即 支 付 </button>
+      <van-button type="primary" bind:click="submit" class="input" > 立 即 支 付 </van-button>
     </view>
     <view wx:else > 预定数量超过当日限制 </view>
   </view>

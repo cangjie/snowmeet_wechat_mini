@@ -163,6 +163,8 @@ Page({
         console.log('get orders', orders)
         that.renderOrders(orders)
         that.setData({ querying: false })
+      }).catch(function (exp){
+        console.log('error', exp)
       })
   },
   query() {
