@@ -36,6 +36,16 @@
       bindinput="setValue" value="{{care.scale}}" />cm
     </view>
   </view>
+  <view class="view-row" style="margin-top: 20rpx;" >
+    <view class="left-column" style="display: flex; font-size: 10pt;align-items: center;" >【优惠券】</view>
+    <view style="display: flex; font-size: 10pt;align-items: center;">
+      (634095672)免费打蜡券
+    </view>
+    <checkbox-group  style="margin-left: 10rpx;">
+      <checkbox style="font-size: 10pt;" >使用</checkbox>
+    </checkbox-group>
+    <van-button type="primary" size="mini" style="margin-left: 20rpx;" >选择其他</van-button>
+  </view>
   <view class="view-row">
     <view class="left-column">【项目】</view>
     <view class="right-column view-row">
@@ -43,8 +53,16 @@
         <checkbox checked="{{care.need_edge == 1}}">修刃</checkbox>
       </checkbox-group>
       <input id="edge_degree" bindinput="setValue" class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1}}" type="number" />度
+    </view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column"></view>
+    <view class="right-column view-row">
+      <checkbox-group  bindchange="setValue" >
+        <checkbox   >机打蜡</checkbox>
+      </checkbox-group>
       <checkbox-group id="need_wax" bindchange="setValue" >
-        <checkbox style="margin-left: 30rpx;" checked="{{care.need_wax == 1}}" >打蜡</checkbox>
+        <checkbox style="margin-left: 30rpx;" checked="{{care.need_wax == 1}}" >热蜡</checkbox>
       </checkbox-group>
       <checkbox-group id="need_unwax" bindchange="setValue" >
         <checkbox style="margin-left: 30rpx;" checked="{{care.need_unwax == 1}}">刮蜡</checkbox>
