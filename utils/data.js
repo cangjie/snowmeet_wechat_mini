@@ -629,6 +629,22 @@ const payWithDepositPromise = function (orderId, sessionKey){
 
   //})
 }
+const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey){
+  var getUrl = app.globalData.requestPrefix + 'Ticket/GetMemberTicketsByStaff/' + memberId + '?sessionKey=' + sessionKey
+  if (bizType != null){
+    getUrl += '&bizType=' + bizType
+  }
+  if (canUse != null){
+    getUrl += '&canUse=' + canUse
+  }
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (tickets){
+      resolve(tickets)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -677,5 +693,6 @@ module.exports = {
   updateCareTaskStatusPromise,
   getPrinterListPromise,
   getMyInfo,
-  payWithDepositPromise
+  payWithDepositPromise,
+  getMemberTicketsPromise
 }
