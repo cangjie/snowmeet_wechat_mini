@@ -81,12 +81,17 @@ Component({
         data.getEquipBrandsPromise('双板').then(function (list) {
           that.setData({ skiBrandList: list })
           data.getEquipBrandsPromise('单板').then(function (list) {
-            that.setData({boardBrandList: list})
+            that.setData({ boardBrandList: list })
             data.getCareOthersServicePromise('双板').then(function (list) {
               that.setData({ skiOthersService: list.map((l) => { return { name: l, checked: false } }) })
               data.getCareOthersServicePromise('单板').then(function (list) {
-                that.setData({othersService: [], boardOthersService: list.map((l) => { return { name: l, checked: false } }) })
+                that.setData({ othersService: [], boardOthersService: list.map((l) => { return { name: l, checked: false } }) })
                 that.loadData(currentCare)
+                data.getMemberTicketsPromise(that.data.order.member_id, '养护', true, app.globalData.sessionKey).then(function (tickets) {
+                  console.log('tickets', tickets)
+                  that.setData({ tickets: tickets })
+                  that.setCateTicket()
+                })
               })
             })
 
@@ -132,7 +137,7 @@ Component({
         }
       }
       var message = util.getCareWellFormMessage(care)
-      that.setData({ brandList, brandSelectIndex, care, othersService, wellFormed: message == ''? true: false })
+      that.setData({ brandList, brandSelectIndex, care, othersService, wellFormed: message == '' ? true : false })
     },
     setValue(e) {
       var that = this
@@ -143,7 +148,7 @@ Component({
       if (!care) {
         care = {}
       }
-      
+
       switch (id) {
         case 'equipment':
           care.equipment = value
@@ -191,10 +196,15 @@ Component({
           break
         case 'need_edge':
           care.need_edge = value.length
-          if (care.edge_degree == undefined || care.edge_degree == null || care.edge_degree == ''){
+          if (care.edge_degree == undefined || care.edge_degree == null || care.edge_degree == '') {
             care.edge_degree = '89'
           }
-          that.getProduct(care)
+          if (care.ticket_code == null) {
+            that.getProduct(care)
+          }
+          else{
+            that.getTicketProduct(care)
+          }
           break
         case 'edge_degree':
           care.edge_degree = value
@@ -202,14 +212,27 @@ Component({
         case 'need_wax':
           care.need_wax = value.length
           care.need_unwax = care.need_wax
-          that.getProduct(care)
+          if (care.need_wax == 1) {
+            care.free_wax = 0
+          }
+          if (care.ticket_code == null) {
+            that.getProduct(care)
+          }
+          else {
+            that.getTicketProduct(care)
+          }
           break
         case 'need_unwax':
           care.need_unwax = value.length
           break
         case 'urgent':
           care.urgent = value.length
-          that.getProduct(care)
+          if (care.ticket_code == null) {
+            that.getProduct(care)
+          }
+          else {
+            that.getTicketProduct(care)
+          }
           break
         case 'othter_services':
           console.log('other services', value)
@@ -225,17 +248,17 @@ Component({
           }
           break
         case 'repair_charge':
-          if (!isNaN(value) && value[value.length - 1]!='.' ) {
+          if (!isNaN(value) && value[value.length - 1] != '.') {
             //needRender = false
             care.repair_charge = parseFloat(value)
             that.computeCharge(care)
           }
-          else{
-            needRender= false
+          else {
+            needRender = false
           }
           break
         case 'discount':
-          if (!isNaN(value) && value[value.length - 1]!='.' ) {
+          if (!isNaN(value) && value[value.length - 1] != '.') {
             //needRender = false
             care.discount = parseFloat(value)
             that.computeCharge(care)
@@ -250,18 +273,48 @@ Component({
         case 'special':
           care.entertain = false
           care.warranty = false
-          if (value == '招待'){
+          if (value == '招待') {
             care.entertain = true
           }
-          if (value == '质保'){
+          if (value == '质保') {
             care.warranty = true
           }
           that.computeCharge(care)
           break
+        case 'ticket':
+          if (e.detail.value.length == 1) {
+            care.ticket_code = care.ticket.code
+            care.ticket.use = true
+            care.free_wax = 1
+            that.getTicketProduct(care)
+          }
+          else {
+            care.ticket_code = null
+            care.ticket.use = false
+            care.free_wax = 0
+            that.getProduct(care)
+          }
+          break
+        case 'free_wax':
+          if (e.detail.value.length == 1) {
+            care.need_wax = 0
+            care.need_unwax = 0
+            care.free_wax = 1
+          }
+          else {
+            care.free_wax = 1
+          }
+          if (care.ticket_code == null) {
+            that.getProduct(care)
+          }
+          else {
+            that.getTicketProduct(care)
+          }
+          break
         default:
           break
       }
-      if (needRender){
+      if (needRender) {
         that.setData({ care })
       }
       e.needRender = needRender
@@ -431,6 +484,7 @@ Component({
           that.setData({ product })
           care.common_charge = product.sale_price
           care.product = product
+          care.product_id = product.id
           that.computeCharge(care)
           that.save()
           that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
@@ -443,6 +497,7 @@ Component({
           that.setData({ product })
           care.common_charge = product.sale_price
           care.product = product
+          care.product_id = product.id
           that.computeCharge(care)
           that.save()
           that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
@@ -450,11 +505,90 @@ Component({
       }
       else {
         care.product = null
+        care.product_id = null
         care.common_charge = 0
         that.computeCharge(care)
         that.save()
         that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
       }
+    },
+    getTicketTemplate(templates, item) {
+      for (var i = 0; i < templates.length; i++) {
+        var prodName = templates[i].product.name
+        switch (item) {
+          case '修刃':
+            if (prodName.indexOf('修刃') >= 0 && prodName.indexOf('打蜡') < 0) {
+              return templates[i]
+            }
+            break
+          case '打蜡':
+            if (prodName.indexOf('修刃') < 0 && prodName.indexOf('打蜡') >= 0) {
+              return templates[i]
+            }
+            break
+          case '双项':
+            if (prodName.indexOf('修刃') >= 0 && prodName.indexOf('打蜡') >= 0) {
+              return templates[i]
+            }
+            break
+          default:
+            break
+        }
+      }
+      return null
+    },
+    getTicketProduct(care) {
+      var that = this
+      var ticket = care.ticket
+      if (ticket.template.productTicketTemplates == null || ticket.template.productTicketTemplates.length == 0) {
+        return
+      }
+      if (care.free_wax == 1) {
+        if (care.need_edge == 1) {
+          var template = that.getTicketTemplate(care.ticket.template.productTicketTemplates, '修刃')
+          if (template != null) {
+            care.product = template.product
+            care.product_id = template.product.id
+            care.common_charge = template.fixed_price
+            that.computeCharge(care)
+            that.save()
+            that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
+          }
+        }
+        else {
+          care.product = null
+          care.product_id = null
+          care.common_charge = 0
+          that.computeCharge(care)
+          that.save()
+          that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
+        }
+      }
+      else{
+        if (care.need_edge == 1) {
+          var template = that.getTicketTemplate(care.ticket.template.productTicketTemplates, '双项')
+          if (template != null) {
+            care.product = template.product
+            care.product_id = template.product.id
+            care.common_charge = template.fixed_price
+            that.computeCharge(care)
+            that.save()
+            that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
+          }
+        }
+        else{
+          var template = that.getTicketTemplate(care.ticket.template.productTicketTemplates, '打蜡')
+          if (template != null) {
+            care.product = template.product
+            care.product_id = template.product.id
+            care.common_charge = template.fixed_price
+            that.computeCharge(care)
+            that.save()
+            that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
+          }
+        }
+      }
+
     },
     computeCharge(care) {
       var that = this
@@ -463,13 +597,13 @@ Component({
       var discount = care.discount ? care.discount : 0
       var summary = commonCharge + repairCharge - discount
       care.summary = summary
-      if (care.warranty == 1 || care.entertain == 1){
+      if (care.warranty == 1 || care.entertain == 1) {
         care.summary = 0
       }
       care.summaryStr = util.showAmount(care.summary)
       that.setData({ care })
     },
-    
+
     save(e) {
       var that = this
       var care = that.data.care
@@ -516,7 +650,7 @@ Component({
         //currentCare = care
         //currentCare.current = 1
       }
-      if (!e || e.needRender == undefined || e.needRender == true){
+      if (!e || e.needRender == undefined || e.needRender == true) {
         that.setData({ order })
       }
       that.triggerEvent('CareOrderUpdate', { order: order, refreshMain: false, refreshFooter: true })
@@ -531,7 +665,7 @@ Component({
       var care = {}
       care.current = 1
       order.cares.push(care)
-      that.setData({ order, care , othersService:[], wellFormed: false})
+      that.setData({ order, care, othersService: [], wellFormed: false })
       console.log('new care', care)
       that.loadData(care)
       that.triggerEvent('CareOrderUpdate', { order: order })
@@ -549,6 +683,32 @@ Component({
         care = order.cares[0]
       }
       return care
+    },
+    setCateTicket() {
+      var that = this
+      var tickets = that.data.tickets
+      if (tickets == null || tickets.length <= 0) {
+        return
+      }
+      var order = that.data.order
+      var care = that.getCurrentCare()
+      var ticket = null
+      for (var j = 0; j < tickets.length; j++) {
+        ticket = tickets[j]
+        var used = false
+        for (var i = 0; order.cares == null && i < order.cares.length; i++) {
+          if (order.cares[i].ticket != null && order.cares[i].ticket.used == true && order.cares[i].ticket.code == ticket.code) {
+            used = true
+            break
+          }
+        }
+        if (used == false) {
+          ticket = tickets[j]
+          break
+        }
+      }
+      care.ticket = ticket
+      that.setData({ care })
     }
   }
 })

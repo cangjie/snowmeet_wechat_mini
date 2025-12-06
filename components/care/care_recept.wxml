@@ -36,15 +36,15 @@
       bindinput="setValue" value="{{care.scale}}" />cm
     </view>
   </view>
-  <view class="view-row" style="margin-top: 20rpx;" >
+  <view class="view-row" style="margin-top: 20rpx;" wx:if="{{care.ticket != null}}}" >
     <view class="left-column" style="display: flex; font-size: 10pt;align-items: center;" >【优惠券】</view>
     <view style="display: flex; font-size: 10pt;align-items: center;">
-      (634095672)免费打蜡券
+      ({{care.ticket.code}}){{care.ticket.name}}
     </view>
-    <checkbox-group  style="margin-left: 10rpx;">
-      <checkbox style="font-size: 10pt;" >使用</checkbox>
+    <checkbox-group  style="margin-left: 10rpx;" id="ticket" bindchange="setValue" >
+      <checkbox style="font-size: 10pt;" checked="{{care.ticket.use == true}}" >使用</checkbox>
     </checkbox-group>
-    <van-button type="primary" size="mini" style="margin-left: 20rpx;" >选择其他</van-button>
+    <!--van-button type="primary" size="mini" style="margin-left: 20rpx;" >选择其他</van-button-->
   </view>
   <view class="view-row">
     <view class="left-column">【项目】</view>
@@ -58,8 +58,8 @@
   <view class="view-row" >
     <view class="left-column"></view>
     <view class="right-column view-row">
-      <checkbox-group  bindchange="setValue" >
-        <checkbox   >机打蜡</checkbox>
+      <checkbox-group  bindchange="setValue" id="free_wax" >
+        <checkbox disabled="{{care.ticket_code == null}}" checked="{{care.free_wax == 1}}" >机打蜡</checkbox>
       </checkbox-group>
       <checkbox-group id="need_wax" bindchange="setValue" >
         <checkbox style="margin-left: 30rpx;" checked="{{care.need_wax == 1}}" >热蜡</checkbox>
