@@ -6,7 +6,7 @@
     <rent-recept wx:if="{{bizType == 'rent'}}" memberId="{{memberId}}" shop="{{shop}}" bindSyncRentData="rentDataUpdated" rentals="{{rentals}}"  ></rent-recept>
     <retail-recept wx:if="{{bizType == 'retail' }}" memberId="{{memberId}}" 
     shop="{{shop}}"  bindSyncRetailOrder="retailOrderUpdate" order="{{retailOrder}}" ></retail-recept>
-    <care-recept wx:if="{{bizType == 'care'}}" order="{{order}}" bindCareOrderUpdate="careOrderUpdate"  ></care-recept>
+    <care-recept wx:if="{{bizType == 'care'}}" order="{{order}}" bindCareOrderUpdate="careOrderUpdate" shop="{{shop}}"  ></care-recept>
   </view>
   <view class="main-frame" wx:else >
     <fire-charge memberId="{{memberId}}" cell="{{cell}}" gender="{{gender}}" 

@@ -8,8 +8,8 @@ Component({
    * Component properties
    */
   properties: {
-    order: Object
-
+    order: Object,
+    shop: String
   },
 
   /**
@@ -32,7 +32,7 @@ Component({
           if (that.properties.order.cares[i].current == 1) {
             that.setData({
               care: that.properties.order.cares[i], currentCareIndex: i,
-              shop: that.properties.order.shop, order: that.properties.order
+              shop: that.properties.shop, order: that.properties.order
             })
             break
           }
@@ -41,21 +41,21 @@ Component({
           order.cares[0].current = 1
           that.setData({
             care: that.data.order.cares[0], currentCareIndex: 0,
-            shop: that.properties.order.shop, order: that.properties.order
+            shop: that.properties.shop, order: that.properties.order
           })
         }
       }
       else {
 
         var order = {
-          shop: '万龙服务中心',
+          shop: that.properties.shop,
           cares: []
         }
         var care = {
           current: 1
         }
         order.cares.push(care)
-        that.setData({ care, order, shop: '万龙服务中心' })
+        that.setData({ care, order, shop: that.properties.shop })
         that.buildImages()
       }
       app.loginPromiseNew.then(function (resolve) {
