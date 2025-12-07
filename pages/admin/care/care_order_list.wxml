@@ -66,38 +66,6 @@
         </fui-col>
       </radio-group>
     </fui-row>
-    <!--fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【类型】</view>
-      </fui-col>
-      <radio-group id="isPackage" bindchange="setQueryOptions">
-        <fui-col span="6">
-          <radio checked="{{true}}" value="false">单店</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="true">套餐</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="null">全部</radio>
-        </fui-col>
-      </radio-group>
-    </fui-row-->
-    <!--fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【挂账】</view>
-      </fui-col>
-      <radio-group id="isOnCredit" bindchange="setQueryOptions">
-        <fui-col span="6">
-          <radio checked="{{true}}" value="false">正常</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="true">挂账</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="null">全部</radio>
-        </fui-col>
-      </radio-group>
-    </fui-row-->
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
         <view class="fui-left-column">【减免】</view>
@@ -206,7 +174,9 @@
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【日期】</view>
             <view class="right-column" style="width: 150rpx;">{{item.dateStr}}</view>
-            <view class="left-column" style="width: 120rpx;">【时间】</view>
+          </view>
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
+            <view class="left-column" >【时间】</view>
             <view class="right-column" style="width: 120rpx;">{{item.timeStr}}</view>
           </view>
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
@@ -218,12 +188,6 @@
             <view class="left-column">【手机】</view>
             <view class="right-column">{{item.customerCell}}</view>
           </view>
-
-       
-          <!--view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【支付类型】</view>
-            <view class="right-column">{{ item.payType }}</view>
-          </view-->
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付方式】</view>
             <view class="right-column">{{ item.payMethod==null? '--' : item.payMethod }}</view>
@@ -231,6 +195,8 @@
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付金额】</view>
             <view class="right-column" style="width: 100rpx;">{{item.paidAmountStr}}</view>
+          </view>
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【退款金额】</view>
             <view class="right-column">{{item.refundAmountStr}}</view>
           </view>
@@ -259,6 +225,11 @@
             <view class="right-column">
               <van-button size="small" type="primary" id="{{index}}" bind:click="gotoDetail"> 查 看 详 细 </van-button>
             </view>
+          </view>
+        </view>
+        <view style="width: 240rpx;">
+          <view wx:for="{{item.cares}}" wx:for-item="care" >
+            <image mode="heightFix" style="width: 220rpx;" wx:if="{{care.careImages.length > 0}}" src="https://snowmeet.wanlonghuaxue.com{{care.careImages[0].image.thumbUrl}}" ></image>
           </view>
         </view>
       </view>

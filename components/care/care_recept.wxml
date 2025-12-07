@@ -36,7 +36,7 @@
       bindinput="setValue" value="{{care.scale}}" />cm
     </view>
   </view>
-  <view class="view-row" style="margin-top: 20rpx;" wx:if="{{care.ticket != null}}}" >
+  <view class="view-row" style="margin-top: 20rpx;" wx:if="{{care.ticket!=null && care.ticket != undefined  }}" >
     <view class="left-column" style="display: flex; font-size: 10pt;align-items: center;" >【优惠券】</view>
     <view style="display: flex; font-size: 10pt;align-items: center;">
       ({{care.ticket.code}}){{care.ticket.name}}
@@ -58,11 +58,11 @@
   <view class="view-row" >
     <view class="left-column"></view>
     <view class="right-column view-row">
-      <checkbox-group  bindchange="setValue" id="free_wax" >
-        <checkbox disabled="{{care.ticket_code == null}}" checked="{{care.free_wax == 1}}" >机打蜡</checkbox>
+      <checkbox-group  bindchange="setValue" id="free_wax" wx:if="{{care.ticket!=null && care.ticket != undefined  }}" >
+        <checkbox style="margin-right: 30rpx;" disabled="{{care.ticket_code == null}}" checked="{{care.free_wax == 1}}" >机打蜡</checkbox>
       </checkbox-group>
       <checkbox-group id="need_wax" bindchange="setValue" >
-        <checkbox style="margin-left: 30rpx;" checked="{{care.need_wax == 1}}" >热蜡</checkbox>
+        <checkbox  checked="{{care.need_wax == 1}}" >热蜡</checkbox>
       </checkbox-group>
       <checkbox-group id="need_unwax" bindchange="setValue" >
         <checkbox style="margin-left: 30rpx;" checked="{{care.need_unwax == 1}}">刮蜡</checkbox>

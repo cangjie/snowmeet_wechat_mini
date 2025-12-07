@@ -10,7 +10,7 @@
       <view wx:if="{{item.title == '南山'}}" >
         <view style="display: flex; flex-direction: row;" >
           <view style="font-size: 11pt;"  >日期：</view>
-          <picker mode="date"   start="{{startDate}}" end="{{endDate}}" bindchange="DateChanged" >
+          <picker mode="date"   start="2025-12-06" end="{{endDate}}" bindchange="DateChanged" >
             <picker-view style="font-size: 11pt;" >{{reserveDate}} {{reserveDateDesc}}</picker-view>
           </picker>
           <radio-group style="margin-left: 20rpx;" bindchange="TagsChange">
