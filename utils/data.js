@@ -479,7 +479,8 @@ const getCareProductPromise = function (shop, service, urgent) {
             resolve(productList[i])
           }
         }
-        if (service != '双项' && productList[i].name.indexOf(service) >= 0) {
+        if (service != '双项' && productList[i].name.indexOf(service) >= 0 
+          && productList[i].name.indexOf('修刃打蜡') < 0) {
           if (productList[i].name.indexOf('次日') >= 0 && urgent != 1) {
             resolve(productList[i])
           }
