@@ -327,10 +327,10 @@ const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type
   if (status != null) {
     qUrl += '&status=' + status
   }
-  if (cell != null && cell != ''){
+  if (cell != null && cell != '') {
     qUrl += '&cell=' + cell
   }
-  if (haveWarranty != null){
+  if (haveWarranty != null) {
     qUrl += '&haveWarranty=' + haveWarranty
   }
   return new Promise(function (resolve, reject) {
@@ -468,22 +468,32 @@ const getCareProductPromise = function (shop, service, urgent) {
   var getUrl = app.globalData.requestPrefix + 'Care/GetProducts?shop=' + encodeURIComponent(shop)
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (productList) {
-      //var product = null
-      for (var i = 0; i < productList.length; i++) {
-        //product = productList[i]
-        if (productList[i].name.indexOf('修刃打蜡') >= 0 && service == '双项') {
-          if (productList[i].name.indexOf('次日') >= 0 && urgent != 1) {
-            resolve(productList[i])
+      if (shop == '万龙体验中心') {
+        for (var i = 0; i < productList.length; i++) {
+          if (productList[i].name.indexOf('修刃打蜡') >= 0 && service == '双项') {
+            if (productList[i].name.indexOf('次日') >= 0 && urgent != 1) {
+              resolve(productList[i])
+            }
+            else if (urgent == 1 && productList[i].name.indexOf('立等') >= 0) {
+              resolve(productList[i])
+            }
           }
-          else if (urgent == 1 && productList[i].name.indexOf('立等') >= 0) {
-            resolve(productList[i])
+          if (service != '双项' && productList[i].name.indexOf(service) >= 0) {
+            if (productList[i].name.indexOf('次日') >= 0 && urgent != 1) {
+              resolve(productList[i])
+            }
+            else if (urgent == 1 && productList[i].name.indexOf('立等') >= 0) {
+              resolve(productList[i])
+            }
           }
         }
-        if (service != '双项' && productList[i].name.indexOf(service) >= 0) {
-          if (productList[i].name.indexOf('次日') >= 0 && urgent != 1) {
+      }
+      else {
+        for (var i = 0; i < productList.length; i++) {
+          if (service == '双项' && productList[i].name.indexOf('修刃打蜡') >= 0){
             resolve(productList[i])
           }
-          else if (urgent == 1 && productList[i].name.indexOf('立等') >= 0) {
+          else if (productList[i].name.indexOf(service) >= 0 && productList[i].name.indexOf('修刃打蜡') < 0) {
             resolve(productList[i])
           }
         }
@@ -505,123 +515,123 @@ const getRentalPromise = function (rentalId, sessionKey) {
   })
 }
 const setRentItemStatsPromise = function (rentItemId, status, sessionKey) {
-  var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemStatus/' + rentItemId.toString() + '?status=' +  encodeURIComponent(status) + '&sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(setUrl, null).then(function (rental){
+  var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemStatus/' + rentItemId.toString() + '?status=' + encodeURIComponent(status) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(setUrl, null).then(function (rental) {
       resolve(rental)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const updateRentalDetailsPromise = function(details, scene, sessionKey) {
-  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalDetails?scene=' + encodeURIComponent(scene) + '&sessionKey='+ sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(updateUrl, details).then(function(rental){
+const updateRentalDetailsPromise = function (details, scene, sessionKey) {
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalDetails?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(updateUrl, details).then(function (rental) {
       resolve(rental)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const refundPromise = function(orderId, refunds, sessionKey){
+const refundPromise = function (orderId, refunds, sessionKey) {
   var refundUrl = app.globalData.requestPrefix + 'Order/Refund/' + orderId.toString() + '?sessionKey=' + sessionKey
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(refundUrl, refunds).then(function(order){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(refundUrl, refunds).then(function (order) {
       resolve(order)
-    }).catch(function(exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const updateRentalPromise = function (rental, scene, sessionKey){
+const updateRentalPromise = function (rental, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(updateUrl, rental).then(function (newRental){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(updateUrl, rental).then(function (newRental) {
       resolve(newRental)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getRentTypePromise = function(){
+const getRentTypePromise = function () {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetRentType'
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (typeList){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (typeList) {
       resolve(typeList)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getRentPriceByIdPromise = function (id){
+const getRentPriceByIdPromise = function (id) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPriceById/' + id.toString()
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function(price){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (price) {
       resolve(price)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const updateCarePromise = function (care, scene, sessionKey){
+const updateCarePromise = function (care, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Care/UpdateCareByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(updateUrl, care).then(function(newCare){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(updateUrl, care).then(function (newCare) {
       resolve(newCare)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey){
+const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Care/SetTaskStatus/' + taskId.toString() + '?status=' + encodeURIComponent(status) + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
-  return new Promise(function(resolve, reject){
-    util.performWebRequest(updateUrl, null).then(function (newCare){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(updateUrl, null).then(function (newCare) {
       resolve(newCare)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const getPrinterListPromise = function(shop, color, sessionKey){
+const getPrinterListPromise = function (shop, color, sessionKey) {
   var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetPrinters?shop=' + encodeURIComponent(shop) + '&color=' + color + '&sessionKey=' + sessionKey
-  return new Promise(function(resolve, reject){
+  return new Promise(function (resolve, reject) {
     wx.request({
       url: getDeviceNameUrl,
       method: 'GET',
-      success:(res)=>{
+      success: (res) => {
         if (res.statusCode == 200) {
           var deviceName = []
-          for(var i = 0; i < res.data.length; i++) {
+          for (var i = 0; i < res.data.length; i++) {
             deviceName.push(res.data[i].name)
           }
           resolve(deviceName)
         }
-        else{
+        else {
           reject()
         }
       }
     })
   })
-  
+
 }
-const getMyInfo = function (sessionKey){
+const getMyInfo = function (sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Member/GetMyInfo?sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (info){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (info) {
       resolve(info)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
 }
-const payWithDepositPromise = function (orderId, sessionKey){
+const payWithDepositPromise = function (orderId, sessionKey) {
   var payUrl = app.globalData.requestPrefix + 'Order/PayWithDeposit/' + orderId + '?sessionKey=' + sessionKey
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(payUrl, null).then(function (order){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(payUrl, null).then(function (order) {
       resolve(order)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
@@ -629,18 +639,18 @@ const payWithDepositPromise = function (orderId, sessionKey){
 
   //})
 }
-const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey){
+const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetMemberTicketsByStaff/' + memberId + '?sessionKey=' + sessionKey
-  if (bizType != null){
+  if (bizType != null) {
     getUrl += '&bizType=' + bizType
   }
-  if (canUse != null){
+  if (canUse != null) {
     getUrl += '&canUse=' + canUse
   }
-  return new Promise(function (resolve, reject){
-    util.performWebRequest(getUrl, null).then(function (tickets){
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (tickets) {
       resolve(tickets)
-    }).catch(function (exp){
+    }).catch(function (exp) {
       reject(exp)
     })
   })
