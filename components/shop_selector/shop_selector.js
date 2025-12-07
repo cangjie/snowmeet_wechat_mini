@@ -36,7 +36,7 @@ Component({
           }
           
 
-          if (that.properties.defaultShop == undefined || that.properties.defaultShop == null || that.properties.defaultShop == ''){
+          if (that.properties.defaultShop == undefined || that.properties.defaultShop == null) {// || that.properties.defaultShop == ' '){
             wx.getFuzzyLocation({
               type: 'wgs84',
               success:(res)=>{

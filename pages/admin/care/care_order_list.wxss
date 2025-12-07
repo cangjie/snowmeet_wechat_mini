@@ -6,7 +6,7 @@
 .right-column{
   margin-top: 0rpx;
   text-align: left;
-  width: 160rpx;
+  width: 190rpx;
 }
 .view-row{
   margin-top: 0rpx;
