@@ -206,7 +206,9 @@
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【日期】</view>
             <view class="right-column" style="width: 150rpx;">{{item.dateStr}}</view>
-            <view class="left-column" style="width: 120rpx;">【时间】</view>
+          </view>
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
+            <view class="left-column" >【时间】</view>
             <view class="right-column" style="width: 120rpx;">{{item.timeStr}}</view>
           </view>
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
@@ -218,12 +220,6 @@
             <view class="left-column">【手机】</view>
             <view class="right-column">{{item.customerCell}}</view>
           </view>
-
-       
-          <!--view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【支付类型】</view>
-            <view class="right-column">{{ item.payType }}</view>
-          </view-->
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付方式】</view>
             <view class="right-column">{{ item.payMethod==null? '--' : item.payMethod }}</view>
@@ -231,6 +227,8 @@
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付金额】</view>
             <view class="right-column" style="width: 100rpx;">{{item.paidAmountStr}}</view>
+          </view>
+          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【退款金额】</view>
             <view class="right-column">{{item.refundAmountStr}}</view>
           </view>
@@ -261,6 +259,7 @@
             </view>
           </view>
         </view>
+        <view style="width: 300rpx;"></view>
       </view>
     </fui-card>
     <view style="height: 20rpx;"></view>

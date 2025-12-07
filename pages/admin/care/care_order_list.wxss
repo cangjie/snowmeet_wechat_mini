@@ -1,8 +1,13 @@
 .left-column{
   text-align: left;
-  width: 190rpx;
+  width: 170rpx;
+  margin-top: 0rpx;
 }
 .right-column{
+  margin-top: 0rpx;
   text-align: left;
-  width: 1350rpx;
+  width: 160rpx;
+}
+.view-row{
+  margin-top: 0rpx;
 }

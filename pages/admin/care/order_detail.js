@@ -871,8 +871,8 @@ Page({
     var id = parseInt(e.currentTarget.id)
     var order = that.data.order
     var careToBePrinted = order.cares[id]
-    careToBePrinted.customerName = order.member.title
-    careToBePrinted.customerCell = order.member.cell
+    careToBePrinted.customerName = order.member == null? '散客' : order.member.title
+    careToBePrinted.customerCell = order.member == null? '' : order.member.cell
     careToBePrinted.shop = order.shop
     that.setData({ showPrint: true, careToBePrinted })
   },
