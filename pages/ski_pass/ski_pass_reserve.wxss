@@ -1,1 +1,7 @@
 /* pages/ski_pass/ski_pass_reserve.wxss */
+.left-column{
+  width: 240rpx;
+}
+.right-column{
+  width: 400rpx
+}

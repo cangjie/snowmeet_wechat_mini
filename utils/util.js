@@ -266,7 +266,7 @@ const getCareWellFormMessage = function (care) {
     && (!care.brand || care.brand == '' || !care.scale || care.scale == '')) {
     return '图片和品牌长度必填其一'
   }
-  if (!care.product && (!care.repair_charge || care.repair_charge == 0)) {
+  if (!care.product && (!care.repair_charge || care.repair_charge == 0 ) && care.free_wax == 0) {
     return '必须选择业务'
   }
   return ''

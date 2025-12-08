@@ -57,13 +57,16 @@ Component({
           services += (services==''?'':',') + '修刃' + care.edge_degree
         }
         if (care.need_wax == 1){
-          services += (services==''?'':',') + '打蜡' 
+          services += (services==''?'':',') + '热蜡' 
         }
         if (care.need_unwax == 1){
           services += (services==''?'':',') + '刮蜡' 
         }
         if (care.repair_memo && care.repair_memo != ''){
           services += care.repair_memo
+        }
+        if (care.free_wax==1){
+          services += (services==''?'':',') + '机打蜡' 
         }
         if (care.urgent == 1){
           services += '加急'
@@ -119,17 +122,6 @@ Component({
         care.id = 0
         care.order_id = order.id
         care.valid = 1
-        /*
-        if (care.repair_memo && care.repair_memo != ''){
-          care.need_repair = 1
-        }
-        if (care.need_repair == 1 && care.repair_charge <= 0){
-          haveFreeRepair = true
-        }
-        
-        if ((care.repair_memo && care.repair_memo != '' ) || (care.repair_charge && care.repair_charge > 0)){
-          care.need_repair = 1
-        }*/
         if (care.repair_memo && care.repair_memo != ''){
           care.need_repair = 1
         }

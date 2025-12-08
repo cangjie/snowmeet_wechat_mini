@@ -693,22 +693,24 @@ Component({
       var order = that.data.order
       var care = that.getCurrentCare()
       var ticket = null
-      for (var j = 0; j < tickets.length; j++) {
+      for (var j = 0; tickets != null && j < tickets.length; j++) {
         ticket = tickets[j]
-        var used = false
-        for (var i = 0; order.cares == null && i < order.cares.length; i++) {
-          if (order.cares[i].ticket != null && order.cares[i].ticket.used == true && order.cares[i].ticket.code == ticket.code) {
-            used = true
+        var use = false
+        for (var i = 0; order.cares != null && i < order.cares.length; i++) {
+          if (order.cares[i].ticket != null && order.cares[i].ticket.use == true && order.cares[i].ticket_code == ticket.code) {
+            use = true
             break
           }
         }
-        if (used == false) {
+        if (use == false) {
           ticket = tickets[j]
           break
         }
       }
-      care.ticket = ticket
-      that.setData({ care })
+      if (care.ticket_code == null){
+        care.ticket = ticket
+        that.setData({ care })
+      }
     }
   }
 })
