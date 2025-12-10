@@ -271,10 +271,11 @@
               <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>
             </view>
             <view wx:if="{{item.veriType == '凭证拍照'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-              bbb
+              <van-uploader  file-list="{{item.pickImage}}" bind:after-read="afterReadPick" capture="['album', 'camera']" 
+              bind:delete="delImagePick" max-count="1" id="{{index}}"  show-upload="{{true}}" deletable="{{true}}" />
             </view>
             <view wx:if="{{item.veriType == '店长确认'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-              ccc
+              <van-button type="danger" bind:click="masterFinish" id="{{index}}" disabled="{{staff.title_level < 200 }}"  > 店 长 确 认 </van-button>
             </view>
           </mp-cell>
           <block wx:if="{{task.status == '已完成'}}" >
@@ -294,56 +295,14 @@
                 <view class="right-column" >{{task.memo}}</view>
               </view>
             </mp-cell>
+            <mp-cell>
+              <view class="view-row" style="justify-content: center;" >
+                <image src="https://snowmeet.wanlonghuaxue.com{{item.pickImage.thumb}}" style="width: 300rpx;" ></image>
+              </view>
+            </mp-cell>
           </block>
-          
         </block>
       </mp-cells>
-      <!--
-      <mp-cells title="安全检查" >
-        <mp-cell>
-          <view class="view-row" >
-            <view class="left-column" >【身高】</view>
-            <view class="right-column" ></view>
-            <block wx:if="{{item.equipment == '双板'}}" >
-            <view class="left-column" >【体重】</view>
-            <view class="right-column" ></view>
-          </block>
-          <block wx:else >
-            <view class="left-column" >【间距】</view>
-            <view class="right-column" ></view>
-          </block>
-          </view>
-        </mp-cell>
-        <mp-cell wx:if="{{item.equipment == '双板'}}" >
-          <view class="view-row" >
-            <view class="left-column" >【脱落值】</view>
-            <view class="right-column view-row" style="width: 550rpx;align-items: center;" >
-              前：<input class="input" style="width: 75rpx;margin-right: 50rpx;" /> 
-              后：<input class="input" style="width: 75rpx;" /> 
-            </view>
-            
-          </view>
-        </mp-cell>
-        <mp-cell wx:else >
-          <view class="view-row" >
-            <view class="left-column" >【角度】</view>
-            <view class="right-column view-row" style="width: 550rpx;align-items: center;" >
-              左：<input class="input" style="width: 75rpx;margin-right: 50rpx;" /> 
-              右：<input class="input" style="width: 75rpx;" /> 
-            </view>
-            
-          </view>
-        </mp-cell>
-        <mp-cell>
-          <view class="view-row" >
-            <view class="left-column" >【备注】</view>
-            <view class="right-column" >
-              <input style="width: 480rpx;" class="input" />
-            </view>
-          </view>
-        </mp-cell>
-      </mp-cells>
-      -->
     </van-tab>
   </van-tabs>
   <view style="height: 100rpx;" ></view>

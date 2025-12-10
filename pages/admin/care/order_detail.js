@@ -22,13 +22,13 @@ Page({
     if (q) {
       var orderId = util.parseQuery(q, 'orderId')
       var careId = util.parseQuery(q, 'careId')
-      if (orderId){
+      if (orderId) {
         that.data.orderId = orderId
       }
-      if (careId){
+      if (careId) {
         that.data.careId = careId
       }
-      that.setData({q})
+      that.setData({ q })
     }
     else {
       if (options.orderId) {
@@ -76,6 +76,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function (resovle) {
       that.getData()
+      that.setData({staff: app.globalData.staff})
 
     }).catch(function (exp) {
       console.log('promise error', exp)
@@ -122,9 +123,9 @@ Page({
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
       var activeTabIndex = 0
-      if (that.data.careId){
-        for(var i = 0; i < order.cares.length; i++){
-          if(order.cares[i].id == that.data.careId){
+      if (that.data.careId) {
+        for (var i = 0; i < order.cares.length; i++) {
+          if (order.cares[i].id == that.data.careId) {
             activeTabIndex = i
             break
           }
@@ -211,7 +212,7 @@ Page({
           }
         }
         else {
-          if (task.status == '未开始' && (care.tasks[j - 1].status == '已完成' || care.tasks[j - 1].status == '强行中止' )) {
+          if (task.status == '未开始' && (care.tasks[j - 1].status == '已完成' || care.tasks[j - 1].status == '强行中止')) {
             task.current = true
           }
           else if (task.status == '已开始') {
@@ -223,6 +224,8 @@ Page({
         }
       }
       order = that.buildImages(order, i)
+      //order = that.buildPickImages(order, i)
+
     }
     return order
   },
@@ -282,6 +285,134 @@ Page({
           })
       })
   },
+  afterReadPick(e) {
+    console.log('photo uploaded', e)
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[index]
+    var uploadFile = e.detail.file
+    var images = [care.pickImage]
+    if (!care.pickImage) {
+      //care.pickImages = []
+      images = [care.pickImage]
+    }
+    /*
+    var image = {
+      id: 0,
+      care_id: care.id,
+      image_id: 0,
+      status: 'uploading',
+      message: '上传中',
+      image: {
+        id: 0,
+        file_path_name: uploadFile.tempFilePath,
+        thumb: uploadFile.thumb,
+        thumbUrl: uploadFile.thumb,
+        file_type: uploadFile.type,
+        care_id: care.id
+      }
+    }
+    */
+    var image = {
+      id: 0,
+      file_path_name: uploadFile.tempFilePath,
+      thumb: uploadFile.thumb,
+      thumbUrl: uploadFile.thumb,
+      file_type: uploadFile.type,
+      care_id: care.id
+    }
+    images.push(image)
+    care.pickImage = image
+    var imageIndex = 0//order.cares[index].pickImages.length - 1
+    order = that.buildPickImages(order, index)
+    that.setData({ order })
+    wx.showToast({
+      title: '正在上传',
+      icon: 'loading'
+    })
+    data.uploadFilePromise(null, uploadFile.tempFilePath, '养护取板', uploadFile.type, app.globalData.sessionKey)
+      .then(function (uploadedFile) {
+        console.log('file uploaded', uploadedFile)
+        var image = order.cares[index].pickImage
+        image.id = uploadedFile.id
+        image.url = uploadedFile.file_path_name
+        image.thumb = uploadedFile.file_path_name
+        image.type = uploadedFile.file_type
+        wx.showToast({
+          title: '正在上传',
+          icon: 'loading'
+        })
+        data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
+          .then(function (uploadThumbFile) {
+            console.log('thumb uploaded', uploadThumbFile)
+            var care = order.cares[index]
+            var image = care.pickImage
+            image.id = uploadThumbFile.id
+            image.thumb = uploadThumbFile.thumbUrl
+            image.status = 'success'
+            image.message = ''
+            image.image = uploadThumbFile
+            //order = that.buildPickImages(order, index)
+            //that.setData({ order })
+            care.pick_image_id = image.id
+            wx.showToast({
+              title: '正在上传',
+              icon: 'loading'
+            })
+            care.tasks[care.tasks.length - 1].pick_image_id = image.id
+            var setUrl = app.globalData.requestPrefix + 'Care/SetPickImageId/' + care.id.toString() + '?imageId=' + image.id + '&sessionKey=' + app.globalData.sessionKey
+            util.performWebRequest(setUrl, null).then(function (newOrder) {
+              data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '上传照片取板', app.globalData.sessionKey).then(function (newCare) {
+                for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
+                  if (order.cares[j].id == newCare.id) {
+                    order.cares[j] = newCare
+                    //that.getData()
+
+                    //that.setData({ order })
+                    wx.showToast({
+                      title: '拍照发板完成',
+                      icon: 'success'
+                    })
+                  }
+                }
+              })
+            })
+
+
+
+
+            /*
+                        data.updateCarePromise(care, '保存发板的照片', app.globalData.sessionKey).then(function (newCare) {
+                          order.cares[index] = newCare
+                          that.renderOrder(order)
+                          order.cares[index].moddingBaseInfo = false
+                          that.setData({ order })
+                          wx.showToast({
+                            title: '正在上传',
+                            icon: 'loading'
+                          })
+                          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '上传照片取板', app.globalData.sessionKey).then(function (newCare) {
+                            for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
+                              if (order.cares[j].id == newCare.id) {
+                                order.cares[j] = newCare
+                                that.getData()
+            
+                                //that.setData({ order })
+                                wx.showToast({
+                                  title: '拍照发板完成',
+                                  icon: 'success'
+                                })
+                              }
+                            }
+                          })
+                          
+                        })
+                        */
+          }).catch(function (exp) {
+          })
+      })
+  },
   buildImages(order, index) {
     //var that = this
     //var order = that.data.order
@@ -312,6 +443,29 @@ Page({
     return order
     //that.setData({ order })
     //that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
+  },
+  buildPickImages(order, index) {
+    var care = order.cares[index]
+    if (!care) {
+      care = {}
+    }
+    if (!care.pickImages) {
+      care.pickImages = []
+    }
+    var image = care.pickImage
+    if (image.thumb.indexOf('http') == 0) {
+      image.thumb = image.thumb
+    }
+    else {
+      image.thumb = 'https://snowmeet.wanlonghuaxue.com' + image.thumb
+    }
+    if (image.file_path_name.indexOf('http') == 0) {
+      image.url = image.file_path_name
+    }
+    else {
+      image.url = 'https://snowmeet.wanlonghuaxue.com' + image.file_path_name
+    }
+    return order
   },
   setModBaseInfo(e) {
     var that = this
@@ -348,9 +502,9 @@ Page({
     //var brandName = null
     if (care.equipment == '双板') {
       care.brand = that.data.skiBrandList[parseInt(e.detail.value)].displayedName
-      if (parseInt(e.detail.value) == that.data.skiBrandList.length - 1){
+      if (parseInt(e.detail.value) == that.data.skiBrandList.length - 1) {
         //care.brand = that.data.skiBrandList[parseInt(e.detail.value)].displayedName
-        that.setData({addNewBrand: true})
+        that.setData({ addNewBrand: true })
         //return
       }
       /*
@@ -361,9 +515,9 @@ Page({
     }
     else {
       care.brand = that.data.boardBrandList[parseInt(e.detail.value)].displayedName
-      if (parseInt(e.detail.value) == that.data.boardBrandList.length - 1){
+      if (parseInt(e.detail.value) == that.data.boardBrandList.length - 1) {
 
-        that.setData({addNewBrand: true})
+        that.setData({ addNewBrand: true })
         //return
       }
       /*
@@ -871,8 +1025,8 @@ Page({
     var id = parseInt(e.currentTarget.id)
     var order = that.data.order
     var careToBePrinted = order.cares[id]
-    careToBePrinted.customerName = order.member == null? '散客' : order.member.title
-    careToBePrinted.customerCell = order.member == null? '' : order.member.cell
+    careToBePrinted.customerName = order.member == null ? '散客' : order.member.title
+    careToBePrinted.customerCell = order.member == null ? '' : order.member.cell
     careToBePrinted.shop = order.shop
     that.setData({ showPrint: true, careToBePrinted })
   },
@@ -880,14 +1034,14 @@ Page({
     var that = this
     that.setData({ showPrint: false })
   },
-  cancelAddNewBrand(e){
+  cancelAddNewBrand(e) {
     var that = this
-    that.setData({addNewBrand: false})
+    that.setData({ addNewBrand: false })
     that.data.newBrandName = null
     that.data.newBrandChineseName = null
     that.getData()
   },
-  confirmAddNewBrand(e){
+  confirmAddNewBrand(e) {
     var that = this
     var id = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -914,14 +1068,14 @@ Page({
             displayedName: '新增品牌'
           }
           boardBrandList.push(unknownBrand)
-          for(var i = 0; i < boardBrandList.length; i++){
-            if (boardBrandList[i].brand_name == that.data.newBrandName){
+          for (var i = 0; i < boardBrandList.length; i++) {
+            if (boardBrandList[i].brand_name == that.data.newBrandName) {
               care.brand = boardBrandList[i].displayedName
             }
           }
           //var brandList = boardBrandList
-          order.cares[id]=care
-          that.setData({ boardBrandList, order, addNewBrand:false, newBrandName: null, newBrandChineseName: null })
+          order.cares[id] = care
+          that.setData({ boardBrandList, order, addNewBrand: false, newBrandName: null, newBrandChineseName: null })
           break
         case '双板':
           var skiBrandList = brandList
@@ -934,13 +1088,13 @@ Page({
             displayedName: '新增品牌'
           }
           skiBrandList.push(unknownBrand)
-          for(var i = 0; i < skiBrandList.length; i++){
-            if (skiBrandList[i].brand_name == that.data.newBrandName){
+          for (var i = 0; i < skiBrandList.length; i++) {
+            if (skiBrandList[i].brand_name == that.data.newBrandName) {
               care.brand = skiBrandList[i].displayedName
             }
           }
-          order.cares[id]=care
-          that.setData({ skiBrandList, order, addNewBrand:false, newBrandName: null, newBrandChineseName: null })
+          order.cares[id] = care
+          that.setData({ skiBrandList, order, addNewBrand: false, newBrandName: null, newBrandChineseName: null })
           break
         default:
           break
@@ -948,18 +1102,48 @@ Page({
     })
 
   },
-  setBrandName(e){
+  setBrandName(e) {
     var that = this
     that.data.newBrandName = e.detail.value
   },
-  setBrandChineseName(e){
+  setBrandChineseName(e) {
     var that = this
     that.data.newBrandChineseName = e.detail.value
   },
-  call(e){
+  call(e) {
     var cell = e.currentTarget.id
     wx.makePhoneCall({
       phoneNumber: cell,
+    })
+  },
+  masterFinish(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[id]
+    wx.showModal({
+      title: '确认发板',
+      content: '请核实取板人和会员本人的关系。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '店长确认', app.globalData.sessionKey).then(function (newCare) {
+            for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
+              if (order.cares[j].id == care.id) {
+                order.cares[j] = newCare
+                that.setData({ order })
+                wx.showToast({
+                  title: '顾客是本人发板',
+                  icon: 'success'
+                })
+              }
+            }
+          })
+        }
+      }
     })
   }
 })
