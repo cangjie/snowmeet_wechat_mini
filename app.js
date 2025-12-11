@@ -76,7 +76,7 @@ App({
               //resolve(app.globalData)
               const env = wx.getAccountInfoSync()
               app.globalData.env = env.miniProgram.envVersion
-              if (app.globalData.staff && app.globalData.env != 'develop') {
+              if (app.globalData.staff && app.globalData.env != 'develop' && app.globalData.scene == '1001') {
                 wx.redirectTo({
                   url: '/pages/admin/admin',
                 })
@@ -90,7 +90,7 @@ App({
               catch (err) {
                 console.log('get sys info sync fail', err)
               }
-              if (app.globalData.staff) {
+              if (app.globalData.staff && app.globalData.scene == '1001' ) {
                 wx.redirectTo({
                   url: '/pages/admin/admin',
                 })
