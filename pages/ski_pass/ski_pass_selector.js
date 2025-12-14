@@ -51,7 +51,7 @@ Page({
 
       var startDate = util.formatDate(reserveDate)
       var endDate = new Date()
-      endDate.setDate(endDate.getDate() + 5)
+      endDate.setDate(endDate.getDate() + 8)
 
       if (util.formatTimeStr(new Date()) > '16:00:00'){
         reserveDate.setDate(reserveDate.getDate() + 1)

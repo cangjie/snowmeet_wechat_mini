@@ -497,6 +497,20 @@ const getCareProductPromise = function (shop, service, urgent) {
           }
         }
       }
+      else{
+        for (var i = 0; i < productList.length; i++) {
+          if (productList[i].name.indexOf('修刃打蜡') >= 0 && service == '双项') {
+            resolve(productList[i])
+          }
+          if (service != '双项' && productList[i].name.indexOf(service) >= 0 && productList[i].name.indexOf('修刃打蜡') < 0) {
+            resolve(productList[i])
+          }
+        }
+        if (service != '双项' && productList[i].name.indexOf(service) >= 0 
+          && productList[i].name.indexOf('修刃打蜡') < 0) {
+          resolve(productList[i])
+        }
+      }
       resolve(null)
     }).catch(function (exp) {
       reject(exp)

@@ -28,13 +28,23 @@ App({
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
+    //const app = getApp()
+    if (res.query.staffId){
+      util.referStafffId = res.query.staffId
+    }
+    
+
   },
   loginPromiseNew: new Promise(function (resolve) {
+    var that = this
     var app = getApp();
     console.log('start to log in.')
     wx.login({
       success: (res) => {
         const app = getApp()
+        if (util.referStafffId){
+          app.globalData.referStaffId = util.referStafffId
+        }
         const env = wx.getAccountInfoSync()
         app.globalData.env = env.miniProgram.envVersion
         if (!app.globalData.env || app.globalData.env == ''){
