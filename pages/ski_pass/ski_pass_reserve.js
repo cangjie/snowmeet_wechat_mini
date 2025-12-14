@@ -170,7 +170,7 @@ Page({
     if (!valid){
       return
     }
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/ReserveSkiPass/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date)) + '&count=' + that.data.count + '&cell='  + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + (that.data.memberId?'&refereeMemberId=' + that.data.memberId: '')
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/ReserveSkiPass/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date)) + '&count=' + that.data.count + '&cell='  + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + (app.globalData.referStaffId?'&staffId=' + app.globalData.referStaffId: '')
     wx.request({
       url: submitUrl,
       method: 'GET',
