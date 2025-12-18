@@ -121,7 +121,7 @@
             <view class="left-column">【备注】</view>
             <view  class="right-column" style="width: 75%;" >
               <input class="input" disabled="{{item.moddingMemo!=true}}" 
-              id="{{index}}" value="{{item.memo}}" bindblur="setMemo" ></input>
+              id="{{index}}" value="{{item.memo}}" bindinput="setMemo" ></input>
             </view>
           </view>
         </mp-cell>

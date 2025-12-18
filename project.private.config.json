@@ -5,7 +5,7 @@
         {
           "name": "雪票",
           "pathName": "pages/ski_pass/ski_pass_selector",
-          "query": "resort=%e4%b8%87%e9%be%99&staffId=28",
+          "query": "resort=%e4%b8%87%e9%be%99&staffId=8",
           "scene": null,
           "launchMode": "default"
         },
