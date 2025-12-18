@@ -161,6 +161,34 @@ Component({
     },
     confirmOrder(e){
       var that = this
+      var order = that.data.order
+      var msg = ''
+      for(var i = 0; order.cares != null && i < order.cares.length; i++){
+        if (order.cares[i].careImages == null || order.cares[i].careImages.length == 0){
+          msg = order.cares[i].brand + ' ' + order.cares[i].scale + ' 未上传照片，是否继续下单？'
+          break
+        }
+      }
+      if (msg!=''){
+        wx.showModal({
+          title: '缺少照片',
+          content: msg,
+          complete: (res) => {
+            if (res.cancel) {
+              
+            }
+            if (res.confirm) {
+              that.placeOrderReal(e)
+            }
+          }
+        })
+      }
+      else{
+        that.placeOrderReal(e)
+      }
+    },
+    placeOrderReal(e){
+      var that = this
       that.setData({paying: true})
       var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(postUrl, that.data.order).then(function (order){
