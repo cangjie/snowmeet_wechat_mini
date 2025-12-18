@@ -174,6 +174,15 @@ Page({
       }
 
     }
+    if (order.closed == 1){
+      var closeDate = new Date(order.close_date)
+      order.close_dateDateStr = util.formatDate(closeDate)
+      order.close_dateTimeStr = util.formatTimeStr(closeDate)
+    }
+    else{
+      order.close_dateDateStr = '--'
+      order.close_dateTimeStr = '--'
+    }
     order.packageNum = packageNum
     order.categoryNum = order.rentals.length - packageNum
     order.paidAmountStr = util.showAmount(order.paidAmount)

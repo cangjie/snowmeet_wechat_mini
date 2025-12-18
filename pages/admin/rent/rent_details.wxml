@@ -34,6 +34,14 @@
     </mp-cell>
     <mp-cell>
       <view class="view-row">
+        <view class="left-column">【关闭日期】</view>
+        <view class="right-column">{{order.close_dateDateStr}}</view>
+        <view class="left-column">【关闭时间】</view>
+        <view class="right-column">{{order.close_dateTimeStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
         <view class="left-column">【单品数量】</view>
         <view class="right-column">{{order.categoryNum}}</view>
         <view class="left-column">【套餐数量】</view>
@@ -270,7 +278,7 @@
           <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" value="{{order.totalRentUnRefund}}" />
           <view style="height: 20rpx;" ></view>
           <van-button type="danger" size="mini" style="margin-top: 20rpx;" 
-            bind:click="refund" disabled="{{refunding}}" >退款</van-button>
+            bind:click="refund" disabled="{{refunding || order.closed == 1}}" >退款</van-button>
         </view>
       </view>
     </mp-cell>
