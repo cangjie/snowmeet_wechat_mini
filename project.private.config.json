@@ -143,5 +143,8 @@
       ]
     }
   },
-  "libVersion": "3.5.8"
+  "libVersion": "3.5.8",
+  "setting": {
+    "urlCheck": true
+  }
 }

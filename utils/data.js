@@ -668,6 +668,20 @@ const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey)
     })
   })
 }
+const getUnreturnedRentItemPromise = function (shop, sessionKey){
+
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetUnReturnedRentItemsByStaff?sessionKey=' + sessionKey
+  if (shop!=null){
+    getUrl = app.globalData.requestPrefix + 'Rent/GetUnReturnedRentItemsByStaff?shop=' + encodeURIComponent(shop) + '&sessionKey=' + sessionKey
+  }
+  return new Promise(function (resolve, reject){
+    util.performWebRequest(getUrl, null).then(function (rentItems){
+      resolve(rentItems)
+    }).catch(function (exp){
+      reject(exp)
+    })
+  })
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -717,5 +731,6 @@ module.exports = {
   getPrinterListPromise,
   getMyInfo,
   payWithDepositPromise,
-  getMemberTicketsPromise
+  getMemberTicketsPromise,
+  getUnreturnedRentItemPromise
 }

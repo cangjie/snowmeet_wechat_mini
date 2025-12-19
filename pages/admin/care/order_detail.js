@@ -264,10 +264,13 @@ Page({
       .then(function (uploadedFile) {
         console.log('file uploaded', uploadedFile)
         var image = order.cares[index].careImages[imageIndex]
+        image.image = uploadedFile
         image.image_id = uploadedFile.id
         image.url = uploadedFile.file_path_name
         image.thumb = uploadedFile.file_path_name
         image.type = uploadedFile.file_type
+        order = that.buildImages(order, index)
+        that.setData({ order })
         data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
           .then(function (uploadThumbFile) {
             console.log('thumb uploaded', uploadThumbFile)
@@ -426,11 +429,11 @@ Page({
 
     for (var i = 0; i < care.careImages.length; i++) {
       var image = care.careImages[i]
-      if (image.image.thumb.indexOf('http') == 0) {
-        image.thumb = image.image.thumb
+      if (image.image.thumbUrl.indexOf('http') == 0) {
+        image.thumb = image.image.thumbUrl
       }
       else {
-        image.thumb = 'https://snowmeet.wanlonghuaxue.com' + image.image.thumb
+        image.thumb = 'https://snowmeet.wanlonghuaxue.com' + image.image.thumbUrl
       }
       if (image.image.file_path_name.indexOf('http') == 0) {
         image.url = image.image.file_path_name
@@ -702,7 +705,14 @@ Page({
     var that = this
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
-    //var care = order.cares[index]
+    var care = order.cares[index]
+    if (care.careImages == null || care.careImages.length <= 0){
+      wx.showToast({
+        title: '必须传照片',
+        icon: 'error'
+      })
+      return
+    }
     wx.showModal({
       title: '安全检查确认',
       content: '确认所填参数皆为真实准确的数值，您将成为顾客本次养护的安全负责人。',
