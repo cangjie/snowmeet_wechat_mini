@@ -259,7 +259,7 @@ Page({
     images.push(image)
     var imageIndex = order.cares[index].careImages.length - 1
     order = that.buildImages(order, index)
-    that.setData({ order })
+    //that.setData({ order })
     data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
       .then(function (uploadedFile) {
         console.log('file uploaded', uploadedFile)
@@ -270,6 +270,7 @@ Page({
         image.thumb = uploadedFile.file_path_name
         image.type = uploadedFile.file_type
         order = that.buildImages(order, index)
+        care.moddingBaseInfo = true
         that.setData({ order })
         data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
           .then(function (uploadThumbFile) {
@@ -282,9 +283,10 @@ Page({
             image.message = ''
             image.image = uploadThumbFile
             order = that.buildImages(order, index)
+            care.moddingBaseInfo = true
             that.setData({ order })
           }).catch(function (exp) {
-
+            console.log('upload error', exp)
           })
       })
   },
@@ -853,7 +855,32 @@ Page({
     if (veriType == '本人扫码') {
       that.createQrCode(care.id)
     }
+    if (veriType == '验证码'){
+      wx.showModal({
+        title: '即将发送验证码',
+        content: '验证码会通过公众号消息的形式发送给【' + that.data.order.member.title + '】手机号【' + that.data.order.member.cell + '】',
+        complete: (res) => {
+          if (res.cancel) {
+            
+          }
+      
+          if (res.confirm) {
+            that.createVeriCode(care.id)      
+          }
+        }
+      })
+      
+    }
     that.setData({ order })
+  },
+  createVeriCode(id){
+    var veriUrl = app.globalData.requestPrefix + 'Care/CreateVerifyCode/' + id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(veriUrl, null).then(function(care){
+      wx.showToast({
+        title: '发送成功',
+        icon: 'success'
+      })
+    })
   },
   createQrCode(id) {
     var that = this
@@ -1152,6 +1179,32 @@ Page({
               }
             }
           })
+        }
+      }
+    })
+  },
+  setVeriCode(e){
+    var that = this
+    that.data.veriCode = e.detail.value
+  },
+  pickVeriCode(e){
+    var that = this
+    var code = that.data.veriCode
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var care = order.cares[id]
+    var veriUrl = app.globalData.requestPrefix + 'Care/VeriCareFinishCode/' + care.id.toString() + '?code=' + code + '&sessionKey=' + app.globalData.sessionKey
+    that.setData({veriCode: ''})
+    util.performWebRequest(veriUrl, null).then(function (newCare){
+      for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
+        if (order.cares[j].id == care.id) {
+          order.cares[j] = newCare
+          that.setData({ order })
+          wx.showToast({
+            title: '验证通过',
+            icon: 'success'
+          })
+          
         }
       }
     })
