@@ -190,6 +190,9 @@ Page({
       case 'rent_unreturned':
         path = '/pages/admin/rent/unreturned'
         break
+      case 'rent_search_fuzzy':
+        path = '/pages/admin/rent/search_fuzzy'
+        break
       case 'maintain_in_stock':
         path = '/pages/admin/maintain/maintain_in_stock'
         break

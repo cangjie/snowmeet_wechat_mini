@@ -114,7 +114,8 @@
     "pages/admin/fire/fire_order_detail",
     "pages/admin/rent/new_rent_list",
     "pages/admin/care/care_order_list",
-    "pages/admin/care/order_detail"
+    "pages/admin/care/order_detail",
+    "pages/admin/rent/search_fuzzy"
   ],
   "window": {
     "backgroundTextStyle": "light",
