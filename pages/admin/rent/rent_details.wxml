@@ -162,8 +162,13 @@
             <view class="view-row">
               <view class="left-column">【编码】</view>
               <view class="right-column">{{item.noNeed == true ? '--' : (item.noCode == true? '无编码' : item.code)}}</view>
+              
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row">
               <view class="left-column">【分类】</view>
-              <view class="right-column">{{item.noNeed == true ? '' : item.category.name}}</view>
+              <view class="right-column" style="width: 550rpx;">{{item.noNeed == true ? '' : item.category.name}}</view>
             </view>
           </mp-cell>
           <mp-cell>
