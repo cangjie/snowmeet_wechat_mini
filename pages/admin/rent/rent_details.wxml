@@ -162,7 +162,6 @@
             <view class="view-row">
               <view class="left-column">【编码】</view>
               <view class="right-column">{{item.noNeed == true ? '--' : (item.noCode == true? '无编码' : item.code)}}</view>
-              
             </view>
           </mp-cell>
           <mp-cell>
@@ -278,14 +277,16 @@
     </mp-cell>
     <mp-cell>
       <view class="view-row" >
-        <view class="left-column" >【实际退款】</view>
-        <view class="right-column" >
+        <view class="left-column view-row" style="align-items: center;height: 50rpx;" >【实际退款】</view>
+        <view class="right-column view-row" style="align-items: center; width: 450rpx;height: 50rpx;" >
           <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" value="{{order.totalRentUnRefund}}" />
-          <view style="height: 20rpx;" ></view>
-          <van-button type="danger" size="mini" style="margin-top: 20rpx;" 
-            bind:click="refund" disabled="{{refunding || order.closed == 1}}" >退款</van-button>
+          <van-button type="danger" size="mini" style="margin-left: 100rpx;" bind:click="refund" disabled="{{refunding || order.closed == 1}}" > 退 款 </van-button>
+          
         </view>
       </view>
+    </mp-cell>
+    <mp-cell>
+      <view style="height: 100rpx;"  ></view>
     </mp-cell>
   </mp-cells>
   <fui-backdrop show="{{showBackdrop}}" closable >

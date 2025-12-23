@@ -418,6 +418,7 @@ Page({
       that.setData({ refundAmount: value })
     }
   },
+
   refund(e) {
     var that = this
     if (that.data.payWithDeposit == true){

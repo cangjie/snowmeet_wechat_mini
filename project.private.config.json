@@ -3,23 +3,23 @@
     "miniprogram": {
       "list": [
         {
-          "name": "雪票",
-          "pathName": "pages/ski_pass/ski_pass_selector",
-          "query": "resort=%e4%b8%87%e9%be%99&staffId=8",
+          "name": "南山验票",
+          "pathName": "pages/admin/ski_pass/nanshan_verify",
+          "query": "memberId=17621",
           "scene": null,
           "launchMode": "default"
         },
         {
-          "name": "顾客支付",
-          "pathName": "pages/order/payment_entry",
-          "query": "paymentId=34365",
+          "name": "雪票",
+          "pathName": "pages/ski_pass/ski_pass_selector",
+          "query": "resort=%e4%b8%87%e9%be%99&staffId=8",
           "launchMode": "default",
           "scene": null
         },
         {
           "name": "顾客支付",
           "pathName": "pages/order/payment_entry",
-          "query": "paymentId=34172",
+          "query": "paymentId=34365",
           "launchMode": "default",
           "scene": null
         },
