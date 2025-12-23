@@ -1,8 +1,10 @@
 .left-column{
   text-align: left;
   width: 190rpx;
+  margin-top: 0rpx;
 }
 .right-column{
   text-align: left;
   width: 1350rpx;
+  margin-top: 0rpx;
 }
