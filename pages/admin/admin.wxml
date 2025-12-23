@@ -1,6 +1,6 @@
 <view wx:if="{{role=='staff'}}" >
-  <mp-cells ext-class="my-cells" title="置顶">
-    <mp-cell id="recept" bindtap="nav" style="background-color: yellow;" >
+  <mp-cells title="置顶">
+    <mp-cell id="recept" bindtap="nav" ext-class="my-cell" >
       <view style="background-color: yellow" >【接待】店铺接待</view>
     </mp-cell>
     <mp-cell id="rent_list" bindtap="nav" >
@@ -25,10 +25,10 @@
       <view style="background-color:#00FFFF">【接待】接待授权</view>
     </mp-cell>
   </mp-cells>
-  <mp-cells ext-class="my-cells" title="扫码" >
+  <mp-cells  title="扫码" >
     <mp-cell value="【扫码】登录后台" bindtap="gotoBackground" ></mp-cell>
   </mp-cells> 
-  <mp-cells ext-class="my-cells" title="餐饮" >
+  <mp-cells  title="餐饮" >
     <mp-cell id="fd_category" value="【餐饮】类目管理" bindtap="nav" ></mp-cell>
     <mp-cell id="fd_prod_list" value="【餐饮】商品列表" bindtap="nav" ></mp-cell>
     <mp-cell id="fd_prod_mod" value="【餐饮】商品信息修改" bindtap="nav" ></mp-cell>
@@ -48,19 +48,19 @@
     <mp-cell id="recept_list" bindtap="nav" >【接待】未完成的接待</mp-cell>
     <mp-cell id="recept_auth" bindtap="nav" >【接待】接待授权</mp-cell>
   </mp-cells>
-  <mp-cells ext-class="my-cells" title="店铺销售" >
+  <mp-cells  title="店铺销售" >
     <!--mp-cell id="shopSale" bindtap="gotoSale" >【零售】店销现货</mp-cell-->
     <mp-cell id="shopSaleList" bindtap="gotoSale" >【零售】订单列表</mp-cell>
     <!--mp-cell id="enterain_form" bindtap="nav" >【零售】招待</mp-cell>
     <mp-cell id="supplement" bindtap="nav" >【零售】补单</mp-cell-->
   </mp-cells>
-  <mp-cells ext-class="my-cells" title="养护相关" >
+  <mp-cells  title="养护相关" >
     <mp-cell value="【养护】现场雪具养护列表" bindtap="goToMaintainInShopList" ></mp-cell>
     <mp-cell value="【养护】快速查询" id="maintainSerchQuick" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_return" value="【养护】养护取板" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_in_stock" value="【养护】需盘点的" bindtap="nav" ></mp-cell>
   </mp-cells>
-  <mp-cells ext-class="my-cells" title="租赁" >
+  <mp-cells  title="租赁" >
     <mp-cell id="rent_list" value="【租赁】订单列表" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_list_cell" value="【租赁】快速查找订单" bindtap="nav" ></mp-cell>
     <mp-cell id="rent_report" value="【租赁】租赁报表" bindtap="nav" ></mp-cell>
@@ -72,36 +72,22 @@
     <mp-cell  id="rent_product_list" value="【租赁】租赁物列表" bindtap="nav" ></mp-cell>
     <mp-cell  id="rent_recepting" value="【租赁】未完成的接待" bindtap="nav" ></mp-cell>
   </mp-cells>
-  <mp-cells ext-class="my-cells" title="储值管理" >
+  <mp-cells  title="储值管理" >
     <mp-cell id="deposit_list" value="【储值】账户列表" bindtap="nav" ></mp-cell>
     <mp-cell id="deposit_add" value="【储值】新增储值" bindtap="nav" ></mp-cell>
     <mp-cell id="deposit_balance" value="【储值】资金流水" bindtap="nav" ></mp-cell>
   </mp-cells>
-  <mp-cells ext-class="my-cells" title="VIP" >
+  <mp-cells  title="VIP" >
     <mp-cell id="vip_maintain" value="【招待】养护招待" bindtap="nav" ></mp-cell>
   </mp-cells>
-  <mp-cells ext-class="my-cells" title="用户管理" >
+  <mp-cells  title="用户管理" >
     <mp-cell id="staff_reg" value="【人事】新员工入职" bindtap="nav" wx:if="{{isManager}}" ></mp-cell>
     <mp-cell id="staff_list_new" value="【人事】员工列表" bindtap="nav" wx:if="{{isManager}}" ></mp-cell>
   </mp-cells>
-  <!--mp-cells ext-class="my-cells" title="试滑" >
-    <mp-cell id="expierence_admit" value="试滑收押金" bindtap="nav" ></mp-cell>
-    <mp-cell id="expierence_active_list" value="当前试滑列表" bindtap="nav" ></mp-cell>
-  </mp-cells-->
-  <!--mp-cells ext-class="my-cells" title="滑雪学校" >
-    <mp-cell id="reserve_instructor" value="课程预约" bindtap="nav" ></mp-cell>
-    <mp-cell id="reserve_instructor_list" value="预约列表" bindtap="nav" ></mp-cell>
-    <mp-cell id="wl_course_reg" value="课程登记" bindtap="nav" ></mp-cell>
-    <mp-cell id="wl_course_list" value="课程列表" bindtap="nav" ></mp-cell>
-  </mp-cells-->
-  <mp-cells ext-class="my-cells" title="优惠券" >
+  <mp-cells  title="优惠券" >
     <mp-cell id="ticket_use" value="【优惠券】核销" bindtap="nav" ></mp-cell>
     <mp-cell id="ticket_print" value="【优惠券】打印" bindtap="nav" ></mp-cell>
   </mp-cells> 
-
-  <!--mp-cells ext-class="my-cells" title="测试" >
-    <mp-cell id="test_upload" value="上传视频" bindtap="nav" ></mp-cell>
-  </mp-cells-->
 </view>
 <view wx:else >
   您不是管理员

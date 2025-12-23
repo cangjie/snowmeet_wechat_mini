@@ -1,4 +1,14 @@
 /* pages/admin/rent/rent_details.wxss */
 .left-column{
   text-align: left;
+  margin-top: 0rpx;
+  height: 0rpx;
+}
+.right-column{
+  margin-top: 0rpx;
+  height: 0rpx;
+}
+.weui-cells__title{
+  font-size: 12pt;
+  color: black
 }

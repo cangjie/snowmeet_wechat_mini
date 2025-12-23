@@ -49,15 +49,22 @@
           <view class="view-row">
             <view class="left-column">【类型】</view>
             <view class="right-column">{{item.equipment}}</view>
+            
+          </view>
+        </mp-cell>
+        <mp-cell>
+          <view class="view-row">
+            
             <view class="left-column view-row">【品牌】<view style="color:red;font-size:15pt">*</view>
             </view>
-            <view class="right-column">
+            <view class="right-column" style="width: 450rpx;">
               <picker class="input" style="margin-top: 0rpx;margin-left: 0rpx;" id="{{index}}" disabled="{{item.moddingBaseInfo==false}}" range="{{item.equipment=='双板'? skiBrandList:boardBrandList }}" range-key="displayedName" bindchange="setBrand">
                 <picker-view>{{item.brand==null?'未填':item.brand}}</picker-view>
               </picker>
             </view>
           </view>
         </mp-cell>
+        
         <mp-cell wx:if="{{addNewBrand==true}}"  >
           <view class="view-row" style="justify-content: center;">
             <input class="input" placeholder="英文名称" style="width: 200rpx;"  bindinput="setBrandName" />

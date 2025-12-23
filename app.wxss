@@ -354,3 +354,7 @@ uni-page-body {
 	word-break: break-all;
 	box-sizing: border-box;
 }
+.mp-cell{
+  height: 0rpx;
+  margin-top: 0rpx;
+}
