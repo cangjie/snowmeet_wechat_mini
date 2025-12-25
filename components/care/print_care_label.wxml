@@ -1,5 +1,5 @@
 <view>
-  <view style="text-align: center;margin-top:  30rpx;margin-bottom:20rpx;font-weight: 1000;">打印【{{type}}】</view>
+  <view style="text-align: center;margin-top:  30rpx;margin-bottom:20rpx;font-weight: 1000;">打印【{{printType}}】</view>
   <view class="view-row">
     <view class="left-column">【姓名】</view>
     <view class="right-column">{{care.customerName}}</view>
@@ -40,19 +40,19 @@
         <view style="width: 150rpx;text-align: center;font-size: 11pt;">{{item.printer.region}}</view>
         <view style="width: 100rpx;text-align: center;font-size: 11pt;">{{item.status}}</view>
         <view style="width: 175rpx;text-align: center;font-size: 12pt;">
-          <van-button id="{{index}}" bind:tap="disconnectDevice" size="mini" type="danger" wx:if="{{item.status!='未连接'}}" >断开</van-button>
+          <van-button id="{{index}}" bind:tap="disconnectDevice" size="mini" type="danger" 
+          wx:if="{{item.status!='未连接' && item.status!='连接失败' }}" >断开</van-button>
           <van-button id="{{index}}" bind:tap="connectDeviceManual"  size="mini" type="primary" wx:else disabled="{{item.status == '连接中'}}"  >连接</van-button>
         </view>
       </view>
     </view>
   </view>
-  <view class="view-row" style="justify-content: center;margin-top: 80rpx">
+  <!--view class="view-row" style="justify-content: center;margin-top: 80rpx">
     <van-button type="info" disabled="{{ready!=true}}" bind:click="printCommonLabel" style="margin-right: 50rpx;">打印标签存根</van-button>
     <van-button type="primary" disabled="{{ready!=true}}" bind:click="printCustLabel" style="margin-left: 50rpx;">打印顾客小票</van-button>
-    <!--van-button type="primary" disabled="{{ready!=true}}" bind:click="print" > 打 印 </van-button-->
-  </view>
+  </view-->
   <view class="view-row" style="justify-content: center;margin-top: 80rpx">
-    <van-button type="primary" > 打 印 </van-button>
+    <van-button type="primary" bind:click="redayToPrint" disabled="{{ready!=true}}" > 打 印 </van-button>
   </view>
   <!--view class="view-row" style="justify-content:center;margin-top:20rpx" >
     <textarea class="input" value="" style="width: 700rpx; height:500rpx" ></textarea>

@@ -36,7 +36,7 @@ Component({
           break
       }
       console.log('care', that.properties.care)
-      that.setData({ order: that.properties.order, type })
+      that.setData({ order: that.properties.order,printType: type })
       wx.showToast({
         title: '正在连接打印机',
         icon: 'loading'
@@ -51,6 +51,9 @@ Component({
               break
             case 'yellow':
               printer.colorStr = '黄'
+              break
+            case 'red':
+              printer.colorStr = '红'
               break
             default:
               break
@@ -81,7 +84,7 @@ Component({
             })
             return
           }
-          that.data.connectingIndex = 0
+          that.data.connectingIndex = that.getDefaultPrinterIndex()
           that.connectDevice()
           console.log('get ble list', availablePrinters)
         }).catch(function (exp) {
@@ -91,10 +94,16 @@ Component({
     },
     detached() {
       var that = this
-      wx.closeBLEConnection({
-        deviceId: that.data.currentDevice.deviceId,
-      })
+      var connectingIndex = that.data.connectingIndex
+      if (!isNaN(connectingIndex) && connectingIndex != null) {
+        var printers = that.data.availablePrinters
+        var printer = printers[connectingIndex]
+        wx.closeBLEConnection({
+          deviceId: printer.deviceId,
+        })
+      }
     }
+
   },
 
   /**
@@ -154,11 +163,23 @@ Component({
         var printer = printers[that.data.connectingIndex]
         printer.connected = true
         printer.status = '已连接'
-        that.setData({ ready: true, currentDevice: device, availablePrinters: printers })
+        that.setData({ ready: true, currentDevice: device, availablePrinters: printers, ready: true })
       }).catch(function () {
+        var printers = that.data.availablePrinters
+        var connectingIndex = that.data.connectingIndex
+        if (!isNaN(connectingIndex) && connectingIndex != null) {
+          var printer = printers[connectingIndex]
+          printer.status = '连接失败'
+          that.setData({ availablePrinters: printers })
+          wx.closeBLEConnection({
+            deviceId: printer.deviceId,
+          })
+        }
+        /*
         connectingIndex++
         that.data.connectingIndex = connectingIndex
         that.connectDevice()
+        */
       })
     },
     getCommand(labelType) {
@@ -327,6 +348,9 @@ Component({
               title: '已打印第' + currentPrint + '张成功',
             })
             that.setData({ nowPrinting: false, finish: true })
+            /*
+            
+            */
           }
         },
         fail: function (e) {
@@ -355,6 +379,20 @@ Component({
                 isLabelSend: false,
                 currentPrint: 1,
                 readyForPrint: true
+              })
+              var connectingIndex = that.data.connectingIndex
+              var printers = that.data.availablePrinters
+              var printer = printers[connectingIndex]
+              wx.closeBLEConnection({
+                deviceId: printer.deviceId,
+                complete: () => {
+                  var connectingIndex = that.data.connectingIndex
+                  var printers = that.data.availablePrinters
+                  var printer = printers[connectingIndex]
+                  printer.status = '未连接'
+                  var connectingIndex = null
+                  that.setData({ connectingIndex: null, availablePrinters: printers })
+                }
               })
             } else {
               currentPrint++
@@ -447,7 +485,7 @@ Component({
       var that = this
       var id = e.currentTarget.id
       var connectingIndex = that.data.connectingIndex
-      if (!isNaN(connectingIndex)) {
+      if (!isNaN(connectingIndex) && connectingIndex != null) {
         var printers = that.data.availablePrinters
         var printer = printers[id]
         wx.closeBLEConnection({
@@ -455,10 +493,10 @@ Component({
           success: (res) => {
             console.log('disconnect success', res)
           },
-          fail:(res)=>{
+          fail: (res) => {
             console.log('disconnect fail', res)
           },
-          complete:()=>{
+          complete: () => {
             var printers = that.data.availablePrinters
             printers[that.data.connectingIndex].status = '未连接'
             that.setData({ connectingIndex: null, availablePrinters: printers })
@@ -467,10 +505,54 @@ Component({
           }
         })
       }
-      else{
+      else {
         that.data.connectingIndex = parseInt(id)
         that.connectDevice()
       }
+    },
+    getDefaultPrinterIndex() {
+      var that = this
+      var printers = that.data.availablePrinters
+      var care = that.properties.care
+      var index = 0
+      if (care.free_wax == 1 || care.urgent == 1) {
+        for (var i = 0; i < printers.length; i++) {
+          var printer = printers[i]
+          if (printer.printer.color == 'red') {
+            index = i
+          }
+        }
+      }
+      else if (care.entertain) {
+        for (var i = 0; i < printers.length; i++) {
+          var printer = printers[i]
+          if (printer.printer.color == 'yellow') {
+            index = i
+          }
+        }
+      }
+      else {
+        index = 0
+      }
+      return index
+    },
+    redayToPrint(e){
+      var that = this
+      var connectingIndex = that.data.connectingIndex
+      if (isNaN(connectingIndex) || connectingIndex == null){
+        connectingIndex = that.getDefaultPrinterIndex()
+        that.data.connectingIndex = connectingIndex
+        that.data.ready = false
+        that.connectDevice()
+        setTimeout(()=>{
+          that.print(e)
+        }, 5000)
+        
+      }
+      else{
+        that.print(e)
+      }
+      
     }
-  },
+  }
 })
