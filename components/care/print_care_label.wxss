@@ -2,7 +2,9 @@
 .left-column{
   text-align: left;
   width: 150rpx;
+  margin-top: 0rpx;
 }
 .right-column{
   text-align: left;
+  margin-top: 0rpx;
 }

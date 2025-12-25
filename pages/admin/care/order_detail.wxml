@@ -219,12 +219,20 @@
           </mp-cell>
           <mp-cell>
             <view class="view-row" style="justify-content: center;" >
-              <van-button type="primary" disabled="{{!item.safeChecking}}" 
+              <van-button type="warning" disabled="{{!item.safeChecking}}" 
               bind:click="safeCheck" id="{{index}}" > 确 认 安 全 </van-button>
             </view>
             <view class="view-row" style="justify-content: center;" >
               <van-button type="info" 
               bind:click="showPrintBackDrop" id="{{index}}" style="margin-top: 50rpx;" > 打 印 标 签 </van-button>
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row" style="justify-content: center;" >
+              <van-button type="primary" size="small" 
+                bind:click="printLabel" id="{{index}}" >打印标签存根</van-button>
+              <van-button type="info" size="small" style="margin-left: 50rpx;"
+                bind:click="printInvoice" id="{{index}}" >打印顾客小票</van-button>
             </view>
           </mp-cell>
         </block>
@@ -321,6 +329,6 @@
   <view style="height: 100rpx;" ></view>
   <van-popup show="{{ showPrint }}" position="bottom" custom-style="height: 80%;" 
   bind:close="onPrinterClose" close-icon="close" >
-    <print-care wx:if="{{showPrint}}" care="{{careToBePrinted}}" order="{{order}}" ></print-care>
+    <print-care wx:if="{{showPrint}}" care="{{careToBePrinted}}" order="{{order}}" type="{{printType}}" ></print-care>
   </van-popup>
 </view>

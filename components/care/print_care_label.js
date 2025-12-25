@@ -10,8 +10,8 @@ Component({
    */
   properties: {
     care: Object,
-    order: Object
-    
+    order: Object,
+    type: String
   },
 
   /**
@@ -23,15 +23,40 @@ Component({
   lifetimes:{
     ready(){
       var that = this
+      var type = ''
+      switch(that.properties.type){
+        case 'label':
+          type = '标签存根'
+          break
+        case 'invoice':
+          type = '顾客小票'
+          break
+        default:
+          break
+      }
       console.log('care', that.properties.care)
-      that.setData({order: that.properties.order})
+      that.setData({order: that.properties.order, type})
       wx.showToast({
         title: '正在连接打印机',
         icon: 'loading'
       })
-      data.getPrinterListPromise(that.properties.care.shop, 'white', app.globalData.sessionKey).then(function(printers){
+      data.getPrinterListPromise(that.properties.care.shop).then(function(printers){
         console.log('get printers', printers)
-        that.data.printers = printers
+        for(var i = 0; i < printers.length; i++){
+          var printer = printers[i]
+          switch(printer.color){
+            case 'white':
+              printer.colorStr = '白'
+              break
+            case 'yellow':
+              printer.colorStr = '黄'
+              break
+            default:
+              break
+          }
+        }
+        that.setData({printers})
+        //that.data.printers = printers
         //that.setData({deviceName: printers})
         util.getBLEDeviceNameListInRangePromise().then(function (list){
           var availablePrinters = []
@@ -382,6 +407,32 @@ Component({
         }
       })
       
+    },
+    pringLabel(e){
+      var that = this
+      switch(that.properties.type){
+        case 'label':
+          that.data.printType = '标签存根'
+          break
+        case 'invoice':
+          that.data.printType = '顾客小票'
+          break
+        default:
+          break
+      }
+      wx.showModal({
+        title: '打印确认',
+        content: '即将打印【' + that.data.printType + '】',
+        complete: (res) => {
+          if (res.cancel) {
+            
+          }
+      
+          if (res.confirm) {
+            that.print(e)
+          }
+        }
+      })
     }
   },
   
