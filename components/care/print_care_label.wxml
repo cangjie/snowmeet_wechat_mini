@@ -32,15 +32,16 @@
         <view style="width: 175rpx;text-align: center;font-size: 11pt;">操作</view>
       </view>
     </view>
-    <view wx:for="{{printers}}" 
-      style="background-color: {{item.region == '维修区'? '#FFFFD0;' : '#FFD0FF;'}} ">
+    <view wx:for="{{availablePrinters}}" 
+      style="background-color: {{item.printer.region == '维修区'? '#FFFFD0;' : '#FFD0FF;'}}"  >
       <view class="view-row" style="margin-top: 0rpx;height: 70rpx; align-items: center;">
-        <view style="width: 280rpx;text-align: center;font-size: 11pt;">{{item.name}}</view>
-        <view style="width: 70rpx;text-align: center;font-size: 11pt;">{{item.colorStr}}</view>
-        <view style="width: 150rpx;text-align: center;font-size: 11pt;">{{item.region}}</view>
-        <view style="width: 100rpx;text-align: center;font-size: 11pt;"></view>
+        <view style="width: 280rpx;text-align: center;font-size: 11pt;">{{item.printer.name}}</view>
+        <view style="width: 70rpx;text-align: center;font-size: 11pt;">{{item.printer.colorStr}}</view>
+        <view style="width: 150rpx;text-align: center;font-size: 11pt;">{{item.printer.region}}</view>
+        <view style="width: 100rpx;text-align: center;font-size: 11pt;">{{item.status}}</view>
         <view style="width: 175rpx;text-align: center;font-size: 12pt;">
-          <van-button size="mini" type="danger">断开</van-button>
+          <van-button id="{{index}}" bind:tap="disconnectDevice" size="mini" type="danger" wx:if="{{item.status!='未连接'}}" >断开</van-button>
+          <van-button id="{{index}}" bind:tap="connectDeviceManual"  size="mini" type="primary" wx:else disabled="{{item.status == '连接中'}}"  >连接</van-button>
         </view>
       </view>
     </view>

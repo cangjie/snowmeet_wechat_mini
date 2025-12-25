@@ -607,7 +607,7 @@ const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey)
     })
   })
 }
-const getPrinterListPromise = function (shop, color, sessionKey) {
+const getPrinterListPromise = function (shop) {
   var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetPrinterByScene?shop=' + encodeURIComponent(shop) 
   return util.performWebRequest(getDeviceNameUrl, null)
   /*
