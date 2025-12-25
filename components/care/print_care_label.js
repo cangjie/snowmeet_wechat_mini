@@ -185,6 +185,12 @@ Component({
     getCommand(labelType) {
       var that = this
       var care = that.properties.care
+      var connectingIndex = that.data.connectingIndex
+      var printer = that.data.availablePrinters[connectingIndex]
+      var font = 'TSS32.BF2'
+      if (printer.printer.name.indexOf('Printer_')>=0){
+        font = 'TSS24.BF2'
+      }
       var brand = care.brand == null ? '未填' : care.brand
       var orderNum = care.task_flow_code
       var name = care.customerName == null ? '' : care.customerName
@@ -197,7 +203,7 @@ Component({
       if (name.length > 0) {
         maskedName = name.substring(0, 1) + care.customerName
       }
-      if (labelType == '【客户联】' || labelType == '【存根】') {
+      if (labelType == '【客户联】' ) {
         maskedName = name
         maskedCell = cell
         that.data.copies = 1
@@ -244,21 +250,26 @@ Component({
       command.setSize(75, 50)//设置标签大小，单位mm.具体参数请用尺子量一下
       command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
       command.setCls()//清除缓冲区
-      command.setText(20, 20, "TSS32.BF2", 0, 1, 1, labelType + ' ' + (urgent ? '(急)' : '') + orderNum)
-      command.setText(20, 20 + 40, "TSS32.BF2", 0, 1, 1, maskedName + " " + maskedCell)
-      command.setText(20, 20 + 40 + 40, "TSS32.BF2", 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)
+      
+      
+      command.setText(20, 20, font, 0, 1, 1, labelType + ' ' + (urgent ? '(急)' : '') + orderNum)
+      command.setText(20, 20 + 40, font, 0, 1, 1, maskedName + " " + maskedCell)
+      command.setText(20, 20 + 40 + 40, font, 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)
       if (edge.toString() == '1') {
-        command.setText(20, 20 + 40 + 40 + 55, "TSS32.BF2", 0, 1, 1, "修刃 " + degree + "：")
+        command.setText(20, 20 + 40 + 40 + 55, font, 0, 1, 1, "修刃 " + degree + "：")
       }
       if (more != '') {
-        command.setText(300, 20 + 40 + 40 + 55, "TSS32.BF2", 0, 1, 1, "其他：" + more)
+        command.setText(300, 20 + 40 + 40 + 55, font, 0, 1, 1, "其他：" + more)
       }
       if (memo != undefined && memo != '') {
-        command.setText(200, 20 + 40 + 40 + 55 + 35, "TSS32.BF2", 0, 1, 1, "注：" + memo)
+        command.setText(200, 20 + 40 + 40 + 55 + 35, font, 0, 1, 1, "注：" + memo)
       }
       if (candle.toString() == '1') {
-        command.setText(20, 20 + 40 + 40 + 55 + 55, "TSS32.BF2", 0, 1, 1, "打蜡：")
-        command.setText(20, 20 + 40 + 40 + 55 + 55 + 55, "TSS32.BF2", 0, 1, 1, "刮蜡：")
+        command.setText(20, 20 + 40 + 40 + 55 + 55, font, 0, 1, 1, "热打蜡：")
+        command.setText(20, 20 + 40 + 40 + 55 + 55 + 55, font, 0, 1, 1, "刮蜡：")
+      }
+      else if (care.free_wax == 1){
+        command.setText(20, 20 + 40 + 40 + 55 + 55, font, 0, 1, 1, "机打蜡：")
       }
       var orderInfoStr = ''
       var priceStr = ''
@@ -272,12 +283,12 @@ Component({
         orderInfoStr = that.data.order.code
         priceStr = '金额：' + parseFloat(that.data.order.paidAmount).toFixed(2)
       }
-      var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/order_detail?orderId=' + that.data.order.id.toString() + '&careId=' + care.id.toString()
       command.setText(290, 20 + 40 + 40 + 55 + 55 + 55 + 50, "TSS24.BF2", 0, 1, 1, orderInfoStr)
-      command.setText(20, 20 + 40 + 40 + 55 + 55 + 55 + 50, "TSS32.BF2", 0, 1, 1, priceStr)
+      command.setText(20, 20 + 40 + 40 + 55 + 55 + 55 + 50, font, 0, 1, 1, priceStr)
+      command.setText(20, 350, font, 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
+      command.setText(300, 350, font, 0, 1, 1, "订单日期：" + orderDateStr)
+      var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/order_detail?orderId=' + that.data.order.id.toString() + '&careId=' + care.id.toString()
       command.setQrcode(400, 20 + 40 + 65 + 25, "L", 3, "M", qrCodeText)
-      command.setText(20, 350, "TSS32.BF2", 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
-      command.setText(300, 350, "TSS32.BF2", 0, 1, 1, "订单日期：" + orderDateStr)
       command.setPagePrint()
       return command.getData()
     },
@@ -348,9 +359,7 @@ Component({
               title: '已打印第' + currentPrint + '张成功',
             })
             that.setData({ nowPrinting: false, finish: true })
-            /*
-            
-            */
+           
           }
         },
         fail: function (e) {
@@ -380,6 +389,7 @@ Component({
                 currentPrint: 1,
                 readyForPrint: true
               })
+              
               var connectingIndex = that.data.connectingIndex
               var printers = that.data.availablePrinters
               var printer = printers[connectingIndex]
@@ -394,6 +404,7 @@ Component({
                   that.setData({ connectingIndex: null, availablePrinters: printers })
                 }
               })
+              
             } else {
               currentPrint++
               that.setData({
