@@ -37,10 +37,9 @@
     <view class="right-column" >{{total}}</view>
   </view>
   <view class="ski-pass-scale" style="border-width: 0rpx;text-align: center;margin-bottom: 0rpx;margin-top: 30rpx;" >
-    <view wx:if="{{avaliableCount >= count}}" >
+    <view>
       <van-button type="primary" bind:click="submit" class="input" > 立 即 支 付 </van-button>
     </view>
-    <view wx:else > 预定数量超过当日限制 </view>
   </view>
 </view>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
