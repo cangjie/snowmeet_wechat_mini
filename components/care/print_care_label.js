@@ -534,7 +534,7 @@ Component({
           }
         }
       }
-      else if (care.entertain) {
+      else if (care.entertain || care.warranty) {
         for (var i = 0; i < printers.length; i++) {
           var printer = printers[i]
           if (printer.printer.color == 'yellow') {
