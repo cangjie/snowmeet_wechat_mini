@@ -197,9 +197,14 @@
           <mp-cell>
             <view class="view-row">
               <view class="left-column">【发放人】</view>
-              <view class="right-column">{{item.noNeed == true ? '' : (item.pickStaff? item.pickStaff.name: '--')}}</view>
-              <view class="left-column">【接收人】</view>
-              <view class="right-column">{{item.noNeed == true ? '' : (item.returnStaff? item.returnStaff.name: '--')}}</view>
+              <view class="right-column" style="width: 500rpx;">{{item.noNeed == true ? '' : (item.pickStaff? item.pickStaff.name: '--')}}</view>
+              
+            </view>
+          </mp-cell>
+          <mp-cell>
+            <view class="view-row">
+             <view class="left-column">【接收人】</view>
+              <view class="right-column" style="width: 500rpx;">{{item.noNeed == true ? '' : (item.returnStaff? item.returnStaff.name: '--')}}</view>
             </view>
           </mp-cell>
           <mp-cell>
@@ -227,6 +232,7 @@
               <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}" bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}" >设置未归还</van-button>
               <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick" wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
               <van-button type="warning" size="small" style="margin-left: 50rpx;" id="{{item.id}}" wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
+              <van-button type="danger" size="small" style="margin-left: 50rpx;" id="{{item.id}}" wx:if="{{item.status=='已发放'}}" bind:click="gotoChange">更换</van-button>
               
               <van-button type="info" size="small" style="margin-left: 50rpx;" id="{{item.id}}">发还记录</van-button>
             </view>

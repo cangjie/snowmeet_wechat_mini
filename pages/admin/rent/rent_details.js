@@ -683,5 +683,12 @@ Page({
     }
     order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
     that.setData({order, payWithDeposit})
+  },
+  gotoChange(e){
+    var that = this
+    var rentItemId = e.currentTarget.id
+    wx.navigateTo({
+      url: 'rent_item_change?orderId=' + that.data.order.id.toString() + '&rentItemId=' + rentItemId.toString()
+    })
   }
 })
