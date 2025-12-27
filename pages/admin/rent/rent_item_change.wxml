@@ -1,2 +1,39 @@
-<!--pages/admin/rent/rent_item_change.wxml-->
-<text>pages/admin/rent/rent_item_change.wxml</text>
+<view>
+  <mp-cells title="现租赁物" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >【名称】</view>
+        <view class="right-column" >{{rentItem.name}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >【编码】</view>
+        <view class="right-column" >{{rentItem.noCode == 1? '无编码': rentItem.code}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >【分类】</view>
+        <view class="right-column"  >{{rentItem.category.name}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >【发放人】</view>
+        <view class="right-column"  >{{rentItem.pickStaff.name}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" >【发放日期】</view>
+        <view class="right-column" style="width: 160rpx;" >{{rentItem.pickDateDateStr}}</view>
+        <view class="left-column" >【发放时间】</view>
+        <view class="right-column" style="width: 160rpx;" >{{rentItem.pickDateTimeStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="新租赁物" >
+  
+  </mp-cells>
+</view>

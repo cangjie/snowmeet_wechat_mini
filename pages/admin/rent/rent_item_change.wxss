@@ -1,1 +1,16 @@
 /* pages/admin/rent/rent_item_change.wxss */
+.weui-cells__title{
+  font-size: 12pt;
+  color: black
+}
+.right-column{
+  margin-top: 0rpx;
+  height: 0rpx;
+  width: 550rpx;
+}
+.left-column{
+  margin-top: 0rpx;
+  height: 0rpx;
+  width: 160rpx;
+  text-align: left;
+}
