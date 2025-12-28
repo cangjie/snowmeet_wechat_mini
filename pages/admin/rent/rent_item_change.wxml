@@ -1,30 +1,30 @@
 <view>
-  <mp-cells title="现租赁物" >
-    <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >【名称】</view>
-        <view class="right-column" >{{rentItem.name}}</view>
-      </view>
-    </mp-cell>
-    <mp-cell>
+  <mp-cells title="现租赁物"  >
+    <mp-cell  ext-class="old" >
       <view class="view-row" >
         <view class="left-column" >【编码】</view>
         <view class="right-column" >{{rentItem.noCode == 1? '无编码': rentItem.code}}</view>
       </view>
     </mp-cell>
-    <mp-cell>
+    <mp-cell ext-class="old">
+      <view class="view-row" >
+        <view class="left-column" >【名称】</view>
+        <view class="right-column" >{{rentItem.name}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell ext-class="old" >
       <view class="view-row" >
         <view class="left-column" >【分类】</view>
         <view class="right-column"  >{{rentItem.category.name}}</view>
       </view>
     </mp-cell>
-    <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >【发放人】</view>
+    <mp-cell ext-class="old" >
+      <view class="view-row"  >
+        <view class="left-column"  >【发放人】</view>
         <view class="right-column"  >{{rentItem.pickStaff.name}}</view>
       </view>
     </mp-cell>
-    <mp-cell>
+    <mp-cell ext-class="old">
       <view class="view-row" >
         <view class="left-column" >【发放日期】</view>
         <view class="right-column" style="width: 160rpx;" >{{rentItem.pickDateDateStr}}</view>
@@ -33,7 +33,64 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <view style="height: 20rpx;" ></view>
   <mp-cells title="新租赁物" >
-  
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column" style="height: 30rpx;" >【编码】</view>
+        <view class="right-column" style="height: 30rpx;" >
+          <input class="input" style="width: 300rpx;text-align: center;" disabled="{{newItem.noCode}}"
+            value="{{newItem.noCode?'无':newItem.code}}" bindinput="setInput" />
+        </view>
+        <view style="width: 50rpx;">
+          <van-icon name="scan" size="19px" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column" style="height: 30rpx;" >【无编码】</view>
+        <view class="right-column" style="height: 30rpx;" >
+          <checkbox-group bindchange="setInput" id="noCode" >
+            <checkbox checked="{{newItem.noCode}}" ></checkbox>
+          </checkbox-group>
+        </view>
+        
+      </view>
+    </mp-cell>
+
+    <mp-cell>
+      <view class="view-row">
+        <view class="view-row left-column" style="height: 80rpx; align-items: center;" >【分类】</view>
+        <view class="right-column" style="height: 80rpx;" >
+          <van-dropdown-menu  >
+            <van-dropdown-item id="category" bind:change="setInput" value="{{ newItem.category_id }}" options="{{categories}}" />
+          </van-dropdown-menu>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column" style="height: 30rpx;" >【名称】</view>
+        <view class="right-column" style="height: 30rpx;" >
+          <input class="input" style="width: 400rpx;text-align: center;" disabled="{{!newItem.noCode}}" 
+          bindinput="setInput" id="name" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell ext-class="mp-memo" >
+      <view class="view-row">
+        <view class="left-column" style="height: 100rpx;" >【备注】</view>
+        <view class="right-column" style="height: 100rpx;" >
+          <textarea style="height: 100rpx;width:400rpx" class="input" id="memo" bindinput="setInput"  ></textarea>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell  >
+      <view class="view-row" style="justify-content: center;">
+        <van-button size="small" type="warning" style="margin-right: 50rpx;" bind:click="cancel"  > 取 消 </van-button>
+        <van-button size="small" type="danger"  style="margin-left: 50rpx;" disabled="{{!wellFormed}}" bind:click="change" > 确 认 </van-button>
+      </view>
+    </mp-cell>
   </mp-cells>
 </view>

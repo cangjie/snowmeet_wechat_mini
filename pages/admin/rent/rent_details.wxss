@@ -12,3 +12,6 @@
   font-size: 12pt;
   color: black
 }
+.changed{
+  background: rgb(196, 195, 195);
+}

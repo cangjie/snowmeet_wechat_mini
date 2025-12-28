@@ -682,6 +682,10 @@ const getUnreturnedRentItemPromise = function (shop, sessionKey){
     })
   })
 }
+const queryRentItemChangeCompatibleCategory = function (categoryId){
+  var getUrl = app.globalData.requestPrefix + 'Rent/QueryChangeCompatibleCategory/' + categoryId.toString()
+  return util.performWebRequest(getUrl, null)
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -732,5 +736,6 @@ module.exports = {
   getMyInfo,
   payWithDepositPromise,
   getMemberTicketsPromise,
-  getUnreturnedRentItemPromise
+  getUnreturnedRentItemPromise,
+  queryRentItemChangeCompatibleCategory
 }

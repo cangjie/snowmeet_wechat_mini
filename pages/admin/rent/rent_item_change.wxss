@@ -14,3 +14,23 @@
   width: 160rpx;
   text-align: left;
 }
+.old{
+  background: rgb(196, 195, 195);
+  height: 25rpx;
+  padding-top: 0rpx;
+}
+.custom-class{
+  width:500rpx
+}
+.van-dropdown-menu{
+  width:500rpx;
+}
+.van-dropdown-item__icon{
+  width: 0rpx;
+}
+.van-dropdown-item__title{
+  width: 650rpx;
+}
+.mp-memo{
+  height: 100rpx;
+}
