@@ -607,8 +607,10 @@ const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey)
     })
   })
 }
-const getPrinterListPromise = function (shop, color, sessionKey) {
-  var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetPrinters?shop=' + encodeURIComponent(shop) + '&color=' + color + '&sessionKey=' + sessionKey
+const getPrinterListPromise = function (shop) {
+  var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetPrinterByScene?shop=' + encodeURIComponent(shop) 
+  return util.performWebRequest(getDeviceNameUrl, null)
+  /*
   return new Promise(function (resolve, reject) {
     wx.request({
       url: getDeviceNameUrl,
@@ -627,7 +629,7 @@ const getPrinterListPromise = function (shop, color, sessionKey) {
       }
     })
   })
-
+  */
 }
 const getMyInfo = function (sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Member/GetMyInfo?sessionKey=' + sessionKey
