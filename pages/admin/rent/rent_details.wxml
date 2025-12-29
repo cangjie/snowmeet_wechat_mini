@@ -264,6 +264,15 @@
       </view>
     </van-tab>
   </van-tabs>
+  <view style="height: 20rpx;"></view>
+  <mp-cells title="追加租赁商品" >
+    <mp-cell>
+      <view class="view-row" style="justify-content: center;" >
+        <van-button type="primary" style="margin-right: 50rpx;" >添加套餐</van-button>
+        <van-button type="danger" style="margin-left: 50rpx;" >添加单品</van-button>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="退款" wx:if="{{allSettled}}" >
     <mp-cell>
       <view class="view-row" >
