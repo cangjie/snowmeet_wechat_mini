@@ -171,6 +171,14 @@ Page({
           rentItem.returnDateStr = util.formatDate(new Date(rentItem.returnDate))
           rentItem.returnTimeStr = util.formatTimeStr(new Date(rentItem.returnDate))
         }
+        if (rentItem.changeDate == null){
+          rentItem.changeDateStr = '--'
+          rentItem.changeTimeStr = '--'
+        }
+        else{
+          rentItem.changeDateStr = util.formatDate(new Date(rentItem.changeDate))
+          rentItem.changeTimeStr = util.formatTimeStr(new Date(rentItem.changeDate))
+        }
       }
 
     }
@@ -307,7 +315,9 @@ Page({
       }
     }
     for (var i = 0; currentRental && i < currentRental.rentItems.length; i++) {
-      if (currentRental.rentItems[i].status != '已归还' && currentRental.rentItems[i].status != '未发放'
+      if (currentRental.rentItems[i].status != '已归还' 
+        && currentRental.rentItems[i].status != '未发放'
+        && currentRental.rentItems[i].status != '已更换'
         && currentRental.rentItems[i].id != id) {
         allReturned = false
       }
@@ -683,5 +693,12 @@ Page({
     }
     order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
     that.setData({order, payWithDeposit})
+  },
+  gotoChange(e){
+    var that = this
+    var rentItemId = e.currentTarget.id
+    wx.navigateTo({
+      url: 'rent_item_change?orderId=' + that.data.order.id.toString() + '&rentItemId=' + rentItemId.toString()
+    })
   }
 })

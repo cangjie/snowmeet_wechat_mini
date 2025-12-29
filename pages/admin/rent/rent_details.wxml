@@ -152,25 +152,25 @@
     <van-tab title="按租赁物">
       <mp-cells wx:for="{{order.rentals}}" wx:for-item="rental" title="{{rental.titleName}}" wx:if="{{currentRentalId == null || (currentRentalId == rental.id) }}">
         <block wx:for="{{rental.rentItems}}">
-          <mp-cell>
-            <view class="view-row">
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
+            <view class="view-row"  >
               <view class="left-column">【名称】</view>
               <view class="right-column" style="width: 500rpx;">{{item.noNeed == true ? '--' : item.name}}</view>
             </view>
           </mp-cell>
-          <mp-cell>
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
             <view class="view-row">
               <view class="left-column">【编码】</view>
               <view class="right-column">{{item.noNeed == true ? '--' : (item.noCode == true? '无编码' : item.code)}}</view>
             </view>
           </mp-cell>
-          <mp-cell>
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
             <view class="view-row">
               <view class="left-column">【分类】</view>
               <view class="right-column" style="width: 550rpx;">{{item.noNeed == true ? '' : item.category.name}}</view>
             </view>
           </mp-cell>
-          <mp-cell>
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
             <view class="view-row">
               <view class="left-column">【发放日期】</view>
               <view class="right-column">{{item.noNeed == true ? '--' : item.pickDateStr}}</view>
@@ -178,7 +178,15 @@
               <view class="right-column">{{item.noNeed == true ? '--' : item.pickTimeStr}}</view>
             </view>
           </mp-cell>
-          <mp-cell>
+          <mp-cell wx:if="{{item.status == '已更换'}}"  ext-class="{{item.status == '已更换'? 'changed': ''}}" >
+            <view class="view-row">
+              <view class="left-column">【更换日期】</view>
+              <view class="right-column">{{item.changeDateStr}}</view>
+              <view class="left-column">【更换时间】</view>
+              <view class="right-column">{{item.changeTimeStr}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell wx:else  >
             <view class="view-row">
               <view class="left-column">【归还日期】</view>
               <view class="right-column">{{item.noNeed == true ? '--' : item.returnDateStr}}</view>
@@ -186,7 +194,7 @@
               <view class="right-column">{{item.noNeed == true ? '--' : item.returnTimeStr}}</view>
             </view>
           </mp-cell>
-          <mp-cell>
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
             <view class="view-row">
               <view class="left-column">【状态】</view>
               <view class="right-column">{{item.noNeed == true ? '不需要'  : item.status}}</view>
@@ -194,15 +202,25 @@
               <view class="right-column"></view>
             </view>
           </mp-cell>
-          <mp-cell>
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
             <view class="view-row">
               <view class="left-column">【发放人】</view>
-              <view class="right-column">{{item.noNeed == true ? '' : (item.pickStaff? item.pickStaff.name: '--')}}</view>
-              <view class="left-column">【接收人】</view>
-              <view class="right-column">{{item.noNeed == true ? '' : (item.returnStaff? item.returnStaff.name: '--')}}</view>
+              <view class="right-column" style="width: 500rpx;">{{item.noNeed == true ? '' : (item.pickStaff? item.pickStaff.name: '--')}}</view>
             </view>
           </mp-cell>
-          <mp-cell>
+          <mp-cell wx:if="{{item.status == '已更换'}}" ext-class="changed" >
+            <view class="view-row">
+              <view class="left-column">【更换人】</view>
+              <view class="right-column" style="width: 500rpx;">{{item.changeStaff.name}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell wx:else >
+            <view class="view-row">
+             <view class="left-column">【接收人】</view>
+              <view class="right-column" style="width: 500rpx;">{{item.noNeed == true ? '' : (item.returnStaff? item.returnStaff.name: '--')}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell wx:if="{{item.status != '已更换'}}" >
             <view class="view-row">
               <view class="left-column">【赔偿】</view>
               <view class="right-column">
@@ -221,16 +239,24 @@
               </view>
             </view>
           </mp-cell>
-          <mp-cell wx:if="{{item.noNeed != true}}">
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}"  >
+            <view class="view-row">
+              <view class="left-column">【备注】</view>
+              <view class="right-column" style="width: 500rpx;">{{item.memo}}</view>
+            </view>
+          </mp-cell>
+          <mp-cell wx:if="{{item.noNeed != true && item.status != '已更换'}}">
             <view class="view-row" style="justify-content: center;">
               <van-button type="primary" size="small" wx:if="{{item.status == '已发放' }}" id="{{item.id}}" bind:click="setReturn">归还</van-button>
               <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}" bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}" >设置未归还</van-button>
               <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick" wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
               <van-button type="warning" size="small" style="margin-left: 50rpx;" id="{{item.id}}" wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
+              <van-button type="danger" size="small" style="margin-left: 50rpx;" id="{{item.id}}" wx:if="{{item.status=='已发放'}}" bind:click="gotoChange">更换</van-button>
               
               <van-button type="info" size="small" style="margin-left: 50rpx;" id="{{item.id}}">发还记录</van-button>
             </view>
           </mp-cell>
+          <mp-cell></mp-cell>
         </block>
       </mp-cells>
       <view class="view-row" style="justify-content: center;" wx:if="{{currentRentalId != null}}">
