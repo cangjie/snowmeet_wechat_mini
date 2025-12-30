@@ -717,5 +717,29 @@ Page({
   addNewCategory(e){
     var that = this
     that.setData({ showSelectCategoryPopUp: true})
-  }
+  },
+  selectPackageConfirm(e){
+    console.log('select package', e)
+    var that = this
+    var order = that.data.order
+    var appendUrl = app.globalData.requestPrefix + 'Rent/AppendRental/' + order.id.toString() 
+      + '?packageId=' + e.detail.id.toString() + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(appendUrl, null).then(function(order){
+      console.log('append order', order)
+    })
+    that.cancelPackagePopUp()
+  },
+  confirmCategory(e){
+    console.log('select category', e)
+    var that = this
+    var order = that.data.order
+    var appendUrl = app.globalData.requestPrefix + 'Rent/AppendRental/' + order.id.toString() 
+      + '?categoryId=' + e.detail.id.toString() + '&sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(appendUrl, null).then(function(order){
+        console.log('append order', order)
+      })
+    that.cancelCategoryPopUp()
+  },
+
+
 })

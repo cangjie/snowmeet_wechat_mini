@@ -15,3 +15,26 @@
 .changed{
   background: rgb(196, 195, 195);
 }
+.add-package{
+  margin-top: 0rpx;
+  background-color: rgb(212, 255, 219);
+}
+.add-item{
+  margin-top: 0rpx;
+  background-color: rgb(255, 198, 236);
+}
+.view-row-append{
+  height: 50rpx;
+}
+.rent-item{
+  background-color: rgb(255, 198, 236);
+}
+.left-column-rent-item{
+  height: 75rpx;
+  margin-top: 0rpx;
+  margin-bottom: 0rpx;
+}
+.right-column-rent-item{
+  height: 75rpx;
+}
+

@@ -1,12 +1,12 @@
 <view>
-  <mp-cells title="订单信息"  >
-    <mp-cell ext-class="my-cell"   >
-      <view class="view-row" >
-        <view class="left-column"  >【订单号】</view>
-        <view class="right-column"  >{{order.code}}</view>
+  <mp-cells title="订单信息">
+    <mp-cell ext-class="my-cell">
+      <view class="view-row">
+        <view class="left-column">【订单号】</view>
+        <view class="right-column">{{order.code}}</view>
       </view>
     </mp-cell>
-    <mp-cell ext-class="my-cell" >
+    <mp-cell ext-class="my-cell">
       <view class="view-row">
         <view class="left-column">【店铺】</view>
         <view class="right-column">{{order.shop}}</view>
@@ -14,17 +14,17 @@
         <view class="right-column">{{order.member.following_wechat == 1 ? '会员' : '散客'}}</view>
       </view>
     </mp-cell>
-    <mp-cell ext-class="my-cell" >
+    <mp-cell ext-class="my-cell">
       <view class="view-row" style="height: 24rpx;align-items: center;">
-        <view class="view-row left-column" style="height: 24rpx;align-items: center;" >【姓名】</view>
-        <view class="view-row right-column" style="height: 24rpx;align-items: center;" >{{order.member.title}}</view>
-        <view class="view-row left-column" style="height: 24rpx;align-items: center;" >【电话】</view>
-        <view class="view-row right-column" style="height: 24rpx;align-items: center;" >
-          <van-button  size="small" id="{{order.member.cell}}" bind:click="call" type="info" >{{order.member.cell}}</van-button>
+        <view class="view-row left-column" style="height: 24rpx;align-items: center;">【姓名】</view>
+        <view class="view-row right-column" style="height: 24rpx;align-items: center;">{{order.member.title}}</view>
+        <view class="view-row left-column" style="height: 24rpx;align-items: center;">【电话】</view>
+        <view class="view-row right-column" style="height: 24rpx;align-items: center;">
+          <van-button size="small" id="{{order.member.cell}}" bind:click="call" type="info">{{order.member.cell}}</van-button>
         </view>
       </view>
     </mp-cell>
-    <mp-cell ext-class="my-cell" >
+    <mp-cell ext-class="my-cell">
       <view class="view-row">
         <view class="left-column">【业务日期】</view>
         <view class="right-column">{{order.bizDateStr}}</view>
@@ -76,7 +76,7 @@
     </mp-cell>
     <mp-cell>
       <view class="view-row" style="justify-content: center;">
-        <van-button type="info" size="small" > 收 支 明 细 </van-button>
+        <van-button type="info" size="small"> 收 支 明 细 </van-button>
       </view>
     </mp-cell>
   </mp-cells>
@@ -97,7 +97,8 @@
             <view class="right-column">{{item.guarantyAmountStr}}</view>
             <view class="left-column">【状态】</view>
             <view class="right-column">
-            {{item.settled == 1 ?   ((item.realStartDate == null && item.realEndDate == null)? '已取消' :  '已结算' ) : '在租'}}</view>
+              {{item.settled == 1 ?   ((item.realStartDate == null && item.realEndDate == null)? '已取消' :  '已结算' ) : '在租'}}
+            </view>
           </view>
         </mp-cell>
         <mp-cell>
@@ -127,23 +128,19 @@
         <mp-cell>
           <view class="view-row">
             <view class="left-column">【备注】</view>
-            <view  class="right-column" style="width: 75%;" >
-              <input class="input" disabled="{{item.moddingMemo!=true}}" 
-              id="{{index}}" value="{{item.memo}}" bindinput="setMemo" ></input>
+            <view class="right-column" style="width: 75%;">
+              <input class="input" disabled="{{item.moddingMemo!=true}}" id="{{index}}" value="{{item.memo}}" bindinput="setMemo"></input>
             </view>
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row" style="justify-content: center;">
-            <block wx:if="{{item.moddingMemo==true}}" >
-              <van-button  type="warning" size="small" id="{{index}}" 
-              bind:click="modMemoCancel" >取消</van-button>
-              <van-button  type="danger" size="small" id="{{index}}" 
-              bind:click="modMemoConfirm" style="margin-left: 30rpx;" >确认</van-button>
+            <block wx:if="{{item.moddingMemo==true}}">
+              <van-button type="warning" size="small" id="{{index}}" bind:click="modMemoCancel">取消</van-button>
+              <van-button type="danger" size="small" id="{{index}}" bind:click="modMemoConfirm" style="margin-left: 30rpx;">确认</van-button>
             </block>
-            <van-button wx:else type="warning" size="small" id="{{index}}" bind:click="modMemo" >修改备注</van-button>
-            <van-button type="info" size="small" id="{{item.id}}" bind:click="showRentalDetail" 
-            disabled="{{item.entertain}}" style="margin-left: 30rpx;" >租金明细</van-button>
+            <van-button wx:else type="warning" size="small" id="{{index}}" bind:click="modMemo">修改备注</van-button>
+            <van-button type="info" size="small" id="{{item.id}}" bind:click="showRentalDetail" disabled="{{item.entertain}}" style="margin-left: 30rpx;">租金明细</van-button>
             <van-button id="{{item.id}}" type="primary" size="small" style="margin-left: 30rpx;" bind:click="showRentItem">租赁物明细</van-button>
           </view>
         </mp-cell>
@@ -152,25 +149,25 @@
     <van-tab title="按租赁物">
       <mp-cells wx:for="{{order.rentals}}" wx:for-item="rental" title="{{rental.titleName}}" wx:if="{{currentRentalId == null || (currentRentalId == rental.id) }}">
         <block wx:for="{{rental.rentItems}}">
-          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
-            <view class="view-row"  >
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}">
+            <view class="view-row">
               <view class="left-column">【名称】</view>
               <view class="right-column" style="width: 500rpx;">{{item.noNeed == true ? '--' : item.name}}</view>
             </view>
           </mp-cell>
-          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}">
             <view class="view-row">
               <view class="left-column">【编码】</view>
               <view class="right-column">{{item.noNeed == true ? '--' : (item.noCode == true? '无编码' : item.code)}}</view>
             </view>
           </mp-cell>
-          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}">
             <view class="view-row">
               <view class="left-column">【分类】</view>
               <view class="right-column" style="width: 550rpx;">{{item.noNeed == true ? '' : item.category.name}}</view>
             </view>
           </mp-cell>
-          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}">
             <view class="view-row">
               <view class="left-column">【发放日期】</view>
               <view class="right-column">{{item.noNeed == true ? '--' : item.pickDateStr}}</view>
@@ -178,7 +175,7 @@
               <view class="right-column">{{item.noNeed == true ? '--' : item.pickTimeStr}}</view>
             </view>
           </mp-cell>
-          <mp-cell wx:if="{{item.status == '已更换'}}"  ext-class="{{item.status == '已更换'? 'changed': ''}}" >
+          <mp-cell wx:if="{{item.status == '已更换'}}" ext-class="{{item.status == '已更换'? 'changed': ''}}">
             <view class="view-row">
               <view class="left-column">【更换日期】</view>
               <view class="right-column">{{item.changeDateStr}}</view>
@@ -186,7 +183,7 @@
               <view class="right-column">{{item.changeTimeStr}}</view>
             </view>
           </mp-cell>
-          <mp-cell wx:else  >
+          <mp-cell wx:else>
             <view class="view-row">
               <view class="left-column">【归还日期】</view>
               <view class="right-column">{{item.noNeed == true ? '--' : item.returnDateStr}}</view>
@@ -194,7 +191,7 @@
               <view class="right-column">{{item.noNeed == true ? '--' : item.returnTimeStr}}</view>
             </view>
           </mp-cell>
-          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}">
             <view class="view-row">
               <view class="left-column">【状态】</view>
               <view class="right-column">{{item.noNeed == true ? '不需要'  : item.status}}</view>
@@ -202,44 +199,40 @@
               <view class="right-column"></view>
             </view>
           </mp-cell>
-          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}" >
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}">
             <view class="view-row">
               <view class="left-column">【发放人】</view>
               <view class="right-column" style="width: 500rpx;">{{item.noNeed == true ? '' : (item.pickStaff? item.pickStaff.name: '--')}}</view>
             </view>
           </mp-cell>
-          <mp-cell wx:if="{{item.status == '已更换'}}" ext-class="changed" >
+          <mp-cell wx:if="{{item.status == '已更换'}}" ext-class="changed">
             <view class="view-row">
               <view class="left-column">【更换人】</view>
               <view class="right-column" style="width: 500rpx;">{{item.changeStaff.name}}</view>
             </view>
           </mp-cell>
-          <mp-cell wx:else >
+          <mp-cell wx:else>
             <view class="view-row">
-             <view class="left-column">【接收人】</view>
+              <view class="left-column">【接收人】</view>
               <view class="right-column" style="width: 500rpx;">{{item.noNeed == true ? '' : (item.returnStaff? item.returnStaff.name: '--')}}</view>
             </view>
           </mp-cell>
-          <mp-cell wx:if="{{item.status != '已更换'}}" >
+          <mp-cell wx:if="{{item.status != '已更换'}}">
             <view class="view-row">
               <view class="left-column">【赔偿】</view>
               <view class="right-column">
-                <input class="input" id="{{item.id}}" bindblur="setRepairAmount" value="{{item.totalRepairationAmount}}"
-                disabled="{{item.setRepairing != true}}" type="number" style="text-align: center;" />
+                <input class="input" id="{{item.id}}" bindblur="setRepairAmount" value="{{item.totalRepairationAmount}}" disabled="{{item.setRepairing != true}}" type="number" style="text-align: center;" />
               </view>
-              <view class="view-row" style="justify-content: center;align-items: center;" >
-                <van-button wx:if="{{item.setRepairing != true}}"  type="danger" size="small" style="margin-left: 50rpx;" 
-                  id="{{item.id}}" bind:click="setRepair" >赔偿</van-button>
-                <block wx:else >
-                  <van-button type="warning" size="small" style="margin-left: 50rpx;" 
-                  id="{{item.id}}" bind:click="setRepairCancel" >取消</van-button>
-                  <van-button type="danger" size="small" style="margin-left: 50rpx;" 
-                  id="{{item.id}}" bind:click="setRepairConfirm" >确认</van-button>
+              <view class="view-row" style="justify-content: center;align-items: center;">
+                <van-button wx:if="{{item.setRepairing != true}}" type="danger" size="small" style="margin-left: 50rpx;" id="{{item.id}}" bind:click="setRepair">赔偿</van-button>
+                <block wx:else>
+                  <van-button type="warning" size="small" style="margin-left: 50rpx;" id="{{item.id}}" bind:click="setRepairCancel">取消</van-button>
+                  <van-button type="danger" size="small" style="margin-left: 50rpx;" id="{{item.id}}" bind:click="setRepairConfirm">确认</van-button>
                 </block>
               </view>
             </view>
           </mp-cell>
-          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}"  >
+          <mp-cell ext-class="{{item.status == '已更换'? 'changed': ''}}">
             <view class="view-row">
               <view class="left-column">【备注】</view>
               <view class="right-column" style="width: 500rpx;">{{item.memo}}</view>
@@ -248,11 +241,10 @@
           <mp-cell wx:if="{{item.noNeed != true && item.status != '已更换'}}">
             <view class="view-row" style="justify-content: center;">
               <van-button type="primary" size="small" wx:if="{{item.status == '已发放' }}" id="{{item.id}}" bind:click="setReturn">归还</van-button>
-              <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}" bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}" >设置未归还</van-button>
+              <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}" bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}">设置未归还</van-button>
               <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick" wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
               <van-button type="warning" size="small" style="margin-left: 50rpx;" id="{{item.id}}" wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
               <van-button type="danger" size="small" style="margin-left: 50rpx;" id="{{item.id}}" wx:if="{{item.status=='已发放'}}" bind:click="gotoChange">更换</van-button>
-              
               <van-button type="info" size="small" style="margin-left: 50rpx;" id="{{item.id}}">发还记录</van-button>
             </view>
           </mp-cell>
@@ -265,7 +257,199 @@
     </van-tab>
   </van-tabs>
   <view style="height: 20rpx;"></view>
+  <view style="background-color: #F0F0F0;margin-top: 10rpx;margin-bottom: 30rpx;">添加租赁商品</view>
+  <view wx:for="{{order.appendingRentals}}" wx:for-item="rental" class="{{rental.package_id != null? 'add-package':'add-item'}}">
+    <view style="margin-left: 20rpx;margin-bottom: 20rpx;">{{rental.name}}</view>
+    <block wx:if="{{rental.package_id != null}}">
+      <view class="view-row view-row-append">
+        <view class="left-column left-column-rent-item">【押金】</view>
+        <view class="right-column right-column-rent-item"></view>
+        <view class="left-column left-column-rent-item">【租金】</view>
+        <view class="right-column"></view>
+      </view>
+      <view class="view-row view-row-append" style="height: 75rpx;">
+        <view class="left-column left-column-rent-item">【免押金】</view>
+        <view class="right-column right-column-rent-item">
+          <checkbox-group>
+            <checkbox></checkbox>
+          </checkbox-group>
+        </view>
+        <view>
+          <van-button type="info" type="info" size="mini">查看价目表</van-button>
+        </view>
+      </view>
+      <view class="view-row view-row-append" style="height: 75rpx;">
+        <view class="left-column view-row view-row-append" style="align-items: center;">【起租日】</view>
+        <view class="right-column">
+          <picker mode="date" class="input">
+            <picker-view>2025-12-30</picker-view>
+          </picker>
+        </view>
+      </view>
+      <view class="view-row view-row-append" style="height: 75rpx;">
+        <view class="left-column">【备注】</view>
+        <view class="right-column">
+          <input class="input" style="width: 500rpx;"></input>
+        </view>
+      </view>
+      <view style="display: flex;flex-direction: row;justify-content: center;">
+        <view class="rent-item" style="width: 95%;">
+          <view wx:for="{{rental.rentItems}}">
+            <view class="view-row" style="margin-top: 10rpx;">
+              <view class="left-column left-column-rent-item">【品类】</view>
+              <view class="right-column" style="width: 550rpx;">{{item.category.name}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column left-column-rent-item">【编码】</view>
+              <view><input class="input" style="width: 200rpx;" /></view>
+              <view>
+                <van-icon name="scan" size="19px" />
+              </view>
+              <view class="left-column left-column-rent-item" style="margin-left: 50rpx;">
+                <checkbox-group>
+                  <checkbox>无编码</checkbox>
+                </checkbox-group>
+              </view>
+            </view>
+            <view class="view-row">
+              <view class="left-column left-column-rent-item">【名称】</view>
+              <view><input class="input" style="width: 500rpx;" /></view>
+            </view>
+            <view class="view-row">
+              <view class="left-column left-column-rent-item" style="height: 75rpx;">【不需要】</view>
+              <view style="height: 75rpx;">
+                <checkbox-group>
+                  <checkbox></checkbox>
+                </checkbox-group>
+              </view>
+              <view></view>
+            </view>
+            <view class="view-row">
+              <view class="left-column left-column-rent-item">【备注】</view>
+              <view>
+                <input class="input" style="width: 500rpx;" />
+              </view>
+              <view></view>
+            </view>
+            <!--view class="view-row" >
+              <view class="left-column" >【品类】</view>
+              <view class="right-column"  ></view>
+             
+            </view-->
+            <view style="background-color: white;height: 5rpx;"></view>
+          </view>
+        </view>
+      </view>
+
+    </block>
+    <block wx:else>
+      <view class="view-row">
+        <view class="left-column left-column-rent-item">【编码】</view>
+        <view><input class="input" style="width: 200rpx;" /></view>
+        <view>
+          <van-icon name="scan" size="19px" />
+        </view>
+        <view class="left-column left-column-rent-item" style="margin-left: 50rpx;">
+          <checkbox-group>
+            <checkbox>无编码</checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+      <view class="view-row">
+        <view class="left-column left-column-rent-item">【名称】</view>
+        <view><input class="input" style="width: 500rpx;" /></view>
+      </view>
+      <view class="view-row">
+        <view class="left-column left-column-rent-item">【押金】</view>
+        <view class="right-column right-column-rent-item" ></view>
+        <view class="left-column left-column-rent-item">【租金】</view>
+        <view class="right-column right-column-rent-item" ></view>
+      </view>
+      <view class="view-row">
+        <view class="left-column left-column-rent-item">【免押金】</view>
+        <view class="right-column right-column-rent-item" >
+          <checkbox-group><checkbox></checkbox></checkbox-group>
+        </view>
+        <view class="left-column left-column-rent-item">
+          <van-button size="mini" type="info" >查看价目表</van-button>
+        </view>
+        
+      </view>
+    </block>
+    <view class="view-row" style="justify-content: center;margin-top: 10rpx;margin-bottom: 10rpx;background-color: white;">
+      <van-button type="danger" size="small"> 删 除 </van-button>
+    </view>
+  </view>
+  <!--
   <mp-cells title="追加租赁商品" >
+    <mp-cell wx:for="{{order.appendingRentals}}" wx:for-item="rental" 
+      ext-class="{{rental.package_id != null? 'add-package':''}}"  >
+      <view  >
+        <view>{{rental.name}}</view>
+      </view>
+      <block wx:if="{{rental.package_id != null}}" >
+        <view class="view-row view-row-append"  >
+          <view class="left-column" >【押金】</view>
+          <view class="right-column" ></view>
+          <view class="left-column" >【租金】</view>
+          <view class="right-column" ></view>
+        </view>
+        <view class="view-row view-row-append"  style="height: 75rpx;" >
+          <view class="left-column" >【免押金】</view>
+          <view class="right-column" >
+            <checkbox-group><checkbox></checkbox></checkbox-group>
+          </view>
+          <view >
+            <van-button type="info" type="info" size="mini" >查看价目表</van-button>
+          </view>
+        </view>
+        <view class="view-row view-row-append" style="height: 75rpx;" >
+          <view class="left-column view-row view-row-append" style="align-items: center;" >【起租日】</view>
+          <view class="right-column" >
+            <picker mode="date" class="input" >
+              <picker-view>2025-12-30</picker-view>
+            </picker>
+          </view>
+        </view>
+        <view class="view-row view-row-append" style="height: 75rpx;"  >
+          <view class="left-column" >【备注】</view>
+          <view class="right-column" >
+            <input class="input" style="width: 500rpx;" ></input>
+          </view>
+        </view>
+        <view class="view-row view-row-append" style="justify-content: center;">
+          <view style="width: 99%;" class="rent-item" >
+            <view class="view-row rent-item-row"  >
+              <view class="left-column" >【编码】</view>
+              <view class="right-column" ></view>
+              <view class="left-column" >【无编码】</view>
+              <view class="right-column" ></view>
+            </view>
+            <view class="view-row rent-item-row" >
+              <view class="left-column" >【品类】</view>
+              <view class="right-column" ></view>
+            </view>
+            <view class="view-row rent-item-row" >
+              <view class="left-column" >【名称】</view>
+              <view class="right-column" ></view>
+            </view>
+            <view class="view-row rent-item-row" >
+              <view class="left-column" >【不需要】</view>
+              <view class="right-column" ></view>
+            </view>
+            <view class="view-row rent-item-row" >
+              <view class="left-column" >【备注】</view>
+              <view class="right-column" ></view>
+            </view>
+          </view>
+        </view>
+        <view style="height: 1rpx;background-color: white;width: 750rpx;" ></view>
+      </block>
+      <block wx:else >
+      
+      </block>
+      
+    </mp-cell>
     <mp-cell>
       <view class="view-row" style="justify-content: center;" >
         <van-button type="primary" style="margin-right: 50rpx;" bind:click="addNewPackage" >添加套餐</van-button>
@@ -273,66 +457,69 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="退款" wx:if="{{allSettled}}" >
+  -->
+  <view class="view-row" style="justify-content: center;">
+    <van-button type="primary" style="margin-right: 50rpx;" bind:click="addNewPackage">添加套餐</van-button>
+    <van-button type="danger" style="margin-left: 50rpx;" bind:click="addNewCategory">添加单品</van-button>
+  </view>
+  <mp-cells title="退款" wx:if="{{allSettled}}">
     <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >【总计押金】</view>
-        <view class="right-column" >{{order.rentProperties.totalPaidGuarantyAmountStr}}</view>
-        <view class="left-column" >【总计租金】</view>
-        <view class="right-column" >{{order.totalRentSummaryAmountStr}}</view>
+      <view class="view-row">
+        <view class="left-column">【总计押金】</view>
+        <view class="right-column">{{order.rentProperties.totalPaidGuarantyAmountStr}}</view>
+        <view class="left-column">【总计租金】</view>
+        <view class="right-column">{{order.totalRentSummaryAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >【总计超时】</view>
-        <view class="right-column" >{{order.totalRentOverTimeAmountStr}}</view>
-        <view class="left-column" >【总计赔偿】</view>
-        <view class="right-column" >{{order.totalRentRepairationAmountStr}}</view>
+      <view class="view-row">
+        <view class="left-column">【总计超时】</view>
+        <view class="right-column">{{order.totalRentOverTimeAmountStr}}</view>
+        <view class="left-column">【总计赔偿】</view>
+        <view class="right-column">{{order.totalRentRepairationAmountStr}}</view>
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >【应退押金】</view>
-        <view class="right-column" >{{order.totalRentNeedToRefundAmountStr}}</view>
-        <view class="left-column" >【已退金额】</view>
-        <view class="right-column" >{{order.refundAmountStr}}</view>
+      <view class="view-row">
+        <view class="left-column">【应退押金】</view>
+        <view class="right-column">{{order.totalRentNeedToRefundAmountStr}}</view>
+        <view class="left-column">【已退金额】</view>
+        <view class="right-column">{{order.refundAmountStr}}</view>
       </view>
     </mp-cell>
-    <mp-cell wx:if="{{order.member && order.member.availableDeposit && order.member.availableDeposit > 0}}"   >
-      <view class="view-row" >
-        <view class="left-column" >【可用储值】</view>
-        <view class="right-column" >{{order.member.availableDepositStr}}</view>
-        <view class="left-column" >【支付租金】</view>
-        <view class="right-column" >
-          <checkbox-group bindchange="setPayWithDeposit"  >
-            <checkbox checked="{{payWithDeposit}}" disabled="{{order.depositPaidAmount > 0}}" ></checkbox>
+    <mp-cell wx:if="{{order.member && order.member.availableDeposit && order.member.availableDeposit > 0}}">
+      <view class="view-row">
+        <view class="left-column">【可用储值】</view>
+        <view class="right-column">{{order.member.availableDepositStr}}</view>
+        <view class="left-column">【支付租金】</view>
+        <view class="right-column">
+          <checkbox-group bindchange="setPayWithDeposit">
+            <checkbox checked="{{payWithDeposit}}" disabled="{{order.depositPaidAmount > 0}}"></checkbox>
           </checkbox-group>
         </view>
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="view-row" >
-        <view class="left-column view-row" style="align-items: center;height: 50rpx;" >【实际退款】</view>
-        <view class="right-column view-row" style="align-items: center; width: 450rpx;height: 50rpx;" >
+      <view class="view-row">
+        <view class="left-column view-row" style="align-items: center;height: 50rpx;">【实际退款】</view>
+        <view class="right-column view-row" style="align-items: center; width: 450rpx;height: 50rpx;">
           <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" value="{{order.totalRentUnRefund}}" />
-          <van-button type="danger" size="mini" style="margin-left: 100rpx;" bind:click="refund" disabled="{{refunding || order.closed == 1}}" > 退 款 </van-button>
-          
+          <van-button type="danger" size="mini" style="margin-left: 100rpx;" bind:click="refund" disabled="{{refunding || order.closed == 1}}"> 退 款 </van-button>
         </view>
       </view>
     </mp-cell>
     <mp-cell>
-      <view style="height: 100rpx;"  ></view>
+      <view style="height: 100rpx;"></view>
     </mp-cell>
   </mp-cells>
-  <fui-backdrop show="{{showBackdrop}}" closable >
-    <confirm-rental wx:if="{{showBackdrop && backDropType == 'confirm_rental'}}" rentalId="{{currentRentalId}}" 
-      bindCloseBackdrop="closeBackdrop" ></confirm-rental>
+  <fui-backdrop show="{{showBackdrop}}" closable>
+    <confirm-rental wx:if="{{showBackdrop && backDropType == 'confirm_rental'}}" rentalId="{{currentRentalId}}" bindCloseBackdrop="closeBackdrop"></confirm-rental>
   </fui-backdrop>
   <van-popup show="{{ showSelectPackagePopUp }}">
-    <package_selector  bindConfirm="selectPackageConfirm" bindCancel="cancelPackagePopUp"></package_selector>
+    <package_selector bindConfirm="selectPackageConfirm" bindCancel="cancelPackagePopUp"></package_selector>
   </van-popup>
-  <van-popup show="{{showSelectCategoryPopUp}}"  >
-    <category-selector  bindCancel="cancelCategoryPopUp" bindConfirm="confirmCategory"></category-selector>
+  <van-popup show="{{showSelectCategoryPopUp}}">
+    <category-selector bindCancel="cancelCategoryPopUp" bindConfirm="confirmCategory"></category-selector>
   </van-popup>
-  
+
 </view>
