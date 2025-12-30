@@ -13,7 +13,8 @@ Page({
     backDropType: 'null',
     showBackdrop: false,
     refunding: false,
-    payWithDeposit: false
+    payWithDeposit: false,
+    showSelectPackagePopUp: false
   },
 
   /**
@@ -700,5 +701,21 @@ Page({
     wx.navigateTo({
       url: 'rent_item_change?orderId=' + that.data.order.id.toString() + '&rentItemId=' + rentItemId.toString()
     })
+  },
+  addNewPackage(e){
+    var that = this
+    that.setData({ showSelectPackagePopUp: true})
+  },
+  cancelPackagePopUp(e){
+    var that = this
+    that.setData({ showSelectPackagePopUp: false })
+  },
+  cancelCategoryPopUp(e){
+    var that = this
+    that.setData({showSelectCategoryPopUp: false})
+  },
+  addNewCategory(e){
+    var that = this
+    that.setData({ showSelectCategoryPopUp: true})
   }
 })

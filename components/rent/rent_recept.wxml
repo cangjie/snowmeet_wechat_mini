@@ -25,11 +25,13 @@
                 {{rental.rentItems[0].category.name}}
               </view>
               <view>
-                <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">重选</van-button>
+                <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini"  
+                id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">重选</van-button>
               </view>
             </view>
             <view class="right-column right-column1" wx:else style="width: 475rpx;">
-              <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini" bind:click="searchListBarcodeFuzzy" id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
+              <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini" 
+              id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
             </view>
           </view>
           <view class="view-row">

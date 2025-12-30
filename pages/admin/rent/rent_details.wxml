@@ -268,8 +268,8 @@
   <mp-cells title="追加租赁商品" >
     <mp-cell>
       <view class="view-row" style="justify-content: center;" >
-        <van-button type="primary" style="margin-right: 50rpx;" >添加套餐</van-button>
-        <van-button type="danger" style="margin-left: 50rpx;" >添加单品</van-button>
+        <van-button type="primary" style="margin-right: 50rpx;" bind:click="addNewPackage" >添加套餐</van-button>
+        <van-button type="danger" style="margin-left: 50rpx;" bind:click="addNewCategory"  >添加单品</van-button>
       </view>
     </mp-cell>
   </mp-cells>
@@ -328,4 +328,11 @@
     <confirm-rental wx:if="{{showBackdrop && backDropType == 'confirm_rental'}}" rentalId="{{currentRentalId}}" 
       bindCloseBackdrop="closeBackdrop" ></confirm-rental>
   </fui-backdrop>
+  <van-popup show="{{ showSelectPackagePopUp }}">
+    <package_selector  bindConfirm="selectPackageConfirm" bindCancel="cancelPackagePopUp"></package_selector>
+  </van-popup>
+  <van-popup show="{{showSelectCategoryPopUp}}"  >
+    <category-selector  bindCancel="cancelCategoryPopUp" bindConfirm="confirmCategory"></category-selector>
+  </van-popup>
+  
 </view>
