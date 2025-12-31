@@ -1,4 +1,13 @@
 .left-column{
   text-align: left;
   width: 190rpx;
+  height: 25rpx;
+  margin-top: 0rpx;
+}
+.right-column{
+  height:25rpx;
+  margin-top: 0rpx;
+}
+.thin-cell{
+  height: 25rpx;
 }

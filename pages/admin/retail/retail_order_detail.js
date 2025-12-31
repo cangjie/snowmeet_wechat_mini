@@ -175,6 +175,9 @@ Page({
           order.retails[0].mi7_code = value
         }
         break
+      case 'retail_type':
+        order.retails[0].retail_type = value
+        break
       default:
         break
     }

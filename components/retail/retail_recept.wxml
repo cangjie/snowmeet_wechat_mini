@@ -34,18 +34,41 @@
   </view>
   <van-divider></van-divider>
   <view class="view-row" >
-    <view class="left-column" >【备注】</view>
+    <view class="left-column" >【测试】</view>
     <view class="right-column" >
-      <textarea class="input" style="width: 420rpx; height: 200rpx;" 
-      value="{{order.retails[0].memo}}" id="memo" bindinput="setInput" ></textarea>
+      <checkbox-group bindchange="checkChanged" id="is_test" >
+        <checkbox value="1" ></checkbox>
+      </checkbox-group>
     </view>
   </view>
+  <van-divider></van-divider>
+  <view class="view-row" style="height: 120rpx;">
+    <view class="left-column"  style="height: 120rpx;" >【订单类型】</view>
+    <view class="right-column"  style="height: 120rpx;" >
+      <radio-group  id="retail_type" bindchange="radioChanged"  >
+        <radio checked="{{true}}" value="零售" >零售</radio>
+        <radio style="margin-left: 10rpx;" value="期货预定" >期货预定</radio>
+        <radio style="margin-left: 10rpx;margin-top:10rpx" value="养护卡类" >养护卡类</radio>
+        <radio style="margin-top:10rpx" value="租赁卡类" >租赁卡类</radio>
+        <radio style="margin-left: 10rpx;margin-top:10rpx" value="租赁卡类" >二手装备</radio>
+      </radio-group>
+    </view>
+  </view>
+  <van-divider></van-divider>
   <view class="view-row" >
     <view class="left-column" >【招待】</view>
     <view class="right-column" >
       <checkbox-group id="entertain" bindchange="checkChanged" >
         <checkbox  ></checkbox>
       </checkbox-group>
+    </view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row" >
+    <view class="left-column" >【备注】</view>
+    <view class="right-column" >
+      <textarea class="input" style="width: 420rpx; height: 200rpx;" 
+      value="{{order.retails[0].memo}}" id="memo" bindinput="setInput" ></textarea>
     </view>
   </view>
 </view>
