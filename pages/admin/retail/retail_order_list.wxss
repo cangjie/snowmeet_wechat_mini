@@ -2,8 +2,13 @@
 .left-column{
   text-align: left;
   width: 190rpx;
+  height: 35rpx;
 }
 .right-column{
   text-align: left;
   width: 1350rpx;
+  height: 35rpx;
+}
+.fui-left-column{
+  text-align: left;
 }

@@ -90,10 +90,19 @@ Component({
       order.total_amount = totalAmout
       order.paying_amount = totalAmout
       that.setData({ordering: true})
+      var isTest = false
+      for(var i = 0; !isTest && order.retails && i < order.retails.length; i++){
+        var retail = order.retails[i]
+        if (retail.is_test == 1){
+          isTest = true
+        }
+      }
+      order.is_test = isTest? 1 : 0
       var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(postUrl, order).then(function (order){
         console.log('place order', order)
         that.setData({ordering: false, order})
+
         if(order.retails[0].order_type == '招待'){
           wx.showToast({
             title: '已确认招待',

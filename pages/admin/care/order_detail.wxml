@@ -21,7 +21,7 @@
         <view class="right-column">{{order.member.title}}</view>
         <view class="left-column">【电话】</view>
         <view class="right-column">
-          <van-button size="small" id="{{order.member.cell}}" bind:click="call" type="info" >{{order.member.cell}}</van-button>
+          <van-button size="small" id="{{order.member.cell}}" bind:click="call" type="info">{{order.member.cell}}</van-button>
         </view>
       </view>
     </mp-cell>
@@ -49,12 +49,12 @@
           <view class="view-row">
             <view class="left-column">【类型】</view>
             <view class="right-column">{{item.equipment}}</view>
-            
+
           </view>
         </mp-cell>
         <mp-cell>
           <view class="view-row">
-            
+
             <view class="left-column view-row">【品牌】<view style="color:red;font-size:15pt">*</view>
             </view>
             <view class="right-column" style="width: 450rpx;">
@@ -64,13 +64,13 @@
             </view>
           </view>
         </mp-cell>
-        
-        <mp-cell wx:if="{{addNewBrand==true}}"  >
+
+        <mp-cell wx:if="{{addNewBrand==true}}">
           <view class="view-row" style="justify-content: center;">
-            <input class="input" placeholder="英文名称" style="width: 200rpx;"  bindinput="setBrandName" />
-            /<input class="input" style="width:200rpx" placeholder="中文名称" bindinput="setBrandChineseName" /> 
-            <van-button type="warning" size="mini" style="margin-left: 10rpx;margin-right: 10rpx;" 
-            bind:click="cancelAddNewBrand" > 取 消 </van-button> <van-button type="danger" size="mini" style="margin-left:10rpx;" bind:click="confirmAddNewBrand" id="{{index}}" > 确 认 </van-button>
+            <input class="input" placeholder="英文名称" style="width: 200rpx;" bindinput="setBrandName" />
+            /<input class="input" style="width:200rpx" placeholder="中文名称" bindinput="setBrandChineseName" />
+            <van-button type="warning" size="mini" style="margin-left: 10rpx;margin-right: 10rpx;" bind:click="cancelAddNewBrand"> 取 消 </van-button>
+            <van-button type="danger" size="mini" style="margin-left:10rpx;" bind:click="confirmAddNewBrand" id="{{index}}"> 确 认 </van-button>
           </view>
         </mp-cell>
         <mp-cell>
@@ -162,22 +162,21 @@
         <block wx:if="{{task.task_name=='安全检查'}}">
           <mp-cell>
             <view class="view-row">
-              <view class="left-column view-row">【身高】<view style="color: red;font-size: 15pt;" >*</view></view>
+              <view class="left-column view-row">【身高】<view style="color: red;font-size: 15pt;">*</view>
+              </view>
               <view class="right-column view-row">
-                <input class="input" style="width: 100rpx;text-align: center;" id="{{index}}" bindblur="setHeight" 
-                disabled="{{!item.safeChecking}}" value="{{item.height}}" />cm
+                <input class="input" style="width: 100rpx;text-align: center;" id="{{index}}" bindblur="setHeight" disabled="{{!item.safeChecking}}" value="{{item.height}}" />cm
               </view>
               <block wx:if="{{item.equipment == '双板'}}">
                 <view class="left-column">【体重】</view>
                 <view class="right-column view-row">
-                  <input class="input" style="width: 100rpx;text-align: center;" id="{{index}}" bindblur="setWeight"
-                  disabled="{{!item.safeChecking }}" value="{{item.weight}}" />kg
+                  <input class="input" style="width: 100rpx;text-align: center;" id="{{index}}" bindblur="setWeight" disabled="{{!item.safeChecking }}" value="{{item.weight}}" />kg
                 </view>
               </block>
               <block wx:else>
                 <view class="left-column view-row">【间距】</view>
                 <view class="right-column">
-                  <input class="input" style="width: 100rpx;text-align: center;"  disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setGap" value="{{item.gap}}" />
+                  <input class="input" style="width: 100rpx;text-align: center;" disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setGap" value="{{item.gap}}" />
                 </view>
               </block>
             </view>
@@ -186,8 +185,8 @@
             <view class="view-row">
               <view class="left-column view-row">【脱落值】</view>
               <view class="right-column view-row" style="width: 550rpx;align-items: center;">
-                <view style="color: red;font-size: 15pt;" >*</view>前：<input class="input" style="width: 75rpx;margin-right: 50rpx;text-align: center;"  disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setFrontDin" value="{{item.front_din}}" />
-                <view style="color: red;font-size: 15pt;text-align: center;" >*</view>后：<input class="input" style="width: 75rpx;text-align: center;"  disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setRearDin" value="{{item.rear_din}}" />
+                <view style="color: red;font-size: 15pt;">*</view>前：<input class="input" style="width: 75rpx;margin-right: 50rpx;text-align: center;" disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setFrontDin" value="{{item.front_din}}" />
+                <view style="color: red;font-size: 15pt;text-align: center;">*</view>后：<input class="input" style="width: 75rpx;text-align: center;" disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setRearDin" value="{{item.rear_din}}" />
               </view>
 
             </view>
@@ -196,8 +195,7 @@
             <view class="view-row">
               <view class="left-column">【角度】</view>
               <view class="right-column view-row" style="width: 550rpx;align-items: center;">
-                左：<input class="input" style="width: 75rpx;margin-right: 50rpx;"  id="{{index}}" bindblur="setLeftAngel"
-                disabled="{{item.safeChecking}}" value="{{item.left_angel}}" />
+                左：<input class="input" style="width: 75rpx;margin-right: 50rpx;" id="{{index}}" bindblur="setLeftAngel" disabled="{{item.safeChecking}}" value="{{item.left_angel}}" />
                 右：<input class="input" style="width: 75rpx;" disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setRightAngel" value="{{item.right_angel}}" />
               </view>
 
@@ -213,104 +211,100 @@
             <view class="view-row">
               <view class="left-column">【备注】</view>
               <view class="right-column">
-                <input style="width: 480rpx;" class="input"  disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setSafeMemo" value="{{item.tasks[0].memo}}" />
+                <input style="width: 480rpx;" class="input" disabled="{{!item.safeChecking}}" id="{{index}}" bindblur="setSafeMemo" value="{{item.tasks[0].memo}}" />
               </view>
             </view>
           </mp-cell>
           <mp-cell>
-            <view class="view-row" style="justify-content: center;" >
-              <van-button type="primary" disabled="{{!item.safeChecking}}" 
-              bind:click="safeCheck" id="{{index}}" > 确 认 安 全 </van-button>
+            <view class="view-row" style="justify-content: center;">
+              <van-button type="warning" disabled="{{!item.safeChecking}}" bind:click="safeCheck" id="{{index}}"> 确 认 安 全 </van-button>
             </view>
-            <view class="view-row" style="justify-content: center;" >
+            <!--view class="view-row" style="justify-content: center;" >
               <van-button type="info" 
               bind:click="showPrintBackDrop" id="{{index}}" style="margin-top: 50rpx;" > 打 印 标 签 </van-button>
+            </view-->
+            <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
+              <van-button type="primary" bind:click="printLabel" id="{{index}}">打印标签存根</van-button>
+              <van-button type="info" style="margin-left: 50rpx;" bind:click="printInvoice" id="{{index}}">打印顾客小票</van-button>
             </view>
           </mp-cell>
         </block>
-        <block wx:if="{{task.task_name!='安全检查' && task.task_name!= '发板'}}" >
+        <block wx:if="{{task.task_name!='安全检查' && task.task_name!= '发板'}}">
           <mp-cell>
-            <view class="view-row" >
-              <view class="left-column" >【技师】</view>
-              <view class="right-column" >{{task.staff? task.staff.name : '--'}}</view>
-              <view class="left-column" >【状态】</view>
-              <view class="right-column" >{{task.status}}</view>
+            <view class="view-row">
+              <view class="left-column">【技师】</view>
+              <view class="right-column">{{task.staff? task.staff.name : '--'}}</view>
+              <view class="left-column">【状态】</view>
+              <view class="right-column">{{task.status}}</view>
             </view>
           </mp-cell>
           <mp-cell>
-            <view class="view-row" >
-              <view class="left-column" >【开始日期】</view>
-              <view class="right-column" >{{task.start_timeDateStr}}</view>
-              <view class="left-column" >【开始时间】</view>
-              <view class="right-column" >{{task.start_timeTimeStr}}</view>
+            <view class="view-row">
+              <view class="left-column">【开始日期】</view>
+              <view class="right-column">{{task.start_timeDateStr}}</view>
+              <view class="left-column">【开始时间】</view>
+              <view class="right-column">{{task.start_timeTimeStr}}</view>
             </view>
           </mp-cell>
           <mp-cell>
-            <view class="view-row" >
-              <view class="left-column" >【结束日期】</view>
-              <view class="right-column" >{{task.end_timeDateStr}}</view>
-              <view class="left-column" >【结束时间】</view>
-              <view class="right-column" >{{task.end_timeTimeStr}}</view>
+            <view class="view-row">
+              <view class="left-column">【结束日期】</view>
+              <view class="right-column">{{task.end_timeDateStr}}</view>
+              <view class="left-column">【结束时间】</view>
+              <view class="right-column">{{task.end_timeTimeStr}}</view>
             </view>
           </mp-cell>
-          <mp-cell wx:if="{{task.current==true}}"  >
-            <view class="view-row" style="justify-content: center;" >
-              <van-button wx:if="{{task.status == '未开始'}}" type="primary" id="{{task.id}}" 
-              bind:click="setTaskStart"  > 开 始 </van-button>
-              <van-button wx:if="{{task.status == '已开始'}}" type="danger" id="{{task.id}}" 
-              bind:click="setTaskEnd"  > 结 束 </van-button>
+          <mp-cell wx:if="{{task.current==true}}">
+            <view class="view-row" style="justify-content: center;">
+              <van-button wx:if="{{task.status == '未开始'}}" type="primary" id="{{task.id}}" bind:click="setTaskStart"> 开 始 </van-button>
+              <van-button wx:if="{{task.status == '已开始'}}" type="danger" id="{{task.id}}" bind:click="setTaskEnd"> 结 束 </van-button>
             </view>
           </mp-cell>
         </block>
-        <block wx:if="{{task.task_name == '发板'}}" >
-          <mp-cell wx:if="{{task.status == '未开始'}}" >
-            <view class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-              <radio-group bindchange="setVeriType" id="{{index}}" >
-                <radio value="本人扫码" disabled="{{task.current==false}}" 
-                  checked="{{item.veriType == '本人扫码'}}" >扫码</radio>
-                <radio style="margin-left:10rpx" value="验证码" disabled="{{task.current==false}}" 
-                  checked="{{item.veriType == '验证码'}}" >验证码</radio>
-                <radio style="margin-left:10rpx" value="凭证拍照" disabled="{{task.current==false}}" 
-                  checked="{{item.veriType == '凭证拍照'}}" >拍照</radio>
-                <radio style="margin-left:10rpx" value="店长确认" disabled="{{task.current==false || app.globalData.staff.title_level < 200 }}" 
-                checked="{{item.veriType == '店长确认'}}" >店长确认</radio>
+        <block wx:if="{{task.task_name == '发板'}}">
+          <mp-cell wx:if="{{task.status == '未开始'}}">
+            <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
+              <radio-group bindchange="setVeriType" id="{{index}}">
+                <radio value="本人扫码" disabled="{{task.current==false}}" checked="{{item.veriType == '本人扫码'}}">扫码</radio>
+                <radio style="margin-left:10rpx" value="验证码" disabled="{{task.current==false}}" checked="{{item.veriType == '验证码'}}">验证码</radio>
+                <radio style="margin-left:10rpx" value="凭证拍照" disabled="{{task.current==false}}" checked="{{item.veriType == '凭证拍照'}}">拍照</radio>
+                <radio style="margin-left:10rpx" value="店长确认" disabled="{{task.current==false || app.globalData.staff.title_level < 200 }}" checked="{{item.veriType == '店长确认'}}">店长确认</radio>
               </radio-group>
             </view>
-            <view wx:if="{{item.veriType == '本人扫码'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-              <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}" ></image>
+            <view wx:if="{{item.veriType == '本人扫码'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;">
+              <image style="width: 300rpx;height: 300rpx;" src="{{qrcodeUrl}}"></image>
             </view>
-            <view wx:if="{{item.veriType == '验证码'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+            <view wx:if="{{item.veriType == '验证码'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;">
               <input type="number" style="width: 150rpx;" class="input" bindinput="setVeriCode" value="{{veriCode? veriCode: ''}}" />
-              <van-button bind:click="pickVeriCode" size="mini" type="primary" style="margin-left: 50rpx;" id="{{index}}" > 验 证 </van-button>
+              <van-button bind:click="pickVeriCode" size="mini" type="primary" style="margin-left: 50rpx;" id="{{index}}"> 验 证 </van-button>
             </view>
-            <view wx:if="{{item.veriType == '凭证拍照'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-              <van-uploader  file-list="{{item.pickImage}}" bind:after-read="afterReadPick" capture="['album', 'camera']" 
-              bind:delete="delImagePick" max-count="1" id="{{index}}"  show-upload="{{true}}" deletable="{{true}}" />
+            <view wx:if="{{item.veriType == '凭证拍照'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;">
+              <van-uploader file-list="{{item.pickImage}}" bind:after-read="afterReadPick" capture="['album', 'camera']" bind:delete="delImagePick" max-count="1" id="{{index}}" show-upload="{{true}}" deletable="{{true}}" />
             </view>
-            <view wx:if="{{item.veriType == '店长确认'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;" >
-              <van-button type="danger" bind:click="masterFinish" id="{{index}}" disabled="{{staff.title_level < 200 }}"  > 店 长 确 认 </van-button>
+            <view wx:if="{{item.veriType == '店长确认'}}" class="view-row" style="justify-content: center;margin-top: 50rpx;">
+              <van-button type="danger" bind:click="masterFinish" id="{{index}}" disabled="{{staff.title_level < 200 }}"> 店 长 确 认 </van-button>
             </view>
           </mp-cell>
-          <block wx:if="{{task.status == '已完成'}}" >
+          <block wx:if="{{task.status == '已完成'}}">
             <mp-cell>
-              <view class="view-row" >
-                <view class="left-column" >【日期】</view>
-                <view class="right-column" >{{task.end_timeDateStr}}</view>
-                <view class="left-column" >【时间】</view>
-                <view class="right-column" >{{task.end_timeTimeStr}}</view>
+              <view class="view-row">
+                <view class="left-column">【日期】</view>
+                <view class="right-column">{{task.end_timeDateStr}}</view>
+                <view class="left-column">【时间】</view>
+                <view class="right-column">{{task.end_timeTimeStr}}</view>
               </view>
             </mp-cell>
             <mp-cell>
-              <view class="view-row" >
-                <view class="left-column" >【负责人】</view>
-                <view class="right-column" >{{task.staff.name}}</view>
-                <view class="left-column" >【验证方式】</view>
-                <view class="right-column" >{{task.memo}}</view>
+              <view class="view-row">
+                <view class="left-column">【负责人】</view>
+                <view class="right-column">{{task.staff.name}}</view>
+                <view class="left-column">【验证方式】</view>
+                <view class="right-column">{{task.memo}}</view>
               </view>
             </mp-cell>
             <mp-cell>
-              <view class="view-row" style="justify-content: center;" >
-                <image src="https://snowmeet.wanlonghuaxue.com{{item.pickImage.thumb}}" style="width: 300rpx;" ></image>
+              <view class="view-row" style="justify-content: center;">
+                <image src="https://snowmeet.wanlonghuaxue.com{{item.pickImage.thumb}}" style="width: 300rpx;"></image>
               </view>
             </mp-cell>
           </block>
@@ -318,9 +312,8 @@
       </mp-cells>
     </van-tab>
   </van-tabs>
-  <view style="height: 100rpx;" ></view>
-  <van-popup show="{{ showPrint }}" position="bottom" custom-style="height: 80%;" 
-  bind:close="onPrinterClose" close-icon="close" >
-    <print-care wx:if="{{showPrint}}" care="{{careToBePrinted}}" order="{{order}}" ></print-care>
+  <view style="height: 100rpx;"></view>
+  <van-popup show="{{ showPrint }}" position="bottom" custom-style="height: 80%;" bind:close="onPrinterClose" close-icon="close">
+    <print-care wx:if="{{showPrint}}" care="{{careToBePrinted}}" order="{{order}}" type="{{printType}}"></print-care>
   </van-popup>
 </view>

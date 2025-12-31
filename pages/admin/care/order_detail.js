@@ -1208,5 +1208,15 @@ Page({
         }
       }
     })
+  },
+  printLabel(e){
+    var that = this
+    that.setData({printType: 'label'})
+    that.showPrintBackDrop(e)
+  },
+  printInvoice(e){
+    var that = this
+    that.setData({printType: 'invoice'})
+    that.showPrintBackDrop(e)
   }
 })

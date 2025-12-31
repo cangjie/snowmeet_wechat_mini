@@ -8,71 +8,69 @@ Page({
    * Page initial data
    */
   data: {
+    querying: false,
+    queryOptions: [
+      { key: 'isTest', value: false },
+      { key: 'isEntertain', value: false },
+      { key: 'retailType', value: null }
+    ],
+    cell: null
 
   },
-
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
-    
-
+    var that = this
+    var nowDate = new Date()
+    that.setData({ startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate) })
   },
-
   /**
    * Lifecycle function--Called when page is initially rendered
    */
   onReady() {
 
   },
-
   /**
    * Lifecycle function--Called when page show
    */
   onShow() {
     var that = this
-    that.data.startDate = new Date("2025-10-1")
-    that.data.endDate = new Date("2026-12-31")
     app.loginPromiseNew.then(function (resolve){
       that.getData()
     })
   },
-
   /**
    * Lifecycle function--Called when page hide
    */
   onHide() {
 
   },
-
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload() {
 
   },
-
   /**
    * Page event handler function--Called when user drop down
    */
   onPullDownRefresh() {
 
   },
-
   /**
    * Called when page reach bottom
    */
   onReachBottom() {
 
   },
-
   /**
    * Called when user click on the top right corner to share
    */
   onShareAppMessage() {
 
   },
-  getData(){
+  getData1(){
     var that = this
     data.getOrdersByStaffPromise(null, null, null, null, '零售', '2025-10-01', '2026-12-31', 
     null, null, null, null, null, null, null, app.globalData.sessionKey).then(function (orders){
@@ -120,12 +118,102 @@ Page({
         order.payMethod = order.availablePayments[j].pay_method
       }
     }
-    that.setData({orders, totalAmount})
+    that.setData({orders, totalAmount, totalAmountStr: util.showAmount(totalAmount)})
   },
   gotoDetail(e){
     var id = parseInt(e.currentTarget.id)
     wx.navigateTo({
       url: 'retail_order_detail?id=' + id
+    })
+  },
+  setCell(e){
+    var that = this
+    //that.data.cell = e.detail.value
+    var cell = e.detail.value
+    that.setData({ cell })
+  },
+  setQueryOptions(e) {
+    var that = this
+    var id = e.currentTarget.id
+    that.setQueryOptionValue(id, e.detail.value)
+  },
+  setQueryOptionValue(key, value) {
+    var that = this
+    var queryOptions = that.data.queryOptions
+    for (var i = 0; i < queryOptions.length; i++) {
+      if (queryOptions[i].key == key) {
+        switch (value) {
+          case 'null':
+            queryOptions[i].value = null
+            break
+          case 'true':
+            queryOptions[i].value = true
+            break
+          case 'false':
+            queryOptions[i].value = false
+            break
+          default:
+            queryOptions[i].value = value
+            break
+        }
+      }
+    }
+    console.log('set query options', queryOptions)
+  },
+  query() {
+    var that = this
+    that.setData({ querying: true })
+    that.getData()
+  },
+  shopSelected(e) {
+    var that = this
+    console.log('shop selected', e)
+    that.setData({ shop: e.detail.shop })
+  },
+  getData(){
+    var that = this
+    var isTest = null
+    var isEntertain = null
+    var retailType = null
+    var queryOptions = that.data.queryOptions
+    for (var i = 0; i < queryOptions.length; i++) {
+      switch (queryOptions[i].key) {
+        case 'isTest':
+          isTest = queryOptions[i].value
+          break
+        case 'isEntertain':
+          isEntertain = queryOptions[i].value
+          break
+        case 'retailType':
+          retailType = queryOptions[i].value
+          break
+        default:
+          break
+      }
+    }
+    var shop = that.data.shop
+    var startDate = that.data.startDate
+    var endDate = that.data.endDate
+    var cell = that.data.cell
+    if (cell != null && cell != '') {
+      startDate = new Date('2025-10-15')
+      endDate = null
+      shop = null
+      isTest = null
+      isEntertain = null
+      retailType = null
+    }
+
+    //data.getOrdersByStaffPromise(null, null, null, null, '零售', startDate, endDate, 
+    //null, null, null, null, null, null, null, app.globalData.sessionKey, retailType)
+    data.getOrdersByStaffPromise(null, shop, null, null, '零售', startDate, endDate, null, isTest, isEntertain, null, null, null, null, app.globalData.sessionKey, cell, null, retailType)
+    .then(function (orders){
+      console.log('get orders', orders)
+      that.renderOrders(orders)
+      that.setData({querying: false})
+      //that.setData({orders})
+    }).catch(function (exp){
+
     })
   }
 })

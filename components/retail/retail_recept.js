@@ -95,7 +95,6 @@ Component({
           break
         case 'mi7_code':
           retail.mi7_code = value
-
           break
         case 'memo':
           retail.memo = value
@@ -124,10 +123,22 @@ Component({
         case 'entertain':
           retail.order_type = value == 1? '招待' : '普通'
           break
+        case 'is_test':
+          retail.is_test = value
+          break
         default:
           break
       }
       that.setData({order})
+      that.triggerEvent('SyncRetailOrder', order)
+    },
+    radioChanged(e){
+      var that = this
+      //var id = e.currentTarget.id
+      var value = e.detail.value
+      var order = that.data.order
+      var retail = order.retails[0]
+      retail.retail_type = value
       that.triggerEvent('SyncRetailOrder', order)
     }
   }

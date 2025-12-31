@@ -1,11 +1,19 @@
 @import '/app.wxss';
 .view-row{
-  margin-top: 20rpx;
+  margin-top: 0rpx;
+  height:40rpx;
+
 }
 .left-column{
   text-align: left;
   width: 240rpx;
+  height:40rpx;
+  display: flex;
+  align-items: center;
+  margin-top: 0rpx;
 }
 .right-column{
   width: 490rpx;
+  height:40rpx;
+  margin-top: 0rpx;
 }
