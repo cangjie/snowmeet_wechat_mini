@@ -105,6 +105,10 @@ Page({
           relieveGuaranty += rental.guaranties[j].amount
         }
       }
+      rental.realGuaranty = rental.guaranty - rental.guaranty_dicount
+      rental.realDepositStr = util.showAmount(rental.realGuaranty)
+      rental.deposit = rental.guaranty
+
       rental.titleName = rental.package_id ? ('套餐-' + rental.name) : ('单品-' + rental.name)
       rental.totalRentalAmountStr = util.showAmount(rental.totalRentalAmount)
       rental.totalRepairationAmountStr = util.showAmount(rental.totalRepairationAmount)
@@ -114,6 +118,7 @@ Page({
         - rental.ticketDiscountAmount - rental.othersDiscountAmount
       totalSummary += rental.summary
       rental.totalSummaryStr = util.showAmount(rental.totalSummary)
+      rental.startDate = new Date(rental.start_date)
       if (rental.realStartDate == null) {
         rental.realStartDateStr = '--'
       }
@@ -229,7 +234,9 @@ Page({
     var getUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + id + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
-      
+      data.getShopByNamePromise(order.shop).then(function (shopObj) {
+        that.setData({shopObj})
+      })
       for (var i = 0; order.rentals && i < order.rentals.length; i++) {
         if (order.rentals[i].id == 0) {
           continue
@@ -740,6 +747,24 @@ Page({
       })
     that.cancelCategoryPopUp()
   },
-
-
+  showItem(e) {
+    var that = this
+    var id = e.currentTarget.id
+    var order = that.data.order
+    var currentRental = order.appendingRentals[parseInt(id)]
+    that.setData({ currentRental, showBackdrop: true, action: 'item'})
+  },
+  showPackage(e) {
+    var that = this
+    var id = e.currentTarget.id
+    var order = that.data.order
+    var currentRental = order.appendingRentals[parseInt(id)]
+    if (currentRental != null) {
+      that.setData({ currentRental, showBackdrop: true, action: 'package' })
+    }
+  },
+  cancelBackdrop(e) {
+    var that = this
+    that.setData({ showBackdrop: false, action: null, currentRental: null, currentItem: null, unSavedRental: null })
+  },
 })

@@ -5,7 +5,8 @@
     "mp-gallery": "weui-miniprogram/gallery/gallery",
     "confirm-rental": "/components/rent/confirm_rental",
     "package_selector": "/components/rent/package_selector",
-    "category-selector": "/components/rent/category_selector"
+    "category-selector": "/components/rent/category_selector",
+    "rent_charge": "/components/rent/rent_charge"
   },
   "navigationBarTitleText": "租赁订单明细"
 }
