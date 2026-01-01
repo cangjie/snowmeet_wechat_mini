@@ -105,6 +105,7 @@ Page({
           relieveGuaranty += rental.guaranties[j].amount
         }
       }
+      
       rental.realGuaranty = rental.guaranty - rental.guaranty_dicount
       rental.realDepositStr = util.showAmount(rental.realGuaranty)
       rental.deposit = rental.guaranty
@@ -187,6 +188,15 @@ Page({
         }
       }
 
+    }
+    for(var i = 0; order.appendingRentals && i < order.appendingRentals.length; i++){
+      var rental = order.appendingRentals[i]
+      rental.realGuaranty = rental.guaranty
+      rental.deposit = rental.guaranty
+      if (!isNaN(rental.guaranty_dicount)){
+        rental.realGuaranty = rental.realGuaranty - parseFloat(rental.guaranty_dicount)
+      }
+      rental.realDepositStr = util.showAmount(rental.realGuaranty )
     }
     if (order.closed == 1){
       var closeDate = new Date(order.close_date)

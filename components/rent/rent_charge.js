@@ -19,17 +19,11 @@ Component({
       data.getEnumListPromise('RentType').then(function (rentTypeList) {
         that.setData({ rentTypeList })
       })
-      //rental.deposit = rental.setGuaranty
       rental.guarantyStr = util.showAmount(rental.guaranty)
       that.setData({ rental, shopObj: that.properties.shop })
       that.computeEndDate()
       console.log('get price list', rental.priceList)
       that.setData({ priceList: rental.priceList })
-      //var price = that.getPrice(rental.startDateIsWeekend ? '周末' : '平日', that.data.rentType[0], that.properties.scene)
-      //price.priceStr = util.showAmount(price.price)
-      //util.getPrice()
-      //that.setData({rental}) 
-      //console.log('item', that.properties.rentItem)
       that.computeRental(rental)
     }
   },
@@ -71,29 +65,6 @@ Component({
       rental.end_date = util.formatDate(endDate)
       that.setData({ rental })
     },
-    /*
-    computeRentalTable(startDate, endDate) {
-      var that = this
-      var rentalDetails = []
-      var totalRentalAmount = 0
-      for (var i = startDate; i <= endDate; i.setDate(i.getDate() + 1)) {
-        var isWeekend = util.isWeekend(new Date(i))
-        var price = that.getPrice(isWeekend ? '周末' : '平日', '多日', that.properties.scene)
-        var detail = {
-          date: util.formatDate(i),
-          isWeekend: isWeekend ? '周末' : '平日',
-          price: price.price,
-          priceStr: util.showAmount(price.price),
-          discount: 0,
-          summary: price.price,
-          summaryStr: util.showAmount(price.price)
-        }
-        totalRentalAmount += price.price
-        rentalDetails.push(detail)
-      }
-      that.setData({ rentalDetails, totalRentalAmount, totalRentalAmountStr: util.showAmount(totalRentalAmount) })
-    },
-    */
     setExpectDays(e) {
       if (isNaN(e.detail.value)) {
         return
