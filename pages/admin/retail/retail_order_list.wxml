@@ -92,22 +92,6 @@
         </fui-col>
       </fui-row>
     </radio-group>
-    <!--fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【减免】</view>
-      </fui-col>
-      <radio-group id="haveDiscount" bindchange="setQueryOptions">
-        <fui-col span="6">
-          <radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || querying}}" >全部</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="true" disabled="{{(cell != null && cell != '') || querying}}" >包含</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="false" disabled="{{(cell != null && cell != '') || querying}}" >不含</radio>
-        </fui-col>
-      </radio-group>
-    </fui-row-->
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
         <view class="fui-left-column">【手机】</view>
