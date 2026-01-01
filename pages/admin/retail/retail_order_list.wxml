@@ -120,7 +120,7 @@
   <view class="view-row" style="justify-content: center;width: 750rpx;">
     <van-button type="info" size="normal" style="margin-top: 20rpx;" bind:click="query" disabled="{{querying}}"> 查 询 </van-button>
   </view>
-  <view>总计：{{order.length}}单 支付金额：{{totalAmountStr}}</view>
+  <view>总计：{{orders.length}}单 支付金额：{{totalAmountStr}}</view>
   <block wx:for="{{orders}}">
     
     <fui-card id="{{item.id}}" style="margin-top: 50rpx;" title="{{item.code}}" tag="{{item.orderStatus}}" tagSize="10rpx" full bind:click="gotoDetail">
