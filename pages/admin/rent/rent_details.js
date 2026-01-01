@@ -105,7 +105,7 @@ Page({
           relieveGuaranty += rental.guaranties[j].amount
         }
       }
-      
+
       rental.realGuaranty = rental.guaranty - rental.guaranty_dicount
       rental.realDepositStr = util.showAmount(rental.realGuaranty)
       rental.deposit = rental.guaranty
@@ -178,37 +178,38 @@ Page({
           rentItem.returnDateStr = util.formatDate(new Date(rentItem.returnDate))
           rentItem.returnTimeStr = util.formatTimeStr(new Date(rentItem.returnDate))
         }
-        if (rentItem.changeDate == null){
+        if (rentItem.changeDate == null) {
           rentItem.changeDateStr = '--'
           rentItem.changeTimeStr = '--'
         }
-        else{
+        else {
           rentItem.changeDateStr = util.formatDate(new Date(rentItem.changeDate))
           rentItem.changeTimeStr = util.formatTimeStr(new Date(rentItem.changeDate))
         }
       }
 
     }
-    for(var i = 0; order.appendingRentals && i < order.appendingRentals.length; i++){
+    for (var i = 0; order.appendingRentals && i < order.appendingRentals.length; i++) {
       var rental = order.appendingRentals[i]
       rental.realGuaranty = rental.guaranty
       rental.deposit = rental.guaranty
-      if (!isNaN(rental.guaranty_dicount)){
+      if (!isNaN(rental.guaranty_dicount)) {
         rental.realGuaranty = rental.realGuaranty - parseFloat(rental.guaranty_dicount)
       }
-      rental.realDepositStr = util.showAmount(rental.realGuaranty )
+      rental.realDepositStr = util.showAmount(rental.realGuaranty)
       rental.startDate = util.formatDate(new Date(rental.start_date))
-      for(var j = 0; rental.pricePresets && j < rental.pricePresets.length; j++){
+
+      for (var j = 0; rental.pricePresets && j < rental.pricePresets.length; j++) {
         var rentDate = new Date(rental.pricePresets[j].rent_date)
         rental.pricePresets[j].date = rentDate
       }
     }
-    if (order.closed == 1){
+    if (order.closed == 1) {
       var closeDate = new Date(order.close_date)
       order.close_dateDateStr = util.formatDate(closeDate)
       order.close_dateTimeStr = util.formatTimeStr(closeDate)
     }
-    else{
+    else {
       order.close_dateDateStr = '--'
       order.close_dateTimeStr = '--'
     }
@@ -230,7 +231,7 @@ Page({
     if (order.totalRentUnRefund < 0 && order.totalRentUnRefund > -0.001) {
       order.totalRentUnRefund = 0.001.toFixed(2) * -1
     }
-    if (order.member && order.member.availableDeposit){
+    if (order.member && order.member.availableDeposit) {
       order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
     }
     that.setData({
@@ -239,7 +240,7 @@ Page({
       totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount),
       needToRefund: totalGuarantyAmount - totalSummary,
       needToRefundStr: util.showAmount(totalGuarantyAmount - totalSummary),
-      payWithDeposit: order.depositPaidAmount == 0? false: true
+      payWithDeposit: order.depositPaidAmount == 0 ? false : true
     })
     return order
   },
@@ -250,7 +251,7 @@ Page({
     util.performWebRequest(getUrl, undefined).then(function (order) {
       console.log('get order', order)
       data.getShopByNamePromise(order.shop).then(function (shopObj) {
-        that.setData({shopObj})
+        that.setData({ shopObj })
       })
       for (var i = 0; order.rentals && i < order.rentals.length; i++) {
         if (order.rentals[i].id == 0) {
@@ -261,12 +262,12 @@ Page({
             if (order.rentals[j].id == newRental.id) {
               order.rentals[j] = newRental
               //var member = null
-              if (!order.member_id){
+              if (!order.member_id) {
                 that.renderOrder(order)
                 that.setData({ order })
               }
               else {
-                data.getMemberPromise(order.member_id, app.globalData.sessionKey).then(function (member){
+                data.getMemberPromise(order.member_id, app.globalData.sessionKey).then(function (member) {
                   order.member = member
                   that.renderOrder(order)
                   that.setData({ order })
@@ -280,8 +281,8 @@ Page({
 
         })
       }
-      order = that.renderOrder(order)
-      that.setData({ order })
+      //order = that.renderOrder(order)
+      //that.setData({ order })
     }).catch(function () {
 
     })
@@ -338,7 +339,7 @@ Page({
       }
     }
     for (var i = 0; currentRental && i < currentRental.rentItems.length; i++) {
-      if (currentRental.rentItems[i].status != '已归还' 
+      if (currentRental.rentItems[i].status != '已归还'
         && currentRental.rentItems[i].status != '未发放'
         && currentRental.rentItems[i].status != '已更换'
         && currentRental.rentItems[i].id != id) {
@@ -454,7 +455,7 @@ Page({
 
   refund(e) {
     var that = this
-    if (that.data.payWithDeposit == true){
+    if (that.data.payWithDeposit == true) {
       that.refundWithDeposit(e)
       return;
     }
@@ -513,7 +514,7 @@ Page({
       }
     })
   },
-  refundWithDeposit(e){
+  refundWithDeposit(e) {
     var that = this
     var order = that.data.order
     var title = '储值支付确认'
@@ -525,13 +526,13 @@ Page({
       content: content,
       complete: (res) => {
         if (res.cancel) {
-          
+
         }
-    
+
         if (res.confirm) {
-          that.setData({refunding: true})
-          data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function(paidOrder){
-            if (paidOrder == null){
+          that.setData({ refunding: true })
+          data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function (paidOrder) {
+            if (paidOrder == null) {
               return
             }
             console.log('paid order', paidOrder)
@@ -565,7 +566,7 @@ Page({
               })
             })
 
-          })  
+          })
         }
       }
     })
@@ -697,69 +698,73 @@ Page({
       that.setRepairCancel(e)
     })
   },
-  call(e){
+  call(e) {
     var cell = e.currentTarget.id
     wx.makePhoneCall({
       phoneNumber: cell,
     })
   },
-  setPayWithDeposit(e){
+  setPayWithDeposit(e) {
     var that = this
-    var payWithDeposit = e.detail.value.length == 1? true: false
+    var payWithDeposit = e.detail.value.length == 1 ? true : false
     //that.setData({payWithDeposit: e.detail.value.length == 1? true: false})
     var order = that.data.order
-    if (payWithDeposit){
+    if (payWithDeposit) {
       order.totalRentUnRefund = order.totalRentUnRefund + order.totalRentSummaryAmount
     }
-    else{
+    else {
       order.totalRentUnRefund = order.totalRentUnRefund - order.totalRentSummaryAmount
     }
     order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
-    that.setData({order, payWithDeposit})
+    that.setData({ order, payWithDeposit })
   },
-  gotoChange(e){
+  gotoChange(e) {
     var that = this
     var rentItemId = e.currentTarget.id
     wx.navigateTo({
       url: 'rent_item_change?orderId=' + that.data.order.id.toString() + '&rentItemId=' + rentItemId.toString()
     })
   },
-  addNewPackage(e){
+  addNewPackage(e) {
     var that = this
-    that.setData({ showSelectPackagePopUp: true})
+    that.setData({ showSelectPackagePopUp: true })
   },
-  cancelPackagePopUp(e){
+  cancelPackagePopUp(e) {
     var that = this
     that.setData({ showSelectPackagePopUp: false })
   },
-  cancelCategoryPopUp(e){
+  cancelCategoryPopUp(e) {
     var that = this
-    that.setData({showSelectCategoryPopUp: false})
+    that.setData({ showSelectCategoryPopUp: false })
   },
-  addNewCategory(e){
+  addNewCategory(e) {
     var that = this
-    that.setData({ showSelectCategoryPopUp: true})
+    that.setData({ showSelectCategoryPopUp: true })
   },
-  selectPackageConfirm(e){
+  selectPackageConfirm(e) {
     console.log('select package', e)
     var that = this
     var order = that.data.order
-    var appendUrl = app.globalData.requestPrefix + 'Rent/AppendRental/' + order.id.toString() 
+    var appendUrl = app.globalData.requestPrefix + 'Rent/AppendRental/' + order.id.toString()
       + '?packageId=' + e.detail.id.toString() + '&sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(appendUrl, null).then(function(order){
+    util.performWebRequest(appendUrl, null).then(function (order) {
       console.log('append order', order)
+      that.renderOrder(order)
+      that.setData({ order })
     })
     that.cancelPackagePopUp()
   },
-  confirmCategory(e){
+  confirmCategory(e) {
     console.log('select category', e)
     var that = this
     var order = that.data.order
-    var appendUrl = app.globalData.requestPrefix + 'Rent/AppendRental/' + order.id.toString() 
+    var appendUrl = app.globalData.requestPrefix + 'Rent/AppendRental/' + order.id.toString()
       + '?categoryId=' + e.detail.id.toString() + '&sessionKey=' + app.globalData.sessionKey
-      util.performWebRequest(appendUrl, null).then(function(order){
-        console.log('append order', order)
-      })
+    util.performWebRequest(appendUrl, null).then(function (order) {
+      console.log('append order', order)
+      that.renderOrder(order)
+      that.setData({ order })
+    })
     that.cancelCategoryPopUp()
   },
   showItem(e) {
@@ -767,7 +772,7 @@ Page({
     var id = e.currentTarget.id
     var order = that.data.order
     var currentRental = order.appendingRentals[parseInt(id)]
-    that.setData({ currentRental, showBackdrop: true, action: 'item'})
+    that.setData({ currentRental, showBackdrop: true, action: 'item' })
   },
   showPackage(e) {
     var that = this
@@ -782,4 +787,119 @@ Page({
     var that = this
     that.setData({ showBackdrop: false, action: null, currentRental: null, currentItem: null, unSavedRental: null })
   },
+  delAppeningRental(e) {
+    var that = this
+    var id = e.currentTarget.id
+    var order = that.data.order
+    var rental = order.appendingRentals[parseInt(id)]
+    wx.showModal({
+      title: '确认删除',
+      content: '正在添加的租赁商品：' + rental.name + ' 即将删除。',
+      complete: (res) => {
+        if (res.cancel) {
+
+        }
+
+        if (res.confirm) {
+          var delUrl = app.globalData.requestPrefix + 'Rent/RemoveAppendingRental/' + rental.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+          util.performWebRequest(delUrl, null).then(function (order) {
+            that.renderOrder(order)
+            that.setData({ order })
+          })
+        }
+      }
+    })
+  },
+  showPriceList(e) {
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var shop = order.shop
+    var rental = order.appendingRentals[id]
+    var targetId = rental.package_id ? rental.package_id : rental.category_id
+    var isWeekend = util.isWeekend(new Date(rental.start_date))
+    that.setData({
+      showBackdrop: true, action: 'priceList',
+      dayType: isWeekend ? '周末' : '平日',
+      type: rental.package_id ? '套餐' : '分类', shop, targetId
+    })
+  },
+  getAppendingRentItem(id){
+    var that = this
+    var order = that.data.order
+    var appendingRentals = order.appendingRentals
+    var item = null
+    for(var i = 0; item == null && appendingRentals && i < appendingRentals.length; i++){
+      var rental = appendingRentals[i]
+      for(var j = 0; item == null && rental.rentItems && j < rental.rentItems.length; j++){
+        if (id == rental.rentItems[j].id){
+          item = rental.rentItems[j]
+        }
+      }
+    }
+    return item
+  },
+  getAppendingRental(id){
+    var that = this
+    var order = that.data.order
+    var appendingRentals = order.appendingRentals
+    var rental = null
+    for(var i = 0; rental == null && appendingRentals && i < appendingRentals.length; i++){
+      if (appendingRentals[i].id == id){
+        rental = appendingRentals[i]
+      }
+    }
+    return rental
+  },
+  setNoCode(e){
+    var that = this
+    var noCode = e.detail.value.length == 1
+    var id = e.currentTarget.id
+    var item = that.getAppendingRentItem(parseInt(id))
+    item.noCode = noCode
+    var order = that.data.order
+    order = that.renderOrder(order)
+    that.setData({order})
+  },
+  setCode(e){
+    var that = this
+    var code = e.detail.value
+    var id = e.currentTarget.id
+    var item = that.getAppendingRentItem(parseInt(id))
+    item.code = code
+  },
+  setName(e){
+    var that = this
+    var name = e.detail.value
+    var id = e.currentTarget.id
+    var item = that.getAppendingRentItem(parseInt(id))
+    item.name = name
+  },
+  setMemo(e){
+    var that = this
+    var memo = e.detail.value
+    var id = e.currentTarget.id
+    var item = that.getAppendingRentItem(parseInt(id))
+    item.memo = memo
+  },
+  setNoNeed(e){
+    var noNeed = e.detail.value.length == 1
+    var id = e.currentTarget.id
+    var item = that.getAppendingRentItem(parseInt(id))
+    item.noNeed = noNeed
+    var order = that.data.order
+    order = that.renderOrder(order)
+    that.setData({order})
+  },
+  setStartDate(e){
+    var that = this
+    var startDate = e.detail.value
+    var id = e.currentTarget.id
+    var rental = that.getAppendingRental(parseInt(id))
+    rental.start_date = new Date(startDate)
+    rental.startDate = util.formatDate(rental.start_date)
+    var order = that.data.order
+    order = that.renderOrder(order)
+    that.setData({order})
+  }
 })
