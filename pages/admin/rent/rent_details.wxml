@@ -466,21 +466,21 @@
       <block wx:if="{{action == 'item'}}">
         <view style="background-color: white;width:650rpx;margin-left: auto;margin-right: auto;">
           <view style="height: 10rpx;"></view>
-          <view class="view-row">
-            <view class="left-column" style="width: 150rpx;">【品类】</view>
-            <view class="right-column" style="width: 500rpx;">
+          <view class="view-row" style="height: 35rpx;">
+            <view class="left-column" style="width: 150rpx;height:35rpx">【品类】</view>
+            <view class="right-column" style="width: 500rpx;height:35rpx">
               {{currentRental.rentItems[0].category.name}}
             </view>
           </view>
-          <view class="view-row">
-            <view class="left-column" style="width: 150rpx;">【编码】</view>
-            <view class="right-column view-row" style="width: 500rpx;">
+          <view class="view-row" style="height: 35rpx;">
+            <view class="left-column" style="width: 150rpx;height: 35rpx;">【编码】</view>
+            <view class="right-column view-row" style="width: 500rpx;height: 35rpx;">
               {{currentRental.rentItems[0].noCode? '【无】' : currentRental.rentItems[0].code}}
             </view>
           </view>
-          <view class="view-row">
-            <view class="left-column" style="width: 150rpx;">【名称】</view>
-            <view class="right-column" style="width: 500rpx;">
+          <view class="view-row" style="height: 35rpx;">
+            <view class="left-column" style="width: 150rpx;height: 35rpx;">【名称】</view>
+            <view class="right-column" style="width: 500rpx;height: 35rpx;">
               {{currentRental.rentItems[0].name? currentRental.rentItems[0].name: ''}}
             </view>
           </view>

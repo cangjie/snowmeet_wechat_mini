@@ -197,6 +197,11 @@ Page({
         rental.realGuaranty = rental.realGuaranty - parseFloat(rental.guaranty_dicount)
       }
       rental.realDepositStr = util.showAmount(rental.realGuaranty )
+      rental.startDate = util.formatDate(new Date(rental.start_date))
+      for(var j = 0; rental.pricePresets && j < rental.pricePresets.length; j++){
+        var rentDate = new Date(rental.pricePresets[j].rent_date)
+        rental.pricePresets[j].date = rentDate
+      }
     }
     if (order.closed == 1){
       var closeDate = new Date(order.close_date)
