@@ -202,6 +202,7 @@ Page({
       for (var j = 0; rental.pricePresets && j < rental.pricePresets.length; j++) {
         var rentDate = new Date(rental.pricePresets[j].rent_date)
         rental.pricePresets[j].date = rentDate
+        rental.pricePresets[j].priceStr = util.showAmount(rental.pricePresets[j].price)
       }
     }
     if (order.closed == 1) {
@@ -797,9 +798,7 @@ Page({
       content: '正在添加的租赁商品：' + rental.name + ' 即将删除。',
       complete: (res) => {
         if (res.cancel) {
-
         }
-
         if (res.confirm) {
           var delUrl = app.globalData.requestPrefix + 'Rent/RemoveAppendingRental/' + rental.id.toString() + '?sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(delUrl, null).then(function (order) {
