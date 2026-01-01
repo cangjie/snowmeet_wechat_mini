@@ -70,16 +70,20 @@ Page({
   onShareAppMessage() {
 
   },
-  getData1(){
+  setDate(e) {
+    var id = e.currentTarget.id
     var that = this
-    data.getOrdersByStaffPromise(null, null, null, null, '零售', '2025-10-01', '2026-12-31', 
-    null, null, null, null, null, null, null, app.globalData.sessionKey).then(function (orders){
-      console.log('get orders', orders)
-      that.renderOrders(orders)
-      //that.setData({orders})
-    }).catch(function (exp){
-
-    })
+    console.log('select date', e)
+    switch (id) {
+      case 'start':
+        that.setData({ startDate: e.detail.value })
+        break
+      case 'end':
+        that.setData({ endDate: e.detail.value })
+        break
+      default:
+        break
+    }
   },
   renderOrders(orders){
     var that = this
