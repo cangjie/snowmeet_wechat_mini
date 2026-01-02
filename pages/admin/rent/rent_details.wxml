@@ -402,16 +402,25 @@
         </view>
       </view>
     </block>
-    <view class="view-row" style="justify-content: center;margin-top: 10rpx;margin-bottom: 10rpx;background-color: white;">
-      <van-button type="primary" size="small" id="{{index}}"
+    <view class="view-row" 
+    style="justify-content: center;margin-top: 10rpx;margin-bottom: 10rpx;background-color: white;margin-bottom: 50rpx;">
+      <van-button type="primary" size="small" id="{{index}}" style="margin-right: 50rpx;"
       bind:click="{{rental.package_id != null?'showPackage':'showItem'}}" >设置租金押金</van-button>
-      <van-button type="danger" size="small" bind:click="delAppeningRental" id="{{index}}" > 删 除 </van-button>
+      <van-button type="danger" size="small" bind:click="delAppeningRental" id="{{index}}" 
+      style="margin-left: 50rpx;" > 删 除 </van-button>
     </view>
+    
   </view>
-  
+  <van-divider ></van-divider>
   <view class="view-row" style="justify-content: center;">
-    <van-button type="primary" style="margin-right: 50rpx;" bind:click="addNewPackage">添加套餐</van-button>
-    <van-button type="danger" style="margin-left: 50rpx;" bind:click="addNewCategory">添加单品</van-button>
+    <van-button type="primary" size="small" style="margin-right: 50rpx;" 
+    bind:click="addNewPackage">添加套餐</van-button>
+    <van-button type="info" size="small" style="margin-left: 50rpx;" 
+    bind:click="addNewCategory">添加单品</van-button>
+  </view>
+  <view class="view-row" style="justify-content: center;margin-top:50rpx;margin-bottom: 50rpx;">
+    <van-button type="warning" disabled="{{!allValid}}"
+    bind:click="saveAppendings"> 确 认 追 加 </van-button>
   </view>
   <mp-cells title="退款" wx:if="{{allSettled}}">
     <mp-cell>

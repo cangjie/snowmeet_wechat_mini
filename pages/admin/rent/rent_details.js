@@ -957,6 +957,7 @@ Page({
   },
   checkAppendingRentalValid(){
     var that = this
+    var allValid = true
     var order = that.data.order
     if (!order){
       return
@@ -980,6 +981,7 @@ Page({
           else{
             rentItem.wellFormed = false
             rentalWellformed = false
+            allValid = false
           }
         }
         else{
@@ -989,11 +991,22 @@ Page({
           else{
             rentItem.wellFormed = false
             rentalWellformed = false
+            allValid = false
           }
         }
         
       }
       rentals[i].wellFormed = rentalWellformed
     }
+    that.setData({allValid})
+  },
+  saveAppendings(e){
+    var that = this
+    var order = that.data.order
+    var appendings = order.appendingRentals
+    var appUrl = app.globalData.requestPrefix + 'Rent/SaveAppendings/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(appUrl, appendings).then(function (order){
+      console.log('append', order)
+    })
   }
 })
