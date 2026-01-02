@@ -213,6 +213,9 @@ Page({
       rental.totalRentalAmount = totalRentalAmount
       rental.totalDiscountAmountStr = util.showAmount(totalRentalAmount)
     }
+    if (order.appendingRentals && order.appendingRentals.length > 0){
+      that.checkAppendingRentalValid()
+    }
     if (order.closed == 1) {
       var closeDate = new Date(order.close_date)
       order.close_dateDateStr = util.formatDate(closeDate)
@@ -875,6 +878,9 @@ Page({
     var id = e.currentTarget.id
     var item = that.getAppendingRentItem(parseInt(id))
     item.code = code
+    var order = that.data.order
+    order = that.renderOrder(order)
+    that.setData({order})
   },
   setName(e) {
     var that = this
@@ -882,6 +888,9 @@ Page({
     var id = e.currentTarget.id
     var item = that.getAppendingRentItem(parseInt(id))
     item.name = name
+    var order = that.data.order
+    order = that.renderOrder(order)
+    that.setData({order})
   },
   setMemo(e) {
     var that = this
@@ -898,6 +907,7 @@ Page({
     item.noNeed = noNeed
     var order = that.data.order
     order = that.renderOrder(order)
+    that.checkAppendingRentalValid()
     that.setData({ order })
   },
   setStartDate(e) {
@@ -944,5 +954,46 @@ Page({
     order = that.renderOrder(order)
     that.setData({ order })
     that.cancelBackdrop(e)
+  },
+  checkAppendingRentalValid(){
+    var that = this
+    var order = that.data.order
+    if (!order){
+      return
+    }
+    var rentals = that.data.order.appendingRentals
+    if (!rentals){
+      return
+    }
+    for(var i = 0; rentals && i < rentals.length; i++){
+      var rentalWellformed = true
+      var rentItems = rentals[i].rentItems
+      for(var j = 0; rentItems && j < rentItems.length; j++){
+        var rentItem = rentItems[j]
+        if (rentItem.noNeed){
+          rentItem.wellFormed = true
+        }
+        else if (rentItem.noCode){
+          if (rentItem.name && rentItem.name != ''){
+            rentItem.wellFormed = true
+          }
+          else{
+            rentItem.wellFormed = false
+            rentalWellformed = false
+          }
+        }
+        else{
+          if (rentItem.code && rentItem.code != ''){
+            rentItem.wellFormed = true
+          }
+          else{
+            rentItem.wellFormed = false
+            rentalWellformed = false
+          }
+        }
+        
+      }
+      rentals[i].wellFormed = rentalWellformed
+    }
   }
 })
