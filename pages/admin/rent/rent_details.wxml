@@ -290,7 +290,7 @@
       <view class="view-row view-row-append" style="height: 75rpx;">
         <view class="left-column" style="{{rental.wellFormed?'':'color:red;'}}" >【备注】</view>
         <view class="right-column">
-          <input class="input" style="width: 500rpx;"></input>
+          <input class="input" style="width: 500rpx;" id="{{rental.id}}" value="{{rental.memo}}" bindinput="setAppendingRentalMemo" ></input>
         </view>
       </view>
       <view style="display: flex;flex-direction: row;justify-content: center;">
@@ -318,7 +318,7 @@
             <view class="view-row">
               <view class="left-column left-column-rent-item">【名称】</view>
               <view>
-                <input class="input" style="width: 500rpx;" id="{{item.id}}" bindinput="setName" />
+                <input class="input" style="width: 500rpx;" id="{{item.id}}" bindinput="setName" value="{{item.name}}" />
               </view>
             </view>
             <view class="view-row">
@@ -333,7 +333,7 @@
             <view class="view-row">
               <view class="left-column left-column-rent-item">【备注】</view>
               <view>
-                <input class="input" style="width: 500rpx;" />
+                <input class="input" style="width: 500rpx;" id="{{item.id}}" bindinput="setAppendingItemMemo" value="{{item.memo}}" />
               </view>
               <view></view>
             </view>
@@ -367,7 +367,7 @@
         <view class="left-column left-column-rent-item">【名称】</view>
         <view>
           <input class="input" style="width: 500rpx;" value="{{rental.rentItems[0].name}}" 
-          bindinput="setName" disabled="{{!rental.rentItems[0].noCode}}" id="{{rental.rentItems[0].id}}" />
+          bindinput="setName" disabled="{{!rental.rentItems[0].noCode}}" id="{{rental.rentItems[0].id}}"  />
       </view>
       </view>
       <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}" >
@@ -398,7 +398,7 @@
       <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}" >
         <view class="left-column left-column-rent-item">【备注】</view>
         <view class="right-column right-column-rent-item">
-          <input style="width: 500rpx;" class="input" bindinput="setMemo" id="{{rental.id}}" />
+          <input style="width: 500rpx;" class="input" bindinput="setAppendingRentalMemo" id="{{rental.id}}" value="{{rental.memo}}" />
         </view>
       </view>
     </block>

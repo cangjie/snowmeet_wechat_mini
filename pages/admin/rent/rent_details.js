@@ -275,14 +275,18 @@ Page({
               order.rentals[j] = newRental
               //var member = null
               if (!order.member_id) {
-                that.renderOrder(order)
+                order = that.renderOrder(order)
                 that.setData({ order })
+                that.checkAppendingRentalValid()
+                that.setData({order})
               }
               else {
                 data.getMemberPromise(order.member_id, app.globalData.sessionKey).then(function (member) {
                   order.member = member
-                  that.renderOrder(order)
+                  order = that.renderOrder(order)
                   that.setData({ order })
+                  that.checkAppendingRentalValid()
+                  that.setData({order})
                 })
               }
               break
@@ -816,6 +820,8 @@ Page({
           util.performWebRequest(delUrl, null).then(function (order) {
             that.renderOrder(order)
             that.setData({ order })
+            that.checkAppendingRentalValid()
+            that.setData({ order })
           })
         }
       }
@@ -892,11 +898,18 @@ Page({
     order = that.renderOrder(order)
     that.setData({order})
   },
-  setMemo(e) {
+  setAppendingItemMemo(e) {
     var that = this
     var memo = e.detail.value
     var id = e.currentTarget.id
     var item = that.getAppendingRentItem(parseInt(id))
+    item.memo = memo
+  },
+  setAppendingRentalMemo(e){
+    var that = this
+    var memo = e.detail.value
+    var id = e.currentTarget.id
+    var item = that.getAppendingRental(parseInt(id))
     item.memo = memo
   },
   setNoNeed(e) {
