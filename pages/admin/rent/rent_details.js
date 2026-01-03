@@ -14,7 +14,8 @@ Page({
     showBackdrop: false,
     refunding: false,
     payWithDeposit: false,
-    showSelectPackagePopUp: false
+    showSelectPackagePopUp: false,
+    showAppendPay: false
   },
 
   /**
@@ -245,6 +246,9 @@ Page({
     }
     if (order.member && order.member.availableDeposit) {
       order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
+    }
+    if (!isNaN(order.paying_amount)){
+      order.paying_amountStr = util.showAmount(parseFloat(order.paying_amount))
     }
     that.setData({
       allSettled, totalGuarantyAmount, totalSummary,
@@ -1020,6 +1024,33 @@ Page({
     var appUrl = app.globalData.requestPrefix + 'Rent/SaveAppendings/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(appUrl, appendings).then(function (order){
       console.log('append', order)
+      order = that.renderOrder(order)
+      that.data.order = order
+      that.checkAppendingRentalValid()
+      that.setData({order, showAppendPay: true})
     })
-  }
+  },
+  closeAppendPay(e){
+    var that = this
+    that.setData({showAppendPay: false})
+  },
+  orderStatusChanged() {
+    var that = this
+    that.getData()
+  },
+  dealPaidResult(e) {
+    var that = this
+    var orderId = e.detail.id
+    data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
+      var paid = util.orderPaid(order)
+      if (paid) {
+        wx.showToast({
+          title: '支付成功',
+          icon: 'success'
+        })
+        that.setData({showAppendPay: false})
+        that.getData()
+      }
+    })
+  },
 })

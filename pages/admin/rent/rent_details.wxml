@@ -261,41 +261,40 @@
   <view wx:for="{{order.appendingRentals}}" wx:for-item="rental" class="{{rental.package_id != null? 'add-package':'add-item'}}">
     <view style="margin-left: 20rpx;margin-bottom: 20rpx;{{rental.wellFormed?'':'color:red;'}}">{{rental.name}}</view>
     <block wx:if="{{rental.package_id != null}}">
-      <view class="view-row view-row-append" style="{{rental.wellFormed?'':'color:red;'}}" >
-        <view class="left-column left-column-rent-item;" >【押金】</view>
-        <view class="right-column right-column-rent-item" >{{rental.realDepositStr}}</view>
-        <view class="left-column left-column-rent-item" >【租金】</view>
-        <view class="right-column" >{{rental.pricePresets[0].priceStr}}</view>
+      <view class="view-row view-row-append" style="{{rental.wellFormed?'':'color:red;'}}">
+        <view class="left-column left-column-rent-item;">【押金】</view>
+        <view class="right-column right-column-rent-item">{{rental.realDepositStr}}</view>
+        <view class="left-column left-column-rent-item">【租金】</view>
+        <view class="right-column">{{rental.pricePresets[0].priceStr}}</view>
       </view>
       <view class="view-row view-row-append" style="height: 75rpx;{{rental.wellFormed?'':'color:red;'}}">
-        <view class="left-column left-column-rent-item" >【免押金】</view>
+        <view class="left-column left-column-rent-item">【免押金】</view>
         <view class="right-column right-column-rent-item">
-          <checkbox-group id="{{rental.id}}" bindchange="setNoGuaranty" >
-            <checkbox checked="{{rental.noGuaranty}}" ></checkbox>
+          <checkbox-group id="{{rental.id}}" bindchange="setNoGuaranty">
+            <checkbox checked="{{rental.noGuaranty}}"></checkbox>
           </checkbox-group>
         </view>
         <view>
-          <van-button size="mini" type="info" id="{{index}}" bind:click="showPriceList"  >查看价目表</van-button>
+          <van-button size="mini" type="info" id="{{index}}" bind:click="showPriceList">查看价目表</van-button>
         </view>
       </view>
       <view class="view-row view-row-append" style="height: 75rpx;">
-        <view class="left-column view-row view-row-append" style="align-items: center;{{rental.wellFormed?'':'color:red;'}}" >【起租日】</view>
+        <view class="left-column view-row view-row-append" style="align-items: center;{{rental.wellFormed?'':'color:red;'}}">【起租日】</view>
         <view class="right-column">
-          <picker mode="date" class="input" start="{{rental.startDate}}" id="{{rental.id}}" 
-          bindchange="setStartDate" >
+          <picker mode="date" class="input" start="{{rental.startDate}}" id="{{rental.id}}" bindchange="setStartDate">
             <picker-view>{{rental.startDate}}</picker-view>
           </picker>
         </view>
       </view>
       <view class="view-row view-row-append" style="height: 75rpx;">
-        <view class="left-column" style="{{rental.wellFormed?'':'color:red;'}}" >【备注】</view>
+        <view class="left-column" style="{{rental.wellFormed?'':'color:red;'}}">【备注】</view>
         <view class="right-column">
-          <input class="input" style="width: 500rpx;" id="{{rental.id}}" value="{{rental.memo}}" bindinput="setAppendingRentalMemo" ></input>
+          <input class="input" style="width: 500rpx;" id="{{rental.id}}" value="{{rental.memo}}" bindinput="setAppendingRentalMemo"></input>
         </view>
       </view>
       <view style="display: flex;flex-direction: row;justify-content: center;">
         <view class="rent-item" style="width: 95%;">
-          <view wx:for="{{rental.rentItems}}" style="{{(item.wellFormed==true)?'color:black':'color:red;'}}" >
+          <view wx:for="{{rental.rentItems}}" style="{{(item.wellFormed==true)?'color:black':'color:red;'}}">
             <view class="view-row" style="margin-top: 10rpx;">
               <view class="left-column left-column-rent-item">【品类】</view>
               <view class="right-column" style="width: 550rpx;">{{item.category.name}}</view>
@@ -303,15 +302,14 @@
             <view class="view-row">
               <view class="left-column left-column-rent-item">【编码】</view>
               <view>
-                <input class="input" style="width: 200rpx;text-align: center;font-size: 10pt;" 
-                disabled="{{item.noCode}}"  value="{{item.noCode?'无':item.code}}" id="{{item.id}}" bindinput="setCode" />
+                <input class="input" style="width: 200rpx;text-align: center;font-size: 10pt;" disabled="{{item.noCode}}" value="{{item.noCode?'无':item.code}}" id="{{item.id}}" bindinput="setCode" />
               </view>
               <view>
                 <van-icon name="scan" size="19px" />
               </view>
               <view class="left-column left-column-rent-item" style="margin-left: 50rpx;">
-                <checkbox-group id="{{item.id}}" bindchange="setNoCode" >
-                  <checkbox checked="{{item.noCode}}" >无编码</checkbox>
+                <checkbox-group id="{{item.id}}" bindchange="setNoCode">
+                  <checkbox checked="{{item.noCode}}">无编码</checkbox>
                 </checkbox-group>
               </view>
             </view>
@@ -325,7 +323,7 @@
               <view class="left-column left-column-rent-item" style="height: 75rpx;">【不需要】</view>
               <view style="height: 75rpx;">
                 <checkbox-group id="{{item.id}}" bindchange="setNoNeed">
-                  <checkbox checked="{{item.noNeed}}" ></checkbox>
+                  <checkbox checked="{{item.noNeed}}"></checkbox>
                 </checkbox-group>
               </view>
               <view></view>
@@ -349,78 +347,71 @@
 
     </block>
     <block wx:else>
-      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}" >
-        <view class="left-column left-column-rent-item"  >【编码】</view>
+      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}">
+        <view class="left-column left-column-rent-item">【编码】</view>
         <view>
-          <input class="input" style="width: 200rpx;text-align: center; font-size: 10pt;"  disabled="{{rental.rentItems[0].noCode}}" bindinput="setCode"
-          value="{{rental.rentItems[0].noCode?'无':rental.rentItems[0].code}}" /></view>
+          <input class="input" style="width: 200rpx;text-align: center; font-size: 10pt;" disabled="{{rental.rentItems[0].noCode}}" bindinput="setCode" value="{{rental.rentItems[0].noCode?'无':rental.rentItems[0].code}}" />
+        </view>
         <view>
           <van-icon name="scan" size="19px" />
         </view>
         <view class="left-column left-column-rent-item" style="margin-left: 50rpx;">
-          <checkbox-group id="{{rental.rentItems[0].id}}" bindchange="setNoCode" >
-            <checkbox checked="{{rental.rentItems[0].noCode}}" >无编码</checkbox>
+          <checkbox-group id="{{rental.rentItems[0].id}}" bindchange="setNoCode">
+            <checkbox checked="{{rental.rentItems[0].noCode}}">无编码</checkbox>
           </checkbox-group>
         </view>
       </view>
-      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}" >
+      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}">
         <view class="left-column left-column-rent-item">【名称】</view>
         <view>
-          <input class="input" style="width: 500rpx;" value="{{rental.rentItems[0].name}}" 
-          bindinput="setName" disabled="{{!rental.rentItems[0].noCode}}" id="{{rental.rentItems[0].id}}"  />
+          <input class="input" style="width: 500rpx;" value="{{rental.rentItems[0].name}}" bindinput="setName" disabled="{{!rental.rentItems[0].noCode}}" id="{{rental.rentItems[0].id}}" />
+        </view>
       </view>
-      </view>
-      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}" >
+      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}">
         <view class="left-column left-column-rent-item">【押金】</view>
         <view class="right-column right-column-rent-item">{{rental.realDepositStr}}</view>
         <view class="left-column left-column-rent-item">【租金】</view>
         <view class="right-column right-column-rent-item">{{rental.totalDiscountAmountStr}}</view>
       </view>
-      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}" >
+      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}">
         <view class="left-column left-column-rent-item">【免押金】</view>
         <view class="right-column right-column-rent-item">
-          <checkbox-group id="{{rental.id}}" bindchange="setNoGuaranty" >
+          <checkbox-group id="{{rental.id}}" bindchange="setNoGuaranty">
             <checkbox></checkbox>
           </checkbox-group>
         </view>
         <view class="left-column left-column-rent-item">
-          <van-button size="mini" type="info" id="{{index}}" bind:click="showPriceList"  >查看价目表</van-button>
+          <van-button size="mini" type="info" id="{{index}}" bind:click="showPriceList">查看价目表</van-button>
         </view>
       </view>
-      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}" >
+      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}">
         <view class="left-column left-column-rent-item">【起租日】</view>
         <view class="right-column">
-          <picker mode="date" class="input" start="{{rental.startDate}}"  id="{{rental.id}}" bindchange="setStartDate" >
+          <picker mode="date" class="input" start="{{rental.startDate}}" id="{{rental.id}}" bindchange="setStartDate">
             <picker-view>{{rental.startDate}}</picker-view>
           </picker>
         </view>
       </view>
-      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}" >
+      <view class="view-row" style="{{rental.rentItems[0].wellFormed?'':'color:red;'}}">
         <view class="left-column left-column-rent-item">【备注】</view>
         <view class="right-column right-column-rent-item">
           <input style="width: 500rpx;" class="input" bindinput="setAppendingRentalMemo" id="{{rental.id}}" value="{{rental.memo}}" />
         </view>
       </view>
     </block>
-    <view class="view-row" 
-    style="justify-content: center;margin-top: 10rpx;margin-bottom: 10rpx;background-color: white;margin-bottom: 50rpx;">
-      <van-button type="primary" size="small" id="{{index}}" style="margin-right: 50rpx;"
-      bind:click="{{rental.package_id != null?'showPackage':'showItem'}}" >设置租金押金</van-button>
-      <van-button type="danger" size="small" bind:click="delAppeningRental" id="{{index}}" 
-      style="margin-left: 50rpx;" > 删 除 </van-button>
+    <view class="view-row" style="justify-content: center;margin-top: 10rpx;margin-bottom: 10rpx;background-color: white;margin-bottom: 50rpx;">
+      <van-button type="primary" size="small" id="{{index}}" style="margin-right: 50rpx;" bind:click="{{rental.package_id != null?'showPackage':'showItem'}}">设置租金押金</van-button>
+      <van-button type="danger" size="small" bind:click="delAppeningRental" id="{{index}}" style="margin-left: 50rpx;"> 删 除 </van-button>
     </view>
-    
+
   </view>
-  <van-divider ></van-divider>
+  <van-divider></van-divider>
   <view class="view-row" style="justify-content: center;">
-    <van-button type="primary" size="small" style="margin-right: 50rpx;" 
-    bind:click="addNewPackage">添加套餐</van-button>
-    <van-button type="info" size="small" style="margin-left: 50rpx;" 
-    bind:click="addNewCategory">添加单品</van-button>
+    <van-button type="primary" size="small" style="margin-right: 50rpx;" bind:click="addNewPackage">添加套餐</van-button>
+    <van-button type="info" size="small" style="margin-left: 50rpx;" bind:click="addNewCategory">添加单品</van-button>
   </view>
   <view class="view-row" style="justify-content: center;margin-top:50rpx;margin-bottom: 50rpx;">
-    <van-button type="warning" disabled="{{!allValid}}"
-    bind:click="saveAppendings"> 确 认 追 加 </van-button>
+    <van-button type="warning" disabled="{{!allValid}}" bind:click="saveAppendings"> 确 认 追 加 </van-button>
   </view>
   <mp-cells title="退款" wx:if="{{allSettled}}">
     <mp-cell>
@@ -481,14 +472,21 @@
   <van-popup show="{{showSelectCategoryPopUp}}">
     <category-selector bindCancel="cancelCategoryPopUp" bindConfirm="confirmCategory"></category-selector>
   </van-popup>
-  <fui-backdrop show="{{showBackdrop}}" closable>
+  <van-popup show="{{showAppendPay}}" closeable close-icon-position="top-right" bind:close="closeAppendPay">
+    <view style="width: 700rpx;height:700rpx">
+      <view>
+        支付追加押金：{{order.paying_amountStr}}
+      </view>
+      <payment orderId="{{order.id}}" wx:if="{{showAppendPay}}"  bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult"></payment>
+    </view>
+  </van-popup>
+  <fui-backdrop show="{{showBackdrop && backDropType != 'confirm_rental' }}" closable>
     <scroll-view style="height: 90vh;margin-left: auto;margin-right: auto;" scroll-y>
       <block wx:if="{{action == 'package'}}">
         <fui-card title="套餐名称：{{currentRental.name}}" tag="共{{currentRental.rentItems.length}}件">
           <view class="fui-card__content" style="width: 650rpx; margin-top:50rpx;height: {{windowHeight}}rpx">
             <scroll-view scroll-y="true" style="height: {{windowHeight }}rpx">
-              <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" 
-              bindRentalChange="onRentalChange" shop="{{shopObj}}"></rent_charge>
+              <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" bindRentalChange="onRentalChange" shop="{{shopObj}}"></rent_charge>
             </scroll-view>
           </view>
           <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
@@ -519,7 +517,7 @@
             </view>
           </view>
           <view style="height: 20rpx;"></view>
-          <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" bindRentalChange="onRentalChange"  shop="{{shopObj}}"></rent_charge>
+          <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" bindRentalChange="onRentalChange" shop="{{shopObj}}"></rent_charge>
           <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
             <button class="input" size="mini" bindtap="cancelBackdrop"> 取 消 </button>
             <button class="input" size="mini" bindtap="saveUpdatedRental"> 保 存 </button>
