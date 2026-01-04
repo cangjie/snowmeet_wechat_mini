@@ -7,7 +7,8 @@
     "package_selector": "/components/rent/package_selector",
     "category-selector": "/components/rent/category_selector",
     "rent_charge": "/components/rent/rent_charge",
-    "payment": "/components/payment/payment"
+    "payment": "/components/payment/payment",
+    "balance": "/components/payment/balance"
   },
   "navigationBarTitleText": "租赁订单明细"
 }

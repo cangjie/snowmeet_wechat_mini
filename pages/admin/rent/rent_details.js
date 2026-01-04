@@ -1053,4 +1053,12 @@ Page({
       }
     })
   },
+  showBalance(e){
+    var that = this
+    that.setData({showBalance: true})
+  },
+  closeBalance(e){
+    var that = this
+    that.setData({showBalance: false})
+  }
 })

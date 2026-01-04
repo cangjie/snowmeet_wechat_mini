@@ -76,7 +76,7 @@
     </mp-cell>
     <mp-cell>
       <view class="view-row" style="justify-content: center;">
-        <van-button type="info" size="small"> 收 支 明 细 </van-button>
+        <van-button type="info" size="small" bind:click="showBalance"> 收 支 明 细 </van-button>
       </view>
     </mp-cell>
   </mp-cells>
@@ -478,6 +478,12 @@
         支付追加押金：{{order.paying_amountStr}}
       </view>
       <payment orderId="{{order.id}}" wx:if="{{showAppendPay}}"  bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult"></payment>
+    </view>
+  </van-popup>
+  <van-popup show="{{showBalance}}"  closeable close-icon-position="top-right" bind:close="closeBalance" >
+    <view style="width: 740rpx;height:700rpx">
+      <view style="height: 50rpx;"></view>
+      <balance wx:if="{{showBalance}}" orderId="{{order.id}}" ></balance>
     </view>
   </van-popup>
   <fui-backdrop show="{{showBackdrop && backDropType != 'confirm_rental' }}" closable>

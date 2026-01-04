@@ -1,0 +1,21 @@
+@import '/app.wxss';
+.cell-1{
+  width: 180rpx;
+  text-align: center;
+}
+.cell-2{
+  width: 80rpx;
+  text-align: center;
+}
+.cell-3{
+  width: 200rpx;
+  text-align: center;
+}
+.cell-4{
+  width: 100rpx;
+  text-align: center;
+}
+.cell-5{
+  width: 180rpx;
+  text-align: center;
+}

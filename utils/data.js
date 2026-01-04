@@ -691,6 +691,10 @@ const queryRentItemChangeCompatibleCategory = function (categoryId){
   var getUrl = app.globalData.requestPrefix + 'Rent/QueryChangeCompatibleCategory/' + categoryId.toString()
   return util.performWebRequest(getUrl, null)
 }
+const getOrderBalancePromise = function (orderId, sessionKey){
+  var bUrl = app.globalData.requestPrefix + 'Order/GetOrderBalance/' + orderId.toString() + '?sessionKey=' + sessionKey
+  return util.performWebRequest(bUrl, null)
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -742,5 +746,6 @@ module.exports = {
   payWithDepositPromise,
   getMemberTicketsPromise,
   getUnreturnedRentItemPromise,
-  queryRentItemChangeCompatibleCategory
+  queryRentItemChangeCompatibleCategory,
+  getOrderBalancePromise
 }
