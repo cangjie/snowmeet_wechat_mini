@@ -4,7 +4,7 @@
   text-align: center;
 }
 .cell-2{
-  width: 80rpx;
+  width: 120rpx;
   text-align: center;
 }
 .cell-3{
@@ -12,7 +12,7 @@
   text-align: center;
 }
 .cell-4{
-  width: 100rpx;
+  width: 80rpx;
   text-align: center;
 }
 .cell-5{
