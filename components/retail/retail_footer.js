@@ -61,6 +61,9 @@ Component({
         if (code.length == 15 && code.indexOf('XSD20') == 0 && (code[14] == 'I' || code[14] == 'A')){
           that.checkMi7Code(code)
         }
+        else if (code.length == 14 && code.indexOf('XSD20') == 0 ){
+          that.checkMi7Code(code)
+        }
         else{
           wellForm = false
         }
