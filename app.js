@@ -56,22 +56,12 @@ App({
           case 'develop':
             app.globalData.domainName = app.getDomain()
             app.globalData.requestPrefix = 'https://' + app.globalData.domainName + '/api/'
-            /*
-            if (app.globalData.domainName == ''){
-              app.globalData.domainName = 'snowmeet.wanlonghuaxue.com'
-              app.globalData.requestPrefix = 'https://' + app.globalData.domainName + '/api/'
-            }
-            */
             break
           default:
             break
         }
-        
-        //app.globalData.domainName = 'snowmeet.wanlonghuaxue.com'
-        //app.globalData.requestPrefix = 'https://' + app.globalData.domainName + '/api/'
         console.log('weixin log in success.', res)
         var url = 'https://' + app.globalData.domainName + '/api/MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
-        //var url = app.globalData.requestPrefix + 'MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
         util.performWebRequest(url, undefined).then(function (resolveData) {
           var session = resolveData
           app.globalData.sessionKey = encodeURIComponent(session.session_key)
@@ -86,7 +76,9 @@ App({
               //resolve(app.globalData)
               const env = wx.getAccountInfoSync()
               app.globalData.env = env.miniProgram.envVersion
-              if (app.globalData.staff && app.globalData.env != 'develop' && app.globalData.scene == '1001') {
+              if (app.globalData.staff //&& app.globalData.env != 'develop' 
+                && app.globalData.scene != '1011' && app.globalData.scene != '1012' 
+                && app.globalData.scene != '1013' && app.globalData.scene != '1014'  ) {
                 wx.redirectTo({
                   url: '/pages/admin/admin',
                 })

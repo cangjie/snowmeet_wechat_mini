@@ -103,7 +103,7 @@
         <view class="fui-left-column">【手机】</view>
       </fui-col>
       <fui-col span="6">
-        <input class="input" bindinput="setCell" style="text-align: center;"  />
+        <input class="input" bindinput="setCell" style="text-align: center;"  type="number" />
       </fui-col>
     </fui-row>
     <!--radio-group id="status" bindchange="setQueryOptions">

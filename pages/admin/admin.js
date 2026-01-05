@@ -45,7 +45,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve) {
       init(that)
-      that.setData({env: app.globalData.env})
+      that.setData({env: app.globalData.env, scene: app.globalData.scene})
     })
 
   },

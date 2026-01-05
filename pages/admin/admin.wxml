@@ -1,5 +1,5 @@
 <view wx:if="{{role=='staff'}}" >
-  <mp-cells title="置顶">
+  <mp-cells title="置顶{{scene}}">
     <mp-cell id="recept" bindtap="nav" ext-class="my-cell" >
       <view style="background-color: yellow" >【接待】店铺接待</view>
     </mp-cell>

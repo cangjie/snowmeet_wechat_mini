@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "admin_index",
+          "pathName": "pages/admin/admin",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "租赁订单",
           "pathName": "/pages/admin/rent/rent_details",
           "query": "id=65420",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "雪票",
@@ -131,12 +138,6 @@
         {
           "name": "upload_big_file",
           "pathName": "pages/test/upload/choose_video_upload",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "admin_index",
-          "pathName": "pages/admin/admin",
           "query": "",
           "scene": null
         }
