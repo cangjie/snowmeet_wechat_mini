@@ -214,6 +214,18 @@ Page({
       rental.totalRentalAmount = totalRentalAmount
       rental.totalDiscountAmountStr = util.showAmount(totalRentalAmount)
     }
+    for(var i = 0; order.availablePayments && i < order.availablePayments.length; i++){
+      var payment = order.availablePayments[i]
+      var paidDate = new Date(payment.paid_date)
+      payment.paid_dateDateStr = util.formatDate(paidDate)
+      payment.paid_dateTimeStr = util.formatTimeStr(paidDate)
+      payment.amountStr = util.showAmount(payment.amount)
+      payment.remainAmount =  payment.amount; 
+      if (!isNaN(payment.refundedAmount)){
+        payment.remainAmount = payment.remainAmount - payment.refundedAmount
+      }
+      payment.remainAmountStr = util.showAmount(payment.remainAmount)
+    }
     if (order.appendingRentals && order.appendingRentals.length > 0){
       that.checkAppendingRentalValid()
     }
@@ -244,6 +256,7 @@ Page({
     if (order.totalRentUnRefund < 0 && order.totalRentUnRefund > -0.001) {
       order.totalRentUnRefund = 0.001.toFixed(2) * -1
     }
+    order.totalRentUnRefundStr = util.showAmount(order.totalRentUnRefund)
     if (order.member && order.member.availableDeposit) {
       order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
     }
@@ -727,7 +740,6 @@ Page({
   setPayWithDeposit(e) {
     var that = this
     var payWithDeposit = e.detail.value.length == 1 ? true : false
-    //that.setData({payWithDeposit: e.detail.value.length == 1? true: false})
     var order = that.data.order
     if (payWithDeposit) {
       order.totalRentUnRefund = order.totalRentUnRefund + order.totalRentSummaryAmount
@@ -736,6 +748,7 @@ Page({
       order.totalRentUnRefund = order.totalRentUnRefund - order.totalRentSummaryAmount
     }
     order.totalRentUnRefund = parseFloat(order.totalRentUnRefund.toFixed(2))
+    that.renderOrder(order)
     that.setData({ order, payWithDeposit })
   },
   gotoChange(e) {
@@ -1060,5 +1073,119 @@ Page({
   closeBalance(e){
     var that = this
     that.setData({showBalance: false})
+  },
+  setRefund(e){
+    var that = this
+    var value = e.detail.value
+    console.log('set refund', value)
+    var order = that.data.order
+    var payments = order.availablePayments
+    for(var i = 0; payments  && i < payments.length; i++){
+      var payment = payments[i]
+      payment.needToRefund = false
+      for(var j = 0; value && j < value.length; j++){
+        var id = parseInt(value[j])
+        if (id == i){
+          payment.needToRefund = true
+        }
+      }
+    }
+    that.checkRefundValid()
+    that.setData({order})
+  },
+  setRefundAmount(e){
+    var that = this
+    var value = e.detail.value
+    if (isNaN(value)){
+      return
+    }
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var payment = order.availablePayments[id]
+    var refundAmount = parseFloat(parseFloat(value).toFixed(2))
+    payment.remainAmount = parseFloat(payment.remainAmount.toFixed(2))
+    if (payment.remainAmount < refundAmount ){
+      wx.showToast({
+        title: '可退金额不足',
+        icon: 'error'
+      })
+      return
+    }
+    payment.needToRefundAmount = refundAmount
+    that.checkRefundValid()
+    that.setData({order})
+  },
+  checkRefundValid(){
+    var that = this
+    var refundValid = true
+    var order = that.data.order
+    var payments = order.availablePayments
+    var filledTotalRefund = 0
+    for(var i = 0; payments && i < payments.length; i++){
+      var payment = payments[i]
+      if (payment.needToRefund == true){
+        if (isNaN(payment.needToRefundAmount)){
+          refundValid = false
+        }
+        else if (payment.remainAmount < payment.needToRefundAmount){
+          refundValid = false
+        }
+        else{
+          filledTotalRefund += parseFloat(payment.needToRefundAmount.toFixed(2))
+        }
+      }
+    }
+    that.setData({filledTotalRefund, filledTotalRefundStr: util.showAmount(filledTotalRefund), refundValid})
+  },
+  refundBatch(e){
+    var that = this
+    var order = that.data.order
+    var payments = order.availablePayments
+    /*
+    var refunds = [{
+            payment_id: payment.id,
+            amount: parseFloat(refundAmount.toFixed(2)),
+            reason: '租赁退押金'
+          }]
+    */
+    var refunds = []
+    var refundCount = 0
+    var refundAmount = 0
+    for(var i = 0; payments && i < payments.length; i++){
+      var payment = payments[i]
+      if (payment.needToRefund == true){
+        var refund = {
+          payment_id: payment.id,
+          amount: parseFloat(payment.needToRefundAmount.toFixed(2))
+        }
+        refundCount++
+        refundAmount += refund.amount
+        refunds.push(refund)
+      }
+    }
+    wx.showModal({
+      title: '确认批量退款',
+      content: '批量退款' + refundCount + '笔，总退款金额：' + util.showAmount(refundAmount),
+      complete: (res) => {
+        if (res.cancel) {
+          that.setData({refunding: false})
+        }
+    
+        if (res.confirm) {
+          that.setData({refunding: true})
+          data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order) {
+            that.getData()
+            that.setData({refunding: false})
+            wx.showToast({
+              title: '退款成功',
+              icon: 'success'
+            })
+          })
+        }
+      }
+    })
+    
+
   }
+
 })

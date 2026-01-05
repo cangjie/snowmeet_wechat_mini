@@ -37,4 +37,33 @@
 .right-column-rent-item{
   height: 75rpx;
 }
-
+.refund-cell-1{
+  width: 50rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}
+.refund-cell-2{
+  width: 220rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}
+.refund-cell-3{
+  width: 150rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}
+.refund-cell-4{
+  width: 180rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}
+.refund-cell-5{
+  width: 160rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}

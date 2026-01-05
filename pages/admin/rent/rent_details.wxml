@@ -450,15 +450,61 @@
         </view>
       </view>
     </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column view-row" style="align-items: center;height: 50rpx;">【实际退款】</view>
-        <view class="right-column view-row" style="align-items: center; width: 450rpx;height: 50rpx;">
-          <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" value="{{order.totalRentUnRefund}}" />
-          <van-button type="danger" size="mini" style="margin-left: 100rpx;" bind:click="refund" disabled="{{refunding || order.closed == 1}}"> 退 款 </van-button>
+    <block wx:if="{{order.availablePayments.length <= 1}}">
+      <mp-cell>
+        <view class="view-row">
+          <view class="left-column view-row" style="align-items: center;height: 50rpx;">【实际应退】</view>
+          <view class="right-column view-row" style="align-items: center; width: 450rpx;height: 50rpx;">
+            <input class="input" style="width: 100rpx;text-align: center;" bindinput="setRefundAmount" value="{{order.totalRentUnRefund}}" />
+            <van-button type="danger" size="mini" style="margin-left: 100rpx;" bind:click="refund" disabled="{{refunding || order.closed == 1}}"> 退 款 </van-button>
+          </view>
         </view>
-      </view>
-    </mp-cell>
+      </mp-cell>
+    </block>
+    <block wx:else>
+      <mp-cell>
+        <view class="view-row">
+          <view class="left-column view-row" style="align-items: center;height: 50rpx;">【实际应退】</view>
+          <view class="right-column view-row" style="align-items: center; width: 450rpx;height: 50rpx;">
+            {{order.totalRentUnRefundStr}}
+          </view>
+        </view>
+      </mp-cell>
+      <mp-cell>
+        <view class="view-row">
+          <view class="refund-cell-1"></view>
+          <view class="refund-cell-2" style="font-weight: 200;">日期</view>
+          <view class="refund-cell-3" style="font-weight: 200;">时间</view>
+          <view class="refund-cell-4" style="font-weight: 200;">可退</view>
+          <view class="refund-cell-5" style="font-weight: 200;">退款</view>
+        </view>
+        <checkbox-group bindchange="setRefund" >
+          <view class="view-row" wx:for="{{order.availablePayments}}">
+            <view class="refund-cell-1">
+              <checkbox value="{{index}}" checked="{{item.needToRefund == true}}"  ></checkbox>
+            </view>
+            <view class="refund-cell-2">{{item.paid_dateDateStr}}</view>
+            <view class="refund-cell-3">{{item.paid_dateTimeStr}}</view>
+            <view class="refund-cell-4" style="text-align: right;">{{item.remainAmountStr}}</view>
+            <view class="refund-cell-5 view-row" style="justify-content: center;">
+              <input id="{{index}}" class="input" bindinput="setRefundAmount"
+              style="width: 90rpx;text-align: center;font-size: 10pt;" disabled="{{item.needToRefund != true}}" />
+            </view>
+          </view>
+        </checkbox-group>
+        <view class="view-row">
+          <view class="refund-cell-1"></view>
+          <view class="refund-cell-2" style="font-weight: 200;"></view>
+          <view class="refund-cell-3" style="font-weight: 200;text-align: right;">总计：</view>
+          <view class="refund-cell-4" style="font-weight: 200; text-align: right;">{{order.paidAmountStr}}</view>
+          <view class="refund-cell-5" style="font-weight: 200;">{{filledTotalRefundStr}}</view>
+        </view>
+        <view class="view-row" style="margin-top: 30rpx;justify-content: center;">
+          <van-button type="danger" size="small" disabled="{{refundValid!=true || refunding == true}}" 
+          bind:click="refundBatch" > 批 量 退 款 </van-button>
+        </view>
+      </mp-cell>
+    </block>
     <mp-cell>
       <view style="height: 100rpx;"></view>
     </mp-cell>
@@ -477,13 +523,13 @@
       <view>
         支付追加押金：{{order.paying_amountStr}}
       </view>
-      <payment orderId="{{order.id}}" wx:if="{{showAppendPay}}"  bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult"></payment>
+      <payment orderId="{{order.id}}" wx:if="{{showAppendPay}}" bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult"></payment>
     </view>
   </van-popup>
-  <van-popup show="{{showBalance}}"  closeable close-icon-position="top-right" bind:close="closeBalance" >
+  <van-popup show="{{showBalance}}" closeable close-icon-position="top-right" bind:close="closeBalance">
     <view style="width: 740rpx;height:700rpx">
       <view style="height: 50rpx;"></view>
-      <balance wx:if="{{showBalance}}" orderId="{{order.id}}" ></balance>
+      <balance wx:if="{{showBalance}}" orderId="{{order.id}}"></balance>
     </view>
   </van-popup>
   <fui-backdrop show="{{showBackdrop && backDropType != 'confirm_rental' }}" closable>
