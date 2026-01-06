@@ -1141,13 +1141,6 @@ Page({
     var that = this
     var order = that.data.order
     var payments = order.availablePayments
-    /*
-    var refunds = [{
-            payment_id: payment.id,
-            amount: parseFloat(refundAmount.toFixed(2)),
-            reason: '租赁退押金'
-          }]
-    */
     var refunds = []
     var refundCount = 0
     var refundAmount = 0
@@ -1156,7 +1149,8 @@ Page({
       if (payment.needToRefund == true){
         var refund = {
           payment_id: payment.id,
-          amount: parseFloat(payment.needToRefundAmount.toFixed(2))
+          amount: parseFloat(payment.needToRefundAmount.toFixed(2)),
+          reason: '批量退款'
         }
         refundCount++
         refundAmount += refund.amount

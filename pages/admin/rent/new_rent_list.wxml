@@ -6,7 +6,7 @@
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <shop-selector wx:if="{{cell != null && cell != ''}}" defaultShop=""  
+          <shop-selector wx:if="{{(cell != null && cell != '') || (keyword != null && keyword != '')}}" defaultShop=""  
             bindShopSelected="shopSelected"   ></shop-selector>
           <shop-selector wx:else  bindShopSelected="shopSelected"   ></shop-selector>
         </view>
@@ -19,12 +19,13 @@
       <fui-col span="18">
         <view class="fui-right-column view-row">
           <picker id="start" mode="date" class="input" style="margin-right:20rpx;" 
-            bindchange="setDate"  disabled="{{(cell != null && cell != '') || querying}}">
+            bindchange="setDate"  
+            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">
             <picker-view>{{startDate}}</picker-view>
           </picker>
           -
           <picker id="end" mode="date" class="input" style="margin-left:20rpx;" 
-            disabled="{{(cell != null && cell != '') || querying}}" bindchange="setDate">
+            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" bindchange="setDate">
             <picker-view>{{endDate}}</picker-view>
           </picker>
         </view>
@@ -39,13 +40,16 @@
       </fui-col>
       <radio-group id="isTest" bindchange="setQueryOptions">
         <fui-col span="6">
-          <radio checked="{{true}}" value="false" disabled="{{(cell != null && cell != '') || querying}}" >营业</radio>
+          <radio checked="{{true}}" value="false" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >营业</radio>
         </fui-col>
         <fui-col span="6">
-          <radio value="{{true}}" disabled="{{(cell != null && cell != '') || querying}}" >测试</radio>
+          <radio value="{{true}}" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >测试</radio>
         </fui-col>
         <fui-col span="7">
-          <radio value="null" disabled="{{(cell != null && cell != '') || querying}}" >全部</radio>
+          <radio value="null" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >全部</radio>
         </fui-col>
 
       </radio-group>
@@ -56,13 +60,16 @@
       </fui-col>
       <radio-group id="isEntertain" bindchange="setQueryOptions">
         <fui-col span="6">
-          <radio checked="{{true}}" value="false" disabled="{{(cell != null && cell != '') || querying}}" >正常</radio>
+          <radio checked="{{true}}" value="false" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >正常</radio>
         </fui-col>
         <fui-col span="6">
-          <radio value="true" disabled="{{(cell != null && cell != '') || querying}}" >招待</radio>
+          <radio value="true" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >招待</radio>
         </fui-col>
         <fui-col span="7">
-          <radio value="null" disabled="{{(cell != null && cell != '') || querying}}" >全部</radio>
+          <radio value="null" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >全部</radio>
         </fui-col>
       </radio-group>
     </fui-row>
@@ -72,13 +79,16 @@
       </fui-col>
       <radio-group id="haveDiscount" bindchange="setQueryOptions">
         <fui-col span="6">
-          <radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || querying}}" >全部</radio>
+          <radio checked="{{true}}" value="null" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >全部</radio>
         </fui-col>
         <fui-col span="6">
-          <radio value="true" disabled="{{(cell != null && cell != '') || querying}}" >包含</radio>
+          <radio value="true" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >包含</radio>
         </fui-col>
         <fui-col span="7">
-          <radio value="false" disabled="{{(cell != null && cell != '') || querying}}" >不含</radio>
+          <radio value="false" 
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}" >不含</radio>
         </fui-col>
       </radio-group>
     </fui-row>
@@ -88,6 +98,14 @@
       </fui-col>
       <fui-col span="6">
         <input class="input" bindinput="setCell" style="text-align: center;" type="number"  />
+      </fui-col>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="5">
+        <view class="fui-left-column">【备注】</view>
+      </fui-col>
+      <fui-col span="6">
+        <input class="input" bindinput="setMemo" style="text-align: center;"  />
       </fui-col>
     </fui-row>
     <!--radio-group id="status" bindchange="setQueryOptions">

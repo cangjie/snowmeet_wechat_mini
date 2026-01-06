@@ -13,7 +13,8 @@ Page({
       { key: 'isEntertain', value: false },
       { key: 'haveDiscount', value: null }
     ],
-    cell: null
+    cell: null,
+    keyword: null
   },
 
   /**
@@ -150,7 +151,8 @@ Page({
     var startDate = that.data.startDate
     var endDate = that.data.endDate
     var cell = that.data.cell
-    if (cell != null && cell != '') {
+    var keyword = that.data.keyword
+    if ((cell != null && cell != '') || (keyword != null && keyword != '')) {
       startDate = new Date('2025-10-15')
       endDate = null
       shop = null
@@ -159,7 +161,7 @@ Page({
       haveDiscount = null
     }
     data.getOrdersByStaffPromise(null, shop, null, null, '租赁', startDate, endDate,
-      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell).then(function (orders) {
+      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, null, null, that.data.keyword).then(function (orders) {
         console.log('get orders', orders)
         that.renderOrders(orders)
         that.setData({ querying: false })
@@ -245,5 +247,10 @@ Page({
     //that.data.cell = e.detail.value
     var cell = e.detail.value
     that.setData({ cell })
+  },
+  setMemo(e){
+    var that = this
+    var keyword = e.detail.value
+    that.setData({keyword})
   }
 })
