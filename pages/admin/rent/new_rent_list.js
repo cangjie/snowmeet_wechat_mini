@@ -245,5 +245,10 @@ Page({
     //that.data.cell = e.detail.value
     var cell = e.detail.value
     that.setData({ cell })
+  },
+  setMemo(e){
+    var that = this
+    var keyword = e.detail.value
+    that.setData({keyword})
   }
 })
