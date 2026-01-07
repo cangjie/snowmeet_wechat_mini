@@ -15,7 +15,8 @@ Page({
       {key: 'haveWarranty', value: null}
     ],
     cell: null,
-    querying: false
+    querying: false,
+    keyword: null
   },
 
   /**
@@ -108,16 +109,17 @@ Page({
     var startDate = that.data.startDate
     var endDate = that.data.endDate
     var cell = that.data.cell
-    if(cell != null && cell != ''){
+    var keyword = that.data.keyword
+    if((cell != null && cell != '') || (keyword != null && keyword != '')){
       startDate = new Date('2025-10-15')
-      endDate = null
+      endDate = new Date()
       shop = null
       isTest = null
       isEntertain = null
       haveDiscount = null
     }
     data.getOrdersByStaffPromise(null, shop, null, null, '养护', startDate, endDate, 
-      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, haveWarranty).then(function (orders){
+      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, haveWarranty, null, that.data.keyword).then(function (orders){
         console.log('get orders', orders)
         that.renderOrders(orders)
         that.setData({querying: false})
@@ -230,4 +232,8 @@ Page({
         break
     }
   },
+  setMemo(e){
+    var that = this
+    that.setData({keyword: e.detail.value})
+  }
 })

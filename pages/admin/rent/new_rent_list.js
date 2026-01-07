@@ -154,7 +154,7 @@ Page({
     var keyword = that.data.keyword
     if ((cell != null && cell != '') || (keyword != null && keyword != '')) {
       startDate = new Date('2025-10-15')
-      endDate = null
+      endDate = new Date()
       shop = null
       isTest = null
       isEntertain = null
