@@ -214,19 +214,19 @@ Page({
       rental.totalRentalAmount = totalRentalAmount
       rental.totalDiscountAmountStr = util.showAmount(totalRentalAmount)
     }
-    for(var i = 0; order.availablePayments && i < order.availablePayments.length; i++){
+    for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
       var payment = order.availablePayments[i]
       var paidDate = new Date(payment.paid_date)
       payment.paid_dateDateStr = util.formatDate(paidDate)
       payment.paid_dateTimeStr = util.formatTimeStr(paidDate)
       payment.amountStr = util.showAmount(payment.amount)
-      payment.remainAmount =  payment.amount; 
-      if (!isNaN(payment.refundedAmount)){
+      payment.remainAmount = payment.amount;
+      if (!isNaN(payment.refundedAmount)) {
         payment.remainAmount = payment.remainAmount - payment.refundedAmount
       }
       payment.remainAmountStr = util.showAmount(payment.remainAmount)
     }
-    if (order.appendingRentals && order.appendingRentals.length > 0){
+    if (order.appendingRentals && order.appendingRentals.length > 0) {
       that.checkAppendingRentalValid()
     }
     if (order.closed == 1) {
@@ -260,7 +260,7 @@ Page({
     if (order.member && order.member.availableDeposit) {
       order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
     }
-    if (!isNaN(order.paying_amount)){
+    if (!isNaN(order.paying_amount)) {
       order.paying_amountStr = util.showAmount(parseFloat(order.paying_amount))
     }
     that.setData({
@@ -295,7 +295,7 @@ Page({
                 order = that.renderOrder(order)
                 that.setData({ order })
                 that.checkAppendingRentalValid()
-                that.setData({order})
+                that.setData({ order })
               }
               else {
                 data.getMemberPromise(order.member_id, app.globalData.sessionKey).then(function (member) {
@@ -303,7 +303,7 @@ Page({
                   order = that.renderOrder(order)
                   that.setData({ order })
                   that.checkAppendingRentalValid()
-                  that.setData({order})
+                  that.setData({ order })
                 })
               }
               break
@@ -903,7 +903,7 @@ Page({
     item.code = code
     var order = that.data.order
     order = that.renderOrder(order)
-    that.setData({order})
+    that.setData({ order })
   },
   setName(e) {
     var that = this
@@ -913,7 +913,7 @@ Page({
     item.name = name
     var order = that.data.order
     order = that.renderOrder(order)
-    that.setData({order})
+    that.setData({ order })
   },
   setAppendingItemMemo(e) {
     var that = this
@@ -922,7 +922,7 @@ Page({
     var item = that.getAppendingRentItem(parseInt(id))
     item.memo = memo
   },
-  setAppendingRentalMemo(e){
+  setAppendingRentalMemo(e) {
     var that = this
     var memo = e.detail.value
     var id = e.currentTarget.id
@@ -985,67 +985,74 @@ Page({
     that.setData({ order })
     that.cancelBackdrop(e)
   },
-  checkAppendingRentalValid(){
+  checkAppendingRentalValid() {
     var that = this
     var allValid = true
     var order = that.data.order
-    if (!order){
+    if (!order) {
       return
     }
     var rentals = that.data.order.appendingRentals
-    if (!rentals){
+    if (!rentals) {
       return
     }
-    for(var i = 0; rentals && i < rentals.length; i++){
+    for (var i = 0; rentals && i < rentals.length; i++) {
       var rentalWellformed = true
       var rentItems = rentals[i].rentItems
-      for(var j = 0; rentItems && j < rentItems.length; j++){
+      for (var j = 0; rentItems && j < rentItems.length; j++) {
         var rentItem = rentItems[j]
-        if (rentItem.noNeed){
+        if (rentItem.noNeed) {
           rentItem.wellFormed = true
         }
-        else if (rentItem.noCode){
-          if (rentItem.name && rentItem.name != ''){
+        else if (rentItem.noCode) {
+          if (rentItem.name && rentItem.name != '') {
             rentItem.wellFormed = true
           }
-          else{
+          else {
             rentItem.wellFormed = false
             rentalWellformed = false
             allValid = false
           }
         }
-        else{
-          if (rentItem.code && rentItem.code != ''){
+        else {
+          if (rentItem.code && rentItem.code != '') {
             rentItem.wellFormed = true
           }
-          else{
+          else {
             rentItem.wellFormed = false
             rentalWellformed = false
             allValid = false
           }
         }
-        
+
       }
       rentals[i].wellFormed = rentalWellformed
     }
-    that.setData({allValid})
+    that.setData({ allValid })
   },
-  saveAppendings(e){
+  saveAppendings(e) {
     var that = this
     var order = that.data.order
     var appendings = order.appendingRentals
     var appUrl = app.globalData.requestPrefix + 'Rent/SaveAppendings/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(appUrl, appendings).then(function (order){
+    util.performWebRequest(appUrl, appendings).then(function (order) {
       console.log('append', order)
-      order = that.renderOrder(order)
-      that.data.order = order
-      that.checkAppendingRentalValid()
-      that.setData({order, showAppendPay: true})
+      if (order.paying_amount > 0) {
+        order = that.renderOrder(order)
+        that.data.order = order
+        that.checkAppendingRentalValid()
+        that.setData({ order, showAppendPay: true })
+      }
+      else {
+        that.getData()
+        //order = that.renderOrder(order)
+        //that.setData({ order })
+      }
     })
   },
-  closeAppendPay(e){
+  closeAppendPay(e) {
     var that = this
-    that.setData({showAppendPay: false})
+    that.setData({ showAppendPay: false })
   },
   orderStatusChanged() {
     var that = this
@@ -1061,42 +1068,42 @@ Page({
           title: '支付成功',
           icon: 'success'
         })
-        that.setData({showAppendPay: false})
+        that.setData({ showAppendPay: false })
         that.getData()
       }
     })
   },
-  showBalance(e){
+  showBalance(e) {
     var that = this
-    that.setData({showBalance: true})
+    that.setData({ showBalance: true })
   },
-  closeBalance(e){
+  closeBalance(e) {
     var that = this
-    that.setData({showBalance: false})
+    that.setData({ showBalance: false })
   },
-  setRefund(e){
+  setRefund(e) {
     var that = this
     var value = e.detail.value
     console.log('set refund', value)
     var order = that.data.order
     var payments = order.availablePayments
-    for(var i = 0; payments  && i < payments.length; i++){
+    for (var i = 0; payments && i < payments.length; i++) {
       var payment = payments[i]
       payment.needToRefund = false
-      for(var j = 0; value && j < value.length; j++){
+      for (var j = 0; value && j < value.length; j++) {
         var id = parseInt(value[j])
-        if (id == i){
+        if (id == i) {
           payment.needToRefund = true
         }
       }
     }
     that.checkRefundValid()
-    that.setData({order})
+    that.setData({ order })
   },
-  setRefundAmount(e){
+  setRefundAmount(e) {
     var that = this
     var value = e.detail.value
-    if (isNaN(value)){
+    if (isNaN(value)) {
       return
     }
     var id = parseInt(e.currentTarget.id)
@@ -1104,7 +1111,7 @@ Page({
     var payment = order.availablePayments[id]
     var refundAmount = parseFloat(parseFloat(value).toFixed(2))
     payment.remainAmount = parseFloat(payment.remainAmount.toFixed(2))
-    if (payment.remainAmount < refundAmount ){
+    if (payment.remainAmount < refundAmount) {
       wx.showToast({
         title: '可退金额不足',
         icon: 'error'
@@ -1113,40 +1120,40 @@ Page({
     }
     payment.needToRefundAmount = refundAmount
     that.checkRefundValid()
-    that.setData({order})
+    that.setData({ order })
   },
-  checkRefundValid(){
+  checkRefundValid() {
     var that = this
     var refundValid = true
     var order = that.data.order
     var payments = order.availablePayments
     var filledTotalRefund = 0
-    for(var i = 0; payments && i < payments.length; i++){
+    for (var i = 0; payments && i < payments.length; i++) {
       var payment = payments[i]
-      if (payment.needToRefund == true){
-        if (isNaN(payment.needToRefundAmount)){
+      if (payment.needToRefund == true) {
+        if (isNaN(payment.needToRefundAmount)) {
           refundValid = false
         }
-        else if (payment.remainAmount < payment.needToRefundAmount){
+        else if (payment.remainAmount < payment.needToRefundAmount) {
           refundValid = false
         }
-        else{
+        else {
           filledTotalRefund += parseFloat(payment.needToRefundAmount.toFixed(2))
         }
       }
     }
-    that.setData({filledTotalRefund, filledTotalRefundStr: util.showAmount(filledTotalRefund), refundValid})
+    that.setData({ filledTotalRefund, filledTotalRefundStr: util.showAmount(filledTotalRefund), refundValid })
   },
-  refundBatch(e){
+  refundBatch(e) {
     var that = this
     var order = that.data.order
     var payments = order.availablePayments
     var refunds = []
     var refundCount = 0
     var refundAmount = 0
-    for(var i = 0; payments && i < payments.length; i++){
+    for (var i = 0; payments && i < payments.length; i++) {
       var payment = payments[i]
-      if (payment.needToRefund == true){
+      if (payment.needToRefund == true) {
         var refund = {
           payment_id: payment.id,
           amount: parseFloat(payment.needToRefundAmount.toFixed(2)),
@@ -1162,14 +1169,14 @@ Page({
       content: '批量退款' + refundCount + '笔，总退款金额：' + util.showAmount(refundAmount),
       complete: (res) => {
         if (res.cancel) {
-          that.setData({refunding: false})
+          that.setData({ refunding: false })
         }
-    
+
         if (res.confirm) {
-          that.setData({refunding: true})
+          that.setData({ refunding: true })
           data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order) {
             that.getData()
-            that.setData({refunding: false})
+            that.setData({ refunding: false })
             wx.showToast({
               title: '退款成功',
               icon: 'success'
@@ -1178,7 +1185,7 @@ Page({
         }
       }
     })
-    
+
 
   }
 
