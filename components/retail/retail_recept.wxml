@@ -2,7 +2,7 @@
   <view class="view-row" >
     <view class="left-column" >【支付金额】</view>
     <view class="right-column" >
-      <input type="digit" style="width: 100rpx;" class="input" 
+      <input type="digit" style="width: 100rpx;text-align: center;" class="input" 
       value="{{order.retails[0].deal_price}}" id="deal_price" bindinput="setInput"  />
     </view>
   </view>
@@ -42,7 +42,7 @@
     </view>
   </view>
   <van-divider></van-divider>
-  <view class="view-row" style="height: 120rpx;">
+  <view class="view-row" style="height: 180rpx;">
     <view class="left-column"  style="height: 120rpx;" >【订单类型】</view>
     <view class="right-column"  style="height: 120rpx;" >
       <radio-group  id="retail_type" bindchange="radioChanged"  >
@@ -51,6 +51,7 @@
         <radio style="margin-left: 10rpx;margin-top:10rpx" value="养护卡类" >养护卡类</radio>
         <radio style="margin-top:10rpx" value="租赁卡类" >租赁卡类</radio>
         <radio style="margin-left: 10rpx;margin-top:10rpx" value="租赁卡类" >二手装备</radio>
+        <radio style="margin-left: 0rpx;margin-top:10rpx" value="雪鞋定型" >雪鞋定型</radio>
       </radio-group>
     </view>
   </view>
@@ -64,11 +65,13 @@
     </view>
   </view>
   <van-divider></van-divider>
-  <view class="view-row" >
+  <view class="view-row" style="height: 150rpx;" >
     <view class="left-column" >【备注】</view>
     <view class="right-column" >
-      <textarea class="input" style="width: 420rpx; height: 200rpx;" 
+      <textarea class="input" style="width: 420rpx; height: 130rpx;" 
       value="{{order.retails[0].memo}}" id="memo" bindinput="setInput" ></textarea>
     </view>
   </view>
+  <van-divider></van-divider>
+  <view style="height: 100rpx;" ></view>
 </view>

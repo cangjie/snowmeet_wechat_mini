@@ -56,7 +56,7 @@
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="view-row">
+      <view class="view-row" style="height: {{moddingOrderInfo?'200':'50'}}rpx;" >
         <view class="left-column">【订单类型】</view>
         <view class="right-column view-row" style="width: 580rpx;height:100rpx" wx:if="{{moddingOrderInfo}}">
           <radio-group id="retail_type" bindchange="inputOrderInfo" >
@@ -69,6 +69,8 @@
             checked="{{order.retails[0].retail_type == '租赁卡类'}}" >租赁卡类</radio>
             <radio style="margin-left: 10rpx;margin-top:10rpx" value="二手装备"
             checked="{{order.retails[0].retail_type == '二手装备'}}" >二手装备</radio>
+            <radio style="margin-left: 0rpx;margin-top:10rpx" value="雪鞋定型"
+            checked="{{order.retails[0].retail_type == '雪鞋定型'}}" >雪鞋定型</radio>
           </radio-group>
         </view>
         <view class="right-column" wx:else>{{order.retails[0].retail_type==null?'未填':order.retails[0].retail_type}}</view>

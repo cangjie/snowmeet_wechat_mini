@@ -13,7 +13,7 @@
       name="{{realName}}" shop="{{shop}}" bizType="{{bizType}}" bindJump="jump" ></fire-charge>
   </view>
   <!--fire hide-->
-  <view style="height: 200rpx;" wx:if="{{fire == null}}">
+  <view style="height: 260rpx;" wx:if="{{fire == null}}">
     <van-goods-action>
       <!--van-goods-action-icon wx:if="{{bizType == 'rent'}}" info="{{rentals.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" /-->
       <rent-recept-footer wx:if="{{showFooter && bizType == 'rent'}}" rentals="{{rentals}}"

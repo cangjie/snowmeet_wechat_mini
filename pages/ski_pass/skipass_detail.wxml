@@ -4,16 +4,14 @@
       {{product.name}}
     </view>
     <view class="view-row">
-      <view class="left-column" >门市价：</view>
-      <view class="right-column"  >{{dailyPrice.marketPriceStr}}</view>
       <view class="left-column" >会员价：</view>
       <view class="right-column"  >{{dailyPrice.deal_priceStr}}</view>
-    </view>
-    <view class="view-row">
       <view class="left-column" >数量：</view>
       <view class="right-column"  >
         <input value="{{count}}" bindinput="setCount"  type="number" style="width: 50rpx;text-align: center;" class="input" disabled="{{true || product.id == 300 || product.id == 312 || product.id == 317 || product.resort=='太舞'}}" />
       </view>
+    </view>
+    <view class="view-row">
       <view class="left-column" >总计：</view>
       <view class="right-column"  >{{summaryStr}}</view>
     </view>
