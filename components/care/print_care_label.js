@@ -201,7 +201,7 @@ Component({
       }
       var maskedName = ''
       if (name.length > 0) {
-        maskedName = name.substring(0, 1) + care.customerName
+        maskedName = name.substring(0, 1) //+ care.customerName
       }
       if (labelType == '【客户联】' ) {
         maskedName = name
@@ -250,8 +250,6 @@ Component({
       command.setSize(75, 50)//设置标签大小，单位mm.具体参数请用尺子量一下
       command.setGap(4)//设置两个标签之间的间隙，单位mm.具体参数请用尺子量一下
       command.setCls()//清除缓冲区
-      
-      
       command.setText(20, 20, font, 0, 1, 1, labelType + ' ' + (urgent ? '(急)' : '') + orderNum)
       command.setText(20, 20 + 40, font, 0, 1, 1, maskedName + " " + maskedCell)
       command.setText(20, 20 + 40 + 40, font, 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)

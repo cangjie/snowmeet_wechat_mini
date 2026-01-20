@@ -59,7 +59,7 @@
     <view class="left-column"></view>
     <view class="right-column view-row">
       <checkbox-group  bindchange="setValue" id="free_wax" wx:if="{{care.ticket!=null && care.ticket != undefined  }}" >
-        <checkbox style="margin-right: 30rpx;" disabled="{{care.ticket_code == null}}" checked="{{care.free_wax == 1}}" >机打蜡</checkbox>
+        <checkbox style="margin-right: 30rpx;" disabled="{{care.ticket_code == null || care.ticket.template_id != 12}}" checked="{{care.free_wax == 1}}" >机打蜡</checkbox>
       </checkbox-group>
       <checkbox-group id="need_wax" bindchange="setValue" >
         <checkbox  checked="{{care.need_wax == 1}}" >热蜡</checkbox>

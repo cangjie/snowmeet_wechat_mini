@@ -89,6 +89,7 @@ Component({
                 that.loadData(currentCare)
                 data.getMemberTicketsPromise(that.data.order.member_id, '养护', true, app.globalData.sessionKey).then(function (tickets) {
                   console.log('tickets', tickets)
+                  tickets = tickets.sort((a, b) => a.template_id - b.template_id)
                   that.setData({ tickets: tickets })
                   that.setCateTicket()
                 })
@@ -139,6 +140,20 @@ Component({
       var message = util.getCareWellFormMessage(care)
       that.setData({ brandList, brandSelectIndex, care, othersService, wellFormed: message == '' ? true : false })
     },
+    setDiscount(e){
+      var that = this
+      var care = that.data.care
+      if (care.ticket_code != null && care.ticket.template_id == 16){
+        if (care.need_edge == 1 && care.need_wax == 1){
+          care.discount = 30
+          that.computeCharge(care)
+        }
+        else if (care.need_edge == 1 || care.need_wax == 1){
+          care.discount = 20
+          that.computeCharge(care)
+        }
+      }
+    },
     setValue(e) {
       var that = this
       var id = e.currentTarget.id
@@ -148,7 +163,6 @@ Component({
       if (!care) {
         care = {}
       }
-
       switch (id) {
         case 'equipment':
           care.equipment = value
@@ -202,8 +216,14 @@ Component({
           if (care.ticket_code == null) {
             that.getProduct(care)
           }
-          else{
-            that.getTicketProduct(care)
+          else {
+            if (care.ticket.template_id == 12){
+              that.getTicketProduct(care)
+            }
+            else if (care.ticket.template_id == 16){
+              that.getProduct(care)
+              that.setDiscount()
+            }
           }
           break
         case 'edge_degree':
@@ -219,7 +239,13 @@ Component({
             that.getProduct(care)
           }
           else {
-            that.getTicketProduct(care)
+            if (care.ticket.template_id == 12){
+              that.getTicketProduct(care)
+            }
+            else if (care.ticket.template_id == 16){
+              that.getProduct(care)
+              that.setDiscount()
+            }
           }
           break
         case 'need_unwax':
@@ -285,13 +311,19 @@ Component({
           if (e.detail.value.length == 1) {
             care.ticket_code = care.ticket.code
             care.ticket.use = true
-            care.free_wax = 1
-            that.getTicketProduct(care)
+            if (care.ticket.template_id == 12) {
+              care.free_wax = 1
+              that.getTicketProduct(care)
+            }
+            else if (care.ticket.template_id == 16){
+              that.setDiscount()
+            }
           }
           else {
             care.ticket_code = null
             care.ticket.use = false
             care.free_wax = 0
+            care.discount = 0;
             that.getProduct(care)
           }
           break
@@ -564,7 +596,7 @@ Component({
           that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
         }
       }
-      else{
+      else {
         if (care.need_edge == 1) {
           var template = that.getTicketTemplate(care.ticket.template.productTicketTemplates, '双项')
           if (template != null) {
@@ -576,7 +608,7 @@ Component({
             that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
           }
         }
-        else{
+        else {
           var template = that.getTicketTemplate(care.ticket.template.productTicketTemplates, '打蜡')
           if (template != null) {
             care.product = template.product
@@ -707,7 +739,7 @@ Component({
           break
         }
       }
-      if (care.ticket_code == null){
+      if (care.ticket_code == null) {
         care.ticket = ticket
         that.setData({ care })
       }
