@@ -33,10 +33,49 @@
       <view wx:else class="view-row" style="justify-content: center;" >
         <van-button type="primary" size="small" bind:click="setModBaseInfo" > 修 改 </van-button>
       </view>
-      <!--button class="input" disabled="{{!rentPackage.need_save}}" bind:tap="saveBaseInfo" size="mini" >保存基本信息</button-->
     </mp-cell>
   </mp-cells>
-
+  <mp-cells title="设置租赁物" >
+    <mp-cell>
+      <view class="view-row"  >
+        <view class="left-column" style="text-align: left; width: 300rpx;" >【租赁物数量】</view>
+        <view class="right-column" wx:if="{{modRentItemCategory}}"  >
+          <input class="input" style="width: 75rpx;text-align: center;" placeholder="{{rentPackage.item_count}}" bindinput="setItemCount" />
+        </view>
+        <view class="right-column" wx:else  >{{rentPackage.item_count}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:for="{{rentItemCategories}}" wx:for-item="rentItem" wx:for-index="rentItemIndex" >
+      <view class="view-row" >
+        <view class="left-column" style="width: 200rpx;{{(rentItem.categories == null || rentItem.categories.length == 0)? 'color:red;': ''}}" >
+          租赁物{{rentItemIndex + 1}}
+        </view>
+        <view class="right-column view-row" style="width:500rpx" >
+          <view style="width: 400rpx;{{(rentItem.categories == null || rentItem.categories.length == 0)? 'color:red;': ''}}" >
+            {{rentItem.categories.length}}选1 
+          </view>
+          <view style="width: 100rpx;">
+            <van-button type="primary" size="mini" wx:if="{{modRentItemCategory}}" id="{{rentItemIndex}}" bind:click="addRentItemCategory" >添加</van-button>
+          </view>
+        </view>
+      </view>
+      <view class="view-row" wx:for="{{rentItem.categories}}" >
+        <view class="left-column" style="width: 650rpx;" >{{item.name}}</view>
+        <view class="right-column" style="width: 100rpx;" >
+          <van-button type="danger" size="mini" wx:if="{{modRentItemCategory}}" id="{{rentItemIndex}}_{{index}}" bind:click="delRentItemCategory" >删除</van-button>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" style="justify-content: center;" >
+        <block wx:if="{{modRentItemCategory}}" >
+          <van-button type="warning" size="small" bind:click="setCancelModRentItemCategory" style="margin-right: 40rpx;"> 取 消 </van-button>
+          <van-button type="danger" size="small"  bind:click="setConfirmModRentItemCategory" style="margin-left: 40rpx;" > 确 认 </van-button>
+        </block>
+        <van-button type="primary" size="small" bind:click="setModRentItemCategory" wx:else > 修 改 </van-button>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="选择分类">
     <mp-cell>
       <tree

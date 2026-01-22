@@ -1,4 +1,5 @@
 // pages/admin/rent/settings/rent_package.js
+//import Linq  from '../../../../node_modules/linq/linq.min.js'
 const app = getApp()
 const data = require('../../../../utils/data.js')
 Page({
@@ -29,6 +30,7 @@ Page({
     showShopMatrix: true,
     moddingBaseInfo: false,
     moddingCategory: false,
+    modRentItemCategory: false,
     changedCategories: []
   },
 
@@ -94,9 +96,43 @@ Page({
         selectedCode.push(rentPackage.rentPackageCategoryList[i].rentCategory.code)
       }
       rentPackage.need_save = false
+      that.buildRentItemCategories(rentPackage)
       that.setData({ rentPackage: rentPackage, selectedCode: selectedCode })
       that.getDataTree()
     })
+  },
+  buildRentItemCategories(rentPackage){
+    var that = this
+    var rentItemCategories = []
+    var categoryList = rentPackage.rentPackageCategoryList
+    var itemCount = rentPackage.item_count
+    for(var i = 0; i < itemCount; i++){
+      var rentItemCategory = {}
+      rentItemCategory.index = i
+      if (categoryList!=null){
+        rentItemCategory.categories = that.getCategories(categoryList, i)
+      }
+      else{
+        var category = {id: null}
+        rentItemCategory.categories = [category]
+      }
+      rentItemCategories.push(rentItemCategory)
+    }
+    that.setData({rentItemCategories})
+    /*
+    for(var i = 0; i < rentPackage.rentPackageItemCategories.length; i++){
+      var categories = that.getCategories()
+    }
+    */
+  },
+  getCategories(rentPackageCategoryList, itemIndex){
+    var categories = []
+    for(var i = 0; i < rentPackageCategoryList.length; i++){
+      if (rentPackageCategoryList[i].item_index == itemIndex){
+        categories.push(rentPackageCategoryList[i].rentCategory)
+      }
+    }
+    return categories
   },
   keyInput(e) {
     var that = this
@@ -272,5 +308,28 @@ Page({
         }
       }
     })
+  },
+  setModRentItemCategory(e){
+    var that = this
+    that.setData({modRentItemCategory: true})
+  },
+  setCancelModRentItemCategory(e){
+    var that = this
+    that.getPackage()
+    that.setData({modRentItemCategory: false})
+  },
+  delRentItemCategory(e){
+    var that = this
+    console.log('del cate', e)
+  },
+  setItemCount(e){
+    var that = this
+    var value = e.detail.value
+    if (isNaN(value)){
+      return
+    }
+    var rentPackage = that.data.rentPackage
+    rentPackage.item_count = parseInt(value)
+    that.buildRentItemCategories(rentPackage)
   }
 })
