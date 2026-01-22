@@ -104,4 +104,8 @@
   <view class="view-row" style="justify-content: center;" >
     <van-button type="danger" bind:click="del" > 删 除 套 餐 </van-button>
   </view>
+  <van-popup show="{{ popUpContent == 'categorySelector' }}">
+  <category-selector  bindCancel="cancelPopUp" bindConfirm="confirmCategory">
+  </category-selector>
+</van-popup>
 </view>

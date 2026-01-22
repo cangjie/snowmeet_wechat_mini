@@ -31,7 +31,8 @@ Page({
     moddingBaseInfo: false,
     moddingCategory: false,
     modRentItemCategory: false,
-    changedCategories: []
+    changedCategories: [],
+
   },
 
   handleSelect(e) {
@@ -108,7 +109,7 @@ Page({
     var itemCount = rentPackage.item_count
     for(var i = 0; i < itemCount; i++){
       var rentItemCategory = {}
-      rentItemCategory.index = i
+      rentItemCategory.itemIndex = i
       if (categoryList!=null){
         rentItemCategory.categories = that.getCategories(categoryList, i)
       }
@@ -320,6 +321,18 @@ Page({
   },
   delRentItemCategory(e){
     var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var rentItemCategories = that.data.rentItemCategories 
+    var rentItemCategory = rentItemCategories[parseInt(idArr[0])]
+    var categories = rentItemCategory.categories
+    var newCategories = []
+    for(var i = 0; i < categories.length; i++){
+      if (i != parseInt(idArr[1])){
+        newCategories.push(categories[i])
+      }
+    }
+    rentItemCategory.categories = newCategories
+    that.setData({rentItemCategories})
     console.log('del cate', e)
   },
   setItemCount(e){
@@ -331,5 +344,34 @@ Page({
     var rentPackage = that.data.rentPackage
     rentPackage.item_count = parseInt(value)
     that.buildRentItemCategories(rentPackage)
+  },
+  addRentItemCategory(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    that.setData({popUpContent: 'categorySelector', currentModRenItemIndex: index})
+  },
+  confirmCategory(e){
+    console.log('selecte cate', e)
+    var that = this
+    var category = e.detail
+    var rentItemCategories = that.data.rentItemCategories
+    var index = that.data.currentModRenItemIndex
+    rentItemCategories[index].categories.push(category)
+    that.setData({rentItemCategories})
+    that.cancelPopUp(e)
+  },
+  cancelPopUp(e){
+    var that = this
+    that.setData({popUpContent: null})
+  },
+  setConfirmModRentItemCategory(e){
+    var that = this
+    var rentItemCategories = that.data.rentItemCategories
+    console.log('updated rentItemCategories', rentItemCategories)
+    //var postUrl = app.globalData.requestPrefix + 'Rent/'
+    data.updateRentPackageCategoryPromise(that.data.rentPackage.id, rentItemCategories, app.globalData.sessionKey).then(function(rentPackage){
+      that.buildRentItemCategories(rentPackage)
+      that.setData({rentPackage})
+    })
   }
 })

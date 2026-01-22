@@ -698,6 +698,10 @@ const getOrderBalancePromise = function (orderId, sessionKey){
   var bUrl = app.globalData.requestPrefix + 'Order/GetOrderBalance/' + orderId.toString() + '?sessionKey=' + sessionKey
   return util.performWebRequest(bUrl, null)
 }
+const updateRentPackageCategoryPromise = function(packageId, packageCategories, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdatePackageRentItemCategories/' + packageId.toString() + '?sessionKey=' + sessionKey
+  return util.performWebRequest(updateUrl, packageCategories)
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -750,5 +754,6 @@ module.exports = {
   getMemberTicketsPromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,
-  getOrderBalancePromise
+  getOrderBalancePromise,
+  updateRentPackageCategoryPromise
 }
