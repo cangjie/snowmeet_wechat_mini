@@ -1,7 +1,7 @@
 <view>
   <mp-cells title="" >
     <mp-cell wx:for="{{packageList}}" >
-      <view id="{{item.id}}" bindtap="gotoDetail" >{{item.name}}</view>
+      <view id="{{item.id}}" bindtap="gotoDetail" >{{item.shop? ('【'+ item.shop + '】'):'' }}{{item.name}}</view>
     </mp-cell>
   </mp-cells>
   <view style="height: 100rpx;" ></view>
