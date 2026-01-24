@@ -8,7 +8,7 @@ Component({
    * Component properties
    */
   properties: {
-
+    shop:String
   },
 
   /**
@@ -20,7 +20,7 @@ Component({
   lifetimes:{
     ready(){
       var that = this
-      data.getPackageListPromise(app).then(function(packages){
+      data.getPackageListPromise(that.properties.shop).then(function(packages){
         console.log('get packages', packages)
         that.setData({packages: packages})
         that.triggerEvent('GetPackages', packages)

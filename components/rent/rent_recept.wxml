@@ -224,7 +224,7 @@
   </view>
 </scroll-view>
 <van-popup show="{{ showPopUp }}">
-  <package_selector wx:if="{{popUpContent == 'packageSelector'}}" bindConfirm="selectPackageConfirm" bindCancel="cancelPopUp"></package_selector>
+  <package_selector wx:if="{{popUpContent == 'packageSelector'}}" shop="{{shop}}" bindConfirm="selectPackageConfirm" bindCancel="cancelPopUp"></package_selector>
   <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" categoryId="{{searchCategoryId}}" bindCancel="cancelPopUp" barCode="{{searchBarCode}}" bindConfirm="confirmProduct"></search-product-fuzzy>
   <category-selector wx:if="{{popUpContent == 'categorySelector'}}" bindCancel="cancelPopUp" bindConfirm="confirmCategory">
   </category-selector>

@@ -1,8 +1,8 @@
 const util = require('./util.js')
 const app = getApp()
 //获取租赁套餐列表
-const getPackageListPromise = function () {
-  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList'
+const getPackageListPromise = function (shop) {
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList?shop=' + encodeURIComponent(shop)
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (packages) {
       resolve(packages)
