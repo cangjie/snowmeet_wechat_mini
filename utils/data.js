@@ -206,13 +206,14 @@ const updateRentCategoryPromise = function (code, name, guaranty, scene, session
     })
   })
 }
-const updateRentPackagePromise = function (id, name, description, guaranty, sessionKey) {
+const updateRentPackagePromise = function (id, name, description, guaranty, sessionKey, shop) {
   var saveUrl = app.globalData.requestPrefix + 'Rent/UpdateRentPackageBaseInfo/'
     + id.toString() + '?name=' + encodeURIComponent(name)
     + '&description=' + encodeURIComponent(description)
     + '&deposit=' + encodeURIComponent(guaranty.toString())
     + '&sessionKey=' + encodeURIComponent(sessionKey)
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    + '&shop=' + encodeURIComponent(shop)
   return new Promise(function (resolve, reject) {
     util.performWebRequest(saveUrl, null).then(function (rentPackage) {
       resolve(rentPackage)

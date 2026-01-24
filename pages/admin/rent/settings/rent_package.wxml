@@ -16,6 +16,16 @@
       </view>
     </mp-cell>
   </mp-cells>
+  <mp-cells title="所属店铺" >
+    <mp-cell>
+      <view class="view-row" wx:if="{{!moddingBaseInfo}}" style="justify-content: center;" >
+        {{rentPackage.shop?rentPackage.shop:''}}
+      </view>
+      <view wx:else class="view-row" style="justify-content: center;" >
+        <shop-selector defaultShop="{{rentPackage.shop}}"   bindShopSelected="shopSelected"   ></shop-selector>
+      </view>
+    </mp-cell>
+  </mp-cells>
   <mp-cells title="设置押金" >
     <mp-cell>
       <view>
@@ -28,7 +38,7 @@
     <mp-cell>
       <view wx:if="{{moddingBaseInfo}}" class="view-row" style="justify-content: center;"  >
         <van-button type="warning" size="small" bind:click="setCancelModBaseInfo" style="margin-right: 40rpx;"> 取 消 </van-button>
-        <van-button type="danger" size="small" bind:click="setConfirmModBaseInfo" style="margin-left: 40rpx;" > 确 认 </van-button>
+        <van-button type="danger" size="small" bind:click="setConfirmModBaseInfo" style="margin-left: 40rpx;" disabled="{{!rentPackage.shop}}" > 确 认 </van-button>
       </view>
       <view wx:else class="view-row" style="justify-content: center;" >
         <van-button type="primary" size="small" bind:click="setModBaseInfo" > 修 改 </van-button>
@@ -76,7 +86,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="选择分类">
+  <!--mp-cells title="选择分类">
     <mp-cell>
       <tree
         dataTree="{{dataTree}}"
@@ -98,7 +108,7 @@
         </block>
       </view>
     </mp-cell>
-  </mp-cells>
+  </mp-cells-->
   <shop-price-matrix wx:if="{{showShopMatrix}}" targetId="{{id}}" priceType="套餐" ></shop-price-matrix>
   <view style="height: 100rpx;"></view> 
   <view class="view-row" style="justify-content: center;" >

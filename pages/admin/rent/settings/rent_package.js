@@ -32,7 +32,7 @@ Page({
     moddingCategory: false,
     modRentItemCategory: false,
     changedCategories: [],
-
+    rentItemCategoryWellFormed: false
   },
 
   handleSelect(e) {
@@ -119,12 +119,23 @@ Page({
       }
       rentItemCategories.push(rentItemCategory)
     }
-    that.setData({rentItemCategories})
+    var rentItemCategoryWellFormed = thet.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategories, rentItemCategoryWellFormed})
     /*
     for(var i = 0; i < rentPackage.rentPackageItemCategories.length; i++){
       var categories = that.getCategories()
     }
     */
+  },
+  checkRentCategoryWellForm(rentItemCategories){
+    var wellFormed = true
+    for(var i = 0; wellFormed && i < rentItemCategories.length; i++){
+      var rentItem = rentItemCategories[i]
+      if (!rentItem.categories || rentItem.categories.length == 0){
+        wellFormed = false
+      }
+    }
+    return wellFormed
   },
   getCategories(rentPackageCategoryList, itemIndex){
     var categories = []
@@ -198,8 +209,9 @@ Page({
               that.data.modedName = rentPackage.name
             }
 
-            data.updateRentPackagePromise(rentPackage.id, that.data.modedName, that.data.modedDescription,
-              that.data.modedDeposit, app.globalData.sessionKey).then(function (rentPackage) {
+            data.updateRentPackagePromise(rentPackage.id, that.data.modedName, 
+              that.data.modedDescription,
+              that.data.modedDeposit, app.globalData.sessionKey, rentPackage.shop).then(function (rentPackage) {
                 that.setData({ rentPackage })
                 that.setCancelModBaseInfo(e)
               }).catch(function (exp) {
@@ -373,5 +385,13 @@ Page({
       that.buildRentItemCategories(rentPackage)
       that.setData({rentPackage})
     })
+  },
+  shopSelected(e){
+    var that = this
+    var rentPackage = that.data.rentPackage
+    rentPackage.shop = e.detail.shop
+    rentPackage.need_save = true
+    that.setData({rentPackage})
+    console.log('shop', e)
   }
 })
