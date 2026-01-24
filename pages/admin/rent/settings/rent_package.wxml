@@ -80,7 +80,7 @@
       <view class="view-row" style="justify-content: center;" >
         <block wx:if="{{modRentItemCategory}}" >
           <van-button type="warning" size="small" bind:click="setCancelModRentItemCategory" style="margin-right: 40rpx;"> 取 消 </van-button>
-          <van-button type="danger" size="small"  bind:click="setConfirmModRentItemCategory" style="margin-left: 40rpx;" > 确 认 </van-button>
+          <van-button type="danger" size="small"  bind:click="setConfirmModRentItemCategory" disabled="{{!rentItemCategoryWellFormed}}"  style="margin-left: 40rpx;" > 确 认 </van-button>
         </block>
         <van-button type="primary" size="small" bind:click="setModRentItemCategory" wx:else > 修 改 </van-button>
       </view>

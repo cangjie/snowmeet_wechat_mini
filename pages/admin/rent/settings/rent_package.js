@@ -119,13 +119,8 @@ Page({
       }
       rentItemCategories.push(rentItemCategory)
     }
-    var rentItemCategoryWellFormed = thet.checkRentCategoryWellForm(rentItemCategories)
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
     that.setData({rentItemCategories, rentItemCategoryWellFormed})
-    /*
-    for(var i = 0; i < rentPackage.rentPackageItemCategories.length; i++){
-      var categories = that.getCategories()
-    }
-    */
   },
   checkRentCategoryWellForm(rentItemCategories){
     var wellFormed = true
@@ -344,7 +339,9 @@ Page({
       }
     }
     rentItemCategory.categories = newCategories
-    that.setData({rentItemCategories})
+    //that.buildRentItemCategories()
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategories, rentItemCategoryWellFormed})
     console.log('del cate', e)
   },
   setItemCount(e){
@@ -370,20 +367,24 @@ Page({
     var index = that.data.currentModRenItemIndex
     rentItemCategories[index].categories.push(category)
     that.setData({rentItemCategories})
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategoryWellFormed})
     that.cancelPopUp(e)
   },
   cancelPopUp(e){
     var that = this
-    that.setData({popUpContent: null})
+    that.setData({popUpContent: null,currentModRenItemIndex: null})
+    //, modRentItemCategory: false, currentModRenItemIndex: null})
   },
   setConfirmModRentItemCategory(e){
     var that = this
     var rentItemCategories = that.data.rentItemCategories
     console.log('updated rentItemCategories', rentItemCategories)
-    //var postUrl = app.globalData.requestPrefix + 'Rent/'
     data.updateRentPackageCategoryPromise(that.data.rentPackage.id, rentItemCategories, app.globalData.sessionKey).then(function(rentPackage){
       that.buildRentItemCategories(rentPackage)
-      that.setData({rentPackage})
+      that.setData({rentPackage, modRentItemCategory: false, currentModRenItemIndex: null})
+
+      //that.cancelPopUp(e)
     })
   },
   shopSelected(e){
