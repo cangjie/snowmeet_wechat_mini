@@ -254,7 +254,8 @@ const deleteRentPackagePromise = function (packageId, sessionKey) {
   })
 }
 const getRentReceptingOrdersPromise = function (shop, sessionKey) {
-  var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrders?shop=' + encodeURIComponent(shop) + '&sessionKey=' + sessionKey
+  //var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrders?shop=' + encodeURIComponent(shop) + '&sessionKey=' + sessionKey
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrders?sessionKey=' + sessionKey + (shop == null ? '' : '&shop=' + encodeURIComponent(shop) )
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (orders) {
       resolve(orders)

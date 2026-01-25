@@ -31,7 +31,7 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve) {
-
+      that.getData()
     })
   },
 
