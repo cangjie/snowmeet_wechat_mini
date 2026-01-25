@@ -257,6 +257,12 @@
     </van-tab>
   </van-tabs>
   <view style="height: 20rpx;"></view>
+  <block wx:if="{{order.orderStatus == '待支付' || order.orderStatus == '待生成'}}" >
+    <view class="view-row" style="justify-content: center;">
+      <payment orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult"></payment>
+    </view>
+    <view style="height: 20rpx;"></view>
+  </block>
   <view style="background-color: #F0F0F0;margin-top: 10rpx;margin-bottom: 30rpx;">添加租赁商品</view>
   <view wx:for="{{order.appendingRentals}}" wx:for-item="rental" class="{{rental.package_id != null? 'add-package':'add-item'}}">
     <view style="margin-left: 20rpx;margin-bottom: 20rpx;{{rental.wellFormed?'':'color:red;'}}">{{rental.name}}</view>

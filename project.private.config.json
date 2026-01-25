@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "未完成的接待",
+          "pathName": "pages/admin/recept/recept_new",
+          "query": "id=67261",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "admin_index",
           "pathName": "pages/admin/admin",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "租赁订单",

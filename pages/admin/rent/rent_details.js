@@ -1185,8 +1185,23 @@ Page({
         }
       }
     })
-
-
+  },
+  orderStatusChanged() {
+    var that = this
+    that.getData()
+  },
+  dealPaidResult(e) {
+    var that = this
+    var orderId = e.detail.id
+    data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
+      var paid = util.orderPaid(order)
+      if (paid) {
+        wx.showToast({
+          title: '支付成功',
+          icon: 'success'
+        })
+        that.getData()
+      }
+    })
   }
-
 })
