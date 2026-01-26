@@ -1,8 +1,8 @@
 const util = require('./util.js')
 const app = getApp()
 //获取租赁套餐列表
-const getPackageListPromise = function () {
-  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList'
+const getPackageListPromise = function (shop) {
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList' + (shop ? ('?shop=' + encodeURIComponent(shop)) : '')
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (packages) {
       resolve(packages)
@@ -206,13 +206,14 @@ const updateRentCategoryPromise = function (code, name, guaranty, scene, session
     })
   })
 }
-const updateRentPackagePromise = function (id, name, description, guaranty, sessionKey) {
+const updateRentPackagePromise = function (id, name, description, guaranty, sessionKey, shop) {
   var saveUrl = app.globalData.requestPrefix + 'Rent/UpdateRentPackageBaseInfo/'
     + id.toString() + '?name=' + encodeURIComponent(name)
     + '&description=' + encodeURIComponent(description)
     + '&deposit=' + encodeURIComponent(guaranty.toString())
     + '&sessionKey=' + encodeURIComponent(sessionKey)
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    + '&shop=' + encodeURIComponent(shop)
   return new Promise(function (resolve, reject) {
     util.performWebRequest(saveUrl, null).then(function (rentPackage) {
       resolve(rentPackage)
@@ -699,6 +700,10 @@ const getOrderBalancePromise = function (orderId, sessionKey){
   var bUrl = app.globalData.requestPrefix + 'Order/GetOrderBalance/' + orderId.toString() + '?sessionKey=' + sessionKey
   return util.performWebRequest(bUrl, null)
 }
+const updateRentPackageCategoryPromise = function(packageId, packageCategories, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdatePackageRentItemCategories/' + packageId.toString() + '?sessionKey=' + sessionKey
+  return util.performWebRequest(updateUrl, packageCategories)
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -751,5 +756,6 @@ module.exports = {
   getMemberTicketsPromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,
-  getOrderBalancePromise
+  getOrderBalancePromise,
+  updateRentPackageCategoryPromise
 }

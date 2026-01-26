@@ -4,7 +4,8 @@
     "mp-cell": "weui-miniprogram/cell/cell",
     "mp-tabs": "/components/tabs/index",
     "tree": "/components/tree/index",
-    "shop-price-matrix": "/components/rent/shop_price_matrix"
+    "shop-price-matrix": "/components/rent/shop_price_matrix",
+    "category-selector": "/components/rent/category_selector"
   },
   "navigationBarTitleText": "套餐详情"
 }

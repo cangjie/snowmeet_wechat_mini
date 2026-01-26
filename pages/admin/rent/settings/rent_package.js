@@ -1,4 +1,5 @@
 // pages/admin/rent/settings/rent_package.js
+//import Linq  from '../../../../node_modules/linq/linq.min.js'
 const app = getApp()
 const data = require('../../../../utils/data.js')
 Page({
@@ -29,7 +30,9 @@ Page({
     showShopMatrix: true,
     moddingBaseInfo: false,
     moddingCategory: false,
-    changedCategories: []
+    modRentItemCategory: false,
+    changedCategories: [],
+    rentItemCategoryWellFormed: false
   },
 
   handleSelect(e) {
@@ -94,9 +97,49 @@ Page({
         selectedCode.push(rentPackage.rentPackageCategoryList[i].rentCategory.code)
       }
       rentPackage.need_save = false
+      that.buildRentItemCategories(rentPackage)
       that.setData({ rentPackage: rentPackage, selectedCode: selectedCode })
       that.getDataTree()
     })
+  },
+  buildRentItemCategories(rentPackage){
+    var that = this
+    var rentItemCategories = []
+    var categoryList = rentPackage.rentPackageCategoryList
+    var itemCount = rentPackage.item_count
+    for(var i = 0; i < itemCount; i++){
+      var rentItemCategory = {}
+      rentItemCategory.itemIndex = i
+      if (categoryList!=null){
+        rentItemCategory.categories = that.getCategories(categoryList, i)
+      }
+      else{
+        var category = {id: null}
+        rentItemCategory.categories = [category]
+      }
+      rentItemCategories.push(rentItemCategory)
+    }
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategories, rentItemCategoryWellFormed})
+  },
+  checkRentCategoryWellForm(rentItemCategories){
+    var wellFormed = true
+    for(var i = 0; wellFormed && i < rentItemCategories.length; i++){
+      var rentItem = rentItemCategories[i]
+      if (!rentItem.categories || rentItem.categories.length == 0){
+        wellFormed = false
+      }
+    }
+    return wellFormed
+  },
+  getCategories(rentPackageCategoryList, itemIndex){
+    var categories = []
+    for(var i = 0; i < rentPackageCategoryList.length; i++){
+      if (rentPackageCategoryList[i].item_index == itemIndex){
+        categories.push(rentPackageCategoryList[i].rentCategory)
+      }
+    }
+    return categories
   },
   keyInput(e) {
     var that = this
@@ -161,8 +204,9 @@ Page({
               that.data.modedName = rentPackage.name
             }
 
-            data.updateRentPackagePromise(rentPackage.id, that.data.modedName, that.data.modedDescription,
-              that.data.modedDeposit, app.globalData.sessionKey).then(function (rentPackage) {
+            data.updateRentPackagePromise(rentPackage.id, that.data.modedName, 
+              that.data.modedDescription,
+              that.data.modedDeposit, app.globalData.sessionKey, rentPackage.shop).then(function (rentPackage) {
                 that.setData({ rentPackage })
                 that.setCancelModBaseInfo(e)
               }).catch(function (exp) {
@@ -272,5 +316,83 @@ Page({
         }
       }
     })
+  },
+  setModRentItemCategory(e){
+    var that = this
+    that.setData({modRentItemCategory: true})
+  },
+  setCancelModRentItemCategory(e){
+    var that = this
+    that.getPackage()
+    that.setData({modRentItemCategory: false})
+  },
+  delRentItemCategory(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var rentItemCategories = that.data.rentItemCategories 
+    var rentItemCategory = rentItemCategories[parseInt(idArr[0])]
+    var categories = rentItemCategory.categories
+    var newCategories = []
+    for(var i = 0; i < categories.length; i++){
+      if (i != parseInt(idArr[1])){
+        newCategories.push(categories[i])
+      }
+    }
+    rentItemCategory.categories = newCategories
+    //that.buildRentItemCategories()
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategories, rentItemCategoryWellFormed})
+    console.log('del cate', e)
+  },
+  setItemCount(e){
+    var that = this
+    var value = e.detail.value
+    if (isNaN(value)){
+      return
+    }
+    var rentPackage = that.data.rentPackage
+    rentPackage.item_count = parseInt(value)
+    that.buildRentItemCategories(rentPackage)
+  },
+  addRentItemCategory(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    that.setData({popUpContent: 'categorySelector', currentModRenItemIndex: index})
+  },
+  confirmCategory(e){
+    console.log('selecte cate', e)
+    var that = this
+    var category = e.detail
+    var rentItemCategories = that.data.rentItemCategories
+    var index = that.data.currentModRenItemIndex
+    rentItemCategories[index].categories.push(category)
+    that.setData({rentItemCategories})
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategoryWellFormed})
+    that.cancelPopUp(e)
+  },
+  cancelPopUp(e){
+    var that = this
+    that.setData({popUpContent: null,currentModRenItemIndex: null})
+    //, modRentItemCategory: false, currentModRenItemIndex: null})
+  },
+  setConfirmModRentItemCategory(e){
+    var that = this
+    var rentItemCategories = that.data.rentItemCategories
+    console.log('updated rentItemCategories', rentItemCategories)
+    data.updateRentPackageCategoryPromise(that.data.rentPackage.id, rentItemCategories, app.globalData.sessionKey).then(function(rentPackage){
+      that.buildRentItemCategories(rentPackage)
+      that.setData({rentPackage, modRentItemCategory: false, currentModRenItemIndex: null})
+
+      //that.cancelPopUp(e)
+    })
+  },
+  shopSelected(e){
+    var that = this
+    var rentPackage = that.data.rentPackage
+    rentPackage.shop = e.detail.shop
+    rentPackage.need_save = true
+    that.setData({rentPackage})
+    console.log('shop', e)
   }
 })

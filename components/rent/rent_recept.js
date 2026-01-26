@@ -224,18 +224,21 @@ Component({
           }
           util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.startDate))
           var items = []
-          for (var i = 0; i < selectedPackage.categories.length; i++) {
+          for (var i = 0; i < selectedPackage.item_count; i++) {
             var item = {
               id: 0,
               rental_id: 0,
               noCode: false,
-              categoryName: selectedPackage.categories[i].name,
+              canChooseCategory: selectedPackage.rentPackageItemCategories[i].categories.length > 1,
+              chooseCategories: selectedPackage.rentPackageItemCategories[i].categories,
+              chooseingCategory: false,
+              categoryName: selectedPackage.rentPackageItemCategories[i].categories[0].name,
               name: null,
               code: null,
               rent_product_id: null,
-              category_id: selectedPackage.categories[i].id,
+              category_id: selectedPackage.rentPackageItemCategories[i].categories[0].id,
               memo: '',
-              category: selectedPackage.categories[i]
+              category: selectedPackage.rentPackageItemCategories[i].categories[0]
             }
             items.push(item)
           }
@@ -310,8 +313,8 @@ Component({
           if (item.noNeed) {
             item.textColor = that.data.noNeedTextColor
           }
-
         }
+        that.formatRentalPackage(rental)
       }
       console.log('render rentals', rentals)
       that.setData({
@@ -319,8 +322,23 @@ Component({
         totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount)
       })
       that.setData({rentals})
-      
       //that.triggerEvent('SyncRentData', rentals)
+    },
+    formatRentalPackage(rental){
+      var that = this
+      if (isNaN(rental.package_id)){
+        return
+      }
+      data.getPackagePromise(rental.package_id).then(function (rentPackage){
+        for(var i = 0; i < rental.rentItems.length; i++){
+          var rentItem = rental.rentItems[i]
+          rentItem.canChooseCategory = rentPackage.rentPackageItemCategories[i].categories.length > 1
+          rentItem.chooseCategories = rentPackage.rentPackageItemCategories[i].categories
+          //chooseingCategory = false
+        }
+        var rentals = that.data.rentals
+        that.setData({rentals})
+      })
     },
     searchBarcodeFuzzy(e) {
       var that = this
@@ -725,6 +743,23 @@ Component({
       }
       that.renderData(newRentals)
       that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
+    },
+    selectRentItemCategory(e){
+      var that = this
+      console.log('category', e)
+      var idArr = e.currentTarget.id.split('_')
+      var rentals = that.data.rentals
+      var rental = rentals[parseInt(idArr[0])]
+      var rentItem = rental.rentItems[parseInt(idArr[1])]
+      var value = parseInt(e.detail.value)
+      var category = rentItem.chooseCategories[value]
+      rentItem.categoryName = category.name
+      rentItem.category_id = category.id
+      rentItem.category = category
+      that.renderData(rentals)
+      that.setData({rentals})
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
     }
-  }
+  },
+
 })

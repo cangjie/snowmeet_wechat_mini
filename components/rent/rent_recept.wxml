@@ -1,6 +1,6 @@
 <scroll-view scroll-y style="height: 100%;">
   <fui-swipeaction-group>
-    <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp"  bind:click="del" id="{{index}}">
+    <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp"  bind:click="del" id="{{index}}"   >
       <view style="height: 50rpx;"></view>
       <view wx:if="{{rental.package_id == null || rental.package_id == undefined}}" class="view-row">
         <view class="number-label" style="margin-top: 100rpx;font-size: 9pt;">【{{rental.rentItems[0].itemIndex}}】</view>
@@ -155,7 +155,7 @@
             </view>
           </view>
         </view>
-        <block wx:for="{{rental.rentItems}}">
+        <block wx:for="{{rental.rentItems}}" wx:for-index="rentItemIndex" >
           <view class="view-row">
             <view class="number-label" style="margin-top: 50rpx;font-size: 9pt;">
               【{{item.itemIndex}}】
@@ -177,7 +177,14 @@
                 </view>
                 <view class="view-row">
                   <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【品类】</view>
-                  <view class="right-column right-column1" style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">{{item.category.name}}</view>
+                  <view wx:if="{{item.canChooseCategory == true}}" class="right-column right-column1" style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">
+                    <picker id="{{index}}_{{rentItemIndex}}" range="{{item.chooseCategories}}" range-key="name" class="input" 
+                    bindchange="selectRentItemCategory" >
+                      <picker-view>{{item.category.name}}</picker-view>
+                    </picker>
+                  </view>
+                  <view wx:else class="right-column right-column1" style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">{{item.category.name}}</view>
+                 
                 </view>
                 <view class="view-row">
                   <view class="left-column" style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【名称】</view>
@@ -224,7 +231,7 @@
   </view>
 </scroll-view>
 <van-popup show="{{ showPopUp }}">
-  <package_selector wx:if="{{popUpContent == 'packageSelector'}}" bindConfirm="selectPackageConfirm" bindCancel="cancelPopUp"></package_selector>
+  <package_selector wx:if="{{popUpContent == 'packageSelector'}}" shop="{{shop}}" bindConfirm="selectPackageConfirm" bindCancel="cancelPopUp"></package_selector>
   <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" categoryId="{{searchCategoryId}}" bindCancel="cancelPopUp" barCode="{{searchBarCode}}" bindConfirm="confirmProduct"></search-product-fuzzy>
   <category-selector wx:if="{{popUpContent == 'categorySelector'}}" bindCancel="cancelPopUp" bindConfirm="confirmCategory">
   </category-selector>
