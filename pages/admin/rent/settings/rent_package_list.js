@@ -8,13 +8,18 @@ Page({
    * Page initial data
    */
   data: {
-    newName: ''
+    newName: '',
+    key: null,
+    activeName: 0
   },
-
+  setKey(e){
+    var that = this
+    that.data.key = e.detail.value
+  },
   getData(){
     var that = this
-    data.getPackageListPromise().then(function (resovle) {
-      that.setData({packageList: resovle})
+    data.getPackageListByShopPromise(that.data.key).then(function (shopPackageList){
+      that.setData({shopPackageList})
     }).catch(function (exp) { })
   },
   gotoDetail(e){
@@ -123,5 +128,11 @@ Page({
    */
   onShareAppMessage() {
 
-  }
+  },
+  onChange(e){
+    var that = this
+    that.setData({
+      activeName: e.detail,
+    });
+  },
 })

@@ -11,6 +11,10 @@ const getPackageListPromise = function (shop) {
     })
   })
 }
+const getPackageListByShopPromise = function (key){
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetShopRentPackages' + ((key != null)? '?key=' + key : '')
+  return util.performWebRequest(getUrl)
+}
 //获取租赁套餐
 const getPackagePromise = function (packageId) {
   var getPackageUrl = app.globalData.requestPrefix + 'Rent/GetRentPackage/' + packageId.toString()
@@ -757,5 +761,6 @@ module.exports = {
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,
   getOrderBalancePromise,
-  updateRentPackageCategoryPromise
+  updateRentPackageCategoryPromise,
+  getPackageListByShopPromise
 }

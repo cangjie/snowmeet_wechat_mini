@@ -1,9 +1,26 @@
 <view>
-  <mp-cells title="" >
+  <view class="view-row" style="justify-content: center;margin-top: 20rpx;">
+    <input class="input" style="width:300rpx;text-align: center;" bindinput="setKey" />
+    <view style="width: 100rpx;"></view>
+    <van-button disabled="{{querying}}" size="small" type="primary" bind:click="getData"> 查 询 </van-button>
+  </view>
+  <view style="margin-top: 50rpx;">
+    <van-collapse accordion value="测试" bind:change="onChange" wx:for="{{shopPackageList}}" wx:for-item="shopPackage" name="{{index}}" value="{{ activeName }}">
+      <van-collapse-item title="{{shopPackage.shop==null? '未分配店铺' : shopPackage.shop.name}}：{{shopPackage.rentPackages.length}}" name="{{index}}">
+        <view wx:for="{{shopPackage.rentPackages}}" class="view-row" style="height:75rpx" id="{{item.id}}" bindtap="gotoDetail" >{{item.name}}</view>
+      </van-collapse-item>
+    </van-collapse>
+  </view>
+
+
+
+
+
+  <!--mp-cells title="" >
     <mp-cell wx:for="{{packageList}}" >
       <view id="{{item.id}}" bindtap="gotoDetail" >{{item.shop? ('【'+ item.shop + '】'):'' }}{{item.name}}</view>
     </mp-cell>
-  </mp-cells>
+  </mp-cells-->
   <view style="height: 100rpx;" ></view>
   <mp-cells title="添加新套餐-填写名称" >
     <mp-cell>
