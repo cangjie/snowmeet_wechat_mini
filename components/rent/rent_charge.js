@@ -107,6 +107,21 @@ Component({
       detail.discount = discount
       that.computeRental(rental)
     },
+    setRentalPrice(e){
+      var value = e.detail.value
+      if (isNaN(value) || value[value.length-1]=='.' 
+        || (value[value.length-1]=='0' && value.indexOf('.') > 0) ){
+        return
+      }
+      var that = this
+      var amount = parseFloat(e.detail.value)
+      var id = parseInt(e.currentTarget.id)
+      var rental = that.data.rental
+      var detail = rental.pricePresets[id]
+      detail.price = amount
+      detail.manual = true
+      that.computeRental(rental)
+    },
     computeRental(){
       var that = this
       var rental = that.data.rental
