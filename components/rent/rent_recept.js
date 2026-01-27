@@ -326,7 +326,7 @@ Component({
     },
     formatRentalPackage(rental){
       var that = this
-      if (isNaN(rental.package_id)){
+      if (isNaN(rental.package_id) || rental.package_id == null){
         return
       }
       data.getPackagePromise(rental.package_id).then(function (rentPackage){
