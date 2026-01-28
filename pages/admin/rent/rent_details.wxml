@@ -485,7 +485,7 @@
           <view class="refund-cell-5" style="font-weight: 200;">退款</view>
         </view>
         <checkbox-group bindchange="setRefund" >
-          <view class="view-row" wx:for="{{order.availablePayments}}">
+          <view class="view-row" wx:for="{{order.availablePayments}}" wx:if="{{item.pay_method !='储值支付'}}" >
             <view class="refund-cell-1">
               <checkbox value="{{index}}" checked="{{item.needToRefund == true}}"  ></checkbox>
             </view>

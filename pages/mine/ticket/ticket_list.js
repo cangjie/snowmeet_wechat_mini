@@ -18,28 +18,7 @@ Page({
     opacity: 0,
     needAuth: false
   },
-  /*
-  AuthFinish(){
-    var that = this
-    that.GetRealName()
-  },
-
-  GetRealName(){
-    var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success:(res) => {
-        if (res.data.mini_users.length > 0){
-          that.setData({name: res.data.mini_users[0].real_name, cell: res.data.mini_users[0].cell_number})
-          app.globalData.cellNumber = that.data.cell
-        }
-        
-      }
-    })
-  },
-  */
+  
   /**
    * Lifecycle function--Called when page load
    */
@@ -66,39 +45,8 @@ Page({
       }).catch(function (exp){
 
       })
-      /*
-      if (app.globalData.cellNumber==undefined || app.globalData.cellNumber==null || app.globalData.cellNumber==''){
-        that.setData({needAuth: true})
-      }
-      */
-      /*
-      var getTicketsUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetMyTickets/' + (!that.data.showUsed? '0' :'1') + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      wx.request({
-        url: getTicketsUrl,
-        success: (res)=>{
-          var tickets = res.data
-          for(var i = 0; i < tickets.length; i++){
-
-            var memo = tickets[i].memo
-            if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
-              tickets[i].rich = true
-            }
-            else{
-              tickets[i].rich = false
-              tickets[i].usage = memo.split(';')
-            }
-            //tickets[i].usage = tickets[i].memo.split(';')
-          }
-          that.setData({ticketArr: tickets})
-        }
-      })
-      */
     })
   },
-
-  /**
-   * Lifecycle function--Called when page is initially rendered
-   */
   onReady: function () {
 
   },

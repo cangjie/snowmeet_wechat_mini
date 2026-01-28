@@ -1146,6 +1146,11 @@ Page({
   },
   refundBatch(e) {
     var that = this
+   
+    if (that.data.payWithDeposit == true) {
+      that.refundBatchWithDeposit(e)
+      return;
+    }
     var order = that.data.order
     var payments = order.availablePayments
     var refunds = []
@@ -1180,6 +1185,59 @@ Page({
             wx.showToast({
               title: '退款成功',
               icon: 'success'
+            })
+          })
+        }
+      }
+    })
+  },
+  refundBatchWithDeposit(e){
+    var that = this
+    var order = that.data.order
+    var title = '储值支付确认'
+    var payAmount = order.totalRentSummaryAmount
+    var refundAmount = order.totalRentUnRefund
+    var content = '储值支付租金' + util.showAmount(payAmount) + '，应退押金：' + util.showAmount(refundAmount)
+    wx.showModal({
+      title: title,
+      content: content,
+      complete: (res) => {
+        if (res.cancel) {
+
+        }
+
+        if (res.confirm) {
+          that.setData({ refunding: true })
+          data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function (paidOrder) {
+            if (paidOrder == null) {
+              return
+            }
+            console.log('paid order', paidOrder)
+            //var order = paidOrder
+            var payments = order.availablePayments
+            var refunds = []
+            var refundCount = 0
+            var refundAmount = 0
+            for (var i = 0; payments && i < payments.length; i++) {
+              var payment = payments[i]
+              if (payment.needToRefund == true) {
+                var refund = {
+                  payment_id: payment.id,
+                  amount: parseFloat(payment.needToRefundAmount.toFixed(2)),
+                  reason: '批量退款'
+                }
+                refundCount++
+                refundAmount += refund.amount
+                refunds.push(refund)
+              }
+            }
+            data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function (order) {
+              that.getData()
+              that.setData({ refunding: false })
+              wx.showToast({
+                title: '退款成功',
+                icon: 'success'
+              })
             })
           })
         }
