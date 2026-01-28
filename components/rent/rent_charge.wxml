@@ -14,7 +14,7 @@
       <view class="view-row">
         <view class="left-column">【押金减免】</view>
         <view class="right-column">
-          <input style="width: 85rpx;text-align: center;" class="input" placeholder="{{rental.guaranty_discount?rental.guaranty_discount: 0}}" bindinput="setGuarantyDiscount" />
+          <input style="width: 85rpx;text-align: center;" class="input" placeholder="{{rental.guaranty_discount?rental.guaranty_discount: 0}}" bindinput="setGuarantyDiscount" type="digit" />
         </view>
       </view>
       <view class="view-row">
@@ -26,7 +26,7 @@
       <view class="view-row">
         <view class="left-column">【预计租赁天数】</view>
         <view class="right-column">
-          <input class="input" style="width: 50rpx;text-align: center;" value="{{rental.expectDays}}" bindinput="setExpectDays" />
+          <input class="input" style="width: 50rpx;text-align: center;" value="{{rental.expectDays}}" bindinput="setExpectDays" type="number" />
         </view>
       </view>
       <view class="view-row">
@@ -56,7 +56,7 @@
             <view class="left-column">【租金】</view>
             <view class="right-column">
               <input class="input" style="width:100rpx;text-align: center;" id="0"
-              placeholder="{{rental.totalSummary}}" bindinput="setRentalPrice" />
+              placeholder="{{rental.totalSummary}}" bindinput="setRentalPrice" type="digit" />
             </view>
           </view>
         </view>
@@ -64,7 +64,7 @@
           <view class="view-row">
             <view class="left-column">【减免】</view>
             <view class="right-column">
-              <input class="input" style="width: 75rpx;text-align: center;" id="0" bindinput="setRentalDiscount" value="{{rental.totalDiscount}}" />
+              <input class="input" style="width: 75rpx;text-align: center;" id="0" bindinput="setRentalDiscount" value="{{rental.totalDiscount}}" type="digit" />
             </view>
           </view>
         </view>
@@ -106,12 +106,12 @@
             <fui-col span="4">
               <view class="fui-col-view view-row" style="text-align: right;justify-content: center;">
                 <input class="input" style="height: 50rpx; width: 75rpx;text-align: center;" 
-                value="{{item.price}}" bindinput="setRental" id="{{index}}" bindinput="setRentalPrice" />
+                value="{{item.price}}" bindinput="setRental" id="{{index}}" bindinput="setRentalPrice" type="digit"  />
               </view>
             </fui-col>
             <fui-col span="5">
               <view class="fui-col-view" style="margin-left: 30rpx;text-align: center;display: flex;">
-                <input class="input" style="height: 50rpx; width: 50rpx;" value="{{item.discount}}" bindinput="setRentalDiscount" id="{{index}}" />
+                <input class="input" style="height: 50rpx; width: 50rpx;" value="{{item.discount}}" bindinput="setRentalDiscount" id="{{index}}" type="digit" />
               </view>
             </fui-col>
             <fui-col span="4">
