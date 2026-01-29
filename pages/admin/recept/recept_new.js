@@ -250,6 +250,10 @@ Page({
           rentals[i].timeStamp = (new Date(rentals[i].create_date)).getTime()
         }
         that.data.order.rentals = rentals
+        if (that.data.order.needRender == true){
+          that.setData({bizType: null})
+          that.setData({bizType: 'rent', rentals})
+        }
       })
     }
   },
