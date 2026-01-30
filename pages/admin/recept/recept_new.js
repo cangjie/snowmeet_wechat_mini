@@ -179,7 +179,12 @@ Page({
     var order = that.data.order
     if (order) {
       order.rentals = rentals
+      if (e.detail.needIntercom != undefined && e.detail.needIntercom != null 
+        && e.detail.needIntercom == false){
+        order.needIntercom = false
+      }
     }
+    
     console.log('rent data updated', e)
     if (e.detail.needUpdate) {
       that.setData({ showFooter: false })

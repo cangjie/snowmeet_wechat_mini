@@ -736,13 +736,19 @@ Component({
       var id = parseInt(e.currentTarget.id)
       var rentals = that.data.rentals
       var newRentals = []
+      var needIntercom = true
       for (var i = 0; i < rentals.length; i++) {
         if (i != id) {
           newRentals.push(rentals[i])
         }
+        else {
+          if (rentals[i].rentItems[0].category_id == 94){
+            needIntercom = false
+          }
+        }
       }
       that.renderData(newRentals)
-      that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
+      that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true, needIntercom })
     },
     selectRentItemCategory(e){
       var that = this
