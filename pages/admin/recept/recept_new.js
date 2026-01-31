@@ -167,7 +167,6 @@ Page({
     var that = this
     that.setData({ showUserInfo: false })
   },
-
   onPopClose() {
     var that = this
     that.setData({ showUserInfo: false })
