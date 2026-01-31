@@ -1,171 +1,172 @@
 <view wx:if="{{isAdmin}}">
-  <tree
-    dataTree="{{dataTree}}"
+  <tree dataTree="{{dataTree}}"
     selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
-    bind:select="handleSelect"
-    isSelectLastNode="true"
-    isOpenAll="{{false}}"
-    checkBox="{{false}}"
-  ></tree>
-  <mp-cells title="当前分类" >
+    bind:select="handleSelect" isSelectLastNode="true" isOpenAll="{{false}}" checkBox="{{false}}"></tree>
+  <mp-cells title="当前分类">
     <mp-cell>
       <view class="view-row">
-        <view wx:if="{{selectedCode==''}}" >顶级</view>
+        <view wx:if="{{selectedCode==''}}">顶级</view>
         <view wx:else>{{selectedDisplayedCode}} {{selectedCategory.name}}</view>
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="修改分类" >
+  <mp-cells title="修改分类">
     <mp-cell>
-      <view class="view-row" style="margin: 10rpx" >
-        <view class="left-column" style="width: 250rpx;display: flex;flex-direction: row;" >
+      <view class="view-row" style="margin: 10rpx">
+        <view class="left-column" style="width: 250rpx;display: flex;flex-direction: row;">
           <view style="margin-top: 7rpx;width: 200rpx;">{{grandpaDisplayedCode}}</view>
-          <input id="modSeq" value="" style="width: 50rpx; text-align: center;" class="input" 
+          <input id="modSeq" value="" style="width: 50rpx; text-align: center;" class="input"
             disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == ''}}"
-            placeholder="{{seq}}"
-            bindinput="setModName"
-            value="{{seq}}"
-          />
+            placeholder="{{seq}}" bindinput="setModName" value="{{seq}}" />
         </view>
-        <view class="right-column" style="width: 450rpx;" >
-          <input id="modName" class="input" style="margin-left: auto; margin-right: auto;text-align: center; width: 260rpx;" 
-            placeholder="{{selectedCategory.name}}" 
-            disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == ''}}" 
-            bindinput="setModName" 
-            value="{{modName}}" />
+        <view class="right-column" style="width: 450rpx;">
+          <input id="modName" class="input"
+            style="margin-left: auto; margin-right: auto;text-align: center; width: 260rpx;"
+            placeholder="{{selectedCategory.name}}"
+            disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == ''}}"
+            bindinput="setModName" value="{{modName}}" />
         </view>
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="view-row" >
-        <button  class="input" style="margin-left: auto; margin-right: auto;" size="mini"
-        disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}"  
-        bind:tap="modCategoryName" > 确 认 修 改 </button>
+      <view class="view-row">
+        <button class="input" style="margin-left: auto; margin-right: auto;" size="mini"
+          disabled="{{selectedCategory == null || selectedCategory == undefined || selectedCategory.name == '' || modName == ''}}"
+          bind:tap="modCategoryName"> 确 认 修 改 </button>
       </view>
     </mp-cell>
-
   </mp-cells>
-
-  <mp-cells title="添加分类" >
+  <mp-cells title="添加分类">
     <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >分类序号：</view>
+      <view class="view-row">
+        <view class="left-column">分类序号：</view>
         <view class="right-column" class="view-row">
           <view>{{fatherDisplayedCode}}</view>
-          <input id="newSeq" bindinput="setNewCategory" class="input" style="width: 50rpx;" disabled="{{selectedCategory == undefined}}" value="{{newSeq}}" /></view>
-          <view style="width: 50rpx;"></view>
-          <switch bindchange="checkSameLevel" disabled="{{selectedCategory == undefined}}" checked="{{isSameLevel}}"  >同级</switch>
+          <input id="newSeq" bindinput="setNewCategory" class="input" style="width: 50rpx;"
+            disabled="{{selectedCategory == undefined}}" value="{{newSeq}}" />
+        </view>
+        <view style="width: 50rpx;"></view>
+        <switch bindchange="checkSameLevel" disabled="{{selectedCategory == undefined}}" checked="{{isSameLevel}}">同级
+        </switch>
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="view-row" >
-        <view class="left-column" >分类名称：</view>
+      <view class="view-row">
+        <view class="left-column">分类名称：</view>
         <view class="right-column">
-          <input id="newSeqName" bindinput="setNewCategory" class="input" style="width: 200rpx;" disabled="{{selectedCategory == undefined}}"  value="{{newName}}" />
+          <input id="newSeqName" bindinput="setNewCategory" class="input" style="width: 200rpx;"
+            disabled="{{selectedCategory == undefined}}" value="{{newName}}" />
         </view>
       </view>
     </mp-cell>
     <mp-cell>
-      <view class="view-row" style="justify-content: center;" >
-      <button class="input" disabled="{{selectedCategory == undefined}}" bind:tap="addCategory" size="mini"  > 添 加 分 类 </button>
-    </view>
+      <view class="view-row" style="justify-content: center;">
+        <button class="input" disabled="{{selectedCategory == undefined}}" bind:tap="addCategory" size="mini"> 添 加 分 类
+        </button>
+      </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="押金设定" >
+  <mp-cells title="押金设定">
     <mp-cell>
-    <view style="display:flex;justify-content: center;" >
-      <input  class="input" id="deposit"  style="width: 150rpx; text-align: center;" 
-      value="{{selectedCategory.deposit}}" 
-      disabled="{{selectedCategory == undefined || selectedCategory.children != null || !modGuaranty}}"
-      bindinput="inputGuarantAmount" />
-      
-    </view>
-  </mp-cell>
-  <mp-cell>
-    <view class="view-row" style="justify-content: center;" wx:if="{{!modGuaranty}}"  >
-      <button size="mini" bind:tap="setModGuaranty" > 修 改 </button>
-    </view>
-    <view class="view-row" style="justify-content: center;" wx:else  >
-      <button size="mini" bind:tap="cancelModGuaranty" > 取 消 </button>
-      <button size="mini" bind:tap="confirmGuarantyAmount" > 确 认 </button>
-    </view>
-  </mp-cell>
-  </mp-cells>
-
-  <!--price-matrix 
-    priceMatrix="{{priceArr}}" 
-    fieldRow="{{['门市', '预约', '会员']}}" 
-    fieldCol="{{['平日','周末','节假日']}}" 
-    bindmod="modPrice"
-    bindTabChange="tabChange"
-    disabled="{{matrixDisabled}}"
-  ></price-matrix-->
-
-  <shop-price-matrix wx:if="{{showShopMatrix}}" targetId="{{selectedCategory.id}}" priceType="分类" ></shop-price-matrix>
-     
-      
-  <!--mp-cells title="保存租金押金设置">
-    <mp-cell>
-        <view style="color: red;">{{canSave? '': canSaveMsg}}</view>
+      <view style="display:flex;justify-content: center;">
+        <input class="input" id="deposit" style="width: 150rpx; text-align: center;"
+          value="{{selectedCategory.deposit}}"
+          disabled="{{selectedCategory == undefined || selectedCategory.children != null || !modGuaranty}}"
+          bindinput="inputGuarantAmount" />
+      </view>
     </mp-cell>
-    <mp-cell><button class="input" disabled="{{!canSave || isSaving}}" bind:tap="save" > 保 存 </button></mp-cell>
-  </mp-cells-->
-  <mp-cells title="租赁商品信息字段设定" >
     <mp-cell>
-      <view class="view-row" >
+      <view class="view-row" style="justify-content: center;" wx:if="{{!modGuaranty}}">
+        <button size="mini" bind:tap="setModGuaranty"> 修 改 </button>
+      </view>
+      <view class="view-row" style="justify-content: center;" wx:else>
+        <button size="mini" bind:tap="cancelModGuaranty"> 取 消 </button>
+        <button size="mini" bind:tap="confirmGuarantyAmount"> 确 认 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="附加分类设置" >
+    <mp-cell>
+      <view class="view-row" style="margin-top:40rpx" wx:for="{{selectedCategory.associateCategories}}" >
+        <view style="width:550rpx; font-size: 11pt;" >
+          {{item.category.name}}  
+        </view>
+        <view>
+          <van-button wx:if="{{modAssociates}}" bind:click="delAssociate" id="{{index}}" type="danger" size="mini"> 删 除 </van-button>
+        </view>
+        
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" style="justify-content: center;" wx:if="{{!modAssociates}}">
+        <button size="mini" bind:tap="setModAssociates"> 修 改 </button>
+      </view>
+      <view class="view-row" style="justify-content: center;" wx:else>
+        <button size="mini" bind:tap="addAssociates"> 新 增 </button>
+        <button size="mini" bind:tap="cancelModAssociates"> 取 消 </button>
+        <button size="mini" bind:tap="confirmAssociates"> 确 认 </button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <shop-price-matrix wx:if="{{showShopMatrix}}" targetId="{{selectedCategory.id}}" priceType="分类"></shop-price-matrix>
+  <mp-cells title="租赁商品信息字段设定">
+    <mp-cell>
+      <view class="view-row">
         <view style="width:400rpx; text-align:  center;">字段名称</view>
         <view style="text-align: center;display: flex;margin: auto;">操作</view>
       </view>
-      <view class="view-row" style="height: 80rpx;" wx:for="{{selectedCategory.infoFields}}" wx:if="{{item.is_delete==0}}" >
-
+      <view class="view-row" style="height: 80rpx;" wx:for="{{selectedCategory.infoFields}}"
+        wx:if="{{item.is_delete==0}}">
         <view style="width:400rpx; text-align:  center;">
-          <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" value="{{item.field_name}}" bindinput="setFieldName" id="{{item.id}}" />
+          <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" value="{{item.field_name}}"
+            bindinput="setFieldName" id="{{item.id}}" />
         </view>
-
         <view class="view-row" style="width:150rpx; text-align:  center;">
           <view style="margin-left:10rpx;margin-right:10rpx">
             <button id="name_{{item.id}}" bind:tap="modFields"
-            style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx" 
-            disabled="{{selectedCategory.code.length != 2 || item.mod!=true}}" class="input" >💾</button>
+              style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"
+              disabled="{{selectedCategory.code.length != 2 || item.mod!=true}}" class="input">💾</button>
           </view>
-          
+
           <view style="margin-left:10rpx;margin-right:10rpx">
             <button id="up_{{item.id}}" bind:tap="modFields"
-            style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx" 
-            disabled="{{selectedCategory.code.length != 2}}" class="input" >⬆️</button>
+              style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"
+              disabled="{{selectedCategory.code.length != 2}}" class="input">⬆️</button>
           </view>
-         
           <view style="margin-left:10rpx;margin-right:10rpx">
             <button id="down_{{item.id}}" bind:tap="modFields"
-            style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  
-            disabled="{{selectedCategory.code.length != 2}}" class="input" >⬇️</button>
+              style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"
+              disabled="{{selectedCategory.code.length != 2}}" class="input">⬇️</button>
           </view>
-
           <view style="margin-left:10rpx;margin-right:10rpx">
-            <button  id="del_{{item.id}}" bind:tap="modFields"
-            style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"  
-            disabled="{{selectedCategory.code.length != 2}}" class="input" >🗑️</button>
+            <button id="del_{{item.id}}" bind:tap="modFields"
+              style="width: 45rpx;height: 45rpx; padding: 0rpx; margin: 0rpx; font-size: 11pt;border:0rpx"
+              disabled="{{selectedCategory.code.length != 2}}" class="input">🗑️</button>
           </view>
-
         </view>
       </view>
-      <view class="view-row" >
+      <view class="view-row">
         <view style="width:400rpx; text-align:  center;">
-          <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" value="{{newFieldName}}" placeholder="添加新字段" bindinput="setNewFieldName" />
+          <input style="margin-left: auto; margin-right: auto; width: 350rpx;" class="input" value="{{newFieldName}}"
+            placeholder="添加新字段" bindinput="setNewFieldName" />
         </view>
         <view class="view-row" style=" text-align:  center;">
-          <button 
-          disabled="{{newFieldName == '' || selectedCategory.code.length != 2}}"  size="mini"
-          class="input" bind:tap="addNewField" > 添 加 新 字 段 </button>
+          <button disabled="{{newFieldName == '' || selectedCategory.code.length != 2}}" size="mini" class="input"
+            bind:tap="addNewField"> 添 加 新 字 段 </button>
         </view>
       </view>
     </mp-cell>
   </mp-cells>
   <mp-cells title="删除分类">
     <mp-cell>
-      <view class="view-row" style="justify-content: center;" >
-      <button disabled="{{ (selectedCategory.children != undefined  && selectedCategory.children != null) || selectedCategory == undefined}}" class="input" bind:tap="metionDelete" size="mini" > 删 除 </button>
-    </view>
+      <view class="view-row" style="justify-content: center;">
+        <button
+          disabled="{{ (selectedCategory.children != undefined  && selectedCategory.children != null) || selectedCategory == undefined}}"
+          class="input" bind:tap="metionDelete" size="mini"> 删 除 </button>
+      </view>
     </mp-cell>
   </mp-cells>
+  <van-popup show="{{ popUpContent == 'categorySelector' }}">
+    <category-selector bindCancel="cancelPopUp" bindConfirm="confirmCategory"></category-selector>
+  </van-popup>
 </view>

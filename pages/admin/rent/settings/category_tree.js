@@ -41,7 +41,9 @@ Page({
       }
     ],
     matrixDisabled: true,
-    newFieldName: ''
+    newFieldName: '',
+    modAssociates: false,
+    popUpContent: ''
   },
 
   getData() {
@@ -517,139 +519,7 @@ Page({
       })
 
   },
-  /*
-    setNumber(e){
-      var that = this
-      var cat = that.data.selectedCategory
-      var shopIndex = that.data.currentShopIndex
-      var shopPriceArr = that.data.priceArr
-      var priceArr = shopPriceArr[that.data.currentShopIndex]
-      var id = e.currentTarget.id
-      if (id == 'deposit'){
-          cat.deposit = e.detail.value
-          that.setData({selectedCategory: cat, depositChanged: true})
-          that.checkValid()
-      }
-      else if (id.indexOf('price_')==0){
-          for(var i = 0; i < priceArr.length; i++){
-              for(var j = 0; j < priceArr[i].length; j++){
-                  if (id == 'price_' + i.toString() + '_' + j.toString()){
-                      priceArr[i][j] = e.detail.value
-                  }
-              }
-          }
-          shopPriceArr[shopIndex] = priceArr
-          that.setData({shopPriceArr: shopPriceArr, needSave: true})
-          that.checkValid()
-      }
-    },
-  */
-  /*
-    save(){
-      var that = this
-      that.setData({isSaving: true})
-      var cat = that.data.selectedCategory
-      if (that.data.depositChanged){
-          var saveDepositUrl = 'https://' +  app.globalData.domainName 
-          + '/api/Rent/UpdateCategory/' + cat.code + '?name=' 
-          + encodeURIComponent(cat.name) + '&deposit=' + cat.deposit.toString()
-          + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
-          + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-          wx.request({
-            url: saveDepositUrl,
-            method:'GET',
-            success:(res)=>{
-                if(res.statusCode == 200){
-                  wx.showToast({
-                    title: '押金保存成功',
-                    icon: 'success'
-                  })
-                  that.setData({depositChanged: false})
-                }
-                
-            }
-          })
-      }
-      
-      
-      for(var k = 0; k < that.data.priceArr.length; k++)
-      {
-        var shopName = that.data.priceArr[k].shop.trim()
-        switch(shopName){
-          case '万龙':
-            shopName = '万龙体验中心'
-            break
-          case '旗舰':
-            shopName = '崇礼旗舰店'
-            break
-          default:
-            break
-        }
-        var priceArr = that.data.priceArr[k].matrix
-        that.setData({saveNum: 0})
-        for(var i = 0; i < priceArr.length; i++){
-            var dayType = ''
-            switch(i){
-                case 0:
-                    dayType = '平日'
-                    break
-                case 1:
-                    dayType = '周末'
-                    break
-                case 2:
-                    dayType = '节假日'
-                    break
-                default:
-                    break
-            }
-            for(var j = 0; j < priceArr[i].length; j++){
-                //var dayType = ''
-                var scene = ''
-                switch(j){
-                    case 0:
-                        scene = '门市'
-                        break
-                    case 1:
-                        scene = '预约'
-                        break
-                    case 2:
-                        scene = '会员'
-                        break
-                    default:
-                        break
-                }
-                var saveUrl = 'https://' + app.globalData.domainName + '/api/Rent/SetShopCategoryRentPrice/'
-                + cat.id.toString() + '?shop=' + encodeURIComponent(shopName) + '&dayType=' + encodeURIComponent(dayType)
-                + '&scene=' + encodeURIComponent(scene) + '&price=' + priceArr[i][j].toString()
-                + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' 
-                + encodeURIComponent('wechat_mini_openid')
-                wx.request({
-                  url: saveUrl,
-                  method: 'GET',
-                  success:(res)=>{
-                      if (res.statusCode == 200){
-                          var saveNum = that.data.saveNum
-                          saveNum++
-                          if (saveNum==27){
-                              that.setData({saveNum: 0, isSaving: false})
-                              wx.showToast({
-                                title: '租金保存成功。',
-                                icon:'success'
-                              })
-                          }
-                          else{
-                              that.setData({saveNum: saveNum})
-                          }
-                      }
-                  }
-                })
   
-  
-            }
-        }
-      }
-    },
-  */
   setNewCategory(e) {
     var that = this
     var v = e.detail.value
@@ -850,15 +720,6 @@ Page({
     var currentField = that.getFieldsById(parseInt(id.toString())).currentField
     currentField.field_name = v
     currentField.mod = true
-    /*
-    var fieldList = that.data.selectedCategory.infoFields
-    for(var i = 0; i < fieldList.length; i++){
-      if (fieldList[i].id == currentField.id){
-        fieldList[i] = currentField
-        break
-      }
-    }
-    */
     that.setData({ selectedCategory: that.data.selectedCategory })
   },
   getFieldsById(id) {
@@ -960,6 +821,69 @@ Page({
    * Called when user click on the top right corner to share
    */
   onShareAppMessage() {
+
+  },
+  setModAssociates(e){
+    var that = this
+    that.setData({modAssociates: true})
+  },
+  cancelModAssociates(e){
+    var that = this
+    that.setData({modAssociates: false})
+    var categoryId = that.data.selectedCategory.id
+    data.getRentCategoryPromise(categoryId).then(function (category){
+      that.setData({selectedCategory: category})
+    })
+  },
+  addAssociates(e){
+    var that = this
+    that.setData({popUpContent: 'categorySelector'})
+  },
+  cancelPopUp(e){
+    var that = this
+    that.setData({popUpContent: ''})
+    
+    
+  },
+  confirmCategory(e){
+    console.log('select cat', e)
+    var asso = e.detail
+    var that = this
+    var category = that.data.selectedCategory
+    var exists = false
+    for(var i = 0; !exists && i < category.associateCategories.length; i++){
+      if (category.associateCategories[i].associate_id == asso.id){
+        exists = true
+      }
+    }
+    if (exists){
+      return
+    }
+    var asso = {
+      id: 0,
+      category_id: category.id,
+      associate_id: asso.id,
+      valid: true,
+      category: asso
+    }
+    category.associateCategories.push(asso)
+    that.setData({selectedCategory: category})
+    //that.setData({popUpContent: ''})
+    that.cancelPopUp(e)
+  },
+  delAssociate(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var category = that.data.selectedCategory
+    var assoList = category.associateCategories
+    var newAssoList = []
+    for(var i = 0; i < assoList.length; i++){
+      if (i != id){
+        newAssoList.push(assoList[i])
+      }
+    }
+    category.associateCategories = newAssoList
+    that.setData({selectedCategory: category})
 
   }
 })
