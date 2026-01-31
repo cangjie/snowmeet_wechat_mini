@@ -202,11 +202,11 @@ Page({
     }
     return index
   },
-
   convertDataTree(data) {
     var dataArr = []
     for (var i = 0; i < data.length; i++) {
-      var leaf = { id: data[i].id, code: data[i].code, name: data[i].name }
+      //var leaf = { id: data[i].id, code: data[i].code, name: data[i].name }
+      var leaf = data[i]
       if (data[i].children != undefined && data[i].children != null) {
         leaf.children = this.convertDataTree(data[i].children)
       }
@@ -214,7 +214,6 @@ Page({
     }
     return dataArr
   },
-
   setNewCategoryName(e) {
     var newName = e.detail.value
     var that = this
@@ -868,7 +867,6 @@ Page({
     }
     category.associateCategories.push(asso)
     that.setData({selectedCategory: category})
-    //that.setData({popUpContent: ''})
     that.cancelPopUp(e)
   },
   delAssociate(e){
@@ -885,5 +883,18 @@ Page({
     category.associateCategories = newAssoList
     that.setData({selectedCategory: category})
 
+  },
+  confirmAssociates(e){
+    var that = this
+    var category = that.data.selectedCategory
+    var postUrl = app.globalData.requestPrefix + 'Rent/SetAssociateCategoriesByStaff/' + category.id + '?sessionKey=' + app.globalData.sessionKey
+    var postData = []
+    for(var i = 0; i < category.associateCategories.length; i++){
+      postData.push(category.associateCategories[i].category)
+    }
+    util.performWebRequest(postUrl, postData).then(function(category){
+      that.setData({selectedCategory: category, modAssociates: false})
+
+    })
   }
 })
