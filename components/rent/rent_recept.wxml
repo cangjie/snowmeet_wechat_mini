@@ -2,7 +2,7 @@
   <fui-swipeaction-group>
     <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp"  bind:click="del" id="{{index}}"   >
       <view style="height: 50rpx;"></view>
-      <view wx:if="{{rental.package_id == null || rental.package_id == undefined}}" class="view-row">
+      <view wx:if="{{(rental.package_id == null || rental.package_id == undefined) && rental.withAssociates != true}}" class="view-row">
         <view class="number-label" style="margin-top: 100rpx;font-size: 9pt;">【{{rental.rentItems[0].itemIndex}}】</view>
         <view style="width: 650rpx; background-color: #FFF0F0;">
           <view class="view-row">
@@ -105,7 +105,8 @@
           <view class="number-label"></view>
           <view style="width: 650rpx;background-color: #F0FFF0;">
             <view class="view-row">
-              <view class="left-column">【套餐】</view>
+              <view class="left-column" wx:if="{{rental.category_id}}">【品类】</view>
+              <view class="left-column" wx:else >【套餐】</view>
               <view class="right-column right-column1">{{rental.name}}</view>
             </view>
             <view class="view-row" style="margin-bottom: 20rpx;">
