@@ -27,7 +27,7 @@
                   id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
               </view>
             </view>
-            <van-collapse-item name="{{index}}" style="padding: 0;">
+            <van-collapse-item name="{{index}}" >
               <view slot="title" class="view-row" style="background-color: #FFF0F0;">
                 <view class="left-column"
                   style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 150rpx;">
@@ -154,6 +154,7 @@
                 <view class="left-column" wx:else>【套餐】</view>
                 <view class="right-column right-column1">{{rental.name}}</view>
               </view>
+              
               <view class="view-row" style="margin-bottom: 20rpx;">
                 <view class="left-column">【押金】</view>
                 <view class="right-column" style="width: 260rpx;">
@@ -282,6 +283,7 @@
               </view>
             </view>
           </block>
+        
         </block>
       </fui-swipe-action>
     </van-collapse>
