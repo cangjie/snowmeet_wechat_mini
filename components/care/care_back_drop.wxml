@@ -7,7 +7,7 @@
       </view>
     </mp-cell>
   </mp-cells>
-  <mp-cells title="储值支付" wx:if="{{availableDeposit > order.paying_amount}}" >
+  <mp-cells title="储值支付" wx:if="{{availableDeposit >= order.paying_amount}}" >
     <mp-cell>
       <view class="view-row">
         <view class="left-column" >【可用储值】</view>
