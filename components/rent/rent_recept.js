@@ -3,7 +3,9 @@ const util = require('../../utils/util.js')
 const data = require('../../utils/data.js')
 const app = getApp()
 Component({
-
+  options: {
+    styleIsolation: 'shared',
+  },
   /**
    * Component properties
    */
@@ -26,7 +28,8 @@ Component({
     noNeedTextColor: 'gray',
     startDate: util.formatDate(new Date()),
     startDateIsWeekend: util.isWeekend(new Date()),
-    currentDate: new Date()
+    currentDate: new Date(),
+    activeNames:['1', '2']
   },
 
   lifetimes: {
@@ -765,7 +768,12 @@ Component({
       that.renderData(rentals)
       that.setData({rentals})
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
+    },
+    onChange(event) {
+      this.setData({
+        activeNames: event.detail,
+      });
     }
   },
-
+  
 })

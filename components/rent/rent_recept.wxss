@@ -47,3 +47,11 @@ picker{
 .van-ellipsis{
   width: 300rpx;
 }
+.van-cell{
+  --cell-vertical-padding: 0rpx;
+  --cell-horizontal-padding:0rpx;
+  
+}
+.van-collapse-item__content {
+  --collapse-item-content-padding: 0rpx;
+}

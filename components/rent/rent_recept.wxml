@@ -1,226 +1,290 @@
 <scroll-view scroll-y style="height: 100%;">
   <fui-swipeaction-group>
-    <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp"  bind:click="del" id="{{index}}"   >
-      <view style="height: 50rpx;"></view>
-      <view wx:if="{{(rental.package_id == null || rental.package_id == undefined) && rental.withAssociates != true}}" class="view-row">
-        <view class="number-label" style="margin-top: 100rpx;font-size: 9pt;">【{{rental.rentItems[0].itemIndex}}】</view>
-        <view style="width: 650rpx; background-color: #FFF0F0;">
-          <view class="view-row">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【编码】</view>
-            <view class="right-column view-row" style="width: 240rpx;">
-              <input bind:tap="searchListBarcodeFuzzy" class="input" style="width: 175rpx;text-align: center;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}" value="{{rental.rentItems[0].noCode? '无' : (rental.rentItems[0].code?rental.rentItems[0].code:'')}}" disabled="{{rental.rentItems[0].noCode}}" id="{{rental.rentItems[0].itemIndex}}" />
-              <van-icon name="scan" size="19px" />
-            </view>
-            <view class="left-column" style="width: 140rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">【无编码】</view>
-            <view class="right-column" style="width: 75rpx;">
-              <checkbox-group id="{{rental.rentItems[0].itemIndex}}" bindchange="setNoCode">
-                <checkbox checked="{{rental.rentItems[0].noCode}}" value="1"></checkbox>
-              </checkbox-group>
-            </view>
+    <van-collapse value="{{ activeNames }}" bind:change="onChange">
+      <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp" bind:click="del" id="{{index}}">
+        <view style="height: 50rpx;"></view>
+        <view wx:if="{{(rental.package_id == null || rental.package_id == undefined) && rental.withAssociates != true}}"
+          class="view-row">
+          <view class="number-label" style="margin-top: 100rpx;font-size: 9pt;">【{{rental.rentItems[0].itemIndex}}】
           </view>
-          <view class="view-row">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【品类】</view>
-            <view class="right-column right-column1 view-row" wx:if="{{rental.name}}" style="width: 475rpx;">
-              <view style="width: 350rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">
-                {{rental.rentItems[0].category.name}}
-              </view>
-              <view>
-                <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini"  
-                id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">重选</van-button>
-              </view>
-            </view>
-            <view class="right-column right-column1" wx:else style="width: 475rpx;">
-              <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini" 
-              id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
-            </view>
-          </view>
-          <view class="view-row">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【名称】</view>
-            <view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
-              <input class="input" style="width: 450rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}" value="{{rental.rentItems[0].name == null? '' : rental.rentItems[0].name}}" id="{{rental.rentItems[0].itemIndex}}" bindblur="setItemName" />
-            </view>
-            <view class="right-column right-column1" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 500rpx" wx:else>{{rental.rentItems[0].name}}</view>
-          </view>
-          <view class="view-row">
-            <view class="left-column"></view>
-            <view class="right-column"></view>
-          </view>
-          <view class="view-row" style="margin-bottom: 20rpx;">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【押金】</view>
-            <view class="right-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 240rpx;">
-              {{rental.realGuarantyStr}}{{rental.guaranty_discount>0?'减':''}}
-            </view>
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 140rpx;">【租金】</view>
-            <view class="right-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}; width:130rpx">
-              {{rental.totalSummaryStr}}{{(rental.totalDiscount && rental.totalDiscount > 0)?'减':''}}
-            </view>
-            <!--租金显示相关的周末价、平日价、节假日价-->
-          </view>
-          <view class="view-row" style="margin-bottom: 20rpx;">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">【免押金】</view>
-            <view class="right-column ">
-              <checkbox-group id="{{index}}" bindchange="setNoGuaranty">
-                <checkbox value="1"  checked="{{rental.noGuaranty}}" ></checkbox>
-              </checkbox-group>
-            </view>
-            <view style="margin-left: 40rpx;">
-              <van-button size="small" type="info" id="{{index}}" bind:click="showPriceList" 
-              disabled="{{rental.rentItems[0].category_id == null}}" >查看价目表</van-button>
-            </view>
-          </view>
-          <view class="view-row" style="margin-bottom: 20rpx;">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;margin-top:30rpx">【起租日】</view>
-            <view class="right-column ">
-              <picker mode="date" class="input" id="{{index}}" bindchange="setStartDate" start="{{rental.startDate}}">
-                <picker-view style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">{{rental.startDate}}</picker-view>
-              </picker>
-            </view>
-            <view class="left-column"></view>
-            <view class="right-column"></view>
-          </view>
-          <view class="view-row" style="margin-bottom: 20rpx;">
-            <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;" id="{{rental.rentItems[0].itemIndex}}"  >【立即发放】
-            </view>
-            <view class="right-column" style="margin-left: 0rpx;">
-              <checkbox-group bindchange="setAtOnce" id="{{rental.rentItems[0].itemIndex}}">
-                <checkbox value="1"></checkbox>
-              </checkbox-group>
-            </view>
-          </view>
-          <view class="view-row" style="margin-bottom: 20rpx;">
-              <view class="left-column" style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;" >【备注】</view>
-              <view class="right-column" style="width: 500rpx;" >
-                <input style="width: 450rpx;" class="input" id="{{index}}"  bindblur="setRentalMemo" value="{{rental.memo}}" />
-              </view>
-            </view>
-          <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
-            <van-button plain type="primary" disabled="{{rental.rentItems[0].category_id == null}}" bind:click="showItem" id="{{index}}">
-              设置 押金 租金 起租时间等
-            </van-button>
-          </view>
-        </view>
-      </view>
-      <block wx:else>
-        <view class="view-row">
-          <view class="number-label"></view>
-          <view style="width: 650rpx;background-color: #F0FFF0;">
+          <view style="width: 650rpx; background-color: #FFF0F0;">
             <view class="view-row">
-              <view class="left-column" wx:if="{{rental.category_id}}">【品类】</view>
-              <view class="left-column" wx:else >【套餐】</view>
-              <view class="right-column right-column1">{{rental.name}}</view>
-            </view>
-            <view class="view-row" style="margin-bottom: 20rpx;">
-              <view class="left-column">【押金】</view>
-              <view class="right-column" style="width: 260rpx;">
-                {{rental.realDepositStr}}{{rental.guaranty_discount>0?'减':''}}
+              <view class="left-column"
+                style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">
+                【单品】</view>
+              <view class="right-column right-column1 view-row" wx:if="{{rental.name}}" style="width: 475rpx;">
+                <view
+                  style="width: 350rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">
+                  {{rental.rentItems[0].category.name}}
+                </view>
+                <view>
+                  <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini"
+                    id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">重选</van-button>
+                </view>
               </view>
-              <view class="left-column">【租金】</view>
-              <view class="right-column" style=" width:150rpx">
-                <!--
-                {{rental.startDateIsWeekend? '周末':'平日'}} {{memberId? '会员' : '门市'}}
-                -->
-                {{rental.totalSummaryStr}}{{(rental.totalDiscount && rental.totalDiscount > 0)?'减':''}}
-              </view>
-            </view>
-            <view class="view-row" style="margin-bottom: 20rpx;">
-              <view class="left-column" style="width: 170rpx;">【免押金】</view>
-              <view class="right-column">
-                <checkbox-group bindchange="setNoGuaranty" id="{{index}}">
-                  <checkbox checked="{{rental.noGuaranty}}" ></checkbox>
-                </checkbox-group>
-              </view>
-              <view style="margin-left: 40rpx;">
-                <van-button size="small" type="info" id="{{index}}" bind:click="showPriceList">查看价目表</van-button>
+              <view class="right-column right-column1" wx:else style="width: 475rpx;">
+                <van-button wx:if="{{rental.rentItems[0].noCode}}" type="primary" round size="mini"
+                  id="{{rental.rentItems[0].itemIndex}}" bind:click="selectCategory">选择</van-button>
               </view>
             </view>
-            <view class="view-row" style="margin-bottom: 20rpx;">
-              <view class="left-column" style="margin-top:30rpx">【起租日】</view>
-              <view class="right-column ">
-                <picker mode="date" class="input" id="{{index}}" bindchange="setStartDate" start="{{currentDate}}">
-                  <picker-view style="text-align: center;">
-                    {{rental.startDate}}
-                  </picker-view>
-                </picker>
+            <van-collapse-item name="{{index}}" style="padding: 0;">
+              <view slot="title" class="view-row" style="background-color: #FFF0F0;">
+                <view class="left-column"
+                  style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 150rpx;">
+                  【押金】</view>
+                <view class="right-column"
+                  style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 140rpx;">
+                  {{rental.realGuarantyStr}}{{rental.guaranty_discount>0?'减':''}}
+                </view>
+                <view class="left-column"
+                  style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 140rpx;">
+                  【租金】</view>
+                <view class="right-column"
+                  style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}; width:130rpx">
+                  {{rental.totalSummaryStr}}{{(rental.totalDiscount && rental.totalDiscount > 0)?'减':''}}
+                </view>
               </view>
-              <view class="left-column"></view>
-              <view class="right-column"></view>
-            </view>
-            <view class="view-row" style="margin-bottom: 20rpx;">
-              <view class="left-column" style="margin-top:20rpx">【备注】</view>
-              <view class="right-column" style="width: 500rpx;" >
-                <input style="width: 450rpx;" class="input" id="{{index}}" bindblur="setRentalMemo" value="{{rental.memo}}" />
-              </view>
-            </view>
-            <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
-              <van-button plain type="primary" bind:click="showPackage" id="{{index}}">设置 押金 租金 起租时间等 </van-button>
-            </view>
-          </view>
-        </view>
-        <block wx:for="{{rental.rentItems}}" wx:for-index="rentItemIndex" >
-          <view class="view-row">
-            <view class="number-label" style="margin-top: 50rpx;font-size: 9pt;">
-              【{{item.itemIndex}}】
-            </view>
-            <view style="display:flex;justify-content: center; width: 650rpx; background-color: #F0FFF0;" id="{{item.itemIndex}}">
-              <view style="width: 630rpx; background-color: #FFF0FF">
-                <view class="view-row" style="margin-bottom: 20rpx;">
-                  <view class="left-column" style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【编码】</view>
-                  <view class="right-column view-row" style="width:240rpx;color:{{item.textColor?item.textColor:defaultTextColor}};">
-                    <input bind:tap="searchListBarcodeFuzzy" class="input" style="width: 175rpx;text-align: center;" value="{{item.noCode? '无' : (item.code?item.code:'')}}" disabled="{{item.noCode || item.noNeed}}" id="{{item.itemIndex}}" />
-                    <van-icon name="scan" size="19px" disabled="{{item.noNeed}}" />
+              <view style="background-color: #FFF0F0;">
+                <view class="view-row">
+                  <view class="left-column"
+                    style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">
+                    【编码】</view>
+                  <view class="right-column view-row" style="width: 240rpx;">
+                    <input bind:tap="searchListBarcodeFuzzy" class="input"
+                      style="width: 175rpx;text-align: center;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}"
+                      value="{{rental.rentItems[0].noCode? '无' : (rental.rentItems[0].code?rental.rentItems[0].code:'')}}"
+                      disabled="{{rental.rentItems[0].noCode}}" id="{{rental.rentItems[0].itemIndex}}" />
+                    <van-icon name="scan" size="19px" />
                   </view>
-                  <view class="left-column" style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【无编码】</view>
-                  <view class="right-column" style="width: 75rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">
-                    <checkbox-group id="index" id="{{item.itemIndex}}" bindchange="setNoCode">
-                      <checkbox checked="{{item.noCode}}" value="1" disabled="{{item.noNeed}}"></checkbox>
+                  <view class="left-column"
+                    style="width: 140rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">
+                    【无编码】</view>
+                  <view class="right-column" style="width: 75rpx;">
+                    <checkbox-group id="{{rental.rentItems[0].itemIndex}}" bindchange="setNoCode">
+                      <checkbox checked="{{rental.rentItems[0].noCode}}" value="1"></checkbox>
                     </checkbox-group>
                   </view>
                 </view>
+
                 <view class="view-row">
-                  <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【品类】</view>
-                  <view wx:if="{{item.canChooseCategory == true}}" class="right-column right-column1" style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">
-                    <picker id="{{index}}_{{rentItemIndex}}" range="{{item.chooseCategories}}" range-key="name" class="input" 
-                    bindchange="selectRentItemCategory" >
-                      <picker-view>{{item.category.name}}</picker-view>
+                  <view class="left-column"
+                    style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">
+                    【名称】</view>
+                  <view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
+                    <input class="input"
+                      style="width: 450rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}"
+                      value="{{rental.rentItems[0].name == null? '' : rental.rentItems[0].name}}"
+                      id="{{rental.rentItems[0].itemIndex}}" bindblur="setItemName" />
+                  </view>
+                  <view class="right-column right-column1"
+                    style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 500rpx"
+                    wx:else>{{rental.rentItems[0].name}}</view>
+                </view>
+                <view class="view-row">
+                  <view class="left-column"></view>
+                  <view class="right-column"></view>
+                </view>
+
+                <view class="view-row" style="margin-bottom: 20rpx;">
+                  <view class="left-column"
+                    style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">
+                    【免押金】</view>
+                  <view class="right-column ">
+                    <checkbox-group id="{{index}}" bindchange="setNoGuaranty">
+                      <checkbox value="1" checked="{{rental.noGuaranty}}"></checkbox>
+                    </checkbox-group>
+                  </view>
+                  <view style="margin-left: 40rpx;">
+                    <van-button size="small" type="info" id="{{index}}" bind:click="showPriceList"
+                      disabled="{{rental.rentItems[0].category_id == null}}">查看价目表</van-button>
+                  </view>
+                </view>
+                <view class="view-row" style="margin-bottom: 20rpx;">
+                  <view class="left-column"
+                    style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;margin-top:30rpx">
+                    【起租日】</view>
+                  <view class="right-column ">
+                    <picker mode="date" class="input" id="{{index}}" bindchange="setStartDate"
+                      start="{{rental.startDate}}">
+                      <picker-view
+                        style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}">
+                        {{rental.startDate}}
+                      </picker-view>
                     </picker>
                   </view>
-                  <view wx:else class="right-column right-column1" style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">{{item.category.name}}</view>
+                  <view class="left-column"></view>
+                  <view class="right-column"></view>
                 </view>
-                <view class="view-row">
-                  <view class="left-column" style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【名称】</view>
-                  <view class="right-column right-column1" style="width: 475rpx;" wx:if="{{item.noCode}}">
-                    <input class="input" style="width: 450rpx;" bindblur="setItemName" id="{{item.itemIndex}}" value="{{item.name == null? '' : item.name}}" disabled="{{item.noNeed}}" />
+                <view class="view-row" style="margin-bottom: 20rpx;">
+                  <view class="left-column"
+                    style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;"
+                    id="{{rental.rentItems[0].itemIndex}}">【立即发放】
                   </view>
-                  <view class="right-column right-column1" wx:else>{{item.name == null? '' : item.name}}</view>
-                </view>
-                <view class="view-row" style="margin-bottom:20rpx">
-                  <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【不需要】</view>
-                  <view class="right-column" style="width:240rpx;color:{{item.textColor?item.textColor:defaultTextColor}};">
-                    <checkbox-group bindchange="setNoNeed" id="{{item.itemIndex}}">
-                      <checkbox checked="{{item.noNeed}}" ></checkbox>
-                    </checkbox-group>
-                  </view>
-                  <view class="left-column" style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【立即发放】
-                  </view>
-                  <view class="right-column" style="width: 50rpx;margin-left: 0rpx;">
-                    <checkbox-group id="{{item.itemIndex}}" bindchange="setAtOnce">
-                      <checkbox disabled="{{item.noNeed}}" checked="{{item.atOnce}}" value="1"></checkbox>
+                  <view class="right-column" style="margin-left: 0rpx;">
+                    <checkbox-group bindchange="setAtOnce" id="{{rental.rentItems[0].itemIndex}}">
+                      <checkbox value="1"></checkbox>
                     </checkbox-group>
                   </view>
                 </view>
-                <view class="view-row" style="margin-bottom:20rpx">
-                  <view class="left-column" style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【备注】</view>
-                  <view class="right-column" style="width:500rpx;color:{{item.textColor?item.textColor:defaultTextColor}};" >
-                    <input class="input" style="width: 450rpx;" id="{{item.itemIndex}}" bindblur="setItemMemo" value="{{item.memo}}" />
+                <view class="view-row" style="margin-bottom: 20rpx;">
+                  <view class="left-column"
+                    style="color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}};width: 170rpx;">
+                    【备注】</view>
+                  <view class="right-column" style="width: 500rpx;">
+                    <input style="width: 450rpx;" class="input" id="{{index}}" bindblur="setRentalMemo"
+                      value="{{rental.memo}}" />
                   </view>
                 </view>
-                <view style="width: 630rpx;background-color: #F0FFF0;height: 10rpx;"></view>
+              </view>
+            </van-collapse-item>
+            <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
+              <van-button plain type="primary" disabled="{{rental.rentItems[0].category_id == null}}"
+                bind:click="showItem" id="{{index}}">
+                设置 押金 租金 起租时间等
+              </van-button>
+            </view>
+          </view>
+        </view>
+        <block wx:else>
+          <view class="view-row">
+            <view class="number-label"></view>
+            <view style="width: 650rpx;background-color: #F0FFF0;">
+              <view class="view-row">
+                <view class="left-column" wx:if="{{rental.category_id}}">【品类】</view>
+                <view class="left-column" wx:else>【套餐】</view>
+                <view class="right-column right-column1">{{rental.name}}</view>
+              </view>
+              <view class="view-row" style="margin-bottom: 20rpx;">
+                <view class="left-column">【押金】</view>
+                <view class="right-column" style="width: 260rpx;">
+                  {{rental.realDepositStr}}{{rental.guaranty_discount>0?'减':''}}
+                </view>
+                <view class="left-column">【租金】</view>
+                <view class="right-column" style=" width:150rpx">
+                  {{rental.totalSummaryStr}}{{(rental.totalDiscount && rental.totalDiscount > 0)?'减':''}}
+                </view>
+              </view>
+              <view class="view-row" style="margin-bottom: 20rpx;">
+                <view class="left-column" style="width: 170rpx;">【免押金】</view>
+                <view class="right-column">
+                  <checkbox-group bindchange="setNoGuaranty" id="{{index}}">
+                    <checkbox checked="{{rental.noGuaranty}}"></checkbox>
+                  </checkbox-group>
+                </view>
+                <view style="margin-left: 40rpx;">
+                  <van-button size="small" type="info" id="{{index}}" bind:click="showPriceList">查看价目表</van-button>
+                </view>
+              </view>
+              <view class="view-row" style="margin-bottom: 20rpx;">
+                <view class="left-column" style="margin-top:30rpx">【起租日】</view>
+                <view class="right-column ">
+                  <picker mode="date" class="input" id="{{index}}" bindchange="setStartDate" start="{{currentDate}}">
+                    <picker-view style="text-align: center;">
+                      {{rental.startDate}}
+                    </picker-view>
+                  </picker>
+                </view>
+                <view class="left-column"></view>
+                <view class="right-column"></view>
+              </view>
+              <view class="view-row" style="margin-bottom: 20rpx;">
+                <view class="left-column" style="margin-top:20rpx">【备注】</view>
+                <view class="right-column" style="width: 500rpx;">
+                  <input style="width: 450rpx;" class="input" id="{{index}}" bindblur="setRentalMemo"
+                    value="{{rental.memo}}" />
+                </view>
+              </view>
+              <view class="view-row" style="justify-content: center; margin-bottom: 10rpx;">
+                <van-button plain type="primary" bind:click="showPackage" id="{{index}}">设置 押金 租金 起租时间等 </van-button>
               </view>
             </view>
           </view>
+          <block wx:for="{{rental.rentItems}}" wx:for-index="rentItemIndex">
+            <view class="view-row">
+              <view class="number-label" style="margin-top: 50rpx;font-size: 9pt;">
+                【{{item.itemIndex}}】
+              </view>
+              <view style="display:flex;justify-content: center; width: 650rpx; background-color: #F0FFF0;"
+                id="{{item.itemIndex}}">
+                <view style="width: 630rpx; background-color: #FFF0FF">
+                  <view class="view-row" style="margin-bottom: 20rpx;">
+                    <view class="left-column"
+                      style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【编码】</view>
+                    <view class="right-column view-row"
+                      style="width:240rpx;color:{{item.textColor?item.textColor:defaultTextColor}};">
+                      <input bind:tap="searchListBarcodeFuzzy" class="input" style="width: 175rpx;text-align: center;"
+                        value="{{item.noCode? '无' : (item.code?item.code:'')}}"
+                        disabled="{{item.noCode || item.noNeed}}" id="{{item.itemIndex}}" />
+                      <van-icon name="scan" size="19px" disabled="{{item.noNeed}}" />
+                    </view>
+                    <view class="left-column"
+                      style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【无编码】</view>
+                    <view class="right-column"
+                      style="width: 75rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">
+                      <checkbox-group id="index" id="{{item.itemIndex}}" bindchange="setNoCode">
+                        <checkbox checked="{{item.noCode}}" value="1" disabled="{{item.noNeed}}"></checkbox>
+                      </checkbox-group>
+                    </view>
+                  </view>
+                  <view class="view-row">
+                    <view class="left-column"
+                      style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【品类】</view>
+                    <view wx:if="{{item.canChooseCategory == true}}" class="right-column right-column1"
+                      style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">
+                      <picker id="{{index}}_{{rentItemIndex}}" range="{{item.chooseCategories}}" range-key="name"
+                        class="input" bindchange="selectRentItemCategory">
+                        <picker-view>{{item.category.name}}</picker-view>
+                      </picker>
+                    </view>
+                    <view wx:else class="right-column right-column1"
+                      style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">
+                      {{item.category.name}}
+                    </view>
+                  </view>
+                  <view class="view-row">
+                    <view class="left-column"
+                      style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【名称】</view>
+                    <view class="right-column right-column1" style="width: 475rpx;" wx:if="{{item.noCode}}">
+                      <input class="input" style="width: 450rpx;" bindblur="setItemName" id="{{item.itemIndex}}"
+                        value="{{item.name == null? '' : item.name}}" disabled="{{item.noNeed}}" />
+                    </view>
+                    <view class="right-column right-column1" wx:else>{{item.name == null? '' : item.name}}</view>
+                  </view>
+                  <view class="view-row" style="margin-bottom:20rpx">
+                    <view class="left-column"
+                      style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【不需要】</view>
+                    <view class="right-column"
+                      style="width:240rpx;color:{{item.textColor?item.textColor:defaultTextColor}};">
+                      <checkbox-group bindchange="setNoNeed" id="{{item.itemIndex}}">
+                        <checkbox checked="{{item.noNeed}}"></checkbox>
+                      </checkbox-group>
+                    </view>
+                    <view class="left-column"
+                      style="width: 160rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【立即发放】
+                    </view>
+                    <view class="right-column" style="width: 50rpx;margin-left: 0rpx;">
+                      <checkbox-group id="{{item.itemIndex}}" bindchange="setAtOnce">
+                        <checkbox disabled="{{item.noNeed}}" checked="{{item.atOnce}}" value="1"></checkbox>
+                      </checkbox-group>
+                    </view>
+                  </view>
+                  <view class="view-row" style="margin-bottom:20rpx">
+                    <view class="left-column"
+                      style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【备注】</view>
+                    <view class="right-column"
+                      style="width:500rpx;color:{{item.textColor?item.textColor:defaultTextColor}};">
+                      <input class="input" style="width: 450rpx;" id="{{item.itemIndex}}" bindblur="setItemMemo"
+                        value="{{item.memo}}" />
+                    </view>
+                  </view>
+                  <view style="width: 630rpx;background-color: #F0FFF0;height: 10rpx;"></view>
+                </view>
+              </view>
+            </view>
+          </block>
         </block>
-      </block>
-    </fui-swipe-action>
+      </fui-swipe-action>
+    </van-collapse>
   </fui-swipeaction-group>
   <van-divider contentPosition="center" textColor="#1989fa">新增租赁商品</van-divider>
   <view class="view-row" style="justify-content: center;">
@@ -231,9 +295,12 @@
   </view>
 </scroll-view>
 <van-popup show="{{ showPopUp }}">
-  <package_selector wx:if="{{popUpContent == 'packageSelector'}}" shop="{{shop}}" bindConfirm="selectPackageConfirm" bindCancel="cancelPopUp"></package_selector>
-  <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" categoryId="{{searchCategoryId}}" bindCancel="cancelPopUp" barCode="{{searchBarCode}}" bindConfirm="confirmProduct"></search-product-fuzzy>
-  <category-selector wx:if="{{popUpContent == 'categorySelector'}}" bindCancel="cancelPopUp" bindConfirm="confirmCategory">
+  <package_selector wx:if="{{popUpContent == 'packageSelector'}}" shop="{{shop}}" bindConfirm="selectPackageConfirm"
+    bindCancel="cancelPopUp"></package_selector>
+  <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" categoryId="{{searchCategoryId}}"
+    bindCancel="cancelPopUp" barCode="{{searchBarCode}}" bindConfirm="confirmProduct"></search-product-fuzzy>
+  <category-selector wx:if="{{popUpContent == 'categorySelector'}}" bindCancel="cancelPopUp"
+    bindConfirm="confirmCategory">
   </category-selector>
 </van-popup>
 <fui-backdrop show="{{showBackdrop}}" closable>
@@ -242,7 +309,8 @@
       <fui-card title="套餐名称：{{currentRental.name}}" tag="共{{currentRental.rentItems.length}}件">
         <view class="fui-card__content" style="width: 650rpx; margin-top:50rpx;height: {{windowHeight}}rpx">
           <scroll-view scroll-y="true" style="height: {{windowHeight }}rpx">
-            <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" shop="{{shopObj}}" ></rent_charge>
+            <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" shop="{{shopObj}}">
+            </rent_charge>
           </scroll-view>
         </view>
         <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
@@ -273,19 +341,20 @@
           </view>
         </view>
         <view style="height: 20rpx;"></view>
-        <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" shop="{{shopObj}}"  ></rent_charge>
+        <rent_charge rentItem="{{currentRental}}" bindRentalUpdated="onRentalChange" shop="{{shopObj}}"></rent_charge>
         <view class="view-row" style="margin-top: 50rpx;margin-bottom: 50rpx;">
           <button class="input" size="mini" bindtap="cancelBackdrop"> 取 消 </button>
-          <button class="input" size="mini" bindtap="saveUpdatedRental" > 保 存 </button>
+          <button class="input" size="mini" bindtap="saveUpdatedRental"> 保 存 </button>
         </view>
         <view style="height: 50rpx;"></view>
       </view>
     </block>
     <block wx:if="{{action == 'priceList'}}">
-      <rent-price-list shopName="{{shop}}" type="{{type}}" dayType="{{dayType}}" 
-      targetId="{{targetId}}" memberId="{{memberId}}" ></rent-price-list>
+      <rent-price-list shopName="{{shop}}" type="{{type}}" dayType="{{dayType}}" targetId="{{targetId}}"
+        memberId="{{memberId}}"></rent-price-list>
       <view class="view-row" style="width: 90%;background-color: white;margin-left: auto;margin-right: auto;">
-        <button class="input" size="mini" bindtap="cancelBackdrop" style="margin-top:50rpx;margin-bottom: 50rpx;" > 关 闭 </button>
+        <button class="input" size="mini" bindtap="cancelBackdrop" style="margin-top:50rpx;margin-bottom: 50rpx;"> 关 闭
+        </button>
       </view>
     </block>
   </scroll-view>
