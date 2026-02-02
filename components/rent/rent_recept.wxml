@@ -185,7 +185,6 @@
                     </picker>
                   </view>
                   <view wx:else class="right-column right-column1" style="width:475rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">{{item.category.name}}</view>
-                 
                 </view>
                 <view class="view-row">
                   <view class="left-column" style="width:140rpx; color:{{item.textColor?item.textColor:defaultTextColor}}">【名称】</view>
