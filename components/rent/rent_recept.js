@@ -3,9 +3,7 @@ const util = require('../../utils/util.js')
 const data = require('../../utils/data.js')
 const app = getApp()
 Component({
-  options: {
-    styleIsolation: 'shared',
-  },
+
   /**
    * Component properties
    */
