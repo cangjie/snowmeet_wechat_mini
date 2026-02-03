@@ -5,7 +5,7 @@
         <view style="height: 50rpx;"></view>
         <view wx:if="{{(rental.package_id == null || rental.package_id == undefined) && rental.withAssociates != true}}"
           class="view-row">
-          <view class="number-label" style="margin-top: 100rpx;font-size: 9pt;">【{{rental.rentItems[0].itemIndex}}】
+          <view class="number-label view-row" style="margin-top: 100rpx;font-size: 9pt;justify-content: center;">【{{rental.rentItems[0].itemIndex}}】
           </view>
           <view style="width: 650rpx; background-color: #FFF0F0;">
             <view class="view-row">
@@ -207,14 +207,14 @@
           </view>
           <block wx:for="{{rental.rentItems}}" wx:for-index="rentItemIndex">
             <view class="view-row">
-              <view class="number-label" style="margin-top: 50rpx;font-size: 9pt;">
+              <view class="number-label view-row" style="font-size: 9pt;justify-content: center;align-items: center;">
                 【{{item.itemIndex}}】
               </view>
               <view style="display:flex;justify-content: center; width: 650rpx; background-color: #F0FFF0;"
                 id="{{item.itemIndex}}">
                 <view style="width: 630rpx; background-color: #FFF0FF">
                   
-                  <van-collapse-item>
+                  <van-collapse-item name="{{index}}_{{rentItemIndex}}">
                   <view class="view-row" slot="title" style="background-color: #FFF0FF" >
                     <view class="left-column"
                       style="width:140rpx;color:{{item.textColor?item.textColor:defaultTextColor}}">【品类】</view>
