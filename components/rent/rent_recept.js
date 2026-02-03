@@ -260,19 +260,32 @@ Component({
     },
     renderData(rentals) {
       var that = this
-      //var rentals = that.data.rentals
+
+
       var packageCommonBackgroud = '#F0F0F0'
       var productCommonBackgroud = '#F0F0F0'
       var packageCommonTextColor = '#000000'
       var itemCommonColor = '#000000'
+
+      var importantUnwellformedBackgroundColor = '#C0C0C0'
+      var importantUnwellformedTextColor = '#FF0000'
+      var importantWellformedBackgroundColor = '#C0C0C0'
+      var importantWellformedTextColor = '#000000'
+      var itemUnwellformedBackgroundColor = '#FFFFFF'
+      var itemWellformedBackgroundColor = '#F0FFF0'
+      var itemUnwellformedTextColor = '#000000'
+      var itemWellformedTextColor = '#000000'
+
+
+
       var itemIndex = 1
       var totalItemNum = 0
       var totalGuarantyAmount = 0
       for (var i = 0; i < rentals.length; i++) {
+        var rentalWellformed = true
         var rental = rentals[i]
         if (!rental.package_id && !rental.category_id && rental.rentItems && rental.rentItems.length > 0){
           rental.category_id = rental.rentItems[0].category_id
-          //rental.name = rental.rentItems[0].cate
         }
         if (isNaN(rental.depositDiscount)) {
           rental.realDeposit = rental.deposit
@@ -286,6 +299,7 @@ Component({
         else {
           rental.realDepositStr = ''
         }
+        /*
         if (rental.package_id) {
           rental.backgroundColor = packageCommonBackgroud
           rental.textColor = packageCommonTextColor
@@ -293,15 +307,44 @@ Component({
         else {
           rental.backgroundColor = productCommonBackgroud
         }
+        */
         if (!isNaN(rental.realDeposit)) {
           totalGuarantyAmount += rental.realDeposit
         }
         for (var j = 0; j < rental.rentItems.length; j++) {
           totalItemNum++
           var item = rental.rentItems[j]
+          var rentItemWellformed = false
           item.itemIndex = itemIndex
           itemIndex++
+          if (item.noNeed==true){
+            rentItemWellformed = true
+          }
+          else {
+            if (item.noCode){
+              if (item.name && item.name.length > 0){
+                rentItemWellformed = true
+              }
+            }
+            else {
+              if (item.code && item.code.length > 0){
+                rentItemWellformed = true
+              }
+            }
+          }
+          if (rentItemWellformed == false){
+            rentalWellformed = false
+            item.textColor = itemUnwellformedTextColor
+            item.backColor = itemUnwellformedBackgroundColor
+          }
+          else{
+            item.textColor = itemWellformedTextColor
+            item.backColor = itemWellformedBackgroundColor
+          }
+          
+          /*
           item.textColor = itemCommonColor
+          
           if (!item.noCode && !item.rent_product_id) {
             item.textColor = 'red'
           }
@@ -314,8 +357,17 @@ Component({
           if (item.noNeed) {
             item.textColor = that.data.noNeedTextColor
           }
+          */
         }
         that.formatRentalPackage(rental)
+      }
+      if (rentalWellformed){
+        rental.textColor = importantWellformedTextColor
+        rental.backColor = importantWellformedBackgroundColor
+      }
+      else {
+        rental.textColor = importantUnwellformedTextColor
+        rental.backColor = importantUnwellformedBackgroundColor
       }
       console.log('render rentals', rentals)
       that.setData({
@@ -323,7 +375,6 @@ Component({
         totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount)
       })
       that.setData({rentals})
-      //that.triggerEvent('SyncRentData', rentals)
     },
     formatRentalPackage(rental){
       var that = this

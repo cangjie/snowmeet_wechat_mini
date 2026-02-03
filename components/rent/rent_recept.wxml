@@ -151,7 +151,7 @@
             <view style="width: 650rpx;background-color: #F0FFF0;">
               <view class="view-row">
                 <view class="left-column" wx:if="{{rental.category_id}}">【品类】</view>
-                <view class="left-column" wx:else>【套餐】</view>
+                <view class="left-column" wx:else    >【套餐】</view>
                 <view class="right-column right-column1">{{rental.name}}</view>
               </view>
               <van-collapse-item name="{{index}}">
