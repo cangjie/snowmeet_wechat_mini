@@ -56,5 +56,7 @@ picker{
   --collapse-item-content-padding: 0rpx;
 }
 page{
-  --title-width: 170rpx
+  --title-width: 170rpx;
+  --title-width-sub: 170rpx;
+  --content-width-sub: 480rpx;
 }
