@@ -55,3 +55,6 @@ picker{
 .van-collapse-item__content {
   --collapse-item-content-padding: 0rpx;
 }
+page{
+  --title-width: 170rpx
+}

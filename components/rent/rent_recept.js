@@ -818,10 +818,19 @@ Component({
       that.setData({rentals})
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
     },
+    onRentalCollapseChange(event) {
+      this.setData({
+        rentalActiveIndex: event.detail,
+      });
+    },
     onChange(event) {
       this.setData({
         activeNames: event.detail,
       });
+    },
+    onItemCollapseChange(e){
+      var that = this
+      that.setData({rentalActiveIndex: e.detail})
     }
   },
   
