@@ -7,7 +7,7 @@
             【{{rental.package_id?'套餐':'单品'}}】
           </view>
           <view style="width: 400rpx">{{rental.package_id? rental.name : rental.rentItems[0].category.name}}</view>
-          <view class="view-row" style="width: 100rpx;">
+          <view class="view-row" style="width: 100rpx;margin-top: 0rpx;">
             <block wx:if="{{rental.package_id}}">
               <!--重选套餐按钮-->
             </block>
