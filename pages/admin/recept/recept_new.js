@@ -228,7 +228,7 @@ Page({
     }
     for (var i = 0; order.rentals && i < order.rentals.length; i++) {
       var rental = order.rentals[i]
-      rental.guaranty = rental.deposit
+      rental.guaranty = rental.guaranty
       var startDate = rental.startDate
       if (startDate) {
         startDate = util.formatDate(new Date(startDate))

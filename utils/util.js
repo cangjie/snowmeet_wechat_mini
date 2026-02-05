@@ -187,7 +187,10 @@ const createRentalDetail = function (rental, startDate, endDate) {
   }
   rental.totalAmount = totalAmount
   rental.totalAmountStr = showAmount(totalAmount)
-  rental.pricePresets = details
+  if (details && details.length > 0){
+    rental.pricePresets = details
+  }
+  
   return details
 }
 const getRentPrice = function (priceList, date, rentType) {

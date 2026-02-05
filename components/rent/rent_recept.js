@@ -103,7 +103,6 @@ Component({
                       continue
                     }
                     rental.priceList = priceList
-
                     util.createRentalDetail(rental, new Date(rental.start_date), new Date(rental.end_date))
                     rentals = that.formatRentals(rentals)
                     that.renderData(rentals)
@@ -213,11 +212,9 @@ Component({
             name: selectedPackage.name,
             valid: 0,
             expectDays: 1,
-            deposit: selectedPackage.deposit,
             guaranty: selectedPackage.deposit,
-            depositStr: util.showAmount(selectedPackage.deposit),
-            realDeposit: selectedPackage.deposit,
-            realDepositStr: util.showAmount(selectedPackage.deposit),
+            realGuaranty: selectedPackage.deposit,
+            guaranty_discount: 0,
             startDate: that.data.startDate,
             startDateIsWeekend: util.isWeekend(new Date(that.data.startDate)),
             priceList: priceList,
@@ -334,40 +331,23 @@ Component({
           }
           if (rentItemWellformed == false){
             rentalWellformed = false
-            item.textColor = itemUnwellformedTextColor
-            item.backColor = itemUnwellformedBackgroundColor
+            //item.textColor = itemUnwellformedTextColor
+            //item.backColor = itemUnwellformedBackgroundColor
           }
           else{
-            item.textColor = itemWellformedTextColor
-            item.backColor = itemWellformedBackgroundColor
+            //item.textColor = itemWellformedTextColor
+            //item.backColor = itemWellformedBackgroundColor
           }
-          
-          /*
-          item.textColor = itemCommonColor
-          
-          if (!item.noCode && !item.rent_product_id) {
-            item.textColor = 'red'
-          }
-          else if (item.noCode && (!item.category_id || !item.name)) {
-            item.textColor = 'red'
-          }
-          else {
-            item.textColor = that.data.defaultTextColor
-          }
-          if (item.noNeed) {
-            item.textColor = that.data.noNeedTextColor
-          }
-          */
         }
         that.formatRentalPackage(rental)
       }
       if (rentalWellformed){
-        rental.textColor = importantWellformedTextColor
-        rental.backColor = importantWellformedBackgroundColor
+        //rental.textColor = importantWellformedTextColor
+        //rental.backColor = importantWellformedBackgroundColor
       }
       else {
-        rental.textColor = importantUnwellformedTextColor
-        rental.backColor = importantUnwellformedBackgroundColor
+        //rental.textColor = importantUnwellformedTextColor
+        //rental.backColor = importantUnwellformedBackgroundColor
       }
       console.log('render rentals', rentals)
       that.setData({
@@ -617,6 +597,36 @@ Component({
       //that.triggerEvent('SyncRentData', that.data.rentals)
       that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
+    updateGuaranty(e){
+      var value = e.detail.value
+      if (isNaN(value) || value == null || value == '') {
+        return
+      }
+      var realGuarantyAmount = parseFloat(value)
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var rentals = that.setGuarantyAmount(id, realGuarantyAmount)
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
+    },
+    setGuaranty(e){
+      var value = e.detail.value
+      if (isNaN(value) || value == null || value == '' ){
+        return
+      }
+      var realGuarantyAmount = parseFloat(value)
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var rentals = that.setGuarantyAmount(id, realGuarantyAmount)
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+    },
+    setGuarantyAmount(index, amount){
+      var that = this
+      var rentals = that.data.rentals
+      var rental = rentals[index]
+      rental.guaranty_discount = rental.guaranty - amount
+      that.renderData(rentals)
+      return rentals
+    },
     setNoGuaranty(e) {
       var that = this
       var id = parseInt(e.currentTarget.id)
@@ -676,17 +686,17 @@ Component({
       console.log('confirm cate', e)
       that.setData({ showPopUp: false, popUpContent: null })
       var item = that.getItemByIndex(that.data.currentItemIndex)
+      console.log('select category', e.detail)
       item.category = e.detail
       item.category_id = item.category.id
       var rental = that.getRentenalByItemIndex(that.data.currentItemIndex)
       data.getRentPriceListPromise(that.data.shopObj.id, '分类',
         item.category_id,  '门市')
         .then(function (priceList) {
-          rental.deposit = e.detail.deposit
-          rental.depositStr = util.showAmount(rental.deposit)
-          rental.realDeposit = rental.deposit
-          rental.realDepositStr = rental.depositStr
-          rental.guaranty = rental.deposit
+          console.log('get category price list', priceList)
+          rental.guaranty = item.category.deposit
+          rental.realGuaranty = rental.guaranty
+          rental.guaranty_discount = 0
           rental.guarantyStr = rental.depositStr
           rental.category = e.detail
           rental.expectDays = 1
@@ -831,7 +841,42 @@ Component({
     onItemCollapseChange(e){
       var that = this
       that.setData({rentalActiveIndex: e.detail})
+    },
+    setPrice(e){
+      var value = e.detail.value
+      if (isNaN(value) || value == null || value == '' ){
+        return
+      }
+      var price = parseFloat(value)
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var rentals = that.setPriceAmount(id, price)
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+    },
+    updatePrice(e){
+      var value = e.detail.value
+      if (isNaN(value) || value == null || value == '' ){
+        return
+      }
+      var price = parseFloat(value)
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var rentals = that.setPriceAmount(id, price)
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
+    },
+    setPriceAmount(index, amount){
+      var that = this
+      var rentals = that.data.rentals
+      var rental = rentals[index]
+      var preset = rental.pricePresets[0]
+      if (preset == null){
+        return null
+      }
+      preset.price = amount
+      that.renderData(rentals)
+      return rentals
     }
+    
   },
   
 })
