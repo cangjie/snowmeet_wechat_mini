@@ -24,69 +24,76 @@
         <van-collapse-item name="{{index}}">
           <view slot="title" class="view-row">
             <view class="left-column" style="width: var(--title-width);">【押金】</view>
-            <view class="right-column view-row" style="width: 140rpx;">
+            <view class="right-column view-row" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
               <input class="input" style="text-align: center;width:100rpx" type="digit"
                 placeholder="{{rental.realGuaranty}}" />{{rental.guaranty_discount>0?'减':''}}
             </view>
             <view class="left-column" style="width: var(--title-width);">【租金】</view>
-            <view class="right-column" style="width:130rpx">
+            <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
               <input class="input" style="text-align: center; width: 100rpx;" type="digit"
                 placeholder="{{rental.totalSummary}}" />{{(rental.totalDiscount && rental.totalDiscount > 0)?'减':''}}
             </view>
           </view>
           <view>
             <view class="view-row">
+              <view class="left-column" style="width: var(--title-width);">【起租日期】</view>
+              <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >2026-12-29</view>
+              <view class="left-column" style="width: var(--title-width);">【起租时间】</view>
+              <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >23:59:59</view>
+            </view>
+            <view class="view-row">
               <view class="left-column" style="width: var(--title-width);">【备注】</view>
-
               <view class="right-column"><input class="input" style="width:
               500rpx" /></view>
             </view>
-            <view style="display: flex;margin-top: 20rpx;justify-content: center;">
-            <van-button plain type="primary" 
-                bind:click="showItem" id="{{index}}">
-                设置 押金 租金 起租时间等
+            <view class="view-row" style="height: 60rpx; justify-content: center;margin-top: 20rpx;">
+              <view style="width: 260rpx;display: flex;justify-content: center;">
+                <van-button plain size="mini" type="primary" bind:click="showItem" id="{{index}}">
+                详细设置押金租金
               </van-button>
+              </view>
+              <van-button size="mini" type="danger" style="margin-right: 10rpx;">混合发放</van-button>
+              <van-button size="mini" type="warning" style="margin-right: 10rpx;">立即租赁</van-button>
+              <van-button size="mini" type="warning" plain style="margin-right: 10rpx;">先租后取</van-button>
+              <van-button size="mini" type="warning" plain style="margin-right: 0rpx;">延时租赁</van-button>
+              
             </view>
-            <view class="view-row" style="height: 100rpx; justify-content: center;margin-top: 50rpx;">
-              <van-button size="mini" type="danger" style="margin-right: 20rpx;">混合发放</van-button>
-              <van-button size="mini" type="warning" style="margin-right: 20rpx;">立即租赁</van-button>
-              <van-button size="mini" type="warning" plain style="margin-right: 20rpx;">先租后取</van-button>
-              <van-button size="mini" type="warning" plain style="margin-right: 20rpx;">延时租赁</van-button>
-              <view style="width: 220rpx;">起租：2026-12-24</view>
-            </view>
-
             <van-collapse id="{{index}}" value="{{rentalActiveIndex}}" bind:change="onItemCollapseChange">
-              <view style="padding-left: 30rpx; padding-right:30rpx">
-                <van-collapse-item wx:for="{{rental.rentItems}}" wx:for-index="itemIndex" name="{{index}}_{{itemIndex}}" >
+              <view style="padding-left: calc((var(--total-width) - var(--total-width-sub))/2); padding-right:calc((var(--total-width) - var(--total-width-sub))/2)">
+                <van-collapse-item wx:for="{{rental.rentItems}}" wx:for-index="itemIndex"
+                  name="{{index}}_{{itemIndex}}">
                   <view slot="title" class="view-row">
-                    <view class="left-column" style="width:var(--title-width-sub)" >【品类】</view>
-                    <view class="right-column" style="width:var(--content-width-sub)">
+                    <view class="left-column" style="width:var(--title-width-sub)">【品类】</view>
+                    <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))">
                       {{item.category.name}}
                     </view>
                   </view>
                   <view>
-                    <view class="view-row" >
-                      <view class="left-column" style="width:var(--title-width-sub)" >【编码】</view>
-                      <view class="right-column view-row" style="width:var(--content-width-sub)" >
+                    <view class="view-row">
+                      <view class="left-column" style="width:var(--title-width-sub)">【编码】</view>
+                      <view class="right-column view-row" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
                         <input class="input" style="width:200rpx" />
                         <van-icon name="scan" size="19px" disabled="{{item.noNeed}}" />
-                        <van-button style="margin-left:30rpx" size="mini" type="info" plain >无编码</van-button>
-                        <van-button wx:if="{{rental.rentItems.length > 1}}" style="margin-left:30rpx" size="mini" type="danger" plain >不需要</van-button>
+                        <van-button style="margin-left:30rpx" size="mini" type="info" plain>无编码</van-button>
+                        <van-button wx:if="{{rental.rentItems.length > 1}}" style="margin-left:30rpx" size="mini"
+                          type="danger" plain>不需要</van-button>
                       </view>
                     </view>
-                    <view class="view-row" >
-                      <view class="left-column" style="width:var(--title-width-sub)" >【名称】</view>
-                      <view class="right-column" style="width:var(--content-width-sub)" ></view>
-                    </view>
-                    <view class="view-row" >
-                      <view class="left-column" style="width:var(--title-width-sub)" >【备注】</view>
-                      <view class="right-column" style="width:var(--content-width-sub)" >
-                        
+                    <view class="view-row">
+                      <view class="left-column" style="width:var(--title-width-sub)">【名称】</view>
+                      <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
+                        <input class="input" style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.5);" />
                       </view>
                     </view>
-                    <view class="view-row" style="margin-top: 20rpx;justify-content: center;" >
-                      <van-button size="mini" plain type="primary" >立即租赁</van-button>
-                      <van-button size="mini" plain type="primary" style="margin-left: 20rpx;" >先租后取</van-button>
+                    <view class="view-row">
+                      <view class="left-column" style="width:var(--title-width-sub)">【备注】</view>
+                      <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
+                        <input class="input" style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.8);" />
+                      </view>
+                    </view>
+                    <view class="view-row" style="margin-top: 20rpx;justify-content: center;">
+                      <van-button size="mini" plain type="primary">立即租赁</van-button>
+                      <van-button size="mini" plain type="primary" style="margin-left: 20rpx;">先租后取</van-button>
                     </view>
 
                   </view>

@@ -14,11 +14,18 @@ picker{
   width: 50rpx;
 }
 .left-column{
+  display: flex;
   width: 140rpx;
   text-align: left;
+  font-size: var(--standart-font-size);
+  align-items: center;
+  margin: 0rpx
+
 }
 .right-column{
-  width: 195rpx
+  width: 195rpx;
+  margin: 0rpx;
+  font-size: var(--standart-font-size);
 }
 .right-column1{
   width: 500rpx
@@ -55,8 +62,14 @@ picker{
 .van-collapse-item__content {
   --collapse-item-content-padding: 0rpx;
 }
+.view-row{
+  margin-top: 10rpx;
+}
 page{
-  --title-width: 170rpx;
-  --title-width-sub: 170rpx;
-  --content-width-sub: 480rpx;
+  --title-width: 180rpx;
+  --title-width-sub: 120rpx;
+  --standart-font-size: 30rpx;
+  --total-width:710rpx;
+  --total-width-sub: 650rpx
+  font-size: var(--standart-font-size);
 }
