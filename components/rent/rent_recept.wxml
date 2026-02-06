@@ -25,7 +25,7 @@
           <view slot="title" class="view-row">
             <view class="left-column" style="width: var(--title-width);">【押金】</view>
             <view class="right-column view-row" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
-              <input class="input" style="text-align: center;width:100rpx" type="digit"
+              <input class="input" style="text-align: center;width:140rpx" type="digit"
                 placeholder="{{rental.realGuaranty}}" id="{{index}}" bindinput="setGuaranty" bindblur="updateGuaranty"  />{{rental.guaranty_discount>0?'减':''}}
             </view>
             <view class="left-column" style="width: var(--title-width);">【租金】</view>
@@ -38,11 +38,11 @@
             <view class="view-row">
               <view class="left-column" style="width: var(--title-width);">【起租日期】</view>
               <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
-                {{rental.pick_type? '2026-12-29': '——'}}
+                {{rental.startDateStr}}
               </view>
               <view class="left-column" style="width: var(--title-width);">【起租时间】</view>
               <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
-                {{rental.pick_type? '23:59:59': '——'}}
+                {{rental.startTimeStr}}
               </view>
             </view>
             <view class="view-row">
@@ -510,3 +510,5 @@
     </block>
   </scroll-view>
 </fui-backdrop>
+<van-calendar id="{{calenderId}}" show="{{ showCalendar }}" 
+bind:close="onCloseCalendar" bind:confirm="onConfirmCalendar" />

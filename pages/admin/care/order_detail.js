@@ -272,6 +272,7 @@ Page({
         order = that.buildImages(order, index)
         care.moddingBaseInfo = true
         that.setData({ order })
+        setTimeout(() => {
         data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
           .then(function (uploadThumbFile) {
             console.log('thumb uploaded', uploadThumbFile)
@@ -287,7 +288,18 @@ Page({
             that.setData({ order })
           }).catch(function (exp) {
             console.log('upload error', exp)
+            var care = order.cares[index]
+            var image = care.careImages[imageIndex]
+            image.image_id = uploadedFile.id
+            image.thumb = uploadedFile.thumbUrl
+            image.status = 'success'
+            image.message = ''
+            image.image = uploadedFile
+            order = that.buildImages(order, index)
+            care.moddingBaseInfo = true
+            that.setData({ order })
           })
+        }, 1000)
       })
   },
   afterReadPick(e) {

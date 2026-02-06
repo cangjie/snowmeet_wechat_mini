@@ -333,6 +333,28 @@ Component({
           }
         }
         that.formatRentalPackage(rental)
+        switch(rental.pick_type){
+          case '立即租赁':
+            var startDate = new Date()
+            rental.startDateStr = util.formatDate(startDate)
+            rental.startTimeStr = util.formatTimeStr(startDate)
+            break
+          case '先租后取':
+            rental.start_date = new Date()
+            rental.startDateStr = util.formatDate(rental.start_date)
+            rental.startTimeStr = '——'
+            break
+          case '延时租赁' :
+            var startDate = new Date(rental.start_date)
+            rental.startDateStr = util.formatDate(startDate)
+            rental.startTimeStr = '00:00:00'
+            break
+          default:
+            
+            rental.startDateStr = '——'
+            rental.startTimeStr = '——'
+            break
+        }
       }
       if (rentalWellformed){
         //rental.textColor = importantWellformedTextColor
@@ -577,7 +599,6 @@ Component({
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
-      //Event('SyncRentData', that.data.rentals)
       that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
     setAtOnce(e) {
@@ -588,7 +609,6 @@ Component({
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
-      //that.triggerEvent('SyncRentData', that.data.rentals)
       that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
     updateGuaranty(e){
@@ -642,7 +662,6 @@ Component({
         }
       }
       that.renderData(rentals)
-      //that.triggerEvent('SyncRentData', rentals)
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     },
     setStartDate(e) {
@@ -657,8 +676,6 @@ Component({
       rental.endDate = e.detail.value
       util.createRentalDetail(rental, date, date)
       that.renderData(rentals)
-      //that.setData({ rentals })
-      //that.triggerEvent('SyncRentData', rentals)
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     },
     setItemName(e) {
@@ -667,7 +684,6 @@ Component({
       var item = that.getItemByIndex(id)
       item.name = e.detail.value
       that.renderData(that.data.rentals)
-      //that.triggerEvent('SyncRentData', that.data.rentals)
       that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
     selectCategory(e) {
@@ -746,7 +762,6 @@ Component({
         }
       }
       that.renderData(that.data.rentals)
-      //that.triggerEvent('SyncRentData', that.data.rentals)
       that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: true })
       that.cancelBackdrop()
       that.setData({ unSavedRental: null })
@@ -891,16 +906,18 @@ Component({
       var that = this
       var rentals = that.data.rentals
       var rental = rentals[id]
-      for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
-        rental.rentItems[i].pick_type = pickType
-      }
       if (pickType == '立即租赁' || pickType == '先租后取'){
+        for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
+          rental.rentItems[i].pick_type = pickType
+        }
         rental.pick_type = pickType
         that.renderData(rentals)
+        that.setData({rentals, showCalendar: false})
         that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
       }
-      else{
-        
+      else if (pickType == '延时租赁'){
+        var calendarId = id
+        that.setData({showCalendar: true, calendarId})
       }
     },
     resetPickType(e){
@@ -951,6 +968,23 @@ Component({
       that.setData({rentals})
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
 
+    },
+    onConfirmCalendar(e){
+      console.log('select date', e)
+      var that = this
+      var id = parseInt(that.data.calendarId)
+      var rentals = that.data.rentals
+      var rental = rentals[id]
+      rental.pick_type = '延时租赁'
+      for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
+        rental.rentItems[i].pick_type = '延时租赁'
+      }
+      var resDate = new Date(e.detail)
+      var resDateStr = util.formatDate(resDate)
+      rental.start_date = resDateStr
+      that.renderData(rentals)
+      that.setData({rentals, showCalendar: false})
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     }
   },
   
