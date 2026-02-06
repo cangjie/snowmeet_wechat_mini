@@ -284,33 +284,26 @@ Component({
         if (!rental.package_id && !rental.category_id && rental.rentItems && rental.rentItems.length > 0){
           rental.category_id = rental.rentItems[0].category_id
         }
-        if (isNaN(rental.depositDiscount)) {
-          rental.realDeposit = rental.deposit
+        try{
+          rental.realGuaranty = isNaN(rental.realGuaranty)? '' : parseFloat(rental.realGuaranty).toFixed(2)
+          if (rental.pricePresets.length > 0){
+            rental.pricePresets[0].price = isNaN(rental.pricePresets[0].price)? '' 
+              : parseFloat(rental.pricePresets[0].price).toFixed(2)
+          }
+          
         }
-        else {
-          rental.realDeposit = rental.deposit - rental.depositDiscount
+        catch{
+
         }
-        if (!isNaN(rental.realDeposit)) {
-          rental.realDepositStr = util.showAmount(rental.realDeposit)
-        }
-        else {
-          rental.realDepositStr = ''
-        }
-        /*
-        if (rental.package_id) {
-          rental.backgroundColor = packageCommonBackgroud
-          rental.textColor = packageCommonTextColor
-        }
-        else {
-          rental.backgroundColor = productCommonBackgroud
-        }
-        */
-        if (!isNaN(rental.realDeposit)) {
-          totalGuarantyAmount += rental.realDeposit
-        }
+        rental.mixedPickType = false
         for (var j = 0; j < rental.rentItems.length; j++) {
           totalItemNum++
           var item = rental.rentItems[j]
+          if (j > 0){
+            if (item.pick_type != rental.rentItems[j - 1].pick_type){
+              rental.mixedPickType = true
+            }
+          }
           var rentItemWellformed = false
           item.itemIndex = itemIndex
           itemIndex++
@@ -389,6 +382,7 @@ Component({
         item.memo = ''
         var rentals = that.data.rentals
         that.renderData(rentals)
+        that.setData({rentals})
         that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
       }
       else {
@@ -875,8 +869,89 @@ Component({
       preset.price = amount
       that.renderData(rentals)
       return rentals
+    },
+    setRentalPickType(e){
+      var that = this
+      var idArr = e.currentTarget.id.split('_')
+      var id = parseInt(idArr[0])
+      var pickType = null
+      switch(parseInt(idArr[1])){
+        case 0:
+          pickType = '立即租赁'
+          break
+        case 1:
+          pickType = '先租后取'
+          break
+        case 2:
+          pickType = '延时租赁'
+          break
+        default:
+          break
+      }
+      var that = this
+      var rentals = that.data.rentals
+      var rental = rentals[id]
+      for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
+        rental.rentItems[i].pick_type = pickType
+      }
+      if (pickType == '立即租赁' || pickType == '先租后取'){
+        rental.pick_type = pickType
+        that.renderData(rentals)
+        that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+      }
+      else{
+        
+      }
+    },
+    resetPickType(e){
+      var that = this
+      var id = parseInt(e.currentTarget.id)
+      var rentals = that.data.rentals
+      var rental = rentals[id]
+      rental.pick_type = null
+      for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
+        rental.rentItems[i].pick_type = null
+      }
+      that.renderData(rentals)
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+    },
+    resetRentItemPickType(e){
+      var that = this
+      var idArr = e.currentTarget.id.split('_')
+      var rentalIndex = parseInt(idArr[0])
+      var itemIndex = parseInt(idArr[1])
+      var rentals = that.data.rentals
+      var item = rentals[rentalIndex].rentItems[itemIndex]
+      item.pick_type = null
+      that.renderData(rentals)
+      that.setData({rentals})
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+    },
+    setRentItemPickType(e){
+      var that = this
+      var idArr = e.currentTarget.id.split('_')
+      var rentalIndex = parseInt(idArr[0])
+      var itemIndex = parseInt(idArr[1])
+      var pickType = null
+      switch(parseInt(idArr[2])){
+        case 0:
+          pickType = '立即租赁'
+          break
+        case 1:
+          pickType = '先租后取'
+          break
+        default:
+          break
+      }
+      var rentals = that.data.rentals
+      var rental = rentals[rentalIndex]
+      var item = rental.rentItems[itemIndex]
+      item.pick_type = pickType
+      that.renderData(rentals)
+      that.setData({rentals})
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+
     }
-    
   },
   
 })
