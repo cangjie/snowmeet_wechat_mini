@@ -61,7 +61,7 @@
             <view class="view-row" style="height: 60rpx; justify-content: center;margin-top: 20rpx;">
 
               <van-button wx:if="{{rental.mixedPickType == true}}" size="small" type="danger" style="margin-right: 20rpx;"   >混合发放</van-button>
-              <van-button wx:else size="small" type="danger" style="margin-right: 20rpx;" plain  >混合发放</van-button>
+              
               <block wx:if="{{rental.pick_type == null}}" >
                 <van-button size="small" type="warning" plain style="margin-right: 20rpx;" 
                 bind:click="setRentalPickType" id="{{index}}_0" >立即租赁</van-button>
@@ -92,9 +92,15 @@
                       <view class="right-column view-row" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
                         <input class="input" style="width:200rpx" />
                         <van-icon name="scan" size="19px" disabled="{{item.noNeed}}" />
-                        <van-button style="margin-left:30rpx" size="mini" type="info" plain>无编码</van-button>
-                        <van-button wx:if="{{rental.rentItems.length > 1}}" style="margin-left:30rpx" size="mini"
-                          type="danger" plain>不需要</van-button>
+                        <van-button id="{{index}}_{{itemIndex}}" wx:if="{{item.noCode == true}}" style="margin-left:30rpx" size="mini" type="info" bind:click="setNoCode"  >无编码</van-button>
+                        <van-button  id="{{index}}_{{itemIndex}}" wx:else style="margin-left:30rpx" size="mini" type="info" plain bind:click="setNoCode" >无编码</van-button>
+                        <block wx:if="{{rental.rentItems.length > 1}}"  >
+                          <van-button id="{{index}}_{{itemIndex}}" wx:if="{{item.noNeed == true}}" style="margin-left:30rpx" size="mini"
+                          type="danger" bind:click="setNoNeed" >不需要</van-button>
+                          <van-button id="{{index}}_{{itemIndex}}" wx:else style="margin-left:30rpx" size="mini"
+                          type="danger" plain bind:click="setNoNeed" >不需要</van-button>
+                        </block>
+                        
                       </view>
                     </view>
                     <view class="view-row">

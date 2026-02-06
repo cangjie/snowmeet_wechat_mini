@@ -582,20 +582,24 @@ Component({
     },
     setNoCode(e) {
       var that = this
-      var id = parseInt(e.currentTarget.id)
-      var item = that.getItemByIndex(id)
-      item.noCode = e.detail.value.length == 0 ? false : true
-      that.setData({ rentals: that.data.rentals })
+      var idArr = e.currentTarget.id.split('_')
+      var rentals = that.data.rentals
+      var rental = rentals[parseInt(idArr[0])]
+      var item = rental.rentItems[parseInt(idArr[1])]
+      item.noCode = item.noCode == true? false: true
       console.log('get item', item)
       that.renderData(that.data.rentals)
+      that.setData({rentals})
       //that.triggerEvent('SyncRentData', that.data.rentals)
       that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
     setNoNeed(e) {
       var that = this
-      var id = parseInt(e.currentTarget.id)
-      var item = that.getItemByIndex(id)
-      item.noNeed = e.detail.value.length == 0 ? false : true
+      var idArr = e.currentTarget.id.split('_')
+      var rentals = that.data.rentals
+      var rental = rentals[parseInt(idArr[0])]
+      var item = rental.rentItems[parseInt(idArr[1])]
+      item.noNeed = item.noNeed == true ? false: true
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)
