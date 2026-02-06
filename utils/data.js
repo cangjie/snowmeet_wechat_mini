@@ -461,7 +461,7 @@ const uploadFilePromise = function (mainId, filePath, purpose, type, sessionKey)
       },
       fail: (res) => {
         console.log('upload failed', res)
-        reject(JSON.parse(res))
+        resolve(JSON.parse(res))
       }
     })
   })
