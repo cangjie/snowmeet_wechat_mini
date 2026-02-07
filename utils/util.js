@@ -216,39 +216,56 @@ const checkRentalsWellForm = function (rentals) {
   var well = true
   for (var i = 0; i < rentals.length; i++) {
     var rental = rentals[i]
-
+    var rentalWell = true
     if (rental.noGuaranty != true && !rental.guaranty) {
       well = false
+      rentalWell = false
       break
     }
     if (rental.rentItems.length <= 0) {
       well = false
+      rentalWell = false
       break
     }
+    if (rental.pick_type == null){
+      well = false
+      rentalWell = false
+    } 
     for (var j = 0; j < rental.rentItems.length; j++) {
+      var itemWell = true
       var item = rental.rentItems[j]
+      if (item.pick_type == null){
+        well = false
+        itemWell = false
+      }
       if (item.noNeed) {
+        item.wellFormed = itemWell
         continue
       }
       if (!item.category) {
         well = false
+        itemWell = false
         break
       }
       if (item.noNeed != true) {
         if (item.noCode == true) {
           if (!item.name || item.name == '') {
             well = false
+            itemWell = false
             break
           }
         }
         else {
           if (!item.code || item.code == '' || !item.name || item.name == '') {
             well = false
+            itemWell = false
             break
           }
         }
       }
+      item.wellFormed = itemWell
     }
+    rental.wellFormed = rentalWell
   }
   return well
 }

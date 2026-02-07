@@ -70,6 +70,7 @@ page{
   --title-width-sub: 120rpx;
   --standart-font-size: 30rpx;
   --total-width:710rpx;
-  --total-width-sub: 650rpx
+  --total-width-sub: 650rpx;
+  --rental-title-backgroud-color: #C0C0C0;
   font-size: var(--standart-font-size);
 }

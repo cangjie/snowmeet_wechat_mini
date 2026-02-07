@@ -2,7 +2,7 @@
   <fui-swipeaction-group>
     <van-collapse value="{{rentalActiveIndex}}" bind:change="onRentalCollapseChange">
       <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp" bind:click="del" id="{{index}}">
-        <view class="view-row">
+        <view class="view-row" style="background-color: var(--rental-title-backgroud-color);margin-top: 0rpx;" >
           <view class="left-column" style="width: var(--title-width);">
             【{{rental.package_id?'套餐':'单品'}}】
           </view>
@@ -22,7 +22,7 @@
           </view>
         </view>
         <van-collapse-item name="{{index}}">
-          <view slot="title" class="view-row">
+          <view slot="title" class="view-row" style="background-color: var(--rental-title-backgroud-color); margin-top: 0rpx;" >
             <view class="left-column" style="width: var(--title-width);">【押金】</view>
             <view class="right-column view-row" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
               <input class="input" style="text-align: center;width:140rpx" type="digit"
@@ -34,8 +34,8 @@
                 placeholder="{{rental.pricePresets[0].price}}" id="{{index}}"  bindinput="setPrice" bindblur="updatePrice" />
             </view>
           </view>
-          <view>
-            <view class="view-row">
+          <view style="background-color: var(--rental-title-backgroud-color);">
+            <view class="view-row" style="margin-top: 0rpx;" >
               <view class="left-column" style="width: var(--title-width);">【起租日期】</view>
               <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
                 {{rental.startDateStr}}
@@ -58,7 +58,7 @@
               <van-button plain size="small" type="info" id="{{index}}" bind:click="showPriceList" style="margin-left: 20rpx"
                       disabled="{{rental.rentItems[0].category_id == null}}"> 查 看 价 目 表 </van-button>
             </view>
-            <view class="view-row" style="height: 60rpx; justify-content: center;margin-top: 20rpx;">
+            <view class="view-row" style="height: 60rpx; justify-content: center;margin-top: 20rpx;margin-bottom: 20rpx;">
 
               <van-button wx:if="{{rental.mixedPickType == true}}" size="small" type="danger" style="margin-right: 20rpx;"   >混合发放</van-button>
               
@@ -74,10 +74,9 @@
                 <van-button size="small" type="warning"   >{{rental.pick_type}}</van-button>
                 <van-button size="small" type="primary" style="margin-left: 20rpx;" bind:click="resetPickType" id="{{index}}" > 重 选 </van-button>
               </block>
-              
             </view>
             <van-collapse id="{{index}}" value="{{rentalActiveIndex}}" bind:change="onItemCollapseChange">
-              <view style="padding-left: calc((var(--total-width) - var(--total-width-sub))/2); padding-right:calc((var(--total-width) - var(--total-width-sub))/2)">
+              <view style="padding-left: calc((var(--total-width) - var(--total-width-sub))/2); padding-right:calc((var(--total-width) - var(--total-width-sub))/2);padding-bottom: 20rpx;background-color: var(--rental-title-backgroud-color);">
                 <van-collapse-item wx:for="{{rental.rentItems}}" wx:for-index="itemIndex"
                   name="{{index}}_{{itemIndex}}">
                   <view slot="title" class="view-row">
@@ -87,7 +86,7 @@
                     </view>
                   </view>
                   <view>
-                    <view class="view-row">
+                    <view class="view-row" style="margin-top: 0rpx;">
                       <view class="left-column" style="width:var(--title-width-sub)">【编码】</view>
                       <view class="right-column view-row" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
                         <input class="input" style="width:200rpx" 
@@ -141,7 +140,7 @@
               </view>
             </van-collapse>
           </view>
-
+          <!--view style="height: 20rpx;background-color: var(--rental-title-backgroud-color);margin-top: 0rpx;" >aaa</view-->
         </van-collapse-item>
         <view style="height:50rpx"></view>
       </fui-swipe-action>
