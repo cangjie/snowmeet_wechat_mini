@@ -393,9 +393,26 @@ Component({
     },
     confirmProduct(e) {
       var that = this
-      if (that.data.currentItemIndex) {
-        var product = e.detail
-        var item = that.getItemByIndex(parseInt(that.data.currentItemIndex))
+      var product = e.detail
+      var rentals = that.data.rentals
+      var item 
+      if (that.data.currentItemId){
+        var idArr = that.data.currentItemId.split('_')
+        var rental = rentals[parseInt(idArr[0])]
+        item = rental.rentItems[parseInt(idArr[1])]
+        item.name = product.name
+        item.category_id = product.category_id
+        item.categoryName = product.category.name
+        item.code = product.barcode
+        item.rent_product_id = product.id
+        item.memo = ''
+        var rentals = that.data.rentals
+        that.renderData(rentals)
+        that.setData({rentals})
+        that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
+      }
+      else if (that.data.currentItemIndex) {
+        item = that.getItemByIndex(parseInt(that.data.currentItemIndex))
         item.name = product.name
         item.category_id = product.category_id
         item.categoryName = product.category.name
@@ -989,6 +1006,20 @@ Component({
       that.renderData(rentals)
       that.setData({rentals, showCalendar: false})
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+    },
+    searchCodePop(e){
+      console.log('open search code')
+      var that = this
+      var idArr = e.currentTarget.id.split('_')
+      var rentals = that.data.rentals
+      var rental = rentals[parseInt(idArr[0])]
+      var item = rental.rentItems[parseInt(idArr[1])]
+      if (item.noCode == true){
+        return
+      }
+
+      var category = item.category
+      that.setData({ showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: category.id, currentItemId: e.currentTarget.id })
     }
   },
   

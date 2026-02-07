@@ -90,7 +90,7 @@
                     <view class="view-row">
                       <view class="left-column" style="width:var(--title-width-sub)">【编码】</view>
                       <view class="right-column view-row" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
-                        <input class="input" style="width:200rpx" />
+                        <input class="input" style="width:200rpx" disabled="{{item.noCode != false || item.noNeed == true}}" bindtap="searchCodePop" id="{{index}}_{{itemIndex}}" />
                         <van-icon name="scan" size="19px" disabled="{{item.noNeed}}" />
                         <van-button id="{{index}}_{{itemIndex}}" wx:if="{{item.noCode == true}}" style="margin-left:30rpx" size="mini" type="info" bind:click="setNoCode"  >无编码</van-button>
                         <van-button  id="{{index}}_{{itemIndex}}" wx:else style="margin-left:30rpx" size="mini" type="info" plain bind:click="setNoCode" >无编码</van-button>
@@ -106,13 +106,16 @@
                     <view class="view-row">
                       <view class="left-column" style="width:var(--title-width-sub)">【名称】</view>
                       <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
-                        <input class="input" style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.5);" />
+                        <input class="input" 
+                        style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.5);" 
+                        disabled="{{item.noCode == false || item.noNeed == true }}"  />
                       </view>
                     </view>
                     <view class="view-row">
                       <view class="left-column" style="width:var(--title-width-sub)">【备注】</view>
                       <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
-                        <input class="input" style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.8);" />
+                        <input class="input" disabled="{{item.noNeed == true}}"
+                        style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.8);" />
                       </view>
                     </view>
                     <view class="view-row" style="margin-top: 20rpx;justify-content: center;">
