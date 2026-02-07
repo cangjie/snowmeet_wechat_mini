@@ -2,7 +2,7 @@
   <fui-swipeaction-group>
     <van-collapse value="{{rentalActiveIndex}}" bind:change="onRentalCollapseChange">
       <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp" bind:click="del" id="{{index}}">
-        <view class="view-row" style="background-color: var(--rental-title-backgroud-color);margin-top: 0rpx;" >
+        <view class="view-row" style="background-color: var(--rental-title-backgroud-color);margin-top: 0rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})" >
           <view class="left-column" style="width: var(--title-width);">
             【{{rental.package_id?'套餐':'单品'}}】
           </view>
@@ -22,19 +22,22 @@
           </view>
         </view>
         <van-collapse-item name="{{index}}">
-          <view slot="title" class="view-row" style="background-color: var(--rental-title-backgroud-color); margin-top: 0rpx;" >
+          <view slot="title" class="view-row" style="background-color: var(--rental-title-backgroud-color); margin-top: 0rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})" >
             <view class="left-column" style="width: var(--title-width);">【押金】</view>
             <view class="right-column view-row" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
-              <input class="input" style="text-align: center;width:140rpx" type="digit"
-                placeholder="{{rental.realGuaranty}}" id="{{index}}" bindinput="setGuaranty" bindblur="updateGuaranty"  />{{rental.guaranty_discount>0?'减':''}}
+              <input class="input" style="text-align: center;width:140rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})" 
+                type="digit"
+                placeholder="{{rental.realGuaranty}}" id="{{index}}" bindinput="setGuaranty" bindblur="updateGuaranty"   />{{rental.guaranty_discount>0?'减':''}}
             </view>
             <view class="left-column" style="width: var(--title-width);">【租金】</view>
             <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
-              <input class="input" style="text-align: center; width: 100rpx;" type="digit"
-                placeholder="{{rental.pricePresets[0].price}}" id="{{index}}"  bindinput="setPrice" bindblur="updatePrice" />
+              <input class="input" 
+                style="text-align: center; width: 100rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})" 
+                type="digit" placeholder="{{rental.pricePresets[0].price}}" id="{{index}}"  
+                bindinput="setPrice" bindblur="updatePrice" />
             </view>
           </view>
-          <view style="background-color: var(--rental-title-backgroud-color);">
+          <view style="background-color: var(--rental-title-backgroud-color);color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})">
             <view class="view-row" style="margin-top: 0rpx;" >
               <view class="left-column" style="width: var(--title-width);">【起租日期】</view>
               <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))" >
@@ -45,10 +48,10 @@
                 {{rental.startTimeStr}}
               </view>
             </view>
-            <view class="view-row">
+            <view class="view-row" style="color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})">
               <view class="left-column" style="width: var(--title-width);">【备注】</view>
               <view class="right-column">
-                <input class="input" style="width:500rpx" id="{{index}}" bindinput="setRentalMemo" />
+                <input class="input" style="width:500rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})" id="{{index}}" bindinput="setRentalMemo" />
               </view>
             </view>
             <view class="view-row" style="height: 60rpx; justify-content: center;margin-top: 20rpx;">
@@ -79,13 +82,13 @@
               <view style="padding-left: calc((var(--total-width) - var(--total-width-sub))/2); padding-right:calc((var(--total-width) - var(--total-width-sub))/2);padding-bottom: 20rpx;background-color: var(--rental-title-backgroud-color);">
                 <van-collapse-item wx:for="{{rental.rentItems}}" wx:for-index="itemIndex"
                   name="{{index}}_{{itemIndex}}">
-                  <view slot="title" class="view-row">
+                  <view slot="title" class="view-row" style="background-color: var({{item.wellFormed? '--rent-item-well-background-color': '--rent-item-unwell-background-color'}});"  >
                     <view class="left-column" style="width:var(--title-width-sub)">【品类】</view>
                     <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))">
                       {{item.category.name}}
                     </view>
                   </view>
-                  <view>
+                  <view style="color: #000000;background-color: var({{item.wellFormed? '--rent-item-well-background-color': '--rent-item-unwell-background-color'}});" >
                     <view class="view-row" style="margin-top: 0rpx;">
                       <view class="left-column" style="width:var(--title-width-sub)">【编码】</view>
                       <view class="right-column view-row" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
