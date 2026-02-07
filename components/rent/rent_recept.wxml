@@ -90,7 +90,9 @@
                     <view class="view-row">
                       <view class="left-column" style="width:var(--title-width-sub)">【编码】</view>
                       <view class="right-column view-row" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
-                        <input class="input" style="width:200rpx" disabled="{{item.noCode != false || item.noNeed == true}}" bindtap="searchCodePop" id="{{index}}_{{itemIndex}}" />
+                        <input class="input" style="width:200rpx" 
+                        disabled="{{item.noCode != false || item.noNeed == true}}" 
+                        bindtap="searchCodePop" id="{{index}}_{{itemIndex}}" value="{{item.code}}" />
                         <van-icon name="scan" size="19px" disabled="{{item.noNeed}}" />
                         <van-button id="{{index}}_{{itemIndex}}" wx:if="{{item.noCode == true}}" style="margin-left:30rpx" size="mini" type="info" bind:click="setNoCode"  >无编码</van-button>
                         <van-button  id="{{index}}_{{itemIndex}}" wx:else style="margin-left:30rpx" size="mini" type="info" plain bind:click="setNoCode" >无编码</van-button>
@@ -107,14 +109,16 @@
                       <view class="left-column" style="width:var(--title-width-sub)">【名称】</view>
                       <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
                         <input class="input" 
-                        style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.5);" 
-                        disabled="{{item.noCode == false || item.noNeed == true }}"  />
+                        style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.8);" 
+                        bindinput="setItemValue" id="{{index}}_{{itemIndex}}_name"
+                        disabled="{{item.noCode == false || item.noNeed == true }}" value="{{item.name}}"  />
                       </view>
                     </view>
                     <view class="view-row">
                       <view class="left-column" style="width:var(--title-width-sub)">【备注】</view>
                       <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
-                        <input class="input" disabled="{{item.noNeed == true}}"
+                        <input class="input" disabled="{{item.noNeed == true}}" 
+                        bindinput="setItemValue" id="{{index}}_{{itemIndex}}_memo"
                         style="width: calc((var(--total-width-sub) - var(--title-width-sub)) * 0.8);" />
                       </view>
                     </view>
@@ -223,7 +227,7 @@
                     【名称】</view>
                   <view class="right-column right-column1" wx:if="{{rental.rentItems[0].noCode}}">
                     <input class="input"
-                      style="width: 450rpx;color:{{rental.rentItems[0].textColor?rental.rentItems[0].textColor:defaultTextColor}}"
+                      style="width: 450rpx;"
                       value="{{rental.rentItems[0].name == null? '' : rental.rentItems[0].name}}"
                       id="{{rental.rentItems[0].itemIndex}}" bindblur="setItemName" />
                   </view>

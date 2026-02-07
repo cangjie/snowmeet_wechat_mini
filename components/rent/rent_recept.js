@@ -1020,6 +1020,31 @@ Component({
 
       var category = item.category
       that.setData({ showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: category.id, currentItemId: e.currentTarget.id })
+    },
+    setItemValue(e){
+      var that = this
+      var idArr = e.currentTarget.id.split('_')
+      var rentals = that.data.rentals
+      var rental = rentals[parseInt(idArr[0])]
+      var item = rental.rentItems[parseInt(idArr[1])]
+      var fieldName = idArr[2]
+      var value = e.detail.value
+      switch(fieldName){
+        case 'name':
+          item.name = value
+          break
+        case 'code':
+          item.code = value
+          break
+        case 'memo':
+          item.memo = value
+          break
+        default:
+          break
+      }
+      that.renderData(rentals)
+      that.setData({rentals})
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     }
   },
   

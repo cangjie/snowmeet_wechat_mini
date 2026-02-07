@@ -373,5 +373,6 @@ Page({
   setRentOrderPaying() {
     var that = this
     that.setData({ rentOrderPaying: true })
-  }
+  },
+  
 })
