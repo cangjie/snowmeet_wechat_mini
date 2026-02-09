@@ -156,7 +156,7 @@
 
   <view style="height:300rpx"></view>
 
-  <fui-swipeaction-group>
+  <!--fui-swipeaction-group>
     <van-collapse value="{{ activeNames }}" bind:change="onChange">
       <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp" bind:click="del" id="{{index}}">
         <view style="height: 50rpx;"></view>
@@ -451,7 +451,7 @@
         </block>
       </fui-swipe-action>
     </van-collapse>
-  </fui-swipeaction-group>
+  </fui-swipeaction-group-->
   <van-divider contentPosition="center" textColor="#1989fa">新增租赁商品</van-divider>
   <view class="view-row" style="justify-content: center;">
     <van-button type="primary" bind:click="addNewPackage">添加套餐</van-button>

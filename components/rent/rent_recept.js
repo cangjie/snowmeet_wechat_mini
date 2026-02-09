@@ -876,6 +876,12 @@ Component({
       if (pickType == '立即租赁' || pickType == '先租后取'){
         for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
           rental.rentItems[i].pick_type = pickType
+          if (pickType == '立即租赁'){
+            rental.rentItems[i].atOnce = true
+          }
+          else {
+            rental.rentItems[i].atOnce = false
+          }
         }
         rental.pick_type = pickType
         that.renderData(rentals)
@@ -895,6 +901,7 @@ Component({
       rental.pick_type = null
       for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
         rental.rentItems[i].pick_type = null
+        rental.rentItems[i].atOnce = false
       }
       that.renderData(rentals)
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
@@ -931,6 +938,12 @@ Component({
       var rental = rentals[rentalIndex]
       var item = rental.rentItems[itemIndex]
       item.pick_type = pickType
+      if (pickType == '立即租赁' || pickType == '先租后取'){
+        item.atOnce = true
+      }
+      else {
+        item.atOnce = false
+      }
       that.renderData(rentals)
       that.setData({rentals})
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
@@ -945,6 +958,7 @@ Component({
       rental.pick_type = '延时租赁'
       for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
         rental.rentItems[i].pick_type = '延时租赁'
+        rental.rentItems[i].atOnce = true
       }
       var resDate = new Date(e.detail)
       var resDateStr = util.formatDate(resDate)
