@@ -568,16 +568,6 @@ Component({
       that.renderData(that.data.rentals)
       that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
     },
-    setAtOnce(e) {
-      var that = this
-      var id = parseInt(e.currentTarget.id)
-      var item = that.getItemByIndex(id)
-      item.atOnce = e.detail.value.length == 0 ? false : true
-      that.setData({ rentals: that.data.rentals })
-      console.log('get item', item)
-      that.renderData(that.data.rentals)
-      that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
-    },
     updateGuaranty(e){
       var value = e.detail.value
       if (isNaN(value) || value == null || value == '') {
@@ -607,29 +597,6 @@ Component({
       rental.guaranty_discount = rental.guaranty - amount
       that.renderData(rentals)
       return rentals
-    },
-    setNoGuaranty(e) {
-      var that = this
-      var id = parseInt(e.currentTarget.id)
-      var rentals = that.data.rentals
-      var rental = rentals[id]
-      rental.noGuaranty = e.detail.value.length == 0 ? false : true
-      if (rental.noGuaranty) {
-        rental.realDeposit = 0
-        rental.realDepositStr = util.showAmount(rental.realDeposit)
-      }
-      else {
-        if (isNaN(rental.depositDiscount)) {
-          rental.realDeposit = rental.deposit
-          rental.realDepositStr = util.showAmount(rental.realDeposit)
-        }
-        else {
-          rental.realDeposit = rental.deposit - rental.depositDiscount
-          rental.realDepositStr = util.showAmount(rental.realDeposit)
-        }
-      }
-      that.renderData(rentals)
-      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     },
     setStartDate(e) {
       var that = this

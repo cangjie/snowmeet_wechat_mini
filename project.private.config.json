@@ -153,6 +153,8 @@
   },
   "libVersion": "3.5.8",
   "setting": {
-    "urlCheck": false
+    "urlCheck": false,
+    "bigPackageSizeSupport": true,
+    "preloadBackgroundData": true
   }
 }
