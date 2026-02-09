@@ -1,3 +1,0 @@
-@import '/app.wxss';
-@import '/common.wxss';
-@import '/weui.wxss';
