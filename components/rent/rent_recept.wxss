@@ -65,6 +65,9 @@ picker{
 .view-row{
   margin-top: 10rpx;
 }
+.input{
+  border-color: #808080;
+}
 page{
   --title-width: 180rpx;
   --title-width-sub: 120rpx;
@@ -76,7 +79,5 @@ page{
   --rental-title-well-color: #000000;
   --rent-item-unwell-background-color: #FFFFFF;
   --rent-item-well-background-color: #AAFFAA;
-
-
   font-size: var(--standart-font-size);
 }

@@ -1,1 +1,4 @@
 @import '/app.wxss';
+.footer{
+  font-size: 11pt;
+}

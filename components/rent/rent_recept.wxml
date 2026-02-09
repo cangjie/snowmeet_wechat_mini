@@ -85,7 +85,14 @@
                   <view slot="title" class="view-row" style="background-color: var({{item.wellFormed? '--rent-item-well-background-color': '--rent-item-unwell-background-color'}});"  >
                     <view class="left-column" style="width:var(--title-width-sub)">【品类】</view>
                     <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))">
-                      {{item.category.name}}
+                      <block wx:if="{{item.canChooseCategory==true}}" >
+                        <picker id="{{index}}_{{itemIndex}}" range="{{item.chooseCategories}}" range-key="name" class="input" bindchange="selectRentItemCategory" >
+                          <picker-view>{{item.category.name}}</picker-view>
+                        </picker>
+                      </block>
+                      <block wx:else >
+                        {{item.category.name}}
+                      </block>
                     </view>
                   </view>
                   <view style="color: #000000;background-color: var({{item.wellFormed? '--rent-item-well-background-color': '--rent-item-unwell-background-color'}});" >
