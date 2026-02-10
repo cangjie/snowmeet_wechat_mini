@@ -23,7 +23,8 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({ id: options.id })
+    that.data.id = options.id
+    //that.setData({ id: options.id })
   },
 
   /**
@@ -733,6 +734,18 @@ Page({
   },
   call(e) {
     var cell = e.currentTarget.id
+    wx.setClipboardData({
+      data:cell,
+      success:(res)=>{
+        wx.showToast({
+          icon: 'success',
+          message: '手机号码已复制'
+        })
+      },
+      fail:(res)=>{
+        console.log('复制失败', res)
+      }
+    })
     wx.makePhoneCall({
       phoneNumber: cell,
     })
