@@ -15,7 +15,8 @@ Page({
     refunding: false,
     payWithDeposit: false,
     showSelectPackagePopUp: false,
-    showAppendPay: false
+    showAppendPay: false,
+    showBalance: false
   },
 
   /**
@@ -1273,6 +1274,33 @@ Page({
         })
         that.getData()
       }
+      
     })
+  },
+  expandOrderInfo(e){
+    var that = this
+    /*
+    var orderInfoExpand = that.data.orderInfoExpand
+    if (orderInfoExpand == '1'){
+      orderInfoExpand='0'
+    }
+    else{
+      orderInfoExpand='1'
+    }
+    */
+    that.setData({orderInfoExpand: e.detail})
+  },
+  expandPayInfo(e){
+    var that = this
+    that.setData({payInfoExpand: e.detail, showBalance: true})
+  },
+  expandRental(e){
+    var that = this
+    that.setData({expandRentals: e.detail})
+    console.log('expand rental', e)
+  },
+  expandRentalDetail(e){
+    var that = this
+    that.setData({acrtiveRentalDetails: e.detail})
   }
 })
