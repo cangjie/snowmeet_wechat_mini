@@ -1322,8 +1322,43 @@ Page({
     var idArr = e.currentTarget.id.split('_')
     var order = that.data.order
     var rental = order.rentals[parseInt(idArr[0])]
-    var item = rental.rentItems[parseInf(idArr[1])]
+    var item = rental.rentItems[parseInt(idArr[1])]
     item.moddingMemo = true
+    that.setData({order})
+  },
+  setItemMemo(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    item.memo = e.detail.value
+  },
+  modItemMemoConfirm(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    data.updateRentItemPromise(item, '租赁订单详细页修改备注', app.globalData.sessionKey)
+      .then(function (newItem) {
+        wx.showToast({
+          title: '修改成功',
+          icon: 'success'
+        })
+        item.moddingMemo = false
+        order.rentals[parseInt(idArr[0])].rentItems[parseInt(idArr[1])] = newItem
+        that.renderOrder(order)
+        that.setData({ order })
+      })
+  },
+  modItemMemoCancel(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    item.moddingMemo = false
     that.setData({order})
   }
 })

@@ -240,7 +240,7 @@
                 <view class="view-row">
                   <view class="left-column">【备注】</view>
                   <view class="right-column-whole" style="width: 500rpx;">
-                    <input value="{{item.memo}}" class="input" />
+                    <input value="{{item.memo}}" class="input" id="{{rentalIndex}}_{{itemIndex}}"  bindinput="setItemMemo" />
                   </view>
                 </view>
                 <view class="view-row" style="justify-content: center;margin-top:20rpx">

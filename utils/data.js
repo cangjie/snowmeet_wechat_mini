@@ -569,6 +569,10 @@ const refundPromise = function (orderId, refunds, sessionKey) {
     })
   })
 }
+const updateRentItemPromise = function(rentItem, scene, sessionKey){
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentItemByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return util.performWebRequest(updateUrl, rentItem)
+}
 const updateRentalPromise = function (rental, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -762,5 +766,6 @@ module.exports = {
   queryRentItemChangeCompatibleCategory,
   getOrderBalancePromise,
   updateRentPackageCategoryPromise,
-  getPackageListByShopPromise
+  getPackageListByShopPromise,
+  updateRentItemPromise
 }
