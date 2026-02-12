@@ -194,8 +194,8 @@ Page({
         var detail = rental.details[j]
         var rDate = new Date(detail.rental_date)
         detail.rental_dateDateStr = util.formatDate(rDate)
-        detail.amount = detail.amount.toFixed(2)
-        detail.discountTotalAmount = detail.discountTotalAmount.toFixed(2)
+        detail.amount = parseFloat(detail.amount).toFixed(2)
+        detail.discountTotalAmount = parseFloat(detail.discountTotalAmount).toFixed(2)
         detail.summary = (parseFloat(detail.amount) - parseFloat(detail.discountTotalAmount)).toFixed(2)
         detail.summaryStr = util.showAmount(parseFloat(detail.summary))
       }
@@ -652,6 +652,7 @@ Page({
         })
         newRental.moddingMemo = false
         order.rentals[index] = newRental
+        that.renderOrder(order)
         that.setData({ order })
       })
   },
@@ -1315,5 +1316,14 @@ Page({
   expandRentalItem(e){
     var that = this
     that.setData({acrtiveRentalItems: e.detail})
+  },
+  modItemMemo(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInf(idArr[1])]
+    item.moddingMemo = true
+    that.setData({order})
   }
 })
