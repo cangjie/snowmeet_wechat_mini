@@ -118,14 +118,36 @@
           <view class="right-column">{{rental.totalSummaryStr}}</view>
         </view>
         <view class="divider"></view>
-        <view class="view-row" style="padding-left: var(--sub-padding); padding-right: var(--sub-padding);">
-          <van-collapse  value="{{acrtiveRentalDetails}}" bind:change="expandRentalDetail">
-            <van-collapse-item  name="{{rentalIndex}}">
-              <view slot="title" class="view-row sub-view-row">
+        <view class="view-row"
+          style="padding-left: var(--sub-padding); padding-right: var(--sub-padding);height:auto; align-items: center; ">
+          <van-collapse value="{{acrtiveRentalDetails}}" bind:change="expandRentalDetail">
+            <van-collapse-item name="{{rentalIndex}}">
+              <view slot="title" class="view-row sub-view-row info-title" style="font-size: 10pt;">
                 租金明细
               </view>
               <view>
-              aaa
+                <view class="view-row sub-view-row" style="background-color: var(--rental-detail-background-color);">
+                  <view class="rent-detail-cell">日期</view>
+                  <view class="rent-detail-cell">租金</view>
+                  <view class="rent-detail-cell">减免</view>
+                  <view class="rent-detail-cell">小计</view>
+                  <view class="rent-detail-cell" style="width: 75rpx;">免除</view>
+                </view>
+                <checkbox-group>
+                  <view class="view-row sub-view-row" wx:for="{{rental.details}}" style="background-color: var(--rental-detail-background-color);">
+                    <view class="rent-detail-cell">{{item.rental_dateDateStr}}</view>
+                    <view class="rent-detail-cell">
+                      <input class="input" style="width: 100rpx;" placeholder="{{item.amount}}" />
+                    </view>
+                    <view class="rent-detail-cell">
+                      <input class="input" style="width: 100rpx;" placeholder="{{item.discountTotalAmount}}" />
+                    </view>
+                    <view class="rent-detail-cell">{{item.summaryStr}}</view>
+                    <view class="rent-detail-cell" style="width: 75rpx;">
+                      <checkbox></checkbox>
+                    </view>
+                  </view>
+                </checkbox-group>
               </view>
             </van-collapse-item>
           </van-collapse>

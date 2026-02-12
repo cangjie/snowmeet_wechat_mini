@@ -190,7 +190,15 @@ Page({
           rentItem.changeTimeStr = util.formatTimeStr(new Date(rentItem.changeDate))
         }
       }
-
+      for(var j = 0; rental.details && j < rental.details.length; j++){
+        var detail = rental.details[j]
+        var rDate = new Date(detail.rental_date)
+        detail.rental_dateDateStr = util.formatDate(rDate)
+        detail.amount = detail.amount.toFixed(2)
+        detail.discountTotalAmount = detail.discountTotalAmount.toFixed(2)
+        detail.summary = (parseFloat(detail.amount) - parseFloat(detail.discountTotalAmount)).toFixed(2)
+        detail.summaryStr = util.showAmount(parseFloat(detail.summary))
+      }
     }
     for (var i = 0; order.appendingRentals && i < order.appendingRentals.length; i++) {
       var rental = order.appendingRentals[i]
@@ -228,6 +236,7 @@ Page({
       }
       payment.remainAmountStr = util.showAmount(payment.remainAmount)
     }
+    
     if (order.appendingRentals && order.appendingRentals.length > 0) {
       that.checkAppendingRentalValid()
     }

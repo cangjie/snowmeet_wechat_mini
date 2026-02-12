@@ -110,7 +110,14 @@
   margin:0rpx
 }
 .sub-view-row {
-  width: calc(var(--total-width) - 2 * var(--sub-padding));
+  width: calc(var(--total-width) - 4 * var(--sub-padding));
+}
+.rent-detail-cell{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc((var(--total-width) - 2 * var(--sub-padding))/5);
+  text-align: center;
 }
 view{
   --total-width: 700rpx;
@@ -123,4 +130,5 @@ view{
   --collapse-item-content-padding: 0rpx;
   --collapse-item-content-text-color: #000000;
   --line-height: 40rpx;
+  --rental-detail-background-color: #ebedf0;
 }
