@@ -1311,5 +1311,9 @@ Page({
   expandRentalDetail(e){
     var that = this
     that.setData({acrtiveRentalDetails: e.detail})
+  },
+  expandRentalItem(e){
+    var that = this
+    that.setData({acrtiveRentalItems: e.detail})
   }
 })
