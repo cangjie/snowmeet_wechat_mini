@@ -1290,15 +1290,6 @@ Page({
   },
   expandOrderInfo(e){
     var that = this
-    /*
-    var orderInfoExpand = that.data.orderInfoExpand
-    if (orderInfoExpand == '1'){
-      orderInfoExpand='0'
-    }
-    else{
-      orderInfoExpand='1'
-    }
-    */
     that.setData({orderInfoExpand: e.detail})
   },
   expandPayInfo(e){
@@ -1475,5 +1466,29 @@ Page({
       that.renderOrder(order)
       that.setData({order})
     })
+  },
+  expandRentalItemChange(e){
+    var that = this
+    var showChanges = e.detail
+    if (showChanges.length == 0){
+      that.setData({showChanges})
+      return
+    }
+    var idArr = e.detail[0].split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var rentItem = rental.rentItems[parseInt(idArr[1])]
+    
+    var getChangesUrl = app.globalData.requestPrefix + 'Rent/GetRentItemChanges/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getChangesUrl, null).then(function (changesLog){
+      for(var i = 0; changesLog && i < changesLog.length; i++){
+        var changeDate = new Date(changesLog[i].changeDate)
+        changesLog[i].changeDateStr = util.formatDate(changeDate)
+        changesLog[i].changeTimeStr = util.formatTimeStr(changeDate)
+      }
+      rentItem.changesLog = changesLog
+      that.setData({order, showChanges})
+    })
+    
   }
 })

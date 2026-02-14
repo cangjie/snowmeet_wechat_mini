@@ -148,42 +148,44 @@
                   <view class="rent-detail-cell">小计</view>
                   <view class="rent-detail-cell" style="width: 75rpx;">免除</view>
                 </view>
-                <checkbox-group id="{{rentalIndex}}" bindchange="checkRentalValid" >
+                <checkbox-group id="{{rentalIndex}}" bindchange="checkRentalValid">
                   <view class="view-row sub-view-row" wx:for="{{rental.details}}"
                     style="background-color: var(--rental-detail-background-color);">
                     <view class="rent-detail-cell">
-                      <block wx:if="{{item.id != 0}}" >
+                      <block wx:if="{{item.id != 0}}">
                         {{item.rental_dateDateStr}}
                       </block>
                       <input class="input" style="font-size:8pt" wx:else bindtap="showCalendar"
-                      value="{{item.rental_dateDateStr}}" id="{{rentalIndex}}_{{index}}" />
+                        value="{{item.rental_dateDateStr}}" id="{{rentalIndex}}_{{index}}" />
                     </view>
                     <view class="rent-detail-cell">
-                      <input class="input" style="width: 100rpx;" value="{{item.amount}}" bindinput="setRentalDetailAmount"
-                      disabled="{{rental.moddingRentalDetail != true}}" id="{{rentalIndex}}_{{index}}" />
+                      <input class="input" style="width: 100rpx;" value="{{item.amount}}"
+                        bindinput="setRentalDetailAmount" disabled="{{rental.moddingRentalDetail != true}}"
+                        id="{{rentalIndex}}_{{index}}" />
                     </view>
                     <view class="rent-detail-cell">
-                      <input class="input" style="width: 100rpx;" 
-                      value="{{item.othersDiscountAmount}}" id="{{rentalIndex}}_{{index}}"
-                      bindinput="setRentalDetailDiscount" 
-                      disabled="{{rental.moddingRentalDetail != true}}" />
+                      <input class="input" style="width: 100rpx;" value="{{item.othersDiscountAmount}}"
+                        id="{{rentalIndex}}_{{index}}" bindinput="setRentalDetailDiscount"
+                        disabled="{{rental.moddingRentalDetail != true}}" />
                     </view>
                     <view class="rent-detail-cell">{{item.summaryStr}}</view>
                     <view class="rent-detail-cell" style="width: 75rpx;">
-                      <checkbox value="{{index}}" checked="{{item.valid == 0}}" 
-                      disabled="{{rental.moddingRentalDetail != true}}" ></checkbox>
+                      <checkbox value="{{index}}" checked="{{item.valid == 0}}"
+                        disabled="{{rental.moddingRentalDetail != true}}"></checkbox>
                     </view>
                   </view>
                 </checkbox-group>
-                <view class="view-row sub-view-row" style="margin-top: 20rpx; justify-content: center;" >
-                  <block wx:if="{{rental.moddingRentalDetail}}" >
-                    <van-button type="primary" size="small" id="{{rentalIndex}}" 
-                    bind:click="addModRenrtalDetail" > 添 加 </van-button>
-                    <van-button type="warning" size="small" style="margin-left: 50rpx;" bind:click="cancelModRenrtalDetail" id="{{rentalIndex}}" > 取 消 </van-button>
-                    <van-button type="danger" size="small" style="margin-left: 50rpx;" 
-                    bind:click="confirmModRenrtalDetail" id="{{rentalIndex}}" > 确 认 </van-button>
+                <view class="view-row sub-view-row" style="margin-top: 20rpx; justify-content: center;">
+                  <block wx:if="{{rental.moddingRentalDetail}}">
+                    <van-button type="primary" size="small" id="{{rentalIndex}}" bind:click="addModRenrtalDetail"> 添 加
+                    </van-button>
+                    <van-button type="warning" size="small" style="margin-left: 50rpx;"
+                      bind:click="cancelModRenrtalDetail" id="{{rentalIndex}}"> 取 消 </van-button>
+                    <van-button type="danger" size="small" style="margin-left: 50rpx;"
+                      bind:click="confirmModRenrtalDetail" id="{{rentalIndex}}"> 确 认 </van-button>
                   </block>
-                  <van-button wx:else id="{{rentalIndex}}" type="primary" size="small" bind:click="setModRentalDetail" > 修 改 </van-button>
+                  <van-button wx:else id="{{rentalIndex}}" type="primary" size="small" bind:click="setModRentalDetail">
+                    修 改 </van-button>
                 </view>
               </view>
             </van-collapse-item>
@@ -198,9 +200,9 @@
               <view slot="title" class="view-row sub-view-row info-title" style="font-size: 10pt;">
                 租赁物明细
               </view>
-              <view wx:for="{{rental.rentItems}}" wx:for-index="itemIndex">
+              <view wx:for="{{rental.rentItems}}" wx:for-index="itemIndex" wx:if="{{item.next_id == null}}">
                 <view class="view-row sub-view-row">
-                  <view class="left-column">【名称】</view>
+                  <view class="left-column">【名称】{{item.prev_id!=null?'(更)':''}}</view>
                   <view class="right-column-whole">{{item.name}}</view>
                 </view>
                 <view class="view-row sub-view-row">
@@ -256,13 +258,44 @@
                         style="min-width: 50rpx;margin-left: 10rpx;">确认</van-button>
                     </block>
                   </view>
-
                 </view>
                 <view class="view-row">
                   <view class="left-column">【备注】</view>
                   <view class="right-column-whole" style="width: 500rpx;">
-                    <input value="{{item.memo}}" class="input" id="{{rentalIndex}}_{{itemIndex}}"  bindinput="setItemMemo" />
+                    <input value="{{item.memo}}" class="input" id="{{rentalIndex}}_{{itemIndex}}"
+                      bindinput="setItemMemo" />
                   </view>
+                </view>
+                <view wx:if="{{item.prev_id != null}}" class="sub-view-row"
+                  style="padding-left: 20rpx;padding-right:20rpx;">
+
+                  <van-collapse value="{{showChanges}}" bind:change="expandRentalItemChange">
+                    <van-collapse-item name="{{rentalIndex}}_{{itemIndex}}">
+                      <view class="sub-view-row" slot="title"
+                        style="width:calc(var(--total-width) - 8 * var(--sub-padding))">
+                        更换记录
+                      </view>
+                      <view class="sub-view-row" 
+                        style="width:calc(var(--total-width) - 8 * var(--sub-padding))" >
+                        <block wx:for="{{item.changesLog}}" wx:for-item="change" >
+                        <view class="view-row sub-view-row"  >
+                          <view class="left-column" >【编码】</view>
+                          <view class="right-column-whole" >{{change.code}}</view>
+                        </view>
+                        <view class="view-row sub-view-row"  >
+                          <view class="left-column" >【名称】</view>
+                          <view class="right-column-whole" >{{change.name}}</view>
+                        </view>
+                        <view class="view-row sub-view-row"  >
+                          <view class="left-column" >【更换日期】</view>
+                          <view class="right-column" >{{change.changeDateStr}}</view>
+                          <view class="left-column" >【更换时间】</view>
+                          <view class="right-column" >{{change.changeTimeStr}}</view>
+                        </view>
+                      </block>
+                      </view>
+                    </van-collapse-item>
+                  </van-collapse>
                 </view>
                 <view class="view-row" style="justify-content: center;margin-top:20rpx">
                   <van-button type="primary" size="small" wx:if="{{item.status == '已发放' }}" id="{{item.id}}"
@@ -271,18 +304,18 @@
                     bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}">设置未归还</van-button>
                   <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick"
                     wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
-                  <van-button type="warning" size="small" style="margin-left: 50rpx;" id="{{item.id}}"
+                  <van-button type="warning" size="small" style="margin-left: 20rpx;" id="{{item.id}}"
                     wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
-                  <van-button type="danger" size="small" style="margin-left: 50rpx;" id="{{item.id}}"
+                  <van-button type="danger" size="small" style="margin-left: 20rpx;" id="{{item.id}}"
                     wx:if="{{item.status=='已发放'}}" bind:click="gotoChange">更换</van-button>
                   <block wx:if="{{item.moddingMemo==true}}">
-                    <van-button type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"  
-                    bind:click="modItemMemoCancel" style="margin-left:20rpx">取消</van-button>
-                    <van-button type="danger" size="small" id="{{rentalIndex}}_{{itemIndex}}" 
-                    bind:click="modItemMemoConfirm"   style="margin-left: 20rpx;">确认</van-button>
+                    <van-button type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"
+                      bind:click="modItemMemoCancel" style="margin-left:20rpx">取消</van-button>
+                    <van-button type="danger" size="small" id="{{rentalIndex}}_{{itemIndex}}"
+                      bind:click="modItemMemoConfirm" style="margin-left: 20rpx;">确认</van-button>
                   </block>
-                  <van-button wx:else type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}" 
-                  bind:click="modItemMemo" style="margin-left:20rpx">修改备注</van-button>
+                  <van-button wx:else type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"
+                    bind:click="modItemMemo" style="margin-left:20rpx">修改备注</van-button>
 
                 </view>
 
@@ -938,6 +971,5 @@
       </block>
     </scroll-view>
   </fui-backdrop>
-  <van-calendar  show="{{ showCalendar }}" 
-  bind:close="onCloseCalendar" bind:confirm="onConfirmCalendar" />
+  <van-calendar show="{{ showCalendar }}" bind:close="onCloseCalendar" bind:confirm="onConfirmCalendar" />
 </view>
