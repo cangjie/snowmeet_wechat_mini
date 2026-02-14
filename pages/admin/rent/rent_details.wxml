@@ -148,22 +148,43 @@
                   <view class="rent-detail-cell">小计</view>
                   <view class="rent-detail-cell" style="width: 75rpx;">免除</view>
                 </view>
-                <checkbox-group>
+                <checkbox-group id="{{rentalIndex}}" bindchange="checkRentalValid" >
                   <view class="view-row sub-view-row" wx:for="{{rental.details}}"
                     style="background-color: var(--rental-detail-background-color);">
-                    <view class="rent-detail-cell">{{item.rental_dateDateStr}}</view>
                     <view class="rent-detail-cell">
-                      <input class="input" style="width: 100rpx;" placeholder="{{item.amount}}" />
+                      <block wx:if="{{item.id != 0}}" >
+                        {{item.rental_dateDateStr}}
+                      </block>
+                      <input class="input" style="font-size:8pt" wx:else bindtap="showCalendar"
+                      value="{{item.rental_dateDateStr}}" id="{{rentalIndex}}_{{index}}" />
                     </view>
                     <view class="rent-detail-cell">
-                      <input class="input" style="width: 100rpx;" placeholder="{{item.discountTotalAmount}}" />
+                      <input class="input" style="width: 100rpx;" value="{{item.amount}}" bindinput="setRentalDetailAmount"
+                      disabled="{{rental.moddingRentalDetail != true}}" id="{{rentalIndex}}_{{index}}" />
+                    </view>
+                    <view class="rent-detail-cell">
+                      <input class="input" style="width: 100rpx;" 
+                      value="{{item.othersDiscountAmount}}" id="{{rentalIndex}}_{{index}}"
+                      bindinput="setRentalDetailDiscount" 
+                      disabled="{{rental.moddingRentalDetail != true}}" />
                     </view>
                     <view class="rent-detail-cell">{{item.summaryStr}}</view>
                     <view class="rent-detail-cell" style="width: 75rpx;">
-                      <checkbox></checkbox>
+                      <checkbox value="{{index}}" checked="{{item.valid == 0}}" 
+                      disabled="{{rental.moddingRentalDetail != true}}" ></checkbox>
                     </view>
                   </view>
                 </checkbox-group>
+                <view class="view-row sub-view-row" style="margin-top: 20rpx; justify-content: center;" >
+                  <block wx:if="{{rental.moddingRentalDetail}}" >
+                    <van-button type="primary" size="small" id="{{rentalIndex}}" 
+                    bind:click="addModRenrtalDetail" > 添 加 </van-button>
+                    <van-button type="warning" size="small" style="margin-left: 50rpx;" bind:click="cancelModRenrtalDetail" id="{{rentalIndex}}" > 取 消 </van-button>
+                    <van-button type="danger" size="small" style="margin-left: 50rpx;" 
+                    bind:click="confirmModRenrtalDetail" id="{{rentalIndex}}" > 确 认 </van-button>
+                  </block>
+                  <van-button wx:else id="{{rentalIndex}}" type="primary" size="small" bind:click="setModRentalDetail" > 修 改 </van-button>
+                </view>
               </view>
             </van-collapse-item>
           </van-collapse>
@@ -917,5 +938,6 @@
       </block>
     </scroll-view>
   </fui-backdrop>
-
+  <van-calendar  show="{{ showCalendar }}" 
+  bind:close="onCloseCalendar" bind:confirm="onConfirmCalendar" />
 </view>

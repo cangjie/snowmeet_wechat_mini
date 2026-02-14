@@ -195,8 +195,9 @@ Page({
         var rDate = new Date(detail.rental_date)
         detail.rental_dateDateStr = util.formatDate(rDate)
         detail.amount = parseFloat(detail.amount).toFixed(2)
-        detail.discountTotalAmount = parseFloat(detail.discountTotalAmount).toFixed(2)
-        detail.summary = (parseFloat(detail.amount) - parseFloat(detail.discountTotalAmount)).toFixed(2)
+        detail.othersDiscountAmount = parseFloat(detail.othersDiscountAmount).toFixed(2)
+        
+        detail.summary = (parseFloat(detail.amount) - parseFloat(detail.othersDiscountAmount)).toFixed(2)
         detail.summaryStr = util.showAmount(parseFloat(detail.summary))
       }
     }
@@ -1360,5 +1361,119 @@ Page({
     var item = rental.rentItems[parseInt(idArr[1])]
     item.moddingMemo = false
     that.setData({order})
+  },
+  setModRentalDetail(e){
+    var that = this
+    var order = that.data.order
+    var id = parseInt(e.currentTarget.id)
+    var rental = order.rentals[id]
+    rental.moddingRentalDetail = true
+    that.setData({order})
+  },
+  cancelModRenrtalDetail(e){
+    var that = this
+    var order = that.data.order
+    var id = parseInt(e.currentTarget.id)
+    var rental = order.rentals[id]
+    data.getRentalPromise(rental.id, app.globalData.sessionKey).then(function(newRental){
+      order.rentals[id] = newRental
+      that.renderOrder(order)
+      that.setData({order})
+    })
+  },
+  addModRenrtalDetail(e){
+    var that = this
+    var order = that.data.order
+    var id = parseInt(e.currentTarget.id)
+    var rental = order.rentals[id]
+    var details = rental.details
+    var detail = {
+      id: 0,
+      rental_date: util.formatDate(new Date()),
+      charge_type: '租金',
+      amount: parseFloat(details[details.length - 1].amount).toFixed(2),
+      othersDiscountAmount: '0.00',
+      summaryStr: util.showAmount(parseFloat(details[details.length - 1].amount)),
+      valid: 1
+    }
+    details.push(detail)
+    that.renderOrder(order)
+    that.setData({order})
+  },
+  showCalendar(e){
+    var that = this
+    var calenderId = e.currentTarget.id
+    that.setData({showCalendar: true, calenderId})
+  },
+  onCloseCalendar(e){
+    var that = this
+    that.setData({showCalendar: false, calenderId: null})
+  },
+  onConfirmCalendar(e){
+    var resDate = new Date(e.detail)
+    var that = this
+    var idArr = that.data.calenderId.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var detail = rental.details[parseInt(idArr[1])]
+    detail.rental_dateStr = util.formatDate(resDate)
+    detail.rental_date = util.formatDate(resDate)
+    that.renderOrder(order)
+    that.setData({order, calenderId: null, showCalendar: false})
+  },
+  checkRentalValid(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var rental = order.rentals[id]
+    for(var i = 0; i < rental.details.length; i++){
+      rental.details[i].valid = 1
+    }
+    for(var i = 0; i < e.detail.value.length; i++){
+      rental.details[parseInt(e.detail.value[i])].valid = 0
+    }
+    that.renderOrder(order)
+    that.setData({order})
+  },
+  setRentalDetailAmount(e){
+    var value = e.detail.value
+    if (!value || isNaN(value)){
+      return
+    }
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var detail = rental.details[parseInt(idArr[1])]
+    detail.amount = parseFloat(value).toFixed(2)
+    that.renderOrder(order)
+    that.setData({order})
+  },
+  setRentalDetailDiscount(e){
+    var value = e.detail.value
+    if (!value || isNaN(value)){
+      return
+    }
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var detail = rental.details[parseInt(idArr[1])]
+    detail.othersDiscountAmount = parseFloat(value).toFixed(2)
+    detail._filledDiscountAmount = parseFloat(detail.othersDiscountAmount)
+    that.renderOrder(order)
+    that.setData({order})
+  },
+  confirmModRenrtalDetail(e){
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var order = that.data.order
+    var rental = order.rentals[id]
+    var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalDetailsByStaff/' + rental.id.toString() + '?scene=' + encodeURIComponent('租赁详情页修改租金') + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, rental.details).then(function(newRental){
+      order.rentals[id] = newRental
+      that.renderOrder(order)
+      that.setData({order})
+    })
   }
 })
