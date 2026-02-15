@@ -1730,7 +1730,7 @@ Page({
     var order = that.data.order
     order.appendingRentals = rentals
     that.setData({
-      totalItemNum, totalGuarantyAmount, order,
+      totalItemNum, totalGuarantyAmount, order, allValid: well,
       totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount)
     })
     return rentals
@@ -1836,7 +1836,7 @@ Page({
     var that = this
     var idArr = e.currentTarget.id.split('_')
     var order = that.data.order
-    var rentals = that.data.appendingRentals
+    var rentals = order.appendingRentals
     var rental = rentals[parseInt(idArr[0])]
     var item = rental.rentItems[parseInt(idArr[1])]
     var fieldName = idArr[2]
