@@ -263,7 +263,7 @@
                   <view class="left-column">【备注】</view>
                   <view class="right-column-whole" style="width: 500rpx;">
                     <input value="{{item.memo}}" class="input" id="{{rentalIndex}}_{{itemIndex}}"
-                      bindinput="setItemMemo" />
+                      bindinput="setItemMemo" disabled="{{item.moddingMemo!=true}}" />
                   </view>
                 </view>
                 <view wx:if="{{item.prev_id != null}}" class="sub-view-row"
@@ -316,9 +316,7 @@
                   </block>
                   <van-button wx:else type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"
                     bind:click="modItemMemo" style="margin-left:20rpx">修改备注</van-button>
-
                 </view>
-
               </view>
             </van-collapse-item>
           </van-collapse>
@@ -326,6 +324,30 @@
       </view>
     </van-collapse-item>
   </van-collapse>
+  <block wx:if="{{order.appendingRentals && order.appendingRentals.length > 0}}" >
+    <view class="info-title">待添加的租赁商品</view>
+    <block wx:for="{{order.appendingRentals}}" wx:for-item="appendingRental" wx:for-index="rentalIndex" >
+      <view  class="view-row">
+        <view class="left-column">{{appendingRental.package_id == null? '【套餐】':'【单品】'}}</view>
+        <view class="right-column-whole">{{appendingRental.name}}</view>
+      </view>
+      <van-collapse>
+        <van-collapse-item>
+          <view slot="title" class="view-row sub-view-row" >
+            <view class="left-column">【押金】</view>
+            <view class="right-column" >
+              <input class="input" style="width: 100rpx" />
+            </view>
+            <view class="left-column">【租金】</view>
+            <view class="right-column" >
+              <input class="input" style="width: 100rpx" />
+            </view>
+          </view>
+        </van-collapse-item>
+      </van-collapse>
+    </block>
+  </block>
+  
 </view>
 
 
@@ -340,7 +362,7 @@
 
 
 
-<view style="height:100rpx"></view>
+<view style="height:1000rpx"></view>
 <view>
   <mp-cells title="订单信息">
     <mp-cell ext-class="my-cell">
@@ -712,11 +734,7 @@
               </view>
               <view></view>
             </view>
-            <!--view class="view-row" >
-              <view class="left-column" >【品类】</view>
-              <view class="right-column"  ></view>
-             
-            </view-->
+           
             <view style="background-color: white;height: 5rpx;"></view>
           </view>
         </view>
