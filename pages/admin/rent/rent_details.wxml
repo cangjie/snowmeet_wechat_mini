@@ -421,9 +421,9 @@
                         id="{{rentalIndex}}_{{itemIndex}}" value="{{item.code}}" />
                       <van-icon name="scan" size="19px" disabled="{{item.noNeed}}" />
                       <van-button id="{{rentalIndex}}_{{itemIndex}}" wx:if="{{item.noCode == true}}"
-                        style="margin-left:30rpx" size="mini" type="info" bind:click="setNoCode">无编码</van-button>
+                        style="margin-left:30rpx" size="mini" type="info" bind:click="setNoCodeNew">无编码</van-button>
                       <van-button id="{{rentalIndex}}_{{itemIndex}}" wx:else style="margin-left:30rpx" size="mini"
-                        type="info" plain bind:click="setNoCode">无编码</van-button>
+                        type="info" plain bind:click="setNoCodeNew">无编码</van-button>
                       <block wx:if="{{appendingRental.rentItems.length > 1}}">
                         <van-button id="{{rentalIndex}}_{{itemIndex}}" wx:if="{{item.noNeed == true}}"
                           style="margin-left:30rpx" size="mini" type="danger" bind:click="setNoNeed">不需要</van-button>
@@ -1111,4 +1111,8 @@
     </scroll-view>
   </fui-backdrop>
   <van-calendar show="{{ showCalendar }}" bind:close="onCloseCalendar" bind:confirm="onConfirmCalendar" />
+  <van-popup show="{{ showPopUp }}">
+    <search-product-fuzzy wx:if="{{popUpContent == 'searchBarCodeFuzzy'}}" categoryId="{{searchCategoryId}}"
+    bindCancel="cancelPopUp" barCode="{{searchBarCode}}" bindConfirm="confirmProduct"></search-product-fuzzy>
+  </van-popup>
 </view>

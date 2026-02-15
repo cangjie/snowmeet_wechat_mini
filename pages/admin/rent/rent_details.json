@@ -8,7 +8,8 @@
     "category-selector": "/components/rent/category_selector",
     "rent_charge": "/components/rent/rent_charge",
     "payment": "/components/payment/payment",
-    "balance": "/components/payment/balance"
+    "balance": "/components/payment/balance",
+    "search-product-fuzzy": "/components/rent/search_product_fuzzy"
   },
   "navigationBarTitleText": "租赁订单明细"
 }
