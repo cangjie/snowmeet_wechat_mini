@@ -275,24 +275,23 @@
                         style="width:calc(var(--total-width) - 8 * var(--sub-padding))">
                         更换记录
                       </view>
-                      <view class="sub-view-row" 
-                        style="width:calc(var(--total-width) - 8 * var(--sub-padding))" >
-                        <block wx:for="{{item.changesLog}}" wx:for-item="change" >
-                        <view class="view-row sub-view-row"  >
-                          <view class="left-column" >【编码】</view>
-                          <view class="right-column-whole" >{{change.code}}</view>
-                        </view>
-                        <view class="view-row sub-view-row"  >
-                          <view class="left-column" >【名称】</view>
-                          <view class="right-column-whole" >{{change.name}}</view>
-                        </view>
-                        <view class="view-row sub-view-row"  >
-                          <view class="left-column" >【更换日期】</view>
-                          <view class="right-column" >{{change.changeDateStr}}</view>
-                          <view class="left-column" >【更换时间】</view>
-                          <view class="right-column" >{{change.changeTimeStr}}</view>
-                        </view>
-                      </block>
+                      <view class="sub-view-row" style="width:calc(var(--total-width) - 8 * var(--sub-padding))">
+                        <block wx:for="{{item.changesLog}}" wx:for-item="change">
+                          <view class="view-row sub-view-row">
+                            <view class="left-column">【编码】</view>
+                            <view class="right-column-whole">{{change.code}}</view>
+                          </view>
+                          <view class="view-row sub-view-row">
+                            <view class="left-column">【名称】</view>
+                            <view class="right-column-whole">{{change.name}}</view>
+                          </view>
+                          <view class="view-row sub-view-row">
+                            <view class="left-column">【更换日期】</view>
+                            <view class="right-column">{{change.changeDateStr}}</view>
+                            <view class="left-column">【更换时间】</view>
+                            <view class="right-column">{{change.changeTimeStr}}</view>
+                          </view>
+                        </block>
                       </view>
                     </van-collapse-item>
                   </van-collapse>
@@ -324,30 +323,75 @@
       </view>
     </van-collapse-item>
   </van-collapse>
-  <block wx:if="{{order.appendingRentals && order.appendingRentals.length > 0}}" >
+  <block wx:if="{{order.appendingRentals && order.appendingRentals.length > 0}}">
     <view class="info-title">待添加的租赁商品</view>
-    <block wx:for="{{order.appendingRentals}}" wx:for-item="appendingRental" wx:for-index="rentalIndex" >
-      <view  class="view-row">
-        <view class="left-column">{{appendingRental.package_id == null? '【套餐】':'【单品】'}}</view>
-        <view class="right-column-whole">{{appendingRental.name}}</view>
-      </view>
-      <van-collapse>
-        <van-collapse-item>
-          <view slot="title" class="view-row sub-view-row" >
+    <van-collapse value="{{appendingOpenIndex}}" bind:change="openAppending">
+      <block wx:for="{{order.appendingRentals}}" wx:for-item="appendingRental" wx:for-index="rentalIndex">
+        <view class="view-row">
+          <view class="left-column">{{appendingRental.package_id != null? '【套餐】':'【单品】'}}</view>
+          <view class="right-column-whole">{{appendingRental.name}}</view>
+        </view>
+        <van-collapse-item name="{{rentalIndex}}">
+          <view slot="title" class="view-row sub-view-row">
             <view class="left-column">【押金】</view>
-            <view class="right-column" >
-              <input class="input" style="width: 100rpx" />
+            <view class="right-column">
+              <input class="input" style="width: 100rpx;text-align: center;"
+                placeholder="{{appendingRental.realGuaranty}}" />
             </view>
             <view class="left-column">【租金】</view>
-            <view class="right-column" >
-              <input class="input" style="width: 100rpx" />
+            <view class="right-column">
+              <input class="input" style="width: 100rpx;text-align: center;"
+                placeholder="{{appendingRental.pricePresets[0].price}}" />
+            </view>
+          </view>
+          <view
+            style="background-color: var(--rental-title-backgroud-color);color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})">
+            <view class="view-row" style="margin-top: 0rpx;">
+              <view class="left-column" style="width: var(--title-width);">【起租日期】</view>
+              <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))">
+                {{rental.startDateStr}}
+              </view>
+              <view class="left-column" style="width: var(--title-width);">【起租时间】</view>
+              <view class="right-column" style="width:calc(var(--total-width) / 2 -  var(--title-width))">
+                {{rental.startTimeStr}}
+              </view>
+            </view>
+            <view class="view-row" style="color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})">
+              <view class="left-column" style="width: var(--title-width);">【备注】</view>
+              <view class="right-column">
+                <input class="input" style="width:500rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})" id="{{index}}" bindinput="setRentalMemo" />
+              </view>
+            </view>
+            <view class="view-row" style="height: 60rpx; justify-content: center;margin-top: 20rpx;">
+              <van-button plain size="small" type="primary" bind:click="showItem" id="{{index}}">
+                设置押金租金
+              </van-button>
+              <van-button plain size="small" type="info" id="{{index}}" bind:click="showPriceList" style="margin-left: 20rpx"
+                      disabled="{{rental.rentItems[0].category_id == null}}"> 查 看 价 目 表 </van-button>
+            </view>
+            <view class="view-row" style="height: 60rpx; justify-content: center;margin-top: 20rpx;margin-bottom: 20rpx;">
+
+              <van-button wx:if="{{rental.mixedPickType == true}}" size="small" type="danger" style="margin-right: 20rpx;"   >混合发放</van-button>
+              
+              <block wx:if="{{rental.pick_type == null}}" >
+                <van-button size="small" type="warning" plain style="margin-right: 20rpx;" 
+                bind:click="setRentalPickType" id="{{index}}_0" >立即租赁</van-button>
+                <van-button size="small" type="warning" plain style="margin-right: 20rpx;"
+                bind:click="setRentalPickType" id="{{index}}_1" >先租后取</van-button>
+                <van-button size="small" type="warning" plain style="margin-right: 0rpx;"
+                bind:click="setRentalPickType" id="{{index}}_2" >延时租赁</van-button>
+              </block>
+              <block wx:else >
+                <van-button size="small" type="warning"   >{{rental.pick_type}}</van-button>
+                <van-button size="small" type="primary" style="margin-left: 20rpx;" bind:click="resetPickType" id="{{index}}" > 重 选 </van-button>
+              </block>
             </view>
           </view>
         </van-collapse-item>
-      </van-collapse>
-    </block>
+      </block>
+    </van-collapse>
   </block>
-  
+
 </view>
 
 
@@ -734,7 +778,7 @@
               </view>
               <view></view>
             </view>
-           
+
             <view style="background-color: white;height: 5rpx;"></view>
           </view>
         </view>

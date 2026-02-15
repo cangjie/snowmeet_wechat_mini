@@ -1489,6 +1489,9 @@ Page({
       rentItem.changesLog = changesLog
       that.setData({order, showChanges})
     })
-    
+  },
+  openAppending(e){
+    var that = this
+    that.setData({appendingOpenIndex: e.detail})
   }
 })
