@@ -259,7 +259,9 @@ Page({
     images.push(image)
     var imageIndex = order.cares[index].careImages.length - 1
     order = that.buildImages(order, index)
-    //that.setData({ order })
+    order.cares[index].moddingBaseInfo = true
+    that.setData({ order })
+    setTimeout(() => {
     data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
       .then(function (uploadedFile) {
         console.log('file uploaded', uploadedFile)
@@ -272,6 +274,7 @@ Page({
         order = that.buildImages(order, index)
         care.moddingBaseInfo = true
         that.setData({ order })
+        setTimeout(() => {
         data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
           .then(function (uploadThumbFile) {
             console.log('thumb uploaded', uploadThumbFile)
@@ -287,8 +290,10 @@ Page({
             that.setData({ order })
           }).catch(function (exp) {
             console.log('upload error', exp)
-          })
-      })
+          })}, 1000)
+      }).catch(function (exp){
+        console.log('upload error', exp)
+      })}, 1000)
   },
   afterReadPick(e) {
     console.log('photo uploaded', e)

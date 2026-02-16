@@ -150,7 +150,7 @@
         </mp-cell>
         <mp-cell>
           <view class="view-row" style="justify-content: center;">
-            <van-button id="{{index}}" wx:if="{{!item.moddingBaseInfo}}" type="primary" size="small" bind:click="setModBaseInfo"> 修 改 </van-button>
+            <van-button id="{{index}}" wx:if="{{item.moddingBaseInfo==false}}" type="primary" size="small" bind:click="setModBaseInfo"> 修 改 </van-button>
             <block wx:else>
               <van-button id="{{index}}" type="warning" size="small" style="margin-right: 40rpx;" bind:click="setCancelModeBaseInfo"> 取 消 </van-button>
               <van-button id="{{index}}" type="danger" size="small" style="margin-left: 40rpx;" bind:click="setSaveBaseInfo"> 确 认 </van-button>
