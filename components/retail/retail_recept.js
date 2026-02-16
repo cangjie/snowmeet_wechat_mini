@@ -172,7 +172,19 @@ Component({
             that.setData({images})
           })
         })
-    }
+    },
+    delImage(e) {
+      console.log('del image', e)
+      var that = this
+      var index = e.detail.index
+      var images = that.data.images
+      var newImages = []
+      for (var i = 0; i < images.length; i++) {
+        if (i != index) {
+          newImages.push(images[i])
+        }
+      }
+      that.setData({ images: newImages })
+    },
   },
-  
 })
