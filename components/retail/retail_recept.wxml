@@ -73,5 +73,12 @@
     </view>
   </view>
   <van-divider></van-divider>
-  <view style="height: 100rpx;" ></view>
+  <view class="view-row" style="height:350rpx"  >
+    <view class="left-column" >【照片】</view>
+    <view class="right-column" >
+      <van-uploader file-list="{{images}}" bind:after-read="afterRead" capture="['album', 'camera']" bind:delete="delImage" max-count="5" />
+    </view>
+  </view>
+  <van-divider></van-divider>
+  <view style="height: 500rpx;" ></view>
 </view>

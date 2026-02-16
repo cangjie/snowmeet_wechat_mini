@@ -6,14 +6,18 @@
 }
 .left-column{
   text-align: left;
-  width: 240rpx;
+  width: 215rpx;
   height:40rpx;
   display: flex;
   align-items: center;
   margin-top: 0rpx;
 }
 .right-column{
-  width: 490rpx;
+  width: 530rpx;
   height:40rpx;
   margin-top: 0rpx;
+}
+image{
+  width: 140rpx;
+  height: 140rpx;
 }
