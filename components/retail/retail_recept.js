@@ -151,6 +151,7 @@ Component({
         order_id: 0,
         status: 'uploading',
         message: '上传中',
+        valid: true,
         url: uploadFile.tempFilePath,
         thumb: uploadFile.tempFilePath
       }

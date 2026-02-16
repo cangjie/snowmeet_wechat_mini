@@ -287,7 +287,7 @@ Page({
             image.image = uploadThumbFile
             order = that.buildImages(order, index)
             care.moddingBaseInfo = true
-            that.setData({ order })
+            setTimeout(() => {that.setData({ order })}, 1000)
           }).catch(function (exp) {
             console.log('upload error', exp)
           })}, 1000)

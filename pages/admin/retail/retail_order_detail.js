@@ -250,7 +250,10 @@ Page({
           //that.setData({images})
           //var order = that.data.order
           order.retailImages = images
-          that.setData({order})
+          console.log('upload image before', order)
+          setTimeout(()=>{that.setData({order})}, 1000)
+          
+          console.log('upload image after', order)
           //that.triggerEvent('SyncRetailOrder', order)
         })}, 1000)
       })
