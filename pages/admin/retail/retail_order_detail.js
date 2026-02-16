@@ -85,6 +85,21 @@ Page({
       }
       order.memberShip = memberShip
       order.totalAmountStr = util.showAmount(order.total_amount)
+      for(var i = 0; order.retailImages && i < order.retailImages.length; i++){
+        var retailImage = order.retailImages[i]
+        if (retailImage.image.thumbUrl.indexOf('http') == 0) {
+          retailImage.thumb = retailImage.image.thumbUrl
+        }
+        else {
+          retailImage.thumb = 'https://snowmeet.wanlonghuaxue.com' + retailImage.image.thumbUrl
+        }
+        if (retailImage.image.file_path_name.indexOf('http') == 0) {
+          retailImage.url = retailImage.image.file_path_name
+        }
+        else {
+          retailImage.url = 'https://snowmeet.wanlonghuaxue.com' + retailImage.image.file_path_name
+        }
+      }
       that.setData({ order })
     })
   },
@@ -189,6 +204,56 @@ Page({
       console.log('order update', order)
       that.cancelModOrderInfo(e)
     })
-  }
+  },
+  delImage(e){
+    var that = this
+    var order = that.data.order
+    var images = order.retailImages
+    var imageIndex = e.detail.index
+    var newImages = []
+    for(var i = 0; images && i < images.length; i++){
+      if (i != imageIndex){
+        newImages.push(images[i])
+      }
+    }
+    order.retailImages = newImages
+    that.setData({order})
+  },
+  afterRead(e) {
+    var that = this
+    var uploadFile = e.detail.file
+    var order = that.data.order
+    var images = order.retailImages
+    var image = {
+      id: 0,
+      image_id: 0,
+      order_id: order.id,
+      status: 'uploading',
+      message: '上传中',
+      url: uploadFile.tempFilePath,
+      thumb: uploadFile.tempFilePath
+    }
+    images.push(image)
+    that.setData({order})
+    data.uploadFilePromise(null, uploadFile.tempFilePath, '零售开单',
+      uploadFile.type, app.globalData.sessionKey).then(function (uploadedFile) {
+        image.image_id = uploadedFile.id
+        image.url = 'https://snowmeet.wanlonghuaxue.com' + uploadedFile.file_path_name
+        image.thumb = 'https://snowmeet.wanlonghuaxue.com' + uploadedFile.file_path_name
+        image.type = uploadedFile.file_type
+        that.setData({order})
+        setTimeout(() => {data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey).then(function (uploadThumbFile) {
+          //image.id = uploadThumbFile.id
+          image.thumb = 'https://snowmeet.wanlonghuaxue.com' + uploadThumbFile.thumbUrl
+          image.status = 'success'
+          image.message = ''
+          //that.setData({images})
+          //var order = that.data.order
+          order.retailImages = images
+          that.setData({order})
+          //that.triggerEvent('SyncRetailOrder', order)
+        })}, 1000)
+      })
+  },
 
 })

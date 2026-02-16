@@ -124,6 +124,12 @@
       </view>
     </mp-cell>
     <mp-cell>
+      <view class="view-row" >
+        <van-uploader file-list="{{order.retailImages}}" bind:after-read="afterRead" capture="['album', 'camera']" bind:delete="delImage"  bind:delete="delImage" show-upload="{{moddingOrderInfo == true}}" deletable="{{moddingOrderInfo == true}}" />
+      </view>
+      
+    </mp-cell>
+    <mp-cell>
       <view class="view-row" style="justify-content: center;">
         <block wx:if="{{moddingOrderInfo}}">
           <van-button type="warning" size="small" bind:click="cancelModOrderInfo" style="margin-right: 50rpx;"> 取 消 </van-button>

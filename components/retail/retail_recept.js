@@ -158,18 +158,20 @@ Component({
       that.setData({images})
       data.uploadFilePromise(null, uploadFile.tempFilePath, '零售开单',
         uploadFile.type, app.globalData.sessionKey).then(function (uploadedFile) {
-          image.id = uploadedFile.id
+          image.image_id = uploadedFile.id
           image.url = 'https://snowmeet.wanlonghuaxue.com' + uploadedFile.file_path_name
           image.thumb = 'https://snowmeet.wanlonghuaxue.com' + uploadedFile.file_path_name
           image.type = uploadedFile.file_type
           that.setData({images})
           data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey).then(function (uploadThumbFile) {
-            image.id = uploadThumbFile.id
+            //image.id = uploadThumbFile.id
             image.thumb = 'https://snowmeet.wanlonghuaxue.com' + uploadThumbFile.thumbUrl
             image.status = 'success'
             image.message = ''
-            //image.image = uploadThumbFile
             that.setData({images})
+            var order = that.data.order
+            order.retailImages = images
+            that.triggerEvent('SyncRetailOrder', order)
           })
         })
     },
