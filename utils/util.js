@@ -187,7 +187,7 @@ const createRentalDetail = function (rental, startDate, endDate) {
   }
   rental.totalAmount = totalAmount
   rental.totalAmountStr = showAmount(totalAmount)
-  if (details && details.length > 0){
+  if (details && details.length > 0 && (rental.pricePresets == null || rental.pricePresets.length == 0)){
     rental.pricePresets = details
   }
   

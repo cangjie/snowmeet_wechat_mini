@@ -164,6 +164,17 @@ Page({
       }
       for (var j = 0; j < rental.rentItems.length; j++) {
         var rentItem = rental.rentItems[j]
+        if (rentItem.status == '未发放'){
+          rentItem.fontColor = '--un-pick-font-color'
+          rental.fontColor = '--un-pick-font-color'
+        }
+        else if (rentItem.status == '已发放'){
+          rentItem.backColor = '--un-return-back-color'
+          rental.backColor = '--un-return-back-color'
+        }
+        if (rentItem.noNeed == true){
+          rentItem.backColor = '--no-need-back-color'
+        }
         rentItem.totalRepairationAmountStr = util.showAmount(rentItem.totalRepairationAmount)
         if (rentItem.pickDate == null) {
           rentItem.pickDateStr = '--'
@@ -213,7 +224,9 @@ Page({
         rental.realGuaranty = 0
         rental.guaranty_dicount = 0
         rental.realDepositStr = util.showAmount(rental.realGuaranty)
+        
       }
+      rental.realGuaranty = parseFloat(rental.realGuaranty).toFixed(2)
       rental.startDate = util.formatDate(new Date(rental.start_date))
       var totalRentalAmount = 0
       for (var j = 0; rental.pricePresets && j < rental.pricePresets.length; j++) {
@@ -321,7 +334,6 @@ Page({
               break
             }
           }
-
         }).catch(function (exp) {
 
         })

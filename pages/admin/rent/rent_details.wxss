@@ -58,10 +58,11 @@
   margin-left: 0rpx;
   margin-top:0rpx;
   margin-bottom: 0rpx;
-  background-color: #FFFFFF;
+  background-color: inherit;
   align-items:center;
   padding-top:5rpx;
   padding-bottom: 5rpx;
+  color:inherit;
 }
 .info-title{
   font-size: var(--info-title-font-size);
@@ -79,6 +80,7 @@
   width: var(--title-width);
   padding: 0rpx;
   height: var(--line-height);
+  background-color: inherit
 }
 .right-column{
   font-size: var(--title-font-size);
@@ -91,6 +93,7 @@
   background-color: #FFFFFF;
   padding: 0rpx;
   height: var(--line-height);
+  background-color: inherit
 }
 .right-column-whole{
   font-size: var(--title-font-size);
@@ -100,17 +103,18 @@
   margin-bottom: 0rpx;
   text-align: left;
   width: calc(var(--total-width) - var(--title-width));
-  background-color: #FFFFFF;
+  background-color: inherit
   padding: 0rpx;
   height: var(--line-height);
 }
 .divider{
   height: 1rpx;
-  background-color: #ebedf0;
-  margin:0rpx
+  background-color: inherit;
+  margin:0rpx;
 }
 .sub-view-row {
   width: calc(var(--total-width) - 4 * var(--sub-padding));
+  background-color: inherit;
 }
 .rent-detail-cell{
   display: flex;
@@ -118,6 +122,16 @@
   align-items: center;
   width: calc((var(--total-width) - 2 * var(--sub-padding))/5);
   text-align: center;
+  background-color: inherit;
+}
+.van-cell{
+  background-color: inherit !important;
+}
+.van-collapse-item__content{
+  background-color: inherit !important;
+}
+.custom-class{
+  background-color: inherit;
 }
 view{
   --total-width: 700rpx;
@@ -131,4 +145,9 @@ view{
   --collapse-item-content-text-color: #000000;
   --line-height: 40rpx;
   --rental-detail-background-color: #ebedf0;
+
+  --un-pick-font-color: #FF0000;
+  --un-return-back-color: #07d3f7;
+  --no-need-back-color:#a0a0a0;
+
 }
