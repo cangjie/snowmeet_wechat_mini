@@ -239,6 +239,7 @@ const checkRentalsWellForm = function (rentals) {
       if (item.pick_type == null){
         well = false
         itemWell = false
+        rentalWell = false
       }
       if (item.noNeed) {
         item.wellFormed = itemWell
@@ -247,6 +248,7 @@ const checkRentalsWellForm = function (rentals) {
       if (!item.category) {
         well = false
         itemWell = false
+        rentalWell = false
         break
       }
       if (item.noNeed != true) {
@@ -254,6 +256,7 @@ const checkRentalsWellForm = function (rentals) {
           if (!item.name || item.name == '') {
             well = false
             itemWell = false
+            rentalWell = false
             break
           }
         }
@@ -261,6 +264,7 @@ const checkRentalsWellForm = function (rentals) {
           if (!item.code || item.code == '' || !item.name || item.name == '') {
             well = false
             itemWell = false
+            rentalWell = false
             break
           }
         }

@@ -577,7 +577,7 @@ Component({
       var that = this
       var id = parseInt(e.currentTarget.id)
       var rentals = that.setGuarantyAmount(id, realGuarantyAmount)
-      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     },
     setGuaranty(e){
       var value = e.detail.value
@@ -680,6 +680,7 @@ Component({
       console.log('rental change', e)
       console.log('rental change ori', that.data.rentals)
       that.setData({ unSavedRental: e.detail })
+      
     },
     saveUpdatedRental() {
       var that = this
@@ -772,18 +773,26 @@ Component({
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
     },
     onRentalCollapseChange(event) {
-      this.setData({
+      var that = this
+      that.setData({
         rentalActiveIndex: event.detail,
       });
+      var rentals = that.data.rentals
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
     },
+    /*
     onChange(event) {
+      var that = this
       this.setData({
         activeNames: event.detail,
       });
     },
+    */
     onItemCollapseChange(e){
       var that = this
       that.setData({rentalActiveIndex: e.detail})
+      var rentals = that.data.rentals
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     },
     setPrice(e){
       var value = e.detail.value
@@ -805,7 +814,7 @@ Component({
       var that = this
       var id = parseInt(e.currentTarget.id)
       var rentals = that.setPriceAmount(id, price)
-      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
+      that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     },
     setPriceAmount(index, amount){
       var that = this
