@@ -1494,8 +1494,9 @@ Page({
     var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalDetailsByStaff/' + rental.id.toString() + '?scene=' + encodeURIComponent('租赁详情页修改租金') + '&sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(updateUrl, rental.details).then(function (newRental) {
       order.rentals[id] = newRental
-      that.renderOrder(order)
-      that.setData({ order })
+      that.getData()
+      //that.renderOrder(order)
+      //that.setData({ order })
     })
   },
   expandRentalItemChange(e) {
