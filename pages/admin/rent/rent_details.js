@@ -162,17 +162,25 @@ Page({
         rental.end_dateDateStr = util.formatDate(endDate)
         rental.end_dateTimeStr = util.formatTimeStr(endDate)
       }
+      if (rental.settled == 1) {
+        rental.backColor = '--returned-back-color'
+      }
       for (var j = 0; j < rental.rentItems.length; j++) {
         var rentItem = rental.rentItems[j]
-        if (rentItem.status == '未发放'){
-          rentItem.fontColor = '--un-pick-font-color'
-          rental.fontColor = '--un-pick-font-color'
+        if (rentItem.noNeed != true) {
+          if (rentItem.status == '未发放') {
+            rentItem.fontColor = '--un-pick-font-color'
+            rental.fontColor = '--un-pick-font-color'
+          }
+          else if (rentItem.status == '已发放') {
+            rentItem.backColor = '--un-return-back-color'
+            rental.backColor = '--un-return-back-color'
+          }
+          else if (rentItem.status == '已归还') {
+            rentItem.backColor = '--returned-back-color'
+          }
         }
-        else if (rentItem.status == '已发放'){
-          rentItem.backColor = '--un-return-back-color'
-          rental.backColor = '--un-return-back-color'
-        }
-        if (rentItem.noNeed == true){
+        else {
           rentItem.backColor = '--no-need-back-color'
         }
         rentItem.totalRepairationAmountStr = util.showAmount(rentItem.totalRepairationAmount)
@@ -224,7 +232,7 @@ Page({
         rental.realGuaranty = 0
         rental.guaranty_dicount = 0
         rental.realDepositStr = util.showAmount(rental.realGuaranty)
-        
+
       }
       rental.realGuaranty = parseFloat(rental.realGuaranty).toFixed(2)
       rental.startDate = util.formatDate(new Date(rental.start_date))
@@ -1841,10 +1849,10 @@ Page({
       that.setData({ order })
       //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
     }
-   
+
     that.setData({ showPopUp: false, popUpContent: null, currentItemIndex: null, barCode: null })
   },
-  setItemValue(e){
+  setItemValue(e) {
     var that = this
     var idArr = e.currentTarget.id.split('_')
     var order = that.data.order
@@ -1853,7 +1861,7 @@ Page({
     var item = rental.rentItems[parseInt(idArr[1])]
     var fieldName = idArr[2]
     var value = e.detail.value
-    switch(fieldName){
+    switch (fieldName) {
       case 'name':
         item.name = value
         break
@@ -1867,7 +1875,7 @@ Page({
         break
     }
     that.renderData(rentals)
-    that.setData({order})
+    that.setData({ order })
     //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
   }
 })

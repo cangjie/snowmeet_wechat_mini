@@ -227,10 +227,12 @@ const checkRentalsWellForm = function (rentals) {
       rentalWell = false
       break
     }
+    /*
     if (rental.pick_type == null){
       well = false
       rentalWell = false
     } 
+    */
     for (var j = 0; j < rental.rentItems.length; j++) {
       var itemWell = true
       var item = rental.rentItems[j]

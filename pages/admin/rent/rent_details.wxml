@@ -78,13 +78,13 @@
   <van-collapse value="{{expandRentals}}" bind:change="expandRental">
     <block wx:for="{{order.rentals}}" wx:for-item="rental" wx:for-index="rentalIndex">
       <van-collapse-item name="{{rental.id}}">
-        <view slot="title" class="view-row" style="{{rental.backColor? ('background-color: var(' + rental.backColor + ');') : ''}}
-          {{rental.fontColor? ('color: var(' + rental.fontColor + ');' ): ''}}">
-          <view class="left-column">{{rental.package_id == null? '【套餐】':'【单品】'}}</view>
+        <view slot="title" class="view-row"
+          style="{{rental.backColor? ('background-color: var(' + rental.backColor + ');') : ''}}{{rental.fontColor? ('color: var(' + rental.fontColor + ');' ): ''}}">
+          <view class="left-column">{{rental.package_id == null? '【单品】':'【套餐】'}}</view>
           <view class="right-column-whole">{{rental.name}}</view>
         </view>
-        <view style="{{rental.backColor? ('background-color: var(' + rental.backColor + ');') : ''}}
-        {{rental.fontColor? ('color: var(' + rental.fontColor + ');' ): ''}}">
+        <view
+          style="{{rental.backColor? ('background-color: var(' + rental.backColor + ');') : ''}}{{rental.fontColor? ('color: var(' + rental.fontColor + ');' ): ''}}">
           <view class="view-row">
             <view class="left-column">【起租日期】</view>
             <view class="right-column">{{rental.realStartDateStr}}</view>
@@ -211,7 +211,7 @@
                   租赁物明细
                 </view>
                 <view wx:for="{{rental.rentItems}}" wx:for-index="itemIndex" wx:if="{{item.next_id == null}}"
-                  style="{{item.backColor? 'background-color:var(' + item.backColor + ');': ''}}">
+                  style="{{item.backColor? 'background-color:var(' + item.backColor + ');': ''}}{{item.fontColor? ('color: var(' + item.fontColor + ');' ): ''}}">
                   <view class="view-row sub-view-row">
                     <view class="left-column">【名称】{{item.prev_id!=null?'(更)':''}}</view>
                     <view class="right-column-whole">{{item.name}}</view>
@@ -497,22 +497,22 @@
   </block>
 </view>
 <view>
-  <view style="height: 20rpx;"></view>
-  <block wx:if="{{order.orderStatus == '待支付' || order.orderStatus == '待生成'}}">
-    <view class="view-row" style="justify-content: center;">
-      <payment orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult">
-      </payment>
-    </view>
-    <view style="height: 20rpx;"></view>
-  </block>
   <van-divider></van-divider>
   <view class="view-row" style="justify-content: center;">
     <van-button type="primary" size="small" style="margin-right: 50rpx;" bind:click="addNewPackage">添加套餐</van-button>
     <van-button type="info" size="small" style="margin-left: 50rpx;" bind:click="addNewCategory">添加单品</van-button>
   </view>
+  <view style="height: 20rpx;"></view>
   <view class="view-row" style="justify-content: center;margin-top:50rpx;margin-bottom: 50rpx;">
     <van-button type="warning" disabled="{{!allValid}}" bind:click="saveAppendings"> 确 认 追 加 </van-button>
   </view>
+  <view style="height: 260rpx;"></view>
+  <view class="view-row" style="justify-content: center;"
+    wx:if="{{order.orderStatus == '待支付' || order.orderStatus == '待生成'}}">
+    <payment orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult">
+    </payment>
+  </view>
+  <view style="height: 20rpx;"></view>
   <mp-cells title="退款" wx:if="{{allSettled}}">
     <mp-cell>
       <view class="view-row">

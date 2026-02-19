@@ -922,13 +922,16 @@ Component({
       var id = parseInt(that.data.calendarId)
       var rentals = that.data.rentals
       var rental = rentals[id]
+      var resDate = new Date(e.detail)
+      var resDateStr = util.formatDate(resDate)
       rental.pick_type = '延时租赁'
       for(var i = 0; rental.rentItems && i < rental.rentItems.length; i++){
         rental.rentItems[i].pick_type = '延时租赁'
         rental.rentItems[i].atOnce = true
+        if (rental.pricePresets != null && rental.pricePresets.length > 0){
+          rental.pricePresets[0].rent_date = resDateStr
+        }
       }
-      var resDate = new Date(e.detail)
-      var resDateStr = util.formatDate(resDate)
       rental.start_date = resDateStr
       that.renderData(rentals)
       that.setData({rentals, showCalendar: false})
@@ -944,7 +947,6 @@ Component({
       if (item.noCode == true){
         return
       }
-
       var category = item.category
       that.setData({ showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: category.id, currentItemId: e.currentTarget.id })
     },
@@ -974,5 +976,4 @@ Component({
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
     }
   },
-  
 })

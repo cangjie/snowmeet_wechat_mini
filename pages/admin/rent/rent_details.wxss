@@ -103,7 +103,7 @@
   margin-bottom: 0rpx;
   text-align: left;
   width: calc(var(--total-width) - var(--title-width));
-  background-color: inherit
+  background-color: inherit;
   padding: 0rpx;
   height: var(--line-height);
 }
@@ -149,5 +149,6 @@ view{
   --un-pick-font-color: #FF0000;
   --un-return-back-color: #07d3f7;
   --no-need-back-color:#a0a0a0;
+  --returned-back-color:#FFFFFF;
 
 }
