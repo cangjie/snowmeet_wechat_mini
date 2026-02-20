@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "聚合支付",
+          "pathName": "pages/payment/uni_pay",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "未完成的接待",
           "pathName": "pages/admin/recept/recept_new",
           "query": "id=67261",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "admin_index",

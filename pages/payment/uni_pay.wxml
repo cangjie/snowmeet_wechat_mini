@@ -1,0 +1,8 @@
+<view>
+  <view class="view-row" style="justify-content: center;margin-top: 100rpx;" >
+    <input class="input" style="width: 300rpx;height: 100rpx;text-align: center;" placeholder="请输入支付金额" type="number" bindinput="setAmount" disabled="{{!loaded}}" />
+  </view>
+  <view class="view-row" style="margin-top: 100rpx;justify-content: center;" >
+    <van-button type="primary" bind:click="pay" disabled="{{!wellForm}}" > 确 认 支 付 </van-button>
+  </view>
+</view>
