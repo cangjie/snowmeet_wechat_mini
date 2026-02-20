@@ -12,7 +12,6 @@
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
     "pages/blt/open_lock",
-   
     "pages/admin/sale/shop_sale",
     "pages/admin/sale/shop_sale_entry",
     "pages/admin/sale/order_list",
@@ -152,7 +151,8 @@
       "pages": [
         "pay_hub",
         "pay_recept",
-        "rent_pay_add"
+        "rent_pay_add",
+        "uni_pay"
       ]
     },
     {
