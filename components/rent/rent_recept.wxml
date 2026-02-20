@@ -111,7 +111,6 @@
                           <van-button id="{{index}}_{{itemIndex}}" wx:else style="margin-left:30rpx" size="mini"
                           type="danger" plain bind:click="setNoNeed" >不需要</van-button>
                         </block>
-                        
                       </view>
                     </view>
                     <view class="view-row">
