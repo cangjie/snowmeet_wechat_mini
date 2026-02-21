@@ -1,0 +1,7 @@
+/* pages/admin/unipay/unipay.wxss */
+view{
+  --order-num-width: 350rpx;
+  --amount-width: 140rpx;
+  --date-width:170rpx;
+  --time-width:140rpx;
+}

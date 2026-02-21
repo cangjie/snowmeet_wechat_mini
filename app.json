@@ -111,7 +111,8 @@
     "pages/admin/care/care_order_list",
     "pages/admin/care/order_detail",
     "pages/admin/rent/search_fuzzy",
-    "pages/admin/rent/rent_item_change"
+    "pages/admin/rent/rent_item_change",
+    "pages/admin/unipay/unipay"
   ],
   "window": {
     "backgroundTextStyle": "light",

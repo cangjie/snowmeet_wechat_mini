@@ -288,6 +288,9 @@ Page({
       case 'careOrderList':
         path = '/pages/admin/care/care_order_list'
         break
+      case "unipay":
+        path = '/pages/admin/unipay/unipay'
+        break
       default:
         break
     }

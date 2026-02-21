@@ -708,6 +708,9 @@ const updateRentPackageCategoryPromise = function(packageId, packageCategories, 
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdatePackageRentItemCategories/' + packageId.toString() + '?sessionKey=' + sessionKey
   return util.performWebRequest(updateUrl, packageCategories)
 }
+const getUnipayOrderPromise = function(startDate, endDate, sessionKey){
+  return getOrdersByStaffPromise(null, null, null, null, '聚合', startDate, endDate, null, null, null, null, null, null, '支付成功', sessionKey, null, null, null, null)
+}
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -762,5 +765,6 @@ module.exports = {
   queryRentItemChangeCompatibleCategory,
   getOrderBalancePromise,
   updateRentPackageCategoryPromise,
-  getPackageListByShopPromise
+  getPackageListByShopPromise,
+  getUnipayOrderPromise
 }

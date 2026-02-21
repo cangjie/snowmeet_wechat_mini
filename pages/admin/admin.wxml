@@ -21,8 +21,11 @@
     <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >
       <view style="background-color: #999999">【雪票】南山预定</view>
     </mp-cell>
-    <mp-cell id="recept_auth" bindtap="nav" >
+    <mp-cell id="recet_auth" bindtap="nav" >
       <view style="background-color:#00FFFF">【接待】接待授权</view>
+    </mp-cell>
+    <mp-cell id="unipay" bindtap="nav" >
+      <view style="background-color:#bad810">【支付】聚合支付</view>
     </mp-cell>
   </mp-cells>
   <mp-cells  title="扫码" >
