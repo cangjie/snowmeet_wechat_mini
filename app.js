@@ -79,7 +79,7 @@ App({
               if (app.globalData.staff //&& app.globalData.env != 'develop' 
                 && app.globalData.scene != '1011' && app.globalData.scene != '1012' 
                 && app.globalData.scene != '1013' && app.globalData.scene != '1014'  
-                && app.globalData.scene != '1001'
+                && app.globalData.scene != '1001' && app.globalData.scene != '1065'
                 ) {
                 wx.redirectTo({
                   url: '/pages/admin/admin',
