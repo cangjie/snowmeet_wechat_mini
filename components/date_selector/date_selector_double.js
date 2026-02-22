@@ -47,6 +47,7 @@ Component({
       var that = this
       that.setData({end: e.detail.value})
       that.triggerEvent('DateSelected', {start: that.data.start, end: that.data.end})
-    }
+    },
+    
   }
 })
