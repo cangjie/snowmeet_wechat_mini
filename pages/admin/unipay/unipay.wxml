@@ -16,11 +16,12 @@
   </view>
   <block wx:for="{{orders}}" wx:for-item="order">
     <van-divider></van-divider>
-    <view class="view-row" style="height:20rpx;margin-top:0rpx" id="{{order.id}}" bindtap="gotoDetail"  >
-      <view style="width: var(--order-num-width);text-align: center;">{{order.code}}</view>
-      <view style="width: var(--amount-width);text-align: right;margin-right: 10rpx;color:red">{{order.paidAmountStr}}</view>
-      <view style="width: var(--date-width);text-align: center;">{{order.biz_dateStr}}</view>
-      <view style="width: var(--time-width);text-align: center;">{{order.biz_timeStr}}</view>
+    <view class="view-row" style="height:20rpx;margin-top:0rpx;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}}" id="{{order.id}}" bindtap="gotoDetail"  >
+      <view style="width: var(--order-num-width);text-align: center;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}}">{{order.code}}</view>
+      <view style="width: var(--amount-width);text-align: right;
+      margin-right: 10rpx;color:red;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}};">{{order.remainAmountStr}}</view>
+      <view style="width: var(--date-width);text-align: center;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}}">{{order.biz_dateStr}}</view>
+      <view style="width: var(--time-width);text-align: center;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}}">{{order.biz_timeStr}}</view>
     </view>
   </block>
 </view>
