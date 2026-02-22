@@ -1,0 +1,11 @@
+<view class="view-row date-selector-view" >
+  <input class="input date-text-box"  placeholder="2026-12-30" /> 
+  <view style="margin-left: 10rpx;margin-right: 10rpx;">~</view>
+  <input class="input date-text-box"  placeholder="2026-12-30" />
+</view>
+<view class="view-row" style="margin-top:10rpx">
+  <van-button plain type="primary" size="mini" >今天</van-button>
+  <van-button plain type="info" size="mini" style="margin-left: 10rpx;" >昨天</van-button>
+  <van-button plain type="warning" size="mini" style="margin-left: 10rpx;" >本周</van-button>
+  <van-button plain type="danger" size="mini" style="margin-left: 10rpx;" >上周</van-button>
+</view>

@@ -113,7 +113,8 @@
     "pages/admin/rent/search_fuzzy",
     "pages/admin/rent/rent_item_change",
     "pages/admin/unipay/unipay",
-    "pages/admin/unipay/unipay_detail"
+    "pages/admin/unipay/unipay_detail",
+    "pages/admin/unipay/unipay_list"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -231,6 +232,7 @@
     "van-cell-group": "@vant/weapp/cell-group/index",
     "van-uploader": "@vant/weapp/uploader/index",
     "van-dropdown-menu": "@vant/weapp/dropdown-menu/index",
-    "van-dropdown-item": "@vant/weapp/dropdown-item/index"
+    "van-dropdown-item": "@vant/weapp/dropdown-item/index",
+    "date-selector": "/components/date_selector/date_selector"
   }
 }

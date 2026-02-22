@@ -1,0 +1,4 @@
+/* pages/admin/unipay/unipay_list.wxss */
+page{
+  --date-selector-font-size:12pt
+}

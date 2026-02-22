@@ -106,5 +106,10 @@ Page({
     wx.navigateTo({
       url: 'unipay_detail?id=' + id
     })
+  },
+  gotoList(){
+    wx.navigateTo({
+      url: 'unipay_list'
+    })
   }
 })
