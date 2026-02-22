@@ -112,7 +112,8 @@
     "pages/admin/care/order_detail",
     "pages/admin/rent/search_fuzzy",
     "pages/admin/rent/rent_item_change",
-    "pages/admin/unipay/unipay"
+    "pages/admin/unipay/unipay",
+    "pages/admin/unipay/unipay_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

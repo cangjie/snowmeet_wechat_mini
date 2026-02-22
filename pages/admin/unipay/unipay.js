@@ -3,28 +3,24 @@ const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
 Page({
-
   /**
    * Page initial data
    */
   data: {
 
   },
-
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
 
   },
-
   /**
    * Lifecycle function--Called when page is initially rendered
    */
   onReady() {
 
   },
-
   /**
    * Lifecycle function--Called when page show
    */
@@ -35,10 +31,8 @@ Page({
       that.setData({qrUrl})
       var interval = setInterval(that.getData, 1000)
       that.setData({interval})
-      
     })
   },
-
   /**
    * Lifecycle function--Called when page hide
    */
@@ -51,7 +45,6 @@ Page({
 
     }
   },
-
   /**
    * Lifecycle function--Called when page unload
    */
@@ -64,21 +57,18 @@ Page({
 
     }
   },
-
   /**
    * Page event handler function--Called when user drop down
    */
   onPullDownRefresh() {
 
   },
-
   /**
    * Called when page reach bottom
    */
   onReachBottom() {
 
   },
-
   /**
    * Called when user click on the top right corner to share
    */
@@ -107,8 +97,14 @@ Page({
     order.paidAmountStr = util.showAmount(order.paidAmount)
     var bizDate = new Date(order.biz_date)
     var dateStrArr = util.formatDate(bizDate).split('-')
-
     order.biz_dateStr = dateStrArr[1] + '-' + dateStrArr[2]
     order.biz_timeStr = util.formatTimeStr(bizDate)
+  },
+  gotoDetail(e){
+    //var that = this
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'unipay_detail?id=' + id
+    })
   }
 })

@@ -11,7 +11,7 @@
   </view>
   <block wx:for="{{orders}}" wx:for-item="order">
     <van-divider></van-divider>
-    <view class="view-row" style="height:10rpx;margin-top:0rpx">
+    <view class="view-row" style="height:20rpx;margin-top:0rpx" id="{{order.id}}" bindtap="gotoDetail"  >
       <view style="width: var(--order-num-width);text-align: center;">{{order.code}}</view>
       <view style="width: var(--amount-width);text-align: right;margin-right: 10rpx;color:red">{{order.paidAmountStr}}</view>
       <view style="width: var(--date-width);text-align: center;">{{order.biz_dateStr}}</view>
