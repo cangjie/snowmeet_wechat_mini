@@ -1,8 +1,9 @@
 /* pages/admin/unipay/unipay_detail.wxss */
 .left-column{
   text-align: left;
-  width: 150rpx;
+  width: 170rpx;
 }
 .right-column{
   text-align: left;
+  width:180rpx;
 }

@@ -1,4 +1,13 @@
 /* pages/admin/unipay/unipay_list.wxss */
+.left-column{
+  text-align: left;
+}
 page{
   --date-selector-font-size:12pt
+}
+view{
+  --order-num-width: 350rpx;
+  --amount-width: 140rpx;
+  --date-width:170rpx;
+  --time-width:140rpx;
 }

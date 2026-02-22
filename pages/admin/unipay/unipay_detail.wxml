@@ -1,35 +1,60 @@
 <view>
-  <view class="view-row" >
-    <view class="left-column" >【订单号】</view>
-    <view class="right-column" >{{order.code}}</view>
+  <view class="view-row">
+    <view class="left-column">【订单号】</view>
+    <view class="right-column">{{order.code}}</view>
   </view>
   <van-divider></van-divider>
-  <view class="view-row" >
-    <view class="left-column" >【日期】</view>
-    <view class="right-column" >{{order.biz_dateStr}}</view>
-    <view class="left-column" >【时间】</view>
-    <view class="right-column" >{{order.biz_timeStr}}</view>
+  <view class="view-row">
+    <view class="left-column">【日期】</view>
+    <view class="right-column">{{order.biz_dateFullStr}}</view>
+    <view class="left-column">【时间】</view>
+    <view class="right-column">{{order.biz_timeStr}}</view>
   </view>
   <van-divider></van-divider>
-  <view class="view-row" >
-    <view class="left-column" >【金额】</view>
-    <view class="right-column" >{{order.paidAmountStr}}</view>
+  <view class="view-row">
+    <view class="left-column">【支付金额】</view>
+    <view class="right-column">
+      <view style="margin-right:80rpx; text-align: right;">{{order.paidAmountStr}}</view>
+    </view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
   </view>
   <van-divider></van-divider>
-  <view class="view-row" >
-    <view class="left-column" >【备注】</view>
-    <view class="right-column" >
-      <textarea style="width:500rpx;height:300rpx" class="input" 
-      disabled="{{modding==false}}" bindinput="setMemo" value="{{order.memo}}">
+  <view class="view-row">
+    <view class="left-column">【退款金额】</view>
+    <view class="right-column">
+      <view style="margin-right:80rpx; text-align: right;">{{order.refundAmountStr}}</view>
+    </view>
+    <view class="left-column">【申请退款】</view>
+    <view class="right-column view-row">
+      <input type="digit" class="input" style="width: 75rpx;text-align: center;" bindinput="setRefundAmount" />
+      <van-button size="mini" type="danger" style="margin-left: 10rpx;" bind:click="refund" >退款</van-button>
+    </view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row">
+    <view class="left-column">【结余金额】</view>
+    <view class="right-column" style="text-align: right;">
+      <view style="margin-right:80rpx; text-align: right;">{{order.remainAmountStr}}</view>
+    </view>
+    <view class="left-column"></view>
+    <view class="right-column"></view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row">
+    <view class="left-column">【备注】</view>
+    <view class="right-column">
+      <textarea style="width:500rpx;height:300rpx" class="input" disabled="{{modding==false}}" bindinput="setMemo"
+        value="{{order.memo}}">
       </textarea>
     </view>
   </view>
   <van-divider></van-divider>
-  <view class="view-row" style="justify-content: center;" >
-    <block wx:if="{{modding==true}}" >
-      <van-button type="warning" style="margin-right: 50rpx;" bind:click="cancel" > 取 消 </van-button>
-      <van-button type="danger" style="margin-right: 50rpx;" bind:click="confirm" > 确 认 </van-button>
+  <view class="view-row" style="justify-content: center;">
+    <block wx:if="{{modding==true}}">
+      <van-button type="warning" style="margin-right: 50rpx;" bind:click="cancel"> 取 消 </van-button>
+      <van-button type="danger" style="margin-right: 50rpx;" bind:click="confirm"> 确 认 </van-button>
     </block>
-    <van-button wx:else type="primary" bind:click="mod" > 修 改 备 注 </van-button>
+    <van-button wx:else type="primary" bind:click="mod"> 修 改 备 注 </van-button>
   </view>
 </view>

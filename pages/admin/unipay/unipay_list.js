@@ -1,11 +1,14 @@
 // pages/admin/unipay/unipay_list.js
+const app = getApp()
+const data = require('../../../utils/data.js')
+const util = require('../../../utils/util.js')
 Page({
 
   /**
    * Page initial data
    */
   data: {
-
+    querying: true
   },
 
   /**
@@ -26,7 +29,9 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
+    app.loginPromiseNew.then(function (resolve){
 
+    })
   },
 
   /**
@@ -62,5 +67,28 @@ Page({
    */
   onShareAppMessage() {
 
-  }
+  },
+  dateSelected(e){
+    console.log('date', e)
+    var startDate = e.detail.startDate
+    var endDate = e.detail.endDate
+    var that = this
+    that.setData({querying: false, startDate, endDate})
+  },
+  getData(){
+    var that = this
+    that.setData({querying: true})
+    data.getUnipayOrderPromise(that.data.startDate, that.data.endDate, app.globalData.sessionKey)
+      .then(function(orders){
+        util.renderUnipayOrders(orders)
+        that.setData({orders, querying: false})
+      })
+  },
+  gotoDetail(e){
+    //var that = this
+    var id = e.currentTarget.id
+    wx.navigateTo({
+      url: 'unipay_detail?id=' + id
+    })
+  },
 })

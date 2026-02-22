@@ -709,7 +709,27 @@ const updateRentPackageCategoryPromise = function(packageId, packageCategories, 
   return util.performWebRequest(updateUrl, packageCategories)
 }
 const getUnipayOrderPromise = function(startDate, endDate, sessionKey){
-  return getOrdersByStaffPromise(null, null, null, null, '聚合', startDate, endDate, null, null, null, null, null, null, '支付成功', sessionKey, null, null, null, null)
+  return new Promise(function (resolve, reject){
+    var totalOrders = []
+    getOrdersByStaffPromise(null, null, null, null, '聚合', startDate, endDate, null, null, null, null, null, null, '支付成功', sessionKey, null, null, null, null).then(function (commonOrders){
+      for(var i = 0; i < commonOrders.length; i++){
+        totalOrders.push(commonOrders[i])
+      }
+      getOrdersByStaffPromise(null, null, null, null, '聚合', startDate, endDate, null, null, null, null, null, null, '部分退款', sessionKey, null, null, null, null).then(function (refundOrders){
+        for(var i = 0; i < refundOrders.length; i++){
+          totalOrders.push(refundOrders[i])
+        }
+        getOrdersByStaffPromise(null, null, null, null, '聚合', startDate, endDate, null, null, null, null, null, null, '全额退款', sessionKey, null, null, null, null).then(function (totalRefundOrders){
+          for(var i = 0; i < totalRefundOrders.length; i++){
+          totalOrders.push(totalRefundOrders[i])
+          }
+          totalOrders.sort((a, b)=>b.id - a.id)
+          resolve(totalOrders)
+        })
+      })
+    })
+  })
+  //return getOrdersByStaffPromise(null, null, null, null, '聚合', startDate, endDate, null, null, null, null, null, null, '支付成功', sessionKey, null, null, null, null)
 }
 module.exports = {
   getPackageListPromise: getPackageListPromise,

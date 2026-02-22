@@ -83,14 +83,15 @@ Page({
     data.getUnipayOrderPromise(startDate, endDate, app.globalData.sessionKey)
       .then(function (orders){
         console.log('get unipay orders', orders)
-        that.renderOrders(orders)
+        util.renderUnipayOrders(orders)
         that.setData({orders})
       })
   },
+  /*
   renderOrders(orders){
     var that = this
     for(var i = 0; i < orders.length; i++){
-      that.renderOrder(orders[i])
+    renderOrder(orders[i])
     }
   },
   renderOrder(order){
@@ -100,6 +101,7 @@ Page({
     order.biz_dateStr = dateStrArr[1] + '-' + dateStrArr[2]
     order.biz_timeStr = util.formatTimeStr(bizDate)
   },
+  */
   gotoDetail(e){
     //var that = this
     var id = e.currentTarget.id

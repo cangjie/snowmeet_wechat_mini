@@ -84,10 +84,11 @@ Page({
     var that = this
     data.getOrderByStaffPromise(that.data.id, app.globalData.sessionKey)
       .then(function (order){
-        that.renderOrder(order)
+        util.renderUnipayOrder(order)
         that.setData({order})
       })
   },
+  /*
   renderOrder(order){
     var that = this
     order.paidAmountStr = util.showAmount(order.paidAmount)
@@ -95,6 +96,7 @@ Page({
     order.biz_dateStr = util.formatDate(bizDate)
     order.biz_timeStr = util.formatTimeStr(bizDate)
   },
+  */
   setMemo(e){
     var that = this
     var order = that.data.order
@@ -113,6 +115,54 @@ Page({
           duration: 2000,
           icon: 'success'
 
+        })
+      })
+  },
+  setRefundAmount(e){
+    var that = this
+    var value = e.detail.value
+    if (isNaN(value)){
+      return
+    }
+    that.data.refundAmount = parseFloat(value)
+  },
+  refund(){
+    var that = this
+    var refundAmount = that.data.refundAmount
+    var order = that.data.order
+    if (refundAmount == null || refundAmount == '' || isNaN(refundAmount)){
+      wx.showToast({
+        icon:'error',
+        title:'退款金额不对',
+        duration: 2000
+      })
+      return
+    }
+    refundAmount = parseFloat(refundAmount)
+    if (refundAmount > parseFloat((order.paidAmount - order.refundAmount).toFixed(2))){
+      wx.showToast({
+        icon:'error',
+        title:'超额退款',
+        duration: 2000
+      })
+      return
+    }
+    var refund = {
+      id: 0,
+      payment_id: order.availablePayments[0].id,
+      amount: parseFloat(refundAmount),
+      reason: '聚合支付退款'
+    }
+    data.refundPromise(order.id, [refund], app.globalData.sessionKey)
+      .then(function(order){
+        wx.showToast({
+          icon: 'success',
+          title: '退款成功',
+          duration: 2000,
+          success:()=>{
+            util.renderUnipayOrder(order)
+            that.setData()
+          }
         })
       })
   }

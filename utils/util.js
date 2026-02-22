@@ -266,7 +266,7 @@ const getCareWellFormMessage = function (care) {
     && (!care.brand || care.brand == '' || !care.scale || care.scale == '')) {
     return '图片和品牌长度必填其一'
   }
-  if (!care.product && (!care.repair_charge || care.repair_charge == 0 ) && care.free_wax == 0) {
+  if (!care.product && (!care.repair_charge || care.repair_charge == 0) && care.free_wax == 0) {
     return '必须选择业务'
   }
   return ''
@@ -422,42 +422,42 @@ const connectBLEPromise = function (deviceId) {
 }
 const getPrinterCharacteristicsPromise = function (device) {
   var index = device.correctServiceIndex
-  return new Promise(function (resolve, reject){
-    if (index > device.services.length){
+  return new Promise(function (resolve, reject) {
+    if (index > device.services.length) {
       reject('未找到服务')
     }
-    else{
+    else {
       var service = device.services[index]
       wx.getBLEDeviceCharacteristics({
         deviceId: device.deviceId,
         serviceId: service.uuid,
-        success:(res)=>{
+        success: (res) => {
           console.log('get character', res)
           var cArr = res.characteristics
-          for(var i = 0; i < cArr.length; i++){
+          for (var i = 0; i < cArr.length; i++) {
             var c = cArr[i]
             var p = c.properties
-            if (!device.notifyUUID && p.notify){
+            if (!device.notifyUUID && p.notify) {
               device.notifyServiceId = service.uuid
               device.notifyUUID = c.uuid
             }
-            if (!device.readUUID && p.read){
+            if (!device.readUUID && p.read) {
               device.readServiceId = service.uuid
               device.readUUID = c.uuid
             }
-            if (!device.writeUUID && p.write){
+            if (!device.writeUUID && p.write) {
               device.writeServiceId = service.uuid
               device.writeUUID = c.uuid
             }
           }
-          if (device.notifyUUID && device.readUUID && device.writeUUID){
+          if (device.notifyUUID && device.readUUID && device.writeUUID) {
             resolve(device)
           }
-          else{
+          else {
             device.correctServiceIndex++
-            getPrinterCharacteristicsPromise(device).then(function (device){
+            getPrinterCharacteristicsPromise(device).then(function (device) {
               resolve(device)
-            }).catch(function (){
+            }).catch(function () {
               reject()
             })
           }
@@ -468,8 +468,7 @@ const getPrinterCharacteristicsPromise = function (device) {
 
 
 
-  if (index >= device.services.length)
-  {
+  if (index >= device.services.length) {
 
   }
   var service = device.services[device.correctServiceIndex]
@@ -487,23 +486,38 @@ const getPrinterCharacteristicsPromise = function (device) {
     })
   })
 }
-const parseQuery = function (url, para){
+const parseQuery = function (url, para) {
   var v = null
   url = decodeURIComponent(url)
-  if (url.indexOf('?') <  0){
+  if (url.indexOf('?') < 0) {
     return null
   }
   var query = url.split('?')[1]
   var queryArr = query.split('&')
-  for(var i = 0; i < queryArr.length; i++){
+  for (var i = 0; i < queryArr.length; i++) {
     var pairArr = queryArr[i].split('=')
-    if (pairArr[0]==para){
-      if (pairArr.length > 1){
+    if (pairArr[0] == para) {
+      if (pairArr.length > 1) {
         v = pairArr[1]
       }
     }
   }
   return v
+}
+const renderUnipayOrders = function (orders) {
+  for(var i = 0; i < orders.length; i++){
+    renderUnipayOrder(orders[i])
+  }
+}
+const renderUnipayOrder = function (order) {
+  order.paidAmountStr = showAmount(order.paidAmount)
+  order.refundAmountStr = showAmount(order.refundAmount)
+  order.remainAmountStr = showAmount(order.paidAmount - order.refundAmount)
+  var bizDate = new Date(order.biz_date)
+  var dateStrArr = formatDate(bizDate).split('-')
+  order.biz_dateStr = dateStrArr[1] + '-' + dateStrArr[2]
+  order.biz_dateFullStr = formatDate(bizDate)
+  order.biz_timeStr = formatTimeStr(bizDate)
 }
 
 
@@ -534,5 +548,7 @@ module.exports = {
   getBLEDeviceNameListInRangePromise,
   connectBLEPromise,
   getPrinterCharacteristicsPromise,
-  parseQuery
+  parseQuery,
+  renderUnipayOrders,
+  renderUnipayOrder
 }
