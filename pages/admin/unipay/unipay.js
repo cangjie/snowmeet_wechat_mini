@@ -87,23 +87,7 @@ Page({
         that.setData({orders})
       })
   },
-  /*
-  renderOrders(orders){
-    var that = this
-    for(var i = 0; i < orders.length; i++){
-    renderOrder(orders[i])
-    }
-  },
-  renderOrder(order){
-    order.paidAmountStr = util.showAmount(order.paidAmount)
-    var bizDate = new Date(order.biz_date)
-    var dateStrArr = util.formatDate(bizDate).split('-')
-    order.biz_dateStr = dateStrArr[1] + '-' + dateStrArr[2]
-    order.biz_timeStr = util.formatTimeStr(bizDate)
-  },
-  */
   gotoDetail(e){
-    //var that = this
     var id = e.currentTarget.id
     wx.navigateTo({
       url: 'unipay_detail?id=' + id

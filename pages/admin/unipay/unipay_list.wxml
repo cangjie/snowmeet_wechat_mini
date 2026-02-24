@@ -9,6 +9,10 @@
     <van-button type="info" disabled="{{querying == true}}" bind:click="getData"> 查 询 </van-button>
   </view>
   <van-divider></van-divider>
+  <view wx:if="{{orders != null && orders.length > 0}}" class="view-row" style="justify-content: left;margin-top:50rpx;background-color: #CACACA;">
+    总计：{{orders.length}} 个订单 总金额：{{totalAmountStr}}
+  </view>
+  <van-divider></van-divider>
   <view class="view-row">
     <view style="width: var(--order-num-width);text-align: center;">订单号</view>
     <view style="width: var(--amount-width);text-align: center;">金额</view>

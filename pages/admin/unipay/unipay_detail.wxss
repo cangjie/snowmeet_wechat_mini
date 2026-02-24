@@ -7,3 +7,6 @@
   text-align: left;
   width:180rpx;
 }
+view{
+  --divider-margin: 5rpx;
+}

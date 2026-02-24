@@ -81,7 +81,11 @@ Page({
     data.getUnipayOrderPromise(that.data.startDate, that.data.endDate, app.globalData.sessionKey)
       .then(function(orders){
         util.renderUnipayOrders(orders)
-        that.setData({orders, querying: false})
+        var totalAmount = 0
+        for(var i = 0; i < orders.length; i++){
+          totalAmount += orders[i].remainAmount
+        }
+        that.setData({orders, querying: false, totalAmount, totalAmountStr: util.showAmount(totalAmount)})
       })
   },
   gotoDetail(e){

@@ -85,6 +85,14 @@ Page({
     data.getOrderByStaffPromise(that.data.id, app.globalData.sessionKey)
       .then(function (order){
         util.renderUnipayOrder(order)
+        var getQrUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=unipay_pickticket_' + order.id.toString()
+        wx.request({
+          url: getQrUrl,
+          method: 'GET',
+          success:(res)=>{
+            that.setData({qrcodeUrl: res.data})
+          }
+        })
         that.setData({order})
       })
   },

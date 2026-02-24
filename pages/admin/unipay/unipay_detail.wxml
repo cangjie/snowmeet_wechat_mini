@@ -5,6 +5,11 @@
   </view>
   <van-divider></van-divider>
   <view class="view-row">
+    <view class="left-column">【支付方式】</view>
+    <view class="right-column">{{order.payMethod}}</view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row">
     <view class="left-column">【日期】</view>
     <view class="right-column">{{order.biz_dateFullStr}}</view>
     <view class="left-column">【时间】</view>
@@ -44,7 +49,7 @@
   <view class="view-row">
     <view class="left-column">【备注】</view>
     <view class="right-column">
-      <textarea style="width:500rpx;height:300rpx" class="input" disabled="{{modding==false}}" bindinput="setMemo"
+      <textarea style="width:500rpx;height:200rpx" class="input" disabled="{{modding==false}}" bindinput="setMemo"
         value="{{order.memo}}">
       </textarea>
     </view>
@@ -56,5 +61,9 @@
       <van-button type="danger" style="margin-right: 50rpx;" bind:click="confirm"> 确 认 </van-button>
     </block>
     <van-button wx:else type="primary" bind:click="mod"> 修 改 备 注 </van-button>
+  </view>
+  <van-divider></van-divider>
+  <view  class="view-row" style="justify-content: center;margin-top: 30rpx;" >
+    <image style="width: 300rpx;height: 300rpx;"  src="{{qrcodeUrl}}" ></image>
   </view>
 </view>
