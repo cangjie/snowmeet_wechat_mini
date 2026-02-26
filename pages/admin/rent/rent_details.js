@@ -1877,6 +1877,35 @@ Page({
     }
     that.renderData(rentals)
     that.setData({ order })
-    //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+  },
+  returnAll(e) {
+    var that = this
+    var order = that.data.order
+    var id = parseInt(e.currentTarget.id)
+    var rental = order.rentals[id]
+    wx.showModal({
+      title: '确认全部归还',
+      content: '请先清点已归还的租赁物',
+      complete: (res) => {
+        if (res.confirm) {
+          var url = app.globalData.requestPrefix + 'Rent/ReturnAllRentItems/' + rental.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+          util.performWebRequest(url, null).then(function (newRental) {
+            wx.showToast({
+              icon:'success',
+              title:'归还成功',
+              duration: 2000,
+              success:()=>{
+                that.getData()
+              }
+            })
+           
+          })
+        }
+        if (res.cancel) {
+
+        }
+      },
+
+    })
   }
 })

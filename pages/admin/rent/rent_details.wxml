@@ -327,9 +327,12 @@
                           bind:click="modItemMemoConfirm" style="margin-left: 20rpx;">确认</van-button>
                       </block>
                       <van-button wx:else type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"
-                        bind:click="modItemMemo" style="margin-left:20rpx">修改备注</van-button>
+                        bind:click="modItemMemo"  style="margin-left:20rpx">修改备注</van-button>
                     </block>
                   </view>
+                </view>
+                <view   class="view-row" style="justify-content: center;margin-top:50rpx"  >
+                  <van-button id="{{rentalIndex}}" type="primary" size="small" bind:click="returnAll" disabled="{{rental.settled == 1}}" > 全 部 归 还 </van-button>
                 </view>
               </van-collapse-item>
             </van-collapse>
