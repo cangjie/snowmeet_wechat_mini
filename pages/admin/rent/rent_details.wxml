@@ -159,7 +159,7 @@
                   <checkbox-group id="{{rentalIndex}}" bindchange="checkRentalValid">
                     <view class="view-row sub-view-row" wx:for="{{rental.details}}"
                       style="{{rental.backColor? ('background-color: var(' + rental.backColor + ');') : ''}}">
-                      <view class="rent-detail-cell">
+                      <view class="rent-detail-cell" style="width: calc((var(--total-width) - 2 * var(--sub-padding))/5 + 15rpx)" >
                         <block wx:if="{{item.id != 0}}">
                           {{item.rental_dateDateStr}}
                         </block>

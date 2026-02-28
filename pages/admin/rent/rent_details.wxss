@@ -137,7 +137,7 @@ view{
   --total-width: 700rpx;
   --info-title-font-size: 12pt;
   --title-font-size: 10pt;
-  --title-width: 190rpx;
+  --title-width: 200rpx;
   --sub-padding: 10rpx;
   --cell-vertical-padding: 0rpx;
   --cell-horizontal-padding: 0rpx;
@@ -145,10 +145,8 @@ view{
   --collapse-item-content-text-color: #000000;
   --line-height: 40rpx;
   --rental-detail-background-color: #ebedf0;
-
   --un-pick-font-color: #FF0000;
   --un-return-back-color: #07d3f7;
   --no-need-back-color:#a0a0a0;
   --returned-back-color:#FFFFFF;
-
 }

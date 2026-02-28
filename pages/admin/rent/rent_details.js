@@ -1845,12 +1845,9 @@ Page({
       item.rent_product_id = product.id
       item.memo = ''
       var order = that.data.order
-      //var rentals = order.rentals
       that.renderData(rentals)
       that.setData({ order })
-      //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
     }
-
     that.setData({ showPopUp: false, popUpContent: null, currentItemIndex: null, barCode: null })
   },
   setItemValue(e) {
