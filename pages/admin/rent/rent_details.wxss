@@ -137,7 +137,7 @@ view{
   --total-width: 700rpx;
   --info-title-font-size: 12pt;
   --title-font-size: 10pt;
-  --title-width: 200rpx;
+  --title-width: 196rpx;
   --sub-padding: 10rpx;
   --cell-vertical-padding: 0rpx;
   --cell-horizontal-padding: 0rpx;

@@ -79,5 +79,6 @@ page{
   --rental-title-well-color: #000000;
   --rent-item-unwell-background-color: #FFFFFF;
   --rent-item-well-background-color: #AAFFAA;
+  --button-normal-font-size: 13px;
   font-size: var(--standart-font-size);
 }

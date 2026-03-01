@@ -1495,8 +1495,6 @@ Page({
     util.performWebRequest(updateUrl, rental.details).then(function (newRental) {
       order.rentals[id] = newRental
       that.getData()
-      //that.renderOrder(order)
-      //that.setData({ order })
     })
   },
   expandRentalItemChange(e) {
@@ -1506,7 +1504,7 @@ Page({
       that.setData({ showChanges })
       return
     }
-    var idArr = e.detail[0].split('_')
+    var idArr = e.detail[e.detail.length - 1].split('_')
     var order = that.data.order
     var rental = order.rentals[parseInt(idArr[0])]
     var rentItem = rental.rentItems[parseInt(idArr[1])]
@@ -1519,6 +1517,18 @@ Page({
         changesLog[i].changeTimeStr = util.formatTimeStr(changeDate)
       }
       rentItem.changesLog = changesLog
+      that.setData({ order, showChanges })
+    })
+    var getLogUrl = app.globalData.requestPrefix + 'Rent/GetRentItemLogByStaff/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getLogUrl, null).then(function (logs) {
+      console.log('get log', logs)
+      for(var i = 0; i < logs.length; i++){
+        var createDate = new Date(logs[i].create_date)
+        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0') 
+          + '-' + createDate.getDate().toString().padStart(2, '0')
+        logs[i].timeStr = util.formatTimeStr(createDate)
+      }
+      rentItem.availableLog = logs
       that.setData({ order, showChanges })
     })
   },
