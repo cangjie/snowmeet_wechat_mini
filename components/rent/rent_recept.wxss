@@ -78,8 +78,8 @@ page{
   --rental-title-unwell-color: #FF0000;
   --rental-title-well-color: #000000;
   --rent-item-unwell-background-color: #FFFFFF;
-  --rent-item-well-background-color: #AAFFAA;
+  --rent-item-well-background-color: #276827a5;
   --button-normal-font-size: 13px;
-  --no-use-background-color: #6C6C6C;
+  --no-need-background-color: #6C6C6C;
   font-size: var(--standart-font-size);
 }
