@@ -3,23 +3,11 @@ const util = require('../../utils/util.js')
 const data = require('../../utils/data.js')
 const app = getApp()
 Component({
-
-  /**
-   * Component properties
-   */
   properties: {
-    /*
-    showPopUp: false,
-    popUpContent: '',
-    */
     memberId: Number,
     shop: String,
     rentals: Array
   },
-
-  /**
-   * Component initial data
-   */
   data: {
     rentals: [],
     defaultTextColor: 'black',
@@ -29,7 +17,6 @@ Component({
     currentDate: new Date(),
     activeNames:['1', '2']
   },
-
   lifetimes: {
     ready() {
       var that = this
@@ -57,10 +44,8 @@ Component({
               rentals[i].end_date = util.formatDate(endDate)
 
               var rentType = rentals[i].package_id == null ? '分类' : '套餐';
-              //var scene = that.data.memberId ? '会员' : '门市'
               var scene = '门市'
               var rental = rentals[i]
-              
               var startDate = rental.start_date
               if (startDate) {
                 startDate = util.formatDate(new Date(startDate))
@@ -85,7 +70,6 @@ Component({
                 that.renderData(rentals)
                 return
               }
-
               data.getRentPriceListPromise(shopObj.id, rentType, id, scene)
                 .then(function (priceList) {
                   if (!priceList || priceList.length <= 0) {
@@ -107,14 +91,9 @@ Component({
                     rentals = that.formatRentals(rentals)
                     that.renderData(rentals)
                   }
-                }).catch(function (exp) {
-
-                })
-
+                }).catch(function (exp) {})
             }
           }
-          
-
         })
       })
     }
@@ -252,8 +231,6 @@ Component({
           that.renderData(newRentals)
           that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
         }).catch(function (exp) { })
-
-
     },
     renderData(rentals) {
       var that = this
@@ -427,18 +404,14 @@ Component({
           rental.rentItems = items
           var rentals = that.data.rentals
           var newRentals = []
-          
           for(var i = 0; rentals && i < rentals.length; i++){
             newRentals.push(rentals[i])
           }
           newRentals.push(rental)
-          //rentals.push(rental)
           that.setData({ showPopUp: false, popUpContent: null })
           that.renderData(newRentals)
-          //that.triggerEvent('SyncRentData', rentals)
           that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
         })
-
     },
     checkCodeDup(code) {
       var dup = false
