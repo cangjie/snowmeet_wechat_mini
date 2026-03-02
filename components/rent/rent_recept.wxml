@@ -3,14 +3,17 @@
     <van-collapse value="{{rentalActiveIndex}}" bind:change="onRentalCollapseChange">
       <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp" bind:click="del" id="{{index}}">
         <view class="view-row" >
-          <view style="display: flex;align-items: center;">{{index+1}}</view>
+          <view style="display: flex;align-items: center;font-family: icon-font;padding-left:5rpx;padding-right:5rpx;background-color: var(--rental-title-backgroud-color);">
+            {{(index+1)}}
+          </view>
+          <view style="width: 1rpx;" ></view>
           <view>
             <van-collapse-item name="{{index}}">
               <view slot="title"
                 style="background-color: var(--rental-title-backgroud-color); margin-top: 0rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})">
                 <view class="view-row"
                   style="background-color: var(--rental-title-backgroud-color);margin-top: 0rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})">
-                  <view class="left-column" style="width: var(--title-width);">
+                  <view class="left-column" style="width: var(--title-width)">
                     {{rental.rentItems.length > 1 ? (rental.rentItems.length) : ''}}【{{rental.package_id?'套餐':'单品'}}】
                   </view>
                   <view style="width: 400rpx;font-size: var(--standart-font-size);">

@@ -31,6 +31,19 @@ Component({
           console.log('load font', res)
         }
       })
+      /*
+      fontUrl = 'https://' + app.globalData.domainName + '/font/endylau.ttf'
+      wx.loadFontFace({
+        family: 'endy',
+        source: 'url("' + fontUrl + '")',
+        success: (res) => {
+          console.log('load font', res)
+        },
+        fail: (res) => {
+          console.log('load font', res)
+        }
+      })
+      */
       that.setData({ memberId: that.properties.memberId, shop: that.properties.shop })
       app.loginPromiseNew.then(function (resolve) {
         data.getShopByNamePromise(that.data.shop).then(function (shopObj) {
