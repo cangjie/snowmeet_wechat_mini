@@ -3,6 +3,7 @@ var util = require('./utils/util.js')
 App({
   onLaunch: function (res) {
     wx.$fui = fuiConfig
+    
     const updateManager = wx.getUpdateManager()
     this.globalData.scene = res.scene
     updateManager.onCheckForUpdate(function (res) {
