@@ -80,5 +80,6 @@ page{
   --rent-item-unwell-background-color: #FFFFFF;
   --rent-item-well-background-color: #AAFFAA;
   --button-normal-font-size: 13px;
+  --no-use-background-color: #6C6C6C;
   font-size: var(--standart-font-size);
 }

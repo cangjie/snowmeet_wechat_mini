@@ -84,7 +84,7 @@
               <view style="padding-left: calc((var(--total-width) - var(--total-width-sub))/2); padding-right:calc((var(--total-width) - var(--total-width-sub))/2);padding-bottom: 20rpx;background-color: var(--rental-title-backgroud-color);">
                 <van-collapse-item wx:for="{{rental.rentItems}}" wx:for-index="itemIndex"
                   name="{{index}}_{{itemIndex}}">
-                  <view slot="title" class="view-row" style="background-color: var({{item.wellFormed? '--rent-item-well-background-color': '--rent-item-unwell-background-color'}});"  >
+                  <view slot="title" class="view-row" style="background-color: var({{item.noNeed == true? '--no-use-background-color' : (item.wellFormed? '--rent-item-well-background-color': '--rent-item-unwell-background-color')}});"  >
                     <view class="left-column" style="width:var(--title-width-sub)">【品类】</view>
                     <view class="right-column" style="width:calc(var(--total-width-sub) - var(--title-width-sub))">
                       <block wx:if="{{item.canChooseCategory==true}}" >
@@ -97,7 +97,7 @@
                       </block>
                     </view>
                   </view>
-                  <view style="color: #000000;background-color: var({{item.wellFormed? '--rent-item-well-background-color': '--rent-item-unwell-background-color'}});" >
+                  <view style="color: #000000;background-color: var({{item.noNeed == true? '--no-use-background-color' : (item.wellFormed? '--rent-item-well-background-color': '--rent-item-unwell-background-color')}});" >
                     <view class="view-row" style="margin-top: 0rpx;">
                       <view class="left-column" style="width:var(--title-width-sub)">【编码】</view>
                       <view class="right-column view-row" style="width:calc(var(--total-width-sub) - var(--title-width-sub))" >
@@ -151,15 +151,12 @@
               </view>
             </van-collapse>
           </view>
-          <!--view style="height: 20rpx;background-color: var(--rental-title-backgroud-color);margin-top: 0rpx;" >aaa</view-->
         </van-collapse-item>
         <view style="height:50rpx"></view>
       </fui-swipe-action>
     </van-collapse>
-
   </fui-swipeaction-group>
   <view style="height:300rpx"></view>
-  
   <van-divider contentPosition="center" textColor="#1989fa">新增租赁商品</van-divider>
   <view class="view-row" style="justify-content: center;">
     <van-button type="primary" bind:click="addNewPackage">添加套餐</van-button>
