@@ -536,6 +536,13 @@ Component({
       var rental = rentals[parseInt(idArr[0])]
       var item = rental.rentItems[parseInt(idArr[1])]
       item.noNeed = item.noNeed == true ? false: true
+      var needItemCount = 0
+      for(var i = 0; i < rental.rentItems.length; i++){
+        if (rental.rentItems[i].noNeed != true){
+          needItemCount++
+        }
+      }
+      rental.neededRentItemCount = needItemCount
       that.setData({ rentals: that.data.rentals })
       console.log('get item', item)
       that.renderData(that.data.rentals)

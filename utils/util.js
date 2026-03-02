@@ -227,12 +227,6 @@ const checkRentalsWellForm = function (rentals) {
       rentalWell = false
       break
     }
-    /*
-    if (rental.pick_type == null){
-      well = false
-      rentalWell = false
-    } 
-    */
     for (var j = 0; j < rental.rentItems.length; j++) {
       var itemWell = true
       var item = rental.rentItems[j]
@@ -242,14 +236,13 @@ const checkRentalsWellForm = function (rentals) {
         rentalWell = false
       }
       if (item.noNeed) {
-        item.wellFormed = itemWell
+        item.wellFormed = true
         continue
       }
       if (!item.category) {
         well = false
         itemWell = false
         rentalWell = false
-        break
       }
       if (item.noNeed != true) {
         if (item.noCode == true) {
@@ -257,7 +250,6 @@ const checkRentalsWellForm = function (rentals) {
             well = false
             itemWell = false
             rentalWell = false
-            break
           }
         }
         else {
@@ -265,7 +257,6 @@ const checkRentalsWellForm = function (rentals) {
             well = false
             itemWell = false
             rentalWell = false
-            break
           }
         }
       }
