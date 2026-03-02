@@ -277,6 +277,7 @@ Component({
         catch {
         }
         rental.mixedPickType = false
+        var seq = 1
         for (var j = 0; j < rental.rentItems.length; j++) {
           totalItemNum++
           var item = rental.rentItems[j]
@@ -286,6 +287,13 @@ Component({
             }
           }
           item.itemIndex = itemIndex
+          if (item.noNeed == true){
+            item.seq = '--'
+          }
+          else{
+            item.seq = seq
+            seq++
+          }
           itemIndex++
         }
         that.formatRentalPackage(rental)
