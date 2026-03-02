@@ -2,9 +2,7 @@
   <fui-swipeaction-group>
     <van-collapse value="{{rentalActiveIndex}}" bind:change="onRentalCollapseChange">
       <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp" bind:click="del" id="{{index}}">
-
         <van-collapse-item name="{{index}}">
-
           <view slot="title"
             style="background-color: var(--rental-title-backgroud-color); margin-top: 0rpx;color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})">
             <view class="view-row"
@@ -51,7 +49,6 @@
               双 双鞋 杖
             </view>
           </view>
-
           <view
             style="background-color: var(--rental-title-backgroud-color);color:var({{rental.wellFormed == true? '--rental-title-well-color': '--rental-title-unwell-color'}})">
             <view class="view-row" style="margin-top: 0rpx;">
