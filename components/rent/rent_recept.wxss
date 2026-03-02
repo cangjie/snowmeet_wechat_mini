@@ -72,8 +72,8 @@ page{
   --title-width: 180rpx;
   --title-width-sub: 120rpx;
   --standart-font-size: 30rpx;
-  --total-width:710rpx;
-  --total-width-sub: 650rpx;
+  --total-width:680rpx;
+  --total-width-sub: 640rpx;
   --rental-title-backgroud-color: #e5e5e5;
   --rental-title-unwell-color: #FF0000;
   --rental-title-well-color: #000000;

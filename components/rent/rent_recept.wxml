@@ -3,7 +3,7 @@
     <van-collapse value="{{rentalActiveIndex}}" bind:change="onRentalCollapseChange">
       <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp" bind:click="del" id="{{index}}">
         <view class="view-row" >
-          <view style="display: flex;align-items: center;">1</view>
+          <view style="display: flex;align-items: center;">{{index+1}}</view>
           <view>
             <van-collapse-item name="{{index}}">
               <view slot="title"
