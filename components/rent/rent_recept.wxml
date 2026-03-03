@@ -1,4 +1,15 @@
 <scroll-view scroll-y style="height: 100%;">
+  <view class="view-row" style="justify-content: right;" >
+    <view style="width: 500rpx;" ></view>
+    <view wx:if="{{sort=='time'}}" >
+    <van-button type="primary"  size="mini" id="sortByTime"  >按时间</van-button>
+    <van-button type="info"  size="mini" id="sortByType" plain bind:click="changeSort" >按品种</van-button>
+  </view>
+  <view wx:else >
+    <van-button type="primary"  size="mini" id="sortByTime" plain bind:click="changeSort" >按时间</van-button>
+    <van-button type="info"  size="mini" id="sortByType"   >按品种</van-button>
+  </view>
+  </view>
   <fui-swipeaction-group>
     <van-collapse value="{{rentalActiveIndex}}" bind:change="onRentalCollapseChange">
       <fui-swipe-action wx:for="{{rentals}}" wx:for-item="rental" wx:key="timeStamp" bind:click="del" id="{{index}}">

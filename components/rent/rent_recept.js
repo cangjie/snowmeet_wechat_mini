@@ -15,7 +15,8 @@ Component({
     startDate: util.formatDate(new Date()),
     startDateIsWeekend: util.isWeekend(new Date()),
     currentDate: new Date(),
-    activeNames: ['1', '2']
+    activeNames: ['1', '2'],
+    sort: 'time'
   },
   lifetimes: {
     ready() {
@@ -987,6 +988,40 @@ Component({
       that.renderData(rentals)
       that.setData({ rentals })
       that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+    },
+    changeSort(e){
+      var that = this
+      var sort = that.data.sort
+      var rentals = that.data.rentals
+      var id = e.currentTarget.id
+      if (id == 'sortByTime'){
+        sort = 'time'
+        rentals = rentals.sort((a, b) => (a.id - b.id))
+      }
+      else {
+        sort = 'type'
+        var newRentals = []
+        var rentalsPackage = []
+        var rentalsCategory = []
+        rentals = rentals.sort((a, b) => (a.id - b.id))
+        for(var i = 0; i < rentals.length; i++){
+          if (rentals[i].package_id != null){
+            rentalsPackage.push(rentals[i])
+          }
+          else{
+            rentalsCategory.push(rentals[i])
+          }
+        }
+        for(var i = 0; i < rentalsPackage.length; i++){
+          newRentals.push(rentalsPackage[i])
+        }
+        for(var i = 0; i < rentalsCategory.length; i++){
+          newRentals.push(rentalsCategory[i])
+        }
+        rentals = newRentals
+      }
+      that.setData({rentals, sort})
     }
   },
+  
 })
