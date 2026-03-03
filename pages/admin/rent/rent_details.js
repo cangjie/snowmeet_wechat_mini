@@ -1928,10 +1928,31 @@ Page({
           that.setData({expandItems: e.detail, showBalance: true})
           break
         default:
+          var expandArr = expandItems[i].split('_')
+          if (expandItems[i].indexOf('rental_item_log_')>=0){
+            that.getRentItemLog(expandArr[expandArr.length - 2], expandArr[expandArr.length - 1])
+          }
           that.setData({expandItems: e.detail})
           break
       }
     }
   },
-
+  getRentItemLog(rentalIndex, rentItemIndex){
+    var that = this
+    var order = that.data.order
+    var rental = order.rentals[rentalIndex]
+    var rentItem = rental.rentItems[rentItemIndex]
+    var getLogUrl = app.globalData.requestPrefix + 'Rent/GetRentItemLogByStaff/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getLogUrl, null).then(function (logs) {
+      console.log('get log', logs)
+      for(var i = 0; i < logs.length; i++){
+        var createDate = new Date(logs[i].create_date)
+        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0') 
+          + '-' + createDate.getDate().toString().padStart(2, '0')
+        logs[i].timeStr = util.formatTimeStr(createDate)
+      }
+      rentItem.availableLog = logs
+      that.setData({ order })
+    })
+  }
 })
