@@ -1932,6 +1932,9 @@ Page({
           if (expandItems[i].indexOf('rental_item_log_')>=0){
             that.getRentItemLog(expandArr[expandArr.length - 2], expandArr[expandArr.length - 1])
           }
+          if (expandItems[i].indexOf('rental_item_change_')>=0){
+            that.getRentItemChange(expandArr[expandArr.length - 2], expandArr[expandArr.length - 1])
+          }
           that.setData({expandItems: e.detail})
           break
       }
@@ -1952,6 +1955,22 @@ Page({
         logs[i].timeStr = util.formatTimeStr(createDate)
       }
       rentItem.availableLog = logs
+      that.setData({ order })
+    })
+  },
+  getRentItemChange(rentalIndex, rentItemIndex){
+    var that = this
+    var order = that.data.order
+    var rental = order.rentals[rentalIndex]
+    var rentItem = rental.rentItems[rentItemIndex]
+    var getChangesUrl = app.globalData.requestPrefix + 'Rent/GetRentItemChanges/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getChangesUrl, null).then(function (changesLog) {
+      for (var i = 0; changesLog && i < changesLog.length; i++) {
+        var changeDate = new Date(changesLog[i].changeDate)
+        changesLog[i].changeDateStr = util.formatDate(changeDate)
+        changesLog[i].changeTimeStr = util.formatTimeStr(changeDate)
+      }
+      rentItem.changesLog = changesLog
       that.setData({ order })
     })
   }
