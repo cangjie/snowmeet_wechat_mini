@@ -1914,5 +1914,24 @@ Page({
       },
 
     })
-  }
+  },
+  expand(e){
+    var that = this
+    var expandItems = e.detail
+    if (expandItems.length == 0){
+      that.setData({expandItems})
+      return
+    }
+    for(var i = 0; i < expandItems.length; i++){
+      switch(expandItems[i]){
+        case 'paymentInfo':
+          that.setData({expandItems: e.detail, showBalance: true})
+          break
+        default:
+          that.setData({expandItems: e.detail})
+          break
+      }
+    }
+  },
+
 })

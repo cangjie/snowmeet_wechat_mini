@@ -1,4 +1,4 @@
-<view>
+<van-collapse value="{{expandItems}}" bind:change="expand">
   <view class="info-title">订单信息</view>
   <view class="view-row">
     <view class="left-column">【姓名】</view>
@@ -9,71 +9,69 @@
       </van-button>
     </view>
   </view>
-  <van-collapse value="{{orderInfoExpand}}" bind:change="expandOrderInfo">
-    <van-collapse-item name="1">
-      <view slot="title" class="view-row">
-        <view class="left-column">【订单号】</view>
-        <view class="right-column-whole">{{order.code}}</view>
+  <van-collapse-item name="orderInfo">
+    <view slot="title" class="view-row">
+      <view class="left-column">【订单号】</view>
+      <view class="right-column-whole">{{order.code}}</view>
+    </view>
+    <view>
+      <view class="view-row">
+        <view class="left-column">【店铺】</view>
+        <view class="right-column">{{order.shop}}</view>
+        <view class="left-column">【会员】</view>
+        <view class="right-column">{{order.member.following_wechat == 1 ? '会员' : '散客'}}</view>
       </view>
-      <view>
-        <view class="view-row">
-          <view class="left-column">【店铺】</view>
-          <view class="right-column">{{order.shop}}</view>
-          <view class="left-column">【会员】</view>
-          <view class="right-column">{{order.member.following_wechat == 1 ? '会员' : '散客'}}</view>
-        </view>
-        <view class="divider"></view>
-        <view class="view-row">
-          <view class="left-column">【业务日期】</view>
-          <view class="right-column">{{order.bizDateStr}}</view>
-          <view class="left-column">【业务时间】</view>
-          <view class="right-column">{{order.bizTimeStr}}</view>
-        </view>
-        <view class="divider"></view>
-        <view class="view-row">
-          <view class="left-column">【关闭日期】</view>
-          <view class="right-column">{{order.close_dateDateStr}}</view>
-          <view class="left-column">【关闭时间】</view>
-          <view class="right-column">{{order.close_dateTimeStr}}</view>
-        </view>
-        <view class="divider"></view>
-        <view class="view-row">
-          <view class="left-column">【单品数量】</view>
-          <view class="right-column">{{order.categoryNum}}</view>
-          <view class="left-column">【套餐数量】</view>
-          <view class="right-column">{{order.packageNum}}</view>
-        </view>
+      <view class="divider"></view>
+      <view class="view-row">
+        <view class="left-column">【业务日期】</view>
+        <view class="right-column">{{order.bizDateStr}}</view>
+        <view class="left-column">【业务时间】</view>
+        <view class="right-column">{{order.bizTimeStr}}</view>
       </view>
-    </van-collapse-item>
-  </van-collapse>
+      <view class="divider"></view>
+      <view class="view-row">
+        <view class="left-column">【关闭日期】</view>
+        <view class="right-column">{{order.close_dateDateStr}}</view>
+        <view class="left-column">【关闭时间】</view>
+        <view class="right-column">{{order.close_dateTimeStr}}</view>
+      </view>
+      <view class="divider"></view>
+      <view class="view-row">
+        <view class="left-column">【单品数量】</view>
+        <view class="right-column">{{order.categoryNum}}</view>
+        <view class="left-column">【套餐数量】</view>
+        <view class="right-column">{{order.packageNum}}</view>
+      </view>
+    </view>
+  </van-collapse-item>
+
   <view class="info-title">支付信息</view>
-  <van-collapse value="{{payInfoExpand}}" bind:change="expandPayInfo">
-    <van-collapse-item name="1">
-      <view slot="title" class="view-row">
-        <view class="left-column">【支付总金额】</view>
-        <view class="right-column">{{order.paidAmountStr}}</view>
-        <view class="left-column">【退款总金额】</view>
-        <view class="right-column">{{order.refundAmountStr}}</view>
+
+  <van-collapse-item name="paymentInfo">
+    <view slot="title" class="view-row">
+      <view class="left-column">【支付总金额】</view>
+      <view class="right-column">{{order.paidAmountStr}}</view>
+      <view class="left-column">【退款总金额】</view>
+      <view class="right-column">{{order.refundAmountStr}}</view>
+    </view>
+    <view>
+      <view class="view-row">
+        <view class="left-column">【支付总笔数】</view>
+        <view class="right-column">{{order.availablePayments.length}}</view>
+        <view class="left-column">【退款总笔数】</view>
+        <view class="right-column">{{order.availableRefunds.length}}</view>
       </view>
-      <view>
-        <view class="view-row">
-          <view class="left-column">【支付总笔数】</view>
-          <view class="right-column">{{order.availablePayments.length}}</view>
-          <view class="left-column">【退款总笔数】</view>
-          <view class="right-column">{{order.availableRefunds.length}}</view>
-        </view>
-        <view class="divider"></view>
-        <view class="view-row">
-          <view class="left-column">【在押押金】</view>
-          <view class="right-column">{{order.unRelieveGuarantyStr}}</view>
-          <view class="left-column">【解押押金】</view>
-          <view class="right-column">{{order.rentProperties.relieveGuarantyAmountStr}}</view>
-        </view>
-        <view class="divider"></view>
-        <balance wx:if="{{showBalance}}" orderId="{{order.id}}"></balance>
+      <view class="divider"></view>
+      <view class="view-row">
+        <view class="left-column">【在押押金】</view>
+        <view class="right-column">{{order.unRelieveGuarantyStr}}</view>
+        <view class="left-column">【解押押金】</view>
+        <view class="right-column">{{order.rentProperties.relieveGuarantyAmountStr}}</view>
       </view>
-    </van-collapse-item>
-  </van-collapse>
+      <view class="divider"></view>
+      <balance wx:if="{{showBalance}}" orderId="{{order.id}}"></balance>
+    </view>
+  </van-collapse-item>
   <view class="info-title">租赁信息</view>
   <van-collapse value="{{expandRentals}}" bind:change="expandRental">
     <block wx:for="{{order.rentals}}" wx:for-item="rental" wx:for-index="rentalIndex">
@@ -302,7 +300,7 @@
                               <view class="rent-detail-cell">{{log.dateStr}}</view>
                               <view class="rent-detail-cell">{{log.timeStr}}</view>
                               <view class="rent-detail-cell">{{log.status}}</view>
-                              <view class="rent-detail-cell" style="width: 200rpx;" >{{log.staff.name}}</view>
+                              <view class="rent-detail-cell" style="width: 200rpx;">{{log.staff.name}}</view>
                             </view>
                           </block>
                         </view>
@@ -524,7 +522,8 @@
       </block>
     </van-collapse>
   </block>
-</view>
+</van-collapse>
+
 <view>
   <van-divider></van-divider>
   <view class="view-row" style="justify-content: center;">
