@@ -311,6 +311,28 @@
                             bindinput="setItemMemo" disabled="{{item.moddingMemo!=true}}" />
                         </view>
                       </view>
+                      <view class="view-row" style="justify-content: center;margin-top:20rpx">
+                        <block wx:if="{{item.noNeed != true}}">
+                          <van-button type="primary" size="small" wx:if="{{item.status == '已发放' }}" id="{{item.id}}"
+                            bind:click="setReturn">归还</van-button>
+                          <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}"
+                            bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}">设置未归还</van-button>
+                          <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick"
+                            wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
+                          <van-button type="warning" size="small" style="margin-left: 20rpx;" id="{{item.id}}"
+                            wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
+                          <van-button type="danger" size="small" style="margin-left: 20rpx;" id="{{item.id}}"
+                            wx:if="{{item.status=='已发放'}}" bind:click="gotoChange">更换</van-button>
+                          <block wx:if="{{item.moddingMemo==true}}">
+                            <van-button type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"
+                              bind:click="modItemMemoCancel" style="margin-left:20rpx">取消</van-button>
+                            <van-button type="danger" size="small" id="{{rentalIndex}}_{{itemIndex}}"
+                              bind:click="modItemMemoConfirm" style="margin-left: 20rpx;">确认</van-button>
+                          </block>
+                          <van-button wx:else type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"
+                            bind:click="modItemMemo" style="margin-left:20rpx">修改备注</van-button>
+                        </block>
+                      </view>
                       <view class="sub-view-row" style="padding-left: 20rpx;padding-right:20rpx;">
 
 
@@ -363,28 +385,7 @@
                           </view>
                         </van-collapse-item>
                       </view>
-                      <view class="view-row" style="justify-content: center;margin-top:20rpx">
-                        <block wx:if="{{item.noNeed != true}}">
-                          <van-button type="primary" size="small" wx:if="{{item.status == '已发放' }}" id="{{item.id}}"
-                            bind:click="setReturn">归还</van-button>
-                          <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}"
-                            bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}">设置未归还</van-button>
-                          <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick"
-                            wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
-                          <van-button type="warning" size="small" style="margin-left: 20rpx;" id="{{item.id}}"
-                            wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
-                          <van-button type="danger" size="small" style="margin-left: 20rpx;" id="{{item.id}}"
-                            wx:if="{{item.status=='已发放'}}" bind:click="gotoChange">更换</van-button>
-                          <block wx:if="{{item.moddingMemo==true}}">
-                            <van-button type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"
-                              bind:click="modItemMemoCancel" style="margin-left:20rpx">取消</van-button>
-                            <van-button type="danger" size="small" id="{{rentalIndex}}_{{itemIndex}}"
-                              bind:click="modItemMemoConfirm" style="margin-left: 20rpx;">确认</van-button>
-                          </block>
-                          <van-button wx:else type="warning" size="small" id="{{rentalIndex}}_{{itemIndex}}"
-                            bind:click="modItemMemo" style="margin-left:20rpx">修改备注</van-button>
-                        </block>
-                      </view>
+
                     </view>
                     <view class="view-row" style="justify-content: center;margin-top:50rpx">
                       <van-button id="{{rentalIndex}}" type="primary" size="small" bind:click="returnAll"
@@ -404,14 +405,129 @@
 
     </van-tab>
     <van-tab title="按租赁物">
-      <block wx:for="{{categories}}" wx:for-item="category" >
+      <block wx:for="{{categories}}" wx:for-item="category">
         <view style="display: flex;flex-direction: row;">
           <view
             style="display: flex;flex-direction: row; align-items: center; font-family: icon-font;width: 29rpx;margin-left:10rpx ">
             {{index + 1}}
           </view>
           <view style="width:1rpx;background-color: #6e6e6e;"></view>
-          <view style="width: 720rpx;"></view>
+          <view style="width: 720rpx;">
+            <van-collapse-item name="category_{{index}}">
+              <view slot="title" class="view-row" style="width:660rpx">
+                <view class="left-column" style="width:var(--title-width-sub);">
+                  【品类】
+                </view>
+                <view class="right-column">{{category.name}}</view>
+                <view class="left-column" style="width:var(--title-width-sub);">
+                  【数量】
+                </view>
+                <view class="right-column">{{category.rentItems.length}}</view>
+              </view>
+              <view>
+                <view wx:for="{{category.rentItems}}" wx:for-index="itemIndex">
+                  <view class="view-row sub-view-row">
+                    <view class="left-column" style="width:var(--title-width-sub);">
+                      【名称】{{item.prev_id!=null?'(更)':''}}
+                    </view>
+                    <view class="right-column-whole">{{item.name}}</view>
+                  </view>
+                  <view class="view-row sub-view-row">
+                    <view class="left-column" style="width:var(--title-width-sub);">【编码】</view>
+                    <view class="right-column-whole">
+                      {{item.noNeed == true ? '--' : (item.noCode == true? '无编码' : item.code)}}
+                    </view>
+                  </view>
+                  <view class="view-row sub-view-row">
+                    <view class="left-column" style="width:var(--title-width-sub);">【分类】</view>
+                    <view class="right-column-whole">
+                      {{item.noNeed == true ? '' : item.category.name}}
+                    </view>
+                  </view>
+                  <view class="view-row sub-view-row">
+                    <view class="left-column" style="width:var(--title-width-sub);">【发放日期】</view>
+                    <view class="right-column" style="width: var(--content-width-sub);">
+                      {{item.noNeed == true ? '--' : item.pickDateStr}}
+                    </view>
+                    <view class="left-column" style="width:var(--title-width-sub);">【发放时间】</view>
+                    <view class="right-column" style="width: var(--content-width-sub-right);">
+                      {{item.noNeed == true ? '--' : item.pickTimeStr}}
+                    </view>
+                  </view>
+                  <view class="view-row sub-view-row">
+                    <view class="left-column" style="width:var(--title-width-sub);">【归还日期】</view>
+                    <view class="right-column" style="width: var(--content-width-sub);">
+                      {{item.noNeed == true ? '--' : item.returnDateStr}}
+                    </view>
+                    <view class="left-column" style="width:var(--title-width-sub);">【归还时间】</view>
+                    <view class="right-column" style="width: var(--content-width-sub-right);">
+                      {{item.noNeed == true ? '--' : item.returnTimeStr}}
+                    </view>
+                  </view>
+                  <view class="view-row sub-view-row">
+                    <view class="left-column" style="width:var(--title-width-sub);">【发放人】</view>
+                    <view class="right-column" style="width: var(--content-width-sub);font-size: 8pt;">
+                      {{item.noNeed == true ? '' : (item.pickStaff? item.pickStaff.name: '--')}}
+                    </view>
+                    <view class="left-column" style="width:var(--title-width-sub);">【接收人】</view>
+                    <view class="right-column" style="width: var(--content-width-sub-right);font-size: 8pt;">
+                      {{item.noNeed == true ? '' : (item.returnStaff? item.returnStaff.name: '--')}}
+                    </view>
+                  </view>
+                  <view class="view-row sub-view-row">
+                    <view class="left-column" style="width:var(--title-width-sub);">【状态】</view>
+                    <view class="right-column" style="width: 100rpx;">
+                      {{item.noNeed == true ? '不需要'  : item.status}}
+                    </view>
+                    <view class="left-column" style="width:120rpx;">【赔偿】</view>
+                    <view class="view-row right-column" style="width:220rpx">
+                      <input class="input" id="{{item.id}}" bindblur="setRepairAmount"
+                        placeholder="{{item.totalRepairationAmount}}" disabled="{{item.setRepairing != true}}"
+                        type="number" style="text-align: center;width:75rpx" />
+                      <van-button wx:if="{{item.setRepairing != true}}" type="danger" size="mini" id="{{item.id}}"
+                        bind:click="setRepair" style="min-width:50rpx" disabled="{{item.noNeed == true}}">赔偿
+                      </van-button>
+                      <block wx:else>
+                        <van-button type="warning" size="mini" id="{{item.id}}" bind:click="setRepairCancel"
+                          style="min-width: 50rpx;">取消</van-button>
+                        <van-button type="danger" size="mini" id="{{item.id}}" bind:click="setRepairConfirm"
+                          style="min-width: 50rpx;margin-left: 10rpx;">确认</van-button>
+                      </block>
+                    </view>
+                  </view>
+                  <view class="view-row">
+                    <view class="left-column" style="width:var(--title-width-sub);">【备注】</view>
+                    <view class="right-column-whole" style="width: 500rpx;">
+                      <input value="{{item.memo}}" class="input" id="{{item.rentalIndex}}_{{item.itemIndex}}"
+                        bindinput="setItemMemo" disabled="{{item.moddingMemo!=true}}" />
+                    </view>
+                  </view>
+                  <view class="view-row" style="justify-content: center;margin-top:20rpx">
+                        <block wx:if="{{item.noNeed != true}}">
+                          <van-button type="primary" size="small" wx:if="{{item.status == '已发放' }}" id="{{item.id}}"
+                            bind:click="setReturn">归还</van-button>
+                          <van-button type="primary" size="small" wx:if="{{item.status == '已归还' }}" id="{{item.id}}"
+                            bind:click="setUnReturn" disabled="{{order.refundAmount > 0}}">设置未归还</van-button>
+                          <van-button type="primary" size="small" id="{{item.id}}" bind:click="setPick"
+                            wx:if="{{item.status == '已暂存' || item.status == '未发放' }}">发放</van-button>
+                          <van-button type="warning" size="small" style="margin-left: 20rpx;" id="{{item.id}}"
+                            wx:if="{{item.status=='已发放'}}" bind:click="setStore">暂存</van-button>
+                          <van-button type="danger" size="small" style="margin-left: 20rpx;" id="{{item.id}}"
+                            wx:if="{{item.status=='已发放'}}" bind:click="gotoChange">更换</van-button>
+                          <block wx:if="{{item.moddingMemo==true}}">
+                            <van-button type="warning" size="small" id="{{item.rentalIndex}}_{{item.itemIndex}}"
+                              bind:click="modItemMemoCancel" style="margin-left:20rpx">取消</van-button>
+                            <van-button type="danger" size="small" id="{{item.rentalIndex}}_{{item.itemIndex}}"
+                              bind:click="modItemMemoConfirm" style="margin-left: 20rpx;">确认</van-button>
+                          </block>
+                          <van-button wx:else type="warning" size="small" id="{{item.rentalIndex}}_{{item.itemIndex}}"
+                            bind:click="modItemMemo" style="margin-left:20rpx">修改备注</van-button>
+                        </block>
+                      </view>
+                </view>
+              </view>
+            </van-collapse-item>
+          </view>
         </view>
       </block>
     </van-tab>

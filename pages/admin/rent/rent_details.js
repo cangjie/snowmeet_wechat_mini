@@ -2000,6 +2000,8 @@ Page({
       var rental = order.rentals[i]
       for(var j = 0; j < rental.rentItems.length; j++){
         var item = rental.rentItems[j]
+        item.rentalIndex = i
+        item.itemIndex = j
         if (item.next_id != null){
           continue
         }
