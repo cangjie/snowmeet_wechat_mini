@@ -21,17 +21,7 @@ Component({
   lifetimes: {
     ready() {
       var that = this
-      var fontUrl = 'https://' + app.globalData.domainName + '/font/thin.ttf'
-      wx.loadFontFace({
-        family: 'icon-font',
-        source: 'url("' + fontUrl + '")',
-        success: (res) => {
-          console.log('load font', res)
-        },
-        fail: (res) => {
-          console.log('load font', res)
-        }
-      })
+      
       /*
       fontUrl = 'https://' + app.globalData.domainName + '/font/endylau.ttf'
       wx.loadFontFace({

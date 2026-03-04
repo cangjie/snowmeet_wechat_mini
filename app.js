@@ -3,7 +3,7 @@ var util = require('./utils/util.js')
 App({
   onLaunch: function (res) {
     wx.$fui = fuiConfig
-    
+
     const updateManager = wx.getUpdateManager()
     this.globalData.scene = res.scene
     updateManager.onCheckForUpdate(function (res) {
@@ -30,10 +30,10 @@ App({
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
     //const app = getApp()
-    if (res.query.staffId){
+    if (res.query.staffId) {
       util.referStafffId = res.query.staffId
     }
-    
+
 
   },
   loginPromiseNew: new Promise(function (resolve) {
@@ -43,15 +43,26 @@ App({
     wx.login({
       success: (res) => {
         const app = getApp()
-        if (util.referStafffId){
+        var fontUrl = 'https://' + app.globalData.domainName + '/font/thin.ttf'
+        wx.loadFontFace({
+          family: 'icon-font',
+          source: 'url("' + fontUrl + '")',
+          success: (res) => {
+            console.log('load font', res)
+          },
+          fail: (res) => {
+            console.log('load font', res)
+          }
+        })
+        if (util.referStafffId) {
           app.globalData.referStaffId = util.referStafffId
         }
         const env = wx.getAccountInfoSync()
         app.globalData.env = env.miniProgram.envVersion
-        if (!app.globalData.env || app.globalData.env == ''){
+        if (!app.globalData.env || app.globalData.env == '') {
           app.globalData.env = 'trail'
         }
-        
+
         switch (app.globalData.env) {
           case 'trail':
           case 'develop':
@@ -78,13 +89,13 @@ App({
               const env = wx.getAccountInfoSync()
               app.globalData.env = env.miniProgram.envVersion
               if (app.globalData.staff //&& app.globalData.env != 'develop' 
-                && app.globalData.scene != '1011' && app.globalData.scene != '1012' 
-                && app.globalData.scene != '1013' && app.globalData.scene != '1014'  ) {
-                  /*
-                wx.redirectTo({
-                  url: '/pages/admin/admin',
-                })
-                */
+                && app.globalData.scene != '1011' && app.globalData.scene != '1012'
+                && app.globalData.scene != '1013' && app.globalData.scene != '1014') {
+                /*
+              wx.redirectTo({
+                url: '/pages/admin/admin',
+              })
+              */
               }
             },
             fail: (res) => {
@@ -95,12 +106,12 @@ App({
               catch (err) {
                 console.log('get sys info sync fail', err)
               }
-              if (app.globalData.staff && app.globalData.scene == '1001' ) {
-                
+              if (app.globalData.staff && app.globalData.scene == '1001') {
+
                 wx.redirectTo({
                   url: '/pages/admin/admin',
                 })
-                
+
               }
             },
             complete: (res) => {

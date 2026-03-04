@@ -68,7 +68,8 @@
   font-size: var(--info-title-font-size);
   font-weight: bold;
   background-color: #FAFAFA;
-  margin: 10rpx
+  margin: 10rpx;
+  width: calc(var(--total-width) - 10rpx);
 }
 .left-column{
   display: flex;
@@ -102,7 +103,7 @@
   margin-top: 0rpx;
   margin-bottom: 0rpx;
   text-align: left;
-  width: calc(var(--total-width) - var(--title-width));
+  width: calc(var(--total-width) - var(--title-width) - 60rpx );
   background-color: inherit;
   padding: 0rpx;
   height: var(--line-height);
@@ -113,7 +114,7 @@
   margin:0rpx;
 }
 .sub-view-row {
-  width: calc(var(--total-width) - 4 * var(--sub-padding));
+  width: calc(var(--total-width) - 70rpx);
   background-color: inherit;
 }
 .rent-detail-cell{
@@ -133,11 +134,18 @@
 .custom-class{
   background-color: inherit;
 }
+.amount{
+  text-align: right;
+  margin-right: 20rpx;
+}
 view{
   --total-width: 700rpx;
   --info-title-font-size: 12pt;
   --title-font-size: 10pt;
   --title-width: 196rpx;
+  --title-width-sub: 170rpx;
+  --content-width-sub: 160rpx;
+  --content-width-sub-right: 140rpx;
   --sub-padding: 10rpx;
   --cell-vertical-padding: 0rpx;
   --cell-horizontal-padding: 0rpx;
