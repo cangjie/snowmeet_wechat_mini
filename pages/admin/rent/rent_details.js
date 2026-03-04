@@ -1969,6 +1969,7 @@ Page({
       }
       rentItem.availableLog = logs
       that.setData({ order })
+      that.convertByCategory()
     })
   },
   getRentItemChange(rentalIndex, rentItemIndex) {
@@ -1985,6 +1986,7 @@ Page({
       }
       rentItem.changesLog = changesLog
       that.setData({ order })
+      that.convertByCategory()
     })
   },
   onTabChange(e){
@@ -2023,9 +2025,17 @@ Page({
           categories.push(category)
           var getUrl = app.globalData.requestPrefix + 'Rent/GetRentCategoryByCode/' + fatherCode
           util.performWebRequest(getUrl, null).then(function(cate){
+            /*
             category.id = cate.id
             category.name = cate.name
             console.log('get categories', categories)
+            */
+            for(var i = 0; i < categories.length; i++){
+              if (categories[i].code == cate.code){
+                categories[i].id = cate.id
+                categories[i].name = cate.name
+              }
+            }
             that.setData({categories})
           })
         }
