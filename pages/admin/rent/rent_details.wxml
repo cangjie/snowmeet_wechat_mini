@@ -403,7 +403,18 @@
       </block>
 
     </van-tab>
-    <van-tab title="按租赁物">内容 2</van-tab>
+    <van-tab title="按租赁物">
+      <block wx:for="{{categories}}" wx:for-item="category" >
+        <view style="display: flex;flex-direction: row;">
+          <view
+            style="display: flex;flex-direction: row; align-items: center; font-family: icon-font;width: 29rpx;margin-left:10rpx ">
+            {{index + 1}}
+          </view>
+          <view style="width:1rpx;background-color: #6e6e6e;"></view>
+          <view style="width: 720rpx;"></view>
+        </view>
+      </block>
+    </van-tab>
   </van-tabs>
 
   <block wx:if="{{order.appendingRentals && order.appendingRentals.length > 0}}">
