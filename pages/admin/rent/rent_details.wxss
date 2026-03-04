@@ -103,7 +103,7 @@
   margin-top: 0rpx;
   margin-bottom: 0rpx;
   text-align: left;
-  width: calc(var(--total-width) - var(--title-width) - 60rpx );
+  /*width: calc(var(--total-width) - var(--title-width-sub) - 60rpx );*/
   background-color: inherit;
   padding: 0rpx;
   height: var(--line-height);

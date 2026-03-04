@@ -252,11 +252,11 @@
                   </view>
                   <view class="view-row sub-view-row">
                     <view class="left-column" style="width:var(--title-width-sub);" >【状态】</view>
-                    <view class="right-column" style="width: var(--content-width-sub);" >
+                    <view class="right-column" style="width: 100rpx;" >
                       {{item.noNeed == true ? '不需要'  : item.status}}
                     </view>
-                    <view class="left-column" style="width:var(--title-width-sub);" >【赔偿】</view>
-                    <view class="view-row right-column" style="width: var(--content-width-sub);" >
+                    <view class="left-column" style="width:120rpx;" >【赔偿】</view>
+                    <view class="view-row right-column" style="width:220rpx" >
                       <input class="input" id="{{item.id}}" bindblur="setRepairAmount"
                         placeholder="{{item.totalRepairationAmount}}" disabled="{{item.setRepairing != true}}"
                         type="number" style="text-align: center;width:75rpx" />
@@ -283,7 +283,7 @@
 
                     <van-collapse-item name="rental_item_log_{{rentalIndex}}_{{itemIndex}}">
                       <view class="sub-view-row" slot="title"
-                        style="width:calc(var(--total-width) - 8 * var(--sub-padding))">
+                        style="width:calc(var(--total-width) - 90rpx)">
                         发放记录
                       </view>
                       <view class="sub-view-row" style="width:calc(var(--total-width) - 8 * var(--sub-padding))">
@@ -309,7 +309,7 @@
                     <van-collapse-item wx:if="{{item.prev_id != null}}"
                       name="rental_item_change_{{rentalIndex}}_{{itemIndex}}">
                       <view class="sub-view-row" slot="title"
-                        style="width:calc(var(--total-width) - 8 * var(--sub-padding))">
+                        style="width:calc(var(--total-width) - 90rpx)">
                         更换记录
                       </view>
                       <view class="sub-view-row" style="width:calc(var(--total-width) - 8 * var(--sub-padding))">
@@ -323,9 +323,9 @@
                             <view class="right-column-whole">{{change.name}}</view>
                           </view>
                           <view class="view-row sub-view-row">
-                            <view class="left-column">【更换日期】</view>
+                            <view class="left-column">【日期】</view>
                             <view class="right-column">{{change.changeDateStr}}</view>
-                            <view class="left-column">【更换时间】</view>
+                            <view class="left-column">【时间】</view>
                             <view class="right-column">{{change.changeTimeStr}}</view>
                           </view>
                         </block>
