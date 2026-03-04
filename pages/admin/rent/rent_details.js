@@ -174,6 +174,7 @@ Page({
           }
           else if (rentItem.status == '已发放') {
             rentItem.backColor = '--un-return-back-color'
+            rentItem.fontColor = '--un-return-font-color'
             rental.backColor = '--un-return-back-color'
           }
           else if (rentItem.status == '已归还') {
@@ -182,6 +183,7 @@ Page({
         }
         else {
           rentItem.backColor = '--no-need-back-color'
+          rentItem.fontColor = '--no-need-font-color'
         }
         rentItem.totalRepairationAmountStr = util.showAmount(rentItem.totalRepairationAmount)
         if (rentItem.pickDate == null) {
@@ -1522,9 +1524,9 @@ Page({
     var getLogUrl = app.globalData.requestPrefix + 'Rent/GetRentItemLogByStaff/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getLogUrl, null).then(function (logs) {
       console.log('get log', logs)
-      for(var i = 0; i < logs.length; i++){
+      for (var i = 0; i < logs.length; i++) {
         var createDate = new Date(logs[i].create_date)
-        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0') 
+        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0')
           + '-' + createDate.getDate().toString().padStart(2, '0')
         logs[i].timeStr = util.formatTimeStr(createDate)
       }
@@ -1898,14 +1900,14 @@ Page({
           var url = app.globalData.requestPrefix + 'Rent/ReturnAllRentItems/' + rental.id.toString() + '?sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(url, null).then(function (newRental) {
             wx.showToast({
-              icon:'success',
-              title:'归还成功',
+              icon: 'success',
+              title: '归还成功',
               duration: 2000,
-              success:()=>{
+              success: () => {
                 that.getData()
               }
             })
-           
+
           })
         }
         if (res.cancel) {
@@ -1915,32 +1917,43 @@ Page({
 
     })
   },
-  expand(e){
+  expand(e) {
     var that = this
     var expandItems = e.detail
-    if (expandItems.length == 0){
-      that.setData({expandItems})
+    var order = that.data.order
+    for (var i = 0; i < order.rentals.length; i++) {
+      order.rentals[i].expand = false
+    }
+    if (expandItems.length == 0) {
+      that.setData({ expandItems, order })
       return
     }
-    for(var i = 0; i < expandItems.length; i++){
-      switch(expandItems[i]){
+    for (var i = 0; i < expandItems.length; i++) {
+      switch (expandItems[i]) {
         case 'paymentInfo':
-          that.setData({expandItems: e.detail, showBalance: true})
+          that.setData({ expandItems: e.detail, showBalance: true })
           break
         default:
           var expandArr = expandItems[i].split('_')
-          if (expandItems[i].indexOf('rental_item_log_')>=0){
+          if (expandItems[i].indexOf('rental_item_log_') >= 0) {
             that.getRentItemLog(expandArr[expandArr.length - 2], expandArr[expandArr.length - 1])
           }
-          if (expandItems[i].indexOf('rental_item_change_')>=0){
+          if (expandItems[i].indexOf('rental_item_change_') >= 0) {
             that.getRentItemChange(expandArr[expandArr.length - 2], expandArr[expandArr.length - 1])
           }
-          that.setData({expandItems: e.detail})
+          if (expandItems[i].indexOf('rental_') >= 0 && expandArr.length == 2) {
+            for (var i = 0; i < order.rentals.length; i++) {
+              if (i == parseInt(expandArr[1])) {
+                order.rentals[i].expand = true
+              }
+            }
+          }
+          that.setData({ expandItems: e.detail, order })
           break
       }
     }
   },
-  getRentItemLog(rentalIndex, rentItemIndex){
+  getRentItemLog(rentalIndex, rentItemIndex) {
     var that = this
     var order = that.data.order
     var rental = order.rentals[rentalIndex]
@@ -1948,9 +1961,9 @@ Page({
     var getLogUrl = app.globalData.requestPrefix + 'Rent/GetRentItemLogByStaff/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(getLogUrl, null).then(function (logs) {
       console.log('get log', logs)
-      for(var i = 0; i < logs.length; i++){
+      for (var i = 0; i < logs.length; i++) {
         var createDate = new Date(logs[i].create_date)
-        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0') 
+        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0')
           + '-' + createDate.getDate().toString().padStart(2, '0')
         logs[i].timeStr = util.formatTimeStr(createDate)
       }
@@ -1958,7 +1971,7 @@ Page({
       that.setData({ order })
     })
   },
-  getRentItemChange(rentalIndex, rentItemIndex){
+  getRentItemChange(rentalIndex, rentItemIndex) {
     var that = this
     var order = that.data.order
     var rental = order.rentals[rentalIndex]

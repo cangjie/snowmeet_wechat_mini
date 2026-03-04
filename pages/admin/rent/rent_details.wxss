@@ -155,6 +155,8 @@ view{
   --rental-detail-background-color: #ebedf0;
   --un-pick-font-color: #FF0000;
   --un-return-back-color: #07d3f7;
-  --no-need-back-color:#a0a0a0;
+  --un-return-font-color: #996600;
+  --no-need-back-color:#aaaaaa;
+  --no-need-font-color: #505050;
   --returned-back-color:#FFFFFF;
 }
