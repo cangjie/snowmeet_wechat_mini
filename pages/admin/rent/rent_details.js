@@ -1989,6 +1989,48 @@ Page({
   },
   onTabChange(e){
     var that = this
+    that.convertByCategory()
     console.log('tab change', e)
+  },
+  convertByCategory(){
+    var that = this
+    var order = that.data.order
+    var categories = []
+    for(var i = 0; i < order.rentals.length; i++){
+      var rental = order.rentals[i]
+      for(var j = 0; j < rental.rentItems.length; j++){
+        var item = rental.rentItems[j]
+        if (item.next_id != null){
+          continue
+        }
+        console.log('item', item)
+        var category = null
+        var fatherCode = item.category.code.substr(0, 2)
+        for(var k = 0; k < categories.length; k++){
+          if (categories[k].code == fatherCode){
+            category = categories[k]
+          }
+        }
+        if (category == null){
+          category = {
+            code: fatherCode,
+            name: null,
+            id: null,
+            rentItems: []
+          }
+          categories.push(category)
+          var getUrl = app.globalData.requestPrefix + 'Rent/GetRentCategoryByCode/' + fatherCode
+          util.performWebRequest(getUrl, null).then(function(cate){
+            category.id = cate.id
+            category.name = cate.name
+            console.log('get categories', categories)
+            that.setData({categories})
+          })
+        }
+        category.rentItems.push(item)
+      }
+    }
+    
   }
+
 })
