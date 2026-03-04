@@ -1986,5 +1986,9 @@ Page({
       rentItem.changesLog = changesLog
       that.setData({ order })
     })
+  },
+  onTabChange(e){
+    var that = this
+    console.log('tab change', e)
   }
 })
