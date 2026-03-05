@@ -159,4 +159,5 @@ view{
   --no-need-back-color:#aaaaaa;
   --no-need-font-color: #505050;
   --returned-back-color:#FFFFFF;
+  --change-log-title-width: 120rpx;
 }

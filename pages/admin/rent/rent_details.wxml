@@ -368,17 +368,17 @@
                           <view class="sub-view-row" style="width:calc(var(--total-width) - 8 * var(--sub-padding))">
                             <block wx:for="{{item.changesLog}}" wx:for-item="change">
                               <view class="view-row sub-view-row">
-                                <view class="left-column">【编码】</view>
+                                <view class="left-column" style="width:var(--change-log-title-width);" >【编码】</view>
                                 <view class="right-column-whole">{{change.code}}</view>
                               </view>
                               <view class="view-row sub-view-row">
-                                <view class="left-column">【名称】</view>
+                                <view class="left-column" style="width:var(--change-log-title-width);" >【名称】</view>
                                 <view class="right-column-whole">{{change.name}}</view>
                               </view>
                               <view class="view-row sub-view-row">
-                                <view class="left-column">【日期】</view>
+                                <view class="left-column" style="width:var(--change-log-title-width);" >【日期】</view>
                                 <view class="right-column">{{change.changeDateStr}}</view>
-                                <view class="left-column">【时间】</view>
+                                <view class="left-column" style="width:var(--change-log-title-width);" >【时间】</view>
                                 <view class="right-column">{{change.changeTimeStr}}</view>
                               </view>
                             </block>
@@ -558,17 +558,17 @@
                       <view class="sub-view-row" style="width:calc(var(--total-width) - 90rpx)">
                         <block wx:for="{{item.changesLog}}" wx:for-item="change">
                           <view class="view-row sub-view-row">
-                            <view class="left-column">【编码】</view>
-                            <view class="right-column-whole">{{change.code}}</view>
+                            <view class="left-column" style="width:var(--change-log-title-width);" >【编码】</view>
+                            <view class="right-column-whole">{{change.code==null? '--' : change.code}}</view>
                           </view>
                           <view class="view-row sub-view-row">
-                            <view class="left-column">【名称】</view>
+                            <view class="left-column" style="width:var(--change-log-title-width);" >【名称】</view>
                             <view class="right-column-whole">{{change.name}}</view>
                           </view>
-                          <view class="view-row sub-view-row">
-                            <view class="left-column">【日期】</view>
+                          <view class="view-row sub-view-row" style="margin-bottom: 25rpx;">
+                            <view class="left-column" style="width:var(--change-log-title-width);" >【日期】</view>
                             <view class="right-column">{{change.changeDateStr}}</view>
-                            <view class="left-column">【时间】</view>
+                            <view class="left-column" style="width:var(--change-log-title-width);" >【时间】</view>
                             <view class="right-column">{{change.changeTimeStr}}</view>
                           </view>
                         </block>

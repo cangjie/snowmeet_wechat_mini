@@ -354,12 +354,6 @@ Page({
 
     })
   },
-  onTabChange(e) {
-    console.log('tab changed', e)
-    var that = this
-    that.setData({ activeTabIndex: e.detail.index })
-
-  },
   showRentItem(e) {
     var that = this
     var id = e.currentTarget.id
@@ -1992,7 +1986,9 @@ Page({
   },
   onTabChange(e) {
     var that = this
-    that.convertByCategory()
+    if (e.detail.index == 1) {
+      that.convertByCategory()
+    }
     console.log('tab change', e)
   },
   convertByCategory() {
@@ -2048,40 +2044,43 @@ Page({
               that.setData({ categories })
             })
           }
-          else{
+          /*
+          else {
             that.setData({ categories })
           }
+          */
         }
         category.rentItems.push(item)
+        that.setData({ categories })
       }
     }
   },
-  returnOrderCategoryAll(e){
+  returnOrderCategoryAll(e) {
     var that = this
     var id = parseInt(e.currentTarget.id)
     var order = that.data.order
     var categories = that.data.categories
     var category = null
-    for (var i = 0; category == null && categories && i < categories.length; i++){
-      if (categories[i].id == id){
+    for (var i = 0; category == null && categories && i < categories.length; i++) {
+      if (categories[i].id == id) {
         category = categories[i]
       }
     }
-    if (category == null){
+    if (category == null) {
       return
     }
     wx.showModal({
       title: '确认归还',
       content: category.rentItems.length + ' 件 ' + category.name + '，确认归还？',
-      complete:()=>{
+      complete: () => {
         var url = app.globalData.requestPrefix + 'Rent/RetualAllRentItemInOrderByCategory/' + order.id + '?categoryId=' + category.id + '&sessionKey=' + app.globalData.sessionKey
-        util.performWebRequest(url, null).then(function (newOrder){
+        util.performWebRequest(url, null).then(function (newOrder) {
           wx.showToast({
             icon: 'seccess',
             title: '归还成功',
             duration: 3000
           })
-          for(var i = 0; newOrder.rentals && i < newOrder.rentals.length; i++){
+          for (var i = 0; newOrder.rentals && i < newOrder.rentals.length; i++) {
             that.data.order = newOrder
             that.refreshStatus(newOrder.rentals[i])
           }
