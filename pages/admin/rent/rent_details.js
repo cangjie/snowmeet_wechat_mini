@@ -2059,6 +2059,7 @@ Page({
   returnOrderCategoryAll(e){
     var that = this
     var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
     var categories = that.data.categories
     var category = null
     for (var i = 0; category == null && categories && i < categories.length; i++){
@@ -2072,8 +2073,19 @@ Page({
     wx.showModal({
       title: '确认归还',
       content: category.rentItems.length + ' 件 ' + category.name + '，确认归还？',
-      confirm:()=>{
-        
+      complete:()=>{
+        var url = app.globalData.requestPrefix + 'Rent/RetualAllRentItemInOrderByCategory/' + order.id + '?categoryId=' + category.id + '&sessionKey=' + app.globalData.sessionKey
+        util.performWebRequest(url, null).then(function (newOrder){
+          wx.showToast({
+            icon: 'seccess',
+            title: '归还成功',
+            duration: 3000
+          })
+          for(var i = 0; newOrder.rentals && i < newOrder.rentals.length; i++){
+            that.data.order = newOrder
+            that.refreshStatus(newOrder.rentals[i])
+          }
+        })
       }
     })
   }
