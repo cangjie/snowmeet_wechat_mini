@@ -2055,7 +2055,27 @@ Page({
         category.rentItems.push(item)
       }
     }
-
+  },
+  returnOrderCategoryAll(e){
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var categories = that.data.categories
+    var category = null
+    for (var i = 0; category == null && categories && i < categories.length; i++){
+      if (categories[i].id == id){
+        category = categories[i]
+      }
+    }
+    if (category == null){
+      return
+    }
+    wx.showModal({
+      title: '确认归还',
+      content: category.rentItems.length + ' 件 ' + category.name + '，确认归还？',
+      confirm:()=>{
+        
+      }
+    })
   }
 
 })
