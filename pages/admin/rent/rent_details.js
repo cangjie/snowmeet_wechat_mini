@@ -487,6 +487,7 @@ Page({
     var rentalIndex = util.getRentalIndexFromOder(rental.id, order)
     order.rentals[rentalIndex] = rental
     that.renderOrder(order)
+    that.convertByCategory()
     that.setData({ order })
   },
   showRentalDetail(e) {
@@ -1989,60 +1990,72 @@ Page({
       that.convertByCategory()
     })
   },
-  onTabChange(e){
+  onTabChange(e) {
     var that = this
     that.convertByCategory()
     console.log('tab change', e)
   },
-  convertByCategory(){
+  convertByCategory() {
     var that = this
     var order = that.data.order
     var categories = []
-    for(var i = 0; i < order.rentals.length; i++){
+    var oldCategories = that.data.categories
+    for (var i = 0; i < order.rentals.length; i++) {
       var rental = order.rentals[i]
-      for(var j = 0; j < rental.rentItems.length; j++){
+      for (var j = 0; j < rental.rentItems.length; j++) {
         var item = rental.rentItems[j]
         item.rentalIndex = i
         item.itemIndex = j
-        if (item.next_id != null){
+        if (item.next_id != null) {
           continue
         }
         console.log('item', item)
         var category = null
         var fatherCode = item.category.code.substr(0, 2)
-        for(var k = 0; k < categories.length; k++){
-          if (categories[k].code == fatherCode){
+        for (var k = 0; k < categories.length; k++) {
+          if (categories[k].code == fatherCode) {
             category = categories[k]
           }
         }
-        if (category == null){
+        if (category == null) {
           category = {
             code: fatherCode,
             name: null,
             id: null,
             rentItems: []
           }
-          categories.push(category)
-          var getUrl = app.globalData.requestPrefix + 'Rent/GetRentCategoryByCode/' + fatherCode
-          util.performWebRequest(getUrl, null).then(function(cate){
-            /*
-            category.id = cate.id
-            category.name = cate.name
-            console.log('get categories', categories)
-            */
-            for(var i = 0; i < categories.length; i++){
-              if (categories[i].code == cate.code){
-                categories[i].id = cate.id
-                categories[i].name = cate.name
-              }
+          var oldCategory = null
+          for (var l = 0; oldCategory == null && oldCategories != null && l < oldCategories.length; l++) {
+            if (oldCategories[l].code == fatherCode) {
+              oldCategory = oldCategories[l]
             }
-            that.setData({categories})
-          })
+          }
+          if (oldCategory != null) {
+            category.code = oldCategory.code
+            category.name = oldCategory.name
+            category.id = oldCategory.id
+          }
+          categories.push(category)
+          if (oldCategory == null) {
+            var getUrl = app.globalData.requestPrefix + 'Rent/GetRentCategoryByCode/' + fatherCode
+            util.performWebRequest(getUrl, null).then(function (cate) {
+              for (var i = 0; i < categories.length; i++) {
+                if (categories[i].code == cate.code) {
+                  categories[i].id = cate.id
+                  categories[i].name = cate.name
+                }
+              }
+              that.setData({ categories })
+            })
+          }
+          else{
+            that.setData({ categories })
+          }
         }
         category.rentItems.push(item)
       }
     }
-    
+
   }
 
 })

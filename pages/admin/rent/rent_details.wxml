@@ -425,7 +425,7 @@
                 <view class="right-column">{{category.rentItems.length}}</view>
               </view>
               <view>
-                <view wx:for="{{category.rentItems}}" wx:for-index="itemIndex">
+                <view wx:for="{{category.rentItems}}" wx:for-index="itemIndex" style="background-color: var({{item.backColor}});color:var({{item.fontColor}})" >
                   <view class="view-row sub-view-row">
                     <view class="left-column" style="width:var(--title-width-sub);">
                       【名称】{{item.prev_id!=null?'(更)':''}}
@@ -573,12 +573,18 @@
                           </view>
                         </block>
                       </view>
+                      
                     </van-collapse-item>
                   </view>
+                
                   <view style="height:50rpx" >
                     <van-divider></van-divider>
                   </view>
                 </view>
+                <view class="view-row" style="justify-content: center;margin-top:50rpx">
+                      <van-button id="{{rentalIndex}}" type="primary" size="small" bind:click="returnAll"
+                        disabled="{{rental.settled == 1}}"> 全 部 归 还 </van-button>
+                    </view>
               </view>
             </van-collapse-item>
           </view>
