@@ -50,11 +50,12 @@
     <view class="left-column">【项目】</view>
     <view class="right-column view-row">
       <checkbox-group id="need_edge" bindchange="setValue" >
-        <checkbox checked="{{care.need_edge == 1}}">修刃</checkbox>
+        <checkbox checked="{{care.need_edge == 1}}" disabled="{{care.summer != null}}" >修刃</checkbox>
       </checkbox-group>
       <input id="edge_degree" bindinput="setValue" class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1}}" type="number" />度
     </view>
   </view>
+  
   <view class="view-row" >
     <view class="left-column"></view>
     <view class="right-column view-row">
@@ -62,18 +63,27 @@
         <checkbox style="margin-right: 30rpx;" disabled="{{care.ticket_code == null || care.ticket.template_id != 12}}" checked="{{care.free_wax == 1}}" >机打蜡</checkbox>
       </checkbox-group>
       <checkbox-group id="need_wax" bindchange="setValue" >
-        <checkbox  checked="{{care.need_wax == 1}}" >热蜡</checkbox>
+        <checkbox  checked="{{care.need_wax == 1}}" disabled="{{care.summer != null}}" >热蜡</checkbox>
       </checkbox-group>
       <checkbox-group id="need_unwax" bindchange="setValue" >
-        <checkbox style="margin-left: 30rpx;" checked="{{care.need_unwax == 1}}">刮蜡</checkbox>
+        <checkbox style="margin-left: 30rpx;" checked="{{care.need_unwax == 1}}" disabled="{{care.summer != null}}" >刮蜡</checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【非雪季】</view>
+    <view class="right-column view-row">
+      <checkbox-group id="summer" bindchange="setValue" >
+        <checkbox value="now" checked="{{care.summer == 'now'}}" >直接寄存</checkbox>
+        <checkbox value="later" style="margin-left: 20rpx;" checked="{{care.summer == 'later'}}" >先双项，晚点寄存</checkbox>
       </checkbox-group>
     </view>
   </view>
   <view class="view-row">
     <view class="left-column">【加急】</view>
     <view class="right-column">
-      <checkbox-group id="urgent" bindchange="setValue" >
-        <checkbox checked="{{care.urgent == 1}}">是</checkbox>
+      <checkbox-group id="urgent" bindchange="setValue"  >
+        <checkbox checked="{{care.urgent == 1}}" disabled="{{care.summer != null}}" >是</checkbox>
       </checkbox-group>
     </view>
   </view>

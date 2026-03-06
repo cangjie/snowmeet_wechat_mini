@@ -11,3 +11,7 @@
 .view-row{
   margin-top: 0rpx;
 }
+.fui-left-column{
+  width: 180rpx;
+  text-align: left;
+}

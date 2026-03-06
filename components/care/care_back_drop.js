@@ -112,7 +112,6 @@ Component({
     },
     placeOrder(e){
       var that = this
-      
       var order = that.data.order
       order.id = 0
       order.valid = 1
@@ -144,10 +143,8 @@ Component({
           title: '订单确认',
           content: '当前订单包含了免费的维修项目，是否确认？',
           complete: (res) => {
-            if (res.cancel) {
-              
+            if (res.cancel) { 
             }
-        
             if (res.confirm) {
               that.confirmOrder(e)
             }
@@ -157,7 +154,6 @@ Component({
       else{
         that.confirmOrder(e)
       }
-      
     },
     confirmOrder(e){
       var that = this

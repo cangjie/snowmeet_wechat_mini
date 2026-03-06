@@ -1,7 +1,7 @@
 .left-column{
   display: flex;
   text-align: left;
-  width: 170rpx;
+  width: 180rpx;
   height: 15rpx;
   align-items: center;
 }

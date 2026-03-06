@@ -140,15 +140,15 @@ Component({
       var message = util.getCareWellFormMessage(care)
       that.setData({ brandList, brandSelectIndex, care, othersService, wellFormed: message == '' ? true : false })
     },
-    setDiscount(e){
+    setDiscount(e) {
       var that = this
       var care = that.data.care
-      if (care.ticket_code != null && care.ticket.template_id == 16){
-        if (care.need_edge == 1 && care.need_wax == 1){
+      if (care.ticket_code != null && care.ticket.template_id == 16) {
+        if (care.need_edge == 1 && care.need_wax == 1) {
           care.discount = 30
           that.computeCharge(care)
         }
-        else if (care.need_edge == 1 || care.need_wax == 1){
+        else if (care.need_edge == 1 || care.need_wax == 1) {
           care.discount = 20
           that.computeCharge(care)
         }
@@ -217,10 +217,10 @@ Component({
             that.getProduct(care)
           }
           else {
-            if (care.ticket.template_id == 12){
+            if (care.ticket.template_id == 12) {
               that.getTicketProduct(care)
             }
-            else if (care.ticket.template_id == 16){
+            else if (care.ticket.template_id == 16) {
               that.getProduct(care)
               that.setDiscount()
             }
@@ -239,10 +239,10 @@ Component({
             that.getProduct(care)
           }
           else {
-            if (care.ticket.template_id == 12){
+            if (care.ticket.template_id == 12) {
               that.getTicketProduct(care)
             }
-            else if (care.ticket.template_id == 16){
+            else if (care.ticket.template_id == 16) {
               that.getProduct(care)
               that.setDiscount()
             }
@@ -315,7 +315,7 @@ Component({
               care.free_wax = 1
               that.getTicketProduct(care)
             }
-            else if (care.ticket.template_id == 16){
+            else if (care.ticket.template_id == 16) {
               that.setDiscount()
             }
           }
@@ -342,6 +342,26 @@ Component({
           else {
             that.getTicketProduct(care)
           }
+          break
+        case 'summer':
+          console.log('summer', value)
+          care.summer = null
+          for (var i = value.length - 1; care.summer == null && i >= 0; i--) {
+            if (value[i] == 'now' || value[i] == 'later') {
+              care.summer = value[i]
+            }
+          }
+          if (care.summer == 'later') {
+            care.need_edge = 1
+            care.need_wax = 1
+            care.need_unwax = 1
+          }
+          if (care.summer == 'now') {
+            care.need_edge = 0
+            care.need_wax = 0
+            care.need_unwax = 0
+          }
+          that.getProduct(care)
           break
         default:
           break
@@ -510,7 +530,7 @@ Component({
       var that = this
       that.setData({ product: null })
       care.common_charge = 0
-      if (care.need_edge == 1 && care.need_wax == 1) {
+      if (care.need_edge == 1 && care.need_wax == 1 && care.summer == null) {
         data.getCareProductPromise(that.data.shop, '双项', care.urgent).then(function (product) {
           product.sale_priceStr = util.showAmount(product.sale_price)
           that.setData({ product })
@@ -522,7 +542,7 @@ Component({
           that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
         })
       }
-      else if (care.need_edge == 1 || care.need_wax == 1) {
+      else if ((care.need_edge == 1 || care.need_wax == 1) && care.summer == null ) {
         var productName = care.need_wax == 1 ? '打蜡' : (care.need_edge == 1 ? '修刃' : null)
         data.getCareProductPromise(that.data.shop, productName, care.urgent).then(function (product) {
           product.sale_priceStr = util.showAmount(product.sale_price)
@@ -534,6 +554,18 @@ Component({
           that.save()
           that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
         })
+      }
+      else if (care.summer != null) {
+        care.product = {
+          sale_price: 330,
+          sale_priceStr: '¥330.00'
+        }
+        care.common_charge = care.product.sale_price
+        care.summary = care.product.sale_price
+        care.summaryStr = care.product.sale_priceStr
+        that.computeCharge(care)
+        that.save()
+        that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: false, refreshFooter: true })
       }
       else {
         care.product = null
@@ -679,8 +711,6 @@ Component({
           care.current = 1
           order.cares[0] = care
         }
-        //currentCare = care
-        //currentCare.current = 1
       }
       if (!e || e.needRender == undefined || e.needRender == true) {
         that.setData({ order })

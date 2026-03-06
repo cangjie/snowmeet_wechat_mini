@@ -84,9 +84,9 @@
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
-        <view class="fui-left-column">【质保】</view>
+        <view class="fui-left-column">【非雪季】</view>
       </fui-col>
-      <radio-group id="haveWarranty" bindchange="setQueryOptions">
+      <radio-group id="summer" bindchange="setQueryOptions">
         <fui-col span="6">
           <radio checked="{{true}}" value="null" disabled="{{(keyword != null && keyword != '') || (cell != null && cell != '') || querying}}" >全部</radio>
         </fui-col>
@@ -176,6 +176,7 @@
           <view wx:if="{{item.haveOnCredit}}">【挂】</view>
           <view wx:if="{{item.haveDiscount}}">【减】</view>
           <view wx:if="{{item.haveWarranty==true}}">【质】</view>
+          <view wx:if="{{item.careProperties.isSummerTask==true}}">【非】</view>
           <view>{{item.memberShip}}</view>
         </view>
         <view>

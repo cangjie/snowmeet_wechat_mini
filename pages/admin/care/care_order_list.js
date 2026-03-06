@@ -12,7 +12,8 @@ Page({
       {key: 'isTest', value: false},
       {key: 'isEntertain', value: false},
       {key: 'haveDiscount', value: null},
-      {key: 'haveWarranty', value: null}
+      {key: 'haveWarranty', value: null},
+      {key: 'summer', value: null}
     ],
     cell: null,
     querying: false,
@@ -87,6 +88,7 @@ Page({
     var haveDiscount = null
     var queryOptions = that.data.queryOptions
     var haveWarranty = null
+    var isSummerCare = null
     for(var i = 0; i < queryOptions.length; i++){
       switch(queryOptions[i].key){
         case 'isTest':
@@ -100,6 +102,9 @@ Page({
           break
         case 'haveWarranty':
           haveWarranty = queryOptions[i].value
+          break
+        case 'summer':
+          isSummerCare = queryOptions[i].value
           break
         default:
           break
@@ -117,9 +122,10 @@ Page({
       isTest = null
       isEntertain = null
       haveDiscount = null
+      isSummerCare = null
     }
     data.getOrdersByStaffPromise(null, shop, null, null, '养护', startDate, endDate, 
-      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, haveWarranty, null, that.data.keyword).then(function (orders){
+      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, haveWarranty, null, that.data.keyword, isSummerCare).then(function (orders){
         console.log('get orders', orders)
         that.renderOrders(orders)
         that.setData({querying: false})

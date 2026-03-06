@@ -289,7 +289,7 @@ const getRetailOrderByMi7CodePromise = function (code, sessionKey) {
     })
   })
 }
-const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey, cell, haveWarranty, retailType, keyword) {
+const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey, cell, haveWarranty, retailType, keyword, isSummerCare) {
   var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaff?sessionKey=' + sessionKey
   if (orderId != null) {
     qUrl += '&orderId=' + orderId
@@ -344,6 +344,9 @@ const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type
   }
   if (keyword != null && keyword != undefined){
     qUrl += '&keyword=' + keyword
+  }
+  if (isSummerCare != null && isSummerCare != undefined){
+    qUrl += '&isSummerCare=' + isSummerCare
   }
   return new Promise(function (resolve, reject) {
     util.performWebRequest(qUrl, null).then(function (orders) {
