@@ -52,7 +52,7 @@
       <checkbox-group id="need_edge" bindchange="setValue" >
         <checkbox checked="{{care.need_edge == 1}}" disabled="{{care.summer != null}}" >修刃</checkbox>
       </checkbox-group>
-      <input id="edge_degree" bindinput="setValue" class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1}}" type="number" />度
+      <input id="edge_degree" bindinput="setValue" class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1 && care.summer == null}}" type="number" />度
     </view>
   </view>
   

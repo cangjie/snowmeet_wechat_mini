@@ -211,9 +211,10 @@ Component({
       else {
         that.data.copies = 1
       }
+      var summer = care.biz_type == '非雪季养护' ? true: false
       var edge = care.need_edge
       var candle = care.need_wax
-      var degree = care.edge_degree
+      var degree = care.edge_degree == null ? '89' : care.edge_degree
       var type = care.equipment
       var more = care.repair_more ? care.repair_more : ''
       var memo = care.repair_memo ? care.repair_memo : ''
@@ -255,6 +256,9 @@ Component({
       command.setText(20, 20 + 40 + 40, font, 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)
       if (edge.toString() == '1') {
         command.setText(20, 20 + 40 + 40 + 55, font, 0, 1, 1, "修刃 " + degree + "：")
+      }
+      else if (summer){
+        command.setText(20, 20 + 40 + 40 + 55, font, 0, 1, 1, "非雪季养护 " + degree + "：")
       }
       if (more != '') {
         command.setText(300, 20 + 40 + 40 + 55, font, 0, 1, 1, "其他：" + more)

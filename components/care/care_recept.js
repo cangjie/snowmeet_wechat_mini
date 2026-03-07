@@ -361,6 +361,9 @@ Component({
             care.need_wax = 0
             care.need_unwax = 0
           }
+          if (care.summer != null && care.edge_degree == null){
+            care.edge_degree = '89'
+          }
           that.getProduct(care)
           break
         default:
