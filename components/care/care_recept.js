@@ -778,7 +778,14 @@ Component({
     },
     ticketSelectorEvent(e){
       var that = this
-      that.setData({showTicketPopUp: false})
+      if (e.detail.action == 'confirm'){
+        var care = that.data.care
+        care.ticket = e.detail.selectedTicket
+        that.setData({care, showTicketPopUp: false})
+      }
+      else{
+        that.setData({showTicketPopUp: false})
+      }
     }
   },
   

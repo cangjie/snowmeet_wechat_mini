@@ -7,4 +7,5 @@ view{
   --cell-1-width: 200rpx;
   --cell-2-width: 200rpx;
   --cell-3-width: 250rpx;
+  --scroll-height: 800rpx;
 }

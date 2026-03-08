@@ -150,5 +150,7 @@
   </view>
 </scroll-view>
 <van-popup show="{{ showTicketPopUp }}" bind:close="onClose">
-  <ticket-selector bindEvent="ticketSelectorEvent" ticketType="{{'养护'}}" memberId="{{order.member_id}}" ></ticket-selector>
+  <ticket-selector wx:if="{{showTicketPopUp}}" bindEvent="ticketSelectorEvent" 
+  ticketType="{{'养护'}}" memberId="{{order.member_id}}" 
+  selectedCode="{{care.ticket.code}}" ></ticket-selector>
 </van-popup>

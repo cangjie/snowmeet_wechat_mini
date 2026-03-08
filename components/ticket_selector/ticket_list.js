@@ -18,6 +18,10 @@ Component({
     memberId:{
       type: Number,
       value: 0
+    },
+    selectedCode:{
+      type: String,
+      value: null
     }
 
   },
@@ -43,7 +47,15 @@ Component({
                 tickets[i].disabled = false
               }
             }
+            if (tickets[i].code == that.properties.selectedCode){
+              tickets[i].selected = true
+            }
+            tickets[i].expire_dateStr = ((tickets[i].expire_date == null) ? '--' : util.formatDate(new Date(tickets[i].expire_date)))
+            if (tickets[i].expire_dateStr == '9999-12-31'){
+              tickets[i].expire_dateStr = '--'
+            }
           }
+          that.setData({tickets})
         })
     }
   },
@@ -59,6 +71,27 @@ Component({
     cancel(e){
       var that = this
       that.triggerEvent('Event', {action: 'cancel'})
+    },
+    confirm(e){
+      var that = this
+      if (that.data.selectedCode==null || that.data.selectedCode == undefined){
+        that.cancel(e)
+      }
+      else{
+        var tickets = that.data.tickets
+        var ticket = null
+        for(var i = 0; ticket == null && i < tickets.length; i++){
+          if (tickets[i].code == that.data.selectedCode){
+            ticket = tickets[i]
+          }
+        }
+        that.triggerEvent('Event', {action: 'confirm', selectedTicket: ticket})
+      }
+    },
+    selectCode(e){
+      var that = this
+      that.data.selectedCode = e.detail.value
+      console.log('select code', e)
     }
   }
 })
