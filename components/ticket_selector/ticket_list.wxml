@@ -12,9 +12,9 @@
       <block wx:for="{{tickets}}">
         <view class="view-row" style="width:var(--modal-width)">
           <view style="width: var(--cell-0-width);text-align: center;">
-            <radio style="margin-left: 15rpx;" checked="{{item.selected}}" value="{{item.code}}" ></radio>
+            <radio style="margin-left: 15rpx;" checked="{{item.selected}}" value="{{item.code}}" disabled="{{item.disabled}}" ></radio>
           </view>
-          <view style="width: var(--cell-1-width);text-align: center;">{{item.code}}</view>
+          <view style="width: var(--cell-1-width);text-align: center;">{{item.code==null?'--':item.code}}</view>
           <view style="width: var(--cell-2-width);text-align: center;">{{item.name}}</view>
           <view style="width: var(--cell-3-width);text-align: center;">{{item.expire_dateStr}}</view>
         </view>

@@ -86,12 +86,14 @@ Component({
               data.getCareOthersServicePromise('单板').then(function (list) {
                 that.setData({ othersService: [], boardOthersService: list.map((l) => { return { name: l, checked: false } }) })
                 that.loadData(currentCare)
+                /*
                 data.getMemberTicketsPromise(that.data.order.member_id, '养护', true, app.globalData.sessionKey).then(function (tickets) {
                   console.log('tickets', tickets)
                   tickets = tickets.sort((a, b) => a.template_id - b.template_id)
                   that.setData({ tickets: tickets })
                   that.setCateTicket()
                 })
+                */
               })
             })
           })
@@ -774,13 +776,55 @@ Component({
     },
     selectTicket(e){
       var that = this
-      that.setData({showTicketPopUp: true})
+      var order = that.data.order
+      var care = that.data.care
+      var disableArr = []
+      for(var i = 0; order != null && i < order.cares.length; i++){
+        if (order.cares[i].ticket_code != null && order.cares[i].ticket_code != care.ticket_code){
+          disableArr.push(order.cares[i].ticket_code)
+        }
+      }
+      that.setData({showTicketPopUp: true, disableArr})
     },
     ticketSelectorEvent(e){
       var that = this
       if (e.detail.action == 'confirm'){
         var care = that.data.care
         care.ticket = e.detail.selectedTicket
+
+        if (care.ticket != null) {
+          care.ticket_code = care.ticket.code
+          care.ticket.use = true
+          if (care.ticket.template_id == 12) {
+            care.free_wax = 1
+            that.getTicketProduct(care)
+          }
+          else if (care.ticket.template_id == 16) {
+            that.setDiscount()
+          }
+          else if (care.ticket.template_id == 17){
+            care.need_edge = 0
+            care.need_wax = 0
+            care.need_unwax = 0
+            care.common_charge = 0
+          }
+          else if (care.ticket.template_id == 18){
+            care.need_edge = 1
+            care.need_wax = 1
+            care.need_unwax = 1 
+            care.common_charge = 0
+          }
+        }
+        else {
+          care.ticket_code = null
+          care.ticket = null
+          care.free_wax = 0
+          care.discount = 0
+          care.need_edge = 0
+          care.need_wax = 0
+          care.need_unwax = 0
+          that.getProduct(care)
+        }
         that.setData({care, showTicketPopUp: false})
       }
       else{

@@ -44,7 +44,7 @@
     <!--checkbox-group  style="margin-left: 10rpx;" id="ticket" bindchange="setValue" >
       <checkbox style="font-size: 10pt;" checked="{{care.ticket.use == true}}" >使用</checkbox>
     </checkbox-group-->
-    <van-button type="primary" size="mini" style="margin-left: 20rpx;" bind:click="selectTicket" >选择其他</van-button>
+    <van-button type="primary" size="mini" style="margin-left: 20rpx;" bind:click="selectTicket"    >选择其他</van-button>
   </view>
   <view class="view-row">
     <view class="left-column">【项目】</view>
@@ -152,5 +152,5 @@
 <van-popup show="{{ showTicketPopUp }}" bind:close="onClose">
   <ticket-selector wx:if="{{showTicketPopUp}}" bindEvent="ticketSelectorEvent" 
   ticketType="{{'养护'}}" memberId="{{order.member_id}}" 
-  selectedCode="{{care.ticket.code}}" ></ticket-selector>
+  selectedCode="{{care.ticket.code}}" disabledCodes="{{disableArr}}" ></ticket-selector>
 </van-popup>

@@ -55,6 +55,12 @@ Component({
               tickets[i].expire_dateStr = '--'
             }
           }
+          var cancelTicket = {
+            code : null,
+            name: '不使用优惠券',
+            expire_dateStr: '--'
+          }
+          tickets.push(cancelTicket)
           that.setData({tickets})
         })
     }
