@@ -77,7 +77,6 @@ Component({
             order.cares.push(currentCare)
           }
         }
-        //that.setData({care: currentCare})
         data.getEquipBrandsPromise('双板').then(function (list) {
           that.setData({ skiBrandList: list })
           data.getEquipBrandsPromise('单板').then(function (list) {
@@ -95,15 +94,11 @@ Component({
                 })
               })
             })
-
           })
         })
-
-
       })
     }
   },
-
   /**
    * Component methods
    */
@@ -776,6 +771,15 @@ Component({
         care.ticket = ticket
         that.setData({ care })
       }
+    },
+    selectTicket(e){
+      var that = this
+      that.setData({showTicketPopUp: true})
+    },
+    ticketSelectorEvent(e){
+      var that = this
+      that.setData({showTicketPopUp: false})
     }
-  }
+  },
+  
 })

@@ -1,4 +1,6 @@
 {
   "component": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "ticket-selector": "../ticket_selector/ticket_list"
+  }
 }

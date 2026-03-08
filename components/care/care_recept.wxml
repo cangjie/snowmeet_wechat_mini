@@ -36,15 +36,15 @@
       bindinput="setValue" value="{{care.scale}}" />cm
     </view>
   </view>
-  <view class="view-row" style="margin-top: 20rpx;" wx:if="{{care.ticket!=null && care.ticket != undefined  }}" >
+  <view class="view-row" style="margin-top: 20rpx;"  >
     <view class="left-column" style="display: flex; font-size: 10pt;align-items: center;" >【优惠券】</view>
-    <view style="display: flex; font-size: 10pt;align-items: center;">
+    <view style="display: flex; font-size: 10pt;align-items: center;" wx:if="{{care.ticket!=null && care.ticket != undefined}}" >
       ({{care.ticket.code}}){{care.ticket.name}}
     </view>
-    <checkbox-group  style="margin-left: 10rpx;" id="ticket" bindchange="setValue" >
+    <!--checkbox-group  style="margin-left: 10rpx;" id="ticket" bindchange="setValue" >
       <checkbox style="font-size: 10pt;" checked="{{care.ticket.use == true}}" >使用</checkbox>
-    </checkbox-group>
-    <!--van-button type="primary" size="mini" style="margin-left: 20rpx;" >选择其他</van-button-->
+    </checkbox-group-->
+    <van-button type="primary" size="mini" style="margin-left: 20rpx;" bind:click="selectTicket" >选择其他</van-button>
   </view>
   <view class="view-row">
     <view class="left-column">【项目】</view>
@@ -149,3 +149,6 @@
     disabled="{{!wellFormed}}" > 下一件 </van-button>
   </view>
 </scroll-view>
+<van-popup show="{{ showTicketPopUp }}" bind:close="onClose">
+  <ticket-selector bindEvent="ticketSelectorEvent" ticketType="{{'养护'}}" memberId="{{order.member_id}}" ></ticket-selector>
+</van-popup>

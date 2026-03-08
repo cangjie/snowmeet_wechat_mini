@@ -1,0 +1,10 @@
+/* components/ticket_selector/ticket_list.wxss */
+@import '/app.wxss';
+
+view{
+  --modal-width: 700rpx;
+  --cell-0-width: 50rpx;
+  --cell-1-width: 200rpx;
+  --cell-2-width: 200rpx;
+  --cell-3-width: 250rpx;
+}
