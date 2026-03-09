@@ -103,7 +103,7 @@ Page({
           member.orderDateStr = '——'
           member.orderAmountStr = '——'
           if (order){
-            member.orderDateStr = util.formatDate(new Date(order.pay_time))
+            member.orderDateStr = util.formatDate(new Date(order.biz_date))
             member.orderAmountStr = util.showAmount(order.paidAmount)
           }
           if (member.depositAccounts && member.depositAccounts.length > 0){

@@ -1,0 +1,8 @@
+/* components/date_selector/date_selector.wxss */
+@import '/app.wxss';
+.date-text-box{
+  width: calc(var(--date-selector-font-size) * 6);
+}
+.date-selector-view{
+  font-size: var(--date-selector-font-size);
+}

@@ -1,0 +1,7 @@
+@import '/app.wxss';
+.left-column{
+  width: 180rpx;
+}
+.right-column{
+  width: 540rpx;
+}

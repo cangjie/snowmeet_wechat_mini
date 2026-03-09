@@ -1,0 +1,12 @@
+/* pages/admin/unipay/unipay_detail.wxss */
+.left-column{
+  text-align: left;
+  width: 170rpx;
+}
+.right-column{
+  text-align: left;
+  width:180rpx;
+}
+view{
+  --divider-margin: 5rpx;
+}

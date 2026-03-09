@@ -34,8 +34,12 @@ Page({
     var that = this
     var resort = decodeURIComponent(options.resort)
     var memberId = options.memberId
+    var staffId = options.staffId
     if (memberId){
       that.setData({memberId})
+    }
+    if (staffId){
+      that.setData({staffId})
     }
     if (!resort){
       resort = '万龙'
@@ -47,7 +51,7 @@ Page({
 
       var startDate = util.formatDate(reserveDate)
       var endDate = new Date()
-      endDate.setDate(endDate.getDate() + 5)
+      endDate.setDate(endDate.getDate() + 8)
 
       if (util.formatTimeStr(new Date()) > '16:00:00'){
         reserveDate.setDate(reserveDate.getDate() + 1)
@@ -73,7 +77,7 @@ Page({
           break
       }
       that.setData({tabbarItemList: app.globalData.userTabBarItem, 
-        role: app.globalData.role, canGetInfo: true, reserveDate: util.formatDate(reserveDate),
+        role: app.globalData.staff? 'staff': '', canGetInfo: true, reserveDate: util.formatDate(reserveDate),
         startDate: startDate, endDate: util.formatDate(endDate), reserveDateDesc: reserveDateDesc})
       that.getResortArr()
       
@@ -161,7 +165,7 @@ Page({
       resort = '万龙'
       that.setData({resort})
     }
-    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?resort=' + encodeURIComponent(resort)
+    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?showHidden=0&resort=' + encodeURIComponent(resort)
     wx.request({
       url: getUrl,
       method: 'GET',
@@ -232,7 +236,7 @@ Page({
             productList.splice(i, 1)
             i--
           }
-          var desc = '<ul><li>出票后不支持退换！</li><li>出票前可申请免费退换。</li><li>客服电话：17800191050。</li><li>出票当日自动出票。</li><more/></ul>'
+          var desc = '<ul><li>出票后不支持退换！</li><li>出票前可申请免费退换。</li><li>客服电话：18612472341 17800191050。</li><li>出票当日自动出票。</li><more/></ul>'
           if (prod.name.indexOf('日场') >= 0){
             var subDesc = '<li>日场营业时间 9:00-17:00</li>'
             desc = desc.replace('<more/>', subDesc)
@@ -242,7 +246,7 @@ Page({
             desc = desc.replace('<more/>', subDesc)
           }
           else if (prod.name.indexOf('下午') >= 0){
-            var subDesc = '<li>下午加夜场时间：限当日14:30后使用</li>'
+            var subDesc = '<li>下午加夜场时间：限当日13:30后使用</li>'
             desc = desc.replace('<more/>', subDesc)
           }
           else if (prod.name.indexOf('夜场') >= 0) {
@@ -266,7 +270,9 @@ Page({
     switch(resort){
       case '南山':
         wx.navigateTo({
-          url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate + (that.data.memberId?'&memberId=' + that.data.memberId : ''),
+          url: 'ski_pass_reserve?id=' + id + '&date=' + that.data.reserveDate 
+            + (that.data.memberId?'&memberId=' + that.data.memberId : '')
+            + (that.data.staffId?'&staffId=' + that.data.staffId : ''),
         })
         break
       /*
@@ -344,8 +350,11 @@ Page({
   gotoDetail(e){
     var that = this
     var id = e.currentTarget.id
+    var url = 'skipass_detail?id=' + id 
+    url += (that.data.memberId?('&memberId=' + that.data.memberId) : '')
+    url += (that.data.staffId?('&staffId=' + that.data.staffId ): '')
     wx.navigateTo({
-      url: 'skipass_detail?id=' + id + (that.data.memberId?'&memberId=' + that.data.memberId : ''),
+      url: url,
     })
   },
   getResortArr(){

@@ -4,7 +4,8 @@
     "mp-cell": "weui-miniprogram/cell/cell",
     "mp-tabs": "/components/tabs/index",
     "tree": "/components/tree/index",
-    "price-matrix": "/components/price_matrix/price_matrix"
+    "shop-price-matrix": "/components/rent/shop_price_matrix",
+    "category-selector": "/components/rent/category_selector"
   },
   "navigationBarTitleText": "租赁分类维护"
 }

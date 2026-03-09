@@ -1,6 +1,7 @@
 // pages/admin/rent/unreturned.js
 const app = getApp()
 const util = require('../../../utils/util')
+const data = require('../../../utils/data.js')
 Page({
 
   /**
@@ -17,54 +18,33 @@ Page({
   getData(){
     var that = this
     that.setData({querying: true})
-    var getUrl = 'https://' + app.globalData.domainName + '/core/Rent/GetUnReturnedItems?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&shop=' + encodeURIComponent(that.data.shop)
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
+    var shop = (!that.data.shop || that.data.shop == '')? null : that.data.shop
+    data.getUnreturnedRentItemPromise(shop, app.globalData.sessionKey).then(function (list){
+      console.log('get list', list)
+      for(var i = 0; i < list.length; i++){
+        var items = list[i].items
+        for(var j = 0; j < items.length; j++){
+          var item = items[j]
+          var pickDate = new Date(item.pickDate)
+          item.pickDateDateStr = util.formatDate(pickDate)
+          item.pickDateTimeStr = util.formatTimeStr(pickDate)
+
         }
-        var items = []
-        var orders = res.data
-        var classList = [{class: '总计', count: orders.length}]
-        for(var i = 0; i < orders.length; i++){
-          var order = orders[i]
-          var item = order.details[0]
-          var findInClassList = false
-          for(var j = 0; j < classList.length; j++){
-            if (classList[j].class == item.rent_item_class){
-              classList[j].count++
-              findInClassList = true
-              break
-            }
-          }
-          if (!findInClassList){
-            classList.push({class: item.rent_item_class, count: 1})
-          }
-
-
-
-
-          item.cell_number = order.cell_number
-          item.real_name = order.real_name
-          var startDate = new Date(item.start_date)
-          item.startDateStr = util.formatDate(startDate)
-          item.startTimeStr = util.formatTimeStr(startDate)
-          item.pay_option = order.pay_option
-          items.push(item)
-        }
-        that.setData({rentItems: items, classList: classList})
-      },
-      complete:()=>{
-        that.setData({querying: false})
       }
+      that.setData({querying: false, classList: list})
     })
   },
+  onChange(e){
+    var that = this
+    that.setData({
+      activeName: e.detail,
+    });
+  },
+ 
   gotoDetail(e){
     var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'rent_detail?id=' + id.toString(),
+      url: 'rent_details?id=' + id.toString(),
     })
   },
   call(e){

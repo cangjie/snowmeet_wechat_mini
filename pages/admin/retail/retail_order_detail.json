@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "payment": "/components/payment/payment"
+  },
+  "navigationBarTitleText": "零售订单详情"
+}

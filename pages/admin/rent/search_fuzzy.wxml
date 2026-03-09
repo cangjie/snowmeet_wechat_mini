@@ -1,0 +1,30 @@
+<view>
+  <view class="view-row" style="margin-top: 50rpx; justify-content: center;align-items: center;" >
+    <input style="width: 400rpx;text-align: center;" placeholder="输入租赁物或者分类的名称" class="input" bindinput="setKey" />
+    <van-button type="primary" size="small" style="margin-left: 50rpx;" bind:click="search" > 查 询 </van-button>
+  </view>
+  <mp-cells title="总计：{{orders.length}}" >
+    <mp-cell wx:for="{{orders}}" >
+      <view class="view-row" id="{{item.id}}" bind:tap="gotoDetail" >
+        <view class="left-column" >【订单号】</view>
+        <view class="right-column" >{{item.code}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bind:tap="gotoDetail" >
+        <view class="left-column" >【店铺】</view>
+        <view class="right-column" >{{item.shop}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bind:tap="gotoDetail" >
+        <view class="left-column" >【日期】</view>
+        <view class="right-column" >{{item.biz_dateDateStr}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bind:tap="gotoDetail" >
+        <view class="left-column" >【日期】</view>
+        <view class="right-column" >{{item.biz_dateTimeStr}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bind:tap="gotoDetail">
+        <view class="left-column" >【店员】</view>
+        <view class="right-column" >{{item.staff.name}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

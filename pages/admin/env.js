@@ -7,7 +7,7 @@ Page({
    * Page initial data
    */
   data: {
-    port: '44314'
+    port: '5000'
   },
 
   /**
@@ -23,6 +23,7 @@ Page({
         that.setData({port})
         domain = 'localhost'
       }
+      
       that.setData({env: app.globalData.env, domain})
     })
   },
@@ -93,6 +94,7 @@ Page({
     var domain = app.globalData.domainName.split(':')[0]
     domain = domain + ':' + port.toString()
     app.globalData.domainName = domain
+
     app.setDomain(domain)
     that.setData({port, domain})
   }

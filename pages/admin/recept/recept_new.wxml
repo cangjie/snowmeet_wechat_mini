@@ -1,0 +1,36 @@
+<view>
+  <view style="height: 100rpx;">
+    <fui-card title="{{realName?realName:''}} {{gender=='男'? '先生': (gender=='女'?'女士':'')}} {{cell?cell:''}}" tag="{{degree}}" bindtap="showUserInfo"></fui-card>
+  </view>
+  <view class="main-frame" wx:if="{{fire == null}}" >
+    <rent-recept wx:if="{{bizType == 'rent'}}" memberId="{{memberId}}" shop="{{shop}}" bindSyncRentData="rentDataUpdated" rentals="{{rentals}}"  ></rent-recept>
+    <retail-recept wx:if="{{bizType == 'retail' }}" memberId="{{memberId}}" 
+    shop="{{shop}}"  bindSyncRetailOrder="retailOrderUpdate" order="{{retailOrder}}" ></retail-recept>
+    <care-recept wx:if="{{bizType == 'care'}}" order="{{order}}" bindCareOrderUpdate="careOrderUpdate" shop="{{shop}}"  ></care-recept>
+  </view>
+  <view class="main-frame" wx:else >
+    <fire-charge memberId="{{memberId}}" cell="{{cell}}" gender="{{gender}}" 
+      name="{{realName}}" shop="{{shop}}" bizType="{{bizType}}" bindJump="jump" ></fire-charge>
+  </view>
+  <!--fire hide-->
+  <view style="height: 260rpx;" wx:if="{{fire == null}}">
+    <van-goods-action>
+      <!--van-goods-action-icon wx:if="{{bizType == 'rent'}}" info="{{rentals.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" /-->
+      <rent-recept-footer wx:if="{{showFooter && bizType == 'rent'}}" rentals="{{rentals}}"
+      bindWellFormed="rentalWellFormed" bindShowRentBackDrop="showRentBackDrop" ></rent-recept-footer>
+      <retail-footer wx:if="{{showFooter && bizType == 'retail'}}" order="{{order}}" bindPlaceOrderFinish="showRetailOrder" ></retail-footer>
+      <care-footer wx:if="{{showFooter && bizType == 'care'}}" order="{{order}}" bindShowCareBackDrop="showCareBackDrop" ></care-footer>
+    </van-goods-action>
+  </view>
+  <!--fire hide end-->
+  <van-popup show="{{ showUserInfo }}" position="top" custom-style="height: 20%;" 
+  bind:close="onPopClose" close-icon="close" />
+  <van-popup show="{{ showOrderInfo }}" position="bottom" custom-style="height: 80%;" 
+  bind:close="onPopOrderInfoClose" close-icon="close" >
+    <retail-order-info wx:if="{{bizType=='retail' && order && showOrderInfo}}" order="{{order}}" 
+    bindJump="jump" bindCareOrderUpdate="careOrderUpdate"   ></retail-order-info>
+    <care-back-drop wx:if="{{bizType=='care' && order && showOrderInfo}}" order="{{order}}" 
+    bindUpdateCare="updateCareCurrent" bindJump="jump"  ></care-back-drop>
+    <rent-back-drop wx:if="{{bizType=='rent' && showOrderInfo}}" rentals="{{rentals}}" bindRentOrderPaying="setRentOrderPaying" bindJump="jump" ></rent-back-drop>
+  </van-popup>
+</view>

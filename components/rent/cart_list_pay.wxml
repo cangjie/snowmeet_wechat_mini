@@ -1,0 +1,55 @@
+<view>
+  <view style="width: 700rpx;" bindtap="onShowCart" style="margin-top: 50rpx;text-align: center; margin-bottom: 50rpx;">
+    【租赁商品】{{rentals? rentals.length : 0}}【总计押金】{{totalGuarantyAmountStr?totalGuarantyAmountStr:'¥0.00'}}
+  </view>
+  <scroll-view scroll-y style="height: 800rpx;">
+    <view wx:for="{{rentals}}" wx:for-item="rental" style="display: flex;justify-content: center;">
+      <view wx:if="{{rental.package_id}}" style="display: flex;justify-content: center;flex-direction: column;">
+        <view class="view-row item">
+          <view class="left-column">【套餐】</view>
+          <view class="right-column">{{rental.name}}</view>
+        </view>
+        <view class="view-row item">
+          <view class="left-column">【押金】</view>
+          <view class="right-column">{{rental.realDepositStr}}</view>
+        </view>
+        <view class="view-row item">
+          <view class="left-column" style="width: 240rpx;">【预计租赁天数】</view>
+          <view class="right-column" style="width: 60rpx;">1天</view>
+          <view class="left-column" style="width: 180rpx;">【预计租金】</view>
+          <view class="right-column" style="width: 100rpx;margin-right: 50rpx;">¥300.00</view>
+        </view>
+
+        <view style="height: 20rpx;"></view>
+      </view>
+      <view wx:else style="display: flex;justify-content: center;flex-direction: column;">
+        <view class="view-row item">
+          <view class="left-column">【单品】</view>
+          <view class="right-column">{{rental.rentItems[0].name}}</view>
+        </view>
+        <view class="view-row item">
+          <view class="left-column">【押金】</view>
+          <view class="right-column">{{rental.realDepositStr}}</view>
+        </view>
+        <view class="view-row item">
+          <view class="left-column" style="width: 240rpx;">【预计租赁天数】</view>
+          <view class="right-column" style="width: 60rpx;">1天</view>
+          <view class="left-column" style="width: 180rpx;">【预计租金】</view>
+          <view class="right-column" style="width: 100rpx;margin-right: 50rpx;">¥300.00</view>
+        </view>
+        <view style="height: 20rpx;"></view>
+      </view>
+
+    </view>
+    <view class="view-row" style="justify-content: center;">
+      <view class="view-row">
+        <view class="view-row item" style="background-color: white;" wx:if="{{rentals.length > 0}}">
+          <view class="left-column" style="width: 180rpx;">
+            <image src="/images/payment.png" mode="widthFix" ></image>
+          </view>
+          <view class="right-column" style="width: 490rpx;">{{totalGuarantyAmountStr}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

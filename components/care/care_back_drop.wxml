@@ -1,0 +1,82 @@
+<scroll-view scroll-y style="height: 95%;" wx:if="{{order && order.id && order.id > 0}}" >
+  <mp-cells title="订单支付信息" >
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column" >【应付金额】</view>
+        <view class="right-column" >{{order.paying_amountStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="储值支付" wx:if="{{availableDeposit >= order.paying_amount}}" >
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column" >【可用储值】</view>
+        <view class="right-column" >{{availableDepositStr}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column" >【储值支付】</view>
+        <view class="right-column" >
+          <checkbox-group bindchange="setUseDeposit" >
+            <checkbox checked="{{useDeposit}}" ></checkbox>
+          </checkbox-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" style="justify-content: center;">
+        <van-button type="danger" disabled="{{useDeposit != true || paying == true}}" bind:click="payWithDeposit" > 确 认 支 付 </van-button>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <mp-cells title="普通支付" wx:if="{{useDeposit==false}}" >
+    <mp-cell>
+      <payment orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChange" 
+        bindOrderPaidResult="dealPaidResult" ></payment>
+    </mp-cell>
+  </mp-cells>
+</scroll-view>
+
+<scroll-view scroll-y style="height: 95%;" wx:else >
+  <view style="margin-top: 20rpx;margin-left: 20rpx;">
+    <fui-swipeaction-group>
+      <fui-swipe-action bind:click="del" id="{{index}}" wx:for="{{order.cares}}">
+        <view class="view-row" id="{{index}}" bind:tap="setCurrent">
+          <view class="equip-image" style="{{item.current == 1? 'background-color: gray;':''}}">
+            <image src="{{item.careImages[0].thumb}}" style="width: 240rpx; height:240rpx; margin-left: 10rpx;margin-top: 10rpx"></image>
+          </view>
+          <view class="equip-main" style="{{item.current == 1? 'background-color: gray;':''}}">
+            <view class="view-row">
+              <view class="left-column">【类型】</view>
+              <view class="right-column">{{item.equipment}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【品牌】</view>
+              <view class="right-column">{{item.brand}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【长度】</view>
+              <view class="right-column">{{item.scale}}cm</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【项目】</view>
+              <view class="right-column">{{item.services}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【金额】</view>
+              <view class="right-column">{{item.summaryStr}}</view>
+            </view>
+          </view>
+        </view>
+        <van-divider ></van-divider>
+      </fui-swipe-action>
+    </fui-swipeaction-group>
+  </view>
+  <block wx:if="{{totalStr != '¥NaN.00'}}" >
+  <view >总计支付：{{totalStr}}</view>
+  <view class="view-row" style="justify-content: center;margin-top: 50rpx;" >
+    <van-button type="primary" disabled="{{!allWellFormed || paying}}" bind:click="placeOrder"  > 确 认 下 单 </van-button>
+  </view>
+</block>
+</scroll-view>

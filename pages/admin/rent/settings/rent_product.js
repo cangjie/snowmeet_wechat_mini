@@ -1,3 +1,5 @@
+const util = require("../../../../utils/util")
+
 // pages/admin/rent/settings/rent_product.js
 const app = getApp()
 Page({
@@ -37,7 +39,7 @@ Page({
 
   getCategories(){
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategoryById/' + that.data.product.category_id
+    var url = 'https://' + app.globalData.domainName + '/api/Rent/GetCategoryById/' + that.data.product.category_id
     wx.request({
       url: url,
       method:'GET',
@@ -49,7 +51,7 @@ Page({
         var categoryCode = res.data.code
         that.setData({selectedCategory: res.data})
         categoryCode = categoryCode.substr(0, categoryCode.length - 2)
-        url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategory/' + categoryCode
+        url = 'https://' + app.globalData.domainName + '/api/Rent/GetCategory/' + categoryCode
         wx.request({
           url: url,
           method:'GET',
@@ -84,7 +86,22 @@ Page({
   getProduct(){
     var that = this
     var id = that.data.id
-    var getUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetRentProduct/' + id.toString()
+    var getUrl = app.globalData.requestPrefix + 'Rent/GetRentProduct/' + id.toString()
+    util.performWebRequest(getUrl, null).then(function (product){
+      if (that.editorCtx != undefined && that.editorCtx != null){
+        that.editorCtx.setContents({html: product.description})
+      }
+      //that.editorCtx.setContents({html: res.data.description})
+      var images = ''
+      for(var i = 0; i < product.images.length; i++){
+        images = images + ((i == 0)?'':',') + product.images[i].image_url
+      }
+
+      that.setData({product, html: product.description, oriProduct: Object.assign({}, product), images: images})
+      that.getProductCategoryInfo()
+      that.getCategories()
+    })
+    /*
     wx.request({
       url: getUrl,
       method: 'GET',
@@ -107,11 +124,12 @@ Page({
         that.getCategories()
       }
     })
+    */
   },
   getProductCategoryInfo(){
     var that = this
     var product = that.data.product
-    var getUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetCategoryById/' + product.category_id.toString()
+    var getUrl = 'https://' + app.globalData.domainName + '/api/Rent/GetCategoryById/' + product.category_id.toString()
     wx.request({
       url: getUrl,
       method: 'GET',
@@ -200,7 +218,7 @@ Page({
         that.saveBaseInfo()
         break
       case 'parameter':
-        var postUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/UpdateRentProductDetailInfo/'
+        var postUrl = 'https://' + app.globalData.domainName + '/api/Rent/UpdateRentProductDetailInfo/'
           + product.id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
         var infos = []
         for(var i = 0; i < that.data.category.infoFields.length; i++){
@@ -251,8 +269,8 @@ Page({
       case 'owner':
         product.owner = e.detail.value
         break
-      case 'isValid':
-        product.is_valid = e.detail.value?1:0
+      case 'available':
+        product.available = e.detail.value?1:0
         break
       case 'isOnline':
         product.is_online = e.detail.value?1:0
@@ -282,19 +300,10 @@ Page({
     if (isNaN(product.count) || product.count == null || product.count == ''){
       product.count = 1
     }
-    var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/ModRentProduct?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-    wx.request({
-      url: saveUrl,
-      method: 'POST',
-      data: product,
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        that.getProduct()
-      }
-
-    })
+    var saveUrl = app.globalData.requestPrefix + 'Rent/ModRentProduct?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    util.performWebRequest(saveUrl, product).then(function (rentProduct){
+      that.getProduct()
+    }).catch(function (exp){})
   },
   inputHtml(e){
     console.log('input html', e)
@@ -346,7 +355,7 @@ Page({
     }
     var that = this
     var product = that.data.product
-    var postUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetRentProductImage/' + product.id.toString() 
+    var postUrl = 'https://' + app.globalData.domainName + '/api/Rent/SetRentProductImage/' + product.id.toString() 
       + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: postUrl,
@@ -373,7 +382,7 @@ Page({
         }
     
         if (res.confirm) {
-          product.is_delete = 1
+          product.valid = 0
           that.saveBaseInfo()
           wx.navigateBack()
         }

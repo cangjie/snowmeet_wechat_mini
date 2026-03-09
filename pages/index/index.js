@@ -16,7 +16,7 @@ Page({
       url: '../logs/logs'
     })
   },
-  onLoad: function () {
+  onLoad: function (options) {
     //wxloginModule.wxlogin()
     /*
     wx.navigateTo({
@@ -24,15 +24,19 @@ Page({
     })
     */
     app.loginPromiseNew.then(function(resolve){
-      if (app.globalData.jumped == undefined && (app.globalData.is_admin == 1 || app.globalData.is_manager == 1 || app.globalData.is_manager == 1)){
+      if (app.globalData.jumped == undefined && app.globalData.staff){
         app.globalData.jumped = true
         wx.navigateTo({
           url: '/admin/admin',
         })
       }
       else{
+        var url = '../ski_pass/ski_pass_selector?resort=' + encodeURIComponent('万龙')
+        var staffId = options.staffId
+        url += staffId? ('&staffId=' + staffId) : ''
         wx.redirectTo({
-          url: '../ski_pass/ski_pass_selector?resort=' + encodeURIComponent('万龙'),
+          
+          url: url,
         })
       }
     })

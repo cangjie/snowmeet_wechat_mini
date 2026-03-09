@@ -1,0 +1,24 @@
+<view class="view-row date-selector-view" >
+  <input id="start" class="input date-text-box" value="{{startDate}}" bindtap="showCalendar" /> 
+  <view style="margin-left: 10rpx;margin-right: 10rpx;">~</view>
+  <input id="end" class="input date-text-box" value="{{endDate}}" bindtap="showCalendar" />
+</view>
+<view class="view-row" style="margin-top:10rpx">
+  <van-button id="today" plain="{{dayType!='今天'}}" type="primary" 
+  size="mini" bind:click="setDay" >今天</van-button>
+  <van-button id="yesterday" plain="{{dayType!='昨天'}}" type="info" 
+  size="mini" style="margin-left: 10rpx;" bind:click="setDay" >昨天</van-button>
+  <van-button id="week" plain="{{dayType!='本周'}}" type="warning" 
+  size="mini" style="margin-left: 10rpx;" bind:click="setDay" >本周</van-button>
+  <van-button id="lastweek" plain="{{dayType!='上周'}}" type="danger" 
+  size="mini" style="margin-left: 10rpx;" bind:click="setDay" >上周</van-button>
+</view>
+<van-calendar
+  show="{{showCalendar}}"
+  type="range"
+  bind:close="onCalendarClose"
+  bind:confirm="onCalendarConfirm"
+  min-date="{{ minDate }}"
+  max-date="{{ maxDate }}" 
+  default-date="{{defaultDate}}"
+/>

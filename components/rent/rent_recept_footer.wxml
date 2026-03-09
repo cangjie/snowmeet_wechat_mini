@@ -1,0 +1,11 @@
+<view class="view-row">
+  <van-goods-action-icon info="{{rentals.length}}" icon="cart-o" text="购物车" bind:click="onClickIcon" />
+  <view bindtap="onClickIcon" >
+    <view style="text-align: right;" bindtap="onClickIcon" >
+      【押金总计】{{totalGuarantyAmountStr}}【押金减免】{{totalGuarantyDiscountAmountStr}}
+    </view>
+    <view style="text-align: left;" bindtap="onClickIcon" >
+      【应付押金】{{totalGuarantyRealAmountStr}}
+    </view>
+  </view>
+</view>

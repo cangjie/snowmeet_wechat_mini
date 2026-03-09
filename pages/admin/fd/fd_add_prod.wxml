@@ -1,0 +1,101 @@
+<view style="margin-top: 50rpx;">
+  <view class="view-row">
+    <view class="left-column">分类：</view>
+    <view class="right-column" style="text-align: center;">
+      <picker range="{{categories}}" range-key="name" class="input" bindchange="selectCategory">
+        <picker-view>
+          <view style="margin-left: auto; margin-right: auto;">{{selectedCategory ? selectedCategory.name : '请选择…'}}</view>
+        </picker-view>
+      </picker>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">名称：</view>
+    <view class="right-column">
+      <input class="input" style="width: 450rpx;" value="{{product.name? product.name: ''}}" bindinput="input" id="name" />
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">简介：</view>
+    <view class="right-column">
+      <textarea class="input" style="width: 450rpx; height: 200rpx;" bindinput="input" id="content">
+      {{product.content? product.content : ''}}
+      </textarea>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">价格：</view>
+    <view class="right-column">
+      <input class="input" style="width: 100rpx;text-align: center;" id="price" type="number" bindinput="input" value="{{product.sale_price}}" />
+    </view>
+  </view>
+  <view class="view-row" style="height: 90rpx;align-items: center;">
+    <view class="left-column">库存：</view>
+    <view class="right-column" style="display: flex; flex-direction: row;width: 75%;align-items:center">
+      <switch wx:if="{{product.id == 0}}" style="margin-left: 50rpx;" checked="{{product.need_no_stock == 1}}" bindchange="setNoStock">无需库存管理</switch>
+      <view wx:else class="view-row" style="align-items: center;">
+        <view wx:if="{{product.need_no_stock==1}}" >
+          ——
+        </view>
+        <view wx:else class="view-row" >
+          {{product.need_no_stock == 1? '——':(product.stock_num==null?'——':product.stock_num)}}
+          <fui-button wx:if="{{product.need_no_stock != 1}}" btnSize="mini" style="margin-left: 50rpx;" size="30" text="增加库存" background="#2EA6D0" bind:click="showAddStock"></fui-button>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="view-row" style="height: 64rpx;align-items: center;">
+    <view class="left-column">上架：</view>
+    <view class="right-column" style="width: 500rpx;">
+      <checkbox-group class="view-row" bindchange="setCheckbox">
+        <checkbox value="hidden" checked="{{product.hidden==0}}" >自助</checkbox>
+        <checkbox value="on_shelves" checked="{{product.on_shelves == 1}}" >零售</checkbox>
+        <checkbox value="no_entrain" checked="{{product.no_entrain == 0}}" >招待</checkbox>
+        <checkbox value="sell_out" checked="{{product.sell_out == 1}}" >售罄</checkbox>
+      </checkbox-group>
+      <!--switch checked="{{product.on_shelves == undefined || product.on_shelves == null || product.on_shelves == 1}}" bindchange="setOnShelves"></switch-->
+    </view>
+  </view>
+  <block wx:if="{{selectedCategory}}">
+    <view class="view-row" wx:for="{{selectedCategory.availableProperties}}" style="align-items: center;">
+      <view class="left-column">{{item.property_name}}：</view>
+      <view class="right-column" style="width: 75%; display: flex; align-items: center;">
+        <radio-group id="{{item.id}}" wx:if="{{item.multi_selected == 0}}" style="display: flex; align-items: center;" bindchange="setPropertyRadioChange">
+          <radio wx:for="{{item.availableOptions}}" wx:for-item="option" wx:key="{{option.id}}" style="margin-right: 20rpx;margin-top: 20rpx;" value="{{option.id}}" checked="{{option.is_checked}}">
+            {{option.option_value}}
+          </radio>
+        </radio-group>
+      </view>
+    </view>
+  </block>
+  <view class="view-row" style="align-items: center;">
+    <view class="left-column">图片：</view>
+    <view class="right-column" style="display: flex; align-items: center;flex-direction: column;">
+      <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 上 传 " background="#2EA6D0" bind:click="uploadImage"></fui-button>
+    </view>
+  </view>
+  <view class="view-row" style="align-items: center;">
+    <view class="left-column"></view>
+    <view class="right-column">
+      <image mode="heightFix" wx:if="{{productImageUrl}}" style="height: 300rpx;" src="{{productImageUrl}}"></image>
+    </view>
+  </view>
+  <view style="margin-top: 50rpx;display: flex;width: 750rpx;justify-content: center;">
+    <fui-button wx:if="{{product.id == 0}}" btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 添 加 " background="#2EA6D0" bind:click="add"></fui-button>
+    <fui-button wx:else btnSize="medium" style="margin-left: 50rpx;" size="35rpx" text=" 保 存 " background="#2EA6D0" bind:click="mod"></fui-button>
+  </view>
+  <view style="height:100rpx"></view>
+  <fui-backdrop show="{{addingStock}}">
+    <view style="display:flex; flex-direction:column; background-color: white; width: 560rpx;" >
+      <view style="height: 100rpx;" ></view>
+      <view style="align-self: center;">
+        <input style="width: 200rpx;" class="input" placeholder="添加库存数量" bindinput="input" id="delta_stock_num" />
+      </view>
+      <view class="view-row" style="background-color: white;align-self: center;">
+        <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 取 消 " background="#2EA6D0" bind:click="cancelAddStock"></fui-button>
+        <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 确 认 " background="#2EA6D0" bind:click="confirmAddStock" ></fui-button>
+      </view>
+      <view style="height: 100rpx;" ></view>
+    </view>
+  </fui-backdrop>
+</view>

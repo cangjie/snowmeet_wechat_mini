@@ -1,93 +1,75 @@
 // pages/admin/rent/settings/rent_package.js
+//import Linq  from '../../../../node_modules/linq/linq.min.js'
 const app = getApp()
+const data = require('../../../../utils/data.js')
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    selectedCode:[],
-    priceArr:[ 
+    selectedCode: [],
+    priceArr: [
       {
         shop: '万龙',
-        matrix:[['1', '2', '3'], ['4', '5','6'], ['7', '8', '9']]
+        matrix: [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
       },
       {
         shop: '旗舰',
-        matrix:[['10', '20', '30'], ['40', '50','60'], ['70', '80', '90']]
+        matrix: [['10', '20', '30'], ['40', '50', '60'], ['70', '80', '90']]
       },
       {
         shop: '南山',
-        matrix:[['-', '-', '-'], ['-', '-','-'], ['-', '-', '-']]
+        matrix: [['-', '-', '-'], ['-', '-', '-'], ['-', '-', '-']]
       }
 
     ],
     priceArrayValid: false,
     currentTabIndex: 0,
-    priceSaving: false
+    priceSaving: false,
+    showShopMatrix: true,
+    moddingBaseInfo: false,
+    moddingCategory: false,
+    modRentItemCategory: false,
+    changedCategories: [],
+    rentItemCategoryWellFormed: false
   },
 
-  handleSelect(e){
+  handleSelect(e) {
     console.log('select', e)
   },
-  handleCheck(e){
+  handleCheck(e) {
     console.log('check', e)
-    var act = e.detail.checked? 'Add' : 'Del'
     var that = this
-    var setUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/RentPackageCategory' 
-    + act + '/' + that.data.rentPackage.id + '?categoryId=' + e.detail.id 
-    + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) 
-    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-    wx.request({
-      url: setUrl,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          wx.showToast({
-            title: '报错失败',
-            icon:'error'
-          })
-          return
-        }
-        that.getPackage()
-      }
-    })
+    var changedCategories = that.data.changedCategories
+    changedCategories.push(e.detail)
+    that.setData({changedCategories})
+    
   },
 
-  getDataTree(){
+  getDataTree() {
     var that = this
-    var url = 'https://' + app.globalData.domainName + '/core/RentSetting/GetAllCategories'
-    wx.request({
-      url: url,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        var dataTree = this.convertDataTree(res.data)
-        that.setData({dataTree: dataTree})
-      }
+    data.getAllRentCategoriesPromise().then(function (categories) {
+      that.data.categories = categories
+      var dataTree = that.convertDataTree(categories, true)
+      that.setData({ dataTree: dataTree })
     })
-
   },
-  convertDataTree(data){
-    
+  convertDataTree(data, diabled) {
     var that = this
-    
     var dataArr = []
-    
-    for(var i = 0; i < data.length; i++){
-      var leaf = {id: data[i].id, code: data[i].code, name: data[i].name, checked: false, open: false}
+    for (var i = 0; i < data.length; i++) {
+      var leaf = { id: data[i].id, code: data[i].code, name: data[i].name, checked: false, open: false, disabled: diabled}
       //var childSelected = false
-      for(var j = 0; j < that.data.selectedCode.length; j++){
+      for (var j = 0; j < that.data.selectedCode.length; j++) {
         var currentCode = that.data.selectedCode[j]
-        if (currentCode.startsWith(leaf.code)){    
+        if (currentCode.startsWith(leaf.code)) {
           leaf.open = true
           leaf.checked = true
         }
       }
-      if (data[i].children != undefined && data[i].children != null){
-        leaf.children = this.convertDataTree(data[i].children)
+      if (data[i].children != undefined && data[i].children != null) {
+        leaf.children = this.convertDataTree(data[i].children, diabled)
       }
       dataArr.push(leaf)
     }
@@ -100,55 +82,83 @@ Page({
   onLoad(options) {
     var that = this
     var id = options.id
-    that.setData({id: id})
-    app.loginPromiseNew.then(function(resolve){
+    that.setData({ id: id })
+    app.loginPromiseNew.then(function (resolve) {
       that.getPackage()
-      //that.getDataTree()
-
     })
-    
+
   },
 
-  getPackage(){
+  getPackage() {
     var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/GetRentPackage/' + that.data.id
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        var rentPackage = res.data
-        var selectedCode = []
-        for(var i = 0; i < rentPackage.rentPackageCategoryList.length; i++){
-          selectedCode.push(rentPackage.rentPackageCategoryList[i].rentCategory.code)
-        }
-        rentPackage.need_save = false
-        that.setData({rentPackage: rentPackage, selectedCode: selectedCode})
-        that.createPriceMatrix()
-        that.getDataTree()
+    data.getPackagePromise(that.data.id).then(function (rentPackage) {
+      var selectedCode = []
+      for (var i = 0; i < rentPackage.rentPackageCategoryList.length; i++) {
+        selectedCode.push(rentPackage.rentPackageCategoryList[i].rentCategory.code)
       }
+      rentPackage.need_save = false
+      that.buildRentItemCategories(rentPackage)
+      that.setData({ rentPackage: rentPackage, selectedCode: selectedCode })
+      that.getDataTree()
     })
   },
-
-  keyInput(e){
+  buildRentItemCategories(rentPackage){
+    var that = this
+    var rentItemCategories = []
+    var categoryList = rentPackage.rentPackageCategoryList
+    var itemCount = rentPackage.item_count
+    for(var i = 0; i < itemCount; i++){
+      var rentItemCategory = {}
+      rentItemCategory.itemIndex = i
+      if (categoryList!=null){
+        rentItemCategory.categories = that.getCategories(categoryList, i)
+      }
+      else{
+        var category = {id: null}
+        rentItemCategory.categories = [category]
+      }
+      rentItemCategories.push(rentItemCategory)
+    }
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategories, rentItemCategoryWellFormed})
+  },
+  checkRentCategoryWellForm(rentItemCategories){
+    var wellFormed = true
+    for(var i = 0; wellFormed && i < rentItemCategories.length; i++){
+      var rentItem = rentItemCategories[i]
+      if (!rentItem.categories || rentItem.categories.length == 0){
+        wellFormed = false
+      }
+    }
+    return wellFormed
+  },
+  getCategories(rentPackageCategoryList, itemIndex){
+    var categories = []
+    for(var i = 0; i < rentPackageCategoryList.length; i++){
+      if (rentPackageCategoryList[i].item_index == itemIndex){
+        categories.push(rentPackageCategoryList[i].rentCategory)
+      }
+    }
+    return categories
+  },
+  keyInput(e) {
     var that = this
     var v = e.detail.value
     var id = e.currentTarget.id
     var rentPackage = that.data.rentPackage
-    switch(id){
+    switch (id) {
       case 'name':
-        rentPackage.name = v
+        //rentPackage.name = v
+        that.data.modedName = v
         rentPackage.need_save = true
         break
       case 'description':
-        rentPackage.description = v
+        //rentPackage.description = v
+        that.data.modedDescription = v
         rentPackage.need_save = true
         break
       case 'deposit':
-        rentPackage.deposit = v
-        if (isNaN(v) || v.toString().trim() == ''){
+        if (isNaN(v) || v.toString().trim() == '') {
           rentPackage.need_save = false
           wx.showToast({
             title: '押金必须是数字。',
@@ -156,224 +166,58 @@ Page({
           })
         }
         else {
-          rentPackage.deposit = parseFloat(v)
+          that.data.modedDeposit = parseFloat(v)
           rentPackage.need_save = true
         }
         break
       default:
         break
     }
-    that.setData({rentPackage: rentPackage})
   },
-  saveBaseInfo(){
+  setCancelModBaseInfo(e) {
     var that = this
-    var pack = that.data.rentPackage
-    var saveUrl = 'https://' + app.globalData.domainName 
-    + '/core/RentSetting/UpdateRentPackageBaseInfo/'
-    + pack.id.toString() + '?name=' + encodeURIComponent(pack.name) 
-    + '&description=' + encodeURIComponent(pack.description)
-    + '&deposit=' + encodeURIComponent(pack.deposit.toString())
-    + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-    wx.request({
-      url: saveUrl,
-      method:'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
+    var rentPackage = that.data.rentPackage
+    rentPackage.need_save = false
+    that.setData({ rentPackage, modedDeposit: null, modedDescription: null, modedName: null, moddingBaseInfo: false })
+  },
+  setConfirmModBaseInfo(e) {
+    var that = this
+    wx.showModal({
+      title: '确认修改？',
+      content: '',
+      complete: (res) => {
+        if (res.cancel) {
+          that.setCancelModBaseInfo(e)
         }
-        wx.showToast({
-          title: '保存成功',
-          icon: 'success'
-        })
-        that.getPackage()
+
+        if (res.confirm) {
+          var rentPackage = that.data.rentPackage
+
+          if (rentPackage.need_save) {
+            if (!that.data.modedDeposit) {
+              that.data.modedDeposit = rentPackage.deposit
+            }
+            if (!that.data.modedDescription) {
+              that.data.modedDescription = rentPackage.description
+            }
+            if (!that.data.modedName) {
+              that.data.modedName = rentPackage.name
+            }
+
+            data.updateRentPackagePromise(rentPackage.id, that.data.modedName, 
+              that.data.modedDescription,
+              that.data.modedDeposit, app.globalData.sessionKey, rentPackage.shop).then(function (rentPackage) {
+                that.setData({ rentPackage })
+                that.setCancelModBaseInfo(e)
+              }).catch(function (exp) {
+                that.setCancelModBaseInfo(e)
+              })
+          }
+        }
       }
     })
   },
-  modPrice(e){
-    console.log('mod price', e)
-    var that = this
-    var priceArr = that.data.priceArr
-    var shopIndex = e.detail.currentShopIndex
-    var x = e.detail.row
-    var y = e.detail.col
-    var v = e.detail.value
-    priceArr[shopIndex].matrix[x][y] = v
-    that.setData({priceArr: priceArr})
-    that.checkPriceValid()
-  },
-
-  createPriceMatrix(){
-    var that = this
-    var rentPackage = that.data.rentPackage
-    var priceList = rentPackage.rentPackagePriceList
-    var matrix = [
-      {shop: '万龙', matrix:[['','',''],['','',''],['','','']]},
-      {shop: '旗舰', matrix:[['','',''],['','',''],['','','']]},
-      {shop: '南山', matrix:[['','',''],['','',''],['','','']]},
-    ]
-    for(var i = 0; i < priceList.length; i++){
-      var price = priceList[i]
-      var shopIndex = -1
-      switch(price.shop){
-        case '万龙体验中心':
-          shopIndex = 0
-          break
-        case '崇礼旗舰店':
-          shopIndex = 1
-          break
-        case '南山':
-          shopIndex = 2
-          break
-        default:
-          break
-      }
-      var y = -1
-      switch(price.scene){
-        case '门市':
-          y = 0
-          break
-        case '预约':
-          y = 1
-          break
-        case '会员':
-          y = 2
-          break
-        default:
-          break
-      }
-      var x = -1
-      switch(price.day_type){
-        case '平日':
-          x = 0
-          break
-        case '周末':
-          x = 1
-          break
-        case '节假日':
-          x = 2
-          break
-        default:
-          break
-      }
-      if (shopIndex != -1 && x != -1 && y != -1){
-        matrix[shopIndex].matrix[x][y] = price.price==null? '-':price.price
-      }
-    }
-    that.setData({priceArr: matrix})
-    that.checkPriceValid()
-  },
-  tabChange(e){
-    console.log('tab change', e)
-    var that = this
-    that.setData({currentTabIndex: e.detail.index})
-    that.checkPriceValid()
-  },
-  checkPriceValid(){
-    var that = this
-    var matrix = that.data.priceArr[that.data.currentTabIndex].matrix
-    var valid = true
-    for(var i = 0; i < matrix.length; i++){
-      for(var j = 0; j < matrix[i].length; j++){
-        var v = matrix[i][j]
-        if ((isNaN(v) || v.toString().trim() == '') && v != '-'){
-          valid = false
-          break
-        }
-      }
-      if (!valid){
-        break
-      }
-    }
-    that.setData({priceArrayValid: valid})
-  },
-
-  savePriceArr(){
-    var that = this
-    that.setData({priceSaving: true, saveNum: 0})
-    var tabIndex = that.data.currentTabIndex
-    
-    var priceArr = that.data.priceArr
-    for(var k = 0; k < that.data.priceArr.length; k++)
-    {
-      var shop = ''
-      switch(k){
-        case 0:
-          shop = '万龙体验中心'
-          break
-        case 1:
-          shop = '崇礼旗舰店'
-          break
-        case 2:
-          shop = '南山'
-          break
-        default:
-          break
-      }
-      var matrix = priceArr[k].matrix
-      for(var i = 0; i < matrix.length; i++){
-        for(var j = 0; j < matrix[i].length; j++){
-          var scene = ''
-          var dayType = ''
-          var v = matrix[i][j]
-          switch(i){
-            case 0:
-              dayType = '平日'
-              break
-            case 1:
-              dayType = '周末'
-              break
-            case 2:
-              dayType = '节假日'
-              break
-            default:
-              break
-          }
-          switch(j){
-            case 0:
-              scene = '门市'
-              break
-            case 1:
-              scene = '预约'
-              break
-            case 2:
-              scene = '会员'
-              break
-            default:
-              break
-          }
-          var saveUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/SetPackageRentPrice/' 
-          + that.data.rentPackage.id.toString() + '?shop=' + encodeURIComponent(shop) 
-          + '&dayType=' + encodeURIComponent(dayType) + '&scene=' + encodeURIComponent(scene)
-          + '&price=' + encodeURIComponent(v) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-          + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
-          wx.request({
-            url: saveUrl,
-            method: 'GET',
-            success:(res)=>{
-              if (res.statusCode != 200){
-                wx.showToast({
-                  title: '价格保存失败',
-                  icon: 'error'
-                })
-              }
-              var saveNum = that.data.saveNum
-              saveNum++
-              that.setData({saveNum: saveNum})
-              if (saveNum == matrix.length * matrix[0].length){
-                that.setData({priceSaving: false})
-                wx.showToast({
-                  title: '保存成功',
-                  icon:'success'
-                })
-              }
-            }
-          })
-        }
-      }
-    }
-  },
-
+  
   /**
    * Lifecycle function--Called when page is initially rendered
    */
@@ -421,5 +265,134 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+  setModBaseInfo() {
+    var that = this
+    that.setData({ moddingBaseInfo: true })
+  },
+  setModCategory(){
+    var that = this
+    var dataTree = that.convertDataTree(that.data.categories, false)
+    that.setData({dataTree, moddingCategory: true, changedCategories:[]})
+  },
+  setCancelModCategory(e){
+    var that = this
+    var dataTree = that.convertDataTree(that.data.categories, true)
+    that.setData({dataTree, moddingCategory: false})
+  },
+  setConfirmModCategory(e){
+    var that = this
+    var changedCategories = that.data.changedCategories
+    for(var i = 0; i < changedCategories.length; i++){
+      var cate = changedCategories[i]
+      var act = cate.checked?'Add':'Del'
+      data.modRentPackageCategory(that.data.id, cate.id, act, app.globalData.sessionKey).then(function (rentPackage){
+        var categories = that.data.categories
+        var selectedCode = []
+        for(var i = 0; i < rentPackage.categories.length; i++){
+          selectedCode.push(rentPackage.categories[i].code)
+        }
+        that.data.selectedCode = selectedCode
+        var dataTree = that.convertDataTree(categories, true)
+        that.setData({rentPackage, categories, dataTree})
+        that.setCancelModCategory(e)
+      }).then(function (exp){})
+    }
+  },
+  del(){
+    var that = this
+    wx.showModal({
+      title: '确认删除',
+      content: '此操作不可逆。',
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          data.deleteRentPackagePromise(that.data.id, app.globalData.sessionKey).then(function (rentPackage){
+            wx.navigateBack()
+          })
+        }
+      }
+    })
+  },
+  setModRentItemCategory(e){
+    var that = this
+    that.setData({modRentItemCategory: true})
+  },
+  setCancelModRentItemCategory(e){
+    var that = this
+    that.getPackage()
+    that.setData({modRentItemCategory: false})
+  },
+  delRentItemCategory(e){
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var rentItemCategories = that.data.rentItemCategories 
+    var rentItemCategory = rentItemCategories[parseInt(idArr[0])]
+    var categories = rentItemCategory.categories
+    var newCategories = []
+    for(var i = 0; i < categories.length; i++){
+      if (i != parseInt(idArr[1])){
+        newCategories.push(categories[i])
+      }
+    }
+    rentItemCategory.categories = newCategories
+    //that.buildRentItemCategories()
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategories, rentItemCategoryWellFormed})
+    console.log('del cate', e)
+  },
+  setItemCount(e){
+    var that = this
+    var value = e.detail.value
+    if (isNaN(value)){
+      return
+    }
+    var rentPackage = that.data.rentPackage
+    rentPackage.item_count = parseInt(value)
+    that.buildRentItemCategories(rentPackage)
+  },
+  addRentItemCategory(e){
+    var that = this
+    var index = parseInt(e.currentTarget.id)
+    that.setData({popUpContent: 'categorySelector', currentModRenItemIndex: index})
+  },
+  confirmCategory(e){
+    console.log('selecte cate', e)
+    var that = this
+    var category = e.detail
+    var rentItemCategories = that.data.rentItemCategories
+    var index = that.data.currentModRenItemIndex
+    rentItemCategories[index].categories.push(category)
+    that.setData({rentItemCategories})
+    var rentItemCategoryWellFormed = that.checkRentCategoryWellForm(rentItemCategories)
+    that.setData({rentItemCategoryWellFormed})
+    that.cancelPopUp(e)
+  },
+  cancelPopUp(e){
+    var that = this
+    that.setData({popUpContent: null,currentModRenItemIndex: null})
+    //, modRentItemCategory: false, currentModRenItemIndex: null})
+  },
+  setConfirmModRentItemCategory(e){
+    var that = this
+    var rentItemCategories = that.data.rentItemCategories
+    console.log('updated rentItemCategories', rentItemCategories)
+    data.updateRentPackageCategoryPromise(that.data.rentPackage.id, rentItemCategories, app.globalData.sessionKey).then(function(rentPackage){
+      that.buildRentItemCategories(rentPackage)
+      that.setData({rentPackage, modRentItemCategory: false, currentModRenItemIndex: null})
+
+      //that.cancelPopUp(e)
+    })
+  },
+  shopSelected(e){
+    var that = this
+    var rentPackage = that.data.rentPackage
+    rentPackage.shop = e.detail.shop
+    rentPackage.need_save = true
+    that.setData({rentPackage})
+    console.log('shop', e)
   }
 })

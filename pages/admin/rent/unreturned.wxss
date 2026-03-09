@@ -2,8 +2,15 @@
 @import '/common.wxss';
 @import '/weui.wxss';
 .left-column{
-  width: 160rpx;
+  text-align: left;
+  width: 230rpx;
+  margin-top: 0rpx;
 }
 .right-column{
-  width:210rpx
+  width:500rpx;
+  text-align: left;
+  margin-top: 0rpx;
+}
+.view-row{
+  margin-top: 0rpx;
 }

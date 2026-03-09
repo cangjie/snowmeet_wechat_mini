@@ -1,0 +1,60 @@
+<view>
+  <view style="text-align: center;margin-top:  30rpx;margin-bottom:20rpx;font-weight: 1000;">打印【{{printType}}】</view>
+  <view class="view-row">
+    <view class="left-column">【姓名】</view>
+    <view class="right-column">{{care.customerName}}</view>
+    <view class="left-column">【电话】</view>
+    <view class="right-column">{{care.customerCell}}</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【品牌】</view>
+    <view class="right-column">{{care.brand}}</view>
+    <view class="left-column">【长度】</view>
+    <view class="right-column">{{care.scale}}</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【项目】</view>
+    <view class="right-column" style="width: 500rpx;">
+      {{care.need_edge == 1? '修刃 ' + care.edge_degree :' ' }}
+      {{care.need_wax == 1? '打蜡 ' :' ' }}
+      {{care.need_unwax == 1? '刮蜡 '  :' ' }}
+      {{care.repair_memo==null? '' : care.repair_memo}}
+    </view>
+  </view>
+
+  <view style="margin-top: 30rpx;">
+    <view style="background-color:#C0C0C0;">
+      <view class="view-row">
+        <view style="width: 280rpx;text-align: center;font-size: 11pt;">打印机</view>
+        <view style="width: 70rpx;text-align: center;font-size: 11pt;">颜色</view>
+        <view style="width: 150rpx;text-align: center;font-size: 11pt;">区域</view>
+        <view style="width: 75rpx;text-align: center;font-size: 11pt;">状态</view>
+        <view style="width: 175rpx;text-align: center;font-size: 11pt;">操作</view>
+      </view>
+    </view>
+    <view wx:for="{{availablePrinters}}" 
+      style="background-color: {{item.printer.region == '维修区'? '#FFFFD0;' : '#FFD0FF;'}}"  >
+      <view class="view-row" style="margin-top: 0rpx;height: 70rpx; align-items: center;">
+        <view style="width: 280rpx;text-align: center;font-size: 11pt;">{{item.printer.name}}</view>
+        <view style="width: 70rpx;text-align: center;font-size: 11pt;">{{item.printer.colorStr}}</view>
+        <view style="width: 150rpx;text-align: center;font-size: 11pt;">{{item.printer.region}}</view>
+        <view style="width: 100rpx;text-align: center;font-size: 11pt;">{{item.status}}</view>
+        <view style="width: 175rpx;text-align: center;font-size: 12pt;">
+          <van-button id="{{index}}" bind:tap="disconnectDevice" size="mini" type="danger" 
+          wx:if="{{item.status!='未连接' && item.status!='连接失败' }}" >断开</van-button>
+          <van-button id="{{index}}" bind:tap="connectDeviceManual"  size="mini" type="primary" wx:else disabled="{{item.status == '连接中'}}"  >连接</van-button>
+        </view>
+      </view>
+    </view>
+  </view>
+  <!--view class="view-row" style="justify-content: center;margin-top: 80rpx">
+    <van-button type="info" disabled="{{ready!=true}}" bind:click="printCommonLabel" style="margin-right: 50rpx;">打印标签存根</van-button>
+    <van-button type="primary" disabled="{{ready!=true}}" bind:click="printCustLabel" style="margin-left: 50rpx;">打印顾客小票</van-button>
+  </view-->
+  <view class="view-row" style="justify-content: center;margin-top: 80rpx">
+    <van-button type="primary" bind:click="redayToPrint" disabled="{{ready!=true}}" > 打 印 </van-button>
+  </view>
+  <!--view class="view-row" style="justify-content:center;margin-top:20rpx" >
+    <textarea class="input" value="" style="width: 700rpx; height:500rpx" ></textarea>
+  </view-->
+</view>

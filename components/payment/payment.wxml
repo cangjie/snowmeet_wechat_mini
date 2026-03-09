@@ -1,0 +1,47 @@
+<view>
+  <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
+      <radio-group class="view-row" bindchange="setPayMethod">
+        <radio value="微信支付" checked="{{payMethod == '微信支付'}}" 
+          disabled="{{paying || order.paying_amount == 0 || payMethod != null}}">微信</radio>
+        <radio value="支付宝" checked="{{payMethod == '支付宝'}}" 
+          disabled="{{paying || order.paying_amount == 0 || payMethod != null}}">支付宝</radio>
+        <radio value="其它" checked="{{payMethod == '其它'}}" 
+          disabled="{{paying || order.paying_amount == 0 || payMethod != null}}">其它</radio>
+        <radio value="挂账" checked="{{payMethod == '挂账'}}" disabled="{{true}}">挂账</radio>
+      </radio-group>
+  </view>
+  <view class="view-row" wx:if="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付' && payMethod != '挂账'}}" >
+    <view class="left-column"></view>
+    <view class="right-column">
+      <picker  wx:if="{{!subPayMethodIndex || subPayMethodIndex < othersPayMethods.length - 1 }}"   
+          range="{{othersPayMethods}}" class="input" style="width: 300rpx;height: 50rpx;" 
+          bindchange="setSubPayMethod"  >
+        <picker-view style="height:50rpx">
+          <view style="text-align: center;height: 50rpx;margin-top: 0rpx;width: 300rpx;" >
+            {{subPayMethodIndex? othersPayMethods[subPayMethodIndex] : '请选择…'}}
+          </view>
+        </picker-view>
+      </picker>
+      <view wx:if="{{subPayMethodIndex && subPayMethodIndex == othersPayMethods.length - 1}}" class="view-row" >
+        <input  class="input" placeholder="{{inputedPayMethod? inputedPayMethod : '请填写支付方式'}}" 
+          style="text-align: center;" bindinput="inputPayMethod" /> 
+        <van-button id="discount" bind:click="cancelPayMethodInput" type="danger" size="small"  > 取 消 </van-button>
+      </view>
+    </view>
+  </view>
+  <view class="view-row" style="justify-content: center;" >
+      <van-button type="warning"  size="small" bind:click="reselectPaymethod" id="payMethod"
+      wx:if="{{(payMethod  || paying)}}"    > 重 选 </van-button>
+    </view>
+    <view style="height: 50rpx;"></view>
+    <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
+      <van-button wx:if="{{payMethod == '其它'}}" id="othersPayMethod" disabled="{{disabledConfirmPaidButton || !subPayMethod}}" type="danger"  bind:click="placeUnneedPayOrderConfirm"  > 确 认 收 款 </van-button>
+    </view>
+    <view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" >
+      <view  style="display: flex;justify-content: center; align-items: center;height: 300rpx;flex-direction: column;margin-top: 0rpx;">
+        <view style="text-align: center;">
+          <image mode="aspectFill" style="width: 300rpx;height: 300rpx;" src="{{qrCodeUrl}}"></image>
+        </view>
+      </view>
+    </view>
+</view>

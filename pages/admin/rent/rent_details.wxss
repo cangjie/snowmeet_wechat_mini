@@ -1,0 +1,69 @@
+/* pages/admin/rent/rent_details.wxss */
+.left-column{
+  text-align: left;
+  margin-top: 0rpx;
+  height: 0rpx;
+}
+.right-column{
+  margin-top: 0rpx;
+  height: 0rpx;
+}
+.weui-cells__title{
+  font-size: 12pt;
+  color: black
+}
+.changed{
+  background: rgb(196, 195, 195);
+}
+.add-package{
+  margin-top: 0rpx;
+  background-color: rgb(212, 255, 219);
+}
+.add-item{
+  margin-top: 0rpx;
+  background-color: rgb(255, 198, 236);
+}
+.view-row-append{
+  height: 50rpx;
+}
+.rent-item{
+  background-color: rgb(255, 198, 236);
+}
+.left-column-rent-item{
+  height: 75rpx;
+  margin-top: 0rpx;
+  margin-bottom: 0rpx;
+}
+.right-column-rent-item{
+  height: 75rpx;
+}
+.refund-cell-1{
+  width: 50rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}
+.refund-cell-2{
+  width: 220rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}
+.refund-cell-3{
+  width: 150rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}
+.refund-cell-4{
+  width: 180rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}
+.refund-cell-5{
+  width: 160rpx;
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 12pt;
+}

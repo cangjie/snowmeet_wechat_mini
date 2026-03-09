@@ -1,0 +1,32 @@
+<view style="margin-top: 50rpx;">
+  <van-row>
+    <van-col span="{{colSpan}}"  >
+      <view style="margin-left: 20rpx;" >——</view>
+    </van-col>
+    <van-col wx:for="{{dayTypeList}}" span="{{colSpan}}" style="text-align: center;" >{{item}}</van-col>
+  </van-row>
+  <van-row wx:for="{{rentTypeList}}" wx:for-item="rentType" wx:for-index="i" >
+    <van-col span="{{colSpan}}"  >
+      <view style="margin-left: 20rpx;margin-top: 20rpx;" >{{rentType}}</view>
+    </van-col>
+    <van-col wx:for="{{dayTypeList}}" span="{{colSpan}}" wx:for-index="j" >
+      <view style="display: flex; justify-content: center;margin-top: 20rpx;">
+        <input id="{{i}}_{{j}}"  class="input" style="width: 100rpx;text-align: center;" 
+        value="{{matrix[i][j].price}}" disabled="{{!mod}}" bindinput="setPrice"  />
+      </view>
+    </van-col>
+  </van-row>
+  <view class="view-row" style="margin-top: 30rpx;justify-content: center;" >
+    <block wx:if="{{mod}}" >
+      <van-button plain type="warning" style="margin-right:60rpx" bind:click="setCancel" > 取 消 </van-button>
+      <van-button plain type="danger" style="margin-left: 60rpx;" bind:click="save" > 保 存 </van-button>
+    </block>
+    <block wx:else >
+      <van-button plain type="primary" bind:click="setMod" > 修 改 </van-button>
+      <van-button plain type="warning" 
+      wx:if="{{(shopId != 10 || scene != '门市') && wellFormed}}" bind:click="importPrice" 
+      style="margin-left: 60rpx;"
+      >导入万龙门市价</van-button>
+    </block>
+  </view>
+</view>

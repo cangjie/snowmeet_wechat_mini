@@ -1,0 +1,51 @@
+<view>
+  <view class="view-row" >
+    <view class="left-column" >【订单号】</view>
+    <view class="right-column" >{{order.code}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【日期】</view>
+    <view class="right-column" >{{order.dateStr}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【时间】</view>
+    <view class="right-column" >{{order.timeStr}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【顾客姓名】</view>
+    <view class="right-column" >{{order.customerCalledName}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【顾客手机】</view>
+    <view class="right-column" >{{order.customerCell}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【开单人】</view>
+    <view class="right-column" >{{order.staff.name}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【订单备注】</view>
+    <view class="right-column" style="width:500rpx" >{{order.memo}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【支付方式】</view>
+    <view class="right-column" >{{order.payMethod}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【押金金额】</view>
+    <view class="right-column" >{{order.paidAmountStr}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >【已退金额】</view>
+    <view class="right-column" >{{order.refundAmountStr}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" style="display: flex;align-items: center;" >【本次退款】</view>
+    <view class="right-column view-row" style="width: 400rpx;align-items:center;">
+      <input class="input" style="width: 100rpx;" bindinput="setRefundAmount" />
+      <view style="width: 50rpx;"></view>
+      <van-button size="small" type="primary" bind:click="refund" disabled="{{refunding}}" > 确 认 退 款 </van-button>
+    </view>
+  </view>
+  
+</view>

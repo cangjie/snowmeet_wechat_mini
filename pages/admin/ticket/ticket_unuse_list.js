@@ -1,5 +1,6 @@
 // pages/admin/ticket/ticket_unuse_list.js
 const app = getApp()
+const data = require('../../../utils/data.js')
 Page({
 
   /**
@@ -75,6 +76,26 @@ Page({
   onShareAppMessage() {
 
   },
+  /*
+  getData(){
+    var that = this
+    data.getMyTickets(0, app.globalData.sessionKey).then(function (tickets){
+      for (var i = 0; i < tickets.length; i++){
+        var memo = tickets[i].memo
+        if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
+          tickets[i].rich = true
+        }
+        else{
+          tickets[i].rich = false
+          tickets[i].usage = memo.split(';')
+        }
+      }
+      console.log(tickets)
+      that.setData({tickets})
+    })
+  },
+  */
+  
   getData(){
     var that = this
     var getUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicketsByUser/0?openId=' + encodeURIComponent(that.data.openId) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -102,6 +123,7 @@ Page({
     })
     
   },
+  
   use(e){
     var that = this
     var code = e.currentTarget.id

@@ -12,12 +12,16 @@ Page({
     statusList: ['全部', '已付押金', '全部归还', '已退款', '免押金'],
     statusSelectedIndex: 0,
     shop: '',
-    querying: false
+    querying: false,
+    orderInfo:{
+      code: 'abc',
+      userName: 'test'
+    }
   },
 
   gotoDetail(e){
     wx.navigateTo({
-      url: 'rent_detail?id=' + e.currentTarget.id,
+      url: 'rent_details?id=' + e.currentTarget.id,
     })
   },
   setDate(e){
@@ -50,9 +54,48 @@ Page({
       url: '../admin',
     })
   },
-
-
   getData(){
+    var that = this
+    that.setData({querying: true})
+    var totalPaid = 0
+    var totalRefund = 0
+    var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaff?type=' + encodeURIComponent('租赁') + '&sessionKey=' + app.globalData.sessionKey
+     + '&startDate=' + encodeURIComponent(that.data.startDate) + '&endDate=' + encodeURIComponent(that.data.endDate) 
+     + (that.data.shop == ''? '' : '&shop=' + encodeURIComponent(that.data.shop))
+     //+ (that.data.statusSelectedIndex == 0 ? '' : '&status=' + encodeURIComponent(that.data.statusList[that.data.statusSelectedIndex]))
+    console.log('q url', qUrl)
+    util.performWebRequest(qUrl, undefined).then(function(resolve){
+      console.log('get rent orders', resolve)
+      var orders = resolve
+      for(var i = 0; i < orders.length; i++){
+        var order = orders[i]
+        if (order.biz_date){
+          var bizDate = new Date(order.biz_date)
+          order.biz_dateDateStr = util.formatDate(bizDate)
+          order.biz_dateTimeStr = util.formatTimeStr(bizDate)
+        }
+        else{
+          order.biz_dateDateStr = '——'
+          order.biz_dateTimeStr = '——'
+        }
+        if (order.rentalLastRefundDate){
+          var rDate = new Date(order.rentalLastRefundDate)
+          order.rentalLastRefundDateDateStr = util.formatDate(rDate)
+          order.rentalLastRefundDateTimeStr = util.formatTimeStr(rDate)
+        }
+        else {
+          order.rentalLastRefundDateDateStr = '——'
+          order.rentalLastRefundDateTimeStr = '——'
+        }
+        order.guarantyAmountStr = util.showAmount(order.guarantyAmount)
+        totalPaid += order.guarantyAmount
+      }
+      that.setData({querying: false, orders: orders, totalPaidStr: util.showAmount(totalPaid)})
+    }).catch(function(){
+      that.setData({querying: false})
+    })
+  },
+  getData1(){
     var that = this
     that.setData({querying: true})
     var totalPaid = 0

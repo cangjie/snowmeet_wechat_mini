@@ -1,0 +1,16 @@
+/* pages/admin/fd/fd_order_list.wxss */
+checkbox{
+  margin-left: 10rpx;
+}
+.left-column
+{
+  width: 200rpx;
+  font-size: 12pt;
+  text-align: left;
+  margin-left: 5rpx;
+}
+.right-column
+{
+  width: 3500rpx;
+  font-size: 12pt;
+}

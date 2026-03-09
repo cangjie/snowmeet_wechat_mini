@@ -30,7 +30,7 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve){
-      if (app.globalData.memberInfo.is_admin == 1 || app.globalData.memberInfo.is_manager == 1){
+      if (app.globalData.staff.title_level >= 200){
         that.setData({isManager: true})
         that.getData()
       }
@@ -73,28 +73,62 @@ Page({
   },
   getData(){
     var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/GetAuthList?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
+    var getUrl = app.globalData.requestPrefix + 'QrCode/GetTodayAuthCellList?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    util.performWebRequest(getUrl, null).then(function (resolve){
+      console.log('cell to auth', resolve)
+      var authList = resolve
+      for(var i = 0; i < authList.length; i++){
+        var auth = authList[i]
+        var subTime = new Date(auth.submitTime)
+        auth.submitTimeDateStr = util.formatDate(subTime)
+        auth.submitTimeTimeStr = util.formatTimeStr(subTime)
+      }
+      that.setData({authList})
+    }).catch(function (reject){
+    })
+  },
+  giveAuth(e){
+    var that = this
+    var para = e
+    wx.showModal({
+      title: '授权确认',
+      content: '确认授权后，今天结束之前，可以直接输入手机号免扫码开单。',
+      confirmText: '授权',
+      cancelText: '拒绝',
+      complete: (res) => {
+        if (res.cancel) {
+          
         }
-        var authList = res.data
-        for(var i = 0; i < authList.length; i++){
-          var a = authList[i]
-          var cDate = new Date(a.create_date)
-          a.create_dateStr = util.formatDate(cDate)
-          a.create_timeStr = util.formatTimeStr(cDate)
-
+    
+        if (res.confirm) {
+          that.auth(para)
         }
-        that.setData({authList})
-        console.log('auth list', res)
       }
     })
   },
   auth(e){
+    var that = this
+    var id = e.currentTarget.id
+    var authUrl = app.globalData.requestPrefix + 'QrCode/GiveAuth/' + id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(authUrl, null).then(function (resolve){
+      console.log('auth result', resolve)
+      var auth = resolve
+      var title = '授权成功'
+      var icon = 'success'
+      if (auth.authed != 1){
+        title = '授权失败'
+        icon = 'error'
+      }
+      wx.showToast({
+        title: title,
+        icon: icon
+      })
+      that.getData()
+    }).catch(function(reject){
+
+    })
+  },
+  auth1(e){
     var that = this
     var id = e.currentTarget.id
     var authUrl = 'https://' + app.globalData.domainName + '/core/ShopSaleInteract/Auth/' + id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)

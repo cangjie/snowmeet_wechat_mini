@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "ticket-selector": "../ticket_selector/ticket_list"
+  }
+}

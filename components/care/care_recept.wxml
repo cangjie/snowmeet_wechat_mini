@@ -1,0 +1,156 @@
+<scroll-view scroll-y style="height: 95%;">
+  <view class="view-row">
+    <view class="left-column">【类型】</view>
+    <view class="right-column view-row">
+      <radio-group class="view-row" bindchange="setValue" id="equipment">
+        <radio value="双板" checked="{{care.equipment == '双板'}}">双板</radio>
+        <radio value="单板" style="margin-left: 66rpx;" checked="{{care.equipment == '单板'}}">单板</radio>
+      </radio-group>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【照片】</view>
+    <view class="right-column">
+      <van-uploader file-list="{{care.careImages}}" bind:after-read="afterRead" capture="['album', 'camera']" bind:delete="delImage" />
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column view-row" style="align-items: center;">【品牌】</view>
+    <view class="right-column">
+      <view wx:if="{{addingNewBrand}}" class="view-row">
+        <input class="input" placeholder="填写英文名称" style="width: 160rpx;" id="brandName" bindinput="setValue" />
+        <view style="margin-left: 10rpx; margin-right: 10rpx;">/</view>
+        <input class="input" placeholder="填写中文名称" style="width: 160rpx;" id="brandChineseName" bindinput="setValue" />
+        <van-button size="mini" style="margin-left:10rpx" type="warning" bind:click="cancelAddBrand">取消</van-button>
+        <van-button size="mini" style="margin-left:10rpx" type="primary" bind:click="confirmAddBrand">确定</van-button>
+      </view>
+      <picker wx:else disabled="{{!care.equipment}}" range="{{brandList}}" class="input" style="width: 300rpx;" range-key="displayedName" id="brand" bindchange="setValue">
+        <picker-view>{{brandSelectIndex? brandList[brandSelectIndex].displayedName: (care.brand? care.brand: '请选择…')}}</picker-view>
+      </picker>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【长度】</view>
+    <view class="right-column view-row">
+      <input class="input" style="width: 100rpx;text-align: center;" id="scale" 
+      bindinput="setValue" value="{{care.scale}}" />cm
+    </view>
+  </view>
+  <view class="view-row" style="margin-top: 20rpx;"  >
+    <view class="left-column" style="display: flex; font-size: 10pt;align-items: center;" >【优惠券】</view>
+    <view style="display: flex; font-size: 10pt;align-items: center;" wx:if="{{care.ticket!=null && care.ticket != undefined}}" >
+      ({{care.ticket.code}}){{care.ticket.name}}
+    </view>
+    <!--checkbox-group  style="margin-left: 10rpx;" id="ticket" bindchange="setValue" >
+      <checkbox style="font-size: 10pt;" checked="{{care.ticket.use == true}}" >使用</checkbox>
+    </checkbox-group-->
+    <van-button type="primary" size="mini" style="margin-left: 20rpx;" bind:click="selectTicket"    >选择其他</van-button>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【项目】</view>
+    <view class="right-column view-row">
+      <checkbox-group id="need_edge" bindchange="setValue" >
+        <checkbox checked="{{care.need_edge == 1}}" disabled="{{care.summer != null}}" >修刃</checkbox>
+      </checkbox-group>
+      <input id="edge_degree" bindinput="setValue" class="input" style="width: 50rpx;text-align: center;" placeholder="89" disabled="{{care.need_edge != 1 && care.summer == null}}" type="number" />度
+    </view>
+  </view>
+  
+  <view class="view-row" >
+    <view class="left-column"></view>
+    <view class="right-column view-row">
+      <checkbox-group  bindchange="setValue" id="free_wax" wx:if="{{care.ticket!=null && care.ticket != undefined  }}" >
+        <checkbox style="margin-right: 30rpx;" disabled="{{care.ticket_code == null || care.ticket.template_id != 12}}" checked="{{care.free_wax == 1}}" >机打蜡</checkbox>
+      </checkbox-group>
+      <checkbox-group id="need_wax" bindchange="setValue" >
+        <checkbox  checked="{{care.need_wax == 1}}" disabled="{{care.summer != null}}" >热蜡</checkbox>
+      </checkbox-group>
+      <checkbox-group id="need_unwax" bindchange="setValue" >
+        <checkbox style="margin-left: 30rpx;" checked="{{care.need_unwax == 1}}" disabled="{{care.summer != null}}" >刮蜡</checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【非雪季】</view>
+    <view class="right-column view-row">
+      <checkbox-group id="summer" bindchange="setValue" >
+        <checkbox value="now" checked="{{care.summer == 'now'}}" >直接寄存</checkbox>
+        <checkbox value="later" style="margin-left: 20rpx;" checked="{{care.summer == 'later'}}" >先双项，晚点寄存</checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【加急】</view>
+    <view class="right-column">
+      <checkbox-group id="urgent" bindchange="setValue"  >
+        <checkbox checked="{{care.urgent == 1}}" disabled="{{care.summer != null}}" >是</checkbox>
+      </checkbox-group>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【收费】</view>
+    <view class="right-column">
+      {{care.product? care.product.sale_priceStr : '¥0.00'}}
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column view-row" style="align-items: center;">【其它】</view>
+    <view class="right-column">
+      <van-grid column-num="3">
+        <checkbox-group id="othter_services" bindchange="setValue" >
+          <van-grid-item wx:for="{{othersService}}" use-slot >
+            <checkbox value="{{item.name}}" checked="{{item.checked}}" >
+              <view style="font: 8pt" >{{item.name}}</view>
+            </checkbox>
+          </van-grid-item>
+        </checkbox-group>
+      </van-grid>
+      <input placeholder="其它项目" class="input" style="width: 450rpx;margin-top: 20rpx;" 
+      id="others_memo" bindinput="setValue" />
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【附加费】</view>
+    <view class="right-column view-row">
+      <input class="input" placeholder="0" style="text-align: center;width: 75rpx;" 
+        id="repair_charge" bindinput="setValue" disabled="{{!care.repair_memo || care.repair_memo == ''}}" 
+        value="{{care.repair_charge? care.repair_charge : null}}" placeholder="0"  />元
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【减免】</view>
+    <view class="right-column view-row">
+      <input class="input" id="discount" bindinput="setValue" placeholder="0" 
+      style="text-align: center;width: 75rpx;" value="{{care.discount? care.discount:null}}" />元
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【特殊】</view>
+    <view class="right-column view-row">
+      <radio-group class="view-row" id="special" bindchange="setValue" >
+        <radio value="" checked="{{care.entertain != true && care.warranty != true}}" >普通</radio>
+        <radio value="招待" checked="{{care.entertain == true}}" style="margin-left: 20rpx;" >招待</radio>
+        <radio value="质保" checked="{{care.warranty == true}}" style="margin-left: 20rpx;" >质保</radio>
+      </radio-group>
+    </view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【总计】</view>
+    <view class="right-column">{{care.summaryStr}}</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column">【备注】</view>
+    <view class="right-column">
+      <textarea class="input" style="width: 450rpx;height: 150rpx;" value="{{care.memo}}" bindinput="setValue" id="memo" ></textarea>
+    </view>
+  </view>
+  <view class="view-row" style="justify-content: center; margin-top: 50rpx;">
+    <van-button type="info" size="small" style="margin-left: 50rpx;" bind:click="addMore" 
+    disabled="{{!wellFormed}}" > 下一件 </van-button>
+  </view>
+</scroll-view>
+<van-popup show="{{ showTicketPopUp }}" bind:close="onClose">
+  <ticket-selector wx:if="{{showTicketPopUp}}" bindEvent="ticketSelectorEvent" 
+  ticketType="{{'养护'}}" memberId="{{order.member_id}}" 
+  selectedCode="{{care.ticket.code}}" disabledCodes="{{disableArr}}" ></ticket-selector>
+</van-popup>

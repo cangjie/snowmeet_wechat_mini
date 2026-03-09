@@ -1,0 +1,15 @@
+<view class="view-row"> 
+  <view class="cell-1" style="font-weight: 200;" >日期</view>
+  <view class="cell-2" style="font-weight: 200;" >时间</view>
+  <view class="cell-3" style="font-weight: 200;" >支付方式</view>
+  <view class="cell-4" style="font-weight: 200;" >类型</view>
+  <view class="cell-5" style="font-weight: 200;text-align: center;" >金额</view>
+</view>
+<van-divider></van-divider>
+<view wx:for="{{balances}}" class="view-row" style="color:{{item.color}};font-weight: 500;"> 
+  <view class="cell-1"  >{{item.transDateStr}}</view>
+  <view class="cell-2"  >{{item.transTimeStr}}</view>
+  <view class="cell-3"  >{{item.payMethod}}</view>
+  <view class="cell-4"  >{{item.transType}}</view>
+  <view class="cell-5"  >{{item.amountStr}}</view>
+</view>

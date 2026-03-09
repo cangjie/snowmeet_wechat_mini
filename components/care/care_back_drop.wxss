@@ -1,0 +1,22 @@
+@import '/app.wxss';
+.equip-image{
+  width: 260rpx;
+  height: 280rpx;
+  display: flex;
+  align-items: center;
+  
+}
+.equip-main{
+  height: 280rpx;
+  margin-left: 10rpx;
+  width: 450rpx;
+  
+}
+.left-column{
+  width: 30%;
+  margin-top: 5rpx;
+}
+.right-column{
+  width: 60%;
+  margin-top: 5rpx;
+}

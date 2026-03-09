@@ -22,7 +22,7 @@
                 <radio value="0" disabled="{{(item.card_member_return_time!=null || item.card_member_pick_time == null)?true:false}}" 
                 checked="{{item.card_lost == 0}}" ></radio>
               </view>
-              <view class="left-column" style="width: 130rpx;" >无卡结算：</view>
+              <view class="left-column" style="width: 130rpx;" >无卡：</view>
               <view class="right-column" >
                 <radio value="1" disabled="{{(item.card_member_return_time!=null || item.card_member_pick_time == null)?true:false}}" checked="{{item.card_lost == 1}}" ></radio>
               </view>

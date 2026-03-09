@@ -1,0 +1,163 @@
+<view>
+  <view wx:if="{{staff && staff.title_level >= 100}}">
+    <fui-swipeaction-group>
+      <fui-list>
+        <fui-swipe-action id="{{index}}" bindclick="del" wx:for="{{order.fdOrders}}">
+          <fui-list-cell>
+            <fui-row>
+              <fui-col span="1">
+                <view style="display:flex;margin-left: 10rpx;align-items: center;height: 200rpx;">{{index+1}}.</view>
+              </fui-col>
+              <fui-col span="1">
+                <view style="display:flex;margin-left: 10rpx;align-items: center;height: 200rpx;">
+                  <view>{{item.order_type == '招待' ? '招' : '零'}}</view>
+                </view>
+              </fui-col>
+              <fui-col span="22">
+                <fui-card title="{{item.product_name}}" tag="单价：{{item.unit_priceStr}}">
+                  <view class="fui-card_content" style="width: 550rpx;">
+                    <fui-row>
+                      <fui-col span="5">
+                        <view class="fui-left-column">数量：</view>
+                      </fui-col>
+                      <fui-col span="3">
+                        <view class="fui-right-column" >
+                          <input id="count_{{index}}" class="input"   style="width: 50rpx;text-align: center;"  
+                          placeholder="{{item.count_editing? item.count : null}}" 
+                          value="{{item.count_editing? null : item.count}}"
+                          bindinput="mod" type="number" disabled="{{!item.count_editing}}" />
+                        </view>
+                      </fui-col>
+                      <fui-col span="4">
+                        <view class="view-row" >
+                          <fui-button id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit" disabled="{{item.count_editing}}" ></fui-button>
+                          <!--utton class="input" size="mini" style="height: 50rpx;width: 100rpx;margin-left: 0rpx; margin-right: 0rpx;margin-top: 0rpx;"  > 修 改 </button-->
+                        </view>
+                      </fui-col>
+                      <fui-col span="5">
+                        <view class="fui-left-column" style="margin-left: 5rpx;">减免：</view>
+                      </fui-col>
+                      <fui-col span="3">
+                        <view class="fui-right-column">
+                          <input disabled="{{!item.discount_editing || item.order_type == '招待'}}" id="discount_{{index}}" style="width:50rpx;text-align: center;" class="input" 
+                          value="{{item.discount_editing?null:item.discountAmount}}" 
+                          placeholder="{{item.discount_editing?item.discountAmount:null}}"
+                          bindinput="mod" type="number" />
+                        </view>
+                      </fui-col>
+                      <fui-col span="4">
+                        <view class="view-row">
+                          <fui-button id="discount_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " background="#2EA6D0" bind:click="edit" disabled="{{item.order_type=='招待' || item.discount_editing}}" color="#000000" background="#C0C0C0" ></fui-button>
+                        </view>
+                      </fui-col>
+                    </fui-row>
+                    <fui-row wx:if="{{item.count_editing || item.discount_editing }}" >
+                      <fui-col span="6" ><view class="button-cell" >
+                        <fui-button wx:if="{{item.count_editing}}" id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#00AA00" disabled="{{!item.count_editing}}" bind:click="confirmMod" ></fui-button>
+                      </view></fui-col>
+                      <fui-col span="6" ><view class="button-cell" >
+                        <fui-button wx:if="{{item.count_editing}}" id="count_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  
+                        text=" 取 消 " background="#DD0000" disabled="{{!item.count_editing}}" bind:click="cancel"  ></fui-button>
+                      </view></fui-col>
+                      <fui-col span="6" ><view class="button-cell" >
+                        <fui-button wx:if="{{item.discount_editing}}" id="discount_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#00AA00" disabled="{{!item.discount_editing}}" bind:click="confirmMod"  ></fui-button>
+                      </view></fui-col>
+                      <fui-col span="6" ><view class="button-cell" >
+                        <fui-button wx:if="{{item.discount_editing}}" id="discount_{{index}}"  margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 取 消 " background="#DD0000" disabled="{{!item.discount_editing}}" bind:click="cancel"  ></fui-button>
+                      </view></fui-col>
+                    </fui-row>
+                    <fui-row>
+                      <fui-col span="5">
+                        <view class="fui-left-column">小计：</view>
+                      </fui-col>
+                      <fui-col span="5">
+                        <view class="fui-right-column">{{item.summaryStr}}</view>
+                      </fui-col>
+                      <fui-col span="14"></fui-col>
+                    </fui-row>
+                    <fui-row>
+                      <fui-col span="5">
+                        <view class="fui-left-column">备注：</view>
+                      </fui-col>
+                      <fui-col span="15">
+                        <view class="fui-left-column">
+                          <input disabled="{{!item.memo_editing}}" id="memo_{{index}}" class="input" style="width: 300rpx;text-align: left;" value="{{item.memo}}" bindinput="mod" />
+                        </view>
+                      </fui-col>
+                      <fui-col span="4">
+                        <view class="view-row">
+                          <fui-button id="memo_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 "  bind:click="edit" disabled="{{item.memo_editing}}" 
+                          color="#000000" background="#C0C0C0" ></fui-button>
+                        </view>
+                      </fui-col>
+                    </fui-row>
+                    <fui-row wx:if="{{item.memo_editing}}" >
+                      <fui-col span="12" ><view class="button-cell" >
+                        <fui-button id="memo_{{index}}" margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 确 认 " background="#00AA00" disabled="{{!item.memo_editing}}" bind:click="confirmMod" ></fui-button>
+                      </view></fui-col>
+                      <fui-col span="12" ><view class="button-cell" >
+                        <fui-button id="memo_{{index}}"  margin="5rpx" width="100rpx" height="50rpx" size="29"  text=" 取 消 " background="#DD0000" disabled="{{!item.memo_editing}}" bind:click="cancel"  ></fui-button>
+                      </view></fui-col>
+                    </fui-row>
+                    <view style="height: 25rpx;"></view>
+                  </view>
+                </fui-card>
+              </fui-col>
+            </fui-row>
+            <view style="height: 50rpx;"></view>
+          </fui-list-cell>
+        </fui-swipe-action>
+      </fui-list>
+    </fui-swipeaction-group>
+    <fui-divider width="750rpx" text=""></fui-divider>
+    <fui-row>
+      <fui-col span="5">
+        <view style="text-align: right;">【桌号】</view>
+      </fui-col>
+      <fui-col span="5">
+        <picker range="{{tableList}}" class="input">
+          <picker-view ><view sstyle="text-align: center;" >外带</view></picker-view>
+        </picker>
+      </fui-col>
+      <fui-col span="14">
+        <view style="text-align: right;margin-right: 25rpx;"></view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="19">
+        <view style="text-align: right;">【总计商品数】</view>
+      </fui-col>
+      <fui-col span="5">
+        <view style="text-align: right;margin-right: 25rpx;">{{totalCount}}</view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="19">
+        <view style="text-align: right;">【总计金额】</view>
+      </fui-col>
+      <fui-col span="5">
+        <view style="text-align: right;margin-right: 25rpx;">{{totalSummaryStr}}</view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="19">
+        <view style="text-align: right;">【总计减免】</view>
+      </fui-col>
+      <fui-col span="5">
+        <view style="text-align: right;margin-right: 25rpx;">{{totalDiscountStr}}</view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="19">
+        <view style="text-align: right;">【需要支付】</view>
+      </fui-col>
+      <fui-col span="5">
+        <view style="text-align: right;margin-right: 25rpx;">{{totalChargeStr}}</view>
+      </fui-col>
+    </fui-row>
+    <view style="height: 50rpx;"></view>
+    <view style="display: flex; justify-content: center;">
+      <fui-button id="{{product.id}}" disabled="{{editing}}" btnSize="medium" size="35rpx" text=" 确 认 订 单 " background="#2EA6D0" bind:click="placeOrder"></fui-button>
+    </view>
+  </view>
+</view>

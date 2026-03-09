@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "print-care": "/components/care/print_care_label"
+  },
+  "navigationBarTitleText": "养护订单"
+}

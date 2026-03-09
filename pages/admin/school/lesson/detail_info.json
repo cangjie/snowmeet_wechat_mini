@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "mp-cells": "weui-miniprogram/cells/cells",
-    "mp-cell": "weui-miniprogram/cell/cell",
-    "video-uploader": "/components/uploader/video-uploader"
-  },
-  "navigationBarTitleText": "学校-课程详情"
-}

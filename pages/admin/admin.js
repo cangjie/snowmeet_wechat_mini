@@ -5,38 +5,24 @@ function init(that) {
   var isSchoolStaff = false
   var isManager = false
   var isAdmin = false
+  var isStaff = false
   if (app.globalData.is_manager){
     isManager = true
   }
-  if (app.globalData.memberInfo != undefined && app.globalData.memberInfo != null){
-    var member = app.globalData.memberInfo
-    if (member.is_staff == 1){
-      role = 'staff'
+  if (app.globalData.staff){
+    role = 'staff'
+    var staff = app.globalData.staff
+    if (staff.title_level <= 100){
+      isStaff = true
     }
-    if (member.is_manager == 1){
+    else if (staff.title_level <= 200){
       isManager = true
     }
-    if (member.is_admin == 1){
+    else {
       isAdmin = true
     }
   }
-  /*
-  var ajaxUrl = 'https://' + app.globalData.domainName + '/core/schoolstaff?sessionkey=' +  encodeURIComponent(app.globalData.sessionKey)
-  wx.request({
-    url: ajaxUrl,
-    method: 'GET',
-    success: (res) => {
-      if (res.data.status == undefined) {
-        that.setData({isSchoolStaff: true})
-      }
-    },
-    fail: (res) => {
-
-    }
-  })
-  */
-  that.setData({role: app.globalData.role, isManager: isManager, isAdmin: isAdmin})
-  
+  that.setData({role: role, isManager: isManager, isAdmin: isAdmin})
 }
 Page({
 
@@ -59,7 +45,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function(resolve) {
       init(that)
-      that.setData({env: app.globalData.env})
+      that.setData({env: app.globalData.env, scene: app.globalData.scene})
     })
 
   },
@@ -164,15 +150,15 @@ Page({
       case 'ticket_print':
         path = '/pages/admin/ticket/ticket_template_list'
         break
-      
       case 'rent_list':
-        path = 'rent/rent_list'
+        path = 'rent/new_rent_list'
         break
       case 'rent_report':
         path = 'rent/rent_report'
         break
       case 'rent_list_cell':
-        path = 'rent/rent_list_by_cell'
+        //path = 'rent/rent_list_by_cell'
+        path = 'fire/fire_care_list?bizType=rent'
         break
       case 'test':
         path = '/pages/admin/recept/customer_identity'
@@ -203,6 +189,9 @@ Page({
         break
       case 'rent_unreturned':
         path = '/pages/admin/rent/unreturned'
+        break
+      case 'rent_search_fuzzy':
+        path = '/pages/admin/rent/search_fuzzy'
         break
       case 'maintain_in_stock':
         path = '/pages/admin/maintain/maintain_in_stock'
@@ -238,7 +227,6 @@ Page({
       case 'ns_ski_pass_refund':
         path = '/pages/admin/ski_pass/nanshan_refund'
         break
-        
       case 'ns_ski_pass_veri':
         path = '/pages/admin/ski_pass/nanshan_pick_card_scan'
         break
@@ -252,7 +240,8 @@ Page({
         path = '/pages/admin/env'
         break
       case 'maintainSerchQuick':
-        path = '/pages/admin/maintain/search_quick'
+        //path = '/pages/admin/maintain/search_quick'
+        path = '/pages/admin/fire/fire_care_list?bizType=care'
         break
       case 'ticket_use':
         path = '/pages/admin/ticket/use_entry'
@@ -277,6 +266,30 @@ Page({
         break
       case 'supplement':
         path = '/pages/admin/sale/supplement'
+        break
+      case 'fd_category':
+        path = '/pages/admin/fd/fd_category'
+        break
+      case 'fd_add_prod':
+        path = '/pages/admin/fd/fd_add_prod'
+        break
+      case 'fd_prod_list':
+        path = '/pages/admin/fd/fd_category_prod_list'
+        break
+      case 'fd_prod_mod':
+        path = '/pages/admin/fd/fd_category_prod_list_mod'
+        break
+      case 'fd_order_list':
+        path = '/pages/admin/fd/fd_order_list'
+        break
+      case 'rent_recepting':
+        path = '/pages/admin/recept/rent_recepting_list'
+        break
+      case 'careOrderList':
+        path = '/pages/admin/care/care_order_list'
+        break
+      case "unipay":
+        path = '/pages/admin/unipay/unipay'
         break
       default:
         break
@@ -308,7 +321,8 @@ Page({
         navUrl = 'sale/shop_sale_entry'
         break
       case "shopSaleList":
-        navUrl = 'sale/order_list'
+        //navUrl = 'sale/order_list'
+        navUrl = 'retail/retail_order_list'
         break
       default:
         break
@@ -333,7 +347,7 @@ Page({
       success:(res)=>{
         console.log(res)
         var timeStamp = res.result
-        var setSessionUrl = 'https://' + app.globalData.domainName + '/core/BackgroundLoginSession/SetSessionKey/' + timeStamp + '?sessionKey=' + app.globalData.sessionKey
+        var setSessionUrl = app.globalData.requestPrefix + 'BackgroundLoginSession/SetSessionKey/' + timeStamp + '?sessionKey=' + app.globalData.sessionKey
         wx.request({
           url: setSessionUrl,
           method: 'GET',

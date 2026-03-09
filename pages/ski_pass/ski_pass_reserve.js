@@ -1,6 +1,7 @@
 // pages/ski_pass/ski_pass_reserve.js
 const app = getApp()
 const util = require('../../utils/util.js')
+const data = require('../../utils/data.js')
 Page({
 
   /**
@@ -87,7 +88,13 @@ Page({
     }
     
   },
-
+  GetRealName(){
+    var that = this
+    data.getMyInfo(app.globalData.sessionKey).then(function (info){
+      that.setData({name: info.real_name, cell: info.cell})
+    })
+  },
+  /*
   GetRealName(){
     var that = this
     var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
@@ -102,6 +109,7 @@ Page({
       }
     })
   },
+  */
 
   AuthFinish(){
     var that = this
@@ -162,7 +170,7 @@ Page({
     if (!valid){
       return
     }
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/ReserveSkiPass/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date)) + '&count=' + that.data.count + '&cell='  + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + (that.data.memberId?'&refereeMemberId=' + that.data.memberId: '')
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/NanshanSkipass/ReserveSkiPass/' + that.data.id + '?date=' + util.formatDate(new Date(that.data.date)) + '&count=' + that.data.count + '&cell='  + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + (app.globalData.referStaffId?'&staffId=' + app.globalData.referStaffId: '')
     wx.request({
       url: submitUrl,
       method: 'GET',
@@ -170,20 +178,18 @@ Page({
         console.log('reserve order create', res)
         var order = res.data
         var paymentId = order.payments[0].id
-        var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Pay/' + paymentId + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+        var paymentUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + paymentId + '?sessionKey=' + app.globalData.sessionKey
+        //var paymentUrl = 'https://' + app.globalData.domainName + '/core/OrderPayment/Pay/' + paymentId + '?sessionKey=' + //encodeURIComponent(app.globalData.sessionKey)
         wx.request({
           url: paymentUrl,
           method: 'GET',
           success:(res) => {
-            var nonce = res.data.nonce
-            var prepayId = res.data.prepay_id
-            var timestamp = res.data.timestamp
-            var sign = res.data.sign
+     
             wx.requestPayment({
-              nonceStr: nonce,
-              package: 'prepay_id=' + prepayId,
-              paySign: sign,
-              timeStamp: timestamp,
+              nonceStr: res.data.data.nonce,
+              package: 'prepay_id=' + res.data.data.prepay_id,
+              paySign: res.data.data.sign,
+              timeStamp: res.data.data.timestamp,
               signType: 'MD5',
               success:(res)=>{
                 wx.showToast({

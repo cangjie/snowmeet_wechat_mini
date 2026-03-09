@@ -1,0 +1,61 @@
+<mp-cells title="顾客基本信息"   >
+  <mp-cell>
+    <radio-group style="text-align: center;"  >
+      <radio class="left-column" checked="{{member && member.id}}" disabled="{{true}}" > 会员 </radio>
+      <radio class="right-column" checked="{{!member || !member.id}}" disabled="{{true}}" > 散客 </radio>
+    </radio-group>
+  </mp-cell>
+  <mp-cell wx:if="{{member && member.id}}" >
+    <view class="view-row" >
+      <view class="left-column" >【绑定手机号】</view>
+      <view class="right-column"  style="display: flex;flex-direction: row;">
+        {{member.cell? member.cell:'未绑定手机'}}
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell >
+    <view class="view-row"  >
+      <view class="left-column" >【联系手机号】</view>
+      <view class="right-column"  style="display: flex;flex-direction: row;">
+        <picker wx:if="{{member && member.id && member.contactNums.length > 1 && !inputContactNum}}"  
+        class="input" range="{{member.contactNums}}" 
+          range-key="num" bindchange="selectNum" style="width: 240rpx;" >
+          <picker-view style="width: 240rpx;"  >
+            <view style="width: 240rpx;"   >{{currentContactNum? currentContactNum : '请选择……'}}</view>
+          </picker-view>
+        </picker>
+        <view wx:else class="view-row" >
+        <input  placeholder="输入联系手机号" class="input" id="contact_num" bindinput="userInfoChanged" />
+        <van-button wx:if="{{member.contactNums.length > 1}}" plain hairline type="info" size="mini" style="margin-left: 30rpx" bind:click="backToPick"  >返回选择</van-button>
+      </view>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view class="view-row"  >
+      <view class="left-column" >【顾客称呼】</view>
+      <view class="right-column" style="display: flex;" >
+        <input style="width: 150rpx;" id="real_name" placeholder="您贵姓？" bindinput="userInfoChanged" value="{{member.real_name}}" class="input" />
+        <radio-group id="gender" bindchange="userInfoChanged" >
+          <radio checked="{{member.gender=='男'}}" value="男" >先生</radio><radio checked="{{member.gender=='女'}}" value="女" >女士</radio>
+        </radio-group>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell wx:if="{{member && member.id}}" >
+    <view class="view-row"  >
+      <view class="left-column" style="width: 190rpx;" >【总计储值】</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.totalDepositStr}}</view>
+      <view class="left-column" style="width: 190rpx;" >【可用储值】</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.availableDepositStr}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell wx:if="{{member && member.id}}" >
+    <view class="view-row"  >
+      <view class="left-column" style="width: 190rpx;" >【总计龙珠】</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.totalPoints}}</view>
+      <view class="left-column" style="width: 190rpx;" >【可用龙珠】</view>
+      <view class="right-column" style="width: 140rpx;" >{{member.avaliablePoints}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>

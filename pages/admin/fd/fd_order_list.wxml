@@ -1,0 +1,227 @@
+<view>
+  <view wx:if="{{staff && staff.title_level >= 100}}" style="margin-top: 50rpx;">
+    <fui-card full>
+      <fui-row>
+        <fui-col span="5">
+          <view class="fui-left-column">【店铺】</view>
+        </fui-col>
+        <fui-col span="18">
+          <view class="fui-right-column">
+            <shop-selector bindShopSelected="shopSelected" defaultShop="崇礼旗舰店"></shop-selector>
+          </view>
+        </fui-col>
+      </fui-row>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column">【日期】</view>
+        </fui-col>
+        <fui-col span="18">
+          <view class="fui-right-column view-row">
+            <picker id="start" mode="date" class="input" style="margin-right:20rpx;" disabled="{{querying}}" bindchange="setDate">
+              <picker-view>{{startDate}}</picker-view>
+            </picker>
+            -
+            <picker id="end" mode="date" class="input" style="margin-left:20rpx;" disabled="{{querying}}" bindchange="setDate">
+              <picker-view>{{endDate}}</picker-view>
+            </picker>
+          </view>
+        </fui-col>
+      </fui-row>
+    </fui-card>
+    <view style="height: 20rpx;"></view>
+    <fui-card full>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column">【测试】</view>
+        </fui-col>
+        <radio-group id="isTest" bindchange="setQueryOptions">
+          <fui-col span="6">
+            <radio checked="{{true}}" value="false">营业</radio>
+          </fui-col>
+          <fui-col span="6">
+            <radio value="{{true}}">测试</radio>
+          </fui-col>
+          <fui-col span="7">
+            <radio value="null">全部</radio>
+          </fui-col>
+
+        </radio-group>
+      </fui-row>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column">【招待】</view>
+        </fui-col>
+        <radio-group id="isEnterain" bindchange="setQueryOptions">
+          <fui-col span="6">
+            <radio checked="{{true}}" value="false">正常</radio>
+          </fui-col>
+          <fui-col span="6">
+            <radio value="true">招待</radio>
+          </fui-col>
+          <fui-col span="7">
+            <radio value="null">全部</radio>
+          </fui-col>
+        </radio-group>
+      </fui-row>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column">【类型】</view>
+        </fui-col>
+        <radio-group id="isPackage" bindchange="setQueryOptions">
+          <fui-col span="6">
+            <radio checked="{{true}}" value="false">单店</radio>
+          </fui-col>
+          <fui-col span="6">
+            <radio value="true">套餐</radio>
+          </fui-col>
+          <fui-col span="7">
+            <radio value="null">全部</radio>
+          </fui-col>
+        </radio-group>
+      </fui-row>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column">【挂账】</view>
+        </fui-col>
+        <radio-group id="isOnCredit" bindchange="setQueryOptions">
+          <fui-col span="6">
+            <radio checked="{{true}}" value="false">正常</radio>
+          </fui-col>
+          <fui-col span="6">
+            <radio value="true">挂账</radio>
+          </fui-col>
+          <fui-col span="7">
+            <radio value="null">全部</radio>
+          </fui-col>
+        </radio-group>
+      </fui-row>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column">【减免】</view>
+        </fui-col>
+        <radio-group id="haveDiscount" bindchange="setQueryOptions">
+          <fui-col span="6">
+            <radio checked="{{true}}" value="null">全部</radio>
+          </fui-col>
+          <fui-col span="6">
+            <radio value="true">包含</radio>
+          </fui-col>
+          <fui-col span="7">
+            <radio value="false">不含</radio>
+          </fui-col>
+        </radio-group>
+      </fui-row>
+      <radio-group id="status" bindchange="setQueryOptions">
+        <fui-row style="margin-top: 20rpx;">
+          <fui-col span="5">
+            <view class="fui-left-column">【状态】</view>
+          </fui-col>
+          <fui-col span="6">
+            <radio checked="{{true}}" value="支付成功" >支付成功</radio>
+          </fui-col>
+          <fui-col span="6">
+            <radio value="部分支付">部分支付</radio>
+          </fui-col>
+          <fui-col span="7">
+            <radio value="待生成" >待生成</radio>
+          </fui-col>
+        </fui-row>
+        <fui-row style="margin-top: 20rpx;">
+          <fui-col span="6" offset="5">
+            <radio value="待支付">待支付</radio>
+          </fui-col>
+          <fui-col span="6">
+            <radio value="订单关闭">订单关闭</radio>
+          </fui-col>
+          <fui-col span="7">
+            <radio value="全额退款">全额退款</radio>
+          </fui-col>
+        </fui-row>
+        <fui-row style="margin-top: 20rpx;">
+          <fui-col span="6" offset="5">
+            <radio value="部分退款">部分退款</radio>
+          </fui-col>
+          <fui-col span="6">
+            <radio value="退款失败">退款失败</radio>
+          </fui-col>
+          <fui-col span="7">
+            <radio value="已下单">已下单</radio>
+          </fui-col>
+        </fui-row>
+        <fui-row style="margin-top: 20rpx;">
+          <fui-col span="6" offset="5">
+            <radio value="null">全部</radio>
+          </fui-col>
+          <fui-col span="13"></fui-col>
+        </fui-row>
+      </radio-group>
+    </fui-card>
+    <view class="view-row" style="margin-top: 20rpx;justify-content: center;">
+      <fui-button disabled="{{querying}}" btnSize="medium" background="#2EA6D0" bind:click="getData">
+        {{querying? ' 查 询 中 … ': ' 查 询 '}}
+      </fui-button>
+    </view>
+    <view style="height: 20rpx"></view>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="5">
+        <view class="fui-left-column">【排序】</view>
+      </fui-col>
+      <fui-col span="6">
+        <picker class="input" style="width:230rpx" range="{{sortType}}" bindchange="setSortType">
+          <picker-view>
+            <view style="width: 230rpx;text-align: center;">{{currentSortType}}</view>
+          </picker-view>
+        </picker>
+      </fui-col>
+      <fui-col span="6">
+      </fui-col>
+      <fui-col span="7">
+      </fui-col>
+    </fui-row>
+    <view style="height: 20rpx"></view>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="5">
+        <view class="fui-left-column">【总计】</view>
+      </fui-col>
+      <fui-col span="19">
+        <view>{{orders? orders.length: 0}}单 总支付金额：{{totalAmountStr?totalAmountStr: '¥0.00'}}</view>
+      </fui-col>
+    </fui-row>
+    <view style="height: 20rpx"></view>
+    <block wx:for="{{orders}}">
+      <fui-card id="{{item.id}}" style="margin-top: 50rpx;" title="{{item.code}}" tag="{{item.orderStatus}}" tagSize="10rpx" full bind:click="gotoDetail">
+        <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
+          <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;">
+            <view wx:if="{{item.is_test == 1}}">【测】</view>
+            <view wx:if="{{item.haveEnterain}}">【招】</view>
+            <view wx:if="{{item.is_package == 0}}">【单】</view>
+            <view wx:if="{{item.haveOnCredit}}">【挂】</view>
+          </view>
+          <view>
+            <view class="view-row">
+              <view class="left-column" style="width: 130rpx;">【日期】</view>
+              <view class="right-column" style="width: 170rpx;margin-right: 0rpx;">{{item.dateStr}}</view>
+              <view class="left-column" style="width: 130rpx;margin-left: 30rpx;">【时间】</view>
+              <view class="right-column">{{item.timeStr}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【支付金额】</view>
+              <view class="right-column" style="width: 120rpx; text-align: right;">{{item.totalChargeStr}}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【支付类型】</view>
+              <view class="right-column">{{ item.payType }}</view>
+            </view>
+            <view class="view-row">
+              <view class="left-column">【开单人】</view>
+              <view class="right-column">{{item.staff.name}}</view>
+            </view>
+          </view>
+        </view>
+      </fui-card>
+      <view style="height: 20rpx;"></view>
+    </block>
+    <view style="height: 200rpx"></view>
+
+  </view>
+</view>

@@ -1,27 +1,26 @@
 // pages/admin/rent/settings/rent_package_list.js
 const app = getApp()
+const data = require('../../../../utils/data.js')
+const util = require('../../../../utils/util.js')
 Page({
 
   /**
    * Page initial data
    */
   data: {
-    newName: ''
+    newName: '',
+    key: null,
+    activeName: 0
   },
-
+  setKey(e){
+    var that = this
+    that.data.key = e.detail.value
+  },
   getData(){
     var that = this
-    var getList = 'https://' + app.globalData.domainName + '/core/RentSetting/GetRentPackageList'
-    wx.request({
-      url: getList,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        that.setData({packageList: res.data})
-      }
-    })
+    data.getPackageListByShopPromise(that.data.key).then(function (shopPackageList){
+      that.setData({shopPackageList})
+    }).catch(function (exp) { })
   },
   gotoDetail(e){
     wx.navigateTo({
@@ -46,10 +45,20 @@ Page({
         }
     
         if (res.confirm) {
-          var addUrl = 'https://' + app.globalData.domainName + '/core/RentSetting/AddRentPackage?'
+          var addUrl = 'https://' + app.globalData.domainName + '/api/Rent/AddRentPackage?'
           + 'name=' + encodeURIComponent(that.data.newName) + '&description='
           + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
           + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+          util.performWebRequest(addUrl, null).then(function (rentPackage){
+            wx.showToast({
+              title: '添加成功，进入详情页填写详细信息。',
+              icon: 'success'
+            })
+            wx.navigateTo({
+              url: 'rent_package?id=' + rentPackage.id
+            })
+          })
+          /*
           wx.request({
             url: addUrl,
             method: 'GET',
@@ -63,6 +72,7 @@ Page({
               })
             }
           })
+          */
         }
       }
     })
@@ -73,24 +83,16 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
+    
+  },
+  onReady() {
+
+  },
+  onShow() {
     var that = this
     app.loginPromiseNew.then(function(resolve){
       that.getData()
     })
-  },
-
-  /**
-   * Lifecycle function--Called when page is initially rendered
-   */
-  onReady() {
-
-  },
-
-  /**
-   * Lifecycle function--Called when page show
-   */
-  onShow() {
-
   },
 
   /**
@@ -126,5 +128,11 @@ Page({
    */
   onShareAppMessage() {
 
-  }
+  },
+  onChange(e){
+    var that = this
+    that.setData({
+      activeName: e.detail,
+    });
+  },
 })
