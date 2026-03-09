@@ -5,7 +5,6 @@
   <view class="cell-4" style="font-weight: 200;" >类型</view>
   <view class="cell-5" style="font-weight: 200;text-align: center;" >金额</view>
 </view>
-<van-divider></van-divider>
 <view wx:for="{{balances}}" class="view-row" style="color:{{item.color}};font-weight: 500;"> 
   <view class="cell-1"  >{{item.transDateStr}}</view>
   <view class="cell-2"  >{{item.transTimeStr}}</view>

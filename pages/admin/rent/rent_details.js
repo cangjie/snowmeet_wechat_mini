@@ -15,7 +15,8 @@ Page({
     refunding: false,
     payWithDeposit: false,
     showSelectPackagePopUp: false,
-    showAppendPay: false
+    showAppendPay: false,
+    showBalance: false
   },
 
   /**
@@ -23,7 +24,8 @@ Page({
    */
   onLoad(options) {
     var that = this
-    that.setData({ id: options.id })
+    that.data.id = options.id
+    //that.setData({ id: options.id })
   },
 
   /**
@@ -160,8 +162,29 @@ Page({
         rental.end_dateDateStr = util.formatDate(endDate)
         rental.end_dateTimeStr = util.formatTimeStr(endDate)
       }
+      if (rental.settled == 1) {
+        rental.backColor = '--returned-back-color'
+      }
       for (var j = 0; j < rental.rentItems.length; j++) {
         var rentItem = rental.rentItems[j]
+        if (rentItem.noNeed != true) {
+          if (rentItem.status == '未发放') {
+            rentItem.fontColor = '--un-pick-font-color'
+            rental.fontColor = '--un-pick-font-color'
+          }
+          else if (rentItem.status == '已发放') {
+            rentItem.backColor = '--un-return-back-color'
+            rentItem.fontColor = '--un-return-font-color'
+            rental.backColor = '--un-return-back-color'
+          }
+          else if (rentItem.status == '已归还') {
+            rentItem.backColor = '--returned-back-color'
+          }
+        }
+        else {
+          rentItem.backColor = '--no-need-back-color'
+          rentItem.fontColor = '--no-need-font-color'
+        }
         rentItem.totalRepairationAmountStr = util.showAmount(rentItem.totalRepairationAmount)
         if (rentItem.pickDate == null) {
           rentItem.pickDateStr = '--'
@@ -188,7 +211,16 @@ Page({
           rentItem.changeTimeStr = util.formatTimeStr(new Date(rentItem.changeDate))
         }
       }
+      for (var j = 0; rental.details && j < rental.details.length; j++) {
+        var detail = rental.details[j]
+        var rDate = new Date(detail.rental_date)
+        detail.rental_dateDateStr = util.formatDate(rDate)
+        detail.amount = parseFloat(detail.amount).toFixed(2)
+        detail.othersDiscountAmount = parseFloat(detail.othersDiscountAmount).toFixed(2)
 
+        detail.summary = (parseFloat(detail.amount) - parseFloat(detail.othersDiscountAmount)).toFixed(2)
+        detail.summaryStr = util.showAmount(parseFloat(detail.summary))
+      }
     }
     for (var i = 0; order.appendingRentals && i < order.appendingRentals.length; i++) {
       var rental = order.appendingRentals[i]
@@ -202,7 +234,9 @@ Page({
         rental.realGuaranty = 0
         rental.guaranty_dicount = 0
         rental.realDepositStr = util.showAmount(rental.realGuaranty)
+
       }
+      rental.realGuaranty = parseFloat(rental.realGuaranty).toFixed(2)
       rental.startDate = util.formatDate(new Date(rental.start_date))
       var totalRentalAmount = 0
       for (var j = 0; rental.pricePresets && j < rental.pricePresets.length; j++) {
@@ -226,6 +260,7 @@ Page({
       }
       payment.remainAmountStr = util.showAmount(payment.remainAmount)
     }
+
     if (order.appendingRentals && order.appendingRentals.length > 0) {
       that.checkAppendingRentalValid()
     }
@@ -309,7 +344,6 @@ Page({
               break
             }
           }
-
         }).catch(function (exp) {
 
         })
@@ -319,12 +353,6 @@ Page({
     }).catch(function () {
 
     })
-  },
-  onTabChange(e) {
-    console.log('tab changed', e)
-    var that = this
-    that.setData({ activeTabIndex: e.detail.index })
-
   },
   showRentItem(e) {
     var that = this
@@ -453,6 +481,7 @@ Page({
     var rentalIndex = util.getRentalIndexFromOder(rental.id, order)
     order.rentals[rentalIndex] = rental
     that.renderOrder(order)
+    that.convertByCategory()
     that.setData({ order })
   },
   showRentalDetail(e) {
@@ -641,6 +670,7 @@ Page({
         })
         newRental.moddingMemo = false
         order.rentals[index] = newRental
+        that.renderOrder(order)
         that.setData({ order })
       })
   },
@@ -733,6 +763,18 @@ Page({
   },
   call(e) {
     var cell = e.currentTarget.id
+    wx.setClipboardData({
+      data: cell,
+      success: (res) => {
+        wx.showToast({
+          icon: 'success',
+          message: '手机号码已复制'
+        })
+      },
+      fail: (res) => {
+        console.log('复制失败', res)
+      }
+    })
     wx.makePhoneCall({
       phoneNumber: cell,
     })
@@ -1146,7 +1188,7 @@ Page({
   },
   refundBatch(e) {
     var that = this
-   
+
     if (that.data.payWithDeposit == true) {
       that.refundBatchWithDeposit(e)
       return;
@@ -1191,7 +1233,7 @@ Page({
       }
     })
   },
-  refundBatchWithDeposit(e){
+  refundBatchWithDeposit(e) {
     var that = this
     var order = that.data.order
     var title = '储值支付确认'
@@ -1260,6 +1302,791 @@ Page({
         })
         that.getData()
       }
+
+    })
+  },
+  expandOrderInfo(e) {
+    var that = this
+    that.setData({ orderInfoExpand: e.detail })
+  },
+  expandPayInfo(e) {
+    var that = this
+    that.setData({ payInfoExpand: e.detail, showBalance: true })
+  },
+  expandRental(e) {
+    var that = this
+    that.setData({ expandRentals: e.detail })
+    console.log('expand rental', e)
+  },
+  expandRentalDetail(e) {
+    var that = this
+    that.setData({ acrtiveRentalDetails: e.detail })
+  },
+  expandRentalItem(e) {
+    var that = this
+    that.setData({ acrtiveRentalItems: e.detail })
+  },
+  modItemMemo(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    item.moddingMemo = true
+    that.setData({ order })
+  },
+  setItemMemo(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    item.memo = e.detail.value
+  },
+  modItemMemoConfirm(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    data.updateRentItemPromise(item, '租赁订单详细页修改备注', app.globalData.sessionKey)
+      .then(function (newItem) {
+        wx.showToast({
+          title: '修改成功',
+          icon: 'success'
+        })
+        item.moddingMemo = false
+        order.rentals[parseInt(idArr[0])].rentItems[parseInt(idArr[1])] = newItem
+        that.renderOrder(order)
+        that.setData({ order })
+      })
+  },
+  modItemMemoCancel(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    item.moddingMemo = false
+    that.setData({ order })
+  },
+  setModRentalDetail(e) {
+    var that = this
+    var order = that.data.order
+    var id = parseInt(e.currentTarget.id)
+    var rental = order.rentals[id]
+    rental.moddingRentalDetail = true
+    that.setData({ order })
+  },
+  cancelModRenrtalDetail(e) {
+    var that = this
+    var order = that.data.order
+    var id = parseInt(e.currentTarget.id)
+    var rental = order.rentals[id]
+    data.getRentalPromise(rental.id, app.globalData.sessionKey).then(function (newRental) {
+      order.rentals[id] = newRental
+      that.renderOrder(order)
+      that.setData({ order })
+    })
+  },
+  addModRenrtalDetail(e) {
+    var that = this
+    var order = that.data.order
+    var id = parseInt(e.currentTarget.id)
+    var rental = order.rentals[id]
+    var details = rental.details
+    var detail = {
+      id: 0,
+      rental_date: util.formatDate(new Date()),
+      charge_type: '租金',
+      amount: parseFloat(details[details.length - 1].amount).toFixed(2),
+      othersDiscountAmount: '0.00',
+      summaryStr: util.showAmount(parseFloat(details[details.length - 1].amount)),
+      valid: 1
+    }
+    details.push(detail)
+    that.renderOrder(order)
+    that.setData({ order })
+  },
+  showCalendar(e) {
+    var that = this
+    var calendarId = e.currentTarget.id
+    that.setData({ showCalendar: true, calendarId })
+  },
+  onCloseCalendar(e) {
+    var that = this
+    that.setData({ showCalendar: false, calendarId: null })
+  },
+  onConfirmCalendar(e) {
+    var resDate = new Date(e.detail)
+    var that = this
+    var idArr = that.data.calendarId.split('_')
+    var order = that.data.order
+    if (idArr[0] == 'appending') {
+      var rental = order.appendingRentals[parseInt(idArr[1])]
+      var resDate = new Date(e.detail)
+      var resDateStr = util.formatDate(resDate)
+      rental.start_date = resDateStr
+      rental.pick_type = '延时租赁'
+      that.renderData(order.appendingRentals)
+      that.setData({ order, showCalendar: false })
+    }
+    else {
+      var rental = order.rentals[parseInt(idArr[0])]
+      var detail = rental.details[parseInt(idArr[1])]
+      detail.rental_dateStr = util.formatDate(resDate)
+      detail.rental_date = util.formatDate(resDate)
+      that.renderOrder(order)
+      that.setData({ order, calendarId: null, showCalendar: false })
+    }
+  },
+  checkRentalValid(e) {
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var rental = order.rentals[id]
+    for (var i = 0; i < rental.details.length; i++) {
+      rental.details[i].valid = 1
+    }
+    for (var i = 0; i < e.detail.value.length; i++) {
+      rental.details[parseInt(e.detail.value[i])].valid = 0
+    }
+    that.renderOrder(order)
+    that.setData({ order })
+  },
+  setRentalDetailAmount(e) {
+    var value = e.detail.value
+    if (!value || isNaN(value)) {
+      return
+    }
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var detail = rental.details[parseInt(idArr[1])]
+    detail.amount = parseFloat(value).toFixed(2)
+    that.renderOrder(order)
+    that.setData({ order })
+  },
+  setRentalDetailDiscount(e) {
+    var value = e.detail.value
+    if (!value || isNaN(value)) {
+      return
+    }
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var detail = rental.details[parseInt(idArr[1])]
+    detail.othersDiscountAmount = parseFloat(value).toFixed(2)
+    detail._filledDiscountAmount = parseFloat(detail.othersDiscountAmount)
+    that.renderOrder(order)
+    that.setData({ order })
+  },
+  confirmModRenrtalDetail(e) {
+    var id = parseInt(e.currentTarget.id)
+    var that = this
+    var order = that.data.order
+    var rental = order.rentals[id]
+    var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalDetailsByStaff/' + rental.id.toString() + '?scene=' + encodeURIComponent('租赁详情页修改租金') + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(updateUrl, rental.details).then(function (newRental) {
+      order.rentals[id] = newRental
+      that.getData()
+    })
+  },
+  expandRentalItemChange(e) {
+    var that = this
+    var showChanges = e.detail
+    if (showChanges.length == 0) {
+      that.setData({ showChanges })
+      return
+    }
+    var idArr = e.detail[e.detail.length - 1].split('_')
+    var order = that.data.order
+    var rental = order.rentals[parseInt(idArr[0])]
+    var rentItem = rental.rentItems[parseInt(idArr[1])]
+
+    var getChangesUrl = app.globalData.requestPrefix + 'Rent/GetRentItemChanges/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getChangesUrl, null).then(function (changesLog) {
+      for (var i = 0; changesLog && i < changesLog.length; i++) {
+        var changeDate = new Date(changesLog[i].changeDate)
+        changesLog[i].changeDateStr = util.formatDate(changeDate)
+        changesLog[i].changeTimeStr = util.formatTimeStr(changeDate)
+      }
+      rentItem.changesLog = changesLog
+      that.setData({ order, showChanges })
+    })
+    var getLogUrl = app.globalData.requestPrefix + 'Rent/GetRentItemLogByStaff/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getLogUrl, null).then(function (logs) {
+      console.log('get log', logs)
+      for (var i = 0; i < logs.length; i++) {
+        var createDate = new Date(logs[i].create_date)
+        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0')
+          + '-' + createDate.getDate().toString().padStart(2, '0')
+        logs[i].timeStr = util.formatTimeStr(createDate)
+      }
+      rentItem.availableLog = logs
+      that.setData({ order, showChanges })
+    })
+  },
+  openAppending(e) {
+    var that = this
+    that.setData({ appendingOpenIndex: e.detail })
+  },
+  setGuaranty(e) {
+    var value = e.detail.value
+    if (isNaN(value) || value == null || value == '') {
+      return
+    }
+    var realGuarantyAmount = parseFloat(value)
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var rentals = that.setGuarantyAmount(id, realGuarantyAmount)
+    var order = that.data.order
+    order.appendingRentals = rentals
+    that.setData({ order })
+    //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+  },
+  setGuarantyAmount(index, amount) {
+    var that = this
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var rental = rentals[index]
+    rental.guaranty_discount = rental.guaranty - amount
+    rentals = that.renderData(rentals)
+    return rentals
+  },
+  setPrice(e) {
+    var value = e.detail.value
+    if (isNaN(value) || value == null || value == '') {
+      return
+    }
+    var price = parseFloat(value)
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var rentals = that.setPriceAmount(id, price)
+    var order = that.data.order
+    order.appendingRentals = rentals
+    that.setData({ order })
+    //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+  },
+  updatePrice(e) {
+    var value = e.detail.value
+    if (isNaN(value) || value == null || value == '') {
+      return
+    }
+    var price = parseFloat(value)
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var rentals = that.setPriceAmount(id, price)
+    var order = that.data.order
+    order.appendingRentals = rentals
+    that.setData({ order })
+    //that.triggerEvent('SyncRentData', { order: rentals, needUpdate: true })
+  },
+  setPriceAmount(index, amount) {
+    var that = this
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var rental = rentals[index]
+    var preset = rental.pricePresets[0]
+    if (preset == null) {
+      return null
+    }
+    preset.price = amount
+    rentals = that.renderData(rentals)
+    return rentals
+  },
+  resetPickType(e) {
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var rental = rentals[id]
+    rental.pick_type = null
+    for (var i = 0; rental.rentItems && i < rental.rentItems.length; i++) {
+      rental.rentItems[i].pick_type = null
+      rental.rentItems[i].atOnce = false
+    }
+    that.renderData(rentals)
+    that.setData({ order })
+    //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+  },
+  setRentalPickType(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var id = parseInt(idArr[0])
+    var pickType = null
+    switch (parseInt(idArr[1])) {
+      case 0:
+        pickType = '立即租赁'
+        break
+      case 1:
+        pickType = '先租后取'
+        break
+      case 2:
+        pickType = '延时租赁'
+        break
+      default:
+        break
+    }
+    var that = this
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var rental = rentals[id]
+    if (pickType == '立即租赁' || pickType == '先租后取') {
+      for (var i = 0; rental.rentItems && i < rental.rentItems.length; i++) {
+        rental.rentItems[i].pick_type = pickType
+        if (pickType == '立即租赁') {
+          rental.rentItems[i].atOnce = true
+        }
+        else {
+          rental.rentItems[i].atOnce = false
+        }
+      }
+      rental.pick_type = pickType
+      that.renderData(rentals)
+      that.setData({ order, showCalendar: false })
+      //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+    }
+    else if (pickType == '延时租赁') {
+      var calendarId = 'appending' + '_' + id.toString()
+      that.setData({ showCalendar: true, calendarId })
+    }
+  },
+  resetRentItemPickType(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var rentalIndex = parseInt(idArr[0])
+    var itemIndex = parseInt(idArr[1])
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var item = rentals[rentalIndex].rentItems[itemIndex]
+    item.pick_type = null
+    that.renderData(rentals)
+    that.setData({ order })
+    //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+  },
+  setRentItemPickType(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var rentalIndex = parseInt(idArr[0])
+    var itemIndex = parseInt(idArr[1])
+    var pickType = null
+    switch (parseInt(idArr[2])) {
+      case 0:
+        pickType = '立即租赁'
+        break
+      case 1:
+        pickType = '先租后取'
+        break
+      default:
+        break
+    }
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var rental = rentals[rentalIndex]
+    var item = rental.rentItems[itemIndex]
+    item.pick_type = pickType
+    if (pickType == '立即租赁' || pickType == '先租后取') {
+      item.atOnce = true
+    }
+    else {
+      item.atOnce = false
+    }
+    that.renderData(rentals)
+    that.setData({ order })
+    //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: false })
+
+  },
+  renderData(rentals) {
+    var that = this
+    var well = util.checkRentalsWellForm(rentals)
+    var itemIndex = 1
+    var totalItemNum = 0
+    var totalGuarantyAmount = 0
+    for (var i = 0; i < rentals.length; i++) {
+      var rental = rentals[i]
+      if (!rental.package_id && !rental.category_id && rental.rentItems && rental.rentItems.length > 0) {
+        rental.category_id = rental.rentItems[0].category_id
+      }
+      try {
+        rental.realGuaranty = isNaN(rental.realGuaranty) ? '' : parseFloat(rental.realGuaranty).toFixed(2)
+        if (rental.pricePresets.length > 0) {
+          rental.pricePresets[0].price = isNaN(rental.pricePresets[0].price) ? ''
+            : parseFloat(rental.pricePresets[0].price).toFixed(2)
+        }
+      }
+      catch {
+      }
+      rental.mixedPickType = false
+      for (var j = 0; j < rental.rentItems.length; j++) {
+        totalItemNum++
+        var item = rental.rentItems[j]
+        if (j > 0) {
+          if (item.pick_type != rental.rentItems[j - 1].pick_type) {
+            rental.mixedPickType = true
+          }
+        }
+        item.itemIndex = itemIndex
+        itemIndex++
+      }
+      that.formatRentalPackage(rental)
+      switch (rental.pick_type) {
+        case '立即租赁':
+          var startDate = new Date()
+          rental.startDateStr = util.formatDate(startDate)
+          rental.startTimeStr = util.formatTimeStr(startDate)
+          break
+        case '先租后取':
+          rental.start_date = new Date()
+          rental.startDateStr = util.formatDate(rental.start_date)
+          rental.startTimeStr = '——'
+          break
+        case '延时租赁':
+          var startDate = new Date(rental.start_date)
+          rental.startDateStr = util.formatDate(startDate)
+          rental.startTimeStr = '00:00:00'
+          break
+        default:
+          rental.startDateStr = '——'
+          rental.startTimeStr = '——'
+          break
+      }
+    }
+    console.log('render rentals', rentals)
+    var order = that.data.order
+    order.appendingRentals = rentals
+    that.setData({
+      totalItemNum, totalGuarantyAmount, order, allValid: well,
+      totalGuarantyAmountStr: util.showAmount(totalGuarantyAmount)
+    })
+    return rentals
+    //that.setData({rentals})
+  },
+  formatRentalPackage(rental) {
+    var that = this
+    if (isNaN(rental.package_id) || rental.package_id == null) {
+      return
+    }
+    data.getPackagePromise(rental.package_id).then(function (rentPackage) {
+      for (var i = 0; i < rental.rentItems.length; i++) {
+        var rentItem = rental.rentItems[i]
+        rentItem.canChooseCategory = rentPackage.rentPackageItemCategories[i].categories.length > 1
+        rentItem.chooseCategories = rentPackage.rentPackageItemCategories[i].categories
+        //chooseingCategory = false
+      }
+      var order = that.data.order
+      that.setData({ order })
+    })
+  },
+  setRentalMemo(e) {
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var rental = order.rentals[id]
+    rental.memo = e.detail.value
+    //that.renderData(order.appendingRentals)
+    //that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
+  },
+  searchCodePop(e) {
+    console.log('open search code')
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var rental = rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    if (item.noCode == true) {
+      return
+    }
+    var category = item.category
+    that.setData({ showPopUp: true, popUpContent: 'searchBarCodeFuzzy', searchCategoryId: category.id, currentItemId: e.currentTarget.id })
+  },
+  setNoCodeNew(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var rental = rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    item.noCode = item.noCode == true ? false : true
+    console.log('get item', item)
+    that.renderData(rentals)
+    that.setData({ order })
+    //that.triggerEvent('SyncRentData', that.data.rentals)
+    //that.triggerEvent('SyncRentData', { rentals: that.data.rentals, needUpdate: false })
+  },
+  cancelPopUp() {
+    var that = this
+    that.setData({ showPopUp: false, popUpContent: 'packageSelector' })
+  },
+  confirmProduct(e) {
+    var that = this
+    var product = e.detail
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var item
+    if (that.data.currentItemId) {
+      var idArr = that.data.currentItemId.split('_')
+      var rental = rentals[parseInt(idArr[0])]
+      item = rental.rentItems[parseInt(idArr[1])]
+      item.name = product.name
+      item.category_id = product.category_id
+      item.categoryName = product.category.name
+      item.code = product.barcode
+      item.rent_product_id = product.id
+      item.memo = ''
+      //var rentals = that.data.rentals
+      that.renderData(rentals)
+      order.appendingRentals = rentals
+      that.setData({ order })
+      //that.triggerEvent('SyncRentData', { rentals: rentals, needUpdate: true })
+    }
+    else if (that.data.currentItemIndex) {
+      item = that.getItemByIndex(parseInt(that.data.currentItemIndex))
+      item.name = product.name
+      item.category_id = product.category_id
+      item.categoryName = product.category.name
+      item.code = product.barcode
+      item.rent_product_id = product.id
+      item.memo = ''
+      var order = that.data.order
+      that.renderData(rentals)
+      that.setData({ order })
+    }
+    that.setData({ showPopUp: false, popUpContent: null, currentItemIndex: null, barCode: null })
+  },
+  setItemValue(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var rentals = order.appendingRentals
+    var rental = rentals[parseInt(idArr[0])]
+    var item = rental.rentItems[parseInt(idArr[1])]
+    var fieldName = idArr[2]
+    var value = e.detail.value
+    switch (fieldName) {
+      case 'name':
+        item.name = value
+        break
+      case 'code':
+        item.code = value
+        break
+      case 'memo':
+        item.memo = value
+        break
+      default:
+        break
+    }
+    that.renderData(rentals)
+    that.setData({ order })
+  },
+  returnAll(e) {
+    var that = this
+    var order = that.data.order
+    var id = parseInt(e.currentTarget.id)
+    var rental = order.rentals[id]
+    wx.showModal({
+      title: '确认全部归还',
+      content: '请先清点已归还的租赁物',
+      complete: (res) => {
+        if (res.confirm) {
+          var url = app.globalData.requestPrefix + 'Rent/ReturnAllRentItems/' + rental.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+          util.performWebRequest(url, null).then(function (newRental) {
+            wx.showToast({
+              icon: 'success',
+              title: '归还成功',
+              duration: 2000,
+              success: () => {
+                that.getData()
+              }
+            })
+
+          })
+        }
+        if (res.cancel) {
+
+        }
+      },
+
+    })
+  },
+  expand(e) {
+    var that = this
+    var expandItems = e.detail
+    var order = that.data.order
+    for (var i = 0; i < order.rentals.length; i++) {
+      order.rentals[i].expand = false
+    }
+    if (expandItems.length == 0) {
+      that.setData({ expandItems, order })
+      return
+    }
+    for (var i = 0; i < expandItems.length; i++) {
+      switch (expandItems[i]) {
+        case 'paymentInfo':
+          that.setData({ expandItems: e.detail, showBalance: true })
+          break
+        default:
+          var expandArr = expandItems[i].split('_')
+          if (expandItems[i].indexOf('rental_item_log_') >= 0) {
+            that.getRentItemLog(expandArr[expandArr.length - 2], expandArr[expandArr.length - 1])
+          }
+          if (expandItems[i].indexOf('rental_item_change_') >= 0) {
+            that.getRentItemChange(expandArr[expandArr.length - 2], expandArr[expandArr.length - 1])
+          }
+          if (expandItems[i].indexOf('rental_') >= 0 && expandArr.length == 2) {
+            for (var i = 0; i < order.rentals.length; i++) {
+              if (i == parseInt(expandArr[1])) {
+                order.rentals[i].expand = true
+              }
+            }
+          }
+          that.setData({ expandItems: e.detail, order })
+          break
+      }
+    }
+  },
+  getRentItemLog(rentalIndex, rentItemIndex) {
+    var that = this
+    var order = that.data.order
+    var rental = order.rentals[rentalIndex]
+    var rentItem = rental.rentItems[rentItemIndex]
+    var getLogUrl = app.globalData.requestPrefix + 'Rent/GetRentItemLogByStaff/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getLogUrl, null).then(function (logs) {
+      console.log('get log', logs)
+      for (var i = 0; i < logs.length; i++) {
+        var createDate = new Date(logs[i].create_date)
+        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0')
+          + '-' + createDate.getDate().toString().padStart(2, '0')
+        logs[i].timeStr = util.formatTimeStr(createDate)
+      }
+      rentItem.availableLog = logs
+      that.setData({ order })
+      that.convertByCategory()
+    })
+  },
+  getRentItemChange(rentalIndex, rentItemIndex) {
+    var that = this
+    var order = that.data.order
+    var rental = order.rentals[rentalIndex]
+    var rentItem = rental.rentItems[rentItemIndex]
+    var getChangesUrl = app.globalData.requestPrefix + 'Rent/GetRentItemChanges/' + rentItem.id.toString() + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getChangesUrl, null).then(function (changesLog) {
+      for (var i = 0; changesLog && i < changesLog.length; i++) {
+        var changeDate = new Date(changesLog[i].changeDate)
+        changesLog[i].changeDateStr = util.formatDate(changeDate)
+        changesLog[i].changeTimeStr = util.formatTimeStr(changeDate)
+      }
+      rentItem.changesLog = changesLog
+      that.setData({ order })
+      that.convertByCategory()
+    })
+  },
+  onTabChange(e) {
+    var that = this
+    if (e.detail.index == 1) {
+      that.convertByCategory()
+    }
+    console.log('tab change', e)
+  },
+  convertByCategory() {
+    var that = this
+    var order = that.data.order
+    var categories = []
+    var oldCategories = that.data.categories
+    for (var i = 0; i < order.rentals.length; i++) {
+      var rental = order.rentals[i]
+      for (var j = 0; j < rental.rentItems.length; j++) {
+        var item = rental.rentItems[j]
+        item.rentalIndex = i
+        item.itemIndex = j
+        if (item.next_id != null) {
+          continue
+        }
+        console.log('item', item)
+        var category = null
+        var fatherCode = item.category.code.substr(0, 2)
+        for (var k = 0; k < categories.length; k++) {
+          if (categories[k].code == fatherCode) {
+            category = categories[k]
+          }
+        }
+        if (category == null) {
+          category = {
+            code: fatherCode,
+            name: null,
+            id: null,
+            rentItems: []
+          }
+          var oldCategory = null
+          for (var l = 0; oldCategory == null && oldCategories != null && l < oldCategories.length; l++) {
+            if (oldCategories[l].code == fatherCode) {
+              oldCategory = oldCategories[l]
+            }
+          }
+          if (oldCategory != null) {
+            category.code = oldCategory.code
+            category.name = oldCategory.name
+            category.id = oldCategory.id
+          }
+          categories.push(category)
+          if (oldCategory == null) {
+            var getUrl = app.globalData.requestPrefix + 'Rent/GetRentCategoryByCode/' + fatherCode
+            util.performWebRequest(getUrl, null).then(function (cate) {
+              for (var i = 0; i < categories.length; i++) {
+                if (categories[i].code == cate.code) {
+                  categories[i].id = cate.id
+                  categories[i].name = cate.name
+                }
+              }
+              that.setData({ categories })
+            })
+          }
+          /*
+          else {
+            that.setData({ categories })
+          }
+          */
+        }
+        category.rentItems.push(item)
+        that.setData({ categories })
+      }
+    }
+  },
+  returnOrderCategoryAll(e) {
+    var that = this
+    var id = parseInt(e.currentTarget.id)
+    var order = that.data.order
+    var categories = that.data.categories
+    var category = null
+    for (var i = 0; category == null && categories && i < categories.length; i++) {
+      if (categories[i].id == id) {
+        category = categories[i]
+      }
+    }
+    if (category == null) {
+      return
+    }
+    wx.showModal({
+      title: '确认归还',
+      content: category.rentItems.length + ' 件 ' + category.name + '，确认归还？',
+      complete: () => {
+        var url = app.globalData.requestPrefix + 'Rent/RetualAllRentItemInOrderByCategory/' + order.id + '?categoryId=' + category.id + '&sessionKey=' + app.globalData.sessionKey
+        util.performWebRequest(url, null).then(function (newOrder) {
+          wx.showToast({
+            icon: 'seccess',
+            title: '归还成功',
+            duration: 3000
+          })
+          for (var i = 0; newOrder.rentals && i < newOrder.rentals.length; i++) {
+            that.data.order = newOrder
+            that.refreshStatus(newOrder.rentals[i])
+          }
+        })
+      }
     })
   }
+
 })

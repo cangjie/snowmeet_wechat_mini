@@ -1,3 +1,0 @@
-/* pages/admin/recept/recept_summary.wxss */
-@import '/app.wxss';
-@import '/common.wxss';

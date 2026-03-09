@@ -14,11 +14,18 @@ picker{
   width: 50rpx;
 }
 .left-column{
+  display: flex;
   width: 140rpx;
   text-align: left;
+  font-size: var(--standart-font-size);
+  align-items: center;
+  margin: 0rpx
+
 }
 .right-column{
-  width: 195rpx
+  width: 195rpx;
+  margin: 0rpx;
+  font-size: var(--standart-font-size);
 }
 .right-column1{
   width: 500rpx
@@ -46,4 +53,33 @@ picker{
 }
 .van-ellipsis{
   width: 300rpx;
+}
+.van-cell{
+  --cell-vertical-padding: 0rpx;
+  --cell-horizontal-padding:0rpx;
+  
+}
+.van-collapse-item__content {
+  --collapse-item-content-padding: 0rpx;
+}
+.view-row{
+  margin-top: 10rpx;
+}
+.input{
+  border-color: #808080;
+}
+page{
+  --title-width: 180rpx;
+  --title-width-sub: 120rpx;
+  --standart-font-size: 30rpx;
+  --total-width:680rpx;
+  --total-width-sub: 640rpx;
+  --rental-title-backgroud-color: #e5e5e5;
+  --rental-title-unwell-color: #FF0000;
+  --rental-title-well-color: #000000;
+  --rent-item-unwell-background-color: #FFFFFF;
+  --rent-item-well-background-color: #276827a5;
+  --button-normal-font-size: 13px;
+  --no-need-background-color: #6C6C6C;
+  font-size: var(--standart-font-size);
 }

@@ -228,7 +228,7 @@ Page({
     }
     for (var i = 0; order.rentals && i < order.rentals.length; i++) {
       var rental = order.rentals[i]
-      rental.guaranty = rental.deposit
+      rental.guaranty = rental.guaranty
       var startDate = rental.startDate
       if (startDate) {
         startDate = util.formatDate(new Date(startDate))
@@ -240,7 +240,8 @@ Page({
       for (var j = 0; rental.pricePresets && j < rental.pricePresets.length; j++) {
         rental.pricePresets[j].id = 0
       }
-      rental.start_date = startDate
+      
+      
       rental.details = null
       rental.category = null
     }
@@ -372,5 +373,6 @@ Page({
   setRentOrderPaying() {
     var that = this
     that.setData({ rentOrderPaying: true })
-  }
+  },
+  
 })

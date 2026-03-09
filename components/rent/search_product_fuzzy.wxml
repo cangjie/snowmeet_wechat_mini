@@ -23,6 +23,7 @@
         </view>
         <view style="background-color: #EEEEEE; width: 550rpx;" >
           <view style="margin-left: 10rpx;">{{item.category.name}}</view>
+          <view style="margin-left: 10rpx;" >{{item.barcode}}</view>
           <view>{{item.name}}</view>
           <view style="height: 10rpx; background-color: white;" ></view>
         </view>

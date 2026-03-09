@@ -3,18 +3,10 @@ const app = getApp()
 const data = require('../../utils/data.js')
 const util = require('../../utils/util.js')
 Component({
-
-  /**
-   * Component properties
-   */
   properties: {
     order: Object,
     shop: String
   },
-
-  /**
-   * Component initial data
-   */
   data: {
     care: null,
     brandSelectIndex: null,

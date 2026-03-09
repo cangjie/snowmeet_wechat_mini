@@ -187,7 +187,10 @@ const createRentalDetail = function (rental, startDate, endDate) {
   }
   rental.totalAmount = totalAmount
   rental.totalAmountStr = showAmount(totalAmount)
-  rental.pricePresets = details
+  if (details && details.length > 0 && (rental.pricePresets == null || rental.pricePresets.length == 0)){
+    rental.pricePresets = details
+  }
+  
   return details
 }
 const getRentPrice = function (priceList, date, rentType) {
@@ -213,39 +216,53 @@ const checkRentalsWellForm = function (rentals) {
   var well = true
   for (var i = 0; i < rentals.length; i++) {
     var rental = rentals[i]
-
+    var rentalWell = true
     if (rental.noGuaranty != true && !rental.guaranty) {
       well = false
+      rentalWell = false
       break
     }
     if (rental.rentItems.length <= 0) {
       well = false
+      rentalWell = false
       break
     }
     for (var j = 0; j < rental.rentItems.length; j++) {
+      var itemWell = true
       var item = rental.rentItems[j]
+      if (item.pick_type == null){
+        well = false
+        itemWell = false
+        rentalWell = false
+      }
       if (item.noNeed) {
+        item.wellFormed = true
         continue
       }
       if (!item.category) {
         well = false
-        break
+        itemWell = false
+        rentalWell = false
       }
       if (item.noNeed != true) {
         if (item.noCode == true) {
           if (!item.name || item.name == '') {
             well = false
-            break
+            itemWell = false
+            rentalWell = false
           }
         }
         else {
           if (!item.code || item.code == '' || !item.name || item.name == '') {
             well = false
-            break
+            itemWell = false
+            rentalWell = false
           }
         }
       }
+      item.wellFormed = itemWell
     }
+    rental.wellFormed = rentalWell
   }
   return well
 }
