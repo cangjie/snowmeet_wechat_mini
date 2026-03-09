@@ -16,16 +16,13 @@
     "pages/admin/sale/shop_sale_entry",
     "pages/admin/sale/order_list",
     "pages/admin/sale/order_detail",
-   
     "pages/admin/background/set_session_key",
-
     "pages/ski_pass/ski_pass_selector",
     "pages/ski_pass/ski_pass_reserve",
     "pages/admin/sale/mod_mi7_order_no",
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
     "pages/tickets/tickets_get",
-    "pages/admin/rent/rent_list",
     "pages/admin/rent/rent_detail",
     "pages/rent/bind_rent_order",
     "pages/admin/rent/rent_report",
@@ -39,7 +36,6 @@
     "pages/admin/vip/recept_review",
     "pages/admin/user/staff_list",
     "pages/register/staff_check_in",
-   
     "pages/admin/rent/unreturned",
     "pages/admin/rent/settings/category_tree",
     "pages/admin/rent/settings/rent_package",

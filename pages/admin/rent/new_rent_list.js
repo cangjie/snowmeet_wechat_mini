@@ -252,5 +252,8 @@ Page({
     var that = this
     var keyword = e.detail.value
     that.setData({keyword})
+  },
+  showBackdrop(e){
+    console.log('click text box')
   }
 })
