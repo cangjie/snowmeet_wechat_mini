@@ -18,13 +18,10 @@ Component({
     memberId:{
       type: Number,
       value: 0
-<<<<<<< HEAD
     },
     selectedCode:{
       type: String,
       value: null
-=======
->>>>>>> rent_combine
     }
 
   },
@@ -50,7 +47,6 @@ Component({
                 tickets[i].disabled = false
               }
             }
-<<<<<<< HEAD
             if (tickets[i].code == that.properties.selectedCode){
               tickets[i].selected = true
             }
@@ -66,9 +62,6 @@ Component({
           }
           tickets.push(cancelTicket)
           that.setData({tickets})
-=======
-          }
->>>>>>> rent_combine
         })
     }
   },
@@ -77,17 +70,13 @@ Component({
       console.log('ticket show')
     }
   },
-<<<<<<< HEAD
   /**
    * Component methods
    */
-=======
->>>>>>> rent_combine
   methods: {
     cancel(e){
       var that = this
       that.triggerEvent('Event', {action: 'cancel'})
-<<<<<<< HEAD
     },
     confirm(e){
       var that = this
@@ -109,8 +98,6 @@ Component({
       var that = this
       that.data.selectedCode = e.detail.value
       console.log('select code', e)
-=======
->>>>>>> rent_combine
     }
   }
 })

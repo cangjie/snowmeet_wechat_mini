@@ -10,12 +10,7 @@
           "launchMode": "default"
         },
         {
-          "name": "未完成的接待",
-          "pathName": "pages/admin/recept/recept_new",
-          "query": "id=67261",
-          "launchMode": "default",
-          "scene": null
-
+  
           "name": "租赁订单",
           "pathName": "/pages/admin/rent/rent_details",
           "query": "id=69084",

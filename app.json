@@ -14,7 +14,6 @@
     "pages/blt/open_lock",
     "pages/admin/sale/shop_sale",
     "pages/admin/sale/shop_sale_entry",
-    "pages/admin/sale/order_list",
     "pages/admin/sale/order_detail",
     "pages/admin/background/set_session_key",
     "pages/ski_pass/ski_pass_selector",
