@@ -1,0 +1,7 @@
+/* components/rent/top_category_selector.wxss */
+@import '/app.wxss';
+view{
+  --main-width: 700rpx;
+  --scroll-height: 800rpx;
+  --line-height:80rpx
+}

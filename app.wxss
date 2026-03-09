@@ -42,7 +42,8 @@
 }
 
 .fui-left-column{
-  text-align: right;
+  text-align: left;
+  width: 210rpx;
 }
 .fui-right-column{
   text-align: left;
