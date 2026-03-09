@@ -148,7 +148,7 @@ Page({
           haveDiscount = queryOptions[i].value
           break
         case 'rentCategory':
-          rentCategoryId = queryOptions[i].value.id
+          rentCategoryId = queryOptions[i].value == null? null : queryOptions[i].value.id
           break
         case 'rentItemName':
           rentItemName = queryOptions[i].value
@@ -175,7 +175,8 @@ Page({
       haveDiscount = null
     }
     data.getOrdersByStaffPromise(null, shop, null, null, '租赁', startDate, endDate,
-      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, null, null, that.data.keyword, null).then(function (orders) {
+      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, null, null, that.data.keyword, null,
+      rentCategoryId, rentItemName).then(function (orders) {
         console.log('get orders', orders)
         that.renderOrders(orders)
         that.setData({ querying: false })
