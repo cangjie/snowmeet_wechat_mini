@@ -290,26 +290,10 @@ Page({
             setTimeout(() => {that.setData({ order })}, 1000)
           }).catch(function (exp) {
             console.log('upload error', exp)
-<<<<<<< HEAD
           })}, 1000)
       }).catch(function (exp){
         console.log('upload error', exp)
       })}, 1000)
-=======
-            var care = order.cares[index]
-            var image = care.careImages[imageIndex]
-            image.image_id = uploadedFile.id
-            image.thumb = uploadedFile.thumbUrl
-            image.status = 'success'
-            image.message = ''
-            image.image = uploadedFile
-            order = that.buildImages(order, index)
-            care.moddingBaseInfo = true
-            that.setData({ order })
-          })
-        }, 1000)
-      })
->>>>>>> rent_combine
   },
   afterReadPick(e) {
     console.log('photo uploaded', e)
