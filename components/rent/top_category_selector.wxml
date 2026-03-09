@@ -1,0 +1,17 @@
+<view>
+  <view style="font-weight: bold;text-align: center;margin-top: 50rpx;margin-bottom: 50rpx;">选择分类</view>
+  <scroll-view style="width: var(--main-width);height:var(--scroll-height)" scroll-y >
+    <radio-group bindchange="selectCategory">
+      <view class="view-row" style="width:var(--main-width);height:var(--line-height);" wx:for="{{categories}}">
+        <view style="width:200rpx" ></view>
+        <radio value="{{index}}" ></radio>
+        <view>{{item.name}}</view>
+      </view>
+    </radio-group>
+  </scroll-view>
+  <view class="view-row" style="justify-content: center;margin-bottom: 50rpx;">
+    <van-button type="warning" round bind:click="cancel" > 取 消 </van-button>
+    <view style="width: 100rpx;"></view>
+    <van-button type="primary" round bind:click="confirm" > 确 认 </van-button>
+  </view>
+</view>

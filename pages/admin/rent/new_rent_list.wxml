@@ -98,9 +98,11 @@
       </fui-col>
       <fui-col span="6">
         <view class="view-row" style="width: 490rpx;">
-          <input class="input" placeholder="点击选择分类" style="font-size: 9pt;width:150rpx" bindtap="showBackdrop" />
-          <input class="input" bindinput="setRentItemName"
-            style="margin-left:20rpx;text-align: center;width:280rpx;font-size: 9pt;" placeholder="输入租赁物名称或编码" />
+          <input class="input" placeholder="点击选择分类" style="font-size: 9pt;width:150rpx;text-align: center;" bindtap="showBackdrop" 
+          value="{{queryOptions[3] == null? null: queryOptions[3].value.name}}" />
+          <input class="input" bindinput="setRentItemName" disabled="{{queryOptions[3].value == null}}"
+            style="margin-left:20rpx;text-align: center;width:280rpx;font-size: 9pt;" 
+            placeholder="输入租赁物名称或编码" value="{{queryOptions[4].value}}" />
         </view>
       </fui-col>
     </fui-row>
@@ -120,50 +122,6 @@
         <input class="input" bindinput="setMemo" style="text-align: center;" />
       </fui-col>
     </fui-row>
-    <!--radio-group id="status" bindchange="setQueryOptions">
-      <fui-row style="margin-top: 20rpx;">
-        <fui-col span="5">
-          <view class="fui-left-column">【状态】</view>
-        </fui-col>
-        <fui-col span="6">
-          <radio checked="{{true}}" value="支付成功">支付成功</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="部分支付">部分支付</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="待生成">待生成</radio>
-        </fui-col>
-      </fui-row>
-      <fui-row style="margin-top: 20rpx;">
-        <fui-col span="6" offset="5">
-          <radio value="待支付">待支付</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="订单关闭">订单关闭</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="全额退款">全额退款</radio>
-        </fui-col>
-      </fui-row>
-      <fui-row style="margin-top: 20rpx;">
-        <fui-col span="6" offset="5">
-          <radio value="部分退款">部分退款</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="退款失败">退款失败</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="已下单">已下单</radio>
-        </fui-col>
-      </fui-row>
-      <fui-row style="margin-top: 20rpx;">
-        <fui-col span="6" offset="5">
-          <radio value="null">全部</radio>
-        </fui-col>
-        <fui-col span="13"></fui-col>
-      </fui-row>
-    </radio-group-->
   </fui-card>
   <view class="view-row" style="justify-content: center;width: 750rpx;">
     <van-button type="info" size="normal" style="margin-top: 20rpx;" bind:click="query" disabled="{{querying}}"> 查 询
@@ -205,10 +163,6 @@
             <view class="left-column">【支付金额】</view>
             <view class="right-column">{{item.paidAmountStr}}</view>
           </view>
-          <!--view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【支付类型】</view>
-            <view class="right-column">{{ item.payType }}</view>
-          </view-->
           <view class="view-row" id="{{index}}" bindtap="gotoDetail">
             <view class="left-column">【支付方式】</view>
             <view class="right-column">{{ item.payMethod==null? '--' : item.payMethod }}</view>
@@ -236,4 +190,7 @@
     </fui-card>
     <view style="height: 20rpx;"></view>
   </block>
+  <van-popup show="{{ showRentCategorySelector }}" >
+    <top-category-selector bindModalClick="selectCategory" ></top-category-selector>
+  </van-popup>
 </view>
