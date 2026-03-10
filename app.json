@@ -22,7 +22,6 @@
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
     "pages/tickets/tickets_get",
-    "pages/admin/rent/rent_list",
     "pages/rent/bind_rent_order",
     "pages/admin/rent/rent_report",
     "pages/admin/rent/rent_list_by_cell",

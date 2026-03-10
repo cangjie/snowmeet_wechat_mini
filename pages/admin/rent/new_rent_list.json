@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "top-category-selector": "/components/rent/top_category_selector"
+  },
   "navigationBarTitleText": "租赁订单列表"
 }

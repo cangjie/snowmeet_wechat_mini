@@ -11,7 +11,9 @@ Page({
     queryOptions: [
       { key: 'isTest', value: false },
       { key: 'isEntertain', value: false },
-      { key: 'haveDiscount', value: null }
+      { key: 'haveDiscount', value: null },
+      { key: 'rentCategory', value: null },
+      { key: 'rentItemName', value: null }
     ],
     cell: null,
     keyword: null
@@ -132,6 +134,8 @@ Page({
     var isEntertain = null
     var haveDiscount = null
     var queryOptions = that.data.queryOptions
+    var rentCategoryId = null
+    var rentItemName = null
     for (var i = 0; i < queryOptions.length; i++) {
       switch (queryOptions[i].key) {
         case 'isTest':
@@ -143,9 +147,19 @@ Page({
         case 'haveDiscount':
           haveDiscount = queryOptions[i].value
           break
+        case 'rentCategory':
+          rentCategoryId = queryOptions[i].value == null? null : queryOptions[i].value.id
+          break
+        case 'rentItemName':
+          rentItemName = queryOptions[i].value
+          break
         default:
           break
       }
+    }
+    if (rentItemName == null || rentCategoryId == null){
+      rentItemName = null
+      rentCategoryId = null
     }
     var shop = that.data.shop
     var startDate = that.data.startDate
@@ -161,7 +175,8 @@ Page({
       haveDiscount = null
     }
     data.getOrdersByStaffPromise(null, shop, null, null, '租赁', startDate, endDate,
-      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, null, null, that.data.keyword).then(function (orders) {
+      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, null, null, that.data.keyword, null,
+      rentCategoryId, rentItemName).then(function (orders) {
         console.log('get orders', orders)
         that.renderOrders(orders)
         that.setData({ querying: false })
@@ -252,5 +267,34 @@ Page({
     var that = this
     var keyword = e.detail.value
     that.setData({keyword})
+  },
+  showBackdrop(e){
+    console.log('click text box')
+    var that = this
+    that.setData({showRentCategorySelector: true})
+  },
+  selectCategory(e){
+    var that = this
+    if (e.detail.action == 'confirm'){
+      var queryOptions = that.data.queryOptions
+      queryOptions[3].value = e.detail.category
+      that.setData({queryOptions, showRentCategorySelector: false})
+    }
+    else{
+      that.setData({showRentCategorySelector: false})
+    }
+  },
+  setRentItemName(e){
+    var that = this
+    var value = e.detail.value
+    var queryOptions = that.data.queryOptions
+    if (value == ''){
+      queryOptions[3].value = null
+      queryOptions[4].value = null 
+    }
+    else{
+      queryOptions[4].value = value
+    }
+    that.setData({queryOptions})
   }
 })
