@@ -10,28 +10,7 @@ Page({
   data: {
     needAuth: false
   },
-  /*
-  AuthFinish(){
-    var that = this
-    that.GetRealName()
-  },
-
-  GetRealName(){
-    var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success:(res) => {
-        if (res.data.mini_users.length > 0){
-          that.setData({name: res.data.mini_users[0].real_name, cell: res.data.mini_users[0].cell_number})
-          app.globalData.cellNumber = that.data.cell
-        }
-        
-      }
-    })
-  },
-  */
+  
   /**
    * Lifecycle function--Called when page load
    */

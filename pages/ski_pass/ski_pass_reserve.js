@@ -94,22 +94,6 @@ Page({
       that.setData({name: info.real_name, cell: info.cell})
     })
   },
-  /*
-  GetRealName(){
-    var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/MiniAppUser/GetMiniUserOld?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success:(res) => {
-        if (res.data.mini_users.length > 0){
-          that.setData({name: res.data.mini_users[0].real_name, cell: res.data.mini_users[0].cell_number})
-        }
-        
-      }
-    })
-  },
-  */
 
   AuthFinish(){
     var that = this

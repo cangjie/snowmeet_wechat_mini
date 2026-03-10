@@ -167,29 +167,36 @@ App({
       {
         "pagePath": "/pages/admin/equip_maintain/uploadimage/uploadimage",
         "text": "上传测试",
+        /*
         "iconPath": "images/book-3-line.png",
         "selectedIconPath": "images/book-3-line-hl.png",
-
+*/
       },
       {
         "pagePath": "/pages/admin/equip_maintain/uploadimage/uploadimage",
         "text": "上传测试",
+        /*
         "iconPath": "images/home-2-line.png",
         "selectedIconPath": "images/home-2-line-hl.png",
+        */
       }
     ],
     userTabBarItem: [
       {
         "pagePath": "/pages/ski_pass/ski_pass_selector",
-        "text": "雪票",
+        "text": "雪票"
+        /*
         "iconPath": "/images/book-3-line.png",
         "selectedIconPath": "/images/book-3-line-hl.png"
+        */
       },
       {
         "pagePath": "/pages/mine/mine",
-        "text": "我的",
+        "text": "我的"
+        /*
         "iconPath": "/images/home-2-line.png",
         "selectedIconPath": "/images/home-2-line-hl.png"
+        */
       }
     ]
   }

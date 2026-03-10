@@ -106,13 +106,9 @@
     "navigationBarTextStyle": "black"
   },
   "sitemapLocation": "sitemap.json",
-  "plugins": {
-    "ocr-plugin": {
-      "version": "2.0.1",
-      "provider": "wxe567a849ff4f3f53",
-      "export": "exportToOcrPlugin.js"
-    }
-  },
+  
+  
+  
   "useExtendedLib": {
     "kbone": true,
     "weui": true

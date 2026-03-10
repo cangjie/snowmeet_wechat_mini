@@ -3,20 +3,25 @@
     "miniprogram": {
       "list": [
         {
-          "name": "聚合支付",
-          "pathName": "pages/payment/uni_pay",
+          "name": "首页",
+          "pathName": "pages/index/index",
           "query": "",
           "scene": null,
           "launchMode": "default"
         },
         {
-  
+          "name": "聚合支付",
+          "pathName": "pages/payment/uni_pay",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "租赁订单",
           "pathName": "/pages/admin/rent/rent_details",
           "query": "id=69084",
-          "scene": null,
-          "launchMode": "default"
-
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "未完成的接待",
@@ -164,6 +169,6 @@
   "setting": {
     "urlCheck": false,
     "bigPackageSizeSupport": true,
-    "preloadBackgroundData": true
+    "preloadBackgroundData": false
   }
 }
