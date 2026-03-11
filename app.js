@@ -184,7 +184,7 @@ App({
     userTabBarItem: [
       {
         "pagePath": "/pages/ski_pass/ski_pass_selector",
-        "text": "雪票"
+        "text": "预定"
         /*
         "iconPath": "/images/book-3-line.png",
         "selectedIconPath": "/images/book-3-line-hl.png"
