@@ -100,7 +100,7 @@
                 </view>
                 <view class="view-row" wx:if="{{rental.rentItems.length > 1}}">
                   <view wx:for="{{rental.rentItems}}" wx:if="{{item.next_id == null}}"
-                    style="width: calc(var(--total-width)/{{rental.rentItems.length}});font-family: icon-font;text-align: center;color:var({{item.fontColor}});">
+                    style="font-family: icon-font;text-align: center;color:var({{item.fontColor}});width: calc(var(--total-width)/9)">
                     {{item.category.short_name}}
                   </view>
                 </view>

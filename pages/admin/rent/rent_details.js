@@ -1937,9 +1937,9 @@ Page({
             that.getRentItemChange(expandArr[expandArr.length - 2], expandArr[expandArr.length - 1])
           }
           if (expandItems[i].indexOf('rental_') >= 0 && expandArr.length == 2) {
-            for (var i = 0; i < order.rentals.length; i++) {
-              if (i == parseInt(expandArr[1])) {
-                order.rentals[i].expand = true
+            for (var j = 0; j < order.rentals.length; j++) {
+              if (j == parseInt(expandArr[1])) {
+                order.rentals[j].expand = true
               }
             }
           }
