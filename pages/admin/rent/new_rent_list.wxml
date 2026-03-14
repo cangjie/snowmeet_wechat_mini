@@ -94,6 +94,25 @@
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
+        <view class="fui-left-column">【次卡】</view>
+      </fui-col>
+      <radio-group id="useCard" bindchange="setQueryOptions">
+        <fui-col span="6">
+          <radio checked="{{true}}" value="null"
+            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">全部</radio>
+        </fui-col>
+        <fui-col span="6">
+          <radio value="true"
+            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">包含</radio>
+        </fui-col>
+        <fui-col span="7">
+          <radio value="false"
+            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">不含</radio>
+        </fui-col>
+      </radio-group>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="5">
         <view class="fui-left-column">【租赁物】</view>
       </fui-col>
       <fui-col span="6">
@@ -140,6 +159,7 @@
           <view wx:if="{{item.is_package == 0}}">【单】</view>
           <view wx:if="{{item.haveOnCredit}}">【挂】</view>
           <view wx:if="{{item.haveDiscount}}">【减】</view>
+          <view wx:if="{{item.useCard}}">【卡】</view>
           <view>{{item.memberShip}}</view>
         </view>
         <view>

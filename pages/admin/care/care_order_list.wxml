@@ -100,6 +100,22 @@
     </fui-row>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
+        <view class="fui-left-column">【次卡】</view>
+      </fui-col>
+      <radio-group id="useCard" bindchange="setQueryOptions">
+        <fui-col span="6">
+          <radio checked="{{true}}" value="null" disabled="{{(keyword != null && keyword != '') || (cell != null && cell != '') || querying}}" >全部</radio>
+        </fui-col>
+        <fui-col span="6">
+          <radio value="true" disabled="{{(keyword != null && keyword != '') ||(cell != null && cell != '') || querying}}" >包含</radio>
+        </fui-col>
+        <fui-col span="7">
+          <radio value="false" disabled="{{(keyword != null && keyword != '') || (cell != null && cell != '') || querying}}" >不含</radio>
+        </fui-col>
+      </radio-group>
+    </fui-row>
+    <fui-row style="margin-top: 20rpx;">
+      <fui-col span="5">
         <view class="fui-left-column">【手机】</view>
       </fui-col>
       <fui-col span="6">
@@ -177,6 +193,7 @@
           <view wx:if="{{item.haveDiscount}}">【减】</view>
           <view wx:if="{{item.haveWarranty==true}}">【质】</view>
           <view wx:if="{{item.careProperties.isSummerTask==true}}">【非】</view>
+          <view wx:if="{{item.useCard==true}}">【卡】</view>
           <view>{{item.memberShip}}</view>
         </view>
         <view>
