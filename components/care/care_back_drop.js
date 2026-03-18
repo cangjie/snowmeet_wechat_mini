@@ -47,7 +47,6 @@ Component({
     renderData(){
       var that = this
       var order = that.data.order
-      //var cares = order.cares
       var total = 0
       var allWellFormed = true
       for(var i = 0; i < order.cares.length; i++){
@@ -72,6 +71,10 @@ Component({
           services += '加急'
         }
         care.services = services
+        if (!care.summary && care.ticket 
+          && (care.ticket.template_id == 17 || care.ticket.template_id == 18)){
+            care.summary = 0
+          }
         total += care.summary
         if (util.getCareWellFormMessage(care) != ''){
           allWellFormed = false

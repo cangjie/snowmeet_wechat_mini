@@ -799,12 +799,17 @@ Component({
             care.need_wax = 0
             care.need_unwax = 0
             care.common_charge = 0
+            care.biz_type = '非雪季养护'
           }
           else if (care.ticket.template_id == 18){
             care.need_edge = 1
+            if (!care.edge_degree){
+              care.edge_degree = '89'
+            }
             care.need_wax = 1
             care.need_unwax = 1 
             care.common_charge = 0
+            care.summary = 0
           }
         }
         else {
@@ -818,10 +823,14 @@ Component({
           that.getProduct(care)
         }
         that.setData({care, showTicketPopUp: false})
+        that.save(e)
       }
       else{
         that.setData({showTicketPopUp: false})
+
+        //that.triggerEvent('CareOrderUpdate', { order: that.data.order, refreshMain: true, refreshFooter: true })
       }
+      that.save(e)
     }
   },
   

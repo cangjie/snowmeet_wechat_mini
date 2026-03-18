@@ -283,7 +283,11 @@ const getCareWellFormMessage = function (care) {
     && (!care.brand || care.brand == '' || !care.scale || care.scale == '')) {
     return '图片和品牌长度必填其一'
   }
-  if (!care.product && (!care.repair_charge || care.repair_charge == 0) && care.free_wax == 0) {
+  var isSummer = false
+  if (care.ticket && (care.ticket.template_id == 17 || care.ticket.template_id == 18) ){
+    isSummer = true
+  }
+  if (!care.product && (!care.repair_charge || care.repair_charge == 0) && care.free_wax == 0 && isSummer == false ) {
     return '必须选择业务'
   }
   return ''
