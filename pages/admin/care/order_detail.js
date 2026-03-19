@@ -76,7 +76,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function (resovle) {
       that.getData()
-      that.setData({staff: app.globalData.staff})
+      that.setData({ staff: app.globalData.staff })
 
     }).catch(function (exp) {
       console.log('promise error', exp)
@@ -262,38 +262,40 @@ Page({
     order.cares[index].moddingBaseInfo = true
     that.setData({ order })
     setTimeout(() => {
-    data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
-      .then(function (uploadedFile) {
-        console.log('file uploaded', uploadedFile)
-        var image = order.cares[index].careImages[imageIndex]
-        image.image = uploadedFile
-        image.image_id = uploadedFile.id
-        image.url = uploadedFile.file_path_name
-        image.thumb = uploadedFile.file_path_name
-        image.type = uploadedFile.file_type
-        order = that.buildImages(order, index)
-        care.moddingBaseInfo = true
-        that.setData({ order })
-        setTimeout(() => {
-        data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
-          .then(function (uploadThumbFile) {
-            console.log('thumb uploaded', uploadThumbFile)
-            var care = order.cares[index]
-            var image = care.careImages[imageIndex]
-            image.image_id = uploadThumbFile.id
-            image.thumb = uploadThumbFile.thumbUrl
-            image.status = 'success'
-            image.message = ''
-            image.image = uploadThumbFile
-            order = that.buildImages(order, index)
-            care.moddingBaseInfo = true
-            setTimeout(() => {that.setData({ order })}, 1000)
-          }).catch(function (exp) {
-            console.log('upload error', exp)
-          })}, 1000)
-      }).catch(function (exp){
-        console.log('upload error', exp)
-      })}, 1000)
+      data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
+        .then(function (uploadedFile) {
+          console.log('file uploaded', uploadedFile)
+          var image = order.cares[index].careImages[imageIndex]
+          image.image = uploadedFile
+          image.image_id = uploadedFile.id
+          image.url = uploadedFile.file_path_name
+          image.thumb = uploadedFile.file_path_name
+          image.type = uploadedFile.file_type
+          order = that.buildImages(order, index)
+          care.moddingBaseInfo = true
+          that.setData({ order })
+          setTimeout(() => {
+            data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey)
+              .then(function (uploadThumbFile) {
+                console.log('thumb uploaded', uploadThumbFile)
+                var care = order.cares[index]
+                var image = care.careImages[imageIndex]
+                image.image_id = uploadThumbFile.id
+                image.thumb = uploadThumbFile.thumbUrl
+                image.status = 'success'
+                image.message = ''
+                image.image = uploadThumbFile
+                order = that.buildImages(order, index)
+                care.moddingBaseInfo = true
+                setTimeout(() => { that.setData({ order }) }, 1000)
+              }).catch(function (exp) {
+                console.log('upload error', exp)
+              })
+          }, 1000)
+        }).catch(function (exp) {
+          console.log('upload error', exp)
+        })
+    }, 1000)
   },
   afterReadPick(e) {
     console.log('photo uploaded', e)
@@ -373,7 +375,7 @@ Page({
             care.tasks[care.tasks.length - 1].pick_image_id = image.id
             var setUrl = app.globalData.requestPrefix + 'Care/SetPickImageId/' + care.id.toString() + '?imageId=' + image.id + '&sessionKey=' + app.globalData.sessionKey
             util.performWebRequest(setUrl, null).then(function (newOrder) {
-              data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '上传照片取板', app.globalData.sessionKey).then(function (newCare) {
+              data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '上传照片取板', app.globalData.sessionKey, null, null).then(function (newCare) {
                 for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
                   if (order.cares[j].id == newCare.id) {
                     order.cares[j] = newCare
@@ -388,37 +390,6 @@ Page({
                 }
               })
             })
-
-
-
-
-            /*
-                        data.updateCarePromise(care, '保存发板的照片', app.globalData.sessionKey).then(function (newCare) {
-                          order.cares[index] = newCare
-                          that.renderOrder(order)
-                          order.cares[index].moddingBaseInfo = false
-                          that.setData({ order })
-                          wx.showToast({
-                            title: '正在上传',
-                            icon: 'loading'
-                          })
-                          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '上传照片取板', app.globalData.sessionKey).then(function (newCare) {
-                            for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
-                              if (order.cares[j].id == newCare.id) {
-                                order.cares[j] = newCare
-                                that.getData()
-            
-                                //that.setData({ order })
-                                wx.showToast({
-                                  title: '拍照发板完成',
-                                  icon: 'success'
-                                })
-                              }
-                            }
-                          })
-                          
-                        })
-                        */
           }).catch(function (exp) {
           })
       })
@@ -713,7 +684,7 @@ Page({
     var index = parseInt(e.currentTarget.id)
     var order = that.data.order
     var care = order.cares[index]
-    if (care.careImages == null || care.careImages.length <= 0){
+    if (care.careImages == null || care.careImages.length <= 0) {
       wx.showToast({
         title: '必须传照片',
         icon: 'error'
@@ -755,7 +726,7 @@ Page({
             return
           }
           data.updateCarePromise(care, '安全检查', app.globalData.sessionKey).then(function (newCare) {
-            data.updateCareTaskStatusPromise(care.tasks[0].id, '已完成', '养护详情页安全检查', app.globalData.sessionKey)
+            data.updateCareTaskStatusPromise(care.tasks[0].id, '已完成', '养护详情页安全检查', app.globalData.sessionKey, null, null)
               .then(function (newCare) {
                 order.cares[index] = newCare
                 that.renderOrder(order)
@@ -780,7 +751,7 @@ Page({
 
         if (res.confirm) {
 
-          data.updateCareTaskStatusPromise(taskId, '已开始', '养护详情页', app.globalData.sessionKey)
+          data.updateCareTaskStatusPromise(taskId, '已开始', '养护详情页', app.globalData.sessionKey, null, null)
             .then(function (newCare) {
 
               for (var i = 0; i < order.cares.length; i++) {
@@ -834,7 +805,7 @@ Page({
 
         }
         if (res.confirm) {
-          data.updateCareTaskStatusPromise(taskId, status, '养护详情页', app.globalData.sessionKey)
+          data.updateCareTaskStatusPromise(taskId, status, '养护详情页', app.globalData.sessionKey, null, null)
             .then(function (newCare) {
               for (var i = 0; i < order.cares.length; i++) {
                 if (order.cares[i].id == newCare.id) {
@@ -860,27 +831,27 @@ Page({
     if (veriType == '本人扫码') {
       that.createQrCode(care.id)
     }
-    if (veriType == '验证码'){
+    if (veriType == '验证码') {
       wx.showModal({
         title: '即将发送验证码',
         content: '验证码会通过公众号消息的形式发送给【' + that.data.order.member.title + '】手机号【' + that.data.order.member.cell + '】',
         complete: (res) => {
           if (res.cancel) {
-            
+
           }
-      
+
           if (res.confirm) {
-            that.createVeriCode(care.id)      
+            that.createVeriCode(care.id)
           }
         }
       })
-      
+
     }
     that.setData({ order })
   },
-  createVeriCode(id){
+  createVeriCode(id) {
     var veriUrl = app.globalData.requestPrefix + 'Care/CreateVerifyCode/' + id.toString() + '?sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(veriUrl, null).then(function(care){
+    util.performWebRequest(veriUrl, null).then(function (care) {
       wx.showToast({
         title: '发送成功',
         icon: 'success'
@@ -971,7 +942,7 @@ Page({
       for (var i = 0; i < order.cares.length; i++) {
         if (order.cares[i].id == careId) {
           var care = order.cares[i]
-          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '扫码取板', app.globalData.sessionKey).then(function (newCare) {
+          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '扫码取板', app.globalData.sessionKey, null, null).then(function (newCare) {
             for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
               if (order.cares[j].id == careId) {
                 order.cares[j] = newCare
@@ -1158,7 +1129,7 @@ Page({
       phoneNumber: cell,
     })
   },
-  masterFinish(e){
+  masterFinish(e) {
     var that = this
     var id = parseInt(e.currentTarget.id)
     var order = that.data.order
@@ -1168,11 +1139,10 @@ Page({
       content: '请核实取板人和会员本人的关系。',
       complete: (res) => {
         if (res.cancel) {
-          
+
         }
-    
         if (res.confirm) {
-          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '店长确认', app.globalData.sessionKey).then(function (newCare) {
+          data.updateCareTaskStatusPromise(care.tasks[care.tasks.length - 1].id, '已完成', '店长确认', app.globalData.sessionKey, null, null).then(function (newCare) {
             for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
               if (order.cares[j].id == care.id) {
                 order.cares[j] = newCare
@@ -1188,19 +1158,19 @@ Page({
       }
     })
   },
-  setVeriCode(e){
+  setVeriCode(e) {
     var that = this
     that.data.veriCode = e.detail.value
   },
-  pickVeriCode(e){
+  pickVeriCode(e) {
     var that = this
     var code = that.data.veriCode
     var id = parseInt(e.currentTarget.id)
     var order = that.data.order
     var care = order.cares[id]
     var veriUrl = app.globalData.requestPrefix + 'Care/VeriCareFinishCode/' + care.id.toString() + '?code=' + code + '&sessionKey=' + app.globalData.sessionKey
-    that.setData({veriCode: ''})
-    util.performWebRequest(veriUrl, null).then(function (newCare){
+    that.setData({ veriCode: '' })
+    util.performWebRequest(veriUrl, null).then(function (newCare) {
       for (var j = 0; order && order.cares[j] && j < order.cares[j].id; j++) {
         if (order.cares[j].id == care.id) {
           order.cares[j] = newCare
@@ -1209,19 +1179,116 @@ Page({
             title: '验证通过',
             icon: 'success'
           })
-          
+
         }
       }
     })
   },
-  printLabel(e){
+  printLabel(e) {
     var that = this
-    that.setData({printType: 'label'})
+    that.setData({ printType: 'label' })
     that.showPrintBackDrop(e)
   },
-  printInvoice(e){
+  printInvoice(e) {
     var that = this
-    that.setData({printType: 'invoice'})
+    that.setData({ printType: 'invoice' })
     that.showPrintBackDrop(e)
+  },
+  setDealMethod(e) {
+    var that = this
+    var value = e.detail.value
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var care = order.cares[parseInt(idArr[0])]
+    var task = care.tasks[parseInt(idArr[1])]
+    task.deal_method = value
+    that.setData({ order })
+  },
+  setMemo(e) {
+    var that = this
+    var value = e.detail.value
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var care = order.cares[parseInt(idArr[0])]
+    var task = care.tasks[parseInt(idArr[1])]
+    task.store_memo = value
+  },
+  saveSummerStore(e) {
+    var that = this
+    var value = e.detail.value
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var care = order.cares[parseInt(idArr[0])]
+    var task = care.tasks[parseInt(idArr[1])]
+    if (!task.deal_method) {
+      wx.showToast({
+        icon: 'error',
+        title: '必须选择寄存方式'
+      })
+      return
+    }
+    if (task.deal_method == '快递' && !task.store_memo) {
+      wx.showToast({
+        icon: 'error',
+        title: '必须填写快递单号'
+      })
+      return
+    }
+    wx.showModal({
+      title: '确认修改',
+      content: '寄存方式为：' + task.deal_method + (task.deal_method == '快递' ? '快递单号：' + task.store_memo : ''),
+      success: (res) => {
+        if (res.confirm) {
+          data.updateCareTaskStatusPromise(task.id, '已完成', '非雪季养护',
+            app.globalData.sessionKey, task.deal_method, task.store_memo)
+            .then(function (newCare) {
+              for (var i = 0; i < order.cares.length; i++) {
+                if (order.cares[i].id == newCare.id) {
+                  order.cares[i] = newCare
+                  break
+                }
+              }
+              order = that.renderOrder(order)
+              that.setData({ order })
+            })
+        }
+      }
+    })
+  },
+  setModify(e) {
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var care = order.cares[parseInt(idArr[0])]
+    var task = care.tasks[parseInt(idArr[1])]
+    task.modified = true
+    that.setData({ order })
+  },
+  setModifyCancel(e) {
+    var that = this
+    that.getData()
+  },
+  setModifyConfirm(e) {
+    var that = this
+    that.saveSummerStore(e)
+    /*
+    var that = this
+    var idArr = e.currentTarget.id.split('_')
+    var order = that.data.order
+    var care = order.cares[parseInt(idArr[0])]
+    var task = care.tasks[parseInt(idArr[1])]
+    data.updateCareTaskStatusPromise(task.id, '已完成', '非雪季养护',
+      app.globalData.sessionKey, task.deal_method, task.store_memo)
+      .then(function (newCare) {
+        for (var i = 0; i < order.cares.length; i++) {
+          if (order.cares[i].id == newCare.id) {
+            order.cares[i] = newCare
+            break
+          }
+        }
+        order = that.renderOrder(order)
+        that.setData({ order })
+      })
+      */
   }
 })

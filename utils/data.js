@@ -625,8 +625,14 @@ const updateCarePromise = function (care, scene, sessionKey) {
     })
   })
 }
-const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey) {
+const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey, dealMethod, storeMemo) {
   var updateUrl = app.globalData.requestPrefix + 'Care/SetTaskStatus/' + taskId.toString() + '?status=' + encodeURIComponent(status) + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  if (dealMethod){
+    updateUrl += '&dealMethod=' + encodeURIComponent(dealMethod)
+  }
+  if (storeMemo!=null && storeMemo!=undefined){
+    updateUrl += '&storeMemo=' + encodeURIComponent(storeMemo)
+  }
   return new Promise(function (resolve, reject) {
     util.performWebRequest(updateUrl, null).then(function (newCare) {
       resolve(newCare)
