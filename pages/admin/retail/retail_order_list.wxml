@@ -67,29 +67,36 @@
         <fui-col span="5">
           <view class="fui-left-column">【类型】</view>
         </fui-col>
-        <fui-col span="6">
+        <fui-col span="7">
           <radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || querying}}">全部</radio>
         </fui-col>
-        <fui-col span="6">
+        <fui-col span="7">
           <radio  value="零售" disabled="{{(cell != null && cell != '') || querying}}">零售</radio>
         </fui-col>
-        <fui-col span="6">
-          <radio  value="期货预定" disabled="{{(cell != null && cell != '') || querying}}">期货预定</radio>
-        </fui-col> 
+        
       </fui-row>
       <fui-row style="margin-top: 20rpx;">
         <fui-col span="5">
           <view class="fui-left-column" style="width: 100rpx;color:white ;" >.</view>
         </fui-col>
-        <fui-col span="6">
+        <fui-col span="7">
           <radio  value="养护卡类" disabled="{{(cell != null && cell != '') || querying}}">养护卡类</radio>
         </fui-col>
-        <fui-col span="6">
+        <fui-col span="7">
           <radio  value="租赁卡类" disabled="{{(cell != null && cell != '') || querying}}">租赁卡类</radio>
         </fui-col>
-        <fui-col span="6">
+        
+      </fui-row>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column" style="width: 100rpx;color:white ;" >.</view>
+        </fui-col>
+        <fui-col span="7">
           <radio  value="二手零售" disabled="{{(cell != null && cell != '') || querying}}">二手零售</radio>
         </fui-col>
+        <fui-col span="7">
+          <radio  value="期货预定" disabled="{{(cell != null && cell != '') || querying}}">期货预定</radio>
+        </fui-col> 
       </fui-row>
     </radio-group>
     <fui-row style="margin-top: 20rpx;">
