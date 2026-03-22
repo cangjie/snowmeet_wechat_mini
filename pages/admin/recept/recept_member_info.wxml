@@ -10,7 +10,7 @@
       <view class="view-row">
         <view class="left-column" ></view>
         <view class="right-column" >
-          <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+          <shop-selector bindShopSelected="shopSelected" scene="recept" ></shop-selector>
         </view>
       </view>
     </mp-cell>
