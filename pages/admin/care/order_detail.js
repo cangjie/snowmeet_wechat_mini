@@ -1204,7 +1204,7 @@ Page({
     task.deal_method = value
     that.setData({ order })
   },
-  setMemo(e) {
+  setStoreMemo(e) {
     var that = this
     var value = e.detail.value
     var idArr = e.currentTarget.id.split('_')

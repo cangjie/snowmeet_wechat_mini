@@ -275,7 +275,7 @@
               <view class="left-column" wx:if="{{task.deal_method == '快递'}}" >【单号】</view>
               <view class="left-column" wx:else >【备注】</view>
               <view class="right-column" style="width: 500rpx;" >
-                <input class="input" style="width:400rpx" disabled="{{task.current!=true && task.modified != true}}" bindinput="setMemo" id="{{index}}_{{itemIndex}}" value="{{task.store_memo == null? '' : task.store_memo}}" />
+                <input class="input" style="width:400rpx" disabled="{{task.current!=true && task.modified != true}}" bindinput="setStoreMemo" id="{{index}}_{{itemIndex}}" value="{{task.store_memo == null? '' : task.store_memo}}" />
               </view>
             </view>
           </mp-cell>
