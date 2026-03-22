@@ -253,7 +253,7 @@
         <view class="view-row">
           <view class="left-column" style="width: 150rpx;">【编码】</view>
           <view class="right-column view-row" style="width: 500rpx;">
-            {{currentRental.rentItems[0].noCode? '【无】' : currentRental.rentItems[0].code}}
+            {{(currentRental.rentItems[0].noCode || currentRental.rentItems[0].noCode == null)? '【无】' : currentRental.rentItems[0].code}}
           </view>
         </view>
         <view class="view-row">
