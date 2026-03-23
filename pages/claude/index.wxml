@@ -59,7 +59,7 @@
               <text class="qty-btn-text">−</text>
             </view>
             <text class="qty-value">{{quantity}}</text>
-            <view class="qty-btn qty-plus" bindtap="onIncrease">
+            <view class="qty-btn qty-plus qty-plus--disabled" bindtap="onIncrease">
               <text class="qty-btn-text">+</text>
             </view>
           </view>

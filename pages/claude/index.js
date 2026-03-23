@@ -33,12 +33,12 @@ Page({
   },
 
   // ========================
-  // 初始化日期列表（从今天起 30 天）
+  // 初始化日期列表（从今天起 5 天）
   // ========================
   _initDateOptions() {
     const options = []
     const today = new Date()
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 5; i++) {
       const d = new Date(today)
       d.setDate(today.getDate() + i)
       const yyyy = d.getFullYear()
@@ -46,7 +46,8 @@ Page({
       const dd = String(d.getDate()).padStart(2, '0')
       const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
       const week = weekDays[d.getDay()]
-      options.push(`${yyyy}-${mm}-${dd}  ${week}`)
+      const label = i === 0 ? '今天' : i === 1 ? '明天' : week
+      options.push(`${yyyy}-${mm}-${dd}  ${label}`)
     }
     this.setData({ dateOptions: options })
   },
@@ -118,13 +119,7 @@ Page({
   // 数量加减
   // ========================
   onIncrease() {
-    const qty = this.data.quantity + 1
-    if (qty > 10) {
-      wx.showToast({ title: '每次最多购买 10 张', icon: 'none' })
-      return
-    }
-    this.setData({ quantity: qty })
-    this._updateTotalPrice()
+    // 加号已禁用，不执行任何操作
   },
 
   onDecrease() {

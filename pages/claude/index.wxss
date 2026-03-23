@@ -303,6 +303,17 @@ page {
   color: #001D4A;
 }
 
+.qty-plus--disabled {
+  background: var(--surface-container-highest) !important;
+  box-shadow: none !important;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.qty-plus--disabled .qty-btn-text {
+  color: var(--outline) !important;
+}
+
 .qty-value {
   font-size: 80rpx;
   font-weight: 800;
