@@ -97,7 +97,8 @@
     "pages/admin/rent/rent_item_change",
     "pages/admin/unipay/unipay",
     "pages/admin/unipay/unipay_detail",
-    "pages/admin/unipay/unipay_list"
+    "pages/admin/unipay/unipay_list",
+    "pages/claude/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -106,9 +107,6 @@
     "navigationBarTextStyle": "black"
   },
   "sitemapLocation": "sitemap.json",
-  
-  
-  
   "useExtendedLib": {
     "kbone": true,
     "weui": true
@@ -213,7 +211,6 @@
     "van-dropdown-menu": "@vant/weapp/dropdown-menu/index",
     "van-dropdown-item": "@vant/weapp/dropdown-item/index",
     "date-selector": "/components/date_selector/date_selector",
-
     "van-calendar": "@vant/weapp/calendar/index"
   }
 }

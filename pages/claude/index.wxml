@@ -1,0 +1,163 @@
+<!-- pages/ticket-booking/index.wxml -->
+<view class="page-container">
+
+  <!-- 顶部导航栏 -->
+  <view class="top-bar">
+    <view class="top-bar-left" bindtap="onBack">
+      <text class="iconfont icon-back">←</text>
+    </view>
+    <text class="top-bar-title">Wanlong Ski Resort</text>
+    <view class="top-bar-right" bindtap="onMore">
+      <text class="icon-more">⋯</text>
+    </view>
+  </view>
+
+  <!-- 主内容区 -->
+  <scroll-view class="main-content" scroll-y="true" enhanced="true" show-scrollbar="false">
+
+    <!-- Hero 横幅图 -->
+    <view class="hero-section">
+      <image
+        class="hero-image"
+        src="/assets/ski-hero.jpg"
+        mode="aspectFill"
+      />
+      <view class="hero-overlay" />
+      <view class="hero-content">
+        <view class="premium-badge">
+          <text class="badge-star">★</text>
+          <text class="badge-text">PREMIUM ACCESS</text>
+        </view>
+        <text class="hero-title">【25-26雪季】夜场自带板滑雪票</text>
+        <text class="hero-subtitle">Wanlong Exclusive Night Session</text>
+      </view>
+    </view>
+
+    <!-- 表单区域 -->
+    <view class="form-section">
+
+      <!-- 日期 & 数量 网格 -->
+      <view class="bento-grid">
+
+        <!-- 日期选择 -->
+        <view class="bento-card date-card" bindtap="onSelectDate">
+          <text class="card-label">日期 (DATE)</text>
+          <view class="date-content">
+            <view class="date-info">
+              <text class="date-value">{{selectedDate}}</text>
+              <text class="date-sub">Friday Night Session</text>
+            </view>
+            <text class="calendar-icon">📅</text>
+          </view>
+        </view>
+
+        <!-- 数量选择 -->
+        <view class="bento-card qty-card">
+          <text class="card-label">数量 (QUANTITY)</text>
+          <view class="qty-content">
+            <view class="qty-btn qty-minus" bindtap="onDecrease">
+              <text class="qty-btn-text">−</text>
+            </view>
+            <text class="qty-value">{{quantity}}</text>
+            <view class="qty-btn qty-plus" bindtap="onIncrease">
+              <text class="qty-btn-text">+</text>
+            </view>
+          </view>
+        </view>
+
+      </view>
+
+      <!-- 游客信息卡片 -->
+      <view class="info-card">
+        <view class="info-card-header">
+          <view class="header-accent" />
+          <text class="info-card-title">游客信息 (Guest Details)</text>
+        </view>
+
+        <view class="field-group">
+          <!-- 姓名输入 -->
+          <view class="field-item">
+            <text class="field-label">姓名 (FULL NAME)</text>
+            <input
+              class="field-input"
+              value="{{guestName}}"
+              placeholder="请输入姓名"
+              placeholder-class="field-placeholder"
+              bindinput="onNameInput"
+            />
+            <view class="field-underline {{nameFocused ? 'field-underline--active' : ''}}" />
+          </view>
+
+          <!-- 电话输入 -->
+          <view class="field-item">
+            <text class="field-label">电话 (PHONE NUMBER)</text>
+            <view class="phone-row">
+              <input
+                class="field-input phone-input"
+                value="{{guestPhone}}"
+                placeholder="请输入手机号"
+                placeholder-class="field-placeholder"
+                type="number"
+                bindinput="onPhoneInput"
+              />
+              <view class="autofill-btn" bindtap="onAutoFill">
+                <text class="autofill-text">自动获取</text>
+              </view>
+            </view>
+            <view class="field-underline {{phoneFocused ? 'field-underline--active' : ''}}" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 提示信息 -->
+      <view class="info-tip">
+        <text class="tip-icon">ℹ</text>
+        <text class="tip-text">请确保您的姓名与身份证件一致。夜场从 18:30 开始，21:30 结束。此门票不包含雪具。</text>
+      </view>
+
+      <!-- 底部占位，防止被支付栏遮挡 -->
+      <view class="bottom-placeholder" />
+
+    </view>
+  </scroll-view>
+
+  <!-- 底部支付栏 -->
+  <view class="pay-bar">
+    <view class="price-section">
+      <text class="price-label">总计 (TOTAL PRICE)</text>
+      <view class="price-row">
+        <text class="price-currency">¥</text>
+        <text class="price-value">{{totalPrice}}</text>
+      </view>
+    </view>
+    <view class="pay-btn" bindtap="onPay">
+      <text class="pay-btn-text">确认支付</text>
+      <text class="pay-btn-arrow">→</text>
+    </view>
+  </view>
+
+  <!-- 日期选择弹窗 -->
+  <view class="date-picker-mask {{showDatePicker ? 'show' : ''}}" bindtap="onCloseDatePicker">
+    <view class="date-picker-panel" catchtap="preventBubble">
+      <view class="picker-header">
+        <text class="picker-title">选择日期</text>
+        <text class="picker-close" bindtap="onCloseDatePicker">✕</text>
+      </view>
+      <picker-view
+        class="picker-view"
+        value="{{pickerValue}}"
+        bindchange="onPickerChange"
+      >
+        <picker-view-column>
+          <view wx:for="{{dateOptions}}" wx:key="index" class="picker-item">
+            {{item}}
+          </view>
+        </picker-view-column>
+      </picker-view>
+      <view class="picker-confirm-btn" bindtap="onConfirmDate">
+        <text class="picker-confirm-text">确认</text>
+      </view>
+    </view>
+  </view>
+
+</view>

@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "首页",
-          "pathName": "pages/index/index",
+          "name": "claude",
+          "pathName": "pages/claude/index",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "首页",
+          "pathName": "pages/index/index",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "聚合支付",
