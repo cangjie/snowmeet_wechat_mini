@@ -169,7 +169,7 @@
     <view style="display: flex;flex-direction: row;">
       <view style="width: 20%;text-align: right;" class="op-cell">租金：</view>
       <view style="width: 30%;margin-left: 0rpx;" class="op-cell">
-        <input id="rental" style="width: 80%;" type="number" class="input" placeholder="{{currentRentItem.rental}}" value="{{currentRentItem.rental==0?'':currentRentItem.rental}}" bindinput="setNumber" />
+        <input id="rental" style="width: 80%;" type="number" class="input" placeholder="{{currentRentItem.rental}}" value="{{currentRentItem.rental==0?'':currentRentItem.rental}}" bindinput="setNumber"  />
       </view>
       <view style="width: 20%;text-align: right;" class="op-cell">押金：</view>
       <view style="width: 30%;margin-left: 0rpx;" class="op-cell">

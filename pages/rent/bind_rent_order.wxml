@@ -1,2 +1,0 @@
-<auth wx:if="{{!bindSuc}}"  validType="cell" bindUpdateSuccess="AuthFinish" ></auth>
-<view wx:else style="margin-top: 200rpx;text-align: center;" > 绑 定 成 功 </view>

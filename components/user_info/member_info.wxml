@@ -25,7 +25,7 @@
           </picker-view>
         </picker>
         <view wx:else class="view-row" >
-        <input  placeholder="输入联系手机号" class="input" id="contact_num" bindinput="userInfoChanged" />
+        <input  placeholder="输入联系手机号" type="digit" class="input" id="contact_num" bindinput="userInfoChanged" />
         <van-button wx:if="{{member.contactNums.length > 1}}" plain hairline type="info" size="mini" style="margin-left: 30rpx" bind:click="backToPick"  >返回选择</van-button>
       </view>
       </view>

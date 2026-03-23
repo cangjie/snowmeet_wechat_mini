@@ -114,13 +114,13 @@
     <view class="right-column view-row">
       <input class="input" placeholder="0" style="text-align: center;width: 75rpx;" 
         id="repair_charge" bindinput="setValue" disabled="{{!care.repair_memo || care.repair_memo == ''}}" 
-        value="{{care.repair_charge? care.repair_charge : null}}" placeholder="0"  />元
+        value="{{care.repair_charge? care.repair_charge : null}}" placeholder="0" type="number"  />元
     </view>
   </view>
   <view class="view-row">
     <view class="left-column">【减免】</view>
     <view class="right-column view-row">
-      <input class="input" id="discount" bindinput="setValue" placeholder="0" 
+      <input class="input" id="discount" bindinput="setValue" placeholder="0" type="number"
       style="text-align: center;width: 75rpx;" value="{{care.discount? care.discount:null}}" />元
     </view>
   </view>

@@ -1,4 +1,3 @@
-<auth wx:if="{{needAuth}}" validType="cell" bindUpdateSuccess="AuthFinish" ></auth>
 <view>
   <view  class="ski-pass-scale" bindtap="reserve" >
     <view class="ski-pass-title"><b>{{item.name}}</b></view>
@@ -11,7 +10,7 @@
   <view class="ski-pass-scale" style="height: 80rpx; display: flex; flex-direction: row;border-width: 0rpx;margin-bottom: 0rpx;margin-top: 0rpx;" >
     <view class="left-column" >联系电话：</view>
     <view class="right-column view-row" style="width: 450rpx;" >
-      <input id="cell"  class="input" value="{{cell}}" style="width: 180rpx;" bindinput="input" />
+      <input id="cell"  type="digit" class="input" value="{{cell}}" style="width: 180rpx;" bindinput="input" />
       <view style="width: 20rpx;"></view>
       <van-button type="info" size="mini"  open-type="getPhoneNumber" bindgetphonenumber="getCell" >自动获取</van-button>
     </view>

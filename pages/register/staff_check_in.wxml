@@ -9,7 +9,7 @@
     <view class="view-row" >
       <view class="left-column">电话：</view>
       <view class="right-column">
-        <input class="input" bindinput="setCell" />
+        <input class="input" bindinput="setCell" type="digit" />
       </view>
     </view>
   </mp-cell>

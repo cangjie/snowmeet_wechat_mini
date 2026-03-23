@@ -21,7 +21,7 @@
         </view>
         <view class="left-column" style="width: 140rpx;">【手机号】</view>
         <view class="right-column">
-          <input class="input" disabled="{{!moddingContactInfo}}" id="contact_num" value="{{order.contact_num}}" style="width: 160rpx;" bindinput="inputContactInfo" />
+          <input class="input" type="number" disabled="{{!moddingContactInfo}}" id="contact_num" value="{{order.contact_num}}" style="width: 160rpx;" bindinput="inputContactInfo" />
         </view>
       </view>
     </mp-cell>

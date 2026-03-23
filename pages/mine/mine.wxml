@@ -1,5 +1,5 @@
 <my-info ></my-info>
-<auth  wx:if="{{canGetInfo}}" validType="info" ></auth>
+
 <mp-cells  >
   <mp-cell value="我的雪票" footer="" bindtap="gotoSkipass"></mp-cell>
   <mp-cell value="我的优惠券" footer="" bindtap="gotoTicket"></mp-cell>
