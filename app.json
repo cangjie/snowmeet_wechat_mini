@@ -98,7 +98,8 @@
     "pages/admin/unipay/unipay",
     "pages/admin/unipay/unipay_detail",
     "pages/admin/unipay/unipay_list",
-    "pages/claude/index"
+    "pages/claude/index",
+    "pages/ski_pass/skipass_detail_new"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -4,8 +4,8 @@
       "list": [
         {
           "name": "claude",
-          "pathName": "pages/claude/index",
-          "query": "",
+          "pathName": "pages/ski_pass/skipass_detail_new",
+          "query": "id=659",
           "scene": null,
           "launchMode": "default"
         },
