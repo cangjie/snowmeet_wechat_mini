@@ -46,15 +46,15 @@ page {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 56rpx 32rpx 24rpx;
+  padding: 44rpx 24rpx 14rpx;
   background-color: var(--surface);
   /* 底部分割线：用渐变色代替 1px border */
   box-shadow: 0 1rpx 0 rgba(116, 119, 127, 0.12);
 }
 
 .top-bar-left {
-  width: 72rpx;
-  height: 72rpx;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -67,21 +67,21 @@ page {
 }
 
 .icon-back {
-  font-size: 40rpx;
+  font-size: 32rpx;
   color: var(--primary);
   font-weight: 600;
 }
 
 .top-bar-title {
-  font-size: 34rpx;
+  font-size: 30rpx;
   font-weight: 700;
   color: var(--on-surface);
   letter-spacing: -0.5rpx;
 }
 
 .top-bar-right {
-  width: 72rpx;
-  height: 72rpx;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -89,7 +89,7 @@ page {
 }
 
 .icon-more {
-  font-size: 44rpx;
+  font-size: 36rpx;
   color: var(--on-surface);
   letter-spacing: -2rpx;
 }
@@ -98,7 +98,7 @@ page {
    主内容滚动区
    ===================== */
 .main-content {
-  padding-top: 152rpx; /* 顶部导航栏高度 */
+  padding-top: 120rpx;
   height: 100vh;
   box-sizing: border-box;
 }
@@ -108,14 +108,13 @@ page {
    ===================== */
 .hero-section {
   position: relative;
-  margin: 32rpx 32rpx 0;
-  border-radius: 48rpx;
+  margin: 20rpx 24rpx 0;
+  border-radius: 32rpx;
   overflow: hidden;
-  height: 440rpx;
-  /* 大圆角 + 深阴影 */
+  height: 260rpx;
   box-shadow:
-    0 24rpx 64rpx rgba(26, 115, 232, 0.18),
-    0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+    0 16rpx 40rpx rgba(26, 115, 232, 0.15),
+    0 4rpx 16rpx rgba(0, 0, 0, 0.10);
 }
 
 .hero-image {
@@ -137,38 +136,37 @@ page {
 
 .hero-content {
   position: absolute;
-  bottom: 48rpx;
-  left: 48rpx;
-  right: 48rpx;
+  bottom: 28rpx;
+  left: 32rpx;
+  right: 32rpx;
 }
 
 .premium-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 6rpx;
   background: var(--primary-container);
   color: #001D4A;
-  padding: 8rpx 24rpx;
+  padding: 6rpx 18rpx;
   border-radius: 9999rpx;
-  margin-bottom: 20rpx;
-  /* 发光效果 */
-  box-shadow: 0 0 30rpx rgba(26, 115, 232, 0.5);
+  margin-bottom: 12rpx;
+  box-shadow: 0 0 20rpx rgba(26, 115, 232, 0.4);
 }
 
 .badge-star {
-  font-size: 22rpx;
+  font-size: 18rpx;
   color: var(--primary);
 }
 
 .badge-text {
-  font-size: 20rpx;
+  font-size: 18rpx;
   font-weight: 800;
   letter-spacing: 2rpx;
 }
 
 .hero-title {
   display: block;
-  font-size: 44rpx;
+  font-size: 34rpx;
   font-weight: 800;
   color: #FFFFFF;
   line-height: 1.25;
@@ -177,17 +175,17 @@ page {
 
 .hero-subtitle {
   display: block;
-  font-size: 26rpx;
+  font-size: 22rpx;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.75);
-  margin-top: 8rpx;
+  margin-top: 6rpx;
 }
 
 /* =====================
    表单区域
    ===================== */
 .form-section {
-  padding: 40rpx 32rpx 0;
+  padding: 24rpx 24rpx 0;
 }
 
 /* =====================
@@ -196,35 +194,34 @@ page {
 .bento-grid {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
-  margin-bottom: 32rpx;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
 }
 
 .bento-card {
   background: var(--surface-container-lowest);
-  border-radius: 48rpx;
-  padding: 48rpx;
-  /* Ambient shadow，主色调蓝 */
+  border-radius: 28rpx;
+  padding: 28rpx 32rpx;
   box-shadow:
-    0 12rpx 40rpx rgba(26, 115, 232, 0.06),
-    0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+    0 8rpx 28rpx rgba(26, 115, 232, 0.06),
+    0 2rpx 6rpx rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s;
 }
 
 .bento-card:active {
   box-shadow:
-    0 4rpx 16rpx rgba(26, 115, 232, 0.06),
+    0 4rpx 12rpx rgba(26, 115, 232, 0.06),
     0 1rpx 4rpx rgba(0, 0, 0, 0.04);
 }
 
 .card-label {
   display: block;
-  font-size: 20rpx;
+  font-size: 18rpx;
   font-weight: 800;
   color: var(--outline);
-  letter-spacing: 4rpx;
+  letter-spacing: 3rpx;
   text-transform: uppercase;
-  margin-bottom: 24rpx;
+  margin-bottom: 14rpx;
 }
 
 /* 日期卡片 */
@@ -237,24 +234,24 @@ page {
 .date-info {
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
+  gap: 4rpx;
 }
 
 .date-value {
-  font-size: 44rpx;
+  font-size: 34rpx;
   font-weight: 800;
   color: var(--on-surface);
   letter-spacing: -1rpx;
 }
 
 .date-sub {
-  font-size: 26rpx;
+  font-size: 22rpx;
   font-weight: 600;
   color: var(--primary);
 }
 
 .calendar-icon {
-  font-size: 52rpx;
+  font-size: 40rpx;
   opacity: 0.5;
 }
 
@@ -270,9 +267,9 @@ page {
 }
 
 .qty-btn {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 28rpx;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 20rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -289,11 +286,11 @@ page {
 
 .qty-plus {
   background: var(--primary-container);
-  box-shadow: 0 8rpx 24rpx rgba(26, 115, 232, 0.2);
+  box-shadow: 0 6rpx 18rpx rgba(26, 115, 232, 0.2);
 }
 
 .qty-btn-text {
-  font-size: 44rpx;
+  font-size: 36rpx;
   font-weight: 300;
   color: var(--on-surface);
   line-height: 1;
@@ -315,11 +312,11 @@ page {
 }
 
 .qty-value {
-  font-size: 80rpx;
+  font-size: 60rpx;
   font-weight: 800;
   color: var(--on-surface);
   letter-spacing: -2rpx;
-  min-width: 80rpx;
+  min-width: 60rpx;
   text-align: center;
 }
 
@@ -328,30 +325,30 @@ page {
    ===================== */
 .info-card {
   background: var(--surface-container-lowest);
-  border-radius: 48rpx;
-  padding: 48rpx;
-  margin-bottom: 32rpx;
+  border-radius: 28rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 20rpx;
   box-shadow:
-    0 12rpx 40rpx rgba(26, 115, 232, 0.06),
-    0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+    0 8rpx 28rpx rgba(26, 115, 232, 0.06),
+    0 2rpx 6rpx rgba(0, 0, 0, 0.04);
 }
 
 .info-card-header {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  margin-bottom: 48rpx;
+  gap: 16rpx;
+  margin-bottom: 28rpx;
 }
 
 .header-accent {
-  width: 6rpx;
-  height: 48rpx;
+  width: 5rpx;
+  height: 36rpx;
   background: var(--primary);
   border-radius: 9999rpx;
 }
 
 .info-card-title {
-  font-size: 36rpx;
+  font-size: 28rpx;
   font-weight: 700;
   color: var(--on-surface);
 }
@@ -359,7 +356,7 @@ page {
 .field-group {
   display: flex;
   flex-direction: column;
-  gap: 56rpx;
+  gap: 36rpx;
 }
 
 .field-item {
@@ -368,17 +365,17 @@ page {
 
 .field-label {
   display: block;
-  font-size: 20rpx;
+  font-size: 18rpx;
   font-weight: 800;
   color: var(--outline);
-  letter-spacing: 3rpx;
+  letter-spacing: 2rpx;
   text-transform: uppercase;
-  margin-bottom: 16rpx;
+  margin-bottom: 10rpx;
 }
 
 .field-input {
   width: 100%;
-  font-size: 40rpx;
+  font-size: 32rpx;
   font-weight: 600;
   color: var(--on-surface);
   padding: 0;
@@ -397,7 +394,7 @@ page {
   height: 2rpx;
   background: var(--outline-variant);
   border-radius: 2rpx;
-  margin-top: 12rpx;
+  margin-top: 8rpx;
   opacity: 0.4;
   transition: all 0.25s;
 }
@@ -411,7 +408,7 @@ page {
 .phone-row {
   display: flex;
   align-items: center;
-  gap: 24rpx;
+  gap: 18rpx;
 }
 
 .phone-input {
@@ -420,9 +417,9 @@ page {
 
 .autofill-btn {
   flex-shrink: 0;
-  padding: 16rpx 28rpx;
+  padding: 12rpx 22rpx;
   background: var(--surface-container-high);
-  border-radius: 20rpx;
+  border-radius: 16rpx;
   transition: background 0.2s;
 }
 
@@ -431,7 +428,7 @@ page {
 }
 
 .autofill-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 700;
   color: var(--on-surface-variant);
   letter-spacing: 1rpx;
@@ -442,35 +439,34 @@ page {
    ===================== */
 .info-tip {
   display: flex;
-  gap: 24rpx;
+  gap: 16rpx;
   align-items: flex-start;
   background: rgba(26, 115, 232, 0.05);
-  border-radius: 28rpx;
-  padding: 32rpx;
-  margin-bottom: 32rpx;
-  /* Ghost border：outline-variant 15% opacity */
+  border-radius: 20rpx;
+  padding: 22rpx 24rpx;
+  margin-bottom: 20rpx;
   border: 1rpx solid rgba(26, 115, 232, 0.12);
 }
 
 .tip-icon {
-  font-size: 36rpx;
+  font-size: 28rpx;
   color: var(--primary);
   font-style: normal;
   flex-shrink: 0;
-  margin-top: -2rpx;
+  margin-top: -1rpx;
 }
 
 .tip-text {
-  font-size: 26rpx;
+  font-size: 22rpx;
   color: var(--on-surface-variant);
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 /* =====================
    底部占位
    ===================== */
 .bottom-placeholder {
-  height: 200rpx;
+  height: 160rpx;
 }
 
 /* =====================
@@ -485,10 +481,9 @@ page {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 32rpx;
-  padding: 28rpx 40rpx calc(env(safe-area-inset-bottom) + 28rpx);
+  gap: 24rpx;
+  padding: 20rpx 32rpx calc(env(safe-area-inset-bottom) + 20rpx);
   background: rgba(248, 249, 255, 0.88);
-  /* 玻璃效果使用 backdrop-filter（部分机型支持） */
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   box-shadow: 0 -2rpx 0 rgba(196, 198, 208, 0.3);
@@ -497,14 +492,14 @@ page {
 .price-section {
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
+  gap: 2rpx;
 }
 
 .price-label {
-  font-size: 18rpx;
+  font-size: 16rpx;
   font-weight: 800;
   color: var(--outline);
-  letter-spacing: 4rpx;
+  letter-spacing: 3rpx;
   text-transform: uppercase;
 }
 
@@ -515,13 +510,13 @@ page {
 }
 
 .price-currency {
-  font-size: 32rpx;
+  font-size: 26rpx;
   font-weight: 700;
   color: var(--on-surface);
 }
 
 .price-value {
-  font-size: 72rpx;
+  font-size: 56rpx;
   font-weight: 800;
   color: var(--on-surface);
   letter-spacing: -2rpx;
@@ -533,33 +528,32 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12rpx;
-  padding: 36rpx 0;
-  border-radius: 28rpx;
-  /* 主渐变 */
+  gap: 10rpx;
+  padding: 28rpx 0;
+  border-radius: 22rpx;
   background: linear-gradient(135deg, #1A73E8 0%, #4285F4 100%);
   box-shadow:
-    0 16rpx 40rpx rgba(26, 115, 232, 0.3),
-    0 4rpx 12rpx rgba(26, 115, 232, 0.2);
+    0 12rpx 30rpx rgba(26, 115, 232, 0.28),
+    0 4rpx 10rpx rgba(26, 115, 232, 0.18);
   transition: all 0.15s;
 }
 
 .pay-btn:active {
   transform: scale(0.97);
   box-shadow:
-    0 8rpx 20rpx rgba(26, 115, 232, 0.25),
-    0 2rpx 6rpx rgba(26, 115, 232, 0.15);
+    0 6rpx 16rpx rgba(26, 115, 232, 0.22),
+    0 2rpx 6rpx rgba(26, 115, 232, 0.14);
 }
 
 .pay-btn-text {
-  font-size: 34rpx;
+  font-size: 30rpx;
   font-weight: 700;
   color: #FFFFFF;
   letter-spacing: 1rpx;
 }
 
 .pay-btn-arrow {
-  font-size: 34rpx;
+  font-size: 30rpx;
   color: #FFFFFF;
   font-weight: 400;
 }
