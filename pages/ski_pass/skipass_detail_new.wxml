@@ -125,11 +125,11 @@
   <view class="price-section">
     <text class="price-label">总计 (TOTAL PRICE)</text>
     <view class="price-row">
-      <text class="price-currency">¥</text>
-      <text class="price-value">{{totalPrice}}</text>
+      <text class="price-currency"></text>
+      <text class="price-value">{{summaryStr}}</text>
     </view>
   </view>
-  <view class="pay-btn" bindtap="onPay">
+  <view class="pay-btn {{(canReserve == false || paying == true)? 'qty-plus--disabled' : ''}}" bindtap="onPay"  >
     <text class="pay-btn-text">确认支付</text>
     <text class="pay-btn-arrow">→</text>
   </view>
@@ -158,5 +158,4 @@
     </view>
   </view>
 </view>
-
 </view>

@@ -90,10 +90,6 @@ Page({
           return
         }
         var product = res.data
-
-        //product.sale_price_str = util.showAmount(parseFloat(product.sale_price)),
-        //product.market_price_str = util.showAmount(parseFloat(product.market_price))
-
         that.setData({ product })
         console.log('get product', product)
         var title = product.resort + ' 雪票预定'

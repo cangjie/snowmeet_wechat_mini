@@ -350,7 +350,7 @@ Page({
   gotoDetail(e){
     var that = this
     var id = e.currentTarget.id
-    var url = 'skipass_detail?id=' + id 
+    var url = 'skipass_detail_new?id=' + id 
     url += (that.data.memberId?('&memberId=' + that.data.memberId) : '')
     url += (that.data.staffId?('&staffId=' + that.data.staffId ): '')
     wx.navigateTo({

@@ -5,7 +5,7 @@
         {
           "name": "claude",
           "pathName": "pages/ski_pass/skipass_detail_new",
-          "query": "id=659",
+          "query": "id=662",
           "scene": null,
           "launchMode": "default"
         },

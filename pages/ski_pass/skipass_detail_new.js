@@ -28,6 +28,7 @@ Page({
     pickerValue: [0],
     // 临时选中 index（未确认前）
     tempPickerIndex: 0,
+    count: 1
   },
 
   onLoad(options) {
@@ -48,7 +49,7 @@ Page({
   _initDateOptions() {
     const options = []
     const today = new Date()
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 7; i++) {
       const d = new Date(today)
       d.setDate(today.getDate() + i)
       const yyyy = d.getFullYear()
@@ -94,7 +95,9 @@ Page({
   },
 
   onCloseDatePicker() {
-    this.setData({ showDatePicker: false })
+    var that = this
+    that.setData({ showDatePicker: false })
+
   },
 
   preventBubble() {
@@ -110,11 +113,12 @@ Page({
   },
 
   onConfirmDate() {
+    var that = this
     const index = this.data.tempPickerIndex
     // 取日期部分（去掉星期）
     const raw = this.data.dateOptions[index] || ''
     const dateStr = raw.split(' ')[0].trim()
-    this.setData({
+    that.setData({
       selectedDate: dateStr,
       showDatePicker: false,
     })
@@ -122,6 +126,9 @@ Page({
       title: `已选择 ${dateStr}`,
       icon: 'success',
       duration: 1500,
+      success: (res) => {
+        that.setDate(new Date(that.data.selectedDate))
+      }
     })
   },
 
@@ -146,11 +153,15 @@ Page({
   // 游客信息输入
   // ========================
   onNameInput(e) {
-    this.setData({ guestName: e.detail.value })
+    //this.setData({ guestName: e.detail.value })
+    var that = this
+    that.data.name = e.detail.value
   },
 
   onPhoneInput(e) {
-    this.setData({ guestPhone: e.detail.value })
+    //this.setData({ guestPhone: e.detail.value })
+    var that = this
+    that.data.cell = e.detail.value
   },
 
   // ========================
@@ -173,6 +184,7 @@ Page({
   // 确认支付
   // ========================
   onPay() {
+    var that = this
     const { guestName, guestPhone, selectedDate, quantity, totalPrice } = this.data
 
     // 基础校验
@@ -187,7 +199,7 @@ Page({
 
     wx.showModal({
       title: '确认订单',
-      content: `日期：${selectedDate}\n数量：${quantity} 张\n总价：¥${totalPrice}\n\n姓名：${guestName}`,
+      content: `日期：${selectedDate}\n数量：${that.data.count} 张\n总价：${that.data.summaryStr}\n\n姓名：${that.data.name}\n取票手机号：${that.data.cell}`,
       confirmText: '去支付',
       success: (res) => {
         if (res.confirm) {
@@ -201,8 +213,50 @@ Page({
   // 发起微信支付（对接实际后端）
   // ========================
   _requestPayment() {
+    var that = this
+    var product = that.data.product
+    var idNo = that.data.idNo? that.data.idNo: ''
     wx.showLoading({ title: '正在下单...' })
-
+    that.setData({paying: true})
+    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + product.product_id + '?date=' + that.data.selectedDate + '&count=' + that.data.count + '&cell=' + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&idNo=' + idNo + (that.data.memberId ? '&refereeMemberId=' + that.data.memberId : '')
+      + (that.data.staffId ? '&staffId=' + that.data.staffId : '')
+    wx.request({
+      url: submitUrl,
+      method: 'GET',
+      success: (res) => {
+        if (res.statusCode != 200) {
+          return
+        }
+        console.log('skipass booked', res)
+        var order = res.data
+        var paymentId = order.payments[0].id
+        var payUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + paymentId + '?sessionKey=' + app.globalData.sessionKey
+        wx.request({
+          url: payUrl,
+          method: 'GET',
+          success: (res) => {
+            wx.requestPayment({
+              nonceStr: res.data.data.nonce,
+              package: 'prepay_id=' + res.data.data.prepay_id,
+              paySign: res.data.data.sign,
+              timeStamp: res.data.data.timestamp,
+              signType: 'MD5',
+              success: (res) => {
+                wx.showToast({
+                  title: '支付成功。',
+                  icon: 'success',
+                  complete: () => {
+                    wx.redirectTo({
+                      url: '../mine/skipass/my_skipass',
+                    })
+                  }
+                })
+              }
+            })
+          }
+        })
+      }
+    })
     // TODO: 替换为真实的后端接口
     // wx.request({
     //   url: 'https://your-server.com/api/order/create',
@@ -235,9 +289,13 @@ Page({
 
     // 演示：模拟成功
     setTimeout(() => {
+      /*
       wx.hideLoading()
       wx.showToast({ title: '支付成功！', icon: 'success', duration: 2000 })
+      */
     }, 1500)
+    
+    
   },
   getBalance() {
     var that = this
@@ -278,7 +336,7 @@ Page({
         that.setData({ product })
         console.log('get product', product)
         var title = product.resort + ' 雪票预定'
-        var currentDate = new Date(that.data.currentDate)
+        var currentDate = new Date(that.data.selectedDate)
         wx.setNavigationBarTitle({
           title: title,
         })
@@ -297,7 +355,7 @@ Page({
             currentDate = new Date(currentDate)
           }
         }
-        that.setData({ currentDate: util.formatDate(currentDate) })
+        that.setData({ selectedDate: util.formatDate(currentDate) })
         that.GetRealName()
         that.getDailyPrice()
         var summary = that.data.count * that.data.dailyPrice.deal_price
@@ -319,7 +377,7 @@ Page({
   getDailyPrice() {
     var that = this
     var product = that.data.product
-    var currentDate = util.formatDate(new Date(that.data.currentDate))
+    var currentDate = util.formatDate(new Date(that.data.selectedDate))
     var find = false
     for (var i = 0; i < product.dailyPrice.length; i++) {
       var pDate = util.formatDate(new Date(product.dailyPrice[i].reserve_date))
@@ -348,8 +406,27 @@ Page({
         }
         var member = res.data
         console.log('get member', member)
-        that.setData({ cell: member.cell })
+        that.setData({ cell: member.currentCell })
       }
     })
+  },
+  setDate(date) {
+    var that = this
+    //var date = new Date(e.detail.value)
+    that.setData({ currentDate: util.formatDate(date) })
+    that.getDailyPrice()
+    if (that.data.dailyPrice) {
+      var dealPrice = that.data.dailyPrice.deal_price
+      var count = that.data.count
+      var summary = dealPrice * count
+      var canReserve = true
+      if (isNaN(that.data.balance) || summary >= that.data.balance) {
+        canReserve = false
+      }
+      that.setData({ summary, summaryStr: util.showAmount(summary), canReserve })
+    }
+    else {
+      that.setData({ summary: 0, summaryStr: util.showAmount(0), canReserve: false })
+    }
   },
 })
