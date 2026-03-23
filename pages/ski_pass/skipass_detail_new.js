@@ -340,7 +340,9 @@ Page({
         wx.setNavigationBarTitle({
           title: title,
         })
+        var productImage = 'https://snowmeet.wanlonghuaxue.com/images/skipass_day.png'
         if (product.name.indexOf('夜场') >= 0) {
+          productImage = 'https://snowmeet.wanlonghuaxue.com/images/skipass_eve.png'
           if (currentDate.getHours() >= 20) {
             currentDate = new Date()
             currentDate = currentDate.setDate(currentDate.getDate() + 1)
@@ -355,7 +357,7 @@ Page({
             currentDate = new Date(currentDate)
           }
         }
-        that.setData({ selectedDate: util.formatDate(currentDate) })
+        that.setData({ selectedDate: util.formatDate(currentDate), productImage })
         that.GetRealName()
         that.getDailyPrice()
         var summary = that.data.count * that.data.dailyPrice.deal_price
