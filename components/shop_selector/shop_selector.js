@@ -41,8 +41,9 @@ Component({
           if (shop != null) {
             that.triggerEvent('ShopSelected', { shop: shop.name, sale: shop.sale, rent: shop.rent, care: shop.care, restuarant: shop.restuarant })
           }
-
-
+          else{
+            that.triggerEvent('ShopSelected', { shop: '万龙服务中心', sale: 1, rent: 0, care: 1, restuarant: 0 })
+          }
           if (that.properties.defaultShop == undefined || that.properties.defaultShop == null) {// || that.properties.defaultShop == ' '){
             wx.getFuzzyLocation({
               type: 'wgs84',
@@ -97,7 +98,8 @@ Component({
       console.log('shop select changed:', e)
       var that = this
       that.setData({ currentSelectedIndex: e.detail.value })
-      if (e.detail.value == 0) {
+
+      if (e.detail.value == 0 && that.properties.scene != 'recept') {
         that.triggerEvent('ShopSelected', { shop: '', sale: 0, care: 0, rent: 0, restuarant: 0 })
       }
       else {
