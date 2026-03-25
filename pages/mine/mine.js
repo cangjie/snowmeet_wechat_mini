@@ -101,7 +101,7 @@ Page({
   },
   gotoSkipass: function(e) {
     wx.navigateTo({
-      url: '/pages/mine/skipass/my_skipass',
+      url: '/pages/mine/skipass/my_skipasses',
     })
   },
   gotoAdmin: function(e) {
