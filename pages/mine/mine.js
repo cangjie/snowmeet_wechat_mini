@@ -92,10 +92,12 @@ Page({
     })
   },
   gotoOrders: function(e) {
+    /*
     wx.navigateTo({
       url: 'plugin-private://wx34345ae5855f892d/pages/orderList/orderList?tabId=all',
      
     });
+    */
   },
   gotoSkipass: function(e) {
     wx.navigateTo({
