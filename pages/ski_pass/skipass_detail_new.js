@@ -33,6 +33,7 @@ Page({
 
   onLoad(options) {
     var that = this
+    that.setData({selectedDate: util.formatDate(new Date())})
     app.loginPromiseNew.then(function (resolve) {
       that._initDateOptions()
       that.getBalance()

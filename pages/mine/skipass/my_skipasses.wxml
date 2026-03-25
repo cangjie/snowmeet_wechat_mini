@@ -138,7 +138,6 @@
       <text class="pickup-label">取票码</text>
       <view class="pickup-code-row">
         <text class="pickup-code">{{useTarget.card_no}}</text>
-  
       </view>
     </view>
 

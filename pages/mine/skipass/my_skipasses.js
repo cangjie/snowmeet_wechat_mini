@@ -6,8 +6,11 @@ Page({
     activeTab: 'unused', // 'unused' | 'used'
     currentList: [],      // 当前 tab 对应的列表（避免 WXML 复杂表达式）
     currentListEmpty: false,
+    unusedList:[],
+    usedList:[],
 
     // 未使用票券列表
+    /*
     unusedList: [
       {
         id: 'T001',
@@ -100,6 +103,7 @@ Page({
         canUse: false,
       },
     ],
+    */
 
     // 退票弹窗
     showCancelModal: false,
@@ -162,6 +166,7 @@ Page({
   },
 
   confirmCancel() {
+    var that = this
     const { id } = this.data.cancelTarget
 
     // 从未使用列表中移除（实际开发中替换为 API 调用）
@@ -177,6 +182,9 @@ Page({
       title: '退票申请已提交',
       icon: 'success',
       duration: 2000,
+      success:()=>{
+        that.cancel(that.data.cancelTarget.id)
+      }
     })
   },
 
@@ -258,5 +266,31 @@ Page({
         that._refreshCurrentList()
       }
     })
-  }
+  },
+  refund(id){
+    var that = this
+    that.setData({cancelling: true})
+    //var id = e.currentTarget.id
+    var cancelUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/Refund?skipassId=' + id + '&reason=' + encodeURIComponent('确认取消成功后退款') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: cancelUrl,
+      success:(res)=>{
+        console.log('cancel result', res)
+        that.getData()
+      }
+    })
+  },
+  cancel(id){
+    var that = this
+    that.setData({cancelling: true})
+    var cancelUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/Cancel/' + id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+    wx.request({
+      url: cancelUrl,
+      success:(res)=>{
+        console.log('cancel result', res)
+        that.setData({activeTab: 'used'})
+        that.getData()
+      }
+    })
+  },
 })
