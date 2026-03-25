@@ -74,7 +74,8 @@
         class="btn {{item.canUse ? 'btn-use' : 'btn-use-disabled'}}"
         bindtap="{{item.canUse ? 'onUseTicket' : ''}}"
         data-id="{{item.id}}"
-        data-serial="{{item.serial}}"
+        data-card_no="{{item.card_no}}" 
+        data-pickupCode="{{item.pickupCode}}"
         data-title="{{item.title}}"
       >
         立即使用
@@ -126,7 +127,7 @@
     <view class="qr-wrapper">
       <image
         class="qr-image"
-        src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{useTarget.serial}}"
+        src="{{useTarget.pickupCode}}"
         mode="aspectFit"
       />
       <view class="qr-scan-line"></view>
@@ -136,10 +137,8 @@
     <view class="pickup-code-section">
       <text class="pickup-label">取票码</text>
       <view class="pickup-code-row">
-        <text class="pickup-code">{{useTarget.pickupCode}}</text>
-        <view class="copy-btn" bindtap="copyCode" data-code="{{useTarget.pickupCode}}">
-          <text class="copy-text">复制</text>
-        </view>
+        <text class="pickup-code">{{useTarget.card_no}}</text>
+  
       </view>
     </view>
 

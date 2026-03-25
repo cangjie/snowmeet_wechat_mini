@@ -182,7 +182,7 @@ Page({
 
   // ===== 立即使用 =====
   onUseTicket(e) {
-    const { id, serial, title } = e.currentTarget.dataset
+    const { id, card_no, pickupCode, title } = e.currentTarget.dataset
 
     // 从列表找到完整数据（含 pickupCode）
     const ticket = this.data.unusedList.find(item => item.id === id)
@@ -193,7 +193,7 @@ Page({
       useTarget: {
         id,
         title,
-        serial,
+        card_no,
         pickupCode: ticket.pickupCode || serial.replace(/\s/g, '').slice(0, 10),
       },
     })
@@ -244,7 +244,8 @@ Page({
           item.statusClass = 'status-picked'
           item.canUse = (list[i].status != '已申请退款' && list[i].status != '已退票' &&  list[i].status != '已取卡'
           &&  list[i].status != '已退押金' )
-          item.pickupCode = item.card_no
+          item.card_no = list[i].card_no
+          item.pickupCode = list[i].qr_code_url
           if (item.canUse){
             unusedList.push(item)
           }
