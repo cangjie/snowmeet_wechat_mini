@@ -45,7 +45,7 @@
         <view class="date-content">
           <view class="date-info">
             <text class="date-value">{{selectedDate}}</text>
-            <text class="date-sub">Friday Night Session</text>
+            <text class="date-sub"></text>
           </view>
           <text class="calendar-icon">📅</text>
         </view>

@@ -31,9 +31,9 @@
     <view class="card-header">
       <view class="card-header-left">
         <view class="badge {{item.tier === 'premium' ? 'badge-premium' : 'badge-standard'}}">
-          {{item.tier === 'premium' ? 'PREMIUM ACCESS' : 'STANDARD'}}
+          {{item.tier === 'premium' ? '' : ''}}
         </view>
-        <text class="ticket-title">{{item.title}}</text>
+        <text class="ticket-title" style="font-size: 10pt;">{{item.title}}</text>
       </view>
       <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
     </view>
