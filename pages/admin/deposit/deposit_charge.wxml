@@ -62,7 +62,7 @@
       <view class="view-row" >
         <view class="left-column" style="width: 230rpx;" >金额：</view>
         <view class="right-column" style="width: 500rpx;" >
-          <input style="width: 150rpx;" class="input" id="amount" bindinput="input" />
+          <input style="width: 150rpx;" type="number" class="input" id="amount" bindinput="input" />
         </view>
       </view>
     </mp-cell>

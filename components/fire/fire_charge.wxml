@@ -3,7 +3,7 @@
     <view wx:if="{{order.type == '租赁'}}" class="left-column" >【押金金额】</view>
     <view wx:else class="left-column" >【收款金额】</view>
     <view class="right-column" >
-      <input class="input" style="width: 150rpx;text-align: center;" type="digit" bindinput="setAmount" />
+      <input class="input" style="width: 150rpx;text-align: center;" type="number" bindinput="setAmount" />
     </view>
   </view>
   <view class="view-row" >

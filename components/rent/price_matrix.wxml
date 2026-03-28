@@ -12,7 +12,7 @@
     <van-col wx:for="{{dayTypeList}}" span="{{colSpan}}" wx:for-index="j" >
       <view style="display: flex; justify-content: center;margin-top: 20rpx;">
         <input id="{{i}}_{{j}}"  class="input" style="width: 100rpx;text-align: center;" 
-        value="{{matrix[i][j].price}}" disabled="{{!mod}}" bindinput="setPrice"  />
+        value="{{matrix[i][j].price}}" disabled="{{!mod}}" bindinput="setPrice" type="number"  />
       </view>
     </van-col>
   </van-row>

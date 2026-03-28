@@ -25,7 +25,6 @@
     "pages/rent/bind_rent_order",
     "pages/admin/rent/rent_report",
     "pages/admin/rent/rent_list_by_cell",
-    "pages/rent/rent_detail",
     "pages/admin/recept/recept_entry",
     "pages/admin/recept/recept_member_info",
     "pages/admin/recept/recept_list",

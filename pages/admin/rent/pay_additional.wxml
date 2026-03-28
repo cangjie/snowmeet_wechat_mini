@@ -2,7 +2,7 @@
   <view class="view-row" style="margin-top: 50rpx;" >
     <view class="left-column" >金额：</view>
     <view class="right-column view-row" >
-      ¥<input class="input" style="width: 100rpx;" bindinput="setAmount" disabled="{{paying}}" value="{{amount}}"  />
+      ¥<input class="input" style="width: 100rpx;" type="number" bindinput="setAmount" disabled="{{paying}}" value="{{amount}}"  />
     </view>
   </view>
   <view class="view-row" style="margin-top: 50rpx;" >

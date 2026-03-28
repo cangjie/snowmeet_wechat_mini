@@ -10,7 +10,7 @@
   </view>
   <view class="view-row" >
     <view class="left-column" >押金：</view>
-    <view class="right-column" ><input class="input" value="100"/></view>
+    <view class="right-column" ><input class="input" value="100" type="number" /></view>
   </view>
   <view class="view-row" >
     <view class="left-column" >起租日：</view>

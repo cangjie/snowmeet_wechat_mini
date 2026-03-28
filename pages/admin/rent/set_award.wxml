@@ -63,7 +63,7 @@
               <view style="width: 140rpx; text-align: center;">{{item.pay_method}}</view>
               <view style="width: 150rpx; text-align: right;">{{item.unRefundedAmountStr}}</view>
               <view style="width: 150rpx; margin-left: 30rpx;">
-                <input class="input" style="width: 100rpx;height: 10rpx;" id="{{index}}" disabled="{{!item.checked}}" value="{{item.filledRefundAmount}}" bindinput="setSubRefundAmount" />
+                <input class="input" style="width: 100rpx;height: 10rpx;" id="{{index}}" disabled="{{!item.checked}}" value="{{item.filledRefundAmount}}" bindinput="setSubRefundAmount" type="number" />
               </view>
             </view>
           </checkbox-group>
@@ -87,7 +87,7 @@
           <view class="left-column" style="width: 190rpx;margin-top: 0rpx;margin-bottom: 0rpx;">抵扣金额：</view>
         </view>
         <view style="margin-top: 15rpx;">
-          <input class="input" style="width: 120rpx;font-size: 10pt;" bindinput="setRefundAmount" />
+          <input class="input" style="width: 120rpx;font-size: 10pt;" type="number" bindinput="setRefundAmount" />
         </view>
       </view>
     </mp-cell>
