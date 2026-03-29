@@ -14,7 +14,8 @@ Page({
       { key: 'haveDiscount', value: null },
       { key: 'rentCategory', value: null },
       { key: 'rentItemName', value: null },
-      { key: 'useCard', value: null }
+      { key: 'useCard', value: null },
+      { key: 'status', value: null}
     ],
     cell: null,
     keyword: null
@@ -138,6 +139,7 @@ Page({
     var rentCategoryId = null
     var rentItemName = null
     var useCard = null
+    var rentStatus = null
     for (var i = 0; i < queryOptions.length; i++) {
       switch (queryOptions[i].key) {
         case 'isTest':
@@ -157,6 +159,9 @@ Page({
           break
         case 'useCard':
           useCard = queryOptions[i].value
+          break
+        case 'status':
+          rentStatus = queryOptions[i].value
           break
         default:
           break
@@ -181,7 +186,7 @@ Page({
     }
     data.getOrdersByStaffPromise(null, shop, null, null, '租赁', startDate, endDate,
       null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, null, null, that.data.keyword, null,
-      rentCategoryId, rentItemName, useCard).then(function (orders) {
+      rentCategoryId, rentItemName, useCard, rentStatus).then(function (orders) {
         console.log('get orders', orders)
         that.renderOrders(orders)
         that.setData({ querying: false })

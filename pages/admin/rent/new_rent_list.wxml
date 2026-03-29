@@ -111,17 +111,59 @@
         </fui-col>
       </radio-group>
     </fui-row>
+    <radio-group id="status" bindchange="setQueryOptions"  >
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column">【状态】</view>
+        </fui-col>
+        <fui-col span="6">
+          <radio checked="{{true}}" value="null" style="font-size: 10pt;" >全部</radio>
+        </fui-col>
+        <fui-col span="6">
+          <radio value="未开始" style="font-size: 10pt;" >未开始</radio>
+        </fui-col>
+        <fui-col span="7">
+          <radio value="租赁中" style="font-size: 10pt;" >租赁中</radio>
+        </fui-col>
+      </fui-row>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column"  style="color:#FFFFFF" >`</view>
+        </fui-col>
+        <fui-col span="6">
+          <radio  value="部分归还" style="font-size: 10pt;" >部分归还</radio>
+        </fui-col>
+        <fui-col span="6">
+          <radio value="全部归还" style="font-size: 10pt;" >全部归还</radio>
+        </fui-col>
+        <fui-col span="7">
+          <radio value="部分退押金" style="font-size: 10pt;" >部分退押金</radio>
+        </fui-col>
+      </fui-row>
+      <fui-row style="margin-top: 20rpx;">
+        <fui-col span="5">
+          <view class="fui-left-column" style="color:#FFFFFF" >`</view>
+        </fui-col>
+        <fui-col span="7">
+          <radio  value="全额退押金" style="font-size: 10pt;" >全额退押金</radio>
+        </fui-col>
+        <fui-col span="8">
+          <radio value="了结关闭" style="font-size: 10pt;" >了结关闭</radio>
+        </fui-col>
+       
+      </fui-row>
+    </radio-group>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
         <view class="fui-left-column">【租赁物】</view>
       </fui-col>
       <fui-col span="6">
         <view class="view-row" style="width: 490rpx;">
-          <input class="input" placeholder="点击选择分类" style="font-size: 9pt;width:150rpx;text-align: center;" bindtap="showBackdrop" 
-          value="{{queryOptions[3] == null? null: queryOptions[3].value.name}}" />
+          <input class="input" placeholder="点击选择分类" style="font-size: 9pt;width:150rpx;text-align: center;"
+            bindtap="showBackdrop" value="{{queryOptions[3] == null? null: queryOptions[3].value.name}}" />
           <input class="input" bindinput="setRentItemName" disabled="{{queryOptions[3].value == null}}"
-            style="margin-left:20rpx;text-align: center;width:280rpx;font-size: 9pt;" 
-            placeholder="输入租赁物名称或编码" value="{{queryOptions[4].value}}" />
+            style="margin-left:20rpx;text-align: center;width:280rpx;font-size: 9pt;" placeholder="输入租赁物名称或编码"
+            value="{{queryOptions[4].value}}" />
         </view>
       </fui-col>
     </fui-row>
@@ -210,7 +252,7 @@
     </fui-card>
     <view style="height: 20rpx;"></view>
   </block>
-  <van-popup show="{{ showRentCategorySelector }}" >
-    <top-category-selector bindModalClick="selectCategory" ></top-category-selector>
+  <van-popup show="{{ showRentCategorySelector }}">
+    <top-category-selector bindModalClick="selectCategory"></top-category-selector>
   </van-popup>
 </view>
