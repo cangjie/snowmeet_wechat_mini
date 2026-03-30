@@ -147,10 +147,12 @@
         <fui-col span="7">
           <radio  value="全额退押金" style="font-size: 10pt;" >全额退押金</radio>
         </fui-col>
-        <fui-col span="8">
+        <fui-col span="6">
           <radio value="了结关闭" style="font-size: 10pt;" >了结关闭</radio>
         </fui-col>
-       
+        <fui-col span="6">
+          <radio value="临时订单" style="font-size: 10pt;" >临时订单</radio>
+        </fui-col>
       </fui-row>
     </radio-group>
     <fui-row style="margin-top: 20rpx;">

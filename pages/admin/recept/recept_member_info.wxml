@@ -26,13 +26,13 @@
         <button size="mini" disabled="{{ shop == ''  || restuarant != 1 }}" bindtap="gotoFlow" id="restuarant" class="input" > 餐 饮 </button>
       </view>
     </mp-cell>
-    <mp-cell style="text-align: center;">
+    <!--mp-cell style="text-align: center;">
       <view style="display: flex;flex-direction: row;" >
         <button size="mini" disabled="{{ shop == '' || !wellFormed || care != 1  }}" bindtap="gotoFlow" id="care_temp" class="input" > 临 时 养 护 </button>
         <view style="width: 20rpx;"></view>
         <button size="mini" disabled="{{ shop == '' || !wellFormed || rent != 1 }}" bindtap="gotoFlow" id="rent_temp" class="input" > 临 时 租 赁 </button>
       </view>
-    </mp-cell>
+    </mp-cell-->
   </mp-cells>
   <view style="height: 100rpx;"></view>
 </view>
