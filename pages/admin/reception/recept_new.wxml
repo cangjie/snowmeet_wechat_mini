@@ -21,6 +21,7 @@
     customer="{{customer}}"
     shop="{{shop}}"
     bizLabel="{{bizLabel}}"
+    bind:memberInfoFound="onMemberInfoFound"
     bind:memberDetail="onMemberDetail" />
 
   <!-- 业务表单：根据 bizType 渲染不同自定义组件 -->

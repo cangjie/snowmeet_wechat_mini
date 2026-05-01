@@ -34,6 +34,13 @@
   flex-shrink: 0;
 }
 
+.member-avatar-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--on-secondary-container);
+  letter-spacing: 0.6px;
+}
+
 .member-body {
   flex: 1;
   min-width: 0;
@@ -83,7 +90,6 @@
   letter-spacing: 0.4px;
   white-space: nowrap;
 }
-.tag-shop { background: var(--surface-container); color: var(--secondary); }
 .tag-biz  { background: var(--primary-fixed); color: var(--on-primary-container); }
 
 .member-detail-link {

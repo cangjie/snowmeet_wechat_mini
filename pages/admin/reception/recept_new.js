@@ -43,27 +43,54 @@ Page({
   },
 
   /* ---------- 生命周期 ---------- */
-  onLoad(options) {
-    // 优先读取入口页传来的 URL 参数；未传时回退到草稿缓存。
+
+  async onLoad(options) {
+    // 优先从订单id获取顾客信息，如果订单id为空或者从订单获取到的用户信息为空，则需要从参数获取顾客信息。
     const draft = wx.getStorageSync('reception_draft') || {};
     const bizType = safeDecode(options.bizType) || draft.bizType || 'rent';
-    const memberId = options.memberId
-      ? Number(safeDecode(options.memberId))
-      : null;
-
     const shop = safeDecode(options.shop) || draft.shopName || '';
-    const name = safeDecode(options.customerName) || draft.customerName || '';
-    const cell = safeDecode(options.customerCell) || draft.customerCell || '';
-    const gender = safeDecode(options.gender) || draft.gender || '';
+
+    let customer = { memberId: null, name: '', cell: '', gender: '' };
+    let orderId = options.orderId ? safeDecode(options.orderId) : null;
+    let orderCustomerLoaded = false;
+
+    if (orderId) {
+      try {
+        const data = require('../../../utils/data.js');
+        const sessionKey = app.globalData.sessionKey || '';
+        const order = await data.getOrderByStaffPromise(orderId, sessionKey);
+        if (order && (order.contact_name || order.contact_num || order.member_id)) {
+          customer = {
+            memberId: order.member_id || null,
+            name: order.contact_name || '',
+            cell: order.contact_num || '',
+            gender: order.contact_gender || '',
+          };
+          orderCustomerLoaded = true;
+        }
+      } catch (e) {
+        console.warn('Failed to load order by orderId:', e);
+      }
+    }
+
+    if (!orderCustomerLoaded) {
+      // fallback to params/draft
+      customer = {
+        memberId: options.memberId ? Number(safeDecode(options.memberId)) : null,
+        name: safeDecode(options.customerName) || draft.customerName || '',
+        cell: safeDecode(options.customerCell) || draft.customerCell || '',
+        gender: safeDecode(options.gender) || draft.gender || '',
+      };
+    }
 
     this.setData({
       bizType,
       bizLabel: BIZ_LABELS[bizType] || '业务',
       shop,
-      customer: { memberId, name, cell, gender },
-      'order.type':       BIZ_LABELS[bizType] || '',
-      'order.shop':       shop,
-      'order.member_id':  memberId,
+      customer,
+      'order.type': BIZ_LABELS[bizType] || '',
+      'order.shop': shop,
+      'order.member_id': customer.memberId,
     });
   },
 
@@ -78,6 +105,16 @@ Page({
     // TODO: 接入新版会员详情页；当前临时复用旧页面
     wx.navigateTo({
       url: '/pages/admin/recept/recept_member_info?memberId=' + memberId,
+    });
+  },
+
+  onMemberInfoFound(e) {
+    const memberId = e && e.detail && e.detail.memberId;
+    if (!memberId) return;
+    if (this.data.customer && this.data.customer.memberId === memberId) return;
+    this.setData({
+      'customer.memberId': memberId,
+      'order.member_id': memberId,
     });
   },
 

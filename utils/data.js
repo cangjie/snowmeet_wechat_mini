@@ -112,6 +112,20 @@ const getMemberPromise = function (memberId, sessionKey) {
     })
   })
 }
+const getMemberByNumPromise = function (cell, sessionKey, sessionType) {
+  sessionKey = sessionKey || app.globalData.sessionKey || ''
+  sessionType = sessionType || 'wechat_mini_openid'
+  var getUrl = app.globalData.requestPrefix + 'Member/GetMemberByNum/' + encodeURIComponent(cell)
+    + '?sessionKey=' + encodeURIComponent(sessionKey)
+    + '&sessionType=' + encodeURIComponent(sessionType)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (member) {
+      resolve(member)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, name, gender, sessionKey) {
   var placeUrl = app.globalData.requestPrefix + 'Order/PlaceBlankOrder/' + isPackage + '?type=' + encodeURIComponent(type) + '&shop=' + encodeURIComponent(shop)
     + memberId ? '&memberId=' + memberId.toString() : ''
@@ -764,6 +778,7 @@ module.exports = {
   getRentCategoryPromise: getRentCategoryPromise,
   verifyMemberCellPromise,
   getMemberPromise,
+  getMemberByNumPromise,
   placeBlankOrderPromise,
   getEnumListPromise,
   getRentPriceListPromise,
