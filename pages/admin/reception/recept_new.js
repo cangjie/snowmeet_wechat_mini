@@ -11,6 +11,14 @@ const util = require('../../../utils/util.js');
 
 const BIZ_LABELS = { rent: '租赁', maintain: '养护', retail: '零售' };
 
+// 防御性解码：如果 options 已经是解码过的就原样返回；如果还是 %xx 格式则解一次
+function safeDecode(v) {
+  if (v == null) return v;
+  const s = String(v);
+  if (s.indexOf('%') < 0) return s;
+  try { return decodeURIComponent(s); } catch (e) { return s; }
+}
+
 Page({
   data: {
     bizType: '',
@@ -36,32 +44,28 @@ Page({
 
   /* ---------- 生命周期 ---------- */
   onLoad(options) {
-    // URL 参数优先；缺什么就从 entry 页落的 reception_draft 兜底
+    // URL 只承载 ASCII 字段（bizType / memberId）；含中文的字段（shop / 姓名）一律读 storage，
+    // 避免微信端 onLoad(options) 不解码导致 %E4%B8... 乱码。
     const draft = wx.getStorageSync('reception_draft') || {};
-    const bizType = options.bizType || draft.bizType || 'rent';
-    const shop = options.shop || draft.shopName || '';
+    const bizType = safeDecode(options.bizType) || draft.bizType || 'rent';
     const memberId = options.memberId
-      ? Number(options.memberId)
+      ? Number(safeDecode(options.memberId))
       : (draft.matchedMemberId || null);
-    const name = options.realName || draft.customerName || '';
-    const cell = options.cell || draft.customerCell || '';
-    const gender = options.gender || draft.gender || '';
 
-    const cellMasked = cell && cell.length === 11
-      ? cell.slice(0, 3) + '****' + cell.slice(7)
-      : (cell || '未提供');
+    const shop   = draft.shopName     || '';
+    const name   = draft.customerName || '';
+    const cell   = draft.customerCell || '';
+    const gender = draft.gender       || '';
 
     this.setData({
       bizType,
       bizLabel: BIZ_LABELS[bizType] || '业务',
       shop,
-      customer: { memberId, name, cell, cellMasked, gender },
+      customer: { memberId, name, cell, gender },
       'order.type':       BIZ_LABELS[bizType] || '',
       'order.shop':       shop,
       'order.member_id':  memberId,
     });
-
-    // wx.setNavigationBarTitle 没用（自定义导航），靠模板渲染
   },
 
   onShow() {},
@@ -69,11 +73,12 @@ Page({
   /* ---------- 通用：返回 / 顶部 ---------- */
   onBack() { wx.navigateBack({ delta: 1 }); },
 
-  onMemberDetail() {
-    if (!this.data.customer.memberId) return;
+  onMemberDetail(e) {
+    const memberId = (e && e.detail && e.detail.memberId) || this.data.customer.memberId;
+    if (!memberId) return;
     // TODO: 接入新版会员详情页；当前临时复用旧页面
     wx.navigateTo({
-      url: '/pages/admin/recept/recept_member_info?memberId=' + this.data.customer.memberId,
+      url: '/pages/admin/recept/recept_member_info?memberId=' + memberId,
     });
   },
 

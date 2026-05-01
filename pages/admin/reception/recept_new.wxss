@@ -62,53 +62,6 @@ page {
   font-size: 18px;
 }
 
-/* 顾客信息条 */
-.member-bar {
-  margin: 16px 16px 0;
-  background: var(--surface-container-lowest);
-  border: 1px solid var(--outline-variant);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.member-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background: var(--secondary-container);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.member-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.member-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.member-row--bottom { margin-top: 2px; }
-.member-name { font-size: 18px; font-weight: 700; color: var(--on-surface); }
-.member-cell { font-size: 13px; color: var(--on-surface-variant); margin-left: 6px; }
-.member-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.member-tag {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-}
-.tag-shop { background: var(--surface-container); color: var(--secondary); }
-.tag-biz  { background: var(--primary-fixed); color: var(--on-primary-container); }
-
-.member-detail-link {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  color: var(--primary);
-  font-size: 12px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
 /* 业务表单插槽 */
 .form-slot { flex: 1; display: flex; flex-direction: column; }
 

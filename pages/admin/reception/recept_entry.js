@@ -142,15 +142,12 @@ Page({
 
     // 进入新版业务开单共享页（pages/admin/reception/recept_new）
     // 由该页根据 bizType 渲染对应的接待表单组件（rent / maintain / retail）
+    //
+    // ⚠ URL 只放纯 ASCII（bizType / memberId），中文（店铺名 / 姓名）走 storage，
+    //   避免微信 onLoad(options) 不解码导致前端显示成 %E4%B8%87... 乱码。
     const memberId = draft.matchedMemberId;
-    const params = [
-      'bizType=' + encodeURIComponent(bizType),
-      'shop=' + encodeURIComponent(shop),
-    ];
-    if (memberId)               params.push('memberId=' + encodeURIComponent(memberId));
-    if (draft.customerName)     params.push('realName=' + encodeURIComponent(draft.customerName));
-    if (draft.customerCell)     params.push('cell=' + encodeURIComponent(draft.customerCell));
-    if (draft.gender)           params.push('gender=' + encodeURIComponent(draft.gender));
+    const params = ['bizType=' + bizType];
+    if (memberId) params.push('memberId=' + memberId);
     wx.navigateTo({ url: '/pages/admin/reception/recept_new?' + params.join('&') });
   },
 

@@ -16,28 +16,12 @@
     <view class="topbar-back"></view>
   </view>
 
-  <!-- 顾客信息条（所有 bizType 共用） -->
-  <view class="member-bar">
-    <view class="member-avatar">
-      <van-icon name="manager" size="22px" color="#586377"/>
-    </view>
-    <view class="member-body">
-      <view class="member-row">
-        <text class="member-name">{{customer.name || '散客'}}</text>
-        <text class="member-cell">{{customer.cellMasked}}</text>
-      </view>
-      <view class="member-row member-row--bottom">
-        <view class="member-tags">
-          <view wx:if="{{shop}}" class="member-tag tag-shop">{{shop}}</view>
-          <view class="member-tag tag-biz">{{bizLabel}}</view>
-        </view>
-        <view wx:if="{{customer.memberId}}" class="member-detail-link" bindtap="onMemberDetail">
-          <text>查看详情</text>
-          <van-icon name="arrow" size="14px" color="#006495"/>
-        </view>
-      </view>
-    </view>
-  </view>
+  <!-- 顾客信息条（所有 bizType 共用，组件化） -->
+  <reception-member-bar
+    customer="{{customer}}"
+    shop="{{shop}}"
+    bizLabel="{{bizLabel}}"
+    bind:memberDetail="onMemberDetail" />
 
   <!-- 业务表单：根据 bizType 渲染不同自定义组件 -->
   <view class="form-slot">

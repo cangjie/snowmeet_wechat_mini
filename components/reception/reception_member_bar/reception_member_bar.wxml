@@ -1,0 +1,31 @@
+<!--components/reception/reception_member_bar/reception_member_bar.wxml
+  接待流程 / 业务开单页顶部的顾客信息条
+  组件契约：
+    properties:
+      customer: { memberId, name, cell, gender }
+      shop: 当前店铺名（中文）
+      bizLabel: 当前业务名（如 租赁 / 养护 / 零售）
+    events:
+      memberDetail：点击「查看详情」时触发
+-->
+<view class="member-bar">
+  <view class="member-avatar">
+    <van-icon name="manager" size="22px" color="#586377"/>
+  </view>
+  <view class="member-body">
+    <view class="member-row">
+      <text class="member-name">{{customer.name || '散客'}}</text>
+      <text wx:if="{{cellMasked}}" class="member-cell">{{cellMasked}}</text>
+    </view>
+    <view class="member-row member-row--bottom">
+      <view class="member-tags">
+        <view wx:if="{{shop}}" class="member-tag tag-shop">{{shop}}</view>
+        <view wx:if="{{bizLabel}}" class="member-tag tag-biz">{{bizLabel}}</view>
+      </view>
+      <view wx:if="{{customer.memberId}}" class="member-detail-link" bindtap="onMemberDetail">
+        <text>查看详情</text>
+        <van-icon name="arrow" size="14px" color="#006495"/>
+      </view>
+    </view>
+  </view>
+</view>
