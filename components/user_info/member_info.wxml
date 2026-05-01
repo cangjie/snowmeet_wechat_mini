@@ -13,7 +13,7 @@
       </view>
     </view>
   </mp-cell>
-  <mp-cell >
+  <mp-cell>
     <view class="view-row"  >
       <view class="left-column" >【联系手机号】</view>
       <view class="right-column"  style="display: flex;flex-direction: row;">

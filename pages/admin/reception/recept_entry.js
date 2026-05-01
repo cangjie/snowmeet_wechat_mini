@@ -7,13 +7,27 @@
 //   第三步 顾客扫码支付时再做账户匹配（不在本页处理）
 //
 // 后端依赖（SnowmeetApi）：
-//   GET Member/GetMemberByNum?num={cell}&type=cell&sessionKey={key}
-//        → ApiResult<Member?>，code=0 命中，code=1 未找到
 //   GET Order/GetShops（由 components/shop_selector 内部调用）
 const app = getApp();
-const util = require('../../../utils/util.js');
 
-let cellLookupTimer = null;
+function isValidInternationalPhone(raw) {
+  const value = String(raw || '').trim();
+  if (!value) return false;
+
+  // 允许国际常见输入形式：+65 8123 4567 / (852) 5123-4567 / 0044 7700 900123
+  let normalized = value.replace(/[\s\-()]/g, '');
+  if (normalized.startsWith('00')) {
+    normalized = '+' + normalized.slice(2);
+  }
+
+  if (normalized.startsWith('+')) {
+    // E.164: + 后 6~15 位数字，首位不能是 0
+    return /^\+[1-9]\d{5,14}$/.test(normalized);
+  }
+
+  // 未带国家区号时，兼容本地写法：7~15 位数字（覆盖 US/HK/SG/EU 常见长度）
+  return /^\d{7,15}$/.test(normalized);
+}
 
 Page({
   data: {
@@ -29,9 +43,7 @@ Page({
     customerName: '',
     gender: '',
     customerCell: '',
-    matchedMember: null,
-    cellLooking: false,
-    cellLooked: false,
+    customerReadyForService: false,
   },
 
   /* ---------- 生命周期 ---------- */
@@ -55,60 +67,35 @@ Page({
   },
 
   /* ---------- 表单输入 ---------- */
-  onNameInput(e) { this.setData({ customerName: e.detail.value }); },
-  onGenderTap(e) { this.setData({ gender: e.currentTarget.dataset.value }); },
+  onNameInput(e) {
+    this.setData({ customerName: e.detail.value });
+    this.updateCustomerReadyState();
+  },
+  onGenderTap(e) {
+    this.setData({ gender: e.currentTarget.dataset.value });
+    this.updateCustomerReadyState();
+  },
 
   onCellInput(e) {
     const cell = (e.detail.value || '').trim();
     this.setData({ customerCell: cell });
-    if (this.data.matchedMember || this.data.cellLooked) {
-      this.setData({ matchedMember: null, cellLooked: false });
-    }
-    if (cell.length === 11) {
-      if (cellLookupTimer) clearTimeout(cellLookupTimer);
-      cellLookupTimer = setTimeout(() => this.lookupMemberByCell(cell), 350);
-    }
+    this.updateCustomerReadyState();
   },
 
-  onCellBlur(e) {
-    const cell = (e.detail.value || '').trim();
-    if (cell.length === 11 && !this.data.cellLooked && !this.data.cellLooking) {
-      this.lookupMemberByCell(cell);
-    }
-  },
-
-  /* ---------- 调用 SnowmeetApi 查会员 ---------- */
-  lookupMemberByCell(cell) {
-    if (!/^1\d{10}$/.test(cell)) {
-      wx.showToast({ title: '手机号格式错误', icon: 'none' });
-      return;
-    }
-    this.setData({ cellLooking: true });
-    const url = app.globalData.requestPrefix
-      + 'Member/GetMemberByNum?num=' + encodeURIComponent(cell)
-      + '&type=cell'
-      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
-    util.performWebRequest(url, undefined)
-      .then((member) => {
-        this.setData({
-          matchedMember: member || null,
-          cellLooked: true,
-          cellLooking: false,
-        });
-      })
-      .catch(() => {
-        this.setData({
-          matchedMember: null,
-          cellLooked: true,
-          cellLooking: false,
-        });
-      });
+  updateCustomerReadyState() {
+    const customerName = (this.data.customerName || '').trim();
+    const customerCell = (this.data.customerCell || '').trim();
+    const gender = (this.data.gender || '').trim();
+    const customerReadyForService = !!customerName && !!gender && isValidInternationalPhone(customerCell);
+    this.setData({ customerReadyForService });
   },
 
   /* ---------- 直接点击业务卡片进入开单 ---------- */
   onBizTap(e) {
     const bizType = e.currentTarget.dataset.type;
     const { shop, sale, rent, care } = this.data;
+    const customerName = (this.data.customerName || '').trim();
+    const customerCell = (this.data.customerCell || '').trim();
 
     if (!shop) {
       wx.showToast({ title: '请先选择店铺', icon: 'none' });
@@ -128,13 +115,24 @@ Page({
       return;
     }
 
+    if (bizType === 'maintain' || bizType === 'rent') {
+      const gender = (this.data.gender || '').trim();
+      if (!customerName || !customerCell || !gender) {
+        wx.showToast({ title: '养护和租赁需填写姓名、手机号和性别', icon: 'none' });
+        return;
+      }
+      if (!isValidInternationalPhone(customerCell)) {
+        wx.showToast({ title: '请输入正确国际手机号', icon: 'none' });
+        return;
+      }
+    }
+
     // 暂存订单标识信息（PRD §1.4.6 订单找回）
     const draft = {
       shopName: shop,
-      customerName: this.data.customerName,
+      customerName: customerName,
       gender: this.data.gender,
-      customerCell: this.data.customerCell,
-      matchedMemberId: this.data.matchedMember ? this.data.matchedMember.id : null,
+      customerCell: customerCell,
       bizType: bizType,
       createdAt: Date.now(),
     };
@@ -143,11 +141,13 @@ Page({
     // 进入新版业务开单共享页（pages/admin/reception/recept_new）
     // 由该页根据 bizType 渲染对应的接待表单组件（rent / maintain / retail）
     //
-    // ⚠ URL 只放纯 ASCII（bizType / memberId），中文（店铺名 / 姓名）走 storage，
-    //   避免微信 onLoad(options) 不解码导致前端显示成 %E4%B8%87... 乱码。
-    const memberId = draft.matchedMemberId;
-    const params = ['bizType=' + bizType];
-    if (memberId) params.push('memberId=' + memberId);
+    const params = [
+      'bizType=' + encodeURIComponent(bizType),
+      'shop=' + encodeURIComponent(shop),
+      'customerName=' + encodeURIComponent(customerName),
+      'gender=' + encodeURIComponent(this.data.gender || ''),
+      'customerCell=' + encodeURIComponent(customerCell),
+    ];
     wx.navigateTo({ url: '/pages/admin/reception/recept_new?' + params.join('&') });
   },
 

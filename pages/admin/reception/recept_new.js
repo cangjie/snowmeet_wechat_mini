@@ -44,18 +44,17 @@ Page({
 
   /* ---------- 生命周期 ---------- */
   onLoad(options) {
-    // URL 只承载 ASCII 字段（bizType / memberId）；含中文的字段（shop / 姓名）一律读 storage，
-    // 避免微信端 onLoad(options) 不解码导致 %E4%B8... 乱码。
+    // 优先读取入口页传来的 URL 参数；未传时回退到草稿缓存。
     const draft = wx.getStorageSync('reception_draft') || {};
     const bizType = safeDecode(options.bizType) || draft.bizType || 'rent';
     const memberId = options.memberId
       ? Number(safeDecode(options.memberId))
-      : (draft.matchedMemberId || null);
+      : null;
 
-    const shop   = draft.shopName     || '';
-    const name   = draft.customerName || '';
-    const cell   = draft.customerCell || '';
-    const gender = draft.gender       || '';
+    const shop = safeDecode(options.shop) || draft.shopName || '';
+    const name = safeDecode(options.customerName) || draft.customerName || '';
+    const cell = safeDecode(options.customerCell) || draft.customerCell || '';
+    const gender = safeDecode(options.gender) || draft.gender || '';
 
     this.setData({
       bizType,
