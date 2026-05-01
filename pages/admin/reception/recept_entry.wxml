@@ -1,0 +1,155 @@
+<!--pages/admin/reception/recept_entry.wxml
+  现场开单入口（新版接待流程，替代 pages/admin/recept/recept_entry）
+  PRD §1.4.5 现场开单流程：
+    第一步 获取订单标识信息（姓名 / 手机号非必填，输入手机号自动触发会员查询）
+    第二步 选择业务类型 → 进入对应业务开单
+    第三步 顾客扫码支付时再做账户匹配
+  设计模板：pages/template/stitch/_1/index
+-->
+<view class="page-root">
+
+  <!-- TopAppBar：去掉左右图标，仅保留居中标题 -->
+  <view class="topbar">
+    <view class="topbar-title">业务开单</view>
+  </view>
+
+  <view class="main">
+
+    <!-- Page header -->
+    <view class="page-header">
+      <view class="page-title">开始开单</view>
+      <!-- 店铺：复用旧系统的 shop-selector，scene="recept"
+           组件内部会调 Order/GetShops + wx.getFuzzyLocation 自动定位
+           并通过 ShopSelected 事件回传 { shop, sale, rent, care, restuarant } -->
+      <view class="shop-card">
+        <view class="shop-card-icon">
+          <van-icon name="location-o" size="16px" color="#545f73"/>
+        </view>
+        <text class="shop-card-label">当前店铺</text>
+        <view class="shop-card-picker">
+          <shop-selector
+            scene="recept"
+            defaultShop="{{currentShopName}}"
+            bindShopSelected="shopSelected" />
+        </view>
+        <van-icon name="arrow-down" size="16px" color="#6f7881"/>
+      </view>
+    </view>
+
+    <!-- Customer info -->
+    <view class="card customer-card">
+      <view class="card-header">
+        <van-icon name="manager-o" size="18px" color="#006495"/>
+        <text class="card-title">顾客信息</text>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">顾客姓名</view>
+        <input
+          class="form-input"
+          placeholder="输入姓名（选填）"
+          placeholder-class="form-input-placeholder"
+          value="{{customerName}}"
+          bindinput="onNameInput"
+          maxlength="20"/>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">性别</view>
+        <view class="seg-control">
+          <view
+            class="seg-item {{gender === '男' ? 'active' : ''}}"
+            data-value="男"
+            bindtap="onGenderTap">男</view>
+          <view
+            class="seg-item {{gender === '女' ? 'active' : ''}}"
+            data-value="女"
+            bindtap="onGenderTap">女</view>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">手机号</view>
+        <view class="form-input-wrap">
+          <view class="form-input-icon">
+            <van-icon name="phone-o" size="18px" color="#6f7881"/>
+          </view>
+          <input
+            class="form-input form-input--with-icon"
+            type="number"
+            maxlength="11"
+            placeholder="输入手机号（选填）"
+            placeholder-class="form-input-placeholder"
+            value="{{customerCell}}"
+            bindinput="onCellInput"
+            bindblur="onCellBlur"/>
+          <view wx:if="{{cellLooking}}" class="form-input-suffix">
+            <van-icon name="loading" size="16px" color="#6f7881" custom-style="animation: spin 1s linear infinite"/>
+          </view>
+        </view>
+        <!-- 命中会员/未命中提示（PRD：仅显示基础信息，不强制关联） -->
+        <view wx:if="{{matchedMember}}" class="hint hint-primary">
+          <van-icon name="passed" size="14px" color="#006495"/>
+          <text>已识别会员：{{matchedMember.real_name || '无姓名'}} · ID {{matchedMember.id}}</text>
+        </view>
+        <view wx:elif="{{cellLooked && !matchedMember && customerCell.length === 11}}" class="hint hint-muted">
+          该手机号未注册会员，支付时将自动注册
+        </view>
+      </view>
+    </view>
+
+    <!-- Business type：直接点击进入对应开单流程
+         capability 由 shop-selector 回传：sale=零售 / care=养护 / rent=租赁 -->
+    <view class="section">
+      <view class="card-header card-header--standalone">
+        <van-icon name="apps-o" size="18px" color="#006495"/>
+        <text class="card-title">业务类型</text>
+      </view>
+      <view class="biz-grid">
+        <view
+          class="biz-card {{shop && sale === 1 ? '' : 'biz-card--disabled'}}"
+          data-type="retail"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap">
+            <van-icon name="shopping-cart-o" size="22px" color="#545f73"/>
+          </view>
+          <text class="biz-label">零售</text>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+
+        <view
+          class="biz-card {{shop && care === 1 ? '' : 'biz-card--disabled'}}"
+          data-type="maintain"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap">
+            <van-icon name="setting-o" size="22px" color="#545f73"/>
+          </view>
+          <text class="biz-label">养护</text>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+
+        <view
+          class="biz-card {{shop && rent === 1 ? '' : 'biz-card--disabled'}}"
+          data-type="rent"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap">
+            <van-icon name="gift-o" size="22px" color="#545f73"/>
+          </view>
+          <text class="biz-label">租赁</text>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+      </view>
+      <view wx:if="{{!shop}}" class="biz-hint">请先选择店铺</view>
+    </view>
+
+    <!-- 找回中断订单（PRD §1.4.6 订单找回：姓名 / 手机号 / 订单号） -->
+    <view class="recover-link" bindtap="onRecoverOrder">
+      <van-icon name="search" size="14px" color="#006495"/>
+      <text>找回中断的订单</text>
+    </view>
+
+  </view>
+
+  <!-- 底部接待导航 -->
+  <reception-tabbar active="open" bind:tabchange="onTabChange" />
+</view>

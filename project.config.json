@@ -114,7 +114,7 @@
     "swc": false,
     "disableSWC": true
   },
-  "libVersion": "3.8.10",
+  "libVersion": "3.5.8",
   "appid": "wxd1310896f2aa68bb",
   "compileType": "miniprogram",
   "packOptions": {

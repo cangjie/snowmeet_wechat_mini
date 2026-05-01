@@ -1,0 +1,19 @@
+<!--components/reception_tabbar/reception_tabbar.wxml
+  接待流程底部导航（工作台 / 开单 / 查询 / 我的）
+-->
+<view class="tabbar">
+  <block wx:for="{{tabs}}" wx:key="key">
+    <view
+      class="tab {{active === item.key ? 'tab--active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTap">
+      <van-icon
+        name="{{active === item.key ? item.iconActive : item.icon}}"
+        size="22px"
+        color="{{active === item.key ? '#006495' : '#3f4850'}}"/>
+      <text class="tab-label">{{item.label}}</text>
+    </view>
+  </block>
+</view>
+<!-- 占位，避免页面内容被悬浮 tabbar 遮挡 -->
+<view class="tabbar-placeholder" />

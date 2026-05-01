@@ -1,0 +1,117 @@
+<!--pages/template/stitch/_3/index.wxml
+  选择套餐（弹层式选择页）
+  数据来源：PRD 2.4.5.5 租赁商品来源 = 二级分类 / 套餐
+  设计要点：
+    - 顶部分类筛选（由租赁物一级分类驱动 + "全部"）
+    - 套餐卡：套餐名 + 包含说明 + 平日 / 周末 / 会员价 + 数量步进器
+    - 底部：已选项 + 件数合计 + 确认添加
+-->
+<view class="page-root">
+
+  <!-- TopAppBar -->
+  <view class="topbar">
+    <view class="topbar-icon" bindtap="onClose">
+      <van-icon name="cross" size="22px" color="#006495"/>
+    </view>
+    <view class="topbar-title">选择套餐</view>
+    <view class="topbar-icon"></view>
+  </view>
+
+  <!-- Category tabs -->
+  <scroll-view scroll-x class="cat-tabs">
+    <view class="cat-tabs-inner">
+      <block wx:for="{{categories}}" wx:key="key">
+        <view
+          class="cat-chip {{activeCat === item.key ? 'cat-chip--active' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="onCatTap">
+          {{item.name}}
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+
+  <!-- Package list -->
+  <scroll-view scroll-y class="pkg-scroll">
+    <view class="pkg-list">
+      <block wx:for="{{visiblePackages}}" wx:key="id" wx:for-index="idx">
+        <view class="pkg-card {{item.qty > 0 ? 'pkg-card--active' : ''}}">
+          <view class="pkg-head">
+            <view class="pkg-checkbox {{item.qty > 0 ? 'pkg-checkbox--on' : ''}}" data-id="{{item.id}}" bindtap="onTogglePackage">
+              <van-icon wx:if="{{item.qty > 0}}" name="success" size="14px" color="#ffffff"/>
+            </view>
+            <view class="pkg-body">
+              <view class="pkg-title">{{item.name}}</view>
+              <view class="pkg-desc">{{item.description}}</view>
+
+              <view class="price-row">
+                <view class="price-cell">
+                  <text class="price-label">平日价</text>
+                  <text class="price-value">¥{{item.weekdayPrice}}</text>
+                </view>
+                <view class="price-cell price-cell--bordered">
+                  <text class="price-label">周末价</text>
+                  <text class="price-value">¥{{item.weekendPrice}}</text>
+                </view>
+                <view class="price-cell price-cell--bordered price-cell--member">
+                  <text class="price-label price-label--member">会员价</text>
+                  <text class="price-value price-value--member">¥{{item.memberPrice}}</text>
+                </view>
+              </view>
+
+              <view class="stepper-wrap">
+                <view class="stepper">
+                  <view class="stepper-btn stepper-btn--minus" data-id="{{item.id}}" bindtap="onMinus">
+                    <van-icon name="minus" size="16px" color="#006495"/>
+                  </view>
+                  <text class="stepper-value">{{item.qty}}</text>
+                  <view class="stepper-btn stepper-btn--plus" data-id="{{item.id}}" bindtap="onPlus">
+                    <van-icon name="plus" size="16px" color="#ffffff"/>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <view wx:if="{{visiblePackages.length === 0}}" class="empty">
+        <view>该分类下暂无可选套餐</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- Footer -->
+  <view class="modal-footer">
+    <view class="footer-summary">
+      <view class="footer-line-1">已选择 {{selectedTypes}} 项 (共 {{selectedQty}} 件)</view>
+      <view class="footer-line-2">
+        <text class="footer-total-label">合计</text>
+        <text class="footer-total-value">¥{{selectedAmount}}</text>
+      </view>
+    </view>
+    <button class="confirm-btn {{selectedQty === 0 ? 'confirm-btn--disabled' : ''}}" bindtap="onConfirm">
+      确认添加
+    </button>
+  </view>
+
+  <!-- Bottom nav -->
+  <view class="bottomnav">
+    <view class="bottomnav-item">
+      <van-icon name="apps-o" size="20px"/>
+      <text>工作台</text>
+    </view>
+    <view class="bottomnav-item active">
+      <van-icon name="orders-o" size="20px" color="#006495"/>
+      <text>开单</text>
+    </view>
+    <view class="bottomnav-item">
+      <van-icon name="search" size="20px"/>
+      <text>查询</text>
+    </view>
+    <view class="bottomnav-item">
+      <van-icon name="manager-o" size="20px"/>
+      <text>我的</text>
+    </view>
+  </view>
+
+</view>

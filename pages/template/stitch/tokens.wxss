@@ -1,0 +1,212 @@
+/* Alpine Operational Minimalist - shared design tokens
+ * Source: pages/template/stitch/alpine_operational_minimalist/DESIGN.md
+ * Mirrors the Tailwind config used in the stitch HTML prototypes.
+ */
+
+page {
+  --surface: #f8f9ff;
+  --surface-dim: #cbdbf5;
+  --surface-bright: #f8f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container: #e5eeff;
+  --surface-container-high: #dce9ff;
+  --surface-container-highest: #d3e4fe;
+  --surface-variant: #d3e4fe;
+
+  --on-surface: #0b1c30;
+  --on-surface-variant: #3f4850;
+  --inverse-surface: #213145;
+  --inverse-on-surface: #eaf1ff;
+
+  --outline: #6f7881;
+  --outline-variant: #bfc7d1;
+
+  --primary: #006495;
+  --on-primary: #ffffff;
+  --primary-container: #4aa9e9;
+  --on-primary-container: #003b5b;
+  --primary-fixed: #cbe6ff;
+  --primary-fixed-dim: #8fcdff;
+
+  --secondary: #545f73;
+  --on-secondary: #ffffff;
+  --secondary-container: #d5e0f8;
+  --on-secondary-container: #586377;
+
+  --tertiary: #006591;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #21abef;
+  --on-tertiary-container: #003c58;
+
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  --success: #09b83e;
+
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-family: 'Lexend', -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography */
+.font-headline-lg { font-size: 32px; font-weight: 700; line-height: 1.2; }
+.font-headline-md { font-size: 24px; font-weight: 600; line-height: 1.3; }
+.font-headline-sm { font-size: 20px; font-weight: 600; line-height: 1.4; }
+.font-body-lg     { font-size: 18px; font-weight: 400; line-height: 1.6; }
+.font-body-md     { font-size: 16px; font-weight: 400; line-height: 1.5; }
+.font-body-sm     { font-size: 14px; font-weight: 400; line-height: 1.5; }
+.font-label-lg    { font-size: 14px; font-weight: 600; line-height: 1; }
+.font-label-md    { font-size: 12px; font-weight: 600; line-height: 1; }
+.font-label-sm    { font-size: 10px; font-weight: 700; line-height: 1; letter-spacing: 0.5px; }
+
+/* Common helpers */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-1 { flex: 1; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-baseline { align-items: baseline; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+.text-center { text-align: center; }
+.gap-xs { gap: 4px; }
+.gap-sm { gap: 12px; }
+.gap-md { gap: 24px; }
+
+/* Card */
+.alp-card {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  padding: 16px;
+}
+.alp-card-flat {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+}
+
+/* Inputs */
+.alp-input {
+  height: 44px;
+  border: 1px solid var(--outline-variant);
+  background-color: var(--surface-container-lowest);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 16px;
+  color: var(--on-surface);
+  width: 100%;
+  box-sizing: border-box;
+}
+.alp-input-placeholder { color: var(--outline); }
+
+/* Buttons */
+.alp-btn-primary {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.alp-btn-secondary {
+  background-color: var(--surface-container);
+  color: var(--primary);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Top app bar */
+.alp-topbar {
+  height: 56px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.alp-topbar-title {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 18px;
+}
+.alp-topbar-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 22px;
+}
+
+/* Bottom nav */
+.alp-bottomnav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 60;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.alp-bottomnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface-variant);
+  font-size: 10px;
+  font-weight: 500;
+  gap: 2px;
+  flex: 1;
+}
+.alp-bottomnav-item.active {
+  color: var(--primary);
+}
+.alp-bottomnav-item .icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* Status chips */
+.alp-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.alp-chip-success { background: #dcfce7; color: #15803d; }
+.alp-chip-primary { background: var(--primary-fixed); color: var(--on-primary-container); }
+.alp-chip-secondary { background: var(--secondary-container); color: var(--on-secondary-container); }
+.alp-chip-error { background: var(--error-container); color: var(--on-error-container); }

@@ -1,0 +1,9 @@
+{
+  "navigationStyle": "custom",
+  "backgroundTextStyle": "light",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index",
+    "shop-selector": "/components/shop_selector/shop_selector",
+    "reception-tabbar": "/components/reception_tabbar/reception_tabbar"
+  }
+}

@@ -100,7 +100,13 @@
     "pages/claude/index",
     "pages/claude/tickets",
     "pages/ski_pass/skipass_detail_new",
-    "pages/mine/skipass/my_skipasses"
+    "pages/mine/skipass/my_skipasses",
+    "pages/admin/reception/recept_entry",
+    "pages/template/stitch/_1/index",
+    "pages/template/stitch/_2/index",
+    "pages/template/stitch/_3/index",
+    "pages/template/stitch/_4/index",
+    "pages/template/stitch/_5/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

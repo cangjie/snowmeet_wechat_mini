@@ -1,0 +1,135 @@
+<!--pages/template/stitch/_5/index.wxml
+  支付结算
+  对应 PRD 1.4.5 现场开单流程·第三步：店员生成支付二维码 → 顾客扫码 → 系统按 openid/payerid 进行会员匹配
+  对应 PRD 2.4.1 租赁开单流程末段：支付押金 → 支付成功转为"租赁中"
+-->
+<view class="page-root">
+
+  <!-- TopAppBar -->
+  <view class="topbar">
+    <view class="topbar-icon" bindtap="onBack">
+      <van-icon name="arrow-left" size="22px" color="#4aa9e9"/>
+    </view>
+    <view class="topbar-title">支付结算</view>
+    <view class="topbar-icon"></view>
+  </view>
+
+  <view class="main">
+
+    <!-- 订单详情（可折叠） -->
+    <view class="order-card">
+      <view class="order-card-head" bindtap="onToggleOrder">
+        <text class="order-card-title">订单详情</text>
+        <van-icon name="{{orderExpanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#3f4850"/>
+      </view>
+      <view wx:if="{{orderExpanded}}" class="order-card-body">
+        <view class="kv-row">
+          <text class="kv-label">套餐名称</text>
+          <text class="kv-value">{{order.packageName}}</text>
+        </view>
+        <view class="kv-row kv-row--multiline">
+          <text class="kv-label">租赁物</text>
+          <view class="kv-value-list">
+            <text wx:for="{{order.items}}" wx:key="*this" class="kv-value-item">{{item}}</text>
+          </view>
+        </view>
+        <view class="kv-row">
+          <text class="kv-label">起租时间</text>
+          <text class="kv-value">{{order.startAt}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 金额 -->
+    <view class="amount">
+      <text class="amount-label">需支付押金</text>
+      <text class="amount-value">¥{{order.deposit}}</text>
+      <text class="amount-sub">包含租金 ¥{{order.rent}}</text>
+    </view>
+
+    <!-- 二维码 -->
+    <view class="qr-card">
+      <view class="qr-frame">
+        <view class="qr-mock">
+          <!-- 占位的 QR 视觉，演示用；接通后替换为真实二维码 image src -->
+          <view class="qr-grid" wx:for="{{qrCells}}" wx:key="*this" wx:for-item="cell">
+            <view class="qr-cell {{cell ? 'qr-cell--on' : ''}}"></view>
+          </view>
+          <view class="qr-corner qr-corner--tl"></view>
+          <view class="qr-corner qr-corner--tr"></view>
+          <view class="qr-corner qr-corner--bl"></view>
+        </view>
+      </view>
+      <view class="qr-tip">
+        <van-icon name="scan" size="16px" color="#4aa9e9"/>
+        <text>请顾客扫描二维码支付</text>
+      </view>
+      <view class="qr-meta">
+        <text class="qr-meta-label">支付状态</text>
+        <view class="qr-meta-status {{paymentStatus === 'paid' ? 'qr-meta-status--ok' : 'qr-meta-status--wait'}}">
+          {{paymentStatus === 'paid' ? '已收款' : '等待扫码…'}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 支付方式 -->
+    <view class="pay-list">
+      <view
+        class="pay-row {{payMethod === 'wechat' ? 'pay-row--active' : ''}}"
+        data-method="wechat"
+        bindtap="onMethodTap">
+        <view class="pay-row-left">
+          <view class="pay-icon pay-icon--wechat">
+            <van-icon name="chat" size="14px" color="#ffffff"/>
+          </view>
+          <text class="pay-row-text">微信支付</text>
+        </view>
+        <van-icon
+          name="{{payMethod === 'wechat' ? 'checked' : 'circle'}}"
+          size="20px"
+          color="{{payMethod === 'wechat' ? '#4aa9e9' : '#bfc7d1'}}"/>
+      </view>
+
+      <view
+        class="pay-row {{payMethod === 'alipay' ? 'pay-row--active' : ''}}"
+        data-method="alipay"
+        bindtap="onMethodTap">
+        <view class="pay-row-left">
+          <view class="pay-icon pay-icon--alipay">
+            <van-icon name="balance-pay" size="14px" color="#ffffff"/>
+          </view>
+          <text class="pay-row-text">支付宝支付</text>
+        </view>
+        <van-icon
+          name="{{payMethod === 'alipay' ? 'checked' : 'circle'}}"
+          size="20px"
+          color="{{payMethod === 'alipay' ? '#4aa9e9' : '#bfc7d1'}}"/>
+      </view>
+
+      <view
+        class="pay-row {{payMethod === 'other' ? 'pay-row--active' : ''}}"
+        data-method="other"
+        bindtap="onMethodTap">
+        <view class="pay-row-left">
+          <view class="pay-icon pay-icon--other">
+            <van-icon name="card" size="14px" color="#ffffff"/>
+          </view>
+          <text class="pay-row-text">其他支付（现金 / 刷卡）</text>
+        </view>
+        <van-icon
+          name="{{payMethod === 'other' ? 'checked' : 'circle'}}"
+          size="20px"
+          color="{{payMethod === 'other' ? '#4aa9e9' : '#bfc7d1'}}"/>
+      </view>
+    </view>
+
+    <!-- 占位让按钮固定底部 -->
+    <view class="spacer"></view>
+  </view>
+
+  <!-- Bottom -->
+  <view class="bottom-bar">
+    <button class="confirm-btn" bindtap="onConfirmPaid">确认支付已完成</button>
+  </view>
+
+</view>

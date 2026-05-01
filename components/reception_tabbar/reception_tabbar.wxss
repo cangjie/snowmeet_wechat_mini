@@ -1,0 +1,41 @@
+/* components/reception_tabbar/reception_tabbar.wxss */
+
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 60;
+  height: calc(56px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #3f4850;
+  font-size: 10px;
+  font-weight: 500;
+  height: 56px;
+}
+
+.tab--active { color: #006495; }
+.tab--active .tab-label { color: #006495; font-weight: 600; }
+
+.tab-label { font-size: 10px; line-height: 1; }
+
+/* 占位高度 = tabbar 高度 + 安全区，确保页面底部内容不被遮挡 */
+.tabbar-placeholder {
+  height: calc(56px + env(safe-area-inset-bottom));
+  width: 100%;
+}

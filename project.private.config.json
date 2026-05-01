@@ -3,170 +3,24 @@
     "miniprogram": {
       "list": [
         {
-          "name": "claude",
-          "pathName": "pages/mine/skipass/my_skipasses",
+          "name": "recept",
+          "pathName": "pages/admin/reception/recept_entry",
           "query": "",
           "scene": null,
           "launchMode": "default"
         },
         {
-          "name": "首页",
-          "pathName": "pages/index/index",
+          "name": "pages/template/stitch/_2/index",
+          "pathName": "pages/template/stitch/_2/index",
           "query": "",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "聚合支付",
-          "pathName": "pages/payment/uni_pay",
+          "name": "pages/template/stitch/_1/index",
+          "pathName": "pages/template/stitch/_1/index",
           "query": "",
           "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "租赁订单",
-          "pathName": "/pages/admin/rent/rent_details",
-          "query": "id=69084",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "未完成的接待",
-          "pathName": "pages/admin/recept/recept_new",
-          "query": "id=67261",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "admin_index",
-          "pathName": "pages/admin/admin",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "雪票",
-          "pathName": "pages/ski_pass/ski_pass_selector",
-          "query": "resort=%e4%b8%87%e9%be%99",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "南山验票",
-          "pathName": "pages/admin/ski_pass/nanshan_verify",
-          "query": "memberId=17621",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "顾客支付",
-          "pathName": "pages/order/payment_entry",
-          "query": "paymentId=34365",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "会员注册",
-          "pathName": "pages/register/reg",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "养护订单",
-          "pathName": "pages/admin/care/order_detail.html?scancode_time=1763292066&q=https://mini.snowmeet.top/mapp/admin/care/order_detail?careId=21286&orderId=61957",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "养护订单列表",
-          "pathName": "pages/admin/care/care_order_list",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "散客接待",
-          "pathName": "pages/admin/recept/recept_member_info",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "个人优惠券",
-          "pathName": "pages/mine/ticket/ticket_list",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "fd_order_detail",
-          "pathName": "pages/admin/fd/fd_order_detail",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "drag",
-          "pathName": "pages/test/drag/drag",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "gprinter",
-          "pathName": "pages/admin/printer/gprinter/print_task",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "spyun",
-          "pathName": "pages/test/spyun/print",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "scroll",
-          "pathName": "pages/test/vtabs/scroll",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "vtabs",
-          "pathName": "pages/test/vtabs/vtab",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "receptnew",
-          "pathName": "pages/admin/recept/recept_new",
-          "query": "contactNum=13501177897&name=苍杰测试&gender=男&memberId=15506&shop=崇礼旗舰店",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "rentNew",
-          "pathName": "pages/test/firstUI/rent_recept",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "rentOrder",
-          "pathName": "pages/test/firstUI/rent_order",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "upload_big_file",
-          "pathName": "pages/test/upload/choose_video_upload",
-          "query": "",
           "scene": null
         }
       ]
@@ -176,6 +30,19 @@
   "setting": {
     "urlCheck": false,
     "bigPackageSizeSupport": true,
-    "preloadBackgroundData": false
-  }
+    "preloadBackgroundData": false,
+    "coverView": false,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "autoAudits": false,
+    "useApiHook": true,
+    "showShadowRootInWxmlPanel": false,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "compileHotReLoad": true,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true
+  },
+  "projectname": "ai_snowmeet_wechat_mini"
 }
