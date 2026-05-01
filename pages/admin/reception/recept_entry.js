@@ -140,19 +140,18 @@ Page({
     };
     wx.setStorageSync('reception_draft', draft);
 
-    // 开单页本身下一步再做。当前临时策略：
-    //   - 租赁：进 reception/rent_recept_list（未建则 toast）
-    //   - 养护 / 零售：toast 占位
-    if (bizType === 'rent') {
-      const memberId = draft.matchedMemberId;
-      const url = memberId
-        ? '/pages/admin/recept/recept_member_info?memberId=' + memberId
-        : '/pages/admin/recept/recept_member_info';
-      wx.navigateTo({ url });
-    } else {
-      const labels = { maintain: '养护', retail: '零售' };
-      wx.showToast({ title: labels[bizType] + '开单页（下一步迁移）', icon: 'none' });
-    }
+    // 进入新版业务开单共享页（pages/admin/reception/recept_new）
+    // 由该页根据 bizType 渲染对应的接待表单组件（rent / maintain / retail）
+    const memberId = draft.matchedMemberId;
+    const params = [
+      'bizType=' + encodeURIComponent(bizType),
+      'shop=' + encodeURIComponent(shop),
+    ];
+    if (memberId)               params.push('memberId=' + encodeURIComponent(memberId));
+    if (draft.customerName)     params.push('realName=' + encodeURIComponent(draft.customerName));
+    if (draft.customerCell)     params.push('cell=' + encodeURIComponent(draft.customerCell));
+    if (draft.gender)           params.push('gender=' + encodeURIComponent(draft.gender));
+    wx.navigateTo({ url: '/pages/admin/reception/recept_new?' + params.join('&') });
   },
 
   /* ---------- 其他交互 ---------- */

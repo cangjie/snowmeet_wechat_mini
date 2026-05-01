@@ -1,0 +1,97 @@
+<!--components/reception/rent_recept_form/rent_recept_form.wxml
+  租赁接待开单表单（第一步）
+  对应 PRD §2.4.1 租赁开单流程：选择租赁商品 / 套餐 → 选择租赁物 → 选择租赁形式 → 提交 → 支付
+  设计参考：pages/template/stitch/_2/index
+  组件契约：
+    - properties.rentals  父页传入的当前购物车
+    - triggerEvent('syncRent', { rentals, needUpdate })  购物车变化
+    - triggerEvent('addAction', { action })              请求父页弹出选择面板
+    - triggerEvent('checkout', { rentals })              点击去结算
+-->
+<view class="rent-recept-form">
+
+  <!-- 分组：按时间 / 按品种 -->
+  <view class="seg-control">
+    <view
+      class="seg-item {{sort === 'time' ? 'active' : ''}}"
+      data-value="time"
+      bindtap="onSortChange">按时间</view>
+    <view
+      class="seg-item {{sort === 'category' ? 'active' : ''}}"
+      data-value="category"
+      bindtap="onSortChange">按品种</view>
+  </view>
+
+  <!-- 购物车列表 / 空态 -->
+  <block wx:if="{{rentals && rentals.length > 0}}">
+    <view class="rent-list">
+      <block wx:for="{{rentals}}" wx:key="timeStamp">
+        <view class="rent-card" bindtap="onTapRental" data-idx="{{index}}">
+          <view class="rent-card-head">
+            <text class="rent-card-name">{{item.displayName}}</text>
+            <view class="rent-card-tags">
+              <view class="chip chip-primary">{{item.kindLabel}}</view>
+              <view wx:if="{{item.mixedDispatch}}" class="chip chip-secondary">混合发放</view>
+            </view>
+          </view>
+          <view class="rent-card-meta">
+            <text class="rent-meta-item">押金 ¥{{item.realGuaranty || 0}}</text>
+            <text class="rent-meta-item">租金/日 ¥{{item.dailyRate || 0}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="empty">
+      <view class="empty-icon">
+        <van-icon name="goods-collect-o" size="48px" color="#bfc7d1"/>
+      </view>
+      <view class="empty-title">还没有添加任何租赁商品</view>
+      <view class="empty-desc">点击下方按钮开始添加</view>
+    </view>
+  </block>
+
+  <!-- 底部固定区：4 个快捷入口 + 押金合计 / 去结算 -->
+  <view class="bottom-stack">
+    <view class="action-bar">
+      <view class="action-item" data-action="package" bindtap="onAddAction">
+        <van-icon name="goods-collect-o" size="22px" color="#006495"/>
+        <text>添加套餐</text>
+      </view>
+      <view class="action-item" data-action="scan" bindtap="onAddAction">
+        <van-icon name="scan" size="22px" color="#006495"/>
+        <text>扫描条码</text>
+      </view>
+      <view class="action-item" data-action="search" bindtap="onAddAction">
+        <van-icon name="search" size="22px" color="#006495"/>
+        <text>搜索单品</text>
+      </view>
+      <view class="action-item" data-action="noCode" bindtap="onAddAction">
+        <van-icon name="apps-o" size="22px" color="#006495"/>
+        <text>无码物品</text>
+      </view>
+    </view>
+
+    <view class="checkout-bar">
+      <view class="checkout-prices">
+        <view class="checkout-price-row">
+          <text class="checkout-label">押金总计</text>
+          <text class="checkout-deposit">¥{{summary.depositLabel}}</text>
+        </view>
+        <view class="checkout-sub-row">
+          <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">押金减免 -¥{{summary.depositReduceLabel}}</text>
+          <text class="checkout-rent">租金 ¥{{summary.rentLabel}}</text>
+        </view>
+      </view>
+      <button
+        class="checkout-btn {{rentals.length === 0 ? 'checkout-btn--disabled' : ''}}"
+        disabled="{{rentals.length === 0}}"
+        bindtap="onCheckout">
+        去结算
+        <van-icon name="arrow" size="16px" color="#ffffff" custom-style="margin-left:6px"/>
+      </button>
+    </view>
+  </view>
+
+</view>

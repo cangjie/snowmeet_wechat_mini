@@ -1,0 +1,124 @@
+/* pages/admin/reception/recept_new.wxss
+   Alpine Operational Minimalist 主题 */
+
+page {
+  --primary: #006495;
+  --on-primary: #ffffff;
+  --primary-fixed: #cbe6ff;
+  --on-primary-container: #003b5b;
+  --secondary: #545f73;
+  --secondary-container: #d5e0f8;
+  --on-secondary-container: #586377;
+  --tertiary-container: #21abef;
+  --on-tertiary-container: #003c58;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #3f4850;
+  --outline: #6f7881;
+  --outline-variant: #bfc7d1;
+  --surface: #f8f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container: #e5eeff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+}
+
+.page-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TopAppBar：返回 + 居中标题 */
+.topbar {
+  height: 56px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.topbar-back {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.topbar-title {
+  flex: 1;
+  text-align: center;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* 顾客信息条 */
+.member-bar {
+  margin: 16px 16px 0;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--secondary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.member-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.member-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.member-row--bottom { margin-top: 2px; }
+.member-name { font-size: 18px; font-weight: 700; color: var(--on-surface); }
+.member-cell { font-size: 13px; color: var(--on-surface-variant); margin-left: 6px; }
+.member-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.member-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.tag-shop { background: var(--surface-container); color: var(--secondary); }
+.tag-biz  { background: var(--primary-fixed); color: var(--on-primary-container); }
+
+.member-detail-link {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* 业务表单插槽 */
+.form-slot { flex: 1; display: flex; flex-direction: column; }
+
+/* 占位（其他业务待迁移） */
+.placeholder {
+  margin: 32px 16px;
+  padding: 64px 16px;
+  border: 1px dashed var(--outline-variant);
+  border-radius: 12px;
+  text-align: center;
+}
+.placeholder-title { font-size: 16px; font-weight: 600; color: var(--on-surface); margin-bottom: 4px; }
+.placeholder-desc { font-size: 13px; color: var(--on-surface-variant); }

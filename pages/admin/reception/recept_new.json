@@ -1,0 +1,9 @@
+{
+  "navigationStyle": "custom",
+  "backgroundTextStyle": "light",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index",
+    "reception-tabbar": "/components/reception_tabbar/reception_tabbar",
+    "rent-recept-form": "/components/reception/rent_recept_form/rent_recept_form"
+  }
+}

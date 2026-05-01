@@ -1,0 +1,63 @@
+<!--pages/admin/reception/recept_new.wxml
+  业务开单（共享页）
+  对应 PRD §1.4.5 第二步：店员选业务后进入对应业务开单
+  设计：参考 pages/admin/recept/recept_new 的结构（顶级页持有数据 + 调接口，
+        子组件只负责渲染表单与回传事件）
+  目前实现：租赁开单第一步（rent-recept-form）
+-->
+<view class="page-root">
+
+  <!-- TopAppBar：标题 = 业务名 + 开单 -->
+  <view class="topbar">
+    <view class="topbar-back" bindtap="onBack">
+      <van-icon name="arrow-left" size="22px" color="#006495"/>
+    </view>
+    <view class="topbar-title">{{bizLabel}}开单</view>
+    <view class="topbar-back"></view>
+  </view>
+
+  <!-- 顾客信息条（所有 bizType 共用） -->
+  <view class="member-bar">
+    <view class="member-avatar">
+      <van-icon name="manager" size="22px" color="#586377"/>
+    </view>
+    <view class="member-body">
+      <view class="member-row">
+        <text class="member-name">{{customer.name || '散客'}}</text>
+        <text class="member-cell">{{customer.cellMasked}}</text>
+      </view>
+      <view class="member-row member-row--bottom">
+        <view class="member-tags">
+          <view wx:if="{{shop}}" class="member-tag tag-shop">{{shop}}</view>
+          <view class="member-tag tag-biz">{{bizLabel}}</view>
+        </view>
+        <view wx:if="{{customer.memberId}}" class="member-detail-link" bindtap="onMemberDetail">
+          <text>查看详情</text>
+          <van-icon name="arrow" size="14px" color="#006495"/>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 业务表单：根据 bizType 渲染不同自定义组件 -->
+  <view class="form-slot">
+    <rent-recept-form
+      wx:if="{{bizType === 'rent'}}"
+      shop="{{shop}}"
+      memberId="{{customer.memberId}}"
+      rentals="{{order.rentals}}"
+      bind:syncRent="onSyncRent"
+      bind:addAction="onAddAction"
+      bind:editRental="onEditRental"
+      bind:checkout="onCheckout"
+      bind:sortChange="onSortChange" />
+
+    <view wx:if="{{bizType === 'maintain' || bizType === 'retail'}}" class="placeholder">
+      <view class="placeholder-title">{{bizLabel}}开单（下一步迁移）</view>
+      <view class="placeholder-desc">该业务的接待表单组件尚未迁移</view>
+    </view>
+  </view>
+
+  <!-- 接待 tabbar -->
+  <reception-tabbar active="open" />
+</view>

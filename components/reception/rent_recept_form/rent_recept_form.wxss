@@ -1,0 +1,177 @@
+/* components/reception/rent_recept_form/rent_recept_form.wxss
+   Alpine Operational Minimalist 主题 */
+
+.rent-recept-form {
+  --primary: #006495;
+  --on-primary: #ffffff;
+  --primary-fixed: #cbe6ff;
+  --on-primary-container: #003b5b;
+  --secondary: #545f73;
+  --secondary-container: #d5e0f8;
+  --on-secondary-container: #586377;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #3f4850;
+  --outline: #6f7881;
+  --outline-variant: #bfc7d1;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container: #e5eeff;
+  --surface-container-high: #dce9ff;
+  --surface-variant: #d3e4fe;
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  /* 给底部固定栏（动作条 + 结算栏 + reception-tabbar）腾空间 */
+  padding-bottom: calc(180px + env(safe-area-inset-bottom));
+}
+
+/* Segmented control */
+.seg-control {
+  display: flex;
+  background: var(--surface-variant);
+  padding: 4px;
+  border-radius: 8px;
+}
+.seg-item {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+.seg-item.active {
+  background: var(--surface-container-lowest);
+  color: var(--primary);
+  box-shadow: 0 1px 2px rgba(11, 28, 48, 0.06);
+}
+
+/* Empty state */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 16px;
+  gap: 8px;
+}
+.empty-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  background: var(--surface-container-low);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.empty-title { font-size: 16px; font-weight: 600; color: var(--on-surface); }
+.empty-desc { font-size: 13px; color: var(--on-surface-variant); }
+
+/* Rental list */
+.rent-list { display: flex; flex-direction: column; gap: 12px; }
+.rent-card {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  padding: 14px;
+}
+.rent-card-head { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.rent-card-name { font-size: 16px; font-weight: 700; color: var(--on-surface); }
+.rent-card-tags { display: flex; gap: 6px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.chip-primary { background: var(--primary-fixed); color: var(--on-primary-container); }
+.chip-secondary { background: var(--secondary-container); color: var(--on-secondary-container); }
+.rent-card-meta { display: flex; gap: 16px; }
+.rent-meta-item { font-size: 13px; color: var(--on-surface-variant); }
+
+/* Bottom stack：浮在 reception-tabbar 之上 */
+.bottom-stack {
+  position: fixed;
+  left: 0;
+  /* tabbar 高度 56 + 安全区 */
+  bottom: calc(56px + env(safe-area-inset-bottom));
+  width: 100%;
+  z-index: 40;
+}
+
+.action-bar {
+  background: var(--surface-container-lowest);
+  border-top: 1px solid var(--outline-variant);
+  padding: 8px 12px;
+  display: flex;
+  gap: 8px;
+}
+.action-item {
+  flex: 1;
+  background: var(--surface-variant);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.action-item:active { background: var(--surface-container-high); }
+
+.checkout-bar {
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.checkout-prices { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.checkout-price-row { display: flex; align-items: baseline; gap: 6px; }
+.checkout-label { font-size: 13px; color: #6b7280; }
+.checkout-deposit {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+.checkout-sub-row { display: flex; align-items: center; gap: 8px; }
+.checkout-reduce { font-size: 11px; font-weight: 600; color: var(--error); }
+.checkout-rent { font-size: 11px; font-weight: 600; color: #374151; }
+.checkout-btn {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: 999px;
+  padding: 0 24px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 6px 14px -8px rgba(0, 100, 149, 0.5);
+  flex-shrink: 0;
+}
+.checkout-btn::after { border: none; }
+.checkout-btn--disabled,
+button[disabled].checkout-btn {
+  background: var(--surface-container-high);
+  color: var(--on-surface-variant);
+  box-shadow: none;
+}
