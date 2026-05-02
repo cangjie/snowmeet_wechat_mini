@@ -130,28 +130,37 @@ Page({
     this.saveRentReceptOrder(); // 持久化到后端
   },
 
-  /**
-   * 添加套餐 / 扫描条码 / 搜索单品 / 无码物品
-   * 这一步先打 toast 占位；下一步迭代里改成弹窗 + 接对应接口
-   */
   onAddAction(e) {
     const action = (e.detail || {}).action;
-    const labels = {
-      package: '添加套餐',
-      scan:    '扫描条码',
-      search:  '搜索单品',
-      noCode:  '无码物品',
-    };
-    if (action === 'scan') {
-      wx.scanCode({
-        success: (res) => {
-          wx.showToast({ title: '已扫码：' + (res.result || '').slice(0, 12), icon: 'none' });
-          // TODO: 调 Rent/QueryByBarcode 后通过 form.addRental 加入购物车
+    if (action === 'package') {
+      wx.navigateTo({
+        url: '/pages/admin/reception/recept_package?shop=' + encodeURIComponent(this.data.shop || ''),
+        events: {
+          rentalsSelected: (rentals) => {
+            this._appendRentals(rentals);
+          },
         },
       });
       return;
     }
+    if (action === 'scan') {
+      wx.scanCode({
+        success: (res) => {
+          wx.showToast({ title: '已扫码：' + (res.result || '').slice(0, 12), icon: 'none' });
+          // TODO: 调 Rent/QueryByBarcode 后追加到购物车
+        },
+      });
+      return;
+    }
+    const labels = { search: '搜索单品', noCode: '无码物品' };
     wx.showToast({ title: (labels[action] || '操作') + '（下一步迭代）', icon: 'none' });
+  },
+
+  _appendRentals(rentals) {
+    const current = (this.data.order && this.data.order.rentals) ? this.data.order.rentals.slice() : [];
+    const merged = current.concat(rentals);
+    this.setData({ 'order.rentals': merged });
+    this.saveRentReceptOrder();
   },
 
   onEditRental(e) {

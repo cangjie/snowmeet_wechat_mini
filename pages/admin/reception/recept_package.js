@@ -1,0 +1,152 @@
+// pages/admin/reception/recept_package.js
+// 添加套餐 — 选择页
+// 调用方（recept_new）via navigateTo + eventChannel:
+//   events: { rentalsSelected: (rentals) => { ... } }
+// 本页确认后 emit rentalsSelected，父页追加到购物车并调 SaveRentRecept
+const app = getApp();
+const data = require('../../../utils/data.js');
+const util = require('../../../utils/util.js');
+
+Page({
+  data: {
+    shop: '',
+    shopObj: null,
+    packages: [],
+    loading: true,
+    selectedCount: 0,
+    selectedQty: 0,
+  },
+
+  onLoad(options) {
+    const shop = options.shop ? decodeURIComponent(options.shop) : '';
+    this.setData({ shop });
+    this._eventChannel = this.getOpenerEventChannel();
+
+    app.loginPromiseNew.then(() => {
+      Promise.all([
+        data.getPackageListPromise(shop),
+        data.getShopByNamePromise(shop),
+      ]).then(([packages, shopObj]) => {
+        const pkgList = (packages || []).map(p => ({ ...p, qty: 0 }));
+        this.setData({ packages: pkgList, shopObj, loading: false });
+      }).catch(() => {
+        this.setData({ loading: false });
+        wx.showToast({ title: '套餐加载失败', icon: 'error' });
+      });
+    });
+  },
+
+  onTogglePackage(e) {
+    const id = e.currentTarget.dataset.id;
+    const packages = this.data.packages.map(p =>
+      p.id === id ? { ...p, qty: p.qty > 0 ? 0 : 1 } : p
+    );
+    this.setData({ packages }, () => this._refreshSummary());
+  },
+
+  onPlus(e) {
+    const id = e.currentTarget.dataset.id;
+    const packages = this.data.packages.map(p =>
+      p.id === id ? { ...p, qty: p.qty + 1 } : p
+    );
+    this.setData({ packages }, () => this._refreshSummary());
+  },
+
+  onMinus(e) {
+    const id = e.currentTarget.dataset.id;
+    const packages = this.data.packages.map(p =>
+      p.id === id ? { ...p, qty: Math.max(0, p.qty - 1) } : p
+    );
+    this.setData({ packages }, () => this._refreshSummary());
+  },
+
+  _refreshSummary() {
+    let count = 0;
+    let qty = 0;
+    this.data.packages.forEach(p => {
+      if (p.qty > 0) { count++; qty += p.qty; }
+    });
+    this.setData({ selectedCount: count, selectedQty: qty });
+  },
+
+  onClose() {
+    wx.navigateBack({ delta: 1 });
+  },
+
+  onConfirm() {
+    const selected = this.data.packages.filter(p => p.qty > 0);
+    if (selected.length === 0) {
+      wx.showToast({ title: '请先选择套餐', icon: 'none' });
+      return;
+    }
+    const shopObj = this.data.shopObj;
+    if (!shopObj) {
+      wx.showToast({ title: '店铺信息未加载，请稍候', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '加载中...' });
+    const startDate = util.formatDate(new Date());
+    const startDateIsWeekend = util.isWeekend(new Date());
+
+    // 每个套餐 × qty 份 → 并行加载完整套餐信息 + 价格列表
+    const tasks = [];
+    selected.forEach(pkg => {
+      for (let i = 0; i < pkg.qty; i++) {
+        tasks.push(Promise.all([
+          data.getPackagePromise(pkg.id),
+          data.getRentPriceListPromise(shopObj.id, '套餐', pkg.id, '门市'),
+        ]));
+      }
+    });
+
+    Promise.all(tasks).then(results => {
+      wx.hideLoading();
+      const rentals = results.map(([fullPkg, priceList]) => {
+        const rental = {
+          id: 0,
+          order_id: null,
+          package_id: fullPkg.id,
+          name: fullPkg.name,
+          valid: 0,
+          expectDays: 1,
+          guaranty: fullPkg.deposit,
+          realGuaranty: fullPkg.deposit,
+          guaranty_discount: 0,
+          startDate,
+          startDateIsWeekend,
+          priceList: priceList || [],
+          memo: '',
+          timeStamp: Date.now(),
+        };
+        rental.rentItems = (fullPkg.rentPackageItemCategories || []).map(itemCat => {
+          const cats = itemCat.categories || [];
+          return {
+            id: 0,
+            rental_id: 0,
+            noCode: false,
+            canChooseCategory: cats.length > 1,
+            chooseCategories: cats,
+            chooseingCategory: false,
+            categoryName: cats[0] ? cats[0].name : '',
+            name: null,
+            code: null,
+            rent_product_id: null,
+            category_id: cats[0] ? cats[0].id : null,
+            memo: '',
+            category: cats[0] || null,
+          };
+        });
+        util.createRentalDetail(rental, new Date(startDate), new Date(startDate));
+        return rental;
+      });
+
+      this._eventChannel.emit('rentalsSelected', rentals);
+      wx.navigateBack({ delta: 1 });
+    }).catch(err => {
+      wx.hideLoading();
+      console.warn('recept_package confirm failed', err);
+      wx.showToast({ title: '加载套餐失败，请重试', icon: 'error' });
+    });
+  },
+});

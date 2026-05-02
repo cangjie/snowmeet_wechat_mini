@@ -1,0 +1,234 @@
+/* pages/admin/reception/recept_package.wxss
+   Alpine Operational Minimalist 主题（与 recept_new 共享 CSS 变量） */
+
+page {
+  --primary: #006495;
+  --on-primary: #ffffff;
+  --on-primary-container: #003b5b;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #3f4850;
+  --outline: #6f7881;
+  --outline-variant: #bfc7d1;
+  --surface: #f8f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container-high: #dce9ff;
+
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+}
+
+.page-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 76px;
+}
+
+/* TopAppBar */
+.topbar {
+  height: 56px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.topbar-back {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.topbar-title {
+  flex: 1;
+  text-align: center;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* 加载提示 */
+.loading-hint {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+}
+
+/* 套餐滚动区 */
+.pkg-scroll {
+  flex: 1;
+  height: 0;
+}
+.pkg-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 套餐卡片 */
+.pkg-card {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  padding: 12px;
+}
+.pkg-card--active {
+  border-color: var(--primary);
+  border-width: 2px;
+  padding: 11px;
+}
+.pkg-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.pkg-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid var(--outline);
+  background: #ffffff;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+.pkg-checkbox--on {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.pkg-body {
+  flex: 1;
+  min-width: 0;
+}
+.pkg-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin-bottom: 4px;
+}
+.pkg-desc {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.pkg-deposit {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.deposit-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+.deposit-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+/* 步进器 */
+.stepper-wrap {
+  display: flex;
+  justify-content: flex-end;
+}
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: 999px;
+  padding: 4px 6px;
+}
+.stepper-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stepper-btn--minus {
+  background: #ffffff;
+  border: 1px solid var(--outline-variant);
+}
+.stepper-btn--plus {
+  background: var(--primary);
+}
+.stepper-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--on-surface);
+  min-width: 20px;
+  text-align: center;
+}
+
+/* 空状态 */
+.empty {
+  padding: 64px 16px;
+  text-align: center;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+}
+
+/* 底部确认栏 */
+.modal-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface-container-lowest);
+  border-top: 1px solid var(--outline-variant);
+  padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 60;
+}
+.footer-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.footer-line-1 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+.confirm-btn {
+  background: var(--primary);
+  color: var(--on-primary);
+  height: 48px;
+  padding: 0 32px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.confirm-btn::after {
+  border: none;
+}
+.confirm-btn--disabled {
+  background: var(--surface-container-high);
+  color: var(--on-surface-variant);
+}
