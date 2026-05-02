@@ -178,10 +178,11 @@ Page({
     var order = that.data.order
     if (order) {
       order.rentals = rentals
-      if (e.detail.needIntercom != undefined && e.detail.needIntercom != null 
-        && e.detail.needIntercom == false){
-        order.needIntercom = false
-      }
+      // 已废弃：needIntercom 相关逻辑（雪板类租赁默认追加对讲机），暂时停用
+      // if (e.detail.needIntercom != undefined && e.detail.needIntercom != null
+      //   && e.detail.needIntercom == false){
+      //   order.needIntercom = false
+      // }
     }
     
     console.log('rent data updated', e)

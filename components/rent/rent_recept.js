@@ -745,19 +745,20 @@ Component({
       var id = parseInt(e.currentTarget.id)
       var rentals = that.data.rentals
       var newRentals = []
-      var needIntercom = true
+      // 已废弃：needIntercom 相关逻辑（雪板类租赁默认追加对讲机），暂时停用
+      // var needIntercom = true
       for (var i = 0; i < rentals.length; i++) {
         if (i != id) {
           newRentals.push(rentals[i])
         }
-        else {
-          if (rentals[i].rentItems[0].category_id == 94) {
-            needIntercom = false
-          }
-        }
+        // else {
+        //   if (rentals[i].rentItems[0].category_id == 94) {
+        //     needIntercom = false
+        //   }
+        // }
       }
       that.renderData(newRentals)
-      that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true, needIntercom })
+      that.triggerEvent('SyncRentData', { rentals: newRentals, needUpdate: true })
     },
     selectRentItemCategory(e) {
       var that = this
