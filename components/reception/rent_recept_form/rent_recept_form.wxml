@@ -23,9 +23,9 @@
   </view>
 
   <!-- 购物车列表 / 空态 -->
-  <block wx:if="{{rentals && rentals.length > 0}}">
+  <block wx:if="{{displayRentals && displayRentals.length > 0}}">
     <view class="rent-list">
-      <block wx:for="{{rentals}}" wx:key="_key" wx:for-item="pkg" wx:for-index="ridx">
+      <block wx:for="{{displayRentals}}" wx:key="_key" wx:for-item="pkg" wx:for-index="ridx">
         <van-swipe-cell right-width="{{ 72 }}" custom-class="rent-swipe">
           <view class="pkg-card">
             <!-- 收起态：单行（名称 + 押金/租金 + 展开箭头） -->
@@ -259,8 +259,8 @@
         </view>
       </view>
       <button
-        class="checkout-btn {{rentals.length === 0 ? 'checkout-btn--disabled' : ''}}"
-        disabled="{{rentals.length === 0}}"
+        class="checkout-btn {{displayRentals.length === 0 ? 'checkout-btn--disabled' : ''}}"
+        disabled="{{displayRentals.length === 0}}"
         bindtap="onCheckout">
         去结算
         <van-icon name="arrow" size="16px" color="#ffffff" custom-style="margin-left:6px"/>

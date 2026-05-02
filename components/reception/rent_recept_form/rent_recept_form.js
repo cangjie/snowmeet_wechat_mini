@@ -61,7 +61,7 @@ Component({
   data: {
     sort: 'time',
     rentModes: RENT_MODES,
-    rentals: [],
+    displayRentals: [],
     expandedPkg: {},
     expandedItem: {},
     summary: {
@@ -124,12 +124,12 @@ Component({
         };
       });
 
-      this.setData({ rentals: augmented, expandedPkg, expandedItem }, () => this._refreshSummary());
+      this.setData({ displayRentals: augmented, expandedPkg, expandedItem }, () => this._refreshSummary());
     },
 
     _refreshSummary() {
       let deposit = 0, rent = 0, reduce = 0;
-      (this.data.rentals || []).forEach(r => {
+      (this.data.displayRentals || []).forEach(r => {
         deposit += Number(r._depositLabel) || 0;
         rent += Number(r._dailyRate) || 0;
         reduce += Number(r.guaranty_discount) || 0;
@@ -145,7 +145,7 @@ Component({
     },
 
     _emitSync(needUpdate) {
-      this.triggerEvent('syncRent', { rentals: stripUI(this.data.rentals), needUpdate: !!needUpdate });
+      this.triggerEvent('syncRent', { rentals: stripUI(this.data.displayRentals), needUpdate: !!needUpdate });
     },
 
     /* ---------- 排序 ---------- */
@@ -163,7 +163,7 @@ Component({
       const next = !this.data.expandedPkg[key];
       this.setData({
         [`expandedPkg.${key}`]: next,
-        [`rentals[${idx}]._expanded`]: next,
+        [`displayRentals[${idx}]._expanded`]: next,
       });
     },
     onToggleItem(e) {
@@ -173,7 +173,7 @@ Component({
       const next = !this.data.expandedItem[key];
       this.setData({
         [`expandedItem.${key}`]: next,
-        [`rentals[${ridx}].rentItems[${iidx}]._expanded`]: next,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._expanded`]: next,
       });
     },
 
@@ -182,13 +182,13 @@ Component({
       const ridx = Number(e.currentTarget.dataset.ridx);
       const mode = e.currentTarget.dataset.mode;
       const pickType = KEY_TO_PT[mode];
-      const items = (this.data.rentals[ridx].rentItems || []).map(it => ({
+      const items = (this.data.displayRentals[ridx].rentItems || []).map(it => ({
         ...it, pick_type: pickType, atOnce: mode !== 'delay', _modeKey: mode,
       }));
       this.setData({
-        [`rentals[${ridx}].pick_type`]: pickType,
-        [`rentals[${ridx}]._modeKey`]: mode,
-        [`rentals[${ridx}].rentItems`]: items,
+        [`displayRentals[${ridx}].pick_type`]: pickType,
+        [`displayRentals[${ridx}]._modeKey`]: mode,
+        [`displayRentals[${ridx}].rentItems`]: items,
       });
       this._emitSync(false);
     },
@@ -196,12 +196,12 @@ Component({
       const ridx = Number(e.currentTarget.dataset.ridx);
       const v = parseFloat(e.detail.value);
       if (Number.isNaN(v)) return;
-      const guaranty = Number(this.data.rentals[ridx].guaranty || 0);
+      const guaranty = Number(this.data.displayRentals[ridx].guaranty || 0);
       this.setData({
-        [`rentals[${ridx}].realGuaranty`]: v,
-        [`rentals[${ridx}].guaranty_discount`]: guaranty - v,
-        [`rentals[${ridx}]._depositLabel`]: v,
-        [`rentals[${ridx}]._depositInput`]: String(v),
+        [`displayRentals[${ridx}].realGuaranty`]: v,
+        [`displayRentals[${ridx}].guaranty_discount`]: guaranty - v,
+        [`displayRentals[${ridx}]._depositLabel`]: v,
+        [`displayRentals[${ridx}]._depositInput`]: String(v),
       });
       this._refreshSummary();
       this._emitSync(false);
@@ -210,12 +210,12 @@ Component({
       const ridx = Number(e.currentTarget.dataset.ridx);
       const v = parseFloat(e.detail.value);
       if (Number.isNaN(v)) return;
-      const presets = (this.data.rentals[ridx].pricePresets || []).slice();
+      const presets = (this.data.displayRentals[ridx].pricePresets || []).slice();
       if (presets.length > 0) presets[0] = { ...presets[0], price: v };
       this.setData({
-        [`rentals[${ridx}].pricePresets`]: presets,
-        [`rentals[${ridx}]._dailyRate`]: v,
-        [`rentals[${ridx}]._dailyRateInput`]: v.toFixed(2),
+        [`displayRentals[${ridx}].pricePresets`]: presets,
+        [`displayRentals[${ridx}]._dailyRate`]: v,
+        [`displayRentals[${ridx}]._dailyRateInput`]: v.toFixed(2),
       });
       this._refreshSummary();
       this._emitSync(false);
@@ -224,9 +224,9 @@ Component({
       const ridx = Number(e.currentTarget.dataset.ridx);
       const date = e.detail.value;
       this.setData({
-        [`rentals[${ridx}].startDate`]: date,
-        [`rentals[${ridx}].start_date`]: date,
-        [`rentals[${ridx}]._startDate`]: date,
+        [`displayRentals[${ridx}].startDate`]: date,
+        [`displayRentals[${ridx}].start_date`]: date,
+        [`displayRentals[${ridx}]._startDate`]: date,
       });
       this._emitSync(false);
     },
@@ -234,8 +234,8 @@ Component({
       const ridx = Number(e.currentTarget.dataset.ridx);
       const time = e.detail.value;
       this.setData({
-        [`rentals[${ridx}].startTime`]: time,
-        [`rentals[${ridx}]._startTime`]: time,
+        [`displayRentals[${ridx}].startTime`]: time,
+        [`displayRentals[${ridx}]._startTime`]: time,
       });
       this._emitSync(false);
     },
@@ -247,22 +247,22 @@ Component({
       const map = { itemName: 'name', code: 'code', note: 'memo' };
       const fld = map[field];
       if (!fld) return;
-      this.setData({ [`rentals[${ridx}].rentItems[${iidx}].${fld}`]: value });
+      this.setData({ [`displayRentals[${ridx}].rentItems[${iidx}].${fld}`]: value });
       if (field === 'code' && value) {
-        this.setData({ [`rentals[${ridx}].rentItems[${iidx}]._entered`]: true });
+        this.setData({ [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: true });
       }
       this._emitSync(false);
     },
     onItemCodeFlag(e) {
       const { ridx, iidx, flag } = e.currentTarget.dataset;
-      const cur = this.data.rentals[ridx].rentItems[iidx]._codeFlag;
+      const cur = this.data.displayRentals[ridx].rentItems[iidx]._codeFlag;
       const next = cur === flag ? '' : flag;
-      const item = this.data.rentals[ridx].rentItems[iidx];
+      const item = this.data.displayRentals[ridx].rentItems[iidx];
       this.setData({
-        [`rentals[${ridx}].rentItems[${iidx}].noCode`]: next === 'no_code',
-        [`rentals[${ridx}].rentItems[${iidx}].noNeed`]: next === 'not_required',
-        [`rentals[${ridx}].rentItems[${iidx}]._codeFlag`]: next,
-        [`rentals[${ridx}].rentItems[${iidx}]._entered`]: !!next || !!item.code,
+        [`displayRentals[${ridx}].rentItems[${iidx}].noCode`]: next === 'no_code',
+        [`displayRentals[${ridx}].rentItems[${iidx}].noNeed`]: next === 'not_required',
+        [`displayRentals[${ridx}].rentItems[${iidx}]._codeFlag`]: next,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: !!next || !!item.code,
       });
       this._emitSync(false);
     },
@@ -270,9 +270,9 @@ Component({
       const { ridx, iidx, mode } = e.currentTarget.dataset;
       const pickType = KEY_TO_PT[mode];
       this.setData({
-        [`rentals[${ridx}].rentItems[${iidx}].pick_type`]: pickType,
-        [`rentals[${ridx}].rentItems[${iidx}].atOnce`]: mode !== 'delay',
-        [`rentals[${ridx}].rentItems[${iidx}]._modeKey`]: mode,
+        [`displayRentals[${ridx}].rentItems[${iidx}].pick_type`]: pickType,
+        [`displayRentals[${ridx}].rentItems[${iidx}].atOnce`]: mode !== 'delay',
+        [`displayRentals[${ridx}].rentItems[${iidx}]._modeKey`]: mode,
       });
       this._emitSync(false);
     },
@@ -282,8 +282,8 @@ Component({
         success: (res) => {
           const code = res.result || '';
           this.setData({
-            [`rentals[${ridx}].rentItems[${iidx}].code`]: code,
-            [`rentals[${ridx}].rentItems[${iidx}]._entered`]: true,
+            [`displayRentals[${ridx}].rentItems[${iidx}].code`]: code,
+            [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: true,
           });
           this._emitSync(false);
         },
@@ -310,22 +310,22 @@ Component({
 
     /* ---------- 结算 ---------- */
     onCheckout() {
-      if (!this.data.rentals || this.data.rentals.length === 0) {
+      if (!this.data.displayRentals || this.data.displayRentals.length === 0) {
         wx.showToast({ title: '请先添加租赁商品', icon: 'none' });
         return;
       }
-      this.triggerEvent('checkout', { rentals: stripUI(this.data.rentals) });
+      this.triggerEvent('checkout', { rentals: stripUI(this.data.displayRentals) });
     },
 
     /* ---------- 父页可调用 ---------- */
     addRental(rental) {
-      const cleaned = stripUI(this.data.rentals);
+      const cleaned = stripUI(this.data.displayRentals);
       rental.timeStamp = rental.timeStamp || Date.now();
       cleaned.push(rental);
       this.triggerEvent('syncRent', { rentals: cleaned, needUpdate: true });
     },
     removeRental(index) {
-      const cleaned = stripUI(this.data.rentals);
+      const cleaned = stripUI(this.data.displayRentals);
       cleaned.splice(index, 1);
       this.triggerEvent('syncRent', { rentals: cleaned, needUpdate: true });
     },
