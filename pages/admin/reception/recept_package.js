@@ -12,6 +12,16 @@ Page({
     shop: '',
     shopObj: null,
     packages: [],
+    visiblePackages: [],
+    categories: [
+      { key: 'all',   name: '全部' },
+      { key: '双板',  name: '双板' },
+      { key: '单板',  name: '单板' },
+      { key: '雪服',  name: '雪服' },
+      { key: '护具',  name: '护具' },
+      { key: 'other', name: '其他' },
+    ],
+    activeCat: 'all',
     loading: true,
     selectedCount: 0,
     selectedQty: 0,
@@ -29,6 +39,7 @@ Page({
       ]).then(([packages, shopObj]) => {
         const pkgList = (packages || []).map(p => ({ ...p, qty: 0 }));
         this.setData({ packages: pkgList, shopObj, loading: false });
+        this._applyFilter();
       }).catch(() => {
         this.setData({ loading: false });
         wx.showToast({ title: '套餐加载失败', icon: 'error' });
@@ -36,12 +47,32 @@ Page({
     });
   },
 
+  onCatTap(e) {
+    const key = e.currentTarget.dataset.key;
+    if (key === this.data.activeCat) return;
+    this.setData({ activeCat: key }, () => this._applyFilter());
+  },
+
+  _applyFilter() {
+    const { activeCat, packages } = this.data;
+    let visible;
+    if (activeCat === 'all') {
+      visible = packages;
+    } else if (activeCat === 'other') {
+      visible = packages.filter(p => !p.package_type);
+    } else {
+      visible = packages.filter(p => p.package_type === activeCat);
+    }
+    this.setData({ visiblePackages: visible });
+    this._refreshSummary();
+  },
+
   onTogglePackage(e) {
     const id = e.currentTarget.dataset.id;
     const packages = this.data.packages.map(p =>
       p.id === id ? { ...p, qty: p.qty > 0 ? 0 : 1 } : p
     );
-    this.setData({ packages }, () => this._refreshSummary());
+    this.setData({ packages }, () => this._applyFilter());
   },
 
   onPlus(e) {
@@ -49,7 +80,7 @@ Page({
     const packages = this.data.packages.map(p =>
       p.id === id ? { ...p, qty: p.qty + 1 } : p
     );
-    this.setData({ packages }, () => this._refreshSummary());
+    this.setData({ packages }, () => this._applyFilter());
   },
 
   onMinus(e) {
@@ -57,7 +88,7 @@ Page({
     const packages = this.data.packages.map(p =>
       p.id === id ? { ...p, qty: Math.max(0, p.qty - 1) } : p
     );
-    this.setData({ packages }, () => this._refreshSummary());
+    this.setData({ packages }, () => this._applyFilter());
   },
 
   _refreshSummary() {

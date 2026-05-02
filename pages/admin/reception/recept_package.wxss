@@ -55,6 +55,34 @@ page {
   font-size: 18px;
 }
 
+/* 分类筛选 */
+.cat-tabs {
+  background: #ffffff;
+  border-bottom: 1px solid var(--outline-variant);
+  white-space: nowrap;
+}
+.cat-tabs-inner {
+  padding: 12px 16px;
+  display: inline-flex;
+  gap: 12px;
+}
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--surface-container-low);
+  color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
+  font-size: 12px;
+  font-weight: 600;
+}
+.cat-chip--active {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
 /* 加载提示 */
 .loading-hint {
   padding: 48px 16px;

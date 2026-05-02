@@ -13,13 +13,27 @@
     <view class="topbar-back"></view>
   </view>
 
+  <!-- 分类筛选 -->
+  <scroll-view scroll-x class="cat-tabs">
+    <view class="cat-tabs-inner">
+      <block wx:for="{{categories}}" wx:key="key">
+        <view
+          class="cat-chip {{activeCat === item.key ? 'cat-chip--active' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="onCatTap">
+          {{item.name}}
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+
   <!-- 加载中 -->
   <view wx:if="{{loading}}" class="loading-hint">加载中...</view>
 
   <!-- 套餐列表 -->
   <scroll-view wx:else scroll-y class="pkg-scroll">
     <view class="pkg-list">
-      <block wx:for="{{packages}}" wx:key="id">
+      <block wx:for="{{visiblePackages}}" wx:key="id">
         <view class="pkg-card {{item.qty > 0 ? 'pkg-card--active' : ''}}">
           <view class="pkg-head">
             <view
@@ -50,7 +64,7 @@
           </view>
         </view>
       </block>
-      <view wx:if="{{packages.length === 0}}" class="empty">暂无可选套餐</view>
+      <view wx:if="{{visiblePackages.length === 0}}" class="empty">该分类下暂无可选套餐</view>
     </view>
   </scroll-view>
 
