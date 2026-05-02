@@ -98,6 +98,19 @@ Component({
       this.triggerEvent('editRental', { index: idx, rental });
     },
 
+    onDeleteRental(e) {
+      const idx = Number(e.currentTarget.dataset.idx);
+      if (Number.isNaN(idx)) return;
+      wx.showModal({
+        title: '删除',
+        content: '确认删除此项？',
+        confirmColor: '#ba1a1a',
+        success: (res) => {
+          if (res.confirm) this.removeRental(idx);
+        },
+      });
+    },
+
     /**
      * 去结算
      * 父页负责后续：组装订单 → Rent/SaveRentRecept 落库 → 跳支付页

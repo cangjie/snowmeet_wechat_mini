@@ -187,8 +187,9 @@ Page({
       return;
     }
     if (!order.rentals || order.rentals.length === 0) {
-      // 空购物车不调接口（避免首次进入就生成空订单）
-      return;
+      // 空购物车：仅在订单已存在（id > 0）时同步给后端清空，
+      // 否则跳过避免首次进入就生成空订单
+      if (!order.id) return;
     }
 
     // 复制并清理 rental，避免循环引用 / 后端拒收（与旧 recept_new 一致）
