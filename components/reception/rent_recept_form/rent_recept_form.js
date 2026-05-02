@@ -1,18 +1,52 @@
 // components/reception/rent_recept_form/rent_recept_form.js
-// 租赁接待开单表单（第一步）
-// 父页面契约：见 wxml 顶部注释
-//
-// 设计原则（参考 components/rent/rent_recept）：
-//   - 组件不直接调接口，所有数据变更通过事件回传父页
-//   - 父页面收到 syncRent 后，按需调 Rent/SaveRentRecept 同步后端
-//   - 添加商品的具体面板（套餐选择 / 单品搜索 / 扫码 / 无码物品）由父页弹窗控制，
-//     本组件只负责发出 addAction 事件请求弹窗
+// 租赁接待开单表单
+// 视觉参考：pages/template/stitch/_4
+// 数据契约：
+//   - properties.rentals  父页购物车，每项保留旧版结构（rentItems/pricePresets/pick_type/...）
+//   - triggerEvent('syncRent', { rentals, needUpdate })  购物车结构/字段变化时同步给父页
+//   - triggerEvent('addAction', { action })              4 个快捷入口
+//   - triggerEvent('checkout', { rentals })              点击去结算
+
+const RENT_MODES = [
+  { key: 'now',   name: '立即租赁' },
+  { key: 'later', name: '先租后取' },
+  { key: 'delay', name: '延时租赁' },
+];
+
+const PT_TO_KEY = { '立即租赁': 'now', '先租后取': 'later', '延时租赁': 'delay' };
+const KEY_TO_PT = { now: '立即租赁', later: '先租后取', delay: '延时租赁' };
+
+function pkgKey(r, idx) {
+  if (r.id) return 'id_' + r.id;
+  if (r.timeStamp) return 'ts_' + r.timeStamp;
+  return 'idx_' + idx;
+}
+function itemKey(item, ridx, iidx) {
+  if (item.id) return 'iid_' + item.id;
+  return 'ri_' + ridx + '_' + iidx;
+}
+function getDailyRate(rental) {
+  const presets = rental.pricePresets || [];
+  if (presets.length > 0 && presets[0].price != null) return Number(presets[0].price);
+  return 0;
+}
+function stripUI(arr) {
+  return (arr || []).map(r => {
+    const out = {};
+    Object.keys(r).forEach(k => { if (k.charAt(0) !== '_') out[k] = r[k]; });
+    if (Array.isArray(out.rentItems)) {
+      out.rentItems = out.rentItems.map(it => {
+        const o = {};
+        Object.keys(it).forEach(k => { if (k.charAt(0) !== '_') o[k] = it[k]; });
+        return o;
+      });
+    }
+    return out;
+  });
+}
 
 Component({
-  options: {
-    addGlobalClass: true,
-    multipleSlots: false,
-  },
+  options: { addGlobalClass: true, multipleSlots: false },
 
   properties: {
     shop: { type: String, value: '' },
@@ -20,84 +54,249 @@ Component({
     rentals: {
       type: Array,
       value: [],
-      observer(newVal) {
-        // 父页主动 setData(rentals) 时，本组件重新渲染并刷新汇总
-        this.setData({ rentals: newVal || [] }, () => this.refreshSummary());
-      },
+      observer(newVal) { this._refreshRentals(newVal || []); },
     },
   },
 
   data: {
-    sort: 'time',                     // 'time' | 'category'
+    sort: 'time',
+    rentModes: RENT_MODES,
     rentals: [],
+    expandedPkg: {},
+    expandedItem: {},
     summary: {
-      deposit: 0,
-      depositReduce: 0,
-      rent: 0,
       depositLabel: '0',
+      depositReduce: 0,
       depositReduceLabel: '0',
       rentLabel: '0.00',
     },
   },
 
   lifetimes: {
-    attached() {
-      this.refreshSummary();
-    },
+    attached() { this._refreshRentals(this.properties.rentals || []); },
   },
 
   methods: {
-    /* ---------- 计算汇总 ---------- */
-    refreshSummary() {
-      const list = this.data.rentals || [];
-      let deposit = 0;
-      let rent = 0;
-      let depositReduce = 0;
-      list.forEach((r) => {
-        deposit += Number(r.realGuaranty) || Number(r.guaranty) || 0;
-        rent += Number(r.dailyRate) || Number(r.price) || 0;
-        depositReduce += Number(r.guaranty_discount) || 0;
+    /* ---------- 数据增强：原始 rentals → 渲染用 rentals ---------- */
+    _refreshRentals(raw) {
+      const expandedPkg = { ...(this.data.expandedPkg || {}) };
+      const expandedItem = { ...(this.data.expandedItem || {}) };
+
+      const augmented = raw.map((r, idx) => {
+        const key = pkgKey(r, idx);
+        if (expandedPkg[key] === undefined) expandedPkg[key] = (idx === 0);
+
+        const dailyRate = getDailyRate(r);
+        const realGuaranty = Number(r.realGuaranty != null ? r.realGuaranty : (r.guaranty || 0));
+
+        const items = (r.rentItems || []).map((it, iidx) => {
+          const ikey = itemKey(it, idx, iidx);
+          if (expandedItem[ikey] === undefined) expandedItem[ikey] = false;
+          let codeFlag = '';
+          if (it.noCode) codeFlag = 'no_code';
+          else if (it.noNeed) codeFlag = 'not_required';
+          return {
+            ...it,
+            _key: ikey,
+            _expanded: expandedItem[ikey],
+            _title: it.name || it.categoryName || '待录入',
+            _spec: it.categoryName ? '类别：' + it.categoryName : '',
+            _codeFlag: codeFlag,
+            _entered: !!(it.code || it.noCode || it.noNeed),
+            _modeKey: PT_TO_KEY[it.pick_type] || '',
+          };
+        });
+
+        return {
+          ...r,
+          _key: key,
+          _expanded: expandedPkg[key],
+          _displayName: r.name || (r.category && r.category.name) || '',
+          _kindLabel: r.package_id ? '套装' : '单品',
+          _depositLabel: realGuaranty,
+          _dailyRate: dailyRate,
+          _depositInput: String(realGuaranty || ''),
+          _dailyRateInput: dailyRate ? dailyRate.toFixed(2) : '',
+          _startDate: r.startDate || (r.start_date ? String(r.start_date).slice(0, 10) : ''),
+          _startTime: r.startTime || '09:00',
+          _modeKey: PT_TO_KEY[r.pick_type] || '',
+          rentItems: items,
+        };
+      });
+
+      this.setData({ rentals: augmented, expandedPkg, expandedItem }, () => this._refreshSummary());
+    },
+
+    _refreshSummary() {
+      let deposit = 0, rent = 0, reduce = 0;
+      (this.data.rentals || []).forEach(r => {
+        deposit += Number(r._depositLabel) || 0;
+        rent += Number(r._dailyRate) || 0;
+        reduce += Number(r.guaranty_discount) || 0;
       });
       this.setData({
         summary: {
-          deposit,
-          depositReduce,
-          rent,
           depositLabel: deposit.toLocaleString('en-US'),
-          depositReduceLabel: depositReduce.toLocaleString('en-US'),
+          depositReduce: reduce,
+          depositReduceLabel: reduce.toLocaleString('en-US'),
           rentLabel: rent.toFixed(2),
         },
       });
     },
 
-    /* ---------- 用户操作 ---------- */
+    _emitSync(needUpdate) {
+      this.triggerEvent('syncRent', { rentals: stripUI(this.data.rentals), needUpdate: !!needUpdate });
+    },
+
+    /* ---------- 排序 ---------- */
     onSortChange(e) {
       const sort = e.currentTarget.dataset.value;
       if (sort === this.data.sort) return;
-      // 排序由父页统一处理（涉及业务规则），组件只通报选择变化
       this.setData({ sort });
       this.triggerEvent('sortChange', { sort });
     },
 
-    /**
-     * 4 个添加入口：套餐 / 扫码 / 搜索 / 无码物品
-     * 触发 addAction 事件，父页负责弹窗 / 跳转 / 调接口
-     */
+    /* ---------- 折叠 / 展开 ---------- */
+    onTogglePkg(e) {
+      const key = e.currentTarget.dataset.key;
+      const idx = Number(e.currentTarget.dataset.idx);
+      const next = !this.data.expandedPkg[key];
+      this.setData({
+        [`expandedPkg.${key}`]: next,
+        [`rentals[${idx}]._expanded`]: next,
+      });
+    },
+    onToggleItem(e) {
+      const key = e.currentTarget.dataset.key;
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const iidx = Number(e.currentTarget.dataset.iidx);
+      const next = !this.data.expandedItem[key];
+      this.setData({
+        [`expandedItem.${key}`]: next,
+        [`rentals[${ridx}].rentItems[${iidx}]._expanded`]: next,
+      });
+    },
+
+    /* ---------- 套餐字段 ---------- */
+    onPkgModeTap(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const mode = e.currentTarget.dataset.mode;
+      const pickType = KEY_TO_PT[mode];
+      const items = (this.data.rentals[ridx].rentItems || []).map(it => ({
+        ...it, pick_type: pickType, atOnce: mode !== 'delay', _modeKey: mode,
+      }));
+      this.setData({
+        [`rentals[${ridx}].pick_type`]: pickType,
+        [`rentals[${ridx}]._modeKey`]: mode,
+        [`rentals[${ridx}].rentItems`]: items,
+      });
+      this._emitSync(false);
+    },
+    onPkgDepositBlur(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const v = parseFloat(e.detail.value);
+      if (Number.isNaN(v)) return;
+      const guaranty = Number(this.data.rentals[ridx].guaranty || 0);
+      this.setData({
+        [`rentals[${ridx}].realGuaranty`]: v,
+        [`rentals[${ridx}].guaranty_discount`]: guaranty - v,
+        [`rentals[${ridx}]._depositLabel`]: v,
+        [`rentals[${ridx}]._depositInput`]: String(v),
+      });
+      this._refreshSummary();
+      this._emitSync(false);
+    },
+    onPkgRateBlur(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const v = parseFloat(e.detail.value);
+      if (Number.isNaN(v)) return;
+      const presets = (this.data.rentals[ridx].pricePresets || []).slice();
+      if (presets.length > 0) presets[0] = { ...presets[0], price: v };
+      this.setData({
+        [`rentals[${ridx}].pricePresets`]: presets,
+        [`rentals[${ridx}]._dailyRate`]: v,
+        [`rentals[${ridx}]._dailyRateInput`]: v.toFixed(2),
+      });
+      this._refreshSummary();
+      this._emitSync(false);
+    },
+    onPkgDateChange(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const date = e.detail.value;
+      this.setData({
+        [`rentals[${ridx}].startDate`]: date,
+        [`rentals[${ridx}].start_date`]: date,
+        [`rentals[${ridx}]._startDate`]: date,
+      });
+      this._emitSync(false);
+    },
+    onPkgTimeChange(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const time = e.detail.value;
+      this.setData({
+        [`rentals[${ridx}].startTime`]: time,
+        [`rentals[${ridx}]._startTime`]: time,
+      });
+      this._emitSync(false);
+    },
+
+    /* ---------- 单品字段 ---------- */
+    onItemFieldBlur(e) {
+      const { ridx, iidx, field } = e.currentTarget.dataset;
+      const value = e.detail.value;
+      const map = { itemName: 'name', code: 'code', note: 'memo' };
+      const fld = map[field];
+      if (!fld) return;
+      this.setData({ [`rentals[${ridx}].rentItems[${iidx}].${fld}`]: value });
+      if (field === 'code' && value) {
+        this.setData({ [`rentals[${ridx}].rentItems[${iidx}]._entered`]: true });
+      }
+      this._emitSync(false);
+    },
+    onItemCodeFlag(e) {
+      const { ridx, iidx, flag } = e.currentTarget.dataset;
+      const cur = this.data.rentals[ridx].rentItems[iidx]._codeFlag;
+      const next = cur === flag ? '' : flag;
+      const item = this.data.rentals[ridx].rentItems[iidx];
+      this.setData({
+        [`rentals[${ridx}].rentItems[${iidx}].noCode`]: next === 'no_code',
+        [`rentals[${ridx}].rentItems[${iidx}].noNeed`]: next === 'not_required',
+        [`rentals[${ridx}].rentItems[${iidx}]._codeFlag`]: next,
+        [`rentals[${ridx}].rentItems[${iidx}]._entered`]: !!next || !!item.code,
+      });
+      this._emitSync(false);
+    },
+    onItemModeTap(e) {
+      const { ridx, iidx, mode } = e.currentTarget.dataset;
+      const pickType = KEY_TO_PT[mode];
+      this.setData({
+        [`rentals[${ridx}].rentItems[${iidx}].pick_type`]: pickType,
+        [`rentals[${ridx}].rentItems[${iidx}].atOnce`]: mode !== 'delay',
+        [`rentals[${ridx}].rentItems[${iidx}]._modeKey`]: mode,
+      });
+      this._emitSync(false);
+    },
+    onItemScan(e) {
+      const { ridx, iidx } = e.currentTarget.dataset;
+      wx.scanCode({
+        success: (res) => {
+          const code = res.result || '';
+          this.setData({
+            [`rentals[${ridx}].rentItems[${iidx}].code`]: code,
+            [`rentals[${ridx}].rentItems[${iidx}]._entered`]: true,
+          });
+          this._emitSync(false);
+        },
+      });
+    },
+
+    /* ---------- 4 个快捷入口 ---------- */
     onAddAction(e) {
       const action = e.currentTarget.dataset.action;
       this.triggerEvent('addAction', { action });
     },
 
-    /**
-     * 卡片点击：打开详情编辑（押金 / 租金 / 起租 / 租赁形式 / 租赁物录入）
-     * 由父页弹窗承载，下一步迭代时填充
-     */
-    onTapRental(e) {
-      const idx = e.currentTarget.dataset.idx;
-      const rental = (this.data.rentals || [])[idx];
-      this.triggerEvent('editRental', { index: idx, rental });
-    },
-
+    /* ---------- 左划删除 ---------- */
     onDeleteRental(e) {
       const idx = Number(e.currentTarget.dataset.idx);
       if (Number.isNaN(idx)) return;
@@ -105,46 +304,30 @@ Component({
         title: '删除',
         content: '确认删除此项？',
         confirmColor: '#ba1a1a',
-        success: (res) => {
-          if (res.confirm) this.removeRental(idx);
-        },
+        success: (res) => { if (res.confirm) this.removeRental(idx); },
       });
     },
 
-    /**
-     * 去结算
-     * 父页负责后续：组装订单 → Rent/SaveRentRecept 落库 → 跳支付页
-     */
+    /* ---------- 结算 ---------- */
     onCheckout() {
       if (!this.data.rentals || this.data.rentals.length === 0) {
         wx.showToast({ title: '请先添加租赁商品', icon: 'none' });
         return;
       }
-      this.triggerEvent('checkout', { rentals: this.data.rentals });
+      this.triggerEvent('checkout', { rentals: stripUI(this.data.rentals) });
     },
 
-    /* ---------- 由父页调用的对外方法 ---------- */
-    /**
-     * 父页在用户从弹窗选完套餐 / 单品 / 无码物品后，组装出新的 rental 并通过此方法
-     * 追加到购物车，组件内部再 triggerEvent('syncRent') 让父页拿到最新清单去调接口
-     */
+    /* ---------- 父页可调用 ---------- */
     addRental(rental) {
-      const rentals = (this.data.rentals || []).slice();
+      const cleaned = stripUI(this.data.rentals);
       rental.timeStamp = rental.timeStamp || Date.now();
-      rentals.push(rental);
-      this.setData({ rentals }, () => {
-        this.refreshSummary();
-        this.triggerEvent('syncRent', { rentals, needUpdate: true });
-      });
+      cleaned.push(rental);
+      this.triggerEvent('syncRent', { rentals: cleaned, needUpdate: true });
     },
-
     removeRental(index) {
-      const rentals = (this.data.rentals || []).slice();
-      rentals.splice(index, 1);
-      this.setData({ rentals }, () => {
-        this.refreshSummary();
-        this.triggerEvent('syncRent', { rentals, needUpdate: true });
-      });
+      const cleaned = stripUI(this.data.rentals);
+      cleaned.splice(index, 1);
+      this.triggerEvent('syncRent', { rentals: cleaned, needUpdate: true });
     },
   },
 });

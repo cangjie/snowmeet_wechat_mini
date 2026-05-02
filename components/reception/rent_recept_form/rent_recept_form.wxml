@@ -25,24 +25,193 @@
   <!-- 购物车列表 / 空态 -->
   <block wx:if="{{rentals && rentals.length > 0}}">
     <view class="rent-list">
-      <block wx:for="{{rentals}}" wx:key="timeStamp">
+      <block wx:for="{{rentals}}" wx:key="_key" wx:for-item="pkg" wx:for-index="ridx">
         <van-swipe-cell right-width="{{ 72 }}" custom-class="rent-swipe">
-          <view class="rent-card" bindtap="onTapRental" data-idx="{{index}}">
-            <view class="rent-card-row">
-              <view class="rent-card-name-wrap">
-                <text class="rent-card-name">{{item.displayName || item.name}}</text>
-                <view wx:if="{{item.kindLabel || item.mixedDispatch}}" class="rent-card-tags">
-                  <view wx:if="{{item.kindLabel}}" class="chip chip-primary">{{item.kindLabel}}</view>
-                  <view wx:if="{{item.mixedDispatch}}" class="chip chip-secondary">混合发放</view>
+          <view class="pkg-card">
+            <!-- 收起态：单行（名称 + 押金/租金 + 展开箭头） -->
+            <view class="pkg-row" data-key="{{pkg._key}}" data-idx="{{ridx}}" bindtap="onTogglePkg">
+              <view class="pkg-row-name-wrap">
+                <text class="pkg-row-name">{{pkg._displayName}}</text>
+                <view wx:if="{{pkg._kindLabel}}" class="chip chip-primary">{{pkg._kindLabel}}</view>
+              </view>
+              <view class="pkg-row-meta">
+                <text class="pkg-row-meta-item">押金 ¥{{pkg._depositLabel}}</text>
+                <text class="pkg-row-meta-item">租金/日 ¥{{pkg._dailyRate}}</text>
+              </view>
+              <view class="pkg-row-chev">
+                <van-icon name="{{pkg._expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
+              </view>
+            </view>
+
+            <!-- 展开态：详情 + 内层装备清单 -->
+            <view wx:if="{{pkg._expanded}}" class="pkg-detail">
+              <!-- 租赁形式 -->
+              <view class="rent-mode">
+                <block wx:for="{{rentModes}}" wx:key="key" wx:for-item="mode">
+                  <view
+                    class="rent-mode-btn {{pkg._modeKey === mode.key ? 'rent-mode-btn--active' : ''}}"
+                    catchtap="onPkgModeTap"
+                    data-ridx="{{ridx}}"
+                    data-mode="{{mode.key}}">{{mode.name}}</view>
+                </block>
+              </view>
+
+              <!-- 押金 / 租金 -->
+              <view class="kv-row">
+                <view class="kv-cell">
+                  <text class="kv-label">押金</text>
+                  <view class="kv-input-wrap">
+                    <text class="kv-prefix">¥</text>
+                    <input
+                      class="kv-input"
+                      type="digit"
+                      value="{{pkg._depositInput}}"
+                      catchblur="onPkgDepositBlur"
+                      data-ridx="{{ridx}}"/>
+                  </view>
+                </view>
+                <view class="kv-cell">
+                  <text class="kv-label">租金 / 日</text>
+                  <view class="kv-input-wrap">
+                    <text class="kv-prefix">¥</text>
+                    <input
+                      class="kv-input"
+                      type="digit"
+                      value="{{pkg._dailyRateInput}}"
+                      catchblur="onPkgRateBlur"
+                      data-ridx="{{ridx}}"/>
+                  </view>
                 </view>
               </view>
-              <view class="rent-card-meta">
-                <text class="rent-meta-item">押金 ¥{{item.realGuaranty || 0}}</text>
-                <text class="rent-meta-item">租金/日 ¥{{item.dailyRate || 0}}</text>
+
+              <!-- 起租日期 / 时间 -->
+              <view class="kv-row">
+                <view class="kv-cell">
+                  <text class="kv-label">起租日期</text>
+                  <picker
+                    mode="date"
+                    value="{{pkg._startDate}}"
+                    bindchange="onPkgDateChange"
+                    data-ridx="{{ridx}}">
+                    <view class="kv-picker-text">{{pkg._startDate || '请选择'}}</view>
+                  </picker>
+                </view>
+                <view class="kv-cell">
+                  <text class="kv-label">起租时间</text>
+                  <picker
+                    mode="time"
+                    value="{{pkg._startTime}}"
+                    bindchange="onPkgTimeChange"
+                    data-ridx="{{ridx}}">
+                    <view class="kv-picker-text">{{pkg._startTime}}</view>
+                  </picker>
+                </view>
+              </view>
+
+              <!-- 内层装备 -->
+              <view wx:if="{{pkg.rentItems && pkg.rentItems.length > 0}}" class="pkg-inner">
+                <block wx:for="{{pkg.rentItems}}" wx:key="_key" wx:for-item="rit" wx:for-index="iidx">
+                  <view class="item-card {{rit._expanded ? 'item-card--expanded' : ''}}">
+                    <view
+                      class="item-head"
+                      data-key="{{rit._key}}"
+                      data-ridx="{{ridx}}"
+                      data-iidx="{{iidx}}"
+                      bindtap="onToggleItem">
+                      <view class="item-thumb">
+                        <van-icon name="goods-collect-o" size="20px" color="#006495"/>
+                      </view>
+                      <view class="item-head-body">
+                        <text class="item-title">{{rit._title}}</text>
+                        <text wx:if="{{rit._spec}}" class="item-spec">{{rit._spec}}</text>
+                      </view>
+                      <view class="item-head-right">
+                        <view class="chip {{rit._entered ? 'chip-success' : 'chip-pending'}}">
+                          <text>{{rit._entered ? '已录入' : '待处理'}}</text>
+                        </view>
+                        <van-icon name="{{rit._expanded ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#6f7881"/>
+                      </view>
+                    </view>
+
+                    <view wx:if="{{rit._expanded}}" class="item-form">
+                      <view class="form-group">
+                        <view class="form-label">租赁物名称</view>
+                        <input
+                          class="form-input"
+                          value="{{rit.name || ''}}"
+                          placeholder="输入租赁物名称..."
+                          placeholder-class="form-input-placeholder"
+                          catchblur="onItemFieldBlur"
+                          data-ridx="{{ridx}}"
+                          data-iidx="{{iidx}}"
+                          data-field="itemName"/>
+                      </view>
+
+                      <view class="form-group">
+                        <view class="form-label">装备编码</view>
+                        <view class="code-row">
+                          <input
+                            class="form-input form-input--inline"
+                            value="{{rit.code || ''}}"
+                            placeholder="输入或扫描编码"
+                            placeholder-class="form-input-placeholder"
+                            catchblur="onItemFieldBlur"
+                            data-ridx="{{ridx}}"
+                            data-iidx="{{iidx}}"
+                            data-field="code"/>
+                          <view class="code-scan-btn" catchtap="onItemScan" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                            <van-icon name="scan" size="20px" color="#006495"/>
+                          </view>
+                        </view>
+                        <view class="code-flag-row">
+                          <view
+                            class="code-flag-btn {{rit._codeFlag === 'no_code' ? 'code-flag-btn--on' : ''}}"
+                            catchtap="onItemCodeFlag"
+                            data-ridx="{{ridx}}"
+                            data-iidx="{{iidx}}"
+                            data-flag="no_code">无编码</view>
+                          <view
+                            class="code-flag-btn {{rit._codeFlag === 'not_required' ? 'code-flag-btn--on' : ''}}"
+                            catchtap="onItemCodeFlag"
+                            data-ridx="{{ridx}}"
+                            data-iidx="{{iidx}}"
+                            data-flag="not_required">不需要</view>
+                        </view>
+                      </view>
+
+                      <view class="form-group">
+                        <view class="form-label">备注信息</view>
+                        <input
+                          class="form-input"
+                          value="{{rit.memo || ''}}"
+                          placeholder="填写板刃磨损等特殊情况..."
+                          placeholder-class="form-input-placeholder"
+                          catchblur="onItemFieldBlur"
+                          data-ridx="{{ridx}}"
+                          data-iidx="{{iidx}}"
+                          data-field="note"/>
+                      </view>
+
+                      <view class="form-group">
+                        <view class="form-label">租赁模式</view>
+                        <view class="rent-mode">
+                          <block wx:for="{{rentModes}}" wx:key="key" wx:for-item="mode">
+                            <view
+                              class="rent-mode-btn {{rit._modeKey === mode.key ? 'rent-mode-btn--active' : ''}}"
+                              catchtap="onItemModeTap"
+                              data-ridx="{{ridx}}"
+                              data-iidx="{{iidx}}"
+                              data-mode="{{mode.key}}">{{mode.name}}</view>
+                          </block>
+                        </view>
+                      </view>
+                    </view>
+                  </view>
+                </block>
               </view>
             </view>
           </view>
-          <view slot="right" class="swipe-delete" data-idx="{{index}}" catchtap="onDeleteRental">删除</view>
+          <view slot="right" class="swipe-delete" data-idx="{{ridx}}" catchtap="onDeleteRental">删除</view>
         </van-swipe-cell>
       </block>
     </view>

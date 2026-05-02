@@ -74,19 +74,22 @@
 .empty-desc { font-size: 13px; color: var(--on-surface-variant); }
 
 /* Rental list */
-.rent-list { display: flex; flex-direction: column; gap: 12px; }
-.rent-card {
+.rent-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* 套餐外卡 */
+.pkg-card {
   background: var(--surface-container-lowest);
   border: 1px solid var(--outline-variant);
   border-radius: 12px;
-  padding: 10px 14px;
+  overflow: hidden;
 }
-.rent-card-row {
+.pkg-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  padding: 10px 14px;
 }
-.rent-card-name-wrap {
+.pkg-row-name-wrap {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -94,7 +97,7 @@
   gap: 6px;
   overflow: hidden;
 }
-.rent-card-name {
+.pkg-row-name {
   font-size: 15px;
   font-weight: 700;
   color: var(--on-surface);
@@ -102,7 +105,15 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.rent-card-tags { display: flex; gap: 4px; flex-shrink: 0; }
+.pkg-row-meta {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.pkg-row-meta-item { font-size: 12px; color: var(--on-surface-variant); white-space: nowrap; }
+.pkg-row-chev { display: flex; align-items: center; flex-shrink: 0; }
+
+/* 通用 chip */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -111,15 +122,155 @@
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.4px;
+  flex-shrink: 0;
 }
 .chip-primary { background: var(--primary-fixed); color: var(--on-primary-container); }
 .chip-secondary { background: var(--secondary-container); color: var(--on-secondary-container); }
-.rent-card-meta {
+.chip-success { background: #dcfce7; color: #15803d; }
+.chip-pending { background: var(--surface-container-high); color: var(--primary); }
+
+/* 套餐展开区 */
+.pkg-detail {
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--surface-container-low);
   display: flex;
+  flex-direction: column;
   gap: 12px;
+}
+
+/* 租赁形式按钮组 */
+.rent-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.rent-mode-btn {
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 8px;
+  border: 1px solid var(--outline-variant);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  background: var(--surface-container-lowest);
+}
+.rent-mode-btn--active {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+/* KV row */
+.kv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kv-cell {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.kv-label { font-size: 10px; font-weight: 700; color: var(--secondary); letter-spacing: 0.4px; }
+.kv-input-wrap { display: flex; align-items: center; gap: 4px; }
+.kv-prefix { font-size: 12px; font-weight: 600; color: var(--on-surface); }
+.kv-input {
+  flex: 1;
+  font-size: 14px;
+  color: var(--on-surface);
+  background: transparent;
+  height: 22px;
+}
+.kv-picker-text { font-size: 13px; color: var(--on-surface); padding: 2px 0; }
+
+/* 内层装备 */
+.pkg-inner {
+  background: var(--surface-container-low);
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.item-card {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.item-card--expanded { padding-bottom: 14px; }
+.item-head { display: flex; align-items: center; gap: 10px; }
+.item-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
-.rent-meta-item { font-size: 12px; color: var(--on-surface-variant); white-space: nowrap; }
+.item-head-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.item-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item-spec { font-size: 11px; color: var(--outline); }
+.item-head-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.item-form {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--on-surface-variant); }
+.form-input {
+  height: 36px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
+  width: 100%;
+  box-sizing: border-box;
+}
+.form-input--inline { flex: 1; }
+.form-input-placeholder { color: var(--outline); }
+.code-row { display: flex; align-items: stretch; gap: 8px; }
+.code-scan-btn {
+  background: var(--surface-container-high);
+  border-radius: 8px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.code-flag-row { display: flex; gap: 8px; margin-top: 6px; }
+.code-flag-btn {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 8px;
+  border: 1px solid var(--outline-variant);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  background: var(--surface-container-lowest);
+}
+.code-flag-btn--on {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
 
 /* 左划删除 */
 .rent-swipe { border-radius: 12px; overflow: hidden; }
