@@ -28,16 +28,18 @@
       <block wx:for="{{rentals}}" wx:key="timeStamp">
         <van-swipe-cell right-width="{{ 72 }}" custom-class="rent-swipe">
           <view class="rent-card" bindtap="onTapRental" data-idx="{{index}}">
-            <view class="rent-card-head">
-              <text class="rent-card-name">{{item.displayName || item.name}}</text>
-              <view class="rent-card-tags">
-                <view wx:if="{{item.kindLabel}}" class="chip chip-primary">{{item.kindLabel}}</view>
-                <view wx:if="{{item.mixedDispatch}}" class="chip chip-secondary">混合发放</view>
+            <view class="rent-card-row">
+              <view class="rent-card-name-wrap">
+                <text class="rent-card-name">{{item.displayName || item.name}}</text>
+                <view wx:if="{{item.kindLabel || item.mixedDispatch}}" class="rent-card-tags">
+                  <view wx:if="{{item.kindLabel}}" class="chip chip-primary">{{item.kindLabel}}</view>
+                  <view wx:if="{{item.mixedDispatch}}" class="chip chip-secondary">混合发放</view>
+                </view>
               </view>
-            </view>
-            <view class="rent-card-meta">
-              <text class="rent-meta-item">押金 ¥{{item.realGuaranty || 0}}</text>
-              <text class="rent-meta-item">租金/日 ¥{{item.dailyRate || 0}}</text>
+              <view class="rent-card-meta">
+                <text class="rent-meta-item">押金 ¥{{item.realGuaranty || 0}}</text>
+                <text class="rent-meta-item">租金/日 ¥{{item.dailyRate || 0}}</text>
+              </view>
             </view>
           </view>
           <view slot="right" class="swipe-delete" data-idx="{{index}}" catchtap="onDeleteRental">删除</view>
