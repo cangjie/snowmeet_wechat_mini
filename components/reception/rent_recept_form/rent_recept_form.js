@@ -44,7 +44,7 @@ function evalEntry(item) {
   }
   if (!item || !item.pick_type) missing.push('模式未选');
   if (missing.length === 0) return { ok: true, label: '已录入' };
-  return { ok: false, label: missing.join('、') };
+  return { ok: false, label: missing[0] };
 }
 
 // 估算字符串视觉宽度（汉字/全角=1，半角=0.5）。卡片标题列宽度大约能放 11~12 个汉字宽度。
