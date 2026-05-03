@@ -210,13 +210,25 @@
 .item-card--disabled .item-spec { color: var(--on-surface-variant); }
 .item-head { display: flex; align-items: center; gap: 10px; }
 .item-head-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.item-title-wrap {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
 .item-title {
   font-size: 14px;
   font-weight: 700;
   color: var(--on-surface);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: inline-block;
   white-space: nowrap;
+}
+.item-title-wrap--marquee .item-title {
+  padding-left: 100%;
+  animation: item-title-marquee 10s linear infinite;
+}
+@keyframes item-title-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 .item-spec { font-size: 11px; color: var(--outline); }
 .item-head-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }

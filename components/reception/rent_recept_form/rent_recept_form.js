@@ -30,6 +30,17 @@ function getDailyRate(rental) {
   if (presets.length > 0 && presets[0].price != null) return Number(presets[0].price);
   return 0;
 }
+// 估算字符串视觉宽度（汉字/全角=1，半角=0.5）。卡片标题列宽度大约能放 11~12 个汉字宽度。
+function visualLen(s) {
+  let n = 0;
+  const str = String(s || '');
+  for (let i = 0; i < str.length; i++) {
+    n += (str.charCodeAt(i) < 128) ? 0.5 : 1;
+  }
+  return n;
+}
+const TITLE_MARQUEE_THRESHOLD = 11;
+
 function stripUI(arr) {
   return (arr || []).map(r => {
     const out = {};
@@ -93,11 +104,13 @@ Component({
           const ikey = itemKey(it, idx, iidx);
           if (expandedItem[ikey] === undefined) expandedItem[ikey] = false;
           const catName = it.class_name || it.categoryName || (it.category && it.category.name) || '';
+          const title = catName || it.name || '待录入';
           return {
             ...it,
             _key: ikey,
             _expanded: expandedItem[ikey],
-            _title: catName || it.name || '待录入',
+            _title: title,
+            _marquee: visualLen(title) > TITLE_MARQUEE_THRESHOLD,
             _spec: it.name ? '名称：' + it.name : '',
             _entered: !!(it.code || it.name) || !!it.noCode || !!it.noNeed,
             _modeKey: PT_TO_KEY[it.pick_type] || '',

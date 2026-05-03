@@ -119,7 +119,9 @@
                       data-iidx="{{iidx}}"
                       bindtap="onToggleItem">
                       <view class="item-head-body">
-                        <text class="item-title">{{rit._title}}</text>
+                        <view class="item-title-wrap {{rit._marquee ? 'item-title-wrap--marquee' : ''}}">
+                          <text class="item-title">{{rit._title}}</text>
+                        </view>
                         <text wx:if="{{rit._spec}}" class="item-spec">{{rit._spec}}</text>
                       </view>
                       <view class="item-head-right">
