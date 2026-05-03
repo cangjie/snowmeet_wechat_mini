@@ -123,6 +123,8 @@ Page({
     wx.showLoading({ title: '加载中...' });
     const startDate = util.formatDate(new Date());
     const startDateIsWeekend = util.isWeekend(new Date());
+    // 万龙系店铺默认为「立即租赁」（套餐 + 套餐内装备）
+    const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
 
     // 每个套餐 × qty 份 → 并行加载完整套餐信息 + 价格列表
     const tasks = [];
@@ -153,6 +155,8 @@ Page({
           priceList: priceList || [],
           memo: '',
           timeStamp: Date.now(),
+          pick_type: defaultPickType,
+          atOnce: defaultPickType === '立即租赁' ? true : null,
         };
         rental.rentItems = (fullPkg.rentPackageItemCategories || []).map(itemCat => {
           const cats = itemCat.categories || [];
@@ -173,6 +177,8 @@ Page({
             category_id: cats[0] ? cats[0].id : null,
             memo: '',
             category: cats[0] || null,
+            pick_type: defaultPickType,
+            atOnce: defaultPickType === '立即租赁' ? true : null,
           };
         });
         util.createRentalDetail(rental, new Date(startDate), new Date(startDate));
