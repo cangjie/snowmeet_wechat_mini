@@ -281,6 +281,11 @@
   border-color: var(--primary);
   color: var(--on-primary);
 }
+.code-flag-btn--warn {
+  background: var(--error);
+  border-color: var(--error);
+  color: #ffffff;
+}
 
 /* 左划删除 */
 .rent-swipe { border-radius: 12px; overflow: hidden; }

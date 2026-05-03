@@ -173,7 +173,7 @@
                             data-iidx="{{iidx}}"
                             data-flag="no_code">无编码</view>
                           <view
-                            class="code-flag-btn {{rit.noNeed ? 'code-flag-btn--on' : ''}}"
+                            class="code-flag-btn {{rit.noNeed ? 'code-flag-btn--warn' : ''}}"
                             catchtap="onItemCodeFlag"
                             data-ridx="{{ridx}}"
                             data-iidx="{{iidx}}"
