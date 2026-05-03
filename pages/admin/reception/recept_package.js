@@ -152,6 +152,7 @@ Page({
         };
         rental.rentItems = (fullPkg.rentPackageItemCategories || []).map(itemCat => {
           const cats = itemCat.categories || [];
+          const allCatNames = cats.map(c => c && c.name).filter(Boolean).join('/');
           return {
             id: 0,
             rental_id: 0,
@@ -159,7 +160,8 @@ Page({
             canChooseCategory: cats.length > 1,
             chooseCategories: cats,
             chooseingCategory: false,
-            categoryName: cats[0] ? cats[0].name : '',
+            categoryName: allCatNames,
+            class_name: allCatNames,
             name: null,
             code: null,
             rent_product_id: null,

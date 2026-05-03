@@ -95,13 +95,13 @@ Component({
           let codeFlag = '';
           if (it.noCode) codeFlag = 'no_code';
           else if (it.noNeed) codeFlag = 'not_required';
-          const catName = it.categoryName || (it.category && it.category.name) || '';
+          const catName = it.class_name || it.categoryName || (it.category && it.category.name) || '';
           return {
             ...it,
             _key: ikey,
             _expanded: expandedItem[ikey],
-            _title: it.name || catName || '待录入',
-            _spec: (it.name && catName) ? '类别：' + catName : '',
+            _title: catName || it.name || '待录入',
+            _spec: it.name ? '名称：' + it.name : '',
             _codeFlag: codeFlag,
             _entered: !!(it.code || it.noCode || it.noNeed),
             _modeKey: PT_TO_KEY[it.pick_type] || '',
