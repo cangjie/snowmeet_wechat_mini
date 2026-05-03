@@ -127,7 +127,7 @@
 .chip-primary { background: var(--primary-fixed); color: var(--on-primary-container); }
 .chip-secondary { background: var(--secondary-container); color: var(--on-secondary-container); }
 .chip-success { background: #dcfce7; color: #15803d; }
-.chip-pending { background: var(--surface-container-high); color: var(--primary); }
+.chip-pending { background: #fee2e2; color: #b91c1c; }
 
 /* 套餐展开区 */
 .pkg-detail {

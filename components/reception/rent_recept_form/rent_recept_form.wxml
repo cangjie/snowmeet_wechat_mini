@@ -125,8 +125,8 @@
                         <text wx:if="{{rit._spec}}" class="item-spec">{{rit._spec}}</text>
                       </view>
                       <view class="item-head-right">
-                        <view class="chip {{rit._entered ? 'chip-success' : 'chip-pending'}}">
-                          <text>{{rit._entered ? '已录入' : '待处理'}}</text>
+                        <view wx:if="{{rit._statusLabel}}" class="chip {{rit._entered ? 'chip-success' : 'chip-pending'}}">
+                          <text>{{rit._statusLabel}}</text>
                         </view>
                         <van-icon name="{{rit._expanded ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#6f7881"/>
                       </view>

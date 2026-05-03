@@ -30,6 +30,23 @@ function getDailyRate(rental) {
   if (presets.length > 0 && presets[0].price != null) return Number(presets[0].price);
   return 0;
 }
+// 录入完整性判定：
+//   - noNeed=true → 不显示 chip（label 留空）
+//   - 否则按 noCode 决定校验 code 还是 name；并且 pick_type 必选
+//   - 完整 → "已录入"；缺项 → "编码未填、模式未选" 等
+function evalEntry(item) {
+  if (item && item.noNeed) return { ok: true, label: '' };
+  const missing = [];
+  if (item && item.noCode) {
+    if (!String((item && item.name) || '').trim()) missing.push('名称未填');
+  } else {
+    if (!String((item && item.code) || '').trim()) missing.push('编码未填');
+  }
+  if (!item || !item.pick_type) missing.push('模式未选');
+  if (missing.length === 0) return { ok: true, label: '已录入' };
+  return { ok: false, label: missing.join('、') };
+}
+
 // 估算字符串视觉宽度（汉字/全角=1，半角=0.5）。卡片标题列宽度大约能放 11~12 个汉字宽度。
 function visualLen(s) {
   let n = 0;
@@ -105,6 +122,7 @@ Component({
           if (expandedItem[ikey] === undefined) expandedItem[ikey] = false;
           const catName = it.class_name || it.categoryName || (it.category && it.category.name) || '';
           const title = catName || it.name || '待录入';
+          const entry = evalEntry(it);
           return {
             ...it,
             _key: ikey,
@@ -112,7 +130,8 @@ Component({
             _title: title,
             _marquee: visualLen(title) > TITLE_MARQUEE_THRESHOLD,
             _spec: it.name ? '名称：' + it.name : '',
-            _entered: !!(it.code || it.name) || !!it.noCode || !!it.noNeed,
+            _entered: entry.ok,
+            _statusLabel: entry.label,
             _modeKey: PT_TO_KEY[it.pick_type] || '',
           };
         });
@@ -192,9 +211,13 @@ Component({
       const ridx = Number(e.currentTarget.dataset.ridx);
       const mode = e.currentTarget.dataset.mode;
       const pickType = KEY_TO_PT[mode];
-      const items = (this.data.displayRentals[ridx].rentItems || []).map(it => ({
-        ...it, pick_type: pickType, atOnce: mode !== 'delay', _modeKey: mode,
-      }));
+      const items = (this.data.displayRentals[ridx].rentItems || []).map(it => {
+        const next = { ...it, pick_type: pickType, atOnce: mode !== 'delay', _modeKey: mode };
+        const entry = evalEntry(next);
+        next._entered = entry.ok;
+        next._statusLabel = entry.label;
+        return next;
+      });
       this.setData({
         [`displayRentals[${ridx}].pick_type`]: pickType,
         [`displayRentals[${ridx}]._modeKey`]: mode,
@@ -257,10 +280,13 @@ Component({
       const map = { itemName: 'name', code: 'code', note: 'memo' };
       const fld = map[field];
       if (!fld) return;
-      this.setData({ [`displayRentals[${ridx}].rentItems[${iidx}].${fld}`]: value });
-      if (field === 'code' && value) {
-        this.setData({ [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: true });
-      }
+      const cur = this.data.displayRentals[ridx].rentItems[iidx];
+      const entry = evalEntry({ ...cur, [fld]: value });
+      this.setData({
+        [`displayRentals[${ridx}].rentItems[${iidx}].${fld}`]: value,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
+      });
       this._emitSync(false);
     },
     onItemCodeFlag(e) {
@@ -295,7 +321,9 @@ Component({
         }
       }
 
-      patch[`${path}._entered`] = !!(nextCode || nextName) || nextNoCode || nextNoNeed;
+      const entry = evalEntry({ ...item, noCode: nextNoCode, noNeed: nextNoNeed, code: nextCode, name: nextName });
+      patch[`${path}._entered`] = entry.ok;
+      patch[`${path}._statusLabel`] = entry.label;
       // 副标题派生（与 _refreshRentals 中保持一致：name 进副标题，主标题不依赖 name）
       patch[`${path}._spec`] = nextName ? '名称：' + nextName : '';
 
@@ -307,10 +335,13 @@ Component({
       const item = this.data.displayRentals[ridx].rentItems[iidx];
       if (item.noNeed) return;
       const pickType = KEY_TO_PT[mode];
+      const entry = evalEntry({ ...item, pick_type: pickType });
       this.setData({
         [`displayRentals[${ridx}].rentItems[${iidx}].pick_type`]: pickType,
         [`displayRentals[${ridx}].rentItems[${iidx}].atOnce`]: mode !== 'delay',
         [`displayRentals[${ridx}].rentItems[${iidx}]._modeKey`]: mode,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
       });
       this._emitSync(false);
     },
@@ -321,9 +352,12 @@ Component({
       wx.scanCode({
         success: (res) => {
           const code = res.result || '';
+          const cur = this.data.displayRentals[ridx].rentItems[iidx];
+          const entry = evalEntry({ ...cur, code });
           this.setData({
             [`displayRentals[${ridx}].rentItems[${iidx}].code`]: code,
-            [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: true,
+            [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
+            [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
           });
           this._emitSync(false);
         },
