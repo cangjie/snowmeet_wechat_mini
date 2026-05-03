@@ -222,13 +222,13 @@
   display: inline-block;
   white-space: nowrap;
 }
+/* 跑马灯：3s 静止 → 8s 线性滚动到完全离开 → 循环（回到原位再静 3s） */
 .item-title-wrap--marquee .item-title {
-  padding-left: 100%;
-  animation: item-title-marquee 10s linear infinite;
+  animation: item-title-marquee 11s linear infinite;
 }
 @keyframes item-title-marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+  0%, 27.27% { transform: translateX(0); }
+  100%       { transform: translateX(-100%); }
 }
 .item-spec { font-size: 11px; color: var(--outline); }
 .item-head-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
