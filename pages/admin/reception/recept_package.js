@@ -7,6 +7,10 @@ const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 
+// 大类 code 前两位白名单：双板=01 / 单板=02 / 双板鞋=03 / 单板鞋=04。
+// 槽位的全部可选品类的大类 code 都不在白名单内 → 默认勾选「无编码」。
+const CODE_REQUIRED_PREFIXES = ['01', '02', '03', '04'];
+
 Page({
   data: {
     shop: '',
@@ -153,10 +157,11 @@ Page({
         rental.rentItems = (fullPkg.rentPackageItemCategories || []).map(itemCat => {
           const cats = itemCat.categories || [];
           const allCatNames = cats.map(c => c && c.name).filter(Boolean).join('/');
+          const requiresCode = cats.some(c => c && c.code && CODE_REQUIRED_PREFIXES.indexOf(String(c.code).substr(0, 2)) >= 0);
           return {
             id: 0,
             rental_id: 0,
-            noCode: false,
+            noCode: !requiresCode,
             canChooseCategory: cats.length > 1,
             chooseCategories: cats,
             chooseingCategory: false,
