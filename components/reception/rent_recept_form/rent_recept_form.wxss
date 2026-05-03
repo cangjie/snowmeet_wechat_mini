@@ -202,17 +202,13 @@
   padding: 10px 12px;
 }
 .item-card--expanded { padding-bottom: 14px; }
-.item-head { display: flex; align-items: center; gap: 10px; }
-.item-thumb {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+.item-card--disabled {
   background: var(--surface-container);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  color: var(--on-surface-variant);
 }
+.item-card--disabled .item-title,
+.item-card--disabled .item-spec { color: var(--on-surface-variant); }
+.item-head { display: flex; align-items: center; gap: 10px; }
 .item-head-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .item-title {
   font-size: 14px;

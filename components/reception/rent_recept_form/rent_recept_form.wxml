@@ -111,16 +111,13 @@
               <!-- 内层装备 -->
               <view wx:if="{{pkg.rentItems && pkg.rentItems.length > 0}}" class="pkg-inner">
                 <block wx:for="{{pkg.rentItems}}" wx:key="_key" wx:for-item="rit" wx:for-index="iidx">
-                  <view class="item-card {{rit._expanded ? 'item-card--expanded' : ''}}">
+                  <view class="item-card {{rit._expanded ? 'item-card--expanded' : ''}} {{rit.noNeed ? 'item-card--disabled' : ''}}">
                     <view
                       class="item-head"
                       data-key="{{rit._key}}"
                       data-ridx="{{ridx}}"
                       data-iidx="{{iidx}}"
                       bindtap="onToggleItem">
-                      <view class="item-thumb">
-                        <van-icon name="goods-collect-o" size="20px" color="#006495"/>
-                      </view>
                       <view class="item-head-body">
                         <text class="item-title">{{rit._title}}</text>
                         <text wx:if="{{rit._spec}}" class="item-spec">{{rit._spec}}</text>
