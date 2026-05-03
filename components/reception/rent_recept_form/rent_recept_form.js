@@ -92,9 +92,6 @@ Component({
         const items = (r.rentItems || []).map((it, iidx) => {
           const ikey = itemKey(it, idx, iidx);
           if (expandedItem[ikey] === undefined) expandedItem[ikey] = false;
-          let codeFlag = '';
-          if (it.noCode) codeFlag = 'no_code';
-          else if (it.noNeed) codeFlag = 'not_required';
           const catName = it.class_name || it.categoryName || (it.category && it.category.name) || '';
           return {
             ...it,
@@ -102,8 +99,7 @@ Component({
             _expanded: expandedItem[ikey],
             _title: catName || it.name || '待录入',
             _spec: it.name ? '名称：' + it.name : '',
-            _codeFlag: codeFlag,
-            _entered: !!(it.code || it.noCode || it.noNeed),
+            _entered: !!(it.code || it.name) || !!it.noCode || !!it.noNeed,
             _modeKey: PT_TO_KEY[it.pick_type] || '',
           };
         });
@@ -256,19 +252,47 @@ Component({
     },
     onItemCodeFlag(e) {
       const { ridx, iidx, flag } = e.currentTarget.dataset;
-      const cur = this.data.displayRentals[ridx].rentItems[iidx]._codeFlag;
-      const next = cur === flag ? '' : flag;
       const item = this.data.displayRentals[ridx].rentItems[iidx];
-      this.setData({
-        [`displayRentals[${ridx}].rentItems[${iidx}].noCode`]: next === 'no_code',
-        [`displayRentals[${ridx}].rentItems[${iidx}].noNeed`]: next === 'not_required',
-        [`displayRentals[${ridx}].rentItems[${iidx}]._codeFlag`]: next,
-        [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: !!next || !!item.code,
-      });
+      const path = `displayRentals[${ridx}].rentItems[${iidx}]`;
+      const patch = {};
+
+      let nextNoCode = !!item.noCode;
+      let nextNoNeed = !!item.noNeed;
+      let nextCode = item.code || '';
+      let nextName = item.name || '';
+
+      if (flag === 'no_code') {
+        nextNoCode = !item.noCode;
+        patch[`${path}.noCode`] = nextNoCode;
+        if (nextNoCode) {
+          nextCode = '';
+          patch[`${path}.code`] = '';
+        } else {
+          nextName = '';
+          patch[`${path}.name`] = '';
+        }
+      } else if (flag === 'not_required') {
+        nextNoNeed = !item.noNeed;
+        patch[`${path}.noNeed`] = nextNoNeed;
+        if (nextNoNeed) {
+          nextName = '';
+          nextCode = '';
+          patch[`${path}.name`] = '';
+          patch[`${path}.code`] = '';
+        }
+      }
+
+      patch[`${path}._entered`] = !!(nextCode || nextName) || nextNoCode || nextNoNeed;
+      // 副标题派生（与 _refreshRentals 中保持一致：name 进副标题，主标题不依赖 name）
+      patch[`${path}._spec`] = nextName ? '名称：' + nextName : '';
+
+      this.setData(patch);
       this._emitSync(false);
     },
     onItemModeTap(e) {
       const { ridx, iidx, mode } = e.currentTarget.dataset;
+      const item = this.data.displayRentals[ridx].rentItems[iidx];
+      if (item.noNeed) return;
       const pickType = KEY_TO_PT[mode];
       this.setData({
         [`displayRentals[${ridx}].rentItems[${iidx}].pick_type`]: pickType,
@@ -279,6 +303,8 @@ Component({
     },
     onItemScan(e) {
       const { ridx, iidx } = e.currentTarget.dataset;
+      const item = this.data.displayRentals[ridx].rentItems[iidx];
+      if (item.noNeed || item.noCode) return;
       wx.scanCode({
         success: (res) => {
           const code = res.result || '';

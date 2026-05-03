@@ -141,6 +141,7 @@
                           value="{{rit.name || ''}}"
                           placeholder="输入租赁物名称..."
                           placeholder-class="form-input-placeholder"
+                          disabled="{{rit.noNeed || !rit.noCode}}"
                           catchblur="onItemFieldBlur"
                           data-ridx="{{ridx}}"
                           data-iidx="{{iidx}}"
@@ -155,23 +156,24 @@
                             value="{{rit.code || ''}}"
                             placeholder="输入或扫描编码"
                             placeholder-class="form-input-placeholder"
+                            disabled="{{rit.noNeed || rit.noCode}}"
                             catchblur="onItemFieldBlur"
                             data-ridx="{{ridx}}"
                             data-iidx="{{iidx}}"
                             data-field="code"/>
-                          <view class="code-scan-btn" catchtap="onItemScan" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                          <view class="code-scan-btn {{(rit.noNeed || rit.noCode) ? 'code-scan-btn--disabled' : ''}}" catchtap="onItemScan" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
                             <van-icon name="scan" size="20px" color="#006495"/>
                           </view>
                         </view>
                         <view class="code-flag-row">
                           <view
-                            class="code-flag-btn {{rit._codeFlag === 'no_code' ? 'code-flag-btn--on' : ''}}"
+                            class="code-flag-btn {{rit.noCode ? 'code-flag-btn--on' : ''}}"
                             catchtap="onItemCodeFlag"
                             data-ridx="{{ridx}}"
                             data-iidx="{{iidx}}"
                             data-flag="no_code">无编码</view>
                           <view
-                            class="code-flag-btn {{rit._codeFlag === 'not_required' ? 'code-flag-btn--on' : ''}}"
+                            class="code-flag-btn {{rit.noNeed ? 'code-flag-btn--on' : ''}}"
                             catchtap="onItemCodeFlag"
                             data-ridx="{{ridx}}"
                             data-iidx="{{iidx}}"
@@ -186,6 +188,7 @@
                           value="{{rit.memo || ''}}"
                           placeholder="填写板刃磨损等特殊情况..."
                           placeholder-class="form-input-placeholder"
+                          disabled="{{rit.noNeed}}"
                           catchblur="onItemFieldBlur"
                           data-ridx="{{ridx}}"
                           data-iidx="{{iidx}}"
@@ -197,7 +200,7 @@
                         <view class="rent-mode">
                           <block wx:for="{{rentModes}}" wx:key="key" wx:for-item="mode">
                             <view
-                              class="rent-mode-btn {{rit._modeKey === mode.key ? 'rent-mode-btn--active' : ''}}"
+                              class="rent-mode-btn {{rit._modeKey === mode.key ? 'rent-mode-btn--active' : ''}} {{rit.noNeed ? 'rent-mode-btn--disabled' : ''}}"
                               catchtap="onItemModeTap"
                               data-ridx="{{ridx}}"
                               data-iidx="{{iidx}}"

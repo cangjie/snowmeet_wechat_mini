@@ -159,6 +159,9 @@
   color: var(--on-primary);
   border-color: var(--primary);
 }
+.rent-mode-btn--disabled {
+  opacity: 0.4;
+}
 
 /* KV row */
 .kv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -245,6 +248,10 @@
 }
 .form-input--inline { flex: 1; }
 .form-input-placeholder { color: var(--outline); }
+.form-input[disabled] {
+  background: var(--surface-container);
+  color: var(--outline);
+}
 .code-row { display: flex; align-items: stretch; gap: 8px; }
 .code-scan-btn {
   background: var(--surface-container-high);
@@ -253,6 +260,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.code-scan-btn--disabled {
+  opacity: 0.4;
 }
 .code-flag-row { display: flex; gap: 8px; margin-top: 6px; }
 .code-flag-btn {
