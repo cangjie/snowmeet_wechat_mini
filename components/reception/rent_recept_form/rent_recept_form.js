@@ -211,7 +211,9 @@ Component({
       const mode = e.currentTarget.dataset.mode;
       const pickType = KEY_TO_PT[mode];
       const items = (this.data.displayRentals[ridx].rentItems || []).map(it => {
-        const next = { ...it, pick_type: pickType, atOnce: mode !== 'delay', _modeKey: mode };
+        // 跟随条件：自身没选过 / 上次也是从套餐继承（_modeFromPkg）。已手动自选的保持不动。
+        if (it.pick_type && !it._modeFromPkg) return it;
+        const next = { ...it, pick_type: pickType, atOnce: mode !== 'delay', _modeKey: mode, _modeFromPkg: true };
         const entry = evalEntry(next);
         next._entered = entry.ok;
         next._statusLabel = entry.label;
@@ -337,6 +339,7 @@ Component({
         [`displayRentals[${ridx}].rentItems[${iidx}].pick_type`]: pickType,
         [`displayRentals[${ridx}].rentItems[${iidx}].atOnce`]: mode !== 'delay',
         [`displayRentals[${ridx}].rentItems[${iidx}]._modeKey`]: mode,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._modeFromPkg`]: false,
         [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
         [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
       });
