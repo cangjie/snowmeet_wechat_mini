@@ -7,9 +7,6 @@ const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 
-// 需要编码（扫码 / 录入条码）的品类。其余品类（如雪服、护具、雪镜等）默认 noCode=true。
-const CODE_REQUIRED_CATS = ['双板', '单板', '双板鞋', '单板鞋'];
-
 Page({
   data: {
     shop: '',
@@ -156,12 +153,10 @@ Page({
         rental.rentItems = (fullPkg.rentPackageItemCategories || []).map(itemCat => {
           const cats = itemCat.categories || [];
           const allCatNames = cats.map(c => c && c.name).filter(Boolean).join('/');
-          // 槽位的全部可选品类都不在编码白名单内 → 默认勾选「无编码」
-          const requiresCode = cats.some(c => c && CODE_REQUIRED_CATS.indexOf(c.name) >= 0);
           return {
             id: 0,
             rental_id: 0,
-            noCode: !requiresCode,
+            noCode: false,
             canChooseCategory: cats.length > 1,
             chooseCategories: cats,
             chooseingCategory: false,
