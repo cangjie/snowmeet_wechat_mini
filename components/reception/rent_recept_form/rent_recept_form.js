@@ -135,6 +135,11 @@ Component({
           };
         });
 
+        // 套餐内 rentItems 的模式是否存在差异（noNeed 项跳过，空 / null 视为同一种"未选"）
+        const modeSet = new Set();
+        items.forEach(it => { if (!it.noNeed) modeSet.add(it.pick_type || ''); });
+        const modeMixed = modeSet.size > 1;
+
         return {
           ...r,
           _key: key,
@@ -148,6 +153,7 @@ Component({
           _startDate: r.startDate || (r.start_date ? String(r.start_date).slice(0, 10) : ''),
           _startTime: r.startTime || '09:00',
           _modeKey: PT_TO_KEY[r.pick_type] || '',
+          _modeMixed: modeMixed,
           rentItems: items,
         };
       });
@@ -225,6 +231,9 @@ Component({
         [`displayRentals[${ridx}].rentItems`]: items,
       });
       this._emitSync(false);
+    },
+    onPkgModeMixedTap() {
+      wx.showToast({ title: '套餐内装备模式不一致', icon: 'none' });
     },
     onPkgDepositBlur(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
