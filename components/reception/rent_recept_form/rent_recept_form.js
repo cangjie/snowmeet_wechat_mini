@@ -129,7 +129,6 @@ Component({
             _expanded: expandedItem[ikey],
             _title: title,
             _marquee: visualLen(title) > TITLE_MARQUEE_THRESHOLD,
-            _spec: it.name ? '名称：' + it.name : '',
             _entered: entry.ok,
             _statusLabel: entry.label,
             _modeKey: PT_TO_KEY[it.pick_type] || '',
@@ -324,8 +323,6 @@ Component({
       const entry = evalEntry({ ...item, noCode: nextNoCode, noNeed: nextNoNeed, code: nextCode, name: nextName });
       patch[`${path}._entered`] = entry.ok;
       patch[`${path}._statusLabel`] = entry.label;
-      // 副标题派生（与 _refreshRentals 中保持一致：name 进副标题，主标题不依赖 name）
-      patch[`${path}._spec`] = nextName ? '名称：' + nextName : '';
 
       this.setData(patch);
       this._emitSync(false);
