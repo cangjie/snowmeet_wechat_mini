@@ -96,6 +96,11 @@ Component({
           if (it.noCode) codeFlag = 'no_code';
           else if (it.noNeed) codeFlag = 'not_required';
           const catName = it.class_name || it.categoryName || (it.category && it.category.name) || '';
+          console.log('[rent_recept_form] item cat debug', {
+            iidx, class_name: it.class_name, categoryName: it.categoryName,
+            category: it.category, category_id: it.category_id, name: it.name,
+            resolvedCatName: catName,
+          });
           return {
             ...it,
             _key: ikey,
