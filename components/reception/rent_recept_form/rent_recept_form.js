@@ -324,6 +324,14 @@ Component({
       });
       this._emitSync(false);
     },
+    onPkgMemoBlur(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const value = e.detail.value;
+      this.setData({
+        [`displayRentals[${ridx}].memo`]: value,
+      });
+      this._emitSync(false);
+    },
 
     /* ---------- 单品字段 ---------- */
     onItemFieldBlur(e) {

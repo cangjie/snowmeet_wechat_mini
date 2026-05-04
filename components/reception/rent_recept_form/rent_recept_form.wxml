@@ -132,6 +132,18 @@
                 </view>
               </view>
 
+              <!-- 套餐备注 -->
+              <view class="kv-cell">
+                <text class="kv-label">备注</text>
+                <input
+                  class="kv-input"
+                  value="{{pkg.memo || ''}}"
+                  placeholder="该套餐的备注信息..."
+                  placeholder-class="form-input-placeholder"
+                  catchblur="onPkgMemoBlur"
+                  data-ridx="{{ridx}}"/>
+              </view>
+
               <!-- 内层装备 -->
               <view wx:if="{{pkg.rentItems && pkg.rentItems.length > 0}}" class="pkg-inner">
                 <block wx:for="{{pkg.rentItems}}" wx:key="_key" wx:for-item="rit" wx:for-index="iidx">
