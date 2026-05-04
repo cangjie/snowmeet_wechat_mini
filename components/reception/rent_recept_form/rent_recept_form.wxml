@@ -112,13 +112,15 @@
               <view class="kv-row">
                 <view class="kv-cell">
                   <text class="kv-label">起租日期</text>
-                  <picker
-                    mode="date"
-                    value="{{pkg._startDate}}"
-                    bindchange="onPkgDateChange"
-                    data-ridx="{{ridx}}">
-                    <view class="kv-picker-text">{{pkg._startDate || '请选择'}}</view>
-                  </picker>
+                  <view class="date-row">
+                    <view class="date-tap" data-ridx="{{ridx}}" bindtap="onPkgDateTap">
+                      {{pkg._startDate || '请选择'}}
+                    </view>
+                    <view class="date-quick">
+                      <view class="date-quick-btn" data-ridx="{{ridx}}" data-day="0" catchtap="onPkgDateQuick">今天</view>
+                      <view class="date-quick-btn" data-ridx="{{ridx}}" data-day="1" catchtap="onPkgDateQuick">明天</view>
+                    </view>
+                  </view>
                 </view>
                 <view class="kv-cell">
                   <text class="kv-label">起租时间</text>
@@ -300,5 +302,13 @@
       </button>
     </view>
   </view>
+
+  <van-calendar
+    show="{{calendarShow}}"
+    default-date="{{calendarDefault}}"
+    min-date="{{calendarMin}}"
+    max-date="{{calendarMax}}"
+    bind:close="onCalendarClose"
+    bind:confirm="onCalendarConfirm"/>
 
 </view>

@@ -74,6 +74,13 @@ const TITLE_MARQUEE_THRESHOLD = 11;
 // rental 名称在展开态独占一行，容器宽度比 rentItem 宽 → 阈值更大
 const RENTAL_TITLE_THRESHOLD = 18;
 
+function formatDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function stripUI(arr) {
   return (arr || []).map(r => {
     const out = {};
@@ -116,6 +123,11 @@ Component({
       count: 0,
       canCheckout: false,
     },
+    calendarShow: false,
+    calendarRidx: -1,
+    calendarDefault: Date.now(),
+    calendarMin: Date.now(),
+    calendarMax: Date.now() + 365 * 24 * 60 * 60 * 1000,
   },
 
   lifetimes: {
@@ -304,9 +316,7 @@ Component({
       this._refreshSummary();
       this._emitSync(false);
     },
-    onPkgDateChange(e) {
-      const ridx = Number(e.currentTarget.dataset.ridx);
-      const date = e.detail.value;
+    _setPkgDate(ridx, date) {
       this.setData({
         [`displayRentals[${ridx}].startDate`]: date,
         [`displayRentals[${ridx}].start_date`]: date,
@@ -314,6 +324,37 @@ Component({
       });
       this._updateRentalChip(ridx);
       this._emitSync(false);
+    },
+    onPkgDateTap(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const r = this.data.displayRentals[ridx];
+      let defaultDate = Date.now();
+      if (r && r._startDate) {
+        const t = new Date(r._startDate).getTime();
+        if (!isNaN(t)) defaultDate = t;
+      }
+      this.setData({
+        calendarShow: true,
+        calendarRidx: ridx,
+        calendarDefault: defaultDate,
+      });
+    },
+    onPkgDateQuick(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const offset = Number(e.currentTarget.dataset.day);
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      this._setPkgDate(ridx, formatDate(d));
+    },
+    onCalendarClose() {
+      this.setData({ calendarShow: false, calendarRidx: -1 });
+    },
+    onCalendarConfirm(e) {
+      const ts = e.detail;
+      const ridx = this.data.calendarRidx;
+      this.setData({ calendarShow: false, calendarRidx: -1 });
+      if (ridx < 0 || !ts) return;
+      this._setPkgDate(ridx, formatDate(new Date(ts)));
     },
     onPkgTimeChange(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
