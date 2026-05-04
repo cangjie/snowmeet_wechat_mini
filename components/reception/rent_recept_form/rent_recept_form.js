@@ -139,6 +139,9 @@ Component({
     _refreshRentals(raw) {
       const expandedPkg = { ...(this.data.expandedPkg || {}) };
       const expandedItem = { ...(this.data.expandedItem || {}) };
+      const today = formatDate(new Date());
+      const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);
+      const tmrw = formatDate(tmrwDate);
 
       const augmented = raw.map((r, idx) => {
         const key = pkgKey(r, idx);
@@ -172,6 +175,7 @@ Component({
 
         const rentalEntry = evalRental({ ...r, rentItems: items });
         const displayName = r.name || (r.category && r.category.name) || '';
+        const startDate = r.startDate || (r.start_date ? String(r.start_date).slice(0, 10) : '');
 
         return {
           ...r,
@@ -184,8 +188,10 @@ Component({
           _dailyRate: dailyRate,
           _depositInput: String(realGuaranty || ''),
           _dailyRateInput: dailyRate ? dailyRate.toFixed(2) : '',
-          _startDate: r.startDate || (r.start_date ? String(r.start_date).slice(0, 10) : ''),
+          _startDate: startDate,
           _startTime: r.startTime || '09:00',
+          _dateIsToday: !!startDate && startDate === today,
+          _dateIsTomorrow: !!startDate && startDate === tmrw,
           _modeKey: PT_TO_KEY[r.pick_type] || '',
           _modeMixed: modeMixed,
           _rentalEntered: rentalEntry.ok,
@@ -317,10 +323,15 @@ Component({
       this._emitSync(false);
     },
     _setPkgDate(ridx, date) {
+      const today = formatDate(new Date());
+      const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);
+      const tmrw = formatDate(tmrwDate);
       this.setData({
         [`displayRentals[${ridx}].startDate`]: date,
         [`displayRentals[${ridx}].start_date`]: date,
         [`displayRentals[${ridx}]._startDate`]: date,
+        [`displayRentals[${ridx}]._dateIsToday`]: date === today,
+        [`displayRentals[${ridx}]._dateIsTomorrow`]: date === tmrw,
       });
       this._updateRentalChip(ridx);
       this._emitSync(false);

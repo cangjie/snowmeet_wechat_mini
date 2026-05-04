@@ -266,6 +266,11 @@
   justify-content: center;
 }
 .date-quick-btn:active { background: var(--surface-container-high); }
+.date-quick-btn--active {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.date-quick-btn--active:active { background: var(--primary); }
 
 /* 内层装备 */
 .pkg-inner {
