@@ -105,6 +105,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.pkg-row-name--pending { color: var(--error); }
 .pkg-row-meta {
   display: flex;
   gap: 12px;
@@ -131,6 +132,7 @@
   display: inline-block;
   white-space: nowrap;
 }
+.pkg-title--pending { color: var(--error); }
 /* 跑马灯：3s 静止 → 8s 滚动到完全离开 → 循环（与 item-title-marquee 同款） */
 .pkg-title-row--marquee .pkg-title {
   animation: pkg-title-marquee 11s linear infinite;
@@ -381,13 +383,13 @@
   background: var(--surface-variant);
   border-radius: 8px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 8px 4px;
+  gap: 6px;
+  padding: 6px 4px;
   color: var(--primary);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }

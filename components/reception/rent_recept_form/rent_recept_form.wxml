@@ -28,12 +28,11 @@
       <block wx:for="{{displayRentals}}" wx:key="_key" wx:for-item="pkg" wx:for-index="ridx">
         <van-swipe-cell right-width="{{ 72 }}" custom-class="rent-swipe">
           <view class="pkg-card">
-            <!-- 收起态：单行（名称 + chips + 押金/租金 + 展开箭头） -->
+            <!-- 收起态：单行（名称 + 套装/单品 chip + 押金/租金 + 展开箭头）。完整性 chip 在折叠态隐藏，缺项时套餐名变红。 -->
             <view wx:if="{{!pkg._expanded}}" class="pkg-row" data-key="{{pkg._key}}" data-idx="{{ridx}}" bindtap="onTogglePkg">
               <view class="pkg-row-name-wrap">
-                <text class="pkg-row-name">{{pkg._displayName}}</text>
+                <text class="pkg-row-name {{!pkg._rentalEntered ? 'pkg-row-name--pending' : ''}}">{{pkg._displayName}}</text>
                 <view wx:if="{{pkg._kindLabel}}" class="chip chip-primary">{{pkg._kindLabel}}</view>
-                <view class="chip {{pkg._rentalEntered ? 'chip-success' : 'chip-pending'}}">{{pkg._rentalStatusLabel}}</view>
               </view>
               <view class="pkg-row-meta">
                 <text class="pkg-row-meta-item">押金 ¥{{pkg._depositLabel}}</text>
@@ -46,7 +45,7 @@
             <!-- 展开态：两行（第一行套餐名 / 第二行 chips + 押金/租金 + 箭头） -->
             <view wx:else class="pkg-row pkg-row--expanded" data-key="{{pkg._key}}" data-idx="{{ridx}}" bindtap="onTogglePkg">
               <view class="pkg-title-row {{pkg._displayMarquee ? 'pkg-title-row--marquee' : ''}}">
-                <text class="pkg-title">{{pkg._displayName}}</text>
+                <text class="pkg-title {{!pkg._rentalEntered ? 'pkg-title--pending' : ''}}">{{pkg._displayName}}</text>
               </view>
               <view class="pkg-meta-row">
                 <view class="pkg-meta-chips">
@@ -256,19 +255,19 @@
   <view class="bottom-stack">
     <view class="action-bar">
       <view class="action-item" data-action="package" bindtap="onAddAction">
-        <van-icon name="goods-collect-o" size="22px" color="#006495"/>
+        <van-icon name="goods-collect-o" size="16px" color="#006495"/>
         <text>添加套餐</text>
       </view>
       <view class="action-item" data-action="scan" bindtap="onAddAction">
-        <van-icon name="scan" size="22px" color="#006495"/>
+        <van-icon name="scan" size="16px" color="#006495"/>
         <text>扫描条码</text>
       </view>
       <view class="action-item" data-action="search" bindtap="onAddAction">
-        <van-icon name="search" size="22px" color="#006495"/>
+        <van-icon name="search" size="16px" color="#006495"/>
         <text>搜索单品</text>
       </view>
       <view class="action-item" data-action="noCode" bindtap="onAddAction">
-        <van-icon name="apps-o" size="22px" color="#006495"/>
+        <van-icon name="apps-o" size="16px" color="#006495"/>
         <text>无码物品</text>
       </view>
     </view>
