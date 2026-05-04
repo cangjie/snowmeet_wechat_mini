@@ -113,6 +113,44 @@
 .pkg-row-meta-item { font-size: 12px; color: var(--on-surface-variant); white-space: nowrap; }
 .pkg-row-chev { display: flex; align-items: center; flex-shrink: 0; }
 
+/* 展开态：套餐名独占一行，chips/押金/箭头下沉到第二行 */
+.pkg-row--expanded {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+.pkg-title-row {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.pkg-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--on-surface);
+  display: inline-block;
+  white-space: nowrap;
+}
+/* 跑马灯：3s 静止 → 8s 滚动到完全离开 → 循环（与 item-title-marquee 同款） */
+.pkg-title-row--marquee .pkg-title {
+  animation: pkg-title-marquee 11s linear infinite;
+}
+@keyframes pkg-title-marquee {
+  0%, 27.27% { transform: translateX(0); }
+  100%       { transform: translateX(-100%); }
+}
+.pkg-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pkg-meta-chips {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-right: auto;
+}
+
 /* 通用 chip */
 .chip {
   display: inline-flex;

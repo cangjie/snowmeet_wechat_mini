@@ -28,8 +28,8 @@
       <block wx:for="{{displayRentals}}" wx:key="_key" wx:for-item="pkg" wx:for-index="ridx">
         <van-swipe-cell right-width="{{ 72 }}" custom-class="rent-swipe">
           <view class="pkg-card">
-            <!-- 收起态：单行（名称 + 押金/租金 + 展开箭头） -->
-            <view class="pkg-row" data-key="{{pkg._key}}" data-idx="{{ridx}}" bindtap="onTogglePkg">
+            <!-- 收起态：单行（名称 + chips + 押金/租金 + 展开箭头） -->
+            <view wx:if="{{!pkg._expanded}}" class="pkg-row" data-key="{{pkg._key}}" data-idx="{{ridx}}" bindtap="onTogglePkg">
               <view class="pkg-row-name-wrap">
                 <text class="pkg-row-name">{{pkg._displayName}}</text>
                 <view wx:if="{{pkg._kindLabel}}" class="chip chip-primary">{{pkg._kindLabel}}</view>
@@ -40,7 +40,26 @@
                 <text class="pkg-row-meta-item">租金/日 ¥{{pkg._dailyRate}}</text>
               </view>
               <view class="pkg-row-chev">
-                <van-icon name="{{pkg._expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
+                <van-icon name="arrow-down" size="16px" color="#6f7881"/>
+              </view>
+            </view>
+            <!-- 展开态：两行（第一行套餐名 / 第二行 chips + 押金/租金 + 箭头） -->
+            <view wx:else class="pkg-row pkg-row--expanded" data-key="{{pkg._key}}" data-idx="{{ridx}}" bindtap="onTogglePkg">
+              <view class="pkg-title-row {{pkg._displayMarquee ? 'pkg-title-row--marquee' : ''}}">
+                <text class="pkg-title">{{pkg._displayName}}</text>
+              </view>
+              <view class="pkg-meta-row">
+                <view class="pkg-meta-chips">
+                  <view wx:if="{{pkg._kindLabel}}" class="chip chip-primary">{{pkg._kindLabel}}</view>
+                  <view class="chip {{pkg._rentalEntered ? 'chip-success' : 'chip-pending'}}">{{pkg._rentalStatusLabel}}</view>
+                </view>
+                <view class="pkg-row-meta">
+                  <text class="pkg-row-meta-item">押金 ¥{{pkg._depositLabel}}</text>
+                  <text class="pkg-row-meta-item">租金/日 ¥{{pkg._dailyRate}}</text>
+                </view>
+                <view class="pkg-row-chev">
+                  <van-icon name="arrow-up" size="16px" color="#6f7881"/>
+                </view>
               </view>
             </view>
 

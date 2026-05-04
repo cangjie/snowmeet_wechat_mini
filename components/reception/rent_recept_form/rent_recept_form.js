@@ -71,6 +71,8 @@ function visualLen(s) {
   return n;
 }
 const TITLE_MARQUEE_THRESHOLD = 11;
+// rental 名称在展开态独占一行，容器宽度比 rentItem 宽 → 阈值更大
+const RENTAL_TITLE_THRESHOLD = 18;
 
 function stripUI(arr) {
   return (arr || []).map(r => {
@@ -155,12 +157,14 @@ Component({
         const modeMixed = modeSet.size > 1;
 
         const rentalEntry = evalRental({ ...r, rentItems: items });
+        const displayName = r.name || (r.category && r.category.name) || '';
 
         return {
           ...r,
           _key: key,
           _expanded: expandedPkg[key],
-          _displayName: r.name || (r.category && r.category.name) || '',
+          _displayName: displayName,
+          _displayMarquee: visualLen(displayName) > RENTAL_TITLE_THRESHOLD,
           _kindLabel: r.package_id ? '套装' : '单品',
           _depositLabel: realGuaranty,
           _dailyRate: dailyRate,
