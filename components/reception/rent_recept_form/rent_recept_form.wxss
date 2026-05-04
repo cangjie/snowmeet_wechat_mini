@@ -240,24 +240,30 @@
 }
 .kv-picker-text { font-size: 13px; color: var(--on-surface); padding: 2px 0; }
 
-/* 起租日期：日期文字 + 今天/明天 快捷按钮 */
-.date-row { display: flex; align-items: center; gap: 8px; }
+/* 起租日期：日期文字 + 今/明 单字快捷按钮（紧凑单行布局，避免折行） */
+.date-row { display: flex; align-items: center; gap: 6px; }
 .date-tap {
   flex: 1;
   font-size: 13px;
   color: var(--on-surface);
   padding: 2px 0;
   min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .date-quick { display: flex; gap: 4px; flex-shrink: 0; }
 .date-quick-btn {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--primary);
   background: var(--surface-variant);
-  padding: 2px 8px;
-  border-radius: 999px;
-  line-height: 1.5;
+  width: 22px;
+  height: 18px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .date-quick-btn:active { background: var(--surface-container-high); }
 

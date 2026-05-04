@@ -117,8 +117,8 @@
                       {{pkg._startDate || '请选择'}}
                     </view>
                     <view class="date-quick">
-                      <view class="date-quick-btn" data-ridx="{{ridx}}" data-day="0" catchtap="onPkgDateQuick">今天</view>
-                      <view class="date-quick-btn" data-ridx="{{ridx}}" data-day="1" catchtap="onPkgDateQuick">明天</view>
+                      <view class="date-quick-btn" data-ridx="{{ridx}}" data-day="0" catchtap="onPkgDateQuick">今</view>
+                      <view class="date-quick-btn" data-ridx="{{ridx}}" data-day="1" catchtap="onPkgDateQuick">明</view>
                     </view>
                   </view>
                 </view>
