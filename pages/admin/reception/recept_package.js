@@ -125,6 +125,8 @@ Page({
     const startDateIsWeekend = util.isWeekend(new Date());
     // 万龙系店铺默认为「立即租赁」（套餐 + 套餐内装备）
     const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
+    // 起租时间默认取当前时分（不分店铺）；切换模式时 onPkgModeTap 会按规则重写。
+    const defaultStartTime = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`;
 
     // 每个套餐 × qty 份 → 并行加载完整套餐信息 + 价格列表
     const tasks = [];
@@ -152,6 +154,7 @@ Page({
           guaranty_discount: 0,
           startDate,
           startDateIsWeekend,
+          startTime: defaultStartTime,
           priceList: priceList || [],
           memo: '',
           timeStamp: Date.now(),

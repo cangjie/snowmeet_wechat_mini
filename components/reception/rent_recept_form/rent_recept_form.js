@@ -81,6 +81,21 @@ function formatDate(d) {
   return `${y}-${m}-${day}`;
 }
 
+function formatTime(d) {
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
+}
+
+function dateTimeForMode(mode) {
+  const now = new Date();
+  if (mode === 'delay') {
+    const tmrw = new Date(); tmrw.setDate(tmrw.getDate() + 1);
+    return { date: formatDate(tmrw), time: '00:00' };
+  }
+  return { date: formatDate(now), time: formatTime(now) };
+}
+
 function stripUI(arr) {
   return (arr || []).map(r => {
     const out = {};
@@ -274,6 +289,10 @@ Component({
       const ridx = Number(e.currentTarget.dataset.ridx);
       const mode = e.currentTarget.dataset.mode;
       const pickType = KEY_TO_PT[mode];
+      const { date, time } = dateTimeForMode(mode);
+      const today = formatDate(new Date());
+      const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);
+      const tmrw = formatDate(tmrwDate);
       const items = (this.data.displayRentals[ridx].rentItems || []).map(it => {
         // 跟随条件：自身没选过 / 上次也是从套餐继承（_modeFromPkg）。已手动自选的保持不动。
         if (it.pick_type && !it._modeFromPkg) return it;
@@ -287,6 +306,13 @@ Component({
         [`displayRentals[${ridx}].pick_type`]: pickType,
         [`displayRentals[${ridx}]._modeKey`]: mode,
         [`displayRentals[${ridx}].rentItems`]: items,
+        [`displayRentals[${ridx}].startDate`]: date,
+        [`displayRentals[${ridx}].start_date`]: date,
+        [`displayRentals[${ridx}]._startDate`]: date,
+        [`displayRentals[${ridx}]._dateIsToday`]: date === today,
+        [`displayRentals[${ridx}]._dateIsTomorrow`]: date === tmrw,
+        [`displayRentals[${ridx}].startTime`]: time,
+        [`displayRentals[${ridx}]._startTime`]: time,
       });
       this._updateRentalChip(ridx);
       this._emitSync(false);
