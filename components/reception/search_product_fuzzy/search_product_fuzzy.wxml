@@ -1,0 +1,46 @@
+<van-popup show="{{show}}" position="bottom" round bind:close="onClose">
+  <view class="search-wrap">
+    <view class="search-header">
+      <text class="search-title">搜索租赁物</text>
+      <view class="search-close" bindtap="onClose">
+        <van-icon name="cross" size="22px" color="#6b7280"/>
+      </view>
+    </view>
+
+    <view wx:if="{{categoryName}}" class="search-cat">
+      <text class="search-cat-label">当前品类</text>
+      <text class="search-cat-name">{{categoryName}}</text>
+    </view>
+
+    <view class="search-input-row">
+      <input class="search-input" placeholder="输入编码或名称" focus="{{show}}"
+        value="{{keyword}}" bindinput="onInput" confirm-type="search" bindconfirm="onSearch"/>
+      <view class="search-btn {{loading ? 'search-btn--loading' : ''}}" bindtap="onSearch">
+        <text>{{loading ? '...' : '查询'}}</text>
+      </view>
+    </view>
+
+    <scroll-view class="search-results" scroll-y>
+      <view wx:if="{{!hasSearched}}" class="search-tip">输入关键词后点查询</view>
+      <view wx:elif="{{products.length === 0}}" class="search-tip">没有匹配的租赁物</view>
+      <block wx:else wx:for="{{products}}" wx:key="id">
+        <view class="search-item {{selectedIndex === index ? 'search-item--active' : ''}}"
+          data-idx="{{index}}" bindtap="onSelect">
+          <view class="search-item-radio">
+            <view class="radio-dot {{selectedIndex === index ? 'radio-dot--active' : ''}}"></view>
+          </view>
+          <view class="search-item-body">
+            <view class="search-item-cat">{{item.category.name}}</view>
+            <view class="search-item-code">{{item.barcode}}</view>
+            <view class="search-item-name">{{item.name}}</view>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+
+    <view class="search-footer">
+      <view class="search-foot-btn search-foot-btn--ghost" bindtap="onClose">取消</view>
+      <view class="search-foot-btn search-foot-btn--primary" bindtap="onConfirm">确认</view>
+    </view>
+  </view>
+</van-popup>

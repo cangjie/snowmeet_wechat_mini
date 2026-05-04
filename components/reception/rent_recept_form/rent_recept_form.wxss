@@ -340,10 +340,22 @@
 }
 .form-input--inline { flex: 1; }
 .form-input-placeholder { color: var(--outline); }
+.form-input-text { color: var(--on-surface); }
 .form-input[disabled] {
   background: var(--surface-container);
   color: var(--outline);
 }
+.form-input--tap {
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+.form-input--disabled {
+  background: var(--surface-container);
+  color: var(--outline);
+}
+.form-input--disabled .form-input-text,
+.form-input--disabled .form-input-placeholder { color: var(--outline); }
 .code-row { display: flex; align-items: stretch; gap: 8px; }
 .code-scan-btn {
   background: var(--surface-container-high);

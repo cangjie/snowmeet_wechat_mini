@@ -187,16 +187,14 @@
                       <view class="form-group">
                         <view class="form-label">装备编码</view>
                         <view class="code-row">
-                          <input
-                            class="form-input form-input--inline"
-                            value="{{rit.code || ''}}"
-                            placeholder="输入或扫描编码"
-                            placeholder-class="form-input-placeholder"
-                            disabled="{{rit.noNeed || rit.noCode}}"
-                            catchblur="onItemFieldBlur"
+                          <view
+                            class="form-input form-input--inline form-input--tap {{(rit.noNeed || rit.noCode) ? 'form-input--disabled' : ''}}"
+                            catchtap="onItemCodeTap"
                             data-ridx="{{ridx}}"
-                            data-iidx="{{iidx}}"
-                            data-field="code"/>
+                            data-iidx="{{iidx}}">
+                            <text wx:if="{{rit.code}}" class="form-input-text">{{rit.code}}</text>
+                            <text wx:else class="form-input-placeholder">点此搜索或扫码录入</text>
+                          </view>
                           <view class="code-scan-btn {{(rit.noNeed || rit.noCode) ? 'code-scan-btn--disabled' : ''}}" catchtap="onItemScan" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
                             <van-icon name="scan" size="20px" color="#006495"/>
                           </view>
@@ -310,5 +308,12 @@
     max-date="{{calendarMax}}"
     bind:close="onCalendarClose"
     bind:confirm="onCalendarConfirm"/>
+
+  <search-product-fuzzy
+    show="{{searchShow}}"
+    category-id="{{searchCategoryId}}"
+    category-name="{{searchCategoryName}}"
+    bind:select="onProductConfirm"
+    bind:close="onSearchClose"/>
 
 </view>

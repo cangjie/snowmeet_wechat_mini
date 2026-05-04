@@ -159,6 +159,11 @@ Component({
     calendarDefault: Date.now(),
     calendarMin: Date.now(),
     calendarMax: Date.now() + 365 * 24 * 60 * 60 * 1000,
+    searchShow: false,
+    searchRidx: -1,
+    searchIidx: -1,
+    searchCategoryId: null,
+    searchCategoryName: '',
   },
 
   lifetimes: {
@@ -523,6 +528,71 @@ Component({
           this._emitSync(false);
         },
       });
+    },
+
+    /* ---------- 编码搜索 modal ---------- */
+    onItemCodeTap(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const iidx = Number(e.currentTarget.dataset.iidx);
+      const item = (this.data.displayRentals[ridx] || {}).rentItems[iidx] || {};
+      if (item.noNeed || item.noCode) return;
+      const cat = item.category || {};
+      this.setData({
+        searchShow: true,
+        searchRidx: ridx,
+        searchIidx: iidx,
+        searchCategoryId: item.category_id || cat.id || null,
+        searchCategoryName: cat.name || item.class_name || '',
+      });
+    },
+    onSearchClose() {
+      this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1 });
+    },
+    onProductConfirm(e) {
+      const product = e.detail && e.detail.product;
+      const ridx = this.data.searchRidx;
+      const iidx = this.data.searchIidx;
+      if (!product || ridx < 0 || iidx < 0) {
+        this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1 });
+        return;
+      }
+      const code = String(product.barcode || '');
+      // 重复编码校验：同一购物车内除自己以外不允许相同编码
+      const dup = (this.data.displayRentals || []).some((r, ri) =>
+        (r.rentItems || []).some((it, ii) =>
+          !it.noNeed && !it.noCode && it.code && it.code === code && !(ri === ridx && ii === iidx)
+        )
+      );
+      if (dup) {
+        wx.showToast({ title: '编码已被占用', icon: 'none' });
+        return;
+      }
+      const cur = this.data.displayRentals[ridx].rentItems[iidx];
+      const next = {
+        ...cur,
+        code,
+        name: product.name || '',
+        category_id: product.category_id != null ? product.category_id : cur.category_id,
+        rent_product_id: product.id,
+        class_name: (product.category && product.category.name) || cur.class_name || '',
+        memo: '',
+      };
+      const entry = evalEntry(next);
+      this.setData({
+        [`displayRentals[${ridx}].rentItems[${iidx}].code`]: next.code,
+        [`displayRentals[${ridx}].rentItems[${iidx}].name`]: next.name,
+        [`displayRentals[${ridx}].rentItems[${iidx}].category_id`]: next.category_id,
+        [`displayRentals[${ridx}].rentItems[${iidx}].rent_product_id`]: next.rent_product_id,
+        [`displayRentals[${ridx}].rentItems[${iidx}].class_name`]: next.class_name,
+        [`displayRentals[${ridx}].rentItems[${iidx}].memo`]: next.memo,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
+        [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
+        searchShow: false,
+        searchRidx: -1,
+        searchIidx: -1,
+      });
+      this._updateRentalChip(Number(ridx));
+      this._emitSync(false);
     },
 
     /* ---------- 4 个快捷入口 ---------- */
