@@ -121,12 +121,14 @@ Page({
     }
 
     wx.showLoading({ title: '加载中...' });
-    const startDate = util.formatDate(new Date());
-    const startDateIsWeekend = util.isWeekend(new Date());
+    const now = new Date();
+    const startDate = util.formatDate(now);
+    const startDateIsWeekend = util.isWeekend(now);
+    // 起租日期+时间合并写入 start_date（snake_case，对齐后端 Rental.start_date 字段）；
+    // camelCase startDate / startTime 后端模型上不存在，会被静默丢弃。
+    const startDateTime = `${startDate}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:00`;
     // 万龙系店铺默认为「立即租赁」（套餐 + 套餐内装备）
     const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
-    // 起租时间默认取当前时分（不分店铺）；切换模式时 onPkgModeTap 会按规则重写。
-    const defaultStartTime = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`;
 
     // 每个套餐 × qty 份 → 并行加载完整套餐信息 + 价格列表
     const tasks = [];
@@ -152,9 +154,8 @@ Page({
           guaranty: fullPkg.deposit,
           realGuaranty: fullPkg.deposit,
           guaranty_discount: 0,
-          startDate,
+          start_date: startDateTime,
           startDateIsWeekend,
-          startTime: defaultStartTime,
           priceList: priceList || [],
           memo: '',
           timeStamp: Date.now(),

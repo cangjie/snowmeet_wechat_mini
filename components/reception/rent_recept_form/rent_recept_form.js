@@ -96,6 +96,22 @@ function dateTimeForMode(mode) {
   return { date: formatDate(now), time: formatTime(now) };
 }
 
+// 后端 Rental 模型只有一个 start_date (DateTime?)；前端把日期 + 时间合并写入 start_date 持久化。
+function combineDateTime(date, time) {
+  const d = date || formatDate(new Date());
+  const t = time || '09:00';
+  return `${d}T${t}:00`;
+}
+
+// 拆 r.start_date（C# DateTime 序列化为 ISO 8601 'YYYY-MM-DDTHH:mm:ss[.fff]'，也兼容 'YYYY-MM-DD HH:mm:ss'）
+function splitISODateTime(sd) {
+  if (!sd) return { date: '', time: '' };
+  const s = String(sd);
+  const date = s.slice(0, 10);
+  const time = s.length >= 16 ? s.slice(11, 16) : '';
+  return { date, time };
+}
+
 function stripUI(arr) {
   return (arr || []).map(r => {
     const out = {};
@@ -190,7 +206,9 @@ Component({
 
         const rentalEntry = evalRental({ ...r, rentItems: items });
         const displayName = r.name || (r.category && r.category.name) || '';
-        const startDate = r.startDate || (r.start_date ? String(r.start_date).slice(0, 10) : '');
+        const sd = splitISODateTime(r.start_date);
+        const startDate = sd.date || r.startDate || '';
+        const startTime = sd.time || r.startTime || '';
 
         return {
           ...r,
@@ -204,7 +222,7 @@ Component({
           _depositInput: String(realGuaranty || ''),
           _dailyRateInput: dailyRate ? dailyRate.toFixed(2) : '',
           _startDate: startDate,
-          _startTime: r.startTime || '09:00',
+          _startTime: startTime || '09:00',
           _dateIsToday: !!startDate && startDate === today,
           _dateIsTomorrow: !!startDate && startDate === tmrw,
           _modeKey: PT_TO_KEY[r.pick_type] || '',
@@ -306,12 +324,10 @@ Component({
         [`displayRentals[${ridx}].pick_type`]: pickType,
         [`displayRentals[${ridx}]._modeKey`]: mode,
         [`displayRentals[${ridx}].rentItems`]: items,
-        [`displayRentals[${ridx}].startDate`]: date,
-        [`displayRentals[${ridx}].start_date`]: date,
+        [`displayRentals[${ridx}].start_date`]: combineDateTime(date, time),
         [`displayRentals[${ridx}]._startDate`]: date,
         [`displayRentals[${ridx}]._dateIsToday`]: date === today,
         [`displayRentals[${ridx}]._dateIsTomorrow`]: date === tmrw,
-        [`displayRentals[${ridx}].startTime`]: time,
         [`displayRentals[${ridx}]._startTime`]: time,
       });
       this._updateRentalChip(ridx);
@@ -352,9 +368,10 @@ Component({
       const today = formatDate(new Date());
       const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);
       const tmrw = formatDate(tmrwDate);
+      const r = this.data.displayRentals[ridx] || {};
+      const oldTime = splitISODateTime(r.start_date).time || r._startTime || '';
       this.setData({
-        [`displayRentals[${ridx}].startDate`]: date,
-        [`displayRentals[${ridx}].start_date`]: date,
+        [`displayRentals[${ridx}].start_date`]: combineDateTime(date, oldTime),
         [`displayRentals[${ridx}]._startDate`]: date,
         [`displayRentals[${ridx}]._dateIsToday`]: date === today,
         [`displayRentals[${ridx}]._dateIsTomorrow`]: date === tmrw,
@@ -396,10 +413,13 @@ Component({
     onPkgTimeChange(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
       const time = e.detail.value;
+      const r = this.data.displayRentals[ridx] || {};
+      const oldDate = splitISODateTime(r.start_date).date || r._startDate || formatDate(new Date());
       this.setData({
-        [`displayRentals[${ridx}].startTime`]: time,
+        [`displayRentals[${ridx}].start_date`]: combineDateTime(oldDate, time),
         [`displayRentals[${ridx}]._startTime`]: time,
       });
+      this._updateRentalChip(ridx);
       this._emitSync(false);
     },
     onPkgMemoBlur(e) {
