@@ -33,6 +33,7 @@
               <view class="pkg-row-name-wrap">
                 <text class="pkg-row-name">{{pkg._displayName}}</text>
                 <view wx:if="{{pkg._kindLabel}}" class="chip chip-primary">{{pkg._kindLabel}}</view>
+                <view class="chip {{pkg._rentalEntered ? 'chip-success' : 'chip-pending'}}">{{pkg._rentalStatusLabel}}</view>
               </view>
               <view class="pkg-row-meta">
                 <text class="pkg-row-meta-item">押金 ¥{{pkg._depositLabel}}</text>

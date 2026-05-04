@@ -47,6 +47,20 @@ function evalEntry(item) {
   return { ok: false, label: missing[0] };
 }
 
+// rental（购物车套餐项）级录入完整性判定，按优先级返回第一个缺项：
+//   1. 没选租赁模式 → 「模式未选」
+//   2. 没填起租日期 → 「起租时间未填」（startTime 有默认值不参与判定）
+//   3. rentItems 有 N 件未录入（noNeed 不计） → 「N 件未录入」
+//   4. 全齐 → 「已录入」
+function evalRental(rental) {
+  if (!rental || !rental.pick_type) return { ok: false, label: '模式未选' };
+  if (!rental.startDate && !rental.start_date) return { ok: false, label: '起租时间未填' };
+  const items = rental.rentItems || [];
+  const unfinished = items.filter(it => !it.noNeed && !evalEntry(it).ok).length;
+  if (unfinished > 0) return { ok: false, label: `${unfinished} 件未录入` };
+  return { ok: true, label: '已录入' };
+}
+
 // 估算字符串视觉宽度（汉字/全角=1，半角=0.5）。卡片标题列宽度大约能放 11~12 个汉字宽度。
 function visualLen(s) {
   let n = 0;
@@ -140,6 +154,8 @@ Component({
         items.forEach(it => { if (!it.noNeed) modeSet.add(it.pick_type || ''); });
         const modeMixed = modeSet.size > 1;
 
+        const rentalEntry = evalRental({ ...r, rentItems: items });
+
         return {
           ...r,
           _key: key,
@@ -154,6 +170,8 @@ Component({
           _startTime: r.startTime || '09:00',
           _modeKey: PT_TO_KEY[r.pick_type] || '',
           _modeMixed: modeMixed,
+          _rentalEntered: rentalEntry.ok,
+          _rentalStatusLabel: rentalEntry.label,
           rentItems: items,
         };
       });
@@ -180,6 +198,16 @@ Component({
 
     _emitSync(needUpdate) {
       this.triggerEvent('syncRent', { rentals: stripUI(this.data.displayRentals), needUpdate: !!needUpdate });
+    },
+
+    _updateRentalChip(ridx) {
+      const r = this.data.displayRentals[ridx];
+      if (!r) return;
+      const entry = evalRental(r);
+      this.setData({
+        [`displayRentals[${ridx}]._rentalEntered`]: entry.ok,
+        [`displayRentals[${ridx}]._rentalStatusLabel`]: entry.label,
+      });
     },
 
     /* ---------- 排序 ---------- */
@@ -230,6 +258,7 @@ Component({
         [`displayRentals[${ridx}]._modeKey`]: mode,
         [`displayRentals[${ridx}].rentItems`]: items,
       });
+      this._updateRentalChip(ridx);
       this._emitSync(false);
     },
     onPkgModeMixedTap() {
@@ -271,6 +300,7 @@ Component({
         [`displayRentals[${ridx}].start_date`]: date,
         [`displayRentals[${ridx}]._startDate`]: date,
       });
+      this._updateRentalChip(ridx);
       this._emitSync(false);
     },
     onPkgTimeChange(e) {
@@ -297,6 +327,7 @@ Component({
         [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
         [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
       });
+      this._updateRentalChip(Number(ridx));
       this._emitSync(false);
     },
     onItemCodeFlag(e) {
@@ -336,6 +367,7 @@ Component({
       patch[`${path}._statusLabel`] = entry.label;
 
       this.setData(patch);
+      this._updateRentalChip(Number(ridx));
       this._emitSync(false);
     },
     onItemModeTap(e) {
@@ -352,6 +384,7 @@ Component({
         [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
         [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
       });
+      this._updateRentalChip(Number(ridx));
       this._emitSync(false);
     },
     onItemScan(e) {
@@ -368,6 +401,7 @@ Component({
             [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
             [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
           });
+          this._updateRentalChip(Number(ridx));
           this._emitSync(false);
         },
       });
