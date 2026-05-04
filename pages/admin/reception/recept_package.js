@@ -160,7 +160,7 @@ Page({
           memo: '',
           timeStamp: Date.now(),
           pick_type: defaultPickType,
-          atOnce: defaultPickType === '立即租赁' ? true : null,
+          atOnce: defaultPickType === '立即租赁',
         };
         rental.rentItems = (fullPkg.rentPackageItemCategories || []).map(itemCat => {
           const cats = itemCat.categories || [];
@@ -182,7 +182,7 @@ Page({
             memo: '',
             category: cats[0] || null,
             pick_type: defaultPickType,
-            atOnce: defaultPickType === '立即租赁' ? true : null,
+            atOnce: defaultPickType === '立即租赁',
           };
         });
         util.createRentalDetail(rental, new Date(startDate), new Date(startDate));
