@@ -23,8 +23,9 @@
     <scroll-view class="search-results" scroll-y>
       <view wx:if="{{!hasSearched}}" class="search-tip">输入关键词后点查询</view>
       <view wx:elif="{{products.length === 0}}" class="search-tip">没有匹配的租赁物</view>
-      <block wx:else wx:for="{{products}}" wx:key="id">
-        <view class="search-item {{selectedIndex === index ? 'search-item--active' : ''}}"
+      <block wx:else>
+        <view wx:for="{{products}}" wx:key="id"
+          class="search-item {{selectedIndex === index ? 'search-item--active' : ''}}"
           data-idx="{{index}}" bindtap="onSelect">
           <view class="search-item-radio">
             <view class="radio-dot {{selectedIndex === index ? 'radio-dot--active' : ''}}"></view>
