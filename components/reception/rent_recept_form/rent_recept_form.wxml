@@ -273,22 +273,18 @@
     </view>
 
     <view class="checkout-bar">
-      <view class="checkout-prices">
-        <view class="checkout-price-row">
-          <text class="checkout-label">押金总计</text>
-          <text class="checkout-deposit">¥{{summary.depositLabel}}</text>
-        </view>
-        <view class="checkout-sub-row">
-          <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">押金减免 -¥{{summary.depositReduceLabel}}</text>
-          <text class="checkout-rent">租金 ¥{{summary.rentLabel}}</text>
-        </view>
+      <view class="checkout-info">
+        <view class="checkout-count">共 {{summary.count}} 件</view>
+        <text class="checkout-deposit">押金 ¥{{summary.depositLabel}}</text>
+        <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">减免 -¥{{summary.depositReduceLabel}}</text>
+        <text class="checkout-rent">租金 ¥{{summary.rentLabel}}</text>
       </view>
       <button
-        class="checkout-btn {{displayRentals.length === 0 ? 'checkout-btn--disabled' : ''}}"
-        disabled="{{displayRentals.length === 0}}"
+        class="checkout-btn {{!summary.canCheckout ? 'checkout-btn--disabled' : ''}}"
+        disabled="{{!summary.canCheckout}}"
         bindtap="onCheckout">
         去结算
-        <van-icon name="arrow" size="16px" color="#ffffff" custom-style="margin-left:6px"/>
+        <van-icon name="arrow" size="14px" color="#ffffff" custom-style="margin-left:4px"/>
       </button>
     </view>
   </view>

@@ -113,6 +113,8 @@ Component({
       depositReduce: 0,
       depositReduceLabel: '0',
       rentLabel: '0.00',
+      count: 0,
+      canCheckout: false,
     },
   },
 
@@ -185,17 +187,22 @@ Component({
 
     _refreshSummary() {
       let deposit = 0, rent = 0, reduce = 0;
-      (this.data.displayRentals || []).forEach(r => {
+      const list = this.data.displayRentals || [];
+      list.forEach(r => {
         deposit += Number(r._depositLabel) || 0;
         rent += Number(r._dailyRate) || 0;
         reduce += Number(r.guaranty_discount) || 0;
       });
+      const count = list.length;
+      const canCheckout = count > 0 && list.every(r => r._rentalEntered);
       this.setData({
         summary: {
           depositLabel: deposit.toLocaleString('en-US'),
           depositReduce: reduce,
           depositReduceLabel: reduce.toLocaleString('en-US'),
           rentLabel: rent.toFixed(2),
+          count,
+          canCheckout,
         },
       });
     },
@@ -212,6 +219,7 @@ Component({
         [`displayRentals[${ridx}]._rentalEntered`]: entry.ok,
         [`displayRentals[${ridx}]._rentalStatusLabel`]: entry.label,
       });
+      this._refreshSummary();
     },
 
     /* ---------- 排序 ---------- */
