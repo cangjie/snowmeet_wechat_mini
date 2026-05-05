@@ -45,6 +45,10 @@ Page({
   /* ---------- 生命周期 ---------- */
 
   async onLoad(options) {
+    // 等待 app 登录流程把测试/生产域名切换到位（开发/体验版从 domain.txt 读测试域名）
+    // 否则直接进入本页时 globalData.requestPrefix 还是默认 mini.snowmeet.top，会打到生产域名
+    await app.loginPromiseNew;
+
     // 优先从订单id获取顾客信息，如果订单id为空或者从订单获取到的用户信息为空，则需要从参数获取顾客信息。
     const draft = wx.getStorageSync('reception_draft') || {};
     const bizType = safeDecode(options.bizType) || draft.bizType || 'rent';
