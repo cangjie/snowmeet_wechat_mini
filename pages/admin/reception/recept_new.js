@@ -161,15 +161,20 @@ Page({
     wx.showToast({ title: (labels[action] || '操作') + '（下一步迭代）', icon: 'none' });
   },
 
-  // 「搜索单品」选中产品后：构造 package_id=null 的 rental（含 1 个填充好的 rentItem）追加到购物车
-  // 流程参考旧版 components/rent/rent_recept.js#selectProduct
+  // 「搜索单品」选中产品后：构造 package_id=null 的 rental 追加到购物车
+  // rentItems = [主项（已填好编码/名称）, ...附件项（按品类带的 associateCategories 自动生成）]
+  // 后端 SaveRentRecept 保存后会调 BuildAssociates 同步关联表，但返回的 order 不含新插入的附件项，
+  // 所以前端必须自己构造附件项一起提交（参考 RentController.cs#BuildAssociates 4363-4400）
   async onAddSingleProduct(e) {
     const product = (e.detail || {}).product;
     if (!product || !product.category) return;
     const data = require('../../../utils/data.js');
     wx.showLoading({ title: '加载中...', mask: true });
     try {
-      const shopObj = await data.getShopByNamePromise(this.data.shop || '');
+      const [shopObj, fullCategory] = await Promise.all([
+        data.getShopByNamePromise(this.data.shop || ''),
+        data.getRentCategoryPromise(product.category.id),
+      ]);
       if (!shopObj || !shopObj.id) {
         wx.hideLoading();
         wx.showToast({ title: '店铺信息未加载，请重试', icon: 'none' });
@@ -185,6 +190,55 @@ Page({
       const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
       const atOnce = defaultPickType === '立即租赁';
       const deposit = (product.category && product.category.deposit) || 0;
+
+      // 主装备项（已填好的单品）
+      const mainItem = {
+        id: 0,
+        rental_id: 0,
+        is_associate: false,
+        noCode: false,
+        canChooseCategory: false,
+        chooseCategories: [product.category],
+        chooseingCategory: false,
+        categoryName: product.category.name,
+        class_name: product.category.name,
+        name: product.name || '',
+        code: String(product.barcode || ''),
+        rent_product_id: product.id,
+        category_id: product.category.id,
+        memo: '',
+        category: product.category,
+        pick_type: defaultPickType,
+        atOnce,
+        valid: 1,
+      };
+
+      // 附件项：按品类的 associateCategories 自动生成（如租双板带雪杖）
+      // 字段对齐后端 BuildAssociates 默认值：noCode=true, atOnce=true, is_associate=true
+      const associates = (fullCategory && fullCategory.associateCategories) || [];
+      const associateItems = associates.map(a => {
+        const cat = a.category || {};
+        return {
+          id: 0,
+          rental_id: 0,
+          is_associate: true,
+          noCode: true,
+          canChooseCategory: false,
+          chooseCategories: [cat],
+          chooseingCategory: false,
+          categoryName: cat.name || '',
+          class_name: cat.name || '',
+          name: null,
+          code: null,
+          rent_product_id: null,
+          category_id: a.associate_id,
+          memo: '',
+          category: cat,
+          pick_type: defaultPickType,
+          atOnce,
+          valid: 1,
+        };
+      });
 
       const rental = {
         id: 0,
@@ -205,24 +259,7 @@ Page({
         pick_type: defaultPickType,
         atOnce,
         category: product.category,
-        rentItems: [{
-          id: 0,
-          rental_id: 0,
-          noCode: false,
-          canChooseCategory: false,
-          chooseCategories: [product.category],
-          chooseingCategory: false,
-          categoryName: product.category.name,
-          class_name: product.category.name,
-          name: product.name || '',
-          code: String(product.barcode || ''),
-          rent_product_id: product.id,
-          category_id: product.category.id,
-          memo: '',
-          category: product.category,
-          pick_type: defaultPickType,
-          atOnce,
-        }],
+        rentItems: [mainItem, ...associateItems],
       };
       util.createRentalDetail(rental, new Date(startDate), new Date(startDate));
       this._appendRentals([rental]);
