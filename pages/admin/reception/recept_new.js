@@ -156,8 +156,81 @@ Page({
       });
       return;
     }
-    const labels = { search: '搜索单品', noCode: '无码物品' };
+    // search 由子组件内部处理（开搜索 modal → addSingleProduct 事件 → onAddSingleProduct）
+    const labels = { noCode: '无码物品' };
     wx.showToast({ title: (labels[action] || '操作') + '（下一步迭代）', icon: 'none' });
+  },
+
+  // 「搜索单品」选中产品后：构造 package_id=null 的 rental（含 1 个填充好的 rentItem）追加到购物车
+  // 流程参考旧版 components/rent/rent_recept.js#selectProduct
+  async onAddSingleProduct(e) {
+    const product = (e.detail || {}).product;
+    if (!product || !product.category) return;
+    const data = require('../../../utils/data.js');
+    wx.showLoading({ title: '加载中...', mask: true });
+    try {
+      const shopObj = await data.getShopByNamePromise(this.data.shop || '');
+      if (!shopObj || !shopObj.id) {
+        wx.hideLoading();
+        wx.showToast({ title: '店铺信息未加载，请重试', icon: 'none' });
+        return;
+      }
+      const priceList = await data.getRentPriceListPromise(shopObj.id, '分类', product.category.id, '门市');
+      wx.hideLoading();
+
+      const now = new Date();
+      const startDate = util.formatDate(now);
+      const startDateIsWeekend = util.isWeekend(now);
+      const startDateTime = `${startDate}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:00`;
+      const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
+      const atOnce = defaultPickType === '立即租赁';
+      const deposit = (product.category && product.category.deposit) || 0;
+
+      const rental = {
+        id: 0,
+        order_id: null,
+        package_id: null,
+        category_id: product.category.id,
+        name: product.category.name,
+        valid: 0,
+        expectDays: 1,
+        guaranty: deposit,
+        realGuaranty: deposit,
+        guaranty_discount: 0,
+        start_date: startDateTime,
+        startDateIsWeekend,
+        priceList: priceList || [],
+        memo: '',
+        timeStamp: Date.now(),
+        pick_type: defaultPickType,
+        atOnce,
+        category: product.category,
+        rentItems: [{
+          id: 0,
+          rental_id: 0,
+          noCode: false,
+          canChooseCategory: false,
+          chooseCategories: [product.category],
+          chooseingCategory: false,
+          categoryName: product.category.name,
+          class_name: product.category.name,
+          name: product.name || '',
+          code: String(product.barcode || ''),
+          rent_product_id: product.id,
+          category_id: product.category.id,
+          memo: '',
+          category: product.category,
+          pick_type: defaultPickType,
+          atOnce,
+        }],
+      };
+      util.createRentalDetail(rental, new Date(startDate), new Date(startDate));
+      this._appendRentals([rental]);
+    } catch (err) {
+      wx.hideLoading();
+      console.warn('onAddSingleProduct failed', err);
+      wx.showToast({ title: '添加失败，请重试', icon: 'error' });
+    }
   },
 
   _appendRentals(rentals) {

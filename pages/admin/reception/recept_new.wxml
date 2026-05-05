@@ -33,6 +33,7 @@
       rentals="{{order.rentals}}"
       bind:syncRent="onSyncRent"
       bind:addAction="onAddAction"
+      bind:addSingleProduct="onAddSingleProduct"
       bind:editRental="onEditRental"
       bind:checkout="onCheckout"
       bind:sortChange="onSortChange" />

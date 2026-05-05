@@ -164,6 +164,9 @@ Component({
     searchIidx: -1,
     searchCategoryId: null,
     searchCategoryName: '',
+    // 区分 modal 触发来源：true=底部"搜索单品"入口（全库搜，选中后新增 rental）
+    //                      false=rentItem 编码区点击（按品类搜，选中后填充已存在槽位）
+    searchAddNew: false,
   },
 
   lifetimes: {
@@ -546,17 +549,37 @@ Component({
       });
     },
     onSearchClose() {
-      this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1 });
+      this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1, searchAddNew: false });
     },
     onProductConfirm(e) {
       const product = e.detail && e.detail.product;
-      const ridx = this.data.searchRidx;
-      const iidx = this.data.searchIidx;
-      if (!product || ridx < 0 || iidx < 0) {
-        this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1 });
+      if (!product) {
+        this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1, searchAddNew: false });
         return;
       }
       const code = String(product.barcode || '');
+      // 「搜索单品」底部入口：选中后由 page 构造 rental 追加到购物车
+      if (this.data.searchAddNew) {
+        const dupAddNew = (this.data.displayRentals || []).some(r =>
+          (r.rentItems || []).some(it =>
+            !it.noNeed && !it.noCode && it.code && it.code === code
+          )
+        );
+        if (dupAddNew) {
+          wx.showToast({ title: '编码已被占用', icon: 'none' });
+          return;
+        }
+        this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1, searchAddNew: false });
+        this.triggerEvent('addSingleProduct', { product });
+        return;
+      }
+      // rentItem 编码区点击：填充已存在槽位
+      const ridx = this.data.searchRidx;
+      const iidx = this.data.searchIidx;
+      if (ridx < 0 || iidx < 0) {
+        this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1 });
+        return;
+      }
       // 重复编码校验：同一购物车内除自己以外不允许相同编码
       const dup = (this.data.displayRentals || []).some((r, ri) =>
         (r.rentItems || []).some((it, ii) =>
@@ -598,6 +621,18 @@ Component({
     /* ---------- 4 个快捷入口 ---------- */
     onAddAction(e) {
       const action = e.currentTarget.dataset.action;
+      // 「搜索单品」内部直接打开搜索 modal（全库搜，无 categoryId）
+      if (action === 'search') {
+        this.setData({
+          searchShow: true,
+          searchAddNew: true,
+          searchRidx: -1,
+          searchIidx: -1,
+          searchCategoryId: null,
+          searchCategoryName: '',
+        });
+        return;
+      }
       this.triggerEvent('addAction', { action });
     },
 
