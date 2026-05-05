@@ -1,7 +1,70 @@
 import fuiConfig from './components/firstui/fui-config/index'
 var util = require('./utils/util.js')
+
+function containsChinese(str) {
+  return /[\u4e00-\u9fff]/.test(str)
+}
+
+function tryDecodeChinese(str) {
+  if (typeof str !== 'string' || str.indexOf('%') < 0) {
+    return str
+  }
+  try {
+    var decoded = decodeURIComponent(str)
+    return containsChinese(decoded) ? decoded : str
+  }
+  catch (e) {
+    return str
+  }
+}
+
+function decodeChineseInPostData(data) {
+  if (data == null || data == undefined) {
+    return data
+  }
+  if (Array.isArray(data)) {
+    return data.map(function (item) {
+      return decodeChineseInPostData(item)
+    })
+  }
+  if (typeof data === 'object') {
+    var out = {}
+    Object.keys(data).forEach(function (key) {
+      out[key] = decodeChineseInPostData(data[key])
+    })
+    return out
+  }
+  if (typeof data === 'string') {
+    return tryDecodeChinese(data)
+  }
+  return data
+}
+
+function patchWxRequestPostDataDecoder() {
+  if (wx.__snowmeetPostDataDecodedPatched) {
+    return
+  }
+  var rawRequest = wx.request
+  wx.request = function (options) {
+    try {
+      if (options && typeof options === 'object') {
+        var method = (options.method || 'GET').toUpperCase()
+        if (method === 'POST' && options.data != null) {
+          options.data = decodeChineseInPostData(options.data)
+        }
+      }
+    }
+    catch (e) {
+      console.warn('patch wx.request decode post data fail', e)
+    }
+    return rawRequest.call(wx, options)
+  }
+  wx.__snowmeetPostDataDecodedPatched = true
+}
+
 App({
   onLaunch: function (res) {
+    patchWxRequestPostDataDecoder()
     wx.$fui = fuiConfig
 
     const updateManager = wx.getUpdateManager()
