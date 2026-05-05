@@ -20,11 +20,20 @@
       </view>
     </view>
 
+    <scroll-view wx:if="{{hasSearched && categoryFilters.length > 1}}"
+      class="search-filter-row" scroll-x scroll-with-animation>
+      <view class="search-filter-chip {{activeFilterCatId === null ? 'search-filter-chip--active' : ''}}"
+        data-cid="" bindtap="onFilterTap">全部 {{products.length}}</view>
+      <view wx:for="{{categoryFilters}}" wx:key="id"
+        class="search-filter-chip {{activeFilterCatId === item.id ? 'search-filter-chip--active' : ''}}"
+        data-cid="{{item.id}}" bindtap="onFilterTap">{{item.name}} {{item.count}}</view>
+    </scroll-view>
+
     <scroll-view class="search-results" scroll-y>
       <view wx:if="{{!hasSearched}}" class="search-tip">输入关键词后点查询</view>
-      <view wx:elif="{{products.length === 0}}" class="search-tip">没有匹配的租赁物</view>
+      <view wx:elif="{{displayProducts.length === 0}}" class="search-tip">没有匹配的租赁物</view>
       <block wx:else>
-        <view wx:for="{{products}}" wx:key="id"
+        <view wx:for="{{displayProducts}}" wx:key="id"
           class="search-item {{selectedIndex === index ? 'search-item--active' : ''}}"
           data-idx="{{index}}" bindtap="onSelect">
           <view class="search-item-radio">

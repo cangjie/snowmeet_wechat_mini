@@ -70,6 +70,30 @@
   opacity: 0.6;
 }
 
+.search-filter-row {
+  white-space: nowrap;
+  margin-bottom: 16rpx;
+  padding-bottom: 4rpx;
+}
+.search-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 48rpx;
+  padding: 0 20rpx;
+  margin-right: 12rpx;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 24rpx;
+  border-radius: 24rpx;
+  border: 1rpx solid transparent;
+}
+.search-filter-chip--active {
+  background: #e0f2fe;
+  color: #006495;
+  border-color: #006495;
+  font-weight: 500;
+}
+
 .search-results {
   height: 600rpx;
   border: 1rpx solid #e5e7eb;
