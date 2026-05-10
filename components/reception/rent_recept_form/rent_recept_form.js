@@ -32,11 +32,15 @@ function getDailyRate(rental) {
 }
 // 录入完整性判定：
 //   - noNeed=true → 不显示 chip（label 留空）
+//   - 主项（!is_associate）必须有 category_id（无码物品入口创建时为 null，需用户选分类）
 //   - 否则按 noCode 决定校验 code 还是 name；并且 pick_type 必选
-//   - 完整 → "已录入"；缺项 → "编码未填、模式未选" 等
+//   - 完整 → "已录入"；缺项 → "分类未选 / 编码未填 / 模式未选" 等
 //   - 附件项（is_associate=true）走同一套校验：noCode 默认 true → 必须录名称
 function evalEntry(item) {
   if (item && item.noNeed) return { ok: true, label: '' };
+  if (item && !item.is_associate && !item.category_id) {
+    return { ok: false, label: '分类未选' };
+  }
   const missing = [];
   if (item && item.noCode) {
     if (!String((item && item.name) || '').trim()) missing.push('名称未填');
@@ -168,6 +172,15 @@ Component({
     // 区分 modal 触发来源：true=底部"搜索单品"入口（全库搜，选中后新增 rental）
     //                      false=rentItem 编码区点击（按品类搜，选中后填充已存在槽位）
     searchAddNew: false,
+
+    // 分类选择 modal（用于无码物品 rentItem 选分类，及修改主项分类时联动重建附件）
+    categoryShow: false,
+    categoryRidx: -1,
+    categoryIidx: -1,
+    categoryItems: [],            // van-tree-select 数据：[{ text, id, children: [{text,id}] }]
+    categoryRaw: [],              // 与 categoryItems 同序的完整分类对象，confirm 时按 activeId 取
+    categoryMainActiveIndex: 0,
+    categoryActiveId: null,
   },
 
   lifetimes: {
@@ -192,9 +205,11 @@ Component({
 
         const items = (r.rentItems || []).map((it, iidx) => {
           const ikey = itemKey(it, idx, iidx);
-          if (expandedItem[ikey] === undefined) expandedItem[ikey] = false;
+          // 待选分类的主项（无码物品入口创建时）默认展开，让用户立刻看到分类入口
+          const needsCategory = !it.is_associate && !it.category_id && !it.noNeed;
+          if (expandedItem[ikey] === undefined) expandedItem[ikey] = needsCategory;
           const catName = it.class_name || it.categoryName || (it.category && it.category.name) || '';
-          const title = catName || it.name || '待录入';
+          const title = catName || it.name || (needsCategory ? '待选分类' : '待录入');
           const entry = evalEntry(it);
           return {
             ...it,
@@ -617,6 +632,173 @@ Component({
       });
       this._updateRentalChip(Number(ridx));
       this._emitSync(false);
+    },
+
+    /* ---------- 分类选择 modal（无码物品主项选分类 / 主项分类切换） ---------- */
+    async onItemCategoryTap(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const iidx = Number(e.currentTarget.dataset.iidx);
+      const item = ((this.data.displayRentals[ridx] || {}).rentItems || [])[iidx];
+      if (!item || item.is_associate || item.noNeed) return;
+      await this._ensureCategoryTreeLoaded();
+      // 主 nav 默认定位到当前 category 所属的顶级
+      let mainIdx = 0;
+      const tree = this.data.categoryItems || [];
+      for (let i = 0; i < tree.length; i++) {
+        const ch = tree[i].children || [];
+        if (ch.some(c => c.id === item.category_id)) { mainIdx = i; break; }
+      }
+      await this._loadCategorySub(mainIdx);
+      this.setData({
+        categoryShow: true,
+        categoryRidx: ridx,
+        categoryIidx: iidx,
+        categoryActiveId: item.category_id || null,
+        categoryMainActiveIndex: mainIdx,
+      });
+    },
+
+    async _ensureCategoryTreeLoaded() {
+      if ((this.data.categoryItems || []).length > 0) return;
+      const data = require('../../../utils/data.js');
+      const tops = await data.getTopCategoriesPromise();
+      const list = (tops || []).map(c => ({ text: c.name, id: c.id }));
+      this.setData({ categoryItems: list, categoryRaw: tops || [] });
+    },
+
+    async _loadCategorySub(mainIdx) {
+      const tree = (this.data.categoryItems || []).slice();
+      if (!tree[mainIdx] || tree[mainIdx].children) return;
+      const data = require('../../../utils/data.js');
+      const top = tree[mainIdx];
+      const sub = (await data.getSubCategoriesPromise(top.id)) || [];
+      const childMap = this.data._categoryChildMap || {};
+      sub.forEach(c => { childMap[c.id] = c; });
+      tree[mainIdx] = { ...top, children: sub.map(c => ({ text: c.name, id: c.id })) };
+      this.setData({ categoryItems: tree, _categoryChildMap: childMap });
+    },
+
+    async onCategoryNav(e) {
+      const idx = (e.detail && e.detail.index) != null ? e.detail.index : 0;
+      await this._loadCategorySub(idx);
+      this.setData({ categoryMainActiveIndex: idx });
+    },
+
+    onCategoryItemTap(e) {
+      const id = e.detail && e.detail.id;
+      if (id != null) this.setData({ categoryActiveId: id });
+    },
+
+    onCategoryClose() {
+      this.setData({ categoryShow: false, categoryRidx: -1, categoryIidx: -1, categoryActiveId: null });
+    },
+
+    onCategoryConfirm() {
+      const activeId = this.data.categoryActiveId;
+      if (!activeId) {
+        wx.showToast({ title: '未选择分类', icon: 'none' });
+        return;
+      }
+      const childMap = this.data._categoryChildMap || {};
+      const chosen = childMap[activeId];
+      if (!chosen) {
+        wx.showToast({ title: '分类无效', icon: 'none' });
+        return;
+      }
+      const ridx = this.data.categoryRidx;
+      const iidx = this.data.categoryIidx;
+      this.setData({ categoryShow: false, categoryRidx: -1, categoryIidx: -1, categoryActiveId: null });
+      this._applyCategoryChange(ridx, iidx, chosen);
+    },
+
+    // 主项分类变更：拉 fullCategory + priceList → 更新主项 + 删旧附件 + 按新 associateCategories 重建附件
+    // → 同步 rental 的 category_id / name / guaranty / priceList → emit syncRent 让父页保存
+    async _applyCategoryChange(ridx, iidx, newCat) {
+      if (ridx < 0 || iidx < 0 || !newCat) return;
+      const dataLib = require('../../../utils/data.js');
+      const util = require('../../../utils/util.js');
+      wx.showLoading({ title: '加载中...', mask: true });
+      try {
+        const [fullCat, shopObj] = await Promise.all([
+          dataLib.getRentCategoryPromise(newCat.id),
+          dataLib.getShopByNamePromise(this.properties.shop || ''),
+        ]);
+        if (!shopObj || !shopObj.id) {
+          wx.hideLoading();
+          wx.showToast({ title: '店铺信息未加载，请重试', icon: 'none' });
+          return;
+        }
+        const priceList = await dataLib.getRentPriceListPromise(shopObj.id, '分类', newCat.id, '门市');
+        wx.hideLoading();
+
+        const rentals = stripUI(this.data.displayRentals);
+        const rental = rentals[ridx];
+        if (!rental || !rental.rentItems || !rental.rentItems[iidx]) return;
+
+        // 1) 主项 rentItem 字段更新
+        const main = rental.rentItems[iidx];
+        main.category_id = newCat.id;
+        main.category = newCat;
+        main.class_name = newCat.name || '';
+        main.categoryName = newCat.name || '';
+        main.chooseCategories = [newCat];
+        main.canChooseCategory = false;
+
+        // 2) 删旧附件 + 按新分类的 associateCategories 重建
+        const nonAssociates = rental.rentItems.filter(it => !it.is_associate);
+        const associates = (fullCat && fullCat.associateCategories) || [];
+        const defaultPickType = rental.pick_type;
+        const atOnce = !!rental.atOnce;
+        const newAssociates = associates.map(a => {
+          const cat = a.category || {};
+          return {
+            id: 0,
+            rental_id: 0,
+            is_associate: true,
+            noCode: true,
+            canChooseCategory: false,
+            chooseCategories: [cat],
+            chooseingCategory: false,
+            categoryName: cat.name || '',
+            class_name: cat.name || '',
+            name: null,
+            code: null,
+            rent_product_id: null,
+            category_id: a.associate_id,
+            memo: '',
+            category: cat,
+            pick_type: defaultPickType,
+            atOnce,
+            valid: 1,
+          };
+        });
+        rental.rentItems = nonAssociates.concat(newAssociates);
+
+        // 3) 同步 rental 字段（参考旧版 confirmCategory 语义）
+        rental.category_id = newCat.id;
+        rental.category = newCat;
+        rental.name = newCat.name || '';
+        rental.guaranty = newCat.deposit || 0;
+        rental.realGuaranty = newCat.deposit || 0;
+        rental.guaranty_discount = 0;
+        rental.priceList = priceList || [];
+
+        // 4) 用 util.createRentalDetail 重算 pricePresets（getDailyRate 取 pricePresets[0].price）
+        const sd = splitISODateTime(rental.start_date);
+        const startDateStr = sd.date || formatDate(new Date());
+        try {
+          util.createRentalDetail(rental, new Date(startDateStr), new Date(startDateStr));
+        } catch (e) {
+          console.warn('createRentalDetail failed', e);
+        }
+
+        // 5) 触发父页保存（needUpdate=true 走 SaveRentRecept；保存返回会经 properties observer 回流刷新）
+        this.triggerEvent('syncRent', { rentals, needUpdate: true });
+      } catch (err) {
+        wx.hideLoading();
+        console.warn('apply category change failed', err);
+        wx.showToast({ title: '设置分类失败，请重试', icon: 'error' });
+      }
     },
 
     /* ---------- 4 个快捷入口 ---------- */
