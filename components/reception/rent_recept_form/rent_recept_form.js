@@ -34,14 +34,9 @@ function getDailyRate(rental) {
 //   - noNeed=true → 不显示 chip（label 留空）
 //   - 否则按 noCode 决定校验 code 还是 name；并且 pick_type 必选
 //   - 完整 → "已录入"；缺项 → "编码未填、模式未选" 等
+//   - 附件项（is_associate=true）走同一套校验：noCode 默认 true → 必须录名称
 function evalEntry(item) {
   if (item && item.noNeed) return { ok: true, label: '' };
-  // 附件项（is_associate=true）由租赁品类自动带出，不强制录入编码/名称；
-  // 模式仍要求选（与主项保持一致，rental 级模式联动会同步覆盖）
-  if (item && item.is_associate) {
-    if (!item.pick_type) return { ok: false, label: '模式未选' };
-    return { ok: true, label: '已录入' };
-  }
   const missing = [];
   if (item && item.noCode) {
     if (!String((item && item.name) || '').trim()) missing.push('名称未填');
