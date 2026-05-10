@@ -24,8 +24,8 @@
           "scene": null
         },
         {
-          "name": "pages/template/stitch/_1/index",
-          "pathName": "pages/template/stitch/_1/index",
+          "name": "recept_entry",
+          "pathName": "pages/admin/reception/recept_entry",
           "query": "",
           "launchMode": "default",
           "scene": null
@@ -51,5 +51,5 @@
     "checkInvalidKey": true,
     "ignoreDevUnusedFiles": true
   },
-  "projectname": "ai_snowmeet_wechat_mini"
+  "projectname": "snowmeet_wechat_mini"
 }

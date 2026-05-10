@@ -170,6 +170,18 @@
                     </view>
 
                     <view wx:if="{{rit._expanded}}" class="item-form">
+                      <view wx:if="{{!rit.is_associate}}" class="form-group">
+                        <view class="form-label">分类</view>
+                        <view
+                          class="form-input form-input--inline form-input--tap {{rit.noNeed ? 'form-input--disabled' : ''}}"
+                          catchtap="onItemCategoryTap"
+                          data-ridx="{{ridx}}"
+                          data-iidx="{{iidx}}">
+                          <text wx:if="{{rit.category_id}}" class="form-input-text">{{rit.class_name || rit.categoryName}}</text>
+                          <text wx:else class="form-input-placeholder">点此选择分类</text>
+                        </view>
+                      </view>
+
                       <view class="form-group">
                         <view class="form-label">租赁物名称</view>
                         <input
@@ -315,5 +327,32 @@
     category-name="{{searchCategoryName}}"
     bind:select="onProductConfirm"
     bind:close="onSearchClose"/>
+
+  <van-popup
+    show="{{categoryShow}}"
+    position="bottom"
+    round
+    custom-style="height: 75vh;"
+    bind:close="onCategoryClose">
+    <view class="cat-modal">
+      <view class="cat-modal-header">
+        <view class="cat-modal-title">选择分类</view>
+        <view class="cat-modal-close" catchtap="onCategoryClose">
+          <van-icon name="cross" size="20px" color="#6f7881"/>
+        </view>
+      </view>
+      <van-tree-select
+        items="{{categoryItems}}"
+        main-active-index="{{categoryMainActiveIndex}}"
+        active-id="{{categoryActiveId}}"
+        height="55vh"
+        bind:click-nav="onCategoryNav"
+        bind:click-item="onCategoryItemTap"/>
+      <view class="cat-modal-footer">
+        <view class="cat-modal-btn cat-modal-btn--cancel" catchtap="onCategoryClose">取消</view>
+        <view class="cat-modal-btn cat-modal-btn--confirm" catchtap="onCategoryConfirm">确认</view>
+      </view>
+    </view>
+  </van-popup>
 
 </view>

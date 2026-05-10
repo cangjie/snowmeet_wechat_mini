@@ -156,9 +156,69 @@ Page({
       });
       return;
     }
+    if (action === 'noCode') {
+      this._addBlankRental();
+      return;
+    }
     // search 由子组件内部处理（开搜索 modal → addSingleProduct 事件 → onAddSingleProduct）
-    const labels = { noCode: '无码物品' };
-    wx.showToast({ title: (labels[action] || '操作') + '（下一步迭代）', icon: 'none' });
+    wx.showToast({ title: '操作（下一步迭代）', icon: 'none' });
+  },
+
+  // 「无码物品」入口：追加一个 category_id=null 的 rental 含一个待选分类的主项 rentItem。
+  // 用户在 form 组件内点 rentItem 的「分类」行打开分类选择 modal；选定后由 form 组件内的
+  // _applyCategoryChange 拉 fullCategory + priceList，更新主项 + 按 associateCategories 重建附件项。
+  _addBlankRental() {
+    const now = new Date();
+    const startDate = util.formatDate(now);
+    const startDateIsWeekend = util.isWeekend(now);
+    const startDateTime = `${startDate}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:00`;
+    const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
+    const atOnce = defaultPickType === '立即租赁';
+
+    const mainItem = {
+      id: 0,
+      rental_id: 0,
+      is_associate: false,
+      noCode: true,
+      canChooseCategory: false,
+      chooseCategories: [],
+      chooseingCategory: false,
+      categoryName: '',
+      class_name: '',
+      name: null,
+      code: null,
+      rent_product_id: null,
+      category_id: null,
+      memo: '',
+      category: null,
+      pick_type: defaultPickType,
+      atOnce,
+      valid: 1,
+    };
+
+    const rental = {
+      id: 0,
+      order_id: null,
+      package_id: null,
+      category_id: null,
+      name: '',
+      valid: 0,
+      expectDays: 1,
+      guaranty: 0,
+      realGuaranty: 0,
+      guaranty_discount: 0,
+      start_date: startDateTime,
+      startDateIsWeekend,
+      priceList: [],
+      memo: '',
+      timeStamp: Date.now(),
+      pick_type: defaultPickType,
+      atOnce,
+      category: null,
+      rentItems: [mainItem],
+    };
+    util.createRentalDetail(rental, new Date(startDate), new Date(startDate));
+    this._appendRentals([rental]);
   },
 
   // 「搜索单品」选中产品后：构造 package_id=null 的 rental 追加到购物车

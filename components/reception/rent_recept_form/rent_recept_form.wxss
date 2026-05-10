@@ -498,3 +498,54 @@ button[disabled].checkout-btn {
   color: var(--on-surface-variant);
   box-shadow: none;
 }
+
+/* ---------- 分类选择 modal ---------- */
+.cat-modal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+}
+.cat-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #e5e7eb;
+  flex-shrink: 0;
+}
+.cat-modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+}
+.cat-modal-close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cat-modal-footer {
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 32rpx 32rpx;
+  flex-shrink: 0;
+}
+.cat-modal-btn {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+.cat-modal-btn--cancel {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.cat-modal-btn--confirm {
+  background: var(--primary);
+  color: var(--on-primary);
+}
