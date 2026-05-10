@@ -1,7 +1,0 @@
-{
-  "navigationStyle": "custom",
-  "backgroundTextStyle": "light",
-  "usingComponents": {
-    "van-icon": "@vant/weapp/icon/index"
-  }
-}
