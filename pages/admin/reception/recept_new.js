@@ -364,7 +364,7 @@ Page({
         return;
       }
       wx.navigateTo({
-        url: '/pages/payment/rent_settle/index?orderId=' + rentOrder.id,
+        url: '/pages/payment/settle/index?orderId=' + rentOrder.id,
       });
     }).catch(() => {
       wx.hideLoading();
