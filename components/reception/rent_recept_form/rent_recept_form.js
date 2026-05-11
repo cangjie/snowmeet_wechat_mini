@@ -370,29 +370,6 @@ Component({
     // 押金：点击 → 输入 modal → 确认 modal → 应用
     onPkgDepositTap(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
-<<<<<<< HEAD
-      const v = parseFloat(e.detail.value);
-      if (Number.isNaN(v)) return;
-      const net = Math.round(v * 100) / 100;
-      const rental = this.data.displayRentals[ridx] || {};
-      const realGuaranty = Number(rental.realGuaranty != null ? rental.realGuaranty : (rental.guaranty || 0));
-      // 输入框代表"实付押金（净额）"。realGuaranty 视为目录押金。
-      //   - 调低（净额 < 目录）→ 保持目录不变，差额转为 guaranty_discount
-      //   - 调高至目录或新建（目录=0）→ 直接当作新的目录押金，无减免
-      let nextRealGuaranty = realGuaranty;
-      let nextDiscount;
-      if (realGuaranty <= 0 || net >= realGuaranty) {
-        nextRealGuaranty = net;
-        nextDiscount = 0;
-      } else {
-        nextDiscount = Math.round((realGuaranty - net) * 100) / 100;
-      }
-      this.setData({
-        [`displayRentals[${ridx}].realGuaranty`]: nextRealGuaranty,
-        [`displayRentals[${ridx}].guaranty_discount`]: nextDiscount,
-        [`displayRentals[${ridx}]._depositLabel`]: net,
-        [`displayRentals[${ridx}]._depositInput`]: String(net),
-=======
       const current = this.data.displayRentals[ridx]._depositInput || '';
       const that = this;
       wx.showModal({
@@ -421,13 +398,13 @@ Component({
       // 同时更新 guaranty 与 realGuaranty：服务端往返不一定保留 realGuaranty，
       // 而 _refreshRentals 会在 realGuaranty 缺失时回退到 guaranty，
       // 若不同步更新 guaranty，UI 会被刷回旧值。
+      // modal 编辑是绝对覆盖，把 guaranty_discount 清零；外部减免（如会员/券）需走各自的路径。
       this.setData({
         [`displayRentals[${ridx}].guaranty`]: v,
         [`displayRentals[${ridx}].realGuaranty`]: v,
         [`displayRentals[${ridx}].guaranty_discount`]: 0,
         [`displayRentals[${ridx}]._depositLabel`]: v,
         [`displayRentals[${ridx}]._depositInput`]: String(v),
->>>>>>> f06a21bbc0f0f8007130cb2473b5a1c90c3e0f04
       });
       this._refreshSummary();
       this._emitSync(false);
