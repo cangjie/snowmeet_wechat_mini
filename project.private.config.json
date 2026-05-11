@@ -3,11 +3,25 @@
     "miniprogram": {
       "list": [
         {
+          "name": "pages/template/stitch/_5/index",
+          "pathName": "pages/template/stitch/_5/index",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
+          "name": "template_4",
+          "pathName": "pages/template/stitch/_4/index",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "rent",
           "pathName": "pages/admin/reception/recept_new",
           "query": "bizType=rent&shop=%25E4%25B8%2587%25E9%25BE%2599%25E4%25BD%2593%25E9%25AA%258C%25E4%25B8%25AD%25E5%25BF%2583&customerName=cj&gender=%25E7%2594%25B7&customerCell=18601197897",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "admin",
