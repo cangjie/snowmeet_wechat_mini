@@ -80,30 +80,20 @@
                 </view>
               </view>
 
-              <!-- 押金 / 租金 -->
+              <!-- 押金 / 租金（点击弹窗修改） -->
               <view class="kv-row">
-                <view class="kv-cell">
+                <view class="kv-cell kv-cell--tap" data-ridx="{{ridx}}" catchtap="onPkgDepositTap">
                   <text class="kv-label">押金</text>
                   <view class="kv-input-wrap">
                     <text class="kv-prefix">¥</text>
-                    <input
-                      class="kv-input"
-                      type="digit"
-                      value="{{pkg._depositInput}}"
-                      catchblur="onPkgDepositBlur"
-                      data-ridx="{{ridx}}"/>
+                    <text class="kv-input kv-input--display">{{pkg._depositInput || '0'}}</text>
                   </view>
                 </view>
-                <view class="kv-cell">
+                <view class="kv-cell kv-cell--tap" data-ridx="{{ridx}}" catchtap="onPkgRateTap">
                   <text class="kv-label">租金 / 日</text>
                   <view class="kv-input-wrap">
                     <text class="kv-prefix">¥</text>
-                    <input
-                      class="kv-input"
-                      type="digit"
-                      value="{{pkg._dailyRateInput}}"
-                      catchblur="onPkgRateBlur"
-                      data-ridx="{{ridx}}"/>
+                    <text class="kv-input kv-input--display">{{pkg._dailyRateInput || '0.00'}}</text>
                   </view>
                 </view>
               </view>
