@@ -388,10 +388,13 @@ Component({
       });
     },
     _applyPkgDeposit(ridx, v) {
-      const guaranty = Number(this.data.displayRentals[ridx].guaranty || 0);
+      // 同时更新 guaranty 与 realGuaranty：服务端往返不一定保留 realGuaranty，
+      // 而 _refreshRentals 会在 realGuaranty 缺失时回退到 guaranty，
+      // 若不同步更新 guaranty，UI 会被刷回旧值。
       this.setData({
+        [`displayRentals[${ridx}].guaranty`]: v,
         [`displayRentals[${ridx}].realGuaranty`]: v,
-        [`displayRentals[${ridx}].guaranty_discount`]: guaranty - v,
+        [`displayRentals[${ridx}].guaranty_discount`]: 0,
         [`displayRentals[${ridx}]._depositLabel`]: v,
         [`displayRentals[${ridx}]._depositInput`]: String(v),
       });
