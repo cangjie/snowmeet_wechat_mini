@@ -300,7 +300,7 @@
       <view class="checkout-info">
         <view class="checkout-count">共 {{summary.count}} 件</view>
         <text class="checkout-deposit">押金 ¥{{summary.depositLabel}}</text>
-        <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">减免 -¥{{summary.depositReduceLabel}}</text>
+        <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">已减免 -¥{{summary.depositReduceLabel}}</text>
         <text class="checkout-rent">租金 ¥{{summary.rentLabel}}</text>
       </view>
       <button

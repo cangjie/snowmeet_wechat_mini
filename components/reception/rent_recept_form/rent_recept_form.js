@@ -202,6 +202,11 @@ Component({
 
         const dailyRate = getDailyRate(r);
         const realGuaranty = Number(r.realGuaranty != null ? r.realGuaranty : (r.guaranty || 0));
+        const guarantyDiscount = Number(r.guaranty_discount || 0);
+        // 押金显示 = realGuaranty - guaranty_discount（实际收取的押金 = 押金 - 已减免）
+        const netDeposit = realGuaranty > 0
+          ? Math.round((realGuaranty - guarantyDiscount) * 100) / 100
+          : 0;
 
         const items = (r.rentItems || []).map((it, iidx) => {
           const ikey = itemKey(it, idx, iidx);
@@ -241,9 +246,9 @@ Component({
           _displayName: displayName,
           _displayMarquee: visualLen(displayName) > RENTAL_TITLE_THRESHOLD,
           _kindLabel: r.package_id ? '套装' : '单品',
-          _depositLabel: realGuaranty,
+          _depositLabel: netDeposit,
           _dailyRate: dailyRate,
-          _depositInput: String(realGuaranty || ''),
+          _depositInput: realGuaranty > 0 ? String(netDeposit) : '',
           _dailyRateInput: dailyRate ? dailyRate.toFixed(2) : '',
           _startDate: startDate,
           _startTime: startTime || '09:00',
@@ -268,6 +273,8 @@ Component({
         rent += Number(r._dailyRate) || 0;
         reduce += Number(r.guaranty_discount) || 0;
       });
+      deposit = Math.round(deposit * 100) / 100;
+      reduce = Math.round(reduce * 100) / 100;
       const count = list.length;
       const canCheckout = count > 0 && list.every(r => r._rentalEntered);
       this.setData({
@@ -364,12 +371,25 @@ Component({
       const ridx = Number(e.currentTarget.dataset.ridx);
       const v = parseFloat(e.detail.value);
       if (Number.isNaN(v)) return;
-      const guaranty = Number(this.data.displayRentals[ridx].guaranty || 0);
+      const net = Math.round(v * 100) / 100;
+      const rental = this.data.displayRentals[ridx] || {};
+      const realGuaranty = Number(rental.realGuaranty != null ? rental.realGuaranty : (rental.guaranty || 0));
+      // 输入框代表"实付押金（净额）"。realGuaranty 视为目录押金。
+      //   - 调低（净额 < 目录）→ 保持目录不变，差额转为 guaranty_discount
+      //   - 调高至目录或新建（目录=0）→ 直接当作新的目录押金，无减免
+      let nextRealGuaranty = realGuaranty;
+      let nextDiscount;
+      if (realGuaranty <= 0 || net >= realGuaranty) {
+        nextRealGuaranty = net;
+        nextDiscount = 0;
+      } else {
+        nextDiscount = Math.round((realGuaranty - net) * 100) / 100;
+      }
       this.setData({
-        [`displayRentals[${ridx}].realGuaranty`]: v,
-        [`displayRentals[${ridx}].guaranty_discount`]: guaranty - v,
-        [`displayRentals[${ridx}]._depositLabel`]: v,
-        [`displayRentals[${ridx}]._depositInput`]: String(v),
+        [`displayRentals[${ridx}].realGuaranty`]: nextRealGuaranty,
+        [`displayRentals[${ridx}].guaranty_discount`]: nextDiscount,
+        [`displayRentals[${ridx}]._depositLabel`]: net,
+        [`displayRentals[${ridx}]._depositInput`]: String(net),
       });
       this._refreshSummary();
       this._emitSync(false);
