@@ -348,9 +348,28 @@ Page({
   },
 
   onCheckout(e) {
-    // 进入支付环节（下一步迭代再做）
-    wx.showToast({ title: '去结算（下一步迭代）', icon: 'none' });
-    // TODO: navigate 到支付页 / 弹出 rent-back-drop
+    const order = this.data.order;
+    if (!order || !order.id) {
+      wx.showToast({ title: '订单尚未生成', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '下单中…', mask: true });
+    const placeUrl = app.globalData.requestPrefix
+      + 'Order/PlaceRentOrder/' + order.id
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+    util.performWebRequest(placeUrl, null).then((rentOrder) => {
+      wx.hideLoading();
+      if (!rentOrder || rentOrder.valid != 1) {
+        wx.showToast({ title: '下单失败', icon: 'none' });
+        return;
+      }
+      wx.navigateTo({
+        url: '/pages/payment/settle/index?orderId=' + rentOrder.id,
+      });
+    }).catch(() => {
+      wx.hideLoading();
+      wx.showToast({ title: '下单失败', icon: 'none' });
+    });
   },
 
   /* ---------- 与后端同步：调 Rent/SaveRentRecept ---------- */

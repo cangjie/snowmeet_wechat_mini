@@ -239,6 +239,12 @@
   height: 22px;
 }
 .kv-picker-text { font-size: 13px; color: var(--on-surface); padding: 2px 0; }
+.kv-cell--tap:active { background: var(--surface-container-low); }
+.kv-input--display {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
 
 /* 起租日期：日期文字 + 今/明 单字快捷按钮（紧凑单行布局，避免折行） */
 .date-row { display: flex; align-items: center; gap: 6px; }

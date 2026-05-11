@@ -103,7 +103,8 @@
     "pages/mine/skipass/my_skipasses",
     "pages/admin/reception/recept_entry",
     "pages/admin/reception/recept_new",
-    "pages/admin/reception/recept_package"
+    "pages/admin/reception/recept_package",
+    "pages/template/stitch/_5/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -137,7 +138,8 @@
         "pay_hub",
         "pay_recept",
         "rent_pay_add",
-        "uni_pay"
+        "uni_pay",
+        "settle/index"
       ]
     },
     {

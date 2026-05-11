@@ -1,0 +1,57 @@
+.order-card {
+  background: var(--surface-container-lowest, #ffffff);
+  border: 1px solid var(--outline-variant, #bfc7d1);
+  border-radius: 8px;
+  padding: 16px;
+}
+.order-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.order-card-head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.order-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-surface, #0b1c30);
+}
+.order-card-sub {
+  font-size: 12px;
+  color: var(--on-surface-variant, #3f4850);
+}
+.order-card-body {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--outline-variant, #bfc7d1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.kv-label { font-size: 13px; color: var(--on-surface-variant, #3f4850); }
+.kv-value {
+  font-size: 13px;
+  color: var(--on-surface, #0b1c30);
+  font-weight: 500;
+  text-align: right;
+}
+.kv-value--strong { font-weight: 700; color: var(--primary-container, #4aa9e9); }
+.kv-value-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-end;
+}
+.kv-value-item {
+  font-size: 13px;
+  color: var(--on-surface, #0b1c30);
+}

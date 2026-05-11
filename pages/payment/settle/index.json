@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "支付结算",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index",
+    "order-summary-card": "/components/order-summary-card/index",
+    "order-payment": "/components/order-payment/index",
+    "reception-tabbar": "/components/reception_tabbar/reception_tabbar"
+  }
+}

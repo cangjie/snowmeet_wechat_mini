@@ -1,0 +1,26 @@
+<view class="order-card">
+  <view class="order-card-head" bindtap="onToggle">
+    <view class="order-card-head-left">
+      <text class="order-card-title">订单详情</text>
+      <text wx:if="{{order}}" class="order-card-sub">#{{order.id}} · {{payingAmountStr}}</text>
+    </view>
+    <van-icon name="{{expanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#3f4850"/>
+  </view>
+  <view wx:if="{{expanded && order}}" class="order-card-body">
+    <view class="kv-row" wx:if="{{order.shop}}">
+      <text class="kv-label">店铺</text>
+      <text class="kv-value">{{order.shop}}</text>
+    </view>
+    <view class="kv-row kv-row--multiline">
+      <text class="kv-label">租赁商品</text>
+      <view class="kv-value-list">
+        <text wx:for="{{rentals}}" wx:key="id" class="kv-value-item">{{item.name || '加载中…'}}</text>
+        <text wx:if="{{rentals.length === 0}}" class="kv-value-item">（无）</text>
+      </view>
+    </view>
+    <view class="kv-row">
+      <text class="kv-label">应付金额</text>
+      <text class="kv-value kv-value--strong">{{payingAmountStr}}</text>
+    </view>
+  </view>
+</view>

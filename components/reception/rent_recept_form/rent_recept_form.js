@@ -367,8 +367,10 @@ Component({
     onPkgModeMixedTap() {
       wx.showToast({ title: '套餐内装备模式不一致', icon: 'none' });
     },
-    onPkgDepositBlur(e) {
+    // 押金：点击 → 输入 modal → 确认 modal → 应用
+    onPkgDepositTap(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
+<<<<<<< HEAD
       const v = parseFloat(e.detail.value);
       if (Number.isNaN(v)) return;
       const net = Math.round(v * 100) / 100;
@@ -390,14 +392,75 @@ Component({
         [`displayRentals[${ridx}].guaranty_discount`]: nextDiscount,
         [`displayRentals[${ridx}]._depositLabel`]: net,
         [`displayRentals[${ridx}]._depositInput`]: String(net),
+=======
+      const current = this.data.displayRentals[ridx]._depositInput || '';
+      const that = this;
+      wx.showModal({
+        title: '修改押金',
+        editable: true,
+        placeholderText: '请输入押金金额',
+        content: String(current),
+        success(res) {
+          if (!res.confirm) return;
+          const v = parseFloat(res.content);
+          if (Number.isNaN(v) || v < 0) {
+            wx.showToast({ title: '请输入有效金额', icon: 'none' });
+            return;
+          }
+          wx.showModal({
+            title: '确认修改',
+            content: `押金将修改为 ¥${v.toFixed(2)}，是否确认？`,
+            success(c) {
+              if (c.confirm) that._applyPkgDeposit(ridx, v);
+            },
+          });
+        },
+      });
+    },
+    _applyPkgDeposit(ridx, v) {
+      // 同时更新 guaranty 与 realGuaranty：服务端往返不一定保留 realGuaranty，
+      // 而 _refreshRentals 会在 realGuaranty 缺失时回退到 guaranty，
+      // 若不同步更新 guaranty，UI 会被刷回旧值。
+      this.setData({
+        [`displayRentals[${ridx}].guaranty`]: v,
+        [`displayRentals[${ridx}].realGuaranty`]: v,
+        [`displayRentals[${ridx}].guaranty_discount`]: 0,
+        [`displayRentals[${ridx}]._depositLabel`]: v,
+        [`displayRentals[${ridx}]._depositInput`]: String(v),
+>>>>>>> f06a21bbc0f0f8007130cb2473b5a1c90c3e0f04
       });
       this._refreshSummary();
       this._emitSync(false);
     },
-    onPkgRateBlur(e) {
+
+    // 租金/日：点击 → 输入 modal → 确认 modal → 应用
+    onPkgRateTap(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
-      const v = parseFloat(e.detail.value);
-      if (Number.isNaN(v)) return;
+      const current = this.data.displayRentals[ridx]._dailyRateInput || '';
+      const that = this;
+      wx.showModal({
+        title: '修改租金/日',
+        editable: true,
+        placeholderText: '请输入每日租金',
+        content: String(current),
+        success(res) {
+          if (!res.confirm) return;
+          const v = parseFloat(res.content);
+          if (Number.isNaN(v) || v < 0) {
+            wx.showToast({ title: '请输入有效金额', icon: 'none' });
+            return;
+          }
+          wx.showModal({
+            title: '确认修改',
+            content: `租金/日 将修改为 ¥${v.toFixed(2)}，是否确认？`,
+            success(c) {
+              if (c.confirm) that._applyPkgRate(ridx, v);
+            },
+          });
+        },
+      });
+    },
+    _applyPkgRate(ridx, v) {
       const presets = (this.data.displayRentals[ridx].pricePresets || []).slice();
       if (presets.length > 0) presets[0] = { ...presets[0], price: v };
       this.setData({
