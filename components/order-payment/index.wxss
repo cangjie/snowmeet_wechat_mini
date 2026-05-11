@@ -1,0 +1,152 @@
+.op-root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 金额 */
+.amount {
+  text-align: center;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.amount-label { font-size: 13px; color: var(--on-surface-variant, #3f4850); }
+.amount-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--primary-container, #4aa9e9);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+/* QR */
+.qr-card {
+  background: var(--surface-container-lowest, #ffffff);
+  border: 1px solid var(--outline-variant, #bfc7d1);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.qr-frame {
+  width: 192px;
+  height: 192px;
+  background: var(--surface-container, #e5eeff);
+  border-radius: 8px;
+  border: 1px solid var(--outline-variant, #bfc7d1);
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qr-img { width: 100%; height: 100%; }
+.qr-placeholder {
+  font-size: 12px;
+  color: var(--on-surface-variant, #3f4850);
+  text-align: center;
+}
+.qr-tip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--on-surface-variant, #3f4850);
+}
+.qr-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+.qr-meta-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--on-surface-variant, #3f4850);
+  letter-spacing: 0.4px;
+}
+.qr-meta-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.qr-meta-status--wait { background: var(--surface-container, #e5eeff); color: var(--on-surface-variant, #3f4850); }
+.qr-meta-status--ok   { background: #dcfce7; color: #15803d; }
+
+/* 支付方式列表 */
+.pay-list {
+  background: var(--surface-container-lowest, #ffffff);
+  border: 1px solid var(--outline-variant, #bfc7d1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.pay-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--outline-variant, #bfc7d1);
+}
+.pay-row:last-child { border-bottom: none; }
+.pay-row--active { background: var(--surface-container-low, #eff4ff); }
+.pay-row-left { display: flex; align-items: center; gap: 12px; }
+.pay-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pay-icon--wechat { background: #09b83e; }
+.pay-icon--alipay { background: #1677ff; }
+.pay-icon--other  { background: var(--secondary, #545f73); }
+.pay-row-text { font-size: 13px; font-weight: 600; color: var(--on-surface, #0b1c30); }
+
+/* 其他支付子面板 */
+.other-panel {
+  background: var(--surface-container-lowest, #ffffff);
+  border: 1px solid var(--outline-variant, #bfc7d1);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.other-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 14px;
+  color: var(--on-surface, #0b1c30);
+}
+.other-row-text { font-size: 14px; }
+.other-input {
+  height: 40px;
+  border: 1px solid var(--outline-variant, #bfc7d1);
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+.confirm-other-btn {
+  width: 100%;
+  height: 48px;
+  background: #e3342f;
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+.confirm-other-btn::after { border: none; }

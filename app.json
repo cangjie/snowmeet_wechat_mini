@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/payment/rent_settle/index",
     "pages/logs/logs",
     "pages/mine/mine",
     "pages/admin/admin",

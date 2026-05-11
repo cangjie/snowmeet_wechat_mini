@@ -1,0 +1,70 @@
+<view class="op-root">
+
+  <!-- 金额 -->
+  <view class="amount">
+    <text class="amount-label">需支付金额</text>
+    <text class="amount-value">¥{{payingAmountStr || '0.00'}}</text>
+  </view>
+
+  <!-- 二维码 -->
+  <view wx:if="{{payMethod === 'wechat' || payMethod === 'alipay'}}" class="qr-card">
+    <view class="qr-frame">
+      <image wx:if="{{qrCodeUrl}}" class="qr-img" src="{{qrCodeUrl}}" mode="aspectFit"/>
+      <view wx:else class="qr-placeholder">
+        <text>{{loadingQr ? '生成二维码中…' : '点击下方支付方式生成二维码'}}</text>
+      </view>
+    </view>
+    <view class="qr-tip">
+      <van-icon name="scan" size="16px" color="#4aa9e9"/>
+      <text>请顾客扫描二维码支付</text>
+    </view>
+    <view class="qr-meta">
+      <text class="qr-meta-label">支付状态</text>
+      <view class="qr-meta-status {{paymentStatus === 'paid' ? 'qr-meta-status--ok' : 'qr-meta-status--wait'}}">
+        {{paymentStatus === 'paid' ? '已收款' : '等待扫码…'}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 支付方式三选一 -->
+  <view class="pay-list">
+    <view class="pay-row {{payMethod === 'wechat' ? 'pay-row--active' : ''}}" data-method="wechat" bindtap="onMethodTap">
+      <view class="pay-row-left">
+        <view class="pay-icon pay-icon--wechat"><van-icon name="chat" size="14px" color="#ffffff"/></view>
+        <text class="pay-row-text">微信支付</text>
+      </view>
+      <van-icon name="{{payMethod === 'wechat' ? 'checked' : 'circle'}}" size="20px" color="{{payMethod === 'wechat' ? '#4aa9e9' : '#bfc7d1'}}"/>
+    </view>
+    <view class="pay-row {{payMethod === 'alipay' ? 'pay-row--active' : ''}}" data-method="alipay" bindtap="onMethodTap">
+      <view class="pay-row-left">
+        <view class="pay-icon pay-icon--alipay"><van-icon name="balance-pay" size="14px" color="#ffffff"/></view>
+        <text class="pay-row-text">支付宝支付</text>
+      </view>
+      <van-icon name="{{payMethod === 'alipay' ? 'checked' : 'circle'}}" size="20px" color="{{payMethod === 'alipay' ? '#4aa9e9' : '#bfc7d1'}}"/>
+    </view>
+    <view class="pay-row {{payMethod === 'other' ? 'pay-row--active' : ''}}" data-method="other" bindtap="onMethodTap">
+      <view class="pay-row-left">
+        <view class="pay-icon pay-icon--other"><van-icon name="card" size="14px" color="#ffffff"/></view>
+        <text class="pay-row-text">其他支付（现金 / 刷卡）</text>
+      </view>
+      <van-icon name="{{payMethod === 'other' ? 'checked' : 'circle'}}" size="20px" color="{{payMethod === 'other' ? '#4aa9e9' : '#bfc7d1'}}"/>
+    </view>
+  </view>
+
+  <!-- 其他支付的子选项 -->
+  <view wx:if="{{payMethod === 'other'}}" class="other-panel">
+    <radio-group bindchange="onSubMethodChange">
+      <label class="other-row" wx:for="{{othersPayMethods}}" wx:key="*this">
+        <radio value="{{index}}" checked="{{subPayMethodIndex === index}}" color="#4aa9e9"/>
+        <text class="other-row-text">{{item}}</text>
+      </label>
+    </radio-group>
+    <input wx:if="{{subPayMethodIndex === othersPayMethods.length - 1}}"
+           class="other-input"
+           placeholder="请输入支付方式"
+           bindinput="onInputMethod"
+           value="{{inputedPayMethod}}"/>
+    <button class="confirm-other-btn" bindtap="onConfirmOtherPaid">确认收款</button>
+  </view>
+
+</view>
