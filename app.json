@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/payment/rent_settle/index",
     "pages/logs/logs",
     "pages/mine/mine",
     "pages/admin/admin",
@@ -139,7 +138,8 @@
         "pay_hub",
         "pay_recept",
         "rent_pay_add",
-        "uni_pay"
+        "uni_pay",
+        "rent_settle/index"
       ]
     },
     {
