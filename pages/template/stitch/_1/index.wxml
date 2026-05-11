@@ -1,0 +1,179 @@
+<!--pages/template/stitch/_1/index.wxml
+  开始开单 - 现场开单流程入口
+  对应 PRD 1.4.5 现场开单流程：
+    第一步 获取订单标识信息（姓名 / 手机号非必填，输入手机号自动触发会员查询）
+    第二步 选择业务类型（零售 / 养护 / 租赁）后进入对应业务开单
+-->
+<view class="page-root">
+
+  <!-- TopAppBar -->
+  <view class="topbar">
+    <view class="topbar-icon" bindtap="onShopTap">
+      <van-icon name="shop" size="22px" color="#006495"/>
+    </view>
+    <view class="topbar-title">PeakFlow Rental</view>
+    <view class="topbar-icon" bindtap="onScanTap">
+      <van-icon name="scan" size="22px" color="#006495"/>
+    </view>
+  </view>
+
+  <!-- Main canvas -->
+  <view class="main">
+    <!-- Page header -->
+    <view class="page-header">
+      <view class="page-title">开始开单</view>
+      <view class="shop-selector" bindtap="onPickShop">
+        <view class="shop-selector-left">
+          <van-icon name="location-o" size="16px" color="#545f73"/>
+          <text class="shop-text">当前店铺: {{currentShop}}</text>
+        </view>
+        <van-icon name="arrow-down" size="16px" color="#6f7881"/>
+      </view>
+    </view>
+
+    <!-- Customer info card -->
+    <view class="card customer-card">
+      <view class="card-header">
+        <van-icon name="manager-o" size="18px" color="#006495"/>
+        <text class="card-title">顾客信息</text>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">顾客姓名</view>
+        <input
+          class="form-input"
+          placeholder="输入姓名（选填）"
+          placeholder-class="form-input-placeholder"
+          value="{{customerName}}"
+          bindinput="onNameInput"/>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">性别</view>
+        <view class="seg-control">
+          <view
+            class="seg-item {{gender === 'male' ? 'active' : ''}}"
+            data-value="male"
+            bindtap="onGenderTap">男</view>
+          <view
+            class="seg-item {{gender === 'female' ? 'active' : ''}}"
+            data-value="female"
+            bindtap="onGenderTap">女</view>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">手机号</view>
+        <view class="form-input-wrap">
+          <view class="form-input-icon">
+            <van-icon name="phone-o" size="18px" color="#6f7881"/>
+          </view>
+          <input
+            class="form-input form-input--with-icon"
+            type="number"
+            maxlength="11"
+            placeholder="输入手机号（选填）"
+            placeholder-class="form-input-placeholder"
+            value="{{customerCell}}"
+            bindblur="onCellBlur"
+            bindinput="onCellInput"/>
+        </view>
+        <!-- 输入手机号后自动会员查询命中提示 -->
+        <view wx:if="{{matchedMember}}" class="hint hint-primary">
+          <van-icon name="passed" size="14px" color="#006495"/>
+          <text>已识别会员：{{matchedMember.name || '无姓名'}} · ID {{matchedMember.id}}</text>
+        </view>
+        <view wx:elif="{{cellLooked && !matchedMember}}" class="hint hint-muted">
+          <text>该手机号未注册会员，支付时将自动注册</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Business type selector -->
+    <view class="section">
+      <view class="card-header card-header--standalone">
+        <van-icon name="apps-o" size="18px" color="#006495"/>
+        <text class="card-title">业务类型</text>
+      </view>
+      <view class="biz-grid">
+        <view
+          class="biz-card {{bizType === 'retail' ? 'biz-card--active' : ''}}"
+          data-type="retail"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap {{bizType === 'retail' ? 'biz-icon-wrap--active' : ''}}">
+            <van-icon name="shopping-cart-o" size="22px" color="{{bizType === 'retail' ? '#ffffff' : '#545f73'}}"/>
+          </view>
+          <text class="biz-label {{bizType === 'retail' ? 'biz-label--active' : ''}}">零售</text>
+          <view wx:if="{{bizType === 'retail'}}" class="biz-check">
+            <van-icon name="success" size="14px" color="#ffffff"/>
+          </view>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+
+        <view
+          class="biz-card {{bizType === 'maintain' ? 'biz-card--active' : ''}}"
+          data-type="maintain"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap {{bizType === 'maintain' ? 'biz-icon-wrap--active' : ''}}">
+            <van-icon name="setting-o" size="22px" color="{{bizType === 'maintain' ? '#ffffff' : '#545f73'}}"/>
+          </view>
+          <text class="biz-label {{bizType === 'maintain' ? 'biz-label--active' : ''}}">养护</text>
+          <view wx:if="{{bizType === 'maintain'}}" class="biz-check">
+            <van-icon name="success" size="14px" color="#ffffff"/>
+          </view>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+
+        <view
+          class="biz-card {{bizType === 'rent' ? 'biz-card--active' : ''}}"
+          data-type="rent"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap {{bizType === 'rent' ? 'biz-icon-wrap--active' : ''}}">
+            <van-icon name="gift-o" size="22px" color="{{bizType === 'rent' ? '#ffffff' : '#545f73'}}"/>
+          </view>
+          <text class="biz-label {{bizType === 'rent' ? 'biz-label--active' : ''}}">租赁</text>
+          <view wx:if="{{bizType === 'rent'}}" class="biz-check">
+            <van-icon name="success" size="14px" color="#ffffff"/>
+          </view>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 进入开单 -->
+    <view class="cta">
+      <button class="cta-btn {{bizType ? '' : 'cta-btn--disabled'}}" bindtap="onStartTap">
+        进入开单
+        <van-icon name="arrow" size="14px" color="#ffffff" custom-style="margin-left:6px"/>
+      </button>
+      <view wx:if="{{!bizType}}" class="cta-hint">请选择业务类型</view>
+    </view>
+
+    <!-- 找回中断订单（PRD 1.4.6 订单找回：姓名 / 手机号 / 订单号） -->
+    <view class="recover-link" bindtap="onRecoverOrder">
+      <van-icon name="search" size="14px" color="#006495"/>
+      <text>找回中断的订单</text>
+    </view>
+  </view>
+
+  <!-- BottomNavBar -->
+  <view class="bottomnav">
+    <view class="bottomnav-item" bindtap="onTabTap" data-tab="dashboard">
+      <van-icon name="apps-o" size="22px"/>
+      <text>工作台</text>
+    </view>
+    <view class="bottomnav-item active" bindtap="onTabTap" data-tab="open">
+      <van-icon name="add-o" size="22px" color="#006495"/>
+      <text>开单</text>
+    </view>
+    <view class="bottomnav-item" bindtap="onTabTap" data-tab="search">
+      <van-icon name="search" size="22px"/>
+      <text>查询</text>
+    </view>
+    <view class="bottomnav-item" bindtap="onTabTap" data-tab="me">
+      <van-icon name="manager-o" size="22px"/>
+      <text>我的</text>
+    </view>
+  </view>
+
+</view>

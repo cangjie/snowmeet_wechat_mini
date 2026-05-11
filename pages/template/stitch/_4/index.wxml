@@ -1,0 +1,308 @@
+<!--pages/template/stitch/_4/index.wxml
+  已选装备 - 套餐详情 / 单品录入 / 租赁形式
+  对应 PRD 2.4.1（开单）+ 2.3 租赁形式（立即租赁 / 先租后取 / 延时租赁）+ 状态：已生成、租赁商品未开始
+  设计要点：
+    - 顶部：客户信息卡（业务标签）
+    - 分组方式：按时间 / 按品种
+    - 套餐外卡：套餐名 + 标签 + 租赁形式三选一 + 押金/日租 + 起租日期/时间
+    - 套餐内卡：每件租赁物（已录入 / 待处理），展开后录入 名称 / 装备编码 / 备注 / 租赁模式
+    - 底部：4个快捷入口 + 押金合计 + 去结算
+-->
+<view class="page-root">
+
+  <!-- TopAppBar -->
+  <view class="topbar">
+    <view class="topbar-icon" bindtap="onBack">
+      <van-icon name="arrow-left" size="22px" color="#006495"/>
+    </view>
+    <view class="topbar-title">已选装备</view>
+    <view class="topbar-icon" bindtap="onScan">
+      <van-icon name="scan" size="22px" color="#006495"/>
+    </view>
+  </view>
+
+  <view class="main">
+
+    <!-- Customer info -->
+    <view class="customer-card">
+      <view class="customer-head">
+        <view class="customer-head-left">
+          <text class="customer-name">{{customer.name}}</text>
+          <text class="customer-cell">{{customer.cellMasked}}</text>
+        </view>
+        <view class="customer-detail" bindtap="onMemberDetail">
+          <text>详情</text>
+          <van-icon name="arrow" size="14px" color="#006495"/>
+        </view>
+      </view>
+      <view class="customer-tags">
+        <view class="customer-tag tag-retail">零</view>
+        <view class="customer-tag tag-rent">租</view>
+        <view class="customer-tag tag-care">养</view>
+        <view class="customer-tag tag-food">餐</view>
+      </view>
+    </view>
+
+    <!-- Group seg -->
+    <view class="seg-control">
+      <view
+        class="seg-item {{groupBy === 'time' ? 'active' : ''}}"
+        data-value="time"
+        bindtap="onGroupChange">按时间</view>
+      <view
+        class="seg-item {{groupBy === 'category' ? 'active' : ''}}"
+        data-value="category"
+        bindtap="onGroupChange">按品种</view>
+    </view>
+
+    <!-- Package outer cards -->
+    <block wx:for="{{packages}}" wx:key="id" wx:for-item="pkg" wx:for-index="pkgIdx">
+      <view class="pkg-card">
+        <view class="pkg-head" bindtap="onTogglePkg" data-idx="{{pkgIdx}}">
+          <view class="pkg-head-body">
+            <view class="pkg-title-row">
+              <text class="pkg-title">{{pkg.name}}</text>
+              <view class="pkg-tags">
+                <view class="chip chip-primary">{{pkg.kindLabel}}</view>
+                <view wx:if="{{pkg.mixedDispatch}}" class="chip chip-secondary">混合发放</view>
+              </view>
+            </view>
+
+            <!-- 租赁形式 -->
+            <view class="rent-mode">
+              <block wx:for="{{rentModes}}" wx:key="key" wx:for-item="mode">
+                <view
+                  class="rent-mode-btn {{pkg.rentMode === mode.key ? 'rent-mode-btn--active' : ''}}"
+                  catchtap="onPkgModeTap"
+                  data-pkg="{{pkgIdx}}"
+                  data-mode="{{mode.key}}">{{mode.name}}</view>
+              </block>
+            </view>
+
+            <!-- 押金 / 租金 -->
+            <view class="kv-row">
+              <view class="kv-cell">
+                <text class="kv-label">押金</text>
+                <view class="kv-input-wrap">
+                  <text class="kv-prefix">¥</text>
+                  <input
+                    class="kv-input"
+                    type="digit"
+                    value="{{pkg.deposit}}"
+                    catchinput="onPkgFieldInput"
+                    data-pkg="{{pkgIdx}}"
+                    data-field="deposit"/>
+                </view>
+              </view>
+              <view class="kv-cell">
+                <text class="kv-label">租金 / 日</text>
+                <view class="kv-input-wrap">
+                  <text class="kv-prefix">¥</text>
+                  <input
+                    class="kv-input"
+                    type="digit"
+                    value="{{pkg.dailyRate}}"
+                    catchinput="onPkgFieldInput"
+                    data-pkg="{{pkgIdx}}"
+                    data-field="dailyRate"/>
+                </view>
+              </view>
+            </view>
+
+            <!-- 起租 -->
+            <view class="kv-row">
+              <view class="kv-cell">
+                <text class="kv-label">起租日期</text>
+                <view class="kv-input-wrap">
+                  <van-icon name="calendar-o" size="14px" color="#545f73"/>
+                  <picker
+                    class="kv-picker"
+                    mode="date"
+                    value="{{pkg.startDate}}"
+                    bindchange="onPkgDateChange"
+                    data-pkg="{{pkgIdx}}">
+                    <view class="kv-picker-text">{{pkg.startDate}}</view>
+                  </picker>
+                </view>
+              </view>
+              <view class="kv-cell">
+                <text class="kv-label">起租时间</text>
+                <view class="kv-input-wrap">
+                  <van-icon name="clock-o" size="14px" color="#545f73"/>
+                  <picker
+                    class="kv-picker"
+                    mode="time"
+                    value="{{pkg.startTime}}"
+                    bindchange="onPkgTimeChange"
+                    data-pkg="{{pkgIdx}}">
+                    <view class="kv-picker-text">{{pkg.startTime}}</view>
+                  </picker>
+                </view>
+              </view>
+            </view>
+
+          </view>
+          <view class="pkg-collapse">
+            <van-icon name="{{pkg.collapsed ? 'arrow-down' : 'arrow-up'}}" size="18px" color="#6f7881"/>
+          </view>
+        </view>
+
+        <!-- Inner items -->
+        <view wx:if="{{!pkg.collapsed}}" class="pkg-inner">
+          <block wx:for="{{pkg.items}}" wx:key="id" wx:for-item="item" wx:for-index="itemIdx">
+            <view class="item-card {{item.expanded ? 'item-card--expanded' : ''}}">
+              <view class="item-head" bindtap="onToggleItem" data-pkg="{{pkgIdx}}" data-item="{{itemIdx}}">
+                <view class="item-thumb">
+                  <van-icon name="{{item.icon}}" size="22px" color="#006495"/>
+                </view>
+                <view class="item-head-body">
+                  <text class="item-title">{{item.title}}</text>
+                  <text class="item-spec">{{item.spec}}</text>
+                </view>
+                <view class="item-head-right">
+                  <view class="chip {{item.entered ? 'chip-success' : 'chip-pending'}}">
+                    <van-icon wx:if="{{item.entered}}" name="success" size="12px" color="#15803d" custom-style="margin-right:2px"/>
+                    <text>{{item.entered ? '已录入' : '待处理'}}</text>
+                  </view>
+                  <van-icon name="{{item.expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
+                </view>
+              </view>
+
+              <view wx:if="{{item.expanded}}" class="item-form">
+                <view class="form-group">
+                  <view class="form-label">租赁物名称</view>
+                  <input
+                    class="form-input"
+                    value="{{item.itemName}}"
+                    placeholder="输入租赁物名称..."
+                    placeholder-class="form-input-placeholder"
+                    catchinput="onItemFieldInput"
+                    data-pkg="{{pkgIdx}}"
+                    data-item="{{itemIdx}}"
+                    data-field="itemName"/>
+                </view>
+
+                <view class="form-group">
+                  <view class="form-label">装备编码</view>
+                  <view class="code-row">
+                    <input
+                      class="form-input form-input--inline"
+                      value="{{item.code}}"
+                      placeholder="输入或扫描编码"
+                      placeholder-class="form-input-placeholder"
+                      catchinput="onItemFieldInput"
+                      data-pkg="{{pkgIdx}}"
+                      data-item="{{itemIdx}}"
+                      data-field="code"/>
+                    <view class="code-scan-btn" catchtap="onItemScan" data-pkg="{{pkgIdx}}" data-item="{{itemIdx}}">
+                      <van-icon name="scan" size="20px" color="#006495"/>
+                    </view>
+                  </view>
+                  <view class="code-flag-row">
+                    <view class="code-flag-btn {{item.codeFlag === 'no_code' ? 'code-flag-btn--on' : ''}}"
+                      catchtap="onItemCodeFlag" data-pkg="{{pkgIdx}}" data-item="{{itemIdx}}" data-flag="no_code">无编码</view>
+                    <view class="code-flag-btn {{item.codeFlag === 'not_required' ? 'code-flag-btn--on' : ''}}"
+                      catchtap="onItemCodeFlag" data-pkg="{{pkgIdx}}" data-item="{{itemIdx}}" data-flag="not_required">不需要</view>
+                  </view>
+                </view>
+
+                <view class="form-group">
+                  <view class="form-label">备注信息</view>
+                  <input
+                    class="form-input"
+                    value="{{item.note}}"
+                    placeholder="填写板刃磨损等特殊情况..."
+                    placeholder-class="form-input-placeholder"
+                    catchinput="onItemFieldInput"
+                    data-pkg="{{pkgIdx}}"
+                    data-item="{{itemIdx}}"
+                    data-field="note"/>
+                </view>
+
+                <view class="form-group">
+                  <view class="form-label">租赁模式</view>
+                  <view class="rent-mode">
+                    <block wx:for="{{rentModes}}" wx:key="key" wx:for-item="mode">
+                      <view
+                        class="rent-mode-btn {{item.rentMode === mode.key ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onItemModeTap"
+                        data-pkg="{{pkgIdx}}"
+                        data-item="{{itemIdx}}"
+                        data-mode="{{mode.key}}">{{mode.name}}</view>
+                    </block>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+
+    <!-- Empty -->
+    <view wx:if="{{packages.length === 0}}" class="empty">
+      <view class="empty-title">还没有选择套餐</view>
+      <view class="empty-link" bindtap="onAddPackage">去添加 ›</view>
+    </view>
+
+  </view>
+
+  <!-- Bottom -->
+  <view class="bottom-stack">
+    <view class="action-bar">
+      <view class="action-item" bindtap="onAddPackage">
+        <van-icon name="goods-collect-o" size="22px" color="#006495"/>
+        <text>添加套餐</text>
+      </view>
+      <view class="action-item" bindtap="onScan">
+        <van-icon name="scan" size="22px" color="#006495"/>
+        <text>扫描条码</text>
+      </view>
+      <view class="action-item" bindtap="onSearchItem">
+        <van-icon name="search" size="22px" color="#006495"/>
+        <text>搜索单品</text>
+      </view>
+      <view class="action-item" bindtap="onNoCode">
+        <van-icon name="apps-o" size="22px" color="#006495"/>
+        <text>无码物品</text>
+      </view>
+    </view>
+
+    <view class="checkout-bar">
+      <view class="checkout-prices">
+        <view class="checkout-price-row">
+          <text class="checkout-label">押金总计</text>
+          <text class="checkout-deposit">¥{{summary.deposit}}</text>
+        </view>
+        <view class="checkout-sub-row">
+          <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">押金减免 -¥{{summary.depositReduce}}</text>
+          <text class="checkout-rent">租金 ¥{{summary.rent}}</text>
+        </view>
+      </view>
+      <button class="checkout-btn" bindtap="onCheckout">
+        去结算
+        <van-icon name="arrow" size="16px" color="#ffffff" custom-style="margin-left:6px"/>
+      </button>
+    </view>
+
+    <view class="bottomnav">
+      <view class="bottomnav-item">
+        <van-icon name="apps-o" size="22px"/>
+        <text>工作台</text>
+      </view>
+      <view class="bottomnav-item active">
+        <van-icon name="add-o" size="22px" color="#006495"/>
+        <text>开单</text>
+      </view>
+      <view class="bottomnav-item">
+        <van-icon name="search" size="22px"/>
+        <text>查询</text>
+      </view>
+      <view class="bottomnav-item">
+        <van-icon name="manager-o" size="22px"/>
+        <text>我的</text>
+      </view>
+    </view>
+  </view>
+
+</view>

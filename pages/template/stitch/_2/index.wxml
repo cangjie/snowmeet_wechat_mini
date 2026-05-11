@@ -1,0 +1,143 @@
+<!--pages/template/stitch/_2/index.wxml
+  租赁开单 - 空购物车 / 添加套餐与租赁物入口
+  对应 PRD 2.4.1 租赁开单流程：
+    录入信息 → 选择租赁商品 / 套餐 → 选择租赁物（合规筛选） → 选择租赁形式 → 提交订单 → 支付押金
+-->
+<view class="page-root">
+
+  <!-- TopAppBar -->
+  <view class="topbar">
+    <view class="topbar-icon" bindtap="onBack">
+      <van-icon name="arrow-left" size="22px" color="#006495"/>
+    </view>
+    <view class="topbar-title">租赁开单</view>
+    <view class="topbar-icon">
+      <view class="staff-avatar">
+        <text class="staff-avatar-text">店</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Main canvas -->
+  <view class="main">
+
+    <!-- Member info card -->
+    <view class="member-card">
+      <view class="member-avatar">
+        <van-icon name="manager" size="22px" color="#586377"/>
+      </view>
+      <view class="member-body">
+        <view class="member-row">
+          <text class="member-name">{{customer.name || '散客'}}</text>
+          <text class="member-cell">{{customer.cellMasked}}</text>
+        </view>
+        <view class="member-row member-row--bottom">
+          <view class="member-tags">
+            <view class="member-tag">零</view>
+            <view class="member-tag">租</view>
+            <view class="member-tag">养</view>
+            <view class="member-tag">餐</view>
+          </view>
+          <view class="member-detail-link" bindtap="onMemberDetail">
+            <text>查看详情</text>
+            <van-icon name="arrow" size="14px" color="#006495"/>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Segmented control: 按时间 / 按品种 -->
+    <view class="seg-control">
+      <view
+        class="seg-item {{groupBy === 'time' ? 'active' : ''}}"
+        data-value="time"
+        bindtap="onGroupChange">按时间</view>
+      <view
+        class="seg-item {{groupBy === 'category' ? 'active' : ''}}"
+        data-value="category"
+        bindtap="onGroupChange">按品种</view>
+    </view>
+
+    <!-- Empty state -->
+    <view wx:if="{{packages.length === 0}}" class="empty">
+      <view class="empty-icon">
+        <van-icon name="goods-collect-o" size="48px" color="#bfc7d1"/>
+      </view>
+      <view class="empty-title">还没有添加任何商品</view>
+      <view class="empty-desc">点击下方"添加套餐"或"扫描条码"开始</view>
+    </view>
+
+    <!-- Package list (would render here once items added) -->
+    <view wx:else class="pkg-list">
+      <block wx:for="{{packages}}" wx:key="id">
+        <view class="pkg-card" bindtap="onOpenPackage" data-id="{{item.id}}">
+          <view class="pkg-name">{{item.name}}</view>
+          <view class="pkg-meta">
+            <text class="pkg-meta-item">押金 ¥{{item.deposit}}</text>
+            <text class="pkg-meta-item">租金/日 ¥{{item.dailyRate}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+
+  </view>
+
+  <!-- Bottom fixed area (action quick keys + checkout) -->
+  <view class="bottom-stack">
+    <view class="action-bar">
+      <view class="action-item" bindtap="onAddPackage">
+        <van-icon name="goods-collect-o" size="22px" color="#006495"/>
+        <text>添加套餐</text>
+      </view>
+      <view class="action-item" bindtap="onScanCode">
+        <van-icon name="scan" size="22px" color="#006495"/>
+        <text>扫描条码</text>
+      </view>
+      <view class="action-item" bindtap="onSearchItem">
+        <van-icon name="search" size="22px" color="#006495"/>
+        <text>搜索单品</text>
+      </view>
+      <view class="action-item" bindtap="onNoCodeItem">
+        <van-icon name="apps-o" size="22px" color="#006495"/>
+        <text>无码物品</text>
+      </view>
+    </view>
+
+    <view class="checkout-bar">
+      <view class="checkout-prices">
+        <view class="checkout-price-row">
+          <text class="checkout-label">押金总计</text>
+          <text class="checkout-deposit">¥{{summary.deposit}}</text>
+        </view>
+        <view class="checkout-sub-row">
+          <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">押金减免 -¥{{summary.depositReduce}}</text>
+          <text class="checkout-rent">租金 ¥{{summary.rent}}</text>
+        </view>
+      </view>
+      <button class="checkout-btn {{packages.length === 0 ? 'checkout-btn--disabled' : ''}}" bindtap="onCheckout">
+        去结算
+        <van-icon name="arrow" size="16px" color="#ffffff" custom-style="margin-left:6px"/>
+      </button>
+    </view>
+
+    <view class="bottomnav">
+      <view class="bottomnav-item">
+        <van-icon name="apps-o" size="22px"/>
+        <text>工作台</text>
+      </view>
+      <view class="bottomnav-item active">
+        <van-icon name="cart-o" size="22px" color="#006495"/>
+        <text>租赁</text>
+      </view>
+      <view class="bottomnav-item">
+        <van-icon name="goods-collect-o" size="22px"/>
+        <text>库存</text>
+      </view>
+      <view class="bottomnav-item">
+        <van-icon name="manager-o" size="22px"/>
+        <text>个人中心</text>
+      </view>
+    </view>
+  </view>
+
+</view>
