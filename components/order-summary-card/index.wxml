@@ -2,7 +2,7 @@
   <view class="order-card-head" bindtap="onToggle">
     <view class="order-card-head-left">
       <text class="order-card-title">订单详情</text>
-      <text wx:if="{{order}}" class="order-card-sub">#{{order.id}} · {{payingAmountStr}}</text>
+      <text wx:if="{{order}}" class="order-card-sub">#{{order.code || order.id}} · {{payingAmountStr}}</text>
     </view>
     <van-icon name="{{expanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#3f4850"/>
   </view>

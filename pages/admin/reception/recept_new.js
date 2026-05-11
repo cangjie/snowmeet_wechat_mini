@@ -131,7 +131,8 @@ Page({
     const detail = e.detail || {};
     const rentals = detail.rentals || [];
     this.setData({ 'order.rentals': rentals });
-    this.saveRentReceptOrder(); // 持久化到后端
+    // fire-and-forget：错误已在内部 console.warn，这里吞掉 rejection 避免 unhandled
+    Promise.resolve(this.saveRentReceptOrder()).catch(() => {});
   },
 
   onAddAction(e) {
@@ -334,7 +335,7 @@ Page({
     const current = (this.data.order && this.data.order.rentals) ? this.data.order.rentals.slice() : [];
     const merged = current.concat(rentals);
     this.setData({ 'order.rentals': merged });
-    this.saveRentReceptOrder();
+    Promise.resolve(this.saveRentReceptOrder()).catch(() => {});
   },
 
   onEditRental(e) {
@@ -354,35 +355,46 @@ Page({
       return;
     }
     wx.showLoading({ title: '下单中…', mask: true });
-    const placeUrl = app.globalData.requestPrefix
-      + 'Order/PlaceRentOrder/' + order.id
-      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
-    util.performWebRequest(placeUrl, null).then((rentOrder) => {
+    // 先把最新一笔编辑落盘：用户改完押金/租金/起租后立刻点结算，
+    // 之前 syncRent 触发的 saveRentReceptOrder 可能还在飞行，需等它收尾后再下单。
+    Promise.resolve(this.saveRentReceptOrder()).then(() => {
+      const placedOrderId = (this.data.order && this.data.order.id) || order.id;
+      const placeUrl = app.globalData.requestPrefix
+        + 'Order/PlaceRentOrder/' + placedOrderId
+        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+      return util.performWebRequest(placeUrl, null);
+    }).then((rentOrder) => {
       wx.hideLoading();
       if (!rentOrder || rentOrder.valid != 1) {
         wx.showToast({ title: '下单失败', icon: 'none' });
         return;
       }
+      // 写回本地：服务端已置 valid=1 并生成 order.code（参考 OrderController.GenerateOrderCode）
+      this.setData({ order: rentOrder });
       wx.navigateTo({
         url: '/pages/payment/settle/index?orderId=' + rentOrder.id,
       });
-    }).catch(() => {
+    }).catch((err) => {
       wx.hideLoading();
+      console.warn('checkout failed', err);
       wx.showToast({ title: '下单失败', icon: 'none' });
     });
   },
 
-  /* ---------- 与后端同步：调 Rent/SaveRentRecept ---------- */
+  /* ---------- 与后端同步：调 Rent/SaveRentRecept ----------
+   * 返回 Promise，便于 onCheckout 等同步链接调用前 await 落盘。
+   * 调用方未消费 Promise 时（fire-and-forget），异常已在 .catch 里吞掉，不会抛到外面。
+   */
   saveRentReceptOrder() {
     const order = this.data.order;
     if (!order.shop) {
       wx.showToast({ title: '店铺不能为空', icon: 'error' });
-      return;
+      return Promise.reject(new Error('店铺不能为空'));
     }
     if (!order.rentals || order.rentals.length === 0) {
       // 空购物车：仅在订单已存在（id > 0）时同步给后端清空，
       // 否则跳过避免首次进入就生成空订单
-      if (!order.id) return;
+      if (!order.id) return Promise.resolve(null);
     }
 
     // 复制并清理 rental，避免循环引用 / 后端拒收（与旧 recept_new 一致）
@@ -409,7 +421,7 @@ Page({
 
     const url = app.globalData.requestPrefix
       + 'Rent/SaveRentRecept?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
-    util.performWebRequest(url, payload).then((submitted) => {
+    return util.performWebRequest(url, payload).then((submitted) => {
       // 后端返回的最新 order，本地同步（保持 timeStamp 用于 wx:key）
       if (submitted && submitted.rentals) {
         submitted.rentals.forEach((r) => {
@@ -417,8 +429,10 @@ Page({
         });
       }
       this.setData({ order: submitted });
+      return submitted;
     }).catch((err) => {
       console.warn('saveRentReceptOrder failed', err);
+      throw err;
     });
   },
 });
