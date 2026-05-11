@@ -3,4 +3,5 @@
     <order-summary-card wx:if="{{orderId}}" orderId="{{orderId}}"/>
     <order-payment wx:if="{{orderId}}" orderId="{{orderId}}" bind:paid="onPaid"/>
   </view>
+  <reception-tabbar active="open"/>
 </view>
