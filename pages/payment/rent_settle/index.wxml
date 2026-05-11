@@ -1,12 +1,4 @@
 <view class="page-root">
-  <view class="topbar">
-    <view class="topbar-icon" bindtap="onBack">
-      <van-icon name="arrow-left" size="22px" color="#4aa9e9"/>
-    </view>
-    <view class="topbar-title">支付结算</view>
-    <view class="topbar-icon"></view>
-  </view>
-
   <view class="main">
     <order-summary-card wx:if="{{orderId}}" orderId="{{orderId}}"/>
     <order-payment wx:if="{{orderId}}" orderId="{{orderId}}" bind:paid="onPaid"/>

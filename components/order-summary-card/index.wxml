@@ -2,7 +2,7 @@
   <view class="order-card-head" bindtap="onToggle">
     <view class="order-card-head-left">
       <text class="order-card-title">订单详情</text>
-      <text wx:if="{{order}}" class="order-card-sub">#{{order.id}} · ¥{{payingAmountStr}}</text>
+      <text wx:if="{{order}}" class="order-card-sub">#{{order.id}} · {{payingAmountStr}}</text>
     </view>
     <van-icon name="{{expanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#3f4850"/>
   </view>
@@ -20,7 +20,7 @@
     </view>
     <view class="kv-row">
       <text class="kv-label">应付金额</text>
-      <text class="kv-value kv-value--strong">¥{{payingAmountStr}}</text>
+      <text class="kv-value kv-value--strong">{{payingAmountStr}}</text>
     </view>
   </view>
 </view>

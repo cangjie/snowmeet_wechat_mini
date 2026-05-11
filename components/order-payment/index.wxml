@@ -3,7 +3,7 @@
   <!-- 金额 -->
   <view class="amount">
     <text class="amount-label">需支付金额</text>
-    <text class="amount-value">¥{{payingAmountStr || '0.00'}}</text>
+    <text class="amount-value">{{payingAmountStr || '¥0.00'}}</text>
   </view>
 
   <!-- 二维码 -->
