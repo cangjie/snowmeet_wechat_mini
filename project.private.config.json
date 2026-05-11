@@ -3,8 +3,8 @@
     "miniprogram": {
       "list": [
         {
-          "name": "admin",
-          "pathName": "pages/admin/admin",
+          "name": "stitch",
+          "pathName": "pages/template/stitch/_5/index",
           "query": "",
           "scene": null,
           "launchMode": "default"
