@@ -20,17 +20,17 @@
           <text class="label">{{rental.displayName}}</text>
           <text class="value">{{rental.rentItems.length}} 件<text class="arrow">▾</text></text>
         </view>
-        <view class="row"><text class="label">押金</text><text class="value">{{rental.guarantyStr}}</text></view>
-        <view class="row"><text class="label">日租金</text><text class="value">{{rental.totalRentalAmountStr}}</text></view>
+        <view class="row fee-row">
+          <view class="fee-group"><text class="label">押金</text><text class="value">{{rental.guarantyStr}}</text></view>
+          <view class="fee-group"><text class="label">日租金</text><text class="value">{{rental.totalRentalAmountStr}}</text></view>
+        </view>
       </view>
 
       <view class="rental-items" wx:if="{{rental.expanded}}">
         <view class="item-row" wx:for="{{rental.rentItems}}" wx:for-item="item" wx:key="id">
-          <view class="row"><text class="label">条码</text><text class="value">{{item.code || '-'}}</text></view>
+          <view class="row"><text class="label">编码</text><text class="value">{{item.code || '-'}}</text></view>
           <view class="row"><text class="label">名称</text><text class="value">{{item.name || '-'}}</text></view>
           <view class="row"><text class="label">品类</text><text class="value">{{item.categoryName}}</text></view>
-          <view class="row"><text class="label">取/还</text><text class="value">{{item.pickReturnStr}}</text></view>
-          <view class="row"><text class="label">状态</text><text class="value">{{item.status || '-'}}</text></view>
         </view>
       </view>
     </block>

@@ -87,6 +87,20 @@
   transform: rotate(180deg);
 }
 
+.fee-row {
+  justify-content: flex-start;
+  gap: 48rpx;
+}
+
+.fee-group {
+  display: flex;
+  align-items: baseline;
+}
+
+.fee-group .label {
+  margin-right: 12rpx;
+}
+
 .rental-items {
   background: #FAFAFA;
   border-radius: 8rpx;

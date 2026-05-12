@@ -104,24 +104,10 @@ Page({
         for (var k = 0; k < rental.rentItems.length; k++){
           var item = rental.rentItems[k]
           item.categoryName = (item.category && item.category.name) || item.class_name || '-'
-          item.pickReturnStr = that.formatPickReturn(item.pick_time, item.return_time)
         }
       }
     }
     that.setData({order, payment})
-  },
-  formatPickReturn(pickTime, returnTime){
-    var pickStr = '-'
-    var returnStr = '-'
-    if (pickTime){
-      var p = new Date(pickTime)
-      pickStr = util.formatDate(p) + ' ' + util.formatTimeStr(p)
-    }
-    if (returnTime){
-      var rt = new Date(returnTime)
-      returnStr = util.formatDate(rt) + ' ' + util.formatTimeStr(rt)
-    }
-    return pickStr + ' ~ ' + returnStr
   },
   toggleRental(e){
     var idx = e.currentTarget.dataset.index
