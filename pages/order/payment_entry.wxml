@@ -1,33 +1,57 @@
-<view>
-  <view wx:if="{{order}}" >
-    <view class="view-row" >
-      <view class="left-column" >【店铺】</view>
-      <view class="right-column" >{{order.shop}}</view>
+<view class="page" wx:if="{{order}}">
+
+  <view class="card">
+    <view class="section-title">订单信息</view>
+    <view class="row"><text class="label">店铺</text><text class="value">{{order.shop}}</text></view>
+    <view class="row"><text class="label">订单号</text><text class="value">{{order.code}}</text></view>
+    <view class="row"><text class="label">日期</text><text class="value">{{order.dataStr}}</text></view>
+    <view class="row"><text class="label">时间</text><text class="value">{{order.timeStr}}</text></view>
+  </view>
+
+  <view class="card" wx:if="{{order.type=='租赁' && order.rentals && order.rentals.length}}">
+    <view class="section-title">租赁内容</view>
+
+    <block wx:for="{{order.rentals}}" wx:for-item="rental" wx:key="id">
+      <view wx:if="{{index > 0}}" class="rental-divider"></view>
+
+      <view class="rental-head {{rental.expanded ? 'rental-head--open' : ''}}"
+            bindtap="toggleRental" data-index="{{index}}">
+        <view class="row">
+          <text class="label">{{rental.displayName}}</text>
+          <text class="value">{{rental.rentItems.length}} 件<text class="arrow">▾</text></text>
+        </view>
+        <view class="row"><text class="label">押金</text><text class="value">{{rental.guarantyStr}}</text></view>
+        <view class="row"><text class="label">日租金</text><text class="value">{{rental.totalRentalAmountStr}}</text></view>
+      </view>
+
+      <view class="rental-items" wx:if="{{rental.expanded}}">
+        <view class="item-row" wx:for="{{rental.rentItems}}" wx:for-item="item" wx:key="id">
+          <view class="row"><text class="label">条码</text><text class="value">{{item.code || '-'}}</text></view>
+          <view class="row"><text class="label">名称</text><text class="value">{{item.name || '-'}}</text></view>
+          <view class="row"><text class="label">品类</text><text class="value">{{item.categoryName}}</text></view>
+          <view class="row"><text class="label">取/还</text><text class="value">{{item.pickReturnStr}}</text></view>
+          <view class="row"><text class="label">状态</text><text class="value">{{item.status || '-'}}</text></view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="section-title">金额</view>
+    <view class="row"><text class="label">总计</text><text class="value value--amount">{{order.total_amountStr}}</text></view>
+    <view class="row" wx:if="{{order.orderStatus != '支付成功'}}">
+      <text class="label">需要支付</text><text class="value value--pay">{{order.paying_amountStr}}</text>
     </view>
-    <view class="view-row" >
-      <view class="left-column" >【订单号】</view>
-      <view class="right-column" >{{order.code}}</view>
-    </view>
-    <view class="view-row" >
-      <view class="left-column" >【日期】</view>
-      <view class="right-column" >{{order.dataStr}}</view>
-    </view>
-    <view class="view-row" >
-      <view class="left-column" >【时间】</view>
-      <view class="right-column" >{{order.timeStr}}</view>
-    </view>
-    <view class="view-row" wx:if="{{order.orderStatus != '支付成功'}}" >
-      <view class="left-column" >【支付金额】</view>
-      <view class="right-column" >{{order.paying_amountStr}}</view>
-    </view>
-    <view class="view-row" wx:else >
-      <view class="left-column" >【支付金额】</view>
-      <view class="right-column" >{{order.paidAmountStr}}</view>
-    </view>
-    <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
-      <van-button wx:if="{{payment.status=='待支付'}}" type="primary"  
-        bind:click="pay" disabled="{{!payment || paying}}" > 敬 请 支 付 </van-button>
-      <view wx:if="{{order.orderStatus=='支付成功'}}" style="text-align: center;font-size: 14pt;color: red" > 支 付 成 功 </view>
+    <view class="row" wx:else>
+      <text class="label">已支付</text><text class="value value--amount">{{order.paidAmountStr}}</text>
     </view>
   </view>
+
+  <view wx:if="{{payment && payment.status=='待支付'}}" class="pay-btn-wrap">
+    <van-button type="primary" color="#2EA6D0" bind:click="pay" disabled="{{paying}}"> 敬 请 支 付 </van-button>
+  </view>
+  <view wx:if="{{order.orderStatus=='支付成功'}}" class="pay-success"> 支 付 成 功 </view>
+
 </view>
+
+<view wx:if="{{!order}}" class="loading">请稍候……</view>

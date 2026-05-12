@@ -1,7 +1,131 @@
 @import '/app.wxss';
-.left-column{
-  text-align: left;
+
+.page {
+  background: #F8F8F8;
+  min-height: 100vh;
+  padding: 20rpx 24rpx 60rpx;
+  box-sizing: border-box;
 }
-.right-column{
-  text-align: left;
+
+.card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  padding: 12rpx 0;
+  margin-bottom: 4rpx;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 6rpx;
+  height: 28rpx;
+  background: #2EA6D0;
+  border-radius: 3rpx;
+  margin-right: 14rpx;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 64rpx;
+  font-size: 28rpx;
+}
+
+.row .label {
+  color: #666;
+  flex-shrink: 0;
+  margin-right: 24rpx;
+}
+
+.row .value {
+  color: #333;
+  text-align: right;
+  word-break: break-all;
+}
+
+.value--amount {
+  font-weight: 600;
+}
+
+.value--pay {
+  color: #E64340;
+  font-weight: 600;
+  font-size: 32rpx;
+}
+
+.rental-head {
+  padding: 4rpx 0;
+}
+
+.rental-head .row:first-child .label {
+  color: #333;
+  font-weight: 600;
+}
+
+.rental-head .row:first-child .value {
+  color: #2EA6D0;
+}
+
+.rental-head .arrow {
+  display: inline-block;
+  margin-left: 8rpx;
+  transition: transform 0.2s ease;
+}
+
+.rental-head--open .arrow {
+  transform: rotate(180deg);
+}
+
+.rental-items {
+  background: #FAFAFA;
+  border-radius: 8rpx;
+  padding: 8rpx 20rpx;
+  margin: 8rpx 0 16rpx;
+}
+
+.item-row {
+  padding: 8rpx 0;
+  border-bottom: 1rpx solid #EEE;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.rental-divider {
+  height: 1rpx;
+  background: #EEE;
+  margin: 12rpx 0;
+}
+
+.pay-btn-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 60rpx;
+}
+
+.pay-success {
+  text-align: center;
+  font-size: 36rpx;
+  color: #E64340;
+  font-weight: 600;
+  margin-top: 60rpx;
+}
+
+.loading {
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+  margin-top: 200rpx;
 }

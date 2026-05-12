@@ -81,6 +81,7 @@ Page({
     var that = this
     order.paying_amountStr = util.showAmount(order.paying_amount)
     order.paidAmountStr = util.showAmount(order.paidAmount)
+    order.total_amountStr = util.showAmount(order.total_amount)
     order.dataStr = util.formatDate(new Date(order.biz_date))
     order.timeStr = util.formatTimeStr(new Date(order.biz_date))
     var payment = null
@@ -89,7 +90,43 @@ Page({
         payment = order.payments[i]
       }
     }
+    if (order.type == '租赁' && order.rentals && order.rentals.length){
+      for (var r = 0; r < order.rentals.length; r++){
+        var rental = order.rentals[r]
+        if (!rental.rentItems){
+          rental.rentItems = []
+        }
+        var firstItemName = rental.rentItems[0] ? rental.rentItems[0].name : ''
+        rental.displayName = rental.name || firstItemName || '租赁'
+        rental.guarantyStr = util.showAmount(rental.guaranty || 0)
+        rental.totalRentalAmountStr = util.showAmount(rental.totalRentalAmount || 0)
+        rental.expanded = false
+        for (var k = 0; k < rental.rentItems.length; k++){
+          var item = rental.rentItems[k]
+          item.categoryName = (item.category && item.category.name) || item.class_name || '-'
+          item.pickReturnStr = that.formatPickReturn(item.pick_time, item.return_time)
+        }
+      }
+    }
     that.setData({order, payment})
+  },
+  formatPickReturn(pickTime, returnTime){
+    var pickStr = '-'
+    var returnStr = '-'
+    if (pickTime){
+      var p = new Date(pickTime)
+      pickStr = util.formatDate(p) + ' ' + util.formatTimeStr(p)
+    }
+    if (returnTime){
+      var rt = new Date(returnTime)
+      returnStr = util.formatDate(rt) + ' ' + util.formatTimeStr(rt)
+    }
+    return pickStr + ' ~ ' + returnStr
+  },
+  toggleRental(e){
+    var idx = e.currentTarget.dataset.index
+    var key = 'order.rentals[' + idx + '].expanded'
+    this.setData({ [key]: !this.data.order.rentals[idx].expanded })
   },
   pay(){
     var that = this
