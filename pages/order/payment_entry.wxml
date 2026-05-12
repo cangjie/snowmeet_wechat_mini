@@ -21,8 +21,8 @@
           <text class="value">{{rental.rentItems.length}} 件<text class="arrow">▾</text></text>
         </view>
         <view class="row fee-row">
-          <view class="fee-group"><text class="label">押金</text><text class="value">{{rental.guarantyStr}}</text></view>
-          <view class="fee-group"><text class="label">日租金</text><text class="value">{{rental.totalRentalAmountStr}}</text></view>
+          <view class="fee-group fee-group--deposit"><text class="label">押金</text><text class="value">{{rental.guarantyStr}}</text></view>
+          <view class="fee-group fee-group--rent"><text class="label">日租金</text><text class="value">{{rental.totalRentalAmountStr}}</text></view>
         </view>
       </view>
 

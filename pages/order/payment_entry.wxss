@@ -89,16 +89,29 @@
 
 .fee-row {
   justify-content: flex-start;
-  gap: 48rpx;
+  gap: 40rpx;
 }
 
 .fee-group {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;
 }
 
 .fee-group .label {
-  margin-right: 12rpx;
+  margin-right: 16rpx;
+}
+
+.fee-group .value {
+  text-align: right;
+}
+
+.fee-group--deposit {
+  min-width: 300rpx;
+}
+
+.fee-group--rent {
+  min-width: 300rpx;
 }
 
 .rental-items {
