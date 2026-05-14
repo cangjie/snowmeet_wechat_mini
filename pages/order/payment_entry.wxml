@@ -47,7 +47,18 @@
     </view>
   </view>
 
-  <view wx:if="{{payment && payment.status=='待支付'}}" class="pay-btn-wrap">
+  <!-- 支付前身份验证：identity 加载完后，非 direct 状态都用组件渲染；direct 状态显示支付按钮 -->
+  <pay-identity-confirm
+    wx:if="{{identity && identity.status && identity.status !== 'direct'}}"
+    payment-id="{{paymentId}}"
+    payer-type="wechat"
+    scanner-id="{{scannerId}}"
+    status="{{identity.status}}"
+    result="{{identity}}"
+    bind:refreshed="onIdentityRefreshed">
+  </pay-identity-confirm>
+
+  <view wx:if="{{payment && payment.status=='待支付' && identity && identity.status === 'direct'}}" class="pay-btn-wrap">
     <van-button type="primary" color="#2EA6D0" bind:click="pay" disabled="{{paying}}"> 敬 请 支 付 </van-button>
   </view>
   <view wx:if="{{order.orderStatus=='支付成功'}}" class="pay-success"> 支 付 成 功 </view>

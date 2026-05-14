@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "pay-identity-confirm": "/components/pay-identity-confirm/index"
+  },
   "navigationBarTitleText": "支付订单"
 }

@@ -441,6 +441,34 @@ const getOrderFromPaymentByCustomer = function (paymentId, sessionKey) {
     })
   })
 }
+// 支付前身份验证 — 只读，返回 CheckPayerIdentityResult
+const checkPayerIdentityPromise = function (paymentId, payerType, scannerId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'PaymentIdentity/CheckPayerIdentity'
+    + '?paymentId=' + paymentId
+    + '&payerType=' + encodeURIComponent(payerType || 'wechat')
+    + '&scannerId=' + encodeURIComponent(scannerId || '')
+    + '&sessionKey=' + encodeURIComponent(sessionKey || '')
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, undefined).then(function (result) {
+      resolve(result)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+// 支付前身份验证 — 写入 OrderPayment / Order，返回更新后 CheckPayerIdentityResult
+// body: { paymentId, payerType, scannerId, action, choice?, encData?, iv?, phoneMock? }
+const confirmPayIdentityPromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'PaymentIdentity/ConfirmPayIdentity'
+    + '?sessionKey=' + encodeURIComponent(sessionKey || '')
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, body).then(function (result) {
+      resolve(result)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const updateOrderWithDetailPromise = function (order, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Order/UpdateOrderWithDetailByStaff?scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -800,6 +828,8 @@ module.exports = {
   updateOrderPromise,
   cancelPayingPromise,
   getOrderFromPaymentByCustomer,
+  checkPayerIdentityPromise,
+  confirmPayIdentityPromise,
   updateOrderWithDetailPromise,
   getEquipBrandsPromise,
   uploadFilePromise,

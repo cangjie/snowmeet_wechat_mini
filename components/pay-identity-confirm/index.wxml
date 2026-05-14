@@ -1,0 +1,58 @@
+<!-- pay-identity-confirm -->
+
+<!-- 1) phone_required：未绑手机号，先一键授权 -->
+<view wx:if="{{status === 'phone_required'}}" class="card identity-card">
+  <view class="section-title">支付前验证</view>
+  <view class="hint">为了完成支付，请先一键授权您的微信手机号。</view>
+  <view class="btn-row">
+    <button class="btn btn-primary"
+            open-type="getPhoneNumber"
+            bindgetphonenumber="onGetPhoneNumber"
+            disabled="{{busy}}">
+      一键授权手机号
+    </button>
+  </view>
+</view>
+
+<!-- 2) direct_to_scanner：订单未匹配会员，将归扫码方 -->
+<view wx:elif="{{status === 'direct_to_scanner'}}" class="card identity-card">
+  <view class="section-title">确认订单归属</view>
+  <view class="hint">
+    支付完成后，订单将归您
+    <text class="hl">{{result.scannerMaskedCell || ''}}</text>
+    名下。
+  </view>
+  <view class="btn-row">
+    <button class="btn btn-primary" bindtap="onConfirmDirect" disabled="{{busy}}">
+      确认并继续
+    </button>
+  </view>
+</view>
+
+<!-- 3) choose_identity：订单已匹配别人，二选一 -->
+<view wx:elif="{{status === 'choose_identity'}}" class="card identity-card">
+  <view class="section-title">选择支付身份</view>
+  <view class="hint">
+    本订单已记录会员
+    <text wx:if="{{result.orderMemberName}}" class="hl">{{result.orderMemberName}} </text>
+    <text class="hl">{{result.orderMemberMaskedCell || ''}}</text>
+    。您与该会员
+    <text wx:if="{{result.scannerMemberId}}">不一致</text>
+    <text wx:else>未匹配</text>
+    ，请选择支付身份：
+  </view>
+  <view class="btn-row btn-row--vertical">
+    <button class="btn btn-primary" bindtap="onChooseSelf" disabled="{{busy}}">
+      正常支付（订单转归我）
+    </button>
+    <button class="btn btn-secondary" bindtap="onChooseProxy" disabled="{{busy}}">
+      替人代付（订单仍归原会员）
+    </button>
+  </view>
+</view>
+
+<!-- 4) error：展示错误信息 -->
+<view wx:elif="{{status === 'error'}}" class="card identity-card">
+  <view class="section-title section-title--error">无法支付</view>
+  <view class="error-text">{{(result && result.errorMessage) || '未知错误'}}</view>
+</view>

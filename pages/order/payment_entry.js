@@ -8,7 +8,10 @@ Page({
    * Page initial data
    */
   data: {
-    paying: false
+    paying: false,
+    paymentId: 0,
+    scannerId: '',
+    identity: null   // CheckPayerIdentityResult；status 决定渲染哪段 UI
   },
 
   /**
@@ -37,10 +40,40 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function (resolve){
+      // 从 globalData 取扫码方 openid（登录后由 MemberLogin 写入 app.globalData.member）
+      var member = app.globalData.member || {}
+      that.setData({ scannerId: member.wechatMiniOpenId || '' })
       data.getOrderFromPaymentByCustomer(that.data.paymentId, app.globalData.sessionKey).then(function (order){
         that.renderData(order)
+        that._refreshIdentity()
       })
     })
+  },
+
+  // 拉 PaymentIdentity/CheckPayerIdentity，结果写到 data.identity 驱动 UI
+  // scannerId 拿不到时不报错 — 后端会用 sessionKey 反查 mini_session 兜底
+  _refreshIdentity() {
+    var that = this
+    if (!that.data.paymentId) {
+      that.setData({ identity: { status: 'error', errorCode: 'no_payment_id', errorMessage: '支付参数缺失' } })
+      return
+    }
+    data.checkPayerIdentityPromise(that.data.paymentId, 'wechat', that.data.scannerId || '', app.globalData.sessionKey)
+      .then(function (result) {
+        that.setData({ identity: result })
+      })
+      .catch(function () {
+        // performWebRequest 已 toast；这里补一个 inline 提示
+        that.setData({ identity: { status: 'error', errorCode: 'check_failed', errorMessage: '身份验证查询失败，请重试' } })
+      })
+  },
+
+  // 子组件 ConfirmPayIdentity 落库后回调，刷新本地 identity
+  onIdentityRefreshed(e) {
+    var result = e && e.detail && e.detail.result
+    if (result) {
+      this.setData({ identity: result })
+    }
   },
 
   /**
@@ -116,6 +149,12 @@ Page({
   },
   pay(){
     var that = this
+    // 身份验证未通过前不可发起支付（防止 wxml 漏判 / 用户手动触发）
+    var identity = that.data.identity
+    if (!identity || identity.status !== 'direct') {
+      wx.showToast({ title: '请先完成支付身份确认', icon: 'none' })
+      return
+    }
     that.setData({paying: true})
     var payment = that.data.payment
     //var order = that.data.order
