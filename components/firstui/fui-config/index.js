@@ -7,7 +7,7 @@
 
 /*
   组件属性全局配置文件。优先级：全局配置文件props < 直接设置组件props
-  目前支持配置的组件：fui-button、fui-icon、fui-text、fui-input、fui-list-cell、fui-section、fui-white-space、fui-wing-blank
+  目前支持配置的组件：fui-button、fui-icon、fui-text、fui-input、fui-list-cell、fui-section、fui-white-space
 */
 
 // 主色，仅适用无法使用css变量控制颜色的组件使用【保持与fui-theme中一致】
@@ -109,13 +109,6 @@ const fuiConfig = {
     size: 'default',
     //设置了height则size失效
     height: 0,
-    background: 'transparent'
-  },
-  //v2.1.0+
-  fuiWingBlank: {
-    size: 'default',
-    //设置了gap则size失效
-    gap: 0,
     background: 'transparent'
   },
   color,
