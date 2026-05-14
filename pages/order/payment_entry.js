@@ -51,17 +51,14 @@ Page({
   },
 
   // 拉 PaymentIdentity/CheckPayerIdentity，结果写到 data.identity 驱动 UI
+  // scannerId 拿不到时不报错 — 后端会用 sessionKey 反查 mini_session 兜底
   _refreshIdentity() {
     var that = this
-    if (!that.data.scannerId) {
-      that.setData({ identity: { status: 'error', errorCode: 'no_openid', errorMessage: '无法获取微信账号，请重新登录后再试' } })
-      return
-    }
     if (!that.data.paymentId) {
       that.setData({ identity: { status: 'error', errorCode: 'no_payment_id', errorMessage: '支付参数缺失' } })
       return
     }
-    data.checkPayerIdentityPromise(that.data.paymentId, 'wechat', that.data.scannerId, app.globalData.sessionKey)
+    data.checkPayerIdentityPromise(that.data.paymentId, 'wechat', that.data.scannerId || '', app.globalData.sessionKey)
       .then(function (result) {
         that.setData({ identity: result })
       })
