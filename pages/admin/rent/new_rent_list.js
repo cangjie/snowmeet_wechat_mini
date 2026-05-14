@@ -238,7 +238,7 @@ Page({
         && order.rentProperties.rentStatus == '了结关闭'  && j < order.rentals.length; j++) {
         var rental = order.rentals[j]
         order.displayedRental += (rental.totalRentalAmount - rental.totalDiscountAmount)
-        totalRentalAmount += order.displayedRental
+        totalRentalAmount += (rental.totalRentalAmount - rental.totalDiscountAmount)
         order.displayedRentalStr = util.showAmount(order.displayedRental)
 
       }
