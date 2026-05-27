@@ -3,22 +3,8 @@
     "miniprogram": {
       "list": [
         {
-          "name": "stitch",
-          "pathName": "pages/template/stitch/_5/index",
-          "query": "",
-          "scene": null,
-          "launchMode": "default"
-        },
-        {
           "name": "recept",
           "pathName": "pages/admin/reception/recept_entry",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/template/stitch/_2/index",
-          "pathName": "pages/template/stitch/_2/index",
           "query": "",
           "launchMode": "default",
           "scene": null

@@ -103,8 +103,7 @@
     "pages/mine/skipass/my_skipasses",
     "pages/admin/reception/recept_entry",
     "pages/admin/reception/recept_new",
-    "pages/admin/reception/recept_package",
-    "pages/template/stitch/_5/index"
+    "pages/admin/reception/recept_package"
   ],
   "window": {
     "backgroundTextStyle": "light",

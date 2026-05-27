@@ -1,5 +1,5 @@
 /* pages/admin/reception/recept_entry.wxss
-   Alpine Operational Minimalist tokens (mirror of pages/template/stitch/_1) */
+   Alpine Operational Minimalist tokens (local) */
 
 page {
   --surface: #f8f9ff;

@@ -1,6 +1,6 @@
 <!--pages/admin/reception/recept_package.wxml
   添加套餐选择页
-  设计参考：pages/template/stitch/_3
+  设计参考：Alpine Operational Minimalist stitch _3
 -->
 <view class="page-root">
 

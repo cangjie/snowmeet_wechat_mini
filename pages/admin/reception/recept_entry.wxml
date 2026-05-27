@@ -4,7 +4,7 @@
     第一步 获取订单标识信息（姓名 / 手机号非必填）
     第二步 选择业务类型 → 进入对应业务开单
     第三步 顾客扫码支付时再做账户匹配
-  设计模板：pages/template/stitch/_1/index
+  设计模板：Alpine Operational Minimalist stitch _1
 -->
 <view class="page-root">
 

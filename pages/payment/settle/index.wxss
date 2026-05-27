@@ -1,4 +1,4 @@
-@import "/pages/template/stitch/tokens.wxss";
+@import "./tokens.wxss";
 
 .page-root {
   display: flex;

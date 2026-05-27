@@ -1,6 +1,6 @@
 // components/reception/rent_recept_form/rent_recept_form.js
 // 租赁接待开单表单
-// 视觉参考：pages/template/stitch/_4
+// 视觉参考：Alpine Operational Minimalist stitch _4
 // 数据契约：
 //   - properties.rentals  父页购物车，每项保留旧版结构（rentItems/pricePresets/pick_type/...）
 //   - triggerEvent('syncRent', { rentals, needUpdate })  购物车结构/字段变化时同步给父页

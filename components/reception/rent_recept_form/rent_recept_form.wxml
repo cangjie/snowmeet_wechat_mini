@@ -1,7 +1,7 @@
 <!--components/reception/rent_recept_form/rent_recept_form.wxml
   租赁接待开单表单（第一步）
   对应 PRD §2.4.1 租赁开单流程：选择租赁商品 / 套餐 → 选择租赁物 → 选择租赁形式 → 提交 → 支付
-  设计参考：pages/template/stitch/_2/index
+  设计参考：Alpine Operational Minimalist stitch _2
   组件契约：
     - properties.rentals  父页传入的当前购物车
     - triggerEvent('syncRent', { rentals, needUpdate })  购物车变化
