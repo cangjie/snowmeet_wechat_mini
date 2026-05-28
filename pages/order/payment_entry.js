@@ -11,7 +11,8 @@ Page({
     paying: false,
     paymentId: 0,
     scannerId: '',
-    identity: null   // CheckPayerIdentityResult；status 决定渲染哪段 UI
+    identity: null,        // CheckPayerIdentityResult；status 决定渲染哪段 UI
+    showPhonePrompt: false // 「敬请支付」点击时若 scannerHasCell=false 则弹软授权提示
   },
 
   /**
@@ -158,9 +159,9 @@ Page({
     var key = 'order.rentals[' + idx + '].expanded'
     this.setData({ [key]: !this.data.order.rentals[idx].expanded })
   },
+  // 「敬请支付」入口：未绑手机号弹软提示，已绑直接调起微信支付
   pay(){
     var that = this
-    // 身份验证未通过前不可发起支付（防止 wxml 漏判 / 用户手动触发）
     var identity = that.data.identity
     if (!identity || identity.status !== 'direct') {
       wx.showToast({ title: '请先完成支付身份确认', icon: 'none' })
@@ -173,6 +174,22 @@ Page({
     }
     if (payment.pay_method != '微信支付' || payment.status != '待支付'){
       wx.showToast({ title: '不可支付', icon: 'error' })
+      return
+    }
+    // 未绑手机号 → 弹软提示卡片，授权或跳过都可继续支付
+    if (!identity.scannerHasCell) {
+      that.setData({ showPhonePrompt: true })
+      return
+    }
+    that._doWepay()
+  },
+
+  // 实际调起微信支付的逻辑，抽出来给 pay() / onAuthorizePhone / onSkipPhone 共用
+  _doWepay(){
+    var that = this
+    var payment = that.data.payment
+    if (!payment) {
+      wx.showToast({ title: '支付状态已变更，请刷新', icon: 'none' })
       return
     }
     that.setData({paying: true})
@@ -199,8 +216,38 @@ Page({
         }
       })
     }).catch(function () {
-      // performWebRequest 内已 toast，这里复位 paying 让用户重试
       that.setData({paying: false})
     })
+  },
+
+  // 软提示弹窗：用户点「授权手机号」按钮（open-type=getPhoneNumber）后回调
+  // 取消授权 / 后端解码失败 → 都兜底当跳过，让用户能继续支付
+  onAuthorizePhone(e){
+    var that = this
+    if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
+      that.setData({ showPhonePrompt: false })
+      that._doWepay()
+      return
+    }
+    data.confirmPayIdentityPromise({
+      paymentId: that.data.paymentId,
+      payerType: 'wechat',
+      scannerId: that.data.scannerId,
+      action: 'submit_phone',
+      encData: e.detail.encryptedData,
+      iv: e.detail.iv
+    }, app.globalData.sessionKey).then(function (result){
+      that.setData({ identity: result, showPhonePrompt: false })
+      that._doWepay()
+    }).catch(function (){
+      that.setData({ showPhonePrompt: false })
+      that._doWepay()
+    })
+  },
+
+  // 软提示弹窗：用户点「跳过,直接支付」或点击遮罩
+  onSkipPhone(){
+    this.setData({ showPhonePrompt: false })
+    this._doWepay()
   }
 })

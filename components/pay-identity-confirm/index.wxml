@@ -1,21 +1,9 @@
 <!-- pay-identity-confirm -->
-
-<!-- 1) phone_required：未绑手机号，先一键授权 -->
-<view wx:if="{{status === 'phone_required'}}" class="card identity-card">
-  <view class="section-title">支付前验证</view>
-  <view class="hint">为了完成支付，请先一键授权您的微信手机号。</view>
-  <view class="btn-row">
-    <button class="btn btn-primary"
-            open-type="getPhoneNumber"
-            bindgetphonenumber="onGetPhoneNumber"
-            disabled="{{busy}}">
-      一键授权手机号
-    </button>
-  </view>
-</view>
+<!-- 已迁出 phone_required 渲染分支:由 payment_entry 在「敬请支付」点击时弹软授权,
+     允许用户跳过。本组件保留 direct_to_scanner / choose_identity / error 三个状态。 -->
 
 <!-- 2) direct_to_scanner：订单未匹配会员，将归扫码方 -->
-<view wx:elif="{{status === 'direct_to_scanner'}}" class="card identity-card">
+<view wx:if="{{status === 'direct_to_scanner'}}" class="card identity-card">
   <view class="section-title">确认订单归属</view>
   <view class="hint">
     支付完成后，订单将归您

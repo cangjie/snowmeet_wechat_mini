@@ -117,6 +117,7 @@ const performWebRequest = function (url, data) {
             title: res.statusCode.toString(),
             icon: 'error'
           })
+          reject(res.statusCode)
           return
         }
         if (res.data.code != 0) {
