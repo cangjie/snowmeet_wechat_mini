@@ -69,11 +69,22 @@ Page({
   },
 
   // 子组件 ConfirmPayIdentity 落库后回调，刷新本地 identity
+  // status 转 direct 时自动重拉订单后调起微信支付，让顾客「一次点击完成支付」
   onIdentityRefreshed(e) {
+    var that = this
     var result = e && e.detail && e.detail.result
-    if (result) {
-      this.setData({ identity: result })
+    if (!result) return
+    if (result.status === 'direct') {
+      that.setData({ identity: result })
+      data.getOrderFromPaymentByCustomer(that.data.paymentId, app.globalData.sessionKey).then(function (order){
+        that.renderData(order)
+        that.pay()
+      }).catch(function () {
+        // 拉单失败不卡死用户：identity 已是 direct，wxml 会显示「敬请支付」让用户手动点重试
+      })
+      return
     }
+    that.setData({ identity: result })
   },
 
   /**
@@ -155,42 +166,31 @@ Page({
       wx.showToast({ title: '请先完成支付身份确认', icon: 'none' })
       return
     }
-    that.setData({paying: true})
     var payment = that.data.payment
-    //var order = that.data.order
-    if (payment.pay_method != '微信支付' || payment.status != '待支付'){
-      wx.showToast({
-        title: '不可支付',
-        icon: 'error'
-      })
+    if (!payment) {
+      wx.showToast({ title: '支付状态已变更，请刷新', icon: 'none' })
       return
     }
+    if (payment.pay_method != '微信支付' || payment.status != '待支付'){
+      wx.showToast({ title: '不可支付', icon: 'error' })
+      return
+    }
+    that.setData({paying: true})
     var payUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + payment.id + '?sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(payUrl, null).then(function (payment){
+    util.performWebRequest(payUrl, null).then(function (payParams){
       wx.requestPayment({
-        nonceStr: payment.nonce,
-        package: 'prepay_id=' + payment.prepay_id,
-        paySign: payment.sign,
-        timeStamp: payment.timestamp,
+        nonceStr: payParams.nonce,
+        package: 'prepay_id=' + payParams.prepay_id,
+        paySign: payParams.sign,
+        timeStamp: payParams.timestamp,
         signType: 'MD5',
         success: (res) => {
-          wx.showToast({
-            title: '支付成功',
-            icon: 'success'
-          })
-          data.getOrderFromPaymentByCustomer(payment.id, app.globalData.sessionKey).then(function (order){
-            /*
-            var currentPayment = null
-            for(var i = 0; i < order.payments.length; i++){
-              if (order.payments[i].id == payment.id){
-                currentPayment = order.payments[i]
-                break
-              }
-            }
-            */
-            //that.setData({payment: currentPayment})
+          wx.showToast({ title: '支付成功', icon: 'success' })
+          data.getOrderFromPaymentByCustomer(that.data.paymentId, app.globalData.sessionKey).then(function (order){
             that.renderData(order)
-            //that.setData({payment: currentPayment})
+            that.setData({paying: false})
+          }).catch(function () {
+            that.setData({paying: false})
           })
         },
         fail: (res) => {
@@ -198,6 +198,9 @@ Page({
           that.setData({paying: false})
         }
       })
+    }).catch(function () {
+      // performWebRequest 内已 toast，这里复位 paying 让用户重试
+      that.setData({paying: false})
     })
   }
 })
