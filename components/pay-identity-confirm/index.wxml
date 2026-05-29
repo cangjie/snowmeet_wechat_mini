@@ -13,7 +13,9 @@
   <view class="btn-row">
     <!-- 无 cell(散客 OR 已是会员但未绑手机号) → 统一弹软授权层(授权/跳过/取消)。
          前端行为一致,后端 _submitPhone 根据 scannerMember 是否存在自动分流:
-           null → _createNewMember(新建会员); 非 null → BindMemberMainCellNum(给现有会员补 cell)。 -->
+           null → _createNewMember(新建会员); 非 null → BindMemberMainCellNum(给现有会员补 cell)。
+         注: 之前曾因 MiniAppHelperController 的「孤儿清理」逻辑会把会员 openid MSA 失效,
+         导致软授权死循环 → 已于 2026-05-29 修复(删 258-294 孤儿清理 + socialAccountForJob 改为兜底)。 -->
     <button wx:if="{{!result.scannerHasCell}}"
             class="btn btn-primary"
             bindtap="onConfirmTapNeedAuth"
