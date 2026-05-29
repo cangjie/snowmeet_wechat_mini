@@ -12,7 +12,6 @@ Page({
     paymentId: 0,
     scannerId: '',
     identity: null,        // CheckPayerIdentityResult；status 决定渲染哪段 UI
-    showPhonePrompt: false, // 「敬请支付」点击时若 scannerHasCell=false 则弹软授权提示
     orderLoadFailed: false // GetOrderFromPaymentByCustomer 失败时为 true，wxml 走 fallback 视图(最小订单卡 + 继续支付)
   },
 
@@ -171,7 +170,9 @@ Page({
     var key = 'order.rentals[' + idx + '].expanded'
     this.setData({ [key]: !this.data.order.rentals[idx].expanded })
   },
-  // 「敬请支付」入口：未绑手机号弹软提示，已绑直接调起微信支付
+  // 「敬请支付」入口:status=direct 时显示,直接调起微信支付。
+  // 手机号授权环节在 pay-identity-confirm 的「确认并继续」按钮(getPhoneNumber)里已处理过,
+  // 走到这里时身份决策已落定,scanner 已与 order 归属一致,无需再弹任何授权 UI。
   pay(){
     var that = this
     var identity = that.data.identity
@@ -187,15 +188,11 @@ Page({
         return
       }
     }
-    // 未绑手机号 → 弹软提示卡片，授权或跳过都可继续支付
-    if (!identity.scannerHasCell) {
-      that.setData({ showPhonePrompt: true })
-      return
-    }
     that._doWepay()
   },
 
-  // 实际调起微信支付的逻辑，抽出来给 pay() / onAuthorizePhone / onSkipPhone 共用
+  // 实际调起微信支付的逻辑(单一入口:pay() 唯一调用方)。
+  // 拆出来保留是为了 onIdentityRefreshed 收到 status=direct 时也能自动 pay 不重复 wxml 校验。
   _doWepay(){
     var that = this
     var payment = that.data.payment
@@ -233,34 +230,4 @@ Page({
     })
   },
 
-  // 软提示弹窗：用户点「授权手机号」按钮（open-type=getPhoneNumber）后回调
-  // 取消授权 / 后端解码失败 → 都兜底当跳过，让用户能继续支付
-  onAuthorizePhone(e){
-    var that = this
-    if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
-      that.setData({ showPhonePrompt: false })
-      that._doWepay()
-      return
-    }
-    data.confirmPayIdentityPromise({
-      paymentId: that.data.paymentId,
-      payerType: 'wechat',
-      scannerId: that.data.scannerId,
-      action: 'submit_phone',
-      encData: e.detail.encryptedData,
-      iv: e.detail.iv
-    }, app.globalData.sessionKey).then(function (result){
-      that.setData({ identity: result, showPhonePrompt: false })
-      that._doWepay()
-    }).catch(function (){
-      that.setData({ showPhonePrompt: false })
-      that._doWepay()
-    })
-  },
-
-  // 软提示弹窗：用户点「跳过,直接支付」或点击遮罩
-  onSkipPhone(){
-    this.setData({ showPhonePrompt: false })
-    this._doWepay()
-  }
 })

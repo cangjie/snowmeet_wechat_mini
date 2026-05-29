@@ -93,14 +93,6 @@
   </view>
 </view>
 
-<!-- 软授权手机号弹窗:点「敬请支付」时若 scannerHasCell=false 显示。授权或跳过都可继续支付 -->
-<view wx:if="{{showPhonePrompt}}" class="phone-prompt-overlay" bindtap="onSkipPhone">
-  <view class="phone-prompt-card" catchtap="">
-    <view class="phone-prompt-title">建议授权手机号</view>
-    <view class="phone-prompt-hint">便于查询订单与售后服务,您也可以跳过直接支付</view>
-    <view class="phone-prompt-btn-row">
-      <button class="phone-prompt-btn-primary" open-type="getPhoneNumber" bindgetphonenumber="onAuthorizePhone">授权手机号</button>
-      <button class="phone-prompt-btn-secondary" bindtap="onSkipPhone">跳过,直接支付</button>
-    </view>
-  </view>
-</view>
+<!-- 手机号授权已合并到 pay-identity-confirm 的「确认并继续」(open-type=getPhoneNumber)按钮:
+     微信原生授权页直接弹出,用户授权/取消都在 onGetPhoneNumberAndConfirmDirect 回调里走 submit_phone+confirm_direct。
+     不再需要本页自己的 phone-prompt-overlay 弹窗。 -->
