@@ -58,13 +58,6 @@ Component({
       this._confirm({ action: 'confirm_direct' });
     },
 
-    // 软授权层「取消」/ 点击遮罩 → 仅关层,不发任何请求,允许用户回到原界面再决策
-    onCloseSoftAuth() {
-      console.log('[pay-identity-confirm] onCloseSoftAuth: closing popup')
-      if (this.data.busy) return;
-      this.setData({ softAuthShow: false });
-    },
-
     // 散客 / 无 cell 会员 在 direct_to_scanner 状态点「确认并继续」(open-type=getPhoneNumber)
     // 流程: 拿手机号 → submit_phone(后端 _createNewMember 或 BindMemberMainCellNum) → confirm_direct → 触发 pay
     // 用户拒绝授权 → 仍尝试 confirm_direct(沿用 MemberLogin stub member 完成支付)

@@ -32,8 +32,8 @@
   </view>
 </view>
 
-<!-- 软授权弹层: 散客 / 会员+无 cell 共用。允许跳过. -->
-<view wx:if="{{softAuthShow}}" class="soft-auth-mask" bindtap="onCloseSoftAuth">
+<!-- 软授权弹层: 散客 / 会员+无 cell 共用。二选一(授权/跳过),无取消选项 — 用户已点过「确认并继续」表示决定支付,不能再回退 -->
+<view wx:if="{{softAuthShow}}" class="soft-auth-mask">
   <view class="soft-auth-card" catchtap="">
     <view class="soft-auth-title">建议授权手机号</view>
     <view class="soft-auth-desc">您还未绑定手机号，授权后可在「我的」查看订单记录。也可跳过，直接支付。</view>
@@ -48,11 +48,6 @@
               bindtap="onSkipPhoneAndConfirm"
               disabled="{{busy}}">
         跳过，直接支付
-      </button>
-      <button class="btn btn-ghost"
-              bindtap="onCloseSoftAuth"
-              disabled="{{busy}}">
-        取消
       </button>
     </view>
   </view>
