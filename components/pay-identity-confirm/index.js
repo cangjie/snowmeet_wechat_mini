@@ -45,12 +45,14 @@ Component({
     // 散客 / 会员+无 cell: 「确认并继续」点击 → 弹底部软授权层(授权/跳过/取消)。
     // 不立即调 getPhoneNumber 是为了让用户能看见「跳过」选项(微信原生授权页只有同意/拒绝二选,UX 突兀)。
     onConfirmTapNeedAuth() {
+      console.log('[pay-identity-confirm] onConfirmTapNeedAuth: showing soft auth popup', { scannerMemberId: this.data.result && this.data.result.scannerMemberId, scannerHasCell: this.data.result && this.data.result.scannerHasCell })
       if (this.data.busy) return;
       this.setData({ softAuthShow: true });
     },
 
     // 软授权层「跳过,直接支付」→ 关层 + 走 confirm_direct(后端不绑 cell, 仅用 scanner 已有的 member 完成支付)
     onSkipPhoneAndConfirm() {
+      console.log('[pay-identity-confirm] onSkipPhoneAndConfirm: skipping phone auth, going confirm_direct')
       if (this.data.busy) return;
       this.setData({ softAuthShow: false });
       this._confirm({ action: 'confirm_direct' });
@@ -58,6 +60,7 @@ Component({
 
     // 软授权层「取消」/ 点击遮罩 → 仅关层,不发任何请求,允许用户回到原界面再决策
     onCloseSoftAuth() {
+      console.log('[pay-identity-confirm] onCloseSoftAuth: closing popup')
       if (this.data.busy) return;
       this.setData({ softAuthShow: false });
     },
