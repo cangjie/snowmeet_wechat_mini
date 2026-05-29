@@ -11,21 +11,50 @@
     名下。
   </view>
   <view class="btn-row">
-    <!-- 散客(scannerMemberId 为空)才触发 getPhoneNumber: 已经有会员就直接 confirm_direct 用现有会员支付,
-         不要因为 scanner 暂时没绑 cell 就反复要求授权(那样会造成死循环 + 把已有 openid MSA 失效掉) -->
-    <button wx:if="{{!result.scannerMemberId}}"
+    <!-- 无 cell(散客 OR 已是会员但未绑手机号) → 统一弹软授权层(授权/跳过/取消)。
+         前端行为一致,后端 _submitPhone 根据 scannerMember 是否存在自动分流:
+           null → _createNewMember(新建会员); 非 null → BindMemberMainCellNum(给现有会员补 cell)。
+         注: 之前曾因 MiniAppHelperController 的「孤儿清理」逻辑会把会员 openid MSA 失效,
+         导致软授权死循环 → 已于 2026-05-29 修复(删 258-294 孤儿清理 + socialAccountForJob 改为兜底)。 -->
+    <button wx:if="{{!result.scannerHasCell}}"
             class="btn btn-primary"
-            open-type="getPhoneNumber"
-            bindgetphonenumber="onGetPhoneNumberAndConfirmDirect"
+            bindtap="onConfirmTapNeedAuth"
             disabled="{{busy}}">
       确认并继续
     </button>
+    <!-- 已是会员且有 cell → 直接走 confirm_direct -->
     <button wx:else
             class="btn btn-primary"
             bindtap="onConfirmDirect"
             disabled="{{busy}}">
       确认并继续
     </button>
+  </view>
+</view>
+
+<!-- 软授权弹层: 散客 / 会员+无 cell 共用。允许跳过. -->
+<view wx:if="{{softAuthShow}}" class="soft-auth-mask" bindtap="onCloseSoftAuth">
+  <view class="soft-auth-card" catchtap="">
+    <view class="soft-auth-title">建议授权手机号</view>
+    <view class="soft-auth-desc">您还未绑定手机号，授权后可在「我的」查看订单记录。也可跳过，直接支付。</view>
+    <view class="soft-auth-btn-row">
+      <button class="btn btn-primary"
+              open-type="getPhoneNumber"
+              bindgetphonenumber="onGetPhoneNumberAndConfirmDirect"
+              disabled="{{busy}}">
+        授权手机号并继续
+      </button>
+      <button class="btn btn-secondary"
+              bindtap="onSkipPhoneAndConfirm"
+              disabled="{{busy}}">
+        跳过，直接支付
+      </button>
+      <button class="btn btn-ghost"
+              bindtap="onCloseSoftAuth"
+              disabled="{{busy}}">
+        取消
+      </button>
+    </view>
   </view>
 </view>
 
