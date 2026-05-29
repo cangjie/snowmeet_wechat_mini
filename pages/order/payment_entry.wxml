@@ -67,7 +67,31 @@
 
 </view>
 
-<view wx:if="{{!order}}" class="loading">请稍候……</view>
+<!-- 加载中 -->
+<view wx:if="{{!order && !orderLoadFailed}}" class="loading">请稍候……</view>
+
+<!-- 订单拉不到的散客兜底:最小卡片 + 身份组件/继续支付按钮(走完整软授权流程,授权时触发 _submitPhone→_createNewMember 自动建会员) -->
+<view wx:if="{{!order && orderLoadFailed}}" class="page">
+  <view class="card">
+    <view class="section-title">订单信息</view>
+    <view class="row"><text class="label">支付号</text><text class="value">{{paymentId}}</text></view>
+    <view class="row"><text class="value" style="color:#999">订单详情暂不可见,仍可继续支付</text></view>
+  </view>
+
+  <pay-identity-confirm
+    wx:if="{{identity && identity.status && identity.status !== 'direct'}}"
+    payment-id="{{paymentId}}"
+    payer-type="wechat"
+    scanner-id="{{scannerId}}"
+    status="{{identity.status}}"
+    result="{{identity}}"
+    bind:refreshed="onIdentityRefreshed">
+  </pay-identity-confirm>
+
+  <view wx:if="{{identity && identity.status === 'direct'}}" class="pay-btn-wrap">
+    <van-button type="primary" color="#2EA6D0" bind:click="pay" disabled="{{paying}}">继 续 支 付</van-button>
+  </view>
+</view>
 
 <!-- 软授权手机号弹窗:点「敬请支付」时若 scannerHasCell=false 显示。授权或跳过都可继续支付 -->
 <view wx:if="{{showPhonePrompt}}" class="phone-prompt-overlay" bindtap="onSkipPhone">

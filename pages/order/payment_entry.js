@@ -12,7 +12,8 @@ Page({
     paymentId: 0,
     scannerId: '',
     identity: null,        // CheckPayerIdentityResult；status 决定渲染哪段 UI
-    showPhonePrompt: false // 「敬请支付」点击时若 scannerHasCell=false 则弹软授权提示
+    showPhonePrompt: false, // 「敬请支付」点击时若 scannerHasCell=false 则弹软授权提示
+    orderLoadFailed: false // GetOrderFromPaymentByCustomer 失败时为 true，wxml 走 fallback 视图(最小订单卡 + 继续支付)
   },
 
   /**
@@ -45,9 +46,20 @@ Page({
       var member = app.globalData.member || {}
       that.setData({ scannerId: member.wechatMiniOpenId || '' })
       data.getOrderFromPaymentByCustomer(that.data.paymentId, app.globalData.sessionKey).then(function (order){
+        that.setData({ orderLoadFailed: false })
         that.renderData(order)
         that._refreshIdentity()
+      }).catch(function (err){
+        // 散客 / sessionKey 失效 / 后端 code!=0 → 不卡死页面,走 fallback 视图让用户仍能继续支付
+        // _refreshIdentity 不依赖 order,仍要拉以驱动支付按钮 + 软授权
+        console.warn('getOrderFromPaymentByCustomer failed', err)
+        that.setData({ orderLoadFailed: true, order: null, payment: null })
+        that._refreshIdentity()
       })
+    }).catch(function (err){
+      // loginPromiseNew 失败极少见,兜底防整页 stall
+      console.warn('loginPromiseNew failed', err)
+      that.setData({ orderLoadFailed: true })
     })
   },
 
@@ -168,13 +180,12 @@ Page({
       return
     }
     var payment = that.data.payment
-    if (!payment) {
-      wx.showToast({ title: '支付状态已变更，请刷新', icon: 'none' })
-      return
-    }
-    if (payment.pay_method != '微信支付' || payment.status != '待支付'){
-      wx.showToast({ title: '不可支付', icon: 'error' })
-      return
+    // payment 拿到了 → 校验 method/status;没拿到(fallback 路径,order 加载失败) → 跳过校验,直接交给后端 paymentId
+    if (payment) {
+      if (payment.pay_method != '微信支付' || payment.status != '待支付'){
+        wx.showToast({ title: '不可支付', icon: 'error' })
+        return
+      }
     }
     // 未绑手机号 → 弹软提示卡片，授权或跳过都可继续支付
     if (!identity.scannerHasCell) {
@@ -188,12 +199,14 @@ Page({
   _doWepay(){
     var that = this
     var payment = that.data.payment
-    if (!payment) {
-      wx.showToast({ title: '支付状态已变更，请刷新', icon: 'none' })
+    // fallback 路径(order 加载失败) payment 为 null,直接用 data.paymentId 兜底
+    var pid = (payment && payment.id) || that.data.paymentId
+    if (!pid) {
+      wx.showToast({ title: '支付参数缺失', icon: 'none' })
       return
     }
     that.setData({paying: true})
-    var payUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + payment.id + '?sessionKey=' + app.globalData.sessionKey
+    var payUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + pid + '?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(payUrl, null).then(function (payParams){
       wx.requestPayment({
         nonceStr: payParams.nonce,
