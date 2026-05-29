@@ -39,6 +39,46 @@ Component({
       this._confirm({ action: 'confirm_direct' });
     },
 
+    // 散客 / 无 cell 会员 在 direct_to_scanner 状态点「确认并继续」(open-type=getPhoneNumber)
+    // 流程: 拿手机号 → submit_phone(后端 _createNewMember 或 BindMemberMainCellNum) → confirm_direct → 触发 pay
+    // 用户拒绝授权 → 仍尝试 confirm_direct(沿用 MemberLogin stub member 完成支付)
+    onGetPhoneNumberAndConfirmDirect(e) {
+      if (this.data.busy) return;
+      if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
+        // 用户取消/拒绝授权 → 直接走原 confirm_direct(沿用 MemberLogin 自动建的 stub)
+        this._confirm({ action: 'confirm_direct' });
+        return;
+      }
+      const that = this;
+      this.setData({ busy: true });
+      wx.showLoading({ title: '处理中...', mask: true });
+      // 第一步: submit_phone → 后端 _submitPhone 自动 _createNewMember/绑 cell
+      data.confirmPayIdentityPromise({
+        paymentId: this.data.paymentId,
+        payerType: this.data.payerType,
+        scannerId: this.data.scannerId,
+        action: 'submit_phone',
+        encData: e.detail.encryptedData,
+        iv: e.detail.iv
+      }, app.globalData.sessionKey).then(function () {
+        // 第二步: confirm_direct → 写 op.member_id = scannerMemberId + 返 status='direct'
+        return data.confirmPayIdentityPromise({
+          paymentId: that.data.paymentId,
+          payerType: that.data.payerType,
+          scannerId: that.data.scannerId,
+          action: 'confirm_direct'
+        }, app.globalData.sessionKey);
+      }).then(function (finalResult) {
+        wx.hideLoading();
+        that.setData({ busy: false });
+        that.triggerEvent('refreshed', { result: finalResult });
+      }).catch(function () {
+        wx.hideLoading();
+        that.setData({ busy: false });
+        // performWebRequest 已 toast 错误信息(如手机号冲突),无需重复
+      });
+    },
+
     // 归我（status == 'choose_identity'，"正常支付"）
     onChooseSelf() {
       if (this.data.busy) return;

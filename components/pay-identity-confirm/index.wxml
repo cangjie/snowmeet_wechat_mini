@@ -11,7 +11,19 @@
     名下。
   </view>
   <view class="btn-row">
-    <button class="btn btn-primary" bindtap="onConfirmDirect" disabled="{{busy}}">
+    <!-- 散客(scannerMemberId 为空) 或 有会员但未绑手机号(scannerHasCell=false) → 按钮带 getPhoneNumber:
+         拿到手机号后先 _submitPhone(后端 _createNewMember 或绑 cell)再 confirm_direct -->
+    <button wx:if="{{!result.scannerMemberId || !result.scannerHasCell}}"
+            class="btn btn-primary"
+            open-type="getPhoneNumber"
+            bindgetphonenumber="onGetPhoneNumberAndConfirmDirect"
+            disabled="{{busy}}">
+      确认并继续
+    </button>
+    <button wx:else
+            class="btn btn-primary"
+            bindtap="onConfirmDirect"
+            disabled="{{busy}}">
       确认并继续
     </button>
   </view>
