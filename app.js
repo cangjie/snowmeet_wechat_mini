@@ -150,7 +150,7 @@ App({
               app.globalData.systemInfo = res
               const env = wx.getAccountInfoSync()
               app.globalData.env = env.miniProgram.envVersion
-              if (app.globalData.staff 
+              if (app.globalData.staff
                 && (app.globalData.scene == '1000'  || app.globalData.scene == '1010'
                 || app.globalData.scene == '1089')) {
                 wx.redirectTo({
@@ -166,7 +166,7 @@ App({
               catch (err) {
                 console.log('get sys info sync fail', err)
               }
-              
+
             },
             complete: (res) => {
               console.log('global data', app.globalData)
@@ -174,10 +174,19 @@ App({
               console.log('env', env)
             }
           })
+        }).catch(function (err) {
+          // MemberLogin 失败(后端返 code!=0, 如"获取会员信息失败"; 或网络非 200) 时,
+          // 5-28 后 performWebRequest 会 reject + toast。必须 resolve 而非永远 pending,
+          // 否则所有 page 的 app.loginPromiseNew.then(...) 永远不跑,页面集体卡死。
+          // 下游页面用 sessionKey/member 时应做 null 兜底(如 payment_entry 已做)。
+          console.warn('MemberLogin failed, resolving loginPromiseNew with empty session', err)
+          resolve({})
         })
       },
       fail: (res) => {
-        console.log(res)
+        // wx.login 本身失败(极少见但可能):同样必须落地 loginPromiseNew,否则全局卡死
+        console.warn('wx.login failed, resolving loginPromiseNew with empty session', res)
+        resolve({})
       }
     })
 
