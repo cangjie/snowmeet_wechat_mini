@@ -3,6 +3,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "payment",
+          "pathName": "pages/order/payment_entry",
+          "query": "paymentId=42558",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "recept",
           "pathName": "pages/admin/reception/recept_entry",
           "query": "",
