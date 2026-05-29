@@ -11,9 +11,9 @@
     名下。
   </view>
   <view class="btn-row">
-    <!-- 散客(scannerMemberId 为空) 或 有会员但未绑手机号(scannerHasCell=false) → 按钮带 getPhoneNumber:
-         拿到手机号后先 _submitPhone(后端 _createNewMember 或绑 cell)再 confirm_direct -->
-    <button wx:if="{{!result.scannerMemberId || !result.scannerHasCell}}"
+    <!-- 散客(scannerMemberId 为空)才触发 getPhoneNumber: 已经有会员就直接 confirm_direct 用现有会员支付,
+         不要因为 scanner 暂时没绑 cell 就反复要求授权(那样会造成死循环 + 把已有 openid MSA 失效掉) -->
+    <button wx:if="{{!result.scannerMemberId}}"
             class="btn btn-primary"
             open-type="getPhoneNumber"
             bindgetphonenumber="onGetPhoneNumberAndConfirmDirect"
