@@ -15,10 +15,7 @@ Component({
   },
 
   data: {
-    busy: false,
-    // softAuthShow: 散客 / 会员+无 cell 点击「确认并继续」时置 true,弹底部卡片三选(授权/跳过/取消).
-    // 两种情况前端行为一致,差异在后端: 散客授权 → 建新会员; 会员无 cell 授权 → 补 cell.
-    softAuthShow: false
+    busy: false
   },
 
   methods: {
@@ -42,32 +39,12 @@ Component({
       this._confirm({ action: 'confirm_direct' });
     },
 
-    // 散客 / 会员+无 cell: 「确认并继续」点击 → 弹底部软授权层(授权/跳过/取消)。
-    // 不立即调 getPhoneNumber 是为了让用户能看见「跳过」选项(微信原生授权页只有同意/拒绝二选,UX 突兀)。
-    onConfirmTapNeedAuth() {
-      console.log('[pay-identity-confirm] onConfirmTapNeedAuth: showing soft auth popup', { scannerMemberId: this.data.result && this.data.result.scannerMemberId, scannerHasCell: this.data.result && this.data.result.scannerHasCell })
-      if (this.data.busy) return;
-      this.setData({ softAuthShow: true });
-    },
-
-    // 软授权层「跳过,直接支付」→ 关层 + 走 confirm_direct(后端不绑 cell, 仅用 scanner 已有的 member 完成支付)
-    onSkipPhoneAndConfirm() {
-      console.log('[pay-identity-confirm] onSkipPhoneAndConfirm: skipping phone auth, going confirm_direct')
-      if (this.data.busy) return;
-      this.setData({ softAuthShow: false });
-      this._confirm({ action: 'confirm_direct' });
-    },
-
     // 散客 / 无 cell 会员 在 direct_to_scanner 状态点「确认并继续」(open-type=getPhoneNumber)
-    // 流程: 拿手机号 → submit_phone(后端 _createNewMember 或 BindMemberMainCellNum) → confirm_direct → 触发 pay
-    // 用户拒绝授权 → 仍尝试 confirm_direct(沿用 MemberLogin stub member 完成支付)
+    // 流程: 拿手机号 → submit_phone(后端按 scanner 自动分流: null→_createNewMember, 非null→BindMemberMainCellNum) → confirm_direct → 触发 pay
+    // 用户拒绝授权 → 仍尝试 confirm_direct(沿用现有会员或在散客分支建无cell会员完成支付)
     onGetPhoneNumberAndConfirmDirect(e) {
       console.log('[pay-identity-confirm] onGetPhoneNumberAndConfirmDirect entry', { errMsg: e && e.detail && e.detail.errMsg })
       if (this.data.busy) return;
-      // 软授权弹层里点的「授权手机号并继续」→ 微信原生页一关就走到这里,顺手关掉弹层
-      if (this.data.softAuthShow) {
-        this.setData({ softAuthShow: false });
-      }
       if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
         console.log('[pay-identity-confirm] user denied or cancelled getPhoneNumber → fall back to confirm_direct')
         // 用户取消/拒绝授权 → 直接走原 confirm_direct(沿用 MemberLogin 自动建的 stub)
