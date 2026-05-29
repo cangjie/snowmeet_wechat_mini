@@ -95,17 +95,21 @@ Page({
   onIdentityRefreshed(e) {
     var that = this
     var result = e && e.detail && e.detail.result
+    console.log('[payment_entry] onIdentityRefreshed', { status: result && result.status, scannerMemberId: result && result.scannerMemberId })
     if (!result) return
     if (result.status === 'direct') {
       that.setData({ identity: result })
       data.getOrderFromPaymentByCustomer(that.data.paymentId, app.globalData.sessionKey).then(function (order){
+        console.log('[payment_entry] refresh order OK, auto-calling pay()')
         that.renderData(order)
         that.pay()
-      }).catch(function () {
+      }).catch(function (err) {
+        console.warn('[payment_entry] refresh order failed after direct, NOT auto-paying', err)
         // 拉单失败不卡死用户：identity 已是 direct，wxml 会显示「敬请支付」让用户手动点重试
       })
       return
     }
+    console.log('[payment_entry] identity status !== direct, not auto-paying')
     that.setData({ identity: result })
   },
 
@@ -186,7 +190,9 @@ Page({
   pay(){
     var that = this
     var identity = that.data.identity
+    console.log('[payment_entry] pay() entry', { identityStatus: identity && identity.status, hasPayment: !!that.data.payment })
     if (!identity || identity.status !== 'direct') {
+      console.warn('[payment_entry] pay() bailed: identity not direct', identity)
       wx.showToast({ title: '请先完成支付身份确认', icon: 'none' })
       return
     }
@@ -194,10 +200,12 @@ Page({
     // payment 拿到了 → 校验 method/status;没拿到(fallback 路径,order 加载失败) → 跳过校验,直接交给后端 paymentId
     if (payment) {
       if (payment.pay_method != '微信支付' || payment.status != '待支付'){
+        console.warn('[payment_entry] pay() bailed: payment not eligible', payment.pay_method, payment.status)
         wx.showToast({ title: '不可支付', icon: 'error' })
         return
       }
     }
+    console.log('[payment_entry] pay() → _doWepay()')
     that._doWepay()
   },
 
@@ -214,7 +222,15 @@ Page({
     }
     that.setData({paying: true})
     var payUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + pid + '?sessionKey=' + app.globalData.sessionKey
+    console.log('[payment_entry] _doWepay → WechatPayByOrderPayment', payUrl)
     util.performWebRequest(payUrl, null).then(function (payParams){
+      console.log('[payment_entry] WechatPayByOrderPayment OK', { hasPrepay: !!(payParams && payParams.prepay_id), payParams })
+      if (!payParams || !payParams.prepay_id) {
+        console.warn('[payment_entry] no prepay_id, abort wx.requestPayment')
+        wx.showToast({ title: '支付参数为空,请重试', icon: 'none' })
+        that.setData({paying: false})
+        return
+      }
       wx.requestPayment({
         nonceStr: payParams.nonce,
         package: 'prepay_id=' + payParams.prepay_id,

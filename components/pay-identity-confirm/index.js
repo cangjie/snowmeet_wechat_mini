@@ -43,8 +43,10 @@ Component({
     // 流程: 拿手机号 → submit_phone(后端 _createNewMember 或 BindMemberMainCellNum) → confirm_direct → 触发 pay
     // 用户拒绝授权 → 仍尝试 confirm_direct(沿用 MemberLogin stub member 完成支付)
     onGetPhoneNumberAndConfirmDirect(e) {
+      console.log('[pay-identity-confirm] onGetPhoneNumberAndConfirmDirect entry', { errMsg: e && e.detail && e.detail.errMsg })
       if (this.data.busy) return;
       if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
+        console.log('[pay-identity-confirm] user denied or cancelled getPhoneNumber → fall back to confirm_direct')
         // 用户取消/拒绝授权 → 直接走原 confirm_direct(沿用 MemberLogin 自动建的 stub)
         this._confirm({ action: 'confirm_direct' });
         return;
@@ -60,7 +62,8 @@ Component({
         action: 'submit_phone',
         encData: e.detail.encryptedData,
         iv: e.detail.iv
-      }, app.globalData.sessionKey).then(function () {
+      }, app.globalData.sessionKey).then(function (r1) {
+        console.log('[pay-identity-confirm] submit_phone OK', { status: r1 && r1.status, scannerMemberId: r1 && r1.scannerMemberId, scannerHasCell: r1 && r1.scannerHasCell })
         // 第二步: confirm_direct → 写 op.member_id = scannerMemberId + 返 status='direct'
         return data.confirmPayIdentityPromise({
           paymentId: that.data.paymentId,
@@ -69,10 +72,12 @@ Component({
           action: 'confirm_direct'
         }, app.globalData.sessionKey);
       }).then(function (finalResult) {
+        console.log('[pay-identity-confirm] confirm_direct OK', { status: finalResult && finalResult.status, scannerMemberId: finalResult && finalResult.scannerMemberId })
         wx.hideLoading();
         that.setData({ busy: false });
         that.triggerEvent('refreshed', { result: finalResult });
-      }).catch(function () {
+      }).catch(function (err) {
+        console.warn('[pay-identity-confirm] submit_phone or confirm_direct failed', err)
         wx.hideLoading();
         that.setData({ busy: false });
         // performWebRequest 已 toast 错误信息(如手机号冲突),无需重复
