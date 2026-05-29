@@ -43,6 +43,7 @@ Page({
     app.loginPromiseNew.then(function (resolve){
       // 从 globalData 取扫码方 openid（登录后由 MemberLogin 写入 app.globalData.member）
       var member = app.globalData.member || {}
+      console.log('[payment_entry] globalData.member', { id: member.id, cell: member.cell, wechatMiniOpenId: member.wechatMiniOpenId })
       that.setData({ scannerId: member.wechatMiniOpenId || '' })
       data.getOrderFromPaymentByCustomer(that.data.paymentId, app.globalData.sessionKey).then(function (order){
         that.setData({ orderLoadFailed: false })
@@ -72,6 +73,15 @@ Page({
     }
     data.checkPayerIdentityPromise(that.data.paymentId, 'wechat', that.data.scannerId || '', app.globalData.sessionKey)
       .then(function (result) {
+        console.log('[CheckPayerIdentity]', {
+          status: result.status,
+          scannerMemberId: result.scannerMemberId,
+          scannerHasCell: result.scannerHasCell,
+          scannerMaskedCell: result.scannerMaskedCell,
+          orderMemberId: result.orderMemberId,
+          orderMemberMaskedCell: result.orderMemberMaskedCell,
+          orderMemberName: result.orderMemberName
+        })
         that.setData({ identity: result })
       })
       .catch(function () {
