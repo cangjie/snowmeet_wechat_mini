@@ -95,8 +95,11 @@ function iBeaconKey(uuid, major, minor) {
 }
 
 // 默认 UUID：业务侧 2026-05-30 指定的部署 beacon 标识，开页就预填好
-// 原始 32 hex: 0112233445566778899AABBCCDDEEFF0 → 标准 8-4-4-4-12 拆分
-const DEFAULT_UUID = '01122334-4556-6778-899A-ABBCCDDEEFF0'
+// 原始 32 hex → 标准 8-4-4-4-12 拆分，换行分隔
+const DEFAULT_UUIDS = [
+  '01122334-4556-6778-899A-ABBCCDDEEFF0',  // 0112233445566778899AABBCCDDEEFF0
+  '01122334-4556-6778-899A-ABBCCDDEEFF1'   // 0112233445566778899AABBCCDDEEFF1
+].join('\n')
 
 Page({
   data: {
@@ -104,8 +107,8 @@ Page({
     error: '',
     warn: '',                  // 软警告（如 startBeaconDiscovery 失败，但 BLE 仍在扫）
     onlyBeacon: false,
-    uuids: DEFAULT_UUID,       // textarea 原始字符串，默认填业务部署的 UUID
-    validUuidCount: 1,         // 解析后合法 UUID 数（与上面默认值保持一致）
+    uuids: DEFAULT_UUIDS,      // textarea 原始字符串，默认填业务部署的 UUID
+    validUuidCount: 2,         // 解析后合法 UUID 数（与上面默认值保持一致）
     devices: []                // 渲染列表（已排序去重）
   },
 
