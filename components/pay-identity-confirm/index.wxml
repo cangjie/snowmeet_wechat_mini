@@ -31,32 +31,9 @@
   </view>
 </view>
 
-<!-- 3) choose_identity：订单已匹配别人。
-     若 scanner 没绑手机号，先盖一层"验证手机号" gate（授权/跳过都放行），
-     用户处理完再露出 正常支付/替人代付 按钮。与 direct_to_scanner 的软授权一致。 -->
-<view wx:elif="{{status === 'choose_identity' && !result.scannerHasCell && !phoneGateDone}}" class="card identity-card">
-  <view class="section-title">验证支付身份</view>
-  <view class="hint">
-    本订单已记录会员
-    <text wx:if="{{result.orderMemberName}}" class="hl">{{result.orderMemberName}} </text>
-    <text class="hl">{{result.orderMemberMaskedCell || ''}}</text>
-    。为确认支付身份，请先授权您的手机号。
-  </view>
-  <view class="btn-row btn-row--vertical">
-    <button class="btn btn-primary"
-            open-type="getPhoneNumber"
-            bindgetphonenumber="onGetPhoneNumberAndPassGate"
-            disabled="{{busy}}">
-      授权手机号
-    </button>
-    <button class="btn btn-secondary"
-            bindtap="onPhoneGateSkip"
-            disabled="{{busy}}">
-      跳过，直接选择支付身份
-    </button>
-  </view>
-</view>
-
+<!-- 3) choose_identity：订单已匹配别人，二选一。
+     scanner 没绑手机号时按钮改用 open-type=getPhoneNumber 触发软授权，
+     回调里 submit_phone 落库再做 choose 动作。文案/布局保持不变。 -->
 <view wx:elif="{{status === 'choose_identity'}}" class="card identity-card">
   <view class="section-title">选择支付身份</view>
   <view class="hint">
@@ -69,10 +46,33 @@
     ，请选择支付身份：
   </view>
   <view class="btn-row btn-row--vertical">
-    <button class="btn btn-primary" bindtap="onChooseSelf" disabled="{{busy}}">
+    <!-- 正常支付：无 cell → getPhoneNumber 触发软授权 -->
+    <button wx:if="{{!result.scannerHasCell}}"
+            class="btn btn-primary"
+            open-type="getPhoneNumber"
+            bindgetphonenumber="onGetPhoneNumberAndChooseSelf"
+            disabled="{{busy}}">
       正常支付（订单转归我）
     </button>
-    <button class="btn btn-secondary" bindtap="onChooseProxy" disabled="{{busy}}">
+    <button wx:else
+            class="btn btn-primary"
+            bindtap="onChooseSelf"
+            disabled="{{busy}}">
+      正常支付（订单转归我）
+    </button>
+
+    <!-- 替人代付：无 cell → getPhoneNumber 触发软授权（回调里弹代付确认 modal） -->
+    <button wx:if="{{!result.scannerHasCell}}"
+            class="btn btn-secondary"
+            open-type="getPhoneNumber"
+            bindgetphonenumber="onGetPhoneNumberAndChooseProxy"
+            disabled="{{busy}}">
+      替人代付（订单仍归原会员）
+    </button>
+    <button wx:else
+            class="btn btn-secondary"
+            bindtap="onChooseProxy"
+            disabled="{{busy}}">
       替人代付（订单仍归原会员）
     </button>
   </view>

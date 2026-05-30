@@ -15,17 +15,7 @@ Component({
   },
 
   data: {
-    busy: false,
-    // choose_identity 状态下、scanner 没绑手机号时，先盖一层"验证手机号"软授权 gate；
-    // 用户授权或跳过后置为 true，露出 正常支付/替人代付 按钮。与 direct_to_scanner 的软授权流程对齐。
-    phoneGateDone: false
-  },
-
-  // status 切换时（如父页 setData refresh 后）重置 gate，避免上次 done 状态污染新决策
-  observers: {
-    status() {
-      if (this.data.phoneGateDone) this.setData({ phoneGateDone: false });
-    }
+    busy: false
   },
 
   methods: {
@@ -94,16 +84,43 @@ Component({
       });
     },
 
-    // choose_identity gate: 拿到手机号 → submit_phone 落库 → 露选身份按钮。
-    // 若 submit_phone 之后后端 _resolveStatus 把 scanner 解析成与 order 同一会员（边界场景），
-    // 返回 status='direct'，父页 onIdentityRefreshed 会自动 _doWepay()，无需再选身份。
-    onGetPhoneNumberAndPassGate(e) {
+    // choose_identity 的软授权变体：scanner 未绑手机号时按钮 open-type=getPhoneNumber 触发本回调
+    // 用户同意 → submit_phone（建会员/绑 cell）→ choose:self → status='direct' → 父页自动 _doWepay
+    // 用户拒绝 → 沿用 stub/旧会员直接 choose:self（与 onGetPhoneNumberAndConfirmDirect 容错一致）
+    onGetPhoneNumberAndChooseSelf(e) {
       if (this.data.busy) return;
       if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
-        // 用户拒绝/取消授权 → 不拦支付，gate 放行让选身份
-        this.setData({ phoneGateDone: true });
+        this._confirm({ action: 'choose', choice: 'self' });
         return;
       }
+      this._submitPhoneThenChoose(e.detail.encryptedData, e.detail.iv, 'self');
+    },
+
+    // 替人代付的软授权变体：tap → 手机号授权 → 「替人代付」确认 modal → submit_phone+choose:proxy
+    // 顺序「手机号 → 代付确认 → 落库」是 plan 里用户拍板的（保留与已绑路径相同的 modal 二次确认）
+    onGetPhoneNumberAndChooseProxy(e) {
+      if (this.data.busy) return;
+      const phoneOK = e && e.detail && e.detail.errMsg === 'getPhoneNumber:ok';
+      const encData = phoneOK ? e.detail.encryptedData : null;
+      const iv = phoneOK ? e.detail.iv : null;
+      wx.showModal({
+        title: '替人代付',
+        content: '订单将继续归于原会员名下，仅本笔付款记为代付。是否确认？',
+        success: (res) => {
+          if (!res.confirm) return;
+          if (phoneOK) {
+            this._submitPhoneThenChoose(encData, iv, 'proxy');
+          } else {
+            // 拒绝授权 → 不带 phone 走 choose:proxy
+            this._confirm({ action: 'choose', choice: 'proxy' });
+          }
+        }
+      });
+    },
+
+    // 内部 helper：submit_phone → choose → triggerEvent refreshed
+    // 与 onGetPhoneNumberAndConfirmDirect 的双 Promise 链结构一致
+    _submitPhoneThenChoose(encData, iv, choice) {
       const that = this;
       this.setData({ busy: true });
       wx.showLoading({ title: '处理中...', mask: true });
@@ -112,26 +129,23 @@ Component({
         payerType: this.data.payerType,
         scannerId: this.data.scannerId,
         action: 'submit_phone',
-        encData: e.detail.encryptedData,
-        iv: e.detail.iv
-      }, app.globalData.sessionKey).then(function (result) {
+        encData, iv
+      }, app.globalData.sessionKey).then(function () {
+        return data.confirmPayIdentityPromise({
+          paymentId: that.data.paymentId,
+          payerType: that.data.payerType,
+          scannerId: that.data.scannerId,
+          action: 'choose',
+          choice
+        }, app.globalData.sessionKey);
+      }).then(function (finalResult) {
         wx.hideLoading();
-        that.setData({ busy: false, phoneGateDone: true });
-        // 把 submit_phone 返回的最新身份结果给父页：若 status 转 direct（scanner 解析成 orderMember）
-        // 父页会自动支付；否则父页仅刷新 identity（scannerHasCell=true / scannerMaskedCell 更新），
-        // 本组件因 status 仍是 choose_identity 走 gate 已 done 分支，露选身份按钮。
-        that.triggerEvent('refreshed', { result });
+        that.setData({ busy: false });
+        that.triggerEvent('refreshed', { result: finalResult });
       }).catch(function () {
         wx.hideLoading();
-        // 失败也放行 gate（与 direct_to_scanner 的容错一致），用户仍可选身份继续支付
-        that.setData({ busy: false, phoneGateDone: true });
+        that.setData({ busy: false });
       });
-    },
-
-    // choose_identity gate: 用户跳过授权，直接进入选身份
-    onPhoneGateSkip() {
-      if (this.data.busy) return;
-      this.setData({ phoneGateDone: true });
     },
 
     // 归我（status == 'choose_identity'，"正常支付"）
