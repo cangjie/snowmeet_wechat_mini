@@ -1,0 +1,281 @@
+/* pages/blt/beacon_scan.wxss */
+
+.page {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+/* ---------- 顶部状态区 ---------- */
+.header {
+  background: #ffffff;
+  padding: 32rpx 32rpx 24rpx;
+  border-bottom: 1rpx solid #e5e7eb;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.status-badge--on {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-badge--off {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.status-badge .dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-badge--on .dot {
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+
+.device-count {
+  font-size: 26rpx;
+  color: #6b7280;
+}
+
+.error-bar {
+  margin-bottom: 24rpx;
+  padding: 16rpx 24rpx;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.ctrl-row {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.ctrl-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 32rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.ctrl-btn::after {
+  border: none;
+}
+
+.ctrl-btn--start {
+  background: #006495;
+  color: #ffffff;
+}
+
+.ctrl-btn--stop {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.ctrl-btn--clear {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 0;
+}
+
+.filter-label {
+  font-size: 28rpx;
+  color: #1f2937;
+}
+
+/* ---------- 设备列表 ---------- */
+.device-list {
+  padding: 24rpx 24rpx 0;
+}
+
+.device-row {
+  background: #ffffff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  gap: 24rpx;
+  box-shadow: 0 1rpx 3rpx rgba(0, 0, 0, 0.04);
+}
+
+.device-row--beacon {
+  border-left: 6rpx solid #006495;
+}
+
+.rssi-col {
+  width: 140rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  flex-shrink: 0;
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4rpx;
+  height: 48rpx;
+}
+
+.bar {
+  width: 10rpx;
+  background: #e5e7eb;
+  border-radius: 2rpx;
+}
+
+.bar:nth-child(1) { height: 18rpx; }
+.bar:nth-child(2) { height: 28rpx; }
+.bar:nth-child(3) { height: 38rpx; }
+.bar:nth-child(4) { height: 48rpx; }
+
+.bar--on { background: #006495; }
+
+.rssi-dbm {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-top: 4rpx;
+}
+
+.ago {
+  font-size: 22rpx;
+  color: #9ca3af;
+}
+
+.main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 360rpx;
+}
+
+.beacon-tag {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 6rpx;
+  background: #dbeafe;
+  color: #006495;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.device-id {
+  font-size: 22rpx;
+  color: #6b7280;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.beacon-block {
+  margin-top: 12rpx;
+  padding: 16rpx;
+  background: #f0f6fb;
+  border-radius: 8rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.beacon-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  font-size: 24rpx;
+}
+
+.beacon-uuid {
+  position: relative;
+}
+
+.kv-key {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.kv-key--sep {
+  margin-left: 16rpx;
+}
+
+.kv-val {
+  color: #1f2937;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.copy-hint {
+  margin-left: auto;
+  padding: 2rpx 12rpx;
+  background: #006495;
+  color: #ffffff;
+  font-size: 20rpx;
+  border-radius: 4rpx;
+}
+
+.empty {
+  text-align: center;
+  padding: 80rpx 32rpx;
+  color: #9ca3af;
+  font-size: 28rpx;
+}
+
+.empty-icon {
+  display: block;
+  font-size: 80rpx;
+  color: #d1d5db;
+  margin-bottom: 16rpx;
+}

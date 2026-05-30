@@ -1,0 +1,76 @@
+<!--pages/blt/beacon_scan.wxml-->
+<view class="page">
+
+  <!-- 顶部状态区 -->
+  <view class="header">
+    <view class="status-row">
+      <view class="status-badge {{scanning ? 'status-badge--on' : 'status-badge--off'}}">
+        <view class="dot"></view>
+        <text>{{scanning ? '扫描中' : '已停止'}}</text>
+      </view>
+      <text class="device-count">已发现 {{devices.length}} 个设备</text>
+    </view>
+
+    <view wx:if="{{error}}" class="error-bar">{{error}}</view>
+
+    <view class="ctrl-row">
+      <button class="ctrl-btn {{scanning ? 'ctrl-btn--stop' : 'ctrl-btn--start'}}" bindtap="toggleScan">
+        {{scanning ? '停止扫描' : '开始扫描'}}
+      </button>
+      <button class="ctrl-btn ctrl-btn--clear" bindtap="clearDevices">清空列表</button>
+    </view>
+
+    <view class="filter-row">
+      <text class="filter-label">仅显示 iBeacon</text>
+      <switch checked="{{onlyBeacon}}" bindchange="toggleOnlyBeacon" color="#006495"/>
+    </view>
+  </view>
+
+  <!-- 设备列表 -->
+  <view class="device-list">
+    <block wx:for="{{devices}}" wx:key="key">
+      <view class="device-row {{item.hasBeacon ? 'device-row--beacon' : ''}}">
+        <view class="rssi-col">
+          <view class="bars">
+            <view class="bar {{1 <= item.rssiBars ? 'bar--on' : ''}}"></view>
+            <view class="bar {{2 <= item.rssiBars ? 'bar--on' : ''}}"></view>
+            <view class="bar {{3 <= item.rssiBars ? 'bar--on' : ''}}"></view>
+            <view class="bar {{4 <= item.rssiBars ? 'bar--on' : ''}}"></view>
+          </view>
+          <text class="rssi-dbm">{{item.rssi}} dBm</text>
+          <text class="ago">{{item.agoSec}}s 前</text>
+        </view>
+
+        <view class="main-col">
+          <view class="name-row">
+            <text class="name">{{item.name}}</text>
+            <view wx:if="{{item.hasBeacon}}" class="beacon-tag">iBeacon</view>
+          </view>
+          <text class="device-id">{{item.deviceId}}</text>
+
+          <view wx:if="{{item.hasBeacon}}" class="beacon-block">
+            <view class="beacon-line beacon-uuid" bindtap="copyUuid" data-uuid="{{item.uuid}}">
+              <text class="kv-key">UUID</text>
+              <text class="kv-val">{{item.uuid}}</text>
+              <text class="copy-hint">复制</text>
+            </view>
+            <view class="beacon-line">
+              <text class="kv-key">Major</text><text class="kv-val">{{item.major}}</text>
+              <text class="kv-key kv-key--sep">Minor</text><text class="kv-val">{{item.minor}}</text>
+              <text class="kv-key kv-key--sep">TX</text><text class="kv-val">{{item.txPower}} dBm</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <view wx:if="{{devices.length === 0 && scanning}}" class="empty">
+      <text class="empty-icon">·</text>
+      正在扫描附近蓝牙设备…
+    </view>
+    <view wx:if="{{devices.length === 0 && !scanning}}" class="empty">
+      点「开始扫描」开始搜索附近蓝牙设备
+    </view>
+  </view>
+
+</view>

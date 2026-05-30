@@ -12,6 +12,7 @@
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
     "pages/blt/open_lock",
+    "pages/blt/beacon_scan",
     "pages/admin/sale/shop_sale",
     "pages/admin/sale/shop_sale_entry",
     "pages/admin/sale/order_detail",
