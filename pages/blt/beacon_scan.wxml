@@ -12,6 +12,26 @@
     </view>
 
     <view wx:if="{{error}}" class="error-bar">{{error}}</view>
+    <view wx:if="{{warn}}" class="warn-bar">{{warn}}</view>
+
+    <!-- UUID 输入区：iOS 必填才能扫到 iBeacon（系统 CoreLocation 路径硬约束） -->
+    <view class="uuids-section">
+      <view class="uuids-head">
+        <text class="uuids-label">iBeacon UUID 列表</text>
+        <text class="uuids-count">{{validUuidCount}} 个有效</text>
+      </view>
+      <textarea
+        class="uuids-input"
+        placeholder="每行一个 UUID，例如&#10;FDA50693-A4E2-4FB1-AFCF-C6EB07647825&#10;E2C56DB5-DFFB-48D2-B060-D0F5A71096E0"
+        value="{{uuids}}"
+        bindinput="onUuidsInput"
+        maxlength="-1"
+        auto-height
+        disable-default-padding="{{true}}"
+        cursor-spacing="20"
+      />
+      <text class="uuids-tip">iOS 必须填 UUID 才能识别 iBeacon（系统约束）；Android 不填也能从 BLE 广播识别，但填了能多拿 accuracy / proximity（距离 + 远近档位）。扫描期间改 UUID 不生效，需要停止后再开始。</text>
+    </view>
 
     <view class="ctrl-row">
       <button class="ctrl-btn {{scanning ? 'ctrl-btn--stop' : 'ctrl-btn--start'}}" bindtap="toggleScan">
@@ -57,7 +77,22 @@
             <view class="beacon-line">
               <text class="kv-key">Major</text><text class="kv-val">{{item.major}}</text>
               <text class="kv-key kv-key--sep">Minor</text><text class="kv-val">{{item.minor}}</text>
-              <text class="kv-key kv-key--sep">TX</text><text class="kv-val">{{item.txPower}} dBm</text>
+              <text wx:if="{{item.txPower !== ''}}" class="kv-key kv-key--sep">TX</text>
+              <text wx:if="{{item.txPower !== ''}}" class="kv-val">{{item.txPower}} dBm</text>
+            </view>
+            <view wx:if="{{item.accuracy !== null || item.proximity}}" class="beacon-line">
+              <text wx:if="{{item.accuracy !== null}}" class="kv-key">距离</text>
+              <text wx:if="{{item.accuracy !== null}}" class="kv-val">~{{item.accuracy}} m</text>
+              <text wx:if="{{item.proximity}}" class="kv-key kv-key--sep">远近</text>
+              <text wx:if="{{item.proximity}}" class="kv-val">{{item.proximity}}</text>
+              <text class="src-tag {{item.source === 'both' ? 'src-tag--both' : (item.source === 'B' ? 'src-tag--b' : 'src-tag--a')}}">
+                {{item.source === 'both' ? 'BLE+CoreLocation' : (item.source === 'B' ? 'CoreLocation' : 'BLE')}}
+              </text>
+            </view>
+            <view wx:elif="{{item.source}}" class="beacon-line">
+              <text class="src-tag {{item.source === 'both' ? 'src-tag--both' : (item.source === 'B' ? 'src-tag--b' : 'src-tag--a')}}">
+                {{item.source === 'both' ? 'BLE+CoreLocation' : (item.source === 'B' ? 'CoreLocation' : 'BLE')}}
+              </text>
             </view>
           </view>
         </view>

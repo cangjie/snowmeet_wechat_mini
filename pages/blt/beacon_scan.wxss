@@ -71,6 +71,67 @@
   line-height: 1.5;
 }
 
+.warn-bar {
+  margin-bottom: 24rpx;
+  padding: 16rpx 24rpx;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+/* ---------- UUID 输入区 ---------- */
+.uuids-section {
+  margin-bottom: 24rpx;
+  padding: 20rpx;
+  background: #f9fafb;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 8rpx;
+}
+
+.uuids-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.uuids-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #374151;
+}
+
+.uuids-count {
+  font-size: 24rpx;
+  color: #006495;
+  background: #dbeafe;
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+}
+
+.uuids-input {
+  width: 100%;
+  min-height: 100rpx;
+  padding: 16rpx;
+  background: #ffffff;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 6rpx;
+  font-size: 24rpx;
+  font-family: monospace;
+  color: #1f2937;
+  box-sizing: border-box;
+}
+
+.uuids-tip {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
 .ctrl-row {
   display: flex;
   gap: 16rpx;
@@ -264,6 +325,30 @@
   color: #ffffff;
   font-size: 20rpx;
   border-radius: 4rpx;
+}
+
+/* 数据来源标签：BLE / CoreLocation / 两者都报 */
+.src-tag {
+  margin-left: auto;
+  padding: 2rpx 12rpx;
+  border-radius: 4rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+}
+
+.src-tag--a {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.src-tag--b {
+  background: #ddd6fe;
+  color: #6d28d9;
+}
+
+.src-tag--both {
+  background: #d1fae5;
+  color: #047857;
 }
 
 .empty {
