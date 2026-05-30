@@ -345,4 +345,31 @@
     </view>
   </van-popup>
 
+  <!-- 金额输入 modal：押金 / 租金/日。type="digit" → iOS 原生带小数点数字键盘 -->
+  <van-popup
+    show="{{amountModal.show}}"
+    position="center"
+    round
+    custom-style="width: 560rpx;"
+    bind:close="onAmountModalCancel">
+    <view class="amount-modal">
+      <view class="amount-modal-title">{{amountModal.title}}</view>
+      <view class="amount-modal-input-wrap">
+        <text class="amount-modal-prefix">¥</text>
+        <input class="amount-modal-input"
+               type="digit"
+               placeholder="{{amountModal.placeholder}}"
+               value="{{amountModal.value}}"
+               focus="{{amountModal.show}}"
+               bindinput="onAmountModalInput"
+               confirm-type="done"
+               bindconfirm="onAmountModalConfirm" />
+      </view>
+      <view class="amount-modal-footer">
+        <view class="amount-modal-btn amount-modal-btn--cancel" catchtap="onAmountModalCancel">取消</view>
+        <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onAmountModalConfirm">确认</view>
+      </view>
+    </view>
+  </van-popup>
+
 </view>

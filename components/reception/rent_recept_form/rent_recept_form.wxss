@@ -555,3 +555,61 @@ button[disabled].checkout-btn {
   background: var(--primary);
   color: var(--on-primary);
 }
+
+/* ---------- 金额输入 modal（押金 / 租金/日） ---------- */
+.amount-modal {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  padding: 36rpx 32rpx 28rpx;
+}
+.amount-modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 28rpx;
+}
+.amount-modal-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 0 24rpx;
+  height: 88rpx;
+  border: 1rpx solid #d3e4fe;
+  border-radius: 12rpx;
+  background: var(--surface-container-low);
+}
+.amount-modal-prefix {
+  font-size: 32rpx;
+  color: var(--primary);
+  font-weight: 600;
+}
+.amount-modal-input {
+  flex: 1;
+  font-size: 32rpx;
+  color: #1f2937;
+  height: 100%;
+}
+.amount-modal-footer {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 32rpx;
+}
+.amount-modal-btn {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+.amount-modal-btn--cancel {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.amount-modal-btn--confirm {
+  background: var(--primary);
+  color: var(--on-primary);
+}

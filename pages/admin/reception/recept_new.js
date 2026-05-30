@@ -369,10 +369,29 @@ Page({
         wx.showToast({ title: '下单失败', icon: 'none' });
         return;
       }
-      // 写回本地：服务端已置 valid=1 并生成 order.code（参考 OrderController.GenerateOrderCode）
-      this.setData({ order: rentOrder });
       wx.navigateTo({
         url: '/pages/payment/settle/index?orderId=' + rentOrder.id,
+      });
+      // 立刻把本地订单脱钩，让下一次"去结算"在后端建一个全新订单（而不是给已下单的订单累加 payment）。
+      // 清空 server 端绑定的 id/code/valid，并把所有 rental / rentItem 的 id 清零，
+      // 这样后续 saveRentReceptOrder 会被后端当作新订单处理。
+      this.setData({
+        order: {
+          ...rentOrder,
+          id: 0,
+          code: null,
+          valid: 0,
+          rentals: (rentOrder.rentals || []).map((r) => ({
+            ...r,
+            id: 0,
+            order_id: 0,
+            rentItems: (r.rentItems || []).map((ri) => ({
+              ...ri,
+              id: 0,
+              rental_id: 0,
+            })),
+          })),
+        },
       });
     }).catch((err) => {
       wx.hideLoading();

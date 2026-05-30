@@ -181,6 +181,18 @@ Component({
     categoryRaw: [],              // 与 categoryItems 同序的完整分类对象，confirm 时按 activeId 取
     categoryMainActiveIndex: 0,
     categoryActiveId: null,
+
+    // 金额输入 modal（押金 / 租金/日）。原本用 wx.showModal({editable:true})，
+    // 但 wx.showModal 的输入框只能用系统默认键盘，没法切到带小数点的数字键盘。
+    // 改成自建 van-popup + <input type="digit">，键盘原生支持小数点。
+    amountModal: {
+      show: false,
+      title: '',
+      placeholder: '',
+      value: '',
+      ridx: -1,
+      field: '', // 'deposit' | 'rate'
+    },
   },
 
   lifetimes: {
@@ -367,30 +379,18 @@ Component({
     onPkgModeMixedTap() {
       wx.showToast({ title: '套餐内装备模式不一致', icon: 'none' });
     },
-    // 押金：点击 → 输入 modal → 确认 modal → 应用
+    // 押金：点击 → 输入 modal（带小数点数字键盘） → 确认 modal → 应用
     onPkgDepositTap(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
       const current = this.data.displayRentals[ridx]._depositInput || '';
-      const that = this;
-      wx.showModal({
-        title: '修改押金',
-        editable: true,
-        placeholderText: '请输入押金金额',
-        content: String(current),
-        success(res) {
-          if (!res.confirm) return;
-          const v = parseFloat(res.content);
-          if (Number.isNaN(v) || v < 0) {
-            wx.showToast({ title: '请输入有效金额', icon: 'none' });
-            return;
-          }
-          wx.showModal({
-            title: '确认修改',
-            content: `押金将修改为 ¥${v.toFixed(2)}，是否确认？`,
-            success(c) {
-              if (c.confirm) that._applyPkgDeposit(ridx, v);
-            },
-          });
+      this.setData({
+        amountModal: {
+          show: true,
+          title: '修改押金',
+          placeholder: '请输入押金金额',
+          value: String(current),
+          ridx,
+          field: 'deposit',
         },
       });
     },
@@ -410,30 +410,48 @@ Component({
       this._emitSync(false);
     },
 
-    // 租金/日：点击 → 输入 modal → 确认 modal → 应用
+    // 租金/日：点击 → 输入 modal（带小数点数字键盘） → 确认 modal → 应用
     onPkgRateTap(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
       const current = this.data.displayRentals[ridx]._dailyRateInput || '';
+      this.setData({
+        amountModal: {
+          show: true,
+          title: '修改租金/日',
+          placeholder: '请输入每日租金',
+          value: String(current),
+          ridx,
+          field: 'rate',
+        },
+      });
+    },
+
+    // ---------- 金额输入 modal（替代 wx.showModal({editable:true}) 以支持小数点数字键盘） ----------
+    onAmountModalInput(e) {
+      this.setData({ 'amountModal.value': e.detail.value });
+    },
+    onAmountModalCancel() {
+      this.setData({ 'amountModal.show': false });
+    },
+    onAmountModalConfirm() {
+      const m = this.data.amountModal;
+      const v = parseFloat(m.value);
+      if (Number.isNaN(v) || v < 0) {
+        wx.showToast({ title: '请输入有效金额', icon: 'none' });
+        return;
+      }
+      const ridx = m.ridx;
+      const field = m.field;
+      const label = field === 'deposit' ? '押金' : '租金/日';
       const that = this;
+      this.setData({ 'amountModal.show': false });
       wx.showModal({
-        title: '修改租金/日',
-        editable: true,
-        placeholderText: '请输入每日租金',
-        content: String(current),
-        success(res) {
-          if (!res.confirm) return;
-          const v = parseFloat(res.content);
-          if (Number.isNaN(v) || v < 0) {
-            wx.showToast({ title: '请输入有效金额', icon: 'none' });
-            return;
-          }
-          wx.showModal({
-            title: '确认修改',
-            content: `租金/日 将修改为 ¥${v.toFixed(2)}，是否确认？`,
-            success(c) {
-              if (c.confirm) that._applyPkgRate(ridx, v);
-            },
-          });
+        title: '确认修改',
+        content: `${label} 将修改为 ¥${v.toFixed(2)}，是否确认？`,
+        success(c) {
+          if (!c.confirm) return;
+          if (field === 'deposit') that._applyPkgDeposit(ridx, v);
+          else that._applyPkgRate(ridx, v);
         },
       });
     },
