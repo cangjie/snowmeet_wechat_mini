@@ -15,7 +15,17 @@ Component({
   },
 
   data: {
-    busy: false
+    busy: false,
+    // choose_identity 状态下、scanner 没绑手机号时，先盖一层"验证手机号"软授权 gate；
+    // 用户授权或跳过后置为 true，露出 正常支付/替人代付 按钮。与 direct_to_scanner 的软授权流程对齐。
+    phoneGateDone: false
+  },
+
+  // status 切换时（如父页 setData refresh 后）重置 gate，避免上次 done 状态污染新决策
+  observers: {
+    status() {
+      if (this.data.phoneGateDone) this.setData({ phoneGateDone: false });
+    }
   },
 
   methods: {
@@ -82,6 +92,46 @@ Component({
         that.setData({ busy: false });
         // performWebRequest 已 toast 错误信息(如手机号冲突),无需重复
       });
+    },
+
+    // choose_identity gate: 拿到手机号 → submit_phone 落库 → 露选身份按钮。
+    // 若 submit_phone 之后后端 _resolveStatus 把 scanner 解析成与 order 同一会员（边界场景），
+    // 返回 status='direct'，父页 onIdentityRefreshed 会自动 _doWepay()，无需再选身份。
+    onGetPhoneNumberAndPassGate(e) {
+      if (this.data.busy) return;
+      if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
+        // 用户拒绝/取消授权 → 不拦支付，gate 放行让选身份
+        this.setData({ phoneGateDone: true });
+        return;
+      }
+      const that = this;
+      this.setData({ busy: true });
+      wx.showLoading({ title: '处理中...', mask: true });
+      data.confirmPayIdentityPromise({
+        paymentId: this.data.paymentId,
+        payerType: this.data.payerType,
+        scannerId: this.data.scannerId,
+        action: 'submit_phone',
+        encData: e.detail.encryptedData,
+        iv: e.detail.iv
+      }, app.globalData.sessionKey).then(function (result) {
+        wx.hideLoading();
+        that.setData({ busy: false, phoneGateDone: true });
+        // 把 submit_phone 返回的最新身份结果给父页：若 status 转 direct（scanner 解析成 orderMember）
+        // 父页会自动支付；否则父页仅刷新 identity（scannerHasCell=true / scannerMaskedCell 更新），
+        // 本组件因 status 仍是 choose_identity 走 gate 已 done 分支，露选身份按钮。
+        that.triggerEvent('refreshed', { result });
+      }).catch(function () {
+        wx.hideLoading();
+        // 失败也放行 gate（与 direct_to_scanner 的容错一致），用户仍可选身份继续支付
+        that.setData({ busy: false, phoneGateDone: true });
+      });
+    },
+
+    // choose_identity gate: 用户跳过授权，直接进入选身份
+    onPhoneGateSkip() {
+      if (this.data.busy) return;
+      this.setData({ phoneGateDone: true });
     },
 
     // 归我（status == 'choose_identity'，"正常支付"）
