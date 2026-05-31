@@ -169,23 +169,43 @@ Component({
       var uuidShopMap = {}  // normalize UUID → shop
       var uuidList = []
       var anyBeaconConfigured = false
+      var configuredShops = []  // 仅含配了 beacon 的店，诊断用
       for (var i = 0; i < shopList.length; i++) {
         var s = shopList[i]
-        if (s.beacon_mac) {
+        var hasMac = !!s.beacon_mac
+        var hasUuid = !!s.beacon_uuid
+        if (hasMac) {
           macMap[_normalizeMac(s.beacon_mac)] = s
           anyBeaconConfigured = true
         }
-        if (s.beacon_uuid) {
+        if (hasUuid) {
           var u = _normalizeUuid(s.beacon_uuid)
           uuidShopMap[u] = s
           // wx.startBeaconDiscovery 要求 uuids 是标准格式（含连字符），按 DB 原样转大写传
           uuidList.push(u)
           anyBeaconConfigured = true
         }
+        if (hasMac || hasUuid) {
+          configuredShops.push({
+            name: s.name,
+            mac: s.beacon_mac ? _normalizeMac(s.beacon_mac) : null,
+            uuid: s.beacon_uuid ? _normalizeUuid(s.beacon_uuid) : null
+          })
+        }
       }
+
+      // 诊断：开扫前打印配置情况，方便从 devtools console 看
+      console.log('[shop_selector] beacon 配置统计：', {
+        '总店数': shopList.length,
+        '已配 beacon 店数': configuredShops.length,
+        '待匹配 UUIDs': uuidList,
+        '待匹配 MACs': Object.keys(macMap),
+        '详情': configuredShops
+      })
 
       // 全店都没配 beacon → 不开蓝牙，直接 fallback
       if (!anyBeaconConfigured) {
+        console.warn('[shop_selector] 所有店铺都未配 beacon_uuid/beacon_mac，跳过扫描走 fallback')
         that._fallback(shopList)
         return
       }
@@ -196,16 +216,36 @@ Component({
       that._foundHandler = null
       that._beaconHandler = null
       that._scanActive = true
+      // 诊断计数：30s 超时时塞进 toast 让用户一眼看出断在哪
+      that._diagSeenBleSet = {}      // 扫到的所有 BLE deviceId（包括没匹配的）
+      that._diagSeenBeaconSet = {}   // 扫到的所有 iBeacon UUID:major:minor（包括没匹配的）
+      that._diagConfigCount = configuredShops.length
+      that._diagUuidList = uuidList
       that._scanTimeoutTimer = setTimeout(function () {
         // 30 秒兜底：扫满 30 秒仍**没有任何 beacon 命中**才进这里（首批命中会立刻 _stopScan + _applySelectedShop）
-        // 行为：弹 toast 提示用户手动选店，**不自动 _fallback**（避免静默选 staff.base_shop_id 误导用户）
-        // 父页面看到 picker 未选中（currentSelectedIndex=0），用户主动滚 picker 后 selectChanged 触发 ShopSelected
         if (!that._scanActive) return
         that._stopScan()
+        // 诊断信息塞进 toast：用户一眼看出断在哪环
+        //   配置:N → DB 里配了 beacon 的店数（=0 就是 DB 没配）
+        //   BLE:M → 30s 内扫到的不同 BLE 设备数（=0 通常是权限/蓝牙未开）
+        //   iBeacon:K → 30s 内 CoreLocation 回的不同 iBeacon 数（iOS 重要，=0 + BLE>0 通常是定位权限拒）
+        var bleCount = Object.keys(that._diagSeenBleSet || {}).length
+        var beaconCount = Object.keys(that._diagSeenBeaconSet || {}).length
+        var diag = '配置:' + (that._diagConfigCount || 0)
+          + ' / BLE:' + bleCount
+          + ' / iBeacon:' + beaconCount
+        console.warn('[shop_selector] 30s 超时未命中', {
+          '配置店数': that._diagConfigCount,
+          '扫到 BLE 总数': bleCount,
+          '扫到 iBeacon 总数': beaconCount,
+          'BLE 列表前 10': Object.keys(that._diagSeenBleSet || {}).slice(0, 10),
+          'iBeacon 列表前 10': Object.keys(that._diagSeenBeaconSet || {}).slice(0, 10),
+          '待匹配 UUIDs': that._diagUuidList
+        })
         wx.showToast({
-          title: '未检测到店内 beacon，请手动选店',
+          title: '未检测到店内 beacon  ' + diag,
           icon: 'none',
-          duration: 2500
+          duration: 4000
         })
       }, SCAN_TIMEOUT_MS)
 
@@ -274,8 +314,11 @@ Component({
         var d = devices[i]
         if (!d.deviceId) continue
         var key = _normalizeMac(d.deviceId)
+        // 诊断：所有 BLE 扫到的 deviceId 都记，不管匹不匹配
+        this._diagSeenBleSet[key] = (this._diagSeenBleSet[key] || -999) > d.RSSI ? this._diagSeenBleSet[key] : d.RSSI
         var shop = macMap[key]
         if (shop) {
+          console.log('[shop_selector] A 路径命中 MAC：', key, '→', shop.name, 'RSSI:', d.RSSI)
           var prev = this._beaconHitMap[shop.id]
           if (prev == null || d.RSSI > prev) {
             this._beaconHitMap[shop.id] = d.RSSI
@@ -293,12 +336,19 @@ Component({
         var b = beacons[i]
         var uuid = _normalizeUuid(b.uuid)
         if (!uuid) continue
+        // 诊断：所有 CoreLocation 报的 iBeacon 都记（key 含 major/minor 区分同 UUID 不同 beacon）
+        var beaconKey = uuid + ':' + b.major + ':' + b.minor
+        this._diagSeenBeaconSet[beaconKey] = (this._diagSeenBeaconSet[beaconKey] || -999) > b.rssi ? this._diagSeenBeaconSet[beaconKey] : b.rssi
         var shop = uuidShopMap[uuid]
         if (shop) {
+          console.log('[shop_selector] B 路径命中 UUID：', uuid, 'major:', b.major, 'minor:', b.minor, '→', shop.name, 'RSSI:', b.rssi)
           var prev = this._beaconHitMap[shop.id]
           if (prev == null || b.rssi > prev) {
             this._beaconHitMap[shop.id] = b.rssi
           }
+        } else if (uuid) {
+          // 重要诊断：扫到了 iBeacon 但 UUID 不在 DB 配置里 —— 8 成是 DB 跟实际部署的 UUID 不一致
+          console.log('[shop_selector] B 路径扫到非配置 UUID：', uuid, 'major:', b.major, 'minor:', b.minor, 'RSSI:', b.rssi)
         }
       }
       this._finalizeIfHit()
