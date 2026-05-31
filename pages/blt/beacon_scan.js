@@ -68,15 +68,20 @@ function rssiBars(rssi) {
   return 0
 }
 
-// 解析 textarea 输入的 UUID 列表：支持换行 / 逗号 / 空格分隔，自动 trim+uppercase，过滤格式非法的
-const UUID_REGEX = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/
+// 解析 textarea 输入的 UUID 列表：支持换行 / 逗号 / 空格分隔
+// 同时兼容两种 UUID 输入形态（beacon 配置软件不允许连字符所以 DB 通常存 32 hex 无连字符；用户也可能直接粘标准格式）：
+//   - 32 hex 无连字符（如 "0112233445566778899AABBCCDDEEFF0"）→ 自动加回连字符
+//   - 36 字符标准格式（如 "01122334-4556-6778-899A-ABBCCDDEEFF0"）→ 原样
+// 微信 wx.startBeaconDiscovery iOS 端**严格要求**带连字符的 8-4-4-4-12 格式，所以输出统一规整
 function parseUuids(raw) {
   if (!raw) return []
   const parts = String(raw).split(/[\s,;]+/)
   const valid = []
   for (let i = 0; i < parts.length; i++) {
-    const u = parts[i].trim().toUpperCase()
-    if (u && UUID_REGEX.test(u)) valid.push(u)
+    const clean = parts[i].trim().toUpperCase().replace(/-/g, '')
+    if (!/^[0-9A-F]{32}$/.test(clean)) continue   // 长度/字符非 hex 都丢
+    const formatted = clean.slice(0, 8) + '-' + clean.slice(8, 12) + '-' + clean.slice(12, 16) + '-' + clean.slice(16, 20) + '-' + clean.slice(20, 32)
+    valid.push(formatted)
   }
   return valid
 }

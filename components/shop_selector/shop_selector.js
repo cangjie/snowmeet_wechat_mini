@@ -32,9 +32,18 @@ function _normalizeMac(s) {
   return String(s || '').replace(/[\s:\-]/g, '').toUpperCase()
 }
 
-// UUID：trim + 大写。DB 约定 8-4-4-4-12 大写
+// UUID 归一：trim → 去掉所有连字符 → 大写 → 按 8-4-4-4-12 重新插连字符
+//   - 微信 wx.startBeaconDiscovery 在 iOS 上**严格要求** 8-4-4-4-12 格式，无连字符直接 "invalid service uuid"
+//   - 但 beacon 配置软件 / DB 通常只存 32 hex 无连字符（厂商配置软件不接受连字符输入）
+//   - 同样 wx.onBeaconUpdate 回的 uuid 是标准格式带连字符，统一归一后双向都好匹配
+//   - 输入是 32 hex 或 36 字符带连字符都接收；输入非法（其它长度/含非 hex 字符）则原样返大写让上游报错
 function _normalizeUuid(s) {
-  return String(s || '').trim().toUpperCase()
+  if (!s) return ''
+  var clean = String(s).trim().toUpperCase().replace(/-/g, '')
+  if (!/^[0-9A-F]{32}$/.test(clean)) {
+    return String(s).trim().toUpperCase()
+  }
+  return clean.slice(0, 8) + '-' + clean.slice(8, 12) + '-' + clean.slice(12, 16) + '-' + clean.slice(16, 20) + '-' + clean.slice(20, 32)
 }
 
 // 平台检测：返 'ios' | 'android' | 'devtools' | 其它字符串
