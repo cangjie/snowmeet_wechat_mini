@@ -72,9 +72,38 @@ Component({
       if (method === 'wechat') {
         that.showWepayQrCode()
       } else if (method === 'alipay') {
-        // TODO: 切换到支付宝小程序后替换为支付宝小程序跳转/下单逻辑
-        that.showWepayQrCode()
+        // 2026-05-30 落地：调 Order/GetAlipayMiniPayment 建一笔 alipay OrderPayment 拿 paymentId，
+        // 编进支付宝小程序唤起 URL 做成二维码。顾客用支付宝扫该 QR → 自动跳进 alipay_snowmeet/pages/payment_entry?paymentId=...
+        that.showAlipayMiniQrCode()
       }
+    },
+
+    // 支付宝小程序方案：QR 内容是 alipays://platformapi/startapp 唤起 URL，
+    // appId=2021006157678375 是 alipay_snowmeet 工程的小程序 appId（独立于商户 appId 2021004143665722）
+    showAlipayMiniQrCode() {
+      var that = this
+      var order = that.data.order
+      if (!order) return
+      that.setData({ loadingQr: true })
+      var payUrl = app.globalData.requestPrefix + 'Order/GetAlipayMiniPayment/' + order.id.toString()
+        + '?sessionKey=' + app.globalData.sessionKey
+      util.performWebRequest(payUrl, null).then(function (payment) {
+        // 支付宝小程序唤起 URL（标准 scheme）：appId + page + query
+        // 注意 page 和 query 都要 encodeURIComponent 一次（再被 GetQRCode 整体 encode 一次）
+        var schemePage = encodeURIComponent('pages/payment_entry/index?paymentId=' + payment.id.toString())
+        var schemeUrl = 'alipays://platformapi/startapp?appId=2021006157678375&page=' + schemePage
+        var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(schemeUrl)
+        console.log('[order-payment] alipay scheme URL:', schemeUrl)
+        that.setData({ paymentId: payment.id, qrCodeUrl: qrCodeUrl, loadingQr: false })
+        // 复用现有 LogShowWechatQrCode 记录展示事件（场景文案在后端，跨支付通道复用）
+        var logUrl = app.globalData.requestPrefix + 'Order/LogShowWechatQrCode/' + payment.order_id.toString() + '?sessionKey=' + app.globalData.sessionKey
+        util.performWebRequest(logUrl, null)
+        // 同样开 WebSocket 监听 paymentpaid 事件，让 wechat 侧收到支付成功通知
+        that.initWebSocket()
+      }).catch(function (err) {
+        console.warn('[order-payment] GetAlipayMiniPayment 失败', err)
+        that.setData({ loadingQr: false })
+      })
     },
 
     showWepayQrCode() {
