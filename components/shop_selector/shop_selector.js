@@ -1,17 +1,21 @@
 // components/shop_selector/shop_selector.js
 //
-// 自动选店逻辑（2026-05-31 重构）：
+// 自动选店逻辑（2026-05-31 重构 + 2026-05-30 调整 30s 超时行为）：
 //   defaultShop 显式传 → 直接定位选中
 //   否则 → 蓝牙扫附近 beacon，命中 shop_list 中 beacon_mac / beacon_uuid 的店即选中（取首批最大 RSSI）
-//   30 秒超时 / 蓝牙错误 / 权限拒绝 / 全店未配 beacon → fallback：staff.base_shop_id → 列表第一家
+//
+// 失败 / 兜底分支：
+//   - 蓝牙错误 / 权限拒绝 / 全店未配 beacon → 静默 _fallback（staff.base_shop_id → 列表第一家），不打扰
+//   - 30 秒超时（扫了但全程没命中） → 弹 toast「未检测到店内 beacon，请手动选店」+ **不自动选**，
+//     让 picker 留待用户手动滚选；避免静默选错店后用户察觉不到（用户拍板，2026-05-30）
 //
 // 双路径并行扫描（参考 pages/blt/beacon_scan.js）：
 //   A 通用 BLE：deviceId 跟 beacon_mac 比对（Android 命中，iOS 系统隐藏真 MAC 恒不命中）
 //   B CoreLocation iBeacon：uuid 跟 beacon_uuid 比对（iOS + Android 通用，但 uuids 必填）
 //
 // 关键点：
-//   - 首批命中即停扫 + 关蓝牙（节能、避免蓝牙残留）
-//   - 错误不弹 toast（开单页频繁进入，定位失败属正常情况）
+//   - 首批命中即停扫 + 关蓝牙（节能、避免蓝牙残留）+ 立即 _applySelectedShop 选中
+//   - 蓝牙/权限错误不弹 toast（开单页频繁进入，定位失败属正常情况）；只有 30s 全程无命中才弹
 const app = getApp()
 const util = require('../../utils/util.js')
 
@@ -193,10 +197,16 @@ Component({
       that._beaconHandler = null
       that._scanActive = true
       that._scanTimeoutTimer = setTimeout(function () {
-        // 30 秒兜底：无任何命中 → 走 fallback
+        // 30 秒兜底：扫满 30 秒仍**没有任何 beacon 命中**才进这里（首批命中会立刻 _stopScan + _applySelectedShop）
+        // 行为：弹 toast 提示用户手动选店，**不自动 _fallback**（避免静默选 staff.base_shop_id 误导用户）
+        // 父页面看到 picker 未选中（currentSelectedIndex=0），用户主动滚 picker 后 selectChanged 触发 ShopSelected
         if (!that._scanActive) return
         that._stopScan()
-        that._fallback(shopList)
+        wx.showToast({
+          title: '未检测到店内 beacon，请手动选店',
+          icon: 'none',
+          duration: 2500
+        })
       }, SCAN_TIMEOUT_MS)
 
       wx.openBluetoothAdapter({
