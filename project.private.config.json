@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pay",
-          "pathName": "pages/order/payment_entry",
-          "query": "paymentId=42566",
+          "name": "beacon",
+          "pathName": "pages/blt/beacon_scan",
+          "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "pay",
+          "pathName": "pages/order/payment_entry",
+          "query": "paymentId=42571",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "recept",
