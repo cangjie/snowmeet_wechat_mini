@@ -195,7 +195,13 @@ Component({
           if (typeof wx.showShareImageMenu === 'function') {
             wx.showShareImageMenu({
               path: res.tempFilePath,
-              fail: function () {
+              fail: function (err) {
+                console.warn('[order-payment] showShareImageMenu fail', err)
+                var msg = (err && err.errMsg) || ''
+                // 用户主动取消分享，不当作错误
+                if (msg.indexOf('cancel') >= 0) return
+                // 开发者工具模拟器不支持该能力，退回图片预览（真机可长按转发）
+                wx.showToast({ title: '当前环境不支持直接分享，已打开预览，可长按图片转发', icon: 'none', duration: 2500 })
                 wx.previewImage({ urls: [res.tempFilePath] })
               }
             })
