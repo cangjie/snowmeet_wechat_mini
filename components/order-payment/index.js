@@ -113,7 +113,7 @@ Component({
       that.setData({ loadingQr: true })
       var payUrl = app.globalData.requestPrefix + 'Order/GetWepayPayment/' + order.id.toString() + '?sessionKey=' + app.globalData.sessionKey
       util.performWebRequest(payUrl, null).then(function (payment) {
-        var qrText = 'https://mini.snowmeet.top/mapp/order/payment_entry?paymentId=' + payment.id.toString()
+        var qrText = 'https://mini.snowmeet.top/mapp/order_payment?paymentId=' + payment.id.toString()
         var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrText)
         that.setData({ paymentId: payment.id, qrCodeUrl: qrCodeUrl, loadingQr: false })
         var logUrl = app.globalData.requestPrefix + 'Order/LogShowWechatQrCode/' + payment.order_id.toString() + '?sessionKey=' + app.globalData.sessionKey
