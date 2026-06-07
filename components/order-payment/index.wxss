@@ -79,6 +79,24 @@
 .qr-meta-status--wait { background: var(--surface-container, #e5eeff); color: var(--on-surface-variant, #3f4850); }
 .qr-meta-status--ok   { background: #dcfce7; color: #15803d; }
 
+.qr-share-btn {
+  margin-top: 4px;
+  width: 100%;
+  height: 40px;
+  background: var(--surface-container, #e5eeff);
+  color: #4aa9e9;
+  border: 1px solid var(--outline-variant, #bfc7d1);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+}
+.qr-share-btn::after { border: none; }
+
 /* 支付方式列表 */
 .pay-list {
   background: var(--surface-container-lowest, #ffffff);

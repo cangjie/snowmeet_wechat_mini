@@ -176,6 +176,41 @@ Component({
       })
     },
 
+    onShareQrCode() {
+      var that = this
+      var qrCodeUrl = that.data.qrCodeUrl
+      if (!qrCodeUrl) {
+        wx.showToast({ title: '二维码尚未生成', icon: 'none' })
+        return
+      }
+      wx.showLoading({ title: '准备分享…' })
+      wx.downloadFile({
+        url: qrCodeUrl,
+        success: function (res) {
+          wx.hideLoading()
+          if (res.statusCode !== 200 || !res.tempFilePath) {
+            wx.showToast({ title: '下载二维码失败', icon: 'none' })
+            return
+          }
+          if (typeof wx.showShareImageMenu === 'function') {
+            wx.showShareImageMenu({
+              path: res.tempFilePath,
+              fail: function () {
+                wx.previewImage({ urls: [res.tempFilePath] })
+              }
+            })
+          } else {
+            // 旧基础库回退：长按图片可保存/转发
+            wx.previewImage({ urls: [res.tempFilePath] })
+          }
+        },
+        fail: function () {
+          wx.hideLoading()
+          wx.showToast({ title: '下载二维码失败', icon: 'none' })
+        }
+      })
+    },
+
     // WebSocket：等待扫码支付完成
     initWebSocket() {
       var that = this

@@ -24,6 +24,10 @@
         {{paymentStatus === 'paid' ? '已收款' : '等待扫码…'}}
       </view>
     </view>
+    <button wx:if="{{qrCodeUrl}}" class="qr-share-btn" bindtap="onShareQrCode">
+      <van-icon name="share-o" size="14px" color="#4aa9e9"/>
+      <text>转发二维码给微信好友</text>
+    </button>
   </view>
 
   <!-- 支付方式三选一 -->
