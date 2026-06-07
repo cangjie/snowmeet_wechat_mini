@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "index",
+          "pathName": "pages/index/index",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "pay",
           "pathName": "pages/order/payment_entry",
           "query": "paymentId=42566",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "recept",

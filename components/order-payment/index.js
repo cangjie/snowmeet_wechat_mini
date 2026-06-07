@@ -79,7 +79,7 @@ Component({
     },
 
     // 支付宝小程序方案：QR 内容是 alipays://platformapi/startapp 唤起 URL，
-    // appId=2021006157678375 是 alipay_snowmeet 工程的小程序 appId（独立于商户 appId 2021004143665722）
+    // appId=2021006157624571 是 alipay_snowmeet 工程的小程序 appId（独立于商户 appId 2021004143665722）
     showAlipayMiniQrCode() {
       var that = this
       var order = that.data.order
@@ -91,7 +91,7 @@ Component({
         // 支付宝小程序唤起 URL（标准 scheme）：appId + page + query
         // 注意 page 和 query 都要 encodeURIComponent 一次（再被 GetQRCode 整体 encode 一次）
         var schemePage = encodeURIComponent('pages/payment_entry/index?paymentId=' + payment.id.toString())
-        var schemeUrl = 'alipays://platformapi/startapp?appId=2021006157678375&page=' + schemePage
+        var schemeUrl = 'alipays://platformapi/startapp?appId=2021006157624571&page=' + schemePage
         var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(schemeUrl)
         console.log('[order-payment] alipay scheme URL:', schemeUrl)
         that.setData({ paymentId: payment.id, qrCodeUrl: qrCodeUrl, loadingQr: false })
