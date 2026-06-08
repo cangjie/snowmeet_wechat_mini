@@ -133,8 +133,14 @@ Page({
     }
     this._lastLookupCell = current;
 
-    data.getMemberByNumSilentPromise(current).then((member) => {
-      // 非会员：保持安静，店员手动录入即可
+    // 登录(app.loginPromiseNew)是异步的：wx.login + MemberLogin 网络往返后才会写入
+    // app.globalData.sessionKey / requestPrefix。入口页是落地首页、自己没 await 登录，
+    // 落地后立刻输入手机号可能在登录返回前就触发查询 → sessionKey 为空 → 后端判无权限 → 查不到。
+    // 这里先等登录完成再查（与 recept_new 一致），杜绝这个竞态。
+    Promise.resolve(app.loginPromiseNew).then(() => {
+      return data.getMemberByNumSilentPromise(current);
+    }).then((member) => {
+      // 非会员 / 无权限 / 网络错：保持安静，店员手动录入即可
       if (!member || !(member.id || member.member_id || member.memberId)) {
         return;
       }
@@ -153,6 +159,8 @@ Page({
         patch.gender = gender;
       }
       if (Object.keys(patch).length === 0) {
+        // 命中会员但档案没有姓名/性别——没东西可填。打日志便于排查是「查不到」还是「查到了但空」
+        console.warn('[recept_entry] 命中会员但 real_name/gender 均为空，无可回填', current, member);
         return;
       }
       this.setData(patch);
