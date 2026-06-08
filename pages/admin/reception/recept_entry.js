@@ -9,16 +9,23 @@
 // 后端依赖（SnowmeetApi）：
 //   GET Order/GetShops（由 components/shop_selector 内部调用）
 const app = getApp();
+const data = require('../../../utils/data.js');
+
+// 把用户输入归一化：去掉空格/横杠/括号，0044... → +44...
+function normalizePhone(raw) {
+  let normalized = String(raw || '').trim().replace(/[\s\-()]/g, '');
+  if (normalized.startsWith('00')) {
+    normalized = '+' + normalized.slice(2);
+  }
+  return normalized;
+}
 
 function isValidInternationalPhone(raw) {
   const value = String(raw || '').trim();
   if (!value) return false;
 
   // 允许国际常见输入形式：+65 8123 4567 / (852) 5123-4567 / 0044 7700 900123
-  let normalized = value.replace(/[\s\-()]/g, '');
-  if (normalized.startsWith('00')) {
-    normalized = '+' + normalized.slice(2);
-  }
+  const normalized = normalizePhone(value);
 
   if (normalized.startsWith('+')) {
     // E.164: + 后 6~15 位数字，首位不能是 0
@@ -27,6 +34,14 @@ function isValidInternationalPhone(raw) {
 
   // 未带国家区号时，兼容本地写法：7~15 位数字（覆盖 US/HK/SG/EU 常见长度）
   return /^\d{7,15}$/.test(normalized);
+}
+
+// 号码是否「完整到可以拿去查会员」：明确带国家区号(+) 或 国内 11 位手机号。
+// 避免在国内号码输到 7~10 位（isValidInternationalPhone 已为 true）时就反复发查询。
+function shouldLookupPhone(normalized) {
+  if (!isValidInternationalPhone(normalized)) return false;
+  if (normalized.startsWith('+')) return true;
+  return /^\d{11}$/.test(normalized);
 }
 
 Page({
@@ -49,9 +64,18 @@ Page({
   /* ---------- 生命周期 ---------- */
   onLoad() {
     // shop-selector 自身依赖 app.loginPromiseNew，这里无需重复
+    this._lookupTimer = null;   // 手机号查会员的防抖定时器
+    this._lastLookupCell = '';  // 最近一次已查询的号码，去重避免重复请求
   },
 
   onShow() {},
+
+  onUnload() {
+    if (this._lookupTimer) {
+      clearTimeout(this._lookupTimer);
+      this._lookupTimer = null;
+    }
+  },
 
   /* ---------- shop-selector 回调（沿用旧系统的事件名/字段） ---------- */
   shopSelected(e) {
@@ -80,6 +104,61 @@ Page({
     const cell = (e.detail.value || '').trim();
     this.setData({ customerCell: cell });
     this.updateCustomerReadyState();
+    this.scheduleMemberLookup(cell);
+  },
+
+  /* ---------- 手机号匹配会员 → 自动回填姓名/性别 ---------- */
+  // 输入手机号时防抖触发查询：号码不完整时不查，号码完整且与上次不同才发请求
+  scheduleMemberLookup(cell) {
+    if (this._lookupTimer) {
+      clearTimeout(this._lookupTimer);
+      this._lookupTimer = null;
+    }
+    const normalized = normalizePhone(cell);
+    if (!shouldLookupPhone(normalized)) {
+      this._lastLookupCell = '';  // 号码删短不完整时重置，便于重新输完再次查询
+      return;
+    }
+    this._lookupTimer = setTimeout(() => {
+      this._lookupTimer = null;
+      this.tryMatchMemberByCell(normalized);
+    }, 450);
+  },
+
+  tryMatchMemberByCell(normalized) {
+    // 防抖期间号码可能又改了，用当前框里的值复核
+    const current = normalizePhone(this.data.customerCell);
+    if (current !== normalized || !shouldLookupPhone(current) || current === this._lastLookupCell) {
+      return;
+    }
+    this._lastLookupCell = current;
+
+    data.getMemberByNumSilentPromise(current).then((member) => {
+      // 非会员：保持安静，店员手动录入即可
+      if (!member || !(member.id || member.member_id || member.memberId)) {
+        return;
+      }
+      // 异步返回时号码若已被改动，丢弃这次回填
+      if (normalizePhone(this.data.customerCell) !== current) {
+        return;
+      }
+      // 用会员档案里的姓名/性别覆盖（仅在档案有值时覆盖，空值不清掉已填内容）
+      const patch = {};
+      const realName = (member.real_name || '').trim();
+      const gender = (member.gender || '').trim();
+      if (realName) {
+        patch.customerName = realName;
+      }
+      if (gender === '男' || gender === '女') {
+        patch.gender = gender;
+      }
+      if (Object.keys(patch).length === 0) {
+        return;
+      }
+      this.setData(patch);
+      this.updateCustomerReadyState();
+      wx.showToast({ title: '已匹配会员信息', icon: 'none', duration: 1500 });
+    });
   },
 
   updateCustomerReadyState() {

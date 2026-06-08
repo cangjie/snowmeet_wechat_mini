@@ -126,6 +126,31 @@ const getMemberByNumPromise = function (cell, sessionKey, sessionType) {
     })
   })
 }
+// 静默版按手机号查会员：匹配上 resolve(member)，查不到 / 无权限 / 网络错都 resolve(null) 且不弹 toast。
+// 用于开单入口边输入手机号边匹配会员的场景——非会员是常态，不应每个号码都弹「会员不存在」打扰店员。
+const getMemberByNumSilentPromise = function (cell, sessionKey, sessionType) {
+  sessionKey = sessionKey || app.globalData.sessionKey || ''
+  sessionType = sessionType || 'wechat_mini_openid'
+  var getUrl = app.globalData.requestPrefix + 'Member/GetMemberByNum/' + encodeURIComponent(cell)
+    + '?sessionKey=' + encodeURIComponent(sessionKey)
+    + '&sessionType=' + encodeURIComponent(sessionType)
+  return new Promise(function (resolve) {
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success: function (res) {
+        if (res && res.statusCode === 200 && res.data && res.data.code === 0) {
+          resolve(res.data.data)
+        } else {
+          resolve(null)
+        }
+      },
+      fail: function () {
+        resolve(null)
+      }
+    })
+  })
+}
 const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, name, gender, sessionKey) {
   var placeUrl = app.globalData.requestPrefix + 'Order/PlaceBlankOrder/' + isPackage + '?type=' + encodeURIComponent(type) + '&shop=' + encodeURIComponent(shop)
     + memberId ? '&memberId=' + memberId.toString() : ''
@@ -807,6 +832,7 @@ module.exports = {
   verifyMemberCellPromise,
   getMemberPromise,
   getMemberByNumPromise,
+  getMemberByNumSilentPromise,
   placeBlankOrderPromise,
   getEnumListPromise,
   getRentPriceListPromise,
