@@ -387,8 +387,9 @@ Component({
         amountModal: {
           show: true,
           title: '修改押金',
-          placeholder: '请输入押金金额',
-          value: String(current),
+          // 当前金额放 placeholder 作参照，输入框留空：点开即可直接输新值，不用先手删旧值
+          placeholder: current ? ('原 ¥' + current) : '请输入押金金额',
+          value: '',
           ridx,
           field: 'deposit',
         },
@@ -418,8 +419,9 @@ Component({
         amountModal: {
           show: true,
           title: '修改租金/日',
-          placeholder: '请输入每日租金',
-          value: String(current),
+          // 当前金额放 placeholder 作参照，输入框留空：点开即可直接输新值，不用先手删旧值
+          placeholder: current ? ('原 ¥' + current) : '请输入每日租金',
+          value: '',
           ridx,
           field: 'rate',
         },
@@ -435,7 +437,13 @@ Component({
     },
     onAmountModalConfirm() {
       const m = this.data.amountModal;
-      const v = parseFloat(m.value);
+      const raw = (m.value == null ? '' : String(m.value)).trim();
+      // 输入框留空 = 不修改，直接关闭（点开看一眼又不改时不报错，金额保持原值）
+      if (raw === '') {
+        this.setData({ 'amountModal.show': false });
+        return;
+      }
+      const v = parseFloat(raw);
       if (Number.isNaN(v) || v < 0) {
         wx.showToast({ title: '请输入有效金额', icon: 'none' });
         return;
