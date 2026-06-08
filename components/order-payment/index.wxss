@@ -75,9 +75,28 @@
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
-.qr-meta-status--wait { background: var(--surface-container, #e5eeff); color: var(--on-surface-variant, #3f4850); }
-.qr-meta-status--ok   { background: #dcfce7; color: #15803d; }
+.qr-meta-status--waiting   { background: var(--surface-container, #e5eeff); color: var(--on-surface-variant, #3f4850); }
+.qr-meta-status--scanned   { background: #dbeafe; color: #1d4ed8; }
+.qr-meta-status--paying    { background: #fef3c7; color: #b45309; }
+.qr-meta-status--paid      { background: #dcfce7; color: #15803d; }
+.qr-meta-status--cancelled { background: #fee2e2; color: #b91c1c; }
+
+/* 实时进行中的小圆点（已扫码 / 支付中）：脉冲呼吸，颜色随状态文字色 */
+.qr-meta-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: qr-meta-pulse 1.1s ease-in-out infinite;
+}
+@keyframes qr-meta-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50%      { opacity: 1; transform: scale(1.15); }
+}
 
 .qr-share-btn {
   margin-top: 4px;

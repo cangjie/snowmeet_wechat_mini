@@ -16,6 +16,8 @@ Component({
     qrCodeUrl: '',
     paymentId: null,
     paymentStatus: 'pending',      // 'pending' | 'paid'
+    payStage: 'waiting',           // 'waiting' | 'scanned' | 'paying' | 'paid' | 'cancelled'
+    payStageLabel: '等待扫码…',
     othersPayMethods: ['京东收银', 'POS机刷卡', '现金'],
     subPayMethodIndex: null,
     subPayMethod: '',
@@ -25,6 +27,8 @@ Component({
   lifetimes: {
     attached() {
       var that = this
+      that._statusTimer = null    // 状态轮询定时器
+      that._paidHandled = false   // 支付成功是否已收尾（WS / 轮询去重）
       app.loginPromiseNew.then(function () {
         that.loadOrder()
         data.GetUnCommonPayMethodPromise && data.GetUnCommonPayMethodPromise().then(function (methods) {
@@ -36,6 +40,7 @@ Component({
     },
     detached() {
       var that = this
+      that.stopStatusPolling()
       that.closeSocket()
       if (that.data.order && that.data.paymentId && that.data.paymentStatus !== 'paid') {
         data.cancelPayingPromise(that.data.order.id, app.globalData.sessionKey).catch(function () {})
@@ -59,15 +64,19 @@ Component({
       var that = this
       var method = e.currentTarget.dataset.method
       if (method === that.data.payMethod) return
-      // 切换方式时清掉旧二维码
+      // 切换方式时清掉旧二维码 + 复位状态
       that.setData({
         payMethod: method,
         qrCodeUrl: '',
         paymentId: null,
         subPayMethodIndex: null,
         subPayMethod: '',
-        inputedPayMethod: ''
+        inputedPayMethod: '',
+        payStage: 'waiting',
+        payStageLabel: '等待扫码…'
       })
+      that._paidHandled = false
+      that.stopStatusPolling()
       that.closeSocket()
       if (method === 'wechat') {
         that.showWepayQrCode()
@@ -100,6 +109,7 @@ Component({
         util.performWebRequest(logUrl, null)
         // 同样开 WebSocket 监听 paymentpaid 事件，让 wechat 侧收到支付成功通知
         that.initWebSocket()
+        that.startStatusPolling()
       }).catch(function (err) {
         console.warn('[order-payment] GetAlipayMiniPayment 失败', err)
         that.setData({ loadingQr: false })
@@ -119,6 +129,7 @@ Component({
         var logUrl = app.globalData.requestPrefix + 'Order/LogShowWechatQrCode/' + payment.order_id.toString() + '?sessionKey=' + app.globalData.sessionKey
         util.performWebRequest(logUrl, null)
         that.initWebSocket()
+        that.startStatusPolling()
       }).catch(function () {
         that.setData({ loadingQr: false })
       })
@@ -168,7 +179,9 @@ Component({
       wx.showLoading({ title: '处理中…' })
       util.performWebRequest(url, null).then(function (paidOrder) {
         wx.hideLoading()
-        that.setData({ paymentStatus: 'paid' })
+        that._paidHandled = true
+        that.stopStatusPolling()
+        that.setData({ paymentStatus: 'paid', payStage: 'paid', payStageLabel: '已收款' })
         that.triggerEvent('paid', { orderId: order.id, payMethod: payMethod, order: paidOrder })
       }).catch(function () {
         wx.hideLoading()
@@ -232,14 +245,7 @@ Component({
         try {
           var ret = JSON.parse(res.data)
           if (ret.code === 0) {
-            var order = ret.data
-            that.setData({ paymentStatus: 'paid' })
-            that.triggerEvent('paid', {
-              orderId: that.data.order.id,
-              payMethod: that.data.payMethod === 'alipay' ? '支付宝' : '微信支付',
-              order: order
-            })
-            that.closeSocket()
+            that.markPaid(ret.data)
           }
         } catch (e) {}
       })
@@ -252,6 +258,69 @@ Component({
       if (!socket) return
       try { socket.close({}) } catch (e) {}
       this.setData({ socket: null })
+    },
+
+    // ---------- 支付状态实时轮询：等待扫码 → 顾客已扫码 → 顾客支付中 → 已支付 ----------
+    startStatusPolling() {
+      var that = this
+      that.stopStatusPolling()
+      if (!that.data.paymentId) return
+      // 立刻拉一次，之后每 2s 轮询，直到支付成功 / 组件销毁 / 切换支付方式
+      that.pollLiveStatus()
+      that._statusTimer = setInterval(function () {
+        that.pollLiveStatus()
+      }, 2000)
+    },
+    stopStatusPolling() {
+      if (this._statusTimer) {
+        clearInterval(this._statusTimer)
+        this._statusTimer = null
+      }
+    },
+    pollLiveStatus() {
+      var that = this
+      var paymentId = that.data.paymentId
+      if (!paymentId || that._paidHandled) {
+        that.stopStatusPolling()
+        return
+      }
+      data.getPaymentLiveStatusPromise(paymentId).then(function (st) {
+        // 轮询期间可能已切换支付方式 / 已收尾，丢弃过期结果
+        if (!st || that._paidHandled || paymentId !== that.data.paymentId) return
+        var labelMap = {
+          waiting: '等待扫码…',
+          scanned: '顾客已扫码',
+          paying: '顾客支付中…',
+          paid: '已收款',
+          cancelled: '支付已取消'
+        }
+        var stage = st.stage || 'waiting'
+        that.setData({
+          payStage: stage,
+          payStageLabel: labelMap[stage] || '等待扫码…'
+        })
+        if (stage === 'paid') {
+          // 兜底：万一 WebSocket 漏收，轮询也能收尾。拉一次最新订单再 markPaid。
+          data.getOrderByStaffPromise(that.data.order.id, app.globalData.sessionKey).then(function (order) {
+            that.markPaid(order)
+          }).catch(function () {
+            that.markPaid(that.data.order)
+          })
+        }
+      })
+    },
+    // 支付成功统一收尾（WebSocket 与轮询共用，_paidHandled 去重，避免重复 triggerEvent）
+    markPaid(order) {
+      if (this._paidHandled) return
+      this._paidHandled = true
+      this.stopStatusPolling()
+      this.closeSocket()
+      this.setData({ paymentStatus: 'paid', payStage: 'paid', payStageLabel: '已收款' })
+      this.triggerEvent('paid', {
+        orderId: this.data.order.id,
+        payMethod: this.data.payMethod === 'alipay' ? '支付宝' : '微信支付',
+        order: order
+      })
     }
   }
 })

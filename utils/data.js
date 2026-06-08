@@ -151,6 +151,31 @@ const getMemberByNumSilentPromise = function (cell, sessionKey, sessionType) {
     })
   })
 }
+// 支付二维码实时状态：供收银端轮询。命中 resolve({ stage, status, paid })，失败 resolve(null) 且不弹 toast（高频轮询不打扰）。
+// stage：waiting(等待扫码) / scanned(顾客已扫码) / paying(顾客支付中) / paid(已支付) / cancelled(已取消)
+const getPaymentLiveStatusPromise = function (paymentId, sessionKey, sessionType) {
+  sessionKey = sessionKey || app.globalData.sessionKey || ''
+  sessionType = sessionType || 'wechat_mini_openid'
+  var getUrl = app.globalData.requestPrefix + 'Order/GetPaymentLiveStatus/' + encodeURIComponent(paymentId)
+    + '?sessionKey=' + encodeURIComponent(sessionKey)
+    + '&sessionType=' + encodeURIComponent(sessionType)
+  return new Promise(function (resolve) {
+    wx.request({
+      url: getUrl,
+      method: 'GET',
+      success: function (res) {
+        if (res && res.statusCode === 200 && res.data && res.data.code === 0) {
+          resolve(res.data.data)
+        } else {
+          resolve(null)
+        }
+      },
+      fail: function () {
+        resolve(null)
+      }
+    })
+  })
+}
 const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, name, gender, sessionKey) {
   var placeUrl = app.globalData.requestPrefix + 'Order/PlaceBlankOrder/' + isPackage + '?type=' + encodeURIComponent(type) + '&shop=' + encodeURIComponent(shop)
     + memberId ? '&memberId=' + memberId.toString() : ''
@@ -854,6 +879,7 @@ module.exports = {
   updateOrderPromise,
   cancelPayingPromise,
   getOrderFromPaymentByCustomer,
+  getPaymentLiveStatusPromise,
   checkPayerIdentityPromise,
   confirmPayIdentityPromise,
   updateOrderWithDetailPromise,

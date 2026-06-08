@@ -20,8 +20,9 @@
     </view>
     <view class="qr-meta">
       <text class="qr-meta-label">支付状态</text>
-      <view class="qr-meta-status {{paymentStatus === 'paid' ? 'qr-meta-status--ok' : 'qr-meta-status--wait'}}">
-        {{paymentStatus === 'paid' ? '已收款' : '等待扫码…'}}
+      <view class="qr-meta-status qr-meta-status--{{payStage}}">
+        <view wx:if="{{payStage === 'scanned' || payStage === 'paying'}}" class="qr-meta-dot"></view>
+        {{payStageLabel}}
       </view>
     </view>
     <button wx:if="{{qrCodeUrl}}" class="qr-share-btn" bindtap="onShareQrCode">
