@@ -3,16 +3,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "beacon",
-          "pathName": "pages/blt/beacon_scan",
-          "query": "",
+          "name": "pay",
+          "pathName": "pages/order/payment_entry",
+          "query": "paymentId=42593",
           "scene": null,
           "launchMode": "default"
         },
         {
-          "name": "pay",
-          "pathName": "pages/order/payment_entry",
-          "query": "paymentId=42571",
+          "name": "beacon",
+          "pathName": "pages/blt/beacon_scan",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },
