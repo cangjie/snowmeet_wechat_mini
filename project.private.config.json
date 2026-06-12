@@ -20,15 +20,8 @@
           "name": "recept",
           "pathName": "pages/admin/reception/recept_entry",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "recept_entry",
-          "pathName": "pages/admin/reception/recept_entry",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
+          "scene": null,
+          "launchMode": "default"
         }
       ]
     }
