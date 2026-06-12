@@ -3,32 +3,11 @@
     "miniprogram": {
       "list": [
         {
-          "name": "beacon",
-          "pathName": "pages/blt/beacon_scan",
-          "query": "",
-          "scene": null,
-          "launchMode": "default"
-        },
-        {
-          "name": "pay",
-          "pathName": "pages/order/payment_entry",
-          "query": "paymentId=42571",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
           "name": "recept",
           "pathName": "pages/admin/reception/recept_entry",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "recept_entry",
-          "pathName": "pages/admin/reception/recept_entry",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
+          "scene": null,
+          "launchMode": "default"
         }
       ]
     }
