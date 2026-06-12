@@ -123,18 +123,11 @@ App({
         const env = wx.getAccountInfoSync()
         app.globalData.env = env.miniProgram.envVersion
         if (!app.globalData.env || app.globalData.env == '') {
-          app.globalData.env = 'trail'
+          app.globalData.env = 'trial'
         }
 
-        switch (app.globalData.env) {
-          case 'trail':
-          case 'develop':
-            app.globalData.domainName = app.getDomain()
-            app.globalData.requestPrefix = 'https://' + app.globalData.domainName + '/api/'
-            break
-          default:
-            break
-        }
+        // 所有版本（开发/体验/正式）统一使用 mini.snowmeet.top（见 globalData 默认值），
+        // 不再按环境读 domain.txt 切换域名
         console.log('weixin log in success.', res)
         var url = 'https://' + app.globalData.domainName + '/api/MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
         util.performWebRequest(url, undefined).then(function (resolveData) {
@@ -201,7 +194,7 @@ App({
       domainName = fileManager.readFileSync(wx.env.USER_DATA_PATH + '/domain.txt', 'utf-8', 0)
     }
     catch {
-      domainName = 'snowmeet.wanlonghuaxue.com'
+      domainName = 'mini.snowmeet.top'
       fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domainName, 'utf-8')
     }
     this.globalData.requestPrefix = 'https://' + domainName + '/api/'

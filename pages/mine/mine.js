@@ -21,14 +21,7 @@ Page({
       var that = this
       const env = wx.getAccountInfoSync()
       app.globalData.env = env.miniProgram.envVersion
-      switch(app.globalData.env){
-        case 'trail':
-        case 'develop':
-          app.globalData.domainName = app.getDomain()
-          break
-        default:
-          break
-      }
+      // 所有版本统一使用 mini.snowmeet.top，不再按环境切换域名
       that.setData({env: app.globalData.env})
       app.loginPromiseNew.then(function(resolve) {
         that.setData({tabbarItemList: app.globalData.userTabBarItem, 
