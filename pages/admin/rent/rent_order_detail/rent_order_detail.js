@@ -210,7 +210,7 @@ Page({
     }
 
     if (order.appendingRentals && order.appendingRentals.length > 0) {
-      that.checkAppendingRentalValid()
+      that.checkAppendingRentalValid(order)
     }
 
     // 关单时间
@@ -320,7 +320,7 @@ Page({
         var payment = null
         for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
           var p = order.availablePayments[i]
-          var unRefund = parseFloat((p.unRefundedAmount || 0).toString())
+          var unRefund = parseFloat((p.remainAmount || 0).toString())
           if (p.status == '支付成功'
             && parseFloat(unRefund.toFixed(2)) >= parseFloat(refundAmount.toFixed(2))) {
             payment = p
@@ -365,9 +365,9 @@ Page({
     })
   },
 
-  checkAppendingRentalValid() {
+  checkAppendingRentalValid(order) {
     var that = this
-    var order = that.data.order
+    if (!order) order = that.data.order
     if (!order || !order.appendingRentals) return
     var allValid = true
     var rentals = order.appendingRentals
@@ -405,9 +405,10 @@ Page({
             + '&sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(appendUrl, null).then(function (updatedOrder) {
             updatedOrder = that.renderOrder(updatedOrder)
+            that.checkAppendingRentalValid(updatedOrder)
             that.setData({ order: updatedOrder })
-            that.checkAppendingRentalValid()
-            that.setData({ order: updatedOrder })
+          }).catch(function () {
+            wx.showToast({ title: '添加失败', icon: 'error' })
           })
         }
       }
@@ -426,9 +427,10 @@ Page({
             + '&sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(appendUrl, null).then(function (updatedOrder) {
             updatedOrder = that.renderOrder(updatedOrder)
+            that.checkAppendingRentalValid(updatedOrder)
             that.setData({ order: updatedOrder })
-            that.checkAppendingRentalValid()
-            that.setData({ order: updatedOrder })
+          }).catch(function () {
+            wx.showToast({ title: '添加失败', icon: 'error' })
           })
         }
       }
@@ -446,8 +448,8 @@ Page({
       wx.hideLoading()
       if (updatedOrder.paying_amount > 0) {
         var renderedOrder = that.renderOrder(updatedOrder)
+        that.checkAppendingRentalValid(renderedOrder)
         that.setData({ order: renderedOrder })
-        that.checkAppendingRentalValid()
         wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + updatedOrder.id })
       } else {
         that.getData()
@@ -477,8 +479,7 @@ Page({
           + '?sessionKey=' + app.globalData.sessionKey
         util.performWebRequest(delUrl, null).then(function (updatedOrder) {
           updatedOrder = that.renderOrder(updatedOrder)
-          that.setData({ order: updatedOrder })
-          that.checkAppendingRentalValid()
+          that.checkAppendingRentalValid(updatedOrder)
           that.setData({ order: updatedOrder })
         })
       }
