@@ -1,7 +1,7 @@
 // pages/admin/rent/rent_order_detail/rent_order_detail.js
 var app = getApp()
-var util = require('../../../utils/util.js')
-var data = require('../../../utils/data.js')
+var util = require('../../../../utils/util.js')
+var data = require('../../../../utils/data.js')
 
 Page({
   data: {
@@ -50,7 +50,7 @@ Page({
         order = that.renderOrder(order)
         wx.hideLoading()
         that.setData({ order })
-      })
+      }).catch(function () { wx.hideLoading() })
     }).catch(function () { wx.hideLoading() })
   },
 
