@@ -1,0 +1,206 @@
+@import '/app.wxss';
+
+/* ── 页面 & 卡片 ─────────────────────── */
+.page { background: #F8F8F8; padding: 20rpx 24rpx 160rpx; min-height: 100vh; }
+.page-loading { display: flex; align-items: center; justify-content: center; height: 100vh; color: #999; }
+
+.card { background: #FFF; border-radius: 12rpx; padding: 24rpx; margin-bottom: 20rpx; }
+
+/* ── 分组标题（蓝色竖条） ─────────────── */
+.section-title {
+  display: flex; align-items: center;
+  font-size: 30rpx; font-weight: 600; color: #333;
+  padding: 12rpx 0; margin-bottom: 8rpx;
+}
+.section-title::before {
+  content: ''; display: inline-block;
+  width: 6rpx; height: 28rpx;
+  background: #2EA6D0; border-radius: 3rpx;
+  margin-right: 14rpx; flex-shrink: 0;
+}
+.section-title-right { margin-left: auto; display: flex; align-items: center; gap: 8rpx; }
+
+/* ── KV 行 ────────────────────────────── */
+.kv-row {
+  display: flex; justify-content: space-between; align-items: center;
+  min-height: 64rpx; font-size: 28rpx; padding: 4rpx 0;
+}
+.kv-label { color: #666; flex-shrink: 0; }
+.kv-value { color: #333; text-align: right; flex: 1; margin-left: 16rpx; word-break: break-all; }
+.kv-value--blue { color: #2EA6D0; font-weight: 600; }
+.kv-value--red { color: #E64340; font-weight: 600; }
+.kv-value--amount { font-weight: 600; font-size: 32rpx; }
+
+/* ── Chip ─────────────────────────────── */
+.chip {
+  display: inline-flex; padding: 4rpx 12rpx;
+  border-radius: 20rpx; font-size: 22rpx; line-height: 1.4;
+  flex-shrink: 0;
+}
+.chip--member { background: #dbeafe; color: #1d4ed8; }
+.chip--guest { background: #f3f4f6; color: #6b7280; }
+.chip--package { background: #e0f2fe; color: #0369a1; }
+.chip--item { background: #f3f4f6; color: #6b7280; }
+.chip--status-unreturned { background: #fef9c3; color: #854d0e; }
+.chip--status-issued { background: #dbeafe; color: #1d4ed8; }
+.chip--status-returned { background: #dcfce7; color: #15803d; }
+.chip--status-noneed { background: #f3f4f6; color: #9ca3af; }
+
+/* ── 分隔线 ───────────────────────────── */
+.divider { height: 1rpx; background: #F0F0F0; margin: 12rpx 0; }
+
+/* ── 支付摘要 2×3 grid ────────────────── */
+.pay-summary-grid {
+  display: flex; flex-wrap: wrap; gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+.pay-summary-cell {
+  flex: 0 0 calc(50% - 8rpx);
+  background: #F8F8F8; border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+}
+.pay-summary-label { font-size: 24rpx; color: #999; margin-bottom: 4rpx; }
+.pay-summary-value { font-size: 30rpx; font-weight: 600; color: #333; }
+.pay-summary-value--blue { color: #2EA6D0; }
+.pay-summary-value--red { color: #E64340; }
+
+/* ── 支付明细表格 ─────────────────────── */
+.pay-table { width: 100%; }
+.pay-table-row {
+  display: flex; align-items: center;
+  font-size: 24rpx; min-height: 56rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+  gap: 8rpx;
+}
+.pay-table-row:last-child { border-bottom: none; }
+.pay-col-date { flex: 0 0 120rpx; color: #666; font-size: 22rpx; }
+.pay-col-method { flex: 1; color: #666; }
+.pay-col-type { flex: 0 0 60rpx; }
+.pay-col-amount { flex: 0 0 130rpx; text-align: right; font-weight: 600; }
+.pay-col-amount--pay { color: #2EA6D0; }
+.pay-col-amount--refund { color: #E64340; }
+
+/* ── Tab pill ─────────────────────────── */
+.tab-pill {
+  display: flex; height: 56rpx; border-radius: 28rpx;
+  background: #f3f4f6; flex-shrink: 0;
+}
+.tab-pill__item {
+  flex: 1; text-align: center; line-height: 56rpx;
+  font-size: 26rpx; border-radius: 28rpx; color: #6b7280;
+}
+.tab-pill__item--active { background: #2EA6D0; color: #fff; }
+
+/* ── 租赁子卡片 ───────────────────────── */
+.rental-card {
+  background: #F8F8F8; border-radius: 8rpx;
+  padding: 12rpx 16rpx; margin-bottom: 12rpx;
+}
+.rental-card:last-child { margin-bottom: 0; }
+
+.rental-head {
+  display: flex; align-items: center; gap: 8rpx;
+  min-height: 52rpx;
+}
+.rental-head-name {
+  flex: 1; font-size: 28rpx; font-weight: 600; color: #333;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rental-head-meta { display: flex; align-items: center; gap: 8rpx; flex-shrink: 0; }
+.rental-head-fee { font-size: 24rpx; color: #666; }
+.rental-head-fee text { color: #333; font-weight: 600; }
+
+.rental-body { padding-top: 12rpx; }
+.rental-detail-grid {
+  display: flex; flex-wrap: wrap; gap: 0;
+  font-size: 26rpx;
+}
+.rental-detail-cell {
+  flex: 0 0 50%; display: flex;
+  min-height: 56rpx; align-items: center; gap: 8rpx;
+}
+.rental-detail-label { color: #999; font-size: 24rpx; flex-shrink: 0; }
+.rental-detail-value { color: #333; }
+
+.rental-fee-row {
+  display: flex; gap: 16rpx; flex-wrap: wrap;
+  font-size: 26rpx; padding: 8rpx 0;
+}
+.rental-fee-cell { display: flex; gap: 6rpx; }
+.rental-fee-label { color: #999; }
+.rental-fee-value { color: #333; font-weight: 600; }
+
+.rental-memo-row {
+  display: flex; align-items: flex-start; gap: 8rpx;
+  font-size: 26rpx; min-height: 52rpx; padding: 4rpx 0;
+}
+.rental-memo-label { color: #999; flex-shrink: 0; padding-top: 6rpx; }
+.rental-memo-tap {
+  flex: 1; color: #333; word-break: break-all;
+  border-bottom: 1rpx solid #e5e7eb; padding-bottom: 4rpx;
+}
+.rental-memo-placeholder { color: #ccc; }
+
+.toggle-row {
+  display: flex; align-items: center; gap: 8rpx;
+  font-size: 26rpx; color: #2EA6D0; padding: 8rpx 0;
+}
+
+/* ── 详情 / 物明细 ─────────────────────── */
+.detail-table { font-size: 24rpx; }
+.detail-table-row {
+  display: flex; gap: 8rpx; min-height: 48rpx; align-items: center;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+.detail-table-row:last-child { border-bottom: none; }
+.detail-col-date { flex: 0 0 160rpx; color: #666; }
+.detail-col-amount { flex: 0 0 100rpx; text-align: right; font-weight: 600; color: #333; }
+.detail-col-discount { flex: 0 0 80rpx; text-align: right; color: #999; }
+.detail-col-subtotal { flex: 1; text-align: right; color: #2EA6D0; font-weight: 600; }
+
+.item-table { font-size: 24rpx; }
+.item-table-row {
+  display: flex; gap: 8rpx; min-height: 48rpx; align-items: center;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+.item-table-row:last-child { border-bottom: none; }
+.item-col-code { flex: 0 0 100rpx; color: #666; }
+.item-col-name { flex: 1; color: #333; }
+.item-col-cat { flex: 0 0 80rpx; color: #666; }
+.item-col-status { flex: 0 0 80rpx; text-align: right; }
+
+/* ── 全部租赁物（Tab 1）─────────────────── */
+.all-items-list { font-size: 26rpx; }
+.all-item-row {
+  display: flex; gap: 8rpx; min-height: 56rpx; align-items: center;
+  border-bottom: 1rpx solid #F0F0F0; padding: 4rpx 0;
+}
+.all-item-row:last-child { border-bottom: none; }
+.all-item-col-code { flex: 0 0 96rpx; color: #666; font-size: 24rpx; }
+.all-item-col-name { flex: 1; color: #333; }
+.all-item-col-cat { flex: 0 0 80rpx; color: #666; font-size: 24rpx; }
+.all-item-col-rental { flex: 0 0 120rpx; color: #999; font-size: 22rpx; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.all-item-col-status { flex: 0 0 80rpx; text-align: right; }
+
+/* ── 退款摘要 ─────────────────────────── */
+.refund-summary-grid {
+  display: flex; flex-wrap: wrap; gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+.refund-summary-cell {
+  flex: 0 0 calc(50% - 6rpx);
+  background: #F8F8F8; border-radius: 8rpx;
+  padding: 10rpx 14rpx;
+}
+.refund-summary-label { font-size: 22rpx; color: #999; margin-bottom: 2rpx; }
+.refund-summary-value { font-size: 28rpx; font-weight: 600; color: #333; }
+
+/* ── 底部操作栏 ───────────────────────── */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; padding: 16rpx 24rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  display: flex; gap: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+.bottom-btn { flex: 1; height: 76rpx; border-radius: 8rpx; font-size: 28rpx; }
