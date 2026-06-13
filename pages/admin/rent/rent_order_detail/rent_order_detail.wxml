@@ -1,10 +1,393 @@
 <view class="page" wx:if="{{order}}">
-  <!-- Card 1: 订单信息 -->
-  <!-- Card 2: 支付信息 -->
-  <!-- Card 3: 租赁信息 -->
-  <!-- Card 4: 退款 -->
-  <!-- 底部操作栏 -->
+
+  <!-- ── Card 1: 订单信息 ─────────────────── -->
+  <view class="card">
+    <view class="section-title" bindtap="onToggleOrderInfo">
+      订单信息
+      <view class="section-title-right">
+        <van-icon name="{{_orderInfoExpanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#999" />
+      </view>
+    </view>
+
+    <block wx:if="{{_orderInfoExpanded}}">
+      <!-- 顾客姓名 + 类型 chip -->
+      <view class="kv-row">
+        <text class="kv-label">顾客姓名</text>
+        <view style="display:flex;align-items:center;gap:8rpx;">
+          <text class="kv-value">{{order.member.title || '—'}}</text>
+          <view class="chip {{order._memberTypeClass}}">{{order._memberTypeLabel}}</view>
+        </view>
+      </view>
+
+      <!-- 手机号 + 拨打按钮 -->
+      <view class="kv-row">
+        <text class="kv-label">手机号</text>
+        <view style="display:flex;align-items:center;gap:12rpx;">
+          <text class="kv-value">{{order.member.cell || '—'}}</text>
+          <van-button wx:if="{{order.member.cell}}"
+            size="mini" type="primary" plain
+            style="flex-shrink:0;"
+            bindtap="onCall">
+            拨打
+          </van-button>
+        </view>
+      </view>
+
+      <!-- 订单号 -->
+      <view class="kv-row">
+        <text class="kv-label">订单号</text>
+        <text class="kv-value">{{order.code || order.id}}</text>
+      </view>
+
+      <!-- 所属门店 -->
+      <view class="kv-row">
+        <text class="kv-label">所属门店</text>
+        <text class="kv-value">{{order.shop || '—'}}</text>
+      </view>
+
+      <!-- 开单店员（staffName 字段，若无则隐藏整行） -->
+      <view class="kv-row" wx:if="{{order.staffName}}">
+        <text class="kv-label">开单店员</text>
+        <text class="kv-value">{{order.staffName}}</text>
+      </view>
+
+      <!-- 订单状态 -->
+      <view class="kv-row" wx:if="{{order.closed == 1}}">
+        <text class="kv-label">关单时间</text>
+        <text class="kv-value">{{order.close_dateDateStr}} {{order.close_dateTimeStr}}</text>
+      </view>
+    </block>
+  </view>
+
+  <!-- ── Card 2: 支付信息 ─────────────────── -->
+  <view class="card">
+    <view class="section-title" bindtap="onTogglePayment">
+      支付信息
+      <view class="section-title-right">
+        <van-icon name="{{_paymentExpanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#999" />
+      </view>
+    </view>
+
+    <block wx:if="{{_paymentExpanded}}">
+      <!-- 2×3 摘要格 -->
+      <view class="pay-summary-grid">
+        <view class="pay-summary-cell">
+          <view class="pay-summary-label">支付总金额</view>
+          <view class="pay-summary-value pay-summary-value--blue">{{order.paidAmountStr}}</view>
+        </view>
+        <view class="pay-summary-cell">
+          <view class="pay-summary-label">退款总金额</view>
+          <view class="pay-summary-value pay-summary-value--red">{{order.refundAmountStr}}</view>
+        </view>
+        <view class="pay-summary-cell">
+          <view class="pay-summary-label">在押押金</view>
+          <view class="pay-summary-value">{{order.unRelieveGuarantyStr}}</view>
+        </view>
+        <view class="pay-summary-cell">
+          <view class="pay-summary-label">解押押金</view>
+          <view class="pay-summary-value">{{order.relieveGuarantyStr}}</view>
+        </view>
+        <view class="pay-summary-cell">
+          <view class="pay-summary-label">支付笔数</view>
+          <view class="pay-summary-value">{{order.availablePayments.length}}</view>
+        </view>
+        <view class="pay-summary-cell">
+          <view class="pay-summary-label">退款笔数</view>
+          <view class="pay-summary-value">{{order.availableRefunds.length || 0}}</view>
+        </view>
+      </view>
+
+      <view class="divider"></view>
+
+      <!-- 支付明细表格 -->
+      <view class="pay-table" wx:if="{{order.availablePayments.length > 0}}">
+        <!-- 表头 -->
+        <view class="pay-table-row" style="font-size:22rpx;color:#999;">
+          <text class="pay-col-date">日期</text>
+          <text class="pay-col-method">方式</text>
+          <text class="pay-col-type">类型</text>
+          <text class="pay-col-amount">金额</text>
+        </view>
+        <!-- 支付行 -->
+        <view class="pay-table-row" wx:for="{{order.availablePayments}}" wx:key="id">
+          <view class="pay-col-date">
+            <text style="display:block;">{{item.paid_dateDateStr}}</text>
+            <text style="display:block;font-size:20rpx;color:#999;">{{item.paid_dateTimeStr}}</text>
+          </view>
+          <text class="pay-col-method">{{item.pay_method}}</text>
+          <view class="pay-col-type">
+            <view class="chip chip--member" style="font-size:20rpx;padding:2rpx 8rpx;">支付</view>
+          </view>
+          <text class="pay-col-amount pay-col-amount--pay">{{item.amountStr}}</text>
+        </view>
+        <!-- 退款行（availableRefunds，若后端有单独返回） -->
+        <view class="pay-table-row" wx:for="{{order.availableRefunds}}" wx:key="id">
+          <view class="pay-col-date">
+            <text style="display:block;">{{item.paid_dateDateStr || '—'}}</text>
+          </view>
+          <text class="pay-col-method">{{item.pay_method || '—'}}</text>
+          <view class="pay-col-type">
+            <view class="chip chip--guest" style="font-size:20rpx;padding:2rpx 8rpx;">退款</view>
+          </view>
+          <text class="pay-col-amount pay-col-amount--refund">-{{item.amountStr}}</text>
+        </view>
+      </view>
+      <view wx:else style="color:#999;font-size:26rpx;text-align:center;padding:20rpx 0;">
+        暂无支付记录
+      </view>
+    </block>
+  </view>
+  <!-- ── Card 3: 租赁信息 ─────────────────── -->
+  <view class="card">
+    <view class="section-title">
+      租赁信息 共{{order.rentals.length}}项
+      <view class="section-title-right">
+        <!-- Tab pill -->
+        <view class="tab-pill">
+          <view class="tab-pill__item {{_rentalTab == 0 ? 'tab-pill__item--active' : ''}}"
+            bindtap="onRentalTabChange" data-tab="0">按商品</view>
+          <view class="tab-pill__item {{_rentalTab == 1 ? 'tab-pill__item--active' : ''}}"
+            bindtap="onRentalTabChange" data-tab="1">按物品</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Tab 0: 按租赁商品 -->
+    <block wx:if="{{_rentalTab == 0}}">
+      <view class="rental-card" wx:for="{{order.rentals}}" wx:key="id" wx:for-index="ridx">
+        <!-- 折叠态 -->
+        <view class="rental-head" bindtap="onToggleRental" data-ridx="{{ridx}}">
+          <view class="chip {{item._isPackage ? 'chip--package' : 'chip--item'}}">
+            {{item._isPackage ? '套餐' : '单品'}}
+          </view>
+          <text class="rental-head-name">{{item.name}}</text>
+          <view class="rental-head-meta">
+            <view class="rental-head-fee">押金<text>{{item.guarantyAmountStr}}</text></view>
+            <van-icon name="{{_expandedRentals[ridx] ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#999" />
+          </view>
+        </view>
+
+        <!-- 展开态 -->
+        <block wx:if="{{_expandedRentals[ridx]}}">
+          <view class="divider"></view>
+
+          <!-- 基础信息 2×2 网格 -->
+          <view class="rental-detail-grid">
+            <view class="rental-detail-cell">
+              <text class="rental-detail-label">起租日期</text>
+              <text class="rental-detail-value">{{item.start_dateDateStr}}</text>
+            </view>
+            <view class="rental-detail-cell">
+              <text class="rental-detail-label">起租时间</text>
+              <text class="rental-detail-value">{{item.start_dateTimeStr}}</text>
+            </view>
+            <view class="rental-detail-cell">
+              <text class="rental-detail-label">退租日期</text>
+              <text class="rental-detail-value">{{item.end_dateDateStr}}</text>
+            </view>
+            <view class="rental-detail-cell">
+              <text class="rental-detail-label">退租时间</text>
+              <text class="rental-detail-value">{{item.end_dateTimeStr}}</text>
+            </view>
+          </view>
+
+          <view class="divider"></view>
+
+          <!-- 费用汇总行 -->
+          <view class="rental-fee-row">
+            <view class="rental-fee-cell">
+              <text class="rental-fee-label">租金</text>
+              <text class="rental-fee-value">¥{{item.totalRentSummaryAmount}}</text>
+            </view>
+            <view class="rental-fee-cell">
+              <text class="rental-fee-label">减免</text>
+              <text class="rental-fee-value">¥{{item.totalDiscountAmount || 0}}</text>
+            </view>
+            <view class="rental-fee-cell">
+              <text class="rental-fee-label">赔偿</text>
+              <text class="rental-fee-value">¥{{item.totalRepairationAmount || 0}}</text>
+            </view>
+            <view class="rental-fee-cell">
+              <text class="rental-fee-label">超时</text>
+              <text class="rental-fee-value">¥{{item.totalOverTimeAmount || 0}}</text>
+            </view>
+          </view>
+          <view class="rental-fee-row">
+            <view class="rental-fee-cell">
+              <text class="rental-fee-label">招待</text>
+              <text class="rental-fee-value">{{item.entertain ? '是' : '否'}}</text>
+            </view>
+            <view class="rental-fee-cell">
+              <text class="rental-fee-label">小计</text>
+              <text class="rental-fee-value kv-value--blue">¥{{item.totalSummaryAmount || 0}}</text>
+            </view>
+          </view>
+
+          <view class="divider"></view>
+
+          <!-- 备注（点击修改） -->
+          <view class="rental-memo-row">
+            <text class="rental-memo-label">备注</text>
+            <view class="rental-memo-tap" bindtap="onModMemo" data-ridx="{{ridx}}">
+              <text wx:if="{{item.memo}}">{{item.memo}}</text>
+              <text wx:else class="rental-memo-placeholder">修改备注</text>
+            </view>
+          </view>
+
+          <view class="divider"></view>
+
+          <!-- 租金明细 toggle -->
+          <view class="toggle-row" bindtap="onToggleDetails" data-ridx="{{ridx}}">
+            <van-icon name="{{_expandedDetails[ridx] ? 'arrow-up' : 'arrow-down'}}" size="14px" />
+            <text>租金明细 ({{item.details.length}}天)</text>
+          </view>
+          <block wx:if="{{_expandedDetails[ridx]}}">
+            <view class="detail-table">
+              <view class="detail-table-row detail-table-head">
+                <text class="detail-col-date">日期</text>
+                <text class="detail-col-amount">租金</text>
+                <text class="detail-col-discount">减免</text>
+                <text class="detail-col-subtotal">小计</text>
+              </view>
+              <view class="detail-table-row" wx:for="{{item.details}}" wx:key="id" wx:for-item="detail">
+                <text class="detail-col-date">{{detail.rental_dateDateStr}}</text>
+                <text class="detail-col-amount">¥{{detail.amount}}</text>
+                <text class="detail-col-discount">¥{{detail.othersDiscountAmount}}</text>
+                <text class="detail-col-subtotal">{{detail.summaryStr}}</text>
+              </view>
+            </view>
+          </block>
+
+          <view class="divider"></view>
+
+          <!-- 租赁物明细 toggle -->
+          <view class="toggle-row" bindtap="onToggleItems" data-ridx="{{ridx}}">
+            <van-icon name="{{_expandedItems[ridx] ? 'arrow-up' : 'arrow-down'}}" size="14px" />
+            <text>租赁物明细 ({{item.rentItems.length}}件)</text>
+          </view>
+          <block wx:if="{{_expandedItems[ridx]}}">
+            <view class="item-table-row" wx:for="{{item.rentItems}}" wx:key="id" wx:for-item="rentItem">
+              <text class="item-col-code">{{rentItem.code || '无编码'}}</text>
+              <text class="item-col-name">{{rentItem.name || '—'}}</text>
+              <text class="item-col-cat">{{rentItem.class_name || '—'}}</text>
+              <view class="item-col-status">
+                <view class="chip {{rentItem._statusClass}}" style="font-size:20rpx;padding:2rpx 8rpx;">
+                  {{rentItem._statusLabel}}
+                </view>
+              </view>
+            </view>
+          </block>
+        </block>
+      </view>
+
+      <!-- 追加中的租赁 -->
+      <view class="appending-section" wx:if="{{order.appendingRentals && order.appendingRentals.length > 0}}">
+        <view class="appending-title">追加中 ({{order.appendingRentals.length}})</view>
+        <view class="appending-card" wx:for="{{order.appendingRentals}}" wx:key="id">
+          <view class="appending-card-head">
+            <text class="appending-card-name">{{item.name}} · {{item.startDate}}</text>
+            <text class="appending-del-btn" bindtap="onDelAppendingRental" data-id="{{item.id}}">删除</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- Tab 1: 按租赁物 -->
+    <block wx:if="{{_rentalTab == 1}}">
+      <view wx:if="{{order._allRentItems.length == 0}}"
+        style="color:#999;font-size:26rpx;text-align:center;padding:20rpx 0;">
+        暂无租赁物
+      </view>
+      <view class="flat-item-row" wx:for="{{order._allRentItems}}" wx:key="id">
+        <text class="flat-item-code">{{item.code || '无码'}}</text>
+        <text class="flat-item-name">{{item.name || '—'}}</text>
+        <text class="flat-item-cat">{{item.class_name || '—'}}</text>
+        <text class="flat-item-pkg">{{item._rentalName}}</text>
+        <view class="flat-item-status">
+          <view class="chip {{item._statusClass}}" style="font-size:20rpx;padding:2rpx 8rpx;">
+            {{item._statusLabel}}
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+  <!-- ── Card 4: 退款 ─────────────────────── -->
+  <view class="card">
+    <view class="section-title" bindtap="onToggleRefund">
+      退款
+      <view class="section-title-right">
+        <van-icon name="{{_refundExpanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#999" />
+      </view>
+    </view>
+
+    <block wx:if="{{_refundExpanded}}">
+      <!-- 退款摘要 -->
+      <view class="refund-summary">
+        <view class="refund-cell">
+          <view class="refund-cell-label">总计押金</view>
+          <view class="refund-cell-value">{{order.totalGuarantyAmountStr}}</view>
+        </view>
+        <view class="refund-cell">
+          <view class="refund-cell-label">总计租金</view>
+          <view class="refund-cell-value">{{order.totalRentSummaryAmountStr}}</view>
+        </view>
+        <view class="refund-cell">
+          <view class="refund-cell-label">总计超时</view>
+          <view class="refund-cell-value">{{order.totalRentOverTimeAmountStr}}</view>
+        </view>
+        <view class="refund-cell">
+          <view class="refund-cell-label">总计赔偿</view>
+          <view class="refund-cell-value">{{order.totalRentRepairationAmountStr}}</view>
+        </view>
+      </view>
+
+      <view class="divider"></view>
+
+      <view class="refund-amount-row">
+        <text class="refund-amount-label">应退押金</text>
+        <text class="refund-amount-value">{{order.totalRentNeedToRefundAmountStr}}</text>
+      </view>
+      <view class="refund-amount-row">
+        <text class="refund-amount-label">已退金额</text>
+        <text class="refund-amount-value">{{order.refundAmountStr}}</text>
+      </view>
+      <view class="refund-amount-row">
+        <text class="refund-amount-label">实际应退</text>
+        <text class="refund-amount-value refund-need">
+          {{order.totalRentUnRefund <= 0 ? '¥0.00' : order.totalRentUnRefundStr}}
+        </text>
+      </view>
+
+      <!-- 退款按钮 -->
+      <view class="refund-btn-row">
+        <van-button
+          type="danger"
+          block
+          disabled="{{order.closed == 1 || order.totalRentUnRefund <= 0}}"
+          bindtap="onRefund">
+          申请退款 {{order.totalRentUnRefund > 0 ? order.totalRentUnRefundStr : ''}}
+        </van-button>
+      </view>
+    </block>
+  </view>
 </view>
 <view wx:else class="page-loading">
   <text>加载中…</text>
+</view>
+
+<!-- ── 底部操作栏（订单未关闭时显示） ─── -->
+<view class="bottom-bar" wx:if="{{order && order.closed == 0}}">
+  <van-button class="bottom-btn bottom-btn--add" bindtap="onAddPackage" size="small">
+    + 添加套餐
+  </van-button>
+  <van-button class="bottom-btn bottom-btn--add" bindtap="onAddItem" size="small">
+    + 添加单品
+  </van-button>
+  <van-button
+    class="bottom-btn bottom-btn--confirm {{!allValid || !order.appendingRentals || order.appendingRentals.length == 0 ? 'bottom-btn--disabled' : ''}}"
+    disabled="{{!allValid || !order.appendingRentals || order.appendingRentals.length == 0}}"
+    bindtap="onConfirmAppend"
+    size="small">
+    ✓ 确认追加
+  </van-button>
 </view>
