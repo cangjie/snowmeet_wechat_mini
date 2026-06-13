@@ -1,0 +1,10 @@
+<view class="page" wx:if="{{order}}">
+  <!-- Card 1: 订单信息 -->
+  <!-- Card 2: 支付信息 -->
+  <!-- Card 3: 租赁信息 -->
+  <!-- Card 4: 退款 -->
+  <!-- 底部操作栏 -->
+</view>
+<view wx:else class="page-loading">
+  <text>加载中…</text>
+</view>
