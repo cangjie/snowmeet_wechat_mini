@@ -209,7 +209,6 @@
                 <text wx:if="{{item.memo}}">{{item.memo}}</text>
                 <text wx:else class="rental-memo-placeholder">输入商品备注</text>
               </view>
-              <van-button size="small" type="default" round bindtap="onModMemo" data-ridx="{{ridx}}">保存</van-button>
             </view>
           </view>
 
