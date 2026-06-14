@@ -25,8 +25,59 @@
   display: flex; justify-content: space-between; align-items: center;
   min-height: 64rpx; font-size: 28rpx; padding: 4rpx 0;
 }
-.kv-label { color: #666; flex-shrink: 0; }
-.kv-value { color: #333; text-align: right; flex: 1; margin-left: 16rpx; word-break: break-all; }
+.kv-row--dual {
+  align-items: center;
+  gap: 24rpx;
+}
+.kv-cell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  overflow: hidden;
+}
+.kv-cell--right {
+  justify-content: flex-start;
+}
+.kv-cell--code {
+  flex: 1.15;
+}
+.kv-cell--shop {
+  flex: 1.1;
+}
+.kv-label {
+  color: #666;
+  flex: 0 0 72rpx;
+  width: 72rpx;
+}
+.kv-label--wide {
+  flex-basis: 96rpx;
+  width: 96rpx;
+}
+.kv-value { color: #333; text-align: left; flex: 1; min-width: 0; margin-left: 0; word-break: break-all; }
+.kv-inline-value {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12rpx;
+  overflow: hidden;
+}
+.kv-value--inline {
+  margin-left: 0;
+  min-width: 0;
+}
+.kv-value--nowrap {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: normal;
+}
+.kv-value--link {
+  color: #2EA6D0;
+}
 .kv-value--blue { color: #2EA6D0; font-weight: 600; }
 .kv-value--red { color: #E64340; font-weight: 600; }
 .kv-value--amount { font-weight: 600; font-size: 32rpx; }
@@ -46,23 +97,60 @@
 .chip--status-returned { background: #dcfce7; color: #15803d; }
 .chip--status-noneed { background: #f3f4f6; color: #9ca3af; }
 
+.page--compact .kv-row {
+  min-height: 56rpx;
+  font-size: 26rpx;
+}
+.page--compact .kv-row--dual {
+  gap: 16rpx;
+}
+.page--compact .kv-label {
+  font-size: 24rpx;
+  flex-basis: 64rpx;
+  width: 64rpx;
+}
+.page--compact .kv-label--wide {
+  flex-basis: 88rpx;
+  width: 88rpx;
+}
+.page--compact .kv-value {
+  font-size: 26rpx;
+}
+.page--compact .chip {
+  padding: 2rpx 10rpx;
+  font-size: 20rpx;
+}
+
 /* ── 分隔线 ───────────────────────────── */
 .divider { height: 1rpx; background: #F0F0F0; margin: 12rpx 0; }
 
 /* ── 支付摘要 2×3 grid ────────────────── */
 .pay-summary-grid {
-  display: flex; flex-wrap: wrap; gap: 16rpx;
+  display: flex; flex-wrap: wrap; justify-content: space-between;
   margin-bottom: 16rpx;
 }
 .pay-summary-cell {
-  flex: 0 0 calc(50% - 8rpx);
+  width: 48%;
+  box-sizing: border-box;
   background: #F8F8F8; border-radius: 8rpx;
   padding: 12rpx 16rpx;
+  margin-bottom: 16rpx;
 }
 .pay-summary-label { font-size: 24rpx; color: #999; margin-bottom: 4rpx; }
 .pay-summary-value { font-size: 30rpx; font-weight: 600; color: #333; }
 .pay-summary-value--blue { color: #2EA6D0; }
 .pay-summary-value--red { color: #E64340; }
+
+.payment-detail-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 0 4rpx;
+}
+.payment-detail-toggle__title {
+  font-size: 26rpx;
+  color: #666;
+}
 
 /* ── 支付明细表格 ─────────────────────── */
 .pay-table { width: 100%; }
@@ -93,57 +181,276 @@
 
 /* ── 租赁子卡片 ───────────────────────── */
 .rental-card {
-  background: #F8F8F8; border-radius: 8rpx;
-  padding: 12rpx 16rpx; margin-bottom: 12rpx;
+  background: #f2f5fa;
+  border-radius: 14rpx;
+  padding: 0;
+  margin-bottom: 14rpx;
+  overflow: hidden;
 }
 .rental-card:last-child { margin-bottom: 0; }
 
 .rental-head {
-  display: flex; align-items: center; gap: 8rpx;
-  min-height: 52rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  min-height: 58rpx;
+  padding: 12rpx 14rpx;
+  background: #dce3ee;
 }
 .rental-head-name {
-  flex: 1; font-size: 28rpx; font-weight: 600; color: #333;
+  flex: 1; font-size: 28rpx; font-weight: 600; color: #0b1c30;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .rental-head-meta { display: flex; align-items: center; gap: 8rpx; flex-shrink: 0; }
-.rental-head-fee { font-size: 24rpx; color: #666; }
-.rental-head-fee text { color: #333; font-weight: 600; }
+.rental-head-fee { font-size: 24rpx; color: #6f7881; }
+.rental-head-fee text { color: #0b1c30; font-weight: 600; }
+
+.rental-showcase {
+  background: #f8fbff;
+  padding: 12rpx;
+}
+.rental-showcase-summary {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  color: #5f6872;
+  font-size: 24rpx;
+  padding: 0 2rpx 8rpx;
+}
+.rental-showcase-summary-value {
+  color: #0b1c30;
+  font-weight: 700;
+}
+.rental-showcase-summary-value--accent {
+  color: #0b8fd6;
+}
+.rental-showcase-time-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+.rental-showcase-time-card {
+  flex: 1;
+  min-height: 110rpx;
+  border-radius: 18rpx;
+  padding: 14rpx 18rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.rental-showcase-time-card--start {
+  background: #c8dfee;
+  border: 1rpx solid #8cb9d1;
+}
+.rental-showcase-time-card--end {
+  background: #e7ebf1;
+  border: 1rpx solid #d5dce7;
+}
+.rental-showcase-time-tag {
+  color: #0b5e88;
+  font-size: 22rpx;
+  margin-bottom: 4rpx;
+}
+.rental-showcase-time-date {
+  color: #0b1c30;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.rental-showcase-time-time {
+  color: #4f5966;
+  font-size: 26rpx;
+  line-height: 1.2;
+  margin-top: 4rpx;
+}
+.rental-showcase-time-arrow {
+  flex: 0 0 22rpx;
+  text-align: center;
+  color: #97a2b1;
+  font-size: 28rpx;
+}
+.rental-showcase-fee-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 8rpx 8rpx 4rpx;
+  background: #f4f6f9;
+  border-radius: 10rpx 10rpx 0 0;
+}
+.rental-showcase-fee-cell {
+  width: 33.33%;
+  box-sizing: border-box;
+  padding: 8rpx 6rpx;
+}
+.rental-showcase-fee-label {
+  display: block;
+  color: #6f7881;
+  font-size: 24rpx;
+  line-height: 1.3;
+}
+.rental-showcase-fee-value {
+  display: block;
+  color: #0b1c30;
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 2rpx;
+}
+.rental-showcase-subtotal {
+  height: 68rpx;
+  border-top: 1rpx solid #e7edf4;
+  border-radius: 0 0 10rpx 10rpx;
+  background: #dde4ef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14rpx;
+}
+.rental-showcase-subtotal-label {
+  color: #3f4850;
+  font-size: 30rpx;
+}
+.rental-showcase-subtotal-value {
+  color: #006fb0;
+  font-size: 48rpx;
+  font-weight: 700;
+}
+.rental-showcase-memo-row {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.rental-showcase-memo-box {
+  flex: 1;
+  min-height: 58rpx;
+  border-radius: 18rpx;
+  border: 1rpx solid #d7dbe2;
+  background: #f6f7f9;
+  color: #0b1c30;
+  font-size: 26rpx;
+  line-height: 58rpx;
+  padding: 0 20rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.page--compact .rental-showcase-time-date {
+  font-size: 28rpx;
+}
+.page--compact .rental-showcase-time-time {
+  font-size: 24rpx;
+}
+.page--compact .rental-showcase-fee-value {
+  font-size: 32rpx;
+}
+.page--compact .rental-showcase-subtotal-label {
+  font-size: 28rpx;
+}
+.page--compact .rental-showcase-subtotal-value {
+  font-size: 42rpx;
+}
+
+.rental-subsection-head {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin: 4rpx 0 10rpx;
+}
+.rental-subsection-head--between {
+  justify-content: space-between;
+}
+.rental-subsection-title {
+  font-size: 24rpx;
+  line-height: 34rpx;
+  color: #3f4850;
+  font-weight: 600;
+  position: relative;
+  padding-left: 12rpx;
+}
+.rental-subsection-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4rpx;
+  width: 4rpx;
+  height: 24rpx;
+  border-radius: 4rpx;
+  background: #8ba8bd;
+}
 
 .rental-body { padding-top: 12rpx; }
 .rental-detail-grid {
   display: flex; flex-wrap: wrap; gap: 0;
   font-size: 26rpx;
 }
-.rental-detail-cell {
-  flex: 0 0 50%; display: flex;
-  min-height: 56rpx; align-items: center; gap: 8rpx;
+.rental-detail-grid--panel {
+  border: 1rpx solid #edf2f6;
+  border-radius: 10rpx;
+  background: #f9fbfd;
+  padding: 6rpx 10rpx;
 }
-.rental-detail-label { color: #999; font-size: 24rpx; flex-shrink: 0; }
-.rental-detail-value { color: #333; }
+.rental-detail-cell {
+  flex: 0 0 50%;
+  display: flex;
+  min-height: 56rpx;
+  align-items: center;
+  gap: 8rpx;
+}
+.rental-detail-label { color: #6f7881; font-size: 24rpx; flex-shrink: 0; }
+.rental-detail-value { color: #0b1c30; font-weight: 500; }
 
 .rental-fee-row {
   display: flex; gap: 16rpx; flex-wrap: wrap;
-  font-size: 26rpx; padding: 8rpx 0;
+  font-size: 26rpx;
+  padding: 8rpx 0;
 }
-.rental-fee-cell { display: flex; gap: 6rpx; }
-.rental-fee-label { color: #999; }
-.rental-fee-value { color: #333; font-weight: 600; }
+.rental-fee-cell {
+  display: flex;
+  gap: 6rpx;
+  background: #f7f9fc;
+  border-radius: 8rpx;
+  padding: 6rpx 10rpx;
+}
+.rental-fee-label { color: #6f7881; }
+.rental-fee-value { color: #0b1c30; font-weight: 600; }
 
 .rental-memo-row {
   display: flex; align-items: flex-start; gap: 8rpx;
   font-size: 26rpx; min-height: 52rpx; padding: 4rpx 0;
 }
-.rental-memo-label { color: #999; flex-shrink: 0; padding-top: 6rpx; }
+.rental-memo-label { color: #6f7881; flex-shrink: 0; padding-top: 6rpx; }
 .rental-memo-tap {
-  flex: 1; color: #333; word-break: break-all;
-  border-bottom: 1rpx solid #e5e7eb; padding-bottom: 4rpx;
+  flex: 1;
+  color: #0b1c30;
+  word-break: break-all;
+  border: 1rpx solid #e5ebf1;
+  background: #f9fbfd;
+  border-radius: 8rpx;
+  min-height: 46rpx;
+  line-height: 36rpx;
+  padding: 4rpx 10rpx;
 }
 .rental-memo-placeholder { color: #ccc; }
 
 .toggle-row {
   display: flex; align-items: center; gap: 8rpx;
-  font-size: 26rpx; color: #2EA6D0; padding: 8rpx 0;
+  font-size: 26rpx;
+  color: #3f4850;
+  padding: 8rpx 12rpx;
+}
+.toggle-row--between {
+  justify-content: space-between;
+  gap: 12rpx;
+}
+.toggle-row-left {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
 /* ── 详情 / 物明细 ─────────────────────── */
@@ -151,6 +458,7 @@
 .detail-table-row {
   display: flex; gap: 8rpx; min-height: 48rpx; align-items: center;
   border-bottom: 1rpx solid #F0F0F0;
+  padding: 0 12rpx;
 }
 .detail-table-row:last-child { border-bottom: none; }
 .detail-table-head .detail-col-date,
@@ -172,6 +480,139 @@
 .item-col-name { flex: 1; color: #333; }
 .item-col-cat { flex: 0 0 80rpx; color: #666; }
 .item-col-status { flex: 0 0 80rpx; text-align: right; }
+
+.item-detail-card {
+  background: #f5f7fb;
+  border-radius: 10rpx;
+  padding: 12rpx;
+  margin: 0 12rpx 12rpx;
+}
+.item-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10rpx;
+  padding-bottom: 8rpx;
+}
+.item-detail-name {
+  flex: 1;
+  min-width: 0;
+  color: #333;
+  font-size: 26rpx;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item-detail-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.item-detail-cell {
+  width: 50%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  min-height: 46rpx;
+  padding-right: 8rpx;
+}
+.item-detail-label {
+  color: #999;
+  font-size: 22rpx;
+  flex-shrink: 0;
+}
+.item-detail-value {
+  color: #333;
+  font-size: 24rpx;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 8rpx;
+}
+.item-edit-row--memo {
+  align-items: flex-start;
+}
+.item-edit-label {
+  color: #666;
+  font-size: 24rpx;
+  width: 56rpx;
+  flex-shrink: 0;
+}
+.item-edit-value {
+  flex: 1;
+  min-width: 0;
+  color: #333;
+  font-size: 24rpx;
+}
+.item-edit-value--memo {
+  word-break: break-all;
+}
+.item-edit-input {
+  flex: 1;
+  min-width: 0;
+  border: 1rpx solid #dcdfe6;
+  border-radius: 8rpx;
+  padding: 4rpx 10rpx;
+  font-size: 24rpx;
+  box-sizing: border-box;
+}
+.item-edit-input--memo {
+  min-height: 56rpx;
+}
+.item-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+.item-log-toggle {
+  margin-top: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #2EA6D0;
+  font-size: 24rpx;
+}
+.item-log-table {
+  margin-top: 6rpx;
+  border-top: 1rpx solid #ececec;
+}
+.item-log-row {
+  display: flex;
+  align-items: center;
+  min-height: 44rpx;
+  font-size: 22rpx;
+  border-bottom: 1rpx solid #efefef;
+  color: #666;
+}
+.item-log-row--head {
+  color: #999;
+}
+.item-log-col-date,
+.item-log-col-time,
+.item-log-col-status {
+  flex: 0 0 22%;
+}
+.item-log-col-staff {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item-log-empty {
+  color: #999;
+  font-size: 24rpx;
+  text-align: center;
+  padding: 12rpx 0;
+}
 
 /* ── 全部租赁物（Tab 1）─────────────────── */
 .all-items-list { font-size: 26rpx; }

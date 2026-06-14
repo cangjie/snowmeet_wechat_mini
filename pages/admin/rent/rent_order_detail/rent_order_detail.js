@@ -3,20 +3,31 @@ var app = getApp()
 var util = require('../../../../utils/util.js')
 var data = require('../../../../utils/data.js')
 
+function formatDisplayOrderCode(rawCode) {
+  var code = rawCode == null ? '' : String(rawCode)
+  if (code.length <= 6) {
+    return code || '—'
+  }
+  return '…' + code.slice(6)
+}
+
 Page({
   data: {
     id: null,
     order: null,
     shopObj: null,
+    _compactScreen: false,
 
     _orderInfoExpanded: true,
-    _paymentExpanded: true,
+    _paymentDetailExpanded: false,
     _refundExpanded: true,
 
     _rentalTab: 0,
     _expandedRentals: {},
     _expandedDetails: {},
     _expandedItems: {},
+    _expandedItemLogs: {},
+    _expandedItemChanges: {},
 
     allValid: false,
   },
@@ -28,6 +39,8 @@ Page({
   onShow() {
     var that = this
     app.loginPromiseNew.then(function () {
+      var uiProfile = app.globalData.uiProfile || {}
+      that.setData({ _compactScreen: !!uiProfile.isCompact })
       that.getData()
     }).catch(function () {})
   },
@@ -63,6 +76,8 @@ Page({
     var unRelieveGuaranty = 0
     var relieveGuaranty = 0
     var allSettled = true
+
+    order._displayCode = formatDisplayOrderCode(order.code || order.id)
 
     for (var i = 0; order.rentals && i < order.rentals.length; i++) {
       var rental = order.rentals[i]
@@ -261,8 +276,8 @@ Page({
   onToggleOrderInfo() {
     this.setData({ _orderInfoExpanded: !this.data._orderInfoExpanded })
   },
-  onTogglePayment() {
-    this.setData({ _paymentExpanded: !this.data._paymentExpanded })
+  onTogglePaymentDetail() {
+    this.setData({ _paymentDetailExpanded: !this.data._paymentDetailExpanded })
   },
   onToggleRefund() {
     this.setData({ _refundExpanded: !this.data._refundExpanded })
@@ -284,6 +299,303 @@ Page({
     var ridx = e.currentTarget.dataset.ridx
     var key = '_expandedItems.' + ridx
     this.setData({ [key]: !this.data._expandedItems[ridx] })
+  },
+
+  _getItemRef(ridx, iidx) {
+    var order = this.data.order
+    if (!order || !order.rentals || !order.rentals[ridx] || !order.rentals[ridx].rentItems || !order.rentals[ridx].rentItems[iidx]) {
+      return null
+    }
+    return {
+      order: order,
+      rental: order.rentals[ridx],
+      item: order.rentals[ridx].rentItems[iidx],
+    }
+  },
+
+  _toggleMapFlag(mapName, key) {
+    var fullKey = mapName + '.' + key
+    this.setData({ [fullKey]: !this.data[mapName][key] })
+    return !this.data[mapName][key]
+  },
+
+  onItemPick(e) {
+    var that = this
+    var id = e.currentTarget.dataset.id
+    wx.showModal({
+      title: '确认发放',
+      content: '',
+      complete: (res) => {
+        if (!res.confirm) return
+        data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
+          that.refreshStatus(newRental)
+        })
+      }
+    })
+  },
+
+  onItemReturn(e) {
+    var that = this
+    var id = e.currentTarget.dataset.id
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var ref = that._getItemRef(ridx, parseInt(e.currentTarget.dataset.iidx))
+    if (!ref) return
+    var rental = ref.rental
+    var allReturned = true
+    for (var i = 0; i < rental.rentItems.length; i++) {
+      var it = rental.rentItems[i]
+      if (it.id == id) continue
+      if (it.status != '已归还' && it.status != '未发放' && it.status != '已更换') {
+        allReturned = false
+      }
+    }
+    var msg = allReturned
+      ? (rental.package_id
+        ? '套餐【' + rental.name + '】中的租赁物，即将全部归还，归还后套餐租金自动结算，此操作不可逆。'
+        : '即将归还【' + rental.name + '】，租金自动结算，此操作不可逆。')
+      : '此操作不可逆。'
+    wx.showModal({
+      title: '确认归还',
+      content: msg,
+      complete: (res) => {
+        if (!res.confirm) return
+        data.setRentItemStatsPromise(id, '已归还', app.globalData.sessionKey).then(function (newRental) {
+          that.refreshStatus(newRental)
+        })
+      }
+    })
+  },
+
+  onItemUnReturn(e) {
+    var that = this
+    var id = e.currentTarget.dataset.id
+    wx.showModal({
+      title: '确认再次发放？',
+      content: '发放后，该租赁商品的已结算状态会自动取消。',
+      complete: (res) => {
+        if (!res.confirm) return
+        data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
+          that.refreshStatus(newRental)
+        })
+      }
+    })
+  },
+
+  onItemStore(e) {
+    var that = this
+    var id = e.currentTarget.dataset.id
+    wx.showModal({
+      title: '确认暂存',
+      content: '',
+      complete: (res) => {
+        if (!res.confirm) return
+        data.setRentItemStatsPromise(id, '已暂存', app.globalData.sessionKey).then(function (newRental) {
+          that.refreshStatus(newRental)
+        })
+      }
+    })
+  },
+
+  onItemChange(e) {
+    var itemId = e.currentTarget.dataset.id
+    var order = this.data.order
+    if (!order || !itemId) return
+    wx.navigateTo({
+      url: '/pages/admin/rent/rent_item_change?orderId=' + order.id.toString() + '&rentItemId=' + itemId.toString()
+    })
+  },
+
+  onItemRepairEdit(e) {
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var ref = this._getItemRef(ridx, iidx)
+    if (!ref) return
+    ref.item._repairEditing = true
+    ref.item._repairDraft = ref.item.totalRepairationAmount != null ? String(ref.item.totalRepairationAmount) : '0'
+    this.setData({ order: ref.order })
+  },
+
+  onItemRepairInput(e) {
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var ref = this._getItemRef(ridx, iidx)
+    if (!ref) return
+    ref.item._repairDraft = e.detail.value
+    this.setData({ order: ref.order })
+  },
+
+  onItemRepairCancel(e) {
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var ref = this._getItemRef(ridx, iidx)
+    if (!ref) return
+    ref.item._repairEditing = false
+    ref.item._repairDraft = ''
+    this.setData({ order: ref.order })
+  },
+
+  onItemRepairConfirm(e) {
+    var that = this
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var ref = that._getItemRef(ridx, iidx)
+    if (!ref) return
+    var amount = parseFloat((ref.item._repairDraft || '').trim())
+    if (isNaN(amount) || amount < 0) {
+      wx.showToast({ title: '请输入有效赔偿金额', icon: 'none' })
+      return
+    }
+    var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemRepairAmount/' + ref.item.id + '?amount=' + amount + '&sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(setUrl, null).then(function (newRental) {
+      wx.showToast({ title: '赔偿已更新', icon: 'success' })
+      if (newRental && newRental.id) {
+        that.refreshStatus(newRental)
+      } else {
+        that.getData()
+      }
+    }).catch(function () {
+      wx.showToast({ title: '更新失败', icon: 'error' })
+    })
+  },
+
+  onItemMemoEdit(e) {
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var ref = this._getItemRef(ridx, iidx)
+    if (!ref) return
+    ref.item._memoEditing = true
+    ref.item._memoDraft = ref.item.memo || ''
+    this.setData({ order: ref.order })
+  },
+
+  onItemMemoInput(e) {
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var ref = this._getItemRef(ridx, iidx)
+    if (!ref) return
+    ref.item._memoDraft = e.detail.value
+    this.setData({ order: ref.order })
+  },
+
+  onItemMemoCancel(e) {
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var ref = this._getItemRef(ridx, iidx)
+    if (!ref) return
+    ref.item._memoEditing = false
+    ref.item._memoDraft = ''
+    this.setData({ order: ref.order })
+  },
+
+  onItemMemoConfirm(e) {
+    var that = this
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var ref = that._getItemRef(ridx, iidx)
+    if (!ref) return
+    ref.item.memo = ref.item._memoDraft || ''
+    data.updateRentItemPromise(ref.item, '租赁订单详细页修改备注', app.globalData.sessionKey)
+      .then(function (newItem) {
+        newItem._memoEditing = false
+        newItem._memoDraft = ''
+        ref.order.rentals[ridx].rentItems[iidx] = newItem
+        that.renderOrder(ref.order)
+        that.setData({ order: ref.order })
+        wx.showToast({ title: '备注已保存', icon: 'success' })
+      }).catch(function () {
+        wx.showToast({ title: '保存失败', icon: 'error' })
+      })
+  },
+
+  onToggleItemLog(e) {
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var key = ridx + '_' + iidx
+    var willOpen = this._toggleMapFlag('_expandedItemLogs', key)
+    if (willOpen) {
+      this.getRentItemLog(ridx, iidx)
+    }
+  },
+
+  onToggleItemChange(e) {
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var iidx = parseInt(e.currentTarget.dataset.iidx)
+    var key = ridx + '_' + iidx
+    var willOpen = this._toggleMapFlag('_expandedItemChanges', key)
+    if (willOpen) {
+      this.getRentItemChange(ridx, iidx)
+    }
+  },
+
+  getRentItemLog(ridx, iidx) {
+    var ref = this._getItemRef(ridx, iidx)
+    var that = this
+    if (!ref || ref.item._logLoaded) return
+    var getLogUrl = app.globalData.requestPrefix + 'Rent/GetRentItemLogByStaff/' + ref.item.id + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getLogUrl, null).then(function (logs) {
+      for (var i = 0; logs && i < logs.length; i++) {
+        var createDate = new Date(logs[i].create_date)
+        logs[i].dateStr = (createDate.getMonth() + 1).toString().padStart(2, '0') + '-' + createDate.getDate().toString().padStart(2, '0')
+        logs[i].timeStr = util.formatTimeStr(createDate)
+      }
+      ref.item.availableLog = logs || []
+      ref.item._logLoaded = true
+      that.setData({ order: ref.order })
+    })
+  },
+
+  getRentItemChange(ridx, iidx) {
+    var ref = this._getItemRef(ridx, iidx)
+    var that = this
+    if (!ref || ref.item._changesLoaded) return
+    var getChangesUrl = app.globalData.requestPrefix + 'Rent/GetRentItemChanges/' + ref.item.id + '?sessionKey=' + app.globalData.sessionKey
+    util.performWebRequest(getChangesUrl, null).then(function (changesLog) {
+      for (var i = 0; changesLog && i < changesLog.length; i++) {
+        var d = new Date(changesLog[i].changeDate)
+        changesLog[i].changeDateStr = util.formatDate(d)
+        changesLog[i].changeTimeStr = util.formatTimeStr(d)
+      }
+      ref.item.changesLog = changesLog || []
+      ref.item._changesLoaded = true
+      that.setData({ order: ref.order })
+    })
+  },
+
+  onReturnAllRental(e) {
+    var that = this
+    var ridx = parseInt(e.currentTarget.dataset.ridx)
+    var order = that.data.order
+    if (!order || !order.rentals || !order.rentals[ridx]) return
+    var rental = order.rentals[ridx]
+    var targetItems = []
+    for (var i = 0; rental.rentItems && i < rental.rentItems.length; i++) {
+      var it = rental.rentItems[i]
+      if (it.noNeed) continue
+      if (it.status == '已归还' || it.status == '已更换') continue
+      targetItems.push(it)
+    }
+    if (targetItems.length == 0) {
+      wx.showToast({ title: '没有可归还租赁物', icon: 'none' })
+      return
+    }
+    var names = targetItems.slice(0, 4).map(function (x) { return x.name || x.code || x.id }).join('、')
+    var suffix = targetItems.length > 4 ? ' 等' + targetItems.length + '件' : ''
+    wx.showModal({
+      title: '确认全部归还',
+      content: '请核对已收回：' + names + suffix,
+      complete: (res) => {
+        if (!res.confirm) return
+        var url = app.globalData.requestPrefix + 'Rent/ReturnAllRentItems/' + rental.id + '?sessionKey=' + app.globalData.sessionKey
+        util.performWebRequest(url, null).then(function (newRental) {
+          wx.showToast({ title: '归还成功', icon: 'success' })
+          if (newRental && newRental.id) {
+            that.refreshStatus(newRental)
+          } else {
+            that.getData()
+          }
+        })
+      }
+    })
   },
 
   onCall() {

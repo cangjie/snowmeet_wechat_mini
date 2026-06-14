@@ -40,6 +40,16 @@ function decodeChineseInPostData(data) {
   return data
 }
 
+function resolveUiProfile(windowWidth) {
+  var width = Number(windowWidth || 0)
+  var isCompact = width > 0 && width <= 375
+  return {
+    windowWidth: width,
+    isCompact: isCompact,
+    fontScale: isCompact ? 0.92 : 1,
+  }
+}
+
 function patchWxRequestPostDataDecoder() {
   if (wx.__snowmeetPostDataDecodedPatched) {
     return
@@ -138,9 +148,11 @@ App({
           app.globalData.deviceInfo = wx.getDeviceInfo()
           app.globalData.windowInfo = wx.getWindowInfo()
           app.globalData.appBaseInfo = wx.getAppBaseInfo()
+          app.globalData.uiProfile = resolveUiProfile(app.globalData.windowInfo && app.globalData.windowInfo.windowWidth)
           wx.getSystemInfoAsync({
             success: (res) => {
               app.globalData.systemInfo = res
+              app.globalData.uiProfile = resolveUiProfile(res && res.windowWidth)
               const env = wx.getAccountInfoSync()
               app.globalData.env = env.miniProgram.envVersion
               if (app.globalData.staff
@@ -155,6 +167,7 @@ App({
               console.log('get sys info fail, try sync', res)
               try {
                 app.globalData.systemInfo = wx.getSystemInfoSync()
+                app.globalData.uiProfile = resolveUiProfile(app.globalData.systemInfo && app.globalData.systemInfo.windowWidth)
               }
               catch (err) {
                 console.log('get sys info sync fail', err)
@@ -217,6 +230,11 @@ App({
     cellNumber: '',
     role: '',
     isWebsocketOpen: false,
+    uiProfile: {
+      windowWidth: 0,
+      isCompact: false,
+      fontScale: 1,
+    },
     //wssUrl: 'wss://' + domainName + '/ws',
     adminTabbarItem: [
       {
