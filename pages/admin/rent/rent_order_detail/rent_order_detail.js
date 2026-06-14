@@ -39,6 +39,9 @@ Page({
     _dayChargeRent: '',
     _dayChargeOvertime: '',
     _dayChargeDiscount: '',
+    _dayChargeRentOrig: '',
+    _dayChargeOvertimeOrig: '',
+    _dayChargeDiscountOrig: '',
   },
 
   onLoad(options) {
@@ -343,9 +346,12 @@ Page({
       _dayChargeRidx: ridx,
       _dayChargeDetailId: row.rentDetailId,
       _dayChargeDate: row.dateStr,
-      _dayChargeRent: String(row.rent),
-      _dayChargeOvertime: String(row.overtime),
-      _dayChargeDiscount: String(row.discount),
+      _dayChargeRent: '',
+      _dayChargeOvertime: '',
+      _dayChargeDiscount: '',
+      _dayChargeRentOrig: String(row.rent),
+      _dayChargeOvertimeOrig: String(row.overtime),
+      _dayChargeDiscountOrig: String(row.discount),
     })
   },
   onDayChargeInput(e) {
@@ -356,6 +362,13 @@ Page({
     this.setData({ _dayChargeShow: false })
   },
   noop() {},
+  // 输入留空 → 回退到原值（点输入框后无需退格删原金额，直接输入即可）
+  _resolveDayChargeVal(input, orig) {
+    var s = String(input == null ? '' : input).trim()
+    if (s === '') s = String(orig == null ? '' : orig).trim()
+    var v = parseFloat(s)
+    return isNaN(v) ? 0 : v
+  },
   onDayChargeConfirm() {
     var that = this
     var ridx = that.data._dayChargeRidx
@@ -366,9 +379,9 @@ Page({
     }
     var rentalId = order.rentals[ridx].id
     var detailId = that.data._dayChargeDetailId
-    var rent = parseFloat(that.data._dayChargeRent); if (isNaN(rent)) rent = 0
-    var overtime = parseFloat(that.data._dayChargeOvertime); if (isNaN(overtime)) overtime = 0
-    var discount = parseFloat(that.data._dayChargeDiscount); if (isNaN(discount)) discount = 0
+    var rent = that._resolveDayChargeVal(that.data._dayChargeRent, that.data._dayChargeRentOrig)
+    var overtime = that._resolveDayChargeVal(that.data._dayChargeOvertime, that.data._dayChargeOvertimeOrig)
+    var discount = that._resolveDayChargeVal(that.data._dayChargeDiscount, that.data._dayChargeDiscountOrig)
     wx.showLoading({ title: '保存中' })
     data.updateRentalDayChargesPromise(rentalId, detailId, rent, overtime, discount,
       '租赁订单详细页修改租金明细', app.globalData.sessionKey)

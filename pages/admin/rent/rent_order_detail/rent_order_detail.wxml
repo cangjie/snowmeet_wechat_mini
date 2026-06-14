@@ -472,15 +472,15 @@
     <view class="dc-date">{{_dayChargeDate}}</view>
     <view class="dc-field">
       <text class="dc-label">租金</text>
-      <input class="dc-input" type="digit" value="{{_dayChargeRent}}" data-field="Rent" bindinput="onDayChargeInput" placeholder="0" />
+      <input class="dc-input" type="digit" value="{{_dayChargeRent}}" data-field="Rent" bindinput="onDayChargeInput" placeholder="{{_dayChargeRentOrig}}" />
     </view>
     <view class="dc-field">
       <text class="dc-label">超时费</text>
-      <input class="dc-input" type="digit" value="{{_dayChargeOvertime}}" data-field="Overtime" bindinput="onDayChargeInput" placeholder="0" />
+      <input class="dc-input" type="digit" value="{{_dayChargeOvertime}}" data-field="Overtime" bindinput="onDayChargeInput" placeholder="{{_dayChargeOvertimeOrig}}" />
     </view>
     <view class="dc-field">
       <text class="dc-label">减免</text>
-      <input class="dc-input" type="digit" value="{{_dayChargeDiscount}}" data-field="Discount" bindinput="onDayChargeInput" placeholder="0" />
+      <input class="dc-input" type="digit" value="{{_dayChargeDiscount}}" data-field="Discount" bindinput="onDayChargeInput" placeholder="{{_dayChargeDiscountOrig}}" />
     </view>
     <view class="dc-actions">
       <view class="dc-btn dc-btn--cancel" bindtap="onDayChargeCancel">取消</view>
