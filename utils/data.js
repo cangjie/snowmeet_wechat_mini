@@ -663,6 +663,19 @@ const updateRentalDetailsPromise = function (details, scene, sessionKey) {
     })
   })
 }
+// 按天一次性修改：当天租金 + 减免 + 超时费（超时费按天 upsert）
+const updateRentalDayChargesPromise = function (rentalId, rentDetailId, rent, overtime, discount, scene, sessionKey) {
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalDayChargesByStaff/' + rentalId
+    + '?rentDetailId=' + rentDetailId + '&rent=' + rent + '&overtime=' + overtime + '&discount=' + discount
+    + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(updateUrl, {}).then(function (rental) {
+      resolve(rental)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const refundPromise = function (orderId, refunds, sessionKey) {
   var refundUrl = app.globalData.requestPrefix + 'Order/Refund/' + orderId.toString() + '?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -890,6 +903,7 @@ module.exports = {
   getRentalPromise,
   setRentItemStatsPromise,
   updateRentalDetailsPromise,
+  updateRentalDayChargesPromise,
   refundPromise,
   updateRentalPromise,
   getRentTypePromise,

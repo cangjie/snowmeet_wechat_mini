@@ -221,21 +221,23 @@
           <!-- 租金明细 toggle -->
           <view class="toggle-row" bindtap="onToggleDetails" data-ridx="{{ridx}}">
             <van-icon name="{{_expandedDetails[ridx] ? 'arrow-up' : 'arrow-down'}}" size="14px" />
-            <text>租金明细 ({{item.details.length}}天)</text>
+            <text>租金明细 ({{item.feeRows.length}}天)</text>
           </view>
           <block wx:if="{{_expandedDetails[ridx]}}">
             <view class="detail-table">
               <view class="detail-table-row detail-table-head">
                 <text class="detail-col-date">日期</text>
                 <text class="detail-col-amount">租金</text>
+                <text class="detail-col-overtime">超时费</text>
                 <text class="detail-col-discount">减免</text>
                 <text class="detail-col-subtotal">小计</text>
               </view>
-              <view class="detail-table-row" wx:for="{{item.details}}" wx:key="id" wx:for-item="detail">
-                <text class="detail-col-date">{{detail.rental_dateDateStr}}</text>
-                <text class="detail-col-amount">¥{{detail.amount}}</text>
-                <text class="detail-col-discount">¥{{detail.othersDiscountAmount}}</text>
-                <text class="detail-col-subtotal">{{detail.summaryStr}}</text>
+              <view class="detail-table-row detail-table-row--tappable" wx:for="{{item.feeRows}}" wx:key="dateStr" wx:for-item="row" wx:for-index="fidx" bindtap="onEditDayCharge" data-ridx="{{ridx}}" data-fidx="{{fidx}}">
+                <text class="detail-col-date">{{row.dateStr}}</text>
+                <text class="detail-col-amount">{{row.rentStr}}</text>
+                <text class="detail-col-overtime">{{row.overtimeStr}}</text>
+                <text class="detail-col-discount">{{row.discountStr}}</text>
+                <text class="detail-col-subtotal">{{row.subtotalStr}}</text>
               </view>
             </view>
           </block>
@@ -461,4 +463,28 @@
     size="small">
     ✓ 确认追加
   </van-button>
+</view>
+
+<!-- 租金明细按天编辑弹窗 -->
+<view wx:if="{{_dayChargeShow}}" class="dc-mask" bindtap="onDayChargeCancel" catchtouchmove="noop">
+  <view class="dc-card" catchtap="noop">
+    <view class="dc-title">编辑租金明细</view>
+    <view class="dc-date">{{_dayChargeDate}}</view>
+    <view class="dc-field">
+      <text class="dc-label">租金</text>
+      <input class="dc-input" type="digit" value="{{_dayChargeRent}}" data-field="Rent" bindinput="onDayChargeInput" placeholder="0" />
+    </view>
+    <view class="dc-field">
+      <text class="dc-label">超时费</text>
+      <input class="dc-input" type="digit" value="{{_dayChargeOvertime}}" data-field="Overtime" bindinput="onDayChargeInput" placeholder="0" />
+    </view>
+    <view class="dc-field">
+      <text class="dc-label">减免</text>
+      <input class="dc-input" type="digit" value="{{_dayChargeDiscount}}" data-field="Discount" bindinput="onDayChargeInput" placeholder="0" />
+    </view>
+    <view class="dc-actions">
+      <view class="dc-btn dc-btn--cancel" bindtap="onDayChargeCancel">取消</view>
+      <view class="dc-btn dc-btn--confirm" bindtap="onDayChargeConfirm">确定</view>
+    </view>
+  </view>
 </view>

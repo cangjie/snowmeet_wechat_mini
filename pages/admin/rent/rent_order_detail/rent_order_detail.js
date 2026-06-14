@@ -30,6 +30,15 @@ Page({
     _expandedItemChanges: {},
 
     allValid: false,
+
+    // 租金明细按天编辑弹窗
+    _dayChargeShow: false,
+    _dayChargeRidx: null,
+    _dayChargeDetailId: null,
+    _dayChargeDate: '',
+    _dayChargeRent: '',
+    _dayChargeOvertime: '',
+    _dayChargeDiscount: '',
   },
 
   onLoad(options) {
@@ -172,16 +181,38 @@ Page({
         }
       }
 
-      // 租金明细
+      // 租金明细（按天聚合：每天一行，含 租金 / 超时费 / 减免 / 小计；赔偿金按租赁物维度，不进此表）
+      var feeDayMap = {}
+      var feeRows = []
       for (var j = 0; rental.details && j < rental.details.length; j++) {
         var detail = rental.details[j]
-        var rDate = new Date(detail.rental_date)
-        detail.rental_dateDateStr = util.formatDate(rDate)
-        detail.amount = parseFloat(detail.amount).toFixed(2)
-        detail.othersDiscountAmount = parseFloat(detail.othersDiscountAmount).toFixed(2)
-        detail.summary = (parseFloat(detail.amount) - parseFloat(detail.othersDiscountAmount)).toFixed(2)
-        detail.summaryStr = util.showAmount(parseFloat(detail.summary))
+        if (detail.valid != 1) continue
+        var ct = (detail.charge_type || '').trim()
+        if (ct != '租金' && ct != '超时费') continue
+        var dayKey = util.formatDate(new Date(detail.rental_date))
+        var row = feeDayMap[dayKey]
+        if (!row) {
+          row = { dateStr: dayKey, rentDetailId: null, rent: 0, overtime: 0, discount: 0 }
+          feeDayMap[dayKey] = row
+          feeRows.push(row)
+        }
+        if (ct == '租金') {
+          row.rentDetailId = detail.id
+          row.rent = parseFloat(detail.amount) || 0
+          row.discount = parseFloat(detail.othersDiscountAmount) || 0
+        } else {
+          row.overtime += parseFloat(detail.amount) || 0
+        }
       }
+      for (var fi = 0; fi < feeRows.length; fi++) {
+        var r0 = feeRows[fi]
+        r0.subtotal = r0.rent + r0.overtime - r0.discount
+        r0.rentStr = util.showAmount(r0.rent)
+        r0.overtimeStr = util.showAmount(r0.overtime)
+        r0.discountStr = util.showAmount(r0.discount)
+        r0.subtotalStr = util.showAmount(r0.subtotal)
+      }
+      rental.feeRows = feeRows
     }
 
     // appendingRentals 处理（追加中的租赁）
@@ -294,6 +325,64 @@ Page({
     var ridx = e.currentTarget.dataset.ridx
     var key = '_expandedDetails.' + ridx
     this.setData({ [key]: !this.data._expandedDetails[ridx] })
+  },
+
+  // 点某天租金行 → 弹窗编辑 当天租金 / 超时费 / 减免
+  onEditDayCharge(e) {
+    var ridx = e.currentTarget.dataset.ridx
+    var fidx = e.currentTarget.dataset.fidx
+    var rental = this.data.order && this.data.order.rentals && this.data.order.rentals[ridx]
+    if (!rental || !rental.feeRows || !rental.feeRows[fidx]) return
+    var row = rental.feeRows[fidx]
+    if (row.rentDetailId == null) {
+      wx.showToast({ title: '该天无租金明细', icon: 'none' })
+      return
+    }
+    this.setData({
+      _dayChargeShow: true,
+      _dayChargeRidx: ridx,
+      _dayChargeDetailId: row.rentDetailId,
+      _dayChargeDate: row.dateStr,
+      _dayChargeRent: String(row.rent),
+      _dayChargeOvertime: String(row.overtime),
+      _dayChargeDiscount: String(row.discount),
+    })
+  },
+  onDayChargeInput(e) {
+    var field = e.currentTarget.dataset.field
+    this.setData({ ['_dayCharge' + field]: e.detail.value })
+  },
+  onDayChargeCancel() {
+    this.setData({ _dayChargeShow: false })
+  },
+  noop() {},
+  onDayChargeConfirm() {
+    var that = this
+    var ridx = that.data._dayChargeRidx
+    var order = that.data.order
+    if (!order || !order.rentals || !order.rentals[ridx]) {
+      that.setData({ _dayChargeShow: false })
+      return
+    }
+    var rentalId = order.rentals[ridx].id
+    var detailId = that.data._dayChargeDetailId
+    var rent = parseFloat(that.data._dayChargeRent); if (isNaN(rent)) rent = 0
+    var overtime = parseFloat(that.data._dayChargeOvertime); if (isNaN(overtime)) overtime = 0
+    var discount = parseFloat(that.data._dayChargeDiscount); if (isNaN(discount)) discount = 0
+    wx.showLoading({ title: '保存中' })
+    data.updateRentalDayChargesPromise(rentalId, detailId, rent, overtime, discount,
+      '租赁订单详细页修改租金明细', app.globalData.sessionKey)
+      .then(function (updatedRental) {
+        var od = that.data.order
+        if (updatedRental) od.rentals[ridx] = updatedRental
+        od = that.renderOrder(od)
+        wx.hideLoading()
+        that.setData({ order: od, _dayChargeShow: false })
+        wx.showToast({ title: '已保存', icon: 'success' })
+      }).catch(function () {
+        wx.hideLoading()
+        wx.showToast({ title: '保存失败', icon: 'error' })
+      })
   },
   onToggleItems(e) {
     var ridx = e.currentTarget.dataset.ridx
