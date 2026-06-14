@@ -298,12 +298,12 @@
         style="color:#999;font-size:26rpx;text-align:center;padding:20rpx 0;">
         暂无租赁物
       </view>
-      <view class="flat-item-row" wx:for="{{order._allRentItems}}" wx:key="id">
-        <text class="flat-item-code">{{item.code || '无码'}}</text>
-        <text class="flat-item-name">{{item.name || '—'}}</text>
-        <text class="flat-item-cat">{{item.class_name || '—'}}</text>
-        <text class="flat-item-pkg">{{item._rentalName}}</text>
-        <view class="flat-item-status">
+      <view class="all-item-row" wx:for="{{order._allRentItems}}" wx:key="id">
+        <text class="all-item-col-code">{{item.code || '无码'}}</text>
+        <text class="all-item-col-name">{{item.name || '—'}}</text>
+        <text class="all-item-col-cat">{{item.class_name || '—'}}</text>
+        <text class="all-item-col-rental">{{item._rentalName}}</text>
+        <view class="all-item-col-status">
           <view class="chip {{item._statusClass}}" style="font-size:20rpx;padding:2rpx 8rpx;">
             {{item._statusLabel}}
           </view>
@@ -322,22 +322,22 @@
 
     <block wx:if="{{_refundExpanded}}">
       <!-- 退款摘要 -->
-      <view class="refund-summary">
-        <view class="refund-cell">
-          <view class="refund-cell-label">总计押金</view>
-          <view class="refund-cell-value">{{order.totalGuarantyAmountStr}}</view>
+      <view class="refund-summary-grid">
+        <view class="refund-summary-cell">
+          <view class="refund-summary-label">总计押金</view>
+          <view class="refund-summary-value">{{order.totalGuarantyAmountStr}}</view>
         </view>
-        <view class="refund-cell">
-          <view class="refund-cell-label">总计租金</view>
-          <view class="refund-cell-value">{{order.totalRentSummaryAmountStr}}</view>
+        <view class="refund-summary-cell">
+          <view class="refund-summary-label">总计租金</view>
+          <view class="refund-summary-value">{{order.totalRentSummaryAmountStr}}</view>
         </view>
-        <view class="refund-cell">
-          <view class="refund-cell-label">总计超时</view>
-          <view class="refund-cell-value">{{order.totalRentOverTimeAmountStr}}</view>
+        <view class="refund-summary-cell">
+          <view class="refund-summary-label">总计超时</view>
+          <view class="refund-summary-value">{{order.totalRentOverTimeAmountStr}}</view>
         </view>
-        <view class="refund-cell">
-          <view class="refund-cell-label">总计赔偿</view>
-          <view class="refund-cell-value">{{order.totalRentRepairationAmountStr}}</view>
+        <view class="refund-summary-cell">
+          <view class="refund-summary-label">总计赔偿</view>
+          <view class="refund-summary-value">{{order.totalRentRepairationAmountStr}}</view>
         </view>
       </view>
 

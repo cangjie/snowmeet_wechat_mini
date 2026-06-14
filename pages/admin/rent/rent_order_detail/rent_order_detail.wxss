@@ -1,7 +1,7 @@
 @import '/app.wxss';
 
 /* ── 页面 & 卡片 ─────────────────────── */
-.page { background: #F8F8F8; padding: 20rpx 24rpx 160rpx; min-height: 100vh; }
+.page { background: #F8F8F8; padding: 20rpx 24rpx 160rpx; min-height: 100vh; box-sizing: border-box; }
 .page-loading { display: flex; align-items: center; justify-content: center; height: 100vh; color: #999; }
 
 .card { background: #FFF; border-radius: 12rpx; padding: 24rpx; margin-bottom: 20rpx; }
@@ -69,7 +69,7 @@
 .pay-table-row {
   display: flex; align-items: center;
   font-size: 24rpx; min-height: 56rpx;
-  border-bottom: 1rpx solid #F5F5F5;
+  border-bottom: 1rpx solid #F0F0F0;
   gap: 8rpx;
 }
 .pay-table-row:last-child { border-bottom: none; }
@@ -182,6 +182,14 @@
 .all-item-col-rental { flex: 0 0 120rpx; color: #999; font-size: 22rpx; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .all-item-col-status { flex: 0 0 80rpx; text-align: right; }
 
+/* ── 追加中的租赁 ─────────────────────── */
+.appending-section { margin-top: 16rpx; }
+.appending-title { font-size: 24rpx; color: #999; margin-bottom: 8rpx; }
+.appending-card { background: #F8F8F8; border-radius: 8rpx; padding: 12rpx 16rpx; margin-bottom: 8rpx; }
+.appending-card-head { display: flex; justify-content: space-between; align-items: center; }
+.appending-card-name { font-size: 26rpx; color: #333; flex: 1; }
+.appending-del-btn { font-size: 24rpx; color: #E64340; padding: 4rpx 8rpx; }
+
 /* ── 退款摘要 ─────────────────────────── */
 .refund-summary-grid {
   display: flex; flex-wrap: wrap; gap: 12rpx;
@@ -194,6 +202,11 @@
 }
 .refund-summary-label { font-size: 22rpx; color: #999; margin-bottom: 2rpx; }
 .refund-summary-value { font-size: 28rpx; font-weight: 600; color: #333; }
+.refund-amount-row { display: flex; justify-content: space-between; align-items: center; padding: 6rpx 0; }
+.refund-amount-label { font-size: 26rpx; color: #666; }
+.refund-amount-value { font-size: 28rpx; color: #333; font-weight: 600; }
+.refund-need { color: #E64340; }
+.refund-btn-row { margin-top: 16rpx; }
 
 /* ── 底部操作栏 ───────────────────────── */
 .bottom-bar {
@@ -204,3 +217,6 @@
   border-top: 1rpx solid #f0f0f0;
 }
 .bottom-btn { flex: 1; height: 76rpx; border-radius: 8rpx; font-size: 28rpx; }
+.bottom-btn--add { background: #006495; color: #fff; border-color: #006495; }
+.bottom-btn--confirm { background: #006495; color: #fff; border-color: #006495; }
+.bottom-btn--disabled { background: #ccc !important; color: #fff !important; border-color: #ccc !important; }

@@ -176,8 +176,8 @@ Page({
     for (var i = 0; order.appendingRentals && i < order.appendingRentals.length; i++) {
       var rental = order.appendingRentals[i]
       rental.realGuaranty = rental.guaranty
-      if (!isNaN(rental.guaranty_discount)) {
-        rental.realGuaranty = rental.guaranty - parseFloat(rental.guaranty_discount)
+      if (!isNaN(rental.guaranty_dicount)) {
+        rental.realGuaranty = rental.guaranty - parseFloat(rental.guaranty_dicount)
       }
       if (rental.noGuaranty) {
         rental.realGuaranty = 0
@@ -210,7 +210,8 @@ Page({
     }
 
     if (order.appendingRentals && order.appendingRentals.length > 0) {
-      that.checkAppendingRentalValid(order)
+      var allValid = that.checkAppendingRentalValid(order)
+      that.setData({ allValid })
     }
 
     // 关单时间
@@ -339,6 +340,8 @@ Page({
         data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function () {
           wx.showToast({ title: '退款成功', icon: 'success' })
           that.getData()
+        }).catch(function () {
+          wx.showToast({ title: '退款失败', icon: 'error' })
         })
       }
     })
@@ -388,7 +391,7 @@ Page({
       }
       rentals[i].wellFormed = rentalWellformed
     }
-    that.setData({ allValid })
+    return allValid
   },
 
   onAddPackage() {
@@ -405,8 +408,8 @@ Page({
             + '&sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(appendUrl, null).then(function (updatedOrder) {
             updatedOrder = that.renderOrder(updatedOrder)
-            that.checkAppendingRentalValid(updatedOrder)
-            that.setData({ order: updatedOrder })
+            var allValid = that.checkAppendingRentalValid(updatedOrder)
+            that.setData({ allValid, order: updatedOrder })
           }).catch(function () {
             wx.showToast({ title: '添加失败', icon: 'error' })
           })
@@ -427,8 +430,8 @@ Page({
             + '&sessionKey=' + app.globalData.sessionKey
           util.performWebRequest(appendUrl, null).then(function (updatedOrder) {
             updatedOrder = that.renderOrder(updatedOrder)
-            that.checkAppendingRentalValid(updatedOrder)
-            that.setData({ order: updatedOrder })
+            var allValid = that.checkAppendingRentalValid(updatedOrder)
+            that.setData({ allValid, order: updatedOrder })
           }).catch(function () {
             wx.showToast({ title: '添加失败', icon: 'error' })
           })
@@ -448,8 +451,8 @@ Page({
       wx.hideLoading()
       if (updatedOrder.paying_amount > 0) {
         var renderedOrder = that.renderOrder(updatedOrder)
-        that.checkAppendingRentalValid(renderedOrder)
-        that.setData({ order: renderedOrder })
+        var allValid = that.checkAppendingRentalValid(renderedOrder)
+        that.setData({ allValid, order: renderedOrder })
         wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + updatedOrder.id })
       } else {
         that.getData()
@@ -479,8 +482,8 @@ Page({
           + '?sessionKey=' + app.globalData.sessionKey
         util.performWebRequest(delUrl, null).then(function (updatedOrder) {
           updatedOrder = that.renderOrder(updatedOrder)
-          that.checkAppendingRentalValid(updatedOrder)
-          that.setData({ order: updatedOrder })
+          var allValid = that.checkAppendingRentalValid(updatedOrder)
+          that.setData({ allValid, order: updatedOrder })
         })
       }
     })
