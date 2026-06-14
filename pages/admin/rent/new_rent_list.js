@@ -263,7 +263,7 @@ Page({
     }
     else {
       wx.navigateTo({
-        url: '/pages/admin/rent/rent_details?id=' + order.id,
+        url: '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + order.id,
       })
     }
   },

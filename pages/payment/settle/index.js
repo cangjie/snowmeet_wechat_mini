@@ -24,8 +24,8 @@ Page({
       cancelText: '继续开单',
       success: function (res) {
         if (res.confirm) {
-          // 查看订单详情：用 redirectTo 替换已完成的结算页（当前迭代仅租赁，详情页为 rent_details）
-          wx.redirectTo({ url: '/pages/admin/rent/rent_details?id=' + orderId })
+          // 查看订单详情：用 redirectTo 替换已完成的结算页（当前迭代仅租赁，详情页为 rent_order_detail）
+          wx.redirectTo({ url: '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + orderId })
         } else if (res.cancel) {
           // 继续开下一单：reLaunch 回开单入口，重置整条栈（与 reception-tabbar「开单」一致）
           wx.reLaunch({ url: '/pages/admin/reception/recept_entry' })

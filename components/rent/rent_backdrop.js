@@ -92,7 +92,7 @@ Component({
             title: '支付成功',
             icon: 'success'
           })
-          that.triggerEvent('Jump', { url: '/pages/admin/rent/rent_details?id=' + order.id })
+          that.triggerEvent('Jump', { url: '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + order.id })
         }
       })
 
