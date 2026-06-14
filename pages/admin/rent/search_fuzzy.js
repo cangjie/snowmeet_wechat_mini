@@ -87,7 +87,7 @@ Page({
     var that = this
     var id = e.currentTarget.id
     wx.navigateTo({
-      url: 'rent_details?id='+id,
+      url: '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + id,
     })
   }
 })
