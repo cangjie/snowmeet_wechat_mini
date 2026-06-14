@@ -257,60 +257,105 @@
             </view>
           </view>
           <block wx:if="{{_expandedItems[ridx]}}">
-            <view class="item-detail-card" wx:for="{{item.rentItems}}" wx:key="id" wx:for-item="rentItem" wx:for-index="iidx">
-              <view class="item-detail-head">
-                <text class="item-detail-name">{{rentItem.name || '—'}}</text>
-                <view class="chip {{rentItem._statusClass}}" style="font-size:20rpx;padding:2rpx 8rpx;">{{rentItem._statusLabel}}</view>
+            <view class="item-detail-card {{rentItem.noNeed ? 'item-detail-card--noneed' : ''}}" wx:for="{{item.rentItems}}" wx:key="id" wx:for-item="rentItem" wx:for-index="iidx">
+              <view class="rid-head">
+                <view class="rid-head-icon">
+                  <van-icon name="goods-collect-o" size="18px" color="#006495" />
+                </view>
+                <view class="rid-head-main">
+                  <view class="rid-head-title">
+                    <text class="rid-name">{{rentItem.name || '—'}}</text>
+                    <view class="chip {{rentItem._statusClass}} rid-badge">{{rentItem._statusLabel}}</view>
+                  </view>
+                  <view class="rid-head-sub">
+                    <text class="rid-sub-label">编码</text>
+                    <text class="rid-sub-value">{{rentItem.noNeed ? '--' : (rentItem.noCode ? '无编码' : (rentItem.code || '--'))}}</text>
+                    <text class="rid-sub-dot" wx:if="{{!rentItem.noNeed}}">·</text>
+                    <text class="rid-sub-label" wx:if="{{!rentItem.noNeed}}">分类</text>
+                    <text class="rid-sub-value" wx:if="{{!rentItem.noNeed}}">{{rentItem.class_name || '—'}}</text>
+                  </view>
+                </view>
               </view>
 
-              <view class="item-detail-grid">
-                <view class="item-detail-cell"><text class="item-detail-label">编码</text><text class="item-detail-value">{{rentItem.noNeed ? '--' : (rentItem.noCode ? '无编码' : (rentItem.code || '--'))}}</text></view>
-                <view class="item-detail-cell"><text class="item-detail-label">分类</text><text class="item-detail-value">{{rentItem.noNeed ? '' : (rentItem.class_name || '—')}}</text></view>
-                <view class="item-detail-cell"><text class="item-detail-label">发放日期</text><text class="item-detail-value">{{rentItem.noNeed ? '--' : rentItem.pickDateStr}}</text></view>
-                <view class="item-detail-cell"><text class="item-detail-label">发放时间</text><text class="item-detail-value">{{rentItem.noNeed ? '--' : rentItem.pickTimeStr}}</text></view>
-                <view class="item-detail-cell"><text class="item-detail-label">归还日期</text><text class="item-detail-value">{{rentItem.noNeed ? '--' : rentItem.returnDateStr}}</text></view>
-                <view class="item-detail-cell"><text class="item-detail-label">归还时间</text><text class="item-detail-value">{{rentItem.noNeed ? '--' : rentItem.returnTimeStr}}</text></view>
-                <view class="item-detail-cell"><text class="item-detail-label">发放人</text><text class="item-detail-value">{{rentItem.noNeed ? '' : (rentItem.pickStaff ? rentItem.pickStaff.name : '--')}}</text></view>
-                <view class="item-detail-cell"><text class="item-detail-label">接收人</text><text class="item-detail-value">{{rentItem.noNeed ? '' : (rentItem.returnStaff ? rentItem.returnStaff.name : '--')}}</text></view>
+              <view class="rid-timeline" wx:if="{{!rentItem.noNeed}}">
+                <view class="rid-tl-col">
+                  <view class="rid-tl-head">
+                    <view class="rid-dot {{rentItem._picked ? 'rid-dot--on' : ''}}"></view>
+                    <text class="rid-tl-label">发放</text>
+                  </view>
+                  <view class="rid-tl-date">{{rentItem.pickDateStr}}</view>
+                  <view class="rid-tl-time">{{rentItem.pickTimeStr}}</view>
+                  <view class="rid-tl-staff">{{rentItem.pickStaff ? rentItem.pickStaff.name : '--'}}</view>
+                </view>
+                <view class="rid-tl-col">
+                  <view class="rid-tl-head">
+                    <view class="rid-dot {{rentItem._returned ? 'rid-dot--on' : ''}}"></view>
+                    <text class="rid-tl-label">归还</text>
+                  </view>
+                  <view class="rid-tl-date">{{rentItem.returnDateStr}}</view>
+                  <view class="rid-tl-time">{{rentItem.returnTimeStr}}</view>
+                  <view class="rid-tl-staff">{{rentItem.returnStaff ? rentItem.returnStaff.name : '--'}}</view>
+                </view>
               </view>
 
-              <view class="item-edit-row">
-                <text class="item-edit-label">赔偿</text>
+              <view class="rid-kv" wx:if="{{!rentItem.noNeed}}">
+                <text class="rid-kv-label">赔偿金额</text>
                 <block wx:if="{{rentItem._repairEditing}}">
-                  <input class="item-edit-input" type="number" value="{{rentItem._repairDraft}}" bindinput="onItemRepairInput" data-ridx="{{ridx}}" data-iidx="{{iidx}}" />
-                  <van-button size="mini" type="default" bindtap="onItemRepairCancel" data-ridx="{{ridx}}" data-iidx="{{iidx}}">取消</van-button>
-                  <van-button size="mini" type="danger" bindtap="onItemRepairConfirm" data-ridx="{{ridx}}" data-iidx="{{iidx}}">确认</van-button>
+                  <input class="rid-kv-input" type="digit" value="{{rentItem._repairDraft}}" bindinput="onItemRepairInput" data-ridx="{{ridx}}" data-iidx="{{iidx}}" />
+                  <view class="rid-mini-btn" bindtap="onItemRepairCancel" data-ridx="{{ridx}}" data-iidx="{{iidx}}">取消</view>
+                  <view class="rid-mini-btn rid-mini-btn--primary" bindtap="onItemRepairConfirm" data-ridx="{{ridx}}" data-iidx="{{iidx}}">确认</view>
                 </block>
-                <block wx:else>
-                  <text class="item-edit-value">{{rentItem.totalRepairationAmountStr || '¥0.00'}}</text>
-                  <van-button size="mini" type="danger" bindtap="onItemRepairEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}" disabled="{{rentItem.noNeed}}">赔偿</van-button>
-                </block>
+                <text wx:else class="rid-kv-value">{{rentItem.totalRepairationAmountStr || '¥0.00'}}</text>
               </view>
 
-              <view class="item-edit-row item-edit-row--memo">
-                <text class="item-edit-label">备注</text>
+              <view class="rid-kv">
+                <text class="rid-kv-label">备注</text>
                 <block wx:if="{{rentItem._memoEditing}}">
-                  <input class="item-edit-input item-edit-input--memo" value="{{rentItem._memoDraft}}" bindinput="onItemMemoInput" data-ridx="{{ridx}}" data-iidx="{{iidx}}" />
-                  <van-button size="mini" type="default" bindtap="onItemMemoCancel" data-ridx="{{ridx}}" data-iidx="{{iidx}}">取消</van-button>
-                  <van-button size="mini" type="primary" bindtap="onItemMemoConfirm" data-ridx="{{ridx}}" data-iidx="{{iidx}}">确认</van-button>
+                  <input class="rid-kv-input" value="{{rentItem._memoDraft}}" bindinput="onItemMemoInput" data-ridx="{{ridx}}" data-iidx="{{iidx}}" />
+                  <view class="rid-mini-btn" bindtap="onItemMemoCancel" data-ridx="{{ridx}}" data-iidx="{{iidx}}">取消</view>
+                  <view class="rid-mini-btn rid-mini-btn--primary" bindtap="onItemMemoConfirm" data-ridx="{{ridx}}" data-iidx="{{iidx}}">确认</view>
                 </block>
-                <block wx:else>
-                  <text class="item-edit-value item-edit-value--memo">{{rentItem.memo || '—'}}</text>
-                  <van-button size="mini" type="warning" plain bindtap="onItemMemoEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">修改备注</van-button>
-                </block>
+                <view wx:else class="rid-kv-right">
+                  <text class="rid-kv-memo" wx:if="{{rentItem.memo}}">{{rentItem.memo}}</text>
+                  <view class="rid-link-btn" bindtap="onItemMemoEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                    <van-icon name="edit" size="13px" />
+                    <text>{{rentItem.memo ? '修改备注' : '添加备注'}}</text>
+                  </view>
+                </view>
               </view>
 
-              <view class="item-action-row" wx:if="{{!rentItem.noNeed}}">
-                <van-button size="mini" type="primary" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemReturn" data-id="{{rentItem.id}}" data-ridx="{{ridx}}" data-iidx="{{iidx}}">归还</van-button>
-                <van-button size="mini" type="primary" wx:if="{{rentItem.status == '已归还'}}" bindtap="onItemUnReturn" data-id="{{rentItem.id}}" data-ridx="{{ridx}}" data-iidx="{{iidx}}" disabled="{{order.refundAmount > 0}}">设置未归还</van-button>
-                <van-button size="mini" type="info" wx:if="{{rentItem.status == '已暂存' || rentItem.status == '未发放'}}" bindtap="onItemPick" data-id="{{rentItem.id}}">发放</van-button>
-                <van-button size="mini" type="warning" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemStore" data-id="{{rentItem.id}}">暂存</van-button>
-                <van-button size="mini" type="danger" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemChange" data-id="{{rentItem.id}}">更换</van-button>
+              <view class="rid-actions" wx:if="{{!rentItem.noNeed}}">
+                <view class="rid-act rid-act--primary" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemReturn" data-id="{{rentItem.id}}" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                  <van-icon name="replay" size="15px" /><text>归还</text>
+                </view>
+                <view class="rid-act" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemStore" data-id="{{rentItem.id}}">
+                  <van-icon name="goods-collect-o" size="15px" /><text>暂存</text>
+                </view>
+                <view class="rid-act" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemChange" data-id="{{rentItem.id}}">
+                  <van-icon name="exchange" size="15px" /><text>更换</text>
+                </view>
+                <view class="rid-act rid-act--primary" wx:if="{{rentItem.status == '已暂存' || rentItem.status == '未发放'}}" bindtap="onItemPick" data-id="{{rentItem.id}}">
+                  <van-icon name="sign" size="15px" /><text>发放</text>
+                </view>
+                <block wx:if="{{rentItem.status == '已归还'}}">
+                  <view class="rid-act rid-act--primary" wx:if="{{!(order.refundAmount > 0)}}" bindtap="onItemUnReturn" data-id="{{rentItem.id}}" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                    <van-icon name="revoke" size="15px" /><text>设未归还</text>
+                  </view>
+                  <view class="rid-act rid-act--disabled" wx:else>
+                    <van-icon name="revoke" size="15px" /><text>设未归还</text>
+                  </view>
+                </block>
+                <view class="rid-act rid-act--danger" wx:if="{{!rentItem._repairEditing}}" bindtap="onItemRepairEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                  <van-icon name="balance-o" size="15px" /><text>赔偿</text>
+                </view>
               </view>
 
-              <view class="item-log-toggle" bindtap="onToggleItemLog" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
-                <text>发放记录</text>
-                <van-icon name="{{_expandedItemLogs[ridx + '_' + iidx] ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#999" />
+              <view class="rid-record-toggle" bindtap="onToggleItemLog" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                <van-icon name="clock-o" size="14px" color="#6f7881" />
+                <text class="rid-record-label">发放记录</text>
+                <text class="rid-record-count" wx:if="{{rentItem.availableLog && rentItem.availableLog.length}}">{{rentItem.availableLog.length}}</text>
+                <view class="rid-record-spacer"></view>
+                <van-icon name="{{_expandedItemLogs[ridx + '_' + iidx] ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#6f7881" />
               </view>
               <view class="item-log-table" wx:if="{{_expandedItemLogs[ridx + '_' + iidx]}}">
                 <view class="item-log-row item-log-row--head">
@@ -328,9 +373,11 @@
                 <view class="item-log-empty" wx:if="{{!rentItem.availableLog || rentItem.availableLog.length == 0}}">暂无发放记录</view>
               </view>
 
-              <view class="item-log-toggle" wx:if="{{rentItem.prev_id != null}}" bindtap="onToggleItemChange" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
-                <text>更换记录</text>
-                <van-icon name="{{_expandedItemChanges[ridx + '_' + iidx] ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#999" />
+              <view class="rid-record-toggle" wx:if="{{rentItem.prev_id != null}}" bindtap="onToggleItemChange" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                <van-icon name="exchange" size="14px" color="#6f7881" />
+                <text class="rid-record-label">更换记录</text>
+                <view class="rid-record-spacer"></view>
+                <van-icon name="{{_expandedItemChanges[ridx + '_' + iidx] ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#6f7881" />
               </view>
               <view class="item-log-table" wx:if="{{rentItem.prev_id != null && _expandedItemChanges[ridx + '_' + iidx]}}">
                 <view class="item-log-row item-log-row--head">

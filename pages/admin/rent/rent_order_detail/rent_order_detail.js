@@ -182,6 +182,8 @@ Page({
           rentItem.returnDateStr = util.formatDate(new Date(rentItem.returnDate))
           rentItem.returnTimeStr = util.formatTimeStr(new Date(rentItem.returnDate))
         }
+        rentItem._picked = rentItem.pickDate != null
+        rentItem._returned = rentItem.returnDate != null
       }
 
       // 租金明细（按天聚合：每天一行，含 租金 / 超时费 / 减免 / 小计；赔偿金按租赁物维度，不进此表）
