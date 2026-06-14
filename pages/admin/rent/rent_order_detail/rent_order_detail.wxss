@@ -153,6 +153,10 @@
   border-bottom: 1rpx solid #F0F0F0;
 }
 .detail-table-row:last-child { border-bottom: none; }
+.detail-table-head .detail-col-date,
+.detail-table-head .detail-col-amount,
+.detail-table-head .detail-col-discount,
+.detail-table-head .detail-col-subtotal { color: #999; font-weight: 400; }
 .detail-col-date { flex: 0 0 160rpx; color: #666; }
 .detail-col-amount { flex: 0 0 100rpx; text-align: right; font-weight: 600; color: #333; }
 .detail-col-discount { flex: 0 0 80rpx; text-align: right; color: #999; }

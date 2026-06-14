@@ -29,7 +29,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function () {
       that.getData()
-    })
+    }).catch(function () {})
   },
 
   getData() {
@@ -48,8 +48,9 @@ Page({
           if (rentals[i]) order.rentals[i] = rentals[i]
         }
         order = that.renderOrder(order)
+        var allValid = that.checkAppendingRentalValid(order)
         wx.hideLoading()
-        that.setData({ order })
+        that.setData({ order, allValid })
       }).catch(function () { wx.hideLoading() })
     }).catch(function () { wx.hideLoading() })
   },
@@ -59,8 +60,6 @@ Page({
     var packages = []
     var rentals = []
     var packageNum = 0
-    var totalGuarantyAmount = 0
-    var totalSummary = 0
     var unRelieveGuaranty = 0
     var relieveGuaranty = 0
     var allSettled = true
@@ -72,8 +71,6 @@ Page({
         rental.realGuaranty = rental.guaranty - parseFloat(rental.guaranty_dicount)
       }
       rental.realGuaranty = parseFloat(rental.realGuaranty.toFixed(2))
-      totalGuarantyAmount += rental.realGuaranty
-      totalSummary += rental.totalSummaryAmount || 0
       if (rental.settled != 1) allSettled = false
       if (rental.guarantyRelieve != 1) {
         unRelieveGuaranty += rental.realGuaranty
@@ -207,11 +204,6 @@ Page({
         payment.remainAmount = payment.remainAmount - payment.refundedAmount
       }
       payment.remainAmountStr = util.showAmount(payment.remainAmount)
-    }
-
-    if (order.appendingRentals && order.appendingRentals.length > 0) {
-      var allValid = that.checkAppendingRentalValid(order)
-      that.setData({ allValid })
     }
 
     // 关单时间
@@ -363,6 +355,8 @@ Page({
           .then(function () {
             that.setData({ ['order.rentals[' + ridx + '].memo']: newMemo })
             wx.showToast({ title: '备注已保存', icon: 'success' })
+          }).catch(function () {
+            wx.showToast({ title: '保存失败', icon: 'error' })
           })
       }
     })
@@ -484,6 +478,8 @@ Page({
           updatedOrder = that.renderOrder(updatedOrder)
           var allValid = that.checkAppendingRentalValid(updatedOrder)
           that.setData({ allValid, order: updatedOrder })
+        }).catch(function () {
+          wx.showToast({ title: '删除失败', icon: 'error' })
         })
       }
     })

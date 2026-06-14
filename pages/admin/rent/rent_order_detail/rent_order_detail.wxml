@@ -197,7 +197,7 @@
           <view class="rental-fee-row">
             <view class="rental-fee-cell">
               <text class="rental-fee-label">租金</text>
-              <text class="rental-fee-value">¥{{item.totalRentSummaryAmount}}</text>
+              <text class="rental-fee-value">¥{{item.totalRentSummaryAmount || 0}}</text>
             </view>
             <view class="rental-fee-cell">
               <text class="rental-fee-label">减免</text>
