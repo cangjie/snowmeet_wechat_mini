@@ -5,7 +5,7 @@
         {
           "name": "pay",
           "pathName": "pages/order/payment_entry",
-          "query": "paymentId=42593",
+          "query": "paymentId=42604",
           "scene": null,
           "launchMode": "default"
         },
@@ -20,8 +20,8 @@
           "name": "recept",
           "pathName": "pages/admin/reception/recept_entry",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }
