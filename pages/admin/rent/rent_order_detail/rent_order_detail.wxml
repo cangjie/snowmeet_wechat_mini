@@ -253,7 +253,7 @@
           <view class="toggle-row toggle-row--between">
             <view class="toggle-row-left" bindtap="onToggleItems" data-ridx="{{ridx}}">
               <van-icon name="{{_expandedItems[ridx] ? 'arrow-up' : 'arrow-down'}}" size="14px" />
-              <text>租赁物明细 ({{item.rentItems.length}}件)</text>
+              <text>租赁物明细 ({{item._activeItemCount}}件)</text>
             </view>
           </view>
           <block wx:if="{{_expandedItems[ridx]}}">

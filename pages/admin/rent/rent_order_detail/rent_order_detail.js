@@ -217,6 +217,9 @@ Page({
         }
       }
 
+      // 件数不统计被换下（已更换）的租赁物（_replaced 在上面的 rentItems 循环里已逐项标好）
+      rental._activeItemCount = (rental.rentItems || []).filter(function (it) { return !it._replaced }).length
+
       // 租金明细（按天聚合：每天一行；免除天连 valid=0 一起纳入并划线；赔偿金按租赁物维度不进此表）
       var feeDayMap = {}
       var feeRows = []
