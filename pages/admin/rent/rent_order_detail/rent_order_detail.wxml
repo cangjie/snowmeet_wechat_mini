@@ -682,3 +682,16 @@
     </view>
   </view>
 </view>
+
+<!-- 微信身份核验二维码弹窗（储值付租金前置）：复用 dc-* 弹窗样式 -->
+<view wx:if="{{_verifyShow}}" class="dc-mask" bindtap="onWechatVerifyCancel" catchtouchmove="noop">
+  <view class="dc-card" catchtap="noop">
+    <view class="dc-title">微信身份核验</view>
+    <view class="verify-qr-tip">请订单会员本人微信扫码，核验通过后才能用储值付租金</view>
+    <image wx:if="{{_verifyQrUrl}}" class="verify-qr-img" src="{{_verifyQrUrl}}" mode="aspectFit" />
+    <view class="verify-qr-waiting">等待顾客扫码核验中…</view>
+    <view class="dc-actions">
+      <view class="dc-btn dc-btn--cancel" bindtap="onWechatVerifyCancel">取消</view>
+    </view>
+  </view>
+</view>

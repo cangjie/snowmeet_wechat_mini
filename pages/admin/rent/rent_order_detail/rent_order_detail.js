@@ -22,6 +22,8 @@ Page({
     _paymentDetailExpanded: false,
     _refundExpanded: true,
     payWithDeposit: false,
+    _verifyShow: false,
+    _verifyQrUrl: '',
 
     _rentalTab: 0,
     _expandedRentals: {},
@@ -466,6 +468,9 @@ Page({
     this.setData({ _dayChargeWaived: !this.data._dayChargeWaived })
   },
   noop() {},
+
+  onHide() { this._stopVerifyPolling() },
+  onUnload() { this._stopVerifyPolling() },
   // 输入留空 → 回退到原值（点输入框后无需退格删原金额，直接输入即可）
   _resolveDayChargeVal(input, orig) {
     var s = String(input == null ? '' : input).trim()
@@ -919,12 +924,58 @@ Page({
   },
 
   onTogglePayWithDeposit() {
-    var order = this.data.order
+    var that = this
+    var order = that.data.order
     if (!order || !order.member || !(order.member.availableDeposit > 0)) return
     if (order.depositPaidAmount > 0) return
-    this.setData({ payWithDeposit: !this.data.payWithDeposit })
-    var od = this.renderOrder(this.data.order)
-    this.setData({ order: od })
+    // 取消勾选：直接关
+    if (that.data.payWithDeposit) {
+      that.setData({ payWithDeposit: false, order: that.renderOrder(order) })
+      return
+    }
+    // 勾上：储值是会员资产，需先通过微信身份核验（wechat_unverified==1 即已核验本人）
+    if (order.wechat_unverified) {
+      that.setData({ payWithDeposit: true, order: that.renderOrder(order) })
+      return
+    }
+    // 未核验 → 弹微信核验二维码 + 轮询，核验通过（扫码人=订单会员）才放行勾选
+    that._openWechatVerify()
+  },
+
+  _openWechatVerify() {
+    var that = this
+    var order = that.data.order
+    // 复用已登记的扫码落地路径 order_payment，带 verifyOrderId；payment_entry 检测到后跳核验页
+    var verifyUrl = 'https://mini.snowmeet.top/mapp/order_payment?verifyOrderId=' + order.id
+    var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(verifyUrl)
+    that.setData({ _verifyShow: true, _verifyQrUrl: qrCodeUrl })
+    that._startVerifyPolling()
+  },
+
+  _startVerifyPolling() {
+    var that = this
+    that._stopVerifyPolling()
+    that._verifyTimer = setInterval(function () {
+      var order = that.data.order
+      if (!order) return
+      data.getWechatVerifyStatusPromise(order.id, app.globalData.sessionKey).then(function (res) {
+        if (res && res.verified) {
+          that._stopVerifyPolling()
+          order.wechat_unverified = true
+          that.setData({ _verifyShow: false, payWithDeposit: true, order: that.renderOrder(order) })
+          wx.showToast({ title: '核验成功', icon: 'success' })
+        }
+      }).catch(function () { /* 轮询失败忽略，下个周期再试 */ })
+    }, 2000)
+  },
+
+  _stopVerifyPolling() {
+    if (this._verifyTimer) { clearInterval(this._verifyTimer); this._verifyTimer = null }
+  },
+
+  onWechatVerifyCancel() {
+    this._stopVerifyPolling()
+    this.setData({ _verifyShow: false })
   },
 
   // 储值付租金：先用会员储值支付租金，再退全额押金（与旧版 refundWithDeposit 同口径）

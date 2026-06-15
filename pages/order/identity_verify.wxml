@@ -1,0 +1,27 @@
+<view class="verify-page">
+  <view class="verify-box">
+    <block wx:if="{{state == 'loading'}}">
+      <view class="verify-spinner"></view>
+      <view class="verify-title">正在核验身份…</view>
+      <view class="verify-sub">请稍候</view>
+    </block>
+
+    <block wx:elif="{{state == 'matched'}}">
+      <view class="verify-icon verify-icon--ok">✓</view>
+      <view class="verify-title">身份核验成功</view>
+      <view class="verify-sub">已确认为本人，请把手机交回店员继续操作</view>
+    </block>
+
+    <block wx:elif="{{state == 'mismatch'}}">
+      <view class="verify-icon verify-icon--no">!</view>
+      <view class="verify-title">与订单会员不一致</view>
+      <view class="verify-sub">请用订单会员本人{{maskedCell ? '（' + maskedCell + '）' : ''}}的微信扫码核验</view>
+    </block>
+
+    <block wx:else>
+      <view class="verify-icon verify-icon--err">×</view>
+      <view class="verify-title">核验失败</view>
+      <view class="verify-sub">{{message}}</view>
+    </block>
+  </view>
+</view>

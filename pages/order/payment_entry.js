@@ -27,6 +27,13 @@ Page({
       console.log('scan url', url)
       var urlArr = url.split('?')
       var queryStr = urlArr[urlArr.length - 1]
+      // 微信身份核验二维码复用本已登记路径：带 verifyOrderId 时跳到纯核验页（小程序内跳转无需公众平台报备）
+      if (queryStr.indexOf('verifyOrderId=') >= 0) {
+        var vOrderId = parseInt(queryStr.replace('verifyOrderId=', ''))
+        that._redirecting = true   // 防止 onShow 用 paymentId=0 触发无谓请求/错误提示
+        wx.redirectTo({ url: '/pages/order/identity_verify?orderId=' + vOrderId })
+        return
+      }
       paymentId = parseInt(queryStr.replace('paymentId=', ''))
       that.setData({paymentId})
     }
@@ -40,6 +47,7 @@ Page({
    */
   onShow() {
     var that = this
+    if (that._redirecting) return   // 已识别为身份核验二维码，正跳转核验页，跳过支付逻辑
     app.loginPromiseNew.then(function (resolve){
       // 从 globalData 取扫码方 openid（登录后由 MemberLogin 写入 app.globalData.member）
       var member = app.globalData.member || {}

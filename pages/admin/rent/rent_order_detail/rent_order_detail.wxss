@@ -783,6 +783,10 @@
   color: #006495; font-size: 22rpx; line-height: 1;
 }
 .refund-deposit-check--on { background: #006495; color: #ffffff; }
+/* 微信身份核验二维码弹窗 */
+.verify-qr-tip { font-size: 24rpx; color: #666; text-align: center; margin: 12rpx 0 20rpx; line-height: 1.5; }
+.verify-qr-img { width: 360rpx; height: 360rpx; display: block; margin: 0 auto; }
+.verify-qr-waiting { font-size: 24rpx; color: #006495; text-align: center; margin-top: 16rpx; }
 
 /* ── 底部操作栏 ───────────────────────── */
 .bottom-bar {

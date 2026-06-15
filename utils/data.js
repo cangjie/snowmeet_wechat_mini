@@ -506,6 +506,20 @@ const checkPayerIdentityPromise = function (paymentId, payerType, scannerId, ses
     })
   })
 }
+// 微信身份核验（纯核验，不涉及支付）：顾客扫码进小程序登录后调用，扫码人==订单会员则后端置 wechat_unverified=1
+const verifyWechatIdentityPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'PaymentIdentity/VerifyWechatIdentity'
+    + '?orderId=' + orderId
+    + '&sessionKey=' + encodeURIComponent(sessionKey || '')
+  return util.performWebRequest(url, undefined)
+}
+// 店员端轮询：该订单是否已通过微信身份核验（返回 { verified: bool }）
+const getWechatVerifyStatusPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'PaymentIdentity/GetWechatVerifyStatus'
+    + '?orderId=' + orderId
+    + '&sessionKey=' + encodeURIComponent(sessionKey || '')
+  return util.performWebRequest(url, undefined)
+}
 // 支付前身份验证 — 写入 OrderPayment / Order，返回更新后 CheckPayerIdentityResult
 // body: { paymentId, payerType, scannerId, action, choice?, encData?, iv?, phoneMock? }
 const confirmPayIdentityPromise = function (body, sessionKey) {
@@ -895,6 +909,8 @@ module.exports = {
   getOrderFromPaymentByCustomer,
   getPaymentLiveStatusPromise,
   checkPayerIdentityPromise,
+  verifyWechatIdentityPromise,
+  getWechatVerifyStatusPromise,
   confirmPayIdentityPromise,
   updateOrderWithDetailPromise,
   getEquipBrandsPromise,
