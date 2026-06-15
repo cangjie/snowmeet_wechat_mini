@@ -523,6 +523,24 @@
   overflow: hidden;
 }
 .item-detail-card--noneed { opacity: 0.6; }
+/* 已更换（被换下）：该租赁物已不可用 —— 更深底色 + 更浅文字 */
+.item-detail-card--replaced {
+  background: #e6eaf0;
+  border-color: rgba(160, 170, 182, 0.5);
+}
+.item-detail-card--replaced .rid-head { background: #dbe1e9; }
+.item-detail-card--replaced .rid-head-icon { background: #eef1f5; opacity: 0.65; }
+.item-detail-card--replaced .rid-name,
+.item-detail-card--replaced .rid-tl-date,
+.item-detail-card--replaced .rid-kv-value { color: #9aa3ad; }
+.item-detail-card--replaced .rid-sub-label,
+.item-detail-card--replaced .rid-sub-value,
+.item-detail-card--replaced .rid-sub-dot,
+.item-detail-card--replaced .rid-tl-label,
+.item-detail-card--replaced .rid-tl-time,
+.item-detail-card--replaced .rid-tl-staff,
+.item-detail-card--replaced .rid-kv-label,
+.item-detail-card--replaced .rid-kv-memo { color: #b0b8c0; }
 
 /* 头部条：图标 + 名称 + 状态 + 编码/分类 */
 .rid-head {

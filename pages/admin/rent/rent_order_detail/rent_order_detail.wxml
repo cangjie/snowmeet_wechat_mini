@@ -257,7 +257,7 @@
             </view>
           </view>
           <block wx:if="{{_expandedItems[ridx]}}">
-            <view class="item-detail-card {{rentItem.noNeed ? 'item-detail-card--noneed' : ''}}" wx:for="{{item.rentItems}}" wx:key="id" wx:for-item="rentItem" wx:for-index="iidx">
+            <view class="item-detail-card {{rentItem.noNeed ? 'item-detail-card--noneed' : ''}} {{rentItem._replaced ? 'item-detail-card--replaced' : ''}}" wx:for="{{item.rentItems}}" wx:key="id" wx:for-item="rentItem" wx:for-index="iidx">
               <view class="rid-head">
                 <view class="rid-head-icon">
                   <van-icon name="goods-collect-o" size="18px" color="#006495" />
@@ -324,7 +324,7 @@
                 </view>
               </view>
 
-              <view class="rid-actions" wx:if="{{!rentItem.noNeed}}">
+              <view class="rid-actions" wx:if="{{!rentItem.noNeed && !rentItem._replaced}}">
                 <view class="rid-act rid-act--primary" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemReturn" data-id="{{rentItem.id}}" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
                   <van-icon name="replay" size="15px" /><text>归还</text>
                 </view>
@@ -345,7 +345,7 @@
                     <van-icon name="revoke" size="15px" /><text>设未归还</text>
                   </view>
                 </block>
-                <view class="rid-act rid-act--danger" wx:if="{{!rentItem._repairEditing}}" bindtap="onItemRepairEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                <view class="rid-act rid-act--danger" wx:if="{{!rentItem._repairEditing && !rentItem._replaced}}" bindtap="onItemRepairEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
                   <van-icon name="balance-o" size="15px" /><text>赔偿</text>
                 </view>
               </view>

@@ -198,6 +198,8 @@ Page({
         }
         rentItem._picked = rentItem.pickDate != null
         rentItem._returned = rentItem.returnDate != null
+        // 已更换（被换下）的租赁物已不可用：隐藏赔偿按钮（更换完成说明租赁物无问题）+ 卡片置灰
+        rentItem._replaced = rentItem.status == '已更换'
 
         // 发放记录每行补充展示用日期/时间：availableLog 来自订单 payload 的计算属性，
         // 原始行只有 status/staff/create_date，没有 dateStr/timeStr。展开「发放记录」时
