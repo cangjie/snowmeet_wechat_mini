@@ -198,6 +198,21 @@ Page({
         }
         rentItem._picked = rentItem.pickDate != null
         rentItem._returned = rentItem.returnDate != null
+
+        // 发放记录每行补充展示用日期/时间：availableLog 来自订单 payload 的计算属性，
+        // 原始行只有 status/staff/create_date，没有 dateStr/timeStr。展开「发放记录」时
+        // 若不在此补全，日期/时间两列会空白（与 getRentItemLog 的补全口径保持一致）。
+        for (var k = 0; rentItem.availableLog && k < rentItem.availableLog.length; k++) {
+          var logEntry = rentItem.availableLog[k]
+          if (logEntry && logEntry.create_date) {
+            var logDate = new Date(logEntry.create_date)
+            logEntry.dateStr = (logDate.getMonth() + 1).toString().padStart(2, '0') + '-' + logDate.getDate().toString().padStart(2, '0')
+            logEntry.timeStr = util.formatTimeStr(logDate)
+          } else {
+            logEntry.dateStr = '--'
+            logEntry.timeStr = '--'
+          }
+        }
       }
 
       // 租金明细（按天聚合：每天一行；免除天连 valid=0 一起纳入并划线；赔偿金按租赁物维度不进此表）
