@@ -952,8 +952,8 @@ Page({
   _openWechatVerify() {
     var that = this
     var order = that.data.order
-    // 复用已登记的扫码落地路径 order_payment，带 verifyOrderId；payment_entry 检测到后跳核验页
-    var verifyUrl = 'https://mini.snowmeet.top/mapp/order_payment?verifyOrderId=' + order.id
+    // 专用扫码落地路径 order_verify（需在公众平台「扫普通链接二维码打开小程序」登记 → pages/order/identity_verify）
+    var verifyUrl = 'https://mini.snowmeet.top/mapp/order_verify?verifyOrderId=' + order.id
     var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(verifyUrl)
     that.setData({ _verifyShow: true, _verifyQrUrl: qrCodeUrl })
     that._startVerifyPolling()
