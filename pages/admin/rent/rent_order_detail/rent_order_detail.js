@@ -926,6 +926,13 @@ Page({
   onTogglePayWithDeposit() {
     var that = this
     var order = that.data.order
+    // 临时诊断：确认新版门槛代码是否生效 + 看到的运行期取值（排查"点了不弹码"）
+    console.log('[储值付租金] tap', {
+      wechat_unverified: order && order.wechat_unverified,
+      depositPaidAmount: order && order.depositPaidAmount,
+      availableDeposit: order && order.member && order.member.availableDeposit,
+      payWithDeposit: that.data.payWithDeposit
+    })
     if (!order || !order.member || !(order.member.availableDeposit > 0)) return
     if (order.depositPaidAmount > 0) return
     // 取消勾选：直接关
