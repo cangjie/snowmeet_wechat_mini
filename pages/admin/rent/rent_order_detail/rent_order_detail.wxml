@@ -462,6 +462,18 @@
         <text class="refund-amount-label">已退金额</text>
         <text class="refund-amount-value">{{order.refundAmountStr}}</text>
       </view>
+      <view class="refund-amount-row" wx:if="{{order.member.availableDeposit > 0}}">
+        <text class="refund-amount-label">可用储值</text>
+        <view class="refund-deposit-right">
+          <text class="refund-amount-value">{{order.member.availableDepositStr}}</text>
+          <view class="refund-deposit-toggle {{order.depositPaidAmount > 0 ? 'refund-deposit-toggle--disabled' : ''}}" bindtap="onTogglePayWithDeposit">
+            <text class="refund-deposit-toggle-label">储值付租金</text>
+            <view class="refund-deposit-check {{(payWithDeposit || order.depositPaidAmount > 0) ? 'refund-deposit-check--on' : ''}}">
+              <text wx:if="{{payWithDeposit || order.depositPaidAmount > 0}}">✓</text>
+            </view>
+          </view>
+        </view>
+      </view>
       <view class="refund-amount-row">
         <text class="refund-amount-label">实际应退</text>
         <text class="refund-amount-value refund-need">

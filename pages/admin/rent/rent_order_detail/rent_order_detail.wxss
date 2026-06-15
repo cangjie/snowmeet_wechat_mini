@@ -773,6 +773,16 @@
 .refund-amount-value { font-size: 28rpx; color: #333; font-weight: 600; }
 .refund-need { color: #E64340; }
 .refund-btn-row { margin-top: 16rpx; }
+.refund-deposit-right { display: flex; align-items: center; gap: 24rpx; }
+.refund-deposit-toggle { display: flex; align-items: center; gap: 10rpx; }
+.refund-deposit-toggle-label { font-size: 24rpx; color: #006495; }
+.refund-deposit-toggle--disabled { opacity: 0.45; }
+.refund-deposit-check {
+  width: 34rpx; height: 34rpx; border-radius: 6rpx;
+  border: 2rpx solid #006495; display: flex; align-items: center; justify-content: center;
+  color: #006495; font-size: 22rpx; line-height: 1;
+}
+.refund-deposit-check--on { background: #006495; color: #ffffff; }
 
 /* ── 底部操作栏 ───────────────────────── */
 .bottom-bar {

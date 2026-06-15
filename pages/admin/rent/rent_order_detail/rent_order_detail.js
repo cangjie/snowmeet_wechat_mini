@@ -21,6 +21,7 @@ Page({
     _orderInfoExpanded: true,
     _paymentDetailExpanded: false,
     _refundExpanded: true,
+    payWithDeposit: false,
 
     _rentalTab: 0,
     _expandedRentals: {},
@@ -354,6 +355,15 @@ Page({
     var paidGuaranty = (order.rentProperties && order.rentProperties.totalPaidGuarantyAmount) || 0
     order.totalRentNeedToRefundAmount = paidGuaranty - sumSummary + (order.depositPaidAmount || 0)
     order.totalRentUnRefund = order.totalRentNeedToRefundAmount - (order.refundAmount || 0)
+    // 勾选「储值付租金」（且尚未用储值支付过）：租金改由会员储值支付 → 押金全额退，实际应退加回被扣的租金。
+    // depositPaidAmount > 0 时不再加（那笔储值已计入上面的 depositPaid 项，避免重复）。
+    if (that.data.payWithDeposit && !(order.depositPaidAmount > 0)) {
+      order.totalRentUnRefund = order.totalRentUnRefund + sumSummary
+    }
+    // 可用储值（会员储值余额，后端已随 order.member 下发）
+    if (order.member && order.member.availableDeposit) {
+      order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
+    }
 
     order.totalGuarantyAmountStr = util.showAmount(order.totalGuarantyAmount)
     order.totalRentSummaryAmountStr = util.showAmount(order.totalRentSummaryAmount)
@@ -896,8 +906,60 @@ Page({
     })
   },
 
+  onTogglePayWithDeposit() {
+    var order = this.data.order
+    if (!order || !order.member || !(order.member.availableDeposit > 0)) return
+    if (order.depositPaidAmount > 0) return
+    this.setData({ payWithDeposit: !this.data.payWithDeposit })
+    var od = this.renderOrder(this.data.order)
+    this.setData({ order: od })
+  },
+
+  // 储值付租金：先用会员储值支付租金，再退全额押金（与旧版 refundWithDeposit 同口径）
+  _refundWithDeposit() {
+    var that = this
+    var order = that.data.order
+    var payAmount = order.totalRentSummaryAmount
+    var refundAmount = order.totalRentUnRefund
+    wx.showModal({
+      title: '储值支付确认',
+      content: '储值支付租金' + util.showAmount(payAmount) + '，应退押金：' + util.showAmount(refundAmount),
+      complete: function (res) {
+        if (!res.confirm) return
+        wx.showLoading({ title: '处理中' })
+        data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function (paidOrder) {
+          if (!paidOrder) { wx.hideLoading(); wx.showToast({ title: '储值支付失败', icon: 'error' }); return }
+          var rAmount = parseFloat((paidOrder.totalRentUnRefund || 0).toFixed(2))
+          if (rAmount <= 0) {
+            wx.hideLoading()
+            wx.showToast({ title: '储值支付成功', icon: 'success' })
+            that.getData()
+            return
+          }
+          var payment = null
+          for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
+            var p = order.availablePayments[i]
+            var unRefund = parseFloat((p.remainAmount || 0).toString())
+            if (p.status == '支付成功' && parseFloat(unRefund.toFixed(2)) >= rAmount) { payment = p; break }
+          }
+          if (!payment) { wx.hideLoading(); wx.showToast({ title: '无可退款支付记录', icon: 'error' }); return }
+          var refunds = [{ payment_id: payment.id, amount: rAmount, reason: '租赁退押金' }]
+          data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function () {
+            wx.hideLoading()
+            wx.showToast({ title: '退款成功', icon: 'success' })
+            that.getData()
+          }).catch(function () { wx.hideLoading(); wx.showToast({ title: '退款失败', icon: 'error' }) })
+        }).catch(function () { wx.hideLoading(); wx.showToast({ title: '储值支付失败', icon: 'error' }) })
+      }
+    })
+  },
+
   onRefund() {
     var that = this
+    if (that.data.payWithDeposit && !(that.data.order.depositPaidAmount > 0)) {
+      that._refundWithDeposit()
+      return
+    }
     var order = that.data.order
     var refundAmount = order.totalRentUnRefund
     if (!refundAmount || isNaN(refundAmount) || refundAmount <= 0) {
