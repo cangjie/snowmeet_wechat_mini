@@ -338,28 +338,31 @@
                 </block>
               </view>
 
-              <view class="rid-record-toggle" bindtap="onToggleItemLog" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
-                <van-icon name="clock-o" size="14px" color="#6f7881" />
-                <text class="rid-record-label">发放记录</text>
-                <text class="rid-record-count" wx:if="{{rentItem.availableLog && rentItem.availableLog.length}}">{{rentItem.availableLog.length}}</text>
-                <view class="rid-record-spacer"></view>
-                <van-icon name="{{_expandedItemLogs[ridx + '_' + iidx] ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#6f7881" />
-              </view>
-              <view class="item-log-table" wx:if="{{_expandedItemLogs[ridx + '_' + iidx]}}">
-                <view class="item-log-row item-log-row--head">
-                  <text class="item-log-col-date">日期</text>
-                  <text class="item-log-col-time">时间</text>
-                  <text class="item-log-col-status">操作</text>
-                  <text class="item-log-col-staff">操作人</text>
+              <!-- 发放记录：已更换的租赁物暂不显示 -->
+              <block wx:if="{{!rentItem._replaced}}">
+                <view class="rid-record-toggle" bindtap="onToggleItemLog" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                  <van-icon name="clock-o" size="14px" color="#6f7881" />
+                  <text class="rid-record-label">发放记录</text>
+                  <text class="rid-record-count" wx:if="{{rentItem.availableLog && rentItem.availableLog.length}}">{{rentItem.availableLog.length}}</text>
+                  <view class="rid-record-spacer"></view>
+                  <van-icon name="{{_expandedItemLogs[ridx + '_' + iidx] ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#6f7881" />
                 </view>
-                <view class="item-log-row" wx:for="{{rentItem.availableLog}}" wx:key="id" wx:for-item="log">
-                  <text class="item-log-col-date">{{log.dateStr}}</text>
-                  <text class="item-log-col-time">{{log.timeStr}}</text>
-                  <text class="item-log-col-status">{{log.status}}</text>
-                  <text class="item-log-col-staff">{{log.staff ? log.staff.name : '--'}}</text>
+                <view class="item-log-table" wx:if="{{_expandedItemLogs[ridx + '_' + iidx]}}">
+                  <view class="item-log-row item-log-row--head">
+                    <text class="item-log-col-date">日期</text>
+                    <text class="item-log-col-time">时间</text>
+                    <text class="item-log-col-status">操作</text>
+                    <text class="item-log-col-staff">操作人</text>
+                  </view>
+                  <view class="item-log-row" wx:for="{{rentItem.availableLog}}" wx:key="id" wx:for-item="log">
+                    <text class="item-log-col-date">{{log.dateStr}}</text>
+                    <text class="item-log-col-time">{{log.timeStr}}</text>
+                    <text class="item-log-col-status">{{log.status}}</text>
+                    <text class="item-log-col-staff">{{log.staff ? log.staff.name : '--'}}</text>
+                  </view>
+                  <view class="item-log-empty" wx:if="{{!rentItem.availableLog || rentItem.availableLog.length == 0}}">暂无发放记录</view>
                 </view>
-                <view class="item-log-empty" wx:if="{{!rentItem.availableLog || rentItem.availableLog.length == 0}}">暂无发放记录</view>
-              </view>
+              </block>
 
               <view class="rid-record-toggle" wx:if="{{rentItem.prev_id != null}}" bindtap="onToggleItemChange" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
                 <van-icon name="exchange" size="14px" color="#6f7881" />

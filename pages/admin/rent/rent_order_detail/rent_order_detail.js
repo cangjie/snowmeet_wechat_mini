@@ -336,6 +336,25 @@ Page({
     order.unRelieveGuaranty = unRelieveGuaranty
     order.unRelieveGuarantyStr = util.showAmount(unRelieveGuaranty)
     order.relieveGuarantyStr = util.showAmount(relieveGuaranty)
+
+    // 退款区订单级汇总：后端这几个是 [NotMapped] 计算属性，初次拉单时算好后随订单序列化下发；
+    // 但 getData 会逐条用 GetRental 替换 order.rentals，且改赔偿/超时/租金后只 refreshStatus 局部替换
+    // 单条 rental，这些订单级标量不会自动重算 → 结算金额（总计赔偿/实际应退）不更新。这里用最新 rentals
+    // 重新累加，口径与后端 Order getter 完全一致（赔偿/超时/减免均已含在 rental.totalSummary 内）。
+    var sumSummary = 0, sumOvertime = 0, sumRepair = 0
+    for (var ri = 0; order.rentals && ri < order.rentals.length; ri++) {
+      var rt = order.rentals[ri]
+      sumOvertime += rt.totalOvertimeAmount || 0
+      sumRepair += rt.totalRepairationAmount || 0
+      if (!rt.experience && !rt.entertain) sumSummary += rt.totalSummary || 0
+    }
+    order.totalRentSummaryAmount = sumSummary
+    order.totalRentOverTimeAmount = sumOvertime
+    order.totalRentRepairAmount = sumRepair
+    var paidGuaranty = (order.rentProperties && order.rentProperties.totalPaidGuarantyAmount) || 0
+    order.totalRentNeedToRefundAmount = paidGuaranty - sumSummary + (order.depositPaidAmount || 0)
+    order.totalRentUnRefund = order.totalRentNeedToRefundAmount - (order.refundAmount || 0)
+
     order.totalGuarantyAmountStr = util.showAmount(order.totalGuarantyAmount)
     order.totalRentSummaryAmountStr = util.showAmount(order.totalRentSummaryAmount)
     order.totalRentNeedToRefundAmountStr = util.showAmount(order.totalRentNeedToRefundAmount)
