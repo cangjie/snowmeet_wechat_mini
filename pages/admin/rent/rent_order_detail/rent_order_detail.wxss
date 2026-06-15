@@ -725,16 +725,17 @@
 
 /* ── 退款摘要 ─────────────────────────── */
 .refund-summary-grid {
-  display: flex; flex-wrap: wrap; gap: 12rpx;
+  display: flex; flex-wrap: nowrap; gap: 8rpx;
   margin-bottom: 16rpx;
 }
 .refund-summary-cell {
-  flex: 0 0 calc(50% - 6rpx);
+  flex: 1;
   background: #F8F8F8; border-radius: 8rpx;
-  padding: 10rpx 14rpx;
+  padding: 8rpx 8rpx;
+  min-width: 0;
 }
-.refund-summary-label { font-size: 22rpx; color: #999; margin-bottom: 2rpx; }
-.refund-summary-value { font-size: 28rpx; font-weight: 600; color: #333; }
+.refund-summary-label { font-size: 20rpx; color: #999; margin-bottom: 2rpx; }
+.refund-summary-value { font-size: 26rpx; font-weight: 600; color: #333; }
 .refund-amount-row { display: flex; justify-content: space-between; align-items: center; padding: 6rpx 0; }
 .refund-amount-label { font-size: 26rpx; color: #666; }
 .refund-amount-value { font-size: 28rpx; color: #333; font-weight: 600; }
