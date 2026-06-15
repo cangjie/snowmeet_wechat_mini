@@ -44,6 +44,12 @@ Page({
     _dayChargeDiscountOrig: '',
     _dayChargeWaived: false,
 
+    // 赔偿金额编辑弹窗（与租金明细弹窗同款）
+    _repairShow: false,
+    _repairItemId: null,
+    _repairAmount: '',
+    _repairAmountOrig: '',
+
     // 更换租赁物弹窗
     _chgShow: false,
     _chgItem: null,
@@ -693,48 +699,44 @@ Page({
     })
   },
 
+  // 点「赔偿」→ 弹出金额输入弹窗（与租金明细弹窗同款）；点开自动清空，原值作 placeholder
   onItemRepairEdit(e) {
     var ridx = parseInt(e.currentTarget.dataset.ridx)
     var iidx = parseInt(e.currentTarget.dataset.iidx)
     var ref = this._getItemRef(ridx, iidx)
     if (!ref) return
-    ref.item._repairEditing = true
-    ref.item._repairDraft = ref.item.totalRepairationAmount != null ? String(ref.item.totalRepairationAmount) : '0'
-    this.setData({ order: ref.order })
+    var cur = ref.item.totalRepairationAmount != null ? ref.item.totalRepairationAmount : 0
+    this.setData({
+      _repairShow: true,
+      _repairItemId: ref.item.id,
+      _repairAmount: '',
+      _repairAmountOrig: String(cur),
+    })
   },
 
-  onItemRepairInput(e) {
-    var ridx = parseInt(e.currentTarget.dataset.ridx)
-    var iidx = parseInt(e.currentTarget.dataset.iidx)
-    var ref = this._getItemRef(ridx, iidx)
-    if (!ref) return
-    ref.item._repairDraft = e.detail.value
-    this.setData({ order: ref.order })
+  onRepairInput(e) {
+    this.setData({ _repairAmount: e.detail.value })
   },
 
-  onItemRepairCancel(e) {
-    var ridx = parseInt(e.currentTarget.dataset.ridx)
-    var iidx = parseInt(e.currentTarget.dataset.iidx)
-    var ref = this._getItemRef(ridx, iidx)
-    if (!ref) return
-    ref.item._repairEditing = false
-    ref.item._repairDraft = ''
-    this.setData({ order: ref.order })
+  onRepairCancel() {
+    this.setData({ _repairShow: false })
   },
 
-  onItemRepairConfirm(e) {
+  onRepairConfirm() {
     var that = this
-    var ridx = parseInt(e.currentTarget.dataset.ridx)
-    var iidx = parseInt(e.currentTarget.dataset.iidx)
-    var ref = that._getItemRef(ridx, iidx)
-    if (!ref) return
-    var amount = parseFloat((ref.item._repairDraft || '').trim())
-    if (isNaN(amount) || amount < 0) {
+    var itemId = that.data._repairItemId
+    if (itemId == null) { that.setData({ _repairShow: false }); return }
+    // 留空 → 回退原值（与租金明细弹窗一致，点开无需退格删原金额）
+    var amount = that._resolveDayChargeVal(that.data._repairAmount, that.data._repairAmountOrig)
+    if (amount < 0) {
       wx.showToast({ title: '请输入有效赔偿金额', icon: 'none' })
       return
     }
-    var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemRepairAmount/' + ref.item.id + '?amount=' + amount + '&sessionKey=' + app.globalData.sessionKey
+    wx.showLoading({ title: '保存中' })
+    var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemRepairAmount/' + itemId + '?amount=' + amount + '&sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(setUrl, null).then(function (newRental) {
+      wx.hideLoading()
+      that.setData({ _repairShow: false })
       wx.showToast({ title: '赔偿已更新', icon: 'success' })
       if (newRental && newRental.id) {
         that.refreshStatus(newRental)
@@ -742,6 +744,7 @@ Page({
         that.getData()
       }
     }).catch(function () {
+      wx.hideLoading()
       wx.showToast({ title: '更新失败', icon: 'error' })
     })
   },

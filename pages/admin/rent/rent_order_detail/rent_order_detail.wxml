@@ -300,12 +300,7 @@
 
               <view class="rid-kv" wx:if="{{!rentItem.noNeed}}">
                 <text class="rid-kv-label">赔偿金额</text>
-                <block wx:if="{{rentItem._repairEditing}}">
-                  <input class="rid-kv-input" type="digit" value="{{rentItem._repairDraft}}" bindinput="onItemRepairInput" data-ridx="{{ridx}}" data-iidx="{{iidx}}" />
-                  <view class="rid-mini-btn" bindtap="onItemRepairCancel" data-ridx="{{ridx}}" data-iidx="{{iidx}}">取消</view>
-                  <view class="rid-mini-btn rid-mini-btn--primary" bindtap="onItemRepairConfirm" data-ridx="{{ridx}}" data-iidx="{{iidx}}">确认</view>
-                </block>
-                <view wx:else class="rid-kv-right">
+                <view class="rid-kv-right">
                   <text class="rid-kv-value">{{rentItem.totalRepairationAmountStr || '¥0.00'}}</text>
                   <view class="rid-kv-repair-btn" wx:if="{{!rentItem._replaced}}" bindtap="onItemRepairEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
                     <van-icon name="balance-o" size="13px" /><text>赔偿</text>
@@ -654,6 +649,21 @@
     <view class="dc-actions">
       <view class="dc-btn dc-btn--cancel" bindtap="onDayChargeCancel">取消</view>
       <view class="dc-btn dc-btn--confirm" bindtap="onDayChargeConfirm">确定</view>
+    </view>
+  </view>
+</view>
+
+<!-- 赔偿金额编辑弹窗（与租金明细弹窗同款） -->
+<view wx:if="{{_repairShow}}" class="dc-mask" bindtap="onRepairCancel" catchtouchmove="noop">
+  <view class="dc-card" catchtap="noop">
+    <view class="dc-title">修改赔偿金额</view>
+    <view class="dc-field">
+      <text class="dc-label">赔偿金额</text>
+      <input class="dc-input" type="digit" value="{{_repairAmount}}" bindinput="onRepairInput" placeholder="{{_repairAmountOrig}}" focus="{{_repairShow}}" />
+    </view>
+    <view class="dc-actions">
+      <view class="dc-btn dc-btn--cancel" bindtap="onRepairCancel">取消</view>
+      <view class="dc-btn dc-btn--confirm" bindtap="onRepairConfirm">确定</view>
     </view>
   </view>
 </view>
