@@ -746,53 +746,30 @@ Page({
     })
   },
 
-  onItemMemoEdit(e) {
-    var ridx = parseInt(e.currentTarget.dataset.ridx)
-    var iidx = parseInt(e.currentTarget.dataset.iidx)
-    var ref = this._getItemRef(ridx, iidx)
-    if (!ref) return
-    ref.item._memoEditing = true
-    ref.item._memoDraft = ref.item.memo || ''
-    this.setData({ order: ref.order })
-  },
-
-  onItemMemoInput(e) {
-    var ridx = parseInt(e.currentTarget.dataset.ridx)
-    var iidx = parseInt(e.currentTarget.dataset.iidx)
-    var ref = this._getItemRef(ridx, iidx)
-    if (!ref) return
-    ref.item._memoDraft = e.detail.value
-    this.setData({ order: ref.order })
-  },
-
-  onItemMemoCancel(e) {
-    var ridx = parseInt(e.currentTarget.dataset.ridx)
-    var iidx = parseInt(e.currentTarget.dataset.iidx)
-    var ref = this._getItemRef(ridx, iidx)
-    if (!ref) return
-    ref.item._memoEditing = false
-    ref.item._memoDraft = ''
-    this.setData({ order: ref.order })
-  },
-
-  onItemMemoConfirm(e) {
+  onItemMemoTap(e) {
     var that = this
     var ridx = parseInt(e.currentTarget.dataset.ridx)
     var iidx = parseInt(e.currentTarget.dataset.iidx)
     var ref = that._getItemRef(ridx, iidx)
     if (!ref) return
-    ref.item.memo = ref.item._memoDraft || ''
-    data.updateRentItemPromise(ref.item, '租赁订单详细页修改备注', app.globalData.sessionKey)
-      .then(function (newItem) {
-        newItem._memoEditing = false
-        newItem._memoDraft = ''
-        ref.order.rentals[ridx].rentItems[iidx] = newItem
-        that.renderOrder(ref.order)
-        that.setData({ order: ref.order })
-        wx.showToast({ title: '备注已保存', icon: 'success' })
-      }).catch(function () {
-        wx.showToast({ title: '保存失败', icon: 'error' })
-      })
+    wx.showModal({
+      title: '修改备注',
+      content: ref.item.memo || '',
+      editable: true,
+      complete: (res) => {
+        if (!res.confirm) return
+        ref.item.memo = res.content || ''
+        data.updateRentItemPromise(ref.item, '租赁订单详细页修改备注', app.globalData.sessionKey)
+          .then(function (newItem) {
+            ref.order.rentals[ridx].rentItems[iidx] = newItem
+            that.renderOrder(ref.order)
+            that.setData({ order: ref.order })
+            wx.showToast({ title: '备注已保存', icon: 'success' })
+          }).catch(function () {
+            wx.showToast({ title: '保存失败', icon: 'error' })
+          })
+      }
+    })
   },
 
   onToggleItemLog(e) {

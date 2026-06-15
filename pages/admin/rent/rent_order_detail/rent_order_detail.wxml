@@ -305,22 +305,18 @@
                   <view class="rid-mini-btn" bindtap="onItemRepairCancel" data-ridx="{{ridx}}" data-iidx="{{iidx}}">取消</view>
                   <view class="rid-mini-btn rid-mini-btn--primary" bindtap="onItemRepairConfirm" data-ridx="{{ridx}}" data-iidx="{{iidx}}">确认</view>
                 </block>
-                <text wx:else class="rid-kv-value">{{rentItem.totalRepairationAmountStr || '¥0.00'}}</text>
+                <view wx:else class="rid-kv-right">
+                  <text class="rid-kv-value">{{rentItem.totalRepairationAmountStr || '¥0.00'}}</text>
+                  <view class="rid-kv-repair-btn" wx:if="{{!rentItem._replaced}}" bindtap="onItemRepairEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                    <van-icon name="balance-o" size="13px" /><text>赔偿</text>
+                  </view>
+                </view>
               </view>
 
-              <view class="rid-kv">
-                <text class="rid-kv-label">备注</text>
-                <block wx:if="{{rentItem._memoEditing}}">
-                  <input class="rid-kv-input" value="{{rentItem._memoDraft}}" bindinput="onItemMemoInput" data-ridx="{{ridx}}" data-iidx="{{iidx}}" />
-                  <view class="rid-mini-btn" bindtap="onItemMemoCancel" data-ridx="{{ridx}}" data-iidx="{{iidx}}">取消</view>
-                  <view class="rid-mini-btn rid-mini-btn--primary" bindtap="onItemMemoConfirm" data-ridx="{{ridx}}" data-iidx="{{iidx}}">确认</view>
-                </block>
-                <view wx:else class="rid-kv-right">
-                  <text class="rid-kv-memo" wx:if="{{rentItem.memo}}">{{rentItem.memo}}</text>
-                  <view class="rid-link-btn" bindtap="onItemMemoEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
-                    <van-icon name="edit" size="13px" />
-                    <text>{{rentItem.memo ? '修改备注' : '添加备注'}}</text>
-                  </view>
+              <view class="rental-showcase-memo-row" style="margin-top:8rpx;">
+                <view class="rental-showcase-memo-box" bindtap="onItemMemoTap" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+                  <text wx:if="{{rentItem.memo}}">{{rentItem.memo}}</text>
+                  <text wx:else class="rental-memo-placeholder">添加备注</text>
                 </view>
               </view>
 
@@ -345,9 +341,6 @@
                     <van-icon name="revoke" size="15px" /><text>设未归还</text>
                   </view>
                 </block>
-                <view class="rid-act rid-act--danger" wx:if="{{!rentItem._repairEditing && !rentItem._replaced}}" bindtap="onItemRepairEdit" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
-                  <van-icon name="balance-o" size="15px" /><text>赔偿</text>
-                </view>
               </view>
 
               <view class="rid-record-toggle" bindtap="onToggleItemLog" data-ridx="{{ridx}}" data-iidx="{{iidx}}">

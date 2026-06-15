@@ -650,6 +650,20 @@
   font-size: 24rpx;
 }
 .rid-mini-btn--primary { background: #006495; border-color: #006495; color: #ffffff; }
+/* 赔偿按钮（移到「赔偿金额」行右侧的紧凑红色按钮） */
+.rid-kv-repair-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 6rpx 18rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid rgba(186, 26, 26, 0.5);
+  color: #ba1a1a;
+  font-size: 24rpx;
+  background: #ffffff;
+}
+.rid-kv-repair-btn:active { opacity: 0.85; }
 
 /* 操作按钮行（图标 + 文字，等宽） */
 .rid-actions {
