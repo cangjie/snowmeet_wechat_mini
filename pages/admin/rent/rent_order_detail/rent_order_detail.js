@@ -93,10 +93,22 @@ Page({
         for (var i = 0; i < rentals.length; i++) {
           if (rentals[i]) order.rentals[i] = rentals[i]
         }
-        order = that.renderOrder(order)
-        var allValid = that.checkAppendingRentalValid(order)
-        wx.hideLoading()
-        that.setData({ order, allValid })
+        var finish = function () {
+          order = that.renderOrder(order)
+          var allValid = that.checkAppendingRentalValid(order)
+          wx.hideLoading()
+          that.setData({ order, allValid })
+        }
+        // 补拉完整会员：GetOrderByStaff 的 order.member 不带 depositAccounts → availableDeposit=0，
+        // 「可用储值 / 储值付租金」要靠它（口径同旧版 rent_details 的 getMemberPromise）。
+        if (order.member_id) {
+          data.getMemberPromise(order.member_id, sessionKey).then(function (member) {
+            if (member && order.member) order.member.availableDeposit = member.availableDeposit
+            finish()
+          }).catch(function () { finish() })
+        } else {
+          finish()
+        }
       }).catch(function () { wx.hideLoading() })
     }).catch(function () { wx.hideLoading() })
   },
