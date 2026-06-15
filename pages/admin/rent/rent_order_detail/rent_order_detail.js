@@ -42,6 +42,20 @@ Page({
     _dayChargeRentOrig: '',
     _dayChargeOvertimeOrig: '',
     _dayChargeDiscountOrig: '',
+    _dayChargeWaived: false,
+
+    // 更换租赁物弹窗
+    _chgShow: false,
+    _chgItem: null,
+    _chgCategories: [],
+    _chgCategoryIdx: 0,
+    _chgCategoryId: null,
+    _chgCategoryName: '',
+    _chgNoCode: false,
+    _chgCode: '',
+    _chgName: '',
+    _chgMemo: '',
+    _chgValid: false,
   },
 
   onLoad(options) {
@@ -186,31 +200,48 @@ Page({
         rentItem._returned = rentItem.returnDate != null
       }
 
-      // 租金明细（按天聚合：每天一行，含 租金 / 超时费 / 减免 / 小计；赔偿金按租赁物维度，不进此表）
+      // 租金明细（按天聚合：每天一行；免除天连 valid=0 一起纳入并划线；赔偿金按租赁物维度不进此表）
       var feeDayMap = {}
       var feeRows = []
       for (var j = 0; rental.details && j < rental.details.length; j++) {
         var detail = rental.details[j]
-        if (detail.valid != 1) continue
         var ct = (detail.charge_type || '').trim()
         if (ct != '租金' && ct != '超时费') continue
         var dayKey = util.formatDate(new Date(detail.rental_date))
         var row = feeDayMap[dayKey]
         if (!row) {
-          row = { dateStr: dayKey, rentDetailId: null, rent: 0, overtime: 0, discount: 0 }
+          row = { dateStr: dayKey, rentDetailId: null, rent: 0, overtime: 0, discount: 0,
+                  waived: false, _rentValid1: false, _otValidSum: 0, _otAllSum: 0 }
           feeDayMap[dayKey] = row
           feeRows.push(row)
         }
         if (ct == '租金') {
-          row.rentDetailId = detail.id
-          row.rent = parseFloat(detail.amount) || 0
-          row.discount = parseFloat(detail.othersDiscountAmount) || 0
-        } else {
-          row.overtime += parseFloat(detail.amount) || 0
+          var isV1 = (detail.valid == 1)
+          // 优先取 valid=1 的租金明细；该天只有 valid=0 时标记免除（仍取原值供恢复/划线展示）
+          if (isV1 || !row._rentValid1) {
+            row.rentDetailId = detail.id
+            row.rent = parseFloat(detail.amount) || 0
+            // 当天非票券「日租金」减免（不论 valid，取原值——免除后 valid=0 仍能取到）
+            var dsum = 0
+            var dl = detail.discounts || []
+            for (var di = 0; di < dl.length; di++) {
+              var dd = dl[di]
+              if (dd && (dd.ticket_code == null || dd.ticket_code === '')) dsum += parseFloat(dd.amount) || 0
+            }
+            row.discount = dsum
+            row.waived = !isV1
+            if (isV1) row._rentValid1 = true
+          }
+        } else { // 超时费
+          var oamt = parseFloat(detail.amount) || 0
+          row._otAllSum += oamt
+          if (detail.valid == 1) row._otValidSum += oamt
         }
       }
       for (var fi = 0; fi < feeRows.length; fi++) {
         var r0 = feeRows[fi]
+        // 免除天取全部超时费（含 valid=0 原值供恢复/划线）；正常天只取 valid=1
+        r0.overtime = r0.waived ? r0._otAllSum : r0._otValidSum
         r0.subtotal = r0.rent + r0.overtime - r0.discount
         r0.rentStr = util.showAmount(r0.rent)
         r0.overtimeStr = util.showAmount(r0.overtime)
@@ -354,6 +385,7 @@ Page({
       _dayChargeRentOrig: String(row.rent),
       _dayChargeOvertimeOrig: String(row.overtime),
       _dayChargeDiscountOrig: String(row.discount),
+      _dayChargeWaived: !!row.waived,
     })
   },
   onDayChargeInput(e) {
@@ -362,6 +394,9 @@ Page({
   },
   onDayChargeCancel() {
     this.setData({ _dayChargeShow: false })
+  },
+  onDayChargeWaivedToggle() {
+    this.setData({ _dayChargeWaived: !this.data._dayChargeWaived })
   },
   noop() {},
   // 输入留空 → 回退到原值（点输入框后无需退格删原金额，直接输入即可）
@@ -386,7 +421,7 @@ Page({
     var discount = that._resolveDayChargeVal(that.data._dayChargeDiscount, that.data._dayChargeDiscountOrig)
     wx.showLoading({ title: '保存中' })
     data.updateRentalDayChargesPromise(rentalId, detailId, rent, overtime, discount,
-      '租赁订单详细页修改租金明细', app.globalData.sessionKey)
+      '租赁订单详细页修改租金明细', app.globalData.sessionKey, that.data._dayChargeWaived)
       .then(function (updatedRental) {
         var od = that.data.order
         if (updatedRental) od.rentals[ridx] = updatedRental
@@ -500,12 +535,141 @@ Page({
     })
   },
 
-  onItemChange(e) {
-    var itemId = e.currentTarget.dataset.id
+  refreshStatus(newRental) {
     var order = this.data.order
+    if (!order || !order.rentals) { this.getData(); return }
+    for (var i = 0; i < order.rentals.length; i++) {
+      if (order.rentals[i].id == newRental.id) {
+        order.rentals[i] = newRental
+        break
+      }
+    }
+    order = this.renderOrder(order)
+    this.setData({ order })
+  },
+
+  onItemChange(e) {
+    var that = this
+    var itemId = e.currentTarget.dataset.id
+    var order = that.data.order
     if (!order || !itemId) return
-    wx.navigateTo({
-      url: '/pages/admin/rent/rent_item_change?orderId=' + order.id.toString() + '&rentItemId=' + itemId.toString()
+
+    var foundItem = null
+    for (var ri = 0; order.rentals && ri < order.rentals.length; ri++) {
+      var rental = order.rentals[ri]
+      for (var ii = 0; rental.rentItems && ii < rental.rentItems.length; ii++) {
+        if (rental.rentItems[ii].id == itemId) { foundItem = rental.rentItems[ii]; break }
+      }
+      if (foundItem) break
+    }
+    if (!foundItem) return
+
+    wx.showLoading({ title: '加载中' })
+    data.queryRentItemChangeCompatibleCategory(foundItem.category_id).then(function (categories) {
+      var chgCategories = []
+      for (var i = 0; categories && i < categories.length; i++) {
+        chgCategories.push({ id: categories[i].id, name: categories[i].name })
+      }
+      var defaultIdx = 0
+      for (var i = 0; i < chgCategories.length; i++) {
+        if (chgCategories[i].id == foundItem.category_id) { defaultIdx = i; break }
+      }
+      wx.hideLoading()
+      that.setData({
+        _chgShow: true,
+        _chgItem: foundItem,
+        _chgCategories: chgCategories,
+        _chgCategoryIdx: defaultIdx,
+        _chgCategoryId: chgCategories.length > 0 ? chgCategories[defaultIdx].id : null,
+        _chgCategoryName: chgCategories.length > 0 ? chgCategories[defaultIdx].name : '',
+        _chgNoCode: false,
+        _chgCode: '',
+        _chgName: '',
+        _chgMemo: '',
+        _chgValid: false,
+      })
+    }).catch(function () {
+      wx.hideLoading()
+      wx.showToast({ title: '加载失败', icon: 'error' })
+    })
+  },
+
+  onChgCancel() {
+    this.setData({ _chgShow: false })
+  },
+
+  onChgNoCodeToggle() {
+    var noCode = !this.data._chgNoCode
+    this.setData({ _chgNoCode: noCode, _chgCode: '', _chgName: '', _chgValid: false })
+  },
+
+  onChgCodeInput(e) {
+    var code = e.detail.value
+    this.setData({ _chgCode: code, _chgValid: !!(code && code.trim()) })
+  },
+
+  onChgNameInput(e) {
+    var name = e.detail.value
+    this.setData({ _chgName: name, _chgValid: !!(name && name.trim()) })
+  },
+
+  onChgMemoInput(e) {
+    this.setData({ _chgMemo: e.detail.value })
+  },
+
+  onChgCategoryChange(e) {
+    var idx = parseInt(e.detail.value)
+    var cats = this.data._chgCategories
+    if (idx >= 0 && idx < cats.length) {
+      this.setData({ _chgCategoryIdx: idx, _chgCategoryId: cats[idx].id, _chgCategoryName: cats[idx].name })
+    }
+  },
+
+  onChgScan() {
+    var that = this
+    wx.scanCode({ onlyFromCamera: false, success: function (res) {
+      var code = res.result
+      that.setData({ _chgCode: code, _chgValid: !!(code && code.trim()) })
+    } })
+  },
+
+  onChgConfirm() {
+    var that = this
+    if (!that.data._chgValid) return
+    var rentItem = that.data._chgItem
+    var newItem = {
+      noCode: that.data._chgNoCode,
+      code: that.data._chgNoCode ? '' : that.data._chgCode,
+      name: that.data._chgName,
+      category_id: that.data._chgCategoryId,
+      class_name: that.data._chgCategoryName,
+      memo: that.data._chgMemo,
+    }
+    var catName = that.data._chgCategoryName || ''
+    var msg = rentItem.category_id == newItem.category_id
+      ? catName + ' 同品类租赁物更换'
+      : '更换为分类：' + catName
+    wx.showModal({
+      title: '确认更换',
+      content: msg,
+      complete: function (res) {
+        if (!res.confirm) return
+        var changeUrl = app.globalData.requestPrefix + 'Rent/ChangeRentItemByStaff/' + rentItem.id + '?sessionKey=' + app.globalData.sessionKey
+        wx.showLoading({ title: '更换中' })
+        util.performWebRequest(changeUrl, newItem).then(function (newRental) {
+          wx.hideLoading()
+          that.setData({ _chgShow: false })
+          wx.showToast({ title: '更换成功', icon: 'success' })
+          if (newRental && newRental.id) {
+            that.refreshStatus(newRental)
+          } else {
+            that.getData()
+          }
+        }).catch(function () {
+          wx.hideLoading()
+          wx.showToast({ title: '更换失败', icon: 'error' })
+        })
+      }
     })
   },
 

@@ -232,7 +232,7 @@
                 <text class="detail-col-discount">减免</text>
                 <text class="detail-col-subtotal">小计</text>
               </view>
-              <view class="detail-table-row detail-table-row--tappable" wx:for="{{item.feeRows}}" wx:key="dateStr" wx:for-item="row" wx:for-index="fidx" bindtap="onEditDayCharge" data-ridx="{{ridx}}" data-fidx="{{fidx}}">
+              <view class="detail-table-row detail-table-row--tappable {{row.waived ? 'detail-table-row--waived' : ''}}" wx:for="{{item.feeRows}}" wx:key="dateStr" wx:for-item="row" wx:for-index="fidx" bindtap="onEditDayCharge" data-ridx="{{ridx}}" data-fidx="{{fidx}}">
                 <text class="detail-col-date">{{row.dateStr}}</text>
                 <text class="detail-col-amount">{{row.rentStr}}</text>
                 <text class="detail-col-overtime">{{row.overtimeStr}}</text>
@@ -512,6 +512,129 @@
   </van-button>
 </view>
 
+<!-- 更换租赁物弹窗 -->
+<view wx:if="{{_chgShow}}" class="chg-overlay" catchtouchmove="noop">
+  <view class="chg-header">
+    <view class="chg-close-btn" bindtap="onChgCancel">
+      <van-icon name="cross" size="20px" color="#333" />
+    </view>
+    <text class="chg-title">更换租赁物</text>
+    <view style="width:60rpx;"></view>
+  </view>
+
+  <scroll-view class="chg-body" scroll-y>
+    <!-- 现租赁物 -->
+    <view class="chg-section">
+      <view class="chg-section-label">现租赁物</view>
+      <view class="chg-cur-card">
+        <view class="chg-cur-head">
+          <view class="chg-cur-icon">
+            <van-icon name="goods-collect-o" size="20px" color="#006495" />
+          </view>
+          <view class="chg-cur-main">
+            <text class="chg-cur-name">{{_chgItem.name || '—'}}</text>
+            <text class="chg-cur-sub">{{_chgItem.noCode ? '无编码' : (_chgItem.code || '—')}}</text>
+          </view>
+          <view class="chip chip--status-unreturned">待替换</view>
+        </view>
+        <view class="chg-cur-rows">
+          <view class="chg-row">
+            <text class="chg-row-label">编码</text>
+            <text class="chg-row-val">{{_chgItem.noCode ? '无编码' : (_chgItem.code || '—')}}</text>
+          </view>
+          <view class="chg-row">
+            <text class="chg-row-label">名称</text>
+            <text class="chg-row-val">{{_chgItem.name || '—'}}</text>
+          </view>
+          <view class="chg-row">
+            <text class="chg-row-label">分类</text>
+            <text class="chg-row-val">{{_chgItem.class_name || '—'}}</text>
+          </view>
+          <view class="chg-row">
+            <text class="chg-row-label">发放人</text>
+            <text class="chg-row-val">{{_chgItem.pickStaff ? _chgItem.pickStaff.name : '—'}}</text>
+          </view>
+          <view class="chg-row">
+            <text class="chg-row-label">发放时间</text>
+            <text class="chg-row-val">{{_chgItem.pickDateStr}} {{_chgItem.pickTimeStr}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 新租赁物 -->
+    <view class="chg-section">
+      <view class="chg-section-label">新租赁物</view>
+      <view class="chg-hint-text">规则同新增租赁物</view>
+
+      <view class="chg-form-card">
+        <!-- 编码 -->
+        <view class="chg-form-row">
+          <text class="chg-form-label">编码</text>
+          <view class="chg-form-right">
+            <input class="chg-form-input" disabled="{{_chgNoCode}}"
+              value="{{_chgCode}}"
+              placeholder="{{_chgNoCode ? '无编码' : '输入或扫描编码'}}"
+              bindinput="onChgCodeInput" />
+            <view wx:if="{{!_chgNoCode}}" class="chg-scan-btn" bindtap="onChgScan">
+              <van-icon name="scan" size="18px" color="#006495" />
+            </view>
+          </view>
+        </view>
+
+        <!-- 无编码 -->
+        <view class="chg-form-row chg-form-row--toggle" bindtap="onChgNoCodeToggle">
+          <view class="chg-toggle-box">
+            <view class="chg-toggle-dot {{_chgNoCode ? 'chg-toggle-dot--on' : ''}}"></view>
+            <text class="chg-form-label">无编码</text>
+            <text class="chg-toggle-desc">该租赁物无物理编码</text>
+          </view>
+          <text class="chg-required">*</text>
+        </view>
+
+        <!-- 分类 -->
+        <view class="chg-form-row">
+          <text class="chg-form-label">分类<text class="chg-required">*</text></text>
+          <picker class="chg-picker-wrap" mode="selector"
+            range="{{_chgCategories}}" range-key="name" value="{{_chgCategoryIdx}}"
+            bindchange="onChgCategoryChange">
+            <view class="chg-picker-val">
+              <text>{{_chgCategoryName || '请选择'}}</text>
+              <van-icon name="arrow" size="14px" color="#999" />
+            </view>
+          </picker>
+        </view>
+
+        <!-- 名称 -->
+        <view class="chg-form-row">
+          <text class="chg-form-label">名称</text>
+          <input class="chg-form-input" disabled="{{!_chgNoCode}}"
+            value="{{_chgName}}"
+            placeholder="{{_chgNoCode ? '请输入名称' : '由编码自动填入'}}"
+            bindinput="onChgNameInput" />
+        </view>
+
+        <!-- 备注 -->
+        <view class="chg-form-row chg-form-row--last">
+          <text class="chg-form-label">备注</text>
+          <input class="chg-form-input" value="{{_chgMemo}}" placeholder="选填" bindinput="onChgMemoInput" />
+        </view>
+      </view>
+    </view>
+
+    <view class="chg-notice">
+      确认后：原租赁物自动归还，新租赁物按当前租赁商品发放，押金与租金保持不变。
+    </view>
+  </scroll-view>
+
+  <view class="chg-footer">
+    <view class="chg-btn chg-btn--cancel" bindtap="onChgCancel">取消</view>
+    <view class="chg-btn chg-btn--confirm {{_chgValid ? '' : 'chg-btn--disabled'}}" bindtap="onChgConfirm">
+      <van-icon name="success" size="16px" /><text>确认更换</text>
+    </view>
+  </view>
+</view>
+
 <!-- 租金明细按天编辑弹窗 -->
 <view wx:if="{{_dayChargeShow}}" class="dc-mask" bindtap="onDayChargeCancel" catchtouchmove="noop">
   <view class="dc-card" catchtap="noop">
@@ -519,15 +642,21 @@
     <view class="dc-date">{{_dayChargeDate}}</view>
     <view class="dc-field">
       <text class="dc-label">租金</text>
-      <input class="dc-input" type="digit" value="{{_dayChargeRent}}" data-field="Rent" bindinput="onDayChargeInput" placeholder="{{_dayChargeRentOrig}}" />
+      <input class="dc-input {{_dayChargeWaived ? 'dc-input--disabled' : ''}}" type="digit" disabled="{{_dayChargeWaived}}" value="{{_dayChargeRent}}" data-field="Rent" bindinput="onDayChargeInput" placeholder="{{_dayChargeRentOrig}}" />
     </view>
     <view class="dc-field">
       <text class="dc-label">超时费</text>
-      <input class="dc-input" type="digit" value="{{_dayChargeOvertime}}" data-field="Overtime" bindinput="onDayChargeInput" placeholder="{{_dayChargeOvertimeOrig}}" />
+      <input class="dc-input {{_dayChargeWaived ? 'dc-input--disabled' : ''}}" type="digit" disabled="{{_dayChargeWaived}}" value="{{_dayChargeOvertime}}" data-field="Overtime" bindinput="onDayChargeInput" placeholder="{{_dayChargeOvertimeOrig}}" />
     </view>
     <view class="dc-field">
       <text class="dc-label">减免</text>
-      <input class="dc-input" type="digit" value="{{_dayChargeDiscount}}" data-field="Discount" bindinput="onDayChargeInput" placeholder="{{_dayChargeDiscountOrig}}" />
+      <input class="dc-input {{_dayChargeWaived ? 'dc-input--disabled' : ''}}" type="digit" disabled="{{_dayChargeWaived}}" value="{{_dayChargeDiscount}}" data-field="Discount" bindinput="onDayChargeInput" placeholder="{{_dayChargeDiscountOrig}}" />
+    </view>
+    <view class="dc-field dc-field--waive" bindtap="onDayChargeWaivedToggle">
+      <text class="dc-label">免除本日全部费用</text>
+      <view class="dc-checkbox {{_dayChargeWaived ? 'dc-checkbox--on' : ''}}">
+        <text wx:if="{{_dayChargeWaived}}" class="dc-checkbox-tick">✓</text>
+      </view>
     </view>
     <view class="dc-actions">
       <view class="dc-btn dc-btn--cancel" bindtap="onDayChargeCancel">取消</view>

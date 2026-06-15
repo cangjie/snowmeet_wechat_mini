@@ -753,3 +753,131 @@
 .bottom-btn--add { background: #006495; color: #fff; border-color: #006495; }
 .bottom-btn--confirm { background: #006495; color: #fff; border-color: #006495; }
 .bottom-btn--disabled { background: #ccc !important; color: #fff !important; border-color: #ccc !important; }
+
+/* ── 更换租赁物弹窗 ─────────────────────── */
+.chg-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: #f8f9fa; z-index: 900;
+  display: flex; flex-direction: column;
+}
+.chg-header {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 88rpx; padding: 0 24rpx;
+  background: #fff; border-bottom: 1rpx solid #f0f0f0;
+}
+.chg-close-btn { width: 60rpx; display: flex; align-items: center; }
+.chg-title { font-size: 32rpx; font-weight: 600; color: #1a1a1a; }
+
+.chg-body { flex: 1; overflow-y: auto; }
+.chg-section { padding: 20rpx 24rpx 8rpx; }
+.chg-section-label {
+  font-size: 26rpx; font-weight: 600; color: #3f4850;
+  padding-left: 12rpx; border-left: 4rpx solid #2EA6D0;
+  margin-bottom: 14rpx;
+}
+.chg-hint-text { font-size: 22rpx; color: #999; margin-bottom: 14rpx; }
+
+/* 现租赁物卡片 */
+.chg-cur-card {
+  background: #fff; border-radius: 12rpx;
+  border: 1rpx solid rgba(191,199,209,0.5); overflow: hidden;
+}
+.chg-cur-head {
+  display: flex; align-items: center; gap: 14rpx;
+  background: #eff4ff; padding: 14rpx 16rpx;
+}
+.chg-cur-icon {
+  width: 52rpx; height: 52rpx; border-radius: 10rpx;
+  background: #fff; border: 1rpx solid rgba(191,199,209,0.5);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.chg-cur-main { flex: 1; min-width: 0; }
+.chg-cur-name { display: block; font-size: 28rpx; font-weight: 700; color: #0b1c30; }
+.chg-cur-sub { display: block; font-size: 22rpx; color: #6f7881; margin-top: 2rpx; }
+.chg-cur-rows { padding: 4rpx 16rpx; }
+.chg-row {
+  display: flex; align-items: center; min-height: 52rpx;
+  border-bottom: 1rpx solid rgba(191,199,209,0.25); font-size: 26rpx;
+}
+.chg-row:last-child { border-bottom: none; }
+.chg-row-label { color: #6f7881; flex: 0 0 120rpx; }
+.chg-row-val { color: #0b1c30; flex: 1; }
+
+/* 新租赁物表单卡片 */
+.chg-form-card {
+  background: #fff; border-radius: 12rpx;
+  border: 1rpx solid rgba(191,199,209,0.45); overflow: hidden;
+}
+.chg-form-row {
+  display: flex; align-items: center;
+  min-height: 88rpx; padding: 0 20rpx;
+  border-bottom: 1rpx solid rgba(191,199,209,0.3);
+  gap: 16rpx;
+}
+.chg-form-row--toggle { }
+.chg-form-row--last { border-bottom: none; }
+.chg-form-label { font-size: 28rpx; color: #3f4850; flex: 0 0 96rpx; }
+.chg-form-right { flex: 1; display: flex; align-items: center; gap: 10rpx; }
+.chg-form-input { flex: 1; font-size: 28rpx; color: #0b1c30; min-height: 60rpx; }
+.chg-scan-btn { padding: 10rpx; flex-shrink: 0; }
+.chg-required { color: #e64340; font-size: 24rpx; flex-shrink: 0; }
+
+/* 无编码 toggle */
+.chg-toggle-box { flex: 1; display: flex; align-items: center; gap: 14rpx; }
+.chg-toggle-dot {
+  width: 20rpx; height: 20rpx; border-radius: 50%;
+  border: 2rpx solid #bfc7d1; flex-shrink: 0; box-sizing: border-box;
+}
+.chg-toggle-dot--on { background: #006495; border-color: #006495; }
+.chg-toggle-desc { font-size: 24rpx; color: #999; }
+
+/* 分类 picker */
+.chg-picker-wrap { flex: 1; }
+.chg-picker-val {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 60rpx; font-size: 28rpx; color: #0b1c30;
+}
+
+/* 说明文字 */
+.chg-notice {
+  margin: 8rpx 24rpx 32rpx;
+  font-size: 22rpx; color: #999; line-height: 1.7;
+  padding: 16rpx 18rpx;
+  background: #fff; border-radius: 10rpx;
+  border: 1rpx solid rgba(191,199,209,0.3);
+}
+
+/* 底部按钮 */
+.chg-footer {
+  flex-shrink: 0;
+  display: flex; gap: 16rpx;
+  padding: 16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: #fff; border-top: 1rpx solid #f0f0f0;
+}
+.chg-btn {
+  flex: 1; height: 88rpx; border-radius: 12rpx;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8rpx; font-size: 30rpx;
+}
+.chg-btn--cancel { background: #f2f3f5; color: #666; }
+.chg-btn--confirm { background: #006495; color: #fff; }
+.chg-btn--disabled { opacity: 0.45; }
+.chg-btn:active { opacity: 0.85; }
+
+/* 免除态：整行划线 */
+.detail-table-row--waived { text-decoration: line-through; color: #b0b0b0; }
+.detail-table-row--waived .detail-col-date,
+.detail-table-row--waived .detail-col-amount,
+.detail-table-row--waived .detail-col-overtime,
+.detail-table-row--waived .detail-col-discount,
+.detail-table-row--waived .detail-col-subtotal { color: #b0b0b0; }
+
+/* 弹窗：免除复选框行 + 禁用态输入框 */
+.dc-checkbox {
+  width: 40rpx; height: 40rpx; border: 2rpx solid #c8cdd4; border-radius: 8rpx;
+  display: flex; align-items: center; justify-content: center; background: #fff;
+}
+.dc-checkbox--on { background: #2EA6D0; border-color: #2EA6D0; }
+.dc-checkbox-tick { color: #fff; font-size: 28rpx; line-height: 1; }
+.dc-input--disabled { color: #b0b0b0; background: #eef0f2; }

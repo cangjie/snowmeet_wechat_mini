@@ -663,10 +663,11 @@ const updateRentalDetailsPromise = function (details, scene, sessionKey) {
     })
   })
 }
-// 按天一次性修改：当天租金 + 减免 + 超时费（超时费按天 upsert）
-const updateRentalDayChargesPromise = function (rentalId, rentDetailId, rent, overtime, discount, scene, sessionKey) {
+// 按天一次性修改：当天租金 + 减免 + 超时费（按天 upsert）；waived=true 免除当天全部费用
+const updateRentalDayChargesPromise = function (rentalId, rentDetailId, rent, overtime, discount, scene, sessionKey, waived) {
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalDayChargesByStaff/' + rentalId
     + '?rentDetailId=' + rentDetailId + '&rent=' + rent + '&overtime=' + overtime + '&discount=' + discount
+    + '&waived=' + (waived ? 'true' : 'false')
     + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
     util.performWebRequest(updateUrl, {}).then(function (rental) {
