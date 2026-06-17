@@ -22,7 +22,8 @@ Component({
     subPayMethodIndex: null,
     subPayMethod: '',
     inputedPayMethod: '',
-    loadingQr: false
+    loadingQr: false,
+    isZeroAmount: false
   },
   lifetimes: {
     attached() {
@@ -53,11 +54,17 @@ Component({
       var orderId = that.properties.orderId
       if (!orderId) return
       data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
-        that.setData({
+        var patch = {
           order: order,
           payingAmountStr: util.showAmount(order.paying_amount)
-        })
+        }
+        if (order.paying_amount == 0) { patch.isZeroAmount = true }
+        that.setData(patch)
       })
+    },
+
+    onConfirmFreeOrder() {
+      this.effectUnpaidOrder('免费')
     },
 
     onMethodTap(e) {

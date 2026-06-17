@@ -475,12 +475,18 @@ Component({
       this._emitSync(false);
     },
 
-    // 招待：勾选后该 rental 免租金（后端 totalSummary 排除租金），entertain 随 syncRent 落库
+    // 招待：勾选后该 rental 免单 —— entertain 落库（后端 totalSummary 排除租金），
+    // 并把押金、租金/日 默认归零（仍可手动改回）。
     onPkgEntertainToggle(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
       const checked = e.detail.value.length > 0;
       this.setData({ [`displayRentals[${ridx}].entertain`]: checked });
-      this._emitSync(false);
+      if (checked) {
+        this._applyPkgDeposit(ridx, 0); // 押金归零（含 guaranty / realGuaranty / _depositInput）
+        this._applyPkgRate(ridx, 0);    // 租金/日归零（含 pricePresets / _dailyRateInput）
+      } else {
+        this._emitSync(false);
+      }
     },
 
     _setPkgDate(ridx, date) {
