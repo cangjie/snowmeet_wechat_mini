@@ -963,17 +963,17 @@ Page({
     if (order.depositPaidAmount > 0) return
     // 取消勾选：直接关
     if (that.data.payWithDeposit) {
-      // 必须先落 payWithDeposit 再 renderOrder：renderOrder 读取 this.data.payWithDeposit 决定
-      // 是否把租金加回「实际应退」；若与 renderOrder 放进同一个 setData，参数里的 renderOrder 会
-      // 先用旧值算好，导致「实际应退」落后一拍、与勾选状态相反。
-      that.setData({ payWithDeposit: false })
-      that.setData({ order: that.renderOrder(order) })
+      // renderOrder 读 this.data.payWithDeposit 决定是否把租金加回「实际应退」。实测 setData 之后
+      // 紧接着读 this.data 仍是旧值，故不能依赖 setData 的「同步更新 this.data」，必须先显式赋值，
+      // 否则「实际应退」会与勾选状态对不上（勾上仍按未勾算）。直接改对象属性是纯 JS 同步操作。
+      that.data.payWithDeposit = false
+      that.setData({ payWithDeposit: false, order: that.renderOrder(order) })
       return
     }
     // 勾上：储值是会员资产，需先通过微信身份核验（wechat_unverified==1 即已核验本人）
     if (order.wechat_unverified) {
-      that.setData({ payWithDeposit: true })
-      that.setData({ order: that.renderOrder(order) })
+      that.data.payWithDeposit = true
+      that.setData({ payWithDeposit: true, order: that.renderOrder(order) })
       return
     }
     // 未核验 → 弹微信核验二维码 + 轮询，核验通过（扫码人=订单会员）才放行勾选
@@ -1000,9 +1000,9 @@ Page({
         if (res && res.verified) {
           that._stopVerifyPolling()
           order.wechat_unverified = true
-          // 同上：先落 payWithDeposit 再 renderOrder，避免「实际应退」用到旧值
-          that.setData({ payWithDeposit: true })
-          that.setData({ _verifyShow: false, order: that.renderOrder(order) })
+          // 同上：显式置位 payWithDeposit（不依赖 setData 同步），再 renderOrder
+          that.data.payWithDeposit = true
+          that.setData({ _verifyShow: false, payWithDeposit: true, order: that.renderOrder(order) })
           wx.showToast({ title: '核验成功', icon: 'success' })
         }
       }).catch(function () { /* 轮询失败忽略，下个周期再试 */ })
