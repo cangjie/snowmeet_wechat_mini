@@ -30,9 +30,9 @@
         <view class="kv-cell">
           <text class="kv-label">手机</text>
           <text
-            class="kv-value kv-value--inline kv-value--nowrap {{order.member.cell ? 'kv-value--link' : ''}}"
+            class="kv-value kv-value--inline kv-value--nowrap {{order.customerCell ? 'kv-value--link' : ''}}"
             bindtap="onCall"
-          >{{order.member.cell || '—'}}</text>
+          >{{order.customerCell || '—'}}</text>
         </view>
         <view class="kv-cell kv-cell--right kv-cell--shop">
           <text class="kv-label">门店</text>
