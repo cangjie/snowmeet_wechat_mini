@@ -179,8 +179,9 @@ Page({
         rental.end_dateDateStr = util.formatDate(endDate)
         rental.end_dateTimeStr = util.formatTimeStr(endDate)
       } else {
-        rental.end_dateDateStr = '——'
-        rental.end_dateTimeStr = '——'
+        // 未归还时 end_date 为空：显示「未退租」而非破折号，归还后自动展示真实退租时间
+        rental.end_dateDateStr = '未退租'
+        rental.end_dateTimeStr = ''
       }
 
       // 租赁物明细
