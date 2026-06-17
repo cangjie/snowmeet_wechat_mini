@@ -290,6 +290,19 @@ Page({
         r0.subtotalStr = util.showAmount(r0.subtotal)
       }
       rental.feeRows = feeRows
+
+      // 截止到当前的租金：累计 rental_date 不晚于今天的有效「租金」明细（毛额，招待也照常显示）
+      var rentToNow = 0
+      var todayEnd = new Date()
+      todayEnd.setHours(23, 59, 59, 999)
+      for (var di = 0; rental.details && di < rental.details.length; di++) {
+        var rd = rental.details[di]
+        if ((rd.charge_type || '').trim() == '租金' && rd.valid == 1 && new Date(rd.rental_date) <= todayEnd) {
+          rentToNow += parseFloat(rd.amount) || 0
+        }
+      }
+      rental._rentToNow = rentToNow
+      rental._rentToNowStr = util.showAmount(rentToNow)
     }
 
     // appendingRentals 处理（追加中的租赁）

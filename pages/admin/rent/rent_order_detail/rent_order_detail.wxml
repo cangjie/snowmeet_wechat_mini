@@ -138,6 +138,7 @@
           </view>
           <text class="rental-head-name">{{item.name}}</text>
           <view class="rental-head-meta">
+            <view class="rental-head-fee">租金<text>{{item._rentToNowStr}}</text></view>
             <view class="rental-head-fee">押金<text>{{item.guarantyAmountStr}}</text></view>
             <van-icon name="{{_expandedRentals[ridx] ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#999" />
           </view>
@@ -150,7 +151,7 @@
           <view class="rental-showcase">
             <view class="rental-showcase-summary">
               <text>押金 <text class="rental-showcase-summary-value">{{item.guarantyAmountStr}}</text></text>
-              <text>租金 <text class="rental-showcase-summary-value rental-showcase-summary-value--accent">¥{{item.totalRentSummaryAmount || 0}}</text></text>
+              <text>租金 <text class="rental-showcase-summary-value rental-showcase-summary-value--accent">¥{{item._rentToNow || 0}}</text></text>
             </view>
 
             <view class="rental-showcase-time-row">
@@ -170,7 +171,7 @@
             <view class="rental-showcase-fee-grid">
               <view class="rental-showcase-fee-cell">
                 <text class="rental-showcase-fee-label">租金</text>
-                <text class="rental-showcase-fee-value">¥{{item.totalRentSummaryAmount || 0}}</text>
+                <text class="rental-showcase-fee-value">¥{{item._rentToNow || 0}}</text>
               </view>
               <view class="rental-showcase-fee-cell">
                 <text class="rental-showcase-fee-label">减免</text>
@@ -182,7 +183,7 @@
               </view>
               <view class="rental-showcase-fee-cell">
                 <text class="rental-showcase-fee-label">超时</text>
-                <text class="rental-showcase-fee-value">¥{{item.totalOverTimeAmount || 0}}</text>
+                <text class="rental-showcase-fee-value">¥{{item.totalOvertimeAmount || 0}}</text>
               </view>
               <view class="rental-showcase-fee-cell">
                 <text class="rental-showcase-fee-label">招待</text>
@@ -192,7 +193,7 @@
 
             <view class="rental-showcase-subtotal">
               <text class="rental-showcase-subtotal-label">小计</text>
-              <text class="rental-showcase-subtotal-value">¥{{item.totalSummaryAmount || 0}}</text>
+              <text class="rental-showcase-subtotal-value">¥{{item.totalSummary || 0}}</text>
             </view>
 
             <view class="rental-showcase-memo-row">
