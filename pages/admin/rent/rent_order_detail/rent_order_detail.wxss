@@ -161,10 +161,10 @@
   gap: 8rpx;
 }
 .pay-table-row:last-child { border-bottom: none; }
-.pay-col-date { flex: 0 0 120rpx; color: #666; font-size: 22rpx; }
-.pay-col-method { flex: 1; color: #666; }
-.pay-col-type { flex: 0 0 60rpx; }
-.pay-col-amount { flex: 0 0 130rpx; text-align: right; font-weight: 600; }
+.pay-col-date { flex: 0 0 130rpx; color: #666; font-size: 22rpx; }
+.pay-col-time { flex: 0 0 110rpx; color: #666; font-size: 22rpx; }
+.pay-col-method { flex: 0 0 130rpx; color: #666; }
+.pay-col-amount { flex: 1; text-align: right; font-weight: 600; }
 .pay-col-amount--pay { color: #2EA6D0; }
 .pay-col-amount--refund { color: #E64340; }
 

@@ -91,29 +91,20 @@
       <view class="pay-table" wx:if="{{order.availablePayments.length > 0 || (order.availableRefunds.length || 0) > 0}}">
         <view class="pay-table-row" style="font-size:22rpx;color:#999;">
           <text class="pay-col-date">日期</text>
-          <text class="pay-col-method">方式</text>
-          <text class="pay-col-type">类型</text>
+          <text class="pay-col-time">时间</text>
+          <text class="pay-col-method">支付方式</text>
           <text class="pay-col-amount">金额</text>
         </view>
         <view class="pay-table-row" wx:for="{{order.availablePayments}}" wx:key="id">
-          <view class="pay-col-date">
-            <text style="display:block;">{{item.paid_dateDateStr}}</text>
-            <text style="display:block;font-size:20rpx;color:#999;">{{item.paid_dateTimeStr}}</text>
-          </view>
+          <text class="pay-col-date">{{item.paid_dateDateStr}}</text>
+          <text class="pay-col-time">{{item.paid_dateTimeStr}}</text>
           <text class="pay-col-method">{{item.pay_method}}</text>
-          <view class="pay-col-type">
-            <view class="chip chip--member" style="font-size:20rpx;padding:2rpx 8rpx;">支付</view>
-          </view>
           <text class="pay-col-amount pay-col-amount--pay">{{item.amountStr}}</text>
         </view>
         <view class="pay-table-row" wx:for="{{order.availableRefunds}}" wx:key="id">
-          <view class="pay-col-date">
-            <text style="display:block;">{{item.paid_dateDateStr || '—'}}</text>
-          </view>
+          <text class="pay-col-date">{{item.paid_dateDateStr || '—'}}</text>
+          <text class="pay-col-time">{{item.paid_dateTimeStr || ''}}</text>
           <text class="pay-col-method">{{item.pay_method || '—'}}</text>
-          <view class="pay-col-type">
-            <view class="chip chip--guest" style="font-size:20rpx;padding:2rpx 8rpx;">退款</view>
-          </view>
           <text class="pay-col-amount pay-col-amount--refund">-{{item.amountStr}}</text>
         </view>
       </view>

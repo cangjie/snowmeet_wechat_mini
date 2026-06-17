@@ -329,6 +329,18 @@ Page({
       payment.remainAmountStr = util.showAmount(payment.remainAmount)
     }
 
+    // 退款明细：退款记录无 paid_date，用 create_date 作日期/时间；方式取原支付方式
+    for (var i = 0; order.availableRefunds && i < order.availableRefunds.length; i++) {
+      var refund = order.availableRefunds[i]
+      var refundDate = new Date(refund.create_date)
+      refund.paid_dateDateStr = util.formatDate(refundDate)
+      refund.paid_dateTimeStr = util.formatTimeStr(refundDate)
+      refund.amountStr = util.showAmount(refund.amount)
+      if (!refund.pay_method && refund.payment) {
+        refund.pay_method = refund.payment.pay_method
+      }
+    }
+
     // 关单时间
     if (order.closed == 1) {
       var closeDate = new Date(order.close_date)
