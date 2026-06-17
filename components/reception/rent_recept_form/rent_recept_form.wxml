@@ -98,6 +98,16 @@
                 </view>
               </view>
 
+              <!-- 招待（免租金） -->
+              <view class="kv-row">
+                <view class="kv-cell">
+                  <text class="kv-label">招待</text>
+                  <checkbox-group class="kv-entertain" bindchange="onPkgEntertainToggle" data-ridx="{{ridx}}">
+                    <checkbox value="1" checked="{{pkg.entertain}}"/>
+                  </checkbox-group>
+                </view>
+              </view>
+
               <!-- 起租日期 / 时间 -->
               <view class="kv-row">
                 <view class="kv-cell">

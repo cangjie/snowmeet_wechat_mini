@@ -137,10 +137,33 @@
                 <view class="divider"></view>
                 <view class="view-row">
                   <view class="left-column" style="width:var(--title-width-sub);">【招待】</view>
-                  <view class="right-column" style="margin-right: 20rpx;">{{rental.entertain == true ? '是' : '否'}}
+                  <view class="right-column" style="margin-right: 20rpx;">
+                    <switch checked="{{rental.entertain}}" data-index="{{rentalIndex}}" bindchange="setEntertain" />
                   </view>
                   <view class="left-column" style="width:var(--title-width-sub);">【小计】</view>
                   <view class="right-column amount">{{rental.totalSummaryStr}}</view>
+                </view>
+                <view class="divider"></view>
+                <view class="view-row">
+                  <view class="left-column" style="width:var(--title-width-sub);">【押金】</view>
+                  <view class="right-column" style="width: 75%;">
+                    <block wx:if="{{rental.moddingGuaranty==true}}">
+                      <input class="input" type="digit" style="width: 200rpx;" data-index="{{rentalIndex}}"
+                        value="{{rental.guarantyEditValue}}" bindinput="setGuarantyEdit"></input>
+                    </block>
+                    <block wx:else>{{rental.depositDueStr}}</block>
+                  </view>
+                </view>
+                <view class="view-row" style="justify-content: center;padding-top: 20rpx;padding-bottom: 20rpx;">
+                  <block wx:if="{{rental.moddingGuaranty==true}}">
+                    <van-button type="warning" size="small" data-index="{{rentalIndex}}" bind:click="modGuarantyCancel">取消
+                    </van-button>
+                    <van-button type="danger" size="small" data-index="{{rentalIndex}}" bind:click="modGuarantyConfirm"
+                      style="margin-left: 30rpx;">确认</van-button>
+                  </block>
+                  <van-button wx:elif="{{rental.guarantyPaid!=true}}" type="info" size="small" data-index="{{rentalIndex}}"
+                    bind:click="modGuaranty">改押金</van-button>
+                  <view wx:else class="left-column" style="width:auto;font-size:9pt;color:#999;">押金已支付，调整请走退款</view>
                 </view>
                 <view class="divider"></view>
                 <view class="view-row">

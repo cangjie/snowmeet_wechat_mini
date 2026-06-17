@@ -474,6 +474,15 @@ Component({
       this._refreshSummary();
       this._emitSync(false);
     },
+
+    // 招待：勾选后该 rental 免租金（后端 totalSummary 排除租金），entertain 随 syncRent 落库
+    onPkgEntertainToggle(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const checked = e.detail.value.length > 0;
+      this.setData({ [`displayRentals[${ridx}].entertain`]: checked });
+      this._emitSync(false);
+    },
+
     _setPkgDate(ridx, date) {
       const today = formatDate(new Date());
       const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);

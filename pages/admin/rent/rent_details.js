@@ -113,8 +113,31 @@ Page({
       rental.realDepositStr = util.showAmount(rental.realGuaranty)
       rental.deposit = rental.guaranty
 
+      var gDiscount = rental.guaranty_discount || 0
+      rental.depositDue = (rental.guaranty || 0) - gDiscount
+      rental.depositDueStr = util.showAmount(rental.depositDue)
+      rental.guarantyEditValue = rental.depositDue
+      rental.guarantyPaid = false
+      for (var gpj = 0; gpj < rental.guaranties.length; gpj++) {
+        var gua = rental.guaranties[gpj]
+        if (gua.valid == 1 && gua.payStatus && gua.payStatus != '未支付') {
+          rental.guarantyPaid = true
+        }
+      }
+
       rental.titleName = rental.package_id ? ('套餐-' + rental.name) : ('单品-' + rental.name)
-      rental.totalRentalAmountStr = util.showAmount(rental.totalRentalAmount)
+      // 招待时后端 totalRentalAmount 归零（不计入应收/营收），但租金需照常显示，故从租金明细累计原始租金
+      var displayRentalAmount = rental.totalRentalAmount
+      if (rental.entertain) {
+        displayRentalAmount = 0
+        for (var di = 0; rental.details && di < rental.details.length; di++) {
+          var dtl = rental.details[di]
+          if (dtl.charge_type == '租金' && dtl.valid == 1) {
+            displayRentalAmount += dtl.amount
+          }
+        }
+      }
+      rental.totalRentalAmountStr = util.showAmount(displayRentalAmount)
       rental.totalRepairationAmountStr = util.showAmount(rental.totalRepairationAmount)
       rental.totalOvertimeAmountStr = util.showAmount(rental.totalOvertimeAmount)
       rental.totalDiscountAmountStr = util.showAmount(rental.totalDiscountAmount)
@@ -672,6 +695,61 @@ Page({
         order.rentals[index] = newRental
         that.renderOrder(order)
         that.setData({ order })
+      })
+  },
+  setEntertain(e) {
+    var that = this
+    var index = e.currentTarget.dataset.index
+    var order = that.data.order
+    var rental = order.rentals[index]
+    rental.entertain = e.detail.value
+    data.updateRentalPromise(rental, '租赁订单详细页设置招待', app.globalData.sessionKey)
+      .then(function (newRental) {
+        wx.showToast({
+          title: '已更新',
+          icon: 'success'
+        })
+        order.rentals[index] = newRental
+        that.renderOrder(order)
+        that.setData({ order })
+      })
+  },
+  modGuaranty(e) {
+    var that = this
+    var index = e.currentTarget.dataset.index
+    var order = that.data.order
+    var rental = order.rentals[index]
+    rental.moddingGuaranty = true
+    rental.guarantyEditValue = rental.depositDue
+    that.setData({ order })
+  },
+  modGuarantyCancel(e) {
+    var that = this
+    var index = e.currentTarget.dataset.index
+    var order = that.data.order
+    order.rentals[index].moddingGuaranty = false
+    that.setData({ order })
+  },
+  setGuarantyEdit(e) {
+    var that = this
+    var index = e.currentTarget.dataset.index
+    var order = that.data.order
+    order.rentals[index].guarantyEditValue = e.detail.value
+  },
+  modGuarantyConfirm(e) {
+    var that = this
+    var index = e.currentTarget.dataset.index
+    var order = that.data.order
+    var rental = order.rentals[index]
+    var amount = parseFloat(rental.guarantyEditValue)
+    if (isNaN(amount) || amount < 0) {
+      wx.showToast({ title: '请输入有效金额', icon: 'none' })
+      return
+    }
+    data.updateRentalGuarantyPromise(rental.id, amount, '租赁订单详细页修改押金', app.globalData.sessionKey)
+      .then(function (newRental) {
+        wx.showToast({ title: '已更新', icon: 'success' })
+        that.getData()
       })
   },
   setRepair(e) {
