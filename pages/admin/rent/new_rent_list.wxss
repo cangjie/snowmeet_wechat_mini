@@ -198,7 +198,7 @@
 .tag-col {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   width: 48rpx;
   flex-shrink: 0;
   gap: 6rpx;
@@ -208,10 +208,11 @@
 
 .tag {
   font-size: 20rpx;
-  padding: 2rpx 10rpx;
+  padding: 2rpx 0;
   border-radius: 4rpx;
   background: #f3f4f6;
   color: #374151;
+  text-align: center;
 }
 
 .tag--test    { background: #fee2e2; color: #b91c1c; }
