@@ -1,260 +1,193 @@
-<view wx:if="{{staff && staff.title_level >= 100}}" style="margin-top: 50rpx;">
-  <fui-card full>
-    <fui-row>
-      <fui-col span="5">
-        <view class="fui-left-column">【店铺】</view>
-      </fui-col>
-      <fui-col span="18">
-        <view class="fui-right-column">
-          <shop-selector wx:if="{{(cell != null && cell != '') || (keyword != null && keyword != '')}}" defaultShop=""
-            bindShopSelected="shopSelected"></shop-selector>
-          <shop-selector wx:else bindShopSelected="shopSelected"></shop-selector>
-        </view>
-      </fui-col>
-    </fui-row>
-    <fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【日期】</view>
-      </fui-col>
-      <fui-col span="18">
-        <view class="fui-right-column view-row">
-          <picker id="start" mode="date" class="input" style="margin-right:20rpx;" bindchange="setDate"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">
-            <picker-view>{{startDate}}</picker-view>
-          </picker>
-          -
-          <picker id="end" mode="date" class="input" style="margin-left:20rpx;"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"
-            bindchange="setDate">
-            <picker-view>{{endDate}}</picker-view>
-          </picker>
-        </view>
-      </fui-col>
-    </fui-row>
-  </fui-card>
-  <view style="height: 20rpx;"></view>
-  <fui-card full>
-    <fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【测试】</view>
-      </fui-col>
-      <radio-group id="isTest" bindchange="setQueryOptions">
-        <fui-col span="6">
-          <radio checked="{{true}}" value="false"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">营业</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="{{true}}"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">测试</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="null"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">全部</radio>
-        </fui-col>
+<view wx:if="{{staff && staff.title_level >= 100}}" class="page-root">
 
+  <!-- 筛选区 -->
+  <view class="filter-card">
+    <!-- 店铺 -->
+    <view class="filter-row">
+      <text class="filter-label">店铺</text>
+      <view class="filter-value">
+        <shop-selector wx:if="{{(cell != null && cell != '') || (keyword != null && keyword != '')}}" defaultShop=""
+          bindShopSelected="shopSelected"></shop-selector>
+        <shop-selector wx:else bindShopSelected="shopSelected"></shop-selector>
+      </view>
+    </view>
+
+    <!-- 日期 -->
+    <view class="filter-row">
+      <text class="filter-label">日期</text>
+      <view class="filter-value filter-row-inner">
+        <picker id="start" mode="date" bindchange="setDate"
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">
+          <view class="date-btn">{{startDate}}</view>
+        </picker>
+        <text class="date-sep">—</text>
+        <picker id="end" mode="date" bindchange="setDate"
+          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">
+          <view class="date-btn">{{endDate}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 测试 -->
+    <view class="filter-row">
+      <text class="filter-label">测试</text>
+      <radio-group id="isTest" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>营业</label>
+        <label class="radio-item"><radio value="{{true}}" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>测试</label>
+        <label class="radio-item"><radio value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
       </radio-group>
-    </fui-row>
-    <fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【招待】</view>
-      </fui-col>
-      <radio-group id="isEntertain" bindchange="setQueryOptions">
-        <fui-col span="6">
-          <radio checked="{{true}}" value="false"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">正常</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="true"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">招待</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="null"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">全部</radio>
-        </fui-col>
+    </view>
+
+    <!-- 招待 -->
+    <view class="filter-row">
+      <text class="filter-label">招待</text>
+      <radio-group id="isEntertain" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>正常</label>
+        <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>招待</label>
+        <label class="radio-item"><radio value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
       </radio-group>
-    </fui-row>
-    <fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【减免】</view>
-      </fui-col>
-      <radio-group id="haveDiscount" bindchange="setQueryOptions">
-        <fui-col span="6">
-          <radio checked="{{true}}" value="null"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">全部</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="true"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">包含</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="false"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">不含</radio>
-        </fui-col>
+    </view>
+
+    <!-- 减免 -->
+    <view class="filter-row">
+      <text class="filter-label">减免</text>
+      <radio-group id="haveDiscount" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
+        <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>包含</label>
+        <label class="radio-item"><radio value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>不含</label>
       </radio-group>
-    </fui-row>
-    <fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【次卡】</view>
-      </fui-col>
-      <radio-group id="useCard" bindchange="setQueryOptions">
-        <fui-col span="6">
-          <radio checked="{{true}}" value="null"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">全部</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="true"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">包含</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="false"
-            disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">不含</radio>
-        </fui-col>
+    </view>
+
+    <!-- 次卡 -->
+    <view class="filter-row">
+      <text class="filter-label">次卡</text>
+      <radio-group id="useCard" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
+        <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>包含</label>
+        <label class="radio-item"><radio value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>不含</label>
       </radio-group>
-    </fui-row>
-    <radio-group id="status" bindchange="setQueryOptions"  >
-      <fui-row style="margin-top: 20rpx;">
-        <fui-col span="5">
-          <view class="fui-left-column">【状态】</view>
-        </fui-col>
-        <fui-col span="6">
-          <radio checked="{{true}}" value="null" style="font-size: 10pt;" >全部</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="未开始" style="font-size: 10pt;" >未开始</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="租赁中" style="font-size: 10pt;" >租赁中</radio>
-        </fui-col>
-      </fui-row>
-      <fui-row style="margin-top: 20rpx;">
-        <fui-col span="5">
-          <view class="fui-left-column"  style="color:#FFFFFF" >`</view>
-        </fui-col>
-        <fui-col span="6">
-          <radio  value="部分归还" style="font-size: 10pt;" >部分归还</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="全部归还" style="font-size: 10pt;" >全部归还</radio>
-        </fui-col>
-        <fui-col span="7">
-          <radio value="部分退押金" style="font-size: 10pt;" >部分退押金</radio>
-        </fui-col>
-      </fui-row>
-      <fui-row style="margin-top: 20rpx;">
-        <fui-col span="5">
-          <view class="fui-left-column" style="color:#FFFFFF" >`</view>
-        </fui-col>
-        <fui-col span="7">
-          <radio  value="全额退押金" style="font-size: 10pt;" >全额退押金</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="了结关闭" style="font-size: 10pt;" >了结关闭</radio>
-        </fui-col>
-        <fui-col span="6">
-          <radio value="临时订单" style="font-size: 10pt;" >临时订单</radio>
-        </fui-col>
-      </fui-row>
-    </radio-group>
-    <fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【租赁物】</view>
-      </fui-col>
-      <fui-col span="6">
-        <view class="view-row" style="width: 490rpx;">
-          <input class="input" placeholder="点击选择分类" style="font-size: 9pt;width:150rpx;text-align: center;"
-            bindtap="showBackdrop" value="{{queryOptions[3] == null? null: queryOptions[3].value.name}}" />
-          <input class="input" bindinput="setRentItemName" disabled="{{queryOptions[3].value == null}}"
-            style="margin-left:20rpx;text-align: center;width:280rpx;font-size: 9pt;" placeholder="输入租赁物名称或编码"
-            value="{{queryOptions[4].value}}" />
-        </view>
-      </fui-col>
-    </fui-row>
-    <fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【手机】</view>
-      </fui-col>
-      <fui-col span="6">
-        <input class="input" bindinput="setCell" style="text-align: center;" type="number" />
-      </fui-col>
-    </fui-row>
-    <fui-row style="margin-top: 20rpx;">
-      <fui-col span="5">
-        <view class="fui-left-column">【备注】</view>
-      </fui-col>
-      <fui-col span="6">
-        <input class="input" bindinput="setMemo" style="text-align: center;" />
-      </fui-col>
-    </fui-row>
-  </fui-card>
-  <view class="view-row" style="justify-content: center;width: 750rpx;">
-    <van-button type="info" size="normal" style="margin-top: 20rpx;" bind:click="query" disabled="{{querying}}"> 查 询
-    </van-button>
+    </view>
+
+    <!-- 状态 -->
+    <view class="filter-row">
+      <text class="filter-label">状态</text>
+      <radio-group id="status" class="radio-group radio-group--wrap" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="null"/>全部</label>
+        <label class="radio-item"><radio value="未开始"/>未开始</label>
+        <label class="radio-item"><radio value="租赁中"/>租赁中</label>
+        <label class="radio-item"><radio value="部分归还"/>部分归还</label>
+        <label class="radio-item"><radio value="全部归还"/>全部归还</label>
+        <label class="radio-item"><radio value="部分退押金"/>部分退押金</label>
+        <label class="radio-item"><radio value="全额退押金"/>全额退押金</label>
+        <label class="radio-item"><radio value="了结关闭"/>了结关闭</label>
+        <label class="radio-item"><radio value="临时订单"/>临时订单</label>
+      </radio-group>
+    </view>
+
+    <!-- 租赁物 -->
+    <view class="filter-row">
+      <text class="filter-label">租赁物</text>
+      <view class="filter-value filter-row-inner">
+        <input class="filter-input filter-input--sm" placeholder="点击选择分类" style="text-align:center;"
+          bindtap="showBackdrop" value="{{queryOptions[3].value == null ? '' : queryOptions[3].value.name}}" />
+        <input class="filter-input" bindinput="setRentItemName" disabled="{{queryOptions[3].value == null}}"
+          style="margin-left:12rpx;" placeholder="名称或编码" value="{{queryOptions[4].value}}" />
+      </view>
+    </view>
+
+    <!-- 手机 -->
+    <view class="filter-row">
+      <text class="filter-label">手机</text>
+      <input class="filter-input" bindinput="setCell" type="number" placeholder="手机号搜索" />
+    </view>
+
+    <!-- 备注 -->
+    <view class="filter-row">
+      <text class="filter-label">备注</text>
+      <input class="filter-input" bindinput="setMemo" placeholder="关键词搜索" />
+    </view>
+
+    <view class="filter-actions">
+      <van-button type="primary" size="normal" bind:click="query" loading="{{querying}}" disabled="{{querying}}">查 询</van-button>
+    </view>
   </view>
-  <view>总计单数：{{orders.length}} 总计租金：{{totalRentalAmountStr}}</view>
-  <block wx:for="{{orders}}">
-    <fui-card style="margin-top: 50rpx;" title="{{item.code}}"
-      tag="{{item.rentProperties == null? '临时订单' : (item.rentProperties.rentStatus == null ? '未知状态' :item.rentProperties.rentStatus )}}"
-      tagSize="10rpx" full>
-      <view class="fui-card__content view-row" style="margin-bottom: 20rpx;">
-        <view style="width: 90rpx; margin-left: 0rpx;margin-top: 10rpx;border-right: #0C0C0C solid 2rpx;" id="{{index}}"
-          bindtap="gotoDetail">
-          <view wx:if="{{item.is_test == 1}}">【测】</view>
-          <view wx:if="{{item.haveEntertain==true}}">【招】</view>
-          <view wx:if="{{item.is_package == 0}}">【单】</view>
-          <view wx:if="{{item.haveOnCredit}}">【挂】</view>
-          <view wx:if="{{item.haveDiscount}}">【减】</view>
-          <view wx:if="{{item.useCard}}">【卡】</view>
-          <view>{{item.memberShip}}</view>
-        </view>
-        <view>
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【日期】</view>
-            <view class="right-column" style="width: 150rpx;">{{item.dateStr}}</view>
-            <view class="left-column" style="width: 120rpx;">【时间】</view>
-            <view class="right-column" style="width: 120rpx;">{{item.timeStr}}</view>
-          </view>
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【顾客称呼】</view>
-            <view class="right-column" style="width: 270rpx;margin-right: 0rpx;">{{item.calledName}}</view>
 
-          </view>
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【手机】</view>
-            <view class="right-column">{{item.customerCell}}</view>
-          </view>
+  <!-- 统计行 + 分页 -->
+  <view wx:if="{{total > 0}}" class="summary-section">
+    <view class="summary-bar">
+      <text>共 {{total}} 单</text>
+      <text class="summary-sep">·</text>
+      <text>总租金 {{totalRentalAmountStr}}</text>
+      <text class="summary-sep">·</text>
+      <text>按时间倒序</text>
+    </view>
+    <view class="page-bar">
+      <van-button size="mini" plain type="primary" disabled="{{page <= 1}}" bind:click="onPrevPage">上一页</van-button>
+      <text class="page-info">第 {{page}} / {{totalPages}} 页（每页 {{pageSize}} 条）</text>
+      <van-button size="mini" plain type="primary" disabled="{{page >= totalPages}}" bind:click="onNextPage">下一页</van-button>
+    </view>
+  </view>
 
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【支付金额】</view>
-            <view class="right-column">{{item.paidAmountStr}}</view>
-          </view>
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【支付方式】</view>
-            <view class="right-column">{{ item.payMethod==null? '--' : item.payMethod }}</view>
-          </view>
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【总计租金】</view>
-            <view class="right-column">{{ item.displayedRentalStr}}</view>
-          </view>
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【开单人】</view>
-            <view class="right-column">{{item.staff.name}}</view>
-          </view>
-          <view class="view-row" id="{{index}}" bindtap="gotoDetail">
-            <view class="left-column">【备注】</view>
-            <view class="right-column">{{item.memo}}</view>
-          </view>
-          <view class="view-row">
-            <view class="left-column"></view>
-            <view class="right-column">
-              <van-button size="small" type="primary" id="{{index}}" bind:click="gotoDetail"> 查 看 详 细 </van-button>
-            </view>
-          </view>
+  <!-- 订单列表 -->
+  <block wx:for="{{orders}}" wx:key="id">
+    <view class="order-card">
+      <!-- 卡片头：订单号 + 状态 -->
+      <view class="order-header">
+        <text class="order-code">{{item.code || ('#' + item.id)}}</text>
+        <view class="status-chip status-chip--{{item.rentProperties == null ? 'temp' : item.rentProperties.rentStatus}}">
+          {{item.rentProperties == null ? '临时订单' : (item.rentProperties.rentStatus || '未知状态')}}
         </view>
       </view>
-    </fui-card>
-    <view style="height: 20rpx;"></view>
+
+      <!-- 标签行 -->
+      <view class="tag-row">
+        <text wx:if="{{item.is_test == 1}}" class="tag tag--test">测</text>
+        <text wx:if="{{item.haveEntertain}}" class="tag tag--entertain">招</text>
+        <text wx:if="{{item.is_package == 0}}" class="tag tag--single">单</text>
+        <text wx:if="{{item.haveOnCredit}}" class="tag tag--credit">挂</text>
+        <text wx:if="{{item.haveDiscount}}" class="tag tag--discount">减</text>
+        <text wx:if="{{item.useCard}}" class="tag tag--card">卡</text>
+        <text class="tag tag--member">{{item.memberShip}}</text>
+      </view>
+
+      <!-- 详情行 -->
+      <view class="order-rows" id="{{index}}" bindtap="gotoDetail">
+        <view class="order-row">
+          <text class="row-label">日期</text><text class="row-value">{{item.dateStr}}</text>
+          <text class="row-label row-label--mid">时间</text><text class="row-value">{{item.timeStr}}</text>
+        </view>
+        <view class="order-row">
+          <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item.calledName}}</text>
+        </view>
+        <view class="order-row">
+          <text class="row-label">手机</text><text class="row-value row-value--wide">{{item.customerCell}}</text>
+        </view>
+        <view class="order-row">
+          <text class="row-label">支付金额</text><text class="row-value">{{item.paidAmountStr}}</text>
+          <text class="row-label row-label--mid">方式</text><text class="row-value">{{item.payMethod || '--'}}</text>
+        </view>
+        <view class="order-row">
+          <text class="row-label">总计租金</text><text class="row-value">{{item.displayedRentalStr || '--'}}</text>
+        </view>
+        <view class="order-row">
+          <text class="row-label">开单人</text><text class="row-value row-value--wide">{{item.staff.name}}</text>
+        </view>
+        <view wx:if="{{item.memo}}" class="order-row">
+          <text class="row-label">备注</text><text class="row-value row-value--wide">{{item.memo}}</text>
+        </view>
+      </view>
+
+      <view class="order-footer">
+        <van-button size="small" type="primary" id="{{index}}" bind:click="gotoDetail">查看详细</van-button>
+      </view>
+    </view>
   </block>
+
+  <!-- 无结果 -->
+  <view wx:if="{{!querying && total == 0}}" class="empty-tip">暂无匹配订单</view>
+
   <van-popup show="{{ showRentCategorySelector }}">
     <top-category-selector bindModalClick="selectCategory"></top-category-selector>
   </van-popup>
+
 </view>

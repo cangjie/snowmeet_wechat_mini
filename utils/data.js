@@ -429,6 +429,40 @@ const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type
     })
   })
 }
+const getRentOrdersByStaffPagedPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey, cell, haveWarranty, retailType, keyword, isSummerCare, rentCategoryId, rentItemName, useCard, rentStatus, pageIndex, pageSize) {
+  var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaffPaged?sessionKey=' + sessionKey
+  if (orderId != null) { qUrl += '&orderId=' + orderId }
+  if (shop != null) { qUrl += '&shop=' + encodeURIComponent(shop) }
+  if (memberId != null) { qUrl += '&memberId=' + memberId.toString() }
+  if (staffId != null) { qUrl += '&staffId=' + staffId.toString() }
+  if (type != null) { qUrl += '&type=' + encodeURIComponent(type) }
+  if (startDate != null) { qUrl += '&startDate=' + encodeURIComponent(util.formatDate(new Date(startDate))) }
+  if (endDate != null) { qUrl += '&endDate=' + encodeURIComponent(util.formatDate(new Date(endDate))) }
+  if (payOption != null) { qUrl += '&payOption=' + payOption }
+  if (isTest != null) { qUrl += '&isTest=' + isTest }
+  if (isEntertain != null) { qUrl += '&isEntertain=' + isEntertain }
+  if (isPackage != null) { qUrl += '&isPackage=' + isPackage }
+  if (isOnCredit != null) { qUrl += '&isOnCredit=' + isOnCredit }
+  if (haveDiscount != null) { qUrl += '&haveDiscount=' + haveDiscount }
+  if (rentStatus != null) { qUrl += '&rentStatus=' + rentStatus }
+  if (cell != null && cell != '') { qUrl += '&cell=' + cell }
+  if (haveWarranty != null) { qUrl += '&haveWarranty=' + haveWarranty }
+  if (retailType != null && retailType != undefined) { qUrl += '&retailType=' + retailType }
+  if (keyword != null && keyword != undefined) { qUrl += '&keyword=' + keyword }
+  if (isSummerCare != null && isSummerCare != undefined) { qUrl += '&isSummerCare=' + isSummerCare }
+  if (rentCategoryId != null) { qUrl += '&rentCategoryId=' + rentCategoryId }
+  if (rentItemName != null) { qUrl += '&rentItemName=' + rentItemName }
+  if (useCard != null) { qUrl += '&useCard=' + useCard }
+  qUrl += '&pageIndex=' + (pageIndex || 1)
+  qUrl += '&pageSize=' + (pageSize || 10)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(qUrl, null).then(function (result) {
+      resolve(result)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const getOrderByStaffPromise = function (orderId, sessionKey) {
   var qUrl = app.globalData.requestPrefix + 'Order/GetOrderByStaff/' + orderId.toString() + '?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -902,6 +936,7 @@ module.exports = {
   getRentReceptingOrderPromise,
   getRetailOrderByMi7CodePromise,
   getOrdersByStaffPromise,
+  getRentOrdersByStaffPagedPromise,
   getOrderByStaffPromise,
   GetUnCommonPayMethodPromise,
   updateOrderPromise,
