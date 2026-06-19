@@ -129,6 +129,19 @@ Page({
     this.getData(1)
   },
 
+  _statusClass(rentStatus) {
+    var map = {
+      '租赁中':   'renting',
+      '全部归还': 'returned',
+      '了结关闭': 'closed',
+      '全额退押金': 'full-refund',
+      '部分退押金': 'part-refund',
+      '部分归还': 'part-return',
+      '未开始':   'not-started'
+    }
+    return map[rentStatus] || 'unknown'
+  },
+
   renderOrders(orders, total, page, pageSize) {
     var totalRentalAmount = 0
     for (var i = 0; orders && i < orders.length; i++) {
@@ -137,6 +150,9 @@ Page({
       order.dateStr = util.formatDate(bizDate)
       order.timeStr = util.formatTimeStr(bizDate)
       order.totalChargeStr = util.showAmount(order.totalCharge)
+      var rs = order.rentProperties ? order.rentProperties.rentStatus : null
+      order.statusLabel = order.rentProperties == null ? '临时订单' : (rs || '未知状态')
+      order.statusClass = order.rentProperties == null ? 'temp' : this._statusClass(rs)
 
       var calledName = ''
       var member = order.member

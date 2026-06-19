@@ -134,8 +134,8 @@
       <!-- 卡片头：订单号 + 状态 -->
       <view class="order-header">
         <text class="order-code">{{item.code || ('#' + item.id)}}</text>
-        <view class="status-chip status-chip--{{item.rentProperties == null ? 'temp' : item.rentProperties.rentStatus}}">
-          {{item.rentProperties == null ? '临时订单' : (item.rentProperties.rentStatus || '未知状态')}}
+        <view class="status-chip status-chip--{{item.statusClass}}">
+          {{item.statusLabel}}
         </view>
       </view>
 

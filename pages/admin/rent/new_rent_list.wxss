@@ -172,14 +172,14 @@
   color: #006495;
 }
 
-.status-chip--租赁中 { background: #dbeafe; color: #1d4ed8; }
-.status-chip--全部归还 { background: #dcfce7; color: #15803d; }
-.status-chip--了结关闭 { background: #f3f4f6; color: #6b7280; }
-.status-chip--全额退押金 { background: #dcfce7; color: #15803d; }
-.status-chip--部分退押金 { background: #fef9c3; color: #92400e; }
-.status-chip--部分归还 { background: #fef3c7; color: #b45309; }
-.status-chip--未开始 { background: #f0f9ff; color: #0369a1; }
-.status-chip--temp { background: #fee2e2; color: #b91c1c; }
+.status-chip--renting      { background: #dbeafe; color: #1d4ed8; }
+.status-chip--returned     { background: #dcfce7; color: #15803d; }
+.status-chip--closed       { background: #f3f4f6; color: #6b7280; }
+.status-chip--full-refund  { background: #dcfce7; color: #15803d; }
+.status-chip--part-refund  { background: #fef9c3; color: #92400e; }
+.status-chip--part-return  { background: #fef3c7; color: #b45309; }
+.status-chip--not-started  { background: #f0f9ff; color: #0369a1; }
+.status-chip--temp         { background: #fee2e2; color: #b91c1c; }
 
 /* 标签行 */
 .tag-row {
