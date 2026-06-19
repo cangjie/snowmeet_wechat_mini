@@ -177,9 +177,6 @@
         </view>
       </view>
 
-      <view class="order-footer">
-        <van-button size="small" type="primary" id="{{index}}" bind:click="gotoDetail">查看详细</van-button>
-      </view>
     </view>
   </block>
 

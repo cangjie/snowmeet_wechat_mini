@@ -242,15 +242,6 @@
   width: auto;
 }
 
-/* 卡片底部 */
-.order-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 8rpx;
-  border-top: 1rpx solid #f0f0f0;
-  padding-top: 12rpx;
-}
-
 /* 空状态 */
 .empty-tip {
   text-align: center;
