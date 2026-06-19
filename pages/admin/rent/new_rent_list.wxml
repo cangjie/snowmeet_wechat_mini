@@ -130,7 +130,7 @@
 
   <!-- 订单列表 -->
   <block wx:for="{{orders}}" wx:key="id">
-    <view class="order-card">
+    <view class="order-card" id="{{index}}" bindtap="gotoDetail">
       <!-- 卡片头：订单号 + 状态 -->
       <view class="order-header">
         <text class="order-code">{{item.code || ('#' + item.id)}}</text>
@@ -139,41 +139,41 @@
         </view>
       </view>
 
-      <!-- 标签行 -->
-      <view class="tag-row">
-        <text wx:if="{{item.is_test == 1}}" class="tag tag--test">测</text>
-        <text wx:if="{{item.haveEntertain}}" class="tag tag--entertain">招</text>
-        <text wx:if="{{item.is_package == 0}}" class="tag tag--single">单</text>
-        <text wx:if="{{item.haveOnCredit}}" class="tag tag--credit">挂</text>
-        <text wx:if="{{item.haveDiscount}}" class="tag tag--discount">减</text>
-        <text wx:if="{{item.useCard}}" class="tag tag--card">卡</text>
-        <text class="tag tag--member">{{item.memberShip}}</text>
-      </view>
-
-      <!-- 详情行 -->
-      <view class="order-rows" id="{{index}}" bindtap="gotoDetail">
-        <view class="order-row">
-          <text class="row-label">日期</text><text class="row-value">{{item.dateStr}}</text>
-          <text class="row-label row-label--mid">时间</text><text class="row-value">{{item.timeStr}}</text>
+      <!-- 内容区：左侧标签列 + 右侧详情 -->
+      <view class="order-body">
+        <view class="tag-col">
+          <text wx:if="{{item.is_test == 1}}" class="tag tag--test">测</text>
+          <text wx:if="{{item.haveEntertain}}" class="tag tag--entertain">招</text>
+          <text wx:if="{{item.is_package == 0}}" class="tag tag--single">单</text>
+          <text wx:if="{{item.haveOnCredit}}" class="tag tag--credit">挂</text>
+          <text wx:if="{{item.haveDiscount}}" class="tag tag--discount">减</text>
+          <text wx:if="{{item.useCard}}" class="tag tag--card">卡</text>
+          <text class="tag tag--member">{{item.memberShip}}</text>
         </view>
-        <view class="order-row">
-          <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item.calledName}}</text>
-        </view>
-        <view class="order-row">
-          <text class="row-label">手机</text><text class="row-value row-value--wide">{{item.customerCell}}</text>
-        </view>
-        <view class="order-row">
-          <text class="row-label">支付金额</text><text class="row-value">{{item.paidAmountStr}}</text>
-          <text class="row-label row-label--mid">方式</text><text class="row-value">{{item.payMethod || '--'}}</text>
-        </view>
-        <view class="order-row">
-          <text class="row-label">总计租金</text><text class="row-value">{{item.displayedRentalStr || '--'}}</text>
-        </view>
-        <view class="order-row">
-          <text class="row-label">开单人</text><text class="row-value row-value--wide">{{item.staff.name}}</text>
-        </view>
-        <view wx:if="{{item.memo}}" class="order-row">
-          <text class="row-label">备注</text><text class="row-value row-value--wide">{{item.memo}}</text>
+        <view class="order-rows">
+          <view class="order-row">
+            <text class="row-label">日期</text><text class="row-value">{{item.dateStr}}</text>
+            <text class="row-label row-label--mid">时间</text><text class="row-value">{{item.timeStr}}</text>
+          </view>
+          <view class="order-row">
+            <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item.calledName}}</text>
+          </view>
+          <view class="order-row">
+            <text class="row-label">手机</text><text class="row-value row-value--wide">{{item.customerCell}}</text>
+          </view>
+          <view class="order-row">
+            <text class="row-label">支付金额</text><text class="row-value">{{item.paidAmountStr}}</text>
+            <text class="row-label row-label--mid">方式</text><text class="row-value">{{item.payMethod || '--'}}</text>
+          </view>
+          <view class="order-row">
+            <text class="row-label">总计租金</text><text class="row-value">{{item.displayedRentalStr || '--'}}</text>
+          </view>
+          <view class="order-row">
+            <text class="row-label">开单人</text><text class="row-value row-value--wide">{{item.staff.name}}</text>
+          </view>
+          <view wx:if="{{item.memo}}" class="order-row">
+            <text class="row-label">备注</text><text class="row-value row-value--wide">{{item.memo}}</text>
+          </view>
         </view>
       </view>
 
