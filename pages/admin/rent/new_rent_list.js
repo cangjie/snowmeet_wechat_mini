@@ -42,12 +42,8 @@ Page({
     this.setData({ shop: e.detail.shop })
   },
 
-  setDate(e) {
-    var id = e.currentTarget.id
-    switch (id) {
-      case 'start': this.setData({ startDate: e.detail.value }); break
-      case 'end':   this.setData({ endDate: e.detail.value });   break
-    }
+  onDateRangeChange(e) {
+    this.setData({ startDate: e.detail.startDate, endDate: e.detail.endDate })
   },
 
   setQueryOptions(e) {

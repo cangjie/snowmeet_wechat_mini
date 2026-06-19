@@ -26,6 +26,12 @@
   border-bottom: none;
 }
 
+.filter-row--date {
+  align-items: flex-start;
+  padding-top: 14rpx;
+  padding-bottom: 14rpx;
+}
+
 .filter-label {
   width: 120rpx;
   flex-shrink: 0;

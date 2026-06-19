@@ -1,0 +1,23 @@
+<view class="dpr-root">
+  <view class="dpr-display" bindtap="openCalendar">
+    <text class="dpr-text">{{startDate}} ~ {{endDate}}</text>
+  </view>
+  <view class="dpr-shortcuts">
+    <view class="dpr-btn {{activeShortcut == 'today' ? 'dpr-btn--active' : ''}}"
+          data-key="today" bindtap="onShortcut">今天</view>
+    <view class="dpr-btn {{activeShortcut == 'yesterday' ? 'dpr-btn--active' : ''}}"
+          data-key="yesterday" bindtap="onShortcut">昨天</view>
+    <view class="dpr-btn {{activeShortcut == 'thisweek' ? 'dpr-btn--active' : ''}}"
+          data-key="thisweek" bindtap="onShortcut">本周</view>
+    <view class="dpr-btn {{activeShortcut == 'lastweek' ? 'dpr-btn--active' : ''}}"
+          data-key="lastweek" bindtap="onShortcut">上周</view>
+  </view>
+</view>
+
+<van-calendar
+  show="{{showCalendar}}"
+  type="range"
+  allow-same-day
+  bind:confirm="onCalendarConfirm"
+  bind:close="closeCalendar"
+/>

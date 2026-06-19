@@ -13,19 +13,13 @@
     </view>
 
     <!-- 日期 -->
-    <view class="filter-row">
+    <view class="filter-row filter-row--date">
       <text class="filter-label">日期</text>
-      <view class="filter-value filter-row-inner">
-        <picker id="start" mode="date" bindchange="setDate"
-          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">
-          <view class="date-btn">{{startDate}}</view>
-        </picker>
-        <text class="date-sep">—</text>
-        <picker id="end" mode="date" bindchange="setDate"
-          disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}">
-          <view class="date-btn">{{endDate}}</view>
-        </picker>
-      </view>
+      <date-range-picker
+        startDate="{{startDate}}"
+        endDate="{{endDate}}"
+        bind:change="onDateRangeChange"
+      />
     </view>
 
     <!-- 测试 -->

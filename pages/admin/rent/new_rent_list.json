@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "top-category-selector": "/components/rent/top_category_selector"
+    "top-category-selector": "/components/rent/top_category_selector",
+    "date-range-picker": "/components/date-range-picker/index"
   },
   "navigationBarTitleText": "租赁订单列表"
 }

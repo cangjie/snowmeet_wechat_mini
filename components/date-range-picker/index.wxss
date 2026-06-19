@@ -1,0 +1,44 @@
+.dpr-root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dpr-display {
+  display: flex;
+  align-items: center;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 6rpx;
+  padding: 8rpx 16rpx;
+  background: #f8f9ff;
+  margin-bottom: 10rpx;
+}
+
+.dpr-text {
+  font-size: 26rpx;
+  color: #333;
+}
+
+.dpr-shortcuts {
+  display: flex;
+  flex-direction: row;
+  gap: 10rpx;
+}
+
+.dpr-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 22rpx;
+  padding: 6rpx 0;
+  border-radius: 6rpx;
+  border: 1rpx solid #d0d0d0;
+  color: #555;
+  background: #fff;
+}
+
+.dpr-btn--active {
+  border-color: #006495;
+  color: #006495;
+  background: #e8f4fd;
+  font-weight: 500;
+}
