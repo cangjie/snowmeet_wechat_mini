@@ -219,6 +219,9 @@
 
 /* KV row */
 .kv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kv-row--triple { grid-template-columns: 1fr 1fr auto; }
+.kv-cell--entertain { justify-content: center; }
+.kv-cell--entertain .kv-entertain { display: flex; align-items: center; height: 22px; }
 .kv-cell {
   background: var(--surface-container-lowest);
   border: 1px solid var(--outline-variant);

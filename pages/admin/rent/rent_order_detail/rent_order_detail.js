@@ -179,8 +179,9 @@ Page({
         rental.end_dateDateStr = util.formatDate(endDate)
         rental.end_dateTimeStr = util.formatTimeStr(endDate)
       } else {
-        rental.end_dateDateStr = '——'
-        rental.end_dateTimeStr = '——'
+        // 未归还时 end_date 为空：显示「未退租」而非破折号，归还后自动展示真实退租时间
+        rental.end_dateDateStr = '未退租'
+        rental.end_dateTimeStr = ''
       }
 
       // 租赁物明细
@@ -290,6 +291,19 @@ Page({
         r0.subtotalStr = util.showAmount(r0.subtotal)
       }
       rental.feeRows = feeRows
+
+      // 截止到当前的租金：累计 rental_date 不晚于今天的有效「租金」明细（毛额，招待也照常显示）
+      var rentToNow = 0
+      var todayEnd = new Date()
+      todayEnd.setHours(23, 59, 59, 999)
+      for (var di = 0; rental.details && di < rental.details.length; di++) {
+        var rd = rental.details[di]
+        if ((rd.charge_type || '').trim() == '租金' && rd.valid == 1 && new Date(rd.rental_date) <= todayEnd) {
+          rentToNow += parseFloat(rd.amount) || 0
+        }
+      }
+      rental._rentToNow = rentToNow
+      rental._rentToNowStr = util.showAmount(rentToNow)
     }
 
     // appendingRentals 处理（追加中的租赁）
@@ -327,6 +341,18 @@ Page({
         payment.remainAmount = payment.remainAmount - payment.refundedAmount
       }
       payment.remainAmountStr = util.showAmount(payment.remainAmount)
+    }
+
+    // 退款明细：退款记录无 paid_date，用 create_date 作日期/时间；方式取原支付方式
+    for (var i = 0; order.availableRefunds && i < order.availableRefunds.length; i++) {
+      var refund = order.availableRefunds[i]
+      var refundDate = new Date(refund.create_date)
+      refund.paid_dateDateStr = util.formatDate(refundDate)
+      refund.paid_dateTimeStr = util.formatTimeStr(refundDate)
+      refund.amountStr = util.showAmount(refund.amount)
+      if (!refund.pay_method && refund.payment) {
+        refund.pay_method = refund.payment.pay_method
+      }
     }
 
     // 关单时间
@@ -937,11 +963,16 @@ Page({
     if (order.depositPaidAmount > 0) return
     // 取消勾选：直接关
     if (that.data.payWithDeposit) {
+      // renderOrder 读 this.data.payWithDeposit 决定是否把租金加回「实际应退」。实测 setData 之后
+      // 紧接着读 this.data 仍是旧值，故不能依赖 setData 的「同步更新 this.data」，必须先显式赋值，
+      // 否则「实际应退」会与勾选状态对不上（勾上仍按未勾算）。直接改对象属性是纯 JS 同步操作。
+      that.data.payWithDeposit = false
       that.setData({ payWithDeposit: false, order: that.renderOrder(order) })
       return
     }
     // 勾上：储值是会员资产，需先通过微信身份核验（wechat_unverified==1 即已核验本人）
     if (order.wechat_unverified) {
+      that.data.payWithDeposit = true
       that.setData({ payWithDeposit: true, order: that.renderOrder(order) })
       return
     }
@@ -969,6 +1000,8 @@ Page({
         if (res && res.verified) {
           that._stopVerifyPolling()
           order.wechat_unverified = true
+          // 同上：显式置位 payWithDeposit（不依赖 setData 同步），再 renderOrder
+          that.data.payWithDeposit = true
           that.setData({ _verifyShow: false, payWithDeposit: true, order: that.renderOrder(order) })
           wx.showToast({ title: '核验成功', icon: 'success' })
         }

@@ -749,6 +749,17 @@ const updateRentalPromise = function (rental, scene, sessionKey) {
     })
   })
 }
+const updateRentalGuarantyPromise = function (rentalId, amount, scene, sessionKey) {
+  var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateRentalGuarantyByStaff/' + rentalId
+    + '?amount=' + amount + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(updateUrl, {}).then(function (newRental) {
+      resolve(newRental)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const getRentTypePromise = function () {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetRentType'
   return new Promise(function (resolve, reject) {
@@ -958,6 +969,7 @@ module.exports = {
   updateRentalDayChargesPromise,
   refundPromise,
   updateRentalPromise,
+  updateRentalGuarantyPromise,
   getRentTypePromise,
   getRentPriceByIdPromise,
   updateCarePromise,

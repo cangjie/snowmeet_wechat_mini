@@ -80,8 +80,8 @@
                 </view>
               </view>
 
-              <!-- 押金 / 租金（点击弹窗修改） -->
-              <view class="kv-row">
+              <!-- 押金 / 租金 / 招待 同排（点击弹窗修改；招待勾选后押金、租金默认归零） -->
+              <view class="kv-row kv-row--triple">
                 <view class="kv-cell kv-cell--tap" data-ridx="{{ridx}}" catchtap="onPkgDepositTap">
                   <text class="kv-label">押金</text>
                   <view class="kv-input-wrap">
@@ -95,6 +95,12 @@
                     <text class="kv-prefix">¥</text>
                     <text class="kv-input kv-input--display">{{pkg._dailyRateInput || '0.00'}}</text>
                   </view>
+                </view>
+                <view class="kv-cell kv-cell--entertain">
+                  <text class="kv-label">招待</text>
+                  <checkbox-group class="kv-entertain" bindchange="onPkgEntertainToggle" data-ridx="{{ridx}}">
+                    <checkbox value="1" checked="{{pkg.entertain}}"/>
+                  </checkbox-group>
                 </view>
               </view>
 

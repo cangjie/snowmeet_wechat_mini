@@ -6,8 +6,14 @@
     <text class="amount-value">{{payingAmountStr || '¥0.00'}}</text>
   </view>
 
+  <!-- 零金额确认 -->
+  <view wx:if="{{isZeroAmount}}" class="zero-amount-confirm">
+    <view class="zero-amount-tip">本次订单金额为 ¥0.00，点击确认后订单生效</view>
+    <button class="zero-amount-btn" bindtap="onConfirmFreeOrder">确认生效</button>
+  </view>
+
   <!-- 二维码 -->
-  <view wx:if="{{payMethod === 'wechat' || payMethod === 'alipay'}}" class="qr-card">
+  <view wx:if="{{!isZeroAmount && (payMethod === 'wechat' || payMethod === 'alipay')}}" class="qr-card">
     <view class="qr-frame">
       <image wx:if="{{qrCodeUrl}}" class="qr-img" src="{{qrCodeUrl}}" mode="aspectFit"/>
       <view wx:else class="qr-placeholder">
@@ -32,7 +38,7 @@
   </view>
 
   <!-- 支付方式三选一 -->
-  <view class="pay-list">
+  <view wx:if="{{!isZeroAmount}}" class="pay-list">
     <view class="pay-row {{payMethod === 'wechat' ? 'pay-row--active' : ''}}" data-method="wechat" bindtap="onMethodTap">
       <view class="pay-row-left">
         <view class="pay-icon pay-icon--wechat"><van-icon name="chat" size="14px" color="#ffffff"/></view>
@@ -57,7 +63,7 @@
   </view>
 
   <!-- 其他支付的子选项 -->
-  <view wx:if="{{payMethod === 'other'}}" class="other-panel">
+  <view wx:if="{{!isZeroAmount && payMethod === 'other'}}" class="other-panel">
     <radio-group bindchange="onSubMethodChange">
       <label class="other-row" wx:for="{{othersPayMethods}}" wx:key="*this">
         <radio value="{{index}}" checked="{{subPayMethodIndex === index}}" color="#4aa9e9"/>
