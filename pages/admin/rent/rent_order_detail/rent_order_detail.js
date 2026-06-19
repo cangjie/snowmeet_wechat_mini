@@ -420,6 +420,14 @@ Page({
     }
     order.totalRentUnRefundStr = util.showAmount(order.totalRentUnRefund)
 
+    // 「去支付」入口：未付清且订单开放（待生成/待支付/部分支付）才显示；
+    // 已支付成功/订单关闭/退款/挂账/免费单(应付≤0)不显示。点击跳通用结算页（与开单流程同一页）。
+    var payable = (order.paying_amount != null && order.paying_amount > 0)
+      ? order.paying_amount
+      : ((order.totalCharge || 0) - (order.paidAmount || 0))
+    order.showGoPay = (order.orderStatus == '待生成' || order.orderStatus == '待支付' || order.orderStatus == '部分支付') && payable > 0
+    order.payableAmountStr = util.showAmount(payable > 0 ? payable : 0)
+
     // 按租赁物 flat list
     var allRentItems = []
     for (var i = 0; order.rentals && i < order.rentals.length; i++) {
@@ -1197,6 +1205,13 @@ Page({
       }
     })
   },
+  // 「去支付」：跳通用结算页（与开单流程同一页）。付完后 settle 的 onPaid 会 redirectTo 回本页重新 getData → 按钮自动消失。
+  onGoPay() {
+    var order = this.data.order
+    if (!order || !order.id) return
+    wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + order.id })
+  },
+
   onConfirmAppend() {
     var that = this
     var order = that.data.order

@@ -80,6 +80,8 @@
       </view>
     </view>
 
+    <view wx:if="{{order.showGoPay}}" class="go-pay-btn" bindtap="onGoPay">去支付 {{order.payableAmountStr}}</view>
+
     <view class="divider"></view>
 
     <view class="payment-detail-toggle" bindtap="onTogglePaymentDetail">
