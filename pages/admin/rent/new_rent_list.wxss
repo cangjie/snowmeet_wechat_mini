@@ -185,6 +185,7 @@
 .status-chip--part-refund  { background: #fef9c3; color: #92400e; }
 .status-chip--part-return  { background: #fef3c7; color: #b45309; }
 .status-chip--not-started  { background: #f0f9ff; color: #0369a1; }
+.status-chip--unpaid       { background: #ffedd5; color: #c2410c; }
 .status-chip--temp         { background: #fee2e2; color: #b91c1c; }
 
 /* 内容区：左侧标签 + 右侧详情 */

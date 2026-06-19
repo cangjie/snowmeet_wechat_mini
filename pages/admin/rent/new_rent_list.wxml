@@ -67,6 +67,7 @@
       <text class="filter-label">状态</text>
       <radio-group id="status" class="radio-group radio-group--wrap" bindchange="setQueryOptions">
         <label class="radio-item"><radio checked="{{true}}" value="null"/>全部</label>
+        <label class="radio-item"><radio value="未支付"/>未支付</label>
         <label class="radio-item"><radio value="未开始"/>未开始</label>
         <label class="radio-item"><radio value="租赁中"/>租赁中</label>
         <label class="radio-item"><radio value="部分归还"/>部分归还</label>

@@ -133,7 +133,8 @@ Page({
       '全额退押金': 'full-refund',
       '部分退押金': 'part-refund',
       '部分归还': 'part-return',
-      '未开始':   'not-started'
+      '未开始':   'not-started',
+      '未支付':   'unpaid'
     }
     return map[rentStatus] || 'unknown'
   },
@@ -147,8 +148,20 @@ Page({
       order.timeStr = util.formatTimeStr(bizDate)
       order.totalChargeStr = util.showAmount(order.totalCharge)
       var rs = order.rentProperties ? order.rentProperties.rentStatus : null
-      order.statusLabel = order.rentProperties == null ? '临时订单' : (rs || '未知状态')
-      order.statusClass = order.rentProperties == null ? 'temp' : this._statusClass(rs)
+      // 未支付优先：顾客还没付清（待生成/待支付/部分支付 且应付>0）→ 显示「未支付」；
+      // 付清后才显示 未开始（已付但起租时间未到）/租赁中/… 与后端筛选口径一致。
+      var unpaid = (order.orderStatus == '待生成' || order.orderStatus == '待支付' || order.orderStatus == '部分支付')
+        && ((order.totalCharge || 0) - (order.paidAmount || 0) > 0.005)
+      if (order.rentProperties == null) {
+        order.statusLabel = '临时订单'
+        order.statusClass = 'temp'
+      } else if (unpaid) {
+        order.statusLabel = '未支付'
+        order.statusClass = 'unpaid'
+      } else {
+        order.statusLabel = rs || '未知状态'
+        order.statusClass = this._statusClass(rs)
+      }
 
       var calledName = ''
       var member = order.member
