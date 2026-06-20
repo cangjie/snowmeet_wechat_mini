@@ -11,6 +11,17 @@ function formatDisplayOrderCode(rawCode) {
   return '…' + code.slice(6)
 }
 
+// 手机号脱敏：保留前 3 后 4，中间打码；空值返回 '—'
+function maskCell(cell) {
+  if (!cell && cell !== 0) return '—'
+  var s = String(cell).trim()
+  if (!s) return '—'
+  if (/^\d{11}$/.test(s)) return s.substr(0, 3) + '****' + s.substr(7)
+  if (s.length > 7) return s.substr(0, 3) + '****' + s.substr(s.length - 4)
+  if (s.length > 4) return s.substr(0, s.length - 4) + '****'
+  return '****'
+}
+
 Page({
   data: {
     id: null,
@@ -341,6 +352,9 @@ Page({
         payment.remainAmount = payment.remainAmount - payment.refundedAmount
       }
       payment.remainAmountStr = util.showAmount(payment.remainAmount)
+      // 他人代付：条目标红 + 显示代付人脱敏手机号（无则 '—'）
+      payment._isProxy = payment.is_proxy_pay === true || payment.is_proxy_pay === 1
+      payment._proxyCellMasked = payment._isProxy ? maskCell(payment.cell) : ''
     }
 
     // 退款明细：退款记录无 paid_date，用 create_date 作日期/时间；方式取原支付方式
