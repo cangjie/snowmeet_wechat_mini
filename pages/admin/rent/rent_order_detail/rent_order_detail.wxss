@@ -175,24 +175,19 @@
   gap: 8rpx;
 }
 .pay-table-row:last-child { border-bottom: none; }
-.pay-col-date { flex: 0 0 130rpx; color: #666; font-size: 22rpx; }
-.pay-col-time { flex: 0 0 110rpx; color: #666; font-size: 22rpx; }
-.pay-col-method { flex: 0 0 130rpx; color: #666; }
+.pay-col-date { flex: 0 0 110rpx; color: #666; font-size: 22rpx; }
+.pay-col-time { flex: 0 0 92rpx; color: #666; font-size: 22rpx; }
+.pay-col-method { flex: 0 0 96rpx; color: #666; font-size: 22rpx; }
+.pay-col-cell { flex: 0 0 116rpx; color: #666; font-size: 22rpx; white-space: nowrap; }
 .pay-col-amount { flex: 1; text-align: right; font-weight: 600; }
 .pay-col-amount--pay { color: #2EA6D0; }
 .pay-col-amount--refund { color: #E64340; }
-/* 他人代付：整条标红 + 代付人脱敏手机号副行 */
-.pay-table-row--proxy { border-bottom: none; }
+/* 他人代付：整条标红 */
 .pay-table-row--proxy .pay-col-date,
 .pay-table-row--proxy .pay-col-time,
 .pay-table-row--proxy .pay-col-method,
+.pay-table-row--proxy .pay-col-cell,
 .pay-table-row--proxy .pay-col-amount { color: #E64340; }
-.pay-proxy-line {
-  font-size: 20rpx; color: #E64340;
-  padding: 0 0 12rpx;
-  border-bottom: 1rpx solid #F0F0F0;
-}
-.pay-proxy-line:last-child { border-bottom: none; }
 
 /* ── Tab pill ─────────────────────────── */
 .tab-pill {

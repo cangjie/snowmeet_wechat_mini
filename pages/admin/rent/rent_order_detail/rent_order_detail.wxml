@@ -95,21 +95,21 @@
           <text class="pay-col-date">日期</text>
           <text class="pay-col-time">时间</text>
           <text class="pay-col-method">支付方式</text>
+          <text class="pay-col-cell">手机号</text>
           <text class="pay-col-amount">金额</text>
         </view>
-        <block wx:for="{{order.availablePayments}}" wx:key="id">
-          <view class="pay-table-row {{item._isProxy ? 'pay-table-row--proxy' : ''}}">
-            <text class="pay-col-date">{{item.paid_dateDateStr}}</text>
-            <text class="pay-col-time">{{item.paid_dateTimeStr}}</text>
-            <text class="pay-col-method">{{item.pay_method}}</text>
-            <text class="pay-col-amount pay-col-amount--pay">{{item.amountStr}}</text>
-          </view>
-          <view wx:if="{{item._isProxy}}" class="pay-proxy-line">他人代付 · 代付人 {{item._proxyCellMasked}}</view>
-        </block>
+        <view class="pay-table-row {{item._isProxy ? 'pay-table-row--proxy' : ''}}" wx:for="{{order.availablePayments}}" wx:key="id">
+          <text class="pay-col-date">{{item.paid_dateDateStr}}</text>
+          <text class="pay-col-time">{{item.paid_dateTimeStr}}</text>
+          <text class="pay-col-method">{{item.pay_method}}</text>
+          <text class="pay-col-cell">{{item._proxyCellMasked}}</text>
+          <text class="pay-col-amount pay-col-amount--pay">{{item.amountStr}}</text>
+        </view>
         <view class="pay-table-row" wx:for="{{order.availableRefunds}}" wx:key="id">
           <text class="pay-col-date">{{item.paid_dateDateStr || '—'}}</text>
           <text class="pay-col-time">{{item.paid_dateTimeStr || ''}}</text>
           <text class="pay-col-method">{{item.pay_method || '—'}}</text>
+          <text class="pay-col-cell"></text>
           <text class="pay-col-amount pay-col-amount--refund">-{{item.amountStr}}</text>
         </view>
       </view>
