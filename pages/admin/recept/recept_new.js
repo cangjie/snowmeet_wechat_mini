@@ -220,7 +220,10 @@ Page({
         valid: 0,
         rentals: that.data.rentals,
         recepting: 1,
-        member_id: memberId
+        member_id: memberId,
+        contact_name:   that.data.realName || null,
+        contact_num:    that.data.cell || null,
+        contact_gender: that.data.gender || null
       }
     }
     else {

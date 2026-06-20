@@ -262,3 +262,14 @@ page {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+/* 找回中断订单面板 */
+.recover-panel { display: flex; flex-direction: column; height: 100%; }
+.recover-panel-header { padding: 32rpx 32rpx 20rpx; border-bottom: 1rpx solid #eee; }
+.recover-panel-title { font-size: 32rpx; font-weight: 600; color: #1a1a1a; }
+.recover-empty { display: flex; justify-content: center; align-items: center; padding: 80rpx 32rpx; color: #999; font-size: 28rpx; }
+.recover-list { flex: 1; }
+.recover-item { display: flex; align-items: center; gap: 20rpx; padding: 28rpx 32rpx; border-bottom: 1rpx solid #f5f5f5; }
+.recover-item-name { font-size: 30rpx; font-weight: 500; color: #1a1a1a; flex: 1; min-width: 0; }
+.recover-item-cell { font-size: 26rpx; color: #6f7881; flex-shrink: 0; }
+.recover-item-time { font-size: 24rpx; color: #aaa; flex-shrink: 0; }

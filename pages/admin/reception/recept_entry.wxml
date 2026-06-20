@@ -141,4 +141,34 @@
 
   <!-- 底部接待导航 -->
   <reception-tabbar active="open" bind:tabchange="onTabChange" />
+
+  <!-- 找回中断订单面板 -->
+  <van-popup
+    show="{{ showRecoverPanel }}"
+    position="bottom"
+    custom-style="height: 70%; border-radius: 16px 16px 0 0; padding: 0;"
+    bind:close="onCloseRecoverPanel">
+    <view class="recover-panel">
+      <view class="recover-panel-header">
+        <text class="recover-panel-title">今日中断的订单</text>
+      </view>
+      <view wx:if="{{ recoverLoading }}" class="recover-empty">
+        <van-loading size="24px">查询中…</van-loading>
+      </view>
+      <view wx:elif="{{ recoverOrders.length === 0 }}" class="recover-empty">
+        <text>暂无中断订单</text>
+      </view>
+      <scroll-view wx:else scroll-y class="recover-list">
+        <view
+          wx:for="{{ recoverOrders }}" wx:key="id"
+          class="recover-item"
+          data-id="{{ item.id }}"
+          bindtap="onRecoverOrderTap">
+          <view class="recover-item-name">{{ item.calledName || '（未填姓名）' }}</view>
+          <view class="recover-item-cell">{{ item.contact_num || '未留手机' }}</view>
+          <view class="recover-item-time">{{ item.timeStr }}</view>
+        </view>
+      </scroll-view>
+    </view>
+  </van-popup>
 </view>

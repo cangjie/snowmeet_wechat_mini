@@ -10,6 +10,7 @@
 //   GET Order/GetShops（由 components/shop_selector 内部调用）
 const app = getApp();
 const data = require('../../../utils/data.js');
+const util = require('../../../utils/util.js');
 
 // 把用户输入归一化：去掉空格/横杠/括号，0044... → +44...
 function normalizePhone(raw) {
@@ -59,6 +60,11 @@ Page({
     gender: '',
     customerCell: '',
     customerReadyForService: false,
+
+    // 找回中断订单面板
+    showRecoverPanel: false,
+    recoverLoading: false,
+    recoverOrders: [],
   },
 
   /* ---------- 生命周期 ---------- */
@@ -245,7 +251,40 @@ Page({
   },
 
   onRecoverOrder() {
-    wx.showToast({ title: '订单找回（待实现）', icon: 'none' });
+    const that = this
+    const shop = that.data.currentShopName || null
+    that.setData({ showRecoverPanel: true, recoverLoading: true, recoverOrders: [] })
+    data.getRentReceptingOrdersPromise(shop, app.globalData.sessionKey).then(function (orders) {
+      for (var i = 0; orders && i < orders.length; i++) {
+        const o = orders[i]
+        if (o.member) {
+          if (!o.contact_name)   o.contact_name   = o.member.real_name || ''
+          if (!o.contact_num)    o.contact_num    = o.member.cell || ''
+          if (!o.contact_gender) o.contact_gender = o.member.gender || ''
+        }
+        o.calledName = ((o.contact_name || '') + ' '
+          + (o.contact_gender === '男' ? '先生' : (o.contact_gender === '女' ? '女士' : ''))).trim()
+        o.timeStr = util.formatTimeStr(new Date(o.biz_date))
+      }
+      that.setData({ recoverOrders: orders || [], recoverLoading: false })
+    }).catch(function () {
+      that.setData({ recoverLoading: false })
+      wx.showToast({ title: '查询失败，请重试', icon: 'none' })
+    })
+  },
+
+  onRecoverOrderTap(e) {
+    const orderId = e.currentTarget.dataset.id
+    const shop = this.data.currentShopName || ''
+    this.setData({ showRecoverPanel: false })
+    wx.navigateTo({
+      url: '/pages/admin/reception/recept_new?orderId=' + orderId
+        + '&bizType=rent&shop=' + encodeURIComponent(shop),
+    })
+  },
+
+  onCloseRecoverPanel() {
+    this.setData({ showRecoverPanel: false })
   },
 
   // 兼容：之前 wxml 里曾绑定过 onPickShop（现在已移除），保留空函数避免外链调用报错

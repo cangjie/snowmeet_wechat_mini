@@ -937,6 +937,53 @@ Page({
     })
   },
 
+  // 「按租赁物」视图底部：归还本订单全部未归还租赁物（跨 rental 顺序调用）
+  onReturnAllOrder() {
+    var that = this
+    var order = that.data.order
+    if (!order || !order.rentals) return
+    var targetRentals = []
+    var totalCount = 0
+    for (var r = 0; r < order.rentals.length; r++) {
+      var rental = order.rentals[r]
+      if (rental.valid != 1 || !rental.rentItems) continue
+      var has = false
+      for (var i = 0; i < rental.rentItems.length; i++) {
+        var it = rental.rentItems[i]
+        if (it.noNeed) continue
+        if (it.status == '已归还' || it.status == '已更换') continue
+        has = true
+        totalCount++
+      }
+      if (has) targetRentals.push(rental)
+    }
+    if (totalCount == 0) {
+      wx.showToast({ title: '没有可归还租赁物', icon: 'none' })
+      return
+    }
+    wx.showModal({
+      title: '确认全部归还',
+      content: '将归还本订单全部未归还租赁物（共 ' + totalCount + ' 件），归还后租金自动结算，此操作不可逆。',
+      complete: function (res) {
+        if (!res.confirm) return
+        var chain = Promise.resolve()
+        targetRentals.forEach(function (rental) {
+          chain = chain.then(function () {
+            var url = app.globalData.requestPrefix + 'Rent/ReturnAllRentItems/' + rental.id + '?sessionKey=' + app.globalData.sessionKey
+            return util.performWebRequest(url, null)
+          })
+        })
+        chain.then(function () {
+          wx.showToast({ title: '归还成功', icon: 'success' })
+          that.getData()
+        }).catch(function () {
+          wx.showToast({ title: '归还失败', icon: 'none' })
+          that.getData()
+        })
+      }
+    })
+  },
+
   onReturnAllRental(e) {
     var that = this
     var ridx = parseInt(e.currentTarget.dataset.ridx)
