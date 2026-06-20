@@ -416,8 +416,12 @@ Page({
     order.totalRentSummaryAmount = sumSummary
     order.totalRentOverTimeAmount = sumOvertime
     order.totalRentRepairAmount = sumRepair
-    var paidGuaranty = (order.rentProperties && order.rentProperties.totalPaidGuarantyAmount) || 0
-    order.totalRentNeedToRefundAmount = paidGuaranty - sumSummary + (order.depositPaidAmount || 0)
+    // 应退押金的押金基数用「总计押金」order.totalGuarantyAmount（与退款区展示的总计押金同源），
+    // 不用 rentProperties.totalPaidGuarantyAmount —— 后者按 guaranty.payStatus 过滤，而订单级 guarantys
+    // 的 payment 在 GetOrderByStaff 未 Include（OrderController.cs:195 注释掉了 ThenInclude payment），
+    // payStatus 不可靠，会把已收押金误算成 0（order 71766：总计押金 0.01，应退押金却算成 0）。
+    var totalGuaranty = order.totalGuarantyAmount || 0
+    order.totalRentNeedToRefundAmount = totalGuaranty - sumSummary + (order.depositPaidAmount || 0)
     order.totalRentUnRefund = order.totalRentNeedToRefundAmount - (order.refundAmount || 0)
     // 勾选「储值付租金」（且尚未用储值支付过）：租金改由会员储值支付 → 押金全额退，实际应退加回被扣的租金。
     // depositPaidAmount > 0 时不再加（那笔储值已计入上面的 depositPaid 项，避免重复）。
