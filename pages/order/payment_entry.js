@@ -151,7 +151,8 @@ Page({
     var that = this
     order.paying_amountStr = util.showAmount(order.paying_amount)
     order.paidAmountStr = util.showAmount(order.paidAmount)
-    order.total_amountStr = util.showAmount(order.total_amount)
+    // 总计用 paying_amount（PlaceRentOrder 设置的押金总额），rental 的 total_amount 字段不含租赁押金
+    order.total_amountStr = util.showAmount(order.paying_amount || 0)
     order.dataStr = util.formatDate(new Date(order.biz_date))
     order.timeStr = util.formatTimeStr(new Date(order.biz_date))
     var payment = null
@@ -169,7 +170,12 @@ Page({
         var firstItemName = rental.rentItems[0] ? rental.rentItems[0].name : ''
         rental.displayName = rental.name || firstItemName || '租赁'
         rental.guarantyStr = util.showAmount(rental.guaranty || 0)
-        rental.totalRentalAmountStr = util.showAmount(rental.totalRentalAmount || 0)
+        // 日租金优先使用开单时配置的 pricePresets（付款前 rental_detail 尚未生成，totalRentalAmount=0）
+        var presetTotal = 0
+        for (var p = 0; rental.pricePresets && p < rental.pricePresets.length; p++){
+          presetTotal += (rental.pricePresets[p].price || 0) - (rental.pricePresets[p].discount || 0)
+        }
+        rental.totalRentalAmountStr = util.showAmount(presetTotal > 0 ? presetTotal : (rental.totalRentalAmount || 0))
         rental.expanded = false
         for (var k = 0; k < rental.rentItems.length; k++){
           var item = rental.rentItems[k]
