@@ -185,15 +185,8 @@ Page({
         rental.start_dateDateStr = '——'
         rental.start_dateTimeStr = '——'
       }
-      if (rental.end_date) {
-        var endDate = new Date(rental.end_date)
-        rental.end_dateDateStr = util.formatDate(endDate)
-        rental.end_dateTimeStr = util.formatTimeStr(endDate)
-      } else {
-        // 未归还时 end_date 为空：显示「未退租」而非破折号，归还后自动展示真实退租时间
-        rental.end_dateDateStr = '未退租'
-        rental.end_dateTimeStr = ''
-      }
+      // 退租时间在下方 rentItems 循环后按归还事件派生：rental.end_date 列在新租赁流程从不写入
+      // （仅旧 RentOrder 模型会写），不能作为退租依据。改为「相关租赁物全部归还时取最晚归还时间」。
 
       // 租赁物明细
       for (var j = 0; rental.rentItems && j < rental.rentItems.length; j++) {
@@ -252,6 +245,23 @@ Page({
 
       // 件数不统计被换下（已更换）的租赁物（_replaced 在上面的 rentItems 循环里已逐项标好）
       rental._activeItemCount = (rental.rentItems || []).filter(function (it) { return !it._replaced }).length
+
+      // 退租时间派生：相关租赁物（排除「不需要」与「已更换」）全部归还后，取最晚归还时间作为退租时间，
+      // 否则显示「未退租」。依据归还事件（RentItemLog→returnDate），与是否结算（settled）无关——归还即视为退租。
+      var _relevantItems = (rental.rentItems || []).filter(function (it) { return !it.noNeed && !it._replaced })
+      var _allReturned = _relevantItems.length > 0 && _relevantItems.every(function (it) { return it._returned })
+      if (_allReturned) {
+        var _latestReturn = null
+        for (var ri = 0; ri < _relevantItems.length; ri++) {
+          var _rd = new Date(_relevantItems[ri].returnDate)
+          if (_latestReturn == null || _rd > _latestReturn) _latestReturn = _rd
+        }
+        rental.end_dateDateStr = util.formatDate(_latestReturn)
+        rental.end_dateTimeStr = util.formatTimeStr(_latestReturn)
+      } else {
+        rental.end_dateDateStr = '未退租'
+        rental.end_dateTimeStr = ''
+      }
 
       // 租金明细（按天聚合：每天一行；免除天连 valid=0 一起纳入并划线；赔偿金按租赁物维度不进此表）
       var feeDayMap = {}
