@@ -1115,7 +1115,9 @@ Page({
         wx.showLoading({ title: '处理中' })
         data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function (paidOrder) {
           if (!paidOrder) { wx.hideLoading(); wx.showToast({ title: '储值支付失败', icon: 'error' }); return }
-          var rAmount = parseFloat((paidOrder.totalRentUnRefund || 0).toFixed(2))
+          // 退押金额用页面已可靠算好的 refundAmount（基于 order.totalGuarantyAmount），不读 PayWithDeposit
+          // 返回的 totalRentUnRefund——后者经 GetOrder 返回、未加载订单级 order.guarantys，恒为 0 会误跳退款
+          var rAmount = parseFloat((refundAmount || 0).toFixed(2))
           if (rAmount <= 0) {
             wx.hideLoading()
             wx.showToast({ title: '储值支付成功', icon: 'success' })
