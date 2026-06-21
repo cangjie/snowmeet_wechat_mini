@@ -170,9 +170,16 @@ Page({
       order.calledName = calledName
       order.memberShip = memberShip
       order.paidAmountStr = util.showAmount(order.paidAmount)
+      var methodSet = {}
+      order.haveDeposit = false
       for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
-        order.payMethod = order.availablePayments[j].pay_method
+        var pm = order.availablePayments[j].pay_method
+        if (pm === '储值支付') { order.haveDeposit = true; continue }
+        if (pm === '次卡支付') continue
+        if (pm) methodSet[pm] = true
       }
+      var methods = Object.keys(methodSet)
+      order.payMethod = methods.length > 0 ? methods.join('/') : null
       order.displayedRental = 0
       for (var j = 0; order.rentals && order.rentProperties
         && order.rentProperties.rentStatus === '了结关闭' && j < order.rentals.length; j++) {

@@ -222,6 +222,7 @@
 .tag--credit  { background: #fce7f3; color: #9d174d; }
 .tag--discount { background: #d1fae5; color: #065f46; }
 .tag--card    { background: #dbeafe; color: #1e40af; }
+.tag--deposit { background: #ffedd5; color: #c2410c; }
 .tag--member  { background: #f0fdf4; color: #166534; }
 
 /* 详情行 */
