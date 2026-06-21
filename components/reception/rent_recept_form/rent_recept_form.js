@@ -464,8 +464,31 @@ Component({
       });
     },
     _applyPkgRate(ridx, v) {
-      const presets = (this.data.displayRentals[ridx].pricePresets || []).slice();
-      if (presets.length > 0) presets[0] = { ...presets[0], price: v };
+      const r = this.data.displayRentals[ridx] || {};
+      const presets = (r.pricePresets || []).slice();
+      if (presets.length > 0) {
+        presets[0] = { ...presets[0], price: v, manual: true };
+      } else {
+        // 该 rental 在库里没有任何 pricePreset（如雪杖等类目在本店没配置租金价格，
+        // createRentalDetail 因 priceList 空而没生成 preset）。此时若不新建，改租金只会
+        // 短暂更新 _dailyRate 显示，pricePresets 仍为空 → round-trip 后 getDailyRate 读回 0，
+        // 表现为「租金改不了」。这里手动补一条 preset，让修改真正写入并落库。
+        const sd = splitISODateTime(r.start_date);
+        const startDateStr = sd.date || formatDate(new Date());
+        const parts = startDateStr.split('-');
+        const dow = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])).getDay();
+        presets.push({
+          id: 0,
+          rental_id: r.id || 0,
+          rent_type: '日场',
+          day_type: (dow === 0 || dow === 6) ? '周末' : '平日',
+          scene: '门市',
+          price: v,
+          discount: 0,
+          rent_date: startDateStr,
+          manual: true,
+        });
+      }
       this.setData({
         [`displayRentals[${ridx}].pricePresets`]: presets,
         [`displayRentals[${ridx}]._dailyRate`]: v,
