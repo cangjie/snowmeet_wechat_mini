@@ -117,6 +117,24 @@ function splitISODateTime(sd) {
   return { date, time };
 }
 
+// 购物车「添加时间正序」排序键：已保存项（id>0，自增=创建先后）按 id 升序；
+// 未保存的新建项（id=0）按 timeStamp 升序，并整体排在已保存项之后（刚加的在最下）。
+function byAddedTime(a, b) {
+  const ai = a.id || 0;
+  const bi = b.id || 0;
+  if (ai && bi) return ai - bi;
+  if (!ai && !bi) return (a.timeStamp || 0) - (b.timeStamp || 0);
+  return ai ? -1 : 1;
+}
+
+// 「按品种」排序：主排序套餐(package_id 非空)在前、单品在后；次排序同组内按添加时间正序。
+function byCategoryThenTime(a, b) {
+  const ag = a.package_id ? 0 : 1;
+  const bg = b.package_id ? 0 : 1;
+  if (ag !== bg) return ag - bg;
+  return byAddedTime(a, b);
+}
+
 function stripUI(arr) {
   return (arr || []).map(r => {
     const out = {};
@@ -202,6 +220,10 @@ Component({
   methods: {
     /* ---------- 数据增强：原始 rentals → 渲染用 rentals ---------- */
     _refreshRentals(raw) {
+      // 购物车排序：按时间=添加时间正序（先添加在上）；按品种=套餐在前/单品在后，组内再按添加时间。
+      // 覆盖找回中断单时 GetReceptingOrder 返回的顺序，保证稳定。新建未保存项排在（同组）最下。
+      const sorter = this.data.sort === 'category' ? byCategoryThenTime : byAddedTime;
+      raw = (raw || []).slice().sort(sorter);
       const expandedPkg = { ...(this.data.expandedPkg || {}) };
       const expandedItem = { ...(this.data.expandedItem || {}) };
       const today = formatDate(new Date());
@@ -320,7 +342,10 @@ Component({
     onSortChange(e) {
       const sort = e.currentTarget.dataset.value;
       if (sort === this.data.sort) return;
+      // 先落 sort（setData 同步更新 this.data），再用当前购物车数据按新规则重排显示。
+      // 仅本地重排，不 _emitSync，避免无意义的后端保存往返。
       this.setData({ sort });
+      this._refreshRentals(stripUI(this.data.displayRentals));
       this.triggerEvent('sortChange', { sort });
     },
 
