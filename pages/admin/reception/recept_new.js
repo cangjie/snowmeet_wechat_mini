@@ -57,23 +57,29 @@ Page({
     let customer = { memberId: null, name: '', cell: '', gender: '' };
     let orderId = options.orderId ? safeDecode(options.orderId) : null;
     let orderCustomerLoaded = false;
+    let recoveredOrder = null;  // 找回中断订单：连同 rentals 一起恢复
 
     if (orderId) {
       try {
         const data = require('../../../utils/data.js');
         const sessionKey = app.globalData.sessionKey || '';
-        const order = await data.getOrderByStaffPromise(orderId, sessionKey);
-        if (order && (order.contact_name || order.contact_num || order.member_id)) {
-          customer = {
-            memberId: order.member_id || null,
-            name: order.contact_name || '',
-            cell: order.contact_num || '',
-            gender: order.contact_gender || '',
-          };
-          orderCustomerLoaded = true;
+        // 用 GetReceptingOrder（不按 rental.valid 过滤）拉中断单；接待中 rental 是 valid=0 草稿态，
+        // 去结算 PlaceRentOrder 才置 1。若用 GetOrderByStaff（valid=1 过滤）会把草稿 rental 滤掉 → 找回成空单
+        const order = await data.getRentReceptingOrderPromise(orderId, sessionKey);
+        if (order && order.id) {
+          recoveredOrder = order;
+          if (order.contact_name || order.contact_num || order.member_id) {
+            customer = {
+              memberId: order.member_id || null,
+              name: order.contact_name || '',
+              cell: order.contact_num || '',
+              gender: order.contact_gender || '',
+            };
+            orderCustomerLoaded = true;
+          }
         }
       } catch (e) {
-        console.warn('Failed to load order by orderId:', e);
+        console.warn('Failed to load recepting order by orderId:', e);
       }
     }
 
@@ -87,15 +93,29 @@ Page({
       };
     }
 
-    this.setData({
-      bizType,
-      bizLabel: BIZ_LABELS[bizType] || '业务',
-      shop,
-      customer,
-      'order.type': BIZ_LABELS[bizType] || '',
-      'order.shop': shop,
-      'order.member_id': customer.memberId,
-    });
+    if (recoveredOrder) {
+      // 恢复整单（含 id + rentals），购物车直接显示原有租赁商品，后续保存更新同一张中断单
+      (recoveredOrder.rentals || []).forEach((r) => {
+        r.timeStamp = (new Date(r.create_date || Date.now())).getTime();
+      });
+      this.setData({
+        bizType,
+        bizLabel: BIZ_LABELS[bizType] || '业务',
+        shop: recoveredOrder.shop || shop,
+        customer,
+        order: recoveredOrder,
+      });
+    } else {
+      this.setData({
+        bizType,
+        bizLabel: BIZ_LABELS[bizType] || '业务',
+        shop,
+        customer,
+        'order.type': BIZ_LABELS[bizType] || '',
+        'order.shop': shop,
+        'order.member_id': customer.memberId,
+      });
+    }
   },
 
   onShow() {},
