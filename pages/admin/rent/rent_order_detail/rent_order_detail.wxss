@@ -332,6 +332,20 @@
   line-height: 1.2;
   margin-top: 2rpx;
 }
+.rental-showcase-fee-cell--tappable {
+  border-radius: 8rpx;
+}
+.rental-showcase-fee-label--row {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+.rental-showcase-fee-cell--tappable:active {
+  background: #eef3f8;
+}
+.rental-showcase-fee-value--entertain {
+  color: #d97706;
+}
 .rental-showcase-subtotal {
   height: 68rpx;
   border-top: 1rpx solid #e7edf4;

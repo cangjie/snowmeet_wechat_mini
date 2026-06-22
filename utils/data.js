@@ -725,6 +725,19 @@ const updateRentalDayChargesPromise = function (rentalId, rentDetailId, rent, ov
     })
   })
 }
+// 设/撤某 rental 的「招待」（招待免该项租金，按现有招待计费规则计费）
+const setRentalEntertainPromise = function (rentalId, entertain, scene, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/SetRentalEntertainByStaff/' + rentalId
+    + '?entertain=' + (entertain ? 'true' : 'false')
+    + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, {}).then(function (rental) {
+      resolve(rental)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const refundPromise = function (orderId, refunds, sessionKey) {
   var refundUrl = app.globalData.requestPrefix + 'Order/Refund/' + orderId.toString() + '?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -967,6 +980,7 @@ module.exports = {
   setRentItemStatsPromise,
   updateRentalDetailsPromise,
   updateRentalDayChargesPromise,
+  setRentalEntertainPromise,
   refundPromise,
   updateRentalPromise,
   updateRentalGuarantyPromise,

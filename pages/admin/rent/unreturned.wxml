@@ -1,37 +1,88 @@
-<view>
-  <view class="view-row" style="justify-content: center;margin-top: 20rpx;">
-    <shop-selector bindShopSelected="shopSelected"></shop-selector>
-    <view style="width: 100rpx;"></view>
-    <van-button disabled="{{querying}}" size="small" type="primary" bind:click="getData"> 查 询 </van-button>
+<view class="ur-page">
+
+  <!-- 顶部工具栏：店铺选择 + 查询 + 模糊搜索 -->
+  <view class="ur-toolbar">
+    <view class="ur-shop-row">
+      <shop-selector bindShopSelected="shopSelected"></shop-selector>
+      <van-button class="ur-query-btn" disabled="{{querying}}" size="small" type="info" bind:click="getData">查 询</van-button>
+    </view>
+    <view class="ur-search">
+      <van-icon name="search" size="16px" color="#9aa4b2" />
+      <input class="ur-search-input" placeholder="按编码 / 名称 / 分类模糊搜索" placeholder-class="ur-search-ph"
+             value="{{keyword}}" bindinput="onKeywordInput" confirm-type="search" />
+    </view>
   </view>
-  <view style="margin-top: 50rpx;">
-    <van-collapse accordion value="{{ activeName }}" bind:change="onChange" wx:for="{{classList}}" wx:for-item="category">
-      <van-collapse-item title="{{category.category.name}}：{{category.items.length}}" name="{{index}}">
-        <mp-cells title="" >
-          <mp-cell wx:for="{{category.items}}">
-            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
-              <view class="left-column">订单号：</view>
-              <view class="right-column" >{{item.rental.order.code}}</view>
-            </view>
-            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
-              <view class="left-column">名称：</view>
-              <view class="right-column">{{item.name}}</view>
-            </view>
-            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
-              <view class="left-column">发放人：</view>
-              <view class="right-column">{{item.pickStaff.name}}</view>
-            </view>
-            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
-              <view class="left-column">发放日期：</view>
-              <view class="right-column">{{item.pickDateDateStr}}</view>
-            </view>
-            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
-              <view class="left-column">发放时间：</view>
-              <view class="right-column">{{item.pickDateTimeStr}}</view>
-            </view>
-          </mp-cell>
-        </mp-cells>
-      </van-collapse-item>
-    </van-collapse>
+
+  <!-- 归类模式切换 -->
+  <view class="ur-modebar">
+    <view class="ur-mode {{groupMode == m.key ? 'ur-mode--on' : ''}}" wx:for="{{modes}}" wx:for-item="m" wx:key="key"
+          data-key="{{m.key}}" bindtap="onSwitchMode">{{m.label}}</view>
   </view>
+
+  <!-- 汇总条 -->
+  <view class="ur-summary">
+    <view class="ur-summary-cell">{{groupLabel}} <text class="ur-summary-num">{{groupCount}}</text></view>
+    <view class="ur-summary-divider"></view>
+    <view class="ur-summary-cell">未归还租赁物 <text class="ur-summary-num">{{itemCount}}</text> 件</view>
+  </view>
+
+  <!-- section 列表（三种模式共用结构） -->
+  <view class="ur-list">
+    <view class="ur-section" wx:for="{{displaySections}}" wx:for-item="sec" wx:key="_key">
+
+      <view class="ur-section-head" data-key="{{sec._key}}" bindtap="onToggleSection">
+        <van-icon class="ur-cat-icon" name="{{sec._icon}}" size="18px" color="#006495" />
+        <text class="ur-cat-name">{{sec._title}}<text class="ur-honorific" wx:if="{{sec._honorific}}"> {{sec._honorific}}</text></text>
+        <view class="ur-cust-cell" wx:if="{{sec._cell}}" catchtap="call" data-cell="{{sec._cell}}">
+          <van-icon name="phone-o" size="14px" color="#2EA6D0" />
+          <text>{{sec._cell}}</text>
+        </view>
+        <text class="ur-sec-code" wx:if="{{sec._code}}">{{sec._code}}</text>
+        <text class="ur-cat-count">{{sec._count}}</text>
+        <van-icon name="{{(keyword || activeNames[sec._key]) ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#9aa4b2" />
+      </view>
+
+      <view class="ur-section-body" wx:if="{{keyword || activeNames[sec._key]}}">
+
+        <view class="ur-group" wx:for="{{sec._groups}}" wx:for-item="grp" wx:key="_gkey">
+
+          <view class="ur-group-head" wx:if="{{grp._ghead}}">
+            <van-icon name="{{grp._gIcon}}" size="15px" color="#006495" />
+            <text class="ur-cust-name" wx:if="{{grp._gLeft}}">{{grp._gLeft}}<text class="ur-honorific" wx:if="{{grp._gHonorific}}"> {{grp._gHonorific}}</text></text>
+            <view class="ur-cust-cell" wx:if="{{grp._gCell}}" catchtap="call" data-cell="{{grp._gCell}}">
+              <van-icon name="phone-o" size="14px" color="#2EA6D0" />
+              <text>{{grp._gCell}}</text>
+            </view>
+            <text class="ur-order-code" wx:if="{{grp._gRight}}">{{grp._gRight}}</text>
+          </view>
+
+          <!-- 租赁物卡片：点击深链跳转明细 -->
+          <view class="ur-item" wx:for="{{grp.items}}" wx:for-item="item" wx:key="id"
+                data-order-id="{{item._orderId}}" data-item-id="{{item.id}}" bindtap="gotoItem">
+            <view class="ur-item-icon">
+              <van-icon name="goods-collect-o" size="20px" color="#006495" />
+            </view>
+            <view class="ur-item-main">
+              <view class="ur-item-title-row">
+                <text class="ur-item-name">{{item.name || '未命名'}}</text>
+                <text class="ur-item-code" wx:if="{{item.code}}">{{item.code}}</text>
+              </view>
+              <view class="ur-item-meta">
+                <van-icon name="clock-o" size="13px" color="#9aa4b2" />
+                <text class="ur-item-time">{{item.pickDateStr}}<text wx:if="{{item.pickTimeStr}}"> {{item.pickTimeStr}}</text></text>
+                <text class="ur-tag-issued">发放</text>
+                <text class="ur-cat-tag" wx:if="{{groupMode != 'category'}}">{{item._categoryName}}</text>
+              </view>
+            </view>
+            <view class="ur-item-days">已租 <text class="ur-days-num">{{item._rentedDays}}</text> 天</view>
+          </view>
+
+        </view>
+
+      </view>
+    </view>
+
+    <view class="ur-empty" wx:if="{{!querying && displaySections.length == 0}}">暂无未归还租赁物</view>
+  </view>
+
 </view>

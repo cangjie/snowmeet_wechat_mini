@@ -1,16 +1,266 @@
-@import '/app.wxss';
-@import '/common.wxss';
-@import '/weui.wxss';
-.left-column{
-  text-align: left;
-  width: 230rpx;
-  margin-top: 0rpx;
+/* 未归还租赁物列表 —— Alpine Operational Minimalist 风格 */
+.ur-page {
+  min-height: 100vh;
+  background: #f8f9ff;
+  padding: 16rpx 20rpx 60rpx;
+  box-sizing: border-box;
 }
-.right-column{
-  width:500rpx;
-  text-align: left;
-  margin-top: 0rpx;
+
+/* ---------- 顶部工具栏 ---------- */
+.ur-toolbar {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 100, 149, 0.05);
 }
-.view-row{
-  margin-top: 0rpx;
+.ur-shop-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+.ur-query-btn {
+  flex: 0 0 auto;
+}
+.ur-search {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 20rpx;
+  background: #f1f4fa;
+  border-radius: 12rpx;
+  padding: 14rpx 20rpx;
+}
+.ur-search-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: #1f2937;
+}
+.ur-search-ph {
+  color: #9aa4b2;
+}
+
+/* ---------- 归类模式切换 ---------- */
+.ur-modebar {
+  display: flex;
+  margin: 20rpx 0 4rpx;
+  background: #eef1f7;
+  border-radius: 14rpx;
+  padding: 6rpx;
+  gap: 6rpx;
+}
+.ur-mode {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  color: #6b7280;
+  padding: 14rpx 0;
+  border-radius: 10rpx;
+  transition: all 0.15s;
+}
+.ur-mode--on {
+  background: #ffffff;
+  color: #006495;
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(0, 100, 149, 0.1);
+}
+
+/* ---------- 汇总条 ---------- */
+.ur-summary {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin: 20rpx 8rpx 8rpx;
+  font-size: 24rpx;
+  color: #6b7280;
+}
+.ur-summary-num {
+  color: #006495;
+  font-weight: 600;
+  font-size: 28rpx;
+}
+.ur-summary-divider {
+  width: 1rpx;
+  height: 22rpx;
+  background: #d6dbe5;
+}
+
+/* ---------- 品类 section ---------- */
+.ur-list {
+  margin-top: 12rpx;
+}
+.ur-section {
+  background: #ffffff;
+  border-radius: 16rpx;
+  margin-bottom: 18rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 100, 149, 0.05);
+}
+.ur-section-head {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 26rpx 24rpx;
+}
+.ur-cat-icon {
+  flex: 0 0 auto;
+}
+.ur-cat-name {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ur-cat-count {
+  min-width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  padding: 0 14rpx;
+  border-radius: 20rpx;
+  background: #e6f1f7;
+  color: #006495;
+  font-size: 24rpx;
+  font-weight: 600;
+  text-align: center;
+}
+.ur-section-body {
+  padding: 0 20rpx 16rpx;
+}
+/* section 头右侧编码（按订单模式显示订单号） */
+.ur-sec-code {
+  flex: 0 0 auto;
+  font-size: 22rpx;
+  color: #9aa4b2;
+  margin-right: 4rpx;
+}
+
+/* ---------- 顾客分组 ---------- */
+.ur-group {
+  border-top: 1rpx solid #eef1f6;
+  padding-top: 16rpx;
+  margin-top: 4rpx;
+}
+.ur-group-head {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 8rpx 4rpx 14rpx;
+  flex-wrap: wrap;
+}
+.ur-cust-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #374151;
+}
+.ur-honorific {
+  font-weight: 400;
+  color: #6b7280;
+}
+.ur-cust-cell {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: #2EA6D0;
+}
+.ur-order-code {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: #9aa4b2;
+}
+
+/* ---------- 租赁物卡片 ---------- */
+.ur-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: #f8fafc;
+  border-radius: 12rpx;
+  padding: 18rpx 20rpx;
+  margin-bottom: 12rpx;
+}
+.ur-item:active {
+  background: #eef3f8;
+}
+.ur-item-icon {
+  flex: 0 0 auto;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 12rpx;
+  background: #e6f1f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ur-item-main {
+  flex: 1;
+  min-width: 0;
+}
+.ur-item-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14rpx;
+}
+.ur-item-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ur-item-code {
+  flex: 0 0 auto;
+  font-size: 22rpx;
+  color: #6b7280;
+  font-family: monospace;
+}
+.ur-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 8rpx;
+}
+.ur-item-time {
+  font-size: 22rpx;
+  color: #9aa4b2;
+}
+.ur-tag-issued {
+  font-size: 20rpx;
+  color: #15803d;
+  background: #dcfce7;
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+  margin-left: 4rpx;
+}
+/* 非「按分类」模式下，卡片内显示品类名 */
+.ur-cat-tag {
+  font-size: 20rpx;
+  color: #006495;
+  background: #e6f1f7;
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+  margin-left: 4rpx;
+}
+.ur-item-days {
+  flex: 0 0 auto;
+  font-size: 22rpx;
+  color: #6b7280;
+  text-align: right;
+}
+.ur-days-num {
+  color: #d97706;
+  font-weight: 600;
+  font-size: 28rpx;
+}
+
+/* ---------- 空态 ---------- */
+.ur-empty {
+  text-align: center;
+  color: #9aa4b2;
+  font-size: 26rpx;
+  padding: 80rpx 0;
 }

@@ -80,6 +80,10 @@ Page({
 
   onLoad(options) {
     this.setData({ id: parseInt(options.id) })
+    // 「未归还租赁物」列表深链：仅此入口会带 rentItemId，普通进入为 null（行为不变）
+    this._targetRentItemId = (options && options.rentItemId != null && options.rentItemId !== '')
+      ? parseInt(options.rentItemId) : null
+    this._deepLinkApplied = false
   },
 
   onShow() {
@@ -111,6 +115,7 @@ Page({
           var allValid = that.checkAppendingRentalValid(order)
           wx.hideLoading()
           that.setData({ order, allValid })
+          that.applyDeepLinkExpand(order)
         }
         // 补拉完整会员：GetOrderByStaff 的 order.member 不带 depositAccounts → availableDeposit=0，
         // 「可用储值 / 储值付租金」要靠它（口径同旧版 rent_details 的 getMemberPromise）。
@@ -494,6 +499,38 @@ Page({
     this.setData({ [key]: !this.data._expandedDetails[ridx] })
   },
 
+  // 点 showcase「招待」格 → 二次确认后设/撤招待（招待免该项租金，按现有招待计费规则计费）
+  onToggleEntertain(e) {
+    var that = this
+    var ridx = e.currentTarget.dataset.ridx
+    var order = that.data.order
+    var rental = order && order.rentals && order.rentals[ridx]
+    if (!rental) return
+    var cur = !!rental.entertain
+    var next = !cur
+    wx.showModal({
+      title: cur ? '取消招待' : '设为招待',
+      content: cur ? '取消后该项恢复正常计费。' : '设为招待将免除该项租金（超时费/赔偿仍照常计）。',
+      success: function (res) {
+        if (!res.confirm) return
+        wx.showLoading({ title: '保存中' })
+        var rentalId = rental.id
+        data.setRentalEntertainPromise(rentalId, next, '租赁订单详细页设置招待', app.globalData.sessionKey)
+          .then(function (updatedRental) {
+            var od = that.data.order
+            if (updatedRental) od.rentals[ridx] = updatedRental
+            od = that.renderOrder(od)
+            wx.hideLoading()
+            that.setData({ order: od })
+            wx.showToast({ title: next ? '已设为招待' : '已取消招待', icon: 'success' })
+          }).catch(function () {
+            wx.hideLoading()
+            wx.showToast({ title: '保存失败', icon: 'error' })
+          })
+      }
+    })
+  },
+
   // 点某天租金行 → 弹窗编辑 当天租金 / 超时费 / 减免
   onEditDayCharge(e) {
     var ridx = e.currentTarget.dataset.ridx
@@ -572,6 +609,50 @@ Page({
     var ridx = e.currentTarget.dataset.ridx
     var key = '_expandedItems.' + ridx
     this.setData({ [key]: !this.data._expandedItems[ridx] })
+  },
+
+  // 从「未归还租赁物」列表深链进入（URL 带 rentItemId）时：
+  // 只展开目标租赁物所在 rental + 其租赁物列表，折叠订单信息/支付/退款及其余 rental，
+  // best-effort 滚动到目标卡片。无 rentItemId（普通进入）直接返回，行为不变。
+  // _deepLinkApplied 守卫：只在首次渲染生效，后续 onShow 不再覆盖用户手动展开。
+  applyDeepLinkExpand(order) {
+    if (this._deepLinkApplied || this._targetRentItemId == null) return
+    if (!order || !order.rentals) return
+    var ridx = -1
+    for (var i = 0; i < order.rentals.length && ridx < 0; i++) {
+      var items = (order.rentals[i] && order.rentals[i].rentItems) || []
+      for (var j = 0; j < items.length; j++) {
+        if (items[j] && items[j].id === this._targetRentItemId) { ridx = i; break }
+      }
+    }
+    if (ridx < 0) return // 目标不在本订单（异常入参）→ 保持默认展开
+    this._deepLinkApplied = true
+    var expandedRentals = {}; expandedRentals[ridx] = true
+    var expandedItems = {}; expandedItems[ridx] = true
+    var that = this
+    this.setData({
+      _rentalTab: 0,
+      _orderInfoExpanded: false,
+      _paymentDetailExpanded: false,
+      _refundExpanded: false,
+      _expandedRentals: expandedRentals,
+      _expandedItems: expandedItems,
+      _expandedDetails: {}
+    }, function () {
+      // setData 回调：此时目标 rental 已展开、租赁物卡片已渲染，再查询定位
+      try {
+        wx.createSelectorQuery().in(that)
+          .select('#rid-item-' + that._targetRentItemId).boundingClientRect()
+          .selectViewport().scrollOffset()
+          .exec(function (res) {
+            var rect = res && res[0]
+            var scroll = res && res[1]
+            if (rect && scroll) {
+              wx.pageScrollTo({ scrollTop: Math.max(0, scroll.scrollTop + rect.top - 80), duration: 200 })
+            }
+          })
+      } catch (e) {}
+    })
   },
 
   _getItemRef(ridx, iidx) {

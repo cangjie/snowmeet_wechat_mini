@@ -1,6 +1,6 @@
 <!-- 租赁物卡片模板：按商品(readonly=true 只读概览) 与 按物品(readonly=false 带操作) 共用 -->
 <template name="rentItemCard">
-  <view class="item-detail-card {{rentItem.noNeed ? 'item-detail-card--noneed' : ''}} {{rentItem._replaced ? 'item-detail-card--replaced' : ''}}">
+  <view id="rid-item-{{rentItem.id}}" class="item-detail-card {{rentItem.noNeed ? 'item-detail-card--noneed' : ''}} {{rentItem._replaced ? 'item-detail-card--replaced' : ''}}">
     <view class="rid-head">
       <view class="rid-head-icon">
         <van-icon name="goods-collect-o" size="18px" color="#006495" />
@@ -321,9 +321,12 @@
                 <text class="rental-showcase-fee-label">超时</text>
                 <text class="rental-showcase-fee-value">¥{{item.totalOvertimeAmount || 0}}</text>
               </view>
-              <view class="rental-showcase-fee-cell">
-                <text class="rental-showcase-fee-label">招待</text>
-                <text class="rental-showcase-fee-value">{{item.entertain ? '是' : '否'}}</text>
+              <view class="rental-showcase-fee-cell rental-showcase-fee-cell--tappable" bindtap="onToggleEntertain" data-ridx="{{ridx}}">
+                <view class="rental-showcase-fee-label rental-showcase-fee-label--row">
+                  <text>招待</text>
+                  <van-icon name="edit" size="11px" color="#9aa4b2" />
+                </view>
+                <text class="rental-showcase-fee-value {{item.entertain ? 'rental-showcase-fee-value--entertain' : ''}}">{{item.entertain ? '是' : '否'}}</text>
               </view>
             </view>
 
