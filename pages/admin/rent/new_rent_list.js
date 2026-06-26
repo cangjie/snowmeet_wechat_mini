@@ -19,7 +19,7 @@ Page({
     orders: [],       // 当前页数据
     total: 0,         // 服务器返回的总条数
     page: 1,
-    pageSize: 10,
+    pageSize: 50,
     totalPages: 0,
     totalRentalAmountStr: '',
     querying: false
@@ -30,11 +30,15 @@ Page({
     this.setData({ startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate) })
   },
 
+  // 返回列表时（从订单明细等页面返回触发 onShow）：保留当前页码/每页条数/筛选 tag，
+  // 用这些参数重新查询并按当前状态显示——不重置回第 1 页。
+  // 页面实例 navigateTo 期间不销毁，page/pageSize/queryOptions 等都还在 this.data 里，
+  // 直接读取即为「记录下的各个参数」。首次进入时 page=1/pageSize=50 自然等同初始查询。
   onShow() {
     var that = this
     app.loginPromiseNew.then(function () {
       that.setData({ staff: app.globalData.staff, querying: true })
-      that.getData(1)
+      that.getData(that.data.page, that.data.pageSize)
     })
   },
 
@@ -100,11 +104,11 @@ Page({
     return { shop, startDate, endDate, cell, keyword, isTest, isEntertain, haveDiscount, rentCategoryId, rentItemName, useCard, rentStatus }
   },
 
-  getData(page) {
+  getData(page, pageSize) {
     var that = this
     page = page || that.data.page
     var p = that._buildQueryParams()
-    var pageSize = that.data.pageSize
+    pageSize = pageSize || that.data.pageSize
     data.getRentOrdersByStaffPagedPromise(
       null, p.shop, null, null, '租赁', p.startDate, p.endDate,
       null, p.isTest, p.isEntertain, null, null, p.haveDiscount, null,
@@ -202,23 +206,18 @@ Page({
       orders,
       total,
       page,
+      pageSize,
       totalPages,
       totalRentalAmountStr: util.showAmount(totalRentalAmount)
     })
   },
 
-  onPrevPage() {
-    var page = this.data.page - 1
-    if (page < 1) return
+  // list-pager 组件统一回调：翻页 / 跳转 / 改每页条数
+  onPagerChange(e) {
+    if (this.data.querying) return
+    var d = e.detail   // { page, pageSize }
     this.setData({ querying: true })
-    this.getData(page)
-  },
-
-  onNextPage() {
-    var page = this.data.page + 1
-    if (page > this.data.totalPages) return
-    this.setData({ querying: true })
-    this.getData(page)
+    this.getData(d.page, d.pageSize)
   },
 
   gotoDetail(e) {

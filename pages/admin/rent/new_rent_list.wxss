@@ -131,17 +131,10 @@
   color: #ccc;
 }
 
-.page-bar {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8rpx 0;
-}
-
-.page-info {
-  font-size: 24rpx;
-  color: #666;
+/* 翻页栏已抽成 list-pager 组件，样式在 components/list-pager/index.wxss */
+.summary-section--bottom {
+  margin-top: 16rpx;
+  margin-bottom: 24rpx;
 }
 
 /* ── 订单卡片 ─────────────────────────────── */

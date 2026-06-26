@@ -248,7 +248,13 @@ Page({
     })
   },
 
-  onLoad(options) {
+  onLoad(options) {},
+
+  // 返回列表时（从订单明细等页面返回触发 onShow）：保留当前归类模式/搜索词/门店等参数，
+  // 重新拉取未归还数据并按当前参数重组显示。页面实例 navigateTo 期间不销毁，
+  // groupMode/keyword/shop 都还在 this.data 里，getData→render 直接沿用即为「按当前参数显示」。
+  // 首次进入也走这里（onLoad 之后触发），等同初始加载。
+  onShow() {
     var that = this
     app.loginPromiseNew.then(function () {
       that.getData()

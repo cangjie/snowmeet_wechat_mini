@@ -139,6 +139,7 @@ Page({
     var unRelieveGuaranty = 0
     var relieveGuaranty = 0
     var allSettled = true
+    var allRentalsReturned = true   // 所有 rental 是否均已退租（退押金前提之一）
 
     order._displayCode = formatDisplayOrderCode(order.code || order.id)
 
@@ -255,6 +256,8 @@ Page({
       // 否则显示「未退租」。依据归还事件（RentItemLog→returnDate），与是否结算（settled）无关——归还即视为退租。
       var _relevantItems = (rental.rentItems || []).filter(function (it) { return !it.noNeed && !it._replaced })
       var _allReturned = _relevantItems.length > 0 && _relevantItems.every(function (it) { return it._returned })
+      rental._allReturned = _allReturned
+      if (!_allReturned) allRentalsReturned = false
       if (_allReturned) {
         var _latestReturn = null
         for (var ri = 0; ri < _relevantItems.length; ri++) {
@@ -403,6 +406,7 @@ Page({
     order.categoryNum = order.rentals ? order.rentals.length - packageNum : 0
     order.paidAmountStr = util.showAmount(order.paidAmount)
     order.refundAmountStr = util.showAmount(order.refundAmount)
+    order._allRentalsReturned = allRentalsReturned
     order.unRelieveGuaranty = unRelieveGuaranty
     order.unRelieveGuarantyStr = util.showAmount(unRelieveGuaranty)
     order.relieveGuarantyStr = util.showAmount(relieveGuaranty)

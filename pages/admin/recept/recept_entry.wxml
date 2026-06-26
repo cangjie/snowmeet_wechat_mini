@@ -23,4 +23,11 @@
     </view>
     </mp-cell>
   </mp-cells>
+  <mp-cells title="新版接待" >
+    <mp-cell>
+      <view class="view-row" style="justify-content: center;" >
+      <button class="input" type="primary" bind:tap="goNewVersion" size="mini" > 进 入 新 版 </button>
+    </view>
+    </mp-cell>
+  </mp-cells>
 </view>

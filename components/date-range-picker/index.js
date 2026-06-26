@@ -20,7 +20,19 @@ Component({
 
   data: {
     showCalendar: false,
-    activeShortcut: 'today'
+    activeShortcut: 'today',
+    minDate: 0,
+    maxDate: 0
+  },
+
+  attached() {
+    var today = new Date()
+    today.setHours(23, 59, 59, 0)
+    // 允许往回选 3 年，往后到今天为止（历史订单查询无需选未来日期）
+    var min = new Date(today)
+    min.setFullYear(today.getFullYear() - 3)
+    min.setHours(0, 0, 0, 0)
+    this.setData({ minDate: min.getTime(), maxDate: today.getTime() })
   },
 
   methods: {

@@ -235,5 +235,10 @@ Page({
       url: 'recept_member_info',
     })
     */
+  },
+  goNewVersion(){
+    wx.navigateTo({
+      url: '/pages/admin/reception/recept_entry'
+    })
   }
 })

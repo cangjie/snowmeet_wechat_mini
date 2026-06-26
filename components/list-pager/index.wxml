@@ -1,0 +1,24 @@
+<view class="lp-root">
+  <view class="lp-bar">
+    <van-button size="mini" plain type="primary" disabled="{{disabled || page <= 1}}" bind:click="onFirst">首页</van-button>
+    <van-button size="mini" plain type="primary" disabled="{{disabled || page <= 1}}" bind:click="onPrev">上一页</van-button>
+    <van-button size="mini" plain type="primary" disabled="{{disabled || page >= totalPages}}" bind:click="onNext">下一页</van-button>
+    <van-button size="mini" plain type="primary" disabled="{{disabled || page >= totalPages}}" bind:click="onLast">末页</van-button>
+  </view>
+  <view class="lp-bar lp-bar--second">
+    <text class="lp-info">第 {{page}} / {{totalPages}} 页</text>
+    <view class="lp-ctrl">
+      <text class="lp-label">跳至</text>
+      <input class="lp-input" type="number" value="{{pageInput}}" placeholder="页码"
+             disabled="{{disabled}}" bindinput="onPageInput" bindconfirm="onJump" confirm-type="go" />
+      <van-button size="mini" plain type="primary" disabled="{{disabled}}" bind:click="onJump">跳转</van-button>
+    </view>
+    <view class="lp-ctrl">
+      <text class="lp-label">每页</text>
+      <input class="lp-input" type="number" value="{{pageSizeInput}}"
+             disabled="{{disabled}}" bindinput="onPageSizeInput" bindblur="onPageSizeChange"
+             bindconfirm="onPageSizeChange" confirm-type="done" />
+      <text class="lp-label">条</text>
+    </view>
+  </view>
+</view>

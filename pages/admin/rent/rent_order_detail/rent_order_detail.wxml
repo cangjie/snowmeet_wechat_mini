@@ -1,4 +1,4 @@
-<!-- 租赁物卡片模板：按商品(readonly=true 只读概览) 与 按物品(readonly=false 带操作) 共用 -->
+<!-- 租赁物卡片模板：按商品 / 按物品 两视图共用，readonly=false 时带归还/暂存/更换/赔偿/备注操作 -->
 <template name="rentItemCard">
   <view id="rid-item-{{rentItem.id}}" class="item-detail-card {{rentItem.noNeed ? 'item-detail-card--noneed' : ''}} {{rentItem._replaced ? 'item-detail-card--replaced' : ''}}">
     <view class="rid-head">
@@ -375,7 +375,7 @@
 
           <view class="divider"></view>
 
-          <!-- 租赁物明细 toggle（概览只读；归还/暂存/更换/赔偿等操作集中在「按租赁物」视图） -->
+          <!-- 租赁物明细 toggle（与「按租赁物」一致，带归还/暂存/更换/赔偿/备注操作按钮） -->
           <view class="toggle-row toggle-row--between">
             <view class="toggle-row-left" bindtap="onToggleItems" data-ridx="{{ridx}}">
               <van-icon name="{{_expandedItems[ridx] ? 'arrow-up' : 'arrow-down'}}" size="14px" />
@@ -385,7 +385,7 @@
           <block wx:if="{{_expandedItems[ridx]}}">
             <template is="rentItemCard"
               wx:for="{{item.rentItems}}" wx:key="id" wx:for-item="rentItem" wx:for-index="iidx"
-              data="{{rentItem: rentItem, ridx: ridx, iidx: iidx, expLogs: _expandedItemLogs, expChg: _expandedItemChanges, refundAmount: order.refundAmount, readonly: true}}" />
+              data="{{rentItem: rentItem, ridx: ridx, iidx: iidx, expLogs: _expandedItemLogs, expChg: _expandedItemChanges, refundAmount: order.refundAmount, readonly: false}}" />
             <view wx:if="{{!item.rentItems || item.rentItems.length == 0}}" class="item-log-empty">暂无租赁物</view>
           </block>
         </block>
@@ -484,10 +484,13 @@
         <van-button
           type="danger"
           block
-          disabled="{{order.closed == 1 || order.totalRentUnRefund <= 0}}"
+          disabled="{{order.closed == 1 || order.totalRentUnRefund <= 0 || !order._allRentalsReturned}}"
           bindtap="onRefund">
           申请退款 {{order.totalRentUnRefund > 0 ? order.totalRentUnRefundStr : ''}}
         </van-button>
+      </view>
+      <view wx:if="{{!order._allRentalsReturned && order.totalRentUnRefund > 0 && order.closed != 1}}" class="refund-hint">
+        所有租赁物退租后才能退押金
       </view>
     </block>
   </view>

@@ -821,6 +821,7 @@
 .refund-amount-value { font-size: 28rpx; color: #333; font-weight: 600; }
 .refund-need { color: #E64340; }
 .refund-btn-row { margin-top: 16rpx; }
+.refund-hint { margin-top: 10rpx; font-size: 22rpx; color: #ba1a1a; text-align: center; }
 .refund-deposit-right { display: flex; align-items: center; gap: 24rpx; }
 .refund-deposit-toggle { display: flex; align-items: center; gap: 10rpx; }
 .refund-deposit-toggle-label { font-size: 24rpx; color: #006495; }

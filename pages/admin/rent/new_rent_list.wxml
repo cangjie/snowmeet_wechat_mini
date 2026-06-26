@@ -116,11 +116,8 @@
       <text class="summary-sep">·</text>
       <text>按时间倒序</text>
     </view>
-    <view class="page-bar">
-      <van-button size="mini" plain type="primary" disabled="{{page <= 1}}" bind:click="onPrevPage">上一页</van-button>
-      <text class="page-info">第 {{page}} / {{totalPages}} 页（每页 {{pageSize}} 条）</text>
-      <van-button size="mini" plain type="primary" disabled="{{page >= totalPages}}" bind:click="onNextPage">下一页</van-button>
-    </view>
+    <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
+                disabled="{{querying}}" bind:change="onPagerChange" />
   </view>
 
   <!-- 订单列表 -->
@@ -175,6 +172,12 @@
 
     </view>
   </block>
+
+  <!-- 列表底部分页 -->
+  <view wx:if="{{total > 0}}" class="summary-section summary-section--bottom">
+    <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
+                disabled="{{querying}}" bind:change="onPagerChange" />
+  </view>
 
   <!-- 无结果 -->
   <view wx:if="{{!querying && total == 0}}" class="empty-tip">暂无匹配订单</view>

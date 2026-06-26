@@ -18,6 +18,8 @@
   show="{{showCalendar}}"
   type="range"
   allow-same-day
+  min-date="{{minDate}}"
+  max-date="{{maxDate}}"
   bind:confirm="onCalendarConfirm"
   bind:close="closeCalendar"
 />
