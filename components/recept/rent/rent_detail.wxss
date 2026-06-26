@@ -1,4 +1,0 @@
-@import '/app.wxss';
-view{
-  font-size: 10pt;
-}

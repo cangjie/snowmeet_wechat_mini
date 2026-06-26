@@ -1,3 +1,0 @@
-/* components/recept/rent/rent_summary.wxss */
-@import '/app.wxss';
-@import '/common.wxss';
