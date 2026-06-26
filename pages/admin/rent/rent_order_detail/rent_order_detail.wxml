@@ -485,7 +485,7 @@
           type="danger"
           block
           disabled="{{order.closed == 1 || order.totalRentUnRefund <= 0 || !order._allRentalsReturned}}"
-          bindtap="onRefund">
+          bind:click="onRefund">
           申请退款 {{order.totalRentUnRefund > 0 ? order.totalRentUnRefundStr : ''}}
         </van-button>
       </view>

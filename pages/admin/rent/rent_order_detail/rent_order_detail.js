@@ -429,7 +429,9 @@ Page({
     // 不用 rentProperties.totalPaidGuarantyAmount —— 后者按 guaranty.payStatus 过滤，而订单级 guarantys
     // 的 payment 在 GetOrderByStaff 未 Include（OrderController.cs:195 注释掉了 ThenInclude payment），
     // payStatus 不可靠，会把已收押金误算成 0（order 71766：总计押金 0.01，应退押金却算成 0）。
-    var totalGuaranty = order.totalGuarantyAmount || 0
+    // 押金基数封顶到「实际已收押金」：totalGuarantyAmount 只是订单配置的应收押金，
+    // 未支付订单（paidAmount=0）押金尚未收取，无可退；用 min(配置押金, 已付金额) 避免给未付订单算出应退（order 71796）。
+    var totalGuaranty = Math.min(order.totalGuarantyAmount || 0, order.paidAmount || 0)
     order.totalRentNeedToRefundAmount = totalGuaranty - sumSummary + (order.depositPaidAmount || 0)
     order.totalRentUnRefund = order.totalRentNeedToRefundAmount - (order.refundAmount || 0)
     // 勾选「储值付租金」（且尚未用储值支付过）：租金改由会员储值支付 → 押金全额退，实际应退加回被扣的租金。
@@ -1229,6 +1231,14 @@ Page({
 
   onRefund() {
     var that = this
+    var od = that.data.order || {}
+    // 防御性守卫：与 wxml 的 disabled 条件一致，防止事件穿透时仍触发退款
+    if (od.closed == 1 || (od.totalRentUnRefund || 0) <= 0 || !od._allRentalsReturned) {
+      if (!od._allRentalsReturned) {
+        wx.showToast({ title: '所有租赁物退租后才能退押金', icon: 'none' })
+      }
+      return
+    }
     if (that.data.payWithDeposit && !(that.data.order.depositPaidAmount > 0)) {
       that._refundWithDeposit()
       return
