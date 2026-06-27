@@ -333,6 +333,11 @@ Page({
       }
       rental._rentToNow = rentToNow
       rental._rentToNowStr = util.showAmount(rentToNow)
+      // showcase 费用格/小计统一走 showAmount 格式化（四舍五入 2 位 + 自带 ¥），避免浮点尾数（如 0.06000000000000005）
+      rental.totalDiscountAmountStr = util.showAmount(rental.totalDiscountAmount || 0)
+      rental.totalRepairationAmountStr = util.showAmount(rental.totalRepairationAmount || 0)
+      rental.totalOvertimeAmountStr = util.showAmount(rental.totalOvertimeAmount || 0)
+      rental.totalSummaryStr = util.showAmount(rental.totalSummary || 0)
     }
 
     // appendingRentals 处理（追加中的租赁）
