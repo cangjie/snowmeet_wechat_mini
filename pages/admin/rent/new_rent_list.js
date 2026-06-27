@@ -185,11 +185,22 @@ Page({
       var methods = Object.keys(methodSet)
       order.payMethod = methods.length > 0 ? methods.join('/') : null
       order.displayedRental = 0
-      for (var j = 0; order.rentals && order.rentProperties
-        && order.rentProperties.rentStatus === '了结关闭' && j < order.rentals.length; j++) {
+      var orderClosed = order.rentProperties && order.rentProperties.rentStatus === '了结关闭'
+      for (var j = 0; order.rentals && j < order.rentals.length; j++) {
         var rental = order.rentals[j]
-        order.displayedRental += (rental.totalRentalAmount - rental.totalDiscountAmount)
-        totalRentalAmount += (rental.totalRentalAmount - rental.totalDiscountAmount)
+        if (rental.entertain) {
+          // 招待 rental：租金被豁免（后端 totalRentalAmount 返 0），改从租金明细累加毛租金显示，
+          // 让店员看到这单招待掉的租金。豁免额不计入页级租金收入合计 totalRentalAmount。
+          var grossRent = 0
+          for (var di = 0; rental.details && di < rental.details.length; di++) {
+            var rd = rental.details[di]
+            if ((rd.charge_type || '').trim() == '租金' && rd.valid == 1) grossRent += parseFloat(rd.amount) || 0
+          }
+          order.displayedRental += (grossRent - (rental.totalDiscountAmount || 0))
+        } else if (orderClosed) {
+          order.displayedRental += (rental.totalRentalAmount - rental.totalDiscountAmount)
+          totalRentalAmount += (rental.totalRentalAmount - rental.totalDiscountAmount)
+        }
       }
       if (order.displayedRental > 0) {
         order.displayedRentalStr = util.showAmount(order.displayedRental)
