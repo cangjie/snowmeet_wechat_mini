@@ -94,8 +94,8 @@ Page({
 
   /* ---------- rent-recept-form 事件 ---------- */
 
-  // 编辑同步：v1 仅前端内存（确认追加时一次性 SaveAppendings 落盘）；
-  // 同时检测组件左划删除的草稿（id 在旧购物车有、在新购物车没了）→ 即时 RemoveAppendingRental
+  // 编辑同步：实时保存草稿（SaveAppendings commit=false：只持久化字段，不提交/不生效）。
+  // 同时检测组件左划删除的草稿（id 在旧购物车有、新购物车没了）→ 即时 RemoveAppendingRental。
   onSyncRent(e) {
     const detail = e.detail || {};
     const newRentals = detail.rentals || [];
@@ -104,12 +104,34 @@ Page({
     newRentals.forEach(function (r) { if (r.id) newIds[r.id] = true; });
     const removed = old.filter(function (r) { return r.id && !newIds[r.id]; });
     this.setData({ 'order.appendingRentals': newRentals });
-    removed.forEach(function (r) {
-      const delUrl = app.globalData.requestPrefix
-        + 'Rent/RemoveAppendingRental/' + r.id.toString()
-        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
-      util.performWebRequest(delUrl, null).catch(function () {});
-    });
+    if (removed.length > 0) {
+      // 删除走 RemoveAppendingRental（草稿置 valid=0），本次不再实时保存（避免与删除竞态）
+      let chain = Promise.resolve();
+      removed.forEach(function (r) {
+        chain = chain.then(function () {
+          const delUrl = app.globalData.requestPrefix
+            + 'Rent/RemoveAppendingRental/' + r.id.toString()
+            + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+          return util.performWebRequest(delUrl, null);
+        });
+      });
+      chain.catch(function () {});
+      return;
+    }
+    this._saveDraft(newRentals);
+  },
+
+  // 实时保存草稿（commit=false：后端只 SaveAppendingRental 持久化字段，保持 appending=true，不提交不生效）。
+  // fire-and-forget，不回设 order 以免打断用户输入；后端已落盘，重进页面会加载到最新草稿。
+  _saveDraft(rentals) {
+    const order = this.data.order;
+    if (!order || !order.id) return;
+    const list = (rentals || []).filter(function (r) { return r.id; });
+    if (list.length === 0) return;
+    const url = app.globalData.requestPrefix
+      + 'Rent/SaveAppendings/' + order.id.toString()
+      + '?commit=false&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+    util.performWebRequest(url, list).catch(function () {});
   },
 
   onAddAction(e) {
@@ -224,7 +246,7 @@ Page({
     wx.showLoading({ title: needPay ? '生成支付' : '确认中', mask: true });
     const url = app.globalData.requestPrefix
       + 'Rent/SaveAppendings/' + order.id.toString()
-      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+      + '?commit=true&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
     util.performWebRequest(url, appendings).then(function (updatedOrder) {
       wx.hideLoading();
       if (updatedOrder && updatedOrder.paying_amount > 0) {
