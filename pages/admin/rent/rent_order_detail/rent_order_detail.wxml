@@ -391,16 +391,7 @@
         </block>
       </view>
 
-      <!-- 追加中的租赁 -->
-      <view class="appending-section" wx:if="{{order.appendingRentals && order.appendingRentals.length > 0}}">
-        <view class="appending-title">追加中 ({{order.appendingRentals.length}})</view>
-        <view class="appending-card" wx:for="{{order.appendingRentals}}" wx:key="id">
-          <view class="appending-card-head">
-            <text class="appending-card-name">{{item.name}} · {{item.startDate}}</text>
-            <text class="appending-del-btn" bindtap="onDelAppendingRental" data-id="{{item.id}}">删除</text>
-          </view>
-        </view>
-      </view>
+      <!-- 追加草稿改由下方「追加租赁商品」独立卡片区展示 -->
     </block>
 
     <!-- Tab 1: 按租赁物 -->
@@ -494,26 +485,47 @@
       </view>
     </block>
   </view>
+
+  <!-- ── Card 5: 追加租赁商品（低频操作，独立卡片区，订单未关闭时显示） ── -->
+  <view class="card append-card" wx:if="{{order.closed == 0}}">
+    <view class="section-title">追加租赁商品</view>
+
+    <!-- 草稿区：未确认，可继续编辑 / 删除（=放弃） -->
+    <block wx:if="{{order.draftRentals && order.draftRentals.length > 0}}">
+      <view class="append-sub-title">
+        <text>未确认（{{order.draftRentals.length}}）</text>
+        <text class="append-discard-all" bindtap="onDiscardAllAppend">放弃全部</text>
+      </view>
+      <view class="append-row append-row--draft" wx:for="{{order.draftRentals}}" wx:key="id">
+        <view class="append-row-main" bindtap="onOpenAppend">
+          <view class="append-row-name">{{item.name || '待录入'}}<text class="append-tag append-tag--draft">未确认</text></view>
+          <view class="append-row-meta">{{item.startDate}} · 押金 {{item.realDepositStr}} · 租金 {{item.totalRentalAmountStr}}/日</view>
+        </view>
+        <view class="append-row-ops">
+          <text class="append-op append-op--edit" bindtap="onOpenAppend">继续编辑</text>
+          <text class="append-op append-op--del" catchtap="onDelAppendingRental" data-id="{{item.id}}">删除</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 待支付区：已确认未生效，靠顶部支付卡「去支付」收尾 -->
+    <block wx:if="{{order.pendingRentals && order.pendingRentals.length > 0}}">
+      <view class="append-sub-title"><text>待支付（{{order.pendingRentals.length}}）</text></view>
+      <view class="append-row append-row--pending" wx:for="{{order.pendingRentals}}" wx:key="id">
+        <view class="append-row-main">
+          <view class="append-row-name">{{item.name || '租赁'}}<text class="append-tag append-tag--pending">待支付</text></view>
+          <view class="append-row-meta">{{item.startDate}} · 押金 {{item.realDepositStr}} · 租金 {{item.totalRentalAmountStr}}/日</view>
+        </view>
+      </view>
+      <view class="append-pending-hint">支付成功后追加项才生效，请在上方支付信息处「去支付」</view>
+    </block>
+
+    <!-- 入口按钮：始终显示 -->
+    <view class="append-entry-btn" bindtap="onOpenAppend">+ 追加租赁商品</view>
+  </view>
 </view>
 <view wx:else class="page-loading">
   <text>加载中…</text>
-</view>
-
-<!-- ── 底部操作栏（订单未关闭时显示） ─── -->
-<view class="bottom-bar" wx:if="{{order && order.closed == 0}}">
-  <van-button class="bottom-btn bottom-btn--add" bindtap="onAddPackage" size="small">
-    + 添加套餐
-  </van-button>
-  <van-button class="bottom-btn bottom-btn--add" bindtap="onAddItem" size="small">
-    + 添加单品
-  </van-button>
-  <van-button
-    class="bottom-btn bottom-btn--confirm {{!allValid || !order.appendingRentals || order.appendingRentals.length == 0 ? 'bottom-btn--disabled' : ''}}"
-    disabled="{{!allValid || !order.appendingRentals || order.appendingRentals.length == 0}}"
-    bindtap="onConfirmAppend"
-    size="small">
-    ✓ 确认追加
-  </van-button>
 </view>
 
 <!-- 更换租赁物弹窗 -->

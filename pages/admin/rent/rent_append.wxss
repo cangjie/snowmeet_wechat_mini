@@ -1,0 +1,18 @@
+/* pages/admin/rent/rent_append.wxss */
+.page-root { min-height: 100vh; background: #f8f9ff; }
+
+.order-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16rpx 24rpx; background: #fff; border-bottom: 1rpx solid #f0f0f0;
+}
+.order-bar-code { font-size: 26rpx; color: #333; font-weight: 600; }
+.order-bar-shop { font-size: 24rpx; color: #999; }
+
+.append-tip {
+  margin: 12rpx 24rpx 0;
+  padding: 12rpx 16rpx;
+  background: #E6F0F6; border-radius: 8rpx;
+  font-size: 22rpx; color: #006495; line-height: 1.5;
+}
+
+.form-slot { padding-bottom: 24rpx; }

@@ -1,0 +1,28 @@
+<!--pages/admin/rent/rent_append.wxml
+  追加租赁商品（独立追加页）：在已有租赁订单上追加新的租赁商品/租赁物。
+  录入规则与开单一致（内嵌 rent-recept-form）。
+  组件「去结算」按钮在此作为「确认追加」：SaveAppendings 分流（应付>0 跳结算 / =0 二次确认后生效）。
+-->
+<view class="page-root">
+  <view class="order-bar" wx:if="{{order.id}}">
+    <text class="order-bar-code">订单 #{{order.code || order.id}}</text>
+    <text class="order-bar-shop">{{shop}}</text>
+  </view>
+
+  <view class="append-tip">
+    新增的租赁商品为「未确认」草稿，点下方「去结算 / 确认追加」后：需支付的支付成功后生效，免支付的二次确认后生效。
+  </view>
+
+  <view class="form-slot">
+    <rent-recept-form
+      shop="{{shop}}"
+      memberId="{{order.member_id}}"
+      rentals="{{order.appendingRentals}}"
+      bind:syncRent="onSyncRent"
+      bind:addAction="onAddAction"
+      bind:addSingleProduct="onAddSingleProduct"
+      bind:editRental="onEditRental"
+      bind:checkout="onConfirmAppend"
+      bind:sortChange="onSortChange" />
+  </view>
+</view>

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "追加租赁商品",
+  "usingComponents": {
+    "rent-recept-form": "/components/reception/rent_recept_form/rent_recept_form"
+  }
+}

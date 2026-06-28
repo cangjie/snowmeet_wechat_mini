@@ -1,0 +1,220 @@
+// pages/admin/rent/rent_append.js
+// 追加租赁商品（独立追加页）：在已有租赁订单上追加新的租赁商品/租赁物。
+// 录入规则与开单一致（内嵌 rent-recept-form）。
+//
+// 草稿态：后端 Rental.appending=true（AppendRental 建草稿入库）。详情页「追加租赁商品」卡片区可见、可删=放弃。
+// 确认追加（组件「去结算」按钮 → onConfirmAppend）：前端预估应付押金分流：
+//   应付>0 → SaveAppendings → 跳结算页，支付成功后追加项 EffectRental 生效
+//   应付=0 → 二次确认 modal → SaveAppendings（免押当场生效）
+//
+// v1 取舍（见交付说明）：套餐/单品走 AppendRental 后端建草稿（单品到品类级，编码在卡片内补录/扫码）；
+//   中途编辑暂不持久化（确认追加时一次性 SaveAppendings 落盘），中途退出回详情页草稿为后端默认值。
+const app = getApp();
+const util = require('../../../utils/util.js');
+const data = require('../../../utils/data.js');
+
+function safeDecode(v) {
+  if (v == null) return v;
+  const s = String(v);
+  if (s.indexOf('%') < 0) return s;
+  try { return decodeURIComponent(s); } catch (e) { return s; }
+}
+
+Page({
+  data: {
+    shop: '',
+    order: { id: 0, code: null, shop: '', member_id: null, appendingRentals: [] },
+  },
+
+  async onLoad(options) {
+    await app.loginPromiseNew;
+    const orderId = options.orderId ? safeDecode(options.orderId) : null;
+    const shop = safeDecode(options.shop) || '';
+    this.setData({ shop });
+    if (!orderId) {
+      wx.showToast({ title: '缺少订单号', icon: 'none' });
+      return;
+    }
+    this._loadOrder(orderId);
+  },
+
+  _loadOrder(orderId) {
+    const that = this;
+    const sessionKey = app.globalData.sessionKey || '';
+    wx.showLoading({ title: '加载中', mask: true });
+    data.getOrderByStaffPromise(orderId, sessionKey).then(function (order) {
+      wx.hideLoading();
+      if (!order || !order.id) {
+        wx.showToast({ title: '订单不存在', icon: 'none' });
+        return;
+      }
+      that._setOrder(order);
+    }).catch(function () {
+      wx.hideLoading();
+      wx.showToast({ title: '加载失败', icon: 'none' });
+    });
+  },
+
+  // 把后端 order 的 appendingRentals 中的草稿（appending=true）装入购物车，加 timeStamp 供组件 wx:key
+  _setOrder(order) {
+    const drafts = (order.appendingRentals || []).filter(function (r) {
+      return r.appending === true || r.appending === 1;
+    });
+    drafts.forEach(function (r) {
+      r.timeStamp = (new Date(r.create_date || Date.now())).getTime();
+    });
+    order.appendingRentals = drafts;
+    this.setData({ shop: order.shop || this.data.shop, order });
+  },
+
+  onBack() { wx.navigateBack({ delta: 1 }); },
+
+  /* ---------- rent-recept-form 事件 ---------- */
+
+  // 编辑同步：v1 仅前端内存（确认追加时一次性 SaveAppendings 落盘）；
+  // 同时检测组件左划删除的草稿（id 在旧购物车有、在新购物车没了）→ 即时 RemoveAppendingRental
+  onSyncRent(e) {
+    const detail = e.detail || {};
+    const newRentals = detail.rentals || [];
+    const old = (this.data.order && this.data.order.appendingRentals) || [];
+    const newIds = {};
+    newRentals.forEach(function (r) { if (r.id) newIds[r.id] = true; });
+    const removed = old.filter(function (r) { return r.id && !newIds[r.id]; });
+    this.setData({ 'order.appendingRentals': newRentals });
+    removed.forEach(function (r) {
+      const delUrl = app.globalData.requestPrefix
+        + 'Rent/RemoveAppendingRental/' + r.id.toString()
+        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+      util.performWebRequest(delUrl, null).catch(function () {});
+    });
+  },
+
+  onAddAction(e) {
+    const action = (e.detail || {}).action;
+    const that = this;
+    if (action === 'package') {
+      wx.navigateTo({
+        url: '/pages/admin/reception/recept_package?shop=' + encodeURIComponent(this.data.shop || ''),
+        events: {
+          rentalsSelected: function (rentals) {
+            that._appendByPackages(rentals);
+          },
+        },
+      });
+      return;
+    }
+    if (action === 'scan') {
+      wx.showToast({ title: '扫码追加（下一步迭代）', icon: 'none' });
+      return;
+    }
+    if (action === 'noCode') {
+      wx.showToast({ title: '无码物品请用「搜索单品」选择品类后追加', icon: 'none' });
+      return;
+    }
+    // action === 'search' 由组件内部开搜索 modal → addSingleProduct 事件
+  },
+
+  // 套餐：用 recept_package 返回 rental 的 package_id 逐个 AppendRental 后端建草稿
+  _appendByPackages(rentals) {
+    const that = this;
+    const order = this.data.order;
+    const list = (rentals || []).filter(function (r) { return r.package_id; });
+    if (list.length === 0) return;
+    wx.showLoading({ title: '添加中', mask: true });
+    let chain = Promise.resolve(null);
+    list.forEach(function (r) {
+      chain = chain.then(function () {
+        const url = app.globalData.requestPrefix
+          + 'Rent/AppendRental/' + order.id.toString()
+          + '?packageId=' + r.package_id
+          + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+        return util.performWebRequest(url, null);
+      });
+    });
+    chain.then(function (updatedOrder) {
+      wx.hideLoading();
+      if (updatedOrder) that._setOrder(updatedOrder);
+    }).catch(function () {
+      wx.hideLoading();
+      wx.showToast({ title: '添加失败', icon: 'none' });
+    });
+  },
+
+  // 单品：组件内搜到具体 product → 用其 category 建品类草稿（v1：编码在卡片内补录/扫码）
+  onAddSingleProduct(e) {
+    const product = (e.detail || {}).product;
+    if (!product || !product.category) return;
+    const that = this;
+    const order = this.data.order;
+    wx.showLoading({ title: '添加中', mask: true });
+    const url = app.globalData.requestPrefix
+      + 'Rent/AppendRental/' + order.id.toString()
+      + '?categoryId=' + product.category.id
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+    util.performWebRequest(url, null).then(function (updatedOrder) {
+      wx.hideLoading();
+      if (updatedOrder) that._setOrder(updatedOrder);
+    }).catch(function () {
+      wx.hideLoading();
+      wx.showToast({ title: '添加失败', icon: 'none' });
+    });
+  },
+
+  onEditRental() {},
+  onSortChange() {},
+
+  // 「确认追加」（组件「去结算」按钮触发 checkout）：前端预估应付押金分流
+  onConfirmAppend() {
+    const that = this;
+    const order = this.data.order;
+    const appendings = (order && order.appendingRentals) || [];
+    if (appendings.length === 0) {
+      wx.showToast({ title: '请先添加追加项', icon: 'none' });
+      return;
+    }
+    // 预估应付押金（押金净额合计）：>0 走支付、=0 走二次确认
+    let totalDeposit = 0;
+    appendings.forEach(function (r) {
+      if (r.noGuaranty) return;
+      let d = r.realGuaranty;
+      if (d == null) d = (r.guaranty || 0) - (r.guaranty_discount || 0);
+      totalDeposit += (d || 0);
+    });
+    if (totalDeposit > 0) {
+      that._doSaveAppendings(true);
+    } else {
+      wx.showModal({
+        title: '确认追加',
+        content: '本次追加无需支付，确认后立即生效。',
+        confirmText: '确认',
+        complete: function (res) {
+          if (res.confirm) that._doSaveAppendings(false);
+        }
+      });
+    }
+  },
+
+  _doSaveAppendings(needPay) {
+    const that = this;
+    const order = this.data.order;
+    const appendings = order.appendingRentals || [];
+    wx.showLoading({ title: needPay ? '生成支付' : '确认中', mask: true });
+    const url = app.globalData.requestPrefix
+      + 'Rent/SaveAppendings/' + order.id.toString()
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+    util.performWebRequest(url, appendings).then(function (updatedOrder) {
+      wx.hideLoading();
+      if (updatedOrder && updatedOrder.paying_amount > 0) {
+        // 应付>0：跳结算页，支付成功后追加项生效（settle.onPaid 自行收尾）
+        wx.redirectTo({ url: '/pages/payment/settle/index?orderId=' + updatedOrder.id });
+      } else {
+        // 应付=0：免押当场生效，返回详情页
+        wx.showToast({ title: '追加成功', icon: 'success' });
+        setTimeout(function () { wx.navigateBack({ delta: 1 }); }, 700);
+      }
+    }).catch(function () {
+      wx.hideLoading();
+      wx.showToast({ title: '确认失败', icon: 'none' });
+    });
+  },
+});

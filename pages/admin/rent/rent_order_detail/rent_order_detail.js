@@ -340,7 +340,11 @@ Page({
       rental.totalSummaryStr = util.showAmount(rental.totalSummary || 0)
     }
 
-    // appendingRentals 处理（追加中的租赁）
+    // appendingRentals 处理（追加中的租赁）：分两态
+    //   _isDraft=true  草稿（appending=true，未确认，可删=放弃 / 可继续编辑）
+    //   _isDraft=false 待支付（appending=false 且 append_commit_time=null，已确认未生效，靠顶部「去支付」收尾）
+    order.draftRentals = []
+    order.pendingRentals = []
     for (var i = 0; order.appendingRentals && i < order.appendingRentals.length; i++) {
       var rental = order.appendingRentals[i]
       rental.realGuaranty = rental.guaranty
@@ -360,7 +364,11 @@ Page({
         totalRentalAmount += rental.pricePresets[j].price
       }
       rental.totalRentalAmount = totalRentalAmount
+      rental.totalRentalAmountStr = util.showAmount(totalRentalAmount)
       rental.totalDiscountAmountStr = util.showAmount(totalRentalAmount)
+      rental._isDraft = (rental.appending === true || rental.appending === 1)
+      if (rental._isDraft) order.draftRentals.push(rental)
+      else order.pendingRentals.push(rental)
     }
 
     // 支付明细
@@ -1341,49 +1349,13 @@ Page({
     return allValid
   },
 
-  onAddPackage() {
-    var that = this
-    var order = that.data.order
+  // 打开追加页（新建追加 / 继续编辑草稿都走这里）：跳独立追加页 rent_append，带订单上下文
+  onOpenAppend() {
+    var order = this.data.order
+    if (!order || !order.id) return
     wx.navigateTo({
-      url: '/pages/admin/reception/recept_package?orderId=' + order.id
-        + '&shop=' + encodeURIComponent(order.shop),
-      events: {
-        selectPackage: function (pkg) {
-          var appendUrl = app.globalData.requestPrefix
-            + 'Rent/AppendRental/' + order.id.toString()
-            + '?packageId=' + pkg.id
-            + '&sessionKey=' + app.globalData.sessionKey
-          util.performWebRequest(appendUrl, null).then(function (updatedOrder) {
-            updatedOrder = that.renderOrder(updatedOrder)
-            var allValid = that.checkAppendingRentalValid(updatedOrder)
-            that.setData({ allValid, order: updatedOrder })
-          }).catch(function () {
-            wx.showToast({ title: '添加失败', icon: 'error' })
-          })
-        }
-      }
-    })
-  },
-  onAddItem() {
-    var that = this
-    var order = that.data.order
-    wx.navigateTo({
-      url: '/pages/admin/rent/search_fuzzy?orderId=' + order.id,
-      events: {
-        selectCategory: function (category) {
-          var appendUrl = app.globalData.requestPrefix
-            + 'Rent/AppendRental/' + order.id.toString()
-            + '?categoryId=' + category.id
-            + '&sessionKey=' + app.globalData.sessionKey
-          util.performWebRequest(appendUrl, null).then(function (updatedOrder) {
-            updatedOrder = that.renderOrder(updatedOrder)
-            var allValid = that.checkAppendingRentalValid(updatedOrder)
-            that.setData({ allValid, order: updatedOrder })
-          }).catch(function () {
-            wx.showToast({ title: '添加失败', icon: 'error' })
-          })
-        }
-      }
+      url: '/pages/admin/rent/rent_append?orderId=' + order.id
+        + '&shop=' + encodeURIComponent(order.shop || '')
     })
   },
   // 「去支付」：跳通用结算页（与开单流程同一页）。付完后 settle 的 onPaid 会 redirectTo 回本页重新 getData → 按钮自动消失。
@@ -1393,28 +1365,37 @@ Page({
     wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + order.id })
   },
 
-  onConfirmAppend() {
+  // 放弃全部未确认草稿：逐个 RemoveAppendingRental（草稿删光 = 订单回到追加前）
+  onDiscardAllAppend() {
     var that = this
     var order = that.data.order
-    if (!order.appendingRentals || order.appendingRentals.length == 0) return
-    var appUrl = app.globalData.requestPrefix
-      + 'Rent/SaveAppendings/' + order.id.toString()
-      + '?sessionKey=' + app.globalData.sessionKey
-    wx.showLoading({ title: '追加中' })
-    util.performWebRequest(appUrl, order.appendingRentals).then(function (updatedOrder) {
-      wx.hideLoading()
-      if (updatedOrder.paying_amount > 0) {
-        var renderedOrder = that.renderOrder(updatedOrder)
-        var allValid = that.checkAppendingRentalValid(renderedOrder)
-        that.setData({ allValid, order: renderedOrder })
-        wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + updatedOrder.id })
-      } else {
-        that.getData()
-        wx.showToast({ title: '追加成功', icon: 'success' })
+    var drafts = (order && order.draftRentals) || []
+    if (drafts.length == 0) return
+    wx.showModal({
+      title: '放弃全部追加',
+      content: '将删除 ' + drafts.length + ' 项未确认的追加，确定？',
+      complete: function (res) {
+        if (!res.confirm) return
+        wx.showLoading({ title: '处理中', mask: true })
+        var chain = Promise.resolve()
+        drafts.forEach(function (d) {
+          chain = chain.then(function () {
+            var delUrl = app.globalData.requestPrefix
+              + 'Rent/RemoveAppendingRental/' + d.id.toString()
+              + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
+            return util.performWebRequest(delUrl, null)
+          })
+        })
+        chain.then(function () {
+          wx.hideLoading()
+          that.getData()
+          wx.showToast({ title: '已放弃', icon: 'success' })
+        }).catch(function () {
+          wx.hideLoading()
+          that.getData()
+          wx.showToast({ title: '部分删除失败', icon: 'none' })
+        })
       }
-    }).catch(function () {
-      wx.hideLoading()
-      wx.showToast({ title: '追加失败', icon: 'error' })
     })
   },
   onDelAppendingRental(e) {

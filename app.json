@@ -73,6 +73,7 @@
     "pages/admin/deposit/deposit_balance",
     "pages/admin/rent/rent_details",
     "pages/admin/rent/rent_order_detail/rent_order_detail",
+    "pages/admin/rent/rent_append",
     "pages/admin/recept/recept_new",
     "pages/admin/printer/gprinter/print_task",
     "pages/order/order_entry",
