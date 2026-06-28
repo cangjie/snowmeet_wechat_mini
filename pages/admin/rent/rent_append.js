@@ -55,13 +55,26 @@ Page({
     });
   },
 
-  // 把后端 order 的 appendingRentals 中的草稿（appending=true）装入购物车，加 timeStamp 供组件 wx:key
+  // 把后端 order 的 appendingRentals 中的草稿（appending=true）装入购物车。
+  // 后端 AppendRental 建的草稿缺开单组件需要的前端字段（class_name/categoryName/chooseCategories…），
+  // 按开单 recept_package 的结构从 rentItem.category 兜底补齐，使内嵌 rent-recept-form 渲染
+  //（分类行/标题/品类选择）与开单一致。GetOrder 已 Include rentItems.category，故 it.category 可用。
   _setOrder(order) {
     const drafts = (order.appendingRentals || []).filter(function (r) {
       return r.appending === true || r.appending === 1;
     });
     drafts.forEach(function (r) {
       r.timeStamp = (new Date(r.create_date || Date.now())).getTime();
+      if (r.realGuaranty == null) r.realGuaranty = r.guaranty;
+      (r.rentItems || []).forEach(function (it) {
+        const catName = (it.category && it.category.name) || it.class_name || '';
+        if (!it.class_name) it.class_name = catName;
+        if (!it.categoryName) it.categoryName = it.class_name || catName;
+        if (it.chooseingCategory == null) it.chooseingCategory = false;
+        if (it.canChooseCategory == null) it.canChooseCategory = false;
+        if (!it.chooseCategories) it.chooseCategories = it.category ? [it.category] : [];
+        if (it.pick_type == null) it.pick_type = r.pick_type || null;
+      });
     });
     order.appendingRentals = drafts;
     this.setData({ shop: order.shop || this.data.shop, order });
