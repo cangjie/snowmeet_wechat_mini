@@ -517,7 +517,8 @@
           <view class="append-row-meta">{{item.startDate}} · 押金 {{item.realDepositStr}} · 租金 {{item.totalRentalAmountStr}}/日</view>
         </view>
       </view>
-      <view class="append-pending-hint">支付成功后追加项才生效，请在上方支付信息处「去支付」</view>
+      <view class="append-pending-hint">支付成功后追加项才生效</view>
+      <view class="append-pay-btn" bindtap="onGoPay">去支付 {{order.payableAmountStr}}</view>
     </block>
 
     <!-- 入口按钮：始终显示 -->

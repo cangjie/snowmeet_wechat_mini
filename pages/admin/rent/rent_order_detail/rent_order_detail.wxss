@@ -820,6 +820,11 @@
 .append-op--edit { color: #006495; }
 .append-op--del { color: #E64340; }
 .append-pending-hint { font-size: 22rpx; color: #B26A00; margin: 4rpx 0 8rpx; line-height: 1.5; }
+.append-pay-btn {
+  margin-top: 4rpx; height: 76rpx; line-height: 76rpx; text-align: center;
+  background: #006495; color: #fff; border-radius: 8rpx; font-size: 28rpx;
+}
+.append-pay-btn:active { opacity: 0.85; }
 .append-entry-btn {
   margin-top: 12rpx; height: 76rpx; line-height: 76rpx; text-align: center;
   border: 2rpx dashed #006495; border-radius: 8rpx;

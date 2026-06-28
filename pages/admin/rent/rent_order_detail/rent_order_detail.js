@@ -481,7 +481,10 @@ Page({
     var payable = (order.paying_amount != null && order.paying_amount > 0)
       ? order.paying_amount
       : ((order.totalCharge || 0) - (order.paidAmount || 0))
-    order.showGoPay = (order.orderStatus == '待生成' || order.orderStatus == '待支付' || order.orderStatus == '部分支付') && payable > 0
+    // 追加待支付项（pendingRentals）也需「去支付」入口：原租赁已付时订单聚合 orderStatus 会是「支付成功」，
+    // 不能只靠它判定；有待支付追加项也放开顶部去支付按钮
+    var hasPendingAppend = (order.pendingRentals && order.pendingRentals.length > 0)
+    order.showGoPay = ((order.orderStatus == '待生成' || order.orderStatus == '待支付' || order.orderStatus == '部分支付') || hasPendingAppend) && payable > 0
     order.payableAmountStr = util.showAmount(payable > 0 ? payable : 0)
 
     // 按租赁物 flat list
