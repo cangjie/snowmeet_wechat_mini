@@ -516,6 +516,9 @@
           <view class="append-row-name">{{item.name || '租赁'}}<text class="append-tag append-tag--pending">待支付</text></view>
           <view class="append-row-meta">{{item.startDate}} · 押金 {{item.realDepositStr}} · 租金 {{item.totalRentalAmountStr}}/日</view>
         </view>
+        <view class="append-row-ops">
+          <text class="append-op append-op--del" catchtap="onDelAppendingRental" data-id="{{item.id}}">删除</text>
+        </view>
       </view>
       <view class="append-pending-hint">支付成功后追加项才生效</view>
       <view class="append-pay-btn" bindtap="onGoPay">去支付 {{order.payableAmountStr}}</view>

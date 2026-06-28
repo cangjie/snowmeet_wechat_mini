@@ -1410,19 +1410,22 @@ Page({
       if (order.appendingRentals[i].id == id) { rental = order.appendingRentals[i]; break }
     }
     if (!rental) return
+    var tip = rental._isDraft ? '未确认的追加' : '待支付的追加'
     wx.showModal({
-      title: '确认删除',
-      content: '正在添加的租赁商品：' + rental.name + ' 即将删除。',
+      title: '删除追加项',
+      content: tip + '：' + (rental.name || '租赁商品') + ' 即将删除' + (rental._isDraft ? '' : '（含其待支付押金）') + '。',
       complete: (res) => {
         if (!res.confirm) return
+        wx.showLoading({ title: '删除中', mask: true })
         var delUrl = app.globalData.requestPrefix
           + 'Rent/RemoveAppendingRental/' + id.toString()
           + '?sessionKey=' + app.globalData.sessionKey
-        util.performWebRequest(delUrl, null).then(function (updatedOrder) {
-          updatedOrder = that.renderOrder(updatedOrder)
-          var allValid = that.checkAppendingRentalValid(updatedOrder)
-          that.setData({ allValid, order: updatedOrder })
+        util.performWebRequest(delUrl, null).then(function () {
+          wx.hideLoading()
+          that.getData()
+          wx.showToast({ title: '已删除', icon: 'success' })
         }).catch(function () {
+          wx.hideLoading()
           wx.showToast({ title: '删除失败', icon: 'error' })
         })
       }
