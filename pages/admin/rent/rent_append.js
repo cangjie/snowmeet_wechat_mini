@@ -202,7 +202,7 @@ Page({
     });
   },
 
-  // 单品：组件内搜到具体 product → 用其 category 建品类草稿（v1：编码在卡片内补录/扫码）
+  // 单品：组件内搜到具体 product → 传 rentProductId，后端建草稿时直接填编码/名称（同开单）
   onAddSingleProduct(e) {
     const product = (e.detail || {}).product;
     if (!product || !product.category) return;
@@ -212,6 +212,7 @@ Page({
     const url = app.globalData.requestPrefix
       + 'Rent/AppendRental/' + order.id.toString()
       + '?categoryId=' + product.category.id
+      + '&rentProductId=' + product.id
       + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
     util.performWebRequest(url, null).then(function (updatedOrder) {
       wx.hideLoading();
