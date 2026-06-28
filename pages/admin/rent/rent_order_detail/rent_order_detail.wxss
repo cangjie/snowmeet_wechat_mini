@@ -549,7 +549,22 @@
 }
 .dc-btn--cancel { background: #f2f3f5; color: #666; }
 .dc-btn--confirm { background: #2EA6D0; color: #fff; }
+.dc-btn--disabled { background: #ccc !important; color: #fff !important; }
 .dc-btn:active { opacity: 0.85; }
+
+/* 逐笔退款弹窗 */
+.rf-item { margin-bottom: 16rpx; }
+.rf-item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8rpx; }
+.rf-item-method { font-size: 27rpx; color: #1a1a1a; font-weight: 600; }
+.rf-item-remain { font-size: 24rpx; color: #999; }
+.rf-item .dc-input { width: 100%; box-sizing: border-box; }
+.rf-summary {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 26rpx; margin-top: 8rpx; padding-top: 14rpx; border-top: 1rpx solid #f0f0f0;
+}
+.rf-allocated { color: #666; }
+.rf-ok { color: #15803d; }
+.rf-pending { color: #E64340; }
 
 .item-table { font-size: 24rpx; }
 .item-table-row {

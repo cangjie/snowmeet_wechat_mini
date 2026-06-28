@@ -45,6 +45,9 @@ Page({
 
     allValid: false,
 
+    // 逐笔退款弹窗（多笔支付 + 可退之和 > 应退时弹出，逐笔输入）
+    refundModal: { show: false, need: 0, needStr: '', items: [], allocatedStr: '', remainToAllocStr: '', canConfirm: false },
+
     // 租金明细按天编辑弹窗
     _dayChargeShow: false,
     _dayChargeRidx: null,
@@ -1264,43 +1267,139 @@ Page({
       return
     }
     var order = that.data.order
-    var refundAmount = order.totalRentUnRefund
-    if (!refundAmount || isNaN(refundAmount) || refundAmount <= 0) {
+    var need = parseFloat((order.totalRentUnRefund || 0).toFixed(2))
+    if (!need || isNaN(need) || need <= 0) {
       wx.showToast({ title: '无需退款', icon: 'none' })
       return
     }
+    // 收集可退款支付（支付成功 + 仍有可退余额）。
+    // 退款退的是押金，储值支付付的是租金、不能用于押金，故排除储值支付，不参与退款。
+    var payable = []
+    var sum = 0
+    for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
+      var p = order.availablePayments[i]
+      var remain = parseFloat((p.remainAmount || 0).toFixed(2))
+      if (p.status == '支付成功' && p.pay_method != '储值支付' && remain > 0) {
+        payable.push({ payment_id: p.id, method: p.pay_method || '支付', remain: remain, remainStr: util.showAmount(remain) })
+        sum += remain
+      }
+    }
+    sum = parseFloat(sum.toFixed(2))
+    if (payable.length == 0) {
+      wx.showToast({ title: '无可退款支付记录', icon: 'error' })
+      return
+    }
+    if (sum < need - 0.001) {
+      wx.showToast({ title: '可退金额不足应退', icon: 'none' })
+      return
+    }
+    // 单笔：直接从这一笔退应退额
+    if (payable.length == 1) {
+      that._confirmAndRefund([{ payment_id: payable[0].payment_id, amount: need, reason: '租赁退押金' }], need)
+      return
+    }
+    // 多笔 + 可退之和 == 应退：逐笔全额退（不弹输入）
+    if (Math.abs(sum - need) < 0.01) {
+      var refunds = payable.map(function (x) {
+        return { payment_id: x.payment_id, amount: x.remain, reason: '租赁退押金' }
+      })
+      that._confirmAndRefund(refunds, need)
+      return
+    }
+    // 多笔 + 可退之和 > 应退：弹逐笔输入 modal
+    that._openRefundModal(payable, need)
+  },
+
+  // 二次确认后提交退款
+  _confirmAndRefund(refunds, need) {
+    var that = this
     wx.showModal({
       title: '确认退款',
-      content: '实际应退 ' + util.showAmount(refundAmount),
-      complete: (res) => {
+      content: '实际应退 ' + util.showAmount(need),
+      complete: function (res) {
         if (!res.confirm) return
-        var payment = null
-        for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
-          var p = order.availablePayments[i]
-          var unRefund = parseFloat((p.remainAmount || 0).toString())
-          if (p.status == '支付成功'
-            && parseFloat(unRefund.toFixed(2)) >= parseFloat(refundAmount.toFixed(2))) {
-            payment = p
-            break
-          }
-        }
-        if (!payment) {
-          wx.showToast({ title: '无可退款支付记录', icon: 'error' })
-          return
-        }
-        var refunds = [{
-          payment_id: payment.id,
-          amount: parseFloat(refundAmount.toFixed(2)),
-          reason: '租赁退押金'
-        }]
-        data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function () {
-          wx.showToast({ title: '退款成功', icon: 'success' })
-          that.getData()
-        }).catch(function () {
-          wx.showToast({ title: '退款失败', icon: 'error' })
-        })
+        that._submitRefunds(refunds)
       }
     })
+  },
+
+  _submitRefunds(refunds) {
+    var that = this
+    var order = that.data.order
+    wx.showLoading({ title: '退款中', mask: true })
+    data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function () {
+      wx.hideLoading()
+      wx.showToast({ title: '退款成功', icon: 'success' })
+      that.getData()
+    }).catch(function () {
+      wx.hideLoading()
+      wx.showToast({ title: '退款失败', icon: 'error' })
+    })
+  },
+
+  // 打开逐笔输入 modal（多笔 + 可退之和 > 应退）
+  _openRefundModal(payable, need) {
+    var items = payable.map(function (x) {
+      return { payment_id: x.payment_id, method: x.method, remain: x.remain, remainStr: x.remainStr, input: '' }
+    })
+    this.setData({
+      refundModal: {
+        show: true, need: need, needStr: util.showAmount(need),
+        items: items, allocatedStr: util.showAmount(0),
+        remainToAllocStr: util.showAmount(need), canConfirm: false
+      }
+    })
+  },
+
+  onRefundItemInput(e) {
+    var idx = e.currentTarget.dataset.idx
+    var modal = this.data.refundModal
+    var items = modal.items.slice()
+    items[idx] = Object.assign({}, items[idx], { input: e.detail.value })
+    var allocated = 0
+    var overflow = false
+    for (var i = 0; i < items.length; i++) {
+      var v = parseFloat(items[i].input)
+      if (!isNaN(v) && v > 0) {
+        allocated += v
+        if (v > parseFloat((items[i].remain + 0.001).toFixed(2))) overflow = true
+      }
+    }
+    allocated = parseFloat(allocated.toFixed(2))
+    var remainToAlloc = parseFloat((modal.need - allocated).toFixed(2))
+    var canConfirm = !overflow && Math.abs(allocated - modal.need) < 0.01
+    this.setData({
+      'refundModal.items': items,
+      'refundModal.allocatedStr': util.showAmount(allocated),
+      'refundModal.remainToAllocStr': util.showAmount(remainToAlloc),
+      'refundModal.canConfirm': canConfirm
+    })
+  },
+
+  onRefundModalCancel() {
+    this.setData({ 'refundModal.show': false })
+  },
+
+  onRefundModalConfirm() {
+    var that = this
+    var modal = this.data.refundModal
+    if (!modal.canConfirm) {
+      wx.showToast({ title: '各笔退款之和需等于应退', icon: 'none' })
+      return
+    }
+    var refunds = []
+    for (var i = 0; i < modal.items.length; i++) {
+      var v = parseFloat(modal.items[i].input)
+      if (!isNaN(v) && v > 0) {
+        refunds.push({ payment_id: modal.items[i].payment_id, amount: parseFloat(v.toFixed(2)), reason: '租赁退押金' })
+      }
+    }
+    if (refunds.length == 0) {
+      wx.showToast({ title: '请输入退款金额', icon: 'none' })
+      return
+    }
+    this.setData({ 'refundModal.show': false })
+    that._submitRefunds(refunds)
   },
 
   onModMemo(e) {

@@ -712,3 +712,26 @@
     </view>
   </view>
 </view>
+
+<!-- 逐笔退款弹窗（多笔支付 + 可退之和 > 应退时弹出，逐笔输入） -->
+<view wx:if="{{refundModal.show}}" class="dc-mask" bindtap="onRefundModalCancel" catchtouchmove="noop">
+  <view class="dc-card" catchtap="noop">
+    <view class="dc-title">逐笔退款</view>
+    <view class="dc-date">应退 {{refundModal.needStr}}，请逐笔分配退款金额</view>
+    <view class="rf-item" wx:for="{{refundModal.items}}" wx:key="payment_id">
+      <view class="rf-item-head">
+        <text class="rf-item-method">{{item.method}}</text>
+        <text class="rf-item-remain">可退 {{item.remainStr}}</text>
+      </view>
+      <input class="dc-input" type="digit" value="{{item.input}}" data-idx="{{index}}" bindinput="onRefundItemInput" placeholder="0.00" />
+    </view>
+    <view class="rf-summary">
+      <text class="rf-allocated">已分配 {{refundModal.allocatedStr}}</text>
+      <text class="{{refundModal.canConfirm ? 'rf-ok' : 'rf-pending'}}">待分配 {{refundModal.remainToAllocStr}}</text>
+    </view>
+    <view class="dc-actions">
+      <view class="dc-btn dc-btn--cancel" bindtap="onRefundModalCancel">取消</view>
+      <view class="dc-btn dc-btn--confirm {{refundModal.canConfirm ? '' : 'dc-btn--disabled'}}" bindtap="onRefundModalConfirm">确认退款</view>
+    </view>
+  </view>
+</view>
