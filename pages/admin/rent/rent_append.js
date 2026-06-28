@@ -66,6 +66,15 @@ Page({
     drafts.forEach(function (r) {
       r.timeStamp = (new Date(r.create_date || Date.now())).getTime();
       if (r.realGuaranty == null) r.realGuaranty = r.guaranty;
+      // 追加默认「立即租赁」（顾客现场即用）：模式未选时默认立即租赁 + 起租=今天当前时分；
+      // atOnce 一律按 pick_type 派生（立即租赁→true），覆盖后端 atOnce 默认 false 的不一致
+      if (r.pick_type == null) {
+        r.pick_type = '立即租赁';
+        const now = new Date();
+        const pad = function (n) { return String(n).padStart(2, '0'); };
+        r.start_date = util.formatDate(now) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':00';
+      }
+      r.atOnce = (r.pick_type === '立即租赁');
       (r.rentItems || []).forEach(function (it) {
         const catName = (it.category && it.category.name) || it.class_name || '';
         if (!it.class_name) it.class_name = catName;
@@ -73,7 +82,8 @@ Page({
         if (it.chooseingCategory == null) it.chooseingCategory = false;
         if (it.canChooseCategory == null) it.canChooseCategory = false;
         if (!it.chooseCategories) it.chooseCategories = it.category ? [it.category] : [];
-        if (it.pick_type == null) it.pick_type = r.pick_type || null;
+        if (it.pick_type == null) it.pick_type = r.pick_type || '立即租赁';
+        it.atOnce = (it.pick_type === '立即租赁');
       });
     });
     order.appendingRentals = drafts;
