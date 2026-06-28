@@ -149,18 +149,32 @@ Page({
   },
   renderData(order){
     var that = this
-    order.paying_amountStr = util.showAmount(order.paying_amount)
-    order.paidAmountStr = util.showAmount(order.paidAmount)
-    // 总计用 paying_amount（PlaceRentOrder 设置的押金总额），rental 的 total_amount 字段不含租赁押金
-    order.total_amountStr = util.showAmount(order.paying_amount || 0)
-    order.dataStr = util.formatDate(new Date(order.biz_date))
-    order.timeStr = util.formatTimeStr(new Date(order.biz_date))
+    // 选「当前扫码这笔 paymentId」对应的 payment；一张订单可有多笔 OrderPayment
+    //（如原租赁已付 + 追加待付），支付 UI / 金额都以这一笔为准，不用订单聚合 orderStatus/paying_amount。
     var payment = null
     for (var i = 0; order.payments && i < order.payments.length; i++){
-      if (order.payments[i].valid == 1 && order.payments[i].pay_method == '微信支付' && order.payments[i].status == '待支付'){
+      if (order.payments[i].id == that.data.paymentId){
         payment = order.payments[i]
+        break
       }
     }
+    if (!payment){
+      // 兜底：未匹配到当前 paymentId 时退回「待支付的微信 payment」(兼容旧入口)
+      for (var j = 0; order.payments && j < order.payments.length; j++){
+        if (order.payments[j].valid == 1 && order.payments[j].pay_method == '微信支付' && order.payments[j].status == '待支付'){
+          payment = order.payments[j]
+        }
+      }
+    }
+    // 支付 UI 判定用「当前这笔」的状态（不是订单聚合 orderStatus）
+    order.payStatus = payment ? payment.status : ((order.orderStatus == '支付成功') ? '支付成功' : '待支付')
+    // 需付 / 总计金额以当前这笔 payment.amount 为准（追加场景订单聚合 paying_amount 可能为 0）
+    var payAmount = (payment && payment.amount != null) ? payment.amount : (order.paying_amount || 0)
+    order.paying_amountStr = util.showAmount(payAmount)
+    order.total_amountStr = util.showAmount(payAmount)
+    order.paidAmountStr = util.showAmount(order.paidAmount)
+    order.dataStr = util.formatDate(new Date(order.biz_date))
+    order.timeStr = util.formatTimeStr(new Date(order.biz_date))
     if (order.type == '租赁' && order.rentals && order.rentals.length){
       for (var r = 0; r < order.rentals.length; r++){
         var rental = order.rentals[r]

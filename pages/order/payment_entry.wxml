@@ -39,7 +39,7 @@
   <view class="card">
     <view class="section-title">金额</view>
     <view class="row"><text class="label">总计</text><text class="value value--amount">{{order.total_amountStr}}</text></view>
-    <view class="row" wx:if="{{order.orderStatus != '支付成功'}}">
+    <view class="row" wx:if="{{order.payStatus != '支付成功'}}">
       <text class="label">需要支付</text><text class="value value--pay">{{order.paying_amountStr}}</text>
     </view>
     <view class="row" wx:else>
@@ -48,11 +48,11 @@
   </view>
 
   <!-- 订单已支付成功 → 直接显示「支付成功」,屏蔽其它支付相关 UI -->
-  <view wx:if="{{order.orderStatus=='支付成功'}}" class="pay-success"> 支 付 成 功 </view>
+  <view wx:if="{{order.payStatus=='支付成功'}}" class="pay-success"> 支 付 成 功 </view>
 
   <!-- 支付前身份验证：仅在订单未支付时显示;identity 非 direct 状态用组件渲染,direct 状态显示支付按钮 -->
   <pay-identity-confirm
-    wx:if="{{order.orderStatus != '支付成功' && identity && identity.status && identity.status !== 'direct'}}"
+    wx:if="{{order.payStatus != '支付成功' && identity && identity.status && identity.status !== 'direct'}}"
     payment-id="{{paymentId}}"
     payer-type="wechat"
     scanner-id="{{scannerId}}"
@@ -61,7 +61,7 @@
     bind:refreshed="onIdentityRefreshed">
   </pay-identity-confirm>
 
-  <view wx:if="{{order.orderStatus != '支付成功' && payment && payment.status=='待支付' && identity && identity.status === 'direct'}}" class="pay-btn-wrap">
+  <view wx:if="{{order.payStatus != '支付成功' && payment && payment.status=='待支付' && identity && identity.status === 'direct'}}" class="pay-btn-wrap">
     <van-button type="primary" color="#2EA6D0" bind:click="pay" disabled="{{paying}}"> 敬 请 支 付 </van-button>
   </view>
 
