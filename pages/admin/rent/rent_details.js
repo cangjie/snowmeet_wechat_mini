@@ -271,6 +271,7 @@ Page({
       rental.totalRentalAmount = totalRentalAmount
       rental.totalDiscountAmountStr = util.showAmount(totalRentalAmount)
     }
+    var paidAmountExcludeDeposit = 0
     for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
       var payment = order.availablePayments[i]
       var paidDate = new Date(payment.paid_date)
@@ -282,6 +283,9 @@ Page({
         payment.remainAmount = payment.remainAmount - payment.refundedAmount
       }
       payment.remainAmountStr = util.showAmount(payment.remainAmount)
+      if (payment.status == '支付成功' && payment.pay_method != '储值支付') {
+        paidAmountExcludeDeposit += parseFloat(payment.amount) || 0
+      }
     }
 
     if (order.appendingRentals && order.appendingRentals.length > 0) {
@@ -298,7 +302,7 @@ Page({
     }
     order.packageNum = packageNum
     order.categoryNum = order.rentals.length - packageNum
-    order.paidAmountStr = util.showAmount(order.paidAmount)
+    order.paidAmountStr = util.showAmount(paidAmountExcludeDeposit)
     order.refundAmountStr = util.showAmount(order.refundAmount)
     order.unRelieveGuaranty = unRelieveGuaranty
     order.unRelieveGuarantyStr = util.showAmount(unRelieveGuaranty)

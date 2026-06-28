@@ -173,7 +173,14 @@ Page({
       }
       order.calledName = calledName
       order.memberShip = memberShip
-      order.paidAmountStr = util.showAmount(order.paidAmount)
+      var paidAmountExcludeDeposit = 0
+      for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
+        var p = order.availablePayments[j]
+        if (p.status === '支付成功' && p.pay_method !== '储值支付') {
+          paidAmountExcludeDeposit += parseFloat(p.amount) || 0
+        }
+      }
+      order.paidAmountStr = util.showAmount(paidAmountExcludeDeposit)
       var methodSet = {}
       order.haveDeposit = false
       for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {

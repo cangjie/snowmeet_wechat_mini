@@ -67,11 +67,13 @@
                 <text class="ur-item-name">{{item.name || '未命名'}}</text>
                 <text class="ur-item-code" wx:if="{{item.code}}">{{item.code}}</text>
               </view>
+              <view class="ur-item-category-row" wx:if="{{groupMode != 'category'}}">
+                <text class="ur-item-category">{{item._categoryName}}</text>
+              </view>
               <view class="ur-item-meta">
                 <van-icon name="clock-o" size="13px" color="#9aa4b2" />
                 <text class="ur-item-time">{{item.pickDateStr}}<text wx:if="{{item.pickTimeStr}}"> {{item.pickTimeStr}}</text></text>
                 <text class="ur-tag-issued">发放</text>
-                <text class="ur-cat-tag" wx:if="{{groupMode != 'category'}}">{{item._categoryName}}</text>
               </view>
             </view>
             <view class="ur-item-days">已租 <text class="ur-days-num">{{item._rentedDays}}</text> 天</view>

@@ -5,9 +5,16 @@
         {
           "name": "pay",
           "pathName": "pages/order/payment_entry",
-          "query": "paymentId=42604",
+          "query": "paymentId=42662",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "orderverify",
+          "pathName": "pages/order/identity_verify",
+          "query": "verifyOrderId=71746",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "beacon",

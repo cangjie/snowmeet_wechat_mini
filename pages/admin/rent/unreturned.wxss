@@ -218,29 +218,41 @@
   color: #6b7280;
   font-family: monospace;
 }
+.ur-item-category-row {
+  margin-top: 6rpx;
+}
+.ur-item-category {
+  display: inline-block;
+  max-width: 100%;
+  font-size: 21rpx;
+  color: #006495;
+  background: #e6f1f7;
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .ur-item-meta {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 8rpx;
   margin-top: 8rpx;
+  overflow: hidden;
 }
 .ur-item-time {
   font-size: 22rpx;
   color: #9aa4b2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .ur-tag-issued {
+  flex: 0 0 auto;
   font-size: 20rpx;
   color: #15803d;
   background: #dcfce7;
-  border-radius: 6rpx;
-  padding: 2rpx 10rpx;
-  margin-left: 4rpx;
-}
-/* 非「按分类」模式下，卡片内显示品类名 */
-.ur-cat-tag {
-  font-size: 20rpx;
-  color: #006495;
-  background: #e6f1f7;
   border-radius: 6rpx;
   padding: 2rpx 10rpx;
   margin-left: 4rpx;
@@ -250,6 +262,7 @@
   font-size: 22rpx;
   color: #6b7280;
   text-align: right;
+  white-space: nowrap;
 }
 .ur-days-num {
   color: #d97706;

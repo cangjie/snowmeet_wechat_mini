@@ -364,6 +364,7 @@ Page({
     }
 
     // 支付明细
+    var paidAmountExcludeDeposit = 0
     for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
       var payment = order.availablePayments[i]
       var paidDate = new Date(payment.paid_date)
@@ -378,6 +379,9 @@ Page({
       // 他人代付：条目标红 + 显示代付人脱敏手机号（无则 '—'）
       payment._isProxy = payment.is_proxy_pay === true || payment.is_proxy_pay === 1
       payment._proxyCellMasked = payment._isProxy ? maskCell(payment.cell) : ''
+      if (payment.status == '支付成功' && payment.pay_method != '储值支付') {
+        paidAmountExcludeDeposit += parseFloat(payment.amount) || 0
+      }
     }
 
     // 退款明细：退款记录无 paid_date，用 create_date 作日期/时间；方式取原支付方式
@@ -409,7 +413,7 @@ Page({
     // 汇总字段
     order.packageNum = packageNum
     order.categoryNum = order.rentals ? order.rentals.length - packageNum : 0
-    order.paidAmountStr = util.showAmount(order.paidAmount)
+    order.paidAmountStr = util.showAmount(paidAmountExcludeDeposit)
     order.refundAmountStr = util.showAmount(order.refundAmount)
     order._allRentalsReturned = allRentalsReturned
     order.unRelieveGuaranty = unRelieveGuaranty

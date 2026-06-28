@@ -91,9 +91,15 @@ Page({
         item._categoryId = catId
         item._categoryName = catName
         item._orderId = (order.id != null) ? order.id : null
-        item._customerName = order.name || order.contact_name || '—'
-        item._honorific = honorific(order.gender || order.contact_gender)
-        item._cell = ('' + (order.cell || order.contact_num || '')).trim()
+        var contactCell = ('' + (order.contact_num || '')).trim()
+        var memberCell = ('' + ((order.member && order.member.cell) || '')).trim()
+        // 顾客汇总严格按开单联系人手机号；无联系人手机号时才回退会员手机号。
+        item._cell = contactCell || memberCell
+        item._customerName = order.contact_name
+          || order.name
+          || (order.member && order.member.real_name)
+          || '—'
+        item._honorific = honorific(order.contact_gender || order.gender || (order.member && order.member.gender))
         item._orderCode = order.code || ('#' + (order.id || ''))
         out.push(item)
       }
@@ -169,7 +175,14 @@ Page({
     var secMap = {}, secs = []
     for (var i = 0; i < items.length; i++) {
       var it = items[i]
-      var sk = it._cell ? ('cell:' + it._cell) : '_nocell'
+      // 顾客分组键：
+      // 1) 优先手机号（开单联系人手机号，缺失时会员手机号）
+      // 2) 无手机号时按顾客姓名分组，避免全部并入一个 "_nocell"
+      // 3) 姓名也缺失时兜底到订单 id，避免误合并
+      var fallbackName = ('' + (it._customerName || '')).trim()
+      var sk = it._cell
+        ? ('cell:' + it._cell)
+        : (fallbackName ? ('name:' + fallbackName) : ('order:' + (it._orderId != null ? it._orderId : ('x' + i))))
       var sec = secMap[sk]
       if (!sec) {
         sec = { _key: sk, _icon: 'manager-o', _title: it._customerName, _honorific: it._honorific, _cell: it._cell, _code: '', _count: 0, _earliestTs: it._pickTs, _groups: [], _gmap: {} }
