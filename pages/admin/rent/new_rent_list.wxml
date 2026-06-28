@@ -155,8 +155,10 @@
             <text class="row-label">手机</text><text class="row-value row-value--wide">{{item.customerCell}}</text>
           </view>
           <view class="order-row">
-            <text class="row-label">支付金额</text><text class="row-value">{{item.paidAmountStr}}</text>
-            <text class="row-label row-label--mid">方式</text><text class="row-value">{{item.payMethod || '--'}}</text>
+            <text class="row-label">支付金额</text><text class="row-value row-value--wide">{{item.paidAmountStr}}</text>
+          </view>
+          <view class="order-row">
+            <text class="row-label">方式</text><text class="row-value row-value--wide row-value--nowrap">{{item.payMethod || '--'}}</text>
           </view>
           <view class="order-row">
             <text class="row-label">总计租金</text><text class="row-value">{{item.displayedRentalStr || '--'}}</text>

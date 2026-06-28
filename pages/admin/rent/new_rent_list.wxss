@@ -254,6 +254,13 @@
   width: auto;
 }
 
+/* 支付方式：独占一行 + 整行宽度，多通道拼接也不折行 */
+.row-value--nowrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* 空状态 */
 .empty-tip {
   text-align: center;
