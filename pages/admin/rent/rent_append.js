@@ -153,10 +153,27 @@ Page({
       return;
     }
     if (action === 'noCode') {
-      wx.showToast({ title: '无码物品请用「搜索单品」选择品类后追加', icon: 'none' });
+      this._appendBlank();
       return;
     }
     // action === 'search' 由组件内部开搜索 modal → addSingleProduct 事件
+  },
+
+  // 无码物品：后端建无分类空白草稿（category_id=null），用户在卡片内点「分类」选定后由组件联动（同开单）
+  _appendBlank() {
+    const that = this;
+    const order = this.data.order;
+    wx.showLoading({ title: '添加中', mask: true });
+    const url = app.globalData.requestPrefix
+      + 'Rent/AppendRental/' + order.id.toString()
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+    util.performWebRequest(url, null).then(function (updatedOrder) {
+      wx.hideLoading();
+      if (updatedOrder) that._setOrder(updatedOrder);
+    }).catch(function () {
+      wx.hideLoading();
+      wx.showToast({ title: '添加失败', icon: 'none' });
+    });
   },
 
   // 套餐：用 recept_package 返回 rental 的 package_id 逐个 AppendRental 后端建草稿
