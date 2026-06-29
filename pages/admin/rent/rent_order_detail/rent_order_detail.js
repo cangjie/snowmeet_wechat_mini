@@ -1366,8 +1366,10 @@ Page({
       }
     }
     allocated = parseFloat(allocated.toFixed(2))
+    // 待分配（已四舍五入到 2 位）必须严格为 0 才允许确认；
+    // 不能用 abs(allocated-need)<0.01——0.02 与 0.03 的浮点差是 0.00999…会被误判为已配平
     var remainToAlloc = parseFloat((modal.need - allocated).toFixed(2))
-    var canConfirm = !overflow && Math.abs(allocated - modal.need) < 0.01
+    var canConfirm = !overflow && remainToAlloc === 0
     this.setData({
       'refundModal.items': items,
       'refundModal.allocatedStr': util.showAmount(allocated),
