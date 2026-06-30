@@ -1,0 +1,180 @@
+<view class="page" wx:if="{{member}}">
+  <scroll-view class="scroll" scroll-y>
+    <!-- 资料卡 -->
+    <view class="card head">
+      <view class="head-top">
+        <view class="avatar {{member.female ? 'avatar--f' : ''}}">{{member.avatar}}</view>
+        <view class="head-mid">
+          <view class="head-line1">
+            <text class="head-name">{{member.name}}</text>
+            <text wx:if="{{member.gender}}" class="gchip {{member.female ? 'gchip--f' : ''}}">{{member.gender}}</text>
+          </view>
+          <view class="head-phone" bindtap="callPhone">
+            <van-icon name="phone-o" size="15px" color="#006495" /><text class="head-phone-txt">{{member.phone || '未绑定手机号'}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="head-grid">
+        <view class="kv"><text class="kv-k">会员 ID</text><text class="kv-v mono">{{member.id}}</text></view>
+        <view class="kv"><text class="kv-k">来源</text><text class="kv-v">{{member.source || '—'}}</text></view>
+      </view>
+    </view>
+
+    <!-- 储值 & 龙珠 -->
+    <view class="card">
+      <view class="card-title"><van-icon name="balance-o" size="16px" color="#006495" /><text class="card-title-txt">储值与龙珠</text></view>
+      <view class="asset-row">
+        <view class="asset-cell">
+          <text class="asset-label">储值合计（C 类）</text>
+          <text class="asset-big">{{member.depositTotalStr}}</text>
+        </view>
+        <view class="asset-cell asset-cell--r">
+          <text class="asset-label">可用龙珠</text>
+          <text class="asset-points">{{member.points}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标签 -->
+    <view class="card">
+      <view class="card-title">
+        <van-icon name="label-o" size="16px" color="#006495" /><text class="card-title-txt">标签</text>
+        <view class="card-edit" bindtap="onEditTags"><van-icon name="edit" size="13px" color="#006495" /><text class="card-edit-txt">编辑</text></view>
+      </view>
+      <view class="tag-sub">系统标签 · 按参与业务自动生成</view>
+      <view class="tag-wrap">
+        <text wx:for="{{member.sys}}" wx:key="*this" class="chip chip--sys">{{item}}</text>
+        <text wx:if="{{member.sys.length === 0}}" class="tag-none">暂无</text>
+      </view>
+      <view class="tag-sub tag-sub--mt">自定义标签</view>
+      <view class="tag-wrap">
+        <text wx:for="{{member.custom}}" wx:key="*this" class="chip chip--custom">{{item}}</text>
+        <text wx:if="{{member.custom.length === 0}}" class="tag-none">暂无</text>
+      </view>
+    </view>
+
+    <!-- 绑定账户 -->
+    <view class="card">
+      <view class="card-title"><van-icon name="link-o" size="16px" color="#006495" /><text class="card-title-txt">绑定账户</text></view>
+      <view class="acc-row"><text class="acc-k">微信</text><text class="acc-v">{{member.accounts.wechatOpenId ? '已绑定' : '未绑定'}}</text></view>
+      <view class="acc-row"><text class="acc-k">支付宝</text><text class="acc-v">{{member.accounts.alipayPayerId ? '已绑定' : '未绑定'}}</text></view>
+      <view class="acc-row"><text class="acc-k">手机号</text><text class="acc-v mono">{{member.accounts.cell || '未绑定'}}</text></view>
+    </view>
+
+    <!-- 名下次卡 -->
+    <view class="card" wx:if="{{member.punchCards.length > 0}}">
+      <view class="card-title"><van-icon name="coupon-o" size="16px" color="#006495" /><text class="card-title-txt">名下次卡</text></view>
+      <view wx:for="{{member.punchCards}}" wx:key="id" class="punch-row">
+        <view class="punch-l"><text class="punch-name">{{item.card_name}}</text><text class="punch-biz">{{item.biz_type}}</text></view>
+        <text class="punch-remain">剩余 {{item.remaining}} / {{item.total}} 次</text>
+      </view>
+    </view>
+
+    <!-- 最近订单 -->
+    <view class="card" wx:if="{{member.recentOrders.length > 0}}">
+      <view class="card-title"><van-icon name="orders-o" size="16px" color="#006495" /><text class="card-title-txt">最近订单</text></view>
+      <view wx:for="{{member.recentOrders}}" wx:key="code" class="order-row">
+        <view class="order-l"><text class="order-code mono">{{item.code}}</text><text class="order-meta">{{item.type}} · {{item.dateStr}}</text></view>
+      </view>
+    </view>
+
+    <view class="bottom-pad"></view>
+  </scroll-view>
+
+  <!-- 底部操作条 -->
+  <view class="actionbar">
+    <view class="act act-ghost" bindtap="onCouponOpen"><van-icon name="gift-o" size="17px" color="#0b1c30" /><text>发券</text></view>
+    <view class="act act-ghost" bindtap="onPunchOpen"><van-icon name="card" size="17px" color="#0b1c30" /><text>加次卡</text></view>
+    <view class="act act-primary" bindtap="onChargeOpen"><van-icon name="gold-coin-o" size="17px" color="#fff" /><text class="act-primary-txt">充值储值</text></view>
+  </view>
+</view>
+
+<view wx:else class="loading-tip">加载中…</view>
+
+<!-- ───── 标签编辑弹层 ───── -->
+<view wx:if="{{tagSheetShow}}" class="mask" bindtap="onTagSheetClose" catchtouchmove="noop">
+  <view class="sheet" catchtap="noop">
+    <view class="sheet-head"><text class="sheet-title">编辑自定义标签</text>
+      <view class="sheet-x" bindtap="onTagSheetClose"><van-icon name="cross" size="18px" color="#3f4850" /></view>
+    </view>
+    <scroll-view class="sheet-body" scroll-y>
+      <view class="sheet-sub">当前标签 <text class="sheet-sub-n">{{tagSel.length}}</text></view>
+      <view class="tag-wrap">
+        <view wx:for="{{tagSel}}" wx:key="*this" class="sel-chip">{{item}}
+          <text class="sel-chip-x" data-v="{{item}}" catchtap="onTagRemove">×</text>
+        </view>
+        <text wx:if="{{tagSel.length === 0}}" class="tag-none">暂无，点下方标签或手动添加</text>
+      </view>
+      <view class="sheet-add">
+        <input class="sheet-input" value="{{tagInput}}" bindinput="onTagInput" placeholder="输入新标签" confirm-type="done" bindconfirm="onTagAdd" />
+        <view class="sheet-add-btn" bindtap="onTagAdd">添加</view>
+      </view>
+      <view class="sheet-sub sheet-sub--mt">从标签库选择</view>
+      <view class="tag-wrap">
+        <view wx:for="{{presetTags}}" wx:key="*this" class="tag-pick {{tagSel.indexOf(item) >= 0 ? 'tag-pick--on' : ''}}"
+              data-v="{{item}}" bindtap="onTagToggle">{{item}}</view>
+      </view>
+    </scroll-view>
+    <view class="sheet-foot">
+      <view class="btn btn-ghost" bindtap="onTagSheetClose">取消</view>
+      <view class="btn btn-primary" bindtap="onTagSave">保存（{{tagSel.length}}）</view>
+    </view>
+  </view>
+</view>
+
+<!-- ───── 充值储值 ───── -->
+<view wx:if="{{chargeShow}}" class="mask" bindtap="onChargeClose" catchtouchmove="noop">
+  <view class="modal" catchtap="noop">
+    <view class="modal-title">充值储值（C 类）</view>
+    <view class="modal-field">
+      <text class="modal-yen">¥</text>
+      <input class="modal-input" type="digit" value="{{chargeAmount}}" bindinput="onChargeInput" placeholder="0.00" focus />
+    </view>
+    <view class="modal-foot">
+      <view class="btn btn-ghost" bindtap="onChargeClose">取消</view>
+      <view class="btn btn-primary" bindtap="onChargeConfirm">确认充值</view>
+    </view>
+  </view>
+</view>
+
+<!-- ───── 加次卡 ───── -->
+<view wx:if="{{punchShow}}" class="mask" bindtap="onPunchClose" catchtouchmove="noop">
+  <view class="modal" catchtap="noop">
+    <view class="modal-title">发放次卡</view>
+    <scroll-view class="modal-list" scroll-y>
+      <view wx:for="{{punchPresets}}" wx:key="card_name" class="opt {{punchSelIdx === index ? 'opt--on' : ''}}"
+            data-idx="{{index}}" bindtap="onPunchSelect">
+        <view class="opt-radio {{punchSelIdx === index ? 'opt-radio--on' : ''}}"></view>
+        <view class="opt-mid"><text class="opt-name">{{item.card_name}}</text><text class="opt-sub">{{item.biz_type}} · {{item.total}} 次</text></view>
+      </view>
+      <view wx:if="{{punchPresets.length === 0}}" class="opt-empty">暂无可发放卡种</view>
+    </scroll-view>
+    <view class="modal-foot">
+      <view class="btn btn-ghost" bindtap="onPunchClose">取消</view>
+      <view class="btn btn-primary" bindtap="onPunchConfirm">确认发卡</view>
+    </view>
+  </view>
+</view>
+
+<!-- ───── 发券 ───── -->
+<view wx:if="{{couponShow}}" class="mask" bindtap="onCouponClose" catchtouchmove="noop">
+  <view class="modal" catchtap="noop">
+    <view class="modal-title">发放优惠券</view>
+    <scroll-view class="modal-list" scroll-y>
+      <view wx:for="{{couponTemplates}}" wx:key="id" class="opt {{couponSelId === item.id ? 'opt--on' : ''}}"
+            data-id="{{item.id}}" bindtap="onCouponSelect">
+        <view class="opt-radio {{couponSelId === item.id ? 'opt-radio--on' : ''}}"></view>
+        <view class="opt-mid"><text class="opt-name">{{item.name}}</text><text class="opt-sub">{{item.type}}</text></view>
+      </view>
+      <view wx:if="{{couponTemplates.length === 0}}" class="opt-empty">暂无可发放券模板</view>
+    </scroll-view>
+    <view class="modal-field modal-field--inline">
+      <text class="modal-count-label">数量</text>
+      <input class="modal-count-input" type="number" value="{{couponCount}}" bindinput="onCouponCountInput" placeholder="1" />
+    </view>
+    <view class="modal-foot">
+      <view class="btn btn-ghost" bindtap="onCouponClose">取消</view>
+      <view class="btn btn-primary" bindtap="onCouponConfirm">确认发券</view>
+    </view>
+  </view>
+</view>

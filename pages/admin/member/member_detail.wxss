@@ -1,0 +1,118 @@
+.page { height: 100vh; background: #f8f9ff; display: flex; flex-direction: column; }
+.scroll { flex: 1; overflow: hidden; }
+.loading-tip { padding: 120rpx 0; text-align: center; color: #6f7881; font-size: 28rpx; }
+
+.card { margin: 20rpx 24rpx 0; background: #fff; border-radius: 22rpx; border: 1rpx solid rgba(191,199,209,.3); padding: 26rpx 28rpx; }
+.card-title { display: flex; align-items: center; gap: 12rpx; margin-bottom: 18rpx; }
+.card-title-txt { font-size: 28rpx; font-weight: 700; color: #0b1c30; }
+.card-edit { margin-left: auto; display: flex; align-items: center; gap: 4rpx; height: 50rpx; padding: 0 18rpx;
+  border-radius: 12rpx; border: 1rpx solid #006495; background: #e1edf7; }
+.card-edit-txt { font-size: 23rpx; color: #006495; font-weight: 600; }
+
+/* 资料卡 */
+.head-top { display: flex; align-items: center; gap: 22rpx; }
+.avatar { width: 100rpx; height: 100rpx; border-radius: 999rpx; background: #d9e7f5; color: #006495; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 44rpx; }
+.avatar--f { background: #fde4ee; color: #b03a6e; }
+.head-mid { flex: 1; min-width: 0; }
+.head-line1 { display: flex; align-items: center; gap: 14rpx; }
+.head-name { font-size: 38rpx; font-weight: 700; color: #0b1c30; }
+.gchip { font-size: 22rpx; font-weight: 600; padding: 2rpx 14rpx; border-radius: 999rpx; background: #dceaff; color: #0a5d8c; }
+.gchip--f { background: #fde4ee; color: #b03a6e; }
+.head-phone { display: inline-flex; align-items: center; gap: 8rpx; margin-top: 10rpx; }
+.head-phone-txt { font-size: 28rpx; color: #006495; font-weight: 600; font-family: monospace; }
+.head-grid { display: flex; gap: 20rpx; margin-top: 24rpx; padding-top: 22rpx; border-top: 1rpx dashed rgba(191,199,209,.5); }
+.kv { flex: 1; }
+.kv-k { font-size: 22rpx; color: #6f7881; display: block; margin-bottom: 4rpx; }
+.kv-v { font-size: 26rpx; font-weight: 600; color: #0b1c30; }
+.mono { font-family: monospace; }
+
+/* 储值 */
+.asset-row { display: flex; align-items: flex-end; justify-content: space-between; }
+.asset-cell--r { text-align: right; }
+.asset-label { font-size: 23rpx; color: #6f7881; display: block; margin-bottom: 6rpx; }
+.asset-big { font-size: 48rpx; font-weight: 800; color: #006495; }
+.asset-points { font-size: 40rpx; font-weight: 800; color: #9a6a00; }
+
+/* 标签 */
+.tag-sub { font-size: 24rpx; font-weight: 600; color: #3f4850; margin-bottom: 14rpx; }
+.tag-sub--mt { margin-top: 22rpx; padding-top: 20rpx; border-top: 1rpx solid rgba(191,199,209,.2); }
+.tag-wrap { display: flex; flex-wrap: wrap; gap: 14rpx; }
+.chip { font-size: 23rpx; font-weight: 600; padding: 6rpx 16rpx; border-radius: 9rpx; }
+.chip--sys { background: #cbe6ff; color: #0a5d8c; }
+.chip--custom { background: #e5eeff; color: #3f4850; }
+.tag-none { font-size: 24rpx; color: #6f7881; }
+
+/* 绑定账户 / 订单 / 次卡 */
+.acc-row, .order-row, .punch-row { display: flex; align-items: center; justify-content: space-between; padding: 14rpx 0;
+  border-top: 1rpx solid rgba(191,199,209,.15); }
+.acc-row:first-of-type, .order-row:first-of-type, .punch-row:first-of-type { border-top: none; }
+.acc-k { font-size: 26rpx; color: #3f4850; }
+.acc-v { font-size: 26rpx; color: #0b1c30; font-weight: 600; }
+.order-l, .punch-l { display: flex; flex-direction: column; gap: 4rpx; }
+.order-code { font-size: 25rpx; font-weight: 600; color: #0b1c30; }
+.order-meta { font-size: 22rpx; color: #6f7881; }
+.punch-name { font-size: 27rpx; font-weight: 600; color: #0b1c30; }
+.punch-biz { font-size: 22rpx; color: #6f7881; }
+.punch-remain { font-size: 25rpx; font-weight: 600; color: #006495; }
+
+.bottom-pad { height: 30rpx; }
+
+/* 底部操作条 */
+.actionbar { flex-shrink: 0; background: #fff; border-top: 1rpx solid rgba(191,199,209,.4); padding: 16rpx 24rpx;
+  display: flex; gap: 16rpx; padding-bottom: calc(16rpx + env(safe-area-inset-bottom)); }
+.act { flex: 1; height: 88rpx; border-radius: 18rpx; display: flex; align-items: center; justify-content: center; gap: 8rpx;
+  font-size: 27rpx; font-weight: 600; color: #0b1c30; }
+.act-ghost { border: 1rpx solid rgba(191,199,209,.5); background: #fff; }
+.act-primary { flex: 1.5; background: #006495; }
+.act-primary-txt { color: #fff; }
+
+/* 通用按钮 */
+.btn { flex: 1; height: 84rpx; border-radius: 18rpx; display: flex; align-items: center; justify-content: center;
+  font-size: 28rpx; font-weight: 600; }
+.btn-ghost { border: 1rpx solid rgba(191,199,209,.5); background: #fff; color: #3f4850; }
+.btn-primary { flex: 2; background: #006495; color: #fff; font-weight: 700; }
+
+/* 遮罩 / 弹层 / 弹窗 */
+.mask { position: fixed; inset: 0; background: rgba(11,28,48,.45); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { width: 100%; background: #f8f9ff; border-radius: 28rpx 28rpx 0 0; max-height: 86vh; display: flex; flex-direction: column; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 26rpx 28rpx 16rpx; }
+.sheet-title { font-size: 32rpx; font-weight: 700; color: #0b1c30; }
+.sheet-x { width: 56rpx; height: 56rpx; border-radius: 999rpx; background: #e5eeff; display: flex; align-items: center; justify-content: center; }
+.sheet-body { flex: 1; overflow: hidden; padding: 0 28rpx 16rpx; }
+.sheet-sub { font-size: 25rpx; font-weight: 600; color: #3f4850; margin-bottom: 14rpx; }
+.sheet-sub--mt { margin-top: 22rpx; }
+.sheet-sub-n { color: #006495; }
+.sel-chip { display: inline-flex; align-items: center; gap: 8rpx; padding: 8rpx 8rpx 8rpx 18rpx; border-radius: 10rpx;
+  background: #e1edf7; color: #006495; font-size: 24rpx; font-weight: 600; }
+.sel-chip-x { font-size: 30rpx; line-height: 1; padding: 0 8rpx; color: #006495; }
+.sheet-add { display: flex; gap: 14rpx; margin-top: 18rpx; }
+.sheet-input { flex: 1; height: 76rpx; border-radius: 14rpx; border: 1rpx solid rgba(191,199,209,.5); padding: 0 20rpx;
+  font-size: 27rpx; background: #fff; }
+.sheet-add-btn { width: 130rpx; height: 76rpx; border-radius: 14rpx; background: #006495; color: #fff; font-size: 27rpx;
+  font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.tag-pick { height: 60rpx; line-height: 60rpx; padding: 0 22rpx; border-radius: 999rpx; font-size: 25rpx;
+  border: 1rpx solid rgba(191,199,209,.5); background: #fff; color: #3f4850; }
+.tag-pick--on { border-color: #006495; background: #e1edf7; color: #006495; font-weight: 700; }
+.sheet-foot { flex-shrink: 0; background: #fff; border-top: 1rpx solid rgba(191,199,209,.4); padding: 16rpx 28rpx;
+  display: flex; gap: 16rpx; padding-bottom: calc(16rpx + env(safe-area-inset-bottom)); }
+
+.modal { width: 84%; background: #fff; border-radius: 24rpx; padding: 32rpx 30rpx; margin-bottom: 30vh; }
+.modal-title { font-size: 32rpx; font-weight: 700; color: #0b1c30; text-align: center; margin-bottom: 24rpx; }
+.modal-field { display: flex; align-items: center; height: 96rpx; border-radius: 16rpx; border: 1rpx solid rgba(191,199,209,.5);
+  padding: 0 24rpx; background: #fff; }
+.modal-yen { font-size: 32rpx; color: #6f7881; margin-right: 8rpx; }
+.modal-input { flex: 1; font-size: 40rpx; font-weight: 700; color: #0b1c30; text-align: right; }
+.modal-field--inline { margin-top: 18rpx; justify-content: space-between; height: 80rpx; }
+.modal-count-label { font-size: 27rpx; color: #3f4850; }
+.modal-count-input { width: 160rpx; text-align: right; font-size: 30rpx; font-weight: 700; color: #0b1c30; }
+.modal-list { max-height: 46vh; margin-bottom: 8rpx; }
+.opt { display: flex; align-items: center; gap: 18rpx; padding: 22rpx 8rpx; border-bottom: 1rpx solid rgba(191,199,209,.2); }
+.opt--on { background: #f3f8fc; }
+.opt-radio { width: 38rpx; height: 38rpx; border-radius: 999rpx; border: 2rpx solid rgba(191,199,209,.7); flex-shrink: 0; }
+.opt-radio--on { border-color: #006495; background: radial-gradient(circle, #006495 42%, transparent 46%); }
+.opt-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4rpx; }
+.opt-name { font-size: 28rpx; font-weight: 600; color: #0b1c30; }
+.opt-sub { font-size: 23rpx; color: #6f7881; }
+.opt-empty { padding: 40rpx 0; text-align: center; color: #6f7881; font-size: 26rpx; }
+.modal-foot { display: flex; gap: 16rpx; margin-top: 24rpx; }

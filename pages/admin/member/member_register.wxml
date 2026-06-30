@@ -1,0 +1,81 @@
+<view class="page">
+  <scroll-view class="scroll" scroll-y>
+    <view class="banner">
+      <van-icon name="info-o" size="18px" color="#006495" />
+      <text class="banner-txt">远程注册：顾客不在店时，仅凭手机号即可创建会员并办理业务。一个手机号只能认证一个会员。</text>
+    </view>
+
+    <!-- 手机号检测 -->
+    <view class="card">
+      <text class="card-title">会员手机号</text>
+      <view class="phone-row">
+        <input class="phone-input" value="{{phone}}" bindinput="onPhoneInput" type="number" placeholder="输入 11 位手机号" />
+        <view class="detect-btn {{phone.length === 11 ? '' : 'detect-btn--off'}}" bindtap="onDetect">检测</view>
+      </view>
+    </view>
+
+    <!-- 已存在 -->
+    <view wx:if="{{phase === 'existing'}}" class="card">
+      <view class="tip tip-warn"><van-icon name="info-o" size="17px" color="#b86e00" /><text>该手机号已是会员，可直接办理业务</text></view>
+      <view class="found">
+        <view class="avatar {{found.gender === '女' ? 'avatar--f' : ''}}">{{found.real_name ? found.real_name[0] : (found.name ? found.name[0] : '?')}}</view>
+        <view class="found-mid">
+          <text class="found-name">{{found.real_name || found.name || '会员'}}</text>
+          <text class="found-id">会员 ID {{found.id}}</text>
+        </view>
+      </view>
+      <view class="btn btn-primary btn-full" bindtap="gotoExisting">进入会员详情</view>
+    </view>
+
+    <!-- 新建表单 -->
+    <block wx:if="{{phase === 'new'}}">
+      <view class="card">
+        <view class="tip tip-ok"><van-icon name="checked" size="17px" color="#1f8a5b" /><text>手机号未注册，将创建新会员</text></view>
+        <view class="form-item">
+          <text class="form-label">姓名 / 称呼<text class="form-opt">（选填）</text></text>
+          <input class="form-input" value="{{form.name}}" bindinput="onNameInput" placeholder="如：王女士" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">性别</text>
+          <view class="seg seg--narrow">
+            <view class="seg-item {{form.gender === '男' ? 'seg-item--on' : ''}}" data-v="男" bindtap="onGenderTap">男</view>
+            <view class="seg-item {{form.gender === '女' ? 'seg-item--on' : ''}}" data-v="女" bindtap="onGenderTap">女</view>
+          </view>
+        </view>
+      </view>
+      <view class="card">
+        <text class="card-title">初始储值（选填 · C 类）</text>
+        <view class="modal-field">
+          <text class="modal-yen">¥</text>
+          <input class="modal-input" type="digit" value="{{form.deposit}}" bindinput="onDepositInput" placeholder="0" />
+        </view>
+      </view>
+    </block>
+
+    <!-- 完成 -->
+    <view wx:if="{{phase === 'done'}}" class="card">
+      <view class="done-head">
+        <view class="done-circle"><van-icon name="success" size="34px" color="#1f8a5b" /></view>
+        <text class="done-title">注册成功</text>
+      </view>
+      <view class="done-box">
+        <view class="done-row"><text class="done-k">会员 ID</text><text class="done-v mono">{{newMember.id}}</text></view>
+        <view class="done-row"><text class="done-k">手机号</text><text class="done-v mono">{{newMember.phone}}</text></view>
+        <view class="done-row"><text class="done-k">姓名</text><text class="done-v">{{newMember.name}}</text></view>
+        <view class="done-row"><text class="done-k">初始储值</text><text class="done-v">{{newMember.depositStr}}</text></view>
+      </view>
+      <view class="done-actions">
+        <view class="btn btn-ghost" bindtap="onReset">再注册一个</view>
+        <view class="btn btn-primary" bindtap="gotoNew">查看会员详情</view>
+      </view>
+    </view>
+
+    <view class="bottom-pad"></view>
+  </scroll-view>
+
+  <!-- 底部提交（新建表单时） -->
+  <view wx:if="{{phase === 'new'}}" class="footer">
+    <view class="btn btn-ghost" bindtap="onReset">重置</view>
+    <view class="btn btn-primary" bindtap="onSubmit">注册会员</view>
+  </view>
+</view>

@@ -1,0 +1,102 @@
+<view class="page">
+  <!-- 顶部条 -->
+  <view class="appbar">
+    <text class="appbar-title">会员管理</text>
+    <view class="appbar-add" bindtap="gotoRegister">
+      <van-icon name="add-o" size="20px" color="#006495" />
+      <text class="appbar-add-txt">注册</text>
+    </view>
+  </view>
+
+  <!-- 折叠筛选面板 -->
+  <view class="filter">
+    <view class="filter-head" bindtap="onToggleFilter">
+      <van-icon name="filter-o" size="16px" color="#006495" />
+      <text class="filter-title">筛选条件</text>
+      <view wx:if="{{activeCount > 0}}" class="filter-badge">{{activeCount}}</view>
+      <van-icon class="filter-arrow" name="{{filterOpen ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881" />
+    </view>
+
+    <view wx:if="{{filterOpen}}" class="filter-body">
+      <view class="field">
+        <text class="field-label">姓名</text>
+        <input class="field-input" value="{{filter.name}}" bindinput="onNameInput" placeholder="模糊匹配姓名" />
+      </view>
+      <view class="field">
+        <text class="field-label">手机号</text>
+        <input class="field-input" value="{{filter.cell}}" bindinput="onCellInput" type="number" placeholder="模糊匹配手机号" />
+      </view>
+      <view class="field">
+        <text class="field-label">性别</text>
+        <view class="seg">
+          <view class="seg-item {{filter.gender === '全部' ? 'seg-item--on' : ''}}" data-v="全部" bindtap="onGenderTap">全部</view>
+          <view class="seg-item {{filter.gender === '男' ? 'seg-item--on' : ''}}" data-v="男" bindtap="onGenderTap">男</view>
+          <view class="seg-item {{filter.gender === '女' ? 'seg-item--on' : ''}}" data-v="女" bindtap="onGenderTap">女</view>
+        </view>
+      </view>
+
+      <view class="tag-group">
+        <text class="tag-group-label">参与业务<text class="tag-group-hint"> · 单选</text></text>
+        <view class="tag-wrap">
+          <view wx:for="{{sysTags}}" wx:key="*this" class="tag-pick {{filter.bizType === item ? 'tag-pick--on' : ''}}"
+                data-v="{{item}}" bindtap="onSysTagTap">{{item}}</view>
+        </view>
+      </view>
+
+      <view class="tag-group">
+        <text class="tag-group-label">自定义标签</text>
+        <view class="tag-wrap">
+          <view wx:for="{{presetTags}}" wx:key="*this" class="tag-pick {{filter.customTags.indexOf(item) >= 0 ? 'tag-pick--on' : ''}}"
+                data-v="{{item}}" bindtap="onCustomTagTap">{{item}}</view>
+        </view>
+      </view>
+
+      <view class="filter-actions">
+        <view class="btn btn-ghost" bindtap="onResetFilter">重置</view>
+        <view class="btn btn-primary" bindtap="onQuery">
+          <van-icon name="search" size="16px" color="#fff" /><text class="btn-txt">查询</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 统计条 -->
+  <view class="stats">
+    <text class="stats-item">会员数 <text class="stats-num">{{total}}</text></text>
+    <text class="stats-sep">|</text>
+    <text class="stats-item">本页储值 <text class="stats-num stats-num--ink">{{pageDepositStr}}</text></text>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list">
+    <block wx:if="{{members.length > 0}}">
+      <view wx:for="{{members}}" wx:key="id" class="mcard" data-id="{{item.id}}" bindtap="gotoDetail">
+        <view class="mcard-main">
+          <view class="avatar {{item.female ? 'avatar--f' : ''}}">{{item.avatar}}</view>
+          <view class="mcard-mid">
+            <view class="mcard-line1">
+              <text class="mcard-name">{{item.name}}</text>
+              <text wx:if="{{item.gender}}" class="gchip {{item.female ? 'gchip--f' : ''}}">{{item.gender}}</text>
+            </view>
+            <text class="mcard-phone">{{item.phone}}</text>
+          </view>
+          <view class="mcard-right">
+            <view><text class="mcard-dep-label">储值 </text><text class="mcard-dep">{{item.depositStr}}</text></view>
+            <view class="mcard-points">龙珠 {{item.points}}</view>
+          </view>
+        </view>
+        <view wx:if="{{item.sys.length > 0 || item.custom.length > 0}}" class="mcard-tags">
+          <text wx:for="{{item.sys}}" wx:for-item="s" wx:key="*this" class="chip chip--sys">{{s}}</text>
+          <text wx:for="{{item.custom}}" wx:for-item="c" wx:key="*this" class="chip chip--custom">{{c}}</text>
+        </view>
+      </view>
+    </block>
+    <view wx:elif="{{!querying}}" class="empty">
+      <van-icon name="friends-o" size="40px" color="#bfc7d1" />
+      <text class="empty-txt">没有匹配的会员</text>
+    </view>
+  </view>
+
+  <list-pager wx:if="{{total > 0}}" page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
+              disabled="{{querying}}" bind:change="onPagerChange" />
+</view>

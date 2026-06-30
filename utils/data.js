@@ -888,6 +888,82 @@ const useRentalPunchCardPromise = function (orderId, body, sessionKey) {
     })
   })
 }
+// ───── 会员管理（MemberAdmin，店长/管理员 title_level≥200） ─────
+// 列表搜索（分页）。filter = {name, cell, gender, bizType, tags(逗号拼)}
+const searchMembersByStaffPromise = function (filter, pageIndex, pageSize, sessionKey) {
+  var f = filter || {}
+  var url = app.globalData.requestPrefix + 'MemberAdmin/SearchMembersByStaff?sessionKey=' + sessionKey
+    + '&pageIndex=' + (pageIndex || 1) + '&pageSize=' + (pageSize || 20)
+  if (f.name) { url += '&name=' + encodeURIComponent(f.name) }
+  if (f.cell) { url += '&cell=' + encodeURIComponent(f.cell) }
+  if (f.gender) { url += '&gender=' + encodeURIComponent(f.gender) }
+  if (f.bizType) { url += '&bizType=' + encodeURIComponent(f.bizType) }
+  if (f.tags) { url += '&tags=' + encodeURIComponent(f.tags) }
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+const getMemberDetailByStaffPromise = function (memberId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GetMemberDetailByStaff/' + memberId + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+const addMemberTagPromise = function (memberId, tag, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/AddMemberTag?sessionKey=' + sessionKey
+    + '&memberId=' + memberId + '&tag=' + encodeURIComponent(tag)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+const removeMemberTagPromise = function (memberId, tag, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/RemoveMemberTag?sessionKey=' + sessionKey
+    + '&memberId=' + memberId + '&tag=' + encodeURIComponent(tag)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+// 手机号注册会员。body = { cell, realName, gender }；返回 { exists, id, name, ... }
+const registerMemberByPhonePromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/RegisterMemberByPhone?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, body).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+// 充值储值。body = { memberId, depositType('C'), amount }
+const chargeMemberDepositPromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/ChargeMemberDeposit?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, body).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+// 发次卡。body = { memberId, bizType, cardName, total }
+const grantPunchCardPromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GrantPunchCard?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, body).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+const getPunchCardPresetsPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GetPunchCardPresets?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+// 发券。body = { memberId, templateId, count }
+const grantCouponPromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GrantCoupon?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, body).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+const getCouponTemplatesPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GetCouponTemplates?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+
 const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetMemberTicketsByStaff/' + memberId + '?sessionKey=' + sessionKey
   if (bizType != null) {
@@ -1015,6 +1091,16 @@ module.exports = {
   payWithDepositPromise,
   getRentalPunchCardInfoPromise,
   useRentalPunchCardPromise,
+  searchMembersByStaffPromise,
+  getMemberDetailByStaffPromise,
+  addMemberTagPromise,
+  removeMemberTagPromise,
+  registerMemberByPhonePromise,
+  chargeMemberDepositPromise,
+  grantPunchCardPromise,
+  getPunchCardPresetsPromise,
+  grantCouponPromise,
+  getCouponTemplatesPromise,
   getMemberTicketsPromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,

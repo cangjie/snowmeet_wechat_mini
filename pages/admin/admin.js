@@ -153,6 +153,9 @@ Page({
       case 'rent_list':
         path = 'rent/new_rent_list'
         break
+      case 'member_list':
+        path = '/pages/admin/member/member_list'
+        break
       case 'rent_report':
         path = 'rent/rent_report'
         break
