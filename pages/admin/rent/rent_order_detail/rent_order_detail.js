@@ -389,7 +389,9 @@ Page({
     var paidAmountExcludeDeposit = 0
     for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
       var payment = order.availablePayments[i]
-      var paidDate = new Date(payment.paid_date)
+      // paid_date 为空时回退 create_date（历史储值支付未写 paid_date，否则显示 1970-01-01 08:00:00）
+      var payDateSrc = payment.paid_date || payment.create_date
+      var paidDate = new Date(payDateSrc)
       payment.paid_dateDateStr = util.formatDate(paidDate)
       payment.paid_dateTimeStr = util.formatTimeStr(paidDate)
       payment.amountStr = util.showAmount(payment.amount)
