@@ -35,6 +35,7 @@ Page({
     payWithDeposit: false,
     _verifyShow: false,
     _verifyQrUrl: '',
+    _verifyTip: '',
 
     _rentalTab: 0,
     _expandedRentals: {},
@@ -124,7 +125,7 @@ Page({
           that.applyDeepLinkExpand(order)
         }
         // 补拉完整会员（availableDeposit，「可用储值/储值付租金」用）+ 次卡信息（次卡消费用），并行后 finish。
-        var emptyPunch = { cards: [], skiRentals: [], totalPunchNeed: 0 }
+        var emptyPunch = { cards: [], skiRentals: [], totalPunchNeed: 0, usedPunches: 0 }
         var memberP = order.member_id
           ? data.getMemberPromise(order.member_id, sessionKey).then(function (member) {
               if (member && order.member) order.member.availableDeposit = member.availableDeposit
@@ -1184,12 +1185,28 @@ Page({
       return
     }
     // 未核验 → 弹微信核验二维码 + 轮询，核验通过（扫码人=订单会员）才放行勾选
-    that._openWechatVerify()
+    that._openWechatVerify('deposit')
   },
 
   // ── 次卡消费 ──────────────────────────
-  // 打开选卡弹窗：列会员租赁次卡（单选）+ 输入抵几次（默认 min(选中卡剩余, 本次需扣)）
+  // 次卡是会员资产，做成复选框（可选）：勾选 → 先过微信身份核验（同储值）→ 弹选卡弹窗核销；
+  // 已核销过（usedPunches>0）则复选框勾选并锁定（同储值 depositPaidAmount>0 锁定）。
   onTogglePunchCard() {
+    var that = this
+    var order = that.data.order
+    var info = order && order.punchCardInfo
+    if (!info || !info.cards || info.cards.length === 0) return
+    // 已核销 → 复选框勾选并锁定，不再操作
+    if (info.usedPunches > 0) { wx.showToast({ title: '次卡已核销', icon: 'none' }); return }
+    if (!(info.totalPunchNeed > 0)) return
+    // 次卡是会员资产，需先通过微信身份核验（wechat_unverified==1 即已核验本人）
+    if (order.wechat_unverified) { that._openPunchModal(); return }
+    // 未核验 → 弹微信核验二维码 + 轮询，核验通过后再弹选卡弹窗
+    that._openWechatVerify('punch')
+  },
+
+  // 打开选卡弹窗：列会员租赁次卡（单选）+ 输入抵几次（默认 min(选中卡剩余, 本次需扣)）
+  _openPunchModal() {
     var info = this.data.order && this.data.order.punchCardInfo
     if (!info || !info.cards || info.cards.length === 0 || !(info.totalPunchNeed > 0)) return
     var cards = info.cards.map(function (c) { return { id: c.id, card_name: c.card_name, remaining: c.remaining } })
@@ -1240,13 +1257,18 @@ Page({
     })
   },
 
-  _openWechatVerify() {
+  // purpose: 'deposit'（储值付租金）| 'punch'（次卡消费）—— 核验通过后的后续动作不同
+  _openWechatVerify(purpose) {
     var that = this
     var order = that.data.order
+    that._verifyPurpose = purpose || 'deposit'
+    var tip = that._verifyPurpose === 'punch'
+      ? '请订单会员本人微信扫码，核验通过后才能用次卡消费'
+      : '请订单会员本人微信扫码，核验通过后才能用储值付租金'
     // 专用扫码落地路径 order_verify（需在公众平台「扫普通链接二维码打开小程序」登记 → pages/order/identity_verify）
     var verifyUrl = 'https://mini.snowmeet.top/mapp/order_verify?verifyOrderId=' + order.id
     var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(verifyUrl)
-    that.setData({ _verifyShow: true, _verifyQrUrl: qrCodeUrl })
+    that.setData({ _verifyShow: true, _verifyQrUrl: qrCodeUrl, _verifyTip: tip })
     that._startVerifyPolling()
   },
 
@@ -1260,10 +1282,17 @@ Page({
         if (res && res.verified) {
           that._stopVerifyPolling()
           order.wechat_unverified = true
-          // 同上：显式置位 payWithDeposit（不依赖 setData 同步），再 renderOrder
-          that.data.payWithDeposit = true
-          that.setData({ _verifyShow: false, payWithDeposit: true, order: that.renderOrder(order) })
-          wx.showToast({ title: '核验成功', icon: 'success' })
+          if (that._verifyPurpose === 'punch') {
+            // 核验通过 → 关二维码、落 wechat_unverified，弹选卡弹窗（次卡核销即生效）
+            that.setData({ _verifyShow: false, order: order })
+            wx.showToast({ title: '核验成功', icon: 'success' })
+            that._openPunchModal()
+          } else {
+            // 储值付租金：显式置位 payWithDeposit（不依赖 setData 同步），再 renderOrder
+            that.data.payWithDeposit = true
+            that.setData({ _verifyShow: false, payWithDeposit: true, order: that.renderOrder(order) })
+            wx.showToast({ title: '核验成功', icon: 'success' })
+          }
         }
       }).catch(function () { /* 轮询失败忽略，下个周期再试 */ })
     }, 2000)

@@ -463,12 +463,15 @@
           </view>
         </view>
       </view>
-      <view class="refund-amount-row" wx:if="{{order.punchCardInfo.cards.length > 0 && order.punchCardInfo.totalPunchNeed > 0}}">
+      <view class="refund-amount-row" wx:if="{{order.punchCardInfo.cards.length > 0 && (order.punchCardInfo.totalPunchNeed > 0 || order.punchCardInfo.usedPunches > 0)}}">
         <text class="refund-amount-label">次卡消费</text>
         <view class="refund-deposit-right">
           <text class="refund-amount-value">剩余 {{order.punchCardInfo.totalRemaining}} 次</text>
-          <view class="refund-deposit-toggle" bindtap="onTogglePunchCard">
-            <text class="refund-deposit-toggle-label">扣 {{order.punchCardInfo.totalPunchNeed}} 次 ›</text>
+          <view class="refund-deposit-toggle {{order.punchCardInfo.usedPunches > 0 ? 'refund-deposit-toggle--disabled' : ''}}" bindtap="onTogglePunchCard">
+            <text class="refund-deposit-toggle-label">次卡消费</text>
+            <view class="refund-deposit-check {{order.punchCardInfo.usedPunches > 0 ? 'refund-deposit-check--on' : ''}}">
+              <text wx:if="{{order.punchCardInfo.usedPunches > 0}}">✓</text>
+            </view>
           </view>
         </view>
       </view>
@@ -709,11 +712,11 @@
   </view>
 </view>
 
-<!-- 微信身份核验二维码弹窗（储值付租金前置）：复用 dc-* 弹窗样式 -->
+<!-- 微信身份核验二维码弹窗（储值付租金 / 次卡消费 前置）：复用 dc-* 弹窗样式 -->
 <view wx:if="{{_verifyShow}}" class="dc-mask" bindtap="onWechatVerifyCancel" catchtouchmove="noop">
   <view class="dc-card" catchtap="noop">
     <view class="dc-title">微信身份核验</view>
-    <view class="verify-qr-tip">请订单会员本人微信扫码，核验通过后才能用储值付租金</view>
+    <view class="verify-qr-tip">{{_verifyTip}}</view>
     <image wx:if="{{_verifyQrUrl}}" class="verify-qr-img" src="{{_verifyQrUrl}}" mode="aspectFit" />
     <view class="verify-qr-waiting">等待顾客扫码核验中…</view>
     <view class="dc-actions">
