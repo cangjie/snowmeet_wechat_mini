@@ -455,7 +455,7 @@
         <text class="refund-amount-label">可用储值</text>
         <view class="refund-deposit-right">
           <text class="refund-amount-value">{{order.member.availableDepositStr}}</text>
-          <view class="refund-deposit-toggle {{order.depositPaidAmount > 0 ? 'refund-deposit-toggle--disabled' : ''}}" bindtap="onTogglePayWithDeposit">
+          <view class="refund-deposit-toggle {{(order.depositPaidAmount > 0 || !order._allRentalsReturned) ? 'refund-deposit-toggle--disabled' : ''}}" bindtap="onTogglePayWithDeposit">
             <text class="refund-deposit-toggle-label">储值付租金</text>
             <view class="refund-deposit-check {{(payWithDeposit || order.depositPaidAmount > 0) ? 'refund-deposit-check--on' : ''}}">
               <text wx:if="{{payWithDeposit || order.depositPaidAmount > 0}}">✓</text>
@@ -466,11 +466,11 @@
       <view class="refund-amount-row" wx:if="{{order.punchCardInfo.cards.length > 0 && (order.punchCardInfo.totalPunchNeed > 0 || order.punchCardInfo.usedPunches > 0)}}">
         <text class="refund-amount-label">次卡消费</text>
         <view class="refund-deposit-right">
-          <text class="refund-amount-value">剩余 {{order.punchCardInfo.totalRemaining}} 次</text>
-          <view class="refund-deposit-toggle {{order.punchCardInfo.usedPunches > 0 ? 'refund-deposit-toggle--disabled' : ''}}" bindtap="onTogglePunchCard">
+          <text class="refund-amount-value">{{punchCardSelected ? ('抵 ' + punchCardSelectedCount + ' 次') : ('剩余 ' + order.punchCardInfo.totalRemaining + ' 次')}}</text>
+          <view class="refund-deposit-toggle {{(order.punchCardInfo.usedPunches > 0 || !order._allRentalsReturned) ? 'refund-deposit-toggle--disabled' : ''}}" bindtap="onTogglePunchCard">
             <text class="refund-deposit-toggle-label">次卡消费</text>
-            <view class="refund-deposit-check {{order.punchCardInfo.usedPunches > 0 ? 'refund-deposit-check--on' : ''}}">
-              <text wx:if="{{order.punchCardInfo.usedPunches > 0}}">✓</text>
+            <view class="refund-deposit-check {{(punchCardSelected || order.punchCardInfo.usedPunches > 0) ? 'refund-deposit-check--on' : ''}}">
+              <text wx:if="{{punchCardSelected || order.punchCardInfo.usedPunches > 0}}">✓</text>
             </view>
           </view>
         </view>
@@ -482,18 +482,18 @@
         </text>
       </view>
 
-      <!-- 退款按钮 -->
+      <!-- 退款 / 确认核销按钮：应退>0→申请退款；无应退但有储值/次卡待核销→确认核销 -->
       <view class="refund-btn-row">
         <van-button
           type="danger"
           block
-          disabled="{{order.closed == 1 || order.totalRentUnRefund <= 0 || !order._allRentalsReturned}}"
+          disabled="{{order.closed == 1 || !order._allRentalsReturned || (order.totalRentUnRefund <= 0 && !order._pendingWriteoff)}}"
           bind:click="onRefund">
-          申请退款 {{order.totalRentUnRefund > 0 ? order.totalRentUnRefundStr : ''}}
+          {{order.totalRentUnRefund > 0 ? ('申请退款 ' + order.totalRentUnRefundStr) : (order._pendingWriteoff ? '确认核销' : '申请退款')}}
         </van-button>
       </view>
-      <view wx:if="{{!order._allRentalsReturned && order.totalRentUnRefund > 0 && order.closed != 1}}" class="refund-hint">
-        所有租赁物退租后才能退押金
+      <view wx:if="{{!order._allRentalsReturned && (order.totalRentUnRefund > 0 || order.punchCardInfo.totalPunchNeed > 0 || order.member.availableDeposit > 0) && order.closed != 1}}" class="refund-hint">
+        所有租赁物归还后才能退款 / 核销储值次卡
       </view>
     </block>
   </view>

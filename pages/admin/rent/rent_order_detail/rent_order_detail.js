@@ -51,6 +51,10 @@ Page({
 
     // 次卡消费选卡弹窗
     punchModal: { show: false, need: 0, cards: [], cardId: 0, punchCount: '', maxPunch: 0 },
+    // 次卡消费预览（同储值：勾选只预览，核销在「申请退款」时）：选了哪张卡、抵几次、预览免除的雪板租金
+    punchCardSelected: false,
+    punchCardSelection: null,
+    punchCardSelectedCount: 0,
 
     // 租金明细按天编辑弹窗
     _dayChargeShow: false,
@@ -461,11 +465,20 @@ Page({
     var totalGuaranty = Math.min(order.totalGuarantyAmount || 0, order.paidAmount || 0)
     order.totalRentNeedToRefundAmount = totalGuaranty - sumSummary + (order.depositPaidAmount || 0)
     order.totalRentUnRefund = order.totalRentNeedToRefundAmount - (order.refundAmount || 0)
-    // 勾选「储值付租金」（且尚未用储值支付过）：租金改由会员储值支付 → 押金全额退，实际应退加回被扣的租金。
-    // depositPaidAmount > 0 时不再加（那笔储值已计入上面的 depositPaid 项，避免重复）。
-    if (that.data.payWithDeposit && !(order.depositPaidAmount > 0)) {
-      order.totalRentUnRefund = order.totalRentUnRefund + sumSummary
+    // 储值付租金 / 次卡消费都是「勾选预览」：把被它们覆盖的租金加回「实际应退」（核销在「申请退款」时才落库）。
+    // 叠加口径：储值付租金覆盖全部租金 → 加 sumSummary（次卡只是把其中雪板那部分换成次卡支付，押金移走总额仍是 sumSummary）；
+    // 仅次卡 → 只加被次卡免除的雪板租金 freedRent（非雪板租金仍从押金扣）。
+    var pendingDeposit = that.data.payWithDeposit && !(order.depositPaidAmount > 0)
+    var pendingPunch = !!(that.data.punchCardSelected && that.data.punchCardSelection)
+    var addBack = 0
+    if (pendingDeposit) {
+      addBack = sumSummary
+    } else if (pendingPunch) {
+      addBack = that.data.punchCardSelection.freedRent || 0
     }
+    order.totalRentUnRefund = order.totalRentUnRefund + addBack
+    // 有待核销（储值/次卡勾选未落库）→ 即使应退为 0，「申请退款」按钮也应可点（变「确认核销」）
+    order._pendingWriteoff = pendingDeposit || pendingPunch
     // 可用储值（会员储值余额，后端已随 order.member 下发）
     if (order.member && order.member.availableDeposit) {
       order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
@@ -1160,15 +1173,10 @@ Page({
   onTogglePayWithDeposit() {
     var that = this
     var order = that.data.order
-    // 临时诊断：确认新版门槛代码是否生效 + 看到的运行期取值（排查"点了不弹码"）
-    console.log('[储值付租金] tap', {
-      wechat_unverified: order && order.wechat_unverified,
-      depositPaidAmount: order && order.depositPaidAmount,
-      availableDeposit: order && order.member && order.member.availableDeposit,
-      payWithDeposit: that.data.payWithDeposit
-    })
     if (!order || !order.member || !(order.member.availableDeposit > 0)) return
     if (order.depositPaidAmount > 0) return
+    // 储值/次卡核销在退款时操作，需所有租赁物先归还
+    if (!order._allRentalsReturned) { wx.showToast({ title: '所有租赁物归还后才能使用', icon: 'none' }); return }
     // 取消勾选：直接关
     if (that.data.payWithDeposit) {
       // renderOrder 读 this.data.payWithDeposit 决定是否把租金加回「实际应退」。实测 setData 之后
@@ -1189,8 +1197,8 @@ Page({
   },
 
   // ── 次卡消费 ──────────────────────────
-  // 次卡是会员资产，做成复选框（可选）：勾选 → 先过微信身份核验（同储值）→ 弹选卡弹窗核销；
-  // 已核销过（usedPunches>0）则复选框勾选并锁定（同储值 depositPaidAmount>0 锁定）。
+  // 次卡是会员资产，做成复选框（同储值「勾选预览」）：勾选 → 微信身份核验 → 选卡弹窗记下「抵几次」并预览；
+  // 真正核销（UseRentalPunchCard）在「申请退款」时随储值一起落库。已核销过（usedPunches>0）则勾选并锁定。
   onTogglePunchCard() {
     var that = this
     var order = that.data.order
@@ -1198,11 +1206,34 @@ Page({
     if (!info || !info.cards || info.cards.length === 0) return
     // 已核销 → 复选框勾选并锁定，不再操作
     if (info.usedPunches > 0) { wx.showToast({ title: '次卡已核销', icon: 'none' }); return }
+    // 已勾选（预览中）→ 取消勾选，清掉预览
+    if (that.data.punchCardSelected) {
+      that.data.punchCardSelected = false
+      that.data.punchCardSelection = null
+      that.setData({ punchCardSelected: false, punchCardSelection: null, punchCardSelectedCount: 0, order: that.renderOrder(order) })
+      return
+    }
     if (!(info.totalPunchNeed > 0)) return
+    // 储值/次卡核销在退款时操作，需所有租赁物先归还
+    if (!order._allRentalsReturned) { wx.showToast({ title: '所有租赁物归还后才能使用', icon: 'none' }); return }
     // 次卡是会员资产，需先通过微信身份核验（wechat_unverified==1 即已核验本人）
     if (order.wechat_unverified) { that._openPunchModal(); return }
     // 未核验 → 弹微信核验二维码 + 轮询，核验通过后再弹选卡弹窗
     that._openWechatVerify('punch')
+  },
+
+  // 预览用：算被次卡免除的雪板租金 = 所有 skiRentals.rentalDates 合并按 date 升序前 n 天 amount 之和
+  _calcPunchFreedRent(n) {
+    var info = this.data.order && this.data.order.punchCardInfo
+    if (!info || !info.skiRentals) return 0
+    var allDates = []
+    info.skiRentals.forEach(function (r) {
+      (r.rentalDates || []).forEach(function (d) { allDates.push(d) })
+    })
+    allDates.sort(function (a, b) { return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0) })
+    var freed = 0
+    for (var i = 0; i < Math.min(n, allDates.length); i++) freed += (allDates[i].amount || 0)
+    return parseFloat(freed.toFixed(2))
   },
 
   // 打开选卡弹窗：列会员租赁次卡（单选）+ 输入抵几次（默认 min(选中卡剩余, 本次需扣)）
@@ -1231,30 +1262,25 @@ Page({
   onPunchModalCancel() {
     this.setData({ 'punchModal.show': false })
   },
+  // 选卡确认：只记下「选哪张卡 + 抵几次」并预览（核销在「申请退款」时落库，不在此立即核销）
   onPunchModalConfirm() {
     var that = this
     var modal = that.data.punchModal
     var n = parseInt(modal.punchCount)
     if (isNaN(n) || n <= 0) { wx.showToast({ title: '请输入抵扣次数', icon: 'none' }); return }
     if (n > modal.maxPunch) { wx.showToast({ title: '超过可抵次数', icon: 'none' }); return }
-    var lessThanNeed = n < modal.need
-    wx.showModal({
-      title: '确认次卡消费',
-      content: '用次卡抵 ' + n + ' 次（本次需扣 ' + modal.need + ' 次）' + (lessThanNeed ? '，不足部分租金仍从押金扣' : '') + '。确认核销？',
-      complete: function (res) {
-        if (!res.confirm) return
-        that.setData({ 'punchModal.show': false })
-        wx.showLoading({ title: '核销中', mask: true })
-        data.useRentalPunchCardPromise(that.data.order.id, { card_id: modal.cardId, punch_count: n }, app.globalData.sessionKey).then(function () {
-          wx.hideLoading()
-          wx.showToast({ title: '次卡核销成功', icon: 'success' })
-          that.getData()
-        }).catch(function () {
-          wx.hideLoading()
-          wx.showToast({ title: '核销失败', icon: 'none' })
-        })
-      }
+    var freed = that._calcPunchFreedRent(n)
+    that.data.punchCardSelected = true
+    that.data.punchCardSelection = { card_id: modal.cardId, punch_count: n, freedRent: freed }
+    that.setData({
+      'punchModal.show': false,
+      punchCardSelected: true,
+      punchCardSelectedCount: n,
+      order: that.renderOrder(that.data.order)
     })
+    if (n < modal.need) {
+      wx.showToast({ title: '不足部分租金仍从押金扣', icon: 'none' })
+    }
   },
 
   // purpose: 'deposit'（储值付租金）| 'punch'（次卡消费）—— 核验通过后的后续动作不同
@@ -1307,63 +1333,112 @@ Page({
     this.setData({ _verifyShow: false })
   },
 
-  // 储值付租金：先用会员储值支付租金，再退全额押金（与旧版 refundWithDeposit 同口径）
-  _refundWithDeposit() {
+  // 核销链：在「申请退款」时依次 ① 次卡核销(UseRentalPunchCard) ② 储值核销(PayWithDeposit) ③ 退押金(refund)。
+  // refundAmount 用页面已可靠算好的预览值（基于 order.totalGuarantyAmount），不读后端返回的 totalRentUnRefund
+  // （PayWithDeposit 经 GetOrder 返回、未加载订单级 order.guarantys，恒为 0 会误跳退款）。
+  _runWriteoffAndRefund(doPunch, doDeposit, refundAmount) {
     var that = this
     var order = that.data.order
-    var payAmount = order.totalRentSummaryAmount
-    var refundAmount = order.totalRentUnRefund
-    wx.showModal({
-      title: '储值支付确认',
-      content: '储值支付租金' + util.showAmount(payAmount) + '，应退押金：' + util.showAmount(refundAmount),
-      complete: function (res) {
-        if (!res.confirm) return
-        wx.showLoading({ title: '处理中' })
-        data.payWithDepositPromise(order.id, app.globalData.sessionKey).then(function (paidOrder) {
-          if (!paidOrder) { wx.hideLoading(); wx.showToast({ title: '储值支付失败', icon: 'error' }); return }
-          // 退押金额用页面已可靠算好的 refundAmount（基于 order.totalGuarantyAmount），不读 PayWithDeposit
-          // 返回的 totalRentUnRefund——后者经 GetOrder 返回、未加载订单级 order.guarantys，恒为 0 会误跳退款
-          var rAmount = parseFloat((refundAmount || 0).toFixed(2))
-          if (rAmount <= 0) {
-            wx.hideLoading()
-            wx.showToast({ title: '储值支付成功', icon: 'success' })
-            that.getData()
-            return
-          }
-          var payment = null
-          for (var i = 0; order.availablePayments && i < order.availablePayments.length; i++) {
-            var p = order.availablePayments[i]
-            var unRefund = parseFloat((p.remainAmount || 0).toString())
-            if (p.status == '支付成功' && parseFloat(unRefund.toFixed(2)) >= rAmount) { payment = p; break }
-          }
-          if (!payment) { wx.hideLoading(); wx.showToast({ title: '无可退款支付记录', icon: 'error' }); return }
-          var refunds = [{ payment_id: payment.id, amount: rAmount, reason: '租赁退押金' }]
-          data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function () {
-            wx.hideLoading()
-            wx.showToast({ title: '退款成功', icon: 'success' })
-            that.getData()
-          }).catch(function () { wx.hideLoading(); wx.showToast({ title: '退款失败', icon: 'error' }) })
-        }).catch(function () { wx.hideLoading(); wx.showToast({ title: '储值支付失败', icon: 'error' }) })
+    wx.showLoading({ title: '处理中', mask: true })
+    var chain = Promise.resolve()
+    if (doPunch && that.data.punchCardSelection) {
+      var sel = that.data.punchCardSelection
+      chain = chain.then(function () {
+        return data.useRentalPunchCardPromise(order.id, { card_id: sel.card_id, punch_count: sel.punch_count }, app.globalData.sessionKey)
+      })
+    }
+    if (doDeposit) {
+      chain = chain.then(function () {
+        return data.payWithDepositPromise(order.id, app.globalData.sessionKey)
+      })
+    }
+    chain.then(function () {
+      var rAmount = parseFloat((refundAmount || 0).toFixed(2))
+      if (rAmount <= 0) {
+        // 仅核销、无需退款
+        wx.hideLoading()
+        wx.showToast({ title: '核销成功', icon: 'success' })
+        that._clearWriteoffPreview()
+        that.getData()
+        return
       }
+      var refunds = that._allocateRefund(rAmount)
+      if (!refunds) {
+        wx.hideLoading()
+        wx.showToast({ title: '核销成功，但无可退款记录', icon: 'none' })
+        that._clearWriteoffPreview()
+        that.getData()
+        return
+      }
+      data.refundPromise(order.id, refunds, app.globalData.sessionKey).then(function () {
+        wx.hideLoading()
+        wx.showToast({ title: '退款成功', icon: 'success' })
+        that._clearWriteoffPreview()
+        that.getData()
+      }).catch(function () {
+        wx.hideLoading(); wx.showToast({ title: '退款失败', icon: 'error' }); that._clearWriteoffPreview(); that.getData()
+      })
+    }).catch(function () {
+      wx.hideLoading(); wx.showToast({ title: '核销失败', icon: 'none' }); that._clearWriteoffPreview(); that.getData()
     })
+  },
+
+  _clearWriteoffPreview() {
+    this.data.payWithDeposit = false
+    this.data.punchCardSelected = false
+    this.data.punchCardSelection = null
+    this.setData({ payWithDeposit: false, punchCardSelected: false, punchCardSelectedCount: 0 })
+  },
+
+  // 退押金分配：从可退款支付（排除储值支付）按顺序贪心填到应退额；凑不够返回 null
+  _allocateRefund(rAmount) {
+    var order = this.data.order
+    var refunds = []
+    var remaining = rAmount
+    for (var i = 0; order.availablePayments && i < order.availablePayments.length && remaining > 0.001; i++) {
+      var p = order.availablePayments[i]
+      var avail = parseFloat((p.remainAmount || 0).toFixed(2))
+      if (p.status == '支付成功' && p.pay_method != '储值支付' && avail > 0) {
+        var take = parseFloat(Math.min(avail, remaining).toFixed(2))
+        refunds.push({ payment_id: p.id, amount: take, reason: '租赁退押金' })
+        remaining = parseFloat((remaining - take).toFixed(2))
+      }
+    }
+    if (remaining > 0.001) return null
+    return refunds.length ? refunds : null
   },
 
   onRefund() {
     var that = this
     var od = that.data.order || {}
-    // 防御性守卫：与 wxml 的 disabled 条件一致，防止事件穿透时仍触发退款
-    if (od.closed == 1 || (od.totalRentUnRefund || 0) <= 0 || !od._allRentalsReturned) {
-      if (!od._allRentalsReturned) {
-        wx.showToast({ title: '所有租赁物退租后才能退押金', icon: 'none' })
-      }
+    if (od.closed == 1) return
+    // 防御性守卫：所有租赁物退租后才能退款/核销（与 wxml disabled 一致）
+    if (!od._allRentalsReturned) {
+      wx.showToast({ title: '所有租赁物退租后才能操作', icon: 'none' })
       return
     }
-    if (that.data.payWithDeposit && !(that.data.order.depositPaidAmount > 0)) {
-      that._refundWithDeposit()
+    var pendingDeposit = that.data.payWithDeposit && !(od.depositPaidAmount > 0)
+    var pendingPunch = !!(that.data.punchCardSelected && that.data.punchCardSelection)
+    var refundDue = parseFloat((od.totalRentUnRefund || 0).toFixed(2))
+    // 有储值/次卡待核销 → 走核销链（含可能的退押金）。二次确认。
+    if (pendingDeposit || pendingPunch) {
+      var parts = []
+      if (pendingPunch) parts.push('次卡抵 ' + that.data.punchCardSelection.punch_count + ' 次')
+      if (pendingDeposit) parts.push('储值付租金 ' + util.showAmount(od.totalRentSummaryAmount))
+      var content = parts.join('，') + (refundDue > 0 ? ('，并退押金 ' + util.showAmount(refundDue)) : '') + '。确认核销？'
+      wx.showModal({
+        title: refundDue > 0 ? '确认退款' : '确认核销',
+        content: content,
+        complete: function (res) {
+          if (!res.confirm) return
+          that._runWriteoffAndRefund(pendingPunch, pendingDeposit, refundDue)
+        }
+      })
       return
     }
+    // 无核销 → 纯退押金（原逻辑：单笔/多笔/逐笔输入 modal）
     var order = that.data.order
-    var need = parseFloat((order.totalRentUnRefund || 0).toFixed(2))
+    var need = refundDue
     if (!need || isNaN(need) || need <= 0) {
       wx.showToast({ title: '无需退款', icon: 'none' })
       return
