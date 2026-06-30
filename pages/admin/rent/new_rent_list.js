@@ -183,10 +183,12 @@ Page({
       order.paidAmountStr = util.showAmount(paidAmountExcludeDeposit)
       var methodSet = {}
       order.haveDeposit = false
+      // 「卡」标签：后端 usePunchCard（punch_card_used 有记录，新结构化核销）或 老的 pay_method='次卡支付'
+      order.useCard = order.usePunchCard === true
       for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
         var pm = order.availablePayments[j].pay_method
         if (pm === '储值支付') { order.haveDeposit = true; continue }
-        if (pm === '次卡支付') continue
+        if (pm === '次卡支付') { order.useCard = true; continue }
         if (pm) methodSet[pm] = true
       }
       var methods = Object.keys(methodSet)
