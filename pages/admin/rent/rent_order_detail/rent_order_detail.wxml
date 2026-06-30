@@ -463,10 +463,10 @@
           </view>
         </view>
       </view>
-      <view class="refund-amount-row" wx:if="{{order.punchCardInfo.cards.length > 0 && (order.punchCardInfo.totalPunchNeed > 0 || order.punchCardInfo.usedPunches > 0)}}">
+      <view class="refund-amount-row" wx:if="{{(order.punchCardInfo.cards.length > 0 && order.punchCardInfo.totalPunchNeed > 0) || order.punchCardInfo.usedPunches > 0}}">
         <text class="refund-amount-label">次卡消费</text>
         <view class="refund-deposit-right">
-          <text class="refund-amount-value">{{punchCardSelected ? ('抵 ' + punchCardSelectedCount + ' 次') : ('剩余 ' + order.punchCardInfo.totalRemaining + ' 次')}}</text>
+          <text class="refund-amount-value">{{order.punchCardInfo.usedPunches > 0 ? ('已核销 ' + order.punchCardInfo.usedPunches + ' 次') : (punchCardSelected ? ('抵 ' + punchCardSelectedCount + ' 次') : ('剩余 ' + order.punchCardInfo.totalRemaining + ' 次'))}}</text>
           <view class="refund-deposit-toggle {{(order.punchCardInfo.usedPunches > 0 || !order._allRentalsReturned) ? 'refund-deposit-toggle--disabled' : ''}}" bindtap="onTogglePunchCard">
             <text class="refund-deposit-toggle-label">次卡消费</text>
             <view class="refund-deposit-check {{(punchCardSelected || order.punchCardInfo.usedPunches > 0) ? 'refund-deposit-check--on' : ''}}">
