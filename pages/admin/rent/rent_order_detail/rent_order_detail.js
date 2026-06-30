@@ -48,6 +48,9 @@ Page({
     // 逐笔退款弹窗（多笔支付 + 可退之和 > 应退时弹出，逐笔输入）
     refundModal: { show: false, need: 0, needStr: '', items: [], allocatedStr: '', remainToAllocStr: '', canConfirm: false },
 
+    // 次卡消费选卡弹窗
+    punchModal: { show: false, need: 0, cards: [], cardId: 0, punchCount: '', maxPunch: 0 },
+
     // 租金明细按天编辑弹窗
     _dayChargeShow: false,
     _dayChargeRidx: null,
@@ -120,16 +123,19 @@ Page({
           that.setData({ order, allValid })
           that.applyDeepLinkExpand(order)
         }
-        // 补拉完整会员：GetOrderByStaff 的 order.member 不带 depositAccounts → availableDeposit=0，
-        // 「可用储值 / 储值付租金」要靠它（口径同旧版 rent_details 的 getMemberPromise）。
-        if (order.member_id) {
-          data.getMemberPromise(order.member_id, sessionKey).then(function (member) {
-            if (member && order.member) order.member.availableDeposit = member.availableDeposit
-            finish()
-          }).catch(function () { finish() })
-        } else {
-          finish()
-        }
+        // 补拉完整会员（availableDeposit，「可用储值/储值付租金」用）+ 次卡信息（次卡消费用），并行后 finish。
+        var emptyPunch = { cards: [], skiRentals: [], totalPunchNeed: 0 }
+        var memberP = order.member_id
+          ? data.getMemberPromise(order.member_id, sessionKey).then(function (member) {
+              if (member && order.member) order.member.availableDeposit = member.availableDeposit
+            }).catch(function () {})
+          : Promise.resolve()
+        var punchP = order.member_id
+          ? data.getRentalPunchCardInfoPromise(order.id, sessionKey).then(function (info) {
+              order.punchCardInfo = info || emptyPunch
+            }).catch(function () { order.punchCardInfo = emptyPunch })
+          : Promise.resolve(order.punchCardInfo = emptyPunch)
+        Promise.all([memberP, punchP]).then(function () { finish() })
       }).catch(function () { wx.hideLoading() })
     }).catch(function () { wx.hideLoading() })
   },
@@ -462,6 +468,14 @@ Page({
     // 可用储值（会员储值余额，后端已随 order.member 下发）
     if (order.member && order.member.availableDeposit) {
       order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
+    }
+    // 次卡消费：会员租赁次卡总剩余次数（各卡 remaining 之和）；本次需扣 = punchCardInfo.totalPunchNeed
+    if (order.punchCardInfo && order.punchCardInfo.cards) {
+      var pcRemaining = 0
+      for (var pci = 0; pci < order.punchCardInfo.cards.length; pci++) {
+        pcRemaining += order.punchCardInfo.cards[pci].remaining || 0
+      }
+      order.punchCardInfo.totalRemaining = pcRemaining
     }
 
     order.totalGuarantyAmountStr = util.showAmount(order.totalGuarantyAmount)
@@ -1171,6 +1185,59 @@ Page({
     }
     // 未核验 → 弹微信核验二维码 + 轮询，核验通过（扫码人=订单会员）才放行勾选
     that._openWechatVerify()
+  },
+
+  // ── 次卡消费 ──────────────────────────
+  // 打开选卡弹窗：列会员租赁次卡（单选）+ 输入抵几次（默认 min(选中卡剩余, 本次需扣)）
+  onTogglePunchCard() {
+    var info = this.data.order && this.data.order.punchCardInfo
+    if (!info || !info.cards || info.cards.length === 0 || !(info.totalPunchNeed > 0)) return
+    var cards = info.cards.map(function (c) { return { id: c.id, card_name: c.card_name, remaining: c.remaining } })
+    var first = cards[0]
+    var max = Math.min(first.remaining, info.totalPunchNeed)
+    this.setData({
+      punchModal: { show: true, need: info.totalPunchNeed, cards: cards, cardId: first.id, punchCount: String(max), maxPunch: max }
+    })
+  },
+  onPunchSelectCard(e) {
+    var cardId = e.currentTarget.dataset.id
+    var modal = this.data.punchModal
+    var card = null
+    for (var i = 0; i < modal.cards.length; i++) { if (modal.cards[i].id == cardId) { card = modal.cards[i]; break } }
+    if (!card) return
+    var max = Math.min(card.remaining, modal.need)
+    this.setData({ 'punchModal.cardId': cardId, 'punchModal.maxPunch': max, 'punchModal.punchCount': String(max) })
+  },
+  onPunchCountInput(e) {
+    this.setData({ 'punchModal.punchCount': e.detail.value })
+  },
+  onPunchModalCancel() {
+    this.setData({ 'punchModal.show': false })
+  },
+  onPunchModalConfirm() {
+    var that = this
+    var modal = that.data.punchModal
+    var n = parseInt(modal.punchCount)
+    if (isNaN(n) || n <= 0) { wx.showToast({ title: '请输入抵扣次数', icon: 'none' }); return }
+    if (n > modal.maxPunch) { wx.showToast({ title: '超过可抵次数', icon: 'none' }); return }
+    var lessThanNeed = n < modal.need
+    wx.showModal({
+      title: '确认次卡消费',
+      content: '用次卡抵 ' + n + ' 次（本次需扣 ' + modal.need + ' 次）' + (lessThanNeed ? '，不足部分租金仍从押金扣' : '') + '。确认核销？',
+      complete: function (res) {
+        if (!res.confirm) return
+        that.setData({ 'punchModal.show': false })
+        wx.showLoading({ title: '核销中', mask: true })
+        data.useRentalPunchCardPromise(that.data.order.id, { card_id: modal.cardId, punch_count: n }, app.globalData.sessionKey).then(function () {
+          wx.hideLoading()
+          wx.showToast({ title: '次卡核销成功', icon: 'success' })
+          that.getData()
+        }).catch(function () {
+          wx.hideLoading()
+          wx.showToast({ title: '核销失败', icon: 'none' })
+        })
+      }
+    })
   },
 
   _openWechatVerify() {

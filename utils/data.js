@@ -866,6 +866,28 @@ const payWithDepositPromise = function (orderId, sessionKey) {
 
   //})
 }
+// 次卡消费：查询会员租赁次卡 + 本订单含雪板雪鞋租赁商品本次需扣次数
+const getRentalPunchCardInfoPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetRentalPunchCardInfo/' + orderId + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (info) {
+      resolve(info)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+// 次卡核销：用指定卡抵 punch_count 次（body = { card_id, punch_count }）
+const useRentalPunchCardPromise = function (orderId, body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/UseRentalPunchCard/' + orderId + '?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, body).then(function (order) {
+      resolve(order)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetMemberTicketsByStaff/' + memberId + '?sessionKey=' + sessionKey
   if (bizType != null) {
@@ -991,6 +1013,8 @@ module.exports = {
   getPrinterListPromise,
   getMyInfo,
   payWithDepositPromise,
+  getRentalPunchCardInfoPromise,
+  useRentalPunchCardPromise,
   getMemberTicketsPromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,

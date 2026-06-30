@@ -568,6 +568,22 @@
 .rf-ok { color: #15803d; }
 .rf-pending { color: #E64340; }
 
+/* 次卡消费选卡弹窗 */
+.pc-card-row {
+  display: flex; align-items: center; gap: 16rpx;
+  padding: 16rpx 12rpx; border-bottom: 1rpx solid #f3f4f6;
+}
+.pc-card-row--on { background: #f0f6fa; }
+.pc-card-radio {
+  width: 36rpx; height: 36rpx; border-radius: 50%;
+  border: 2rpx solid #ccc; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 22rpx; flex-shrink: 0;
+}
+.pc-card-radio--on { background: #006495; border-color: #006495; }
+.pc-card-name { flex: 1; font-size: 27rpx; color: #1a1a1a; }
+.pc-card-remain { font-size: 24rpx; color: #999; }
+.pc-hint { font-size: 22rpx; color: #999; margin-top: 10rpx; }
+
 .item-table { font-size: 24rpx; }
 .item-table-row {
   display: flex; gap: 8rpx; min-height: 48rpx; align-items: center;

@@ -463,6 +463,15 @@
           </view>
         </view>
       </view>
+      <view class="refund-amount-row" wx:if="{{order.punchCardInfo.cards.length > 0 && order.punchCardInfo.totalPunchNeed > 0}}">
+        <text class="refund-amount-label">次卡消费</text>
+        <view class="refund-deposit-right">
+          <text class="refund-amount-value">剩余 {{order.punchCardInfo.totalRemaining}} 次</text>
+          <view class="refund-deposit-toggle" bindtap="onTogglePunchCard">
+            <text class="refund-deposit-toggle-label">扣 {{order.punchCardInfo.totalPunchNeed}} 次 ›</text>
+          </view>
+        </view>
+      </view>
       <view class="refund-amount-row">
         <text class="refund-amount-label">实际应退</text>
         <text class="refund-amount-value refund-need">
@@ -735,6 +744,30 @@
     <view class="dc-actions">
       <view class="dc-btn dc-btn--cancel" bindtap="onRefundModalCancel">取消</view>
       <view class="dc-btn dc-btn--confirm {{refundModal.canConfirm ? '' : 'dc-btn--disabled'}}" bindtap="onRefundModalConfirm">确认退款</view>
+    </view>
+  </view>
+</view>
+
+<!-- 次卡消费选卡弹窗 -->
+<view wx:if="{{punchModal.show}}" class="dc-mask" bindtap="onPunchModalCancel" catchtouchmove="noop">
+  <view class="dc-card" catchtap="noop">
+    <view class="dc-title">次卡消费</view>
+    <view class="dc-date">本次需扣 {{punchModal.need}} 次 · 选择次卡 + 抵扣次数</view>
+    <view class="pc-card-row {{item.id == punchModal.cardId ? 'pc-card-row--on' : ''}}" wx:for="{{punchModal.cards}}" wx:key="id" bindtap="onPunchSelectCard" data-id="{{item.id}}">
+      <view class="pc-card-radio {{item.id == punchModal.cardId ? 'pc-card-radio--on' : ''}}">
+        <text wx:if="{{item.id == punchModal.cardId}}">✓</text>
+      </view>
+      <text class="pc-card-name">{{item.card_name}}</text>
+      <text class="pc-card-remain">剩余 {{item.remaining}} 次</text>
+    </view>
+    <view class="dc-field">
+      <text class="dc-label">抵扣次数</text>
+      <input class="dc-input" type="number" value="{{punchModal.punchCount}}" bindinput="onPunchCountInput" placeholder="0" />
+    </view>
+    <view class="pc-hint">最多可抵 {{punchModal.maxPunch}} 次（受所选卡剩余 + 本次需扣限制）</view>
+    <view class="dc-actions">
+      <view class="dc-btn dc-btn--cancel" bindtap="onPunchModalCancel">取消</view>
+      <view class="dc-btn dc-btn--confirm" bindtap="onPunchModalConfirm">确认核销</view>
     </view>
   </view>
 </view>
