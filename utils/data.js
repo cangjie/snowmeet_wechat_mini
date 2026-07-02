@@ -889,7 +889,7 @@ const useRentalPunchCardPromise = function (orderId, body, sessionKey) {
   })
 }
 // ───── 会员管理（MemberAdmin，店长/管理员 title_level≥200） ─────
-// 列表搜索（分页）。filter = {name, cell, gender, bizType, tags(逗号拼)}
+// 列表搜索（分页）。filter = {name, cell, gender, bizTypes(逗号拼), tags(逗号拼)}
 const searchMembersByStaffPromise = function (filter, pageIndex, pageSize, sessionKey) {
   var f = filter || {}
   var url = app.globalData.requestPrefix + 'MemberAdmin/SearchMembersByStaff?sessionKey=' + sessionKey
@@ -897,7 +897,7 @@ const searchMembersByStaffPromise = function (filter, pageIndex, pageSize, sessi
   if (f.name) { url += '&name=' + encodeURIComponent(f.name) }
   if (f.cell) { url += '&cell=' + encodeURIComponent(f.cell) }
   if (f.gender) { url += '&gender=' + encodeURIComponent(f.gender) }
-  if (f.bizType) { url += '&bizType=' + encodeURIComponent(f.bizType) }
+  if (f.bizTypes) { url += '&bizTypes=' + encodeURIComponent(f.bizTypes) }
   if (f.tags) { url += '&tags=' + encodeURIComponent(f.tags) }
   return new Promise(function (resolve, reject) {
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })

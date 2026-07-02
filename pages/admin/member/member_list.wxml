@@ -36,9 +36,9 @@
       </view>
 
       <view class="tag-group">
-        <text class="tag-group-label">参与业务<text class="tag-group-hint"> · 单选</text></text>
+        <text class="tag-group-label">参与业务<text class="tag-group-hint"> · 多选</text></text>
         <view class="tag-wrap">
-          <view wx:for="{{sysTags}}" wx:key="*this" class="tag-pick {{filter.bizType === item ? 'tag-pick--on' : ''}}"
+          <view wx:for="{{sysTags}}" wx:key="*this" class="tag-pick {{filter.bizTypes.indexOf(item) >= 0 ? 'tag-pick--on' : ''}}"
                 data-v="{{item}}" bindtap="onSysTagTap">{{item}}</view>
         </view>
       </view>

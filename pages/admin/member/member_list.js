@@ -4,12 +4,12 @@ const data = require('../../../utils/data.js')
 const util = require('../../../utils/util.js')
 
 const SYS_TAGS = ['租赁', '养护', '零售', '雪票', '二手回收', '水吧餐厅']
-const DEFAULT_FILTER = { name: '', cell: '', gender: '全部', bizType: '', customTags: [] }
+const DEFAULT_FILTER = { name: '', cell: '', gender: '全部', bizTypes: [], customTags: [] }
 
 Page({
   data: {
     filterOpen: false,
-    filter: { name: '', cell: '', gender: '全部', bizType: '', customTags: [] },
+    filter: { name: '', cell: '', gender: '全部', bizTypes: [], customTags: [] },
     sysTags: SYS_TAGS,
     presetTags: [],
     activeCount: 0,
@@ -47,10 +47,13 @@ Page({
   onNameInput(e) { this.setData({ 'filter.name': e.detail.value }) },
   onCellInput(e) { this.setData({ 'filter.cell': e.detail.value }) },
   onGenderTap(e) { this.setData({ 'filter.gender': e.currentTarget.dataset.v }) },
-  // 系统标签（参与业务）单选：再点取消
+  // 系统标签（参与业务）多选：需同时参与所选全部业务
   onSysTagTap(e) {
     var v = e.currentTarget.dataset.v
-    this.setData({ 'filter.bizType': this.data.filter.bizType === v ? '' : v })
+    var arr = this.data.filter.bizTypes.slice()
+    var i = arr.indexOf(v)
+    if (i >= 0) { arr.splice(i, 1) } else { arr.push(v) }
+    this.setData({ 'filter.bizTypes': arr })
   },
   // 自定义标签多选
   onCustomTagTap(e) {
@@ -69,7 +72,7 @@ Page({
   },
 
   _activeCount(f) {
-    return (f.name ? 1 : 0) + (f.cell ? 1 : 0) + (f.gender !== '全部' ? 1 : 0) + (f.bizType ? 1 : 0) + f.customTags.length
+    return (f.name ? 1 : 0) + (f.cell ? 1 : 0) + (f.gender !== '全部' ? 1 : 0) + f.bizTypes.length + f.customTags.length
   },
 
   getData(page, pageSize) {
@@ -80,7 +83,7 @@ Page({
       name: f.name,
       cell: f.cell,
       gender: f.gender === '全部' ? '' : f.gender,
-      bizType: f.bizType,
+      bizTypes: (f.bizTypes || []).join(','),
       tags: (f.customTags || []).join(',')
     }
     that.setData({ querying: true, activeCount: that._activeCount(f) })
