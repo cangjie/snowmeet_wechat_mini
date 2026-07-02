@@ -22,6 +22,10 @@ Page({
     orderTab: '全部',
     filteredOrders: [],
 
+    // 编辑资料（姓名/性别/手机号）
+    profileShow: false,
+    pf: { name: '', gender: '男', cell: '' },
+
     // 充值储值
     chargeShow: false,
     chargeAmount: '',
@@ -89,6 +93,30 @@ Page({
   callPhone() {
     var p = this.data.member && this.data.member.phone
     if (p) wx.makePhoneCall({ phoneNumber: p })
+  },
+
+  // ── 编辑资料（姓名/性别/手机号）──
+  onEditProfile() {
+    var m = this.data.member || {}
+    this.setData({ profileShow: true, pf: { name: m.name === '—' ? '' : (m.name || ''), gender: m.gender || '男', cell: m.phone || '' } })
+  },
+  onProfileClose() { this.setData({ profileShow: false }) },
+  onPfNameInput(e) { this.setData({ 'pf.name': e.detail.value }) },
+  onPfGenderTap(e) { this.setData({ 'pf.gender': e.currentTarget.dataset.v }) },
+  onPfCellInput(e) { this.setData({ 'pf.cell': (e.detail.value || '').replace(/[^0-9]/g, '').slice(0, 11) }) },
+  onProfileSave() {
+    var that = this
+    var pf = that.data.pf
+    var cell = (pf.cell || '').trim()
+    if (cell !== '' && !/^1\d{10}$/.test(cell)) { wx.showToast({ title: '手机号格式不对', icon: 'none' }); return }
+    wx.showLoading({ title: '保存中', mask: true })
+    data.updateMemberProfilePromise(
+      { memberId: that.data.memberId, realName: pf.name, gender: pf.gender, cell: cell },
+      app.globalData.sessionKey
+    ).then(function () {
+      wx.hideLoading(); wx.showToast({ title: '已保存', icon: 'success' })
+      that.setData({ profileShow: false }); that.getData()
+    }).catch(function () { wx.hideLoading() /* 后端 message 已 toast（如手机号已被他人绑定）*/ })
   },
 
   onOrderTab(e) {

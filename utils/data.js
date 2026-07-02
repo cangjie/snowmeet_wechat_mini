@@ -939,6 +939,13 @@ const addTagPresetPromise = function (tag, groupName, sessionKey) {
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
   })
 }
+// 修改会员资料（姓名/性别/手机号）。body = { memberId, realName, gender, cell }
+const updateMemberProfilePromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/UpdateMemberProfile?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, body).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
 const getMemberDetailByStaffPromise = function (memberId, sessionKey) {
   var url = app.globalData.requestPrefix + 'MemberAdmin/GetMemberDetailByStaff/' + memberId + '?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -1129,6 +1136,7 @@ module.exports = {
   useRentalPunchCardPromise,
   searchMembersByStaffPromise,
   getMemberDetailByStaffPromise,
+  updateMemberProfilePromise,
   getTagLibraryPromise,
   getTagLibraryStatsPromise,
   mergeTagPresetPromise,

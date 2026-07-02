@@ -13,6 +13,7 @@
             <van-icon name="phone-o" size="15px" color="#006495" /><text class="head-phone-txt">{{member.phone || '未绑定手机号'}}</text>
           </view>
         </view>
+        <view class="head-edit" catchtap="onEditProfile"><van-icon name="edit" size="13px" color="#006495" /><text class="head-edit-txt">编辑</text></view>
       </view>
       <view class="head-grid">
         <view class="kv"><text class="kv-k">会员 ID</text><text class="kv-v mono">{{member.id}}</text></view>
@@ -181,6 +182,32 @@
     <view class="modal-foot">
       <view class="btn btn-ghost" bindtap="onCouponClose">取消</view>
       <view class="btn btn-primary" bindtap="onCouponConfirm">确认发券</view>
+    </view>
+  </view>
+</view>
+
+<!-- ───── 编辑会员资料（姓名/性别/手机号）───── -->
+<view wx:if="{{profileShow}}" class="mask" bindtap="onProfileClose" catchtouchmove="noop">
+  <view class="modal" catchtap="noop">
+    <view class="modal-title">编辑资料</view>
+    <view class="pf-item">
+      <text class="pf-label">姓名</text>
+      <input class="pf-input" value="{{pf.name}}" bindinput="onPfNameInput" placeholder="姓名 / 称呼" />
+    </view>
+    <view class="pf-item">
+      <text class="pf-label">性别</text>
+      <view class="seg">
+        <view class="seg-item {{pf.gender === '男' ? 'seg-item--on' : ''}}" data-v="男" bindtap="onPfGenderTap">男</view>
+        <view class="seg-item {{pf.gender === '女' ? 'seg-item--on' : ''}}" data-v="女" bindtap="onPfGenderTap">女</view>
+      </view>
+    </view>
+    <view class="pf-item">
+      <text class="pf-label">手机号</text>
+      <input class="pf-input mono" value="{{pf.cell}}" bindinput="onPfCellInput" type="number" placeholder="11 位手机号" />
+    </view>
+    <view class="modal-foot">
+      <view class="btn btn-ghost" bindtap="onProfileClose">取消</view>
+      <view class="btn btn-primary" bindtap="onProfileSave">保存</view>
     </view>
   </view>
 </view>
