@@ -61,7 +61,7 @@ Page({
       m.avatar = (m.name && m.name.length > 0) ? m.name[0] : '?'
       m.female = m.gender === '女'
       m.recentOrders = (m.recentOrders || []).map(function (o) {
-        return { code: o.code, type: o.type, dateStr: o.bizDate ? util.formatDate(new Date(o.bizDate)) : '' }
+        return { id: o.id, code: o.code, type: o.type, dateStr: o.bizDate ? util.formatDate(new Date(o.bizDate)) : '' }
       })
       m.punchCards = (m.punchCards || []).map(function (c) {
         return { id: c.id, biz_type: c.biz_type, card_name: c.card_name, total: c.total, punches: c.punches, remaining: c.total - c.punches }
@@ -76,6 +76,19 @@ Page({
   callPhone() {
     var p = this.data.member && this.data.member.phone
     if (p) wx.makePhoneCall({ phoneNumber: p })
+  },
+
+  // 最近订单 → 按业务类型进对应详情页
+  gotoOrder(e) {
+    var id = e.currentTarget.dataset.id
+    var type = e.currentTarget.dataset.type
+    if (!id) return
+    var url = ''
+    if (type === '租赁') { url = '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + id }
+    else if (type === '养护') { url = '/pages/admin/care/order_detail?orderId=' + id }
+    else if (type === '零售') { url = '/pages/admin/retail/retail_order_detail?id=' + id }
+    else { wx.showToast({ title: type + '订单暂无详情页', icon: 'none' }); return }
+    wx.navigateTo({ url: url })
   },
 
   // ── 标签编辑 ──

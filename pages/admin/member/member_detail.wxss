@@ -49,6 +49,7 @@
 .acc-row:first-of-type, .order-row:first-of-type, .punch-row:first-of-type { border-top: none; }
 .acc-k { font-size: 26rpx; color: #3f4850; }
 .acc-v { font-size: 26rpx; color: #0b1c30; font-weight: 600; }
+.order-row--tap:active { background: #f3f8fc; }
 .order-l, .punch-l { display: flex; flex-direction: column; gap: 4rpx; }
 .order-code { font-size: 25rpx; font-weight: 600; color: #0b1c30; }
 .order-meta { font-size: 22rpx; color: #6f7881; }
