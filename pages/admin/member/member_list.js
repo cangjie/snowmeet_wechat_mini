@@ -4,7 +4,6 @@ const data = require('../../../utils/data.js')
 const util = require('../../../utils/util.js')
 
 const SYS_TAGS = ['租赁', '养护', '零售', '雪票', '二手回收', '水吧餐厅']
-const PRESET_TAGS = ['VIP', '高净值', '老客户', '潜在客户', '教练', '团体客户', '需回访', '投诉记录', '黑名单', '双板', '单板', '装备控', '亲子']
 const DEFAULT_FILTER = { name: '', cell: '', gender: '全部', bizType: '', customTags: [] }
 
 Page({
@@ -12,7 +11,7 @@ Page({
     filterOpen: false,
     filter: { name: '', cell: '', gender: '全部', bizType: '', customTags: [] },
     sysTags: SYS_TAGS,
-    presetTags: PRESET_TAGS,
+    presetTags: [],
     activeCount: 0,
 
     members: [],
@@ -24,9 +23,21 @@ Page({
     pageDepositStr: '¥0.00'
   },
 
+  onLoad() {
+    this._loadTagLibrary()
+  },
   onShow() {
     // 保参重查（从详情/注册返回保留页码 + 筛选）
     this.getData(this.data.page, this.data.pageSize)
+  },
+
+  // 标签库（从 DB 读，member_tag_preset）
+  _loadTagLibrary() {
+    var that = this
+    data.getTagLibraryPromise(app.globalData.sessionKey).then(function (r) {
+      var tags = ((r && r.tags) || []).map(function (t) { return t.tag })
+      that.setData({ presetTags: tags })
+    }).catch(function () {})
   },
 
   // 折叠筛选面板

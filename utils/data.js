@@ -903,6 +903,13 @@ const searchMembersByStaffPromise = function (filter, pageIndex, pageSize, sessi
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
   })
 }
+// 标签库（预设标签字典，从 DB 读）
+const getTagLibraryPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GetTagLibrary?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
 const getMemberDetailByStaffPromise = function (memberId, sessionKey) {
   var url = app.globalData.requestPrefix + 'MemberAdmin/GetMemberDetailByStaff/' + memberId + '?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -1093,6 +1100,7 @@ module.exports = {
   useRentalPunchCardPromise,
   searchMembersByStaffPromise,
   getMemberDetailByStaffPromise,
+  getTagLibraryPromise,
   addMemberTagPromise,
   removeMemberTagPromise,
   registerMemberByPhonePromise,

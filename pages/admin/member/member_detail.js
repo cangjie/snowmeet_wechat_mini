@@ -4,8 +4,6 @@ const app = getApp()
 const data = require('../../../utils/data.js')
 const util = require('../../../utils/util.js')
 
-const PRESET_TAGS = ['VIP', '高净值', '老客户', '潜在客户', '教练', '团体客户', '需回访', '投诉记录', '黑名单', '双板', '单板', '装备控', '亲子']
-
 Page({
   data: {
     memberId: 0,
@@ -16,7 +14,7 @@ Page({
     tagSheetShow: false,
     tagSel: [],
     tagInput: '',
-    presetTags: PRESET_TAGS,
+    presetTags: [],
 
     // 充值储值
     chargeShow: false,
@@ -36,9 +34,19 @@ Page({
 
   onLoad(options) {
     this.setData({ memberId: parseInt(options.id) || 0 })
+    this._loadTagLibrary()
   },
   onShow() {
     if (this.data.memberId) this.getData()
+  },
+
+  // 标签库（从 DB 读，member_tag_preset）
+  _loadTagLibrary() {
+    var that = this
+    data.getTagLibraryPromise(app.globalData.sessionKey).then(function (r) {
+      var tags = ((r && r.tags) || []).map(function (t) { return t.tag })
+      that.setData({ presetTags: tags })
+    }).catch(function () {})
   },
 
   getData() {
