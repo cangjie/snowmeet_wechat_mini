@@ -17,6 +17,11 @@ Page({
     presetTags: [],
     presetTagsView: [],   // [{name, on}]，WXML 不支持 arr.indexOf() 故派生 on 标记
 
+    // 最近订单分类
+    orderTabs: ['全部'],
+    orderTab: '全部',
+    filteredOrders: [],
+
     // 充值储值
     chargeShow: false,
     chargeAmount: '',
@@ -66,7 +71,15 @@ Page({
       m.punchCards = (m.punchCards || []).map(function (c) {
         return { id: c.id, biz_type: c.biz_type, card_name: c.card_name, total: c.total, punches: c.punches, remaining: c.total - c.punches }
       })
-      that.setData({ member: m, loading: false })
+      // 最近订单分类 tab：全部 + 实际出现的业务类型（按首次出现顺序）
+      var typeSet = []
+      m.recentOrders.forEach(function (o) { if (o.type && typeSet.indexOf(o.type) < 0) typeSet.push(o.type) })
+      that.setData({
+        member: m, loading: false,
+        orderTabs: ['全部'].concat(typeSet),
+        orderTab: '全部',
+        filteredOrders: m.recentOrders
+      })
     }).catch(function () {
       that.setData({ loading: false })
       wx.showToast({ title: '加载失败', icon: 'none' })
@@ -76,6 +89,13 @@ Page({
   callPhone() {
     var p = this.data.member && this.data.member.phone
     if (p) wx.makePhoneCall({ phoneNumber: p })
+  },
+
+  onOrderTab(e) {
+    var t = e.currentTarget.dataset.t
+    var all = (this.data.member && this.data.member.recentOrders) || []
+    var list = t === '全部' ? all : all.filter(function (o) { return o.type === t })
+    this.setData({ orderTab: t, filteredOrders: list })
   },
 
   // 最近订单 → 按业务类型进对应详情页

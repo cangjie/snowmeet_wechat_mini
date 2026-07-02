@@ -49,6 +49,11 @@
 .acc-row:first-of-type, .order-row:first-of-type, .punch-row:first-of-type { border-top: none; }
 .acc-k { font-size: 26rpx; color: #3f4850; }
 .acc-v { font-size: 26rpx; color: #0b1c30; font-weight: 600; }
+.otab { white-space: nowrap; margin-bottom: 6rpx; }
+.otab-item { display: inline-block; height: 56rpx; line-height: 56rpx; padding: 0 24rpx; margin-right: 12rpx;
+  border-radius: 999rpx; font-size: 24rpx; color: #3f4850; background: #eff4ff; border: 1rpx solid transparent; }
+.otab-item--on { background: #e1edf7; color: #006495; font-weight: 700; border-color: #006495; }
+.order-empty { padding: 40rpx 0; text-align: center; color: #6f7881; font-size: 25rpx; }
 .order-row--tap:active { background: #f3f8fc; }
 .order-l, .punch-l { display: flex; flex-direction: column; gap: 4rpx; }
 .order-code { font-size: 25rpx; font-weight: 600; color: #0b1c30; }

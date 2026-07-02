@@ -73,10 +73,15 @@
     <!-- 最近订单 -->
     <view class="card" wx:if="{{member.recentOrders.length > 0}}">
       <view class="card-title"><van-icon name="orders-o" size="16px" color="#006495" /><text class="card-title-txt">最近订单</text></view>
-      <view wx:for="{{member.recentOrders}}" wx:key="id" class="order-row order-row--tap" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="gotoOrder">
+      <scroll-view class="otab" scroll-x wx:if="{{orderTabs.length > 1}}">
+        <view wx:for="{{orderTabs}}" wx:key="*this" class="otab-item {{orderTab === item ? 'otab-item--on' : ''}}"
+              data-t="{{item}}" bindtap="onOrderTab">{{item}}</view>
+      </scroll-view>
+      <view wx:for="{{filteredOrders}}" wx:key="id" class="order-row order-row--tap" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="gotoOrder">
         <view class="order-l"><text class="order-code mono">{{item.code}}</text><text class="order-meta">{{item.type}} · {{item.dateStr}}</text></view>
         <van-icon name="arrow" size="15px" color="#bfc7d1" />
       </view>
+      <view wx:if="{{filteredOrders.length === 0}}" class="order-empty">该分类暂无订单</view>
     </view>
 
     <view class="bottom-pad"></view>
