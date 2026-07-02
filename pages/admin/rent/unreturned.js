@@ -93,8 +93,13 @@ Page({
         item._orderId = (order.id != null) ? order.id : null
         var contactCell = ('' + (order.contact_num || '')).trim()
         var memberCell = ('' + ((order.member && order.member.cell) || '')).trim()
-        // 顾客汇总严格按开单联系人手机号；无联系人手机号时才回退会员手机号。
-        item._cell = contactCell || memberCell
+        var memberContactNum = ('' + ((order.member && order.member.contactNum) || '')).trim()
+        var legacyOrderCell = ('' + (order.cell || '')).trim()
+        // 与订单明细同源优先 customerCell；接口偶发未下发该计算字段时再走原始字段兜底。
+        var detailCell = ('' + (order.customerCell || '')).trim() || contactCell || memberCell || memberContactNum || legacyOrderCell
+        // 分组口径：开单联系人手机号优先，其次会员手机号。
+        item._groupCell = contactCell || memberCell || memberContactNum
+        item._cell = detailCell
         item._customerName = order.contact_name
           || order.name
           || (order.member && order.member.real_name)
@@ -180,8 +185,8 @@ Page({
       // 2) 无手机号时按顾客姓名分组，避免全部并入一个 "_nocell"
       // 3) 姓名也缺失时兜底到订单 id，避免误合并
       var fallbackName = ('' + (it._customerName || '')).trim()
-      var sk = it._cell
-        ? ('cell:' + it._cell)
+      var sk = it._groupCell
+        ? ('cell:' + it._groupCell)
         : (fallbackName ? ('name:' + fallbackName) : ('order:' + (it._orderId != null ? it._orderId : ('x' + i))))
       var sec = secMap[sk]
       if (!sec) {
@@ -192,6 +197,10 @@ Page({
         sec._earliestTs = it._pickTs
         sec._title = it._customerName
         sec._honorific = it._honorific
+      }
+      // 组头手机号回填：首条可能为空，只要组内任一订单有手机号就显示。
+      if (!sec._cell && it._cell) {
+        sec._cell = it._cell
       }
       var gk = (it._orderId != null) ? ('o' + it._orderId) : ('x' + i)
       var g = sec._gmap[gk]

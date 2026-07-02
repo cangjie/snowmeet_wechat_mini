@@ -36,6 +36,20 @@ Component({
   },
 
   methods: {
+    _isDisabledByStatus(product) {
+      const status = String((product && product.status) || '').trim();
+      return status !== '' && status !== '正常';
+    },
+    _decorateProducts(products) {
+      const list = Array.isArray(products) ? products : [];
+      return list.map(p => Object.assign({}, p, { _disabled: this._isDisabledByStatus(p) }));
+    },
+    _firstEnabledIndex(list) {
+      for (let i = 0; Array.isArray(list) && i < list.length; i++) {
+        if (!list[i]._disabled) return i;
+      }
+      return -1;
+    },
     onInput(e) {
       this.setData({ keyword: e.detail.value });
     },
@@ -48,7 +62,7 @@ Component({
       this.setData({ loading: true });
       data.searchBarCodeFuzzyPromise(key, this.data.categoryId || null)
         .then(products => {
-          const list = Array.isArray(products) ? products : [];
+          const list = this._decorateProducts(products);
           // 派生品类筛选项：按 category.id 去重 + 计数
           const map = new Map();
           list.forEach(p => {
@@ -64,7 +78,7 @@ Component({
             displayProducts: list,
             categoryFilters: filters,
             activeFilterCatId: null,
-            selectedIndex: list.length === 1 ? 0 : -1,
+            selectedIndex: this._firstEnabledIndex(list),
             hasSearched: true,
             loading: false,
           });
@@ -92,11 +106,15 @@ Component({
       this.setData({
         activeFilterCatId: next,
         displayProducts: filtered,
-        selectedIndex: filtered.length === 1 ? 0 : -1,
+        selectedIndex: this._firstEnabledIndex(filtered),
       });
     },
     onSelect(e) {
       const idx = Number(e.currentTarget.dataset.idx);
+       const item = this.data.displayProducts[idx];
+      if (item && item._disabled) {
+        return;
+      }
       this.setData({ selectedIndex: idx });
     },
     onConfirm() {
@@ -104,6 +122,10 @@ Component({
       const product = idx >= 0 ? this.data.displayProducts[idx] : null;
       if (!product) {
         wx.showToast({ title: '请选择一个租赁物', icon: 'none' });
+        return;
+      }
+      if (product._disabled) {
+        wx.showToast({ title: '该租赁物当前不可选', icon: 'none' });
         return;
       }
       this.triggerEvent('select', { product });

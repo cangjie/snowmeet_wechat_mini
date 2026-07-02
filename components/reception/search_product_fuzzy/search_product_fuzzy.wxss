@@ -116,6 +116,9 @@
 .search-item--active {
   background: #f0f9ff;
 }
+.search-item--disabled {
+  background: #f1f3f5;
+}
 .search-item-radio {
   width: 60rpx;
   display: flex;
@@ -134,9 +137,18 @@
   background: #006495;
   box-shadow: inset 0 0 0 6rpx #ffffff;
 }
+.radio-dot--disabled {
+  border-color: #c7ced8;
+  background: #edf1f5;
+}
 .search-item-body {
   flex: 1;
   min-width: 0;
+}
+.search-item--disabled .search-item-cat,
+.search-item--disabled .search-item-code,
+.search-item--disabled .search-item-name {
+  color: #9aa4b2;
 }
 .search-item-cat {
   font-size: 22rpx;

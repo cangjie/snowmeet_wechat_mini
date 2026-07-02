@@ -5,7 +5,7 @@
         {
           "name": "pay",
           "pathName": "pages/order/payment_entry",
-          "query": "paymentId=42662",
+          "query": "paymentId=42691",
           "scene": null,
           "launchMode": "default"
         },
