@@ -15,6 +15,7 @@ Page({
     tagSel: [],
     tagInput: '',
     presetTags: [],
+    presetTagsView: [],   // [{name, on}]，WXML 不支持 arr.indexOf() 故派生 on 标记
 
     // 充值储值
     chargeShow: false,
@@ -45,8 +46,11 @@ Page({
     var that = this
     data.getTagLibraryPromise(app.globalData.sessionKey).then(function (r) {
       var tags = ((r && r.tags) || []).map(function (t) { return t.tag })
-      that.setData({ presetTags: tags })
+      that.setData({ presetTags: tags, presetTagsView: that._buildPresetView(tags, that.data.tagSel) })
     }).catch(function () {})
+  },
+  _buildPresetView(names, sel) {
+    return (names || []).map(function (n) { return { name: n, on: sel.indexOf(n) >= 0 } })
   },
 
   getData() {
@@ -76,8 +80,8 @@ Page({
 
   // ── 标签编辑 ──
   onEditTags() {
-    var custom = (this.data.member && this.data.member.custom) || []
-    this.setData({ tagSheetShow: true, tagSel: custom.slice(), tagInput: '' })
+    var sel = ((this.data.member && this.data.member.custom) || []).slice()
+    this.setData({ tagSheetShow: true, tagSel: sel, tagInput: '', presetTagsView: this._buildPresetView(this.data.presetTags, sel) })
   },
   onTagSheetClose() { this.setData({ tagSheetShow: false }) },
   onTagInput(e) { this.setData({ tagInput: e.detail.value }) },
@@ -86,19 +90,19 @@ Page({
     var arr = this.data.tagSel.slice()
     var i = arr.indexOf(v)
     if (i >= 0) { arr.splice(i, 1) } else { arr.push(v) }
-    this.setData({ tagSel: arr })
+    this.setData({ tagSel: arr, presetTagsView: this._buildPresetView(this.data.presetTags, arr) })
   },
   onTagAdd() {
     var v = (this.data.tagInput || '').trim()
     if (!v) return
     var arr = this.data.tagSel.slice()
     if (arr.indexOf(v) < 0) arr.push(v)
-    this.setData({ tagSel: arr, tagInput: '' })
+    this.setData({ tagSel: arr, tagInput: '', presetTagsView: this._buildPresetView(this.data.presetTags, arr) })
   },
   onTagRemove(e) {
     var v = e.currentTarget.dataset.v
     var arr = this.data.tagSel.filter(function (x) { return x !== v })
-    this.setData({ tagSel: arr })
+    this.setData({ tagSel: arr, presetTagsView: this._buildPresetView(this.data.presetTags, arr) })
   },
   onTagSave() {
     var that = this

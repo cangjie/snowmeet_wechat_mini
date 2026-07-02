@@ -111,8 +111,8 @@
       </view>
       <view class="sheet-sub sheet-sub--mt">从标签库选择</view>
       <view class="tag-wrap">
-        <view wx:for="{{presetTags}}" wx:key="*this" class="tag-pick {{tagSel.indexOf(item) >= 0 ? 'tag-pick--on' : ''}}"
-              data-v="{{item}}" bindtap="onTagToggle">{{item}}</view>
+        <view wx:for="{{presetTagsView}}" wx:key="name" class="tag-pick {{item.on ? 'tag-pick--on' : ''}}"
+              data-v="{{item.name}}" bindtap="onTagToggle">{{item.name}}</view>
       </view>
     </scroll-view>
     <view class="sheet-foot">

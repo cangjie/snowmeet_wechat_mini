@@ -4,13 +4,14 @@ const data = require('../../../utils/data.js')
 const util = require('../../../utils/util.js')
 
 const SYS_TAGS = ['租赁', '养护', '零售', '雪票', '二手回收', '水吧餐厅']
-const DEFAULT_FILTER = { name: '', cell: '', gender: '全部', bizTypes: [], customTags: [] }
+// 标签选中态用每项的 on 标记（WXML 不支持 arr.indexOf() 表达式，故不能靠数组 indexOf 判高亮）
+function mkTagObjs(names) { return names.map(function (n) { return { name: n, on: false } }) }
 
 Page({
   data: {
     filterOpen: false,
-    filter: { name: '', cell: '', gender: '全部', bizTypes: [], customTags: [] },
-    sysTags: SYS_TAGS,
+    filter: { name: '', cell: '', gender: '全部' },
+    sysTags: mkTagObjs(SYS_TAGS),
     presetTags: [],
     activeCount: 0,
 
@@ -35,7 +36,7 @@ Page({
   _loadTagLibrary() {
     var that = this
     data.getTagLibraryPromise(app.globalData.sessionKey).then(function (r) {
-      var tags = ((r && r.tags) || []).map(function (t) { return t.tag })
+      var tags = ((r && r.tags) || []).map(function (t) { return { name: t.tag, on: false } })
       that.setData({ presetTags: tags })
     }).catch(function () {})
   },
@@ -47,32 +48,35 @@ Page({
   onNameInput(e) { this.setData({ 'filter.name': e.detail.value }) },
   onCellInput(e) { this.setData({ 'filter.cell': e.detail.value }) },
   onGenderTap(e) { this.setData({ 'filter.gender': e.currentTarget.dataset.v }) },
-  // 系统标签（参与业务）多选：需同时参与所选全部业务
+  // 系统标签（参与业务）多选：切 on 标记（需同时参与所选全部业务）
   onSysTagTap(e) {
-    var v = e.currentTarget.dataset.v
-    var arr = this.data.filter.bizTypes.slice()
-    var i = arr.indexOf(v)
-    if (i >= 0) { arr.splice(i, 1) } else { arr.push(v) }
-    this.setData({ 'filter.bizTypes': arr })
+    var idx = e.currentTarget.dataset.idx
+    this.setData({ ['sysTags[' + idx + '].on']: !this.data.sysTags[idx].on })
   },
   // 自定义标签多选
   onCustomTagTap(e) {
-    var v = e.currentTarget.dataset.v
-    var arr = this.data.filter.customTags.slice()
-    var i = arr.indexOf(v)
-    if (i >= 0) { arr.splice(i, 1) } else { arr.push(v) }
-    this.setData({ 'filter.customTags': arr })
+    var idx = e.currentTarget.dataset.idx
+    this.setData({ ['presetTags[' + idx + '].on']: !this.data.presetTags[idx].on })
   },
   onResetFilter() {
-    this.setData({ filter: JSON.parse(JSON.stringify(DEFAULT_FILTER)) })
+    this.setData({
+      filter: { name: '', cell: '', gender: '全部' },
+      sysTags: this.data.sysTags.map(function (t) { return { name: t.name, on: false } }),
+      presetTags: this.data.presetTags.map(function (t) { return { name: t.name, on: false } })
+    })
   },
   onQuery() {
     this.setData({ filterOpen: false })
     this.getData(1, this.data.pageSize)
   },
 
-  _activeCount(f) {
-    return (f.name ? 1 : 0) + (f.cell ? 1 : 0) + (f.gender !== '全部' ? 1 : 0) + f.bizTypes.length + f.customTags.length
+  _selectedNames(list) {
+    return list.filter(function (t) { return t.on }).map(function (t) { return t.name })
+  },
+  _activeCount() {
+    var f = this.data.filter
+    return (f.name ? 1 : 0) + (f.cell ? 1 : 0) + (f.gender !== '全部' ? 1 : 0)
+      + this._selectedNames(this.data.sysTags).length + this._selectedNames(this.data.presetTags).length
   },
 
   getData(page, pageSize) {
@@ -83,10 +87,10 @@ Page({
       name: f.name,
       cell: f.cell,
       gender: f.gender === '全部' ? '' : f.gender,
-      bizTypes: (f.bizTypes || []).join(','),
-      tags: (f.customTags || []).join(',')
+      bizTypes: that._selectedNames(that.data.sysTags).join(','),
+      tags: that._selectedNames(that.data.presetTags).join(',')
     }
-    that.setData({ querying: true, activeCount: that._activeCount(f) })
+    that.setData({ querying: true, activeCount: that._activeCount() })
     data.searchMembersByStaffPromise(param, page, pageSize, app.globalData.sessionKey).then(function (r) {
       r = r || { items: [], total: 0 }
       var pageDeposit = 0
