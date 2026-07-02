@@ -89,6 +89,7 @@
     "pages/admin/member/member_list",
     "pages/admin/member/member_detail",
     "pages/admin/member/member_register",
+    "pages/admin/member/member_tag_admin",
     "pages/admin/care/care_order_list",
     "pages/admin/care/order_detail",
     "pages/admin/rent/search_fuzzy",

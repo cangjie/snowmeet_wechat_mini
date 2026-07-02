@@ -1,0 +1,58 @@
+<view class="page">
+  <view class="appbar">
+    <text class="appbar-title">标签库维护</text>
+    <view class="appbar-add" bindtap="onAddOpen">
+      <van-icon name="add-o" size="20px" color="#006495" /><text class="appbar-add-txt">新增</text>
+    </view>
+  </view>
+
+  <view class="hint">只维护「标签库」预设标签。合并 = 把 A 的会员标签迁到 B、A 从库移除；删除仅限没有会员在用的标签。</view>
+
+  <view class="list">
+    <block wx:if="{{tags.length > 0}}">
+      <view wx:for="{{tags}}" wx:key="tag" class="trow">
+        <view class="trow-l">
+          <text class="trow-tag">{{item.tag}}</text>
+          <text wx:if="{{item.group}}" class="trow-group">{{item.group}}</text>
+          <text class="trow-count">{{item.count}} 人使用</text>
+        </view>
+        <view class="trow-actions">
+          <view class="tbtn tbtn-merge" data-tag="{{item.tag}}" bindtap="onMergeOpen">合并</view>
+          <view class="tbtn {{item.count > 0 ? 'tbtn-del--off' : 'tbtn-del'}}" data-tag="{{item.tag}}" data-count="{{item.count}}" bindtap="onDelete">删除</view>
+        </view>
+      </view>
+    </block>
+    <view wx:elif="{{!loading}}" class="empty">
+      <van-icon name="label-o" size="40px" color="#bfc7d1" /><text class="empty-txt">标签库为空</text>
+    </view>
+  </view>
+</view>
+
+<!-- 新增标签 -->
+<view wx:if="{{addShow}}" class="mask" bindtap="onAddClose" catchtouchmove="noop">
+  <view class="modal" catchtap="noop">
+    <view class="modal-title">新增标签</view>
+    <input class="modal-input" value="{{addInput}}" bindinput="onAddInput" placeholder="输入标签名" focus confirm-type="done" bindconfirm="onAddConfirm" />
+    <view class="modal-foot">
+      <view class="btn btn-ghost" bindtap="onAddClose">取消</view>
+      <view class="btn btn-primary" bindtap="onAddConfirm">添加</view>
+    </view>
+  </view>
+</view>
+
+<!-- 合并：选目标 -->
+<view wx:if="{{mergeShow}}" class="mask" bindtap="onMergeClose" catchtouchmove="noop">
+  <view class="sheet" catchtap="noop">
+    <view class="sheet-head">
+      <text class="sheet-title">把「{{mergeFrom}}」合并到…</text>
+      <view class="sheet-x" bindtap="onMergeClose"><van-icon name="cross" size="18px" color="#3f4850" /></view>
+    </view>
+    <scroll-view class="sheet-body" scroll-y>
+      <view wx:for="{{mergeTargets}}" wx:key="tag" class="mtarget" data-tag="{{item.tag}}" bindtap="onMergePick">
+        <text class="mtarget-tag">{{item.tag}}</text>
+        <text class="mtarget-count">{{item.count}} 人</text>
+      </view>
+      <view wx:if="{{mergeTargets.length === 0}}" class="empty-txt" style="padding:40rpx;text-align:center;">没有其它标签可合并到</view>
+    </scroll-view>
+  </view>
+</view>

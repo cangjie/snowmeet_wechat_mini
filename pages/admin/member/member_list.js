@@ -132,5 +132,8 @@ Page({
   },
   gotoRegister() {
     wx.navigateTo({ url: '/pages/admin/member/member_register' })
+  },
+  gotoTagAdmin() {
+    wx.navigateTo({ url: '/pages/admin/member/member_tag_admin' })
   }
 })

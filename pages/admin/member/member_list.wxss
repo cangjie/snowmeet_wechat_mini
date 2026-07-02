@@ -26,7 +26,10 @@
 .seg-item--on { background: #fff; color: #006495; font-weight: 700; box-shadow: 0 1rpx 4rpx rgba(0,0,0,.06); }
 
 .tag-group { padding: 14rpx 0; }
+.tag-group-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14rpx; }
 .tag-group-label { font-size: 26rpx; font-weight: 600; color: #3f4850; display: block; margin-bottom: 14rpx; }
+.tag-group-head .tag-group-label { margin-bottom: 0; }
+.tag-manage { font-size: 24rpx; color: #006495; font-weight: 600; }
 .tag-group-hint { font-size: 22rpx; font-weight: 400; color: #6f7881; }
 .tag-wrap { display: flex; flex-wrap: wrap; gap: 14rpx; }
 .tag-pick { height: 58rpx; line-height: 58rpx; padding: 0 22rpx; border-radius: 999rpx; font-size: 25rpx;

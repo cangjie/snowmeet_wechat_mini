@@ -910,6 +910,35 @@ const getTagLibraryPromise = function (sessionKey) {
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
   })
 }
+// 标签库维护：库标签 + 用量
+const getTagLibraryStatsPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GetTagLibraryWithStats?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+const mergeTagPresetPromise = function (from, to, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/MergeTagPreset?sessionKey=' + sessionKey
+    + '&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+const deleteTagPresetPromise = function (tag, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/DeleteTagPreset?sessionKey=' + sessionKey
+    + '&tag=' + encodeURIComponent(tag)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+const addTagPresetPromise = function (tag, groupName, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/AddTagPreset?sessionKey=' + sessionKey
+    + '&tag=' + encodeURIComponent(tag)
+  if (groupName) { url += '&groupName=' + encodeURIComponent(groupName) }
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
 const getMemberDetailByStaffPromise = function (memberId, sessionKey) {
   var url = app.globalData.requestPrefix + 'MemberAdmin/GetMemberDetailByStaff/' + memberId + '?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -1101,6 +1130,10 @@ module.exports = {
   searchMembersByStaffPromise,
   getMemberDetailByStaffPromise,
   getTagLibraryPromise,
+  getTagLibraryStatsPromise,
+  mergeTagPresetPromise,
+  deleteTagPresetPromise,
+  addTagPresetPromise,
   addMemberTagPromise,
   removeMemberTagPromise,
   registerMemberByPhonePromise,

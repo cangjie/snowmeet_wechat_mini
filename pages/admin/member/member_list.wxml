@@ -44,7 +44,10 @@
       </view>
 
       <view class="tag-group">
-        <text class="tag-group-label">自定义标签</text>
+        <view class="tag-group-head">
+          <text class="tag-group-label">自定义标签</text>
+          <text class="tag-manage" catchtap="gotoTagAdmin">标签维护 ›</text>
+        </view>
         <view class="tag-wrap">
           <view wx:for="{{presetTags}}" wx:key="*this" class="tag-pick {{filter.customTags.indexOf(item) >= 0 ? 'tag-pick--on' : ''}}"
                 data-v="{{item}}" bindtap="onCustomTagTap">{{item}}</view>
