@@ -1006,6 +1006,14 @@ const getCouponTemplatesPromise = function (sessionKey) {
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
   })
 }
+// 会员合并：source 的订单/储值/龙珠/次卡/优惠券 全部迁到 target，source 失效（is_merge=1）
+const mergeMemberByStaffPromise = function (sourceMemberId, targetMemberId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/MergeMemberByStaff?sessionKey=' + sessionKey
+    + '&sourceMemberId=' + sourceMemberId + '&targetMemberId=' + targetMemberId
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
 
 const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetMemberTicketsByStaff/' + memberId + '?sessionKey=' + sessionKey
@@ -1150,6 +1158,7 @@ module.exports = {
   getPunchCardPresetsPromise,
   grantCouponPromise,
   getCouponTemplatesPromise,
+  mergeMemberByStaffPromise,
   getMemberTicketsPromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,

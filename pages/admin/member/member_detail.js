@@ -39,7 +39,13 @@ Page({
     couponShow: false,
     couponTemplates: [],
     couponSelId: 0,
-    couponCount: '1'
+    couponCount: '1',
+
+    // 会员合并（当前会员 → 搜索选中的目标会员）
+    mergeShow: false,
+    mergeKeyword: '',
+    mergeResults: [],
+    mergeSearched: false
   },
 
   onLoad(options) {
@@ -265,6 +271,51 @@ Page({
         that.setData({ couponShow: false }); that.getData()
       })
       .catch(function () { wx.hideLoading(); wx.showToast({ title: '发放失败', icon: 'none' }) })
+  },
+
+  // ── 会员合并 ──
+  onMergeOpen() { this.setData({ mergeShow: true, mergeKeyword: '', mergeResults: [], mergeSearched: false }) },
+  onMergeClose() { this.setData({ mergeShow: false }) },
+  onMergeInput(e) { this.setData({ mergeKeyword: e.detail.value }) },
+  onMergeSearch() {
+    var that = this
+    var kw = (that.data.mergeKeyword || '').trim()
+    if (!kw) { wx.showToast({ title: '请输入手机号或姓名', icon: 'none' }); return }
+    var filter = /^\d{3,}$/.test(kw) ? { cell: kw } : { name: kw }
+    wx.showLoading({ title: '搜索中', mask: true })
+    data.searchMembersByStaffPromise(filter, 1, 20, app.globalData.sessionKey).then(function (r) {
+      wx.hideLoading()
+      var items = ((r && r.items) || [])
+        .filter(function (m) { return m.id !== that.data.memberId })
+        .map(function (m) { return { id: m.id, name: m.name || '—', gender: m.gender || '', phone: m.phone || '' } })
+      that.setData({ mergeResults: items, mergeSearched: true })
+    }).catch(function () {
+      wx.hideLoading()
+      that.setData({ mergeResults: [], mergeSearched: true })
+    })
+  },
+  onMergeSelect(e) {
+    var that = this
+    var t = that.data.mergeResults[e.currentTarget.dataset.idx]
+    if (!t) return
+    wx.showModal({
+      title: '确认合并',
+      content: '当前会员将被合并，订单、储值、龙珠、次卡、优惠券全部转移到「' + t.name + '（ID ' + t.id + '）」名下，当前会员失效。此操作不可撤销！',
+      confirmText: '确认合并',
+      confirmColor: '#ba1a1a',
+      complete: function (res) {
+        if (!res.confirm) return
+        wx.showLoading({ title: '合并中', mask: true })
+        data.mergeMemberByStaffPromise(that.data.memberId, t.id, app.globalData.sessionKey).then(function () {
+          wx.hideLoading()
+          wx.showToast({ title: '合并完成', icon: 'success' })
+          that.setData({ mergeShow: false })
+          wx.redirectTo({ url: '/pages/admin/member/member_detail?id=' + t.id })
+        }).catch(function () {
+          wx.hideLoading() /* 后端 message（已被合并过/没有权限等）已由 performWebRequest toast */
+        })
+      }
+    })
   },
 
   noop() {}

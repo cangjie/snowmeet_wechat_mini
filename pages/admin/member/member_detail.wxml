@@ -14,6 +14,7 @@
           </view>
         </view>
         <view class="head-edit" catchtap="onEditProfile"><van-icon name="edit" size="13px" color="#006495" /><text class="head-edit-txt">编辑</text></view>
+        <view class="head-edit head-edit--merge" catchtap="onMergeOpen"><van-icon name="exchange" size="13px" color="#ba1a1a" /><text class="head-edit-txt head-edit-txt--merge">合并</text></view>
       </view>
       <view class="head-grid">
         <view class="kv"><text class="kv-k">会员 ID</text><text class="kv-v mono">{{member.id}}</text></view>
@@ -183,6 +184,31 @@
       <view class="btn btn-ghost" bindtap="onCouponClose">取消</view>
       <view class="btn btn-primary" bindtap="onCouponConfirm">确认发券</view>
     </view>
+  </view>
+</view>
+
+<!-- ───── 会员合并：搜索目标会员弹层 ───── -->
+<view wx:if="{{mergeShow}}" class="mask" bindtap="onMergeClose" catchtouchmove="noop">
+  <view class="sheet" catchtap="noop">
+    <view class="sheet-head"><text class="sheet-title">合并到其他会员</text>
+      <view class="sheet-x" bindtap="onMergeClose"><van-icon name="cross" size="18px" color="#3f4850" /></view>
+    </view>
+    <view class="merge-warn">当前会员（{{member.name}} · ID {{member.id}}）的订单、储值、龙珠、次卡、优惠券将全部转移到所选会员名下，当前会员随即失效。此操作不可撤销。</view>
+    <view class="sheet-add merge-search">
+      <input class="sheet-input" value="{{mergeKeyword}}" bindinput="onMergeInput" placeholder="输入手机号 / 姓名搜索" confirm-type="search" bindconfirm="onMergeSearch" />
+      <view class="sheet-add-btn" bindtap="onMergeSearch">搜索</view>
+    </view>
+    <scroll-view class="sheet-body merge-body" scroll-y>
+      <view wx:for="{{mergeResults}}" wx:key="id" class="opt" data-idx="{{index}}" bindtap="onMergeSelect">
+        <view class="opt-mid">
+          <text class="opt-name">{{item.name}}{{item.gender ? '（' + item.gender + '）' : ''}}</text>
+          <text class="opt-sub mono">ID {{item.id}} · {{item.phone || '无手机号'}}</text>
+        </view>
+        <van-icon name="arrow" size="15px" color="#bfc7d1" />
+      </view>
+      <view wx:if="{{mergeSearched && mergeResults.length === 0}}" class="opt-empty">未找到匹配会员</view>
+      <view wx:if="{{!mergeSearched}}" class="opt-empty">输入手机号或姓名后点搜索</view>
+    </scroll-view>
   </view>
 </view>
 
