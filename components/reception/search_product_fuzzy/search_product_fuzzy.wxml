@@ -34,10 +34,10 @@
       <view wx:elif="{{displayProducts.length === 0}}" class="search-tip">没有匹配的租赁物</view>
       <block wx:else>
         <view wx:for="{{displayProducts}}" wx:key="id"
-          class="search-item {{selectedIndex === index ? 'search-item--active' : ''}}"
+          class="search-item {{item._disabled ? 'search-item--disabled' : ''}} {{selectedIndex === index ? 'search-item--active' : ''}}"
           data-idx="{{index}}" bindtap="onSelect">
           <view class="search-item-radio">
-            <view class="radio-dot {{selectedIndex === index ? 'radio-dot--active' : ''}}"></view>
+            <view class="radio-dot {{item._disabled ? 'radio-dot--disabled' : ''}} {{selectedIndex === index ? 'radio-dot--active' : ''}}"></view>
           </view>
           <view class="search-item-body">
             <view class="search-item-cat">{{item.category.name}}</view>
