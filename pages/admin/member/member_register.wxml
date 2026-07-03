@@ -50,6 +50,23 @@
           <input class="modal-input" type="digit" value="{{form.deposit}}" bindinput="onDepositInput" placeholder="0" />
         </view>
       </view>
+      <view class="card">
+        <text class="card-title">开卡礼包<text class="form-opt">（选填）</text></text>
+        <view class="gift-btns">
+          <view class="gift-btn" bindtap="onAddCoupon">＋ 优惠券</view>
+          <view class="gift-btn" bindtap="onAddRentPunch">＋ 租赁次卡</view>
+          <view class="gift-btn" bindtap="onAddCarePunch">＋ 养护次卡</view>
+        </view>
+        <view wx:if="{{grants.length > 0}}" class="gift-list">
+          <view wx:for="{{grants}}" wx:key="index" class="gift-item">
+            <view class="gift-mid">
+              <text class="gift-name">{{item.name}}</text>
+              <text class="gift-sub">{{item.subStr}}</text>
+            </view>
+            <view class="gift-del" data-idx="{{index}}" bindtap="onGrantRemove"><van-icon name="cross" size="14px" color="#6f7881" /></view>
+          </view>
+        </view>
+      </view>
     </block>
 
     <!-- 完成 -->
@@ -64,6 +81,14 @@
         <view class="done-row"><text class="done-k">姓名</text><text class="done-v">{{newMember.name}}</text></view>
         <view class="done-row"><text class="done-k">初始储值</text><text class="done-v">{{newMember.depositStr}}</text></view>
       </view>
+      <view wx:if="{{grantResults.length > 0}}" class="grant-results">
+        <view wx:for="{{grantResults}}" wx:key="index" class="grant-row">
+          <van-icon wx:if="{{item.ok}}" name="success" size="15px" color="#15803d" />
+          <van-icon wx:else name="cross" size="15px" color="#b91c1c" />
+          <text class="grant-label {{item.ok ? '' : 'grant-label--fail'}}">{{item.label}}</text>
+        </view>
+        <view wx:if="{{grantFailed}}" class="grant-fail-tip">部分发放失败，可到会员详情页补发</view>
+      </view>
       <view class="done-actions">
         <view class="btn btn-ghost" bindtap="onReset">再注册一个</view>
         <view class="btn btn-primary" bindtap="gotoNew">查看会员详情</view>
@@ -77,5 +102,51 @@
   <view wx:if="{{phase === 'new'}}" class="footer">
     <view class="btn btn-ghost" bindtap="onReset">重置</view>
     <view class="btn btn-primary" bindtap="onSubmit">注册会员</view>
+  </view>
+
+  <!-- 优惠券选择弹窗 -->
+  <view wx:if="{{couponPickShow}}" class="mask" bindtap="onCouponPickClose" catchtouchmove="noop">
+    <view class="modal" catchtap="noop">
+      <view class="modal-title">选择优惠券</view>
+      <scroll-view class="modal-list" scroll-y>
+        <view wx:for="{{couponTemplates}}" wx:key="id" class="opt {{couponSelId === item.id ? 'opt--on' : ''}}" data-id="{{item.id}}" bindtap="onCouponPickSelect">
+          <view class="opt-radio {{couponSelId === item.id ? 'opt-radio--on' : ''}}"></view>
+          <view class="opt-mid">
+            <text class="opt-name">{{item.name}}</text>
+            <text class="opt-sub">{{item.type}}</text>
+          </view>
+        </view>
+        <view wx:if="{{couponTemplates.length === 0}}" class="opt-empty">加载中…</view>
+      </scroll-view>
+      <view class="modal-field modal-field--inline">
+        <text class="modal-count-label">数量</text>
+        <input class="modal-count-input" type="number" value="{{couponCount}}" bindinput="onCouponCountInput" placeholder="1" />
+      </view>
+      <view class="modal-foot">
+        <view class="btn btn-ghost" bindtap="onCouponPickClose">取消</view>
+        <view class="btn btn-primary" bindtap="onCouponPickConfirm">加入礼包</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 次卡选择弹窗（租赁/养护共用，标题随 punchPickBiz） -->
+  <view wx:if="{{punchPickShow}}" class="mask" bindtap="onPunchPickClose" catchtouchmove="noop">
+    <view class="modal" catchtap="noop">
+      <view class="modal-title">选择{{punchPickBiz}}次卡</view>
+      <scroll-view class="modal-list" scroll-y>
+        <view wx:for="{{punchPickList}}" wx:key="index" class="opt {{punchSelIdx === index ? 'opt--on' : ''}}" data-idx="{{index}}" bindtap="onPunchPickSelect">
+          <view class="opt-radio {{punchSelIdx === index ? 'opt-radio--on' : ''}}"></view>
+          <view class="opt-mid">
+            <text class="opt-name">{{item.card_name}}</text>
+            <text class="opt-sub">{{item.biz_type}} · {{item.total}} 次</text>
+          </view>
+        </view>
+        <view wx:if="{{punchPickList.length === 0}}" class="opt-empty">加载中…</view>
+      </scroll-view>
+      <view class="modal-foot">
+        <view class="btn btn-ghost" bindtap="onPunchPickClose">取消</view>
+        <view class="btn btn-primary" bindtap="onPunchPickConfirm">加入礼包</view>
+      </view>
+    </view>
   </view>
 </view>
