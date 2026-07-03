@@ -41,7 +41,8 @@ Page({
     couponSelId: 0,
     couponCount: '1',
 
-    // 会员合并（当前会员 → 搜索选中的目标会员）
+    // 会员合并（当前会员 → 搜索选中的目标会员），仅系统管理员（title_level >= 300）可操作
+    isAdmin: false,
     mergeShow: false,
     mergeKeyword: '',
     mergeResults: [],
@@ -49,8 +50,13 @@ Page({
   },
 
   onLoad(options) {
+    var that = this
     this.setData({ memberId: parseInt(options.id) || 0 })
     this._loadTagLibrary()
+    Promise.resolve(app.loginPromiseNew).then(function () {
+      var staff = app.globalData.staff
+      that.setData({ isAdmin: !!(staff && staff.title_level >= 300) })
+    }).catch(function () {})
   },
   onShow() {
     if (this.data.memberId) this.getData()
@@ -75,6 +81,8 @@ Page({
       m.depositTotalStr = util.showAmount(m.depositTotal || 0)
       m.avatar = (m.name && m.name.length > 0) ? m.name[0] : '?'
       m.female = m.gender === '女'
+      // 联系手机号（合并会员时保留的旧号，type=contact）
+      m.contactCellsStr = (m.accounts && m.accounts.contactCells && m.accounts.contactCells.length > 0) ? m.accounts.contactCells.join('、') : ''
       m.recentOrders = (m.recentOrders || []).map(function (o) {
         return { id: o.id, code: o.code, type: o.type, dateStr: o.bizDate ? util.formatDate(new Date(o.bizDate)) : '' }
       })
@@ -274,7 +282,10 @@ Page({
   },
 
   // ── 会员合并 ──
-  onMergeOpen() { this.setData({ mergeShow: true, mergeKeyword: '', mergeResults: [], mergeSearched: false }) },
+  onMergeOpen() {
+    if (!this.data.isAdmin) { wx.showToast({ title: '仅系统管理员可操作', icon: 'none' }); return }
+    this.setData({ mergeShow: true, mergeKeyword: '', mergeResults: [], mergeSearched: false })
+  },
   onMergeClose() { this.setData({ mergeShow: false }) },
   onMergeInput(e) { this.setData({ mergeKeyword: e.detail.value }) },
   onMergeSearch() {

@@ -1,0 +1,14 @@
+{
+  "name": "snowmeet-wechat-mini-automation-test",
+  "version": "1.0.0",
+  "private": true,
+  "description": "snowmeet_wechat_mini 小程序自动化测试（基于官方 miniprogram-automator + jest）",
+  "scripts": {
+    "test": "jest --runInBand",
+    "test:watch": "jest --runInBand --watch"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "miniprogram-automator": "^0.12.1"
+  }
+}

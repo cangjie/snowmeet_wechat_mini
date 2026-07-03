@@ -14,7 +14,7 @@
           </view>
         </view>
         <view class="head-edit" catchtap="onEditProfile"><van-icon name="edit" size="13px" color="#006495" /><text class="head-edit-txt">编辑</text></view>
-        <view class="head-edit head-edit--merge" catchtap="onMergeOpen"><van-icon name="exchange" size="13px" color="#ba1a1a" /><text class="head-edit-txt head-edit-txt--merge">合并</text></view>
+        <view wx:if="{{isAdmin}}" class="head-edit head-edit--merge" catchtap="onMergeOpen"><van-icon name="exchange" size="13px" color="#ba1a1a" /><text class="head-edit-txt head-edit-txt--merge">合并</text></view>
       </view>
       <view class="head-grid">
         <view class="kv"><text class="kv-k">会员 ID</text><text class="kv-v mono">{{member.id}}</text></view>
@@ -61,6 +61,7 @@
       <view class="acc-row"><text class="acc-k">微信</text><text class="acc-v">{{member.accounts.wechatOpenId ? '已绑定' : '未绑定'}}</text></view>
       <view class="acc-row"><text class="acc-k">支付宝</text><text class="acc-v">{{member.accounts.alipayPayerId ? '已绑定' : '未绑定'}}</text></view>
       <view class="acc-row"><text class="acc-k">手机号</text><text class="acc-v mono">{{member.accounts.cell || '未绑定'}}</text></view>
+      <view wx:if="{{member.contactCellsStr}}" class="acc-row"><text class="acc-k">联系手机号</text><text class="acc-v mono">{{member.contactCellsStr}}</text></view>
     </view>
 
     <!-- 名下次卡 -->
