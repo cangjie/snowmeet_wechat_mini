@@ -26,8 +26,12 @@ Page({
     profileShow: false,
     pf: { name: '', gender: '男', cell: '' },
 
-    // 充值储值
+    // 充值储值（类型/七色米订单号/备注/金额 四项一个弹窗）
     chargeShow: false,
+    chargeTypes: ['储值送装备', '二手回收', '零售赠送', '预定', '其他赠送'],
+    chargeType: '',
+    chargeMi7: '',
+    chargeMemo: '',
     chargeAmount: '',
 
     // 加次卡
@@ -205,19 +209,26 @@ Page({
   },
 
   // ── 充值储值 ──
-  onChargeOpen() { this.setData({ chargeShow: true, chargeAmount: '' }) },
+  onChargeOpen() { this.setData({ chargeShow: true, chargeType: '', chargeMi7: '', chargeMemo: '', chargeAmount: '' }) },
   onChargeClose() { this.setData({ chargeShow: false }) },
+  onChargeTypeTap(e) { this.setData({ chargeType: e.currentTarget.dataset.v }) },
+  onChargeMi7Input(e) { this.setData({ chargeMi7: e.detail.value }) },
+  onChargeMemoInput(e) { this.setData({ chargeMemo: e.detail.value }) },
   onChargeInput(e) { this.setData({ chargeAmount: e.detail.value }) },
   onChargeConfirm() {
     var that = this
+    if (!that.data.chargeType) { wx.showToast({ title: '请选择充值类型', icon: 'none' }); return }
     var amt = parseFloat(that.data.chargeAmount)
     if (isNaN(amt) || amt <= 0) { wx.showToast({ title: '请输入金额', icon: 'none' }); return }
     wx.showModal({
-      title: '确认充值', content: '为该会员充值储值 ' + util.showAmount(amt) + '（C 类）',
+      title: '确认充值', content: '为该会员充值储值 ' + util.showAmount(amt) + '（' + that.data.chargeType + '）',
       complete: function (res) {
         if (!res.confirm) return
         wx.showLoading({ title: '充值中', mask: true })
-        data.chargeMemberDepositPromise({ memberId: that.data.memberId, depositType: 'C', amount: amt }, app.globalData.sessionKey)
+        data.chargeMemberDepositPromise({
+          memberId: that.data.memberId, depositType: 'C', amount: amt,
+          chargeType: that.data.chargeType, mi7Code: that.data.chargeMi7, memo: that.data.chargeMemo
+        }, app.globalData.sessionKey)
           .then(function () { wx.hideLoading(); wx.showToast({ title: '充值成功', icon: 'success' }); that.setData({ chargeShow: false }); that.getData() })
           .catch(function () { wx.hideLoading(); wx.showToast({ title: '充值失败', icon: 'none' }) })
       }

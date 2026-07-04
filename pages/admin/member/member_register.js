@@ -8,9 +8,18 @@ Page({
     phone: '',
     phase: 'idle', // idle | existing | new | done
     found: null,
-    form: { name: '', gender: '男', deposit: '' },
+    form: { name: '', gender: '男' },
     newMember: null,
     busy: false,
+
+    // 初始储值（四字段一个弹窗；depositCfg = null 未配置 / {chargeType, mi7Code, memo, amount, amountStr, subStr}）
+    depositCfg: null,
+    depositShow: false,
+    chargeTypes: ['储值送装备', '二手回收', '零售赠送', '预定', '其他赠送'],
+    depositType: '',
+    depositMi7: '',
+    depositMemo: '',
+    depositAmount: '',
 
     // 开卡礼包清单：{kind:'coupon',templateId,name,type,count,subStr} / {kind:'punch',bizType,cardName,total,name,subStr}
     grants: [],
@@ -53,16 +62,51 @@ Page({
 
   onNameInput(e) { this.setData({ 'form.name': e.detail.value }) },
   onGenderTap(e) { this.setData({ 'form.gender': e.currentTarget.dataset.v }) },
-  onDepositInput(e) { this.setData({ 'form.deposit': e.detail.value }) },
 
   onReset() {
     this.setData({
       phone: '', phase: 'idle', found: null,
-      form: { name: '', gender: '男', deposit: '' }, newMember: null,
+      form: { name: '', gender: '男' }, newMember: null,
+      depositCfg: null, depositShow: false,
       grants: [], grantResults: [], grantFailed: false,
       couponPickShow: false, punchPickShow: false
     })
   },
+
+  // ── 初始储值（四字段弹窗；已配置时点摘要重开编辑） ──
+  onDepositOpen() {
+    var cfg = this.data.depositCfg
+    this.setData({
+      depositShow: true,
+      depositType: cfg ? cfg.chargeType : '',
+      depositMi7: cfg ? cfg.mi7Code : '',
+      depositMemo: cfg ? cfg.memo : '',
+      depositAmount: cfg ? String(cfg.amount) : ''
+    })
+  },
+  onDepositModalClose() { this.setData({ depositShow: false }) },
+  onDepositTypeTap(e) { this.setData({ depositType: e.currentTarget.dataset.v }) },
+  onDepositMi7Input(e) { this.setData({ depositMi7: e.detail.value }) },
+  onDepositMemoInput(e) { this.setData({ depositMemo: e.detail.value }) },
+  onDepositAmountInput(e) { this.setData({ depositAmount: e.detail.value }) },
+  onDepositModalConfirm() {
+    var that = this
+    if (!that.data.depositType) { wx.showToast({ title: '请选择充值类型', icon: 'none' }); return }
+    var amt = parseFloat(that.data.depositAmount)
+    if (isNaN(amt) || amt <= 0) { wx.showToast({ title: '请输入金额', icon: 'none' }); return }
+    var subParts = []
+    if (that.data.depositMi7) subParts.push(that.data.depositMi7)
+    if (that.data.depositMemo) subParts.push(that.data.depositMemo)
+    that.setData({
+      depositShow: false,
+      depositCfg: {
+        chargeType: that.data.depositType, mi7Code: that.data.depositMi7, memo: that.data.depositMemo,
+        amount: amt, amountStr: util.showAmount(amt),
+        subStr: subParts.join(' · ')
+      }
+    })
+  },
+  onDepositRemove() { this.setData({ depositCfg: null }) },
 
   noop() {},
 
@@ -163,12 +207,16 @@ Page({
     var sk = app.globalData.sessionKey
     var f = that.data.form
     var tasks = []
-    var depositAmt = parseFloat(f.deposit)
-    var hasDeposit = !isNaN(depositAmt) && depositAmt > 0
-    if (hasDeposit) {
+    var dep = that.data.depositCfg
+    if (dep) {
       tasks.push({
-        label: '储值 ' + util.showAmount(depositAmt),
-        run: function () { return data.chargeMemberDepositPromise({ memberId: memberId, depositType: 'C', amount: depositAmt }, sk) }
+        label: '储值 ' + dep.amountStr + '（' + dep.chargeType + '）',
+        run: function () {
+          return data.chargeMemberDepositPromise({
+            memberId: memberId, depositType: 'C', amount: dep.amount,
+            chargeType: dep.chargeType, mi7Code: dep.mi7Code, memo: dep.memo
+          }, sk)
+        }
       })
     }
     that.data.grants.forEach(function (g) {
@@ -203,7 +251,7 @@ Page({
         grantResults: results, grantFailed: failed,
         newMember: {
           id: memberId, name: f.name || '未填写', phone: that.data.phone,
-          depositStr: util.showAmount(hasDeposit ? depositAmt : 0)
+          depositStr: dep ? dep.amountStr : util.showAmount(0)
         }
       })
     })

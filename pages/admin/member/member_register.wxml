@@ -44,10 +44,18 @@
         </view>
       </view>
       <view class="card">
-        <text class="card-title">初始储值（选填 · C 类）</text>
-        <view class="modal-field">
-          <text class="modal-yen">¥</text>
-          <input class="modal-input" type="digit" value="{{form.deposit}}" bindinput="onDepositInput" placeholder="0" />
+        <text class="card-title">初始储值<text class="form-opt">（选填 · C 类）</text></text>
+        <view wx:if="{{!depositCfg}}" class="gift-btns">
+          <view class="gift-btn" bindtap="onDepositOpen">＋ 添加储值</view>
+        </view>
+        <view wx:else class="gift-list gift-list--flat">
+          <view class="gift-item">
+            <view class="gift-mid" bindtap="onDepositOpen">
+              <text class="gift-name">{{depositCfg.chargeType}} · {{depositCfg.amountStr}}</text>
+              <text class="gift-sub">{{depositCfg.subStr || '点击修改'}}</text>
+            </view>
+            <view class="gift-del" bindtap="onDepositRemove"><van-icon name="cross" size="14px" color="#6f7881" /></view>
+          </view>
         </view>
       </view>
       <view class="card">
@@ -125,6 +133,38 @@
       <view class="modal-foot">
         <view class="btn btn-ghost" bindtap="onCouponPickClose">取消</view>
         <view class="btn btn-primary" bindtap="onCouponPickConfirm">加入礼包</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 初始储值弹窗（类型/七色米订单号/备注/金额 四项） -->
+  <view wx:if="{{depositShow}}" class="mask" bindtap="onDepositModalClose" catchtouchmove="noop">
+    <view class="modal" catchtap="noop">
+      <view class="modal-title">初始储值（C 类）</view>
+      <view class="charge-row">
+        <text class="charge-label">充值类型</text>
+        <view class="charge-types">
+          <view wx:for="{{chargeTypes}}" wx:key="*this" class="ct-chip {{depositType === item ? 'ct-chip--on' : ''}}" data-v="{{item}}" bindtap="onDepositTypeTap">{{item}}</view>
+        </view>
+      </view>
+      <view class="charge-row">
+        <text class="charge-label">七色米订单号<text class="charge-opt">（选填）</text></text>
+        <input class="charge-input" value="{{depositMi7}}" bindinput="onDepositMi7Input" placeholder="如：XSD20260701001I" />
+      </view>
+      <view class="charge-row">
+        <text class="charge-label">备注<text class="charge-opt">（选填）</text></text>
+        <input class="charge-input" value="{{depositMemo}}" bindinput="onDepositMemoInput" placeholder="备注" />
+      </view>
+      <view class="charge-row">
+        <text class="charge-label">金额</text>
+        <view class="modal-field">
+          <text class="modal-yen">¥</text>
+          <input class="modal-input" type="digit" value="{{depositAmount}}" bindinput="onDepositAmountInput" placeholder="0.00" />
+        </view>
+      </view>
+      <view class="modal-foot">
+        <view class="btn btn-ghost" bindtap="onDepositModalClose">取消</view>
+        <view class="btn btn-primary" bindtap="onDepositModalConfirm">确定</view>
       </view>
     </view>
   </view>

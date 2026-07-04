@@ -131,13 +131,30 @@
   </view>
 </view>
 
-<!-- ───── 充值储值 ───── -->
+<!-- ───── 充值储值（类型/七色米订单号/备注/金额 四项） ───── -->
 <view wx:if="{{chargeShow}}" class="mask" bindtap="onChargeClose" catchtouchmove="noop">
   <view class="modal" catchtap="noop">
     <view class="modal-title">充值储值（C 类）</view>
-    <view class="modal-field">
-      <text class="modal-yen">¥</text>
-      <input class="modal-input" type="digit" value="{{chargeAmount}}" bindinput="onChargeInput" placeholder="0.00" focus />
+    <view class="charge-row">
+      <text class="charge-label">充值类型</text>
+      <view class="charge-types">
+        <view wx:for="{{chargeTypes}}" wx:key="*this" class="ct-chip {{chargeType === item ? 'ct-chip--on' : ''}}" data-v="{{item}}" bindtap="onChargeTypeTap">{{item}}</view>
+      </view>
+    </view>
+    <view class="charge-row">
+      <text class="charge-label">七色米订单号<text class="charge-opt">（选填）</text></text>
+      <input class="charge-input" value="{{chargeMi7}}" bindinput="onChargeMi7Input" placeholder="如：XSD20260701001I" />
+    </view>
+    <view class="charge-row">
+      <text class="charge-label">备注<text class="charge-opt">（选填）</text></text>
+      <input class="charge-input" value="{{chargeMemo}}" bindinput="onChargeMemoInput" placeholder="备注" />
+    </view>
+    <view class="charge-row">
+      <text class="charge-label">金额</text>
+      <view class="modal-field">
+        <text class="modal-yen">¥</text>
+        <input class="modal-input" type="digit" value="{{chargeAmount}}" bindinput="onChargeInput" placeholder="0.00" />
+      </view>
     </view>
     <view class="modal-foot">
       <view class="btn btn-ghost" bindtap="onChargeClose">取消</view>
