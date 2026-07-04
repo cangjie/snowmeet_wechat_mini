@@ -68,6 +68,8 @@
     "pages/admin/deposit/deposit_detail",
     "pages/admin/deposit/deposit_charge",
     "pages/admin/deposit/deposit_charge_search",
+    "pages/admin/deposit/deposit_account_list",
+    "pages/admin/deposit/deposit_account_detail",
     "pages/admin/rent/set_award",
     "pages/admin/recept/recept_auth_list",
     "pages/admin/deposit/deposit_balance",

@@ -1,0 +1,62 @@
+<view class="page">
+  <!-- 顶部条 -->
+  <view class="appbar">
+    <text class="appbar-title">储值账户</text>
+  </view>
+
+  <!-- 手机号搜索 -->
+  <view class="search-bar">
+    <input class="search-input" value="{{cell}}" bindinput="onCellInput" type="number"
+           placeholder="输入手机号搜索（留空查全部）" confirm-type="search" bindconfirm="onSearch" />
+    <view class="search-btn" bindtap="onSearch">
+      <van-icon name="search" size="16px" color="#fff" /><text class="search-btn-txt">搜索</text>
+    </view>
+  </view>
+
+  <!-- 统计条 -->
+  <view class="stats">
+    <text class="stats-item">会员数 <text class="stats-num">{{total}}</text></text>
+    <text class="stats-sep">|</text>
+    <text class="stats-item">本页账户 <text class="stats-num stats-num--ink">{{pageAccounts}}</text></text>
+  </view>
+
+  <!-- 列表：会员卡片 + 内嵌账户行 -->
+  <view class="list">
+    <block wx:if="{{items.length > 0}}">
+      <view wx:for="{{items}}" wx:key="memberId" class="mcard">
+        <view class="mcard-main" data-id="{{item.memberId}}" bindtap="gotoMember">
+          <view class="avatar {{item.female ? 'avatar--f' : ''}}">{{item.avatar}}</view>
+          <view class="mcard-mid">
+            <view class="mcard-line1">
+              <text class="mcard-name">{{item.name}}</text>
+              <text wx:if="{{item.gender}}" class="gchip {{item.female ? 'gchip--f' : ''}}">{{item.gender}}</text>
+            </view>
+            <text class="mcard-phone">{{item.phone}}</text>
+          </view>
+          <van-icon name="arrow" size="14px" color="#bfc7d1" />
+        </view>
+        <view class="acct-list">
+          <view wx:for="{{item.accounts}}" wx:for-item="acct" wx:key="id" class="acct-row"
+                data-id="{{acct.id}}" bindtap="gotoDetail">
+            <view class="acct-head">
+              <text class="acct-type">{{acct.typeLabel}}</text>
+              <van-icon name="arrow" size="13px" color="#bfc7d1" />
+            </view>
+            <view class="acct-nums">
+              <view class="acct-cell"><text class="acct-label">总储值</text><text class="acct-num">{{acct.incomeStr}}</text></view>
+              <view class="acct-cell"><text class="acct-label">已消费</text><text class="acct-num acct-num--consume">{{acct.consumeStr}}</text></view>
+              <view class="acct-cell"><text class="acct-label">可用</text><text class="acct-num acct-num--avail">{{acct.availableStr}}</text></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view wx:elif="{{!querying}}" class="empty">
+      <van-icon name="gold-coin-o" size="40px" color="#bfc7d1" />
+      <text class="empty-txt">没有匹配的储值账户</text>
+    </view>
+  </view>
+
+  <list-pager wx:if="{{total > 0}}" page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
+              disabled="{{querying}}" bind:change="onPagerChange" />
+</view>

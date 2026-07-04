@@ -28,7 +28,7 @@ Page({
 
     // 充值储值（类型/七色米订单号/备注/金额 四项一个弹窗）
     chargeShow: false,
-    chargeTypes: ['储值送装备', '二手回收', '零售赠送', '预定', '其他赠送'],
+    chargeTypes: ['储值送装备', '二手回收', '零售赠送', '预定', '其它赠送'],
     chargeType: '',
     chargeMi7: '',
     chargeMemo: '',

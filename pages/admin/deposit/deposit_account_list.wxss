@@ -1,0 +1,53 @@
+/* 储值账户管理列表（风格对齐 member_list） */
+.page { min-height: 100vh; background: #f8f9ff; padding-bottom: 24rpx; }
+
+/* 顶部条 */
+.appbar { height: 88rpx; background: #fff; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24rpx; border-bottom: 1rpx solid rgba(191,199,209,.3); position: sticky; top: 0; z-index: 30; }
+.appbar-title { font-size: 34rpx; font-weight: 700; color: #006495; }
+
+/* 搜索行 */
+.search-bar { display: flex; gap: 16rpx; padding: 20rpx 24rpx; background: #fff;
+  border-bottom: 1rpx solid rgba(191,199,209,.25); }
+.search-input { flex: 1; height: 76rpx; border-radius: 14rpx; border: 1rpx solid rgba(191,199,209,.5);
+  padding: 0 20rpx; font-size: 27rpx; color: #0b1c30; background: #fff; box-sizing: border-box; }
+.search-btn { width: 160rpx; height: 76rpx; border-radius: 14rpx; background: #006495; color: #fff;
+  display: flex; align-items: center; justify-content: center; gap: 8rpx; }
+.search-btn-txt { font-size: 27rpx; font-weight: 700; color: #fff; }
+
+/* 统计 */
+.stats { display: flex; align-items: center; gap: 24rpx; padding: 20rpx 24rpx; background: #eff4ff;
+  border-bottom: 1rpx solid rgba(191,199,209,.2); }
+.stats-item { font-size: 25rpx; color: #3f4850; }
+.stats-num { font-size: 30rpx; font-weight: 700; color: #006495; }
+.stats-num--ink { color: #0b1c30; }
+.stats-sep { color: rgba(191,199,209,.6); }
+
+/* 列表卡片 */
+.list { padding: 18rpx 24rpx; display: flex; flex-direction: column; gap: 18rpx; }
+.mcard { background: #fff; border-radius: 22rpx; border: 1rpx solid rgba(191,199,209,.3); overflow: hidden; }
+.mcard-main { display: flex; align-items: center; gap: 20rpx; padding: 22rpx 24rpx 16rpx; }
+.avatar { width: 76rpx; height: 76rpx; border-radius: 999rpx; background: #d9e7f5; color: #006495; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 32rpx; }
+.avatar--f { background: #fde4ee; color: #b03a6e; }
+.mcard-mid { flex: 1; min-width: 0; }
+.mcard-line1 { display: flex; align-items: center; gap: 12rpx; }
+.mcard-name { font-size: 30rpx; font-weight: 700; color: #0b1c30; }
+.gchip { font-size: 21rpx; font-weight: 600; padding: 1rpx 12rpx; border-radius: 999rpx; background: #dceaff; color: #0a5d8c; }
+.gchip--f { background: #fde4ee; color: #b03a6e; }
+.mcard-phone { font-size: 26rpx; color: #3f4850; margin-top: 6rpx; display: block; font-family: monospace; }
+
+/* 账户行 */
+.acct-list { padding: 0 24rpx 18rpx; display: flex; flex-direction: column; gap: 14rpx; }
+.acct-row { background: #eff4ff; border-radius: 16rpx; padding: 18rpx 22rpx; }
+.acct-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12rpx; }
+.acct-type { font-size: 26rpx; font-weight: 700; color: #0b1c30; }
+.acct-nums { display: flex; gap: 8rpx; }
+.acct-cell { flex: 1; display: flex; flex-direction: column; gap: 4rpx; }
+.acct-label { font-size: 21rpx; color: #6f7881; }
+.acct-num { font-size: 27rpx; font-weight: 700; color: #0b1c30; }
+.acct-num--consume { color: #b86e00; }
+.acct-num--avail { color: #006495; }
+
+.empty { padding: 100rpx 0; display: flex; flex-direction: column; align-items: center; gap: 16rpx; }
+.empty-txt { font-size: 27rpx; color: #6f7881; }

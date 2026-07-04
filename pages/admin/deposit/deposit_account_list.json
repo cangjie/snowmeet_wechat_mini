@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index",
+    "list-pager": "/components/list-pager/index"
+  },
+  "navigationBarTitleText": "储值账户"
+}

@@ -15,7 +15,7 @@ Page({
     // 初始储值（四字段一个弹窗；depositCfg = null 未配置 / {chargeType, mi7Code, memo, amount, amountStr, subStr}）
     depositCfg: null,
     depositShow: false,
-    chargeTypes: ['储值送装备', '二手回收', '零售赠送', '预定', '其他赠送'],
+    chargeTypes: ['储值送装备', '二手回收', '零售赠送', '预定', '其它赠送'],
     depositType: '',
     depositMi7: '',
     depositMemo: '',

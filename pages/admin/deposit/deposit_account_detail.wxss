@@ -1,0 +1,45 @@
+/* 储值账户详情（风格对齐会员管理系列） */
+.page { min-height: 100vh; background: #f8f9ff; padding: 20rpx 24rpx 40rpx; box-sizing: border-box; }
+
+/* 汇总卡 */
+.head-card { background: #fff; border-radius: 22rpx; border: 1rpx solid rgba(191,199,209,.3); padding: 26rpx 28rpx; }
+.head-main { display: flex; align-items: center; gap: 20rpx; }
+.avatar { width: 84rpx; height: 84rpx; border-radius: 999rpx; background: #d9e7f5; color: #006495; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 34rpx; }
+.avatar--f { background: #fde4ee; color: #b03a6e; }
+.head-mid { flex: 1; min-width: 0; }
+.head-line1 { display: flex; align-items: center; gap: 12rpx; }
+.head-name { font-size: 32rpx; font-weight: 700; color: #0b1c30; }
+.gchip { font-size: 21rpx; font-weight: 600; padding: 1rpx 12rpx; border-radius: 999rpx; background: #dceaff; color: #0a5d8c; }
+.gchip--f { background: #fde4ee; color: #b03a6e; }
+.head-phone-row { display: flex; align-items: center; gap: 8rpx; margin-top: 6rpx; }
+.head-phone { font-size: 26rpx; color: #3f4850; font-family: monospace; }
+.head-type { font-size: 24rpx; font-weight: 700; color: #006495; background: #e1edf7; padding: 6rpx 16rpx;
+  border-radius: 10rpx; flex-shrink: 0; }
+.head-nums { display: flex; gap: 12rpx; margin-top: 24rpx; }
+.head-cell { flex: 1; background: #eff4ff; border-radius: 16rpx; padding: 16rpx 0; display: flex; flex-direction: column;
+  align-items: center; gap: 6rpx; }
+.head-label { font-size: 22rpx; color: #6f7881; }
+.head-num { font-size: 30rpx; font-weight: 700; color: #0b1c30; }
+.head-num--consume { color: #b86e00; }
+.head-num--avail { color: #006495; }
+
+/* 流水 */
+.flow-card { background: #fff; border-radius: 22rpx; border: 1rpx solid rgba(191,199,209,.3);
+  padding: 26rpx 28rpx; margin-top: 20rpx; }
+.flow-title { font-size: 28rpx; font-weight: 700; color: #0b1c30; display: block; margin-bottom: 10rpx; }
+.flow-row { padding: 20rpx 0; border-bottom: 1rpx solid rgba(191,199,209,.2); }
+.flow-row:last-of-type { border-bottom: none; }
+.flow-line1 { display: flex; align-items: center; gap: 14rpx; }
+.flow-amount { font-size: 30rpx; font-weight: 700; }
+.flow-amount--in { color: #15803d; }
+.flow-amount--out { color: #b91c1c; }
+.flow-chip { font-size: 21rpx; font-weight: 600; padding: 2rpx 12rpx; border-radius: 8rpx; }
+.flow-chip--in { background: #dff2e7; color: #15803d; }
+.flow-chip--out { background: #fee2e2; color: #b91c1c; }
+.flow-time { margin-left: auto; font-size: 22rpx; color: #6f7881; }
+.flow-sub { font-size: 24rpx; color: #3f4850; margin-top: 8rpx; word-break: break-all; }
+.flow-empty { padding: 60rpx 0; text-align: center; color: #6f7881; font-size: 26rpx; }
+
+.empty { padding: 120rpx 0; display: flex; flex-direction: column; align-items: center; gap: 16rpx; }
+.empty-txt { font-size: 27rpx; color: #6f7881; }

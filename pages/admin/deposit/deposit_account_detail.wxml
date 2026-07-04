@@ -1,0 +1,49 @@
+<view class="page">
+  <block wx:if="{{account}}">
+    <!-- 账户汇总卡 -->
+    <view class="head-card">
+      <view class="head-main">
+        <view class="avatar {{account.female ? 'avatar--f' : ''}}">{{account.avatar}}</view>
+        <view class="head-mid">
+          <view class="head-line1">
+            <text class="head-name">{{account.name || '—'}}</text>
+            <text wx:if="{{account.gender}}" class="gchip {{account.female ? 'gchip--f' : ''}}">{{account.gender}}</text>
+          </view>
+          <view class="head-phone-row" bindtap="onCallPhone">
+            <text class="head-phone">{{account.phone || '—'}}</text>
+            <van-icon wx:if="{{account.phone}}" name="phone-o" size="14px" color="#006495" />
+          </view>
+        </view>
+        <text class="head-type">{{account.typeLabel}}</text>
+      </view>
+      <view class="head-nums">
+        <view class="head-cell"><text class="head-label">总储值</text><text class="head-num">{{account.incomeStr}}</text></view>
+        <view class="head-cell"><text class="head-label">已消费</text><text class="head-num head-num--consume">{{account.consumeStr}}</text></view>
+        <view class="head-cell"><text class="head-label">可用</text><text class="head-num head-num--avail">{{account.availableStr}}</text></view>
+      </view>
+    </view>
+
+    <!-- 流水列表 -->
+    <view class="flow-card">
+      <text class="flow-title">账户流水（{{balances.length}} 笔）</text>
+      <view wx:for="{{balances}}" wx:key="id" class="flow-row">
+        <view class="flow-line1">
+          <text class="flow-amount {{item.isCharge ? 'flow-amount--in' : 'flow-amount--out'}}">{{item.amountStr}}</text>
+          <text wx:if="{{item.isCharge}}" class="flow-chip flow-chip--in">{{item.bizType || '充值'}}</text>
+          <text wx:else class="flow-chip flow-chip--out">消费</text>
+          <text class="flow-time">{{item.timeStr}}</text>
+        </view>
+        <view wx:if="{{item.isCharge && item.bizId}}" class="flow-sub">七色米订单号：{{item.bizId}}</view>
+        <view wx:if="{{item.isCharge && item.memo}}" class="flow-sub">备注：{{item.memo}}</view>
+        <view wx:if="{{!item.isCharge && item.orderLabel}}" class="flow-sub">订单：{{item.orderLabel}}</view>
+      </view>
+      <view wx:if="{{balances.length === 0}}" class="flow-empty">暂无流水</view>
+    </view>
+  </block>
+
+  <view wx:elif="{{loading}}" class="empty"><text class="empty-txt">加载中…</text></view>
+  <view wx:else class="empty">
+    <van-icon name="gold-coin-o" size="40px" color="#bfc7d1" />
+    <text class="empty-txt">账户不存在</text>
+  </view>
+</view>

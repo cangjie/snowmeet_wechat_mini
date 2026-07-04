@@ -1006,6 +1006,23 @@ const getCouponTemplatesPromise = function (sessionKey) {
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
   })
 }
+// 储值账户管理列表：按手机号搜会员分组返回名下储值账户 { items, total }
+const searchDepositAccountsByStaffPromise = function (cell, pageIndex, pageSize, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/SearchDepositAccountsByStaff?sessionKey=' + sessionKey
+    + '&pageIndex=' + pageIndex + '&pageSize=' + pageSize
+  if (cell) url += '&cell=' + cell
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+// 储值账户详情：{ account, balances }（充值行带 bizType/bizId/memo，消费行带 orderCode）
+const getDepositAccountDetailByStaffPromise = function (accountId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GetDepositAccountDetailByStaff?sessionKey=' + sessionKey
+    + '&accountId=' + accountId
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
 // 会员资产速览（开单页会员条）：{ depositTotal, points, punchRemaining }，店员级 100 可读
 const getMemberAssetsByStaffPromise = function (memberId, sessionKey) {
   var url = app.globalData.requestPrefix + 'MemberAdmin/GetMemberAssetsByStaff?sessionKey=' + sessionKey
@@ -1168,6 +1185,8 @@ module.exports = {
   getCouponTemplatesPromise,
   mergeMemberByStaffPromise,
   getMemberAssetsByStaffPromise,
+  searchDepositAccountsByStaffPromise,
+  getDepositAccountDetailByStaffPromise,
   getMemberTicketsPromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,

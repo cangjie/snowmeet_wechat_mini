@@ -264,6 +264,9 @@ Page({
       case 'deposit_balance':
         path = '/pages/admin/deposit/deposit_balance'
         break
+      case 'deposit_account_list':
+        path = '/pages/admin/deposit/deposit_account_list'
+        break
       case 'enterain_form':
         path = '/pages/admin/sale/enterain_form'
         break
