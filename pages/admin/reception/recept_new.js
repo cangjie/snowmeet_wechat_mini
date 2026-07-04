@@ -126,9 +126,8 @@ Page({
   onMemberDetail(e) {
     const memberId = (e && e.detail && e.detail.memberId) || this.data.customer.memberId;
     if (!memberId) return;
-    // TODO: 接入新版会员详情页；当前临时复用旧页面
     wx.navigateTo({
-      url: '/pages/admin/recept/recept_member_info?memberId=' + memberId,
+      url: '/pages/admin/member/member_detail?id=' + memberId,
     });
   },
 

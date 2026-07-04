@@ -1006,6 +1006,14 @@ const getCouponTemplatesPromise = function (sessionKey) {
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
   })
 }
+// 会员资产速览（开单页会员条）：{ depositTotal, points, punchRemaining }，店员级 100 可读
+const getMemberAssetsByStaffPromise = function (memberId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/GetMemberAssetsByStaff?sessionKey=' + sessionKey
+    + '&memberId=' + memberId
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
 // 会员合并：source 的订单/储值/龙珠/次卡/优惠券 全部迁到 target，source 失效（is_merge=1）
 const mergeMemberByStaffPromise = function (sourceMemberId, targetMemberId, sessionKey) {
   var url = app.globalData.requestPrefix + 'MemberAdmin/MergeMemberByStaff?sessionKey=' + sessionKey
@@ -1159,6 +1167,7 @@ module.exports = {
   grantCouponPromise,
   getCouponTemplatesPromise,
   mergeMemberByStaffPromise,
+  getMemberAssetsByStaffPromise,
   getMemberTicketsPromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,

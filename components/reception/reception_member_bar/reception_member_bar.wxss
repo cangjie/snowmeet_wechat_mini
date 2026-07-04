@@ -91,6 +91,10 @@
   white-space: nowrap;
 }
 .tag-biz  { background: var(--primary-fixed); color: var(--on-primary-container); }
+/* 会员资产速览 chip（有则显示） */
+.tag-deposit { background: #dff2e7; color: #15803d; }
+.tag-punch   { background: #fdf1dc; color: #b86e00; }
+.tag-points  { background: #fde4ee; color: #b03a6e; }
 
 .member-detail-link {
   display: flex;

@@ -20,6 +20,9 @@
     <view class="member-row member-row--bottom">
       <view class="member-tags">
         <view wx:if="{{bizLabel}}" class="member-tag tag-biz">{{bizLabel}}</view>
+        <view wx:if="{{assets && assets.depositStr}}" class="member-tag tag-deposit">储值 {{assets.depositStr}}</view>
+        <view wx:if="{{assets && assets.punchRemaining > 0}}" class="member-tag tag-punch">次卡 {{assets.punchRemaining}} 次</view>
+        <view wx:if="{{assets && assets.points > 0}}" class="member-tag tag-points">龙珠 {{assets.points}}</view>
       </view>
       <view wx:if="{{customer.memberId}}" class="member-detail-link" bindtap="onMemberDetail">
         <text>查看详情</text>

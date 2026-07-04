@@ -1,6 +1,7 @@
 // components/reception/reception_member_bar/reception_member_bar.js
 // 业务开单 / 接待页顶部的顾客信息条
 const data = require('../../../utils/data.js');
+const util = require('../../../utils/util.js');
 
 Component({
   options: {
@@ -19,6 +20,7 @@ Component({
       observer() {
         this.refreshMask();
         this.lookupMemberByCell();
+        this.syncAssets();
       },
     },
     shop: { type: String, value: '' },
@@ -29,12 +31,16 @@ Component({
     cellMasked: '',
     memberFlagText: '顾客',
     lastLookupCell: '',
+    // 会员资产速览（有则显示）：{ depositStr, punchRemaining, points }
+    assets: null,
+    lastAssetsMemberId: 0,
   },
 
   lifetimes: {
     attached() {
       this.refreshMask();
       this.lookupMemberByCell();
+      this.syncAssets();
     },
   },
 
@@ -73,6 +79,7 @@ Component({
         }
 
         this.setData({ memberFlagText: '会员' });
+        this._loadAssets(memberId);
         this.triggerEvent('memberInfoFound', {
           memberId,
           member,
@@ -80,6 +87,35 @@ Component({
       }).catch(() => {
         this.setData({ memberFlagText: customer.memberId ? '会员' : '顾客' });
       });
+    },
+
+    // customer.memberId 变化时同步资产速览
+    syncAssets() {
+      const memberId = this.properties.customer && this.properties.customer.memberId;
+      if (!memberId) {
+        if (this.data.assets || this.data.lastAssetsMemberId) this.setData({ assets: null, lastAssetsMemberId: 0 });
+        return;
+      }
+      this._loadAssets(memberId);
+    },
+
+    _loadAssets(memberId) {
+      const that = this;
+      if (!memberId || memberId === that.data.lastAssetsMemberId) return;
+      that.setData({ lastAssetsMemberId: memberId });
+      const app = getApp();
+      Promise.resolve(app.loginPromiseNew).then(() => {
+        return data.getMemberAssetsByStaffPromise(memberId, app.globalData.sessionKey);
+      }).then((r) => {
+        if (!r || that.data.lastAssetsMemberId !== memberId) return;
+        that.setData({
+          assets: {
+            depositStr: (r.depositTotal > 0) ? util.showAmount(r.depositTotal) : '',
+            punchRemaining: r.punchRemaining || 0,
+            points: r.points || 0,
+          },
+        });
+      }).catch(() => {});
     },
 
     onMemberDetail() {
