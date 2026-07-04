@@ -28,8 +28,20 @@ Component({
       var orderId = that.properties.orderId
       if (!orderId) return
       data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
+        // 养护单：每个 care 派生一行展示名（装备 · 品牌 · 长度 + 服务描述）
+        var cares = (order.cares || []).map(function (c) {
+          var parts = []
+          if (c.equipment) parts.push(c.equipment)
+          if (c.brand) parts.push(String(c.brand).split('/')[0])
+          if (c.scale) parts.push(c.scale + 'cm')
+          var name = parts.join(' · ') || '养护装备'
+          if (c.description && c.description !== '无') name += '（' + c.description + '）'
+          return { id: c.id, name: name }
+        })
         that.setData({
           order: order,
+          isCare: (order.type || '').trim() === '养护',
+          cares: cares,
           rentals: order.rentals || [],
           payingAmountStr: util.showAmount(order.paying_amount)
         })

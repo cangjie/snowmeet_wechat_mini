@@ -1,0 +1,251 @@
+<!--pages/admin/care/care_order_detail/care_order_detail.wxml
+  新版养护订单详情（Alpine Operational Minimalist）
+  A 订单信息 / B 支付信息（四格摘要 + 可折叠明细） / C 每件装备卡（服务 + 照片 + 任务时间线 + 操作）
+-->
+<view class="page-root">
+
+  <!-- A 订单信息 -->
+  <view class="card">
+    <view class="section-title">订单信息</view>
+    <view class="info-grid">
+      <view class="info-cell">
+        <text class="info-label">订单号</text>
+        <text class="info-value">{{order.code || order.id}}</text>
+      </view>
+      <view class="info-cell">
+        <text class="info-label">店铺</text>
+        <text class="info-value">{{order.shop}}</text>
+      </view>
+      <view class="info-cell">
+        <text class="info-label">顾客</text>
+        <text class="info-value">{{order.contact_name || '散客'}}</text>
+      </view>
+      <view class="info-cell" bindtap="onCall">
+        <text class="info-label">电话</text>
+        <text class="info-value info-value--link">{{order.contact_num || '--'}}</text>
+      </view>
+      <view class="info-cell">
+        <text class="info-label">业务日期</text>
+        <text class="info-value">{{order.bizDateStr}}</text>
+      </view>
+      <view class="info-cell">
+        <text class="info-label">装备数量</text>
+        <text class="info-value">{{cares.length}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- B 支付信息 -->
+  <view class="card">
+    <view class="section-title-row" bindtap="onTogglePayment">
+      <view class="section-title">支付信息</view>
+      <van-icon name="{{payment.expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
+    </view>
+    <view class="pay-grid">
+      <view class="pay-cell">
+        <text class="pay-label">总计</text>
+        <text class="pay-value">{{payment.totalStr}}</text>
+      </view>
+      <view class="pay-cell">
+        <text class="pay-label">已支付</text>
+        <text class="pay-value pay-value--paid">{{payment.paidStr}}</text>
+      </view>
+      <view class="pay-cell">
+        <text class="pay-label">已退款</text>
+        <text class="pay-value">{{payment.refundStr}}</text>
+      </view>
+      <view class="pay-cell">
+        <text class="pay-label">待支付</text>
+        <text class="pay-value pay-value--due">{{payment.payingStr}}</text>
+      </view>
+    </view>
+    <view wx:if="{{payment.expanded}}" class="pay-rows">
+      <view wx:for="{{payment.rows}}" wx:key="id" class="pay-row">
+        <text class="pay-row-method">{{item.method}}</text>
+        <text class="pay-row-status">{{item.status}}</text>
+        <text class="pay-row-date">{{item.dateStr}}</text>
+        <text class="pay-row-amount">{{item.amountStr}}</text>
+      </view>
+      <view wx:if="{{payment.rows.length === 0}}" class="pay-row pay-row--empty">（无支付记录）</view>
+    </view>
+  </view>
+
+  <!-- C 装备卡 -->
+  <block wx:for="{{cares}}" wx:key="id" wx:for-item="care" wx:for-index="cidx">
+    <view class="card">
+      <view class="care-head" data-cidx="{{cidx}}" bindtap="onToggleCare">
+        <view class="care-head-left">
+          <text class="care-title">{{care._title}}</text>
+          <view class="chip {{care._status === '已完成' ? 'chip-success' : (care._status === '未开始' ? 'chip-muted' : 'chip-primary')}}">{{care._status}}</view>
+        </view>
+        <van-icon name="{{care._expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
+      </view>
+
+      <!-- 服务 chips + 金额（折叠态也显示） -->
+      <view class="care-chips">
+        <view wx:for="{{care._chips}}" wx:key="*this" wx:for-item="chip" class="chip chip-outline">{{chip}}</view>
+        <text class="care-summary">{{care._summaryStr}}</text>
+      </view>
+
+      <view wx:if="{{care._expanded}}" class="care-body">
+        <!-- 装备信息 -->
+        <view class="info-grid">
+          <view class="info-cell">
+            <text class="info-label">序列号</text>
+            <text class="info-value">{{care._serialText || '--'}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">附件</text>
+            <text class="info-value">{{care.with_pole ? '雪杖 ' : ''}}{{care.others_associates || ''}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">项目收费</text>
+            <text class="info-value">{{care._commonStr}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">附加费</text>
+            <text class="info-value">{{care._repairStr}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">减免</text>
+            <text class="info-value">{{care._discountStr}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">取板码</text>
+            <text class="info-value">{{care.task_flow_code || '--'}}</text>
+          </view>
+        </view>
+        <view wx:if="{{care.memo}}" class="care-memo">备注：{{care.memo}}</view>
+
+        <!-- 照片 -->
+        <view wx:if="{{care._photos.length > 0}}" class="photo-row">
+          <image wx:for="{{care._photos}}" wx:key="id" wx:for-index="idx"
+                 class="photo-thumb" src="{{item.thumb}}" mode="aspectFill"
+                 data-cidx="{{cidx}}" data-idx="{{idx}}" bindtap="onPhotoTap"/>
+        </view>
+
+        <!-- 任务时间线 -->
+        <view class="section-title section-title--sub">养护任务</view>
+        <view class="task-list">
+          <block wx:for="{{care._tasks}}" wx:key="id" wx:for-item="task" wx:for-index="tidx">
+            <view class="task-row {{task._current ? 'task-row--current' : ''}}">
+              <view class="task-main">
+                <view class="task-name-wrap">
+                  <text class="task-name">{{task._title}}</text>
+                  <view class="chip {{task.status === '已完成' ? 'chip-success' : (task.status === '已开始' ? 'chip-primary' : (task.status === '强行中止' ? 'chip-pending' : 'chip-muted'))}}">{{task.status}}</view>
+                </view>
+                <view class="task-meta">
+                  <text wx:if="{{task._staffName}}">{{task._staffName}}</text>
+                  <text wx:if="{{task._startStr}}">{{task._startStr}}</text>
+                  <text wx:if="{{task._endStr}}">→ {{task._endStr}}</text>
+                </view>
+              </view>
+              <view class="task-actions" wx:if="{{task._current}}">
+                <!-- 安全检查：录入 + 确认在下方专区 -->
+                <block wx:if="{{task.task_name !== '安全检查' && task.task_name !== '发板' && task.task_name !== '寄存或快递'}}">
+                  <view wx:if="{{task.status === '未开始'}}" class="btn btn--primary btn--sm"
+                        data-task-id="{{task.id}}" catchtap="onTaskStart">开始</view>
+                  <view wx:if="{{task.status === '已开始'}}" class="btn btn--danger btn--sm"
+                        data-cidx="{{cidx}}" data-task-id="{{task.id}}" catchtap="onTaskEnd">结束</view>
+                </block>
+              </view>
+            </view>
+
+            <!-- 安全检查录入区 -->
+            <view wx:if="{{task.task_name === '安全检查' && task._current && care._safeChecking}}" class="task-panel">
+              <view class="kv-grid">
+                <view class="kv-item">
+                  <text class="info-label">身高(cm) *</text>
+                  <input class="panel-input" type="digit" value="{{care.height || ''}}"
+                         data-cidx="{{cidx}}" data-field="height" bindblur="onSafeFieldBlur"/>
+                </view>
+                <view wx:if="{{care.equipment === '双板'}}" class="kv-item">
+                  <text class="info-label">体重(kg)</text>
+                  <input class="panel-input" type="digit" value="{{care.weight || ''}}"
+                         data-cidx="{{cidx}}" data-field="weight" bindblur="onSafeFieldBlur"/>
+                </view>
+                <view wx:else class="kv-item">
+                  <text class="info-label">间距</text>
+                  <input class="panel-input" type="digit" value="{{care.gap || ''}}"
+                         data-cidx="{{cidx}}" data-field="gap" bindblur="onSafeFieldBlur"/>
+                </view>
+                <block wx:if="{{care.equipment === '双板'}}">
+                  <view class="kv-item">
+                    <text class="info-label">前脱落值 *</text>
+                    <input class="panel-input" type="digit" value="{{care.front_din || ''}}"
+                           data-cidx="{{cidx}}" data-field="front_din" bindblur="onSafeFieldBlur"/>
+                  </view>
+                  <view class="kv-item">
+                    <text class="info-label">后脱落值 *</text>
+                    <input class="panel-input" type="digit" value="{{care.rear_din || ''}}"
+                           data-cidx="{{cidx}}" data-field="rear_din" bindblur="onSafeFieldBlur"/>
+                  </view>
+                </block>
+                <block wx:else>
+                  <view class="kv-item">
+                    <text class="info-label">左角度</text>
+                    <input class="panel-input" type="digit" value="{{care.left_angle || ''}}"
+                           data-cidx="{{cidx}}" data-field="left_angle" bindblur="onSafeFieldBlur"/>
+                  </view>
+                  <view class="kv-item">
+                    <text class="info-label">右角度</text>
+                    <input class="panel-input" type="digit" value="{{care.right_angle || ''}}"
+                           data-cidx="{{cidx}}" data-field="right_angle" bindblur="onSafeFieldBlur"/>
+                  </view>
+                </block>
+              </view>
+              <view class="panel-btn-row">
+                <view class="btn btn--warning" data-cidx="{{cidx}}" catchtap="onSafeCheck">确认安全</view>
+              </view>
+            </view>
+
+            <!-- 寄存或快递 -->
+            <view wx:if="{{task.task_name === '寄存或快递' && task._current && task.status === '已开始'}}" class="task-panel">
+              <view class="deal-method-row">
+                <view class="btn btn--sm {{task.deal_method === '寄存' ? 'btn--primary' : 'btn--plain'}}"
+                      data-cidx="{{cidx}}" data-tidx="{{tidx}}" data-method="寄存" catchtap="onDealMethodTap">寄存</view>
+                <view class="btn btn--sm {{task.deal_method === '快递' ? 'btn--primary' : 'btn--plain'}}"
+                      data-cidx="{{cidx}}" data-tidx="{{tidx}}" data-method="快递" catchtap="onDealMethodTap">快递</view>
+                <view class="btn btn--sm {{task.deal_method === '万龙寄存柜' ? 'btn--primary' : 'btn--plain'}}"
+                      data-cidx="{{cidx}}" data-tidx="{{tidx}}" data-method="万龙寄存柜" catchtap="onDealMethodTap">万龙寄存柜</view>
+              </view>
+              <input class="panel-input panel-input--wide"
+                     placeholder="{{task.deal_method === '快递' ? '快递单号（必填）' : '备注'}}"
+                     value="{{task.store_memo || ''}}"
+                     data-cidx="{{cidx}}" data-tidx="{{tidx}}" bindblur="onStoreMemoBlur"/>
+              <view class="panel-btn-row">
+                <view class="btn btn--danger" data-cidx="{{cidx}}" data-tidx="{{tidx}}" catchtap="onStoreConfirm">确认</view>
+              </view>
+            </view>
+
+            <!-- 发板核销 -->
+            <view wx:if="{{task.task_name === '发板' && task._current && task.status === '未开始'}}" class="task-panel">
+              <view class="veri-row">
+                <input class="panel-input" type="number" placeholder="4 位取板码"
+                       value="{{veriCode}}" bindinput="onVeriCodeInput"/>
+                <view class="btn btn--primary btn--sm" data-cidx="{{cidx}}" catchtap="onVeriCodeConfirm">验证</view>
+                <view class="btn btn--plain btn--sm" data-cidx="{{cidx}}" catchtap="onSendVeriCode">发送取板码</view>
+              </view>
+              <view class="panel-btn-row" wx:if="{{isMaster}}">
+                <view class="btn btn--danger" data-cidx="{{cidx}}" catchtap="onMasterFinish">店长确认发板</view>
+              </view>
+              <view class="veri-hint">扫码取板 / 拍照凭证请使用旧版养护详情页（后续迁移）</view>
+            </view>
+          </block>
+        </view>
+
+        <!-- 打印 -->
+        <view class="panel-btn-row panel-btn-row--split">
+          <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onPrintLabel">打印标签存根</view>
+          <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onPrintInvoice">打印顾客小票</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view style="height: 120rpx;"></view>
+
+  <van-popup show="{{ printShow }}" position="bottom" custom-style="height: 80%;" bind:close="onPrinterClose" closeable>
+    <print-care wx:if="{{printShow}}" care="{{careToBePrinted}}" order="{{order}}" type="{{printType}}"></print-care>
+  </van-popup>
+</view>

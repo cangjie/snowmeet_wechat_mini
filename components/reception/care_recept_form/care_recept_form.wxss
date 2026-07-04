@@ -1,0 +1,62 @@
+/* components/reception/care_recept_form/care_recept_form.wxss
+   基础卡片/chip/结算条样式复用租赁表单（Alpine Operational Minimalist），
+   这里只放养护特有的增量样式 */
+@import "../rent_recept_form/rent_recept_form.wxss";
+
+/* 服务项按钮行：可换行版本的 rent-mode */
+.svc-btn-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12rpx;
+}
+.svc-btn-row--wrap {
+  flex-wrap: wrap;
+}
+.svc-btn-row .rent-mode-btn {
+  flex: none;
+  padding-left: 24rpx;
+  padding-right: 24rpx;
+}
+
+/* 修刃角度行 */
+.edge-degree-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 16rpx;
+  gap: 12rpx;
+}
+.edge-degree-input {
+  width: 120rpx;
+  text-align: center;
+  flex: none;
+}
+.edge-degree-unit {
+  font-size: 26rpx;
+  color: #6f7881;
+}
+
+/* 其它维修项追加输入 */
+.others-memo-input {
+  margin-top: 16rpx;
+}
+
+/* 本件小计 */
+.care-item-summary {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #006495;
+}
+
+/* 底部添加装备（单按钮加宽） */
+.action-item--wide {
+  flex: 1;
+}
+
+/* 新增品牌 modal 内容 */
+.brand-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 0 32rpx 8rpx;
+}

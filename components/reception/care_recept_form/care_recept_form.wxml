@@ -1,0 +1,303 @@
+<!--components/reception/care_recept_form/care_recept_form.wxml
+  养护接待开单表单：业务字段对齐旧版 components/care/care_recept，
+  卡片/chip/底部结算条视觉对齐 rent_recept_form（wxss @import 复用）
+  组件契约：
+    - properties.cares  父页传入的当前购物车（care 数组）
+    - triggerEvent('syncCare', { cares, needUpdate })  购物车变化
+    - triggerEvent('checkout', { cares })              点击去结算
+-->
+<view class="rent-recept-form care-recept-form">
+
+  <!-- 购物车列表 / 空态 -->
+  <block wx:if="{{displayCares && displayCares.length > 0}}">
+    <view class="rent-list">
+      <block wx:for="{{displayCares}}" wx:key="_key" wx:for-item="care" wx:for-index="cidx">
+        <van-swipe-cell right-width="{{ 72 }}" custom-class="rent-swipe">
+          <view class="pkg-card">
+            <!-- 折叠态：单行（装备名 + 服务 chips + 金额 + 箭头）；缺项时名称变红 -->
+            <view wx:if="{{!care._expanded}}" class="pkg-row" data-key="{{care._key}}" bindtap="onToggleCare">
+              <view class="pkg-row-name-wrap">
+                <text class="pkg-row-name {{!care._entered ? 'pkg-row-name--pending' : ''}}">{{care._title}}</text>
+                <block wx:for="{{care._svcChipsView}}" wx:key="*this" wx:for-item="chip">
+                  <view class="chip chip-primary">{{chip}}</view>
+                </block>
+              </view>
+              <view class="pkg-row-meta">
+                <text class="pkg-row-meta-item">{{care._summaryStr}}</text>
+              </view>
+              <view class="pkg-row-chev">
+                <van-icon name="arrow-down" size="16px" color="#6f7881"/>
+              </view>
+            </view>
+            <!-- 展开态：标题行 + chips 行 -->
+            <view wx:else class="pkg-row pkg-row--expanded" data-key="{{care._key}}" bindtap="onToggleCare">
+              <view class="pkg-title-row">
+                <text class="pkg-title {{!care._entered ? 'pkg-title--pending' : ''}}">{{care._title}}</text>
+              </view>
+              <view class="pkg-meta-row">
+                <view class="pkg-meta-chips">
+                  <view class="chip {{care._entered ? 'chip-success' : 'chip-pending'}}">{{care._statusLabel}}</view>
+                </view>
+                <view class="pkg-row-meta">
+                  <text class="pkg-row-meta-item">{{care._summaryStr}}</text>
+                </view>
+                <view class="pkg-row-chev">
+                  <van-icon name="arrow-up" size="16px" color="#6f7881"/>
+                </view>
+              </view>
+            </view>
+
+            <!-- 展开态：养护详情表单 -->
+            <view wx:if="{{care._expanded}}" class="pkg-detail">
+              <!-- 类型 -->
+              <view class="form-group">
+                <view class="form-label">装备类型</view>
+                <view class="rent-mode">
+                  <view class="rent-mode-btn {{care.equipment === '双板' ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onEquipTap" data-cidx="{{cidx}}" data-equip="双板">双板</view>
+                  <view class="rent-mode-btn {{care.equipment === '单板' ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onEquipTap" data-cidx="{{cidx}}" data-equip="单板">单板</view>
+                </view>
+              </view>
+
+              <!-- 照片 -->
+              <view class="form-group">
+                <view class="form-label">装备照片</view>
+                <van-uploader
+                  file-list="{{care.careImages}}"
+                  capture="{{['album', 'camera']}}"
+                  data-cidx="{{cidx}}"
+                  bind:after-read="onPhotoRead"
+                  bind:delete="onPhotoDelete"/>
+              </view>
+
+              <!-- 品牌 / 长度 -->
+              <view class="kv-row">
+                <view class="kv-cell">
+                  <text class="kv-label">品牌</text>
+                  <picker range="{{care._brandListView}}"
+                          disabled="{{!care.equipment}}"
+                          value="{{care._brandIndex || 0}}"
+                          data-cidx="{{cidx}}"
+                          bindchange="onBrandChange">
+                    <view class="kv-picker-text">{{care.brand || (care.equipment ? '点此选择品牌' : '先选装备类型')}}</view>
+                  </picker>
+                </view>
+                <view class="kv-cell">
+                  <text class="kv-label">长度 (cm)</text>
+                  <input class="kv-input" type="digit"
+                         value="{{care.scale || ''}}"
+                         placeholder="如 170"
+                         placeholder-class="form-input-placeholder"
+                         data-cidx="{{cidx}}" data-field="scale"
+                         catchblur="onFieldBlur"/>
+                </view>
+              </view>
+
+              <!-- 优惠券 -->
+              <view class="form-group">
+                <view class="form-label">优惠券</view>
+                <view class="form-input form-input--inline form-input--tap" catchtap="onTicketTap" data-cidx="{{cidx}}">
+                  <text wx:if="{{care.ticket_code}}" class="form-input-text">({{care.ticket_code}}){{care.ticket.name || '已选券'}}</text>
+                  <text wx:else class="form-input-placeholder">点此选择优惠券（可跳过）</text>
+                </view>
+              </view>
+
+              <!-- 服务项目 -->
+              <view class="form-group">
+                <view class="form-label">养护项目</view>
+                <view class="svc-btn-row">
+                  <view class="rent-mode-btn {{care.need_edge === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
+                        catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="need_edge">修刃</view>
+                  <view class="rent-mode-btn {{care.need_wax === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
+                        catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="need_wax">热蜡</view>
+                  <view class="rent-mode-btn {{care.need_unwax === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
+                        catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="need_unwax">刮蜡</view>
+                  <view wx:if="{{care._hasFreeWaxTicket}}"
+                        class="rent-mode-btn {{care.free_wax === 1 ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="free_wax">机打蜡</view>
+                  <view class="rent-mode-btn {{care.urgent === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
+                        catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="urgent">立等</view>
+                </view>
+                <view wx:if="{{care.need_edge === 1 || care.summer != null}}" class="edge-degree-row">
+                  <text class="kv-label">修刃角度</text>
+                  <input class="kv-input edge-degree-input" type="digit"
+                         value="{{care.edge_degree || ''}}"
+                         placeholder="89"
+                         data-cidx="{{cidx}}" data-field="edge_degree"
+                         catchblur="onFieldBlur"/>
+                  <text class="edge-degree-unit">度</text>
+                </view>
+              </view>
+
+              <!-- 非雪季养护 -->
+              <view class="form-group">
+                <view class="form-label">非雪季养护</view>
+                <view class="rent-mode">
+                  <view class="rent-mode-btn {{care.summer === 'now' ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onSummerTap" data-cidx="{{cidx}}" data-mode="now">直接寄存</view>
+                  <view class="rent-mode-btn {{care.summer === 'later' ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onSummerTap" data-cidx="{{cidx}}" data-mode="later">先双项，晚点寄存</view>
+                </view>
+              </view>
+
+              <!-- 维修（其它服务） -->
+              <view wx:if="{{care._othersView.length > 0}}" class="form-group">
+                <view class="form-label">维修项目</view>
+                <view class="svc-btn-row svc-btn-row--wrap">
+                  <block wx:for="{{care._othersView}}" wx:key="name" wx:for-item="svc">
+                    <view class="rent-mode-btn {{svc.on ? 'rent-mode-btn--active' : ''}}"
+                          catchtap="onOthersToggle" data-cidx="{{cidx}}" data-name="{{svc.name}}">{{svc.name}}</view>
+                  </block>
+                </view>
+                <input class="form-input others-memo-input"
+                       placeholder="其它维修项目（回车追加）"
+                       placeholder-class="form-input-placeholder"
+                       data-cidx="{{cidx}}"
+                       catchblur="onOthersMemoBlur"/>
+              </view>
+
+              <!-- 收费 / 附加费 / 减免 -->
+              <view class="kv-row kv-row--triple">
+                <view class="kv-cell">
+                  <text class="kv-label">项目收费</text>
+                  <view class="kv-input-wrap">
+                    <text class="kv-input kv-input--display">{{care._commonChargeStr}}</text>
+                  </view>
+                </view>
+                <view class="kv-cell kv-cell--tap" data-cidx="{{cidx}}" data-field="repair_charge" catchtap="onAmountTap">
+                  <text class="kv-label">附加费</text>
+                  <view class="kv-input-wrap">
+                    <text class="kv-prefix">¥</text>
+                    <text class="kv-input kv-input--display">{{care._repairChargeStr}}</text>
+                  </view>
+                </view>
+                <view class="kv-cell kv-cell--tap" data-cidx="{{cidx}}" data-field="discount" catchtap="onAmountTap">
+                  <text class="kv-label">减免</text>
+                  <view class="kv-input-wrap">
+                    <text class="kv-prefix">¥</text>
+                    <text class="kv-input kv-input--display">{{care._discountStr}}</text>
+                  </view>
+                </view>
+              </view>
+
+              <!-- 特殊 -->
+              <view class="form-group">
+                <view class="form-label">特殊</view>
+                <view class="rent-mode">
+                  <view class="rent-mode-btn {{care._specialKey === 'none' ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onSpecialTap" data-cidx="{{cidx}}" data-special="none">普通</view>
+                  <view class="rent-mode-btn {{care._specialKey === 'entertain' ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onSpecialTap" data-cidx="{{cidx}}" data-special="entertain">招待</view>
+                  <view class="rent-mode-btn {{care._specialKey === 'warranty' ? 'rent-mode-btn--active' : ''}}"
+                        catchtap="onSpecialTap" data-cidx="{{cidx}}" data-special="warranty">质保</view>
+                </view>
+              </view>
+
+              <!-- 小计 -->
+              <view class="kv-cell">
+                <text class="kv-label">本件小计</text>
+                <text class="care-item-summary">{{care._summaryStr}}</text>
+              </view>
+
+              <!-- 备注 -->
+              <view class="form-group">
+                <view class="form-label">备注信息</view>
+                <input class="form-input"
+                       value="{{care.memo || ''}}"
+                       placeholder="板刃磨损等特殊情况..."
+                       placeholder-class="form-input-placeholder"
+                       data-cidx="{{cidx}}" data-field="memo"
+                       catchblur="onFieldBlur"/>
+              </view>
+            </view>
+          </view>
+          <view slot="right" class="swipe-delete" data-idx="{{cidx}}" catchtap="onDeleteCare">删除</view>
+        </van-swipe-cell>
+      </block>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="empty">
+      <view class="empty-icon">
+        <van-icon name="setting-o" size="48px" color="#bfc7d1"/>
+      </view>
+      <view class="empty-title">还没有添加养护装备</view>
+      <view class="empty-desc">点击下方按钮添加第一块板</view>
+    </view>
+  </block>
+
+  <!-- 底部固定区：添加入口 + 合计 / 去结算 -->
+  <view class="bottom-stack">
+    <view class="action-bar">
+      <view class="action-item action-item--wide" bindtap="onAddCare">
+        <van-icon name="plus" size="16px" color="#006495"/>
+        <text>添加装备</text>
+      </view>
+    </view>
+
+    <view class="checkout-bar">
+      <view class="checkout-info">
+        <view class="checkout-count">共 {{summary.count}} 件</view>
+        <text class="checkout-rent">合计 ¥{{summary.totalLabel}}</text>
+      </view>
+      <button
+        class="checkout-btn {{!summary.canCheckout ? 'checkout-btn--disabled' : ''}}"
+        disabled="{{!summary.canCheckout}}"
+        bindtap="onCheckout">
+        去结算
+        <van-icon name="arrow" size="14px" color="#ffffff" custom-style="margin-left:4px"/>
+      </button>
+    </view>
+  </view>
+
+  <!-- 新增品牌 modal -->
+  <van-popup show="{{addBrand.show}}" position="center" round custom-style="width: 560rpx;" bind:close="onAddBrandCancel">
+    <view class="amount-modal">
+      <view class="amount-modal-title">新增品牌</view>
+      <view class="brand-modal-body">
+        <input class="form-input" placeholder="英文名称（必填）" placeholder-class="form-input-placeholder"
+               value="{{addBrand.name}}" data-field="name" bindinput="onAddBrandInput"/>
+        <input class="form-input" placeholder="中文名称" placeholder-class="form-input-placeholder"
+               value="{{addBrand.chineseName}}" data-field="chineseName" bindinput="onAddBrandInput"/>
+      </view>
+      <view class="amount-modal-footer">
+        <view class="amount-modal-btn amount-modal-btn--cancel" catchtap="onAddBrandCancel">取消</view>
+        <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onAddBrandConfirm">确认</view>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 金额输入 modal：附加费 / 减免 -->
+  <van-popup show="{{amountModal.show}}" position="center" round custom-style="width: 560rpx;" bind:close="onAmountModalCancel">
+    <view class="amount-modal">
+      <view class="amount-modal-title">{{amountModal.title}}</view>
+      <view class="amount-modal-input-wrap">
+        <text class="amount-modal-prefix">¥</text>
+        <input class="amount-modal-input"
+               type="digit"
+               placeholder="{{amountModal.placeholder}}"
+               value="{{amountModal.value}}"
+               focus="{{amountModal.show}}"
+               bindinput="onAmountModalInput"
+               confirm-type="done"
+               bindconfirm="onAmountModalConfirm" />
+      </view>
+      <view class="amount-modal-footer">
+        <view class="amount-modal-btn amount-modal-btn--cancel" catchtap="onAmountModalCancel">取消</view>
+        <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onAmountModalConfirm">确认</view>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 优惠券选择弹层（复用旧 ticket-selector） -->
+  <van-popup show="{{ticketPopup.show}}" position="bottom" round bind:close="onTicketSelectorEvent">
+    <ticket-selector wx:if="{{ticketPopup.show}}"
+                     bindEvent="onTicketSelectorEvent"
+                     ticketType="{{'养护'}}"
+                     memberId="{{memberId}}"
+                     selectedCode="{{ticketPopup.selectedCode}}"
+                     disabledCodes="{{ticketPopup.disabledCodes}}"/>
+  </van-popup>
+
+</view>

@@ -10,6 +10,8 @@ const app = getApp();
 const util = require('../../../utils/util.js');
 
 const BIZ_LABELS = { rent: '租赁', maintain: '养护', retail: '零售' };
+// 找回中断单时从 order.type 反推 bizType（URL/draft 里的 bizType 可能与单子实际业务不符）
+const TYPE_TO_BIZ = { '租赁': 'rent', '养护': 'maintain', '零售': 'retail' };
 
 // 防御性解码：如果 options 已经是解码过的就原样返回；如果还是 %xx 格式则解一次
 function safeDecode(v) {
@@ -39,6 +41,7 @@ Page({
       shop: '',
       member_id: null,
       rentals: [],
+      cares: [],
     },
   },
 
@@ -94,13 +97,18 @@ Page({
     }
 
     if (recoveredOrder) {
-      // 恢复整单（含 id + rentals），购物车直接显示原有租赁商品，后续保存更新同一张中断单
+      // 恢复整单（含 id + rentals/cares），购物车直接显示原有商品，后续保存更新同一张中断单。
+      // bizType 以单子实际 order.type 为准：养护草稿从 URL 缺省 'rent' 进来时若不反推，会被租赁表单渲染
+      const recoveredBiz = TYPE_TO_BIZ[(recoveredOrder.type || '').trim()] || bizType;
       (recoveredOrder.rentals || []).forEach((r) => {
         r.timeStamp = (new Date(r.create_date || Date.now())).getTime();
       });
+      (recoveredOrder.cares || []).forEach((c) => {
+        c.timeStamp = (new Date(c.create_date || Date.now())).getTime();
+      });
       this.setData({
-        bizType,
-        bizLabel: BIZ_LABELS[bizType] || '业务',
+        bizType: recoveredBiz,
+        bizLabel: BIZ_LABELS[recoveredBiz] || '业务',
         shop: recoveredOrder.shop || shop,
         customer,
         order: recoveredOrder,
@@ -152,6 +160,14 @@ Page({
     this.setData({ 'order.rentals': rentals });
     // fire-and-forget：错误已在内部 console.warn，这里吞掉 rejection 避免 unhandled
     Promise.resolve(this.saveRentReceptOrder()).catch(() => {});
+  },
+
+  /* ---------- 子组件：care-recept-form 事件 ---------- */
+  onSyncCare(e) {
+    const detail = e.detail || {};
+    const cares = detail.cares || [];
+    this.setData({ 'order.cares': cares });
+    Promise.resolve(this.saveCareReceptOrder()).catch(() => {});
   },
 
   onAddAction(e) {
@@ -368,6 +384,10 @@ Page({
   },
 
   onCheckout(e) {
+    if (this.data.bizType === 'maintain') {
+      this._checkoutCare();
+      return;
+    }
     const order = this.data.order;
     if (!order || !order.id) {
       wx.showToast({ title: '订单尚未生成', icon: 'none' });
@@ -471,6 +491,117 @@ Page({
     }).catch((err) => {
       console.warn('saveRentReceptOrder failed', err);
       throw err;
+    });
+  },
+
+  /* ---------- 与后端同步：调 Care/SaveCareRecept ----------
+   * 与 saveRentReceptOrder 同模式：返回 Promise 供 _checkoutCare await 落盘。
+   * 后端 CareImage 模型没有 url/thumb 展示字段，round-trip 会把照片显示地址丢掉，
+   * 所以响应回填时按下标把本地 careImages / ticket 对象合并回去。
+   */
+  saveCareReceptOrder() {
+    const order = this.data.order;
+    if (!order.shop) {
+      wx.showToast({ title: '店铺不能为空', icon: 'error' });
+      return Promise.reject(new Error('店铺不能为空'));
+    }
+    if (!order.cares || order.cares.length === 0) {
+      // 空购物车：仅在订单已存在时同步清空，避免首次进入就生成空订单
+      if (!order.id) return Promise.resolve(null);
+    }
+
+    const localCares = (order.cares || []);
+    const payload = {
+      ...order,
+      contact_name:   this.data.customer.name || null,
+      contact_gender: this.data.customer.gender || null,
+      contact_num:    this.data.customer.cell || null,
+      member_id:      this.data.customer.memberId || null,
+      type:           '养护',
+      valid:          0,
+      recepting:      1,
+      rentals:        [],
+      cares: localCares.map((c) => {
+        const copy = { ...c };
+        // ticket/product 是前端展示对象，后端 Care 模型没有对应字段；ticket_code 标量已在 copy 里
+        copy.ticket = null;
+        copy.product = null;
+        copy.tasks = null;
+        copy.order = null;
+        return copy;
+      }),
+    };
+
+    const url = app.globalData.requestPrefix
+      + 'Care/SaveCareRecept?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+    return util.performWebRequest(url, payload).then((submitted) => {
+      if (submitted && submitted.cares) {
+        submitted.cares.forEach((c, i) => {
+          c.timeStamp = (new Date(c.create_date || Date.now())).getTime();
+          const local = localCares[i];
+          if (local) {
+            if (local.careImages && local.careImages.length > 0) c.careImages = local.careImages;
+            if (local.ticket) c.ticket = local.ticket;
+            if (local.product) c.product = local.product;
+          }
+        });
+        // 后端返回的 care.id 回填到照片关联，便于后续保存
+        submitted.cares.forEach((c) => {
+          (c.careImages || []).forEach((im) => { im.care_id = c.id || im.care_id; });
+        });
+      }
+      if (submitted) submitted.rentals = submitted.rentals || [];
+      this.setData({ order: submitted });
+      return submitted;
+    }).catch((err) => {
+      console.warn('saveCareReceptOrder failed', err);
+      throw err;
+    });
+  },
+
+  // 养护去结算：await 落盘 → Order/PlaceCareOrder → settle，本地订单脱钩（同租赁 onCheckout 约定）
+  _checkoutCare() {
+    const order = this.data.order;
+    if (!order || !order.id) {
+      wx.showToast({ title: '订单尚未生成', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '下单中…', mask: true });
+    Promise.resolve(this.saveCareReceptOrder()).then(() => {
+      const placedOrderId = (this.data.order && this.data.order.id) || order.id;
+      const placeUrl = app.globalData.requestPrefix
+        + 'Order/PlaceCareOrder/' + placedOrderId
+        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+      return util.performWebRequest(placeUrl, null);
+    }).then((careOrder) => {
+      wx.hideLoading();
+      if (!careOrder || careOrder.valid != 1) {
+        wx.showToast({ title: '下单失败', icon: 'none' });
+        return;
+      }
+      wx.navigateTo({
+        url: '/pages/payment/settle/index?orderId=' + careOrder.id,
+      });
+      // 本地订单脱钩：下一次「去结算」在后端建全新订单（同租赁写法）
+      this.setData({
+        order: {
+          ...careOrder,
+          id: 0,
+          code: null,
+          valid: 0,
+          rentals: [],
+          cares: (careOrder.cares || []).map((c) => ({
+            ...c,
+            id: 0,
+            order_id: 0,
+            careImages: (c.careImages || []).map((im) => ({ ...im, id: 0, care_id: 0 })),
+          })),
+        },
+      });
+    }).catch((err) => {
+      wx.hideLoading();
+      console.warn('care checkout failed', err);
+      // performWebRequest 已 toast 后端 message（如"非雪季养护需要匹配会员"），这里不重复弹
     });
   },
 });

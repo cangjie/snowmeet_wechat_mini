@@ -38,7 +38,15 @@
       bind:checkout="onCheckout"
       bind:sortChange="onSortChange" />
 
-    <view wx:if="{{bizType === 'maintain' || bizType === 'retail'}}" class="placeholder">
+    <care-recept-form
+      wx:if="{{bizType === 'maintain'}}"
+      shop="{{shop}}"
+      memberId="{{customer.memberId}}"
+      cares="{{order.cares}}"
+      bind:syncCare="onSyncCare"
+      bind:checkout="onCheckout" />
+
+    <view wx:if="{{bizType === 'retail'}}" class="placeholder">
       <view class="placeholder-title">{{bizLabel}}开单（下一步迁移）</view>
       <view class="placeholder-desc">该业务的接待表单组件尚未迁移</view>
     </view>

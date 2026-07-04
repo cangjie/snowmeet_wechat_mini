@@ -5,6 +5,7 @@
     "van-icon": "@vant/weapp/icon/index",
     "reception-tabbar": "/components/reception_tabbar/reception_tabbar",
     "reception-member-bar": "/components/reception/reception_member_bar/reception_member_bar",
-    "rent-recept-form": "/components/reception/rent_recept_form/rent_recept_form"
+    "rent-recept-form": "/components/reception/rent_recept_form/rent_recept_form",
+    "care-recept-form": "/components/reception/care_recept_form/care_recept_form"
   }
 }

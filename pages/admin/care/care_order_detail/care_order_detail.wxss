@@ -1,0 +1,259 @@
+/* pages/admin/care/care_order_detail/care_order_detail.wxss
+   Alpine Operational Minimalist：卡片 + 蓝竖条分组标题 + chip */
+.page-root {
+  min-height: 100vh;
+  background: #f8f9ff;
+  padding: 16rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  position: relative;
+  padding-left: 18rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2a33;
+  margin-bottom: 16rpx;
+}
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6rpx;
+  bottom: 6rpx;
+  width: 6rpx;
+  border-radius: 3rpx;
+  background: #006495;
+}
+.section-title--sub {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+}
+.section-title-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.section-title-row .section-title { margin-bottom: 16rpx; }
+
+/* 订单信息双列 */
+.info-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.info-cell {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  padding: 8rpx 0;
+  box-sizing: border-box;
+}
+.info-label {
+  font-size: 24rpx;
+  color: #6f7881;
+}
+.info-value {
+  font-size: 28rpx;
+  color: #1f2a33;
+  margin-top: 4rpx;
+  word-break: break-all;
+}
+.info-value--link { color: #006495; }
+
+/* 支付四格 */
+.pay-grid {
+  display: flex;
+  flex-direction: row;
+}
+.pay-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pay-label { font-size: 24rpx; color: #6f7881; }
+.pay-value { font-size: 28rpx; font-weight: 600; color: #1f2a33; margin-top: 6rpx; }
+.pay-value--paid { color: #15803d; }
+.pay-value--due { color: #e64340; }
+.pay-rows { margin-top: 16rpx; border-top: 1rpx solid #eef1f5; padding-top: 8rpx; }
+.pay-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10rpx 0;
+  font-size: 26rpx;
+  color: #3f4850;
+  gap: 16rpx;
+}
+.pay-row-method { width: 140rpx; }
+.pay-row-status { width: 120rpx; color: #6f7881; }
+.pay-row-date { flex: 1; color: #6f7881; }
+.pay-row-amount { font-weight: 600; }
+.pay-row--empty { color: #9aa3ac; justify-content: center; }
+
+/* chip */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  flex: none;
+}
+.chip-primary { background: #e1f0f7; color: #006495; }
+.chip-success { background: #dcfce7; color: #15803d; }
+.chip-pending { background: #fee2e2; color: #b91c1c; }
+.chip-muted { background: #eef1f5; color: #6f7881; }
+.chip-outline { background: #f4f7fa; color: #3f4850; }
+
+/* 装备卡 */
+.care-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.care-head-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12rpx;
+  min-width: 0;
+}
+.care-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2a33;
+}
+.care-chips {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 12rpx;
+}
+.care-summary {
+  margin-left: auto;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #006495;
+}
+.care-body { margin-top: 16rpx; border-top: 1rpx solid #eef1f5; padding-top: 16rpx; }
+.care-memo { font-size: 26rpx; color: #6f7881; margin-top: 8rpx; }
+
+/* 照片 */
+.photo-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+.photo-thumb {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  background: #eef1f5;
+}
+
+/* 任务时间线 */
+.task-list { display: flex; flex-direction: column; }
+.task-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f2f4f8;
+}
+.task-row--current { background: #f7fbfd; border-radius: 8rpx; padding-left: 8rpx; padding-right: 8rpx; }
+.task-main { flex: 1; min-width: 0; }
+.task-name-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10rpx;
+}
+.task-name { font-size: 28rpx; color: #1f2a33; }
+.task-meta {
+  display: flex;
+  flex-direction: row;
+  gap: 12rpx;
+  font-size: 22rpx;
+  color: #9aa3ac;
+  margin-top: 4rpx;
+}
+.task-actions { flex: none; }
+
+/* 任务操作面板 */
+.task-panel {
+  background: #f7f9fc;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  margin: 8rpx 0 12rpx;
+}
+.kv-grid { display: flex; flex-wrap: wrap; }
+.kv-item {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  padding: 8rpx;
+  box-sizing: border-box;
+}
+.panel-input {
+  background: #ffffff;
+  border: 1rpx solid #dfe5ec;
+  border-radius: 8rpx;
+  padding: 8rpx 16rpx;
+  font-size: 28rpx;
+  margin-top: 6rpx;
+}
+.panel-input--wide { margin-top: 16rpx; }
+.panel-btn-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 24rpx;
+  margin-top: 16rpx;
+}
+.panel-btn-row--split { margin-top: 24rpx; }
+
+/* 按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12rpx 32rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  line-height: 1.2;
+}
+.btn--sm { padding: 8rpx 22rpx; font-size: 24rpx; }
+.btn--primary { background: #006495; color: #ffffff; }
+.btn--danger { background: #e64340; color: #ffffff; }
+.btn--warning { background: #d97706; color: #ffffff; }
+.btn--plain { background: #ffffff; color: #006495; border: 1rpx solid #bfd7e4; }
+
+/* 发板核销 */
+.deal-method-row, .veri-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
+}
+.veri-row .panel-input { flex: 1; margin-top: 0; }
+.veri-hint {
+  font-size: 22rpx;
+  color: #9aa3ac;
+  margin-top: 12rpx;
+  text-align: center;
+}

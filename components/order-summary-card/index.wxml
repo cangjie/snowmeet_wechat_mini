@@ -11,7 +11,14 @@
       <text class="kv-label">店铺</text>
       <text class="kv-value">{{order.shop}}</text>
     </view>
-    <view class="kv-row kv-row--multiline">
+    <view wx:if="{{isCare}}" class="kv-row kv-row--multiline">
+      <text class="kv-label">养护内容</text>
+      <view class="kv-value-list">
+        <text wx:for="{{cares}}" wx:key="id" class="kv-value-item">{{item.name}}</text>
+        <text wx:if="{{cares.length === 0}}" class="kv-value-item">（无）</text>
+      </view>
+    </view>
+    <view wx:else class="kv-row kv-row--multiline">
       <text class="kv-label">租赁商品</text>
       <view class="kv-value-list">
         <text wx:for="{{rentals}}" wx:key="id" class="kv-value-item">{{item.name || '加载中…'}}</text>
