@@ -16,15 +16,20 @@
 //   首批命中即停扫 + 立即 _applySelectedShop 选中
 //
 // 失败 / 兜底分支：
-//   - 全店未配 beacon → 静默 _fallback（staff.base_shop_id → 列表第一家），不打扰
+//   - 全店未配 beacon → 静默 _fallback（staff.base_shop_id → 万龙服务中心 → 列表第一家），不打扰
+//   - scene='recept'（开单入口）：开扫前**先立即落默认店**（同 _fallback 链）并 triggerEvent，
+//     避免扫描期间/超时后无店选中把业务入口按钮卡灰；beacon 命中后覆盖这次默认选择（2026-07-08）
 //   - iOS 上 startBeaconDiscovery 失败（多为定位权限/精确位置关）→ 弹 toast 提示用户去 iOS 设置改
 //   - Android openBluetoothAdapter 失败（蓝牙未开/权限拒）→ 静默 _fallback
 //   - 30 秒超时（扫了但全程没命中） → 弹 toast「未检测到店内 beacon  配置:N / BLE:M / iBeacon:K」
-//                                    + **不自动选**，让用户手动滚 picker（避免静默选错店）
+//                                    + 不再改选（recept 场景保持默认店；其它场景维持用户手动选）
 const app = getApp()
 const util = require('../../utils/util.js')
 
 const SCAN_TIMEOUT_MS = 30 * 1000
+
+// 系统级默认店铺：staff 没有基地店（或基地店不在列表里）时的兜底默认（用户拍板 2026-07-08）
+const DEFAULT_SHOP_NAME = '万龙服务中心'
 
 // 去冒号/空格 + 大写。Android wx 回调的 deviceId 通常是 "AA:BB:CC:DD:EE:FF" 格式，
 // DB 字段约定同格式，但代码两边归一防止偶发空格/小写
@@ -78,12 +83,17 @@ function _parseIBeacon(advertisData) {
   }
 }
 
-// fallback 链：staff.base_shop_id → 列表第一家 → null
+// fallback 链：staff.base_shop_id → 万龙服务中心(DEFAULT_SHOP_NAME) → 列表第一家 → null
 function _resolveFallbackShop(shopList) {
   var staff = app.globalData && app.globalData.staff
   if (staff && staff.base_shop_id && shopList) {
     for (var i = 0; i < shopList.length; i++) {
       if (shopList[i].id === staff.base_shop_id) return shopList[i]
+    }
+  }
+  if (shopList) {
+    for (var j = 0; j < shopList.length; j++) {
+      if (shopList[j].name === DEFAULT_SHOP_NAME) return shopList[j]
     }
   }
   return shopList && shopList.length > 0 ? shopList[0] : null
@@ -254,6 +264,14 @@ Component({
         console.warn('[shop_selector] 所有店铺都未配 beacon_uuid/beacon_mac，跳过扫描走 fallback')
         that._fallback(shopList)
         return
+      }
+
+      // 开单入口（scene='recept'）：开扫前先立即落默认店并 triggerEvent，
+      // 否则扫描期间/30s 超时未命中时始终无店选中，业务入口按钮一直灰。
+      // beacon 命中后 _finalizeIfHit → _applySelectedShop 会覆盖这次默认选择。
+      if (that.properties.scene === 'recept') {
+        console.log('[shop_selector] recept 场景：扫描前先落默认店')
+        that._fallback(shopList)
       }
 
       // 实例字段（不进 data，避免 setData 开销 + 帧间稳定）

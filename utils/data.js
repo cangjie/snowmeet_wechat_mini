@@ -588,7 +588,8 @@ const getEquipBrandsPromise = function (type) {
   })
 }
 const uploadFilePromise = function (mainId, filePath, purpose, type, sessionKey) {
-  var uploadUrl = 'https://snowmeet.wanlonghuaxue.com/api/UploadFile/UploadFileWithThumb?sessionKey=' + sessionKey
+  // 2026-07-08 暂时切到 mini.snowmeet.top（wanlonghuaxue 那台对新 session 鉴权 400，待其部署对齐后再定）
+  var uploadUrl = 'https://mini.snowmeet.top/api/UploadFile/UploadFileWithThumb?sessionKey=' + sessionKey
   //+ '&purpose=' + encodeURIComponent(purpose) + '&fileType=' + encodeURIComponent(type)
   if (mainId) {
     uploadUrl += ('&mainId=' + mainId.toString())
@@ -607,14 +608,36 @@ const uploadFilePromise = function (mainId, filePath, purpose, type, sessionKey)
       name: 'file',
       url: uploadUrl,
       success: (res) => {
+        // wx.uploadFile 对任何 HTTP 状态码都走 success：非 2xx（如鉴权失败 400）必须 reject，
+        // 否则 ProblemDetails 错误体被当成 UploadFile resolve，下游拿 undefined 的 id 继续"假成功"
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          console.warn('upload failed http ' + res.statusCode, res.data)
+          reject(res)
+          return
+        }
         console.log('upload success', res)
-        resolve(JSON.parse(res.data))
-
+        try {
+          resolve(JSON.parse(res.data))
+        } catch (e) {
+          reject(e)
+        }
       },
       fail: (res) => {
-        console.log('upload failed', res)
-        resolve(JSON.parse(res))
+        console.warn('upload failed', res)
+        reject(res)
       }
+    })
+  })
+}
+// 会员养护过的装备列表（按装备类型，brand+scale 去重、按最近养护时间倒序）
+const getMemberCaredEquipmentsPromise = function (memberId, equipment, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Care/GetMemberCaredEquipments?memberId=' + memberId
+    + '&equipment=' + encodeURIComponent(equipment) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, undefined).then(function (list) {
+      resolve(list)
+    }).catch(function (exp) {
+      reject(exp)
     })
   })
 }
@@ -1149,6 +1172,7 @@ module.exports = {
   getEquipBrandsPromise,
   uploadFilePromise,
   getCareOthersServicePromise,
+  getMemberCaredEquipmentsPromise,
   getCareProductPromise,
   getRentalPromise,
   setRentItemStatsPromise,

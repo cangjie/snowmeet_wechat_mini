@@ -510,6 +510,14 @@ Page({
       if (!order.id) return Promise.resolve(null);
     }
 
+    // 装备类型（单板/双板）是每件装备的必填项：只要有一件未选类型就跳过本次保存，
+    // 不把 equipment=null 的草稿落库；等类型选定后的下一次 syncCare 再整单保存。
+    // 去结算路径不受影响：checkout 由组件 canCheckout 门控（每件「已录入」才可点，含类型必选）。
+    if ((order.cares || []).some((c) => !c.equipment)) {
+      console.log('[saveCareReceptOrder] 存在未选类型（单板/双板）的装备，跳过 SaveCareRecept');
+      return Promise.resolve(null);
+    }
+
     const localCares = (order.cares || []);
     const payload = {
       ...order,
@@ -540,7 +548,15 @@ Page({
           c.timeStamp = (new Date(c.create_date || Date.now())).getTime();
           const local = localCares[i];
           if (local) {
-            if (local.careImages && local.careImages.length > 0) c.careImages = local.careImages;
+            if (local.careImages && local.careImages.length > 0) {
+              // 保留本地展示字段（url/thumb），但按 image_id 回填服务端生成的 careImage.id。
+              // 若整个用本地对象覆盖，id 永远是 0 → 下次保存后端重复插行 + 删旧行时跟踪撞键 500
+              const srvImgs = c.careImages || [];
+              c.careImages = local.careImages.map((lim) => {
+                const hit = srvImgs.find((s) => s.image_id === lim.image_id);
+                return hit ? { ...lim, id: hit.id, care_id: hit.care_id } : lim;
+              });
+            }
             if (local.ticket) c.ticket = local.ticket;
             if (local.product) c.product = local.product;
           }

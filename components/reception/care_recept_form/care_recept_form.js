@@ -13,7 +13,8 @@ const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 
-const UPLOAD_HOST = 'https://snowmeet.wanlonghuaxue.com';
+// 2026-07-08 暂时与 data.js uploadFilePromise 的上传域名保持一致（文件落在处理上传那台服务器的磁盘）
+const UPLOAD_HOST = 'https://mini.snowmeet.top';
 
 // 新建一个空 care（snake_case 对齐后端；valid=0 草稿态，PlaceCareOrder 才置 1）
 function blankCare() {
@@ -74,6 +75,9 @@ Component({
     amountModal: { show: false, title: '', placeholder: '', value: '', cidx: -1, field: '' },
     // 优惠券弹层
     ticketPopup: { show: false, cidx: -1, selectedCode: null, disabledCodes: [] },
+    // 历史装备弹层：会员选定装备类型后，列出其养护过的同类型装备供直接选择；
+    // 也可在弹层里手动选品牌 + 填长度（列表里没有的新装备）
+    historyModal: { show: false, cidx: -1, equip: '', list: [], brandListView: [], brandIndex: null, brand: '', scale: '' },
     expandedMap: {},
   },
   observers: {
@@ -159,6 +163,7 @@ Component({
       const that = this;
       const raw = (this.data.cares || []).slice();
       const expandedMap = this.data.expandedMap || {};
+      this.data.expandedMap = expandedMap;
       const displayCares = raw.map((care, idx) => {
         const key = that._careKey(care, idx);
         // 找回中断单时后端 careImages 只带 image 导航对象，没有 van-uploader 需要的 url/thumb，补齐
@@ -172,6 +177,15 @@ Component({
         });
         const ev = that.evalCare(care);
         that.computeCharge(care);
+        // 展开状态：手动开合记录优先；无记录时「未录入完整」默认展开，并把展开态写入 expandedMap。
+        // 写入是关键——录入过程中任何字段变化（选类型/品牌/项目/照片）都会触发保存回填重渲染，
+        // 甚至录入完整后 ev.ok 翻真，若每次都按默认规则现算，卡片会被自动折叠打断录入。
+        // 记住展开态后，只有用户手动点头部才会收起（2026-07-08 用户拍板：录入中永不自动折叠）
+        let expanded = expandedMap[key];
+        if (expanded === undefined) {
+          expanded = !ev.ok;
+          if (expanded) expandedMap[key] = true;
+        }
         const brandDisp = care.brand ? String(care.brand).split('/')[0] : '';
         const titleParts = [];
         titleParts.push(care.equipment || '待选类型');
@@ -192,7 +206,7 @@ Component({
         return {
           ...care,
           _key: key,
-          _expanded: expandedMap[key] === undefined ? care.id === 0 && !ev.ok : expandedMap[key],
+          _expanded: expanded,
           _entered: ev.ok,
           _statusLabel: ev.label,
           _title: titleParts.join(' · '),
@@ -357,14 +371,78 @@ Component({
     onEquipTap(e) {
       const cidx = Number(e.currentTarget.dataset.cidx);
       const equip = e.currentTarget.dataset.equip;
+      const cur = this.data.displayCares[cidx];
+      if (cur && cur.equipment === equip) return; // 重复点同类型：不动数据也不弹历史
       this._mutate(cidx, (c) => {
-        if (c.equipment === equip) return;
         c.equipment = equip;
         // 换类型后品牌/其它服务字典跟随切换，原选择作废
         c.brand = null;
         c.repair_memo = null;
         c.need_repair = 0;
       });
+      this._maybeShowHistory(cidx, equip);
+    },
+    /* ---------- 历史装备弹层：会员 + 有同类型养护记录才弹 ---------- */
+    _maybeShowHistory(cidx, equip) {
+      const that = this;
+      const memberId = this.data.memberId;
+      if (!memberId) return; // 散客：直接在页面上填品牌/长度
+      data.getMemberCaredEquipmentsPromise(memberId, equip, app.globalData.sessionKey).then((list) => {
+        list = list || [];
+        // 异步返回时确认该装备的类型没有再被切换
+        const cur = that.data.displayCares[cidx];
+        if (!cur || cur.equipment !== equip) return;
+        if (list.length === 0) return; // 无历史记录：不弹，走页面填写
+        const view = list.map((it) => ({
+          ...it,
+          _brandDisp: it.brand ? String(it.brand).split('/')[0] : '',
+          _dateStr: it.last_care_date ? String(it.last_care_date).slice(0, 10) : '',
+        }));
+        const brandListView = that._brandListFor({ equipment: equip }).map((b) => b.displayedName);
+        that.setData({
+          historyModal: {
+            show: true, cidx, equip, list: view,
+            brandListView, brandIndex: null, brand: '', scale: '',
+          },
+        });
+      }).catch(() => {}); // 查询失败静默降级为页面填写
+    },
+    onHistoryPick(e) {
+      const idx = Number(e.currentTarget.dataset.idx);
+      const m = this.data.historyModal;
+      const item = m.list[idx];
+      if (!item) return;
+      this._mutate(m.cidx, (c) => {
+        c.brand = item.brand || null;
+        c.scale = item.scale || null;
+      });
+      this.setData({ 'historyModal.show': false });
+    },
+    onHistoryBrandChange(e) {
+      const idx = Number(e.detail.value);
+      const name = this.data.historyModal.brandListView[idx];
+      this.setData({ 'historyModal.brandIndex': idx, 'historyModal.brand': name || '' });
+    },
+    onHistoryScaleInput(e) {
+      this.setData({ 'historyModal.scale': e.detail.value });
+    },
+    onHistoryManualConfirm() {
+      const m = this.data.historyModal;
+      const brand = (m.brand || '').trim();
+      const scale = (m.scale || '').trim();
+      if (!brand || !scale) {
+        wx.showToast({ title: '请选择品牌并填写长度', icon: 'none' });
+        return;
+      }
+      this._mutate(m.cidx, (c) => {
+        c.brand = brand;
+        c.scale = scale;
+      });
+      this.setData({ 'historyModal.show': false });
+    },
+    onHistoryClose() {
+      // 跳过：不改动 care，店员回到页面上照常填写
+      this.setData({ 'historyModal.show': false });
     },
     onBrandChange(e) {
       const cidx = Number(e.currentTarget.dataset.cidx);

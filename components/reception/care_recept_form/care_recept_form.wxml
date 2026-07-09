@@ -300,4 +300,48 @@
                      disabledCodes="{{ticketPopup.disabledCodes}}"/>
   </van-popup>
 
+  <!-- 历史装备弹层：会员养护过的同类型装备直接选择，或手动填品牌/长度 -->
+  <van-popup show="{{historyModal.show}}" position="bottom" round bind:close="onHistoryClose">
+    <view class="history-modal">
+      <view class="history-modal-title">该会员养护过的{{historyModal.equip}}</view>
+      <view class="history-modal-subtitle">点击直接带入品牌和长度</view>
+      <scroll-view scroll-y class="history-list">
+        <view class="history-item" wx:for="{{historyModal.list}}" wx:key="index"
+              data-idx="{{index}}" catchtap="onHistoryPick">
+          <view class="history-item-main">
+            <text class="history-item-brand">{{item._brandDisp}}</text>
+            <text wx:if="{{item.scale}}" class="history-item-scale">{{item.scale}}cm</text>
+          </view>
+          <text class="history-item-date">上次养护 {{item._dateStr}}</text>
+          <van-icon name="arrow" size="14px" color="#bfc7d1"/>
+        </view>
+      </scroll-view>
+      <view class="history-manual">
+        <view class="history-manual-label">不在列表里？直接填写新装备：</view>
+        <view class="kv-row">
+          <view class="kv-cell">
+            <text class="kv-label">品牌</text>
+            <picker range="{{historyModal.brandListView}}"
+                    value="{{historyModal.brandIndex || 0}}"
+                    bindchange="onHistoryBrandChange">
+              <view class="kv-picker-text">{{historyModal.brand || '点此选择品牌'}}</view>
+            </picker>
+          </view>
+          <view class="kv-cell">
+            <text class="kv-label">长度 (cm)</text>
+            <input class="kv-input" type="digit"
+                   value="{{historyModal.scale}}"
+                   placeholder="如 170"
+                   placeholder-class="form-input-placeholder"
+                   bindinput="onHistoryScaleInput"/>
+          </view>
+        </view>
+      </view>
+      <view class="amount-modal-footer">
+        <view class="amount-modal-btn amount-modal-btn--cancel" catchtap="onHistoryClose">跳过</view>
+        <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onHistoryManualConfirm">确认填写</view>
+      </view>
+    </view>
+  </van-popup>
+
 </view>

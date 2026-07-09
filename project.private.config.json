@@ -3,11 +3,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pay",
-          "pathName": "pages/order/payment_entry",
-          "query": "paymentId=42691",
+          "name": "deposit",
+          "pathName": "pages/admin/deposit/deposit_account_list",
+          "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "pay",
+          "pathName": "pages/order/payment_entry",
+          "query": "paymentId=42693",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "orderverify",
