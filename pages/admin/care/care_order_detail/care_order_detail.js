@@ -8,8 +8,8 @@ const app = getApp();
 const util = require('../../../../utils/util.js');
 const data = require('../../../../utils/data.js');
 
-// 2026-07-08 暂时与 data.js uploadFilePromise 的上传域名保持一致（新流程照片落在 mini 那台磁盘）
-const IMG_HOST = 'https://mini.snowmeet.top';
+// 与 data.js uploadFilePromise 的上传域名保持一致（照片落在处理上传那台服务器的磁盘）
+const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com';
 
 function fullUrl(p) {
   if (!p) return '';

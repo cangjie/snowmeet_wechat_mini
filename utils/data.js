@@ -588,8 +588,8 @@ const getEquipBrandsPromise = function (type) {
   })
 }
 const uploadFilePromise = function (mainId, filePath, purpose, type, sessionKey) {
-  // 2026-07-08 暂时切到 mini.snowmeet.top（wanlonghuaxue 那台对新 session 鉴权 400，待其部署对齐后再定）
-  var uploadUrl = 'https://mini.snowmeet.top/api/UploadFile/UploadFileWithThumb?sessionKey=' + sessionKey
+  // 2026-07-09 改回 snowmeet.wanlonghuaxue.com（7-8 曾暂切 mini.snowmeet.top 排查鉴权 400）
+  var uploadUrl = 'https://snowmeet.wanlonghuaxue.com/api/UploadFile/UploadFileWithThumb?sessionKey=' + sessionKey
   //+ '&purpose=' + encodeURIComponent(purpose) + '&fileType=' + encodeURIComponent(type)
   if (mainId) {
     uploadUrl += ('&mainId=' + mainId.toString())
