@@ -1,9 +1,10 @@
 // components/reception/ticket_card_selector/ticket_card_selector.js
 // 养护开单「优惠券 / 会员卡」双 tab 选择弹层（自带 van-popup）
-// - 优惠券 tab：列 code / 名称 / 到期日 / 来源(create_memo)，单选 + 「不使用优惠券」
-//   事件契约与旧 ticket_list 一致：triggerEvent('Event', {action:'cancel'})
-//   / {action:'confirm', selectedTicket}（selectedTicket=null 表示清除所选券）
-// - 会员卡 tab：纯展示不可选。卡名含「季卡」显示上次使用时间，其余按次卡显示已用/剩余
+// - 优惠券 tab：列 code / 名称 / 到期日 / 来源(create_memo)
+// - 会员卡 tab：卡名含「季卡」显示上次使用时间，其余按次卡显示已用/剩余
+// - 全局单选：券与券、卡与卡、券与卡互斥，外加「不使用」；确认时三者最多一个非空
+//   事件契约：triggerEvent('Event', {action:'cancel'})
+//   / {action:'confirm', selectedTicket, selectedCard}（都为 null 表示清除所选）
 const app = getApp();
 const util = require('../../../utils/util.js');
 const data = require('../../../utils/data.js');
@@ -30,6 +31,7 @@ Component({
     ticketType: { type: String, value: '养护' },
     memberId: { type: Number, value: 0 },
     selectedCode: { type: String, value: null },
+    selectedCardId: { type: null, value: null },
     disabledCodes: { type: Array, value: [] },
   },
   data: {
@@ -38,16 +40,18 @@ Component({
     cardsLoading: false,
     tickets: [],
     cards: [],
-    pickedCode: null,    // 当前选中券 code
-    pickedNone: false,   // 选中「不使用优惠券」
+    pickedCode: null,    // 当前选中券 code（与 pickedCardId/pickedNone 互斥）
+    pickedCardId: null,  // 当前选中卡 id
+    pickedNone: false,   // 选中「不使用」
   },
   methods: {
     _load() {
       const that = this;
       const memberId = this.data.memberId;
       this.setData({
-        activeTab: 'ticket',
-        pickedCode: this.data.selectedCode || null,
+        activeTab: this.data.selectedCardId ? 'card' : 'ticket',
+        pickedCode: this.data.selectedCardId ? null : (this.data.selectedCode || null),
+        pickedCardId: this.data.selectedCardId || null,
         pickedNone: false,
         tickets: [],
         cards: [],
@@ -87,27 +91,38 @@ Component({
       const idx = Number(e.currentTarget.dataset.idx);
       const t = this.data.tickets[idx];
       if (!t || t._disabled) return;
-      this.setData({ pickedCode: t.code, pickedNone: false });
+      this.setData({ pickedCode: t.code, pickedCardId: null, pickedNone: false });
+    },
+    onCardTap(e) {
+      const idx = Number(e.currentTarget.dataset.idx);
+      const c = this.data.cards[idx];
+      if (!c) return;
+      this.setData({ pickedCardId: c.id, pickedCode: null, pickedNone: false });
     },
     onNoneTap() {
-      this.setData({ pickedCode: null, pickedNone: true });
+      this.setData({ pickedCode: null, pickedCardId: null, pickedNone: true });
     },
     onClose() {
       this.triggerEvent('Event', { action: 'cancel' });
     },
     onConfirm() {
       if (this.data.pickedNone) {
-        this.triggerEvent('Event', { action: 'confirm', selectedTicket: null });
+        this.triggerEvent('Event', { action: 'confirm', selectedTicket: null, selectedCard: null });
         return;
       }
-      const code = this.data.pickedCode;
-      if (!code) {
-        // 没做任何选择，等同取消
-        this.triggerEvent('Event', { action: 'cancel' });
+      if (this.data.pickedCode) {
+        const code = this.data.pickedCode;
+        const ticket = this.data.tickets.filter((t) => t.code === code)[0] || null;
+        this.triggerEvent('Event', { action: 'confirm', selectedTicket: ticket, selectedCard: null });
         return;
       }
-      const ticket = this.data.tickets.filter((t) => t.code === code)[0] || null;
-      this.triggerEvent('Event', { action: 'confirm', selectedTicket: ticket });
+      if (this.data.pickedCardId) {
+        const card = this.data.cards.filter((c) => c.id === this.data.pickedCardId)[0] || null;
+        this.triggerEvent('Event', { action: 'confirm', selectedTicket: null, selectedCard: card });
+        return;
+      }
+      // 没做任何选择，等同取消
+      this.triggerEvent('Event', { action: 'cancel' });
     },
   },
 });

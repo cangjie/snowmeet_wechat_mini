@@ -559,6 +559,9 @@ Page({
             }
             if (local.ticket) c.ticket = local.ticket;
             if (local.product) c.product = local.product;
+            // card_id/card_name 后端 Care 无对应列不回传，从本地带回（use_card 本身后端持久化）
+            c.card_id = local.card_id || null;
+            c.card_name = local.card_name || null;
           }
         });
         // 后端返回的 care.id 回填到照片关联，便于后续保存

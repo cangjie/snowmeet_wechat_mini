@@ -38,39 +38,51 @@
             <view class="radio-dot {{pickedNone ? 'radio-dot--active' : ''}}"></view>
           </view>
           <view class="tcs-item-body">
-            <view class="tcs-item-name tcs-item-name--none">不使用优惠券</view>
+            <view class="tcs-item-name tcs-item-name--none">不使用优惠券/会员卡</view>
           </view>
         </view>
       </block>
     </scroll-view>
 
-    <!-- 会员卡 tab：纯展示 -->
+    <!-- 会员卡 tab：与优惠券全局互斥单选 -->
     <scroll-view wx:else class="tcs-list" scroll-y>
       <view wx:if="{{cardsLoading}}" class="tcs-tip">加载中…</view>
       <view wx:elif="{{cards.length === 0}}" class="tcs-tip">暂无会员卡</view>
       <block wx:else>
-        <view wx:for="{{cards}}" wx:key="id" class="tcs-card">
-          <view class="tcs-card-head">
-            <text class="tcs-chip {{item.biz_type === '养护' ? 'tcs-chip--care' : 'tcs-chip--rent'}}">{{item.biz_type}}</text>
-            <text class="tcs-card-name">{{item.card_name}}</text>
+        <view wx:for="{{cards}}" wx:key="id"
+          class="tcs-item {{pickedCardId === item.id ? 'tcs-item--active' : ''}}"
+          data-idx="{{index}}" bindtap="onCardTap">
+          <view class="tcs-item-radio">
+            <view class="radio-dot {{pickedCardId === item.id ? 'radio-dot--active' : ''}}"></view>
           </view>
-          <view wx:if="{{item._isSeason}}" class="tcs-card-meta">
-            <text>上次使用：{{item._lastUsed}}</text>
+          <view class="tcs-item-body">
+            <view class="tcs-card-head">
+              <text class="tcs-chip {{item.biz_type === '养护' ? 'tcs-chip--care' : 'tcs-chip--rent'}}">{{item.biz_type}}</text>
+              <text class="tcs-card-name">{{item.card_name}}</text>
+            </view>
+            <view wx:if="{{item._isSeason}}" class="tcs-card-meta">
+              <text>上次使用：{{item._lastUsed}}</text>
+            </view>
+            <view wx:else class="tcs-card-meta">
+              <text>已用 {{item.punches}} 次</text>
+              <text class="tcs-card-remaining">剩余 {{item.remaining}} 次</text>
+            </view>
           </view>
-          <view wx:else class="tcs-card-meta">
-            <text>已用 {{item.punches}} 次</text>
-            <text class="tcs-card-remaining">剩余 {{item.remaining}} 次</text>
+        </view>
+        <view class="tcs-item {{pickedNone ? 'tcs-item--active' : ''}}" bindtap="onNoneTap">
+          <view class="tcs-item-radio">
+            <view class="radio-dot {{pickedNone ? 'radio-dot--active' : ''}}"></view>
+          </view>
+          <view class="tcs-item-body">
+            <view class="tcs-item-name tcs-item-name--none">不使用优惠券/会员卡</view>
           </view>
         </view>
       </block>
     </scroll-view>
 
-    <view wx:if="{{activeTab === 'ticket'}}" class="tcs-footer">
+    <view class="tcs-footer">
       <view class="tcs-foot-btn tcs-foot-btn--ghost" bindtap="onClose">取消</view>
       <view class="tcs-foot-btn tcs-foot-btn--primary" bindtap="onConfirm">确认</view>
-    </view>
-    <view wx:else class="tcs-footer">
-      <view class="tcs-foot-btn tcs-foot-btn--ghost" bindtap="onClose">关闭</view>
     </view>
   </view>
 </van-popup>

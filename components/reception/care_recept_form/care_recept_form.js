@@ -45,6 +45,9 @@ function blankCare() {
     discount: 0,
     ticket_code: null,
     ticket_discount: 0,
+    use_card: false,
+    card_id: null,   // 所选会员卡（后端 Care 无对应列，仅前端标量，随 use_card 一起维护）
+    card_name: null,
     common_charge: 0,
     memo: null,
     others_associates: null,
@@ -73,8 +76,8 @@ Component({
     addBrand: { show: false, cidx: -1, name: '', chineseName: '' },
     // 金额输入 modal（附加费 / 减免，复用租赁的 amount-modal 样式）
     amountModal: { show: false, title: '', placeholder: '', value: '', cidx: -1, field: '' },
-    // 优惠券弹层
-    ticketPopup: { show: false, cidx: -1, selectedCode: null, disabledCodes: [] },
+    // 优惠券/会员卡弹层
+    ticketPopup: { show: false, cidx: -1, selectedCode: null, selectedCardId: null, disabledCodes: [] },
     // 历史装备弹层：会员选定装备类型后，列出其养护过的同类型装备供直接选择；
     // 也可在弹层里手动选品牌 + 填长度（列表里没有的新装备）
     historyModal: { show: false, cidx: -1, equip: '', list: [], brandListView: [], brandIndex: null, brand: '', scale: '' },
@@ -148,6 +151,7 @@ Component({
       if (care.entertain) chips.push('招待');
       if (care.warranty) chips.push('质保');
       if (care.ticket_code) chips.push('券');
+      else if (care.use_card) chips.push('卡');
       return chips;
     },
     computeCharge(care) {
@@ -662,7 +666,12 @@ Component({
         .filter((c, i) => i !== cidx && c.ticket_code)
         .map((c) => c.ticket_code);
       this.setData({
-        ticketPopup: { show: true, cidx, selectedCode: (care && care.ticket_code) || null, disabledCodes },
+        ticketPopup: {
+          show: true, cidx,
+          selectedCode: (care && care.ticket_code) || null,
+          selectedCardId: (care && care.use_card && care.card_id) || null,
+          disabledCodes,
+        },
       });
     },
     onTicketSelectorEvent(e) {
@@ -673,9 +682,22 @@ Component({
         return;
       }
       const ticket = e.detail.selectedTicket || null;
+      const card = e.detail.selectedCard || null;
       this.setData({ 'ticketPopup.show': false });
       this._mutate(cidx, (c) => {
-        if (ticket) {
+        if (card) {
+          // 选会员卡：与券互斥，清券侧字段；落 use_card（后端持久化）+ 卡展示标量
+          c.ticket = null;
+          c.ticket_code = null;
+          c.free_wax = 0;
+          c.discount = 0;
+          c.use_card = true;
+          c.card_id = card.id;
+          c.card_name = card.card_name;
+        } else if (ticket) {
+          c.use_card = false;
+          c.card_id = null;
+          c.card_name = null;
           c.ticket = ticket;
           c.ticket_code = ticket.code;
           if (ticket.template_id === 12) {
@@ -698,6 +720,9 @@ Component({
           c.ticket_code = null;
           c.free_wax = 0;
           c.discount = 0;
+          c.use_card = false;
+          c.card_id = null;
+          c.card_name = null;
         }
       });
       const cur = that.data.displayCares[cidx];

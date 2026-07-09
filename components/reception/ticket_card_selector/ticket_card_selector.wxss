@@ -129,14 +129,7 @@
   color: #9aa4b2;
 }
 
-/* ---- 会员卡行 ---- */
-.tcs-card {
-  padding: 20rpx 24rpx;
-  border-bottom: 1rpx solid #f3f4f6;
-}
-.tcs-card:last-child {
-  border-bottom: none;
-}
+/* ---- 会员卡行（行容器复用 .tcs-item） ---- */
 .tcs-card-head {
   display: flex;
   align-items: center;
