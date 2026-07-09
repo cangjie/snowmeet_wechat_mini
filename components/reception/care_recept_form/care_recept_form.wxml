@@ -290,15 +290,13 @@
     </view>
   </van-popup>
 
-  <!-- 优惠券选择弹层（复用旧 ticket-selector） -->
-  <van-popup show="{{ticketPopup.show}}" position="bottom" round bind:close="onTicketSelectorEvent">
-    <ticket-selector wx:if="{{ticketPopup.show}}"
-                     bindEvent="onTicketSelectorEvent"
-                     ticketType="{{'养护'}}"
-                     memberId="{{memberId}}"
-                     selectedCode="{{ticketPopup.selectedCode}}"
-                     disabledCodes="{{ticketPopup.disabledCodes}}"/>
-  </van-popup>
+  <!-- 优惠券/会员卡选择弹层（双 tab，自带 popup） -->
+  <ticket-card-selector show="{{ticketPopup.show}}"
+                        bindEvent="onTicketSelectorEvent"
+                        ticketType="养护"
+                        memberId="{{memberId}}"
+                        selectedCode="{{ticketPopup.selectedCode}}"
+                        disabledCodes="{{ticketPopup.disabledCodes}}"/>
 
   <!-- 历史装备弹层：会员养护过的同类型装备直接选择，或手动填品牌/长度 -->
   <van-popup show="{{historyModal.show}}" position="bottom" round bind:close="onHistoryClose">

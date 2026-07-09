@@ -5,6 +5,6 @@
     "van-popup": "@vant/weapp/popup/index",
     "van-swipe-cell": "@vant/weapp/swipe-cell/index",
     "van-uploader": "@vant/weapp/uploader/index",
-    "ticket-selector": "../../ticket_selector/ticket_list"
+    "ticket-card-selector": "../ticket_card_selector/ticket_card_selector"
   }
 }

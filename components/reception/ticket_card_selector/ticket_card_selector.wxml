@@ -1,0 +1,76 @@
+<van-popup show="{{show}}" position="bottom" round bind:close="onClose">
+  <view class="tcs-wrap">
+    <view class="tcs-header">
+      <view class="tcs-tabs">
+        <view class="tcs-tab {{activeTab === 'ticket' ? 'tcs-tab--active' : ''}}"
+          data-tab="ticket" bindtap="onTabTap">优惠券</view>
+        <view class="tcs-tab {{activeTab === 'card' ? 'tcs-tab--active' : ''}}"
+          data-tab="card" bindtap="onTabTap">会员卡</view>
+      </view>
+      <view class="tcs-close" bindtap="onClose">
+        <van-icon name="cross" size="22px" color="#6b7280"/>
+      </view>
+    </view>
+
+    <!-- 优惠券 tab：单选 -->
+    <scroll-view wx:if="{{activeTab === 'ticket'}}" class="tcs-list" scroll-y>
+      <view wx:if="{{ticketsLoading}}" class="tcs-tip">加载中…</view>
+      <view wx:elif="{{tickets.length === 0}}" class="tcs-tip">暂无可用优惠券</view>
+      <block wx:else>
+        <view wx:for="{{tickets}}" wx:key="code"
+          class="tcs-item {{item._disabled ? 'tcs-item--disabled' : ''}} {{pickedCode === item.code ? 'tcs-item--active' : ''}}"
+          data-idx="{{index}}" bindtap="onTicketTap">
+          <view class="tcs-item-radio">
+            <view class="radio-dot {{item._disabled ? 'radio-dot--disabled' : ''}} {{pickedCode === item.code ? 'radio-dot--active' : ''}}"></view>
+          </view>
+          <view class="tcs-item-body">
+            <view class="tcs-item-name">{{item.name}}</view>
+            <view class="tcs-item-code">{{item.code}}</view>
+            <view class="tcs-item-meta">
+              <text>到期 {{item._expire}}</text>
+              <text wx:if="{{item._memo}}" class="tcs-item-memo">{{item._memo}}</text>
+              <text wx:if="{{item._disabled}}" class="tcs-item-occupied">本单其它装备已选</text>
+            </view>
+          </view>
+        </view>
+        <view class="tcs-item {{pickedNone ? 'tcs-item--active' : ''}}" bindtap="onNoneTap">
+          <view class="tcs-item-radio">
+            <view class="radio-dot {{pickedNone ? 'radio-dot--active' : ''}}"></view>
+          </view>
+          <view class="tcs-item-body">
+            <view class="tcs-item-name tcs-item-name--none">不使用优惠券</view>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+
+    <!-- 会员卡 tab：纯展示 -->
+    <scroll-view wx:else class="tcs-list" scroll-y>
+      <view wx:if="{{cardsLoading}}" class="tcs-tip">加载中…</view>
+      <view wx:elif="{{cards.length === 0}}" class="tcs-tip">暂无会员卡</view>
+      <block wx:else>
+        <view wx:for="{{cards}}" wx:key="id" class="tcs-card">
+          <view class="tcs-card-head">
+            <text class="tcs-chip {{item.biz_type === '养护' ? 'tcs-chip--care' : 'tcs-chip--rent'}}">{{item.biz_type}}</text>
+            <text class="tcs-card-name">{{item.card_name}}</text>
+          </view>
+          <view wx:if="{{item._isSeason}}" class="tcs-card-meta">
+            <text>上次使用：{{item._lastUsed}}</text>
+          </view>
+          <view wx:else class="tcs-card-meta">
+            <text>已用 {{item.punches}} 次</text>
+            <text class="tcs-card-remaining">剩余 {{item.remaining}} 次</text>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+
+    <view wx:if="{{activeTab === 'ticket'}}" class="tcs-footer">
+      <view class="tcs-foot-btn tcs-foot-btn--ghost" bindtap="onClose">取消</view>
+      <view class="tcs-foot-btn tcs-foot-btn--primary" bindtap="onConfirm">确认</view>
+    </view>
+    <view wx:else class="tcs-footer">
+      <view class="tcs-foot-btn tcs-foot-btn--ghost" bindtap="onClose">关闭</view>
+    </view>
+  </view>
+</van-popup>

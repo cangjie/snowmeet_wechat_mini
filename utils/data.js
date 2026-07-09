@@ -1079,6 +1079,17 @@ const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey)
     })
   })
 }
+// 会员名下各类卡（次卡/季卡），staff≥100；返回 id/biz_type/card_name/total/punches/remaining/lastUsedDate
+const getMemberCardsPromise = function (memberId, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'MemberAdmin/GetMemberCardsByStaff?memberId=' + memberId + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (cards) {
+      resolve(cards)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const getUnreturnedRentItemPromise = function (shop, sessionKey){
 
   var getUrl = app.globalData.requestPrefix + 'Rent/GetUnReturnedRentItemsByStaff?sessionKey=' + sessionKey
@@ -1212,6 +1223,7 @@ module.exports = {
   searchDepositAccountsByStaffPromise,
   getDepositAccountDetailByStaffPromise,
   getMemberTicketsPromise,
+  getMemberCardsPromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,
   getOrderBalancePromise,
