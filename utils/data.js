@@ -1079,6 +1079,22 @@ const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey)
     })
   })
 }
+// 养护服务费服务端计算（真理之源，与 PlaceCareOrder 同一套定价）：POST care 对象，
+// 返回 { commonCharge, ticketDiscount }（ticketDiscount 仅券16 有值：双项30/单项20）
+const calcCareChargePromise = function (shop, memberId, care, sessionKey) {
+  var postUrl = app.globalData.requestPrefix + 'Care/CalcCareCharge?shop=' + encodeURIComponent(shop)
+    + '&sessionKey=' + sessionKey
+  if (memberId != null) {
+    postUrl += '&memberId=' + memberId
+  }
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(postUrl, care).then(function (res) {
+      resolve(res)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 // 会员名下各类卡（次卡/季卡），staff≥100；bizType（养护/租赁）按业务线过滤，不传返回全部
 const getMemberCardsPromise = function (memberId, bizType, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'MemberAdmin/GetMemberCardsByStaff?memberId=' + memberId + '&sessionKey=' + sessionKey
@@ -1227,6 +1243,7 @@ module.exports = {
   getDepositAccountDetailByStaffPromise,
   getMemberTicketsPromise,
   getMemberCardsPromise,
+  calcCareChargePromise,
   getUnreturnedRentItemPromise,
   queryRentItemChangeCompatibleCategory,
   getOrderBalancePromise,

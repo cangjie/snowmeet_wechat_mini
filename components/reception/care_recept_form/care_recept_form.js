@@ -261,81 +261,42 @@ Component({
       this._refreshCares();
       this._emitSync(needUpdate);
     },
-    /* ---------- 估价（展示用；真理之源是 PlaceCareOrder 服务端重算） ---------- */
+    /* ---------- 计费（服务端计算，与 PlaceCareOrder 共用 CareController.CalcCharge；
+       附加费/减免由 computeCharge 在服务费之上累加） ---------- */
     _fetchPrice(cidx) {
       const that = this;
       const care = this.data.displayCares[cidx];
       if (!care) return;
-      // 票券定价路径
-      if (care.ticket_code && care.ticket && care.ticket.template_id === 12) {
-        that._applyTicketPrice(cidx);
-        return;
-      }
-      if (care.summer != null) {
-        that._mutate(cidx, (c) => { c.common_charge = 330; });
-        return;
-      }
-      let serviceName = null;
-      if (care.need_edge === 1 && care.need_wax === 1) serviceName = '双项';
-      else if (care.need_wax === 1) serviceName = '打蜡';
-      else if (care.need_edge === 1) serviceName = '修刃';
-      if (!serviceName) {
-        that._mutate(cidx, (c) => { c.common_charge = 0; });
-        return;
-      }
-      data.getCareProductPromise(this.data.shop, serviceName, care.urgent).then((product) => {
-        that._mutate(cidx, (c) => {
-          c.common_charge = product ? product.sale_price : 0;
-          c.product = product || null;
+      // 提交剥离 UI 字段的 care（含项目/券码/use_card/summer 等），导航对象与照片置空瘦身
+      const payload = this._stripUI(care);
+      payload.ticket = null;
+      payload.product = null;
+      payload.careImages = null;
+      // 防竞态：按卡片 key 记序号，过期响应丢弃；响应时按 key 反查下标（防中途增删卡片下标漂移）
+      const key = care._key || 'i' + cidx;
+      this._priceSeqMap = this._priceSeqMap || {};
+      const seq = (this._priceSeqMap[key] || 0) + 1;
+      this._priceSeqMap[key] = seq;
+      data.calcCareChargePromise(this.data.shop, this.data.memberId || null, payload, app.globalData.sessionKey)
+        .then((res) => {
+          if (that._priceSeqMap[key] !== seq) return;
+          const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
+          if (idx < 0) return;
+          that._mutate(idx, (c) => {
+            c.common_charge = (res && res.commonCharge) || 0;
+            c.product = null;
+            // 券16 减免由服务端算（双项30/单项20）；非16券绝不回写，保住店员手动减免
+            if (c.ticket && c.ticket.template_id === 16) {
+              c.discount = (res && res.ticketDiscount) || 0;
+            }
+          });
+        })
+        .catch(() => {
+          if (that._priceSeqMap[key] !== seq) return;
+          const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
+          if (idx < 0) return;
+          that._mutate(idx, (c) => { c.common_charge = 0; });
         });
-        // 16 号折扣券随项目变化重算减免
-        const cur = that.data.displayCares[cidx];
-        if (cur && cur.ticket_code && cur.ticket && cur.ticket.template_id === 16) {
-          that._applyTicket16Discount(cidx);
-        }
-      }).catch(() => {
-        that._mutate(cidx, (c) => { c.common_charge = 0; });
-      });
-    },
-    // 票券 12（免费机打蜡）：按票模板产品 fixed_price 定价（对齐旧 getTicketProduct）
-    _applyTicketPrice(cidx) {
-      const that = this;
-      const care = this.data.displayCares[cidx];
-      const ticket = care.ticket;
-      if (!ticket || !ticket.template || !ticket.template.productTicketTemplates
-        || ticket.template.productTicketTemplates.length === 0) return;
-      const templates = ticket.template.productTicketTemplates;
-      const pick = (item) => {
-        for (let i = 0; i < templates.length; i++) {
-          const prodName = (templates[i].product && templates[i].product.name) || '';
-          if (item === '修刃' && prodName.indexOf('修刃') >= 0 && prodName.indexOf('打蜡') < 0) return templates[i];
-          if (item === '打蜡' && prodName.indexOf('修刃') < 0 && prodName.indexOf('打蜡') >= 0) return templates[i];
-          if (item === '双项' && prodName.indexOf('修刃') >= 0 && prodName.indexOf('打蜡') >= 0) return templates[i];
-        }
-        return null;
-      };
-      let template = null;
-      if (care.free_wax === 1) {
-        template = care.need_edge === 1 ? pick('修刃') : null;
-      } else {
-        template = care.need_edge === 1 ? pick('双项') : pick('打蜡');
-      }
-      that._mutate(cidx, (c) => {
-        if (template) {
-          c.product = template.product;
-          c.common_charge = template.fixed_price;
-        } else {
-          c.product = null;
-          c.common_charge = 0;
-        }
-      });
-    },
-    // 票券 16（折扣券）：双项减 30 / 单项减 20（对齐旧 setDiscount）
-    _applyTicket16Discount(cidx) {
-      this._mutate(cidx, (c) => {
-        if (c.need_edge === 1 && c.need_wax === 1) c.discount = 30;
-        else if (c.need_edge === 1 || c.need_wax === 1) c.discount = 20;
-      });
     },
     /* ---------- 卡片开合 / 增删 ---------- */
     onToggleCare(e) {
@@ -737,14 +698,7 @@ Component({
           c.card_name = null;
         }
       });
-      const cur = that.data.displayCares[cidx];
-      if (cur && cur.ticket_code && cur.ticket) {
-        if (cur.ticket.template_id === 12) that._applyTicketPrice(cidx);
-        else if (cur.ticket.template_id === 16) that._applyTicket16Discount(cidx);
-        else that._fetchPrice(cidx);
-      } else {
-        that._fetchPrice(cidx);
-      }
+      that._fetchPrice(cidx);
     },
     /* ---------- 结算 ---------- */
     onCheckout() {
