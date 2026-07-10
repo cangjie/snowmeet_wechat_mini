@@ -74,7 +74,8 @@ Component({
           that.setData({ tickets: list, ticketsLoading: false });
         })
         .catch(() => that.setData({ ticketsLoading: false }));
-      data.getMemberCardsPromise(memberId, app.globalData.sessionKey)
+      // 只列本业务线的卡（养护开单不显示租赁次卡），ticketType 与券的 bizType 同值复用
+      data.getMemberCardsPromise(memberId, this.data.ticketType, app.globalData.sessionKey)
         .then((cards) => {
           const list = (cards || []).map((c) => Object.assign(c, {
             _isSeason: (c.card_name || '').indexOf('季卡') >= 0,

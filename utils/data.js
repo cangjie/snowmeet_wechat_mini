@@ -1079,9 +1079,12 @@ const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey)
     })
   })
 }
-// 会员名下各类卡（次卡/季卡），staff≥100；返回 id/biz_type/card_name/total/punches/remaining/lastUsedDate
-const getMemberCardsPromise = function (memberId, sessionKey) {
+// 会员名下各类卡（次卡/季卡），staff≥100；bizType（养护/租赁）按业务线过滤，不传返回全部
+const getMemberCardsPromise = function (memberId, bizType, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'MemberAdmin/GetMemberCardsByStaff?memberId=' + memberId + '&sessionKey=' + sessionKey
+  if (bizType != null) {
+    getUrl += '&bizType=' + bizType
+  }
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (cards) {
       resolve(cards)
