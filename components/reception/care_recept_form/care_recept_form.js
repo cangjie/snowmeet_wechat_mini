@@ -685,22 +685,29 @@ Component({
       const card = e.detail.selectedCard || null;
       this.setData({ 'ticketPopup.show': false });
       this._mutate(cidx, (c) => {
+        // 更改券/卡（含改选「不使用」）时：先清空已选服务，再套用新选择约定的默认项（用户 2026-07-09 拍板）。
+        // 清空范围 = 养护项目行 + 非雪季状态 + 减免（减免可能来自折扣券 16，区分不了来源、一并清）；
+        // 立等/维修/质保/招待与券无关，保留
+        c.need_edge = 0;
+        c.edge_degree = null;
+        c.need_wax = 0;
+        c.need_unwax = 0;
+        c.free_wax = 0;
+        c.summer = null;
+        if (c.biz_type === '非雪季养护') c.biz_type = null;
+        c.discount = 0;
         if (card) {
           // 选会员卡：与券互斥，清券侧字段；落 use_card（后端持久化）+ 卡展示标量
           c.ticket = null;
           c.ticket_code = null;
-          c.free_wax = 0;
-          c.discount = 0;
           c.use_card = true;
           c.card_id = card.id;
           c.card_name = card.card_name;
-          // 服务项目默认（用户 2026-07-09 拍板）：双项卡 → 默认勾 修刃+热蜡+刮蜡；
-          // 单项次卡不默认；「季卡」暂不默认勾任何项目（未来另有定义）。
-          // 非雪季流程（summer 已设）服务按钮本就禁用，不套默认
+          // 默认服务：双项卡 → 修刃+热蜡+刮蜡；单项次卡不默认；「季卡」暂不默认（未来另有定义）
           const cname = card.card_name || '';
-          if (cname.indexOf('双项') >= 0 && c.summer == null) {
+          if (cname.indexOf('双项') >= 0) {
             c.need_edge = 1;
-            if (!c.edge_degree) c.edge_degree = '89';
+            c.edge_degree = '89';
             c.need_wax = 1;
             c.need_unwax = 1;
           }
@@ -712,15 +719,12 @@ Component({
           c.ticket_code = ticket.code;
           if (ticket.template_id === 12) {
             c.free_wax = 1;
-            c.need_wax = 0;
-            c.need_unwax = 0;
           } else if (ticket.template_id === 17) {
-            c.need_edge = 0; c.need_wax = 0; c.need_unwax = 0;
             c.summer = 'now';
             c.biz_type = '非雪季养护';
           } else if (ticket.template_id === 18) {
             c.need_edge = 1;
-            if (!c.edge_degree) c.edge_degree = '89';
+            c.edge_degree = '89';
             c.need_wax = 1; c.need_unwax = 1;
             c.summer = 'later';
             c.biz_type = '非雪季养护';
@@ -728,8 +732,6 @@ Component({
         } else {
           c.ticket = null;
           c.ticket_code = null;
-          c.free_wax = 0;
-          c.discount = 0;
           c.use_card = false;
           c.card_id = null;
           c.card_name = null;
