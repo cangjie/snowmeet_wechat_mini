@@ -69,7 +69,8 @@
       <view class="card-title"><van-icon name="coupon-o" size="16px" color="#006495" /><text class="card-title-txt">名下次卡</text></view>
       <view wx:for="{{member.punchCards}}" wx:key="id" class="punch-row">
         <view class="punch-l"><text class="punch-name">{{item.card_name}}</text><text class="punch-biz">{{item.biz_type}}</text></view>
-        <text class="punch-remain">剩余 {{item.remaining}} / {{item.total}} 次</text>
+        <text wx:if="{{item.isSeason}}" class="punch-remain">季卡 · 不限次数</text>
+        <text wx:else class="punch-remain">剩余 {{item.remaining}} / {{item.total}} 次</text>
       </view>
     </view>
 

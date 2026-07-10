@@ -77,8 +77,9 @@ Component({
       // 只列本业务线的卡（养护开单不显示租赁次卡），ticketType 与券的 bizType 同值复用
       data.getMemberCardsPromise(memberId, this.data.ticketType, app.globalData.sessionKey)
         .then((cards) => {
+          // 季卡判定以数据为准：total=NULL 即不限次数季卡（2026-07-09 起）；卡名含「季卡」作旧数据兜底
           const list = (cards || []).map((c) => Object.assign(c, {
-            _isSeason: (c.card_name || '').indexOf('季卡') >= 0,
+            _isSeason: !!(c.isSeason || c.total == null || (c.card_name || '').indexOf('季卡') >= 0),
             _lastUsed: fmtDateTime(c.lastUsedDate) || '未使用',
           }));
           that.setData({ cards: list, cardsLoading: false });

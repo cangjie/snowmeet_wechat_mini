@@ -91,7 +91,11 @@ Page({
         return { id: o.id, code: o.code, type: o.type, dateStr: o.bizDate ? util.formatDate(new Date(o.bizDate)) : '' }
       })
       m.punchCards = (m.punchCards || []).map(function (c) {
-        return { id: c.id, biz_type: c.biz_type, card_name: c.card_name, total: c.total, punches: c.punches, remaining: c.total - c.punches }
+        // total=NULL 即季卡（不限次数，2026-07-09 起）
+        var isSeason = c.total == null
+        return { id: c.id, biz_type: c.biz_type, card_name: c.card_name, total: c.total,
+          punches: c.punches || 0, isSeason: isSeason,
+          remaining: isSeason ? null : (c.total - (c.punches || 0)) }
       })
       // 最近订单分类 tab：全部 + 实际出现的业务类型（按首次出现顺序）
       var typeSet = []
