@@ -694,10 +694,11 @@ Component({
           c.use_card = true;
           c.card_id = card.id;
           c.card_name = card.card_name;
-          // 单项「季卡」默认带出 修刃+热蜡+刮蜡；「次卡」不默认选任何项目（用户 2026-07-09 拍板）。
+          // 服务项目默认（用户 2026-07-09 拍板）：双项卡 → 默认勾 修刃+热蜡+刮蜡；
+          // 单项次卡不默认；「季卡」暂不默认勾任何项目（未来另有定义）。
           // 非雪季流程（summer 已设）服务按钮本就禁用，不套默认
           const cname = card.card_name || '';
-          if (cname.indexOf('季卡') >= 0 && cname.indexOf('单项') >= 0 && c.summer == null) {
+          if (cname.indexOf('双项') >= 0 && c.summer == null) {
             c.need_edge = 1;
             if (!c.edge_degree) c.edge_degree = '89';
             c.need_wax = 1;
