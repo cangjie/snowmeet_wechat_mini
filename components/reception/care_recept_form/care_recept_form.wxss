@@ -121,3 +121,17 @@
   color: #6f7881;
   margin-bottom: 8rpx;
 }
+
+/* 限装备季卡：装备信息锁定态 */
+.equip-lock-hint {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #b45309;
+}
+.kv-text--locked {
+  color: #9aa4b2;
+}
+.kv-input--locked {
+  color: #9aa4b2;
+  background: #f1f3f5;
+}

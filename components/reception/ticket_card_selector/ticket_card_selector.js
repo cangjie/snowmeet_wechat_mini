@@ -81,6 +81,10 @@ Component({
           const list = (cards || []).map((c) => Object.assign(c, {
             _isSeason: !!(c.isSeason || c.total == null || (c.card_name || '').indexOf('季卡') >= 0),
             _lastUsed: fmtDateTime(c.lastUsedDate) || '未使用',
+            // 限装备季卡：显示绑定装备一行（品牌按 / 前段显示，与表单一致）
+            _equipDisp: c.equipBound
+              ? [c.equip_type, String(c.equip_brand || '').split('/')[0], c.equip_scale + 'cm'].join(' · ')
+              : null,
           }));
           that.setData({ cards: list, cardsLoading: false });
         })

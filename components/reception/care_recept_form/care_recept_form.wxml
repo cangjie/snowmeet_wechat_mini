@@ -53,11 +53,12 @@
               <view class="form-group">
                 <view class="form-label">装备类型</view>
                 <view class="rent-mode">
-                  <view class="rent-mode-btn {{care.equipment === '双板' ? 'rent-mode-btn--active' : ''}}"
+                  <view class="rent-mode-btn {{care.equipment === '双板' ? 'rent-mode-btn--active' : ''}} {{care.card_equip_lock ? 'rent-mode-btn--disabled' : ''}}"
                         catchtap="onEquipTap" data-cidx="{{cidx}}" data-equip="双板">双板</view>
-                  <view class="rent-mode-btn {{care.equipment === '单板' ? 'rent-mode-btn--active' : ''}}"
+                  <view class="rent-mode-btn {{care.equipment === '单板' ? 'rent-mode-btn--active' : ''}} {{care.card_equip_lock ? 'rent-mode-btn--disabled' : ''}}"
                         catchtap="onEquipTap" data-cidx="{{cidx}}" data-equip="单板">单板</view>
                 </view>
+                <view wx:if="{{care.card_equip_lock}}" class="equip-lock-hint">装备信息由所选季卡绑定，不可修改</view>
               </view>
 
               <!-- 照片 -->
@@ -76,17 +77,18 @@
                 <view class="kv-cell">
                   <text class="kv-label">品牌</text>
                   <picker range="{{care._brandListView}}"
-                          disabled="{{!care.equipment}}"
+                          disabled="{{!care.equipment || care.card_equip_lock}}"
                           value="{{care._brandIndex || 0}}"
                           data-cidx="{{cidx}}"
                           bindchange="onBrandChange">
-                    <view class="kv-picker-text">{{care.brand || (care.equipment ? '点此选择品牌' : '先选装备类型')}}</view>
+                    <view class="kv-picker-text {{care.card_equip_lock ? 'kv-text--locked' : ''}}">{{care.brand || (care.equipment ? '点此选择品牌' : '先选装备类型')}}</view>
                   </picker>
                 </view>
                 <view class="kv-cell">
                   <text class="kv-label">长度 (cm)</text>
-                  <input class="kv-input" type="digit"
+                  <input class="kv-input {{care.card_equip_lock ? 'kv-input--locked' : ''}}" type="digit"
                          value="{{care.scale || ''}}"
+                         disabled="{{care.card_equip_lock}}"
                          placeholder="如 170"
                          placeholder-class="form-input-placeholder"
                          data-cidx="{{cidx}}" data-field="scale"

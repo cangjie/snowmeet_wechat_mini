@@ -67,6 +67,9 @@
               <text>已用 {{item.punches}} 次</text>
               <text class="tcs-card-remaining">剩余 {{item.remaining}} 次</text>
             </view>
+            <view wx:if="{{item._equipDisp}}" class="tcs-card-meta">
+              <text>绑定装备：{{item._equipDisp}}</text>
+            </view>
           </view>
         </view>
         <view class="tcs-item {{pickedNone ? 'tcs-item--active' : ''}}" bindtap="onNoneTap">

@@ -48,6 +48,7 @@ function blankCare() {
     use_card: false,
     card_id: null,   // 所选会员卡（后端 Care 无对应列，仅前端标量，随 use_card 一起维护）
     card_name: null,
+    card_equip_lock: false, // 限装备季卡带入的装备信息锁（前端标量，同上）
     common_charge: 0,
     memo: null,
     others_associates: null,
@@ -337,6 +338,10 @@ Component({
       const cidx = Number(e.currentTarget.dataset.cidx);
       const equip = e.currentTarget.dataset.equip;
       const cur = this.data.displayCares[cidx];
+      if (cur && cur.card_equip_lock) {
+        wx.showToast({ title: '该季卡已绑定装备，不可修改', icon: 'none' });
+        return;
+      }
       if (cur && cur.equipment === equip) return; // 重复点同类型：不动数据也不弹历史
       this._mutate(cidx, (c) => {
         c.equipment = equip;
@@ -453,6 +458,8 @@ Component({
       const cidx = Number(e.currentTarget.dataset.cidx);
       const field = e.currentTarget.dataset.field;
       const value = e.detail.value;
+      const cur = this.data.displayCares[cidx];
+      if (field === 'scale' && cur && cur.card_equip_lock) return; // 限装备季卡：长度锁定
       this._mutate(cidx, (c) => { c[field] = value === '' ? null : value; });
     },
     /* ---------- 服务项 ---------- */
@@ -672,10 +679,26 @@ Component({
             c.need_wax = 1;
             c.need_unwax = 1;
           }
+          // 限装备季卡：装备信息带入卡绑定值并锁定不可改（用户 2026-07-09 拍板；serial 暂不参与）
+          const isSeason = !!(card.isSeason || card.total == null);
+          if (isSeason && card.equipBound) {
+            if (c.equipment !== card.equip_type) {
+              // 类型变化时与 onEquipTap 同口径：品牌/维修字典跟随切换，原维修选择作废
+              c.repair_memo = null;
+              c.need_repair = 0;
+            }
+            c.equipment = card.equip_type;
+            c.brand = card.equip_brand;
+            c.scale = card.equip_scale;
+            c.card_equip_lock = true;
+          } else {
+            c.card_equip_lock = false;
+          }
         } else if (ticket) {
           c.use_card = false;
           c.card_id = null;
           c.card_name = null;
+          c.card_equip_lock = false;
           c.ticket = ticket;
           c.ticket_code = ticket.code;
           if (ticket.template_id === 12) {
@@ -696,6 +719,7 @@ Component({
           c.use_card = false;
           c.card_id = null;
           c.card_name = null;
+          c.card_equip_lock = false;
         }
       });
       that._fetchPrice(cidx);
