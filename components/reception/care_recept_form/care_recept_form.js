@@ -223,7 +223,8 @@ Component({
           _repairChargeStr: String(care.repair_charge || 0),
           _discountStr: String(care.discount || 0),
           _specialKey: care.entertain ? 'entertain' : (care.warranty ? 'warranty' : 'none'),
-          _hasFreeWaxTicket: !!(care.ticket && care.ticket.template_id === 12),
+          // 机打蜡按钮显示：券12 或 服务端推导出机打蜡（如机打蜡季卡）时可见
+          _hasFreeWaxTicket: !!((care.ticket && care.ticket.template_id === 12) || care.free_wax === 1),
         };
       });
       const count = displayCares.length;
@@ -263,9 +264,11 @@ Component({
       this._emitSync(needUpdate);
     },
     /* ---------- 计费（服务端计算，与 PlaceCareOrder 共用 CareController.CalcCharge；
-       附加费/减免由 computeCharge 在服务费之上累加） ---------- */
-    _fetchPrice(cidx) {
+       附加费/减免由 computeCharge 在服务费之上累加）。
+       opts.derive=true（换券/换卡时传）：服务项也由服务端推导，响应 services 回填 ---------- */
+    _fetchPrice(cidx, opts) {
       const that = this;
+      const derive = !!(opts && opts.derive);
       const care = this.data.displayCares[cidx];
       if (!care) return;
       // 提交剥离 UI 字段的 care（含项目/券码/use_card/summer 等），导航对象与照片置空瘦身
@@ -278,7 +281,9 @@ Component({
       this._priceSeqMap = this._priceSeqMap || {};
       const seq = (this._priceSeqMap[key] || 0) + 1;
       this._priceSeqMap[key] = seq;
-      data.calcCareChargePromise(this.data.shop, this.data.memberId || null, payload, app.globalData.sessionKey)
+      const cardId = care.use_card ? (care.card_id || null) : null;
+      data.calcCareChargePromise(this.data.shop, this.data.memberId || null, payload,
+        app.globalData.sessionKey, cardId, derive)
         .then((res) => {
           if (that._priceSeqMap[key] !== seq) return;
           const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
@@ -286,6 +291,16 @@ Component({
           that._mutate(idx, (c) => {
             c.common_charge = (res && res.commonCharge) || 0;
             c.product = null;
+            // 换券/换卡：服务项以服务端推导为准（双项卡→三项、机打蜡季卡→机打蜡、券12/17/18 等）
+            if (res && res.services) {
+              c.need_edge = res.services.need_edge || 0;
+              c.edge_degree = res.services.edge_degree || null;
+              c.need_wax = res.services.need_wax || 0;
+              c.need_unwax = res.services.need_unwax || 0;
+              c.free_wax = res.services.free_wax || 0;
+              c.summer = res.services.summer || null;
+              c.biz_type = res.services.biz_type || null;
+            }
             // 券16 减免由服务端算（双项30/单项20）；非16券绝不回写，保住店员手动减免
             if (c.ticket && c.ticket.template_id === 16) {
               c.discount = (res && res.ticketDiscount) || 0;
@@ -653,7 +668,9 @@ Component({
       const card = e.detail.selectedCard || null;
       this.setData({ 'ticketPopup.show': false });
       this._mutate(cidx, (c) => {
-        // 更改券/卡（含改选「不使用」）时：先清空已选服务，再套用新选择约定的默认项（用户 2026-07-09 拍板）。
+        // 更改券/卡（含改选「不使用」）时：先清空已选服务（用户 2026-07-09 拍板）。
+        // 默认服务项由服务端 CalcCareCharge(deriveServices=true) 推导，响应 services 回填——
+        // 这里的清空只为响应前的即时 UI 反馈，真理之源在服务端 ApplyDefaultServices。
         // 清空范围 = 养护项目行 + 非雪季状态 + 减免（减免可能来自折扣券 16，区分不了来源、一并清）；
         // 立等/维修/质保/招待与券无关，保留
         c.need_edge = 0;
@@ -671,14 +688,6 @@ Component({
           c.use_card = true;
           c.card_id = card.id;
           c.card_name = card.card_name;
-          // 默认服务：双项卡 → 修刃+热蜡+刮蜡；单项次卡不默认；「季卡」暂不默认（未来另有定义）
-          const cname = card.card_name || '';
-          if (cname.indexOf('双项') >= 0) {
-            c.need_edge = 1;
-            c.edge_degree = '89';
-            c.need_wax = 1;
-            c.need_unwax = 1;
-          }
           // 限装备季卡：装备信息带入卡绑定值并锁定不可改（用户 2026-07-09 拍板；serial 暂不参与）
           const isSeason = !!(card.isSeason || card.total == null);
           if (isSeason && card.equipBound) {
@@ -701,18 +710,6 @@ Component({
           c.card_equip_lock = false;
           c.ticket = ticket;
           c.ticket_code = ticket.code;
-          if (ticket.template_id === 12) {
-            c.free_wax = 1;
-          } else if (ticket.template_id === 17) {
-            c.summer = 'now';
-            c.biz_type = '非雪季养护';
-          } else if (ticket.template_id === 18) {
-            c.need_edge = 1;
-            c.edge_degree = '89';
-            c.need_wax = 1; c.need_unwax = 1;
-            c.summer = 'later';
-            c.biz_type = '非雪季养护';
-          }
         } else {
           c.ticket = null;
           c.ticket_code = null;
@@ -722,7 +719,8 @@ Component({
           c.card_equip_lock = false;
         }
       });
-      that._fetchPrice(cidx);
+      // derive=true：服务项与价格一并由服务端按新选择推导返回
+      that._fetchPrice(cidx, { derive: true });
     },
     /* ---------- 结算 ---------- */
     onCheckout() {
