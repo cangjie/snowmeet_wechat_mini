@@ -281,9 +281,16 @@ Component({
       this._priceSeqMap = this._priceSeqMap || {};
       const seq = (this._priceSeqMap[key] || 0) + 1;
       this._priceSeqMap[key] = seq;
-      const cardId = care.use_card ? (care.card_id || null) : null;
-      data.calcCareChargePromise(this.data.shop, this.data.memberId || null, payload,
-        app.globalData.sessionKey, cardId, derive)
+      // 全量状态整包提交（用户 2026-07-09 拍板）：店铺/会员/所选卡 + care 内装备/服务/券码/附加费
+      const req = {
+        shop: this.data.shop,
+        memberId: this.data.memberId || null,
+        cardId: care.use_card ? (care.card_id || null) : null,
+        cardName: care.use_card ? (care.card_name || null) : null,
+        deriveServices: derive,
+        care: payload,
+      };
+      data.calcCareChargePromise(req, app.globalData.sessionKey)
         .then((res) => {
           if (that._priceSeqMap[key] !== seq) return;
           const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);

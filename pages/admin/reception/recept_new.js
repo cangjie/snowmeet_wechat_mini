@@ -496,8 +496,10 @@ Page({
 
   /* ---------- 与后端同步：调 Care/SaveCareRecept ----------
    * 与 saveRentReceptOrder 同模式：返回 Promise 供 _checkoutCare await 落盘。
-   * 后端 CareImage 模型没有 url/thumb 展示字段，round-trip 会把照片显示地址丢掉，
-   * 所以响应回填时按下标把本地 careImages / ticket 对象合并回去。
+   * 响应合并原则（2026-07-09 重构）：以「响应时刻的最新本地状态」为基底，只从响应吸收
+   * 服务端生成的 care.id / order_id / careImage.id——不能拿响应整体覆盖本地：POST 之后
+   * 用户可能已继续操作（换卡/改服务项），晚到的响应整体覆盖会把新状态冲掉
+   * （曾复现：选机打蜡季卡后加选修刃，季卡选择被更早一次保存的晚到响应冲掉）。
    */
   saveCareReceptOrder() {
     const order = this.data.order;
@@ -544,28 +546,28 @@ Page({
       + 'Care/SaveCareRecept?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
     return util.performWebRequest(url, payload).then((submitted) => {
       if (submitted && submitted.cares) {
-        submitted.cares.forEach((c, i) => {
-          c.timeStamp = (new Date(c.create_date || Date.now())).getTime();
-          const local = localCares[i];
-          if (local) {
-            if (local.careImages && local.careImages.length > 0) {
-              // 保留本地展示字段（url/thumb），但按 image_id 回填服务端生成的 careImage.id。
-              // 若整个用本地对象覆盖，id 永远是 0 → 下次保存后端重复插行 + 删旧行时跟踪撞键 500
-              const srvImgs = c.careImages || [];
-              c.careImages = local.careImages.map((lim) => {
-                const hit = srvImgs.find((s) => s.image_id === lim.image_id);
-                return hit ? { ...lim, id: hit.id, care_id: hit.care_id } : lim;
-              });
-            }
-            if (local.ticket) c.ticket = local.ticket;
-            if (local.product) c.product = local.product;
-            // card_id/card_name/card_equip_lock 后端 Care 无对应列不回传，从本地带回（use_card 本身后端持久化）
-            c.card_id = local.card_id || null;
-            c.card_name = local.card_name || null;
-            c.card_equip_lock = local.card_equip_lock || false;
-          }
+        // 基底 = 响应时刻的最新本地 cares（可能比 POST 时的 localCares 更新）；
+        // 按下标与响应对齐（提交同序），只吸收服务端生成的主键。
+        // 局限：POST 与响应之间增删装备会下标漂移（与旧逻辑同级风险，属既有边界）
+        const curCares = (this.data.order.cares || []);
+        const srvCares = submitted.cares;
+        submitted.cares = curCares.map((localC, i) => {
+          const srv = srvCares[i];
+          if (!srv) return localC; // POST 后新增的装备：本次响应没有它，下次保存再落库
+          const merged = { ...localC };
+          merged.id = merged.id || srv.id;
+          merged.order_id = merged.order_id || srv.order_id;
+          merged.timeStamp = merged.timeStamp || (new Date(srv.create_date || Date.now())).getTime();
+          // 照片保留本地展示字段（url/thumb），按 image_id 回填服务端生成的 careImage.id。
+          // 若整个用本地对象覆盖，id 永远是 0 → 下次保存后端重复插行 + 删旧行时跟踪撞键 500
+          const srvImgs = srv.careImages || [];
+          merged.careImages = (merged.careImages || []).map((lim) => {
+            const hit = srvImgs.find((s) => s.image_id === lim.image_id);
+            return hit ? { ...lim, id: lim.id || hit.id, care_id: hit.care_id || lim.care_id } : lim;
+          });
+          return merged;
         });
-        // 后端返回的 care.id 回填到照片关联，便于后续保存
+        // 服务端返回的 care.id 回填到照片关联，便于后续保存
         submitted.cares.forEach((c) => {
           (c.careImages || []).forEach((im) => { im.care_id = c.id || im.care_id; });
         });

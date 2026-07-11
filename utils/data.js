@@ -1079,23 +1079,15 @@ const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey)
     })
   })
 }
-// 养护服务费服务端计算（真理之源，与 PlaceCareOrder 同一套定价）：POST care 对象，
+// 养护服务费服务端计算（真理之源，与 PlaceCareOrder 同一套定价）。
+// req 为当前界面全量状态：{ shop, memberId, cardId, cardName, deriveServices, care }
+// （care 含装备信息/服务项/券码/use_card/附加费/减免；每次界面操作都整包提交）
 // 返回 { commonCharge, ticketDiscount, services }（ticketDiscount 仅券16 有值：双项30/单项20；
 // services 仅 deriveServices=true 时返回：按所选券/卡推导的服务项，换券/换卡时前端回填）
-const calcCareChargePromise = function (shop, memberId, care, sessionKey, cardId, deriveServices) {
-  var postUrl = app.globalData.requestPrefix + 'Care/CalcCareCharge?shop=' + encodeURIComponent(shop)
-    + '&sessionKey=' + sessionKey
-  if (memberId != null) {
-    postUrl += '&memberId=' + memberId
-  }
-  if (cardId != null) {
-    postUrl += '&cardId=' + cardId
-  }
-  if (deriveServices) {
-    postUrl += '&deriveServices=true'
-  }
+const calcCareChargePromise = function (req, sessionKey) {
+  var postUrl = app.globalData.requestPrefix + 'Care/CalcCareCharge?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
-    util.performWebRequest(postUrl, care).then(function (res) {
+    util.performWebRequest(postUrl, req).then(function (res) {
       resolve(res)
     }).catch(function (exp) {
       reject(exp)
