@@ -234,8 +234,11 @@ Component({
           _repairChargeStr: String(care.repair_charge || 0),
           _discountStr: String(care.discount || 0),
           _specialKey: care.entertain ? 'entertain' : (care.warranty ? 'warranty' : 'none'),
-          // 机打蜡按钮显示：券12 或 服务端推导出机打蜡（如机打蜡季卡）时可见
-          _hasFreeWaxTicket: !!((care.ticket && care.ticket.template_id === 12) || care.free_wax === 1),
+          // 机打蜡按钮显示：券12、或选中机打蜡季卡（卡名含「机打蜡」，与卡的选中状态绑定——
+          // 升级热蜡联动清掉 free_wax 后按钮仍在，可切回机打蜡）、或 free_wax=1（找回草稿兜底）
+          _hasFreeWaxTicket: !!((care.ticket && care.ticket.template_id === 12)
+            || (care.use_card && (care.card_name || '').indexOf('机打蜡') >= 0)
+            || care.free_wax === 1),
         };
       });
       const count = displayCares.length;
