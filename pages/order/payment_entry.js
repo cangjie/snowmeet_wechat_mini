@@ -197,6 +197,39 @@ Page({
         }
       }
     }
+    // 养护订单：每件装备一段（装备 / 项目 / 所用券卡 / 金额），文案口径对齐开单页 _svcChips
+    if (order.type == '养护' && order.cares && order.cares.length){
+      for (var ci = 0; ci < order.cares.length; ci++){
+        var care = order.cares[ci]
+        var parts = []
+        if (care.equipment) parts.push(care.equipment)
+        if (care.brand) parts.push(String(care.brand).split('/')[0])
+        if (care.scale) parts.push(care.scale + 'cm')
+        care.displayName = parts.join(' · ') || '养护装备'
+        var svcs = []
+        if (care.summer == 'now') svcs.push('非雪季·寄存')
+        else if (care.summer == 'later') svcs.push('非雪季·先双项')
+        else {
+          if (care.need_edge == 1 && care.need_wax == 1) svcs.push('双项(修刃+热蜡)')
+          else if (care.need_edge == 1) svcs.push('修刃')
+          else if (care.need_wax == 1) svcs.push('热蜡')
+          if (care.free_wax == 1) svcs.push('机打蜡')
+          if (care.need_unwax == 1 && care.need_wax != 1) svcs.push('刮蜡')
+          if (care.urgent == 1) svcs.push('立等')
+        }
+        if (care.repair_memo) svcs.push('维修(' + care.repair_memo + ')')
+        if (care.warranty) svcs.push('质保')
+        if (care.entertain) svcs.push('招待')
+        care.svcStr = svcs.join('、') || '-'
+        // 所用优惠：券显示 code、卡显示卡名（card_name 随 care 持久化）
+        if (care.ticket_code) care.couponStr = '优惠券 (' + care.ticket_code + ')'
+        else if (care.use_card) care.couponStr = care.card_name || '会员卡'
+        else care.couponStr = ''
+        var amt = (care.common_charge || 0) + (care.repair_charge || 0)
+          - (care.discount || 0) - (care.ticket_discount || 0)
+        care.amountStr = util.showAmount(amt)
+      }
+    }
     that.setData({order, payment})
   },
   toggleRental(e){

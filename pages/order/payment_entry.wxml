@@ -36,6 +36,17 @@
     </block>
   </view>
 
+  <view class="card" wx:if="{{order.type=='养护' && order.cares && order.cares.length}}">
+    <view class="section-title">养护内容</view>
+    <block wx:for="{{order.cares}}" wx:for-item="care" wx:key="id">
+      <view wx:if="{{index > 0}}" class="rental-divider"></view>
+      <view class="row"><text class="label">装备</text><text class="value">{{care.displayName}}</text></view>
+      <view class="row"><text class="label">项目</text><text class="value">{{care.svcStr}}</text></view>
+      <view class="row" wx:if="{{care.couponStr}}"><text class="label">优惠</text><text class="value">{{care.couponStr}}</text></view>
+      <view class="row"><text class="label">金额</text><text class="value value--amount">{{care.amountStr}}</text></view>
+    </block>
+  </view>
+
   <view class="card">
     <view class="section-title">金额</view>
     <view class="row"><text class="label">总计</text><text class="value value--amount">{{order.total_amountStr}}</text></view>

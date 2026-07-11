@@ -495,13 +495,39 @@ Page({
   },
 
   /* ---------- 与后端同步：调 Care/SaveCareRecept ----------
-   * 与 saveRentReceptOrder 同模式：返回 Promise 供 _checkoutCare await 落盘。
+   * 保存串行化入口：上一笔在飞时不并发发第二笔——order.id=0 时并发的两笔都会走后端
+   * create 分支重复建单（2026-07-11 生产实录：孤儿草稿成对出现，间隔 ~90ms）。
+   * 在飞时排队一笔「待重存」，上一笔返回（拿到 order.id）后再用当时的最新状态重存；
+   * 排队期间的多次触发合并为同一笔。返回的 Promise 始终以最后落盘的状态 resolve，
+   * 供 _checkoutCare await。
+   */
+  saveCareReceptOrder() {
+    const that = this;
+    if (this._careSaveInFlight) {
+      if (!this._careSaveQueued) {
+        this._careSaveQueued = this._careSaveInFlight.catch(() => {}).then(() => {
+          that._careSaveQueued = null;
+          return that.saveCareReceptOrder();
+        });
+      }
+      return this._careSaveQueued;
+    }
+    const clear = () => { that._careSaveInFlight = null; };
+    const p = Promise.resolve(this._doSaveCareRecept());
+    this._careSaveInFlight = p.then(
+      (r) => { clear(); return r; },
+      (e) => { clear(); throw e; }
+    );
+    return this._careSaveInFlight;
+  },
+
+  /* 实际保存逻辑。与 saveRentReceptOrder 同模式。
    * 响应合并原则（2026-07-09 重构）：以「响应时刻的最新本地状态」为基底，只从响应吸收
    * 服务端生成的 care.id / order_id / careImage.id——不能拿响应整体覆盖本地：POST 之后
    * 用户可能已继续操作（换卡/改服务项），晚到的响应整体覆盖会把新状态冲掉
    * （曾复现：选机打蜡季卡后加选修刃，季卡选择被更早一次保存的晚到响应冲掉）。
    */
-  saveCareReceptOrder() {
+  _doSaveCareRecept() {
     const order = this.data.order;
     if (!order.shop) {
       wx.showToast({ title: '店铺不能为空', icon: 'error' });
@@ -584,13 +610,20 @@ Page({
   // 养护去结算：await 落盘 → Order/PlaceCareOrder → settle，本地订单脱钩（同租赁 onCheckout 约定）
   _checkoutCare() {
     const order = this.data.order;
-    if (!order || !order.id) {
-      wx.showToast({ title: '订单尚未生成', icon: 'none' });
+    if (!order || !order.cares || order.cares.length === 0) {
+      wx.showToast({ title: '购物车是空的', icon: 'none' });
       return;
     }
+    // 不再要求进入时已有 order.id：草稿保存可能还在飞行（刚下过一单脱钩重建时尤甚），
+    // 等串行化保存收尾——没有 id 时这笔保存本身就会建单——再取 id 下单
     wx.showLoading({ title: '下单中…', mask: true });
     Promise.resolve(this.saveCareReceptOrder()).then(() => {
-      const placedOrderId = (this.data.order && this.data.order.id) || order.id;
+      const placedOrderId = (this.data.order && this.data.order.id) || 0;
+      if (!placedOrderId) {
+        const err = new Error('订单尚未生成，请重试');
+        err._toastMsg = '订单尚未生成，请重试';
+        throw err;
+      }
       const placeUrl = app.globalData.requestPrefix
         + 'Order/PlaceCareOrder/' + placedOrderId
         + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
@@ -622,6 +655,10 @@ Page({
       });
     }).catch((err) => {
       wx.hideLoading();
+      if (err && err._toastMsg) {
+        wx.showToast({ title: err._toastMsg, icon: 'none' });
+        return;
+      }
       console.warn('care checkout failed', err);
       // performWebRequest 已 toast 后端 message（如"非雪季养护需要匹配会员"），这里不重复弹
     });
