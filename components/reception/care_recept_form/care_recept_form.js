@@ -281,12 +281,11 @@ Component({
       this._priceSeqMap = this._priceSeqMap || {};
       const seq = (this._priceSeqMap[key] || 0) + 1;
       this._priceSeqMap[key] = seq;
-      // 全量状态整包提交（用户 2026-07-09 拍板）：店铺/会员/所选卡 + care 内装备/服务/券码/附加费
+      // 全量状态整包提交（用户 2026-07-09 拍板）：店铺/会员 + care 内装备/服务/券码/卡(card_id,card_name)/附加费。
+      // 卡选择跟着单件装备（care）走，卡信息只在 care 内、不设平级字段
       const req = {
         shop: this.data.shop,
         memberId: this.data.memberId || null,
-        cardId: care.use_card ? (care.card_id || null) : null,
-        cardName: care.use_card ? (care.card_name || null) : null,
         deriveServices: derive,
         care: payload,
       };
