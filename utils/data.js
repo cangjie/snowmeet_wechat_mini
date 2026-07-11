@@ -1080,11 +1080,11 @@ const getMemberTicketsPromise = function (memberId, bizType, canUse, sessionKey)
   })
 }
 // 养护服务费服务端计算（真理之源，与 PlaceCareOrder 同一套定价）。
-// req 为当前界面全量状态：{ shop, memberId, deriveServices, care }
+// req 为当前界面全量状态：{ shop, memberId, deriveServices, changedField, care }
 // （care 含装备信息/服务项/券码/use_card/card_id/card_name/附加费/减免——
-//   卡选择跟着单件装备走、只在 care 内；每次界面操作都整包提交）
-// 返回 { commonCharge, ticketDiscount, services }（ticketDiscount 仅券16 有值：双项30/单项20；
-// services 仅 deriveServices=true 时返回：按所选券/卡推导的服务项，换券/换卡时前端回填）
+//   卡选择跟着单件装备走、只在 care 内；每次界面操作都整包提交；
+//   changedField=本次改动字段名，服务联动（如开热蜡带刮蜡）由服务端按它判定）
+// 返回 { commonCharge, ticketDiscount, care }：care 是联动/推导后的完整对象，前端以它回填
 const calcCareChargePromise = function (req, sessionKey) {
   var postUrl = app.globalData.requestPrefix + 'Care/CalcCareCharge?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {

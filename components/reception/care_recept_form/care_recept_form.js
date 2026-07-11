@@ -187,6 +187,17 @@ Component({
         // 甚至录入完整后 ev.ok 翻真，若每次都按默认规则现算，卡片会被自动折叠打断录入。
         // 记住展开态后，只有用户手动点头部才会收起（2026-07-08 用户拍板：录入中永不自动折叠）
         let expanded = expandedMap[key];
+        if (expanded === undefined && care.timeStamp) {
+          // key 漂移迁移：首次落库 id 0→真实 id 后 key 从 't'+timeStamp 变 'c'+id，
+          // 把旧 key 的展开记录搬过来——否则选卡/选券让表单变「已录入」时，
+          // 保存回来 key 一换记录丢失、卡片被默认规则自动折叠（2026-07-09 用户反馈）
+          const oldKey = 't' + care.timeStamp;
+          if (oldKey !== key && expandedMap[oldKey] !== undefined) {
+            expanded = expandedMap[oldKey];
+            expandedMap[key] = expanded;
+            delete expandedMap[oldKey];
+          }
+        }
         if (expanded === undefined) {
           expanded = !ev.ok;
           if (expanded) expandedMap[key] = true;
@@ -265,10 +276,13 @@ Component({
     },
     /* ---------- 计费（服务端计算，与 PlaceCareOrder 共用 CareController.CalcCharge；
        附加费/减免由 computeCharge 在服务费之上累加）。
-       opts.derive=true（换券/换卡时传）：服务项也由服务端推导，响应 services 回填 ---------- */
+       opts.derive=true（换券/换卡时传）：服务项由服务端按新选择推导；
+       opts.changed=字段名（服务开关等操作时传）：服务联动由服务端判定（如开热蜡带刮蜡）。
+       响应返回整个 care，服务项/联动/计费结果以它为真理之源回填 ---------- */
     _fetchPrice(cidx, opts) {
       const that = this;
       const derive = !!(opts && opts.derive);
+      const changed = (opts && opts.changed) || null;
       const care = this.data.displayCares[cidx];
       if (!care) return;
       // 提交剥离 UI 字段的 care（含项目/券码/use_card/summer 等），导航对象与照片置空瘦身
@@ -287,6 +301,7 @@ Component({
         shop: this.data.shop,
         memberId: this.data.memberId || null,
         deriveServices: derive,
+        changedField: changed,
         care: payload,
       };
       data.calcCareChargePromise(req, app.globalData.sessionKey)
@@ -294,22 +309,24 @@ Component({
           if (that._priceSeqMap[key] !== seq) return;
           const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
           if (idx < 0) return;
+          const rc = res && res.care;
           that._mutate(idx, (c) => {
-            c.common_charge = (res && res.commonCharge) || 0;
             c.product = null;
-            // 换券/换卡：服务项以服务端推导为准（双项卡→三项、机打蜡季卡→机打蜡、券12/17/18 等）
-            if (res && res.services) {
-              c.need_edge = res.services.need_edge || 0;
-              c.edge_degree = res.services.edge_degree || null;
-              c.need_wax = res.services.need_wax || 0;
-              c.need_unwax = res.services.need_unwax || 0;
-              c.free_wax = res.services.free_wax || 0;
-              c.summer = res.services.summer || null;
-              c.biz_type = res.services.biz_type || null;
-            }
-            // 券16 减免由服务端算（双项30/单项20）；非16券绝不回写，保住店员手动减免
-            if (c.ticket && c.ticket.template_id === 16) {
-              c.discount = (res && res.ticketDiscount) || 0;
+            if (rc) {
+              // 服务端返回的整个 care 是服务项/联动/计费的真理之源；
+              // 只回填服务端会改的业务字段，本地 UI/展示对象（careImages/ticket/锁标志/装备录入值）不动
+              c.need_edge = rc.need_edge || 0;
+              c.edge_degree = rc.edge_degree || null;
+              c.need_wax = rc.need_wax || 0;
+              c.need_unwax = rc.need_unwax || 0;
+              c.free_wax = rc.free_wax || 0;
+              c.urgent = rc.urgent || 0;
+              c.summer = rc.summer || null;
+              c.biz_type = rc.biz_type || null;
+              c.common_charge = rc.common_charge || 0;
+              c.discount = rc.discount || 0;
+            } else {
+              c.common_charge = (res && res.commonCharge) || 0;
             }
           });
         })
@@ -493,37 +510,21 @@ Component({
         wx.showToast({ title: '非雪季养护项目固定', icon: 'none' });
         return;
       }
+      // 只翻本次点的开关；联动（热蜡带刮蜡/机打蜡互斥/修刃默认角度）由服务端
+      // ApplyServiceLinkage 判定，响应整个 care 回填
       this._mutate(cidx, (c) => {
-        const cur = c[flag] === 1 ? 0 : 1;
-        c[flag] = cur;
-        if (flag === 'need_edge' && cur === 1 && !c.edge_degree) c.edge_degree = '89';
-        if (flag === 'need_wax') {
-          c.need_unwax = cur; // 热蜡默认连带刮蜡（对齐旧逻辑）
-          if (cur === 1) c.free_wax = 0;
-        }
-        if (flag === 'free_wax' && cur === 1) {
-          c.need_wax = 0;
-          c.need_unwax = 0;
-        }
+        c[flag] = c[flag] === 1 ? 0 : 1;
       });
-      this._fetchPrice(cidx);
+      this._fetchPrice(cidx, { changed: flag });
     },
     onSummerTap(e) {
       const cidx = Number(e.currentTarget.dataset.cidx);
       const mode = e.currentTarget.dataset.mode; // 'now' | 'later'
+      // 只翻 summer 本身；later→三项 / now→清三项 / 取消立等 等联动由服务端判定
       this._mutate(cidx, (c) => {
         c.summer = c.summer === mode ? null : mode;
-        if (c.summer === 'later') {
-          c.need_edge = 1; c.need_wax = 1; c.need_unwax = 1;
-        } else if (c.summer === 'now') {
-          c.need_edge = 0; c.need_wax = 0; c.need_unwax = 0;
-        }
-        if (c.summer != null) {
-          c.urgent = 0;
-          if (!c.edge_degree) c.edge_degree = '89';
-        }
       });
-      this._fetchPrice(cidx);
+      this._fetchPrice(cidx, { changed: 'summer' });
     },
     onOthersToggle(e) {
       const cidx = Number(e.currentTarget.dataset.cidx);
@@ -673,6 +674,11 @@ Component({
       const ticket = e.detail.selectedTicket || null;
       const card = e.detail.selectedCard || null;
       this.setData({ 'ticketPopup.show': false });
+      // 选券/选卡后表单可能瞬间变「已录入」，显式记住展开态——装备卡片不自动折叠
+      const curCare = this.data.displayCares[cidx];
+      if (curCare && curCare._key) {
+        this.data.expandedMap[curCare._key] = true;
+      }
       this._mutate(cidx, (c) => {
         // 更改券/卡（含改选「不使用」）时：先清空已选服务（用户 2026-07-09 拍板）。
         // 默认服务项由服务端 CalcCareCharge(deriveServices=true) 推导，响应 services 回填——
