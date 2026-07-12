@@ -1,126 +1,95 @@
 // pages/admin/care/care_order_list.js
+// 养护订单列表（Alpine 风格，仿租赁订单列表 new_rent_list）
+// 查询条件与旧版保持一致：店铺 / 日期 / 测试 / 招待 / 减免 / 非雪季 / 次卡 / 手机 / 备注
+// 分页复用通用后端接口 Order/GetOrdersByStaffPaged（getRentOrdersByStaffPagedPromise，type='养护'）+ list-pager 组件
 const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
+
+const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com'
+
 Page({
 
-  /**
-   * Page initial data
-   */
   data: {
-    queryOptions:[
-      {key: 'isTest', value: false},
-      {key: 'isEntertain', value: false},
-      {key: 'haveDiscount', value: null},
-      {key: 'haveWarranty', value: null},
-      {key: 'summer', value: null},
-      {key: 'useCard', value: null}
+    queryOptions: [
+      { key: 'isTest', value: false },
+      { key: 'isEntertain', value: false },
+      { key: 'haveDiscount', value: null },
+      { key: 'summer', value: null },
+      { key: 'useCard', value: null }
     ],
     cell: null,
-    querying: false,
-    keyword: null
+    keyword: null,
+    orders: [],       // 当前页数据
+    total: 0,         // 服务器返回的总条数
+    page: 1,
+    pageSize: 50,
+    totalPages: 0,
+    totalEarnStr: '',
+    querying: false
   },
 
-  /**
-   * Lifecycle function--Called when page load
-   */
   onLoad(options) {
-    var that = this
     var nowDate = new Date()
-    that.setData({startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate)})
+    this.setData({ startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate) })
   },
 
-  /**
-   * Lifecycle function--Called when page is initially rendered
-   */
-  onReady() {
-
-  },
-
-  /**
-   * Lifecycle function--Called when page show
-   */
+  // 返回列表时（从订单详情返回触发 onShow）：保留当前页码/每页条数/筛选，用这些参数重查，不重置回第 1 页。
+  // 页面实例 navigateTo 期间不销毁，page/pageSize/queryOptions 都还在 this.data 里。首次进入 page=1/pageSize=50 自然等同初始查询。
   onShow() {
     var that = this
-    app.loginPromiseNew.then(function (resolve){
-      that.setData({staff: app.globalData.staff, querying: true})
-      that.getData()
+    app.loginPromiseNew.then(function () {
+      that.setData({ staff: app.globalData.staff, querying: true })
+      that.getData(that.data.page, that.data.pageSize)
     })
   },
 
-  /**
-   * Lifecycle function--Called when page hide
-   */
-  onHide() {
-
+  shopSelected(e) {
+    this.setData({ shop: e.detail.shop })
   },
 
-  /**
-   * Lifecycle function--Called when page unload
-   */
-  onUnload() {
-
+  onDateRangeChange(e) {
+    this.setData({ startDate: e.detail.startDate, endDate: e.detail.endDate })
   },
 
-  /**
-   * Page event handler function--Called when user drop down
-   */
-  onPullDownRefresh() {
-
+  setQueryOptions(e) {
+    this.setQueryOptionValue(e.currentTarget.id, e.detail.value)
   },
 
-  /**
-   * Called when page reach bottom
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * Called when user click on the top right corner to share
-   */
-  onShareAppMessage() {
-
-  },
-  getData(){
-    var that = this
-    var isTest = null
-    var isEntertain = null
-    var haveDiscount = null
-    var queryOptions = that.data.queryOptions
-    var haveWarranty = null
-    var isSummerCare = null
-    var useCard = null
-    for(var i = 0; i < queryOptions.length; i++){
-      switch(queryOptions[i].key){
-        case 'isTest':
-          isTest = queryOptions[i].value
-          break
-        case 'isEntertain':
-          isEntertain = queryOptions[i].value
-          break
-        case 'haveDiscount':
-          haveDiscount = queryOptions[i].value
-          break
-        case 'haveWarranty':
-          haveWarranty = queryOptions[i].value
-          break
-        case 'summer':
-          isSummerCare = queryOptions[i].value
-          break
-        case 'useCard':
-          useCard = queryOptions[i].value
-          break
-        default:
-          break
+  setQueryOptionValue(key, value) {
+    var queryOptions = this.data.queryOptions
+    for (var i = 0; i < queryOptions.length; i++) {
+      if (queryOptions[i].key === key) {
+        switch (value) {
+          case 'null':  queryOptions[i].value = null;  break
+          case 'true':  queryOptions[i].value = true;  break
+          case 'false': queryOptions[i].value = false; break
+          default:      queryOptions[i].value = value; break
+        }
       }
     }
-    var shop = that.data.shop
-    var startDate = that.data.startDate
-    var endDate = that.data.endDate
-    var cell = that.data.cell
-    var keyword = that.data.keyword
-    if((cell != null && cell != '') || (keyword != null && keyword != '')){
+    this.setData({ queryOptions })
+  },
+
+  _buildQueryParams() {
+    var isTest = null, isEntertain = null, haveDiscount = null, isSummerCare = null, useCard = null
+    var queryOptions = this.data.queryOptions
+    for (var i = 0; i < queryOptions.length; i++) {
+      switch (queryOptions[i].key) {
+        case 'isTest':       isTest       = queryOptions[i].value; break
+        case 'isEntertain':  isEntertain  = queryOptions[i].value; break
+        case 'haveDiscount': haveDiscount = queryOptions[i].value; break
+        case 'summer':       isSummerCare = queryOptions[i].value; break
+        case 'useCard':      useCard      = queryOptions[i].value; break
+      }
+    }
+    var shop = this.data.shop
+    var startDate = this.data.startDate
+    var endDate = this.data.endDate
+    var cell = this.data.cell
+    var keyword = this.data.keyword
+    // 手机 / 备注搜索时放宽到全时段、全店铺、忽略其它筛选（与旧版一致）
+    if ((cell != null && cell != '') || (keyword != null && keyword != '')) {
       startDate = new Date('2025-10-15')
       endDate = new Date()
       shop = null
@@ -130,122 +99,125 @@ Page({
       isSummerCare = null
       useCard = null
     }
-    data.getOrdersByStaffPromise(null, shop, null, null, '养护', startDate, endDate, 
-      null, isTest, isEntertain, null, null, haveDiscount, null, app.globalData.sessionKey, that.data.cell, haveWarranty, null, that.data.keyword, isSummerCare, null, null, useCard).then(function (orders){
-        console.log('get orders', orders)
-        that.renderOrders(orders)
-        that.setData({querying: false})
-      })
+    return { shop, startDate, endDate, cell, keyword, isTest, isEntertain, haveDiscount, isSummerCare, useCard }
   },
-  renderOrders(orders) {
+
+  getData(page, pageSize) {
     var that = this
-    var totalAmount = 0
+    page = page || that.data.page
+    pageSize = pageSize || that.data.pageSize
+    var p = that._buildQueryParams()
+    data.getRentOrdersByStaffPagedPromise(
+      null, p.shop, null, null, '养护', p.startDate, p.endDate,
+      null, p.isTest, p.isEntertain, null, null, p.haveDiscount, null,
+      app.globalData.sessionKey, p.cell, null, null, p.keyword, p.isSummerCare,
+      null, null, p.useCard, null,
+      page, pageSize
+    ).then(function (result) {
+      that.renderOrders(result.items || [], result.total || 0, page, pageSize)
+      that.setData({ querying: false })
+    }).catch(function (exp) {
+      console.log('error', exp)
+      that.setData({ querying: false })
+    })
+  },
+
+  query() {
+    this.setData({ querying: true })
+    this.getData(1)
+  },
+
+  _statusClass(s) {
+    var map = { '正常订单': 'normal', '临时订单': 'temp' }
+    return map[s] || 'unknown'
+  },
+
+  renderOrders(orders, total, page, pageSize) {
+    var totalEarn = 0
     for (var i = 0; orders && i < orders.length; i++) {
       var order = orders[i]
       var bizDate = new Date(order.biz_date)
       order.dateStr = util.formatDate(bizDate)
       order.timeStr = util.formatTimeStr(bizDate)
-      totalAmount += order.totalEarnAmount
-      order.totalChargeStr = util.showAmount(order.totalCharge)
+      // 状态（养护订单只有 临时订单 / 正常订单 两态）
+      var cp = order.careProperties
+      order.statusLabel = cp ? cp.orderStatus : '临时订单'
+      order.statusClass = this._statusClass(order.statusLabel)
+      order.services = cp ? cp.services : ''
+      order.isSummerTask = !!(cp && cp.isSummerTask)
+      // 顾客称呼 + 会员标识
       var calledName = ''
       var member = order.member
-      var cell = ''
       var memberShip = '【散】'
       if (order.contact_name) {
-        calledName = order.contact_name + (order.contact_gender == '男' ? '(先生)' : (order.contact_gender == '女' ? '(女士)' : ''))
-        cell = order.contact_num
+        calledName = order.contact_name + (order.contact_gender === '男' ? '(先生)' : (order.contact_gender === '女' ? '(女士)' : ''))
+      } else if (member) {
+        calledName = member.real_name + (member.gender === '男' ? ' 先生' : (member.gender === '女' ? ' 女士' : ''))
       }
-      else if (member) {
-        calledName = member.real_name + (member.gender == '男' ? ' 先生' : (member.gender == '女' ? ' 女士' : ''))
-        cell = member.cell
-      }
-      if (member && member.following_wechat == 1) {
+      if (member && member.following_wechat === 1) {
         memberShip = '【会】'
       }
       order.calledName = calledName
-      order.cell = cell
       order.memberShip = memberShip
+      // 支付方式拼接（排除储值/次卡，单列标签）
+      var methodSet = {}
+      order.haveDeposit = false
+      order.useCard = order.useCard === true || order.usePunchCard === true
+      for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
+        var pm = order.availablePayments[j].pay_method
+        if (pm === '储值支付') { order.haveDeposit = true; continue }
+        if (pm === '次卡支付') { order.useCard = true; continue }
+        if (pm) methodSet[pm] = true
+      }
+      var methods = Object.keys(methodSet)
+      order.payMethod = methods.length > 0 ? methods.join('/') : null
       order.paidAmountStr = util.showAmount(order.paidAmount)
       order.refundAmountStr = util.showAmount(order.refundAmount)
       order.totalEarnAmountStr = util.showAmount(order.totalEarnAmount)
-      for (var j = 0; order.availablePayments && j < order.availablePayments.length; j++) {
-        order.payMethod = order.availablePayments[j].pay_method
-      }
-    }
-    that.setData({ orders, totalAmount, totalAmountStr: util.showAmount(totalAmount) })
-  },
-  query(){
-    var that = this
-    that.setData({querying: true})
-    that.getData()
-  },
-  setCell(e){
-    var that = this
-    //that.data.cell = e.detail.value
-    var cell = e.detail.value
-    that.setData({cell})
-  },
-  setQueryOptions(e){
-    var that = this
-    var id = e.currentTarget.id
-    that.setQueryOptionValue(id, e.detail.value)
-  },
-  setQueryOptionValue(key, value){
-    var that = this
-    var queryOptions = that.data.queryOptions
-    for(var i = 0; i < queryOptions.length; i++){
-      if (queryOptions[i].key == key){
-        switch(value){
-          case 'null':
-            queryOptions[i].value = null
-            break
-          case 'true':
-            queryOptions[i].value = true
-            break
-          case 'false':
-            queryOptions[i].value = false
-            break
-          default:
-            queryOptions[i].value = value
-            break
+      order.careCount = order.cares ? order.cares.length : 0
+      // 装备照片缩略图
+      var thumbs = []
+      for (var k = 0; order.cares && k < order.cares.length; k++) {
+        var care = order.cares[k]
+        if (care.careImages && care.careImages.length > 0 && care.careImages[0].image) {
+          thumbs.push(IMG_HOST + care.careImages[0].image.thumbUrl)
         }
       }
+      order.thumbs = thumbs
+      totalEarn += order.totalEarnAmount || 0
     }
-    console.log('set query options', queryOptions)
+    var totalPages = Math.max(1, Math.ceil(total / pageSize))
+    this.setData({
+      orders,
+      total,
+      page,
+      pageSize,
+      totalPages,
+      totalEarnStr: util.showAmount(totalEarn)
+    })
   },
-  shopSelected(e){
-    var that = this
-    console.log('shop selected', e)
-    that.setData({shop: e.detail.shop})
+
+  // list-pager 组件统一回调：翻页 / 跳转 / 改每页条数 → { page, pageSize }
+  onPagerChange(e) {
+    if (this.data.querying) return
+    var d = e.detail
+    this.setData({ querying: true })
+    this.getData(d.page, d.pageSize)
   },
-  gotoDetail(e){
-    var that = this
-    var index = e.currentTarget.id
-    var order = that.data.orders[index]
-    if (order != null && order.careProperties != null
-      && order.careProperties.orderStatus != '临时订单'){
-        wx.navigateTo({
-          url: 'care_order_detail/care_order_detail?orderId=' + order.id,
-        })
-      }
-  },
-  setDate(e){
-    var id = e.currentTarget.id
-    var that = this
-    console.log('select date', e)
-    switch(id){
-      case 'start':
-        that.setData({startDate: e.detail.value})
-        break
-      case 'end':
-        that.setData({endDate: e.detail.value})
-        break
-      default:
-        break
+
+  gotoDetail(e) {
+    var index = parseInt(e.currentTarget.id)
+    var order = this.data.orders[index]
+    if (order && order.careProperties && order.careProperties.orderStatus !== '临时订单') {
+      wx.navigateTo({ url: 'care_order_detail/care_order_detail?orderId=' + order.id })
     }
   },
-  setMemo(e){
-    var that = this
-    that.setData({keyword: e.detail.value})
+
+  setCell(e) {
+    this.setData({ cell: e.detail.value })
+  },
+
+  setMemo(e) {
+    this.setData({ keyword: e.detail.value })
   }
 })
