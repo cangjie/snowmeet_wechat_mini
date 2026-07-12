@@ -239,20 +239,20 @@
   text-overflow: ellipsis;
 }
 
-/* 装备照片缩略图行 */
-.care-thumbs {
+/* 装备照片：卡片最右侧竖排 */
+.order-photos {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 12rpx;
-  padding-top: 12rpx;
-  border-top: 1rpx solid #f0f0f0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+  width: 160rpx;
+  flex-shrink: 0;
+  margin-left: 12rpx;
 }
 
 .care-thumb {
-  width: 120rpx;
-  height: 120rpx;
+  width: 150rpx;
+  height: 150rpx;
   border-radius: 8rpx;
   background: #f3f4f6;
 }

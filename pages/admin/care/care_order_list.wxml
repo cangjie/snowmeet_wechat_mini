@@ -128,8 +128,10 @@
         </view>
         <view class="order-rows">
           <view class="order-row">
-            <text class="row-label">日期</text><text class="row-value">{{item.dateStr}}</text>
-            <text class="row-label row-label--mid">时间</text><text class="row-value">{{item.timeStr}}</text>
+            <text class="row-label">日期</text><text class="row-value row-value--wide">{{item.dateStr}}</text>
+          </view>
+          <view class="order-row">
+            <text class="row-label">时间</text><text class="row-value row-value--wide">{{item.timeStr}}</text>
           </view>
           <view class="order-row">
             <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item.calledName}}</text>
@@ -141,8 +143,10 @@
             <text class="row-label">方式</text><text class="row-value row-value--wide row-value--nowrap">{{item.payMethod || '--'}}</text>
           </view>
           <view class="order-row">
-            <text class="row-label">支付金额</text><text class="row-value">{{item.paidAmountStr}}</text>
-            <text class="row-label row-label--mid">退款</text><text class="row-value">{{item.refundAmountStr}}</text>
+            <text class="row-label">支付金额</text><text class="row-value row-value--wide">{{item.paidAmountStr}}</text>
+          </view>
+          <view class="order-row">
+            <text class="row-label">退款</text><text class="row-value row-value--wide">{{item.refundAmountStr}}</text>
           </view>
           <view class="order-row">
             <text class="row-label">总计收款</text><text class="row-value row-value--wide row-value--strong">{{item.totalEarnAmountStr}}</text>
@@ -160,12 +164,12 @@
             <text class="row-label">备注</text><text class="row-value row-value--wide">{{item.memo}}</text>
           </view>
         </view>
-      </view>
 
-      <!-- 装备照片缩略图 -->
-      <view wx:if="{{item.thumbs.length > 0}}" class="care-thumbs">
-        <image wx:for="{{item.thumbs}}" wx:for-item="thumb" wx:for-index="ti" wx:key="ti"
-               class="care-thumb" mode="aspectFill" src="{{thumb}}" />
+        <!-- 装备照片：卡片最右侧竖排 -->
+        <view wx:if="{{item.thumbs.length > 0}}" class="order-photos">
+          <image wx:for="{{item.thumbs}}" wx:for-item="thumb" wx:for-index="ti" wx:key="ti"
+                 class="care-thumb" mode="aspectFill" src="{{thumb}}" />
+        </view>
       </view>
 
     </view>
