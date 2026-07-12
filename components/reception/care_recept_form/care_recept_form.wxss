@@ -122,6 +122,47 @@
   margin-bottom: 8rpx;
 }
 
+/* 会员储值行（结算条上方） */
+.deposit-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 24rpx;
+  margin: 0 16rpx 12rpx;
+  background: #eff4ff;
+  border-radius: 12rpx;
+}
+.deposit-info {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 12rpx;
+}
+.deposit-label {
+  font-size: 24rpx;
+  color: #6f7881;
+}
+.deposit-amount {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #006495;
+}
+.deposit-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10rpx;
+}
+.deposit-toggle-text {
+  font-size: 26rpx;
+  color: #6f7881;
+}
+.deposit-toggle-text--on {
+  color: #006495;
+  font-weight: 600;
+}
+
 /* 限装备季卡：装备信息锁定态 */
 .equip-lock-hint {
   margin-top: 8rpx;

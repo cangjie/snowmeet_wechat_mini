@@ -6,7 +6,7 @@
 //   - properties.shop       店铺名（定价用）
 //   - properties.memberId   会员 id（优惠券选择用）
 //   - triggerEvent('syncCare', { cares, needUpdate })   购物车变化，父页调 saveCareReceptOrder
-//   - triggerEvent('checkout', { cares })               点击去结算
+//   - triggerEvent('checkout', { cares, useDeposit })   点击去结算（useDeposit=店员勾选的用储值意向）
 // 字段名以后端 Models/Care/Care.cs 为准（snake_case；warranty/entertain 是 bool；
 // 旧前端 left_angel 拼写错误，后端是 left_angle——本组件不采集安检字段，安检数据在任务环节录入）
 const app = getApp();
@@ -62,12 +62,20 @@ Component({
   options: { multipleSlots: false },
   properties: {
     shop: { type: String, value: '' },
-    memberId: { type: null, value: null },
+    memberId: {
+      type: null,
+      value: null,
+      observer(v) { this._loadDeposit(v); },
+    },
     cares: { type: Array, value: [] },
   },
   data: {
     displayCares: [],
     summary: { count: 0, totalLabel: '0.00', canCheckout: false },
+    // 会员储值（会员且有余额时结算条上方显示 + 「使用储值」复选框；本期仅记录意向，实际扣款后续规划）
+    hasDeposit: false,
+    depositAvailableStr: '',
+    useDeposit: false,
     // 品牌 / 其它服务字典（按装备类型缓存）
     skiBrandList: [],
     boardBrandList: [],
@@ -737,11 +745,41 @@ Component({
       // derive=true：服务项与价格一并由服务端按新选择推导返回
       that._fetchPrice(cidx, { derive: true });
     },
+    /* ---------- 会员储值 ---------- */
+    // memberId 变化时拉会员资产（depositTotal）。散客 / 无余额则不显示储值行。
+    _loadDeposit(memberId) {
+      const that = this;
+      if (!memberId) {
+        if (that.data.hasDeposit || that.data.useDeposit || that.data.depositAvailableStr) {
+          that.setData({ hasDeposit: false, depositAvailableStr: '', useDeposit: false });
+        }
+        that._lastDepositMemberId = 0;
+        return;
+      }
+      if (memberId === that._lastDepositMemberId) return;
+      that._lastDepositMemberId = memberId;
+      Promise.resolve(app.loginPromiseNew).then(() => {
+        return data.getMemberAssetsByStaffPromise(memberId, app.globalData.sessionKey);
+      }).then((r) => {
+        if (!r || that._lastDepositMemberId !== memberId) return; // 已换人，丢弃过期结果
+        const dep = r.depositTotal || 0;
+        const patch = { hasDeposit: dep > 0, depositAvailableStr: dep > 0 ? util.showAmount(dep) : '' };
+        // 新会员无储值时清掉上一位的勾选
+        if (dep <= 0 && that.data.useDeposit) patch.useDeposit = false;
+        that.setData(patch);
+      }).catch(() => {});
+    },
+
+    onToggleUseDeposit() {
+      this.setData({ useDeposit: !this.data.useDeposit });
+    },
+
     /* ---------- 结算 ---------- */
     onCheckout() {
       if (!this.data.summary.canCheckout) return;
       const cares = this.data.displayCares.map((c) => this._stripUI(c));
-      this.triggerEvent('checkout', { cares });
+      // useDeposit：店员勾选的「使用储值支付」意向，随去结算落到订单（本期仅记录）
+      this.triggerEvent('checkout', { cares, useDeposit: this.data.useDeposit });
     },
   },
 });

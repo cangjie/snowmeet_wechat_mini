@@ -385,7 +385,8 @@ Page({
 
   onCheckout(e) {
     if (this.data.bizType === 'maintain') {
-      this._checkoutCare();
+      // useDeposit：care_recept_form 传来的「使用储值支付」意向，随去结算落到订单（本期仅记录）
+      this._checkoutCare(!!(e && e.detail && e.detail.useDeposit));
       return;
     }
     const order = this.data.order;
@@ -608,7 +609,8 @@ Page({
   },
 
   // 养护去结算：await 落盘 → Order/PlaceCareOrder → settle，本地订单脱钩（同租赁 onCheckout 约定）
-  _checkoutCare() {
+  // useDeposit：店员勾选的「使用储值支付」意向，随 PlaceCareOrder 落到订单（本期仅记录，扣款后续规划）
+  _checkoutCare(useDeposit) {
     const order = this.data.order;
     if (!order || !order.cares || order.cares.length === 0) {
       wx.showToast({ title: '购物车是空的', icon: 'none' });
@@ -626,7 +628,8 @@ Page({
       }
       const placeUrl = app.globalData.requestPrefix
         + 'Order/PlaceCareOrder/' + placedOrderId
-        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
+        + '&useDeposit=' + (useDeposit ? 'true' : 'false');
       return util.performWebRequest(placeUrl, null);
     }).then((careOrder) => {
       wx.hideLoading();

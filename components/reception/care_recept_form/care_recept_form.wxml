@@ -239,6 +239,18 @@
       </view>
     </view>
 
+    <!-- 会员储值：会员且有余额时显示，店员勾选是否用储值（本期仅记录意向） -->
+    <view wx:if="{{hasDeposit}}" class="deposit-bar" bindtap="onToggleUseDeposit">
+      <view class="deposit-info">
+        <text class="deposit-label">会员储值</text>
+        <text class="deposit-amount">{{depositAvailableStr}}</text>
+      </view>
+      <view class="deposit-toggle">
+        <text class="deposit-toggle-text {{useDeposit ? 'deposit-toggle-text--on' : ''}}">使用储值支付</text>
+        <van-icon name="{{useDeposit ? 'checked' : 'circle'}}" size="22px" color="{{useDeposit ? '#006495' : '#c8c9cc'}}"/>
+      </view>
+    </view>
+
     <view class="checkout-bar">
       <view class="checkout-info">
         <view class="checkout-count">共 {{summary.count}} 件</view>
