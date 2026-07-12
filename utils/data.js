@@ -842,6 +842,57 @@ const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey,
     })
   })
 }
+/* ---------- 养护详情页：发板核销 / 品牌 / 扫码取板（2026-07-12 从旧页内联接口收口） ---------- */
+// 发送取板码（公众号模板消息发给会员）
+const createCareVerifyCodePromise = function (careId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Care/CreateVerifyCode/' + careId.toString()
+    + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+// 验证取板码并完成发板（60 分钟内有效）
+const veriCareFinishCodePromise = function (careId, code, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Care/VeriCareFinishCode/' + careId.toString()
+    + '?code=' + encodeURIComponent(code) + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+// 绑定取板凭证照片
+const setCarePickImagePromise = function (careId, imageId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Care/SetPickImageId/' + careId.toString()
+    + '?imageId=' + imageId.toString() + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+// 新增装备品牌（返回该类型品牌全列表）
+const updateCareBrandPromise = function (type, brandName, chineseName, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Care/UpdateBrandByStaff?type=' + encodeURIComponent(type)
+    + '&brandName=' + encodeURIComponent(brandName)
+    + '&chineseName=' + encodeURIComponent(chineseName || '')
+    + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+// 店员生成扫码二维码（顾客扫码核销身份用）
+const createScanQrCodeByStaffPromise = function (code, scene, purpose, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/CreateNewScanQrCodeByStaff?code=' + encodeURIComponent(code)
+    + '&scene=' + encodeURIComponent(scene) + '&purpose=' + encodeURIComponent(purpose)
+    + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
+// 停止扫码轮询（离开/切换核销方式时释放二维码）
+const stopScanQrCodePromise = function (qrCodeId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/StopQeryScan/' + qrCodeId.toString()
+    + '?sessionKey=' + sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
+// wxoa 公众号二维码图（返回纯字符串 URL，不走 ApiResult 解包，故不用 performWebRequest）
+const getOAQrCodeUrlPromise = function (content) {
+  return new Promise(function (resolve, reject) {
+    wx.request({
+      url: 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOAQRCodeUrl?content=' + content,
+      method: 'GET',
+      success: (res) => { resolve(res.data) },
+      fail: (res) => { reject(res) }
+    })
+  })
+}
 const getPrinterListPromise = function (shop) {
   var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetPrinterByScene?shop=' + encodeURIComponent(shop) 
   return util.performWebRequest(getDeviceNameUrl, null)
@@ -1216,6 +1267,13 @@ module.exports = {
   getRentPriceByIdPromise,
   updateCarePromise,
   updateCareTaskStatusPromise,
+  createCareVerifyCodePromise,
+  veriCareFinishCodePromise,
+  setCarePickImagePromise,
+  updateCareBrandPromise,
+  createScanQrCodeByStaffPromise,
+  stopScanQrCodePromise,
+  getOAQrCodeUrlPromise,
   getPrinterListPromise,
   getMyInfo,
   payWithDepositPromise,

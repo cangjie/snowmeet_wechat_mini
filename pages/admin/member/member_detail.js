@@ -155,7 +155,7 @@ Page({
     if (!id) return
     var url = ''
     if (type === '租赁') { url = '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + id }
-    else if (type === '养护') { url = '/pages/admin/care/order_detail?orderId=' + id }
+    else if (type === '养护') { url = '/pages/admin/care/care_order_detail/care_order_detail?orderId=' + id }
     else if (type === '零售') { url = '/pages/admin/retail/retail_order_detail?id=' + id }
     else { wx.showToast({ title: type + '订单暂无详情页', icon: 'none' }); return }
     wx.navigateTo({ url: url })

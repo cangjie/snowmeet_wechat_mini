@@ -289,7 +289,9 @@ Component({
       command.setText(20, 20 + 40 + 40 + 55 + 55 + 55 + 50, font, 0, 1, 1, priceStr)
       command.setText(20, 350, font, 0, 1, 1, "取板 " + pickDateTitle + " " + pickDateStr)
       command.setText(300, 350, font, 0, 1, 1, "订单日期：" + orderDateStr)
-      var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/order_detail?orderId=' + that.data.order.id.toString() + '&careId=' + care.id.toString()
+      // 2026-07-12 标签二维码切新版养护详情页（需公众平台「扫普通链接二维码打开小程序」登记新路径规则；
+      // 已打印的旧标签仍指旧页 order_detail，旧页保留兼容）
+      var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/care_order_detail/care_order_detail?orderId=' + that.data.order.id.toString() + '&careId=' + care.id.toString()
       command.setQrcode(400, 20 + 40 + 65 + 25, "L", 3, "M", qrCodeText)
       command.setPagePrint()
       return command.getData()

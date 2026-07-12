@@ -257,3 +257,171 @@
   margin-top: 12rpx;
   text-align: center;
 }
+.veri-hint--left { text-align: left; margin-bottom: 12rpx; }
+.veri-seg {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.scan-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12rpx;
+}
+.scan-qr-img {
+  width: 360rpx;
+  height: 360rpx;
+  background: #ffffff;
+  border-radius: 12rpx;
+}
+.task-panel--proof {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
+}
+.task-proof-label { font-size: 24rpx; color: #6f7881; }
+
+/* 非雪季订单醒目横幅（琥珀警示系：蓝=操作 绿=成功 红=危险已占用） */
+.summer-banner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
+  background: #fffbeb;
+  border-left: 8rpx solid #f59e0b;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+.summer-banner-texts { display: flex; flex-direction: column; min-width: 0; }
+.summer-banner-title { font-size: 30rpx; font-weight: 600; color: #92400e; }
+.summer-banner-desc { font-size: 24rpx; color: #b45309; margin-top: 4rpx; }
+.chip-summer { background: #fef3c7; color: #92400e; font-weight: 600; }
+
+/* 任务行三态：当前高亮 / 未来淡化 / 完成收敛 */
+.task-row--current {
+  background: #f0f7fb;
+  border-left: 8rpx solid #006495;
+  border-bottom: none;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  margin: 8rpx 0;
+}
+.task-row--current .task-name { font-weight: 600; }
+.task-row--future .task-name { color: #9aa3ac; }
+.task-row--future .chip { opacity: 0.7; }
+.task-row--done { gap: 10rpx; padding: 10rpx 0; }
+.task-done-name { font-size: 26rpx; color: #3f4850; flex: none; }
+.task-done-flag { font-size: 22rpx; color: #b91c1c; flex: none; }
+.task-done-meta {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: #9aa3ac;
+  text-align: right;
+  min-width: 0;
+}
+
+/* 进行中计时 */
+.task-elapsed {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #006495;
+}
+.task-elapsed-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #006495;
+  animation: elapsed-pulse 1.6s ease-in-out infinite;
+}
+@keyframes elapsed-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* 整宽大按钮 + 引导文案 */
+.btn--block {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 14rpx;
+  padding: 18rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.btn--danger-plain { background: #ffffff; color: #e64340; border: 1rpx solid #f3b6b5; }
+.btn--half { flex: 1; justify-content: center; }
+.task-hint {
+  font-size: 22rpx;
+  color: #9aa3ac;
+  text-align: center;
+  margin-top: 8rpx;
+}
+
+/* 装备信息编辑 */
+.sub-title-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.edit-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 26rpx;
+  color: #006495;
+  padding: 0 4rpx 16rpx;
+}
+.edit-panel {
+  background: #f7f9fc;
+  border-radius: 12rpx;
+  padding: 16rpx;
+}
+.edit-panel .panel-input { width: 100%; box-sizing: border-box; }
+.edit-block { margin-top: 16rpx; }
+.edit-block-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+.seg-row {
+  display: flex;
+  flex-direction: row;
+  gap: 16rpx;
+  margin-top: 6rpx;
+}
+.panel-picker-value { color: #1f2a33; min-height: 40rpx; }
+
+/* 新增品牌弹层 */
+.brand-modal { padding: 32rpx 24rpx 24rpx; }
+.brand-modal-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2a33;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+.brand-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.brand-modal-body .panel-input { width: 100%; box-sizing: border-box; }
+.brand-modal-footer {
+  display: flex;
+  flex-direction: row;
+  gap: 20rpx;
+  margin-top: 24rpx;
+}

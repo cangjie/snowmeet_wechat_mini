@@ -1,9 +1,10 @@
 // pages/admin/care/care_order_detail/care_order_detail.js
 // 新版养护订单详情页（Alpine Operational Minimalist，对标 rent_order_detail）
-// 功能：订单信息 + 支付摘要 + 每件装备卡（装备信息 / 服务 / 照片 / 任务时间线）
-//       任务操作（开始/结束/强行中止）、安全检查录入确认、寄存或快递、
-//       发板核销（发送取板码 + 验证码 + 店长确认）、打印标签/小票（复用旧 print-care 组件）
-// 业务逻辑对齐旧版 pages/admin/care/order_detail（扫码取板/拍照凭证两种核销方式仍在旧页，后续迁移）
+// 功能：非雪季醒目横幅 + 订单信息 + 支付摘要 + 每件装备卡（装备信息/编辑 / 服务 / 照片 / 任务时间线）
+//       任务操作（开始/结束/强行中止，按实际时间引导：进行中计时 + 结束显示耗时 + 耗时过短二次确认）、
+//       安全检查录入确认、寄存或快递、发板核销（扫码取板 / 验证码 / 拍照凭证 / 店长确认）、
+//       装备基础信息编辑（品牌/长度/序列号/附件/招待质保/照片增删）、打印标签/小票（复用旧 print-care 组件）
+// 业务逻辑对齐旧版 pages/admin/care/order_detail（能力已全量迁入，旧页仅作历史标签二维码兼容入口）
 const app = getApp();
 const util = require('../../../../utils/util.js');
 const data = require('../../../../utils/data.js');
@@ -22,7 +23,12 @@ Page({
     order: null,
     cares: [],
     payment: { totalStr: '', paidStr: '', refundStr: '', payingStr: '', rows: [], expanded: false },
+    summerBanner: { show: false, desc: '' },
     veriCode: '',
+    scanQr: { careId: 0, url: '', status: '' }, // status: loading / ready / broken
+    addBrand: { show: false, cidx: -1, name: '', chineseName: '' },
+    skiBrandList: [],
+    boardBrandList: [],
     printShow: false,
     printType: 'label',
     careToBePrinted: null,
@@ -31,17 +37,69 @@ Page({
 
   async onLoad(options) {
     await app.loginPromiseNew;
-    const orderId = parseInt(options.id || options.orderId, 10) || 0;
+    // 标签二维码「扫普通链接二维码打开小程序」进入时，原始 URL 在 options.q（URL-encoded）
+    let orderId = 0;
+    let careId = 0;
+    if (options.q) {
+      orderId = parseInt(util.parseQuery(options.q, 'orderId'), 10) || 0;
+      careId = parseInt(util.parseQuery(options.q, 'careId'), 10) || 0;
+    }
+    if (!orderId) orderId = parseInt(options.id || options.orderId, 10) || 0;
+    if (!careId) careId = parseInt(options.careId, 10) || 0;
     const staff = app.globalData.staff || {};
+    // 页面级 UI 状态（loadOrder 全量重渲染时按 care.id 回填，避免打断用户操作）
+    this._uiState = { expanded: {}, veriType: {} };
+    this._targetCareId = careId;
     this.setData({ orderId, isMaster: (staff.title_level || 0) >= 200 });
+    this._loadBrandLists();
     this.loadOrder();
+    this._loadedOnce = true;
+  },
+
+  onShow() {
+    if (!this._loadedOnce) return;
+    // 编辑中不自动刷新（相机/相册返回可能触发 onShow，整页重载会丢编辑内容）
+    const editing = (this.data.cares || []).some((c) => c._editing);
+    if (editing) {
+      if ((this._runningPaths || []).length > 0) this._startElapsedTimer();
+      return;
+    }
+    this.loadOrder();
+  },
+
+  onHide() {
+    this._stopElapsedTimer();
+    this._closeScan();
+  },
+
+  onUnload() {
+    this._stopElapsedTimer();
+    this._closeScan();
+  },
+
+  _loadBrandLists() {
+    const that = this;
+    const addNewItem = (type) => ({
+      brand_type: type, brand_name: 'Add New', chinese_name: '新增品牌', origin: '', displayedName: '新增品牌',
+    });
+    data.getEquipBrandsPromise('双板').then((list) => {
+      list.push(addNewItem('双板'));
+      that.setData({ skiBrandList: list });
+    }).catch(() => {});
+    data.getEquipBrandsPromise('单板').then((list) => {
+      list.push(addNewItem('单板'));
+      that.setData({ boardBrandList: list });
+    }).catch(() => {});
   },
 
   loadOrder() {
     const that = this;
     if (!this.data.orderId) return;
     data.getOrderByStaffPromise(this.data.orderId, app.globalData.sessionKey).then((order) => {
+      that._rawCares = order.cares || [];
       that.renderOrder(order);
+      that._applyTargetCare();
+      that._syncScanWithOrder();
     }).catch((e) => {
       console.warn('load care order failed', e);
     });
@@ -51,6 +109,26 @@ Page({
     const bizDate = order.biz_date ? new Date(order.biz_date) : null;
     order.bizDateStr = bizDate ? util.formatDate(bizDate) : '';
     const cares = (order.cares || []).map((care) => this._renderCare(care));
+    // 非雪季订单醒目横幅（任一 care 是非雪季即显示，按 summer 汇总）
+    let nowCount = 0;
+    let laterCount = 0;
+    let summerTotal = 0;
+    (order.cares || []).forEach((c) => {
+      if (c.biz_type === '非雪季养护') {
+        summerTotal += 1;
+        if (c.summer === 'now') nowCount += 1;
+        else if (c.summer === 'later') laterCount += 1;
+      }
+    });
+    const parts = [];
+    if (nowCount > 0) parts.push('立等现修 ' + nowCount + ' 件');
+    if (laterCount > 0) parts.push('寄存后修 ' + laterCount + ' 件');
+    const otherCount = summerTotal - nowCount - laterCount;
+    if (otherCount > 0) parts.push('非雪季养护 ' + otherCount + ' 件');
+    const summerBanner = {
+      show: summerTotal > 0,
+      desc: parts.length > 0 ? parts.join(' · ') : '本单含非雪季养护装备',
+    };
     const rows = (order.payments || []).map((p) => ({
       id: p.id,
       method: p.pay_method || (p.is_debt === 1 ? '挂账' : '未知'),
@@ -61,6 +139,7 @@ Page({
     this.setData({
       order,
       cares,
+      summerBanner,
       payment: {
         ...this.data.payment,
         totalStr: util.showAmount(order.totalCharge || 0),
@@ -70,26 +149,31 @@ Page({
         rows,
       },
     });
+    this._collectRunning(cares);
   },
 
   _renderCare(raw) {
     const care = { ...raw };
+    const ui = this._uiState || { expanded: {}, veriType: {} };
     const brandDisp = care.brand ? String(care.brand).split('/')[0] : '';
     const titleParts = [care.equipment || '装备'];
     if (brandDisp) titleParts.push(brandDisp);
     if (care.scale) titleParts.push(care.scale + 'cm');
     care._title = titleParts.join(' · ');
-    // 服务 chips
+    // 服务 chips（对象数组：非雪季用醒目琥珀 chip，其余 outline）
     const chips = [];
-    if (care.biz_type === '非雪季养护') chips.push('非雪季');
-    if (care.need_edge === 1) chips.push('修刃' + (care.edge_degree ? care.edge_degree + '°' : ''));
-    if (care.need_wax === 1) chips.push('热蜡');
-    if (care.free_wax === 1) chips.push('机打蜡');
-    if (care.need_unwax === 1) chips.push('刮蜡');
-    if (care.urgent === 1) chips.push('立等');
-    if (care.repair_memo) chips.push('维修:' + care.repair_memo);
-    if (care.entertain) chips.push('招待');
-    if (care.warranty) chips.push('质保');
+    if (care.biz_type === '非雪季养护') {
+      const t = care.summer === 'now' ? '非雪季·立等现修' : (care.summer === 'later' ? '非雪季·寄存后修' : '非雪季');
+      chips.push({ text: t, cls: 'chip-summer' });
+    }
+    if (care.need_edge === 1) chips.push({ text: '修刃' + (care.edge_degree ? care.edge_degree + '°' : ''), cls: 'chip-outline' });
+    if (care.need_wax === 1) chips.push({ text: '热蜡', cls: 'chip-outline' });
+    if (care.free_wax === 1) chips.push({ text: '机打蜡', cls: 'chip-outline' });
+    if (care.need_unwax === 1) chips.push({ text: '刮蜡', cls: 'chip-outline' });
+    if (care.urgent === 1) chips.push({ text: '立等', cls: 'chip-outline' });
+    if (care.repair_memo) chips.push({ text: '维修:' + care.repair_memo, cls: 'chip-outline' });
+    if (care.entertain) chips.push({ text: '招待', cls: 'chip-outline' });
+    if (care.warranty) chips.push({ text: '质保', cls: 'chip-outline' });
     care._chips = chips;
     // 金额
     care._commonStr = util.showAmount(care.common_charge || 0);
@@ -108,9 +192,16 @@ Page({
         url: fullUrl(img.file_path_name),
       };
     });
-    // 序列号左右拆分展示
+    // 取板凭证（拍照核销后展示）
+    if (care.pickImage) {
+      care._pickThumb = fullUrl(care.pickImage.thumbUrl || care.pickImage.file_path_name);
+      care._pickUrl = fullUrl(care.pickImage.file_path_name);
+    }
+    // 序列号展示
     care._serialText = care.serials || '';
-    // 任务时间线：第一个未完成（且非中止）的任务为 current，可操作
+    // 任务时间线：第一个未完成（且非中止）的任务为 current；已开始的任务始终可操作
+    const myStaffId = (app.globalData.staff || {}).id;
+    const now = Date.now();
     let currentFound = false;
     care._tasks = (care.tasks || []).map((t) => {
       const task = { ...t };
@@ -118,8 +209,27 @@ Page({
       task._endStr = t.end_time ? util.formatDate(new Date(t.end_time)) + ' ' + this._timeStr(t.end_time) : '';
       task._staffName = (t.staff && t.staff.name) || '';
       const done = t.status === '已完成' || t.status === '强行中止';
-      task._current = !done && !currentFound;
-      if (task._current) currentFound = true;
+      task._done = done;
+      task._running = t.status === '已开始';
+      task._isMine = !!(t.staff_id && myStaffId && t.staff_id === myStaffId);
+      task._current = (!done && !currentFound) || task._running;
+      if (!done && !currentFound) currentFound = true;
+      if (task._running && t.start_time) {
+        task._elapsedStr = this._fmtDuration(now - new Date(t.start_time).valueOf());
+      }
+      if (done && t.start_time && t.end_time) {
+        task._durationStr = this._fmtDuration(new Date(t.end_time).valueOf() - new Date(t.start_time).valueOf());
+      }
+      // 引导文案：让店员按实际操作时间点按钮
+      if (task._current && !done) {
+        if (t.status === '未开始') {
+          task._hint = '请在实际开始操作时点击，系统将记录真实开始时间';
+        } else if (task._running) {
+          task._hint = task._isMine
+            ? '完成后请及时点击结束，系统将记录真实结束时间'
+            : ((task._staffName || '他人') + ' 执行中');
+        }
+      }
       switch (t.task_name) {
         case '修刃': task._title = '修刃 角度：' + (care.edge_degree || '89'); break;
         case '维修': task._title = '维修 ' + (care.repair_memo || ''); break;
@@ -127,11 +237,16 @@ Page({
       }
       return task;
     });
-    // 安检可录入：品牌长度已填 + 首任务未完成
+    // 安检可录入：首任务为安全检查且未完成
     const t0 = care._tasks[0];
     care._safeChecking = !!(t0 && t0.task_name === '安全检查' && t0.status !== '已完成');
     care._status = care.status || (care._tasks.length === 0 ? '未开始' : '进行中');
-    care._expanded = care._status !== '已完成';
+    // 展开态 / 发板核销方式：按 care.id 回填页面级记忆
+    care._expanded = ui.expanded[care.id] !== undefined ? ui.expanded[care.id] : (care._status !== '已完成');
+    const finishTask = care._tasks.find((t) => t.task_name === '发板');
+    if (!finishTask || finishTask.status !== '未开始') delete ui.veriType[care.id];
+    care._veriType = ui.veriType[care.id] || '';
+    care._editing = false;
     return care;
   },
 
@@ -142,9 +257,80 @@ Page({
 
   _careIdx(e) { return Number(e.currentTarget.dataset.cidx); },
 
+  /* ---------- 进行中任务计时（30s 一跳，不做高频 setData） ---------- */
+  _fmtDuration(ms) {
+    if (!ms || ms < 0) ms = 0;
+    const sec = Math.floor(ms / 1000);
+    if (sec < 60) return sec + ' 秒';
+    const min = Math.floor(sec / 60);
+    if (min < 60) return min + ' 分钟';
+    return Math.floor(min / 60) + ' 小时 ' + (min % 60) + ' 分';
+  },
+
+  _collectRunning(cares) {
+    const paths = [];
+    cares.forEach((c, ci) => {
+      (c._tasks || []).forEach((t, ti) => {
+        if (t._running && t.start_time) {
+          paths.push({ ci, ti, start: new Date(t.start_time).valueOf() });
+        }
+      });
+    });
+    this._runningPaths = paths;
+    if (paths.length > 0) this._startElapsedTimer();
+    else this._stopElapsedTimer();
+  },
+
+  _startElapsedTimer() {
+    this._stopElapsedTimer();
+    const that = this;
+    this._elapsedTimer = setInterval(() => { that._tickElapsed(); }, 30000);
+  },
+
+  _stopElapsedTimer() {
+    if (this._elapsedTimer) {
+      clearInterval(this._elapsedTimer);
+      this._elapsedTimer = null;
+    }
+  },
+
+  _tickElapsed() {
+    const paths = this._runningPaths || [];
+    if (paths.length === 0) { this._stopElapsedTimer(); return; }
+    const nowTs = Date.now();
+    const patch = {};
+    paths.forEach((p) => {
+      patch['cares[' + p.ci + ']._tasks[' + p.ti + ']._elapsedStr'] = this._fmtDuration(nowTs - p.start);
+    });
+    this.setData(patch);
+  },
+
+  /* ---------- careId 深链定位（标签二维码 / 列表带入） ---------- */
+  _applyTargetCare() {
+    if (!this._targetCareId || this._targetApplied) return;
+    const cid = this._targetCareId;
+    const cares = this.data.cares || [];
+    const idx = cares.findIndex((c) => c.id === cid);
+    if (idx < 0) return;
+    this._targetApplied = true;
+    const patch = {};
+    cares.forEach((c, i) => {
+      this._uiState.expanded[c.id] = (c.id === cid);
+      patch['cares[' + i + ']._expanded'] = (c.id === cid);
+    });
+    this.setData(patch);
+    setTimeout(() => {
+      wx.pageScrollTo({ selector: '#care-' + cid, offsetTop: -20, duration: 300 });
+    }, 300);
+  },
+
   onToggleCare(e) {
     const cidx = this._careIdx(e);
-    this.setData({ ['cares[' + cidx + ']._expanded']: !this.data.cares[cidx]._expanded });
+    const care = this.data.cares[cidx];
+    const next = !care._expanded;
+    this._uiState.expanded[care.id] = next;
+    if (!next && this._scan && this._scan.careId === care.id) this._closeScan();
+    this.setData({ ['cares[' + cidx + ']._expanded']: next });
   },
 
   onTogglePayment() {
@@ -161,6 +347,24 @@ Page({
     const idx = Number(e.currentTarget.dataset.idx);
     const urls = this.data.cares[cidx]._photos.map((p) => p.url);
     wx.previewImage({ urls, current: urls[idx] });
+  },
+
+  onPickProofTap(e) {
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
+    if (care && care._pickUrl) wx.previewImage({ urls: [care._pickUrl] });
+  },
+
+  // careImages 去导航（防后端 EF 图附加撞键；既有行保留全部标量字段，create_date 等不被冲掉）
+  _stripImageNavs(careImages, careId) {
+    return (careImages || []).map((im) => {
+      const keep = { ...im };
+      delete keep.image;
+      delete keep.care;
+      keep.care_id = careId;
+      keep.image_id = keep.image_id || (im.image && im.image.id) || 0;
+      return keep;
+    });
   },
 
   /* ---------- 安全检查 ---------- */
@@ -195,6 +399,7 @@ Page({
         const payload = { ...care };
         // 去掉派生字段，避免后端 diff 日志噪音
         Object.keys(payload).forEach((k) => { if (k.indexOf('_') === 0) delete payload[k]; });
+        payload.careImages = that._stripImageNavs(care.careImages, care.id);
         payload.tasks = care.tasks;
         data.updateCarePromise(payload, '安全检查', app.globalData.sessionKey).then(() => {
           return data.updateCareTaskStatusPromise(care.tasks[0].id, '已完成', '养护详情页安全检查',
@@ -207,13 +412,14 @@ Page({
     });
   },
 
-  /* ---------- 任务开始 / 结束 ---------- */
+  /* ---------- 任务开始 / 结束（按实际时间引导） ---------- */
   onTaskStart(e) {
     const that = this;
     const taskId = Number(e.currentTarget.dataset.taskId);
+    const taskName = e.currentTarget.dataset.taskName || '任务';
     wx.showModal({
-      title: '确认开始？',
-      content: '',
+      title: '开始任务',
+      content: '点击确定后将记录「' + taskName + '」的实际开始时间，请确保现在开始操作。',
       success(res) {
         if (!res.confirm) return;
         data.updateCareTaskStatusPromise(taskId, '已开始', '养护详情页', app.globalData.sessionKey, null, null)
@@ -231,21 +437,45 @@ Page({
     if (!task) return;
     const myStaffId = (app.globalData.staff || {}).id;
     // 他人执行中的任务只能强行中止（对齐旧页）
-    const interrupt = task.staff_id && task.staff_id !== myStaffId;
-    const status = interrupt ? '强行中止' : '已完成';
-    const minutes = task.start_time
-      ? ((Date.now() - new Date(task.start_time).valueOf()) / 60000).toFixed(2) : '0';
+    if (task.staff_id && task.staff_id !== myStaffId) {
+      wx.showModal({
+        title: '确认强行中止任务',
+        content: '本任务是 ' + (task._staffName || '他人') + ' 在执行，确认强行中止吗？',
+        success(res) {
+          if (res.confirm) that._commitTaskEnd(taskId, '强行中止');
+        },
+      });
+      return;
+    }
+    const elapsedMs = task.start_time ? (Date.now() - new Date(task.start_time).valueOf()) : 0;
+    const durStr = this._fmtDuration(elapsedMs);
     wx.showModal({
-      title: interrupt ? '确认强行中止任务' : '确认任务结束',
-      content: interrupt
-        ? ('本任务是 ' + (task._staffName || '他人') + ' 在执行，确认强行中止吗？')
-        : ('本任务共耗时 ' + minutes + ' 分钟'),
+      title: '确认任务结束',
+      content: '「' + task.task_name + '」实际耗时 ' + durStr + '。',
       success(res) {
         if (!res.confirm) return;
-        data.updateCareTaskStatusPromise(taskId, status, '养护详情页', app.globalData.sessionKey, null, null)
-          .then(() => { that.loadOrder(); }).catch(() => {});
+        if (elapsedMs < 60000) {
+          // 耗时异常短：二次确认，引导按实际完成时间点结束
+          wx.showModal({
+            title: '耗时过短提醒',
+            content: '本任务仅用时 ' + durStr + '，确认已实际完成操作？',
+            confirmText: '确认完成',
+            cancelText: '返回',
+            success(res2) {
+              if (res2.confirm) that._commitTaskEnd(taskId, '已完成');
+            },
+          });
+          return;
+        }
+        that._commitTaskEnd(taskId, '已完成');
       },
     });
+  },
+
+  _commitTaskEnd(taskId, status) {
+    const that = this;
+    data.updateCareTaskStatusPromise(taskId, status, '养护详情页', app.globalData.sessionKey, null, null)
+      .then(() => { that.loadOrder(); }).catch(() => {});
   },
 
   /* ---------- 寄存或快递（非雪季） ---------- */
@@ -287,14 +517,44 @@ Page({
     });
   },
 
-  /* ---------- 发板核销 ---------- */
-  onSendVeriCode(e) {
-    const care = this.data.cares[this._careIdx(e)];
-    const url = app.globalData.requestPrefix + 'Care/CreateVerifyCode/' + care.id
-      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
-    util.performWebRequest(url, null).then(() => {
+  /* ---------- 发板核销：四方式（扫码取板 / 验证码 / 拍照凭证 / 店长确认） ---------- */
+  onVeriTypeTap(e) {
+    const that = this;
+    const cidx = this._careIdx(e);
+    const type = e.currentTarget.dataset.type;
+    const care = this.data.cares[cidx];
+    if (!care || care._veriType === type) return;
+    // 切走扫码态先关闭会话
+    if (care._veriType === '扫码取板') this._closeScan();
+    this._uiState.veriType[care.id] = type;
+    this.setData({ ['cares[' + cidx + ']._veriType']: type });
+    if (type === '扫码取板') {
+      this._openScan(cidx);
+    } else if (type === '验证码') {
+      const order = this.data.order || {};
+      const m = order.member || {};
+      const name = m.title || order.contact_name || '顾客';
+      const cell = m.cell || order.contact_num || '';
+      wx.showModal({
+        title: '即将发送取板码',
+        content: '取板码将通过公众号消息发送给【' + name + '】手机号【' + cell + '】',
+        success(res) {
+          if (res.confirm) that._sendVeriCode(cidx);
+        },
+      });
+    }
+  },
+
+  _sendVeriCode(cidx) {
+    const care = this.data.cares[cidx];
+    data.createCareVerifyCodePromise(care.id, app.globalData.sessionKey).then(() => {
       wx.showToast({ title: '发送成功', icon: 'success' });
     }).catch(() => {});
+  },
+
+  onSendVeriCode(e) {
+    // 「重新发送」按钮（进入验证码面板时已确认过一次）
+    this._sendVeriCode(this._careIdx(e));
   },
 
   onVeriCodeInput(e) {
@@ -309,11 +569,8 @@ Page({
       wx.showToast({ title: '请输入取板码', icon: 'none' });
       return;
     }
-    const url = app.globalData.requestPrefix + 'Care/VeriCareFinishCode/' + care.id
-      + '?code=' + encodeURIComponent(code)
-      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
     this.setData({ veriCode: '' });
-    util.performWebRequest(url, null).then(() => {
+    data.veriCareFinishCodePromise(care.id, code, app.globalData.sessionKey).then(() => {
       wx.showToast({ title: '验证通过', icon: 'success' });
       that.loadOrder();
     }).catch(() => {});
@@ -322,7 +579,7 @@ Page({
   onMasterFinish(e) {
     const that = this;
     const care = this.data.cares[this._careIdx(e)];
-    const finishTask = (care._tasks || []).filter((t) => t.task_name === '发板')[0];
+    const finishTask = (care._tasks || []).find((t) => t.task_name === '发板');
     if (!finishTask) return;
     wx.showModal({
       title: '确认发板',
@@ -339,22 +596,390 @@ Page({
     });
   },
 
+  // 拍照凭证：两段上传原图+缩略图 → 绑定取板凭证 → 完成发板
+  onPickPhotoRead(e) {
+    const that = this;
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
+    const finishTask = (care._tasks || []).find((t) => t.task_name === '发板');
+    if (!finishTask) return;
+    const uploadFile = e.detail.file;
+    wx.showLoading({ title: '上传中', mask: true });
+    data.uploadFilePromise(null, uploadFile.tempFilePath, '养护取板', uploadFile.type, app.globalData.sessionKey)
+      .then((uploaded) => data.uploadFilePromise(uploaded.id, uploadFile.thumb || uploadFile.tempFilePath,
+        null, null, app.globalData.sessionKey))
+      .then((withThumb) => data.setCarePickImagePromise(care.id, withThumb.id, app.globalData.sessionKey))
+      .then(() => data.updateCareTaskStatusPromise(finishTask.id, '已完成', '上传照片取板',
+        app.globalData.sessionKey, null, null))
+      .then(() => {
+        wx.hideLoading();
+        wx.showToast({ title: '拍照发板完成', icon: 'success' });
+        that.loadOrder();
+      })
+      .catch(() => {
+        wx.hideLoading();
+        wx.showToast({ title: '上传失败', icon: 'none' });
+      });
+  },
+
+  /* ---------- 扫码取板（页面级单例 WebSocket 会话） ---------- */
+  _openScan(cidx) {
+    const that = this;
+    this._closeScan();
+    const care = this.data.cares[cidx];
+    if (!care) return;
+    this._scan = { careId: care.id, qrCode: null, socketTask: null, replied: false };
+    this.setData({ scanQr: { careId: care.id, url: '', status: 'loading' } });
+    data.createScanQrCodeByStaffPromise('care_veri_' + care.id, '店铺接待', '养护取板', app.globalData.sessionKey)
+      .then((qrCode) => {
+        if (!that._scan || that._scan.careId !== care.id) return null; // 已被切走
+        that._scan.qrCode = qrCode;
+        return data.getOAQrCodeUrlPromise(qrCode.code).then((url) => {
+          if (!that._scan || that._scan.careId !== care.id) return;
+          that.setData({ scanQr: { careId: care.id, url, status: 'ready' } });
+          that._startSocket();
+        });
+      })
+      .catch(() => {
+        if (!that._scan || that._scan.careId !== care.id) return;
+        that.setData({ 'scanQr.status': 'broken' });
+      });
+  },
+
+  _startSocket() {
+    const that = this;
+    const scan = this._scan;
+    if (!scan || !scan.qrCode) return;
+    const socketTask = wx.connectSocket({
+      url: 'wss://' + app.globalData.domainName + '/ws',
+      header: { 'content-type': 'application/json' },
+    });
+    scan.socketTask = socketTask;
+    socketTask.onOpen(() => {
+      socketTask.send({ data: JSON.stringify({ command: 'queryqrscan', id: scan.qrCode.id }) });
+    });
+    socketTask.onMessage((res) => { that._onScanMessage(res); });
+    socketTask.onClose(() => { that._onScanClosed(); });
+    socketTask.onError(() => { that._onScanClosed(); });
+  },
+
+  _onScanMessage(res) {
+    const that = this;
+    const scan = this._scan;
+    if (!scan) return;
+    let msg = null;
+    try { msg = JSON.parse(res.data); } catch (err) { return; }
+    const scanQrCode = (msg && msg.data) || {};
+    scan.replied = true;
+    const order = this.data.order || {};
+    const scanCareId = scan.careId;
+    if (order.member_id && order.member_id === scanQrCode.scaner_member_id) {
+      const care = (this.data.cares || []).find((c) => c.id === scanCareId);
+      const finishTask = care ? (care._tasks || []).find((t) => t.task_name === '发板') : null;
+      this._closeScan();
+      if (!finishTask) return;
+      data.updateCareTaskStatusPromise(finishTask.id, '已完成', '扫码取板', app.globalData.sessionKey, null, null)
+        .then(() => {
+          wx.showToast({ title: '扫码发板完成', icon: 'success' });
+          that.loadOrder();
+        }).catch(() => {});
+    } else {
+      this._closeScan();
+      wx.showToast({ title: '顾客非本人', icon: 'error' });
+      // 二维码已被消费，面板给「重新生成二维码」入口
+      this.setData({ scanQr: { careId: scanCareId, url: '', status: 'broken' } });
+    }
+  },
+
+  _onScanClosed() {
+    const scan = this._scan;
+    if (!scan) return; // 主动关闭
+    if (!scan.replied) {
+      scan.socketTask = null;
+      this.setData({ 'scanQr.status': 'broken' });
+    }
+  },
+
+  _closeScan() {
+    const scan = this._scan;
+    if (!scan) return;
+    this._scan = null;
+    if (scan.qrCode && !scan.replied) {
+      data.stopScanQrCodePromise(scan.qrCode.id, app.globalData.sessionKey).catch(() => {});
+    }
+    if (scan.socketTask) {
+      try { scan.socketTask.close({}); } catch (err) { /* 已关闭 */ }
+    }
+    this.setData({ scanQr: { careId: 0, url: '', status: '' } });
+  },
+
+  onScanRetry(e) {
+    this._openScan(this._careIdx(e));
+  },
+
+  // loadOrder 后校准扫码会话：对应 care 的发板任务已不是待核销态时清理
+  _syncScanWithOrder() {
+    const scan = this._scan;
+    if (!scan) return;
+    const care = (this.data.cares || []).find((c) => c.id === scan.careId);
+    const finishTask = care ? (care._tasks || []).find((t) => t.task_name === '发板') : null;
+    if (!care || !finishTask || finishTask.status !== '未开始') this._closeScan();
+  },
+
+  /* ---------- 装备基础信息编辑 ---------- */
+  onEditTap(e) {
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
+    const raw = (this._rawCares || [])[cidx] || {};
+    // 品牌选中下标预派生（WXML 不能 indexOf）
+    const list = care.equipment === '双板' ? this.data.skiBrandList : this.data.boardBrandList;
+    let brandIndex = -1;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].displayedName === care.brand) { brandIndex = i; break; }
+    }
+    const serials = care.serials || '';
+    const diff = serials.indexOf('|') >= 0;
+    const arr = serials.split('|');
+    // 编辑照片列表（van-uploader file-list 格式，image_id 对齐服务端）
+    const photoFiles = (raw.careImages || []).map((im) => {
+      const img = im.image || {};
+      return {
+        id: im.id,
+        image_id: im.image_id || img.id || 0,
+        url: fullUrl(img.file_path_name),
+        thumb: fullUrl(img.thumbUrl || img.file_path_name),
+        status: 'success',
+      };
+    });
+    this.setData({
+      ['cares[' + cidx + ']._editing']: true,
+      ['cares[' + cidx + ']._brandIndex']: brandIndex,
+      ['cares[' + cidx + ']._diffSerial']: diff,
+      ['cares[' + cidx + ']._leftSerial']: diff ? arr[0] : '',
+      ['cares[' + cidx + ']._rightSerial']: diff && arr.length > 1 ? arr[1] : '',
+      ['cares[' + cidx + ']._photoFiles']: photoFiles,
+      ['cares[' + cidx + ']._specialKey']: care.entertain ? 'entertain' : (care.warranty ? 'warranty' : 'none'),
+    });
+  },
+
+  onEditCancel() {
+    // 丢弃本地改动，服务端为真理之源
+    this.loadOrder();
+  },
+
+  onEditFieldBlur(e) {
+    const cidx = this._careIdx(e);
+    const field = e.currentTarget.dataset.field; // scale/boot_length/serials/_leftSerial/_rightSerial/others_associates/memo
+    this.setData({ ['cares[' + cidx + '].' + field]: e.detail.value });
+  },
+
+  onBrandChange(e) {
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
+    const list = care.equipment === '双板' ? this.data.skiBrandList : this.data.boardBrandList;
+    const idx = parseInt(e.detail.value, 10);
+    const item = list[idx];
+    if (!item) return;
+    if (idx === list.length - 1) {
+      // 末项「新增品牌」→ 弹层
+      this.setData({ addBrand: { show: true, cidx, name: '', chineseName: '' } });
+      return;
+    }
+    this.setData({
+      ['cares[' + cidx + '].brand']: item.displayedName,
+      ['cares[' + cidx + ']._brandIndex']: idx,
+    });
+  },
+
+  onBoardFrontTap(e) {
+    const cidx = this._careIdx(e);
+    const v = e.currentTarget.dataset.value; // 左 / 右
+    this.setData({ ['cares[' + cidx + '].board_front']: v });
+  },
+
+  onSerialDiffTap(e) {
+    const cidx = this._careIdx(e);
+    const next = !this.data.cares[cidx]._diffSerial;
+    this.setData({
+      ['cares[' + cidx + ']._diffSerial']: next,
+      ['cares[' + cidx + '].serials']: '',
+      ['cares[' + cidx + ']._leftSerial']: '',
+      ['cares[' + cidx + ']._rightSerial']: '',
+    });
+  },
+
+  onWithPoleTap(e) {
+    const cidx = this._careIdx(e);
+    this.setData({ ['cares[' + cidx + '].with_pole']: !this.data.cares[cidx].with_pole });
+  },
+
+  onSpecialTap(e) {
+    const cidx = this._careIdx(e);
+    const key = e.currentTarget.dataset.key; // none / entertain / warranty
+    this.setData({
+      ['cares[' + cidx + ']._specialKey']: key,
+      ['cares[' + cidx + '].entertain']: key === 'entertain',
+      ['cares[' + cidx + '].warranty']: key === 'warranty',
+    });
+  },
+
+  onEditPhotoRead(e) {
+    const that = this;
+    const cidx = this._careIdx(e);
+    const uploadFile = e.detail.file;
+    const pending = {
+      id: 0, image_id: 0,
+      url: uploadFile.tempFilePath,
+      thumb: uploadFile.thumb || uploadFile.tempFilePath,
+      status: 'uploading', message: '上传中',
+    };
+    const files = (this.data.cares[cidx]._photoFiles || []).concat([pending]);
+    this.setData({ ['cares[' + cidx + ']._photoFiles']: files });
+    data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
+      .then((uploaded) => data.uploadFilePromise(uploaded.id, uploadFile.thumb || uploadFile.tempFilePath,
+        null, null, app.globalData.sessionKey))
+      .then((withThumb) => {
+        const cur = (that.data.cares[cidx]._photoFiles || []).slice();
+        const i = cur.findIndex((f) => f.status === 'uploading');
+        if (i >= 0) {
+          cur[i] = {
+            id: 0,
+            image_id: withThumb.id,
+            url: fullUrl(withThumb.file_path_name),
+            thumb: fullUrl(withThumb.thumbUrl || withThumb.file_path_name),
+            status: 'success',
+          };
+        }
+        that.setData({ ['cares[' + cidx + ']._photoFiles']: cur });
+      })
+      .catch(() => {
+        wx.showToast({ title: '照片上传失败', icon: 'none' });
+        const cur = (that.data.cares[cidx]._photoFiles || []).filter((f) => f.status !== 'uploading');
+        that.setData({ ['cares[' + cidx + ']._photoFiles']: cur });
+      });
+  },
+
+  onEditPhotoDelete(e) {
+    const cidx = this._careIdx(e);
+    const index = e.detail.index;
+    const cur = (this.data.cares[cidx]._photoFiles || []).filter((f, i) => i !== index);
+    this.setData({ ['cares[' + cidx + ']._photoFiles']: cur });
+  },
+
+  onEditSave(e) {
+    const that = this;
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
+    const raw = (this._rawCares || [])[cidx];
+    if (!raw) return;
+    // 以原始 care 为基底合成 payload（保存别整体覆盖本地状态的反向应用：提交时以服务端原对象为基底）
+    const payload = { ...raw };
+    payload.brand = care.brand || null;
+    payload.scale = care.scale || null;
+    payload.boot_length = care.boot_length || null;
+    payload.board_front = care.board_front || null;
+    payload.others_associates = care.others_associates || null;
+    payload.memo = care.memo || null;
+    payload.serials = care._diffSerial
+      ? ((care._leftSerial || '') + '|' + (care._rightSerial || ''))
+      : (care.serials || '');
+    // bool 字段 coerce，不发 null（后端非可空 bool，null 反序列化 400）
+    payload.with_pole = !!care.with_pole;
+    payload.entertain = !!care.entertain;
+    payload.warranty = !!care.warranty;
+    payload.use_card = !!raw.use_card;
+    // careImages：以编辑面板照片为准；既有行保留原对象标量（去导航），新照片 id=0 插入，删掉的行后端按 id diff 物理删
+    payload.careImages = [];
+    (care._photoFiles || []).forEach((f) => {
+      if (f.status !== 'success' || !f.image_id) return;
+      if (f.id > 0) {
+        const ori = (raw.careImages || []).find((im) => im.id === f.id);
+        if (ori) {
+          const keep = { ...ori };
+          delete keep.image;
+          delete keep.care;
+          keep.image_id = f.image_id;
+          keep.care_id = raw.id;
+          payload.careImages.push(keep);
+          return;
+        }
+      }
+      payload.careImages.push({ id: 0, care_id: raw.id, image_id: f.image_id, valid: true });
+    });
+    payload.tasks = raw.tasks;
+    data.updateCarePromise(payload, '养护订单详情页修改装备信息', app.globalData.sessionKey).then(() => {
+      wx.showToast({ title: '更新成功', icon: 'success' });
+      that.loadOrder();
+    }).catch(() => {});
+  },
+
+  /* ---------- 新增品牌 ---------- */
+  onAddBrandInput(e) {
+    const field = e.currentTarget.dataset.field; // name / chineseName
+    this.setData({ ['addBrand.' + field]: e.detail.value });
+  },
+
+  onAddBrandCancel() {
+    this.setData({ addBrand: { show: false, cidx: -1, name: '', chineseName: '' } });
+  },
+
+  onAddBrandConfirm() {
+    const that = this;
+    const { cidx, name, chineseName } = this.data.addBrand;
+    const care = this.data.cares[cidx];
+    if (!care) return;
+    if (!name) {
+      wx.showToast({ title: '必须填写英文名称', icon: 'error' });
+      return;
+    }
+    data.updateCareBrandPromise(care.equipment, name, chineseName || '', app.globalData.sessionKey)
+      .then((brandList) => {
+        brandList.push({
+          brand_type: care.equipment, brand_name: 'Add New', chinese_name: '新增品牌', origin: '', displayedName: '新增品牌',
+        });
+        let brand = care.brand;
+        let brandIndex = care._brandIndex;
+        for (let i = 0; i < brandList.length; i++) {
+          if (brandList[i].brand_name === name) {
+            brand = brandList[i].displayedName;
+            brandIndex = i;
+            break;
+          }
+        }
+        const patch = { addBrand: { show: false, cidx: -1, name: '', chineseName: '' } };
+        patch[care.equipment === '双板' ? 'skiBrandList' : 'boardBrandList'] = brandList;
+        patch['cares[' + cidx + '].brand'] = brand;
+        patch['cares[' + cidx + ']._brandIndex'] = brandIndex;
+        that.setData(patch);
+      })
+      .catch(() => {
+        wx.showToast({ title: '新增品牌失败', icon: 'none' });
+      });
+  },
+
   /* ---------- 打印 ---------- */
+  _preparePrint(cidx) {
+    const care = this.data.cares[cidx];
+    const order = this.data.order || {};
+    const m = order.member;
+    // print-care 组件依赖 care 上的 customerName/customerCell/shop（对齐旧页 showPrintBackDrop）
+    care.customerName = m ? m.title : (order.contact_name || '散客');
+    care.customerCell = m ? m.cell : (order.contact_num || '');
+    care.shop = order.shop;
+    return care;
+  },
+
   onPrintLabel(e) {
-    const care = this.data.cares[this._careIdx(e)];
+    const care = this._preparePrint(this._careIdx(e));
     this.setData({ printShow: true, printType: 'label', careToBePrinted: care });
   },
 
   onPrintInvoice(e) {
-    const care = this.data.cares[this._careIdx(e)];
+    const care = this._preparePrint(this._careIdx(e));
     this.setData({ printShow: true, printType: 'invoice', careToBePrinted: care });
   },
 
   onPrinterClose() {
     this.setData({ printShow: false });
-  },
-
-  onBack() {
-    wx.navigateBack({ delta: 1 });
   },
 });

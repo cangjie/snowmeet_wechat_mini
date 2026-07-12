@@ -225,7 +225,7 @@ Page({
     if (order != null && order.careProperties != null
       && order.careProperties.orderStatus != '临时订单'){
         wx.navigateTo({
-          url: 'order_detail?orderId=' + order.id,
+          url: 'care_order_detail/care_order_detail?orderId=' + order.id,
         })
       }
   },
