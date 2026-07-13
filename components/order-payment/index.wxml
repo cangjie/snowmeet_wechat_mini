@@ -12,6 +12,12 @@
     <button class="zero-amount-btn" bindtap="onConfirmFreeOrder">确认生效</button>
   </view>
 
+  <!-- 养护核销：微信核验会员本人 + 核销（储值实扣 / 券卡核销） -->
+  <view wx:if="{{careWriteoff}}" class="care-writeoff">
+    <view class="care-writeoff-tip">{{order.pay_with_deposit ? '本单用储值支付，需订单会员本人微信核验后扣款生效' : '本单用卡券抵扣，需订单会员本人微信核验后核销生效'}}</view>
+    <button class="care-writeoff-btn" bindtap="onCareWriteoffVerify">微信核验会员本人并核销</button>
+  </view>
+
   <!-- 二维码 -->
   <view wx:if="{{!isZeroAmount && (payMethod === 'wechat' || payMethod === 'alipay')}}" class="qr-card">
     <view class="qr-frame">
@@ -24,6 +30,7 @@
       <van-icon name="scan" size="16px" color="#4aa9e9"/>
       <text>请顾客扫描二维码支付</text>
     </view>
+    <view wx:if="{{isCare && payMethod === 'wechat'}}" class="care-pay-hint">请订单会员本人的微信扫码支付</view>
     <view class="qr-meta">
       <text class="qr-meta-label">支付状态</text>
       <view class="qr-meta-status qr-meta-status--{{payStage}}">
@@ -38,7 +45,7 @@
   </view>
 
   <!-- 支付方式三选一 -->
-  <view wx:if="{{!isZeroAmount}}" class="pay-list">
+  <view wx:if="{{!isZeroAmount && !careWriteoff}}" class="pay-list">
     <view class="pay-row {{payMethod === 'wechat' ? 'pay-row--active' : ''}}" data-method="wechat" bindtap="onMethodTap">
       <view class="pay-row-left">
         <view class="pay-icon pay-icon--wechat"><van-icon name="chat" size="14px" color="#ffffff"/></view>
@@ -63,7 +70,7 @@
   </view>
 
   <!-- 其他支付的子选项 -->
-  <view wx:if="{{!isZeroAmount && payMethod === 'other'}}" class="other-panel">
+  <view wx:if="{{!isZeroAmount && !careWriteoff && payMethod === 'other'}}" class="other-panel">
     <radio-group bindchange="onSubMethodChange">
       <label class="other-row" wx:for="{{othersPayMethods}}" wx:key="*this">
         <radio value="{{index}}" checked="{{subPayMethodIndex === index}}" color="#4aa9e9"/>
@@ -76,6 +83,20 @@
            bindinput="onInputMethod"
            value="{{inputedPayMethod}}"/>
     <button class="confirm-other-btn" bindtap="onConfirmOtherPaid">确认收款</button>
+  </view>
+
+  <!-- 微信身份核验二维码弹层（0元/储值核销、支付宝支付前） -->
+  <view wx:if="{{_verifyShow}}" class="verify-mask" catchtap="onWechatVerifyCancel">
+    <view class="verify-card" catchtap="noop">
+      <view class="verify-title">微信身份核验</view>
+      <view class="verify-tip">{{_verifyTip}}</view>
+      <image wx:if="{{_verifyQrUrl}}" class="verify-qr" src="{{_verifyQrUrl}}" mode="aspectFit"/>
+      <view class="verify-wait">
+        <view class="verify-dot"></view>
+        <text>等待顾客扫码核验中…</text>
+      </view>
+      <button class="verify-cancel" bindtap="onWechatVerifyCancel">取消</button>
+    </view>
   </view>
 
 </view>

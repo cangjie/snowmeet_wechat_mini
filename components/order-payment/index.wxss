@@ -193,3 +193,25 @@
 .zero-amount-tip { font-size: 28rpx; color: #3f4850; margin-bottom: 32rpx; }
 .zero-amount-btn { background: #006495; color: #fff; border-radius: 8rpx;
                    font-size: 32rpx; height: 88rpx; line-height: 88rpx; }
+
+/* 养护核销 */
+.care-writeoff { padding: 24rpx; text-align: center; }
+.care-writeoff-tip { font-size: 26rpx; color: #3f4850; line-height: 1.5; margin-bottom: 28rpx; }
+.care-writeoff-btn { background: #006495; color: #fff; border-radius: 8rpx;
+                     font-size: 30rpx; height: 88rpx; line-height: 88rpx; }
+.care-pay-hint { margin-top: 12rpx; font-size: 24rpx; color: #E64340; text-align: center; }
+
+/* 微信身份核验二维码弹层 */
+.verify-mask { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1000;
+               background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; }
+.verify-card { width: 560rpx; background: #fff; border-radius: 16rpx; padding: 40rpx 32rpx;
+               display: flex; flex-direction: column; align-items: center; }
+.verify-title { font-size: 32rpx; font-weight: 600; color: #0b1c30; }
+.verify-tip { margin-top: 16rpx; font-size: 26rpx; color: #3f4850; text-align: center; line-height: 1.5; }
+.verify-qr { width: 360rpx; height: 360rpx; margin: 28rpx 0; }
+.verify-wait { display: flex; align-items: center; gap: 10rpx; font-size: 26rpx; color: #4aa9e9; }
+.verify-dot { width: 14rpx; height: 14rpx; border-radius: 50%; background: #4aa9e9;
+              animation: verify-pulse 1.2s infinite; }
+@keyframes verify-pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+.verify-cancel { margin-top: 28rpx; width: 240rpx; background: #f2f3f5; color: #3f4850;
+                 border-radius: 8rpx; font-size: 28rpx; height: 76rpx; line-height: 76rpx; }

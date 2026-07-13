@@ -61,9 +61,15 @@
   <!-- 订单已支付成功 → 直接显示「支付成功」,屏蔽其它支付相关 UI -->
   <view wx:if="{{order.payStatus=='支付成功'}}" class="pay-success"> 支 付 成 功 </view>
 
+  <!-- 养护微信支付：必须订单会员本人扫码，非本人拦截支付 -->
+  <view wx:if="{{order.payStatus != '支付成功' && identity && identity.status === 'care_member_required'}}" class="care-member-required">
+    <view class="care-member-required-title">请用订单会员本人的微信扫码支付</view>
+    <view class="care-member-required-tip">本单为养护会员单，仅限会员（{{identity.orderMemberMaskedCell || '本人'}}）本人的微信支付</view>
+  </view>
+
   <!-- 支付前身份验证：仅在订单未支付时显示;identity 非 direct 状态用组件渲染,direct 状态显示支付按钮 -->
   <pay-identity-confirm
-    wx:if="{{order.payStatus != '支付成功' && identity && identity.status && identity.status !== 'direct'}}"
+    wx:if="{{order.payStatus != '支付成功' && identity && identity.status && identity.status !== 'direct' && identity.status !== 'care_member_required'}}"
     payment-id="{{paymentId}}"
     payer-type="wechat"
     scanner-id="{{scannerId}}"
@@ -89,8 +95,13 @@
     <view class="row"><text class="value" style="color:#999">订单详情暂不可见,仍可继续支付</text></view>
   </view>
 
+  <view wx:if="{{identity && identity.status === 'care_member_required'}}" class="care-member-required">
+    <view class="care-member-required-title">请用订单会员本人的微信扫码支付</view>
+    <view class="care-member-required-tip">本单为养护会员单，仅限会员（{{identity.orderMemberMaskedCell || '本人'}}）本人的微信支付</view>
+  </view>
+
   <pay-identity-confirm
-    wx:if="{{identity && identity.status && identity.status !== 'direct'}}"
+    wx:if="{{identity && identity.status && identity.status !== 'direct' && identity.status !== 'care_member_required'}}"
     payment-id="{{paymentId}}"
     payer-type="wechat"
     scanner-id="{{scannerId}}"

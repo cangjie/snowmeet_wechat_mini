@@ -940,6 +940,11 @@ const payWithDepositPromise = function (orderId, sessionKey) {
 
   //})
 }
+// 养护核销：微信核验会员本人（wechat_unverified==1）后，核销储值/卡券并使订单生效（EffectCareOrder）
+const writeoffCareOrderPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Order/WriteoffCareOrder/' + orderId + '?sessionKey=' + encodeURIComponent(sessionKey || '')
+  return util.performWebRequest(url, null)
+}
 // 次卡消费：查询会员租赁次卡 + 本订单含雪板雪鞋租赁商品本次需扣次数
 const getRentalPunchCardInfoPromise = function (orderId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetRentalPunchCardInfo/' + orderId + '?sessionKey=' + sessionKey
@@ -1277,6 +1282,7 @@ module.exports = {
   getPrinterListPromise,
   getMyInfo,
   payWithDepositPromise,
+  writeoffCareOrderPromise,
   getRentalPunchCardInfoPromise,
   useRentalPunchCardPromise,
   searchMembersByStaffPromise,

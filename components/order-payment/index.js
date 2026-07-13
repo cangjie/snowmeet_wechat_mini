@@ -23,7 +23,12 @@ Component({
     subPayMethod: '',
     inputedPayMethod: '',
     loadingQr: false,
-    isZeroAmount: false
+    isZeroAmount: false,
+    isCare: false,            // 养护订单
+    careWriteoff: false,      // 养护核销单（储值/卡券，无需外部支付）→ 微信核验会员本人 + 核销
+    _verifyShow: false,       // 微信身份核验二维码弹层
+    _verifyQrUrl: '',
+    _verifyTip: ''
   },
   lifetimes: {
     attached() {
@@ -42,6 +47,7 @@ Component({
     detached() {
       var that = this
       that.stopStatusPolling()
+      that._stopVerifyPolling()
       that.closeSocket()
       if (that.data.order && that.data.paymentId && that.data.paymentStatus !== 'paid') {
         data.cancelPayingPromise(that.data.order.id, app.globalData.sessionKey).catch(function () {})
@@ -54,17 +60,97 @@ Component({
       var orderId = that.properties.orderId
       if (!orderId) return
       data.getOrderByStaffPromise(orderId, app.globalData.sessionKey).then(function (order) {
+        var isCare = order.type === '养护'
+        // 养护核销单：用了储值/卡券的未生效单（dealed!=1）无需外部支付，走「微信核验会员本人 + 核销」。
+        // 质保/招待 0 元单在 PlaceCareOrder 里 dealed==1 已立即生效，不进此分支，走 isZeroAmount 免费确认。
+        var careWriteoff = isCare && order.dealed != 1 && (order.paying_amount == 0 || order.pay_with_deposit)
         var patch = {
           order: order,
+          isCare: isCare,
+          careWriteoff: careWriteoff,
           payingAmountStr: util.showAmount(order.paying_amount)
         }
-        if (order.paying_amount == 0) { patch.isZeroAmount = true }
+        if (order.paying_amount == 0 && !careWriteoff) { patch.isZeroAmount = true }
         that.setData(patch)
       })
     },
 
     onConfirmFreeOrder() {
       this.effectUnpaidOrder('免费')
+    },
+
+    noop() {},
+
+    // ── 养护核销：微信核验会员本人 → WriteoffCareOrder（储值实扣 / 券卡核销 → 生效）──
+    onCareWriteoffVerify() {
+      var that = this
+      var order = that.data.order
+      if (!order) return
+      if (order.wechat_unverified) { that._doWriteoff(); return }
+      that._openWechatVerify('writeoff')
+    },
+    _doWriteoff() {
+      var that = this
+      var order = that.data.order
+      wx.showLoading({ title: '核销中…', mask: true })
+      data.writeoffCareOrderPromise(order.id, app.globalData.sessionKey).then(function (updated) {
+        wx.hideLoading()
+        if (!updated) { wx.showToast({ title: '核销失败', icon: 'none' }); return }
+        that._paidHandled = true
+        that.stopStatusPolling()
+        that.setData({ paymentStatus: 'paid', payStage: 'paid', payStageLabel: '已核销' })
+        that.triggerEvent('paid', {
+          orderId: order.id,
+          payMethod: order.pay_with_deposit ? '储值支付' : '核销',
+          order: updated
+        })
+      }).catch(function (err) {
+        wx.hideLoading()
+        var msg = (err && err._toastMsg) || '核销失败'
+        wx.showToast({ title: msg, icon: 'none' })
+      })
+    },
+
+    // ── 微信身份核验二维码 + 轮询（照搬 rent_order_detail 机制，共用 order.wechat_unverified）──
+    // purpose: 'writeoff'（0元/储值核销）| 'alipay'（支付宝支付前核验）
+    _openWechatVerify(purpose) {
+      var that = this
+      var order = that.data.order
+      if (!order) return
+      that._verifyPurpose = purpose || 'writeoff'
+      // 专用扫码落地路径 order_verify（公众平台已登记 → pages/order/identity_verify）
+      var verifyUrl = 'https://mini.snowmeet.top/mapp/order_verify?verifyOrderId=' + order.id
+      var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(verifyUrl)
+      that.setData({ _verifyShow: true, _verifyQrUrl: qrCodeUrl, _verifyTip: '请订单会员本人的微信扫码核验身份' })
+      that._startVerifyPolling()
+    },
+    _startVerifyPolling() {
+      var that = this
+      that._stopVerifyPolling()
+      that._verifyTimer = setInterval(function () {
+        var order = that.data.order
+        if (!order) return
+        data.getWechatVerifyStatusPromise(order.id, app.globalData.sessionKey).then(function (res) {
+          if (res && res.verified) {
+            that._stopVerifyPolling()
+            order.wechat_unverified = true
+            that.setData({ _verifyShow: false, order: order })
+            wx.showToast({ title: '核验成功', icon: 'success' })
+            if (that._verifyPurpose === 'alipay') {
+              that.showAlipayMiniQrCode()
+            } else {
+              that._doWriteoff()
+            }
+          }
+        }).catch(function () { /* 轮询失败忽略，下个周期再试 */ })
+      }, 2000)
+    },
+    _stopVerifyPolling() {
+      if (this._verifyTimer) { clearInterval(this._verifyTimer); this._verifyTimer = null }
+    },
+    onWechatVerifyCancel() {
+      this._stopVerifyPolling()
+      this.setData({ _verifyShow: false })
     },
 
     onMethodTap(e) {
@@ -88,6 +174,11 @@ Component({
       if (method === 'wechat') {
         that.showWepayQrCode()
       } else if (method === 'alipay') {
+        // 养护支付宝支付：先微信核验会员本人（wechat_unverified=1），核验通过后再出支付宝支付码
+        if (that.data.isCare && !(that.data.order && that.data.order.wechat_unverified)) {
+          that._openWechatVerify('alipay')
+          return
+        }
         // 2026-05-30 落地：调 Order/GetAlipayMiniPayment 建一笔 alipay OrderPayment 拿 paymentId，
         // 编进支付宝小程序唤起 URL 做成二维码。顾客用支付宝扫该 QR → 自动跳进 alipay_snowmeet/pages/payment_entry?paymentId=...
         that.showAlipayMiniQrCode()

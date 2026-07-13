@@ -158,3 +158,15 @@
 }
 
 /* 手机号软授权样式已删除:相关 wxml 弹窗合并到 pay-identity-confirm 的 getPhoneNumber 按钮 */
+
+/* 养护微信支付：非会员本人拦截提示 */
+.care-member-required {
+  margin: 24rpx;
+  padding: 32rpx 24rpx;
+  background: #FFF7F7;
+  border: 1rpx solid #F5C6C6;
+  border-radius: 12rpx;
+  text-align: center;
+}
+.care-member-required-title { font-size: 30rpx; font-weight: 600; color: #E64340; }
+.care-member-required-tip { margin-top: 16rpx; font-size: 24rpx; color: #8a4b4b; line-height: 1.5; }
