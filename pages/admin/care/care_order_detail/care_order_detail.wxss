@@ -99,6 +99,37 @@
 .pay-row-amount { font-weight: 600; }
 .pay-row--empty { color: #9aa3ac; justify-content: center; }
 
+.payment-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12rpx;
+}
+
+.order-memo-block {
+  margin-top: 12rpx;
+  border-top: 1rpx solid #eef1f5;
+  padding-top: 14rpx;
+}
+
+.order-memo-input {
+  width: 100%;
+  min-height: 108rpx;
+  box-sizing: border-box;
+  margin-top: 8rpx;
+  background: #ffffff;
+  border: 1rpx solid #dfe5ec;
+  border-radius: 8rpx;
+  padding: 10rpx 14rpx;
+  font-size: 26rpx;
+  color: #1f2a33;
+}
+
+.order-memo-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10rpx;
+}
+
 /* chip */
 .chip {
   display: inline-flex;
@@ -424,4 +455,29 @@
   flex-direction: row;
   gap: 20rpx;
   margin-top: 24rpx;
+}
+
+.refund-modal {
+  padding: 30rpx 24rpx 24rpx;
+}
+
+.refund-modal-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2a33;
+  text-align: center;
+  margin-bottom: 18rpx;
+}
+
+.refund-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.refund-modal-actions {
+  margin-top: 20rpx;
+  display: flex;
+  flex-direction: row;
+  gap: 18rpx;
 }

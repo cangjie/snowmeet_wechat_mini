@@ -43,6 +43,14 @@
         <text class="info-value">{{cares.length}}</text>
       </view>
     </view>
+    <view class="order-memo-block">
+      <text class="info-label">订单备注</text>
+      <textarea class="order-memo-input" maxlength="200" placeholder="填写订单备注（选填）"
+                value="{{orderMemoDraft}}" bindinput="onOrderMemoInput"/>
+      <view class="order-memo-actions">
+        <view class="btn btn--primary btn--sm" bindtap="onSaveOrderMemo">{{savingOrderMemo ? '保存中...' : '保存备注'}}</view>
+      </view>
+    </view>
   </view>
 
   <!-- B 支付信息 -->
@@ -50,6 +58,9 @@
     <view class="section-title-row" bindtap="onTogglePayment">
       <view class="section-title">支付信息</view>
       <van-icon name="{{payment.expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
+    </view>
+    <view class="payment-toolbar">
+      <view class="btn btn--danger btn--sm" catchtap="onOpenRefundPopup">退款</view>
     </view>
     <view class="pay-grid">
       <view class="pay-cell">
@@ -107,33 +118,42 @@
           </view>
         </view>
 
-        <block wx:if="{{!care._editing}}">
-          <view class="info-grid">
-            <view class="info-cell">
-              <text class="info-label">序列号</text>
-              <text class="info-value">{{care._serialText || '--'}}</text>
-            </view>
-            <view class="info-cell">
-              <text class="info-label">附件</text>
-              <text class="info-value">{{care.with_pole ? '雪杖 ' : ''}}{{care.others_associates || ''}}</text>
-            </view>
-            <view class="info-cell">
-              <text class="info-label">项目收费</text>
-              <text class="info-value">{{care._commonStr}}</text>
-            </view>
-            <view class="info-cell">
-              <text class="info-label">附加费</text>
-              <text class="info-value">{{care._repairStr}}</text>
-            </view>
-            <view class="info-cell">
-              <text class="info-label">减免</text>
-              <text class="info-value">{{care._discountStr}}</text>
-            </view>
-            <view class="info-cell">
-              <text class="info-label">取板码</text>
-              <text class="info-value">{{care.task_flow_code || '--'}}</text>
-            </view>
+        <view class="info-grid">
+          <view class="info-cell">
+            <text class="info-label">序列号</text>
+            <text class="info-value">{{care._serialText || '--'}}</text>
           </view>
+          <view class="info-cell">
+            <text class="info-label">附件</text>
+            <text class="info-value">{{care.with_pole ? '雪杖 ' : ''}}{{care.others_associates || ''}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">项目收费</text>
+            <text class="info-value">{{care._commonStr}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">附加费</text>
+            <text class="info-value">{{care._repairStr}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">减免</text>
+            <text class="info-value">{{care._discountStr}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">任务码</text>
+            <text class="info-value">{{care.task_flow_code || '--'}}</text>
+          </view>
+          <view class="info-cell">
+            <text class="info-label">特殊标记</text>
+            <text class="info-value">{{care.entertain ? '招待' : (care.warranty ? '质保' : '无')}}</text>
+          </view>
+          <view wx:if="{{care.equipment === '单板'}}" class="info-cell">
+            <text class="info-label">前脚</text>
+            <text class="info-value">{{care.board_front === '左' ? '左脚' : (care.board_front === '右' ? '右脚' : '--')}}</text>
+          </view>
+        </view>
+
+        <block wx:if="{{!care._editing}}">
           <view wx:if="{{care.memo}}" class="care-memo">备注：{{care.memo}}</view>
 
           <!-- 照片 -->
@@ -204,18 +224,6 @@
           </view>
 
           <view class="edit-block">
-            <view class="edit-block-head"><text class="info-label">特殊标记</text></view>
-            <view class="seg-row">
-              <view class="btn btn--sm {{care._specialKey === 'none' ? 'btn--primary' : 'btn--plain'}}"
-                    data-cidx="{{cidx}}" data-key="none" catchtap="onSpecialTap">无</view>
-              <view class="btn btn--sm {{care._specialKey === 'entertain' ? 'btn--primary' : 'btn--plain'}}"
-                    data-cidx="{{cidx}}" data-key="entertain" catchtap="onSpecialTap">招待</view>
-              <view class="btn btn--sm {{care._specialKey === 'warranty' ? 'btn--primary' : 'btn--plain'}}"
-                    data-cidx="{{cidx}}" data-key="warranty" catchtap="onSpecialTap">质保</view>
-            </view>
-          </view>
-
-          <view class="edit-block">
             <view class="edit-block-head"><text class="info-label">备注</text></view>
             <input class="panel-input" placeholder="备注" value="{{care.memo || ''}}"
                    data-cidx="{{cidx}}" data-field="memo" bindblur="onEditFieldBlur"/>
@@ -267,7 +275,7 @@
                 <!-- 通用任务整宽大按钮（安全检查/发板/寄存或快递走各自专属面板） -->
                 <block wx:if="{{task._current && task.task_name !== '安全检查' && task.task_name !== '发板' && task.task_name !== '寄存或快递'}}">
                   <view wx:if="{{task.status === '未开始'}}" class="btn btn--primary btn--block"
-                        data-task-id="{{task.id}}" data-task-name="{{task.task_name}}" catchtap="onTaskStart">开始 {{task.task_name}}</view>
+                        data-cidx="{{cidx}}" data-task-id="{{task.id}}" data-task-name="{{task.task_name}}" catchtap="onTaskStart">开始 {{task.task_name}}</view>
                   <view wx:elif="{{task._running && task._isMine}}" class="btn btn--danger btn--block"
                         data-cidx="{{cidx}}" data-task-id="{{task.id}}" catchtap="onTaskEnd">结束 {{task.task_name}}</view>
                   <view wx:elif="{{task._running}}" class="btn btn--danger-plain btn--block"
@@ -279,49 +287,50 @@
 
             <!-- 安全检查录入区 -->
             <view wx:if="{{task.task_name === '安全检查' && task._current && care._safeChecking}}" class="task-panel">
-              <view class="kv-grid">
-                <view class="kv-item">
-                  <text class="info-label">身高(cm) *</text>
-                  <input class="panel-input" type="digit" value="{{care.height || ''}}"
-                         data-cidx="{{cidx}}" data-field="height" bindblur="onSafeFieldBlur"/>
+                <view class="kv-grid">
+                  <view class="kv-item">
+                    <text class="info-label">身高(cm) *</text>
+                    <input class="panel-input" type="digit" value="{{care.height || ''}}"
+                           data-cidx="{{cidx}}" data-field="height" bindblur="onSafeFieldBlur"/>
+                  </view>
+                  <view wx:if="{{care.equipment === '双板'}}" class="kv-item">
+                    <text class="info-label">体重(kg)</text>
+                    <input class="panel-input" type="digit" value="{{care.weight || ''}}"
+                           data-cidx="{{cidx}}" data-field="weight" bindblur="onSafeFieldBlur"/>
+                  </view>
+                  <view wx:else class="kv-item">
+                    <text class="info-label">间距</text>
+                    <input class="panel-input" type="digit" value="{{care.gap || ''}}"
+                           data-cidx="{{cidx}}" data-field="gap" bindblur="onSafeFieldBlur"/>
+                  </view>
+                  <block wx:if="{{care.equipment === '双板'}}">
+                    <view class="kv-item">
+                      <text class="info-label">前脱落值 *</text>
+                      <input class="panel-input" type="digit" value="{{care.front_din || ''}}"
+                             data-cidx="{{cidx}}" data-field="front_din" bindblur="onSafeFieldBlur"/>
+                    </view>
+                    <view class="kv-item">
+                      <text class="info-label">后脱落值 *</text>
+                      <input class="panel-input" type="digit" value="{{care.rear_din || ''}}"
+                             data-cidx="{{cidx}}" data-field="rear_din" bindblur="onSafeFieldBlur"/>
+                    </view>
+                  </block>
+                  <block wx:else>
+                    <view class="kv-item">
+                      <text class="info-label">左角度</text>
+                      <input class="panel-input" type="digit" value="{{care.left_angle || ''}}"
+                             data-cidx="{{cidx}}" data-field="left_angle" bindblur="onSafeFieldBlur"/>
+                    </view>
+                    <view class="kv-item">
+                      <text class="info-label">右角度</text>
+                      <input class="panel-input" type="digit" value="{{care.right_angle || ''}}"
+                             data-cidx="{{cidx}}" data-field="right_angle" bindblur="onSafeFieldBlur"/>
+                    </view>
+                  </block>
                 </view>
-                <view wx:if="{{care.equipment === '双板'}}" class="kv-item">
-                  <text class="info-label">体重(kg)</text>
-                  <input class="panel-input" type="digit" value="{{care.weight || ''}}"
-                         data-cidx="{{cidx}}" data-field="weight" bindblur="onSafeFieldBlur"/>
-                </view>
-                <view wx:else class="kv-item">
-                  <text class="info-label">间距</text>
-                  <input class="panel-input" type="digit" value="{{care.gap || ''}}"
-                         data-cidx="{{cidx}}" data-field="gap" bindblur="onSafeFieldBlur"/>
-                </view>
-                <block wx:if="{{care.equipment === '双板'}}">
-                  <view class="kv-item">
-                    <text class="info-label">前脱落值 *</text>
-                    <input class="panel-input" type="digit" value="{{care.front_din || ''}}"
-                           data-cidx="{{cidx}}" data-field="front_din" bindblur="onSafeFieldBlur"/>
-                  </view>
-                  <view class="kv-item">
-                    <text class="info-label">后脱落值 *</text>
-                    <input class="panel-input" type="digit" value="{{care.rear_din || ''}}"
-                           data-cidx="{{cidx}}" data-field="rear_din" bindblur="onSafeFieldBlur"/>
-                  </view>
-                </block>
-                <block wx:else>
-                  <view class="kv-item">
-                    <text class="info-label">左角度</text>
-                    <input class="panel-input" type="digit" value="{{care.left_angle || ''}}"
-                           data-cidx="{{cidx}}" data-field="left_angle" bindblur="onSafeFieldBlur"/>
-                  </view>
-                  <view class="kv-item">
-                    <text class="info-label">右角度</text>
-                    <input class="panel-input" type="digit" value="{{care.right_angle || ''}}"
-                           data-cidx="{{cidx}}" data-field="right_angle" bindblur="onSafeFieldBlur"/>
-                  </view>
-                </block>
-              </view>
-              <view class="btn btn--warning btn--block" data-cidx="{{cidx}}" catchtap="onSafeCheck">确认安全</view>
-              <view class="task-hint">确认后您将成为本次养护的安全负责人</view>
+                <view class="btn btn--warning btn--block" data-cidx="{{cidx}}" catchtap="onSafeCheck">确认安全</view>
+                <view class="task-hint">确认后您将成为本次养护的安全负责人</view>
+              <view wx:if="{{task._hint}}" class="task-hint">{{task._hint}}</view>
             </view>
 
             <!-- 寄存或快递（非雪季） -->
@@ -371,7 +380,7 @@
               <!-- 验证码 -->
               <block wx:if="{{care._veriType === '验证码'}}">
                 <view class="veri-row">
-                  <input class="panel-input" type="number" placeholder="4 位取板码"
+                      <input class="panel-input" type="number" placeholder="4 位任务码"
                          value="{{veriCode}}" bindinput="onVeriCodeInput"/>
                   <view class="btn btn--primary btn--sm" data-cidx="{{cidx}}" catchtap="onVeriCodeConfirm">验证</view>
                   <view class="btn btn--plain btn--sm" data-cidx="{{cidx}}" catchtap="onSendVeriCode">重新发送</view>
@@ -427,6 +436,24 @@
       <view class="brand-modal-footer">
         <view class="btn btn--plain btn--half" catchtap="onAddBrandCancel">取消</view>
         <view class="btn btn--primary btn--half" catchtap="onAddBrandConfirm">确认</view>
+      </view>
+    </view>
+  </van-popup>
+
+  <van-popup show="{{refundPopup.show}}" position="center" round custom-style="width: 620rpx;" bind:close="onCloseRefundPopup">
+    <view class="refund-modal">
+      <view class="refund-modal-title">订单退款</view>
+      <view class="refund-modal-body">
+        <text class="info-label">退款金额</text>
+        <input class="panel-input" type="digit" placeholder="请输入退款金额"
+               value="{{refundPopup.amount}}" bindinput="onRefundAmountInput"/>
+        <text class="info-label">退款备注</text>
+        <textarea class="order-memo-input" maxlength="100" placeholder="请填写退款备注"
+                  value="{{refundPopup.memo}}" bindinput="onRefundMemoInput"/>
+      </view>
+      <view class="refund-modal-actions">
+        <view class="btn btn--plain btn--half" catchtap="onCloseRefundPopup">取消</view>
+        <view class="btn btn--danger btn--half" catchtap="onConfirmRefund">{{refundPopup.refunding ? '退款中...' : '确认退款'}}</view>
       </view>
     </view>
   </van-popup>

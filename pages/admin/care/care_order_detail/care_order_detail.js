@@ -17,12 +17,34 @@ function fullUrl(p) {
   return p.indexOf('http') === 0 ? p : IMG_HOST + p;
 }
 
+function taskOrderValue(task) {
+  if (!task) return 999999;
+  if (task.task_name === '安全检查') return -1000;
+  return task.sort === undefined || task.sort === null ? 999999 : Number(task.sort);
+}
+
+function sortCareTasks(tasks) {
+  return (tasks || []).slice().sort((a, b) => {
+    const orderDiff = taskOrderValue(a) - taskOrderValue(b);
+    if (orderDiff !== 0) return orderDiff;
+    return (a.id || 0) - (b.id || 0);
+  });
+}
+
 Page({
   data: {
     orderId: 0,
     order: null,
+    orderMemoDraft: '',
+    savingOrderMemo: false,
     cares: [],
     payment: { totalStr: '', paidStr: '', refundStr: '', payingStr: '', rows: [], expanded: false },
+    refundPopup: {
+      show: false,
+      amount: '',
+      memo: '',
+      refunding: false,
+    },
     summerBanner: { show: false, desc: '' },
     veriCode: '',
     scanQr: { careId: 0, url: '', status: '' }, // status: loading / ready / broken
@@ -109,6 +131,14 @@ Page({
     const bizDate = order.biz_date ? new Date(order.biz_date) : null;
     order.bizDateStr = bizDate ? util.formatDate(bizDate) : '';
     const cares = (order.cares || []).map((care) => this._renderCare(care));
+    const careTotal = cares.reduce((sum, care) => sum + this._calcCareSummaryAmount(care), 0);
+    // 首次进入且没有 deep-link 参数时，默认展开第一件装备。
+    if (!this._targetCareId && cares.length > 0) {
+      const hasExpandedMemory = Object.keys((this._uiState && this._uiState.expanded) || {}).length > 0;
+      if (!hasExpandedMemory) {
+        cares[0]._expanded = true;
+      }
+    }
     // 非雪季订单醒目横幅（任一 care 是非雪季即显示，按 summer 汇总）
     let nowCount = 0;
     let laterCount = 0;
@@ -138,11 +168,13 @@ Page({
     }));
     this.setData({
       order,
+      orderMemoDraft: order.memo || '',
       cares,
       summerBanner,
       payment: {
         ...this.data.payment,
-        totalStr: util.showAmount(order.totalCharge || 0),
+        // 详情页总计口径：各装备费用之和（项目收费 + 附加费 - 减免）。
+        totalStr: util.showAmount(careTotal),
         paidStr: util.showAmount(order.paidAmount || 0),
         refundStr: util.showAmount(order.refundAmount || 0),
         payingStr: util.showAmount(order.paying_amount || 0),
@@ -203,7 +235,9 @@ Page({
     const myStaffId = (app.globalData.staff || {}).id;
     const now = Date.now();
     let currentFound = false;
-    care._tasks = (care.tasks || []).map((t) => {
+    const orderedTasks = sortCareTasks(care.tasks);
+    care.tasks = orderedTasks;
+    care._tasks = orderedTasks.map((t) => {
       const task = { ...t };
       task._startStr = t.start_time ? util.formatDate(new Date(t.start_time)) + ' ' + this._timeStr(t.start_time) : '';
       task._endStr = t.end_time ? util.formatDate(new Date(t.end_time)) + ' ' + this._timeStr(t.end_time) : '';
@@ -218,11 +252,15 @@ Page({
         task._elapsedStr = this._fmtDuration(now - new Date(t.start_time).valueOf());
       }
       if (done && t.start_time && t.end_time) {
-        task._durationStr = this._fmtDuration(new Date(t.end_time).valueOf() - new Date(t.start_time).valueOf());
+        if (t.task_name !== '安全检查') {
+          task._durationStr = this._fmtDuration(new Date(t.end_time).valueOf() - new Date(t.start_time).valueOf());
+        }
       }
       // 引导文案：让店员按实际操作时间点按钮
       if (task._current && !done) {
-        if (t.status === '未开始') {
+        if (t.task_name === '安全检查' && t.status === '未开始') {
+          task._hint = '填写单双板检查项后，点击“确认安全”即可';
+        } else if (t.status === '未开始') {
           task._hint = '请在实际开始操作时点击，系统将记录真实开始时间';
         } else if (task._running) {
           task._hint = task._isMine
@@ -237,9 +275,9 @@ Page({
       }
       return task;
     });
-    // 安检可录入：首任务为安全检查且未完成
-    const t0 = care._tasks[0];
-    care._safeChecking = !!(t0 && t0.task_name === '安全检查' && t0.status !== '已完成');
+    // 安检是养护单的第一道任务，按 care_task 记录查找，不依赖数组原始顺序。
+    const safeTask = care._tasks.find((t) => t.task_name === '安全检查');
+    care._safeChecking = !!(safeTask && safeTask.status !== '已完成' && safeTask.status !== '强行中止');
     care._status = care.status || (care._tasks.length === 0 ? '未开始' : '进行中');
     // 展开态 / 发板核销方式：按 care.id 回填页面级记忆
     care._expanded = ui.expanded[care.id] !== undefined ? ui.expanded[care.id] : (care._status !== '已完成');
@@ -248,6 +286,16 @@ Page({
     care._veriType = ui.veriType[care.id] || '';
     care._editing = false;
     return care;
+  },
+
+  _calcCareSummaryAmount(care) {
+    if (!care) return 0;
+    if (care.warranty || care.entertain) return 0;
+    const common = Number(care.common_charge) || 0;
+    const repair = Number(care.repair_charge) || 0;
+    const discount = Number(care.discount) || 0;
+    const ticketDiscount = Number(care.ticket_discount) || 0;
+    return Math.round((common + repair - discount - ticketDiscount) * 100) / 100;
   },
 
   _timeStr(d) {
@@ -337,6 +385,126 @@ Page({
     this.setData({ 'payment.expanded': !this.data.payment.expanded });
   },
 
+  onOrderMemoInput(e) {
+    this.setData({ orderMemoDraft: e.detail.value || '' });
+  },
+
+  onSaveOrderMemo() {
+    const that = this;
+    const order = this.data.order;
+    if (!order || this.data.savingOrderMemo) return;
+    const nextMemo = (this.data.orderMemoDraft || '').trim();
+    const currentMemo = (order.memo || '').trim();
+    if (nextMemo === currentMemo) {
+      wx.showToast({ title: '备注未变化', icon: 'none' });
+      return;
+    }
+    const payload = { ...order, memo: nextMemo };
+    this.setData({ savingOrderMemo: true });
+    data.updateOrderPromise(payload, '养护订单详情页修改备注', app.globalData.sessionKey)
+      .then((updated) => {
+        that.setData({ savingOrderMemo: false });
+        that._rawCares = updated.cares || [];
+        that.renderOrder(updated);
+        wx.showToast({ title: '备注已保存', icon: 'success' });
+      })
+      .catch(() => {
+        that.setData({ savingOrderMemo: false });
+      });
+  },
+
+  onOpenRefundPopup() {
+    this.setData({
+      refundPopup: {
+        show: true,
+        amount: '',
+        memo: '',
+        refunding: false,
+      },
+    });
+  },
+
+  onCloseRefundPopup() {
+    if (this.data.refundPopup.refunding) return;
+    this.setData({
+      'refundPopup.show': false,
+      'refundPopup.amount': '',
+      'refundPopup.memo': '',
+    });
+  },
+
+  onRefundAmountInput(e) {
+    this.setData({ 'refundPopup.amount': e.detail.value || '' });
+  },
+
+  onRefundMemoInput(e) {
+    this.setData({ 'refundPopup.memo': e.detail.value || '' });
+  },
+
+  _buildRefundPayload(order, refundAmount, memo) {
+    const payments = (order.availablePayments || []).filter((p) => p.status === '支付成功');
+    const refunds = [];
+    let remain = Math.round(refundAmount * 100) / 100;
+    for (let i = 0; i < payments.length && remain > 0; i++) {
+      const p = payments[i];
+      const unRefunded = Math.round((Number(p.unRefundedAmount) || 0) * 100) / 100;
+      if (unRefunded <= 0) continue;
+      const splitAmount = Math.min(unRefunded, remain);
+      if (splitAmount <= 0) continue;
+      refunds.push({
+        id: 0,
+        payment_id: p.id,
+        amount: Math.round(splitAmount * 100) / 100,
+        reason: memo,
+      });
+      remain = Math.round((remain - splitAmount) * 100) / 100;
+    }
+    if (remain > 0) return null;
+    return refunds;
+  },
+
+  onConfirmRefund() {
+    const that = this;
+    const order = this.data.order;
+    if (!order || this.data.refundPopup.refunding) return;
+    const amountText = (this.data.refundPopup.amount || '').trim();
+    const memo = (this.data.refundPopup.memo || '').trim();
+    const refundAmount = Number(amountText);
+    if (!amountText || Number.isNaN(refundAmount) || refundAmount <= 0) {
+      wx.showToast({ title: '请填写正确退款金额', icon: 'none' });
+      return;
+    }
+    if (!memo) {
+      wx.showToast({ title: '请填写退款备注', icon: 'none' });
+      return;
+    }
+    const remain = Math.round(((order.paidAmount || 0) - (order.refundAmount || 0)) * 100) / 100;
+    if (refundAmount > remain) {
+      wx.showToast({ title: '超额退款', icon: 'none' });
+      return;
+    }
+    const refunds = this._buildRefundPayload(order, refundAmount, memo);
+    if (!refunds || refunds.length === 0) {
+      wx.showToast({ title: '无可退款支付记录', icon: 'none' });
+      return;
+    }
+    this.setData({ 'refundPopup.refunding': true });
+    data.refundPromise(order.id, refunds, app.globalData.sessionKey)
+      .then(() => {
+        that.setData({
+          'refundPopup.refunding': false,
+          'refundPopup.show': false,
+          'refundPopup.amount': '',
+          'refundPopup.memo': '',
+        });
+        wx.showToast({ title: '退款成功', icon: 'success' });
+        that.loadOrder();
+      })
+      .catch(() => {
+        that.setData({ 'refundPopup.refunding': false });
+      });
+  },
+
   onCall() {
     const num = this.data.order && this.data.order.contact_num;
     if (num) wx.makePhoneCall({ phoneNumber: num });
@@ -378,8 +546,16 @@ Page({
     const that = this;
     const cidx = this._careIdx(e);
     const care = this.data.cares[cidx];
+    if (!String(care.brand || '').trim()) {
+      wx.showToast({ title: '请先补全品牌', icon: 'none' });
+      return;
+    }
+    if (!String(care.scale || '').trim()) {
+      wx.showToast({ title: '请先补全长度', icon: 'none' });
+      return;
+    }
     if (!care._photos || care._photos.length === 0) {
-      wx.showToast({ title: '必须传照片', icon: 'error' });
+      wx.showToast({ title: '请先补全照片', icon: 'none' });
       return;
     }
     if (!care.height) {
@@ -401,8 +577,13 @@ Page({
         Object.keys(payload).forEach((k) => { if (k.indexOf('_') === 0) delete payload[k]; });
         payload.careImages = that._stripImageNavs(care.careImages, care.id);
         payload.tasks = care.tasks;
+        const safeTask = (care.tasks || []).find((t) => t.task_name === '安全检查');
+        if (!safeTask) {
+          wx.showToast({ title: '缺少安检任务', icon: 'error' });
+          return;
+        }
         data.updateCarePromise(payload, '安全检查', app.globalData.sessionKey).then(() => {
-          return data.updateCareTaskStatusPromise(care.tasks[0].id, '已完成', '养护详情页安全检查',
+          return data.updateCareTaskStatusPromise(safeTask.id, '已完成', '养护详情页安全检查',
             app.globalData.sessionKey, null, null);
         }).then(() => {
           wx.showToast({ title: '安全确认完成', icon: 'success' });
@@ -412,11 +593,16 @@ Page({
     });
   },
 
-  /* ---------- 任务开始 / 结束（按实际时间引导） ---------- */
+  /* ---------- 任务开始 / 结束（按实际时间引导；安全检查除外） ---------- */
   onTaskStart(e) {
     const that = this;
     const taskId = Number(e.currentTarget.dataset.taskId);
     const taskName = e.currentTarget.dataset.taskName || '任务';
+    // 安全检查不记录开始耗时：直接填写检查项后点「确认安全」。
+    if (taskName === '安全检查') {
+      wx.showToast({ title: '请填写后点确认安全', icon: 'none' });
+      return;
+    }
     wx.showModal({
       title: '开始任务',
       content: '点击确定后将记录「' + taskName + '」的实际开始时间，请确保现在开始操作。',
@@ -454,19 +640,6 @@ Page({
       content: '「' + task.task_name + '」实际耗时 ' + durStr + '。',
       success(res) {
         if (!res.confirm) return;
-        if (elapsedMs < 60000) {
-          // 耗时异常短：二次确认，引导按实际完成时间点结束
-          wx.showModal({
-            title: '耗时过短提醒',
-            content: '本任务仅用时 ' + durStr + '，确认已实际完成操作？',
-            confirmText: '确认完成',
-            cancelText: '返回',
-            success(res2) {
-              if (res2.confirm) that._commitTaskEnd(taskId, '已完成');
-            },
-          });
-          return;
-        }
         that._commitTaskEnd(taskId, '已完成');
       },
     });
@@ -758,7 +931,6 @@ Page({
       ['cares[' + cidx + ']._leftSerial']: diff ? arr[0] : '',
       ['cares[' + cidx + ']._rightSerial']: diff && arr.length > 1 ? arr[1] : '',
       ['cares[' + cidx + ']._photoFiles']: photoFiles,
-      ['cares[' + cidx + ']._specialKey']: care.entertain ? 'entertain' : (care.warranty ? 'warranty' : 'none'),
     });
   },
 
@@ -811,16 +983,6 @@ Page({
   onWithPoleTap(e) {
     const cidx = this._careIdx(e);
     this.setData({ ['cares[' + cidx + '].with_pole']: !this.data.cares[cidx].with_pole });
-  },
-
-  onSpecialTap(e) {
-    const cidx = this._careIdx(e);
-    const key = e.currentTarget.dataset.key; // none / entertain / warranty
-    this.setData({
-      ['cares[' + cidx + ']._specialKey']: key,
-      ['cares[' + cidx + '].entertain']: key === 'entertain',
-      ['cares[' + cidx + '].warranty']: key === 'warranty',
-    });
   },
 
   onEditPhotoRead(e) {
