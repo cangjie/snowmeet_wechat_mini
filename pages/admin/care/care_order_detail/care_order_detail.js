@@ -17,6 +17,17 @@ function fullUrl(p) {
   return p.indexOf('http') === 0 ? p : IMG_HOST + p;
 }
 
+// 手机号脱敏：保留前 3 后 4，中间打码；空值返回 '—'（与 rent_order_detail 同款）
+function maskCell(cell) {
+  if (!cell && cell !== 0) return '—';
+  const s = String(cell).trim();
+  if (!s) return '—';
+  if (/^\d{11}$/.test(s)) return s.substr(0, 3) + '****' + s.substr(7);
+  if (s.length > 7) return s.substr(0, 3) + '****' + s.substr(s.length - 4);
+  if (s.length > 4) return s.substr(0, s.length - 4) + '****';
+  return '****';
+}
+
 function taskOrderValue(task) {
   if (!task) return 999999;
   if (task.task_name === '安全检查') return -1000;
@@ -36,9 +47,10 @@ Page({
     orderId: 0,
     order: null,
     orderMemoDraft: '',
+    orderMemoEditing: false,
     savingOrderMemo: false,
     cares: [],
-    payment: { totalStr: '', paidStr: '', refundStr: '', payingStr: '', rows: [], expanded: false },
+    payment: { paidStr: '', refundStr: '', payRows: [], refundRows: [], expanded: false },
     refundPopup: {
       show: false,
       amount: '',
@@ -131,7 +143,6 @@ Page({
     const bizDate = order.biz_date ? new Date(order.biz_date) : null;
     order.bizDateStr = bizDate ? util.formatDate(bizDate) : '';
     const cares = (order.cares || []).map((care) => this._renderCare(care));
-    const careTotal = cares.reduce((sum, care) => sum + this._calcCareSummaryAmount(care), 0);
     // 首次进入且没有 deep-link 参数时，默认展开第一件装备。
     if (!this._targetCareId && cares.length > 0) {
       const hasExpandedMemory = Object.keys((this._uiState && this._uiState.expanded) || {}).length > 0;
@@ -159,26 +170,43 @@ Page({
       show: summerTotal > 0,
       desc: parts.length > 0 ? parts.join(' · ') : '本单含非雪季养护装备',
     };
-    const rows = (order.payments || []).map((p) => ({
-      id: p.id,
-      method: p.pay_method || (p.is_debt === 1 ? '挂账' : '未知'),
-      amountStr: util.showAmount(p.amount || 0),
-      status: p.status || '',
-      dateStr: p.paid_date ? util.formatDate(new Date(p.paid_date)) : '',
-    }));
+    // 支付明细（与租赁详情页同款）：成功支付 + 退款两组行，代付标红 + 脱敏手机号
+    const payRows = (order.availablePayments || []).map((p) => {
+      // paid_date 为空时回退 create_date（历史储值支付未写 paid_date，否则显示 1970-01-01）
+      const d = new Date(p.paid_date || p.create_date);
+      const isProxy = p.is_proxy_pay === true || p.is_proxy_pay === 1;
+      return {
+        ...p,
+        paid_dateDateStr: util.formatDate(d),
+        paid_dateTimeStr: util.formatTimeStr(d),
+        amountStr: util.showAmount(p.amount || 0),
+        _isProxy: isProxy,
+        _proxyCellMasked: isProxy ? maskCell(p.cell) : '',
+      };
+    });
+    // 退款记录无 paid_date，用 create_date 作日期/时间；方式取原支付方式
+    const refundRows = (order.availableRefunds || []).map((r) => {
+      const d = new Date(r.create_date);
+      return {
+        ...r,
+        paid_dateDateStr: util.formatDate(d),
+        paid_dateTimeStr: util.formatTimeStr(d),
+        amountStr: util.showAmount(r.amount || 0),
+        pay_method: r.pay_method || (r.payment && r.payment.pay_method) || '',
+      };
+    });
     this.setData({
       order,
-      orderMemoDraft: order.memo || '',
+      // 编辑中保留草稿，防 onShow 等后台刷新把正在输入的内容冲掉
+      orderMemoDraft: this.data.orderMemoEditing ? this.data.orderMemoDraft : (order.memo || ''),
       cares,
       summerBanner,
       payment: {
         ...this.data.payment,
-        // 详情页总计口径：各装备费用之和（项目收费 + 附加费 - 减免）。
-        totalStr: util.showAmount(careTotal),
         paidStr: util.showAmount(order.paidAmount || 0),
         refundStr: util.showAmount(order.refundAmount || 0),
-        payingStr: util.showAmount(order.paying_amount || 0),
-        rows,
+        payRows,
+        refundRows,
       },
     });
     this._collectRunning(cares);
@@ -288,16 +316,6 @@ Page({
     return care;
   },
 
-  _calcCareSummaryAmount(care) {
-    if (!care) return 0;
-    if (care.warranty || care.entertain) return 0;
-    const common = Number(care.common_charge) || 0;
-    const repair = Number(care.repair_charge) || 0;
-    const discount = Number(care.discount) || 0;
-    const ticketDiscount = Number(care.ticket_discount) || 0;
-    return Math.round((common + repair - discount - ticketDiscount) * 100) / 100;
-  },
-
   _timeStr(d) {
     const dt = new Date(d);
     return String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0');
@@ -385,6 +403,16 @@ Page({
     this.setData({ 'payment.expanded': !this.data.payment.expanded });
   },
 
+  onOrderMemoEditTap() {
+    const order = this.data.order;
+    this.setData({ orderMemoEditing: true, orderMemoDraft: (order && order.memo) || '' });
+  },
+
+  onOrderMemoCancel() {
+    const order = this.data.order;
+    this.setData({ orderMemoEditing: false, orderMemoDraft: (order && order.memo) || '' });
+  },
+
   onOrderMemoInput(e) {
     this.setData({ orderMemoDraft: e.detail.value || '' });
   },
@@ -396,14 +424,14 @@ Page({
     const nextMemo = (this.data.orderMemoDraft || '').trim();
     const currentMemo = (order.memo || '').trim();
     if (nextMemo === currentMemo) {
-      wx.showToast({ title: '备注未变化', icon: 'none' });
+      this.setData({ orderMemoEditing: false });
       return;
     }
     const payload = { ...order, memo: nextMemo };
     this.setData({ savingOrderMemo: true });
     data.updateOrderPromise(payload, '养护订单详情页修改备注', app.globalData.sessionKey)
       .then((updated) => {
-        that.setData({ savingOrderMemo: false });
+        that.setData({ savingOrderMemo: false, orderMemoEditing: false });
         that._rawCares = updated.cares || [];
         that.renderOrder(updated);
         wx.showToast({ title: '备注已保存', icon: 'success' });

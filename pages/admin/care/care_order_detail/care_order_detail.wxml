@@ -43,52 +43,87 @@
         <text class="info-value">{{cares.length}}</text>
       </view>
     </view>
+    <!-- 订单备注：只读 / 编辑二态（同装备信息） -->
     <view class="order-memo-block">
-      <text class="info-label">订单备注</text>
-      <textarea class="order-memo-input" maxlength="200" placeholder="填写订单备注（选填）"
-                value="{{orderMemoDraft}}" bindinput="onOrderMemoInput"/>
-      <view class="order-memo-actions">
-        <view class="btn btn--primary btn--sm" bindtap="onSaveOrderMemo">{{savingOrderMemo ? '保存中...' : '保存备注'}}</view>
+      <view class="sub-title-row">
+        <text class="info-label">订单备注</text>
+        <view wx:if="{{!orderMemoEditing}}" class="edit-link edit-link--memo" catchtap="onOrderMemoEditTap">
+          <van-icon name="edit" size="14px" color="#006495"/>
+          <text>编辑</text>
+        </view>
       </view>
+      <text wx:if="{{!orderMemoEditing}}" class="order-memo-text {{order.memo ? '' : 'order-memo-text--empty'}}">{{order.memo || '暂无备注'}}</text>
+      <block wx:else>
+        <textarea class="order-memo-input" maxlength="200" placeholder="填写订单备注（选填）"
+                  value="{{orderMemoDraft}}" bindinput="onOrderMemoInput"/>
+        <view class="order-memo-actions">
+          <view class="btn btn--plain btn--sm" bindtap="onOrderMemoCancel">取消</view>
+          <view class="btn btn--primary btn--sm" bindtap="onSaveOrderMemo">{{savingOrderMemo ? '保存中...' : '保存备注'}}</view>
+        </view>
+      </block>
     </view>
   </view>
 
   <!-- B 支付信息 -->
+  <!-- 与租赁详情页同款：2×2 摘要格 + 可折叠支付明细表（代付标红 + 脱敏手机号） -->
   <view class="card">
-    <view class="section-title-row" bindtap="onTogglePayment">
+    <view class="section-title-row">
       <view class="section-title">支付信息</view>
-      <van-icon name="{{payment.expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
-    </view>
-    <view class="payment-toolbar">
       <view class="btn btn--danger btn--sm" catchtap="onOpenRefundPopup">退款</view>
     </view>
-    <view class="pay-grid">
-      <view class="pay-cell">
-        <text class="pay-label">总计</text>
-        <text class="pay-value">{{payment.totalStr}}</text>
+
+    <view class="pay-summary-grid">
+      <view class="pay-summary-cell">
+        <view class="pay-summary-label">支付总金额</view>
+        <view class="pay-summary-value pay-summary-value--blue">{{payment.paidStr}}</view>
       </view>
-      <view class="pay-cell">
-        <text class="pay-label">已支付</text>
-        <text class="pay-value pay-value--paid">{{payment.paidStr}}</text>
+      <view class="pay-summary-cell">
+        <view class="pay-summary-label">退款总金额</view>
+        <view class="pay-summary-value pay-summary-value--red">{{payment.refundStr}}</view>
       </view>
-      <view class="pay-cell">
-        <text class="pay-label">已退款</text>
-        <text class="pay-value">{{payment.refundStr}}</text>
+      <view class="pay-summary-cell">
+        <view class="pay-summary-label">支付笔数</view>
+        <view class="pay-summary-value">{{payment.payRows.length}}</view>
       </view>
-      <view class="pay-cell">
-        <text class="pay-label">待支付</text>
-        <text class="pay-value pay-value--due">{{payment.payingStr}}</text>
+      <view class="pay-summary-cell">
+        <view class="pay-summary-label">退款笔数</view>
+        <view class="pay-summary-value">{{payment.refundRows.length}}</view>
       </view>
     </view>
-    <view wx:if="{{payment.expanded}}" class="pay-rows">
-      <view wx:for="{{payment.rows}}" wx:key="id" class="pay-row">
-        <text class="pay-row-method">{{item.method}}</text>
-        <text class="pay-row-status">{{item.status}}</text>
-        <text class="pay-row-date">{{item.dateStr}}</text>
-        <text class="pay-row-amount">{{item.amountStr}}</text>
-      </view>
-      <view wx:if="{{payment.rows.length === 0}}" class="pay-row pay-row--empty">（无支付记录）</view>
+
+    <view class="divider"></view>
+
+    <view class="payment-detail-toggle" bindtap="onTogglePayment">
+      <text class="payment-detail-toggle__title">支付明细</text>
+      <van-icon name="{{payment.expanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#999"/>
     </view>
+
+    <block wx:if="{{payment.expanded}}">
+      <view class="pay-table" wx:if="{{payment.payRows.length > 0 || payment.refundRows.length > 0}}">
+        <view class="pay-table-row" style="font-size:22rpx;color:#999;">
+          <text class="pay-col-date">日期</text>
+          <text class="pay-col-time">时间</text>
+          <text class="pay-col-method">支付方式</text>
+          <text class="pay-col-cell">手机号</text>
+          <text class="pay-col-amount">金额</text>
+        </view>
+        <view class="pay-table-row {{item._isProxy ? 'pay-table-row--proxy' : ''}}" wx:for="{{payment.payRows}}" wx:key="id">
+          <text class="pay-col-date">{{item.paid_dateDateStr}}</text>
+          <text class="pay-col-time">{{item.paid_dateTimeStr}}</text>
+          <text class="pay-col-method">{{item.pay_method}}</text>
+          <text class="pay-col-cell">{{item._proxyCellMasked}}</text>
+          <text class="pay-col-amount pay-col-amount--pay">{{item.amountStr}}</text>
+        </view>
+        <view class="pay-table-row" wx:for="{{payment.refundRows}}" wx:key="id">
+          <text class="pay-col-date">{{item.paid_dateDateStr || '—'}}</text>
+          <text class="pay-col-time">{{item.paid_dateTimeStr || ''}}</text>
+          <text class="pay-col-method">{{item.pay_method || '—'}}</text>
+          <text class="pay-col-cell"></text>
+          <text class="pay-col-amount pay-col-amount--refund">-{{item.amountStr}}</text>
+        </view>
+      </view>
+      <view wx:else class="pay-empty">暂无支付记录</view>
+    </block>
   </view>
 
   <!-- C 装备卡 -->

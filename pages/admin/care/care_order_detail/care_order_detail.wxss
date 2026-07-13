@@ -68,42 +68,58 @@
 }
 .info-value--link { color: #006495; }
 
-/* 支付四格 */
-.pay-grid {
-  display: flex;
-  flex-direction: row;
+/* 支付信息（与租赁详情页同款：2×2 摘要格 + 可折叠支付明细表） */
+.pay-summary-grid {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  margin-bottom: 4rpx;
 }
-.pay-cell {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.pay-summary-cell {
+  width: 48%;
+  box-sizing: border-box;
+  background: #F8F8F8; border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  margin-bottom: 16rpx;
 }
-.pay-label { font-size: 24rpx; color: #6f7881; }
-.pay-value { font-size: 28rpx; font-weight: 600; color: #1f2a33; margin-top: 6rpx; }
-.pay-value--paid { color: #15803d; }
-.pay-value--due { color: #e64340; }
-.pay-rows { margin-top: 16rpx; border-top: 1rpx solid #eef1f5; padding-top: 8rpx; }
-.pay-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 10rpx 0;
-  font-size: 26rpx;
-  color: #3f4850;
-  gap: 16rpx;
-}
-.pay-row-method { width: 140rpx; }
-.pay-row-status { width: 120rpx; color: #6f7881; }
-.pay-row-date { flex: 1; color: #6f7881; }
-.pay-row-amount { font-weight: 600; }
-.pay-row--empty { color: #9aa3ac; justify-content: center; }
+.pay-summary-label { font-size: 24rpx; color: #999; margin-bottom: 4rpx; }
+.pay-summary-value { font-size: 30rpx; font-weight: 600; color: #333; }
+.pay-summary-value--blue { color: #2EA6D0; }
+.pay-summary-value--red { color: #E64340; }
 
-.payment-toolbar {
+.divider { height: 1rpx; background: #F0F0F0; margin: 12rpx 0; }
+
+.payment-detail-toggle {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 12rpx;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 0 4rpx;
 }
+.payment-detail-toggle__title {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.pay-table { width: 100%; }
+.pay-table-row {
+  display: flex; align-items: center;
+  font-size: 24rpx; min-height: 56rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+  gap: 8rpx;
+}
+.pay-table-row:last-child { border-bottom: none; }
+.pay-col-date { flex: 0 0 118rpx; color: #666; font-size: 22rpx; white-space: nowrap; }
+.pay-col-time { flex: 0 0 100rpx; color: #666; font-size: 22rpx; white-space: nowrap; }
+.pay-col-method { flex: 0 0 94rpx; color: #666; font-size: 22rpx; white-space: nowrap; }
+.pay-col-cell { flex: 0 0 124rpx; color: #666; font-size: 22rpx; white-space: nowrap; text-align: center; }
+.pay-col-amount { flex: 1; text-align: right; font-weight: 600; }
+.pay-col-amount--pay { color: #2EA6D0; }
+.pay-col-amount--refund { color: #E64340; }
+/* 他人代付整行标红 */
+.pay-table-row--proxy .pay-col-date,
+.pay-table-row--proxy .pay-col-time,
+.pay-table-row--proxy .pay-col-method,
+.pay-table-row--proxy .pay-col-cell,
+.pay-table-row--proxy .pay-col-amount { color: #E64340; }
+.pay-empty { color: #999; font-size: 26rpx; text-align: center; padding: 20rpx 0; }
 
 .order-memo-block {
   margin-top: 12rpx;
@@ -127,8 +143,22 @@
 .order-memo-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 12rpx;
   margin-top: 10rpx;
 }
+
+/* 备注只读展示态 */
+.order-memo-text {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: #1f2a33;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.order-memo-text--empty { color: #9aa3ac; }
+.edit-link--memo { padding-bottom: 0; }
 
 /* chip */
 .chip {
