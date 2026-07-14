@@ -825,7 +825,12 @@ Page({
     const cidx = this._careIdx(e);
     const type = e.currentTarget.dataset.type;
     const care = this.data.cares[cidx];
-    if (!care || care._veriType === type) return;
+    if (!care) return;
+    if (care._veriType === type) {
+      // 已选中扫码取板但上次因取消原因未填未生成二维码：允许原地重试，不需要再点「生成二维码」
+      if (type === '扫码取板') this._openScan(cidx);
+      return;
+    }
     // 切走扫码态先关闭会话
     if (care._veriType === '扫码取板') this._closeScan();
     this._uiState.veriType[care.id] = type;

@@ -518,7 +518,7 @@
           <text class="info-label">取消原因 *</text>
           <textarea class="panel-input panel-input--wide safe-memo-textarea" placeholder="必填，如顾客改约/装备不适合养护等"
                     value="{{care._cancelReason || ''}}" maxlength="200"
-                    data-cidx="{{cidx}}" bindblur="onCancelReasonBlur"/>
+                    data-cidx="{{cidx}}" bindinput="onCancelReasonBlur" bindblur="onCancelReasonBlur"/>
           <view class="veri-hint veri-hint--left">仍有养护任务未完成，本次仅支持取消。请选择下方任一方式核验身份，核验通过后按取消处理，不再赠送养护完成券</view>
         </view>
         <view class="veri-seg">
