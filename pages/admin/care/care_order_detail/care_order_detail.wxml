@@ -69,7 +69,7 @@
   <view class="card">
     <view class="section-title-row">
       <view class="section-title">支付信息</view>
-      <view class="btn btn--danger btn--sm" catchtap="onOpenRefundPopup">退款</view>
+      <view class="btn btn--danger btn--sm {{payment.canRefund ? '' : 'btn--disabled'}}" catchtap="onOpenRefundPopup">退款</view>
     </view>
 
     <view class="pay-summary-grid">

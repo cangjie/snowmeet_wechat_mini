@@ -70,7 +70,22 @@ Component({
           careWriteoff: careWriteoff,
           payingAmountStr: util.showAmount(order.paying_amount)
         }
-        if (order.paying_amount == 0 && !careWriteoff) { patch.isZeroAmount = true }
+        if (order.paying_amount == 0) {
+          if (order.dealed == 1) {
+            // 无权益消耗的 0 元单（如养护纯质保/招待）下单时已立即生效（PlaceCareOrder/PlaceOrder 里
+            // dealed=1 + EffectCareOrder，租赁 entertain 走 EffectRental 不设 dealed 不受影响）。
+            // 「确认生效」按钮是给尚未处理的订单用的，此时点它会被 EffectUnpaidOrder 的 dealed
+            // 守卫拦下返回「无效订单」（前端再叠一层「处理失败」）。这里直接当作已完成收尾。
+            that._paidHandled = true
+            patch.paymentStatus = 'paid'
+            patch.payStage = 'paid'
+            patch.payStageLabel = '已生效'
+            that.setData(patch)
+            that.triggerEvent('paid', { orderId: order.id, payMethod: '', order: order })
+            return
+          }
+          if (!careWriteoff) { patch.isZeroAmount = true }
+        }
         that.setData(patch)
       })
     },

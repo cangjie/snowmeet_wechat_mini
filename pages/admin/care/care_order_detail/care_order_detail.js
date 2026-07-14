@@ -209,6 +209,7 @@ Page({
         ...this.data.payment,
         paidStr: util.showAmount(order.paidAmount || 0),
         refundStr: util.showAmount(order.refundAmount || 0),
+        canRefund: Math.round(((order.paidAmount || 0) - (order.refundAmount || 0)) * 100) / 100 > 0,
         payRows,
         refundRows,
       },
@@ -524,6 +525,11 @@ Page({
   },
 
   onOpenRefundPopup() {
+    // 防御性守卫：可退金额为 0 时不开窗（与 wxml 按钮置灰一致）
+    if (!this.data.payment.canRefund) {
+      wx.showToast({ title: '无可退款金额', icon: 'none' });
+      return;
+    }
     const cares = this.data.cares || [];
     const cancelledCare = cares.find((c) => c.is_cancel);
     const defaultMemo = (cancelledCare && cancelledCare.cancel_reason) || '';
