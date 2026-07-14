@@ -85,7 +85,7 @@ Page({
     // safeCheck：安检数值/备注在"确认安全"提交前只存在于本地，任何无关操作触发的 loadOrder() 都会
     // 用服务端原始数据重建 care（该字段服务端此时仍为空）；此 map 是这些草稿值的唯一持久来源，
     // 见 _renderCare 的合并逻辑。
-    this._uiState = { expanded: {}, veriType: {}, safeCheck: {} };
+    this._uiState = { expanded: {}, veriType: {}, safeCheck: {}, cancelReason: {} };
     this._targetCareId = careId;
     this.setData({ orderId, isMaster: (staff.title_level || 0) >= 200 });
     this._loadBrandLists();
@@ -256,8 +256,9 @@ Page({
 
   _renderCare(raw) {
     const care = { ...raw };
-    const ui = this._uiState || { expanded: {}, veriType: {}, safeCheck: {} };
+    const ui = this._uiState || { expanded: {}, veriType: {}, safeCheck: {}, cancelReason: {} };
     ui.safeCheck = ui.safeCheck || {};
+    ui.cancelReason = ui.cancelReason || {};
     const brandDisp = care.brand ? String(care.brand).split('/')[0] : '';
     const titleParts = [care.equipment || '装备'];
     if (brandDisp) titleParts.push(brandDisp);
@@ -368,10 +369,28 @@ Page({
       delete ui.safeCheck[care.id]; // 已核验完成/终止，草稿不再需要
       care._safeMemoDraft = (safeTask && safeTask.memo) || '';
     }
-    care._status = care.status || (care._tasks.length === 0 ? '未开始' : '进行中');
+    // 取消是通过发板任务"已完成"落库的，后端 status 计算属性无法区分；展示层单独改成"已取消"，
+    // 避免顶部状态 chip 显示"已完成"和旁边的"已取消"标签自相矛盾
+    care._status = care.is_cancel ? '已取消' : (care.status || (care._tasks.length === 0 ? '未开始' : '进行中'));
     // 展开态 / 发板核销方式：按 care.id 回填页面级记忆
     care._expanded = ui.expanded[care.id] !== undefined ? ui.expanded[care.id] : (care._status !== '已完成');
     const finishTask = care._tasks.find((t) => t.task_name === '发板');
+    const finishDone = !!finishTask && (finishTask.status === '已完成' || finishTask.status === '强行中止');
+    const nonFinishTasks = care._tasks.filter((t) => t.task_name !== '发板');
+    const allNonFinishDone = nonFinishTasks.every((t) => t.status === '已完成' || t.status === '强行中止');
+    // 可取消：发板本身未完成，且不是"只剩发板没完成"（那个终态走正常发板，不提供取消——
+    // 全部养护工作已完成时没有"取消"的业务意义）。已开始的任务同样可取消，不要求"未开始"。
+    care._canCancel = !!finishTask && !finishDone && !allNonFinishDone;
+    if (care._canCancel) {
+      // 取消原因草稿跨无关操作重载保留，同 safeCheck 字段的持久化方式
+      care._cancelReason = ui.cancelReason[care.id] || '';
+    } else {
+      delete ui.cancelReason[care.id];
+      care._cancelReason = '';
+    }
+    // 取消模式由任务状态自动判定，不再是用户手动开关：处于"可取消"阶段时该核销面板只提供取消，
+    // 到达"只剩发板"终态时只提供正常发板，两者互斥
+    care._cancelMode = care._canCancel;
     if (!finishTask || finishTask.status !== '未开始') delete ui.veriType[care.id];
     care._veriType = ui.veriType[care.id] || '';
     care._editing = false;
@@ -827,22 +846,16 @@ Page({
     }
   },
 
-  // 取消发板：叠加在四种核验方式之上的模式开关（非互斥 tab）。开启后需先填原因，
-  // 核验通过时随对应方式一起提交 isCancel=true + cancelReason，而不是走正常完成。
-  onCancelModeToggle(e) {
-    const cidx = this._careIdx(e);
-    const care = this.data.cares[cidx];
-    if (!care) return;
-    const next = !care._cancelMode;
-    this.setData({
-      ['cares[' + cidx + ']._cancelMode']: next,
-      ['cares[' + cidx + ']._cancelReason']: next ? (care._cancelReason || '') : '',
-    });
-  },
-
+  // 取消原因：care._cancelMode 由 _renderCare 按任务状态自动判定（非用户手动开关），
+  // 只要还有任务未完成（不含发板本身）就处于取消阶段，此时该核销面板只提供取消、不提供正常发板。
   onCancelReasonBlur(e) {
     const cidx = this._careIdx(e);
-    this.setData({ ['cares[' + cidx + ']._cancelReason']: e.detail.value });
+    const care = this.data.cares[cidx];
+    const value = e.detail.value;
+    this.setData({ ['cares[' + cidx + ']._cancelReason']: value });
+    if (care && this._uiState) {
+      this._uiState.cancelReason[care.id] = value;
+    }
   },
 
   // 非取消模式：{ ok:true, isCancel:false }；取消模式下原因必填，未填返回 { ok:false }（已 toast）
