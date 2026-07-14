@@ -879,7 +879,8 @@ Page({
     if (!care._cancelMode) return { ok: true, isCancel: false, reason: undefined };
     const reason = (care._cancelReason || '').trim();
     if (!reason) {
-      wx.showToast({ title: '请填写取消原因', icon: 'none' });
+      // TEMP DEBUG：定位「填了原因仍提示未填」的问题，确认后会删掉
+      wx.showToast({ title: '未填[mode=' + care._cancelMode + ',val=' + JSON.stringify(care._cancelReason) + ']', icon: 'none', duration: 4000 });
       return { ok: false };
     }
     return { ok: true, isCancel: true, reason };
