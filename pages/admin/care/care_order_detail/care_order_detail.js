@@ -82,7 +82,10 @@ Page({
     if (!careId) careId = parseInt(options.careId, 10) || 0;
     const staff = app.globalData.staff || {};
     // 页面级 UI 状态（loadOrder 全量重渲染时按 care.id 回填，避免打断用户操作）
-    this._uiState = { expanded: {}, veriType: {} };
+    // safeCheck：安检数值/备注在"确认安全"提交前只存在于本地，任何无关操作触发的 loadOrder() 都会
+    // 用服务端原始数据重建 care（该字段服务端此时仍为空）；此 map 是这些草稿值的唯一持久来源，
+    // 见 _renderCare 的合并逻辑。
+    this._uiState = { expanded: {}, veriType: {}, safeCheck: {} };
     this._targetCareId = careId;
     this.setData({ orderId, isMaster: (staff.title_level || 0) >= 200 });
     this._loadBrandLists();
@@ -232,11 +235,16 @@ Page({
       const cidx = cares.findIndex((c) => c.id === careId);
       if (cidx < 0) return;
       const care = cares[cidx];
-      // 只填当前仍为空的字段，不覆盖已录入/服务端已存的值
+      const ui = that._uiState || (that._uiState = { expanded: {}, veriType: {}, safeCheck: {} });
+      const draft = ui.safeCheck[careId] || (ui.safeCheck[careId] = {});
+      // 只填当前仍为空的字段，不覆盖已录入/服务端已存的值；同步写页面级草稿，跨无关操作重载不丢
       const fields = ['height', 'weight', 'gap', 'front_din', 'rear_din', 'left_angle', 'right_angle'];
       const patch = {};
       fields.forEach((f) => {
-        if (!care[f] && hist[f]) patch['cares[' + cidx + '].' + f] = hist[f];
+        if (!care[f] && hist[f]) {
+          patch['cares[' + cidx + '].' + f] = hist[f];
+          draft[f] = hist[f];
+        }
       });
       if (Object.keys(patch).length > 0) {
         that.setData(patch);
@@ -248,7 +256,8 @@ Page({
 
   _renderCare(raw) {
     const care = { ...raw };
-    const ui = this._uiState || { expanded: {}, veriType: {} };
+    const ui = this._uiState || { expanded: {}, veriType: {}, safeCheck: {} };
+    ui.safeCheck = ui.safeCheck || {};
     const brandDisp = care.brand ? String(care.brand).split('/')[0] : '';
     const titleParts = [care.equipment || '装备'];
     if (brandDisp) titleParts.push(brandDisp);
@@ -340,8 +349,25 @@ Page({
     // 安检是养护单的第一道任务，按 care_task 记录查找，不依赖数组原始顺序。
     const safeTask = care._tasks.find((t) => t.task_name === '安全检查');
     care._safeChecking = !!(safeTask && safeTask.status !== '已完成' && safeTask.status !== '强行中止');
-    // 备注真正落在 CareTask.memo（安检任务自身），取当前值做编辑草稿（与 height/weight 等安检字段同一取值方式）
-    care._safeMemoDraft = (safeTask && safeTask.memo) || '';
+    if (care._safeChecking) {
+      // 安检未确认期间：数值/备注只存在本地，任何无关操作触发的 loadOrder() 都会用服务端原始数据
+      // （此时仍为空）重建 care。合并规则——服务端已落库的值优先（一旦落库即代表已确认，用它覆盖草稿
+      // 并同步回草稿）；否则用草稿（用户已填/已改、或历史预填的值），跨重载保留；都没有则留空。
+      const draft = ui.safeCheck[care.id] || (ui.safeCheck[care.id] = {});
+      ['height', 'weight', 'gap', 'front_din', 'rear_din', 'left_angle', 'right_angle'].forEach((f) => {
+        if (care[f]) {
+          draft[f] = care[f];
+        } else if (draft[f]) {
+          care[f] = draft[f];
+        }
+      });
+      const memoDraft = (safeTask && safeTask.memo) || draft.memo || '';
+      draft.memo = memoDraft;
+      care._safeMemoDraft = memoDraft;
+    } else {
+      delete ui.safeCheck[care.id]; // 已核验完成/终止，草稿不再需要
+      care._safeMemoDraft = (safeTask && safeTask.memo) || '';
+    }
     care._status = care.status || (care._tasks.length === 0 ? '未开始' : '进行中');
     // 展开态 / 发板核销方式：按 care.id 回填页面级记忆
     care._expanded = ui.expanded[care.id] !== undefined ? ui.expanded[care.id] : (care._status !== '已完成');
@@ -602,13 +628,26 @@ Page({
   /* ---------- 安全检查 ---------- */
   onSafeFieldBlur(e) {
     const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
     const field = e.currentTarget.dataset.field; // height/weight/gap/front_din/rear_din/left_angle/right_angle
-    this.setData({ ['cares[' + cidx + '].' + field]: e.detail.value });
+    const value = e.detail.value;
+    this.setData({ ['cares[' + cidx + '].' + field]: value });
+    // 同步写入页面级草稿：确认安全前的无关操作（如保存装备信息）触发的重载不会冲掉这次编辑
+    if (care && this._uiState) {
+      const draft = this._uiState.safeCheck[care.id] || (this._uiState.safeCheck[care.id] = {});
+      draft[field] = value;
+    }
   },
 
   onSafeMemoBlur(e) {
     const cidx = this._careIdx(e);
-    this.setData({ ['cares[' + cidx + ']._safeMemoDraft']: e.detail.value });
+    const care = this.data.cares[cidx];
+    const value = e.detail.value;
+    this.setData({ ['cares[' + cidx + ']._safeMemoDraft']: value });
+    if (care && this._uiState) {
+      const draft = this._uiState.safeCheck[care.id] || (this._uiState.safeCheck[care.id] = {});
+      draft.memo = value;
+    }
   },
 
   onSafeCheck(e) {
