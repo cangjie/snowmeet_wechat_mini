@@ -524,11 +524,14 @@ Page({
   },
 
   onOpenRefundPopup() {
+    const cares = this.data.cares || [];
+    const cancelledCare = cares.find((c) => c.is_cancel);
+    const defaultMemo = (cancelledCare && cancelledCare.cancel_reason) || '';
     this.setData({
       refundPopup: {
         show: true,
         amount: '',
-        memo: '',
+        memo: defaultMemo,
         refunding: false,
       },
     });
