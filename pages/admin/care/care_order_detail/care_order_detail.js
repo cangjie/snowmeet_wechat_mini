@@ -61,6 +61,7 @@ Page({
     veriCode: '',
     scanQr: { careId: 0, url: '', status: '' }, // status: loading / ready / broken
     addBrand: { show: false, cidx: -1, name: '', chineseName: '' },
+    cancelModal: { show: false, cidx: -1 },
     skiBrandList: [],
     boardBrandList: [],
     printShow: false,
@@ -858,6 +859,16 @@ Page({
     }
   },
 
+  // 取消是少数情况：单独一个弹窗承载（原因 + 四方式核验），不常驻在页面上
+  onOpenCancelModal(e) {
+    const cidx = this._careIdx(e);
+    this.setData({ cancelModal: { show: true, cidx } });
+  },
+  onCloseCancelModal() {
+    this._closeScan();
+    this.setData({ 'cancelModal.show': false });
+  },
+
   // 非取消模式：{ ok:true, isCancel:false }；取消模式下原因必填，未填返回 { ok:false }（已 toast）
   _resolveCancelParams(care) {
     if (!care._cancelMode) return { ok: true, isCancel: false, reason: undefined };
@@ -899,6 +910,7 @@ Page({
     this.setData({ veriCode: '' });
     data.veriCareFinishCodePromise(care.id, code, app.globalData.sessionKey, cp.isCancel, cp.reason).then(() => {
       wx.showToast({ title: cp.isCancel ? '已取消' : '验证通过', icon: 'success' });
+      if (cp.isCancel) that.setData({ 'cancelModal.show': false });
       that.loadOrder();
     }).catch(() => {});
   },
@@ -919,6 +931,7 @@ Page({
           app.globalData.sessionKey, null, null, null, cp.isCancel, cp.reason)
           .then(() => {
             wx.showToast({ title: cp.isCancel ? '已取消' : '发板完成', icon: 'success' });
+            if (cp.isCancel) that.setData({ 'cancelModal.show': false });
             that.loadOrder();
           }).catch(() => {});
       },
@@ -945,6 +958,7 @@ Page({
       .then(() => {
         wx.hideLoading();
         wx.showToast({ title: cp.isCancel ? '已取消' : '拍照发板完成', icon: 'success' });
+        if (cp.isCancel) that.setData({ 'cancelModal.show': false });
         that.loadOrder();
       })
       .catch(() => {
@@ -1019,6 +1033,7 @@ Page({
         app.globalData.sessionKey, null, null, null, cp.isCancel, cp.reason)
         .then(() => {
           wx.showToast({ title: cp.isCancel ? '已取消' : '扫码发板完成', icon: 'success' });
+          if (cp.isCancel) that.setData({ 'cancelModal.show': false });
           that.loadOrder();
         }).catch(() => {});
     } else {

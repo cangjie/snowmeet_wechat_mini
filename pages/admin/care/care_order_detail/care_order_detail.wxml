@@ -317,6 +317,11 @@
                         data-cidx="{{cidx}}" data-task-id="{{task.id}}" catchtap="onTaskEnd">强行中止（{{task._staffName || '他人'}} 执行中）</view>
                   <view wx:if="{{task._hint}}" class="task-hint">{{task._hint}}</view>
                 </block>
+                <!-- 取消养护：少数情况，收成小按钮弹窗，不常驻在任务行上 -->
+                <block wx:if="{{task.task_name === '发板' && care._canCancel}}">
+                  <view class="btn btn--sm btn--danger-plain cancel-trigger-btn"
+                        data-cidx="{{cidx}}" catchtap="onOpenCancelModal">取消养护</view>
+                </block>
               </view>
             </view>
 
@@ -391,16 +396,8 @@
               <view class="btn btn--danger btn--block" data-cidx="{{cidx}}" data-tidx="{{tidx}}" catchtap="onStoreConfirm">确认寄存方式</view>
             </view>
 
-            <!-- 发板核销 / 取消养护：同一套四方式核验，按任务状态自动判定用途。
-                 只剩发板没完成（终态）→ 正常发板；其余任务只要还有未完成的（含已开始）→ 仅提供取消，非互斥、非用户手动开关 -->
-            <view wx:if="{{task.task_name === '发板' && task.status === '未开始' && (task._current || care._canCancel)}}" class="task-panel {{care._cancelMode ? 'task-panel--cancel-active' : ''}}">
-              <view wx:if="{{care._cancelMode}}" class="cancel-reason-box">
-                <text class="info-label">取消原因 *</text>
-                <textarea class="panel-input panel-input--wide safe-memo-textarea" placeholder="必填，如顾客改约/装备不适合养护等"
-                          value="{{care._cancelReason || ''}}" maxlength="200"
-                          data-cidx="{{cidx}}" bindblur="onCancelReasonBlur"/>
-                <view class="veri-hint veri-hint--left">仍有养护任务未完成，本次仅支持取消。请选择下方任一方式核验身份，核验通过后按取消处理，不再赠送养护完成券</view>
-              </view>
+            <!-- 发板核销：四方式（正常完成路径，仅终态显示；取消走上方「取消养护」按钮弹窗） -->
+            <view wx:if="{{task.task_name === '发板' && task._current && task.status === '未开始' && !care._canCancel}}" class="task-panel">
               <view class="veri-seg">
                 <view class="btn btn--sm {{care._veriType === '扫码取板' ? 'btn--primary' : 'btn--plain'}}"
                       data-cidx="{{cidx}}" data-type="扫码取板" catchtap="onVeriTypeTap">扫码取板</view>
@@ -411,7 +408,7 @@
                 <view wx:if="{{isMaster}}" class="btn btn--sm {{care._veriType === '店长确认' ? 'btn--primary' : 'btn--plain'}}"
                       data-cidx="{{cidx}}" data-type="店长确认" catchtap="onVeriTypeTap">店长确认</view>
               </view>
-              <view wx:if="{{!care._veriType}}" class="veri-hint">{{care._cancelMode ? '请选择核验方式：由顾客本人操作，或核实操作人身份' : '请选择核销方式：由顾客本人操作，或核实取板人身份'}}</view>
+              <view wx:if="{{!care._veriType}}" class="veri-hint">请选择核销方式：由顾客本人操作，或核实取板人身份</view>
 
               <!-- 扫码取板 -->
               <block wx:if="{{care._veriType === '扫码取板'}}">
@@ -419,7 +416,7 @@
                   <image wx:if="{{scanQr.careId === care.id && scanQr.url}}" class="scan-qr-img"
                          src="{{scanQr.url}}" mode="aspectFit"/>
                   <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'loading'}}" class="veri-hint">二维码生成中…</view>
-                  <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'ready'}}" class="veri-hint">{{care._cancelMode ? '请顾客本人用微信扫码，扫码成功自动完成取消' : '请顾客本人用微信扫码，扫码成功自动完成发板'}}</view>
+                  <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'ready'}}" class="veri-hint">请顾客本人用微信扫码，扫码成功自动完成发板</view>
                   <view wx:if="{{scanQr.careId !== care.id || scanQr.status === 'broken'}}" class="panel-btn-row">
                     <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onScanRetry">{{scanQr.careId === care.id && scanQr.status === 'broken' ? '重新生成二维码' : '生成二维码'}}</view>
                   </view>
@@ -438,13 +435,13 @@
 
               <!-- 拍照凭证 -->
               <block wx:if="{{care._veriType === '拍照凭证'}}">
-                <view class="veri-hint veri-hint--left">{{care._cancelMode ? '拍摄操作人凭证照片，上传成功后自动完成取消' : '拍摄取板人凭证照片，上传成功后自动完成发板'}}</view>
+                <view class="veri-hint veri-hint--left">拍摄取板人凭证照片，上传成功后自动完成发板</view>
                 <van-uploader max-count="1" data-cidx="{{cidx}}" bind:after-read="onPickPhotoRead"/>
               </block>
 
               <!-- 店长确认 -->
               <block wx:if="{{care._veriType === '店长确认'}}">
-                <view class="btn btn--danger btn--block" data-cidx="{{cidx}}" catchtap="onMasterFinish">{{care._cancelMode ? '店长确认取消' : '店长确认发板'}}</view>
+                <view class="btn btn--danger btn--block" data-cidx="{{cidx}}" catchtap="onMasterFinish">店长确认发板</view>
               </block>
             </view>
 
@@ -508,5 +505,68 @@
         <view class="btn btn--danger btn--half" catchtap="onConfirmRefund">{{refundPopup.refunding ? '退款中...' : '确认退款'}}</view>
       </view>
     </view>
+  </van-popup>
+
+  <!-- 取消养护：少数情况用弹窗承载（原因 + 四方式核验），不常驻在任务行上。
+       复用 wx:for 定位到目标 care，与页面主循环用同一套 care/cidx 变量名，handler 完全复用 -->
+  <van-popup show="{{cancelModal.show}}" position="bottom" round custom-style="max-height: 85%;" bind:close="onCloseCancelModal" closeable>
+    <block wx:for="{{cares}}" wx:key="id" wx:for-item="care" wx:for-index="cidx">
+      <view wx:if="{{cidx === cancelModal.cidx}}" class="cancel-modal">
+        <view class="cancel-modal-title">取消养护</view>
+        <view class="cancel-modal-sub">{{care._title}}</view>
+        <view class="cancel-reason-box">
+          <text class="info-label">取消原因 *</text>
+          <textarea class="panel-input panel-input--wide safe-memo-textarea" placeholder="必填，如顾客改约/装备不适合养护等"
+                    value="{{care._cancelReason || ''}}" maxlength="200"
+                    data-cidx="{{cidx}}" bindblur="onCancelReasonBlur"/>
+          <view class="veri-hint veri-hint--left">仍有养护任务未完成，本次仅支持取消。请选择下方任一方式核验身份，核验通过后按取消处理，不再赠送养护完成券</view>
+        </view>
+        <view class="veri-seg">
+          <view class="btn btn--sm {{care._veriType === '扫码取板' ? 'btn--primary' : 'btn--plain'}}"
+                data-cidx="{{cidx}}" data-type="扫码取板" catchtap="onVeriTypeTap">扫码取板</view>
+          <view class="btn btn--sm {{care._veriType === '验证码' ? 'btn--primary' : 'btn--plain'}}"
+                data-cidx="{{cidx}}" data-type="验证码" catchtap="onVeriTypeTap">验证码</view>
+          <view class="btn btn--sm {{care._veriType === '拍照凭证' ? 'btn--primary' : 'btn--plain'}}"
+                data-cidx="{{cidx}}" data-type="拍照凭证" catchtap="onVeriTypeTap">拍照凭证</view>
+          <view wx:if="{{isMaster}}" class="btn btn--sm {{care._veriType === '店长确认' ? 'btn--primary' : 'btn--plain'}}"
+                data-cidx="{{cidx}}" data-type="店长确认" catchtap="onVeriTypeTap">店长确认</view>
+        </view>
+        <view wx:if="{{!care._veriType}}" class="veri-hint">请选择核验方式：由顾客本人操作，或核实操作人身份</view>
+
+        <!-- 扫码取板 -->
+        <block wx:if="{{care._veriType === '扫码取板'}}">
+          <view class="scan-qr">
+            <image wx:if="{{scanQr.careId === care.id && scanQr.url}}" class="scan-qr-img"
+                   src="{{scanQr.url}}" mode="aspectFit"/>
+            <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'loading'}}" class="veri-hint">二维码生成中…</view>
+            <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'ready'}}" class="veri-hint">请顾客本人用微信扫码，扫码成功自动完成取消</view>
+            <view wx:if="{{scanQr.careId !== care.id || scanQr.status === 'broken'}}" class="panel-btn-row">
+              <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onScanRetry">{{scanQr.careId === care.id && scanQr.status === 'broken' ? '重新生成二维码' : '生成二维码'}}</view>
+            </view>
+          </view>
+        </block>
+
+        <!-- 验证码 -->
+        <block wx:if="{{care._veriType === '验证码'}}">
+          <view class="veri-row">
+                <input class="panel-input" type="number" placeholder="4 位任务码"
+                   value="{{veriCode}}" bindinput="onVeriCodeInput"/>
+            <view class="btn btn--primary btn--sm" data-cidx="{{cidx}}" catchtap="onVeriCodeConfirm">验证</view>
+            <view class="btn btn--plain btn--sm" data-cidx="{{cidx}}" catchtap="onSendVeriCode">重新发送</view>
+          </view>
+        </block>
+
+        <!-- 拍照凭证 -->
+        <block wx:if="{{care._veriType === '拍照凭证'}}">
+          <view class="veri-hint veri-hint--left">拍摄操作人凭证照片，上传成功后自动完成取消</view>
+          <van-uploader max-count="1" data-cidx="{{cidx}}" bind:after-read="onPickPhotoRead"/>
+        </block>
+
+        <!-- 店长确认 -->
+        <block wx:if="{{care._veriType === '店长确认'}}">
+          <view class="btn btn--danger btn--block" data-cidx="{{cidx}}" catchtap="onMasterFinish">店长确认取消</view>
+        </block>
+      </view>
+    </block>
   </van-popup>
 </view>

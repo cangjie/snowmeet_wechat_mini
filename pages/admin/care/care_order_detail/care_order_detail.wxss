@@ -348,8 +348,22 @@
 .task-panel--cancel { background: #fef2f2; }
 .task-panel--cancel .task-proof-label { color: #b91c1c; }
 
-/* 核销面板处于"取消"阶段（按任务状态自动判定，非用户手动开关）时的醒目提示区 */
-.task-panel--cancel-active { border: 1rpx solid #f3b6b5; }
+/* 取消养护：任务行上的小触发按钮 + 底部弹窗 */
+.cancel-trigger-btn { margin-top: 12rpx; align-self: flex-start; }
+.cancel-modal { padding: 32rpx 24rpx 48rpx; }
+.cancel-modal-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2a33;
+  text-align: center;
+}
+.cancel-modal-sub {
+  font-size: 24rpx;
+  color: #6f7881;
+  text-align: center;
+  margin-top: 6rpx;
+  margin-bottom: 20rpx;
+}
 .cancel-reason-box { margin-bottom: 16rpx; }
 
 /* 非雪季订单醒目横幅（琥珀警示系：蓝=操作 绿=成功 红=危险已占用） */
