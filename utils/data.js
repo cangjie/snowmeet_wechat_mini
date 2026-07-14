@@ -838,7 +838,7 @@ const updateCarePromise = function (care, scene, sessionKey) {
     })
   })
 }
-const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey, dealMethod, storeMemo, taskMemo) {
+const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey, dealMethod, storeMemo, taskMemo, isCancel, cancelReason) {
   var updateUrl = app.globalData.requestPrefix + 'Care/SetTaskStatus/' + taskId.toString() + '?status=' + encodeURIComponent(status) + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
   if (dealMethod){
     updateUrl += '&dealMethod=' + encodeURIComponent(dealMethod)
@@ -850,6 +850,13 @@ const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey,
   // 未传（undefined）的调用方保持旧行为不变
   if (taskMemo!=null && taskMemo!=undefined){
     updateUrl += '&taskMemo=' + encodeURIComponent(taskMemo)
+  }
+  // 取消发板：isCancel=true 时后端跳过完成赠券、改置 Care.is_cancel/cancel_reason
+  if (isCancel){
+    updateUrl += '&isCancel=true'
+    if (cancelReason!=null && cancelReason!=undefined){
+      updateUrl += '&cancelReason=' + encodeURIComponent(cancelReason)
+    }
   }
   return new Promise(function (resolve, reject) {
     util.performWebRequest(updateUrl, null).then(function (newCare) {
@@ -866,10 +873,16 @@ const createCareVerifyCodePromise = function (careId, sessionKey) {
     + '?sessionKey=' + sessionKey
   return util.performWebRequest(url, undefined)
 }
-// 验证取板码并完成发板（60 分钟内有效）
-const veriCareFinishCodePromise = function (careId, code, sessionKey) {
+// 验证取板码并完成发板（60 分钟内有效）；isCancel=true 时按取消处理（跳过完成赠券、记 Care.cancel_reason）
+const veriCareFinishCodePromise = function (careId, code, sessionKey, isCancel, cancelReason) {
   var url = app.globalData.requestPrefix + 'Care/VeriCareFinishCode/' + careId.toString()
     + '?code=' + encodeURIComponent(code) + '&sessionKey=' + sessionKey
+  if (isCancel){
+    url += '&isCancel=true'
+    if (cancelReason!=null && cancelReason!=undefined){
+      url += '&cancelReason=' + encodeURIComponent(cancelReason)
+    }
+  }
   return util.performWebRequest(url, undefined)
 }
 // 绑定取板凭证照片

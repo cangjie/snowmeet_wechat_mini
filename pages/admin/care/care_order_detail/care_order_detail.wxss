@@ -345,6 +345,12 @@
   gap: 16rpx;
 }
 .task-proof-label { font-size: 24rpx; color: #6f7881; }
+.task-panel--cancel { background: #fef2f2; }
+.task-panel--cancel .task-proof-label { color: #b91c1c; }
+
+/* 取消发板：叠加在核销四方式之上的开关 */
+.cancel-toggle-row { margin-top: 16rpx; }
+.cancel-reason-box { margin-top: 12rpx; }
 
 /* 非雪季订单醒目横幅（琥珀警示系：蓝=操作 绿=成功 红=危险已占用） */
 .summer-banner {

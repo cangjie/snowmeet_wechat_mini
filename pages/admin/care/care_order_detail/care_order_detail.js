@@ -788,6 +788,35 @@ Page({
     }
   },
 
+  // 取消发板：叠加在四种核验方式之上的模式开关（非互斥 tab）。开启后需先填原因，
+  // 核验通过时随对应方式一起提交 isCancel=true + cancelReason，而不是走正常完成。
+  onCancelModeToggle(e) {
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
+    if (!care) return;
+    const next = !care._cancelMode;
+    this.setData({
+      ['cares[' + cidx + ']._cancelMode']: next,
+      ['cares[' + cidx + ']._cancelReason']: next ? (care._cancelReason || '') : '',
+    });
+  },
+
+  onCancelReasonBlur(e) {
+    const cidx = this._careIdx(e);
+    this.setData({ ['cares[' + cidx + ']._cancelReason']: e.detail.value });
+  },
+
+  // 非取消模式：{ ok:true, isCancel:false }；取消模式下原因必填，未填返回 { ok:false }（已 toast）
+  _resolveCancelParams(care) {
+    if (!care._cancelMode) return { ok: true, isCancel: false, reason: undefined };
+    const reason = (care._cancelReason || '').trim();
+    if (!reason) {
+      wx.showToast({ title: '请填写取消原因', icon: 'none' });
+      return { ok: false };
+    }
+    return { ok: true, isCancel: true, reason };
+  },
+
   _sendVeriCode(cidx) {
     const care = this.data.cares[cidx];
     data.createCareVerifyCodePromise(care.id, app.globalData.sessionKey).then(() => {
@@ -806,15 +835,18 @@ Page({
 
   onVeriCodeConfirm(e) {
     const that = this;
-    const care = this.data.cares[this._careIdx(e)];
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
     const code = (this.data.veriCode || '').trim();
     if (!code) {
       wx.showToast({ title: '请输入取板码', icon: 'none' });
       return;
     }
+    const cp = this._resolveCancelParams(care);
+    if (!cp.ok) return;
     this.setData({ veriCode: '' });
-    data.veriCareFinishCodePromise(care.id, code, app.globalData.sessionKey).then(() => {
-      wx.showToast({ title: '验证通过', icon: 'success' });
+    data.veriCareFinishCodePromise(care.id, code, app.globalData.sessionKey, cp.isCancel, cp.reason).then(() => {
+      wx.showToast({ title: cp.isCancel ? '已取消' : '验证通过', icon: 'success' });
       that.loadOrder();
     }).catch(() => {});
   },
@@ -824,28 +856,32 @@ Page({
     const care = this.data.cares[this._careIdx(e)];
     const finishTask = (care._tasks || []).find((t) => t.task_name === '发板');
     if (!finishTask) return;
+    const cp = this._resolveCancelParams(care);
+    if (!cp.ok) return;
     wx.showModal({
-      title: '确认发板',
-      content: '请核实取板人和会员本人的关系。',
+      title: cp.isCancel ? '确认取消' : '确认发板',
+      content: cp.isCancel ? ('确认取消本件养护？原因：' + cp.reason) : '请核实取板人和会员本人的关系。',
       success(res) {
         if (!res.confirm) return;
         data.updateCareTaskStatusPromise(finishTask.id, '已完成', '店长确认',
-          app.globalData.sessionKey, null, null)
+          app.globalData.sessionKey, null, null, null, cp.isCancel, cp.reason)
           .then(() => {
-            wx.showToast({ title: '发板完成', icon: 'success' });
+            wx.showToast({ title: cp.isCancel ? '已取消' : '发板完成', icon: 'success' });
             that.loadOrder();
           }).catch(() => {});
       },
     });
   },
 
-  // 拍照凭证：两段上传原图+缩略图 → 绑定取板凭证 → 完成发板
+  // 拍照凭证：两段上传原图+缩略图 → 绑定取板凭证 → 完成发板（取消模式同样走这条链，仅末尾状态不同）
   onPickPhotoRead(e) {
     const that = this;
     const cidx = this._careIdx(e);
     const care = this.data.cares[cidx];
     const finishTask = (care._tasks || []).find((t) => t.task_name === '发板');
     if (!finishTask) return;
+    const cp = this._resolveCancelParams(care);
+    if (!cp.ok) return;
     const uploadFile = e.detail.file;
     wx.showLoading({ title: '上传中', mask: true });
     data.uploadFilePromise(null, uploadFile.tempFilePath, '养护取板', uploadFile.type, app.globalData.sessionKey)
@@ -853,10 +889,10 @@ Page({
         null, null, app.globalData.sessionKey))
       .then((withThumb) => data.setCarePickImagePromise(care.id, withThumb.id, app.globalData.sessionKey))
       .then(() => data.updateCareTaskStatusPromise(finishTask.id, '已完成', '上传照片取板',
-        app.globalData.sessionKey, null, null))
+        app.globalData.sessionKey, null, null, null, cp.isCancel, cp.reason))
       .then(() => {
         wx.hideLoading();
-        wx.showToast({ title: '拍照发板完成', icon: 'success' });
+        wx.showToast({ title: cp.isCancel ? '已取消' : '拍照发板完成', icon: 'success' });
         that.loadOrder();
       })
       .catch(() => {
@@ -868,9 +904,13 @@ Page({
   /* ---------- 扫码取板（页面级单例 WebSocket 会话） ---------- */
   _openScan(cidx) {
     const that = this;
-    this._closeScan();
     const care = this.data.cares[cidx];
     if (!care) return;
+    const cp = this._resolveCancelParams(care);
+    if (!cp.ok) return;
+    this._closeScan();
+    // 供 _onScanMessage 扫码成功回调读取（含重新生成二维码场景，每次 open 都重新取当前值）
+    this._scanCancelParams = cp;
     this._scan = { careId: care.id, qrCode: null, socketTask: null, replied: false };
     this.setData({ scanQr: { careId: care.id, url: '', status: 'loading' } });
     data.createScanQrCodeByStaffPromise('care_veri_' + care.id, '店铺接待', '养护取板', app.globalData.sessionKey)
@@ -916,14 +956,17 @@ Page({
     scan.replied = true;
     const order = this.data.order || {};
     const scanCareId = scan.careId;
+    // 先取出，_closeScan() 会清掉 this._scanCancelParams
+    const cp = this._scanCancelParams || { isCancel: false, reason: undefined };
     if (order.member_id && order.member_id === scanQrCode.scaner_member_id) {
       const care = (this.data.cares || []).find((c) => c.id === scanCareId);
       const finishTask = care ? (care._tasks || []).find((t) => t.task_name === '发板') : null;
       this._closeScan();
       if (!finishTask) return;
-      data.updateCareTaskStatusPromise(finishTask.id, '已完成', '扫码取板', app.globalData.sessionKey, null, null)
+      data.updateCareTaskStatusPromise(finishTask.id, '已完成', '扫码取板',
+        app.globalData.sessionKey, null, null, null, cp.isCancel, cp.reason)
         .then(() => {
-          wx.showToast({ title: '扫码发板完成', icon: 'success' });
+          wx.showToast({ title: cp.isCancel ? '已取消' : '扫码发板完成', icon: 'success' });
           that.loadOrder();
         }).catch(() => {});
     } else {
@@ -945,6 +988,7 @@ Page({
 
   _closeScan() {
     const scan = this._scan;
+    this._scanCancelParams = null;
     if (!scan) return;
     this._scan = null;
     if (scan.qrCode && !scan.replied) {

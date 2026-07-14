@@ -133,6 +133,7 @@
         <view class="care-head-left">
           <text class="care-title">{{care._title}}</text>
           <view class="chip {{care._status === '已完成' ? 'chip-success' : (care._status === '未开始' ? 'chip-muted' : 'chip-primary')}}">{{care._status}}</view>
+          <view wx:if="{{care.is_cancel}}" class="chip chip-pending">已取消</view>
         </view>
         <van-icon name="{{care._expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
       </view>
@@ -391,7 +392,7 @@
               <view class="btn btn--danger btn--block" data-cidx="{{cidx}}" data-tidx="{{tidx}}" catchtap="onStoreConfirm">确认寄存方式</view>
             </view>
 
-            <!-- 发板核销：四方式 -->
+            <!-- 发板核销：四方式 + 取消开关 -->
             <view wx:if="{{task.task_name === '发板' && task._current && task.status === '未开始'}}" class="task-panel">
               <view class="veri-seg">
                 <view class="btn btn--sm {{care._veriType === '扫码取板' ? 'btn--primary' : 'btn--plain'}}"
@@ -404,6 +405,19 @@
                       data-cidx="{{cidx}}" data-type="店长确认" catchtap="onVeriTypeTap">店长确认</view>
               </view>
               <view wx:if="{{!care._veriType}}" class="veri-hint">请选择核销方式：由顾客本人操作，或核实取板人身份</view>
+
+              <!-- 取消开关：叠加在上方核销方式之上，非互斥。开启后走同样的核验流程，但落库为取消而非正常完成 -->
+              <view class="cancel-toggle-row">
+                <view class="btn btn--sm {{care._cancelMode ? 'btn--danger' : 'btn--danger-plain'}}"
+                      data-cidx="{{cidx}}" catchtap="onCancelModeToggle">{{care._cancelMode ? '✓ 本次核验按取消处理' : '取消本件养护'}}</view>
+              </view>
+              <view wx:if="{{care._cancelMode}}" class="cancel-reason-box">
+                <text class="info-label">取消原因 *</text>
+                <textarea class="panel-input panel-input--wide safe-memo-textarea" placeholder="必填，如顾客改约/装备不适合养护等"
+                          value="{{care._cancelReason || ''}}" maxlength="200"
+                          data-cidx="{{cidx}}" bindblur="onCancelReasonBlur"/>
+                <view class="veri-hint veri-hint--left">仍需选择下方任一方式核验身份，核验通过后将按取消处理，不再赠送养护完成券</view>
+              </view>
 
               <!-- 扫码取板 -->
               <block wx:if="{{care._veriType === '扫码取板'}}">
@@ -445,6 +459,9 @@
               <text wx:if="{{task.memo}}" class="task-proof-label">核销方式：{{task.memo}}</text>
               <image wx:if="{{care._pickThumb}}" class="photo-thumb" src="{{care._pickThumb}}" mode="aspectFill"
                      data-cidx="{{cidx}}" catchtap="onPickProofTap"/>
+            </view>
+            <view wx:if="{{task.task_name === '发板' && task.status === '已完成' && care.is_cancel}}" class="task-panel task-panel--cancel">
+              <text class="task-proof-label">已取消 · 原因：{{care.cancel_reason || '（未填写）'}}</text>
             </view>
           </block>
         </view>
