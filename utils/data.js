@@ -641,6 +641,18 @@ const getMemberCaredEquipmentsPromise = function (memberId, equipment, sessionKe
     })
   })
 }
+// 会员 + 该装备类型的最近一次安全检查数值（身高/体重/脱落值/角度），供新单默认预填；无历史返回 null
+const getMemberLatestSafeCheckPromise = function (memberId, equipment, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Care/GetMemberLatestSafeCheck?memberId=' + memberId
+    + '&equipment=' + encodeURIComponent(equipment) + '&sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, undefined).then(function (hist) {
+      resolve(hist)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const getCareOthersServicePromise = function (type) {
   var getUrl = app.globalData.requestPrefix + 'Care/GetOthersService?type=' + encodeURIComponent(type)
   return new Promise(function (resolve, reject) {
@@ -826,13 +838,18 @@ const updateCarePromise = function (care, scene, sessionKey) {
     })
   })
 }
-const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey, dealMethod, storeMemo) {
+const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey, dealMethod, storeMemo, taskMemo) {
   var updateUrl = app.globalData.requestPrefix + 'Care/SetTaskStatus/' + taskId.toString() + '?status=' + encodeURIComponent(status) + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
   if (dealMethod){
     updateUrl += '&dealMethod=' + encodeURIComponent(dealMethod)
   }
   if (storeMemo!=null && storeMemo!=undefined){
     updateUrl += '&storeMemo=' + encodeURIComponent(storeMemo)
+  }
+  // taskMemo 显式传入（哪怕空串）时才带上，让后端把它写进 CareTask.memo（覆盖默认的场景字符串行为）；
+  // 未传（undefined）的调用方保持旧行为不变
+  if (taskMemo!=null && taskMemo!=undefined){
+    updateUrl += '&taskMemo=' + encodeURIComponent(taskMemo)
   }
   return new Promise(function (resolve, reject) {
     util.performWebRequest(updateUrl, null).then(function (newCare) {
@@ -1259,6 +1276,7 @@ module.exports = {
   uploadFilePromise,
   getCareOthersServicePromise,
   getMemberCaredEquipmentsPromise,
+  getMemberLatestSafeCheckPromise,
   getCareProductPromise,
   getRentalPromise,
   setRentItemStatsPromise,

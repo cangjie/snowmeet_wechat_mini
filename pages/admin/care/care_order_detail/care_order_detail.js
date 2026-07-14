@@ -210,6 +210,40 @@ Page({
       },
     });
     this._collectRunning(cares);
+    // 会员 + 安检未完成 + 本装备身高尚未录入 → 拉该会员该装备类型的最近一次安检数据默认预填
+    if (order.member_id) {
+      cares.forEach((c) => {
+        if (c._safeChecking && !c.height) {
+          this._fetchSafeCheckHistory(c.id, c.equipment, order.member_id);
+        }
+      });
+    }
+  },
+
+  // 每张 care 只拉一次（页面级记忆，避免 loadOrder 重复轮询时反复请求/反复覆盖用户已录入的值）
+  _fetchSafeCheckHistory(careId, equipment, memberId) {
+    const that = this;
+    this._safeHistoryFetched = this._safeHistoryFetched || {};
+    if (this._safeHistoryFetched[careId]) return;
+    this._safeHistoryFetched[careId] = true;
+    data.getMemberLatestSafeCheckPromise(memberId, equipment, app.globalData.sessionKey).then((hist) => {
+      if (!hist) return;
+      const cares = that.data.cares;
+      const cidx = cares.findIndex((c) => c.id === careId);
+      if (cidx < 0) return;
+      const care = cares[cidx];
+      // 只填当前仍为空的字段，不覆盖已录入/服务端已存的值
+      const fields = ['height', 'weight', 'gap', 'front_din', 'rear_din', 'left_angle', 'right_angle'];
+      const patch = {};
+      fields.forEach((f) => {
+        if (!care[f] && hist[f]) patch['cares[' + cidx + '].' + f] = hist[f];
+      });
+      if (Object.keys(patch).length > 0) {
+        that.setData(patch);
+        const dateStr = hist.last_care_date ? util.formatDate(new Date(hist.last_care_date)) : '';
+        wx.showToast({ title: '已带入' + dateStr + '的历史安检数据', icon: 'none' });
+      }
+    }).catch(() => {});
   },
 
   _renderCare(raw) {
@@ -306,6 +340,8 @@ Page({
     // 安检是养护单的第一道任务，按 care_task 记录查找，不依赖数组原始顺序。
     const safeTask = care._tasks.find((t) => t.task_name === '安全检查');
     care._safeChecking = !!(safeTask && safeTask.status !== '已完成' && safeTask.status !== '强行中止');
+    // 备注真正落在 CareTask.memo（安检任务自身），取当前值做编辑草稿（与 height/weight 等安检字段同一取值方式）
+    care._safeMemoDraft = (safeTask && safeTask.memo) || '';
     care._status = care.status || (care._tasks.length === 0 ? '未开始' : '进行中');
     // 展开态 / 发板核销方式：按 care.id 回填页面级记忆
     care._expanded = ui.expanded[care.id] !== undefined ? ui.expanded[care.id] : (care._status !== '已完成');
@@ -570,6 +606,11 @@ Page({
     this.setData({ ['cares[' + cidx + '].' + field]: e.detail.value });
   },
 
+  onSafeMemoBlur(e) {
+    const cidx = this._careIdx(e);
+    this.setData({ ['cares[' + cidx + ']._safeMemoDraft']: e.detail.value });
+  },
+
   onSafeCheck(e) {
     const that = this;
     const cidx = this._careIdx(e);
@@ -611,8 +652,9 @@ Page({
           return;
         }
         data.updateCarePromise(payload, '安全检查', app.globalData.sessionKey).then(() => {
+          // taskMemo 显式带上（哪怕空串），落进 CareTask.memo；scene 仍保留场景字符串供审计日志用
           return data.updateCareTaskStatusPromise(safeTask.id, '已完成', '养护详情页安全检查',
-            app.globalData.sessionKey, null, null);
+            app.globalData.sessionKey, null, null, care._safeMemoDraft || '');
         }).then(() => {
           wx.showToast({ title: '安全确认完成', icon: 'success' });
           that.loadOrder();

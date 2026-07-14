@@ -363,6 +363,12 @@
                     </view>
                   </block>
                 </view>
+                <view class="edit-block">
+                  <view class="edit-block-head"><text class="info-label">安全检查备注</text></view>
+                  <textarea class="panel-input panel-input--wide safe-memo-textarea" placeholder="选填，如顾客体态/特殊注意事项等"
+                            value="{{care._safeMemoDraft || ''}}" maxlength="200"
+                            data-cidx="{{cidx}}" bindblur="onSafeMemoBlur"/>
+                </view>
                 <view class="btn btn--warning btn--block" data-cidx="{{cidx}}" catchtap="onSafeCheck">确认安全</view>
                 <view class="task-hint">确认后您将成为本次养护的安全负责人</view>
               <view wx:if="{{task._hint}}" class="task-hint">{{task._hint}}</view>
