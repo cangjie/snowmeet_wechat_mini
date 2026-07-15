@@ -616,6 +616,30 @@ Page({
       wx.showToast({ title: '购物车是空的', icon: 'none' });
       return;
     }
+    // 0 元且未用任何权益（储值/卡/券）的单（纯质保/招待）：PlaceCareOrder 即刻生效、
+    // 结算页也没有支付/核销等任何确认环节，先弹确认防误触。金额按服务端最近一次
+    // CalcCareCharge 回填的 care 字段估算，与 PlaceCareOrder 的权威重算同源
+    const cares = order.cares || [];
+    const estTotal = cares.reduce((s, c) => s
+      + (c.common_charge || 0) + (c.repair_charge || 0)
+      - (c.discount || 0) - (c.ticket_discount || 0), 0);
+    const usedBenefit = useDeposit
+      || cares.some((c) => c.use_card || (c.ticket_code && String(c.ticket_code).trim() !== ''));
+    if (Math.round(estTotal * 100) === 0 && !usedBenefit) {
+      const that = this;
+      wx.showModal({
+        title: '确认下单',
+        content: '本单金额为 ¥0.00，无需收款，确认后订单立即生效。',
+        success(res) {
+          if (res.confirm) that._doCheckoutCare(useDeposit);
+        },
+      });
+      return;
+    }
+    this._doCheckoutCare(useDeposit);
+  },
+
+  _doCheckoutCare(useDeposit) {
     // 不再要求进入时已有 order.id：草稿保存可能还在飞行（刚下过一单脱钩重建时尤甚），
     // 等串行化保存收尾——没有 id 时这笔保存本身就会建单——再取 id 下单
     wx.showLoading({ title: '下单中…', mask: true });
