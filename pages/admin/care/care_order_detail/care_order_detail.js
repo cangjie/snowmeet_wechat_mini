@@ -250,8 +250,6 @@ Page({
       });
       if (Object.keys(patch).length > 0) {
         that.setData(patch);
-        const dateStr = hist.last_care_date ? util.formatDate(new Date(hist.last_care_date)) : '';
-        wx.showToast({ title: '已带入' + dateStr + '的历史安检数据', icon: 'none' });
       }
     }).catch(() => {});
   },
@@ -281,6 +279,9 @@ Page({
     if (care.entertain) chips.push({ text: '招待', cls: 'chip-outline' });
     if (care.warranty) chips.push({ text: '质保', cls: 'chip-outline' });
     care._chips = chips;
+    // 用了卡/券 → chips 行显示卡券 icon，点击 toast 详情（onBenefitTap）
+    care._hasBenefit = !!(care.use_card && care.card_id)
+      || !!(care.ticket_code && String(care.ticket_code).trim());
     // 金额
     care._commonStr = util.showAmount(care.common_charge || 0);
     care._repairStr = util.showAmount(care.repair_charge || 0);
@@ -484,6 +485,32 @@ Page({
 
   onTogglePayment() {
     this.setData({ 'payment.expanded': !this.data.payment.expanded });
+  },
+
+  // 卡券 icon：点击 toast 该装备所用卡/券详情。券名不在 care 上，首次点按 code 拉取并缓存
+  onBenefitTap(e) {
+    const that = this;
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
+    if (!care) return;
+    if (care.use_card && care.card_id) {
+      wx.showToast({ title: '会员卡：' + (care.card_name || '会员卡'), icon: 'none', duration: 3000 });
+      return;
+    }
+    const code = String(care.ticket_code || '').trim();
+    if (!code) return;
+    this._ticketNameCache = this._ticketNameCache || {};
+    if (this._ticketNameCache[code]) {
+      wx.showToast({ title: '优惠券：' + this._ticketNameCache[code] + '（' + code + '）', icon: 'none', duration: 3000 });
+      return;
+    }
+    data.getTicket(code).then((ticket) => {
+      const name = (ticket && ticket.name) || '';
+      if (name) that._ticketNameCache[code] = name;
+      wx.showToast({ title: '优惠券：' + (name ? name + '（' + code + '）' : code), icon: 'none', duration: 3000 });
+    }).catch(() => {
+      wx.showToast({ title: '优惠券：' + code, icon: 'none', duration: 3000 });
+    });
   },
 
   onOrderMemoEditTap() {

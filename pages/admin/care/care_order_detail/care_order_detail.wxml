@@ -140,6 +140,9 @@
       <!-- 服务 chips + 金额（折叠态也显示） -->
       <view class="care-chips">
         <view wx:for="{{care._chips}}" wx:key="text" wx:for-item="chip" class="chip {{chip.cls}}">{{chip.text}}</view>
+        <view wx:if="{{care._hasBenefit}}" class="benefit-icon" data-cidx="{{cidx}}" catchtap="onBenefitTap">
+          <van-icon name="coupon-o" size="16px" color="#006495"/>
+        </view>
         <text class="care-summary">{{care._summaryStr}}</text>
       </view>
 

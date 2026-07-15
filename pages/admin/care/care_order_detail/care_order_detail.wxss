@@ -203,6 +203,12 @@
   gap: 8rpx;
   margin-top: 12rpx;
 }
+/* 卡券 icon：加大点按热区，与 chip 行内对齐 */
+.benefit-icon {
+  display: flex;
+  align-items: center;
+  padding: 4rpx 8rpx;
+}
 .care-summary {
   margin-left: auto;
   font-size: 28rpx;
