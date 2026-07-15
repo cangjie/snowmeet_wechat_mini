@@ -679,6 +679,40 @@ Page({
     }
   },
 
+  // 安检面板内直接补传装备照片（上传即落库，不等「确认安全」才被照片校验拦下）
+  onSafePhotoRead(e) {
+    const that = this;
+    const cidx = this._careIdx(e);
+    const uploadFile = e.detail.file;
+    const pending = [{
+      url: uploadFile.tempFilePath,
+      thumb: uploadFile.thumb || uploadFile.tempFilePath,
+      status: 'uploading', message: '上传中',
+    }];
+    this.setData({ ['cares[' + cidx + ']._safePhotoFiles']: pending });
+    data.uploadFilePromise(null, uploadFile.tempFilePath, '养护开单', uploadFile.type, app.globalData.sessionKey)
+      .then((uploaded) => data.uploadFilePromise(uploaded.id, uploadFile.thumb || uploadFile.tempFilePath,
+        null, null, app.globalData.sessionKey))
+      .then((withThumb) => {
+        // 以服务端原始 care 为基底追加新 careImage（UpdateCare 按 id diff：既有行原样保留、id=0 插入）
+        const raw = (that._rawCares || [])[cidx];
+        if (!raw) return Promise.reject();
+        const payload = { ...raw };
+        payload.careImages = that._stripImageNavs(raw.careImages, raw.id)
+          .concat([{ id: 0, care_id: raw.id, image_id: withThumb.id, valid: true }]);
+        payload.tasks = raw.tasks;
+        return data.updateCarePromise(payload, '安全检查补传照片', app.globalData.sessionKey);
+      })
+      .then(() => {
+        wx.showToast({ title: '照片已上传', icon: 'success' });
+        that.loadOrder();
+      })
+      .catch(() => {
+        wx.showToast({ title: '照片上传失败', icon: 'none' });
+        that.setData({ ['cares[' + cidx + ']._safePhotoFiles']: [] });
+      });
+  },
+
   onSafeCheck(e) {
     const that = this;
     const cidx = this._careIdx(e);

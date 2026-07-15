@@ -368,6 +368,13 @@
                     </view>
                   </block>
                 </view>
+                <!-- 装备无照片时可在此直接补传（上传即落库），不必等点「确认安全」才被拦下 -->
+                <view wx:if="{{care._photos.length === 0}}" class="edit-block">
+                  <view class="edit-block-head"><text class="info-label">装备照片 *</text></view>
+                  <van-uploader file-list="{{care._safePhotoFiles}}" max-count="1" deletable="{{false}}"
+                                data-cidx="{{cidx}}" bind:after-read="onSafePhotoRead"/>
+                  <view class="task-hint task-hint--left">该装备尚无照片，确认安全前请先拍摄上传</view>
+                </view>
                 <view class="edit-block">
                   <view class="edit-block-head"><text class="info-label">安全检查备注</text></view>
                   <textarea class="panel-input panel-input--wide safe-memo-textarea" placeholder="选填，如顾客体态/特殊注意事项等"
