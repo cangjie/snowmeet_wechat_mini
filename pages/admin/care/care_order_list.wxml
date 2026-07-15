@@ -124,6 +124,7 @@
           <text wx:if="{{item.haveWarranty}}" class="tag tag--warranty">质</text>
           <text wx:if="{{item.isSummerTask}}" class="tag tag--summer">非</text>
           <text wx:if="{{item.useCard}}" class="tag tag--card">卡</text>
+          <text wx:if="{{item.haveTicket}}" class="tag tag--ticket">券</text>
           <text class="tag tag--member">{{item.memberShip}}</text>
         </view>
         <view class="order-rows">

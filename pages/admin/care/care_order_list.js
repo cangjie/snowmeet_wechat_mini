@@ -175,15 +175,20 @@ Page({
       order.refundAmountStr = util.showAmount(order.refundAmount)
       order.totalEarnAmountStr = util.showAmount(order.totalEarnAmount)
       order.careCount = order.cares ? order.cares.length : 0
-      // 装备照片缩略图
+      // 装备照片缩略图 + 卡券使用派生（任一 care 选了券 →「券」标签；选了卡 → 并入「卡」标签，
+      // 从 care.ticket_code/use_card 直接看，不依赖 punch_card_used——未生效/历史漏记也能亮）
       var thumbs = []
+      var haveTicket = false
       for (var k = 0; order.cares && k < order.cares.length; k++) {
         var care = order.cares[k]
         if (care.careImages && care.careImages.length > 0 && care.careImages[0].image) {
           thumbs.push(IMG_HOST + care.careImages[0].image.thumbUrl)
         }
+        if (care.ticket_code && String(care.ticket_code).trim() !== '') haveTicket = true
+        if (care.use_card) order.useCard = true
       }
       order.thumbs = thumbs
+      order.haveTicket = haveTicket
       totalEarn += order.totalEarnAmount || 0
     }
     var totalPages = Math.max(1, Math.ceil(total / pageSize))

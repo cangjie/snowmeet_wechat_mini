@@ -187,6 +187,7 @@
 .tag--warranty  { background: #cffafe; color: #0e7490; }
 .tag--summer    { background: #fef3c7; color: #b45309; }
 .tag--card      { background: #dbeafe; color: #1e40af; }
+.tag--ticket    { background: #ffedd5; color: #c2410c; }
 .tag--member    { background: #f0fdf4; color: #166534; }
 
 /* 详情行 */
