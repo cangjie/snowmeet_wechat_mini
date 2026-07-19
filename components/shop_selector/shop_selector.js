@@ -160,6 +160,10 @@ Component({
   methods: {
     selectChanged: function (e) {
       var that = this
+      // 用户手动选择必须优先：立即停掉可能仍在后台跑的自动定位扫描（beacon 命中是异步的，
+      // 若不停掉，稍后命中会通过 _finalizeIfHit → _applySelectedShop 静默覆盖这次手动选择，
+      // 且「万龙互换逻辑」会把结果换成店员自己的基地店，与手动选的店不一致）
+      that._stopScan()
       that.setData({ currentSelectedIndex: e.detail.value })
 
       if (e.detail.value == 0 && that.properties.scene != 'recept') {
