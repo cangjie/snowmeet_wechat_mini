@@ -1,0 +1,101 @@
+/* 食材过期提醒·标签打印弹层样式 */
+
+.pf-root {
+  padding: 32rpx;
+}
+
+.pf-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #006495;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.pf-preview {
+  background: #f8f9ff;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 24rpx;
+}
+.pf-row {
+  display: flex;
+  margin-bottom: 8rpx;
+}
+.pf-row:last-child { margin-bottom: 0; }
+.pf-label {
+  width: 140rpx;
+  color: #6f7881;
+  font-size: 26rpx;
+}
+.pf-value {
+  flex: 1;
+  color: #0b1c30;
+  font-size: 26rpx;
+}
+
+.pf-status {
+  text-align: center;
+  color: #3f4850;
+  font-size: 26rpx;
+  margin-bottom: 20rpx;
+}
+
+.pf-printer-list {
+  border: 1px solid rgba(191, 199, 209, 0.4);
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin-bottom: 32rpx;
+}
+.pf-printer-head {
+  display: flex;
+  background: #eef1f5;
+  padding: 16rpx;
+}
+.pf-printer-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  border-top: 1px solid rgba(191, 199, 209, 0.4);
+}
+.pf-col-name {
+  flex: 1;
+  font-size: 24rpx;
+  color: #0b1c30;
+}
+.pf-col-status {
+  width: 120rpx;
+  font-size: 24rpx;
+  color: #6f7881;
+  text-align: center;
+}
+.pf-col-action {
+  width: 120rpx;
+  text-align: center;
+}
+
+.pf-copies-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24rpx;
+}
+.pf-copies-row .pf-label {
+  width: auto;
+  margin-right: 16rpx;
+}
+.pf-copies-input {
+  width: 100rpx;
+  height: 64rpx;
+  text-align: center;
+  border: 1px solid rgba(191, 199, 209, 0.4);
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #0b1c30;
+  background: #f8f9ff;
+}
+
+.pf-print-btn-row {
+  display: flex;
+  justify-content: center;
+}

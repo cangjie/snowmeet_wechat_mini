@@ -291,8 +291,12 @@ Component({
       command.setText(300, 350, font, 0, 1, 1, "订单日期：" + orderDateStr)
       // 2026-07-12 标签二维码切新版养护详情页（需公众平台「扫普通链接二维码打开小程序」登记新路径规则；
       // 已打印的旧标签仍指旧页 order_detail，旧页保留兼容）
+      // 2026-07-21 cellWidth 3→4（放大二维码，跟食材过期提醒标签同一次调优诉求）+ x 从 400 左移到 360，
+      // 留够右侧安全边距防止在 75mm 标签宽度上出边被裁——见 x=300 处"其他："/"注："两个可选文本字段
+      // 与二维码共享同一竖向区间（y≈150-190），若这两个字段实际内容较长，理论上仍可能与放大后的二维码
+      // 左边缘重叠，需要下一批真机打印时留意实际效果
       var qrCodeText = 'https://mini.snowmeet.top/mapp/admin/care/care_order_detail/care_order_detail?orderId=' + that.data.order.id.toString() + '&careId=' + care.id.toString()
-      command.setQrcode(400, 20 + 40 + 65 + 25, "L", 3, "M", qrCodeText)
+      command.setQrcode(360, 20 + 40 + 65 + 25, "L", 4, "M", qrCodeText)
       command.setPagePrint()
       return command.getData()
     },

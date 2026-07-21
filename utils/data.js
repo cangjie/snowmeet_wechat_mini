@@ -923,8 +923,13 @@ const getOAQrCodeUrlPromise = function (content) {
     })
   })
 }
+// 食材过期提醒·标签打印：全表打印机（不按店过滤，BLE 扫描的物理距离已经是唯一有效的筛选边界）
+const getAllPrintersPromise = function () {
+  var getUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetAllPrinters'
+  return util.performWebRequest(getUrl, null)
+}
 const getPrinterListPromise = function (shop) {
-  var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetPrinterByScene?shop=' + encodeURIComponent(shop) 
+  var getDeviceNameUrl = 'https://' + app.globalData.domainName + '/api/Printer/GetPrinterByScene?shop=' + encodeURIComponent(shop)
   return util.performWebRequest(getDeviceNameUrl, null)
   /*
   return new Promise(function (resolve, reject) {
@@ -1244,6 +1249,93 @@ const getUnipayOrderPromise = function(startDate, endDate, sessionKey){
   })
   //return getOrdersByStaffPromise(null, null, null, null, '聚合', startDate, endDate, null, null, null, null, null, null, '支付成功', sessionKey, null, null, null, null)
 }
+// ====== 食材过期提醒（mat_expire，FnbMaterialController）======
+// 鉴权：小程序自身 sessionKey（后端 _requireStaff 已支持 wechat_mini_openid 会话回退）
+
+// GET GetBatches — 全量有效批次 + 服务器今日日期字符串（状态派生必须用这个 today，不能用设备本地日期）
+const getMatExpireBatchesPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'FnbMaterial/GetBatches?sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+
+// POST SaveBatch — 新增(batch.id===0)/编辑(batch.id>0)。字段名须与后端属性名一致（下划线，非驼峰）：
+// name/batch_no/produce_date/shelf_life_value/shelf_life_unit/expire_date/warn_days/image_ids
+const saveMatExpireBatchPromise = function (batch, sessionKey) {
+  var url = app.globalData.requestPrefix + 'FnbMaterial/SaveBatch?sessionKey=' + sessionKey
+  return util.performWebRequest(url, batch)
+}
+
+// GET DisposeBatch — action='用完'|'报废'，幂等（已处置直接返回当前行）
+const disposeMatExpireBatchPromise = function (id, action, sessionKey) {
+  var url = app.globalData.requestPrefix + 'FnbMaterial/DisposeBatch?id=' + id
+    + '&action=' + encodeURIComponent(action) + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+
+// GET DeleteBatch — 软删（valid=false），无恢复入口，调用前必须先二次确认
+const deleteMatExpireBatchPromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'FnbMaterial/DeleteBatch?id=' + id + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+
+// GET GenBatchNo — 生成参考批次号 B{yyMMdd}-{当日已发数+1}，仅参考不保证并发唯一
+const genMatExpireBatchNoPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'FnbMaterial/GenBatchNo?sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+
+// GET GetImages — 按逗号分隔的 upload_file.id 列表批量取图片路径，编辑页回显 image_ids 用
+const getMatExpireImagesPromise = function (ids, sessionKey) {
+  var url = app.globalData.requestPrefix + 'FnbMaterial/GetImages?ids=' + encodeURIComponent(ids)
+    + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+
+// POST OcrScanName — imageBase64 为 JPEG base64（不带 data: 前缀；wx.getFileSystemManager()
+// .readFileSync(path,'base64') 的返回值本身不带前缀，直接传即可）。一次响应覆盖四种扫描用途：
+// { candidates:[{text,height}], dates:[...], expireDates:[...], shelfLives:[{value,unit}] }
+const ocrScanMatExpirePromise = function (imageBase64, sessionKey) {
+  var url = app.globalData.requestPrefix + 'FnbMaterial/OcrScanName?sessionKey=' + sessionKey
+  return util.performWebRequest(url, { image: imageBase64 })
+}
+
+// POST UploadPhoto (multipart) — 现场照片直传 FnbMaterial/UploadPhoto（不是通用 UploadFile/
+// UploadFileWithThumb！本功能专属接口，落库 purpose="食材批次"，直接返 {id,file_path_name} 可用于
+// image_ids，无需二段缩略图上传）。
+// ⚠️ 返回体是标准 ApiResult 信封（有 code/message/data），必须先判 code 再取 .data，不能照抄
+// uploadFilePromise 直接把 JSON.parse 结果当裸对象用。wx.uploadFile 对任意 HTTP 状态码都会触发
+// success 回调，必须手动判断 res.statusCode 落在 [200,300) 才算成功（本仓库已有过因漏判导致假成功的教训）
+const uploadMatExpirePhotoPromise = function (filePath, sessionKey) {
+  var uploadUrl = app.globalData.requestPrefix + 'FnbMaterial/UploadPhoto?sessionKey=' + sessionKey
+  return new Promise(function (resolve, reject) {
+    wx.uploadFile({
+      filePath: filePath,
+      name: 'file',
+      url: uploadUrl,
+      success: (res) => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          console.warn('mat_expire upload failed http ' + res.statusCode, res.data)
+          reject(res)
+          return
+        }
+        try {
+          var body = JSON.parse(res.data)
+          if (body.code !== 0) {
+            reject(body.message || '上传失败')
+            return
+          }
+          resolve(body.data)
+        } catch (e) {
+          reject(e)
+        }
+      },
+      fail: (res) => {
+        reject(res)
+      },
+    })
+  })
+}
+
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
@@ -1311,6 +1403,7 @@ module.exports = {
   stopScanQrCodePromise,
   getOAQrCodeUrlPromise,
   getPrinterListPromise,
+  getAllPrintersPromise,
   getMyInfo,
   payWithDepositPromise,
   writeoffCareOrderPromise,
@@ -1345,5 +1438,13 @@ module.exports = {
   updateRentPackageCategoryPromise,
   getPackageListByShopPromise,
   getUnipayOrderPromise,
-  updateRentItemPromise
+  updateRentItemPromise,
+  getMatExpireBatchesPromise,
+  saveMatExpireBatchPromise,
+  disposeMatExpireBatchPromise,
+  deleteMatExpireBatchPromise,
+  genMatExpireBatchNoPromise,
+  getMatExpireImagesPromise,
+  ocrScanMatExpirePromise,
+  uploadMatExpirePhotoPromise
 }

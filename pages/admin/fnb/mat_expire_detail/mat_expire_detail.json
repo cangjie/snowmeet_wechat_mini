@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "录入批次",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index",
+    "van-uploader": "@vant/weapp/uploader/index",
+    "ocr-scan-layer": "/components/fnb/ocr_scan_layer/ocr_scan_layer",
+    "print-food-label": "/components/fnb/print_food_label/print_food_label"
+  }
+}

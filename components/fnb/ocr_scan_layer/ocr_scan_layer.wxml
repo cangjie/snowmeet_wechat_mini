@@ -1,0 +1,44 @@
+<!--
+  食材过期提醒：实时连续扫描层。
+  对标网页版 wwwroot/fnb/mat_expire/new.html 的 getUserMedia+canvas 逐帧识别，
+  小程序侧改用 <camera> 原生组件 + CameraContext.takePhoto() 定时轮询（见 ocr_scan_layer.js）。
+  <camera> 是原生组件，永远盖在普通渲染层之上，叠加 UI 一律用 cover-view/cover-image，
+  不能用普通 view（会被摄像头层挡住看不见）。
+-->
+<view class="scan-root" wx:if="{{show}}">
+  <camera
+    wx:if="{{permState !== 'denied'}}"
+    device-position="back"
+    resolution="medium"
+    flash="off"
+    class="scan-camera"
+    bindstop="onCameraStop"
+    binderror="onCameraError"
+  />
+
+  <block wx:if="{{permState !== 'denied'}}">
+    <cover-view class="scan-frame" />
+    <cover-view class="scan-tip">{{tip}}</cover-view>
+    <cover-view class="scan-bottom">
+      <cover-view wx:if="{{confirmVisible}}" class="scan-confirm" bindtap="onConfirmTap">{{confirmText}}</cover-view>
+      <cover-view class="scan-cands">
+        <cover-view
+          wx:for="{{chips}}"
+          wx:key="key"
+          class="scan-chip {{item.cls}} {{item.on ? 'on' : ''}}"
+          data-key="{{item.key}}"
+          data-kind="{{item.kind}}"
+          bindtap="onChipTap"
+        >{{item.label}}</cover-view>
+      </cover-view>
+    </cover-view>
+  </block>
+
+  <cover-view wx:else class="scan-fallback">
+    <cover-view class="fb-text">无法使用相机，请检查授权</cover-view>
+    <cover-view class="fb-btn" bindtap="onOpenSetting">去设置</cover-view>
+    <cover-view class="fb-btn fb-btn--plain" bindtap="onCloseTap">手动输入</cover-view>
+  </cover-view>
+
+  <cover-view class="scan-close" bindtap="onCloseTap">×</cover-view>
+</view>

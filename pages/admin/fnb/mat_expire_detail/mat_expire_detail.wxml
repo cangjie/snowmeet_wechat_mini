@@ -1,0 +1,153 @@
+<view class="page">
+
+  <view class="header">
+    <view class="htitle">{{pageTitle}}</view>
+    <view class="hsub">登记效期 · 加入到期提醒</view>
+  </view>
+
+  <view class="form">
+
+    <!-- 基本信息 -->
+    <view class="section">
+      <view class="shead"><text class="st">基本信息</text></view>
+      <view class="fgroup">
+        <view class="flabel">名称<text class="req">*</text></view>
+        <view class="frow">
+          <input class="finput" value="{{form.name}}" placeholder="如：鲜牛奶（巴氏）" bindinput="onNameInput" />
+          <view class="gen-btn" data-mode="all" bindtap="onScanTap">
+            <van-icon name="scan" size="16px" />扫描
+          </view>
+        </view>
+      </view>
+      <view class="fgroup">
+        <view class="flabel">批次号<text class="req">*</text><text class="hint">· 可自动生成</text></view>
+        <view class="frow">
+          <input class="finput" value="{{form.batch_no}}" placeholder="输入或点右侧生成" bindinput="onBatchNoInput" />
+          <view class="gen-btn" bindtap="genNo">
+            <van-icon name="replay" size="16px" />生成
+          </view>
+        </view>
+      </view>
+      <view class="fgroup">
+        <view class="flabel">现场照片<text class="hint">· 选填，可拍照或从相册上传</text></view>
+        <van-uploader file-list="{{photos}}" max-count="9" deletable bind:after-read="onPhotoRead" bind:delete="onPhotoDelete" />
+      </view>
+    </view>
+
+    <!-- 效期 -->
+    <view class="section">
+      <view class="shead"><text class="st">效期</text><text class="sd">生产日期 + 保质期自动推算到期日</text></view>
+      <view class="fgroup">
+        <view class="flabel">生产日期</view>
+        <view class="frow">
+          <picker class="finput finput--picker" mode="date" value="{{form.produce_date}}" bindchange="onProduceChange">
+            <view class="picker-text">{{form.produce_date || '请选择'}}</view>
+          </picker>
+          <view class="gen-btn" data-mode="date" bindtap="onScanTap">
+            <van-icon name="scan" size="16px" />扫描
+          </view>
+        </view>
+      </view>
+      <view class="fgroup">
+        <view class="flabel">保质期</view>
+        <view class="frow">
+          <input class="finput finput--num" type="number" value="{{form.shelf_value}}" placeholder="数值" bindinput="onShelfInput" />
+          <view class="seg">
+            <view class="segbtn {{form.unit === '天' ? 'on' : ''}}" data-unit="天" bindtap="onUnitTap">天</view>
+            <view class="segbtn {{form.unit === '月' ? 'on' : ''}}" data-unit="月" bindtap="onUnitTap">月</view>
+          </view>
+          <view class="gen-btn" data-mode="shelf" bindtap="onScanTap">
+            <van-icon name="scan" size="16px" />扫描
+          </view>
+        </view>
+      </view>
+      <view class="fgroup">
+        <view class="flabel">到期日期<text class="req">*</text><text class="hint">· 自动计算，可手动修改</text></view>
+        <view class="frow">
+          <picker class="finput finput--picker" mode="date" value="{{form.expire_date}}" bindchange="onExpireChange">
+            <view class="picker-text">{{form.expire_date || '请选择'}}</view>
+          </picker>
+          <text wx:if="{{autoTag}}" class="auto-tag">自动</text>
+          <view class="gen-btn" data-mode="expire" bindtap="onScanTap">
+            <van-icon name="scan" size="16px" />扫描
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提醒 -->
+    <view class="section">
+      <view class="shead"><text class="st">提醒</text></view>
+      <view class="fgroup">
+        <view class="flabel">到期预警提前<text class="req">*</text><text class="hint">· 默认 3 天，可自定义</text></view>
+        <view class="stepper">
+          <view class="sbtn" data-delta="-1" bindtap="stepWarn">
+            <van-icon name="minus" size="16px" />
+          </view>
+          <view class="sval">
+            <input type="number" value="{{form.warn_days}}" bindinput="onWarnInput" />
+            <text>天</text>
+          </view>
+          <view class="sbtn" data-delta="1" bindtap="stepWarn">
+            <van-icon name="plus" size="16px" />
+          </view>
+        </view>
+        <view class="step-hint">{{warnHint}}</view>
+      </view>
+    </view>
+
+    <!-- 批次操作（编辑模式才显示；已处理批次只留 返回列表/删除） -->
+    <view class="section" wx:if="{{opsShow}}">
+      <view class="shead"><text class="st">操作</text></view>
+      <view class="ops-grid">
+        <view wx:if="{{opDoneShow}}" class="op-btn op-done" data-action="用完" bindtap="doDispose">
+          <van-icon name="success" size="16px" />标记用完
+        </view>
+        <view wx:if="{{opScrapShow}}" class="op-btn op-scrap" data-action="报废" bindtap="doDispose">
+          <van-icon name="warning-o" size="16px" />标记报废
+        </view>
+        <view class="op-btn op-back" bindtap="goBack">
+          <van-icon name="arrow-left" size="16px" />返回列表
+        </view>
+        <view class="op-btn op-del" bindtap="doDelete">
+          <van-icon name="cross" size="16px" />删除
+        </view>
+      </view>
+    </view>
+
+    <!-- 打印标签（已保存批次才有 id 可打印，与操作区共用 opsShow 门控） -->
+    <view class="section" wx:if="{{opsShow}}">
+      <view class="btn btn-plain" bindtap="onPrintTap">
+        <van-icon name="orders-o" size="16px" />打印标签
+      </view>
+    </view>
+
+    <!-- 状态预览 -->
+    <view class="preview {{preview.cls}}" wx:if="{{preview.show}}">
+      <van-icon name="clock-o" size="20px" />
+      <view class="pv-text">
+        <view class="pt">{{preview.title}}</view>
+        <view class="pm">{{preview.meta}}</view>
+      </view>
+    </view>
+
+  </view>
+
+  <view class="footer">
+    <view class="btn btn-plain" bindtap="cancel">取消</view>
+    <view class="btn btn-primary {{saveDisabled ? 'disabled' : ''}}" bindtap="save">{{saveBtnText}}</view>
+  </view>
+
+  <ocr-scan-layer
+    show="{{scan.show}}"
+    mode="{{scan.mode}}"
+    bind:fill="onScanFill"
+    bind:confirm="onScanConfirm"
+    bind:close="onScanClose"
+  />
+
+  <van-popup show="{{printShow}}" position="bottom" custom-style="height:70%;" bind:close="onPrinterClose" closeable>
+    <print-food-label wx:if="{{printShow}}" batch="{{printBatch}}" />
+  </van-popup>
+
+</view>

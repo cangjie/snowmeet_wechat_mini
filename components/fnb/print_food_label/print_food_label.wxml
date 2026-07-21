@@ -1,0 +1,58 @@
+<view class="pf-root">
+  <view class="pf-title">打印标签</view>
+
+  <view class="pf-preview">
+    <view class="pf-row">
+      <text class="pf-label">名称</text>
+      <text class="pf-value">{{batch.name}}</text>
+    </view>
+    <view class="pf-row">
+      <text class="pf-label">批次号</text>
+      <text class="pf-value">{{batch.batch_no}}</text>
+    </view>
+    <view class="pf-row">
+      <text class="pf-label">到期日期</text>
+      <text class="pf-value">{{batch.expire_date}}</text>
+    </view>
+  </view>
+
+  <view class="pf-status">{{statusText}}</view>
+
+  <view class="pf-printer-list" wx:if="{{availablePrinters.length > 0}}">
+    <view class="pf-printer-head">
+      <text class="pf-col-name">打印机</text>
+      <text class="pf-col-status">状态</text>
+      <text class="pf-col-action">操作</text>
+    </view>
+    <view class="pf-printer-row" wx:for="{{availablePrinters}}" wx:key="deviceId">
+      <text class="pf-col-name">{{item.printer.name}}</text>
+      <text class="pf-col-status">{{item.status}}</text>
+      <view class="pf-col-action">
+        <van-button
+          wx:if="{{item.status === '已连接' || item.status === '连接中'}}"
+          id="{{index}}"
+          bind:tap="disconnectDevice"
+          size="mini"
+          type="danger"
+          disabled="{{item.status === '连接中'}}"
+        >断开</van-button>
+        <van-button
+          wx:else
+          id="{{index}}"
+          bind:tap="connectDeviceManual"
+          size="mini"
+          type="primary"
+        >连接</van-button>
+      </view>
+    </view>
+  </view>
+
+  <view class="pf-copies-row">
+    <text class="pf-label">打印份数</text>
+    <input class="pf-copies-input" type="number" value="{{copies}}" bindinput="onCopiesInput" />
+  </view>
+
+  <view class="pf-print-btn-row">
+    <van-button type="primary" bind:click="print" disabled="{{!ready || printing}}">{{printing ? '打印中…' : '打 印'}}</van-button>
+  </view>
+</view>

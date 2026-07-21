@@ -1,0 +1,73 @@
+<view class="page">
+
+  <view class="header">
+    <view class="htitle">食材库存</view>
+    <view class="hsub">效期台账 · 到期提醒</view>
+  </view>
+
+  <view class="search-row">
+    <van-icon name="search" class="search-ic" />
+    <input class="search-input" value="{{kw}}" placeholder="搜索名称 / 批次号" bindinput="onKwInput" />
+  </view>
+
+  <scroll-view class="chips" scroll-x>
+    <view
+      wx:for="{{chips}}"
+      wx:key="status"
+      class="chip {{item.on ? 'on' : ''}}"
+      data-status="{{item.status}}"
+      bindtap="onChipTap"
+    >{{item.label}}<text class="chip-cnt">{{item.count}}</text></view>
+  </scroll-view>
+
+  <view class="list">
+    <view wx:if="{{loading}}" class="empty">加载中…</view>
+    <block wx:elif="{{rows.length === 0}}">
+      <view class="empty">{{kw || filter !== '全部' ? '没有匹配的批次' : '还没有批次，点右下角录入'}}</view>
+    </block>
+    <block wx:else>
+      <view
+        wx:for="{{rows}}"
+        wx:key="id"
+        class="bcard {{item._disposed ? 'disposed' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onCardTap"
+      >
+        <view class="bl">
+          <view class="bname">{{item.name}}</view>
+          <view class="bmeta">
+            <text>{{item.batch_no}}</text>
+            <text>到期 {{item.dateShort}}</text>
+          </view>
+        </view>
+        <view class="br">
+          <view class="badge {{item._badgeCls}}">
+            <van-icon wx:if="{{item._badgeCls === 'expired'}}" name="warning-o" class="badge-ic" />
+            {{item._badgeText}}
+          </view>
+          <view class="more-btn" data-id="{{item.id}}" catchtap="onMoreTap">⋯</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="fab" bindtap="onAdd">
+    <van-icon name="plus" size="26px" color="#fff" />
+  </view>
+
+  <view class="mask {{sheet.show ? 'show' : ''}}" bindtap="onSheetClose"></view>
+  <view class="sheet {{sheet.show ? 'show' : ''}}">
+    <view class="stitle">{{sheet.batch.name}} · {{sheet.batch.batch_no}}</view>
+    <view class="sopt" data-action="用完" bindtap="onSheetDispose">标记用完</view>
+    <view class="sopt" data-action="报废" bindtap="onSheetDispose">标记报废</view>
+    <view class="sopt" bindtap="onSheetEdit">编辑</view>
+    <view class="sopt" bindtap="onSheetPrint">打印标签</view>
+    <view class="sopt warn" bindtap="onSheetDelete">删除</view>
+    <view class="sopt scancel" bindtap="onSheetClose">取消</view>
+  </view>
+
+  <van-popup show="{{printShow}}" position="bottom" custom-style="height:70%;" bind:close="onPrinterClose" closeable>
+    <print-food-label wx:if="{{printShow}}" batch="{{printBatch}}" />
+  </van-popup>
+
+</view>

@@ -95,6 +95,8 @@
     "pages/admin/care/care_order_list",
     "pages/admin/care/order_detail",
     "pages/admin/care/care_order_detail/care_order_detail",
+    "pages/admin/fnb/mat_expire_list/mat_expire_list",
+    "pages/admin/fnb/mat_expire_detail/mat_expire_detail",
     "pages/admin/rent/search_fuzzy",
     "pages/admin/rent/rent_item_change",
     "pages/admin/unipay/unipay",
