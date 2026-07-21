@@ -5,6 +5,9 @@ const app = getApp()
 const data = require('../../../../utils/data.js')
 const matExpire = require('../../../../utils/matExpire.js')
 const util = require('../../../../utils/util.js')
+// 2026-07-21：图片改为统一落 snowmeet.wanlonghuaxue.com（与养护开单 care_order_detail.js 的
+// IMG_HOST 同一套域名），不再跟随 app.globalData.domainName（mini.snowmeet.top）
+const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com'
 
 Page({
   data: {
@@ -122,9 +125,7 @@ Page({
       if (b.image_ids) {
         data.getMatExpireImagesPromise(b.image_ids, app.globalData.sessionKey).then(function (imgs) {
           var photos = (imgs || []).map(function (im) {
-            // PIC_HOST=mini.snowmeet.top（后端 FnbMaterialController 常量），与 app.globalData.domainName
-            // 一致；不能照抄 care_order_detail.js 的 IMG_HOST（snowmeet.wanlonghuaxue.com，两个上传域名不是一回事）
-            var url = 'https://' + app.globalData.domainName + im.file_path_name
+            var url = IMG_HOST + im.file_path_name
             return { id: im.id, url: url, thumb: url, status: 'done' }
           })
           that.setData({ photos: photos })
@@ -281,7 +282,7 @@ Page({
     data.uploadMatExpirePhotoPromise(uploadFile.tempFilePath, app.globalData.sessionKey).then(function (res) {
       var cur = (that.data.photos || []).slice()
       var i = cur.findIndex(function (p) { return p.status === 'uploading' && p.id === 0 && p.url === pending.url })
-      var url = 'https://' + app.globalData.domainName + res.file_path_name
+      var url = IMG_HOST + res.file_path_name
       if (i >= 0) {
         cur[i] = { id: res.id, url: url, thumb: url, status: 'done' }
       }

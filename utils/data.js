@@ -1306,7 +1306,9 @@ const ocrScanMatExpirePromise = function (imageBase64, sessionKey) {
 // uploadFilePromise 直接把 JSON.parse 结果当裸对象用。wx.uploadFile 对任意 HTTP 状态码都会触发
 // success 回调，必须手动判断 res.statusCode 落在 [200,300) 才算成功（本仓库已有过因漏判导致假成功的教训）
 const uploadMatExpirePhotoPromise = function (filePath, sessionKey) {
-  var uploadUrl = app.globalData.requestPrefix + 'FnbMaterial/UploadPhoto?sessionKey=' + sessionKey
+  // 2026-07-21 改为与 uploadFilePromise（养护开单）一致，硬编码 snowmeet.wanlonghuaxue.com，
+  // 不再走 requestPrefix（mini.snowmeet.top）——图片统一落到 wanlonghuaxue 那台服务器磁盘
+  var uploadUrl = 'https://snowmeet.wanlonghuaxue.com/api/FnbMaterial/UploadPhoto?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
     wx.uploadFile({
       filePath: filePath,
