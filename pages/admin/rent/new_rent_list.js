@@ -12,7 +12,8 @@ Page({
       { key: 'rentCategory', value: null },
       { key: 'rentItemName', value: null },
       { key: 'useCard', value: null },
-      { key: 'status', value: null }
+      { key: 'status', value: null },
+      { key: 'hasRetail', value: null }
     ],
     cell: null,
     keyword: null,
@@ -71,7 +72,7 @@ Page({
 
   _buildQueryParams() {
     var isTest = null, isEntertain = null, haveDiscount = null
-    var rentCategoryId = null, rentItemName = null, useCard = null, rentStatus = null
+    var rentCategoryId = null, rentItemName = null, useCard = null, rentStatus = null, hasRetail = null
     var queryOptions = this.data.queryOptions
     for (var i = 0; i < queryOptions.length; i++) {
       switch (queryOptions[i].key) {
@@ -82,6 +83,7 @@ Page({
         case 'rentItemName':  rentItemName  = queryOptions[i].value; break
         case 'useCard':       useCard       = queryOptions[i].value; break
         case 'status':        rentStatus    = queryOptions[i].value; break
+        case 'hasRetail':     hasRetail     = queryOptions[i].value; break
       }
     }
     if (rentItemName == null || rentCategoryId == null) {
@@ -101,7 +103,7 @@ Page({
       isEntertain = null
       haveDiscount = null
     }
-    return { shop, startDate, endDate, cell, keyword, isTest, isEntertain, haveDiscount, rentCategoryId, rentItemName, useCard, rentStatus }
+    return { shop, startDate, endDate, cell, keyword, isTest, isEntertain, haveDiscount, rentCategoryId, rentItemName, useCard, rentStatus, hasRetail }
   },
 
   getData(page, pageSize) {
@@ -113,7 +115,7 @@ Page({
       null, p.shop, null, null, '租赁', p.startDate, p.endDate,
       null, p.isTest, p.isEntertain, null, null, p.haveDiscount, null,
       app.globalData.sessionKey, p.cell, null, null, p.keyword, null,
-      p.rentCategoryId, p.rentItemName, p.useCard, p.rentStatus,
+      p.rentCategoryId, p.rentItemName, p.useCard, p.rentStatus, p.hasRetail,
       page, pageSize
     ).then(function (result) {
       that.renderOrders(result.items || [], result.total || 0, page, pageSize)

@@ -62,6 +62,16 @@
       </radio-group>
     </view>
 
+    <!-- 零售子订单（如退押金顺带卖的次卡） -->
+    <view class="filter-row">
+      <text class="filter-label">零售</text>
+      <radio-group id="hasRetail" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
+        <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>包含</label>
+        <label class="radio-item"><radio value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>不含</label>
+      </radio-group>
+    </view>
+
     <!-- 状态 -->
     <view class="filter-row">
       <text class="filter-label">状态</text>
@@ -141,6 +151,7 @@
           <text wx:if="{{item.haveDiscount}}" class="tag tag--discount">减</text>
           <text wx:if="{{item.useCard}}" class="tag tag--card">卡</text>
           <text wx:if="{{item.haveDeposit}}" class="tag tag--deposit">储</text>
+          <text wx:if="{{item.hasRetail}}" class="tag tag--retail">零</text>
           <text class="tag tag--member">{{item.memberShip}}</text>
         </view>
         <view class="order-rows">

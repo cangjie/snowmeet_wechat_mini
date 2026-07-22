@@ -429,7 +429,7 @@ const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type
     })
   })
 }
-const getRentOrdersByStaffPagedPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey, cell, haveWarranty, retailType, keyword, isSummerCare, rentCategoryId, rentItemName, useCard, rentStatus, pageIndex, pageSize) {
+const getRentOrdersByStaffPagedPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey, cell, haveWarranty, retailType, keyword, isSummerCare, rentCategoryId, rentItemName, useCard, rentStatus, hasRetail, pageIndex, pageSize) {
   var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaffPaged?sessionKey=' + sessionKey
   if (orderId != null) { qUrl += '&orderId=' + orderId }
   if (shop != null) { qUrl += '&shop=' + encodeURIComponent(shop) }
@@ -453,6 +453,7 @@ const getRentOrdersByStaffPagedPromise = function (orderId, shop, memberId, staf
   if (rentCategoryId != null) { qUrl += '&rentCategoryId=' + rentCategoryId }
   if (rentItemName != null) { qUrl += '&rentItemName=' + rentItemName }
   if (useCard != null) { qUrl += '&useCard=' + useCard }
+  if (hasRetail != null) { qUrl += '&hasRetail=' + hasRetail }
   qUrl += '&pageIndex=' + (pageIndex || 1)
   qUrl += '&pageSize=' + (pageSize || 10)
   return new Promise(function (resolve, reject) {
