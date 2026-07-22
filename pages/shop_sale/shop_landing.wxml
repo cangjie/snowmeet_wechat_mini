@@ -1,3 +1,0 @@
-<!--pages/shop_sale/shop_landing.wxml-->
-<official-account  ></official-account>
-<text>{{q}}</text>
