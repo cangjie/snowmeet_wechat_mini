@@ -129,10 +129,6 @@
       "root": "pages/payment",
       "name": "pay",
       "pages": [
-        "pay_hub",
-        "pay_recept",
-        "rent_pay_add",
-        "uni_pay",
         "settle/index"
       ]
     },
@@ -156,11 +152,8 @@
     }
   ],
   "usingComponents": {
-    "fui-button": "components/firstui/fui-button/fui-button",
-    "fui-section": "components/firstui/fui-section/fui-section",
     "fui-card": "components/firstui/fui-card/fui-card",
     "fui-backdrop": "components/firstui/fui-backdrop/fui-backdrop",
-    "fui-segmented-control": "components/firstui/fui-segmented-control/fui-segmented-control",
     "fui-swipeaction-group": "/components/firstui/fui-swipeaction-group/fui-swipeaction-group",
     "fui-swipe-action": "/components/firstui/fui-swipe-action/fui-swipe-action",
     "fui-row": "/components/firstui/fui-row/fui-row",
@@ -169,8 +162,6 @@
     "mp-cell": "weui-miniprogram/cell/cell",
     "shop-selector": "/components/shop_selector/shop_selector",
     "member-info": "/components/user_info/member_info",
-    "mp-vtabs": "@miniprogram-component-plus/vtabs",
-    "mp-vtabs-content": "@miniprogram-component-plus/vtabs-content",
     "van-collapse": "@vant/weapp/collapse/index",
     "van-collapse-item": "@vant/weapp/collapse-item/index",
     "van-button": "@vant/weapp/button/index",
@@ -180,10 +171,8 @@
     "van-tree-select": "@vant/weapp/tree-select/index",
     "van-goods-action": "@vant/weapp/goods-action/index",
     "van-goods-action-icon": "@vant/weapp/goods-action-icon/index",
-    "van-goods-action-button": "@vant/weapp/goods-action-button/index",
     "van-tab": "@vant/weapp/tab/index",
     "van-tabs": "@vant/weapp/tabs/index",
-    "van-panel": "@vant/weapp/panel/index",
     "member-auth": "/components/user_info/auth_cell",
     "rent-recept": "/components/rent/rent_recept",
     "van-grid": "@vant/weapp/grid/index",
@@ -191,8 +180,6 @@
     "van-row": "@vant/weapp/row/index",
     "van-col": "@vant/weapp/col/index",
     "rent-price-list": "/components/rent/rent_price_list",
-    "van-cell": "@vant/weapp/cell/index",
-    "van-cell-group": "@vant/weapp/cell-group/index",
     "van-uploader": "@vant/weapp/uploader/index",
     "van-dropdown-menu": "@vant/weapp/dropdown-menu/index",
     "van-dropdown-item": "@vant/weapp/dropdown-item/index",
