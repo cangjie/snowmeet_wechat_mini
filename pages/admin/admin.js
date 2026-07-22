@@ -160,7 +160,6 @@ Page({
         path = 'rent/rent_report'
         break
       case 'rent_list_cell':
-        //path = 'rent/rent_list_by_cell'
         path = 'fire/fire_care_list?bizType=rent'
         break
       case 'test':
@@ -180,9 +179,6 @@ Page({
         break
       case 'vip_maintain':
         path = '/pages/admin/vip/maintain_recept'
-        break
-      case 'staff_list':
-        path = '/pages/admin/user/staff_list'
         break
         case 'staff_list_new':
           path = '/pages/admin/staff/staff_list'
