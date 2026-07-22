@@ -215,6 +215,10 @@
       </view>
     </view>
 
+    <view wx:if="{{order._punchCardRefundTotal > 0}}" class="pc-sale-hint">
+      其中含购买次卡多退 {{order._punchCardRefundTotalStr}}（详见下方"次卡销售"）
+    </view>
+
     <view wx:if="{{order.showGoPay}}" class="go-pay-btn" bindtap="onGoPay">去支付 {{order.payableAmountStr}}</view>
 
     <view class="divider"></view>
@@ -475,8 +479,22 @@
           </view>
         </view>
       </view>
-      <!-- 购买次卡（退押金推荐购买）：与「次卡消费」/「储值付租金」互斥，三者同时跑会冲突（都要动同一批租金天数） -->
-      <view class="refund-amount-row" wx:if="{{order._allRentalsReturned && !punchCardSelected && !payWithDeposit && !(order.punchCardInfo.usedPunches > 0) && !(order.depositPaidAmount > 0)}}">
+      <!-- 已售出的次卡（子订单）：本单曾经卖过次卡（不论是本次退押金顺带卖的，还是顾客自助买的），
+           就在这里展示这笔零售记录——名称/价格/核销与结算方式全部来自 memo（FinalizePunchCardSale 落库时写好）。 -->
+      <view wx:if="{{order._hasPunchCardSale}}" class="pc-sale-list">
+        <view class="pc-sale-list-title">次卡销售 · 消费 {{order._punchCardSaleTotalStr}}</view>
+        <view class="pc-sale-row" wx:for="{{order._punchCardSaleRetails}}" wx:key="id">
+          <view class="pc-sale-row-main">
+            <text class="pc-sale-name">{{item.productName}}</text>
+            <text class="pc-sale-price">{{item.dealPriceStr}}</text>
+          </view>
+          <view class="pc-sale-memo">{{item.memo}}</view>
+          <view class="pc-sale-date">{{item.createDateStr}}</view>
+        </view>
+      </view>
+      <!-- 购买次卡（退押金推荐购买）：与「次卡消费」/「储值付租金」互斥，三者同时跑会冲突（都要动同一批租金天数）；
+           本单已经卖过一张次卡（_hasPunchCardSale）就不再推荐，避免同一单反复加卖 -->
+      <view class="refund-amount-row" wx:if="{{order._allRentalsReturned && !punchCardSelected && !payWithDeposit && !(order.punchCardInfo.usedPunches > 0) && !(order.depositPaidAmount > 0) && !order._hasPunchCardSale}}">
         <text class="refund-amount-label">推荐次卡</text>
         <van-button size="mini" type="primary" bind:click="onOpenSellPunchCard">购买次卡</van-button>
       </view>

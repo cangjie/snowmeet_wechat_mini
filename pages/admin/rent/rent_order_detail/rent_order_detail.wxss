@@ -596,6 +596,23 @@
 .pc-shortfall-methods { display: flex; flex-direction: column; gap: 16rpx; margin-top: 24rpx; }
 .pc-shortfall-methods .dc-btn { flex: none; }
 
+/* 支付信息卡·次卡多退提示 */
+.pc-sale-hint { font-size: 22rpx; color: #E6A23C; margin: -6rpx 0 12rpx; }
+
+/* 退款卡·已售次卡列表 */
+.pc-sale-list {
+  background: #f0f6fa; border-radius: 10rpx;
+  padding: 12rpx 16rpx; margin-bottom: 16rpx;
+}
+.pc-sale-list-title { font-size: 24rpx; color: #006495; font-weight: 600; margin-bottom: 8rpx; }
+.pc-sale-row { padding: 10rpx 0; border-top: 1rpx solid #dcebf2; }
+.pc-sale-row:first-child { border-top: none; }
+.pc-sale-row-main { display: flex; justify-content: space-between; align-items: center; }
+.pc-sale-name { font-size: 27rpx; color: #1a1a1a; }
+.pc-sale-price { font-size: 27rpx; color: #E64340; font-weight: 600; }
+.pc-sale-memo { font-size: 22rpx; color: #666; margin-top: 4rpx; }
+.pc-sale-date { font-size: 20rpx; color: #999; margin-top: 2rpx; }
+
 .item-table { font-size: 24rpx; }
 .item-table-row {
   display: flex; gap: 8rpx; min-height: 48rpx; align-items: center;

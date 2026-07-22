@@ -516,6 +516,35 @@ Page({
     }
     order.totalRentUnRefundStr = util.showAmount(order.totalRentUnRefund)
 
+    // 次卡销售（子订单）：租赁订单也可能挂着一笔"购买次卡"的零售记录（见 FinalizePunchCardSale/
+    // 顾客自助购买）。总计押金/总计租金等既有口径都只算 rentals，不含这笔钱——这里单独汇总展示，
+    // 不并入上面几个租金/押金字段，避免把"卖了张卡"和"退了多少押金"两件事的口径混在一起。
+    var punchCardSaleRetails = []
+    var punchCardSaleTotal = 0
+    for (var pri = 0; order.retails && pri < order.retails.length; pri++) {
+      var rt2 = order.retails[pri]
+      if (rt2.valid == 1 && rt2.product_id != null) {
+        rt2.dealPriceStr = util.showAmount(rt2.deal_price)
+        rt2.productName = (rt2.product && rt2.product.name) || (rt2.punchCard && rt2.punchCard.card_name) || '次卡'
+        rt2.createDateStr = util.formatDate(new Date(rt2.create_date))
+        punchCardSaleTotal += rt2.deal_price || 0
+        punchCardSaleRetails.push(rt2)
+      }
+    }
+    order._punchCardSaleRetails = punchCardSaleRetails
+    order._hasPunchCardSale = punchCardSaleRetails.length > 0
+    order._punchCardSaleTotalStr = util.showAmount(punchCardSaleTotal)
+    // 已退金额里可能混着"购买次卡多退"（与押金退款是两件事）——单独挑出来标注，避免退款金额突然
+    // 变化却看不出原因；reason 是 FinalizePunchCardSale 里 AllocateRefundAcrossPayments 时写死的字符串。
+    var punchCardRefundTotal = 0
+    for (var rfi = 0; order.availableRefunds && rfi < order.availableRefunds.length; rfi++) {
+      if (order.availableRefunds[rfi].reason == '购买次卡多退') {
+        punchCardRefundTotal += order.availableRefunds[rfi].amount || 0
+      }
+    }
+    order._punchCardRefundTotal = punchCardRefundTotal
+    order._punchCardRefundTotalStr = util.showAmount(punchCardRefundTotal)
+
     // 「去支付」入口：未付清且订单开放（待生成/待支付/部分支付）才显示；
     // 已支付成功/订单关闭/退款/挂账/免费单(应付≤0)不显示。点击跳通用结算页（与开单流程同一页）。
     var payable = (order.paying_amount != null && order.paying_amount > 0)
