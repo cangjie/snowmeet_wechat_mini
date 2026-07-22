@@ -1,0 +1,106 @@
+<view wx:if="{{staff && staff.title_level >= 100}}" class="page-root">
+
+  <!-- 筛选区 -->
+  <view class="filter-card">
+    <!-- 店铺 -->
+    <view class="filter-row">
+      <text class="filter-label">店铺</text>
+      <view class="filter-value">
+        <shop-selector bindShopSelected="shopSelected"></shop-selector>
+      </view>
+    </view>
+
+    <!-- 装备类型 -->
+    <view class="filter-row">
+      <text class="filter-label">类型</text>
+      <radio-group id="equipment" class="radio-group" bindchange="onEquipmentChange">
+        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{querying}}"/>全部</label>
+        <label class="radio-item"><radio value="双板" disabled="{{querying}}"/>双板</label>
+        <label class="radio-item"><radio value="单板" disabled="{{querying}}"/>单板</label>
+      </radio-group>
+    </view>
+
+    <!-- 品牌 -->
+    <view class="filter-row">
+      <text class="filter-label">品牌</text>
+      <input class="filter-input" bindinput="setBrand" placeholder="品牌模糊搜索" />
+    </view>
+
+    <!-- 手机 -->
+    <view class="filter-row">
+      <text class="filter-label">手机</text>
+      <input class="filter-input" bindinput="setCell" type="number" placeholder="手机号模糊搜索" />
+    </view>
+
+    <view class="filter-actions">
+      <van-button type="primary" size="normal" bind:click="query" loading="{{querying}}" disabled="{{querying}}">查 询</van-button>
+    </view>
+  </view>
+
+  <!-- 统计行 + 分页 -->
+  <view wx:if="{{total > 0}}" class="summary-section">
+    <view class="summary-bar">
+      <text>共 {{total}} 件未发板</text>
+      <text class="summary-sep">·</text>
+      <text>按寄存天数倒序</text>
+    </view>
+    <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
+                disabled="{{querying}}" bind:change="onPagerChange" />
+  </view>
+
+  <!-- 装备列表：一件装备一条 -->
+  <block wx:for="{{items}}" wx:key="id">
+    <view class="care-card" id="{{index}}" bindtap="gotoDetail">
+      <view class="care-body">
+        <!-- 左侧属性标签竖排 -->
+        <view class="tag-col">
+          <text wx:if="{{item.haveWarranty}}" class="tag tag--warranty">质</text>
+          <text wx:if="{{item.isSummerTask}}" class="tag tag--summer">非</text>
+          <text wx:if="{{item.haveEntertain}}" class="tag tag--entertain">招</text>
+        </view>
+
+        <!-- 中间数据项 -->
+        <view class="care-rows">
+          <view class="care-row">
+            <text class="row-label">品牌</text><text class="row-value row-value--wide">{{item.brand || '-'}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">长度</text><text class="row-value row-value--wide">{{item.scale ? (item.scale + 'cm') : '-'}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">项目</text><text class="row-value row-value--wide">{{item.svcStr}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">金额</text><text class="row-value row-value--wide row-value--strong">{{item.amountStr}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item._customerName}}</text>
+          </view>
+          <view class="care-row" catchtap="call" data-cell="{{item._customerCell}}">
+            <text class="row-label">电话</text><text class="row-value row-value--wide row-value--link">{{item._customerCell || '-'}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">已寄存</text><text class="row-value row-value--wide row-value--strong">{{item.storedDays}} 天</text>
+          </view>
+        </view>
+
+        <!-- 装备照片：卡片最右侧竖排，与订单列表一致 -->
+        <view wx:if="{{item.thumbs.length > 0}}" class="care-photos">
+          <image wx:for="{{item.thumbs}}" wx:for-item="thumb" wx:for-index="ti" wx:key="ti"
+                 class="care-thumb" mode="aspectFill" src="{{thumb}}"
+                 data-idx="{{index}}" data-ti="{{ti}}" catchtap="onPhotoTap" />
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 列表底部分页 -->
+  <view wx:if="{{total > 0}}" class="summary-section summary-section--bottom">
+    <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
+                disabled="{{querying}}" bind:change="onPagerChange" />
+  </view>
+
+  <!-- 无结果 -->
+  <view wx:if="{{!querying && total == 0}}" class="empty-tip">暂无未发板装备</view>
+
+</view>

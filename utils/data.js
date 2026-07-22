@@ -1214,6 +1214,22 @@ const getUnreturnedRentItemPromise = function (shop, sessionKey){
     })
   })
 }
+// 养护已生效订单中所有"未发板"的装备（顾客送来养护、还没取走），一件装备一条，服务端内存分页
+const getUnpickedCareItemsByStaffPromise = function (shop, equipment, brand, cell, sessionKey, pageIndex, pageSize) {
+  var qUrl = app.globalData.requestPrefix + 'Care/GetUnpickedCareItemsByStaff?sessionKey=' + sessionKey
+  if (shop != null) { qUrl += '&shop=' + encodeURIComponent(shop) }
+  if (equipment != null) { qUrl += '&equipment=' + encodeURIComponent(equipment) }
+  if (brand != null && brand != '') { qUrl += '&brand=' + encodeURIComponent(brand) }
+  if (cell != null && cell != '') { qUrl += '&cell=' + cell }
+  qUrl += '&pageIndex=' + (pageIndex || 1) + '&pageSize=' + (pageSize || 10)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(qUrl, null).then(function (result) {
+      resolve(result)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const queryRentItemChangeCompatibleCategory = function (categoryId){
   var getUrl = app.globalData.requestPrefix + 'Rent/QueryChangeCompatibleCategory/' + categoryId.toString()
   return util.performWebRequest(getUrl, null)
@@ -1435,6 +1451,7 @@ module.exports = {
   getMemberCardsPromise,
   calcCareChargePromise,
   getUnreturnedRentItemPromise,
+  getUnpickedCareItemsByStaffPromise,
   queryRentItemChangeCompatibleCategory,
   getOrderBalancePromise,
   updateRentPackageCategoryPromise,

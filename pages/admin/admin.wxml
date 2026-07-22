@@ -60,6 +60,7 @@
     <mp-cell value="【养护】快速查询" id="maintainSerchQuick" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_return" value="【养护】养护取板" bindtap="nav" ></mp-cell>
     <mp-cell id="maintain_in_stock" value="【养护】需盘点的" bindtap="nav" ></mp-cell>
+    <mp-cell id="care_unpicked" value="【养护】未发板装备列表" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells  title="租赁" >
     <mp-cell id="rent_list" value="【租赁】订单列表" bindtap="nav" ></mp-cell>

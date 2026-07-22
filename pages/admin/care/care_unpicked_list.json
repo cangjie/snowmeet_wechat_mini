@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "list-pager": "/components/list-pager/index"
+  },
+  "navigationBarTitleText": "养护未发板装备"
+}
