@@ -18,7 +18,6 @@
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
     "pages/tickets/tickets_get",
-    "pages/rent/bind_rent_order",
     "pages/admin/rent/rent_report",
     "pages/admin/recept/recept_entry",
     "pages/admin/recept/recept_member_info",
