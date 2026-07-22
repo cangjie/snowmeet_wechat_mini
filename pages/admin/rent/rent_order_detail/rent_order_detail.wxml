@@ -813,7 +813,6 @@
       <view wx:else class="pc-shortfall-methods">
         <view class="dc-btn dc-btn--confirm" bindtap="onShortfallMethodChoose" data-method="qr">扫码支付</view>
         <view class="dc-btn dc-btn--confirm" bindtap="onShortfallMethodChoose" data-method="cash">现金/其他</view>
-        <view class="dc-btn dc-btn--confirm" bindtap="onShortfallMethodChoose" data-method="deposit">储值扣款</view>
         <view class="dc-btn dc-btn--cancel" bindtap="onSellCardModalCancel">取消</view>
       </view>
     </block>

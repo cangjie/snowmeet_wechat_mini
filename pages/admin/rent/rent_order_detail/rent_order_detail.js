@@ -1416,15 +1416,6 @@ Page({
           that._finalizeSale({ method: 'cash', payMethodLabel: '现金' })
         }
       })
-    } else if (method === 'deposit') {
-      wx.showModal({
-        title: '储值扣款',
-        content: '将从顾客储值余额扣除 ' + util.showAmount(preview.priceDiff) + '，确认？',
-        complete: function (res) {
-          if (!res.confirm) return
-          that._finalizeSale({ method: 'deposit' })
-        }
-      })
     } else if (method === 'qr') {
       that._openShortfallQr()
     }
