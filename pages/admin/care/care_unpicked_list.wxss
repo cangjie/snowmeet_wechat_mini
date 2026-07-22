@@ -139,6 +139,7 @@
   text-align: center;
 }
 
+.tag--test      { background: #fee2e2; color: #b91c1c; }
 .tag--entertain { background: #fef3c7; color: #92400e; }
 .tag--warranty  { background: #cffafe; color: #0e7490; }
 .tag--summer    { background: #fef3c7; color: #b45309; }

@@ -22,6 +22,9 @@ Page({
     equipment: null,
     brand: null,
     cell: null,
+    isTest: false,        // 测试订单筛选，默认只看正常订单（营业）
+    isSummerCare: null,   // 非雪季养护筛选，默认全部
+    sortOrder: 'asc',     // 送到时间排序，默认正序（最早送到的排最前，即寄存最久优先）
     items: [],
     total: 0,
     page: 1,
@@ -49,6 +52,15 @@ Page({
     this.setData({ equipment: v === 'null' ? null : v })
   },
 
+  setQueryOptions(e) {
+    var key = e.currentTarget.id
+    var v = e.detail.value
+    var parsed = v === 'null' ? null : (v === 'true' ? true : (v === 'false' ? false : v))
+    var patch = {}
+    patch[key] = parsed
+    this.setData(patch)
+  },
+
   setBrand(e) {
     this.setData({ brand: e.detail.value })
   },
@@ -68,6 +80,7 @@ Page({
     pageSize = pageSize || that.data.pageSize
     data.getUnpickedCareItemsByStaffPromise(
       that.data.shop, that.data.equipment, that.data.brand, that.data.cell,
+      that.data.isTest, that.data.isSummerCare, that.data.sortOrder,
       app.globalData.sessionKey, page, pageSize
     ).then(function (result) {
       that.renderItems(result.items || [], result.total || 0, page, pageSize)
@@ -85,6 +98,7 @@ Page({
       care.haveWarranty = !!care.warranty
       care.haveEntertain = !!care.entertain
       care.isSummerTask = care.biz_type === '非雪季养护'
+      care.isTestOrder = !!(care.order && care.order.is_test === 1)
       // 养护项目 + 金额（口径抄自 pages/order/payment_entry.js 养护段）
       var svcs = []
       if (care.summer == 'now') svcs.push('非雪季·寄存')

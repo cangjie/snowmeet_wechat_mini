@@ -20,6 +20,35 @@
       </radio-group>
     </view>
 
+    <!-- 测试 -->
+    <view class="filter-row">
+      <text class="filter-label">测试</text>
+      <radio-group id="isTest" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="false" disabled="{{querying}}"/>营业</label>
+        <label class="radio-item"><radio value="true" disabled="{{querying}}"/>测试</label>
+        <label class="radio-item"><radio value="null" disabled="{{querying}}"/>全部</label>
+      </radio-group>
+    </view>
+
+    <!-- 非雪季 -->
+    <view class="filter-row">
+      <text class="filter-label">非雪季</text>
+      <radio-group id="isSummerCare" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{querying}}"/>全部</label>
+        <label class="radio-item"><radio value="true" disabled="{{querying}}"/>包含</label>
+        <label class="radio-item"><radio value="false" disabled="{{querying}}"/>不含</label>
+      </radio-group>
+    </view>
+
+    <!-- 排序 -->
+    <view class="filter-row">
+      <text class="filter-label">排序</text>
+      <radio-group id="sortOrder" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="asc" disabled="{{querying}}"/>正序</label>
+        <label class="radio-item"><radio value="desc" disabled="{{querying}}"/>倒序</label>
+      </radio-group>
+    </view>
+
     <!-- 品牌 -->
     <view class="filter-row">
       <text class="filter-label">品牌</text>
@@ -42,7 +71,7 @@
     <view class="summary-bar">
       <text>共 {{total}} 件未发板</text>
       <text class="summary-sep">·</text>
-      <text>按寄存天数倒序</text>
+      <text>{{sortOrder == 'desc' ? '按送到时间倒序' : '按送到时间正序'}}</text>
     </view>
     <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
                 disabled="{{querying}}" bind:change="onPagerChange" />
@@ -54,6 +83,7 @@
       <view class="care-body">
         <!-- 左侧属性标签竖排 -->
         <view class="tag-col">
+          <text wx:if="{{item.isTestOrder}}" class="tag tag--test">测</text>
           <text wx:if="{{item.haveWarranty}}" class="tag tag--warranty">质</text>
           <text wx:if="{{item.isSummerTask}}" class="tag tag--summer">非</text>
           <text wx:if="{{item.haveEntertain}}" class="tag tag--entertain">招</text>
