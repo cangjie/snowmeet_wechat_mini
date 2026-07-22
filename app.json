@@ -1,11 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/logs/logs",
     "pages/mine/mine",
     "pages/admin/admin",
-    "pages/mine/my_maintain/my_maintain",
-    "pages/mine/my_maintain/my_maintain_detail",
     "pages/admin/scan/scan",
     "pages/admin/printer/gprinter/ticket",
     "pages/admin/ticket/ticket_template_list",
@@ -17,12 +14,10 @@
     "pages/ski_pass/ski_pass_reserve",
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
-    "pages/tickets/tickets_get",
     "pages/admin/rent/rent_report",
     "pages/admin/recept/recept_entry",
     "pages/admin/recept/recept_member_info",
     "pages/admin/recept/recept_list",
-    "pages/register/staff_check_in",
     "pages/admin/rent/unreturned",
     "pages/admin/rent/settings/category_tree",
     "pages/admin/rent/settings/rent_package",
@@ -35,7 +30,6 @@
     "pages/admin/staff/staff_detail",
     "pages/admin/staff_reg_qrcode",
     "pages/register/out_reg",
-    "pages/tickets/get_ticket_from_channel",
     "pages/admin/ski_pass/nanshan_reserve",
     "pages/admin/ski_pass/nanshan_reserve_detail",
     "pages/admin/ski_pass/nanshan_verify",
@@ -45,7 +39,6 @@
     "pages/admin/ski_pass/nanshan_pick_card_scan",
     "pages/mine/skipass/my_skipass",
     "pages/ski_pass/nanshan_overtime_reserve",
-    "pages/ski_pass/skipass_detail",
     "pages/admin/ski_pass/common_skipass_list",
     "pages/admin/ski_pass/common_skipass_detail",
     "pages/admin/ski_pass/reserve_qrcode",
@@ -92,8 +85,6 @@
     "pages/admin/unipay/unipay",
     "pages/admin/unipay/unipay_detail",
     "pages/admin/unipay/unipay_list",
-    "pages/claude/index",
-    "pages/claude/tickets",
     "pages/ski_pass/skipass_detail_new",
     "pages/mine/skipass/my_skipasses",
     "pages/admin/reception/recept_entry",
@@ -130,24 +121,6 @@
       "name": "pay",
       "pages": [
         "settle/index"
-      ]
-    },
-    {
-      "root": "pages/mine/maintain/",
-      "name": "maintain_payment",
-      "pages": [
-        "order_detail",
-        "bind_maintain_order",
-        "order_list",
-        "task"
-      ]
-    },
-    
-    {
-      "root": "pages/experience",
-      "name": "experience_payment",
-      "pages": [
-        "pay_temp"
       ]
     }
   ],
