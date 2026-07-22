@@ -1,0 +1,68 @@
+@import '/app.wxss';
+
+.page {
+  background: #F8F8F8;
+  min-height: 100vh;
+  padding: 20rpx 24rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  padding: 12rpx 0;
+  margin-bottom: 4rpx;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 6rpx;
+  height: 28rpx;
+  background: #2EA6D0;
+  border-radius: 3rpx;
+  margin-right: 14rpx;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+  padding: 60rpx 0;
+}
+
+.pcard-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 72rpx;
+  font-size: 28rpx;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.pcard-row:last-child { border-bottom: none; }
+
+.pcard-name { color: #1a1a1a; }
+.pcard-remain { color: #2EA6D0; font-weight: 600; }
+
+.buy-btn {
+  background: #2EA6D0;
+  color: #fff;
+  text-align: center;
+  padding: 22rpx 0;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  margin-top: 20rpx;
+}
+
+.buy-btn:active { opacity: 0.85; }

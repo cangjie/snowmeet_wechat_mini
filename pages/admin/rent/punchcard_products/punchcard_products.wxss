@@ -1,0 +1,67 @@
+page { background: #f6f7f9; }
+
+.page { padding: 20rpx; box-sizing: border-box; }
+
+.card {
+  background: #fff; border-radius: 16rpx; padding: 24rpx;
+  box-sizing: border-box; margin-bottom: 20rpx;
+}
+
+.section-title { font-size: 28rpx; font-weight: 600; color: #1a1a1a; margin-bottom: 12rpx; }
+
+.empty-tip { font-size: 26rpx; color: #999; text-align: center; padding: 40rpx 0; }
+
+.prod-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20rpx 8rpx; border-bottom: 1rpx solid #f3f4f6;
+}
+.prod-row:last-child { border-bottom: none; }
+.prod-info { flex: 1; }
+.prod-name { font-size: 28rpx; color: #1a1a1a; font-weight: 600; }
+.prod-tag--off {
+  font-size: 20rpx; color: #E64340; border: 1rpx solid #E64340;
+  border-radius: 6rpx; padding: 2rpx 8rpx; margin-left: 12rpx; font-weight: normal;
+}
+.prod-sub { font-size: 24rpx; color: #999; margin-top: 6rpx; }
+
+.add-btn {
+  text-align: center; background: #2EA6D0; color: #fff;
+  font-size: 28rpx; padding: 20rpx 0; border-radius: 12rpx;
+}
+.add-btn:active { opacity: 0.85; }
+
+/* 新增/编辑弹窗，复用 rent_order_detail 的 dc-* 视觉语言 */
+.dc-mask {
+  position: fixed; left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.dc-card {
+  width: 600rpx; background: #fff; border-radius: 20rpx;
+  padding: 36rpx 32rpx 28rpx; box-sizing: border-box;
+}
+.dc-title { font-size: 32rpx; font-weight: 600; color: #1a1a1a; text-align: center; margin-bottom: 16rpx; }
+.dc-field {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16rpx 0; border-bottom: 1rpx solid #f0f0f0;
+}
+.dc-label { font-size: 28rpx; color: #333; flex: 0 0 140rpx; }
+.dc-input {
+  flex: 1; text-align: right; font-size: 30rpx; color: #1a1a1a;
+  background: #f6f7f9; border-radius: 10rpx; padding: 10rpx 16rpx;
+}
+.dc-actions { display: flex; gap: 20rpx; margin-top: 32rpx; }
+.dc-btn {
+  flex: 1; text-align: center; padding: 18rpx 0; border-radius: 12rpx; font-size: 30rpx;
+}
+.dc-btn--cancel { background: #f2f3f5; color: #666; }
+.dc-btn--confirm { background: #2EA6D0; color: #fff; }
+.dc-btn:active { opacity: 0.85; }
+
+.shelves-toggle {
+  width: 44rpx; height: 44rpx; border-radius: 8rpx;
+  border: 2rpx solid #ccc; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 26rpx;
+}
+.shelves-toggle--on { background: #2EA6D0; border-color: #2EA6D0; }

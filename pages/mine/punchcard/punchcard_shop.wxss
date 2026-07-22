@@ -1,0 +1,57 @@
+@import '/app.wxss';
+
+.page {
+  background: #F8F8F8;
+  min-height: 100vh;
+  padding: 20rpx 24rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  padding: 12rpx 0;
+  margin-bottom: 4rpx;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 6rpx;
+  height: 28rpx;
+  background: #2EA6D0;
+  border-radius: 3rpx;
+  margin-right: 14rpx;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+  padding: 60rpx 0;
+}
+
+.prod-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 88rpx;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.prod-row:last-child { border-bottom: none; }
+.prod-row:active { background: #f8f9ff; }
+
+.prod-name { font-size: 28rpx; color: #1a1a1a; }
+.prod-punch { font-size: 24rpx; color: #999; margin-top: 4rpx; }
+.prod-price { font-size: 32rpx; font-weight: 600; color: #E64340; }

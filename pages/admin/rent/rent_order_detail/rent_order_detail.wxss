@@ -584,6 +584,18 @@
 .pc-card-remain { font-size: 24rpx; color: #999; }
 .pc-hint { font-size: 22rpx; color: #999; margin-top: 10rpx; }
 
+/* 购买次卡·试算结果 */
+.pc-preview-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 26rpx; color: #333; padding: 10rpx 0; border-bottom: 1rpx solid #f3f4f6;
+}
+.pc-preview-row--result {
+  font-size: 30rpx; font-weight: 600; color: #E64340; border-bottom: none;
+  margin-top: 8rpx; padding-top: 16rpx; border-top: 1rpx solid #e8eaed;
+}
+.pc-shortfall-methods { display: flex; flex-direction: column; gap: 16rpx; margin-top: 24rpx; }
+.pc-shortfall-methods .dc-btn { flex: none; }
+
 .item-table { font-size: 24rpx; }
 .item-table-row {
   display: flex; gap: 8rpx; min-height: 48rpx; align-items: center;

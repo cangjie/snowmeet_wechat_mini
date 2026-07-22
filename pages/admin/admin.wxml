@@ -70,6 +70,7 @@
     <mp-cell id="rent_search_fuzzy" value="【租赁】查询租赁物" bindtap="nav" ></mp-cell>
     <mp-cell wx:if="{{isAdmin}}" id="category_tree" value="【租赁】租赁分类维护" bindtap="nav" ></mp-cell>
     <mp-cell wx:if="{{isAdmin}}" id="rent_package" value="【租赁】租赁套餐设置" bindtap="nav" ></mp-cell>
+    <mp-cell wx:if="{{isAdmin}}" id="punchcard_products" value="【租赁】次卡商品管理" bindtap="nav" ></mp-cell>
     <mp-cell  id="rent_product_add" value="【租赁】添加租赁物" bindtap="nav" ></mp-cell>
     <mp-cell  id="rent_product_list" value="【租赁】租赁物列表" bindtap="nav" ></mp-cell>
     <mp-cell  id="rent_recepting" value="【租赁】未完成的接待" bindtap="nav" ></mp-cell>

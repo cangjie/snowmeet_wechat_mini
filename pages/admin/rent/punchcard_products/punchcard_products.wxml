@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="card">
+    <view class="section-title">次卡商品</view>
+    <view wx:if="{{products.length == 0}}" class="empty-tip">暂无次卡商品</view>
+    <view class="prod-row" wx:for="{{products}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+      <view class="prod-info">
+        <view class="prod-name">{{item.name}}<text wx:if="{{!item.on_shelves}}" class="prod-tag--off">已下架</text></view>
+        <view class="prod-sub">{{item.punch_total}} 次 · ¥{{item.sale_price}}{{item.shop ? (' · ' + item.shop) : ''}}</view>
+      </view>
+    </view>
+  </view>
+  <view class="add-btn" bindtap="onAdd">+ 新增次卡商品</view>
+</view>
+
+<view wx:if="{{modal.show}}" class="dc-mask" bindtap="onModalCancel" catchtouchmove="noop">
+  <view class="dc-card" catchtap="noop">
+    <view class="dc-title">{{modal.id ? '编辑次卡商品' : '新增次卡商品'}}</view>
+    <view class="dc-field">
+      <text class="dc-label">名称</text>
+      <input class="dc-input" value="{{modal.name}}" bindinput="onNameInput" placeholder="如：双板季前次卡" />
+    </view>
+    <view class="dc-field">
+      <text class="dc-label">价格</text>
+      <input class="dc-input" type="digit" value="{{modal.sale_price}}" bindinput="onPriceInput" placeholder="0.00" />
+    </view>
+    <view class="dc-field">
+      <text class="dc-label">次数</text>
+      <input class="dc-input" type="number" value="{{modal.punch_total}}" bindinput="onPunchTotalInput" placeholder="0" />
+    </view>
+    <view class="dc-field">
+      <text class="dc-label">限定店铺</text>
+      <input class="dc-input" value="{{modal.shop}}" bindinput="onShopInput" placeholder="留空=不限店铺" />
+    </view>
+    <view class="dc-field" bindtap="onToggleOnShelves">
+      <text class="dc-label">上架销售</text>
+      <view class="shelves-toggle {{modal.on_shelves ? 'shelves-toggle--on' : ''}}">
+        <text wx:if="{{modal.on_shelves}}">✓</text>
+      </view>
+    </view>
+    <view class="dc-actions">
+      <view class="dc-btn dc-btn--cancel" bindtap="onModalCancel">取消</view>
+      <view class="dc-btn dc-btn--confirm" bindtap="onModalConfirm">保存</view>
+    </view>
+  </view>
+</view>

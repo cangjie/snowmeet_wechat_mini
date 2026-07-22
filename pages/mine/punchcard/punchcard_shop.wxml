@@ -1,0 +1,17 @@
+<view class="page">
+  <view class="card">
+    <view class="section-title">选择门店</view>
+    <shop-selector bindShopSelected="shopSelected"></shop-selector>
+  </view>
+  <view class="card">
+    <view class="section-title">次卡商品</view>
+    <view wx:if="{{products.length == 0}}" class="empty-tip">暂无可购买的次卡商品</view>
+    <view class="prod-row" wx:for="{{products}}" wx:key="id" bindtap="onBuyProduct" data-id="{{item.id}}">
+      <view class="prod-info">
+        <view class="prod-name">{{item.name}}</view>
+        <view class="prod-punch">{{item.punch_total}} 次</view>
+      </view>
+      <view class="prod-price">¥{{item.sale_price}}</view>
+    </view>
+  </view>
+</view>

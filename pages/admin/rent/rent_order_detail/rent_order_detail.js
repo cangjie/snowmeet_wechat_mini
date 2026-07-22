@@ -56,6 +56,13 @@ Page({
     punchCardSelection: null,
     punchCardSelectedCount: 0,
 
+    // 购买次卡（退押金推荐购买）：step 'pick'(选商品)｜'preview'(试算结果)。
+    // 与「次卡消费」/「储值付租金」互斥——三者最终都要动同一批 rental_detail 天数行，同时跑会冲突。
+    sellCardModal: { show: false, step: 'pick', products: [], productId: null, productName: '' },
+    punchCardSalePreview: null,   // Rent/PreparePunchCardSale 的响应，纯试算不写库
+    // 补差价·扫码结算（唯一真正跨请求异步的结算方式）：qrShow 控制二维码弹窗；payStage 跟 GetPaymentLiveStatus 一致
+    shortfallSettle: { qrShow: false, qrCodeUrl: '', paymentId: null, retailId: null, payStage: 'waiting' },
+
     // 租金明细按天编辑弹窗
     _dayChargeShow: false,
     _dayChargeRidx: null,
@@ -1333,6 +1340,158 @@ Page({
   onWechatVerifyCancel() {
     this._stopVerifyPolling()
     this.setData({ _verifyShow: false })
+  },
+
+  // ── 购买次卡（退押金时推荐购买）──────────────
+  // 三步：① 选商品 ② 试算（服务端算好应核销次数/免租金/应退押金/多退或需补） ③ 按结算方式确认。
+  // 与「次卡消费」/「储值付租金」互斥（wxml 里已按 sellCardModal.show 隐藏那两行入口）。
+  onOpenSellPunchCard() {
+    var that = this
+    var order = that.data.order
+    if (!order || !order._allRentalsReturned) { wx.showToast({ title: '所有租赁物归还后才能操作', icon: 'none' }); return }
+    wx.showLoading({ title: '加载中', mask: true })
+    data.getPunchCardProductsPromise(order.shop, app.globalData.sessionKey).then(function (products) {
+      wx.hideLoading()
+      if (!products || products.length === 0) { wx.showToast({ title: '暂无可购买的次卡商品', icon: 'none' }); return }
+      that.setData({ sellCardModal: { show: true, step: 'pick', products: products, productId: null, productName: '' } })
+    }).catch(function () { wx.hideLoading() })
+  },
+
+  onPickPunchCardProduct(e) {
+    var productId = parseInt(e.currentTarget.dataset.id, 10)
+    var modal = this.data.sellCardModal
+    var product = null
+    for (var i = 0; i < modal.products.length; i++) { if (modal.products[i].id == productId) { product = modal.products[i]; break } }
+    if (!product) return
+    this.setData({ 'sellCardModal.productId': productId, 'sellCardModal.productName': product.name })
+    this._previewPunchCardSale(productId)
+  },
+
+  _previewPunchCardSale(productId) {
+    var that = this
+    var order = that.data.order
+    wx.showLoading({ title: '试算中', mask: true })
+    data.preparePunchCardSalePromise(order.id, productId, app.globalData.sessionKey).then(function (preview) {
+      wx.hideLoading()
+      that.setData({ 'sellCardModal.step': 'preview', punchCardSalePreview: preview })
+    }).catch(function () { wx.hideLoading() })
+  },
+
+  onSellCardModalCancel() {
+    this._stopShortfallPolling()
+    this.setData({
+      sellCardModal: { show: false, step: 'pick', products: [], productId: null, productName: '' },
+      punchCardSalePreview: null,
+      shortfallSettle: { qrShow: false, qrCodeUrl: '', paymentId: null, retailId: null, payStage: 'waiting' }
+    })
+  },
+
+  // 试算结果 priceDiff<=0（多退）：直接确认，走 refund 结算腿（退款+建卡+核销服务端一次原子完成）
+  onConfirmSellPunchCard() {
+    var that = this
+    var preview = that.data.punchCardSalePreview
+    if (!preview || preview.priceDiff > 0) return
+    wx.showModal({
+      title: '确认购买次卡',
+      content: (preview.priceDiff < 0 ? ('将退还 ' + util.showAmount(-preview.priceDiff) + '，') : '') + '确认购买「' + preview.cardName + '」？',
+      complete: function (res) {
+        if (!res.confirm) return
+        that._finalizeSale({ method: 'refund' })
+      }
+    })
+  },
+
+  // 试算结果 priceDiff>0（需补差价）：选结算方式
+  onShortfallMethodChoose(e) {
+    var that = this
+    var method = e.currentTarget.dataset.method
+    var preview = that.data.punchCardSalePreview
+    if (!preview || !(preview.priceDiff > 0)) return
+    if (method === 'cash') {
+      wx.showModal({
+        title: '确认收款',
+        content: '确认已收到现金 ' + util.showAmount(preview.priceDiff) + '？',
+        complete: function (res) {
+          if (!res.confirm) return
+          that._finalizeSale({ method: 'cash', payMethodLabel: '现金' })
+        }
+      })
+    } else if (method === 'deposit') {
+      wx.showModal({
+        title: '储值扣款',
+        content: '将从顾客储值余额扣除 ' + util.showAmount(preview.priceDiff) + '，确认？',
+        complete: function (res) {
+          if (!res.confirm) return
+          that._finalizeSale({ method: 'deposit' })
+        }
+      })
+    } else if (method === 'qr') {
+      that._openShortfallQr()
+    }
+  },
+
+  // 唯一真正跨请求异步的结算方式：先建 pending(valid=0) 零售行 + 待支付单，扫码支付成功后才 Finalize。
+  // 如果顾客一直不扫/中途放弃，这个 pending 行和待支付单永久停留在无效/待支付状态，无需清理，
+  // 订单其它状态（rentals/rental_detail/押金）完全不受影响。
+  _openShortfallQr() {
+    var that = this
+    var order = that.data.order
+    var productId = that.data.sellCardModal.productId
+    wx.showLoading({ title: '生成二维码', mask: true })
+    data.startPunchCardSaleQrPromise(order.id, productId, app.globalData.sessionKey).then(function (res) {
+      var payUrl = app.globalData.requestPrefix + 'Order/GetWepayPayment/' + order.id.toString()
+        + '?amount=' + res.priceDiff + '&sessionKey=' + app.globalData.sessionKey
+      return util.performWebRequest(payUrl, null).then(function (payment) {
+        wx.hideLoading()
+        var qrText = 'https://mini.snowmeet.top/mapp/order_payment?paymentId=' + payment.id.toString()
+        var qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrText)
+        that.setData({
+          shortfallSettle: { qrShow: true, qrCodeUrl: qrCodeUrl, paymentId: payment.id, retailId: res.retailId, payStage: 'waiting' }
+        })
+        that._startShortfallPolling()
+      })
+    }).catch(function () { wx.hideLoading() })
+  },
+
+  _startShortfallPolling() {
+    var that = this
+    that._stopShortfallPolling()
+    that._shortfallTimer = setInterval(function () {
+      var settle = that.data.shortfallSettle
+      if (!settle || !settle.paymentId) return
+      data.getPaymentLiveStatusPromise(settle.paymentId, app.globalData.sessionKey).then(function (res) {
+        if (res && res.stage === 'paid') {
+          that._stopShortfallPolling()
+          that.setData({ 'shortfallSettle.qrShow': false, 'shortfallSettle.payStage': 'paid' })
+          that._finalizeSale({ method: 'qr', retailId: settle.retailId, qrPaymentId: settle.paymentId })
+        } else if (res && res.stage) {
+          that.setData({ 'shortfallSettle.payStage': res.stage })
+        }
+      })
+    }, 2000)
+  },
+
+  _stopShortfallPolling() {
+    if (this._shortfallTimer) { clearInterval(this._shortfallTimer); this._shortfallTimer = null }
+  },
+
+  onShortfallQrCancel() {
+    this._stopShortfallPolling()
+    this.setData({ 'shortfallSettle.qrShow': false })
+  },
+
+  // 确认落地：服务端重新算一遍、钱落地后才建卡+核销，全部原子完成。
+  _finalizeSale(settlement) {
+    var that = this
+    var order = that.data.order
+    var productId = that.data.sellCardModal.productId
+    wx.showLoading({ title: '处理中', mask: true })
+    data.finalizePunchCardSalePromise(order.id, productId, settlement, app.globalData.sessionKey).then(function () {
+      wx.hideLoading()
+      wx.showToast({ title: '购买成功', icon: 'success' })
+      that.onSellCardModalCancel()
+      that.getData()
+    }).catch(function () { wx.hideLoading() })
   },
 
   // 核销链：在「申请退款」时依次 ① 次卡核销(UseRentalPunchCard) ② 储值核销(PayWithDeposit) ③ 退押金(refund)。

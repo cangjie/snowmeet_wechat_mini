@@ -475,6 +475,11 @@
           </view>
         </view>
       </view>
+      <!-- 购买次卡（退押金推荐购买）：与「次卡消费」/「储值付租金」互斥，三者同时跑会冲突（都要动同一批租金天数） -->
+      <view class="refund-amount-row" wx:if="{{order._allRentalsReturned && !punchCardSelected && !payWithDeposit && !(order.punchCardInfo.usedPunches > 0) && !(order.depositPaidAmount > 0)}}">
+        <text class="refund-amount-label">推荐次卡</text>
+        <van-button size="mini" type="primary" bind:click="onOpenSellPunchCard">购买次卡</van-button>
+      </view>
       <view class="refund-amount-row">
         <text class="refund-amount-label">实际应退</text>
         <text class="refund-amount-value refund-need">
@@ -771,6 +776,59 @@
     <view class="dc-actions">
       <view class="dc-btn dc-btn--cancel" bindtap="onPunchModalCancel">取消</view>
       <view class="dc-btn dc-btn--confirm" bindtap="onPunchModalConfirm">确认核销</view>
+    </view>
+  </view>
+</view>
+
+<!-- 购买次卡：① 选商品 ② 试算结果（多退直接确认 / 需补选结算方式） -->
+<view wx:if="{{sellCardModal.show}}" class="dc-mask" bindtap="onSellCardModalCancel" catchtouchmove="noop">
+  <view class="dc-card" catchtap="noop">
+    <block wx:if="{{sellCardModal.step == 'pick'}}">
+      <view class="dc-title">购买次卡</view>
+      <view class="dc-date">选择要购买的次卡商品</view>
+      <view class="pc-card-row" wx:for="{{sellCardModal.products}}" wx:key="id" bindtap="onPickPunchCardProduct" data-id="{{item.id}}">
+        <text class="pc-card-name">{{item.name}}</text>
+        <text class="pc-card-remain">{{item.punch_total}} 次 · ¥{{item.sale_price}}</text>
+      </view>
+      <view class="dc-actions">
+        <view class="dc-btn dc-btn--cancel" bindtap="onSellCardModalCancel">取消</view>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="dc-title">购买次卡·试算</view>
+      <view class="dc-date">{{sellCardModal.productName}}</view>
+      <view class="pc-preview-row"><text>本单应核销次数</text><text>{{punchCardSalePreview.punchCountNow}} 次</text></view>
+      <view class="pc-preview-row"><text>次卡总次数</text><text>{{punchCardSalePreview.punchTotal}} 次</text></view>
+      <view class="pc-preview-row"><text>立即免除租金</text><text>¥{{punchCardSalePreview.freedRentValue}}</text></view>
+      <view class="pc-preview-row"><text>核销前应退押金</text><text>¥{{punchCardSalePreview.refundableDepositBeforeCard}}</text></view>
+      <view class="pc-preview-row"><text>次卡价格</text><text>¥{{punchCardSalePreview.price}}</text></view>
+      <view class="pc-preview-row pc-preview-row--result">
+        <text>{{punchCardSalePreview.priceDiff > 0 ? '需补差价' : '多退'}}</text>
+        <text>¥{{punchCardSalePreview.priceDiff > 0 ? punchCardSalePreview.priceDiff : -punchCardSalePreview.priceDiff}}</text>
+      </view>
+      <view wx:if="{{punchCardSalePreview.priceDiff <= 0}}" class="dc-actions">
+        <view class="dc-btn dc-btn--cancel" bindtap="onSellCardModalCancel">取消</view>
+        <view class="dc-btn dc-btn--confirm" bindtap="onConfirmSellPunchCard">确认购买</view>
+      </view>
+      <view wx:else class="pc-shortfall-methods">
+        <view class="dc-btn dc-btn--confirm" bindtap="onShortfallMethodChoose" data-method="qr">扫码支付</view>
+        <view class="dc-btn dc-btn--confirm" bindtap="onShortfallMethodChoose" data-method="cash">现金/其他</view>
+        <view class="dc-btn dc-btn--confirm" bindtap="onShortfallMethodChoose" data-method="deposit">储值扣款</view>
+        <view class="dc-btn dc-btn--cancel" bindtap="onSellCardModalCancel">取消</view>
+      </view>
+    </block>
+  </view>
+</view>
+
+<!-- 购买次卡·补差价扫码支付二维码 -->
+<view wx:if="{{shortfallSettle.qrShow}}" class="dc-mask" bindtap="onShortfallQrCancel" catchtouchmove="noop">
+  <view class="dc-card" catchtap="noop">
+    <view class="dc-title">扫码支付差价</view>
+    <view class="verify-qr-tip">¥{{punchCardSalePreview.priceDiff}}</view>
+    <image wx:if="{{shortfallSettle.qrCodeUrl}}" class="verify-qr-img" src="{{shortfallSettle.qrCodeUrl}}" mode="aspectFit" />
+    <view class="verify-qr-waiting">等待顾客扫码支付中…</view>
+    <view class="dc-actions">
+      <view class="dc-btn dc-btn--cancel" bindtap="onShortfallQrCancel">取消</view>
     </view>
   </view>
 </view>

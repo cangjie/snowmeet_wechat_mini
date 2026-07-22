@@ -1002,6 +1002,46 @@ const useRentalPunchCardPromise = function (orderId, body, sessionKey) {
     })
   })
 }
+// 购买次卡：商品目录（会话级，退押金卖卡弹窗 + 顾客自助购买页共用）
+const getPunchCardProductsPromise = function (shop, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetPunchCardProducts?sessionKey=' + sessionKey
+  if (shop != null) { url += '&shop=' + encodeURIComponent(shop) }
+  return util.performWebRequest(url, null)
+}
+// 次卡商品管理（店长/管理员）：不过滤 valid/on_shelves 的全量列表
+const getAllPunchCardProductsPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetAllPunchCardProducts?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+// 次卡商品管理：新增/编辑，复用通用商品目录的 Category/AddProduct、Category/ModProduct
+const addPunchCardProductPromise = function (product, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Category/AddProduct?sessionKey=' + sessionKey
+  return util.performWebRequest(url, product)
+}
+const modPunchCardProductPromise = function (product, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Category/ModProduct?sessionKey=' + sessionKey
+  return util.performWebRequest(url, product)
+}
+// 购买次卡：我的次卡列表（顾客自助会话，member_id 由服务端从 sessionKey 解析）
+const getMyPunchCardsPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCards?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+// 购买次卡·试算（只读，不写库）
+const preparePunchCardSalePromise = function (orderId, productId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/PreparePunchCardSale/' + orderId + '?productId=' + productId + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+// 购买次卡·发起扫码补差价：创建 pending(valid=0) 零售行，返回 { retailId, priceDiff }
+const startPunchCardSaleQrPromise = function (orderId, productId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/StartPunchCardSaleQr/' + orderId + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, { productId: productId })
+}
+// 购买次卡·确认落地：settlement = { method: 'refund'|'cash'|'deposit'|'qr', retailId?, qrPaymentId?, payMethodLabel? }
+const finalizePunchCardSalePromise = function (orderId, productId, settlement, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/FinalizePunchCardSale/' + orderId + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, { productId: productId, settlement: settlement })
+}
 // ───── 会员管理（MemberAdmin，店长/管理员 title_level≥200） ─────
 // 列表搜索（分页）。filter = {name, cell, gender, bizTypes(逗号拼), tags(逗号拼)}
 const searchMembersByStaffPromise = function (filter, pageIndex, pageSize, sessionKey) {
@@ -1430,6 +1470,14 @@ module.exports = {
   writeoffCareOrderPromise,
   getRentalPunchCardInfoPromise,
   useRentalPunchCardPromise,
+  getPunchCardProductsPromise,
+  getAllPunchCardProductsPromise,
+  addPunchCardProductPromise,
+  modPunchCardProductPromise,
+  getMyPunchCardsPromise,
+  preparePunchCardSalePromise,
+  startPunchCardSaleQrPromise,
+  finalizePunchCardSalePromise,
   searchMembersByStaffPromise,
   getMemberDetailByStaffPromise,
   updateMemberProfilePromise,

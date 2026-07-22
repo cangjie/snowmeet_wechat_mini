@@ -122,6 +122,11 @@ Page({
       url: '/pages/mine/deposit/deposit_list',
     })
   },
+  gotoPunchCards(){
+    wx.navigateTo({
+      url: '/pages/mine/punchcard/my_punchcards',
+    })
+  },
   nav(e){
     var path = '/pages/index/index'
     var id = e.currentTarget.id
