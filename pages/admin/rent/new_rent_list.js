@@ -197,6 +197,17 @@ Page({
       order.payMethod = methods.length > 0 ? methods.join('/') : null
       order.displayedRental = 0
       var orderClosed = order.rentProperties && order.rentProperties.rentStatus === '了结关闭'
+      // 「套」「单」两个标签各自独立判定（本单是否含至少一个套餐 rental / 至少一个单品 rental）：
+      // 不能用 order.is_package——那是老流程遗留的订单级标量字段，新版接待流程从不写它，
+      // 恒为默认值 0，导致原来的「单」标签对所有新单都恒真、不反映真实内容。
+      // 真实的套餐/单品判定要落到每个 rental 上（Rental.isPackage = package_id != null），
+      // 一单可能同时含套餐和单品 rental，此时两个标签都显示。
+      var hasPackage = false, hasSingle = false
+      for (var pj = 0; order.rentals && pj < order.rentals.length; pj++) {
+        if (order.rentals[pj].isPackage) { hasPackage = true } else { hasSingle = true }
+      }
+      order._hasPackage = hasPackage
+      order._hasSingle = hasSingle
       for (var j = 0; order.rentals && j < order.rentals.length; j++) {
         var rental = order.rentals[j]
         if (rental.entertain) {
