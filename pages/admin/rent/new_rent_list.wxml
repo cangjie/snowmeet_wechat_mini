@@ -146,8 +146,6 @@
         <view class="tag-col">
           <text wx:if="{{item.is_test == 1}}" class="tag tag--test">测</text>
           <text wx:if="{{item.haveEntertain}}" class="tag tag--entertain">招</text>
-          <text wx:if="{{item._hasPackage}}" class="tag tag--package">套</text>
-          <text wx:if="{{item._hasSingle}}" class="tag tag--single">单</text>
           <text wx:if="{{item.haveOnCredit}}" class="tag tag--credit">挂</text>
           <text wx:if="{{item.haveDiscount}}" class="tag tag--discount">减</text>
           <text wx:if="{{item.useCard}}" class="tag tag--card">卡</text>
