@@ -6,31 +6,33 @@
     <text class="info-strip-text">在线购买 · 支付成功后次卡自动到账</text>
   </view>
 
-  <view class="card">
-    <view class="section-title">选择门店</view>
-    <shop-selector bindShopSelected="shopSelected"></shop-selector>
-  </view>
-
-  <view class="section-title section-title--pkg">选择次卡套餐</view>
-
   <view wx:if="{{loading}}" class="loading-state">加载中…</view>
   <block wx:else>
-    <view wx:if="{{products.length == 0}}" class="empty-state">暂无可购买的次卡商品</view>
-    <view class="pkg-list" wx:else>
-      <view class="pkg-card" wx:for="{{products}}" wx:key="id" bindtap="onCardTap" data-id="{{item.id}}">
-        <view class="pkg-hero">
-          <text class="pkg-hero-count">{{item.punch_total}}</text>
-          <text class="pkg-hero-unit">次</text>
-        </view>
-        <view class="pkg-body">
-          <view class="pkg-name">{{item.name}}</view>
-          <view class="pkg-shop-chip">{{item.shopLabel}}</view>
-          <view class="pkg-price-row">
-            <text class="pkg-price">{{item.priceStr}}</text>
-            <text wx:if="{{item.unitPriceStr}}" class="pkg-unit-price">约{{item.unitPriceStr}}/次</text>
+    <view class="feed-list">
+      <view class="feed-card" wx:for="{{items}}" wx:key="_key" data-index="{{index}}" bindtap="onCardTap">
+        <view class="feed-banner feed-banner--{{item.theme}}">
+          <text class="feed-banner-tag">{{item.bizType}}次卡</text>
+          <view class="feed-banner-count-row">
+            <block wx:if="{{item.isSeason}}">
+              <text class="feed-banner-count feed-banner-count--season">季卡</text>
+            </block>
+            <block wx:else>
+              <text class="feed-banner-count">{{item.punch_total}}</text>
+              <text class="feed-banner-unit">次</text>
+            </block>
           </view>
         </view>
-        <van-icon name="arrow" size="16px" color="#6f7881" />
+        <view class="feed-body">
+          <view class="feed-name">{{item.name}}</view>
+          <view class="feed-desc">{{item.desc}}</view>
+          <view class="feed-bottom-row">
+            <view class="feed-price-group">
+              <text class="feed-price">{{item.priceStr}}</text>
+              <text wx:if="{{item.unitPriceStr}}" class="feed-unit-price">约{{item.unitPriceStr}}/次</text>
+            </view>
+            <view class="feed-buy-btn" catchtap="onBuyTap" data-index="{{index}}">购买</view>
+          </view>
+        </view>
       </view>
     </view>
   </block>

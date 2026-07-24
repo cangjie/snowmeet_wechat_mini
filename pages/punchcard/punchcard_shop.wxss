@@ -38,116 +38,136 @@ page {
   color: #ffffff;
 }
 
-.card {
-  background: var(--surface-container-lowest);
-  border: 1px solid var(--outline-variant);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 4px;
-}
-
-.section-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--on-surface);
-  padding: 4px 0;
-}
-
-.section-title--pkg {
-  margin: 14px 2px 10px;
-}
-
-.loading-state,
-.empty-state {
+.loading-state {
   text-align: center;
   color: var(--on-surface-variant);
   font-size: 13px;
   padding: 60px 0;
 }
 
-.pkg-list {
+/* 信息流：仿公众号群发的横幅卡片列表 */
+.feed-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
-.pkg-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.feed-card {
   background: var(--surface-container-lowest);
   border: 1px solid var(--outline-variant);
   border-radius: 14px;
-  padding: 12px;
+  overflow: hidden;
 }
 
-.pkg-card:active {
-  background: var(--surface-container-low);
+.feed-card:active {
+  opacity: 0.94;
 }
 
-.pkg-hero {
-  flex-shrink: 0;
-  width: 68px;
-  height: 68px;
-  border-radius: 12px;
-  background: linear-gradient(145deg, var(--primary), var(--tertiary-container));
+/* 横幅（无真实商品图，用渐变色块 + 大字当"封面图"，不同卡种不同配色区分） */
+.feed-banner {
+  position: relative;
+  height: 96px;
+  padding: 14px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 
-.pkg-hero-count {
+.feed-banner--rent { background: linear-gradient(135deg, #006495, #21abef); }
+.feed-banner--rent-deep { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+.feed-banner--care { background: linear-gradient(135deg, #047857, #10b981); }
+.feed-banner--care-season { background: linear-gradient(135deg, #b45309, #f59e0b); }
+
+.feed-banner-tag {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.feed-banner-count-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.feed-banner-count {
   font-family: 'Lexend', sans-serif;
-  font-size: 22px;
+  font-size: 34px;
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.1;
+  line-height: 1;
 }
 
-.pkg-hero-unit {
-  font-size: 11px;
+.feed-banner-count--season {
+  font-size: 26px;
+}
+
+.feed-banner-unit {
+  font-size: 14px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85);
 }
 
-.pkg-body {
-  flex: 1;
-  min-width: 0;
+.feed-body {
+  padding: 12px 14px 14px;
 }
 
-.pkg-name {
-  font-size: 15.5px;
+.feed-name {
+  font-size: 16px;
   font-weight: 700;
   color: var(--on-surface);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
-.pkg-shop-chip {
-  display: inline-flex;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--surface-container-low);
+.feed-desc {
+  font-size: 12px;
   color: var(--on-surface-variant);
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 6px;
+  line-height: 1.5;
+  margin-bottom: 12px;
 }
 
-.pkg-price-row {
+.feed-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.feed-price-group {
   display: flex;
   align-items: baseline;
   gap: 6px;
+  min-width: 0;
 }
 
-.pkg-price {
+.feed-price {
   font-family: 'Lexend', sans-serif;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 800;
   color: var(--primary);
 }
 
-.pkg-unit-price {
+.feed-unit-price {
   font-size: 11px;
   color: var(--on-surface-variant);
+  white-space: nowrap;
+}
+
+.feed-buy-btn {
+  flex-shrink: 0;
+  padding: 8px 24px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.feed-buy-btn:active {
+  opacity: 0.85;
 }
