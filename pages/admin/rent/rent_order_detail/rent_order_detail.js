@@ -472,7 +472,20 @@ Page({
     // 押金基数封顶到「实际已收押金」：totalGuarantyAmount 只是订单配置的应收押金，
     // 未支付订单（paidAmount=0）押金尚未收取，无可退；用 min(配置押金, 已付金额) 避免给未付订单算出应退（order 71796）。
     var totalGuaranty = Math.min(order.totalGuarantyAmount || 0, order.paidAmount || 0)
-    order.totalRentNeedToRefundAmount = totalGuaranty - sumSummary + (order.depositPaidAmount || 0)
+    // 若本单卖出过次卡、且是"refund"方式结算的（memo 里不含"补差价"——现金/扫码补差价走的是
+    // 全新付款，跟押金无关，不需要这条修正）：这笔卡价已经从押金里被拿走当次卡销售款，不是
+    // "还没退的押金"，要跟总计租金一样从应退押金里扣掉。否则次卡结算的退款只退了
+    // (totalBenefit-价格)，剩下的"价格"那部分会在这之后被"正常退押金"流程当成还没退、再退一次
+    // （订单 71892 复现：押金0.06/租金0.02，买¥0.03次卡免租¥0.01，refund方式已退0.02，
+    // 若不扣，"应退押金"仍按 0.06-0.01=0.05 算，减去已退0.02，还会再冒出0.03可退）。
+    var punchCardDepositConsumed = 0
+    for (var pcdi = 0; order.retails && pcdi < order.retails.length; pcdi++) {
+      var rtd = order.retails[pcdi]
+      if (rtd.valid == 1 && rtd.product_id != null && (rtd.memo || '').indexOf('补差价') < 0) {
+        punchCardDepositConsumed += rtd.deal_price || 0
+      }
+    }
+    order.totalRentNeedToRefundAmount = totalGuaranty - sumSummary + (order.depositPaidAmount || 0) - punchCardDepositConsumed
     order.totalRentUnRefund = order.totalRentNeedToRefundAmount - (order.refundAmount || 0)
     // 储值付租金 / 次卡消费都是「勾选预览」：把被它们覆盖的租金加回「实际应退」（核销在「申请退款」时才落库）。
     // 叠加口径：储值付租金覆盖全部租金 → 加 sumSummary（次卡只是把其中雪板那部分换成次卡支付，押金移走总额仍是 sumSummary）；
