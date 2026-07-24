@@ -1,0 +1,78 @@
+<view class="page" wx:if="{{loading}}">
+  <view class="loading-state">加载中…</view>
+</view>
+
+<block wx:else>
+  <view class="page" wx:if="{{product}}">
+
+    <!-- 数字热区：无商品图，用真实次数当视觉主体 -->
+    <view class="hero">
+      <text class="hero-count">{{product.punch_total}}</text>
+      <text class="hero-unit">次</text>
+      <text class="hero-name">{{product.name}}</text>
+    </view>
+
+    <view class="price-row">
+      <text class="price-main">{{product.priceStr}}</text>
+      <text wx:if="{{product.unitPriceStr}}" class="price-unit">约{{product.unitPriceStr}}/次</text>
+    </view>
+
+    <view class="info-card">
+      <view class="info-card-title">套餐说明</view>
+      <view class="info-card-text">「{{product.name}}」共 {{product.punch_total}} 次，支付成功后自动存入「我的-次卡」</view>
+    </view>
+
+    <view class="info-card">
+      <view class="info-card-title">使用规则</view>
+      <view class="rule-row">
+        <van-icon name="completed" size="17px" color="#006495" />
+        <view class="rule-text">
+          <view class="rule-text-main">{{product.punch_total}} 次核销</view>
+          <view class="rule-text-sub">每次租用消耗 1 次，用完即止</view>
+        </view>
+      </view>
+      <view class="rule-row">
+        <van-icon name="clock-o" size="17px" color="#006495" />
+        <view class="rule-text">
+          <view class="rule-text-main">无使用期限</view>
+          <view class="rule-text-sub">购买后长期有效，不设失效日期</view>
+        </view>
+      </view>
+      <view class="rule-row">
+        <van-icon name="manager-o" size="17px" color="#006495" />
+        <view class="rule-text">
+          <view class="rule-text-main">本人专属</view>
+          <view class="rule-text-sub">仅限购买会员本人核销使用，不可转让</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="info-card">
+      <view class="info-card-title">适用门店</view>
+      <view class="shop-chip">
+        <van-icon name="location-o" size="14px" color="#3f4850" />
+        <text>{{product.shopLabel}}</text>
+      </view>
+    </view>
+
+    <view class="footer">
+      <view class="stepper">
+        <view class="stepper-btn stepper-btn--minus {{qty<=1 ? 'stepper-btn--disabled' : ''}}" bindtap="onQtyMinus">
+          <van-icon name="minus" size="15px" color="{{qty<=1 ? '#bfc7d1' : '#006495'}}" />
+        </view>
+        <text class="stepper-value">{{qty}}</text>
+        <view class="stepper-btn stepper-btn--plus {{qty>=9 ? 'stepper-btn--disabled' : ''}}" bindtap="onQtyPlus">
+          <van-icon name="plus" size="15px" color="#ffffff" />
+        </view>
+      </view>
+      <view class="footer-total">
+        <text class="footer-total-label">合计</text>
+        <text class="footer-total-value">{{totalStr}}</text>
+      </view>
+      <button class="buy-btn {{buying ? 'buy-btn--disabled' : ''}}" bindtap="onBuyNow">
+        {{buying ? '下单中…' : '立即购买'}}
+      </button>
+    </view>
+
+  </view>
+</block>

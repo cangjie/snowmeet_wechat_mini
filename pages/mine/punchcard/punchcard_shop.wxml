@@ -1,17 +1,38 @@
 <view class="page">
+
+  <!-- 真实信息条：只陈述系统实际会做的事，不写促销/优惠数字 -->
+  <view class="info-strip">
+    <van-icon name="shopping-cart-o" size="17px" color="#ffffff" />
+    <text class="info-strip-text">在线购买 · 支付成功后次卡自动到账</text>
+  </view>
+
   <view class="card">
     <view class="section-title">选择门店</view>
     <shop-selector bindShopSelected="shopSelected"></shop-selector>
   </view>
-  <view class="card">
-    <view class="section-title">次卡商品</view>
-    <view wx:if="{{products.length == 0}}" class="empty-tip">暂无可购买的次卡商品</view>
-    <view class="prod-row" wx:for="{{products}}" wx:key="id" bindtap="onBuyProduct" data-id="{{item.id}}">
-      <view class="prod-info">
-        <view class="prod-name">{{item.name}}</view>
-        <view class="prod-punch">{{item.punch_total}} 次</view>
+
+  <view class="section-title section-title--pkg">选择次卡套餐</view>
+
+  <view wx:if="{{loading}}" class="loading-state">加载中…</view>
+  <block wx:else>
+    <view wx:if="{{products.length == 0}}" class="empty-state">暂无可购买的次卡商品</view>
+    <view class="pkg-list" wx:else>
+      <view class="pkg-card" wx:for="{{products}}" wx:key="id" bindtap="onCardTap" data-id="{{item.id}}">
+        <view class="pkg-hero">
+          <text class="pkg-hero-count">{{item.punch_total}}</text>
+          <text class="pkg-hero-unit">次</text>
+        </view>
+        <view class="pkg-body">
+          <view class="pkg-name">{{item.name}}</view>
+          <view class="pkg-shop-chip">{{item.shopLabel}}</view>
+          <view class="pkg-price-row">
+            <text class="pkg-price">{{item.priceStr}}</text>
+            <text wx:if="{{item.unitPriceStr}}" class="pkg-unit-price">约{{item.unitPriceStr}}/次</text>
+          </view>
+        </view>
+        <van-icon name="arrow" size="16px" color="#6f7881" />
       </view>
-      <view class="prod-price">¥{{item.sale_price}}</view>
     </view>
-  </view>
+  </block>
+
 </view>

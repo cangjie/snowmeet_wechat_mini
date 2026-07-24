@@ -51,6 +51,7 @@
     "pages/mine/deposit/deposit_list",
     "pages/mine/punchcard/my_punchcards",
     "pages/mine/punchcard/punchcard_shop",
+    "pages/mine/punchcard/punchcard_detail",
     "pages/admin/deposit/deposit_list",
     "pages/admin/deposit/deposit_detail",
     "pages/admin/deposit/deposit_charge",
