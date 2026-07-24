@@ -31,12 +31,11 @@ Page({
         })
       }
       else{
-        var url = '../ski_pass/ski_pass_selector?resort=' + encodeURIComponent('万龙')
-        var staffId = options.staffId
-        url += staffId? ('&staffId=' + staffId) : ''
+        // 首页自动跳转目标：原来是雪票选购页 ski_pass_selector，现改为次卡销售首页
+        // punchcard_shop（该页不消费 resort/staffId 参数，故不再拼接）。雪票选购页本身
+        // 保留、未删除，仍可通过其它入口访问，只是不再是首页默认跳转目标。
         wx.redirectTo({
-          
-          url: url,
+          url: '/pages/punchcard/punchcard_shop',
         })
       }
     })

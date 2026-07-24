@@ -124,7 +124,7 @@ Page({
   },
   gotoPunchCards(){
     wx.navigateTo({
-      url: '/pages/mine/punchcard/my_punchcards',
+      url: '/pages/mine/my_punchcards',
     })
   },
   nav(e){

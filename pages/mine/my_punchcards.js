@@ -1,8 +1,8 @@
-// pages/mine/punchcard/my_punchcards.js
+// pages/mine/my_punchcards.js
 // 我的次卡：顾客自助会话，member_id 由服务端从 sessionKey 解析，不需要传参。
 var app = getApp()
-var util = require('../../../utils/util.js')
-var data = require('../../../utils/data.js')
+var util = require('../../utils/util.js')
+var data = require('../../utils/data.js')
 
 Page({
   data: {
@@ -33,6 +33,6 @@ Page({
   },
 
   onBuyCard() {
-    wx.navigateTo({ url: '/pages/mine/punchcard/punchcard_shop' })
+    wx.navigateTo({ url: '/pages/punchcard/punchcard_shop' })
   }
 })

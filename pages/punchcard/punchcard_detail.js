@@ -1,11 +1,11 @@
-// pages/mine/punchcard/punchcard_detail.js
+// pages/punchcard/punchcard_detail.js
 // 次卡详情页：从首页传来 id/shop，在 Rent/GetPunchCardProducts 结果里按 id 找到对应商品
 // （列表本来就短，不新建单条查询接口）；选份数 → 下单（product_id 相同的 N 条 retail 行）→
 // 跳通用结算页付款。支付成功后每条 retail 行各建一张 PunchCard（见后端 DealSuccessPaidOrder
 // 的"零售"分支），本页不需要额外处理发卡逻辑。
 var app = getApp()
-var util = require('../../../utils/util.js')
-var data = require('../../../utils/data.js')
+var util = require('../../utils/util.js')
+var data = require('../../utils/data.js')
 
 Page({
   data: {
