@@ -896,11 +896,11 @@
 
 /* ── 退款摘要 ─────────────────────────── */
 .refund-summary-grid {
-  display: flex; flex-wrap: nowrap; gap: 8rpx;
+  display: flex; flex-wrap: wrap; gap: 8rpx;
   margin-bottom: 16rpx;
 }
 .refund-summary-cell {
-  flex: 1;
+  flex: 1 1 30%;
   background: #F8F8F8; border-radius: 8rpx;
   padding: 8rpx 8rpx;
   min-width: 0;

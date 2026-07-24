@@ -443,6 +443,10 @@
           <view class="refund-summary-label">总计赔偿</view>
           <view class="refund-summary-value">{{order.totalRentRepairationAmountStr}}</view>
         </view>
+        <view class="refund-summary-cell">
+          <view class="refund-summary-label">总计消费</view>
+          <view class="refund-summary-value">{{order.totalConsumeAmountStr}}</view>
+        </view>
       </view>
 
       <view class="divider"></view>

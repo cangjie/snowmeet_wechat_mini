@@ -487,6 +487,10 @@ Page({
     }
     order.totalRentNeedToRefundAmount = totalGuaranty - sumSummary + (order.depositPaidAmount || 0) - punchCardDepositConsumed
     order.totalRentUnRefund = order.totalRentNeedToRefundAmount - (order.refundAmount || 0)
+    // 「总计消费」摘要格：暴露给店员看的就是上面用来扣应退押金的这同一个数，避免"格子显示的数"
+    // 和"实际扣掉的数"对不上
+    order.totalConsumeAmount = punchCardDepositConsumed
+    order.totalConsumeAmountStr = util.showAmount(punchCardDepositConsumed)
     // 储值付租金 / 次卡消费都是「勾选预览」：把被它们覆盖的租金加回「实际应退」（核销在「申请退款」时才落库）。
     // 叠加口径：储值付租金覆盖全部租金 → 加 sumSummary（次卡只是把其中雪板那部分换成次卡支付，押金移走总额仍是 sumSummary）；
     // 仅次卡 → 只加被次卡免除的雪板租金 freedRent（非雪板租金仍从押金扣）。
