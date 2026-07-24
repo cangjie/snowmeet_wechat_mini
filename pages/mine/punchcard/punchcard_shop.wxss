@@ -1,4 +1,20 @@
-@import "/pages/payment/settle/tokens.wxss";
+/* Alpine Operational Minimalist token 本地拷贝——不能 @import "/pages/payment/settle/tokens.wxss"，
+   那个文件在 app.json 的 subPackages（root: pages/payment）里，主包页面无法跨分包引用其资源，
+   同 recept_package.wxss/recept_new.wxss 的既有做法：各自内联一份同款变量 */
+page {
+  --surface: #f8f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container-high: #dce9ff;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #3f4850;
+  --outline: #6f7881;
+  --outline-variant: #bfc7d1;
+  --primary: #006495;
+  --on-primary: #ffffff;
+  --tertiary: #006591;
+  --tertiary-container: #21abef;
+}
 
 .page {
   min-height: 100vh;
