@@ -415,6 +415,23 @@
       </view>
     </block>
   </view>
+
+  <!-- ── Card 3.5: 零售信息（子订单）──────────
+       本单虽是"租赁"类型，但也可能挂着零售子订单（如退押金时顺带卖出的次卡，见
+       FinalizePunchCardSale/顾客自助购买）——跟"租赁信息"是并列的两类子订单，各自单独一张卡展示，
+       不塞进租赁信息或退款卡片里。仅当本单确实有零售子订单时才显示这张卡。 -->
+  <view class="card" wx:if="{{order._hasPunchCardSale}}">
+    <view class="section-title">零售信息 共{{order._punchCardSaleRetails.length}}项</view>
+    <view class="pc-sale-row" wx:for="{{order._punchCardSaleRetails}}" wx:key="id">
+      <view class="pc-sale-row-main">
+        <text class="pc-sale-name">{{item.productName}}</text>
+        <text class="pc-sale-price">{{item.dealPriceStr}}</text>
+      </view>
+      <view class="pc-sale-memo">{{item.memo}}</view>
+      <view class="pc-sale-date">{{item.createDateStr}}</view>
+    </view>
+  </view>
+
   <!-- ── Card 4: 退款 ─────────────────────── -->
   <view class="card">
     <view class="section-title" bindtap="onToggleRefund">
@@ -481,19 +498,6 @@
               <text wx:if="{{punchCardSelected || order.punchCardInfo.usedPunches > 0}}">✓</text>
             </view>
           </view>
-        </view>
-      </view>
-      <!-- 已售出的次卡（子订单）：本单曾经卖过次卡（不论是本次退押金顺带卖的，还是顾客自助买的），
-           就在这里展示这笔零售记录——名称/价格/核销与结算方式全部来自 memo（FinalizePunchCardSale 落库时写好）。 -->
-      <view wx:if="{{order._hasPunchCardSale}}" class="pc-sale-list">
-        <view class="pc-sale-list-title">次卡销售 · 消费 {{order._punchCardSaleTotalStr}}</view>
-        <view class="pc-sale-row" wx:for="{{order._punchCardSaleRetails}}" wx:key="id">
-          <view class="pc-sale-row-main">
-            <text class="pc-sale-name">{{item.productName}}</text>
-            <text class="pc-sale-price">{{item.dealPriceStr}}</text>
-          </view>
-          <view class="pc-sale-memo">{{item.memo}}</view>
-          <view class="pc-sale-date">{{item.createDateStr}}</view>
         </view>
       </view>
       <!-- 购买次卡（退押金推荐购买）：与「次卡消费」/「储值付租金」互斥，三者同时跑会冲突（都要动同一批租金天数）；
