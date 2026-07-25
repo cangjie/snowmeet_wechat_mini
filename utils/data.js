@@ -1003,10 +1003,12 @@ const useRentalPunchCardPromise = function (orderId, body, sessionKey) {
     })
   })
 }
-// 购买次卡：商品目录（会话级，退押金卖卡弹窗 + 顾客自助购买页共用）
-const getPunchCardProductsPromise = function (shop, sessionKey) {
+// 购买次卡：商品目录（会话级，退押金卖卡弹窗 + 顾客自助购买页共用）。bizType 不传时后端默认"租赁"，
+// 现有调用方（退押金卖卡弹窗/次卡详情页）行为不变；首页会显式传"租赁"/"养护"分别取两类卡。
+const getPunchCardProductsPromise = function (shop, sessionKey, bizType) {
   var url = app.globalData.requestPrefix + 'Rent/GetPunchCardProducts?sessionKey=' + sessionKey
   if (shop != null) { url += '&shop=' + encodeURIComponent(shop) }
+  if (bizType != null) { url += '&bizType=' + encodeURIComponent(bizType) }
   return util.performWebRequest(url, null)
 }
 // 次卡商品管理（店长/管理员）：不过滤 valid/on_shelves 的全量列表
