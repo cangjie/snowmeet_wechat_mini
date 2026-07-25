@@ -1,19 +1,29 @@
 // pages/admin/rent/punchcard_products/punchcard_products.js
-// 次卡商品管理（店长/管理员 title_level≥200）：管理"租赁/次卡"分类下的商品行——
-// 名称/价格/次数/上下架/店铺。列表用专用只读接口 Rent/GetAllPunchCardProducts；
-// 新增/编辑复用通用商品目录现成的 Category/AddProduct、Category/ModProduct（不新造后端）。
-// 商品的权威识别方式是 category_code（关联 category.code，人工维护、不随 category_id 自增变化），
-// 不再是 type 字符串——本页新建/编辑时通过 Rent/GetPunchCardCategoryCode 拿到当前应该写入的
-// category_code，随表单一起提交。
+// 次卡/季卡商品管理（店长/管理员 title_level≥200）：管理 养护/租赁 × 次卡/季卡 4 种组合下的商品行——
+// 名称/价格/图片/简介/次数（季卡不需要次数）/上下架/店铺。列表用 Rent/GetAllPunchCardProducts（不传
+// bizType/cardType 时一次拿全部 4 组合）；新增/编辑跳转到详情维护页 punchcard_product_detail，
+// 那边负责图片上传 + 富文本简介编辑，弹窗表单装不下这些，本页只保留列表 + 筛选 + 跳转入口。
 var app = getApp()
-var util = require('../../../../utils/util.js')
 var data = require('../../../../utils/data.js')
+
+var BIZ_TYPES = ['养护', '租赁']
+var CARD_TYPES = ['次卡', '季卡']
+var ADD_COMBOS = []
+BIZ_TYPES.forEach(function (bizType) {
+  CARD_TYPES.forEach(function (cardType) {
+    ADD_COMBOS.push({ bizType: bizType, cardType: cardType, label: '+ ' + bizType + cardType })
+  })
+})
 
 Page({
   data: {
     products: [],
-    categoryCode: null,
-    modal: { show: false, id: 0, name: '', sale_price: '', punch_total: '', shop: '', on_shelves: true }
+    filteredProducts: [],
+    filterBizType: '',
+    filterCardType: '',
+    bizTypes: BIZ_TYPES,
+    cardTypes: CARD_TYPES,
+    addCombos: ADD_COMBOS
   },
 
   onShow() {
@@ -26,19 +36,6 @@ Page({
         return
       }
       that.getData()
-      that._loadCategoryCode()
-    })
-  },
-
-  // 找不到"租赁/次卡"分类行（或没设置 code）时，新建/编辑会被 onModalConfirm 拦下，
-  // 提示先去分类管理把这一行建好——不能在缺 code 的情况下保存商品，否则这商品会永远匹配不到、
-  // 对顾客/店员都不可见。
-  _loadCategoryCode() {
-    var that = this
-    data.getPunchCardCategoryCodePromise(app.globalData.sessionKey).then(function (res) {
-      that.setData({ categoryCode: (res && res.categoryCode) || null })
-    }).catch(function () {
-      that.setData({ categoryCode: null })
     })
   },
 
@@ -46,69 +43,52 @@ Page({
     var that = this
     data.getAllPunchCardProductsPromise(app.globalData.sessionKey).then(function (products) {
       that.setData({ products: products || [] })
+      that.applyFilter()
     })
   },
 
-  onAdd() {
-    this.setData({ modal: { show: true, id: 0, name: '', sale_price: '', punch_total: '', shop: '', on_shelves: true } })
+  applyFilter() {
+    var that = this
+    var bizType = that.data.filterBizType
+    var cardType = that.data.filterCardType
+    var filtered = that.data.products.filter(function (p) {
+      if (bizType && p.bizType != bizType) { return false }
+      if (cardType && p.cardType != cardType) { return false }
+      return true
+    }).map(function (p) {
+      var countText = p.cardType == '次卡' ? ((p.punch_total || 0) + ' 次') : '不限次数'
+      return Object.assign({}, p, { countText: countText })
+    })
+    that.setData({ filteredProducts: filtered })
+  },
+
+  onFilterBizType(e) {
+    var value = e.currentTarget.dataset.value
+    var that = this
+    that.setData({ filterBizType: that.data.filterBizType == value ? '' : value })
+    that.applyFilter()
+  },
+
+  onFilterCardType(e) {
+    var value = e.currentTarget.dataset.value
+    var that = this
+    that.setData({ filterCardType: that.data.filterCardType == value ? '' : value })
+    that.applyFilter()
+  },
+
+  onAdd(e) {
+    var bizType = e.currentTarget.dataset.biztype
+    var cardType = e.currentTarget.dataset.cardtype
+    wx.navigateTo({
+      url: 'punchcard_product_detail/punchcard_product_detail?id=0&bizType=' + encodeURIComponent(bizType)
+        + '&cardType=' + encodeURIComponent(cardType)
+    })
   },
 
   onEdit(e) {
-    var id = parseInt(e.currentTarget.dataset.id, 10)
-    var p = null
-    for (var i = 0; i < this.data.products.length; i++) { if (this.data.products[i].id == id) { p = this.data.products[i]; break } }
-    if (!p) return
-    this.setData({
-      modal: {
-        show: true, id: p.id, name: p.name, sale_price: String(p.sale_price),
-        punch_total: String(p.punch_total), shop: p.shop || '', on_shelves: !!p.on_shelves
-      }
-    })
-  },
-
-  onModalCancel() {
-    this.setData({ 'modal.show': false })
-  },
-
-  onNameInput(e) { this.setData({ 'modal.name': e.detail.value }) },
-  onPriceInput(e) { this.setData({ 'modal.sale_price': e.detail.value }) },
-  onPunchTotalInput(e) { this.setData({ 'modal.punch_total': e.detail.value }) },
-  onShopInput(e) { this.setData({ 'modal.shop': e.detail.value }) },
-  onToggleOnShelves() { this.setData({ 'modal.on_shelves': !this.data.modal.on_shelves }) },
-
-  onModalConfirm() {
-    var that = this
-    var m = that.data.modal
-    var name = (m.name || '').trim()
-    var price = parseFloat(m.sale_price)
-    var punchTotal = parseInt(m.punch_total, 10)
-    if (!name) { wx.showToast({ title: '请输入名称', icon: 'none' }); return }
-    if (isNaN(price) || price <= 0) { wx.showToast({ title: '请输入有效价格', icon: 'none' }); return }
-    if (isNaN(punchTotal) || punchTotal <= 0) { wx.showToast({ title: '请输入有效次数', icon: 'none' }); return }
-    if (!that.data.categoryCode) {
-      wx.showToast({ title: '未找到「租赁/次卡」分类，请先联系管理员建好该分类', icon: 'none' })
-      return
-    }
-    var product = {
-      id: m.id || 0,
-      category_id: null,
-      category_code: that.data.categoryCode,
-      shop_id: null,
-      name: name,
-      sale_price: price,
-      type: '租赁次卡',
-      shop: (m.shop || '').trim() || null,
-      hidden: 0,
-      valid: 1,
-      on_shelves: m.on_shelves ? 1 : 0,
-      punch_total: punchTotal
-    }
-    var promise = m.id ? data.modPunchCardProductPromise(product, app.globalData.sessionKey)
-      : data.addPunchCardProductPromise(product, app.globalData.sessionKey)
-    promise.then(function () {
-      wx.showToast({ title: '保存成功', icon: 'success' })
-      that.setData({ 'modal.show': false })
-      that.getData()
+    var id = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: 'punchcard_product_detail/punchcard_product_detail?id=' + id
     })
   }
 })

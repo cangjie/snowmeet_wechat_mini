@@ -1,0 +1,74 @@
+<block wx:if="{{dataLoaded}}">
+  <mp-cells title="基本信息">
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">类型：</view>
+        <view class="right-column">{{bizType}}{{cardType}}</view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">名称：</view>
+        <view class="right-column">
+          <input class="input" value="{{name}}" bindinput="onNameInput" placeholder="如：双板季前次卡" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">价格：</view>
+        <view class="right-column">
+          <input class="input" type="digit" value="{{sale_price}}" bindinput="onPriceInput" placeholder="0.00" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell wx:if="{{cardType == '次卡'}}">
+      <view class="view-row">
+        <view class="left-column">次数：</view>
+        <view class="right-column">
+          <input class="input" type="number" value="{{punch_total}}" bindinput="onPunchTotalInput" placeholder="0" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">限定店铺：</view>
+        <view class="right-column">
+          <input class="input" value="{{shop}}" bindinput="onShopInput" placeholder="留空=不限店铺" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row">
+        <view class="left-column">上架销售：</view>
+        <view class="right-column">
+          <switch checked="{{on_shelves}}" bindchange="onToggleOnShelves"></switch>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+
+  <mp-cells title="商品图片">
+    <mp-cell>
+      <multi-uploader image_count="1" title="商品图片（1 张）" uploaded_files="{{imageUrl}}" bindUploaded="onImageUploaded"></multi-uploader>
+    </mp-cell>
+  </mp-cells>
+
+  <mp-cells title="简介">
+    <mp-cell>
+      <editor id="editor" class="ql-container" bindstatuschange="onEditorStatusChange" bindready="onEditorReady" bindinput="onEditorInput"></editor>
+    </mp-cell>
+  </mp-cells>
+  <view class="toolbar" catchtouchend="format">
+    <text class="tool-item {{formats.bold ? 'tool-item--on' : ''}}" data-name="bold">加粗</text>
+    <text class="tool-item {{formats.italic ? 'tool-item--on' : ''}}" data-name="italic">斜体</text>
+    <text class="tool-item {{formats.underline ? 'tool-item--on' : ''}}" data-name="underline">下划线</text>
+    <text class="tool-item {{formats.list === 'ordered' ? 'tool-item--on' : ''}}" data-name="list" data-value="ordered">有序列表</text>
+    <text class="tool-item {{formats.list === 'bullet' ? 'tool-item--on' : ''}}" data-name="list" data-value="bullet">无序列表</text>
+  </view>
+
+  <view class="save-bar">
+    <button class="save-btn" loading="{{saving}}" disabled="{{saving}}" bindtap="onSave">保 存</button>
+  </view>
+  <view style="height: 60rpx;"></view>
+</block>

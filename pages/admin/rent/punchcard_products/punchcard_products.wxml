@@ -1,45 +1,36 @@
 <view class="page">
   <view class="card">
-    <view class="section-title">次卡商品</view>
-    <view wx:if="{{products.length == 0}}" class="empty-tip">暂无次卡商品</view>
-    <view class="prod-row" wx:for="{{products}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+    <view class="section-title">筛选</view>
+    <view class="filter-row">
+      <view class="filter-chip {{filterBizType == '' ? 'filter-chip--on' : ''}}" bindtap="onFilterBizType" data-value="">全部业务</view>
+      <view class="filter-chip {{filterBizType == item ? 'filter-chip--on' : ''}}" wx:for="{{bizTypes}}" wx:key="*this" bindtap="onFilterBizType" data-value="{{item}}">{{item}}</view>
+    </view>
+    <view class="filter-row">
+      <view class="filter-chip {{filterCardType == '' ? 'filter-chip--on' : ''}}" bindtap="onFilterCardType" data-value="">全部卡类</view>
+      <view class="filter-chip {{filterCardType == item ? 'filter-chip--on' : ''}}" wx:for="{{cardTypes}}" wx:key="*this" bindtap="onFilterCardType" data-value="{{item}}">{{item}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">商品列表</view>
+    <view wx:if="{{filteredProducts.length == 0}}" class="empty-tip">暂无商品</view>
+    <view class="prod-row" wx:for="{{filteredProducts}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+      <image wx:if="{{item.imageUrl}}" class="prod-thumb" src="{{item.imageUrl}}" mode="aspectFill"></image>
+      <view wx:else class="prod-thumb prod-thumb--empty">无图</view>
       <view class="prod-info">
         <view class="prod-name">{{item.name}}<text wx:if="{{!item.on_shelves}}" class="prod-tag--off">已下架</text></view>
-        <view class="prod-sub">{{item.punch_total}} 次 · ¥{{item.sale_price}}{{item.shop ? (' · ' + item.shop) : ''}}</view>
+        <view class="prod-sub">
+          <text class="prod-tag">{{item.bizType}}{{item.cardType}}</text>
+          {{item.countText}} · ¥{{item.sale_price}}{{item.shop ? (' · ' + item.shop) : ''}}
+        </view>
       </view>
     </view>
   </view>
-  <view class="add-btn" bindtap="onAdd">+ 新增次卡商品</view>
-</view>
 
-<view wx:if="{{modal.show}}" class="dc-mask" bindtap="onModalCancel" catchtouchmove="noop">
-  <view class="dc-card" catchtap="noop">
-    <view class="dc-title">{{modal.id ? '编辑次卡商品' : '新增次卡商品'}}</view>
-    <view class="dc-field">
-      <text class="dc-label">名称</text>
-      <input class="dc-input" value="{{modal.name}}" bindinput="onNameInput" placeholder="如：双板季前次卡" />
-    </view>
-    <view class="dc-field">
-      <text class="dc-label">价格</text>
-      <input class="dc-input" type="digit" value="{{modal.sale_price}}" bindinput="onPriceInput" placeholder="0.00" />
-    </view>
-    <view class="dc-field">
-      <text class="dc-label">次数</text>
-      <input class="dc-input" type="number" value="{{modal.punch_total}}" bindinput="onPunchTotalInput" placeholder="0" />
-    </view>
-    <view class="dc-field">
-      <text class="dc-label">限定店铺</text>
-      <input class="dc-input" value="{{modal.shop}}" bindinput="onShopInput" placeholder="留空=不限店铺" />
-    </view>
-    <view class="dc-field" bindtap="onToggleOnShelves">
-      <text class="dc-label">上架销售</text>
-      <view class="shelves-toggle {{modal.on_shelves ? 'shelves-toggle--on' : ''}}">
-        <text wx:if="{{modal.on_shelves}}">✓</text>
-      </view>
-    </view>
-    <view class="dc-actions">
-      <view class="dc-btn dc-btn--cancel" bindtap="onModalCancel">取消</view>
-      <view class="dc-btn dc-btn--confirm" bindtap="onModalConfirm">保存</view>
+  <view class="card">
+    <view class="section-title">新增商品</view>
+    <view class="add-grid">
+      <view class="add-btn" wx:for="{{addCombos}}" wx:key="label" bindtap="onAdd" data-biztype="{{item.bizType}}" data-cardtype="{{item.cardType}}">{{item.label}}</view>
     </view>
   </view>
 </view>

@@ -1011,17 +1011,22 @@ const getPunchCardProductsPromise = function (shop, sessionKey, bizType) {
   if (bizType != null) { url += '&bizType=' + encodeURIComponent(bizType) }
   return util.performWebRequest(url, null)
 }
-// 次卡商品管理（店长/管理员）：不过滤 valid/on_shelves 的全量列表
-const getAllPunchCardProductsPromise = function (sessionKey) {
+// 次卡/季卡商品管理（店长/管理员）：不过滤 valid/on_shelves 的全量列表。
+// bizType/cardType 都不传时返回 养护/租赁 × 次卡/季卡 4 种组合的合并列表（每行带 bizType/cardType）。
+const getAllPunchCardProductsPromise = function (sessionKey, bizType, cardType) {
   var url = app.globalData.requestPrefix + 'Rent/GetAllPunchCardProducts?sessionKey=' + sessionKey
+  if (bizType != null) { url += '&bizType=' + encodeURIComponent(bizType) }
+  if (cardType != null) { url += '&cardType=' + encodeURIComponent(cardType) }
   return util.performWebRequest(url, null)
 }
-// 次卡商品管理页新建/编辑时用来回填 category_code（该分类当前稳定的 code 值）
-const getPunchCardCategoryCodePromise = function (sessionKey) {
+// 次卡/季卡商品管理页新建时用来回填 category_code（该分类当前稳定的 code 值，找不到会自动创建）
+const getPunchCardCategoryCodePromise = function (sessionKey, bizType, cardType) {
   var url = app.globalData.requestPrefix + 'Rent/GetPunchCardCategoryCode?sessionKey=' + sessionKey
+  if (bizType != null) { url += '&bizType=' + encodeURIComponent(bizType) }
+  if (cardType != null) { url += '&cardType=' + encodeURIComponent(cardType) }
   return util.performWebRequest(url, null)
 }
-// 次卡商品管理：新增/编辑，复用通用商品目录的 Category/AddProduct、Category/ModProduct
+// 次卡/季卡商品管理：新增/编辑，复用通用商品目录的 Category/AddProduct、Category/ModProduct
 const addPunchCardProductPromise = function (product, sessionKey) {
   var url = app.globalData.requestPrefix + 'Category/AddProduct?sessionKey=' + sessionKey
   return util.performWebRequest(url, product)
@@ -1029,6 +1034,11 @@ const addPunchCardProductPromise = function (product, sessionKey) {
 const modPunchCardProductPromise = function (product, sessionKey) {
   var url = app.globalData.requestPrefix + 'Category/ModProduct?sessionKey=' + sessionKey
   return util.performWebRequest(url, product)
+}
+// 商品详情（通用商品目录，含 images/properties/category），次卡/季卡商品维护详情页编辑态用来回填
+const getProductPromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Category/GetProduct/' + id + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
 }
 // 购买次卡：我的次卡列表（顾客自助会话，member_id 由服务端从 sessionKey 解析）
 const getMyPunchCardsPromise = function (sessionKey) {
@@ -1483,6 +1493,7 @@ module.exports = {
   getPunchCardCategoryCodePromise,
   addPunchCardProductPromise,
   modPunchCardProductPromise,
+  getProductPromise,
   getMyPunchCardsPromise,
   preparePunchCardSalePromise,
   startPunchCardSaleQrPromise,

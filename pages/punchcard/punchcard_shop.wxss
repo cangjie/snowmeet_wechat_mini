@@ -22,22 +22,6 @@ page {
   box-sizing: border-box;
 }
 
-.info-strip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  margin-bottom: 14px;
-  background: linear-gradient(120deg, var(--primary), var(--tertiary));
-}
-
-.info-strip-text {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
 .loading-state {
   text-align: center;
   color: var(--on-surface-variant);

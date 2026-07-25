@@ -1,12 +1,7 @@
 <view class="page">
 
-  <!-- 真实信息条：只陈述系统实际会做的事，不写促销/优惠数字 -->
-  <view class="info-strip">
-    <van-icon name="shopping-cart-o" size="17px" color="#ffffff" />
-    <text class="info-strip-text">在线购买 · 支付成功后次卡自动到账</text>
-  </view>
-
   <view wx:if="{{loading}}" class="loading-state">加载中…</view>
+  <view wx:elif="{{items.length == 0}}" class="loading-state">暂无可购买的次卡</view>
   <block wx:else>
     <view class="feed-list">
       <view class="feed-card" wx:for="{{items}}" wx:key="_key" data-index="{{index}}" bindtap="onCardTap">

@@ -1,0 +1,19 @@
+page { background: #f6f7f9; }
+
+.ql-container {
+  width: 100%; min-height: 300rpx; box-sizing: border-box; padding: 16rpx;
+}
+
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 12rpx;
+  padding: 16rpx 24rpx; background: #fff; margin-top: -20rpx; margin-bottom: 20rpx;
+}
+.tool-item {
+  font-size: 24rpx; color: #666; background: #f2f3f5;
+  border-radius: 8rpx; padding: 8rpx 20rpx;
+}
+.tool-item--on { background: #2EA6D0; color: #fff; }
+
+.save-bar { padding: 24rpx; }
+.save-btn { background: #2EA6D0; color: #fff; font-size: 30rpx; }
+.save-btn:active { opacity: 0.85; }
