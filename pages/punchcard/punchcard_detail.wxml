@@ -33,29 +33,33 @@
       <view wx:else class="info-card-text">「{{product.name}}」{{product.countLabel}}，支付成功后自动存入「我的-次卡」</view>
     </view>
 
+    <!-- 使用规则：后台商品维护页编了就整段渲染它；没编则回退下面这套默认规则（存量商品不至于空白） -->
     <view class="info-card">
       <view class="info-card-title">使用规则</view>
-      <view class="rule-row">
-        <van-icon name="completed" size="17px" color="#006495" />
-        <view class="rule-text">
-          <view class="rule-text-main">{{product.usageMain}}</view>
-          <view class="rule-text-sub">{{product.usageSub}}</view>
+      <rich-text wx:if="{{product.usageRules}}" class="info-card-rich" nodes="{{product.usageRules}}" />
+      <block wx:else>
+        <view class="rule-row">
+          <van-icon name="completed" size="17px" color="#006495" />
+          <view class="rule-text">
+            <view class="rule-text-main">{{product.usageMain}}</view>
+            <view class="rule-text-sub">{{product.usageSub}}</view>
+          </view>
         </view>
-      </view>
-      <view class="rule-row">
-        <van-icon name="clock-o" size="17px" color="#006495" />
-        <view class="rule-text">
-          <view class="rule-text-main">无使用期限</view>
-          <view class="rule-text-sub">购买后长期有效，不设失效日期</view>
+        <view class="rule-row">
+          <van-icon name="clock-o" size="17px" color="#006495" />
+          <view class="rule-text">
+            <view class="rule-text-main">无使用期限</view>
+            <view class="rule-text-sub">购买后长期有效，不设失效日期</view>
+          </view>
         </view>
-      </view>
-      <view class="rule-row">
-        <van-icon name="manager-o" size="17px" color="#006495" />
-        <view class="rule-text">
-          <view class="rule-text-main">本人专属</view>
-          <view class="rule-text-sub">仅限购买会员本人核销使用，不可转让</view>
+        <view class="rule-row">
+          <van-icon name="manager-o" size="17px" color="#006495" />
+          <view class="rule-text">
+            <view class="rule-text-main">本人专属</view>
+            <view class="rule-text-sub">仅限购买会员本人核销使用，不可转让</view>
+          </view>
         </view>
-      </view>
+      </block>
     </view>
 
     <view class="info-card">

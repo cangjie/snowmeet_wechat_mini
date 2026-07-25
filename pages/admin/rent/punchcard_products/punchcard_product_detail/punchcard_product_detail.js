@@ -23,8 +23,10 @@ Page({
     on_shelves: true,
     imageId: 0,
     imageUrl: '',
-    html: '',
+    html: '',            // 简介（富文本）：顾客端首页取它的纯文本摘要、详情页整段渲染
     formats: {},
+    rulesHtml: '',       // 使用规则（富文本）：顾客端详情页「使用规则」卡片；留空则显示默认规则
+    rulesFormats: {},
     saving: false
   },
 
@@ -75,6 +77,7 @@ Page({
       var imgList = product.availableImages || product.images || []
       var img = imgList.length > 0 ? imgList[0] : null
       var html = product.content || ''
+      var rulesHtml = product.usage_rules || ''
       that.setData({
         name: product.name || '',
         sale_price: product.sale_price != null ? String(product.sale_price) : '',
@@ -85,14 +88,20 @@ Page({
         bizType: bizType,
         cardType: cardType,
         html: html,
+        rulesHtml: rulesHtml,
         imageId: img ? img.id : 0,
         imageUrl: img ? img.imageUrl || img.image_url : '',
         dataLoaded: true,
         pageTitle: '编辑' + bizType + cardType
       })
       wx.setNavigationBarTitle({ title: '编辑' + bizType + cardType })
+      // 两个 editor 的 ready 与拉数据是并发的：谁先到都得能把内容填进去，
+      // 所以这里拿到数据补一次、ready 回调里再按 data 补一次
       if (that.editorCtx) {
         that.editorCtx.setContents({ html: html })
+      }
+      if (that.rulesEditorCtx) {
+        that.rulesEditorCtx.setContents({ html: rulesHtml })
       }
     }).catch(function () {
       // 不 catch 的话 dataLoaded 永远是 false，页面就是一片空白、没有任何提示
@@ -129,11 +138,32 @@ Page({
   onEditorStatusChange(e) {
     this.setData({ formats: e.detail })
   },
+
+  onRulesReady() {
+    var that = this
+    wx.createSelectorQuery().select('#editorRules').context(function (res) {
+      that.rulesEditorCtx = res.context
+      if (that.data.rulesHtml) {
+        that.rulesEditorCtx.setContents({ html: that.data.rulesHtml })
+      }
+    }).exec()
+  },
+  onRulesInput(e) {
+    this.setData({ rulesHtml: e.detail.html })
+  },
+  onRulesStatusChange(e) {
+    this.setData({ rulesFormats: e.detail })
+  },
+
+  // 两个编辑器共用这一个工具条 handler：目标由工具条容器上的 data-target 决定
+  // （data-name/data-value 在被点的按钮上 → e.target；data-target 在绑定事件的容器上 → e.currentTarget）
   format(e) {
     var name = e.target.dataset.name
     var value = e.target.dataset.value
-    if (!name || !this.editorCtx) { return }
-    this.editorCtx.format(name, value)
+    if (!name) { return }
+    var ctx = e.currentTarget.dataset.target == 'rules' ? this.rulesEditorCtx : this.editorCtx
+    if (!ctx) { return }
+    ctx.format(name, value)
   },
 
   onSave() {
@@ -187,6 +217,7 @@ Page({
       on_shelves: that.data.on_shelves ? 1 : 0,
       punch_total: punchTotal,
       content: that.data.html || '',
+      usage_rules: that.data.rulesHtml || '',
       images: images,
       properties: []
     }

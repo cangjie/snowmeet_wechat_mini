@@ -37,14 +37,26 @@
     </view>
 
     <view class="section">
-      <view class="shead"><text class="st">简介</text></view>
+      <view class="shead"><text class="st">简介</text><text class="sd">顾客端首页卡片取它的纯文本摘要</text></view>
       <editor id="editor" class="editor" bindstatuschange="onEditorStatusChange" bindready="onEditorReady" bindinput="onEditorInput"></editor>
-      <view class="toolbar" catchtouchend="format">
+      <view class="toolbar" catchtouchend="format" data-target="intro">
         <view class="tool-item {{formats.bold ? 'tool-item--on' : ''}}" data-name="bold">加粗</view>
         <view class="tool-item {{formats.italic ? 'tool-item--on' : ''}}" data-name="italic">斜体</view>
         <view class="tool-item {{formats.underline ? 'tool-item--on' : ''}}" data-name="underline">下划线</view>
         <view class="tool-item {{formats.list === 'ordered' ? 'tool-item--on' : ''}}" data-name="list" data-value="ordered">有序列表</view>
         <view class="tool-item {{formats.list === 'bullet' ? 'tool-item--on' : ''}}" data-name="list" data-value="bullet">无序列表</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="shead"><text class="st">使用规则</text><text class="sd">留空则顾客端显示默认规则</text></view>
+      <editor id="editorRules" class="editor" bindstatuschange="onRulesStatusChange" bindready="onRulesReady" bindinput="onRulesInput"></editor>
+      <view class="toolbar" catchtouchend="format" data-target="rules">
+        <view class="tool-item {{rulesFormats.bold ? 'tool-item--on' : ''}}" data-name="bold">加粗</view>
+        <view class="tool-item {{rulesFormats.italic ? 'tool-item--on' : ''}}" data-name="italic">斜体</view>
+        <view class="tool-item {{rulesFormats.underline ? 'tool-item--on' : ''}}" data-name="underline">下划线</view>
+        <view class="tool-item {{rulesFormats.list === 'ordered' ? 'tool-item--on' : ''}}" data-name="list" data-value="ordered">有序列表</view>
+        <view class="tool-item {{rulesFormats.list === 'bullet' ? 'tool-item--on' : ''}}" data-name="list" data-value="bullet">无序列表</view>
       </view>
     </view>
 

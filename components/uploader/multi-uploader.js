@@ -82,18 +82,39 @@ Component({
             name: 'file',
             url: uploadUrl,
             success: (res)=>{
+              // wx.uploadFile 的 success 对任何 HTTP 状态码都会触发（400/401/500 也进这里）。
+              // 不判 statusCode 的话，错误响应体（JSON/HTML）会被当成文件路径拼进 URL 存库，
+              // 上传界面看着成功、库里存的却是垃圾地址，顾客端 <image> 只能显示空白。
+              if (res.statusCode < 200 || res.statusCode >= 300) {
+                console.error('multi-uploader 上传失败', res.statusCode, res.data)
+                wx.showToast({ title: '图片上传失败', icon: 'none' })
+                return
+              }
               var filesData = this.data.files
               //var filesData = [{url: 'http://mini.luqinwenda.com/upload/1596954732.jpg'}]
               var uploadFilesData = res.data.split(',')
+              var added = 0
               for(var i = 0; i < uploadFilesData.length; i++) {
-                filesData.push({url: 'https://' + app.globalData.domainName + uploadFilesData[i]})
+                var path = (uploadFilesData[i] || '').trim()
+                // 正常返回的是以 / 开头的站内相对路径；不是这个形状就说明拿到的不是上传结果，别往库里存
+                if (path.charAt(0) != '/') {
+                  console.error('multi-uploader 返回值不是文件路径', uploadFilesData[i])
+                  continue
+                }
+                filesData.push({url: 'https://' + app.globalData.domainName + path})
+                added++
+              }
+              if (added == 0) {
+                wx.showToast({ title: '图片上传失败', icon: 'none' })
+                return
               }
               this.setData({files: filesData})
               this.triggerEvent('Uploaded', {files: filesData}, "100")
               console.log(res)
             },
             fail: (res)=>{
-              console.log(res)
+              console.error('multi-uploader 上传失败', res)
+              wx.showToast({ title: '图片上传失败', icon: 'none' })
             }
           })
         }
