@@ -52,7 +52,17 @@
 
 .pcard-row:last-child { border-bottom: none; }
 
-.pcard-name { color: #1a1a1a; }
+.pcard-name { color: #1a1a1a; display: flex; align-items: center; gap: 10rpx; }
+/* 租赁卡/养护卡混在一个列表里，靠角标区分（顾客自助两种卡都能买） */
+.pcard-biz {
+  font-size: 20rpx;
+  line-height: 1;
+  padding: 6rpx 10rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+}
+.pcard-biz--rent { background: #e3f2fb; color: #006495; }
+.pcard-biz--care { background: #e3f6ee; color: #047857; }
 .pcard-remain { color: #2EA6D0; font-weight: 600; }
 
 .buy-btn {

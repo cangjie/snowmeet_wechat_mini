@@ -5,10 +5,19 @@
 <block wx:else>
   <view class="page" wx:if="{{product}}">
 
-    <!-- 数字热区：无商品图，用真实次数当视觉主体 -->
-    <view class="hero">
-      <text class="hero-count">{{product.punch_total}}</text>
-      <text class="hero-unit">次</text>
+    <!-- 配了商品图就用图，没配图退回"数字热区"（用真实次数当视觉主体） -->
+    <view wx:if="{{product.imageUrl}}" class="hero hero--image">
+      <image class="hero-img" src="{{product.imageUrl}}" mode="aspectFill" />
+      <text class="hero-name hero-name--onimage">{{product.name}}</text>
+    </view>
+    <view wx:else class="hero">
+      <block wx:if="{{product.isSeason}}">
+        <text class="hero-count hero-count--season">季卡</text>
+      </block>
+      <block wx:else>
+        <text class="hero-count">{{product.punch_total}}</text>
+        <text class="hero-unit">次</text>
+      </block>
       <text class="hero-name">{{product.name}}</text>
     </view>
 
@@ -17,9 +26,11 @@
       <text wx:if="{{product.unitPriceStr}}" class="price-unit">约{{product.unitPriceStr}}/次</text>
     </view>
 
+    <!-- 商品简介：后台商品维护页编的富文本原文，有就整段渲染；没编简介时退回一句自动生成的说明 -->
     <view class="info-card">
-      <view class="info-card-title">套餐说明</view>
-      <view class="info-card-text">「{{product.name}}」共 {{product.punch_total}} 次，支付成功后自动存入「我的-次卡」</view>
+      <view class="info-card-title">商品简介</view>
+      <rich-text wx:if="{{product.content}}" class="info-card-rich" nodes="{{product.content}}" />
+      <view wx:else class="info-card-text">「{{product.name}}」{{product.countLabel}}，支付成功后自动存入「我的-次卡」</view>
     </view>
 
     <view class="info-card">
@@ -27,8 +38,8 @@
       <view class="rule-row">
         <van-icon name="completed" size="17px" color="#006495" />
         <view class="rule-text">
-          <view class="rule-text-main">{{product.punch_total}} 次核销</view>
-          <view class="rule-text-sub">每次租用消耗 1 次，用完即止</view>
+          <view class="rule-text-main">{{product.usageMain}}</view>
+          <view class="rule-text-sub">{{product.usageSub}}</view>
         </view>
       </view>
       <view class="rule-row">

@@ -3,7 +3,10 @@
     <view class="section-title">我的次卡</view>
     <view wx:if="{{!loading && cards.length == 0}}" class="empty-tip">暂无次卡</view>
     <view class="pcard-row" wx:for="{{cards}}" wx:key="id">
-      <view class="pcard-name">{{item.card_name}}</view>
+      <view class="pcard-name">
+        <text wx:if="{{item.biz_type}}" class="pcard-biz pcard-biz--{{item.biz_type == '养护' ? 'care' : 'rent'}}">{{item.biz_type}}</text>
+        <text>{{item.card_name}}</text>
+      </view>
       <view class="pcard-remain">{{item.remainingStr}}</view>
     </view>
   </view>

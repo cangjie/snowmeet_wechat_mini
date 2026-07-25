@@ -47,7 +47,7 @@ page {
   opacity: 0.94;
 }
 
-/* 横幅（无真实商品图，用渐变色块 + 大字当"封面图"，不同卡种不同配色区分） */
+/* 横幅：配了商品图就铺图（.feed-banner--image），没配图退回渐变色块 + 大字次数当"封面图" */
 .feed-banner {
   position: relative;
   height: 96px;
@@ -63,6 +63,19 @@ page {
 .feed-banner--care { background: linear-gradient(135deg, #047857, #10b981); }
 .feed-banner--care-season { background: linear-gradient(135deg, #b45309, #f59e0b); }
 
+/* 图片横幅：图铺满，角标绝对定位压在图上 */
+.feed-banner--image {
+  padding: 0;
+  overflow: hidden;
+  background: #eef2f7;
+}
+
+.feed-banner-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .feed-banner-tag {
   align-self: flex-start;
   padding: 3px 10px;
@@ -71,6 +84,14 @@ page {
   color: #ffffff;
   font-size: 11px;
   font-weight: 700;
+}
+
+/* 压在照片上的角标：照片明暗不可控，用半透明黑底保证白字始终可读 */
+.feed-banner-tag--onimage {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .feed-banner-count-row {
@@ -113,6 +134,11 @@ page {
   color: var(--on-surface-variant);
   line-height: 1.5;
   margin-bottom: 12px;
+  /* 简介来自后台富文本摘要、长度不可控，固定夹 2 行，免得不同商品的卡片高度参差不齐 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .feed-bottom-row {

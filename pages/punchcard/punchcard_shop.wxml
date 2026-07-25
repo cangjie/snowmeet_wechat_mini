@@ -5,8 +5,13 @@
   <block wx:else>
     <view class="feed-list">
       <view class="feed-card" wx:for="{{items}}" wx:key="_key" data-index="{{index}}" bindtap="onCardTap">
-        <view class="feed-banner feed-banner--{{item.theme}}">
-          <text class="feed-banner-tag">{{item.bizType}}次卡</text>
+        <!-- 有商品图就用图，没配图退回原来的渐变色块 + 大字次数，存量没图的商品不会开天窗 -->
+        <view wx:if="{{item.imageUrl}}" class="feed-banner feed-banner--image">
+          <image class="feed-banner-img" src="{{item.imageUrl}}" mode="aspectFill" lazy-load="{{true}}" />
+          <text class="feed-banner-tag feed-banner-tag--onimage">{{item.bizType}}{{item.cardType}}</text>
+        </view>
+        <view wx:else class="feed-banner feed-banner--{{item.theme}}">
+          <text class="feed-banner-tag">{{item.bizType}}{{item.cardType}}</text>
           <view class="feed-banner-count-row">
             <block wx:if="{{item.isSeason}}">
               <text class="feed-banner-count feed-banner-count--season">季卡</text>
@@ -19,7 +24,7 @@
         </view>
         <view class="feed-body">
           <view class="feed-name">{{item.name}}</view>
-          <view class="feed-desc">{{item.desc}}</view>
+          <view wx:if="{{item.desc}}" class="feed-desc">{{item.desc}}</view>
           <view class="feed-bottom-row">
             <view class="feed-price-group">
               <text class="feed-price">{{item.priceStr}}</text>

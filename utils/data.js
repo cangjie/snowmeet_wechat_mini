@@ -1003,12 +1003,22 @@ const useRentalPunchCardPromise = function (orderId, body, sessionKey) {
     })
   })
 }
-// 购买次卡：商品目录（会话级，退押金卖卡弹窗 + 顾客自助购买页共用）。bizType 不传时后端默认"租赁"，
-// 现有调用方（退押金卖卡弹窗/次卡详情页）行为不变；首页会显式传"租赁"/"养护"分别取两类卡。
-const getPunchCardProductsPromise = function (shop, sessionKey, bizType) {
+// 购买次卡：商品目录（会话级，退押金卖卡弹窗 + 顾客自助购买页共用）。bizType 不传时后端默认"租赁"、
+// cardType 不传时默认"次卡"，现有调用方（退押金卖卡弹窗）行为不变；顾客自助首页显式传"租赁"/"养护"
+// 且 cardType 传空串，拿该业务下 次卡+季卡 的合并列表。
+// 返回字段含 name/sale_price/punch_total/shop/bizType/cardType/isSeason/content(富文本)/intro(纯文本摘要)/imageUrl，
+// 商品文案和图片一律以这里下发的为准，前端不得再自行拼简介。
+const getPunchCardProductsPromise = function (shop, sessionKey, bizType, cardType) {
   var url = app.globalData.requestPrefix + 'Rent/GetPunchCardProducts?sessionKey=' + sessionKey
   if (shop != null) { url += '&shop=' + encodeURIComponent(shop) }
   if (bizType != null) { url += '&bizType=' + encodeURIComponent(bizType) }
+  if (cardType != null) { url += '&cardType=' + encodeURIComponent(cardType) }
+  return util.performWebRequest(url, null)
+}
+// 购买次卡：单个商品详情（顾客端详情页用）。只按 id 查，后端自己反查 biz_type/card_type，
+// 不需要调用方知道这是租赁卡还是养护卡——分享/扫码直接进详情页也能拿到。
+const getPunchCardProductPromise = function (productId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetPunchCardProduct/' + productId + '?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
 // 次卡/季卡商品管理（店长/管理员）：不过滤 valid/on_shelves 的全量列表。
@@ -1489,6 +1499,7 @@ module.exports = {
   getRentalPunchCardInfoPromise,
   useRentalPunchCardPromise,
   getPunchCardProductsPromise,
+  getPunchCardProductPromise,
   getAllPunchCardProductsPromise,
   getPunchCardCategoryCodePromise,
   addPunchCardProductPromise,
