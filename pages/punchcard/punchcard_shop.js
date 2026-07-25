@@ -78,6 +78,16 @@ Page({
     return items
   },
 
+  // 商品图加载失败（URL 坏了/文件不在那台服务器上）时退回渐变色块 + 大字次数，
+  // 否则只会显示一个有高度但空白的色块，看不出到底是"没配图"还是"图挂了"
+  onBannerImageError(e) {
+    var index = parseInt(e.currentTarget.dataset.index, 10)
+    var item = this.data.items[index]
+    if (!item) { return }
+    console.error('次卡商品图加载失败', item.imageUrl, e && e.detail)
+    this.setData({ ['items[' + index + '].imageUrl']: '' })
+  },
+
   _goDetail(item) {
     if (!item) return
     wx.navigateTo({ url: '/pages/punchcard/punchcard_detail?id=' + item.id })

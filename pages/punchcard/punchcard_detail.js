@@ -56,6 +56,13 @@ Page({
     })
   },
 
+  // 商品图加载失败（URL 坏了/文件不在那台服务器上）时退回数字热区，
+  // 否则只会显示一个有高度但空白的色块，看不出到底是"没配图"还是"图挂了"
+  onHeroImageError(e) {
+    console.error('次卡商品图加载失败', this.data.product && this.data.product.imageUrl, e && e.detail)
+    this.setData({ 'product.imageUrl': '' })
+  },
+
   onQtyMinus() {
     if (this.data.qty <= 1) return
     this.setData({ qty: this.data.qty - 1 })
