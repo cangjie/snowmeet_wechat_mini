@@ -1014,6 +1014,11 @@ const getAllPunchCardProductsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetAllPunchCardProducts?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
+// 次卡商品管理页新建/编辑时用来回填 category_code（该分类当前稳定的 code 值）
+const getPunchCardCategoryCodePromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetPunchCardCategoryCode?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
 // 次卡商品管理：新增/编辑，复用通用商品目录的 Category/AddProduct、Category/ModProduct
 const addPunchCardProductPromise = function (product, sessionKey) {
   var url = app.globalData.requestPrefix + 'Category/AddProduct?sessionKey=' + sessionKey
@@ -1473,6 +1478,7 @@ module.exports = {
   useRentalPunchCardPromise,
   getPunchCardProductsPromise,
   getAllPunchCardProductsPromise,
+  getPunchCardCategoryCodePromise,
   addPunchCardProductPromise,
   modPunchCardProductPromise,
   getMyPunchCardsPromise,

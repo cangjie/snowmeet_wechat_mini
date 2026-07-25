@@ -1,7 +1,10 @@
 // pages/admin/rent/punchcard_products/punchcard_products.js
-// 次卡商品管理（店长/管理员 title_level≥200）：管理 Product.type=="租赁次卡" 的行——
+// 次卡商品管理（店长/管理员 title_level≥200）：管理"租赁/次卡"分类下的商品行——
 // 名称/价格/次数/上下架/店铺。列表用专用只读接口 Rent/GetAllPunchCardProducts；
 // 新增/编辑复用通用商品目录现成的 Category/AddProduct、Category/ModProduct（不新造后端）。
+// 商品的权威识别方式是 category_code（关联 category.code，人工维护、不随 category_id 自增变化），
+// 不再是 type 字符串——本页新建/编辑时通过 Rent/GetPunchCardCategoryCode 拿到当前应该写入的
+// category_code，随表单一起提交。
 var app = getApp()
 var util = require('../../../../utils/util.js')
 var data = require('../../../../utils/data.js')
@@ -9,6 +12,7 @@ var data = require('../../../../utils/data.js')
 Page({
   data: {
     products: [],
+    categoryCode: null,
     modal: { show: false, id: 0, name: '', sale_price: '', punch_total: '', shop: '', on_shelves: true }
   },
 
@@ -22,6 +26,19 @@ Page({
         return
       }
       that.getData()
+      that._loadCategoryCode()
+    })
+  },
+
+  // 找不到"租赁/次卡"分类行（或没设置 code）时，新建/编辑会被 onModalConfirm 拦下，
+  // 提示先去分类管理把这一行建好——不能在缺 code 的情况下保存商品，否则这商品会永远匹配不到、
+  // 对顾客/店员都不可见。
+  _loadCategoryCode() {
+    var that = this
+    data.getPunchCardCategoryCodePromise(app.globalData.sessionKey).then(function (res) {
+      that.setData({ categoryCode: (res && res.categoryCode) || null })
+    }).catch(function () {
+      that.setData({ categoryCode: null })
     })
   },
 
@@ -68,9 +85,14 @@ Page({
     if (!name) { wx.showToast({ title: '请输入名称', icon: 'none' }); return }
     if (isNaN(price) || price <= 0) { wx.showToast({ title: '请输入有效价格', icon: 'none' }); return }
     if (isNaN(punchTotal) || punchTotal <= 0) { wx.showToast({ title: '请输入有效次数', icon: 'none' }); return }
+    if (!that.data.categoryCode) {
+      wx.showToast({ title: '未找到「租赁/次卡」分类，请先联系管理员建好该分类', icon: 'none' })
+      return
+    }
     var product = {
       id: m.id || 0,
       category_id: null,
+      category_code: that.data.categoryCode,
       shop_id: null,
       name: name,
       sale_price: price,
