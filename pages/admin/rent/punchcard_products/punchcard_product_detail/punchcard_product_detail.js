@@ -70,7 +70,10 @@ Page({
     data.getProductPromise(id, app.globalData.sessionKey).then(function (product) {
       var bizType = product.type && product.type.indexOf('养护') == 0 ? '养护' : '租赁'
       var cardType = product.type && product.type.indexOf('季卡') >= 0 ? '季卡' : '次卡'
-      var img = (product.images && product.images.length > 0) ? product.images[0] : null
+      // 用 availableImages（后端 [NotMapped] getter，只含 valid=1）；product.images 是全量，
+      // 换过图的商品里躺着 valid=0 的旧行，取 [0] 会回填到已删除的那张
+      var imgList = product.availableImages || product.images || []
+      var img = imgList.length > 0 ? imgList[0] : null
       var html = product.content || ''
       that.setData({
         name: product.name || '',
@@ -91,6 +94,10 @@ Page({
       if (that.editorCtx) {
         that.editorCtx.setContents({ html: html })
       }
+    }).catch(function () {
+      // 不 catch 的话 dataLoaded 永远是 false，页面就是一片空白、没有任何提示
+      wx.showToast({ title: '商品加载失败', icon: 'none' })
+      setTimeout(function () { wx.navigateBack() }, 800)
     })
   },
 
