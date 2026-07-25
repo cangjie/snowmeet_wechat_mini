@@ -12,6 +12,7 @@ Page({
     id: 0,
     isNew: true,
     dataLoaded: false,
+    pageTitle: '',
     bizType: '',
     cardType: '',
     categoryCode: null,
@@ -41,15 +42,17 @@ Page({
       if (id > 0) {
         that.loadForEdit(id)
       } else {
-        var bizType = options.bizType
-        var cardType = options.cardType
+        // wx.navigateTo 不会自动解码 query，新增入口拼 URL 时手动 encodeURIComponent 过，这里对应解码
+        var bizType = options.bizType ? decodeURIComponent(options.bizType) : ''
+        var cardType = options.cardType ? decodeURIComponent(options.cardType) : ''
         if (!bizType || !cardType) {
           wx.showToast({ title: '缺少业务类型/卡类型参数', icon: 'none' })
           wx.navigateBack()
           return
         }
-        that.setData({ bizType: bizType, cardType: cardType, dataLoaded: true })
-        wx.setNavigationBarTitle({ title: '新增' + bizType + cardType })
+        var title = '新增' + bizType + cardType
+        that.setData({ bizType: bizType, cardType: cardType, dataLoaded: true, pageTitle: title })
+        wx.setNavigationBarTitle({ title: title })
         that.loadCategoryCode(bizType, cardType)
       }
     })
@@ -81,7 +84,8 @@ Page({
         html: html,
         imageId: img ? img.id : 0,
         imageUrl: img ? img.imageUrl || img.image_url : '',
-        dataLoaded: true
+        dataLoaded: true,
+        pageTitle: '编辑' + bizType + cardType
       })
       wx.setNavigationBarTitle({ title: '编辑' + bizType + cardType })
       if (that.editorCtx) {
@@ -89,6 +93,8 @@ Page({
       }
     })
   },
+
+  onCancel() { wx.navigateBack() },
 
   onNameInput(e) { this.setData({ name: e.detail.value }) },
   onPriceInput(e) { this.setData({ sale_price: e.detail.value }) },

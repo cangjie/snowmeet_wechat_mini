@@ -1,74 +1,58 @@
-<block wx:if="{{dataLoaded}}">
-  <mp-cells title="基本信息">
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">类型：</view>
-        <view class="right-column">{{bizType}}{{cardType}}</view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">名称：</view>
-        <view class="right-column">
-          <input class="input" value="{{name}}" bindinput="onNameInput" placeholder="如：双板季前次卡" />
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">价格：</view>
-        <view class="right-column">
-          <input class="input" type="digit" value="{{sale_price}}" bindinput="onPriceInput" placeholder="0.00" />
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell wx:if="{{cardType == '次卡'}}">
-      <view class="view-row">
-        <view class="left-column">次数：</view>
-        <view class="right-column">
-          <input class="input" type="number" value="{{punch_total}}" bindinput="onPunchTotalInput" placeholder="0" />
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">限定店铺：</view>
-        <view class="right-column">
-          <input class="input" value="{{shop}}" bindinput="onShopInput" placeholder="留空=不限店铺" />
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">上架销售：</view>
-        <view class="right-column">
-          <switch checked="{{on_shelves}}" bindchange="onToggleOnShelves"></switch>
-        </view>
-      </view>
-    </mp-cell>
-  </mp-cells>
+<view class="page" wx:if="{{dataLoaded}}">
 
-  <mp-cells title="商品图片">
-    <mp-cell>
-      <multi-uploader image_count="1" title="商品图片（1 张）" uploaded_files="{{imageUrl}}" bindUploaded="onImageUploaded"></multi-uploader>
-    </mp-cell>
-  </mp-cells>
-
-  <mp-cells title="简介">
-    <mp-cell>
-      <editor id="editor" class="ql-container" bindstatuschange="onEditorStatusChange" bindready="onEditorReady" bindinput="onEditorInput"></editor>
-    </mp-cell>
-  </mp-cells>
-  <view class="toolbar" catchtouchend="format">
-    <text class="tool-item {{formats.bold ? 'tool-item--on' : ''}}" data-name="bold">加粗</text>
-    <text class="tool-item {{formats.italic ? 'tool-item--on' : ''}}" data-name="italic">斜体</text>
-    <text class="tool-item {{formats.underline ? 'tool-item--on' : ''}}" data-name="underline">下划线</text>
-    <text class="tool-item {{formats.list === 'ordered' ? 'tool-item--on' : ''}}" data-name="list" data-value="ordered">有序列表</text>
-    <text class="tool-item {{formats.list === 'bullet' ? 'tool-item--on' : ''}}" data-name="list" data-value="bullet">无序列表</text>
+  <view class="header">
+    <view class="htitle">{{pageTitle}}</view>
+    <view class="hsub">名称 / 价格 / 图片 / 简介{{cardType == '次卡' ? ' / 次数' : ''}}</view>
   </view>
 
-  <view class="save-bar">
-    <button class="save-btn" loading="{{saving}}" disabled="{{saving}}" bindtap="onSave">保 存</button>
+  <view class="form">
+
+    <view class="section">
+      <view class="shead"><text class="st">基本信息</text></view>
+      <view class="fgroup">
+        <view class="flabel">名称<text class="req">*</text></view>
+        <input class="finput" value="{{name}}" placeholder="如：双板季前次卡" bindinput="onNameInput" />
+      </view>
+      <view class="fgroup">
+        <view class="flabel">价格<text class="req">*</text></view>
+        <input class="finput" type="digit" value="{{sale_price}}" placeholder="0.00" bindinput="onPriceInput" />
+      </view>
+      <view class="fgroup" wx:if="{{cardType == '次卡'}}">
+        <view class="flabel">次数<text class="req">*</text></view>
+        <input class="finput" type="number" value="{{punch_total}}" placeholder="0" bindinput="onPunchTotalInput" />
+      </view>
+      <view class="fgroup">
+        <view class="flabel">限定店铺<text class="hint">· 留空=不限店铺</text></view>
+        <input class="finput" value="{{shop}}" placeholder="留空=不限店铺" bindinput="onShopInput" />
+      </view>
+      <view class="fgroup fgroup--row">
+        <view class="flabel">上架销售</view>
+        <switch checked="{{on_shelves}}" bindchange="onToggleOnShelves" color="#006495" />
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="shead"><text class="st">商品图片</text><text class="sd">选填 · 1 张</text></view>
+      <multi-uploader image_count="1" uploaded_files="{{imageUrl}}" bindUploaded="onImageUploaded"></multi-uploader>
+    </view>
+
+    <view class="section">
+      <view class="shead"><text class="st">简介</text></view>
+      <editor id="editor" class="editor" bindstatuschange="onEditorStatusChange" bindready="onEditorReady" bindinput="onEditorInput"></editor>
+      <view class="toolbar" catchtouchend="format">
+        <view class="tool-item {{formats.bold ? 'tool-item--on' : ''}}" data-name="bold">加粗</view>
+        <view class="tool-item {{formats.italic ? 'tool-item--on' : ''}}" data-name="italic">斜体</view>
+        <view class="tool-item {{formats.underline ? 'tool-item--on' : ''}}" data-name="underline">下划线</view>
+        <view class="tool-item {{formats.list === 'ordered' ? 'tool-item--on' : ''}}" data-name="list" data-value="ordered">有序列表</view>
+        <view class="tool-item {{formats.list === 'bullet' ? 'tool-item--on' : ''}}" data-name="list" data-value="bullet">无序列表</view>
+      </view>
+    </view>
+
   </view>
-  <view style="height: 60rpx;"></view>
-</block>
+
+  <view class="footer">
+    <view class="btn btn-plain" bindtap="onCancel">取消</view>
+    <view class="btn btn-primary {{saving ? 'disabled' : ''}}" bindtap="onSave">{{saving ? '保存中...' : '保 存'}}</view>
+  </view>
+
+</view>

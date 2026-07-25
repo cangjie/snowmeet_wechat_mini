@@ -1,19 +1,83 @@
-page { background: #f6f7f9; }
+/* 次卡/季卡商品维护·详情页样式，与 pages/admin/fnb/mat_expire_detail 的卡片风格对齐 */
 
-.ql-container {
-  width: 100%; min-height: 300rpx; box-sizing: border-box; padding: 16rpx;
+page { background: #f8f9ff; }
+
+.page { min-height: 100vh; }
+
+.header { padding: 24rpx 32rpx 8rpx; }
+.htitle { font-size: 34rpx; font-weight: 700; color: #006495; }
+.hsub { font-size: 23rpx; color: #6f7881; margin-top: 4rpx; }
+
+.form { padding: 0 32rpx 200rpx; }
+
+.section {
+  background: #fff;
+  border: 1px solid rgba(191, 199, 209, 0.4);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  margin-top: 24rpx;
+}
+.section .shead { display: flex; align-items: baseline; margin-bottom: 24rpx; }
+.section .shead .st { font-size: 26rpx; font-weight: 700; color: #0b1c30; margin-right: 16rpx; }
+.section .shead .sd { font-size: 22rpx; color: #6f7881; }
+
+.fgroup { margin-bottom: 24rpx; }
+.fgroup:last-child { margin-bottom: 0; }
+.fgroup--row { display: flex; align-items: center; justify-content: space-between; }
+.flabel { display: flex; align-items: baseline; font-size: 25rpx; color: #3f4850; margin-bottom: 12rpx; }
+.fgroup--row .flabel { margin-bottom: 0; }
+.flabel .req { color: #ba1a1a; margin-left: 4rpx; }
+.flabel .hint { font-size: 22rpx; color: #6f7881; margin-left: 12rpx; }
+
+.finput {
+  width: 100%;
+  height: 84rpx;
+  padding: 0 24rpx;
+  border: 1px solid rgba(191, 199, 209, 0.4);
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  color: #0b1c30;
+  background: #f8f9ff;
+  box-sizing: border-box;
+}
+
+.editor {
+  width: 100%; min-height: 260rpx; box-sizing: border-box;
+  border: 1px solid rgba(191, 199, 209, 0.4); border-radius: 20rpx;
+  padding: 16rpx; background: #f8f9ff;
 }
 
 .toolbar {
   display: flex; flex-wrap: wrap; gap: 12rpx;
-  padding: 16rpx 24rpx; background: #fff; margin-top: -20rpx; margin-bottom: 20rpx;
+  margin-top: 16rpx;
 }
 .tool-item {
-  font-size: 24rpx; color: #666; background: #f2f3f5;
-  border-radius: 8rpx; padding: 8rpx 20rpx;
+  font-size: 23rpx; color: #3f4850; background: #eef1f5;
+  border-radius: 16rpx; padding: 10rpx 22rpx;
 }
-.tool-item--on { background: #2EA6D0; color: #fff; }
+.tool-item--on { background: #006495; color: #fff; }
 
-.save-bar { padding: 24rpx; }
-.save-btn { background: #2EA6D0; color: #fff; font-size: 30rpx; }
-.save-btn:active { opacity: 0.85; }
+.footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 10;
+  display: flex;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #f8f9ff;
+  border-top: 1px solid rgba(191, 199, 209, 0.4);
+}
+.btn {
+  flex: 1;
+  height: 92rpx;
+  border-radius: 24rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+}
+.btn:last-child { margin-right: 0; }
+.btn-plain { color: #3f4850; background: #fff; border: 1px solid rgba(191, 199, 209, 0.4); }
+.btn-primary { color: #fff; background: #006495; font-weight: 700; }
+.btn-primary.disabled { background: #eef1f5; color: #6f7881; }
