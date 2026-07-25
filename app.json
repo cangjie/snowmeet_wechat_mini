@@ -51,6 +51,7 @@
     "pages/admin/rent/pay_additional",
     "pages/mine/deposit/deposit_list",
     "pages/mine/my_punchcards",
+    "pages/mine/punchcard_usage",
     "pages/punchcard/punchcard_shop",
     "pages/punchcard/punchcard_detail",
     "pages/admin/deposit/deposit_list",

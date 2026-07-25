@@ -1,0 +1,121 @@
+/* 视觉与 my_punchcards 保持一致（同一套白卡 + 竖条标题 + #2EA6D0 主色） */
+@import '/app.wxss';
+
+.page {
+  background: #F8F8F8;
+  min-height: 100vh;
+  padding: 20rpx 24rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  padding: 12rpx 0;
+  margin-bottom: 4rpx;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 6rpx;
+  height: 28rpx;
+  background: #2EA6D0;
+  border-radius: 3rpx;
+  margin-right: 14rpx;
+}
+
+/* 卡片摘要 */
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 72rpx;
+  font-size: 30rpx;
+}
+
+.head-name {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.head-remain {
+  color: #2EA6D0;
+  font-weight: 600;
+}
+
+.biz {
+  font-size: 20rpx;
+  line-height: 1;
+  padding: 6rpx 10rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+}
+
+.biz--rent { background: #e3f2fb; color: #006495; }
+.biz--care { background: #e3f6ee; color: #047857; }
+
+.head-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+  padding-bottom: 12rpx;
+}
+
+.head-sub-date { color: #bbb; }
+
+/* 核销记录行 */
+.urow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.urow:last-child { border-bottom: none; }
+
+.ucol { flex: 1; min-width: 0; }
+
+.ucode {
+  font-size: 28rpx;
+  color: #1a1a1a;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.udate {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 6rpx;
+}
+
+.ucount {
+  font-size: 28rpx;
+  color: #2EA6D0;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-left: 20rpx;
+}
+
+.tip {
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+  padding: 60rpx 0;
+}

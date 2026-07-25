@@ -7,7 +7,7 @@
       <view class="feed-card" wx:for="{{items}}" wx:key="_key" data-index="{{index}}" bindtap="onCardTap">
         <!-- 有商品图就用图，没配图退回原来的渐变色块 + 大字次数，存量没图的商品不会开天窗 -->
         <view wx:if="{{item.imageUrl}}" class="feed-banner feed-banner--image">
-          <image class="feed-banner-img" src="{{item.imageUrl}}" mode="aspectFill" lazy-load="{{true}}"
+          <image class="feed-banner-img" src="{{item.imageUrl}}" mode="widthFix" lazy-load="{{true}}"
             data-index="{{index}}" binderror="onBannerImageError" />
           <text class="feed-banner-tag feed-banner-tag--onimage">{{item.bizType}}{{item.cardType}}</text>
         </view>

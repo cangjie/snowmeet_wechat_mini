@@ -7,7 +7,7 @@
 
     <!-- 配了商品图就用图，没配图退回"数字热区"（用真实次数当视觉主体） -->
     <view wx:if="{{product.imageUrl}}" class="hero hero--image">
-      <image class="hero-img" src="{{product.imageUrl}}" mode="aspectFill" binderror="onHeroImageError" />
+      <image class="hero-img" src="{{product.imageUrl}}" mode="widthFix" binderror="onHeroImageError" />
       <text class="hero-name hero-name--onimage">{{product.name}}</text>
     </view>
     <view wx:else class="hero">

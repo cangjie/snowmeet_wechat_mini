@@ -1055,6 +1055,11 @@ const getMyPunchCardsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCards?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
+// 我的次卡·使用明细：某张卡被哪些订单核销过、每单核销几次（服务端按 order_id 汇总并校验卡归属本人）
+const getMyPunchCardUsagesPromise = function (cardId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCardUsages?cardId=' + cardId + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
 // 购买次卡·试算（只读，不写库）
 const preparePunchCardSalePromise = function (orderId, productId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/PreparePunchCardSale/' + orderId + '?productId=' + productId + '&sessionKey=' + sessionKey
@@ -1506,6 +1511,7 @@ module.exports = {
   modPunchCardProductPromise,
   getProductPromise,
   getMyPunchCardsPromise,
+  getMyPunchCardUsagesPromise,
   preparePunchCardSalePromise,
   startPunchCardSaleQrPromise,
   finalizePunchCardSalePromise,

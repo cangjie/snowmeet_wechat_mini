@@ -2,12 +2,16 @@
   <view class="card">
     <view class="section-title">我的次卡</view>
     <view wx:if="{{!loading && cards.length == 0}}" class="empty-tip">暂无次卡</view>
-    <view class="pcard-row" wx:for="{{cards}}" wx:key="id">
+    <!-- 整行可点，进这张卡的核销记录 -->
+    <view class="pcard-row" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="onCardTap">
       <view class="pcard-name">
         <text wx:if="{{item.biz_type}}" class="pcard-biz pcard-biz--{{item.biz_type == '养护' ? 'care' : 'rent'}}">{{item.biz_type}}</text>
         <text>{{item.card_name}}</text>
       </view>
-      <view class="pcard-remain">{{item.remainingStr}}</view>
+      <view class="pcard-right">
+        <text class="pcard-remain">{{item.remainingStr}}</text>
+        <text class="pcard-arrow">›</text>
+      </view>
     </view>
   </view>
   <view class="buy-btn" bindtap="onBuyCard">购买次卡</view>

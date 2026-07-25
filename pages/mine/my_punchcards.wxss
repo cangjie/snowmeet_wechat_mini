@@ -63,7 +63,10 @@
 }
 .pcard-biz--rent { background: #e3f2fb; color: #006495; }
 .pcard-biz--care { background: #e3f6ee; color: #047857; }
+.pcard-right { display: flex; align-items: center; gap: 8rpx; }
 .pcard-remain { color: #2EA6D0; font-weight: 600; }
+.pcard-arrow { color: #c8c9cc; font-size: 32rpx; line-height: 1; }
+.pcard-row:active { background: #f7f8fa; }
 
 .buy-btn {
   background: #2EA6D0;

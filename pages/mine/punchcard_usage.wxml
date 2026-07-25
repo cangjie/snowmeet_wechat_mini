@@ -1,0 +1,36 @@
+<view class="page">
+
+  <!-- 卡片摘要：卡名 + 业务角标 + 剩余，和「我的次卡」列表口径一致 -->
+  <view wx:if="{{card}}" class="card">
+    <view class="head">
+      <view class="head-name">
+        <text class="biz biz--{{card.biz_type == '养护' ? 'care' : 'rent'}}">{{card.biz_type}}</text>
+        <text>{{card.card_name}}</text>
+      </view>
+      <view class="head-remain">{{card.remainingStr}}</view>
+    </view>
+    <view class="head-sub">
+      <text wx:if="{{!card.isSeason}}">总 {{card.total}} 次 · 已核销 {{usedTotal}} 次</text>
+      <text wx:else>不限次数 · 已核销 {{usedTotal}} 次</text>
+      <text class="head-sub-date">开卡 {{card.createDateStr}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">核销记录</view>
+
+    <view wx:if="{{loading}}" class="tip">加载中…</view>
+    <view wx:elif="{{usages.length == 0}}" class="tip">这张卡还没有核销记录</view>
+
+    <block wx:else>
+      <view class="urow" wx:for="{{usages}}" wx:key="orderId">
+        <view class="ucol">
+          <view class="ucode">{{item.orderCode}}</view>
+          <view class="udate">{{item.bizDateStr}}</view>
+        </view>
+        <view class="ucount">核销 {{item.punchCount}} 次</view>
+      </view>
+    </block>
+  </view>
+
+</view>

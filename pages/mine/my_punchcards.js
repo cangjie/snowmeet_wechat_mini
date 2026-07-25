@@ -32,6 +32,13 @@ Page({
     })
   },
 
+  // 点某张卡 → 看这张卡的核销记录（哪些订单用过、每单核销几次）
+  onCardTap(e) {
+    var cardId = e.currentTarget.dataset.id
+    if (!cardId) { return }
+    wx.navigateTo({ url: '/pages/mine/punchcard_usage?cardId=' + cardId })
+  },
+
   onBuyCard() {
     wx.navigateTo({ url: '/pages/punchcard/punchcard_shop' })
   }
