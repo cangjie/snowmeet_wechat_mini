@@ -1055,6 +1055,18 @@ const getMyPunchCardsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCards?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
+// 顾客自助购买次卡·确认页数据（商品/数量/金额/使用规则，服务端现算金额并校验订单归属本人）
+const getMyPunchCardOrderPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCardOrder/' + orderId + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+// 顾客自助购买次卡·发起微信支付：建待支付单返回 paymentId，
+// 接着调 Order/WechatPayByOrderPayment 换预支付参数再 wx.requestPayment。
+// 不能用店员的 Order/GetWepayPayment（内部取 staff.id，顾客会话会 NRE）
+const startMyPunchCardPaymentPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/StartMyPunchCardPayment/' + orderId + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
 // 我的次卡·使用明细：某张卡被哪些订单核销过、每单核销几次（服务端按 order_id 汇总并校验卡归属本人）
 const getMyPunchCardUsagesPromise = function (cardId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCardUsages?cardId=' + cardId + '&sessionKey=' + sessionKey
@@ -1512,6 +1524,8 @@ module.exports = {
   getProductPromise,
   getMyPunchCardsPromise,
   getMyPunchCardUsagesPromise,
+  getMyPunchCardOrderPromise,
+  startMyPunchCardPaymentPromise,
   preparePunchCardSalePromise,
   startPunchCardSaleQrPromise,
   finalizePunchCardSalePromise,

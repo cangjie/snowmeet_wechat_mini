@@ -1,0 +1,278 @@
+/* Alpine Operational Minimalist token 本地拷贝——不能 @import "/pages/payment/settle/tokens.wxss"，
+   那个文件在 app.json 的 subPackages（root: pages/payment）里，主包页面无法跨分包引用其资源，
+   与 punchcard_detail.wxss 同款做法 */
+page {
+  --surface: #f8f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #3f4850;
+  --outline-variant: #bfc7d1;
+  --primary: #006495;
+  --tertiary-container: #21abef;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 14px 14px 110px;
+  box-sizing: border-box;
+}
+
+.tip {
+  text-align: center;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+  padding: 80px 0;
+}
+
+.card {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 14px;
+  padding: 14px 15px;
+  margin-bottom: 12px;
+}
+
+/* 商品行 */
+.goods {
+  display: flex;
+  gap: 12px;
+}
+
+.goods-img {
+  width: 88px;
+  height: 88px;
+  border-radius: 10px;
+  background: var(--surface-container-low);
+  flex-shrink: 0;
+}
+
+.goods-img--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary), var(--tertiary-container));
+}
+
+.goods-img-count {
+  font-family: 'Lexend', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.goods-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.goods-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.goods-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.biz {
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.biz--rent { background: #e3f2fb; color: #006495; }
+.biz--care { background: #e3f6ee; color: #047857; }
+
+.goods-count {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.goods-desc {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* 数量 / 金额 */
+.krow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(191, 199, 209, 0.3);
+}
+
+.krow:last-child { border-bottom: none; }
+
+.klabel {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.kvalue {
+  font-size: 13px;
+  color: var(--on-surface);
+  text-align: right;
+  max-width: 62%;
+}
+
+.krow--amount { align-items: baseline; }
+
+.kamount {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.kamount-main {
+  font-family: 'Lexend', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.kamount-unit {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+}
+
+.section-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin-bottom: 8px;
+}
+
+/* rich-text 内部节点不受本页 class 影响，只能在容器上定基准字号/行高/颜色 */
+.rich {
+  display: block;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.rule {
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(191, 199, 209, 0.3);
+}
+
+.rule:last-child { border-bottom: none; }
+
+.rule-main {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.rule-sub {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-top: 3px;
+}
+
+.order-no {
+  font-size: 11.5px;
+  color: #9aa3ad;
+  text-align: center;
+  padding: 4px 0 8px;
+}
+
+/* 底部支付条 */
+.footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px calc(10px + constant(safe-area-inset-bottom));
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  background: var(--surface-container-lowest);
+  border-top: 1px solid var(--outline-variant);
+}
+
+.footer-total {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.footer-label {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.footer-value {
+  font-family: 'Lexend', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.pay-btn {
+  min-width: 132px;
+  text-align: center;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pay-btn:active { opacity: 0.88; }
+
+.pay-btn--disabled,
+.pay-btn--done {
+  background: #c8ccd2;
+  color: #ffffff;
+}
+
+/* 支付成功结果态 */
+.result {
+  padding: 70px 20px 0;
+  text-align: center;
+}
+
+.result-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin-top: 14px;
+}
+
+.result-sub {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.result-btn {
+  display: inline-block;
+  margin-top: 26px;
+  padding: 11px 30px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.result-btn:active { opacity: 0.88; }

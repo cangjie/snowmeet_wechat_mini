@@ -102,7 +102,10 @@ Page({
     var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(postUrl, order).then(function (placedOrder) {
       that.setData({ buying: false })
-      wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + placedOrder.id })
+      // 顾客自助不走 /pages/payment/settle（那是店员开单收银页：生成二维码给顾客扫、
+      // 还带现金/挂账/支付宝等店员才用得到的方式）。这里跳顾客自己的确认页，
+      // 核对数量/金额/使用规则后在页内直接调起微信支付。
+      wx.navigateTo({ url: '/pages/punchcard/punchcard_confirm?orderId=' + placedOrder.id })
     }).catch(function () {
       that.setData({ buying: false })
     })

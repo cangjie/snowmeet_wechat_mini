@@ -1,0 +1,101 @@
+<view class="page" wx:if="{{loading}}">
+  <view class="tip">加载中…</view>
+</view>
+
+<block wx:else>
+  <view class="page" wx:if="{{info}}">
+
+    <!-- 支付成功后整页切结果态，不再显示支付按钮 -->
+    <view wx:if="{{paidDone}}" class="result">
+      <van-icon name="checked" size="56px" color="#07c160" />
+      <view class="result-title">支付成功</view>
+      <view class="result-sub">次卡已存入「我的-次卡」，可在那里查看剩余次数和核销记录</view>
+      <view class="result-btn" bindtap="onViewMyCards">查看我的次卡</view>
+    </view>
+
+    <block wx:else>
+      <!-- 商品 -->
+      <view class="card">
+        <view class="goods">
+          <image wx:if="{{info.product.imageUrl}}" class="goods-img" src="{{info.product.imageUrl}}"
+            mode="aspectFit" binderror="onImageError" />
+          <view wx:else class="goods-img goods-img--empty">
+            <text class="goods-img-count">{{info.product.isSeason ? '季卡' : info.product.punch_total}}</text>
+          </view>
+          <view class="goods-info">
+            <view class="goods-name">{{info.product.name}}</view>
+            <view class="goods-tag">
+              <text class="biz biz--{{info.product.bizType == '养护' ? 'care' : 'rent'}}">{{info.product.bizType}}{{info.product.cardType}}</text>
+              <text class="goods-count">{{info.product.isSeason ? '不限次数' : info.product.punch_total + ' 次'}}</text>
+            </view>
+            <view wx:if="{{info.product.intro}}" class="goods-desc">{{info.product.intro}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 数量与金额 -->
+      <view class="card">
+        <view class="krow">
+          <text class="klabel">购买数量</text>
+          <text class="kvalue">{{info.quantity}} 张</text>
+        </view>
+        <view class="krow">
+          <text class="klabel">适用门店</text>
+          <text class="kvalue">{{info.product.shop || '不限门店 · 全部门店通用'}}</text>
+        </view>
+        <view class="krow krow--amount">
+          <text class="klabel">支付金额</text>
+          <view class="kamount">
+            <text class="kamount-main">{{amountStr}}</text>
+            <text wx:if="{{unitPriceStr}}" class="kamount-unit">约{{unitPriceStr}}/次</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 使用规则：后台编了就渲染富文本，没编则显示默认规则。购买前必须让顾客看到 -->
+      <view class="card">
+        <view class="section-title">使用规则</view>
+        <rich-text wx:if="{{info.product.usageRules}}" class="rich" nodes="{{info.product.usageRules}}" />
+        <block wx:else>
+          <view class="rule">
+            <view class="rule-main">{{info.product.isSeason ? '不限次数核销' : info.product.punch_total + ' 次核销'}}</view>
+            <view class="rule-sub">{{info.product.isSeason ? '有效期内不限次数使用' : '每次租用消耗 1 次，用完即止'}}</view>
+          </view>
+          <view class="rule">
+            <view class="rule-main">无使用期限</view>
+            <view class="rule-sub">购买后长期有效，不设失效日期</view>
+          </view>
+          <view class="rule">
+            <view class="rule-main">本人专属</view>
+            <view class="rule-sub">仅限购买会员本人核销使用，不可转让</view>
+          </view>
+        </block>
+      </view>
+
+      <!-- 商品简介（后台富文本），有就展示 -->
+      <view wx:if="{{info.product.content}}" class="card">
+        <view class="section-title">商品简介</view>
+        <rich-text class="rich" nodes="{{info.product.content}}" />
+      </view>
+
+      <view class="order-no">订单号 {{info.orderCode}}</view>
+
+      <view class="footer">
+        <view class="footer-total">
+          <text class="footer-label">合计</text>
+          <text class="footer-value">{{amountStr}}</text>
+        </view>
+        <view wx:if="{{info.paid}}" class="pay-btn pay-btn--done">已支付</view>
+        <view wx:elif="{{info.closed}}" class="pay-btn pay-btn--done">订单已关闭</view>
+        <view wx:else class="pay-btn {{paying ? 'pay-btn--disabled' : ''}}" bindtap="onPay">
+          {{paying ? '处理中…' : '确认并支付'}}
+        </view>
+      </view>
+    </block>
+
+  </view>
+
+  <view wx:else class="page">
+    <view class="tip">订单不存在或已失效</view>
+  </view>
+</block>
