@@ -4,9 +4,12 @@
     <view wx:if="{{!loading && cards.length == 0}}" class="empty-tip">暂无次卡</view>
     <!-- 整行可点，进这张卡的核销记录 -->
     <view class="pcard-row {{item.isRefund ? 'pcard-row--refunded' : ''}}" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="onCardTap">
-      <view class="pcard-name">
-        <text wx:if="{{item.biz_type}}" class="pcard-biz pcard-biz--{{item.biz_type == '养护' ? 'care' : 'rent'}}">{{item.biz_type}}</text>
-        <text>{{item.card_name}}</text>
+      <view class="pcard-main">
+        <view class="pcard-name">
+          <text wx:if="{{item.biz_type}}" class="pcard-biz pcard-biz--{{item.biz_type == '养护' ? 'care' : 'rent'}}">{{item.biz_type}}</text>
+          <text>{{item.card_name}}</text>
+        </view>
+        <view wx:if="{{item.createDateStr}}" class="pcard-date">开卡 {{item.createDateStr}}</view>
       </view>
       <view class="pcard-right">
         <text wx:if="{{item.isRefund}}" class="pcard-refunded">已退款</text>

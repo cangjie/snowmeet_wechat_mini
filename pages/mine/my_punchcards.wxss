@@ -45,14 +45,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 72rpx;
+  /* 两行内容（卡名 + 开卡日期），行高相应加高 */
+  min-height: 116rpx;
+  padding: 16rpx 0;
   font-size: 28rpx;
   border-bottom: 1rpx solid #f3f4f6;
 }
 
 .pcard-row:last-child { border-bottom: none; }
 
+.pcard-main { flex: 1; min-width: 0; }
 .pcard-name { color: #1a1a1a; display: flex; align-items: center; gap: 10rpx; }
+.pcard-date { font-size: 22rpx; color: #999; margin-top: 8rpx; }
 /* 租赁卡/养护卡混在一个列表里，靠角标区分（顾客自助两种卡都能买） */
 .pcard-biz {
   font-size: 20rpx;
@@ -71,6 +75,7 @@
 /* 已退款的卡：整行灰化 + 右侧「已退款」标记（仍可点进去看核销记录/退款状态） */
 .pcard-row--refunded .pcard-name { color: #9ca3af; }
 .pcard-row--refunded .pcard-biz { background: #e5e7eb; color: #9ca3af; }
+.pcard-row--refunded .pcard-date { color: #c8ccd2; }
 .pcard-refunded {
   font-size: 22rpx;
   font-weight: 600;
