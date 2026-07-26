@@ -104,6 +104,12 @@
                   <text wx:elif="{{care.use_card}}" class="form-input-text">(卡){{care.card_name || '已选会员卡'}}</text>
                   <text wx:else class="form-input-placeholder">点此选择优惠券或会员卡（可跳过）</text>
                 </view>
+                <!-- 未开卡的季卡：告诉店员这次的装备会被写进卡、此后这张卡只认这块板。
+                     文案随装备录入实时变化，装备没填全时会写明还缺什么 -->
+                <view wx:if="{{care._cardOpenHint}}" class="card-open-hint">
+                  <van-icon name="info-o" size="13px" color="#b45309"/>
+                  <text class="card-open-hint-text">{{care._cardOpenHint}}</text>
+                </view>
               </view>
 
               <!-- 服务项目 -->

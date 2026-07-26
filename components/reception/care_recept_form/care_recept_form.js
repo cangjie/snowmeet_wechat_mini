@@ -227,12 +227,29 @@ Component({
           name,
           on: memoArr.indexOf(name) >= 0,
         }));
+        // 未开卡的季卡：提示店员这次养护的装备会被写进卡、从此这张卡只能给这块板用。
+        // 文案随装备录入实时变，装备没填全时明确说还缺什么（缺了服务端不会开卡）
+        let cardOpenHint = '';
+        if (care.card_pending_open) {
+          const equipParts = [];
+          if (care.equipment) equipParts.push(care.equipment);
+          if (brandDisp) equipParts.push(brandDisp);
+          if (care.scale) equipParts.push(care.scale + 'cm');
+          const missing = [];
+          if (!care.equipment) missing.push('类型');
+          if (!care.brand) missing.push('品牌');
+          if (!care.scale) missing.push('长度');
+          cardOpenHint = missing.length > 0
+            ? '该季卡尚未开卡，将按本次装备开卡。请先补全' + missing.join('、') + '。'
+            : '该季卡尚未开卡：订单生效后将绑定到「' + equipParts.join(' · ') + '」，此后仅限该装备使用。';
+        }
         return {
           ...care,
           _key: key,
           _expanded: expanded,
           _entered: ev.ok,
           _statusLabel: ev.label,
+          _cardOpenHint: cardOpenHint,
           _title: titleParts.join(' · '),
           _svcChipsView: that._svcChips(care),
           _brandIndex: brandIndex,
@@ -723,14 +740,20 @@ Component({
             c.brand = card.equip_brand;
             c.scale = card.equip_scale;
             c.card_equip_lock = true;
+            c.card_pending_open = false;
           } else {
             c.card_equip_lock = false;
+            // 季卡但三项装备信息为空 = 还没开卡。发卡/售卡时并不知道顾客拿哪块板来，
+            // 第一次用它养护才绑定。这里**不锁装备**——本次录入的装备正是要写进卡的内容，
+            // 订单生效时由服务端 EffectCareOrder 写入 punch_card 的 equip_* 三列。
+            c.card_pending_open = isSeason;
           }
         } else if (ticket) {
           c.use_card = false;
           c.card_id = null;
           c.card_name = null;
           c.card_equip_lock = false;
+          c.card_pending_open = false;
           c.ticket = ticket;
           c.ticket_code = ticket.code;
         } else {
@@ -740,6 +763,7 @@ Component({
           c.card_id = null;
           c.card_name = null;
           c.card_equip_lock = false;
+          c.card_pending_open = false;
         }
       });
       // derive=true：服务项与价格一并由服务端按新选择推导返回
