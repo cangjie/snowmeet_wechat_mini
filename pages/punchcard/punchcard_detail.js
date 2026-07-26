@@ -85,27 +85,17 @@ Page({
     var that = this
     var product = that.data.product
     if (!product || that.data.buying) return
-    if (!product.shop && !that.data.shop) {
-      wx.showToast({ title: '请先选择门店', icon: 'none' })
-      return
-    }
     that.setData({ buying: true })
-    var retails = []
-    for (var i = 0; i < that.data.qty; i++) {
-      retails.push({ id: 0, order_id: 0, product_id: product.id, retail_type: '租赁卡类' })
-    }
-    var order = {
-      type: '零售',
-      shop: product.shop || that.data.shop,
-      retails: retails
-    }
-    var postUrl = app.globalData.requestPrefix + 'Order/PlaceOrder?sessionKey=' + app.globalData.sessionKey
-    util.performWebRequest(postUrl, order).then(function (placedOrder) {
+    // 走顾客自助专用下单接口：订单归属购买人本人、商品/价格服务端现算。
+    // 不用 Order/PlaceOrder——那条路在下单人是店员时只写 staff_id、member_id 留空，
+    // 订单没有归属会员，确认页会判成「订单不存在」。
+    data.placeMyPunchCardOrderPromise(product.id, that.data.qty, app.globalData.sessionKey).then(function (res) {
       that.setData({ buying: false })
+      if (!res || !res.orderId) { return }
       // 顾客自助不走 /pages/payment/settle（那是店员开单收银页：生成二维码给顾客扫、
       // 还带现金/挂账/支付宝等店员才用得到的方式）。这里跳顾客自己的确认页，
       // 核对数量/金额/使用规则后在页内直接调起微信支付。
-      wx.navigateTo({ url: '/pages/punchcard/punchcard_confirm?orderId=' + placedOrder.id })
+      wx.navigateTo({ url: '/pages/punchcard/punchcard_confirm?orderId=' + res.orderId })
     }).catch(function () {
       that.setData({ buying: false })
     })

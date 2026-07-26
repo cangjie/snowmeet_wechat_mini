@@ -1055,6 +1055,14 @@ const getMyPunchCardsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCards?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
+// 顾客自助购买次卡·下单。不能用 Order/PlaceOrder——它是 if/else 分流的，
+// 下单人本身是店员时只写 staff_id、member_id 留空，订单就没有归属会员，
+// 后续"这单是不是我的"全判不了（表现为确认页「订单不存在」）。
+const placeMyPunchCardOrderPromise = function (productId, quantity, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/PlaceMyPunchCardOrder/' + productId
+    + '?quantity=' + quantity + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
 // 顾客自助购买次卡·确认页数据（商品/数量/金额/使用规则，服务端现算金额并校验订单归属本人）
 const getMyPunchCardOrderPromise = function (orderId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCardOrder/' + orderId + '?sessionKey=' + sessionKey
@@ -1533,6 +1541,7 @@ module.exports = {
   getMyPunchCardsPromise,
   getMyPunchCardUsagesPromise,
   refundMyPunchCardPromise,
+  placeMyPunchCardOrderPromise,
   getMyPunchCardOrderPromise,
   startMyPunchCardPaymentPromise,
   preparePunchCardSalePromise,
