@@ -43,9 +43,11 @@ Page({
     // 不传店铺——纯线上自助购买不需要先选店；product.shop 仍随条目展示（不限门店的商品显示"不限门店"）
     // 按 biz_type 分别取（租赁/养护是两条独立的 category 规则，互不影响），再合并展示
     var sessionKey = app.globalData.sessionKey
-    // cardType 传空串（不是 null——null 会被 data.js 跳过、后端回落默认"次卡"）拿次卡+季卡
+    // cardType 传显式哨兵 'all' 拿「次卡+季卡」。
+    // 不能传空串：?cardType= 这种「参数在、值为空」的写法，ASP.NET Core 对可选参数会回落到默认值
+    // （即变回 "次卡"），季卡就被悄悄过滤掉了——线上表现为购买页只有次卡、季卡怎么建都不出现。
     Promise.all(BIZ_TYPES.map(function (bizType) {
-      return data.getPunchCardProductsPromise(null, sessionKey, bizType, '').catch(function () { return [] })
+      return data.getPunchCardProductsPromise(null, sessionKey, bizType, 'all').catch(function () { return [] })
     })).then(function (resultsByBizType) {
       var realItems = []
       for (var b = 0; b < resultsByBizType.length; b++) {
