@@ -19,15 +19,16 @@
   </view>
 
   <!-- 退款入口只在服务端判定「可自助退款」时出现（一次未核销 + 微信/支付宝支付）。
-       需要人工处理的情况（现金支付、可退余额不足等）改成引导联系店员，不给按钮。
-       已使用过 / 赠送发放的卡两种都不显示这一块——核销记录本身已经说明情况，多一句提示反而是噪音。 -->
+       不能自助退时一律把原因写出来：一张没用过的卡却没有退款按钮，不解释顾客必然来问
+       （赠送发放的卡没有支付记录、现金支付要走人工，都属于这类）。
+       唯一不写的是卡本身已退款——卡片已经整块灰掉并标了「已退款」，再补一句是重复。 -->
   <view wx:if="{{!loading && refund.canRefund}}" class="card">
     <view class="refund-tip">这张卡还没有使用过，可以申请退款，款项按原路退回支付账户。</view>
     <view class="refund-btn {{refunding ? 'refund-btn--disabled' : ''}}" bindtap="onRefundTap">
       {{refunding ? '退款中…' : '申请退款 ' + refundAmountStr}}
     </view>
   </view>
-  <view wx:elif="{{!loading && refund.contactStaff}}" class="card">
+  <view wx:elif="{{!loading && refund.blockReason && !refund.isRefund}}" class="card">
     <view class="refund-tip refund-tip--staff">{{refund.blockReason}}</view>
   </view>
 
