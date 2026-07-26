@@ -124,6 +124,33 @@ page {
 /* Form */
 .form-group { display: flex; flex-direction: column; margin-bottom: 12px; }
 .form-group:last-child { margin-bottom: 0; }
+
+/* 会员匹配提示条：默认绿（匹配成功），缺姓名/性别时琥珀警示（与全局警示色一致，
+   蓝=操作 / 绿=成功 / 红=危险 已被占用，琥珀留给"需要你补点东西"） */
+.member-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+}
+
+.member-hint--warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.member-hint-text {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #15803d;
+}
+
+.member-hint--warn .member-hint-text { color: #92400e; }
 .form-label {
   font-size: 12px;
   font-weight: 600;

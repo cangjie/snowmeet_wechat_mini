@@ -60,6 +60,8 @@ Page({
     gender: '',
     customerCell: '',
     customerReadyForService: false,
+    // 手机号匹配会员的提示条 { warn: 是否为缺资料警示, text }；null = 不显示（散客或号码未输完）
+    memberHint: null,
 
     // 找回中断订单面板
     showRecoverPanel: false,
@@ -123,6 +125,11 @@ Page({
     const normalized = normalizePhone(cell);
     if (!shouldLookupPhone(normalized)) {
       this._lastLookupCell = '';  // 号码删短不完整时重置，便于重新输完再次查询
+      // 号码已经不完整了，上一个号码的匹配结论就不再成立，提示条必须撤掉，
+      // 否则会出现「号码是 A、提示条还说匹配到 B 的会员」这种误导
+      if (this.data.memberHint) {
+        this.setData({ memberHint: null });
+      }
       return;
     }
     this._lookupTimer = setTimeout(() => {
@@ -146,15 +153,16 @@ Page({
     Promise.resolve(app.loginPromiseNew).then(() => {
       return data.getMemberByNumSilentPromise(current);
     }).then((member) => {
-      // 非会员 / 无权限 / 网络错：保持安静，店员手动录入即可
-      if (!member || !(member.id || member.member_id || member.memberId)) {
-        return;
-      }
-      // 异步返回时号码若已被改动，丢弃这次回填
+      // 异步返回时号码若已被改动，丢弃这次结果
       if (normalizePhone(this.data.customerCell) !== current) {
         return;
       }
-      // 用会员档案里的姓名/性别覆盖（仅在档案有值时覆盖，空值不清掉已填内容）
+      // 非会员 / 无权限 / 网络错：清掉提示条，按散客处理，店员手动录入即可
+      if (!member || !(member.id || member.member_id || member.memberId)) {
+        this.setData({ memberHint: null });
+        return;
+      }
+      // 用会员档案里的姓名/性别回填（仅在档案有值时覆盖，空值不清掉店员已填的内容）
       const patch = {};
       const realName = (member.real_name || '').trim();
       const gender = (member.gender || '').trim();
@@ -164,14 +172,16 @@ Page({
       if (gender === '男' || gender === '女') {
         patch.gender = gender;
       }
-      if (Object.keys(patch).length === 0) {
-        // 命中会员但档案没有姓名/性别——没东西可填。打日志便于排查是「查不到」还是「查到了但空」
-        console.warn('[recept_entry] 命中会员但 real_name/gender 均为空，无可回填', current, member);
-        return;
-      }
+      // 只要命中会员就提示——哪怕档案是空的也要让店员知道"这个号是会员"，
+      // 否则店员会以为没匹配上、按散客处理，开单就挂不到这个会员名下
+      const missing = [];
+      if (!realName) { missing.push('姓名'); }
+      if (gender !== '男' && gender !== '女') { missing.push('性别'); }
+      patch.memberHint = missing.length > 0
+        ? { warn: true, text: '已匹配会员，但该会员未填写' + missing.join('、') + '。会员开单必须填写姓名和性别，请补充后继续。' }
+        : { warn: false, text: '已匹配会员：' + realName + '（' + gender + '）' };
       this.setData(patch);
       this.updateCustomerReadyState();
-      wx.showToast({ title: '已匹配会员信息', icon: 'none', duration: 1500 });
     });
   },
 
@@ -180,7 +190,14 @@ Page({
     const customerCell = (this.data.customerCell || '').trim();
     const gender = (this.data.gender || '').trim();
     const customerReadyForService = !!customerName && !!gender && isValidInternationalPhone(customerCell);
-    this.setData({ customerReadyForService });
+    const patch = { customerReadyForService };
+    // 店员把缺的姓名/性别补上后，警示条自动收敛成正常的「已匹配会员」，
+    // 不用停在那儿一直红着（红着不消会让人以为还没填对）
+    const hint = this.data.memberHint;
+    if (hint && hint.warn && customerName && (gender === '男' || gender === '女')) {
+      patch.memberHint = { warn: false, text: '已匹配会员：' + customerName + '（' + gender + '）' };
+    }
+    this.setData(patch);
   },
 
   /* ---------- 直接点击业务卡片进入开单 ---------- */

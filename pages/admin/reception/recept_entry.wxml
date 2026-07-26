@@ -58,6 +58,13 @@
             value="{{customerCell}}"
             bindinput="onCellInput"/>
         </view>
+        <!-- 手机号匹配到会员就常驻提示（不用 toast：一闪而过，缺姓名/性别这种要店员动手补的
+             信息必须一直看得见）。缺资料时琥珀警示，补齐后自动转成普通的「已匹配会员」 -->
+        <view wx:if="{{memberHint}}" class="member-hint {{memberHint.warn ? 'member-hint--warn' : ''}}">
+          <van-icon name="{{memberHint.warn ? 'warning-o' : 'passed'}}" size="14px"
+            color="{{memberHint.warn ? '#b45309' : '#15803d'}}"/>
+          <text class="member-hint-text">{{memberHint.text}}</text>
+        </view>
       </view>
 
       <view class="form-group">
