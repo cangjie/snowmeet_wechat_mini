@@ -17,6 +17,7 @@
     "pages/admin/rent/rent_report",
     "pages/admin/rent/punchcard_products/punchcard_products",
     "pages/admin/rent/punchcard_products/punchcard_product_detail/punchcard_product_detail",
+    "pages/admin/rent/punchcard_sales/punchcard_sales",
     "pages/admin/recept/recept_entry",
     "pages/admin/recept/recept_member_info",
     "pages/admin/recept/recept_list",

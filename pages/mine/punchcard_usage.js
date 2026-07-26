@@ -26,6 +26,10 @@ Page({
     refund: null,          // 服务端退款判定 { isRefund, canRefund, contactStaff, blockReason, refundAmount }
     refundAmountStr: '',
     refunding: false,
+    member: null,          // 仅店员模式下发：{ id, name, gender, cell, displayName }
+    equipBrand: '',        // 季卡绑定装备编辑框（仅店员模式，季卡才显示）
+    equipScale: '',
+    savingEquip: false,
     loading: true
   },
 
@@ -56,8 +60,16 @@ Page({
         card.remainingStr = card.isSeason ? '不限次数' : ('剩余 ' + card.remaining + ' 次')
       }
       var refund = res.refund || null
+      // 店员模式（管理后台卡销售明细）多带顾客信息；季卡还可以改绑定装备的品牌/长度
+      var member = res.member || null
+      if (member) {
+        member.displayName = (member.name || '（未填姓名）') + (member.gender ? '·' + member.gender : '')
+      }
       that.setData({
         card: card,
+        member: member,
+        equipBrand: (card && card.equip_brand) || '',
+        equipScale: (card && card.equip_scale) || '',
         usages: res.usages || [],
         usedTotal: res.usedTotal || 0,
         refund: refund,
@@ -70,6 +82,29 @@ Page({
       }
     }).catch(function () {
       that.setData({ loading: false })
+    })
+  },
+
+  /* ---------- 季卡绑定装备（仅店员模式） ---------- */
+  onEquipBrandInput(e) { this.setData({ equipBrand: e.detail.value }) },
+  onEquipScaleInput(e) { this.setData({ equipScale: e.detail.value }) },
+
+  // 只开放品牌和长度：装备类型换了等于换一块板，属于"换卡"不是"改信息"，服务端也不接受
+  onSaveEquip() {
+    var that = this
+    if (that.data.savingEquip) return
+    that.setData({ savingEquip: true })
+    wx.showLoading({ title: '保存中', mask: true })
+    data.updatePunchCardEquipByStaffPromise(that.data.cardId, that.data.equipBrand,
+      that.data.equipScale, app.globalData.sessionKey).then(function () {
+      wx.hideLoading()
+      that.setData({ savingEquip: false })
+      wx.showToast({ title: '已保存', icon: 'success' })
+      that.getData()   // 重新拉，确保界面与库里一致
+    }).catch(function () {
+      // performWebRequest 已把服务端拒绝原因 toast 出来了，这里只复位状态
+      wx.hideLoading()
+      that.setData({ savingEquip: false })
     })
   },
 

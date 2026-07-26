@@ -125,6 +125,43 @@
   border-color: #e8c4c3;
 }
 
+/* 顾客信息 / 绑定装备（仅店员模式） */
+.kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+  font-size: 28rpx;
+}
+.kv:last-child { border-bottom: none; }
+.kv-k { color: #666; }
+.kv-v { color: #1a1a1a; font-weight: 600; }
+
+.fgroup { display: flex; align-items: center; gap: 20rpx; padding: 14rpx 0; }
+.fl { font-size: 28rpx; color: #666; width: 160rpx; flex-shrink: 0; }
+.fi {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+.save-btn {
+  margin-top: 16rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  background: #2EA6D0;
+  color: #fff;
+  border-radius: 8rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.save-btn--disabled { background: #cfd4d9; }
+
 /* 核销记录行 */
 .urow {
   display: flex;

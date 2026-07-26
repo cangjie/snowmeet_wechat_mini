@@ -211,6 +211,9 @@ Page({
       case 'rent_product_add':
         path = '/pages/admin/rent/settings/rent_product_add'
         break
+      case 'punchcard_sales':
+        path = '/pages/admin/rent/punchcard_sales/punchcard_sales'
+        break
       case 'punchcard_products':
         path = '/pages/admin/rent/punchcard_products/punchcard_products'
         break

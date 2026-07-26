@@ -32,6 +32,32 @@
     <view class="refund-tip refund-tip--staff">{{refund.blockReason}}</view>
   </view>
 
+  <!-- 顾客信息 + 购买时间：仅店员模式（管理后台按卡找人）。顾客自己看自己的卡不需要这块 -->
+  <view wx:if="{{isStaff && member}}" class="card">
+    <view class="section-title">顾客信息</view>
+    <view class="kv"><text class="kv-k">顾客</text><text class="kv-v">{{member.displayName}}</text></view>
+    <view class="kv"><text class="kv-k">手机号</text><text class="kv-v">{{member.cell || '（无手机号）'}}</text></view>
+    <view class="kv"><text class="kv-k">购买/开卡时间</text><text class="kv-v">{{card.createTimeStr || card.createDateStr}}</text></view>
+  </view>
+
+  <!-- 季卡绑定装备：仅店员模式可改，且只开放品牌/长度。
+       装备类型换了等于换一块板，属于"换卡"不是"改信息"，不在这里开放（服务端也拒） -->
+  <view wx:if="{{isStaff && card && card.isSeason}}" class="card">
+    <view class="section-title">绑定装备</view>
+    <view class="kv"><text class="kv-k">装备类型</text><text class="kv-v">{{card.equip_type || '（尚未开卡）'}}</text></view>
+    <view class="fgroup">
+      <text class="fl">品牌</text>
+      <input class="fi" value="{{equipBrand}}" placeholder="未绑定" bindinput="onEquipBrandInput" />
+    </view>
+    <view class="fgroup">
+      <text class="fl">长度 (cm)</text>
+      <input class="fi" type="number" value="{{equipScale}}" placeholder="未绑定" bindinput="onEquipScaleInput" />
+    </view>
+    <view class="save-btn {{savingEquip ? 'save-btn--disabled' : ''}}" bindtap="onSaveEquip">
+      {{savingEquip ? '保存中…' : '保存装备信息'}}
+    </view>
+  </view>
+
   <view class="card">
     <view class="section-title">核销记录</view>
 

@@ -1,0 +1,131 @@
+/* 视觉与 punchcard_products / my_punchcards 一致（白卡 + 竖条标题 + #2EA6D0 主色） */
+@import '/app.wxss';
+
+.page {
+  background: #F8F8F8;
+  min-height: 100vh;
+  padding: 20rpx 24rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  padding: 12rpx 0;
+  margin-bottom: 4rpx;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 6rpx;
+  height: 28rpx;
+  background: #2EA6D0;
+  border-radius: 3rpx;
+  margin-right: 14rpx;
+}
+
+/* 搜索 */
+.search-row { display: flex; align-items: center; gap: 16rpx; padding: 12rpx 0; }
+.search-input {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+.search-ph { color: #bbb; }
+.search-clear { font-size: 26rpx; color: #999; flex-shrink: 0; }
+.search-btn {
+  flex-shrink: 0;
+  padding: 0 28rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  background: #2EA6D0;
+  color: #fff;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.sum-row { font-size: 24rpx; color: #999; padding-bottom: 8rpx; }
+
+/* 列表行 */
+.row {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+.row:last-child { border-bottom: none; }
+.row:active { background: #f7f8fa; }
+.row-main { flex: 1; min-width: 0; }
+.row-arrow { color: #c8c9cc; font-size: 32rpx; line-height: 1; margin-left: 12rpx; flex-shrink: 0; }
+
+.row-head { display: flex; align-items: center; gap: 10rpx; }
+.row-name { font-size: 28rpx; font-weight: 600; color: #1a1a1a; }
+
+.biz {
+  font-size: 20rpx;
+  line-height: 1;
+  padding: 6rpx 10rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.biz--rent { background: #e3f2fb; color: #006495; }
+.biz--care { background: #e3f6ee; color: #047857; }
+
+.row-sub {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 8rpx;
+}
+.row-sub--customer { color: #333; }
+.row-sub--time { color: #bbb; font-size: 22rpx; }
+.row-remain { color: #2EA6D0; font-weight: 600; }
+.row-cell { color: #666; }
+
+/* 销售方式角标：三种来源各一色，扫一眼就能分辨 */
+.sale-type {
+  font-size: 20rpx;
+  line-height: 1;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.st-self  { background: #e6f0fd; color: #1d4ed8; }  /* 顾客自助购买 */
+.st-order { background: #fdf1dc; color: #b86e00; }  /* 随订单购买 */
+.st-gift  { background: #f3e8ff; color: #7e22ce; }  /* 赠送 */
+
+/* 已退款：整行灰化 */
+.row--refunded .row-name,
+.row--refunded .row-sub { color: #9ca3af; }
+.row--refunded .biz { background: #e5e7eb; color: #9ca3af; }
+.row--refunded .row-remain { color: #9ca3af; }
+.refunded-tag {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #9ca3af;
+  background: #e5e7eb;
+  padding: 4rpx 12rpx;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+}
+
+.tip { text-align: center; color: #999; font-size: 26rpx; padding: 60rpx 0; }

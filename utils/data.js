@@ -1108,6 +1108,20 @@ const startMyPunchCardPaymentPromise = function (orderId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/StartMyPunchCardPayment/' + orderId + '?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
+// 卡类产品销售列表（管理后台 staff≥200）：倒序列出卖出/发出的次卡与季卡
+const getPunchCardSalesByStaffPromise = function (keyword, pageIndex, pageSize, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetPunchCardSalesByStaff?sessionKey=' + sessionKey
+    + '&pageIndex=' + (pageIndex || 1) + '&pageSize=' + (pageSize || 20)
+  if (keyword) { url += '&keyword=' + encodeURIComponent(keyword) }
+  return util.performWebRequest(url, null)
+}
+// 修改季卡绑定的装备品牌/长度（管理后台 staff≥200）
+const updatePunchCardEquipByStaffPromise = function (cardId, brand, scale, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/UpdatePunchCardEquipByStaff/' + cardId
+    + '?sessionKey=' + sessionKey
+    + '&brand=' + encodeURIComponent(brand || '') + '&scale=' + encodeURIComponent(scale || '')
+  return util.performWebRequest(url, null)
+}
 // 次卡使用明细（店员侧，会员详情页用）：按 staff 权限放行，不校验"卡是我的"，且不下发退款判定。
 // 展示口径与顾客侧同源（服务端 BuildPunchCardUsageView）
 const getPunchCardUsagesByStaffPromise = function (cardId, sessionKey) {
@@ -1582,6 +1596,8 @@ module.exports = {
   getMyPunchCardsPromise,
   getMyPunchCardUsagesPromise,
   getPunchCardUsagesByStaffPromise,
+  getPunchCardSalesByStaffPromise,
+  updatePunchCardEquipByStaffPromise,
   refundMyPunchCardPromise,
   checkMyPunchCardPurchasePromise,
   bindWechatCellPromise,

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "卡类产品销售",
+  "usingComponents": {
+    "list-pager": "/components/list-pager/index"
+  }
+}

@@ -1,0 +1,47 @@
+<view class="page">
+
+  <view class="card">
+    <view class="search-row">
+      <input class="search-input" value="{{keyword}}" placeholder="卡名 / 顾客姓名 / 手机号"
+        placeholder-class="search-ph" bindinput="onKeywordInput" bindconfirm="onSearch" />
+      <view wx:if="{{keyword}}" class="search-clear" bindtap="onClearKeyword">清空</view>
+      <view class="search-btn" bindtap="onSearch">查询</view>
+    </view>
+    <view class="sum-row">共 {{total}} 张卡</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">销售记录</view>
+
+    <view wx:if="{{loading}}" class="tip">加载中…</view>
+    <view wx:elif="{{items.length === 0}}" class="tip">暂无记录</view>
+
+    <block wx:else>
+      <view class="row {{item.isRefund ? 'row--refunded' : ''}}" wx:for="{{items}}" wx:key="id"
+        data-id="{{item.id}}" bindtap="onItemTap">
+        <view class="row-main">
+          <view class="row-head">
+            <text class="biz biz--{{item.biz_type === '养护' ? 'care' : 'rent'}}">{{item.biz_type}}</text>
+            <text class="row-name">{{item.card_name}}</text>
+            <text wx:if="{{item.isRefund}}" class="refunded-tag">已退款</text>
+          </view>
+          <view class="row-sub">
+            <text>{{item.countText}}</text>
+            <text class="row-remain">{{item.remainText}}</text>
+            <text class="sale-type {{item.saleTypeCls}}">{{item.saleType}}</text>
+          </view>
+          <view class="row-sub row-sub--customer">
+            <text>{{item.customerText}}</text>
+            <text class="row-cell">{{item.memberCell || '（无手机号）'}}</text>
+          </view>
+          <view class="row-sub row-sub--time">{{item.createDateStr}}</view>
+        </view>
+        <text class="row-arrow">›</text>
+      </view>
+    </block>
+  </view>
+
+  <list-pager wx:if="{{!loading && total > 0}}" page="{{page}}" total-pages="{{totalPages}}"
+    page-size="{{pageSize}}" disabled="{{loading}}" bind:change="onPagerChange" />
+
+</view>

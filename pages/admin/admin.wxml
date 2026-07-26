@@ -53,6 +53,7 @@
     <!--mp-cell id="shopSale" bindtap="gotoSale" >【零售】店销现货</mp-cell-->
     <mp-cell id="shopSaleList" bindtap="gotoSale" >【零售】订单列表</mp-cell>
     <mp-cell wx:if="{{isAdmin}}" id="punchcard_products" value="【零售】次卡商品管理" bindtap="nav" ></mp-cell>
+    <mp-cell wx:if="{{isAdmin}}" id="punchcard_sales" value="【零售】卡类产品销售" bindtap="nav" ></mp-cell>
     <!--mp-cell id="enterain_form" bindtap="nav" >【零售】招待</mp-cell>
     <mp-cell id="supplement" bindtap="nav" >【零售】补单</mp-cell-->
   </mp-cells>
