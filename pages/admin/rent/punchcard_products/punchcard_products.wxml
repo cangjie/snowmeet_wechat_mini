@@ -23,7 +23,7 @@
         <view class="prod-sub">
           <text class="prod-tag">{{item.bizType}}{{item.cardType}}</text>
           <text wx:if="{{item.projectText}}" class="prod-tag">{{item.projectText}}</text>
-          {{item.countText}} · ¥{{item.sale_price}}{{item.shop ? (' · ' + item.shop) : ''}}
+          {{item.countText}} · ¥{{item.sale_price}} · 收款 {{item.shop || '未设置'}}
         </view>
       </view>
     </view>

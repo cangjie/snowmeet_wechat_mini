@@ -1066,6 +1066,28 @@ const getMyPunchCardsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCards?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
+// 顾客自助购买次卡·前置校验：本人有没有验证过手机号。
+// 必须在点购买之前问，因为 getPhoneNumber 只能由 button 直接触发，不能等下单报错再补
+const checkMyPunchCardPurchasePromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/CheckMyPunchCardPurchase?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+// 微信授权手机号后落库（沿用雪票预定页那条现成链路，走 /core 旧路由）
+const bindWechatCellPromise = function (encData, iv, sessionKey) {
+  var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateWechatMemberCell?sessionKey='
+    + encodeURIComponent(sessionKey) + '&encData=' + encodeURIComponent(encData) + '&iv=' + encodeURIComponent(iv)
+  // 该接口直接返回 Member 对象（不是 ApiResult 信封），所以不能用 performWebRequest
+  return new Promise(function (resolve, reject) {
+    wx.request({
+      url: url, method: 'GET',
+      success: function (res) {
+        if (res.statusCode != 200 || !res.data) { reject(res.statusCode); return }
+        resolve(res.data)
+      },
+      fail: function (err) { reject(err) }
+    })
+  })
+}
 // 顾客自助购买次卡·下单。不能用 Order/PlaceOrder——它是 if/else 分流的，
 // 下单人本身是店员时只写 staff_id、member_id 留空，订单就没有归属会员，
 // 后续"这单是不是我的"全判不了（表现为确认页「订单不存在」）。
@@ -1561,6 +1583,8 @@ module.exports = {
   getMyPunchCardUsagesPromise,
   getPunchCardUsagesByStaffPromise,
   refundMyPunchCardPromise,
+  checkMyPunchCardPurchasePromise,
+  bindWechatCellPromise,
   placeMyPunchCardOrderPromise,
   getMyPunchCardOrderPromise,
   startMyPunchCardPaymentPromise,

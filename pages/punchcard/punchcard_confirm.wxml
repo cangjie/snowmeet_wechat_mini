@@ -39,10 +39,8 @@
           <text class="klabel">购买数量</text>
           <text class="kvalue">{{info.quantity}} 张</text>
         </view>
-        <view class="krow">
-          <text class="klabel">适用门店</text>
-          <text class="kvalue">{{info.product.shop || '不限门店 · 全部门店通用'}}</text>
-        </view>
+        <!-- 不展示 product.shop：它是收款归属门店（内部记账），不是"适用门店"，
+             展示出来会让顾客以为这张卡只能在那一家用 -->
         <view class="krow krow--amount">
           <text class="klabel">支付金额</text>
           <view class="kamount">

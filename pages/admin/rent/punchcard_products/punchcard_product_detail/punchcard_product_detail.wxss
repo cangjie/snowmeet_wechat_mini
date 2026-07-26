@@ -42,6 +42,7 @@ page { background: #f8f9ff; }
   background: #fff;
 }
 .fpicker-val { font-size: 28rpx; color: #0b1c30; }
+.fpicker-val--ph { color: #a8b0b8; }   /* 占位「请选择门店」用浅色，与已选值区分开 */
 .fpicker-arrow { color: #c8c9cc; font-size: 32rpx; line-height: 1; }
 
 /* 单项/双项分段控件（仅养护次卡显示） */

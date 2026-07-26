@@ -40,7 +40,8 @@ Page({
   getData() {
     var that = this
     that.setData({ loading: true })
-    // 不传店铺——纯线上自助购买不需要先选店；product.shop 仍随条目展示（不限门店的商品显示"不限门店"）
+    // 不传店铺：product.shop 是收款归属门店（内部记账），不是适用门店，
+    // 卡全店通用，所以目录不按门店过滤、也不对顾客展示门店
     // 按 biz_type 分别取（租赁/养护是两条独立的 category 规则，互不影响），再合并展示
     var sessionKey = app.globalData.sessionKey
     // cardType 传显式哨兵 'all' 拿「次卡+季卡」。

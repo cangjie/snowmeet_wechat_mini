@@ -18,7 +18,10 @@ Page({
     qty: 1,
     totalStr: '',
     loading: true,
-    buying: false
+    buying: false,
+    // 买卡必须先验证手机号（服务端也会拦）。微信的 getPhoneNumber 只能由 button 直接触发、
+    // JS 调不起来，所以要在点购买之前就知道该把按钮渲染成普通按钮还是授权按钮
+    hasCell: true
   },
 
   onLoad(options) {
@@ -28,6 +31,39 @@ Page({
     var that = this
     app.loginPromiseNew.then(function () {
       that._loadProduct()
+      that._checkCell()
+    })
+  },
+
+  _checkCell() {
+    var that = this
+    data.checkMyPunchCardPurchasePromise(app.globalData.sessionKey).then(function (res) {
+      that.setData({ hasCell: !!(res && res.hasCell) })
+    }).catch(function () {
+      // 查不到就按"没验证"处理：宁可多让顾客授权一次，也别让他点了购买才被服务端拒
+      that.setData({ hasCell: false })
+    })
+  },
+
+  // 用户在微信原生授权弹窗里同意后回调：解密落库 → 标记已验证 → 直接继续下单，
+  // 不让顾客再点一次「立即购买」
+  onGetCell(e) {
+    var that = this
+    var d = e.detail || {}
+    if (!d.encryptedData || !d.iv) {
+      // 用户点了拒绝
+      wx.showToast({ title: '需验证手机号后才能购买', icon: 'none' })
+      return
+    }
+    wx.showLoading({ title: '验证中', mask: true })
+    data.bindWechatCellPromise(d.encryptedData, d.iv, app.globalData.sessionKey).then(function (member) {
+      wx.hideLoading()
+      if (!member || !member.cell) { return Promise.reject('no cell') }
+      that.setData({ hasCell: true })
+      that.onBuyNow()
+    }).catch(function () {
+      wx.hideLoading()
+      wx.showToast({ title: '手机号验证失败', icon: 'none' })
     })
   },
 
@@ -42,7 +78,6 @@ Page({
       product.priceStr = util.showAmount(product.sale_price)
       product.unitPriceStr = (!product.isSeason && product.punch_total > 0)
         ? util.showAmount(product.sale_price / product.punch_total) : ''
-      product.shopLabel = product.shop || '不限门店 · 全部门店通用'
       // 季卡不限次数，「N 次核销」这类文案对它不成立，统一在这里派生好给 wxml 用
       product.countLabel = product.isSeason ? '不限次数' : (product.punch_total + ' 次')
       product.usageMain = product.isSeason ? '不限次数核销' : (product.punch_total + ' 次核销')

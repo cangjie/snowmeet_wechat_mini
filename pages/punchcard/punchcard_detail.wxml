@@ -62,13 +62,9 @@
       </block>
     </view>
 
-    <view class="info-card">
-      <view class="info-card-title">适用门店</view>
-      <view class="shop-chip">
-        <van-icon name="location-o" size="14px" color="#3f4850" />
-        <text>{{product.shopLabel}}</text>
-      </view>
-    </view>
+    <!-- 这里原本有个「适用门店」卡片，展示 product.shop —— 那是误解字段含义。
+         product.shop 只表示购买款项收到哪个门店账户（内部记账），卡本身全店通用。
+         把它当"适用门店"展示给顾客，会让人以为只能在那一家用，所以整块删掉、不展示。 -->
 
     <view class="footer">
       <view class="stepper">
@@ -84,7 +80,14 @@
         <text class="footer-total-label">合计</text>
         <text class="footer-total-value">{{totalStr}}</text>
       </view>
-      <button class="buy-btn {{buying ? 'buy-btn--disabled' : ''}}" bindtap="onBuyNow">
+      <!-- 买卡必须先验证手机号。微信的 getPhoneNumber 只能由 button 直接触发、JS 调不起来，
+           所以未验证时这个按钮本身就得是授权按钮；授权成功后在 onGetCell 里自动接着下单，
+           不让顾客再点一次 -->
+      <button wx:if="{{hasCell}}" class="buy-btn {{buying ? 'buy-btn--disabled' : ''}}" bindtap="onBuyNow">
+        {{buying ? '下单中…' : '立即购买'}}
+      </button>
+      <button wx:else class="buy-btn {{buying ? 'buy-btn--disabled' : ''}}"
+        open-type="getPhoneNumber" bindgetphonenumber="onGetCell">
         {{buying ? '下单中…' : '立即购买'}}
       </button>
     </view>

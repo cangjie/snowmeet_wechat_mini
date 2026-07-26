@@ -19,8 +19,10 @@ Page({
     name: '',
     sale_price: '',
     punch_total: '',
-    shop: '',              // 空 = 不限门店；非空必须与 shop_list.name 一字不差
-    shopOptions: ['不限门店'],   // picker 选项：第 0 项固定是「不限门店」，其余来自 shop_list
+    // 收款门店（必填）：决定购买款项进哪个门店账户，不是"适用门店"——卡全店通用。
+    // 值必须与 shop_list.name 一字不差，所以只能选不能输
+    shop: '',
+    shopOptions: ['请选择门店'],   // 第 0 项是占位提示，选中它视为未填
     shopIndex: 0,
     on_shelves: true,
     careProjectCount: 0,   // 养护次卡专用：1=单项（修刃 或 热蜡）/ 2=双项（修刃 + 热打蜡）；0=未选
@@ -154,7 +156,7 @@ Page({
   _loadShops() {
     var that = this
     data.getShopListPromise().then(function (shops) {
-      var options = ['不限门店']
+      var options = ['请选择门店']
       for (var i = 0; i < (shops || []).length; i++) {
         var n = (shops[i].name || '').trim()
         if (n) { options.push(n) }
@@ -162,7 +164,7 @@ Page({
       that.setData({ shopOptions: options })
       that._syncShopIndex()
     }).catch(function () {
-      // 拉不到门店列表就只剩「不限门店」，至少不会让店员手输出一个对不上的店名
+      // 拉不到门店列表就只剩占位项，保存会被必填校验拦下——总比让店员手输出一个对不上的店名好
     })
   },
   _syncShopIndex() {
@@ -172,8 +174,8 @@ Page({
     for (var i = 1; i < options.length; i++) {
       if (options[i] === shop) { idx = i; break }
     }
-    // 存量商品的 shop 若不在门店列表里（历史手输的脏值），idx 会是 0——
-    // 这时把 shop 也一并清成「不限门店」，避免界面显示"不限门店"、库里却存着个对不上的店名
+    // 存量商品的 shop 若不在门店列表里（历史手输的脏值），idx 会落回 0（占位项）——
+    // 这时把 shop 也清空，逼店员重新选一个真实门店，避免界面看着有值、库里存的却对不上
     if (idx === 0 && shop) {
       this.setData({ shop: '' })
     }
@@ -262,6 +264,11 @@ Page({
         wx.showToast({ title: '请选择养护项目（单项/双项）', icon: 'none' })
         return
       }
+    }
+    // 收款门店必填：没有它就不知道这笔钱该进谁的账，顾客下单会被服务端直接拒
+    if (!(that.data.shop || '').trim()) {
+      wx.showToast({ title: '请选择收款门店', icon: 'none' })
+      return
     }
     if (!that.data.categoryCode) {
       wx.showToast({ title: '分类未就绪，请稍后重试', icon: 'none' })

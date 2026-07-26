@@ -33,17 +33,20 @@
       <view class="fhint" wx:if="{{bizType == '养护' && cardType == '次卡'}}">
         单项 = 修刃 或 热蜡（二选一）；双项 = 修刃 + 热打蜡
       </view>
-      <!-- 门店只能从 shop_list 选、不能手输：顾客端门店过滤是 product.shop == shop_list.name 的
-           精确匹配，手输差一个字（「南山」写成「南山店」）就静默失效，店员完全看不出来 -->
+      <!-- 收款门店：决定这笔购买的钱进哪个门店账户（订单落在该店 → GetMchId 选微信商户号）。
+           不是"适用门店"——卡买到手全店通用。
+           只能从门店列表选、不能手输：值要与 shop_list.name 一字不差，手输差一个字
+           （「南山」写成「南山店」）后面订单落店就对不上了 -->
       <view class="fgroup">
-        <view class="flabel">限定门店<text class="hint">· 不限门店=全店通用</text></view>
+        <view class="flabel">收款门店<text class="req">*</text></view>
         <picker mode="selector" range="{{shopOptions}}" value="{{shopIndex}}" bindchange="onShopPick">
           <view class="fpicker">
-            <text class="fpicker-val">{{shopOptions[shopIndex]}}</text>
+            <text class="fpicker-val {{shopIndex === 0 ? 'fpicker-val--ph' : ''}}">{{shopOptions[shopIndex]}}</text>
             <text class="fpicker-arrow">›</text>
           </view>
         </picker>
       </view>
+      <view class="fhint">购买这张卡的款项将收到该门店账户下。卡本身全店通用，不限制使用门店。</view>
       <view class="fgroup fgroup--row">
         <view class="flabel">上架销售</view>
         <switch checked="{{on_shelves}}" bindchange="onToggleOnShelves" color="#006495" />
