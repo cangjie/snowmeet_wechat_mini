@@ -103,6 +103,12 @@ Component({
       const idx = Number(e.currentTarget.dataset.idx);
       const c = this.data.cards[idx];
       if (!c) return;
+      // 季卡每天限用一次：今天已核销过的直接拦下并说明原因，
+      // 只置灰不给反馈的话店员会以为是点击没生效、反复戳
+      if (c.usedToday) {
+        wx.showToast({ title: '该季卡今天已使用过，每天限一次', icon: 'none' });
+        return;
+      }
       this.setData({ pickedCardId: c.id, pickedCode: null, pickedNone: false });
     },
     onNoneTap() {

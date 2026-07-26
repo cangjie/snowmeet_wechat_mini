@@ -49,8 +49,9 @@
       <view wx:if="{{cardsLoading}}" class="tcs-tip">加载中…</view>
       <view wx:elif="{{cards.length === 0}}" class="tcs-tip">暂无会员卡</view>
       <block wx:else>
+        <!-- 季卡今天已用过（usedToday）→ 整条置灰禁选：季卡不限总次数，靠「每天一次」约束 -->
         <view wx:for="{{cards}}" wx:key="id"
-          class="tcs-item {{pickedCardId === item.id ? 'tcs-item--active' : ''}}"
+          class="tcs-item {{pickedCardId === item.id ? 'tcs-item--active' : ''}} {{item.usedToday ? 'tcs-item--disabled' : ''}}"
           data-idx="{{index}}" bindtap="onCardTap">
           <view class="tcs-item-radio">
             <view class="radio-dot {{pickedCardId === item.id ? 'radio-dot--active' : ''}}"></view>
@@ -59,6 +60,7 @@
             <view class="tcs-card-head">
               <text class="tcs-chip {{item.biz_type === '养护' ? 'tcs-chip--care' : 'tcs-chip--rent'}}">{{item.biz_type}}</text>
               <text class="tcs-card-name">{{item.card_name}}</text>
+              <text wx:if="{{item.usedToday}}" class="tcs-card-usedtag">今日已用</text>
             </view>
             <view wx:if="{{item._isSeason}}" class="tcs-card-meta">
               <text>上次使用：{{item._lastUsed}}</text>

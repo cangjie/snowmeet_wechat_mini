@@ -65,6 +65,22 @@
 .tcs-item--disabled {
   background: #f1f3f5;
 }
+/* 季卡今日已用：整条降下去（卡名/角标/明细一起），不用读文字也看得出不能选 */
+.tcs-item--disabled .tcs-card-name,
+.tcs-item--disabled .tcs-card-meta,
+.tcs-item--disabled .tcs-card-remaining { color: #9ca3af; }
+.tcs-item--disabled .tcs-chip { background: #e5e7eb; color: #9ca3af; }
+.tcs-item--disabled .radio-dot { border-color: #d1d5db; }
+.tcs-card-usedtag {
+  margin-left: 12rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 20rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+}
 .tcs-item-radio {
   width: 60rpx;
   display: flex;
