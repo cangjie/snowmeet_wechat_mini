@@ -79,6 +79,52 @@
 
 .head-sub-date { color: #bbb; }
 
+/* 已退款：整卡灰化（底色、卡名、业务角标、副行一起降下去），配合右上角「已退款」标记，
+   不用读文字也能看出这张卡已经不可用 */
+.card--refunded { background: #f5f5f5; }
+.card--refunded .head-name { color: #9ca3af; }
+.card--refunded .biz { background: #e5e7eb; color: #9ca3af; }
+.card--refunded .head-sub { color: #b8bcc2; }
+.card--refunded .head-sub-date { color: #c8ccd2; }
+
+.head-refunded {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #9ca3af;
+  background: #e5e7eb;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+}
+
+/* 退款入口：描边红按钮（危险动作但不是本页主操作，实心红太抢） */
+.refund-tip {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+  padding: 12rpx 0;
+}
+
+.refund-tip--staff { color: #999; }
+
+.refund-btn {
+  margin: 8rpx 0 16rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  background: #FFFFFF;
+  color: #E64340;
+  border: 1rpx solid #E64340;
+  border-radius: 8rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.refund-btn--disabled {
+  color: #d9a5a3;
+  border-color: #e8c4c3;
+}
+
 /* 核销记录行 */
 .urow {
   display: flex;

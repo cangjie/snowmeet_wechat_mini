@@ -68,6 +68,18 @@
 .pcard-arrow { color: #c8c9cc; font-size: 32rpx; line-height: 1; }
 .pcard-row:active { background: #f7f8fa; }
 
+/* 已退款的卡：整行灰化 + 右侧「已退款」标记（仍可点进去看核销记录/退款状态） */
+.pcard-row--refunded .pcard-name { color: #9ca3af; }
+.pcard-row--refunded .pcard-biz { background: #e5e7eb; color: #9ca3af; }
+.pcard-refunded {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #9ca3af;
+  background: #e5e7eb;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+}
+
 .buy-btn {
   background: #2EA6D0;
   color: #fff;

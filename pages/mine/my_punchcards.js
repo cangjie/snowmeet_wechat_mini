@@ -24,7 +24,9 @@ Page({
       cards = cards || []
       for (var i = 0; i < cards.length; i++) {
         var c = cards[i]
-        c.remainingStr = c.isSeason ? '不限次数' : ('剩余 ' + c.remaining + ' 次')
+        // 已退款的卡照样列出来（整行置灰 + 右侧标「已退款」），不能让它凭空消失，
+        // 否则顾客会以为卡丢了；剩余次数对它已经没有意义，不再显示
+        c.remainingStr = c.isRefund ? '' : (c.isSeason ? '不限次数' : ('剩余 ' + c.remaining + ' 次'))
       }
       that.setData({ cards: cards, loading: false })
     }).catch(function () {

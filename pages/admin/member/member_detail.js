@@ -95,6 +95,9 @@ Page({
         var isSeason = c.total == null
         return { id: c.id, biz_type: c.biz_type, card_name: c.card_name, total: c.total,
           punches: c.punches || 0, isSeason: isSeason,
+          // 已退款的卡仍列出但标灰（2026-07-25 起）：钱已退回顾客，任何核销入口都用不了它，
+          // 店员在这里必须一眼看出来，不能当成可用余额报给顾客
+          isRefund: !!c.is_refund,
           remaining: isSeason ? null : (c.total - (c.punches || 0)) }
       })
       // 最近订单分类 tab：全部 + 实际出现的业务类型（按首次出现顺序）

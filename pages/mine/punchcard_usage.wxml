@@ -1,19 +1,34 @@
 <view class="page">
 
-  <!-- 卡片摘要：卡名 + 业务角标 + 剩余，和「我的次卡」列表口径一致 -->
-  <view wx:if="{{card}}" class="card">
+  <!-- 卡片摘要：卡名 + 业务角标 + 剩余，和「我的次卡」列表口径一致。
+       已退款的卡整卡置灰、右上角换成「已退款」标记，一眼看出这张卡不能用了 -->
+  <view wx:if="{{card}}" class="card {{card.isRefund ? 'card--refunded' : ''}}">
     <view class="head">
       <view class="head-name">
         <text class="biz biz--{{card.biz_type == '养护' ? 'care' : 'rent'}}">{{card.biz_type}}</text>
         <text>{{card.card_name}}</text>
       </view>
-      <view class="head-remain">{{card.remainingStr}}</view>
+      <view wx:if="{{card.isRefund}}" class="head-refunded">已退款</view>
+      <view wx:else class="head-remain">{{card.remainingStr}}</view>
     </view>
     <view class="head-sub">
       <text wx:if="{{!card.isSeason}}">总 {{card.total}} 次 · 已核销 {{usedTotal}} 次</text>
       <text wx:else>不限次数 · 已核销 {{usedTotal}} 次</text>
       <text class="head-sub-date">开卡 {{card.createDateStr}}</text>
     </view>
+  </view>
+
+  <!-- 退款入口只在服务端判定「可自助退款」时出现（一次未核销 + 微信/支付宝支付）。
+       需要人工处理的情况（现金支付、可退余额不足等）改成引导联系店员，不给按钮。
+       已使用过 / 赠送发放的卡两种都不显示这一块——核销记录本身已经说明情况，多一句提示反而是噪音。 -->
+  <view wx:if="{{!loading && refund.canRefund}}" class="card">
+    <view class="refund-tip">这张卡还没有使用过，可以申请退款，款项按原路退回支付账户。</view>
+    <view class="refund-btn {{refunding ? 'refund-btn--disabled' : ''}}" bindtap="onRefundTap">
+      {{refunding ? '退款中…' : '申请退款 ' + refundAmountStr}}
+    </view>
+  </view>
+  <view wx:elif="{{!loading && refund.contactStaff}}" class="card">
+    <view class="refund-tip refund-tip--staff">{{refund.blockReason}}</view>
   </view>
 
   <view class="card">

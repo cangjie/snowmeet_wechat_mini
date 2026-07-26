@@ -1067,10 +1067,18 @@ const startMyPunchCardPaymentPromise = function (orderId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/StartMyPunchCardPayment/' + orderId + '?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
-// 我的次卡·使用明细：某张卡被哪些订单核销过、每单核销几次（服务端按 order_id 汇总并校验卡归属本人）
+// 我的次卡·使用明细：某张卡被哪些订单核销过、每单核销几次（服务端按 order_id 汇总并校验卡归属本人）。
+// 同时返回 refund 判定（能不能自助退款、退多少、不能退的原因），前端不自己拼这套规则。
 const getMyPunchCardUsagesPromise = function (cardId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetMyPunchCardUsages?cardId=' + cardId + '&sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
+}
+// 我的次卡·自助退款：一次未核销过的卡原路退回微信/支付宝，成功后服务端置 punch_card.is_refund=1。
+// 金额和可退性全部由服务端判定（与 GetMyPunchCardUsages 返回的 refund 同一份口径），前端只管发起。
+// 传 {} 是为了走 POST（这个接口不读 body，退款这种有副作用的动作不该用 GET）
+const refundMyPunchCardPromise = function (cardId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/RefundMyPunchCard/' + cardId + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, {})
 }
 // 购买次卡·试算（只读，不写库）
 const preparePunchCardSalePromise = function (orderId, productId, sessionKey) {
@@ -1524,6 +1532,7 @@ module.exports = {
   getProductPromise,
   getMyPunchCardsPromise,
   getMyPunchCardUsagesPromise,
+  refundMyPunchCardPromise,
   getMyPunchCardOrderPromise,
   startMyPunchCardPaymentPromise,
   preparePunchCardSalePromise,
