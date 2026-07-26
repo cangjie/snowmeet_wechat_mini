@@ -79,6 +79,10 @@
 .punch-name { font-size: 27rpx; font-weight: 600; color: #0b1c30; }
 .punch-biz { font-size: 22rpx; color: #6f7881; }
 .punch-remain { font-size: 25rpx; font-weight: 600; color: #006495; }
+/* 次卡行可点进核销记录：右侧剩余次数 + 箭头 */
+.punch-r { display: flex; align-items: center; gap: 8rpx; }
+.punch-arrow { color: #c8c9cc; font-size: 30rpx; line-height: 1; }
+.punch-row:active { background: #f7f8fa; }
 /* 已退款的卡：整行灰化，避免店员把它当成可用余额报给顾客 */
 .punch-row--refunded .punch-name { color: #9ca3af; }
 .punch-row--refunded .punch-biz { color: #b8bcc2; }

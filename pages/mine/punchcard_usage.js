@@ -7,6 +7,11 @@
 // 一次都没核销过的卡还能在这里自助退款：能不能退、退多少、不能退的原因，全部由服务端
 // 随上面那个接口一起下发（refund 字段），本页不自己判规则——判断口径必须和真正执行退款时
 // 完全一致，否则会出现"页面给了按钮、点下去被拒"。
+//
+// 本页同时服务店员：会员详情页点某张卡也进这里，带 ?staff=1。区别只有两点——
+// ① 数据走 Rent/GetPunchCardUsagesByStaff（按 staff 权限放行，不校验"卡是我的"）
+// ② 服务端不下发 refund，所以顾客自助退款入口自然不显示（店员替顾客退款走店员自己的流程）
+// 展示口径两边完全一致，由服务端同一个 BuildPunchCardUsageView 组装。
 var app = getApp()
 var util = require('../../utils/util.js')
 var data = require('../../utils/data.js')
@@ -14,6 +19,7 @@ var data = require('../../utils/data.js')
 Page({
   data: {
     cardId: 0,
+    isStaff: false,        // 店员模式（从会员详情进来）：换数据源 + 不显示顾客自助退款入口
     card: null,
     usages: [],
     usedTotal: 0,
@@ -25,7 +31,8 @@ Page({
 
   onLoad(options) {
     var cardId = parseInt(options.cardId, 10) || 0
-    this.setData({ cardId: cardId })
+    var isStaff = options.staff == '1'
+    this.setData({ cardId: cardId, isStaff: isStaff })
     var that = this
     app.loginPromiseNew.then(function () {
       that.getData()
@@ -39,7 +46,10 @@ Page({
       return
     }
     that.setData({ loading: true })
-    data.getMyPunchCardUsagesPromise(that.data.cardId, app.globalData.sessionKey).then(function (res) {
+    var promise = that.data.isStaff
+      ? data.getPunchCardUsagesByStaffPromise(that.data.cardId, app.globalData.sessionKey)
+      : data.getMyPunchCardUsagesPromise(that.data.cardId, app.globalData.sessionKey)
+    promise.then(function (res) {
       res = res || {}
       var card = res.card || null
       if (card) {

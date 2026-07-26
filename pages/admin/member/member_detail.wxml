@@ -67,11 +67,16 @@
     <!-- 名下次卡 -->
     <view class="card" wx:if="{{member.punchCards.length > 0}}">
       <view class="card-title"><van-icon name="coupon-o" size="16px" color="#006495" /><text class="card-title-txt">名下次卡</text></view>
-      <view wx:for="{{member.punchCards}}" wx:key="id" class="punch-row {{item.isRefund ? 'punch-row--refunded' : ''}}">
+      <!-- 整行可点，进这张卡的核销记录（与顾客侧「我的次卡」同一个页面、同一套展示口径） -->
+      <view wx:for="{{member.punchCards}}" wx:key="id" class="punch-row {{item.isRefund ? 'punch-row--refunded' : ''}}"
+            data-id="{{item.id}}" bindtap="onPunchCardTap">
         <view class="punch-l"><text class="punch-name">{{item.card_name}}</text><text class="punch-biz">{{item.biz_type}}</text></view>
-        <text wx:if="{{item.isRefund}}" class="punch-remain punch-remain--refunded">已退款</text>
-        <text wx:elif="{{item.isSeason}}" class="punch-remain">季卡 · 不限次数</text>
-        <text wx:else class="punch-remain">剩余 {{item.remaining}} / {{item.total}} 次</text>
+        <view class="punch-r">
+          <text wx:if="{{item.isRefund}}" class="punch-remain punch-remain--refunded">已退款</text>
+          <text wx:elif="{{item.isSeason}}" class="punch-remain">季卡 · 不限次数</text>
+          <text wx:else class="punch-remain">剩余 {{item.remaining}} / {{item.total}} 次</text>
+          <text class="punch-arrow">›</text>
+        </view>
       </view>
     </view>
 

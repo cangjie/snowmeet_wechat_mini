@@ -1075,6 +1075,12 @@ const startMyPunchCardPaymentPromise = function (orderId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/StartMyPunchCardPayment/' + orderId + '?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
+// 次卡使用明细（店员侧，会员详情页用）：按 staff 权限放行，不校验"卡是我的"，且不下发退款判定。
+// 展示口径与顾客侧同源（服务端 BuildPunchCardUsageView）
+const getPunchCardUsagesByStaffPromise = function (cardId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/GetPunchCardUsagesByStaff?cardId=' + cardId + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
 // 我的次卡·使用明细：某张卡被哪些订单核销过、每单核销几次（服务端按 order_id 汇总并校验卡归属本人）。
 // 同时返回 refund 判定（能不能自助退款、退多少、不能退的原因），前端不自己拼这套规则。
 const getMyPunchCardUsagesPromise = function (cardId, sessionKey) {
@@ -1540,6 +1546,7 @@ module.exports = {
   getProductPromise,
   getMyPunchCardsPromise,
   getMyPunchCardUsagesPromise,
+  getPunchCardUsagesByStaffPromise,
   refundMyPunchCardPromise,
   placeMyPunchCardOrderPromise,
   getMyPunchCardOrderPromise,

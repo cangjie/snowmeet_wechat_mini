@@ -144,6 +144,14 @@ Page({
     }).catch(function () { wx.hideLoading() /* 后端 message 已 toast（如手机号已被他人绑定）*/ })
   },
 
+  // 点某张次卡 → 该卡的核销记录。复用顾客侧的使用明细页，带 staff=1 切成店员模式
+  // （换成按 staff 权限放行的接口，且不显示顾客自助退款入口）
+  onPunchCardTap(e) {
+    var cardId = e.currentTarget.dataset.id
+    if (!cardId) { return }
+    wx.navigateTo({ url: '/pages/mine/punchcard_usage?cardId=' + cardId + '&staff=1' })
+  },
+
   onOrderTab(e) {
     var t = e.currentTarget.dataset.t
     var all = (this.data.member && this.data.member.recentOrders) || []
