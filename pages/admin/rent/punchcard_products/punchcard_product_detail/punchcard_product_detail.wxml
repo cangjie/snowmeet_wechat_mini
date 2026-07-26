@@ -72,6 +72,13 @@
       </view>
     </view>
 
+    <!-- 删除只在编辑已有商品时出现；新建还没落库，没什么可删 -->
+    <view class="section" wx:if="{{!isNew}}">
+      <view class="shead"><text class="st">删除商品</text></view>
+      <view class="fhint">删除后该商品不再出现在顾客购买页、发卡列表和本管理页。已经发出去的卡不受影响，仍可正常使用。</view>
+      <view class="btn-danger {{deleting ? 'disabled' : ''}}" bindtap="onDelete">{{deleting ? '删除中...' : '删除该商品'}}</view>
+    </view>
+
   </view>
 
   <view class="footer">

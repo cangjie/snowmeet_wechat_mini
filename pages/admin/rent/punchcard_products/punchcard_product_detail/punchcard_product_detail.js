@@ -28,7 +28,8 @@ Page({
     formats: {},
     rulesHtml: '',       // 使用规则（富文本）：顾客端详情页「使用规则」卡片；留空则显示默认规则
     rulesFormats: {},
-    saving: false
+    saving: false,
+    deleting: false
   },
 
   onLoad(options) {
@@ -113,6 +114,33 @@ Page({
   },
 
   onCancel() { wx.navigateBack() },
+
+  // 删除 = 软删除（服务端置 valid=0），不物理删行：已售出的零售行和已发出的卡还引用着这个商品。
+  // 已发出的卡不受影响——卡上的名称/次数是发卡时复制过去的，不依赖商品行。
+  onDelete() {
+    var that = this
+    if (that.data.deleting || !that.data.id) { return }
+    wx.showModal({
+      title: '确认删除',
+      content: '删除「' + (that.data.name || '该商品') + '」后，顾客购买页和发卡列表都不再出现它。已经发出去的卡不受影响。',
+      confirmText: '删除',
+      confirmColor: '#ba1a1a',
+      success: function (r) {
+        if (!r.confirm) { return }
+        that.setData({ deleting: true })
+        wx.showLoading({ title: '删除中', mask: true })
+        data.deletePunchCardProductPromise(that.data.id, app.globalData.sessionKey).then(function () {
+          wx.hideLoading()
+          wx.showToast({ title: '已删除', icon: 'success' })
+          setTimeout(function () { wx.navigateBack() }, 500)
+        }).catch(function () {
+          // performWebRequest 已把服务端的拒绝原因 toast 出来了，这里只复位状态
+          wx.hideLoading()
+          that.setData({ deleting: false })
+        })
+      }
+    })
+  },
 
   onNameInput(e) { this.setData({ name: e.detail.value }) },
   onPriceInput(e) { this.setData({ sale_price: e.detail.value }) },

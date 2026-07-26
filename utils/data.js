@@ -1045,6 +1045,11 @@ const modPunchCardProductPromise = function (product, sessionKey) {
   var url = app.globalData.requestPrefix + 'Category/ModProduct?sessionKey=' + sessionKey
   return util.performWebRequest(url, product)
 }
+// 次卡/季卡商品管理：删除（软删除 valid=0）。已发出的卡不受影响，商品从目录/发卡预设/管理列表消失
+const deletePunchCardProductPromise = function (productId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/DeletePunchCardProduct/' + productId + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
 // 商品详情（通用商品目录，含 images/properties/category），次卡/季卡商品维护详情页编辑态用来回填
 const getProductPromise = function (id, sessionKey) {
   var url = app.globalData.requestPrefix + 'Category/GetProduct/' + id + '?sessionKey=' + sessionKey
@@ -1543,6 +1548,7 @@ module.exports = {
   getPunchCardCategoryCodePromise,
   addPunchCardProductPromise,
   modPunchCardProductPromise,
+  deletePunchCardProductPromise,
   getProductPromise,
   getMyPunchCardsPromise,
   getMyPunchCardUsagesPromise,
