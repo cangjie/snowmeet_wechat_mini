@@ -21,6 +21,7 @@ Page({
     punch_total: '',
     shop: '',
     on_shelves: true,
+    careProjectCount: 0,   // 养护次卡专用：1=单项（修刃 或 热蜡）/ 2=双项（修刃 + 热打蜡）；0=未选
     imageId: 0,
     imageUrl: '',
     html: '',            // 简介（富文本）：顾客端首页取它的纯文本摘要、详情页整段渲染
@@ -82,6 +83,7 @@ Page({
         name: product.name || '',
         sale_price: product.sale_price != null ? String(product.sale_price) : '',
         punch_total: product.punch_total != null ? String(product.punch_total) : '',
+        careProjectCount: product.care_project_count || 0,
         shop: product.shop || '',
         on_shelves: !!product.on_shelves,
         categoryCode: product.category_code,
@@ -117,6 +119,7 @@ Page({
   onPunchTotalInput(e) { this.setData({ punch_total: e.detail.value }) },
   onShopInput(e) { this.setData({ shop: e.detail.value }) },
   onToggleOnShelves() { this.setData({ on_shelves: !this.data.on_shelves }) },
+  onProjectCountTap(e) { this.setData({ careProjectCount: parseInt(e.currentTarget.dataset.v, 10) }) },
 
   onImageUploaded(e) {
     var files = (e.detail && e.detail.files) || []
@@ -186,6 +189,15 @@ Page({
         return
       }
     }
+    // 养护次卡必须指明单项/双项：它决定开单选中这张卡时自动带出哪些养护服务项，缺了核销就推不出默认项
+    var careProjectCount = null
+    if (that.data.bizType == '养护' && that.data.cardType == '次卡') {
+      careProjectCount = that.data.careProjectCount
+      if (careProjectCount != 1 && careProjectCount != 2) {
+        wx.showToast({ title: '请选择养护项目（单项/双项）', icon: 'none' })
+        return
+      }
+    }
     if (!that.data.categoryCode) {
       wx.showToast({ title: '分类未就绪，请稍后重试', icon: 'none' })
       return
@@ -216,6 +228,7 @@ Page({
       valid: 1,
       on_shelves: that.data.on_shelves ? 1 : 0,
       punch_total: punchTotal,
+      care_project_count: careProjectCount,
       content: that.data.html || '',
       usage_rules: that.data.rulesHtml || '',
       images: images,

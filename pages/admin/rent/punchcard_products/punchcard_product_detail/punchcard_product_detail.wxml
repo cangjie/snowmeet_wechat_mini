@@ -21,6 +21,18 @@
         <view class="flabel">次数<text class="req">*</text></view>
         <input class="finput" type="number" value="{{punch_total}}" placeholder="0" bindinput="onPunchTotalInput" />
       </view>
+      <!-- 养护次卡才有单项/双项之分：单项=修刃 或 热蜡（二选一），双项=修刃 + 热打蜡。
+           它决定开单选中这张卡时自动带出哪些养护服务项 -->
+      <view class="fgroup" wx:if="{{bizType == '养护' && cardType == '次卡'}}">
+        <view class="flabel">养护项目<text class="req">*</text></view>
+        <view class="seg">
+          <view class="seg-item {{careProjectCount == 1 ? 'seg-item--on' : ''}}" data-v="1" bindtap="onProjectCountTap">单项</view>
+          <view class="seg-item {{careProjectCount == 2 ? 'seg-item--on' : ''}}" data-v="2" bindtap="onProjectCountTap">双项</view>
+        </view>
+      </view>
+      <view class="fhint" wx:if="{{bizType == '养护' && cardType == '次卡'}}">
+        单项 = 修刃 或 热蜡（二选一）；双项 = 修刃 + 热打蜡
+      </view>
       <view class="fgroup">
         <view class="flabel">限定店铺<text class="hint">· 留空=不限店铺</text></view>
         <input class="finput" value="{{shop}}" placeholder="留空=不限店铺" bindinput="onShopInput" />

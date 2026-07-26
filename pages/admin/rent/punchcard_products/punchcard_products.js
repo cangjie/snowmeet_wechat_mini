@@ -57,7 +57,12 @@ Page({
       return true
     }).map(function (p) {
       var countText = p.cardType == '次卡' ? ((p.punch_total || 0) + ' 次') : '不限次数'
-      return Object.assign({}, p, { countText: countText })
+      // 养护次卡的单项/双项直接列在副行，不用点进详情才看得到
+      var projectText = ''
+      if (p.bizType == '养护' && p.cardType == '次卡') {
+        projectText = p.care_project_count == 2 ? '双项' : (p.care_project_count == 1 ? '单项' : '项目未设')
+      }
+      return Object.assign({}, p, { countText: countText, projectText: projectText })
     })
     that.setData({ filteredProducts: filtered })
   },
@@ -79,6 +84,11 @@ Page({
   onAdd(e) {
     var bizType = e.currentTarget.dataset.biztype
     var cardType = e.currentTarget.dataset.cardtype
+    var that = this
+    // 把筛选切到正在新增的这个组合：否则筛选停在别的组合时（比如停在「租赁+季卡」却去加养护次卡），
+    // 加完返回列表会被筛选挡住显示「暂无商品」，看起来就像根本没添加成功
+    that.setData({ filterBizType: bizType, filterCardType: cardType })
+    that.applyFilter()
     wx.navigateTo({
       url: 'punchcard_product_detail/punchcard_product_detail?id=0&bizType=' + encodeURIComponent(bizType)
         + '&cardType=' + encodeURIComponent(cardType)

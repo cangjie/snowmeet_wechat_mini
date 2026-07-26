@@ -29,6 +29,26 @@ page { background: #f8f9ff; }
 .flabel .req { color: #ba1a1a; margin-left: 4rpx; }
 .flabel .hint { font-size: 22rpx; color: #6f7881; margin-left: 12rpx; }
 
+/* 单项/双项分段控件（仅养护次卡显示） */
+.seg { display: flex; gap: 16rpx; }
+.seg-item {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 0;
+  border-radius: 10rpx;
+  border: 1rpx solid #bfc7d1;
+  font-size: 26rpx;
+  color: #3f4850;
+  background: #ffffff;
+}
+.seg-item--on {
+  border-color: #006495;
+  background: #eff4ff;
+  color: #006495;
+  font-weight: 600;
+}
+.fhint { font-size: 22rpx; color: #6f7881; line-height: 1.5; margin: -8rpx 0 24rpx; }
+
 .finput {
   width: 100%;
   height: 84rpx;
