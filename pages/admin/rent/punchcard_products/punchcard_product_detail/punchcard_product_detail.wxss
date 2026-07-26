@@ -29,6 +29,21 @@ page { background: #f8f9ff; }
 .flabel .req { color: #ba1a1a; margin-left: 4rpx; }
 .flabel .hint { font-size: 22rpx; color: #6f7881; margin-left: 12rpx; }
 
+/* 门店选择器：外观与 .finput 保持一致，只是右侧多个箭头表示可点开 */
+.fpicker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  border: 1px solid rgba(191, 199, 209, 0.5);
+  border-radius: 10rpx;
+  background: #fff;
+}
+.fpicker-val { font-size: 28rpx; color: #0b1c30; }
+.fpicker-arrow { color: #c8c9cc; font-size: 32rpx; line-height: 1; }
+
 /* 单项/双项分段控件（仅养护次卡显示） */
 .seg { display: flex; gap: 16rpx; }
 .seg-item {

@@ -1045,6 +1045,12 @@ const modPunchCardProductPromise = function (product, sessionKey) {
   var url = app.globalData.requestPrefix + 'Category/ModProduct?sessionKey=' + sessionKey
   return util.performWebRequest(url, product)
 }
+// 门店列表（shop_list 全量）。次卡商品维护页的「限定门店」选择器用；
+// 商品的 shop 字段必须与 shop_list.name 一字不差，顾客端门店过滤是精确匹配，所以只能选不能手输
+const getShopListPromise = function () {
+  var url = app.globalData.requestPrefix + 'Order/GetShops'
+  return util.performWebRequest(url, null)
+}
 // 次卡/季卡商品管理：删除（软删除 valid=0）。已发出的卡不受影响，商品从目录/发卡预设/管理列表消失
 const deletePunchCardProductPromise = function (productId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/DeletePunchCardProduct/' + productId + '?sessionKey=' + sessionKey
@@ -1549,6 +1555,7 @@ module.exports = {
   addPunchCardProductPromise,
   modPunchCardProductPromise,
   deletePunchCardProductPromise,
+  getShopListPromise,
   getProductPromise,
   getMyPunchCardsPromise,
   getMyPunchCardUsagesPromise,

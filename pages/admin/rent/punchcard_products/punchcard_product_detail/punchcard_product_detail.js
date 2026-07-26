@@ -19,7 +19,9 @@ Page({
     name: '',
     sale_price: '',
     punch_total: '',
-    shop: '',
+    shop: '',              // 空 = 不限门店；非空必须与 shop_list.name 一字不差
+    shopOptions: ['不限门店'],   // picker 选项：第 0 项固定是「不限门店」，其余来自 shop_list
+    shopIndex: 0,
     on_shelves: true,
     careProjectCount: 0,   // 养护次卡专用：1=单项（修刃 或 热蜡）/ 2=双项（修刃 + 热打蜡）；0=未选
     imageId: 0,
@@ -43,6 +45,7 @@ Page({
         wx.navigateBack()
         return
       }
+      that._loadShops()   // 新建/编辑都要，与拉商品并发
       if (id > 0) {
         that.loadForEdit(id)
       } else {
@@ -97,6 +100,7 @@ Page({
         dataLoaded: true,
         pageTitle: '编辑' + bizType + cardType
       })
+      that._syncShopIndex()   // 商品先到时在这里对下标；门店列表先到则由 _loadShops 里那次负责
       wx.setNavigationBarTitle({ title: '编辑' + bizType + cardType })
       // 两个 editor 的 ready 与拉数据是并发的：谁先到都得能把内容填进去，
       // 所以这里拿到数据补一次、ready 回调里再按 data 补一次
@@ -145,7 +149,40 @@ Page({
   onNameInput(e) { this.setData({ name: e.detail.value }) },
   onPriceInput(e) { this.setData({ sale_price: e.detail.value }) },
   onPunchTotalInput(e) { this.setData({ punch_total: e.detail.value }) },
-  onShopInput(e) { this.setData({ shop: e.detail.value }) },
+  // 门店列表拉回来后，把当前商品已存的 shop 对到选项下标上。
+  // 拉列表与拉商品是并发的，所以两边完成时都调一次，谁后到谁生效
+  _loadShops() {
+    var that = this
+    data.getShopListPromise().then(function (shops) {
+      var options = ['不限门店']
+      for (var i = 0; i < (shops || []).length; i++) {
+        var n = (shops[i].name || '').trim()
+        if (n) { options.push(n) }
+      }
+      that.setData({ shopOptions: options })
+      that._syncShopIndex()
+    }).catch(function () {
+      // 拉不到门店列表就只剩「不限门店」，至少不会让店员手输出一个对不上的店名
+    })
+  },
+  _syncShopIndex() {
+    var shop = (this.data.shop || '').trim()
+    var options = this.data.shopOptions
+    var idx = 0
+    for (var i = 1; i < options.length; i++) {
+      if (options[i] === shop) { idx = i; break }
+    }
+    // 存量商品的 shop 若不在门店列表里（历史手输的脏值），idx 会是 0——
+    // 这时把 shop 也一并清成「不限门店」，避免界面显示"不限门店"、库里却存着个对不上的店名
+    if (idx === 0 && shop) {
+      this.setData({ shop: '' })
+    }
+    this.setData({ shopIndex: idx })
+  },
+  onShopPick(e) {
+    var idx = parseInt(e.detail.value, 10) || 0
+    this.setData({ shopIndex: idx, shop: idx === 0 ? '' : this.data.shopOptions[idx] })
+  },
   onToggleOnShelves() { this.setData({ on_shelves: !this.data.on_shelves }) },
   onProjectCountTap(e) { this.setData({ careProjectCount: parseInt(e.currentTarget.dataset.v, 10) }) },
 

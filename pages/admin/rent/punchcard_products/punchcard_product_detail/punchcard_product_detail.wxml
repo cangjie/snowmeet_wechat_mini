@@ -33,9 +33,16 @@
       <view class="fhint" wx:if="{{bizType == '养护' && cardType == '次卡'}}">
         单项 = 修刃 或 热蜡（二选一）；双项 = 修刃 + 热打蜡
       </view>
+      <!-- 门店只能从 shop_list 选、不能手输：顾客端门店过滤是 product.shop == shop_list.name 的
+           精确匹配，手输差一个字（「南山」写成「南山店」）就静默失效，店员完全看不出来 -->
       <view class="fgroup">
-        <view class="flabel">限定店铺<text class="hint">· 留空=不限店铺</text></view>
-        <input class="finput" value="{{shop}}" placeholder="留空=不限店铺" bindinput="onShopInput" />
+        <view class="flabel">限定门店<text class="hint">· 不限门店=全店通用</text></view>
+        <picker mode="selector" range="{{shopOptions}}" value="{{shopIndex}}" bindchange="onShopPick">
+          <view class="fpicker">
+            <text class="fpicker-val">{{shopOptions[shopIndex]}}</text>
+            <text class="fpicker-arrow">›</text>
+          </view>
+        </picker>
       </view>
       <view class="fgroup fgroup--row">
         <view class="flabel">上架销售</view>
