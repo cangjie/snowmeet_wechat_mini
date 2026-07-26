@@ -39,3 +39,6 @@
   </block>
 
 </view>
+
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;font-size: medium;"
+  current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch"></mp-tabbar>

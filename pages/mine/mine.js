@@ -8,7 +8,8 @@ Page({
   data: {
     role: '',
     canGetInfo: false,
-    tabIndex: 1
+    // 底部菜单里「我的」的下标。app.js 的 userTabBarItem 在 预定/我的 之间插了「次卡」后由 1 变 2
+    tabIndex: 2
   },
 
   /**

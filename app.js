@@ -266,6 +266,9 @@ App({
         */
       }
     ],
+    // ⚠️ 各页面的 tabIndex 是硬编码的（页面 data 里写死 0/1/2），
+    // 往这个数组中间插项会让后面所有页面的高亮错位——增删项时必须同步检查
+    // 所有用了 mp-tabbar 的页面：index / mine / ski_pass_selector / ski_pass_reserve / punchcard_shop
     userTabBarItem: [
       {
         "pagePath": "/pages/ski_pass/ski_pass_selector",
@@ -274,6 +277,10 @@ App({
         "iconPath": "/images/book-3-line.png",
         "selectedIconPath": "/images/book-3-line-hl.png"
         */
+      },
+      {
+        "pagePath": "/pages/punchcard/punchcard_shop",
+        "text": "次卡"
       },
       {
         "pagePath": "/pages/mine/mine",

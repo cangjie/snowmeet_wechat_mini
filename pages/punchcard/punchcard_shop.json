@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "购买次卡",
-  "usingComponents": {}
+  "usingComponents": {
+    "mp-tabbar": "weui-miniprogram/tabbar/tabbar"
+  }
 }

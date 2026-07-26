@@ -18,7 +18,8 @@ page {
 
 .page {
   min-height: 100vh;
-  padding: 16px 14px 32px;
+  /* 底部菜单是 fixed 的，留出它的高度 + 安全区，否则最后一张卡片会被盖住 */
+  padding: 16px 14px calc(110px + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 

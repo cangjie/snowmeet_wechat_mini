@@ -24,20 +24,15 @@ Page({
     })
     */
     app.loginPromiseNew.then(function(resolve){
-      if (app.globalData.jumped == undefined && app.globalData.staff){
-        app.globalData.jumped = true
-        wx.navigateTo({
-          url: '/admin/admin',
-        })
-      }
-      else{
-        // 首页自动跳转目标：原来是雪票选购页 ski_pass_selector，现改为次卡销售首页
-        // punchcard_shop（该页不消费 resort/staffId 参数，故不再拼接）。雪票选购页本身
-        // 保留、未删除，仍可通过其它入口访问，只是不再是首页默认跳转目标。
-        wx.redirectTo({
-          url: '/pages/punchcard/punchcard_shop',
-        })
-      }
+      // 首页只是个跳板，所有人（含店员）统一落到次卡销售首页。
+      // 原来这里有个「店员自动进后台」的分支，但它跳的是 '/admin/admin' —— app.json 注册的是
+      // 'pages/admin/admin'，路径不存在、navigateTo 必然失败，且失败后不会走 else，
+      // 结果店员打开小程序就卡在空白首页。店员进后台的入口在「我的 → 我是管理员」（wx:if="{{staff}}"），
+      // 不依赖这里，所以直接去掉该分支，不再按身份分流。
+      // 雪票选购页 ski_pass_selector 保留、未删除，仍可从底部菜单「预定」进入。
+      wx.redirectTo({
+        url: '/pages/punchcard/punchcard_shop',
+      })
     })
     
     

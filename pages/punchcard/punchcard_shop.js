@@ -18,14 +18,23 @@ var BIZ_TYPES = ['租赁', '养护']
 Page({
   data: {
     items: [],
-    loading: true
+    loading: true,
+    // 底部菜单：本页在 app.js userTabBarItem 里是第 2 项「次卡」（预定 / 次卡 / 我的）
+    tabIndex: 1,
+    tabbarItemList: []
   },
 
   onShow() {
     var that = this
     app.loginPromiseNew.then(function () {
+      that.setData({ tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1 })
       that.getData()
     })
+  },
+
+  // 与 index / mine / ski_pass_* 同款：整页替换，不往页面栈里叠
+  tabSwitch(e) {
+    wx.redirectTo({ url: e.detail.item.pagePath })
   },
 
   getData() {
