@@ -20,9 +20,12 @@
     <view class="member-row member-row--bottom">
       <view class="member-tags">
         <view wx:if="{{bizLabel}}" class="member-tag tag-biz">{{bizLabel}}</view>
-        <view wx:if="{{assets && assets.depositStr}}" class="member-tag tag-deposit">储值 {{assets.depositStr}}</view>
-        <view wx:if="{{assets && assets.punchRemaining > 0}}" class="member-tag tag-punch">次卡 {{assets.punchRemaining}} 次</view>
-        <view wx:if="{{assets && assets.points > 0}}" class="member-tag tag-points">龙珠 {{assets.points}}</view>
+        <!-- 资产 chip 由 JS 的 rebuildAssetChips 派生（券/次卡/季卡/储值/龙珠），
+             卡按当前业务线过滤，这里只负责渲染 -->
+        <view wx:for="{{assetChips}}" wx:key="key" class="member-tag {{item.cls}}">
+          <van-icon name="{{item.icon}}" size="11px"/>
+          <text class="member-tag-text">{{item.text}}</text>
+        </view>
       </view>
       <view wx:if="{{customer.memberId}}" class="member-detail-link" bindtap="onMemberDetail">
         <text>查看详情</text>
