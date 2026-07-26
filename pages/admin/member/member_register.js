@@ -164,9 +164,11 @@ Page({
     var that = this
     var p = that.data.punchPickList[that.data.punchSelIdx]
     if (!p) { wx.showToast({ title: '请选择卡种', icon: 'none' }); return }
+    var spec = p.isSeason ? '不限次数' : (p.total + ' 次')
     var grants = that.data.grants.concat([{
-      kind: 'punch', bizType: p.biz_type, cardName: p.card_name, total: p.total,
-      name: p.card_name, subStr: p.biz_type + '次卡 · ' + p.total + ' 次'
+      // productId 是发卡唯一依据；bizType/cardName/spec 只用于礼包清单展示
+      kind: 'punch', productId: p.productId, bizType: p.biz_type, cardName: p.card_name, spec: spec,
+      name: p.card_name, subStr: p.biz_type + p.card_type + ' · ' + spec
     }])
     that.setData({ grants: grants, punchPickShow: false })
   },
@@ -227,8 +229,9 @@ Page({
         })
       } else {
         tasks.push({
-          label: g.cardName + '（' + g.bizType + ' · ' + g.total + ' 次）',
-          run: function () { return data.grantPunchCardPromise({ memberId: memberId, bizType: g.bizType, cardName: g.cardName, total: g.total }, sk) }
+          label: g.cardName + '（' + g.bizType + ' · ' + g.spec + '）',
+          // 只传 productId，卡名/次数由服务端从商品目录取
+          run: function () { return data.grantPunchCardPromise({ memberId: memberId, productId: g.productId }, sk) }
         })
       }
     })

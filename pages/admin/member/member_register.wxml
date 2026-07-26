@@ -178,7 +178,9 @@
           <view class="opt-radio {{punchSelIdx === index ? 'opt-radio--on' : ''}}"></view>
           <view class="opt-mid">
             <text class="opt-name">{{item.card_name}}</text>
-            <text class="opt-sub">{{item.biz_type}} · {{item.total}} 次</text>
+            <text class="opt-sub">
+              {{item.biz_type}}{{item.card_type}} · {{item.isSeason ? '不限次数' : item.total + ' 次'}}{{item.onShelves ? '' : ' · 已下架'}}
+            </text>
           </view>
         </view>
         <view wx:if="{{punchPickList.length === 0}}" class="opt-empty">加载中…</view>

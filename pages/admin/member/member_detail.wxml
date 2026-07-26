@@ -175,10 +175,16 @@
   <view class="modal" catchtap="noop">
     <view class="modal-title">发放次卡</view>
     <scroll-view class="modal-list" scroll-y>
-      <view wx:for="{{punchPresets}}" wx:key="card_name" class="opt {{punchSelIdx === index ? 'opt--on' : ''}}"
+      <!-- 卡种来自次卡/季卡商品目录，key 用 productId（卡名可能重名） -->
+      <view wx:for="{{punchPresets}}" wx:key="productId" class="opt {{punchSelIdx === index ? 'opt--on' : ''}}"
             data-idx="{{index}}" bindtap="onPunchSelect">
         <view class="opt-radio {{punchSelIdx === index ? 'opt-radio--on' : ''}}"></view>
-        <view class="opt-mid"><text class="opt-name">{{item.card_name}}</text><text class="opt-sub">{{item.biz_type}} · {{item.total}} 次</text></view>
+        <view class="opt-mid">
+          <text class="opt-name">{{item.card_name}}</text>
+          <text class="opt-sub">
+            {{item.biz_type}}{{item.card_type}} · {{item.isSeason ? '不限次数' : item.total + ' 次'}}{{item.onShelves ? '' : ' · 已下架'}}
+          </text>
+        </view>
       </view>
       <view wx:if="{{punchPresets.length === 0}}" class="opt-empty">暂无可发放卡种</view>
     </scroll-view>

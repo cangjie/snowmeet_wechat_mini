@@ -267,12 +267,14 @@ Page({
     var idx = that.data.punchSelIdx
     if (idx < 0) { wx.showToast({ title: '请选择卡种', icon: 'none' }); return }
     var p = that.data.punchPresets[idx]
+    var spec = p.isSeason ? '不限次数' : (p.total + ' 次')
     wx.showModal({
-      title: '确认发卡', content: '发放「' + p.card_name + '」（' + p.biz_type + ' ' + p.total + ' 次）给该会员',
+      title: '确认发卡', content: '发放「' + p.card_name + '」（' + p.biz_type + p.card_type + ' ' + spec + '）给该会员',
       complete: function (res) {
         if (!res.confirm) return
         wx.showLoading({ title: '发放中', mask: true })
-        data.grantPunchCardPromise({ memberId: that.data.memberId, bizType: p.biz_type, cardName: p.card_name, total: p.total }, app.globalData.sessionKey)
+        // 只传 productId：卡名/次数/业务类型由服务端从商品目录取，前端传的字符串一概不作数
+        data.grantPunchCardPromise({ memberId: that.data.memberId, productId: p.productId }, app.globalData.sessionKey)
           .then(function () { wx.hideLoading(); wx.showToast({ title: '发放成功', icon: 'success' }); that.setData({ punchShow: false }); that.getData() })
           .catch(function () { wx.hideLoading(); wx.showToast({ title: '发放失败', icon: 'none' }) })
       }
