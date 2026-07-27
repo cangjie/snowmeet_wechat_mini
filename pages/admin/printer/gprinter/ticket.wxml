@@ -1,4 +1,0 @@
-<view>
-  <canvas canvas-id="img" style="width: 560px; height: 370px;" ></canvas>
-  <view wx:for="{{msg}}" >{{item}}</view>
-</view>
