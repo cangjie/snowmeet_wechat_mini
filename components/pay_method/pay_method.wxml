@@ -1,3 +1,0 @@
-<picker mode="selector" style="width: 200rpx;" range="{{payMethodList}}" bindchange="selectChanged" class="input" >
-  <picker-view  >{{payMethodList[payMethodSelectedIndex]}}</picker-view>
-</picker>

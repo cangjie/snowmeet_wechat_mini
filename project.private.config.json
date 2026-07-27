@@ -24,13 +24,6 @@
           "scene": null
         },
         {
-          "name": "beacon",
-          "pathName": "pages/blt/beacon_scan",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
           "name": "recept",
           "pathName": "pages/admin/reception/recept_entry",
           "query": "",
