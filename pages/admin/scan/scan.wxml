@@ -1,2 +1,0 @@
-<!--pages/admin/scan/scan.wxml-->
-<text>{{result}}</text>

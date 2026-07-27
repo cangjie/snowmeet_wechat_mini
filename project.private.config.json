@@ -3,13 +3,14 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pay",
-          "pathName": "pages/order/payment_entry",
-          "query": "paymentId=42696",
+          "name": "card shop",
+          "pathName": "pages/punchcard/punchcard_shop",
+          "query": "",
           "scene": null,
           "launchMode": "default"
         },
         {
+<<<<<<< HEAD
           "name": "deposit",
           "pathName": "pages/admin/deposit/deposit_account_list",
           "query": "",
@@ -24,6 +25,8 @@
           "scene": null
         },
         {
+=======
+>>>>>>> 5a1566ed8430c4069b4e1abcb1dbf1ef6a546739
           "name": "recept",
           "pathName": "pages/admin/reception/recept_entry",
           "query": "",
