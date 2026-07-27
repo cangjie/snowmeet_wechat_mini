@@ -35,6 +35,28 @@
   margin-right: 14rpx;
 }
 
+/* 日期筛选行：与租赁/养护订单列表同样的「标签 + 控件」排布 */
+.filter-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+.filter-label {
+  width: 96rpx;
+  flex-shrink: 0;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 72rpx;
+}
+.filter-row--date { padding-bottom: 16rpx; }
+
+.sum-hint {
+  font-size: 24rpx;
+  color: #d08700;
+  padding: 4rpx 0;
+}
+
 /* 搜索 */
 .search-row { display: flex; align-items: center; gap: 16rpx; padding: 12rpx 0; }
 .search-input {
@@ -59,7 +81,39 @@
   font-size: 28rpx;
   font-weight: 600;
 }
-.sum-row { font-size: 24rpx; color: #999; padding-bottom: 8rpx; }
+/* 销售方式筛选：四个 pill，选中实心主色 */
+.st-filter { flex: 1; display: flex; flex-wrap: wrap; gap: 12rpx; padding: 12rpx 0; }
+.st-chip {
+  padding: 0 24rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: #FFFFFF;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 999rpx;
+}
+.st-chip--active {
+  background: #2EA6D0;
+  border-color: #2EA6D0;
+  color: #fff;
+  font-weight: 600;
+}
+
+.sum-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+  padding-bottom: 8rpx;
+}
+.sum-amount { color: #2EA6D0; font-weight: 600; font-size: 26rpx; }
+.sum-hint--refund { color: #999; }
+
+/* 条目内金额：购买来的卡才有，赠送的不显示。推到行尾当金额列看 */
+.row-price { color: #1a1a1a; font-weight: 600; flex-shrink: 0; margin-left: auto; }
+.row--refunded .row-price { color: #9ca3af; text-decoration: line-through; }
 
 /* 列表行 */
 .row {

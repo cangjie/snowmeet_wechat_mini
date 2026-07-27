@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "卡类产品销售",
   "usingComponents": {
-    "list-pager": "/components/list-pager/index"
+    "list-pager": "/components/list-pager/index",
+    "date-range-picker": "/components/date-range-picker/index"
   }
 }

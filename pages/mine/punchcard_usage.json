@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "次卡使用明细",
-  "usingComponents": {}
+  "usingComponents": {
+    "van-popup": "@vant/weapp/popup/index"
+  }
 }

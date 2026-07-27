@@ -4,6 +4,7 @@
 // 点条目进明细页（复用 pages/mine/punchcard_usage 的店员模式：顾客信息 + 购买时间 + 核销订单列表，
 // 季卡另有修改装备品牌/长度的功能）。
 var app = getApp()
+var util = require('../../../../utils/util.js')
 var data = require('../../../../utils/data.js')
 
 var PAGE_SIZE = 20
@@ -16,7 +17,26 @@ Page({
     pageSize: PAGE_SIZE,
     totalPages: 1,
     keyword: '',
+    startDate: '',        // 开卡/购买日期区间，与租赁/养护订单列表同款控件
+    endDate: '',
+    saleType: '',         // '' = 全部 / 赠送 / 顾客自助购买 / 随订单购买
+    saleTypeOptions: [
+      { key: '', name: '全部' },
+      { key: '赠送', name: '赠送' },
+      { key: '顾客自助购买', name: '顾客自助' },
+      { key: '随订单购买', name: '随订单' }
+    ],
+    // 筛选后全集的合计（服务端算，不是当前页累加）
+    totalAmountStr: '',
+    refundCount: 0,
+    refundAmountStr: '',
     loading: false
+  },
+
+  onLoad() {
+    // 默认今天，与租赁/养护订单列表一致（控件里「今天」快捷键也正好是高亮态）
+    var today = util.formatDate(new Date())
+    this.setData({ startDate: today, endDate: today })
   },
 
   onShow() {
@@ -36,7 +56,8 @@ Page({
   getData(page, pageSize) {
     var that = this
     that.setData({ loading: true })
-    data.getPunchCardSalesByStaffPromise(that.data.keyword, page, pageSize, app.globalData.sessionKey)
+    data.getPunchCardSalesByStaffPromise(that.data.keyword, that.data.startDate, that.data.endDate,
+      that.data.saleType, page, pageSize, app.globalData.sessionKey)
       .then(function (res) {
         res = res || {}
         var items = (res.items || []).map(function (it) {
@@ -46,13 +67,18 @@ Page({
             remainText: it.isSeason ? '—' : ('剩余 ' + it.remaining + ' 次'),
             customerText: (it.memberName || '（未填姓名）') + (it.memberGender ? '·' + it.memberGender : ''),
             saleTypeCls: it.saleType === '赠送' ? 'st-gift'
-              : (it.saleType === '随订单购买' ? 'st-order' : 'st-self')
+              : (it.saleType === '随订单购买' ? 'st-order' : 'st-self'),
+            // 赠送的卡没有关联零售行、没有金额，这一格就不显示（showAmount 自带 ¥ 前缀）
+            priceStr: it.salePrice == null ? '' : util.showAmount(it.salePrice)
           })
         })
         var total = res.total || 0
         that.setData({
           items: items,
           total: total,
+          totalAmountStr: util.showAmount(res.totalAmount || 0),
+          refundCount: res.refundCount || 0,
+          refundAmountStr: util.showAmount(res.refundAmount || 0),
           page: page,
           pageSize: pageSize,
           totalPages: Math.max(1, Math.ceil(total / pageSize)),
@@ -61,6 +87,19 @@ Page({
       }).catch(function () {
         that.setData({ loading: false })
       })
+  },
+
+  // 改日期即刷新（与租赁/养护列表要点「查询」不同：这页筛选项少，多一步点击没必要）
+  onDateRangeChange(e) {
+    this.setData({ startDate: e.detail.startDate, endDate: e.detail.endDate })
+    this.getData(1, this.data.pageSize)
+  },
+
+  onSaleTypeTap(e) {
+    var key = e.currentTarget.dataset.key || ''
+    if (key == this.data.saleType) return
+    this.setData({ saleType: key })
+    this.getData(1, this.data.pageSize)
   },
 
   onKeywordInput(e) { this.setData({ keyword: e.detail.value }) },

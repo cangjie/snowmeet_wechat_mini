@@ -1,13 +1,38 @@
 <view class="page">
 
   <view class="card">
+    <!-- 日期按开卡/购买时间筛，与租赁/养护订单列表同一个控件 -->
+    <view class="filter-row filter-row--date">
+      <text class="filter-label">日期</text>
+      <date-range-picker startDate="{{startDate}}" endDate="{{endDate}}" bind:change="onDateRangeChange" />
+    </view>
     <view class="search-row">
       <input class="search-input" value="{{keyword}}" placeholder="卡名 / 顾客姓名 / 手机号"
         placeholder-class="search-ph" bindinput="onKeywordInput" bindconfirm="onSearch" />
       <view wx:if="{{keyword}}" class="search-clear" bindtap="onClearKeyword">清空</view>
       <view class="search-btn" bindtap="onSearch">查询</view>
     </view>
-    <view class="sum-row">共 {{total}} 张卡</view>
+    <view class="filter-row">
+      <text class="filter-label">销售方式</text>
+      <view class="st-filter">
+        <view wx:for="{{saleTypeOptions}}" wx:key="key"
+          class="st-chip {{saleType == item.key ? 'st-chip--active' : ''}}"
+          data-key="{{item.key}}" bindtap="onSaleTypeTap">{{item.name}}</view>
+      </view>
+    </view>
+    <!-- 关键字搜索时服务端会忽略日期区间，这里明说一句，免得以为筛选没生效 -->
+    <view wx:if="{{keyword}}" class="sum-hint">搜索关键字时不受日期限制</view>
+    <!-- 合计是筛选后全集的（服务端算），不是当前页累加。
+         已退款的卡不计入销售额——钱已原路退回，计进去等于虚增，所以单列一行说明 -->
+    <view class="sum-row">
+      <text>共 {{total}} 张卡</text>
+      <text class="sum-amount">销售额 {{totalAmountStr}}</text>
+    </view>
+    <view wx:if="{{refundCount > 0}}" class="sum-hint sum-hint--refund">
+      其中 {{refundCount}} 张已退款（{{refundAmountStr}}），未计入销售额
+    </view>
+    <list-pager wx:if="{{total > 0}}" page="{{page}}" total-pages="{{totalPages}}"
+      page-size="{{pageSize}}" disabled="{{loading}}" bind:change="onPagerChange" />
   </view>
 
   <view class="card">
@@ -29,6 +54,8 @@
             <text>{{item.countText}}</text>
             <text class="row-remain">{{item.remainText}}</text>
             <text class="sale-type {{item.saleTypeCls}}">{{item.saleType}}</text>
+            <!-- 赠送的卡没有关联零售行，也就没有金额 -->
+            <text wx:if="{{item.priceStr}}" class="row-price">{{item.priceStr}}</text>
           </view>
           <view class="row-sub row-sub--customer">
             <text>{{item.customerText}}</text>

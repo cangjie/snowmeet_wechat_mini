@@ -1108,17 +1108,25 @@ const startMyPunchCardPaymentPromise = function (orderId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/StartMyPunchCardPayment/' + orderId + '?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
-// 卡类产品销售列表（管理后台 staff≥200）：倒序列出卖出/发出的次卡与季卡
-const getPunchCardSalesByStaffPromise = function (keyword, pageIndex, pageSize, sessionKey) {
+// 卡类产品销售列表（管理后台 staff≥200）：倒序列出卖出/发出的次卡与季卡。
+// 日期按开卡/购买时间筛；传了 keyword 时服务端会忽略日期区间（放宽到全时段）。
+// saleType 传 赠送/随订单购买/顾客自助购买 之一即按该方式筛，留空为全部。
+// 返回除 items 外还带筛选后全集的 total / totalAmount / refundCount / refundAmount
+const getPunchCardSalesByStaffPromise = function (keyword, startDate, endDate, saleType, pageIndex, pageSize, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/GetPunchCardSalesByStaff?sessionKey=' + sessionKey
     + '&pageIndex=' + (pageIndex || 1) + '&pageSize=' + (pageSize || 20)
   if (keyword) { url += '&keyword=' + encodeURIComponent(keyword) }
+  if (startDate != null) { url += '&startDate=' + encodeURIComponent(util.formatDate(new Date(startDate))) }
+  if (endDate != null) { url += '&endDate=' + encodeURIComponent(util.formatDate(new Date(endDate))) }
+  if (saleType) { url += '&saleType=' + encodeURIComponent(saleType) }
   return util.performWebRequest(url, null)
 }
-// 修改季卡绑定的装备品牌/长度（管理后台 staff≥200）
-const updatePunchCardEquipByStaffPromise = function (cardId, brand, scale, sessionKey) {
+// 修改季卡绑定的装备类型/品牌/长度（管理后台 staff≥200）。
+// 三项要么全填、要么全空（全空 = 退回未开卡，下次养护重新绑），服务端会拒绝残缺绑定
+const updatePunchCardEquipByStaffPromise = function (cardId, equipType, brand, scale, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/UpdatePunchCardEquipByStaff/' + cardId
     + '?sessionKey=' + sessionKey
+    + '&equipType=' + encodeURIComponent(equipType || '')
     + '&brand=' + encodeURIComponent(brand || '') + '&scale=' + encodeURIComponent(scale || '')
   return util.performWebRequest(url, null)
 }

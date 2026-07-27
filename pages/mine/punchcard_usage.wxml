@@ -40,23 +40,53 @@
     <view class="kv"><text class="kv-k">购买/开卡时间</text><text class="kv-v">{{card.createTimeStr || card.createDateStr}}</text></view>
   </view>
 
-  <!-- 季卡绑定装备：仅店员模式可改，且只开放品牌/长度。
-       装备类型换了等于换一块板，属于"换卡"不是"改信息"，不在这里开放（服务端也拒） -->
+  <!-- 季卡绑定装备：仅店员模式可改。开卡时按第一次养护的装备自动绑，绑错了在这里改。
+       录入方式与养护开单的装备信息一致：类型双选 + 品牌 picker（可新增）+ 长度。
+       三项要么全填要么全空——缺一项是残缺绑定，这张卡以后再也匹配不上装备（服务端同样拒绝） -->
   <view wx:if="{{isStaff && card && card.isSeason}}" class="card">
     <view class="section-title">绑定装备</view>
-    <view class="kv"><text class="kv-k">装备类型</text><text class="kv-v">{{card.equip_type || '（尚未开卡）'}}</text></view>
+    <view class="fgroup">
+      <text class="fl">装备类型</text>
+      <view class="etype">
+        <view class="etype-btn {{equipType == '双板' ? 'etype-btn--active' : ''}}"
+              data-equip="双板" bindtap="onEquipTypeTap">双板</view>
+        <view class="etype-btn {{equipType == '单板' ? 'etype-btn--active' : ''}}"
+              data-equip="单板" bindtap="onEquipTypeTap">单板</view>
+      </view>
+    </view>
     <view class="fgroup">
       <text class="fl">品牌</text>
-      <input class="fi" value="{{equipBrand}}" placeholder="未绑定" bindinput="onEquipBrandInput" />
+      <picker class="fi-wrap" range="{{brandListView}}" value="{{brandIndex}}"
+              disabled="{{!equipType}}" bindchange="onBrandChange">
+        <view class="fi fi--picker {{equipBrand ? '' : 'fi--placeholder'}}">
+          {{equipBrand || (equipType ? '点此选择品牌' : '先选装备类型')}}
+        </view>
+      </picker>
     </view>
     <view class="fgroup">
       <text class="fl">长度 (cm)</text>
-      <input class="fi" type="number" value="{{equipScale}}" placeholder="未绑定" bindinput="onEquipScaleInput" />
+      <input class="fi" type="digit" value="{{equipScale}}" placeholder="如 170" bindinput="onEquipScaleInput" />
     </view>
+    <view class="equip-hint">三项全部留空可让这张卡退回「未开卡」，下次养护时按当次装备重新绑定。</view>
     <view class="save-btn {{savingEquip ? 'save-btn--disabled' : ''}}" bindtap="onSaveEquip">
       {{savingEquip ? '保存中…' : '保存装备信息'}}
     </view>
   </view>
+
+  <!-- 新增品牌：品牌库里没有的牌子当场加，加完直接选中（与养护开单同一接口同一行为） -->
+  <van-popup show="{{addBrand.show}}" position="center" round custom-style="width: 560rpx;" bind:close="onAddBrandCancel">
+    <view class="bmodal">
+      <view class="bmodal-title">新增品牌</view>
+      <input class="fi bmodal-input" placeholder="英文名称（必填）" value="{{addBrand.name}}"
+             data-field="name" bindinput="onAddBrandInput" />
+      <input class="fi bmodal-input" placeholder="中文名称" value="{{addBrand.chineseName}}"
+             data-field="chineseName" bindinput="onAddBrandInput" />
+      <view class="bmodal-btns">
+        <view class="bmodal-btn" bindtap="onAddBrandCancel">取消</view>
+        <view class="bmodal-btn bmodal-btn--primary" bindtap="onAddBrandConfirm">确定</view>
+      </view>
+    </view>
+  </van-popup>
 
   <view class="card">
     <view class="section-title">核销记录</view>
