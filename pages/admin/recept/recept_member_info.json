@@ -1,8 +1,4 @@
 {
-  "usingComponents": {
-    "user-info": "/components/user_info/user_info",
-    "ticket": "/components/ticket_selector/ticket_selector"
-    
-  },
+  "usingComponents": {},
   "navigationBarTitleText": "确认用户信息"
 }

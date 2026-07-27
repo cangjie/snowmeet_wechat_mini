@@ -1,8 +1,4 @@
 {
-  "usingComponents": {
-
-    "auth": "../../../components/auth/auth"
-
-  },
+  "usingComponents": {},
   "navigationBarTitleText": "优惠券详情"
 }

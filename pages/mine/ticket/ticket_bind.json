@@ -1,6 +1,4 @@
 {
-  "usingComponents": {
-    "auth": "../../../components/auth/auth"
-  },
+  "usingComponents": {},
   "navigationBarTitleText": "绑定优惠券"
 }
