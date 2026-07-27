@@ -116,17 +116,8 @@ App({
     wx.login({
       success: (res) => {
         const app = getApp()
-        var fontUrl = 'https://' + app.globalData.domainName + '/font/thin.ttf'
-        wx.loadFontFace({
-          family: 'icon-font',
-          source: 'url("' + fontUrl + '")',
-          success: (res) => {
-            console.log('load font', res)
-          },
-          fail: (res) => {
-            console.log('load font', res)
-          }
-        })
+        // icon-font(thin.ttf, 2MB) 只有旧版接待 components/rent/rent_recept 用到，
+        // 已下沉到该组件按需加载，不再让所有用户冷启动都下这 2MB
         if (util.referStafffId) {
           app.globalData.referStaffId = util.referStafffId
         }

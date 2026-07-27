@@ -2,6 +2,31 @@
 const util = require('../../utils/util.js')
 const data = require('../../utils/data.js')
 const app = getApp()
+
+// icon-font(thin.ttf, 约 2MB) 只有本组件的序号样式在用（见 rent_recept.wxml 的
+// font-family: icon-font）。原先在 app.js 登录流程里无条件加载，导致所有用户每次
+// 冷启动都下载一遍；现改为进入旧版接待页时才按需加载，且进程内只加载一次。
+let iconFontLoaded = false
+function ensureIconFont() {
+  if (iconFontLoaded) {
+    return
+  }
+  iconFontLoaded = true
+  const fontUrl = 'https://' + app.globalData.domainName + '/font/thin.ttf'
+  wx.loadFontFace({
+    family: 'icon-font',
+    source: 'url("' + fontUrl + '")',
+    global: true,
+    success: (res) => {
+      console.log('load font', res)
+    },
+    fail: (res) => {
+      iconFontLoaded = false
+      console.log('load font', res)
+    }
+  })
+}
+
 Component({
   properties: {
     memberId: Number,
@@ -19,9 +44,12 @@ Component({
     sort: 'time'
   },
   lifetimes: {
+    attached() {
+      ensureIconFont()
+    },
     ready() {
       var that = this
-      
+
       /*
       fontUrl = 'https://' + app.globalData.domainName + '/font/endylau.ttf'
       wx.loadFontFace({
