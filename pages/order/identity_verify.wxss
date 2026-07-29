@@ -45,3 +45,13 @@
 @keyframes verify-spin { to { transform: rotate(360deg); } }
 .verify-title { font-size: 34rpx; font-weight: 600; color: #1a1a1a; }
 .verify-sub { margin-top: 16rpx; font-size: 26rpx; color: #888; line-height: 1.5; }
+.verify-btn {
+  margin-top: 28rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+  background: #006495;
+  color: #fff;
+  font-size: 28rpx;
+  padding: 0 36rpx;
+}

@@ -22,6 +22,13 @@
       <view class="verify-icon verify-icon--err">×</view>
       <view class="verify-title">核验失败</view>
       <view class="verify-sub">{{message}}</view>
+      <button wx:if="{{canBindCell}}"
+              class="verify-btn"
+              open-type="getPhoneNumber"
+              bindgetphonenumber="onBindCell"
+              disabled="{{busy}}">
+        授权手机号后重试
+      </button>
     </block>
   </view>
 </view>

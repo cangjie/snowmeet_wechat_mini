@@ -10,7 +10,9 @@ Page({
     orderId: 0,
     state: 'loading',   // loading | matched | mismatch | error
     message: '',
-    maskedCell: ''
+    maskedCell: '',
+    canBindCell: false,
+    busy: false
   },
 
   onLoad(options) {
@@ -26,23 +28,50 @@ Page({
   },
 
   onShow() {
+    this.verifyNow()
+  },
+
+  verifyNow() {
     var that = this
     if (!that.data.orderId || isNaN(that.data.orderId)) {
       that.setData({ state: 'error', message: '核验参数缺失' })
       return
     }
+    that.setData({ state: 'loading', message: '', canBindCell: false })
     app.loginPromiseNew.then(function () {
       data.verifyWechatIdentityPromise(that.data.orderId, app.globalData.sessionKey).then(function (res) {
         if (res && res.matched) {
-          that.setData({ state: 'matched' })
+          that.setData({ state: 'matched', canBindCell: false })
         } else {
-          that.setData({ state: 'mismatch', maskedCell: (res && res.orderMemberMaskedCell) || '' })
+          that.setData({ state: 'mismatch', maskedCell: (res && res.orderMemberMaskedCell) || '', canBindCell: false })
         }
       }).catch(function (msg) {
-        that.setData({ state: 'error', message: (typeof msg === 'string' && msg) ? msg : '核验失败，请重试' })
+        var errMsg = (typeof msg === 'string' && msg) ? msg : '核验失败，请重试'
+        var canBindCell = errMsg.indexOf('未识别扫码人身份') >= 0
+        that.setData({ state: 'error', message: errMsg, canBindCell: canBindCell })
       })
     }).catch(function () {
       that.setData({ state: 'error', message: '登录失败，请重试' })
+    })
+  },
+
+  onBindCell(e) {
+    var that = this
+    if (that.data.busy) return
+    if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
+      wx.showToast({ title: '未授权手机号', icon: 'none' })
+      return
+    }
+    that.setData({ busy: true })
+    wx.showLoading({ title: '处理中...', mask: true })
+    data.bindWechatCellPromise(e.detail.encryptedData, e.detail.iv, app.globalData.sessionKey).then(function () {
+      wx.hideLoading()
+      that.setData({ busy: false })
+      that.verifyNow()
+    }).catch(function () {
+      wx.hideLoading()
+      that.setData({ busy: false })
+      wx.showToast({ title: '手机号绑定失败，请重试', icon: 'none' })
     })
   }
 })

@@ -3,56 +3,19 @@
     "miniprogram": {
       "list": [
         {
-          "name": "card shop",
-          "pathName": "pages/punchcard/punchcard_shop",
+          "name": "receptnew",
+          "pathName": "pages/admin/reception/recept_entry",
           "query": "",
           "scene": null,
           "launchMode": "default"
         },
         {
-<<<<<<< HEAD
-          "name": "deposit",
-          "pathName": "pages/admin/deposit/deposit_account_list",
+          "name": "admin_index",
+          "pathName": "pages/admin/admin",
           "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "orderverify",
-          "pathName": "pages/order/identity_verify",
-          "query": "verifyOrderId=71746",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-=======
->>>>>>> 5a1566ed8430c4069b4e1abcb1dbf1ef6a546739
-          "name": "recept",
-          "pathName": "pages/admin/reception/recept_entry",
-          "query": "",
-          "launchMode": "default",
           "scene": null
         }
       ]
     }
-  },
-  "libVersion": "3.5.8",
-  "setting": {
-    "urlCheck": false,
-    "bigPackageSizeSupport": true,
-    "preloadBackgroundData": false,
-    "coverView": false,
-    "lazyloadPlaceholderEnable": false,
-    "skylineRenderEnable": false,
-    "autoAudits": false,
-    "useApiHook": true,
-    "showShadowRootInWxmlPanel": false,
-    "useStaticServer": false,
-    "useLanDebug": false,
-    "showES6CompileOption": false,
-    "compileHotReLoad": true,
-    "checkInvalidKey": true,
-    "ignoreDevUnusedFiles": true
-  },
-  "projectname": "snowmeet_wechat_mini"
+  }
 }
