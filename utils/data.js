@@ -1395,6 +1395,26 @@ const getUnpickedCareItemsByStaffPromise = function (shop, equipment, brand, cel
     })
   })
 }
+const getIncompleteCareItemsByStaffPromise = function (shop, equipment, brand, cell, isTest, isSummerCare, sortOrder, startDate, endDate, sessionKey, pageIndex, pageSize) {
+  var qUrl = app.globalData.requestPrefix + 'Care/GetIncompleteCareItemsByStaff?sessionKey=' + sessionKey
+  if (shop != null) { qUrl += '&shop=' + encodeURIComponent(shop) }
+  if (equipment != null) { qUrl += '&equipment=' + encodeURIComponent(equipment) }
+  if (brand != null && brand != '') { qUrl += '&brand=' + encodeURIComponent(brand) }
+  if (cell != null && cell != '') { qUrl += '&cell=' + cell }
+  if (isTest != null) { qUrl += '&isTest=' + isTest }
+  if (isSummerCare != null) { qUrl += '&isSummerCare=' + isSummerCare }
+  if (sortOrder != null) { qUrl += '&sortOrder=' + encodeURIComponent(sortOrder) }
+  if (startDate != null) { qUrl += '&startDate=' + encodeURIComponent(util.formatDate(new Date(startDate))) }
+  if (endDate != null) { qUrl += '&endDate=' + encodeURIComponent(util.formatDate(new Date(endDate))) }
+  qUrl += '&pageIndex=' + (pageIndex || 1) + '&pageSize=' + (pageSize || 10)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(qUrl, null).then(function (result) {
+      resolve(result)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const queryRentItemChangeCompatibleCategory = function (categoryId){
   var getUrl = app.globalData.requestPrefix + 'Rent/QueryChangeCompatibleCategory/' + categoryId.toString()
   return util.performWebRequest(getUrl, null)
@@ -1640,6 +1660,7 @@ module.exports = {
   calcCareChargePromise,
   getUnreturnedRentItemPromise,
   getUnpickedCareItemsByStaffPromise,
+  getIncompleteCareItemsByStaffPromise,
   queryRentItemChangeCompatibleCategory,
   getOrderBalancePromise,
   updateRentPackageCategoryPromise,

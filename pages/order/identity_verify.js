@@ -8,7 +8,7 @@ const data = require('../../utils/data.js')
 Page({
   data: {
     orderId: 0,
-    state: 'loading',   // loading | matched | mismatch | error
+    state: 'loading',   // loading | matched | mismatch | bind_cell | error
     message: '',
     maskedCell: '',
     canBindCell: false,
@@ -48,7 +48,7 @@ Page({
       }).catch(function (msg) {
         var errMsg = (typeof msg === 'string' && msg) ? msg : '核验失败，请重试'
         var canBindCell = errMsg.indexOf('未识别扫码人身份') >= 0
-        that.setData({ state: 'error', message: errMsg, canBindCell: canBindCell })
+        that.setData({ state: canBindCell ? 'bind_cell' : 'error', message: errMsg, canBindCell: canBindCell })
       })
     }).catch(function () {
       that.setData({ state: 'error', message: '登录失败，请重试' })

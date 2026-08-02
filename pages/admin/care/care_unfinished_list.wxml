@@ -1,0 +1,120 @@
+<view wx:if="{{staff && staff.title_level >= 100}}" class="page-root">
+  <view class="filter-card">
+    <view class="filter-row">
+      <text class="filter-label">店铺</text>
+      <view class="filter-value">
+        <shop-selector bindShopSelected="shopSelected"></shop-selector>
+      </view>
+    </view>
+    <view class="filter-row filter-row--date">
+      <text class="filter-label">日期</text>
+      <date-range-picker
+        startDate="{{startDate}}"
+        endDate="{{endDate}}"
+        bind:change="onDateRangeChange"
+      />
+    </view>
+    <view class="filter-row">
+      <text class="filter-label">类型</text>
+      <radio-group id="equipment" class="radio-group" bindchange="onEquipmentChange">
+        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{querying}}"/>全部</label>
+        <label class="radio-item"><radio value="双板" disabled="{{querying}}"/>双板</label>
+        <label class="radio-item"><radio value="单板" disabled="{{querying}}"/>单板</label>
+      </radio-group>
+    </view>
+    <view class="filter-row">
+      <text class="filter-label">测试</text>
+      <radio-group id="isTest" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="false" disabled="{{querying}}"/>营业</label>
+        <label class="radio-item"><radio value="true" disabled="{{querying}}"/>测试</label>
+        <label class="radio-item"><radio value="null" disabled="{{querying}}"/>全部</label>
+      </radio-group>
+    </view>
+    <view class="filter-row">
+      <text class="filter-label">非雪季</text>
+      <radio-group id="isSummerCare" class="radio-group" bindchange="setQueryOptions">
+        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{querying}}"/>全部</label>
+        <label class="radio-item"><radio value="true" disabled="{{querying}}"/>包含</label>
+        <label class="radio-item"><radio value="false" disabled="{{querying}}"/>不含</label>
+      </radio-group>
+    </view>
+    <view class="filter-row">
+      <text class="filter-label">排序</text>
+      <radio-group id="sortOrder" class="radio-group" bindchange="setQueryOptions" value="{{sortOrder}}">
+        <label class="radio-item"><radio value="asc" disabled="{{querying}}"/>正序</label>
+        <label class="radio-item"><radio value="desc" disabled="{{querying}}"/>倒序</label>
+      </radio-group>
+    </view>
+    <view class="filter-row">
+      <text class="filter-label">品牌</text>
+      <input class="filter-input" bindinput="setBrand" placeholder="品牌模糊搜索" />
+    </view>
+    <view class="filter-row">
+      <text class="filter-label">手机</text>
+      <input class="filter-input" bindinput="setCell" type="number" placeholder="手机号模糊搜索" />
+    </view>
+    <view class="filter-actions">
+      <van-button type="primary" size="normal" bind:click="query" loading="{{querying}}" disabled="{{querying}}">查 询</van-button>
+    </view>
+  </view>
+
+  <view wx:if="{{total > 0}}" class="summary-section">
+    <view class="summary-bar">
+      <text>共 {{total}} 件未完成养护</text>
+      <text class="summary-sep">·</text>
+      <text>{{sortOrder == 'desc' ? '按送到时间倒序' : '按送到时间正序'}}</text>
+    </view>
+    <view wx:if="{{taskStats.length > 0}}" class="task-stats">
+      <text class="task-stats-label">待完成任务统计：</text>
+      <view class="task-stats-list">
+        <view wx:for="{{taskStats}}" wx:key="taskName" class="task-stat-item">
+          <text class="task-stat-name">{{item.taskName}}</text>
+          <text class="task-stat-count">{{item.count}}件</text>
+        </view>
+      </view>
+    </view>
+    <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}" disabled="{{querying}}" bind:change="onPagerChange" />
+  </view>
+
+  <block wx:for="{{items}}" wx:key="id">
+    <view class="care-card" id="{{index}}" bindtap="gotoDetail">
+      <view class="care-body">
+        <view class="care-rows">
+          <view class="care-row">
+            <text class="row-label">店铺</text><text class="row-value row-value--wide">{{item.shop || '-'}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">装备</text><text class="row-value row-value--wide">{{item.equipment || '-'}} · {{item.brand || '-'}} · {{item.scale ? item.scale + 'cm' : '-'}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item.customerName || '-'}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">电话</text><text class="row-value row-value--wide">{{item.customerCell || '-'}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">已完成</text><text class="row-value row-value--wide">{{item.completedTaskStr}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">待完成</text><text class="row-value row-value--wide row-value--strong">{{item.pendingTaskStr}}</text>
+          </view>
+          <view class="care-row">
+            <text class="row-label">订单</text><text class="row-value row-value--wide">{{item.order_code || '-'}}</text>
+          </view>
+        </view>
+
+        <view wx:if="{{item.thumbs.length > 0}}" class="care-photos">
+          <image wx:for="{{item.thumbs}}" wx:for-item="thumb" wx:for-index="ti" wx:key="ti"
+                 class="care-thumb" mode="aspectFill" src="{{thumb}}"
+                 data-idx="{{index}}" data-ti="{{ti}}" catchtap="onPhotoTap" />
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{total > 0}}" class="summary-section summary-section--bottom">
+    <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}" disabled="{{querying}}" bind:change="onPagerChange" />
+  </view>
+
+  <view wx:if="{{!querying && total == 0}}" class="empty-tip">暂无未完成养护装备</view>
+</view>
