@@ -18,10 +18,29 @@
       <view class="verify-sub">请用订单会员本人{{maskedCell ? '（' + maskedCell + '）' : ''}}的微信扫码核验</view>
     </block>
 
+    <block wx:elif="{{state == 'bind_cell'}}">
+      <view class="verify-icon verify-icon--no">!</view>
+      <view class="verify-title">请先授权手机号</view>
+      <view class="verify-sub">当前微信未识别到您的会员身份，点击下方按钮授权手机号后即可继续核验</view>
+      <button class="verify-btn"
+              open-type="getPhoneNumber"
+              bindgetphonenumber="onBindCell"
+              disabled="{{busy}}">
+        授权手机号后重试
+      </button>
+    </block>
+
     <block wx:else>
       <view class="verify-icon verify-icon--err">×</view>
       <view class="verify-title">核验失败</view>
       <view class="verify-sub">{{message}}</view>
+      <button wx:if="{{canBindCell}}"
+              class="verify-btn"
+              open-type="getPhoneNumber"
+              bindgetphonenumber="onBindCell"
+              disabled="{{busy}}">
+        授权手机号后重试
+      </button>
     </block>
   </view>
 </view>

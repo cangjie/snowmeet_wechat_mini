@@ -192,6 +192,9 @@ Page({
       case 'care_unpicked':
         path = '/pages/admin/care/care_unpicked_list'
         break
+      case 'care_unfinished':
+        path = '/pages/admin/care/care_unfinished_list'
+        break
       case 'rent_search_fuzzy':
         path = '/pages/admin/rent/search_fuzzy'
         break

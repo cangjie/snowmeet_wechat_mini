@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "shop-selector": "/components/shop_selector/shop_selector",
+    "van-button": "@vant/weapp/button/index",
+    "list-pager": "/components/list-pager/index",
+    "date-range-picker": "/components/date-range-picker/index"
+  },
+  "navigationBarTitleText": "未完成养护装备"
+}

@@ -112,6 +112,7 @@ Page({
       null, p.isTest, p.isEntertain, null, null, p.haveDiscount, null,
       app.globalData.sessionKey, p.cell, null, null, p.keyword, p.isSummerCare,
       null, null, p.useCard, null,
+      null,
       page, pageSize
     ).then(function (result) {
       that.renderOrders(result.items || [], result.total || 0, page, pageSize)
