@@ -10,17 +10,19 @@
     </view>
     <view style="width: 100rpx;"></view>
   </view>
-  <view>
-    <button bindtap="accept" > 接 受 </button>
-  </view>
-  <!--view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;margin-top: 100rpx;" >
+  <view wx:if="{{!followed}}" class="flex-wrp" style="flex-direction:row;margin-top:20rpx; width: 100%;" >
     <view style="width: 100rpx;"></view>
-    <view style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;" >
-      <view><b>长按识别以下二维码关注“易龙雪聚体验中心”微信公众号，优惠券才能进入个人账户。</b></view>
+    <view style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;padding-bottom:20rpx;" >
+      <view style="margin:20rpx;"><b>长按识别以下二维码关注公众号，关注后才能接受这张优惠券。</b></view>
       <view style="text-align: center;">
         <image show-menu-by-longpress src="{{qrCodeUrl}}" style="width: 300rpx;height: 300rpx;" ></image>
       </view>
+      <view style="text-align: center;color:gray;margin-top:10rpx;">正在检测关注状态...</view>
     </view>
     <view style="width: 100rpx;"></view>
-  </view-->
+  </view>
+  <view wx:else style="text-align: center;color:green;margin-top:20rpx;">已关注 ✓</view>
+  <view>
+    <button bindtap="accept" disabled="{{!followed}}"> 接 受 </button>
+  </view>
 </view>

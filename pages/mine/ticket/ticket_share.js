@@ -1,34 +1,67 @@
 // pages/mine/ticket/ticket_share.js
 const app = getApp()
 const util = require('../../../utils/util.js')
+const data = require('../../../utils/data.js')
+var FOLLOW_POLL_INTERVAL_MS = 2500
 Page({
 
   /**
    * Page initial data
    */
   data: {
-
+    followed: false,
+    qrCodeUrl: ''
   },
   accept(){
     var that = this
-    var acceptUrl = 'https://' + app.globalData.domainName + '/core/Ticket/AcceptTicket/' + that.data.ticket.code + '?memo=' + encodeURIComponent('分享获得') + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: acceptUrl,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode == 200){
-          wx.showToast({
-            title: '优惠券已经入账。',
-            icon:'success',
-            success:()=>{
-              wx.navigateTo({
-                url: './ticket_list',
-              })
-            }
-          })
+    if (!that.data.followed){
+      wx.showToast({ title: '请先关注公众号', icon: 'none' })
+      return
+    }
+    data.acceptTicketPromise(that.data.ticket.code, '分享获得', app.globalData.sessionKey).then(function (){
+      that._stopFollowPoll()
+      wx.showToast({
+        title: '优惠券已经入账',
+        icon:'success',
+        success:()=>{
+          setTimeout(function (){
+            wx.redirectTo({
+              url: './ticket_list',
+            })
+          }, 1000)
         }
-      }
+      })
+    }).catch(function (){
+      // 失败已由 performWebRequest 统一 toast（如「不能转赠给自己」「链接可能已失效」）
     })
+  },
+  _startFollowPoll(code){
+    var that = this
+    that._stopFollowPoll()
+    that._checkFollowOnce(code)
+    that._followTimer = setInterval(function (){
+      that._checkFollowOnce(code)
+    }, FOLLOW_POLL_INTERVAL_MS)
+  },
+  _checkFollowOnce(code){
+    var that = this
+    if (that.data.followed){
+      return
+    }
+    data.checkTransferFollowPromise(code).then(function (followed){
+      if (followed){
+        that.setData({ followed: true })
+        that._stopFollowPoll()
+      }
+    }).catch(function (){
+      // 轮询失败静默重试，不打断用户
+    })
+  },
+  _stopFollowPoll(){
+    if (this._followTimer){
+      clearInterval(this._followTimer)
+      this._followTimer = null
+    }
   },
   /**
    * Lifecycle function--Called when page load
@@ -36,24 +69,19 @@ Page({
   onLoad(options) {
     var code = options.code
     var that = this
+    that.setData({ code: code })
+    var qrCodeUrl = 'https://' + app.globalData.domainName + '/api/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=ticket_gift_' + code)
+    that.setData({ qrCodeUrl: qrCodeUrl })
     app.loginPromiseNew.then(function(resolve){
-      var getTicketUrl = 'https://' + app.globalData.domainName + '/core/Ticket/GetTicket/' + code
-      wx.request({
-        url: getTicketUrl,
-        method: 'GET',
-        success:(res)=>{
-          if (res.statusCode == 200){
-            var ticket = res.data
-            ticket.usage = ticket.memo.split(';')
-            var titleColor = 'yellowgreen'
-            if (ticket.used == 1){
-              titleColor = 'gray'
-            }
-            var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=accept_ticket_code_' + code)
-            that.setData({ticket: ticket, titleColor: titleColor, qrCodeUrl: qrCodeUrl})
-          }
+      data.getTicket(code).then(function (ticket){
+        ticket.usage = ticket.memo.split(';')
+        var titleColor = 'yellowgreen'
+        if (ticket.used == 1){
+          titleColor = 'gray'
         }
+        that.setData({ticket: ticket, titleColor: titleColor})
       })
+      that._startFollowPoll(code)
     })
   },
 
@@ -68,21 +96,23 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-
+    if (this.data.code && !this.data.followed && !this._followTimer){
+      this._startFollowPoll(this.data.code)
+    }
   },
 
   /**
    * Lifecycle function--Called when page hide
    */
   onHide() {
-
+    this._stopFollowPoll()
   },
 
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload() {
-
+    this._stopFollowPoll()
   },
 
   /**

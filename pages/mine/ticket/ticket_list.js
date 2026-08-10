@@ -1,6 +1,8 @@
 // pages/mine/ticket/ticket_list.js
 const app = getApp()
 const data = require('../../../utils/data.js')
+// 硬编码：允许转赠的优惠券模板（12=免费打蜡券，16=老顾客优惠券），需与后端 TicketController.TransferableTemplateIds 保持一致
+const TRANSFERABLE_TEMPLATE_IDS = [12, 16]
 Page({
 
   /**
@@ -40,6 +42,7 @@ Page({
             tickets[i].usage = memo.split(';')
           }
           //tickets[i].usage = tickets[i].memo.split(';')
+          tickets[i].canTransfer = TRANSFERABLE_TEMPLATE_IDS.indexOf(tickets[i].template_id) >= 0 && tickets[i].used != 1
         }
         that.setData({ticketArr: tickets})
       }).catch(function (exp){
@@ -87,10 +90,24 @@ Page({
   },
 
   /**
-   * Called when user click on the top right corner to share
+   * Called when user click on the top right corner to share, or a "转赠" button (open-type="share")
    */
-  onShareAppMessage: function () {
-
+  onShareAppMessage: function (res) {
+    var that = this
+    var code = res && res.target && res.target.dataset ? res.target.dataset.code : undefined
+    if (!code){
+      return {}
+    }
+    var ticket = (that.data.ticketArr || []).filter(function (t){ return t.code === code })[0]
+    var title = ticket ? ('赠送优惠券：' + ticket.name) : '赠送优惠券'
+    return data.setTicketToSharePromise(code, app.globalData.sessionKey).then(function (){
+      return {
+        title: title,
+        path: '/pages/mine/ticket/ticket_share?code=' + code
+      }
+    }).catch(function (){
+      return {}
+    })
   },
   showDetail: function(source){
     console.log(source)

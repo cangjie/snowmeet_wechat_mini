@@ -19,8 +19,11 @@
     </view>
     <view style="width: 100rpx;"></view>
   </view>
+  <view wx:if="{{item.canTransfer}}" class="flex-wrp" style="flex-direction:row; width: 100%; justify-content:center; margin-top:10rpx;">
+    <button size="mini" open-type="share" data-code="{{item.code}}" style="font-size:24rpx;">转赠</button>
+  </view>
   <view style="height: 1rpx;" ></view>
-  
+
 </view>
 <cover-view bindtap="hideDetail" class="cover-view" style="height: 100%;background-color: #c0c0c0;position:fixed;top:0px;width:100%;display: {{showCover}};opacity: {{opacity}};">
 

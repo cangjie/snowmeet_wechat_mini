@@ -264,6 +264,36 @@ const getTicket = function (code) {
     })
   })
 }
+const setTicketToSharePromise = function (code, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Ticket/SetTicketToShare/' + code + '?sessionKey=' + encodeURIComponent(sessionKey)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (ticket) {
+      resolve(ticket)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const acceptTicketPromise = function (code, memo, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Ticket/AcceptTicket/' + code + '?memo=' + encodeURIComponent(memo) + '&sessionKey=' + encodeURIComponent(sessionKey)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (ticket) {
+      resolve(ticket)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
+const checkTransferFollowPromise = function (code) {
+  var getUrl = app.globalData.requestPrefix + 'Ticket/CheckTransferFollow?code=' + code
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (followed) {
+      resolve(followed)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const updateRentCategoryPromise = function (code, name, guaranty, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateCategory/' + code + '?name=' + encodeURIComponent(name) + '&guaranty=' + guaranty + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -1539,6 +1569,9 @@ module.exports = {
   getShopByNamePromise,
   getMyTickets,
   getTicket,
+  setTicketToSharePromise,
+  acceptTicketPromise,
+  checkTransferFollowPromise,
   updateRentCategoryPromise,
   updateRentPackagePromise,
   modRentPackageCategory,
