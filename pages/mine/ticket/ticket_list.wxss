@@ -1,7 +1,32 @@
 /* pages/mine/ticket/ticket_list.wxss */
-.navigator-hover {
-  color:blue;
+@import "./ticket_card.wxss";
+
+/* ===== Tab 导航 ===== */
+.tab-nav {
+  display: flex;
+  background: #E4E7EF;
+  border-radius: 999rpx;
+  padding: 8rpx;
+  margin-bottom: 32rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
-.other-navigator-hover {
-  color:red;
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 22rpx 0;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.tab-active {
+  background: var(--color-white);
+  color: var(--color-blue);
+  box-shadow: 0 4rpx 20rpx rgba(37, 99, 235, 0.12);
+}
+
+.tab-inactive {
+  color: var(--color-text-secondary);
 }

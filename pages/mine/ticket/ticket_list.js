@@ -9,25 +9,18 @@ Page({
    * Page initial data
    */
   data: {
-    usedColor: 'gray',
-    unUsedColor: 'red',
     showUsed: false,
-    ticketTitleColor: 'greenyellow',
-    showCover: 'none',
     ticketArr:[],
-    currentQrUrl :'',
-    currentY: 0,
-    opacity: 0,
     needAuth: false
   },
-  
+
   /**
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
     var that = this
     if (options.used != undefined && options.used != 0){
-      this.setData({showUsed: true, usedColor: 'red', unUsedColor: 'gray', ticketTitleColor:'gray'})
+      this.setData({showUsed: true})
     }
     app.loginPromiseNew.then(function(resolve){
       data.getMyTickets((!that.data.showUsed?0:1), app.globalData.sessionKey).then(function (tickets){
@@ -41,8 +34,19 @@ Page({
             tickets[i].rich = false
             tickets[i].usage = memo.split(';')
           }
-          //tickets[i].usage = tickets[i].memo.split(';')
           tickets[i].canTransfer = TRANSFERABLE_TEMPLATE_IDS.indexOf(tickets[i].template_id) >= 0 && tickets[i].used != 1
+          if (tickets[i].used == 1){
+            tickets[i].statusText = '已使用'
+            tickets[i].statusClass = 'status-used'
+          }
+          else if (tickets[i].shared == 1){
+            tickets[i].statusText = '分享中'
+            tickets[i].statusClass = 'status-shared'
+          }
+          else{
+            tickets[i].statusText = '待使用'
+            tickets[i].statusClass = 'status-pending'
+          }
         }
         that.setData({ticketArr: tickets})
       }).catch(function (exp){
@@ -110,31 +114,12 @@ Page({
     })
   },
   showDetail: function(source){
-    console.log(source)
     if (this.options.used == 1){
       return
     }
     var code = source.currentTarget.id
-
     wx.navigateTo({
       url: 'ticket_detail?code=' + code,
     })
-
-
-    //var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code
-
-    /*
-
-    var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' 
-    //+ encodeURIComponent('show_qrcode.aspx?qrcodetext=' + code)
-    + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code)
-
-
-    this.setData({currentQrUrl: qrCodeUrl, currentX: 200,currentY:source.detail.y, showCover: 'block', opacity: 0.8 })
-   
-    */
-  },
-  hideDetail: function(){
-    this.setData({showCover: 'none', opacity: 0})
   }
 })

@@ -1,0 +1,162 @@
+/* pages/mine/ticket/ticket_card.wxss
+   与 pages/mine/skipass/my_skipasses.wxss 同一套新版样式规范（客户端"我的X"系列页面），
+   转赠/优惠券列表与详情页共用，通过 @import 引入。 */
+
+page {
+  --color-bg: #F0F2F7;
+  --color-white: #ffffff;
+  --color-blue: #2563EB;
+  --color-blue-light: #EFF4FF;
+  --color-danger: #EF4444;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-border: #E5E7EB;
+  --color-gray-light: #F3F4F6;
+  --radius-card: 36rpx;
+  --radius-btn: 999rpx;
+  --shadow-card: 0 4rpx 40rpx rgba(0, 0, 0, 0.06);
+  background-color: var(--color-bg);
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+}
+
+.container {
+  min-height: 100vh;
+  padding: 40rpx 28rpx 60rpx;
+  box-sizing: border-box;
+}
+
+/* ===== 票券卡片 ===== */
+.ticket-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 44rpx 40rpx;
+  margin-bottom: 32rpx;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+
+.ticket-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+  background: linear-gradient(90deg, var(--color-blue) 0%, #7CB9F4 100%);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  opacity: 0.6;
+}
+
+.ticket-card--used {
+  opacity: 0.6;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28rpx;
+  gap: 20rpx;
+}
+
+.ticket-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.status-tag {
+  padding: 8rpx 22rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status-pending {
+  background: var(--color-blue-light);
+  color: var(--color-blue);
+}
+
+.status-shared {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.status-used {
+  background: var(--color-gray-light);
+  color: var(--color-text-muted);
+}
+
+/* ===== 使用说明 ===== */
+.usage-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.usage-item {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.usage-rich {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* ===== 操作按钮 ===== */
+.card-actions {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 28rpx;
+}
+
+.btn {
+  flex: 1;
+  text-align: center;
+  padding: 22rpx 0;
+  border-radius: var(--radius-btn);
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.btn::after {
+  border: none;
+}
+
+.btn:active {
+  opacity: 0.85;
+}
+
+.btn-use {
+  background: var(--color-blue);
+  color: var(--color-white);
+  box-shadow: 0 8rpx 28rpx rgba(37, 99, 235, 0.3);
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+  gap: 24rpx;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: var(--color-text-muted);
+}

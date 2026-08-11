@@ -1,7 +1,32 @@
 /* pages/mine/ticket/ticket_detail.wxss */
-.navigator-hover {
-  color:blue;
+@import "./ticket_card.wxss";
+
+/* ===== 核销二维码卡片 ===== */
+.qr-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 44rpx 40rpx;
+  margin-top: 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.other-navigator-hover {
-  color:red;
+
+.qr-card-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  margin-bottom: 24rpx;
+}
+
+.qr-card-image {
+  width: 360rpx;
+  margin-bottom: 20rpx;
+}
+
+.qr-card-code {
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  letter-spacing: 2rpx;
 }
