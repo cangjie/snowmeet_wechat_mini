@@ -106,7 +106,8 @@ Page({
     return data.setTicketToSharePromise(ticket.code, app.globalData.sessionKey).then(function (){
       return {
         title: '赠送优惠券：' + ticket.name,
-        path: '/pages/mine/ticket/ticket_share?code=' + ticket.code
+        path: '/pages/mine/ticket/ticket_share?code=' + ticket.code,
+        imageUrl: '/images/ticket_share_cover.png'
       }
     }).catch(function (){
       return {}

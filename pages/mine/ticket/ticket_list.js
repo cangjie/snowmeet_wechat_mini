@@ -107,7 +107,8 @@ Page({
     return data.setTicketToSharePromise(code, app.globalData.sessionKey).then(function (){
       return {
         title: title,
-        path: '/pages/mine/ticket/ticket_share?code=' + code
+        path: '/pages/mine/ticket/ticket_share?code=' + code,
+        imageUrl: '/images/ticket_share_cover.png'
       }
     }).catch(function (){
       return {}
