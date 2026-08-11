@@ -107,7 +107,7 @@ Page({
       return {
         title: '赠送优惠券：' + ticket.name,
         path: '/pages/mine/ticket/ticket_share?code=' + ticket.code,
-        imageUrl: '/images/ticket_share_cover.png'
+        imageUrl: 'https://' + app.globalData.domainName + '/images/snowmeet_logo.png'
       }
     }).catch(function (){
       return {}

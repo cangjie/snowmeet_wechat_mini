@@ -108,7 +108,7 @@ Page({
       return {
         title: title,
         path: '/pages/mine/ticket/ticket_share?code=' + code,
-        imageUrl: '/images/ticket_share_cover.png'
+        imageUrl: 'https://' + app.globalData.domainName + '/images/snowmeet_logo.png'
       }
     }).catch(function (){
       return {}
