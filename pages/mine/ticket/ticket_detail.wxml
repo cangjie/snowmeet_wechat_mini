@@ -1,5 +1,5 @@
 <!--pages/mine/ticket/ticket_detail.wxml-->
-<view class="container">
+<view class="ticket-page">
 
   <view class="ticket-card {{ticket.used == 1 ? 'ticket-card--used' : ''}}">
     <view class="card-header">
@@ -12,7 +12,10 @@
     </view>
   </view>
 
-  <view class="card-actions" wx:if="{{ticket.canTransfer}}">
+  <view class="card-actions" wx:if="{{ticket.shared == 1}}">
+    <button class="btn btn-cancel-share" bindtap="onCancelShare">撤回分享</button>
+  </view>
+  <view class="card-actions" wx:elif="{{ticket.canTransfer}}">
     <button open-type="share" class="btn btn-use">转赠好友</button>
   </view>
 

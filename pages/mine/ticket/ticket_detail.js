@@ -104,6 +104,10 @@ Page({
       return {}
     }
     return data.setTicketToSharePromise(ticket.code, app.globalData.sessionKey).then(function (){
+      ticket.shared = 1
+      ticket.statusText = '分享中'
+      ticket.statusClass = 'status-shared'
+      that.setData({ ticket: ticket })
       return {
         title: '赠送优惠券：' + ticket.name,
         path: '/pages/mine/ticket/ticket_share?code=' + ticket.code,
@@ -111,6 +115,31 @@ Page({
       }
     }).catch(function (){
       return {}
+    })
+  },
+  onCancelShare(){
+    var that = this
+    var ticket = that.data.ticket
+    if (!ticket){
+      return
+    }
+    wx.showModal({
+      title: '撤回分享',
+      content: '撤回后，对方将无法再通过分享链接接受这张优惠券。',
+      confirmText: '撤回',
+      confirmColor: '#EF4444',
+      success: function (res){
+        if (!res.confirm){
+          return
+        }
+        data.cancelShareTicketPromise(ticket.code, app.globalData.sessionKey).then(function (){
+          ticket.shared = 0
+          ticket.statusText = '待使用'
+          ticket.statusClass = 'status-pending'
+          that.setData({ ticket: ticket })
+          wx.showToast({ title: '已撤回分享', icon: 'success' })
+        }).catch(function (){})
+      }
     })
   }
 })

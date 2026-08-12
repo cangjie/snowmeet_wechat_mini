@@ -20,7 +20,7 @@ page {
   font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
 }
 
-.container {
+.ticket-page {
   min-height: 100vh;
   padding: 40rpx 28rpx 60rpx;
   box-sizing: border-box;
@@ -141,6 +141,11 @@ page {
   background: var(--color-blue);
   color: var(--color-white);
   box-shadow: 0 8rpx 28rpx rgba(37, 99, 235, 0.3);
+}
+
+.btn-cancel-share {
+  background: #FEF3C7;
+  color: #B45309;
 }
 
 /* ===== 空状态 ===== */

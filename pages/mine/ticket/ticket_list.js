@@ -105,6 +105,7 @@ Page({
     var ticket = (that.data.ticketArr || []).filter(function (t){ return t.code === code })[0]
     var title = ticket ? ('赠送优惠券：' + ticket.name) : '赠送优惠券'
     return data.setTicketToSharePromise(code, app.globalData.sessionKey).then(function (){
+      that._patchTicketStatus(code, { shared: 1, statusText: '分享中', statusClass: 'status-shared' })
       return {
         title: title,
         path: '/pages/mine/ticket/ticket_share?code=' + code,
@@ -112,6 +113,38 @@ Page({
       }
     }).catch(function (){
       return {}
+    })
+  },
+  /**
+   * 就地更新某张券在 ticketArr 里的字段（分享/撤回分享成功后用），避免整页重新拉取
+   */
+  _patchTicketStatus: function (code, patch){
+    var arr = this.data.ticketArr
+    for (var i = 0; i < arr.length; i++){
+      if (arr[i].code === code){
+        Object.assign(arr[i], patch)
+        break
+      }
+    }
+    this.setData({ ticketArr: arr })
+  },
+  onCancelShare: function (e){
+    var that = this
+    var code = e.currentTarget.dataset.code
+    wx.showModal({
+      title: '撤回分享',
+      content: '撤回后，对方将无法再通过分享链接接受这张优惠券。',
+      confirmText: '撤回',
+      confirmColor: '#EF4444',
+      success: function (res){
+        if (!res.confirm){
+          return
+        }
+        data.cancelShareTicketPromise(code, app.globalData.sessionKey).then(function (){
+          that._patchTicketStatus(code, { shared: 0, statusText: '待使用', statusClass: 'status-pending' })
+          wx.showToast({ title: '已撤回分享', icon: 'success' })
+        }).catch(function (){})
+      }
     })
   },
   showDetail: function(source){

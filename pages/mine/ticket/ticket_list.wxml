@@ -1,4 +1,4 @@
-<view class="container">
+<view class="ticket-page">
 
   <!-- 顶部 Tab 导航 -->
   <view class="tab-nav">
@@ -18,7 +18,10 @@
         <view class="usage-item" wx:for="{{item.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
       </view>
     </view>
-    <view class="card-actions" wx:if="{{item.canTransfer}}">
+    <view class="card-actions" wx:if="{{item.shared == 1}}">
+      <button size="mini" class="btn btn-cancel-share" bindtap="onCancelShare" data-code="{{item.code}}">撤回分享</button>
+    </view>
+    <view class="card-actions" wx:elif="{{item.canTransfer}}">
       <button size="mini" class="btn btn-use" open-type="share" data-code="{{item.code}}">转赠好友</button>
     </view>
   </view>

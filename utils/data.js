@@ -294,6 +294,16 @@ const checkTransferFollowPromise = function (code) {
     })
   })
 }
+const cancelShareTicketPromise = function (code, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Ticket/CancelShare/' + code + '?sessionKey=' + encodeURIComponent(sessionKey)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (ticket) {
+      resolve(ticket)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const updateRentCategoryPromise = function (code, name, guaranty, scene, sessionKey) {
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdateCategory/' + code + '?name=' + encodeURIComponent(name) + '&guaranty=' + guaranty + '&scene=' + encodeURIComponent(scene) + '&sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
@@ -1592,6 +1602,7 @@ module.exports = {
   setTicketToSharePromise,
   acceptTicketPromise,
   checkTransferFollowPromise,
+  cancelShareTicketPromise,
   updateRentCategoryPromise,
   updateRentPackagePromise,
   modRentPackageCategory,
