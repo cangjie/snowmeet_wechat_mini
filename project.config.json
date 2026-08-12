@@ -7,6 +7,12 @@
           "pathName": "pages/admin/admin",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "ticket_share_test",
+          "pathName": "pages/mine/ticket/ticket_share",
+          "query": "code=775025175",
+          "scene": null
         }
       ]
     }

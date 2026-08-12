@@ -53,7 +53,7 @@ Page({
   // 页面首次加载时查一次当前关注状态：已关注 -> 只显示接受按钮；未关注 -> 只显示二维码并开始轮询
   _checkInitialFollow(code){
     var that = this
-    data.checkTransferFollowPromise(code).then(function (followed){
+    data.checkTransferFollowPromise(code, app.globalData.sessionKey).then(function (followed){
       that.setData({ followed: followed, checking: false })
       if (!followed){
         that._startFollowPoll(code)
@@ -78,7 +78,7 @@ Page({
     if (that.data.followed){
       return
     }
-    data.checkTransferFollowPromise(code).then(function (followed){
+    data.checkTransferFollowPromise(code, app.globalData.sessionKey).then(function (followed){
       if (followed){
         that._stopFollowPoll()
         that.setData({ followed: true })

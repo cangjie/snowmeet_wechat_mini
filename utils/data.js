@@ -284,8 +284,8 @@ const acceptTicketPromise = function (code, memo, sessionKey) {
     })
   })
 }
-const checkTransferFollowPromise = function (code) {
-  var getUrl = app.globalData.requestPrefix + 'Ticket/CheckTransferFollow?code=' + code
+const checkTransferFollowPromise = function (code, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Ticket/CheckTransferFollow?code=' + code + '&sessionKey=' + encodeURIComponent(sessionKey)
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (followed) {
       resolve(followed)

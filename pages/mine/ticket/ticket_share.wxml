@@ -18,7 +18,7 @@
     <text class="qr-tip">长按识别下方二维码关注公众号</text>
     <text class="qr-tip qr-tip-sub">关注后将自动为您接受这张优惠券</text>
     <image class="qr-image" show-menu-by-longpress src="{{qrCodeUrl}}"></image>
-    <text class="qr-status">{{accepting ? '已关注，正在为您接受...' : '正在检测关注状态...'}}</text>
+    <text class="qr-status">{{accepting ? '已关注，正在为您接受...' : '还未关注，请扫码关注后自动接收'}}</text>
   </view>
 
   <view wx:else class="share-panel accept-panel">
