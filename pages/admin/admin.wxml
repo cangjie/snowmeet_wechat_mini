@@ -18,9 +18,6 @@
     <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >
       <view style="background-color: #999999">【雪票】南山预定</view>
     </mp-cell>
-    <mp-cell id="recept_auth" bindtap="nav" >
-      <view style="background-color:#00FFFF">【接待】接待授权</view>
-    </mp-cell>
     <mp-cell id="unipay" bindtap="nav" >
       <view style="background-color:#bad810">【支付】聚合支付</view>
     </mp-cell>
@@ -47,7 +44,6 @@
   <mp-cells title="实体店铺接待" >
     <mp-cell id="recept" bindtap="nav">【接待】店铺接待</mp-cell>
     <mp-cell id="recept_list" bindtap="nav" >【接待】未完成的接待</mp-cell>
-    <mp-cell id="recept_auth" bindtap="nav" >【接待】接待授权</mp-cell>
   </mp-cells>
   <mp-cells  title="店铺销售" >
     <!--mp-cell id="shopSale" bindtap="gotoSale" >【零售】店销现货</mp-cell-->

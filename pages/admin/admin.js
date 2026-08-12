@@ -172,7 +172,7 @@ Page({
         path = '/pages/admin/utv/reserve_list'
         break
       case 'recept':
-        path = '/pages/admin/recept/recept_entry'
+        path = '/pages/admin/reception/recept_entry'
         break
       case 'recept_list':
         path = '/pages/admin/recept/recept_list'
@@ -266,9 +266,6 @@ Page({
       case 'deposit_add':
         path = '/pages/admin/deposit/deposit_charge_search'
         break
-      case 'recept_auth':
-        path = '/pages/admin/recept/recept_auth_list'
-        break
       case 'deposit_balance':
         path = '/pages/admin/deposit/deposit_balance'
         break
@@ -300,7 +297,7 @@ Page({
         path = '/pages/admin/fnb/mat_expire_list/mat_expire_list'
         break
       case 'rent_recepting':
-        path = '/pages/admin/recept/rent_recepting_list'
+        path = '/pages/admin/reception/recept_entry'
         break
       case 'careOrderList':
         path = '/pages/admin/care/care_order_list'
