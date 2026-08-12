@@ -1,1 +1,62 @@
 /* pages/mine/ticket/ticket_share.wxss */
+@import "./ticket_card.wxss";
+
+.share-panel {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 44rpx 40rpx;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.share-loading {
+  padding: 80rpx 40rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: var(--color-text-muted);
+}
+
+/* ===== 未关注：只显示二维码 ===== */
+.qr-tip {
+  font-size: 28rpx;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.qr-tip-sub {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+  margin-bottom: 32rpx;
+}
+
+.qr-image {
+  width: 360rpx;
+  height: 360rpx;
+  border-radius: 16rpx;
+  background: var(--color-gray-light);
+}
+
+.qr-status {
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+}
+
+/* ===== 已关注：只显示接受按钮 ===== */
+.followed-tip {
+  font-size: 28rpx;
+  color: var(--color-blue);
+  font-weight: 600;
+  margin-bottom: 32rpx;
+}
+
+.accept-panel .btn {
+  width: 100%;
+}
