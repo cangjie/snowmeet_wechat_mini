@@ -70,8 +70,6 @@ Page({
     var code = options.code
     var that = this
     that.setData({ code: code })
-    var qrCodeUrl = 'https://' + app.globalData.domainName + '/api/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=ticket_gift_' + code)
-    that.setData({ qrCodeUrl: qrCodeUrl })
     app.loginPromiseNew.then(function(resolve){
       data.getTicket(code).then(function (ticket){
         ticket.usage = ticket.memo.split(';')
@@ -79,7 +77,13 @@ Page({
         if (ticket.used == 1){
           titleColor = 'gray'
         }
-        that.setData({ticket: ticket, titleColor: titleColor})
+        // 二维码场景值必须用后端算好的 ticket.transfer_scene（绑定在这一次分享上），
+        // 不能自己拼 code——否则同一张券换收件人转赠时会复用到别人的历史扫码/关注记录
+        var qrCodeUrl = ''
+        if (ticket.transfer_scene){
+          qrCodeUrl = 'https://' + app.globalData.domainName + '/api/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=' + ticket.transfer_scene)
+        }
+        that.setData({ticket: ticket, titleColor: titleColor, qrCodeUrl: qrCodeUrl})
       })
       that._startFollowPoll(code)
     })
