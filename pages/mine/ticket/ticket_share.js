@@ -2,7 +2,7 @@
 const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
-var FOLLOW_POLL_INTERVAL_MS = 2500
+var STATUS_POLL_INTERVAL_MS = 2500
 Page({
 
   /**
@@ -15,84 +15,102 @@ Page({
     qrCodeUrl: ''
   },
 
-  // 手动点击"接受"按钮（仅在页面加载时就已关注的情况下展示此按钮）
+  // 手动点击"接受"按钮（仅在已经关注公众号的情况下展示此按钮）。
+  // 未关注状态下扫码关注后的自动接受，是公众号服务器收到关注事件时直接调用
+  // SnowmeetApi 的 AcceptTicketByOaFollow 完成的（见 SnowmeetOfficialAccount 的
+  // AcceptGiftedTicket），不在小程序端触发——这里只负责轮询状态、更新界面。
   accept(){
-    this._doAccept('优惠券已经入账')
-  },
-
-  // 未关注状态下，轮询检测到扫码关注成功后自动接受，无需用户再点按钮
-  _autoAccept(){
-    this._doAccept('已关注，优惠券自动入账')
-  },
-
-  _doAccept(toastTitle){
     var that = this
     if (that.data.accepting || !that.data.ticket){
       return
     }
     that.setData({ accepting: true })
     data.acceptTicketPromise(that.data.ticket.code, '分享获得', app.globalData.sessionKey).then(function (){
-      that._stopFollowPoll()
-      wx.showToast({
-        title: toastTitle,
-        icon: 'success',
-        success: () => {
-          setTimeout(function (){
-            wx.redirectTo({
-              url: './ticket_list',
-            })
-          }, 1000)
-        }
-      })
+      that._stopStatusPoll()
+      that._goAcceptedSuccess('优惠券已经入账')
     }).catch(function (){
       // 失败已由 performWebRequest 统一 toast（如「不能转赠给自己」「链接可能已失效」）
       that.setData({ accepting: false })
     })
   },
 
-  // 页面首次加载时查一次当前关注状态：已关注 -> 只显示接受按钮；未关注 -> 只显示二维码并开始轮询
+  _goAcceptedSuccess(toastTitle){
+    wx.showToast({
+      title: toastTitle,
+      icon: 'success',
+      success: () => {
+        setTimeout(function (){
+          wx.redirectTo({
+            url: './ticket_list',
+          })
+        }, 1000)
+      }
+    })
+  },
+
+  // 页面首次加载时查一次当前关注状态：已关注 -> 显示接受按钮；未关注 -> 显示二维码，
+  // 之后统一交给 _startStatusPoll 轮询后续变化
   _checkInitialFollow(code){
     var that = this
     data.checkTransferFollowPromise(code, app.globalData.sessionKey).then(function (followed){
       that.setData({ followed: followed, checking: false })
-      if (!followed){
-        that._startFollowPoll(code)
-      }
+      that._startStatusPoll(code)
     }).catch(function (){
       // 查询失败时兜底当作未关注处理，展示二维码并继续轮询重试，而不是卡死在加载态
       that.setData({ checking: false, followed: false })
-      that._startFollowPoll(code)
+      that._startStatusPoll(code)
     })
   },
 
-  _startFollowPoll(code){
+  _startStatusPoll(code){
     var that = this
-    that._stopFollowPoll()
-    that._followTimer = setInterval(function (){
-      that._checkFollowOnce(code)
-    }, FOLLOW_POLL_INTERVAL_MS)
+    that._stopStatusPoll()
+    that._statusTimer = setInterval(function (){
+      that._checkStatusOnce(code)
+    }, STATUS_POLL_INTERVAL_MS)
   },
 
-  _checkFollowOnce(code){
+  // 轮询这张券的状态：
+  // 1. 如果已经不在"分享中"了，要么是公众号那边自动接受成功了，要么是对方撤回了分享——
+  //    用 member_id 有没有变化来区分这两种情况（接受会把 member_id 改成我；撤回只会把
+  //    shared 清零，member_id 还是原来发起分享的人），分别给出对应的提示，不能笼统当作
+  //    "已接受"，否则撤回的情况会误导用户。
+  // 2. 如果还在分享中，只更新"是否关注"这个展示状态（未关注显示二维码，已关注显示按钮）。
+  _checkStatusOnce(code){
     var that = this
-    if (that.data.followed){
-      return
-    }
-    data.checkTransferFollowPromise(code, app.globalData.sessionKey).then(function (followed){
-      if (followed){
-        that._stopFollowPoll()
-        that.setData({ followed: true })
-        that._autoAccept()
+    data.getTicket(code).then(function (ticket){
+      if (ticket.shared == 0){
+        that._stopStatusPoll()
+        if (ticket.member_id != that._originalMemberId){
+          that._goAcceptedSuccess('已关注，优惠券自动入账')
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: '对方已撤回这张优惠券的分享。',
+            showCancel: false,
+            success: function (){
+              wx.redirectTo({ url: './ticket_list' })
+            }
+          })
+        }
+        return
+      }
+      if (!that.data.followed){
+        data.checkTransferFollowPromise(code, app.globalData.sessionKey).then(function (followed){
+          if (followed){
+            that.setData({ followed: true })
+          }
+        }).catch(function (){})
       }
     }).catch(function (){
       // 轮询失败静默重试，不打断用户
     })
   },
 
-  _stopFollowPoll(){
-    if (this._followTimer){
-      clearInterval(this._followTimer)
-      this._followTimer = null
+  _stopStatusPoll(){
+    if (this._statusTimer){
+      clearInterval(this._statusTimer)
+      this._statusTimer = null
     }
   },
 
@@ -106,6 +124,7 @@ Page({
     app.loginPromiseNew.then(function(resolve){
       data.getTicket(code).then(function (ticket){
         ticket.usage = ticket.memo.split(';')
+        that._originalMemberId = ticket.member_id   // 用于轮询时区分"被接受"还是"被撤回"
         // 二维码场景值必须用后端算好的 ticket.transfer_scene（绑定在这一次分享上），
         // 不能自己拼 code——否则同一张券换收件人转赠时会复用到别人的历史扫码/关注记录
         var qrCodeUrl = ''
@@ -129,8 +148,8 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow() {
-    if (this.data.code && !this.data.checking && !this.data.followed && !this._followTimer){
-      this._startFollowPoll(this.data.code)
+    if (this.data.code && !this.data.checking && !this._statusTimer){
+      this._startStatusPoll(this.data.code)
     }
   },
 
@@ -138,14 +157,14 @@ Page({
    * Lifecycle function--Called when page hide
    */
   onHide() {
-    this._stopFollowPoll()
+    this._stopStatusPoll()
   },
 
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload() {
-    this._stopFollowPoll()
+    this._stopStatusPoll()
   },
 
   /**
