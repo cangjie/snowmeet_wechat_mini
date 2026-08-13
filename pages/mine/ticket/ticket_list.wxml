@@ -2,8 +2,9 @@
 
   <!-- 顶部 Tab 导航 -->
   <view class="tab-nav">
-    <navigator class="tab-item {{!showUsed ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?used=0" open-type="redirect" hover-class="none">未使用</navigator>
-    <navigator class="tab-item {{showUsed ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?used=1" open-type="redirect" hover-class="none">已使用</navigator>
+    <navigator class="tab-item {{activeTab == 'pending' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=pending" open-type="redirect" hover-class="none">未使用</navigator>
+    <navigator class="tab-item {{activeTab == 'used' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=used" open-type="redirect" hover-class="none">已使用</navigator>
+    <navigator class="tab-item {{activeTab == 'shared' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=shared" open-type="redirect" hover-class="none">已分享</navigator>
   </view>
 
   <!-- 优惠券列表 -->
@@ -13,6 +14,7 @@
         <text class="ticket-title">{{item.name}}</text>
         <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
       </view>
+      <text class="ticket-code">{{item.codeDisplay}}</text>
       <rich-text class="usage-rich" wx:if="{{item.rich}}" nodes="{{item.memo}}"></rich-text>
       <view class="usage-block" wx:else>
         <view class="usage-item" wx:for="{{item.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
