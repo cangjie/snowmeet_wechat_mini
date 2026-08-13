@@ -1,51 +1,7 @@
 // pages/mine/ticket/ticket_list.js
 const app = getApp()
 const data = require('../../../utils/data.js')
-// 硬编码：允许转赠的优惠券模板（12=免费打蜡券，16=老顾客优惠券），需与后端 TicketController.TransferableTemplateIds 保持一致
-const TRANSFERABLE_TEMPLATE_IDS = [12, 16]
-
-// 优惠券编码 3 位一节、用横线连接，纯展示用（不影响传给后端的原始 code）
-function formatTicketCode(code){
-  var s = (code || '').toString()
-  var parts = []
-  for (var i = 0; i < s.length; i += 3){
-    parts.push(s.substr(i, 3))
-  }
-  return parts.join('-')
-}
-
-// 给单张券补齐展示用字段。tab=='shared' 时，shared==0 表示"对方已经接受"（不是"待使用"，
-// 券已经不是我的了），要单独给一个状态、并且不能再显示"转赠好友"按钮。
-function annotateTicket(ticket, tab){
-  var memo = ticket.memo
-  if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
-    ticket.rich = true
-  }
-  else{
-    ticket.rich = false
-    ticket.usage = memo.split(';')
-  }
-  ticket.codeDisplay = formatTicketCode(ticket.code)
-  ticket.canTransfer = TRANSFERABLE_TEMPLATE_IDS.indexOf(ticket.template_id) >= 0 && ticket.used != 1
-  if (ticket.used == 1){
-    ticket.statusText = '已使用'
-    ticket.statusClass = 'status-used'
-  }
-  else if (ticket.shared == 1){
-    ticket.statusText = '分享中'
-    ticket.statusClass = 'status-shared'
-  }
-  else if (tab == 'shared'){
-    ticket.statusText = '对方已接受'
-    ticket.statusClass = 'status-accepted'
-    ticket.canTransfer = false   // 已经不是我的了，不能再转赠
-  }
-  else{
-    ticket.statusText = '待使用'
-    ticket.statusClass = 'status-pending'
-  }
-  return ticket
-}
+const ticketHelper = require('./ticket_helper.js')
 
 Page({
 
@@ -68,14 +24,15 @@ Page({
     app.loginPromiseNew.then(function(resolve){
       if (tab == 'shared'){
         data.getMySharedTicketsPromise(app.globalData.sessionKey).then(function (tickets){
-          tickets = (tickets || []).map(function (t){ return annotateTicket(t, tab) })
+          tickets = that._dedupeByCode(tickets || [])
+          tickets = tickets.map(function (t){ return ticketHelper.annotateTicket(t, tab) })
           that.setData({ ticketArr: tickets })
         }).catch(function (exp){})
         return
       }
       var used = (tab == 'used') ? 1 : 0
       data.getMyTickets(used, app.globalData.sessionKey).then(function (tickets){
-        tickets = (tickets || []).map(function (t){ return annotateTicket(t, tab) })
+        tickets = (tickets || []).map(function (t){ return ticketHelper.annotateTicket(t, tab) })
         // used=0 拉回来的既有待使用也有分享中的："未使用" tab 只留没在分享中的，
         // 分享中的挪到"已分享" tab 去看（那边走的是 GetMySharedTickets）
         if (tab == 'pending'){
@@ -84,6 +41,20 @@ Page({
         that.setData({ ticketArr: tickets })
       }).catch(function (exp){})
     })
+  },
+  /**
+   * 按 code 去重，防止同一张券因为历史多次转赠记录被后端重复返回（前端兜底，后端也会去重）
+   */
+  _dedupeByCode: function (tickets){
+    var seen = {}
+    var out = []
+    for (var i = 0; i < tickets.length; i++){
+      if (!seen[tickets[i].code]){
+        seen[tickets[i].code] = true
+        out.push(tickets[i])
+      }
+    }
+    return out
   },
   onReady: function () {
 
@@ -187,7 +158,7 @@ Page({
     }
     var code = source.currentTarget.id
     wx.navigateTo({
-      url: 'ticket_detail?code=' + code,
+      url: 'ticket_detail?code=' + code + '&tab=' + this.data.activeTab,
     })
   }
 })

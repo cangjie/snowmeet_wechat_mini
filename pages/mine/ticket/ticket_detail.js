@@ -2,8 +2,7 @@
 const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
-// 硬编码：允许转赠的优惠券模板（12=免费打蜡券，16=老顾客优惠券），需与后端 TicketController.TransferableTemplateIds 保持一致
-const TRANSFERABLE_TEMPLATE_IDS = [12, 16]
+const ticketHelper = require('./ticket_helper.js')
 Page({
 
   /**
@@ -18,31 +17,15 @@ Page({
    */
   onLoad(options) {
     var code = options.code
+    // 从"已分享"列表点进来的会带上 tab=shared，用来判断这张券是不是已经被对方接受、
+    // 不再是我的了（见 ticket_helper.annotateTicket）；直接深链进来（不经过列表页）没有
+    // 这个参数，按原来的逻辑处理，当作自己名下的券
+    var tab = options.tab
     var that = this
     that.setData({ code: code })
     app.loginPromiseNew.then(function (resolve) {
       data.getTicket(code).then(function (ticket) {
-        var memo = ticket.memo
-        if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
-          ticket.rich = true
-        }
-        else{
-          ticket.rich = false
-          ticket.usage = memo.split(';')
-        }
-        ticket.canTransfer = TRANSFERABLE_TEMPLATE_IDS.indexOf(ticket.template_id) >= 0 && ticket.used != 1
-        if (ticket.used == 1){
-          ticket.statusText = '已使用'
-          ticket.statusClass = 'status-used'
-        }
-        else if (ticket.shared == 1){
-          ticket.statusText = '分享中'
-          ticket.statusClass = 'status-shared'
-        }
-        else{
-          ticket.statusText = '待使用'
-          ticket.statusClass = 'status-pending'
-        }
+        ticket = ticketHelper.annotateTicket(ticket, tab)
         if (!ticket.canTransfer){
           wx.hideShareMenu()
         }
@@ -120,7 +103,7 @@ Page({
   onCancelShare(){
     var that = this
     var ticket = that.data.ticket
-    if (!ticket){
+    if (!ticket || ticket.shared != 1){
       return
     }
     wx.showModal({

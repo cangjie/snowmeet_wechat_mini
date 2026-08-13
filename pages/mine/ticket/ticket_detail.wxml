@@ -19,7 +19,7 @@
     <button open-type="share" class="btn btn-use">转赠好友</button>
   </view>
 
-  <view class="qr-card" wx:if="{{ticket.used == 0}}">
+  <view class="qr-card" wx:if="{{ticket.used == 0 && ticket.actionable}}">
     <text class="qr-card-title">核销二维码</text>
     <image class="qr-card-image" src="{{qrCodeUrl}}" mode="widthFix"></image>
     <text class="qr-card-code">{{ticket.code}}</text>
