@@ -14,6 +14,39 @@ function formatTicketCode(code){
   return parts.join('-')
 }
 
+// 给单张券补齐展示用字段。tab=='shared' 时，shared==0 表示"对方已经接受"（不是"待使用"，
+// 券已经不是我的了），要单独给一个状态、并且不能再显示"转赠好友"按钮。
+function annotateTicket(ticket, tab){
+  var memo = ticket.memo
+  if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
+    ticket.rich = true
+  }
+  else{
+    ticket.rich = false
+    ticket.usage = memo.split(';')
+  }
+  ticket.codeDisplay = formatTicketCode(ticket.code)
+  ticket.canTransfer = TRANSFERABLE_TEMPLATE_IDS.indexOf(ticket.template_id) >= 0 && ticket.used != 1
+  if (ticket.used == 1){
+    ticket.statusText = '已使用'
+    ticket.statusClass = 'status-used'
+  }
+  else if (ticket.shared == 1){
+    ticket.statusText = '分享中'
+    ticket.statusClass = 'status-shared'
+  }
+  else if (tab == 'shared'){
+    ticket.statusText = '对方已接受'
+    ticket.statusClass = 'status-accepted'
+    ticket.canTransfer = false   // 已经不是我的了，不能再转赠
+  }
+  else{
+    ticket.statusText = '待使用'
+    ticket.statusClass = 'status-pending'
+  }
+  return ticket
+}
+
 Page({
 
   /**
@@ -32,46 +65,24 @@ Page({
     var that = this
     var tab = options.tab || 'pending'
     this.setData({ activeTab: tab })
-    var used = (tab == 'used') ? 1 : 0
     app.loginPromiseNew.then(function(resolve){
+      if (tab == 'shared'){
+        data.getMySharedTicketsPromise(app.globalData.sessionKey).then(function (tickets){
+          tickets = (tickets || []).map(function (t){ return annotateTicket(t, tab) })
+          that.setData({ ticketArr: tickets })
+        }).catch(function (exp){})
+        return
+      }
+      var used = (tab == 'used') ? 1 : 0
       data.getMyTickets(used, app.globalData.sessionKey).then(function (tickets){
-        for(var i = 0; i < tickets.length; i++){
-
-          var memo = tickets[i].memo
-          if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
-            tickets[i].rich = true
-          }
-          else{
-            tickets[i].rich = false
-            tickets[i].usage = memo.split(';')
-          }
-          tickets[i].codeDisplay = formatTicketCode(tickets[i].code)
-          tickets[i].canTransfer = TRANSFERABLE_TEMPLATE_IDS.indexOf(tickets[i].template_id) >= 0 && tickets[i].used != 1
-          if (tickets[i].used == 1){
-            tickets[i].statusText = '已使用'
-            tickets[i].statusClass = 'status-used'
-          }
-          else if (tickets[i].shared == 1){
-            tickets[i].statusText = '分享中'
-            tickets[i].statusClass = 'status-shared'
-          }
-          else{
-            tickets[i].statusText = '待使用'
-            tickets[i].statusClass = 'status-pending'
-          }
-        }
-        // used=0 拉回来的既有待使用也有分享中的，按当前 tab 再筛一遍；
-        // used=1（已使用）不会有分享中的（分享/转赠前置条件就排除了已使用的券），不用筛
-        if (tab == 'shared'){
-          tickets = tickets.filter(function (t){ return t.shared == 1 })
-        }
-        else if (tab == 'pending'){
+        tickets = (tickets || []).map(function (t){ return annotateTicket(t, tab) })
+        // used=0 拉回来的既有待使用也有分享中的："未使用" tab 只留没在分享中的，
+        // 分享中的挪到"已分享" tab 去看（那边走的是 GetMySharedTickets）
+        if (tab == 'pending'){
           tickets = tickets.filter(function (t){ return t.shared != 1 })
         }
-        that.setData({ticketArr: tickets})
-      }).catch(function (exp){
-
-      })
+        that.setData({ ticketArr: tickets })
+      }).catch(function (exp){})
     })
   },
   onReady: function () {
@@ -82,7 +93,12 @@ Page({
    * Lifecycle function--Called when page show
    */
   onShow: function () {
-
+    // 转赠成功后不能在 onShareAppMessage 里直接跳转（分享面板此时可能还没弹出/还没关闭），
+    // 等分享面板关闭、页面重新可见时再跳到"已分享" tab
+    if (this._justShared && this.data.activeTab != 'shared'){
+      this._justShared = false
+      wx.redirectTo({ url: 'ticket_list?tab=shared' })
+    }
   },
 
   /**
@@ -125,9 +141,10 @@ Page({
     var ticket = (that.data.ticketArr || []).filter(function (t){ return t.code === code })[0]
     var title = ticket ? ('赠送优惠券：' + ticket.name) : '赠送优惠券'
     return data.setTicketToSharePromise(code, app.globalData.sessionKey).then(function (){
-      // 分享成功后这张券归到"已分享"标签，不再属于当前"未使用"列表，直接移出
+      // 分享成功后这张券归到"已分享"标签，不再属于当前"未使用"列表，直接移出；
+      // 真正的页面跳转放到 onShow 里做（见上面的注释）
       that._removeTicketFromList(code)
-      wx.showToast({ title: '已转赠，可在"已分享"中查看', icon: 'none' })
+      that._justShared = true
       return {
         title: title,
         path: '/pages/mine/ticket/ticket_share?code=' + code,

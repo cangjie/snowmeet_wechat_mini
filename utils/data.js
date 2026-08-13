@@ -254,6 +254,16 @@ const getMyTickets = function (used, sessionKey) {
     })
   })
 }
+const getMySharedTicketsPromise = function (sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Ticket/GetMySharedTickets?sessionKey=' + encodeURIComponent(sessionKey)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (tickets) {
+      resolve(tickets)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const getTicket = function (code) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetTicket/' + code
   return new Promise(function (resolve, reject) {
@@ -1599,6 +1609,7 @@ module.exports = {
   getShopByNamePromise,
   getMyTickets,
   getTicket,
+  getMySharedTicketsPromise,
   setTicketToSharePromise,
   acceptTicketPromise,
   checkTransferFollowPromise,

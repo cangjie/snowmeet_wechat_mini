@@ -101,6 +101,11 @@ page {
   color: var(--color-text-muted);
 }
 
+.status-accepted {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
 /* ===== 使用说明 ===== */
 .usage-block {
   display: flex;
