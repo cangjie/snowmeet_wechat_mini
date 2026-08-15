@@ -3,37 +3,16 @@
     "miniprogram": {
       "list": [
         {
-          "name": "receptnew",
-          "pathName": "pages/admin/reception/recept_entry",
-          "query": "",
+          "name": "acceptticket",
+          "pathName": "pages/mine/ticket/ticket_share",
+          "query": "code=658516135",
           "scene": null,
           "launchMode": "default"
         },
         {
-<<<<<<< HEAD
-          "name": "deposit",
-          "pathName": "pages/admin/deposit/deposit_account_list",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "orderverify",
-          "pathName": "pages/order/identity_verify",
-          "query": "verifyOrderId=71746",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "recept",
-          "pathName": "pages/admin/reception/recept_entry",
-          "query": "",
-          "launchMode": "default",
-=======
           "name": "admin_index",
           "pathName": "pages/admin/admin",
           "query": "",
->>>>>>> 90d583aa7aefb304c041578f9b9bf75f968cb15c
           "scene": null
         }
       ]

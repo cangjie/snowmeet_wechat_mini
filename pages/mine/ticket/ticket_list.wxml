@@ -20,7 +20,7 @@
         <view class="usage-item" wx:for="{{item.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
       </view>
     </view>
-    <view class="card-actions" wx:if="{{item.shared == 1}}">
+    <view class="card-actions" wx:if="{{item.canCancelShare}}">
       <button size="mini" class="btn btn-cancel-share" bindtap="onCancelShare" data-code="{{item.code}}">撤回分享</button>
     </view>
     <view class="card-actions" wx:elif="{{item.canTransfer}}">

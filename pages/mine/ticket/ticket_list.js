@@ -157,8 +157,12 @@ Page({
       return
     }
     var code = source.currentTarget.id
+    // 详情页拉券走的是 GetTicket（不带会话、判断不了归属），所以把列表这边由后端
+    // 下发的"已转赠出去"结论一并带过去，保证两页的状态和操作权限一致
+    var current = (this.data.ticketArr || []).filter(function (t){ return t.code == code })[0]
+    var transferred = (current && current.transferredOut) ? 1 : 0
     wx.navigateTo({
-      url: 'ticket_detail?code=' + code + '&tab=' + this.data.activeTab,
+      url: 'ticket_detail?code=' + code + '&tab=' + this.data.activeTab + '&transferred=' + transferred,
     })
   }
 })

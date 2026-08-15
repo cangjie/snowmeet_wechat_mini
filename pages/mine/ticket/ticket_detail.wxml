@@ -12,7 +12,7 @@
     </view>
   </view>
 
-  <view class="card-actions" wx:if="{{ticket.shared == 1}}">
+  <view class="card-actions" wx:if="{{ticket.canCancelShare}}">
     <button class="btn btn-cancel-share" bindtap="onCancelShare">撤回分享</button>
   </view>
   <view class="card-actions" wx:elif="{{ticket.canTransfer}}">

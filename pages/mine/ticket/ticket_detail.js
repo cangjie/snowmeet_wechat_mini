@@ -21,10 +21,14 @@ Page({
     // 不再是我的了（见 ticket_helper.annotateTicket）；直接深链进来（不经过列表页）没有
     // 这个参数，按原来的逻辑处理，当作自己名下的券
     var tab = options.tab
+    // GetTicket 不带会话、判断不了这张券现在归谁，所以"已经转赠出去"这个结论由列表页
+    // 从后端拿到后经 URL 带过来（见 ticket_list.showDetail）
+    var transferredOut = options.transferred == '1'
     var that = this
     that.setData({ code: code })
     app.loginPromiseNew.then(function (resolve) {
       data.getTicket(code).then(function (ticket) {
+        ticket.transferredOut = transferredOut
         ticket = ticketHelper.annotateTicket(ticket, tab)
         if (!ticket.canTransfer){
           wx.hideShareMenu()
