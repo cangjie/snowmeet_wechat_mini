@@ -113,6 +113,25 @@ page {
   gap: 12rpx;
 }
 
+/* 券卡片上那行时间：未使用=领取/获得时间，已使用=核销时间，
+   已分享=分享时间或对方领取时间。文案和数值都由后端按所在 tab 算好下发。 */
+.ticket-time {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 20rpx;
+}
+
+.ticket-time-label {
+  font-size: 22rpx;
+  color: var(--color-text-muted);
+  margin-right: 12rpx;
+}
+
+.ticket-time-value {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+}
+
 .usage-item {
   font-size: 26rpx;
   color: var(--color-text-secondary);

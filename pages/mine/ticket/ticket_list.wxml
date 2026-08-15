@@ -15,6 +15,11 @@
         <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
       </view>
       <text class="ticket-code">{{item.codeDisplay}}</text>
+      <!-- 时间由后端按所在 tab 算好并格式化下发，前端不做日期解析（iOS 解析 'yyyy-MM-dd HH:mm:ss' 会 Invalid Date） -->
+      <view class="ticket-time" wx:if="{{item.displayTimeText}}">
+        <text class="ticket-time-label">{{item.displayTimeLabel}}</text>
+        <text class="ticket-time-value">{{item.displayTimeText}}</text>
+      </view>
       <rich-text class="usage-rich" wx:if="{{item.rich}}" nodes="{{item.memo}}"></rich-text>
       <view class="usage-block" wx:else>
         <view class="usage-item" wx:for="{{item.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
