@@ -12,8 +12,9 @@ Page({
     activeTab: 'pending',   // pending: 未使用 | shared: 已分享 | used: 已使用
     ticketArr:[],
     needAuth: false,
-    transferShow: false,    // 转赠确认弹层
-    transferCode: ''
+    transferShow: false,      // 转赠确认弹层
+    transferCode: '',
+    subscribeBlocked: false   // 订阅被用户永久拒绝，需要引导去设置页
   },
 
   onNoop: function (){},
@@ -24,8 +25,20 @@ Page({
   onTransferTap: function (e){
     var that = this
     var code = e.currentTarget.dataset.code
-    ticketHelper.requestTransferSubscribe(function (){
-      that.setData({ transferShow: true, transferCode: code })
+    ticketHelper.requestTransferSubscribe(function (blocked){
+      that.setData({ transferShow: true, transferCode: code, subscribeBlocked: blocked })
+    })
+  },
+
+  // 用户之前勾了「总是保持以上选择」并拒绝，微信从此不再弹订阅窗，
+  // 只能送他去小程序设置页自己打开
+  onOpenSubscribeSetting: function (){
+    var that = this
+    ticketHelper.openSubscribeSetting(function (stillBlocked){
+      that.setData({ subscribeBlocked: stillBlocked })
+      if (!stillBlocked){
+        wx.showToast({ title: '已开启领取通知', icon: 'success' })
+      }
     })
   },
 

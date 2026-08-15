@@ -12,17 +12,79 @@ const TRANSFERABLE_TEMPLATE_IDS = [12, 16]
 // 先点按钮弹订阅授权，再在确认弹层里点「选择好友」真正分享。
 const SUBSCRIBE_TEMPLATE_ID = 'TsWgivHWG5TT8OVI5hN7n56yCWJ5K8THFBtmmACfek4'
 
+// 从 wx.getSetting({withSubscriptions:true}) 的 subscriptionsSetting 判断这个模板是不是
+// 被用户「永久拒绝」了。
+// itemSettings 里只会出现用户勾过「总是保持以上选择，不再询问」的模板 —— 所以某个模板
+// 没出现在里面 ≠ 被拒绝，只是以后每次还会正常弹窗而已，不要把这两种情况搞混。
+// mainSwitch 是小程序订阅消息的总开关，关掉了同样收不到。
+function isSubscribePermanentlyBlocked(subscriptionsSetting, tmplId){
+  if (!subscriptionsSetting){
+    return false
+  }
+  if (subscriptionsSetting.mainSwitch === false){
+    return true
+  }
+  var items = subscriptionsSetting.itemSettings
+  return !!items && items[tmplId] === 'reject'
+}
+
+function checkSubscribeBlocked(done){
+  if (!wx.getSetting){
+    done(false)
+    return
+  }
+  wx.getSetting({
+    withSubscriptions: true,
+    success: function (res){
+      done(isSubscribePermanentlyBlocked(res && res.subscriptionsSetting, SUBSCRIBE_TEMPLATE_ID))
+    },
+    fail: function (){
+      done(false)
+    }
+  })
+}
+
 // 两个页面共用：点「转赠好友」先请求订阅授权，无论用户同意还是拒绝都继续往下走
 // （拒绝只是收不到通知，不该挡住转赠本身），最后回调打开确认弹层。
+//
+// done(blocked)：blocked=true 表示用户之前勾了「总是保持以上选择」并拒绝，微信从此
+// 不再弹窗、直接返回 reject。这种情况代码绕不过去，只能在弹层里提示用户去设置页开启，
+// 所以要把这个状态回传给调用方。
 function requestTransferSubscribe(done){
   if (!wx.requestSubscribeMessage){
-    done()
+    done(false)
     return
   }
   wx.requestSubscribeMessage({
     tmplIds: [SUBSCRIBE_TEMPLATE_ID],
-    complete: function (){
-      done()
+    success: function (res){
+      if (res && res[SUBSCRIBE_TEMPLATE_ID] === 'accept'){
+        done(false)
+        return
+      }
+      // 这次没同意。可能只是本次点了取消（下次还会弹），也可能是被永久拒绝了，
+      // 得查一下订阅设置才能区分——只有后者需要提示用户去设置页。
+      checkSubscribeBlocked(done)
+    },
+    fail: function (){
+      checkSubscribeBlocked(done)
+    }
+  })
+}
+
+// 引导用户去小程序设置页重新打开订阅消息。必须由点击手势触发。
+function openSubscribeSetting(done){
+  if (!wx.openSetting){
+    done(true)
+    return
+  }
+  wx.openSetting({
+    withSubscriptions: true,
+    success: function (res){
+      done(isSubscribePermanentlyBlocked(res && res.subscriptionsSetting, SUBSCRIBE_TEMPLATE_ID))
+    },
+    fail: function (){
+      done(true)
     }
   })
 }
@@ -89,5 +151,7 @@ module.exports = {
   formatTicketCode,
   annotateTicket,
   requestTransferSubscribe,
+  openSubscribeSetting,
+  isSubscribePermanentlyBlocked,
   SUBSCRIBE_TEMPLATE_ID
 }

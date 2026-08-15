@@ -32,6 +32,9 @@
   <view class="tr-panel" catchtap="onNoop">
     <view class="tr-title">转赠优惠券</view>
     <view class="tr-desc">选择好友后，对方需关注公众号才能领取。领取成功会通知你，并回赠你一张同款券。</view>
+    <view class="tr-warn" wx:if="{{subscribeBlocked}}">
+      你之前选择了不再接收提醒，对方领取后将收不到通知。<text class="tr-warn-link" catchtap="onOpenSubscribeSetting">去开启</text>
+    </view>
     <button class="tr-share-btn" open-type="share" bindtap="onTransferPanelShareTap">选择好友</button>
     <view class="tr-cancel" bindtap="onTransferPanelClose">取消</view>
   </view>

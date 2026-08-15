@@ -10,7 +10,8 @@ Page({
    */
   data: {
     needAuth: false,
-    transferShow: false   // 转赠确认弹层
+    transferShow: false,      // 转赠确认弹层
+    subscribeBlocked: false   // 订阅被用户永久拒绝，需要引导去设置页
   },
 
   onNoop(){},
@@ -20,8 +21,20 @@ Page({
   // 领取通知，不该挡住转赠本身。
   onTransferTap(){
     var that = this
-    ticketHelper.requestTransferSubscribe(function (){
-      that.setData({ transferShow: true })
+    ticketHelper.requestTransferSubscribe(function (blocked){
+      that.setData({ transferShow: true, subscribeBlocked: blocked })
+    })
+  },
+
+  // 用户之前勾了「总是保持以上选择」并拒绝，微信从此不再弹订阅窗，
+  // 只能送他去小程序设置页自己打开
+  onOpenSubscribeSetting(){
+    var that = this
+    ticketHelper.openSubscribeSetting(function (stillBlocked){
+      that.setData({ subscribeBlocked: stillBlocked })
+      if (!stillBlocked){
+        wx.showToast({ title: '已开启领取通知', icon: 'success' })
+      }
     })
   },
 
