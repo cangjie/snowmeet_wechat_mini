@@ -24,7 +24,7 @@
       <button size="mini" class="btn btn-cancel-share" bindtap="onCancelShare" data-code="{{item.code}}">撤回分享</button>
     </view>
     <view class="card-actions" wx:elif="{{item.canTransfer}}">
-      <button size="mini" class="btn btn-use" open-type="share" data-code="{{item.code}}">转赠好友</button>
+      <button size="mini" class="btn btn-use" bindtap="onTransferTap" data-code="{{item.code}}">转赠好友</button>
     </view>
   </view>
 
@@ -34,5 +34,15 @@
     <text class="empty-text">暂无优惠券</text>
   </view>
 
+</view>
+
+<!-- 转赠确认弹层：订阅授权走完之后才弹，里面这个才是真正拉起微信转发面板的按钮 -->
+<view class="tr-mask" wx:if="{{transferShow}}" bindtap="onTransferPanelClose" catchtouchmove="onNoop">
+  <view class="tr-panel" catchtap="onNoop">
+    <view class="tr-title">转赠优惠券</view>
+    <view class="tr-desc">选择好友后，对方需关注公众号才能领取。领取成功会通知你，并回赠你一张同款券。</view>
+    <button class="tr-share-btn" open-type="share" data-code="{{transferCode}}" bindtap="onTransferPanelShareTap">选择好友</button>
+    <view class="tr-cancel" bindtap="onTransferPanelClose">取消</view>
+  </view>
 </view>
 <!--auth wx:if="{{needAuth}}" validType="cell" bindUpdateSuccess="AuthFinish" ></auth-->

@@ -30,3 +30,30 @@
 .tab-inactive {
   color: var(--color-text-secondary);
 }
+
+/* 转赠确认弹层：订阅授权走完之后才弹 */
+.tr-mask{
+  position: fixed; left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.45); z-index: 100;
+  display: flex; align-items: flex-end;
+}
+.tr-panel{
+  width: 100%; background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 40rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+.tr-title{ font-size: 34rpx; font-weight: 600; color: #333; text-align: center; }
+.tr-desc{
+  font-size: 26rpx; color: #888; line-height: 1.6;
+  margin: 20rpx 0 36rpx; text-align: center;
+}
+.tr-share-btn{
+  background: #2EA6D0; color: #fff; border-radius: 12rpx;
+  font-size: 30rpx; line-height: 84rpx; height: 84rpx;
+}
+.tr-share-btn::after{ border: none; }
+.tr-cancel{
+  margin-top: 20rpx; text-align: center;
+  font-size: 30rpx; color: #888; line-height: 72rpx;
+}

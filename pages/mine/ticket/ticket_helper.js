@@ -2,6 +2,31 @@
 // 硬编码：允许转赠的优惠券模板（12=免费打蜡券，16=老顾客优惠券），需与后端 TicketController.TransferableTemplateIds 保持一致
 const TRANSFERABLE_TEMPLATE_IDS = [12, 16]
 
+// 小程序订阅消息模板：优惠券领取成功提醒（模版编号 38451）。对方领取成功后，
+// 后端会用这个模板通知分享人"券被领走了、已回赠你一张同款"。
+// 需与后端 TicketController.TransferAcceptedTemplateId 保持一致。
+//
+// 授权必须在用户点击手势的回调里发起（wx.requestSubscribeMessage 的硬约束），
+// 而「转赠好友」原本是 open-type="share" 的按钮、点下去立刻拉起转发面板，
+// 两个系统弹窗挤在同一次点击里会打架 —— 所以转赠改成了两步：
+// 先点按钮弹订阅授权，再在确认弹层里点「选择好友」真正分享。
+const SUBSCRIBE_TEMPLATE_ID = 'TsWgivHWG5TT8OVI5hN7n56yCWJ5K8THFBtmmACfek4'
+
+// 两个页面共用：点「转赠好友」先请求订阅授权，无论用户同意还是拒绝都继续往下走
+// （拒绝只是收不到通知，不该挡住转赠本身），最后回调打开确认弹层。
+function requestTransferSubscribe(done){
+  if (!wx.requestSubscribeMessage){
+    done()
+    return
+  }
+  wx.requestSubscribeMessage({
+    tmplIds: [SUBSCRIBE_TEMPLATE_ID],
+    complete: function (){
+      done()
+    }
+  })
+}
+
 // 优惠券编码 3 位一节、用横线连接，纯展示用（不影响传给后端的原始 code）
 function formatTicketCode(code){
   var s = (code || '').toString()
@@ -62,5 +87,7 @@ function annotateTicket(ticket, tab){
 
 module.exports = {
   formatTicketCode,
-  annotateTicket
+  annotateTicket,
+  requestTransferSubscribe,
+  SUBSCRIBE_TEMPLATE_ID
 }

@@ -9,7 +9,30 @@ Page({
    * Page initial data
    */
   data: {
-    needAuth: false
+    needAuth: false,
+    transferShow: false   // 转赠确认弹层
+  },
+
+  onNoop(){},
+
+  // 转赠第一步：请求订阅授权。必须在 tap 回调里同步发起（微信硬约束），
+  // 所以这里不能先 await 任何东西。授权同意与否都继续开弹层——拒绝只是收不到
+  // 领取通知，不该挡住转赠本身。
+  onTransferTap(){
+    var that = this
+    ticketHelper.requestTransferSubscribe(function (){
+      that.setData({ transferShow: true })
+    })
+  },
+
+  // 弹层里的「选择好友」被点：微信会同时拉起转发面板（open-type=share），
+  // 这里只负责把弹层收起来，免得转发完回来还盖在页面上
+  onTransferPanelShareTap(){
+    this.setData({ transferShow: false })
+  },
+
+  onTransferPanelClose(){
+    this.setData({ transferShow: false })
   },
 
   /**
