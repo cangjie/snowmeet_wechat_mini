@@ -1,0 +1,62 @@
+<!--pages/admin/ticket/coupon_detail/coupon_detail.wxml-->
+<view class="page">
+
+  <block wx:if="{{ticket}}">
+
+    <!-- 券本身 -->
+    <view class="card">
+      <view class="head">
+        <view class="value">
+          <text class="value-yuan">¥</text><text class="value-num">{{ticket.valueText}}</text>
+        </view>
+        <view class="head-main">
+          <view class="head-line">
+            <text class="title">{{ticket.templateName || ticket.name}}</text>
+            <view class="state state--{{ticket.stateCls}}">{{ticket.stateLabel}}</view>
+            <view class="state state--invalid" wx:if="{{ticket.showInvalid}}">无效</view>
+            <view class="state state--inactive" wx:if="{{ticket.showInactive}}">未激活</view>
+          </view>
+          <view class="code" bindtap="onCopyCode">{{ticket.code}} <text class="code-copy">复制</text></view>
+        </view>
+      </view>
+
+      <view class="kv"><text class="k">持有会员</text>
+        <text class="v {{ticket.memberId ? 'v--link' : ''}}" bindtap="onMemberTap">{{ticket.customerText}}<text wx:if="{{ticket.memberPhone}}"> · {{ticket.memberPhone}}</text></text>
+      </view>
+      <view class="kv"><text class="k">发放时间</text><text class="v">{{ticket.createDateStr}}</text></view>
+      <view class="kv" wx:if="{{ticket.startDateStr}}"><text class="k">生效时间</text><text class="v">{{ticket.startDateStr}}</text></view>
+      <view class="kv"><text class="k">到期时间</text><text class="v">{{ticket.expireDateStr}}</text></view>
+      <view class="kv" wx:if="{{ticket.usedTimeStr}}"><text class="k">核销时间</text><text class="v">{{ticket.usedTimeStr}}</text></view>
+      <view class="kv" wx:if="{{ticket.sharedTimeStr}}"><text class="k">分享时间</text><text class="v">{{ticket.sharedTimeStr}}</text></view>
+      <view class="kv"><text class="k">转赠次数</text><text class="v v--strong">{{ticket.transferText}}</text></view>
+      <view class="kv" wx:if="{{ticket.channel}}"><text class="k">渠道</text><text class="v">{{ticket.channel}}</text></view>
+      <view class="kv" wx:if="{{ticket.createMemo}}"><text class="k">来源备注</text><text class="v">{{ticket.createMemo}}</text></view>
+    </view>
+
+    <!-- 操作流水 -->
+    <view class="card">
+      <view class="section-title">操作流水</view>
+      <view class="log-empty" wx:if="{{logs.length == 0}}">这张券还没有任何操作记录</view>
+      <view class="log" wx:for="{{logs}}" wx:key="index">
+        <view class="log-dot log-dot--{{item.typeCls}}"></view>
+        <view class="log-main">
+          <view class="log-head">
+            <view class="log-type log-type--{{item.typeCls}}">{{item.typeLabel}}</view>
+            <text class="log-time">{{item.timeStr}}</text>
+          </view>
+          <view class="log-flow">{{item.flowText}}</view>
+          <view class="log-memo" wx:if="{{item.memo}}">{{item.memo}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 使用说明 -->
+    <view class="card" wx:if="{{usageList.length > 0}}">
+      <view class="section-title">使用说明</view>
+      <view class="usage" wx:for="{{usageList}}" wx:key="*this">· {{item}}</view>
+    </view>
+
+  </block>
+
+  <view class="empty" wx:if="{{!loading && !ticket}}">没有找到这张优惠券</view>
+</view>

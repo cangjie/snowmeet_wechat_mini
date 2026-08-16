@@ -1194,6 +1194,12 @@ const searchTicketMembersByStaffPromise = function (filter, pageIndex, pageSize,
   return util.performWebRequest(
     _buildCouponAdminUrl('SearchTicketMembersByStaff', filter, pageIndex, pageSize, sessionKey), null)
 }
+// 单张券详情 + 全量操作流水（转赠/核销/撤回/发放都列）
+const getTicketDetailByStaffPromise = function (code, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketAdmin/GetTicketDetailByStaff?sessionKey=' + sessionKey
+    + '&code=' + encodeURIComponent(code)
+  return util.performWebRequest(url, null)
+}
 const getTicketTemplateOptionsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketAdmin/GetTemplateOptions?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
@@ -1711,6 +1717,7 @@ module.exports = {
   searchTicketsByStaffPromise,
   searchTicketMembersByStaffPromise,
   getTicketTemplateOptionsPromise,
+  getTicketDetailByStaffPromise,
   updatePunchCardEquipByStaffPromise,
   refundMyPunchCardPromise,
   checkMyPunchCardPurchasePromise,

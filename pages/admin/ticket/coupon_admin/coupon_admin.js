@@ -163,8 +163,14 @@ Page({
     this.getData(1, this.data.pageSize)
   },
 
+  // 筛选卡片里的四项（日期/模板/核销/转赠）都只暂存，点「查询」才生效。
+  // 与养护、租赁订单列表一致——筛选项一多，每改一项就打一次接口既慢又容易误触。
   onDateRangeChange(e) {
     this.setData({ startDate: e.detail.startDate, endDate: e.detail.endDate })
+  },
+
+  onQuery() {
+    if (this.data.loading) { return }
     this.getData(1, this.data.pageSize)
   },
 
@@ -172,21 +178,18 @@ Page({
     var idx = parseInt(e.detail.value, 10) || 0
     var opt = this.data.templateOptions[idx] || {}
     this.setData({ templateIndex: idx, templateId: opt.id || null })
-    this.getData(1, this.data.pageSize)
   },
 
   onUsedTap(e) {
     var key = e.currentTarget.dataset.key || ''
     if (key === this.data.usedKey) { return }
     this.setData({ usedKey: key })
-    this.getData(1, this.data.pageSize)
   },
 
   onTransferTap(e) {
     var key = e.currentTarget.dataset.key || ''
     if (key === this.data.transferKey) { return }
     this.setData({ transferKey: key })
-    this.getData(1, this.data.pageSize)
   },
 
   onToggleWasted() {
@@ -199,6 +202,14 @@ Page({
     this.getData(d.page || 1, d.pageSize || this.data.pageSize)
   },
 
+  // 明细视图点一行 → 券详情（券信息 + 转赠历史）
+  onTicketTap(e) {
+    var code = e.currentTarget.dataset.code
+    if (!code) { return }
+    wx.navigateTo({ url: '/pages/admin/ticket/coupon_detail/coupon_detail?code=' + code })
+  },
+
+  // 汇总视图点一行 → 会员详情
   onMemberTap(e) {
     var id = e.currentTarget.dataset.id
     if (!id) { return }   // 无会员归属的行不可点

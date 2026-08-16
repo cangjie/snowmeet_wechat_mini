@@ -7,7 +7,7 @@
           class="vs-item {{view == item.key ? 'vs-item--active' : ''}}">{{item.name}}</view>
   </view>
 
-  <!-- 筛选卡片：改任何一项立即重查，不用点「查询」 -->
+  <!-- 筛选卡片：四项都只暂存，点「查询」才生效 -->
   <view class="card">
     <view class="filter-row filter-row--date">
       <date-range-picker startDate="{{startDate}}" endDate="{{endDate}}" bind:change="onDateRangeChange" />
@@ -35,6 +35,10 @@
               class="chip {{transferKey == item.key ? 'chip--active' : ''}}">{{item.name}}</view>
       </view>
     </view>
+
+    <view class="filter-actions">
+      <button class="query-btn" bindtap="onQuery" disabled="{{loading}}">{{loading ? '查询中…' : '查 询'}}</button>
+    </view>
   </view>
 
   <!-- 顶部信息条 -->
@@ -59,7 +63,7 @@
 
   <!-- 按券明细 -->
   <block wx:if="{{view == 'ticket'}}">
-    <view wx:for="{{ticketItems}}" wx:key="code" class="row" data-id="{{item.memberId}}" bindtap="onMemberTap">
+    <view wx:for="{{ticketItems}}" wx:key="code" class="row" data-code="{{item.code}}" bindtap="onTicketTap">
       <view class="row-head">
         <text class="row-title">{{item.templateName || item.name}}</text>
         <view class="state state--{{item.stateCls}}">{{item.stateLabel}}</view>

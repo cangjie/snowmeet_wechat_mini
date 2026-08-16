@@ -99,3 +99,19 @@ page { background: #F5F6FA; }
   text-align: center; color: #9CA3AF;
   font-size: 26rpx; padding: 80rpx 0;
 }
+
+/* 查询按钮：筛选卡片里的四项都是暂存的，点它才真正发起查询 */
+.filter-actions {
+  padding: 20rpx 0 8rpx;
+}
+.query-btn {
+  background: #2EA6D0;
+  color: #fff;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 80rpx;
+  height: 80rpx;
+}
+.query-btn::after { border: none; }
+.query-btn[disabled] { background: #B7D9E6; color: #fff; }

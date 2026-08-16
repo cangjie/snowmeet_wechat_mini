@@ -1,0 +1,122 @@
+/* pages/admin/ticket/coupon_detail/coupon_detail.wxss */
+page { background: #F5F6FA; }
+.page { padding: 24rpx; box-sizing: border-box; }
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+/* ===== 头部：面额 + 券名 + 状态 ===== */
+.head {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #F0F1F5;
+  margin-bottom: 8rpx;
+}
+
+.value {
+  display: flex;
+  align-items: baseline;
+  flex-shrink: 0;
+}
+.value-yuan { font-size: 26rpx; font-weight: 700; color: #2EA6D0; }
+.value-num { font-size: 60rpx; font-weight: 700; color: #2EA6D0; line-height: 1; }
+
+.head-main { flex: 1; min-width: 0; }
+.head-line { display: flex; align-items: center; flex-wrap: wrap; }
+.title {
+  font-size: 32rpx; font-weight: 600; color: #1F2937;
+  margin-right: 12rpx;
+}
+.code {
+  font-size: 24rpx; color: #9CA3AF;
+  letter-spacing: 1rpx; margin-top: 8rpx;
+}
+.code-copy { color: #2EA6D0; margin-left: 12rpx; }
+
+/* 状态徽标：主状态互斥，无效/未激活是叠加的 */
+.state {
+  font-size: 20rpx; padding: 2rpx 12rpx;
+  border-radius: 999rpx; margin-right: 8rpx;
+}
+.state--used { background: #E8F5E9; color: #2E7D32; }
+.state--expired { background: #F3F4F6; color: #9CA3AF; }
+.state--shared { background: #FFF7E6; color: #A15C00; }
+.state--unused { background: #E7F3F8; color: #2EA6D0; }
+.state--invalid { background: #FDECEC; color: #C62828; }
+.state--inactive { background: #F3F4F6; color: #6B7280; }
+
+/* ===== 字段行 ===== */
+.kv {
+  display: flex;
+  align-items: flex-start;
+  padding: 14rpx 0;
+}
+.k {
+  width: 140rpx; flex-shrink: 0;
+  font-size: 26rpx; color: #9CA3AF;
+}
+.v { flex: 1; font-size: 26rpx; color: #1F2937; line-height: 1.5; }
+.v--link { color: #2EA6D0; }
+.v--strong { font-weight: 600; color: #2EA6D0; }
+
+/* ===== 操作流水 ===== */
+.section-title {
+  font-size: 28rpx; font-weight: 600; color: #1F2937;
+  padding-bottom: 16rpx;
+}
+
+.log {
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 0;
+  border-top: 1rpx solid #F0F1F5;
+}
+
+.log-dot {
+  width: 16rpx; height: 16rpx;
+  border-radius: 999rpx;
+  margin-top: 12rpx;
+  flex-shrink: 0;
+  background: #D1D5DB;
+}
+.log-dot--transfer { background: #2EA6D0; }
+.log-dot--use { background: #2E7D32; }
+.log-dot--cancel { background: #A15C00; }
+.log-dot--grant { background: #9CA3AF; }
+.log-dot--other { background: #D1D5DB; }
+
+.log-main { flex: 1; min-width: 0; }
+.log-head { display: flex; align-items: center; gap: 12rpx; }
+.log-type {
+  font-size: 20rpx; padding: 2rpx 12rpx; border-radius: 999rpx;
+}
+.log-type--transfer { background: #E7F3F8; color: #2EA6D0; }
+.log-type--use { background: #E8F5E9; color: #2E7D32; }
+.log-type--cancel { background: #FFF7E6; color: #A15C00; }
+.log-type--grant { background: #F3F4F6; color: #6B7280; }
+.log-type--other { background: #F3F4F6; color: #9CA3AF; }
+
+.log-time { font-size: 22rpx; color: #9CA3AF; }
+.log-flow { font-size: 26rpx; color: #1F2937; margin-top: 8rpx; }
+.log-memo { font-size: 22rpx; color: #9CA3AF; margin-top: 4rpx; }
+
+.log-empty {
+  font-size: 26rpx; color: #9CA3AF;
+  padding: 32rpx 0; text-align: center;
+}
+
+.usage {
+  font-size: 26rpx; color: #6B7280;
+  line-height: 1.7;
+}
+
+.empty {
+  text-align: center; color: #9CA3AF;
+  font-size: 26rpx; padding: 120rpx 0;
+}
