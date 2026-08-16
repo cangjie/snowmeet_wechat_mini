@@ -1,0 +1,101 @@
+/* pages/admin/ticket/coupon_admin/coupon_admin.wxss */
+page { background: #F5F6FA; }
+.page { padding: 24rpx; box-sizing: border-box; }
+
+/* 视图切换 */
+.view-switch {
+  display: flex; background: #E4E7EF; border-radius: 999rpx;
+  padding: 6rpx; margin-bottom: 20rpx;
+}
+.vs-item {
+  flex: 1; text-align: center; padding: 18rpx 0;
+  border-radius: 999rpx; font-size: 28rpx; color: #6B7280;
+}
+.vs-item--active {
+  background: #fff; color: #2EA6D0; font-weight: 600;
+  box-shadow: 0 4rpx 16rpx rgba(46, 166, 208, 0.14);
+}
+
+/* 筛选卡片 */
+.card {
+  background: #fff; border-radius: 16rpx;
+  padding: 8rpx 24rpx; margin-bottom: 20rpx;
+}
+.filter-row {
+  display: flex; align-items: center;
+  padding: 18rpx 0; border-bottom: 1rpx solid #F0F1F5;
+}
+.filter-row:last-child { border-bottom: none; }
+.filter-row--date { display: block; }
+.filter-label {
+  width: 90rpx; flex-shrink: 0;
+  font-size: 26rpx; color: #6B7280;
+}
+.picker-value { font-size: 28rpx; color: #333; }
+
+.chip-group { display: flex; flex-wrap: wrap; }
+.chip {
+  padding: 8rpx 24rpx; margin-right: 16rpx;
+  border-radius: 999rpx; background: #F3F4F6;
+  font-size: 26rpx; color: #6B7280;
+}
+.chip--active { background: #2EA6D0; color: #fff; }
+
+/* 顶部信息条 */
+.sum-row {
+  font-size: 28rpx; color: #333; font-weight: 600;
+  padding: 8rpx 4rpx 16rpx;
+}
+.hint {
+  font-size: 24rpx; color: #6B7280; line-height: 1.6;
+  padding: 12rpx 20rpx; background: #fff;
+  border-radius: 12rpx; margin-bottom: 16rpx;
+}
+.hint--warn { background: #FFF7E6; color: #A15C00; }
+.hint-link { color: #2EA6D0; margin-left: 12rpx; text-decoration: underline; }
+
+/* 列表行 */
+.row {
+  background: #fff; border-radius: 16rpx;
+  padding: 24rpx; margin-bottom: 16rpx;
+}
+.row--member { display: flex; align-items: center; }
+.row-head { display: flex; align-items: center; flex-wrap: wrap; }
+.row-title {
+  font-size: 30rpx; color: #1F2937; font-weight: 600;
+  margin-right: 12rpx;
+}
+.row-sub { font-size: 24rpx; color: #6B7280; line-height: 1.7; margin-top: 6rpx; }
+.row-memo { font-size: 22rpx; color: #9CA3AF; margin-top: 6rpx; }
+.row-transfer {
+  font-size: 24rpx; color: #2EA6D0; font-weight: 600;
+  margin-top: 8rpx;
+}
+
+/* 状态徽标：主状态互斥，无效/未激活是叠加的 */
+.state {
+  font-size: 20rpx; padding: 2rpx 12rpx;
+  border-radius: 999rpx; margin-right: 8rpx;
+}
+.state--used { background: #E8F5E9; color: #2E7D32; }
+.state--expired { background: #F3F4F6; color: #9CA3AF; }
+.state--shared { background: #FFF7E6; color: #A15C00; }
+.state--unused { background: #E7F3F8; color: #2EA6D0; }
+.state--invalid { background: #FDECEC; color: #C62828; }
+.state--inactive { background: #F3F4F6; color: #6B7280; }
+
+/* 汇总视图 */
+.avatar {
+  width: 72rpx; height: 72rpx; border-radius: 50%;
+  background: #E7F3F8; color: #2EA6D0;
+  font-size: 30rpx; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  margin-right: 20rpx; flex-shrink: 0;
+}
+.mem-main { flex: 1; min-width: 0; }
+.mem-phone { font-size: 24rpx; color: #9CA3AF; }
+
+.empty {
+  text-align: center; color: #9CA3AF;
+  font-size: 26rpx; padding: 80rpx 0;
+}

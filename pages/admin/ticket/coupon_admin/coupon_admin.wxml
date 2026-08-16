@@ -1,0 +1,95 @@
+<!--pages/admin/ticket/coupon_admin/coupon_admin.wxml-->
+<view class="page">
+
+  <!-- 视图切换：两种视图共用下面的筛选条件 -->
+  <view class="view-switch">
+    <view wx:for="{{viewOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onViewTap"
+          class="vs-item {{view == item.key ? 'vs-item--active' : ''}}">{{item.name}}</view>
+  </view>
+
+  <!-- 筛选卡片：改任何一项立即重查，不用点「查询」 -->
+  <view class="card">
+    <view class="filter-row filter-row--date">
+      <date-range-picker startDate="{{startDate}}" endDate="{{endDate}}" bind:change="onDateRangeChange" />
+    </view>
+
+    <view class="filter-row">
+      <text class="filter-label">模板</text>
+      <picker range="{{templateNames}}" value="{{templateIndex}}" bindchange="onTemplateChange">
+        <view class="picker-value">{{templateNames[templateIndex] || '全部模板'}} ▾</view>
+      </picker>
+    </view>
+
+    <view class="filter-row">
+      <text class="filter-label">核销</text>
+      <view class="chip-group">
+        <view wx:for="{{usedOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onUsedTap"
+              class="chip {{usedKey == item.key ? 'chip--active' : ''}}">{{item.name}}</view>
+      </view>
+    </view>
+
+    <view class="filter-row">
+      <text class="filter-label">转赠</text>
+      <view class="chip-group">
+        <view wx:for="{{transferOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onTransferTap"
+              class="chip {{transferKey == item.key ? 'chip--active' : ''}}">{{item.name}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 顶部信息条 -->
+  <view class="sum-row">
+    <block wx:if="{{view == 'ticket'}}">共 {{total}} 张券</block>
+    <block wx:else>共 {{total}} 位会员 · {{ticketTotal}} 张券</block>
+  </view>
+  <view class="hint hint--warn" wx:if="{{view == 'ticket' && invalidCount > 0}}">
+    其中 {{invalidCount}} 张 valid=0，顾客端看不到
+  </view>
+  <view class="hint" wx:if="{{view == 'ticket' && !includeWasted && wastedTotal > 0}}">
+    另有 {{wastedTotal}} 张已过期废券未显示
+    <text class="hint-link" bindtap="onToggleWasted">显示废券</text>
+  </view>
+  <view class="hint" wx:if="{{includeWasted}}">
+    已包含过期废券
+    <text class="hint-link" bindtap="onToggleWasted">只看有效券</text>
+  </view>
+
+  <list-pager wx:if="{{total > 0}}" page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
+              disabled="{{loading}}" bind:change="onPagerChange" />
+
+  <!-- 按券明细 -->
+  <block wx:if="{{view == 'ticket'}}">
+    <view wx:for="{{ticketItems}}" wx:key="code" class="row" data-id="{{item.memberId}}" bindtap="onMemberTap">
+      <view class="row-head">
+        <text class="row-title">{{item.templateName || item.name}}</text>
+        <view class="state state--{{item.stateCls}}">{{item.stateLabel}}</view>
+        <view class="state state--invalid" wx:if="{{item.showInvalid}}">无效</view>
+        <view class="state state--inactive" wx:if="{{item.showInactive}}">未激活</view>
+      </view>
+      <view class="row-sub">{{item.code}} · {{item.customerText}}<text wx:if="{{item.memberPhone}}"> · {{item.memberPhone}}</text></view>
+      <view class="row-sub">发放 {{item.createDateStr}} · 到期 {{item.expireDateStr}}<text wx:if="{{item.usedTimeStr}}"> · 核销 {{item.usedTimeStr}}</text></view>
+      <view class="row-transfer" wx:if="{{item.transferText}}">{{item.transferText}}</view>
+      <view class="row-memo" wx:if="{{item.createMemo || item.channel}}">{{item.channel}}<text wx:if="{{item.channel && item.createMemo}}"> · </text>{{item.createMemo}}</view>
+    </view>
+  </block>
+
+  <!-- 按会员汇总 -->
+  <block wx:else>
+    <view wx:for="{{memberItems}}" wx:key="memberId" class="row row--member" data-id="{{item.memberId}}" bindtap="onMemberTap">
+      <view class="avatar">{{item.avatarText}}</view>
+      <view class="mem-main">
+        <view class="row-head">
+          <text class="row-title">{{item.customerText}}</text>
+          <text class="mem-phone" wx:if="{{item.memberPhone}}">{{item.memberPhone}}</text>
+        </view>
+        <view class="row-sub">共 {{item.ticketCount}} 张 · 已核销 {{item.usedCount}} 张 · {{item.transferText}}</view>
+        <view class="row-sub">最近发放 {{item.lastCreateDateStr}}</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="empty" wx:if="{{!loading && total == 0}}">没有符合条件的优惠券</view>
+
+  <list-pager wx:if="{{total > 0}}" page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
+              disabled="{{loading}}" bind:change="onPagerChange" />
+</view>

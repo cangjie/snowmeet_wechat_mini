@@ -1171,6 +1171,34 @@ const getPunchCardSalesByStaffPromise = function (keyword, startDate, endDate, s
   if (saleType) { url += '&saleType=' + encodeURIComponent(saleType) }
   return util.performWebRequest(url, null)
 }
+// ── 优惠券管理后台（staff≥100）─────────────────────────────────
+// 明细视图和汇总视图入参完全一样，所以共用一个拼 URL 的函数。
+// 三态参数（used / transferred）只在明确指定时才拼进去：不拼 = 全部。
+function _buildCouponAdminUrl(action, f, pageIndex, pageSize, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketAdmin/' + action + '?sessionKey=' + sessionKey
+    + '&pageIndex=' + (pageIndex || 1) + '&pageSize=' + (pageSize || 20)
+  f = f || {}
+  if (f.startDate) { url += '&startDate=' + encodeURIComponent(f.startDate) }
+  if (f.endDate) { url += '&endDate=' + encodeURIComponent(f.endDate) }
+  if (f.templateId) { url += '&templateId=' + f.templateId }
+  if (f.used === true || f.used === false) { url += '&used=' + f.used }
+  if (f.transferred === true || f.transferred === false) { url += '&transferred=' + f.transferred }
+  if (f.includeWasted) { url += '&includeWasted=true' }
+  return url
+}
+const searchTicketsByStaffPromise = function (filter, pageIndex, pageSize, sessionKey) {
+  return util.performWebRequest(
+    _buildCouponAdminUrl('SearchTicketsByStaff', filter, pageIndex, pageSize, sessionKey), null)
+}
+const searchTicketMembersByStaffPromise = function (filter, pageIndex, pageSize, sessionKey) {
+  return util.performWebRequest(
+    _buildCouponAdminUrl('SearchTicketMembersByStaff', filter, pageIndex, pageSize, sessionKey), null)
+}
+const getTicketTemplateOptionsPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketAdmin/GetTemplateOptions?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+
 // 修改季卡绑定的装备类型/品牌/长度（管理后台 staff≥200）。
 // 三项要么全填、要么全空（全空 = 退回未开卡，下次养护重新绑），服务端会拒绝残缺绑定
 const updatePunchCardEquipByStaffPromise = function (cardId, equipType, brand, scale, sessionKey) {
@@ -1680,6 +1708,9 @@ module.exports = {
   getMyPunchCardUsagesPromise,
   getPunchCardUsagesByStaffPromise,
   getPunchCardSalesByStaffPromise,
+  searchTicketsByStaffPromise,
+  searchTicketMembersByStaffPromise,
+  getTicketTemplateOptionsPromise,
   updatePunchCardEquipByStaffPromise,
   refundMyPunchCardPromise,
   checkMyPunchCardPurchasePromise,

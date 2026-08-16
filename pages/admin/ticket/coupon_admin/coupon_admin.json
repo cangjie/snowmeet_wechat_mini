@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "date-range-picker": "/components/date-range-picker/index",
+    "list-pager": "/components/list-pager/index"
+  },
+  "navigationBarTitleText": "优惠券管理"
+}
