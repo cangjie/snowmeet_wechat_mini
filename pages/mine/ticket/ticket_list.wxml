@@ -2,29 +2,58 @@
 
   <!-- 顶部 Tab 导航 -->
   <view class="tab-nav">
-    <navigator class="tab-item {{activeTab == 'pending' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=pending" open-type="redirect" hover-class="none">未使用</navigator>
+    <navigator class="tab-item {{activeTab == 'pending' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=pending" open-type="redirect" hover-class="none">
+      未使用<text class="tab-badge" wx:if="{{pendingCount > 0}}">{{pendingCount}}</text>
+    </navigator>
     <navigator class="tab-item {{activeTab == 'used' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=used" open-type="redirect" hover-class="none">已使用</navigator>
     <navigator class="tab-item {{activeTab == 'shared' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=shared" open-type="redirect" hover-class="none">已分享</navigator>
   </view>
 
+  <!-- 汇总行：仅未使用 tab -->
+  <view class="list-summary" wx:if="{{summaryText}}">
+    <text class="summary-text">{{summaryText}}</text>
+    <text class="summary-sort" bindtap="onToggleSort">{{sortLabel}} ⌄</text>
+  </view>
+
   <!-- 优惠券列表 -->
-  <view wx:for="{{ticketArr}}" wx:key="code" class="ticket-card {{item.used == 1 ? 'ticket-card--used' : ''}}">
-    <view id="{{item.code}}" bindtap="showDetail">
-      <view class="card-header">
-        <text class="ticket-title">{{item.name}}</text>
-        <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
+  <view wx:for="{{ticketArr}}" wx:key="code" class="ticket-card {{item.used == 1 || item.transferredOut ? 'ticket-card--used' : ''}}">
+
+    <!-- 票根主体：左侧面额 + 虚线打孔 + 右侧信息 -->
+    <view class="stub-row" id="{{item.code}}" bindtap="showDetail">
+      <view class="stub">
+        <view class="stub-value">
+          <text class="stub-yuan">¥</text><text class="stub-num">{{item.valueText}}</text>
+        </view>
       </view>
-      <text class="ticket-code">{{item.codeDisplay}}</text>
-      <!-- 时间由后端按所在 tab 算好并格式化下发，前端不做日期解析（iOS 解析 'yyyy-MM-dd HH:mm:ss' 会 Invalid Date） -->
-      <view class="ticket-time" wx:if="{{item.displayTimeText}}">
-        <text class="ticket-time-label">{{item.displayTimeLabel}}</text>
-        <text class="ticket-time-value">{{item.displayTimeText}}</text>
+      <view class="stub-divider">
+        <view class="punch punch--top"></view>
+        <view class="punch punch--bottom"></view>
+        <view class="punch-line"></view>
       </view>
-      <rich-text class="usage-rich" wx:if="{{item.rich}}" nodes="{{item.memo}}"></rich-text>
-      <view class="usage-block" wx:else>
-        <view class="usage-item" wx:for="{{item.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
+      <view class="stub-main">
+        <view class="card-header">
+          <text class="ticket-title">{{item.name}}</text>
+          <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
+        </view>
+        <text class="meta-line {{item.expireUrgent ? 'meta-line--urgent' : ''}}">{{item.metaLine}}</text>
+        <text class="code-time-line">{{item.codeTimeLine}}</text>
       </view>
     </view>
+
+    <!-- 使用说明：默认收起，没有说明的券整行不显示 -->
+    <block wx:if="{{item.hasUsage}}">
+      <view class="usage-toggle" data-code="{{item.code}}" bindtap="onToggleUsage">
+        <text class="usage-toggle-label">使用说明<text wx:if="{{item.usageCount > 0}}"> · {{item.usageCount}} 条</text></text>
+        <text class="usage-toggle-arrow">{{expandedCode == item.code ? '收起 ⌃' : '展开 ⌄'}}</text>
+      </view>
+      <view class="usage-panel" wx:if="{{expandedCode == item.code}}">
+        <rich-text class="usage-rich" wx:if="{{item.rich}}" nodes="{{item.memo}}"></rich-text>
+        <block wx:else>
+          <view class="usage-item" wx:for="{{item.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
+        </block>
+      </view>
+    </block>
+
     <view class="card-actions" wx:if="{{item.canCancelShare}}">
       <button size="mini" class="btn btn-cancel-share" bindtap="onCancelShare" data-code="{{item.code}}">撤回分享</button>
     </view>
@@ -35,8 +64,9 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{ticketArr.length == 0}}">
-    <text class="empty-icon">🎟️</text>
-    <text class="empty-text">暂无优惠券</text>
+    <view class="empty-icon-box"><view class="empty-icon-inner"></view></view>
+    <text class="empty-title">这里还没有券</text>
+    <text class="empty-text">到店养护或参与活动可获得体验券</text>
   </view>
 
 </view>

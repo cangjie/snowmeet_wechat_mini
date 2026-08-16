@@ -15,10 +15,48 @@
 .tab-item {
   flex: 1;
   text-align: center;
-  padding: 22rpx 0;
+  padding: 20rpx 0;
   border-radius: 999rpx;
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+}
+
+/* 未使用 tab 的数量角标。三个 tab 是 redirect 各自重新加载页面，
+   站在别的 tab 上拿不到未使用张数，所以只在未使用 tab 上显示 */
+.tab-badge {
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  border-radius: 999rpx;
+  background: var(--color-blue);
+  color: var(--color-white);
+  font-size: 20rpx;
+  font-weight: 700;
+  line-height: 32rpx;
+  text-align: center;
+}
+
+/* 汇总行：仅未使用 tab */
+.list-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8rpx 20rpx;
+}
+
+.summary-text {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.summary-sort {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-blue);
 }
 
 .tab-active {

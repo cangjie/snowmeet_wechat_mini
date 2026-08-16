@@ -30,11 +30,131 @@ page {
 .ticket-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 44rpx 40rpx;
-  margin-bottom: 32rpx;
+  /* 内边距下放到各分区（票根行 / 说明 / 按钮），让「使用说明」的分隔线能通栏 */
+  margin-bottom: 24rpx;
   box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
+}
+
+/* ===== 票根布局：左侧面额 · 虚线打孔 · 右侧信息 ===== */
+.stub-row {
+  padding: 36rpx 36rpx 0;
+  display: flex;
+  gap: 32rpx;
+  align-items: stretch;
+}
+
+.stub {
+  width: 148rpx;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rpx 0 16rpx;
+}
+
+.stub-value {
+  display: flex;
+  align-items: baseline;
+}
+
+.stub-yuan {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-blue);
+}
+
+.stub-num {
+  font-size: 68rpx;
+  font-weight: 700;
+  color: var(--color-blue);
+  letter-spacing: -1rpx;
+  line-height: 1;
+}
+
+/* 已使用/已被领取的券整卡降透明度，这里不再单独变灰，避免叠加后过淡 */
+
+.stub-divider {
+  width: 0;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* 打孔：卡片 overflow:hidden 会把圆孔切掉一半，正好是纸质票根被撕开的样子 */
+.punch {
+  position: absolute;
+  left: -10rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 999rpx;
+  background: var(--color-bg);
+}
+
+.punch--top { top: -40rpx; }
+.punch--bottom { bottom: -10rpx; }
+
+.punch-line {
+  position: absolute;
+  top: 4rpx;
+  bottom: 12rpx;
+  left: 0;
+  border-left: 1rpx dashed var(--color-border);
+}
+
+.stub-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  padding-bottom: 28rpx;
+}
+
+.meta-line {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.meta-line--urgent {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.code-time-line {
+  font-size: 22rpx;
+  color: var(--color-text-muted);
+  letter-spacing: 0.8rpx;
+  line-height: 1.4;
+}
+
+/* ===== 使用说明折叠 ===== */
+.usage-toggle {
+  border-top: 1rpx solid var(--color-gray-light);
+  padding: 24rpx 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.usage-toggle-label {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.usage-toggle-arrow {
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+}
+
+.usage-panel {
+  padding: 0 36rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
 }
 
 .ticket-card::before {
@@ -57,12 +177,11 @@ page {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 28rpx;
-  gap: 20rpx;
+  gap: 16rpx;
 }
 
 .ticket-title {
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: 700;
   color: var(--color-text-primary);
   line-height: 1.4;
@@ -78,9 +197,9 @@ page {
 }
 
 .status-tag {
-  padding: 8rpx 22rpx;
+  padding: 10rpx 18rpx;
   border-radius: 12rpx;
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
@@ -147,8 +266,8 @@ page {
 /* ===== 操作按钮 ===== */
 .card-actions {
   display: flex;
-  gap: 24rpx;
-  margin-top: 28rpx;
+  gap: 20rpx;
+  padding: 0 36rpx 36rpx;
 }
 
 .btn {
@@ -182,18 +301,41 @@ page {
 
 /* ===== 空状态 ===== */
 .empty-state {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 120rpx 0;
+  padding: 104rpx 48rpx;
   gap: 24rpx;
 }
 
-.empty-icon {
-  font-size: 100rpx;
+.empty-icon-box {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 20rpx;
+  background: var(--color-blue-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon-inner {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 8rpx;
+  border: 4rpx dashed var(--color-blue);
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
 .empty-text {
-  font-size: 30rpx;
+  font-size: 26rpx;
   color: var(--color-text-muted);
+  text-align: center;
 }

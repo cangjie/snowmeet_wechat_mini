@@ -113,15 +113,35 @@ function formatTicketCode(code){
 // 由 list 页跳转时通过 URL 参数把结论带过去（深链直接进 detail 的场景拿不到，
 // 退回 tab 兜底，与修复前行为一致）。
 function annotateTicket(ticket, tab){
-  var memo = ticket.memo
+  var memo = ticket.memo || ''
   if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
     ticket.rich = true
+    ticket.usage = []
   }
   else{
     ticket.rich = false
-    ticket.usage = memo.split(';')
+    // 过滤掉空条目：模板 16「老顾客优惠券」的 memo 是空串，直接 split 会得到 ['']，
+    // 渲染出一个孤零零的「· 」。库里 86% 的券都是这种，必须挡掉。
+    ticket.usage = memo.split(';').filter(function (s){ return (s || '').trim() !== '' })
   }
+  // 有说明才显示「使用说明」那一行折叠入口
+  ticket.hasUsage = ticket.rich || ticket.usage.length > 0
+  ticket.usageCount = ticket.rich ? 0 : ticket.usage.length
+
   ticket.codeDisplay = formatTicketCode(ticket.code)
+
+  // 左侧票根的面额。后端从 ticket_template.currency_value 下发，当前全库都是 0（体验券）
+  ticket.valueText = String(ticket.currencyValue == null ? 0 : ticket.currencyValue)
+
+  // 有效期行：临期标红。expireText / expireUrgent 都由后端算好，前端不解析日期
+  ticket.metaLine = ticket.expireUrgent
+    ? ('即将到期 · ' + (ticket.expireText || ''))
+    : ('有效期至 ' + (ticket.expireText || ''))
+
+  // 券码 · 时间。displayTimeLabel 形如「领取时间」，这里去掉「时间」二字更紧凑
+  var timeTag = (ticket.displayTimeLabel || '').replace('时间', '')
+  ticket.codeTimeLine = ticket.codeDisplay
+    + (ticket.displayTimeText ? (' · ' + ticket.displayTimeText + ' ' + timeTag) : '')
   ticket.canTransfer = TRANSFERABLE_TEMPLATE_IDS.indexOf(ticket.template_id) >= 0 && ticket.used != 1
   ticket.actionable = true       // 是否还允许任何操作（转赠/撤回分享/核销二维码等）
   ticket.canCancelShare = false  // 是否显示"撤回分享"按钮。wxml 一律用这个，不要直接判 shared

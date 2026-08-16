@@ -3,6 +3,15 @@ const app = getApp()
 const data = require('../../../utils/data.js')
 const ticketHelper = require('./ticket_helper.js')
 
+// 把后端下发的 expireText（yyyy.M.d，不补零）转成可字典序比较的键；
+// 「长期有效」用 '9999' 排到最后
+function _expireKey(t){
+  var s = t.expireText || ''
+  var m = /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/.exec(s)
+  if (!m){ return '9999' }
+  return m[1] + ('0' + m[2]).slice(-2) + ('0' + m[3]).slice(-2)
+}
+
 Page({
 
   /**
@@ -11,6 +20,11 @@ Page({
   data: {
     activeTab: 'pending',   // pending: 未使用 | shared: 已分享 | used: 已使用
     ticketArr:[],
+    summaryText: '',        // 「3 张可用 · 1 张 30 天内到期」，仅未使用 tab
+    pendingCount: 0,        // 未使用 tab 上的角标数量
+    sortBy: 'expire',       // expire 按有效期 | time 按获得时间
+    sortLabel: '按有效期排序',
+    expandedCode: '',       // 当前展开「使用说明」的券码，一次只展开一张
     needAuth: false,
     transferShow: false,      // 转赠确认弹层
     transferCode: '',
@@ -64,7 +78,7 @@ Page({
         data.getMySharedTicketsPromise(app.globalData.sessionKey).then(function (tickets){
           tickets = that._dedupeByCode(tickets || [])
           tickets = tickets.map(function (t){ return ticketHelper.annotateTicket(t, tab) })
-          that.setData({ ticketArr: tickets })
+          that._render(tickets)
         }).catch(function (exp){})
         return
       }
@@ -76,9 +90,58 @@ Page({
         if (tab == 'pending'){
           tickets = tickets.filter(function (t){ return t.shared != 1 })
         }
-        that.setData({ ticketArr: tickets })
+        that._render(tickets)
       }).catch(function (exp){})
     })
+  },
+
+  // 排序 + 汇总行 + 角标数量，统一在这里派生（WXML 表达式不支持方法调用）
+  _render: function (tickets){
+    tickets = this._sort(tickets || [])
+    var urgent = tickets.filter(function (t){ return t.expireUrgent }).length
+    var summary = ''
+    if (this.data.activeTab == 'pending' && tickets.length > 0){
+      summary = tickets.length + ' 张可用'
+      if (urgent > 0){ summary += ' · ' + urgent + ' 张 30 天内到期' }
+    }
+    this.setData({
+      ticketArr: tickets,
+      summaryText: summary,
+      // 角标只在未使用 tab 显示：三个 tab 是 redirect 各自重新加载页面，
+      // 站在别的 tab 上拿不到未使用的张数，为一个角标再多打一次接口不值当
+      pendingCount: this.data.activeTab == 'pending' ? tickets.length : 0
+    })
+  },
+
+  _sort: function (tickets){
+    var byExpire = this.data.sortBy == 'expire'
+    return tickets.slice().sort(function (a, b){
+      if (byExpire){
+        // 后端不下发可比较的到期时间戳，用 expireText（yyyy.M.d）补零后按字典序排；
+        // 「长期有效」排最后
+        var ka = _expireKey(a), kb = _expireKey(b)
+        if (ka !== kb){ return ka < kb ? -1 : 1 }
+      }
+      // 同到期日、或按获得时间排：新的在前
+      var ta = a.displayTimeText || '', tb = b.displayTimeText || ''
+      if (ta !== tb){ return ta > tb ? -1 : 1 }
+      return 0
+    })
+  },
+
+  onToggleSort: function (){
+    var next = this.data.sortBy == 'expire' ? 'time' : 'expire'
+    this.setData({
+      sortBy: next,
+      sortLabel: next == 'expire' ? '按有效期排序' : '按获得时间排序'
+    })
+    this._render(this.data.ticketArr)
+  },
+
+  // 「使用说明」折叠：一次只展开一张，再点一次收起
+  onToggleUsage: function (e){
+    var code = e.currentTarget.dataset.code
+    this.setData({ expandedCode: this.data.expandedCode == code ? '' : code })
   },
   /**
    * 按 code 去重，防止同一张券因为历史多次转赠记录被后端重复返回（前端兜底，后端也会去重）
@@ -168,7 +231,8 @@ Page({
    */
   _removeTicketFromList: function (code){
     var arr = this.data.ticketArr.filter(function (t){ return t.code !== code })
-    this.setData({ ticketArr: arr })
+    // 走 _render 而不是直接 setData：汇总行的可用张数和 tab 角标要跟着变
+    this._render(arr)
   },
   onCancelShare: function (e){
     var that = this
