@@ -147,7 +147,6 @@ Page({
       // WXML 表达式不支持方法调用，展示文案一律在这里派生好
       var list = (res.items || []).map(function (c) {
         return Object.assign({}, c, {
-          valueText: String(c.currencyValue == null ? 0 : c.currencyValue),
           showInvalid: c.valid !== 1,
           showInactive: c.isActive !== 1,
           transferText: c.transferCount > 0 ? ('转赠 ' + c.transferCount + ' 次') : '',

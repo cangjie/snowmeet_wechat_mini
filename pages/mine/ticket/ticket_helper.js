@@ -130,9 +130,6 @@ function annotateTicket(ticket, tab){
 
   ticket.codeDisplay = formatTicketCode(ticket.code)
 
-  // 左侧票根的面额。后端从 ticket_template.currency_value 下发，当前全库都是 0（体验券）
-  ticket.valueText = String(ticket.currencyValue == null ? 0 : ticket.currencyValue)
-
   // 有效期行：临期标红。expireText / expireUrgent 都由后端算好，前端不解析日期
   ticket.metaLine = ticket.expireUrgent
     ? ('即将到期 · ' + (ticket.expireText || ''))

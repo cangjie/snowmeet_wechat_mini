@@ -111,7 +111,6 @@
           </scroll-view>
 
           <view wx:for="{{filteredCoupons}}" wx:key="code" class="cp-row" data-code="{{item.code}}" bindtap="gotoCoupon">
-            <view class="cp-value"><text class="cp-yuan">¥</text><text class="cp-num">{{item.valueText}}</text></view>
             <view class="cp-main">
               <view class="cp-head">
                 <text class="cp-name">{{item.templateName || item.name}}</text>

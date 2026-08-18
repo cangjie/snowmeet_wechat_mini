@@ -6,9 +6,6 @@
     <!-- 券本身 -->
     <view class="card">
       <view class="head">
-        <view class="value">
-          <text class="value-yuan">¥</text><text class="value-num">{{ticket.valueText}}</text>
-        </view>
         <view class="head-main">
           <view class="head-line">
             <text class="title">{{ticket.templateName || ticket.name}}</text>

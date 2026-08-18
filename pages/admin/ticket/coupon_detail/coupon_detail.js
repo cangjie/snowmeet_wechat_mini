@@ -47,7 +47,6 @@ Page({
           : '（无会员归属）',
         showInvalid: res.valid !== 1,
         showInactive: res.isActive !== 1,
-        valueText: String(res.currencyValue == null ? 0 : res.currencyValue),
         transferText: res.transferCount > 0 ? (res.transferCount + ' 次') : '未转赠过'
       })
       var logs = (res.logs || []).map(function (l) {

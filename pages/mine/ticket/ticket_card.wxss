@@ -37,70 +37,12 @@ page {
   overflow: hidden;
 }
 
-/* ===== 票根布局：左侧面额 · 虚线打孔 · 右侧信息 ===== */
+/* ===== 券主体 =====
+   原设计稿这里有个左侧 ¥ 面额票根 + 虚线打孔，因为优惠券绝大多数是 0 元、
+   打折券的力度又随商品而变，金额表达不了信息，已整列移除 */
 .stub-row {
   padding: 36rpx 36rpx 0;
   display: flex;
-  gap: 32rpx;
-  align-items: stretch;
-}
-
-.stub {
-  width: 148rpx;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rpx 0 16rpx;
-}
-
-.stub-value {
-  display: flex;
-  align-items: baseline;
-}
-
-.stub-yuan {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: var(--color-blue);
-}
-
-.stub-num {
-  font-size: 68rpx;
-  font-weight: 700;
-  color: var(--color-blue);
-  letter-spacing: -1rpx;
-  line-height: 1;
-}
-
-/* 已使用/已被领取的券整卡降透明度，这里不再单独变灰，避免叠加后过淡 */
-
-.stub-divider {
-  width: 0;
-  position: relative;
-  flex-shrink: 0;
-}
-
-/* 打孔：卡片 overflow:hidden 会把圆孔切掉一半，正好是纸质票根被撕开的样子 */
-.punch {
-  position: absolute;
-  left: -10rpx;
-  width: 20rpx;
-  height: 20rpx;
-  border-radius: 999rpx;
-  background: var(--color-bg);
-}
-
-.punch--top { top: -40rpx; }
-.punch--bottom { bottom: -10rpx; }
-
-.punch-line {
-  position: absolute;
-  top: 4rpx;
-  bottom: 12rpx;
-  left: 0;
-  border-left: 1rpx dashed var(--color-border);
 }
 
 .stub-main {

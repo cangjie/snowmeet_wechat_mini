@@ -18,18 +18,9 @@
   <!-- 优惠券列表 -->
   <view wx:for="{{ticketArr}}" wx:key="code" class="ticket-card {{item.used == 1 || item.transferredOut ? 'ticket-card--used' : ''}}">
 
-    <!-- 票根主体：左侧面额 + 虚线打孔 + 右侧信息 -->
+    <!-- 券主体。原设计稿左侧有个 ¥ 面额票根，但优惠券绝大多数是 0 元、
+         打折券的力度又随商品而变，一个金额表达不了任何东西，所以整列去掉 -->
     <view class="stub-row" id="{{item.code}}" bindtap="showDetail">
-      <view class="stub">
-        <view class="stub-value">
-          <text class="stub-yuan">¥</text><text class="stub-num">{{item.valueText}}</text>
-        </view>
-      </view>
-      <view class="stub-divider">
-        <view class="punch punch--top"></view>
-        <view class="punch punch--bottom"></view>
-        <view class="punch-line"></view>
-      </view>
       <view class="stub-main">
         <view class="card-header">
           <text class="ticket-title">{{item.name}}</text>
