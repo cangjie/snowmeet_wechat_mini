@@ -22,6 +22,21 @@ Page({
     orderTab: '全部',
     filteredOrders: [],
 
+    // 名下优惠券（可折叠）。一次拉全，按 未使用/已核销/已过期 前端切换——
+    // 三个桶是完备互斥划分，由后端 bucket 字段决定，前端不再自己判过期
+    couponOpen: false,
+    couponLoaded: false,
+    couponLoading: false,
+    coupons: [],
+    filteredCoupons: [],
+    couponTab: 'unused',
+    couponTabs: [
+      { key: 'unused', name: '未使用' },
+      { key: 'used', name: '已核销' },
+      { key: 'expired', name: '已过期' }
+    ],
+    couponCounts: { unused: 0, used: 0, expired: 0, total: 0 },
+
     // 编辑资料（姓名/性别/手机号）
     profileShow: false,
     pf: { name: '', gender: '男', cell: '' },
@@ -113,6 +128,68 @@ Page({
       that.setData({ loading: false })
       wx.showToast({ title: '加载失败', icon: 'none' })
     })
+  },
+
+  // 优惠券折叠区：首次展开才拉数据，收起不清空（再展开不用重拉）
+  onCouponToggle() {
+    var open = !this.data.couponOpen
+    this.setData({ couponOpen: open })
+    if (open && !this.data.couponLoaded && !this.data.couponLoading) {
+      this.loadCoupons()
+    }
+  },
+
+  loadCoupons() {
+    var that = this
+    that.setData({ couponLoading: true })
+    data.getMemberCouponsByStaffPromise(that.data.memberId, app.globalData.sessionKey).then(function (res) {
+      res = res || {}
+      // WXML 表达式不支持方法调用，展示文案一律在这里派生好
+      var list = (res.items || []).map(function (c) {
+        return Object.assign({}, c, {
+          valueText: String(c.currencyValue == null ? 0 : c.currencyValue),
+          showInvalid: c.valid !== 1,
+          showInactive: c.isActive !== 1,
+          transferText: c.transferCount > 0 ? ('转赠 ' + c.transferCount + ' 次') : '',
+          metaLine: c.bucket === 'used'
+            ? ('核销 ' + (c.usedTimeStr || ''))
+            : ('发放 ' + c.createDateStr + ' · 到期 ' + c.expireDateStr)
+        })
+      })
+      that.setData({
+        coupons: list,
+        couponLoaded: true,
+        couponLoading: false,
+        couponCounts: {
+          unused: res.unusedCount || 0,
+          used: res.usedCount || 0,
+          expired: res.expiredCount || 0,
+          total: res.total || 0
+        }
+      })
+      that._filterCoupons(that.data.couponTab)
+    }).catch(function () {
+      that.setData({ couponLoading: false })
+    })
+  },
+
+  onCouponTab(e) {
+    var key = e.currentTarget.dataset.k
+    if (key === this.data.couponTab) { return }
+    this.setData({ couponTab: key })
+    this._filterCoupons(key)
+  },
+
+  _filterCoupons(key) {
+    this.setData({
+      filteredCoupons: this.data.coupons.filter(function (c) { return c.bucket === key })
+    })
+  },
+
+  gotoCoupon(e) {
+    var code = e.currentTarget.dataset.code
+    if (!code) { return }
+    wx.navigateTo({ url: '/pages/admin/ticket/coupon_detail/coupon_detail?code=' + code })
   },
 
   callPhone() {

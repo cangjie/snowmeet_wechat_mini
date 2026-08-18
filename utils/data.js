@@ -1194,6 +1194,13 @@ const searchTicketMembersByStaffPromise = function (filter, pageIndex, pageSize,
   return util.performWebRequest(
     _buildCouponAdminUrl('SearchTicketMembersByStaff', filter, pageIndex, pageSize, sessionKey), null)
 }
+// 某会员名下全部优惠券（会员详情页折叠区用）。不分页——会员名下券数平均 2.1 张、
+// 最多 129 张，一次拉全再由前端按 未使用/已核销/已过期 切换
+const getMemberCouponsByStaffPromise = function (memberId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketAdmin/GetMemberCouponsByStaff?sessionKey=' + sessionKey
+    + '&memberId=' + memberId
+  return util.performWebRequest(url, null)
+}
 // 单张券详情 + 全量操作流水（转赠/核销/撤回/发放都列）
 const getTicketDetailByStaffPromise = function (code, sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketAdmin/GetTicketDetailByStaff?sessionKey=' + sessionKey
@@ -1718,6 +1725,7 @@ module.exports = {
   searchTicketMembersByStaffPromise,
   getTicketTemplateOptionsPromise,
   getTicketDetailByStaffPromise,
+  getMemberCouponsByStaffPromise,
   updatePunchCardEquipByStaffPromise,
   refundMyPunchCardPromise,
   checkMyPunchCardPurchasePromise,

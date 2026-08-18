@@ -94,6 +94,43 @@
       <view wx:if="{{filteredOrders.length === 0}}" class="order-empty">该分类暂无订单</view>
     </view>
 
+    <!-- 名下优惠券（可折叠，与最近订单平行） -->
+    <view class="card">
+      <view class="card-title card-title--tap" bindtap="onCouponToggle">
+        <van-icon name="coupon-o" size="16px" color="#006495" />
+        <text class="card-title-txt">名下优惠券<text wx:if="{{couponLoaded}}" class="cp-total"> · {{couponCounts.total}} 张</text></text>
+        <van-icon name="{{couponOpen ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#bfc7d1" />
+      </view>
+
+      <block wx:if="{{couponOpen}}">
+        <view wx:if="{{couponLoading}}" class="order-empty">加载中…</view>
+        <block wx:else>
+          <scroll-view class="otab" scroll-x>
+            <view wx:for="{{couponTabs}}" wx:key="key" class="otab-item {{couponTab === item.key ? 'otab-item--on' : ''}}"
+                  data-k="{{item.key}}" bindtap="onCouponTab">{{item.name}} {{couponCounts[item.key]}}</view>
+          </scroll-view>
+
+          <view wx:for="{{filteredCoupons}}" wx:key="code" class="cp-row" data-code="{{item.code}}" bindtap="gotoCoupon">
+            <view class="cp-value"><text class="cp-yuan">¥</text><text class="cp-num">{{item.valueText}}</text></view>
+            <view class="cp-main">
+              <view class="cp-head">
+                <text class="cp-name">{{item.templateName || item.name}}</text>
+                <view class="cp-state cp-state--{{item.stateCls}}">{{item.stateLabel}}</view>
+                <view class="cp-state cp-state--invalid" wx:if="{{item.showInvalid}}">无效</view>
+                <view class="cp-state cp-state--inactive" wx:if="{{item.showInactive}}">未激活</view>
+              </view>
+              <text class="cp-meta mono">{{item.code}}</text>
+              <text class="cp-meta">{{item.metaLine}}</text>
+              <text class="cp-transfer" wx:if="{{item.transferText}}">{{item.transferText}}</text>
+            </view>
+            <van-icon name="arrow" size="15px" color="#bfc7d1" />
+          </view>
+
+          <view wx:if="{{filteredCoupons.length === 0}}" class="order-empty">该分类暂无优惠券</view>
+        </block>
+      </block>
+    </view>
+
     <view class="bottom-pad"></view>
   </scroll-view>
 
