@@ -131,7 +131,9 @@ Page({
                  + (it.lastTransferTimeStr ? '（最后一次 ' + it.lastTransferTimeStr + '）' : ''))
               : '',
             showInvalid: it.valid !== 1,
-            showInactive: it.isActive !== 1
+            showInactive: it.isActive !== 1,
+            // 失效（已核销/已过期）的券种色条降灰
+            muted: it.used === 1 || it.stateCls === 'expired'
           })
         })
         patch.wastedTotal = res.wastedTotal || 0

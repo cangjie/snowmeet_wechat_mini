@@ -150,6 +150,7 @@ Page({
           showInvalid: c.valid !== 1,
           showInactive: c.isActive !== 1,
           transferText: c.transferCount > 0 ? ('转赠 ' + c.transferCount + ' 次') : '',
+          muted: c.bucket !== 'unused',
           metaLine: c.bucket === 'used'
             ? ('核销 ' + (c.usedTimeStr || ''))
             : ('发放 ' + c.createDateStr + ' · 到期 ' + c.expireDateStr)

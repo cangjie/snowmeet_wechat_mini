@@ -16,14 +16,19 @@
   </view>
 
   <!-- 优惠券列表 -->
-  <view wx:for="{{ticketArr}}" wx:key="code" class="ticket-card {{item.used == 1 || item.transferredOut ? 'ticket-card--used' : ''}}">
+  <view wx:for="{{ticketArr}}" wx:key="code" class="ticket-card">
 
-    <!-- 券主体。原设计稿左侧有个 ¥ 面额票根，但优惠券绝大多数是 0 元、
-         打折券的力度又随商品而变，一个金额表达不了任何东西，所以整列去掉 -->
-    <view class="stub-row" id="{{item.code}}" bindtap="showDetail">
+    <!-- 券种通栏 banner：底色 + 几何图案按券种区分，失效统一降灰。
+         券名放这里（原设计稿这里右侧还有个 ¥ 金额，已按业务要求全站去掉） -->
+    <view class="tk-banner tk-banner--{{item.bannerCls}} {{item.muted ? 'tk-banner--muted' : ''}}"
+          id="{{item.code}}" bindtap="showDetail">
+      <text class="tk-banner-kind">{{item.bannerLabel}}</text>
+      <text class="tk-banner-name">{{item.name}}</text>
+    </view>
+
+    <view class="stub-row {{item.muted ? 'stub-row--muted' : ''}}" id="{{item.code}}" bindtap="showDetail">
       <view class="stub-main">
         <view class="card-header">
-          <text class="ticket-title">{{item.name}}</text>
           <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
         </view>
         <text class="meta-line {{item.expireUrgent ? 'meta-line--urgent' : ''}}">{{item.metaLine}}</text>

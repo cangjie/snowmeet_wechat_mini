@@ -139,6 +139,11 @@ function annotateTicket(ticket, tab){
   var timeTag = (ticket.displayTimeLabel || '').replace('时间', '')
   ticket.codeTimeLine = ticket.codeDisplay
     + (ticket.displayTimeText ? (' · ' + ticket.displayTimeText + ' ' + timeTag) : '')
+  // 失效态：banner 降灰 + 文字降色。设计明确要求不用整卡 opacity——
+  // 那样会把券码、时间这些小字压到读不清
+  // 顾客端「未使用」tab 后端已经滤掉过期券、「已使用」tab 全是 used==1，
+  // 所以这里只需判这两种；不引用后端并不下发的 expired 字段
+  ticket.muted = ticket.used == 1 || !!ticket.transferredOut
   ticket.canTransfer = TRANSFERABLE_TEMPLATE_IDS.indexOf(ticket.template_id) >= 0 && ticket.used != 1
   ticket.actionable = true       // 是否还允许任何操作（转赠/撤回分享/核销二维码等）
   ticket.canCancelShare = false  // 是否显示"撤回分享"按钮。wxml 一律用这个，不要直接判 shared

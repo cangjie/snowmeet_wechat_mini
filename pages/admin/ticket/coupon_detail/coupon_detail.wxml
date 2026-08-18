@@ -6,8 +6,10 @@
     <!-- 券本身 -->
     <view class="card">
       <view class="head">
+        <view class="kind-strip kind-strip--{{ticket.muted ? 'muted' : ticket.bannerCls}}"></view>
         <view class="head-main">
           <view class="head-line">
+            <view class="kind-tag kind-tag--{{ticket.muted ? 'muted' : ticket.bannerCls}}">{{ticket.bannerLabel}}</view>
             <text class="title">{{ticket.templateName || ticket.name}}</text>
             <view class="state state--{{ticket.stateCls}}">{{ticket.stateLabel}}</view>
             <view class="state state--invalid" wx:if="{{ticket.showInvalid}}">无效</view>

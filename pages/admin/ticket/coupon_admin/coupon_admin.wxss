@@ -115,3 +115,40 @@ page { background: #F5F6FA; }
 }
 .query-btn::after { border: none; }
 .query-btn[disabled] { background: #B7D9E6; color: #fff; }
+
+/* ═══ 券种色条（后台密集列表用）═══
+   与顾客端同一套配色，但只做一条 8rpx 竖条 + 一个券种小标签，不铺大色块——
+   后台是密集列表，整块底色会盖掉信息层级。券种由后端统一判定。 */
+.kind-strip {
+  width: 8rpx;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+  align-self: stretch;
+  background: #2563EB;
+}
+.kind-strip--wax { background: #2563EB; }
+.kind-strip--hotwax { background: #EA580C; }
+.kind-strip--edge { background: #0F766E; }
+.kind-strip--dual { background: #4338CA; }
+.kind-strip--pass { background: #0284C7; }
+.kind-strip--course { background: #334155; }
+.kind-strip--cash { background: #B45309; }
+.kind-strip--muted { background: #D1D5DB; }
+
+.kind-tag {
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+  margin-right: 8rpx;
+}
+.kind-tag--wax { background: #EFF4FF; color: #1D4FD7; }
+.kind-tag--hotwax { background: #FFF1E7; color: #C2410C; }
+.kind-tag--edge { background: #E6F5F3; color: #0F766E; }
+.kind-tag--dual { background: #EEF0FF; color: #4338CA; }
+.kind-tag--pass { background: #E8F5FE; color: #0369A1; }
+.kind-tag--course { background: #F1F5F9; color: #334155; }
+.kind-tag--cash { background: #FEF3C7; color: #B45309; }
+.kind-tag--muted { background: #F3F4F6; color: #6B7280; }
+.row--kind { display: flex; gap: 16rpx; align-items: stretch; }
+.row--kind .row-body { flex: 1; min-width: 0; }

@@ -111,8 +111,10 @@
           </scroll-view>
 
           <view wx:for="{{filteredCoupons}}" wx:key="code" class="cp-row" data-code="{{item.code}}" bindtap="gotoCoupon">
+            <view class="kind-strip kind-strip--{{item.muted ? 'muted' : item.bannerCls}}"></view>
             <view class="cp-main">
               <view class="cp-head">
+                <view class="kind-tag kind-tag--{{item.muted ? 'muted' : item.bannerCls}}">{{item.bannerLabel}}</view>
                 <text class="cp-name">{{item.templateName || item.name}}</text>
                 <view class="cp-state cp-state--{{item.stateCls}}">{{item.stateLabel}}</view>
                 <view class="cp-state cp-state--invalid" wx:if="{{item.showInvalid}}">无效</view>

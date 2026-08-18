@@ -47,6 +47,7 @@ Page({
           : '（无会员归属）',
         showInvalid: res.valid !== 1,
         showInactive: res.isActive !== 1,
+        muted: res.used === 1 || res.stateCls === 'expired',
         transferText: res.transferCount > 0 ? (res.transferCount + ' 次') : '未转赠过'
       })
       var logs = (res.logs || []).map(function (l) {

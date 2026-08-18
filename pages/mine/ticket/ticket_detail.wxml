@@ -1,14 +1,22 @@
 <!--pages/mine/ticket/ticket_detail.wxml-->
 <view class="ticket-page">
 
-  <view class="ticket-card {{ticket.used == 1 ? 'ticket-card--used' : ''}}">
-    <view class="card-header">
-      <text class="ticket-title">{{ticket.name}}</text>
-      <view class="status-tag {{ticket.statusClass}}">{{ticket.statusText}}</view>
+  <view class="ticket-card">
+    <!-- 券种 banner 作页头，与列表页同一套配色；失效统一降灰 -->
+    <view class="tk-banner tk-banner--{{ticket.bannerCls}} {{ticket.muted ? 'tk-banner--muted' : ''}}">
+      <text class="tk-banner-kind">{{ticket.bannerLabel}}</text>
+      <text class="tk-banner-name">{{ticket.name}}</text>
     </view>
-    <rich-text class="usage-rich" wx:if="{{ticket.rich}}" nodes="{{ticket.memo}}"></rich-text>
-    <view class="usage-block" wx:else>
-      <view class="usage-item" wx:for="{{ticket.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
+    <view class="detail-body {{ticket.muted ? 'stub-row--muted' : ''}}">
+      <view class="card-header">
+        <view class="status-tag {{ticket.statusClass}}">{{ticket.statusText}}</view>
+      </view>
+      <text class="meta-line {{ticket.expireUrgent ? 'meta-line--urgent' : ''}}">{{ticket.metaLine}}</text>
+      <text class="code-time-line">{{ticket.codeTimeLine}}</text>
+      <rich-text class="usage-rich" wx:if="{{ticket.rich}}" nodes="{{ticket.memo}}"></rich-text>
+      <view class="usage-block" wx:elif="{{ticket.usage.length > 0}}">
+        <view class="usage-item" wx:for="{{ticket.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
+      </view>
     </view>
   </view>
 

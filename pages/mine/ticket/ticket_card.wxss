@@ -111,10 +111,6 @@ page {
   opacity: 0.6;
 }
 
-.ticket-card--used {
-  opacity: 0.6;
-}
-
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -280,4 +276,106 @@ page {
   font-size: 26rpx;
   color: var(--color-text-muted);
   text-align: center;
+}
+
+/* ═══ 券种 banner ═══
+   每个券种一套「底色 + 几何图案」。全部是 repeating-linear-gradient / radial-gradient，
+   不出图，新增券种只要加一条 class。
+   图案透明度 ≤20%，保证正文压在上面仍有足够对比度。
+   券种由后端 TicketTransferRules.ResolveBanner 按券名判定，四个页面共用同一口径。 */
+.tk-banner {
+  padding: 28rpx 36rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.tk-banner-kind {
+  font-size: 22rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+}
+
+.tk-banner-name {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+/* 机打蜡 · 主蓝 · 45° 细斜纹 */
+.tk-banner--wax {
+  background-color: #EFF4FF;
+  background-image: repeating-linear-gradient(45deg, rgba(37,99,235,.13) 0 14rpx, transparent 14rpx 30rpx);
+}
+.tk-banner--wax .tk-banner-kind { color: #1D4FD7; }
+
+/* 热打蜡 · 暖橙 · 热扩散同心弧 */
+.tk-banner--hotwax {
+  background-color: #FFF1E7;
+  background-image:
+    radial-gradient(circle at 92% 128%, transparent 80rpx, rgba(234,88,12,.15) 80rpx 84rpx, transparent 84rpx),
+    radial-gradient(circle at 92% 128%, transparent 128rpx, rgba(234,88,12,.13) 128rpx 132rpx, transparent 132rpx),
+    radial-gradient(circle at 92% 128%, transparent 176rpx, rgba(234,88,12,.11) 176rpx 180rpx, transparent 180rpx);
+}
+.tk-banner--hotwax .tk-banner-kind { color: #C2410C; }
+
+/* 修刃 · 钢青 · 刻度竖线 */
+.tk-banner--edge {
+  background-color: #E6F5F3;
+  background-image: repeating-linear-gradient(90deg, rgba(15,118,110,.16) 0 4rpx, transparent 4rpx 26rpx);
+}
+.tk-banner--edge .tk-banner-kind { color: #0F766E; }
+
+/* 双项 · 蓝紫 · 交叉网格 */
+.tk-banner--dual {
+  background-color: #EEF0FF;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(67,56,202,.12) 0 4rpx, transparent 4rpx 24rpx),
+    repeating-linear-gradient(-45deg, rgba(67,56,202,.12) 0 4rpx, transparent 4rpx 24rpx);
+}
+.tk-banner--dual .tk-banner-kind { color: #4338CA; }
+
+/* 雪票 / 体验 · 天蓝 · 雪粒点阵 */
+.tk-banner--pass {
+  background-color: #E8F5FE;
+  background-image: radial-gradient(circle, rgba(2,132,199,.20) 3rpx, transparent 3.2rpx);
+  background-size: 28rpx 28rpx;
+}
+.tk-banner--pass .tk-banner-kind { color: #0369A1; }
+
+/* 课程 · 石墨 · 宽斜条 */
+.tk-banner--course {
+  background-color: #F1F5F9;
+  background-image: repeating-linear-gradient(-45deg, rgba(51,65,85,.10) 0 20rpx, transparent 20rpx 44rpx);
+}
+.tk-banner--course .tk-banner-kind { color: #334155; }
+
+/* 代金 · 琥珀 · 横向细纹 */
+.tk-banner--cash {
+  background-color: #FEF3C7;
+  background-image: repeating-linear-gradient(180deg, rgba(180,83,9,.13) 0 4rpx, transparent 4rpx 32rpx);
+}
+.tk-banner--cash .tk-banner-kind { color: #B45309; }
+
+/* 失效态：任何券种失效后统一降灰。
+   注意用的是"换灰底 + 文字降色"，不是整卡 opacity——后者会把小字压到读不清。 */
+.tk-banner--muted {
+  background-color: #F3F4F6 !important;
+  background-image: repeating-linear-gradient(45deg, rgba(107,114,128,.20) 0 14rpx, transparent 14rpx 30rpx) !important;
+}
+.tk-banner--muted .tk-banner-kind { color: #6B7280 !important; }
+.tk-banner--muted .tk-banner-name { color: #6B7280; }
+
+/* 失效卡片正文降色（配合 .tk-banner--muted，取代原来的整卡 opacity） */
+.stub-row--muted .ticket-title,
+.stub-row--muted .meta-line,
+.stub-row--muted .code-time-line { color: var(--color-text-secondary); }
+
+/* 券详情页正文（banner 下方） */
+.detail-body {
+  padding: 32rpx 36rpx 36rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
 }
