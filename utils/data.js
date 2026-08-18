@@ -1212,6 +1212,43 @@ const getTicketTemplateOptionsPromise = function (sessionKey) {
   return util.performWebRequest(url, null)
 }
 
+// ── 优惠券模板维护（staff≥200）─────────────────────────────────
+// 门槛比上面的优惠券管理（100）高一档：改模板等于改发放规则和定价规则——
+// bizType 决定这类券在开单时选不选得到，可用天数决定券多久过期，
+// 商品优惠规则直接进养护服务费的算式。
+const getTicketTemplateListPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetTemplateListByStaff?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+const getTicketTemplateDetailPromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetTemplateDetailByStaff?sessionKey=' + sessionKey
+    + '&id=' + id
+  return util.performWebRequest(url, null)
+}
+// body = { id(0=新建), name, type, memo, bizType, validityMode('days'|'date'|'forever'),
+//          availableDays, expireDate, miniappReceptPath, hide, valid }
+// validityMode 说了算：服务端会按它清空另一个有效期字段，前端不用自己置空
+const saveTicketTemplatePromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/SaveTemplateByStaff?sessionKey=' + sessionKey
+  return util.performWebRequest(url, body)
+}
+// body = { id(0=新建), templateId, productId(0=全部商品), mode('fixed'|'rate'|'amount'), value }
+const saveTicketProductRulePromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/SaveProductRuleByStaff?sessionKey=' + sessionKey
+  return util.performWebRequest(url, body)
+}
+const deleteTicketProductRulePromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/DeleteProductRuleByStaff?sessionKey=' + sessionKey
+    + '&id=' + id
+  return util.performWebRequest(url, null)
+}
+// 商品选择器。服务端已排除雪票（596 条，会淹没真正要配的服务类商品）并限 200 条
+const getTicketRuleProductOptionsPromise = function (keyword, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetProductOptionsByStaff?sessionKey=' + sessionKey
+  if (keyword) { url += '&keyword=' + encodeURIComponent(keyword) }
+  return util.performWebRequest(url, null)
+}
+
 // 修改季卡绑定的装备类型/品牌/长度（管理后台 staff≥200）。
 // 三项要么全填、要么全空（全空 = 退回未开卡，下次养护重新绑），服务端会拒绝残缺绑定
 const updatePunchCardEquipByStaffPromise = function (cardId, equipType, brand, scale, sessionKey) {
@@ -1724,6 +1761,12 @@ module.exports = {
   searchTicketsByStaffPromise,
   searchTicketMembersByStaffPromise,
   getTicketTemplateOptionsPromise,
+  getTicketTemplateListPromise,
+  getTicketTemplateDetailPromise,
+  saveTicketTemplatePromise,
+  saveTicketProductRulePromise,
+  deleteTicketProductRulePromise,
+  getTicketRuleProductOptionsPromise,
   getTicketDetailByStaffPromise,
   getMemberCouponsByStaffPromise,
   updatePunchCardEquipByStaffPromise,

@@ -1,0 +1,30 @@
+<!--pages/admin/ticket/template_admin/template_admin.wxml-->
+<view class="page">
+
+  <view class="hint" wx:if="{{conflictCount > 0}}">
+    有 {{conflictCount}} 个模板同时设了「可用天数」和「总过期日」。这两项只能留一个，
+    否则实际发券会按总过期日走、天数形同虚设。点进去改一下。
+  </view>
+
+  <view class="card">
+    <view class="row" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="onTemplateTap">
+      <view class="row-main">
+        <view class="row-title">
+          <text class="name {{item.hide == 1 ? 'name--hidden' : ''}}">{{item.name}}</text>
+          <text class="tag tag--type">{{item.type}}</text>
+          <text class="tag tag--biz {{item.bizType ? '' : 'tag--off'}}">{{item.bizTypeText}}</text>
+          <text class="tag tag--hidden" wx:if="{{item.hide == 1}}">已隐藏</text>
+          <text class="tag tag--invalid" wx:if="{{item.valid != 1}}">已停用</text>
+        </view>
+        <view class="row-meta {{item.hasConflict ? 'row-meta--warn' : ''}}">{{item.validityText}}</view>
+        <view class="row-meta">
+          商品优惠 {{item.ruleCount}} 条 · 累计发券 {{item.ticketTotal}} 张 · 近一年 {{item.ticketRecent}} 张
+        </view>
+      </view>
+      <view class="row-arrow">›</view>
+    </view>
+    <view class="empty" wx:if="{{!loading && items.length == 0}}">没有模板</view>
+  </view>
+
+  <button class="btn-add" bindtap="onAddTap">新建模板</button>
+</view>

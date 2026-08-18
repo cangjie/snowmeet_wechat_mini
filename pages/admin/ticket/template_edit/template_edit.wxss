@@ -1,0 +1,99 @@
+/* pages/admin/ticket/template_edit/template_edit.wxss */
+page { background: #F5F6FA; }
+.page { padding: 24rpx; box-sizing: border-box; }
+
+.card {
+  background: #fff; border-radius: 16rpx;
+  padding: 8rpx 24rpx 24rpx; margin-bottom: 20rpx;
+}
+.sec-title {
+  font-size: 28rpx; color: #333; font-weight: 600;
+  padding: 20rpx 0 8rpx;
+}
+.sec-hint {
+  font-size: 22rpx; color: #9AA0AC; line-height: 1.6;
+  padding: 12rpx 0 4rpx;
+}
+
+.frow {
+  display: flex; align-items: center;
+  padding: 18rpx 0; border-bottom: 1rpx solid #F0F1F5;
+}
+.frow:last-child { border-bottom: none; }
+.frow--block { display: block; }
+.flabel { width: 110rpx; flex-shrink: 0; font-size: 26rpx; color: #6B7280; }
+.finput { flex: 1; font-size: 28rpx; color: #333; }
+.ftextarea {
+  width: 100%; font-size: 28rpx; color: #333;
+  min-height: 120rpx; padding: 12rpx 0;
+}
+.fpicker { flex: 1; font-size: 28rpx; color: #333; }
+.fswitch { transform: scale(0.8); margin-left: auto; }
+
+.chip-group { display: flex; flex-wrap: wrap; padding: 8rpx 0; }
+.chip {
+  padding: 10rpx 28rpx; margin-right: 16rpx; margin-bottom: 8rpx;
+  border-radius: 999rpx; background: #F3F4F6;
+  font-size: 26rpx; color: #6B7280;
+}
+.chip--active { background: #2EA6D0; color: #fff; }
+
+/* 商品优惠行 */
+.rrow {
+  display: flex; align-items: center;
+  padding: 22rpx 0; border-bottom: 1rpx solid #F0F1F5;
+}
+.rrow-main { flex: 1; min-width: 0; }
+.rrow-arrow { color: #C4C8D2; font-size: 36rpx; padding-left: 16rpx; }
+.rrow-title { display: flex; align-items: center; flex-wrap: wrap; }
+.rname { font-size: 28rpx; color: #333; margin-right: 12rpx; }
+.rshop {
+  font-size: 20rpx; color: #6B7280;
+  background: #EEF2F7; border-radius: 6rpx; padding: 2rpx 12rpx;
+}
+.rrow-meta { font-size: 24rpx; color: #6B7280; margin-top: 6rpx; }
+
+.rule-add {
+  text-align: center; color: #2EA6D0; font-size: 28rpx;
+  padding: 24rpx 0 8rpx;
+}
+.empty { text-align: center; color: #9AA0AC; font-size: 26rpx; padding: 40rpx 0; }
+
+.btn-save {
+  margin-top: 12rpx; background: #2EA6D0; color: #fff;
+  font-size: 30rpx; border-radius: 12rpx;
+}
+.save-hint {
+  text-align: center; font-size: 22rpx; color: #9AA0AC; padding: 16rpx 0;
+}
+
+/* 弹层 */
+.mask {
+  position: fixed; left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.45); z-index: 100;
+  display: flex; align-items: flex-end;
+}
+.panel {
+  width: 100%; background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 28rpx 32rpx 40rpx; box-sizing: border-box;
+  max-height: 82vh; overflow-y: auto;
+}
+.panel-title {
+  font-size: 30rpx; color: #333; font-weight: 600;
+  text-align: center; padding-bottom: 12rpx;
+}
+.panel-chips { padding: 16rpx 0; }
+.panel-del {
+  text-align: center; color: #D9534F; font-size: 26rpx; padding: 24rpx 0 8rpx;
+}
+.panel-cancel {
+  text-align: center; color: #6B7280; font-size: 28rpx; padding: 20rpx 0 0;
+}
+
+.plist { max-height: 52vh; }
+.prow {
+  padding: 22rpx 0; border-bottom: 1rpx solid #F0F1F5;
+  font-size: 26rpx; color: #333;
+}
+.prow--all { color: #2EA6D0; }

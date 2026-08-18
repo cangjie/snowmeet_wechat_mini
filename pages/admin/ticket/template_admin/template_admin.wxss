@@ -1,0 +1,43 @@
+/* pages/admin/ticket/template_admin/template_admin.wxss */
+page { background: #F5F6FA; }
+.page { padding: 24rpx; box-sizing: border-box; }
+
+.hint {
+  background: #FFF7E6; border: 1rpx solid #FFE0A3; border-radius: 12rpx;
+  padding: 16rpx 20rpx; margin-bottom: 20rpx;
+  font-size: 24rpx; color: #8A6D3B; line-height: 1.6;
+}
+
+.card { background: #fff; border-radius: 16rpx; padding: 0 24rpx; }
+
+.row {
+  display: flex; align-items: center;
+  padding: 24rpx 0; border-bottom: 1rpx solid #F0F1F5;
+}
+.row:last-child { border-bottom: none; }
+.row-main { flex: 1; min-width: 0; }
+.row-arrow { color: #C4C8D2; font-size: 36rpx; padding-left: 16rpx; }
+
+.row-title { display: flex; align-items: center; flex-wrap: wrap; }
+.name { font-size: 30rpx; color: #333; font-weight: 600; margin-right: 12rpx; }
+.name--hidden { color: #9AA0AC; }
+
+.tag {
+  font-size: 20rpx; padding: 2rpx 12rpx; border-radius: 6rpx;
+  margin-right: 8rpx; margin-top: 4rpx;
+}
+.tag--type { background: #EEF2F7; color: #6B7280; }
+.tag--biz { background: #E4F4F9; color: #2EA6D0; }
+.tag--off { background: #F3F4F6; color: #9AA0AC; }
+.tag--hidden { background: #F3F4F6; color: #9AA0AC; }
+.tag--invalid { background: #FDECEC; color: #D9534F; }
+
+.row-meta { font-size: 24rpx; color: #6B7280; margin-top: 8rpx; line-height: 1.5; }
+.row-meta--warn { color: #D9534F; }
+
+.empty { text-align: center; color: #9AA0AC; font-size: 26rpx; padding: 60rpx 0; }
+
+.btn-add {
+  margin-top: 28rpx; background: #2EA6D0; color: #fff;
+  font-size: 30rpx; border-radius: 12rpx;
+}

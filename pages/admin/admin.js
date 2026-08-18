@@ -150,6 +150,9 @@ Page({
       case 'ticket_print':
         path = '/pages/admin/ticket/ticket_template_list'
         break
+      case 'ticket_template_admin':
+        path = '/pages/admin/ticket/template_admin/template_admin'
+        break
       case 'rent_list':
         path = 'rent/new_rent_list'
         break

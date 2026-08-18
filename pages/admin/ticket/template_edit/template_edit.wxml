@@ -1,0 +1,147 @@
+<!--pages/admin/ticket/template_edit/template_edit.wxml-->
+<view class="page">
+
+  <!-- 基础信息 -->
+  <view class="card">
+    <view class="sec-title">基础信息</view>
+    <view class="frow">
+      <text class="flabel">名称</text>
+      <input class="finput" value="{{name}}" data-field="name" bindinput="onInput" placeholder="模板名称" />
+    </view>
+    <view class="frow">
+      <text class="flabel">类型</text>
+      <input class="finput" value="{{type}}" data-field="type" bindinput="onInput" placeholder="如 养护券 / 租赁券" />
+    </view>
+    <view class="frow frow--block">
+      <text class="flabel">说明</text>
+      <textarea class="ftextarea" value="{{memo}}" data-field="memo" bindinput="onInput"
+        placeholder="券面说明，多条用分号分隔" auto-height></textarea>
+    </view>
+    <view class="frow">
+      <text class="flabel">隐藏</text>
+      <switch class="fswitch" checked="{{hide == 1}}" data-field="hide" bindchange="onSwitch" color="#2EA6D0" />
+    </view>
+    <view class="frow">
+      <text class="flabel">启用</text>
+      <switch class="fswitch" checked="{{valid == 1}}" data-field="valid" bindchange="onSwitch" color="#2EA6D0" />
+    </view>
+  </view>
+
+  <!-- 业务类型 -->
+  <view class="card">
+    <view class="sec-title">业务类型</view>
+    <view class="chip-group">
+      <view class="chip {{bizType == item.key ? 'chip--active' : ''}}"
+        wx:for="{{bizOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onBizTap">{{item.name}}</view>
+    </view>
+    <view class="sec-hint">
+      决定开单时能不能选到这个模板发出的券。选「不参与开单」的话，券照常发放和展示，
+      但店员在养护、租赁开单页的选券弹层里看不到它。
+    </view>
+  </view>
+
+  <!-- 有效期 -->
+  <view class="card">
+    <view class="sec-title">有效期</view>
+    <view class="chip-group">
+      <view class="chip {{validityMode == item.key ? 'chip--active' : ''}}"
+        wx:for="{{validityOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onValidityTap">{{item.name}}</view>
+    </view>
+
+    <view class="frow" wx:if="{{validityMode == 'days'}}">
+      <text class="flabel">天数</text>
+      <input class="finput" type="number" value="{{availableDays}}"
+        data-field="availableDays" bindinput="onInput" placeholder="如 200" />
+    </view>
+    <view class="frow" wx:if="{{validityMode == 'date'}}">
+      <text class="flabel">截止日</text>
+      <picker mode="date" value="{{expireDate}}" bindchange="onExpireDateChange">
+        <view class="fpicker">{{expireDate || '请选择'}}</view>
+      </picker>
+    </view>
+
+    <view class="sec-hint" wx:if="{{validityMode == 'days'}}">
+      从券「启用当天」起算，第 N 天结束时失效。这两种口径只能选一个——同时设的话
+      实际发券会按固定日期走，天数形同虚设。
+    </view>
+    <view class="sec-hint" wx:if="{{validityMode == 'date'}}">
+      所有用这个模板发出的券，都在这一天失效，与什么时候领的无关。
+    </view>
+    <view class="sec-hint" wx:if="{{validityMode == 'forever'}}">
+      券不会自己过期。只在发券时由调用方另行指定到期日的场景（如雪票赠券、转赠回赠）才用这档。
+    </view>
+  </view>
+
+  <!-- 商品优惠 -->
+  <view class="card">
+    <view class="sec-title">商品优惠</view>
+    <view class="sec-hint">
+      这个模板的券用在哪些商品上、怎么优惠。没配到的商品按原价，券只起「能核销」的作用。
+    </view>
+
+    <view class="rrow" wx:for="{{rules}}" wx:key="id" data-idx="{{index}}" bindtap="onRuleTap">
+      <view class="rrow-main">
+        <view class="rrow-title">
+          <text class="rname">{{item.productName}}</text>
+          <text class="rshop" wx:if="{{item.productShop}}">{{item.productShop}}</text>
+        </view>
+        <view class="rrow-meta">{{item.discountText}}<text wx:if="{{item.priceText}}"> · {{item.priceText}}</text></view>
+      </view>
+      <view class="rrow-arrow">›</view>
+    </view>
+    <view class="empty" wx:if="{{rules.length == 0}}">还没有商品优惠</view>
+
+    <view class="rule-add" bindtap="onAddRuleTap">+ 添加商品优惠</view>
+  </view>
+
+  <button class="btn-save" loading="{{saving}}" bindtap="onSave">保存</button>
+  <view class="save-hint" wx:if="{{isNew}}">先保存模板，才能给它配商品优惠。</view>
+</view>
+
+<!-- 规则编辑 / 商品选择：共用一层遮罩，切 step 而不是叠两层弹窗 -->
+<view class="mask" wx:if="{{rulePanel}}" bindtap="onRulePanelClose" catchtouchmove="onNoop">
+  <view class="panel" catchtap="onNoop">
+
+    <block wx:if="{{rulePanel == 'form'}}">
+      <view class="panel-title">商品优惠</view>
+
+      <view class="frow" bindtap="onPickProductTap">
+        <text class="flabel">商品</text>
+        <view class="fpicker">{{editProductName || '请选择'}}</view>
+        <text class="rrow-arrow">›</text>
+      </view>
+
+      <view class="chip-group panel-chips">
+        <view class="chip {{editMode == item.key ? 'chip--active' : ''}}"
+          wx:for="{{modeOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onRuleModeTap">{{item.name}}</view>
+      </view>
+
+      <view class="frow">
+        <text class="flabel">数值</text>
+        <input class="finput" type="digit" value="{{editValue}}" bindinput="onRuleValueInput" placeholder="填写数值" />
+      </view>
+      <view class="sec-hint">{{modeHint}}</view>
+
+      <button class="btn-save" bindtap="onRuleSave">保存</button>
+      <view class="panel-del" wx:if="{{editRuleId > 0}}" bindtap="onRuleDelete">删除这条规则</view>
+      <view class="panel-cancel" bindtap="onRulePanelClose">取消</view>
+    </block>
+
+    <block wx:elif="{{rulePanel == 'product'}}">
+      <view class="panel-title">选择商品</view>
+      <view class="frow">
+        <input class="finput" value="{{productKeyword}}" bindinput="onProductKeywordInput"
+          bindconfirm="loadProducts" placeholder="搜商品名，回车查询" confirm-type="search" />
+      </view>
+      <view class="prow prow--all" bindtap="onPickAllProducts">（全部商品）—— 对本模板的券一律适用</view>
+      <scroll-view class="plist" scroll-y>
+        <view class="prow" wx:for="{{productOptions}}" wx:key="id" data-idx="{{index}}" bindtap="onProductTap">
+          {{item.label}}
+        </view>
+        <view class="empty" wx:if="{{!productLoading && productOptions.length == 0}}">没有匹配的商品</view>
+      </scroll-view>
+      <view class="panel-cancel" bindtap="onBackToForm">返回</view>
+    </block>
+
+  </view>
+</view>

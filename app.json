@@ -41,6 +41,8 @@
     "pages/admin/ski_pass/reserve_qrcode",
     "pages/admin/env",
     "pages/admin/ticket/coupon_admin/coupon_admin",
+    "pages/admin/ticket/template_admin/template_admin",
+    "pages/admin/ticket/template_edit/template_edit",
     "pages/admin/ticket/coupon_detail/coupon_detail",
     "pages/admin/ticket/use_entry",
     "pages/admin/ticket/ticket_unuse_list",

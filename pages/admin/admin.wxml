@@ -90,6 +90,7 @@
     <mp-cell id="coupon_admin" value="【优惠券】管理" bindtap="nav" ></mp-cell>
     <mp-cell id="ticket_use" value="【优惠券】核销" bindtap="nav" ></mp-cell>
     <mp-cell id="ticket_print" value="【优惠券】打印" bindtap="nav" ></mp-cell>
+    <mp-cell id="ticket_template_admin" value="【优惠券】模板设置" bindtap="nav" ></mp-cell>
   </mp-cells> 
 </view>
 <view wx:else >
