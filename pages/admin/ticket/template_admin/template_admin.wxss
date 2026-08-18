@@ -39,7 +39,6 @@ page { background: #F5F6FA; }
   font-size: 20rpx; padding: 2rpx 12rpx; border-radius: 6rpx;
   margin-right: 8rpx; margin-top: 4rpx;
 }
-.tag--type { background: #EEF2F7; color: #6B7280; }
 .tag--biz { background: #E4F4F9; color: #2EA6D0; }
 .tag--missing { background: #FFF1E0; color: #C77700; }
 .tag--invalid { background: #FDECEC; color: #D9534F; }

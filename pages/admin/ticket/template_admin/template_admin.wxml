@@ -22,7 +22,6 @@
       <view class="row-main">
         <view class="row-title">
           <text class="name {{item.hide == 1 ? 'name--hidden' : ''}}">{{item.name}}</text>
-          <text class="tag tag--type">{{item.type}}</text>
           <text class="tag {{item.bizTypeMissing ? 'tag--missing' : 'tag--biz'}}">{{item.bizTypeText}}</text>
           <text class="tag tag--invalid" wx:if="{{item.valid != 1}}">已停用</text>
         </view>
