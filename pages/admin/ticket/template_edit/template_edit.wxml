@@ -35,8 +35,8 @@
         wx:for="{{bizOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onBizTap">{{item.name}}</view>
     </view>
     <view class="sec-hint">
-      决定开单时能不能选到这个模板发出的券。选「不参与开单」的话，券照常发放和展示，
-      但店员在养护、租赁开单页的选券弹层里看不到它。
+      决定这个模板发出的券归哪条业务线。店员只在对应业务线的开单页选得到它——
+      养护券不会出现在租赁开单的选券弹层里，反之亦然。
     </view>
   </view>
 

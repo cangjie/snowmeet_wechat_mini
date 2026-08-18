@@ -13,6 +13,7 @@ Page({
   data: {
     items: [],
     conflictCount: 0,
+    missingBizCount: 0,
     loading: false
   },
 
@@ -38,6 +39,7 @@ Page({
       that.setData({
         items: items,
         conflictCount: items.filter(function (x) { return x.hasConflict }).length,
+        missingBizCount: items.filter(function (x) { return x.bizTypeMissing }).length,
         loading: false
       })
     }).catch(function () {

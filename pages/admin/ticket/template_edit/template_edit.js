@@ -9,10 +9,13 @@
 var app = getApp()
 var data = require('../../../../utils/data.js')
 
+// 与 [order].type 对齐（生产库订单类型就是这四个），因为 biz_type 的作用
+// 就是把券路由到对应的开单流程。没有"都不参与"这一档，必须选一个。
 var BIZ_OPTIONS = [
+  { key: '零售', name: '零售' },
   { key: '养护', name: '养护' },
   { key: '租赁', name: '租赁' },
-  { key: '', name: '不参与开单' }
+  { key: '餐饮', name: '餐饮' }
 ]
 var VALIDITY_OPTIONS = [
   { key: 'days', name: '按天数' },
@@ -163,6 +166,10 @@ Page({
     }
     if (!that.data.type.trim()) {
       wx.showToast({ title: '请填写模板类型', icon: 'none' })
+      return
+    }
+    if (!that.data.bizType) {
+      wx.showToast({ title: '请选择业务类型', icon: 'none' })
       return
     }
     if (that.data.validityMode === 'days' && !(parseInt(that.data.availableDays, 10) > 0)) {

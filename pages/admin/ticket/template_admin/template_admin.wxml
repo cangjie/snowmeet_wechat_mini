@@ -6,13 +6,17 @@
     否则实际发券会按总过期日走、天数形同虚设。点进去改一下。
   </view>
 
+  <view class="hint" wx:if="{{missingBizCount > 0}}">
+    有 {{missingBizCount}} 个模板还没设业务类型。没设的模板，它发出的券在任何开单页都选不到。
+  </view>
+
   <view class="card">
     <view class="row" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="onTemplateTap">
       <view class="row-main">
         <view class="row-title">
           <text class="name {{item.hide == 1 ? 'name--hidden' : ''}}">{{item.name}}</text>
           <text class="tag tag--type">{{item.type}}</text>
-          <text class="tag tag--biz {{item.bizType ? '' : 'tag--off'}}">{{item.bizTypeText}}</text>
+          <text class="tag {{item.bizTypeMissing ? 'tag--missing' : 'tag--biz'}}">{{item.bizTypeText}}</text>
           <text class="tag tag--hidden" wx:if="{{item.hide == 1}}">已隐藏</text>
           <text class="tag tag--invalid" wx:if="{{item.valid != 1}}">已停用</text>
         </view>

@@ -28,7 +28,7 @@ page { background: #F5F6FA; }
 }
 .tag--type { background: #EEF2F7; color: #6B7280; }
 .tag--biz { background: #E4F4F9; color: #2EA6D0; }
-.tag--off { background: #F3F4F6; color: #9AA0AC; }
+.tag--missing { background: #FFF1E0; color: #C77700; }
 .tag--hidden { background: #F3F4F6; color: #9AA0AC; }
 .tag--invalid { background: #FDECEC; color: #D9534F; }
 
