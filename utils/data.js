@@ -1242,9 +1242,11 @@ const deleteTicketProductRulePromise = function (id, sessionKey) {
     + '&id=' + id
   return util.performWebRequest(url, null)
 }
-// 商品选择器。服务端已排除雪票（596 条，会淹没真正要配的服务类商品）并限 200 条
-const getTicketRuleProductOptionsPromise = function (keyword, sessionKey) {
+// 商品选择器。只列与模板同业务线的商品——业务线取自 category.biz_type（不是 product.type）。
+// bizType 必传，服务端没有它会直接拒（否则会把 596 条雪票和别的业务线商品一股脑列出来）。
+const getTicketRuleProductOptionsPromise = function (bizType, keyword, sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetProductOptionsByStaff?sessionKey=' + sessionKey
+    + '&bizType=' + encodeURIComponent(bizType || '')
   if (keyword) { url += '&keyword=' + encodeURIComponent(keyword) }
   return util.performWebRequest(url, null)
 }

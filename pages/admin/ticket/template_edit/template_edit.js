@@ -305,6 +305,11 @@ Page({
   // ── 商品选择器（与规则表单共用同一层遮罩，切 step 不叠遮罩）────
 
   onPickProductTap() {
+    // 商品列表按业务线过滤，没选业务类型就没法列
+    if (!this.data.bizType) {
+      wx.showToast({ title: '请先选择业务类型', icon: 'none' })
+      return
+    }
     this.setData({ rulePanel: 'product' })
     this.loadProducts()
   },
@@ -316,7 +321,8 @@ Page({
   loadProducts() {
     var that = this
     that.setData({ productLoading: true })
-    data.getTicketRuleProductOptionsPromise(that.data.productKeyword, app.globalData.sessionKey)
+    data.getTicketRuleProductOptionsPromise(
+      that.data.bizType, that.data.productKeyword, app.globalData.sessionKey)
       .then(function (res) {
         that.setData({ productOptions: (res && res.items) || [], productLoading: false })
       }).catch(function () {

@@ -129,6 +129,7 @@
 
     <block wx:elif="{{rulePanel == 'product'}}">
       <view class="panel-title">选择商品</view>
+      <view class="sec-hint">只列「{{bizType}}」业务线的商品。</view>
       <view class="frow">
         <input class="finput" value="{{productKeyword}}" bindinput="onProductKeywordInput"
           bindconfirm="loadProducts" placeholder="搜商品名，回车查询" confirm-type="search" />
@@ -138,7 +139,9 @@
         <view class="prow" wx:for="{{productOptions}}" wx:key="id" data-idx="{{index}}" bindtap="onProductTap">
           {{item.label}}
         </view>
-        <view class="empty" wx:if="{{!productLoading && productOptions.length == 0}}">没有匹配的商品</view>
+        <view class="empty" wx:if="{{!productLoading && productOptions.length == 0}}">
+          「{{bizType}}」业务线下没有匹配的商品
+        </view>
       </scroll-view>
       <view class="panel-cancel" bindtap="onBackToForm">返回</view>
     </block>
