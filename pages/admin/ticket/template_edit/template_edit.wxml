@@ -82,8 +82,8 @@
     <view class="rrow" wx:for="{{rules}}" wx:key="id" data-idx="{{index}}" bindtap="onRuleTap">
       <view class="rrow-main">
         <view class="rrow-title">
+          <text class="rshop" wx:if="{{item.productShop}}">【{{item.productShop}}】</text>
           <text class="rname">{{item.productName}}</text>
-          <text class="rshop" wx:if="{{item.productShop}}">{{item.productShop}}</text>
         </view>
         <view class="rrow-meta">{{item.discountText}}<text wx:if="{{item.priceText}}"> · {{item.priceText}}</text></view>
       </view>

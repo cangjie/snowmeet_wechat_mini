@@ -46,11 +46,8 @@ page { background: #F5F6FA; }
 .rrow-main { flex: 1; min-width: 0; }
 .rrow-arrow { color: #C4C8D2; font-size: 36rpx; padding-left: 16rpx; }
 .rrow-title { display: flex; align-items: center; flex-wrap: wrap; }
-.rname { font-size: 28rpx; color: #333; margin-right: 12rpx; }
-.rshop {
-  font-size: 20rpx; color: #6B7280;
-  background: #EEF2F7; border-radius: 6rpx; padding: 2rpx 12rpx;
-}
+.rname { font-size: 28rpx; color: #333; }
+.rshop { font-size: 28rpx; color: #6B7280; }
 .rrow-meta { font-size: 24rpx; color: #6B7280; margin-top: 6rpx; }
 
 .rule-add {

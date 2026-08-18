@@ -2,6 +2,19 @@
 page { background: #F5F6FA; }
 .page { padding: 24rpx; box-sizing: border-box; }
 
+.view-switch {
+  display: flex; background: #E4E7EF; border-radius: 999rpx;
+  padding: 6rpx; margin-bottom: 20rpx;
+}
+.vs-item {
+  flex: 1; text-align: center; padding: 18rpx 0;
+  border-radius: 999rpx; font-size: 28rpx; color: #6B7280;
+}
+.vs-item--active {
+  background: #fff; color: #2EA6D0; font-weight: 600;
+  box-shadow: 0 4rpx 16rpx rgba(46, 166, 208, 0.14);
+}
+
 .hint {
   background: #FFF7E6; border: 1rpx solid #FFE0A3; border-radius: 12rpx;
   padding: 16rpx 20rpx; margin-bottom: 20rpx;
@@ -29,7 +42,6 @@ page { background: #F5F6FA; }
 .tag--type { background: #EEF2F7; color: #6B7280; }
 .tag--biz { background: #E4F4F9; color: #2EA6D0; }
 .tag--missing { background: #FFF1E0; color: #C77700; }
-.tag--hidden { background: #F3F4F6; color: #9AA0AC; }
 .tag--invalid { background: #FDECEC; color: #D9534F; }
 
 .row-meta { font-size: 24rpx; color: #6B7280; margin-top: 8rpx; line-height: 1.5; }
