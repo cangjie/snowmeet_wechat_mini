@@ -63,9 +63,9 @@
 
   <!-- 按券明细 -->
   <block wx:if="{{view == 'ticket'}}">
-    <view wx:for="{{ticketItems}}" wx:key="code" class="row row--kind" data-code="{{item.code}}" bindtap="onTicketTap">
-      <view class="kind-strip kind-strip--{{item.muted ? 'muted' : item.bannerCls}}"></view>
-      <view class="row-body">
+    <view wx:for="{{ticketItems}}" wx:key="code"
+          class="row kind-bg--{{item.muted ? 'muted' : item.bannerCls}}"
+          data-code="{{item.code}}" bindtap="onTicketTap">
       <view class="row-head">
         <view class="kind-tag kind-tag--{{item.muted ? 'muted' : item.bannerCls}}">{{item.bannerLabel}}</view>
         <text class="row-title">{{item.templateName || item.name}}</text>
@@ -77,7 +77,6 @@
       <view class="row-sub">发放 {{item.createDateStr}} · 到期 {{item.expireDateStr}}<text wx:if="{{item.usedTimeStr}}"> · 核销 {{item.usedTimeStr}}</text></view>
       <view class="row-transfer" wx:if="{{item.transferText}}">{{item.transferText}}</view>
       <view class="row-memo" wx:if="{{item.createMemo || item.channel}}">{{item.channel}}<text wx:if="{{item.channel && item.createMemo}}"> · </text>{{item.createMemo}}</view>
-      </view>
     </view>
   </block>
 

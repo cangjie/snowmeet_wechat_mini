@@ -5,8 +5,7 @@
 
     <!-- 券本身 -->
     <view class="card">
-      <view class="head">
-        <view class="kind-strip kind-strip--{{ticket.muted ? 'muted' : ticket.bannerCls}}"></view>
+      <view class="head kind-bg--{{ticket.muted ? 'muted' : ticket.bannerCls}}">
         <view class="head-main">
           <view class="head-line">
             <view class="kind-tag kind-tag--{{ticket.muted ? 'muted' : ticket.bannerCls}}">{{ticket.bannerLabel}}</view>

@@ -10,13 +10,14 @@ page { background: #F5F6FA; }
 }
 
 /* ===== 头部：面额 + 券名 + 状态 ===== */
+/* 券种背景挂在 head 上，所以它要有自己的内边距和圆角，不再靠 card 的白底 */
 .head {
   display: flex;
   align-items: center;
   gap: 24rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #F0F1F5;
-  margin-bottom: 8rpx;
+  padding: 24rpx;
+  margin: -28rpx -24rpx 16rpx;
+  border-radius: 16rpx 16rpx 0 0;
 }
 
 .head-main { flex: 1; min-width: 0; }
@@ -113,24 +114,50 @@ page { background: #F5F6FA; }
   font-size: 26rpx; padding: 120rpx 0;
 }
 
-/* ═══ 券种色条（后台密集列表用）═══
-   与顾客端同一套配色，但只做一条 8rpx 竖条 + 一个券种小标签，不铺大色块——
-   后台是密集列表，整块底色会盖掉信息层级。券种由后端统一判定。 */
-.kind-strip {
-  width: 8rpx;
-  border-radius: 999rpx;
-  flex-shrink: 0;
-  align-self: stretch;
-  background: #2563EB;
+/* ═══ 券种背景（与顾客端 banner 同一套配色）═══
+   底色只用最浅一档、图案透明度 ≤20%，保证正文压在上面仍有足够对比度。
+   全部是 repeating-linear-gradient / radial-gradient，不出图，新增券种加一条 class 即可。
+   券种由后端 TicketTransferRules.ResolveBanner 统一判定，各页面口径一致。 */
+.kind-bg--wax {
+  background-color: #EFF4FF;
+  background-image: repeating-linear-gradient(45deg, rgba(37,99,235,.13) 0 14rpx, transparent 14rpx 30rpx);
 }
-.kind-strip--wax { background: #2563EB; }
-.kind-strip--hotwax { background: #EA580C; }
-.kind-strip--edge { background: #0F766E; }
-.kind-strip--dual { background: #4338CA; }
-.kind-strip--pass { background: #0284C7; }
-.kind-strip--course { background: #334155; }
-.kind-strip--cash { background: #B45309; }
-.kind-strip--muted { background: #D1D5DB; }
+.kind-bg--hotwax {
+  background-color: #FFF1E7;
+  background-image:
+    radial-gradient(circle at 96% 150%, transparent 80rpx, rgba(234,88,12,.15) 80rpx 84rpx, transparent 84rpx),
+    radial-gradient(circle at 96% 150%, transparent 128rpx, rgba(234,88,12,.13) 128rpx 132rpx, transparent 132rpx),
+    radial-gradient(circle at 96% 150%, transparent 176rpx, rgba(234,88,12,.11) 176rpx 180rpx, transparent 180rpx);
+}
+.kind-bg--edge {
+  background-color: #E6F5F3;
+  background-image: repeating-linear-gradient(90deg, rgba(15,118,110,.16) 0 4rpx, transparent 4rpx 26rpx);
+}
+.kind-bg--dual {
+  background-color: #EEF0FF;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(67,56,202,.12) 0 4rpx, transparent 4rpx 24rpx),
+    repeating-linear-gradient(-45deg, rgba(67,56,202,.12) 0 4rpx, transparent 4rpx 24rpx);
+}
+.kind-bg--pass {
+  background-color: #E8F5FE;
+  background-image: radial-gradient(circle, rgba(2,132,199,.20) 3rpx, transparent 3.2rpx);
+  background-size: 28rpx 28rpx;
+}
+.kind-bg--course {
+  background-color: #F1F5F9;
+  background-image: repeating-linear-gradient(-45deg, rgba(51,65,85,.10) 0 20rpx, transparent 20rpx 44rpx);
+}
+.kind-bg--cash {
+  background-color: #FEF3C7;
+  background-image: repeating-linear-gradient(180deg, rgba(180,83,9,.13) 0 4rpx, transparent 4rpx 32rpx);
+}
+/* 失效态：任何券种统一降灰。用换底色+文字降色，不用整行 opacity——
+   那样会把券码、时间这些小字压到读不清。 */
+.kind-bg--muted {
+  background-color: #F3F4F6;
+  background-image: repeating-linear-gradient(45deg, rgba(107,114,128,.20) 0 14rpx, transparent 14rpx 30rpx);
+}
 
 .kind-tag {
   font-size: 20rpx;
@@ -138,12 +165,13 @@ page { background: #F5F6FA; }
   padding: 2rpx 12rpx;
   border-radius: 999rpx;
   margin-right: 8rpx;
+  background: rgba(255,255,255,.75);
 }
-.kind-tag--wax { background: #EFF4FF; color: #1D4FD7; }
-.kind-tag--hotwax { background: #FFF1E7; color: #C2410C; }
-.kind-tag--edge { background: #E6F5F3; color: #0F766E; }
-.kind-tag--dual { background: #EEF0FF; color: #4338CA; }
-.kind-tag--pass { background: #E8F5FE; color: #0369A1; }
-.kind-tag--course { background: #F1F5F9; color: #334155; }
-.kind-tag--cash { background: #FEF3C7; color: #B45309; }
-.kind-tag--muted { background: #F3F4F6; color: #6B7280; }
+.kind-tag--wax { color: #1D4FD7; }
+.kind-tag--hotwax { color: #C2410C; }
+.kind-tag--edge { color: #0F766E; }
+.kind-tag--dual { color: #4338CA; }
+.kind-tag--pass { color: #0369A1; }
+.kind-tag--course { color: #334155; }
+.kind-tag--cash { color: #B45309; }
+.kind-tag--muted { color: #6B7280; }
