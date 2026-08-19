@@ -19,6 +19,10 @@
   color: #333;
 }
 
+.dpr-text--placeholder {
+  color: #9AA0AC;
+}
+
 .dpr-shortcuts {
   display: flex;
   flex-direction: row;

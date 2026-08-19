@@ -1,3 +1,15 @@
+// components/date-range-picker/index.js
+// 全站统一的日期选择控件（2026-08-19 起，所有日期选择一律用它，不要再用原生 <picker mode="date">）。
+//
+// 两种模式：
+//   mode="range"（默认）—— 起止日期 + 今天/昨天/本周/上周 快捷键，查询类页面用。
+//                          事件 change → { startDate, endDate }
+//   mode="single"        —— 单个日期，配置类页面用（如优惠券模板的总过期日）。
+//                          事件 change → { date }
+//
+// 快捷键只在 range 模式出现：给一个「截止日」提供「昨天/上周」没有意义。
+// 可选日期范围默认是「往回 3 年 ~ 今天」（查历史订单不需要未来）；
+// 配置类场景传 allow-future 放开到往后 15 年（存量模板里最远的截止日是 2035-12-31）。
 const util = require('../../utils/util.js')
 
 function _fmt(d) {
@@ -14,8 +26,12 @@ function _getMonday(d) {
 
 Component({
   properties: {
-    startDate: { type: String, value: '' },
-    endDate: { type: String, value: '' }
+    mode: { type: String, value: 'range' },      // 'range' | 'single'
+    startDate: { type: String, value: '' },      // range 模式
+    endDate: { type: String, value: '' },        // range 模式
+    date: { type: String, value: '' },           // single 模式
+    allowFuture: { type: Boolean, value: false },
+    placeholder: { type: String, value: '请选择' }
   },
 
   data: {
@@ -28,11 +44,16 @@ Component({
   attached() {
     var today = new Date()
     today.setHours(23, 59, 59, 0)
-    // 允许往回选 3 年，往后到今天为止（历史订单查询无需选未来日期）
+    // 允许往回选 3 年
     var min = new Date(today)
     min.setFullYear(today.getFullYear() - 3)
     min.setHours(0, 0, 0, 0)
-    this.setData({ minDate: min.getTime(), maxDate: today.getTime() })
+    // 往后默认到今天为止（历史订单查询无需选未来日期）；配置类场景放开到 15 年
+    var max = new Date(today)
+    if (this.data.allowFuture) {
+      max.setFullYear(today.getFullYear() + 15)
+    }
+    this.setData({ minDate: min.getTime(), maxDate: max.getTime() })
   },
 
   methods: {
@@ -45,11 +66,18 @@ Component({
     },
 
     onCalendarConfirm(e) {
-      var dates = e.detail  // [startDate, endDate] as Date objects in range mode
-      var start = _fmt(new Date(dates[0]))
-      var end = _fmt(new Date(dates[1]))
-      this.setData({ showCalendar: false, activeShortcut: '' })
-      this.triggerEvent('change', { startDate: start, endDate: end })
+      this.setData({ showCalendar: false })
+      // single 模式 van-calendar 回一个 Date，range 模式回 [start, end]
+      if (this.data.mode === 'single') {
+        this.triggerEvent('change', { date: _fmt(new Date(e.detail)) })
+        return
+      }
+      var dates = e.detail
+      this.setData({ activeShortcut: '' })
+      this.triggerEvent('change', {
+        startDate: _fmt(new Date(dates[0])),
+        endDate: _fmt(new Date(dates[1]))
+      })
     },
 
     onShortcut(e) {

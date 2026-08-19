@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "date-range-picker": "/components/date-range-picker/index"
+  },
   "navigationBarTitleText": "模板设置"
 }

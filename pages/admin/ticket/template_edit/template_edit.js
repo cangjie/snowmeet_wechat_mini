@@ -153,8 +153,9 @@ Page({
     this.setData(patch)
   },
 
+  // 统一日期控件（date-range-picker）single 模式回的是 { date }，不是原生 picker 的 { value }
   onExpireDateChange(e) {
-    this.setData({ expireDate: e.detail.value })
+    this.setData({ expireDate: e.detail.date })
   },
 
   onSave() {

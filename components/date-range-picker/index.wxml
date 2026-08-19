@@ -1,8 +1,9 @@
 <view class="dpr-root">
   <view class="dpr-display" bindtap="openCalendar">
-    <text class="dpr-text">{{startDate}} ~ {{endDate}}</text>
+    <text class="dpr-text {{mode == 'single' && !date ? 'dpr-text--placeholder' : ''}}">{{mode == 'single' ? (date || placeholder) : startDate + ' ~ ' + endDate}}</text>
   </view>
-  <view class="dpr-shortcuts">
+  <!-- 快捷键只对区间查询有意义，单选（如"截止日"）不出现 -->
+  <view class="dpr-shortcuts" wx:if="{{mode != 'single'}}">
     <view class="dpr-btn {{activeShortcut == 'today' ? 'dpr-btn--active' : ''}}"
           data-key="today" bindtap="onShortcut">今天</view>
     <view class="dpr-btn {{activeShortcut == 'yesterday' ? 'dpr-btn--active' : ''}}"
@@ -16,7 +17,7 @@
 
 <van-calendar
   show="{{showCalendar}}"
-  type="range"
+  type="{{mode == 'single' ? 'single' : 'range'}}"
   allow-same-day
   min-date="{{minDate}}"
   max-date="{{maxDate}}"

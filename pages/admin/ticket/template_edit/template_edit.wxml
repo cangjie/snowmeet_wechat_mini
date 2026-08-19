@@ -55,9 +55,8 @@
     </view>
     <view class="frow" wx:if="{{validityMode == 'date'}}">
       <text class="flabel">截止日</text>
-      <picker mode="date" value="{{expireDate}}" bindchange="onExpireDateChange">
-        <view class="fpicker">{{expireDate || '请选择'}}</view>
-      </picker>
+      <date-range-picker mode="single" date="{{expireDate}}" allow-future
+        placeholder="请选择截止日" bind:change="onExpireDateChange" />
     </view>
 
     <view class="sec-hint" wx:if="{{validityMode == 'days'}}">
