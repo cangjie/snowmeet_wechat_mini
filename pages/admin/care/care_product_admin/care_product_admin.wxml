@@ -1,0 +1,84 @@
+<!--pages/admin/care/care_product_admin/care_product_admin.wxml-->
+<view class="page">
+
+  <view class="card filter">
+    <view class="frow">
+      <text class="flabel">门店</text>
+      <picker range="{{shopNames}}" value="{{shopIndex}}" bindchange="onShopChange">
+        <view class="fpicker">{{shopNames[shopIndex]}}</view>
+      </picker>
+    </view>
+    <view class="frow" bindtap="onToggleInvalid">
+      <text class="flabel">已停用</text>
+      <view class="fpicker">{{includeInvalid ? '一并显示' : '不显示'}}</view>
+    </view>
+  </view>
+
+  <view class="hint" wx:if="{{unrecognizedCount > 0}}">
+    有 {{unrecognizedCount}} 个在售商品的名称不是「双项 / 单项 / 双项加急 / 单项加急」。
+    开单计价按服务组合去对这几个名字取价，名字对不上就取不到价、服务费会算成 0。
+    非雪季养护、免费打蜡升级这类走的是别的路径，可以不用管。
+  </view>
+
+  <view class="card">
+    <view class="row" wx:for="{{items}}" wx:key="id" data-idx="{{index}}" bindtap="onItemTap">
+      <view class="row-main">
+        <view class="row-title">
+          <text class="name">{{item.name}}</text>
+          <text class="tag tag--{{item.stateCls}}">{{item.stateLabel}}</text>
+          <text class="tag tag--warn" wx:if="{{!item.pricingRecognized}}">非标准名</text>
+        </view>
+        <view class="row-meta">【{{item.shopName}}】{{item.priceText}}</view>
+        <view class="row-meta" wx:if="{{item.ruleText}}">{{item.ruleText}}</view>
+      </view>
+      <view class="row-arrow">›</view>
+    </view>
+    <view class="empty" wx:if="{{!loading && items.length == 0}}">没有养护商品</view>
+  </view>
+
+  <button class="btn-add" bindtap="onAddTap">新建养护商品</button>
+</view>
+
+<view class="mask" wx:if="{{editShow}}" bindtap="onEditClose" catchtouchmove="onNoop">
+  <view class="panel" catchtap="onNoop">
+    <view class="panel-title">{{editId > 0 ? '修改养护商品' : '新建养护商品'}}</view>
+
+    <view class="frow">
+      <text class="flabel">名称</text>
+      <input class="finput" value="{{editName}}" data-field="editName" bindinput="onEditInput"
+        placeholder="如 双项" />
+    </view>
+    <view class="chip-group">
+      <view class="chip {{editName == item ? 'chip--active' : ''}}"
+        wx:for="{{nameTips}}" wx:key="*this" data-name="{{item}}" bindtap="onNameTipTap">{{item}}</view>
+    </view>
+
+    <view class="frow">
+      <text class="flabel">门店</text>
+      <picker range="{{editShopNames}}" value="{{editShopIndex}}" bindchange="onEditShopChange">
+        <view class="fpicker">{{editShopNames[editShopIndex] || '请选择'}}</view>
+      </picker>
+    </view>
+    <view class="frow">
+      <text class="flabel">价格</text>
+      <input class="finput" type="digit" value="{{editPrice}}" data-field="editPrice"
+        bindinput="onEditInput" placeholder="元" />
+    </view>
+    <view class="frow">
+      <text class="flabel">排序</text>
+      <input class="finput" type="number" value="{{editSort}}" data-field="editSort"
+        bindinput="onEditInput" placeholder="数字越小越靠前" />
+    </view>
+    <view class="frow">
+      <text class="flabel">隐藏</text>
+      <switch class="fswitch" checked="{{editHidden == 1}}" bindchange="onEditHiddenChange" color="#2EA6D0" />
+    </view>
+    <view class="sec-hint">
+      隐藏只是不在顾客端露出，不影响开单计价；但隐藏后它在优惠券模板的商品选择器里也会消失。
+    </view>
+
+    <button class="btn-save" loading="{{saving}}" bindtap="onSave">保存</button>
+    <view class="panel-del" wx:if="{{editId > 0}}" bindtap="onDelete">停用这个商品</view>
+    <view class="panel-cancel" bindtap="onEditClose">取消</view>
+  </view>
+</view>

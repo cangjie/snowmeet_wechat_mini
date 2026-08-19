@@ -1242,6 +1242,26 @@ const deleteTicketProductRulePromise = function (id, sessionKey) {
     + '&id=' + id
   return util.performWebRequest(url, null)
 }
+// ── 养护价格维护（staff≥200）─────────────────────────────────
+// 维护 product.category_id = 14 这批商品——它们就是养护定价的价目表，
+// CalcCharge 按门店 + 服务组合从里面取 sale_price。门槛与优惠券模板设置同为 200。
+const getCareProductsPromise = function (shopId, includeInvalid, sessionKey) {
+  var url = app.globalData.requestPrefix + 'CareProductAdmin/GetCareProductsByStaff?sessionKey=' + sessionKey
+    + '&includeInvalid=' + (includeInvalid ? 'true' : 'false')
+  if (shopId) { url += '&shopId=' + shopId }
+  return util.performWebRequest(url, null)
+}
+// body = { id(0=新建), name, shopId, salePrice, hidden, sort }
+const saveCareProductPromise = function (body, sessionKey) {
+  var url = app.globalData.requestPrefix + 'CareProductAdmin/SaveCareProductByStaff?sessionKey=' + sessionKey
+  return util.performWebRequest(url, body)
+}
+const deleteCareProductPromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'CareProductAdmin/DeleteCareProductByStaff?sessionKey=' + sessionKey
+    + '&id=' + id
+  return util.performWebRequest(url, null)
+}
+
 // 商品选择器。只列与模板同业务线的商品——业务线取自 category.biz_type（不是 product.type）。
 // bizType 必传，服务端没有它会直接拒（否则会把 596 条雪票和别的业务线商品一股脑列出来）。
 const getTicketRuleProductOptionsPromise = function (bizType, keyword, sessionKey) {
@@ -1769,6 +1789,9 @@ module.exports = {
   saveTicketProductRulePromise,
   deleteTicketProductRulePromise,
   getTicketRuleProductOptionsPromise,
+  getCareProductsPromise,
+  saveCareProductPromise,
+  deleteCareProductPromise,
   getTicketDetailByStaffPromise,
   getMemberCouponsByStaffPromise,
   updatePunchCardEquipByStaffPromise,

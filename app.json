@@ -75,6 +75,7 @@
     "pages/admin/care/care_order_list",
     "pages/admin/care/care_unpicked_list",
     "pages/admin/care/care_unfinished_list",
+    "pages/admin/care/care_product_admin/care_product_admin",
     "pages/admin/care/care_order_detail/care_order_detail",
     "pages/admin/fnb/mat_expire_list/mat_expire_list",
     "pages/admin/fnb/mat_expire_detail/mat_expire_detail",

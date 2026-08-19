@@ -195,6 +195,9 @@ Page({
       case 'care_unpicked':
         path = '/pages/admin/care/care_unpicked_list'
         break
+      case 'care_product_admin':
+        path = '/pages/admin/care/care_product_admin/care_product_admin'
+        break
       case 'care_unfinished':
         path = '/pages/admin/care/care_unfinished_list'
         break
