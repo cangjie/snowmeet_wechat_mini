@@ -1,11 +1,11 @@
 // pages/admin/care/care_product_admin/care_product_admin.js
-// 养护价格维护（管理后台 staff≥200）
+// 养护价格维护（管理后台 staff≥300，系统管理员）
 //
 // 维护 product.category_id = 14 这批商品——它们就是养护定价的价目表：
 // 开单时按「门店 + 服务组合」从里面取 sale_price（后端 CarePricingRules）。
-// 改这里的价 = 改线上收费，所以门槛是 200 不是店员级的 100。
+// 改这里的价 = 改线上收费，门槛比优惠券模板设置（200）还高一档。
 //
-// 商品总共十几个，不分页，按门店筛选后一次全列。
+// 商品总共十几个，不分页；门店用 chip 单选，已停用的后端不下发。
 var app = getApp()
 var data = require('../../../../utils/data.js')
 
@@ -14,11 +14,8 @@ var PRICING_NAMES = ['双项', '单项', '双项加急', '单项加急']
 
 Page({
   data: {
-    shops: [],                 // [{id,name}]，第 0 项是「全部门店」
-    shopNames: [],
-    shopIndex: 0,
-    shopId: null,
-    includeInvalid: false,
+    shops: [],                 // [{id,name}]，第 0 项是「全部」，id 为 null
+    shopId: null,              // null = 全部门店
 
     items: [],
     unrecognizedCount: 0,
@@ -42,7 +39,7 @@ Page({
     var that = this
     app.loginPromiseNew.then(function () {
       var staff = app.globalData.staff
-      if (!staff || staff.title_level < 200) {
+      if (!staff || staff.title_level < 300) {
         wx.showToast({ title: '没有权限', icon: 'none' })
         wx.navigateBack()
         return
@@ -59,10 +56,8 @@ Page({
     var that = this
     data.getShopListPromise().then(function (list) {
       list = list || []
-      var withAll = [{ id: null, name: '全部门店' }].concat(list)
       that.setData({
-        shops: withAll,
-        shopNames: withAll.map(function (s) { return s.name }),
+        shops: [{ id: null, name: '全部' }].concat(list),
         editShops: list,
         editShopNames: list.map(function (s) { return s.name })
       })
@@ -73,7 +68,7 @@ Page({
   getData() {
     var that = this
     that.setData({ loading: true })
-    data.getCareProductsPromise(that.data.shopId, that.data.includeInvalid, app.globalData.sessionKey)
+    data.getCareProductsPromise(that.data.shopId, app.globalData.sessionKey)
       .then(function (res) {
         var items = (res && res.items) || []
         // WXML 不支持方法调用，展示文案一律在这里派生
@@ -93,15 +88,12 @@ Page({
       }).catch(function () { that.setData({ loading: false }) })
   },
 
-  onShopChange(e) {
-    var idx = parseInt(e.detail.value, 10) || 0
-    var s = this.data.shops[idx] || {}
-    this.setData({ shopIndex: idx, shopId: s.id || null })
-    this.getData()
-  },
-
-  onToggleInvalid() {
-    this.setData({ includeInvalid: !this.data.includeInvalid })
+  // 门店 chip 单选。dataset 取不到 null，用空串代表「全部」
+  onShopTap(e) {
+    var id = e.currentTarget.dataset.id
+    id = (id === '' || id === undefined) ? null : Number(id)
+    if (id === this.data.shopId) { return }
+    this.setData({ shopId: id })
     this.getData()
   },
 

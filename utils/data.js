@@ -1242,12 +1242,11 @@ const deleteTicketProductRulePromise = function (id, sessionKey) {
     + '&id=' + id
   return util.performWebRequest(url, null)
 }
-// ── 养护价格维护（staff≥200）─────────────────────────────────
+// ── 养护价格维护（staff≥300）─────────────────────────────────
 // 维护 product.category_id = 14 这批商品——它们就是养护定价的价目表，
-// CalcCharge 按门店 + 服务组合从里面取 sale_price。门槛与优惠券模板设置同为 200。
-const getCareProductsPromise = function (shopId, includeInvalid, sessionKey) {
+// CalcCharge 按门店 + 服务组合从里面取 sale_price。已停用的不下发。
+const getCareProductsPromise = function (shopId, sessionKey) {
   var url = app.globalData.requestPrefix + 'CareProductAdmin/GetCareProductsByStaff?sessionKey=' + sessionKey
-    + '&includeInvalid=' + (includeInvalid ? 'true' : 'false')
   if (shopId) { url += '&shopId=' + shopId }
   return util.performWebRequest(url, null)
 }

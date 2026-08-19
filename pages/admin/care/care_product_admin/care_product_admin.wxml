@@ -1,17 +1,9 @@
 <!--pages/admin/care/care_product_admin/care_product_admin.wxml-->
 <view class="page">
 
-  <view class="card filter">
-    <view class="frow">
-      <text class="flabel">门店</text>
-      <picker range="{{shopNames}}" value="{{shopIndex}}" bindchange="onShopChange">
-        <view class="fpicker">{{shopNames[shopIndex]}}</view>
-      </picker>
-    </view>
-    <view class="frow" bindtap="onToggleInvalid">
-      <text class="flabel">已停用</text>
-      <view class="fpicker">{{includeInvalid ? '一并显示' : '不显示'}}</view>
-    </view>
+  <view class="shop-chips">
+    <view class="chip {{shopId == item.id ? 'chip--active' : ''}}"
+      wx:for="{{shops}}" wx:key="name" data-id="{{item.id}}" bindtap="onShopTap">{{item.name}}</view>
   </view>
 
   <view class="hint" wx:if="{{unrecognizedCount > 0}}">
