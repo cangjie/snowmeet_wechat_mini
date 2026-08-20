@@ -35,6 +35,10 @@ Page({
     templateIndex: 0,
     templateOptions: [],       // [{id,name}]，第 0 项是「全部模板」
     templateNames: [],         // picker 用的纯文案数组
+    issuerKey: '',             // '' 全部 | 'system' 系统自动发放 | 店员 id
+    issuerIndex: 0,
+    issuerOptions: [],         // [{key,name}]，第 0 项「全部发券人」、第 1 项「系统/自动发放」
+    issuerNames: [],
     usedKey: '',               // '' 全部 | '1' 已核销 | '0' 未核销
     usedOptions: [
       { key: '', name: '全部' }, { key: '1', name: '已核销' }, { key: '0', name: '未核销' }
@@ -77,6 +81,9 @@ Page({
       if (!that.data.templateOptions.length) {
         that.loadTemplates()
       }
+      if (!that.data.issuerOptions.length) {
+        that.loadIssuers()
+      }
       // 从会员详情返回时保留当前页码/筛选重查（列表页实例没销毁，this.data 就是记录）
       that.getData(that.data.page, that.data.pageSize)
     })
@@ -93,6 +100,26 @@ Page({
     }).catch(function () {})
   },
 
+  loadIssuers() {
+    var that = this
+    data.getTicketIssuerOptionsPromise(app.globalData.sessionKey).then(function (res) {
+      // 「系统/自动发放」= staff_id 为空的券。存量券全在这一档：2026-08-19 之前
+      // CreateTicket 收了 staffId 却没存，全库 12252 张券没有一条记了发券人。
+      var list = [{ key: '', name: '全部发券人' }, { key: 'system', name: '系统 / 自动发放' }]
+        .concat((res && res.staffs) || [])
+      that.setData({
+        issuerOptions: list,
+        issuerNames: list.map(function (x) { return x.name })
+      })
+    }).catch(function () {})
+  },
+
+  onIssuerChange(e) {
+    var idx = parseInt(e.detail.value, 10) || 0
+    var opt = this.data.issuerOptions[idx] || {}
+    this.setData({ issuerIndex: idx, issuerKey: opt.key || '' })
+  },
+
   _filter() {
     return {
       startDate: this.data.startDate,
@@ -100,7 +127,8 @@ Page({
       templateId: this.data.templateId,
       used: this.data.usedKey === '' ? null : this.data.usedKey === '1',
       transferred: this.data.transferKey === '' ? null : this.data.transferKey === '1',
-      includeWasted: this.data.includeWasted
+      includeWasted: this.data.includeWasted,
+      issuer: this.data.issuerKey
     }
   },
 

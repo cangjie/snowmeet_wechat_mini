@@ -20,8 +20,11 @@ Page({
     sale_price: '',
     punch_total: '',
     // 收款门店（必填）：决定购买款项进哪个门店账户，不是"适用门店"——卡全店通用。
-    // 值必须与 shop_list.name 一字不差，所以只能选不能输
-    shop: '',
+    // 2026-08-19 起存的是 shop_id（关联 shop_list），不再存店名文本：
+    // 名字文本历史上写法不统一（同一个店有"万龙"和"万龙服务中心"两种），
+    // 而这个值要经 order.shop 决定微信商户号，必须来自主数据。
+    shopId: null,
+    shops: [],                     // [{id,name}]，与 shopOptions 同序，第 0 项是占位
     shopOptions: ['请选择门店'],   // 第 0 项是占位提示，选中它视为未填
     shopIndex: 0,
     on_shelves: true,
@@ -90,7 +93,7 @@ Page({
         sale_price: product.sale_price != null ? String(product.sale_price) : '',
         punch_total: product.punch_total != null ? String(product.punch_total) : '',
         careProjectCount: product.care_project_count || 0,
-        shop: product.shop || '',
+        shopId: product.shop_id != null ? product.shop_id : null,
         on_shelves: !!product.on_shelves,
         categoryCode: product.category_code,
         bizType: bizType,
@@ -151,39 +154,44 @@ Page({
   onNameInput(e) { this.setData({ name: e.detail.value }) },
   onPriceInput(e) { this.setData({ sale_price: e.detail.value }) },
   onPunchTotalInput(e) { this.setData({ punch_total: e.detail.value }) },
-  // 门店列表拉回来后，把当前商品已存的 shop 对到选项下标上。
+  // 门店列表拉回来后，把当前商品已存的 shop_id 对到选项下标上。
   // 拉列表与拉商品是并发的，所以两边完成时都调一次，谁后到谁生效
   _loadShops() {
     var that = this
     data.getShopListPromise().then(function (shops) {
-      var options = ['请选择门店']
+      var list = [{ id: null, name: '请选择门店' }]
       for (var i = 0; i < (shops || []).length; i++) {
         var n = (shops[i].name || '').trim()
-        if (n) { options.push(n) }
+        if (n) { list.push({ id: shops[i].id, name: n }) }
       }
-      that.setData({ shopOptions: options })
+      that.setData({
+        shops: list,
+        shopOptions: list.map(function (x) { return x.name })
+      })
       that._syncShopIndex()
     }).catch(function () {
       // 拉不到门店列表就只剩占位项，保存会被必填校验拦下——总比让店员手输出一个对不上的店名好
     })
   },
   _syncShopIndex() {
-    var shop = (this.data.shop || '').trim()
-    var options = this.data.shopOptions
+    var id = this.data.shopId
+    var list = this.data.shops
     var idx = 0
-    for (var i = 1; i < options.length; i++) {
-      if (options[i] === shop) { idx = i; break }
+    for (var i = 1; i < list.length; i++) {
+      if (list[i].id === id) { idx = i; break }
     }
-    // 存量商品的 shop 若不在门店列表里（历史手输的脏值），idx 会落回 0（占位项）——
-    // 这时把 shop 也清空，逼店员重新选一个真实门店，避免界面看着有值、库里存的却对不上
-    if (idx === 0 && shop) {
-      this.setData({ shop: '' })
+    // 存量商品的 shop_id 若为空或对不上 shop_list（历史数据 shop_id 一直是 NULL），
+    // idx 落回 0（占位项），同时把 shopId 清掉，逼店员重新选一个真实门店——
+    // 避免界面看着有值、库里存的却是空
+    if (idx === 0 && id != null) {
+      this.setData({ shopId: null })
     }
     this.setData({ shopIndex: idx })
   },
   onShopPick(e) {
     var idx = parseInt(e.detail.value, 10) || 0
-    this.setData({ shopIndex: idx, shop: idx === 0 ? '' : this.data.shopOptions[idx] })
+    var picked = this.data.shops[idx] || {}
+    this.setData({ shopIndex: idx, shopId: idx === 0 ? null : picked.id })
   },
   onToggleOnShelves() { this.setData({ on_shelves: !this.data.on_shelves }) },
   onProjectCountTap(e) { this.setData({ careProjectCount: parseInt(e.currentTarget.dataset.v, 10) }) },
@@ -266,7 +274,7 @@ Page({
       }
     }
     // 收款门店必填：没有它就不知道这笔钱该进谁的账，顾客下单会被服务端直接拒
-    if (!(that.data.shop || '').trim()) {
+    if (that.data.shopId == null) {
       wx.showToast({ title: '请选择收款门店', icon: 'none' })
       return
     }
@@ -291,11 +299,10 @@ Page({
       id: that.data.id || 0,
       category_id: null,
       category_code: that.data.categoryCode,
-      shop_id: null,
+      shop_id: that.data.shopId,
       name: name,
       sale_price: price,
       type: that.data.bizType + that.data.cardType,
-      shop: (that.data.shop || '').trim() || null,
       hidden: 0,
       valid: 1,
       on_shelves: that.data.on_shelves ? 1 : 0,

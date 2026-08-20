@@ -180,3 +180,7 @@ page { background: #F5F6FA; }
 
 .row--kind { display: flex; gap: 16rpx; align-items: stretch; }
 .row--kind .row-body { flex: 1; min-width: 0; }
+
+/* 发券人：真人用常规色，系统/自动发放的降一档，一眼能分出哪些是店员经手的 */
+.issuer--staff { color: #333; }
+.issuer--auto { color: #9AA0AC; }

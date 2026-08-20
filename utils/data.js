@@ -1184,6 +1184,8 @@ function _buildCouponAdminUrl(action, f, pageIndex, pageSize, sessionKey) {
   if (f.used === true || f.used === false) { url += '&used=' + f.used }
   if (f.transferred === true || f.transferred === false) { url += '&transferred=' + f.transferred }
   if (f.includeWasted) { url += '&includeWasted=true' }
+  // issuer：不传 = 全部；'system' = 系统自动发放（staff_id 为空）；数字 = 指定店员 id
+  if (f.issuer) { url += '&issuer=' + encodeURIComponent(f.issuer) }
   return url
 }
 const searchTicketsByStaffPromise = function (filter, pageIndex, pageSize, sessionKey) {
@@ -1209,6 +1211,11 @@ const getTicketDetailByStaffPromise = function (code, sessionKey) {
 }
 const getTicketTemplateOptionsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketAdmin/GetTemplateOptions?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+// 发券人下拉（在职店员）。「系统/自动发放」那一档由前端自己加，不占接口
+const getTicketIssuerOptionsPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketAdmin/GetIssuerOptions?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
 
@@ -1782,6 +1789,7 @@ module.exports = {
   searchTicketsByStaffPromise,
   searchTicketMembersByStaffPromise,
   getTicketTemplateOptionsPromise,
+  getTicketIssuerOptionsPromise,
   getTicketTemplateListPromise,
   getTicketTemplateDetailPromise,
   saveTicketTemplatePromise,

@@ -21,6 +21,13 @@
     </view>
 
     <view class="filter-row">
+      <text class="filter-label">发券人</text>
+      <picker range="{{issuerNames}}" value="{{issuerIndex}}" bindchange="onIssuerChange">
+        <view class="picker-value">{{issuerNames[issuerIndex] || '全部发券人'}} ▾</view>
+      </picker>
+    </view>
+
+    <view class="filter-row">
       <text class="filter-label">核销</text>
       <view class="chip-group">
         <view wx:for="{{usedOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onUsedTap"
@@ -75,6 +82,7 @@
       </view>
       <view class="row-sub">{{item.code}} · {{item.customerText}}<text wx:if="{{item.memberPhone}}"> · {{item.memberPhone}}</text></view>
       <view class="row-sub">发放 {{item.createDateStr}} · 到期 {{item.expireDateStr}}<text wx:if="{{item.usedTimeStr}}"> · 核销 {{item.usedTimeStr}}</text></view>
+      <view class="row-sub">发券人 <text class="{{item.issuerIsStaff ? 'issuer--staff' : 'issuer--auto'}}">{{item.issuerText}}</text></view>
       <view class="row-transfer" wx:if="{{item.transferText}}">{{item.transferText}}</view>
       <view class="row-memo" wx:if="{{item.createMemo || item.channel}}">{{item.channel}}<text wx:if="{{item.channel && item.createMemo}}"> · </text>{{item.createMemo}}</view>
     </view>
