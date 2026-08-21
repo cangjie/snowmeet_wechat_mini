@@ -116,8 +116,6 @@ App({
     wx.login({
       success: (res) => {
         const app = getApp()
-        // icon-font(thin.ttf, 2MB) 只有旧版接待 components/rent/rent_recept 用到，
-        // 已下沉到该组件按需加载，不再让所有用户冷启动都下这 2MB
         if (util.referStafffId) {
           app.globalData.referStaffId = util.referStafffId
         }
@@ -227,36 +225,6 @@ App({
       fontScale: 1,
     },
     //wssUrl: 'wss://' + domainName + '/ws',
-    adminTabbarItem: [
-      {
-        "text": "养护",
-        "iconPath": "/images/icons/icon_maintain_white.jpg",
-        "selectedIconPath": "/images/icons/icon_maintain_white.jpg",
-        "pagePath": "/pages/admin/equip_maintain/search_order/search_order"
-      },
-      {
-        "text": "订单",
-        "iconPath": "images/zhihu-fill.png",
-        "selectedIconPath": "images/zhihu-fill-hl.png",
-        "pagePath": "/pages/test/upload/upload"
-      },
-      {
-        "pagePath": "/pages/admin/equip_maintain/uploadimage/uploadimage",
-        "text": "上传测试",
-        /*
-        "iconPath": "images/book-3-line.png",
-        "selectedIconPath": "images/book-3-line-hl.png",
-*/
-      },
-      {
-        "pagePath": "/pages/admin/equip_maintain/uploadimage/uploadimage",
-        "text": "上传测试",
-        /*
-        "iconPath": "images/home-2-line.png",
-        "selectedIconPath": "images/home-2-line-hl.png",
-        */
-      }
-    ],
     // ⚠️ 各页面的 tabIndex 是硬编码的（页面 data 里写死 0/1/2），
     // 往这个数组中间插项会让后面所有页面的高亮错位——增删项时必须同步检查
     // 所有用了 mp-tabbar 的页面：index / mine / ski_pass_selector / ski_pass_reserve / punchcard_shop

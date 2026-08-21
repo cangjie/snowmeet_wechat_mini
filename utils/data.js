@@ -28,16 +28,6 @@ const getPackagePromise = function (packageId) {
   //查询租赁物
 
 }
-const searchBarCodePromise = function (code) {
-  var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductByBarcode/' + code
-  return new Promise(function (resolve, reject) {
-    util.performWebRequest(searchUrl, null).then(function (product) {
-      resolve(product)
-    }).catch(function (exp) {
-      reject(exp)
-    })
-  })
-}
 //模糊查询租赁物
 const searchBarCodeFuzzyPromise = function (key, categoryId) {
   var searchUrl = app.globalData.requestPrefix + 'Rent/GetRentProductFuzzy?key=' + key
@@ -173,21 +163,6 @@ const getPaymentLiveStatusPromise = function (paymentId, sessionKey, sessionType
       fail: function () {
         resolve(null)
       }
-    })
-  })
-}
-const placeBlankOrderPromise = function (isPackage, type, shop, memberId, cell, name, gender, sessionKey) {
-  var placeUrl = app.globalData.requestPrefix + 'Order/PlaceBlankOrder/' + isPackage + '?type=' + encodeURIComponent(type) + '&shop=' + encodeURIComponent(shop)
-    + memberId ? '&memberId=' + memberId.toString() : ''
-      + cell ? '&cell=' + cell : ''
-        + name ? '&name=' + encodeURIComponent(name) : ''
-          + gender ? '&gender=' + encodeURIComponent(gender) : ''
-          + '&sessonKey=' + sessionKey
-  return new Promose(function (resolve, reject) {
-    util.performWebRequest(placeUrl, null).then(function (order) {
-      resolve(order)
-    }).catch(function (exp) {
-      reject(exp)
     })
   })
 }
@@ -854,26 +829,6 @@ const updateRentalGuarantyPromise = function (rentalId, amount, scene, sessionKe
   return new Promise(function (resolve, reject) {
     util.performWebRequest(updateUrl, {}).then(function (newRental) {
       resolve(newRental)
-    }).catch(function (exp) {
-      reject(exp)
-    })
-  })
-}
-const getRentTypePromise = function () {
-  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentType'
-  return new Promise(function (resolve, reject) {
-    util.performWebRequest(getUrl, null).then(function (typeList) {
-      resolve(typeList)
-    }).catch(function (exp) {
-      reject(exp)
-    })
-  })
-}
-const getRentPriceByIdPromise = function (id) {
-  var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPriceById/' + id.toString()
-  return new Promise(function (resolve, reject) {
-    util.performWebRequest(getUrl, null).then(function (price) {
-      resolve(price)
     }).catch(function (exp) {
       reject(exp)
     })
@@ -1629,10 +1584,6 @@ const queryRentItemChangeCompatibleCategory = function (categoryId){
   var getUrl = app.globalData.requestPrefix + 'Rent/QueryChangeCompatibleCategory/' + categoryId.toString()
   return util.performWebRequest(getUrl, null)
 }
-const getOrderBalancePromise = function (orderId, sessionKey){
-  var bUrl = app.globalData.requestPrefix + 'Order/GetOrderBalance/' + orderId.toString() + '?sessionKey=' + sessionKey
-  return util.performWebRequest(bUrl, null)
-}
 const updateRentPackageCategoryPromise = function(packageId, packageCategories, sessionKey){
   var updateUrl = app.globalData.requestPrefix + 'Rent/UpdatePackageRentItemCategories/' + packageId.toString() + '?sessionKey=' + sessionKey
   return util.performWebRequest(updateUrl, packageCategories)
@@ -1752,7 +1703,6 @@ const uploadMatExpirePhotoPromise = function (filePath, sessionKey) {
 module.exports = {
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
-  searchBarCodePromise: searchBarCodePromise,
   searchBarCodeFuzzyPromise: searchBarCodeFuzzyPromise,
   getAllRentCategoriesPromise: getAllRentCategoriesPromise,
   getTopCategoriesPromise: getTopCategoriesPromise,
@@ -1762,7 +1712,6 @@ module.exports = {
   getMemberPromise,
   getMemberByNumPromise,
   getMemberByNumSilentPromise,
-  placeBlankOrderPromise,
   getEnumListPromise,
   getRentPriceListPromise,
   updateRentPricePromise,
@@ -1809,8 +1758,6 @@ module.exports = {
   refundPromise,
   updateRentalPromise,
   updateRentalGuarantyPromise,
-  getRentTypePromise,
-  getRentPriceByIdPromise,
   updateCarePromise,
   updateCareTaskStatusPromise,
   createCareVerifyCodePromise,
@@ -1899,7 +1846,6 @@ module.exports = {
   getUnpickedCareItemsByStaffPromise,
   getIncompleteCareItemsByStaffPromise,
   queryRentItemChangeCompatibleCategory,
-  getOrderBalancePromise,
   updateRentPackageCategoryPromise,
   getPackageListByShopPromise,
   getUnipayOrderPromise,

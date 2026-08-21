@@ -1,4 +1,0 @@
-@import '/app.wxss';
-.view-row{
-  width: 700rpx;
-}
