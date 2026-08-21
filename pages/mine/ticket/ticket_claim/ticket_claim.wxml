@@ -1,0 +1,36 @@
+<!--pages/mine/ticket/ticket_claim/ticket_claim.wxml-->
+<view class="page">
+  <view class="tip" wx:if="{{loading}}">加载中…</view>
+  <view class="tip tip--err" wx:elif="{{errMsg}}">{{errMsg}}</view>
+
+  <block wx:elif="{{info}}">
+    <view class="card">
+      <view class="tname">{{info.templateName}}</view>
+      <view class="tmemo" wx:if="{{info.templateMemo}}">{{info.templateMemo}}</view>
+    </view>
+
+    <!-- 已领到 -->
+    <view class="card" wx:if="{{doneCode}}">
+      <view class="ok">已领取</view>
+      <view class="ok-sub">券码 {{doneCode}}</view>
+      <button class="btn" bindtap="onGoMyTickets">去我的优惠券</button>
+    </view>
+
+    <!-- 领完了 -->
+    <view class="card" wx:elif="{{info.soldOut}}">
+      <view class="tip tip--err">{{info.shareType == 'personal' ? '这张券已经被别人领走了' : '这次分享的券已经领完了'}}</view>
+    </view>
+
+    <!-- 还没关注公众号：先扫码 -->
+    <view class="card" wx:elif="{{!info.followed}}">
+      <view class="qr-title">扫码关注公众号后领取</view>
+      <image class="qr" src="{{qrCodeUrl}}" mode="widthFix" wx:if="{{qrCodeUrl}}"></image>
+      <view class="qr-hint">长按识别或截图后用微信扫一扫。关注成功后本页会自动出现领取按钮。</view>
+    </view>
+
+    <!-- 可以领了 -->
+    <view class="card" wx:else>
+      <button class="btn" loading="{{claiming}}" bindtap="onClaim">领取优惠券</button>
+    </view>
+  </block>
+</view>

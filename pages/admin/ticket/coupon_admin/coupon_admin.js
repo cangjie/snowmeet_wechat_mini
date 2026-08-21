@@ -35,10 +35,11 @@ Page({
     templateIndex: 0,
     templateOptions: [],       // [{id,name}]，第 0 项是「全部模板」
     templateNames: [],         // picker 用的纯文案数组
-    issuerKey: '',             // '' 全部 | 'system' 系统自动发放 | 店员 id
-    issuerIndex: 0,
-    issuerOptions: [],         // [{key,name}]，第 0 项「全部发券人」、第 1 项「系统/自动发放」
-    issuerNames: [],
+    // 发券人筛选（多选）。只认 ticket.staff_id，没记发券人的券在选了人时不出现。
+    issuerIds: [],             // 选中的 staff id
+    issuerOptions: [],         // [{id,name,valid,checked}]，在职在前、同组按姓名排
+    issuerSummary: '全部发券人',
+    issuerPanelShow: false,
     usedKey: '',               // '' 全部 | '1' 已核销 | '0' 未核销
     usedOptions: [
       { key: '', name: '全部' }, { key: '1', name: '已核销' }, { key: '0', name: '未核销' }
@@ -103,21 +104,48 @@ Page({
   loadIssuers() {
     var that = this
     data.getTicketIssuerOptionsPromise(app.globalData.sessionKey).then(function (res) {
-      // 「系统/自动发放」= staff_id 为空的券。存量券全在这一档：2026-08-19 之前
-      // CreateTicket 收了 staffId 却没存，全库 12252 张券没有一条记了发券人。
-      var list = [{ key: '', name: '全部发券人' }, { key: 'system', name: '系统 / 自动发放' }]
-        .concat((res && res.staffs) || [])
-      that.setData({
-        issuerOptions: list,
-        issuerNames: list.map(function (x) { return x.name })
+      var picked = that.data.issuerIds
+      var list = ((res && res.staffs) || []).map(function (x) {
+        return Object.assign({}, x, {
+          checked: picked.indexOf(x.id) >= 0,
+          // WXML 不支持方法调用，离职标记在这里派生
+          off: x.valid !== 1
+        })
       })
+      that.setData({ issuerOptions: list })
     }).catch(function () {})
   },
 
-  onIssuerChange(e) {
-    var idx = parseInt(e.detail.value, 10) || 0
-    var opt = this.data.issuerOptions[idx] || {}
-    this.setData({ issuerIndex: idx, issuerKey: opt.key || '' })
+  onIssuerPanelOpen() { this.setData({ issuerPanelShow: true }) },
+  onIssuerPanelClose() { this.setData({ issuerPanelShow: false }) },
+  onNoop() {},
+
+  onIssuerToggle(e) {
+    var idx = Number(e.currentTarget.dataset.idx)
+    var list = this.data.issuerOptions.slice()
+    if (!list[idx]) { return }
+    list[idx] = Object.assign({}, list[idx], { checked: !list[idx].checked })
+    this.setData({ issuerOptions: list })
+  },
+
+  onIssuerClear() {
+    this.setData({
+      issuerOptions: this.data.issuerOptions.map(function (x) {
+        return Object.assign({}, x, { checked: false })
+      })
+    })
+  },
+
+  // 面板里只改勾选状态，点「确定」才落到筛选条件上——与日期/模板一样，攒够再查
+  onIssuerConfirm() {
+    var picked = this.data.issuerOptions.filter(function (x) { return x.checked })
+    var names = picked.map(function (x) { return x.name })
+    this.setData({
+      issuerIds: picked.map(function (x) { return x.id }),
+      issuerSummary: names.length === 0 ? '全部发券人'
+        : (names.length <= 2 ? names.join('、') : (names[0] + ' 等 ' + names.length + ' 人')),
+      issuerPanelShow: false
+    })
   },
 
   _filter() {
@@ -128,7 +156,7 @@ Page({
       used: this.data.usedKey === '' ? null : this.data.usedKey === '1',
       transferred: this.data.transferKey === '' ? null : this.data.transferKey === '1',
       includeWasted: this.data.includeWasted,
-      issuer: this.data.issuerKey
+      issuer: this.data.issuerIds.join(',')
     }
   },
 

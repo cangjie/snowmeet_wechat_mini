@@ -10,6 +10,7 @@
     "pages/ski_pass/ski_pass_reserve",
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
+    "pages/mine/ticket/ticket_claim/ticket_claim",
     "pages/admin/rent/rent_report",
     "pages/admin/rent/punchcard_products/punchcard_products",
     "pages/admin/rent/punchcard_products/punchcard_product_detail/punchcard_product_detail",

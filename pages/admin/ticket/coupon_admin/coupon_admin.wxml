@@ -20,11 +20,9 @@
       </picker>
     </view>
 
-    <view class="filter-row">
+    <view class="filter-row" bindtap="onIssuerPanelOpen">
       <text class="filter-label">发券人</text>
-      <picker range="{{issuerNames}}" value="{{issuerIndex}}" bindchange="onIssuerChange">
-        <view class="picker-value">{{issuerNames[issuerIndex] || '全部发券人'}} ▾</view>
-      </picker>
+      <view class="picker-value">{{issuerSummary}} ▾</view>
     </view>
 
     <view class="filter-row">
@@ -82,7 +80,7 @@
       </view>
       <view class="row-sub">{{item.code}} · {{item.customerText}}<text wx:if="{{item.memberPhone}}"> · {{item.memberPhone}}</text></view>
       <view class="row-sub">发放 {{item.createDateStr}} · 到期 {{item.expireDateStr}}<text wx:if="{{item.usedTimeStr}}"> · 核销 {{item.usedTimeStr}}</text></view>
-      <view class="row-sub">发券人 <text class="{{item.issuerIsStaff ? 'issuer--staff' : 'issuer--auto'}}">{{item.issuerText}}</text></view>
+      <view class="row-sub" wx:if="{{item.issuerText}}">发券人 {{item.issuerText}}</view>
       <view class="row-transfer" wx:if="{{item.transferText}}">{{item.transferText}}</view>
       <view class="row-memo" wx:if="{{item.createMemo || item.channel}}">{{item.channel}}<text wx:if="{{item.channel && item.createMemo}}"> · </text>{{item.createMemo}}</view>
     </view>
@@ -107,4 +105,22 @@
 
   <list-pager wx:if="{{total > 0}}" page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
               disabled="{{loading}}" bind:change="onPagerChange" />
+</view>
+
+<!-- 发券人多选面板：店员有几十位，chip 平铺放不下，用可滚动的勾选列表 -->
+<view class="mask" wx:if="{{issuerPanelShow}}" bindtap="onIssuerPanelClose" catchtouchmove="onNoop">
+  <view class="panel" catchtap="onNoop">
+    <view class="panel-title">选择发券人</view>
+    <view class="panel-hint">不选 = 不按发券人筛。没记录发券人的券，选了人之后不会出现。</view>
+    <scroll-view class="issuer-list" scroll-y>
+      <view class="issuer-row {{item.checked ? 'issuer-row--on' : ''}}"
+        wx:for="{{issuerOptions}}" wx:key="id" data-idx="{{index}}" bindtap="onIssuerToggle">
+        <text class="issuer-name">{{item.name}}</text>
+        <text class="issuer-off" wx:if="{{item.off}}">已离职</text>
+        <text class="issuer-check" wx:if="{{item.checked}}">✓</text>
+      </view>
+    </scroll-view>
+    <button class="query-btn" bindtap="onIssuerConfirm">确定</button>
+    <view class="panel-cancel" bindtap="onIssuerClear">清空选择</view>
+  </view>
 </view>

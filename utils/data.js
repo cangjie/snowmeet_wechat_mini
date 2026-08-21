@@ -1184,7 +1184,7 @@ function _buildCouponAdminUrl(action, f, pageIndex, pageSize, sessionKey) {
   if (f.used === true || f.used === false) { url += '&used=' + f.used }
   if (f.transferred === true || f.transferred === false) { url += '&transferred=' + f.transferred }
   if (f.includeWasted) { url += '&includeWasted=true' }
-  // issuer：不传 = 全部；'system' = 系统自动发放（staff_id 为空）；数字 = 指定店员 id
+  // issuer：逗号分隔的 staff id，可多选；不传 = 不筛发券人
   if (f.issuer) { url += '&issuer=' + encodeURIComponent(f.issuer) }
   return url
 }
@@ -1213,7 +1213,7 @@ const getTicketTemplateOptionsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketAdmin/GetTemplateOptions?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
 }
-// 发券人下拉（在职店员）。「系统/自动发放」那一档由前端自己加，不占接口
+// 发券人选项（全部店员，在职在前、同组按姓名排）。离职的也要列，否则查历史券找不到经手人
 const getTicketIssuerOptionsPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketAdmin/GetIssuerOptions?sessionKey=' + sessionKey
   return util.performWebRequest(url, null)
@@ -1268,6 +1268,60 @@ const deleteCareProductPromise = function (id, sessionKey) {
   return util.performWebRequest(url, null)
 }
 
+// 店员分享发券：建一条分享批次，返回 { batchId, templateName, shareType, sharePath }。
+// shareType：'personal' 分享给好友（只有第一个点开的人能领）/ 'group' 分享到群（每人各领一张）。
+// 微信分不出卡片最终发给谁，所以模式由店员分享前自己选。券在被领取时才生成。
+const shareTicketTemplatePromise = function (templateId, shareType, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/ShareTemplateByStaff?sessionKey=' + sessionKey
+    + '&templateId=' + templateId + '&shareType=' + encodeURIComponent(shareType || 'personal')
+  return util.performWebRequest(url, null)
+}
+// 生成/取回固定二维码批次（员工发券途径之三）。幂等：同一个 (店员,模板,场景) 返回同一条批次，
+// 二维码不会变，已印出去的物料不会作废。返回 { batchId, templateName, channel, scene, claimCount }
+const createQrCodeBatchPromise = function (templateId, channel, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/CreateQrCodeBatchByStaff?sessionKey=' + sessionKey
+    + '&templateId=' + templateId + '&channel=' + encodeURIComponent(channel || '')
+  return util.performWebRequest(url, null)
+}
+// 用 scene 换公众号永久二维码图片地址（QR_LIMIT_STR_SCENE）。
+// 这个接口在公众号那个服务上，不走 requestPrefix，返回的是一段纯文本 URL 而不是 ApiResult。
+const getOaLimitQrCodeUrlPromise = function (scene, sessionKey) {
+  return new Promise(function (resolve, reject) {
+    wx.request({
+      url: 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOALimitQrCodeBySessionKey'
+        + '?content=' + encodeURIComponent(scene) + '&sessionKey=' + encodeURIComponent(sessionKey),
+      method: 'GET',
+      success: function (res) {
+        if (res.statusCode === 200 && res.data) { resolve(String(res.data)) }
+        else { reject(res.statusCode) }
+      },
+      fail: function () { reject({}) }
+    })
+  })
+}
+// 我发起的分享批次（不传 templateId 就是全部模板的）
+const getMyShareBatchesPromise = function (templateId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetMyShareBatches?sessionKey=' + sessionKey
+  if (templateId) { url += '&templateId=' + templateId }
+  return util.performWebRequest(url, null)
+}
+// 撤回分享：链接当场失效，已领走的券不受影响
+const revokeShareBatchPromise = function (batchId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/RevokeShareBatch?sessionKey=' + sessionKey
+    + '&batchId=' + batchId
+  return util.performWebRequest(url, null)
+}
+// ── 店员分享发券的领取端（顾客侧，无需权限）────────────────────
+const getShareBatchPromise = function (batchId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketShare/GetShareBatch?sessionKey=' + sessionKey
+    + '&batchId=' + batchId
+  return util.performWebRequest(url, null)
+}
+const claimSharedTicketPromise = function (batchId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketShare/ClaimSharedTicket?sessionKey=' + sessionKey
+    + '&batchId=' + batchId
+  return util.performWebRequest(url, null)
+}
 // 商品选择器。只列与模板同业务线的商品——业务线取自 category.biz_type（不是 product.type）。
 // bizType 必传，服务端没有它会直接拒（否则会把 596 条雪票和别的业务线商品一股脑列出来）。
 const getTicketRuleProductOptionsPromise = function (bizType, keyword, sessionKey) {
@@ -1796,6 +1850,13 @@ module.exports = {
   saveTicketProductRulePromise,
   deleteTicketProductRulePromise,
   getTicketRuleProductOptionsPromise,
+  shareTicketTemplatePromise,
+  createQrCodeBatchPromise,
+  getOaLimitQrCodeUrlPromise,
+  getMyShareBatchesPromise,
+  revokeShareBatchPromise,
+  getShareBatchPromise,
+  claimSharedTicketPromise,
   getCareProductsPromise,
   saveCareProductPromise,
   deleteCareProductPromise,

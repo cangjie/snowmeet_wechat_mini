@@ -181,6 +181,35 @@ page { background: #F5F6FA; }
 .row--kind { display: flex; gap: 16rpx; align-items: stretch; }
 .row--kind .row-body { flex: 1; min-width: 0; }
 
-/* 发券人：真人用常规色，系统/自动发放的降一档，一眼能分出哪些是店员经手的 */
-.issuer--staff { color: #333; }
-.issuer--auto { color: #9AA0AC; }
+/* 发券人多选面板 */
+.mask {
+  position: fixed; left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.45); z-index: 100;
+  display: flex; align-items: flex-end;
+}
+.panel {
+  width: 100%; background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 28rpx 32rpx 40rpx; box-sizing: border-box;
+  max-height: 82vh;
+}
+.panel-title {
+  font-size: 30rpx; color: #333; font-weight: 600;
+  text-align: center; padding-bottom: 8rpx;
+}
+.panel-hint {
+  font-size: 22rpx; color: #9AA0AC; line-height: 1.6; padding-bottom: 12rpx;
+}
+.panel-cancel { text-align: center; color: #6B7280; font-size: 28rpx; padding: 20rpx 0 0; }
+.issuer-list { max-height: 52vh; }
+.issuer-row {
+  display: flex; align-items: center;
+  padding: 22rpx 0; border-bottom: 1rpx solid #F0F1F5;
+}
+.issuer-row--on .issuer-name { color: #2EA6D0; font-weight: 600; }
+.issuer-name { flex: 1; font-size: 28rpx; color: #333; }
+.issuer-off {
+  font-size: 20rpx; color: #9AA0AC;
+  background: #F3F4F6; border-radius: 6rpx; padding: 2rpx 12rpx; margin-right: 12rpx;
+}
+.issuer-check { color: #2EA6D0; font-size: 30rpx; }

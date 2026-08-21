@@ -47,6 +47,7 @@ Page({
     miniappReceptPath: '',
     hide: 0,
     valid: 1,
+    sharable: 0,
 
     bizOptions: BIZ_OPTIONS,
     bizType: '',
@@ -58,6 +59,14 @@ Page({
 
     // ── 商品优惠规则
     rules: [],
+
+    shareMode: '',             // '' | 'personal' | 'group'，点分享按钮时置位，onShareAppMessage 读完即清
+    shareBatches: [],          // 我在本模板下发起过的分享
+    // 固定二维码（途径三）：一个 (店员, 模板, 投放场景) 一张码
+    qrChannel: '',
+    qrScene: '',
+    qrImageUrl: '',
+    qrLoading: false,
 
     // ── 规则编辑面板：'' 关闭 | 'form' 填规则 | 'product' 选商品
     rulePanel: '',
@@ -88,7 +97,10 @@ Page({
         wx.navigateBack()
         return
       }
-      if (that.data.id > 0) { that.getData() }
+      if (that.data.id > 0) {
+        that.getData()
+        that.loadShareBatches()
+      }
     })
   },
 
@@ -104,6 +116,7 @@ Page({
         miniappReceptPath: d.miniappReceptPath || '',
         hide: d.hide || 0,
         valid: d.valid == null ? 1 : d.valid,
+        sharable: d.sharable || 0,
         bizType: d.bizType || '',
         validityMode: d.validityMode || 'forever',
         availableDays: d.availableDays == null ? '' : String(d.availableDays),
@@ -194,7 +207,8 @@ Page({
       expireDate: that.data.validityMode === 'date' ? that.data.expireDate : null,
       miniappReceptPath: that.data.miniappReceptPath,
       hide: that.data.hide,
-      valid: that.data.valid
+      valid: that.data.valid,
+      sharable: that.data.sharable
     }, app.globalData.sessionKey).then(function (res) {
       wx.showToast({ title: '已保存', icon: 'success' })
       // 新建完要留在本页继续配商品优惠，所以就地转成编辑态而不是返回
@@ -206,6 +220,102 @@ Page({
     }).catch(function () {
       that.setData({ saving: false })
     })
+  },
+
+  // ── 分享发券（员工发券途径之二）────────────────────────────────
+  //
+  // 微信分不出卡片是「发给个人」还是「发到群」——onShareAppMessage 是同一个 API，
+  // 发给谁是店员在微信自己的面板里选的，小程序拿不到结果。所以只能让店员**先选模式**。
+  //
+  // 「分享给好友」：调接口按模板生成一张待领取的券，卡片带券码，与顾客转赠同一条领取链路。
+  // 「分享到群」：一张卡片多人各领一张，需要分享批次表 + 另一套关注校验，尚未实现。
+
+  // 两个按钮都是 open-type="share"，点谁只是置个模式标记，
+  // 真正的分享由微信在 onShareAppMessage 里取内容
+  onShareFriendTap() {
+    if (this.data.sharable !== 1) { return }
+    this.setData({ shareMode: 'personal' })
+  },
+
+  onShareGroupTap() {
+    if (this.data.sharable !== 1) { return }
+    this.setData({ shareMode: 'group' })
+  },
+
+  loadShareBatches() {
+    var that = this
+    if (that.data.id <= 0) { return }
+    data.getMyShareBatchesPromise(that.data.id, app.globalData.sessionKey).then(function (res) {
+      that.setData({ shareBatches: (res && res.items) || [] })
+    }).catch(function () {})
+  },
+
+  onQrChannelInput(e) {
+    this.setData({ qrChannel: e.detail.value })
+  },
+
+  // 幂等：同样的 (模板, 场景) 再点一次拿到的是同一张码，不会作废已印出去的物料
+  onGenQrCode() {
+    var that = this
+    if (that.data.qrLoading) { return }
+    if (!that.data.qrChannel.trim()) {
+      wx.showToast({ title: '请填写投放场景', icon: 'none' })
+      return
+    }
+    that.setData({ qrLoading: true, qrImageUrl: '' })
+    data.createQrCodeBatchPromise(that.data.id, that.data.qrChannel.trim(), app.globalData.sessionKey)
+      .then(function (res) {
+        that.setData({ qrScene: res.scene })
+        return data.getOaLimitQrCodeUrlPromise(res.scene, app.globalData.sessionKey)
+      }).then(function (imgUrl) {
+        that.setData({ qrImageUrl: imgUrl, qrLoading: false })
+        that.loadShareBatches()
+      }).catch(function () {
+        that.setData({ qrLoading: false })
+      })
+  },
+
+  onSaveQrCode() {
+    if (!this.data.qrImageUrl) { return }
+    wx.previewImage({ urls: [this.data.qrImageUrl] })
+  },
+
+  onRevokeBatch(e) {
+    var that = this
+    var b = that.data.shareBatches[Number(e.currentTarget.dataset.idx)]
+    if (!b || !b.canRevoke) { return }
+    wx.showModal({
+      title: '撤回这次分享',
+      content: '撤回后这张卡片就领不了了。已经被领走的券不受影响，收不回来。',
+      success: function (res) {
+        if (!res.confirm) { return }
+        data.revokeShareBatchPromise(b.batchId, app.globalData.sessionKey).then(function () {
+          that.loadShareBatches()
+        }).catch(function () {})
+      }
+    })
+  },
+
+  onShareAppMessage() {
+    var that = this
+    // 不是从分享按钮进来的（比如右上角菜单转发），不发券
+    var mode = that.data.shareMode
+    if ((mode !== 'personal' && mode !== 'group') || that.data.sharable !== 1 || that.data.id <= 0) {
+      return {}
+    }
+    that.setData({ shareMode: '' })
+    return data.shareTicketTemplatePromise(that.data.id, mode, app.globalData.sessionKey)
+      .then(function (res) {
+        // 分享动作已经建了批次，刷一下列表，店员能立刻看到并在需要时撤回
+        that.loadShareBatches()
+        return {
+          title: '送你一张' + (res.templateName || that.data.name),
+          path: res.sharePath,
+          imageUrl: 'https://' + app.globalData.domainName + '/images/snowmeet_logo.png'
+        }
+      }).catch(function () {
+        return {}
+      })
   },
 
   // ── 商品优惠规则 ──────────────────────────────────────────────
