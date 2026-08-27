@@ -24,8 +24,8 @@
     <!-- 还没关注公众号：先扫码 -->
     <view class="card" wx:elif="{{!info.followed}}">
       <view class="qr-title">扫码关注公众号后领取</view>
-      <image class="qr" src="{{qrCodeUrl}}" mode="widthFix" wx:if="{{qrCodeUrl}}"></image>
-      <view class="qr-hint">长按识别或截图后用微信扫一扫。关注成功后本页会自动出现领取按钮。</view>
+      <image class="qr" src="{{qrCodeUrl}}" mode="widthFix" show-menu-by-longpress wx:if="{{qrCodeUrl}}"></image>
+      <view class="qr-hint">长按识别或截图后用微信扫一扫。关注成功后会自动领取优惠券。</view>
     </view>
 
     <!-- 可以领了 -->

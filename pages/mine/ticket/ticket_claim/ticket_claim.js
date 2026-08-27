@@ -52,7 +52,11 @@ Page({
         doneCode: info.claimed ? info.claimedCode : '',
         loading: false
       })
-      // 还没关注的话开始轮询，扫码关注后自动放出领取按钮
+      if (info.followed && !info.claimed && !info.soldOut) {
+        that.onClaim()
+        return
+      }
+      // 还没关注的话开始轮询，扫码关注后自动领取
       if (!info.followed && !info.claimed && !info.soldOut) {
         that._startPoll()
       }
@@ -68,7 +72,14 @@ Page({
       data.getShareBatchPromise(that.data.batchId, app.globalData.sessionKey).then(function (info) {
         if (info.followed) {
           that._stopPoll()
-          that.setData({ info: info, qrCodeUrl: '' })
+          that.setData({
+            info: info,
+            qrCodeUrl: '',
+            doneCode: info.claimed ? info.claimedCode : ''
+          })
+          if (!info.claimed && !info.soldOut) {
+            that.onClaim()
+          }
         }
       }).catch(function () { that._stopPoll() })
     }, POLL_INTERVAL_MS)
