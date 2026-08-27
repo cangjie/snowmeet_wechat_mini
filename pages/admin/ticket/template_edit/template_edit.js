@@ -48,6 +48,16 @@ Page({
     hide: 0,
     valid: 1,
     sharable: 0,
+    coverUploadId: null,
+    coverUrl: '',
+    posterWidth: 1080,
+    posterHeight: 1440,
+    qrX: 0,
+    qrY: 0,
+    qrWidth: 240,
+    qrHeight: 240,
+    qrOverlayStyle: '',
+    uploadingCover: false,
 
     bizOptions: BIZ_OPTIONS,
     bizType: '',
@@ -62,6 +72,9 @@ Page({
 
     shareMode: '',             // '' | 'personal' | 'group'，点分享按钮时置位，onShareAppMessage 读完即清
     shareBatches: [],          // 我在本模板下发起过的分享
+    timelineSharePath: '',
+    timelinePosterUrl: '',
+    timelinePreparing: false,
     // 固定二维码（途径三）：一个 (店员, 模板, 投放场景) 一张码
     qrChannel: '',
     qrScene: '',
@@ -109,6 +122,10 @@ Page({
     that.setData({ loading: true })
     data.getTicketTemplateDetailPromise(that.data.id, app.globalData.sessionKey).then(function (d) {
       d = d || {}
+      var coverUrl = d.coverUrl || ''
+      if (coverUrl && coverUrl.indexOf('http') !== 0) {
+        coverUrl = 'https://snowmeet.wanlonghuaxue.com' + coverUrl
+      }
       that.setData({
         name: d.name || '',
         type: d.type || '',
@@ -117,6 +134,14 @@ Page({
         hide: d.hide || 0,
         valid: d.valid == null ? 1 : d.valid,
         sharable: d.sharable || 0,
+        coverUploadId: d.coverUploadId || null,
+        coverUrl: coverUrl,
+        posterWidth: d.posterWidth || 1080,
+        posterHeight: d.posterHeight || 1440,
+        qrX: d.qrX || 0,
+        qrY: d.qrY || 0,
+        qrWidth: d.qrWidth || 240,
+        qrHeight: d.qrHeight || 240,
         bizType: d.bizType || '',
         validityMode: d.validityMode || 'forever',
         availableDays: d.availableDays == null ? '' : String(d.availableDays),
@@ -124,6 +149,8 @@ Page({
         rules: that._decorate(d.rules || []),
         loading: false
       })
+      that._updateQrOverlay()
+      that._prepareTimelineShare()
     }).catch(function () {
       that.setData({ loading: false })
     })
@@ -143,14 +170,73 @@ Page({
 
   onInput(e) {
     var patch = {}
-    patch[e.currentTarget.dataset.field] = e.detail.value
+    var field = e.currentTarget.dataset.field
+    patch[field] = e.detail.value
     this.setData(patch)
+    if (field === 'qrX' || field === 'qrY' || field === 'qrWidth' || field === 'qrHeight') {
+      this._updateQrOverlay()
+    }
   },
+
+  _updateQrOverlay() {
+    var scale = 650 / (parseInt(this.data.posterWidth, 10) || 1080)
+    var x = Math.max(0, parseInt(this.data.qrX, 10) || 0) * scale
+    var y = Math.max(0, parseInt(this.data.qrY, 10) || 0) * scale
+    var width = Math.max(1, parseInt(this.data.qrWidth, 10) || 240) * scale
+    var height = Math.max(1, parseInt(this.data.qrHeight, 10) || 240) * scale
+    this.setData({ qrOverlayStyle: 'left:' + x + 'rpx;top:' + y + 'rpx;width:' + width + 'rpx;height:' + height + 'rpx;' })
+  },
+
+  onQrTouchStart(e) {
+    var touch = e.touches[0]
+    this._qrDrag = { startX: touch.pageX, startY: touch.pageY,
+      qrX: parseInt(this.data.qrX, 10) || 0, qrY: parseInt(this.data.qrY, 10) || 0 }
+  },
+
+  onQrTouchMove(e) {
+    if (!this._qrDrag) { return }
+    var touch = e.touches[0]
+    var scale = 650 / (parseInt(this.data.posterWidth, 10) || 1080)
+    var nextX = Math.round(this._qrDrag.qrX + (touch.pageX - this._qrDrag.startX) / (scale * 2))
+    var nextY = Math.round(this._qrDrag.qrY + (touch.pageY - this._qrDrag.startY) / (scale * 2))
+    this.setData({ qrX: Math.max(0, nextX), qrY: Math.max(0, nextY) })
+    this._updateQrOverlay()
+  },
+
+  onQrTouchEnd() { this._qrDrag = null },
 
   onSwitch(e) {
     var patch = {}
     patch[e.currentTarget.dataset.field] = e.detail.value ? 1 : 0
     this.setData(patch)
+  },
+
+  onChooseCover() {
+    var that = this
+    if (that.data.uploadingCover) { return }
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        var path = res.tempFiles[0].tempFilePath
+        that.setData({ uploadingCover: true })
+        data.uploadFilePromise(null, path, '优惠券模板海报', 'image', app.globalData.sessionKey)
+          .then(function (upload) {
+            var item = upload && upload.data ? upload.data : upload
+            var id = item && (item.id || item.upload_id)
+            var url = item && (item.file_path_name || item.url || item.path)
+            if (!id || !url) { throw new Error('海报上传结果无效') }
+            if (url.indexOf('http') !== 0) {
+              url = 'https://snowmeet.wanlonghuaxue.com' + url
+            }
+            that.setData({ coverUploadId: id, coverUrl: url, uploadingCover: false })
+            wx.showToast({ title: '海报已上传', icon: 'success' })
+          }).catch(function () {
+            that.setData({ uploadingCover: false })
+          })
+      }
+    })
   },
 
   onBizTap(e) {
@@ -208,7 +294,14 @@ Page({
       miniappReceptPath: that.data.miniappReceptPath,
       hide: that.data.hide,
       valid: that.data.valid,
-      sharable: that.data.sharable
+      sharable: that.data.sharable,
+      coverUploadId: that.data.coverUploadId,
+      posterWidth: parseInt(that.data.posterWidth, 10) || 1080,
+      posterHeight: parseInt(that.data.posterHeight, 10) || 1440,
+      qrX: parseInt(that.data.qrX, 10) || 0,
+      qrY: parseInt(that.data.qrY, 10) || 0,
+      qrWidth: parseInt(that.data.qrWidth, 10) || 240,
+      qrHeight: parseInt(that.data.qrHeight, 10) || 240
     }, app.globalData.sessionKey).then(function (res) {
       wx.showToast({ title: '已保存', icon: 'success' })
       // 新建完要留在本页继续配商品优惠，所以就地转成编辑态而不是返回
@@ -228,7 +321,7 @@ Page({
   // 发给谁是店员在微信自己的面板里选的，小程序拿不到结果。所以只能让店员**先选模式**。
   //
   // 「分享给好友」：调接口按模板生成一张待领取的券，卡片带券码，与顾客转赠同一条领取链路。
-  // 「分享到群」：一张卡片多人各领一张，需要分享批次表 + 另一套关注校验，尚未实现。
+  // 「分享到群」和朋友圈：使用模板海报叠加本次批次的动态公众号二维码。
 
   // 两个按钮都是 open-type="share"，点谁只是置个模式标记，
   // 真正的分享由微信在 onShareAppMessage 里取内容
@@ -308,13 +401,46 @@ Page({
       .then(function (res) {
         // 分享动作已经建了批次，刷一下列表，店员能立刻看到并在需要时撤回
         that.loadShareBatches()
-        return {
+        return data.generateTicketPosterPromise(res.batchId, app.globalData.sessionKey).then(function (poster) {
+          return {
           title: '送你一张' + (res.templateName || that.data.name),
           path: res.sharePath,
-          imageUrl: 'https://' + app.globalData.domainName + '/images/snowmeet_logo.png'
-        }
+            imageUrl: poster.url
+          }
+        })
       }).catch(function () {
         return {}
+      })
+  },
+
+  onShareTimeline() {
+    if (!this.data.timelinePosterUrl || !this.data.timelineSharePath) {
+      wx.showToast({ title: '海报正在准备，请稍后再试', icon: 'none' })
+      return {}
+    }
+    return {
+      title: '送你一张' + this.data.name,
+      query: this.data.timelineSharePath.split('?')[1] || '',
+      imageUrl: this.data.timelinePosterUrl
+    }
+  },
+
+  _prepareTimelineShare() {
+    var that = this
+    if (that.data.id <= 0 || that.data.sharable !== 1 || !that.data.coverUploadId
+      || that.data.timelinePreparing || that.data.timelinePosterUrl) { return }
+    that.setData({ timelinePreparing: true })
+    data.shareTicketTemplatePromise(that.data.id, 'group', app.globalData.sessionKey)
+      .then(function (res) {
+        return data.generateTicketPosterPromise(res.batchId, app.globalData.sessionKey).then(function (poster) {
+          that.setData({
+            timelineSharePath: res.sharePath,
+            timelinePosterUrl: poster.url,
+            timelinePreparing: false
+          })
+        })
+      }).catch(function () {
+        that.setData({ timelinePreparing: false })
       })
   },
 

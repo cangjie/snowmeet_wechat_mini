@@ -35,6 +35,21 @@
     </view>
   </view>
 
+  <view class="card">
+    <view class="sec-title">分享海报</view>
+    <view class="sec-hint">上传 1080×1440 海报。二维码位置和尺寸将在预览中调整。</view>
+    <view class="poster-upload" bindtap="onChooseCover">
+      <image wx:if="{{coverUrl}}" class="poster-preview" src="{{coverUrl}}" mode="aspectFit"></image>
+      <view wx:if="{{coverUrl}}" class="qr-overlay" style="{{qrOverlayStyle}}"
+        catchtouchstart="onQrTouchStart" catchtouchmove="onQrTouchMove" catchtouchend="onQrTouchEnd"></view>
+      <view wx:else class="poster-empty">{{uploadingCover ? '正在上传...' : '点击上传海报'}}</view>
+    </view>
+    <view class="frow"><text class="flabel">二维码 X</text><input class="finput" type="number" value="{{qrX}}" data-field="qrX" bindinput="onInput" /></view>
+    <view class="frow"><text class="flabel">二维码 Y</text><input class="finput" type="number" value="{{qrY}}" data-field="qrY" bindinput="onInput" /></view>
+    <view class="frow"><text class="flabel">二维码宽</text><input class="finput" type="number" value="{{qrWidth}}" data-field="qrWidth" bindinput="onInput" /></view>
+    <view class="frow"><text class="flabel">二维码高</text><input class="finput" type="number" value="{{qrHeight}}" data-field="qrHeight" bindinput="onInput" /></view>
+  </view>
+
   <view class="card" wx:if="{{sharable == 1 && id > 0}}">
     <view class="sec-title">分享发券</view>
     <view class="sec-hint">

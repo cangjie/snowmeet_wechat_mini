@@ -1188,7 +1188,8 @@ const getTicketTemplateDetailPromise = function (id, sessionKey) {
   return util.performWebRequest(url, null)
 }
 // body = { id(0=新建), name, type, memo, bizType, validityMode('days'|'date'|'forever'),
-//          availableDays, expireDate, miniappReceptPath, hide, valid }
+//          availableDays, expireDate, miniappReceptPath, hide, valid,
+//          coverUploadId, posterWidth, posterHeight, qrX, qrY, qrWidth, qrHeight }
 // validityMode 说了算：服务端会按它清空另一个有效期字段，前端不用自己置空
 const saveTicketTemplatePromise = function (body, sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/SaveTemplateByStaff?sessionKey=' + sessionKey
@@ -1229,6 +1230,11 @@ const deleteCareProductPromise = function (id, sessionKey) {
 const shareTicketTemplatePromise = function (templateId, shareType, sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/ShareTemplateByStaff?sessionKey=' + sessionKey
     + '&templateId=' + templateId + '&shareType=' + encodeURIComponent(shareType || 'personal')
+  return util.performWebRequest(url, null)
+}
+const generateTicketPosterPromise = function (batchId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'TicketPoster/Generate?batchId=' + batchId
+    + '&sessionKey=' + encodeURIComponent(sessionKey || '')
   return util.performWebRequest(url, null)
 }
 // 生成/取回固定二维码批次（员工发券途径之三）。幂等：同一个 (店员,模板,场景) 返回同一条批次，
@@ -1798,6 +1804,7 @@ module.exports = {
   deleteTicketProductRulePromise,
   getTicketRuleProductOptionsPromise,
   shareTicketTemplatePromise,
+  generateTicketPosterPromise,
   createQrCodeBatchPromise,
   getOaLimitQrCodeUrlPromise,
   getMyShareBatchesPromise,
