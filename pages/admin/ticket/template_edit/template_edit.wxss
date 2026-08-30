@@ -95,6 +95,26 @@ page { background: #F5F6FA; }
 }
 .prow--all { color: #2EA6D0; }
 
+/* 分享卡片：三个可折叠子区 */
+.acc-head {
+  display: flex; align-items: center;
+  padding: 26rpx 0; border-bottom: 1rpx solid #F0F1F5;
+}
+.acc-head:last-child { border-bottom: none; }
+.acc-title { flex: 1; font-size: 28rpx; color: #333; font-weight: 600; }
+.acc-count {
+  font-size: 22rpx; color: #6B7280; background: #F3F4F6;
+  border-radius: 999rpx; padding: 2rpx 14rpx; margin-right: 12rpx;
+}
+.acc-arrow {
+  display: inline-block; color: #C4C8D2; font-size: 36rpx;
+  line-height: 1; padding-left: 8rpx;
+  transition: transform .2s;
+}
+.acc-arrow--open { transform: rotate(90deg); }
+.acc-body { padding-bottom: 20rpx; border-bottom: 1rpx solid #F0F1F5; }
+.acc-body:last-child { border-bottom: none; }
+
 /* 分享发券 */
 .share-btns { display: flex; padding: 12rpx 0 4rpx; }
 .share-btn {

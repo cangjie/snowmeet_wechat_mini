@@ -78,6 +78,8 @@ Page({
     timelinePreparing: false,
     groupQrMode: 'dynamic',
     generatingGroupPoster: false,
+    // 「分享」卡片里三个子区的展开状态，默认都收起
+    shareOpen: { poster: false, card: false, batch: false },
 
     // ── 规则编辑面板：'' 关闭 | 'form' 填规则 | 'product' 选商品
     rulePanel: '',
@@ -366,6 +368,15 @@ Page({
 
   onGroupQrModeTap(e) {
     this.setData({ groupQrMode: e.currentTarget.dataset.mode })
+  },
+
+  // 「分享」卡片里的三个子区各自独立开合，不做互斥手风琴
+  onShareSectionTap(e) {
+    var key = e.currentTarget.dataset.key
+    var open = this.data.shareOpen || {}
+    var patch = {}
+    patch['shareOpen.' + key] = !open[key]
+    this.setData(patch)
   },
 
   onShareGroupTap() {
