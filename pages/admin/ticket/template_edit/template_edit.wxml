@@ -48,6 +48,18 @@
     <view class="frow"><text class="flabel">二维码 Y</text><input class="finput" type="number" value="{{qrY}}" data-field="qrY" bindinput="onInput" /></view>
     <view class="frow"><text class="flabel">二维码宽</text><input class="finput" type="number" value="{{qrWidth}}" data-field="qrWidth" bindinput="onInput" /></view>
     <view class="frow"><text class="flabel">二维码高</text><input class="finput" type="number" value="{{qrHeight}}" data-field="qrHeight" bindinput="onInput" /></view>
+
+    <block wx:if="{{sharable == 1 && id > 0}}">
+      <button class="share-btn share-btn--ghost poster-share-btn" loading="{{generatingGroupPoster}}" bindtap="onShareGroupTap">生成群分享海报</button>
+      <view class="sec-hint">
+        群海报默认使用动态二维码，每次生成独立批次；下载完成后可直接发到微信群。
+      </view>
+      <view class="chip-group">
+        <view class="chip {{groupQrMode == 'dynamic' ? 'chip--active' : ''}}" data-mode="dynamic" bindtap="onGroupQrModeTap">动态二维码</view>
+        <view class="chip {{groupQrMode == 'static' ? 'chip--active' : ''}}" data-mode="static" bindtap="onGroupQrModeTap">静态二维码</view>
+      </view>
+      <view class="sec-hint">静态二维码会复用本模板的长期二维码；动态二维码仅对应本次群分享。</view>
+    </block>
   </view>
 
   <view class="card" wx:if="{{sharable == 1 && id > 0}}">
@@ -58,16 +70,8 @@
     </view>
     <view class="share-btns">
       <button class="share-btn" open-type="share" bindtap="onShareFriendTap">分享给好友</button>
-      <button class="share-btn share-btn--ghost" loading="{{generatingGroupPoster}}" bindtap="onShareGroupTap">生成群分享海报</button>
     </view>
-    <view class="sec-hint">
-      群海报默认使用动态二维码，每次生成独立批次；下载完成后可直接发到微信群。
-    </view>
-    <view class="chip-group">
-      <view class="chip {{groupQrMode == 'dynamic' ? 'chip--active' : ''}}" data-mode="dynamic" bindtap="onGroupQrModeTap">动态二维码</view>
-      <view class="chip {{groupQrMode == 'static' ? 'chip--active' : ''}}" data-mode="static" bindtap="onGroupQrModeTap">静态二维码</view>
-    </view>
-    <view class="sec-hint">静态二维码会复用本模板的长期二维码；动态二维码仅对应本次群分享。</view>
+    <view class="sec-hint">群分享海报的入口在上方「分享海报」里。</view>
 
     <view class="sec-title" wx:if="{{shareBatches.length > 0}}">我的分享记录</view>
     <view class="brow" wx:for="{{shareBatches}}" wx:key="batchId">

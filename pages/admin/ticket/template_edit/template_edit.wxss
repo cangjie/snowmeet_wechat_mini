@@ -106,6 +106,8 @@ page { background: #F5F6FA; }
   background: #fff; color: #2EA6D0;
   border: 1rpx solid #2EA6D0;
 }
+/* 海报卡片里的单独一颗按钮，不在 .share-btns 的 flex 行里 */
+.poster-share-btn { margin: 20rpx 0 4rpx; }
 
 /* 分享记录 */
 .brow {
