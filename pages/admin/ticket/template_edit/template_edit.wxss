@@ -133,9 +133,9 @@ page { background: #F5F6FA; }
 
 /* 分享海报 */
 .poster-upload {
-  position: relative; width: 650rpx; height: 867rpx; margin: 16rpx auto; background: #F3F4F6;
+  position: relative; width: 650rpx; margin: 16rpx auto; background: #F3F4F6;
   display: flex; align-items: center; justify-content: center;
 }
-.poster-preview { width: 650rpx; height: 867rpx; display: block; }
+.poster-preview { width: 650rpx; display: block; }
 .qr-overlay { position: absolute; box-sizing: border-box; border: 4rpx solid #2EA6D0; background: rgba(46, 166, 208, 0.2); z-index: 2; }
 .poster-empty { color: #9AA0AC; font-size: 28rpx; padding: 80rpx 0; }

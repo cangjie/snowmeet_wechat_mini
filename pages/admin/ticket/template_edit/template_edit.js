@@ -56,6 +56,7 @@ Page({
     qrY: 0,
     qrWidth: 240,
     qrHeight: 240,
+    posterPreviewHeight: 867,
     qrOverlayStyle: '',
     uploadingCover: false,
 
@@ -75,11 +76,8 @@ Page({
     timelineSharePath: '',
     timelinePosterUrl: '',
     timelinePreparing: false,
-    // 固定二维码（途径三）：一个 (店员, 模板, 投放场景) 一张码
-    qrChannel: '',
-    qrScene: '',
-    qrImageUrl: '',
-    qrLoading: false,
+    groupQrMode: 'dynamic',
+    generatingGroupPoster: false,
 
     // ── 规则编辑面板：'' 关闭 | 'form' 填规则 | 'product' 选商品
     rulePanel: '',
@@ -124,7 +122,7 @@ Page({
       d = d || {}
       var coverUrl = d.coverUrl || ''
       if (coverUrl && coverUrl.indexOf('http') !== 0) {
-        coverUrl = 'https://snowmeet.wanlonghuaxue.com' + coverUrl
+        coverUrl = 'https://mini.snowmeet.top' + coverUrl
       }
       that.setData({
         name: d.name || '',
@@ -148,9 +146,11 @@ Page({
         expireDate: d.expireDate || '',
         rules: that._decorate(d.rules || []),
         loading: false
+      }, function () {
+        that._updateQrOverlay()
+        that._setPosterPreviewRatio(coverUrl)
+        that._prepareTimelineShare()
       })
-      that._updateQrOverlay()
-      that._prepareTimelineShare()
     }).catch(function () {
       that.setData({ loading: false })
     })
@@ -172,19 +172,42 @@ Page({
     var patch = {}
     var field = e.currentTarget.dataset.field
     patch[field] = e.detail.value
-    this.setData(patch)
     if (field === 'qrX' || field === 'qrY' || field === 'qrWidth' || field === 'qrHeight') {
-      this._updateQrOverlay()
+      this.setData(patch, () => this._updateQrOverlay())
+      return
     }
+    this.setData(patch)
   },
 
   _updateQrOverlay() {
-    var scale = 650 / (parseInt(this.data.posterWidth, 10) || 1080)
-    var x = Math.max(0, parseInt(this.data.qrX, 10) || 0) * scale
-    var y = Math.max(0, parseInt(this.data.qrY, 10) || 0) * scale
-    var width = Math.max(1, parseInt(this.data.qrWidth, 10) || 240) * scale
-    var height = Math.max(1, parseInt(this.data.qrHeight, 10) || 240) * scale
-    this.setData({ qrOverlayStyle: 'left:' + x + 'rpx;top:' + y + 'rpx;width:' + width + 'rpx;height:' + height + 'rpx;' })
+    var posterWidth = parseInt(this.data.posterWidth, 10) || 1080
+    var posterHeight = parseInt(this.data.posterHeight, 10) || 1440
+    var x = Math.max(0, parseInt(this.data.qrX, 10) || 0)
+    var y = Math.max(0, parseInt(this.data.qrY, 10) || 0)
+    var width = Math.max(1, parseInt(this.data.qrWidth, 10) || 240)
+    var height = Math.max(1, parseInt(this.data.qrHeight, 10) || 240)
+    var previewScale = 650 / posterWidth
+    this.setData({ qrOverlayStyle: 'left:' + (x * 100 / posterWidth) + '%;top:'
+      + (y * 100 / posterHeight) + '%;width:' + (width * previewScale)
+      // 预览宽度固定 650rpx，宽高都以它为基准，二维码不会受容器高度影响。
+      + 'rpx;height:' + (height * previewScale) + 'rpx;' })
+  },
+
+  _posterPreviewWidthPx() {
+    return 650 * wx.getSystemInfoSync().windowWidth / 750
+  },
+
+  _setPosterPreviewRatio(url) {
+    var that = this
+    if (!url) { return }
+    wx.getImageInfo({
+      src: url,
+      success: function (info) {
+        if (info.width > 0 && info.height > 0) {
+          that.setData({ posterPreviewHeight: Math.round(650 * info.height / info.width) })
+        }
+      }
+    })
   },
 
   onQrTouchStart(e) {
@@ -196,11 +219,20 @@ Page({
   onQrTouchMove(e) {
     if (!this._qrDrag) { return }
     var touch = e.touches[0]
-    var scale = 650 / (parseInt(this.data.posterWidth, 10) || 1080)
-    var nextX = Math.round(this._qrDrag.qrX + (touch.pageX - this._qrDrag.startX) / (scale * 2))
-    var nextY = Math.round(this._qrDrag.qrY + (touch.pageY - this._qrDrag.startY) / (scale * 2))
-    this.setData({ qrX: Math.max(0, nextX), qrY: Math.max(0, nextY) })
-    this._updateQrOverlay()
+    var posterWidth = parseInt(this.data.posterWidth, 10) || 1080
+    var posterHeight = parseInt(this.data.posterHeight, 10) || 1440
+    var previewWidth = this._posterPreviewWidthPx()
+    var previewHeight = previewWidth * (parseInt(this.data.posterPreviewHeight, 10) || 867) / 650
+    var nextX = Math.round(this._qrDrag.qrX
+      + (touch.pageX - this._qrDrag.startX) * posterWidth / previewWidth)
+    var nextY = Math.round(this._qrDrag.qrY
+      + (touch.pageY - this._qrDrag.startY) * posterHeight / previewHeight)
+    var qrWidth = parseInt(this.data.qrWidth, 10) || 240
+    var qrHeight = parseInt(this.data.qrHeight, 10) || 240
+    this.setData({
+      qrX: Math.max(0, Math.min(nextX, posterWidth - qrWidth)),
+      qrY: Math.max(0, Math.min(nextY, posterHeight - qrHeight))
+    }, () => this._updateQrOverlay())
   },
 
   onQrTouchEnd() { this._qrDrag = null },
@@ -221,16 +253,18 @@ Page({
       success: function (res) {
         var path = res.tempFiles[0].tempFilePath
         that.setData({ uploadingCover: true })
-        data.uploadFilePromise(null, path, '优惠券模板海报', 'image', app.globalData.sessionKey)
+        data.uploadFilePromise(null, path, '优惠券模板海报', 'image', app.globalData.sessionKey,
+          'https://mini.snowmeet.top')
           .then(function (upload) {
             var item = upload && upload.data ? upload.data : upload
             var id = item && (item.id || item.upload_id)
             var url = item && (item.file_path_name || item.url || item.path)
             if (!id || !url) { throw new Error('海报上传结果无效') }
             if (url.indexOf('http') !== 0) {
-              url = 'https://snowmeet.wanlonghuaxue.com' + url
+              url = 'https://mini.snowmeet.top' + url
             }
             that.setData({ coverUploadId: id, coverUrl: url, uploadingCover: false })
+            that._setPosterPreviewRatio(url)
             wx.showToast({ title: '海报已上传', icon: 'success' })
           }).catch(function () {
             that.setData({ uploadingCover: false })
@@ -330,9 +364,49 @@ Page({
     this.setData({ shareMode: 'personal' })
   },
 
+  onGroupQrModeTap(e) {
+    this.setData({ groupQrMode: e.currentTarget.dataset.mode })
+  },
+
   onShareGroupTap() {
-    if (this.data.sharable !== 1) { return }
-    this.setData({ shareMode: 'group' })
+    var that = this
+    if (that.data.generatingGroupPoster || that.data.sharable !== 1) { return }
+    if (!that.data.coverUploadId) {
+      wx.showToast({ title: '请先上传并保存分享海报', icon: 'none' })
+      return
+    }
+    that.setData({ generatingGroupPoster: true })
+    var createBatch = that.data.groupQrMode === 'static'
+      ? data.createQrCodeBatchPromise(that.data.id, '群分享', app.globalData.sessionKey)
+      : data.shareTicketTemplatePromise(that.data.id, 'group', app.globalData.sessionKey)
+    createBatch.then(function (res) {
+      return data.generateTicketPosterPromise(res.batchId, app.globalData.sessionKey)
+    }).then(function (poster) {
+      return that._downloadPoster(poster.url)
+    }).then(function (filePath) {
+      that.setData({ generatingGroupPoster: false })
+      wx.showShareImageMenu({ path: filePath, fail: function () {} })
+      that.loadShareBatches()
+    }).catch(function () {
+      that.setData({ generatingGroupPoster: false })
+    })
+  },
+
+  _downloadPoster(url) {
+    return new Promise(function (resolve, reject) {
+      wx.downloadFile({
+        url: url,
+        success: function (res) {
+          if (res.statusCode !== 200) { reject(res); return }
+          wx.saveImageToPhotosAlbum({
+            filePath: res.tempFilePath,
+            success: function () { resolve(res.tempFilePath) },
+            fail: function () { resolve(res.tempFilePath) }
+          })
+        },
+        fail: reject
+      })
+    })
   },
 
   loadShareBatches() {
@@ -341,36 +415,6 @@ Page({
     data.getMyShareBatchesPromise(that.data.id, app.globalData.sessionKey).then(function (res) {
       that.setData({ shareBatches: (res && res.items) || [] })
     }).catch(function () {})
-  },
-
-  onQrChannelInput(e) {
-    this.setData({ qrChannel: e.detail.value })
-  },
-
-  // 幂等：同样的 (模板, 场景) 再点一次拿到的是同一张码，不会作废已印出去的物料
-  onGenQrCode() {
-    var that = this
-    if (that.data.qrLoading) { return }
-    if (!that.data.qrChannel.trim()) {
-      wx.showToast({ title: '请填写投放场景', icon: 'none' })
-      return
-    }
-    that.setData({ qrLoading: true, qrImageUrl: '' })
-    data.createQrCodeBatchPromise(that.data.id, that.data.qrChannel.trim(), app.globalData.sessionKey)
-      .then(function (res) {
-        that.setData({ qrScene: res.scene })
-        return data.getOaLimitQrCodeUrlPromise(res.scene, app.globalData.sessionKey)
-      }).then(function (imgUrl) {
-        that.setData({ qrImageUrl: imgUrl, qrLoading: false })
-        that.loadShareBatches()
-      }).catch(function () {
-        that.setData({ qrLoading: false })
-      })
-  },
-
-  onSaveQrCode() {
-    if (!this.data.qrImageUrl) { return }
-    wx.previewImage({ urls: [this.data.qrImageUrl] })
   },
 
   onRevokeBatch(e) {

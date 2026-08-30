@@ -38,8 +38,8 @@
   <view class="card">
     <view class="sec-title">分享海报</view>
     <view class="sec-hint">上传 1080×1440 海报。二维码位置和尺寸将在预览中调整。</view>
-    <view class="poster-upload" bindtap="onChooseCover">
-      <image wx:if="{{coverUrl}}" class="poster-preview" src="{{coverUrl}}" mode="aspectFit"></image>
+    <view class="poster-upload" style="height: {{posterPreviewHeight}}rpx;" bindtap="onChooseCover">
+      <image wx:if="{{coverUrl}}" class="poster-preview" style="height: {{posterPreviewHeight}}rpx;" src="{{coverUrl}}" mode="scaleToFill"></image>
       <view wx:if="{{coverUrl}}" class="qr-overlay" style="{{qrOverlayStyle}}"
         catchtouchstart="onQrTouchStart" catchtouchmove="onQrTouchMove" catchtouchend="onQrTouchEnd"></view>
       <view wx:else class="poster-empty">{{uploadingCover ? '正在上传...' : '点击上传海报'}}</view>
@@ -58,27 +58,16 @@
     </view>
     <view class="share-btns">
       <button class="share-btn" open-type="share" bindtap="onShareFriendTap">分享给好友</button>
-      <button class="share-btn share-btn--ghost" open-type="share" bindtap="onShareGroupTap">分享到群</button>
+      <button class="share-btn share-btn--ghost" loading="{{generatingGroupPoster}}" bindtap="onShareGroupTap">生成群分享海报</button>
     </view>
     <view class="sec-hint">
-      「分享给好友」一张卡片只有第一个点开的人能领；「分享到群」不限人数，但每人只能领一张。
-      微信分不出卡片最终发给谁，所以按你点的这个按钮算——点了「给好友」却发到群里，群里也只有一个人能领。
+      群海报默认使用动态二维码，每次生成独立批次；下载完成后可直接发到微信群。
     </view>
-
-    <view class="sec-title">固定二维码</view>
-    <view class="sec-hint">
-      给陌生人扫的长期二维码。每个投放场景各生成一张（如「前台台卡」「雪具大厅海报」），
-      领到的券记在你名下，按场景能分开统计。同一模板一个人**一天只能领一张**，换别人的码也不行。
+    <view class="chip-group">
+      <view class="chip {{groupQrMode == 'dynamic' ? 'chip--active' : ''}}" data-mode="dynamic" bindtap="onGroupQrModeTap">动态二维码</view>
+      <view class="chip {{groupQrMode == 'static' ? 'chip--active' : ''}}" data-mode="static" bindtap="onGroupQrModeTap">静态二维码</view>
     </view>
-    <view class="frow">
-      <text class="flabel">投放场景</text>
-      <input class="finput" value="{{qrChannel}}" bindinput="onQrChannelInput" placeholder="如 前台台卡" />
-    </view>
-    <button class="share-btn share-btn--ghost" loading="{{qrLoading}}" bindtap="onGenQrCode">生成二维码</button>
-    <view class="qr-box" wx:if="{{qrImageUrl}}">
-      <image class="qr-img" src="{{qrImageUrl}}" mode="widthFix" bindtap="onSaveQrCode"></image>
-      <view class="sec-hint">点图片可放大保存。同样的场景再点「生成」拿到的还是这张码，不会作废已印好的物料。</view>
-    </view>
+    <view class="sec-hint">静态二维码会复用本模板的长期二维码；动态二维码仅对应本次群分享。</view>
 
     <view class="sec-title" wx:if="{{shareBatches.length > 0}}">我的分享记录</view>
     <view class="brow" wx:for="{{shareBatches}}" wx:key="batchId">
