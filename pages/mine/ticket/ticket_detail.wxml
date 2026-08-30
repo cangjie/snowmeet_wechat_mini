@@ -47,4 +47,14 @@
     <view class="tr-cancel" bindtap="onTransferPanelClose">取消</view>
   </view>
 </view>
-<!--auth wx:if="{{needAuth}}" validType="cell" bindUpdateSuccess="AuthFinish" ></auth-->
+<!-- 未验证手机号：整页盖死，只留「授权」和「返回」两条路。
+     catchtap + catchtouchmove 吃掉所有穿透，遮罩本身点不掉 -->
+<view class="auth-mask" wx:if="{{needAuth}}" catchtap="onNoop" catchtouchmove="onNoop">
+  <view class="auth-panel">
+    <view class="auth-title">需要验证手机号</view>
+    <view class="auth-desc">优惠券绑定在你的手机号上。验证后才能查看券面和核销二维码，也方便你换设备后仍能找到它。</view>
+    <button class="auth-btn" loading="{{authBusy}}"
+      open-type="getPhoneNumber" bindgetphonenumber="onGetCell">授权手机号</button>
+    <view class="auth-cancel" catchtap="onAuthBack">返回</view>
+  </view>
+</view>

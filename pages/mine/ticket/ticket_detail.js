@@ -9,7 +9,11 @@ Page({
    * Page initial data
    */
   data: {
+    // 未验证手机号的顾客一进来就被整页遮罩挡住，只能授权或返回。
+    // 微信的 getPhoneNumber 只能由 button 直接触发、JS 调不起来，所以"强制"
+    // 只能做成一颗盖在页面上的授权按钮，没法自动弹窗。
     needAuth: false,
+    authBusy: false,
     transferShow: false,      // 转赠确认弹层
     subscribeBlocked: false   // 订阅被用户永久拒绝，需要引导去设置页
   },
@@ -48,6 +52,48 @@ Page({
     this.setData({ transferShow: false })
   },
 
+  // 2026-05-29 起 MemberLogin 不再自动建 stub 会员：没验证过手机号的顾客
+  // globalData.member 直接是 null；老会员则可能有 member 但 cell 为空
+  _checkCell() {
+    var m = app.globalData.member
+    var cell = m && m.cell ? String(m.cell).trim() : ''
+    this.setData({ needAuth: !cell })
+  },
+
+  // 授权手机号 → 落库（走次卡购买页同一条链路：UpdateWechatMemberCell，
+  // 内部 ResolveOrCreateMemberByCell：按 cell 查到会员就归并并链上当前 openid/unionid，
+  // 查不到才建新会员，并回填 mini_session.member_id）
+  onGetCell(e) {
+    var that = this
+    var d = e && e.detail
+    if (!d || d.errMsg !== 'getPhoneNumber:ok' || !d.encryptedData || !d.iv) {
+      wx.showToast({ title: '需要验证手机号才能查看优惠券', icon: 'none' })
+      return
+    }
+    if (that.data.authBusy) { return }
+    that.setData({ authBusy: true })
+    data.bindWechatCellPromise(d.encryptedData, d.iv, app.globalData.sessionKey)
+      .then(function (member) {
+        app.globalData.member = member
+        that.setData({ authBusy: false })
+        // 后端偶发返回不带 cell 的 member（会话归属没回填上），此时别放行，
+        // 否则遮罩没了、人却还是没手机号
+        that._checkCell()
+      }).catch(function () {
+        that.setData({ authBusy: false })
+        wx.showToast({ title: '手机号验证失败，请重试', icon: 'none' })
+      })
+  },
+
+  // 深链直接进来的没有上一页，navigateBack 会失败，兜底回「我的优惠券」
+  onAuthBack() {
+    wx.navigateBack({
+      fail: function () {
+        wx.redirectTo({ url: '/pages/mine/ticket/ticket_list' })
+      }
+    })
+  },
+
   /**
    * Lifecycle function--Called when page load
    */
@@ -63,6 +109,7 @@ Page({
     var that = this
     that.setData({ code: code })
     app.loginPromiseNew.then(function (resolve) {
+      that._checkCell()
       data.getTicket(code).then(function (ticket) {
         ticket.transferredOut = transferredOut
         ticket = ticketHelper.annotateTicket(ticket, tab)
