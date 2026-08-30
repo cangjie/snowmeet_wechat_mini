@@ -165,6 +165,7 @@
           <view class="brow-main">
             <view class="brow-title">
               <text class="btype">{{item.shareTypeText}}</text>
+              <text class="bstaff">{{item.staffName || '未知'}}{{item.isMine ? '（我）' : ''}}</text>
               <text class="tag tag--{{item.stateCls}}">{{item.stateLabel}}</text>
             </view>
             <view class="brow-meta">{{item.progressText}}</view>

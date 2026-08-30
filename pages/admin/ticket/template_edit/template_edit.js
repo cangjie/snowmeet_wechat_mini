@@ -439,7 +439,7 @@ Page({
   loadShareBatches() {
     var that = this
     if (that.data.id <= 0) { return }
-    data.getMyShareBatchesPromise(that.data.id, app.globalData.sessionKey,
+    data.getShareBatchesPromise(that.data.id, app.globalData.sessionKey,
       that.data.batchStartDate, that.data.batchEndDate).then(function (res) {
       that.setData({ shareBatches: (res && res.items) || [] })
     }).catch(function () {})

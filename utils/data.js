@@ -1262,8 +1262,9 @@ const getOaLimitQrCodeUrlPromise = function (scene, sessionKey) {
   })
 }
 // 我发起的分享批次（不传 templateId 就是全部模板的）
-const getMyShareBatchesPromise = function (templateId, sessionKey, startDate, endDate) {
-  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetMyShareBatches?sessionKey=' + sessionKey
+// 全店所有员工在该模板下的分享批次（撤回仍只限自己发起的，服务端挡）
+const getShareBatchesPromise = function (templateId, sessionKey, startDate, endDate) {
+  var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetShareBatches?sessionKey=' + sessionKey
   if (templateId) { url += '&templateId=' + templateId }
   if (startDate) { url += '&startDate=' + startDate }
   if (endDate) { url += '&endDate=' + endDate }
@@ -1810,7 +1811,7 @@ module.exports = {
   generateTicketPosterPromise,
   createQrCodeBatchPromise,
   getOaLimitQrCodeUrlPromise,
-  getMyShareBatchesPromise,
+  getShareBatchesPromise,
   revokeShareBatchPromise,
   getShareBatchPromise,
   claimSharedTicketPromise,

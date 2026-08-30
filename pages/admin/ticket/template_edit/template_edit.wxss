@@ -139,6 +139,7 @@ page { background: #F5F6FA; }
 .brow-main { flex: 1; min-width: 0; }
 .brow-title { display: flex; align-items: center; flex-wrap: wrap; }
 .btype { font-size: 28rpx; color: #333; margin-right: 12rpx; }
+.bstaff { font-size: 24rpx; color: #6B7280; margin-right: 12rpx; }
 .brow-meta { font-size: 22rpx; color: #6B7280; margin-top: 6rpx; }
 .brow-act {
   color: #D9534F; font-size: 26rpx; padding: 8rpx 16rpx; flex-shrink: 0;
