@@ -693,7 +693,6 @@ Component({
       });
     },
     onTicketSelectorEvent(e) {
-      const that = this;
       const cidx = this.data.ticketPopup.cidx;
       if (e.detail.action !== 'confirm') {
         this.setData({ 'ticketPopup.show': false });
@@ -702,6 +701,13 @@ Component({
       const ticket = e.detail.selectedTicket || null;
       const card = e.detail.selectedCard || null;
       this.setData({ 'ticketPopup.show': false });
+      this._applyTicketSelection(cidx, ticket, card);
+    },
+
+    // 选券/选卡的唯一落地口。手选弹层和扫码（onTicketScan）都走这里——
+    // 「扫出来的效果要和手选一模一样」靠的是同一段代码，不是两段写成一样
+    _applyTicketSelection(cidx, ticket, card) {
+      const that = this;
       // 选券/选卡后表单可能瞬间变「已录入」，显式记住展开态——装备卡片不自动折叠
       const curCare = this.data.displayCares[cidx];
       if (curCare && curCare._key) {
@@ -769,6 +775,151 @@ Component({
       // derive=true：服务项与价格一并由服务端按新选择推导返回
       that._fetchPrice(cidx, { derive: true });
     },
+    /* ---------- 扫码用券 ---------- */
+    // 顾客在「我的优惠券」详情页出示二维码（内容就是券码），店员扫一下：
+    // 识别券码 → 查持有者 → 需要时把开单顾客切成持有者 → 选中这张券。
+    // 落券走的是 _applyTicketSelection，与手选弹层同一段代码。
+    onTicketScan(e) {
+      const that = this;
+      const cidx = Number(e.currentTarget.dataset.cidx);
+      wx.scanCode({
+        onlyFromCamera: false,
+        success(res) {
+          const code = that._parseTicketCode(res && res.result);
+          if (!code) {
+            wx.showToast({ title: '无法识别的二维码', icon: 'none' });
+            return;
+          }
+          that._useScannedTicket(cidx, code);
+        },
+        fail() {},   // 用户主动取消扫码，不打扰
+      });
+    },
+
+    // 券详情页的码内容就是纯券码。这里只做容错：万一扫到的是带券码的链接
+    // （历史物料、别处生成的码），把券码抠出来而不是直接判"识别失败"
+    _parseTicketCode(raw) {
+      let s = (raw || '').trim();
+      if (!s) return '';
+      if (s.indexOf('http') === 0) {
+        const m = s.match(/[?&](?:code|ticketCode)=([^&#]+)/);
+        if (m) return decodeURIComponent(m[1]).trim();
+        s = s.split('#')[0].split('?')[0].replace(/\/+$/, '').split('/').pop();
+      }
+      return s.trim();
+    },
+
+    _useScannedTicket(cidx, code) {
+      const that = this;
+      const curMemberId = that.data.memberId || null;
+      wx.showLoading({ title: '识别中', mask: true });
+      data.getTicketDetailByStaffPromise(code, app.globalData.sessionKey)
+        .then((detail) => {
+          wx.hideLoading();
+          if (!detail) {
+            wx.showToast({ title: '优惠券不存在', icon: 'none' });
+            return;
+          }
+          const ownerId = Number(detail.memberId || 0) || null;
+          if (!ownerId) {
+            // 券还没落到任何会员名下（未领取/未绑定），没有"持有者"可切，也无从判断能不能用
+            wx.showModal({
+              title: '这张券还没有归属',
+              content: '该券尚未绑定会员，请顾客先在小程序里领取，再扫码使用。',
+              showCancel: false,
+            });
+            return;
+          }
+          if (ownerId === curMemberId) {
+            that._pickScannedTicket(cidx, code, ownerId);
+            return;
+          }
+          // 换人：已录进购物车的其它券属于原顾客，切完就非法了，必须一并清掉
+          const owner = (detail.memberName || '').trim() || ('会员 ' + ownerId);
+          const phone = (detail.memberPhone || '').trim();
+          const who = owner + (phone ? '（' + phone + '）' : '');
+          wx.showModal({
+            title: '切换开单顾客',
+            content: curMemberId
+              ? '这张券属于 ' + who + '。继续将把本单顾客切换为 ' + owner + '，原顾客已选的优惠券会被清除。'
+              : '这张券属于 ' + who + '。继续将把本单顾客设为 ' + owner + '。',
+            confirmText: '继续',
+            success(r) {
+              if (!r.confirm) return;
+              that._switchMemberTo(detail, ownerId, owner);
+              that._pickScannedTicket(cidx, code, ownerId);
+            },
+          });
+        })
+        .catch(() => {
+          wx.hideLoading();
+          // performWebRequest 已经 toast 过服务端的 message（券不存在 / 没有权限）
+        });
+    },
+
+    // 切开单顾客：本组件只负责清掉挂在旧顾客名下的券，customer 的真理之源在父页。
+    // 姓名/手机号必须一并回传——顶部会员条按 customer.cell 反查会员，只换 memberId
+    // 会让条上还挂着原顾客的名字和手机号
+    _switchMemberTo(detail, memberId, memberName) {
+      const cares = this.data.displayCares || [];
+      let cleared = 0;
+      cares.forEach((c, i) => {
+        if (!c.ticket_code && !c.use_card) return;
+        cleared += 1;
+        this._mutate(i, (x) => {
+          x.ticket = null;
+          x.ticket_code = null;
+          x.use_card = false;
+          x.card_id = null;
+          x.card_name = null;
+          x.card_equip_lock = false;
+          x.card_pending_open = false;
+          x.discount = 0;
+        });
+      });
+      if (cleared > 0) {
+        wx.showToast({ title: '已清除原顾客的优惠券', icon: 'none' });
+      }
+      // 本地先把 memberId 顶上：紧接着的 _pickScannedTicket → _applyTicketSelection →
+      // _fetchPrice 会把 memberId 发给 CalcCareCharge，等父页 setData 回传就晚了，
+      // 会拿旧会员算价。父页随后传回同一个值，observer 幂等（_loadDeposit 自带去重）
+      this.setData({ memberId });
+      this.triggerEvent('memberSwitch', {
+        memberId,
+        name: memberName,
+        cell: (detail.memberPhone || '').trim(),
+        gender: (detail.memberGender || '').trim(),
+      });
+    },
+
+    // 用"该会员的可用券列表"当校验：过期 / 已用 / 作废 / 不是养护线的券
+    // 一律表现为"不在列表里"，不用在前端把服务端的券状态机再实现一遍
+    _pickScannedTicket(cidx, code, memberId) {
+      const that = this;
+      const dup = (that.data.displayCares || []).some(
+        (c, i) => i !== cidx && c.ticket_code === code);
+      if (dup) {
+        wx.showToast({ title: '这张券已用在本单其它装备上', icon: 'none' });
+        return;
+      }
+      wx.showLoading({ title: '查询券', mask: true });
+      data.getMemberTicketsPromise(memberId, '养护', true, app.globalData.sessionKey)
+        .then((tickets) => {
+          wx.hideLoading();
+          const t = (tickets || []).find((x) => x && x.code === code);
+          if (!t) {
+            wx.showModal({
+              title: '这张券不能用',
+              content: '该券已使用、已过期，或不属于养护业务线。',
+              showCancel: false,
+            });
+            return;
+          }
+          that._applyTicketSelection(cidx, t, null);
+        })
+        .catch(() => wx.hideLoading());
+    },
+
     /* ---------- 会员储值 ---------- */
     // memberId 变化时拉会员资产（depositTotal）。散客 / 无余额则不显示储值行。
     _loadDeposit(memberId) {

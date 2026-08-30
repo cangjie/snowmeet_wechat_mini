@@ -116,7 +116,12 @@ Page({
         if (!ticket.canTransfer){
           wx.hideShareMenu()
         }
-        var qrCodeUrl = 'https://' + app.globalData.domainName + '/api/MediaHelper/ShowImageFromOfficialAccount?img=' + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code)
+        // 2026-08-30：从公众号带参二维码（scene=oper_ticket_code_xxx）换成"内容即券码"的普通二维码。
+        // 公众号码里编码的是 weixin.qq.com 短链，券码不在二维码内容里，店员在小程序开单页
+        // 用 wx.scanCode 扫它只能拿到那串短链、还原不出券码。
+        // 代价（用户已确认接受）：公众号 ScanTicket 那条路——店员用微信扫一扫、公众号回一条
+        // 带 miniapp_recept_path 链接的消息——随之失效。
+        var qrCodeUrl = 'https://' + app.globalData.domainName + '/api/MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(code)
         that.setData({ ticket: ticket, qrCodeUrl: qrCodeUrl })
       })
     })

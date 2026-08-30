@@ -196,3 +196,11 @@
   line-height: 1.5;
   color: #92400e;
 }
+
+/* 优惠券行：输入区 + 右侧扫码按钮 */
+.ticket-row { display: flex; align-items: center; }
+.ticket-row-input { flex: 1; min-width: 0; }
+.ticket-scan-btn {
+  flex-shrink: 0; padding: 12rpx 8rpx 12rpx 24rpx;
+  display: flex; align-items: center;
+}

@@ -99,10 +99,17 @@
               <!-- 优惠券/会员卡（互斥单选） -->
               <view class="form-group">
                 <view class="form-label">优惠券/卡</view>
-                <view class="form-input form-input--inline form-input--tap" catchtap="onTicketTap" data-cidx="{{cidx}}">
-                  <text wx:if="{{care.ticket_code}}" class="form-input-text">({{care.ticket_code}}){{care.ticket.name || '已选券'}}</text>
-                  <text wx:elif="{{care.use_card}}" class="form-input-text">(卡){{care.card_name || '已选会员卡'}}</text>
-                  <text wx:else class="form-input-placeholder">点此选择优惠券或会员卡（可跳过）</text>
+                <view class="ticket-row">
+                  <view class="form-input form-input--inline form-input--tap ticket-row-input" catchtap="onTicketTap" data-cidx="{{cidx}}">
+                    <text wx:if="{{care.ticket_code}}" class="form-input-text">({{care.ticket_code}}){{care.ticket.name || '已选券'}}</text>
+                    <text wx:elif="{{care.use_card}}" class="form-input-text">(卡){{care.card_name || '已选会员卡'}}</text>
+                    <text wx:else class="form-input-placeholder">点此选择优惠券或会员卡（可跳过）</text>
+                  </view>
+                  <!-- 扫顾客券详情页的二维码直接用券。不受"散客无可用优惠券"限制——
+                       扫码恰恰是给散客定人的手段 -->
+                  <view class="ticket-scan-btn" catchtap="onTicketScan" data-cidx="{{cidx}}">
+                    <van-icon name="scan" size="20px" color="#2EA6D0"/>
+                  </view>
                 </view>
                 <!-- 未开卡的季卡：告诉店员这次的装备会被写进卡、此后这张卡只认这块板。
                      文案随装备录入实时变化，装备没填全时会写明还缺什么 -->

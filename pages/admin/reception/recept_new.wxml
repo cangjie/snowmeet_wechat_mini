@@ -44,6 +44,7 @@
       memberId="{{customer.memberId}}"
       cares="{{order.cares}}"
       bind:syncCare="onSyncCare"
+      bind:memberSwitch="onMemberSwitchByTicket"
       bind:checkout="onCheckout" />
 
     <view wx:if="{{bizType === 'retail'}}" class="placeholder">

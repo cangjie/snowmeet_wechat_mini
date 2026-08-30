@@ -163,6 +163,25 @@ Page({
   },
 
   /* ---------- 子组件：care-recept-form 事件 ---------- */
+  /**
+   * 店员扫了顾客的优惠券二维码，而这张券属于别人：把本单顾客整体切成券的持有者。
+   * 组件那边已经清掉了原顾客的券并弹过二次确认，这里只负责改 customer/order 并落盘。
+   * 姓名和手机号一起换，否则顶部会员条会停在原顾客身上。
+   */
+  onMemberSwitchByTicket(e) {
+    const d = e.detail || {};
+    const memberId = Number(d.memberId || 0) || null;
+    if (!memberId || this.data.customer.memberId === memberId) return;
+    this.setData({
+      'customer.memberId': memberId,
+      'customer.name': d.name || '',
+      'customer.cell': d.cell || '',
+      'customer.gender': d.gender || '',
+      'order.member_id': memberId,
+    });
+    Promise.resolve(this.saveCareReceptOrder()).catch(() => {});
+  },
+
   onSyncCare(e) {
     const detail = e.detail || {};
     const cares = detail.cares || [];
