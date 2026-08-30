@@ -53,7 +53,16 @@ Component({
     if (this.data.allowFuture) {
       max.setFullYear(today.getFullYear() + 15)
     }
-    this.setData({ minDate: min.getTime(), maxDate: max.getTime() })
+    var patch = { minDate: min.getTime(), maxDate: max.getTime() }
+    // activeShortcut 初值是 'today'，但调用方传进来的初始区间往往不是今天
+    // （如"最近一周"、雪季至今）。不比对就会高亮一个与实际区间不符的快捷键。
+    if (this.data.mode !== 'single') {
+      var t = _fmt(new Date())
+      if (this.data.startDate !== t || this.data.endDate !== t) {
+        patch.activeShortcut = ''
+      }
+    }
+    this.setData(patch)
   },
 
   methods: {

@@ -1262,9 +1262,11 @@ const getOaLimitQrCodeUrlPromise = function (scene, sessionKey) {
   })
 }
 // 我发起的分享批次（不传 templateId 就是全部模板的）
-const getMyShareBatchesPromise = function (templateId, sessionKey) {
+const getMyShareBatchesPromise = function (templateId, sessionKey, startDate, endDate) {
   var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetMyShareBatches?sessionKey=' + sessionKey
   if (templateId) { url += '&templateId=' + templateId }
+  if (startDate) { url += '&startDate=' + startDate }
+  if (endDate) { url += '&endDate=' + endDate }
   return util.performWebRequest(url, null)
 }
 // 撤回分享：链接当场失效，已领走的券不受影响

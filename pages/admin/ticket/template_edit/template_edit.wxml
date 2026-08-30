@@ -157,6 +157,10 @@
         <text class="acc-arrow {{shareOpen.batch ? 'acc-arrow--open' : ''}}">›</text>
       </view>
       <view class="acc-body" wx:if="{{shareOpen.batch}}">
+        <view class="batch-filter">
+          <date-range-picker startDate="{{batchStartDate}}" endDate="{{batchEndDate}}"
+            bind:change="onBatchDateChange" />
+        </view>
         <view class="brow" wx:for="{{shareBatches}}" wx:key="batchId">
           <view class="brow-main">
             <view class="brow-title">
@@ -168,7 +172,7 @@
           </view>
           <view class="brow-act" wx:if="{{item.canRevoke}}" data-idx="{{index}}" catchtap="onRevokeBatch">撤回</view>
         </view>
-        <view class="empty" wx:if="{{shareBatches.length == 0}}">还没有分享记录</view>
+        <view class="empty" wx:if="{{shareBatches.length == 0}}">这段时间没有分享记录</view>
       </view>
     </block>
   </view>

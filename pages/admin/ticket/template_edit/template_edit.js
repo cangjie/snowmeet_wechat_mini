@@ -8,6 +8,16 @@
 // 因为这两个约束一旦破了，发出去的券要么永不过期、要么一落库就过期。
 var app = getApp()
 var data = require('../../../../utils/data.js')
+var util = require('../../../../utils/util.js')
+
+// 分享记录默认只看最近一周（含今天共 7 天）。批次会越攒越多，
+// 一进来就把历史全铺出来没意义，店员要找的基本是刚发出去的那几张。
+function defaultBatchRange() {
+  var end = new Date()
+  var start = new Date()
+  start.setDate(end.getDate() - 6)
+  return { startDate: util.formatDate(start), endDate: util.formatDate(end) }
+}
 
 // 与 [order].type 对齐（生产库订单类型就是这四个），因为 biz_type 的作用
 // 就是把券路由到对应的开单流程。没有"都不参与"这一档，必须选一个。
@@ -72,7 +82,9 @@ Page({
     rules: [],
 
     shareMode: '',             // '' | 'personal' | 'group'，点分享按钮时置位，onShareAppMessage 读完即清
-    shareBatches: [],          // 我在本模板下发起过的分享
+    shareBatches: [],          // 我在本模板下发起过的分享（按下面的日期区间筛）
+    batchStartDate: '',
+    batchEndDate: '',
     timelineSharePath: '',
     timelinePosterUrl: '',
     timelinePreparing: false,
@@ -98,7 +110,11 @@ Page({
 
   onLoad(options) {
     var id = parseInt((options && options.id) || '0', 10) || 0
-    this.setData({ id: id, isNew: id <= 0 })
+    var range = defaultBatchRange()
+    this.setData({
+      id: id, isNew: id <= 0,
+      batchStartDate: range.startDate, batchEndDate: range.endDate
+    })
   },
 
   onShow() {
@@ -423,9 +439,18 @@ Page({
   loadShareBatches() {
     var that = this
     if (that.data.id <= 0) { return }
-    data.getMyShareBatchesPromise(that.data.id, app.globalData.sessionKey).then(function (res) {
+    data.getMyShareBatchesPromise(that.data.id, app.globalData.sessionKey,
+      that.data.batchStartDate, that.data.batchEndDate).then(function (res) {
       that.setData({ shareBatches: (res && res.items) || [] })
     }).catch(function () {})
+  },
+
+  onBatchDateChange(e) {
+    this.setData({
+      batchStartDate: e.detail.startDate,
+      batchEndDate: e.detail.endDate
+    })
+    this.loadShareBatches()
   },
 
   onRevokeBatch(e) {
