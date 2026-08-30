@@ -35,6 +35,72 @@
     </view>
   </view>
 
+  <!-- 业务类型 -->
+  <view class="card">
+    <view class="sec-title">业务类型</view>
+    <view class="chip-group">
+      <view class="chip {{bizType == item.key ? 'chip--active' : ''}}"
+        wx:for="{{bizOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onBizTap">{{item.name}}</view>
+    </view>
+    <view class="sec-hint">
+      决定这个模板发出的券归哪条业务线。店员只在对应业务线的开单页选得到它——
+      养护券不会出现在租赁开单的选券弹层里，反之亦然。
+    </view>
+  </view>
+
+  <!-- 有效期 -->
+  <view class="card">
+    <view class="sec-title">有效期</view>
+    <view class="chip-group">
+      <view class="chip {{validityMode == item.key ? 'chip--active' : ''}}"
+        wx:for="{{validityOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onValidityTap">{{item.name}}</view>
+    </view>
+
+    <view class="frow" wx:if="{{validityMode == 'days'}}">
+      <text class="flabel">天数</text>
+      <input class="finput" type="number" value="{{availableDays}}"
+        data-field="availableDays" bindinput="onInput" placeholder="如 200" />
+    </view>
+    <view class="frow" wx:if="{{validityMode == 'date'}}">
+      <text class="flabel">截止日</text>
+      <date-range-picker mode="single" date="{{expireDate}}" allow-future
+        placeholder="请选择截止日" bind:change="onExpireDateChange" />
+    </view>
+
+    <view class="sec-hint" wx:if="{{validityMode == 'days'}}">
+      从券「启用当天」起算，第 N 天结束时失效。这两种口径只能选一个——同时设的话
+      实际发券会按固定日期走，天数形同虚设。
+    </view>
+    <view class="sec-hint" wx:if="{{validityMode == 'date'}}">
+      所有用这个模板发出的券，都在这一天失效，与什么时候领的无关。
+    </view>
+    <view class="sec-hint" wx:if="{{validityMode == 'forever'}}">
+      券不会自己过期。只在发券时由调用方另行指定到期日的场景（如雪票赠券、转赠回赠）才用这档。
+    </view>
+  </view>
+
+  <!-- 商品优惠 -->
+  <view class="card">
+    <view class="sec-title">商品优惠</view>
+    <view class="sec-hint">
+      这个模板的券用在哪些商品上、怎么优惠。没配到的商品按原价，券只起「能核销」的作用。
+    </view>
+
+    <view class="rrow" wx:for="{{rules}}" wx:key="id" data-idx="{{index}}" bindtap="onRuleTap">
+      <view class="rrow-main">
+        <view class="rrow-title">
+          <text class="rshop" wx:if="{{item.productShop}}">【{{item.productShop}}】</text>
+          <text class="rname">{{item.productName}}</text>
+        </view>
+        <view class="rrow-meta">{{item.discountText}}<text wx:if="{{item.priceText}}"> · {{item.priceText}}</text></view>
+      </view>
+      <view class="rrow-arrow">›</view>
+    </view>
+    <view class="empty" wx:if="{{rules.length == 0}}">还没有商品优惠</view>
+
+    <view class="rule-add" bindtap="onAddRuleTap">+ 添加商品优惠</view>
+  </view>
+
   <!-- 分享：海报 / 小程序卡片 / 记录，三个子区各自折叠 -->
   <view class="card">
     <view class="sec-title">分享</view>
@@ -105,72 +171,6 @@
         <view class="empty" wx:if="{{shareBatches.length == 0}}">还没有分享记录</view>
       </view>
     </block>
-  </view>
-
-  <!-- 业务类型 -->
-  <view class="card">
-    <view class="sec-title">业务类型</view>
-    <view class="chip-group">
-      <view class="chip {{bizType == item.key ? 'chip--active' : ''}}"
-        wx:for="{{bizOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onBizTap">{{item.name}}</view>
-    </view>
-    <view class="sec-hint">
-      决定这个模板发出的券归哪条业务线。店员只在对应业务线的开单页选得到它——
-      养护券不会出现在租赁开单的选券弹层里，反之亦然。
-    </view>
-  </view>
-
-  <!-- 有效期 -->
-  <view class="card">
-    <view class="sec-title">有效期</view>
-    <view class="chip-group">
-      <view class="chip {{validityMode == item.key ? 'chip--active' : ''}}"
-        wx:for="{{validityOptions}}" wx:key="key" data-key="{{item.key}}" bindtap="onValidityTap">{{item.name}}</view>
-    </view>
-
-    <view class="frow" wx:if="{{validityMode == 'days'}}">
-      <text class="flabel">天数</text>
-      <input class="finput" type="number" value="{{availableDays}}"
-        data-field="availableDays" bindinput="onInput" placeholder="如 200" />
-    </view>
-    <view class="frow" wx:if="{{validityMode == 'date'}}">
-      <text class="flabel">截止日</text>
-      <date-range-picker mode="single" date="{{expireDate}}" allow-future
-        placeholder="请选择截止日" bind:change="onExpireDateChange" />
-    </view>
-
-    <view class="sec-hint" wx:if="{{validityMode == 'days'}}">
-      从券「启用当天」起算，第 N 天结束时失效。这两种口径只能选一个——同时设的话
-      实际发券会按固定日期走，天数形同虚设。
-    </view>
-    <view class="sec-hint" wx:if="{{validityMode == 'date'}}">
-      所有用这个模板发出的券，都在这一天失效，与什么时候领的无关。
-    </view>
-    <view class="sec-hint" wx:if="{{validityMode == 'forever'}}">
-      券不会自己过期。只在发券时由调用方另行指定到期日的场景（如雪票赠券、转赠回赠）才用这档。
-    </view>
-  </view>
-
-  <!-- 商品优惠 -->
-  <view class="card">
-    <view class="sec-title">商品优惠</view>
-    <view class="sec-hint">
-      这个模板的券用在哪些商品上、怎么优惠。没配到的商品按原价，券只起「能核销」的作用。
-    </view>
-
-    <view class="rrow" wx:for="{{rules}}" wx:key="id" data-idx="{{index}}" bindtap="onRuleTap">
-      <view class="rrow-main">
-        <view class="rrow-title">
-          <text class="rshop" wx:if="{{item.productShop}}">【{{item.productShop}}】</text>
-          <text class="rname">{{item.productName}}</text>
-        </view>
-        <view class="rrow-meta">{{item.discountText}}<text wx:if="{{item.priceText}}"> · {{item.priceText}}</text></view>
-      </view>
-      <view class="rrow-arrow">›</view>
-    </view>
-    <view class="empty" wx:if="{{rules.length == 0}}">还没有商品优惠</view>
-
-    <view class="rule-add" bindtap="onAddRuleTap">+ 添加商品优惠</view>
   </view>
 
   <button class="btn-save" loading="{{saving}}" bindtap="onSave">保存</button>
