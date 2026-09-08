@@ -9,6 +9,7 @@ Component({
     pageKey: '',
     pageHelp: null,
     messages: [],
+    queryMode: false,
     input: '',
     error: ''
   },
@@ -86,6 +87,10 @@ Component({
       this.setData({ input: event.detail.value })
     },
 
+    onQueryMode() {
+      this.setData({ queryMode: true, error: '' })
+    },
+
     onRetry() {
       this.setData({ error: '' })
       if (this.data.pageHelp) this.sendQuestion()
@@ -108,6 +113,10 @@ Component({
     async sendQuestion() {
       var question = (this.data.input || '').trim()
       if (!question || this.data.loading) return
+      if (this.data.queryMode) {
+        this.queryRentOrders(question)
+        return
+      }
       var nextMessages = this.data.messages.concat([{ role: 'user', content: question }])
       this.setData({ messages: nextMessages, input: '', loading: true, error: '' })
       try {
@@ -120,6 +129,30 @@ Component({
         this.setData({ messages: nextMessages, loading: false })
       } catch (error) {
         this.setData({ loading: false, error: '暂时无法获得回答' })
+      }
+    },
+
+    async queryRentOrders(question) {
+      this.setData({ loading: true, error: '' })
+      try {
+        var app = getApp()
+        await app.loginPromiseNew
+        var result = await data.queryRentOrdersByNaturalLanguagePromise(question, app.globalData.sessionKey)
+        if (result.status && result.status !== 'ready') {
+          this.setData({ messages: this.data.messages.concat([{ role: 'assistant', content: result.clarification || '请补充查询条件后再试。' }]), loading: false })
+          return
+        }
+        var summary = result.summary || {}
+        var parts = ['已按条件查询 ' + (summary.total || 0) + ' 单租赁订单。']
+        if (summary.chargeTotal != null) parts.push('应收合计 ¥' + Number(summary.chargeTotal).toFixed(2) + '；实收 ¥' + Number(summary.paidTotal || 0).toFixed(2) + '；退款 ¥' + Number(summary.refundTotal || 0).toFixed(2) + '。')
+        if (summary.unpaidCount > 0) parts.push('其中有 ' + summary.unpaidCount + ' 单尚未完成支付，建议优先核对。')
+        if (summary.note) parts.push(summary.note)
+        this.setData({
+          messages: this.data.messages.concat([{ role: 'user', content: question }, { role: 'assistant', content: parts.join('\n') }]),
+          input: '', queryMode: false, loading: false
+        })
+      } catch (error) {
+        this.setData({ loading: false, error: '暂时无法完成数据查询' })
       }
     }
   }

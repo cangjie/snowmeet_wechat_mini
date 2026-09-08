@@ -8,6 +8,7 @@
   <view class="help-panel">
     <view class="help-header">
       <view class="help-title">页面帮助</view>
+      <van-button wx:if="{{pageKey == 'pages/admin/rent/new_rent_list'}}" size="small" plain type="primary" bindtap="onQueryMode">查询数据</van-button>
       <van-icon name="cross" size="20px" bindtap="onClose" />
     </view>
     <scroll-view class="help-content" scroll-y>
@@ -29,7 +30,7 @@
       <view wx:if="{{loading && pageHelp}}" class="help-state">正在获取回答...</view>
     </scroll-view>
     <view class="help-input-bar">
-      <textarea class="help-input" value="{{input}}" maxlength="12000" auto-height placeholder="输入你的问题" bindinput="onInput" />
+      <textarea class="help-input" value="{{input}}" maxlength="12000" auto-height placeholder="{{queryMode ? '例如：查询本周未支付的租赁订单' : '输入你的问题'}}" bindinput="onInput" />
       <van-button type="primary" size="small" loading="{{loading}}" disabled="{{!input}}" bindtap="sendQuestion">发送</van-button>
     </view>
   </view>

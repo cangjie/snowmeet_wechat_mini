@@ -513,6 +513,11 @@ const askAdminPageHelpPromise = function (pageKey, question, sessionKey, busines
     business_context: businessContext || null
   })
 }
+const queryRentOrdersByNaturalLanguagePromise = function (question, sessionKey) {
+  var qUrl = app.globalData.requestPrefix + 'AdminAi/QueryRentOrdersByNaturalLanguage?sessionKey=' + sessionKey
+    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(qUrl, { question: question })
+}
 const GetUnCommonPayMethodPromise = function () {
   var getPayMethodUrl = app.globalData.requestPrefix + 'Order/GetUnCommonPayMethod'
   return new Promise(function (resolve, reject) {
@@ -1760,6 +1765,7 @@ module.exports = {
   getOrderByStaffPromise,
   getAdminPageHelpPromise,
   askAdminPageHelpPromise,
+  queryRentOrdersByNaturalLanguagePromise,
   GetUnCommonPayMethodPromise,
   updateOrderPromise,
   cancelPayingPromise,
