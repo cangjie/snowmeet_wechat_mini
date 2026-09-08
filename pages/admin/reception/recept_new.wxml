@@ -56,3 +56,5 @@
   <!-- 接待 tabbar -->
   <reception-tabbar active="open" />
 </view>
+
+<admin-page-help />

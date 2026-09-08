@@ -26,3 +26,5 @@
       bind:sortChange="onSortChange" />
   </view>
 </view>
+
+<admin-page-help />

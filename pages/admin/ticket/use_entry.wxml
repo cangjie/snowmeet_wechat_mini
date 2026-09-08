@@ -3,3 +3,4 @@
     <image style="height: 400rpx;width: 400rpx;" src="{{qrcodeUrl}}" ></image>
   </view>
 </view>
+<admin-page-help />

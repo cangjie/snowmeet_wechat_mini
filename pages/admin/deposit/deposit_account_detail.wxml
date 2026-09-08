@@ -47,3 +47,5 @@
     <text class="empty-txt">账户不存在</text>
   </view>
 </view>
+
+<admin-page-help />

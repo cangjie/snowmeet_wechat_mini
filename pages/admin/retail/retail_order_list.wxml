@@ -172,3 +172,4 @@
     <view style="height: 20rpx;"></view>
   </block>
 </view>
+<admin-page-help />

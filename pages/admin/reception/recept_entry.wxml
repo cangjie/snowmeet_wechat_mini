@@ -179,3 +179,5 @@
     </view>
   </van-popup>
 </view>
+
+<admin-page-help />

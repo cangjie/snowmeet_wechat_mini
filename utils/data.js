@@ -499,6 +499,20 @@ const getOrderByStaffPromise = function (orderId, sessionKey) {
     })
   })
 }
+const getAdminPageHelpPromise = function (pageKey, sessionKey, businessContext) {
+  var qUrl = app.globalData.requestPrefix + 'AdminAi/GetPageHelpByStaff?sessionKey=' + sessionKey
+    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(qUrl, { page_key: pageKey, business_context: businessContext || null })
+}
+const askAdminPageHelpPromise = function (pageKey, question, sessionKey, businessContext) {
+  var qUrl = app.globalData.requestPrefix + 'AdminAi/AskPageHelpByStaff?sessionKey=' + sessionKey
+    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(qUrl, {
+    page_key: pageKey,
+    question: question,
+    business_context: businessContext || null
+  })
+}
 const GetUnCommonPayMethodPromise = function () {
   var getPayMethodUrl = app.globalData.requestPrefix + 'Order/GetUnCommonPayMethod'
   return new Promise(function (resolve, reject) {
@@ -1744,6 +1758,8 @@ module.exports = {
   getOrdersByStaffPromise,
   getRentOrdersByStaffPagedPromise,
   getOrderByStaffPromise,
+  getAdminPageHelpPromise,
+  askAdminPageHelpPromise,
   GetUnCommonPayMethodPromise,
   updateOrderPromise,
   cancelPayingPromise,

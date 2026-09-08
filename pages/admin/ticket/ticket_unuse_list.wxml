@@ -31,3 +31,4 @@
     <view style="height: 15rpx;"></view>
   </view>
 </view>
+<admin-page-help />

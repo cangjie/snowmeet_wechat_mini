@@ -1,0 +1,36 @@
+<view class="help-fab {{fabMoved ? 'help-fab--moved' : ''}}" style="{{fabStyle}}" bindtap="onOpen"
+  bindtouchstart="onFabTouchStart" catchtouchmove="onFabTouchMove" bindtouchend="onFabTouchEnd"
+  aria-label="页面帮助">
+  <van-icon name="question" size="22px" color="#ffffff" />
+</view>
+
+<van-popup show="{{visible}}" position="bottom" round bind:close="onClose" custom-style="height: 78vh;">
+  <view class="help-panel">
+    <view class="help-header">
+      <view class="help-title">页面帮助</view>
+      <van-icon name="cross" size="20px" bindtap="onClose" />
+    </view>
+    <scroll-view class="help-content" scroll-y>
+      <view wx:if="{{loading && !pageHelp}}" class="help-state">正在整理页面说明...</view>
+      <view wx:if="{{error}}" class="help-error">
+        <text>{{error}}</text>
+        <van-button size="small" plain type="primary" bindtap="onRetry">重试</van-button>
+      </view>
+      <view wx:if="{{pageHelp}}" class="help-answer">
+        <text selectable="true">{{pageHelp.answer}}</text>
+        <view wx:if="{{pageHelp.citations.length}}" class="citation-list">依据项目资料生成</view>
+      </view>
+      <block wx:for="{{messages}}" wx:key="index">
+        <view class="chat-message chat-message--{{item.role}}">
+          <text selectable="true">{{item.content}}</text>
+          <view wx:if="{{item.citations.length}}" class="citation-list">依据项目资料生成</view>
+        </view>
+      </block>
+      <view wx:if="{{loading && pageHelp}}" class="help-state">正在获取回答...</view>
+    </scroll-view>
+    <view class="help-input-bar">
+      <textarea class="help-input" value="{{input}}" maxlength="12000" auto-height placeholder="输入你的问题" bindinput="onInput" />
+      <van-button type="primary" size="small" loading="{{loading}}" disabled="{{!input}}" bindtap="sendQuestion">发送</van-button>
+    </view>
+  </view>
+</van-popup>

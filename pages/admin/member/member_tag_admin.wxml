@@ -56,3 +56,5 @@
     </scroll-view>
   </view>
 </view>
+
+<admin-page-help />

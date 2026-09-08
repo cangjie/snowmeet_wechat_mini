@@ -104,3 +104,4 @@
     <category-selector bindCancel="cancelPopUp" bindConfirm="confirmCategory"></category-selector>
   </van-popup>
 </view>
+<admin-page-help />

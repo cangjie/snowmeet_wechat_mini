@@ -39,3 +39,5 @@
 
   <button class="btn-add" wx:if="{{view == 'active'}}" bindtap="onAddTap">新建模板</button>
 </view>
+
+<admin-page-help />

@@ -66,3 +66,4 @@
     </view>
   </page-container>
 </view>
+<admin-page-help />

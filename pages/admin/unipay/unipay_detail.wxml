@@ -67,3 +67,4 @@
     <image style="width: 300rpx;height: 300rpx;"  src="{{qrcodeUrl}}" ></image>
   </view>
 </view>
+<admin-page-help />

@@ -186,3 +186,5 @@
   <view wx:if="{{!querying && total == 0}}" class="empty-tip">暂无匹配订单</view>
 
 </view>
+
+<admin-page-help />

@@ -155,5 +155,6 @@
     "van-dropdown-item": "@vant/weapp/dropdown-item/index",
     "date-selector": "/components/date_selector/date_selector",
     "van-calendar": "@vant/weapp/calendar/index"
+    ,"admin-page-help": "/components/admin-page-help/index"
   }
 }

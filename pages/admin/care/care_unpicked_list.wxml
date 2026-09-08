@@ -134,3 +134,5 @@
   <view wx:if="{{!querying && total == 0}}" class="empty-tip">暂无未发板装备</view>
 
 </view>
+
+<admin-page-help />

@@ -74,3 +74,5 @@
     <view class="panel-cancel" bindtap="onEditClose">取消</view>
   </view>
 </view>
+
+<admin-page-help />

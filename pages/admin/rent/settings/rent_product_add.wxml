@@ -47,3 +47,4 @@
   </view>
   </mp-cell>
 </mp-cells>
+<admin-page-help />

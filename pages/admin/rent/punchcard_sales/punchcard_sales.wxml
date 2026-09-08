@@ -72,3 +72,5 @@
     page-size="{{pageSize}}" disabled="{{loading}}" bind:change="onPagerChange" />
 
 </view>
+
+<admin-page-help />

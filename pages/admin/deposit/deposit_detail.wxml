@@ -83,3 +83,4 @@
     <button class="input" bindtap="setShow" > {{showAll? '显示当前记录':'显示全部'}} </button>
   </view>
 </view>
+<admin-page-help />

@@ -60,3 +60,5 @@
   <list-pager wx:if="{{total > 0}}" page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
               disabled="{{querying}}" bind:change="onPagerChange" />
 </view>
+
+<admin-page-help />

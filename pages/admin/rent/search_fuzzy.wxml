@@ -28,3 +28,4 @@
     </mp-cell>
   </mp-cells>
 </view>
+<admin-page-help />

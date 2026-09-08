@@ -118,3 +118,5 @@
 
   <view wx:if="{{!querying && total == 0}}" class="empty-tip">暂无未完成养护装备</view>
 </view>
+
+<admin-page-help />

@@ -26,3 +26,4 @@
 <view wx:else style="margin-top: 200rpx;">
   <button bindtap="reload" class="input" >授权后点击重新进入小程序</button>
 </view>
+<admin-page-help />

@@ -307,3 +307,5 @@
     </view>
   </view>
 </view>
+
+<admin-page-help />

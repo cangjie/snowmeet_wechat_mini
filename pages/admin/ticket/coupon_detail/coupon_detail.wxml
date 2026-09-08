@@ -58,3 +58,5 @@
 
   <view class="empty" wx:if="{{!loading && !ticket}}">没有找到这张优惠券</view>
 </view>
+
+<admin-page-help />

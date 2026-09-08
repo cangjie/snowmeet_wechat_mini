@@ -97,3 +97,4 @@
 <view wx:else >
   您不是管理员
 </view>
+<admin-page-help />

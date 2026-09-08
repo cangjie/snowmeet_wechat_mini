@@ -202,3 +202,4 @@
   </mp-cells>
   <button bindtap="goBack"> 返 回 </button>
 </view>
+<admin-page-help />
