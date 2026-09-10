@@ -182,6 +182,21 @@ test('网络错误保留原问题供重试，成功重试只追加一次问答',
   } finally { loaded.restore(); cleanGlobals() }
 })
 
+test('超过 API 2000 字符上限的问题显示安全反馈且不调用统一接口', async () => {
+  assistant.clearContext()
+  let calls = 0
+  const loaded = loadComponentWithData({ askAdminAssistantPromise: async () => { calls++ } })
+  installAppAndWx()
+  try {
+    loaded.instance.data.input = '问'.repeat(2001)
+    await loaded.instance.sendQuestion()
+    assert.equal(calls, 0)
+    assert.equal(loaded.instance.data.error, '问题不能超过 2000 个字符')
+    assert.equal(loaded.instance.data.retryable, false)
+    assert.equal(loaded.instance.data.loading, false)
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
 test('跳转失败时保留服务端文字并显示安全反馈', async () => {
   assistant.clearContext()
   const loaded = loadComponentWithData({ askAdminAssistantPromise: async () => response('共查询到 12 单。', [{ type: 'rental_order.show_results', status: 'completed', state: aprilState }]) })
@@ -414,5 +429,32 @@ test('A 的重试请求在切换到 B 后不恢复 A 的对话或错误状态', 
     assert.equal(loaded.instance.data.retryable, false)
     assert.equal(loaded.instance.data.pageHelp, null)
     assert.deepEqual(loaded.instance.data.messages, [])
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('同一 owner 的旧 stale 请求不清除新请求 loading，当前 stale 请求会结算 loading', async () => {
+  assistant.clearContext()
+  const rejecters = []
+  const loaded = loadComponentWithData({
+    askAdminAssistantPromise: async () => new Promise((resolve, reject) => { rejecters.push(reject) }),
+    isAdminAssistantStaleSessionError: error => error && error.code === 'stale_session'
+  })
+  installAppAndWx()
+  try {
+    loaded.instance.data.pageKey = 'pages/admin/rent/new_rent_list'
+    const older = loaded.instance.loadPageHelp()
+    await new Promise(resolve => setImmediate(resolve))
+    const current = loaded.instance.loadPageHelp()
+    await new Promise(resolve => setImmediate(resolve))
+    const stale = new Error('登录状态已变化，请重新提问。')
+    stale.code = 'stale_session'
+    rejecters[0](stale)
+    await older
+    assert.equal(loaded.instance.data.loading, true)
+    rejecters[1](stale)
+    await current
+    assert.equal(loaded.instance.data.loading, false)
+    assert.equal(loaded.instance.data.error, '')
+    assert.equal(loaded.instance.data.retryable, false)
   } finally { loaded.restore(); cleanGlobals() }
 })

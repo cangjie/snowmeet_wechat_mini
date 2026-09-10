@@ -15,6 +15,10 @@ function sameOwner(left, right) {
     left.sessionKey === right.sessionKey && left.generation === right.generation
 }
 
+function samePendingRequest(pending, owner, token) {
+  return !!pending && pending.token === token && sameOwner(pending.owner, owner)
+}
+
 Component({
   data: {
     visible: false,
@@ -142,38 +146,50 @@ Component({
       if (!this.isCurrentUiOwner(prepared.owner)) return
       var question = (this.data.input || '').trim()
       if (!question || this.data.loading) return
+      if (question.length > 2000) {
+        this.setData({ error: '问题不能超过 2000 个字符', retryable: false, lastQuestion: '' })
+        return
+      }
       return this.requestAnswer(question, true, '暂时无法获得回答', prepared)
     },
 
     async requestAnswer(question, appendUserMessage, errorMessage, prepared) {
       if (!this.isCurrentUiOwner(prepared.owner)) return
-      this._pendingRequestOwner = prepared.owner
+      var requestToken = (this._nextRequestToken || 0) + 1
+      this._nextRequestToken = requestToken
+      this._pendingRequest = { owner: prepared.owner, token: requestToken }
       this.setData({
         input: '', loading: true, error: '', retryable: false, traceId: '', failureType: '',
         lastQuestion: question, lastAppendUserMessage: appendUserMessage,
         lastErrorMessage: errorMessage
       })
       try {
-        await this.ask(question, appendUserMessage, prepared)
+        await this.ask(question, appendUserMessage, prepared, requestToken)
       } catch (error) {
         if (typeof data.isAdminAssistantStaleSessionError === 'function' &&
             data.isAdminAssistantStaleSessionError(error)) {
-          this.isCurrentUiOwner(prepared.owner)
+          if (this.isCurrentUiOwner(prepared.owner) &&
+              samePendingRequest(this._pendingRequest, prepared.owner, requestToken)) {
+            this._pendingRequest = null
+            this.setData({ loading: false })
+          }
           return
         }
-        if (!this.isCurrentUiOwner(prepared.owner)) return
-        this._pendingRequestOwner = null
+        if (!this.isCurrentUiOwner(prepared.owner) ||
+            !samePendingRequest(this._pendingRequest, prepared.owner, requestToken)) return
+        this._pendingRequest = null
         this.setData({ loading: false, error: errorMessage, retryable: true })
       }
     },
 
-    async ask(question, appendUserMessage, prepared) {
+    async ask(question, appendUserMessage, prepared, requestToken) {
       var app = prepared.app
       var conversation = this.data.messages
       var request = adminAssistant.buildRequest(this.data.pageKey, question, conversation, app.globalData.staff)
       var result = await data.askAdminAssistantPromise(request, app.globalData.sessionKey)
-      if (!this.isCurrentUiOwner(prepared.owner) || !sameOwner(this._pendingRequestOwner, prepared.owner)) return
-      this._pendingRequestOwner = null
+      if (!this.isCurrentUiOwner(prepared.owner) ||
+          !samePendingRequest(this._pendingRequest, prepared.owner, requestToken)) return
+      this._pendingRequest = null
       var failure = typeof data.getAdminAssistantFailure === 'function'
         ? data.getAdminAssistantFailure(result) : null
       if (!failure) adminAssistant.acceptContext(app.globalData.staff, result.context)
@@ -244,7 +260,7 @@ Component({
       }
       next.generation = this._uiOwner.generation + 1
       this._uiOwner = next
-      this._pendingRequestOwner = null
+      this._pendingRequest = null
       this._pendingActionOwner = null
       this.setData({
         pageHelp: null, messages: [], queryHint: false, input: '', loading: false,

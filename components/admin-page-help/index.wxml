@@ -34,7 +34,7 @@
       <view wx:if="{{loading && pageHelp}}" class="help-state">正在获取回答...</view>
     </scroll-view>
     <view class="help-input-bar">
-      <textarea class="help-input" value="{{input}}" maxlength="12000" auto-height placeholder="{{queryHint ? '例如：请查询今年四月份的租赁订单' : '输入你的问题'}}" bindinput="onInput" />
+      <textarea class="help-input" value="{{input}}" maxlength="2000" auto-height placeholder="{{queryHint ? '例如：请查询今年四月份的租赁订单' : '输入你的问题'}}" bindinput="onInput" />
       <van-button type="primary" size="small" loading="{{loading}}" disabled="{{!input}}" bindtap="sendQuestion">发送</van-button>
     </view>
   </view>
