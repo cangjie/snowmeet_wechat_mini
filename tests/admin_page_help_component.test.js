@@ -2,6 +2,7 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 
 const assistant = require('../utils/adminAssistant.js')
+const adminAiQuery = require('../utils/adminAiQuery.js')
 
 const aprilState = {
   start_date: '2026-04-01', end_date: '2026-04-30', shop: '万龙服务中心',
@@ -89,8 +90,30 @@ test('初始页面说明和错误回复均使用统一响应', async () => {
     assert.equal(initialRequest.question, '请说明当前页面的用途、标准操作步骤、关键限制和常见错误。')
     assert.deepEqual(initialRequest.conversation, [])
     assert.equal(loaded.instance.data.pageHelp.text, '请先选择筛选条件。')
+    assert.deepEqual(loaded.instance.data.messages, [])
     const failed = loadComponentWithData({ askAdminAssistantPromise: async () => { throw new Error('network') } })
     try { failed.instance.data.input = '这个页面怎么操作'; await failed.instance.sendQuestion(); assert.equal(failed.instance.data.error, '暂时无法获得回答') } finally { failed.restore() }
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('初始页面说明保留单独展示，后续回答只加入聊天记录', async () => {
+  assistant.clearContext()
+  let calls = 0
+  const loaded = loadComponentWithData({ askAdminAssistantPromise: async () => {
+    calls++
+    return response(calls === 1 ? '这是初始页面说明。' : '这是后续回答。')
+  } })
+  installAppAndWx()
+  try {
+    loaded.instance.data.pageKey = 'pages/admin/rent/new_rent_list'
+    await loaded.instance.loadPageHelp()
+    loaded.instance.data.input = '这个筛选怎么用'
+    await loaded.instance.sendQuestion()
+    assert.equal(loaded.instance.data.pageHelp.text, '这是初始页面说明。')
+    assert.deepEqual(loaded.instance.data.messages, [
+      { role: 'user', content: '这个筛选怎么用' },
+      { role: 'assistant', content: '这是后续回答。', citations: [] }
+    ])
   } finally { loaded.restore(); cleanGlobals() }
 })
 
@@ -102,7 +125,34 @@ test('未知客户端 action 保留服务端文字且不跳转', async () => {
     loaded.instance.data.input = '执行一个不支持的操作'; await loaded.instance.sendQuestion()
     assert.equal(loaded.instance.data.messages.at(-1).content, '服务器已处理说明。')
     assert.equal(loaded.instance.data.error, '当前版本暂不支持此操作，请升级后重试')
+    assert.equal(loaded.instance.data.retryable, false)
     assert.deepEqual(navigations, [])
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('网络错误保留原问题供重试，成功重试只追加一次问答', async () => {
+  assistant.clearContext()
+  let calls = 0
+  const loaded = loadComponentWithData({ askAdminAssistantPromise: async () => {
+    calls++
+    if (calls === 1) throw new Error('network')
+    return response('重试后的回答。')
+  } })
+  installAppAndWx()
+  try {
+    loaded.instance.data.input = '这个页面怎么操作'
+    await loaded.instance.sendQuestion()
+    assert.equal(loaded.instance.data.input, '')
+    assert.equal(loaded.instance.data.retryable, true)
+    assert.equal(loaded.instance.data.lastQuestion, '这个页面怎么操作')
+    await loaded.instance.onRetry()
+    assert.equal(calls, 2)
+    assert.equal(loaded.instance.data.error, '')
+    assert.equal(loaded.instance.data.retryable, false)
+    assert.deepEqual(loaded.instance.data.messages, [
+      { role: 'user', content: '这个页面怎么操作' },
+      { role: 'assistant', content: '重试后的回答。', citations: [] }
+    ])
   } finally { loaded.restore(); cleanGlobals() }
 })
 
@@ -118,5 +168,26 @@ test('跳转失败时保留服务端文字并显示安全反馈', async () => {
     navigationFailure(new Error('route missing'))
     assert.equal(loaded.instance.data.messages.at(-1).content, '共查询到 12 单。')
     assert.equal(loaded.instance.data.error, '当前版本暂不支持此操作，请升级后重试')
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('超长 CJK 关键词或编码后超限的完整 action 均保留文字且不跳转', async () => {
+  assistant.clearContext()
+  const oversizedStates = [
+    { ...aprilState, keyword: '雪'.repeat(1000) },
+    { ...aprilState, shop: '万'.repeat(64), rent_status: '未'.repeat(64), keyword: '雪'.repeat(100) }
+  ]
+  assert.equal(assistant.isValidQueryState(oversizedStates[1]), true)
+  assert.ok(adminAiQuery.buildRentOrderListUrl(oversizedStates[1]).length > 1800)
+  let index = 0
+  const loaded = loadComponentWithData({ askAdminAssistantPromise: async () => response('共查询到 12 单。', [{ type: 'rental_order.show_results', status: 'completed', state: oversizedStates[index++] }]) })
+  const navigations = installAppAndWx()
+  try {
+    loaded.instance.data.input = '第一条超长查询'; await loaded.instance.sendQuestion()
+    loaded.instance.data.input = '第二条超长查询'; await loaded.instance.sendQuestion()
+    assert.equal(loaded.instance.data.messages.at(-1).content, '共查询到 12 单。')
+    assert.equal(loaded.instance.data.error, '当前版本暂不支持此操作，请升级后重试')
+    assert.equal(loaded.instance.data.retryable, false)
+    assert.deepEqual(navigations, [])
   } finally { loaded.restore(); cleanGlobals() }
 })

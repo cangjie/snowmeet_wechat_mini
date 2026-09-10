@@ -12,7 +12,11 @@ Component({
     messages: [],
     queryHint: false,
     input: '',
-    error: ''
+    error: '',
+    retryable: false,
+    lastQuestion: '',
+    lastAppendUserMessage: false,
+    lastErrorMessage: ''
   },
 
   lifetimes: {
@@ -93,29 +97,39 @@ Component({
     },
 
     onRetry() {
-      this.setData({ error: '' })
-      if (this.data.pageHelp) this.sendQuestion()
-      else this.loadPageHelp()
+      if (!this.data.retryable || this.data.loading || !this.data.lastQuestion) return
+      return this.requestAnswer(
+        this.data.lastQuestion,
+        this.data.lastAppendUserMessage,
+        this.data.lastErrorMessage
+      )
     },
 
     async loadPageHelp() {
       if (!this.data.pageKey) return
-      this.setData({ loading: true, error: '' })
-      try {
-        await this.ask('请说明当前页面的用途、标准操作步骤、关键限制和常见错误。', false)
-      } catch (error) {
-        this.setData({ loading: false, error: '暂时无法获取页面说明' })
-      }
+      return this.requestAnswer(
+        '请说明当前页面的用途、标准操作步骤、关键限制和常见错误。',
+        false,
+        '暂时无法获取页面说明'
+      )
     },
 
     async sendQuestion() {
       var question = (this.data.input || '').trim()
       if (!question || this.data.loading) return
-      this.setData({ loading: true, error: '' })
+      return this.requestAnswer(question, true, '暂时无法获得回答')
+    },
+
+    async requestAnswer(question, appendUserMessage, errorMessage) {
+      this.setData({
+        input: '', loading: true, error: '', retryable: false,
+        lastQuestion: question, lastAppendUserMessage: appendUserMessage,
+        lastErrorMessage: errorMessage
+      })
       try {
-        await this.ask(question, true)
+        await this.ask(question, appendUserMessage)
       } catch (error) {
-        this.setData({ loading: false, error: '暂时无法获得回答' })
+        this.setData({ loading: false, error: errorMessage, retryable: true })
       }
     },
 
@@ -127,15 +141,21 @@ Component({
       var result = await data.askAdminAssistantPromise(request, app.globalData.sessionKey)
       adminAssistant.acceptContext(app.globalData.staff, result.context)
       var next = appendUserMessage ? conversation.concat([{ role: 'user', content: question }]) : conversation.slice()
-      next.push({ role: 'assistant', content: result.reply.text, citations: result.reply.citations || [] })
-      this.setData({ messages: next, pageHelp: result.reply, input: '', loading: false })
+      if (appendUserMessage) {
+        next.push({ role: 'assistant', content: result.reply.text, citations: result.reply.citations || [] })
+        this.setData({ messages: next, input: '', loading: false, retryable: false, lastQuestion: '' })
+      } else {
+        this.setData({ pageHelp: result.reply, input: '', loading: false, retryable: false, lastQuestion: '' })
+      }
       try {
         adminAssistant.executeActions(result.actions, url => wx.navigateTo({
           url,
-          fail: () => this.setData({ error: '当前版本暂不支持此操作，请升级后重试' })
+          fail: () => this.setData({
+            error: '当前版本暂不支持此操作，请升级后重试', retryable: false, lastQuestion: ''
+          })
         }))
       } catch (error) {
-        this.setData({ error: '当前版本暂不支持此操作，请升级后重试' })
+        this.setData({ error: '当前版本暂不支持此操作，请升级后重试', retryable: false, lastQuestion: '' })
       }
     }
   }

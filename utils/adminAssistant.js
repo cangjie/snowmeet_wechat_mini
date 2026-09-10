@@ -8,6 +8,7 @@ const queryFields = [
 const nullableBooleanFields = new Set([
   'is_test', 'is_entertain', 'have_discount', 'use_card', 'has_retail'
 ])
+const maxRentOrderListUrlLength = 1800
 
 let ownerStaffId = null
 let ownerSessionKey = null
@@ -57,6 +58,10 @@ function isNullableString(value) {
   return value == null || typeof value === 'string'
 }
 
+function isBoundedNullableString(value, maxLength) {
+  return isNullableString(value) && (value == null || value.length <= maxLength)
+}
+
 function isValidQueryState(state) {
   if (!isPlainObject(state)) return false
   if (Object.keys(state).some(key => !queryFields.includes(key))) return false
@@ -65,8 +70,8 @@ function isValidQueryState(state) {
   const startDate = new Date(state.start_date.slice(0, 10) + 'T00:00:00Z')
   const endDate = new Date(state.end_date.slice(0, 10) + 'T00:00:00Z')
   if (endDate < startDate || endDate - startDate > 365 * 24 * 60 * 60 * 1000) return false
-  if (!isNullableString(state.shop) || !isNullableString(state.rent_status) ||
-      !isNullableString(state.keyword)) return false
+  if (!isBoundedNullableString(state.shop, 64) || !isBoundedNullableString(state.rent_status, 64) ||
+      !isBoundedNullableString(state.keyword, 100)) return false
   if (state.cell_suffix != null && (!/^\d{4,15}$/.test(state.cell_suffix))) return false
   return queryFields.every(key =>
     !nullableBooleanFields.has(key) || state[key] == null || typeof state[key] === 'boolean'
@@ -135,7 +140,10 @@ function executeActions(actions, navigateTo) {
       throw new Error(unsupportedActionMessage)
     }
     const url = adminAiQuery.buildRentOrderListUrl(action.state)
-    if (typeof url !== 'string' || !/^\/pages\/admin\/rent\/new_rent_list\?aiIntent=/.test(url)) {
+    // buildRentOrderListUrl percent-encodes the JSON, so URL length measures the
+    // encoded transport payload rather than the source JavaScript string length.
+    if (typeof url !== 'string' || url.length > maxRentOrderListUrlLength ||
+        !/^\/pages\/admin\/rent\/new_rent_list\?aiIntent=/.test(url)) {
       throw new Error(unsupportedActionMessage)
     }
     navigateTo(url)

@@ -15,7 +15,7 @@
       <view wx:if="{{loading && !pageHelp}}" class="help-state">正在整理页面说明...</view>
       <view wx:if="{{error}}" class="help-error">
         <text>{{error}}</text>
-        <van-button size="small" plain type="primary" bindtap="onRetry">重试</van-button>
+        <van-button wx:if="{{retryable}}" size="small" plain type="primary" bindtap="onRetry">重试</van-button>
       </view>
       <view wx:if="{{pageHelp}}" class="help-answer">
         <text selectable="true">{{pageHelp.text}}</text>
