@@ -10,6 +10,8 @@ const nullableBooleanFields = new Set([
 ])
 
 let ownerStaffId = null
+let ownerSessionKey = null
+let contextGeneration = 0
 let context = emptyContext()
 
 function emptyContext() {
@@ -24,8 +26,20 @@ function syncStaff(staff) {
   const nextStaffId = staff && staff.id != null ? String(staff.id) : null
   if (nextStaffId !== ownerStaffId) {
     ownerStaffId = nextStaffId
+    ownerSessionKey = null
+    contextGeneration++
     context = emptyContext()
   }
+}
+
+function captureRequestOwner(sessionKey) {
+  const nextSessionKey = sessionKey == null ? null : String(sessionKey)
+  if (ownerSessionKey != null && ownerSessionKey !== nextSessionKey) {
+    context = emptyContext()
+    contextGeneration++
+  }
+  ownerSessionKey = nextSessionKey
+  return { staffId: ownerStaffId, sessionKey: ownerSessionKey, generation: contextGeneration }
 }
 
 function isPlainObject(value) {
@@ -87,6 +101,7 @@ function buildRequest(pageKey, question, conversation, staff) {
 function acceptContext(staff, nextContext) {
   syncStaff(staff)
   context = isValidContext(nextContext) ? copy(nextContext) : emptyContext()
+  contextGeneration++
   return currentContext(staff)
 }
 
@@ -97,7 +112,17 @@ function currentContext(staff) {
 
 function clearContext() {
   ownerStaffId = null
+  ownerSessionKey = null
+  contextGeneration++
   context = emptyContext()
+}
+
+function clearContextForOwner(owner) {
+  if (!owner || owner.staffId !== ownerStaffId || owner.sessionKey !== ownerSessionKey ||
+      owner.generation !== contextGeneration) return false
+  context = emptyContext()
+  contextGeneration++
+  return true
 }
 
 function executeActions(actions, navigateTo) {
@@ -122,6 +147,8 @@ module.exports = {
   acceptContext,
   currentContext,
   clearContext,
+  captureRequestOwner,
+  clearContextForOwner,
   executeActions,
   isValidQueryState,
   isValidResponse

@@ -1,3 +1,12 @@
+// Temporary compatibility shim for the unchanged help component. Task 8 removes
+// both that component call and this export once all questions use the v1 endpoint.
+function isRentOrderDataQuery(question) {
+  var text = (question || '').replace(/\s+/g, '')
+  if (!text || !/(租赁|出租)/.test(text) || !/(订单|单据)/.test(text)) return false
+  if (/(如何|怎么|怎样|哪里|在哪|操作|步骤|使用|功能|为什么)/.test(text)) return false
+  return /(?:请(?:帮我)?(?:查询|查)(?:一下)?|帮我(?:查询|查)|查询|查一下|统计|多少|几单|合计|有哪些|列出|显示)/.test(text)
+}
+
 function buildRentOrderListUrl(intent) {
   return '/pages/admin/rent/new_rent_list?aiIntent=' + encodeURIComponent(JSON.stringify(intent || {}))
 }
@@ -44,6 +53,7 @@ function buildRentOrderListState(intent) {
 }
 
 module.exports = {
+  isRentOrderDataQuery,
   buildRentOrderListUrl,
   readRentOrderIntent,
   buildRentOrderListState

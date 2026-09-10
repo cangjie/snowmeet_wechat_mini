@@ -149,3 +149,21 @@ test('统一 API 错误或无效响应会清空当前员工的查询上下文', 
     invalid.restore()
   }
 })
+
+test('旧员工的统一请求失败不会清除已切换员工的上下文', async () => {
+  assistant.clearContext()
+  assistant.acceptContext({ id: 7 }, { rental_order_query: aprilUnpaid })
+  let rejectRequest
+  const loaded = loadDataWithRequest(() => new Promise((resolve, reject) => { rejectRequest = reject }))
+  try {
+    const failedRequest = loaded.data.askAdminAssistantPromise({ version: '1' }, 'session-a')
+    const mayContext = { ...aprilUnpaid, shop: '密苑云顶' }
+    assistant.acceptContext({ id: 8 }, { rental_order_query: mayContext })
+
+    rejectRequest(new Error('network'))
+    await assert.rejects(() => failedRequest, /network/)
+    assert.deepEqual(assistant.currentContext({ id: 8 }).rental_order_query, mayContext)
+  } finally {
+    loaded.restore()
+  }
+})

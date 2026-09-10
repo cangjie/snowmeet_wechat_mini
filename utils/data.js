@@ -522,13 +522,14 @@ const queryRentOrdersByNaturalLanguagePromise = function (question, sessionKey) 
 const askAdminAssistantPromise = function (request, sessionKey) {
   var url = app.globalData.requestPrefix + 'AdminAi/AskAdminAssistantByStaff?sessionKey=' + encodeURIComponent(sessionKey)
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  var requestOwner = adminAssistant.captureRequestOwner(sessionKey)
   return util.performWebRequest(url, request).then(function (response) {
     if (!adminAssistant.isValidResponse(response)) {
       throw new Error('管理员助手响应格式无效')
     }
     return response
   }).catch(function (error) {
-    adminAssistant.clearContext()
+    adminAssistant.clearContextForOwner(requestOwner)
     throw error
   })
 }
