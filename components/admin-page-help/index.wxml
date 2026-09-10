@@ -17,6 +17,10 @@
         <text>{{error}}</text>
         <van-button wx:if="{{retryable}}" size="small" plain type="primary" bindtap="onRetry">重试</van-button>
       </view>
+      <view wx:if="{{traceId}}" class="help-state">请求编号：{{traceId}}</view>
+      <view wx:if="{{retryable && !error}}" class="help-state">
+        <van-button size="small" plain type="primary" bindtap="onRetry">重试</van-button>
+      </view>
       <view wx:if="{{pageHelp}}" class="help-answer">
         <text selectable="true">{{pageHelp.text}}</text>
         <view wx:if="{{pageHelp.citations.length}}" class="citation-list">依据项目资料生成</view>

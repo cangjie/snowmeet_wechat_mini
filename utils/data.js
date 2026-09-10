@@ -519,13 +519,57 @@ const queryRentOrdersByNaturalLanguagePromise = function (question, sessionKey) 
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   return util.performWebRequest(qUrl, { question: question })
 }
+const adminAssistantFailureKey = '__snowmeetAdminAssistantFailure'
+const adminAssistantFailureForStatus = function (statusCode) {
+  if (statusCode === 400) return { type: 'invalid_request', retryable: false }
+  if (statusCode === 401 || statusCode === 403) return { type: 'permission_denied', retryable: false }
+  if (statusCode >= 500) return { type: 'service_unavailable', retryable: true }
+  return { type: 'transport_failure', retryable: true }
+}
+const markAdminAssistantFailure = function (response, statusCode) {
+  Object.defineProperty(response, adminAssistantFailureKey, {
+    value: adminAssistantFailureForStatus(statusCode), enumerable: false
+  })
+  return response
+}
+const getAdminAssistantFailure = function (response) {
+  return response && response[adminAssistantFailureKey] ? response[adminAssistantFailureKey] : null
+}
+const performAdminAssistantRequest = function (url, request) {
+  return new Promise(function (resolve, reject) {
+    wx.request({
+      url: url,
+      data: request,
+      method: 'POST',
+      success: function (res) {
+        var envelope = res && res.data
+        var response = envelope && envelope.data
+        if (!adminAssistant.isValidResponse(response)) {
+          reject(new Error('管理员助手服务暂不可用，请稍后重试。'))
+          return
+        }
+        if (res.statusCode !== 200 || envelope.code !== 0) {
+          resolve(markAdminAssistantFailure(response, res.statusCode))
+          return
+        }
+        resolve(response)
+      },
+      fail: function () {
+        reject(new Error('管理员助手服务暂不可用，请稍后重试。'))
+      }
+    })
+  })
+}
 const askAdminAssistantPromise = function (request, sessionKey) {
   var url = app.globalData.requestPrefix + 'AdminAi/AskAdminAssistantByStaff?sessionKey=' + encodeURIComponent(sessionKey)
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   var requestOwner = adminAssistant.captureRequestOwner(sessionKey)
-  return util.performWebRequest(url, request).then(function (response) {
+  return performAdminAssistantRequest(url, request).then(function (response) {
     if (!adminAssistant.isValidResponse(response)) {
       throw new Error('管理员助手响应格式无效')
+    }
+    if (getAdminAssistantFailure(response)) {
+      adminAssistant.clearContextForOwner(requestOwner)
     }
     return response
   }).catch(function (error) {
@@ -1782,6 +1826,7 @@ module.exports = {
   askAdminPageHelpPromise,
   queryRentOrdersByNaturalLanguagePromise,
   askAdminAssistantPromise,
+  getAdminAssistantFailure,
   GetUnCommonPayMethodPromise,
   updateOrderPromise,
   cancelPayingPromise,

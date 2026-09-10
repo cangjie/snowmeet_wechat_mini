@@ -1,5 +1,6 @@
 import fuiConfig from './components/firstui/fui-config/index'
 var util = require('./utils/util.js')
+var authSession = require('./utils/authSession.js')
 
 function containsChinese(str) {
   return /[\u4e00-\u9fff]/.test(str)
@@ -175,12 +176,14 @@ App({
           // 否则所有 page 的 app.loginPromiseNew.then(...) 永远不跑,页面集体卡死。
           // 下游页面用 sessionKey/member 时应做 null 兜底(如 payment_entry 已做)。
           console.warn('MemberLogin failed, resolving loginPromiseNew with empty session', err)
+          authSession.resetAuthenticationState(app)
           resolve({})
         })
       },
       fail: (res) => {
         // wx.login 本身失败(极少见但可能):同样必须落地 loginPromiseNew,否则全局卡死
         console.warn('wx.login failed, resolving loginPromiseNew with empty session', res)
+        authSession.resetAuthenticationState(getApp())
         resolve({})
       }
     })

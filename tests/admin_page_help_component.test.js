@@ -39,6 +39,28 @@ function installAppAndWx() {
 
 function cleanGlobals() { delete global.getApp; delete global.wx; assistant.clearContext() }
 
+function loadActualDataWithWxResponse(response) {
+  const dataPath = require.resolve('../utils/data.js')
+  const originalData = require.cache[dataPath]
+  delete require.cache[dataPath]
+  global.getApp = () => ({ loginPromiseNew: Promise.resolve(), globalData: { requestPrefix: 'https://api.example/api/', sessionKey: 'session-1', staff: { id: 7, title_level: 200 } } })
+  const navigations = []
+  global.wx = {
+    request(options) { options.success(response) },
+    navigateTo(options) { navigations.push(options.url) }
+  }
+  const data = require('../utils/data.js')
+  return {
+    data,
+    navigations,
+    restore() {
+      delete require.cache[dataPath]
+      if (originalData) require.cache[dataPath] = originalData
+      else delete require.cache[dataPath]
+    }
+  }
+}
+
 test('四月租赁查询显示服务端文字，保存上下文并跳转到固定筛选列表', async () => {
   assistant.clearContext()
   let unifiedCalls = 0
@@ -190,4 +212,45 @@ test('超长 CJK 关键词或编码后超限的完整 action 均保留文字且�
     assert.equal(loaded.instance.data.retryable, false)
     assert.deepEqual(navigations, [])
   } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('502 的有效 v1 失败 envelope 显示服务端安全答复与 trace，不执行 action 且允许重试', async () => {
+  assistant.clearContext()
+  assistant.acceptContext({ id: 7 }, { rental_order_query: aprilState })
+  const rawMessage = 'upstream database password=secret'
+  const actual = loadActualDataWithWxResponse({
+    statusCode: 502,
+    data: { code: 1, message: rawMessage, data: response('管理员助手服务暂不可用，请稍后重试。', [{ type: 'rental_order.show_results', status: 'completed', state: aprilState }]) }
+  })
+  const loaded = loadComponentWithData(actual.data)
+  try {
+    loaded.instance.data.input = '查询四月租赁订单'
+    await loaded.instance.sendQuestion()
+    assert.equal(loaded.instance.data.messages.at(-1).content, '管理员助手服务暂不可用，请稍后重试。')
+    assert.equal(loaded.instance.data.traceId, 'trace-1')
+    assert.equal(loaded.instance.data.failureType, 'service_unavailable')
+    assert.equal(loaded.instance.data.retryable, true)
+    assert.deepEqual(actual.navigations, [])
+    assert.equal(assistant.currentContext({ id: 7 }).rental_order_query, null)
+    assert.doesNotMatch(JSON.stringify(loaded.instance.data), /password|secret/i)
+  } finally { loaded.restore(); actual.restore(); cleanGlobals() }
+})
+
+test('400 的有效 v1 失败 envelope 显示服务端安全答复与 trace，不执行 action 且不重试', async () => {
+  assistant.clearContext()
+  const actual = loadActualDataWithWxResponse({
+    statusCode: 400,
+    data: { code: 1, message: 'raw validation detail: sessionKey=secret', data: response('请求条件不合法，请调整后重试。', [{ type: 'rental_order.show_results', status: 'completed', state: aprilState }]) }
+  })
+  const loaded = loadComponentWithData(actual.data)
+  try {
+    loaded.instance.data.input = '查询'
+    await loaded.instance.sendQuestion()
+    assert.equal(loaded.instance.data.messages.at(-1).content, '请求条件不合法，请调整后重试。')
+    assert.equal(loaded.instance.data.traceId, 'trace-1')
+    assert.equal(loaded.instance.data.failureType, 'invalid_request')
+    assert.equal(loaded.instance.data.retryable, false)
+    assert.deepEqual(actual.navigations, [])
+    assert.doesNotMatch(JSON.stringify(loaded.instance.data), /sessionKey|secret/i)
+  } finally { loaded.restore(); actual.restore(); cleanGlobals() }
 })

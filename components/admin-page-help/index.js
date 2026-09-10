@@ -14,6 +14,8 @@ Component({
     input: '',
     error: '',
     retryable: false,
+    traceId: '',
+    failureType: '',
     lastQuestion: '',
     lastAppendUserMessage: false,
     lastErrorMessage: ''
@@ -122,7 +124,7 @@ Component({
 
     async requestAnswer(question, appendUserMessage, errorMessage) {
       this.setData({
-        input: '', loading: true, error: '', retryable: false,
+        input: '', loading: true, error: '', retryable: false, traceId: '', failureType: '',
         lastQuestion: question, lastAppendUserMessage: appendUserMessage,
         lastErrorMessage: errorMessage
       })
@@ -139,14 +141,29 @@ Component({
       var conversation = this.data.messages
       var request = adminAssistant.buildRequest(this.data.pageKey, question, conversation, app.globalData.staff)
       var result = await data.askAdminAssistantPromise(request, app.globalData.sessionKey)
-      adminAssistant.acceptContext(app.globalData.staff, result.context)
+      var failure = typeof data.getAdminAssistantFailure === 'function'
+        ? data.getAdminAssistantFailure(result) : null
+      if (!failure) adminAssistant.acceptContext(app.globalData.staff, result.context)
       var next = appendUserMessage ? conversation.concat([{ role: 'user', content: question }]) : conversation.slice()
       if (appendUserMessage) {
         next.push({ role: 'assistant', content: result.reply.text, citations: result.reply.citations || [] })
-        this.setData({ messages: next, input: '', loading: false, retryable: false, lastQuestion: '' })
+        this.setData({
+          messages: next, input: '', loading: false,
+          traceId: result.trace_id,
+          failureType: failure ? failure.type : '',
+          retryable: failure ? failure.retryable : false,
+          lastQuestion: failure && failure.retryable ? question : ''
+        })
       } else {
-        this.setData({ pageHelp: result.reply, input: '', loading: false, retryable: false, lastQuestion: '' })
+        this.setData({
+          pageHelp: result.reply, input: '', loading: false,
+          traceId: result.trace_id,
+          failureType: failure ? failure.type : '',
+          retryable: failure ? failure.retryable : false,
+          lastQuestion: failure && failure.retryable ? question : ''
+        })
       }
+      if (failure) return
       try {
         adminAssistant.executeActions(result.actions, url => wx.navigateTo({
           url,

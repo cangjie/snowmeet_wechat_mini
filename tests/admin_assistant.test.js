@@ -82,15 +82,24 @@ test('执行器接受 API 序列化的日期时间状态并规范跳转为日期
 
 function loadDataWithRequest(request) {
   const dataPath = require.resolve('../utils/data.js')
-  const utilPath = require.resolve('../utils/util.js')
   const originalData = require.cache[dataPath]
-  const originalUtil = require.cache[utilPath]
+  const originalWx = global.wx
   delete require.cache[dataPath]
-  require.cache[utilPath] = {
-    id: utilPath,
-    filename: utilPath,
-    loaded: true,
-    exports: { performWebRequest: request }
+  global.wx = {
+    request(options) {
+      let requestResult
+      try {
+        requestResult = request(options.url, options.data)
+      } catch (error) {
+        options.fail(error)
+        return
+      }
+      Promise.resolve(requestResult).then(function (response) {
+        options.success({ statusCode: 200, data: { code: 0, data: response } })
+      }).catch(function (error) {
+        options.fail(error)
+      })
+    }
   }
   global.getApp = () => ({ globalData: { requestPrefix: 'https://api.example/api/' } })
   const data = require('../utils/data.js')
@@ -99,8 +108,8 @@ function loadDataWithRequest(request) {
     restore() {
       delete require.cache[dataPath]
       if (originalData) require.cache[dataPath] = originalData
-      if (originalUtil) require.cache[utilPath] = originalUtil
-      else delete require.cache[utilPath]
+      if (originalWx) global.wx = originalWx
+      else delete global.wx
       delete global.getApp
     }
   }
@@ -134,7 +143,7 @@ test('统一 API 错误或无效响应会清空当前员工的查询上下文', 
   assistant.acceptContext({ id: 7 }, { rental_order_query: aprilUnpaid })
   const failed = loadDataWithRequest(() => Promise.reject(new Error('network')))
   try {
-    await assert.rejects(() => failed.data.askAdminAssistantPromise({ version: '1' }, 'session-1'), /network/)
+    await assert.rejects(() => failed.data.askAdminAssistantPromise({ version: '1' }, 'session-1'), /暂不可用/)
     assert.equal(assistant.currentContext({ id: 7 }).rental_order_query, null)
   } finally {
     failed.restore()
@@ -143,7 +152,7 @@ test('统一 API 错误或无效响应会清空当前员工的查询上下文', 
   assistant.acceptContext({ id: 7 }, { rental_order_query: aprilUnpaid })
   const invalid = loadDataWithRequest(() => Promise.resolve({ version: '2' }))
   try {
-    await assert.rejects(() => invalid.data.askAdminAssistantPromise({ version: '1' }, 'session-1'), /响应格式/)
+    await assert.rejects(() => invalid.data.askAdminAssistantPromise({ version: '1' }, 'session-1'), /暂不可用/)
     assert.equal(assistant.currentContext({ id: 7 }).rental_order_query, null)
   } finally {
     invalid.restore()
@@ -161,7 +170,7 @@ test('旧员工的统一请求失败不会清除已切换员工的上下文', as
     assistant.acceptContext({ id: 8 }, { rental_order_query: mayContext })
 
     rejectRequest(new Error('network'))
-    await assert.rejects(() => failedRequest, /network/)
+    await assert.rejects(() => failedRequest, /暂不可用/)
     assert.deepEqual(assistant.currentContext({ id: 8 }).rental_order_query, mayContext)
   } finally {
     loaded.restore()
