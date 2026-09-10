@@ -9,6 +9,9 @@ const nullableBooleanFields = new Set([
   'is_test', 'is_entertain', 'have_discount', 'use_card', 'has_retail'
 ])
 const maxRentOrderListUrlLength = 1800
+const maxConversationMessages = 20
+const maxConversationMessageLength = 2000
+const maxConversationLength = 12000
 
 let ownerStaffId = null
 let ownerSessionKey = null
@@ -85,6 +88,15 @@ function isValidContext(nextContext) {
     (nextContext.rental_order_query === null || isValidQueryState(nextContext.rental_order_query))
 }
 
+function normalizeContext(nextContext) {
+  if (!isValidContext(nextContext)) return null
+  if (nextContext.rental_order_query === null) return emptyContext()
+  const normalized = copy(nextContext)
+  normalized.rental_order_query.start_date = normalized.rental_order_query.start_date.slice(0, 10)
+  normalized.rental_order_query.end_date = normalized.rental_order_query.end_date.slice(0, 10)
+  return normalized
+}
+
 function isValidResponse(response) {
   return isPlainObject(response) && response.version === '1' &&
     typeof response.trace_id === 'string' && isPlainObject(response.reply) &&
@@ -98,14 +110,29 @@ function buildRequest(pageKey, question, conversation, staff) {
     version: '1',
     page_key: pageKey,
     question,
-    conversation: (conversation || []).slice(-20).map(copy),
+    conversation: projectConversation(conversation),
     context: copy(context)
   }
 }
 
+function projectConversation(conversation) {
+  const messages = Array.isArray(conversation) ? conversation : []
+  const projected = []
+  let totalLength = 0
+  for (let index = messages.length - 1; index >= 0 && projected.length < maxConversationMessages; index--) {
+    const message = messages[index]
+    if (!isPlainObject(message) || (message.role !== 'user' && message.role !== 'assistant') ||
+        typeof message.content !== 'string' || message.content.length > maxConversationMessageLength ||
+        totalLength + message.content.length > maxConversationLength) continue
+    projected.unshift({ role: message.role, content: message.content })
+    totalLength += message.content.length
+  }
+  return projected
+}
+
 function acceptContext(staff, nextContext) {
   syncStaff(staff)
-  context = isValidContext(nextContext) ? copy(nextContext) : emptyContext()
+  context = normalizeContext(nextContext) || emptyContext()
   contextGeneration++
   return currentContext(staff)
 }
@@ -128,6 +155,17 @@ function clearContextForOwner(owner) {
   context = emptyContext()
   contextGeneration++
   return true
+}
+
+function isCurrentRequestOwner(owner) {
+  return !!owner && owner.staffId === ownerStaffId && owner.sessionKey === ownerSessionKey &&
+    owner.generation === contextGeneration
+}
+
+function staleSessionError() {
+  const error = new Error('登录状态已变化，请重新提问。')
+  error.code = 'stale_session'
+  return error
 }
 
 function executeActions(actions, navigateTo) {
@@ -157,6 +195,8 @@ module.exports = {
   clearContext,
   captureRequestOwner,
   clearContextForOwner,
+  isCurrentRequestOwner,
+  staleSessionError,
   executeActions,
   isValidQueryState,
   isValidResponse

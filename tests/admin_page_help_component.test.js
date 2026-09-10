@@ -96,7 +96,7 @@ test('普通帮助和条件回顾均走统一接口，并携带上一轮完整�
     assert.equal(requests.length, 2)
     assert.equal(requests[1].question, '当前查询条件是什么')
     assert.deepEqual(requests[1].context.rental_order_query, aprilState)
-    assert.deepEqual(requests[1].conversation, [{ role: 'user', content: '这个页面怎么操作' }, { role: 'assistant', content: '这里是操作说明。', citations: [] }])
+    assert.deepEqual(requests[1].conversation, [{ role: 'user', content: '这个页面怎么操作' }, { role: 'assistant', content: '这里是操作说明。' }])
     assert.equal(loaded.instance.data.messages.at(-1).content, '日期为 4 月，状态为未支付，其余条件见当前筛选。')
   } finally { loaded.restore(); cleanGlobals() }
 })
@@ -252,5 +252,24 @@ test('400 的有效 v1 失败 envelope 显示服务端安全答复与 trace，�
     assert.equal(loaded.instance.data.retryable, false)
     assert.deepEqual(actual.navigations, [])
     assert.doesNotMatch(JSON.stringify(loaded.instance.data), /sessionKey|secret/i)
+  } finally { loaded.restore(); actual.restore(); cleanGlobals() }
+})
+
+test('403 的有效 v1 失败 envelope 保留安全答复和 trace，不执行 action 且不可重试', async () => {
+  assistant.clearContext()
+  const actual = loadActualDataWithWxResponse({
+    statusCode: 403,
+    data: { code: 1, message: 'raw authorization header=secret', data: response('没有权限访问此查询。', [{ type: 'rental_order.show_results', status: 'completed', state: aprilState }]) }
+  })
+  const loaded = loadComponentWithData(actual.data)
+  try {
+    loaded.instance.data.input = '查询'
+    await loaded.instance.sendQuestion()
+    assert.equal(loaded.instance.data.messages.at(-1).content, '没有权限访问此查询。')
+    assert.equal(loaded.instance.data.traceId, 'trace-1')
+    assert.equal(loaded.instance.data.failureType, 'permission_denied')
+    assert.equal(loaded.instance.data.retryable, false)
+    assert.deepEqual(actual.navigations, [])
+    assert.doesNotMatch(JSON.stringify(loaded.instance.data), /authorization|secret/i)
   } finally { loaded.restore(); actual.restore(); cleanGlobals() }
 })

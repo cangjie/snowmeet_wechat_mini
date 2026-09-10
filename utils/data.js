@@ -535,6 +535,9 @@ const markAdminAssistantFailure = function (response, statusCode) {
 const getAdminAssistantFailure = function (response) {
   return response && response[adminAssistantFailureKey] ? response[adminAssistantFailureKey] : null
 }
+const isAdminAssistantStaleSessionError = function (error) {
+  return !!error && error.code === 'stale_session'
+}
 const performAdminAssistantRequest = function (url, request) {
   return new Promise(function (resolve, reject) {
     wx.request({
@@ -570,7 +573,9 @@ const askAdminAssistantPromise = function (request, sessionKey) {
     }
     if (getAdminAssistantFailure(response)) {
       adminAssistant.clearContextForOwner(requestOwner)
+      return response
     }
+    if (!adminAssistant.isCurrentRequestOwner(requestOwner)) throw adminAssistant.staleSessionError()
     return response
   }).catch(function (error) {
     adminAssistant.clearContextForOwner(requestOwner)
@@ -1827,6 +1832,7 @@ module.exports = {
   queryRentOrdersByNaturalLanguagePromise,
   askAdminAssistantPromise,
   getAdminAssistantFailure,
+  isAdminAssistantStaleSessionError,
   GetUnCommonPayMethodPromise,
   updateOrderPromise,
   cancelPayingPromise,

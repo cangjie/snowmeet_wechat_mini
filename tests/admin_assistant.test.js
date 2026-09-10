@@ -27,6 +27,44 @@ test('同一员工的自然语言条件回顾会携带完整查询上下文，�
   assert.equal(Object.hasOwn(request, 'staff'), false)
 })
 
+test('请求对话投影为严格 binder 接受的 role/content JSON，且丢弃无效或超长条目', () => {
+  assistant.clearContext()
+  const request = assistant.buildRequest('pages/admin/member/member_list', '当前查询条件是什么', [
+    { role: 'user', content: '上一轮问题', citations: [{ url: 'secret' }], ignored: true },
+    { role: 'system', content: '不能发送' },
+    { role: 'assistant', content: '上一轮答复', actions: [{ type: 'refund.execute' }] },
+    { role: 'user', content: '过长'.repeat(1001) }
+  ], { id: 7 })
+  const serialized = JSON.parse(JSON.stringify(request))
+
+  assert.deepEqual(serialized, {
+    version: '1', page_key: 'pages/admin/member/member_list', question: '当前查询条件是什么',
+    conversation: [
+      { role: 'user', content: '上一轮问题' },
+      { role: 'assistant', content: '上一轮答复' }
+    ],
+    context: { rental_order_query: null }
+  })
+  assert.ok(serialized.conversation.every(message => Object.keys(message).join(',') === 'role,content'))
+})
+
+test('从 API 接受 ISO 日期后，条件回顾和增量查询只发送 yyyy-MM-dd', () => {
+  assistant.clearContext()
+  assistant.acceptContext({ id: 7 }, {
+    rental_order_query: {
+      ...aprilUnpaid,
+      start_date: '2026-04-01T00:00:00',
+      end_date: '2026-04-30T00:00:00Z'
+    }
+  })
+
+  const recall = assistant.buildRequest('pages/admin/member/member_list', '当前查询条件是什么', [], { id: 7 })
+  const patch = assistant.buildRequest('pages/admin/member/member_list', '改成五月份', [], { id: 7 })
+  assert.equal(recall.context.rental_order_query.start_date, '2026-04-01')
+  assert.equal(recall.context.rental_order_query.end_date, '2026-04-30')
+  assert.deepEqual(patch.context, recall.context)
+})
+
 test('切换员工或收到无效上下文时清除运行期查询上下文', () => {
   assistant.clearContext()
   assistant.acceptContext({ id: 7 }, { rental_order_query: aprilUnpaid })
@@ -171,6 +209,27 @@ test('旧员工的统一请求失败不会清除已切换员工的上下文', as
 
     rejectRequest(new Error('network'))
     await assert.rejects(() => failedRequest, /暂不可用/)
+    assert.deepEqual(assistant.currentContext({ id: 8 }).rental_order_query, mayContext)
+  } finally {
+    loaded.restore()
+  }
+})
+
+test('旧员工的统一请求延迟成功时返回安全 stale_session 信号且不改变新员工上下文', async () => {
+  assistant.clearContext()
+  assistant.acceptContext({ id: 7 }, { rental_order_query: aprilUnpaid })
+  let resolveRequest
+  const loaded = loadDataWithRequest(() => new Promise(resolve => { resolveRequest = resolve }))
+  try {
+    const pending = loaded.data.askAdminAssistantPromise({ version: '1' }, 'session-a')
+    const mayContext = { ...aprilUnpaid, shop: '密苑云顶' }
+    assistant.acceptContext({ id: 8 }, { rental_order_query: mayContext })
+    resolveRequest({
+      version: '1', trace_id: 'trace-a', reply: { text: '不应显示的旧答复', citations: [] }, actions: [],
+      context: { rental_order_query: aprilUnpaid }
+    })
+
+    await assert.rejects(() => pending, error => error && error.code === 'stale_session' && /登录状态已变化/.test(error.message))
     assert.deepEqual(assistant.currentContext({ id: 8 }).rental_order_query, mayContext)
   } finally {
     loaded.restore()
