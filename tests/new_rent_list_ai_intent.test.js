@@ -27,7 +27,7 @@ test('租赁订单列表首次加载时应用帮助系统传入的 AI 查询条�
   const intent = {
     start_date: '2026-04-01', end_date: '2026-04-30', shop: '万龙服务中心',
     rent_status: '未支付', is_test: null, is_entertain: false,
-    have_discount: true, use_card: null, cell_suffix: null, keyword: '雪板'
+    have_discount: true, use_card: null, has_retail: null, cell_suffix: null, keyword: '雪板'
   }
   const encoded = buildRentOrderListUrl(intent).split('aiIntent=')[1]
   const page = loadPage()
@@ -58,7 +58,7 @@ test('AI 复合查询中的手机号不应冲掉日期门店和其它筛选条�
   const intent = {
     start_date: '2026-04-01T00:00:00', end_date: '2026-04-30T00:00:00',
     shop: '崇礼旗舰店', rent_status: '未支付', is_test: true,
-    is_entertain: false, have_discount: true, use_card: false,
+    is_entertain: false, have_discount: true, use_card: false, has_retail: true,
     cell_suffix: '7788', keyword: null
   }
   const encoded = buildRentOrderListUrl(intent).split('aiIntent=')[1]
@@ -76,4 +76,5 @@ test('AI 复合查询中的手机号不应冲掉日期门店和其它筛选条�
   assert.equal(params.haveDiscount, true)
   assert.equal(params.useCard, false)
   assert.equal(params.rentStatus, '未支付')
+  assert.equal(params.hasRetail, true)
 })

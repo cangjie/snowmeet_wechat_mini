@@ -2,18 +2,10 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 
 const {
-  isRentOrderDataQuery,
   buildRentOrderListUrl,
   readRentOrderIntent,
   buildRentOrderListState
 } = require('../utils/adminAiQuery.js')
-
-test('Task 8 统一协议接线前保留旧租赁查询识别兼容行为', () => {
-  assert.equal(isRentOrderDataQuery('请查询一下今年4月份的租赁订单'), true)
-  assert.equal(isRentOrderDataQuery('统计本月未支付的租赁订单金额'), true)
-  assert.equal(isRentOrderDataQuery('如何操作才能查询租赁订单？'), false)
-  assert.equal(isRentOrderDataQuery('这个页面怎么查询租赁订单'), false)
-})
 
 test('查询意图通过跳转参数完整传给租赁订单列表', () => {
   const intent = {
@@ -23,7 +15,7 @@ test('查询意图通过跳转参数完整传给租赁订单列表', () => {
     rent_status: '未支付',
     is_test: null,
     is_entertain: false,
-    have_discount: true,
+    have_discount: true, has_retail: true,
     use_card: null,
     cell_suffix: '7788',
     keyword: '雪板'

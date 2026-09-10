@@ -1,5 +1,5 @@
 const data = require('../../utils/data.js')
-const adminAiQuery = require('../../utils/adminAiQuery.js')
+const adminAssistant = require('../../utils/adminAssistant.js')
 
 Component({
   data: {
@@ -10,7 +10,7 @@ Component({
     pageKey: '',
     pageHelp: null,
     messages: [],
-    queryMode: false,
+    queryHint: false,
     input: '',
     error: ''
   },
@@ -89,7 +89,7 @@ Component({
     },
 
     onQueryMode() {
-      this.setData({ queryMode: true, error: '' })
+      this.setData({ queryHint: true, error: '' })
     },
 
     onRetry() {
@@ -102,10 +102,7 @@ Component({
       if (!this.data.pageKey) return
       this.setData({ loading: true, error: '' })
       try {
-        var app = getApp()
-        await app.loginPromiseNew
-        var result = await data.getAdminPageHelpPromise(this.data.pageKey, app.globalData.sessionKey)
-        this.setData({ pageHelp: result.result, loading: false })
+        await this.ask('请说明当前页面的用途、标准操作步骤、关键限制和常见错误。', false)
       } catch (error) {
         this.setData({ loading: false, error: '暂时无法获取页面说明' })
       }
@@ -114,54 +111,31 @@ Component({
     async sendQuestion() {
       var question = (this.data.input || '').trim()
       if (!question || this.data.loading) return
-      if (this.data.queryMode || adminAiQuery.isRentOrderDataQuery(question)) {
-        return this.queryRentOrders(question)
-      }
-      var nextMessages = this.data.messages.concat([{ role: 'user', content: question }])
-      this.setData({ messages: nextMessages, input: '', loading: true, error: '' })
+      this.setData({ loading: true, error: '' })
       try {
-        var app = getApp()
-        await app.loginPromiseNew
-        var result = await data.askAdminPageHelpPromise(this.data.pageKey, question, app.globalData.sessionKey, {
-          conversation: this.data.messages
-        })
-        nextMessages.push({ role: 'assistant', content: result.result.answer, citations: result.result.citations || [] })
-        this.setData({ messages: nextMessages, loading: false })
+        await this.ask(question, true)
       } catch (error) {
         this.setData({ loading: false, error: '暂时无法获得回答' })
       }
     },
 
-    async queryRentOrders(question) {
-      this.setData({ loading: true, error: '' })
+    async ask(question, appendUserMessage) {
+      var app = getApp()
+      await app.loginPromiseNew
+      var conversation = this.data.messages
+      var request = adminAssistant.buildRequest(this.data.pageKey, question, conversation, app.globalData.staff)
+      var result = await data.askAdminAssistantPromise(request, app.globalData.sessionKey)
+      adminAssistant.acceptContext(app.globalData.staff, result.context)
+      var next = appendUserMessage ? conversation.concat([{ role: 'user', content: question }]) : conversation.slice()
+      next.push({ role: 'assistant', content: result.reply.text, citations: result.reply.citations || [] })
+      this.setData({ messages: next, pageHelp: result.reply, input: '', loading: false })
       try {
-        var app = getApp()
-        await app.loginPromiseNew
-        var result = await data.queryRentOrdersByNaturalLanguagePromise(question, app.globalData.sessionKey)
-        var nextMessages = this.data.messages.concat([{ role: 'user', content: question }])
-        if (result.status && result.status !== 'ready') {
-          nextMessages.push({ role: 'assistant', content: result.clarification || '请补充查询条件后再试。' })
-          this.setData({
-            messages: nextMessages,
-            input: '',
-            queryMode: result.status === 'clarification_required',
-            loading: false
-          })
-          return
-        }
-        var summary = result.summary || {}
-        var parts = ['已按条件查询 ' + (summary.total || 0) + ' 单租赁订单。']
-        if (summary.chargeTotal != null) parts.push('应收合计 ¥' + Number(summary.chargeTotal).toFixed(2) + '；实收 ¥' + Number(summary.paidTotal || 0).toFixed(2) + '；退款 ¥' + Number(summary.refundTotal || 0).toFixed(2) + '。')
-        if (summary.unpaidCount > 0) parts.push('其中有 ' + summary.unpaidCount + ' 单尚未完成支付，建议优先核对。')
-        if (summary.note) parts.push(summary.note)
-        nextMessages.push({ role: 'assistant', content: parts.join('\n') })
-        this.setData({
-          messages: nextMessages,
-          input: '', queryMode: false, loading: false, visible: false
-        })
-        wx.navigateTo({ url: adminAiQuery.buildRentOrderListUrl(result.intent) })
+        adminAssistant.executeActions(result.actions, url => wx.navigateTo({
+          url,
+          fail: () => this.setData({ error: '当前版本暂不支持此操作，请升级后重试' })
+        }))
       } catch (error) {
-        this.setData({ loading: false, error: '暂时无法完成数据查询' })
+        this.setData({ error: '当前版本暂不支持此操作，请升级后重试' })
       }
     }
   }

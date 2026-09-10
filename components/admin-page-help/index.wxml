@@ -18,7 +18,7 @@
         <van-button size="small" plain type="primary" bindtap="onRetry">重试</van-button>
       </view>
       <view wx:if="{{pageHelp}}" class="help-answer">
-        <text selectable="true">{{pageHelp.answer}}</text>
+        <text selectable="true">{{pageHelp.text}}</text>
         <view wx:if="{{pageHelp.citations.length}}" class="citation-list">依据项目资料生成</view>
       </view>
       <block wx:for="{{messages}}" wx:key="index">
@@ -30,7 +30,7 @@
       <view wx:if="{{loading && pageHelp}}" class="help-state">正在获取回答...</view>
     </scroll-view>
     <view class="help-input-bar">
-      <textarea class="help-input" value="{{input}}" maxlength="12000" auto-height placeholder="{{queryMode ? '例如：查询本周未支付的租赁订单' : '输入你的问题'}}" bindinput="onInput" />
+      <textarea class="help-input" value="{{input}}" maxlength="12000" auto-height placeholder="{{queryHint ? '例如：请查询今年四月份的租赁订单' : '输入你的问题'}}" bindinput="onInput" />
       <van-button type="primary" size="small" loading="{{loading}}" disabled="{{!input}}" bindtap="sendQuestion">发送</van-button>
     </view>
   </view>
