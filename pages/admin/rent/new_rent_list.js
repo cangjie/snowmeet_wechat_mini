@@ -2,6 +2,7 @@
 const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
+const adminAiQuery = require('../../../utils/adminAiQuery.js')
 Page({
 
   data: {
@@ -27,6 +28,12 @@ Page({
   },
 
   onLoad(options) {
+    var intent = adminAiQuery.readRentOrderIntent(options)
+    if (intent && intent.start_date && intent.end_date) {
+      this._ignoreInitialShopSelection = true
+      this.setData(adminAiQuery.buildRentOrderListState(intent))
+      return
+    }
     var nowDate = new Date()
     this.setData({ startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate) })
   },
@@ -44,6 +51,10 @@ Page({
   },
 
   shopSelected(e) {
+    if (this._ignoreInitialShopSelection) {
+      this._ignoreInitialShopSelection = false
+      return
+    }
     this.setData({ shop: e.detail.shop })
   },
 
@@ -95,7 +106,7 @@ Page({
     var endDate = this.data.endDate
     var cell = this.data.cell
     var keyword = this.data.keyword
-    if ((cell != null && cell != '') || (keyword != null && keyword != '')) {
+    if (!this.data.aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) {
       startDate = new Date('2025-10-15')
       endDate = new Date()
       shop = null

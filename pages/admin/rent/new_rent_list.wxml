@@ -6,9 +6,10 @@
     <view class="filter-row">
       <text class="filter-label">店铺</text>
       <view class="filter-value">
-        <shop-selector wx:if="{{(cell != null && cell != '') || (keyword != null && keyword != '')}}" defaultShop=""
+        <shop-selector wx:if="{{!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))}}" defaultShop="全部店铺"
           bindShopSelected="shopSelected"></shop-selector>
-        <shop-selector wx:else bindShopSelected="shopSelected"></shop-selector>
+        <shop-selector wx:else defaultShop="{{aiQueryApplied ? (shop || '全部店铺') : ''}}"
+          bindShopSelected="shopSelected"></shop-selector>
       </view>
     </view>
 
@@ -26,9 +27,9 @@
     <view class="filter-row">
       <text class="filter-label">测试</text>
       <radio-group id="isTest" class="radio-group" bindchange="setQueryOptions">
-        <label class="radio-item"><radio checked="{{true}}" value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>营业</label>
-        <label class="radio-item"><radio value="{{true}}" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>测试</label>
-        <label class="radio-item"><radio value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
+        <label class="radio-item"><radio checked="{{queryOptions[0].value === false}}" value="false" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>营业</label>
+        <label class="radio-item"><radio checked="{{queryOptions[0].value === true}}" value="{{true}}" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>测试</label>
+        <label class="radio-item"><radio checked="{{queryOptions[0].value == null}}" value="null" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>全部</label>
       </radio-group>
     </view>
 
@@ -36,9 +37,9 @@
     <view class="filter-row">
       <text class="filter-label">招待</text>
       <radio-group id="isEntertain" class="radio-group" bindchange="setQueryOptions">
-        <label class="radio-item"><radio checked="{{true}}" value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>正常</label>
-        <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>招待</label>
-        <label class="radio-item"><radio value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
+        <label class="radio-item"><radio checked="{{queryOptions[1].value === false}}" value="false" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>正常</label>
+        <label class="radio-item"><radio checked="{{queryOptions[1].value === true}}" value="true" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>招待</label>
+        <label class="radio-item"><radio checked="{{queryOptions[1].value == null}}" value="null" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>全部</label>
       </radio-group>
     </view>
 
@@ -46,9 +47,9 @@
     <view class="filter-row">
       <text class="filter-label">减免</text>
       <radio-group id="haveDiscount" class="radio-group" bindchange="setQueryOptions">
-        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
-        <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>包含</label>
-        <label class="radio-item"><radio value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>不含</label>
+        <label class="radio-item"><radio checked="{{queryOptions[2].value == null}}" value="null" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>全部</label>
+        <label class="radio-item"><radio checked="{{queryOptions[2].value === true}}" value="true" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>包含</label>
+        <label class="radio-item"><radio checked="{{queryOptions[2].value === false}}" value="false" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>不含</label>
       </radio-group>
     </view>
 
@@ -56,9 +57,9 @@
     <view class="filter-row">
       <text class="filter-label">次卡</text>
       <radio-group id="useCard" class="radio-group" bindchange="setQueryOptions">
-        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
-        <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>包含</label>
-        <label class="radio-item"><radio value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>不含</label>
+        <label class="radio-item"><radio checked="{{queryOptions[5].value == null}}" value="null" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>全部</label>
+        <label class="radio-item"><radio checked="{{queryOptions[5].value === true}}" value="true" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>包含</label>
+        <label class="radio-item"><radio checked="{{queryOptions[5].value === false}}" value="false" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>不含</label>
       </radio-group>
     </view>
 
@@ -66,9 +67,9 @@
     <view class="filter-row">
       <text class="filter-label">零售</text>
       <radio-group id="hasRetail" class="radio-group" bindchange="setQueryOptions">
-        <label class="radio-item"><radio checked="{{true}}" value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
-        <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>包含</label>
-        <label class="radio-item"><radio value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>不含</label>
+        <label class="radio-item"><radio checked="{{queryOptions[7].value == null}}" value="null" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>全部</label>
+        <label class="radio-item"><radio checked="{{queryOptions[7].value === true}}" value="true" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>包含</label>
+        <label class="radio-item"><radio checked="{{queryOptions[7].value === false}}" value="false" disabled="{{(!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) || querying}}"/>不含</label>
       </radio-group>
     </view>
 
@@ -76,16 +77,16 @@
     <view class="filter-row">
       <text class="filter-label">状态</text>
       <radio-group id="status" class="radio-group radio-group--wrap" bindchange="setQueryOptions">
-        <label class="radio-item"><radio checked="{{true}}" value="null"/>全部</label>
-        <label class="radio-item"><radio value="未支付"/>未支付</label>
-        <label class="radio-item"><radio value="未开始"/>未开始</label>
-        <label class="radio-item"><radio value="租赁中"/>租赁中</label>
-        <label class="radio-item"><radio value="部分归还"/>部分归还</label>
-        <label class="radio-item"><radio value="全部归还"/>全部归还</label>
-        <label class="radio-item"><radio value="部分退押金"/>部分退押金</label>
-        <label class="radio-item"><radio value="全额退押金"/>全额退押金</label>
-        <label class="radio-item"><radio value="了结关闭"/>了结关闭</label>
-        <label class="radio-item"><radio value="临时订单"/>临时订单</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value == null}}" value="null"/>全部</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '未支付'}}" value="未支付"/>未支付</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '未开始'}}" value="未开始"/>未开始</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '租赁中'}}" value="租赁中"/>租赁中</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '部分归还'}}" value="部分归还"/>部分归还</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '全部归还'}}" value="全部归还"/>全部归还</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '部分退押金'}}" value="部分退押金"/>部分退押金</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '全额退押金'}}" value="全额退押金"/>全额退押金</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '了结关闭'}}" value="了结关闭"/>了结关闭</label>
+        <label class="radio-item"><radio checked="{{queryOptions[6].value === '临时订单'}}" value="临时订单"/>临时订单</label>
       </radio-group>
     </view>
 
@@ -103,13 +104,13 @@
     <!-- 手机 -->
     <view class="filter-row">
       <text class="filter-label">手机</text>
-      <input class="filter-input" bindinput="setCell" type="number" placeholder="手机号搜索" />
+      <input class="filter-input" bindinput="setCell" type="number" placeholder="手机号搜索" value="{{cell}}" />
     </view>
 
     <!-- 备注 -->
     <view class="filter-row">
       <text class="filter-label">备注</text>
-      <input class="filter-input" bindinput="setMemo" placeholder="关键词搜索" />
+      <input class="filter-input" bindinput="setMemo" placeholder="关键词搜索" value="{{keyword}}" />
     </view>
 
     <view class="filter-actions">

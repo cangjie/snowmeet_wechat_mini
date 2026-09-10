@@ -1,4 +1,5 @@
 const data = require('../../utils/data.js')
+const adminAiQuery = require('../../utils/adminAiQuery.js')
 
 Component({
   data: {
@@ -113,9 +114,8 @@ Component({
     async sendQuestion() {
       var question = (this.data.input || '').trim()
       if (!question || this.data.loading) return
-      if (this.data.queryMode) {
-        this.queryRentOrders(question)
-        return
+      if (this.data.queryMode || adminAiQuery.isRentOrderDataQuery(question)) {
+        return this.queryRentOrders(question)
       }
       var nextMessages = this.data.messages.concat([{ role: 'user', content: question }])
       this.setData({ messages: nextMessages, input: '', loading: true, error: '' })
@@ -138,8 +138,15 @@ Component({
         var app = getApp()
         await app.loginPromiseNew
         var result = await data.queryRentOrdersByNaturalLanguagePromise(question, app.globalData.sessionKey)
+        var nextMessages = this.data.messages.concat([{ role: 'user', content: question }])
         if (result.status && result.status !== 'ready') {
-          this.setData({ messages: this.data.messages.concat([{ role: 'assistant', content: result.clarification || '请补充查询条件后再试。' }]), loading: false })
+          nextMessages.push({ role: 'assistant', content: result.clarification || '请补充查询条件后再试。' })
+          this.setData({
+            messages: nextMessages,
+            input: '',
+            queryMode: result.status === 'clarification_required',
+            loading: false
+          })
           return
         }
         var summary = result.summary || {}
@@ -147,10 +154,12 @@ Component({
         if (summary.chargeTotal != null) parts.push('应收合计 ¥' + Number(summary.chargeTotal).toFixed(2) + '；实收 ¥' + Number(summary.paidTotal || 0).toFixed(2) + '；退款 ¥' + Number(summary.refundTotal || 0).toFixed(2) + '。')
         if (summary.unpaidCount > 0) parts.push('其中有 ' + summary.unpaidCount + ' 单尚未完成支付，建议优先核对。')
         if (summary.note) parts.push(summary.note)
+        nextMessages.push({ role: 'assistant', content: parts.join('\n') })
         this.setData({
-          messages: this.data.messages.concat([{ role: 'user', content: question }, { role: 'assistant', content: parts.join('\n') }]),
-          input: '', queryMode: false, loading: false
+          messages: nextMessages,
+          input: '', queryMode: false, loading: false, visible: false
         })
+        wx.navigateTo({ url: adminAiQuery.buildRentOrderListUrl(result.intent) })
       } catch (error) {
         this.setData({ loading: false, error: '暂时无法完成数据查询' })
       }

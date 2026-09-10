@@ -130,6 +130,14 @@ Component({
           }
           that.setData({ shop_list: shopList, name_list: name_list })
 
+          // AI/跨页查询显式要求“全部店铺”时，不启动 beacon 自动选店，
+          // 避免页面结果被异步缩小到员工基地店。
+          if (that.properties.defaultShop === '全部店铺' && !that.properties.scene) {
+            that.setData({ currentSelectedIndex: 0 })
+            that.triggerEvent('ShopSelected', { shop: '', sale: 0, care: 0, rent: 0, restuarant: 0 })
+            return
+          }
+
           // defaultShop 显式命中 → 直接选中（不扫蓝牙）
           var defaultShop = that.getShop(that.properties.defaultShop)
           if (defaultShop != null) {
