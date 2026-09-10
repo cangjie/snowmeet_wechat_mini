@@ -1,4 +1,5 @@
 const util = require('./util.js')
+const adminAssistant = require('./adminAssistant.js')
 const app = getApp()
 //获取租赁套餐列表
 const getPackageListPromise = function (shop) {
@@ -517,6 +518,19 @@ const queryRentOrdersByNaturalLanguagePromise = function (question, sessionKey) 
   var qUrl = app.globalData.requestPrefix + 'AdminAi/QueryRentOrdersByNaturalLanguage?sessionKey=' + sessionKey
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   return util.performWebRequest(qUrl, { question: question })
+}
+const askAdminAssistantPromise = function (request, sessionKey) {
+  var url = app.globalData.requestPrefix + 'AdminAi/AskAdminAssistantByStaff?sessionKey=' + encodeURIComponent(sessionKey)
+    + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, request).then(function (response) {
+    if (!adminAssistant.isValidResponse(response)) {
+      throw new Error('管理员助手响应格式无效')
+    }
+    return response
+  }).catch(function (error) {
+    adminAssistant.clearContext()
+    throw error
+  })
 }
 const GetUnCommonPayMethodPromise = function () {
   var getPayMethodUrl = app.globalData.requestPrefix + 'Order/GetUnCommonPayMethod'
@@ -1766,6 +1780,7 @@ module.exports = {
   getAdminPageHelpPromise,
   askAdminPageHelpPromise,
   queryRentOrdersByNaturalLanguagePromise,
+  askAdminAssistantPromise,
   GetUnCommonPayMethodPromise,
   updateOrderPromise,
   cancelPayingPromise,

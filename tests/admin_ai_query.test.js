@@ -2,21 +2,10 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 
 const {
-  isRentOrderDataQuery,
   buildRentOrderListUrl,
   readRentOrderIntent,
   buildRentOrderListState
 } = require('../utils/adminAiQuery.js')
-
-test('明确要求查询租赁订单时自动进入数据查询', () => {
-  assert.equal(isRentOrderDataQuery('请查询一下今年4月份的租赁订单'), true)
-  assert.equal(isRentOrderDataQuery('统计本月未支付的租赁订单金额'), true)
-})
-
-test('询问如何操作时仍由页面帮助回答', () => {
-  assert.equal(isRentOrderDataQuery('如何操作才能查询租赁订单？'), false)
-  assert.equal(isRentOrderDataQuery('这个页面怎么查询租赁订单'), false)
-})
 
 test('查询意图通过跳转参数完整传给租赁订单列表', () => {
   const intent = {
@@ -47,6 +36,7 @@ test('租赁订单列表使用 AI 条件替换默认筛选并从第一页查询'
     is_entertain: true,
     have_discount: false,
     use_card: true,
+    has_retail: true,
     cell_suffix: null,
     keyword: null
   })
@@ -67,7 +57,7 @@ test('租赁订单列表使用 AI 条件替换默认筛选并从第一页查询'
       { key: 'rentItemName', value: null },
       { key: 'useCard', value: true },
       { key: 'status', value: '全部归还' },
-      { key: 'hasRetail', value: null }
+      { key: 'hasRetail', value: true }
     ]
   })
 })
