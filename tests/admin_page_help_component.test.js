@@ -39,6 +39,10 @@ function installAppAndWx() {
 
 function cleanGlobals() { delete global.getApp; delete global.wx; assistant.clearContext() }
 
+function appFor(staffId, sessionKey) {
+  return { loginPromiseNew: Promise.resolve(), globalData: { sessionKey, staff: { id: staffId, title_level: 200 } } }
+}
+
 function loadActualDataWithWxResponse(response) {
   const dataPath = require.resolve('../utils/data.js')
   const originalData = require.cache[dataPath]
@@ -272,4 +276,143 @@ test('403 的有效 v1 失败 envelope 保留安全答复和 trace，不执行 a
     assert.deepEqual(actual.navigations, [])
     assert.doesNotMatch(JSON.stringify(loaded.instance.data), /authorization|secret/i)
   } finally { loaded.restore(); actual.restore(); cleanGlobals() }
+})
+
+test('员工切换后清空旧会话界面，B 的初始帮助和提问不发送 A 的历史', async () => {
+  assistant.clearContext()
+  const requests = []
+  let activeApp = appFor(7, 'session-a')
+  const loaded = loadComponentWithData({ askAdminAssistantPromise: async request => {
+    requests.push(request)
+    return response(request.question.indexOf('请说明当前页面') === 0 ? 'B 的页面说明。' : '当前员工的回答。')
+  } })
+  const navigations = installAppAndWx()
+  global.getApp = () => activeApp
+  try {
+    loaded.instance.data.input = 'A 的历史问题'
+    await loaded.instance.sendQuestion()
+    assert.equal(loaded.instance.data.messages.at(-1).content, '当前员工的回答。')
+
+    activeApp = appFor(8, 'session-b')
+    loaded.instance.data.pageKey = 'pages/admin/rent/new_rent_list'
+    await loaded.instance.loadPageHelp()
+    loaded.instance.data.input = 'B 的新问题'
+    await loaded.instance.sendQuestion()
+
+    assert.equal(requests.length, 3)
+    assert.deepEqual(requests[1].conversation, [])
+    assert.deepEqual(requests[2].conversation, [])
+    assert.equal(requests[2].question, 'B 的新问题')
+    assert.equal(loaded.instance.data.pageHelp.text, 'B 的页面说明。')
+    assert.deepEqual(loaded.instance.data.messages, [
+      { role: 'user', content: 'B 的新问题' },
+      { role: 'assistant', content: '当前员工的回答。', citations: [] }
+    ])
+    assert.deepEqual(navigations, [])
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('A 的 stale_session 延迟结果在切换到 B 后静默丢弃，不改变 B 的界面、上下文或跳转', async () => {
+  assistant.clearContext()
+  let rejectA
+  let activeApp = appFor(7, 'session-a')
+  const loaded = loadComponentWithData({
+    askAdminAssistantPromise: async () => new Promise((resolve, reject) => { rejectA = reject }),
+    isAdminAssistantStaleSessionError: error => error && error.code === 'stale_session'
+  })
+  const navigations = installAppAndWx()
+  global.getApp = () => activeApp
+  try {
+    loaded.instance.data.pageKey = 'pages/admin/rent/new_rent_list'
+    loaded.instance.data.input = 'A 的待处理问题'
+    const pending = loaded.instance.sendQuestion()
+    await new Promise(resolve => setImmediate(resolve))
+    activeApp = appFor(8, 'session-b')
+    const error = new Error('登录状态已变化，请重新提问。')
+    error.code = 'stale_session'
+    rejectA(error)
+    await pending
+
+    assert.deepEqual(loaded.instance.data.messages, [])
+    assert.equal(loaded.instance.data.pageHelp, null)
+    assert.equal(loaded.instance.data.error, '')
+    assert.equal(loaded.instance.data.loading, false)
+    assert.equal(loaded.instance.data.retryable, false)
+    assert.deepEqual(assistant.currentContext({ id: 8 }), { rental_order_query: null })
+    assert.deepEqual(navigations, [])
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('同一员工的 sessionKey 变化也会在下一次帮助请求前清空旧对话', async () => {
+  assistant.clearContext()
+  const requests = []
+  let activeApp = appFor(7, 'session-a')
+  const loaded = loadComponentWithData({ askAdminAssistantPromise: async request => {
+    requests.push(request)
+    return response('当前会话的页面说明。')
+  } })
+  installAppAndWx()
+  global.getApp = () => activeApp
+  try {
+    loaded.instance.data.input = '旧 session 的问题'
+    await loaded.instance.sendQuestion()
+    activeApp = appFor(7, 'session-b')
+    loaded.instance.data.pageKey = 'pages/admin/rent/new_rent_list'
+    await loaded.instance.loadPageHelp()
+
+    assert.deepEqual(requests[1].conversation, [])
+    assert.equal(loaded.instance.data.pageHelp.text, '当前会话的页面说明。')
+    assert.deepEqual(loaded.instance.data.messages, [])
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('A 的延迟初始页面说明在切换到 B 后不覆盖 B 的空白界面', async () => {
+  assistant.clearContext()
+  let resolveA
+  let activeApp = appFor(7, 'session-a')
+  const loaded = loadComponentWithData({ askAdminAssistantPromise: async () => new Promise(resolve => { resolveA = resolve }) })
+  installAppAndWx()
+  global.getApp = () => activeApp
+  try {
+    loaded.instance.data.pageKey = 'pages/admin/rent/new_rent_list'
+    const pending = loaded.instance.loadPageHelp()
+    await new Promise(resolve => setImmediate(resolve))
+    activeApp = appFor(8, 'session-b')
+    resolveA(response('A 的页面说明。', [], { rental_order_query: aprilState }))
+    await pending
+
+    assert.equal(loaded.instance.data.pageHelp, null)
+    assert.deepEqual(loaded.instance.data.messages, [])
+    assert.equal(loaded.instance.data.error, '')
+    assert.equal(loaded.instance.data.loading, false)
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('A 的重试请求在切换到 B 后不恢复 A 的对话或错误状态', async () => {
+  assistant.clearContext()
+  let resolveRetry
+  let calls = 0
+  let activeApp = appFor(7, 'session-a')
+  const loaded = loadComponentWithData({ askAdminAssistantPromise: async () => {
+    calls++
+    if (calls === 1) throw new Error('network')
+    return new Promise(resolve => { resolveRetry = resolve })
+  } })
+  installAppAndWx()
+  global.getApp = () => activeApp
+  try {
+    loaded.instance.data.input = 'A 的重试问题'
+    await loaded.instance.sendQuestion()
+    assert.equal(loaded.instance.data.retryable, true)
+    const retry = loaded.instance.onRetry()
+    await new Promise(resolve => setImmediate(resolve))
+    activeApp = appFor(8, 'session-b')
+    resolveRetry(response('不应显示的 A 重试答复。'))
+    await retry
+
+    assert.equal(loaded.instance.data.error, '')
+    assert.equal(loaded.instance.data.retryable, false)
+    assert.equal(loaded.instance.data.pageHelp, null)
+    assert.deepEqual(loaded.instance.data.messages, [])
+  } finally { loaded.restore(); cleanGlobals() }
 })

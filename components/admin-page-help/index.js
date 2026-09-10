@@ -1,6 +1,20 @@
 const data = require('../../utils/data.js')
 const adminAssistant = require('../../utils/adminAssistant.js')
 
+function ownerFromApp(app) {
+  var globalData = app && app.globalData ? app.globalData : {}
+  var staff = globalData.staff
+  return {
+    staffId: staff && staff.id != null ? String(staff.id) : null,
+    sessionKey: globalData.sessionKey == null ? null : String(globalData.sessionKey)
+  }
+}
+
+function sameOwner(left, right) {
+  return !!left && !!right && left.staffId === right.staffId &&
+    left.sessionKey === right.sessionKey && left.generation === right.generation
+}
+
 Component({
   data: {
     visible: false,
@@ -34,6 +48,7 @@ Component({
       if (this._suppressFabTap) {
         return
       }
+      this.syncUiOwner(getApp())
       this.setData({ visible: true })
       if (!this.data.pageHelp && !this.data.loading) this.loadPageHelp()
     },
@@ -98,49 +113,67 @@ Component({
       this.setData({ queryHint: true, error: '' })
     },
 
-    onRetry() {
+    async onRetry() {
+      var prepared = await this.prepareUiOwner()
+      if (!this.isCurrentUiOwner(prepared.owner)) return
       if (!this.data.retryable || this.data.loading || !this.data.lastQuestion) return
       return this.requestAnswer(
         this.data.lastQuestion,
         this.data.lastAppendUserMessage,
-        this.data.lastErrorMessage
+        this.data.lastErrorMessage,
+        prepared
       )
     },
 
     async loadPageHelp() {
+      var prepared = await this.prepareUiOwner()
+      if (!this.isCurrentUiOwner(prepared.owner)) return
       if (!this.data.pageKey) return
       return this.requestAnswer(
         '请说明当前页面的用途、标准操作步骤、关键限制和常见错误。',
         false,
-        '暂时无法获取页面说明'
+        '暂时无法获取页面说明',
+        prepared
       )
     },
 
     async sendQuestion() {
+      var prepared = await this.prepareUiOwner()
+      if (!this.isCurrentUiOwner(prepared.owner)) return
       var question = (this.data.input || '').trim()
       if (!question || this.data.loading) return
-      return this.requestAnswer(question, true, '暂时无法获得回答')
+      return this.requestAnswer(question, true, '暂时无法获得回答', prepared)
     },
 
-    async requestAnswer(question, appendUserMessage, errorMessage) {
+    async requestAnswer(question, appendUserMessage, errorMessage, prepared) {
+      if (!this.isCurrentUiOwner(prepared.owner)) return
+      this._pendingRequestOwner = prepared.owner
       this.setData({
         input: '', loading: true, error: '', retryable: false, traceId: '', failureType: '',
         lastQuestion: question, lastAppendUserMessage: appendUserMessage,
         lastErrorMessage: errorMessage
       })
       try {
-        await this.ask(question, appendUserMessage)
+        await this.ask(question, appendUserMessage, prepared)
       } catch (error) {
+        if (typeof data.isAdminAssistantStaleSessionError === 'function' &&
+            data.isAdminAssistantStaleSessionError(error)) {
+          this.isCurrentUiOwner(prepared.owner)
+          return
+        }
+        if (!this.isCurrentUiOwner(prepared.owner)) return
+        this._pendingRequestOwner = null
         this.setData({ loading: false, error: errorMessage, retryable: true })
       }
     },
 
-    async ask(question, appendUserMessage) {
-      var app = getApp()
-      await app.loginPromiseNew
+    async ask(question, appendUserMessage, prepared) {
+      var app = prepared.app
       var conversation = this.data.messages
       var request = adminAssistant.buildRequest(this.data.pageKey, question, conversation, app.globalData.staff)
       var result = await data.askAdminAssistantPromise(request, app.globalData.sessionKey)
+      if (!this.isCurrentUiOwner(prepared.owner) || !sameOwner(this._pendingRequestOwner, prepared.owner)) return
+      this._pendingRequestOwner = null
       var failure = typeof data.getAdminAssistantFailure === 'function'
         ? data.getAdminAssistantFailure(result) : null
       if (!failure) adminAssistant.acceptContext(app.globalData.staff, result.context)
@@ -164,16 +197,70 @@ Component({
         })
       }
       if (failure) return
+      if (!this.isCurrentUiOwner(prepared.owner)) return
+      this._pendingActionOwner = prepared.owner
+      var navigated = false
       try {
-        adminAssistant.executeActions(result.actions, url => wx.navigateTo({
-          url,
-          fail: () => this.setData({
-            error: '当前版本暂不支持此操作，请升级后重试', retryable: false, lastQuestion: ''
+        adminAssistant.executeActions(result.actions, url => {
+          if (!this.isCurrentUiOwner(prepared.owner) || !sameOwner(this._pendingActionOwner, prepared.owner)) return
+          navigated = true
+          wx.navigateTo({
+            url,
+            success: () => {
+              if (sameOwner(this._pendingActionOwner, prepared.owner)) this._pendingActionOwner = null
+            },
+            fail: () => {
+              if (!this.isCurrentUiOwner(prepared.owner) || !sameOwner(this._pendingActionOwner, prepared.owner)) return
+              this._pendingActionOwner = null
+              this.setData({
+                error: '当前版本暂不支持此操作，请升级后重试', retryable: false, lastQuestion: ''
+              })
+            }
           })
-        }))
+        })
+        if (!navigated) this._pendingActionOwner = null
       } catch (error) {
+        if (!this.isCurrentUiOwner(prepared.owner) || !sameOwner(this._pendingActionOwner, prepared.owner)) return
+        this._pendingActionOwner = null
         this.setData({ error: '当前版本暂不支持此操作，请升级后重试', retryable: false, lastQuestion: '' })
       }
+    },
+
+    async prepareUiOwner() {
+      var app = getApp()
+      await app.loginPromiseNew
+      return { app: app, owner: this.syncUiOwner(app) }
+    },
+
+    syncUiOwner(app) {
+      var next = ownerFromApp(app)
+      if (!this._uiOwner) {
+        next.generation = 1
+        this._uiOwner = next
+        return next
+      }
+      if (this._uiOwner && this._uiOwner.staffId === next.staffId && this._uiOwner.sessionKey === next.sessionKey) {
+        return this._uiOwner
+      }
+      next.generation = this._uiOwner.generation + 1
+      this._uiOwner = next
+      this._pendingRequestOwner = null
+      this._pendingActionOwner = null
+      this.setData({
+        pageHelp: null, messages: [], queryHint: false, input: '', loading: false,
+        error: '', retryable: false, traceId: '', failureType: '', lastQuestion: '',
+        lastAppendUserMessage: false, lastErrorMessage: ''
+      })
+      return next
+    },
+
+    isCurrentUiOwner(owner) {
+      var current = ownerFromApp(getApp())
+      if (!this._uiOwner || this._uiOwner.staffId !== current.staffId || this._uiOwner.sessionKey !== current.sessionKey) {
+        this.syncUiOwner(getApp())
+        return false
+      }
+      return sameOwner(this._uiOwner, owner)
     }
   }
 })
