@@ -39,18 +39,24 @@ function installAppAndWx() {
 
 function cleanGlobals() { delete global.getApp; delete global.wx; assistant.clearContext() }
 
+function abortError() {
+  const error = new Error('已停止本次提问。')
+  error.code = 'aborted'
+  return error
+}
+
 function appFor(staffId, sessionKey) {
   return { loginPromiseNew: Promise.resolve(), globalData: { sessionKey, staff: { id: staffId, title_level: 200 } } }
 }
 
-function loadActualDataWithWxResponse(response) {
+function loadActualDataWithWxRequest(handler) {
   const dataPath = require.resolve('../utils/data.js')
   const originalData = require.cache[dataPath]
   delete require.cache[dataPath]
   global.getApp = () => ({ loginPromiseNew: Promise.resolve(), globalData: { requestPrefix: 'https://api.example/api/', sessionKey: 'session-1', staff: { id: 7, title_level: 200 } } })
   const navigations = []
   global.wx = {
-    request(options) { options.success(response) },
+    request(options) { return handler(options) },
     navigateTo(options) { navigations.push(options.url) }
   }
   const data = require('../utils/data.js')
@@ -63,6 +69,10 @@ function loadActualDataWithWxResponse(response) {
       else delete require.cache[dataPath]
     }
   }
+}
+
+function loadActualDataWithWxResponse(response) {
+  return loadActualDataWithWxRequest(options => { options.success(response) })
 }
 
 test('四月租赁查询显示服务端文字，保存上下文并跳转到固定筛选列表', async () => {
@@ -457,4 +467,84 @@ test('同一 owner 的旧 stale 请求不清除新请求 loading，当前 stale 
     assert.equal(loaded.instance.data.error, '')
     assert.equal(loaded.instance.data.retryable, false)
   } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('加载中点停止会中止请求、收掉 loading 并留下重试入口', async () => {
+  assistant.clearContext()
+  let aborted = 0
+  const loaded = loadComponentWithData({
+    askAdminAssistantPromise: (request, sessionKey, onTask) => new Promise((resolve, reject) => {
+      if (typeof onTask === 'function') onTask({ abort() { aborted++; reject(abortError()) } })
+    }),
+    isAdminAssistantAbortError: error => !!error && error.code === 'aborted'
+  })
+  installAppAndWx()
+  try {
+    loaded.instance.data.pageKey = 'pages/admin/rent/new_rent_list'
+    const pending = loaded.instance.loadPageHelp()
+    await new Promise(resolve => setImmediate(resolve))
+    assert.equal(loaded.instance.data.loading, true)
+    loaded.instance.stopRequest()
+    await pending
+    assert.equal(aborted, 1)
+    assert.equal(loaded.instance.data.loading, false)
+    assert.equal(loaded.instance.data.stopped, true)
+    assert.equal(loaded.instance.data.error, '')
+    assert.equal(loaded.instance.data.retryable, true)
+    assert.equal(loaded.instance.data.pageHelp, null)
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('停止后重试可以拿到正常回答并清掉停止态', async () => {
+  assistant.clearContext()
+  let calls = 0
+  const loaded = loadComponentWithData({
+    askAdminAssistantPromise: (request, sessionKey, onTask) => {
+      calls++
+      if (calls === 1) {
+        return new Promise((resolve, reject) => {
+          if (typeof onTask === 'function') onTask({ abort() { reject(abortError()) } })
+        })
+      }
+      return Promise.resolve(response('停止后重新生成的说明。'))
+    },
+    isAdminAssistantAbortError: error => !!error && error.code === 'aborted'
+  })
+  installAppAndWx()
+  try {
+    loaded.instance.data.pageKey = 'pages/admin/rent/new_rent_list'
+    const pending = loaded.instance.loadPageHelp()
+    await new Promise(resolve => setImmediate(resolve))
+    loaded.instance.stopRequest()
+    await pending
+    await loaded.instance.onRetry()
+    assert.equal(calls, 2)
+    assert.equal(loaded.instance.data.stopped, false)
+    assert.equal(loaded.instance.data.loading, false)
+    assert.equal(loaded.instance.data.error, '')
+    assert.equal(loaded.instance.data.pageHelp.text, '停止后重新生成的说明。')
+  } finally { loaded.restore(); cleanGlobals() }
+})
+
+test('停止保留已有查询上下文，真正的网络失败仍然清空上下文', async () => {
+  assistant.clearContext()
+  assistant.acceptContext({ id: 7 }, { rental_order_query: aprilState })
+  const stopped = loadActualDataWithWxRequest(options => ({
+    abort() { options.fail({ errMsg: 'request:fail abort' }) }
+  }))
+  try {
+    let task = null
+    const pending = stopped.data.askAdminAssistantPromise(
+      { version: '1', page_key: 'pages/admin/rent/new_rent_list' }, 'session-1', value => { task = value })
+    task.abort()
+    await assert.rejects(() => pending, error => error.code === 'aborted')
+    assert.deepEqual(assistant.currentContext({ id: 7 }), { rental_order_query: aprilState })
+  } finally { stopped.restore() }
+  const broken = loadActualDataWithWxRequest(options => { options.fail({ errMsg: 'request:fail timeout' }); return {} })
+  try {
+    await assert.rejects(
+      () => broken.data.askAdminAssistantPromise({ version: '1', page_key: 'pages/admin/rent/new_rent_list' }, 'session-1'),
+      /暂不可用/)
+    assert.deepEqual(assistant.currentContext({ id: 7 }), { rental_order_query: null })
+  } finally { broken.restore(); cleanGlobals() }
 })

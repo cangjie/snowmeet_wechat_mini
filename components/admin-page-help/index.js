@@ -32,6 +32,7 @@ Component({
     input: '',
     error: '',
     retryable: false,
+    stopped: false,
     traceId: '',
     failureType: '',
     lastQuestion: '',
@@ -117,6 +118,23 @@ Component({
       this.setData({ queryHint: true, error: '' })
     },
 
+    stopRequest() {
+      if (!this.data.loading) return
+      var task = this._pendingTask
+      this._pendingTask = null
+      this._pendingRequest = null
+      if (task && typeof task.abort === 'function') {
+        try {
+          task.abort()
+        } catch (error) {
+          // 请求已经结束时 abort 可能抛错，停止本身仍然算完成
+        }
+      }
+      this.setData({
+        loading: false, stopped: true, error: '', retryable: !!this.data.lastQuestion
+      })
+    },
+
     async onRetry() {
       var prepared = await this.prepareUiOwner()
       if (!this.isCurrentUiOwner(prepared.owner)) return
@@ -159,18 +177,22 @@ Component({
       this._nextRequestToken = requestToken
       this._pendingRequest = { owner: prepared.owner, token: requestToken }
       this.setData({
-        input: '', loading: true, error: '', retryable: false, traceId: '', failureType: '',
+        input: '', loading: true, error: '', retryable: false, stopped: false, traceId: '', failureType: '',
         lastQuestion: question, lastAppendUserMessage: appendUserMessage,
         lastErrorMessage: errorMessage
       })
       try {
         await this.ask(question, appendUserMessage, prepared, requestToken)
       } catch (error) {
+        // 停止是用户主动行为，stopRequest 已经收好界面状态，这里不再报错
+        if (typeof data.isAdminAssistantAbortError === 'function' &&
+            data.isAdminAssistantAbortError(error)) return
         if (typeof data.isAdminAssistantStaleSessionError === 'function' &&
             data.isAdminAssistantStaleSessionError(error)) {
           if (this.isCurrentUiOwner(prepared.owner) &&
               samePendingRequest(this._pendingRequest, prepared.owner, requestToken)) {
             this._pendingRequest = null
+            this._pendingTask = null
             this.setData({ loading: false })
           }
           return
@@ -178,6 +200,7 @@ Component({
         if (!this.isCurrentUiOwner(prepared.owner) ||
             !samePendingRequest(this._pendingRequest, prepared.owner, requestToken)) return
         this._pendingRequest = null
+        this._pendingTask = null
         this.setData({ loading: false, error: errorMessage, retryable: true })
       }
     },
@@ -186,10 +209,13 @@ Component({
       var app = prepared.app
       var conversation = this.data.messages
       var request = adminAssistant.buildRequest(this.data.pageKey, question, conversation, app.globalData.staff)
-      var result = await data.askAdminAssistantPromise(request, app.globalData.sessionKey)
+      var result = await data.askAdminAssistantPromise(request, app.globalData.sessionKey, task => {
+        if (samePendingRequest(this._pendingRequest, prepared.owner, requestToken)) this._pendingTask = task
+      })
       if (!this.isCurrentUiOwner(prepared.owner) ||
           !samePendingRequest(this._pendingRequest, prepared.owner, requestToken)) return
       this._pendingRequest = null
+      this._pendingTask = null
       var failure = typeof data.getAdminAssistantFailure === 'function'
         ? data.getAdminAssistantFailure(result) : null
       if (!failure) adminAssistant.acceptContext(app.globalData.staff, result.context)
@@ -261,10 +287,11 @@ Component({
       next.generation = this._uiOwner.generation + 1
       this._uiOwner = next
       this._pendingRequest = null
+      this._pendingTask = null
       this._pendingActionOwner = null
       this.setData({
         pageHelp: null, messages: [], queryHint: false, input: '', loading: false,
-        error: '', retryable: false, traceId: '', failureType: '', lastQuestion: '',
+        error: '', retryable: false, stopped: false, traceId: '', failureType: '', lastQuestion: '',
         lastAppendUserMessage: false, lastErrorMessage: ''
       })
       return next

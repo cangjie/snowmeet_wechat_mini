@@ -538,9 +538,20 @@ const getAdminAssistantFailure = function (response) {
 const isAdminAssistantStaleSessionError = function (error) {
   return !!error && error.code === 'stale_session'
 }
-const performAdminAssistantRequest = function (url, request) {
+const adminAssistantAbortError = function () {
+  var error = new Error('已停止本次提问。')
+  error.code = 'aborted'
+  return error
+}
+const isAdminAssistantAbortError = function (error) {
+  return !!error && error.code === 'aborted'
+}
+const isAdminAssistantAbortFailure = function (res) {
+  return !!res && typeof res.errMsg === 'string' && res.errMsg.indexOf('abort') >= 0
+}
+const performAdminAssistantRequest = function (url, request, onTask) {
   return new Promise(function (resolve, reject) {
-    wx.request({
+    var task = wx.request({
       url: url,
       data: request,
       method: 'POST',
@@ -557,17 +568,23 @@ const performAdminAssistantRequest = function (url, request) {
         }
         resolve(response)
       },
-      fail: function () {
+      fail: function (res) {
+        // task.abort() 也走 fail，errMsg 形如 'request:fail abort'，不能当作服务故障报错
+        if (isAdminAssistantAbortFailure(res)) {
+          reject(adminAssistantAbortError())
+          return
+        }
         reject(new Error('管理员助手服务暂不可用，请稍后重试。'))
       }
     })
+    if (typeof onTask === 'function') onTask(task)
   })
 }
-const askAdminAssistantPromise = function (request, sessionKey) {
+const askAdminAssistantPromise = function (request, sessionKey, onTask) {
   var url = app.globalData.requestPrefix + 'AdminAi/AskAdminAssistantByStaff?sessionKey=' + encodeURIComponent(sessionKey)
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   var requestOwner = adminAssistant.captureRequestOwner(sessionKey)
-  return performAdminAssistantRequest(url, request).then(function (response) {
+  return performAdminAssistantRequest(url, request, onTask).then(function (response) {
     if (!adminAssistant.isValidResponse(response)) {
       throw new Error('管理员助手响应格式无效')
     }
@@ -578,7 +595,8 @@ const askAdminAssistantPromise = function (request, sessionKey) {
     if (!adminAssistant.isCurrentRequestOwner(requestOwner)) throw adminAssistant.staleSessionError()
     return response
   }).catch(function (error) {
-    adminAssistant.clearContextForOwner(requestOwner)
+    // 主动停止时服务端上下文没有推进，保留本地上下文供重试和追问
+    if (!isAdminAssistantAbortError(error)) adminAssistant.clearContextForOwner(requestOwner)
     throw error
   })
 }
@@ -1833,6 +1851,7 @@ module.exports = {
   askAdminAssistantPromise,
   getAdminAssistantFailure,
   isAdminAssistantStaleSessionError,
+  isAdminAssistantAbortError,
   GetUnCommonPayMethodPromise,
   updateOrderPromise,
   cancelPayingPromise,
