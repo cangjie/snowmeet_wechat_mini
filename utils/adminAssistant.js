@@ -1,14 +1,8 @@
 const adminAiQuery = require('./adminAiQuery.js')
+const adminAiDomains = require('./adminAiDomains.js')
 
 const unsupportedActionMessage = '当前版本暂不支持此操作，请升级后重试'
-const queryFields = [
-  'start_date', 'end_date', 'shop', 'rent_status', 'is_test', 'is_entertain',
-  'have_discount', 'use_card', 'has_retail', 'cell_suffix', 'keyword'
-]
-const nullableBooleanFields = new Set([
-  'is_test', 'is_entertain', 'have_discount', 'use_card', 'has_retail'
-])
-const maxRentOrderListUrlLength = 1800
+const maxListUrlLength = 1800
 const maxConversationMessages = 20
 const maxConversationMessageLength = 2000
 const maxConversationLength = 12000
@@ -19,7 +13,11 @@ let contextGeneration = 0
 let context = emptyContext()
 
 function emptyContext() {
-  return { rental_order_query: null }
+  // 每个业务域各一个键，外加「当前进行中的是哪个域」的指针：
+  // 增量修改（「改成五月」）必须落在同一个域上，不能靠猜。
+  const empty = { active_query_type: null }
+  adminAiDomains.CONTEXT_KEYS.forEach(function (key) { empty[key] = null })
+  return empty
 }
 
 function copy(value) {
@@ -65,35 +63,46 @@ function isBoundedNullableString(value, maxLength) {
   return isNullableString(value) && (value == null || value.length <= maxLength)
 }
 
-function isValidQueryState(state) {
-  if (!isPlainObject(state)) return false
-  if (Object.keys(state).some(key => !queryFields.includes(key))) return false
-  if (!queryFields.every(key => Object.hasOwn(state, key))) return false
+/** 按业务域校验：本域没有的字段一律不接受，别域的条件混不进来。 */
+function isValidQueryState(domain, state) {
+  if (domain == null || !isPlainObject(state)) return false
+  const fields = domain.fields
+  if (Object.keys(state).some(key => !fields.includes(key))) return false
+  if (!fields.every(key => Object.hasOwn(state, key))) return false
   if (!isDateOnly(state.start_date) || !isDateOnly(state.end_date)) return false
   const startDate = new Date(state.start_date.slice(0, 10) + 'T00:00:00Z')
   const endDate = new Date(state.end_date.slice(0, 10) + 'T00:00:00Z')
   if (endDate < startDate || endDate - startDate > 365 * 24 * 60 * 60 * 1000) return false
   if (!isBoundedNullableString(state.shop, 64) || !isBoundedNullableString(state.rent_status, 64) ||
-      !isBoundedNullableString(state.keyword, 100)) return false
+      !isBoundedNullableString(state.retail_type, 64) || !isBoundedNullableString(state.keyword, 40)) return false
   if (state.cell_suffix != null && (!/^\d{4,15}$/.test(state.cell_suffix))) return false
-  return queryFields.every(key =>
-    !nullableBooleanFields.has(key) || state[key] == null || typeof state[key] === 'boolean'
+  return fields.every(key =>
+    domain.booleanFields.indexOf(key) < 0 || state[key] == null || typeof state[key] === 'boolean'
   )
 }
 
 function isValidContext(nextContext) {
-  return isPlainObject(nextContext) &&
-    Object.keys(nextContext).length === 1 &&
-    Object.hasOwn(nextContext, 'rental_order_query') &&
-    (nextContext.rental_order_query === null || isValidQueryState(nextContext.rental_order_query))
+  if (!isPlainObject(nextContext)) return false
+  const allowed = ['active_query_type'].concat(adminAiDomains.CONTEXT_KEYS)
+  if (Object.keys(nextContext).some(key => !allowed.includes(key))) return false
+  const activeType = nextContext.active_query_type
+  if (activeType != null && adminAiDomains.byQueryType(activeType) == null) return false
+  return adminAiDomains.CONTEXT_KEYS.every(function (key) {
+    const state = nextContext[key]
+    if (state == null) return true
+    return isValidQueryState(adminAiDomains.byContextKey(key), state)
+  })
 }
 
 function normalizeContext(nextContext) {
   if (!isValidContext(nextContext)) return null
-  if (nextContext.rental_order_query === null) return emptyContext()
-  const normalized = copy(nextContext)
-  normalized.rental_order_query.start_date = normalized.rental_order_query.start_date.slice(0, 10)
-  normalized.rental_order_query.end_date = normalized.rental_order_query.end_date.slice(0, 10)
+  const normalized = Object.assign(emptyContext(), copy(nextContext))
+  adminAiDomains.CONTEXT_KEYS.forEach(function (key) {
+    const state = normalized[key]
+    if (state == null) return
+    state.start_date = state.start_date.slice(0, 10)
+    state.end_date = state.end_date.slice(0, 10)
+  })
   return normalized
 }
 
@@ -168,20 +177,40 @@ function staleSessionError() {
   return error
 }
 
+/**
+ * 列表页 onLoad 承接 AI 条件：校验 → 映射成页面 data → 附上条件摘要。
+ * 返回 null 表示这次不是 AI 跳转，页面按自己的默认值初始化。
+ *
+ * 四个页面共用同一段逻辑，省得每加一个域就抄一遍、抄漏一处。
+ */
+function applyPageIntent(actionType, options) {
+  const domain = adminAiDomains.byActionType(actionType)
+  if (domain == null) return null
+  const intent = adminAiQuery.readOrderIntent(options)
+  if (!isValidQueryState(domain, intent)) return null
+  const state = adminAiQuery.buildListState(actionType, intent)
+  if (state == null) return null
+  state.aiQueryConditions = adminAiQuery.describeIntent(actionType, intent)
+  return state
+}
+
 function executeActions(actions, navigateTo) {
   if (!Array.isArray(actions) || actions.length > 1 || typeof navigateTo !== 'function') {
     throw new Error(unsupportedActionMessage)
   }
   actions.forEach(function (action) {
-    if (!isPlainObject(action) || action.type !== 'rental_order.show_results' ||
-        action.status !== 'completed' || !isValidQueryState(action.state)) {
+    if (!isPlainObject(action) || action.status !== 'completed') {
       throw new Error(unsupportedActionMessage)
     }
-    const url = adminAiQuery.buildRentOrderListUrl(action.state)
-    // buildRentOrderListUrl percent-encodes the JSON, so URL length measures the
+    const domain = adminAiDomains.byActionType(action.type)
+    if (domain == null || !isValidQueryState(domain, action.state)) {
+      throw new Error(unsupportedActionMessage)
+    }
+    const url = adminAiQuery.buildListUrl(action.type, action.state)
+    // buildListUrl percent-encodes the JSON, so URL length measures the
     // encoded transport payload rather than the source JavaScript string length.
-    if (typeof url !== 'string' || url.length > maxRentOrderListUrlLength ||
-        !/^\/pages\/admin\/rent\/new_rent_list\?aiIntent=/.test(url)) {
+    if (typeof url !== 'string' || url.length > maxListUrlLength ||
+        url.indexOf(domain.path + '?aiIntent=') !== 0) {
       throw new Error(unsupportedActionMessage)
     }
     navigateTo(url)
@@ -198,6 +227,7 @@ module.exports = {
   isCurrentRequestOwner,
   staleSessionError,
   executeActions,
+  applyPageIntent,
   isValidQueryState,
   isValidResponse
 }

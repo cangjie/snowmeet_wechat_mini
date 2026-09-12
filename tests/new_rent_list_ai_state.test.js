@@ -22,7 +22,7 @@ function loadPage() {
 }
 
 test('AI 租赁列表解码完整条件，显示条件摘要并原样生成分页查询参数', () => {
-  const state = adminAiQuery.buildRentOrderListState(fullState)
+  const state = adminAiQuery.buildListState('rental_order.show_results', fullState)
   assert.equal(state.queryOptions.find(option => option.key === 'hasRetail').value, true)
   assert.equal(state.cell, '7788')
   assert.equal(state.keyword, '雪板')

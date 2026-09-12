@@ -1,4 +1,7 @@
 <view>
+  <view wx:if="{{aiQueryApplied && aiQueryConditions}}" style="margin: 20rpx 50rpx; color: #56717e; font-size: 24rpx;">
+    AI 条件：{{aiQueryConditions}}
+  </view>
   <view class="view-row">
     <view style="text-align: right;width: 250rpx;">
       <button class="input" size="mini" bind:tap="gotoPrev">《 上一日</button>

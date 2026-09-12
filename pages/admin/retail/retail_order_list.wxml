@@ -1,13 +1,21 @@
 <view>
   <fui-card full>
+    <fui-row wx:if="{{aiQueryApplied && aiQueryConditions}}">
+      <fui-col span="5">
+        <view class="fui-left-column">AI 条件</view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column">{{aiQueryConditions}}</view>
+      </fui-col>
+    </fui-row>
     <fui-row>
       <fui-col span="5">
         <view class="fui-left-column">【店铺】</view>
       </fui-col>
       <fui-col span="18">
         <view class="fui-right-column">
-          <shop-selector wx:if="{{cell != null && cell != ''}}" defaultShop="" bindShopSelected="shopSelected"></shop-selector>
-          <shop-selector wx:else bindShopSelected="shopSelected"></shop-selector>
+          <shop-selector wx:if="{{!aiQueryApplied && cell != null && cell != ''}}" defaultShop="" bindShopSelected="shopSelected"></shop-selector>
+          <shop-selector wx:else defaultShop="{{aiQueryApplied ? (shop || '全部店铺') : ''}}" bindShopSelected="shopSelected"></shop-selector>
         </view>
       </fui-col>
     </fui-row>

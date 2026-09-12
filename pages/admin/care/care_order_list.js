@@ -5,6 +5,7 @@
 const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
+const adminAssistant = require('../../../utils/adminAssistant.js')
 
 const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com'
 
@@ -26,10 +27,17 @@ Page({
     pageSize: 50,
     totalPages: 0,
     totalEarnStr: '',
-    querying: false
+    querying: false,
+    aiQueryConditions: ''
   },
 
   onLoad(options) {
+    var aiState = adminAssistant.applyPageIntent('care_order.show_results', options)
+    if (aiState) {
+      this._ignoreInitialShopSelection = true
+      this.setData(aiState)
+      return
+    }
     var nowDate = new Date()
     this.setData({ startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate) })
   },
@@ -45,6 +53,11 @@ Page({
   },
 
   shopSelected(e) {
+    // AI 指定了门店时，吃掉 shop_selector 首次的自动选店事件，否则会被就近扫描覆盖掉。
+    if (this._ignoreInitialShopSelection) {
+      this._ignoreInitialShopSelection = false
+      return
+    }
     this.setData({ shop: e.detail.shop })
   },
 
@@ -88,8 +101,9 @@ Page({
     var endDate = this.data.endDate
     var cell = this.data.cell
     var keyword = this.data.keyword
-    // 手机 / 备注搜索时放宽到全时段、全店铺、忽略其它筛选（与旧版一致）
-    if ((cell != null && cell != '') || (keyword != null && keyword != '')) {
+    // 手机 / 备注搜索时放宽到全时段、全店铺、忽略其它筛选（与旧版一致）。
+    // AI 下发的是一组完整条件，手机号只是其中一项，不能触发放宽——否则日期门店会被冲掉。
+    if (!this.data.aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) {
       startDate = new Date('2025-10-15')
       endDate = new Date()
       shop = null

@@ -2,13 +2,17 @@
 // pages/admin/ski_pass/nanshan_reserve.js
 const app = getApp()
 const util = require('../../../utils/util.js')
+const adminAssistant = require('../../../utils/adminAssistant.js')
 Page({
 
   /**
    * Page initial data
    */
   data: {
-
+    // 本页原本只看单日；AI 查询会给一个日期区间，用 startDate/endDate 承接。
+    // 后端 GetDHHSReservedSkipasses 本来就收 start/end，之前一直传同一天而已。
+    aiQueryApplied: false,
+    aiQueryConditions: ''
   },
 
   /**
@@ -16,8 +20,18 @@ Page({
    */
   onLoad(options) {
     var that = this
+    var aiState = adminAssistant.applyPageIntent('ski_pass.show_results', options)
+    if (aiState) {
+      that.setData({
+        aiQueryApplied: true,
+        aiQueryConditions: aiState.aiQueryConditions,
+        startDate: aiState.startDate,
+        endDate: aiState.endDate,
+        currentDate: aiState.startDate
+      })
+      return
+    }
     var currentDate = util.formatDate(new Date())
-    console.log('current date', currentDate)
     that.setData({currentDate})
   },
 
@@ -76,7 +90,7 @@ Page({
     var that = this
     var currentDate = new Date(that.data.currentDate)
     currentDate = currentDate.setDate(currentDate.getDate() + 1)
-    that.setData({currentDate: util.formatDate(new Date(currentDate))})
+    that.setData({currentDate: util.formatDate(new Date(currentDate)), aiQueryApplied: false, aiQueryConditions: ''})
     that.getData()
   },
 
@@ -84,17 +98,19 @@ Page({
     var that = this
     var currentDate = new Date(that.data.currentDate)
     currentDate = currentDate.setDate(currentDate.getDate() - 1)
-    that.setData({currentDate: util.formatDate(new Date(currentDate))})
+    that.setData({currentDate: util.formatDate(new Date(currentDate)), aiQueryApplied: false, aiQueryConditions: ''})
     that.getData()
   },
   selectDate(e){
     var that = this
     var currentDate = e.detail.value
-    that.setData({currentDate})
+    that.setData({currentDate, aiQueryApplied: false, aiQueryConditions: ''})
   },
   getData(){
     var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetDHHSReservedSkipasses?start=' + util.formatDate(new Date(that.data.currentDate)) + '&end=' + util.formatDate(new Date(that.data.currentDate)) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+    var start = that.data.aiQueryApplied && that.data.startDate ? that.data.startDate : that.data.currentDate
+    var end = that.data.aiQueryApplied && that.data.endDate ? that.data.endDate : that.data.currentDate
+    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetDHHSReservedSkipasses?start=' + util.formatDate(new Date(start)) + '&end=' + util.formatDate(new Date(end)) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
     wx.request({
       url: getUrl,
       method: 'GET',

@@ -3,6 +3,16 @@ const assert = require('node:assert/strict')
 
 const assistant = require('../utils/adminAssistant.js')
 const adminAiQuery = require('../utils/adminAiQuery.js')
+const adminAiDomains = require('../utils/adminAiDomains.js')
+
+const RENTAL = 'rental_order.show_results'
+
+/** 空上下文的完整形状：每个业务域一个键，外加当前进行中的域指针。 */
+function contextShape(overrides) {
+  const shape = { active_query_type: null }
+  adminAiDomains.CONTEXT_KEYS.forEach(key => { shape[key] = null })
+  return Object.assign(shape, overrides || {})
+}
 
 const aprilState = {
   start_date: '2026-04-01', end_date: '2026-04-30', shop: '万龙服务中心',
@@ -89,7 +99,7 @@ test('四月租赁查询显示服务端文字，保存上下文并跳转到固�
     await loaded.instance.sendQuestion()
     assert.equal(unifiedCalls, 1)
     assert.equal(loaded.instance.data.messages.at(-1).content, '共查询到 12 单。')
-    assert.deepEqual(assistant.currentContext({ id: 7 }), { rental_order_query: aprilState })
+    assert.deepEqual(assistant.currentContext({ id: 7 }), contextShape({ rental_order_query: aprilState }))
     assert.equal(navigations.length, 1)
     assert.match(navigations[0], /^\/pages\/admin\/rent\/new_rent_list\?aiIntent=/)
   } finally { loaded.restore(); cleanGlobals() }
@@ -226,10 +236,12 @@ test('超长 CJK 关键词或编码后超限的完整 action 均保留文字且�
   assistant.clearContext()
   const oversizedStates = [
     { ...aprilState, keyword: '雪'.repeat(1000) },
-    { ...aprilState, shop: '万'.repeat(64), rent_status: '未'.repeat(64), keyword: '雪'.repeat(100) }
+    // keyword 已收紧到 40 字，但门店/状态/关键词都顶到上限时，编码后仍会超过 1800 —— 
+    // 这条用例要的就是「状态本身合法、URL 却超限」，所以按新上限取值。
+    { ...aprilState, shop: '万'.repeat(64), rent_status: '未'.repeat(64), keyword: '雪'.repeat(40) }
   ]
-  assert.equal(assistant.isValidQueryState(oversizedStates[1]), true)
-  assert.ok(adminAiQuery.buildRentOrderListUrl(oversizedStates[1]).length > 1800)
+  assert.equal(assistant.isValidQueryState(adminAiDomains.byActionType(RENTAL), oversizedStates[1]), true)
+  assert.ok(adminAiQuery.buildListUrl(RENTAL, oversizedStates[1]).length > 1800)
   let index = 0
   const loaded = loadComponentWithData({ askAdminAssistantPromise: async () => response('共查询到 12 单。', [{ type: 'rental_order.show_results', status: 'completed', state: oversizedStates[index++] }]) })
   const navigations = installAppAndWx()
@@ -363,7 +375,7 @@ test('A 的 stale_session 延迟结果在切换到 B 后静默丢弃，不改变
     assert.equal(loaded.instance.data.error, '')
     assert.equal(loaded.instance.data.loading, false)
     assert.equal(loaded.instance.data.retryable, false)
-    assert.deepEqual(assistant.currentContext({ id: 8 }), { rental_order_query: null })
+    assert.deepEqual(assistant.currentContext({ id: 8 }), contextShape())
     assert.deepEqual(navigations, [])
   } finally { loaded.restore(); cleanGlobals() }
 })
@@ -538,13 +550,13 @@ test('停止保留已有查询上下文，真正的网络失败仍然清空上�
       { version: '1', page_key: 'pages/admin/rent/new_rent_list' }, 'session-1', value => { task = value })
     task.abort()
     await assert.rejects(() => pending, error => error.code === 'aborted')
-    assert.deepEqual(assistant.currentContext({ id: 7 }), { rental_order_query: aprilState })
+    assert.deepEqual(assistant.currentContext({ id: 7 }), contextShape({ rental_order_query: aprilState }))
   } finally { stopped.restore() }
   const broken = loadActualDataWithWxRequest(options => { options.fail({ errMsg: 'request:fail timeout' }); return {} })
   try {
     await assert.rejects(
       () => broken.data.askAdminAssistantPromise({ version: '1', page_key: 'pages/admin/rent/new_rent_list' }, 'session-1'),
       /暂不可用/)
-    assert.deepEqual(assistant.currentContext({ id: 7 }), { rental_order_query: null })
+    assert.deepEqual(assistant.currentContext({ id: 7 }), contextShape())
   } finally { broken.restore(); cleanGlobals() }
 })

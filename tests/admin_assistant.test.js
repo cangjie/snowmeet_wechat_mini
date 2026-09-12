@@ -2,6 +2,14 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 
 const assistant = require('../utils/adminAssistant.js')
+const adminAiDomains = require('../utils/adminAiDomains.js')
+
+/** 空上下文的完整形状：每个业务域一个键，外加当前进行中的域指针。 */
+function emptyContextShape(overrides) {
+  const shape = { active_query_type: null }
+  adminAiDomains.CONTEXT_KEYS.forEach(key => { shape[key] = null })
+  return Object.assign(shape, overrides || {})
+}
 
 const aprilUnpaid = {
   start_date: '2026-04-01', end_date: '2026-04-30', shop: '万龙服务中心',
@@ -43,7 +51,7 @@ test('请求对话投影为严格 binder 接受的 role/content JSON，且丢弃
       { role: 'user', content: '上一轮问题' },
       { role: 'assistant', content: '上一轮答复' }
     ],
-    context: { rental_order_query: null }
+    context: emptyContextShape()
   })
   assert.ok(serialized.conversation.every(message => Object.keys(message).join(',') === 'role,content'))
 })
@@ -234,4 +242,77 @@ test('旧员工的统一请求延迟成功时返回安全 stale_session 信号�
   } finally {
     loaded.restore()
   }
+})
+
+
+test('每个业务域的 action 只跳自己的列表页', () => {
+  assistant.clearContext()
+  const april = { start_date: '2026-04-01', end_date: '2026-04-30' }
+  const cases = [
+    ['care_order.show_results', Object.assign({}, april, {
+      shop: null, is_test: null, is_entertain: null, have_discount: null,
+      cell_suffix: null, use_card: null, is_summer_care: true, keyword: null
+    }), /^\/pages\/admin\/care\/care_order_list\?aiIntent=/],
+    ['retail_order.show_results', Object.assign({}, april, {
+      shop: null, is_test: null, is_entertain: null, have_discount: null,
+      cell_suffix: null, retail_type: '养护卡类'
+    }), /^\/pages\/admin\/retail\/retail_order_list\?aiIntent=/],
+    ['ski_pass.show_results', april, /^\/pages\/admin\/ski_pass\/dhhs_skipass_order\?aiIntent=/]
+  ]
+
+  cases.forEach(([type, state, expected]) => {
+    const urls = []
+    assistant.executeActions([{ type, status: 'completed', state }], url => urls.push(url))
+    assert.equal(urls.length, 1, type)
+    assert.match(urls[0], expected)
+  })
+})
+
+test('别的域的条件混进来时拒绝执行，不跳转', () => {
+  assistant.clearContext()
+  const april = { start_date: '2026-04-01', end_date: '2026-04-30' }
+  // 养护域没有 rent_status / has_retail，这正是线上那个 bug 的形状
+  assert.throws(() => assistant.executeActions([{
+    type: 'care_order.show_results', status: 'completed',
+    state: Object.assign({}, april, {
+      shop: null, is_test: null, is_entertain: null, have_discount: null,
+      cell_suffix: null, use_card: null, is_summer_care: null, keyword: null,
+      rent_status: '未支付'
+    })
+  }], () => {}), /暂不支持/)
+
+  // 雪票域只有日期
+  assert.throws(() => assistant.executeActions([{
+    type: 'ski_pass.show_results', status: 'completed',
+    state: Object.assign({}, april, { shop: '万龙服务中心' })
+  }], () => {}), /暂不支持/)
+
+  // 压根不存在的业务域
+  assert.throws(() => assistant.executeActions([{
+    type: 'payroll.show_results', status: 'completed', state: april
+  }], () => {}), /暂不支持/)
+})
+
+test('多个业务域的上下文各自保留，互不冲掉', () => {
+  assistant.clearContext()
+  const rental = {
+    start_date: '2026-04-01', end_date: '2026-04-30', shop: null, rent_status: '未支付',
+    is_test: null, is_entertain: null, have_discount: null, use_card: null,
+    has_retail: null, cell_suffix: null, keyword: null
+  }
+  const care = {
+    start_date: '2026-05-01', end_date: '2026-05-31', shop: null, is_test: null,
+    is_entertain: null, have_discount: null, cell_suffix: null, use_card: null,
+    is_summer_care: true, keyword: null
+  }
+
+  assistant.acceptContext({ id: 7 }, {
+    active_query_type: 'care_order.query', rental_order_query: rental, care_order_query: care
+  })
+  const saved = assistant.currentContext({ id: 7 })
+
+  assert.deepEqual(saved.rental_order_query, rental)
+  assert.deepEqual(saved.care_order_query, care)
+  assert.equal(saved.active_query_type, 'care_order.query')
+  assert.equal(saved.retail_order_query, null)
 })

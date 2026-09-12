@@ -2,28 +2,8 @@
 const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
-const adminAiQuery = require('../../../utils/adminAiQuery.js')
 const adminAssistant = require('../../../utils/adminAssistant.js')
 
-function booleanCondition(value, whenTrue, whenFalse) {
-  if (value == null) return '全部'
-  return value ? whenTrue : whenFalse
-}
-
-function describeAiQueryConditions(state) {
-  return [
-    '日期：' + state.start_date.slice(0, 10) + ' 至 ' + state.end_date.slice(0, 10),
-    '门店：' + (state.shop || '全部'),
-    '状态：' + (state.rent_status || '全部'),
-    '测试：' + booleanCondition(state.is_test, '测试', '营业'),
-    '招待：' + booleanCondition(state.is_entertain, '招待', '正常'),
-    '减免：' + booleanCondition(state.have_discount, '包含', '不含'),
-    '次卡：' + booleanCondition(state.use_card, '包含', '不含'),
-    '零售子单：' + booleanCondition(state.has_retail, '包含', '不含'),
-    '手机号后缀：' + (state.cell_suffix || '未限制'),
-    '关键词：' + (state.keyword || '未限制')
-  ].join('；')
-}
 
 Page({
 
@@ -51,11 +31,9 @@ Page({
   },
 
   onLoad(options) {
-    var intent = adminAiQuery.readRentOrderIntent(options)
-    if (adminAssistant.isValidQueryState(intent)) {
+    var aiState = adminAssistant.applyPageIntent('rental_order.show_results', options)
+    if (aiState) {
       this._ignoreInitialShopSelection = true
-      var aiState = adminAiQuery.buildRentOrderListState(intent)
-      aiState.aiQueryConditions = describeAiQueryConditions(intent)
       this.setData(aiState)
       return
     }

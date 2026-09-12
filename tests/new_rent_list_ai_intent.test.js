@@ -1,6 +1,6 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
-const { buildRentOrderListUrl } = require('../utils/adminAiQuery.js')
+const { buildListUrl } = require('../utils/adminAiQuery.js')
 
 function loadPage() {
   const pagePath = require.resolve('../pages/admin/rent/new_rent_list.js')
@@ -29,7 +29,7 @@ test('租赁订单列表首次加载时应用帮助系统传入的 AI 查询条�
     rent_status: '未支付', is_test: null, is_entertain: false,
     have_discount: true, use_card: null, has_retail: null, cell_suffix: null, keyword: '雪板'
   }
-  const encoded = buildRentOrderListUrl(intent).split('aiIntent=')[1]
+  const encoded = buildListUrl('rental_order.show_results', intent).split('aiIntent=')[1]
   const page = loadPage()
 
   page.onLoad.call(page, { aiIntent: encoded })
@@ -61,7 +61,7 @@ test('AI 复合查询中的手机号不应冲掉日期门店和其它筛选条�
     is_entertain: false, have_discount: true, use_card: false, has_retail: true,
     cell_suffix: '7788', keyword: null
   }
-  const encoded = buildRentOrderListUrl(intent).split('aiIntent=')[1]
+  const encoded = buildListUrl('rental_order.show_results', intent).split('aiIntent=')[1]
   const page = loadPage()
   page.onLoad.call(page, { aiIntent: encoded })
 

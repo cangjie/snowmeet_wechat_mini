@@ -1,5 +1,6 @@
 const data = require('../../utils/data.js')
 const adminAssistant = require('../../utils/adminAssistant.js')
+const adminAiDomains = require('../../utils/adminAiDomains.js')
 
 function ownerFromApp(app) {
   var globalData = app && app.globalData ? app.globalData : {}
@@ -37,14 +38,20 @@ Component({
     failureType: '',
     lastQuestion: '',
     lastAppendUserMessage: false,
-    lastErrorMessage: ''
+    lastErrorMessage: '',
+    queryDomainLabel: ''
   },
 
   lifetimes: {
     attached() {
       var pages = getCurrentPages()
       var current = pages[pages.length - 1]
-      this.setData({ pageKey: current && current.route ? current.route : '' })
+      var pageKey = current && current.route ? current.route : ''
+      var domain = adminAiDomains.byPageRoute(pageKey)
+      this.setData({
+        pageKey: pageKey,
+        queryDomainLabel: domain ? domain.label : ''
+      })
     }
   },
 

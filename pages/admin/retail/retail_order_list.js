@@ -1,6 +1,7 @@
 // pages/admin/retail/retail_order_list.js
 const app = getApp()
 const util = require('../../../utils/util.js')
+const adminAssistant = require('../../../utils/adminAssistant.js')
 const data = require('../../../utils/data.js')
 Page({
 
@@ -14,14 +15,21 @@ Page({
       { key: 'isEntertain', value: false },
       { key: 'retailType', value: null }
     ],
-    cell: null
-
+    cell: null,
+    aiQueryApplied: false,
+    aiQueryConditions: ''
   },
   /**
    * Lifecycle function--Called when page load
    */
   onLoad(options) {
     var that = this
+    var aiState = adminAssistant.applyPageIntent('retail_order.show_results', options)
+    if (aiState) {
+      that._ignoreInitialShopSelection = true
+      that.setData(aiState)
+      return
+    }
     var nowDate = new Date()
     that.setData({ startDate: util.formatDate(nowDate), endDate: util.formatDate(nowDate) })
   },
@@ -162,7 +170,7 @@ Page({
         }
       }
     }
-    console.log('set query options', queryOptions)
+    that.setData({ queryOptions })
   },
   query() {
     var that = this
@@ -171,7 +179,11 @@ Page({
   },
   shopSelected(e) {
     var that = this
-    console.log('shop selected', e)
+    // AI 指定了门店时，吃掉首次的自动选店事件，否则会被就近扫描覆盖掉。
+    if (that._ignoreInitialShopSelection) {
+      that._ignoreInitialShopSelection = false
+      return
+    }
     that.setData({ shop: e.detail.shop })
   },
   getData(){
@@ -199,7 +211,8 @@ Page({
     var startDate = that.data.startDate
     var endDate = that.data.endDate
     var cell = that.data.cell
-    if (cell != null && cell != '') {
+    // AI 下发的是一组完整条件，手机号只是其中一项，不能触发放宽——否则日期门店会被冲掉。
+    if (!that.data.aiQueryApplied && cell != null && cell != '') {
       startDate = new Date('2025-10-15')
       endDate = null
       shop = null
