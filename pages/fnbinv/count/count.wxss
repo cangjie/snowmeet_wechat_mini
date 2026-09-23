@@ -1,0 +1,4 @@
+@import "../common/fnb.wxss";
+.card-title.small { font-size: 28rpx; }
+.count { width: 170rpx; flex: none !important; text-align: right; }
+.actions { gap: 16rpx; justify-content: center; }

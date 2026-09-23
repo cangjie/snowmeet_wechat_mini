@@ -1,0 +1,11 @@
+@import "../common/fnb.wxss";
+.stat-num { font-size: 36rpx; }
+.bar { display: flex; flex-direction: column; gap: 10rpx; padding: 10rpx 0; }
+.bar-name { font-size: 26rpx; font-weight: 600; }
+.bar-val { font-size: 26rpx; font-weight: 700; }
+.pct { width: 70rpx; text-align: right; }
+.led-row { display: flex; align-items: center; gap: 16rpx; padding: 16rpx 0; border-bottom: 2rpx solid var(--gray); }
+.led-row:last-child { border-bottom: none; }
+.led-qty { font-size: 26rpx; font-weight: 700; }
+.card-title.small { font-size: 28rpx; }
+.fnb-empty.small { padding: 24rpx 0; font-size: 24rpx; }

@@ -1,0 +1,37 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">批次详情</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:elif="{{info}}">
+    <view class="card card-pad col">
+      <view class="card-row"><text class="card-title">{{info.name}}</text><text class="tag {{info.form === 'opened' ? 'warn' : info.form === 'sealed' ? 'muted' : 'ok'}}">{{info.formLabel}}</text><text wx:if="{{info.destroyed}}" class="tag danger">已销毁</text></view>
+      <view class="batch-no">{{info.batchNo}}</view>
+      <view class="card-row big-row"><view class="qty">{{info.qtyLabel}}</view><view class="tag {{info.tone}}">{{info.expireText}}</view></view>
+    </view>
+    <view class="card">
+      <view class="kv"><text class="k">储存方式</text><text>{{info.storage}}</text></view>
+      <view class="kv"><text class="k">到期日期</text><text>{{info.expireDate}}</text></view>
+      <view class="kv"><text class="k">效期依据</text><text>{{info.source}}</text></view>
+      <view wx:if="{{info.note}}" class="kv"><text class="k">说明</text><text class="v">{{info.note}}</text></view>
+      <view wx:if="{{info.produceDate}}" class="kv"><text class="k">生产日期</text><text>{{info.produceDate}}</text></view>
+      <view wx:if="{{info.shelfLife}}" class="kv"><text class="k">保质期</text><text>{{info.shelfLife}}</text></view>
+      <view wx:if="{{info.openedDate}}" class="kv"><text class="k">开封日期</text><text>{{info.openedDate}}（原到期 {{info.originalExpire}}）</text></view>
+      <view wx:if="{{info.openRule}}" class="kv"><text class="k">开封后</text><text>{{info.openRule}}</text></view>
+      <view class="kv"><text class="k">临期提醒</text><text>提前 {{info.warnDays}} 天</text></view>
+      <view wx:if="{{info.cost}}" class="kv"><text class="k">在库成本</text><text>{{info.cost}}</text></view>
+    </view>
+    <view wx:if="{{photos.length}}" class="card card-pad">
+      <view class="fnb-section-title">批次照片</view>
+      <view class="photos"><image wx:for="{{photos}}" wx:key="*this" src="{{item}}" mode="aspectFill" class="photo" data-url="{{item}}" bindtap="onPreview" /></view>
+    </view>
+    <view class="actions">
+      <view wx:if="{{info.canOpen}}" class="btn primary grow-btn" bindtap="onOpen">开封 1 {{info.packName}}</view>
+      <view class="btn grow-btn" bindtap="onPrint">打印标签</view>
+      <view wx:if="{{!info.empty && !info.destroyed}}" class="btn {{isManager ? 'danger' : 'disabled'}} grow-btn" bindtap="onWaste">报损</view>
+    </view>
+    <view wx:if="{{!isManager}}" class="fnb-note">报损需要店长权限。</view>
+  </block>
+</view>
+<van-popup show="{{printShow}}" position="bottom" custom-style="height:70%;" closeable bind:close="onPrintClose">
+  <print-food-label wx:if="{{printShow}}" batch="{{printBatch}}" />
+</van-popup>
+<fnb-tabbar active="stock" />

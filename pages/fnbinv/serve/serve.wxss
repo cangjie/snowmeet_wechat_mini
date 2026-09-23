@@ -1,0 +1,10 @@
+@import "../common/fnb.wxss";
+.order-no { font-size: 28rpx; font-weight: 700; letter-spacing: 0.6rpx; }
+.dish-line { font-size: 26rpx; font-weight: 600; color: #374151; }
+.remark { font-size: 22rpx; color: var(--warn); background: var(--warn-bg); border-radius: 10rpx; padding: 8rpx 14rpx; align-self: flex-start; }
+.batch-qty { font-size: 26rpx; font-weight: 700; }
+.need-head { background: var(--gray); font-size: 22rpx; font-weight: 600; color: var(--muted); }
+.actions { gap: 16rpx; flex-wrap: wrap; }
+.editor { max-height: 88vh; }
+.dish-row { display: flex; align-items: center; gap: 16rpx; padding: 16rpx 0; border-bottom: 2rpx solid var(--gray); }
+.card-title.small { font-size: 28rpx; }

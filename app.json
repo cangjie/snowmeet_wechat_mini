@@ -121,6 +121,23 @@
       "pages": [
         "settle/index"
       ]
+    },
+    {
+      "root": "pages/fnbinv",
+      "name": "fnbinv",
+      "pages": [
+        "stock/stock",
+        "expiry/expiry",
+        "destroy/destroy",
+        "batch/batch",
+        "inbound/inbound",
+        "cats/cats",
+        "prep/prep",
+        "recipe/recipe",
+        "serve/serve",
+        "count/count",
+        "dash/dash"
+      ]
     }
   ],
   "usingComponents": {

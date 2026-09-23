@@ -1,0 +1,74 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">每道菜的用料</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="seg">
+      <view class="chip-sq {{seg === 'dish' ? 'on' : ''}}" data-seg="dish" bindtap="onSeg">菜品配方</view>
+      <view class="chip-sq {{seg === 'prep' ? 'on' : ''}}" data-seg="prep" bindtap="onSeg">半成品配方</view>
+    </view>
+    <view class="fnb-note" wx:if="{{seg === 'dish'}}">每道菜按<text class="em">一份</text>设用料，出餐时按厨房单数量扣减。补齐配方后，待核对的厨房单才能出餐。<text wx:if="{{!isManager}}">维护需要店长权限。</text></view>
+    <view class="fnb-note" wx:else>半成品也是食材：制作一次即核销原料，产出按自己的保质期入库。半成品食材在「分类」里新增时选「半成品」类型。</view>
+    <view wx:if="{{seg === 'dish' && isManager}}" class="btn primary btn-block" bindtap="newDish">＋ 新建菜品</view>
+
+    <view wx:for="{{seg === 'dish' ? dishes : preps}}" wx:key="key" class="card">
+      <view class="card-pad card-row" data-key="{{item.key}}" bindtap="onToggle">
+        <view class="grow col">
+          <view class="card-title">{{item.name}}</view>
+          <view class="card-meta">{{seg === 'dish' ? item.categoryName + ' · ' + item.priceLabel : item.yieldLabel}}</view>
+        </view>
+        <view class="tag {{item.status.tone}}">{{item.status.text}}</view>
+        <view class="caret">{{openKey === item.key ? '⌃' : '⌄'}}</view>
+      </view>
+      <view wx:if="{{openKey === item.key}}" class="sub-list">
+        <view wx:for="{{lines[item.key]}}" wx:for-item="l" wx:key="itemId" class="sub-row"><text class="grow">{{l.name}}</text><text class="batch-qty">{{l.qtyLabel}}</text></view>
+        <view wx:if="{{lines[item.key] && !lines[item.key].length}}" class="fnb-empty small">还没有配料</view>
+        <view wx:if="{{isManager}}" class="sub-row actions">
+          <view class="btn primary" data-key="{{item.key}}" bindtap="editRecipe">编辑用料</view>
+          <view wx:if="{{seg === 'dish'}}" class="btn ghost" data-key="{{item.key}}" bindtap="editDish">菜品资料</view>
+        </view>
+      </view>
+    </view>
+    <view wx:if="{{!loading && seg === 'dish' && !dishes.length}}" class="fnb-empty">还没有菜品{{isManager ? '，点上方新建' : '，请店长先建菜品'}}</view>
+    <view wx:if="{{!loading && seg === 'prep' && !preps.length}}" class="fnb-empty">还没有半成品食材，先在「分类」里新增类型为半成品的食材</view>
+  </block>
+</view>
+
+<van-popup show="{{dishShow}}" position="bottom" round bind:close="closeDish">
+  <view class="sheet" wx:if="{{dish}}">
+    <view class="sheet-title">{{dish.id ? '菜品资料' : '新建菜品'}}</view>
+    <view class="field"><view class="field-label">名称</view><input class="input" value="{{dish.name}}" data-field="name" bindinput="setDish" placeholder="如：酸菜白肉锅" /></view>
+    <view class="field"><view class="field-label">售价（元）</view><input class="input" type="digit" value="{{dish.price}}" data-field="price" bindinput="setDish" /></view>
+    <view class="field"><view class="field-label">分类</view>
+      <view class="chips wrap"><view wx:for="{{categories}}" wx:key="id" class="chip-sq {{dish.categoryId === item.id ? 'on' : ''}}" data-field="categoryId" data-value="{{item.id}}" bindtap="setDish">{{item.name}}</view></view>
+      <input class="input" value="{{dish.categoryName}}" data-field="categoryName" bindinput="setDish" placeholder="或新建分类，如：热菜" /></view>
+    <view class="btn primary btn-block" bindtap="onSaveDish">保存</view>
+    <view wx:if="{{dish.id}}" class="btn danger btn-block" bindtap="onDisableDish">停用菜品</view>
+  </view>
+</van-popup>
+
+<van-popup show="{{editShow}}" position="bottom" round custom-style="max-height:88%;" bind:close="closeEditor">
+  <scroll-view scroll-y class="editor" wx:if="{{editor}}">
+    <view class="sheet">
+      <view class="sheet-title">{{editor.title}} · 用料</view>
+      <view wx:if="{{editor.kind === 'prep'}}" class="date-row"><text class="date-label">每次产出</text><input class="input grow" type="digit" value="{{editor.outputQty}}" bindinput="setOutputQty" /><text class="unit-suffix">{{editor.outputUnitLabel}}</text></view>
+      <view wx:else class="card-meta">以下为「一份」的用量</view>
+      <view wx:for="{{editor.lines}}" wx:key="itemId" class="date-row">
+        <text class="line-name">{{item.name}}</text>
+        <input class="input grow" type="digit" value="{{item.qty}}" data-index="{{index}}" bindinput="setLineQty" placeholder="用量" />
+        <text class="unit-suffix">{{item.unitLabel}}</text>
+        <view class="remove" data-index="{{index}}" bindtap="removeLine">×</view>
+      </view>
+      <view class="btn" bindtap="openPicker">＋ 添加用料</view>
+      <view wx:if="{{pickShow}}" class="picker">
+        <input class="input" placeholder="搜索食材" value="{{pickQuery}}" bindinput="onPickQuery" />
+        <scroll-view scroll-y class="pick-list"><view wx:for="{{pickList}}" wx:key="id" class="pick-row" data-id="{{item.id}}" bindtap="onPick"><text>{{item.name}}{{item.prepared ? '（半成品）' : ''}}</text><text class="card-meta">{{item.unit}}</text></view></scroll-view>
+        <view class="link" bindtap="closePicker">收起</view>
+      </view>
+      <view class="input-row">
+        <view class="btn ghost grow-btn" bindtap="onSaveDraft">存草稿</view>
+        <view class="btn primary grow-btn {{saving ? 'disabled' : ''}}" bindtap="onPublish">{{saving ? '保存中…' : '保存并发布'}}</view>
+      </view>
+    </view>
+  </scroll-view>
+</van-popup>
+<fnb-tabbar active="recipe" />

@@ -1,0 +1,5 @@
+@import "../common/fnb.wxss";
+.card-title.small { font-size: 28rpx; }
+.qty.small { font-size: 28rpx; }
+.group { gap: 16rpx; }
+.banner { background: var(--danger-bg); box-shadow: none; }

@@ -1,0 +1,4 @@
+.stepper { display: inline-flex; align-items: center; background: #F3F4F6; border-radius: 999rpx; padding: 6rpx; }
+.btn { width: 56rpx; height: 56rpx; border-radius: 50%; background: #FFFFFF; color: #2563EB; font-size: 32rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.val { width: 110rpx; text-align: center; font-size: 28rpx; font-weight: 700; }
+.off { opacity: 0.5; }

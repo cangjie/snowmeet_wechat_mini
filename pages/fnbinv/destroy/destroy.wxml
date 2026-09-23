@@ -1,0 +1,35 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">待销毁与已销毁记录</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card card-pad banner {{pending.length ? 'bad' : 'good'}}">
+      <view class="card-title small">{{pending.length ? '待销毁 ' + pending.length + ' 批' : '没有待销毁的过期食材'}}</view>
+      <view class="card-meta">过期批次自动进清单，逐批确认销毁并留时间戳，同步写入损耗台账</view>
+    </view>
+    <view class="seg">
+      <view class="chip-sq {{tab === 'pending' ? 'on' : ''}}" data-tab="pending" bindtap="onTab">待销毁 {{pending.length}}</view>
+      <view class="chip-sq {{tab === 'done' ? 'on' : ''}}" data-tab="done" bindtap="onTab">已销毁</view>
+    </view>
+    <view wx:if="{{tab === 'pending'}}" class="card">
+      <view wx:for="{{pending}}" wx:key="batchId" class="sub-row">
+        <view class="grow col">
+          <view class="card-row"><text class="card-title small">{{item.name}}</text><text class="tag danger">过期 {{item.overdue}} 天</text></view>
+          <view class="batch-no">{{item.batchNo}}</view>
+          <view class="card-meta">{{item.line}} · {{item.qtyLabel}}</view>
+        </view>
+        <view class="btn {{isManager ? 'danger' : 'disabled'}}" data-id="{{item.batchId}}" bindtap="onDestroy">确认已销毁</view>
+      </view>
+      <view wx:if="{{!loading && pending.length === 0}}" class="fnb-empty">没有待销毁的过期食材</view>
+    </view>
+    <view wx:else class="card">
+      <view wx:if="{{doneError}}" class="fnb-empty">{{doneError}}</view>
+      <view wx:for="{{done}}" wx:key="id" class="sub-row">
+        <view class="grow col"><view class="card-title small">{{item.name}}</view><view class="card-meta">{{item.reason}}</view><view class="card-meta">{{item.at}}</view></view>
+        <view class="col right"><view class="qty small tone-danger">{{item.qty}}</view><view class="tag muted">已留痕</view></view>
+      </view>
+      <view wx:if="{{!doneError && !loading && done.length === 0}}" class="fnb-empty">还没有销毁记录</view>
+    </view>
+    <view wx:if="{{!isManager}}" class="fnb-note">确认销毁需要店长权限。</view>
+  </block>
+</view>
+<fnb-tabbar active="stock" />

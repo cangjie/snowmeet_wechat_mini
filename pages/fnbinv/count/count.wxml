@@ -1,0 +1,46 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">系统数量 vs 实盘数量</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:elif="{{!documentId}}">
+    <view class="card card-pad col">
+      <view class="card-title">没有进行中的盘点</view>
+      <view class="card-meta">只盘散装与已开封余量，未开封整件不参与差异计算。当前可盘点 {{candidates}} 种食材。</view>
+      <view class="btn primary btn-block {{isManager ? '' : 'disabled'}}" bindtap="onStart">开始盘点</view>
+      <view wx:if="{{!isManager}}" class="card-meta">开始盘点需要店长权限；店长开始后，员工可在这里录入实盘数。</view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="card card-pad col">
+      <view class="card-row"><text class="card-title grow">盘点中 · 共 {{rows.length}} 项</text><text class="tag {{pending ? 'warn' : 'ok'}}">{{pending ? pending + ' 项未录' : '已录完'}}</text></view>
+      <view class="card-meta">有差异 <text class="{{diffCount ? 'tone-danger' : ''}}">{{diffCount}}</text> 项 · 实盘数失焦自动保存</view>
+      <view wx:if="{{changed}}" class="danger-line">盘点期间库存有变动，请放弃后重新开始盘点</view>
+    </view>
+    <view class="card">
+      <view wx:for="{{rows}}" wx:key="itemId" class="sub-row">
+        <view class="grow col"><text class="card-title small">{{item.name}}</text><text class="card-meta">系统 {{item.systemLabel}}</text></view>
+        <view class="col right">
+          <view class="input-row"><input class="input count" type="digit" value="{{item.countedInput}}" placeholder="实盘" data-index="{{index}}" bindblur="onCount" /><text class="unit-suffix">{{item.inputLabel}}</text></view>
+          <view wx:if="{{item.diffText}}" class="card-row"><text class="card-meta tone-{{item.tone}}">{{item.diffText}}</text>
+            <text wx:if="{{item.diff > 0}}" class="tag {{gains[item.itemId] ? 'ok' : 'warn'}}" data-index="{{index}}" bindtap="openGain">{{gains[item.itemId] ? '已补批次' : '补承接批次'}}</text></view>
+        </view>
+      </view>
+    </view>
+    <view class="btn primary btn-block {{isManager && !posting ? '' : 'disabled'}}" bindtap="onPost">{{posting ? '过账中…' : '提交盘点并登记差异'}}</view>
+    <view class="card-row actions"><view class="btn ghost" bindtap="onPreview">检查库存是否变动</view><view wx:if="{{isManager}}" class="btn danger" bindtap="onAbandon">放弃本次盘点</view></view>
+    <view class="fnb-note">提交后以实盘数量为准更新库存：盘亏按最早到期批次扣减并进损耗台账；盘盈需要确认承接批次的效期、成本和照片。<text wx:if="{{!isManager}}">过账需要店长权限。</text></view>
+  </block>
+</view>
+
+<van-popup show="{{gainShow}}" position="bottom" round bind:close="closeGain">
+  <view class="sheet" wx:if="{{gain}}">
+    <view class="sheet-title">盘盈承接批次 · {{gain.name}} {{gain.diffText}}</view>
+    <view class="field"><view class="field-label">批次号</view><input class="input" value="{{gain.batchNo}}" data-field="batchNo" bindinput="setGain" /></view>
+    <view class="field"><view class="field-label">到期日期</view><date-range-picker mode="single" allow-future date="{{gain.expireDate}}" placeholder="选择到期日期" bind:change="onGainExpire" /></view>
+    <view class="field"><view class="field-label">储存方式</view>
+      <view class="seg"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{gain.storage === item.code ? 'on' : ''}}" data-field="storage" data-value="{{item.code}}" bindtap="setGain">{{item.label}}</view></view></view>
+    <view class="field"><view class="field-label">单位成本（元 / 基本单位）<text class="hint">留空按 0</text></view><input class="input" type="digit" value="{{gain.unitCost}}" data-field="unitCost" bindinput="setGain" /></view>
+    <view class="field"><view class="field-label">实物照片<text class="hint">必填</text></view><photo-field photos="{{gain.photos}}" bind:change="onGainPhotos" /></view>
+    <view class="btn primary btn-block" bindtap="saveGain">确定</view>
+  </view>
+</van-popup>
+<fnb-tabbar active="count" />

@@ -53,6 +53,11 @@ Page({
     var id = 0
     if (options.q) {
       id = parseInt(util.parseQuery(options.q, 'id'), 10) || 0
+      // 食材库存上线后，标签二维码统一进新的批次详情页（二维码规则仍指向本页，不必改公众平台配置）
+      if (id > 0) {
+        wx.redirectTo({ url: '/pages/fnbinv/batch/batch?id=' + id })
+        return
+      }
     }
     if (!id) id = parseInt(options.id, 10) || 0
     if (id > 0) {

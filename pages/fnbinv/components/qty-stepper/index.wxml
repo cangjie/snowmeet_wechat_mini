@@ -1,0 +1,5 @@
+<view class="stepper {{disabled ? 'off' : ''}}">
+  <view class="btn" catchtap="onDec">−</view>
+  <input class="val" type="{{integer ? 'number' : 'digit'}}" value="{{value}}" disabled="{{disabled}}" bindblur="onBlur" />
+  <view class="btn" catchtap="onInc">+</view>
+</view>

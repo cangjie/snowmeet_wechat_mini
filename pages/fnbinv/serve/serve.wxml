@@ -1,0 +1,59 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">按厨房单扣减 · 最早到期批次先扣</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="btn primary btn-block" bindtap="openNew">＋ 新建厨房单</view>
+    <view class="fnb-section-title">今日厨房单<text class="side">{{orders.length}} 单</text></view>
+    <view wx:for="{{orders}}" wx:key="id" class="card">
+      <view class="card-pad card-row" data-id="{{item.id}}" bindtap="onToggle">
+        <view class="grow col">
+          <view class="card-row"><text class="order-no">{{item.displayNo}}</text><text wx:if="{{item.table}}" class="tag">{{item.table}}</text><text class="card-meta">{{item.time}}</text></view>
+          <view class="dish-line">{{item.summary}}</view>
+          <view wx:if="{{item.remark}}" class="remark">备注 · {{item.remark}}</view>
+        </view>
+        <view class="tag {{item.status.tone}}">{{item.status.text}}</view>
+      </view>
+      <view wx:if="{{openId === item.id}}" class="sub-list">
+        <view wx:for="{{item.lines}}" wx:for-item="l" wx:key="id" class="sub-row"><text class="grow">{{l.name}}</text><text wx:if="{{l.remark}}" class="card-meta">{{l.remark}}</text><text class="batch-qty">×{{l.qty}}</text></view>
+        <block wx:if="{{preview[item.id] || result[item.id]}}">
+          <view class="sub-row need-head"><text class="grow">{{result[item.id] ? '已扣减' : '预计扣减'}}</text><text class="card-meta">计划 / 实际</text></view>
+          <view wx:for="{{result[item.id] || preview[item.id]}}" wx:for-item="n" wx:key="itemId" class="sub-row">
+            <text class="grow">{{n.name}}</text><text class="card-meta">{{n.planned}} / {{n.actual}}</text><text wx:if="{{n.short}}" class="tag danger">{{n.shortLabel}}</text>
+          </view>
+        </block>
+        <view class="sub-row actions">
+          <block wx:if="{{item.status.key === 'review'}}">
+            <view class="btn {{isManager ? 'primary' : 'disabled'}}" data-id="{{item.id}}" bindtap="onReview">核对</view>
+            <text wx:if="{{!isManager}}" class="card-meta grow">菜品缺配方，店长补配方后核对</text>
+            <view class="btn ghost" data-id="{{item.id}}" bindtap="onCancel">取消</view>
+          </block>
+          <block wx:elif="{{item.status.key === 'ready'}}">
+            <view class="btn" data-id="{{item.id}}" bindtap="onPreview">预览扣料</view>
+            <view class="btn primary {{working === item.id ? 'disabled' : ''}}" data-id="{{item.id}}" bindtap="onServe">{{working === item.id ? '扣减中…' : '确认出餐并扣减'}}</view>
+            <view class="btn ghost" data-id="{{item.id}}" bindtap="onCancel">取消</view>
+          </block>
+          <text wx:elif="{{item.status.key === 'served'}}" class="card-meta">已出餐，库存已按配方扣减</text>
+          <text wx:else class="card-meta">已取消</text>
+        </view>
+      </view>
+    </view>
+    <view wx:if="{{!loading && !orders.length}}" class="fnb-empty">今天还没有厨房单</view>
+    <view class="fnb-note">配方按一份扣减，只扣散装与已开封的量。库存不足时仍可出餐，按实际可用量扣减并记录欠料。</view>
+  </block>
+</view>
+
+<van-popup show="{{newShow}}" position="bottom" round custom-style="max-height:88%;" bind:close="closeNew">
+  <scroll-view scroll-y class="editor">
+    <view class="sheet">
+      <view class="sheet-title">新建厨房单</view>
+      <view wx:for="{{dishes}}" wx:key="productId" class="dish-row">
+        <view class="grow col"><text class="card-title small">{{item.name}}</text><view class="card-row"><text class="card-meta">{{item.priceLabel}}</text><text wx:if="{{!item.publishedRecipeId}}" class="tag warn">缺配方</text></view></view>
+        <qty-stepper value="{{qty[item.productId] || 0}}" min="0" integer data-id="{{item.productId}}" bind:change="onDishQty" />
+      </view>
+      <view class="field"><view class="field-label">桌号 / 取餐方式</view><input class="input" value="{{tableNo}}" placeholder="如：A3 桌、外卖打包" bindinput="onTable" /></view>
+      <view class="field"><view class="field-label">备注</view><input class="input" value="{{remark}}" placeholder="如：不要葱，辣度小辣" bindinput="onRemark" /></view>
+      <view class="btn primary btn-block {{creating ? 'disabled' : ''}}" bindtap="createOrder">{{creating ? '提交中…' : '建单'}}</view>
+    </view>
+  </scroll-view>
+</van-popup>
+<fnb-tabbar active="serve" />

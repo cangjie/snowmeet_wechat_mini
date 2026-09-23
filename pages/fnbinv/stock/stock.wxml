@@ -1,0 +1,64 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">单店 · 批次级库存</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card card-pad card-row" bindtap="goExpiry">
+      <view class="alert-num">{{alertCount}}</view>
+      <view class="grow col"><view class="card-title small">临期与过期批次</view><view class="card-meta">{{alertSummary}}</view></view>
+      <view class="caret">›</view>
+    </view>
+    <view class="stats">
+      <view class="stat"><view class="stat-num">{{skuCount}}</view><view class="stat-label">在库品种</view></view>
+      <view class="stat"><view class="stat-num">{{batchCount}}</view><view class="stat-label">批次</view></view>
+      <view class="stat"><view class="stat-num tone-warn">{{openedCount}}</view><view class="stat-label">已开封</view></view>
+    </view>
+    <view class="search"><text class="card-meta">搜</text><input placeholder="食材名称或批次号" value="{{filter.query}}" bindinput="onQuery" /></view>
+    <scroll-view scroll-x class="chip-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="chips">
+        <view class="chip {{filter.l1 === 0 ? 'on' : ''}}" data-id="0" bindtap="onL1">全部</view>
+        <view wx:for="{{tree}}" wx:key="id" class="chip {{filter.l1 === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="onL1">{{item.name}}</view>
+      </view>
+    </scroll-view>
+    <scroll-view wx:if="{{subs.length}}" scroll-x class="chip-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="chips">
+        <view class="chip-sq {{filter.l2 === 0 ? 'on' : ''}}" data-id="0" bindtap="onL2">全部</view>
+        <view wx:for="{{subs}}" wx:key="id" class="chip-sq {{filter.l2 === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="onL2">{{item.name}}</view>
+      </view>
+    </scroll-view>
+    <view class="seg">
+      <view class="chip-sq {{filter.storage === '' ? 'on' : ''}}" data-code="" bindtap="onStorage">全部</view>
+      <view wx:for="{{storages}}" wx:key="code" class="chip-sq {{filter.storage === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onStorage">{{item.label}}</view>
+    </view>
+
+    <view wx:for="{{items}}" wx:key="itemId" class="card">
+      <view class="card-pad card-row" data-id="{{item.itemId}}" bindtap="onToggle">
+        <view class="thumb">{{item.initial}}</view>
+        <view class="grow col">
+          <view class="card-row name-row"><text class="card-title">{{item.name}}</text><text class="tag">{{item.subName}}</text></view>
+          <view class="card-meta">{{item.metaLine}}</view>
+          <view wx:if="{{item.hasSealed}}" class="sealed-line">{{item.availLine}}</view>
+        </view>
+        <view class="col right">
+          <view class="qty">{{item.availableLabel}}</view>
+          <view class="tag {{item.tag.tone}}">{{item.tag.text}}</view>
+        </view>
+      </view>
+      <view wx:if="{{expanded === item.itemId}}" class="sub-list">
+        <view wx:for="{{item.batches}}" wx:for-item="b" wx:key="batchId" class="sub-row" data-id="{{b.batchId}}" bindtap="goBatch">
+          <view class="grow col">
+            <view class="batch-no">{{b.batchNo}}</view>
+            <view class="batch-line">{{b.storageLabel}} · {{b.expireDate}} 到期</view>
+            <view class="card-meta tone-{{b.tone}}">{{b.expireText}}</view>
+          </view>
+          <view class="batch-qty">{{b.qtyLabel}}</view>
+          <view wx:if="{{b.canOpen}}" class="btn" data-id="{{b.batchId}}" catchtap="onOpen">开封</view>
+          <view wx:elif="{{b.form === 'opened'}}" class="tag warn">已开封</view>
+          <view wx:elif="{{b.form === 'sealed'}}" class="tag muted">未开封</view>
+          <view wx:else class="tag ok">散装可用</view>
+        </view>
+      </view>
+    </view>
+    <view wx:if="{{!loading && items.length === 0}}" class="fnb-empty">没有符合条件的食材</view>
+  </block>
+</view>
+<fnb-tabbar active="stock" badge="{{alertCount}}" />

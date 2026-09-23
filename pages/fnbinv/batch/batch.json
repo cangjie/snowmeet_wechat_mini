@@ -1,0 +1,2 @@
+{ "navigationBarTitleText": "批次详情", "backgroundColor": "#F0F2F7",
+  "usingComponents": { "fnb-tabbar": "../components/fnb-tabbar/index", "print-food-label": "/components/fnb/print_food_label/print_food_label" } }

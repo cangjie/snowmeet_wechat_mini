@@ -1,0 +1,37 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">制作即核销原料，产出入库</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="fnb-note">半成品也是食材：<text class="em">制作一次即核销原料</text>，产出按自己的保质期入库，之后可以直接用在菜品配方里。</view>
+    <view wx:for="{{cards}}" wx:key="id" class="card">
+      <view class="card-pad card-row" data-id="{{item.id}}" bindtap="onToggle">
+        <view class="grow col"><view class="card-title">{{item.name}}</view><view class="card-meta">{{item.meta}}</view></view>
+        <view class="caret">{{openId === item.id ? '⌃' : '⌄'}}</view>
+      </view>
+      <view wx:if="{{openId === item.id}}" class="sub-list make">
+        <view class="card-row"><text class="grow field-label">制作批数</text><qty-stepper value="{{n}}" min="1" integer bind:change="onN" /></view>
+        <view class="card-meta">产出 <text class="em">{{outLabel}}</text></view>
+        <view class="needs">
+          <view wx:for="{{needs}}" wx:for-item="r" wx:key="itemId" class="need-row">
+            <text class="grow">{{r.name}}</text><text class="need">−{{r.needLabel}}</text><text class="card-meta {{r.short ? 'tone-danger' : ''}}">{{r.stockLabel}}</text>
+          </view>
+        </view>
+        <view wx:if="{{!canMake}}" class="danger-line">原料可用量不足时不允许制作，请先开封或补货</view>
+        <view class="field"><view class="field-label">产出储存方式</view>
+          <view class="seg"><view wx:for="{{storages}}" wx:for-item="s" wx:key="code" class="chip-sq {{storage === s.code ? 'on' : ''}}" data-code="{{s.code}}" bindtap="onStorage">{{s.label}}</view></view></view>
+        <view class="field"><view class="field-label">到期日期<text class="hint">{{expireHint}}</text></view>
+          <date-range-picker mode="single" allow-future date="{{expireDate}}" placeholder="选择到期日期" bind:change="onExpire" /></view>
+        <view class="field"><view class="field-label">批次号</view><view class="input-row"><input class="input" value="{{batchNo}}" bindinput="onBatchNo" /><view class="btn" bindtap="newBatchNo">重新生成</view></view></view>
+        <view class="field"><view class="field-label">产出照片<text class="hint">必填</text></view><photo-field photos="{{photos}}" bind:change="onPhotos" /></view>
+        <view class="btn primary btn-block {{canMake && !making ? '' : 'disabled'}}" bindtap="onMake">{{making ? '制作中…' : '确认制作并核销原料'}}</view>
+      </view>
+    </view>
+    <view wx:if="{{!loading && !cards.length}}" class="fnb-empty">还没有已发布的半成品配方，先到「配方 → 半成品配方」里配置</view>
+    <view class="fnb-section-title">今日制作记录</view>
+    <view class="card">
+      <view wx:for="{{log}}" wx:key="id" class="sub-row"><view class="grow col"><view class="card-title small">{{item.name}}</view><view class="batch-no">{{item.batchNo}}</view></view><text class="card-meta">{{item.detail}}</text></view>
+      <view wx:if="{{!log.length}}" class="fnb-empty small">今天还没有制作记录</view>
+    </view>
+  </block>
+</view>
+<fnb-tabbar active="prep" />

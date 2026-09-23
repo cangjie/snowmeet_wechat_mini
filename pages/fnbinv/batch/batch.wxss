@@ -1,0 +1,10 @@
+@import "../common/fnb.wxss";
+.big-row { justify-content: space-between; margin-top: 8rpx; }
+.kv { display: flex; justify-content: space-between; gap: 24rpx; padding: 22rpx 32rpx; border-bottom: 2rpx solid var(--gray); font-size: 26rpx; }
+.kv:last-child { border-bottom: none; }
+.kv .k { color: var(--muted); flex: none; }
+.kv .v { text-align: right; color: var(--ink); }
+.photos { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 16rpx; }
+.photo { width: 196rpx; height: 196rpx; border-radius: 16rpx; background: var(--gray); }
+.actions { display: flex; gap: 16rpx; }
+.grow-btn { flex: 1; padding: 24rpx 0; font-size: 26rpx; }

@@ -1,0 +1,8 @@
+@import "../common/fnb.wxss";
+.card-title.small { font-size: 28rpx; }
+.qty.small { font-size: 28rpx; }
+.banner { box-shadow: none; display: flex; flex-direction: column; gap: 8rpx; }
+.banner.bad { background: var(--danger-bg); }
+.banner.bad .card-title { color: var(--danger); }
+.banner.good { background: var(--ok-bg); }
+.banner.good .card-title { color: var(--ok); }

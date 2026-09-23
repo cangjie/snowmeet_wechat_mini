@@ -1,0 +1,3 @@
+{ "navigationBarTitleText": "半成品制作", "enablePullDownRefresh": true, "backgroundColor": "#F0F2F7",
+  "usingComponents": { "fnb-tabbar": "../components/fnb-tabbar/index", "photo-field": "../components/photo-field/index",
+    "qty-stepper": "../components/qty-stepper/index", "date-range-picker": "/components/date-range-picker/index" } }

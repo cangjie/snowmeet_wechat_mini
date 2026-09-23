@@ -1,0 +1,102 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">分类 → 名称 → 拍照 → 批次号</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card card-pad col form">
+      <view class="step"><view class="step-no">1</view><view class="step-body">
+        <view class="step-title">选择分类</view>
+        <view wx:if="{{!tree.length}}" class="col"><view class="card-meta">入库要先有二级分类，才能带出储存方式、保质期和计量单位。</view><view class="btn" bindtap="goCats">去分类页添加</view></view>
+        <scroll-view wx:else scroll-x class="chip-scroll" show-scrollbar="{{false}}" enhanced><view class="chips">
+          <view wx:for="{{tree}}" wx:key="id" class="chip {{l1 === item.id ? 'on' : 'gray'}}" data-id="{{item.id}}" bindtap="onL1">{{item.name}}</view></view></scroll-view>
+        <view wx:if="{{tree.length && !subs.length}}" class="card-meta">这个一级分类下还没有二级分类，<text class="tone-blue" bindtap="goCats">去分类页添加</text></view>
+        <view wx:if="{{subs.length}}" class="chips wrap"><view wx:for="{{subs}}" wx:key="id" class="chip-sq {{sub.id === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="onL2">{{item.name}}</view></view>
+      </view></view>
+
+      <view class="step"><view class="step-no">2</view><view class="step-body">
+        <view class="step-title">食材名称</view>
+        <input class="input" value="{{nameQuery}}" placeholder="{{sub ? '输入或选择' + sub.name + '下的食材' : '先选分类'}}" bindinput="onName" disabled="{{!sub}}" />
+        <view wx:if="{{material}}" class="tag ok picked">已选：{{material.name}}</view>
+        <view wx:if="{{!material && hints.length}}" class="chips wrap"><view wx:for="{{hints}}" wx:key="id" class="chip-sq" data-id="{{item.id}}" bindtap="onHint">{{item.name}}</view></view>
+        <view wx:if="{{canCreate}}" class="btn {{isManager ? '' : 'disabled'}}" bindtap="onCreateMaterial">{{isManager ? '＋ 新建食材「' + nameQuery + '」' : '「' + nameQuery + '」还没建档，请店长先在「分类」里建档'}}</view>
+      </view></view>
+
+      <view class="step"><view class="step-no">3</view><view class="step-body">
+        <view class="step-title">拍照建档<text class="hint-inline">必填，照片随批次留存</text></view>
+        <photo-field photos="{{photos}}" bind:change="onPhotos" />
+      </view></view>
+
+      <view class="step"><view class="step-no">4</view><view class="step-body">
+        <view class="step-title">批次号</view>
+        <view class="input-row"><input class="input" value="{{batchNo}}" bindinput="onBatchNo" /><view class="btn" bindtap="newBatchNo">重新生成</view></view>
+      </view></view>
+
+      <view class="step"><view class="step-no">5</view><view class="step-body">
+        <view class="step-title">储存方式<text wx:if="{{sub}}" class="hint-inline">分类建议：{{sub.default_storage === 'frozen' ? '冷冻' : sub.default_storage === 'ambient' ? '常温' : '冷藏'}}</text></view>
+        <view class="seg"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{storage === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onStorage">{{item.label}}</view></view>
+      </view></view>
+
+      <view class="step"><view class="step-no">6</view><view class="step-body">
+        <view class="step-title">日期<text class="hint-inline">选填一项即可 · 点「识别」拍包装</text></view>
+        <view class="date-row"><text class="date-label">生产日期</text><view class="grow"><date-range-picker mode="single" date="{{prodDate}}" placeholder="选择生产日期" bind:change="onProdDate" /></view><view class="btn" data-mode="date" bindtap="onScan">识别</view></view>
+        <view class="date-row"><text class="date-label">保质期</text>
+          <input class="input grow" type="number" value="{{shelfValue}}" placeholder="留空按分类规则" bindinput="onShelf" />
+          <view class="seg mini"><view class="chip-sq {{shelfUnit === 'day' ? 'on' : ''}}" data-unit="day" bindtap="onShelfUnit">天</view><view class="chip-sq {{shelfUnit === 'month' ? 'on' : ''}}" data-unit="month" bindtap="onShelfUnit">月</view></view>
+          <view class="btn" data-mode="shelf" bindtap="onScan">识别</view></view>
+        <view class="date-row"><text class="date-label">到期日期</text><view class="grow"><date-range-picker mode="single" allow-future date="{{expireDate}}" placeholder="包装上的到期日" bind:change="onExpireDate" /></view><view class="btn" data-mode="expire" bindtap="onScan">识别</view></view>
+        <block wx:if="{{!prodDate && !expireDate}}">
+          <view class="card-meta">没有具体日期时，选生产月份（影响高温档 / 低温档保质期）</view>
+          <view class="chips wrap"><view wx:for="{{months}}" wx:key="*this" class="chip-sq month {{month === item ? 'on' : ''}}" data-m="{{item}}" bindtap="onMonth">{{item}}月</view></view>
+        </block>
+        <view wx:if="{{ruleText}}" class="{{ruleBad ? 'danger-line' : 'rule-line'}}">{{ruleText}}</view>
+        <view wx:if="{{dateNote}}" class="warn-line">{{dateNote}}</view>
+        <view wx:if="{{prodDate || expireDate || shelfValue || month}}" class="link" bindtap="clearDates">清空日期</view>
+      </view></view>
+
+      <view class="step"><view class="step-no">7</view><view class="step-body">
+        <view class="step-title">包装形式</view>
+        <view class="seg"><view class="chip-sq {{!packed ? 'on' : ''}}" data-v="0" bindtap="onPacked">散装（入库即可用）</view><view class="chip-sq {{packed ? 'on' : ''}}" data-v="1" bindtap="onPacked">封装（开封后才可用）</view></view>
+        <block wx:if="{{packed}}">
+          <view class="chips wrap"><view wx:for="{{packNames}}" wx:key="*this" class="chip-sq {{packName === item ? 'on' : ''}}" data-v="{{item}}" bindtap="onPackName">{{item}}</view></view>
+          <view class="date-row"><text class="date-label">每{{packName}}含量</text><input class="input grow" type="digit" value="{{packSize}}" placeholder="如 500" bindinput="onPackSize" />
+            <view class="seg mini"><view wx:for="{{contentUnits}}" wx:key="code" class="chip-sq {{contentUnit === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onContentUnit">{{item.label}}</view></view></view>
+          <view class="date-row"><text class="date-label">开封后</text>
+            <view class="seg grow"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{openStorage === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onOpenStorage">{{item.label}}</view></view>
+            <input class="input days" type="number" value="{{openDays}}" placeholder="天" bindinput="onOpenDays" /></view>
+        </block>
+      </view></view>
+
+      <view class="step"><view class="step-no">8</view><view class="step-body">
+        <view class="step-title">数量</view>
+        <view class="input-row"><qty-stepper value="{{qty}}" integer="{{packed}}" step="1" min="0" bind:change="onQty" />
+          <text wx:if="{{packed}}" class="unit-suffix">{{packName}}</text>
+          <view wx:else class="seg mini"><view wx:for="{{inputUnits}}" wx:key="code" class="chip-sq {{inputUnit === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onInputUnit">{{item.label}}</view></view></view>
+        <view class="date-row"><text class="date-label">单价（选填）</text><input class="input grow" type="digit" value="{{unitPrice}}" placeholder="留空按 0" bindinput="onPrice" /><text class="unit-suffix">元/{{priceUnit || '单位'}}</text></view>
+      </view></view>
+
+      <view class="btn primary btn-block" bindtap="addDraft">加入入库单</view>
+    </view>
+
+    <view class="fnb-section-title">今日入库单<text class="side">{{drafts.length}} 条待提交</text></view>
+    <view wx:if="{{drafts.length}}" class="card">
+      <view wx:for="{{drafts}}" wx:key="key" class="sub-row">
+        <view class="grow col"><view class="card-row"><text class="card-title small">{{item.name}}</text><text class="batch-no">{{item.batchNo}}</text></view>
+          <view class="card-meta">{{item.line}}</view><view wx:if="{{item.error}}" class="danger-line">{{item.error}}</view></view>
+        <view class="remove" data-key="{{item.key}}" bindtap="removeDraft">×</view>
+      </view>
+      <view class="card-pad"><view class="btn primary btn-block {{submitting ? 'disabled' : ''}}" bindtap="submit">{{submitting ? '提交中…' : '提交入库（' + drafts.length + ' 条）'}}</view></view>
+    </view>
+    <view wx:else class="fnb-empty small">填好上面的表单后点「加入入库单」</view>
+
+    <block wx:if="{{done.length}}">
+      <view class="fnb-section-title">本次已入库<text class="side">可打印标签</text></view>
+      <view class="card"><view wx:for="{{done}}" wx:key="batchId" class="sub-row">
+        <view class="grow col"><view class="card-row"><text class="card-title small">{{item.name}}</text><text class="batch-no">{{item.batchNo}}</text></view><view class="card-meta">{{item.line}}</view></view>
+        <view class="btn" data-id="{{item.batchId}}" bindtap="onPrint">打标签</view></view></view>
+    </block>
+  </block>
+</view>
+<ocr-scan-layer show="{{scan.show}}" mode="{{scan.mode}}" bind:fill="onScanFill" bind:confirm="onScanConfirm" bind:close="onScanClose" />
+<van-popup show="{{printShow}}" position="bottom" custom-style="height:70%;" closeable bind:close="onPrintClose">
+  <print-food-label wx:if="{{printShow}}" batch="{{printBatch}}" />
+</van-popup>
+<fnb-tabbar active="inbound" />

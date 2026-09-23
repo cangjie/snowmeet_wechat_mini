@@ -303,7 +303,7 @@ Page({
         path = '/pages/admin/fd/fd_order_list'
         break
       case 'mat_expire':
-        path = '/pages/admin/fnb/mat_expire_list/mat_expire_list'
+        path = '/pages/fnbinv/stock/stock'
         break
       case 'rent_recepting':
         path = '/pages/admin/reception/recept_entry'

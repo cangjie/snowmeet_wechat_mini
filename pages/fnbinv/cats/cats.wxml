@@ -1,0 +1,89 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">一级分类 / 二级分类</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="fnb-note">二级分类决定入库时的<text class="em">建议储存方式</text>、<text class="em">默认保质期</text>与<text class="em">临期阈值</text>。入库时三种储存方式都可选，这里只是默认值和标准规则。<text wx:if="{{!isManager}}">维护需要店长权限。</text></view>
+    <view wx:if="{{isManager}}" class="btn primary btn-block" bindtap="addL1">＋ 新增一级分类</view>
+    <view wx:for="{{groups}}" wx:for-item="g" wx:key="id" class="card">
+      <view class="card-pad card-row" data-id="{{g.id}}" bindtap="onToggle">
+        <view class="grow col"><view class="card-title">{{g.name}}</view><view class="card-meta">{{g.meta}}</view></view>
+        <view class="caret">{{openL1 === g.id ? '⌃' : '⌄'}}</view>
+      </view>
+      <view wx:if="{{openL1 === g.id}}" class="sub-list">
+        <view wx:for="{{g.subs}}" wx:for-item="s" wx:key="id" class="l2">
+          <view class="card-row">
+            <view class="grow col">
+              <view class="card-row"><text class="card-title small">{{s.name}}</text><text class="tag blue">{{s.storage}}</text><text class="tag">{{s.unit}}</text></view>
+              <view class="card-meta">{{s.ruleLine}}</view>
+            </view>
+            <view wx:if="{{isManager}}" class="btn" data-id="{{s.id}}" bindtap="editL2">编辑</view>
+          </view>
+          <view class="card-row warn-row">
+            <text class="card-meta grow">临期提前提醒</text>
+            <view wx:if="{{isManager}}" class="mini-step" data-id="{{s.id}}" data-delta="-1" bindtap="bumpWarn">−</view>
+            <text class="warn-val">{{s.warn}} 天</text>
+            <view wx:if="{{isManager}}" class="mini-step" data-id="{{s.id}}" data-delta="1" bindtap="bumpWarn">+</view>
+          </view>
+          <view class="mats">
+            <view wx:for="{{s.items}}" wx:for-item="m" wx:key="id" class="tag {{m.prepared ? 'ok' : 'muted'}} mat" data-id="{{m.id}}" bindtap="editMaterial">{{m.name}}{{m.prepared ? '（半成品）' : ''}}</view>
+            <view wx:if="{{isManager}}" class="tag blue mat" data-id="{{s.id}}" bindtap="addMaterial">＋ 食材</view>
+            <text wx:if="{{!s.items.length && !isManager}}" class="card-meta">暂无食材</text>
+          </view>
+        </view>
+        <view wx:if="{{isManager}}" class="sub-row"><view class="btn" data-id="{{g.id}}" bindtap="addL2">＋ 二级分类</view></view>
+        <view wx:if="{{!g.subs.length && !isManager}}" class="fnb-empty">暂无二级分类</view>
+      </view>
+    </view>
+    <view wx:if="{{!loading && groups.length === 0}}" class="fnb-empty">还没有分类{{isManager ? '，先新增一级分类' : '，请店长先建分类'}}</view>
+  </block>
+</view>
+
+<van-popup show="{{editShow}}" position="bottom" round custom-style="max-height:88%;" bind:close="closeEditor">
+  <scroll-view scroll-y class="editor" wx:if="{{edit}}">
+    <view class="sheet">
+      <view class="sheet-title">{{edit.id ? '编辑二级分类' : '新增二级分类'}}</view>
+      <view class="field"><view class="field-label">名称</view><input class="input" value="{{edit.name}}" data-field="name" bindinput="setEdit" placeholder="如：蔬菜类" /></view>
+      <view class="field"><view class="field-label">建议储存方式</view>
+        <view class="seg"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{edit.defaultStorage === item.code ? 'on' : ''}}" data-field="defaultStorage" data-value="{{item.code}}" bindtap="pickEdit">{{item.label}}</view></view></view>
+      <view class="field"><view class="field-label">计量方式（默认录入单位）<text class="hint">决定基本单位，已有库存的食材不能改</text></view>
+        <view class="chips wrap"><view wx:for="{{unitOpts}}" wx:key="code" class="chip-sq {{edit.defaultUnitCode === item.code ? 'on' : ''}}" data-field="defaultUnitCode" data-value="{{item.code}}" bindtap="pickEdit">{{item.label}}</view></view></view>
+      <view class="field"><view class="field-label">临期提前提醒（天）<text class="hint">生鲜 1 天、冻品 7 天、干货 30 天</text></view>
+        <input class="input" type="number" value="{{edit.warnDays}}" data-field="warnDays" bindinput="setEdit" /></view>
+      <view class="field"><view class="field-label">封装品开封后默认</view>
+        <view class="input-row">
+          <view class="seg grow"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{edit.defaultOpenStorage === item.code ? 'on' : ''}}" data-field="defaultOpenStorage" data-value="{{item.code}}" bindtap="pickEdit">{{item.label}}</view></view>
+          <input class="input days" type="number" value="{{edit.defaultOpenDays}}" data-field="defaultOpenDays" bindinput="setEdit" placeholder="天" />
+        </view></view>
+      <view class="fnb-section-title">未开封保质期规则<text class="side">按生产月份分档：6–9 月为高温档</text></view>
+      <view wx:for="{{storages}}" wx:for-item="st" wx:key="code" class="rule-box">
+        <view class="card-row"><text class="rule-name">{{st.label}}</text>
+          <view class="seg grow"><view wx:for="{{modes}}" wx:for-item="md" wx:key="code" class="chip-sq {{edit.rules[st.code].mode === md.code ? 'on' : ''}}" data-field="rules.{{st.code}}.mode" data-value="{{md.code}}" bindtap="pickEdit">{{md.label}}</view></view></view>
+        <view wx:if="{{edit.rules[st.code].mode === 'custom'}}" class="warn-line">该储存方式为逐月自定义规则，这里不修改</view>
+        <view wx:if="{{edit.rules[st.code].mode === 'all'}}" class="input-row"><input class="input" type="number" value="{{edit.rules[st.code].all}}" data-field="rules.{{st.code}}.all" bindinput="setEdit" placeholder="保质期" /><text class="unit-suffix">{{edit.rules[st.code].unit === 'month' ? '个月' : '天'}}</text></view>
+        <view wx:if="{{edit.rules[st.code].mode === 'band'}}" class="input-row">
+          <input class="input" type="number" value="{{edit.rules[st.code].warm}}" data-field="rules.{{st.code}}.warm" bindinput="setEdit" placeholder="高温档" />
+          <input class="input" type="number" value="{{edit.rules[st.code].cold}}" data-field="rules.{{st.code}}.cold" bindinput="setEdit" placeholder="低温档" />
+          <text class="unit-suffix">{{edit.rules[st.code].unit === 'month' ? '个月' : '天'}}</text></view>
+        <view wx:if="{{edit.rules[st.code].mode === 'all' || edit.rules[st.code].mode === 'band'}}" class="seg unit-seg">
+          <view class="chip-sq {{edit.rules[st.code].unit === 'day' ? 'on' : ''}}" data-field="rules.{{st.code}}.unit" data-value="day" bindtap="pickEdit">按天</view>
+          <view class="chip-sq {{edit.rules[st.code].unit === 'month' ? 'on' : ''}}" data-field="rules.{{st.code}}.unit" data-value="month" bindtap="pickEdit">按月</view></view>
+      </view>
+      <view class="btn primary btn-block {{saving ? 'disabled' : ''}}" bindtap="saveEditor">{{saving ? '保存中…' : '保存'}}</view>
+    </view>
+  </scroll-view>
+</van-popup>
+
+<van-popup show="{{matShow}}" position="bottom" round bind:close="closeMat">
+  <view class="sheet" wx:if="{{mat}}">
+    <view class="sheet-title">{{mat.id ? '编辑食材' : '新增食材'}} · {{mat.categoryName}}</view>
+    <view class="field"><view class="field-label">名称</view><input class="input" value="{{mat.name}}" data-field="name" bindinput="setMat" placeholder="如：大白菜" /></view>
+    <view class="field"><view class="field-label">类型</view>
+      <view class="seg"><view class="chip-sq {{mat.itemType === 'raw' ? 'on' : ''}}" data-field="itemType" data-value="raw" bindtap="setMat">原料</view>
+        <view class="chip-sq {{mat.itemType === 'prepared' ? 'on' : ''}}" data-field="itemType" data-value="prepared" bindtap="setMat">半成品（靠制作产出）</view></view></view>
+    <view class="field"><view class="field-label">默认录入单位<text class="hint">{{mat.id ? '只能在同一计量方式内切换' : ''}}</text></view>
+      <view class="chips wrap"><view wx:for="{{unitOpts}}" wx:key="code" class="chip-sq {{mat.inputUnit === item.code ? 'on' : ''}}" data-field="inputUnit" data-value="{{item.code}}" bindtap="setMat">{{item.label}}</view></view></view>
+    <view class="btn primary btn-block" bindtap="onSaveMat">保存</view>
+    <view wx:if="{{mat.id}}" class="btn danger btn-block" bindtap="onDisableMat">停用该食材</view>
+  </view>
+</van-popup>
+<fnb-tabbar active="cats" />

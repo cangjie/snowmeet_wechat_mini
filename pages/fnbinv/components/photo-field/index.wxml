@@ -1,0 +1,1 @@
+<van-uploader file-list="{{photos}}" max-count="{{max}}" multiple="{{false}}" capture="{{['camera', 'album']}}" deletable bind:after-read="onRead" bind:delete="onDelete" />

@@ -1,0 +1,30 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">未开封 / 开封后分开计算</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view wx:if="{{expiredCount}}" class="card card-pad card-row banner" bindtap="goDestroy">
+      <view class="grow col"><view class="card-title small tone-danger">{{expiredCount}} 批已过期</view><view class="card-meta">过期不等于已处理，去销毁清单逐批确认</view></view>
+      <view class="btn danger">去销毁 ›</view>
+    </view>
+    <view wx:for="{{groups}}" wx:for-item="g" wx:key="key" class="col group">
+      <view class="fnb-section-title"><text class="tone-{{g.tone}}">{{g.title}}</text><text class="side">{{g.rows.length}} 批</text></view>
+      <view class="card">
+        <view wx:for="{{g.rows}}" wx:key="batchId" class="sub-row" data-id="{{item.batchId}}" bindtap="goBatch">
+          <view class="grow col">
+            <view class="card-row"><text class="card-title small">{{item.name}}</text><text class="batch-no">{{item.batchNo}}</text></view>
+            <view class="card-meta">{{item.line}}</view>
+            <view class="card-meta tone-{{item.tone}}">{{item.expireText}}</view>
+          </view>
+          <view class="col right">
+            <view class="qty small">{{item.qtyLabel}}</view>
+            <view wx:if="{{g.key === 'expired'}}" class="btn danger" catchtap="goDestroy">去销毁</view>
+            <view wx:else class="btn {{isManager ? 'danger' : 'disabled'}}" data-id="{{item.batchId}}" catchtap="onDiscard">报损</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view wx:if="{{!loading && groups.length === 0}}" class="fnb-empty">没有临期批次</view>
+    <view class="fnb-note">临期阈值按二级分类设置，可在「分类」里改。<text wx:if="{{!isManager}}">报损需要店长权限。</text></view>
+  </block>
+</view>
+<fnb-tabbar active="stock" />

@@ -1,0 +1,7 @@
+<view class="tabbar">
+  <view wx:for="{{tabs}}" wx:key="key" class="tab {{item.key === active ? 'on' : ''}}" data-key="{{item.key}}" bindtap="onTap">
+    <view class="icon"></view>
+    <view class="label">{{item.label}}</view>
+    <view wx:if="{{item.key === 'stock' && alert > 0}}" class="badge">{{alert}}</view>
+  </view>
+</view>

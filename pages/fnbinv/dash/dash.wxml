@@ -1,0 +1,29 @@
+<view class="fnb-page">
+  <view class="fnb-head"><view class="fnb-sub">损耗 · 成本</view><view class="fnb-date">{{todayLabel}}</view></view>
+  <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
+  <view wx:elif="{{!isManager}}" class="fnb-blocked">看板包含成本数据，需要店长权限</view>
+  <block wx:else>
+    <view class="stats">
+      <view class="stat"><view class="stat-num">{{totalCost}}</view><view class="stat-label">在库成本 · {{skuCount}} 种</view></view>
+      <view class="stat"><view class="stat-num tone-danger">{{lossLabel}}</view><view class="stat-label">本周损耗 · {{lossCount}} 条</view></view>
+    </view>
+    <view class="card card-pad col">
+      <view class="fnb-section-title">在库成本结构<text class="side">按一级分类</text></view>
+      <view wx:for="{{bars}}" wx:key="id" class="bar">
+        <view class="card-row"><text class="grow bar-name">{{item.name}}</text><text class="bar-val">{{item.valueLabel}}</text><text class="card-meta pct">{{item.pctLabel}}</text></view>
+        <view class="bar-track"><view class="bar-fill" style="width: {{item.pct}}%; background: {{item.color}};"></view></view>
+      </view>
+      <view wx:if="{{!loading && !bars.length}}" class="fnb-empty small">暂无在库成本</view>
+    </view>
+    <view class="card card-pad col">
+      <view class="fnb-section-title">损耗台账<text class="side">本周 {{range}}</text></view>
+      <view wx:for="{{ledger}}" wx:key="id" class="led-row">
+        <view class="grow col"><text class="card-title small">{{item.name}}</text><text class="card-meta">{{item.date}} · {{item.reason}}</text></view>
+        <view class="col right"><text class="led-qty {{item.gain ? 'tone-ok' : 'tone-danger'}}">{{item.qty}}</text><text class="card-meta">{{item.amount}}</text></view>
+      </view>
+      <view wx:if="{{!loading && !ledger.length}}" class="fnb-empty small">暂无损耗记录</view>
+    </view>
+    <view class="fnb-note">过期销毁、临期报损、损坏、盘亏、盘盈汇总到同一本账；盘盈冲减损耗金额。损耗率与周转天数将在后续版本提供。</view>
+  </block>
+</view>
+<fnb-tabbar active="dash" />
