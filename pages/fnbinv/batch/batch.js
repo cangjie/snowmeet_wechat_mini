@@ -42,10 +42,11 @@ Page({
         storage: expiry.storageLabel(s.storage_type), qtyLabel: packs ? (s.sealed_pack_count || 0) + ' ' + (s.pack_unit_name || '件') + ' × ' + units.formatQty(s.pack_size, unit) : units.formatQty(s.quantity, unit),
         totalLabel: units.formatQty(s.quantity, unit), quantity: s.quantity, unit,
         expireDate: String(b.expire_date).slice(0, 10), expireText: view.expireText(days), tone: view.tone(days, b.warn_days),
-        produceDate: b.produce_date ? String(b.produce_date).slice(0, 10) : '', shelfLife: b.shelf_life_value ? b.shelf_life_value + ' ' + (b.shelf_life_unit || '天') : '',
+        produceDate: b.produce_date ? String(b.produce_date).slice(0, 10) : '', shelfLife: b.shelf_life_value === expiry.OPEN_KEEP_DAYS ? '与开封前到期日期相同' : b.shelf_life_value ? b.shelf_life_value + ' ' + (b.shelf_life_unit || '天') : '',
         source: SOURCE[s.expiry_source] || s.expiry_source || '', note: s.expiry_note || '', warnDays: b.warn_days,
         openedDate: s.opened_date ? String(s.opened_date).slice(0, 10) : '', originalExpire: s.original_expire_date ? String(s.original_expire_date).slice(0, 10) : '',
-        openRule: packs && s.open_storage_type ? '开封后' + expiry.storageLabel(s.open_storage_type) + ' ' + s.open_shelf_life_days + ' 天' : '',
+        openRule: packs && s.open_storage_type ? '开封后' + expiry.storageLabel(s.open_storage_type) +
+          (s.open_shelf_life_days === expiry.OPEN_KEEP_DAYS ? ' · 保质期不变' : ' ' + s.open_shelf_life_days + ' 天') : '',
         cost: s.stock_amount === null || s.stock_amount === undefined ? '' : units.money(s.stock_amount),
         destroyed: s.is_destroyed, empty: s.quantity <= 0,
         canOpen: packs && (s.sealed_pack_count || 0) > 0 && days >= 0 && !s.is_destroyed,

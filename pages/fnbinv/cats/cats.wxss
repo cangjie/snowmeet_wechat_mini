@@ -7,5 +7,7 @@
 .editor { max-height: 88vh; }
 .rule-box { background: #F8F9FB; border-radius: 20rpx; padding: 20rpx; display: flex; flex-direction: column; gap: 16rpx; }
 .rule-name { width: 72rpx; font-size: 26rpx; font-weight: 700; flex: none; }
-.days { flex: none !important; width: 140rpx; }
 .unit-seg { width: 50%; }
+/* 开封后保质期不变：天数框换成说明文字 */
+.keep-box { color: var(--muted); }
+.chip-sq.keep { flex: none; padding: 0 20rpx; height: 80rpx; display: flex; align-items: center; }

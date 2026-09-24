@@ -17,7 +17,7 @@ Page({
     photos: [], uploading: 0, batchNo: '', storages: expiry.STORAGE, storage: '',
     prodDate: '', shelfValue: '', shelfUnit: 'day', expireDate: '',
     ruleText: '', expireShown: '', packed: false, packNames: PACK_NAMES, packName: '瓶', packSize: '', contentUnit: '', contentUnits: [],
-    openStorage: '', openDays: '', qty: 1, inputUnit: '', inputUnits: [], unitPrice: '', priceUnit: '',
+    openStorage: '', openDays: '', openKeep: false, qty: 1, inputUnit: '', inputUnits: [], unitPrice: '', priceUnit: '',
     drafts: [], done: [], submitting: false, scan: { show: false, mode: 'all' }, printShow: false, printBatch: null
   },
 
@@ -62,7 +62,7 @@ Page({
   onL2(e) { this.pickSub(Number(e.currentTarget.dataset.id)) },
   pickSub(id) {
     const sub = this.src.categories.find(c => c.id === id)
-    this.setData({ sub, storage: sub.default_storage || 'chilled', openStorage: sub.default_storage || 'chilled', openDays: '' })
+    this.setData({ sub, storage: sub.default_storage || 'chilled', openStorage: sub.default_storage || 'chilled', openDays: '', openKeep: false })
     this.clearMaterial()
   },
   goCats() { wx.redirectTo({ url: '/pages/fnbinv/cats/cats' }) },
@@ -105,7 +105,9 @@ Page({
     this.setData({ material, nameQuery: material.name, hints: [], canCreate: false, inputUnits,
       inputUnit: material.default_input_unit_code, contentUnits, contentUnit: kept ? kept.code : material.base_unit_code,
       openStorage: material.default_open_storage || (sub && sub.default_storage) || 'chilled',
-      openDays: material.default_open_days === null || material.default_open_days === undefined ? '' : String(material.default_open_days) })
+      openKeep: material.default_open_days === expiry.OPEN_KEEP_DAYS,
+      openDays: material.default_open_days === null || material.default_open_days === undefined || material.default_open_days === expiry.OPEN_KEEP_DAYS
+        ? '' : String(material.default_open_days) })
     this.refreshRule()
     this.refreshPriceUnit()
   },
@@ -118,7 +120,7 @@ Page({
     const unit = d.packed ? d.contentUnit : d.inputUnit
     if (d.material || !d.canCreate || !name || !d.sub || !unit) return null
     const edit = Object.assign(catalog.materialEditState({ name, category_id: d.sub.id }, d.sub, []), { inputUnit: unit })
-    if (d.packed) Object.assign(edit, { openStorage: d.openStorage, openDays: d.openDays })
+    if (d.packed) Object.assign(edit, { openStorage: d.openStorage, openDays: d.openDays, openKeep: d.openKeep })
     return edit
   },
   pendingMaterial() {
@@ -211,6 +213,8 @@ Page({
   },
   onOpenStorage(e) { this.setData({ openStorage: e.currentTarget.dataset.code }) },
   onOpenDays(e) { this.setData({ openDays: e.detail.value }) },
+  // 开封后保质期不变：开封后的到期日期就是封装的到期日期
+  onOpenKeep() { this.setData({ openKeep: !this.data.openKeep, openDays: '' }) },
   onQty(e) { this.setData({ qty: e.detail.value }) },
   onInputUnit(e) { this.setData({ inputUnit: e.currentTarget.dataset.code }); this.refreshPriceUnit() },
   onPrice(e) { this.setData({ unitPrice: e.detail.value }) },
@@ -224,7 +228,7 @@ Page({
     return { material, photos: d.photos.filter(p => p.id), batchNo: d.batchNo, storage: d.storage,
       warnDays: material ? material.warn_days : 0, prodDate: d.prodDate, shelfValue: d.shelfValue, shelfUnit: d.shelfUnit,
       expireDate: d.expireDate, rule: this.currentRule(), packed: d.packed, packSize: d.packSize,
-      contentUnit: d.contentUnit, packName: d.packName, openStorage: d.openStorage, openDays: d.openDays,
+      contentUnit: d.contentUnit, packName: d.packName, openStorage: d.openStorage, openDays: d.openDays, openKeep: d.openKeep,
       qty: d.qty, inputUnit: d.inputUnit, unitPrice: d.unitPrice, units: this.src ? this.src.units : [] }
   },
 

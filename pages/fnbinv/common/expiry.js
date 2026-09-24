@@ -5,6 +5,9 @@ const STORAGE = [
   { code: 'ambient', label: '常温' }
 ]
 
+// 开封后「保质期不变」：开封天数记为 100 年。服务端开封到期取 min(原到期日, 开封日 + 天数)，自然等于封装的原到期日
+const OPEN_KEEP_DAYS = 36500
+
 function storageLabel(code) {
   const hit = STORAGE.find(s => s.code === code)
   return hit ? hit.label : ''
@@ -105,5 +108,5 @@ function ruleFor(rules, itemId, storage, month) {
   return (rules || []).find(r => r.valid && r.item_id === itemId && r.storage_type === storage && r.production_month === month) || null
 }
 
-module.exports = { STORAGE, storageLabel, isWarmMonth, addDays, addMonths, calcExpiry, daysBetween, today,
+module.exports = { STORAGE, OPEN_KEEP_DAYS, storageLabel, isWarmMonth, addDays, addMonths, calcExpiry, daysBetween, today,
   groupAlerts, summarizeRules, planRuleSaves, ruleFor }

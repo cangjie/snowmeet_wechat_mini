@@ -435,6 +435,34 @@ test('入库页：封装的新食材须选含量单位，按含量单位建档�
   assert.deepEqual({ stockForm: draft.stockForm, packSize: draft.packSize, openShelfLifeDays: draft.openShelfLifeDays }, { stockForm: 'sealed', packSize: 750, openShelfLifeDays: 30 })
 })
 
+test('入库页 / 分类页：开封后可选「保质期不变」，提交与建档都记为 OPEN_KEEP_DAYS', async () => {
+  const KEEP = require('../pages/fnbinv/common/expiry.js').OPEN_KEEP_DAYS
+  installFakes(MANAGER)
+  const inbound = loadPage('inbound')
+  inbound.onLoad({})
+  await settle()
+  inbound.onHint({ currentTarget: { dataset: { id: 12 } } })
+  inbound.onPacked({ currentTarget: { dataset: { v: '1' } } })
+  assert.deepEqual({ openKeep: inbound.data.openKeep, openDays: inbound.data.openDays }, { openKeep: false, openDays: '7' })
+  inbound.onOpenKeep()
+  assert.deepEqual({ openKeep: inbound.data.openKeep, openDays: inbound.data.openDays }, { openKeep: true, openDays: '' })
+  inbound.onPackSize({ detail: { value: '500' } })
+  inbound.onExpireDate({ detail: { date: '2099-10-01' } })
+  inbound.addDraft()
+  await settle()
+  assert.equal(inbound.data.drafts[0].body.openShelfLifeDays, KEEP)
+
+  installFakes(MANAGER)
+  const cats = loadPage('cats')
+  cats.onLoad({})
+  await settle()
+  cats.editMaterial({ currentTarget: { dataset: { id: 12 } } })
+  cats.toggleOpenKeep()
+  cats.onSaveMat()
+  await settle()
+  assert.equal(calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data.defaultOpenDays, KEEP)
+})
+
 test('入库页：普通员工输入未建档的新名字不能入库，也不会建档', async () => {
   installFakes({ id: 3, title_level: 100, base_shop_id: 12 })
   const page = loadPage('inbound')

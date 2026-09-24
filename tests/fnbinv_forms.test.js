@@ -2,6 +2,7 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 const forms = require('../pages/fnbinv/common/forms.js')
 const units = require('../pages/fnbinv/common/units.js')
+const expiry = require('../pages/fnbinv/common/expiry.js')
 
 const UNITS = [
   { code: 'g', dimension: 1, factor_to_base: 1 }, { code: 'kg', dimension: 1, factor_to_base: 1000 },
@@ -38,6 +39,15 @@ test('封装 + 包装上的到期日：来源 package，每件含量换算到基
   assert.equal(r.body.unitPrice, 12.5)
   assert.equal(r.body.expirySource, 'package')
   assert.equal(r.body.shelfLifeRuleId, null)
+})
+
+test('封装开封后保质期不变：开封天数记为 OPEN_KEEP_DAYS；既没填天数也没选不变时拦下', () => {
+  const sealed = Object.assign({}, base, { material: sauce, packed: true, qty: '2', packSize: '500', contentUnit: 'ml',
+    packName: '瓶', openStorage: 'chilled', expireDate: '2027-03-01' })
+  const keep = forms.buildReceipt(Object.assign({}, sealed, { openKeep: true, openDays: '' }), '2026-09-23')
+  assert.equal(keep.ok, true, keep.error)
+  assert.equal(keep.body.openShelfLifeDays, expiry.OPEN_KEEP_DAYS)
+  assert.match(forms.buildReceipt(Object.assign({}, sealed, { openDays: '' }), '2026-09-23').error, /保质期不变/)
 })
 
 test('封装含量单位与食材计量方式不一致（按毫升计量的酱写成克）时拦下', () => {

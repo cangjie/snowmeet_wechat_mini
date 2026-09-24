@@ -58,8 +58,8 @@ function buildReceipt(d, today) {
     const option = units.contentUnitOptions(baseUnit, d.units).find(u => u.code === (d.contentUnit || baseUnit))
     if (!option || option.off) return fail('每' + d.packName + '含量的单位须与食材计量方式一致')
     if (!d.openStorage) return fail('请选择开封后储存方式')
-    const openDays = num(d.openDays)
-    if (!(openDays >= 0) || !Number.isInteger(openDays)) return fail('请填写开封后保质期天数')
+    const openDays = d.openKeep ? expiry.OPEN_KEEP_DAYS : num(d.openDays)
+    if (!(openDays >= 0) || !Number.isInteger(openDays)) return fail('请填写开封后保质期天数，或选「保质期不变」')
     body.inputUnitCode = baseUnit
     body.packSize = units.toBase(size, d.contentUnit || baseUnit, d.units)
     body.packUnitName = d.packName

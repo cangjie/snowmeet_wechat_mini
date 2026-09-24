@@ -55,9 +55,11 @@
       <view class="field"><view class="field-label">临期提前提醒（天）<text class="hint">生鲜 1 天、冻品 7 天、干货 30 天</text></view>
         <input class="input" type="number" value="{{mat.warnDays}}" data-field="warnDays" bindinput="setMat" /></view>
       <view class="field"><view class="field-label">封装品开封后默认<text class="hint">成袋、成瓶入库时带出，散装不用</text></view>
+        <view class="seg"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{mat.openStorage === item.code ? 'on' : ''}}" data-value="{{item.code}}" bindtap="pickOpenStorage">{{item.label}}</view></view>
         <view class="input-row">
-          <view class="seg grow"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{mat.openStorage === item.code ? 'on' : ''}}" data-value="{{item.code}}" bindtap="pickOpenStorage">{{item.label}}</view></view>
-          <input class="input days" type="number" value="{{mat.openDays}}" data-field="openDays" bindinput="setMat" placeholder="天" />
+          <view wx:if="{{mat.openKeep}}" class="input keep-box">与封装到期日期相同</view>
+          <input wx:else class="input" type="number" value="{{mat.openDays}}" data-field="openDays" bindinput="setMat" placeholder="开封后可放几天" />
+          <view class="chip-sq keep {{mat.openKeep ? 'on' : ''}}" bindtap="toggleOpenKeep">保质期不变</view>
         </view></view>
       <view class="fnb-section-title">未开封保质期规则<text class="side">按生产月份分档：6–9 月为高温档</text></view>
       <view wx:for="{{storages}}" wx:for-item="st" wx:key="code" class="rule-box">

@@ -58,6 +58,19 @@ test('编辑食材 ↔ 请求：保留编码、图片和备注，规则只取本
   assert.equal(catalog.ruleSpec(edit.rules.frozen), null)
 })
 
+test('开封后保质期不变：档案里记为 OPEN_KEEP_DAYS，编辑时显示为选项而不是天数', () => {
+  const item = { id: 9, name: '速冻水饺', category_id: 7, base_unit_code: 'piece', default_input_unit_code: 'piece', warn_days: 7,
+    default_open_storage: 'frozen', default_open_days: expiry.OPEN_KEEP_DAYS }
+  const edit = catalog.materialEditState(item, dryBeans, [])
+  assert.deepEqual({ openKeep: edit.openKeep, openDays: edit.openDays }, { openKeep: true, openDays: '' })
+  assert.equal(catalog.validateMaterial(edit, UNITS), '')
+  assert.equal(catalog.materialBody(edit, UNITS, 0).defaultOpenDays, expiry.OPEN_KEEP_DAYS)
+  edit.openKeep = false
+  edit.openDays = '3'
+  assert.equal(catalog.materialBody(edit, UNITS, 0).defaultOpenDays, 3)
+  assert.equal(catalog.materialEditState(Object.assign({}, item, { default_open_days: 5 }), dryBeans, []).openKeep, false)
+})
+
 test('食材规则保存计划：挂在食材上，只发有变化的月份', () => {
   const item = { id: 9, category_id: 7, base_unit_code: 'g', default_input_unit_code: 'kg', warn_days: 1 }
   const edit = catalog.materialEditState(item, dryBeans, rules)

@@ -49,7 +49,9 @@ function materialEditState(material, category, rules) {
     categoryName: category ? category.name : '', itemType: m.item_type || 'raw',
     inputUnit: m.default_input_unit_code || 'kg', baseUnit: m.base_unit_code || '',
     warnDays: m.id ? str(m.warn_days) : String(WARN_BY_STORAGE[storage]),
-    openStorage: m.id ? (m.default_open_storage || '') : storage, openDays: m.id ? str(m.default_open_days) : '',
+    openStorage: m.id ? (m.default_open_storage || '') : storage,
+    openKeep: m.default_open_days === expiry.OPEN_KEEP_DAYS,
+    openDays: m.id && m.default_open_days !== expiry.OPEN_KEEP_DAYS ? str(m.default_open_days) : '',
     imageId: m.image_id || null, remark: m.remark || null, rules: {}
   }
   expiry.STORAGE.forEach(s => { edit.rules[s.code] = ruleEdit(m.id ? expiry.summarizeRules(own, s.code) : null) })
@@ -61,7 +63,8 @@ function materialBody(edit, units, now) {
     id: edit.id, code: edit.code || newMaterialCode(now), name: String(edit.name).trim(), categoryId: edit.categoryId,
     itemType: edit.itemType, baseUnitCode: edit.id ? edit.baseUnit : baseUnitFor(edit.inputUnit, units),
     defaultInputUnitCode: edit.inputUnit, warnDays: Number(edit.warnDays),
-    defaultOpenStorage: edit.openStorage || null, defaultOpenDays: edit.openDays === '' ? null : Number(edit.openDays),
+    defaultOpenStorage: edit.openStorage || null,
+    defaultOpenDays: edit.openKeep ? expiry.OPEN_KEEP_DAYS : edit.openDays === '' ? null : Number(edit.openDays),
     imageId: edit.imageId || null, remark: edit.remark || null, valid: true
   }
 }
@@ -95,7 +98,7 @@ function validateMaterial(edit, units) {
   if (!edit.inputUnit) return '请选择计量单位'
   if (edit.id && baseUnitFor(edit.inputUnit, units) !== edit.baseUnit) return '录入单位须与原计量方式一致'
   if (!nonNegativeInt(edit.warnDays)) return '临期提醒天数须为不小于 0 的整数'
-  if (edit.openDays !== '' && !nonNegativeInt(edit.openDays)) return '开封后天数须为不小于 0 的整数'
+  if (!edit.openKeep && edit.openDays !== '' && !nonNegativeInt(edit.openDays)) return '开封后天数须为不小于 0 的整数'
   for (const s of expiry.STORAGE) {
     const r = edit.rules[s.code]
     if (r.mode === 'all' && !positiveInt(r.all)) return s.label + '保质期须为正整数'

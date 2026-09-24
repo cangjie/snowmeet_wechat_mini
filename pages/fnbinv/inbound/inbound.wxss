@@ -25,3 +25,6 @@
 .fnb-empty.small { padding: 24rpx 0; font-size: 24rpx; }
 /* 新食材的数量单位会列出全部单位，放不下时换行 */
 .qty-units { flex: 1 !important; min-width: 0; flex-wrap: wrap; }
+/* 开封后保质期不变：天数框换成说明文字 */
+.keep-box { color: var(--muted); }
+.chip-sq.keep { flex: none; padding: 0 20rpx; height: 80rpx; display: flex; align-items: center; }

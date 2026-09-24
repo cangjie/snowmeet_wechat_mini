@@ -140,6 +140,8 @@ Page({
     const code = e.currentTarget.dataset.value
     this.setData({ 'mat.openStorage': this.data.mat.openStorage === code ? '' : code })
   },
+  // 开封后保质期不变：开封后的到期日期就是封装的到期日期
+  toggleOpenKeep() { this.setData({ 'mat.openKeep': !this.data.mat.openKeep, 'mat.openDays': '' }) },
   saveMat(del) {
     if (this.data.saving) return
     const m = this.data.mat
