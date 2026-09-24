@@ -40,6 +40,13 @@ test('封装 + 包装上的到期日：来源 package，每件含量换算到基
   assert.equal(r.body.shelfLifeRuleId, null)
 })
 
+test('封装含量单位与食材计量方式不一致（按毫升计量的酱写成克）时拦下', () => {
+  const r = forms.buildReceipt(Object.assign({}, base, { material: sauce, packed: true, qty: '3', packSize: '500', contentUnit: 'g',
+    packName: '瓶', openStorage: 'chilled', openDays: '7', expireDate: '2027-03-01' }), '2026-09-23')
+  assert.equal(r.ok, false)
+  assert.match(r.error, /每瓶含量的单位须与食材计量方式一致/)
+})
+
 test('只知道生产月份：按规则从入库日估算，来源 estimated 并写明依据', () => {
   const r = forms.buildReceipt(Object.assign({}, base, { material: cabbage, month: 9, rule }), '2026-09-23')
   assert.equal(r.ok, true, r.error)

@@ -60,8 +60,9 @@
         <view class="seg"><view class="chip-sq {{!packed ? 'on' : ''}}" data-v="0" bindtap="onPacked">散装（入库即可用）</view><view class="chip-sq {{packed ? 'on' : ''}}" data-v="1" bindtap="onPacked">封装（开封后才可用）</view></view>
         <block wx:if="{{packed}}">
           <view class="chips wrap"><view wx:for="{{packNames}}" wx:key="*this" class="chip-sq {{packName === item ? 'on' : ''}}" data-v="{{item}}" bindtap="onPackName">{{item}}</view></view>
-          <view class="date-row"><text class="date-label">每{{packName}}含量</text><input class="input grow" type="digit" value="{{packSize}}" placeholder="如 500" bindinput="onPackSize" />
-            <view class="seg mini"><view wx:for="{{contentUnits}}" wx:key="code" class="chip-sq {{contentUnit === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onContentUnit">{{item.label}}</view></view></view>
+          <view class="date-row"><text class="date-label">每{{packName}}含量</text><input class="input grow" type="digit" value="{{packSize}}" placeholder="如 500" bindinput="onPackSize" /></view>
+          <view class="date-row"><text class="date-label">含量单位</text>
+            <view class="seg mini content-units"><view wx:for="{{contentUnits}}" wx:key="code" class="chip-sq {{contentUnit === item.code ? 'on' : ''}} {{item.off ? 'off' : ''}}" data-code="{{item.code}}" bindtap="onContentUnit">{{item.label}}</view></view></view>
           <view class="date-row"><text class="date-label">开封后</text>
             <view class="seg grow"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{openStorage === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onOpenStorage">{{item.label}}</view></view>
             <input class="input days" type="number" value="{{openDays}}" placeholder="天" bindinput="onOpenDays" /></view>

@@ -24,6 +24,18 @@ test('输入单位按系数换算到基本单位，只列同量纲单位', () =>
   assert.equal(units.unitName('piece'), '个')
 })
 
+test('封装含量单位：全部列出；选了食材后，其他计量方式的置灰', () => {
+  const list = [
+    { code: 'g', dimension: 1, factor_to_base: 1 }, { code: 'kg', dimension: 1, factor_to_base: 1000 },
+    { code: 'ml', dimension: 2, factor_to_base: 1 }, { code: 'l', dimension: 2, factor_to_base: 1000 }, { code: 'piece', dimension: 3, factor_to_base: 1 }
+  ]
+  const free = units.contentUnitOptions(null, list)
+  assert.deepEqual(free.map(u => u.label), ['g', 'kg', 'ml', 'L', '个'])
+  assert.ok(free.every(u => !u.off))
+  assert.deepEqual(units.contentUnitOptions('ml', list).filter(u => !u.off).map(u => u.code), ['ml', 'l'])
+  assert.deepEqual(units.contentUnitOptions('piece', list).filter(u => !u.off).map(u => u.code), ['piece'])
+})
+
 test('储存方式中文名与高温档月份', () => {
   assert.equal(expiry.storageLabel('chilled'), '冷藏')
   assert.equal(expiry.storageLabel('frozen'), '冷冻')

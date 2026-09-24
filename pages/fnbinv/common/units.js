@@ -34,8 +34,15 @@ function inputUnitsFor(baseUnit, units) {
   return units.filter(u => u.dimension === base.dimension && u.valid !== false)
 }
 
+// 封装含量的单位选项：全部单位都列出；选了食材后，与其计量方式（重量 / 体积 / 个数）不同的置灰，因为换算不到库存基本单位
+function contentUnitOptions(baseUnit, units) {
+  const base = (units || []).find(u => u.code === baseUnit)
+  return (units || []).filter(u => u.valid !== false)
+    .map(u => ({ code: u.code, label: unitName(u.code), off: !!base && u.dimension !== base.dimension }))
+}
+
 function money(amount) {
   return '¥' + Number(amount || 0).toFixed(2)
 }
 
-module.exports = { trimNum, unitName, formatQty, toBase, fromBase, inputUnitsFor, money }
+module.exports = { trimNum, unitName, formatQty, toBase, fromBase, inputUnitsFor, contentUnitOptions, money }

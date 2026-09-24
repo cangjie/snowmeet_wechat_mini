@@ -334,6 +334,36 @@ test('入库页：生产日期 + 保质期自动填出到期日期；手填到�
   assert.deepEqual({ expireDate: page.data.expireDate, expireShown: page.data.expireShown }, { expireDate: '', expireShown: '2099-09-30' })
 })
 
+test('入库页：封装含量可选单位，选了按毫升计量的食材后只能用 ml / L，按 L 填的含量换成毫升提交', async () => {
+  installFakes(MANAGER)
+  const saved = RESPONSES['FnbCatalog/GetUnits']
+  RESPONSES['FnbCatalog/GetUnits'] = saved.concat([{ code: 'l', name: '升', dimension: 2, factor_to_base: 1000, valid: true }])
+  try {
+    const page = loadPage('inbound')
+    page.onLoad({})
+    await settle()
+    page.onPacked({ currentTarget: { dataset: { v: '1' } } })
+    assert.ok(page.data.contentUnits.length === 5 && page.data.contentUnits.every(u => !u.off), '没选食材时全部单位可选')
+    page.onHint({ currentTarget: { dataset: { id: 12 } } })
+    assert.deepEqual(page.data.contentUnits.filter(u => !u.off).map(u => u.code), ['ml', 'l'])
+    assert.equal(page.data.contentUnit, 'ml')
+    page.onContentUnit({ currentTarget: { dataset: { code: 'g' } } })
+    assert.equal(page.data.contentUnit, 'ml')
+    page.onContentUnit({ currentTarget: { dataset: { code: 'l' } } })
+    page.onPackSize({ detail: { value: '1.5' } })
+    page.onQty({ detail: { value: 2 } })
+    page.onExpireDate({ detail: { date: '2099-10-01' } })
+    page.onPhotos({ detail: { photos: [{ id: 5 }], uploading: 0 } })
+    page.addDraft()
+    await settle()
+    const body = page.data.drafts[0].body
+    assert.deepEqual({ stockForm: body.stockForm, packSize: body.packSize, quantity: body.quantity, inputUnitCode: body.inputUnitCode },
+      { stockForm: 'sealed', packSize: 1500, quantity: 2, inputUnitCode: 'ml' })
+  } finally {
+    RESPONSES['FnbCatalog/GetUnits'] = saved
+  }
+})
+
 test('入库页：店长现场建档先选计量单位，临期提醒按分类储存方式给默认', async () => {
   installFakes(MANAGER)
   const page = loadPage('inbound')

@@ -13,6 +13,9 @@
 .rule-line { font-size: 22rpx; color: var(--blue); line-height: 1.5; }
 .link { font-size: 22rpx; color: var(--faint); align-self: flex-start; }
 .link.blue { color: var(--blue); }
+/* 封装含量单位：与所选食材计量方式不同的置灰 */
+.content-units { flex-wrap: wrap; }
+.content-units .chip-sq.off { opacity: .35; }
 /* 已手填到期日期：生产日期、保质期置灰不可改 */
 .date-row.locked .date-label { color: var(--faint); }
 .date-row.locked .input { background: var(--gray); color: var(--faint); }

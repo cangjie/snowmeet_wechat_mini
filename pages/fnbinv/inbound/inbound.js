@@ -36,7 +36,7 @@ Page({
     ]).then(([categories, materials, unitList, rules]) => {
       this.src = { categories, materials: materials.filter(m => m.valid), units: unitList.filter(u => u.valid), rules }
       const tree = view.categoryTree(categories)
-      this.setData({ tree, drafts: this.restoreDrafts() })
+      this.setData({ tree, drafts: this.restoreDrafts(), contentUnits: units.contentUnitOptions(null, this.src.units) })
       if (tree.length) this.pickL1(tree[0].id)
       this.newBatchNo()
     }).catch(base.fail)
@@ -70,7 +70,7 @@ Page({
 
   // ---- 2. 名称 ----
   clearMaterial() {
-    this.setData({ material: null, nameQuery: '', canCreate: false })
+    this.setData({ material: null, nameQuery: '', canCreate: false, contentUnits: units.contentUnitOptions(null, this.src.units) })
     this.refreshHints('')
   },
   refreshHints(q) {
@@ -85,12 +85,14 @@ Page({
     this.setData({ nameQuery: q, material: null })
     this.refreshHints(q)
   },
-  // 开封后默认、临期提醒、保质期规则都取自食材档案
+  // 开封后默认、临期提醒、保质期规则都取自食材档案；已选的含量单位与食材计量方式一致时保留
   pickMaterial(material) {
     const inputUnits = units.inputUnitsFor(material.base_unit_code, this.src.units).map(u => ({ code: u.code, label: units.unitName(u.code) }))
+    const contentUnits = units.contentUnitOptions(material.base_unit_code, this.src.units)
+    const kept = contentUnits.find(u => u.code === this.data.contentUnit && !u.off)
     const sub = this.data.sub
     this.setData({ material, nameQuery: material.name, hints: [], canCreate: false, inputUnits,
-      inputUnit: material.default_input_unit_code, contentUnits: inputUnits, contentUnit: material.base_unit_code,
+      inputUnit: material.default_input_unit_code, contentUnits, contentUnit: kept ? kept.code : material.base_unit_code,
       openStorage: material.default_open_storage || (sub && sub.default_storage) || 'chilled',
       openDays: material.default_open_days === null || material.default_open_days === undefined ? '' : String(material.default_open_days) })
     this.refreshRule()
@@ -189,7 +191,15 @@ Page({
   },
   onPackName(e) { this.setData({ packName: e.currentTarget.dataset.v }); this.refreshPriceUnit() },
   onPackSize(e) { this.setData({ packSize: e.detail.value }) },
-  onContentUnit(e) { this.setData({ contentUnit: e.currentTarget.dataset.code }) },
+  onContentUnit(e) {
+    const option = this.data.contentUnits.find(u => u.code === e.currentTarget.dataset.code)
+    if (option.off) {
+      const m = this.data.material
+      wx.showToast({ title: '「' + m.name + '」按' + units.unitName(m.base_unit_code) + '计量，含量单位要同一计量方式', icon: 'none' })
+      return
+    }
+    this.setData({ contentUnit: option.code })
+  },
   onOpenStorage(e) { this.setData({ openStorage: e.currentTarget.dataset.code }) },
   onOpenDays(e) { this.setData({ openDays: e.detail.value }) },
   onQty(e) { this.setData({ qty: e.detail.value }) },
