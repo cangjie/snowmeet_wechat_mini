@@ -17,11 +17,11 @@
         <input class="input" value="{{nameQuery}}" placeholder="{{sub ? '输入或选择' + sub.name + '下的食材' : '先选分类'}}" bindinput="onName" disabled="{{!sub}}" />
         <view wx:if="{{material}}" class="tag ok picked">已选：{{material.name}}</view>
         <view wx:if="{{!material && hints.length}}" class="chips wrap"><view wx:for="{{hints}}" wx:key="id" class="chip-sq" data-id="{{item.id}}" bindtap="onHint">{{item.name}}</view></view>
-        <view wx:if="{{canCreate}}" class="btn {{isManager ? '' : 'disabled'}}" bindtap="onCreateMaterial">{{isManager ? '＋ 新建食材「' + nameQuery + '」' : '「' + nameQuery + '」还没建档，请店长先在「分类」里建档'}}</view>
+        <view wx:if="{{canCreate}}" class="{{isManager ? 'rule-line' : 'warn-line'}}">{{isManager ? '新食材，加入入库单时自动建档，计量单位按下面选的单位' : '「' + nameQuery + '」还没建档，需店长入库或先在「分类」里建档'}}</view>
       </view></view>
 
       <view class="step"><view class="step-no">3</view><view class="step-body">
-        <view class="step-title">拍照建档<text class="hint-inline">选填，照片随批次留存</text></view>
+        <view class="step-title">拍照<text class="hint-inline">选填，照片随批次留存</text></view>
         <photo-field photos="{{photos}}" bind:change="onPhotos" />
       </view></view>
 
@@ -69,11 +69,11 @@
         <view class="step-title">数量</view>
         <view class="input-row"><qty-stepper value="{{qty}}" integer="{{packed}}" step="1" min="0" bind:change="onQty" />
           <text wx:if="{{packed}}" class="unit-suffix">{{packName}}</text>
-          <view wx:else class="seg mini"><view wx:for="{{inputUnits}}" wx:key="code" class="chip-sq {{inputUnit === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onInputUnit">{{item.label}}</view></view></view>
+          <view wx:else class="seg mini qty-units"><view wx:for="{{inputUnits}}" wx:key="code" class="chip-sq {{inputUnit === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="onInputUnit">{{item.label}}</view></view></view>
         <view class="date-row"><text class="date-label">单价（选填）</text><input class="input grow" type="digit" value="{{unitPrice}}" placeholder="留空按 0" bindinput="onPrice" /><text class="unit-suffix">元/{{priceUnit || '单位'}}</text></view>
       </view></view>
 
-      <view class="btn primary btn-block" bindtap="addDraft">加入入库单</view>
+      <view class="btn primary btn-block {{adding ? 'disabled' : ''}}" bindtap="addDraft">{{adding ? '建档中…' : '加入入库单'}}</view>
     </view>
 
     <view class="fnb-section-title">今日入库单<text class="side">{{drafts.length}} 条待提交</text></view>

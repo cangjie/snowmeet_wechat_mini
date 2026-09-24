@@ -385,19 +385,67 @@ test('入库页：输入与已建档食材同名时直接选中；不拍照也�
   assert.deepEqual(page.data.drafts[0].body.imageIds, [])
 })
 
-test('入库页：店长现场建档先选计量单位，临期提醒按分类储存方式给默认', async () => {
+test('入库页：新食材不用单独建档，表单填完加入入库单时按所选数量单位自动建档', async () => {
   installFakes(MANAGER)
   const page = loadPage('inbound')
   page.onLoad({})
   await settle()
   page.onName({ detail: { value: '冬瓜' } })
   assert.equal(page.data.canCreate, true)
-  page.onCreateMaterial()
+  assert.deepEqual(page.data.inputUnits.map(u => u.code), ['g', 'kg', 'ml', 'piece'])
+  page.onInputUnit({ currentTarget: { dataset: { code: 'g' } } })
+  page.onQty({ detail: { value: 3 } })
+  page.addDraft()
+  await settle()
+  assert.equal(calls.filter(c => c.path === 'FnbCatalog/SaveMaterial').length, 0, '表单不完整时不建档')
+  page.onExpireDate({ detail: { date: '2099-10-01' } })
+  page.addDraft()
   await settle()
   const body = calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data
   assert.deepEqual({ name: body.name, categoryId: body.categoryId, baseUnitCode: body.baseUnitCode, defaultInputUnitCode: body.defaultInputUnitCode, warnDays: body.warnDays },
     { name: '冬瓜', categoryId: 2, baseUnitCode: 'g', defaultInputUnitCode: 'g', warnDays: 1 })
-  assert.equal(page.data.material.id, 10)
+  assert.equal(page.data.drafts.length, 1)
+  assert.deepEqual({ itemId: page.data.drafts[0].body.itemId, quantity: page.data.drafts[0].body.quantity, inputUnitCode: page.data.drafts[0].body.inputUnitCode },
+    { itemId: 10, quantity: 3, inputUnitCode: 'g' })
+  assert.equal(page.data.adding, false)
+})
+
+test('入库页：封装的新食材须选含量单位，按含量单位建档并带上本次的开封后默认', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('inbound')
+  page.onLoad({})
+  await settle()
+  page.onName({ detail: { value: '香草糖浆' } })
+  page.onPacked({ currentTarget: { dataset: { v: '1' } } })
+  page.onPackSize({ detail: { value: '750' } })
+  page.onOpenStorage({ currentTarget: { dataset: { code: 'chilled' } } })
+  page.onOpenDays({ detail: { value: '30' } })
+  page.onExpireDate({ detail: { date: '2099-10-01' } })
+  assert.equal(page.data.contentUnit, '')
+  page.addDraft()
+  await settle()
+  assert.equal(calls.filter(c => c.path === 'FnbCatalog/SaveMaterial').length, 0, '没选含量单位不建档')
+  page.onContentUnit({ currentTarget: { dataset: { code: 'ml' } } })
+  page.addDraft()
+  await settle()
+  const body = calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data
+  assert.deepEqual({ baseUnitCode: body.baseUnitCode, defaultInputUnitCode: body.defaultInputUnitCode, defaultOpenStorage: body.defaultOpenStorage, defaultOpenDays: body.defaultOpenDays },
+    { baseUnitCode: 'ml', defaultInputUnitCode: 'ml', defaultOpenStorage: 'chilled', defaultOpenDays: 30 })
+  const draft = page.data.drafts[0].body
+  assert.deepEqual({ stockForm: draft.stockForm, packSize: draft.packSize, openShelfLifeDays: draft.openShelfLifeDays }, { stockForm: 'sealed', packSize: 750, openShelfLifeDays: 30 })
+})
+
+test('入库页：普通员工输入未建档的新名字不能入库，也不会建档', async () => {
+  installFakes({ id: 3, title_level: 100, base_shop_id: 12 })
+  const page = loadPage('inbound')
+  page.onLoad({})
+  await settle()
+  page.onName({ detail: { value: '冬瓜' } })
+  page.onExpireDate({ detail: { date: '2099-10-01' } })
+  page.addDraft()
+  await settle()
+  assert.equal(calls.filter(c => c.path === 'FnbCatalog/SaveMaterial').length, 0)
+  assert.equal(page.data.drafts.length, 0)
 })
 
 test('分类页：有可用食材的分类不能删；空分类确认后发 DeleteCategory，一级分类连同二级一起删', async () => {

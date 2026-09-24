@@ -13,7 +13,7 @@ const PACK_NAMES = ['瓶', '袋', '盒', '桶', '罐', '箱', '件']
 Page({
   data: {
     blocked: '', isManager: false, tree: [], l1: 0, subs: [], sub: null,
-    nameQuery: '', hints: [], material: null, canCreate: false,
+    nameQuery: '', hints: [], material: null, canCreate: false, adding: false,
     photos: [], uploading: 0, batchNo: '', storages: expiry.STORAGE, storage: '',
     prodDate: '', shelfValue: '', shelfUnit: 'day', expireDate: '',
     ruleText: '', expireShown: '', packed: false, packNames: PACK_NAMES, packName: '瓶', packSize: '', contentUnit: '', contentUnits: [],
@@ -89,8 +89,12 @@ Page({
       this.setData({ nameQuery: q })
       return
     }
-    this.setData({ nameQuery: q, material: null })
+    // 没建档的新名字：数量单位、含量单位列出全部，选哪个就按哪个计量方式建档
+    const all = this.src.units.map(u => ({ code: u.code, label: units.unitName(u.code) }))
+    this.setData({ nameQuery: q, material: null, inputUnits: all, contentUnits: units.contentUnitOptions(null, this.src.units),
+      inputUnit: all.some(u => u.code === this.data.inputUnit) ? this.data.inputUnit : 'kg' })
     this.refreshHints(q)
+    this.refreshPriceUnit()
   },
   // 开封后默认、临期提醒、保质期规则都取自食材档案；已选的含量单位与食材计量方式一致时保留
   pickMaterial(material) {
@@ -106,18 +110,21 @@ Page({
     this.refreshPriceUnit()
   },
   onHint(e) { this.pickMaterial(this.src.materials.find(m => m.id === Number(e.currentTarget.dataset.id))) },
-  // 现场建档只问计量单位；临期提醒按分类储存方式给默认，其余到「分类」页补
-  onCreateMaterial() {
-    if (!this.data.isManager) { wx.showToast({ title: '新食材请店长先在「分类」里建档', icon: 'none' }); return }
-    const sub = this.data.sub
-    const name = this.data.nameQuery.trim()
-    const list = this.src.units
-    wx.showActionSheet({ itemList: list.map(u => '按' + u.name + '计量'), success: res => {
-      const edit = Object.assign(catalog.materialEditState({ name, category_id: sub.id }, sub, []), { inputUnit: list[res.tapIndex].code })
-      api.post(this.ctx, 'FnbCatalog/SaveMaterial', catalog.materialBody(edit, list, Date.now()))
-        .then(row => { this.src.materials.push(row); this.pickMaterial(row); wx.showToast({ title: '已建档', icon: 'success' }) })
-        .catch(base.fail)
-    } })
+  // 新名字不单独建档：加入入库单时自动建。计量单位取散装的数量单位 / 封装的含量单位，
+  // 临期提醒按分类储存方式给默认，开封后默认取本次填写的；保质期规则等到「分类」页补
+  newMaterialEdit() {
+    const d = this.data
+    const name = d.nameQuery.trim()
+    const unit = d.packed ? d.contentUnit : d.inputUnit
+    if (d.material || !d.canCreate || !name || !d.sub || !unit) return null
+    const edit = Object.assign(catalog.materialEditState({ name, category_id: d.sub.id }, d.sub, []), { inputUnit: unit })
+    if (d.packed) Object.assign(edit, { openStorage: d.openStorage, openDays: d.openDays })
+    return edit
+  },
+  pendingMaterial() {
+    const edit = this.newMaterialEdit()
+    return edit ? { id: 0, name: edit.name, category_id: edit.categoryId, base_unit_code: catalog.baseUnitFor(edit.inputUnit, this.src.units),
+      default_input_unit_code: edit.inputUnit, warn_days: Number(edit.warnDays) } : null
   },
 
   // ---- 3. 照片 / 4. 批次号 ----
@@ -213,29 +220,42 @@ Page({
 
   draftState() {
     const d = this.data
-    return { material: d.material, photos: d.photos.filter(p => p.id), batchNo: d.batchNo, storage: d.storage,
-      warnDays: d.material ? d.material.warn_days : 0, prodDate: d.prodDate, shelfValue: d.shelfValue, shelfUnit: d.shelfUnit,
+    const material = d.material || (this.src ? this.pendingMaterial() : null)
+    return { material, photos: d.photos.filter(p => p.id), batchNo: d.batchNo, storage: d.storage,
+      warnDays: material ? material.warn_days : 0, prodDate: d.prodDate, shelfValue: d.shelfValue, shelfUnit: d.shelfUnit,
       expireDate: d.expireDate, rule: this.currentRule(), packed: d.packed, packSize: d.packSize,
       contentUnit: d.contentUnit, packName: d.packName, openStorage: d.openStorage, openDays: d.openDays,
       qty: d.qty, inputUnit: d.inputUnit, unitPrice: d.unitPrice, units: this.src ? this.src.units : [] }
   },
 
   addDraft() {
-    if (this.data.uploading > 0) { wx.showToast({ title: '照片还在上传', icon: 'none' }); return }
+    const d = this.data
+    if (d.adding) return
+    if (d.uploading > 0) { wx.showToast({ title: '照片还在上传', icon: 'none' }); return }
+    const isNew = !d.material && d.canCreate
+    if (isNew && !d.isManager) { wx.showToast({ title: '「' + d.nameQuery.trim() + '」还没建档，需店长入库或先建档', icon: 'none', duration: 2500 }); return }
+    if (isNew && d.packed && !d.contentUnit) { wx.showToast({ title: '请选择每' + d.packName + '含量的单位', icon: 'none' }); return }
     const state = this.draftState()
-    const built = forms.buildReceipt(Object.assign(state, { requestId: requestId.newRequestId() }), this.data.today)
+    const built = forms.buildReceipt(Object.assign(state, { requestId: requestId.newRequestId() }), d.today)
     if (!built.ok) { wx.showToast({ title: built.error, icon: 'none', duration: 2500 }); return }
     const b = built.body
-    const qtyText = this.data.packed ? b.quantity + ' ' + b.packUnitName + ' × ' + units.formatQty(b.packSize, state.material.base_unit_code)
-      : units.trimNum(b.quantity) + ' ' + units.unitName(b.inputUnitCode)
-    const draft = { key: b.requestId, body: b, name: state.material.name, batchNo: b.batchNo, error: '',
-      line: qtyText + ' · ' + expiry.storageLabel(b.storageType) + ' · ' + b.expireDate + ' 到期' }
-    this.saveDrafts(this.data.drafts.concat([draft]))
-    this.setData({ photos: [], prodDate: '', expireDate: '', shelfValue: '', qty: 1, unitPrice: '', packSize: '' })
-    this.clearMaterial()
-    this.refreshRule()
-    this.newBatchNo()
-    wx.showToast({ title: '已加入入库单', icon: 'success' })
+    const ready = isNew
+      ? api.post(this.ctx, 'FnbCatalog/SaveMaterial', catalog.materialBody(this.newMaterialEdit(), this.src.units, Date.now()))
+        .then(row => { this.src.materials.push(row); b.itemId = row.id; return row })
+      : Promise.resolve(state.material)
+    this.setData({ adding: true })
+    ready.then(material => {
+      const qtyText = d.packed ? b.quantity + ' ' + b.packUnitName + ' × ' + units.formatQty(b.packSize, material.base_unit_code)
+        : units.trimNum(b.quantity) + ' ' + units.unitName(b.inputUnitCode)
+      const draft = { key: b.requestId, body: b, name: material.name, batchNo: b.batchNo, error: '',
+        line: qtyText + ' · ' + expiry.storageLabel(b.storageType) + ' · ' + b.expireDate + ' 到期' }
+      this.saveDrafts(this.data.drafts.concat([draft]))
+      this.setData({ adding: false, photos: [], prodDate: '', expireDate: '', shelfValue: '', qty: 1, unitPrice: '', packSize: '' })
+      this.clearMaterial()
+      this.refreshRule()
+      this.newBatchNo()
+      wx.showToast({ title: isNew ? '已建档并加入' : '已加入入库单', icon: 'success' })
+    }).catch(err => { this.setData({ adding: false }); base.fail(err) })
   },
   removeDraft(e) {
     this.saveDrafts(this.data.drafts.filter(d => d.key !== e.currentTarget.dataset.key))
