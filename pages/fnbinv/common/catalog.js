@@ -83,9 +83,18 @@ function validate(edit) {
   return ''
 }
 
+// 删除即停用；分类下还有可用食材时不能删（服务端同样校验）。一级分类连同其下二级分类一起删
+function deleteCheck(name, subs, withSubs) {
+  const list = subs || []
+  const count = list.reduce((n, s) => n + s.items.length, 0)
+  if (count) return { blocked: true, message: '「' + name + '」下还有 ' + count + ' 种可用食材，请先停用这些食材再删除' }
+  const extra = withSubs && list.length ? '，其下 ' + list.length + ' 个二级分类会一并删除' : ''
+  return { blocked: false, message: '删除「' + name + '」' + extra + '。已有库存和出入库记录不受影响。' }
+}
+
 function newMaterialCode(now) {
   const suffix = Math.floor(Math.random() * 36 * 36).toString(36)
   return ('M' + Number(now || Date.now()).toString(36) + suffix).toUpperCase().slice(0, 64)
 }
 
-module.exports = { baseUnitFor, ruleLine, editState, categoryBody, ruleSpec, validate, newMaterialCode }
+module.exports = { baseUnitFor, ruleLine, editState, categoryBody, ruleSpec, validate, deleteCheck, newMaterialCode }

@@ -48,6 +48,23 @@ test('分类校验：名称必填、二级须有默认单位与非负整数预�
   assert.equal(catalog.validate(edit), '')
 })
 
+test('删除分类：有可用食材时拦下并给出数量；一级分类提示连同二级一起删', () => {
+  const sub = (id, n) => ({ id, name: '小类' + id, items: [...Array(n)].map((_, i) => ({ id: i + 1 })) })
+  const vegetables = catalog.deleteCheck('蔬菜类', [sub(2, 2)], false)
+  assert.equal(vegetables.blocked, true)
+  assert.match(vegetables.message, /「蔬菜类」下还有 2 种可用食材/)
+  const fresh = catalog.deleteCheck('生鲜', [sub(2, 0), sub(3, 1)], true)
+  assert.equal(fresh.blocked, true)
+  assert.match(fresh.message, /还有 1 种可用食材/)
+  const dry = catalog.deleteCheck('干货', [sub(4, 0), sub(5, 0)], true)
+  assert.equal(dry.blocked, false)
+  assert.match(dry.message, /2 个二级分类会一并删除/)
+  const mushroom = catalog.deleteCheck('菌菇类', [sub(6, 0)], false)
+  assert.equal(mushroom.blocked, false)
+  assert.doesNotMatch(mushroom.message, /二级分类/)
+  assert.doesNotMatch(catalog.deleteCheck('空大类', [], true).message, /一并/)
+})
+
 test('新食材编码：M + 时间戳，全大写且不超过 64 字符', () => {
   const code = catalog.newMaterialCode(1790000000000)
   assert.match(code, /^M[0-9A-Z]+$/)

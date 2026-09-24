@@ -8,7 +8,10 @@ const TODAY_BATCH = { id: 100, name: '大白菜', batch_no: 'B1', expire_date: '
 const RESPONSES = {
   'FnbCatalog/ListCategories': [
     { id: 1, level: 1, parent_id: null, name: '生鲜', valid: true, sort: 1 },
-    { id: 2, level: 2, parent_id: 1, name: '蔬菜类', default_storage: 'chilled', default_unit_code: 'kg', warn_days: 1, default_open_storage: 'chilled', default_open_days: 2, valid: true, sort: 1 }],
+    { id: 2, level: 2, parent_id: 1, name: '蔬菜类', default_storage: 'chilled', default_unit_code: 'kg', warn_days: 1, default_open_storage: 'chilled', default_open_days: 2, valid: true, sort: 1 },
+    { id: 3, level: 2, parent_id: 1, name: '菌菇类', default_storage: 'chilled', default_unit_code: 'kg', warn_days: 1, valid: true, sort: 2 },
+    { id: 4, level: 1, parent_id: null, name: '干货', valid: true, sort: 2 },
+    { id: 5, level: 2, parent_id: 4, name: '豆类', default_storage: 'ambient', default_unit_code: 'kg', warn_days: 30, valid: true, sort: 1 }],
   'FnbCatalog/ListMaterials': { total: 3, rows: [
     { id: 10, code: 'VEG1', name: '大白菜', category_id: 2, item_type: 'raw', base_unit_code: 'g', default_input_unit_code: 'kg', valid: true },
     { id: 11, code: 'DGH1', name: '面团', category_id: 2, item_type: 'prepared', base_unit_code: 'piece', default_input_unit_code: 'piece', valid: true },
@@ -43,6 +46,7 @@ const RESPONSES = {
   'FnbRecipe/SaveRecipeDraft': { id: '21', version_no: 2, rowVersion: 'RV21' },
   'FnbRecipe/PublishRecipe': { id: '21', version_no: 2 },
   'FnbCatalog/SaveCategory': { id: 2 },
+  'FnbCatalog/DeleteCategory': { ids: [3] },
   'FnbCatalog/SaveShelfLifeRule': { id: 1 }
 }
 
@@ -237,4 +241,40 @@ test('分类页：编辑二级分类的冷藏规则只写有变化的月份', as
   assert.equal(rules.length, 12)
   assert.deepEqual(rules.map(r => r.data.shelfLifeValue), new Array(12).fill(7))
   assert.equal(calls.find(c => c.path === 'FnbCatalog/SaveCategory').data.warnDays, 1)
+})
+
+test('分类页：有可用食材的分类不能删；空分类确认后发 DeleteCategory，一级分类连同二级一起删', async () => {
+  installFakes(MANAGER)
+  const modals = []
+  const confirm = wx.showModal
+  wx.showModal = o => { modals.push(o); confirm(o) }
+  const page = loadPage('cats')
+  page.onLoad({})
+  await settle()
+  page.editL2({ currentTarget: { dataset: { id: 2 } } })
+  page.onDeleteL2()
+  page.onDeleteL1({ currentTarget: { dataset: { id: 1 } } })
+  await settle()
+  assert.equal(calls.filter(c => c.path === 'FnbCatalog/DeleteCategory').length, 0)
+  assert.match(modals[0].content, /「蔬菜类」下还有 3 种可用食材/)
+  assert.match(modals[1].content, /「生鲜」下还有 3 种可用食材/)
+
+  page.editL2({ currentTarget: { dataset: { id: 3 } } })
+  page.onDeleteL2()
+  await settle()
+  assert.equal(page.data.editShow, false)
+  page.onDeleteL1({ currentTarget: { dataset: { id: 4 } } })
+  await settle()
+  assert.match(modals[3].content, /1 个二级分类会一并删除/)
+  assert.deepEqual(calls.filter(c => c.path === 'FnbCatalog/DeleteCategory').map(c => c.data), [{ shopId: 12, id: 3 }, { shopId: 12, id: 4 }])
+})
+
+test('分类页：普通员工不能删分类', async () => {
+  installFakes({ id: 3, title_level: 100, base_shop_id: 12 })
+  const page = loadPage('cats')
+  page.onLoad({})
+  await settle()
+  page.onDeleteL1({ currentTarget: { dataset: { id: 4 } } })
+  await settle()
+  assert.equal(calls.filter(c => c.path === 'FnbCatalog/DeleteCategory').length, 0)
 })

@@ -103,6 +103,30 @@ Page({
     }).catch(err => { this.setData({ saving: false }); base.fail(err); this.load() })
   },
 
+  // 删除分类：分类下还有可用食材时只提示原因，不发请求
+  removeCategory(id, name, subs, withSubs) {
+    if (!this.guard()) return
+    const check = catalog.deleteCheck(name, subs, withSubs)
+    if (check.blocked) { wx.showModal({ title: '不能删除', content: check.message, showCancel: false }); return }
+    wx.showModal({ title: '删除分类', content: check.message, confirmText: '删除', confirmColor: '#EF4444', success: res => {
+      if (!res.confirm) return
+      api.post(this.ctx, 'FnbCatalog/DeleteCategory', { id }).then(() => {
+        this.setData({ editShow: false, openL1: withSubs ? 0 : this.data.openL1 })
+        wx.showToast({ title: '已删除', icon: 'success' })
+        this.load()
+      }).catch(err => { base.fail(err); this.load() })
+    } })
+  },
+  onDeleteL1(e) {
+    const g = this.data.groups.find(x => x.id === Number(e.currentTarget.dataset.id))
+    if (g) this.removeCategory(g.id, g.name, g.subs, true)
+  },
+  onDeleteL2() {
+    const id = this.data.edit.id
+    const s = this.data.groups.reduce((all, g) => all.concat(g.subs), []).find(x => x.id === id)
+    if (s) this.removeCategory(s.id, s.name, [s], false)
+  },
+
   bumpWarn(e) {
     if (!this.guard()) return
     const id = Number(e.currentTarget.dataset.id)

@@ -30,7 +30,8 @@
             <text wx:if="{{!s.items.length && !isManager}}" class="card-meta">暂无食材</text>
           </view>
         </view>
-        <view wx:if="{{isManager}}" class="sub-row"><view class="btn" data-id="{{g.id}}" bindtap="addL2">＋ 二级分类</view></view>
+        <view wx:if="{{isManager}}" class="sub-row"><view class="btn" data-id="{{g.id}}" bindtap="addL2">＋ 二级分类</view>
+          <view class="grow"></view><view class="btn danger" data-id="{{g.id}}" bindtap="onDeleteL1">删除一级分类</view></view>
         <view wx:if="{{!g.subs.length && !isManager}}" class="fnb-empty">暂无二级分类</view>
       </view>
     </view>
@@ -69,6 +70,7 @@
           <view class="chip-sq {{edit.rules[st.code].unit === 'month' ? 'on' : ''}}" data-field="rules.{{st.code}}.unit" data-value="month" bindtap="pickEdit">按月</view></view>
       </view>
       <view class="btn primary btn-block {{saving ? 'disabled' : ''}}" bindtap="saveEditor">{{saving ? '保存中…' : '保存'}}</view>
+      <view wx:if="{{edit.id}}" class="btn danger btn-block" bindtap="onDeleteL2">删除该分类</view>
     </view>
   </scroll-view>
 </van-popup>
