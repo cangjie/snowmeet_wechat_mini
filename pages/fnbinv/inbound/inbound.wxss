@@ -9,7 +9,6 @@
 .date-row .grow { flex: 1; min-width: 0; }
 .seg.mini { flex: none; gap: 8rpx; }
 .seg.mini .chip-sq { flex: none; padding: 12rpx 18rpx; }
-.month { width: 96rpx; text-align: center; padding: 12rpx 0; }
 .rule-line { font-size: 22rpx; color: var(--blue); line-height: 1.5; }
 .link { font-size: 22rpx; color: var(--faint); align-self: flex-start; }
 .link.blue { color: var(--blue); }

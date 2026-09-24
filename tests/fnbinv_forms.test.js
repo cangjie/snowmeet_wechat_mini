@@ -47,13 +47,10 @@ test('封装含量单位与食材计量方式不一致（按毫升计量的酱�
   assert.match(r.error, /每瓶含量的单位须与食材计量方式一致/)
 })
 
-test('只知道生产月份：按规则从入库日估算，来源 estimated 并写明依据', () => {
+test('没有生产日期也没有到期日期：拦下，不再按月份估算', () => {
   const r = forms.buildReceipt(Object.assign({}, base, { material: cabbage, month: 9, rule }), '2026-09-23')
-  assert.equal(r.ok, true, r.error)
-  assert.equal(r.body.expirySource, 'estimated')
-  assert.equal(r.body.expireDate, '2026-09-30')
-  assert.equal(r.body.productionDate, null)
-  assert.match(r.body.expiryNote, /9 月/)
+  assert.equal(r.ok, false)
+  assert.match(r.error, /到期日期/)
 })
 
 test('生产日期 + 手填保质期：来源 manual，按天数推算到期', () => {
@@ -63,9 +60,14 @@ test('生产日期 + 手填保质期：来源 manual，按天数推算到期', (
   assert.equal(r.body.shelfLifeValue, 5)
 })
 
-test('拦截：没照片、已过期、封装件数非整数、没有任何日期、没选食材', () => {
+test('批次照片选填：不拍照也能加入入库单，照片列表为空', () => {
+  const r = forms.buildReceipt(Object.assign({}, base, { material: cabbage, expireDate: '2026-10-01', photos: [] }), '2026-09-23')
+  assert.equal(r.ok, true, r.error)
+  assert.deepEqual(r.body.imageIds, [])
+})
+
+test('拦截：已过期、封装件数非整数、没有任何日期、没选食材', () => {
   const draft = Object.assign({}, base, { material: cabbage, expireDate: '2026-10-01' })
-  assert.match(forms.buildReceipt(Object.assign({}, draft, { photos: [] }), '2026-09-23').error, /照片/)
   assert.match(forms.buildReceipt(Object.assign({}, draft, { expireDate: '2026-09-22' }), '2026-09-23').error, /已过期/)
   assert.match(forms.buildReceipt(Object.assign({}, draft, { packed: true, qty: '1.5', packSize: '500', contentUnit: 'g', packName: '袋', openStorage: 'chilled', openDays: '3' }), '2026-09-23').error, /整数/)
   assert.match(forms.buildReceipt(Object.assign({}, base, { material: cabbage }), '2026-09-23').error, /到期/)

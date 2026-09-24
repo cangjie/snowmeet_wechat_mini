@@ -21,7 +21,7 @@
       </view></view>
 
       <view class="step"><view class="step-no">3</view><view class="step-body">
-        <view class="step-title">拍照建档<text class="hint-inline">必填，照片随批次留存</text></view>
+        <view class="step-title">拍照建档<text class="hint-inline">选填，照片随批次留存</text></view>
         <photo-field photos="{{photos}}" bind:change="onPhotos" />
       </view></view>
 
@@ -46,13 +46,9 @@
           <view class="seg mini"><view class="chip-sq {{shelfUnit === 'day' ? 'on' : ''}}" data-unit="day" bindtap="onShelfUnit">天</view><view class="chip-sq {{shelfUnit === 'month' ? 'on' : ''}}" data-unit="month" bindtap="onShelfUnit">月</view></view>
           <view class="btn {{expireDate ? 'disabled' : ''}}" data-mode="shelf" bindtap="onScan">识别</view></view>
         <view class="date-row"><text class="date-label">到期日期</text><view class="grow"><date-range-picker mode="single" allow-future date="{{expireShown}}" placeholder="包装上的到期日" bind:change="onExpireDate" /></view><view class="btn" data-mode="expire" bindtap="onScan">识别</view></view>
-        <block wx:if="{{!prodDate && !expireDate}}">
-          <view class="card-meta">没有具体日期时，选生产月份（影响高温档 / 低温档保质期）</view>
-          <view class="chips wrap"><view wx:for="{{months}}" wx:key="*this" class="chip-sq month {{month === item ? 'on' : ''}}" data-m="{{item}}" bindtap="onMonth">{{item}}月</view></view>
-        </block>
         <view wx:if="{{ruleText}}" class="{{ruleBad ? 'danger-line' : 'rule-line'}}">{{ruleText}}</view>
         <view wx:if="{{expireDate}}" class="link blue" bindtap="clearExpire">改用生产日期 + 保质期计算</view>
-        <view wx:if="{{prodDate || expireDate || shelfValue || month}}" class="link" bindtap="clearDates">清空日期</view>
+        <view wx:if="{{prodDate || expireDate || shelfValue}}" class="link" bindtap="clearDates">清空日期</view>
       </view></view>
 
       <view class="step"><view class="step-no">7</view><view class="step-body">

@@ -9,14 +9,13 @@ const view = require('../common/stock-view.js')
 const requestId = require('../common/request-id.js')
 
 const PACK_NAMES = ['瓶', '袋', '盒', '桶', '罐', '箱', '件']
-const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 Page({
   data: {
     blocked: '', isManager: false, tree: [], l1: 0, subs: [], sub: null,
     nameQuery: '', hints: [], material: null, canCreate: false,
     photos: [], uploading: 0, batchNo: '', storages: expiry.STORAGE, storage: '',
-    prodDate: '', shelfValue: '', shelfUnit: 'day', expireDate: '', month: 0, months: MONTHS,
+    prodDate: '', shelfValue: '', shelfUnit: 'day', expireDate: '',
     ruleText: '', expireShown: '', packed: false, packNames: PACK_NAMES, packName: '瓶', packSize: '', contentUnit: '', contentUnits: [],
     openStorage: '', openDays: '', qty: 1, inputUnit: '', inputUnits: [], unitPrice: '', priceUnit: '',
     drafts: [], done: [], submitting: false, scan: { show: false, mode: 'all' }, printShow: false, printBatch: null
@@ -80,8 +79,16 @@ Page({
     const exact = list.some(m => m.name === q.trim())
     this.setData({ hints, canCreate: !!q.trim() && !exact })
   },
+  // 输入与本分类下已建档食材同名时直接选中，不用再点候选
   onName(e) {
     const q = e.detail.value
+    const sub = this.data.sub
+    const same = sub && this.src.materials.find(m => m.category_id === sub.id && m.name === q.trim())
+    if (same) {
+      if (!this.data.material || this.data.material.id !== same.id) this.pickMaterial(same)
+      this.setData({ nameQuery: q })
+      return
+    }
     this.setData({ nameQuery: q, material: null })
     this.refreshHints(q)
   },
@@ -127,36 +134,31 @@ Page({
   // 一旦手填（或识别）到期日期，data.expireDate 有值，生产日期和保质期置灰、不参与计算
   locked() { return !!this.data.expireDate },
   onStorage(e) { this.setData({ storage: e.currentTarget.dataset.code }); this.refreshRule() },
-  onProdDate(e) { if (this.locked()) return; this.setData({ prodDate: e.detail.date, month: 0 }); this.refreshRule() },
+  onProdDate(e) { if (this.locked()) return; this.setData({ prodDate: e.detail.date }); this.refreshRule() },
   onExpireDate(e) { this.setData({ expireDate: e.detail.date }); this.refreshRule() },
   clearExpire() { this.setData({ expireDate: '' }); this.refreshRule() },
   onShelf(e) { if (this.locked()) return; this.setData({ shelfValue: e.detail.value }); this.refreshRule() },
   onShelfUnit(e) { if (this.locked()) return; this.setData({ shelfUnit: e.currentTarget.dataset.unit }); this.refreshRule() },
-  onMonth(e) {
-    const m = Number(e.currentTarget.dataset.m)
-    this.setData({ month: this.data.month === m ? 0 : m })
-    this.refreshRule()
-  },
   clearDates() {
-    this.setData({ prodDate: '', expireDate: '', shelfValue: '', month: 0 })
+    this.setData({ prodDate: '', expireDate: '', shelfValue: '' })
     this.refreshRule()
   },
+  // 保质期规则按生产日期所在月份取（高温档 / 低温档）
   currentRule() {
     const d = this.data
-    if (!d.material) return null
-    const month = d.prodDate ? Number(d.prodDate.slice(5, 7)) : d.month
-    return month ? expiry.ruleFor(this.src.rules, d.material.id, d.storage, month) : null
+    if (!d.material || !d.prodDate) return null
+    return expiry.ruleFor(this.src.rules, d.material.id, d.storage, Number(d.prodDate.slice(5, 7)))
   },
   refreshRule() {
     const d = this.data
     const rule = this.currentRule()
     const draft = this.draftState()
-    const resolved = forms.resolveExpiry(draft, d.today)
+    const resolved = forms.resolveExpiry(draft)
     let ruleText = ''
     if (!resolved.error) {
-      const source = { package: '按填写的到期日期', manual: '按生产日期 + 保质期', category: '按食材规则', estimated: '按生产月份估算' }[resolved.source]
+      const source = { package: '按填写的到期日期', manual: '按生产日期 + 保质期', category: '按食材规则' }[resolved.source]
       ruleText = source + ' → ' + resolved.expireDate + ' 到期' + (resolved.expireDate < d.today ? '（已过期，不能入库）' : '')
-    } else if (d.material && (d.prodDate || d.month) && !rule) {
+    } else if (d.material && d.prodDate && !rule) {
       ruleText = '该食材的' + expiry.storageLabel(d.storage) + '没有保质期规则，请直接填写到期日期或保质期'
     }
     this.setData({ ruleText, ruleBad: !resolved.error && resolved.expireDate < d.today,
@@ -175,13 +177,13 @@ Page({
     this.setData({ 'scan.show': false })
     if (d.field === 'expire_date') this.setData({ expireDate: d.value })
     else if (this.locked()) return
-    else if (d.field === 'produce_date') this.setData({ prodDate: d.value, month: 0 })
+    else if (d.field === 'produce_date') this.setData({ prodDate: d.value })
     else if (d.field === 'shelf') this.setData({ shelfValue: String(d.value.value), shelfUnit: d.value.unit === '月' ? 'month' : 'day' })
     this.refreshRule()
   },
   onScanConfirm(e) {
     this.setData({ 'scan.show': false })
-    if (e.detail.produceDate && !this.locked()) { this.setData({ prodDate: e.detail.produceDate, month: 0 }); this.refreshRule() }
+    if (e.detail.produceDate && !this.locked()) { this.setData({ prodDate: e.detail.produceDate }); this.refreshRule() }
   },
 
   // ---- 7. 包装 / 8. 数量 / 单价 ----
@@ -213,7 +215,7 @@ Page({
     const d = this.data
     return { material: d.material, photos: d.photos.filter(p => p.id), batchNo: d.batchNo, storage: d.storage,
       warnDays: d.material ? d.material.warn_days : 0, prodDate: d.prodDate, shelfValue: d.shelfValue, shelfUnit: d.shelfUnit,
-      expireDate: d.expireDate, month: d.month, rule: this.currentRule(), packed: d.packed, packSize: d.packSize,
+      expireDate: d.expireDate, rule: this.currentRule(), packed: d.packed, packSize: d.packSize,
       contentUnit: d.contentUnit, packName: d.packName, openStorage: d.openStorage, openDays: d.openDays,
       qty: d.qty, inputUnit: d.inputUnit, unitPrice: d.unitPrice, units: this.src ? this.src.units : [] }
   },
@@ -229,7 +231,7 @@ Page({
     const draft = { key: b.requestId, body: b, name: state.material.name, batchNo: b.batchNo, error: '',
       line: qtyText + ' · ' + expiry.storageLabel(b.storageType) + ' · ' + b.expireDate + ' 到期' }
     this.saveDrafts(this.data.drafts.concat([draft]))
-    this.setData({ photos: [], prodDate: '', expireDate: '', shelfValue: '', month: 0, qty: 1, unitPrice: '', packSize: '' })
+    this.setData({ photos: [], prodDate: '', expireDate: '', shelfValue: '', qty: 1, unitPrice: '', packSize: '' })
     this.clearMaterial()
     this.refreshRule()
     this.newBatchNo()

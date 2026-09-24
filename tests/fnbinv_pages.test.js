@@ -364,6 +364,27 @@ test('入库页：封装含量可选单位，选了按毫升计量的食材后�
   }
 })
 
+test('入库页：输入与已建档食材同名时直接选中；不拍照也能加入入库单', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('inbound')
+  page.onLoad({})
+  await settle()
+  page.onName({ detail: { value: '大白' } })
+  assert.equal(page.data.material, null)
+  assert.deepEqual(page.data.hints.map(h => h.id), [10])
+  page.onName({ detail: { value: '大白菜' } })
+  assert.equal(page.data.material.id, 10)
+  assert.equal(page.data.nameQuery, '大白菜')
+  page.onInputUnit({ currentTarget: { dataset: { code: 'g' } } })
+  page.onName({ detail: { value: '大白菜' } })
+  assert.equal(page.data.inputUnit, 'g', '已选中同一食材时不重新带出默认值')
+  page.onExpireDate({ detail: { date: '2099-10-01' } })
+  page.addDraft()
+  await settle()
+  assert.equal(page.data.drafts.length, 1)
+  assert.deepEqual(page.data.drafts[0].body.imageIds, [])
+})
+
 test('入库页：店长现场建档先选计量单位，临期提醒按分类储存方式给默认', async () => {
   installFakes(MANAGER)
   const page = loadPage('inbound')
