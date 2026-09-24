@@ -63,8 +63,7 @@ Page({
   onL2(e) { this.pickSub(Number(e.currentTarget.dataset.id)) },
   pickSub(id) {
     const sub = this.src.categories.find(c => c.id === id)
-    this.setData({ sub, storage: sub.default_storage || 'chilled', openStorage: sub.default_open_storage || sub.default_storage || 'chilled',
-      openDays: sub.default_open_days === null || sub.default_open_days === undefined ? '' : String(sub.default_open_days) })
+    this.setData({ sub, storage: sub.default_storage || 'chilled', openStorage: sub.default_storage || 'chilled', openDays: '' })
     this.clearMaterial()
   },
   goCats() { wx.redirectTo({ url: '/pages/fnbinv/cats/cats' }) },
@@ -86,23 +85,30 @@ Page({
     this.setData({ nameQuery: q, material: null })
     this.refreshHints(q)
   },
+  // 开封后默认、临期提醒、保质期规则都取自食材档案
   pickMaterial(material) {
     const inputUnits = units.inputUnitsFor(material.base_unit_code, this.src.units).map(u => ({ code: u.code, label: units.unitName(u.code) }))
+    const sub = this.data.sub
     this.setData({ material, nameQuery: material.name, hints: [], canCreate: false, inputUnits,
-      inputUnit: material.default_input_unit_code, contentUnits: inputUnits, contentUnit: material.base_unit_code })
+      inputUnit: material.default_input_unit_code, contentUnits: inputUnits, contentUnit: material.base_unit_code,
+      openStorage: material.default_open_storage || (sub && sub.default_storage) || 'chilled',
+      openDays: material.default_open_days === null || material.default_open_days === undefined ? '' : String(material.default_open_days) })
     this.refreshRule()
     this.refreshPriceUnit()
   },
   onHint(e) { this.pickMaterial(this.src.materials.find(m => m.id === Number(e.currentTarget.dataset.id))) },
+  // 现场建档只问计量单位；临期提醒按分类储存方式给默认，其余到「分类」页补
   onCreateMaterial() {
     if (!this.data.isManager) { wx.showToast({ title: '新食材请店长先在「分类」里建档', icon: 'none' }); return }
     const sub = this.data.sub
     const name = this.data.nameQuery.trim()
-    const baseUnit = catalog.baseUnitFor(sub.default_unit_code, this.src.units)
-    api.post(this.ctx, 'FnbCatalog/SaveMaterial', { id: 0, code: catalog.newMaterialCode(Date.now()), name, categoryId: sub.id, itemType: 'raw',
-      baseUnitCode: baseUnit, defaultInputUnitCode: sub.default_unit_code, imageId: null, remark: null, valid: true })
-      .then(row => { this.src.materials.push(row); this.pickMaterial(row); wx.showToast({ title: '已建档', icon: 'success' }) })
-      .catch(base.fail)
+    const list = this.src.units
+    wx.showActionSheet({ itemList: list.map(u => '按' + u.name + '计量'), success: res => {
+      const edit = Object.assign(catalog.materialEditState({ name, category_id: sub.id }, sub, []), { inputUnit: list[res.tapIndex].code })
+      api.post(this.ctx, 'FnbCatalog/SaveMaterial', catalog.materialBody(edit, list, Date.now()))
+        .then(row => { this.src.materials.push(row); this.pickMaterial(row); wx.showToast({ title: '已建档', icon: 'success' }) })
+        .catch(base.fail)
+    } })
   },
 
   // ---- 3. 照片 / 4. 批次号 ----
@@ -131,9 +137,9 @@ Page({
   },
   currentRule() {
     const d = this.data
-    if (!d.sub) return null
+    if (!d.material) return null
     const month = d.prodDate ? Number(d.prodDate.slice(5, 7)) : d.month
-    return month ? expiry.ruleFor(this.src.rules, d.sub.id, d.storage, month) : null
+    return month ? expiry.ruleFor(this.src.rules, d.material.id, d.storage, month) : null
   },
   refreshRule() {
     const d = this.data
@@ -142,10 +148,10 @@ Page({
     const resolved = forms.resolveExpiry(draft, d.today)
     let ruleText = ''
     if (!resolved.error) {
-      const source = { package: '按填写的到期日期', manual: '按生产日期 + 保质期', category: '按分类规则', estimated: '按生产月份估算' }[resolved.source]
+      const source = { package: '按填写的到期日期', manual: '按生产日期 + 保质期', category: '按食材规则', estimated: '按生产月份估算' }[resolved.source]
       ruleText = source + ' → ' + resolved.expireDate + ' 到期' + (resolved.expireDate < d.today ? '（已过期，不能入库）' : '')
-    } else if ((d.prodDate || d.month) && !rule) {
-      ruleText = '该分类的' + expiry.storageLabel(d.storage) + '没有保质期规则，请直接填写到期日期或保质期'
+    } else if (d.material && (d.prodDate || d.month) && !rule) {
+      ruleText = '该食材的' + expiry.storageLabel(d.storage) + '没有保质期规则，请直接填写到期日期或保质期'
     }
     this.setData({ ruleText, ruleBad: !resolved.error && resolved.expireDate < d.today, dateNote: forms.dateNote(d) })
   },
@@ -186,7 +192,7 @@ Page({
   draftState() {
     const d = this.data
     return { material: d.material, photos: d.photos.filter(p => p.id), batchNo: d.batchNo, storage: d.storage,
-      warnDays: d.sub ? d.sub.warn_days : 0, prodDate: d.prodDate, shelfValue: d.shelfValue, shelfUnit: d.shelfUnit,
+      warnDays: d.material ? d.material.warn_days : 0, prodDate: d.prodDate, shelfValue: d.shelfValue, shelfUnit: d.shelfUnit,
       expireDate: d.expireDate, month: d.month, rule: this.currentRule(), packed: d.packed, packSize: d.packSize,
       contentUnit: d.contentUnit, packName: d.packName, openStorage: d.openStorage, openDays: d.openDays,
       qty: d.qty, inputUnit: d.inputUnit, unitPrice: d.unitPrice, units: this.src ? this.src.units : [] }

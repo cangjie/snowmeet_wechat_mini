@@ -1,4 +1,4 @@
-// 入库表单 → PostReceipt 请求体。效期来源四选一：包装到期日 / 手填保质期 / 分类规则 / 按生产月份估算
+// 入库表单 → PostReceipt 请求体。效期来源四选一：包装到期日 / 手填保质期 / 食材保质期规则（来源码仍为 category） / 按生产月份估算
 const units = require('./units.js')
 const expiry = require('./expiry.js')
 
@@ -23,7 +23,7 @@ function resolveExpiry(d, today) {
       shelfLifeValue: shelf, shelfLifeUnit: unit, ruleId: null, note: null }
   }
   if (d.prodDate && d.rule) {
-    if (Number(d.prodDate.slice(5, 7)) !== d.rule.production_month) return { error: '分类规则与生产月份不一致，请重新选择日期' }
+    if (Number(d.prodDate.slice(5, 7)) !== d.rule.production_month) return { error: '食材规则与生产月份不一致，请重新选择日期' }
     return { expireDate: expiry.calcExpiry(d.prodDate, d.rule.shelf_life_value, d.rule.shelf_life_unit), source: 'category',
       productionDate: d.prodDate, shelfLifeValue: d.rule.shelf_life_value, shelfLifeUnit: d.rule.shelf_life_unit, ruleId: d.rule.id, note: null }
   }
@@ -31,9 +31,9 @@ function resolveExpiry(d, today) {
     const band = expiry.isWarmMonth(d.month) ? '高温档' : '低温档'
     return { expireDate: expiry.calcExpiry(today, d.rule.shelf_life_value, d.rule.shelf_life_unit), source: 'estimated',
       productionDate: null, shelfLifeValue: null, shelfLifeUnit: null, ruleId: null,
-      note: '按 ' + d.month + ' 月生产（' + band + '）的分类规则，自入库日 ' + today + ' 起估算' }
+      note: '按 ' + d.month + ' 月生产（' + band + '）的食材规则，自入库日 ' + today + ' 起估算' }
   }
-  return { error: '请填写到期日期，或填写生产日期由系统按分类规则计算' }
+  return { error: '请填写到期日期，或填写生产日期由系统按食材规则计算' }
 }
 
 // 三项日期都填且互相矛盾：以到期日期为准，表单上提示差异

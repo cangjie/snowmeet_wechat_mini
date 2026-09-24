@@ -55,7 +55,7 @@ test('临期汇总分成已过期、开封后临期、未开封临期三组，�
 })
 
 test('按储存方式归纳 12 个月规则：全年一致 / 高低温两档 / 未设置', () => {
-  const make = (month, value) => ({ id: month, category_id: 7, storage_type: 'ambient', production_month: month, shelf_life_value: value, shelf_life_unit: 'day', valid: true })
+  const make = (month, value) => ({ id: month, item_id: 7, storage_type: 'ambient', production_month: month, shelf_life_value: value, shelf_life_unit: 'day', valid: true })
   const all = [...Array(12)].map((_, i) => make(i + 1, 180))
   assert.deepEqual(expiry.summarizeRules(all, 'ambient'), { mode: 'all', unit: 'day', value: 180 })
   const band = [...Array(12)].map((_, i) => make(i + 1, expiry.isWarmMonth(i + 1) ? 90 : 180))
@@ -64,11 +64,11 @@ test('按储存方式归纳 12 个月规则：全年一致 / 高低温两档 / �
 })
 
 test('规则保存计划：只改有变化的月份，删除时把已有规则置为停用', () => {
-  const existing = [{ id: 11, category_id: 7, storage_type: 'chilled', production_month: 1, shelf_life_value: 10, shelf_life_unit: 'day', valid: true },
-    { id: 17, category_id: 7, storage_type: 'chilled', production_month: 7, shelf_life_value: 10, shelf_life_unit: 'day', valid: true }]
+  const existing = [{ id: 11, item_id: 7, storage_type: 'chilled', production_month: 1, shelf_life_value: 10, shelf_life_unit: 'day', valid: true },
+    { id: 17, item_id: 7, storage_type: 'chilled', production_month: 7, shelf_life_value: 10, shelf_life_unit: 'day', valid: true }]
   const plan = expiry.planRuleSaves(existing, 7, 'chilled', { unit: 'day', warm: 7, cold: 10 })
   assert.equal(plan.length, 11)
-  assert.deepEqual(plan.find(p => p.productionMonth === 7), { id: 17, categoryId: 7, storageType: 'chilled', productionMonth: 7, shelfLifeValue: 7, shelfLifeUnit: 'day', remark: null, valid: true })
+  assert.deepEqual(plan.find(p => p.productionMonth === 7), { id: 17, itemId: 7, storageType: 'chilled', productionMonth: 7, shelfLifeValue: 7, shelfLifeUnit: 'day', remark: null, valid: true })
   assert.equal(plan.find(p => p.productionMonth === 1), undefined)
   assert.equal(plan.find(p => p.productionMonth === 2).id, 0)
   const removal = expiry.planRuleSaves(existing, 7, 'chilled', null)

@@ -39,7 +39,7 @@
         <view class="step-title">日期<text class="hint-inline">选填一项即可 · 点「识别」拍包装</text></view>
         <view class="date-row"><text class="date-label">生产日期</text><view class="grow"><date-range-picker mode="single" date="{{prodDate}}" placeholder="选择生产日期" bind:change="onProdDate" /></view><view class="btn" data-mode="date" bindtap="onScan">识别</view></view>
         <view class="date-row"><text class="date-label">保质期</text>
-          <input class="input grow" type="number" value="{{shelfValue}}" placeholder="留空按分类规则" bindinput="onShelf" />
+          <input class="input grow" type="number" value="{{shelfValue}}" placeholder="留空按食材规则" bindinput="onShelf" />
           <view class="seg mini"><view class="chip-sq {{shelfUnit === 'day' ? 'on' : ''}}" data-unit="day" bindtap="onShelfUnit">天</view><view class="chip-sq {{shelfUnit === 'month' ? 'on' : ''}}" data-unit="month" bindtap="onShelfUnit">月</view></view>
           <view class="btn" data-mode="shelf" bindtap="onScan">识别</view></view>
         <view class="date-row"><text class="date-label">到期日期</text><view class="grow"><date-range-picker mode="single" allow-future date="{{expireDate}}" placeholder="包装上的到期日" bind:change="onExpireDate" /></view><view class="btn" data-mode="expire" bindtap="onScan">识别</view></view>

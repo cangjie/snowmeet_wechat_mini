@@ -287,21 +287,6 @@ Page({
       case 'supplement':
         path = '/pages/admin/sale/supplement'
         break
-      case 'fd_category':
-        path = '/pages/admin/fd/fd_category'
-        break
-      case 'fd_add_prod':
-        path = '/pages/admin/fd/fd_add_prod'
-        break
-      case 'fd_prod_list':
-        path = '/pages/admin/fd/fd_category_prod_list'
-        break
-      case 'fd_prod_mod':
-        path = '/pages/admin/fd/fd_category_prod_list_mod'
-        break
-      case 'fd_order_list':
-        path = '/pages/admin/fd/fd_order_list'
-        break
       case 'mat_expire':
         path = '/pages/fnbinv/stock/stock'
         break

@@ -6,7 +6,7 @@ const units = require('../common/units.js')
 const view = require('../common/stock-view.js')
 const requestId = require('../common/request-id.js')
 const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com'
-const SOURCE = { manual: '手填保质期推算', package: '包装标注', category: '分类规则计算', estimated: '按生产月份估算', opened: '开封后重算' }
+const SOURCE = { manual: '手填保质期推算', package: '包装标注', category: '食材规则计算', estimated: '按生产月份估算', opened: '开封后重算' }
 
 function parseId(options) {
   if (options.id) return Number(options.id)

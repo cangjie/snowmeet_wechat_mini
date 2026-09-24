@@ -82,11 +82,11 @@ function summarizeRules(rules, storage) {
   return warm === cold ? { mode: 'all', unit, value: warm } : { mode: 'band', unit, warm, cold }
 }
 
-// 生成 SaveShelfLifeRule 请求体（不含 shopId）；spec=null 表示停用该储存方式的全部规则
-function planRuleSaves(existing, categoryId, storage, spec) {
-  const current = activeRules(existing, storage).filter(r => r.category_id === categoryId)
+// 生成 SaveShelfLifeRule 请求体（不含 shopId）；spec=null 表示停用该储存方式的全部规则。规则挂在食材上
+function planRuleSaves(existing, itemId, storage, spec) {
+  const current = activeRules(existing, storage).filter(r => r.item_id === itemId)
   if (!spec) {
-    return current.map(r => ({ id: r.id, categoryId, storageType: storage, productionMonth: r.production_month,
+    return current.map(r => ({ id: r.id, itemId, storageType: storage, productionMonth: r.production_month,
       shelfLifeValue: r.shelf_life_value, shelfLifeUnit: r.shelf_life_unit, remark: r.remark || null, valid: false }))
   }
   const plan = []
@@ -94,15 +94,15 @@ function planRuleSaves(existing, categoryId, storage, spec) {
     const value = isWarmMonth(month) ? spec.warm : spec.cold
     const hit = current.find(r => r.production_month === month)
     if (hit && hit.shelf_life_value === value && hit.shelf_life_unit === spec.unit) continue
-    plan.push({ id: hit ? hit.id : 0, categoryId, storageType: storage, productionMonth: month,
+    plan.push({ id: hit ? hit.id : 0, itemId, storageType: storage, productionMonth: month,
       shelfLifeValue: value, shelfLifeUnit: spec.unit, remark: null, valid: true })
   }
   return plan
 }
 
-// 给某个生产月份和储存方式挑出规则
-function ruleFor(rules, categoryId, storage, month) {
-  return (rules || []).find(r => r.valid && r.category_id === categoryId && r.storage_type === storage && r.production_month === month) || null
+// 给某个食材的生产月份和储存方式挑出规则
+function ruleFor(rules, itemId, storage, month) {
+  return (rules || []).find(r => r.valid && r.item_id === itemId && r.storage_type === storage && r.production_month === month) || null
 }
 
 module.exports = { STORAGE, storageLabel, isWarmMonth, addDays, addMonths, calcExpiry, daysBetween, today,

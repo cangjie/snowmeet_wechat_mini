@@ -1,8 +1,8 @@
-// 分类维护：一级 / 二级分类、保质期规则、食材档案（维护需店长权限，员工只读）
+// 分类维护：一级 / 二级分类（二级只有名称和建议储存方式）、食材档案（计量、临期、开封默认、保质期规则）
+// 维护需店长权限，员工只读
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const expiry = require('../common/expiry.js')
-const units = require('../common/units.js')
 const catalog = require('../common/catalog.js')
 
 const MODES = [{ code: 'none', label: '不适用' }, { code: 'all', label: '全年' }, { code: 'band', label: '分高低温档' }]
@@ -29,8 +29,8 @@ Page({
       const groups = valid.filter(c => c.level === 1).map(g => {
         const subs = valid.filter(c => c.level === 2 && c.parent_id === g.id).map(s => {
           const items = materials.filter(m => m.category_id === s.id && m.valid)
-          return { id: s.id, name: s.name, storage: expiry.storageLabel(s.default_storage), unit: units.unitName(s.default_unit_code),
-            warn: s.warn_days, ruleLine: catalog.ruleLine(rules, s.id), items: items.map(m => ({ id: m.id, name: m.name, prepared: m.item_type === 'prepared' })) }
+          return { id: s.id, name: s.name, storage: expiry.storageLabel(s.default_storage),
+            items: items.map(m => ({ id: m.id, name: m.name, prepared: m.item_type === 'prepared' })) }
         })
         return { id: g.id, name: g.name, subs, meta: subs.length + ' 个二级分类 · ' + subs.reduce((n, s) => n + s.items.length, 0) + ' 种食材' }
       })
@@ -60,15 +60,15 @@ Page({
     } })
   },
 
+  // 二级分类：名称 + 建议储存方式
   openEditor(category) {
-    this.setData({ editShow: true, edit: catalog.editState(category, this.src.rules) })
+    this.setData({ editShow: true, edit: catalog.categoryEditState(category) })
   },
   addL2(e) {
     if (!this.guard()) return
     const parentId = Number(e.currentTarget.dataset.id)
     const siblings = this.src.categories.filter(c => c.parent_id === parentId)
-    this.openEditor({ id: 0, parent_id: parentId, level: 2, name: '', default_storage: 'chilled', default_unit_code: 'kg', warn_days: 1,
-      default_open_storage: 'chilled', default_open_days: 1, sort: siblings.length + 1, valid: true })
+    this.openEditor({ id: 0, parent_id: parentId, level: 2, name: '', default_storage: 'chilled', sort: siblings.length + 1, valid: true })
   },
   editL2(e) {
     if (!this.guard()) return
@@ -80,27 +80,18 @@ Page({
     const value = e.detail.value !== undefined ? e.detail.value : e.currentTarget.dataset.value
     this.setData({ ['edit.' + field]: value })
   },
-  pickEdit(e) {
-    this.setData({ ['edit.' + e.currentTarget.dataset.field]: e.currentTarget.dataset.value })
-  },
 
   saveEditor() {
     if (this.data.saving) return
     const edit = this.data.edit
-    const error = catalog.validate(edit)
+    const error = catalog.validateCategory(edit)
     if (error) { wx.showToast({ title: error, icon: 'none' }); return }
     this.setData({ saving: true })
-    api.post(this.ctx, 'FnbCatalog/SaveCategory', catalog.categoryBody(edit)).then(row => {
-      const plans = expiry.STORAGE.reduce((all, s) => {
-        const spec = catalog.ruleSpec(edit.rules[s.code])
-        return spec === 'custom' ? all : all.concat(expiry.planRuleSaves(this.src.rules, row.id, s.code, spec))
-      }, [])
-      return plans.reduce((p, body) => p.then(() => api.post(this.ctx, 'FnbCatalog/SaveShelfLifeRule', body)), Promise.resolve())
-    }).then(() => {
+    api.post(this.ctx, 'FnbCatalog/SaveCategory', catalog.categoryBody(edit)).then(() => {
       this.setData({ saving: false, editShow: false })
       wx.showToast({ title: '已保存', icon: 'success' })
       this.load()
-    }).catch(err => { this.setData({ saving: false }); base.fail(err); this.load() })
+    }).catch(err => { this.setData({ saving: false }); base.fail(err) })
   },
 
   // 删除分类：分类下还有可用食材时只提示原因，不发请求
@@ -127,48 +118,43 @@ Page({
     if (s) this.removeCategory(s.id, s.name, [s], false)
   },
 
-  bumpWarn(e) {
-    if (!this.guard()) return
-    const id = Number(e.currentTarget.dataset.id)
-    const delta = Number(e.currentTarget.dataset.delta)
-    const c = this.src.categories.find(x => x.id === id)
-    const next = Math.max(0, (c.warn_days || 0) + delta)
-    if (next === c.warn_days) return
-    const body = catalog.categoryBody(Object.assign(catalog.editState(c, []), { warnDays: String(next) }))
-    api.post(this.ctx, 'FnbCatalog/SaveCategory', body).then(() => this.load()).catch(base.fail)
-  },
-
-  // 食材档案
+  // 食材档案：计量单位、临期提醒、开封后默认、保质期规则
   addMaterial(e) {
     if (!this.guard()) return
     const category = this.src.categories.find(c => c.id === Number(e.currentTarget.dataset.id))
-    this.setData({ matShow: true, mat: { id: 0, code: '', name: '', categoryId: category.id, categoryName: category.name,
-      itemType: 'raw', inputUnit: category.default_unit_code, hasStock: false } })
+    this.setData({ matShow: true, mat: catalog.materialEditState(null, category, []) })
   },
   editMaterial(e) {
     if (!this.guard()) return
     const m = this.src.materials.find(x => x.id === Number(e.currentTarget.dataset.id))
     const category = this.src.categories.find(c => c.id === m.category_id)
-    this.setData({ matShow: true, mat: { id: m.id, code: m.code, name: m.name, categoryId: m.category_id, categoryName: category ? category.name : '',
-      itemType: m.item_type, inputUnit: m.default_input_unit_code, baseUnit: m.base_unit_code, hasStock: true } })
+    this.setData({ matShow: true, mat: catalog.materialEditState(m, category, this.src.rules) })
   },
   closeMat() { this.setData({ matShow: false }) },
   setMat(e) {
     const field = e.currentTarget.dataset.field
     this.setData({ ['mat.' + field]: e.detail.value !== undefined ? e.detail.value : e.currentTarget.dataset.value })
   },
+  // 开封后储存方式可以不设：再点一次已选中的取消
+  pickOpenStorage(e) {
+    const code = e.currentTarget.dataset.value
+    this.setData({ 'mat.openStorage': this.data.mat.openStorage === code ? '' : code })
+  },
   saveMat(del) {
+    if (this.data.saving) return
     const m = this.data.mat
-    if (!String(m.name).trim()) { wx.showToast({ title: '请填写食材名称', icon: 'none' }); return }
-    const baseUnit = m.id ? m.baseUnit : catalog.baseUnitFor(m.inputUnit, this.src.units)
-    if (catalog.baseUnitFor(m.inputUnit, this.src.units) !== baseUnit) { wx.showToast({ title: '录入单位须与原计量方式一致', icon: 'none' }); return }
-    const body = { id: m.id, code: m.code || catalog.newMaterialCode(Date.now()), name: String(m.name).trim(), categoryId: m.categoryId,
-      itemType: m.itemType, baseUnitCode: baseUnit, defaultInputUnitCode: m.inputUnit, imageId: null, remark: null, valid: del !== true }
-    api.post(this.ctx, 'FnbCatalog/SaveMaterial', body).then(() => {
-      this.setData({ matShow: false })
+    const error = del === true ? '' : catalog.validateMaterial(m, this.src.units)
+    if (error) { wx.showToast({ title: error, icon: 'none' }); return }
+    const body = Object.assign(catalog.materialBody(m, this.src.units, Date.now()), { valid: del !== true })
+    this.setData({ saving: true })
+    api.post(this.ctx, 'FnbCatalog/SaveMaterial', body).then(row => {
+      const plans = del === true ? [] : catalog.rulePlans(this.src.rules, row.id, m.rules)
+      return plans.reduce((p, rule) => p.then(() => api.post(this.ctx, 'FnbCatalog/SaveShelfLifeRule', rule)), Promise.resolve())
+    }).then(() => {
+      this.setData({ saving: false, matShow: false })
       wx.showToast({ title: del === true ? '已停用' : '已保存', icon: 'success' })
       this.load()
-    }).catch(base.fail)
+    }).catch(err => { this.setData({ saving: false }); base.fail(err); this.load() })
   },
   onSaveMat() { this.saveMat(false) },
   onDisableMat() {

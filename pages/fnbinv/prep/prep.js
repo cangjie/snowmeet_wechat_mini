@@ -36,7 +36,7 @@ Page({
       const cards = materials.filter(m => m.valid && m.item_type === 'prepared').map(m => {
         const r = recipe.latestFor(recipes, m.id).published
         const cat = categories.find(c => c.id === m.category_id) || {}
-        return r ? { id: m.id, name: m.name, recipeId: r.id, outputQty: r.output_qty, unit: m.base_unit_code, category: cat,
+        return r ? { id: m.id, name: m.name, recipeId: r.id, outputQty: r.output_qty, unit: m.base_unit_code, category: cat, warnDays: m.warn_days || 0,
           meta: '每批产出 ' + units.formatQty(r.output_qty, m.base_unit_code) + ' · 建议' + expiry.storageLabel(cat.default_storage) } : null
       }).filter(Boolean)
       const preparedIds = new Set(materials.filter(m => m.item_type === 'prepared').map(m => m.id))
@@ -71,12 +71,12 @@ Page({
     if (!card) return
     const r = recipe.prepNeeds(this.lines, this.data.n, this.src.available, this.src.materials)
     const month = Number(this.data.today.slice(5, 7))
-    const rule = expiry.ruleFor(this.src.rules, card.category.id, this.data.storage, month)
+    const rule = expiry.ruleFor(this.src.rules, card.id, this.data.storage, month)
     this.setData({ needs: r.rows, canMake: r.ok, outLabel: units.formatQty(card.outputQty * this.data.n, card.unit) })
     if (this.expireManual) return  // 手动选过到期日后，改批数或储存方式不再覆盖
     this.rule = rule
     this.setData({ expireDate: rule ? expiry.calcExpiry(this.data.today, rule.shelf_life_value, rule.shelf_life_unit) : '',
-      expireHint: rule ? '按分类规则自今天起算，可改' : '该分类的' + expiry.storageLabel(this.data.storage) + '没有保质期规则，请选择到期日期' })
+      expireHint: rule ? '按食材规则自今天起算，可改' : '该食材的' + expiry.storageLabel(this.data.storage) + '没有保质期规则，请选择到期日期' })
   },
   onN(e) { this.setData({ n: Math.max(1, Number(e.detail.value) || 1) }); this.refresh() },
   onStorage(e) { this.setData({ storage: e.currentTarget.dataset.code }); this.refresh() },
@@ -101,8 +101,8 @@ Page({
     this.setData({ making: true })
     api.post(this.ctx, 'FnbInventory/PostPreparation', {
       requestId: this.keeper.get(key), recipeId: card.recipeId, outputQuantity: card.outputQty * d.n, batchNo: d.batchNo,
-      storageType: d.storage, storageLocation: null, expireDate: d.expireDate, warnDays: card.category.warn_days || 0,
-      imageIds: photos.map(p => p.id), expiryNote: this.rule ? '按分类规则自制作日起算' : null
+      storageType: d.storage, storageLocation: null, expireDate: d.expireDate, warnDays: card.warnDays,
+      imageIds: photos.map(p => p.id), expiryNote: this.rule ? '按食材规则自制作日起算' : null
     }).then(() => {
       this.keeper.done(key)
       this.setData({ making: false, openId: 0 })

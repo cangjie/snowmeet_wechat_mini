@@ -8,14 +8,15 @@ const TODAY_BATCH = { id: 100, name: '大白菜', batch_no: 'B1', expire_date: '
 const RESPONSES = {
   'FnbCatalog/ListCategories': [
     { id: 1, level: 1, parent_id: null, name: '生鲜', valid: true, sort: 1 },
-    { id: 2, level: 2, parent_id: 1, name: '蔬菜类', default_storage: 'chilled', default_unit_code: 'kg', warn_days: 1, default_open_storage: 'chilled', default_open_days: 2, valid: true, sort: 1 },
-    { id: 3, level: 2, parent_id: 1, name: '菌菇类', default_storage: 'chilled', default_unit_code: 'kg', warn_days: 1, valid: true, sort: 2 },
+    { id: 2, level: 2, parent_id: 1, name: '蔬菜类', default_storage: 'chilled', valid: true, sort: 1 },
+    { id: 3, level: 2, parent_id: 1, name: '菌菇类', default_storage: 'chilled', valid: true, sort: 2 },
     { id: 4, level: 1, parent_id: null, name: '干货', valid: true, sort: 2 },
-    { id: 5, level: 2, parent_id: 4, name: '豆类', default_storage: 'ambient', default_unit_code: 'kg', warn_days: 30, valid: true, sort: 1 }],
+    { id: 5, level: 2, parent_id: 4, name: '豆类', default_storage: 'ambient', valid: true, sort: 1 }],
   'FnbCatalog/ListMaterials': { total: 3, rows: [
-    { id: 10, code: 'VEG1', name: '大白菜', category_id: 2, item_type: 'raw', base_unit_code: 'g', default_input_unit_code: 'kg', valid: true },
-    { id: 11, code: 'DGH1', name: '面团', category_id: 2, item_type: 'prepared', base_unit_code: 'piece', default_input_unit_code: 'piece', valid: true },
-    { id: 12, code: 'SAU1', name: '番茄酱', category_id: 2, item_type: 'raw', base_unit_code: 'ml', default_input_unit_code: 'ml', valid: true }] },
+    { id: 10, code: 'VEG1', name: '大白菜', category_id: 2, item_type: 'raw', base_unit_code: 'g', default_input_unit_code: 'kg', warn_days: 1, valid: true },
+    { id: 11, code: 'DGH1', name: '面团', category_id: 2, item_type: 'prepared', base_unit_code: 'piece', default_input_unit_code: 'piece', warn_days: 2, valid: true },
+    { id: 12, code: 'SAU1', name: '番茄酱', category_id: 2, item_type: 'raw', base_unit_code: 'ml', default_input_unit_code: 'ml', warn_days: 30,
+      default_open_storage: 'chilled', default_open_days: 7, valid: true }] },
   'FnbCatalog/GetUnits': [{ code: 'g', name: '克', dimension: 1, factor_to_base: 1, valid: true }, { code: 'kg', name: '千克', dimension: 1, factor_to_base: 1000, valid: true },
     { code: 'ml', name: '毫升', dimension: 2, factor_to_base: 1, valid: true }, { code: 'piece', name: '个', dimension: 3, factor_to_base: 1, valid: true }],
   'FnbCatalog/ListShelfLifeRules': [],
@@ -46,6 +47,7 @@ const RESPONSES = {
   'FnbRecipe/SaveRecipeDraft': { id: '21', version_no: 2, rowVersion: 'RV21' },
   'FnbRecipe/PublishRecipe': { id: '21', version_no: 2 },
   'FnbCatalog/SaveCategory': { id: 2 },
+  'FnbCatalog/SaveMaterial': { id: 10, code: 'VEG1', name: '大白菜', category_id: 2, item_type: 'raw', base_unit_code: 'g', default_input_unit_code: 'kg', warn_days: 1, valid: true },
   'FnbCatalog/DeleteCategory': { ids: [3] },
   'FnbCatalog/SaveShelfLifeRule': { id: 1 }
 }
@@ -227,20 +229,92 @@ test('配方页：编辑已发布配方 → 存新草稿 → 用返回的 rowVer
   assert.deepEqual({ recipeId: publish.data.recipeId, rowVersion: publish.data.rowVersion }, { recipeId: '21', rowVersion: 'RV21' })
 })
 
-test('分类页：编辑二级分类的冷藏规则只写有变化的月份', async () => {
+test('分类页：新增二级分类只存名称和储存方式，不写保质期规则', async () => {
   installFakes(MANAGER)
   const page = loadPage('cats')
   page.onLoad({})
   await settle()
-  page.editL2({ currentTarget: { dataset: { id: 2 } } })
-  page.pickEdit({ currentTarget: { dataset: { field: 'rules.chilled.mode', value: 'all' } } })
-  page.setEdit({ currentTarget: { dataset: { field: 'rules.chilled.all' } }, detail: { value: '7' } })
+  page.addL2({ currentTarget: { dataset: { id: 1 } } })
+  page.setEdit({ currentTarget: { dataset: { field: 'name' } }, detail: { value: '速冻面点' } })
+  page.setEdit({ currentTarget: { dataset: { field: 'defaultStorage', value: 'frozen' } }, detail: {} })
   page.saveEditor()
   await settle()
+  assert.deepEqual(calls.find(c => c.path === 'FnbCatalog/SaveCategory').data,
+    { shopId: 12, id: 0, parentId: 1, level: 2, name: '速冻面点', defaultStorage: 'frozen', sort: 3, valid: true })
+  assert.equal(calls.filter(c => c.path === 'FnbCatalog/SaveShelfLifeRule').length, 0)
+  assert.equal(page.data.editShow, false)
+})
+
+test('分类页：编辑食材带临期和开封默认，冷藏规则挂在食材上且只写有变化的月份', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('cats')
+  page.onLoad({})
+  await settle()
+  page.editMaterial({ currentTarget: { dataset: { id: 10 } } })
+  page.setMat({ currentTarget: { dataset: { field: 'warnDays' } }, detail: { value: '2' } })
+  page.pickOpenStorage({ currentTarget: { dataset: { value: 'frozen' } } })
+  page.setMat({ currentTarget: { dataset: { field: 'openDays' } }, detail: { value: '3' } })
+  page.setMat({ currentTarget: { dataset: { field: 'rules.chilled.mode', value: 'all' } }, detail: {} })
+  page.setMat({ currentTarget: { dataset: { field: 'rules.chilled.all' } }, detail: { value: '7' } })
+  page.onSaveMat()
+  await settle()
+  const saved = calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data
+  assert.deepEqual({ id: saved.id, code: saved.code, warnDays: saved.warnDays, defaultOpenStorage: saved.defaultOpenStorage, defaultOpenDays: saved.defaultOpenDays, baseUnitCode: saved.baseUnitCode },
+    { id: 10, code: 'VEG1', warnDays: 2, defaultOpenStorage: 'frozen', defaultOpenDays: 3, baseUnitCode: 'g' })
   const rules = calls.filter(c => c.path === 'FnbCatalog/SaveShelfLifeRule')
   assert.equal(rules.length, 12)
-  assert.deepEqual(rules.map(r => r.data.shelfLifeValue), new Array(12).fill(7))
-  assert.equal(calls.find(c => c.path === 'FnbCatalog/SaveCategory').data.warnDays, 1)
+  assert.ok(rules.every(r => r.data.itemId === 10 && r.data.shelfLifeValue === 7 && r.data.categoryId === undefined))
+  assert.equal(page.data.matShow, false)
+})
+
+test('分类页：开封后储存方式再点一次取消，保存为空', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('cats')
+  page.onLoad({})
+  await settle()
+  page.editMaterial({ currentTarget: { dataset: { id: 12 } } })
+  assert.equal(page.data.mat.openStorage, 'chilled')
+  assert.equal(page.data.mat.openDays, '7')
+  page.pickOpenStorage({ currentTarget: { dataset: { value: 'chilled' } } })
+  page.onSaveMat()
+  await settle()
+  assert.equal(calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data.defaultOpenStorage, null)
+})
+
+test('入库页：开封后默认、临期天数、保质期规则都取自所选食材', async () => {
+  installFakes(MANAGER)
+  const saved = RESPONSES['FnbCatalog/ListShelfLifeRules']
+  RESPONSES['FnbCatalog/ListShelfLifeRules'] = [{ id: 77, item_id: 10, storage_type: 'chilled', production_month: 9, shelf_life_value: 7, shelf_life_unit: 'day', valid: true }]
+  try {
+    const page = loadPage('inbound')
+    page.onLoad({})
+    await settle()
+    page.onHint({ currentTarget: { dataset: { id: 12 } } })
+    assert.deepEqual({ openStorage: page.data.openStorage, openDays: page.data.openDays, warnDays: page.draftState().warnDays },
+      { openStorage: 'chilled', openDays: '7', warnDays: 30 })
+    page.onProdDate({ detail: { date: '2099-09-20' } })
+    assert.match(page.data.ruleText, /该食材的冷藏没有保质期规则/)
+    page.onHint({ currentTarget: { dataset: { id: 10 } } })
+    assert.match(page.data.ruleText, /按食材规则 → 2099-09-27 到期/)
+    assert.deepEqual({ openStorage: page.data.openStorage, openDays: page.data.openDays }, { openStorage: 'chilled', openDays: '' })
+  } finally {
+    RESPONSES['FnbCatalog/ListShelfLifeRules'] = saved
+  }
+})
+
+test('入库页：店长现场建档先选计量单位，临期提醒按分类储存方式给默认', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('inbound')
+  page.onLoad({})
+  await settle()
+  page.onName({ detail: { value: '冬瓜' } })
+  assert.equal(page.data.canCreate, true)
+  page.onCreateMaterial()
+  await settle()
+  const body = calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data
+  assert.deepEqual({ name: body.name, categoryId: body.categoryId, baseUnitCode: body.baseUnitCode, defaultInputUnitCode: body.defaultInputUnitCode, warnDays: body.warnDays },
+    { name: '冬瓜', categoryId: 2, baseUnitCode: 'g', defaultInputUnitCode: 'g', warnDays: 1 })
+  assert.equal(page.data.material.id, 10)
 })
 
 test('分类页：有可用食材的分类不能删；空分类确认后发 DeleteCategory，一级分类连同二级一起删', async () => {

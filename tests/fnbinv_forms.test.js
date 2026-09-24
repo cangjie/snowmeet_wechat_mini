@@ -10,11 +10,11 @@ const UNITS = [
 ]
 const cabbage = { id: 10, name: '大白菜', base_unit_code: 'g', default_input_unit_code: 'kg', category_id: 2 }
 const sauce = { id: 20, name: '番茄酱', base_unit_code: 'ml', default_input_unit_code: 'ml', category_id: 4 }
-const rule = { id: 77, category_id: 2, storage_type: 'chilled', production_month: 9, shelf_life_value: 7, shelf_life_unit: 'day', valid: true }
+const rule = { id: 77, item_id: 10, storage_type: 'chilled', production_month: 9, shelf_life_value: 7, shelf_life_unit: 'day', valid: true }
 const base = { requestId: 'r-1', photos: [{ id: 5 }], batchNo: 'B260923-01', storage: 'chilled', warnDays: 1,
   packed: false, qty: '10', inputUnit: 'kg', unitPrice: '', units: UNITS }
 
-test('散装 + 生产日期按分类规则算到期：来源 category，带规则号', () => {
+test('散装 + 生产日期按食材规则算到期：来源 category，带规则号', () => {
   const r = forms.buildReceipt(Object.assign({}, base, { material: cabbage, prodDate: '2026-09-20', rule }), '2026-09-23')
   assert.equal(r.ok, true, r.error)
   assert.deepEqual(r.body, {
