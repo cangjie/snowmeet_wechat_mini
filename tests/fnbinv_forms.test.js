@@ -65,10 +65,13 @@ test('拦截：没照片、已过期、封装件数非整数、没有任何日�
   assert.match(forms.buildReceipt(Object.assign({}, base, { expireDate: '2026-10-01' }), '2026-09-23').error, /食材/)
 })
 
-test('三项日期都填且矛盾时提示以到期日为准', () => {
-  assert.equal(forms.dateNote({ prodDate: '2026-09-20', shelfValue: '5', shelfUnit: 'day', expireDate: '2026-09-30' }),
-    '按生产日期和保质期应为 2026-09-25，将以到期日期 2026-09-30 入库')
-  assert.equal(forms.dateNote({ prodDate: '2026-09-20', shelfValue: '5', shelfUnit: 'day', expireDate: '2026-09-25' }), '')
+test('手填了到期日期：以它为准，生产日期和保质期不参与计算、也不提交', () => {
+  const r = forms.buildReceipt(Object.assign({}, base, { material: cabbage, prodDate: '2026-09-20', shelfValue: '5', shelfUnit: 'day',
+    expireDate: '2026-09-30', rule }), '2026-09-23')
+  assert.equal(r.ok, true, r.error)
+  assert.deepEqual({ source: r.body.expirySource, expireDate: r.body.expireDate, productionDate: r.body.productionDate,
+    shelfLifeValue: r.body.shelfLifeValue, shelfLifeUnit: r.body.shelfLifeUnit, ruleId: r.body.shelfLifeRuleId },
+  { source: 'package', expireDate: '2026-09-30', productionDate: null, shelfLifeValue: null, shelfLifeUnit: null, ruleId: null })
 })
 
 test('基本单位换回录入单位显示', () => {
@@ -83,8 +86,8 @@ test('批次号：服务端发号若已被入库单占用，则递增末尾序�
   assert.equal(forms.nextBatchNo('自定义', ['自定义']), '自定义-2')
 })
 
-test('生产日期晚于到期日期时在加入入库单前就拦下（服务端会拒）', () => {
+test('手填的到期日期早于之前填的生产日期：生产日期不提交，不再因矛盾被拦', () => {
   const r = forms.buildReceipt(Object.assign({}, base, { material: cabbage, prodDate: '2026-10-05', expireDate: '2026-10-01' }), '2026-09-23')
-  assert.equal(r.ok, false)
-  assert.match(r.error, /生产日期/)
+  assert.equal(r.ok, true, r.error)
+  assert.equal(r.body.productionDate, null)
 })

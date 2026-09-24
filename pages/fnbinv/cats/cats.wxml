@@ -26,7 +26,8 @@
         <view wx:if="{{!g.subs.length && !isManager}}" class="fnb-empty">暂无二级分类</view>
       </view>
     </view>
-    <view wx:if="{{!loading && groups.length === 0}}" class="fnb-empty">还没有分类{{isManager ? '，先新增一级分类' : '，请店长先建分类'}}</view>
+    <view wx:if="{{loadError}}" class="fnb-empty">分类加载失败，下拉刷新重试</view>
+    <view wx:elif="{{!loading && groups.length === 0}}" class="fnb-empty">还没有分类{{isManager ? '，先新增一级分类' : '，请店长先建分类'}}</view>
   </block>
 </view>
 

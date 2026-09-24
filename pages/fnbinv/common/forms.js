@@ -10,12 +10,12 @@ function fail(error) {
   return { ok: false, error }
 }
 
+// d.expireDate 只放手填（或识别）的到期日期：有它就以它为准，生产日期和保质期不参与计算、也不提交
 function resolveExpiry(d, today) {
   const shelf = num(d.shelfValue)
   if (d.expireDate) {
-    const withShelf = !!d.prodDate && shelf > 0
-    return { expireDate: d.expireDate, source: 'package', productionDate: d.prodDate || null,
-      shelfLifeValue: withShelf ? shelf : null, shelfLifeUnit: withShelf ? (d.shelfUnit || 'day') : null, ruleId: null, note: null }
+    return { expireDate: d.expireDate, source: 'package', productionDate: null,
+      shelfLifeValue: null, shelfLifeUnit: null, ruleId: null, note: null }
   }
   if (d.prodDate && shelf > 0) {
     const unit = d.shelfUnit || 'day'
@@ -36,14 +36,6 @@ function resolveExpiry(d, today) {
   return { error: '请填写到期日期，或填写生产日期由系统按食材规则计算' }
 }
 
-// 三项日期都填且互相矛盾：以到期日期为准，表单上提示差异
-function dateNote(d) {
-  const shelf = num(d.shelfValue)
-  if (!d.prodDate || !(shelf > 0) || !d.expireDate) return ''
-  const calc = expiry.calcExpiry(d.prodDate, shelf, d.shelfUnit || 'day')
-  return calc === d.expireDate ? '' : '按生产日期和保质期应为 ' + calc + '，将以到期日期 ' + d.expireDate + ' 入库'
-}
-
 function buildReceipt(d, today) {
   if (!d.material) return fail('请先选择食材')
   if (!d.photos || d.photos.length === 0) return fail('请至少拍一张批次照片')
@@ -56,7 +48,6 @@ function buildReceipt(d, today) {
   const e = resolveExpiry(d, today)
   if (e.error) return fail(e.error)
   if (e.expireDate < today) return fail('该批次已过期（' + e.expireDate + '），不能入库')
-  if (e.productionDate && e.productionDate > e.expireDate) return fail('生产日期不能晚于到期日期')
   const baseUnit = d.material.base_unit_code
   const body = {
     requestId: d.requestId, itemId: d.material.id, batchNo: String(d.batchNo).trim(), stockForm: d.packed ? 'sealed' : 'bulk',
@@ -99,4 +90,4 @@ function nextBatchNo(serverNo, used) {
   return candidate
 }
 
-module.exports = { buildReceipt, dateNote, resolveExpiry, nextBatchNo }
+module.exports = { buildReceipt, resolveExpiry, nextBatchNo }

@@ -302,6 +302,38 @@ test('入库页：开封后默认、临期天数、保质期规则都取自所�
   }
 })
 
+test('入库页：生产日期 + 保质期自动填出到期日期；手填到期日期后生产日期和保质期锁定、不提交，可改回计算', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('inbound')
+  page.onLoad({})
+  await settle()
+  page.onHint({ currentTarget: { dataset: { id: 10 } } })
+  page.onProdDate({ detail: { date: '2099-09-23' } })
+  page.onShelf({ detail: { value: '7' } })
+  assert.equal(page.data.expireDate, '')
+  assert.equal(page.data.expireShown, '2099-09-30')
+
+  page.onExpireDate({ detail: { date: '2099-10-15' } })
+  assert.equal(page.data.expireShown, '2099-10-15')
+  page.onProdDate({ detail: { date: '2099-09-01' } })
+  page.onShelf({ detail: { value: '99' } })
+  page.onScan({ currentTarget: { dataset: { mode: 'date' } } })
+  assert.deepEqual({ prodDate: page.data.prodDate, shelfValue: page.data.shelfValue, scan: page.data.scan.show }, { prodDate: '2099-09-23', shelfValue: '7', scan: false })
+  page.onPhotos({ detail: { photos: [{ id: 5 }], uploading: 0 } })
+  page.addDraft()
+  await settle()
+  const body = page.data.drafts[0].body
+  assert.deepEqual({ expireDate: body.expireDate, source: body.expirySource, productionDate: body.productionDate, shelfLifeValue: body.shelfLifeValue },
+    { expireDate: '2099-10-15', source: 'package', productionDate: null, shelfLifeValue: null })
+
+  page.onHint({ currentTarget: { dataset: { id: 10 } } })
+  page.onProdDate({ detail: { date: '2099-09-23' } })
+  page.onShelf({ detail: { value: '7' } })
+  page.onExpireDate({ detail: { date: '2099-10-15' } })
+  page.clearExpire()
+  assert.deepEqual({ expireDate: page.data.expireDate, expireShown: page.data.expireShown }, { expireDate: '', expireShown: '2099-09-30' })
+})
+
 test('入库页：店长现场建档先选计量单位，临期提醒按分类储存方式给默认', async () => {
   installFakes(MANAGER)
   const page = loadPage('inbound')

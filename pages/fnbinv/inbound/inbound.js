@@ -17,7 +17,7 @@ Page({
     nameQuery: '', hints: [], material: null, canCreate: false,
     photos: [], uploading: 0, batchNo: '', storages: expiry.STORAGE, storage: '',
     prodDate: '', shelfValue: '', shelfUnit: 'day', expireDate: '', month: 0, months: MONTHS,
-    ruleText: '', dateNote: '', packed: false, packNames: PACK_NAMES, packName: '瓶', packSize: '', contentUnit: '', contentUnits: [],
+    ruleText: '', expireShown: '', packed: false, packNames: PACK_NAMES, packName: '瓶', packSize: '', contentUnit: '', contentUnits: [],
     openStorage: '', openDays: '', qty: 1, inputUnit: '', inputUnits: [], unitPrice: '', priceUnit: '',
     drafts: [], done: [], submitting: false, scan: { show: false, mode: 'all' }, printShow: false, printBatch: null
   },
@@ -121,11 +121,15 @@ Page({
   onBatchNo(e) { this.setData({ batchNo: e.detail.value }) },
 
   // ---- 5. 储存 / 6. 日期 ----
+  // 到期日期由生产日期 + 保质期（或食材规则）自动算出并显示在「到期日期」框里；
+  // 一旦手填（或识别）到期日期，data.expireDate 有值，生产日期和保质期置灰、不参与计算
+  locked() { return !!this.data.expireDate },
   onStorage(e) { this.setData({ storage: e.currentTarget.dataset.code }); this.refreshRule() },
-  onProdDate(e) { this.setData({ prodDate: e.detail.date, month: 0 }); this.refreshRule() },
+  onProdDate(e) { if (this.locked()) return; this.setData({ prodDate: e.detail.date, month: 0 }); this.refreshRule() },
   onExpireDate(e) { this.setData({ expireDate: e.detail.date }); this.refreshRule() },
-  onShelf(e) { this.setData({ shelfValue: e.detail.value }); this.refreshRule() },
-  onShelfUnit(e) { this.setData({ shelfUnit: e.currentTarget.dataset.unit }); this.refreshRule() },
+  clearExpire() { this.setData({ expireDate: '' }); this.refreshRule() },
+  onShelf(e) { if (this.locked()) return; this.setData({ shelfValue: e.detail.value }); this.refreshRule() },
+  onShelfUnit(e) { if (this.locked()) return; this.setData({ shelfUnit: e.currentTarget.dataset.unit }); this.refreshRule() },
   onMonth(e) {
     const m = Number(e.currentTarget.dataset.m)
     this.setData({ month: this.data.month === m ? 0 : m })
@@ -153,23 +157,29 @@ Page({
     } else if (d.material && (d.prodDate || d.month) && !rule) {
       ruleText = '该食材的' + expiry.storageLabel(d.storage) + '没有保质期规则，请直接填写到期日期或保质期'
     }
-    this.setData({ ruleText, ruleBad: !resolved.error && resolved.expireDate < d.today, dateNote: forms.dateNote(d) })
+    this.setData({ ruleText, ruleBad: !resolved.error && resolved.expireDate < d.today,
+      expireShown: d.expireDate || (resolved.error ? '' : resolved.expireDate) })
   },
 
-  // ---- OCR 识别 ----
-  onScan(e) { this.setData({ scan: { show: true, mode: e.currentTarget.dataset.mode } }) },
+  // ---- OCR 识别（到期日期已手填时，生产日期和保质期的识别不再生效）----
+  onScan(e) {
+    const mode = e.currentTarget.dataset.mode
+    if (this.locked() && mode !== 'expire') return
+    this.setData({ scan: { show: true, mode } })
+  },
   onScanClose() { this.setData({ 'scan.show': false }) },
   onScanFill(e) {
     const d = e.detail
     this.setData({ 'scan.show': false })
-    if (d.field === 'produce_date') this.setData({ prodDate: d.value, month: 0 })
-    else if (d.field === 'expire_date') this.setData({ expireDate: d.value })
+    if (d.field === 'expire_date') this.setData({ expireDate: d.value })
+    else if (this.locked()) return
+    else if (d.field === 'produce_date') this.setData({ prodDate: d.value, month: 0 })
     else if (d.field === 'shelf') this.setData({ shelfValue: String(d.value.value), shelfUnit: d.value.unit === '月' ? 'month' : 'day' })
     this.refreshRule()
   },
   onScanConfirm(e) {
     this.setData({ 'scan.show': false })
-    if (e.detail.produceDate) { this.setData({ prodDate: e.detail.produceDate, month: 0 }); this.refreshRule() }
+    if (e.detail.produceDate && !this.locked()) { this.setData({ prodDate: e.detail.produceDate, month: 0 }); this.refreshRule() }
   },
 
   // ---- 7. 包装 / 8. 数量 / 单价 ----

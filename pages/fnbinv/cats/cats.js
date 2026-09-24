@@ -9,7 +9,7 @@ const MODES = [{ code: 'none', label: '不适用' }, { code: 'all', label: '全�
 
 Page({
   data: {
-    blocked: '', loading: true, isManager: false, groups: [], openL1: 0, storages: expiry.STORAGE, modes: MODES,
+    blocked: '', loading: true, loadError: false, isManager: false, groups: [], openL1: 0, storages: expiry.STORAGE, modes: MODES,
     unitOpts: [], editShow: false, edit: null, saving: false, matShow: false, mat: null
   },
 
@@ -34,9 +34,9 @@ Page({
         })
         return { id: g.id, name: g.name, subs, meta: subs.length + ' 个二级分类 · ' + subs.reduce((n, s) => n + s.items.length, 0) + ' 种食材' }
       })
-      this.setData({ loading: false, groups, unitOpts: unitList.filter(u => u.valid).map(u => ({ code: u.code, label: u.name })),
+      this.setData({ loading: false, loadError: false, groups, unitOpts: unitList.filter(u => u.valid).map(u => ({ code: u.code, label: u.name })),
         openL1: this.data.openL1 || (groups[0] ? groups[0].id : 0) })
-    }).catch(err => { this.setData({ loading: false }); base.fail(err) })
+    }).catch(err => { this.setData({ loading: false, loadError: true }); base.fail(err) })
   },
 
   onToggle(e) {
