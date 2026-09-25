@@ -38,6 +38,8 @@ Page({
   },
 
   onSeg(e) { this.setData({ seg: e.currentTarget.dataset.seg, openKey: '' }) },
+  // 半成品食材放在半成品分类下：分类页新增分类选「半成品」，再点「＋ 食材」
+  goCats() { wx.redirectTo({ url: '/pages/fnbinv/cats/cats' }) },
 
   cardOf(key) {
     return this.data.dishes.find(d => d.key === key) || this.data.preps.find(p => p.key === key)

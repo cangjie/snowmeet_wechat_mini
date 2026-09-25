@@ -12,3 +12,4 @@
 .pick-list { max-height: 40vh; }
 .link { font-size: 22rpx; color: var(--faint); text-align: center; }
 .grow-btn { flex: 1; padding: 24rpx 0; font-size: 26rpx; }
+.go-cats { margin: 24rpx auto 0; display: flex; width: 320rpx; }

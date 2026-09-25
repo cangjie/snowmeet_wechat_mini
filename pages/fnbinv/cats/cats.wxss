@@ -11,3 +11,5 @@
 /* 开封后保质期不变：天数框换成说明文字 */
 .keep-box { color: var(--muted); }
 .chip-sq.keep { flex: none; padding: 0 20rpx; height: 80rpx; display: flex; align-items: center; }
+/* 类型由上级决定时只读显示 */
+.locked-type { padding: 18rpx 24rpx; border-radius: 16rpx; background: var(--gray); color: var(--muted); font-size: 24rpx; font-weight: 600; }

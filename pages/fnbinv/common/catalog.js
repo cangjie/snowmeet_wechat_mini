@@ -1,4 +1,4 @@
-// 分类维护：二级分类只有名称和建议储存方式；
+// 分类维护：分类分原料 / 半成品（一级设为半成品，其下二级都跟着）；二级分类另有建议储存方式；
 // 计量单位、临期提醒、开封后默认和三种储存方式的保质期规则（全年 / 高低温分档）都在具体食材上
 const expiry = require('./expiry.js')
 
@@ -22,15 +22,26 @@ function str(v) {
   return v === null || v === undefined ? '' : String(v)
 }
 
-function categoryEditState(category) {
+// 半成品分类：自身标了半成品，或一级父分类标了半成品；其下食材都是半成品（靠制作产出）
+function isPreparedCategory(category, categories) {
+  if (!category) return false
+  if (category.is_prepared) return true
+  const parent = category.parent_id ? (categories || []).find(c => c.id === category.parent_id) : null
+  return !!(parent && parent.is_prepared)
+}
+
+// parent：二级分类的一级父分类；父分类是半成品时二级分类锁定为半成品
+function categoryEditState(category, parent) {
   return { id: category.id || 0, parentId: category.parent_id || null, level: category.level, name: category.name || '',
-    defaultStorage: category.default_storage || 'chilled', sort: category.sort || 0, valid: category.valid !== false }
+    defaultStorage: category.default_storage || 'chilled', sort: category.sort || 0, valid: category.valid !== false,
+    isPrepared: !!category.is_prepared, parentPrepared: !!(parent && parent.is_prepared), parentName: parent ? parent.name : '' }
 }
 
 function categoryBody(edit) {
   const l2 = edit.level === 2
   return { id: edit.id, parentId: l2 ? edit.parentId : null, level: edit.level, name: String(edit.name).trim(),
-    defaultStorage: l2 ? edit.defaultStorage : null, sort: edit.sort, valid: edit.valid }
+    defaultStorage: l2 ? edit.defaultStorage : null, sort: edit.sort, valid: edit.valid,
+    isPrepared: !!(edit.isPrepared || edit.parentPrepared) }
 }
 
 function validateCategory(edit) {
@@ -39,14 +50,15 @@ function validateCategory(edit) {
   return ''
 }
 
-// 食材编辑态；新建（material 无 id）时按所属二级分类的建议储存方式给默认值
-function materialEditState(material, category, rules) {
+// 食材编辑态；新建（material 无 id）时按所属二级分类的建议储存方式给默认值。
+// 原料/半成品由分类决定（prepared=所在分类是半成品分类）；已有食材显示自己的类型
+function materialEditState(material, category, rules, prepared) {
   const m = material || {}
   const storage = (category && category.default_storage) || 'chilled'
   const own = m.id ? (rules || []).filter(r => r.item_id === m.id) : []
   const edit = {
     id: m.id || 0, code: m.code || '', name: m.name || '', categoryId: m.category_id || (category ? category.id : 0),
-    categoryName: category ? category.name : '', itemType: m.item_type || 'raw',
+    categoryName: category ? category.name : '', itemType: m.item_type || (prepared ? 'prepared' : 'raw'),
     inputUnit: m.default_input_unit_code || 'kg', baseUnit: m.base_unit_code || '',
     warnDays: m.id ? str(m.warn_days) : String(WARN_BY_STORAGE[storage]),
     openStorage: m.id ? (m.default_open_storage || '') : storage,
@@ -121,5 +133,5 @@ function newMaterialCode(now) {
   return ('M' + Number(now || Date.now()).toString(36) + suffix).toUpperCase().slice(0, 64)
 }
 
-module.exports = { baseUnitFor, categoryEditState, categoryBody, validateCategory, materialEditState, materialBody,
+module.exports = { baseUnitFor, isPreparedCategory, categoryEditState, categoryBody, validateCategory, materialEditState, materialBody,
   ruleSpec, rulePlans, validateMaterial, deleteCheck, newMaterialCode }

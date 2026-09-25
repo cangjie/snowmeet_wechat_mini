@@ -16,15 +16,29 @@ test('基本单位由默认录入单位的量纲决定', () => {
   assert.equal(catalog.baseUnitFor('piece', UNITS), 'piece')
 })
 
-test('二级分类只有名称和建议储存方式', () => {
+test('二级分类只有名称、原料/半成品和建议储存方式', () => {
   const edit = catalog.categoryEditState(dryBeans)
-  assert.deepEqual(catalog.categoryBody(edit), { id: 7, parentId: 1, level: 2, name: '干豆制品', defaultStorage: 'ambient', sort: 3, valid: true })
+  assert.deepEqual(catalog.categoryBody(edit), { id: 7, parentId: 1, level: 2, name: '干豆制品', defaultStorage: 'ambient', sort: 3, valid: true, isPrepared: false })
   assert.deepEqual(catalog.categoryBody(catalog.categoryEditState({ id: 1, level: 1, name: ' 干货 ', sort: 2, valid: true })),
-    { id: 1, parentId: null, level: 1, name: '干货', defaultStorage: null, sort: 2, valid: true })
+    { id: 1, parentId: null, level: 1, name: '干货', defaultStorage: null, sort: 2, valid: true, isPrepared: false })
   const blank = catalog.categoryEditState({ id: 0, parent_id: 1, level: 2, name: '', default_storage: 'chilled', sort: 0, valid: true })
   assert.match(catalog.validateCategory(blank), /名称/)
   blank.name = '速冻面点'
   assert.equal(catalog.validateCategory(blank), '')
+})
+
+test('半成品分类：一级设为半成品时二级跟着是半成品并锁定；新食材类型跟分类，已有食材保留自己的类型', () => {
+  const top = { id: 50, level: 1, name: '半成品', is_prepared: true, valid: true }
+  const sauce = { id: 51, parent_id: 50, level: 2, name: '酱料', default_storage: 'chilled', valid: true }
+  const all = [top, sauce, dryBeans, { id: 1, level: 1, name: '干货', valid: true }]
+  assert.deepEqual([catalog.isPreparedCategory(sauce, all), catalog.isPreparedCategory(dryBeans, all), catalog.isPreparedCategory(top, all)], [true, false, true])
+  const edit = catalog.categoryEditState(sauce, top)
+  assert.deepEqual([edit.parentPrepared, edit.parentName, catalog.categoryBody(edit).isPrepared], [true, '半成品', true])
+  const own = catalog.categoryEditState(Object.assign({}, dryBeans, { is_prepared: true }), all[3])
+  assert.deepEqual([own.parentPrepared, own.isPrepared, catalog.categoryBody(own).isPrepared], [false, true, true])
+  assert.equal(catalog.materialEditState(null, sauce, [], true).itemType, 'prepared')
+  assert.equal(catalog.materialEditState(null, dryBeans, [], false).itemType, 'raw')
+  assert.equal(catalog.materialEditState({ id: 3, item_type: 'prepared', category_id: 7 }, dryBeans, [], false).itemType, 'prepared')
 })
 
 test('新建食材：临期提醒按分类储存方式给默认，开封后默认储存同分类，保质期规则都不适用', () => {

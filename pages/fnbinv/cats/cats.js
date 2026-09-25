@@ -1,5 +1,5 @@
-// 分类维护：一级 / 二级分类（二级只有名称和建议储存方式）、食材档案（计量、临期、开封默认、保质期规则）
-// 维护需店长权限，员工只读
+// 分类维护：一级 / 二级分类（分原料 / 半成品；一级设为半成品，其下二级都跟着；二级另有建议储存方式）、
+// 食材档案（计量、临期、开封默认、保质期规则；原料 / 半成品由所在分类决定）。维护需店长权限，员工只读
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const expiry = require('../common/expiry.js')
@@ -29,10 +29,11 @@ Page({
       const groups = valid.filter(c => c.level === 1).map(g => {
         const subs = valid.filter(c => c.level === 2 && c.parent_id === g.id).map(s => {
           const items = materials.filter(m => m.category_id === s.id && m.valid)
-          return { id: s.id, name: s.name, storage: expiry.storageLabel(s.default_storage),
+          return { id: s.id, name: s.name, storage: expiry.storageLabel(s.default_storage), prepared: catalog.isPreparedCategory(s, categories),
             items: items.map(m => ({ id: m.id, name: m.name, prepared: m.item_type === 'prepared' })) }
         })
-        return { id: g.id, name: g.name, subs, meta: subs.length + ' 个二级分类 · ' + subs.reduce((n, s) => n + s.items.length, 0) + ' 种食材' }
+        return { id: g.id, name: g.name, prepared: !!g.is_prepared, subs,
+          meta: subs.length + ' 个二级分类 · ' + subs.reduce((n, s) => n + s.items.length, 0) + ' 种食材' }
       })
       this.setData({ loading: false, loadError: false, groups, unitOpts: unitList.filter(u => u.valid).map(u => ({ code: u.code, label: u.name })),
         openL1: this.data.openL1 || (groups[0] ? groups[0].id : 0) })
@@ -50,19 +51,20 @@ Page({
     return false
   },
 
+  // 一级分类：名称 + 原料 / 半成品
   addL1() {
     if (!this.guard()) return
-    wx.showModal({ title: '新增一级分类', editable: true, placeholderText: '如：生鲜、冻品、干货', success: res => {
-      const name = (res.content || '').trim()
-      if (!res.confirm || !name) return
-      api.post(this.ctx, 'FnbCatalog/SaveCategory', { id: 0, parentId: null, level: 1, name, sort: this.data.groups.length + 1, valid: true })
-        .then(row => { this.setData({ openL1: row.id }); this.load() }).catch(base.fail)
-    } })
+    this.openEditor({ id: 0, parent_id: null, level: 1, name: '', sort: this.data.groups.length + 1, valid: true })
+  },
+  editL1(e) {
+    if (!this.guard()) return
+    this.openEditor(this.src.categories.find(c => c.id === Number(e.currentTarget.dataset.id)))
   },
 
-  // 二级分类：名称 + 建议储存方式
+  // 二级分类：名称 + 原料 / 半成品（一级是半成品时锁定）+ 建议储存方式
   openEditor(category) {
-    this.setData({ editShow: true, edit: catalog.categoryEditState(category) })
+    const parent = category.parent_id ? this.src.categories.find(c => c.id === category.parent_id) : null
+    this.setData({ editShow: true, edit: catalog.categoryEditState(category, parent) })
   },
   addL2(e) {
     if (!this.guard()) return
@@ -87,8 +89,9 @@ Page({
     const error = catalog.validateCategory(edit)
     if (error) { wx.showToast({ title: error, icon: 'none' }); return }
     this.setData({ saving: true })
-    api.post(this.ctx, 'FnbCatalog/SaveCategory', catalog.categoryBody(edit)).then(() => {
+    api.post(this.ctx, 'FnbCatalog/SaveCategory', catalog.categoryBody(edit)).then(row => {
       this.setData({ saving: false, editShow: false })
+      if (edit.level === 1 && !edit.id && row) this.setData({ openL1: row.id })
       wx.showToast({ title: '已保存', icon: 'success' })
       this.load()
     }).catch(err => { this.setData({ saving: false }); base.fail(err) })
@@ -122,13 +125,15 @@ Page({
   addMaterial(e) {
     if (!this.guard()) return
     const category = this.src.categories.find(c => c.id === Number(e.currentTarget.dataset.id))
-    this.setData({ matShow: true, mat: catalog.materialEditState(null, category, []) })
+    const prepared = catalog.isPreparedCategory(category, this.src.categories)
+    this.setData({ matShow: true, mat: catalog.materialEditState(null, category, [], prepared) })
   },
   editMaterial(e) {
     if (!this.guard()) return
     const m = this.src.materials.find(x => x.id === Number(e.currentTarget.dataset.id))
     const category = this.src.categories.find(c => c.id === m.category_id)
-    this.setData({ matShow: true, mat: catalog.materialEditState(m, category, this.src.rules) })
+    const prepared = catalog.isPreparedCategory(category, this.src.categories)
+    this.setData({ matShow: true, mat: catalog.materialEditState(m, category, this.src.rules, prepared) })
   },
   closeMat() { this.setData({ matShow: false }) },
   setMat(e) {

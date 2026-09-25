@@ -2,17 +2,17 @@
   <view class="fnb-head"><view class="fnb-sub">一级分类 / 二级分类</view><view class="fnb-date">{{todayLabel}}</view></view>
   <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
   <block wx:else>
-    <view class="fnb-note">二级分类只定<text class="em">名称</text>和<text class="em">建议储存方式</text>。计量单位、临期提醒、开封后默认和保质期规则跟着<text class="em">具体食材</text>走，点食材即可设置。<text wx:if="{{!isManager}}">维护需要店长权限。</text></view>
+    <view class="fnb-note">分类分<text class="em">原料</text>和<text class="em">半成品</text>：半成品分类下的食材都是半成品（靠制作产出），一级分类设为半成品，其下二级分类都跟着是半成品。二级分类另定<text class="em">建议储存方式</text>；计量单位、临期提醒、开封后默认和保质期规则跟着<text class="em">具体食材</text>走，点食材即可设置。<text wx:if="{{!isManager}}">维护需要店长权限。</text></view>
     <view wx:if="{{isManager}}" class="btn primary btn-block" bindtap="addL1">＋ 新增一级分类</view>
     <view wx:for="{{groups}}" wx:for-item="g" wx:key="id" class="card">
       <view class="card-pad card-row" data-id="{{g.id}}" bindtap="onToggle">
-        <view class="grow col"><view class="card-title">{{g.name}}</view><view class="card-meta">{{g.meta}}</view></view>
+        <view class="grow col"><view class="card-row"><text class="card-title">{{g.name}}</text><text wx:if="{{g.prepared}}" class="tag ok">半成品</text></view><view class="card-meta">{{g.meta}}</view></view>
         <view class="caret">{{openL1 === g.id ? '⌃' : '⌄'}}</view>
       </view>
       <view wx:if="{{openL1 === g.id}}" class="sub-list">
         <view wx:for="{{g.subs}}" wx:for-item="s" wx:key="id" class="l2">
           <view class="card-row">
-            <view class="grow card-row"><text class="card-title small">{{s.name}}</text><text class="tag blue">{{s.storage}}</text></view>
+            <view class="grow card-row"><text class="card-title small">{{s.name}}</text><text wx:if="{{s.prepared}}" class="tag ok">半成品</text><text class="tag blue">{{s.storage}}</text></view>
             <view wx:if="{{isManager}}" class="btn" data-id="{{s.id}}" bindtap="editL2">编辑</view>
           </view>
           <view class="mats">
@@ -22,7 +22,8 @@
           </view>
         </view>
         <view wx:if="{{isManager}}" class="sub-row"><view class="btn" data-id="{{g.id}}" bindtap="addL2">＋ 二级分类</view>
-          <view class="grow"></view><view class="btn danger" data-id="{{g.id}}" bindtap="onDeleteL1">删除一级分类</view></view>
+          <view class="grow"></view><view class="btn ghost" data-id="{{g.id}}" bindtap="editL1">编辑一级分类</view>
+          <view class="btn danger" data-id="{{g.id}}" bindtap="onDeleteL1">删除</view></view>
         <view wx:if="{{!g.subs.length && !isManager}}" class="fnb-empty">暂无二级分类</view>
       </view>
     </view>
@@ -33,12 +34,17 @@
 
 <van-popup show="{{editShow}}" position="bottom" round bind:close="closeEditor">
   <view class="sheet" wx:if="{{edit}}">
-    <view class="sheet-title">{{edit.id ? '编辑二级分类' : '新增二级分类'}}</view>
-    <view class="field"><view class="field-label">名称</view><input class="input" value="{{edit.name}}" data-field="name" bindinput="setEdit" placeholder="如：速冻面点" /></view>
-    <view class="field"><view class="field-label">建议储存方式<text class="hint">入库时默认选中，仍可改</text></view>
+    <view class="sheet-title">{{edit.id ? '编辑' : '新增'}}{{edit.level === 1 ? '一级分类' : '二级分类'}}</view>
+    <view class="field"><view class="field-label">名称</view><input class="input" value="{{edit.name}}" data-field="name" bindinput="setEdit" placeholder="{{edit.level === 1 ? '如：生鲜、冻品、半成品' : '如：速冻面点'}}" /></view>
+    <view class="field"><view class="field-label">类型<text class="hint">半成品分类下的食材靠制作产出</text></view>
+      <view wx:if="{{edit.parentPrepared}}" class="locked-type">半成品（一级分类「{{edit.parentName}}」是半成品分类）</view>
+      <view wx:else class="seg"><view class="chip-sq {{!edit.isPrepared ? 'on' : ''}}" data-field="isPrepared" data-value="{{false}}" bindtap="setEdit">原料</view>
+        <view class="chip-sq {{edit.isPrepared ? 'on' : ''}}" data-field="isPrepared" data-value="{{true}}" bindtap="setEdit">半成品</view></view>
+      <view wx:if="{{edit.level === 1 && edit.isPrepared}}" class="card-meta">其下所有二级分类都算半成品分类</view></view>
+    <view wx:if="{{edit.level === 2}}" class="field"><view class="field-label">建议储存方式<text class="hint">入库时默认选中，仍可改</text></view>
       <view class="seg"><view wx:for="{{storages}}" wx:key="code" class="chip-sq {{edit.defaultStorage === item.code ? 'on' : ''}}" data-field="defaultStorage" data-value="{{item.code}}" bindtap="setEdit">{{item.label}}</view></view></view>
     <view class="btn primary btn-block {{saving ? 'disabled' : ''}}" bindtap="saveEditor">{{saving ? '保存中…' : '保存'}}</view>
-    <view wx:if="{{edit.id}}" class="btn danger btn-block" bindtap="onDeleteL2">删除该分类</view>
+    <view wx:if="{{edit.id && edit.level === 2}}" class="btn danger btn-block" bindtap="onDeleteL2">删除该分类</view>
   </view>
 </van-popup>
 
@@ -47,9 +53,8 @@
     <view class="sheet">
       <view class="sheet-title">{{mat.id ? '编辑食材' : '新增食材'}} · {{mat.categoryName}}</view>
       <view class="field"><view class="field-label">名称</view><input class="input" value="{{mat.name}}" data-field="name" bindinput="setMat" placeholder="如：袋装速冻饺子" /></view>
-      <view class="field"><view class="field-label">类型</view>
-        <view class="seg"><view class="chip-sq {{mat.itemType === 'raw' ? 'on' : ''}}" data-field="itemType" data-value="raw" bindtap="setMat">原料</view>
-          <view class="chip-sq {{mat.itemType === 'prepared' ? 'on' : ''}}" data-field="itemType" data-value="prepared" bindtap="setMat">半成品（靠制作产出）</view></view></view>
+      <view class="field"><view class="field-label">类型<text class="hint">由所在分类决定</text></view>
+        <view class="locked-type">{{mat.itemType === 'prepared' ? '半成品（靠制作产出）' : '原料'}}</view></view>
       <view class="field"><view class="field-label">计量单位（默认录入单位）<text class="hint">{{mat.id ? '只能在同一计量方式内切换' : '决定库存基本单位，入库后不能跨克/毫升/个'}}</text></view>
         <view class="chips wrap"><view wx:for="{{unitOpts}}" wx:key="code" class="chip-sq {{mat.inputUnit === item.code ? 'on' : ''}}" data-field="inputUnit" data-value="{{item.code}}" bindtap="setMat">{{item.label}}</view></view></view>
       <view class="field"><view class="field-label">临期提前提醒（天）<text class="hint">生鲜 1 天、冻品 7 天、干货 30 天</text></view>

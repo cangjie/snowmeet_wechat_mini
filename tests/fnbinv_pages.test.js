@@ -463,9 +463,25 @@ test('分类页：新增二级分类只存名称和储存方式，不写保质�
   page.saveEditor()
   await settle()
   assert.deepEqual(calls.find(c => c.path === 'FnbCatalog/SaveCategory').data,
-    { shopId: 12, id: 0, parentId: 1, level: 2, name: '速冻面点', defaultStorage: 'frozen', sort: 3, valid: true })
+    { shopId: 12, id: 0, parentId: 1, level: 2, name: '速冻面点', defaultStorage: 'frozen', sort: 3, valid: true, isPrepared: false })
   assert.equal(calls.filter(c => c.path === 'FnbCatalog/SaveShelfLifeRule').length, 0)
   assert.equal(page.data.editShow, false)
+})
+
+test('分类页：新增一级分类可选半成品，保存后展开该分类', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('cats')
+  page.onLoad({})
+  await settle()
+  page.addL1()
+  assert.deepEqual([page.data.editShow, page.data.edit.level, page.data.edit.parentPrepared], [true, 1, false])
+  page.setEdit({ currentTarget: { dataset: { field: 'name' } }, detail: { value: '半成品' } })
+  page.setEdit({ currentTarget: { dataset: { field: 'isPrepared', value: true } }, detail: {} })
+  page.saveEditor()
+  await settle()
+  assert.deepEqual(calls.find(c => c.path === 'FnbCatalog/SaveCategory').data,
+    { shopId: 12, id: 0, parentId: null, level: 1, name: '半成品', defaultStorage: null, sort: 3, valid: true, isPrepared: true })
+  assert.equal(page.data.openL1, 2)
 })
 
 test('分类页：编辑食材带临期和开封默认，冷藏规则挂在食材上且只写有变化的月份', async () => {
@@ -544,6 +560,7 @@ test('入库页：生产日期 + 保质期自动填出到期日期；手填到�
   assert.deepEqual({ prodDate: page.data.prodDate, shelfValue: page.data.shelfValue, scan: page.data.scan.show }, { prodDate: '2099-09-23', shelfValue: '7', scan: false })
   page.onPhotos({ detail: { photos: [{ id: 5 }], uploading: 0 } })
   page.submit()
+  await settle()
   await settle()
   const body = receipts()[0]
   assert.deepEqual({ expireDate: body.expireDate, source: body.expirySource, productionDate: body.productionDate, shelfLifeValue: body.shelfLifeValue },
