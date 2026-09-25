@@ -37,8 +37,11 @@ const RESPONSES = {
   'FnbRecipe/GetRecipe': { recipe: { id: '20', output_qty: 10, row_version: 'AAA=' }, lines: [{ item_id: 10, quantity: 1000, sort: 1 }] },
   'FnbKitchen/ListOrders': { total: 1, rows: [{ id: '5' }] },
   'FnbKitchen/GetOrder': { order: { id: '5', display_no: 'M0923', ordered_at: '2026-09-23T03:42:00', order_status: 'pending', review_status: 'verified', table_no: 'A3', remark: '少盐' },
-    lines: [{ id: '1', item_name: '酸菜白肉锅', quantity: 2, remark: null }], served: false },
+    lines: [{ id: '1', item_name: '酸菜白肉锅', quantity: 2, remark: null, dish_spec_id: 3 }], served: false, servedNeeds: [], changeSecondsLeft: null },
   'FnbKitchen/CreateManualOrder': { orderId: '6', displayNo: 'M1', reviewStatus: 'verified', lineCount: 1, replayed: false },
+  'FnbKitchen/CreateAndServe': { orderId: '6', displayNo: 'M1', documentId: '12', replayed: false, needs: [{ itemId: 10, itemName: '大白菜', plannedQuantity: 200, actualQuantity: 200, shortageQuantity: 0 }] },
+  'FnbKitchen/DeleteServedOrder': { orderId: '5' },
+  'FnbKitchen/UpdateServedOrder': { orderId: '5', displayNo: 'M0923', documentId: '12', needs: [] },
   'FnbStocktake/CreateSnapshot': { documentId: '77' },
   'FnbStocktake/GetSnapshot': { documentId: '77', status: 'draft', rows: [{ item_id: 10, system_qty: 5000, counted_qty: null, rowVersion: 'v1' }] },
   'FnbInventory/PostReceipt': { documentId: '11', batchId: 104, quantity: 3000, amount: null, replayed: false },
@@ -154,7 +157,7 @@ test('入库页：选食材、拍照、填到期日后提交即入库，出现�
   assert.equal(page.data.material, null, '入库成功后表单清空')
 })
 
-test('出餐页：选菜建厨房单发 CreateManualOrder', async () => {
+test('出餐页：选菜自动带出配方配料，可改用量、加料，建单即扣料发 CreateAndServe', async () => {
   installFakes(MANAGER)
   const page = loadPage('serve')
   page.onLoad({})
@@ -163,12 +166,72 @@ test('出餐页：选菜建厨房单发 CreateManualOrder', async () => {
   assert.equal(page.data.orders[0].time, '11:42')
   page.openNew()
   page.onDishQty({ currentTarget: { dataset: { id: 7 } }, detail: { value: 2 } })
+  await settle()
+  // 假后端的配方：每 10 份用大白菜 1000 g → 2 份 200 g，按默认录入单位 kg 显示
+  assert.deepEqual(page.data.ingredients.map(l => [l.itemId, l.qty, l.unitCode]), [[10, '0.2', 'kg']])
+  page.setIngQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.25' } })
+  page.openPicker()
+  page.onPick({ currentTarget: { dataset: { id: 12 } } })
+  page.setIngQty({ currentTarget: { dataset: { index: 1 } }, detail: { value: '30' } })
+  page.onDishQty({ currentTarget: { dataset: { id: 7 } }, detail: { value: 3 } })
+  await settle()
+  assert.deepEqual(page.data.ingredients.map(l => [l.itemId, l.qty]), [[10, '0.25'], [12, '30']], '改过的用量和手动加的配料在改份数后保留')
   page.onTable({ detail: { value: 'A3' } })
   page.createOrder()
   await settle()
-  const created = calls.find(c => c.path === 'FnbKitchen/CreateManualOrder')
-  assert.deepEqual(created.data.lines, [{ productId: 7, quantity: 2, remark: null }])
-  assert.equal(created.data.tableNo, 'A3')
+  assert.equal(calls.filter(c => c.path === 'FnbKitchen/CreateManualOrder').length, 0)
+  const created = calls.find(c => c.path === 'FnbKitchen/CreateAndServe').data
+  assert.deepEqual({ lines: created.lines, tableNo: created.tableNo, ingredients: created.ingredients },
+    { lines: [{ productId: 7, quantity: 3, remark: null }], tableNo: 'A3', ingredients: [{ itemId: 10, quantity: 250 }, { itemId: 12, quantity: 30 }] })
+  assert.equal(page.data.newShow, false)
+})
+
+test('出餐页：扣料 10 分钟内的厨房单显示已扣配料，可删除并退回配料', async () => {
+  installFakes(MANAGER)
+  const saved = RESPONSES['FnbKitchen/GetOrder']
+  RESPONSES['FnbKitchen/GetOrder'] = Object.assign({}, saved, { served: true, changeSecondsLeft: 300,
+    servedNeeds: [{ itemId: 10, itemName: '大白菜', plannedQuantity: 300, actualQuantity: 200, shortageQuantity: 100 }] })
+  try {
+    const page = loadPage('serve')
+    page.onLoad({})
+    await settle()
+    const order = page.data.orders[0]
+    assert.equal(order.status.text, '已出餐')
+    assert.deepEqual({ canChange: order.canChange, used: order.used.map(u => [u.planned, u.actual, u.shortLabel]) },
+      { canChange: true, used: [['300 g', '200 g', '欠 100 g']] })
+    page.onDeleteOrder({ currentTarget: { dataset: { id: '5' } } })
+    await settle()
+    assert.deepEqual(calls.filter(c => c.path === 'FnbKitchen/DeleteServedOrder').map(c => c.data), [{ shopId: 12, orderId: '5' }])
+  } finally {
+    RESPONSES['FnbKitchen/GetOrder'] = saved
+  }
+})
+
+test('出餐页：扣料 10 分钟内可编辑，带出原菜品与已确认配料，保存发 UpdateServedOrder', async () => {
+  installFakes(MANAGER)
+  const saved = RESPONSES['FnbKitchen/GetOrder']
+  RESPONSES['FnbKitchen/GetOrder'] = Object.assign({}, saved, { served: true, changeSecondsLeft: 300,
+    servedNeeds: [{ itemId: 10, itemName: '大白菜', plannedQuantity: 200, actualQuantity: 200, shortageQuantity: 0 },
+      { itemId: 12, itemName: '番茄酱', plannedQuantity: 30, actualQuantity: 30, shortageQuantity: 0 }] })
+  try {
+    const page = loadPage('serve')
+    page.onLoad({})
+    await settle()
+    page.onEditOrder({ currentTarget: { dataset: { id: '5' } } })
+    await settle()
+    assert.deepEqual({ editingId: page.data.editingId, qty: page.data.qty, tableNo: page.data.tableNo, remark: page.data.remark },
+      { editingId: '5', qty: { 7: 2 }, tableNo: 'A3', remark: '少盐' })
+    assert.deepEqual(page.data.ingredients.map(l => [l.itemId, l.qty, l.auto]), [[10, '0.2', true], [12, '30', false]])
+    page.setIngQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.3' } })
+    page.createOrder()
+    await settle()
+    assert.equal(calls.filter(c => c.path === 'FnbKitchen/CreateAndServe').length, 0)
+    assert.deepEqual(calls.find(c => c.path === 'FnbKitchen/UpdateServedOrder').data, { shopId: 12, orderId: '5', tableNo: 'A3', remark: '少盐',
+      lines: [{ productId: 7, quantity: 2, remark: null }], ingredients: [{ itemId: 10, quantity: 300 }, { itemId: 12, quantity: 30 }] })
+    assert.deepEqual({ newShow: page.data.newShow, editingId: page.data.editingId }, { newShow: false, editingId: '' })
+  } finally {
+    RESPONSES['FnbKitchen/GetOrder'] = saved
+  }
 })
 
 test('盘点页：店长开始盘点只快照有可用量的食材并记住单号', async () => {

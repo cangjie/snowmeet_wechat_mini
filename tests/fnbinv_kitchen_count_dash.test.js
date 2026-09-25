@@ -58,3 +58,33 @@ test('厨房单排序：待核对、待出餐在前，已出餐其次，已取�
   ]
   assert.deepEqual(kitchen.sortOrders(rows).map(r => r.order.id), ['4', '3', '1', '2'])
 })
+
+const KUNITS = [{ code: 'g', dimension: 1, factor_to_base: 1 }, { code: 'kg', dimension: 1, factor_to_base: 1000 },
+  { code: 'ml', dimension: 2, factor_to_base: 1 }]
+const KMATERIALS = [{ id: 10, name: '大白菜', base_unit_code: 'g', default_input_unit_code: 'kg' },
+  { id: 12, name: '番茄酱', base_unit_code: 'ml', default_input_unit_code: 'ml' }, { id: 13, name: '糖浆', base_unit_code: 'ml', default_input_unit_code: 'ml' }]
+
+test('建单配料：按已发布配方 × 份数合计，无配方的菜不带料', () => {
+  const dishes = [{ productId: 7, publishedRecipeId: '9' }, { productId: 8, publishedRecipeId: '10' }, { productId: 9, publishedRecipeId: null }]
+  const recipes = { 9: { output: 1, lines: [{ item_id: 10, quantity: 300 }, { item_id: 12, quantity: 20 }] }, 10: { output: 1, lines: [{ item_id: 12, quantity: 15 }] } }
+  assert.deepEqual(kitchen.dishNeeds(dishes, { 7: 2, 8: 1, 9: 3 }, recipes), [{ itemId: 10, baseQty: 600 }, { itemId: 12, baseQty: 55 }])
+  assert.deepEqual(kitchen.dishNeeds(dishes, {}, recipes), [])
+})
+
+test('建单配料：重算时保留改过的用量和手动加的配料，删掉的不再出现，取消的菜带的料去掉', () => {
+  let lines = kitchen.mergeIngredients([], [{ itemId: 10, baseQty: 600 }, { itemId: 12, baseQty: 55 }], [], KMATERIALS, KUNITS)
+  assert.deepEqual(lines.map(l => [l.itemId, l.qty, l.unitCode]), [[10, '0.6', 'kg'], [12, '55', 'ml']])
+  lines[1] = Object.assign({}, lines[1], { qty: '40', touched: true })
+  lines = lines.concat([{ itemId: 13, name: '糖浆', qty: '10', unitCode: 'ml', auto: false, touched: true }])
+  lines = kitchen.mergeIngredients(lines, [{ itemId: 10, baseQty: 900 }, { itemId: 12, baseQty: 80 }], [], KMATERIALS, KUNITS)
+  assert.deepEqual(lines.map(l => [l.itemId, l.qty]), [[10, '0.9'], [12, '40'], [13, '10']])
+  lines = kitchen.mergeIngredients(lines, [{ itemId: 10, baseQty: 900 }], [10], KMATERIALS, KUNITS)
+  assert.deepEqual(lines.map(l => l.itemId), [13], '删掉的大白菜不再出现，番茄酱随菜取消（改过用量的也只在配方仍需要时保留）')
+})
+
+test('建单配料：换算为基本单位；空表或用量为 0 时拦下', () => {
+  assert.deepEqual(kitchen.ingredientBody([{ itemId: 10, qty: '0.6', unitCode: 'kg' }, { itemId: 12, qty: '40', unitCode: 'ml' }], KUNITS),
+    { ingredients: [{ itemId: 10, quantity: 600 }, { itemId: 12, quantity: 40 }] })
+  assert.match(kitchen.ingredientBody([], KUNITS).error, /至少/)
+  assert.match(kitchen.ingredientBody([{ itemId: 10, qty: '0', unitCode: 'kg' }], KUNITS).error, /大于 0/)
+})
