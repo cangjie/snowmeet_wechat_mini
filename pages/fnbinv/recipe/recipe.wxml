@@ -14,7 +14,7 @@
       <view class="card-pad card-row" data-key="{{item.key}}" bindtap="onToggle">
         <view class="grow col">
           <view class="card-title">{{item.name}}</view>
-          <view class="card-meta">{{seg === 'dish' ? item.categoryName + ' · ' + item.priceLabel : item.yieldLabel}}</view>
+          <view wx:if="{{seg === 'dish' ? item.meta : item.yieldLabel}}" class="card-meta">{{seg === 'dish' ? item.meta : item.yieldLabel}}</view>
         </view>
         <view class="tag {{item.status.tone}}">{{item.status.text}}</view>
         <view class="caret">{{openKey === item.key ? '⌃' : '⌄'}}</view>
@@ -35,12 +35,8 @@
 
 <van-popup show="{{dishShow}}" position="bottom" round bind:close="closeDish">
   <view class="sheet" wx:if="{{dish}}">
-    <view class="sheet-title">{{dish.id ? '菜品资料' : '新建菜品'}}</view>
+    <view class="sheet-title">菜品资料</view>
     <view class="field"><view class="field-label">名称</view><input class="input" value="{{dish.name}}" data-field="name" bindinput="setDish" placeholder="如：酸菜白肉锅" /></view>
-    <view class="field"><view class="field-label">售价（元）</view><input class="input" type="digit" value="{{dish.price}}" data-field="price" bindinput="setDish" /></view>
-    <view class="field"><view class="field-label">分类</view>
-      <view class="chips wrap"><view wx:for="{{categories}}" wx:key="id" class="chip-sq {{dish.categoryId === item.id ? 'on' : ''}}" data-field="categoryId" data-value="{{item.id}}" bindtap="setDish">{{item.name}}</view></view>
-      <input class="input" value="{{dish.categoryName}}" data-field="categoryName" bindinput="setDish" placeholder="或新建分类，如：热菜" /></view>
     <view class="btn primary btn-block" bindtap="onSaveDish">保存</view>
     <view wx:if="{{dish.id}}" class="btn danger btn-block" bindtap="onDisableDish">停用菜品</view>
   </view>
@@ -49,7 +45,9 @@
 <van-popup show="{{editShow}}" position="bottom" round custom-style="max-height:88%;" bind:close="closeEditor">
   <scroll-view scroll-y class="editor" wx:if="{{editor}}">
     <view class="sheet">
-      <view class="sheet-title">{{editor.title}} · 用料</view>
+      <view class="sheet-title">{{editor.isNew ? '新建菜品' : editor.title + ' · 用料'}}</view>
+      <view wx:if="{{editor.isNew}}" class="field"><view class="field-label">菜品名称</view>
+        <input class="input" value="{{editor.name}}" bindinput="setEditorName" placeholder="如：榛果饮" /></view>
       <view wx:if="{{editor.kind === 'prep'}}" class="date-row"><text class="date-label">每次产出</text><input class="input grow" type="digit" value="{{editor.outputQty}}" bindinput="setOutputQty" /><text class="unit-suffix">{{editor.outputUnitLabel}}</text></view>
       <view wx:else class="card-meta">以下为「一份」的用量</view>
       <view wx:for="{{editor.lines}}" wx:key="itemId" class="date-row">

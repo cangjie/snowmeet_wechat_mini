@@ -48,6 +48,12 @@ function draftBody(editor, unitList) {
   }
 }
 
+// 菜品卡片副标题：不设分类（「未分类」）、售价为 0 时不显示
+function dishMeta(dish) {
+  return [dish.categoryName && dish.categoryName !== '未分类' ? dish.categoryName : '',
+    dish.salePrice > 0 ? units.money(dish.salePrice) : ''].filter(Boolean).join(' · ')
+}
+
 function dishStatus(dish) {
   if (dish.publishedRecipeId) return { text: '已发布 v' + dish.publishedVersion, tone: 'ok' }
   if (dish.draftRecipeId) return { text: '草稿未发布', tone: 'warn' }
@@ -73,4 +79,4 @@ function prepNeeds(lines, batches, availableByItem, materials) {
   return { rows, ok: rows.length > 0 && rows.every(r => !r.short) }
 }
 
-module.exports = { linesView, editorLine, editorLines, draftBody, dishStatus, latestFor, prepNeeds }
+module.exports = { linesView, editorLine, editorLines, draftBody, dishMeta, dishStatus, latestFor, prepNeeds }

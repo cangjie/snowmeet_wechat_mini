@@ -47,6 +47,7 @@ const RESPONSES = {
   'FnbInventory/PostPreparation': { documentId: '10', batchId: 103, quantity: 20, amount: null, replayed: false },
   'FnbRecipe/SaveRecipeDraft': { id: '21', version_no: 2, rowVersion: 'RV21' },
   'FnbRecipe/PublishRecipe': { id: '21', version_no: 2 },
+  'FnbRecipe/SaveDish': { productId: 8, name: '榛果饮', salePrice: 0, categoryId: 31, categoryName: '未分类', specId: 4, specName: '标准份' },
   'FnbCatalog/SaveCategory': { id: 2 },
   'FnbCatalog/SaveMaterial': { id: 10, code: 'VEG1', name: '大白菜', category_id: 2, item_type: 'raw', base_unit_code: 'g', default_input_unit_code: 'kg', warn_days: 1, valid: true },
   'FnbCatalog/DeleteCategory': { ids: [3] },
@@ -214,6 +215,46 @@ test('制作页：原料不足不能制作；1 批面团按配方产出量过账
   const made = calls.find(c => c.path === 'FnbInventory/PostPreparation')
   assert.deepEqual({ recipeId: made.data.recipeId, outputQuantity: made.data.outputQuantity, imageIds: made.data.imageIds, expireDate: made.data.expireDate },
     { recipeId: '20', outputQuantity: 10, imageIds: [5], expireDate: '2099-01-01' })
+})
+
+test('配方页：新建菜品只填名称和用料，先建菜品再存用料并发布，不带售价和分类', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('recipe')
+  page.onLoad({})
+  await settle()
+  const posted = path => calls.filter(c => c.path === path).map(c => c.data)
+  page.newDish()
+  assert.equal(page.data.editor.isNew, true)
+  page.onPublish()
+  await settle()
+  assert.equal(posted('FnbRecipe/SaveDish').length, 0, '没填名称不建菜品')
+  page.setEditorName({ detail: { value: '榛果饮' } })
+  page.onPublish()
+  await settle()
+  assert.equal(posted('FnbRecipe/SaveDish').length, 0, '没有用料不建菜品')
+  page.openPicker()
+  page.onPick({ currentTarget: { dataset: { id: 10 } } })
+  page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.2' } })
+  page.onPublish()
+  await settle()
+  assert.deepEqual(posted('FnbRecipe/SaveDish'), [{ shopId: 12, id: 0, name: '榛果饮', valid: true }])
+  const draft = posted('FnbRecipe/SaveRecipeDraft')[0]
+  assert.deepEqual({ dishSpecId: draft.dishSpecId, lines: draft.lines }, { dishSpecId: 4, lines: [{ itemId: 10, quantity: 200, sort: 1, remark: null }] })
+  assert.equal(posted('FnbRecipe/PublishRecipe').length, 1)
+  assert.equal(page.data.editShow, false)
+})
+
+test('配方页：菜品资料只改名称，不带售价和分类', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('recipe')
+  page.onLoad({})
+  await settle()
+  assert.equal(page.data.dishes[0].meta, '热菜 · ¥68.00')
+  page.editDish({ currentTarget: { dataset: { key: 'd7' } } })
+  page.setDish({ currentTarget: { dataset: { field: 'name' } }, detail: { value: '酸菜白肉锅（大）' } })
+  page.onSaveDish()
+  await settle()
+  assert.deepEqual(calls.find(c => c.path === 'FnbRecipe/SaveDish').data, { shopId: 12, id: 7, name: '酸菜白肉锅（大）', valid: true })
 })
 
 test('配方页：编辑已发布配方 → 存新草稿 → 用返回的 rowVersion 发布', async () => {

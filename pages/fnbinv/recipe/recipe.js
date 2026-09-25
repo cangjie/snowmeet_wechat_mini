@@ -1,4 +1,4 @@
-// 菜品配方与半成品配方：店长建菜品、编辑用料 → 存草稿 → 发布；员工只读
+// 菜品配方与半成品配方：店长新建菜品时直接填名称和用料（不设售价、分类）→ 存草稿 / 发布；员工只读
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const units = require('../common/units.js')
@@ -7,7 +7,7 @@ const recipe = require('../common/recipe.js')
 Page({
   data: {
     blocked: '', loading: true, isManager: false, seg: 'dish',
-    dishes: [], categories: [], preps: [], openKey: '', lines: {},
+    dishes: [], preps: [], openKey: '', lines: {},
     dishShow: false, dish: null, editShow: false, editor: null, pickShow: false, pickQuery: '', pickList: [], saving: false
   },
 
@@ -23,8 +23,7 @@ Page({
       api.get(this.ctx, 'FnbRecipe/ListRecipes')
     ]).then(([dishList, materials, unitList, recipes]) => {
       this.src = { materials: materials.filter(m => m.valid), units: unitList, recipes, dishes: dishList.dishes }
-      const dishes = dishList.dishes.map(d => Object.assign({ key: 'd' + d.productId, status: recipe.dishStatus(d),
-        priceLabel: units.money(d.salePrice) }, d))
+      const dishes = dishList.dishes.map(d => Object.assign({ key: 'd' + d.productId, status: recipe.dishStatus(d), meta: recipe.dishMeta(d) }, d))
       const preps = this.src.materials.filter(m => m.item_type === 'prepared').map(m => {
         const latest = recipe.latestFor(recipes, m.id)
         const status = latest.published ? { text: '已发布 v' + latest.published.version_no, tone: 'ok' }
@@ -33,7 +32,7 @@ Page({
         return { key: 'p' + m.id, itemId: m.id, name: m.name, status, publishedRecipeId: latest.published ? latest.published.id : null,
           draftRecipeId: latest.draft ? latest.draft.id : null, yieldLabel: out ? '每次产出 ' + units.formatQty(out.output_qty, m.base_unit_code) : '' }
       })
-      this.setData({ loading: false, dishes, preps, categories: dishList.categories, lines: {} })
+      this.setData({ loading: false, dishes, preps, lines: {} })
       if (this.data.openKey) this.loadLines(this.data.openKey)
     }).catch(err => { this.setData({ loading: false }); base.fail(err) })
   },
@@ -64,33 +63,24 @@ Page({
     return false
   },
 
-  // ---- 菜品资料 ----
+  // ---- 菜品：新建时直接填名称和用料；「菜品资料」只改名称或停用（售价、分类不在这里维护）----
   newDish() {
     if (!this.guard()) return
-    const first = this.data.categories[0]
-    this.setData({ dishShow: true, dish: { id: 0, name: '', price: '', categoryId: first ? first.id : 0, categoryName: first ? '' : '热菜' } })
+    this.setData({ editShow: true, pickShow: false, editor: { key: '', isNew: true, name: '', title: '', kind: 'dish', dishSpecId: null,
+      outputItemId: null, outputUnit: '', outputUnitLabel: '', outputQty: '', id: 0, rowVersion: null, lines: [] } })
   },
+  setEditorName(e) { this.setData({ 'editor.name': e.detail.value }) },
   editDish(e) {
     if (!this.guard()) return
     const d = this.data.dishes.find(x => x.key === e.currentTarget.dataset.key)
-    this.setData({ dishShow: true, dish: { id: d.productId, name: d.name, price: String(d.salePrice), categoryId: d.categoryId, categoryName: '' } })
+    this.setData({ dishShow: true, dish: { id: d.productId, name: d.name } })
   },
   closeDish() { this.setData({ dishShow: false }) },
-  setDish(e) {
-    const f = e.currentTarget.dataset.field
-    const v = e.detail.value !== undefined ? e.detail.value : e.currentTarget.dataset.value
-    this.setData({ ['dish.' + f]: f === 'categoryId' ? Number(v) : v })
-    if (f === 'categoryId') this.setData({ 'dish.categoryName': '' })
-    if (f === 'categoryName' && v) this.setData({ 'dish.categoryId': 0 })
-  },
+  setDish(e) { this.setData({ ['dish.' + e.currentTarget.dataset.field]: e.detail.value }) },
   saveDish(valid) {
     const d = this.data.dish
     if (!String(d.name).trim()) { wx.showToast({ title: '请填写菜品名称', icon: 'none' }); return }
-    const price = d.price === '' ? 0 : Number(d.price)
-    if (isNaN(price) || price < 0) { wx.showToast({ title: '售价格式不正确', icon: 'none' }); return }
-    if (!d.categoryId && !String(d.categoryName).trim()) { wx.showToast({ title: '请选择或填写分类', icon: 'none' }); return }
-    api.post(this.ctx, 'FnbRecipe/SaveDish', { id: d.id, name: String(d.name).trim(), salePrice: Math.round(price * 100) / 100,
-      categoryId: d.categoryId || null, categoryName: d.categoryId ? null : String(d.categoryName).trim(), valid: valid !== false })
+    api.post(this.ctx, 'FnbRecipe/SaveDish', { id: d.id, name: String(d.name).trim(), valid: valid !== false })
       .then(() => { this.setData({ dishShow: false }); wx.showToast({ title: valid === false ? '已停用' : '已保存', icon: 'success' }); this.load() })
       .catch(base.fail)
   },
@@ -147,14 +137,27 @@ Page({
 
   saveRecipe(publish) {
     if (this.data.saving) return
-    const built = recipe.draftBody(this.data.editor, this.src.units)
+    const editor = this.data.editor
+    const name = String(editor.name || '').trim()
+    if (editor.isNew && !name) { wx.showToast({ title: '请填写菜品名称', icon: 'none' }); return }
+    const built = recipe.draftBody(editor, this.src.units)
     if (built.error) { wx.showToast({ title: built.error, icon: 'none' }); return }
     this.setData({ saving: true })
-    api.post(this.ctx, 'FnbRecipe/SaveRecipeDraft', built.body).then(res => {
+    // 新菜品：先建菜品；建好后编辑框转为该菜品，配方保存失败再点也不会重复建菜
+    const dish = editor.isNew
+      ? api.post(this.ctx, 'FnbRecipe/SaveDish', { id: 0, name, valid: true }).then(row => {
+        this.setData({ 'editor.isNew': false, 'editor.key': 'd' + row.productId, 'editor.title': row.name, 'editor.dishSpecId': row.specId })
+        return row.specId
+      })
+      : Promise.resolve(editor.dishSpecId)
+    dish.then(specId => {
+      if (built.body.recipeType === 'dish') built.body.dishSpecId = specId
+      return api.post(this.ctx, 'FnbRecipe/SaveRecipeDraft', built.body)
+    }).then(res => {
       if (!publish) return res
       return api.post(this.ctx, 'FnbRecipe/PublishRecipe', { recipeId: res.id, rowVersion: res.rowVersion }).then(() => res)
     }).then(res => {
-      this.setData({ saving: false, editShow: false })
+      this.setData({ saving: false, editShow: false, openKey: this.data.editor.key })
       wx.showToast({ title: publish ? '已发布 v' + res.version_no : '草稿已保存', icon: 'success' })
       this.load()
     }).catch(err => {

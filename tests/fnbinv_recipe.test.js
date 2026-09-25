@@ -60,3 +60,9 @@ test('制作预估：用量 × 批数 对比可用量，不足则整单不可制
   assert.equal(r.ok, false)
   assert.equal(recipe.prepNeeds(lines, 1, { 1: 5000, 2: 600 }, materials).ok, true)
 })
+
+test('菜品卡片副标题：不设分类（未分类）、售价为 0 时不显示', () => {
+  assert.equal(recipe.dishMeta({ categoryName: '未分类', salePrice: 0 }), '')
+  assert.equal(recipe.dishMeta({ categoryName: '热菜', salePrice: 68 }), '热菜 · ¥68.00')
+  assert.equal(recipe.dishMeta({ categoryName: '鲜榨果汁', salePrice: 0 }), '鲜榨果汁')
+})
