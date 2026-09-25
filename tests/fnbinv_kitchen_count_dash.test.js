@@ -80,6 +80,25 @@ test('将扣减用料：按配方 × 份数以常用单位带出，改过的保�
   assert.match(kitchen.adjustments([Object.assign({}, lines[0], { qty: '', touched: true })], unitList).error, /不小于 0/)
 })
 
+test('库存提示：按当前用量算欠多少；编辑时加回这单已扣的量；只列没被盘点调整的欠料', () => {
+  const unitList = [{ code: 'g', dimension: 1, factor_to_base: 1 }, { code: 'kg', dimension: 1, factor_to_base: 1000 }]
+  const materialOf = { 10: { id: 10, name: '大白菜', base_unit_code: 'g', default_input_unit_code: 'kg' }, 13: { id: 13, name: '葱', base_unit_code: 'g', default_input_unit_code: 'g' } }
+  const lines = kitchen.deductLines([{ itemId: 10, baseQty: 1500 }, { itemId: 13, baseQty: 20 }], [], materialOf, unitList)
+  const stockOf = { 10: { availableQuantity: 1200, sealedPacks: 2, openBatchId: 5, packUnitName: '袋' }, 13: { availableQuantity: 50, sealedPacks: 0, openBatchId: null } }
+  let rows = kitchen.withStock(lines, stockOf, unitList)
+  assert.deepEqual(rows.map(r => [r.availLabel, r.short, r.shortLabel, r.openHint, r.canOpen]),
+    [['可用 1.2 kg', true, '欠 300 g', '另有 2 袋未开封', true], ['可用 50 g', false, '', '', false]])
+  assert.equal(kitchen.shortageText(rows), '大白菜 欠 300 g（另有 2 袋未开封）')
+  // 编辑已扣料的单：这单已扣 400 g，保存时先退回，所以算够
+  rows = kitchen.withStock(lines, stockOf, unitList, { 10: 400 })
+  assert.deepEqual([rows[0].availLabel, rows[0].short], ['可用 1.6 kg', false])
+  assert.equal(kitchen.shortageText(rows), '')
+  // 查不到库存的不提示
+  assert.deepEqual(kitchen.withStock(lines, {}, unitList).map(r => [r.stockKnown, r.short]), [[false, false], [false, false]])
+  assert.deepEqual(kitchen.openShortage([
+    { itemId: 10, shortageQuantity: 100 }, { itemId: 11, shortageQuantity: 0 }, { itemId: 12, shortageQuantity: 5, settledByStocktake: true }]).map(n => n.itemId), [10])
+})
+
 test('出餐列表耗用：按实际扣减量列每种食材，欠料注明欠多少', () => {
   const unitOf = { 10: 'g', 12: 'ml' }
   assert.equal(kitchen.usedSummary([{ itemId: 10, itemName: '大白菜', actualQuantity: 1500, shortageQuantity: 0 },

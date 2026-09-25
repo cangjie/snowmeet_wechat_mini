@@ -264,6 +264,91 @@ test('出餐页：扣料 10 分钟内可编辑，带出原菜品、份数、桌�
   }
 })
 
+test('出餐页：建单前逐项提示库存，缺的是没开封的整包可直接开封；库存不够要确认才建单', async () => {
+  installFakes(MANAGER)
+  RESPONSES['FnbKitchen/GetDeductStock'] = [{ itemId: 10, availableQuantity: 150, sealedQuantity: 1000, sealedPacks: 2,
+    openBatchId: 101, openBatchNo: 'B2', openPackSize: 500, packUnitName: '袋' }]
+  try {
+    const page = loadPage('serve')
+    page.onLoad({})
+    await settle()
+    page.openNew()
+    page.onDishInput({ detail: { value: '酸菜白肉锅' } })
+    page.onPortions({ detail: { value: 2 } })
+    await settle()
+    assert.match(calls.find(c => c.path === 'FnbKitchen/GetDeductStock').url, /itemIds=10/)
+    const line = page.data.deduct[0]
+    assert.deepEqual([line.availLabel, line.short, line.shortLabel, line.openHint, line.canOpen, line.openLabel],
+      ['可用 150 g', true, '欠 50 g', '另有 2 袋未开封', true, '开封 1 袋'])
+
+    // 开封一袋后重新查库存，够了就不再提示欠料
+    RESPONSES['FnbKitchen/GetDeductStock'] = [{ itemId: 10, availableQuantity: 650, sealedQuantity: 500, sealedPacks: 1,
+      openBatchId: 101, openBatchNo: 'B2', openPackSize: 500, packUnitName: '袋' }]
+    page.onOpenPack({ currentTarget: { dataset: { index: 0 } } })
+    await settle()
+    const opened = calls.find(c => c.path === 'FnbInventory/PostOpen').data
+    assert.deepEqual([opened.parentBatchId, opened.packCount], [101, 1])
+    assert.deepEqual([page.data.deduct[0].availLabel, page.data.deduct[0].short], ['可用 650 g', false])
+
+    // 微调到 1 kg 又不够：先确认，取消就不建单，确认才建单
+    page.setDeductQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '1' } })
+    assert.equal(page.data.deduct[0].shortLabel, '欠 350 g')
+    const modals = []
+    let answer = false
+    wx.showModal = o => { modals.push(o); setImmediate(() => o.success({ confirm: answer })) }
+    page.createOrder()
+    await settle()
+    assert.equal(modals[0].title, '库存不够')
+    assert.match(modals[0].content, /大白菜 欠 350 g/)
+    assert.equal(calls.filter(c => c.path === 'FnbKitchen/CreateAndServe').length, 0)
+    answer = true
+    page.createOrder()
+    await settle()
+    assert.deepEqual(calls.find(c => c.path === 'FnbKitchen/CreateAndServe').data.ingredients, [{ itemId: 10, quantity: 1000 }])
+  } finally {
+    delete RESPONSES['FnbKitchen/GetDeductStock']
+  }
+})
+
+test('出餐页：有欠料的单可补扣欠料（过了 10 分钟也行），「有欠料」看近 7 天没补的单，已盘点的不能补', async () => {
+  installFakes(MANAGER)
+  const saved = RESPONSES['FnbKitchen/GetOrder']
+  const shortNeed = { itemId: 10, itemName: '大白菜', plannedQuantity: 300, actualQuantity: 200, shortageQuantity: 100, settledByStocktake: false }
+  RESPONSES['FnbKitchen/GetOrder'] = Object.assign({}, saved, { served: true, changeSecondsLeft: null, servedNeeds: [shortNeed] })
+  RESPONSES['FnbKitchen/FillShortage'] = { orderId: '5', filledItems: 1, settledByStocktake: [],
+    needs: [Object.assign({}, shortNeed, { actualQuantity: 300, shortageQuantity: 0 })] }
+  RESPONSES['FnbKitchen/ListShortageOrders'] = [{ id: '5', business_date: '2026-09-24T00:00:00' }]
+  try {
+    const page = loadPage('serve')
+    page.onLoad({})
+    await settle()
+    assert.deepEqual([page.data.orders[0].canChange, page.data.orders[0].canFill], [false, true])
+    const modals = []
+    const confirm = wx.showModal
+    wx.showModal = o => { modals.push(o); confirm(o) }
+    page.onFillShortage({ currentTarget: { dataset: { id: '5' } } })
+    await settle()
+    assert.match(modals[0].content, /大白菜 欠 100 g/)
+    assert.deepEqual(calls.filter(c => c.path === 'FnbKitchen/FillShortage').map(c => c.data), [{ shopId: 12, orderId: '5' }])
+
+    page.onFilter({ currentTarget: { dataset: { filter: 'short' } } })
+    await settle()
+    assert.match(calls.find(c => c.path === 'FnbKitchen/ListShortageOrders').url, /days=7/)
+    assert.deepEqual([page.data.filter, page.data.orders.length], ['short', 1])
+
+    RESPONSES['FnbKitchen/GetOrder'] = Object.assign({}, saved, { served: true, changeSecondsLeft: null,
+      servedNeeds: [Object.assign({}, shortNeed, { settledByStocktake: true })] })
+    page.load()
+    await settle()
+    const order = page.data.orders[0]
+    assert.deepEqual([order.canFill, order.used[0].shortLabel, order.usedLine], [false, '欠 100 g · 已盘点', '大白菜 200 g（欠 100 g，已盘点）'])
+  } finally {
+    RESPONSES['FnbKitchen/GetOrder'] = saved
+    delete RESPONSES['FnbKitchen/FillShortage']
+    delete RESPONSES['FnbKitchen/ListShortageOrders']
+  }
+})
+
 test('盘点页：店长开始盘点只快照有可用量的食材并记住单号', async () => {
   installFakes(MANAGER)
   const page = loadPage('count')

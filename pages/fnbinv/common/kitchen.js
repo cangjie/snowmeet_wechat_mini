@@ -1,4 +1,4 @@
-// 厨房单展示：状态、菜品摘要、出餐扣料需求、列表耗用；建单时按配方带出将扣减的用料，可微调
+// 厨房单展示：状态、菜品摘要、出餐扣料需求、列表耗用；建单时按配方带出将扣减的用料，可微调，并提示库存够不够
 const units = require('./units.js')
 const recipe = require('./recipe.js')
 
@@ -15,7 +15,8 @@ function deductLines(needs, prev, materialOf, unitList) {
   ;(prev || []).forEach(l => { old[l.itemId] = l })
   return needs.map(n => {
     const m = materialOf[n.itemId] || { id: n.itemId, name: '食材#' + n.itemId, base_unit_code: '', default_input_unit_code: '' }
-    const line = Object.assign(recipe.editorLine(m, n.baseQty, unitList), { recipeQty: n.baseQty, recipeLabel: units.formatQty(n.baseQty, m.base_unit_code) })
+    const line = Object.assign(recipe.editorLine(m, n.baseQty, unitList),
+      { baseUnit: m.base_unit_code, recipeQty: n.baseQty, recipeLabel: units.formatQty(n.baseQty, m.base_unit_code) })
     const hit = old[n.itemId]
     return Object.assign(line, hit && hit.touched ? { qty: hit.qty, touched: true } : { touched: false })
   })
@@ -26,6 +27,35 @@ function adjustments(lines, unitList) {
   if ((lines || []).some(l => l.qty === '' || isNaN(Number(l.qty)) || Number(l.qty) < 0)) return { error: '用量要填不小于 0 的数' }
   if (lines.length && lines.every(l => Number(l.qty) === 0)) return { error: '至少要扣一种配料' }
   return { ingredients: lines.filter(l => l.touched).map(l => ({ itemId: l.itemId, quantity: units.toBase(l.qty, l.unitCode, unitList) })) }
+}
+
+// 建单前的库存提示（仅展示，以服务端扣料为准）：用量超过能扣的量（散装、已开封、自制，未过期）就标欠料；
+// 欠料且有整包没开封的，提示开封。stockOf：GetDeductStock 按食材；served：编辑已扣料的单时这单已扣的量（保存时先退回，算可用时加回）
+function withStock(lines, stockOf, unitList, served) {
+  return (lines || []).map(l => {
+    const s = stockOf && stockOf[l.itemId]
+    if (!s) return Object.assign({}, l, { stockKnown: false, short: false, availLabel: '', shortLabel: '', openHint: '', canOpen: false })
+    const avail = Math.round((Number(s.availableQuantity || 0) + Number((served && served[l.itemId]) || 0)) * 1e6) / 1e6
+    const need = l.qty === '' || isNaN(Number(l.qty)) ? 0 : units.toBase(l.qty, l.unitCode, unitList)
+    const gap = Math.round((need - avail) * 1e6) / 1e6
+    const short = gap > 0
+    const packs = Number(s.sealedPacks || 0)
+    return Object.assign({}, l, { stockKnown: true, short,
+      availLabel: '可用 ' + units.formatQty(avail, l.baseUnit),
+      shortLabel: short ? '欠 ' + units.formatQty(gap, l.baseUnit) : '',
+      openHint: short && packs > 0 ? '另有 ' + packs + ' ' + (s.packUnitName || '件') + '未开封' : '',
+      canOpen: short && !!s.openBatchId, openLabel: '开封 1 ' + (s.packUnitName || '件') })
+  })
+}
+
+// 建单确认框里列出欠料：大白菜 欠 50 g（另有 2 袋未开封）
+function shortageText(lines) {
+  return (lines || []).filter(l => l.short).map(l => l.name + ' ' + l.shortLabel + (l.openHint ? '（' + l.openHint + '）' : '')).join('；')
+}
+
+// 还能补扣的欠料：欠着、且出餐后没被盘点调整过
+function openShortage(needs) {
+  return (needs || []).filter(n => n.shortageQuantity > 0 && !n.settledByStocktake)
 }
 
 function orderStatus(order, served) {
@@ -43,16 +73,17 @@ function needRows(needs, unitOf) {
   return (needs || []).map(n => {
     const unit = unitOf[n.itemId] || ''
     const short = n.shortageQuantity > 0
+    const label = short ? '欠 ' + units.formatQty(n.shortageQuantity, unit) + (n.settledByStocktake ? ' · 已盘点' : '') : ''
     return { itemId: n.itemId, name: n.itemName, planned: units.formatQty(n.plannedQuantity, unit),
-      actual: units.formatQty(n.actualQuantity, unit), short, shortLabel: short ? '欠 ' + units.formatQty(n.shortageQuantity, unit) : '' }
+      actual: units.formatQty(n.actualQuantity, unit), short, shortLabel: label }
   })
 }
 
-// 列表卡片上的一行耗用：按实际扣减量列出每种食材，欠料的注明欠多少
+// 列表卡片上的一行耗用：按实际扣减量列出每种食材，欠料的注明欠多少（出餐后已盘点调整的注明）
 function usedSummary(needs, unitOf) {
   return (needs || []).map(n => {
     const unit = unitOf[n.itemId] || ''
-    return n.itemName + ' ' + units.formatQty(n.actualQuantity, unit) + (n.shortageQuantity > 0 ? '（欠 ' + units.formatQty(n.shortageQuantity, unit) + '）' : '')
+    return n.itemName + ' ' + units.formatQty(n.actualQuantity, unit) + (n.shortageQuantity > 0 ? '（欠 ' + units.formatQty(n.shortageQuantity, unit) + (n.settledByStocktake ? '，已盘点' : '') + '）' : '')
   }).join('、')
 }
 
@@ -74,4 +105,5 @@ function sortOrders(rows) {
   })
 }
 
-module.exports = { orderStatus, lineSummary, needRows, usedSummary, localTime, sortOrders, portionNeeds, deductLines, adjustments }
+module.exports = { orderStatus, lineSummary, needRows, usedSummary, localTime, sortOrders, portionNeeds, deductLines, adjustments,
+  withStock, shortageText, openShortage }

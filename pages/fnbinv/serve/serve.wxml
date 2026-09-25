@@ -3,11 +3,15 @@
   <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
   <block wx:else>
     <view class="btn primary btn-block" bindtap="openNew">＋ 新建厨房单</view>
-    <view class="fnb-section-title">今日厨房单<text class="side">{{orders.length}} 单</text></view>
+    <view class="seg filter-seg">
+      <view class="chip-sq {{filter === 'today' ? 'on' : ''}}" data-filter="today" bindtap="onFilter">今日</view>
+      <view class="chip-sq {{filter === 'short' ? 'on' : ''}}" data-filter="short" bindtap="onFilter">有欠料（近 7 天）</view>
+    </view>
+    <view class="fnb-section-title">{{filter === 'short' ? '待补扣欠料' : '今日厨房单'}}<text class="side">{{orders.length}} 单</text></view>
     <view wx:for="{{orders}}" wx:key="id" class="card">
       <view class="card-pad card-row" data-id="{{item.id}}" bindtap="onToggle">
         <view class="grow col">
-          <view class="card-row"><text class="order-no">{{item.displayNo}}</text><text wx:if="{{item.table}}" class="tag">{{item.table}}</text><text class="card-meta">{{item.time}}</text></view>
+          <view class="card-row"><text class="order-no">{{item.displayNo}}</text><text wx:if="{{item.table}}" class="tag">{{item.table}}</text><text class="card-meta">{{filter === 'short' ? item.date + ' ' : ''}}{{item.time}}</text><text wx:if="{{item.canFill}}" class="tag danger">欠料</text></view>
           <view class="dish-line">{{item.summary}}</view>
           <view wx:if="{{item.usedLine}}" class="used-line">耗用 · {{item.usedLine}}</view>
           <view wx:if="{{item.remark}}" class="remark">备注 · {{item.remark}}</view>
@@ -35,6 +39,7 @@
           </block>
           <block wx:elif="{{item.status.key === 'served'}}">
             <text class="card-meta grow">已出餐，配料已扣减</text>
+            <view wx:if="{{item.canFill}}" class="btn primary {{working === item.id ? 'disabled' : ''}}" data-id="{{item.id}}" bindtap="onFillShortage">{{working === item.id ? '补扣中…' : '补扣欠料'}}</view>
             <view wx:if="{{item.canChange}}" class="btn" data-id="{{item.id}}" bindtap="onEditOrder">编辑</view>
             <view wx:if="{{item.canChange}}" class="btn danger" data-id="{{item.id}}" bindtap="onDeleteOrder">删除并退回配料</view>
           </block>
@@ -42,8 +47,8 @@
         </view>
       </view>
     </view>
-    <view wx:if="{{!loading && !orders.length}}" class="fnb-empty">今天还没有厨房单</view>
-    <view class="fnb-note">一张厨房单一道菜，建单即按该菜配方 × 份数扣料，只扣散装与已开封的量；库存不足时按实际可用量扣减并记录欠料。扣料 10 分钟内可编辑或删除，删除时配料退回库存。</view>
+    <view wx:if="{{!loading && !orders.length}}" class="fnb-empty">{{filter === 'short' ? '近 7 天没有待补扣的欠料' : '今天还没有厨房单'}}</view>
+    <view class="fnb-note">一张厨房单一道菜，建单即按该菜配方 × 份数扣料，只扣散装与已开封的量；库存不足时按实际可用量扣减并记录欠料，补录入库或开封后可在单上「补扣欠料」。扣料 10 分钟内可编辑或删除，删除时配料退回库存。</view>
   </block>
 </view>
 
@@ -68,6 +73,11 @@
             <text class="unit-suffix">{{item.unitLabel}}</text>
           </view>
           <text wx:if="{{item.touched}}" class="card-meta recipe-hint">配方 {{item.recipeLabel}}</text>
+          <view wx:if="{{item.stockKnown}}" class="stock-hint">
+            <text class="card-meta {{item.short ? 'tone-danger' : ''}}">{{item.availLabel}}{{item.short ? ' · ' + item.shortLabel : ''}}</text>
+            <text wx:if="{{item.openHint}}" class="card-meta tone-warn">{{item.openHint}}</text>
+            <view wx:if="{{item.canOpen}}" class="btn" data-index="{{index}}" bindtap="onOpenPack">{{item.openLabel}}</view>
+          </view>
         </view>
         <view wx:if="{{deduct.length}}" class="card-meta">填 0 表示这单不用这一项</view>
       </block>
