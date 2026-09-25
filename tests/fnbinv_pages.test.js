@@ -50,6 +50,7 @@ const RESPONSES = {
   'FnbCatalog/SaveCategory': { id: 2 },
   'FnbCatalog/SaveMaterial': { id: 10, code: 'VEG1', name: '大白菜', category_id: 2, item_type: 'raw', base_unit_code: 'g', default_input_unit_code: 'kg', warn_days: 1, valid: true },
   'FnbCatalog/DeleteCategory': { ids: [3] },
+  'FnbInventory/DeleteReceipt': { batchId: 104 },
   'FnbCatalog/SaveShelfLifeRule': { id: 1 }
 }
 
@@ -66,7 +67,7 @@ function installFakes(staff) {
       : options.success({ statusCode: 200, data: { code: 0, message: '', data: JSON.parse(JSON.stringify(data)) } }))
   })
   global.wx = {
-    showToast() {}, setNavigationBarTitle() {}, stopPullDownRefresh() {}, redirectTo() {}, navigateTo() {}, previewImage() {},
+    showToast() {}, setNavigationBarTitle() {}, stopPullDownRefresh() {}, redirectTo() {}, navigateTo() {}, navigateBack() {}, previewImage() {},
     showModal(o) { setImmediate(() => o.success && o.success({ confirm: true, content: o.content })) },
     showActionSheet(o) { setImmediate(() => o.success && o.success({ tapIndex: 0 })) },
     getStorageSync(k) { return storage[k] }, setStorageSync(k, v) { storage[k] = v }, removeStorageSync(k) { delete storage[k] }
@@ -463,6 +464,76 @@ test('入库页：网络失败时表单保留，重试沿用同一请求号不�
   assert.equal(first.requestId, second.requestId)
   assert.equal(page.data.done.length, 1)
   assert.equal(page.data.material, null)
+})
+
+test('入库页：提交前弹确认框，取消则不入库；确认后才建档入库', async () => {
+  installFakes(MANAGER)
+  const modals = []
+  let answer = false
+  wx.showModal = o => { modals.push(o); setImmediate(() => o.success({ confirm: answer })) }
+  const page = loadPage('inbound')
+  page.onLoad({})
+  await settle()
+  page.onHint({ currentTarget: { dataset: { id: 10 } } })
+  page.onExpireDate({ detail: { date: '2099-10-01' } })
+  page.onQty({ detail: { value: 2 } })
+  page.submit()
+  await settle()
+  assert.equal(receipts().length, 0)
+  assert.match(modals[0].content, /大白菜：2 kg · 冷藏 · 2099-10-01 到期/)
+  answer = true
+  page.submit()
+  await settle()
+  assert.equal(receipts().length, 1)
+})
+
+test('入库页：本次已入库 10 分钟内可删除，超时后不再发删除请求', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('inbound')
+  page.onLoad({})
+  await settle()
+  const receive = async () => {
+    page.onHint({ currentTarget: { dataset: { id: 10 } } })
+    page.onExpireDate({ detail: { date: '2099-10-01' } })
+    page.submit()
+    await settle()
+  }
+  const deletes = () => calls.filter(c => c.path === 'FnbInventory/DeleteReceipt').map(c => c.data)
+  await receive()
+  assert.equal(page.data.done[0].canDelete, true)
+  page.onDeleteDone({ currentTarget: { dataset: { id: 104 } } })
+  await settle()
+  assert.deepEqual(deletes(), [{ shopId: 12, batchId: 104 }])
+  assert.equal(page.data.done.length, 0)
+
+  await receive()
+  page.data.done[0].deleteUntil = Date.now() - 1
+  page.onDeleteDone({ currentTarget: { dataset: { id: 104 } } })
+  await settle()
+  assert.equal(deletes().length, 1, '超过 10 分钟不发删除请求')
+  assert.equal(page.data.done[0].canDelete, false)
+})
+
+test('批次页：服务端给出剩余可删秒数时显示「删除这次入库」，删除发 DeleteReceipt', async () => {
+  installFakes(MANAGER)
+  const saved = RESPONSES['FnbInventory/GetBatch']
+  RESPONSES['FnbInventory/GetBatch'] = Object.assign({}, saved, { deleteSecondsLeft: 300 })
+  try {
+    const page = loadPage('batch')
+    page.onLoad({ id: '100' })
+    await settle()
+    assert.equal(page.data.info.canDelete, true)
+    page.onDelete()
+    await settle()
+    assert.deepEqual(calls.filter(c => c.path === 'FnbInventory/DeleteReceipt').map(c => c.data), [{ shopId: 12, batchId: 100 }])
+  } finally {
+    RESPONSES['FnbInventory/GetBatch'] = saved
+  }
+  installFakes(MANAGER)
+  const plain = loadPage('batch')
+  plain.onLoad({ id: '100' })
+  await settle()
+  assert.equal(plain.data.info.canDelete, false)
 })
 
 test('入库页 / 分类页：开封后可选「保质期不变」，提交与建档都记为 OPEN_KEEP_DAYS', async () => {

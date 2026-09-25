@@ -9,6 +9,14 @@ const view = require('../common/stock-view.js')
 const requestId = require('../common/request-id.js')
 
 const PACK_NAMES = ['瓶', '袋', '盒', '桶', '罐', '箱', '件']
+const DELETE_WINDOW_MS = 10 * 60 * 1000  // 与服务端 FnbReceiptService.DeleteWindow 一致
+
+// 入库请求体 → 「2 袋 × 500 g · 冷冻 · 2026-11-22 到期」
+function receiptLine(b, baseUnit) {
+  const qty = b.stockForm === 'sealed' ? b.quantity + ' ' + b.packUnitName + ' × ' + units.formatQty(b.packSize, baseUnit)
+    : units.trimNum(b.quantity) + ' ' + units.unitName(b.inputUnitCode)
+  return qty + ' · ' + expiry.storageLabel(b.storageType) + ' · ' + b.expireDate + ' 到期'
+}
 
 Page({
   data: {
@@ -222,7 +230,8 @@ Page({
       qty: d.qty, inputUnit: d.inputUnit, unitPrice: d.unitPrice, units: this.src ? this.src.units : [] }
   },
 
-  // 提交即入库：新食材先建档，再 PostReceipt。失败时表单保留；网络类失败重试沿用同一请求号，服务端据此去重
+  // 提交入库：校验通过后先弹确认框防误触；确认后新食材先建档，再 PostReceipt。
+  // 失败时表单保留；网络类失败重试沿用同一请求号，服务端据此去重
   submit() {
     const d = this.data
     if (d.submitting) return
@@ -235,20 +244,26 @@ Page({
     const built = forms.buildReceipt(Object.assign(state, { requestId: this.pendingRequestId }), d.today)
     if (!built.ok) { wx.showToast({ title: built.error, icon: 'none', duration: 2500 }); return }
     const b = built.body
+    const line = receiptLine(b, state.material.base_unit_code)
+    wx.showModal({
+      title: '确认入库', content: state.material.name + '：' + line + (isNew ? '。新食材，将同时建档' : ''), confirmText: '入库',
+      success: res => { if (res.confirm) this.postReceipt(b, isNew, line) }
+    })
+  },
+  postReceipt(b, isNew, line) {
+    if (this.data.submitting) return
     this.setData({ submitting: true })
     const ready = isNew
       ? api.post(this.ctx, 'FnbCatalog/SaveMaterial', catalog.materialBody(this.newMaterialEdit(), this.src.units, Date.now()))
         .then(row => { this.src.materials.push(row); this.setData({ material: row, canCreate: false, hints: [] }); return row })
-      : Promise.resolve(state.material)
+      : Promise.resolve(this.data.material)
     ready.then(material => {
       b.itemId = material.id
       return api.post(this.ctx, 'FnbInventory/PostReceipt', b).then(res => {
         this.pendingRequestId = null
-        const qtyText = d.packed ? b.quantity + ' ' + b.packUnitName + ' × ' + units.formatQty(b.packSize, material.base_unit_code)
-          : units.trimNum(b.quantity) + ' ' + units.unitName(b.inputUnitCode)
-        const row = { batchId: res.batchId, name: material.name, batchNo: b.batchNo, expireDate: b.expireDate,
-          line: qtyText + ' · ' + expiry.storageLabel(b.storageType) + ' · ' + b.expireDate + ' 到期' }
-        this.setData({ submitting: false, done: [row].concat(this.data.done),
+        const row = { batchId: res.batchId, name: material.name, batchNo: b.batchNo, expireDate: b.expireDate, line,
+          deleteUntil: Date.now() + DELETE_WINDOW_MS, canDelete: true }
+        this.setData({ submitting: false, done: [row].concat(this.freshDone()),
           photos: [], prodDate: '', expireDate: '', shelfValue: '', qty: 1, unitPrice: '', packSize: '' })
         this.clearMaterial()
         this.refreshRule()
@@ -259,6 +274,36 @@ Page({
       if (!err.retryable) this.pendingRequestId = null
       this.setData({ submitting: false })
       base.fail(err)
+    })
+  },
+
+  // ---- 本次已入库：打标签；入库 10 分钟内、还没开封使用的可删除（服务端再校验）----
+  freshDone() {
+    const now = Date.now()
+    return this.data.done.map(r => Object.assign({}, r, { canDelete: r.canDelete && now < r.deleteUntil }))
+  },
+  onShow() {
+    if (this.data.done.length) this.setData({ done: this.freshDone() })
+  },
+  onDeleteDone(e) {
+    const row = this.data.done.find(d => d.batchId === Number(e.currentTarget.dataset.id))
+    if (Date.now() >= row.deleteUntil) {
+      this.setData({ done: this.freshDone() })
+      wx.showToast({ title: '入库已超过 10 分钟，不能删除', icon: 'none' })
+      return
+    }
+    wx.showModal({
+      title: '删除这次入库', content: '「' + row.name + '」' + row.line + '，删除后库存里不再有这一批。', confirmText: '删除', confirmColor: '#EF4444',
+      success: res => {
+        if (!res.confirm) return
+        api.post(this.ctx, 'FnbInventory/DeleteReceipt', { batchId: row.batchId }).then(() => {
+          this.setData({ done: this.data.done.filter(d => d.batchId !== row.batchId) })
+          wx.showToast({ title: '已删除', icon: 'success' })
+        }).catch(err => {
+          this.setData({ done: this.data.done.map(d => d.batchId === row.batchId ? Object.assign({}, d, { canDelete: false }) : d) })
+          base.fail(err)
+        })
+      }
     })
   },
 

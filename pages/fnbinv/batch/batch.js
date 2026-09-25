@@ -1,4 +1,4 @@
-// 批次详情：效期依据、照片；开封 / 报损（店长）/ 打印标签
+// 批次详情：效期依据、照片；开封 / 报损（店长）/ 打印标签；入库 10 分钟内、未开封使用前可删除
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const expiry = require('../common/expiry.js')
@@ -30,6 +30,8 @@ Page({
     if (!this.ctx || !this.batchId) { this.setData({ loading: false, blocked: this.batchId ? this.data.blocked : '批次不存在' }); return Promise.resolve() }
     return api.get(this.ctx, 'FnbInventory/GetBatch', { batchId: this.batchId }).then(res => {
       this.raw = res
+      // 服务端给剩余秒数（超时、已有后续操作、无权时为 null），换算成本机截止时间
+      this.deleteUntil = res.deleteSecondsLeft > 0 ? Date.now() + res.deleteSecondsLeft * 1000 : 0
       return api.get(this.ctx, 'FnbCatalog/GetMaterial', { id: res.stock.item_id })
     }).then(material => {
       const b = this.raw.batch
@@ -50,6 +52,7 @@ Page({
         cost: s.stock_amount === null || s.stock_amount === undefined ? '' : units.money(s.stock_amount),
         destroyed: s.is_destroyed, empty: s.quantity <= 0,
         canOpen: packs && (s.sealed_pack_count || 0) > 0 && days >= 0 && !s.is_destroyed,
+        canDelete: this.deleteUntil > Date.now(),
         packName: s.pack_unit_name || '件', packSizeLabel: units.formatQty(s.pack_size, unit)
       }
       this.setData({ loading: false, info })
@@ -97,6 +100,25 @@ Page({
               .catch(err => { if (!err.retryable) this.keeper.done(key); base.fail(err) })
           }
         })
+      }
+    })
+  },
+
+  onDelete() {
+    if (Date.now() >= this.deleteUntil) {
+      this.setData({ 'info.canDelete': false })
+      wx.showToast({ title: '入库已超过 10 分钟，不能删除', icon: 'none' })
+      return
+    }
+    const info = this.data.info
+    wx.showModal({
+      title: '删除这次入库', content: '「' + info.name + '」批次 ' + info.batchNo + ' 将从库存中删除，就像没入过库。', confirmText: '删除', confirmColor: '#EF4444',
+      success: res => {
+        if (!res.confirm) return
+        api.post(this.ctx, 'FnbInventory/DeleteReceipt', { batchId: this.batchId }).then(() => {
+          wx.showToast({ title: '已删除', icon: 'success' })
+          setTimeout(() => wx.navigateBack({ fail: () => wx.redirectTo({ url: '/pages/fnbinv/stock/stock' }) }), 800)
+        }).catch(err => { base.fail(err); this.load() })
       }
     })
   },

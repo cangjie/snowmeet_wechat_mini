@@ -80,10 +80,11 @@
     </view>
 
     <block wx:if="{{done.length}}">
-      <view class="fnb-section-title">本次已入库<text class="side">可打印标签</text></view>
+      <view class="fnb-section-title">本次已入库<text class="side">可打标签 · 10 分钟内可删除</text></view>
       <view class="card"><view wx:for="{{done}}" wx:key="batchId" class="sub-row">
         <view class="grow col"><view class="card-row"><text class="card-title small">{{item.name}}</text><text class="batch-no">{{item.batchNo}}</text></view><view class="card-meta">{{item.line}}</view></view>
-        <view class="btn" data-id="{{item.batchId}}" bindtap="onPrint">打标签</view></view></view>
+        <view class="btn" data-id="{{item.batchId}}" bindtap="onPrint">打标签</view>
+        <view wx:if="{{item.canDelete}}" class="btn danger" data-id="{{item.batchId}}" bindtap="onDeleteDone">删除</view></view></view>
     </block>
   </block>
 </view>

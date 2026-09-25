@@ -28,6 +28,8 @@
       <view class="btn grow-btn" bindtap="onPrint">打印标签</view>
       <view wx:if="{{!info.empty && !info.destroyed}}" class="btn {{isManager ? 'danger' : 'disabled'}} grow-btn" bindtap="onWaste">报损</view>
     </view>
+    <view wx:if="{{info.canDelete}}" class="btn danger btn-block" bindtap="onDelete">删除这次入库</view>
+    <view wx:if="{{info.canDelete}}" class="fnb-note">入库 10 分钟内、还没开封使用前可以删除，用于录错或误触。</view>
     <view wx:if="{{!isManager}}" class="fnb-note">报损需要店长权限。</view>
   </block>
 </view>
