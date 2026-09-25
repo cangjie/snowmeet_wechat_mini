@@ -1,4 +1,4 @@
-// 页面级冒烟：假后端 + 假 wx，逐页 onLoad，并走通入库加单、建厨房单、开始盘点、开封这几条关键交互
+// 页面级冒烟：假后端 + 假 wx，逐页 onLoad，并走通入库提交、建厨房单、开始盘点、开封这几条关键交互
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const path = require('node:path')
@@ -41,6 +41,7 @@ const RESPONSES = {
   'FnbKitchen/CreateManualOrder': { orderId: '6', displayNo: 'M1', reviewStatus: 'verified', lineCount: 1, replayed: false },
   'FnbStocktake/CreateSnapshot': { documentId: '77' },
   'FnbStocktake/GetSnapshot': { documentId: '77', status: 'draft', rows: [{ item_id: 10, system_qty: 5000, counted_qty: null, rowVersion: 'v1' }] },
+  'FnbInventory/PostReceipt': { documentId: '11', batchId: 104, quantity: 3000, amount: null, replayed: false },
   'FnbInventory/PostOpen': { documentId: '8', batchId: 102, quantity: 1000, amount: null, replayed: false },
   'FnbInventory/PostWaste': { documentId: '9', batchId: 100, quantity: 5000, amount: 20, replayed: false },
   'FnbInventory/PostPreparation': { documentId: '10', batchId: 103, quantity: 20, amount: null, replayed: false },
@@ -94,6 +95,7 @@ function loadPage(name) {
 }
 
 const settle = () => new Promise(r => setTimeout(r, 30))
+const receipts = () => calls.filter(c => c.path === 'FnbInventory/PostReceipt').map(c => c.data)
 const MANAGER = { id: 1, title_level: 200, base_shop_id: 12 }
 
 for (const name of ['stock', 'expiry', 'destroy', 'batch', 'inbound', 'cats', 'prep', 'recipe', 'serve', 'count', 'dash']) {
@@ -131,7 +133,7 @@ test('库存页：按食材分组、临期角标、开封发 PostOpen', async ()
   assert.match(open.data.requestId, /^[0-9a-f-]{36}$/)
 })
 
-test('入库页：选食材、拍照、填到期日后加入入库单，批次号避让', async () => {
+test('入库页：选食材、拍照、填到期日后提交即入库，出现在本次已入库', async () => {
   installFakes(MANAGER)
   const page = loadPage('inbound')
   page.onLoad({})
@@ -140,13 +142,14 @@ test('入库页：选食材、拍照、填到期日后加入入库单，批次�
   page.onPhotos({ detail: { photos: [{ id: 5, url: 'u', status: 'done' }], uploading: 0 } })
   page.onExpireDate({ detail: { date: '2099-10-01' } })
   page.onQty({ detail: { value: 3 } })
-  page.addDraft()
+  page.submit()
   await settle()
-  assert.equal(page.data.drafts.length, 1)
-  const body = page.data.drafts[0].body
+  assert.equal(receipts().length, 1)
+  const body = receipts()[0]
   assert.deepEqual({ itemId: body.itemId, quantity: body.quantity, inputUnitCode: body.inputUnitCode, expirySource: body.expirySource, imageIds: body.imageIds },
     { itemId: 10, quantity: 3, inputUnitCode: 'kg', expirySource: 'package', imageIds: [5] })
-  assert.equal(page.data.batchNo, 'B260923-02')
+  assert.deepEqual({ batchId: page.data.done[0].batchId, name: page.data.done[0].name }, { batchId: 104, name: '大白菜' })
+  assert.equal(page.data.material, null, '入库成功后表单清空')
 })
 
 test('出餐页：选菜建厨房单发 CreateManualOrder', async () => {
@@ -320,9 +323,9 @@ test('入库页：生产日期 + 保质期自动填出到期日期；手填到�
   page.onScan({ currentTarget: { dataset: { mode: 'date' } } })
   assert.deepEqual({ prodDate: page.data.prodDate, shelfValue: page.data.shelfValue, scan: page.data.scan.show }, { prodDate: '2099-09-23', shelfValue: '7', scan: false })
   page.onPhotos({ detail: { photos: [{ id: 5 }], uploading: 0 } })
-  page.addDraft()
+  page.submit()
   await settle()
-  const body = page.data.drafts[0].body
+  const body = receipts()[0]
   assert.deepEqual({ expireDate: body.expireDate, source: body.expirySource, productionDate: body.productionDate, shelfLifeValue: body.shelfLifeValue },
     { expireDate: '2099-10-15', source: 'package', productionDate: null, shelfLifeValue: null })
 
@@ -354,9 +357,9 @@ test('入库页：封装含量可选单位，选了按毫升计量的食材后�
     page.onQty({ detail: { value: 2 } })
     page.onExpireDate({ detail: { date: '2099-10-01' } })
     page.onPhotos({ detail: { photos: [{ id: 5 }], uploading: 0 } })
-    page.addDraft()
+    page.submit()
     await settle()
-    const body = page.data.drafts[0].body
+    const body = receipts()[0]
     assert.deepEqual({ stockForm: body.stockForm, packSize: body.packSize, quantity: body.quantity, inputUnitCode: body.inputUnitCode },
       { stockForm: 'sealed', packSize: 1500, quantity: 2, inputUnitCode: 'ml' })
   } finally {
@@ -364,7 +367,7 @@ test('入库页：封装含量可选单位，选了按毫升计量的食材后�
   }
 })
 
-test('入库页：输入与已建档食材同名时直接选中；不拍照也能加入入库单', async () => {
+test('入库页：输入与已建档食材同名时直接选中；不拍照也能提交入库', async () => {
   installFakes(MANAGER)
   const page = loadPage('inbound')
   page.onLoad({})
@@ -379,13 +382,13 @@ test('入库页：输入与已建档食材同名时直接选中；不拍照也�
   page.onName({ detail: { value: '大白菜' } })
   assert.equal(page.data.inputUnit, 'g', '已选中同一食材时不重新带出默认值')
   page.onExpireDate({ detail: { date: '2099-10-01' } })
-  page.addDraft()
+  page.submit()
   await settle()
-  assert.equal(page.data.drafts.length, 1)
-  assert.deepEqual(page.data.drafts[0].body.imageIds, [])
+  assert.equal(receipts().length, 1)
+  assert.deepEqual(receipts()[0].imageIds, [])
 })
 
-test('入库页：新食材不用单独建档，表单填完加入入库单时按所选数量单位自动建档', async () => {
+test('入库页：新食材不用单独建档，表单填完提交入库时按所选数量单位自动建档', async () => {
   installFakes(MANAGER)
   const page = loadPage('inbound')
   page.onLoad({})
@@ -395,19 +398,19 @@ test('入库页：新食材不用单独建档，表单填完加入入库单时�
   assert.deepEqual(page.data.inputUnits.map(u => u.code), ['g', 'kg', 'ml', 'piece'])
   page.onInputUnit({ currentTarget: { dataset: { code: 'g' } } })
   page.onQty({ detail: { value: 3 } })
-  page.addDraft()
+  page.submit()
   await settle()
   assert.equal(calls.filter(c => c.path === 'FnbCatalog/SaveMaterial').length, 0, '表单不完整时不建档')
   page.onExpireDate({ detail: { date: '2099-10-01' } })
-  page.addDraft()
+  page.submit()
   await settle()
   const body = calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data
   assert.deepEqual({ name: body.name, categoryId: body.categoryId, baseUnitCode: body.baseUnitCode, defaultInputUnitCode: body.defaultInputUnitCode, warnDays: body.warnDays },
     { name: '冬瓜', categoryId: 2, baseUnitCode: 'g', defaultInputUnitCode: 'g', warnDays: 1 })
-  assert.equal(page.data.drafts.length, 1)
-  assert.deepEqual({ itemId: page.data.drafts[0].body.itemId, quantity: page.data.drafts[0].body.quantity, inputUnitCode: page.data.drafts[0].body.inputUnitCode },
+  assert.equal(receipts().length, 1)
+  assert.deepEqual({ itemId: receipts()[0].itemId, quantity: receipts()[0].quantity, inputUnitCode: receipts()[0].inputUnitCode },
     { itemId: 10, quantity: 3, inputUnitCode: 'g' })
-  assert.equal(page.data.adding, false)
+  assert.equal(page.data.submitting, false)
 })
 
 test('入库页：封装的新食材须选含量单位，按含量单位建档并带上本次的开封后默认', async () => {
@@ -422,17 +425,44 @@ test('入库页：封装的新食材须选含量单位，按含量单位建档�
   page.onOpenDays({ detail: { value: '30' } })
   page.onExpireDate({ detail: { date: '2099-10-01' } })
   assert.equal(page.data.contentUnit, '')
-  page.addDraft()
+  page.submit()
   await settle()
   assert.equal(calls.filter(c => c.path === 'FnbCatalog/SaveMaterial').length, 0, '没选含量单位不建档')
   page.onContentUnit({ currentTarget: { dataset: { code: 'ml' } } })
-  page.addDraft()
+  page.submit()
   await settle()
   const body = calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data
   assert.deepEqual({ baseUnitCode: body.baseUnitCode, defaultInputUnitCode: body.defaultInputUnitCode, defaultOpenStorage: body.defaultOpenStorage, defaultOpenDays: body.defaultOpenDays },
     { baseUnitCode: 'ml', defaultInputUnitCode: 'ml', defaultOpenStorage: 'chilled', defaultOpenDays: 30 })
-  const draft = page.data.drafts[0].body
+  const draft = receipts()[0]
   assert.deepEqual({ stockForm: draft.stockForm, packSize: draft.packSize, openShelfLifeDays: draft.openShelfLifeDays }, { stockForm: 'sealed', packSize: 750, openShelfLifeDays: 30 })
+})
+
+test('入库页：网络失败时表单保留，重试沿用同一请求号不会重复入库；成功后清空表单', async () => {
+  installFakes(MANAGER)
+  let failOnce = true
+  api.setTransport(function (options) {
+    const p = options.url.replace('https://x/api/', '').split('?')[0]
+    calls.push({ path: p, method: options.method, data: options.data, url: options.url })
+    if (p === 'FnbInventory/PostReceipt' && failOnce) { failOnce = false; setImmediate(() => options.fail()); return }
+    const data = RESPONSES[p]
+    setImmediate(() => options.success({ statusCode: 200, data: { code: 0, message: '', data: JSON.parse(JSON.stringify(data)) } }))
+  })
+  const page = loadPage('inbound')
+  page.onLoad({})
+  await settle()
+  page.onHint({ currentTarget: { dataset: { id: 10 } } })
+  page.onExpireDate({ detail: { date: '2099-10-01' } })
+  page.submit()
+  await settle()
+  assert.equal(page.data.material.id, 10, '失败后表单保留')
+  assert.equal(page.data.done.length, 0)
+  page.submit()
+  await settle()
+  const [first, second] = receipts()
+  assert.equal(first.requestId, second.requestId)
+  assert.equal(page.data.done.length, 1)
+  assert.equal(page.data.material, null)
 })
 
 test('入库页 / 分类页：开封后可选「保质期不变」，提交与建档都记为 OPEN_KEEP_DAYS', async () => {
@@ -448,9 +478,9 @@ test('入库页 / 分类页：开封后可选「保质期不变」，提交与�
   assert.deepEqual({ openKeep: inbound.data.openKeep, openDays: inbound.data.openDays }, { openKeep: true, openDays: '' })
   inbound.onPackSize({ detail: { value: '500' } })
   inbound.onExpireDate({ detail: { date: '2099-10-01' } })
-  inbound.addDraft()
+  inbound.submit()
   await settle()
-  assert.equal(inbound.data.drafts[0].body.openShelfLifeDays, KEEP)
+  assert.equal(receipts()[0].openShelfLifeDays, KEEP)
 
   installFakes(MANAGER)
   const cats = loadPage('cats')
@@ -470,10 +500,10 @@ test('入库页：普通员工输入未建档的新名字不能入库，也不�
   await settle()
   page.onName({ detail: { value: '冬瓜' } })
   page.onExpireDate({ detail: { date: '2099-10-01' } })
-  page.addDraft()
+  page.submit()
   await settle()
   assert.equal(calls.filter(c => c.path === 'FnbCatalog/SaveMaterial').length, 0)
-  assert.equal(page.data.drafts.length, 0)
+  assert.equal(receipts().length, 0)
 })
 
 test('分类页：有可用食材的分类不能删；空分类确认后发 DeleteCategory，一级分类连同二级一起删', async () => {

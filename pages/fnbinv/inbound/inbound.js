@@ -1,4 +1,4 @@
-// 每日入库八步：分类 → 名称 → 拍照 → 批次号 → 储存 → 日期 → 包装 → 数量；先攒入库单，再逐条提交 PostReceipt
+// 每日入库八步：分类 → 名称 → 拍照 → 批次号 → 储存 → 日期 → 包装 → 数量；点「提交入库」直接 PostReceipt
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const expiry = require('../common/expiry.js')
@@ -13,12 +13,12 @@ const PACK_NAMES = ['瓶', '袋', '盒', '桶', '罐', '箱', '件']
 Page({
   data: {
     blocked: '', isManager: false, tree: [], l1: 0, subs: [], sub: null,
-    nameQuery: '', hints: [], material: null, canCreate: false, adding: false,
+    nameQuery: '', hints: [], material: null, canCreate: false,
     photos: [], uploading: 0, batchNo: '', storages: expiry.STORAGE, storage: '',
     prodDate: '', shelfValue: '', shelfUnit: 'day', expireDate: '',
     ruleText: '', expireShown: '', packed: false, packNames: PACK_NAMES, packName: '瓶', packSize: '', contentUnit: '', contentUnits: [],
     openStorage: '', openDays: '', openKeep: false, qty: 1, inputUnit: '', inputUnits: [], unitPrice: '', priceUnit: '',
-    drafts: [], done: [], submitting: false, scan: { show: false, mode: 'all' }, printShow: false, printBatch: null
+    done: [], submitting: false, scan: { show: false, mode: 'all' }, printShow: false, printBatch: null
   },
 
   onLoad() {
@@ -35,20 +35,10 @@ Page({
     ]).then(([categories, materials, unitList, rules]) => {
       this.src = { categories, materials: materials.filter(m => m.valid), units: unitList.filter(u => u.valid), rules }
       const tree = view.categoryTree(categories)
-      this.setData({ tree, drafts: this.restoreDrafts(), contentUnits: units.contentUnitOptions(null, this.src.units) })
+      this.setData({ tree, contentUnits: units.contentUnitOptions(null, this.src.units) })
       if (tree.length) this.pickL1(tree[0].id)
       this.newBatchNo()
     }).catch(base.fail)
-  },
-
-  // ---- 入库单暂存（防误退丢失） ----
-  storageKey() { return 'fnbinv_inbound_' + this.ctx.shopId },
-  restoreDrafts() {
-    try { return wx.getStorageSync(this.storageKey()) || [] } catch (e) { return [] }
-  },
-  saveDrafts(drafts) {
-    this.setData({ drafts })
-    try { wx.setStorageSync(this.storageKey(), drafts) } catch (e) { /* 存储不可用时只保留内存 */ }
   },
 
   // ---- 1. 分类 ----
@@ -112,7 +102,7 @@ Page({
     this.refreshPriceUnit()
   },
   onHint(e) { this.pickMaterial(this.src.materials.find(m => m.id === Number(e.currentTarget.dataset.id))) },
-  // 新名字不单独建档：加入入库单时自动建。计量单位取散装的数量单位 / 封装的含量单位，
+  // 新名字不单独建档：提交入库时自动建。计量单位取散装的数量单位 / 封装的含量单位，
   // 临期提醒按分类储存方式给默认，开封后默认取本次填写的；保质期规则等到「分类」页补
   newMaterialEdit() {
     const d = this.data
@@ -133,7 +123,7 @@ Page({
   onPhotos(e) { this.setData({ photos: e.detail.photos, uploading: e.detail.uploading }) },
   newBatchNo() {
     api.get(this.ctx, 'FnbMaterial/GenBatchNo').then(res => {
-      this.setData({ batchNo: forms.nextBatchNo(res.batchNo, this.data.drafts.map(d => d.batchNo)) })
+      this.setData({ batchNo: res.batchNo })
     }).catch(() => {})
   },
   onBatchNo(e) { this.setData({ batchNo: e.detail.value }) },
@@ -232,54 +222,43 @@ Page({
       qty: d.qty, inputUnit: d.inputUnit, unitPrice: d.unitPrice, units: this.src ? this.src.units : [] }
   },
 
-  addDraft() {
+  // 提交即入库：新食材先建档，再 PostReceipt。失败时表单保留；网络类失败重试沿用同一请求号，服务端据此去重
+  submit() {
     const d = this.data
-    if (d.adding) return
+    if (d.submitting) return
     if (d.uploading > 0) { wx.showToast({ title: '照片还在上传', icon: 'none' }); return }
     const isNew = !d.material && d.canCreate
     if (isNew && !d.isManager) { wx.showToast({ title: '「' + d.nameQuery.trim() + '」还没建档，需店长入库或先建档', icon: 'none', duration: 2500 }); return }
     if (isNew && d.packed && !d.contentUnit) { wx.showToast({ title: '请选择每' + d.packName + '含量的单位', icon: 'none' }); return }
     const state = this.draftState()
-    const built = forms.buildReceipt(Object.assign(state, { requestId: requestId.newRequestId() }), d.today)
+    this.pendingRequestId = this.pendingRequestId || requestId.newRequestId()
+    const built = forms.buildReceipt(Object.assign(state, { requestId: this.pendingRequestId }), d.today)
     if (!built.ok) { wx.showToast({ title: built.error, icon: 'none', duration: 2500 }); return }
     const b = built.body
+    this.setData({ submitting: true })
     const ready = isNew
       ? api.post(this.ctx, 'FnbCatalog/SaveMaterial', catalog.materialBody(this.newMaterialEdit(), this.src.units, Date.now()))
-        .then(row => { this.src.materials.push(row); b.itemId = row.id; return row })
+        .then(row => { this.src.materials.push(row); this.setData({ material: row, canCreate: false, hints: [] }); return row })
       : Promise.resolve(state.material)
-    this.setData({ adding: true })
     ready.then(material => {
-      const qtyText = d.packed ? b.quantity + ' ' + b.packUnitName + ' × ' + units.formatQty(b.packSize, material.base_unit_code)
-        : units.trimNum(b.quantity) + ' ' + units.unitName(b.inputUnitCode)
-      const draft = { key: b.requestId, body: b, name: material.name, batchNo: b.batchNo, error: '',
-        line: qtyText + ' · ' + expiry.storageLabel(b.storageType) + ' · ' + b.expireDate + ' 到期' }
-      this.saveDrafts(this.data.drafts.concat([draft]))
-      this.setData({ adding: false, photos: [], prodDate: '', expireDate: '', shelfValue: '', qty: 1, unitPrice: '', packSize: '' })
-      this.clearMaterial()
-      this.refreshRule()
-      this.newBatchNo()
-      wx.showToast({ title: isNew ? '已建档并加入' : '已加入入库单', icon: 'success' })
-    }).catch(err => { this.setData({ adding: false }); base.fail(err) })
-  },
-  removeDraft(e) {
-    this.saveDrafts(this.data.drafts.filter(d => d.key !== e.currentTarget.dataset.key))
-  },
-
-  submit() {
-    if (this.data.submitting || !this.data.drafts.length) return
-    this.setData({ submitting: true })
-    const done = this.data.done.slice()
-    const run = this.data.drafts.reduce((p, draft) => p.then(left => {
-      return api.post(this.ctx, 'FnbInventory/PostReceipt', draft.body).then(res => {
-        done.unshift({ batchId: res.batchId, name: draft.name, batchNo: draft.batchNo, expireDate: draft.body.expireDate, line: draft.line })
-        return left
-      }).catch(err => left.concat([Object.assign({}, draft, { error: err.message || '提交失败' })]))
-    }), Promise.resolve([]))
-    run.then(left => {
-      this.saveDrafts(left)
-      this.setData({ submitting: false, done })
-      wx.showToast({ title: left.length ? left.length + ' 条未成功，可重试' : '入库完成', icon: left.length ? 'none' : 'success' })
-      this.newBatchNo()
+      b.itemId = material.id
+      return api.post(this.ctx, 'FnbInventory/PostReceipt', b).then(res => {
+        this.pendingRequestId = null
+        const qtyText = d.packed ? b.quantity + ' ' + b.packUnitName + ' × ' + units.formatQty(b.packSize, material.base_unit_code)
+          : units.trimNum(b.quantity) + ' ' + units.unitName(b.inputUnitCode)
+        const row = { batchId: res.batchId, name: material.name, batchNo: b.batchNo, expireDate: b.expireDate,
+          line: qtyText + ' · ' + expiry.storageLabel(b.storageType) + ' · ' + b.expireDate + ' 到期' }
+        this.setData({ submitting: false, done: [row].concat(this.data.done),
+          photos: [], prodDate: '', expireDate: '', shelfValue: '', qty: 1, unitPrice: '', packSize: '' })
+        this.clearMaterial()
+        this.refreshRule()
+        this.newBatchNo()
+        wx.showToast({ title: '已入库', icon: 'success' })
+      })
+    }).catch(err => {
+      if (!err.retryable) this.pendingRequestId = null
+      this.setData({ submitting: false })
+      base.fail(err)
     })
   },
 

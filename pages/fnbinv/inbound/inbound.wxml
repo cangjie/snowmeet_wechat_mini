@@ -17,7 +17,7 @@
         <input class="input" value="{{nameQuery}}" placeholder="{{sub ? '输入或选择' + sub.name + '下的食材' : '先选分类'}}" bindinput="onName" disabled="{{!sub}}" />
         <view wx:if="{{material}}" class="tag ok picked">已选：{{material.name}}</view>
         <view wx:if="{{!material && hints.length}}" class="chips wrap"><view wx:for="{{hints}}" wx:key="id" class="chip-sq" data-id="{{item.id}}" bindtap="onHint">{{item.name}}</view></view>
-        <view wx:if="{{canCreate}}" class="{{isManager ? 'rule-line' : 'warn-line'}}">{{isManager ? '新食材，加入入库单时自动建档，计量单位按下面选的单位' : '「' + nameQuery + '」还没建档，需店长入库或先在「分类」里建档'}}</view>
+        <view wx:if="{{canCreate}}" class="{{isManager ? 'rule-line' : 'warn-line'}}">{{isManager ? '新食材，提交入库时自动建档，计量单位按下面选的单位' : '「' + nameQuery + '」还没建档，需店长入库或先在「分类」里建档'}}</view>
       </view></view>
 
       <view class="step"><view class="step-no">3</view><view class="step-body">
@@ -76,19 +76,8 @@
         <view class="date-row"><text class="date-label">单价（选填）</text><input class="input grow" type="digit" value="{{unitPrice}}" placeholder="留空按 0" bindinput="onPrice" /><text class="unit-suffix">元/{{priceUnit || '单位'}}</text></view>
       </view></view>
 
-      <view class="btn primary btn-block {{adding ? 'disabled' : ''}}" bindtap="addDraft">{{adding ? '建档中…' : '加入入库单'}}</view>
+      <view class="btn primary btn-block {{submitting ? 'disabled' : ''}}" bindtap="submit">{{submitting ? '入库中…' : '提交入库'}}</view>
     </view>
-
-    <view class="fnb-section-title">今日入库单<text class="side">{{drafts.length}} 条待提交</text></view>
-    <view wx:if="{{drafts.length}}" class="card">
-      <view wx:for="{{drafts}}" wx:key="key" class="sub-row">
-        <view class="grow col"><view class="card-row"><text class="card-title small">{{item.name}}</text><text class="batch-no">{{item.batchNo}}</text></view>
-          <view class="card-meta">{{item.line}}</view><view wx:if="{{item.error}}" class="danger-line">{{item.error}}</view></view>
-        <view class="remove" data-key="{{item.key}}" bindtap="removeDraft">×</view>
-      </view>
-      <view class="card-pad"><view class="btn primary btn-block {{submitting ? 'disabled' : ''}}" bindtap="submit">{{submitting ? '提交中…' : '提交入库（' + drafts.length + ' 条）'}}</view></view>
-    </view>
-    <view wx:else class="fnb-empty small">填好上面的表单后点「加入入库单」</view>
 
     <block wx:if="{{done.length}}">
       <view class="fnb-section-title">本次已入库<text class="side">可打印标签</text></view>
