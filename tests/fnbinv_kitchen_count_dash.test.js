@@ -67,6 +67,19 @@ test('一道菜按已发布配方 × 份数算用料；没有配方或份数为 
   assert.deepEqual(kitchen.portionNeeds(r, 0), [])
 })
 
+test('将扣减用料：按配方 × 份数以常用单位带出，改过的保留；提交只发改过的项，0 表示不扣', () => {
+  const unitList = [{ code: 'g', dimension: 1, factor_to_base: 1 }, { code: 'kg', dimension: 1, factor_to_base: 1000 }, { code: 'ml', dimension: 2, factor_to_base: 1 }]
+  const materialOf = { 10: { id: 10, name: '大白菜', base_unit_code: 'g', default_input_unit_code: 'kg' }, 12: { id: 12, name: '糖浆', base_unit_code: 'ml', default_input_unit_code: 'ml' } }
+  let lines = kitchen.deductLines([{ itemId: 10, baseQty: 200 }, { itemId: 12, baseQty: 10 }], [], materialOf, unitList)
+  assert.deepEqual(lines.map(l => [l.name, l.qty, l.unitCode, l.recipeLabel, l.touched]), [['大白菜', '0.2', 'kg', '200 g', false], ['糖浆', '10', 'ml', '10 ml', false]])
+  lines[1] = Object.assign({}, lines[1], { qty: '0', touched: true })
+  lines = kitchen.deductLines([{ itemId: 10, baseQty: 300 }, { itemId: 12, baseQty: 15 }], lines, materialOf, unitList)
+  assert.deepEqual(lines.map(l => l.qty), ['0.3', '0'])
+  assert.deepEqual(kitchen.adjustments(lines, unitList), { ingredients: [{ itemId: 12, quantity: 0 }] })
+  assert.match(kitchen.adjustments([Object.assign({}, lines[0], { qty: '0', touched: true }), lines[1]], unitList).error, /至少/)
+  assert.match(kitchen.adjustments([Object.assign({}, lines[0], { qty: '', touched: true })], unitList).error, /不小于 0/)
+})
+
 test('出餐列表耗用：按实际扣减量列每种食材，欠料注明欠多少', () => {
   const unitOf = { 10: 'g', 12: 'ml' }
   assert.equal(kitchen.usedSummary([{ itemId: 10, itemName: '大白菜', actualQuantity: 1500, shortageQuantity: 0 },

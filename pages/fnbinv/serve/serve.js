@@ -1,5 +1,5 @@
 // 出餐扣减：一张厨房单一道菜（将来由外部订单自动导入，手动输入是少数情况）。菜名文本框输入、按菜品库自动提示，
-// 建单即按该菜已发布配方 × 份数扣料（FEFO，欠料不扣负）；扣料 10 分钟内本人或店长可编辑（退回原配料后按新菜品重扣）
+// 建单即按该菜已发布配方 × 份数扣料，用量可在单上微调（FEFO，欠料不扣负）；扣料 10 分钟内本人或店长可编辑（退回原配料后按新菜品重扣）
 // 或删除（配料退回原批次）。旧的「待核对 / 待出餐」厨房单仍可核对、预览、出餐或取消
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
@@ -35,8 +35,10 @@ Page({
     return Promise.all([
       api.getAll(this.ctx, 'FnbKitchen/ListOrders', { businessDate: this.data.today }),
       api.getAll(this.ctx, 'FnbCatalog/ListMaterials'),
-      api.get(this.ctx, 'FnbRecipe/ListDishes')
-    ]).then(([orders, materials, dishList]) => {
+      api.get(this.ctx, 'FnbRecipe/ListDishes'),
+      api.get(this.ctx, 'FnbCatalog/GetUnits')
+    ]).then(([orders, materials, dishList, unitList]) => {
+      this.units = unitList
       this.materialOf = {}
       this.unitOf = {}
       materials.forEach(m => { this.materialOf[m.id] = m; this.unitOf[m.id] = m.base_unit_code })
@@ -80,11 +82,11 @@ Page({
   },
   onDishHint(e) { this.pickDish(this.data.dishes.find(d => d.productId === Number(e.currentTarget.dataset.id))) },
   pickDish(dish, query) {
-    this.setData({ dish, dishQuery: query === undefined ? dish.name : query, dishHints: [] })
+    this.setData({ dish, dishQuery: query === undefined ? dish.name : query, dishHints: [], deduct: [] })
     this.refreshDeduct()
   },
   onPortions(e) { this.setData({ portions: e.detail.value }); this.refreshDeduct() },
-  // 按所选菜品的已发布配方 × 份数，预览将扣减的用料（以服务端过账为准）
+  // 按所选菜品的已发布配方 × 份数带出将扣减的用料；微调过的保留（以服务端过账为准）
   refreshDeduct() {
     const dish = this.data.dish
     if (!dish || !dish.publishedRecipeId) { this.setData({ deduct: [] }); return Promise.resolve() }
@@ -93,11 +95,12 @@ Page({
       .then(res => { this.recipes[dish.publishedRecipeId] = { output: res.recipe.output_qty, lines: res.lines }; return this.recipes[dish.publishedRecipeId] })
     return loaded.then(r => {
       if (this.data.dish !== dish) return
-      this.setData({ deduct: kitchen.portionNeeds(r, this.data.portions).map(n => {
-        const m = this.materialOf[n.itemId] || { name: '食材#' + n.itemId, base_unit_code: '' }
-        return { itemId: n.itemId, name: m.name, qtyLabel: units.formatQty(n.baseQty, m.base_unit_code) }
-      }) })
+      this.setData({ deduct: kitchen.deductLines(kitchen.portionNeeds(r, this.data.portions), this.data.deduct, this.materialOf, this.units) })
     }).catch(base.fail)
+  },
+  setDeductQty(e) {
+    const i = e.currentTarget.dataset.index
+    this.setData({ ['deduct[' + i + '].qty']: e.detail.value, ['deduct[' + i + '].touched']: true })
   },
   onTable(e) { this.setData({ tableNo: e.detail.value }) },
   onRemark(e) { this.setData({ remark: e.detail.value }) },
@@ -108,8 +111,10 @@ Page({
     if (!d.dish.publishedRecipeId) { wx.showToast({ title: '「' + d.dish.name + '」还没有已发布的配方', icon: 'none' }); return }
     const portions = Number(d.portions)
     if (!(portions > 0)) { wx.showToast({ title: '份数要大于 0', icon: 'none' }); return }
+    const tuned = kitchen.adjustments(d.deduct, this.units)
+    if (tuned.error) { wx.showToast({ title: tuned.error, icon: 'none' }); return }
     const body = { tableNo: d.tableNo.trim() || null, remark: d.remark.trim() || null,
-      lines: [{ productId: d.dish.productId, quantity: portions, remark: null }] }
+      lines: [{ productId: d.dish.productId, quantity: portions, remark: null }], ingredients: tuned.ingredients.length ? tuned.ingredients : null }
     this.setData({ creating: true })
     const editing = d.editingId
     const call = editing
@@ -145,7 +150,14 @@ Page({
     if (!dish) { wx.showToast({ title: '「' + (line ? line.item_name : '') + '」已停用，不能编辑这张单', icon: 'none' }); return }
     this.setData({ newShow: true, editingId: order.id, dish, dishQuery: dish.name, dishHints: [], portions: Number(line.quantity),
       deduct: [], tableNo: d.order.table_no || '', remark: d.order.remark || '' })
-    return this.refreshDeduct()
+    // 这单当时实际确认的用量与配方 × 份数不同的，按微调过带出（没扣的记 0）
+    const served = {}
+    d.servedNeeds.forEach(n => { served[n.itemId] = n.plannedQuantity })
+    return this.refreshDeduct().then(() => this.setData({ deduct: this.data.deduct.map(l => {
+      const planned = served[l.itemId] === undefined ? 0 : served[l.itemId]
+      if (Math.abs(planned - l.recipeQty) < 1e-6) return l
+      return Object.assign({}, l, { qty: recipe.editorLine(this.materialOf[l.itemId] || { base_unit_code: '' }, planned, this.units).qty, touched: true })
+    }) }))
   },
   onDeleteOrder(e) {
     const order = this.data.orders.find(o => o.id === e.currentTarget.dataset.id)

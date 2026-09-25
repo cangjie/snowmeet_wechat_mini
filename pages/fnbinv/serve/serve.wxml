@@ -59,9 +59,17 @@
         <view wx:if="{{!dish && dishQuery && !dishHints.length}}" class="warn-line">菜品库里没有「{{dishQuery}}」，请店长先在「配方」里建菜品</view></view>
       <view class="field"><view class="field-label">份数</view><qty-stepper value="{{portions}}" min="1" integer bind:change="onPortions" /></view>
       <block wx:if="{{dish}}">
-        <view class="fnb-section-title">将扣减<text class="side">按配方 × 份数</text></view>
+        <view class="fnb-section-title">将扣减<text class="side">按配方 × 份数带出，可微调</text></view>
         <view wx:if="{{!dish.publishedRecipeId}}" class="warn-line">「{{dish.name}}」还没有已发布的配方，先到「配方」里配好用料</view>
-        <view wx:for="{{deduct}}" wx:key="itemId" class="sub-row"><text class="grow">{{item.name}}</text><text class="batch-qty">{{item.qtyLabel}}</text></view>
+        <view wx:for="{{deduct}}" wx:key="itemId" class="deduct-row">
+          <view class="date-row">
+            <text class="line-name">{{item.name}}</text>
+            <input class="input grow" type="digit" value="{{item.qty}}" data-index="{{index}}" bindinput="setDeductQty" />
+            <text class="unit-suffix">{{item.unitLabel}}</text>
+          </view>
+          <text wx:if="{{item.touched}}" class="card-meta recipe-hint">配方 {{item.recipeLabel}}</text>
+        </view>
+        <view wx:if="{{deduct.length}}" class="card-meta">填 0 表示这单不用这一项</view>
       </block>
       <view class="field"><view class="field-label">桌号 / 取餐方式</view><input class="input" value="{{tableNo}}" placeholder="如：A3 桌、外卖打包" bindinput="onTable" /></view>
       <view class="field"><view class="field-label">备注</view><input class="input" value="{{remark}}" placeholder="如：不要葱，辣度小辣" bindinput="onRemark" /></view>

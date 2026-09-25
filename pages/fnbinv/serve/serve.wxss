@@ -9,3 +9,8 @@
 .chips.wrap { flex-wrap: wrap; white-space: normal; }
 .picked { align-self: flex-start; }
 .used-line { font-size: 22rpx; color: var(--muted); line-height: 1.5; }
+/* 将扣减：按配方带出，可微调用量 */
+.date-row { display: flex; align-items: center; gap: 14rpx; }
+.line-name { flex: none; width: 220rpx; font-size: 26rpx; font-weight: 600; }
+.deduct-row { display: flex; flex-direction: column; gap: 6rpx; }
+.recipe-hint { padding-left: 234rpx; }

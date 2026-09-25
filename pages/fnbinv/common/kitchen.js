@@ -1,11 +1,31 @@
-// 厨房单展示：状态、菜品摘要、出餐扣料需求、列表耗用；建单时按配方预览将扣减的用料
+// 厨房单展示：状态、菜品摘要、出餐扣料需求、列表耗用；建单时按配方带出将扣减的用料，可微调
 const units = require('./units.js')
+const recipe = require('./recipe.js')
 
 // 一张厨房单一道菜：按已发布配方 × 份数算用料（基本单位）。recipe：{ output, lines: [{ item_id, quantity }] }
 function portionNeeds(recipe, portions) {
   const n = Number(portions) || 0
   if (!recipe || !(n > 0)) return []
   return recipe.lines.map(l => ({ itemId: l.item_id, baseQty: Math.round(l.quantity * n / (recipe.output || 1) * 1e6) / 1e6 }))
+}
+
+// 将扣减的用料行（按常用单位显示，可微调）：改过的（touched）保留原值，其余按配方 × 份数
+function deductLines(needs, prev, materialOf, unitList) {
+  const old = {}
+  ;(prev || []).forEach(l => { old[l.itemId] = l })
+  return needs.map(n => {
+    const m = materialOf[n.itemId] || { id: n.itemId, name: '食材#' + n.itemId, base_unit_code: '', default_input_unit_code: '' }
+    const line = Object.assign(recipe.editorLine(m, n.baseQty, unitList), { recipeQty: n.baseQty, recipeLabel: units.formatQty(n.baseQty, m.base_unit_code) })
+    const hit = old[n.itemId]
+    return Object.assign(line, hit && hit.touched ? { qty: hit.qty, touched: true } : { touched: false })
+  })
+}
+
+// 微调过的用料 → CreateAndServe / UpdateServedOrder 的 ingredients（基本单位；0 表示这单不扣这一项）；没改的按配方
+function adjustments(lines, unitList) {
+  if ((lines || []).some(l => l.qty === '' || isNaN(Number(l.qty)) || Number(l.qty) < 0)) return { error: '用量要填不小于 0 的数' }
+  if (lines.length && lines.every(l => Number(l.qty) === 0)) return { error: '至少要扣一种配料' }
+  return { ingredients: lines.filter(l => l.touched).map(l => ({ itemId: l.itemId, quantity: units.toBase(l.qty, l.unitCode, unitList) })) }
 }
 
 function orderStatus(order, served) {
@@ -54,4 +74,4 @@ function sortOrders(rows) {
   })
 }
 
-module.exports = { orderStatus, lineSummary, needRows, usedSummary, localTime, sortOrders, portionNeeds }
+module.exports = { orderStatus, lineSummary, needRows, usedSummary, localTime, sortOrders, portionNeeds, deductLines, adjustments }

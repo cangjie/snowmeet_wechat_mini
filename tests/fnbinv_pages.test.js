@@ -174,17 +174,22 @@ test('出餐页：一单一道菜，菜名输入按菜品库提示，预览配�
   page.onDishInput({ detail: { value: '酸菜白肉锅' } })
   await settle()
   assert.equal(page.data.dish.productId, 7, '输入完整菜名直接选中')
-  // 假后端配方：每 10 份用大白菜 1000 g → 1 份 100 g
-  assert.deepEqual(page.data.deduct.map(d => [d.name, d.qtyLabel]), [['大白菜', '100 g']])
+  // 假后端配方：每 10 份用大白菜 1000 g → 1 份 100 g，按常用单位 kg 显示
+  assert.deepEqual(page.data.deduct.map(d => [d.name, d.qty, d.unitCode, d.touched]), [['大白菜', '0.1', 'kg', false]])
   page.onPortions({ detail: { value: 2 } })
   await settle()
-  assert.deepEqual(page.data.deduct.map(d => d.qtyLabel), ['200 g'])
+  assert.deepEqual(page.data.deduct.map(d => d.qty), ['0.2'])
+  // 微调用量后再改份数：改过的保留，并注明配方原用量
+  page.setDeductQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.15' } })
+  page.onPortions({ detail: { value: 3 } })
+  await settle()
+  assert.deepEqual(page.data.deduct.map(d => [d.qty, d.touched, d.recipeLabel]), [['0.15', true, '300 g']])
   page.onTable({ detail: { value: 'A3' } })
   page.createOrder()
   await settle()
   const created = calls.find(c => c.path === 'FnbKitchen/CreateAndServe').data
-  assert.deepEqual({ tableNo: created.tableNo, remark: created.remark, lines: created.lines },
-    { tableNo: 'A3', remark: null, lines: [{ productId: 7, quantity: 2, remark: null }] })
+  assert.deepEqual({ tableNo: created.tableNo, remark: created.remark, lines: created.lines, ingredients: created.ingredients },
+    { tableNo: 'A3', remark: null, lines: [{ productId: 7, quantity: 3, remark: null }], ingredients: [{ itemId: 10, quantity: 150 }] })
   assert.ok(created.requestId)
   assert.equal(page.data.newShow, false)
 })
@@ -235,22 +240,24 @@ test('出餐页：扣料 10 分钟内可编辑，带出原菜品、份数、桌�
   installFakes(MANAGER)
   const saved = RESPONSES['FnbKitchen/GetOrder']
   RESPONSES['FnbKitchen/GetOrder'] = Object.assign({}, saved, { served: true, changeSecondsLeft: 300,
-    servedNeeds: [{ itemId: 10, itemName: '大白菜', plannedQuantity: 200, actualQuantity: 200, shortageQuantity: 0 }] })
+    servedNeeds: [{ itemId: 10, itemName: '大白菜', plannedQuantity: 180, actualQuantity: 180, shortageQuantity: 0 }] })
   try {
     const page = loadPage('serve')
     page.onLoad({})
     await settle()
     page.onEditOrder({ currentTarget: { dataset: { id: '5' } } })
     await settle()
+    // 当时微调成 180 g（配方 2 份是 200 g），编辑时按微调过带出
     assert.deepEqual({ editingId: page.data.editingId, dish: page.data.dish.productId, dishQuery: page.data.dishQuery, portions: page.data.portions,
-      tableNo: page.data.tableNo, remark: page.data.remark, deduct: page.data.deduct.map(d => d.qtyLabel) },
-    { editingId: '5', dish: 7, dishQuery: '酸菜白肉锅', portions: 2, tableNo: 'A3', remark: '少盐', deduct: ['200 g'] })
+      tableNo: page.data.tableNo, remark: page.data.remark, deduct: page.data.deduct.map(d => [d.qty, d.touched]) },
+    { editingId: '5', dish: 7, dishQuery: '酸菜白肉锅', portions: 2, tableNo: 'A3', remark: '少盐', deduct: [['0.18', true]] })
     page.onPortions({ detail: { value: 3 } })
+    await settle()
     page.createOrder()
     await settle()
     assert.equal(calls.filter(c => c.path === 'FnbKitchen/CreateAndServe').length, 0)
     assert.deepEqual(calls.find(c => c.path === 'FnbKitchen/UpdateServedOrder').data,
-      { shopId: 12, orderId: '5', tableNo: 'A3', remark: '少盐', lines: [{ productId: 7, quantity: 3, remark: null }] })
+      { shopId: 12, orderId: '5', tableNo: 'A3', remark: '少盐', lines: [{ productId: 7, quantity: 3, remark: null }], ingredients: [{ itemId: 10, quantity: 180 }] })
     assert.deepEqual({ newShow: page.data.newShow, editingId: page.data.editingId }, { newShow: false, editingId: '' })
   } finally {
     RESPONSES['FnbKitchen/GetOrder'] = saved
