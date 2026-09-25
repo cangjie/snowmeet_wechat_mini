@@ -16,3 +16,4 @@
 .pick-list { max-height: 40vh; }
 .link { font-size: 22rpx; color: var(--faint); text-align: center; }
 .no-recipe { align-self: flex-start; }
+.used-line { font-size: 22rpx; color: var(--muted); line-height: 1.5; }

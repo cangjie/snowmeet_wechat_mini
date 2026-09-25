@@ -9,6 +9,7 @@
         <view class="grow col">
           <view class="card-row"><text class="order-no">{{item.displayNo}}</text><text wx:if="{{item.table}}" class="tag">{{item.table}}</text><text class="card-meta">{{item.time}}</text></view>
           <view class="dish-line">{{item.summary}}</view>
+          <view wx:if="{{item.usedLine}}" class="used-line">耗用 · {{item.usedLine}}</view>
           <view wx:if="{{item.remark}}" class="remark">备注 · {{item.remark}}</view>
         </view>
         <view class="tag {{item.status.tone}}">{{item.status.text}}</view>

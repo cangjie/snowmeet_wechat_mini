@@ -53,7 +53,7 @@ Page({
         id: d.order.id, displayNo: d.order.display_no, table: d.order.table_no || '', time: kitchen.localTime(d.order.ordered_at),
         remark: d.order.remark || '', status: kitchen.orderStatus(d.order, d.served), summary: kitchen.lineSummary(d.lines),
         lines: d.lines.map(l => ({ id: l.id, name: l.item_name, qty: units.trimNum(l.quantity), remark: l.remark || '' })),
-        used: kitchen.needRows(d.servedNeeds, this.unitOf),
+        used: kitchen.needRows(d.servedNeeds, this.unitOf), usedLine: kitchen.usedSummary(d.servedNeeds, this.unitOf),
         changeUntil: d.changeSecondsLeft > 0 ? now + d.changeSecondsLeft * 1000 : 0, canChange: d.changeSecondsLeft > 0
       }))
       this.setData({ loading: false, orders })

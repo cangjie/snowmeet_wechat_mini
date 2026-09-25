@@ -88,3 +88,10 @@ test('建单配料：换算为基本单位；空表或用量为 0 时拦下', ()
   assert.match(kitchen.ingredientBody([], KUNITS).error, /至少/)
   assert.match(kitchen.ingredientBody([{ itemId: 10, qty: '0', unitCode: 'kg' }], KUNITS).error, /大于 0/)
 })
+
+test('出餐列表耗用：按实际扣减量列每种食材，欠料注明欠多少', () => {
+  const unitOf = { 10: 'g', 12: 'ml' }
+  assert.equal(kitchen.usedSummary([{ itemId: 10, itemName: '大白菜', actualQuantity: 1500, shortageQuantity: 0 },
+    { itemId: 12, itemName: '番茄酱', actualQuantity: 20, shortageQuantity: 10 }], unitOf), '大白菜 1.5 kg、番茄酱 20 ml（欠 10 ml）')
+  assert.equal(kitchen.usedSummary([], unitOf), '')
+})

@@ -57,6 +57,14 @@ function needRows(needs, unitOf) {
   })
 }
 
+// 列表卡片上的一行耗用：按实际扣减量列出每种食材，欠料的注明欠多少
+function usedSummary(needs, unitOf) {
+  return (needs || []).map(n => {
+    const unit = unitOf[n.itemId] || ''
+    return n.itemName + ' ' + units.formatQty(n.actualQuantity, unit) + (n.shortageQuantity > 0 ? '（欠 ' + units.formatQty(n.shortageQuantity, unit) + '）' : '')
+  }).join('、')
+}
+
 // 审计时间按 UTC 存，EF 输出不带 Z：一律按 UTC 解析再换北京时间
 function localTime(iso) {
   const text = String(iso || '')
@@ -75,4 +83,4 @@ function sortOrders(rows) {
   })
 }
 
-module.exports = { orderStatus, lineSummary, needRows, localTime, sortOrders, dishNeeds, mergeIngredients, ingredientBody }
+module.exports = { orderStatus, lineSummary, needRows, usedSummary, localTime, sortOrders, dishNeeds, mergeIngredients, ingredientBody }

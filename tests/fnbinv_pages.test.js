@@ -199,6 +199,7 @@ test('出餐页：扣料 10 分钟内的厨房单显示已扣配料，可删除�
     assert.equal(order.status.text, '已出餐')
     assert.deepEqual({ canChange: order.canChange, used: order.used.map(u => [u.planned, u.actual, u.shortLabel]) },
       { canChange: true, used: [['300 g', '200 g', '欠 100 g']] })
+    assert.equal(order.usedLine, '大白菜 200 g（欠 100 g）', '列表卡片直接列出耗用')
     page.onDeleteOrder({ currentTarget: { dataset: { id: '5' } } })
     await settle()
     assert.deepEqual(calls.filter(c => c.path === 'FnbKitchen/DeleteServedOrder').map(c => c.data), [{ shopId: 12, orderId: '5' }])
