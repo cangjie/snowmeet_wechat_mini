@@ -15,8 +15,15 @@ function linesView(lines, materials) {
   })
 }
 
+// 配方用量都不大：食材常用单位是千克、升的，用料按克、毫升填（单位表里有才换）
+function lineUnitCode(material, unitList) {
+  const code = material.default_input_unit_code || material.base_unit_code
+  const small = { kg: 'g', l: 'ml' }[code]
+  return small && (unitList || []).some(u => u.code === small) ? small : code
+}
+
 function editorLine(material, baseQty, unitList) {
-  const unitCode = material.default_input_unit_code || material.base_unit_code
+  const unitCode = lineUnitCode(material, unitList)
   return { itemId: material.id, name: material.name, qty: baseQty === null ? '' : String(units.fromBase(baseQty, unitCode, unitList)),
     unitCode, unitLabel: units.unitName(unitCode) }
 }
@@ -87,4 +94,4 @@ function prepNeeds(lines, factor, availableByItem, materials) {
   return { rows, ok: rows.length > 0 && rows.every(r => !r.short) }
 }
 
-module.exports = { linesView, editorLine, editorLines, perUnitCode, draftBody, dishMeta, dishStatus, latestFor, prepNeeds }
+module.exports = { linesView, lineUnitCode, editorLine, editorLines, perUnitCode, draftBody, dishMeta, dishStatus, latestFor, prepNeeds }

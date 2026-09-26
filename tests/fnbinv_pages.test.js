@@ -175,15 +175,15 @@ test('出餐页：一单一道菜，菜名输入按菜品库提示，预览配�
   await settle()
   assert.equal(page.data.dish.productId, 7, '输入完整菜名直接选中')
   // 假后端配方：每 10 份用大白菜 1000 g → 1 份 100 g，按常用单位 kg 显示
-  assert.deepEqual(page.data.deduct.map(d => [d.name, d.qty, d.unitCode, d.touched]), [['大白菜', '0.1', 'kg', false]])
+  assert.deepEqual(page.data.deduct.map(d => [d.name, d.qty, d.unitCode, d.touched]), [['大白菜', '100', 'g', false]])
   page.onPortions({ detail: { value: 2 } })
   await settle()
-  assert.deepEqual(page.data.deduct.map(d => d.qty), ['0.2'])
+  assert.deepEqual(page.data.deduct.map(d => d.qty), ['200'])
   // 微调用量后再改份数：改过的保留，并注明配方原用量
-  page.setDeductQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.15' } })
+  page.setDeductQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '150' } })
   page.onPortions({ detail: { value: 3 } })
   await settle()
-  assert.deepEqual(page.data.deduct.map(d => [d.qty, d.touched, d.recipeLabel]), [['0.15', true, '300 g']])
+  assert.deepEqual(page.data.deduct.map(d => [d.qty, d.touched, d.recipeLabel]), [['150', true, '300 g']])
   page.onTable({ detail: { value: 'A3' } })
   page.createOrder()
   await settle()
@@ -250,7 +250,7 @@ test('出餐页：扣料 10 分钟内可编辑，带出原菜品、份数、桌�
     // 当时微调成 180 g（配方 2 份是 200 g），编辑时按微调过带出
     assert.deepEqual({ editingId: page.data.editingId, dish: page.data.dish.productId, dishQuery: page.data.dishQuery, portions: page.data.portions,
       tableNo: page.data.tableNo, remark: page.data.remark, deduct: page.data.deduct.map(d => [d.qty, d.touched]) },
-    { editingId: '5', dish: 7, dishQuery: '酸菜白肉锅', portions: 2, tableNo: 'A3', remark: '少盐', deduct: [['0.18', true]] })
+    { editingId: '5', dish: 7, dishQuery: '酸菜白肉锅', portions: 2, tableNo: 'A3', remark: '少盐', deduct: [['180', true]] })
     page.onPortions({ detail: { value: 3 } })
     await settle()
     page.createOrder()
@@ -291,7 +291,7 @@ test('出餐页：建单前逐项提示库存，缺的是没开封的整包可�
     assert.deepEqual([page.data.deduct[0].availLabel, page.data.deduct[0].short], ['可用 650 g', false])
 
     // 微调到 1 kg 又不够：先确认，取消就不建单，确认才建单
-    page.setDeductQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '1' } })
+    page.setDeductQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '1000' } })
     assert.equal(page.data.deduct[0].shortLabel, '欠 350 g')
     const modals = []
     let answer = false
@@ -414,7 +414,7 @@ test('配方页：新建菜品只填名称和用料，先建菜品再存用料�
   assert.equal(posted('FnbRecipe/SaveDish').length, 0, '没有用料不建菜品')
   page.openPicker()
   page.onPick({ currentTarget: { dataset: { id: 10 } } })
-  page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.2' } })
+  page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '200' } })
   page.onPublish()
   await settle()
   assert.deepEqual(posted('FnbRecipe/SaveDish'), [{ shopId: 12, id: 0, name: '榛果饮', valid: true }])
@@ -444,8 +444,8 @@ test('配方页：编辑已发布配方 → 存新草稿 → 用返回的 rowVer
   await settle()
   page.editRecipe({ currentTarget: { dataset: { key: 'd7' } } })
   await settle()
-  assert.equal(page.data.editor.lines[0].qty, '1')
-  page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.4' } })
+  assert.equal(page.data.editor.lines[0].qty, '1000')
+  page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '400' } })
   page.onPublish()
   await settle()
   const draft = calls.find(c => c.path === 'FnbRecipe/SaveRecipeDraft')
@@ -472,7 +472,7 @@ test('配方页：新建半成品先建半成品食材（所选半成品分类�
     page.setEditorName({ detail: { value: 'Pizza面团' } })
     page.openPicker()
     page.onPick({ currentTarget: { dataset: { id: 10 } } })
-    page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.6' } })
+    page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '600' } })
     page.onPublish()
     await settle()
     await settle()
@@ -498,7 +498,7 @@ test('配方页：早先按每批 10 个存的半成品配方，编辑时换成�
   assert.equal(page.data.preps[0].yieldLabel, '每 10 个的用量')
   page.editRecipe({ currentTarget: { dataset: { key: 'p11' } } })
   await settle()
-  assert.deepEqual([page.data.editor.outputUnitLabel, page.data.editor.lines[0].qty], ['个', '0.1'])
+  assert.deepEqual([page.data.editor.outputUnitLabel, page.data.editor.lines[0].qty], ['个', '100'])
   page.onPublish()
   await settle()
   const draft = calls.find(c => c.path === 'FnbRecipe/SaveRecipeDraft').data

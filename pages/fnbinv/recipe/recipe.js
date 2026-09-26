@@ -168,7 +168,7 @@ Page({
   filterPick(q) {
     const used = new Set(this.data.editor.lines.map(l => l.itemId).concat([this.data.editor.outputItemId]))
     this.setData({ pickList: this.src.materials.filter(m => !used.has(m.id) && (!q || m.name.indexOf(q) >= 0)).slice(0, 60)
-      .map(m => ({ id: m.id, name: m.name, unit: units.unitName(m.default_input_unit_code || m.base_unit_code), prepared: m.item_type === 'prepared' })) })
+      .map(m => ({ id: m.id, name: m.name, unit: units.unitName(recipe.lineUnitCode(m, this.src.units)), prepared: m.item_type === 'prepared' })) })
   },
   onPick(e) {
     const m = this.src.materials.find(x => x.id === Number(e.currentTarget.dataset.id))

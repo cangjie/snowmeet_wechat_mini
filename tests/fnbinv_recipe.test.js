@@ -17,7 +17,7 @@ test('配方行展示：名称 + 基本单位换算后的用量', () => {
 
 test('编辑态按录入单位显示，提交时换回基本单位', () => {
   const lines = recipe.editorLines([{ item_id: 1, quantity: 400 }, { item_id: 2, quantity: 20 }], materials, UNITS)
-  assert.deepEqual(lines[0], { itemId: 1, name: '大白菜', qty: '0.4', unitCode: 'kg', unitLabel: 'kg' })
+  assert.deepEqual(lines[0], { itemId: 1, name: '大白菜', qty: '400', unitCode: 'g', unitLabel: 'g' })
   const body = recipe.draftBody({ id: '12', rowVersion: 'rv', kind: 'dish', dishSpecId: 5, lines }, UNITS)
   assert.deepEqual(body.body, { id: '12', recipeType: 'dish', dishSpecId: 5, outputItemId: null, outputQty: 1, remark: null, rowVersion: 'rv',
     lines: [{ itemId: 1, quantity: 400, sort: 1, remark: null }, { itemId: 2, quantity: 20, sort: 2, remark: null }] })
@@ -25,7 +25,7 @@ test('编辑态按录入单位显示，提交时换回基本单位', () => {
 
 test('半成品配方：用量按每 1 单位填，不用填产出量（固定存 1 单位）；用料不能包含产出本身', () => {
   const ok = recipe.draftBody({ id: 0, kind: 'prep', outputItemId: 3, outputUnit: 'piece',
-    lines: [{ itemId: 1, qty: '0.18', unitCode: 'kg' }] }, UNITS)
+    lines: [{ itemId: 1, qty: '180', unitCode: 'g' }] }, UNITS)
   assert.equal(ok.body.recipeType, 'prep')
   assert.equal(ok.body.outputQty, 1)
   assert.equal(ok.body.dishSpecId, null)
@@ -36,7 +36,7 @@ test('半成品配方：用量按每 1 单位填，不用填产出量（固定�
 
 test('早先按整批存的半成品配方，编辑时换成每 1 单位的用量；克、毫升按千克、升计', () => {
   const lines = recipe.editorLines([{ item_id: 1, quantity: 1800 }], materials, UNITS, 1 / 10)
-  assert.equal(lines[0].qty, '0.18')
+  assert.equal(lines[0].qty, '180')
   assert.equal(recipe.perUnitCode('g', UNITS), 'kg')
   assert.equal(recipe.perUnitCode('ml', UNITS), 'ml', '单位表里没有升就不换')
   assert.equal(recipe.perUnitCode('piece', UNITS), 'piece')
