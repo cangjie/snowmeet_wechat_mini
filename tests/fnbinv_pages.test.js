@@ -422,6 +422,11 @@ test('制作页：原料不够而且有整包没开封，可直接开封，开�
     const opened = calls.find(c => c.path === 'FnbInventory/PostOpen').data
     assert.deepEqual([opened.parentBatchId, opened.packCount], [101, 1])
     assert.deepEqual([page.data.needs[0].stockLabel, page.data.needs[0].short, page.data.canMake], ['可用 1 kg', false, true])
+    // 照片选填：不拍照也能制作
+    page.onExpire({ detail: { date: '2099-01-01' } })
+    page.onMake()
+    await settle()
+    assert.deepEqual(calls.find(c => c.path === 'FnbInventory/PostPreparation').data.imageIds, [])
   } finally {
     delete RESPONSES['FnbKitchen/GetDeductStock']
   }

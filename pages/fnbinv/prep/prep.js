@@ -126,8 +126,7 @@ Page({
     if (d.making) return
     if (!d.canMake) { wx.showToast({ title: '原料可用量不足，需先开封或补货', icon: 'none' }); return }
     if (d.uploading > 0) { wx.showToast({ title: '照片还在上传', icon: 'none' }); return }
-    const photos = d.photos.filter(p => p.id)
-    if (!photos.length) { wx.showToast({ title: '请给产出批次拍照', icon: 'none' }); return }
+    const photos = d.photos.filter(p => p.id)  // 照片选填
     if (!d.expireDate || d.expireDate < d.today) { wx.showToast({ title: '请选择不早于今天的到期日期', icon: 'none' }); return }
     if (!d.batchNo) { wx.showToast({ title: '请填写批次号', icon: 'none' }); return }
     const card = this.card()

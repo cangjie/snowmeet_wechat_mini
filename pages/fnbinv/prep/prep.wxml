@@ -28,7 +28,7 @@
         <view class="field"><view class="field-label">到期日期<text class="hint">{{expireHint}}</text></view>
           <date-range-picker mode="single" allow-future date="{{expireDate}}" placeholder="选择到期日期" bind:change="onExpire" /></view>
         <view class="field"><view class="field-label">批次号</view><view class="input-row"><input class="input" value="{{batchNo}}" bindinput="onBatchNo" /><view class="btn" bindtap="newBatchNo">重新生成</view></view></view>
-        <view class="field"><view class="field-label">产出照片<text class="hint">必填</text></view><photo-field photos="{{photos}}" bind:change="onPhotos" /></view>
+        <view class="field"><view class="field-label">产出照片<text class="hint">选填</text></view><photo-field photos="{{photos}}" bind:change="onPhotos" /></view>
         <view class="btn primary btn-block {{canMake && !making ? '' : 'disabled'}}" bindtap="onMake">{{making ? '制作中…' : '确认制作并核销原料'}}</view>
       </view>
     </view>
