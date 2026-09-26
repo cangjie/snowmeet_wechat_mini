@@ -2,14 +2,14 @@
   <view class="fnb-head"><view class="fnb-sub">制作即核销原料，产出入库</view><view class="fnb-date">{{todayLabel}}</view></view>
   <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
   <block wx:else>
-    <view class="fnb-note">半成品也是食材：<text class="em">制作一次即核销原料</text>，产出按自己的保质期入库，之后可以直接用在菜品配方里。</view>
+    <view class="fnb-note">半成品也是食材：填这次做了多少，<text class="em">按配方比例核销原料</text>，产出按自己的保质期入库，之后可以直接用在菜品配方里。</view>
     <view wx:for="{{cards}}" wx:key="id" class="card">
       <view class="card-pad card-row" data-id="{{item.id}}" bindtap="onToggle">
         <view class="grow col"><view class="card-title">{{item.name}}</view><view class="card-meta">{{item.meta}}</view></view>
         <view class="caret">{{openId === item.id ? '⌃' : '⌄'}}</view>
       </view>
       <view wx:if="{{openId === item.id}}" class="sub-list make">
-        <view class="card-row"><text class="grow field-label">制作批数</text><qty-stepper value="{{n}}" min="1" integer bind:change="onN" /></view>
+        <view class="card-row"><text class="grow field-label">产出数量（{{item.unitLabel}}）</text><qty-stepper value="{{outQty}}" min="{{item.integer ? 1 : 0.01}}" integer="{{item.integer}}" bind:change="onOutQty" /></view>
         <view class="card-meta">产出 <text class="em">{{outLabel}}</text></view>
         <view class="needs">
           <view wx:for="{{needs}}" wx:for-item="r" wx:key="itemId" class="need-row">

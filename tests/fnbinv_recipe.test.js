@@ -23,15 +23,23 @@ test('编辑态按录入单位显示，提交时换回基本单位', () => {
     lines: [{ itemId: 1, quantity: 400, sort: 1, remark: null }, { itemId: 2, quantity: 20, sort: 2, remark: null }] })
 })
 
-test('半成品配方：产出量按产出食材单位，用料不能包含产出本身', () => {
-  const ok = recipe.draftBody({ id: 0, kind: 'prep', outputItemId: 3, outputQty: '10', outputUnit: 'piece',
-    lines: [{ itemId: 1, qty: '1.8', unitCode: 'kg' }] }, UNITS)
+test('半成品配方：用量按每 1 单位填，不用填产出量（固定存 1 单位）；用料不能包含产出本身', () => {
+  const ok = recipe.draftBody({ id: 0, kind: 'prep', outputItemId: 3, outputUnit: 'piece',
+    lines: [{ itemId: 1, qty: '0.18', unitCode: 'kg' }] }, UNITS)
   assert.equal(ok.body.recipeType, 'prep')
-  assert.equal(ok.body.outputQty, 10)
+  assert.equal(ok.body.outputQty, 1)
   assert.equal(ok.body.dishSpecId, null)
-  assert.equal(ok.body.lines[0].quantity, 1800)
-  assert.match(recipe.draftBody({ id: 0, kind: 'prep', outputItemId: 3, outputQty: '10', outputUnit: 'piece', lines: [{ itemId: 3, qty: '1', unitCode: 'piece' }] }, UNITS).error, /产出/)
-  assert.match(recipe.draftBody({ id: 0, kind: 'prep', outputItemId: 3, outputQty: '', outputUnit: 'piece', lines: [{ itemId: 1, qty: '1', unitCode: 'kg' }] }, UNITS).error, /产出量/)
+  assert.equal(ok.body.lines[0].quantity, 180)
+  assert.equal(recipe.draftBody({ id: 0, kind: 'prep', outputItemId: 3, outputUnit: 'kg', lines: [{ itemId: 1, qty: '0.6', unitCode: 'kg' }] }, UNITS).body.outputQty, 1000)
+  assert.match(recipe.draftBody({ id: 0, kind: 'prep', outputItemId: 3, outputUnit: 'piece', lines: [{ itemId: 3, qty: '1', unitCode: 'piece' }] }, UNITS).error, /产出/)
+})
+
+test('早先按整批存的半成品配方，编辑时换成每 1 单位的用量；克、毫升按千克、升计', () => {
+  const lines = recipe.editorLines([{ item_id: 1, quantity: 1800 }], materials, UNITS, 1 / 10)
+  assert.equal(lines[0].qty, '0.18')
+  assert.equal(recipe.perUnitCode('g', UNITS), 'kg')
+  assert.equal(recipe.perUnitCode('ml', UNITS), 'ml', '单位表里没有升就不换')
+  assert.equal(recipe.perUnitCode('piece', UNITS), 'piece')
 })
 
 test('配方校验：至少一行、用量大于 0、同一食材不重复', () => {
@@ -52,7 +60,7 @@ test('半成品配方取最新发布版与最新草稿', () => {
   assert.deepEqual({ published: picked.published.id, draft: picked.draft.id }, { published: '2', draft: '4' })
 })
 
-test('制作预估：用量 × 批数 对比可用量，不足则整单不可制作', () => {
+test('制作预估：配方用量 × 倍数（实际产出 ÷ 配方产出）对比可用量，不足则整单不可制作', () => {
   const lines = [{ item_id: 1, quantity: 1800 }, { item_id: 2, quantity: 600 }]
   const stock = { 1: 5000, 2: 400 }
   const r = recipe.prepNeeds(lines, 2, stock, materials)

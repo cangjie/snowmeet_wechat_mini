@@ -375,18 +375,20 @@ test('销毁清单：店长确认销毁按过期原因整批报损', async () =>
   assert.deepEqual({ batchId: waste.data.batchId, quantity: waste.data.quantity, reasonCode: waste.data.reasonCode }, { batchId: 100, quantity: 5000, reasonCode: 'expiry' })
 })
 
-test('制作页：原料不足不能制作；1 批面团按配方产出量过账，带照片和到期日', async () => {
+test('制作页：填实际产出数量按配方比例算原料，不足不能制作；按产出量过账，带照片和到期日', async () => {
   installFakes(MANAGER)
   const page = loadPage('prep')
   page.onLoad({})
   await settle()
   page.onToggle({ currentTarget: { dataset: { id: 11 } } })
   await settle()
-  page.onN({ detail: { value: 6 } })
+  assert.equal(page.data.outQty, 10, '默认一份配方的产出')
+  page.onOutQty({ detail: { value: 60 } })
+  assert.equal(page.data.needs[0].needLabel, '6 kg')
   page.onExpire({ detail: { date: '2099-01-01' } })
   page.onPhotos({ detail: { photos: [{ id: 5 }], uploading: 0 } })
   assert.equal(page.data.canMake, false)
-  page.onN({ detail: { value: 1 } })
+  page.onOutQty({ detail: { value: 10 } })
   assert.equal(page.data.canMake, true)
   page.onMake()
   await settle()
@@ -452,7 +454,7 @@ test('配方页：编辑已发布配方 → 存新草稿 → 用返回的 rowVer
   assert.deepEqual({ recipeId: publish.data.recipeId, rowVersion: publish.data.rowVersion }, { recipeId: '21', rowVersion: 'RV21' })
 })
 
-test('配方页：新建半成品先建半成品食材（所选半成品分类），再按每次产出存配方并发布', async () => {
+test('配方页：新建半成品先建半成品食材（所选半成品分类），再按每 1 千克的用量存配方并发布，不填产出量', async () => {
   installFakes(MANAGER)
   const savedCats = RESPONSES['FnbCatalog/ListCategories']
   const savedMat = RESPONSES['FnbCatalog/SaveMaterial']
@@ -468,10 +470,9 @@ test('配方页：新建半成品先建半成品食材（所选半成品分类�
     page.newPrep()
     assert.deepEqual([page.data.editor.kind, page.data.editor.isNew, page.data.editor.categoryId, page.data.editor.outputUnit], ['prep', true, 61, 'kg'])
     page.setEditorName({ detail: { value: 'Pizza面团' } })
-    page.setOutputQty({ detail: { value: '5' } })
     page.openPicker()
     page.onPick({ currentTarget: { dataset: { id: 10 } } })
-    page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '3' } })
+    page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '0.6' } })
     page.onPublish()
     await settle()
     await settle()
@@ -480,13 +481,29 @@ test('配方页：新建半成品先建半成品食材（所选半成品分类�
       { id: 0, name: 'Pizza面团', categoryId: 61, baseUnitCode: 'g', defaultInputUnitCode: 'kg' })
     const draft = calls.find(c => c.path === 'FnbRecipe/SaveRecipeDraft').data
     assert.deepEqual({ recipeType: draft.recipeType, outputItemId: draft.outputItemId, outputQty: draft.outputQty, lines: draft.lines },
-      { recipeType: 'prep', outputItemId: 30, outputQty: 5000, lines: [{ itemId: 10, quantity: 3000, sort: 1, remark: null }] })
+      { recipeType: 'prep', outputItemId: 30, outputQty: 1000, lines: [{ itemId: 10, quantity: 600, sort: 1, remark: null }] })
     assert.ok(calls.some(c => c.path === 'FnbRecipe/PublishRecipe'))
     assert.equal(page.data.editShow, false)
   } finally {
     RESPONSES['FnbCatalog/ListCategories'] = savedCats
     RESPONSES['FnbCatalog/SaveMaterial'] = savedMat
   }
+})
+
+test('配方页：早先按每批 10 个存的半成品配方，编辑时换成每 1 个的用量，重新发布只存 1 个', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('recipe')
+  page.onLoad({})
+  await settle()
+  assert.equal(page.data.preps[0].yieldLabel, '每 10 个的用量')
+  page.editRecipe({ currentTarget: { dataset: { key: 'p11' } } })
+  await settle()
+  assert.deepEqual([page.data.editor.outputUnitLabel, page.data.editor.lines[0].qty], ['个', '0.1'])
+  page.onPublish()
+  await settle()
+  const draft = calls.find(c => c.path === 'FnbRecipe/SaveRecipeDraft').data
+  assert.deepEqual({ outputItemId: draft.outputItemId, outputQty: draft.outputQty, lines: draft.lines },
+    { outputItemId: 11, outputQty: 1, lines: [{ itemId: 10, quantity: 100, sort: 1, remark: null }] })
 })
 
 test('配方页：还没有半成品分类时，新建半成品提示先去分类页', async () => {

@@ -21,10 +21,18 @@ function editorLine(material, baseQty, unitList) {
     unitCode, unitLabel: units.unitName(unitCode) }
 }
 
-function editorLines(lines, materials, unitList) {
+// scale：按比例换算用量（早先按整批产出存的半成品配方，编辑时换成每 1 单位的用量）
+function editorLines(lines, materials, unitList, scale) {
   const map = byId(materials)
+  const k = scale > 0 ? scale : 1
   return (lines || []).slice().sort((a, b) => (a.sort || 0) - (b.sort || 0))
-    .filter(l => map[l.item_id]).map(l => editorLine(map[l.item_id], l.quantity, unitList))
+    .filter(l => map[l.item_id]).map(l => editorLine(map[l.item_id], Math.round(l.quantity * k * 1e6) / 1e6, unitList))
+}
+
+// 半成品配方按「每 1 单位」填用量：克、毫升太小，换成千克、升（单位表里有才换）
+function perUnitCode(code, unitList) {
+  const big = { g: 'kg', ml: 'l' }[code]
+  return big && (unitList || []).some(u => u.code === big) ? big : code
 }
 
 function draftBody(editor, unitList) {
@@ -36,8 +44,8 @@ function draftBody(editor, unitList) {
   let outputQty = 1
   if (prep) {
     if (lines.some(l => l.itemId === editor.outputItemId)) return { error: '用料不能包含产出的半成品本身' }
-    outputQty = units.toBase(editor.outputQty, editor.outputUnit, unitList)
-    if (!(outputQty > 0)) return { error: '请填写每次制作的产出量' }
+    // 用量是每 1 单位半成品的，产出量固定存 1 单位；制作时按实际产出量折算
+    outputQty = units.toBase(1, editor.outputUnit, unitList)
   }
   return {
     body: {
@@ -66,12 +74,12 @@ function latestFor(recipes, outputItemId) {
   return { published: top('published'), draft: top('draft') }
 }
 
-// 制作预估（仅展示，以服务端过账为准）：每批用量 × 批数，对比可用量（散装 + 已开封，不含过期）
-function prepNeeds(lines, batches, availableByItem, materials) {
+// 制作预估（仅展示，以服务端过账为准）：配方用量 × 倍数（实际产出 ÷ 配方产出），对比可用量（散装 + 已开封，不含过期）
+function prepNeeds(lines, factor, availableByItem, materials) {
   const map = byId(materials)
   const rows = (lines || []).map(l => {
     const m = map[l.item_id] || { name: '食材#' + l.item_id, base_unit_code: '' }
-    const need = Math.round(l.quantity * batches * 1e6) / 1e6
+    const need = Math.round(l.quantity * factor * 1e6) / 1e6
     const have = Number(availableByItem[l.item_id] || 0)
     return { itemId: l.item_id, name: m.name, need, needLabel: units.formatQty(need, m.base_unit_code),
       stockLabel: '可用 ' + units.formatQty(have, m.base_unit_code), short: have < need }
@@ -79,4 +87,4 @@ function prepNeeds(lines, batches, availableByItem, materials) {
   return { rows, ok: rows.length > 0 && rows.every(r => !r.short) }
 }
 
-module.exports = { linesView, editorLine, editorLines, draftBody, dishMeta, dishStatus, latestFor, prepNeeds }
+module.exports = { linesView, editorLine, editorLines, perUnitCode, draftBody, dishMeta, dishStatus, latestFor, prepNeeds }

@@ -1,4 +1,4 @@
-// 半成品制作：选批数 → 预估原料 → 拍照、储存、到期 → PostPreparation（核销原料，产出新批次）
+// 半成品制作：填产出数量 → 按配方比例预估原料 → 拍照、储存、到期 → PostPreparation（核销原料，产出新批次）
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const expiry = require('../common/expiry.js')
@@ -10,7 +10,7 @@ const requestId = require('../common/request-id.js')
 Page({
   data: {
     blocked: '', loading: true, isManager: false, cards: [], openId: 0, storages: expiry.STORAGE,
-    n: 1, needs: [], canMake: false, outLabel: '', storage: 'chilled', expireDate: '', expireHint: '', photos: [], uploading: 0,
+    outQty: 1, needs: [], canMake: false, outLabel: '', storage: 'chilled', expireDate: '', expireHint: '', photos: [], uploading: 0,
     batchNo: '', making: false, log: []
   },
 
@@ -28,16 +28,21 @@ Page({
       api.get(this.ctx, 'FnbInventory/GetStock'),
       api.get(this.ctx, 'FnbCatalog/ListCategories'),
       api.get(this.ctx, 'FnbCatalog/ListShelfLifeRules'),
-      api.getAll(this.ctx, 'FnbInventory/ListBatches')
-    ]).then(([recipes, materials, stock, categories, rules, batches]) => {
+      api.getAll(this.ctx, 'FnbInventory/ListBatches'),
+      api.get(this.ctx, 'FnbCatalog/GetUnits')
+    ]).then(([recipes, materials, stock, categories, rules, batches, unitList]) => {
       const available = {}
       ;(stock || []).forEach(s => { available[s.item_id] = s.availableQty })
-      this.src = { materials, categories, rules, available }
+      this.src = { materials, categories, rules, available, units: unitList }
       const cards = materials.filter(m => m.valid && m.item_type === 'prepared').map(m => {
         const r = recipe.latestFor(recipes, m.id).published
         const cat = categories.find(c => c.id === m.category_id) || {}
+        // 产出数量按每 1 个 / 1 千克 / 1 升填，默认一份配方的产出
+        const unitCode = recipe.perUnitCode(m.default_input_unit_code || m.base_unit_code, unitList)
         return r ? { id: m.id, name: m.name, recipeId: r.id, outputQty: r.output_qty, unit: m.base_unit_code, category: cat, warnDays: m.warn_days || 0,
-          meta: '每批产出 ' + units.formatQty(r.output_qty, m.base_unit_code) + ' · 建议' + expiry.storageLabel(cat.default_storage) } : null
+          unitCode, unitLabel: units.unitName(unitCode), integer: m.base_unit_code === 'piece',
+          defaultQty: units.fromBase(r.output_qty, unitCode, unitList),
+          meta: '用量按每 ' + units.formatQty(r.output_qty, m.base_unit_code) + '计 · 建议' + expiry.storageLabel(cat.default_storage) } : null
       }).filter(Boolean)
       const preparedIds = new Set(materials.filter(m => m.item_type === 'prepared').map(m => m.id))
       const log = batches.filter(r => preparedIds.has(r.stock.item_id) && String(r.batch.create_date).slice(0, 10) === this.data.today)
@@ -59,26 +64,34 @@ Page({
     api.get(this.ctx, 'FnbRecipe/GetRecipe', { recipeId: card.recipeId }).then(res => {
       this.lines = res.lines
       this.expireManual = false
-      this.setData({ openId: id, n: 1, photos: [], storage: card.category.default_storage || 'chilled' })
+      this.setData({ openId: id, outQty: card.defaultQty, photos: [], storage: card.category.default_storage || 'chilled' })
       this.refresh()
       this.newBatchNo()
     }).catch(base.fail)
   },
   card() { return this.data.cards.find(c => c.id === this.data.openId) },
+  // 实际产出量（基本单位）
+  outBase(card) { return units.toBase(this.data.outQty, card.unitCode, this.src.units) },
 
   refresh() {
     const card = this.card()
     if (!card) return
-    const r = recipe.prepNeeds(this.lines, this.data.n, this.src.available, this.src.materials)
+    const out = this.outBase(card)
+    const r = recipe.prepNeeds(this.lines, out / card.outputQty, this.src.available, this.src.materials)
     const month = Number(this.data.today.slice(5, 7))
     const rule = expiry.ruleFor(this.src.rules, card.id, this.data.storage, month)
-    this.setData({ needs: r.rows, canMake: r.ok, outLabel: units.formatQty(card.outputQty * this.data.n, card.unit) })
-    if (this.expireManual) return  // 手动选过到期日后，改批数或储存方式不再覆盖
+    this.setData({ needs: r.rows, canMake: r.ok && out > 0, outLabel: units.formatQty(out, card.unit) })
+    if (this.expireManual) return  // 手动选过到期日后，改产出量或储存方式不再覆盖
     this.rule = rule
     this.setData({ expireDate: rule ? expiry.calcExpiry(this.data.today, rule.shelf_life_value, rule.shelf_life_unit) : '',
       expireHint: rule ? '按食材规则自今天起算，可改' : '该食材的' + expiry.storageLabel(this.data.storage) + '没有保质期规则，请选择到期日期' })
   },
-  onN(e) { this.setData({ n: Math.max(1, Number(e.detail.value) || 1) }); this.refresh() },
+  onOutQty(e) {
+    const v = Number(e.detail.value)
+    if (v > 0) this.setData({ outQty: v })
+    else wx.showToast({ title: '产出数量要大于 0', icon: 'none' })
+    this.refresh()
+  },
   onStorage(e) { this.setData({ storage: e.currentTarget.dataset.code }); this.refresh() },
   onExpire(e) { this.rule = null; this.expireManual = true; this.setData({ expireDate: e.detail.date, expireHint: '手动选择的到期日期' }) },
   onPhotos(e) { this.setData({ photos: e.detail.photos, uploading: e.detail.uploading }) },
@@ -97,10 +110,11 @@ Page({
     if (!d.expireDate || d.expireDate < d.today) { wx.showToast({ title: '请选择不早于今天的到期日期', icon: 'none' }); return }
     if (!d.batchNo) { wx.showToast({ title: '请填写批次号', icon: 'none' }); return }
     const card = this.card()
-    const key = 'prep:' + card.recipeId + ':' + d.n + ':' + d.batchNo
+    const out = this.outBase(card)
+    const key = 'prep:' + card.recipeId + ':' + out + ':' + d.batchNo
     this.setData({ making: true })
     api.post(this.ctx, 'FnbInventory/PostPreparation', {
-      requestId: this.keeper.get(key), recipeId: card.recipeId, outputQuantity: card.outputQty * d.n, batchNo: d.batchNo,
+      requestId: this.keeper.get(key), recipeId: card.recipeId, outputQuantity: out, batchNo: d.batchNo,
       storageType: d.storage, storageLocation: null, expireDate: d.expireDate, warnDays: card.warnDays,
       imageIds: photos.map(p => p.id), expiryNote: this.rule ? '按食材规则自制作日起算' : null
     }).then(() => {

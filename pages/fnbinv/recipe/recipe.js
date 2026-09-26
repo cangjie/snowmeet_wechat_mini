@@ -1,5 +1,5 @@
 // 菜品配方与半成品配方：店长新建菜品时直接填名称和用料（不设售价、分类）；新建半成品时填名称、选半成品分类、
-// 计量单位、每次产出和用料（先建半成品食材，再存配方）→ 存草稿 / 发布；员工只读
+// 计量单位和每 1 单位的用料（先建半成品食材，再存配方）→ 存草稿 / 发布；员工只读
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const units = require('../common/units.js')
@@ -36,7 +36,7 @@ Page({
           : latest.draft ? { text: '草稿未发布', tone: 'warn' } : { text: '未配置配方', tone: 'danger' }
         const out = latest.published || latest.draft
         return { key: 'p' + m.id, itemId: m.id, name: m.name, status, publishedRecipeId: latest.published ? latest.published.id : null,
-          draftRecipeId: latest.draft ? latest.draft.id : null, yieldLabel: out ? '每次产出 ' + units.formatQty(out.output_qty, m.base_unit_code) : '' }
+          draftRecipeId: latest.draft ? latest.draft.id : null, yieldLabel: out ? '每 ' + units.formatQty(out.output_qty, m.base_unit_code) + '的用量' : '' }
       })
       this.setData({ loading: false, dishes, preps, lines: {}, prepCats,
         unitOpts: unitList.filter(u => u.valid).map(u => ({ code: u.code, label: u.name })) })
@@ -76,11 +76,11 @@ Page({
   newDish() {
     if (!this.guard()) return
     this.setData({ editShow: true, pickShow: false, editor: { key: '', isNew: true, name: '', title: '', kind: 'dish', dishSpecId: null,
-      outputItemId: null, outputUnit: '', outputUnitLabel: '', outputQty: '', id: 0, rowVersion: null, lines: [] } })
+      outputItemId: null, outputUnit: '', outputUnitLabel: '', id: 0, rowVersion: null, lines: [] } })
   },
   setEditorName(e) { this.setData({ 'editor.name': e.detail.value }) },
 
-  // ---- 半成品：新建时填名称、选半成品分类和计量单位、填每次产出和用料 ----
+  // ---- 半成品：新建时填名称、选半成品分类和计量单位、填每 1 单位的用料 ----
   newPrep() {
     if (!this.guard()) return
     const cats = this.data.prepCats
@@ -90,18 +90,20 @@ Page({
       return
     }
     this.setData({ editShow: true, pickShow: false, editor: { key: '', isNew: true, name: '', title: '', kind: 'prep', dishSpecId: null,
-      categoryId: cats[0].id, outputItemId: null, outputUnit: 'kg', outputUnitLabel: units.unitName('kg'), outputQty: '',
+      categoryId: cats[0].id, outputItemId: null, unitCode: 'kg', outputUnit: 'kg', outputUnitLabel: units.unitName('kg'),
       id: 0, rowVersion: null, lines: [] } })
   },
   setEditorCategory(e) { this.setData({ 'editor.categoryId': Number(e.currentTarget.dataset.id) }) },
+  // unitCode 是半成品食材的录入单位；配方用量按每 1 个 / 1 千克 / 1 升填（选了克、毫升也按千克、升）
   setEditorUnit(e) {
     const code = e.currentTarget.dataset.code
-    this.setData({ 'editor.outputUnit': code, 'editor.outputUnitLabel': units.unitName(code) })
+    const per = recipe.perUnitCode(code, this.src.units)
+    this.setData({ 'editor.unitCode': code, 'editor.outputUnit': per, 'editor.outputUnitLabel': units.unitName(per) })
   },
   // 先建半成品食材（类型由半成品分类决定），编辑框随即转为该半成品，配方保存失败再点也不会重复建
   createPrepMaterial(editor, name) {
     const category = this.src.categories.find(c => c.id === editor.categoryId)
-    const edit = Object.assign(catalog.materialEditState({ name, category_id: category.id }, category, [], true), { name, inputUnit: editor.outputUnit })
+    const edit = Object.assign(catalog.materialEditState({ name, category_id: category.id }, category, [], true), { name, inputUnit: editor.unitCode })
     return api.post(this.ctx, 'FnbCatalog/SaveMaterial', catalog.materialBody(edit, this.src.units, Date.now())).then(row => {
       this.src.materials.push(row)
       this.setData({ 'editor.isNew': false, 'editor.key': 'p' + row.id, 'editor.title': row.name, 'editor.outputItemId': row.id })
@@ -142,19 +144,19 @@ Page({
     const start = spec.then(() => sourceId ? api.get(this.ctx, 'FnbRecipe/GetRecipe', { recipeId: sourceId }) : null)
     start.then(res => {
       const fromDraft = !!card.draftRecipeId
-      const outputUnit = material ? (material.default_input_unit_code || material.base_unit_code) : ''
+      const outputUnit = material ? recipe.perUnitCode(material.default_input_unit_code || material.base_unit_code, this.src.units) : ''
+      // 早先的半成品配方按整批产出存用量，这里换成每 1 单位的用量
+      const scale = res && prep ? units.toBase(1, outputUnit, this.src.units) / res.recipe.output_qty : 1
       this.setData({ editShow: true, editor: {
         key: card.key, title: card.name, kind: prep ? 'prep' : 'dish', dishSpecId: prep ? null : card.specId,
         outputItemId: prep ? card.itemId : null, outputUnit, outputUnitLabel: units.unitName(outputUnit),
-        outputQty: res && prep ? String(units.fromBase(res.recipe.output_qty, outputUnit, this.src.units)) : '',
         id: fromDraft ? res.recipe.id : 0, rowVersion: fromDraft ? res.recipe.row_version : null,
-        lines: res ? recipe.editorLines(res.lines, this.src.materials, this.src.units) : []
+        lines: res ? recipe.editorLines(res.lines, this.src.materials, this.src.units, scale) : []
       } })
     }).catch(base.fail)
   },
   closeEditor() { this.setData({ editShow: false, pickShow: false }) },
   setLineQty(e) { this.setData({ ['editor.lines[' + e.currentTarget.dataset.index + '].qty']: e.detail.value }) },
-  setOutputQty(e) { this.setData({ 'editor.outputQty': e.detail.value }) },
   removeLine(e) {
     const lines = this.data.editor.lines.slice()
     lines.splice(Number(e.currentTarget.dataset.index), 1)
