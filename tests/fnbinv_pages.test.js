@@ -452,6 +452,55 @@ test('配方页：编辑已发布配方 → 存新草稿 → 用返回的 rowVer
   assert.deepEqual({ recipeId: publish.data.recipeId, rowVersion: publish.data.rowVersion }, { recipeId: '21', rowVersion: 'RV21' })
 })
 
+test('配方页：新建半成品先建半成品食材（所选半成品分类），再按每次产出存配方并发布', async () => {
+  installFakes(MANAGER)
+  const savedCats = RESPONSES['FnbCatalog/ListCategories']
+  const savedMat = RESPONSES['FnbCatalog/SaveMaterial']
+  RESPONSES['FnbCatalog/ListCategories'] = savedCats.concat([{ id: 60, level: 1, parent_id: null, name: '半成品', is_prepared: true, valid: true, sort: 3 },
+    { id: 61, level: 2, parent_id: 60, name: 'Pizza面团', default_storage: 'chilled', valid: true, sort: 1 }])
+  RESPONSES['FnbCatalog/SaveMaterial'] = { id: 30, code: 'M1', name: 'Pizza面团', category_id: 61, item_type: 'prepared', base_unit_code: 'g', default_input_unit_code: 'kg', warn_days: 1, valid: true }
+  try {
+    const page = loadPage('recipe')
+    page.onLoad({})
+    await settle()
+    assert.deepEqual(page.data.prepCats, [{ id: 61, name: 'Pizza面团' }])
+    page.onSeg({ currentTarget: { dataset: { seg: 'prep' } } })
+    page.newPrep()
+    assert.deepEqual([page.data.editor.kind, page.data.editor.isNew, page.data.editor.categoryId, page.data.editor.outputUnit], ['prep', true, 61, 'kg'])
+    page.setEditorName({ detail: { value: 'Pizza面团' } })
+    page.setOutputQty({ detail: { value: '5' } })
+    page.openPicker()
+    page.onPick({ currentTarget: { dataset: { id: 10 } } })
+    page.setLineQty({ currentTarget: { dataset: { index: 0 } }, detail: { value: '3' } })
+    page.onPublish()
+    await settle()
+    await settle()
+    const mat = calls.find(c => c.path === 'FnbCatalog/SaveMaterial').data
+    assert.deepEqual({ id: mat.id, name: mat.name, categoryId: mat.categoryId, baseUnitCode: mat.baseUnitCode, defaultInputUnitCode: mat.defaultInputUnitCode },
+      { id: 0, name: 'Pizza面团', categoryId: 61, baseUnitCode: 'g', defaultInputUnitCode: 'kg' })
+    const draft = calls.find(c => c.path === 'FnbRecipe/SaveRecipeDraft').data
+    assert.deepEqual({ recipeType: draft.recipeType, outputItemId: draft.outputItemId, outputQty: draft.outputQty, lines: draft.lines },
+      { recipeType: 'prep', outputItemId: 30, outputQty: 5000, lines: [{ itemId: 10, quantity: 3000, sort: 1, remark: null }] })
+    assert.ok(calls.some(c => c.path === 'FnbRecipe/PublishRecipe'))
+    assert.equal(page.data.editShow, false)
+  } finally {
+    RESPONSES['FnbCatalog/ListCategories'] = savedCats
+    RESPONSES['FnbCatalog/SaveMaterial'] = savedMat
+  }
+})
+
+test('配方页：还没有半成品分类时，新建半成品提示先去分类页', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('recipe')
+  page.onLoad({})
+  await settle()
+  const modals = []
+  wx.showModal = o => { modals.push(o) }
+  page.newPrep()
+  assert.equal(page.data.editShow, false)
+  assert.equal(modals[0].title, '还没有半成品分类')
+})
+
 test('分类页：新增二级分类只存名称和储存方式，不写保质期规则', async () => {
   installFakes(MANAGER)
   const page = loadPage('cats')

@@ -1,13 +1,15 @@
-// 菜品配方与半成品配方：店长新建菜品时直接填名称和用料（不设售价、分类）→ 存草稿 / 发布；员工只读
+// 菜品配方与半成品配方：店长新建菜品时直接填名称和用料（不设售价、分类）；新建半成品时填名称、选半成品分类、
+// 计量单位、每次产出和用料（先建半成品食材，再存配方）→ 存草稿 / 发布；员工只读
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const units = require('../common/units.js')
 const recipe = require('../common/recipe.js')
+const catalog = require('../common/catalog.js')
 
 Page({
   data: {
     blocked: '', loading: true, isManager: false, seg: 'dish',
-    dishes: [], preps: [], openKey: '', lines: {},
+    dishes: [], preps: [], openKey: '', lines: {}, prepCats: [], unitOpts: [],
     dishShow: false, dish: null, editShow: false, editor: null, pickShow: false, pickQuery: '', pickList: [], saving: false
   },
 
@@ -20,9 +22,13 @@ Page({
       api.get(this.ctx, 'FnbRecipe/ListDishes'),
       api.getAll(this.ctx, 'FnbCatalog/ListMaterials'),
       api.get(this.ctx, 'FnbCatalog/GetUnits'),
-      api.get(this.ctx, 'FnbRecipe/ListRecipes')
-    ]).then(([dishList, materials, unitList, recipes]) => {
-      this.src = { materials: materials.filter(m => m.valid), units: unitList, recipes, dishes: dishList.dishes }
+      api.get(this.ctx, 'FnbRecipe/ListRecipes'),
+      api.get(this.ctx, 'FnbCatalog/ListCategories')
+    ]).then(([dishList, materials, unitList, recipes, categories]) => {
+      this.src = { materials: materials.filter(m => m.valid), units: unitList, recipes, dishes: dishList.dishes, categories }
+      // 新建半成品可选的分类：有效的半成品二级分类（自身或一级父分类标了半成品）
+      const prepCats = categories.filter(c => c.valid && c.level === 2 && catalog.isPreparedCategory(c, categories))
+        .map(c => ({ id: c.id, name: c.name }))
       const dishes = dishList.dishes.map(d => Object.assign({ key: 'd' + d.productId, status: recipe.dishStatus(d), meta: recipe.dishMeta(d) }, d))
       const preps = this.src.materials.filter(m => m.item_type === 'prepared').map(m => {
         const latest = recipe.latestFor(recipes, m.id)
@@ -32,7 +38,8 @@ Page({
         return { key: 'p' + m.id, itemId: m.id, name: m.name, status, publishedRecipeId: latest.published ? latest.published.id : null,
           draftRecipeId: latest.draft ? latest.draft.id : null, yieldLabel: out ? '每次产出 ' + units.formatQty(out.output_qty, m.base_unit_code) : '' }
       })
-      this.setData({ loading: false, dishes, preps, lines: {} })
+      this.setData({ loading: false, dishes, preps, lines: {}, prepCats,
+        unitOpts: unitList.filter(u => u.valid).map(u => ({ code: u.code, label: u.name })) })
       if (this.data.openKey) this.loadLines(this.data.openKey)
     }).catch(err => { this.setData({ loading: false }); base.fail(err) })
   },
@@ -72,6 +79,35 @@ Page({
       outputItemId: null, outputUnit: '', outputUnitLabel: '', outputQty: '', id: 0, rowVersion: null, lines: [] } })
   },
   setEditorName(e) { this.setData({ 'editor.name': e.detail.value }) },
+
+  // ---- 半成品：新建时填名称、选半成品分类和计量单位、填每次产出和用料 ----
+  newPrep() {
+    if (!this.guard()) return
+    const cats = this.data.prepCats
+    if (!cats.length) {
+      wx.showModal({ title: '还没有半成品分类', content: '先到「分类」页新增一个分类，类型选「半成品」。', confirmText: '去分类页',
+        success: r => { if (r.confirm) this.goCats() } })
+      return
+    }
+    this.setData({ editShow: true, pickShow: false, editor: { key: '', isNew: true, name: '', title: '', kind: 'prep', dishSpecId: null,
+      categoryId: cats[0].id, outputItemId: null, outputUnit: 'kg', outputUnitLabel: units.unitName('kg'), outputQty: '',
+      id: 0, rowVersion: null, lines: [] } })
+  },
+  setEditorCategory(e) { this.setData({ 'editor.categoryId': Number(e.currentTarget.dataset.id) }) },
+  setEditorUnit(e) {
+    const code = e.currentTarget.dataset.code
+    this.setData({ 'editor.outputUnit': code, 'editor.outputUnitLabel': units.unitName(code) })
+  },
+  // 先建半成品食材（类型由半成品分类决定），编辑框随即转为该半成品，配方保存失败再点也不会重复建
+  createPrepMaterial(editor, name) {
+    const category = this.src.categories.find(c => c.id === editor.categoryId)
+    const edit = Object.assign(catalog.materialEditState({ name, category_id: category.id }, category, [], true), { name, inputUnit: editor.outputUnit })
+    return api.post(this.ctx, 'FnbCatalog/SaveMaterial', catalog.materialBody(edit, this.src.units, Date.now())).then(row => {
+      this.src.materials.push(row)
+      this.setData({ 'editor.isNew': false, 'editor.key': 'p' + row.id, 'editor.title': row.name, 'editor.outputItemId': row.id })
+      return row.id
+    })
+  },
   editDish(e) {
     if (!this.guard()) return
     const d = this.data.dishes.find(x => x.key === e.currentTarget.dataset.key)
@@ -141,19 +177,24 @@ Page({
     if (this.data.saving) return
     const editor = this.data.editor
     const name = String(editor.name || '').trim()
-    if (editor.isNew && !name) { wx.showToast({ title: '请填写菜品名称', icon: 'none' }); return }
+    const prep = editor.kind === 'prep'
+    if (editor.isNew && !name) { wx.showToast({ title: prep ? '请填写半成品名称' : '请填写菜品名称', icon: 'none' }); return }
+    if (editor.isNew && prep && this.src.materials.some(m => m.name === name)) {
+      wx.showToast({ title: '已有同名食材「' + name + '」', icon: 'none' }); return
+    }
     const built = recipe.draftBody(editor, this.src.units)
     if (built.error) { wx.showToast({ title: built.error, icon: 'none' }); return }
     this.setData({ saving: true })
-    // 新菜品：先建菜品；建好后编辑框转为该菜品，配方保存失败再点也不会重复建菜
-    const dish = editor.isNew
-      ? api.post(this.ctx, 'FnbRecipe/SaveDish', { id: 0, name, valid: true }).then(row => {
+    // 新菜品 / 新半成品：先建菜品或半成品食材；建好后编辑框转为它，配方保存失败再点也不会重复建
+    const owner = !editor.isNew ? Promise.resolve(prep ? editor.outputItemId : editor.dishSpecId)
+      : prep ? this.createPrepMaterial(editor, name)
+      : api.post(this.ctx, 'FnbRecipe/SaveDish', { id: 0, name, valid: true }).then(row => {
         this.setData({ 'editor.isNew': false, 'editor.key': 'd' + row.productId, 'editor.title': row.name, 'editor.dishSpecId': row.specId })
         return row.specId
       })
-      : Promise.resolve(editor.dishSpecId)
-    dish.then(specId => {
-      if (built.body.recipeType === 'dish') built.body.dishSpecId = specId
+    owner.then(ownerId => {
+      if (prep) built.body.outputItemId = ownerId
+      else built.body.dishSpecId = ownerId
       return api.post(this.ctx, 'FnbRecipe/SaveRecipeDraft', built.body)
     }).then(res => {
       if (!publish) return res

@@ -7,8 +7,9 @@
       <view class="chip-sq {{seg === 'prep' ? 'on' : ''}}" data-seg="prep" bindtap="onSeg">半成品配方</view>
     </view>
     <view class="fnb-note" wx:if="{{seg === 'dish'}}">每道菜按<text class="em">一份</text>设用料，出餐时按厨房单数量扣减。补齐配方后，待核对的厨房单才能出餐。<text wx:if="{{!isManager}}">维护需要店长权限。</text></view>
-    <view class="fnb-note" wx:else>半成品也是食材：制作一次即核销原料，产出按自己的保质期入库。新增半成品：到「分类」页新增或编辑分类时类型选「半成品」，再在其下点「＋ 食材」。</view>
+    <view class="fnb-note" wx:else>半成品也是食材：制作一次即核销原料，产出按自己的保质期入库。新建半成品时填名称、选所属的半成品分类、填每次产出和用料；半成品分类在「分类」页新增时类型选「半成品」。</view>
     <view wx:if="{{seg === 'dish' && isManager}}" class="btn primary btn-block" bindtap="newDish">＋ 新建菜品</view>
+    <view wx:if="{{seg === 'prep' && isManager}}" class="btn primary btn-block" bindtap="newPrep">＋ 新建半成品</view>
 
     <view wx:for="{{seg === 'dish' ? dishes : preps}}" wx:key="key" class="card">
       <view class="card-pad card-row" data-key="{{item.key}}" bindtap="onToggle">
@@ -29,8 +30,8 @@
       </view>
     </view>
     <view wx:if="{{!loading && seg === 'dish' && !dishes.length}}" class="fnb-empty">还没有菜品{{isManager ? '，点上方新建' : '，请店长先建菜品'}}</view>
-    <view wx:if="{{!loading && seg === 'prep' && !preps.length}}" class="fnb-empty">还没有半成品食材。到「分类」页建一个类型为「半成品」的分类，再在其下点「＋ 食材」
-      <view wx:if="{{isManager}}" class="btn primary go-cats" bindtap="goCats">去分类页新增</view></view>
+    <view wx:if="{{!loading && seg === 'prep' && !preps.length}}" class="fnb-empty">还没有半成品{{!isManager ? '，请店长先建' : prepCats.length ? '，点上方新建' : '。先到「分类」页新增一个类型为「半成品」的分类'}}
+      <view wx:if="{{isManager && !prepCats.length}}" class="btn primary go-cats" bindtap="goCats">去分类页新增</view></view>
   </block>
 </view>
 
@@ -46,9 +47,15 @@
 <van-popup show="{{editShow}}" position="bottom" round custom-style="max-height:88%;" bind:close="closeEditor">
   <scroll-view scroll-y class="editor" wx:if="{{editor}}">
     <view class="sheet">
-      <view class="sheet-title">{{editor.isNew ? '新建菜品' : editor.title + ' · 用料'}}</view>
-      <view wx:if="{{editor.isNew}}" class="field"><view class="field-label">菜品名称</view>
-        <input class="input" value="{{editor.name}}" bindinput="setEditorName" placeholder="如：榛果饮" /></view>
+      <view class="sheet-title">{{editor.isNew ? (editor.kind === 'prep' ? '新建半成品' : '新建菜品') : editor.title + ' · 用料'}}</view>
+      <view wx:if="{{editor.isNew}}" class="field"><view class="field-label">{{editor.kind === 'prep' ? '半成品名称' : '菜品名称'}}</view>
+        <input class="input" value="{{editor.name}}" bindinput="setEditorName" placeholder="{{editor.kind === 'prep' ? '如：Pizza面团' : '如：榛果饮'}}" /></view>
+      <block wx:if="{{editor.isNew && editor.kind === 'prep'}}">
+        <view class="field"><view class="field-label">所属半成品分类</view>
+          <view class="chips wrap"><view wx:for="{{prepCats}}" wx:key="id" class="chip-sq {{editor.categoryId === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="setEditorCategory">{{item.name}}</view></view></view>
+        <view class="field"><view class="field-label">计量单位<text class="hint">决定库存基本单位，之后不能跨克/毫升/个</text></view>
+          <view class="chips wrap"><view wx:for="{{unitOpts}}" wx:key="code" class="chip-sq {{editor.outputUnit === item.code ? 'on' : ''}}" data-code="{{item.code}}" bindtap="setEditorUnit">{{item.label}}</view></view></view>
+      </block>
       <view wx:if="{{editor.kind === 'prep'}}" class="date-row"><text class="date-label">每次产出</text><input class="input grow" type="digit" value="{{editor.outputQty}}" bindinput="setOutputQty" /><text class="unit-suffix">{{editor.outputUnitLabel}}</text></view>
       <view wx:else class="card-meta">以下为「一份」的用量</view>
       <view wx:for="{{editor.lines}}" wx:key="itemId" class="date-row">
