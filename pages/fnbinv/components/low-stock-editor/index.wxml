@@ -1,0 +1,19 @@
+<van-popup show="{{show}}" position="bottom" round bind:close="onClose">
+  <view class="sheet" wx:if="{{edit}}">
+    <view class="sheet-title">{{edit.name}} · 用量预警</view>
+    <view wx:if="{{edit.lastLabel}}" class="card-meta">{{edit.lastLabel}}</view>
+    <view class="seg">
+      <view class="chip-sq {{edit.mode === 'ratio' ? 'on' : ''}}" data-mode="ratio" bindtap="setMode">按最近一批的比例</view>
+      <view class="chip-sq {{edit.mode === 'qty' ? 'on' : ''}}" data-mode="qty" bindtap="setMode">按数量</view>
+    </view>
+    <view wx:if="{{edit.mode === 'ratio'}}" class="field">
+      <view class="field-label">剩到最近一批的多少时预警<text class="hint">填 10 即默认</text></view>
+      <view class="input-row"><input class="input" type="digit" value="{{edit.ratioText}}" bindinput="setRatio" /><text class="unit-suffix">%</text></view>
+    </view>
+    <view wx:else class="field">
+      <view class="field-label">可用量低于多少时预警</view>
+      <view class="input-row"><input class="input" type="digit" value="{{edit.qtyText}}" bindinput="setQty" placeholder="如 0.5" /><text class="unit-suffix">{{edit.unitLabel}}</text></view>
+    </view>
+    <view class="btn primary btn-block {{saving ? 'disabled' : ''}}" bindtap="onSave">{{saving ? '保存中…' : '保存'}}</view>
+  </view>
+</van-popup>

@@ -2,7 +2,7 @@
   <view class="fnb-head"><view class="fnb-sub">可用量 = 未开封 + 已开封（不含过期、报损）</view><view class="fnb-date">{{todayLabel}}</view></view>
   <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
   <block wx:else>
-    <view class="fnb-note">可用量降到预警线就提醒。预警线默认是最近一次入库（半成品为最近一次制作）数量的 <text class="em">10%</text>，每种食材可以改比例，也可以直接填数量。<text wx:if="{{!isManager}}">修改需要店长权限。</text></view>
+    <view class="fnb-note">可用量降到预警线就提醒。预警线默认是最近一次入库（半成品为最近一次制作）数量的 <text class="em">10%</text>，可以改比例，也可以直接填数量；在库存页搜到食材、点开后也能设置。<text wx:if="{{!isManager}}">修改需要店长权限。</text></view>
 
     <block wx:for="{{groups}}" wx:for-item="g" wx:key="key">
       <view class="col group">
@@ -22,24 +22,5 @@
     <view wx:if="{{!loading && !groups.length}}" class="fnb-empty">还没有入库过的食材</view>
   </block>
 </view>
-
-<van-popup show="{{editShow}}" position="bottom" round bind:close="closeEdit">
-  <view class="sheet" wx:if="{{edit}}">
-    <view class="sheet-title">{{edit.name}} · 用量预警</view>
-    <view wx:if="{{edit.lastLabel}}" class="card-meta">{{edit.lastLabel}}</view>
-    <view class="seg">
-      <view class="chip-sq {{edit.mode === 'ratio' ? 'on' : ''}}" data-mode="ratio" bindtap="setMode">按最近一批的比例</view>
-      <view class="chip-sq {{edit.mode === 'qty' ? 'on' : ''}}" data-mode="qty" bindtap="setMode">按数量</view>
-    </view>
-    <view wx:if="{{edit.mode === 'ratio'}}" class="field">
-      <view class="field-label">剩到最近一批的多少时预警<text class="hint">填 10 即默认</text></view>
-      <view class="input-row"><input class="input" type="digit" value="{{edit.ratioText}}" bindinput="setRatio" /><text class="unit-suffix">%</text></view>
-    </view>
-    <view wx:else class="field">
-      <view class="field-label">可用量低于多少时预警</view>
-      <view class="input-row"><input class="input" type="digit" value="{{edit.qtyText}}" bindinput="setQty" placeholder="如 0.5" /><text class="unit-suffix">{{edit.unitLabel}}</text></view>
-    </view>
-    <view class="btn primary btn-block {{saving ? 'disabled' : ''}}" bindtap="onSave">{{saving ? '保存中…' : '保存'}}</view>
-  </view>
-</van-popup>
+<low-stock-editor show="{{editShow}}" row="{{editRow}}" units="{{units}}" saving="{{saving}}" bind:submit="onEditSubmit" bind:close="closeEdit" />
 <fnb-tabbar active="stock" />

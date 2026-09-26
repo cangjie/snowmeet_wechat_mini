@@ -11,6 +11,7 @@ Page({
   data: {
     loading: true, blocked: '', isManager: false,
     alertCount: 0, alertSummary: '', lowKnown: false, lowCount: 0, lowSummary: '', badge: 0,
+    lowEditShow: false, lowEditRow: null, lowSaving: false, units: [],
     tree: [], subs: [], storages: expiry.STORAGE,
     filter: { l1: 0, l2: 0, storage: '', query: '' },
     items: [], skuCount: 0, batchCount: 0, openedCount: 0, expanded: 0
@@ -38,9 +39,13 @@ Page({
       api.getAll(ctx, 'FnbInventory/ListBatches'),
       api.getAll(ctx, 'FnbReport/GetExpirySummary'),
       // 用量预警只是提示：查不到（网络或旧版服务端）就不显示这张卡
-      api.get(ctx, 'FnbInventory/ListLowStock').catch(() => null)
-    ]).then(([categories, materials, batches, summary, low]) => {
+      api.get(ctx, 'FnbInventory/ListLowStock').catch(() => null),
+      api.get(ctx, 'FnbCatalog/GetUnits')
+    ]).then(([categories, materials, batches, summary, low, unitList]) => {
       this.lowIds = new Set((low || []).filter(r => r.low).map(r => r.itemId))
+      this.lowRowOf = {}
+      ;(low || []).forEach(r => { this.lowRowOf[r.itemId] = r })
+      this.units = unitList
       this.source = { categories, materials, rows: batches }
       this.loadedOnce = true
       const groups = expiry.groupAlerts(summary)
@@ -60,7 +65,13 @@ Page({
     const result = view.buildStockRows(Object.assign({ today: this.data.today, filter: f }, this.source))
     const group = this.data.tree.find(g => g.id === f.l1)
     const lowIds = this.lowIds || new Set()
-    result.items.forEach(i => { i.low = lowIds.has(i.itemId) })
+    const lowRowOf = this.lowRowOf || {}
+    // 各食材展开后显示用量预警线和规则，店长可就地设置（查不到用量预警时不显示）
+    result.items.forEach(i => {
+      i.low = lowIds.has(i.itemId)
+      const row = lowRowOf[i.itemId]
+      i.lowRule = row ? lowstock.viewRow(row).lineLabel + ' · ' + lowstock.ruleLabel(row) : ''
+    })
     this.setData({ items: result.items, skuCount: result.skuCount, batchCount: result.batchCount,
       openedCount: result.openedCount, subs: group ? group.subs : [] })
   },
@@ -79,6 +90,23 @@ Page({
   },
   goExpiry() { wx.navigateTo({ url: '/pages/fnbinv/expiry/expiry' }) },
   goLowStock() { wx.navigateTo({ url: '/pages/fnbinv/lowstock/lowstock' }) },
+
+  // 用量预警设置：弹层（low-stock-editor）校验后发 submit，这里保存再刷新
+  onEditLow(e) {
+    if (!this.data.isManager) { wx.showToast({ title: '设置用量预警需要店长权限', icon: 'none' }); return }
+    const row = (this.lowRowOf || {})[Number(e.currentTarget.dataset.id)]
+    if (row) this.setData({ lowEditShow: true, lowEditRow: row, units: this.units })
+  },
+  closeLowEdit() { this.setData({ lowEditShow: false }) },
+  onLowSubmit(e) {
+    if (this.data.lowSaving) return
+    this.setData({ lowSaving: true })
+    api.post(this.ctx, 'FnbCatalog/SaveLowStockAlert', e.detail).then(() => {
+      this.setData({ lowSaving: false, lowEditShow: false })
+      wx.showToast({ title: '已保存', icon: 'success' })
+      this.load()
+    }).catch(err => { this.setData({ lowSaving: false }); base.fail(err) })
+  },
   goBatch(e) { wx.navigateTo({ url: '/pages/fnbinv/batch/batch?id=' + e.currentTarget.dataset.id }) },
 
   onOpen(e) {

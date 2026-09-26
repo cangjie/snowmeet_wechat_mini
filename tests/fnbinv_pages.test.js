@@ -174,13 +174,40 @@ test('用量预警页：库存低的排前面；店长按数量设置预警，�
   const cabbage = page.data.groups[0].rows[0]
   assert.deepEqual([cabbage.tag.text, cabbage.availLabel, cabbage.lineLabel, cabbage.ruleLabel], ['库存低', '可用 400 g', '预警线 500 g', '最近一批的 10%（默认）'])
   page.onEdit({ currentTarget: { dataset: { id: 10 } } })
-  assert.deepEqual([page.data.edit.mode, page.data.edit.ratioText, page.data.edit.unitLabel], ['ratio', '10', 'kg'])
-  page.setMode({ currentTarget: { dataset: { mode: 'qty' } } })
-  page.setQty({ detail: { value: '0.3' } })
-  page.onSave()
+  assert.deepEqual([page.data.editShow, page.data.editRow.itemId], [true, 10])
+  page.onEditSubmit({ detail: { itemId: 10, ratio: null, quantity: 300 } })
   await settle()
   assert.deepEqual(calls.find(c => c.path === 'FnbCatalog/SaveLowStockAlert').data, { shopId: 12, itemId: 10, ratio: null, quantity: 300 })
   assert.equal(page.data.editShow, false)
+})
+
+test('库存页：搜到食材后点开，就地查看和设置用量预警（店长）', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('stock')
+  page.onLoad({})
+  await settle()
+  page.onQuery({ detail: { value: '番茄' } })
+  const sauce = page.data.items[0]
+  assert.deepEqual([sauce.name, sauce.low, sauce.lowRule], ['番茄酱', false, '预警线 600 ml · 最近一批的 20%'])
+  page.onEditLow({ currentTarget: { dataset: { id: 12 } } })
+  assert.deepEqual([page.data.lowEditShow, page.data.lowEditRow.itemId, page.data.units.length > 0], [true, 12, true])
+  page.onLowSubmit({ detail: { itemId: 12, ratio: 0.3, quantity: null } })
+  await settle()
+  assert.deepEqual(calls.find(c => c.path === 'FnbCatalog/SaveLowStockAlert').data, { shopId: 12, itemId: 12, ratio: 0.3, quantity: null })
+  assert.equal(page.data.lowEditShow, false)
+})
+
+test('库存页：员工能看到用量预警，但不能设置', async () => {
+  installFakes({ id: 3, title_level: 100, base_shop_id: 12 })
+  const page = loadPage('stock')
+  page.onLoad({})
+  await settle()
+  const toasts = []
+  wx.showToast = o => { toasts.push(o.title) }
+  page.onEditLow({ currentTarget: { dataset: { id: 10 } } })
+  assert.equal(page.data.lowEditShow, false)
+  assert.match(toasts[0], /店长/)
+  assert.equal(page.data.items[0].lowRule, '预警线 500 g · 最近一批的 10%（默认）')
 })
 
 test('入库页：选食材、拍照、填到期日后提交即入库，出现在本次已入库', async () => {

@@ -49,6 +49,10 @@
         </view>
       </view>
       <view wx:if="{{expanded === item.itemId}}" class="sub-list">
+        <view wx:if="{{item.lowRule}}" class="sub-row low-row">
+          <view class="grow col"><view class="batch-line {{item.low ? 'tone-warn' : ''}}">用量预警{{item.low ? ' · 库存低' : ''}}</view><view class="card-meta">{{item.lowRule}}</view></view>
+          <view class="btn {{isManager ? '' : 'disabled'}}" data-id="{{item.itemId}}" catchtap="onEditLow">设置</view>
+        </view>
         <view wx:for="{{item.batches}}" wx:for-item="b" wx:key="batchId" class="sub-row" data-id="{{b.batchId}}" bindtap="goBatch">
           <view class="grow col">
             <view class="batch-no">{{b.batchNo}}</view>
@@ -66,4 +70,5 @@
     <view wx:if="{{!loading && items.length === 0}}" class="fnb-empty">没有符合条件的食材</view>
   </block>
 </view>
+<low-stock-editor show="{{lowEditShow}}" row="{{lowEditRow}}" units="{{units}}" saving="{{lowSaving}}" bind:submit="onLowSubmit" bind:close="closeLowEdit" />
 <fnb-tabbar active="stock" badge="{{badge}}" />

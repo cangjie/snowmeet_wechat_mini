@@ -29,6 +29,36 @@ test('库存页卡片说明：列出前两种，多了写总数', () => {
   assert.equal(lowstock.summary([row({ low: true }), row({ itemName: '面粉', low: true }), row({ itemName: '糖', low: true })]), '牛奶、面粉 等 3 种快用完了')
 })
 
+test('设置弹层组件：打开时按这行带出当前设置，切到按数量填写后发 submit；填错不发', () => {
+  let def = null
+  global.Component = d => { def = d }
+  const toasts = []
+  global.wx = { showToast(o) { toasts.push(o.title) } }
+  delete require.cache[require.resolve('../pages/fnbinv/components/low-stock-editor/index.js')]
+  require('../pages/fnbinv/components/low-stock-editor/index.js')
+  delete global.Component
+  const events = []
+  const comp = {
+    data: JSON.parse(JSON.stringify(def.data)),
+    properties: { show: true, row: row({ itemId: 7, itemName: '面粉', baseUnitCode: 'g', defaultInputUnitCode: 'kg' }), units: UNITS, saving: false },
+    setData(patch) { Object.keys(patch).forEach(k => { const p = k.split('.'); let o = this.data; p.slice(0, -1).forEach(x => { o = o[x] }); o[p[p.length - 1]] = patch[k] }) },
+    triggerEvent(name, detail) { events.push([name, detail]) }
+  }
+  Object.keys(def.methods).forEach(k => { comp[k] = def.methods[k].bind(comp) })
+  def.observers['show, row'].call(comp, true, comp.properties.row)
+  assert.deepEqual([comp.data.edit.name, comp.data.edit.mode, comp.data.edit.unitLabel], ['面粉', 'ratio', 'kg'])
+  comp.setMode({ currentTarget: { dataset: { mode: 'qty' } } })
+  comp.setQty({ detail: { value: 'abc' } })
+  comp.onSave()
+  assert.equal(events.length, 0)
+  assert.match(toasts[0], /数量/)
+  comp.setQty({ detail: { value: '1.2' } })
+  comp.onSave()
+  assert.deepEqual(events, [['submit', { itemId: 7, ratio: null, quantity: 1200 }]])
+  comp.onClose()
+  assert.equal(events[1][0], 'close')
+})
+
 test('设置：比例按百分数填，填 10 即恢复默认；数量按常用单位填、换成基本单位', () => {
   const cabbage = row({ itemId: 7, baseUnitCode: 'g', defaultInputUnitCode: 'kg', fixedQuantity: 2500 })
   const edit = lowstock.editorState(cabbage, UNITS)

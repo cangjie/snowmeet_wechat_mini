@@ -12,3 +12,4 @@
 .sealed-line { font-size: 20rpx; font-weight: 600; color: var(--warn); }
 .batch-line { font-size: 24rpx; font-weight: 600; color: #374151; }
 .batch-qty { flex: none; font-size: 24rpx; font-weight: 700; color: #374151; }
+.low-row { background: #FAFBFD; }
