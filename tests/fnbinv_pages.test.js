@@ -27,6 +27,10 @@ const RESPONSES = {
       stock: { batch_id: 101, item_id: 12, stock_form: 'sealed', storage_type: 'chilled', quantity: 2000, pack_size: 1000, pack_unit_name: '瓶', sealed_pack_count: 2, is_destroyed: false } }] },
   'FnbInventory/GetBatch': { batch: TODAY_BATCH, stock: { batch_id: 100, item_id: 10, stock_form: 'bulk', storage_type: 'chilled', quantity: 5000, stock_amount: 20, expiry_source: 'category', is_destroyed: false } },
   'FnbInventory/GetStock': [{ item_id: 10, itemName: '大白菜', base_unit_code: 'g', totalQty: 5000, availableQty: 5000, sealedQty: 0 }],
+  'FnbInventory/ListLowStock': [
+    { itemId: 10, itemName: '大白菜', categoryId: 2, baseUnitCode: 'g', defaultInputUnitCode: 'kg', availableQuantity: 400, lastBatchQuantity: 5000, ratio: null, fixedQuantity: null, threshold: 500, low: true },
+    { itemId: 12, itemName: '番茄酱', categoryId: 2, baseUnitCode: 'ml', defaultInputUnitCode: 'ml', availableQuantity: 2000, lastBatchQuantity: 3000, ratio: 0.2, fixedQuantity: null, threshold: 600, low: false }],
+  'FnbCatalog/SaveLowStockAlert': { id: 10, low_stock_ratio: null, low_stock_qty: 300 },
   'FnbReport/GetExpirySummary': { total: 1, rows: [{ batch_id: 100, item_id: 10, itemName: '大白菜', base_unit_code: 'g', batch_no: 'B1', expire_date: '2020-01-01T00:00:00', quantity: 5000, stock_form: 'bulk', status: '已过期' }] },
   'FnbReport/GetOverview': { total: 1, rows: [{ item_id: 10, category_id: 2, total_qty: 5000, total_amount: 20 }] },
   'FnbReport/GetLossLedger': { total: 1, rows: [{ movementId: '1', item_name: '大白菜', reason_code: 'damage', batch_no: 'B1', base_unit_code: 'g', delta_qty: -100, delta_amount: -0.4, business_date: '2026-09-23T00:00:00', posted_at: '2026-09-23T02:00:00' }] },
@@ -103,7 +107,7 @@ const settle = () => new Promise(r => setTimeout(r, 30))
 const receipts = () => calls.filter(c => c.path === 'FnbInventory/PostReceipt').map(c => c.data)
 const MANAGER = { id: 1, title_level: 200, base_shop_id: 12 }
 
-for (const name of ['stock', 'expiry', 'destroy', 'batch', 'inbound', 'cats', 'prep', 'recipe', 'serve', 'count', 'dash']) {
+for (const name of ['stock', 'expiry', 'lowstock', 'destroy', 'batch', 'inbound', 'cats', 'prep', 'recipe', 'serve', 'count', 'dash']) {
   test('页面 ' + name + '：店长打开无报错且不阻塞', async () => {
     installFakes(MANAGER)
     const page = loadPage(name)
@@ -136,6 +140,47 @@ test('库存页：按食材分组、临期角标、开封发 PostOpen', async ()
   const open = calls.find(c => c.path === 'FnbInventory/PostOpen')
   assert.deepEqual({ shopId: open.data.shopId, parentBatchId: open.data.parentBatchId, packCount: open.data.packCount }, { shopId: 12, parentBatchId: 101, packCount: 1 })
   assert.match(open.data.requestId, /^[0-9a-f-]{36}$/)
+})
+
+test('库存页：用量预警卡和临期卡并排，库存低的食材带标签，角标算上用量预警', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('stock')
+  page.onLoad({})
+  await settle()
+  assert.deepEqual([page.data.lowKnown, page.data.lowCount, page.data.lowSummary, page.data.badge], [true, 1, '大白菜快用完了', 2])
+  assert.deepEqual(page.data.items.map(i => [i.name, i.low]), [['大白菜', true], ['番茄酱', false]])
+})
+
+test('库存页：旧版服务端没有用量预警接口时不显示这张卡，其余照常', async () => {
+  installFakes(MANAGER)
+  const saved = RESPONSES['FnbInventory/ListLowStock']
+  delete RESPONSES['FnbInventory/ListLowStock']
+  try {
+    const page = loadPage('stock')
+    page.onLoad({})
+    await settle()
+    assert.deepEqual([page.data.lowKnown, page.data.alertCount, page.data.items.length], [false, 1, 2])
+  } finally {
+    RESPONSES['FnbInventory/ListLowStock'] = saved
+  }
+})
+
+test('用量预警页：库存低的排前面；店长按数量设置预警，按常用单位换成基本单位保存', async () => {
+  installFakes(MANAGER)
+  const page = loadPage('lowstock')
+  page.onLoad({})
+  await settle()
+  assert.deepEqual(page.data.groups.map(g => [g.title, g.rows.map(r => r.name)]), [['需要补货', ['大白菜']], ['其他食材', ['番茄酱']]])
+  const cabbage = page.data.groups[0].rows[0]
+  assert.deepEqual([cabbage.tag.text, cabbage.availLabel, cabbage.lineLabel, cabbage.ruleLabel], ['库存低', '可用 400 g', '预警线 500 g', '最近一批的 10%（默认）'])
+  page.onEdit({ currentTarget: { dataset: { id: 10 } } })
+  assert.deepEqual([page.data.edit.mode, page.data.edit.ratioText, page.data.edit.unitLabel], ['ratio', '10', 'kg'])
+  page.setMode({ currentTarget: { dataset: { mode: 'qty' } } })
+  page.setQty({ detail: { value: '0.3' } })
+  page.onSave()
+  await settle()
+  assert.deepEqual(calls.find(c => c.path === 'FnbCatalog/SaveLowStockAlert').data, { shopId: 12, itemId: 10, ratio: null, quantity: 300 })
+  assert.equal(page.data.editShow, false)
 })
 
 test('入库页：选食材、拍照、填到期日后提交即入库，出现在本次已入库', async () => {

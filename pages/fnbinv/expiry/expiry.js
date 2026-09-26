@@ -3,6 +3,7 @@ const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/stock-view.js')
 const expiry = require('../common/expiry.js')
+const lowstock = require('../common/lowstock.js')
 const requestId = require('../common/request-id.js')
 
 Page({
@@ -20,7 +21,7 @@ Page({
     return api.getAll(this.ctx, 'FnbReport/GetExpirySummary').then(rows => {
       this.loadedOnce = true
       const g = expiry.groupAlerts(rows)
-      getApp().globalData.fnbAlertCount = g.total
+      lowstock.setBadge({ expiry: g.total })
       const row = r => view.alertRow(r, this.data.today)
       this.setData({
         loading: false, expiredCount: g.expired.length,

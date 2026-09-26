@@ -128,6 +128,7 @@
       "pages": [
         "stock/stock",
         "expiry/expiry",
+        "lowstock/lowstock",
         "destroy/destroy",
         "batch/batch",
         "inbound/inbound",

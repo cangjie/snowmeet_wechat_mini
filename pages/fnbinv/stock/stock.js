@@ -1,15 +1,17 @@
-// 食材库总览：按食材分组看批次与到期，未开封批次可直接开封
+// 食材库总览：按食材分组看批次与到期，未开封批次可直接开封；顶部并排显示临期过期批次和用量预警
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/stock-view.js')
 const expiry = require('../common/expiry.js')
 const units = require('../common/units.js')
+const lowstock = require('../common/lowstock.js')
 const requestId = require('../common/request-id.js')
 
 Page({
   data: {
     loading: true, blocked: '', isManager: false,
-    alertCount: 0, alertSummary: '', tree: [], subs: [], storages: expiry.STORAGE,
+    alertCount: 0, alertSummary: '', lowKnown: false, lowCount: 0, lowSummary: '', badge: 0,
+    tree: [], subs: [], storages: expiry.STORAGE,
     filter: { l1: 0, l2: 0, storage: '', query: '' },
     items: [], skuCount: 0, batchCount: 0, openedCount: 0, expanded: 0
   },
@@ -34,15 +36,19 @@ Page({
       api.get(ctx, 'FnbCatalog/ListCategories'),
       api.getAll(ctx, 'FnbCatalog/ListMaterials'),
       api.getAll(ctx, 'FnbInventory/ListBatches'),
-      api.getAll(ctx, 'FnbReport/GetExpirySummary')
-    ]).then(([categories, materials, batches, summary]) => {
+      api.getAll(ctx, 'FnbReport/GetExpirySummary'),
+      // 用量预警只是提示：查不到（网络或旧版服务端）就不显示这张卡
+      api.get(ctx, 'FnbInventory/ListLowStock').catch(() => null)
+    ]).then(([categories, materials, batches, summary, low]) => {
+      this.lowIds = new Set((low || []).filter(r => r.low).map(r => r.itemId))
       this.source = { categories, materials, rows: batches }
       this.loadedOnce = true
       const groups = expiry.groupAlerts(summary)
-      getApp().globalData.fnbAlertCount = groups.total
+      const badge = lowstock.setBadge({ expiry: groups.total, low: low ? this.lowIds.size : 0 })
       this.setData({
-        loading: false, tree: view.categoryTree(categories), alertCount: groups.total,
-        alertSummary: groups.total ? '已过期 ' + groups.expired.length + ' · 开封后临期 ' + groups.opened.length + ' · 未开封临期 ' + groups.sealed.length : '暂无临期批次'
+        loading: false, tree: view.categoryTree(categories), alertCount: groups.total, badge,
+        alertSummary: groups.total ? '已过期 ' + groups.expired.length + ' · 开封后临期 ' + groups.opened.length + ' · 未开封临期 ' + groups.sealed.length : '暂无临期批次',
+        lowKnown: !!low, lowCount: this.lowIds.size, lowSummary: low ? lowstock.summary(low) : ''
       })
       this.render()
     }).catch(err => { this.setData({ loading: false }); base.fail(err) })
@@ -53,6 +59,8 @@ Page({
     const f = this.data.filter
     const result = view.buildStockRows(Object.assign({ today: this.data.today, filter: f }, this.source))
     const group = this.data.tree.find(g => g.id === f.l1)
+    const lowIds = this.lowIds || new Set()
+    result.items.forEach(i => { i.low = lowIds.has(i.itemId) })
     this.setData({ items: result.items, skuCount: result.skuCount, batchCount: result.batchCount,
       openedCount: result.openedCount, subs: group ? group.subs : [] })
   },
@@ -70,6 +78,7 @@ Page({
     this.setData({ expanded: this.data.expanded === id ? 0 : id })
   },
   goExpiry() { wx.navigateTo({ url: '/pages/fnbinv/expiry/expiry' }) },
+  goLowStock() { wx.navigateTo({ url: '/pages/fnbinv/lowstock/lowstock' }) },
   goBatch(e) { wx.navigateTo({ url: '/pages/fnbinv/batch/batch?id=' + e.currentTarget.dataset.id }) },
 
   onOpen(e) {

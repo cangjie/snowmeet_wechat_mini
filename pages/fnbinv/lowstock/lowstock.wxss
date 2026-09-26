@@ -1,0 +1,4 @@
+@import "../common/fnb.wxss";
+.card-title.small { font-size: 28rpx; }
+.name-row { gap: 14rpx; }
+.group { gap: 16rpx; }

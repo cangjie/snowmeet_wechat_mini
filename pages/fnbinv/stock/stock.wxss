@@ -1,5 +1,11 @@
 @import "../common/fnb.wxss";
-.alert-num { flex: none; width: 76rpx; height: 76rpx; border-radius: 20rpx; background: var(--danger-bg); color: var(--danger); font-size: 34rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+/* 临期过期批次、用量预警两张卡并排 */
+.alert-cards { display: flex; gap: 20rpx; }
+.alert-card { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12rpx; }
+.alert-card .card-row { gap: 14rpx; }
+.alert-num { flex: none; width: 64rpx; height: 64rpx; border-radius: 18rpx; background: var(--danger-bg); color: var(--danger); font-size: 30rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.alert-num.low { background: var(--warn-bg); color: var(--warn); }
+.alert-num.none { background: var(--gray); color: var(--muted); }
 .card-title.small { font-size: 28rpx; }
 .thumb { flex: none; width: 88rpx; height: 88rpx; border-radius: 20rpx; background: var(--blue-soft); color: var(--blue); font-size: 32rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 .name-row { gap: 14rpx; }

@@ -2,10 +2,15 @@
   <view class="fnb-head"><view class="fnb-sub">单店 · 批次级库存</view><view class="fnb-date">{{todayLabel}}</view></view>
   <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
   <block wx:else>
-    <view class="card card-pad card-row" bindtap="goExpiry">
-      <view class="alert-num">{{alertCount}}</view>
-      <view class="grow col"><view class="card-title small">临期与过期批次</view><view class="card-meta">{{alertSummary}}</view></view>
-      <view class="caret">›</view>
+    <view class="alert-cards">
+      <view class="card card-pad alert-card" bindtap="goExpiry">
+        <view class="card-row"><view class="alert-num">{{alertCount}}</view><view class="grow card-title small">临期与过期批次</view><view class="caret">›</view></view>
+        <view class="card-meta">{{alertSummary}}</view>
+      </view>
+      <view wx:if="{{lowKnown}}" class="card card-pad alert-card" bindtap="goLowStock">
+        <view class="card-row"><view class="alert-num low {{lowCount ? '' : 'none'}}">{{lowCount}}</view><view class="grow card-title small">用量预警</view><view class="caret">›</view></view>
+        <view class="card-meta">{{lowSummary}}</view>
+      </view>
     </view>
     <view class="stats">
       <view class="stat"><view class="stat-num">{{skuCount}}</view><view class="stat-label">在库品种</view></view>
@@ -34,7 +39,7 @@
       <view class="card-pad card-row" data-id="{{item.itemId}}" bindtap="onToggle">
         <view class="thumb">{{item.initial}}</view>
         <view class="grow col">
-          <view class="card-row name-row"><text class="card-title">{{item.name}}</text><text class="tag">{{item.subName}}</text></view>
+          <view class="card-row name-row"><text class="card-title">{{item.name}}</text><text class="tag">{{item.subName}}</text><text wx:if="{{item.low}}" class="tag warn">库存低</text></view>
           <view class="card-meta">{{item.metaLine}}</view>
           <view wx:if="{{item.hasSealed}}" class="sealed-line">{{item.availLine}}</view>
         </view>
@@ -61,4 +66,4 @@
     <view wx:if="{{!loading && items.length === 0}}" class="fnb-empty">没有符合条件的食材</view>
   </block>
 </view>
-<fnb-tabbar active="stock" badge="{{alertCount}}" />
+<fnb-tabbar active="stock" badge="{{badge}}" />

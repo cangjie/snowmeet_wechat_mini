@@ -1,0 +1,2 @@
+{ "navigationBarTitleText": "用量预警", "enablePullDownRefresh": true, "backgroundColor": "#F0F2F7",
+  "usingComponents": { "fnb-tabbar": "../components/fnb-tabbar/index" } }
