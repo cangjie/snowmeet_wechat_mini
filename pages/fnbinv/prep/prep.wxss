@@ -1,8 +1,11 @@
 @import "../common/fnb.wxss";
 .make { padding: 28rpx 32rpx; display: flex; flex-direction: column; gap: 24rpx; }
 .needs { background: var(--card); border-radius: 20rpx; padding: 8rpx 24rpx; }
-.need-row { display: flex; align-items: center; gap: 16rpx; padding: 16rpx 0; border-bottom: 2rpx solid var(--gray); font-size: 26rpx; }
-.need-row:last-child { border-bottom: none; }
+.need-item { padding: 16rpx 0; border-bottom: 2rpx solid var(--gray); }
+.need-item:last-child { border-bottom: none; }
+.need-row { display: flex; align-items: center; gap: 16rpx; font-size: 26rpx; }
+/* 原料不够而且有整包没开封：提示并可直接开封 */
+.need-open { display: flex; align-items: center; justify-content: flex-end; gap: 14rpx; margin-top: 10rpx; }
 .need { font-weight: 700; color: var(--danger); }
 .card-title.small { font-size: 28rpx; }
 .fnb-empty.small { padding: 24rpx 0; font-size: 24rpx; }

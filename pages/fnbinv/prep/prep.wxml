@@ -12,11 +12,17 @@
         <view class="card-row"><text class="grow field-label">产出数量（{{item.unitLabel}}）</text><qty-stepper value="{{outQty}}" min="{{item.integer ? 1 : 0.01}}" integer="{{item.integer}}" bind:change="onOutQty" /></view>
         <view class="card-meta">产出 <text class="em">{{outLabel}}</text></view>
         <view class="needs">
-          <view wx:for="{{needs}}" wx:for-item="r" wx:key="itemId" class="need-row">
-            <text class="grow">{{r.name}}</text><text class="need">−{{r.needLabel}}</text><text class="card-meta {{r.short ? 'tone-danger' : ''}}">{{r.stockLabel}}</text>
+          <view wx:for="{{needs}}" wx:for-item="r" wx:key="itemId" class="need-item">
+            <view class="need-row">
+              <text class="grow">{{r.name}}</text><text class="need">−{{r.needLabel}}</text><text class="card-meta {{r.short ? 'tone-danger' : ''}}">{{r.stockLabel}}</text>
+            </view>
+            <view wx:if="{{r.openHint || r.canOpen}}" class="need-open">
+              <text class="card-meta tone-warn">{{r.openHint}}</text>
+              <view wx:if="{{r.canOpen}}" class="btn" data-index="{{index}}" bindtap="onOpenPack">{{r.openLabel}}</view>
+            </view>
           </view>
         </view>
-        <view wx:if="{{!canMake}}" class="danger-line">原料可用量不足时不允许制作，请先开封或补货</view>
+        <view wx:if="{{!canMake}}" class="danger-line">原料可用量不足时不允许制作，请先开封或补货入库</view>
         <view class="field"><view class="field-label">产出储存方式</view>
           <view class="seg"><view wx:for="{{storages}}" wx:for-item="s" wx:key="code" class="chip-sq {{storage === s.code ? 'on' : ''}}" data-code="{{s.code}}" bindtap="onStorage">{{s.label}}</view></view></view>
         <view class="field"><view class="field-label">到期日期<text class="hint">{{expireHint}}</text></view>

@@ -81,15 +81,24 @@ function latestFor(recipes, outputItemId) {
   return { published: top('published'), draft: top('draft') }
 }
 
-// 制作预估（仅展示，以服务端过账为准）：配方用量 × 倍数（实际产出 ÷ 配方产出），对比可用量（散装 + 已开封，不含过期）
-function prepNeeds(lines, factor, availableByItem, materials) {
+// 制作预估（仅展示，以服务端过账为准）：配方用量 × 倍数（实际产出 ÷ 配方产出），对比能扣的量（散装、已开封、自制，未过期）；
+// 不够而且有整包没开封的，提示开封。stockOf：GetDeductStock 按食材；查不到（null）就不提示，由服务端判断够不够
+function prepNeeds(lines, factor, stockOf, materials) {
   const map = byId(materials)
   const rows = (lines || []).map(l => {
     const m = map[l.item_id] || { name: '食材#' + l.item_id, base_unit_code: '' }
     const need = Math.round(l.quantity * factor * 1e6) / 1e6
-    const have = Number(availableByItem[l.item_id] || 0)
-    return { itemId: l.item_id, name: m.name, need, needLabel: units.formatQty(need, m.base_unit_code),
-      stockLabel: '可用 ' + units.formatQty(have, m.base_unit_code), short: have < need }
+    const row = { itemId: l.item_id, name: m.name, baseUnit: m.base_unit_code, need, needLabel: units.formatQty(need, m.base_unit_code),
+      stockLabel: '', short: false, openHint: '', canOpen: false, openLabel: '' }
+    if (!stockOf) return row
+    const s = stockOf[l.item_id] || {}
+    const have = Number(s.availableQuantity || 0)
+    const short = have < need
+    const packs = Number(s.sealedPacks || 0)
+    const packName = s.packUnitName || '件'
+    return Object.assign(row, { stockLabel: '可用 ' + units.formatQty(have, m.base_unit_code), short,
+      openHint: short && packs > 0 ? '另有 ' + packs + ' ' + packName + '未开封' : '',
+      canOpen: short && !!s.openBatchId, openLabel: '开封 1 ' + packName })
   })
   return { rows, ok: rows.length > 0 && rows.every(r => !r.short) }
 }

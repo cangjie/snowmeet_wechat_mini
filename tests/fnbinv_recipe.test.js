@@ -62,11 +62,15 @@ test('半成品配方取最新发布版与最新草稿', () => {
 
 test('制作预估：配方用量 × 倍数（实际产出 ÷ 配方产出）对比可用量，不足则整单不可制作', () => {
   const lines = [{ item_id: 1, quantity: 1800 }, { item_id: 2, quantity: 600 }]
-  const stock = { 1: 5000, 2: 400 }
+  const stock = { 1: { availableQuantity: 5000 }, 2: { availableQuantity: 400, sealedPacks: 2, packUnitName: '瓶', openBatchId: 7 } }
   const r = recipe.prepNeeds(lines, 2, stock, materials)
   assert.deepEqual(r.rows.map(x => [x.name, x.needLabel, x.stockLabel, x.short]), [['大白菜', '3.6 kg', '可用 5 kg', false], ['生抽', '1.2 L', '可用 400 ml', true]])
   assert.equal(r.ok, false)
-  assert.equal(recipe.prepNeeds(lines, 1, { 1: 5000, 2: 600 }, materials).ok, true)
+  assert.deepEqual([r.rows[0].canOpen, r.rows[1].openHint, r.rows[1].canOpen, r.rows[1].openLabel], [false, '另有 2 瓶未开封', true, '开封 1 瓶'])
+  assert.equal(recipe.prepNeeds(lines, 1, { 1: { availableQuantity: 5000 }, 2: { availableQuantity: 600 } }, materials).ok, true)
+  // 库存查不到就不提示，由服务端制作时判断
+  const unknown = recipe.prepNeeds(lines, 2, null, materials)
+  assert.deepEqual([unknown.ok, unknown.rows[1].stockLabel, unknown.rows[1].short], [true, '', false])
 })
 
 test('菜品卡片副标题：不设分类（未分类）、售价为 0 时不显示', () => {

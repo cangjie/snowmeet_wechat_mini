@@ -377,24 +377,54 @@ test('销毁清单：店长确认销毁按过期原因整批报损', async () =>
 
 test('制作页：填实际产出数量按配方比例算原料，不足不能制作；按产出量过账，带照片和到期日', async () => {
   installFakes(MANAGER)
-  const page = loadPage('prep')
-  page.onLoad({})
-  await settle()
-  page.onToggle({ currentTarget: { dataset: { id: 11 } } })
-  await settle()
-  assert.equal(page.data.outQty, 10, '默认一份配方的产出')
-  page.onOutQty({ detail: { value: 60 } })
-  assert.equal(page.data.needs[0].needLabel, '6 kg')
-  page.onExpire({ detail: { date: '2099-01-01' } })
-  page.onPhotos({ detail: { photos: [{ id: 5 }], uploading: 0 } })
-  assert.equal(page.data.canMake, false)
-  page.onOutQty({ detail: { value: 10 } })
-  assert.equal(page.data.canMake, true)
-  page.onMake()
-  await settle()
-  const made = calls.find(c => c.path === 'FnbInventory/PostPreparation')
-  assert.deepEqual({ recipeId: made.data.recipeId, outputQuantity: made.data.outputQuantity, imageIds: made.data.imageIds, expireDate: made.data.expireDate },
-    { recipeId: '20', outputQuantity: 10, imageIds: [5], expireDate: '2099-01-01' })
+  RESPONSES['FnbKitchen/GetDeductStock'] = [{ itemId: 10, availableQuantity: 5000, sealedPacks: 0 }]
+  try {
+    const page = loadPage('prep')
+    page.onLoad({})
+    await settle()
+    page.onToggle({ currentTarget: { dataset: { id: 11 } } })
+    await settle()
+    assert.match(calls.find(c => c.path === 'FnbKitchen/GetDeductStock').url, /itemIds=10/)
+    assert.equal(page.data.outQty, 10, '默认一份配方的产出')
+    page.onOutQty({ detail: { value: 60 } })
+    assert.deepEqual([page.data.needs[0].needLabel, page.data.needs[0].canOpen], ['6 kg', false])
+    page.onExpire({ detail: { date: '2099-01-01' } })
+    page.onPhotos({ detail: { photos: [{ id: 5 }], uploading: 0 } })
+    assert.equal(page.data.canMake, false)
+    page.onOutQty({ detail: { value: 10 } })
+    assert.equal(page.data.canMake, true)
+    page.onMake()
+    await settle()
+    const made = calls.find(c => c.path === 'FnbInventory/PostPreparation')
+    assert.deepEqual({ recipeId: made.data.recipeId, outputQuantity: made.data.outputQuantity, imageIds: made.data.imageIds, expireDate: made.data.expireDate },
+      { recipeId: '20', outputQuantity: 10, imageIds: [5], expireDate: '2099-01-01' })
+  } finally {
+    delete RESPONSES['FnbKitchen/GetDeductStock']
+  }
+})
+
+test('制作页：原料不够而且有整包没开封，可直接开封，开封后重新查库存，够了就能制作', async () => {
+  installFakes(MANAGER)
+  RESPONSES['FnbKitchen/GetDeductStock'] = [{ itemId: 10, availableQuantity: 0, sealedQuantity: 1000, sealedPacks: 2,
+    openBatchId: 101, openBatchNo: 'B2', openPackSize: 500, packUnitName: '袋' }]
+  try {
+    const page = loadPage('prep')
+    page.onLoad({})
+    await settle()
+    page.onToggle({ currentTarget: { dataset: { id: 11 } } })
+    await settle()
+    const row = page.data.needs[0]
+    assert.deepEqual([row.stockLabel, row.short, row.openHint, row.canOpen, row.openLabel, page.data.canMake],
+      ['可用 0 g', true, '另有 2 袋未开封', true, '开封 1 袋', false])
+    RESPONSES['FnbKitchen/GetDeductStock'] = [{ itemId: 10, availableQuantity: 1000, sealedQuantity: 0, sealedPacks: 0 }]
+    page.onOpenPack({ currentTarget: { dataset: { index: 0 } } })
+    await settle()
+    const opened = calls.find(c => c.path === 'FnbInventory/PostOpen').data
+    assert.deepEqual([opened.parentBatchId, opened.packCount], [101, 1])
+    assert.deepEqual([page.data.needs[0].stockLabel, page.data.needs[0].short, page.data.canMake], ['可用 1 kg', false, true])
+  } finally {
+    delete RESPONSES['FnbKitchen/GetDeductStock']
+  }
 })
 
 test('配方页：新建菜品只填名称和用料，先建菜品再存用料并发布，不带售价和分类', async () => {

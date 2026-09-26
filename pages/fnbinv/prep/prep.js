@@ -1,4 +1,4 @@
-// 半成品制作：填产出数量 → 按配方比例预估原料 → 拍照、储存、到期 → PostPreparation（核销原料，产出新批次）
+// 半成品制作：填产出数量 → 按配方比例预估原料（不够而且有整包没开封的可直接开封）→ 拍照、储存、到期 → PostPreparation（核销原料，产出新批次）
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const expiry = require('../common/expiry.js')
@@ -6,6 +6,7 @@ const units = require('../common/units.js')
 const recipe = require('../common/recipe.js')
 const forms = require('../common/forms.js')
 const requestId = require('../common/request-id.js')
+const openPack = require('../common/open-pack.js')
 
 Page({
   data: {
@@ -25,15 +26,12 @@ Page({
     return Promise.all([
       api.get(this.ctx, 'FnbRecipe/ListRecipes'),
       api.getAll(this.ctx, 'FnbCatalog/ListMaterials'),
-      api.get(this.ctx, 'FnbInventory/GetStock'),
       api.get(this.ctx, 'FnbCatalog/ListCategories'),
       api.get(this.ctx, 'FnbCatalog/ListShelfLifeRules'),
       api.getAll(this.ctx, 'FnbInventory/ListBatches'),
       api.get(this.ctx, 'FnbCatalog/GetUnits')
-    ]).then(([recipes, materials, stock, categories, rules, batches, unitList]) => {
-      const available = {}
-      ;(stock || []).forEach(s => { available[s.item_id] = s.availableQty })
-      this.src = { materials, categories, rules, available, units: unitList }
+    ]).then(([recipes, materials, categories, rules, batches, unitList]) => {
+      this.src = { materials, categories, rules, units: unitList }
       const cards = materials.filter(m => m.valid && m.item_type === 'prepared').map(m => {
         const r = recipe.latestFor(recipes, m.id).published
         const cat = categories.find(c => c.id === m.category_id) || {}
@@ -63,6 +61,8 @@ Page({
     if (!card) { this.setData({ openId: 0 }); return }
     api.get(this.ctx, 'FnbRecipe/GetRecipe', { recipeId: card.recipeId }).then(res => {
       this.lines = res.lines
+      return this.loadStock()
+    }).then(() => {
       this.expireManual = false
       this.setData({ openId: id, outQty: card.defaultQty, photos: [], storage: card.category.default_storage || 'chilled' })
       this.refresh()
@@ -70,6 +70,27 @@ Page({
     }).catch(base.fail)
   },
   card() { return this.data.cards.find(c => c.id === this.data.openId) },
+  // 原料能扣多少、有没有整包没开封：只是提示，查不到（网络或旧版服务端）就不提示，够不够由服务端制作时判断
+  loadStock() {
+    const ids = (this.lines || []).map(l => l.item_id)
+    this.stockOf = null
+    if (!ids.length) return Promise.resolve()
+    return api.get(this.ctx, 'FnbKitchen/GetDeductStock', { itemIds: ids.join(',') })
+      .then(rows => {
+        const map = {}
+        ;(rows || []).forEach(r => { map[r.itemId] = r })
+        this.stockOf = map
+      })
+      .catch(() => {})
+  },
+  onOpenPack(e) {
+    const row = this.data.needs[e.currentTarget.dataset.index]
+    const s = row && this.stockOf && this.stockOf[row.itemId]
+    if (!s || !s.openBatchId) return
+    openPack.openOne(this, row.name, row.baseUnit, s).then(opened => {
+      if (opened) return this.loadStock().then(() => this.refresh())
+    })
+  },
   // 实际产出量（基本单位）
   outBase(card) { return units.toBase(this.data.outQty, card.unitCode, this.src.units) },
 
@@ -77,7 +98,7 @@ Page({
     const card = this.card()
     if (!card) return
     const out = this.outBase(card)
-    const r = recipe.prepNeeds(this.lines, out / card.outputQty, this.src.available, this.src.materials)
+    const r = recipe.prepNeeds(this.lines, out / card.outputQty, this.stockOf, this.src.materials)
     const month = Number(this.data.today.slice(5, 7))
     const rule = expiry.ruleFor(this.src.rules, card.id, this.data.storage, month)
     this.setData({ needs: r.rows, canMake: r.ok && out > 0, outLabel: units.formatQty(out, card.unit) })

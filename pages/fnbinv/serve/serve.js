@@ -8,6 +8,7 @@ const units = require('../common/units.js')
 const kitchen = require('../common/kitchen.js')
 const recipe = require('../common/recipe.js')
 const requestId = require('../common/request-id.js')
+const openPack = require('../common/open-pack.js')
 
 function limit(tasks, size) {
   const results = []
@@ -140,23 +141,10 @@ Page({
     const line = this.data.deduct[e.currentTarget.dataset.index]
     const s = line && this.stockOf[line.itemId]
     if (!s || !s.openBatchId) return
-    const packName = s.packUnitName || '件'
-    wx.showModal({
-      title: '开封 1 ' + packName + line.name,
-      content: '批次 ' + (s.openBatchNo || '') + '，放出 ' + units.formatQty(s.openPackSize, line.baseUnit) + '，之后按开封后保质期计算。',
-      confirmText: '开封',
-      success: r => {
-        if (!r.confirm) return
-        const key = 'open:' + s.openBatchId
-        api.post(this.ctx, 'FnbInventory/PostOpen', { requestId: this.keeper.get(key), parentBatchId: s.openBatchId, packCount: 1 })
-          .then(() => {
-            this.keeper.done(key)
-            wx.showToast({ title: '已开封 1 ' + packName, icon: 'success' })
-            return this.loadStock(this.data.deduct.map(l => l.itemId), true)
-          })
-          .then(() => this.setData({ deduct: kitchen.withStock(this.data.deduct, this.stockOf, this.units, this.servedQty) }))
-          .catch(err => { if (!err.retryable) this.keeper.done(key); base.fail(err) })
-      }
+    openPack.openOne(this, line.name, line.baseUnit, s).then(opened => {
+      if (!opened) return
+      return this.loadStock(this.data.deduct.map(l => l.itemId), true)
+        .then(() => this.setData({ deduct: kitchen.withStock(this.data.deduct, this.stockOf, this.units, this.servedQty) }))
     })
   },
   onTable(e) { this.setData({ tableNo: e.detail.value }) },
