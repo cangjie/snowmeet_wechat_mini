@@ -24,7 +24,7 @@
       </view>
     </view>
     <view wx:if="{{!loading && groups.length === 0}}" class="fnb-empty">没有临期批次</view>
-    <view class="fnb-note">临期阈值按二级分类设置，可在「分类」里改。<text wx:if="{{!isManager}}">报损需要店长权限。</text></view>
+    <view class="fnb-note">临期提醒天数按食材设置，可在「分类」里点食材修改。<text wx:if="{{!isManager}}">报损需要店长权限。</text></view>
   </block>
 </view>
 <fnb-tabbar active="stock" />
