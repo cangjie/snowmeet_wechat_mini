@@ -10,7 +10,7 @@ const util = require('../../../../utils/util.js');
 const data = require('../../../../utils/data.js');
 
 // 与 data.js uploadFilePromise 的上传域名保持一致（照片落在处理上传那台服务器的磁盘）
-const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com';
+const IMG_HOST = data.IMAGE_HOST;
 
 function fullUrl(p) {
   if (!p) return '';

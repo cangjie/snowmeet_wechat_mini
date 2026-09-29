@@ -91,13 +91,13 @@ Page({
           retailImage.thumb = retailImage.image.thumbUrl
         }
         else {
-          retailImage.thumb = 'https://snowmeet.wanlonghuaxue.com' + retailImage.image.thumbUrl
+          retailImage.thumb = data.IMAGE_HOST + retailImage.image.thumbUrl
         }
         if (retailImage.image.file_path_name.indexOf('http') == 0) {
           retailImage.url = retailImage.image.file_path_name
         }
         else {
-          retailImage.url = 'https://snowmeet.wanlonghuaxue.com' + retailImage.image.file_path_name
+          retailImage.url = data.IMAGE_HOST + retailImage.image.file_path_name
         }
       }
       that.setData({ order })
@@ -238,13 +238,13 @@ Page({
     data.uploadFilePromise(null, uploadFile.tempFilePath, '零售开单',
       uploadFile.type, app.globalData.sessionKey).then(function (uploadedFile) {
         image.image_id = uploadedFile.id
-        image.url = 'https://snowmeet.wanlonghuaxue.com' + uploadedFile.file_path_name
-        image.thumb = 'https://snowmeet.wanlonghuaxue.com' + uploadedFile.file_path_name
+        image.url = data.IMAGE_HOST + uploadedFile.file_path_name
+        image.thumb = data.IMAGE_HOST + uploadedFile.file_path_name
         image.type = uploadedFile.file_type
         that.setData({order})
         setTimeout(() => {data.uploadFilePromise(uploadedFile.id, uploadFile.thumb, null, null, app.globalData.sessionKey).then(function (uploadThumbFile) {
           //image.id = uploadThumbFile.id
-          image.thumb = 'https://snowmeet.wanlonghuaxue.com' + uploadThumbFile.thumbUrl
+          image.thumb = data.IMAGE_HOST + uploadThumbFile.thumbUrl
           image.status = 'success'
           image.message = ''
           //that.setData({images})

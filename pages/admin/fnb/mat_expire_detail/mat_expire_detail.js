@@ -5,9 +5,8 @@ const app = getApp()
 const data = require('../../../../utils/data.js')
 const matExpire = require('../../../../utils/matExpire.js')
 const util = require('../../../../utils/util.js')
-// 2026-07-21：图片改为统一落 snowmeet.wanlonghuaxue.com（与养护开单 care_order_detail.js 的
-// IMG_HOST 同一套域名），不再跟随 app.globalData.domainName（mini.snowmeet.top）
-const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com'
+// 图片域名统一取 data.IMAGE_HOST（与养护开单同一套），不跟随 app.globalData.domainName
+const IMG_HOST = data.IMAGE_HOST
 
 Page({
   data: {

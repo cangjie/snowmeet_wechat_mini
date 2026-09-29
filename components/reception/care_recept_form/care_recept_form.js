@@ -14,7 +14,7 @@ const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 
 // 与 data.js uploadFilePromise 的上传域名保持一致（文件落在处理上传那台服务器的磁盘）
-const UPLOAD_HOST = 'https://snowmeet.wanlonghuaxue.com';
+const UPLOAD_HOST = data.IMAGE_HOST;
 
 // 新建一个空 care（snake_case 对齐后端；valid=0 草稿态，PlaceCareOrder 才置 1）
 function blankCare() {

@@ -7,7 +7,7 @@ const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
 const adminAssistant = require('../../../utils/adminAssistant.js')
 
-const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com'
+const IMG_HOST = data.IMAGE_HOST
 
 Page({
 

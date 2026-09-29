@@ -1,6 +1,6 @@
 // 批次照片：复用旧食材模块的上传接口（FnbMaterial/UploadPhoto，用途「食材批次」），发 change {photos, uploading}
 const data = require('../../../../utils/data.js')
-const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com'
+const IMG_HOST = data.IMAGE_HOST
 
 Component({
   properties: {

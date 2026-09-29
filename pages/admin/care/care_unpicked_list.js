@@ -8,7 +8,7 @@ const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
 
-const IMG_HOST = 'https://snowmeet.wanlonghuaxue.com'
+const IMG_HOST = data.IMAGE_HOST
 
 function daysSince(d) {
   var days = Math.floor((Date.now() - d.getTime()) / 86400000)
