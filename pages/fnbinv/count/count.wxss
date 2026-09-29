@@ -2,3 +2,6 @@
 .card-title.small { font-size: 28rpx; }
 .count { width: 170rpx; flex: none !important; text-align: right; }
 .actions { gap: 16rpx; justify-content: center; }
+/* iOS：overflow:hidden 的纵向 flex 卡片会压缩多行说明，按钮盖住文字 */
+.start-card > view { flex-shrink: 0; }
+.start-card .btn-block { margin-top: 12rpx; }

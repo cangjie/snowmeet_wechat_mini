@@ -2,7 +2,7 @@
   <view class="fnb-head"><view class="fnb-sub">系统数量 vs 实盘数量</view><view class="fnb-date">{{todayLabel}}</view></view>
   <view wx:if="{{blocked}}" class="fnb-blocked">{{blocked}}</view>
   <block wx:elif="{{!documentId}}">
-    <view class="card card-pad col">
+    <view class="card card-pad col start-card">
       <view class="card-title">没有进行中的盘点</view>
       <view class="card-meta">只盘散装与已开封余量，未开封整件不参与差异计算。当前可盘点 {{candidates}} 种食材。</view>
       <view class="btn primary btn-block {{isManager ? '' : 'disabled'}}" bindtap="onStart">开始盘点</view>

@@ -6,7 +6,7 @@
       <view class="chip-sq {{seg === 'dish' ? 'on' : ''}}" data-seg="dish" bindtap="onSeg">菜品配方</view>
       <view class="chip-sq {{seg === 'prep' ? 'on' : ''}}" data-seg="prep" bindtap="onSeg">半成品配方</view>
     </view>
-    <view class="fnb-note" wx:if="{{seg === 'dish'}}">每道菜按<text class="em">一份</text>设用料，出餐时按厨房单数量扣减。补齐配方后，待核对的厨房单才能出餐。<text wx:if="{{!isManager}}">维护需要店长权限。</text></view>
+    <view class="fnb-note" wx:if="{{seg === 'dish'}}">每道菜按<text class="em">一份</text>设用料，出餐时按厨房单数量扣减。发布配方后，才能在「出餐」建厨房单扣料。<text wx:if="{{!isManager}}">维护需要店长权限。</text></view>
     <view class="fnb-note" wx:else>半成品也是食材：按<text class="em">每 1 个 / 1 千克</text>设用料，制作时填实际产出多少，按比例核销原料，产出按自己的保质期入库。半成品分类在「分类」页新增时类型选「半成品」。</view>
     <view wx:if="{{seg === 'dish' && isManager}}" class="btn primary btn-block" bindtap="newDish">＋ 新建菜品</view>
     <view wx:if="{{seg === 'prep' && isManager}}" class="btn primary btn-block" bindtap="newPrep">＋ 新建半成品</view>
