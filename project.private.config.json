@@ -17,5 +17,8 @@
         }
       ]
     }
+  },
+  "setting": {
+    "urlCheck": true
   }
 }
