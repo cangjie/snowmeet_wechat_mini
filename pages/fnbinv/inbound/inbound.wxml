@@ -5,7 +5,9 @@
     <view class="card card-pad col form">
       <view class="step"><view class="step-no">1</view><view class="step-body">
         <view class="step-title">选择分类</view>
-        <view wx:if="{{!tree.length}}" class="col"><view class="card-meta">入库要先有二级分类，才能带出储存方式、保质期和计量单位。</view><view class="btn" bindtap="goCats">去分类页添加</view></view>
+        <view wx:if="{{loadState === 'loading' && !tree.length}}" class="card-meta">加载中…</view>
+        <view wx:elif="{{loadState === 'fail' && !tree.length}}" class="col"><view class="card-meta">分类加载失败</view><view class="btn" bindtap="onRetry">重试</view></view>
+        <view wx:elif="{{!tree.length}}" class="col"><view class="card-meta">入库要先有二级分类，才能带出储存方式、保质期和计量单位。</view><view class="btn" bindtap="goCats">去分类页添加</view></view>
         <scroll-view wx:else scroll-x class="chip-scroll" show-scrollbar="{{false}}" enhanced><view class="chips">
           <view wx:for="{{tree}}" wx:key="id" class="chip {{l1 === item.id ? 'on' : 'gray'}}" data-id="{{item.id}}" bindtap="onL1">{{item.name}}</view></view></scroll-view>
         <view wx:if="{{tree.length && !subs.length}}" class="card-meta">这个一级分类下还没有二级分类，<text class="tone-blue" bindtap="goCats">去分类页添加</text></view>

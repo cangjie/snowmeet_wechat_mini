@@ -11,6 +11,12 @@ const requestId = require('../common/request-id.js')
 const PACK_NAMES = ['瓶', '袋', '盒', '桶', '罐', '箱', '件']
 const DELETE_WINDOW_MS = 10 * 60 * 1000  // 与服务端 FnbReceiptService.DeleteWindow 一致
 
+// TEMP 耗时诊断（2026-09-30）：定位入库页慢在哪一步，控制台打印「[入库页耗时]」，定位后删除
+function timed(log, label, promise) {
+  const t = Date.now()
+  return promise.then(v => { log.push(label + ' ' + (Date.now() - t) + 'ms'); return v })
+}
+
 // 入库请求体 → 「2 袋 × 500 g · 冷冻 · 2026-11-22 到期」
 function receiptLine(b, baseUnit) {
   const qty = b.stockForm === 'sealed' ? b.quantity + ' ' + b.packUnitName + ' × ' + units.formatQty(b.packSize, baseUnit)
@@ -20,7 +26,7 @@ function receiptLine(b, baseUnit) {
 
 Page({
   data: {
-    blocked: '', isManager: false, tree: [], l1: 0, subs: [], sub: null,
+    blocked: '', isManager: false, loadState: 'loading', tree: [], l1: 0, subs: [], sub: null,
     nameQuery: '', hints: [], material: null, canCreate: false,
     photos: [], uploading: 0, batchNo: '', storages: expiry.STORAGE, storage: '',
     prodDate: '', shelfValue: '', shelfUnit: 'day', expireDate: '',
@@ -30,24 +36,44 @@ Page({
   },
 
   onLoad() {
-    base.boot(this).then(() => this.load()).catch(() => {})
+    this.perf = { t0: Date.now(), log: [] }
+    base.boot(this).then(() => {
+      this.perf.log.push('登录/员工信息 ' + (Date.now() - this.perf.t0) + 'ms')
+      return this.load()
+    }).catch(() => {})
   },
+  onReady() { if (this.perf) this.perf.log.push('首屏渲染 ' + (Date.now() - this.perf.t0) + 'ms') },
   onHide() { this.setData({ 'scan.show': false }) },
 
   load() {
+    const perf = this.perf || { t0: Date.now(), log: [] }
+    const tFetch = Date.now()
+    this.setData({ loadState: 'loading' })
+    // 批次号不依赖目录数据，与目录并发取，不再等目录回来后才发
+    this.newBatchNo()
     return Promise.all([
-      api.get(this.ctx, 'FnbCatalog/ListCategories'),
-      api.getAll(this.ctx, 'FnbCatalog/ListMaterials'),
-      api.get(this.ctx, 'FnbCatalog/GetUnits'),
-      api.get(this.ctx, 'FnbCatalog/ListShelfLifeRules')
+      timed(perf.log, 'ListCategories', api.get(this.ctx, 'FnbCatalog/ListCategories')),
+      timed(perf.log, 'ListMaterials', api.getAll(this.ctx, 'FnbCatalog/ListMaterials')),
+      timed(perf.log, 'GetUnits', api.get(this.ctx, 'FnbCatalog/GetUnits')),
+      timed(perf.log, 'ListShelfLifeRules', api.get(this.ctx, 'FnbCatalog/ListShelfLifeRules'))
     ]).then(([categories, materials, unitList, rules]) => {
+      perf.log.push('4 个请求并发共 ' + (Date.now() - tFetch) + 'ms')
+      const tRender = Date.now()
       this.src = { categories, materials: materials.filter(m => m.valid), units: unitList.filter(u => u.valid), rules }
       const tree = view.categoryTree(categories)
       this.setData({ tree, contentUnits: units.contentUnitOptions(null, this.src.units) })
       if (tree.length) this.pickL1(tree[0].id)
-      this.newBatchNo()
-    }).catch(base.fail)
+      // 最后一次 setData 的回调在前面几次渲染完成之后触发
+      this.setData({ loadState: 'ok' }, () => {
+        perf.log.push('数据渲染 ' + (Date.now() - tRender) + 'ms')
+        console.log('[入库页耗时] 从打开到可用 ' + (Date.now() - perf.t0) + 'ms：' + perf.log.join('，'))
+      })
+    }).catch(err => {
+      this.setData({ loadState: 'fail' })
+      base.fail(err)
+    })
   },
+  onRetry() { this.load() },
 
   // ---- 1. 分类 ----
   pickL1(id) {
@@ -130,8 +156,10 @@ Page({
   // ---- 3. 照片 / 4. 批次号 ----
   onPhotos(e) { this.setData({ photos: e.detail.photos, uploading: e.detail.uploading }) },
   newBatchNo() {
+    const t = Date.now()
     api.get(this.ctx, 'FnbMaterial/GenBatchNo').then(res => {
       this.setData({ batchNo: res.batchNo })
+      console.log('[入库页耗时] GenBatchNo ' + (Date.now() - t) + 'ms')
     }).catch(() => {})
   },
   onBatchNo(e) { this.setData({ batchNo: e.detail.value }) },
