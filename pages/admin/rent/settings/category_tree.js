@@ -34,10 +34,6 @@ Page({
       {
         shop: '旗舰',
         matrix: [['', '', ''], ['', '', ''], ['', '', '']]
-      },
-      {
-        shop: '南山',
-        matrix: [['', '', ''], ['', '', ''], ['', '', '']]
       }
     ],
     matrixDisabled: true,
@@ -121,9 +117,6 @@ Page({
           break
         case '崇礼旗舰店':
           shop = '旗舰'
-          break
-        case '南山':
-          shop = '南山'
           break
         default:
           break

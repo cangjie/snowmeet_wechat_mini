@@ -216,7 +216,6 @@ App({
     appId: 'wxd1310896f2aa68bb',
     domainName: 'mini.snowmeet.top',
     requestPrefix: 'https://mini.snowmeet.top/api/',
-    uploadDomain: 'xuexiaotupian.wanlonghuaxue.com',
     userInfo: null,
     sessionKey: '',
     cellNumber: '',
@@ -230,7 +229,7 @@ App({
     //wssUrl: 'wss://' + domainName + '/ws',
     // ⚠️ 各页面的 tabIndex 是硬编码的（页面 data 里写死 0/1/2），
     // 往这个数组中间插项会让后面所有页面的高亮错位——增删项时必须同步检查
-    // 所有用了 mp-tabbar 的页面：index / mine / ski_pass_selector / ski_pass_reserve / punchcard_shop
+    // 所有用了 mp-tabbar 的页面：index / mine / ski_pass_selector / punchcard_shop
     userTabBarItem: [
       {
         "pagePath": "/pages/ski_pass/ski_pass_selector",

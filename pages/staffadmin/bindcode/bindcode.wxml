@@ -1,0 +1,32 @@
+<view class="sa-page">
+  <view wx:if="{{prototype}}" class="sa-proto">原型 · 演示数据，二维码为占位图</view>
+  <view wx:if="{{blocked}}" class="sa-blocked">{{blocked}}</view>
+  <block wx:elif="{{code}}">
+    <view class="card"><view class="card-pad" style="align-items: center; gap: 28rpx;">
+      <view class="card-title" style="text-align: center;">{{title}}</view>
+      <block wx:if="{{code.status === 'ok'}}">
+        <view class="qr">
+          <view class="qr-eye tl"></view><view class="qr-eye tr"></view><view class="qr-eye bl"></view>
+          <view class="qr-text">二维码<view>（原型占位）</view></view>
+        </view>
+        <view class="col" style="align-self: stretch;">
+          <view wx:for="{{lines}}" wx:key="*this" class="effect">{{item}}</view>
+        </view>
+        <view wx:if="{{prototype}}" class="btn" bindtap="onSimulate">模拟被扫码（原型）</view>
+      </block>
+      <block wx:elif="{{code.status === 'used'}}">
+        <view class="done-mark">✓</view>
+        <view class="card-title small">{{code.purpose === 'job_phone' ? '工作手机 ' + code.phone.tail + ' 已绑定微信' : '已完成绑定'}}</view>
+        <view class="btn-row">
+          <view wx:if="{{code.staff}}" class="btn primary" bindtap="onOpenStaff">查看账号</view>
+          <view wx:else class="btn primary" bindtap="onBack">返回</view>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="done-mark off">!</view>
+        <view class="card-title small">这个码已失效</view>
+        <view class="btn primary" bindtap="onRegenerate">重新生成</view>
+      </block>
+    </view></view>
+  </block>
+</view>

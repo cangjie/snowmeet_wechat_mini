@@ -1,0 +1,41 @@
+<view class="sa-page">
+  <view wx:if="{{prototype}}" class="sa-proto">原型 · 演示数据，操作不会保存到服务器</view>
+  <view wx:if="{{blocked}}" class="sa-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="stats">
+      <view wx:for="{{filters}}" wx:key="key" class="stat {{status === item.key && !keyword ? 'on' : ''}}" data-key="{{item.key}}" bindtap="onFilter">
+        <text class="stat-num {{item.key === 'attention' && counts.attention ? 'tone-danger' : ''}}">{{counts[item.key] || 0}}</text>
+        <text class="stat-label">{{item.label}}</text>
+      </view>
+    </view>
+    <view class="search">
+      <input placeholder="搜姓名或手机号" value="{{keyword}}" bindinput="onSearch" confirm-type="search" />
+      <text wx:if="{{keyword}}" class="caret" bindtap="onClear">×</text>
+    </view>
+    <view wx:if="{{status === 'attention' && !keyword}}" class="sa-note">在职却登不上后台，或离职了还占着手机的账号。点开按提示处理。</view>
+    <view wx:if="{{status === 'pending' && !keyword}}" class="sa-note">员工扫「自助登记码」提交的账号，点开设定职级和门店后开通。</view>
+
+    <view class="sa-section-title"><text>{{keyword ? '搜索结果' : sectionTitle}}</text><text class="side">{{rows.length}} 个账号</text></view>
+    <view wx:if="{{rows.length}}" class="card">
+      <view wx:for="{{rows}}" wx:key="id" class="sub-row" data-id="{{item.id}}" bindtap="onOpen">
+        <view class="avatar {{item.status === 'left' ? 'muted' : ''}}">{{item.initial}}</view>
+        <view class="grow col">
+          <view class="card-row wrap" style="gap: 12rpx;">
+            <text class="card-title small">{{item.name}}</text>
+            <text wx:if="{{item.typeTag}}" class="tag {{item.typeTag.tone}}">{{item.typeTag.text}}</text>
+            <text wx:if="{{keyword}}" class="tag {{item.statusTag.tone}}">{{item.statusTag.text}}</text>
+          </view>
+          <view class="card-meta">{{item.titleLabel}}<text wx:if="{{item.shop_name}}"> · {{item.shop_name}}</text> · {{item.phoneLabel}}<text wx:if="{{item.wechatTag}}" class="tone-{{item.wechatTag.tone}}"> · {{item.wechatTag.text}}</text></view>
+          <view wx:for="{{item.issues}}" wx:for-item="iss" wx:key="code" class="issue tone-{{iss.tone}}">{{iss.text}}</view>
+        </view>
+        <text class="caret">›</text>
+      </view>
+    </view>
+    <view wx:elif="{{!loading}}" class="sa-empty">没有账号</view>
+  </block>
+</view>
+<view wx:if="{{!blocked}}" class="bottom-bar">
+  <view class="btn ghost" bindtap="onSelfCode">自助登记码</view>
+  <view class="btn ghost" bindtap="onPhones">工作手机</view>
+  <view class="btn primary" bindtap="onOnboard">新员工入职</view>
+</view>

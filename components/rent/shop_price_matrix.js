@@ -18,8 +18,7 @@ Component({
   data: {
     shops:[
       {id: 10, name: '万龙体验中心', scene: '门市' },
-      {id: 9,  name: '崇礼旗舰店', scene: '门市' },
-      {id: 4,  name: '南山', scene: '门市' }
+      {id: 9,  name: '崇礼旗舰店', scene: '门市' }
     ],
     active: 0,
     scene: '门市',

@@ -7,7 +7,6 @@
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
     "pages/ski_pass/ski_pass_selector",
-    "pages/ski_pass/ski_pass_reserve",
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
     "pages/mine/ticket/ticket_claim/ticket_claim",
@@ -28,15 +27,7 @@
     "pages/admin/staff/staff_detail",
     "pages/admin/staff_reg_qrcode",
     "pages/register/out_reg",
-    "pages/admin/ski_pass/nanshan_reserve",
-    "pages/admin/ski_pass/nanshan_reserve_detail",
-    "pages/admin/ski_pass/nanshan_verify",
-    "pages/admin/ski_pass/nanshan_card_search",
-    "pages/admin/ski_pass/nanshan_refund",
-    "pages/admin/ski_pass/nanshan_refund_detail",
-    "pages/admin/ski_pass/nanshan_pick_card_scan",
     "pages/mine/skipass/my_skipass",
-    "pages/ski_pass/nanshan_overtime_reserve",
     "pages/admin/ski_pass/common_skipass_list",
     "pages/admin/ski_pass/common_skipass_detail",
     "pages/admin/ski_pass/reserve_qrcode",
@@ -138,6 +129,19 @@
         "serve/serve",
         "count/count",
         "dash/dash"
+      ]
+    },
+    {
+      "root": "pages/staffadmin",
+      "name": "staffadmin",
+      "pages": [
+        "list/list",
+        "detail/detail",
+        "onboard/onboard",
+        "phones/phones",
+        "bindcode/bindcode",
+        "bind/bind",
+        "selfreg/selfreg"
       ]
     }
   ],

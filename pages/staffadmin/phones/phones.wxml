@@ -1,0 +1,51 @@
+<view class="sa-page">
+  <view wx:if="{{prototype}}" class="sa-proto">原型 · 演示数据，操作不会保存到服务器</view>
+  <view wx:if="{{blocked}}" class="sa-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="stats">
+      <view class="stat"><text class="stat-num">{{counts.total || 0}}</text><text class="stat-label">共</text></view>
+      <view class="stat"><text class="stat-num">{{counts.in_use || 0}}</text><text class="stat-label">在用</text></view>
+      <view class="stat"><text class="stat-num">{{counts.idle || 0}}</text><text class="stat-label">空闲</text></view>
+      <view class="stat"><text class="stat-num {{counts.attention ? 'tone-danger' : ''}}">{{counts.attention || 0}}</text><text class="stat-label">需处理</text></view>
+    </view>
+    <view class="sa-note">工作手机上的微信只需绑定一次。换人时把手机分给新账号就行，不用重新扫码。</view>
+
+    <view wx:if="{{rows.length}}" class="card">
+      <block wx:for="{{rows}}" wx:key="id">
+        <view class="sub-row" data-id="{{item.id}}" bindtap="onToggle">
+          <view class="grow col">
+            <view class="card-row" style="gap: 12rpx;"><text class="card-title small">{{item.tail}}</text><text class="tag {{item.statusTag.tone}}">{{item.statusTag.text}}</text></view>
+            <view class="card-meta">{{item.cell}}<text wx:if="{{item.holder}}"> · {{item.holder.name}}</text></view>
+          </view>
+          <text class="caret">{{openId === item.id ? '˄' : '˅'}}</text>
+        </view>
+        <view wx:if="{{openId === item.id}}" class="card-pad" style="background: #FAFBFC;">
+          <view class="btn-row">
+            <view wx:if="{{item.status === 'orphan'}}" class="btn danger" data-id="{{item.id}}" bindtap="onReclaim">收回</view>
+            <view wx:if="{{item.holder}}" class="btn" data-id="{{item.holder.staff_id}}" bindtap="onHolder">查看账号</view>
+            <view wx:if="{{item.status === 'idle'}}" class="btn" data-id="{{item.id}}" bindtap="onAssign">分给新员工</view>
+            <view wx:if="{{item.status !== 'orphan'}}" class="btn {{item.has_wechat ? 'ghost' : ''}}" data-id="{{item.id}}" bindtap="onBindWechat">{{item.has_wechat ? '重新绑定微信' : '绑定微信'}}</view>
+          </view>
+          <view>
+            <view class="card-meta">使用记录</view>
+            <view wx:for="{{item.historyRows}}" wx:for-item="h" wx:key="key" class="hist-row"><text class="grow">{{h.name}}</text><text class="hist-range">{{h.range}}</text></view>
+            <view wx:if="{{!item.historyRows.length}}" class="card-meta">还没有分给过员工</view>
+          </view>
+        </view>
+      </block>
+    </view>
+    <view wx:elif="{{!loading}}" class="sa-empty">还没有登记工作手机</view>
+  </block>
+</view>
+<view wx:if="{{!blocked}}" class="bottom-bar"><view class="btn primary" bindtap="onAdd">＋ 登记工作手机</view></view>
+
+<van-popup show="{{addShow}}" position="bottom" round bind:close="closeAdd">
+  <view class="sheet">
+    <view class="sheet-title">登记工作手机</view>
+    <view class="field"><view class="field-label">手机号</view>
+      <input class="input" type="number" maxlength="11" value="{{addCell}}" placeholder="11 位手机号" bindinput="onAddCell" />
+    </view>
+    <view class="sa-note">登记后生成绑定码。用这部手机上的微信扫码并授权手机号，微信才算绑定，之后才能分给员工。</view>
+    <view class="btn primary btn-block" bindtap="onConfirmAdd">登记并生成绑定码</view>
+  </view>
+</van-popup>

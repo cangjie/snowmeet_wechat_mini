@@ -1,0 +1,48 @@
+<view class="sa-page">
+  <view wx:if="{{prototype}}" class="sa-proto">原型 · 演示数据，操作不会保存到服务器</view>
+  <view wx:if="{{blocked}}" class="sa-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card"><view class="card-pad">
+      <view class="card-title small">员工信息</view>
+      <view class="field">
+        <view class="field-label">姓名<text wx:if="{{form.type === 'private'}}" class="hint">同一人已有工作号时，建议加「（个人）」区分</text></view>
+        <input class="input" value="{{form.name}}" placeholder="如 李明" bindinput="onName" />
+      </view>
+      <view class="field"><view class="field-label">性别</view>
+        <view class="seg"><view wx:for="{{['男', '女']}}" wx:key="*this" class="chip-sq {{form.gender === item ? 'on' : ''}}" data-v="{{item}}" bindtap="onGender">{{item}}</view></view>
+      </view>
+      <view class="field"><view class="field-label">职级</view>
+        <view class="seg"><view wx:for="{{titleOptions}}" wx:key="level" class="chip-sq {{form.title_level === item.level ? 'on' : ''}}" data-level="{{item.level}}" bindtap="onTitle">{{item.label}}</view></view>
+      </view>
+      <view class="field"><view class="field-label">门店</view>
+        <picker range="{{shops}}" range-key="name" value="{{shopIdx}}" bindchange="onShop"><view class="input">{{shops[shopIdx].name}}</view></picker>
+      </view>
+      <view class="field"><view class="field-label">入职日期</view>
+        <picker mode="date" value="{{form.start_date}}" bindchange="onDate"><view class="input">{{form.start_date}}</view></picker>
+      </view>
+    </view></view>
+
+    <view class="card"><view class="card-pad">
+      <view class="card-title small">手机与微信</view>
+      <view class="card-meta">一个账号只对应一套手机号 + 微信。同一人既用工作手机、又用私人手机时，要开两个账号。</view>
+      <view class="seg">
+        <view class="chip-sq {{form.type === 'job' ? 'on' : ''}}" data-type="job" bindtap="onType">工作号 · 分配工作手机</view>
+        <view class="chip-sq {{form.type === 'private' ? 'on' : ''}}" data-type="private" bindtap="onType">个人号 · 用本人手机</view>
+      </view>
+      <block wx:if="{{form.type === 'job'}}">
+        <view wx:for="{{phones}}" wx:key="id" class="pick-row {{form.account_id === item.id ? 'on' : ''}} {{item.assignable ? '' : 'off'}}" data-id="{{item.id}}" bindtap="onPickPhone">
+          <view class="radio"></view>
+          <view class="grow col"><text class="card-title small">{{item.tail}}</text><text class="card-meta">{{item.cell}}</text></view>
+          <text class="tag {{item.statusTag.tone}}">{{item.statusTag.text}}</text>
+        </view>
+        <view wx:if="{{!loading && !phones.length}}" class="sa-note">没有空闲的工作手机。</view>
+        <view wx:if="{{orphanCount}}" class="warn-line">另有 {{orphanCount}} 部手机被离职员工占用，收回后才能分配。</view>
+        <view class="btn ghost" bindtap="onGoPhones">管理工作手机</view>
+      </block>
+      <view wx:else class="sa-note">提交后生成一个绑定码。请员工用<text class="em">本人手机上的微信</text>扫码并授权手机号，绑定后这个微信就能进后台。码 30 分钟内有效，只能用一次。</view>
+    </view></view>
+  </block>
+</view>
+<view wx:if="{{!blocked}}" class="bottom-bar">
+  <view class="btn primary {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">{{form.type === 'job' ? '确认入职' : '提交并生成绑定码'}}</view>
+</view>

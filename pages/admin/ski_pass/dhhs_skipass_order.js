@@ -1,5 +1,4 @@
 // pages/admin/ski_pass/dhhs_skipass_order.js
-// pages/admin/ski_pass/nanshan_reserve.js
 const app = getApp()
 const util = require('../../../utils/util.js')
 const adminAssistant = require('../../../utils/adminAssistant.js')

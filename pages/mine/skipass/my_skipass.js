@@ -81,28 +81,6 @@ Page({
         var list = res.data
         for(var i = 0; i < list.length; i++){
           var prod = list[i]
-          
-          var desc = '<ul><li>出票后不支持退换！</li><li>出票前可申请免费退换。</li><li>客服电话：18612472341 17800191050。</li><li>出票当日自动出票。</li><more/></ul>'
-          if (prod.product_name.indexOf('日场') >= 0){
-            var subDesc = '<li>日场营业时间 9:00-17:00</li>'
-            desc = desc.replace('<more/>', subDesc)
-          }
-          else if (prod.product_name.indexOf('上午场') >= 0){
-            var subDesc = '<li>上午场滑雪时间：9:00-13:00</li>'
-            desc = desc.replace('<more/>', subDesc)
-          }
-          else if (prod.product_name.indexOf('下午') >= 0){
-            var subDesc = '<li>下午加夜场时间：限当日14:30后使用</li>'
-            desc = desc.replace('<more/>', subDesc)
-          }
-          else if (prod.product_name.indexOf('夜场') >= 0) {
-            var subDesc = '<li>夜场营业时间18:30-22:00（除夕、初一仅开放日场）</li>'
-            desc = desc.replace('<more/>', subDesc)
-          }
-          
-          prod.desc = desc
-          prod.sale_price_str = util.showAmount(prod.ticket_price)
-          prod.deposit_str = util.showAmount(prod.deposit)
           prod.reserve_dateStr = util.formatDate(new Date(prod.reserve_date))
           prod.deal_priceStr = util.showAmount(prod.deal_price)
           switch(prod.status){

@@ -15,9 +15,6 @@
     <mp-cell  id="shopSaleList" bindtap="gotoSale"  >
       <view style="background-color:#FF99FF" >【零售】临时查询</view>
     </mp-cell>
-    <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >
-      <view style="background-color: #999999">【雪票】南山预定</view>
-    </mp-cell>
     <mp-cell id="unipay" bindtap="nav" >
       <view style="background-color:#bad810">【支付】聚合支付</view>
     </mp-cell>
@@ -29,10 +26,6 @@
     <mp-cell id="mat_expire" value="【餐饮】食材管理" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells title="雪票" >
-    <mp-cell id="ns_ski_pass_reserve" bindtap="nav" >【雪票】南山预定</mp-cell>
-    <mp-cell id="ns_ski_pass_veri" bindtap="nav" >【雪票】南山验票</mp-cell>
-    <mp-cell id="ns_ski_pass_fee" bindtap="nav" >【雪票】南山消费</mp-cell>
-    <mp-cell id="ns_ski_pass_refund" bindtap="nav" >【雪票】南山退押金</mp-cell>
     <mp-cell id="ziwoyou" bindtap="nav" >【雪票】大好河山雪票管理</mp-cell>
     <mp-cell id="ziwoyou_order" bindtap="nav" >【雪票】自我游订单</mp-cell>
     <mp-cell id="skipassqr" bindtap="nav" >【雪票】订票二维码</mp-cell>
@@ -82,6 +75,7 @@
   <mp-cells  title="用户管理" >
     <mp-cell id="staff_reg" value="【人事】新员工入职" bindtap="nav" wx:if="{{isManager}}" ></mp-cell>
     <mp-cell id="staff_list_new" value="【人事】员工列表" bindtap="nav" wx:if="{{isManager}}" ></mp-cell>
+    <mp-cell id="staff_account_admin" value="【人事】员工账号管理（原型）" bindtap="nav" wx:if="{{isAdmin}}" ></mp-cell>
   </mp-cells>
   <mp-cells  title="优惠券" >
     <mp-cell id="coupon_admin" value="【优惠券】管理" bindtap="nav" ></mp-cell>

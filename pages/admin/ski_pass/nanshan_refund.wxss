@@ -1,8 +1,0 @@
-/* pages/admin/ski_pass/nanshan_refund.wxss */
-.time-label{
-  background-color:gray;
-  color: white;
-  margin-top: 50rpx;
-  margin-bottom: 50rpx;
-  
-}

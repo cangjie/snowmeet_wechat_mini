@@ -1,0 +1,8 @@
+@import "../common/sa.wxss";
+/* 二维码占位：三个定位角 + 说明文字 */
+.qr { position: relative; width: 400rpx; height: 400rpx; border-radius: 24rpx; border: 2rpx dashed var(--line); background: #FAFBFC; display: flex; align-items: center; justify-content: center; }
+.qr-eye { position: absolute; width: 72rpx; height: 72rpx; border: 14rpx solid var(--ink); border-radius: 12rpx; box-sizing: border-box; }
+.qr-eye.tl { top: 24rpx; left: 24rpx; } .qr-eye.tr { top: 24rpx; right: 24rpx; } .qr-eye.bl { bottom: 24rpx; left: 24rpx; }
+.qr-text { font-size: 24rpx; color: var(--faint); text-align: center; line-height: 1.6; }
+.done-mark { width: 120rpx; height: 120rpx; border-radius: 50%; background: var(--ok-bg); color: var(--ok); font-size: 60rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.done-mark.off { background: var(--warn-bg); color: var(--warn); }

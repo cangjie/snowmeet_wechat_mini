@@ -186,6 +186,9 @@ Page({
         case 'staff_list_new':
           path = '/pages/admin/staff/staff_list'
           break
+      case 'staff_account_admin':
+        path = '/pages/staffadmin/list/list'
+        break
       case 'maintain_return':
         path = '/pages/admin/maintain/return_entry'
         break
@@ -234,18 +237,6 @@ Page({
         break
       case 'staff_reg':
         path = '/pages/admin/staff_reg_qrcode'
-        break
-      case 'ns_ski_pass_reserve':
-        path = '/pages/admin/ski_pass/nanshan_reserve'
-        break
-      case 'ns_ski_pass_fee':
-        path = '/pages/admin/ski_pass/nanshan_card_search'
-        break
-      case 'ns_ski_pass_refund':
-        path = '/pages/admin/ski_pass/nanshan_refund'
-        break
-      case 'ns_ski_pass_veri':
-        path = '/pages/admin/ski_pass/nanshan_pick_card_scan'
         break
       case 'ziwoyou':
         path = '/pages/admin/ski_pass/common_skipass_list'

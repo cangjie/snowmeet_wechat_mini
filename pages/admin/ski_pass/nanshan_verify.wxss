@@ -1,7 +1,0 @@
-/* pages/admin/ski_pass/nanshan_verify.wxss */
-.left-column{
-  width: 88rpx;
-}
-.right-column{
-  width: 50rpx
-}

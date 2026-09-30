@@ -1,0 +1,155 @@
+<view class="sa-page">
+  <view wx:if="{{prototype}}" class="sa-proto">原型 · 演示数据，操作不会保存到服务器</view>
+  <view wx:if="{{blocked}}" class="sa-blocked">{{blocked}}</view>
+  <block wx:elif="{{staff}}">
+    <view class="card"><view class="card-pad">
+      <view class="card-row">
+        <view class="avatar {{staff.status === 'left' ? 'muted' : ''}}">{{staff.initial}}</view>
+        <view class="grow col">
+          <view class="card-row wrap" style="gap: 12rpx;"><text class="card-title">{{staff.name}}</text><text class="tag {{staff.statusTag.tone}}">{{staff.statusTag.text}}</text></view>
+          <view class="card-meta">{{staff.titleLabel}}<text wx:if="{{staff.shop_name}}"> · {{staff.shop_name}}</text> · {{staff.gender}}</view>
+        </view>
+      </view>
+      <view wx:for="{{staff.issues}}" wx:for-item="iss" wx:key="code" class="issue tone-{{iss.tone}}">{{iss.text}}</view>
+    </view></view>
+
+    <view class="card"><view class="card-pad">
+      <view class="card-row"><text class="card-title small grow">手机与微信</text><text wx:if="{{staff.typeTag}}" class="tag {{staff.typeTag.tone}}">{{staff.typeTag.text}}</text></view>
+      <block wx:if="{{staff.binding}}">
+        <view class="kv"><text class="k">手机号</text><text class="v">{{staff.binding.cell}}</text></view>
+        <view class="kv"><text class="k">微信</text><text class="v tone-{{staff.wechatTag.tone}}">{{staff.wechatTag.text}}</text></view>
+        <view class="kv"><text class="k">开始日期</text><text class="v">{{staff.binding.start_date}}</text></view>
+      </block>
+      <view wx:elif="{{staff.pending_bind}}" class="sa-note">已生成绑定码，等员工用本人微信扫码。码在 {{staff.pending_bind.expire_at}} 前有效。</view>
+      <view wx:else class="sa-note">没有绑定手机，这个账号现在登不上后台。</view>
+      <view wx:if="{{staff.valid}}" class="btn-row">
+        <block wx:if="{{staff.binding && !staff.binding.is_private}}">
+          <view class="btn" bindtap="onChangePhone">更换工作手机</view>
+          <view wx:if="{{!staff.binding.has_wechat}}" class="btn" bindtap="onBindWechat">给这部手机绑定微信</view>
+        </block>
+        <view wx:elif="{{staff.binding}}" class="btn" bindtap="onRebind">重新绑定微信</view>
+        <block wx:else>
+          <view wx:if="{{staff.pending_bind}}" class="btn" bindtap="onShowCode">查看绑定码</view>
+          <view class="btn" bindtap="onChangePhone">分配工作手机</view>
+          <view class="btn" bindtap="onRebind">{{staff.pending_bind ? '重新生成绑定码' : '绑定私人微信'}}</view>
+        </block>
+      </view>
+      <view wx:elif="{{staff.status === 'attention'}}" class="btn-row"><view class="btn danger" bindtap="onRelease">结束绑定</view></view>
+      <view wx:if="{{staff.valid && staff.binding}}" class="card-meta">{{staff.binding.is_private ? '个人号只能重新绑定私人微信；要用工作手机请另开一个工作号。' : '工作号只能换成另一部工作手机，原手机退回空闲。'}}</view>
+    </view></view>
+
+    <view class="card"><view class="card-pad">
+      <view class="card-title small">基本信息</view>
+      <block wx:if="{{staff.status === 'left'}}">
+        <view class="kv"><text class="k">姓名</text><text class="v">{{staff.name}}</text></view>
+        <view class="kv"><text class="k">性别</text><text class="v">{{staff.gender}}</text></view>
+        <view class="kv"><text class="k">职级</text><text class="v">{{staff.titleLabel}}</text></view>
+        <view class="kv"><text class="k">门店</text><text class="v">{{staff.shop_name || '不限门店'}}</text></view>
+      </block>
+      <block wx:else>
+        <view class="field"><view class="field-label">姓名</view><input class="input" value="{{form.name}}" bindinput="onName" /></view>
+        <view class="field"><view class="field-label">性别</view>
+          <view class="seg"><view wx:for="{{['男', '女']}}" wx:key="*this" class="chip-sq {{form.gender === item ? 'on' : ''}}" data-v="{{item}}" bindtap="onGender">{{item}}</view></view>
+        </view>
+        <block wx:if="{{staff.status !== 'pending'}}">
+          <view class="field"><view class="field-label">职级</view>
+            <view class="seg"><view wx:for="{{titleOptions}}" wx:key="level" class="chip-sq {{form.title_level === item.level ? 'on' : ''}}" data-level="{{item.level}}" bindtap="onTitle">{{item.label}}</view></view>
+          </view>
+          <view class="field"><view class="field-label">门店</view>
+            <picker range="{{shops}}" range-key="name" value="{{shopIdx}}" bindchange="onShop"><view class="input">{{shops[shopIdx].name}}</view></picker>
+          </view>
+        </block>
+        <view class="btn primary btn-block {{dirty ? '' : 'disabled'}}" bindtap="onSave">保存</view>
+      </block>
+    </view></view>
+
+    <view class="card"><view class="card-pad">
+      <view class="card-row"><text class="card-title small grow">使用记录</text><text class="card-meta">{{history.length}} 条</text></view>
+      <view>
+        <view wx:for="{{history}}" wx:key="id" class="hist-row">
+          <text class="tag {{item.typeTag.tone}}">{{item.typeTag.text}}</text>
+          <text class="grow">{{item.tail}}<text wx:if="{{item.current}}" class="tone-ok">（当前）</text></text>
+          <text class="hist-range">{{item.range}}</text>
+        </view>
+      </view>
+      <view wx:if="{{!history.length}}" class="card-meta">还没有绑定过手机</view>
+    </view></view>
+
+    <view wx:if="{{related.length || canAddPersonal}}" class="card"><view class="card-pad">
+      <view class="card-title small">同一人的其他账号</view>
+      <view class="card-meta">按姓名匹配，忽略「（个人）」「-工作号」这类后缀</view>
+      <view wx:for="{{related}}" wx:key="id" class="pick-row" data-id="{{item.id}}" bindtap="onOpenRelated">
+        <view class="grow col">
+          <view class="card-row wrap" style="gap: 12rpx;">
+            <text class="card-title small">{{item.name}}</text>
+            <text wx:if="{{item.typeTag}}" class="tag {{item.typeTag.tone}}">{{item.typeTag.text}}</text>
+            <text class="tag {{item.statusTag.tone}}">{{item.statusTag.text}}</text>
+          </view>
+          <view class="card-meta">{{item.titleLabel}} · {{item.phoneLabel}}</view>
+        </view>
+        <text class="caret">›</text>
+      </view>
+      <view wx:if="{{canAddPersonal}}" class="btn" bindtap="onAddPersonal">＋ 为此人登记个人号</view>
+    </view></view>
+  </block>
+</view>
+
+<view wx:if="{{!blocked && staff && staff.status === 'pending'}}" class="bottom-bar">
+  <view class="btn ghost" bindtap="onReject">拒绝</view>
+  <view class="btn primary" bindtap="onApprove">开通</view>
+</view>
+<view wx:elif="{{!blocked && staff && staff.valid}}" class="bottom-bar">
+  <view class="btn danger" bindtap="onOffboard">办理离职</view>
+</view>
+
+<van-popup show="{{phoneShow}}" position="bottom" round bind:close="closePhone">
+  <view class="sheet">
+    <view class="sheet-title">选择工作手机</view>
+    <view class="card-meta">只列出空闲且已绑定微信的手机。<text wx:if="{{staff.binding && !staff.binding.is_private}}">原手机 {{staff.phoneLabel}} 会退回空闲。</text></view>
+    <scroll-view scroll-y class="sheet-scroll">
+      <view class="col" style="gap: 16rpx;">
+        <view wx:for="{{phones}}" wx:key="id" class="pick-row {{pickPhoneId === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="onPickPhone">
+          <view class="radio"></view>
+          <view class="grow col"><text class="card-title small">{{item.tail}}</text><text class="card-meta">{{item.cell}}</text></view>
+          <text class="tag {{item.statusTag.tone}}">{{item.statusTag.text}}</text>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="btn primary btn-block" bindtap="onConfirmPhone">确认</view>
+  </view>
+</van-popup>
+
+<van-popup show="{{offShow}}" position="bottom" round bind:close="closeOff">
+  <view class="sheet">
+    <view class="sheet-title">办理离职 · {{staff.name}}</view>
+    <view class="field"><view class="field-label">离职日期</view>
+      <picker mode="date" value="{{offDate}}" end="{{today}}" bindchange="onOffDate"><view class="input">{{offDate}}</view></picker>
+    </view>
+    <view class="col"><view class="field-label">离职后</view><view wx:for="{{offEffects}}" wx:key="*this" class="effect">{{item}}</view></view>
+    <view wx:if="{{offRelated.length}}" class="col" style="gap: 16rpx;">
+      <view class="field-label">同一人的其他在职账号<text class="hint">建议一起离职</text></view>
+      <view wx:for="{{offRelated}}" wx:key="id" class="pick-row {{item.checked ? 'on' : ''}}" data-index="{{index}}" bindtap="onToggleRelated">
+        <view class="check {{item.checked ? 'on' : ''}}">✓</view>
+        <view class="grow col">
+          <view class="card-row" style="gap: 12rpx;"><text class="card-title small">{{item.name}}</text><text wx:if="{{item.typeTag}}" class="tag {{item.typeTag.tone}}">{{item.typeTag.text}}</text></view>
+          <text wx:for="{{item.effects}}" wx:for-item="ef" wx:key="*this" class="card-meta">{{ef}}</text>
+        </view>
+      </view>
+      <view class="warn-line">不勾选的账号离职后仍能登录后台。</view>
+    </view>
+    <view class="btn danger btn-block" bindtap="onConfirmOff">确认离职</view>
+  </view>
+</van-popup>
+
+<van-popup show="{{approveShow}}" position="bottom" round bind:close="closeApprove">
+  <view class="sheet">
+    <view class="sheet-title">开通 · {{staff.name}}</view>
+    <view class="field"><view class="field-label">职级</view>
+      <view class="seg"><view wx:for="{{titleOptions}}" wx:key="level" class="chip-sq {{approveLevel === item.level ? 'on' : ''}}" data-level="{{item.level}}" bindtap="onApproveLevel">{{item.label}}</view></view>
+    </view>
+    <view class="field"><view class="field-label">门店</view>
+      <picker range="{{shops}}" range-key="name" value="{{approveShopIdx}}" bindchange="onApproveShop"><view class="input">{{shops[approveShopIdx].name}}</view></picker>
+    </view>
+    <view class="btn primary btn-block" bindtap="onConfirmApprove">开通</view>
+  </view>
+</van-popup>

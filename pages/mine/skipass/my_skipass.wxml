@@ -9,15 +9,7 @@
       <view style="width: 50%;">数量：{{item.count}}</view> 
       <view style="width: 50%;">金额：{{item.deal_priceStr}}</view> 
     </view>
-    <block wx:if="{{item.resort=='南山'}}" >
-      <view style="margin-left: 10rpx;display: flex; flex-direction: row;" >
-        <view style="width: 50%;">票价：{{item.sale_price_str}}</view> 
-        <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
-      </view>
-      
-      <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  ></rich-text>
-    </block>
-    <block wx:else >
+    <block>
       <view wx:if="{{item.qr_code_url}}" style="margin-top: 50rpx;text-align: center;" >
         <image style="width: 300rpx;height: 300rpx;" src="{{item.qr_code_url}}" ></image>
       </view>
