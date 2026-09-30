@@ -35,6 +35,10 @@ Component({
   },
 
   data: {
+    // van-calendar 藏在弹层里也会在页面加载时创建全部月份子组件（每月一个组件、各自多次 setData），
+    // 3 年 = 36 个月、带 allow-future 的 18 年 = 216 个月，入库页两个日期框曾让首屏卡 6 秒多、
+    // setData 1.7 MB。所以第一次点开时才挂载日历，挂载后保留，再次打开不用重建
+    calendarMounted: false,
     showCalendar: false,
     activeShortcut: 'today',
     minDate: 0,
@@ -67,7 +71,12 @@ Component({
 
   methods: {
     openCalendar() {
-      this.setData({ showCalendar: true })
+      if (this.data.calendarMounted) {
+        this.setData({ showCalendar: true })
+        return
+      }
+      // 先以关闭状态挂载，渲染完再打开，弹出动画才正常
+      this.setData({ calendarMounted: true }, () => this.setData({ showCalendar: true }))
     },
 
     closeCalendar() {
