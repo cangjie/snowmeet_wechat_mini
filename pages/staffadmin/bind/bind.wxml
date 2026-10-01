@@ -1,5 +1,4 @@
 <view class="sa-page">
-  <view wx:if="{{prototype}}" class="sa-proto">原型 · 这是员工扫码后在自己手机上看到的页面</view>
   <view class="card"><view class="card-pad" style="align-items: center; gap: 28rpx;">
     <block wx:if="{{state === 'confirm'}}">
       <block wx:if="{{code.purpose === 'job_phone'}}">
@@ -14,13 +13,16 @@
         <view class="sa-note" style="text-align: center;">一个账号只关联一套手机号 + 微信。绑定后，这个微信就能进员工后台。</view>
       </block>
       <button class="btn primary btn-block {{submitting ? 'disabled' : ''}}" open-type="getPhoneNumber" bindgetphonenumber="onPhone">授权手机号并绑定</button>
-      <view wx:if="{{prototype}}" class="card-meta tone-blue" bindtap="onSkip">原型：跳过授权直接绑定</view>
     </block>
     <block wx:elif="{{state === 'done'}}">
       <view class="done-mark">✓</view>
       <view class="card-title small">绑定成功</view>
       <view class="sa-note" style="text-align: center;">{{code.purpose === 'job_phone' ? '这部手机分给员工后，本机微信就能进后台。' : '退出并重新进入小程序后，「我的」页会出现「我是管理员」入口。'}}</view>
-      <view wx:if="{{prototype}}" class="btn primary" bindtap="onBack">返回绑定码页（原型）</view>
+    </block>
+    <block wx:elif="{{state === 'not_member'}}">
+      <view class="done-mark off">!</view>
+      <view class="card-title small">这个微信还不是会员</view>
+      <view class="sa-note" style="text-align: center;">员工必须先是会员。请先在小程序里注册会员，再重新扫码。</view>
     </block>
     <block wx:elif="{{state === 'used'}}">
       <view class="done-mark off">!</view>

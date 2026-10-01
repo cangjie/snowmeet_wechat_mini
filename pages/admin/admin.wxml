@@ -73,9 +73,7 @@
     <mp-cell id="vip_maintain" value="【招待】养护招待" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells  title="用户管理" >
-    <mp-cell id="staff_reg" value="【人事】新员工入职" bindtap="nav" wx:if="{{isManager}}" ></mp-cell>
-    <mp-cell id="staff_list_new" value="【人事】员工列表" bindtap="nav" wx:if="{{isManager}}" ></mp-cell>
-    <mp-cell id="staff_account_admin" value="【人事】员工账号管理（原型）" bindtap="nav" wx:if="{{isAdmin}}" ></mp-cell>
+    <mp-cell id="staff_account_admin" value="【人事】员工账号管理" bindtap="nav" wx:if="{{isAdmin}}" ></mp-cell>
   </mp-cells>
   <mp-cells  title="优惠券" >
     <mp-cell id="coupon_admin" value="【优惠券】管理" bindtap="nav" ></mp-cell>

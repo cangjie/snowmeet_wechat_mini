@@ -1,14 +1,11 @@
-// 各页公共启动：管理页只对系统管理员（title_level ≥ 300）开放；扫码页（bind、selfreg）不限身份
-const api = require('./api.js')
-
+// 各页公共启动：管理页只对系统管理员（title_level ≥ 300）开放；扫码页（bind、selfreg）不限身份，服务端另有校验
 const ADMIN_LEVEL = 300
 
 function boot(page, adminOnly) {
-  page.setData({ prototype: api.PROTOTYPE })
   const app = getApp()
   return Promise.resolve(app.loginPromiseNew).then(() => {
     const staff = app.globalData.staff
-    if (adminOnly && !(staff && staff.title_level >= ADMIN_LEVEL)) {
+    if (adminOnly && !(staff && staff.valid === 1 && staff.title_level >= ADMIN_LEVEL)) {
       page.setData({ blocked: '只有系统管理员可以管理员工账号' })
       throw new Error('blocked')
     }
@@ -16,12 +13,16 @@ function boot(page, adminOnly) {
   })
 }
 
-// 写操作成功：原型阶段提醒没有真正提交
 function done(title) {
-  wx.showToast({ title: api.PROTOTYPE ? title + '（原型，未提交服务器）' : title, icon: 'none', duration: 2200 })
+  wx.showToast({ title, icon: 'none', duration: 2200 })
 }
 
+// 登录失效（code 2）引导重新进入小程序
 function fail(err) {
+  if (err && err.code === 2) {
+    wx.showModal({ title: '登录已失效', content: '请退出后重新进入小程序', showCancel: false })
+    return
+  }
   wx.showToast({ title: (err && err.message) || '操作失败', icon: 'none', duration: 2800 })
 }
 

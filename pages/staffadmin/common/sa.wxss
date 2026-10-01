@@ -7,7 +7,6 @@ page {
   font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
 }
 .sa-page { padding: 28rpx 32rpx calc(200rpx + env(safe-area-inset-bottom)); box-sizing: border-box; display: flex; flex-direction: column; gap: 24rpx; }
-.sa-proto { padding: 14rpx 24rpx; border-radius: 16rpx; background: var(--warn-bg); color: var(--warn); font-size: 22rpx; font-weight: 600; line-height: 1.5; }
 .sa-blocked { margin-top: 80rpx; padding: 48rpx 40rpx; background: var(--card); border-radius: 32rpx; text-align: center; font-size: 26rpx; color: var(--muted); line-height: 1.6; }
 .sa-note { font-size: 24rpx; color: var(--muted); line-height: 1.6; padding: 4rpx 8rpx; }
 .sa-note .em { color: var(--ink); font-weight: 600; }

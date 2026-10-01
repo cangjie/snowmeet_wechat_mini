@@ -10,7 +10,7 @@ function shopIndex(shops, id) {
 
 Page({
   data: {
-    blocked: '', prototype: false, loading: true, staff: null, history: [],
+    blocked: '', loading: true, staff: null, history: [],
     shops: [], titleOptions: view.TITLE_OPTIONS, form: null, shopIdx: 0, dirty: false, today: '',
     phoneShow: false, phones: [], pickPhoneId: null,
     offShow: false, offDate: '', offEffects: [],
@@ -91,7 +91,7 @@ Page({
   onRelease() {
     base.confirm('结束绑定', '结束后这套手机号和微信不再关联这个账号。', '结束').then(ok => {
       if (!ok) return
-      api.offboard([this.id], view.today()).then(() => { base.done('已结束绑定'); this.load() }).catch(base.fail)
+      api.offboard(this.id, view.today()).then(() => { base.done('已结束绑定'); this.load() }).catch(base.fail)
     })
   },
 
@@ -99,7 +99,7 @@ Page({
   closeOff() { this.setData({ offShow: false }) },
   onOffDate(e) { this.setData({ offDate: e.detail.value }) },
   onConfirmOff() {
-    api.offboard([this.id], this.data.offDate).then(() => {
+    api.offboard(this.id, this.data.offDate).then(() => {
       this.setData({ offShow: false })
       base.done('已办理离职')
       this.load()

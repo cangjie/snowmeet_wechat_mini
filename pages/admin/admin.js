@@ -183,9 +183,6 @@ Page({
       case 'vip_maintain':
         path = '/pages/admin/vip/maintain_recept'
         break
-        case 'staff_list_new':
-          path = '/pages/admin/staff/staff_list'
-          break
       case 'staff_account_admin':
         path = '/pages/staffadmin/list/list'
         break
@@ -234,9 +231,6 @@ Page({
         break
       case 'wl_course_list':
         path = '/pages/admin/school/course_reg_list'
-        break
-      case 'staff_reg':
-        path = '/pages/admin/staff_reg_qrcode'
         break
       case 'ziwoyou':
         path = '/pages/admin/ski_pass/common_skipass_list'

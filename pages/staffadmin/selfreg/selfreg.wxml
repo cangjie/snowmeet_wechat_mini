@@ -1,6 +1,5 @@
 <view class="sa-page">
-  <view wx:if="{{prototype}}" class="sa-proto">原型 · 这是新员工扫码后在自己手机上看到的页面</view>
-  <view wx:if="{{!submitted}}" class="card"><view class="card-pad">
+  <view wx:if="{{state === 'form'}}" class="card"><view class="card-pad">
     <view class="card-title">新员工登记</view>
     <view class="card-meta">用你的私人手机和微信登记。提交后由系统管理员开通，开通后这个微信就能进员工后台。</view>
     <view class="field"><view class="field-label">姓名</view><input class="input" value="{{name}}" placeholder="请填写真实姓名" bindinput="onName" /></view>
@@ -8,12 +7,15 @@
       <view class="seg"><view wx:for="{{['男', '女']}}" wx:key="*this" class="chip-sq {{gender === item ? 'on' : ''}}" data-v="{{item}}" bindtap="onGender">{{item}}</view></view>
     </view>
     <button class="btn primary btn-block {{submitting ? 'disabled' : ''}}" open-type="getPhoneNumber" bindgetphonenumber="onPhone">授权手机号并提交</button>
-    <view wx:if="{{prototype}}" class="card-meta tone-blue" style="text-align: center;" bindtap="onSkip">原型：跳过授权直接提交</view>
+  </view></view>
+  <view wx:elif="{{state === 'not_member'}}" class="card"><view class="card-pad" style="align-items: center; gap: 28rpx;">
+    <view class="done-mark off">!</view>
+    <view class="card-title small">这个微信还不是会员</view>
+    <view class="sa-note" style="text-align: center;">员工必须先是会员。请先在小程序里注册会员，再回到公众号点链接登记。</view>
   </view></view>
   <view wx:else class="card"><view class="card-pad" style="align-items: center; gap: 28rpx;">
     <view class="done-mark">✓</view>
     <view class="card-title small">已提交，等待系统管理员开通</view>
     <view class="sa-note" style="text-align: center;">开通后退出并重新进入小程序即可使用。</view>
-    <view wx:if="{{prototype}}" class="btn primary" bindtap="onBack">返回（原型）</view>
   </view></view>
 </view>

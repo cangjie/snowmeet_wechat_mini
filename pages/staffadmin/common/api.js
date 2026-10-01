@@ -1,35 +1,56 @@
-// 员工账号管理的数据接口，页面只调这里。原型阶段全部走 mock.js 的内存演示数据；
-// 服务器阶段只替换本文件的实现（改为请求 /api/StaffAdmin/*），函数名、参数和返回结构保持不变
-const mock = require('./mock.js')
+// 员工账号管理接口（SnowmeetApi /api/StaffAdmin/*），页面只调这里。
+// 保留服务端 code：2 登录失效 / 3 无权限 / 5 这个微信还不是会员，便于页面区分处理
+let transport = function (options) { wx.request(options) }
 
-const PROTOTYPE = true
+function setTransport(fn) { transport = fn }
 
-function call(fn) {
-  const args = Array.prototype.slice.call(arguments, 1)
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try { resolve(JSON.parse(JSON.stringify(fn.apply(null, args)))) } catch (e) { reject(e) }
-    }, 0)
+function request(method, action, params, body) {
+  return new Promise(function (resolve, reject) {
+    const g = getApp().globalData
+    // globalData.sessionKey 已经 encodeURIComponent 过，原样拼接
+    const query = ['sessionKey=' + g.sessionKey].concat(Object.keys(params || {})
+      .filter(k => params[k] !== undefined && params[k] !== null && params[k] !== '')
+      .map(k => k + '=' + encodeURIComponent(params[k]))).join('&')
+    transport({
+      url: g.requestPrefix + 'StaffAdmin/' + action + '?' + query,
+      method,
+      data: body,
+      header: { 'content-type': 'application/json' },
+      success(res) {
+        if (res.statusCode !== 200) {
+          reject({ code: -1, message: '服务暂时繁忙（' + res.statusCode + '），请重试' })
+          return
+        }
+        const d = res.data || {}
+        if (d.code === 0) resolve(d.data)
+        else reject({ code: d.code, message: d.message || '操作失败' })
+      },
+      fail() { reject({ code: -1, message: '网络不通，请重试' }) }
+    })
   })
 }
 
+const get = (action, params) => request('GET', action, params)
+const post = (action, body) => request('POST', action, {}, body || {})
+
 module.exports = {
-  PROTOTYPE,
-  listShops: () => call(mock.listShops),
-  listStaff: () => call(mock.listStaff),
-  getStaff: id => call(mock.getStaff, id),
-  listPhones: () => call(mock.listPhones),
-  onboard: form => call(mock.onboard, form),
-  updateStaff: form => call(mock.updateStaff, form),
-  changePhone: (staffId, accountId) => call(mock.changePhone, { staff_id: staffId, account_id: accountId }),
-  rebind: staffId => call(mock.rebind, staffId),
-  offboard: (staffIds, date) => call(mock.offboard, { staff_ids: staffIds, date }),
-  approve: (staffId, titleLevel, shopId) => call(mock.approve, { staff_id: staffId, title_level: titleLevel, base_shop_id: shopId }),
-  reject: staffId => call(mock.reject, staffId),
-  reclaimPhone: accountId => call(mock.reclaimPhone, accountId),
-  addJobPhone: cell => call(mock.addJobPhone, cell),
-  bindJobPhone: accountId => call(mock.bindJobPhone, accountId),
-  getCode: token => call(mock.getCode, token),
-  confirmBind: (token, cell) => call(mock.confirmBind, { token, cell }),
-  selfRegister: form => call(mock.selfRegister, form)
+  setTransport,
+  listShops: () => get('ListShops'),
+  listStaff: () => get('ListStaff'),
+  getStaff: id => get('GetStaff', { id }),
+  listPhones: () => get('ListPhones'),
+  onboard: form => post('Onboard', form),
+  updateStaff: form => post('UpdateStaff', form),
+  changePhone: (staffId, accountId) => post('ChangePhone', { staff_id: staffId, account_id: accountId }),
+  rebind: staffId => post('Rebind', { staff_id: staffId }),
+  offboard: (staffId, date) => post('Offboard', { staff_id: staffId, date }),
+  approve: (staffId, titleLevel, shopId) => post('Approve', { staff_id: staffId, title_level: titleLevel, base_shop_id: shopId }),
+  reject: staffId => post('Reject', { staff_id: staffId }),
+  reclaimPhone: accountId => post('ReclaimPhone', { account_id: accountId }),
+  addJobPhone: cell => post('AddJobPhone', { cell }),
+  bindJobPhone: accountId => post('BindJobPhone', { account_id: accountId }),
+  getCode: token => get('GetBindCode', { token }),
+  // getPhoneNumber 的 encryptedData + iv 交给后端用会话的 session_key 解密
+  confirmBind: (token, encData, iv) => post('ConfirmBind', { token, encData, iv }),
+  selfRegister: (name, gender, encData, iv) => post('SelfRegister', { name, gender, encData, iv })
 }

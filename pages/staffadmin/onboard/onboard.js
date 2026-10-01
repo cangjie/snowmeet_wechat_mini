@@ -6,7 +6,7 @@ const view = require('../common/staff-view.js')
 
 Page({
   data: {
-    blocked: '', prototype: false, titleOptions: view.TITLE_OPTIONS, shops: [], shopIdx: 0, today: '',
+    blocked: '', titleOptions: view.TITLE_OPTIONS, shops: [], shopIdx: 0, today: '',
     form: { name: '', gender: '', title_level: 100, base_shop_id: null, start_date: '', type: 'job', account_id: null },
     phones: [], orphanCount: 0, loading: true, submitting: false
   },

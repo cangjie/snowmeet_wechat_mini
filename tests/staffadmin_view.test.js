@@ -14,7 +14,13 @@ test('viewStaff：手机标签标的是这套手机的属性，不是账号类�
 
 test('classify：在职、待开通、需处理、已离职', () => {
   assert.equal(view.classify(staff()).status, 'active')
-  assert.equal(view.classify(staff({ valid: false, title_level: 0, binding: bind({ is_private: true }) })).status, 'pending')
+  // 待开通只看服务端的 pending_reg（自助登记还没开通）
+  assert.equal(view.classify(staff({ valid: false, title_level: 0, pending_reg: true, binding: bind({ is_private: true }) })).status, 'pending')
+  assert.equal(view.classify(staff({ valid: false, title_level: 0, binding: null })).status, 'left')
+  const loginFail = view.classify(staff({ binding: bind({ login_ok: false }) }))
+  assert.equal(loginFail.status, 'attention')
+  assert.equal(loginFail.issues[0].code, 'login_fail')
+  assert.equal(view.classify(staff({ binding: bind({ login_ok: true }) })).status, 'active')
   assert.equal(view.classify(staff({ valid: false, binding: null })).status, 'left')
 
   const noPhone = view.classify(staff({ binding: null }))

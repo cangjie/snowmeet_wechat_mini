@@ -1,18 +1,14 @@
 <view class="sa-page">
-  <view wx:if="{{prototype}}" class="sa-proto">原型 · 演示数据，二维码为占位图</view>
   <view wx:if="{{blocked}}" class="sa-blocked">{{blocked}}</view>
   <block wx:elif="{{code}}">
     <view class="card"><view class="card-pad" style="align-items: center; gap: 28rpx;">
       <view class="card-title" style="text-align: center;">{{title}}</view>
       <block wx:if="{{code.status === 'ok'}}">
-        <view class="qr">
-          <view class="qr-eye tl"></view><view class="qr-eye tr"></view><view class="qr-eye bl"></view>
-          <view class="qr-text">二维码<view>（原型占位）</view></view>
-        </view>
+        <image class="qr" src="{{qrSrc}}" mode="aspectFit" bindtap="onPreview" show-menu-by-longpress></image>
         <view class="col" style="align-self: stretch;">
           <view wx:for="{{lines}}" wx:key="*this" class="effect">{{item}}</view>
         </view>
-        <view wx:if="{{prototype}}" class="btn" bindtap="onSimulate">模拟被扫码（原型）</view>
+        <view wx:if="{{code.purpose !== 'selfreg'}}" class="btn ghost" bindtap="onRefresh">对方扫完后点这里刷新</view>
       </block>
       <block wx:elif="{{code.status === 'used'}}">
         <view class="done-mark">✓</view>

@@ -6,7 +6,7 @@ const view = require('../common/staff-view.js')
 const ORDER = { orphan: 0, no_wechat: 1, idle: 2, in_use: 3 }
 
 Page({
-  data: { blocked: '', prototype: false, loading: true, counts: {}, rows: [], openId: null, addShow: false, addCell: '' },
+  data: { blocked: '', loading: true, counts: {}, rows: [], openId: null, addShow: false, addCell: '' },
 
   onLoad() { base.boot(this, true).then(() => this.load()).catch(() => {}) },
   onShow() { if (this.loadedOnce) this.load() },

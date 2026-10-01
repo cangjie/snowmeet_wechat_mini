@@ -52,14 +52,16 @@ function seasonMemo(iso) {
   return (start - 2000) + '-' + (start + 1 - 2000) + '雪季'
 }
 
-// 账号状态：待开通 = 自助登记后还没开通（未启用、职级 0、已绑手机）；需处理 = 能不能登录和账号状态对不上
+// 账号状态：待开通 = 员工自助登记、还没开通（服务端 pending_reg）；需处理 = 能不能登录和账号状态对不上
+// 登录时按 openid → 会员 → social_account_for_job.member_id 认员工，login_ok 为 false 表示这个微信登录认不出员工身份
 function classify(s) {
   const b = s.binding
   const issues = []
   let status
-  if (!s.valid) {
-    if (b && s.title_level === 0) status = 'pending'
-    else if (b) {
+  if (s.pending_reg) {
+    status = 'pending'
+  } else if (!s.valid) {
+    if (b) {
       status = 'attention'
       issues.push({ code: 'departed_holding', tone: 'danger', text: '已离职但仍占用' + (b.is_private ? '私人手机 ' : '工作手机 ') + tail(b.cell) })
     } else status = 'left'
@@ -74,6 +76,9 @@ function classify(s) {
   } else if (!b.has_wechat) {
     status = 'attention'
     issues.push({ code: 'no_wechat', tone: 'danger', text: '手机 ' + tail(b.cell) + ' 还没绑定微信，无法登录' })
+  } else if (b.login_ok === false) {
+    status = 'attention'
+    issues.push({ code: 'login_fail', tone: 'danger', text: '这个微信登录认不出员工身份（不是会员或会员不匹配），请让员工重新扫码绑定' })
   } else {
     status = 'active'
   }

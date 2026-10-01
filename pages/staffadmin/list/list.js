@@ -4,7 +4,7 @@ const base = require('../common/page-base.js')
 const view = require('../common/staff-view.js')
 
 Page({
-  data: { blocked: '', prototype: false, loading: true, filters: view.FILTERS, status: 'active', sectionTitle: '在职', keyword: '', counts: {}, rows: [] },
+  data: { blocked: '', loading: true, filters: view.FILTERS, status: 'active', sectionTitle: '在职', keyword: '', counts: {}, rows: [] },
 
   onLoad(options) {
     if (options && options.status) this.setData({ status: options.status })

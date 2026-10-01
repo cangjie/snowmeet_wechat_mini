@@ -1,5 +1,4 @@
 <view class="sa-page">
-  <view wx:if="{{prototype}}" class="sa-proto">原型 · 演示数据，操作不会保存到服务器</view>
   <view wx:if="{{blocked}}" class="sa-blocked">{{blocked}}</view>
   <block wx:else>
     <view class="card"><view class="card-pad">
