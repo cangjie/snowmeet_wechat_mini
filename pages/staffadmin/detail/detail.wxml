@@ -10,6 +10,7 @@
         </view>
       </view>
       <view wx:for="{{staff.issues}}" wx:for-item="iss" wx:key="code" class="issue tone-{{iss.tone}}">{{iss.text}}</view>
+      <view wx:if="{{!staff.manageable}}" class="issue tone-warn">这个账号职级比你高，只能查看；需要办理请找超级管理员。</view>
     </view></view>
 
     <view class="card"><view class="card-pad">
