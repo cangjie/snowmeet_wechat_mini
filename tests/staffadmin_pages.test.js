@@ -220,13 +220,16 @@ test('换手机：私人手机换成工作手机、再换回私人手机，任�
   assert.equal((await api.listPhones()).find(p => p.id === 6).holder, null)
 })
 
-test('职级比自己高的账号只读', async () => {
+test('系统管理员可以给超级管理员办离职', async () => {
   installFakes(ADMIN)
-  fake.snapshot().staff.find(s => s.id === 12).title_level = 1000
   const page = loadPage('detail')
   page.onLoad({ id: '12' })
   await settle()
-  assert.equal(page.data.staff.manageable, false)
+  assert.equal(page.data.staff.title_level, 1000)
+  page.onOffboard()
+  page.onConfirmOff()
+  await settle()
+  assert.equal(page.data.staff.status, 'left')
 })
 
 test('工作手机：收回离职员工占用的手机', async () => {

@@ -75,7 +75,6 @@ function newCode(purpose, staffId, accountId) {
   db.codes.push(code)
   return code.token
 }
-function admin() { return { title_level: 300, id: 4 } }
 function requireMember(openid) { if (db.members.indexOf(openid) < 0) fail('这个微信还不是会员，请先在小程序里注册会员后再扫码', 5) }
 function phoneStatus(a) {
   const link = activeLinkOfAccount(a.id)
@@ -95,7 +94,7 @@ function staffDto(s) {
     binding: a ? { link_id: link.id, account_id: a.id, cell: a.cell, is_private: !!a.is_private, has_wechat: !!a.wechat_mini_openid,
       start_date: link.start_date, login_ok: db.members.indexOf(a.wechat_mini_openid) >= 0 } : null,
     pending_bind: code ? { token: code.token, expire_at: stamp(code.expire_ms) } : null,
-    pending_reg: pendingReg, manageable: s.title_level <= admin().title_level
+    pending_reg: pendingReg
   }
 }
 

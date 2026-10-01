@@ -10,7 +10,6 @@
         </view>
       </view>
       <view wx:for="{{staff.issues}}" wx:for-item="iss" wx:key="code" class="issue tone-{{iss.tone}}">{{iss.text}}</view>
-      <view wx:if="{{!staff.manageable}}" class="issue tone-warn">这个账号职级比你高，只能查看；需要办理请找超级管理员。</view>
     </view></view>
 
     <view class="card"><view class="card-pad">
@@ -22,19 +21,19 @@
       </block>
       <view wx:elif="{{staff.pending_bind}}" class="sa-note">已生成绑定码，等员工用私人手机的微信扫码。码在 {{staff.pending_bind.expire_at}} 前有效。</view>
       <view wx:else class="sa-note">没有绑定手机，这个账号现在登不上后台。</view>
-      <view wx:if="{{staff.valid && staff.manageable}}" class="btn-row">
+      <view wx:if="{{staff.valid}}" class="btn-row">
         <view wx:if="{{staff.pending_bind}}" class="btn" bindtap="onShowCode">查看绑定码</view>
         <view wx:if="{{staff.binding && !staff.binding.is_private && (!staff.binding.has_wechat || !staff.binding.login_ok)}}" class="btn" bindtap="onBindWechat">{{staff.binding.has_wechat ? '重新绑定这部手机的微信' : '给这部手机绑定微信'}}</view>
         <view class="btn" bindtap="onChangePhone">{{staff.binding ? '换成工作手机' : '分配工作手机'}}</view>
         <view class="btn" bindtap="onRebind">{{staff.binding ? '换成私人手机' : (staff.pending_bind ? '重新生成绑定码' : '绑定私人手机')}}</view>
       </view>
-      <view wx:elif="{{staff.status === 'attention' && staff.manageable}}" class="btn-row"><view class="btn danger" bindtap="onRelease">结束绑定</view></view>
+      <view wx:elif="{{staff.status === 'attention'}}" class="btn-row"><view class="btn danger" bindtap="onRelease">结束绑定</view></view>
       <view wx:if="{{staff.valid && staff.binding}}" class="card-meta">一个账号同一时间只关联一套手机号 + 微信。换成别的手机后，原来那套不能再登录这个账号；原来是工作手机的，退回空闲。</view>
     </view></view>
 
     <view class="card"><view class="card-pad">
       <view class="card-title small">基本信息</view>
-      <block wx:if="{{staff.status === 'left' || !staff.manageable}}">
+      <block wx:if="{{staff.status === 'left'}}">
         <view class="kv"><text class="k">姓名</text><text class="v">{{staff.name}}</text></view>
         <view class="kv"><text class="k">性别</text><text class="v">{{staff.gender}}</text></view>
         <view class="kv"><text class="k">职级</text><text class="v">{{staff.titleLabel}}</text></view>
@@ -71,11 +70,11 @@
   </block>
 </view>
 
-<view wx:if="{{!blocked && staff && staff.manageable && staff.status === 'pending'}}" class="bottom-bar">
+<view wx:if="{{!blocked && staff && staff.status === 'pending'}}" class="bottom-bar">
   <view class="btn ghost" bindtap="onReject">拒绝</view>
   <view class="btn primary" bindtap="onApprove">开通</view>
 </view>
-<view wx:elif="{{!blocked && staff && staff.manageable && staff.valid}}" class="bottom-bar">
+<view wx:elif="{{!blocked && staff && staff.valid}}" class="bottom-bar">
   <view class="btn danger" bindtap="onOffboard">办理离职</view>
 </view>
 
