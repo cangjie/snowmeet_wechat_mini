@@ -1,5 +1,6 @@
-// 员工账号管理的纯函数：账号状态分类、工作手机状态、同一人匹配。页面只认这里的结论，数据来自 api.js
-// 一个账号只对应一套手机号 + 微信；同一个人的工作号和个人号是两个账号（如「王政-工作号」「王政（个人）」）
+// 员工账号管理的纯函数：账号状态分类、工作手机状态。页面只认这里的结论，数据来自 api.js
+// 一个员工账号同一时间只关联一套手机号 + 微信（social_account_for_job 的一行）；
+// 这套手机是工作手机（is_private=0）还是私人手机（is_private=1）是手机自己的属性，账号本身不分类型
 
 const TITLE_OPTIONS = [
   { level: 50, label: '万龙对账' },
@@ -38,16 +39,8 @@ function tail(cell) {
   return s ? '···' + s.slice(-4) : ''
 }
 
-// 「王政（个人）」「王政-工作号」「王政(测试)」→「王政」
-function baseName(name) {
-  return String(name || '').trim()
-    .replace(/\s*[（(](个人|工作号|工作|测试)[）)]\s*$/, '')
-    .replace(/\s*[-－—_](工作号|个人号|个人|工作)\s*$/, '')
-    .trim()
-}
-
 function phoneType(isPrivate) {
-  return isPrivate ? { text: '个人号', tone: 'muted' } : { text: '工作号', tone: 'blue' }
+  return isPrivate ? { text: '私人手机', tone: 'muted' } : { text: '工作手机', tone: 'blue' }
 }
 
 // 雪季：6 月起算下一季，与后端 StaffController.CreateStaff 一致
@@ -95,7 +88,7 @@ function viewStaff(s) {
     typeTag: b ? phoneType(b.is_private) : null,
     phoneLabel: b ? tail(b.cell) : (s.pending_bind ? '待扫码' : '无手机'),
     wechatTag: !b ? null : (b.has_wechat ? { text: '微信已绑定', tone: 'ok' } : { text: '微信未绑定', tone: 'warn' }),
-    initial: baseName(s.name).slice(0, 1) || '?'
+    initial: String(s.name || '').trim().slice(0, 1) || '?'
   })
 }
 
@@ -116,14 +109,6 @@ function matchKeyword(v, keyword) {
 function filterStaff(views, status, keyword) {
   const k = String(keyword || '').trim()
   return views.filter(v => (k ? true : v.status === status) && matchKeyword(v, k))
-}
-
-// 同一个人的其他账号：去掉后缀后姓名相同。在职的排前面
-function relatedAccounts(staff, all) {
-  const key = baseName(staff.name)
-  if (!key) return []
-  return all.filter(o => o.id !== staff.id && baseName(o.name) === key)
-    .sort((a, b) => (b.valid ? 1 : 0) - (a.valid ? 1 : 0))
 }
 
 // 离职会发生什么，给确认弹层逐条列出
@@ -176,7 +161,7 @@ function historyRows(history) {
 
 module.exports = {
   TITLE_OPTIONS, FILTERS, STATUS, PHONE_STATUS,
-  today, dateLabel, titleLabel, tail, baseName, phoneType, seasonMemo,
-  classify, viewStaff, summarize, filterStaff, relatedAccounts, offboardEffects,
+  today, dateLabel, titleLabel, tail, phoneType, seasonMemo,
+  classify, viewStaff, summarize, filterStaff, offboardEffects,
   phoneStatus, viewPhone, summarizePhones, assignablePhones, historyRows
 }

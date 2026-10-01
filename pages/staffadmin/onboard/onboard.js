@@ -1,4 +1,5 @@
-// 新员工入职（系统管理员代办）：工作号从空闲手机里选一部，立即生效；个人号提交后出绑定码，员工用本人微信扫码完成
+// 新员工入职（系统管理员代办）：账号关联一套手机号 + 微信。分配工作手机的立即生效；
+// 用私人手机的，提交后出绑定码，员工用那部手机的微信扫码完成
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/staff-view.js')
@@ -10,16 +11,12 @@ Page({
     phones: [], orphanCount: 0, loading: true, submitting: false
   },
 
-  // 可带参数预填：type、name、gender、level、shop、account（从详情页「为此人登记个人号」、工作手机页「分给新员工」进来）
+  // 从工作手机页「分给新员工」进来时带 type=job&account=手机 id，预选这部手机
   onLoad(options) {
     const o = options || {}
     const form = Object.assign({}, this.data.form, { start_date: view.today() })
     if (o.type === 'job' || o.type === 'private') form.type = o.type
-    if (o.name) form.name = decodeURIComponent(o.name)
-    if (o.gender) form.gender = decodeURIComponent(o.gender)
-    if (view.TITLE_OPTIONS.some(t => t.level === Number(o.level))) form.title_level = Number(o.level)
     if (o.account) form.account_id = Number(o.account)
-    this.presetShop = o.shop ? Number(o.shop) : null
     this.setData({ form, today: view.today() })
     base.boot(this, true).then(() => this.load()).catch(() => {})
   },
@@ -28,7 +25,7 @@ Page({
     return Promise.all([api.listShops(), api.listPhones()]).then(([shopList, phoneList]) => {
       const shops = [{ id: null, name: '不限门店' }].concat(shopList)
       // 从工作手机页返回时重新拉手机，已选的门店保留
-      const shopIdx = this.data.shops.length ? this.data.shopIdx : Math.max(0, shops.findIndex(s => s.id === this.presetShop))
+      const shopIdx = this.data.shops.length ? this.data.shopIdx : 0
       const views = phoneList.map(view.viewPhone)
       const phones = views.filter(p => p.status === 'idle' || p.status === 'no_wechat')
         .sort((a, b) => (b.assignable ? 1 : 0) - (a.assignable ? 1 : 0))

@@ -2,7 +2,7 @@
   <view wx:if="{{prototype}}" class="sa-proto">原型 · 这是新员工扫码后在自己手机上看到的页面</view>
   <view wx:if="{{!submitted}}" class="card"><view class="card-pad">
     <view class="card-title">新员工登记</view>
-    <view class="card-meta">用你本人的手机和微信登记。提交后由系统管理员开通，开通后这个微信就能进员工后台。</view>
+    <view class="card-meta">用你的私人手机和微信登记。提交后由系统管理员开通，开通后这个微信就能进员工后台。</view>
     <view class="field"><view class="field-label">姓名</view><input class="input" value="{{name}}" placeholder="请填写真实姓名" bindinput="onName" /></view>
     <view class="field"><view class="field-label">性别</view>
       <view class="seg"><view wx:for="{{['男', '女']}}" wx:key="*this" class="chip-sq {{gender === item ? 'on' : ''}}" data-v="{{item}}" bindtap="onGender">{{item}}</view></view>

@@ -1,4 +1,4 @@
-// 员工账号管理原型：假 wx 逐页 onLoad，并走通入职（工作号 / 个人号扫码）、连带离职、收回手机、开通、自助登记
+// 员工账号管理原型：假 wx 逐页 onLoad，并走通入职（工作手机 / 私人手机扫码）、换手机、离职、收回手机、开通、自助登记
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const path = require('node:path')
@@ -76,12 +76,13 @@ test('列表：各状态人数、筛选、搜索', async () => {
   await settle()
   assert.deepEqual(page.data.counts, { active: 6, pending: 1, attention: 2, left: 2 })
   page.onFilter(tap({ key: 'attention' }))
-  assert.deepEqual(page.data.rows.map(r => r.name), ['王强-工作号', '钱进'])
+  assert.deepEqual(page.data.rows.map(r => r.name), ['王强', '钱进'])
   page.onSearch({ detail: { value: '7440' } })
-  assert.deepEqual(page.data.rows.map(r => r.name), ['李明-工作号'])
+  assert.deepEqual(page.data.rows.map(r => r.name), ['李明'])
+  assert.equal(page.data.rows[0].typeTag.text, '工作手机')
 })
 
-test('入职（工作号）：只能选空闲且已绑微信的手机，提交后进详情', async () => {
+test('入职（分配工作手机）：只能选空闲且已绑微信的手机，提交后进详情', async () => {
   installFakes(ADMIN)
   const page = loadPage('onboard')
   page.onLoad({})
@@ -101,11 +102,14 @@ test('入职（工作号）：只能选空闲且已绑微信的手机，提交�
   assert.equal(d.staff.binding.is_private, false)
 })
 
-test('入职（个人号）：出绑定码 → 员工扫码授权 → 账号绑上私人手机，码作废', async () => {
+test('入职（私人手机）：出绑定码 → 员工扫码授权 → 账号关联这部私人手机，码作废', async () => {
   installFakes(ADMIN)
   const page = loadPage('onboard')
-  page.onLoad({ type: 'private', name: encodeURIComponent('李明（个人）'), gender: encodeURIComponent('男') })
+  page.onLoad({})
   await settle()
+  page.onType(tap({ type: 'private' }))
+  page.onName({ detail: { value: '新人丙' } })
+  page.onGender(tap({ v: '男' }))
   page.onSubmit()
   await settle()
   assert.match(nav[nav.length - 1], /^\.\.\/bindcode\/bindcode\?token=/)
@@ -115,7 +119,7 @@ test('入职（个人号）：出绑定码 → 员工扫码授权 → 账号绑�
   code.onLoad({ token })
   await settle()
   assert.equal(code.data.code.status, 'ok')
-  assert.match(code.data.title, /李明（个人）/)
+  assert.match(code.data.title, /新人丙/)
 
   const bind = loadPage('bind')
   bind.onLoad({ token })
@@ -143,33 +147,20 @@ test('扫码时拒绝授权手机号：不绑定', async () => {
   assert.match(toasts[0], /授权手机号/)
 })
 
-test('离职：同一人的个人号默认一起离职，工作手机退回空闲', async () => {
+test('离职：只停这一个账号，工作手机退回空闲，其他账号不受影响', async () => {
   installFakes(ADMIN)
   const page = loadPage('detail')
   page.onLoad({ id: '1' })
   await settle()
-  assert.deepEqual(page.data.related.map(r => r.name), ['李明（个人）'])
   page.onOffboard()
-  assert.equal(page.data.offRelated.length, 1)
-  assert.equal(page.data.offRelated[0].checked, true)
+  assert.match(page.data.offEffects[0], /工作手机 ···7440 退回空闲/)
   page.onConfirmOff()
   await settle()
   assert.equal(page.data.staff.status, 'left')
-  assert.equal((await api.getStaff(3)).staff.valid, false)
   const phone = (await api.listPhones()).find(p => p.id === 1)
   assert.equal(phone.holder, null)
-})
-
-test('离职时取消勾选同一人的账号：那个账号保持在职', async () => {
-  installFakes(ADMIN)
-  const page = loadPage('detail')
-  page.onLoad({ id: '1' })
-  await settle()
-  page.onOffboard()
-  page.onToggleRelated(tap({ index: 0 }))
-  page.onConfirmOff()
-  await settle()
-  assert.equal((await api.getStaff(3)).staff.valid, true)
+  const others = (await api.listStaff()).filter(s => s.id !== 1 && s.valid)
+  assert.equal(others.length, 6)
 })
 
 test('工作手机：收回离职员工占用的手机', async () => {
@@ -227,8 +218,34 @@ test('自助登记 → 待开通 → 管理员开通', async () => {
   assert.equal(page.data.staff.title_level, 200)
 })
 
-test('规则：个人号不能换成工作手机，工作号不能改绑私人微信', async () => {
+test('换手机：私人手机换成工作手机、再换回私人手机，任何时候账号只关联一套', async () => {
   installFakes(ADMIN)
-  await assert.rejects(api.changePhone(3, 6), /个人号只能重新绑定微信/)
-  await assert.rejects(api.rebind(1), /工作号请更换工作手机/)
+  const page = loadPage('detail')
+  page.onLoad({ id: '3' })
+  await settle()
+  assert.equal(page.data.staff.binding.is_private, true)
+
+  page.onChangePhone()
+  await settle()
+  page.onPickPhone(tap({ id: 6 }))
+  page.onConfirmPhone()
+  await settle()
+  assert.equal(page.data.staff.binding.account_id, 6)
+  assert.equal(page.data.staff.typeTag.text, '工作手机')
+  assert.equal(page.data.history.filter(h => h.current).length, 1)
+
+  page.onRebind()
+  await settle()
+  const token = lastToken()
+  await api.confirmBind(token)
+  page.onShow()
+  await settle()
+  assert.equal(page.data.staff.binding.is_private, true)
+  assert.equal(page.data.history.filter(h => h.current).length, 1)
+  assert.equal((await api.listPhones()).find(p => p.id === 6).holder, null, '换走后工作手机退回空闲')
+})
+
+test('工作手机不能同时分给两个账号', async () => {
+  installFakes(ADMIN)
+  await assert.rejects(api.changePhone(3, 1), /不能分配/)
 })

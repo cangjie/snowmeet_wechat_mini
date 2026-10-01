@@ -88,14 +88,12 @@ button.btn-block { width: 100% !important; }
 .warn-line { font-size: 22rpx; color: var(--warn); line-height: 1.5; }
 .danger-line { font-size: 22rpx; color: var(--danger); line-height: 1.5; }
 
-/* 可选列表（手机、同一人账号） */
+/* 可选列表（手机） */
 .pick-row { padding: 24rpx 24rpx; border-radius: 20rpx; border: 2rpx solid var(--line); display: flex; align-items: center; gap: 20rpx; }
 .pick-row.on { border-color: var(--blue); background: var(--blue-soft); }
 .pick-row.off { opacity: 0.5; }
 .radio { flex: none; width: 36rpx; height: 36rpx; border-radius: 50%; border: 3rpx solid var(--line); box-sizing: border-box; }
 .pick-row.on .radio { border: 11rpx solid var(--blue); }
-.check { flex: none; width: 36rpx; height: 36rpx; border-radius: 10rpx; border: 3rpx solid var(--line); box-sizing: border-box; color: #fff; font-size: 24rpx; display: flex; align-items: center; justify-content: center; }
-.check.on { background: var(--blue); border-color: var(--blue); }
 
 /* 弹层 */
 .sheet { padding: 40rpx 32rpx calc(40rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 24rpx; }

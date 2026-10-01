@@ -19,17 +19,17 @@ function seed() {
   return {
     seq: 100,
     staff: [
-      st(1, '李明-工作号', '男', 100, 1, 4),
-      st(2, '周婷-工作号', '女', 200, 1, 10),
-      st(3, '李明（个人）', '男', 100, 1, 4),
+      st(1, '李明', '男', 100, 1, 4),
+      st(2, '周婷', '女', 200, 1, 10),
+      st(3, '张伟', '男', 100, 1, 4),
       st(4, '孙悦', '女', 300, 1, null),
       st(5, '吴芳', '女', 50, 1, 4),
       st(6, '郑浩', '男', 0, 0, null),
-      st(7, '王强-工作号', '男', 100, 1, 4),
+      st(7, '王强', '男', 100, 1, 4),
       st(8, '刘洋', '男', 100, 1, 10),
-      st(9, '赵磊-工作号', '男', 100, 0, 4),
+      st(9, '赵磊', '男', 100, 0, 4),
       st(10, '钱进', '男', 100, 0, 10),
-      st(11, '陈晨（个人）', '女', 100, 0, 12)
+      st(11, '陈晨', '女', 100, 0, 12)
     ],
     accounts: [
       acc(1, '13900007440', 0, 'o-demo-01'),
@@ -124,7 +124,7 @@ function getStaff(id) {
   const history = db.links.filter(l => l.staff_id === s.id)
     .sort((x, y) => (y.start_date > x.start_date ? 1 : -1))
     .map(l => { const a = findAccount(l.social_account_id); return { id: l.id, cell: a.cell, is_private: !!a.is_private, start_date: l.start_date, end_date: l.end_date, season_memo: l.season_memo } })
-  return { staff: s, history, related: view.relatedAccounts(s, listStaff()) }
+  return { staff: s, history }
 }
 
 function listPhones() { return db.accounts.filter(a => !a.is_private).map(phoneDto) }
@@ -137,7 +137,7 @@ function checkBasic(p) {
 
 function onboard(p) {
   checkBasic(p)
-  if (p.type !== 'job' && p.type !== 'private') fail('请选择工作号或个人号')
+  if (p.type !== 'job' && p.type !== 'private') fail('请选择分配工作手机还是用私人手机')
   if (p.type === 'job') {
     const a = findAccount(p.account_id)
     if (a.is_private || view.phoneStatus(phoneDto(a)) !== 'idle') fail('这部工作手机不能分配，请重新选择')
@@ -159,11 +159,11 @@ function updateStaff(p) {
   return { staff_id: s.id }
 }
 
+// 换手机：结束当前那套（工作手机随之退回空闲），改为关联一部空闲的工作手机
 function changePhone(p) {
   const s = findStaff(p.staff_id)
   const link = activeLinkOfStaff(s.id)
   if (!s.valid) fail('账号已停用')
-  if (link && findAccount(link.social_account_id).is_private) fail('个人号只能重新绑定微信，不能换成工作手机')
   const a = findAccount(p.account_id)
   if (a.is_private || view.phoneStatus(phoneDto(a)) !== 'idle') fail('这部工作手机不能分配，请重新选择')
   endLink(link)
@@ -172,11 +172,10 @@ function changePhone(p) {
   return { staff_id: s.id }
 }
 
+// 改用私人手机：只生成绑定码，扫码确认时才结束当前那套
 function rebind(staffId) {
   const s = findStaff(staffId)
-  const link = activeLinkOfStaff(s.id)
   if (!s.valid) fail('账号已停用')
-  if (link && !findAccount(link.social_account_id).is_private) fail('工作号请更换工作手机')
   cancelCodes(s.id)
   return { token: newCode('private', s.id) }
 }
@@ -248,7 +247,7 @@ function getCode(token) {
   return out
 }
 
-// 扫码的那部手机确认绑定：个人号新建一套私人手机并替换旧的；工作手机只补上微信
+// 扫码的那部手机确认绑定：私人手机新建一套并替换账号当前那套；工作手机只补上微信
 function confirmBind(p) {
   const c = db.codes.find(x => x.token === p.token) || fail('绑定码不存在')
   const status = codeStatus(c)

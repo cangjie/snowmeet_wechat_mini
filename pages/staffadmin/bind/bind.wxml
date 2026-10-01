@@ -11,7 +11,7 @@
         <view class="card-meta">你将绑定为员工账号</view>
         <view class="card-title">{{code.staff.name}}</view>
         <view class="card-meta">{{code.staff.title_label}}<text wx:if="{{code.staff.shop_name}}"> · {{code.staff.shop_name}}</text></view>
-        <view class="sa-note" style="text-align: center;">一个账号只对应一套手机号 + 微信。绑定后，这个微信就能进员工后台。</view>
+        <view class="sa-note" style="text-align: center;">一个账号只关联一套手机号 + 微信。绑定后，这个微信就能进员工后台。</view>
       </block>
       <button class="btn primary btn-block {{submitting ? 'disabled' : ''}}" open-type="getPhoneNumber" bindgetphonenumber="onPhone">授权手机号并绑定</button>
       <view wx:if="{{prototype}}" class="card-meta tone-blue" bindtap="onSkip">原型：跳过授权直接绑定</view>

@@ -5,7 +5,7 @@
     <view class="card"><view class="card-pad">
       <view class="card-title small">员工信息</view>
       <view class="field">
-        <view class="field-label">姓名<text wx:if="{{form.type === 'private'}}" class="hint">同一人已有工作号时，建议加「（个人）」区分</text></view>
+        <view class="field-label">姓名</view>
         <input class="input" value="{{form.name}}" placeholder="如 李明" bindinput="onName" />
       </view>
       <view class="field"><view class="field-label">性别</view>
@@ -24,10 +24,10 @@
 
     <view class="card"><view class="card-pad">
       <view class="card-title small">手机与微信</view>
-      <view class="card-meta">一个账号只对应一套手机号 + 微信。同一人既用工作手机、又用私人手机时，要开两个账号。</view>
+      <view class="card-meta">一个账号只关联一套手机号 + 微信。</view>
       <view class="seg">
-        <view class="chip-sq {{form.type === 'job' ? 'on' : ''}}" data-type="job" bindtap="onType">工作号 · 分配工作手机</view>
-        <view class="chip-sq {{form.type === 'private' ? 'on' : ''}}" data-type="private" bindtap="onType">个人号 · 用本人手机</view>
+        <view class="chip-sq {{form.type === 'job' ? 'on' : ''}}" data-type="job" bindtap="onType">分配工作手机</view>
+        <view class="chip-sq {{form.type === 'private' ? 'on' : ''}}" data-type="private" bindtap="onType">用私人手机</view>
       </view>
       <block wx:if="{{form.type === 'job'}}">
         <view wx:for="{{phones}}" wx:key="id" class="pick-row {{form.account_id === item.id ? 'on' : ''}} {{item.assignable ? '' : 'off'}}" data-id="{{item.id}}" bindtap="onPickPhone">
@@ -39,7 +39,7 @@
         <view wx:if="{{orphanCount}}" class="warn-line">另有 {{orphanCount}} 部手机被离职员工占用，收回后才能分配。</view>
         <view class="btn ghost" bindtap="onGoPhones">管理工作手机</view>
       </block>
-      <view wx:else class="sa-note">提交后生成一个绑定码。请员工用<text class="em">本人手机上的微信</text>扫码并授权手机号，绑定后这个微信就能进后台。码 30 分钟内有效，只能用一次。</view>
+      <view wx:else class="sa-note">提交后生成一个绑定码。请员工用<text class="em">私人手机上的微信</text>扫码并授权手机号，绑定后这个微信就能进后台。码 30 分钟内有效，只能用一次。</view>
     </view></view>
   </block>
 </view>

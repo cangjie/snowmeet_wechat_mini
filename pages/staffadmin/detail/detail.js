@@ -1,4 +1,4 @@
-// 账号详情：一个账号只对应一套手机号 + 微信。改基本信息、换手机/重新绑定、开通、离职都在这里办
+// 账号详情：一个账号同一时间只关联一套手机号 + 微信。改基本信息、换手机、开通、离职都在这里办
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/staff-view.js')
@@ -10,11 +10,10 @@ function shopIndex(shops, id) {
 
 Page({
   data: {
-    blocked: '', prototype: false, loading: true, staff: null, history: [], related: [],
-    shops: [], titleOptions: view.TITLE_OPTIONS, form: null, shopIdx: 0, dirty: false,
-    canAddPersonal: false, today: '',
+    blocked: '', prototype: false, loading: true, staff: null, history: [],
+    shops: [], titleOptions: view.TITLE_OPTIONS, form: null, shopIdx: 0, dirty: false, today: '',
     phoneShow: false, phones: [], pickPhoneId: null,
-    offShow: false, offDate: '', offEffects: [], offRelated: [],
+    offShow: false, offDate: '', offEffects: [],
     approveShow: false, approveLevel: 100, approveShopIdx: 0
   },
 
@@ -30,14 +29,11 @@ Page({
       this.loadedOnce = true
       const shops = [{ id: null, name: '不限门店' }].concat(shopList)
       const staff = view.viewStaff(d.staff)
-      const related = d.related.map(view.viewStaff)
-      const b = staff.binding
       this.setData({
-        loading: false, staff, shops, related,
+        loading: false, staff, shops,
         history: view.historyRows(d.history),
         form: { name: staff.name, gender: staff.gender, title_level: staff.title_level, base_shop_id: staff.base_shop_id },
-        shopIdx: shopIndex(shops, staff.base_shop_id), dirty: false,
-        canAddPersonal: staff.valid && !!b && !b.is_private && !related.some(r => r.valid && r.binding && r.binding.is_private)
+        shopIdx: shopIndex(shops, staff.base_shop_id), dirty: false
       })
       wx.setNavigationBarTitle({ title: staff.name })
     }).catch(err => { this.setData({ loading: false }); base.fail(err) })
@@ -56,7 +52,7 @@ Page({
     api.updateStaff(Object.assign({ id: this.id }, this.data.form)).then(() => { base.done('已保存'); this.load() }).catch(base.fail)
   },
 
-  // 工作号：换一部空闲的工作手机；没有手机的在职账号也从这里分配
+  // 改用一部空闲的工作手机，立即生效；原来那套随之结束
   onChangePhone() {
     api.listPhones().then(list => {
       const phones = view.assignablePhones(list)
@@ -75,10 +71,12 @@ Page({
     }).catch(base.fail)
   },
 
-  // 个人号：生成新的绑定码，员工用新微信扫码后旧的那套才失效
+  // 改用私人手机：生成绑定码，员工用那部手机的微信扫码后，原来那套才结束
   onRebind() {
     const b = this.data.staff.binding
-    const content = b ? '员工用新微信扫码绑定后，旧手机 ' + view.tail(b.cell) + ' 立即不能再进后台。' : '生成绑定码，员工用本人微信扫码后即可登录。'
+    const content = b
+      ? '员工用私人手机的微信扫码绑定后，原来的' + (b.is_private ? '私人手机 ' : '工作手机 ') + view.tail(b.cell) + ' 立即不能再登录这个账号。'
+      : '生成绑定码，员工用私人手机的微信扫码后即可登录。'
     base.confirm('生成绑定码', content, '生成').then(ok => {
       if (!ok) return
       api.rebind(this.id).then(r => wx.navigateTo({ url: '../bindcode/bindcode?token=' + r.token })).catch(base.fail)
@@ -91,38 +89,19 @@ Page({
 
   // 已离职但还占着手机：结束绑定
   onRelease() {
-    base.confirm('结束绑定', '结束后这套手机和微信不再属于这个账号。', '结束').then(ok => {
+    base.confirm('结束绑定', '结束后这套手机号和微信不再关联这个账号。', '结束').then(ok => {
       if (!ok) return
       api.offboard([this.id], view.today()).then(() => { base.done('已结束绑定'); this.load() }).catch(base.fail)
     })
   },
 
-  onAddPersonal() {
-    const s = this.data.staff
-    const q = ['type=private', 'name=' + encodeURIComponent(view.baseName(s.name) + '（个人）'), 'gender=' + encodeURIComponent(s.gender),
-      'level=' + s.title_level, 'shop=' + (s.base_shop_id || '')]
-    wx.navigateTo({ url: '../onboard/onboard?' + q.join('&') })
-  },
-  onOpenRelated(e) { wx.navigateTo({ url: '../detail/detail?id=' + e.currentTarget.dataset.id }) },
-
-  // 离职：同一人其他在职账号默认一起勾上
-  onOffboard() {
-    const offRelated = this.data.related.filter(r => r.valid).map(r => ({
-      id: r.id, name: r.name, typeTag: r.typeTag, checked: true, effects: view.offboardEffects(r)
-    }))
-    this.setData({ offShow: true, offDate: view.today(), offEffects: view.offboardEffects(this.data.staff), offRelated })
-  },
+  onOffboard() { this.setData({ offShow: true, offDate: view.today(), offEffects: view.offboardEffects(this.data.staff) }) },
   closeOff() { this.setData({ offShow: false }) },
   onOffDate(e) { this.setData({ offDate: e.detail.value }) },
-  onToggleRelated(e) {
-    const i = Number(e.currentTarget.dataset.index)
-    this.setData({ ['offRelated[' + i + '].checked']: !this.data.offRelated[i].checked })
-  },
   onConfirmOff() {
-    const ids = [this.id].concat(this.data.offRelated.filter(r => r.checked).map(r => r.id))
-    api.offboard(ids, this.data.offDate).then(() => {
+    api.offboard([this.id], this.data.offDate).then(() => {
       this.setData({ offShow: false })
-      base.done(ids.length > 1 ? '已办理 ' + ids.length + ' 个账号离职' : '已办理离职')
+      base.done('已办理离职')
       this.load()
     }).catch(base.fail)
   },

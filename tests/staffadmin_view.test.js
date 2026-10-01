@@ -1,4 +1,4 @@
-// 员工账号管理纯函数：状态分类、同一人匹配、工作手机状态
+// 员工账号管理纯函数：状态分类、工作手机状态
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const view = require('../pages/staffadmin/common/staff-view.js')
@@ -6,13 +6,10 @@ const view = require('../pages/staffadmin/common/staff-view.js')
 const bind = (over) => Object.assign({ account_id: 1, cell: '13900007440', is_private: false, has_wechat: true, start_date: '2025-11-01' }, over)
 const staff = (over) => Object.assign({ id: 1, name: '李明', gender: '男', title_level: 100, valid: true, base_shop_id: null, binding: bind(), pending_bind: null }, over)
 
-test('baseName 去掉个人、工作号、测试后缀', () => {
-  assert.equal(view.baseName('王政（个人）'), '王政')
-  assert.equal(view.baseName('王政-工作号'), '王政')
-  assert.equal(view.baseName('肖志强（工作号）'), '肖志强')
-  assert.equal(view.baseName('苍杰(测试)'), '苍杰')
-  assert.equal(view.baseName('  李明 '), '李明')
-  assert.equal(view.baseName('HR'), 'HR')
+test('viewStaff：手机标签标的是这套手机的属性，不是账号类型', () => {
+  assert.equal(view.viewStaff(staff()).typeTag.text, '工作手机')
+  assert.equal(view.viewStaff(staff({ binding: bind({ is_private: true }) })).typeTag.text, '私人手机')
+  assert.equal(view.viewStaff(staff({ binding: null, pending_bind: { token: 't' } })).typeTag, null)
 })
 
 test('classify：在职、待开通、需处理、已离职', () => {
@@ -40,7 +37,7 @@ test('classify：在职、待开通、需处理、已离职', () => {
 
 test('filterStaff：按状态筛选；有关键字时在全部账号里按姓名或手机号搜', () => {
   const views = [
-    staff({ id: 1, name: '李明-工作号' }),
+    staff({ id: 1, name: '李明' }),
     staff({ id: 2, name: '周婷', binding: bind({ cell: '13900001129' }) }),
     staff({ id: 3, name: '陈晨', valid: false, binding: null })
   ].map(view.viewStaff)
@@ -48,17 +45,6 @@ test('filterStaff：按状态筛选；有关键字时在全部账号里按姓名
   assert.deepEqual(view.filterStaff(views, 'left', '').map(v => v.id), [3])
   assert.deepEqual(view.filterStaff(views, 'active', '陈').map(v => v.id), [3])
   assert.deepEqual(view.filterStaff(views, 'left', '1129').map(v => v.id), [2])
-})
-
-test('relatedAccounts：同名不同后缀的账号，在职排前面，不含自己', () => {
-  const all = [
-    staff({ id: 1, name: '王政-工作号' }),
-    staff({ id: 2, name: '王政（个人）', valid: false }),
-    staff({ id: 3, name: '王政(测试)' }),
-    staff({ id: 4, name: '王政明' })
-  ]
-  assert.deepEqual(view.relatedAccounts(all[1], all).map(s => s.id), [1, 3])
-  assert.deepEqual(view.relatedAccounts(all[3], all).map(s => s.id), [])
 })
 
 test('工作手机状态：在用、离职员工占用、空闲、微信未绑定；只有空闲的能分配', () => {
@@ -73,7 +59,7 @@ test('工作手机状态：在用、离职员工占用、空闲、微信未绑�
   assert.deepEqual(view.summarizePhones(phones.map(view.viewPhone)), { total: 4, in_use: 1, idle: 1, no_wechat: 1, orphan: 1 })
 })
 
-test('offboardEffects：工作号退回手机、个人号结束绑定', () => {
+test('offboardEffects：工作手机退回空闲、私人手机结束绑定', () => {
   assert.match(view.offboardEffects(staff())[0], /工作手机 ···7440 退回空闲/)
   assert.match(view.offboardEffects(staff({ binding: bind({ is_private: true }) }))[0], /私人手机 ···7440 的绑定结束/)
 })
