@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "van-collapse": "/miniprogram_npm/@vant/weapp/collapse/index",
+    "van-collapse-item": "/miniprogram_npm/@vant/weapp/collapse-item/index",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index"
+  },
+  "navigationBarTitleText": "套餐列表"
+}

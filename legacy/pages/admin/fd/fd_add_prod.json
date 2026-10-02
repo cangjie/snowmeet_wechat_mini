@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "fui-button": "/legacy/components/firstui/fui-button/fui-button",
+    "fui-backdrop": "/components/firstui/fui-backdrop/fui-backdrop"
+  },
+  "navigationBarTitleText": "【餐饮】添加商品"
+}

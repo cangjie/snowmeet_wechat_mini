@@ -1,0 +1,132 @@
+<view>
+<view style="height:calc(100vh - 200rpx);"  >
+  <mp-vtabs height="{{vtabHeight}}" wx:if="{{showVtabs}}" vtabs="{{vtabs}}" activeTab="{{activeTab}}" bindtabclick="onTabCLick" bindchange="onChange"  >
+    <block wx:for="{{vtabs}}" wx:key="title">
+      <mp-vtabs-content tabIndex="{{index}}" >
+        <!--view class="vtabs-content-item" style="/*height:{{categories[index].products.length * 550}}rpx;*/margin-left: 5rpx;margin-top: 10rpx;"-->
+        <view class="vtabs-content-item" style="margin-left: 5rpx;margin-top: 10rpx;" >
+          <view wx:for="{{categories[index].products}}" wx:for-index="pIdx" wx:for-item="product">
+            <fui-card title="{{product.name}}" tag="库存：{{product.stock_numStr}}" background="{{product.inCart? '#EEEEEE': '#FFFFFF'}}">
+              <view class="fui-card__content fui-padding">
+                <view class="view-row">
+                  <view class="left-column">单价：</view>
+                  <view class="right-column">{{product.sale_priceStr}}</view>
+                </view>
+              </view>
+              <view class="fui-card__content fui-padding view-row">
+                <view class="view-row" wx:for="{{product.availableProperties}}" wx:for-item="property">
+                  <view class="left-column">{{property.title}}：</view>
+                  <view class="right-column">{{property.value}}</view>
+                </view>
+              </view>
+              <view class="fui-card__content fui-padding">
+                <view class="view-row">
+                  <view class="left-column">数量：</view>
+                  <view class="right-column">
+                    <input wx:if="{{product.inCart}}" type="number" id="{{product.id}}" class="input" style="width: 50rpx;text-align: center;color:red" value="{{product.count}}"   bindinput="setCount" />
+                    <input wx:else type="number" id="{{product.id}}" class="input" style="width: 50rpx;text-align: center;" value="{{product.count == 1? null: product.count}}" placeholder="{{product.count}}" bindinput="setCount" />
+                  </view>
+                </view>
+                <view class="view-row">
+                  <view class="left-column">类型：</view>
+                  <view class="right-column">
+                    <radio-group id="{{product.id}}" bindchange="setCartType">
+                      <radio value="零售" disabled="{{product.on_shelves == 0 || categories[index].on_shelves == 0 || product.sell_out == 1}}" checked="{{product.cartType=='零售'}}">零售</radio>
+                      <radio value="招待" disabled="{{product.no_entrain == 1 || categories[index].no_entrain == 1 || product.sell_out == 1 }}">招待</radio>
+                    </radio-group>
+                  </view>
+                </view>
+                <view class="view-row" style="margin-bottom: 20rpx;">
+                  <view class="left-column">备注：</view>
+                  <view class="right-column">
+                    <input class="input" style="width: 300rpx;" id="{{product.id}}" bindinput="setCartMemo" />
+                    
+                  </view>
+                </view>
+                <view style="display: flex;flex-direction: row; justify-content: center; margin-bottom: 20rpx;">
+                  <fui-button id="{{product.id}}" btnSize="mini" size="35rpx" text=" 添 加 " background="#2EA6D0" bind:click="addCart"></fui-button>
+                </view>
+              </view>
+            </fui-card>
+            <view style="height: 20rpx;"></view>
+          </view>
+        </view>
+      </mp-vtabs-content>
+    </block>
+  </mp-vtabs>
+</view>
+  <view class="view-row">
+    <view style="margin-top: 20rpx;">
+      <image bindtap="placeOrder" src="{{cartUrl}}" mode="scaleToFill" style="width: 100rpx;height: 100rpx;"></image>
+    </view>
+    <view style="margin-top: 20rpx; margin-left: 20rpx;" class="view-row" bindtap="popCart" >
+      <view class="left-column" style="width: 140rpx;">商品：</view>
+      <view class="right-column" style="width: 130rpx;">{{cartCount}}件</view>
+      <view class="left-column" style="width: 140rpx;">总计金额：</view>
+      <view class="right-column" style="width: 130rpx; ">{{totalPriceStr}}</view>
+    </view>
+  </view>
+  <fui-bottom-popup show="{{showCart}}" bindclose="closePopup">
+    <view class="fui-scroll__wrap">
+      <view class="fui-title fui-title__pb">购物车</view>
+      <fui-row>
+        <fui-col span="9">
+          <view class="fui-col__item" style="font-weight: 800;">商品</view>
+        </fui-col>
+        <fui-col span="5">
+          <view class="fui-col__item" style="font-weight: 800;">类型</view>
+        </fui-col>
+        <fui-col span="5">
+          <view class="fui-col__item" style="font-weight: 800;">数量</view>
+        </fui-col>
+        <fui-col span="5">
+          <view class="fui-col__item" style="font-weight: 800;">小计</view>
+        </fui-col>
+      </fui-row>
+      <scroll-view scroll-y class="fui-scroll__view">
+        <fui-swipeaction-group>
+          <fui-row wx:for="{{cart}}">
+            <fui-swipe-action bindclick="delCart" id="{{index}}">
+              <fui-col span="9">
+                <view class="fui-col__item" style="font-weight: 200;">{{item.name}}</view>
+              </fui-col>
+              <fui-col span="5">
+                <view class="fui-col__item" style="font-weight: 200;">{{item.cartType}}</view>
+              </fui-col>
+              <fui-col span="5">
+                <view class="fui-col__item" style="font-weight: 800;display: flex;flex-direction: row;justify-content: center;">
+                  <input id="{{index}}" bindinput="modCartItemCount" class="input" style="width: 70rpx;" placeholder="{{item.count}}" type="number" />
+                </view>
+              </fui-col>
+              <fui-col span="5">
+                <view class="fui-col__item" style="font-weight: 200;">{{item.summaryStr}}</view>
+              </fui-col>
+            </fui-swipe-action>
+          </fui-row>
+        </fui-swipeaction-group>
+      </scroll-view>
+      <fui-row>
+        <fui-swipe-action bindclick="delCart" id="{{index}}">
+          <fui-col span="9">
+            <view class="fui-col__item" style="font-weight: 200;">总计：</view>
+          </fui-col>
+          <fui-col span="5">
+            <view class="fui-col__item" style="font-weight: 200;"></view>
+          </fui-col>
+          <fui-col span="5">
+            <view class="fui-col__item" style="font-weight: 200;">{{cartCount}}</view>
+          </fui-col>
+          <fui-col span="5">
+            <view class="fui-col__item" style="font-weight: 200;">{{totalPriceStr}}</view>
+          </fui-col>
+        </fui-swipe-action>
+      </fui-row>
+      <view class="view-row" style="justify-content: center;">
+        <fui-button id="{{product.id}}" btnSize="medium" size="35rpx" text=" 确 认 " background="#2EA6D0" bind:click="placeOrder" ></fui-button>
+      </view>
+      <view class="fui-icon__close" bindtap="closePopup">
+        <fui-icon name="close" size="{{48}}"></fui-icon>
+      </view>
+    </view>
+  </fui-bottom-popup>
+</view>

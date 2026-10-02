@@ -1,0 +1,4 @@
+/* pages/ski_pass/skipass_detail.wxss */
+.right-column{
+  width: 100rpx
+}

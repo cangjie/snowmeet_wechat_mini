@@ -1,0 +1,17 @@
+.left-column{
+  text-align: left;
+  width: 170rpx;
+  margin-top: 0rpx;
+}
+.right-column{
+  margin-top: 0rpx;
+  text-align: left;
+  width: 190rpx;
+}
+.view-row{
+  margin-top: 0rpx;
+}
+.fui-left-column{
+  width: 180rpx;
+  text-align: left;
+}

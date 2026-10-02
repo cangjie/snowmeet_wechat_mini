@@ -1,0 +1,49 @@
+<!--mp-cells title="入库状态" >
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >是否入库：</view>
+      <view class="right-column" >
+        <switch bindchange="setStock" checked="{{inStock}}">是</switch>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells-->
+<mp-cells title="选择店铺" >
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" ></view>
+      <view class="right-column" >
+        <shop-selector wx:if="{{inStock}}" bindShopSelected="selectShop" ></shop-selector>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="填写租赁商品名称" >
+  <mp-cell>
+    <view class="view-row" >
+      <view class="left-column" >名称：</view>
+      <view class="right-column" >
+        <input class="input" style="width: 400rpx;" bindinput="setProductName" />
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="选择分类">
+  <mp-cell>
+    <tree
+      dataTree="{{dataTree}}"
+      selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
+      bind:select="handleSelect"
+      isSelectLastNode="true"
+      isOpenAll="{{true}}"
+      checkBox="{{true}}"
+    ></tree>
+  </mp-cell>
+</mp-cells>
+<mp-cells>
+  <mp-cell>
+    <view class="view-row" style="justify-content: center;" >
+    <button class="input" disabled="{{!canSubmit}}" bindtap="submit" size="mini" > 确 认 添 加 </button>
+  </view>
+  </mp-cell>
+</mp-cells>

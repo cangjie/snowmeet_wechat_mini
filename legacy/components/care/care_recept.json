@@ -1,0 +1,11 @@
+{
+  "component": true,
+  "usingComponents": {
+    "ticket-selector": "/legacy/components/ticket_selector/ticket_list",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-popup": "/miniprogram_npm/@vant/weapp/popup/index",
+    "van-grid": "/miniprogram_npm/@vant/weapp/grid/index",
+    "van-grid-item": "/miniprogram_npm/@vant/weapp/grid-item/index",
+    "van-uploader": "/miniprogram_npm/@vant/weapp/uploader/index"
+  }
+}

@@ -81,6 +81,11 @@
     <mp-cell id="ticket_print" value="【优惠券】打印" bindtap="nav" ></mp-cell>
     <mp-cell id="ticket_template_admin" value="【优惠券】模板设置" bindtap="nav" ></mp-cell>
   </mp-cells> 
+  <!-- legacy-demo begin：旧版演示入口，仅管理员可见（删除旧版时连同 end 这一行一起删） -->
+  <mp-cells wx:if="{{isAdmin}}" title="演示" >
+    <mp-cell id="legacy_demo" value="【演示】进入旧版" bindtap="nav" ></mp-cell>
+  </mp-cells>
+  <!-- legacy-demo end -->
 </view>
 <view wx:else >
   您不是管理员

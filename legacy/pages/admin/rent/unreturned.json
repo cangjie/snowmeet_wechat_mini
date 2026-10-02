@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "shop-selector": "/legacy/components/shop_selector/shop_selector",
+    "van-collapse": "/miniprogram_npm/@vant/weapp/collapse/index",
+    "van-collapse-item": "/miniprogram_npm/@vant/weapp/collapse-item/index",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index"
+  },
+  "navigationBarTitleText": "未归还租赁物"
+}

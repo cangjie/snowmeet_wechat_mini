@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "payment": "/legacy/components/payment/payment",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-divider": "/miniprogram_npm/@vant/weapp/divider/index"
+  }
+}

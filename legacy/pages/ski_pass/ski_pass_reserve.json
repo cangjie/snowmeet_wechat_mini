@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "auth": "/legacy/components/auth/auth",
+    "mp-tabbar": "weui-miniprogram/tabbar/tabbar",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index"
+  },
+  "navigationBarTitleText": "雪票预定"
+}

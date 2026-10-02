@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "fui-button": "/legacy/components/firstui/fui-button/fui-button",
+    "fui-card": "/components/firstui/fui-card/fui-card",
+    "fui-row": "/components/firstui/fui-row/fui-row",
+    "fui-col": "/components/firstui/fui-col/fui-col",
+    "shop-selector": "/legacy/components/shop_selector/shop_selector"
+  },
+  "navigationBarTitleText": "【餐饮】订单列表"
+}

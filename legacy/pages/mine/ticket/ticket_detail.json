@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "auth": "/legacy/components/auth/auth"
+  },
+  "navigationBarTitleText": "优惠券详情"
+}

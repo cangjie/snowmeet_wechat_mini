@@ -1,0 +1,147 @@
+var __L = require('../../legacy_app.js') // legacy-demo：旧版演示的独立 App
+const app = __L
+var wxloginModule = require('../../utils/wxlogin.js')
+__L.Page({
+
+  /**
+   * Page initial data
+   */
+  data: {
+    role: '',
+    canGetInfo: false,
+    tabIndex: 1
+  },
+
+  /**
+   * Lifecycle function--Called when page load
+   */
+  onLoad: function (options) {
+    //wxloginModule.wxlogin()
+    
+    
+      var that = this
+      const env = wx.getAccountInfoSync()
+      app.globalData.env = env.miniProgram.envVersion
+      switch(app.globalData.env){
+        case 'trail':
+        case 'develop':
+          app.globalData.domainName = app.getDomain()
+          break
+        default:
+          break
+      }
+      that.setData({env: app.globalData.env})
+      app.loginPromiseNew.then(function(resolve) {
+        that.setData({tabbarItemList: app.globalData.userTabBarItem, 
+          staff: app.globalData.staff, canGetInfo: true})
+      })
+    
+    
+  },
+
+  /**
+   * Lifecycle function--Called when page is initially rendered
+   */
+  onReady: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page show
+   */
+  onShow: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page hide
+   */
+  onHide: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page unload
+   */
+  onUnload: function () {
+
+  },
+
+  /**
+   * Page event handler function--Called when user drop down
+   */
+  onPullDownRefresh: function () {
+
+  },
+
+  /**
+   * Called when page reach bottom
+   */
+  onReachBottom: function () {
+
+  },
+
+  /**
+   * Called when user click on the top right corner to share
+   */
+  onShareAppMessage: function () {
+
+  },
+  tabSwitch: function(e) {
+    wx.redirectTo({
+      url: e.detail.item.pagePath
+    })
+  },
+  gotoOrders: function(e) {
+    /*
+    wx.navigateTo({
+      url: 'plugin-private://wx34345ae5855f892d/pages/orderList/orderList?tabId=all',
+     
+    });
+    */
+  },
+  gotoSkipass: function(e) {
+    wx.navigateTo({
+      url: '/legacy/pages/mine/skipass/my_skipasses',
+    })
+  },
+  gotoAdmin: function(e) {
+    wx.navigateTo({
+      url: '/legacy/pages/admin/admin',
+    })
+  },
+  gotoTicket: function(){
+    wx.navigateTo({
+      url: '/legacy/pages/mine/ticket/ticket_list',
+    })
+  },
+  gotoSummerMaintain:function(){
+    wx.navigateTo({
+      url: '/legacy/pages/summer_maintain/my_summer_maintain',
+    })
+  },
+  gotoMaintain(){
+    wx.navigateTo({
+      url: '/legacy/pages/mine/maintain/order_list',
+    })
+  },
+  gotoDeposit(){
+    wx.navigateTo({
+      url: '/legacy/pages/mine/deposit/deposit_list',
+    })
+  },
+  nav(e){
+    var path = '/legacy/pages/index/index'
+    var id = e.currentTarget.id
+    switch(id) {
+      case 'env':
+        path = '/legacy/pages/admin/env'
+      default:
+        break
+    }
+    wx.navigateTo({
+      url: path
+    })
+  }
+
+})

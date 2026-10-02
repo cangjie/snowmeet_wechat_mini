@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "fui-button": "/legacy/components/firstui/fui-button/fui-button",
+    "fui-row": "/components/firstui/fui-row/fui-row",
+    "fui-col": "/components/firstui/fui-col/fui-col"
+  },
+  "navigationBarTitleText": "【餐饮】订单确认"
+}

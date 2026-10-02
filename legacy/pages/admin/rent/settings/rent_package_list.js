@@ -1,0 +1,139 @@
+var __L = require('../../../../legacy_app.js') // legacy-demo：旧版演示的独立 App
+// pages/admin/rent/settings/rent_package_list.js
+const app = __L
+const data = require('../../../../utils/data.js')
+const util = require('../../../../utils/util.js')
+__L.Page({
+
+  /**
+   * Page initial data
+   */
+  data: {
+    newName: '',
+    key: null,
+    activeName: 0
+  },
+  setKey(e){
+    var that = this
+    that.data.key = e.detail.value
+  },
+  getData(){
+    var that = this
+    data.getPackageListByShopPromise(that.data.key).then(function (shopPackageList){
+      that.setData({shopPackageList})
+    }).catch(function (exp) { })
+  },
+  gotoDetail(e){
+    wx.navigateTo({
+      url: 'rent_package?id=' + e.currentTarget.id,
+    })
+  },
+
+  setNewName(e){
+    var that = this
+    that.setData({newName: e.detail.value})
+
+  },
+
+  addNew(e){
+    var that = this
+    wx.showModal({
+      title: '即将添加新套餐',
+      content: '套餐名称：' + that.data.newName  ,
+      complete: (res) => {
+        if (res.cancel) {
+          
+        }
+    
+        if (res.confirm) {
+          var addUrl = 'https://' + app.globalData.domainName + '/api/Rent/AddRentPackage?'
+          + 'name=' + encodeURIComponent(that.data.newName) + '&description='
+          + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
+          + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+          util.performWebRequest(addUrl, null).then(function (rentPackage){
+            wx.showToast({
+              title: '添加成功，进入详情页填写详细信息。',
+              icon: 'success'
+            })
+            wx.navigateTo({
+              url: 'rent_package?id=' + rentPackage.id
+            })
+          })
+          /*
+          wx.request({
+            url: addUrl,
+            method: 'GET',
+            success:(res)=>{
+              wx.showToast({
+                title: '添加成功，进入详情页填写详细信息。',
+                icon: 'success'
+              })
+              wx.navigateTo({
+                url: 'rent_package?id=' + res.data.id
+              })
+            }
+          })
+          */
+        }
+      }
+    })
+  },
+ 
+
+  /**
+   * Lifecycle function--Called when page load
+   */
+  onLoad(options) {
+    
+  },
+  onReady() {
+
+  },
+  onShow() {
+    var that = this
+    app.loginPromiseNew.then(function(resolve){
+      that.getData()
+    })
+  },
+
+  /**
+   * Lifecycle function--Called when page hide
+   */
+  onHide() {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page unload
+   */
+  onUnload() {
+
+  },
+
+  /**
+   * Page event handler function--Called when user drop down
+   */
+  onPullDownRefresh() {
+
+  },
+
+  /**
+   * Called when page reach bottom
+   */
+  onReachBottom() {
+
+  },
+
+  /**
+   * Called when user click on the top right corner to share
+   */
+  onShareAppMessage() {
+
+  },
+  onChange(e){
+    var that = this
+    that.setData({
+      activeName: e.detail,
+    });
+  },
+})

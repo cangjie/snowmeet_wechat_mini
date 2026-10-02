@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "drag-to-sort": "/legacy/components/drag/drag-to-sort/index",
+    "drag-item": "/legacy/components/drag/drag-item/index",
+    "fui-button": "/legacy/components/firstui/fui-button/fui-button",
+    "fui-card": "/components/firstui/fui-card/fui-card",
+    "fui-swipeaction-group": "/components/firstui/fui-swipeaction-group/fui-swipeaction-group",
+    "fui-swipe-action": "/components/firstui/fui-swipe-action/fui-swipe-action"
+  },
+  "navigationBarTitleText": "【餐饮】类目管理"
+}

@@ -1,0 +1,68 @@
+<view>
+  <view class="view-row" >
+    <view class="left-column" style="width: 100rpx;" >日期：</view>
+    <view class="right-column" style="width: 145rpx;" >{{productReserveList.reserveDateStr}}</view>
+    <view class="left-column" style="width: 100rpx;" >名称：</view>
+    <view class="right-column" style="width: 410rpx;"  >{{productReserveList.product_name}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" style="width: 100rpx;" >人数：</view>
+    <view class="right-column" style="width: 145rpx;" >{{productReserveList.memberList.length}}</view>
+    <view class="left-column" style="width: 100rpx;" >张数：</view>
+    <view class="right-column" >{{productReserveList.skiPassCount}}</view>
+  </view>
+  <view>
+    <view>
+      <mp-cells wx:for="{{productReserveList.memberList}}"  wx:for-index="memberIdx" wx:for-item="member"  title="{{memberIdx+1}}.【姓名：{{member.name}}】 【电话：{{member.cell}}】【张数：{{member.skiPasses.length}}】" >
+        <mp-cell wx:for="{{member.skiPasses}}" >
+
+          <view class="view-row" wx:if="{{item.status == 'edit'}}" >
+            <view class="left-column" style="width: 90rpx;" >票号：</view>
+            <view class="right-column view-row" style="width: 260rpx;"  >
+              <input class="input" style="width: 180rpx;" value="{{item.card_no_filled? item.card_no_filled: (item.card_no? item.card_no : '')}}" id="{{item.id}}" bindinput="inputCardNo" />
+            </view>
+            <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
+              <van-button id="{{item.id}}"  size="small" bind:click="ocr" type="primary" style="margin-right: 10rpx;" >识别</van-button>
+              <view style="width: 5rpx;" ></view>
+              <van-button id="{{item.id}}" class="input" type="danger"  size="small" bind:click="setCardNo" style="margin-left: 10rpx;" >确定</van-button>
+            </view>
+          </view>
+          <view class="view-row" wx:else >
+            <view class="left-column" style="width: 90rpx;" >票号：</view>
+            <view class="right-column" style="width: 260rpx;" bindtap="showCard" id="{{item.id}}" >{{item.card_no == null? '未填':item.card_no}}</view>
+            <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
+              <van-button id="{{item.id}}" type="primary" size="small" bind:click="setEdit" style="margin-right: 10rpx;" >填写</van-button>
+              <!--button id="{{item.id}}" class="input" size="mini" bindtap="setEdit" style="width: 125rpx;" >填写</button-->
+              <van-button disabled="{{canceling || !item.canRefund }}" id="{{item.id}}" type="danger" size="small" bind:click="cancel"  style="width: 125rpx;" style="margin-left:10rpx" >退票</van-button>
+            </view>
+          </view>
+
+
+
+          <view class="view-row">
+            <view class="left-column" style="width: 90rpx;" >状态：</view>
+            <view class="right-column" style="width: 260rpx;" >{{item.card_member_pick_time == null? '未取' : '已取'}}</view>
+            <view class="left-column view-row" style="width: 320rpx; text-align: left;" >
+              <van-button id="{{item.id}}" type="warning" size="small" bind:click="setEdit" style="width: 125rpx;" disabled="{{true}}" >退款</van-button>
+            </view>
+          </view>
+        </mp-cell>
+        
+        <mp-cell>
+          <view class="view-row" style="justify-content: center;"  >
+            <van-button id="{{memberIdx}}" type="info" disabled="{{!finish}}" bind:click="preparePrint" > 打 印 </van-button>
+          </view>
+        </mp-cell>
+      </mp-cells>
+     
+    </view>
+  </view>
+  <page-container 
+    show="{{showCard}}"
+    position="top"
+  >
+    <view style="margin-top: 100rpx;text-align: center;" >
+      <image src="{{imgUrl}}" mode="aspectFill" style="width: 725rpx;"  ></image>
+    </view>
+  </page-container>
+</view>

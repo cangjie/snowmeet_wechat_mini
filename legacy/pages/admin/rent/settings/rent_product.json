@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "multi-uploader": "/legacy/components/uploader/multi-uploader",
+    "shop-selector": "/legacy/components/shop_selector/shop_selector",
+    "mp-tabs": "/components/tabs/index",
+    "tree": "/legacy/components/tree/index"
+  },
+  "navigationBarTitleText": "租赁商品详细信息"
+}

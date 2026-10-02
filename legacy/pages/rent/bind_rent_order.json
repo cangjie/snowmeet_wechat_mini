@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "auth": "/legacy/components/auth/auth"
+  }
+}

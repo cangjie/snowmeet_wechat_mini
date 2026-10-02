@@ -1,0 +1,13 @@
+{
+  "usingComponents": {
+    "fui-button": "/legacy/components/firstui/fui-button/fui-button",
+    "fui-card": "/components/firstui/fui-card/fui-card",
+    "fui-swipeaction-group": "/components/firstui/fui-swipeaction-group/fui-swipeaction-group",
+    "fui-swipe-action": "/components/firstui/fui-swipe-action/fui-swipe-action",
+    "fui-row": "/components/firstui/fui-row/fui-row",
+    "fui-col": "/components/firstui/fui-col/fui-col",
+    "fui-icon": "/legacy/components/firstui/fui-icon/fui-icon",
+    "fui-bottom-popup": "/legacy/components/firstui/fui-bottom-popup/fui-bottom-popup"
+  },
+  "navigationBarTitleText": "【餐饮】订单详情"
+}

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "van-goods-action-icon": "/miniprogram_npm/@vant/weapp/goods-action-icon/index"
+  }
+}

@@ -1,0 +1,8 @@
+<!-- legacy-demo：旧版演示的返回条（build_legacy.py 注入） -->
+<view style="background:#fff3cd;color:#8a6d3b;padding:20rpx 24rpx;font-size:28rpx;text-align:center;" bindtap="__legacyExit">【演示】当前为旧版，点此返回新版</view>
+
+<view>
+  <official-account bindload="officalLoad"  ></official-account>
+
+</view>
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;font-size: medium;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

@@ -1,0 +1,4 @@
+@import '/app.wxss';
+.left-column{
+  text-align: left;
+}

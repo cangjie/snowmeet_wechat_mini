@@ -1,0 +1,14 @@
+{
+  "usingComponents": {
+    "fui-button": "/legacy/components/firstui/fui-button/fui-button",
+    "fui-card": "/components/firstui/fui-card/fui-card",
+    "fui-list": "/legacy/components/firstui/fui-list/fui-list",
+    "fui-list-cell": "/legacy/components/firstui/fui-list-cell/fui-list-cell",
+    "fui-swipeaction-group": "/components/firstui/fui-swipeaction-group/fui-swipeaction-group",
+    "fui-swipe-action": "/components/firstui/fui-swipe-action/fui-swipe-action",
+    "fui-row": "/components/firstui/fui-row/fui-row",
+    "fui-col": "/components/firstui/fui-col/fui-col",
+    "fui-divider": "/legacy/components/firstui/fui-divider/fui-divider"
+  },
+  "navigationBarTitleText": "【餐饮】确认购物车商品"
+}

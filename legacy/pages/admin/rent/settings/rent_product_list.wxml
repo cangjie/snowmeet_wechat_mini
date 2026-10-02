@@ -1,0 +1,24 @@
+<tree
+        dataTree="{{dataTree}}"
+        bind:select="handleSelect"
+        isSelectLastNode="{{false}}"
+        isOpenAll="{{false}}"
+        checkBox="{{false}}"
+        bind:check="handleCheck"
+        selectKey="{{(selectedCategory!=undefined && selectedCategory!=null)? selectedCategory.id:''}}"
+    
+></tree>
+<mp-cells title="租赁商品列表" >
+  <mp-cell wx:for="{{selectedCategory.productList}}">
+    <view id="{{item.id}}" bind:tap="gotoDetail" class="view-row">
+      <view  class="left-column">名称：</view>
+      <view class="right-column" style="width: 75%;" >{{item.name}}</view>
+    </view>
+    <view id="{{item.id}}" bind:tap="gotoDetail" class="view-row" >
+      <view class="left-column" >品牌：</view>
+      <view class="right-column" >{{item.brand}}</view>
+      <view class="left-column" >状态：</view>
+      <view class="right-column" >-</view>
+    </view>
+  </mp-cell>
+</mp-cells>

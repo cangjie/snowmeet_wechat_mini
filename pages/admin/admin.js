@@ -131,6 +131,12 @@ Page({
   nav: function(e) {
     var path = '/pages/index/index'
     var id = e.currentTarget.id
+    // legacy-demo begin：旧版演示入口（删除旧版时连同 end 这一行一起删）
+    if (id == 'legacy_demo') {
+      wx.reLaunch({ url: '/legacy/pages/admin/admin' })
+      return
+    }
+    // legacy-demo end
     switch(id) {
       case 'expierence_admit':
         path = '/pages/admin/expierence/expierence_admit'

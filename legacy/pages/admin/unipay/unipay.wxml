@@ -1,0 +1,35 @@
+<view>
+  <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
+    <image src="{{qrUrl}}" style="width: 300rpx;height:300rpx"></image>
+  </view>
+  <van-divider></van-divider>
+  <view>
+    <view style="width: 550rpx;" ></view>
+    <view style="color:blue; text-align: right;" bindtap="gotoList">更多查询>></view>
+  </view>
+  <van-divider></van-divider>
+  <view class="view-row">
+    <view style="width: var(--order-num-width);text-align: center;">订单号</view>
+    <view style="width: var(--amount-width);text-align: center;">金额</view>
+    <view style="width: var(--date-width);text-align: center;">日期</view>
+    <view style="width: var(--time-width);text-align: center;">时间</view>
+  </view>
+  <block wx:for="{{orders}}" wx:for-item="order">
+    <van-divider></van-divider>
+    <view class="view-row" 
+    style="height:20rpx;margin-top:0rpx;" id="{{order.id}}" bindtap="gotoDetail"  >
+      <view  style="width: var(--order-num-width);text-align: center;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}}">
+        {{order.code}}
+      </view>
+      <view style="width: var(--amount-width);text-align: right;margin-right: 10rpx;color:red;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}};">
+        {{order.remainAmountStr}}
+      </view>
+      <view style="width: var(--date-width);text-align: center;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}}">
+        {{order.biz_dateStr}}
+      </view>
+      <view style="width: var(--time-width);text-align: center;text-decoration-line: {{order.refundAmount == 0? 'none': 'line-through'}}">
+        {{order.biz_timeStr}}
+      </view>
+    </view>
+  </block>
+</view>

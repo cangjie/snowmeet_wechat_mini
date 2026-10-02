@@ -1,0 +1,6 @@
+<mp-dialog title="{{title}}" show="{{show}}" >
+  <view>
+    <button wx:if="{{validType=='info'}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 授 权 </button>
+    <button wx:if="{{validType=='cell'}}" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" > 授 权 </button>
+  </view>
+</mp-dialog>

@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "van-divider": "/miniprogram_npm/@vant/weapp/divider/index"
+  },
+  "navigationBarTitleText": "聚合支付"
+}

@@ -1,0 +1,73 @@
+<view>
+  <view class="view-row" id="{{item.id}}" bindtap="gotoCharge">
+    <view class="left-column">姓名：</view>
+    <view class="right-column">
+      {{member.real_name}}
+      {{(member.gender == '男')? '先生' : ''}}
+      {{(member.gender == '女')? '女士' : ''}}
+    </view>
+    <view class="left-column">电话：</view>
+    <view class="right-column">{{member.cell}}</view>
+  </view>
+  <view class="view-row" id="{{member.id}}" bindtap="gotoCharge">
+    <view class="left-column">订单日期：</view>
+    <view class="right-column">{{member.orderDateStr}}</view>
+    <view class="left-column">订单金额：</view>
+    <view class="right-column">{{member.orderAmountStr}}</view>
+  </view>
+  <view class="view-row" id="{{member.id}}" bindtap="gotoCharge">
+    <view class="left-column">已有账户：</view>
+    <view class="right-column">{{member.haveDeposit}}</view>
+    <view class="left-column">储值金额：</view>
+    <view class="right-column">{{member.depositAmountStr}}</view>
+  </view>
+  <mp-cells title="储值账户充值" >
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 230rpx;" >七色米订单号：</view>
+        <view class="right-column" style="width: 500rpx;" >
+          <input style="width: 400rpx;" class="input" id="bizId" bindinput="input" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 230rpx;" >充值类型：</view>
+        <view class="right-column" style="width: 500rpx;" >
+          <radio-group id="bizType" bindchange="input" >
+            <view class="view-row" >
+              <view style="width: 200rpx;" ><radio value="储值送装备" >储值送装备</radio></view>
+              <view style="width: 200rpx;margin-left: 20rpx;" ><radio value="二手回收" >二手回收</radio></view>
+            </view>
+            <view class="view-row" style="margin-top: 20rpx;">
+              <view style="width: 200rpx;" ><radio value="零售赠送" >零售赠送</radio></view>
+              <view style="width: 200rpx;margin-left: 20rpx;" ><radio value="预定" >预定</radio></view>
+            </view>
+            <view class="view-row" style="margin-top: 20rpx;">
+              <view style="width: 200rpx;" ><radio value="其它赠送" >其它赠送</radio></view>
+            </view>
+          </radio-group>
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 230rpx;" >备注：</view>
+        <view class="right-column" style="width: 500rpx;" >
+          <input style="width: 400rpx;" class="input" id="memo" bindinput="input" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <view class="view-row" >
+        <view class="left-column" style="width: 230rpx;" >金额：</view>
+        <view class="right-column" style="width: 500rpx;" >
+          <input style="width: 150rpx;" type="number" class="input" id="amount" bindinput="input" />
+        </view>
+      </view>
+    </mp-cell>
+    <mp-cell>
+      <button class="input" bindtap="charge" disabled="{{dealing}}" > 确 认 充 值 </button>
+    </mp-cell>
+  </mp-cells>
+</view>

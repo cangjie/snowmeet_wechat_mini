@@ -1,0 +1,37 @@
+<view>
+  <view class="view-row" style="justify-content: center;margin-top: 20rpx;">
+    <shop-selector bindShopSelected="shopSelected"></shop-selector>
+    <view style="width: 100rpx;"></view>
+    <van-button disabled="{{querying}}" size="small" type="primary" bind:click="getData"> 查 询 </van-button>
+  </view>
+  <view style="margin-top: 50rpx;">
+    <van-collapse accordion value="{{ activeName }}" bind:change="onChange" wx:for="{{classList}}" wx:for-item="category">
+      <van-collapse-item title="{{category.category.name}}：{{category.items.length}}" name="{{index}}">
+        <mp-cells title="" >
+          <mp-cell wx:for="{{category.items}}">
+            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
+              <view class="left-column">订单号：</view>
+              <view class="right-column" >{{item.rental.order.code}}</view>
+            </view>
+            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
+              <view class="left-column">名称：</view>
+              <view class="right-column">{{item.name}}</view>
+            </view>
+            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
+              <view class="left-column">发放人：</view>
+              <view class="right-column">{{item.pickStaff.name}}</view>
+            </view>
+            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
+              <view class="left-column">发放日期：</view>
+              <view class="right-column">{{item.pickDateDateStr}}</view>
+            </view>
+            <view class="view-row" id="{{item.rental.order.id}}" bindtap="gotoDetail">
+              <view class="left-column">发放时间：</view>
+              <view class="right-column">{{item.pickDateTimeStr}}</view>
+            </view>
+          </mp-cell>
+        </mp-cells>
+      </van-collapse-item>
+    </van-collapse>
+  </view>
+</view>

@@ -1,0 +1,47 @@
+<view wx:if="{{titleLevel >= 200}}" >
+  <fui-swipeaction-group>
+    <drag-to-sort length="{{categories.length}}" drag-y bind:change="sortChange" bind:poschange="posChange">
+      <drag-item wx:for="{{categories}}" wx:key="*this" class="item" idx="{{index}}">
+        <view slot="body" class="body">
+          <fui-swipe-action bindclick="del" id="{{item.id}}">
+            <fui-collapse-item bindchange="change">
+              <view class="fui-item__box">
+                <text>{{item.name}}</text>
+              </view>
+              <view class="fui-descr" slot="content">
+                <view class="view-row">
+                  <input bindinput="setModName" class="input" id="{{item.id}}" value="{{item.modName}}" style="width: 200rpx;text-align: center;" placeholder="{{item.name}}" />
+                  <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 改 名 " background="#2EA6D0" bind:click="saveMod" id="{{item.id}}"></fui-button>
+                </view>
+                <view class="view-row" >
+                  <checkbox-group bindchange="optionChange" id="{{item.id}}" >
+                    <checkbox checked="{{item.hide == 0}}" value="hide" >自助</checkbox>
+                    <checkbox checked="{{item.on_shelves == 1}}" value="on_shelves" >零售</checkbox>
+                    <checkbox checked="{{item.no_entrain == 0}}" value="no_entrain" >招待</checkbox>
+                  </checkbox-group>
+                </view>
+              </view>
+            </fui-collapse-item>
+          </fui-swipe-action>
+        </view>
+        <view slot="btn" class="btn">
+          <view class="btn-sign"></view>
+        </view>
+      </drag-item>
+    </drag-to-sort>
+  </fui-swipeaction-group>
+  <view style="height: 50rpx;"></view>
+  <view>
+    <fui-card title="新增类目" tag="">
+      <view class="fui-card__content view-row" style="margin-top: 50rpx; margin-left: 20rpx; margin-bottom: 50rpx;">
+        <input style="text-align: center;width: 350rpx;" placeholder="输入新类目名称" class="input" bindinput="setNewName" value="{{newName}}" />
+        <!--fui-button style="margin-left: 50rpx;" width="150rpx" height="55rpx" size="32" text=" 添 加 " background="#2EA6D0" ></fui-button-->
+        <fui-button btnSize="mini" style="margin-left: 50rpx;" size="35rpx" text=" 添 加 " background="#2EA6D0" bind:click="addNewDialog">
+        </fui-button>
+      </view>
+    </fui-card>
+  </view>
+</view>
+<view wx:else >
+  没有权限
+</view>

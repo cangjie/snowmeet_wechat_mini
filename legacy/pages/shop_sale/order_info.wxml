@@ -1,0 +1,58 @@
+<!--pages/shop_sale/order_info.wxml-->
+<auth wx:if="{{needAuth}}" validType="cell" ></auth>
+<mp-cells title="{{title}}" >
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >订单号：</view>
+      <view class="right-column" >{{order.id}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >订单总价：</view>
+      <view class="right-column" >{{order.order_price_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >成交价：</view>
+      <view class="right-column" >{{order.order_real_pay_price_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >优惠券：</view>
+      <view class="right-column" >
+        <block wx:if="{{order.tickets == null || order.tickets.length == 0}}" >--</block>
+        <block wx:else >
+          {{order.tickets[0].code + ' ' + order.tickets[0].name}}
+        </block>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >优惠券减免：</view>
+      <view class="right-column" >{{order.ticket_amount_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >其他减免：</view>
+      <view class="right-column" >{{order.other_discount_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >最终支付：</view>
+      <view class="right-column" >{{order.final_price_str}}</view>
+    </view>
+  </mp-cell>
+  <mp-cell>
+    <view style="display:flex; flex-direction: row;">
+      <view class="left-column" >支付方式：</view>
+      <view class="right-column" >{{order.pay_method}}</view>
+    </view>
+  </mp-cell>
+</mp-cells>
+<button wx:if="{{scene=='payment'}}" bindtap="submitPayment" > 确 认 支 付 </button>

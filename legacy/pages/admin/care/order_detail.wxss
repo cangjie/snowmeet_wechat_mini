@@ -1,0 +1,14 @@
+.left-column{
+  display: flex;
+  text-align: left;
+  width: 180rpx;
+  height: 15rpx;
+  align-items: center;
+}
+.right-column{
+  display: flex;
+  text-align: left;
+  width: 170rpx;
+  height: 15rpx;
+  align-items: center;
+}

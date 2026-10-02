@@ -1,0 +1,12 @@
+{
+  "component": true,
+  "usingComponents": {
+    "payment": "/legacy/components/payment/payment",
+    "fui-swipeaction-group": "/components/firstui/fui-swipeaction-group/fui-swipeaction-group",
+    "fui-swipe-action": "/components/firstui/fui-swipe-action/fui-swipe-action",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-divider": "/miniprogram_npm/@vant/weapp/divider/index"
+  }
+}

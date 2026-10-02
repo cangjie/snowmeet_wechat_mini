@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-divider": "/miniprogram_npm/@vant/weapp/divider/index"
+  },
+  "navigationBarTitleText": "聚合支付订单详情"
+}

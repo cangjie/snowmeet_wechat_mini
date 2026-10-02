@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-divider": "/miniprogram_npm/@vant/weapp/divider/index",
+    "date-selector": "/legacy/components/date_selector/date_selector"
+  },
+  "navigationBarTitleText": "聚合支付订单查询"
+}

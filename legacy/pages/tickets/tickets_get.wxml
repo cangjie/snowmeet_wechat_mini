@@ -1,0 +1,23 @@
+<!--pages/admin/ticket/ticket_template_list.wxml-->
+<view>
+  <view class="flex-wrp"  style="flex-direction:row;" >
+    <input id="txt_channel"  wx:if="{{channelIndex == channelArr.length -1}}" placeholder="填写新渠道名称" bindinput="setChannel" />
+  </view>
+  <view style="height: 50rpx;" ></view>
+  <view wx:for="{{ticketTemplateArr}}" >
+    <view class="flex-wrp"  style="flex-direction:row;margin-top:0rpx; width: 100%;" >
+      <view style="width: 100rpx;" ></view>
+      <view style="border-color: ivory;border-width: 1rpx;width: 80%;border-style: solid;">
+        <view style="background-color: greenyellow;text-align: center;margin-top: 20rpx;margin-bottom: 20rpx;"><b>{{item.name}}</b></view>
+        <view wx:for="{{item.usage}}" >
+        *{{item}}
+        </view>
+        <view class="flex-wrp"  style="flex-direction:row" >
+          <button disabled="{{!item.enable}}" id="{{item.id}}" bindtap="get" > 领 取 </button>
+        </view>
+      </view>
+      <view style="width: 100rpx;" ></view>
+    </view>
+    <view style="height: 50rpx;" ></view>
+  </view>
+</view>

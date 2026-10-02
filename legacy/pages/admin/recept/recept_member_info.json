@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "user-info": "/legacy/components/user_info/user_info",
+    "ticket": "/legacy/components/ticket_selector/ticket_selector",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "shop-selector": "/legacy/components/shop_selector/shop_selector",
+    "member-info": "/legacy/components/user_info/member_info"
+  },
+  "navigationBarTitleText": "确认用户信息"
+}

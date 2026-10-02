@@ -1,0 +1,5 @@
+<view style="text-align: center;" >
+  <view style="margin-top: 150rpx;" >
+    <image style="width: 400rpx;height: 400rpx;" src="{{qrcodeUrl}}" />
+  </view>
+</view>

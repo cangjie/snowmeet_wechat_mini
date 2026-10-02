@@ -1,0 +1,33 @@
+<view>
+  <view class="view-row" >
+    <view style="margin-left: 200rpx; width: 300rpx;justify-content: right;margin-top: 15rpx;" >
+      <shop-selector bindShopSelected="shopSelected" ></shop-selector>
+    </view>
+    <view class="right-column" style="width: 200rpx;" >
+      <van-button type="info" size="small" disabled="{{querying}}" bind:click="getData" > 查 询 </van-button> 
+    </view>
+  </view>
+  <view style="margin-top: 50rpx;" >
+    <block wx:for="{{orders}}">
+      <view class="view-row" bind:tap="gotoRecept" id="{{item.id}}" >
+        <view class="left-column" >【称呼】</view>
+        <view class="right-column" >{{item.called_name}}</view>
+        <view class="left-column" >【手机】</view>
+        <view class="right-column" >{{item.contact_num}}</view>
+      </view>
+      <view class="view-row" bind:tap="gotoRecept" id="{{item.id}}" >
+        <view class="left-column" >【类型】</view>
+        <view class="right-column" >{{(item.member && item.member.following_wechat == 1)? '会员' : '散客'}}</view>
+        <view class="left-column" >【时间】</view>
+        <view class="right-column" >{{item.timeStr}}</view>
+      </view>
+      <view class="view-row" bind:tap="gotoRecept" id="{{item.id}}" >
+        <view class="left-column" >【店员】</view>
+        <view class="right-column" >{{item.staff.name}}</view>
+        <view class="left-column" ></view>
+        <view class="right-column" ></view>
+      </view>
+      <van-divider />
+    </block>
+  </view>
+</view>

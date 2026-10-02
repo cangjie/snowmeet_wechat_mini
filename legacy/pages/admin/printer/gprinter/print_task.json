@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "fui-row": "/components/firstui/fui-row/fui-row",
+    "fui-col": "/components/firstui/fui-col/fui-col",
+    "shop-selector": "/legacy/components/shop_selector/shop_selector"
+  },
+  "navigationBarTitleText": "打印队列"
+}

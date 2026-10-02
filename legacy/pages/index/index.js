@@ -1,0 +1,92 @@
+var __L = require('../../legacy_app.js') // legacy-demo：旧版演示的独立 App
+//index.js
+//获取应用实例
+const app = __L
+var wxloginModule = require('../../utils/wxlogin.js')
+__L.Page({
+  data: {
+    motto: 'Hello World',
+    userInfo: {},
+    hasUserInfo: false,
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    tabIndex: 0
+  },
+  //事件处理函数
+  bindViewTap: function() {
+    wx.navigateTo({
+      url: '../logs/logs'
+    })
+  },
+  onLoad: function (options) {
+    //wxloginModule.wxlogin()
+    /*
+    wx.navigateTo({
+      url: '/legacy/pages/maintain/in_shop_request/in_shop_request',
+    })
+    */
+    app.loginPromiseNew.then(function(resolve){
+      if (app.globalData.jumped == undefined && app.globalData.staff){
+        app.globalData.jumped = true
+        wx.navigateTo({
+          url: '/admin/admin',
+        })
+      }
+      else{
+        var url = '../ski_pass/ski_pass_selector?resort=' + encodeURIComponent('万龙')
+        var staffId = options.staffId
+        url += staffId? ('&staffId=' + staffId) : ''
+        wx.redirectTo({
+          
+          url: url,
+        })
+      }
+    })
+    
+    
+  },
+  onShow: function(e) {
+   
+    
+      
+    
+
+    this.setData({tabbarItemList: app.globalData.userTabBarItem, tabIndex: 0})
+    
+
+
+  },
+  getUserInfo: function(e) {
+    console.log(e)
+    app.globalData.userInfo = e.detail.userInfo
+    this.setData({
+      userInfo: e.detail.userInfo,
+      hasUserInfo: true
+    })
+  },
+  jump: function(e){
+
+    /*
+    wx.removeTabBarBadge({
+      index: 0
+    })
+    
+    wx.removeTabBarBadge({
+      index: 1
+    })
+    wx.removeTabBarBadge({
+      index: 2
+    })
+    */
+    wx.navigateTo({
+      url: '/legacy/pages/test/tab/tab',
+    })
+  },
+  tabSwitch: function(e) {
+    wx.redirectTo({
+      url: e.detail.item.pagePath
+    })
+  },
+  officalLoad: function(e){
+    
+  }
+})

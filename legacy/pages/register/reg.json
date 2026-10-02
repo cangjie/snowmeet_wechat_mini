@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "member-auth": "/legacy/components/user_info/auth_cell"
+  },
+  "navigationBarTitleText": "会员注册"
+}

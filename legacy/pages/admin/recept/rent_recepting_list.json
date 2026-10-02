@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "shop-selector": "/legacy/components/shop_selector/shop_selector",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-divider": "/miniprogram_npm/@vant/weapp/divider/index"
+  },
+  "navigationBarTitleText": "【租赁】未完成的接待"
+}

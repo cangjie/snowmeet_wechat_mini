@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "mp-tabbar": "weui-miniprogram/tabbar/tabbar",
+    "mp-tabs": "/components/tabs/index",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index"
+  },
+  "navigationBarTitleText": "雪票预定"
+}

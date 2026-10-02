@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "van-divider": "/miniprogram_npm/@vant/weapp/divider/index",
+    "van-uploader": "/miniprogram_npm/@vant/weapp/uploader/index"
+  }
+}

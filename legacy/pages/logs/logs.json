@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "查看启动日志",
+  "usingComponents": {
+    "mp-tabbar": "weui-miniprogram/tabbar/tabbar"
+  }
+}

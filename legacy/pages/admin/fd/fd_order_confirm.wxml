@@ -1,0 +1,153 @@
+<view style="margin-top: 50rpx;">
+  <view wx:if="{{staff && staff.title_level >= 100}}">
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">总计金额：</view>
+      </fui-col>
+      <fui-col span="4">
+        <view class="fui-right-column" style="text-align: right;">{{totalAmountStr}}</view>
+      </fui-col>
+      <fui-col span="8">
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">商品减免：</view>
+      </fui-col>
+      <fui-col span="4">
+        <view class="fui-right-column" style="text-align: right;">{{productDiscountAmountStr}}</view>
+      </fui-col>
+      <fui-col span="8">
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column" 
+          style="display: flex;align-items: center;justify-content:flex-end;" >
+          <view style="text-align: right;margin-top: 0rpx;">订单减免：</view>
+        </view>
+      </fui-col>
+      <fui-col span="6">
+        <view class="fui-right-column" style="align-items: center;">
+          <input id="discount" type="number" value="{{filledDiscount}}"  
+          placeholder="{{editingDiscount?filledDiscount:null}}" 
+          value="{{editingDiscount?null:filledDiscount}}"
+          class="input" bindinput="modInput" style="width: 100rpx;text-align: center;" disabled="{{!editingDiscount}}" />
+        </view>
+      </fui-col>
+      <fui-col span="12">
+        <view class="fui-right-column view-row">
+          <block wx:if="{{editingDiscount}}">
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00"  bind:click="confirmMod"></fui-button>
+            <view style="width: 50rpx;" ></view>
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000"  bind:click="cancel"></fui-button>
+          </block>
+          <block wx:else>
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+          </block>
+        </view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">实付金额：</view>
+      </fui-col>
+      <fui-col span="4">
+        <view class="fui-right-column" style="text-align: right;">{{totalChargeStr}}</view>
+      </fui-col>
+      <fui-col span="8">
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">订单备注：</view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column">
+          <input id="memo" disabled="{{!editingMemo}}" class="input" style="width: 450rpx;text-align: left;" bindinput="modInput" value="{{order.memo}}" />
+        </view>
+      </fui-col>
+    </fui-row>
+    <fui-row>
+      <block wx:if="{{!editingMemo}}" >
+        <fui-col span="24" >
+          <view style="display: flex;justify-content: center;">
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 修 改 " color="#000000" background="#C0C0C0" bind:click="edit"  ></fui-button>
+          </view>
+        </fui-col>
+      </block>
+      <block wx:else >
+        <fui-col span="12" >
+          <view style="display: flex;justify-content: center;">
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 确 认 " background="#00AA00" bind:click="confirmMod" ></fui-button>
+          </view>
+        </fui-col>
+        <fui-col span="12" >
+          <view style="display: flex;justify-content: center;">
+            <fui-button id="memo" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " background="#DD0000" bind:click="cancel" ></fui-button>
+          </view>
+        </fui-col>
+      </block>
+    </fui-row>
+    <view style="margin-top: 50rpx;display: flex;justify-content: center;">
+      <fui-button id="payLater" background="#DD0000" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text=" 下 单 " bind:click="placeRestaurantOrder" disabled="{{paying || editingDiscount || editingMemo || payMethod }}" ></fui-button>
+    </view>
+    <view style="height: 50rpx;"></view>
+    <fui-row>
+      <fui-col span="6">
+        <view class="fui-left-column">支付方式：</view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column">
+          <radio-group class="view-row" bindchange="setPayMethod" >
+            <radio value="微信支付"  checked="{{payMethod == '微信支付'}}" disabled="{{paying || editingDiscount || totalCharge == 0}}" >微信</radio>
+            <radio value="支付宝"  checked="{{payMethod == '支付宝'}}" disabled="{{paying || editingDiscount || totalCharge == 0 }}" >支付宝</radio>
+            <radio value="其它" checked="{{payMethod == '其它'}}" disabled="{{paying || editingDiscount || totalCharge == 0 }}" >其它</radio>
+            <radio value="挂账" checked="{{payMethod == '挂账'}}" disabled="{{true}}" >挂账</radio>
+          </radio-group>
+        </view>
+      </fui-col>
+    </fui-row>
+    <fui-row wx:if="{{payMethod && payMethod != '支付宝' && payMethod != '微信支付' && payMethod != '挂账'}}">
+      <fui-col span="6">
+        <view class="fui-left-column"></view>
+      </fui-col>
+      <fui-col span="18">
+        <view class="fui-right-column" style="margin-top: 0rpx;">
+          <picker  wx:if="{{!subPayMethodIndex || subPayMethodIndex < othersPayMethods.length - 1 }}"   
+          range="{{othersPayMethods}}" class="input" style="width: 300rpx;height: 50rpx;" 
+          bindchange="setSubPayMethod"  >
+            <picker-view style="height:50rpx">
+              <view 
+                style="text-align: center;height: 50rpx;margin-top: 0rpx;width: 300rpx;" >
+                {{subPayMethodIndex? othersPayMethods[subPayMethodIndex] : '请选择…'}}
+              </view>
+            </picker-view>
+          </picker>
+          <view wx:if="{{subPayMethodIndex && subPayMethodIndex == othersPayMethods.length - 1}}" class="view-row" >
+            <input  class="input" placeholder="{{inputedPayMethod? inputedPayMethod : '请填写支付方式'}}" style="text-align: center;" bindinput="inputPayMethod" /> 
+            <fui-button id="discount" margin="5rpx" width="100rpx" height="50rpx" size="29" text=" 取 消 " color="#000000" background="#C0C0C0" bind:click="cancelPayMethodInput"  ></fui-button>
+          </view>
+        </view>
+      </fui-col>
+    </fui-row>
+    <view class="view-row" style="justify-content: center;" >
+      <fui-button  wx:if="{{((payMethod != null && payMethod != undefined) || paying)}}"   id="payMethod" margin="5rpx" width="100rpx" height="50rpx" size="29" text="重选" color="#000000" background="#C0C0C0" bind:click="edit" disabled="{{!paying && payMethod != '其它'}}" ></fui-button>
+    </view>
+    <view style="height: 50rpx;"></view>
+    <view class="view-row" style="justify-content: center;margin-top: 50rpx;">
+      <fui-button wx:if="{{payMethod == '其它'}}" id="othersPayMethod" disabled="{{disabledConfirmPaidButton}}" btnSize="medium" style="margin-left: 20rpx;" size="35rpx" text="确认收款" background="#2EA6D0" bind:click="placeUnneedPayOrderConfirm"></fui-button>
+    </view>
+    <view wx:if="{{payMethod == '微信支付' || payMethod == '支付宝'}}" >
+      <view  style="display: flex;justify-content: center; align-items: center;height: 300rpx;flex-direction: column;margin-top: 0rpx;">
+        <view style="text-align: center;">
+          <image mode="aspectFill" style="width: 300rpx;height: 300rpx;" src="{{qrCodeUrl}}"></image>
+        </view>
+      </view>
+    </view>
+    <view style="height: 100rpx;" ></view>
+  </view>
+  <view wx:else>
+    没有权限
+  </view>
+</view>

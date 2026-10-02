@@ -1,0 +1,10 @@
+.left-column{
+  text-align: left;
+  width: 210rpx;
+  margin-top: 0rpx;
+}
+.right-column{
+  text-align: left;
+  width: 500rpx;
+  margin-top: 0rpx;
+}

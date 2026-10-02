@@ -1,0 +1,574 @@
+/* pages/tickets/tickets.wxss */
+
+/* ===== 全局变量 ===== */
+page {
+  --color-bg: #F0F2F7;
+  --color-white: #ffffff;
+  --color-blue: #2563EB;
+  --color-blue-light: #EFF4FF;
+  --color-blue-mid: #BFCFFE;
+  --color-danger: #EF4444;
+  --color-danger-light: #FEF2F2;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-border: #E5E7EB;
+  --color-gray-light: #F3F4F6;
+  --radius-card: 36rpx;
+  --radius-btn: 999rpx;
+  --shadow-card: 0 4rpx 40rpx rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 20rpx 80rpx rgba(0, 0, 0, 0.18);
+  background-color: var(--color-bg);
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+}
+
+/* ===== 容器 ===== */
+.container {
+  min-height: 100vh;
+  padding: 40rpx 28rpx 60rpx;
+  box-sizing: border-box;
+}
+
+/* ===== Tab 导航 ===== */
+.tab-nav {
+  display: flex;
+  background: #E4E7EF;
+  border-radius: 999rpx;
+  padding: 8rpx;
+  margin-bottom: 40rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 26rpx 0;
+  border-radius: 999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.tab-active {
+  background: var(--color-white);
+  color: var(--color-blue);
+  box-shadow: 0 4rpx 20rpx rgba(37, 99, 235, 0.12);
+}
+
+.tab-inactive {
+  color: var(--color-text-secondary);
+}
+
+/* ===== 票券列表 ===== */
+.ticket-list {
+  height: calc(100vh - 200rpx);
+}
+
+/* ===== 票券卡片 ===== */
+.ticket-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 48rpx 44rpx;
+  margin-bottom: 32rpx;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.4s ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 装饰线 */
+.ticket-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+  background: linear-gradient(90deg, var(--color-blue) 0%, #7CB9F4 100%);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  opacity: 0.6;
+}
+
+/* ===== 卡片头部 ===== */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 36rpx;
+  gap: 24rpx;
+}
+
+.card-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  flex: 1;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6rpx 18rpx;
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  width: fit-content;
+}
+
+.badge-premium {
+  background: var(--color-blue-light);
+  color: var(--color-blue);
+}
+
+.badge-standard {
+  background: var(--color-gray-light);
+  color: var(--color-text-secondary);
+}
+
+.ticket-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.status-tag {
+  padding: 8rpx 22rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status-picked {
+  background: var(--color-blue-light);
+  color: var(--color-blue);
+}
+
+.status-pending {
+  background: var(--color-gray-light);
+  color: var(--color-text-secondary);
+}
+
+.status-used {
+  background: #F3F4F6;
+  color: #9CA3AF;
+}
+
+/* ===== 序列号 ===== */
+.serial-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg);
+  border-radius: 20rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 40rpx;
+}
+
+.serial-label {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 3rpx;
+  text-transform: uppercase;
+}
+
+.serial-value {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 2rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 详情网格 ===== */
+.details-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 36rpx 0;
+  margin-bottom: 48rpx;
+}
+
+.detail-item {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.align-right {
+  align-items: flex-end;
+}
+
+.detail-label {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 2rpx;
+}
+
+.detail-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.amount {
+  font-size: 40rpx;
+  color: var(--color-text-primary);
+}
+
+.amount-premium {
+  color: var(--color-blue);
+}
+
+/* ===== 操作按钮 ===== */
+.card-actions {
+  display: flex;
+  gap: 24rpx;
+}
+
+.btn {
+  flex: 1;
+  text-align: center;
+  padding: 30rpx 0;
+  border-radius: var(--radius-btn);
+  font-size: 30rpx;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+.btn-cancel {
+  background: var(--color-gray-light);
+  color: var(--color-text-secondary);
+  border: 2rpx solid var(--color-border);
+}
+
+.btn-use {
+  background: var(--color-blue);
+  color: var(--color-white);
+  box-shadow: 0 8rpx 28rpx rgba(37, 99, 235, 0.3);
+}
+
+.btn-use-disabled {
+  background: var(--color-gray-light);
+  color: var(--color-text-muted);
+}
+
+/* ===== 已使用遮盖 ===== */
+.used-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-card);
+}
+
+.used-stamp {
+  padding: 16rpx 52rpx;
+  border: 6rpx solid #D1D5DB;
+  color: #D1D5DB;
+  font-size: 52rpx;
+  font-weight: 900;
+  letter-spacing: 8rpx;
+  border-radius: 12rpx;
+  transform: rotate(-12deg);
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+  gap: 24rpx;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: var(--color-text-muted);
+}
+
+/* ===== 遮罩层 ===== */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8rpx);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal-visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ===== 弹窗卡片 ===== */
+.modal-box {
+  background: var(--color-white);
+  border-radius: 56rpx 56rpx 0 0;
+  padding: 60rpx 52rpx 80rpx;
+  width: 100%;
+  max-width: 750rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(60rpx);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  box-shadow: var(--shadow-modal);
+}
+
+.modal-visible .modal-box {
+  transform: translateY(0);
+}
+
+/* ===== 取消确认弹窗 ===== */
+.cancel-icon-wrap {
+  width: 100rpx;
+  height: 100rpx;
+  background: #FEF3C7;
+  border-radius: 999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+}
+
+.modal-icon {
+  font-size: 52rpx;
+}
+
+.modal-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 16rpx;
+}
+
+.modal-desc {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.modal-ticket-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-bottom: 24rpx;
+  padding: 20rpx 32rpx;
+  background: var(--color-gray-light);
+  border-radius: 16rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-tip {
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 52rpx;
+  padding: 0 12rpx;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 24rpx;
+  width: 100%;
+}
+
+.modal-btn {
+  flex: 1;
+  text-align: center;
+  padding: 32rpx 0;
+  border-radius: var(--radius-btn);
+  font-size: 32rpx;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.modal-btn:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+.modal-btn-secondary {
+  background: var(--color-gray-light);
+  color: var(--color-text-secondary);
+}
+
+.modal-btn-danger {
+  background: var(--color-danger);
+  color: var(--color-white);
+  box-shadow: 0 8rpx 28rpx rgba(239, 68, 68, 0.3);
+}
+
+/* ===== 二维码弹窗 ===== */
+.qr-modal {
+  padding: 80rpx 52rpx 80rpx;
+}
+
+.close-btn {
+  position: absolute;
+  top: 36rpx;
+  right: 44rpx;
+  width: 64rpx;
+  height: 64rpx;
+  background: var(--color-gray-light);
+  border-radius: 999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-icon {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  font-weight: 700;
+}
+
+.close-btn:active {
+  background: var(--color-border);
+}
+
+.qr-modal-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 12rpx;
+}
+
+.qr-modal-subtitle {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: 48rpx;
+  line-height: 1.5;
+  padding: 0 20rpx;
+}
+
+/* 二维码容器 */
+.qr-wrapper {
+  position: relative;
+  width: 360rpx;
+  height: 360rpx;
+  padding: 28rpx;
+  background: var(--color-white);
+  border-radius: 28rpx;
+  box-shadow: 0 8rpx 48rpx rgba(0, 0, 0, 0.1);
+  margin-bottom: 48rpx;
+  overflow: hidden;
+}
+
+.qr-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 扫描动画线 */
+.qr-scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, var(--color-blue), transparent);
+  animation: scanLine 2s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes scanLine {
+  0% { top: 10%; }
+  50% { top: 85%; }
+  100% { top: 10%; }
+}
+
+/* 取票码 */
+.pickup-code-section {
+  width: 100%;
+  background: var(--color-blue-light);
+  border-radius: 24rpx;
+  padding: 32rpx 36rpx;
+  margin-bottom: 32rpx;
+  box-sizing: border-box;
+}
+
+.pickup-label {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #6B7280;
+  letter-spacing: 3rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.pickup-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pickup-code {
+  font-size: 52rpx;
+  font-weight: 900;
+  color: var(--color-blue);
+  letter-spacing: 8rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+.copy-btn {
+  padding: 12rpx 32rpx;
+  background: var(--color-blue);
+  border-radius: 999rpx;
+}
+
+.copy-btn:active {
+  opacity: 0.8;
+}
+
+.copy-text {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.qr-tip {
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 20rpx;
+}

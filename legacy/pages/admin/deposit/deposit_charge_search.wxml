@@ -1,0 +1,34 @@
+<view>
+  <view class="view-row" style="text-align: center;" >
+    <view style="margin-left: 100rpx;margin-top: 10rpx;width: 300rpx;">
+      <input class="input" placeholder="输入姓名或手机号后四位" style="width: 350rpx;" bindinput="setKey" />
+    </view>
+    <button class="input" size="mini" disabled="{{dealing}}" bindtap="getData" > 查 询 </button>
+  </view>
+  <mp-cells title="总共{{members.length}}">
+    <mp-cell wx:for="{{members}}" >
+      <view class="view-row" id="{{item.id}}" bindtap="gotoCharge" >
+        <view class="left-column" >姓名：</view>
+        <view class="right-column" >
+          {{item.real_name}}
+          {{(item.gender == '男')? '先生' : ''}}
+          {{(item.gender == '女')? '女士' : ''}}
+        </view>
+        <view class="left-column" >电话：</view>
+        <view class="right-column" >{{item.cell}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="gotoCharge" >
+        <view class="left-column" >订单日期：</view>
+        <view class="right-column" >{{item.orderDateStr}}</view>
+        <view class="left-column" >订单金额：</view>
+        <view class="right-column" >{{item.orderAmountStr}}</view>
+      </view>
+      <view class="view-row" id="{{item.id}}" bindtap="gotoCharge" >
+        <view class="left-column" >已有账户：</view>
+        <view class="right-column" >{{item.haveDeposit}}</view>
+        <view class="left-column" >储值金额：</view>
+        <view class="right-column" >{{item.depositAmountStr}}</view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>

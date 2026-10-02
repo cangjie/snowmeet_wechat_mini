@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "payment": "/legacy/components/payment/payment",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-uploader": "/miniprogram_npm/@vant/weapp/uploader/index"
+  },
+  "navigationBarTitleText": "零售订单详情"
+}

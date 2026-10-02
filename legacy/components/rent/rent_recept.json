@@ -1,0 +1,22 @@
+{
+  "component": true,
+  "usingComponents": {
+    "rent_charge": "/legacy/components/rent/rent_charge",
+    "package_selector": "/legacy/components/rent/package_selector",
+    "search-product-fuzzy": "/legacy/components/rent/search_product_fuzzy",
+    "category-selector": "/legacy/components/rent/category_selector",
+    "cart-list-pay": "/legacy/components/rent/cart_list_pay",
+    "fui-card": "/components/firstui/fui-card/fui-card",
+    "fui-backdrop": "/components/firstui/fui-backdrop/fui-backdrop",
+    "fui-swipeaction-group": "/components/firstui/fui-swipeaction-group/fui-swipeaction-group",
+    "fui-swipe-action": "/components/firstui/fui-swipe-action/fui-swipe-action",
+    "van-collapse": "/miniprogram_npm/@vant/weapp/collapse/index",
+    "van-collapse-item": "/miniprogram_npm/@vant/weapp/collapse-item/index",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-icon": "/miniprogram_npm/@vant/weapp/icon/index",
+    "van-divider": "/miniprogram_npm/@vant/weapp/divider/index",
+    "van-popup": "/miniprogram_npm/@vant/weapp/popup/index",
+    "rent-price-list": "/legacy/components/rent/rent_price_list",
+    "van-calendar": "/miniprogram_npm/@vant/weapp/calendar/index"
+  }
+}

@@ -1,0 +1,124 @@
+var __L = require('../../../legacy_app.js') // legacy-demo：旧版演示的独立 App
+// pages/mine/ticket/ticket_list.js
+const app = __L
+const data = require('../../../utils/data.js')
+__L.Page({
+
+  /**
+   * Page initial data
+   */
+  data: {
+    usedColor: 'gray',
+    unUsedColor: 'red',
+    showUsed: false,
+    ticketTitleColor: 'greenyellow',
+    showCover: 'none',
+    ticketArr:[],
+    currentQrUrl :'',
+    currentY: 0,
+    opacity: 0,
+    needAuth: false
+  },
+  
+  /**
+   * Lifecycle function--Called when page load
+   */
+  onLoad: function (options) {
+    var that = this
+    if (options.used != undefined && options.used != 0){
+      this.setData({showUsed: true, usedColor: 'red', unUsedColor: 'gray', ticketTitleColor:'gray'})
+    }
+    app.loginPromiseNew.then(function(resolve){
+      data.getMyTickets((!that.data.showUsed?0:1), app.globalData.sessionKey).then(function (tickets){
+        for(var i = 0; i < tickets.length; i++){
+
+          var memo = tickets[i].memo
+          if (memo.indexOf('>') >= 0 && memo.indexOf('<') >= 0){
+            tickets[i].rich = true
+          }
+          else{
+            tickets[i].rich = false
+            tickets[i].usage = memo.split(';')
+          }
+          //tickets[i].usage = tickets[i].memo.split(';')
+        }
+        that.setData({ticketArr: tickets})
+      }).catch(function (exp){
+
+      })
+    })
+  },
+  onReady: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page show
+   */
+  onShow: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page hide
+   */
+  onHide: function () {
+
+  },
+
+  /**
+   * Lifecycle function--Called when page unload
+   */
+  onUnload: function () {
+
+  },
+
+  /**
+   * Page event handler function--Called when user drop down
+   */
+  onPullDownRefresh: function () {
+
+  },
+
+  /**
+   * Called when page reach bottom
+   */
+  onReachBottom: function () {
+
+  },
+
+  /**
+   * Called when user click on the top right corner to share
+   */
+  onShareAppMessage: function () {
+
+  },
+  showDetail: function(source){
+    console.log(source)
+    if (this.options.used == 1){
+      return
+    }
+    var code = source.currentTarget.id
+
+    wx.navigateTo({
+      url: 'ticket_detail?code=' + code,
+    })
+
+
+    //var qrCodeUrl = 'http://weixin.snowmeet.top/show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code
+
+    /*
+
+    var qrCodeUrl = 'https://' + app.globalData.domainName + '/core/MediaHelper/ShowImageFromOfficialAccount?img=' 
+    //+ encodeURIComponent('show_qrcode.aspx?qrcodetext=' + code)
+    + encodeURIComponent('show_wechat_temp_qrcode.aspx?scene=oper_ticket_code_' + code)
+
+
+    this.setData({currentQrUrl: qrCodeUrl, currentX: 200,currentY:source.detail.y, showCover: 'block', opacity: 0.8 })
+   
+    */
+  },
+  hideDetail: function(){
+    this.setData({showCover: 'none', opacity: 0})
+  }
+})

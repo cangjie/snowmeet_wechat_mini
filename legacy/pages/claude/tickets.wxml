@@ -1,0 +1,150 @@
+<!-- pages/tickets/tickets.wxml -->
+<view class="container">
+
+  <!-- 顶部 Tab 导航 -->
+  <view class="tab-nav">
+    <view
+      class="tab-item {{activeTab === 'unused' ? 'tab-active' : 'tab-inactive'}}"
+      bindtap="switchTab"
+      data-tab="unused"
+    >
+      未使用 ({{unusedList.length}})
+    </view>
+    <view
+      class="tab-item {{activeTab === 'used' ? 'tab-active' : 'tab-inactive'}}"
+      bindtap="switchTab"
+      data-tab="used"
+    >
+      已使用 ({{usedList.length}})
+    </view>
+  </view>
+
+  <!-- 票券列表 -->
+  <scroll-view scroll-y class="ticket-list">
+    <view
+      wx:for="{{currentList}}"
+      wx:key="id"
+      class="ticket-card"
+      style="animation-delay: {{index * 80}}ms"
+    >
+      <!-- 卡片头部 -->
+      <view class="card-header">
+        <view class="card-header-left">
+          <view class="badge {{item.tier === 'premium' ? 'badge-premium' : 'badge-standard'}}">
+            {{item.tier === 'premium' ? 'PREMIUM ACCESS' : 'STANDARD'}}
+          </view>
+          <text class="ticket-title">{{item.title}}</text>
+        </view>
+        <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
+      </view>
+
+      <!-- 序列号 -->
+      <view class="serial-block">
+        <text class="serial-label">Serial Number</text>
+        <text class="serial-value">{{item.serial}}</text>
+      </view>
+
+      <!-- 详情信息 -->
+      <view class="details-grid">
+        <view class="detail-item">
+          <text class="detail-label">VALID DATE</text>
+          <text class="detail-value">{{item.validDate}}</text>
+        </view>
+        <view class="detail-item align-right" wx:if="{{item.quantity}}">
+          <text class="detail-label">QUANTITY</text>
+          <text class="detail-value">{{item.quantity}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">AMOUNT</text>
+          <text class="detail-value amount {{item.tier === 'premium' ? 'amount-premium' : ''}}">¥ {{item.amount}}</text>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="card-actions" wx:if="{{activeTab === 'unused'}}">
+        <view
+          class="btn btn-cancel"
+          bindtap="onCancelTicket"
+          data-id="{{item.id}}"
+          data-title="{{item.title}}"
+        >
+          申请取消
+        </view>
+        <view
+          class="btn {{item.canUse ? 'btn-use' : 'btn-use-disabled'}}"
+          bindtap="{{item.canUse ? 'onUseTicket' : ''}}"
+          data-id="{{item.id}}"
+          data-serial="{{item.serial}}"
+          data-title="{{item.title}}"
+        >
+          立即使用
+        </view>
+      </view>
+
+      <!-- 已使用状态遮盖 -->
+      <view class="used-overlay" wx:if="{{activeTab === 'used'}}">
+        <view class="used-stamp">已使用</view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{currentListEmpty}}">
+      <text class="empty-icon">🎫</text>
+      <text class="empty-text">暂无票券</text>
+    </view>
+  </scroll-view>
+
+  <!-- ===== 弹窗：申请取消确认 ===== -->
+  <view class="modal-mask {{showCancelModal ? 'modal-visible' : ''}}" bindtap="closeCancelModal">
+    <view class="modal-box" catchtap="">
+      <view class="modal-icon-wrap cancel-icon-wrap">
+        <text class="modal-icon">⚠️</text>
+      </view>
+      <text class="modal-title">确认退票？</text>
+      <text class="modal-desc">您即将申请取消以下票券：</text>
+      <text class="modal-ticket-name">{{cancelTarget.title}}</text>
+      <text class="modal-tip">退款将在 3-5 个工作日内原路返回，手续费可能不予退还。</text>
+      <view class="modal-actions">
+        <view class="modal-btn modal-btn-secondary" bindtap="closeCancelModal">再想想</view>
+        <view class="modal-btn modal-btn-danger" bindtap="confirmCancel">确认退票</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 弹窗：立即使用 - 二维码 ===== -->
+  <view class="modal-mask {{showUseModal ? 'modal-visible' : ''}}" bindtap="closeUseModal">
+    <view class="modal-box qr-modal" catchtap="">
+      <!-- 关闭按钮 -->
+      <view class="close-btn" bindtap="closeUseModal">
+        <text class="close-icon">✕</text>
+      </view>
+
+      <text class="qr-modal-title">扫码取票</text>
+      <text class="qr-modal-subtitle">{{useTarget.title}}</text>
+
+      <!-- 二维码区域 -->
+      <view class="qr-wrapper">
+        <image
+          class="qr-image"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{useTarget.serial}}"
+          mode="aspectFit"
+        />
+        <view class="qr-scan-line"></view>
+      </view>
+
+      <!-- 数字取票码 -->
+      <view class="pickup-code-section">
+        <text class="pickup-label">取票码</text>
+        <view class="pickup-code-row">
+          <text class="pickup-code">{{useTarget.pickupCode}}</text>
+          <view class="copy-btn" bindtap="copyCode" data-code="{{useTarget.pickupCode}}">
+            <text class="copy-text">复制</text>
+          </view>
+        </view>
+      </view>
+
+      <text class="qr-tip">请将此码出示给工作人员，或在自助取票机扫描</text>
+    </view>
+  </view>
+
+</view>

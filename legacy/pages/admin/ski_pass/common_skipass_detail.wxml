@@ -1,0 +1,58 @@
+<view>
+  <view class="view-row" style="margin-top: 50rpx;" >
+    <view class="left-column" style="width: 100rpx;" >名称：</view>
+    <view class="right-column" style="width: 500rpx;" >{{product.name}}</view>
+  </view>
+  <view style="margin-top: 20rpx;" class="view-row">
+    <view class="left-column" style="width: 100rpx;" >状态：</view>
+    <view class="right-column" style="width:500rpx; margin-left: 30rpx;" >
+      <radio-group class="view-row" bindchange="setHidden" >
+        <radio checked="{{product.hidden == 0}}" value="0" >上架</radio>
+        <view style="width: 50rpx;" ></view>
+        <radio checked="{{product.hidden == 1}}"  value="1" >下架</radio>
+      </radio-group>
+    </view>
+  </view>
+  <view class="view-row" style="margin-top: 20rpx;" >
+    <view class="left-column" style="width: 100rpx;" >平日：</view>
+    <view class="right-column" style="width: 260rpx;" >
+      <input class="input" style="width: 100rpx;"  value="{{product.commonDayDealPrice}}" id="common" bindinput="setTotalPrice" />
+    </view>
+    <view class="left-column" style="width: 100rpx;" >周末：</view>
+    <view class="right-column" style="width: 260rpx;" >
+      <input class="input"  style="width: 100rpx;"  value="{{product.weekendDealPrice}}" id="weekend" bindinput="setTotalPrice" />
+    </view>
+  </view>
+  <mp-cells title="未来{{product.avaliablePriceList.length}}日价格" >
+    <mp-cell>
+      <veiw class="view-row" >
+        <view style="width: 200rpx;text-align: center;">日期</view>
+        <view style="width: 100rpx;text-align: center;">类型</view>
+        <view style="width: 150rpx;text-align: center;">成本</view>
+        <view style="width: 150rpx;text-align: center;">零售</view>
+      </veiw>
+    </mp-cell>
+    <mp-cell wx:for="{{product.avaliablePriceList}}" >
+      <view class="view-row" style="{{item.backColor==''?'':('background-color: ' + item.backColor)}}"  >
+        <view  style="{{item.color != ''?'color:' + item.color: ''}}" >{{item.reserve_dateStr}}</view>
+        <view style="margin-left: 50rpx;">
+          <picker class="input" id="{{item.id}}" bindchange="setDayType"  style="text-align: center;width:110rpx;" range="{{dayType}}" >
+            <picker-view style="text-align: center;{{item.color != ''?'color:' + item.color: ''}}">
+              {{item.day_type}}
+            </picker-view>
+          </picker>
+        </view>
+        <view style="width: 150rpx;text-align: right;{{item.color != ''?'color:' + item.color: ''}}">
+          {{item.settlementPriceStr}}
+        </view>
+        <view style="text-align: center;margin-left: 30rpx;" >
+          <input style="width: 110rpx;{{item.color != ''?'color:' + item.color: ''}}" id="{{item.id}}"  bindinput="setItemPrice"  value="{{item.deal_price}}" class="input" />
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+  <view style="margin-top:50rpx" >
+    <button class="input" disabled="{{saving}}" bind:tap="save" > 保 存 </button>
+  </view>
+  <view style="height: 50rpx;" ></view>
+</view>

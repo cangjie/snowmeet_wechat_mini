@@ -1,0 +1,11 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "Wanlong Ski Resort",
+  "navigationBarBackgroundColor": "#F8F9FF",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#F8F9FF",
+  "backgroundTextStyle": "light",
+  "enablePullDownRefresh": false,
+  "onReachBottomDistance": 50,
+  "usingComponents": {}
+}

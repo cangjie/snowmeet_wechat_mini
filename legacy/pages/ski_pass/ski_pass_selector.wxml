@@ -1,0 +1,71 @@
+<mp-tabs 
+  tabs="{{tabs}}" 
+  activeTab="{{activeTab}}" 
+  swiperClass="weui-tabs-swiper"
+  bindchange="onChange"
+  activeClass="tab-bar-title__selected"
+>
+  <block wx:for="{{tabs}}" wx:key="title">
+    <view class="tab-content" slot="tab-content-{{index}}"   >
+      <view wx:if="{{item.title == '南山'}}" >
+        <view style="display: flex; flex-direction: row;" >
+          <view style="font-size: 11pt;"  >日期：</view>
+          <picker mode="date"   start="2025-12-06" end="{{endDate}}" bindchange="DateChanged" >
+            <picker-view style="font-size: 11pt;" >{{reserveDate}} {{reserveDateDesc}}</picker-view>
+          </picker>
+          <radio-group style="margin-left: 20rpx;" bindchange="TagsChange">
+            <radio style="margin-left: 10rpx;font-size: 11pt;"  value="自带板" >自带板</radio>
+            <radio style="margin-left: 10rpx;font-size: 11pt;" value="租板"  >租板</radio>
+          </radio-group>
+        </view>
+        <!--view style="margin-top: 10rpx;">
+          <view wx:for="{{productList}}" style="margin-top: 5rpx; margin-bottom: 5rpx;">
+            <view>{{item.name}}</view>
+          </view>
+        </view-->
+      </view>
+      <view wx:else >
+        
+      </view>
+    </view>
+  </block>
+</mp-tabs>
+<view wx:if="{{resort == '南山'}}" >
+  <view  wx:for="{{productList}}" class="ski-pass-scale" >
+    <view class="ski-pass-title" bindtap="reserve" id="{{item.id}}"  ><b>{{item.name}}</b></view>
+    <view style="margin-left: 10rpx;display: flex; flex-direction: row;" bindtap="reserve" id="{{item.id}}"  >
+      <block wx:if="{{resort=='南山'}}" >
+        <view style="width: 50%;">票价：{{item.sale_price_str}}</view> 
+        <view style="width: 50%;">押金：{{item.deposit_str}}</view> 
+      </block>
+      <block wx:else >
+        <view style="width: 50%;">优惠价：{{item.sale_price_str}}</view> 
+        <view style="width: 50%;">门市价：{{item.market_price_str}}</view> 
+      </block>
+    </view>
+    <rich-text  nodes="{{item.desc}}" type="nodes" style="height: 500rpx;"  bindtap="reserve" id="{{item.id}}"  ></rich-text>
+    <view wx:if="{{role=='staff' && resort=='南山'}}" class="view-row" style="justify-content: center;">
+      <van-button type="info"  id="{{item.id}}" bind:click="showTempQr">临时加票二维码</van-button>
+    </view>
+
+  </view>
+  <view>
+  
+  </view>
+</view>
+<view wx:else >
+  <mp-cells>
+    <mp-cell wx:for="{{productList}}" >
+      <view class="view-row" >
+        <view style="width: 450rpx;">{{item.name}}</view>
+        <!--view style="width: 180rpx;margin-top: 50rpx;text-align: right;">{{item.sale_price_str}}起</view-->
+        <view style="margin-left: 20rpx;margin-top: 20rpx;">
+          <!--button id="{{item.id}}" size="mini" class="input" bind:tap="gotoDetail">预定</button-->
+          <van-button id="{{item.id}}" size="small" type="info" bind:click="gotoDetail" > 预 定 </van-button>
+        </view>
+      </view>
+    </mp-cell>
+  </mp-cells>
+</view>
+<view style="height: 200rpx;"></view>
+<mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>

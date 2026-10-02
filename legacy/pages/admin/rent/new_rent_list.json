@@ -1,0 +1,12 @@
+{
+  "usingComponents": {
+    "top-category-selector": "/legacy/components/rent/top_category_selector",
+    "fui-card": "/components/firstui/fui-card/fui-card",
+    "fui-row": "/components/firstui/fui-row/fui-row",
+    "fui-col": "/components/firstui/fui-col/fui-col",
+    "shop-selector": "/legacy/components/shop_selector/shop_selector",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-popup": "/miniprogram_npm/@vant/weapp/popup/index"
+  },
+  "navigationBarTitleText": "租赁订单列表"
+}

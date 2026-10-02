@@ -1,0 +1,30 @@
+<view>
+  <view class="view-row" >
+    <view class="left-column" >雪票：</view>
+    <view class="right-column"  >{{item.name}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >日期：</view>
+    <view class="right-column" >{{date}}</view>
+  </view>
+  <view class="view-row" >
+    <view class="left-column" >票价：</view>
+    <view class="right-column" >{{item.sale_price_str}}</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" >押金：</view>
+    <view class="right-column" >{{item.deposit_str}}</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" >总计：</view>
+    <view class="right-column" >{{item.totalStr}}</view>
+  </view>
+  <view class="view-row">
+    <view class="left-column" ></view>
+    <view class="right-column" style="color: red;" >请客人扫码支付</view>
+  </view>
+  <view style="margin-top: 50rpx;text-align: center;">
+    <image style="width: 450rpx;" src="{{qrCode}}" ></image>
+  </view>
+  
+</view>

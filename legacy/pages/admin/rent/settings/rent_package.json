@@ -1,0 +1,14 @@
+{
+  "usingComponents": {
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "mp-tabs": "/components/tabs/index",
+    "tree": "/legacy/components/tree/index",
+    "shop-price-matrix": "/legacy/components/rent/shop_price_matrix",
+    "category-selector": "/legacy/components/rent/category_selector",
+    "shop-selector": "/legacy/components/shop_selector/shop_selector",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-popup": "/miniprogram_npm/@vant/weapp/popup/index"
+  },
+  "navigationBarTitleText": "套餐详情"
+}

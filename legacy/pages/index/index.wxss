@@ -1,0 +1,37 @@
+/**index.wxss**/
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+  border-radius: 50%;
+}
+
+.userinfo-nickname {
+  color: #aaa;
+}
+
+.usermotto {
+  margin-top: 200px;
+}
+.cell-left{
+  border-right-style:solid;
+  border-right-width:1rpx;
+  border-right-color:#E0E0E0;
+  border-bottom-style:solid;
+  border-bottom-width:1rpx;
+  border-bottom-color:#E0E0E0
+}
+.cell-right{
+  border-bottom-style:solid;
+  border-bottom-width:1rpx;
+  border-bottom-color:#E0E0E0
+}
+.product-cell{
+  padding: 10rpx
+}

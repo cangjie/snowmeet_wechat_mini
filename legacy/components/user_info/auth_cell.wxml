@@ -1,0 +1,5 @@
+<view style="display: flex;justify-content: center; align-items: center;" >
+  <van-button type="primary" open-type="getPhoneNumber" round bind:getphonenumber="getCell"   >
+    请授权您的手机号
+  </van-button>
+</view>

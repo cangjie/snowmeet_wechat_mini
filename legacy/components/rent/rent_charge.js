@@ -1,0 +1,160 @@
+const util = require('../../utils/util.js')
+const data = require('../../utils/data.js')
+Component({
+  properties: {
+    rentItem: Object,
+    shop: Object,
+    scene: {
+      type: String,
+      value: '会员'
+    }
+  },
+  data: {
+    activeNames: ['1', '2', '3']
+  },
+  lifetimes: {
+    ready() {
+      var that = this
+      var rental = that.properties.rentItem
+      data.getEnumListPromise('RentType').then(function (rentTypeList) {
+        that.setData({ rentTypeList })
+      })
+      rental.guarantyStr = util.showAmount(rental.guaranty)
+      that.setData({ rental, shopObj: that.properties.shop })
+      that.computeEndDate()
+      console.log('get price list', rental.priceList)
+      that.setData({ priceList: rental.priceList })
+      that.computeRental(rental)
+    }
+  },
+  methods: {
+    switchSeg(e) {
+      var that = this
+      var segIndex = e.detail.index
+      that.setData({ segIndex })
+    },
+    onChange(event) {
+      this.setData({
+        activeNames: event.detail,
+      });
+    },
+    setGuarantyDiscount(e) {
+      var that = this
+      var value = e.detail.value
+      var rental = that.data.rental
+      if (!isNaN(value)) {
+        var discount = parseFloat(value)
+        var deposit = rental.deposit
+        rental.depositDiscount = discount
+        rental.guaranty_discount = discount
+        rental.guaranty_discountStr = util.showAmount(discount)
+        rental.depositDiscountStr = util.showAmount(discount)
+        rental.realDeposit = deposit - discount
+        rental.realDepositStr = util.showAmount(rental.realDeposit)
+        that.setData({ rental })
+        that.triggerEvent('RentalChange', rental)
+      }
+    },
+    computeEndDate() {
+      var that = this
+      var rental = that.data.rental
+      var endDate = new Date(rental.startDate)
+      var expectDays = parseInt(rental.expectDays) - 1
+      endDate.setDate(endDate.getDate() + expectDays)
+      rental.endDate = util.formatDate(endDate)
+      rental.end_date = util.formatDate(endDate)
+      that.setData({ rental })
+    },
+    setExpectDays(e) {
+      if (isNaN(e.detail.value)) {
+        return
+      }
+      var that = this
+      var days = parseInt(e.detail.value)
+      var rental = that.data.rental
+      rental.expectDays = days
+      that.computeEndDate()
+      util.createRentalDetail(rental, new Date(rental.startDate), new Date(rental.endDate))
+      console.log('new rental', rental)
+      that.computeRental(rental)
+      
+    },
+    setRentType(e){
+      var that = this
+      var rentType = that.data.rentTypeList[e.detail.value]
+      var rental = that.data.rental
+      var detail = rental.pricePresets[0]
+      var price = util.getRentPrice(rental.priceList, new Date(detail.date), rentType)
+      detail.rent_type = price.rent_type
+      detail.price = price.price
+      detail.priceStr = util.showAmount(detail.price)
+      rental.totalAmount = detail.price
+      rental.totalAmountStr = util.showAmount(rental.totalAmount)
+      //that.setData({rental})
+      that.computeRental(rental)
+    },
+    setRentalDiscount(e){
+      var value = e.detail.value
+      if (isNaN(value) || value[value.length-1]=='.' 
+        || (value[value.length-1]=='0' && value.indexOf('.') > 0) ){
+        return
+      }
+      var that = this
+      var discount = parseFloat(e.detail.value)
+      var id = parseInt(e.currentTarget.id)
+      var rental = that.data.rental
+      var detail = rental.pricePresets[id]
+      detail.discount = discount
+      that.computeRental(rental)
+    },
+    setRentalPrice(e){
+      var value = e.detail.value
+      if (isNaN(value) || value[value.length-1]=='.' 
+        || (value[value.length-1]=='0' && value.indexOf('.') > 0) ){
+        return
+      }
+      var that = this
+      var amount = parseFloat(e.detail.value)
+      var id = parseInt(e.currentTarget.id)
+      var rental = that.data.rental
+      var detail = rental.pricePresets[id]
+      detail.price = amount
+      detail.manual = true
+      that.computeRental(rental)
+    },
+    computeRental(){
+      var that = this
+      var rental = that.data.rental
+      var totalAmount = 0
+      var totalDiscount = 0
+      var totalSummary = 0
+      for(var i = 0; rental.pricePresets && i < rental.pricePresets.length; i++){
+        var detail = rental.pricePresets[i]
+        detail.summary = detail.price - detail.discount
+        detail.summaryStr = util.showAmount(detail.summary)
+        totalAmount += detail.price
+        totalDiscount += detail.discount
+        totalSummary += (detail.price - detail.discount)
+      }
+      rental.totalAmount = totalAmount
+      rental.totalDiscount = totalDiscount
+      rental.totalSummary = totalSummary
+      rental.totalAmountStr = util.showAmount(rental.totalAmount)
+      rental.totalDiscountStr = util.showAmount(rental.totalDiscount)
+      rental.totalSummaryStr = util.showAmount(rental.totalSummary)
+      that.setData({rental})
+      that.triggerEvent('RentalUpdated', rental)
+    },
+    setEntertain(e){
+      var that = this
+      var rental = that.data.rental
+      if (e.detail.value.length == 0){
+        rental.entertain = false
+      }
+      else{
+        rental.entertain = true
+      }
+      that.computeRental()
+    }
+  }
+})

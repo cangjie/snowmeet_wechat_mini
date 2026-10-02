@@ -1,0 +1,17 @@
+{
+  "usingComponents": {
+    "rent-recept-footer": "/legacy/components/rent/rent_recept_footer",
+    "retail-recept": "/legacy/components/retail/retail_recept",
+    "retail-footer": "/legacy/components/retail/retail_footer",
+    "retail-order-info": "/legacy/components/retail/retail_order_info",
+    "care-recept": "/legacy/components/care/care_recept",
+    "care-footer": "/legacy/components/care/care_footer",
+    "care-back-drop": "/legacy/components/care/care_back_drop",
+    "rent-back-drop": "/legacy/components/rent/rent_backdrop",
+    "fire-charge": "/legacy/components/fire/fire_charge",
+    "fui-card": "/components/firstui/fui-card/fui-card",
+    "van-popup": "/miniprogram_npm/@vant/weapp/popup/index",
+    "van-goods-action": "/miniprogram_npm/@vant/weapp/goods-action/index",
+    "rent-recept": "/legacy/components/rent/rent_recept"
+  }
+}

@@ -1,0 +1,11 @@
+@import '/app.wxss';
+.left-column{
+  text-align: left;
+}
+.right-column{
+  text-align: left;
+  width: 500rpx;
+}
+.view-row{
+  margin-top: 20rpx;
+}

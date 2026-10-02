@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "fui-card": "/components/firstui/fui-card/fui-card",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-tree-select": "/miniprogram_npm/@vant/weapp/tree-select/index"
+  }
+}

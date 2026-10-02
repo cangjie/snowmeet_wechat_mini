@@ -1,0 +1,20 @@
+<mp-cells title="搜索手机号" >
+  <mp-cell>
+    <view class="view-row" >
+      <view>手机号：</view>
+      <input style="width: 220rpx;" class="input" bindinput="setInput" />
+      <button size="mini" class="input" bindtap="query" > 查 询 </button>
+    </view>
+  </mp-cell>
+</mp-cells>
+<mp-cells title="员工列表" >
+  <mp-cell wx:for="{{staffList}}" >
+    <view class="view-row" >
+      <view style="width: 270rpx;">{{item.cell_number}}</view>
+      <view style="width: 200rpx;">{{item.real_name}}</view>
+      <view>
+        <switch id="{{item.open_id}}" checked="{{item.is_admin == 1}}" bindchange="setStaff" ></switch>
+      </view>
+    </view>
+  </mp-cell>
+</mp-cells>

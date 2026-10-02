@@ -1,0 +1,13 @@
+{
+  "usingComponents": {
+    "print-care": "/legacy/components/care/print_care_label",
+    "mp-cells": "weui-miniprogram/cells/cells",
+    "mp-cell": "weui-miniprogram/cell/cell",
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "van-popup": "/miniprogram_npm/@vant/weapp/popup/index",
+    "van-tab": "/miniprogram_npm/@vant/weapp/tab/index",
+    "van-tabs": "/miniprogram_npm/@vant/weapp/tabs/index",
+    "van-uploader": "/miniprogram_npm/@vant/weapp/uploader/index"
+  },
+  "navigationBarTitleText": "养护订单"
+}

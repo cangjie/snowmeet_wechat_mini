@@ -1,0 +1,29 @@
+<view class="flex-wrp" style="flex-direction:column;text-align: center;margin-left: 80rpx;">
+  <view wx:for="{{tickets}}" style=" width:80%;margin-top: 15rpx;border-width: 1rpx; border-color: #c0c0c0;border-style: solid;">
+    <view style="background-color:{{item.is_active==1 && item.used == 0 ?'green':'gray'}}; text-align: center;color: #FFFFFF;">{{item.name}} {{item.is_active==1?'':'【未激活】'}}{{item.used==1?'【已核销】':''}}</view>
+    <block wx:if="{{item.is_active == 1}}">
+      <view id="{{index}}" wx:if="{{index==current_selected_index}}" style="margin-left: 20rpx; background-color: #c0c0c0;" bindtap="select">
+        <text wx:for="{{item.usage}}" wx:key="u" decode="{{true}}" style="font-size: 9pt; ">
+          {{u}}
+        </text>
+      </view>
+      <view id="{{index}}" wx:else bindtap="select" style="margin-left: 20rpx;">
+        <rich-text style="text-align: left;" wx:if="{{item.rich}}" nodes="{{item.memo}}" ></rich-text>
+        <view wx:for="{{item.usage}}"  decode="{{true}}" style="text-align: left;" >
+          *{{item}}
+        </view>
+      </view>
+   
+    </block>
+    <block wx:else>
+      <view id="{{index}}" style="margin-left: 20rpx;">
+        <rich-text style="text-align: left;" wx:if="{{item.rich}}" nodes="{{item.memo}}" ></rich-text>
+        <view wx:for="{{item.usage}}"  decode="{{true}}" style="text-align: left;" >
+          *{{item}}
+        </view>
+      </view>
+
+    </block>
+    <view style="height: 15rpx;"></view>
+  </view>
+</view>

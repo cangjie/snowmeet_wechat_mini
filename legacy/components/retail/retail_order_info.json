@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "payment": "/legacy/components/payment/payment"
+  }
+}

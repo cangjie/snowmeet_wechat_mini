@@ -1,0 +1,30 @@
+<view style="width:var(--modal-width)">
+  <view style="text-align: center;font-weight: bold;">选择优惠券</view>
+  <scroll-view style="width:var(--modal-width)" style="margin-top: 50rpx; height: var(--scroll-height);">
+    <view class="view-row" style="width:var(--modal-width)">
+      <view style="width: var(--cell-0-width);text-align: center;"></view>
+      <view style="width: var(--cell-1-width);text-align: center;">编码</view>
+      <view style="width: var(--cell-2-width);text-align: center;">名称</view>
+      <view style="width: var(--cell-3-width);text-align: center;">到期日</view>
+    </view>
+    <van-divider></van-divider>
+    <radio-group bindchange="selectCode">
+      <block wx:for="{{tickets}}">
+        <view class="view-row" style="width:var(--modal-width)">
+          <view style="width: var(--cell-0-width);text-align: center;">
+            <radio style="margin-left: 15rpx;" checked="{{item.selected}}" value="{{item.code}}" disabled="{{item.disabled}}" ></radio>
+          </view>
+          <view style="width: var(--cell-1-width);text-align: center;">{{item.code==null?'--':item.code}}</view>
+          <view style="width: var(--cell-2-width);text-align: center;">{{item.name}}</view>
+          <view style="width: var(--cell-3-width);text-align: center;">{{item.expire_dateStr}}</view>
+        </view>
+        <van-divider></van-divider>
+      </block>
+    </radio-group>
+  </scroll-view>
+  <view class="view-row" style="justify-content: center;width: var(--modal-width);">
+    <van-button type="warning" round bind:click="cancel"> 取 消 </van-button>
+    <view style="width:100rpx"></view>
+    <van-button type="primary" round bind:click="confirm"> 确 认 </van-button>
+  </view>
+</view>

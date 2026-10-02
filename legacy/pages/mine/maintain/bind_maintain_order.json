@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "auth": "/legacy/components/auth/auth"
+  },
+  "navigationBarTitleText": "注册新会员"
+}
