@@ -19,7 +19,17 @@ Component({
    */
   data: {
     printType: '顾客小票',
-    currentDeviceIndex: null
+    currentDeviceIndex: null,
+    hasConnected: false
+  },
+  // 打印按钮只在列表里有「已连接」的打印机时可点；状态每次变化都会 setData availablePrinters
+  observers: {
+    'availablePrinters': function (printers) {
+      var hasConnected = (printers || []).some(function (p) { return p.status == '已连接' })
+      if (hasConnected != this.data.hasConnected) {
+        this.setData({ hasConnected })
+      }
+    }
   },
   lifetimes: {
     ready() {
@@ -37,6 +47,23 @@ Component({
       }
       console.log('care', that.properties.care)
       that.setData({ order: that.properties.order,printType: type })
+      // 打印机关机或走远掉线时，把列表里对应的「已连接」改回「未连接」（打印按钮随之变灰）
+      that._onBLEStateChange = function (res) {
+        if (res.connected) {
+          return
+        }
+        var printers = that.data.availablePrinters || []
+        for (var i = 0; i < printers.length; i++) {
+          if (printers[i].deviceId == res.deviceId && printers[i].status == '已连接') {
+            printers[i].status = '未连接'
+            if (that.data.connectingIndex == i) {
+              that.data.connectingIndex = null
+            }
+            that.setData({ availablePrinters: printers })
+          }
+        }
+      }
+      wx.onBLEConnectionStateChange(that._onBLEStateChange)
       wx.showToast({
         title: '正在连接打印机',
         icon: 'loading'
@@ -94,6 +121,9 @@ Component({
     },
     detached() {
       var that = this
+      if (that._onBLEStateChange && wx.offBLEConnectionStateChange) {
+        wx.offBLEConnectionStateChange(that._onBLEStateChange)
+      }
       var connectingIndex = that.data.connectingIndex
       if (!isNaN(connectingIndex) && connectingIndex != null) {
         var printers = that.data.availablePrinters
@@ -389,6 +419,7 @@ Component({
           } else {
             console.log(currentPrint)
             if (currentPrint == printNum) {
+              // 打完保持连接，补打不用重连；关闭弹窗（detached）时才断开
               that.setData({
                 looptime: 0,
                 lastData: 0,
@@ -397,22 +428,6 @@ Component({
                 currentPrint: 1,
                 readyForPrint: true
               })
-              
-              var connectingIndex = that.data.connectingIndex
-              var printers = that.data.availablePrinters
-              var printer = printers[connectingIndex]
-              wx.closeBLEConnection({
-                deviceId: printer.deviceId,
-                complete: () => {
-                  var connectingIndex = that.data.connectingIndex
-                  var printers = that.data.availablePrinters
-                  var printer = printers[connectingIndex]
-                  printer.status = '未连接'
-                  var connectingIndex = null
-                  that.setData({ connectingIndex: null, availablePrinters: printers })
-                }
-              })
-              
             } else {
               currentPrint++
               that.setData({
