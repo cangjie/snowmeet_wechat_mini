@@ -1,5 +1,6 @@
 // components/uploader/multi-uploader.js
 const app = getApp()
+const data = require('../../utils/data.js')
 Component({
   /**
    * Component properties
@@ -101,7 +102,7 @@ Component({
                   console.error('multi-uploader 返回值不是文件路径', uploadFilesData[i])
                   continue
                 }
-                filesData.push({url: 'https://' + app.globalData.domainName + path})
+                filesData.push({url: data.IMAGE_HOST + path})
                 added++
               }
               if (added == 0) {

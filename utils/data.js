@@ -714,14 +714,13 @@ const getEquipBrandsPromise = function (type) {
     })
   })
 }
-// 图片上传与显示共用的域名：照片落在处理上传那台服务器的磁盘，显示也必须从同一台取。
-// 2026-09-28 临时切到 mini.snowmeet.top（wanlonghuaxue 图片服务器待修复），
-// 修好后只改这一行，切回 'https://snowmeet.wanlonghuaxue.com'。
-const IMAGE_HOST = 'https://mini.snowmeet.top'
+// 图片显示域名：2026-10-03 起上传文件统一存 AWS S3，经 CloudFront 用 img.snowmeet.top 对外。
+// 库里存的是 /upload/... 相对路径，显示时拼这个前缀。上传仍然走 API（requestPrefix），由服务端写进 S3。
+const IMAGE_HOST = 'https://img.snowmeet.top'
 
 const uploadFilePromise = function (mainId, filePath, purpose, type, sessionKey, uploadHost) {
-  var host = uploadHost || IMAGE_HOST
-  var uploadUrl = host + '/api/UploadFile/UploadFileWithThumb?sessionKey=' + sessionKey
+  var uploadUrl = (uploadHost ? uploadHost + '/api/' : app.globalData.requestPrefix)
+    + 'UploadFile/UploadFileWithThumb?sessionKey=' + sessionKey
   //+ '&purpose=' + encodeURIComponent(purpose) + '&fileType=' + encodeURIComponent(type)
   if (mainId) {
     uploadUrl += ('&mainId=' + mainId.toString())
@@ -1783,8 +1782,8 @@ const ocrScanMatExpirePromise = function (imageBase64, sessionKey) {
 // uploadFilePromise 直接把 JSON.parse 结果当裸对象用。wx.uploadFile 对任意 HTTP 状态码都会触发
 // success 回调，必须手动判断 res.statusCode 落在 [200,300) 才算成功（本仓库已有过因漏判导致假成功的教训）
 const uploadMatExpirePhotoPromise = function (filePath, sessionKey) {
-  // 与 uploadFilePromise（养护开单）共用 IMAGE_HOST，不走 requestPrefix
-  var uploadUrl = IMAGE_HOST + '/api/FnbMaterial/UploadPhoto?sessionKey=' + sessionKey
+  // 上传走 API；返回的 file_path_name 显示时拼 IMAGE_HOST
+  var uploadUrl = app.globalData.requestPrefix + 'FnbMaterial/UploadPhoto?sessionKey=' + sessionKey
   return new Promise(function (resolve, reject) {
     wx.uploadFile({
       filePath: filePath,

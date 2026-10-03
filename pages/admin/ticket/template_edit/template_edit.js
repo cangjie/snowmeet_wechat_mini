@@ -140,7 +140,7 @@ Page({
       d = d || {}
       var coverUrl = d.coverUrl || ''
       if (coverUrl && coverUrl.indexOf('http') !== 0) {
-        coverUrl = 'https://mini.snowmeet.top' + coverUrl
+        coverUrl = data.IMAGE_HOST + coverUrl
       }
       that.setData({
         name: d.name || '',
@@ -271,15 +271,14 @@ Page({
       success: function (res) {
         var path = res.tempFiles[0].tempFilePath
         that.setData({ uploadingCover: true })
-        data.uploadFilePromise(null, path, '优惠券模板海报', 'image', app.globalData.sessionKey,
-          'https://mini.snowmeet.top')
+        data.uploadFilePromise(null, path, '优惠券模板海报', 'image', app.globalData.sessionKey)
           .then(function (upload) {
             var item = upload && upload.data ? upload.data : upload
             var id = item && (item.id || item.upload_id)
             var url = item && (item.file_path_name || item.url || item.path)
             if (!id || !url) { throw new Error('海报上传结果无效') }
             if (url.indexOf('http') !== 0) {
-              url = 'https://mini.snowmeet.top' + url
+              url = data.IMAGE_HOST + url
             }
             that.setData({ coverUploadId: id, coverUrl: url, uploadingCover: false })
             that._setPosterPreviewRatio(url)

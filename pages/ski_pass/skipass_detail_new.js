@@ -341,9 +341,9 @@ Page({
         wx.setNavigationBarTitle({
           title: title,
         })
-        var productImage = 'https://snowmeet.wanlonghuaxue.com/images/skipass_day.png'
+        var productImage = 'https://mini.snowmeet.top/images/skipass_day.png'
         if (product.name.indexOf('夜场') >= 0) {
-          productImage = 'https://snowmeet.wanlonghuaxue.com/images/skipass_eve.png'
+          productImage = 'https://mini.snowmeet.top/images/skipass_eve.png'
           if (currentDate.getHours() >= 20) {
             currentDate = new Date()
             currentDate = currentDate.setDate(currentDate.getDate() + 1)
