@@ -55,7 +55,9 @@ Page({
     // 优先从订单id获取顾客信息，如果订单id为空或者从订单获取到的用户信息为空，则需要从参数获取顾客信息。
     const draft = wx.getStorageSync('reception_draft') || {};
     const bizType = safeDecode(options.bizType) || draft.bizType || 'rent';
-    const shop = safeDecode(options.shop) || draft.shopName || '';
+    const selectedShop = safeDecode(options.shop) || draft.shopName || '';
+    const shop = bizType === 'maintain' && selectedShop === '万龙体验中心'
+      ? '万龙服务中心' : selectedShop;
 
     let customer = { memberId: null, name: '', cell: '', gender: '' };
     let orderId = options.orderId ? safeDecode(options.orderId) : null;
@@ -100,6 +102,9 @@ Page({
       // 恢复整单（含 id + rentals/cares），购物车直接显示原有商品，后续保存更新同一张中断单。
       // bizType 以单子实际 order.type 为准：养护草稿从 URL 缺省 'rent' 进来时若不反推，会被租赁表单渲染
       const recoveredBiz = TYPE_TO_BIZ[(recoveredOrder.type || '').trim()] || bizType;
+      const recoveredShop = recoveredBiz === 'maintain' && recoveredOrder.shop === '万龙体验中心'
+        ? '万龙服务中心' : (recoveredOrder.shop || shop);
+      recoveredOrder.shop = recoveredShop;
       (recoveredOrder.rentals || []).forEach((r) => {
         r.timeStamp = (new Date(r.create_date || Date.now())).getTime();
       });
@@ -109,7 +114,7 @@ Page({
       this.setData({
         bizType: recoveredBiz,
         bizLabel: BIZ_LABELS[recoveredBiz] || '业务',
-        shop: recoveredOrder.shop || shop,
+        shop: recoveredShop,
         customer,
         order: recoveredOrder,
       });

@@ -88,12 +88,14 @@ Page({
   /* ---------- shop-selector 回调（沿用旧系统的事件名/字段） ---------- */
   shopSelected(e) {
     const { shop, sale, rent, care, restuarant } = e.detail || {};
+    // 万龙体验中心的养护按旧版接待规则归万龙服务中心，入口仍允许发起。
+    const canStartCare = care === 1 || shop === '万龙体验中心';
     this.setData({
       currentShopName: shop || '',
       shop: shop || '',
       sale: sale || 0,
       rent: rent || 0,
-      care: care || 0,
+      care: canStartCare ? 1 : 0,
       restuarant: restuarant || 0,
     });
   },
@@ -204,6 +206,8 @@ Page({
   onBizTap(e) {
     const bizType = e.currentTarget.dataset.type;
     const { shop, sale, rent, care } = this.data;
+    const orderShop = bizType === 'maintain' && shop === '万龙体验中心'
+      ? '万龙服务中心' : shop;
     const customerName = (this.data.customerName || '').trim();
     const customerCell = (this.data.customerCell || '').trim();
 
@@ -239,7 +243,7 @@ Page({
 
     // 暂存订单标识信息（PRD §1.4.6 订单找回）
     const draft = {
-      shopName: shop,
+      shopName: orderShop,
       customerName: customerName,
       gender: this.data.gender,
       customerCell: customerCell,
@@ -253,7 +257,7 @@ Page({
     //
     const params = [
       'bizType=' + encodeURIComponent(bizType),
-      'shop=' + encodeURIComponent(shop),
+      'shop=' + encodeURIComponent(orderShop),
       'customerName=' + encodeURIComponent(customerName),
       'gender=' + encodeURIComponent(this.data.gender || ''),
       'customerCell=' + encodeURIComponent(customerCell),
