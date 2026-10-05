@@ -208,17 +208,21 @@ Component({
           }
         }
       }
-      // 沿用旧版万龙互换逻辑：选中店和店员 base_shop 同属"万龙系"时按店员的店落地
-      var shopName = shop.name
+      // 万龙系按店员基地店落地时，店名、能力标记和选择框必须来自同一家店。
+      // 否则服务中心的 care=1 会跟体验中心的店名一起发出，养护计价找不到商品。
+      var selectedShop = shop
       var staff = app.globalData && app.globalData.staff
-      if (shopName.indexOf('万龙') >= 0
+      if (shop.name.indexOf('万龙') >= 0
         && staff && staff.shop && staff.shop.name
         && staff.shop.name.indexOf('万龙') >= 0) {
-        shopName = staff.shop.name
+        selectedShop = this.getShop(staff.shop.name) || shop
       }
+      var selectedIndex = (this.data.name_list || []).indexOf(selectedShop.name)
+      if (selectedIndex >= 0) this.setData({ currentSelectedIndex: selectedIndex })
       this.triggerEvent('ShopSelected', {
-        shop: shopName,
-        sale: shop.sale, rent: shop.rent, care: shop.care, restuarant: shop.restuarant
+        shop: selectedShop.name,
+        sale: selectedShop.sale, rent: selectedShop.rent,
+        care: selectedShop.care, restuarant: selectedShop.restuarant
       })
     },
 
