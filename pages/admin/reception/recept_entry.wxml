@@ -19,7 +19,7 @@
     <view class="page-header">
       <view class="page-title">开始开单</view>
       <!-- 店铺：复用旧系统的 shop-selector，scene="recept"
-           组件内部会调 Order/GetShops + wx.getFuzzyLocation 自动定位
+           组件内部会调 Order/GetShops + beacon 扫描自动选店
            并通过 ShopSelected 事件回传 { shop, sale, rent, care, restuarant } -->
       <view class="shop-card">
         <view class="shop-card-icon">
@@ -29,7 +29,6 @@
         <view class="shop-card-picker">
           <shop-selector
             scene="recept"
-            defaultShop="{{currentShopName}}"
             bindShopSelected="shopSelected" />
         </view>
         <van-icon name="arrow-down" size="16px" color="#6f7881"/>
@@ -51,9 +50,9 @@
           </view>
           <input
             class="form-input form-input--with-icon"
-            type="text"
+            type="number"
             maxlength="20"
-            placeholder="输入手机号（支持国际区号）"
+            placeholder="输入手机号（国际区号用 00）"
             placeholder-class="form-input-placeholder"
             value="{{customerCell}}"
             bindinput="onCellInput"/>

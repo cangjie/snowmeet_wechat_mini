@@ -195,7 +195,7 @@ Component({
       return null
     },
 
-    // 选店落地：setData 当前索引 + 万龙系互换 + triggerEvent
+    // 选店落地：开单入口以 beacon 命中的店为准；其它旧页面保留万龙系基地店逻辑。
     _applySelectedShop(shop, idx) {
       if (!shop) return
       if (idx >= 0) this.setData({ currentSelectedIndex: idx })
@@ -208,11 +208,13 @@ Component({
           }
         }
       }
-      // 万龙系按店员基地店落地时，店名、能力标记和选择框必须来自同一家店。
-      // 否则服务中心的 care=1 会跟体验中心的店名一起发出，养护计价找不到商品。
+      // 开单入口的 beacon 命中必须直接生效。扫描前的 fallback 已经按基地店落过一次；
+      // 若这里再次换回基地店，就永远看不到 beacon 选出的门店。
+      // 其它旧页面仍沿用万龙系基地店逻辑，并保持店名、能力标记与选择框一致。
       var selectedShop = shop
       var staff = app.globalData && app.globalData.staff
-      if (shop.name.indexOf('万龙') >= 0
+      if (this.properties.scene !== 'recept'
+        && shop.name.indexOf('万龙') >= 0
         && staff && staff.shop && staff.shop.name
         && staff.shop.name.indexOf('万龙') >= 0) {
         selectedShop = this.getShop(staff.shop.name) || shop
