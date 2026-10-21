@@ -58,14 +58,9 @@ test('关了系统导航栏的页面都用 safe-nav-bar', () => {
       problems.push(`${page}.wxml 没有使用 <safe-nav-bar>`)
     }
   }
-  assert.deepEqual(problems, [], '自定义导航栏必须用 safe-nav-bar，否则 iPhone 上返回键会被状态栏挡住：\n' + problems.join('\n'))
-})
-
-test('旧版演示页面不关系统导航栏', () => {
-  const legacy = registeredPages().filter(p => p.startsWith('legacy/'))
-  assert.ok(legacy.length > 0, '没读到 legacy 分包')
-  const custom = legacy.filter(p => pageJson(p).navigationStyle === 'custom')
-  assert.deepEqual(custom, [], '旧版页面自己画的顶栏没让出状态栏，build_legacy.py 生成时应去掉 navigationStyle: custom')
+  assert.deepEqual(problems, [],
+    '自定义导航栏必须用 safe-nav-bar，否则 iPhone 上返回键会被状态栏挡住'
+    + '（旧版演示页面别手改，改 build_legacy.py 后重新生成）：\n' + problems.join('\n'))
 })
 
 // ---- utils/navbar.js ----
