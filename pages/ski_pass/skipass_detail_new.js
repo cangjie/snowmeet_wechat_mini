@@ -4,9 +4,12 @@ const UNIT_PRICE = 253.00
 const app = getApp()
 const data = require('../../utils/data.js')
 const util = require('../../utils/util.js')
+const { getNavMetrics } = require('../../utils/navbar.js')
 Page({
 
   data: {
+    // 导航栏总高度（状态栏 + 导航栏），主内容区据此留出上边距；onLoad 里按机型取实际值
+    navTotalHeight: 64,
     // 当前选中日期（显示用）
     selectedDate: '2026-03-20',
     // 购票数量
@@ -33,7 +36,7 @@ Page({
 
   onLoad(options) {
     var that = this
-    that.setData({selectedDate: util.formatDate(new Date())})
+    that.setData({selectedDate: util.formatDate(new Date()), navTotalHeight: getNavMetrics().totalHeight})
     app.loginPromiseNew.then(function (resolve) {
       that._initDateOptions()
       that.getBalance()
@@ -72,21 +75,7 @@ Page({
     this.setData({ totalPrice: total })
   },
 
-  // ========================
-  // 顶部导航
-  // ========================
-  onBack() {
-    wx.navigateBack({ delta: 1 })
-  },
-
-  onMore() {
-    wx.showActionSheet({
-      itemList: ['分享给朋友', '复制链接', '举报'],
-      success(res) {
-        console.log('选择了:', res.tapIndex)
-      }
-    })
-  },
+  // 顶部导航：返回由 safe-nav-bar 处理（navigateBack，直接打开时回首页）
 
   // ========================
   // 日期选择

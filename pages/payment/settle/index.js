@@ -25,10 +25,13 @@ Page({
       cancelText: '继续开单',
       success: function (res) {
         if (res.confirm) {
-          // 查看订单详情：按 order.type 路由（养护 → 新版养护详情页，其余默认租赁详情页）
-          var detailUrl = orderType === '养护'
-            ? '/pages/admin/care/care_order_detail/care_order_detail?id=' + orderId
-            : '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + orderId
+          // 查看订单详情：按 order.type 路由（养护 / 零售各自的详情页，其余默认租赁详情页）
+          var detailUrl = '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + orderId
+          if (orderType === '养护') {
+            detailUrl = '/pages/admin/care/care_order_detail/care_order_detail?id=' + orderId
+          } else if (orderType === '零售') {
+            detailUrl = '/pages/admin/retail/retail_order_detail?id=' + orderId
+          }
           wx.redirectTo({ url: detailUrl })
         } else if (res.cancel) {
           // 继续开下一单：reLaunch 回开单入口，重置整条栈（与 reception-tabbar「开单」一致）

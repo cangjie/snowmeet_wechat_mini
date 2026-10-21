@@ -18,6 +18,16 @@
         <text wx:if="{{cares.length === 0}}" class="kv-value-item">（无）</text>
       </view>
     </view>
+    <block wx:elif="{{isRetail}}">
+      <view class="kv-row">
+        <text class="kv-label">七色米单号</text>
+        <text class="kv-value">{{retailInfo ? retailInfo.mi7 : '（无）'}}</text>
+      </view>
+      <view class="kv-row" wx:if="{{retailInfo}}">
+        <text class="kv-label">订单类型</text>
+        <text class="kv-value">{{retailInfo.type}}{{retailInfo.entertain ? ' · 招待' : ''}}</text>
+      </view>
+    </block>
     <view wx:else class="kv-row kv-row--multiline">
       <text class="kv-label">租赁商品</text>
       <view class="kv-value-list">

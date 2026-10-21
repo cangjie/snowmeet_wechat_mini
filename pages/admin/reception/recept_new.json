@@ -3,9 +3,11 @@
   "backgroundTextStyle": "light",
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index",
+    "safe-nav-bar": "/components/safe_nav_bar/safe_nav_bar",
     "reception-tabbar": "/components/reception_tabbar/reception_tabbar",
     "reception-member-bar": "/components/reception/reception_member_bar/reception_member_bar",
     "rent-recept-form": "/components/reception/rent_recept_form/rent_recept_form",
-    "care-recept-form": "/components/reception/care_recept_form/care_recept_form"
+    "care-recept-form": "/components/reception/care_recept_form/care_recept_form",
+    "retail-recept-form": "/components/reception/retail_recept_form/retail_recept_form"
   }
 }

@@ -3,18 +3,12 @@
   对应 PRD §1.4.5 第二步：店员选业务后进入对应业务开单
   设计：参考 pages/admin/recept/recept_new 的结构（顶级页持有数据 + 调接口，
         子组件只负责渲染表单与回传事件）
-  目前实现：租赁开单第一步（rent-recept-form）
+  目前实现：租赁（rent-recept-form）/ 养护（care-recept-form）/ 零售（retail-recept-form）
 -->
 <view class="page-root">
 
-  <!-- TopAppBar：标题 = 业务名 + 开单 -->
-  <view class="topbar">
-    <view class="topbar-back" bindtap="onBack">
-      <van-icon name="arrow-left" size="22px" color="#006495"/>
-    </view>
-    <view class="topbar-title">{{bizLabel}}开单</view>
-    <view class="topbar-back"></view>
-  </view>
+  <!-- 顶栏：标题 = 业务名 + 开单。必须用 safe-nav-bar，自己画的顶栏会和手机状态栏重叠、返回键点不动 -->
+  <safe-nav-bar title="{{bizLabel}}开单" homeUrl="/pages/admin/reception/recept_entry" />
 
   <!-- 顾客信息条（所有 bizType 共用，组件化） -->
   <reception-member-bar
@@ -47,10 +41,12 @@
       bind:memberSwitch="onMemberSwitchByTicket"
       bind:checkout="onCheckout" />
 
-    <view wx:if="{{bizType === 'retail'}}" class="placeholder">
-      <view class="placeholder-title">{{bizLabel}}开单（下一步迁移）</view>
-      <view class="placeholder-desc">该业务的接待表单组件尚未迁移</view>
-    </view>
+    <retail-recept-form
+      wx:if="{{bizType === 'retail'}}"
+      id="retailForm"
+      shop="{{shop}}"
+      memberId="{{customer.memberId}}"
+      bind:checkout="onRetailCheckout" />
   </view>
 
   <!-- 接待 tabbar -->

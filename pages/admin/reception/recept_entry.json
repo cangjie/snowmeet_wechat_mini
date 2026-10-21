@@ -3,6 +3,7 @@
   "backgroundTextStyle": "light",
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index",
+    "safe-nav-bar": "/components/safe_nav_bar/safe_nav_bar",
     "shop-selector": "/components/shop_selector/shop_selector",
     "reception-tabbar": "/components/reception_tabbar/reception_tabbar"
   }

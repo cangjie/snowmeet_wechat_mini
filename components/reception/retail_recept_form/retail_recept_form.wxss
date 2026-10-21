@@ -1,0 +1,85 @@
+/* components/reception/retail_recept_form/retail_recept_form.wxss
+   基础卡片/按钮/结算条样式复用租赁表单（Alpine Operational Minimalist），
+   这里只放零售特有的增量样式 */
+@import "../rent_recept_form/rent_recept_form.wxss";
+
+/* 没有添加入口栏，只剩结算条 + reception-tabbar */
+.retail-recept-form {
+  padding-bottom: calc(130px + env(safe-area-inset-bottom));
+}
+
+.retail-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 0;
+}
+.retail-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+/* 支付金额 */
+.retail-amount {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.retail-amount-placeholder {
+  font-size: 14px;
+}
+
+/* 七色米单号状态提示 */
+.mi7-hint {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+.mi7-hint--invalid,
+.mi7-hint--dup { color: var(--error); }
+.mi7-hint--ok { color: #15803d; }
+
+.retail-hint {
+  font-size: 12px;
+  color: #b45309;
+}
+
+/* 放弃龙珠开关行 */
+.retail-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: var(--surface-container-lowest);
+}
+.retail-toggle-row--disabled {
+  background: var(--surface-container);
+}
+.retail-toggle-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.retail-toggle-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+.retail-toggle-sub {
+  font-size: 11px;
+  color: var(--outline);
+}
+
+.retail-memo {
+  width: 100%;
+  box-sizing: border-box;
+  height: 72px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
+}

@@ -7,5 +7,7 @@
   "backgroundTextStyle": "light",
   "enablePullDownRefresh": false,
   "onReachBottomDistance": 50,
-  "usingComponents": {}
+  "usingComponents": {
+    "safe-nav-bar": "/components/safe_nav_bar/safe_nav_bar"
+  }
 }

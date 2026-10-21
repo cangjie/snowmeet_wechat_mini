@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "payment": "/components/payment/payment"
+    "van-icon": "@vant/weapp/icon/index",
+    "van-uploader": "@vant/weapp/uploader/index"
   },
   "navigationBarTitleText": "零售订单详情"
 }

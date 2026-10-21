@@ -27,34 +27,6 @@ page {
   padding-bottom: 76px;
 }
 
-/* TopAppBar */
-.topbar {
-  height: 56px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-.topbar-back {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.topbar-title {
-  flex: 1;
-  text-align: center;
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 18px;
-}
-
 /* 分类筛选 */
 .cat-tabs {
   background: #ffffff;

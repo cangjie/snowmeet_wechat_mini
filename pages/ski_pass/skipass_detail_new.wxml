@@ -1,19 +1,12 @@
 <!-- pages/ticket-booking/index.wxml -->
 <view class="page-container">
 
-<!-- 顶部导航栏 -->
-<view class="top-bar">
-  <view class="top-bar-left" bindtap="onBack">
-    <text class="iconfont icon-back">←</text>
-  </view>
-  <text class="top-bar-title">万龙雪票预定</text>
-  <view class="top-bar-right" bindtap="onMore">
-    <text class="icon-more">⋯</text>
-  </view>
-</view>
+<!-- 顶部导航栏：必须用 safe-nav-bar，自己画的顶栏会和手机状态栏重叠、返回键点不动。
+     原来右上角的「⋯」占位按钮去掉了：那个位置是微信胶囊按钮，胶囊自带分享等菜单 -->
+<safe-nav-bar title="万龙雪票预定" placeholder="{{false}}" background="#F8F9FF" color="#1A73E8" border="{{false}}" />
 
-<!-- 主内容区 -->
-<scroll-view class="main-content" scroll-y="true" enhanced="true" show-scrollbar="false">
+<!-- 主内容区：整页 scroll-view，上边距 = 导航栏总高度（状态栏 + 导航栏） -->
+<scroll-view class="main-content" style="padding-top: {{navTotalHeight}}px;" scroll-y="true" enhanced="true" show-scrollbar="false">
 
   <!-- Hero 横幅图 -->
   <view class="hero-section">

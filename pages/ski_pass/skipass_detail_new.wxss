@@ -34,71 +34,13 @@
     position: relative;
   }
   
-  /* =====================
-     顶部导航栏
-     ===================== */
-  .top-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 44rpx 24rpx 14rpx;
-    background-color: var(--surface);
-    /* 底部分割线：用渐变色代替 1px border */
-    box-shadow: 0 1rpx 0 rgba(116, 119, 127, 0.12);
-  }
-  
-  .top-bar-left {
-    width: 56rpx;
-    height: 56rpx;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-  }
-  
-  .top-bar-left:active {
-    background: rgba(26, 115, 232, 0.08);
-  }
-  
-  .icon-back {
-    font-size: 32rpx;
-    color: var(--primary);
-    font-weight: 600;
-  }
-  
-  .top-bar-title {
-    font-size: 30rpx;
-    font-weight: 700;
-    color: var(--on-surface);
-    letter-spacing: -0.5rpx;
-  }
-  
-  .top-bar-right {
-    width: 56rpx;
-    height: 56rpx;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .icon-more {
-    font-size: 36rpx;
-    color: var(--on-surface);
-    letter-spacing: -2rpx;
-  }
-  
+  /* 顶部导航栏改用 components/safe_nav_bar（让出手机状态栏，返回键与胶囊同一行） */
+
   /* =====================
      主内容滚动区
      ===================== */
   .main-content {
-    padding-top: 120rpx;
+    /* padding-top 由页面按导航栏实际高度内联设置（状态栏 + 导航栏） */
     height: 100vh;
     box-sizing: border-box;
   }

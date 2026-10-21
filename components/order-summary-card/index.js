@@ -1,5 +1,5 @@
 // components/order-summary-card/index.js
-// 订单详情卡片（可折叠）。仅根据 orderId 拉取并展示租赁商品名称。
+// 订单详情卡片（可折叠）。根据 orderId 拉取并展示租赁商品 / 养护内容 / 零售单号。
 const app = getApp()
 const util = require('../../utils/util.js')
 const data = require('../../utils/data.js')
@@ -38,9 +38,18 @@ Component({
           if (c.description && c.description !== '无') name += '（' + c.description + '）'
           return { id: c.id, name: name }
         })
+        // 零售单：一单一笔，展示七色米单号（紧急开单时还没有）+ 订单类型 + 是否招待
+        var retail = (order.retails || [])[0] || null
+        var retailInfo = retail ? {
+          mi7: retail.mi7_code || '紧急开单（待补单号）',
+          type: retail.retail_type || '零售',
+          entertain: (retail.order_type || '').trim() === '招待'
+        } : null
         that.setData({
           order: order,
           isCare: (order.type || '').trim() === '养护',
+          isRetail: (order.type || '').trim() === '零售',
+          retailInfo: retailInfo,
           cares: cares,
           rentals: order.rentals || [],
           payingAmountStr: util.showAmount(order.paying_amount)

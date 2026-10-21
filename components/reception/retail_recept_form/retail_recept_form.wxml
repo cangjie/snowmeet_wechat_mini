@@ -1,0 +1,138 @@
+<!--components/reception/retail_recept_form/retail_recept_form.wxml
+  零售接待开单表单：字段对齐旧版 components/retail/retail_recept（一单一笔），
+  卡片/按钮/结算条视觉对齐 rent_recept_form（wxss @import 复用）
+-->
+<view class="rent-recept-form retail-recept-form">
+
+  <view class="pkg-card">
+    <view class="retail-card-head">
+      <van-icon name="shopping-cart-o" size="18px" color="#006495"/>
+      <text class="retail-card-title">零售信息</text>
+    </view>
+
+    <view class="pkg-detail">
+      <!-- 支付金额 -->
+      <view class="kv-cell kv-cell--tap" catchtap="onAmountTap">
+        <text class="kv-label">支付金额</text>
+        <view class="kv-input-wrap">
+          <text wx:if="{{dealPriceStr}}" class="retail-amount">{{dealPriceStr}}</text>
+          <text wx:else class="form-input-placeholder retail-amount-placeholder">点此填写金额</text>
+        </view>
+      </view>
+
+      <!-- 七色米单号 + 紧急开单 -->
+      <view class="form-group">
+        <view class="form-label">七色米单号</view>
+        <view class="code-row">
+          <input class="form-input form-input--inline {{form.urgent ? 'form-input--disabled' : ''}}"
+                 value="{{form.mi7Code}}"
+                 disabled="{{form.urgent}}"
+                 placeholder="{{form.urgent ? '紧急开单，之后在订单详情里补' : '如 XSD20261021001I'}}"
+                 placeholder-class="form-input-placeholder"
+                 bindinput="onMi7Input"
+                 bindblur="onMi7Blur"/>
+          <view class="code-scan-btn {{form.urgent ? 'code-scan-btn--disabled' : ''}}" catchtap="onMi7Scan">
+            <van-icon name="scan" size="20px" color="#006495"/>
+          </view>
+        </view>
+        <view class="code-flag-row">
+          <view class="code-flag-btn {{form.urgent ? 'code-flag-btn--on' : ''}}" catchtap="onToggleUrgent">紧急开单（先不填单号）</view>
+        </view>
+        <view wx:if="{{mi7Hint}}" class="mi7-hint mi7-hint--{{form.mi7Status}}">{{mi7Hint}}</view>
+      </view>
+
+      <!-- 订单类型（两种卡类置灰不可选） -->
+      <view class="form-group">
+        <view class="form-label">订单类型</view>
+        <view class="rent-mode">
+          <block wx:for="{{typeOptions}}" wx:key="value">
+            <view class="rent-mode-btn {{item.on ? 'rent-mode-btn--active' : ''}} {{item.disabled ? 'rent-mode-btn--disabled' : ''}}"
+                  catchtap="onTypeTap" data-value="{{item.value}}">{{item.label}}</view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 普通 / 招待 -->
+      <view class="form-group">
+        <view class="form-label">特殊</view>
+        <view class="rent-mode">
+          <view class="rent-mode-btn {{!form.entertain ? 'rent-mode-btn--active' : ''}}"
+                catchtap="onSpecialTap" data-special="none">普通</view>
+          <view class="rent-mode-btn {{form.entertain ? 'rent-mode-btn--active' : ''}}"
+                catchtap="onSpecialTap" data-special="entertain">招待</view>
+        </view>
+        <view wx:if="{{form.entertain}}" class="retail-hint">招待单不收款，金额只做记录</view>
+      </view>
+
+      <!-- 放弃龙珠 -->
+      <view class="retail-toggle-row {{canKeepScore ? '' : 'retail-toggle-row--disabled'}}" catchtap="onToggleGiveupScore">
+        <view class="retail-toggle-texts">
+          <text class="retail-toggle-label">放弃龙珠</text>
+          <text wx:if="{{!canKeepScore}}" class="retail-toggle-sub">散客或未关注公众号，不积龙珠</text>
+        </view>
+        <van-icon name="{{form.giveupScore ? 'checked' : 'circle'}}" size="22px" color="{{form.giveupScore ? (canKeepScore ? '#006495' : '#9aa4b2') : '#c8c9cc'}}"/>
+      </view>
+
+      <!-- 照片 -->
+      <view class="form-group">
+        <view class="form-label">照片（最多 {{maxImages}} 张，选填）</view>
+        <van-uploader
+          file-list="{{form.images}}"
+          max-count="{{maxImages}}"
+          capture="{{['album', 'camera']}}"
+          bind:after-read="onPhotoRead"
+          bind:delete="onPhotoDelete"/>
+      </view>
+
+      <!-- 备注 -->
+      <view class="form-group">
+        <view class="form-label">备注</view>
+        <textarea class="retail-memo"
+                  value="{{form.memo}}"
+                  maxlength="200"
+                  placeholder="选填"
+                  placeholder-class="form-input-placeholder"
+                  bindinput="onMemoInput"/>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部固定区：应收 / 去结算 -->
+  <view class="bottom-stack">
+    <view class="checkout-bar">
+      <view class="checkout-info">
+        <view wx:if="{{form.entertain}}" class="checkout-count">招待</view>
+        <text class="checkout-deposit">应收 {{summary.amountStr}}</text>
+      </view>
+      <button
+        class="checkout-btn {{!summary.canCheckout ? 'checkout-btn--disabled' : ''}}"
+        bindtap="onCheckout">
+        去结算
+        <van-icon name="arrow" size="14px" color="{{summary.canCheckout ? '#ffffff' : '#3f4850'}}" custom-style="margin-left:4px"/>
+      </button>
+    </view>
+  </view>
+
+  <!-- 金额输入 modal（数字键盘带小数点，复用租赁的 amount-modal 样式） -->
+  <van-popup show="{{amountModal.show}}" position="center" round custom-style="width: 560rpx;" bind:close="onAmountModalCancel">
+    <view class="amount-modal">
+      <view class="amount-modal-title">支付金额</view>
+      <view class="amount-modal-input-wrap">
+        <text class="amount-modal-prefix">¥</text>
+        <input class="amount-modal-input"
+               type="digit"
+               placeholder="{{dealPriceStr ? '原 ' + dealPriceStr : '0'}}"
+               value="{{amountModal.value}}"
+               focus="{{amountModal.show}}"
+               bindinput="onAmountModalInput"
+               confirm-type="done"
+               bindconfirm="onAmountModalConfirm" />
+      </view>
+      <view class="amount-modal-footer">
+        <view class="amount-modal-btn amount-modal-btn--cancel" catchtap="onAmountModalCancel">取消</view>
+        <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onAmountModalConfirm">确认</view>
+      </view>
+    </view>
+  </van-popup>
+
+</view>

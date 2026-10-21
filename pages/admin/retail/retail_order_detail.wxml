@@ -1,148 +1,229 @@
-<view>
-  <mp-cells title="顾客下单信息">
-    <mp-cell ext-class="thin-cell" >
-      <view class="view-row">
-        <view class="left-column" style="width: 140rpx;">【姓名】</view>
-        <view class="right-column" style="width: 200rpx;">
-          <input class="input" disabled="{{!moddingContactInfo}}" id="contact_name" bindinput="inputContactInfo" value="{{order.contact_name}}" style="width: 150rpx;text-align: center;" />
-        </view>
-        <view class="left-column" style="width: 140rpx;">【状态】</view>
-        <view class="right-column">{{order.memberShip}}</view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column" style="width: 140rpx;">【性别】</view>
-        <view class="right-column view-row" style="width: 200rpx;">
-          <radio-group id="contact_gender" bindchange="inputContactInfo">
-            <radio disabled="{{!moddingContactInfo}}" checked="{{order.contact_gender == '男'}}" value="男">男</radio>
-            <radio disabled="{{!moddingContactInfo}}" checked="{{order.contact_gender == '女'}}" value="女">女</radio>
-          </radio-group>
-        </view>
-        <view class="left-column" style="width: 140rpx;">【手机号】</view>
-        <view class="right-column">
-          <input class="input" type="number" disabled="{{!moddingContactInfo}}" id="contact_num" value="{{order.contact_num}}" style="width: 160rpx;" bindinput="inputContactInfo" />
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row" style="justify-content: center;">
-        <block wx:if="{{moddingContactInfo}}">
-          <van-button type="warning" size="small" bind:click="cancelModContactInfo" style="margin-right: 50rpx;"> 取 消 </van-button>
-          <van-button type="danger" size="small" bind:click="confirmModContactInfo" style="margin-left: 50rpx;"> 确 认 </van-button>
-        </block>
-        <van-button wx:else type="primary" size="small" bind:click="modContactInfo"> 修 改 </van-button>
-      </view>
-    </mp-cell>
-  </mp-cells>
-  <mp-cells title="订单信息">
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">【订单号】</view>
-        <view class="right-column">{{order.code}}</view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">【七色米单号】</view>
-        <view class="right-column">
-          <block wx:if="{{order.retails[0].mi7_code || moddingOrderInfo}}">
-            <input class="input" style="width: 260rpx;text-align: center;" id="mi7_code" value="{{order.retails[0].mi7_code}}" bindinput="inputOrderInfo" disabled="{{!moddingOrderInfo}}" />
-          </block>
-          <block wx:else>
-            紧急开单
-          </block>
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row" style="height: {{moddingOrderInfo?'200':'50'}}rpx;" >
-        <view class="left-column">【订单类型】</view>
-        <view class="right-column view-row" style="width: 580rpx;height:100rpx" wx:if="{{moddingOrderInfo}}">
-          <radio-group id="retail_type" bindchange="inputOrderInfo" >
-            <radio checked="{{order.retails[0].retail_type == '零售'}}" value="零售">零售</radio>
-            <radio style="margin-left: 10rpx;" checked="{{order.retails[0].retail_type == '期货预定'}}" 
-            value="期货预定">期货预定</radio>
-            <radio style="margin-left: 10rpx;margin-top:10rpx" 
-            checked="{{order.retails[0].retail_type == '养护卡类'}}" value="养护卡类">养护卡类</radio>
-            <radio style="margin-top:10rpx" value="租赁卡类"
-            checked="{{order.retails[0].retail_type == '租赁卡类'}}" >租赁卡类</radio>
-            <radio style="margin-left: 10rpx;margin-top:10rpx" value="二手装备"
-            checked="{{order.retails[0].retail_type == '二手装备'}}" >二手装备</radio>
-            <radio style="margin-left: 0rpx;margin-top:10rpx" value="雪鞋定型"
-            checked="{{order.retails[0].retail_type == '雪鞋定型'}}" >雪鞋定型</radio>
-          </radio-group>
-        </view>
-        <view class="right-column" wx:else>{{order.retails[0].retail_type==null?'未填':order.retails[0].retail_type}}</view>
+<!--pages/admin/retail/retail_order_detail.wxml
+  新版零售订单详情（Alpine Operational Minimalist，对标 care_order_detail）
+  A 订单信息 / B 顾客信息（可编辑） / C 零售内容（可编辑） / D 支付信息（四格摘要 + 可折叠明细 + 去收款）
+-->
+<view class="page-root" wx:if="{{order}}">
 
+  <!-- A 订单信息 -->
+  <view class="card">
+    <view class="section-title-row">
+      <view class="section-title">订单信息</view>
+      <view class="chip {{view.statusChip}}">{{view.status}}</view>
+    </view>
+    <view class="info-grid">
+      <view class="info-cell">
+        <text class="info-label">订单号</text>
+        <text class="info-value">{{view.code}}</text>
       </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">【招待】</view>
-        <view class="right-column">{{order.haveEntertain == 1? '是' : '否'}}</view>
+      <view class="info-cell">
+        <text class="info-label">店铺</text>
+        <text class="info-value">{{order.shop}}</text>
       </view>
-    </mp-cell>
-    <mp-cell wx:if="{{order.paying_amount}}">
-      <view class="view-row">
-        <view class="left-column">【支付金额】</view>
-        <view class="right-column">
-          <block wx:if="{{order.haveEntertain == 1}}">
-            ¥0.00
-          </block>
-          <block wx:else>
-            <input class="input" style="width: 100rpx;text-align: center;" type="digit" bindinput="inputOrderInfo" value="{{order.paying_amount}}" disabled="{{!moddingOrderInfo}}" id="paying_amount" />
+      <view class="info-cell">
+        <text class="info-label">开单时间</text>
+        <text class="info-value">{{view.bizDateStr}}</text>
+      </view>
+      <view class="info-cell">
+        <text class="info-label">开单店员</text>
+        <text class="info-value">{{view.staffName || '--'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- B 顾客信息 -->
+  <view class="card">
+    <view class="sub-title-row">
+      <view class="section-title">顾客信息</view>
+      <view wx:if="{{!contactEditing}}" class="edit-link" catchtap="onContactEditTap">
+        <van-icon name="edit" size="14px" color="#006495"/>
+        <text>编辑</text>
+      </view>
+    </view>
+    <view wx:if="{{!contactEditing}}" class="info-grid">
+      <view class="info-cell">
+        <text class="info-label">姓名</text>
+        <view class="info-value-row">
+          <text class="info-value">{{view.customerName ? view.customerName + ' ' + view.customerTitle : '散客'}}</text>
+          <view class="chip {{view.memberChip}}">{{view.memberShip}}</view>
+        </view>
+      </view>
+      <view class="info-cell" bindtap="onCall">
+        <text class="info-label">电话</text>
+        <text class="info-value {{view.cell ? 'info-value--link' : ''}}">{{view.cell || '--'}}</text>
+      </view>
+    </view>
+    <view wx:else class="edit-panel">
+      <view class="edit-block edit-block--first">
+        <text class="info-label">姓名</text>
+        <input class="panel-input" value="{{contactDraft.name}}" placeholder="选填"
+               data-field="name" bindinput="onContactInput"/>
+      </view>
+      <view class="edit-block">
+        <text class="info-label">性别</text>
+        <view class="seg-row">
+          <view class="btn btn--sm {{contactDraft.gender === '男' ? 'btn--primary' : 'btn--plain'}}"
+                data-gender="男" catchtap="onContactGenderTap">男</view>
+          <view class="btn btn--sm {{contactDraft.gender === '女' ? 'btn--primary' : 'btn--plain'}}"
+                data-gender="女" catchtap="onContactGenderTap">女</view>
+        </view>
+      </view>
+      <view class="edit-block">
+        <text class="info-label">手机号</text>
+        <input class="panel-input" type="number" value="{{contactDraft.cell}}" placeholder="选填"
+               data-field="cell" bindinput="onContactInput"/>
+      </view>
+      <view class="panel-btn-row">
+        <view class="btn btn--plain btn--half" catchtap="onContactCancel">取消</view>
+        <view class="btn btn--primary btn--half" catchtap="onContactSave">{{savingContact ? '保存中...' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- C 零售内容 -->
+  <view class="card">
+    <view class="sub-title-row">
+      <view class="section-title">零售内容</view>
+      <view wx:if="{{!retailEditing && retail}}" class="edit-link" catchtap="onRetailEditTap">
+        <van-icon name="edit" size="14px" color="#006495"/>
+        <text>编辑</text>
+      </view>
+    </view>
+
+    <view wx:if="{{!retail}}" class="pay-empty">没有零售明细</view>
+
+    <block wx:elif="{{!retailEditing}}">
+      <view class="kv-list">
+        <view class="kv-line">
+          <text class="kv-line-label">七色米单号</text>
+          <text wx:if="{{view.mi7}}" class="kv-line-value">{{view.mi7}}</text>
+          <view wx:else class="chip chip-warn">紧急开单 · 待补单号</view>
+        </view>
+        <view class="kv-line">
+          <text class="kv-line-label">订单类型</text>
+          <text class="kv-line-value">{{view.retailType}}</text>
+        </view>
+        <view class="kv-line">
+          <text class="kv-line-label">金额</text>
+          <view class="kv-line-value-row">
+            <text class="kv-line-value kv-line-value--amount">{{view.amountStr}}</text>
+            <view wx:if="{{view.entertain}}" class="chip chip-warn">招待 · 不收款</view>
+          </view>
+        </view>
+        <view class="kv-line">
+          <text class="kv-line-label">放弃龙珠</text>
+          <text class="kv-line-value">{{view.giveupScore ? '是' : '否'}}</text>
+        </view>
+        <view class="kv-line kv-line--top">
+          <text class="kv-line-label">备注</text>
+          <text class="kv-line-value kv-line-value--memo {{view.memo ? '' : 'kv-line-value--empty'}}">{{view.memo || '暂无备注'}}</text>
+        </view>
+      </view>
+      <view wx:if="{{view.photos.length > 0}}" class="photo-row">
+        <image wx:for="{{view.photos}}" wx:key="id" class="photo-thumb" mode="aspectFill"
+               src="{{item.thumb}}" data-idx="{{index}}" bindtap="onPhotoTap"/>
+      </view>
+    </block>
+
+    <view wx:else class="edit-panel">
+      <view class="edit-block edit-block--first">
+        <text class="info-label">七色米单号</text>
+        <input class="panel-input" value="{{retailDraft.mi7Code}}" placeholder="留空表示紧急开单"
+               bindinput="onDraftMi7Input" bindblur="onDraftMi7Blur"/>
+        <text wx:if="{{mi7Hint}}" class="mi7-hint mi7-hint--{{retailDraft.mi7Status}}">{{mi7Hint}}</text>
+      </view>
+      <view class="edit-block">
+        <text class="info-label">订单类型</text>
+        <view class="type-grid">
+          <block wx:for="{{typeOptions}}" wx:key="value">
+            <view class="type-btn {{item.on ? 'type-btn--active' : ''}} {{item.disabled ? 'type-btn--disabled' : ''}}"
+                  data-value="{{item.value}}" catchtap="onDraftTypeTap">{{item.label}}</view>
           </block>
         </view>
       </view>
-    </mp-cell>
-    <mp-cell wx:else>
-      <view class="view-row">
-        <view class="left-column">【订单金额】</view>
-        <view class="right-column">
-          <block wx:if="{{order.haveEntertain == 1}}">
-            ¥0.00
-          </block>
-          <block wx:else>
-            {{order.totalAmountStr}}
-          </block>
+      <view class="edit-block">
+        <text class="info-label">金额</text>
+        <input wx:if="{{view.canEditAmount}}" class="panel-input" type="digit"
+               value="{{retailDraft.amountInput}}" placeholder="原 {{view.amountStr}}，不改留空"
+               bindinput="onDraftAmountInput"/>
+        <text wx:else class="edit-readonly">{{view.amountStr}}（{{view.entertain ? '招待单' : '已收款'}}，不能改）</text>
+      </view>
+      <view class="edit-block">
+        <text class="info-label">备注</text>
+        <textarea class="panel-input panel-textarea" maxlength="200" value="{{retailDraft.memo}}"
+                  placeholder="选填" bindinput="onDraftMemoInput"/>
+      </view>
+      <view class="edit-block">
+        <text class="info-label">照片（最多 {{maxImages}} 张）</text>
+        <van-uploader file-list="{{retailDraft.images}}" max-count="{{maxImages}}"
+                      capture="{{['album', 'camera']}}"
+                      bind:after-read="onDraftPhotoRead" bind:delete="onDraftPhotoDelete"/>
+      </view>
+      <view class="panel-btn-row">
+        <view class="btn btn--plain btn--half" catchtap="onRetailCancel">取消</view>
+        <view class="btn btn--primary btn--half" catchtap="onRetailSave">{{savingRetail ? '保存中...' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- D 支付信息 -->
+  <view class="card">
+    <view class="section-title">支付信息</view>
+    <view class="pay-summary-grid">
+      <view class="pay-summary-cell">
+        <view class="pay-summary-label">支付总金额</view>
+        <view class="pay-summary-value pay-summary-value--blue">{{payment.paidStr}}</view>
+      </view>
+      <view class="pay-summary-cell">
+        <view class="pay-summary-label">退款总金额</view>
+        <view class="pay-summary-value pay-summary-value--red">{{payment.refundStr}}</view>
+      </view>
+      <view class="pay-summary-cell">
+        <view class="pay-summary-label">支付笔数</view>
+        <view class="pay-summary-value">{{payment.payRows.length}}</view>
+      </view>
+      <view class="pay-summary-cell">
+        <view class="pay-summary-label">退款笔数</view>
+        <view class="pay-summary-value">{{payment.refundRows.length}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{view.showGoPay}}" class="btn btn--primary btn--block" catchtap="onGoPay">{{view.goPayLabel}}</view>
+
+    <view class="divider"></view>
+
+    <view class="payment-detail-toggle" bindtap="onTogglePayment">
+      <text class="payment-detail-toggle__title">支付明细</text>
+      <van-icon name="{{payment.expanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#999"/>
+    </view>
+
+    <block wx:if="{{payment.expanded}}">
+      <view class="pay-table" wx:if="{{payment.payRows.length > 0 || payment.refundRows.length > 0}}">
+        <view class="pay-table-row" style="font-size:22rpx;color:#999;">
+          <text class="pay-col-date">日期</text>
+          <text class="pay-col-time">时间</text>
+          <text class="pay-col-method">支付方式</text>
+          <text class="pay-col-cell">手机号</text>
+          <text class="pay-col-amount">金额</text>
+        </view>
+        <view class="pay-table-row {{item._isProxy ? 'pay-table-row--proxy' : ''}}" wx:for="{{payment.payRows}}" wx:key="id">
+          <text class="pay-col-date">{{item.paid_dateDateStr}}</text>
+          <text class="pay-col-time">{{item.paid_dateTimeStr}}</text>
+          <text class="pay-col-method">{{item.pay_method}}</text>
+          <text class="pay-col-cell">{{item._proxyCellMasked}}</text>
+          <text class="pay-col-amount pay-col-amount--pay">{{item.amountStr}}</text>
+        </view>
+        <view class="pay-table-row" wx:for="{{payment.refundRows}}" wx:key="id">
+          <text class="pay-col-date">{{item.paid_dateDateStr || '—'}}</text>
+          <text class="pay-col-time">{{item.paid_dateTimeStr || ''}}</text>
+          <text class="pay-col-method">{{item.pay_method || '—'}}</text>
+          <text class="pay-col-cell"></text>
+          <text class="pay-col-amount pay-col-amount--refund">-{{item.amountStr}}</text>
         </view>
       </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">【备注】</view>
-        <view class="right-column" style="height:200rpx;">
-          <textarea style="width: 400rpx;height: 200rpx;" class="input" disabled="{{!moddingOrderInfo}}" id="memo" bindinput="inputOrderInfo" value="{{order.retails[0].memo}}"></textarea>
-        </view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row">
-        <view class="left-column">【订单状态】</view>
-        <view class="right-column">{{order.orderStatus}}</view>
-      </view>
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row" >
-        <van-uploader file-list="{{order.retailImages}}" bind:after-read="afterRead" capture="['album', 'camera']" bind:delete="delImage"  bind:delete="delImage" show-upload="{{moddingOrderInfo == true}}" deletable="{{moddingOrderInfo == true}}" />
-      </view>
-      
-    </mp-cell>
-    <mp-cell>
-      <view class="view-row" style="justify-content: center;">
-        <block wx:if="{{moddingOrderInfo}}">
-          <van-button type="warning" size="small" bind:click="cancelModOrderInfo" style="margin-right: 50rpx;"> 取 消 </van-button>
-          <van-button type="danger" size="small" bind:click="confirmModOrderInfo" style="margin-left: 50rpx;"> 确 认 </van-button>
-        </block>
-        <van-button wx:else type="primary" size="small" bind:click="modOrderInfo"> 修 改 </van-button>
-      </view>
-    </mp-cell>
-  </mp-cells>
-  <mp-cells title="支付" wx:if="{{order.orderStatus == '待生成' || order.orderStatus == '待支付'}}">
-    <mp-cell>
-      <payment orderId="{{order.id}}" bindOrderStatusChanged="orderStatusChanged" bindOrderPaidResult="dealPaidResult"></payment>
-    </mp-cell>
-  </mp-cells>
+      <view wx:else class="pay-empty">暂无支付记录</view>
+    </block>
+  </view>
+
 </view>
+<view wx:else class="page-loading">加载中…</view>
 <admin-page-help />

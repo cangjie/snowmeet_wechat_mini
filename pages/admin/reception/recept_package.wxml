@@ -4,14 +4,8 @@
 -->
 <view class="page-root">
 
-  <!-- TopAppBar -->
-  <view class="topbar">
-    <view class="topbar-back" bindtap="onClose">
-      <van-icon name="arrow-left" size="22px" color="#006495"/>
-    </view>
-    <view class="topbar-title">选择套餐</view>
-    <view class="topbar-back"></view>
-  </view>
+  <!-- 顶栏：必须用 safe-nav-bar，自己画的顶栏会和手机状态栏重叠、返回键点不动 -->
+  <safe-nav-bar title="选择套餐" homeUrl="/pages/admin/reception/recept_entry" />
 
   <!-- 分类筛选 -->
   <scroll-view scroll-x class="cat-tabs">

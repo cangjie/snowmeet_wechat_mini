@@ -1,0 +1,13 @@
+<view class="snb {{border ? 'snb--border' : ''}}" style="padding-top: {{statusBarHeight}}px; background: {{background}};">
+  <view class="snb-inner" style="height: {{navBarHeight}}px;">
+    <view class="snb-side" style="width: {{sideWidth}}px;">
+      <view wx:if="{{showBack}}" class="snb-back" bindtap="onBackTap" hover-class="snb-back--hover">
+        <van-icon name="arrow-left" size="22px" color="{{color}}"/>
+      </view>
+    </view>
+    <view class="snb-title" style="color: {{color}};">{{title}}</view>
+    <!-- 右侧留给胶囊按钮，与左侧等宽，标题才会在屏幕正中 -->
+    <view class="snb-side" style="width: {{sideWidth}}px;"></view>
+  </view>
+</view>
+<view wx:if="{{placeholder}}" style="height: {{totalHeight}}px;"></view>

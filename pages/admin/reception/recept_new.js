@@ -5,7 +5,7 @@
 //             按需向 SnowmeetApi 同步订单（Rent/SaveRentRecept 等）
 //   * 子组件：仅渲染表单 + 通过事件回传数据更新
 //
-// 当前实现：租赁开单第一步（rent-recept-form）。其他业务后续迭代。
+// 当前实现：租赁（rent-recept-form）、养护（care-recept-form）、零售（retail-recept-form）。
 const app = getApp();
 const util = require('../../../utils/util.js');
 
@@ -712,6 +712,59 @@ Page({
       }
       console.warn('care checkout failed', err);
       // performWebRequest 已 toast 后端 message（如"非雪季养护需要匹配会员"），这里不重复弹
+    });
+  },
+
+  /* ---------- 零售：去结算 → Order/PlaceOrder → settle ----------
+   * 零售不存草稿（2026-10-21 用户决定）：表单只在本地，点「去结算」才建单（valid=1）。
+   * 订单结构与旧版 components/retail/retail_footer.placeOrder 一致：一单一笔 retails[0]，
+   * 招待单不计入应收（total_amount = paying_amount = 0，结算页走「确认生效」）。
+   * is_test 不传：PlaceOrder 按店员 id 判定测试单，会覆盖客户端的值。
+   */
+  onRetailCheckout(e) {
+    const { retail, retailImages } = e.detail || {};
+    if (!retail) return;
+    if (this._retailPlacing) return;
+    if (!this.data.shop) {
+      wx.showToast({ title: '店铺不能为空', icon: 'none' });
+      return;
+    }
+    const amount = retail.order_type === '招待' ? 0 : Math.round((retail.deal_price || 0) * 100) / 100;
+    const order = {
+      id: 0,
+      type: '零售',
+      shop: this.data.shop,
+      contact_name:   this.data.customer.name || null,
+      contact_gender: this.data.customer.gender || null,
+      contact_num:    this.data.customer.cell || null,
+      member_id:      this.data.customer.memberId || null,
+      total_amount: amount,
+      paying_amount: amount,
+      retails: [retail],
+      retailImages: retailImages || [],
+    };
+    this._retailPlacing = true;
+    wx.showLoading({ title: '下单中…', mask: true });
+    const url = app.globalData.requestPrefix
+      + 'Order/PlaceOrder?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+    util.performWebRequest(url, order).then((placed) => {
+      wx.hideLoading();
+      this._retailPlacing = false;
+      if (!placed || !placed.id || placed.valid != 1) {
+        wx.showToast({ title: '下单失败', icon: 'none' });
+        return;
+      }
+      wx.navigateTo({
+        url: '/pages/payment/settle/index?orderId=' + placed.id,
+      });
+      // 表单清空：从结算页返回时是一张空白新单，避免同一笔被重复下单
+      const form = this.selectComponent('#retailForm');
+      if (form) form.reset();
+    }).catch((err) => {
+      wx.hideLoading();
+      this._retailPlacing = false;
+      // performWebRequest 已 toast 后端 message（如「七色米订单号重复」），这里不重复弹
+      console.warn('retail checkout failed', err);
     });
   },
 });

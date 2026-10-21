@@ -1,13 +1,312 @@
-.left-column{
-  text-align: left;
-  width: 190rpx;
-  height: 25rpx;
-  margin-top: 0rpx;
+/* pages/admin/retail/retail_order_detail.wxss
+   Alpine Operational Minimalist：卡片 + 蓝竖条分组标题 + chip（与 care_order_detail 同一套样式） */
+.page-root {
+  min-height: 100vh;
+  background: #f8f9ff;
+  padding: 16rpx 24rpx 48rpx;
+  box-sizing: border-box;
 }
-.right-column{
-  height:25rpx;
-  margin-top: 0rpx;
+.page-loading {
+  min-height: 100vh;
+  background: #f8f9ff;
+  padding-top: 200rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #9aa3ac;
 }
-.thin-cell{
-  height: 25rpx;
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
 }
+
+.section-title {
+  position: relative;
+  padding-left: 18rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2a33;
+  margin-bottom: 16rpx;
+}
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6rpx;
+  bottom: 6rpx;
+  width: 6rpx;
+  border-radius: 3rpx;
+  background: #006495;
+}
+.section-title-row,
+.sub-title-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.section-title-row .section-title { margin-bottom: 16rpx; }
+.section-title-row .chip { margin-bottom: 16rpx; }
+
+/* 订单信息双列 */
+.info-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.info-cell {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  padding: 8rpx 0;
+  box-sizing: border-box;
+}
+.info-label {
+  font-size: 24rpx;
+  color: #6f7881;
+}
+.info-value {
+  font-size: 28rpx;
+  color: #1f2a33;
+  margin-top: 4rpx;
+  word-break: break-all;
+}
+.info-value--link { color: #006495; }
+.info-value-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+.info-value-row .info-value { margin-top: 4rpx; }
+
+/* 零售内容：标签-值 行 */
+.kv-list { display: flex; flex-direction: column; }
+.kv-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f2f4f8;
+}
+.kv-line:last-child { border-bottom: none; }
+.kv-line--top { align-items: flex-start; }
+.kv-line-label {
+  font-size: 26rpx;
+  color: #6f7881;
+  flex: none;
+}
+.kv-line-value {
+  font-size: 28rpx;
+  color: #1f2a33;
+  text-align: right;
+  word-break: break-all;
+}
+.kv-line-value-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12rpx;
+}
+.kv-line-value--amount {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #006495;
+}
+.kv-line-value--memo {
+  flex: 1;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+.kv-line-value--empty { color: #9aa3ac; }
+
+/* 照片 */
+.photo-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+.photo-thumb {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  background: #eef1f5;
+}
+
+/* chip */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  flex: none;
+}
+.chip-primary { background: #e1f0f7; color: #006495; }
+.chip-success { background: #dcfce7; color: #15803d; }
+.chip-pending { background: #fee2e2; color: #b91c1c; }
+.chip-muted { background: #eef1f5; color: #6f7881; }
+/* 琥珀：需要补东西（紧急开单待补单号 / 招待 / 挂账） */
+.chip-warn { background: #fef3c7; color: #92400e; }
+
+/* 编辑面板 */
+.edit-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 26rpx;
+  color: #006495;
+  padding: 0 4rpx 16rpx;
+}
+.edit-panel {
+  background: #f7f9fc;
+  border-radius: 12rpx;
+  padding: 16rpx;
+}
+.edit-block { margin-top: 16rpx; display: flex; flex-direction: column; }
+.edit-block--first { margin-top: 0; }
+.panel-input {
+  background: #ffffff;
+  border: 1rpx solid #dfe5ec;
+  border-radius: 8rpx;
+  padding: 8rpx 16rpx;
+  font-size: 28rpx;
+  margin-top: 6rpx;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 64rpx;
+}
+.panel-textarea { height: 140rpx; }
+.edit-readonly {
+  font-size: 26rpx;
+  color: #6f7881;
+  margin-top: 6rpx;
+}
+.seg-row {
+  display: flex;
+  flex-direction: row;
+  gap: 16rpx;
+  margin-top: 6rpx;
+}
+.panel-btn-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 24rpx;
+  margin-top: 24rpx;
+}
+
+.mi7-hint { font-size: 22rpx; color: #6f7881; margin-top: 6rpx; }
+.mi7-hint--invalid,
+.mi7-hint--dup { color: #b91c1c; }
+.mi7-hint--empty { color: #b45309; }
+
+/* 订单类型三列按钮（两种卡类置灰） */
+.type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12rpx;
+  margin-top: 6rpx;
+}
+.type-btn {
+  text-align: center;
+  padding: 14rpx 0;
+  border-radius: 12rpx;
+  border: 1rpx solid #bfc7d1;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #3f4850;
+  background: #ffffff;
+}
+.type-btn--active {
+  background: #006495;
+  border-color: #006495;
+  color: #ffffff;
+}
+.type-btn--disabled { opacity: 0.4; }
+
+/* 按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12rpx 32rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  line-height: 1.2;
+}
+.btn--sm { padding: 8rpx 28rpx; font-size: 26rpx; }
+.btn--primary { background: #006495; color: #ffffff; }
+.btn--plain { background: #ffffff; color: #006495; border: 1rpx solid #bfd7e4; }
+.btn--half { flex: 1; }
+.btn--block {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 8rpx;
+  margin-bottom: 8rpx;
+  padding: 18rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+/* 支付信息（与养护/租赁详情页同款：2×2 摘要格 + 可折叠支付明细表） */
+.pay-summary-grid {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  margin-bottom: 4rpx;
+}
+.pay-summary-cell {
+  width: 48%;
+  box-sizing: border-box;
+  background: #F8F8F8; border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  margin-bottom: 16rpx;
+}
+.pay-summary-label { font-size: 24rpx; color: #999; margin-bottom: 4rpx; }
+.pay-summary-value { font-size: 30rpx; font-weight: 600; color: #333; }
+.pay-summary-value--blue { color: #2EA6D0; }
+.pay-summary-value--red { color: #E64340; }
+
+.divider { height: 1rpx; background: #F0F0F0; margin: 12rpx 0; }
+
+.payment-detail-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 0 4rpx;
+}
+.payment-detail-toggle__title {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.pay-table { width: 100%; }
+.pay-table-row {
+  display: flex; align-items: center;
+  font-size: 24rpx; min-height: 56rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+  gap: 8rpx;
+}
+.pay-table-row:last-child { border-bottom: none; }
+.pay-col-date { flex: 0 0 118rpx; color: #666; font-size: 22rpx; white-space: nowrap; }
+.pay-col-time { flex: 0 0 100rpx; color: #666; font-size: 22rpx; white-space: nowrap; }
+.pay-col-method { flex: 0 0 94rpx; color: #666; font-size: 22rpx; white-space: nowrap; }
+.pay-col-cell { flex: 0 0 124rpx; color: #666; font-size: 22rpx; white-space: nowrap; text-align: center; }
+.pay-col-amount { flex: 1; text-align: right; font-weight: 600; }
+.pay-col-amount--pay { color: #2EA6D0; }
+.pay-col-amount--refund { color: #E64340; }
+/* 他人代付整行标红 */
+.pay-table-row--proxy .pay-col-date,
+.pay-table-row--proxy .pay-col-time,
+.pay-table-row--proxy .pay-col-method,
+.pay-table-row--proxy .pay-col-cell,
+.pay-table-row--proxy .pay-col-amount { color: #E64340; }
+.pay-empty { color: #999; font-size: 26rpx; text-align: center; padding: 20rpx 0; }

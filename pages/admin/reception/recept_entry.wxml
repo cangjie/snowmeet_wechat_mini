@@ -8,10 +8,8 @@
 -->
 <view class="page-root">
 
-  <!-- TopAppBar：去掉左右图标，仅保留居中标题 -->
-  <view class="topbar">
-    <view class="topbar-title">业务开单</view>
-  </view>
+  <!-- 顶栏：仅保留居中标题（开单入口没有上一页）。必须用 safe-nav-bar，否则标题会和手机状态栏重叠 -->
+  <safe-nav-bar title="业务开单" showBack="{{false}}" />
 
   <view class="main">
 
