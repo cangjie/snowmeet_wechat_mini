@@ -1069,6 +1069,25 @@ const getReceptCheckinByCustomerPromise = function (code, sessionKey) {
     + '&sessionKey=' + encodeURIComponent(sessionKey)
   return _silentApiGet(url)
 }
+// ---- 养护扫码取板：顾客扫店员手机上的码直接进小程序验证本人（取代公众号 care_veri 码） ----
+// 店员出取板码（120 秒过期），返回 { id, careId, code, qrText, stage, expireTime }
+const createCarePickByStaffPromise = function (careId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/CreateCarePickByStaff?careId=' + careId.toString()
+    + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
+// 店员轮询取板码：stage = waiting_scan / expired / stopped / need_member / matched / mismatch
+const getCarePickByStaffPromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/GetCarePickByStaff/' + id.toString()
+    + '?sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return _silentApiGet(url)
+}
+// 顾客扫码后验证本人：stage = matched / mismatch / need_member，mismatch 时带 orderMemberMaskedCell
+const verifyCarePickPromise = function (code, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/VerifyCarePick?code=' + encodeURIComponent(code)
+    + '&sessionKey=' + encodeURIComponent(sessionKey)
+  return util.performWebRequest(url, undefined)
+}
 // 店员在出码页输手机号进入：只认已登记手机号的会员；店长及以上直接通过（authed=1），普通店员等店长授权
 const queryReceptCellPromise = function (checkinId, cell, sessionKey) {
   var url = app.globalData.requestPrefix + 'QrCode/QueryCell/' + checkinId.toString() + '?cell=' + encodeURIComponent(cell)
@@ -1963,6 +1982,9 @@ module.exports = {
   getReceptCheckinByCustomerPromise,
   updateMemberInfoByStaffPromise,
   queryReceptCellPromise,
+  createCarePickByStaffPromise,
+  getCarePickByStaffPromise,
+  verifyCarePickPromise,
   getTodayAuthCellListPromise,
   giveReceptAuthPromise,
   stopScanQrCodePromise,

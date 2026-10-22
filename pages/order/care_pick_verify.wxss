@@ -1,0 +1,2 @@
+/* pages/order/care_pick_verify.wxss：与身份核验落地页同一版式 */
+@import "./identity_verify.wxss";

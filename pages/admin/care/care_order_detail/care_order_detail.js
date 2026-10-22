@@ -12,6 +12,9 @@ const data = require('../../../../utils/data.js');
 // 与 data.js uploadFilePromise 的上传域名保持一致（照片落在处理上传那台服务器的磁盘）
 const IMG_HOST = data.IMAGE_HOST;
 
+// 扫码取板：店员页查询顾客是否已扫码验证的间隔
+const SCAN_POLL_INTERVAL = 1500;
+
 function fullUrl(p) {
   if (!p) return '';
   return p.indexOf('http') === 0 ? p : IMG_HOST + p;
@@ -59,7 +62,7 @@ Page({
     },
     summerBanner: { show: false, desc: '' },
     veriCode: '',
-    scanQr: { careId: 0, url: '', status: '' }, // status: loading / ready / broken
+    scanQr: { careId: 0, url: '', status: '' }, // status: loading / ready / scanned（顾客已扫码、在授权手机号） / broken
     addBrand: { show: false, cidx: -1, name: '', chineseName: '' },
     cancelModal: { show: false, cidx: -1 },
     skiBrandList: [],
@@ -1043,7 +1046,9 @@ Page({
       });
   },
 
-  /* ---------- 扫码取板（页面级单例 WebSocket 会话） ---------- */
+  /* ---------- 扫码取板（页面级单例：小程序码 + 轮询） ---------- */
+  // 顾客用微信扫码直接进小程序 pages/order/care_pick_verify 验证本人（扫码人就是下单会员），
+  // 本页每 1.5 秒查一次，验证通过就完成「发板」。取代原公众号带参码 care_veri_ + WebSocket queryqrscan。
   _openScan(cidx) {
     const that = this;
     const care = this.data.cares[cidx];
@@ -1051,19 +1056,17 @@ Page({
     const cp = this._resolveCancelParams(care);
     if (!cp.ok) return;
     this._closeScan();
-    // 供 _onScanMessage 扫码成功回调读取（含重新生成二维码场景，每次 open 都重新取当前值）
+    // 供 _onScanResult 验证通过回调读取（含重新生成二维码场景，每次 open 都重新取当前值）
     this._scanCancelParams = cp;
-    this._scan = { careId: care.id, qrCode: null, socketTask: null, replied: false };
+    this._scan = { careId: care.id, qrCode: null, timer: null, finished: false };
     this.setData({ scanQr: { careId: care.id, url: '', status: 'loading' } });
-    data.createScanQrCodeByStaffPromise('care_veri_' + care.id, '店铺接待', '养护取板', app.globalData.sessionKey)
+    data.createCarePickByStaffPromise(care.id, app.globalData.sessionKey)
       .then((qrCode) => {
-        if (!that._scan || that._scan.careId !== care.id) return null; // 已被切走
+        if (!that._scan || that._scan.careId !== care.id) return; // 已被切走
         that._scan.qrCode = qrCode;
-        return data.getOAQrCodeUrlPromise(qrCode.code).then((url) => {
-          if (!that._scan || that._scan.careId !== care.id) return;
-          that.setData({ scanQr: { careId: care.id, url, status: 'ready' } });
-          that._startSocket();
-        });
+        const url = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(qrCode.qrText);
+        that.setData({ scanQr: { careId: care.id, url, status: 'ready' } });
+        that._scan.timer = setInterval(() => that._pollScan(), SCAN_POLL_INTERVAL);
       })
       .catch(() => {
         if (!that._scan || that._scan.careId !== care.id) return;
@@ -1071,36 +1074,33 @@ Page({
       });
   },
 
-  _startSocket() {
-    const that = this;
+  _pollScan() {
     const scan = this._scan;
-    if (!scan || !scan.qrCode) return;
-    const socketTask = wx.connectSocket({
-      url: 'wss://' + app.globalData.domainName + '/ws',
-      header: { 'content-type': 'application/json' },
+    if (!scan || !scan.qrCode || scan.finished) return;
+    const qrId = scan.qrCode.id;
+    data.getCarePickByStaffPromise(qrId, app.globalData.sessionKey).then((res) => {
+      // 网络抖动 / 偶发错误：等下一轮再查
+      if (!res || res.code !== 0 || !res.data) return;
+      const cur = this._scan;
+      if (!cur || !cur.qrCode || cur.qrCode.id !== qrId || cur.finished) return; // 已换码 / 已关闭
+      this._onScanResult(res.data);
     });
-    scan.socketTask = socketTask;
-    socketTask.onOpen(() => {
-      socketTask.send({ data: JSON.stringify({ command: 'queryqrscan', id: scan.qrCode.id }) });
-    });
-    socketTask.onMessage((res) => { that._onScanMessage(res); });
-    socketTask.onClose(() => { that._onScanClosed(); });
-    socketTask.onError(() => { that._onScanClosed(); });
   },
 
-  _onScanMessage(res) {
+  _onScanResult(view) {
     const that = this;
     const scan = this._scan;
-    if (!scan) return;
-    let msg = null;
-    try { msg = JSON.parse(res.data); } catch (err) { return; }
-    const scanQrCode = (msg && msg.data) || {};
-    scan.replied = true;
-    const order = this.data.order || {};
+    if (view.stage === 'waiting_scan') return;
+    if (view.stage === 'need_member') {
+      // 顾客已扫码，新微信号正在手机上授权手机号，继续等
+      if (this.data.scanQr.status !== 'scanned') this.setData({ 'scanQr.status': 'scanned' });
+      return;
+    }
+    scan.finished = true;
     const scanCareId = scan.careId;
     // 先取出，_closeScan() 会清掉 this._scanCancelParams
     const cp = this._scanCancelParams || { isCancel: false, reason: undefined };
-    if (order.member_id && order.member_id === scanQrCode.scaner_member_id) {
+    if (view.stage === 'matched') {
       const care = (this.data.cares || []).find((c) => c.id === scanCareId);
       const finishTask = care ? (care._tasks || []).find((t) => t.task_name === '发板') : null;
       this._closeScan();
@@ -1114,18 +1114,9 @@ Page({
         }).catch(() => {});
     } else {
       this._closeScan();
-      wx.showToast({ title: '顾客非本人', icon: 'error' });
-      // 二维码已被消费，面板给「重新生成二维码」入口
+      if (view.stage === 'mismatch') wx.showToast({ title: '顾客非本人', icon: 'error' });
+      // 不是本人 / 二维码过期或作废：面板给「重新生成二维码」入口
       this.setData({ scanQr: { careId: scanCareId, url: '', status: 'broken' } });
-    }
-  },
-
-  _onScanClosed() {
-    const scan = this._scan;
-    if (!scan) return; // 主动关闭
-    if (!scan.replied) {
-      scan.socketTask = null;
-      this.setData({ 'scanQr.status': 'broken' });
     }
   },
 
@@ -1134,11 +1125,9 @@ Page({
     this._scanCancelParams = null;
     if (!scan) return;
     this._scan = null;
-    if (scan.qrCode && !scan.replied) {
+    if (scan.timer) clearInterval(scan.timer);
+    if (scan.qrCode && !scan.finished) {
       data.stopScanQrCodePromise(scan.qrCode.id, app.globalData.sessionKey).catch(() => {});
-    }
-    if (scan.socketTask) {
-      try { scan.socketTask.close({}); } catch (err) { /* 已关闭 */ }
     }
     this.setData({ scanQr: { careId: 0, url: '', status: '' } });
   },

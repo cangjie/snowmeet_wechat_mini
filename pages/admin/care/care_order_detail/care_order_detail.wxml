@@ -427,6 +427,7 @@
                          src="{{scanQr.url}}" mode="aspectFit"/>
                   <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'loading'}}" class="veri-hint">二维码生成中…</view>
                   <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'ready'}}" class="veri-hint">请顾客本人用微信扫码，扫码成功自动完成发板</view>
+                  <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'scanned'}}" class="veri-hint">顾客已扫码，正在手机上授权手机号验证身份…</view>
                   <view wx:if="{{scanQr.careId !== care.id || scanQr.status === 'broken'}}" class="panel-btn-row">
                     <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onScanRetry">{{scanQr.careId === care.id && scanQr.status === 'broken' ? '重新生成二维码' : '生成二维码'}}</view>
                   </view>
@@ -550,6 +551,7 @@
                    src="{{scanQr.url}}" mode="aspectFit"/>
             <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'loading'}}" class="veri-hint">二维码生成中…</view>
             <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'ready'}}" class="veri-hint">请顾客本人用微信扫码，扫码成功自动完成取消</view>
+            <view wx:if="{{scanQr.careId === care.id && scanQr.status === 'scanned'}}" class="veri-hint">顾客已扫码，正在手机上授权手机号验证身份…</view>
             <view wx:if="{{scanQr.careId !== care.id || scanQr.status === 'broken'}}" class="panel-btn-row">
               <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onScanRetry">{{scanQr.careId === care.id && scanQr.status === 'broken' ? '重新生成二维码' : '生成二维码'}}</view>
             </view>

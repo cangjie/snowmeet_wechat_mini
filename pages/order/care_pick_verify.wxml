@@ -1,0 +1,41 @@
+<!-- 养护扫码取板落地页（顾客侧），版式沿用 identity_verify -->
+<view class="verify-page">
+  <view class="verify-box">
+    <block wx:if="{{state == 'loading'}}">
+      <view class="verify-spinner"></view>
+      <view class="verify-title">正在验证取板身份…</view>
+      <view class="verify-sub">请稍候</view>
+    </block>
+
+    <block wx:elif="{{state == 'matched'}}">
+      <view class="verify-icon verify-icon--ok">✓</view>
+      <view class="verify-title">取板验证成功</view>
+      <view class="verify-sub">已确认是下单人本人，店员正在为您发板</view>
+    </block>
+
+    <block wx:elif="{{state == 'mismatch'}}">
+      <view class="verify-icon verify-icon--no">!</view>
+      <view class="verify-title">不是下单人本人</view>
+      <view class="verify-sub">请用下单人{{maskedCell ? '（' + maskedCell + '）' : ''}}的微信扫码取板，或请店员换其他方式验证</view>
+    </block>
+
+    <block wx:elif="{{state == 'bind_cell'}}">
+      <view class="verify-icon verify-icon--no">!</view>
+      <view class="verify-title">请先授权手机号</view>
+      <view class="verify-sub">当前微信未识别到您的会员身份，授权手机号后即可继续验证</view>
+      <button class="verify-btn"
+              open-type="getPhoneNumber"
+              bindgetphonenumber="onBindCell"
+              disabled="{{busy}}">
+        授权手机号后重试
+      </button>
+    </block>
+
+    <block wx:else>
+      <view class="verify-icon verify-icon--err">×</view>
+      <view class="verify-title">验证失败</view>
+      <view class="verify-sub">{{message}}</view>
+      <button class="verify-btn" bindtap="onRetryTap">重试</button>
+    </block>
+  </view>
+</view>
