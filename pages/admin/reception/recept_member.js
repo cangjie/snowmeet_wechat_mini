@@ -47,7 +47,7 @@ Page({
 
   /* ---------- 生命周期 ---------- */
   // options.stage：扫码页跳过来时码的阶段。need_phone = 新顾客还要授权手机号，授权后弹窗告诉店员；
-  // verified = 老顾客已有手机号，拉到会员信息直接显示
+  // verified = 老顾客已有手机号、phone_authed = 店员输手机号已授权，都拉到会员信息直接显示
   onLoad(options) {
     this._pollTimer = null;
     this._lookupTimer = null;
@@ -58,7 +58,7 @@ Page({
       this.setData({ mode: 'walkin' });
       return;
     }
-    this._announceOnVerify = options.stage !== 'verified';
+    this._announceOnVerify = options.stage === 'need_phone';
     this.setData({ mode: 'scan', checkinId, waitingPhone: true });
     this.pollCheckin();
   },
@@ -110,7 +110,7 @@ Page({
   },
 
   applyCheckin(view) {
-    if (view.stage !== 'verified') return;
+    if (view.stage !== 'verified' && view.stage !== 'phone_authed') return;
     this._stopPolling();
     this.setData({
       waitingPhone: false,

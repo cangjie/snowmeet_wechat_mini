@@ -5,9 +5,10 @@ const { loadPage, settle, tap } = require('./reception_harness.js')
 
 const PAGE = 'pages/admin/reception/recept_scan.js'
 
-function setup(pollResult) {
-  const calls = { create: 0, poll: [], stop: [], recoverShop: [] }
+function setup(pollResult, queryCell) {
+  const calls = { create: 0, poll: [], stop: [], recoverShop: [], queryCell: [] }
   const nav = []
+  const toasts = []
   let nextId = 5
   global.getApp = () => ({
     loginPromiseNew: Promise.resolve(),
@@ -15,7 +16,7 @@ function setup(pollResult) {
   })
   global.wx = {
     navigateTo(o) { nav.push(o.url) },
-    showToast(o) { throw new Error('不应提示：' + o.title) }
+    showToast(o) { toasts.push(o.title) }
   }
   const fakeData = {
     createReceptCheckinByStaffPromise() {
@@ -28,6 +29,7 @@ function setup(pollResult) {
       return Promise.resolve(pollResult ? pollResult() : { code: 0, data: { stage: 'waiting_scan' } })
     },
     stopScanQrCodePromise(id) { calls.stop.push(id); return Promise.resolve() },
+    queryReceptCellPromise(id, cell) { calls.queryCell.push([id, cell]); return queryCell ? queryCell(id, cell) : Promise.reject('用户不存在') },
     getRentReceptingOrdersPromise(shop) {
       calls.recoverShop.push(shop)
       return Promise.resolve([{ id: 88, contact_name: '张三', contact_gender: '男', contact_num: '13800138000', biz_date: '2026-10-22T10:00:00' }])
@@ -35,7 +37,7 @@ function setup(pollResult) {
   }
   const page = loadPage(PAGE, fakeData)
   page.onLoad()
-  return { page, calls, nav }
+  return { page, calls, nav, toasts }
 }
 
 function cleanup(page) {
@@ -132,6 +134,80 @@ test('找回今天所有店铺中断的订单，按单子上的店铺恢复', as
   assert.equal(page.data.recoverOrders[0].calledName, '张三 先生')
   page.onRecoverOrderTap(tap({ id: 88 }))
   assert.deepEqual(nav, ['/pages/admin/reception/recept_new?orderId=88&bizType=rent'])
+  cleanup(page)
+})
+
+test('店长输会员手机号直接通过，进入顾客信息页', async () => {
+  const { page, calls, nav, toasts } = setup(null, () => Promise.resolve({ id: 5, authed: 1 }))
+  page.onShow()
+  await settle()
+  page.onCellInput({ detail: { value: ' 13800138000 ' } })
+  page.onSubmitCell()
+  await settle()
+  assert.deepEqual(calls.queryCell, [[5, '13800138000']])
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=phone_authed'])
+  assert.equal(page.data.checkin, null)
+  assert.deepEqual(toasts, [])
+  cleanup(page)
+})
+
+test('普通店员输手机号要等店长授权，授权后进入顾客信息页', async () => {
+  let stage = { stage: 'need_auth', name: '张三', maskedCell: '138****8000' }
+  const { page, nav, toasts } = setup(() => ({ code: 0, data: stage }), () => Promise.resolve({ id: 5, authed: 0 }))
+  page.onShow()
+  await settle()
+  page.onCellInput({ detail: { value: '13800138000' } })
+  page.onSubmitCell()
+  await settle()
+  assert.equal(page.data.waitingAuth, true)
+  assert.match(page.data.authText, /138\*\*\*\*8000/)
+  assert.deepEqual(toasts, ['需要店长授权'])
+  assert.notEqual(page._pollTimer, null)
+
+  page.pollCheckin()
+  await settle()
+  assert.match(page.data.authText, /张三 138\*\*\*\*8000/)
+  assert.deepEqual(nav, [])
+
+  stage = { stage: 'phone_authed', memberId: 42 }
+  page.pollCheckin()
+  await settle()
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=phone_authed'])
+  assert.equal(page.data.waitingAuth, false)
+  cleanup(page)
+})
+
+test('不等授权了：作废这次提交，重新出码', async () => {
+  const { page, calls } = setup(() => ({ code: 0, data: { stage: 'need_auth' } }), () => Promise.resolve({ id: 5, authed: 0 }))
+  page.onShow()
+  await settle()
+  page.onCellInput({ detail: { value: '13800138000' } })
+  page.onSubmitCell()
+  await settle()
+  page.onCancelAuthTap()
+  await settle()
+  assert.deepEqual(calls.stop, [5])
+  assert.equal(page.data.waitingAuth, false)
+  assert.equal(page.data.cell, '')
+  assert.equal(page.data.checkin.id, 6)
+  cleanup(page)
+})
+
+test('手机号不完整不提交；不是会员时停在本页', async () => {
+  const { page, calls, nav, toasts } = setup()
+  page.onShow()
+  await settle()
+  page.onCellInput({ detail: { value: '13800' } })
+  page.onSubmitCell()
+  assert.deepEqual(toasts, ['请输入完整手机号'])
+  assert.deepEqual(calls.queryCell, [])
+
+  page.onCellInput({ detail: { value: '13900139000' } })
+  page.onSubmitCell()
+  await settle()
+  assert.deepEqual(calls.queryCell, [[5, '13900139000']])
+  assert.equal(page.data.waitingAuth, false)
+  assert.deepEqual(nav, [])
   cleanup(page)
 })
 

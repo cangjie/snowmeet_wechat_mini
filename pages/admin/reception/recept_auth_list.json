@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "接待授权",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index"
+  }
+}

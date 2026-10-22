@@ -4,16 +4,21 @@
 //   → 本页一发现有人扫码，就跳到顾客信息页（recept_member）：老顾客直接显示会员信息，
 //     新顾客在手机上授权手机号后那边弹窗提示，再选店铺和业务开单。
 //   顾客不扫码时点「散客进入」，同样到顾客信息页选店铺和业务。
+//   也可以输会员手机号进入（同旧版）：店长及以上直接进入；普通店员要等店长在「【接待】接待授权」
+//   （recept_auth_list）里授权，本页查到授权后进入顾客信息页。
 // 手动录入顾客信息的入口 recept_entry 保留，由页面底部链接进入。
 //
 // 后端依赖（SnowmeetApi QrCodeController）：
-//   CreateReceptCheckinByStaff / GetReceptCheckinByStaff / StopQeryScan
+//   CreateReceptCheckinByStaff / GetReceptCheckinByStaff / QueryCell / StopQeryScan
 const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
+const { normalizePhone, shouldLookupPhone } = require('../../../utils/phone.js');
 
 const POLL_INTERVAL = 1500;
 const MEMBER_PAGE = '/pages/admin/reception/recept_member';
+// 有了顾客、交给顾客信息页的阶段：顾客扫码（待授权手机号 / 已验证），店员输手机号已授权
+const HANDOFF_STAGES = ['need_phone', 'verified', 'phone_authed'];
 
 Page({
   data: {
@@ -22,6 +27,12 @@ Page({
     qrCodeUrl: '',
     loadingQr: false,
     stageText: '',
+
+    // 输手机号进入
+    cell: '',
+    // 已提交手机号、等店长授权；authText 说明是哪位会员
+    waitingAuth: false,
+    authText: '',
 
     // 找回中断订单面板
     showRecoverPanel: false,
@@ -62,7 +73,7 @@ Page({
     that._creating = true;
     that._stopPolling();
     that._discardUnusedCode();
-    that.setData({ loadingQr: true, checkin: null, qrCodeUrl: '', stageText: '' });
+    that.setData({ loadingQr: true, checkin: null, qrCodeUrl: '', stageText: '', cell: '', waitingAuth: false, authText: '' });
     Promise.resolve(app.loginPromiseNew).then(function () {
       return data.createReceptCheckinByStaffPromise(app.globalData.sessionKey);
     }).then(function (checkin) {
@@ -113,13 +124,59 @@ Page({
       this.refreshCheckin();
       return;
     }
-    if (view.stage === 'need_phone' || view.stage === 'verified') {
-      // 有人扫码了：这张码交给顾客信息页继续跟进，本页回来时重新出码
+    if (view.stage === 'need_auth') {
+      this._showWaitingAuth(view);
+      return;
+    }
+    if (HANDOFF_STAGES.indexOf(view.stage) >= 0) {
+      // 有了顾客：这张码交给顾客信息页继续跟进，本页回来时重新出码
       this._stopPolling();
       const checkinId = this.data.checkin.id;
-      this.setData({ checkin: null, qrCodeUrl: '', stageText: '' });
+      this.setData({ checkin: null, qrCodeUrl: '', stageText: '', cell: '', waitingAuth: false, authText: '' });
       wx.navigateTo({ url: MEMBER_PAGE + '?checkinId=' + checkinId + '&stage=' + view.stage });
     }
+  },
+
+  /* ---------- 输手机号进入 ---------- */
+  onCellInput(e) {
+    this.setData({ cell: (e.detail.value || '').trim() });
+  },
+
+  onSubmitCell() {
+    const checkin = this.data.checkin;
+    const cell = normalizePhone(this.data.cell);
+    if (!checkin) {
+      wx.showToast({ title: '二维码还没生成好，请稍候', icon: 'none' });
+      return;
+    }
+    if (!shouldLookupPhone(cell)) {
+      wx.showToast({ title: '请输入完整手机号', icon: 'none' });
+      return;
+    }
+    // QueryCell 只认已登记手机号的会员，查不到时 performWebRequest 会提示「用户不存在」
+    data.queryReceptCellPromise(checkin.id, cell, app.globalData.sessionKey).then((sq) => {
+      if (!this.data.checkin || this.data.checkin.id !== checkin.id) return;
+      if (sq && sq.authed === 1) {
+        this.applyCheckin({ stage: 'phone_authed' });
+        return;
+      }
+      this._showWaitingAuth({ maskedCell: cell.length === 11 ? cell.slice(0, 3) + '****' + cell.slice(7) : cell });
+      wx.showToast({ title: '需要店长授权', icon: 'none' });
+    }).catch(() => {});
+  },
+
+  _showWaitingAuth(view) {
+    const who = ((view.name || '') + ' ' + (view.maskedCell || '')).trim();
+    this.setData({
+      waitingAuth: true,
+      authText: '已提交' + (who ? ' ' + who : '') + '，等店长在「【接待】接待授权」里授权…',
+    });
+    if (!this._pollTimer) this._startPolling();
+  },
+
+  // 不等授权了：作废这次提交，重新出码
+  onCancelAuthTap() {
+    this.refreshCheckin();
   },
 
   // 作废还没人扫的码，免得过后有人扫到、一直等不到开单
@@ -133,7 +190,7 @@ Page({
   onWalkInTap() {
     this._stopPolling();
     this._discardUnusedCode();
-    this.setData({ checkin: null, qrCodeUrl: '', stageText: '' });
+    this.setData({ checkin: null, qrCodeUrl: '', stageText: '', cell: '', waitingAuth: false, authText: '' });
     wx.navigateTo({ url: MEMBER_PAGE + '?walkin=1' });
   },
 

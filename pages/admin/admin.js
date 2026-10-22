@@ -183,6 +183,9 @@ Page({
       case 'recept':
         path = '/pages/admin/reception/recept_scan'
         break
+      case 'recept_auth':
+        path = '/pages/admin/reception/recept_auth_list'
+        break
       case 'recept_list':
         path = '/pages/admin/recept/recept_list'
         break

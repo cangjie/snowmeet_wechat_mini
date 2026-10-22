@@ -1069,6 +1069,24 @@ const getReceptCheckinByCustomerPromise = function (code, sessionKey) {
     + '&sessionKey=' + encodeURIComponent(sessionKey)
   return _silentApiGet(url)
 }
+// 店员在出码页输手机号进入：只认已登记手机号的会员；店长及以上直接通过（authed=1），普通店员等店长授权
+const queryReceptCellPromise = function (checkinId, cell, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/QueryCell/' + checkinId.toString() + '?cell=' + encodeURIComponent(cell)
+    + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
+// 店长：今天店员提交的手机号进入申请（含已授权的）
+const getTodayAuthCellListPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/GetTodayAuthCellList'
+    + '?sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
+// 店长：授权一条手机号进入申请
+const giveReceptAuthPromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/GiveAuth/' + id.toString()
+    + '?sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
 // 店员更新会员资料（姓名/性别；新的联系电话追加为 contact，不动绑定手机号），返回更新后的会员
 const updateMemberInfoByStaffPromise = function (member, scene, sessionKey) {
   var url = app.globalData.requestPrefix + 'Member/UpdateMemberInfo?scene=' + encodeURIComponent(scene)
@@ -1944,6 +1962,9 @@ module.exports = {
   verifyReceptCheckinPhonePromise,
   getReceptCheckinByCustomerPromise,
   updateMemberInfoByStaffPromise,
+  queryReceptCellPromise,
+  getTodayAuthCellListPromise,
+  giveReceptAuthPromise,
   stopScanQrCodePromise,
   getOAQrCodeUrlPromise,
   getPrinterListPromise,

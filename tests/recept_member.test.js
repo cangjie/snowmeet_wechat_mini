@@ -116,6 +116,19 @@ test('新顾客扫码：授权前不能开单，授权后弹窗提示店员，�
   cleanup(page)
 })
 
+test('店员输手机号已授权：直接显示会员信息，不弹窗', async () => {
+  const env = setup(() => ({ code: 0, data: { stage: 'phone_authed', memberId: 42, name: '张三', gender: '男', cell: '13800138000', maskedCell: '138****8000' } }))
+  env.page.onLoad({ checkinId: '5', stage: 'phone_authed' })
+  env.page.onShow()
+  await settle()
+  await settle()
+  assert.equal(env.page.data.waitingPhone, false)
+  assert.equal(env.page.data.member.id, 42)
+  assert.equal(env.page.data.form.cell, '13800138000')
+  assert.deepEqual(env.modals, [])
+  cleanup(env.page)
+})
+
 test('改称呼和电话只带进本次订单，不改会员资料', async () => {
   const env = setup(() => VERIFIED)
   await openVerified(env)

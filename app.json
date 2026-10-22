@@ -76,6 +76,7 @@
     "pages/mine/skipass/my_skipasses",
     "pages/admin/reception/recept_scan",
     "pages/admin/reception/recept_member",
+    "pages/admin/reception/recept_auth_list",
     "pages/admin/reception/recept_entry",
     "pages/admin/reception/recept_new",
     "pages/admin/reception/recept_package"

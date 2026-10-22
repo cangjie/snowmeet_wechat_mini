@@ -39,6 +39,24 @@
   color: var(--primary);
 }
 
+.scan-stage--active { color: var(--primary); text-align: center; }
+
+.cell-row { display: flex; align-items: center; gap: 8px; }
+.cell-input { flex: 1; min-width: 0; }
+.cell-submit {
+  flex-shrink: 0;
+  height: 44px;
+  line-height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+.cell-submit--disabled { background: var(--outline-variant); }
+.cell-hint { margin-top: 8px; text-align: left; }
+
 .walkin-btn {
   height: 44px;
   line-height: 44px;

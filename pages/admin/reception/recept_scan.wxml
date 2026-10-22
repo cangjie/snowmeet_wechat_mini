@@ -21,18 +21,50 @@
         <van-icon name="scan" size="18px" color="#006495"/>
         <text class="card-title">顾客扫码验证身份</text>
       </view>
-      <view class="scan-qr-wrap">
-        <view class="scan-qr-box">
-          <image wx:if="{{qrCodeUrl}}" class="scan-qr" src="{{qrCodeUrl}}" mode="aspectFit"/>
-          <van-loading wx:elif="{{loadingQr}}" size="24px"/>
+      <!-- 已提交手机号、等店长授权：收起二维码，免得有人再扫 -->
+      <view wx:if="{{waitingAuth}}" class="scan-qr-wrap">
+        <van-loading size="24px" color="#006495"/>
+        <view class="scan-stage scan-stage--active">{{authText}}</view>
+        <view class="scan-hint">店长授权后自动进入顾客信息页</view>
+        <view class="scan-refresh" bindtap="onCancelAuthTap">
+          <van-icon name="close" size="14px" color="#006495"/>
+          <text>不等了，重新出码</text>
         </view>
-        <view class="scan-stage">{{stageText}}</view>
-        <view class="scan-hint">顾客扫码后自动进入顾客信息页。二维码每 2 分钟自动更新。</view>
       </view>
-      <view class="scan-refresh" bindtap="onRefreshTap">
-        <van-icon name="replay" size="14px" color="#006495"/>
-        <text>换一个码</text>
+      <block wx:else>
+        <view class="scan-qr-wrap">
+          <view class="scan-qr-box">
+            <image wx:if="{{qrCodeUrl}}" class="scan-qr" src="{{qrCodeUrl}}" mode="aspectFit"/>
+            <van-loading wx:elif="{{loadingQr}}" size="24px"/>
+          </view>
+          <view class="scan-stage">{{stageText}}</view>
+          <view class="scan-hint">顾客扫码后自动进入顾客信息页。二维码每 2 分钟自动更新。</view>
+        </view>
+        <view class="scan-refresh" bindtap="onRefreshTap">
+          <van-icon name="replay" size="14px" color="#006495"/>
+          <text>换一个码</text>
+        </view>
+      </block>
+    </view>
+
+    <!-- 通过手机号（同旧版）：普通店员要店长授权 -->
+    <view wx:if="{{!waitingAuth}}" class="card">
+      <view class="card-header">
+        <van-icon name="phone-o" size="18px" color="#006495"/>
+        <text class="card-title">通过手机号</text>
       </view>
+      <view class="cell-row">
+        <input
+          class="form-input cell-input"
+          type="number"
+          maxlength="20"
+          placeholder="输入会员手机号"
+          placeholder-class="form-input-placeholder"
+          value="{{cell}}"
+          bindinput="onCellInput"/>
+        <view class="cell-submit {{cell ? '' : 'cell-submit--disabled'}}" bindtap="onSubmitCell">确认</view>
+      </view>
+      <view class="scan-hint cell-hint">只能查已登记手机号的会员；普通店员需要店长授权。不是会员请点「散客进入」。</view>
     </view>
 
     <!-- 散客 -->

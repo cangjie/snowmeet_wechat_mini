@@ -1,0 +1,33 @@
+<!--pages/admin/reception/recept_auth_list.wxml
+  【接待】接待授权：店员输会员手机号进入时，店长在这里授权
+-->
+<view class="page-root">
+  <view class="main">
+    <view wx:if="{{!isManager}}" class="card auth-empty">只有店长及以上可以授权</view>
+
+    <block wx:else>
+      <view class="auth-toolbar">
+        <text class="auth-toolbar-title">今天的手机号进入申请</text>
+        <view class="auth-refresh" bindtap="onRefreshTap">
+          <van-icon name="replay" size="14px" color="#006495"/>
+          <text>刷新</text>
+        </view>
+      </view>
+
+      <view wx:if="{{loaded && authList.length === 0}}" class="card auth-empty">暂时没有需要授权的申请</view>
+
+      <view wx:for="{{authList}}" wx:key="id" class="card auth-item">
+        <view class="auth-row">
+          <text class="auth-name">{{item.name || '（未填姓名）'}}</text>
+          <text wx:if="{{item.gender}}" class="auth-gender">{{item.gender}}</text>
+          <text class="auth-cell">{{item.cell}}</text>
+          <view class="auth-status {{item.authed ? 'auth-status--ok' : ''}}">{{item.authed ? '已授权' : '未授权'}}</view>
+        </view>
+        <view class="auth-meta">店员 {{item.staffName || '—'}} · {{item.timeStr}}</view>
+        <view wx:if="{{!item.authed}}" class="auth-btn" data-id="{{item.id}}" bindtap="giveAuth">授权</view>
+      </view>
+    </block>
+  </view>
+</view>
+
+<admin-page-help />
