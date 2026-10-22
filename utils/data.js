@@ -1069,6 +1069,12 @@ const getReceptCheckinByCustomerPromise = function (code, sessionKey) {
     + '&sessionKey=' + encodeURIComponent(sessionKey)
   return _silentApiGet(url)
 }
+// 店员更新会员资料（姓名/性别；新的联系电话追加为 contact，不动绑定手机号），返回更新后的会员
+const updateMemberInfoByStaffPromise = function (member, scene, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Member/UpdateMemberInfo?scene=' + encodeURIComponent(scene)
+    + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, member)
+}
 // wxoa 公众号二维码图（返回纯字符串 URL，不走 ApiResult 解包，故不用 performWebRequest）
 const getOAQrCodeUrlPromise = function (content) {
   return new Promise(function (resolve, reject) {
@@ -1937,6 +1943,7 @@ module.exports = {
   scanReceptCheckinPromise,
   verifyReceptCheckinPhonePromise,
   getReceptCheckinByCustomerPromise,
+  updateMemberInfoByStaffPromise,
   stopScanQrCodePromise,
   getOAQrCodeUrlPromise,
   getPrinterListPromise,

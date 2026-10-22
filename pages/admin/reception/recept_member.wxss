@@ -1,5 +1,5 @@
 /* pages/admin/reception/recept_member.wxss
-   与开单入口共用 Alpine Operational Minimalist 样式，这里只补等授权卡片 */
+   与开单入口共用 Alpine Operational Minimalist 样式（卡片 / 表单 / 性别分段 / 业务格），这里只补本页特有的 */
 @import "./recept_entry.wxss";
 
 .member-waiting {
@@ -19,5 +19,74 @@
   text-decoration: underline;
 }
 
-/* reception-member-bar 自带 16px 外边距（开单页贴边用），这里放进 main 的 16px 内边距里，抵掉一层 */
-.member-bar-slot { display: block; margin: -16px -16px 0; }
+/* 会员 / 散客标记 + 查看详情 */
+.member-type {
+  margin-left: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+.member-type--member { background: #cbe6ff; color: #003b5b; }
+.member-detail-link {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.info-label { color: var(--secondary); }
+.info-label--gap { margin-left: 16px; }
+.info-value { color: var(--on-surface); font-weight: 600; }
+
+.num-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.num-chips-label { font-size: 12px; color: var(--on-surface-variant); }
+.num-chip {
+  padding: 2px 8px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--primary);
+}
+
+.name-row { display: flex; align-items: center; gap: 8px; }
+.name-input { flex: 1; min-width: 0; }
+.name-gender { flex-shrink: 0; width: 140px; }
+
+.update-btn {
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+.update-btn--disabled {
+  border-color: var(--outline-variant);
+  color: var(--outline);
+}
+.form-tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}

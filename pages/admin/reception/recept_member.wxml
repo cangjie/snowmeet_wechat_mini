@@ -1,5 +1,6 @@
 <!--pages/admin/reception/recept_member.wxml
-  接待·顾客信息（对应旧版 recept_member_info）：看顾客信息 → 选店铺 → 选业务进入开单
+  接待·顾客信息（对应旧版 recept_member_info）：直接显示并可修改顾客信息 → 选店铺 → 选业务进入开单
+  修改只用于本次订单；会员点「更新顾客信息」才改会员资料
   样式沿用 recept_entry.wxss（Alpine Operational Minimalist stitch _1）
 -->
 <view class="page-root">
@@ -16,15 +17,67 @@
       <view class="member-waiting-link" bindtap="onWalkInInstead">顾客不方便授权，按散客开单</view>
     </view>
 
-    <!-- 顾客信息：会员显示档案和资产；散客可以点「编辑」填写（都选填） -->
-    <view wx:else>
-      <reception-member-bar
-        class="member-bar-slot"
-        customer="{{customer}}"
-        bind:memberInfoFound="onMemberInfoFound"
-        bind:memberDetail="onMemberDetail"
-        bind:customerChange="onCustomerChange" />
-      <view wx:if="{{!customer.memberId}}" class="biz-hint">散客的姓名、性别、电话都可以不填，也可以在开单页顶部填写</view>
+    <!-- 顾客基本信息 -->
+    <view wx:else class="card customer-card">
+      <view class="card-header">
+        <van-icon name="manager-o" size="18px" color="#006495"/>
+        <text class="card-title">顾客基本信息</text>
+        <view class="member-type {{member ? 'member-type--member' : ''}}">{{member ? '会员' : '散客'}}</view>
+        <view wx:if="{{member}}" class="member-detail-link" bindtap="onMemberDetail">
+          <text>查看详情</text>
+          <van-icon name="arrow" size="14px" color="#006495"/>
+        </view>
+      </view>
+
+      <view wx:if="{{member}}" class="info-row">
+        <text class="info-label">绑定手机号</text>
+        <text class="info-value">{{member.cell || '未绑定手机'}}</text>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">联系电话</view>
+        <input
+          class="form-input"
+          type="number"
+          maxlength="20"
+          placeholder="{{member ? '输入联系电话' : '输入联系电话（选填，国际区号用 00）'}}"
+          placeholder-class="form-input-placeholder"
+          value="{{form.cell}}"
+          bindinput="onCellInput"/>
+        <view wx:if="{{otherNums.length > 0}}" class="num-chips">
+          <text class="num-chips-label">其他号码</text>
+          <view wx:for="{{otherNums}}" wx:key="*this" class="num-chip" data-num="{{item}}" bindtap="onPickNum">{{item}}</view>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">顾客称呼</view>
+        <view class="name-row">
+          <input
+            class="form-input name-input"
+            placeholder="您贵姓？"
+            placeholder-class="form-input-placeholder"
+            value="{{form.name}}"
+            maxlength="20"
+            bindinput="onNameInput"/>
+          <view class="seg-control name-gender">
+            <view class="seg-item {{form.gender === '男' ? 'active' : ''}}" data-value="男" bindtap="onGenderTap">先生</view>
+            <view class="seg-item {{form.gender === '女' ? 'active' : ''}}" data-value="女" bindtap="onGenderTap">女士</view>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{member}}" class="info-row">
+        <text class="info-label">可用储值</text>
+        <text class="info-value">{{member.availableDepositStr}}</text>
+        <text class="info-label info-label--gap">可用龙珠</text>
+        <text class="info-value">{{member.availablePoints}}</text>
+      </view>
+
+      <view wx:if="{{member}}"
+        class="update-btn {{needUpdate ? '' : 'update-btn--disabled'}}"
+        bindtap="onUpdateMemberTap">更新顾客信息</view>
+      <view class="form-tip">{{member ? '修改的电话和称呼只用于本次订单；点「更新顾客信息」才会改会员资料。' : '散客的电话和称呼都可以不填。'}}</view>
     </view>
 
     <!-- 选择店铺：shop-selector 内部调 Order/GetShops + beacon 自动选店 -->
