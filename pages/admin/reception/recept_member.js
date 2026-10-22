@@ -13,7 +13,6 @@
 const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
-const receptionShop = require('../../../utils/reception_shop.js');
 const { normalizePhone, isValidInternationalPhone, shouldLookupPhone } = require('../../../utils/phone.js');
 
 const POLL_INTERVAL = 1500;
@@ -302,7 +301,7 @@ Page({
       shop: shop || '',
       sale: sale || 0,
       rent: rent || 0,
-      care: receptionShop.canStartCare(shop, care) ? 1 : 0,
+      care: care || 0,
       restuarant: restuarant || 0,
     });
   },
@@ -340,10 +339,9 @@ Page({
       return;
     }
 
-    const orderShop = receptionShop.orderShopFor(bizType, shop);
     // 暂存订单标识信息（PRD §1.4.6 订单找回），字段与 recept_entry 一致
     wx.setStorageSync('reception_draft', {
-      shopName: orderShop,
+      shopName: shop,
       customerName: name,
       gender: form.gender || '',
       customerCell: cell,
@@ -353,7 +351,7 @@ Page({
 
     const params = [
       'bizType=' + encodeURIComponent(bizType),
-      'shop=' + encodeURIComponent(orderShop),
+      'shop=' + encodeURIComponent(shop),
       'customerName=' + encodeURIComponent(name),
       'gender=' + encodeURIComponent(form.gender || ''),
       'customerCell=' + encodeURIComponent(cell),

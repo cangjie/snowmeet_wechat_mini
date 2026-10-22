@@ -12,7 +12,6 @@ const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 const { normalizePhone, isValidInternationalPhone, shouldLookupPhone } = require('../../../utils/phone.js');
-const receptionShop = require('../../../utils/reception_shop.js');
 
 Page({
   data: {
@@ -62,7 +61,7 @@ Page({
       shop: shop || '',
       sale: sale || 0,
       rent: rent || 0,
-      care: receptionShop.canStartCare(shop, care) ? 1 : 0,
+      care: care || 0,
       restuarant: restuarant || 0,
     });
   },
@@ -173,7 +172,6 @@ Page({
   onBizTap(e) {
     const bizType = e.currentTarget.dataset.type;
     const { shop, sale, rent, care } = this.data;
-    const orderShop = receptionShop.orderShopFor(bizType, shop);
     const customerName = (this.data.customerName || '').trim();
     const customerCell = (this.data.customerCell || '').trim();
 
@@ -209,7 +207,7 @@ Page({
 
     // 暂存订单标识信息（PRD §1.4.6 订单找回）
     const draft = {
-      shopName: orderShop,
+      shopName: shop,
       customerName: customerName,
       gender: this.data.gender,
       customerCell: customerCell,
@@ -223,7 +221,7 @@ Page({
     //
     const params = [
       'bizType=' + encodeURIComponent(bizType),
-      'shop=' + encodeURIComponent(orderShop),
+      'shop=' + encodeURIComponent(shop),
       'customerName=' + encodeURIComponent(customerName),
       'gender=' + encodeURIComponent(this.data.gender || ''),
       'customerCell=' + encodeURIComponent(customerCell),

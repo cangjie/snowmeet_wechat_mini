@@ -106,6 +106,11 @@ test('新顾客扫码：授权前不能开单，授权后弹窗提示店员，�
   assert.equal(modals[0].title, '顾客已授权手机号')
   assert.match(modals[0].content, /138\*\*\*\*8000/)
 
+  // 万龙体验中心不做养护（care=0），养护不能开；换到万龙服务中心再开
+  page.onBizTap(tap({ type: 'maintain' }))
+  assert.deepEqual(toasts, ['请等顾客授权手机号', '当前店铺不支持养护'])
+  assert.deepEqual(nav, [])
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 0, care: 1 } })
   page.onBizTap(tap({ type: 'maintain' }))
   assert.equal(nav.length, 1)
   assert.match(nav[0], /^\/pages\/admin\/reception\/recept_new\?bizType=maintain/)
