@@ -109,7 +109,7 @@
 
   <!-- 订单列表 -->
   <block wx:for="{{orders}}" wx:key="id">
-    <view class="order-card" id="{{index}}" bindtap="gotoDetail">
+    <view class="order-card {{item.unpaid ? 'order-card--unpaid' : ''}}" id="{{index}}" bindtap="gotoDetail">
       <!-- 卡片头：订单号 + 状态 -->
       <view class="order-header">
         <text class="order-code">{{item.code || ('#' + item.id)}}</text>

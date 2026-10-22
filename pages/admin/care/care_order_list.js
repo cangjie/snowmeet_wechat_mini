@@ -9,6 +9,18 @@ const adminAssistant = require('../../../utils/adminAssistant.js')
 
 const IMG_HOST = data.IMAGE_HOST
 
+// 订单状态 chip 的配色（状态文字是后端 Order.orderStatus，与旧系统其它订单列表、新版零售订单列表同口径）
+const STATUS_CLASS = {
+  '临时订单': 'temp',
+  '支付成功': 'paid', '已下单': 'paid', '已完成': 'paid',
+  '部分支付': 'partial',
+  '待生成': 'unpaid', '待支付': 'unpaid', '订单关闭': 'unpaid',
+  '全额退款': 'refund', '部分退款': 'refund', '退款失败': 'refund',
+  '挂账': 'credit'
+}
+// 没付成功的订单：整张卡片文字置灰
+const UNPAID_STATUSES = ['待生成', '待支付', '订单关闭']
+
 Page({
 
   data: {
@@ -143,8 +155,7 @@ Page({
   },
 
   _statusClass(s) {
-    var map = { '正常订单': 'normal', '临时订单': 'temp' }
-    return map[s] || 'unknown'
+    return STATUS_CLASS[s] || 'unknown'
   },
 
   renderOrders(orders, total, page, pageSize) {
@@ -154,10 +165,13 @@ Page({
       var bizDate = new Date(order.biz_date)
       order.dateStr = util.formatDate(bizDate)
       order.timeStr = util.formatTimeStr(bizDate)
-      // 状态（养护订单只有 临时订单 / 正常订单 两态）
+      // 状态：没有装备的仍是「临时订单」（同旧版养护列表，不能进详情）；其余显示后端统一的订单状态
+      // （待生成 / 待支付 / 部分支付 / 支付成功 / 已下单 / 订单关闭 / 退款 / 挂账），不再笼统写「正常订单」
       var cp = order.careProperties
-      order.statusLabel = cp ? cp.orderStatus : '临时订单'
+      var isTemp = !cp || cp.orderStatus === '临时订单'
+      order.statusLabel = isTemp ? '临时订单' : (order.orderStatus || '未定义')
       order.statusClass = this._statusClass(order.statusLabel)
+      order.unpaid = !isTemp && UNPAID_STATUSES.indexOf(order.statusLabel) >= 0
       order.services = cp ? cp.services : ''
       order.isSummerTask = !!(cp && cp.isSummerTask)
       // 顾客称呼 + 会员标识

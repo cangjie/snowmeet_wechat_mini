@@ -148,8 +148,19 @@
   color: #006495;
 }
 
-.status-chip--normal  { background: #dcfce7; color: #15803d; }
+.status-chip--paid    { background: #dcfce7; color: #15803d; }
 .status-chip--temp    { background: #fee2e2; color: #b91c1c; }
+.status-chip--partial { background: #fef3c7; color: #b45309; }
+.status-chip--unpaid  { background: #f3f4f6; color: #6b7280; }
+.status-chip--refund  { background: #ede9fe; color: #6d28d9; }
+.status-chip--credit  { background: #e0e7ff; color: #3730a3; }
+
+/* 没付成功的订单（待生成 / 待支付 / 订单关闭）：整张卡片文字置灰 */
+.order-card--unpaid .order-code,
+.order-card--unpaid .row-label,
+.order-card--unpaid .row-value,
+.order-card--unpaid .row-value--strong { color: #b0b0b0; }
+.order-card--unpaid .tag { background: #f3f4f6; color: #b0b0b0; }
 
 /* 内容区：左侧标签 + 右侧详情 */
 .order-body {
