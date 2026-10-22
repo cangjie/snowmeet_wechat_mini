@@ -14,7 +14,7 @@ const TABS = [
 // 各 tab 默认要跳到的页面（如果父页面不监听 tabchange，则使用默认跳转）
 const DEFAULT_ROUTES = {
   dashboard: '/pages/admin/admin',                    // 暂用旧后台首页
-  open:      '/pages/admin/reception/recept_entry',   // 业务开单入口
+  open:      '/pages/admin/reception/recept_scan',    // 业务开单入口（扫码接待；手动录入入口由该页底部链接进入）
   search:    '',                                      // 待迁移
   me:        '/pages/mine/mine',
 };

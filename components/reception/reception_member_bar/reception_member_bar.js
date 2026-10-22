@@ -2,6 +2,7 @@
 // 业务开单 / 接待页顶部的顾客信息条
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
+const { normalizePhone, isValidInternationalPhone, shouldLookupPhone } = require('../../../utils/phone.js');
 
 Component({
   options: {
@@ -36,6 +37,12 @@ Component({
   data: {
     cellMasked: '',
     memberFlagText: '顾客',
+    displayName: '散客',
+    // 编辑弹层
+    editing: false,
+    draftName: '',
+    draftGender: '',
+    draftCell: '',
     lastLookupCell: '',
     // 服务端原始资产数字，chip 由 rebuildAssetChips 派生
     assetsRaw: null,
@@ -58,19 +65,23 @@ Component({
       const masked = cell && cell.length === 11
         ? cell.slice(0, 3) + '****' + cell.slice(7)
         : (cell || '');
-      const memberId = this.properties.customer && this.properties.customer.memberId;
+      const customer = this.properties.customer || {};
+      const memberId = customer.memberId;
+      const name = (customer.name || '').trim();
       this.setData({
         cellMasked: masked,
         memberFlagText: memberId ? '会员' : '顾客',
+        // 会员档案没填姓名时不能显示成「散客」，否则店员会以为没匹配上会员
+        displayName: name || (memberId ? '会员（未填姓名）' : '散客'),
       });
     },
 
     lookupMemberByCell() {
       const customer = this.properties.customer || {};
-      const cellRaw = (customer.cell || '').trim();
-      const cell = cellRaw.replace(/[\s\-()]/g, '');
+      const cell = normalizePhone(customer.cell);
 
-      if (!cell) {
+      // 号码不完整不查，避免散客号码输一半就去匹配
+      if (!shouldLookupPhone(cell)) {
         this.setData({ lastLookupCell: '', memberFlagText: customer.memberId ? '会员' : '顾客' });
         return;
       }
@@ -79,7 +90,8 @@ Component({
       }
 
       this.setData({ lastLookupCell: cell });
-      data.getMemberByNumPromise(cell).then((member) => {
+      // 静默查询：散客号码查不到是常态，不弹「会员不存在」
+      data.getMemberByNumSilentPromise(cell).then((member) => {
         const memberId = member && (member.id || member.member_id || member.memberId);
         if (!memberId) {
           this.setData({ memberFlagText: customer.memberId ? '会员' : '顾客' });
@@ -178,6 +190,49 @@ Component({
       const memberId = this.properties.customer && this.properties.customer.memberId;
       if (!memberId) return;
       this.triggerEvent('memberDetail', { memberId });
+    },
+
+    /* ---------- 编辑顾客信息 ---------- */
+    onEditTap() {
+      const customer = this.properties.customer || {};
+      this.setData({
+        editing: true,
+        draftName: customer.name || '',
+        draftGender: customer.gender || '',
+        draftCell: customer.cell || '',
+      });
+    },
+
+    onEditCancel() {
+      this.setData({ editing: false });
+    },
+
+    onDraftNameInput(e) {
+      this.setData({ draftName: e.detail.value });
+    },
+
+    // 再点一次已选的性别 = 取消选择（散客性别选填）
+    onDraftGenderTap(e) {
+      const value = e.currentTarget.dataset.value;
+      this.setData({ draftGender: this.data.draftGender === value ? '' : value });
+    },
+
+    onDraftCellInput(e) {
+      this.setData({ draftCell: e.detail.value });
+    },
+
+    onEditConfirm() {
+      const customer = this.properties.customer || {};
+      const name = (this.data.draftName || '').trim();
+      const gender = this.data.draftGender === '男' || this.data.draftGender === '女' ? this.data.draftGender : '';
+      // 会员的手机号只读：沿用原号码
+      const cell = customer.memberId ? (customer.cell || '') : (this.data.draftCell || '').trim();
+      if (!customer.memberId && cell && !isValidInternationalPhone(cell)) {
+        wx.showToast({ title: '请输入正确手机号', icon: 'none' });
+        return;
+      }
+      this.setData({ editing: false });
+      this.triggerEvent('customerChange', { name, gender, cell });
     },
   },
 });

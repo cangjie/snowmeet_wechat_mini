@@ -144,14 +144,45 @@ Page({
     });
   },
 
+  // 顶部顾客条按手机号匹配到会员。只给散客挂会员：已有会员（扫码识别 / 找回的单）不被手机号改挂，
+  // 否则扫码顾客的手机号若登记在别的会员名下，订单会挂错人、顾客手机等不到付款页
   onMemberInfoFound(e) {
     const memberId = e && e.detail && e.detail.memberId;
     if (!memberId) return;
-    if (this.data.customer && this.data.customer.memberId === memberId) return;
-    this.setData({
+    if (this.data.customer && this.data.customer.memberId) return;
+    const member = (e.detail && e.detail.member) || {};
+    const patch = {
       'customer.memberId': memberId,
       'order.member_id': memberId,
+    };
+    // 店员没填的姓名/性别用会员档案补上（已填的不覆盖）
+    const realName = (member.real_name || '').trim();
+    const gender = (member.gender || '').trim();
+    if (!this.data.customer.name && realName) patch['customer.name'] = realName;
+    if (!this.data.customer.gender && (gender === '男' || gender === '女')) patch['customer.gender'] = gender;
+    this.setData(patch);
+    this._saveDraftAfterCustomerChange();
+  },
+
+  // 顶部顾客条「编辑」：散客填姓名/性别/电话（都选填），会员补姓名/性别
+  onCustomerChange(e) {
+    const d = e.detail || {};
+    this.setData({
+      'customer.name': d.name || '',
+      'customer.gender': d.gender || '',
+      'customer.cell': d.cell || '',
     });
+    this._saveDraftAfterCustomerChange();
+  },
+
+  // 草稿已经存在时把顾客信息同步上去；还没有草稿就等第一次保存时一起带上（保存时读 this.data.customer）
+  _saveDraftAfterCustomerChange() {
+    if (!this.data.order || !this.data.order.id) return;
+    if (this.data.bizType === 'rent') {
+      Promise.resolve(this.saveRentReceptOrder()).catch(() => {});
+    } else if (this.data.bizType === 'maintain') {
+      Promise.resolve(this.saveCareReceptOrder()).catch(() => {});
+    }
   },
 
   /* ---------- 子组件：rent-recept-form 事件 ---------- */

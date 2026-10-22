@@ -11,39 +11,8 @@
 const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
-
-// 把用户输入归一化：去掉空格/横杠/括号，0044... → +44...
-function normalizePhone(raw) {
-  let normalized = String(raw || '').trim().replace(/[\s\-()]/g, '');
-  if (normalized.startsWith('00')) {
-    normalized = '+' + normalized.slice(2);
-  }
-  return normalized;
-}
-
-function isValidInternationalPhone(raw) {
-  const value = String(raw || '').trim();
-  if (!value) return false;
-
-  // 允许国际常见输入形式：+65 8123 4567 / (852) 5123-4567 / 0044 7700 900123
-  const normalized = normalizePhone(value);
-
-  if (normalized.startsWith('+')) {
-    // E.164: + 后 6~15 位数字，首位不能是 0
-    return /^\+[1-9]\d{5,14}$/.test(normalized);
-  }
-
-  // 未带国家区号时，兼容本地写法：7~15 位数字（覆盖 US/HK/SG/EU 常见长度）
-  return /^\d{7,15}$/.test(normalized);
-}
-
-// 号码是否「完整到可以拿去查会员」：明确带国家区号(+) 或 国内 11 位手机号。
-// 避免在国内号码输到 7~10 位（isValidInternationalPhone 已为 true）时就反复发查询。
-function shouldLookupPhone(normalized) {
-  if (!isValidInternationalPhone(normalized)) return false;
-  if (normalized.startsWith('+')) return true;
-  return /^\d{11}$/.test(normalized);
-}
+const { normalizePhone, isValidInternationalPhone, shouldLookupPhone } = require('../../../utils/phone.js');
+const receptionShop = require('../../../utils/reception_shop.js');
 
 Page({
   data: {
@@ -88,14 +57,12 @@ Page({
   /* ---------- shop-selector 回调（沿用旧系统的事件名/字段） ---------- */
   shopSelected(e) {
     const { shop, sale, rent, care, restuarant } = e.detail || {};
-    // 万龙体验中心的养护按旧版接待规则归万龙服务中心，入口仍允许发起。
-    const canStartCare = care === 1 || shop === '万龙体验中心';
     this.setData({
       currentShopName: shop || '',
       shop: shop || '',
       sale: sale || 0,
       rent: rent || 0,
-      care: canStartCare ? 1 : 0,
+      care: receptionShop.canStartCare(shop, care) ? 1 : 0,
       restuarant: restuarant || 0,
     });
   },
@@ -206,8 +173,7 @@ Page({
   onBizTap(e) {
     const bizType = e.currentTarget.dataset.type;
     const { shop, sale, rent, care } = this.data;
-    const orderShop = bizType === 'maintain' && shop === '万龙体验中心'
-      ? '万龙服务中心' : shop;
+    const orderShop = receptionShop.orderShopFor(bizType, shop);
     const customerName = (this.data.customerName || '').trim();
     const customerCell = (this.data.customerCell || '').trim();
 

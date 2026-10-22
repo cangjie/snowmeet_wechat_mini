@@ -35,7 +35,7 @@ Page({
           wx.redirectTo({ url: detailUrl })
         } else if (res.cancel) {
           // 继续开下一单：reLaunch 回开单入口，重置整条栈（与 reception-tabbar「开单」一致）
-          wx.reLaunch({ url: '/pages/admin/reception/recept_entry' })
+          wx.reLaunch({ url: '/pages/admin/reception/recept_scan' })
         }
       }
     })

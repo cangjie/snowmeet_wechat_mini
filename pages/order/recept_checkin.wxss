@@ -1,0 +1,2 @@
+/* pages/order/recept_checkin.wxss：与身份核验落地页同一版式 */
+@import "./identity_verify.wxss";

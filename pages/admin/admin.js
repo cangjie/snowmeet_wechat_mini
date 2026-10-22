@@ -181,7 +181,7 @@ Page({
         path = '/pages/admin/utv/reserve_list'
         break
       case 'recept':
-        path = '/pages/admin/reception/recept_entry'
+        path = '/pages/admin/reception/recept_scan'
         break
       case 'recept_list':
         path = '/pages/admin/recept/recept_list'
@@ -282,7 +282,7 @@ Page({
         path = '/pages/fnbinv/stock/stock'
         break
       case 'rent_recepting':
-        path = '/pages/admin/reception/recept_entry'
+        path = '/pages/admin/reception/recept_scan'
         break
       case 'careOrderList':
         path = '/pages/admin/care/care_order_list'

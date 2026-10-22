@@ -21,6 +21,8 @@ Page({
   onLoad(options) {
     var paymentId = options.paymentId
     var that = this
+    // 从店铺接待等待页（recept_checkin）跳来时带 autoPay=1：顾客刚验证过身份，进来就直接调起支付
+    that._autoPay = options.autoPay === '1'
     that.setData({paymentId})
     if (options.q != undefined){
       var url = decodeURIComponent(options.q)
@@ -83,6 +85,11 @@ Page({
           orderMemberName: result.orderMemberName
         })
         that.setData({ identity: result })
+        // autoPay 只用一次：支付弹窗关掉后 onShow 会再查身份，不能再弹一遍
+        if (that._autoPay && result.status === 'direct') {
+          that._autoPay = false
+          that.pay()
+        }
       })
       .catch(function () {
         // performWebRequest 已 toast；这里补一个 inline 提示

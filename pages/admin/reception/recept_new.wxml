@@ -8,7 +8,7 @@
 <view class="page-root">
 
   <!-- 顶栏：标题 = 业务名 + 开单。必须用 safe-nav-bar，自己画的顶栏会和手机状态栏重叠、返回键点不动 -->
-  <safe-nav-bar title="{{bizLabel}}开单" homeUrl="/pages/admin/reception/recept_entry" />
+  <safe-nav-bar title="{{bizLabel}}开单" homeUrl="/pages/admin/reception/recept_scan" />
 
   <!-- 顾客信息条（所有 bizType 共用，组件化） -->
   <reception-member-bar
@@ -16,7 +16,8 @@
     shop="{{shop}}"
     bizLabel="{{bizLabel}}"
     bind:memberInfoFound="onMemberInfoFound"
-    bind:memberDetail="onMemberDetail" />
+    bind:memberDetail="onMemberDetail"
+    bind:customerChange="onCustomerChange" />
 
   <!-- 业务表单：根据 bizType 渲染不同自定义组件 -->
   <view class="form-slot">

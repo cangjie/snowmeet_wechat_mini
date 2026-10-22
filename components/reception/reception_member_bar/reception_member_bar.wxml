@@ -7,6 +7,8 @@
     events:
       memberInfoFound：按手机号命中会员时触发，回传 memberId
       memberDetail：点击「查看详情」时触发
+      customerChange：店员在「编辑」弹层里改了顾客信息，回传 { name, gender, cell }
+        散客三项都能填（都选填）；已匹配会员的手机号只读，姓名和性别可以补
 -->
 <view class="member-bar">
   <view class="member-avatar">
@@ -14,8 +16,15 @@
   </view>
   <view class="member-body">
     <view class="member-row">
-      <text class="member-name">{{customer.name || '散客'}}</text>
-      <text wx:if="{{cellMasked}}" class="member-cell">{{cellMasked}}</text>
+      <view class="member-name-wrap">
+        <text class="member-name">{{displayName}}</text>
+        <text wx:if="{{customer.gender}}" class="member-gender">{{customer.gender}}</text>
+        <text wx:if="{{cellMasked}}" class="member-cell">{{cellMasked}}</text>
+      </view>
+      <view class="member-edit-link" bindtap="onEditTap">
+        <van-icon name="edit" size="14px" color="#006495"/>
+        <text>编辑</text>
+      </view>
     </view>
     <view class="member-row member-row--bottom">
       <view class="member-tags">
@@ -34,3 +43,52 @@
     </view>
   </view>
 </view>
+
+<!-- 编辑顾客信息弹层 -->
+<van-popup
+  show="{{editing}}"
+  position="bottom"
+  round
+  bind:close="onEditCancel">
+  <view class="edit-panel">
+    <view class="edit-title">顾客信息</view>
+    <view class="edit-sub">{{customer.memberId ? '会员的手机号不能修改，姓名和性别可以补充' : '散客信息都可以不填'}}</view>
+
+    <view class="edit-group">
+      <view class="edit-label">姓名</view>
+      <input
+        class="edit-input"
+        placeholder="输入姓名（选填）"
+        placeholder-class="edit-placeholder"
+        value="{{draftName}}"
+        maxlength="20"
+        bindinput="onDraftNameInput"/>
+    </view>
+
+    <view class="edit-group">
+      <view class="edit-label">性别</view>
+      <view class="edit-seg">
+        <view class="edit-seg-item {{draftGender === '男' ? 'active' : ''}}" data-value="男" bindtap="onDraftGenderTap">男</view>
+        <view class="edit-seg-item {{draftGender === '女' ? 'active' : ''}}" data-value="女" bindtap="onDraftGenderTap">女</view>
+      </view>
+    </view>
+
+    <view class="edit-group">
+      <view class="edit-label">手机号</view>
+      <input
+        class="edit-input {{customer.memberId ? 'edit-input--readonly' : ''}}"
+        type="number"
+        maxlength="20"
+        disabled="{{!!customer.memberId}}"
+        placeholder="输入手机号（选填，国际区号用 00）"
+        placeholder-class="edit-placeholder"
+        value="{{draftCell}}"
+        bindinput="onDraftCellInput"/>
+    </view>
+
+    <view class="edit-actions">
+      <view class="edit-btn" bindtap="onEditCancel">取消</view>
+      <view class="edit-btn edit-btn--primary" bindtap="onEditConfirm">确定</view>
+    </view>
+  </view>
+</van-popup>

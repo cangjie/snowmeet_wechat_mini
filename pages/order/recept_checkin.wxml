@@ -1,0 +1,49 @@
+<!-- 店铺接待扫码落地页（顾客侧），版式沿用 identity_verify -->
+<view class="verify-page">
+  <view class="verify-box">
+    <block wx:if="{{state == 'loading'}}">
+      <view class="verify-spinner"></view>
+      <view class="verify-title">正在识别您的身份…</view>
+      <view class="verify-sub">请稍候</view>
+    </block>
+
+    <block wx:elif="{{state == 'need_phone'}}">
+      <view class="verify-icon verify-icon--no">!</view>
+      <view class="verify-title">请验证手机号</view>
+      <view class="verify-sub">验证后店员即可为您开单</view>
+      <button class="verify-btn"
+              open-type="getPhoneNumber"
+              bindgetphonenumber="onGetPhoneNumber"
+              disabled="{{busy}}">
+        微信手机号一键验证
+      </button>
+    </block>
+
+    <block wx:elif="{{state == 'waiting'}}">
+      <view class="verify-spinner"></view>
+      <view class="verify-title">请耐心等待店员开单</view>
+      <view class="verify-sub">店员开好单后，本页会自动打开付款页面，请不要关闭</view>
+      <view wx:if="{{maskedCell}}" class="verify-sub">已验证手机号 {{maskedCell}}</view>
+    </block>
+
+    <block wx:elif="{{state == 'alipay'}}">
+      <view class="verify-icon verify-icon--no">!</view>
+      <view class="verify-title">请用支付宝扫码付款</view>
+      <view class="verify-sub">店员选择了支付宝支付，请打开支付宝，扫描店员手机上的二维码</view>
+    </block>
+
+    <block wx:elif="{{state == 'expired'}}">
+      <view class="verify-icon verify-icon--no">!</view>
+      <view class="verify-title">等待时间较长</view>
+      <view class="verify-sub">请联系店员。如果店员已经开好单，点下方按钮刷新</view>
+      <button class="verify-btn" bindtap="onRetryTap">刷新</button>
+    </block>
+
+    <block wx:else>
+      <view class="verify-icon verify-icon--err">×</view>
+      <view class="verify-title">无法报到</view>
+      <view class="verify-sub">{{message}}</view>
+      <button class="verify-btn" bindtap="onRetryTap">重试</button>
+    </block>
+  </view>
+</view>

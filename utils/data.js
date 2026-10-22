@@ -1023,6 +1023,52 @@ const stopScanQrCodePromise = function (qrCodeId, sessionKey) {
     + '?sessionKey=' + sessionKey + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   return util.performWebRequest(url, undefined)
 }
+// ---- 店铺接待扫码：顾客扫店员手机上的码直接进小程序报到 ----
+// 轮询专用：不弹 toast，resolve 原始 ApiResult（{code, message, data}），网络错 resolve(null)，由页面决定怎么提示
+const _silentApiGet = function (url) {
+  return new Promise(function (resolve) {
+    wx.request({
+      url: url,
+      method: 'GET',
+      success: function (res) {
+        resolve(res && res.statusCode === 200 && res.data ? res.data : null)
+      },
+      fail: function () {
+        resolve(null)
+      }
+    })
+  })
+}
+// 店员出一张接待码（120 秒过期），返回 { id, code, qrText, stage, expireTime }
+const createReceptCheckinByStaffPromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/CreateReceptCheckinByStaff'
+    + '?sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
+// 店员轮询接待码：stage = waiting_scan / need_phone / verified / expired / stopped
+const getReceptCheckinByStaffPromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/GetReceptCheckinByStaff/' + id.toString()
+    + '?sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return _silentApiGet(url)
+}
+// 顾客扫码报到，返回 { code, stage, maskedCell, paymentId }
+const scanReceptCheckinPromise = function (code, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/ScanReceptCheckin?code=' + encodeURIComponent(code)
+    + '&sessionKey=' + encodeURIComponent(sessionKey)
+  return util.performWebRequest(url, undefined)
+}
+// 顾客微信手机号一键授权
+const verifyReceptCheckinPhonePromise = function (code, encData, iv, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/VerifyReceptCheckinPhone'
+    + '?sessionKey=' + encodeURIComponent(sessionKey)
+  return util.performWebRequest(url, { code: code, encData: encData, iv: iv })
+}
+// 顾客等待页轮询：stage = need_phone / waiting / wepay / alipay / expired
+const getReceptCheckinByCustomerPromise = function (code, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/GetReceptCheckinByCustomer?code=' + encodeURIComponent(code)
+    + '&sessionKey=' + encodeURIComponent(sessionKey)
+  return _silentApiGet(url)
+}
 // wxoa 公众号二维码图（返回纯字符串 URL，不走 ApiResult 解包，故不用 performWebRequest）
 const getOAQrCodeUrlPromise = function (content) {
   return new Promise(function (resolve, reject) {
@@ -1886,6 +1932,11 @@ module.exports = {
   setCarePickImagePromise,
   updateCareBrandPromise,
   createScanQrCodeByStaffPromise,
+  createReceptCheckinByStaffPromise,
+  getReceptCheckinByStaffPromise,
+  scanReceptCheckinPromise,
+  verifyReceptCheckinPhonePromise,
+  getReceptCheckinByCustomerPromise,
   stopScanQrCodePromise,
   getOAQrCodeUrlPromise,
   getPrinterListPromise,

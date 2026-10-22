@@ -5,7 +5,7 @@
 <view class="page-root">
 
   <!-- 顶栏：必须用 safe-nav-bar，自己画的顶栏会和手机状态栏重叠、返回键点不动 -->
-  <safe-nav-bar title="选择套餐" homeUrl="/pages/admin/reception/recept_entry" />
+  <safe-nav-bar title="选择套餐" homeUrl="/pages/admin/reception/recept_scan" />
 
   <!-- 分类筛选 -->
   <scroll-view scroll-x class="cat-tabs">

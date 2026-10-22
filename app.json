@@ -55,6 +55,7 @@
     "pages/admin/retail/retail_order_detail",
     "pages/order/payment_entry",
     "pages/order/identity_verify",
+    "pages/order/recept_checkin",
     "pages/admin/rent/new_rent_list",
     "pages/admin/member/member_list",
     "pages/admin/member/member_detail",
@@ -73,6 +74,7 @@
     "pages/admin/unipay/unipay_list",
     "pages/ski_pass/skipass_detail_new",
     "pages/mine/skipass/my_skipasses",
+    "pages/admin/reception/recept_scan",
     "pages/admin/reception/recept_entry",
     "pages/admin/reception/recept_new",
     "pages/admin/reception/recept_package"
