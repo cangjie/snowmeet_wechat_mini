@@ -1,4 +1,4 @@
-// 扫码接待入口（pages/admin/reception/recept_scan）：出码、识别顾客、带会员开单、散客开单作废码、手动录入链接
+// 扫码接待入口（pages/admin/reception/recept_scan）：出码、有人扫码就跳顾客信息页、散客进入、码过期换新、手动录入链接
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const { loadPage, settle, tap } = require('./reception_harness.js')
@@ -6,10 +6,8 @@ const { loadPage, settle, tap } = require('./reception_harness.js')
 const PAGE = 'pages/admin/reception/recept_scan.js'
 
 function setup(pollResult) {
-  const calls = { create: 0, poll: [], stop: [] }
+  const calls = { create: 0, poll: [], stop: [], recoverShop: [] }
   const nav = []
-  const modals = []
-  const storage = {}
   let nextId = 5
   global.getApp = () => ({
     loginPromiseNew: Promise.resolve(),
@@ -17,9 +15,7 @@ function setup(pollResult) {
   })
   global.wx = {
     navigateTo(o) { nav.push(o.url) },
-    setStorageSync(k, v) { storage[k] = v },
-    showToast(o) { throw new Error('不应提示：' + o.title) },
-    showModal(o) { modals.push(o.title); o.success({ confirm: true }) }
+    showToast(o) { throw new Error('不应提示：' + o.title) }
   }
   const fakeData = {
     createReceptCheckinByStaffPromise() {
@@ -32,11 +28,14 @@ function setup(pollResult) {
       return Promise.resolve(pollResult ? pollResult() : { code: 0, data: { stage: 'waiting_scan' } })
     },
     stopScanQrCodePromise(id) { calls.stop.push(id); return Promise.resolve() },
-    getRentReceptingOrdersPromise() { return Promise.resolve([]) }
+    getRentReceptingOrdersPromise(shop) {
+      calls.recoverShop.push(shop)
+      return Promise.resolve([{ id: 88, contact_name: '张三', contact_gender: '男', contact_num: '13800138000', biz_date: '2026-10-22T10:00:00' }])
+    }
   }
   const page = loadPage(PAGE, fakeData)
   page.onLoad()
-  return { page, calls, nav, modals, storage }
+  return { page, calls, nav }
 }
 
 function cleanup(page) {
@@ -45,9 +44,8 @@ function cleanup(page) {
   delete global.wx
 }
 
-test('出码后顾客验证完手机号，开单带上会员信息', async () => {
-  const verified = { code: 0, data: { stage: 'verified', memberId: 42, name: '张三', gender: '男', cell: '13800138000', maskedCell: '138****8000' } }
-  const { page, calls, nav, storage } = setup(() => verified)
+test('出码后新顾客扫码，跳到顾客信息页等授权；回到本页重新出码', async () => {
+  const { page, calls, nav } = setup(() => ({ code: 0, data: { stage: 'need_phone' } }))
   page.onShow()
   await settle()
   assert.equal(calls.create, 1)
@@ -56,37 +54,13 @@ test('出码后顾客验证完手机号，开单带上会员信息', async () =>
 
   page.pollCheckin()
   await settle()
-  assert.equal(page.data.customer.memberId, 42)
-  assert.equal(page.data.checkin.stage, 'verified')
-  assert.equal(page._pollTimer, null)
-
-  page.shopSelected({ detail: { shop: '万龙体验中心', sale: 1, rent: 1, care: 0 } })
-  assert.equal(page.data.care, 1)
-  page.onBizTap(tap({ type: 'maintain' }))
-  assert.equal(nav.length, 1)
-  assert.match(nav[0], /memberId=42/)
-  assert.match(nav[0], /customerCell=13800138000/)
-  assert.match(nav[0], /shop=%E4%B8%87%E9%BE%99%E6%9C%8D%E5%8A%A1%E4%B8%AD%E5%BF%83/)
-  assert.equal(storage.reception_draft.shopName, '万龙服务中心')
-  // 已识别的码不作废；回到本页保留顾客、不重新出码
-  page.onHide()
-  page.onShow()
-  assert.deepEqual(calls.stop, [])
-  assert.equal(calls.create, 1)
-  cleanup(page)
-})
-
-test('没扫码直接点业务按散客开单，没用上的码作废', async () => {
-  const { page, calls, nav } = setup()
-  page.onShow()
-  await settle()
-  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
-  page.onBizTap(tap({ type: 'rent' }))
-  assert.equal(nav.length, 1)
-  assert.doesNotMatch(nav[0], /memberId=/)
-  assert.deepEqual(calls.stop, [5])
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=need_phone'])
   assert.equal(page.data.checkin, null)
-  // 回到本页重新出一张码
+  assert.equal(page._pollTimer, null)
+  // 已扫的码交给顾客信息页，不作废
+  assert.deepEqual(calls.stop, [])
+
+  page.onHide()
   page.onShow()
   await settle()
   assert.equal(calls.create, 2)
@@ -94,18 +68,25 @@ test('没扫码直接点业务按散客开单，没用上的码作废', async ()
   cleanup(page)
 })
 
-test('顾客还在验证手机号时开单要先确认', async () => {
-  const { page, nav, modals } = setup(() => ({ code: 0, data: { stage: 'need_phone' } }))
+test('老顾客扫码直接跳顾客信息页显示会员信息', async () => {
+  const { page, nav } = setup(() => ({ code: 0, data: { stage: 'verified', memberId: 42 } }))
   page.onShow()
   await settle()
   page.pollCheckin()
   await settle()
-  assert.equal(page.data.stageText, '顾客已扫码，正在验证手机号…')
-  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
-  page.onBizTap(tap({ type: 'retail' }))
-  assert.deepEqual(modals, ['顾客还在验证手机号'])
-  assert.equal(nav.length, 1)
-  assert.doesNotMatch(nav[0], /memberId=/)
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=verified'])
+  cleanup(page)
+})
+
+test('散客进入：作废没用上的码，进顾客信息页的散客模式', async () => {
+  const { page, calls, nav } = setup()
+  page.onShow()
+  await settle()
+  page.onWalkInTap()
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?walkin=1'])
+  assert.deepEqual(calls.stop, [5])
+  assert.equal(page.data.checkin, null)
+  assert.equal(page._pollTimer, null)
   cleanup(page)
 })
 
@@ -140,6 +121,17 @@ test('切到后台只暂停轮询不作废码，离开页面才作废', async ()
   page.onUnload()
   assert.equal(page._pollTimer, null)
   assert.deepEqual(calls.stop, [5])
+  cleanup(page)
+})
+
+test('找回今天所有店铺中断的订单，按单子上的店铺恢复', async () => {
+  const { page, calls, nav } = setup()
+  page.onRecoverOrder()
+  await settle()
+  assert.deepEqual(calls.recoverShop, [null])
+  assert.equal(page.data.recoverOrders[0].calledName, '张三 先生')
+  page.onRecoverOrderTap(tap({ id: 88 }))
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_new?orderId=88&bizType=rent'])
   cleanup(page)
 })
 

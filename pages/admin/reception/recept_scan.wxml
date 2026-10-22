@@ -1,7 +1,7 @@
 <!--pages/admin/reception/recept_scan.wxml
-  扫码接待（管理员菜单默认进入的开单入口）
-    店员手机出一次性接待码 → 顾客用微信扫码进小程序、验证手机号 → 本页识别出顾客 → 点业务开单
-    不扫码也能直接点业务，按散客开单；手动录入顾客信息的入口在页面底部
+  扫码接待（管理员菜单默认进入的开单入口，对应旧版 recept_entry）
+    顾客扫码 → 自动跳到顾客信息页（recept_member）选店铺和业务；顾客不扫码点「散客进入」
+    手动录入顾客信息的入口在页面底部
   样式沿用 recept_entry.wxss（Alpine Operational Minimalist stitch _1）
 -->
 <view class="page-root">
@@ -13,94 +13,35 @@
 
     <view class="page-header">
       <view class="page-title">扫码接待</view>
-      <view class="shop-card">
-        <view class="shop-card-icon">
-          <van-icon name="location-o" size="16px" color="#545f73"/>
-        </view>
-        <text class="shop-card-label">当前店铺</text>
-        <view class="shop-card-picker">
-          <shop-selector
-            scene="recept"
-            bindShopSelected="shopSelected" />
-        </view>
-        <van-icon name="arrow-down" size="16px" color="#6f7881"/>
-      </view>
     </view>
 
-    <!-- 顾客扫码 -->
-    <view class="card customer-card">
+    <!-- 顾客扫码验证身份 -->
+    <view class="card">
       <view class="card-header">
         <van-icon name="scan" size="18px" color="#006495"/>
-        <text class="card-title">顾客扫码</text>
+        <text class="card-title">顾客扫码验证身份</text>
       </view>
-
-      <view wx:if="{{customer}}" class="scan-customer">
-        <view class="scan-customer-main">
-          <van-icon name="passed" size="20px" color="#15803d"/>
-          <text class="scan-customer-name">{{customer.name || '会员（未填姓名）'}}</text>
-          <text wx:if="{{customer.gender}}" class="scan-customer-gender">{{customer.gender}}</text>
-        </view>
-        <view class="scan-customer-cell">{{customer.maskedCell}}</view>
-        <view class="scan-hint">已识别顾客，请点下方业务开单</view>
-      </view>
-
-      <view wx:else class="scan-qr-wrap">
+      <view class="scan-qr-wrap">
         <view class="scan-qr-box">
           <image wx:if="{{qrCodeUrl}}" class="scan-qr" src="{{qrCodeUrl}}" mode="aspectFit"/>
           <van-loading wx:elif="{{loadingQr}}" size="24px"/>
         </view>
-        <view class="scan-stage {{checkin.stage === 'need_phone' ? 'scan-stage--active' : ''}}">{{stageText}}</view>
-        <view class="scan-hint">二维码每 2 分钟自动更新。顾客不扫码也可以直接点业务，按散客开单。</view>
+        <view class="scan-stage">{{stageText}}</view>
+        <view class="scan-hint">顾客扫码后自动进入顾客信息页。二维码每 2 分钟自动更新。</view>
       </view>
-
       <view class="scan-refresh" bindtap="onRefreshTap">
         <van-icon name="replay" size="14px" color="#006495"/>
-        <text>{{customer ? '换一位顾客' : '换一个码'}}</text>
+        <text>换一个码</text>
       </view>
     </view>
 
-    <!-- 业务类型：只看门店能力，不要求先识别顾客 -->
-    <view class="section">
-      <view class="card-header card-header--standalone">
-        <van-icon name="apps-o" size="18px" color="#006495"/>
-        <text class="card-title">业务类型</text>
+    <!-- 散客 -->
+    <view class="card">
+      <view class="card-header">
+        <van-icon name="friends-o" size="18px" color="#006495"/>
+        <text class="card-title">散客</text>
       </view>
-      <view class="biz-grid">
-        <view
-          class="biz-card {{shop && sale === 1 ? '' : 'biz-card--disabled'}}"
-          data-type="retail"
-          bindtap="onBizTap">
-          <view class="biz-icon-wrap">
-            <van-icon name="shopping-cart-o" size="22px" color="#545f73"/>
-          </view>
-          <text class="biz-label">零售</text>
-          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
-        </view>
-
-        <view
-          class="biz-card {{shop && care === 1 ? '' : 'biz-card--disabled'}}"
-          data-type="maintain"
-          bindtap="onBizTap">
-          <view class="biz-icon-wrap">
-            <van-icon name="setting-o" size="22px" color="#545f73"/>
-          </view>
-          <text class="biz-label">养护</text>
-          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
-        </view>
-
-        <view
-          class="biz-card {{shop && rent === 1 ? '' : 'biz-card--disabled'}}"
-          data-type="rent"
-          bindtap="onBizTap">
-          <view class="biz-icon-wrap">
-            <van-icon name="gift-o" size="22px" color="#545f73"/>
-          </view>
-          <text class="biz-label">租赁</text>
-          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
-        </view>
-      </view>
-      <view wx:if="{{!shop}}" class="biz-hint">请先选择店铺</view>
-      <view wx:elif="{{!customer}}" class="biz-hint">还没识别到顾客，现在开单按散客处理，可在开单页顶部填写顾客信息</view>
+      <view class="walkin-btn" bindtap="onWalkInTap">散客进入</view>
     </view>
 
     <!-- 找回中断订单（PRD §1.4.6） -->

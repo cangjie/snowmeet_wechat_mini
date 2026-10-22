@@ -1,0 +1,91 @@
+<!--pages/admin/reception/recept_member.wxml
+  接待·顾客信息（对应旧版 recept_member_info）：看顾客信息 → 选店铺 → 选业务进入开单
+  样式沿用 recept_entry.wxss（Alpine Operational Minimalist stitch _1）
+-->
+<view class="page-root">
+
+  <safe-nav-bar title="顾客信息" homeUrl="/pages/admin/reception/recept_scan" />
+
+  <view class="main">
+
+    <!-- 新顾客：等顾客在手机上授权手机号 -->
+    <view wx:if="{{waitingPhone}}" class="card member-waiting">
+      <van-loading size="24px" color="#006495"/>
+      <view class="member-waiting-title">顾客已扫码，正在手机上授权手机号…</view>
+      <view class="member-waiting-sub">顾客授权后这里会弹出提示，再选择店铺和业务开单</view>
+      <view class="member-waiting-link" bindtap="onWalkInInstead">顾客不方便授权，按散客开单</view>
+    </view>
+
+    <!-- 顾客信息：会员显示档案和资产；散客可以点「编辑」填写（都选填） -->
+    <view wx:else>
+      <reception-member-bar
+        class="member-bar-slot"
+        customer="{{customer}}"
+        bind:memberInfoFound="onMemberInfoFound"
+        bind:memberDetail="onMemberDetail"
+        bind:customerChange="onCustomerChange" />
+      <view wx:if="{{!customer.memberId}}" class="biz-hint">散客的姓名、性别、电话都可以不填，也可以在开单页顶部填写</view>
+    </view>
+
+    <!-- 选择店铺：shop-selector 内部调 Order/GetShops + beacon 自动选店 -->
+    <view class="shop-card">
+      <view class="shop-card-icon">
+        <van-icon name="location-o" size="16px" color="#545f73"/>
+      </view>
+      <text class="shop-card-label">当前店铺</text>
+      <view class="shop-card-picker">
+        <shop-selector
+          scene="recept"
+          bindShopSelected="shopSelected" />
+      </view>
+      <van-icon name="arrow-down" size="16px" color="#6f7881"/>
+    </view>
+
+    <!-- 选择业务 -->
+    <view class="section">
+      <view class="card-header card-header--standalone">
+        <van-icon name="apps-o" size="18px" color="#006495"/>
+        <text class="card-title">业务类型</text>
+      </view>
+      <view class="biz-grid">
+        <view
+          class="biz-card {{shop && sale === 1 && !waitingPhone ? '' : 'biz-card--disabled'}}"
+          data-type="retail"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap">
+            <van-icon name="shopping-cart-o" size="22px" color="#545f73"/>
+          </view>
+          <text class="biz-label">零售</text>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+
+        <view
+          class="biz-card {{shop && care === 1 && !waitingPhone ? '' : 'biz-card--disabled'}}"
+          data-type="maintain"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap">
+            <van-icon name="setting-o" size="22px" color="#545f73"/>
+          </view>
+          <text class="biz-label">养护</text>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+
+        <view
+          class="biz-card {{shop && rent === 1 && !waitingPhone ? '' : 'biz-card--disabled'}}"
+          data-type="rent"
+          bindtap="onBizTap">
+          <view class="biz-icon-wrap">
+            <van-icon name="gift-o" size="22px" color="#545f73"/>
+          </view>
+          <text class="biz-label">租赁</text>
+          <view class="biz-arrow"><van-icon name="arrow" size="14px"/></view>
+        </view>
+      </view>
+      <view wx:if="{{waitingPhone}}" class="biz-hint">顾客授权手机号后才能开单</view>
+      <view wx:elif="{{!shop}}" class="biz-hint">请先选择店铺</view>
+    </view>
+
+  </view>
+</view>
+
+<admin-page-help />

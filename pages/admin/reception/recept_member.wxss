@@ -1,0 +1,23 @@
+/* pages/admin/reception/recept_member.wxss
+   与开单入口共用 Alpine Operational Minimalist 样式，这里只补等授权卡片 */
+@import "./recept_entry.wxss";
+
+.member-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px;
+  text-align: center;
+}
+.member-waiting-title { font-size: 16px; font-weight: 600; color: var(--on-surface); }
+.member-waiting-sub { font-size: 13px; color: var(--on-surface-variant); }
+.member-waiting-link {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+/* reception-member-bar 自带 16px 外边距（开单页贴边用），这里放进 main 的 16px 内边距里，抵掉一层 */
+.member-bar-slot { display: block; margin: -16px -16px 0; }

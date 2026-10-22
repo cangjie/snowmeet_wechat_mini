@@ -1,5 +1,5 @@
 /* pages/admin/reception/recept_scan.wxss
-   与手动录入入口共用 Alpine Operational Minimalist 样式，这里只补扫码卡片 */
+   与手动录入入口共用 Alpine Operational Minimalist 样式，这里只补扫码卡片和散客按钮 */
 @import "./recept_entry.wxss";
 
 .scan-qr-wrap {
@@ -24,27 +24,11 @@
   font-weight: 600;
   color: var(--on-surface);
 }
-.scan-stage--active { color: var(--primary); }
 .scan-hint {
   font-size: 12px;
   color: var(--on-surface-variant);
   text-align: center;
 }
-
-.scan-customer {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px;
-  border-radius: 8px;
-  background: #dcfce7;
-}
-.scan-customer-main { display: flex; align-items: center; gap: 8px; }
-.scan-customer-name { font-size: 18px; font-weight: 700; color: var(--on-surface); }
-.scan-customer-gender { font-size: 14px; color: var(--secondary); }
-.scan-customer-cell { font-size: 14px; color: var(--on-surface-variant); padding-left: 28px; }
-.scan-customer .scan-hint { text-align: left; padding-left: 28px; color: #15803d; }
-
 .scan-refresh {
   display: flex;
   align-items: center;
@@ -54,3 +38,15 @@
   font-size: 13px;
   color: var(--primary);
 }
+
+.walkin-btn {
+  height: 44px;
+  line-height: 44px;
+  text-align: center;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 16px;
+  font-weight: 600;
+}
+.walkin-btn:active { opacity: 0.85; }
