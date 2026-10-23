@@ -59,8 +59,6 @@ Page({
 
     let customer = { memberId: null, name: '', cell: '', gender: '' };
     let orderId = options.orderId ? safeDecode(options.orderId) : null;
-    // 开单前顾客扫的报到码（scan_qrcode.id），建单/存草稿时带给后端定「已核验本人」；找回中断单不带
-    this._checkinId = Number(safeDecode(options.checkinId) || 0) || null;
     // 顾客信息页勾了「这是测试订单」：建单/存草稿时让后端记为测试单
     this._isTest = safeDecode(options.isTest) === '1';
     let orderCustomerLoaded = false;
@@ -134,13 +132,10 @@ Page({
 
   onShow() {},
 
-  // 建单/存草稿请求附带的参数：
-  // - checkinId：开单前的报到码。后端核对是顾客本人扫码验证过、且就是本单会员，
-  //   订单一生成就记为「已核验本人」（order.wechat_unverified=1）。顾客换了人后端会自动取消
-  // - isTest：顾客信息页勾了「这是测试订单」，订单记为测试单（order.is_test=1）
+  // 建单/存草稿请求附带的参数。isTest：顾客信息页勾了「这是测试订单」，订单记为测试单（order.is_test=1）。
+  // 顾客开单前扫码报到过的，后端自己查到后把订单记为「已核验本人」，这里不用带
   _receptQuery() {
-    return (this._checkinId ? '&checkinId=' + this._checkinId : '')
-      + (this._isTest ? '&isTest=true' : '');
+    return this._isTest ? '&isTest=true' : '';
   },
 
   /* ---------- 通用：返回 / 顶部 ---------- */

@@ -365,11 +365,6 @@ Page({
     if (this.data.member) {
       params.push('memberId=' + encodeURIComponent(this.data.member.id));
     }
-    // 顾客扫码报到进来的：带上报到码，后端据此把订单记为「已核验本人」，用券/卡/储值时不用再扫核验码。
-    // 店员输手机号进入的也是 scan 模式，后端只认顾客本人扫码验证过的报到，这里不用区分
-    if (this.data.mode === 'scan' && this.data.checkinId) {
-      params.push('checkinId=' + this.data.checkinId);
-    }
     if (this.data.isTest) {
       params.push('isTest=1');
     }
