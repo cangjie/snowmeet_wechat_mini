@@ -61,6 +61,8 @@ Page({
     let orderId = options.orderId ? safeDecode(options.orderId) : null;
     // 开单前顾客扫的报到码（scan_qrcode.id），建单/存草稿时带给后端定「已核验本人」；找回中断单不带
     this._checkinId = Number(safeDecode(options.checkinId) || 0) || null;
+    // 顾客信息页勾了「这是测试订单」：建单/存草稿时让后端记为测试单
+    this._isTest = safeDecode(options.isTest) === '1';
     let orderCustomerLoaded = false;
     let recoveredOrder = null;  // 找回中断订单：连同 rentals 一起恢复
 
@@ -132,10 +134,13 @@ Page({
 
   onShow() {},
 
-  // 建单/存草稿请求带上开单前的报到码：后端核对是顾客本人扫码验证过、且就是本单会员，
-  // 订单一生成就记为「已核验本人」（order.wechat_unverified=1）。顾客换了人后端会自动取消
-  _checkinQuery() {
-    return this._checkinId ? '&checkinId=' + this._checkinId : '';
+  // 建单/存草稿请求附带的参数：
+  // - checkinId：开单前的报到码。后端核对是顾客本人扫码验证过、且就是本单会员，
+  //   订单一生成就记为「已核验本人」（order.wechat_unverified=1）。顾客换了人后端会自动取消
+  // - isTest：顾客信息页勾了「这是测试订单」，订单记为测试单（order.is_test=1）
+  _receptQuery() {
+    return (this._checkinId ? '&checkinId=' + this._checkinId : '')
+      + (this._isTest ? '&isTest=true' : '');
   },
 
   /* ---------- 通用：返回 / 顶部 ---------- */
@@ -540,7 +545,7 @@ Page({
 
     const url = app.globalData.requestPrefix
       + 'Rent/SaveRentRecept?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
-      + this._checkinQuery();
+      + this._receptQuery();
     return util.performWebRequest(url, payload).then((submitted) => {
       // 后端返回的最新 order，本地同步（保持 timeStamp 用于 wx:key）
       if (submitted && submitted.rentals) {
@@ -632,7 +637,7 @@ Page({
 
     const url = app.globalData.requestPrefix
       + 'Care/SaveCareRecept?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
-      + this._checkinQuery();
+      + this._receptQuery();
     return util.performWebRequest(url, payload).then((submitted) => {
       if (submitted && submitted.cares) {
         // 基底 = 响应时刻的最新本地 cares（可能比 POST 时的 localCares 更新）；
@@ -785,7 +790,7 @@ Page({
     wx.showLoading({ title: '下单中…', mask: true });
     const url = app.globalData.requestPrefix
       + 'Order/PlaceOrder?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
-      + this._checkinQuery();
+      + this._receptQuery();
     util.performWebRequest(url, order).then((placed) => {
       wx.hideLoading();
       this._retailPlacing = false;

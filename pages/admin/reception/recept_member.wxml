@@ -94,6 +94,15 @@
       <van-icon name="arrow-down" size="16px" color="#6f7881"/>
     </view>
 
+    <!-- 测试订单：勾选后本次开的单记为测试单（order.is_test=1） -->
+    <view class="test-row {{isTest ? 'test-row--on' : ''}}" bindtap="onTestToggle">
+      <view class="test-box">
+        <van-icon wx:if="{{isTest}}" name="success" size="13px" color="#ffffff"/>
+      </view>
+      <text class="test-label">这是测试订单</text>
+      <text wx:if="{{isTest}}" class="test-note">本次开的单记为测试单</text>
+    </view>
+
     <!-- 选择业务 -->
     <view class="section">
       <view class="card-header card-header--standalone">

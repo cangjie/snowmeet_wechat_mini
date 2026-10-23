@@ -34,6 +34,8 @@ Page({
     otherNums: [],
     // 表单和会员资料不一致时可以「更新顾客信息」
     needUpdate: false,
+    // 店员勾了「这是测试订单」：本次开的单记为测试单（order.is_test=1）
+    isTest: false,
 
     // 店铺信息：由 shop-selector 通过 ShopSelected 事件回传
     currentShopName: '',
@@ -306,6 +308,10 @@ Page({
     });
   },
 
+  onTestToggle() {
+    this.setData({ isTest: !this.data.isTest });
+  },
+
   /* ---------- 选业务进入开单 ---------- */
   onBizTap(e) {
     const bizType = e.currentTarget.dataset.type;
@@ -363,6 +369,9 @@ Page({
     // 店员输手机号进入的也是 scan 模式，后端只认顾客本人扫码验证过的报到，这里不用区分
     if (this.data.mode === 'scan' && this.data.checkinId) {
       params.push('checkinId=' + this.data.checkinId);
+    }
+    if (this.data.isTest) {
+      params.push('isTest=1');
     }
     wx.navigateTo({ url: '/pages/admin/reception/recept_new?' + params.join('&') });
   },
