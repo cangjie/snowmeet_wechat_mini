@@ -280,6 +280,12 @@
           </view>
         </view>
 
+        <!-- 打印：放在装备信息之后、养护任务之前 -->
+        <view class="panel-btn-row panel-btn-row--split">
+          <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onPrintLabel">打印标签存根</view>
+          <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onPrintInvoice">打印顾客小票</view>
+        </view>
+
         <!-- 任务时间线 -->
         <view class="section-title section-title--sub">养护任务</view>
         <view class="task-list">
@@ -466,12 +472,6 @@
               <text class="task-proof-label">已取消 · 原因：{{care.cancel_reason || '（未填写）'}}</text>
             </view>
           </block>
-        </view>
-
-        <!-- 打印 -->
-        <view class="panel-btn-row panel-btn-row--split">
-          <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onPrintLabel">打印标签存根</view>
-          <view class="btn btn--plain" data-cidx="{{cidx}}" catchtap="onPrintInvoice">打印顾客小票</view>
         </view>
       </view>
     </view>
