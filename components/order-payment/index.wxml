@@ -14,8 +14,15 @@
 
   <!-- 养护核销：微信核验会员本人 + 核销（储值实扣 / 券卡核销） -->
   <view wx:if="{{careWriteoff}}" class="care-writeoff">
-    <view class="care-writeoff-tip">{{order.pay_with_deposit ? '本单用储值支付，需订单会员本人微信核验后扣款生效' : '本单用卡券抵扣，需订单会员本人微信核验后核销生效'}}</view>
-    <button class="care-writeoff-btn" bindtap="onCareWriteoffVerify">微信核验会员本人并核销</button>
+    <!-- 已核验本人（开单前扫码报到 / 扫过核验码）：点按钮直接核销，不再出核验码 -->
+    <block wx:if="{{order.wechat_unverified}}">
+      <view class="care-writeoff-tip">{{order.pay_with_deposit ? '本单用储值支付，订单会员已核验本人，确认后扣款生效' : '本单用卡券抵扣，订单会员已核验本人，确认后核销生效'}}</view>
+      <button class="care-writeoff-btn" bindtap="onCareWriteoffVerify">{{order.pay_with_deposit ? '确认储值扣款' : '确认核销'}}</button>
+    </block>
+    <block wx:else>
+      <view class="care-writeoff-tip">{{order.pay_with_deposit ? '本单用储值支付，需订单会员本人微信核验后扣款生效' : '本单用卡券抵扣，需订单会员本人微信核验后核销生效'}}</view>
+      <button class="care-writeoff-btn" bindtap="onCareWriteoffVerify">微信核验会员本人并核销</button>
+    </block>
   </view>
 
   <!-- 二维码 -->
