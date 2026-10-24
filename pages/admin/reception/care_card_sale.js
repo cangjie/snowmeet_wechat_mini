@@ -1,7 +1,7 @@
 const cards = require('../../../utils/careCardSale.js');
 
 const initialData = {
-  careCardSelections: [], careCardPreview: null, careCardError: '',
+  careCardSelections: [], careCardPreview: null, careCardError: '', careCardMode: '',
   cardSaleShow: false, cardSaleProducts: [], cardSalePreview: null,
   cardSaleLoading: false, cardSaleBusy: false, cardSaleError: ''
 };
@@ -14,9 +14,23 @@ const methods = {
     try {
       const draft = await this._cardApi('GetDraft', null, this.data.order.id);
       this._hadCareCardDraft = !!(draft.selections && draft.selections.length);
-      this.setData({ careCardSelections: draft.selections || [],
-        careCardPreview: draft.selections && draft.selections.length ? cards.displayPreview(draft.preview, this.data.order.cares) : null });
+      this.setData({ careCardSelections: draft.selections || [] });
+      if (this._hadCareCardDraft) this._applyCareCardPreview(draft.preview);
     } catch (e) { console.warn('load care card draft failed', e); }
+  },
+
+  _applyCareCardPreview(preview) {
+    const projects = preview.projects || [];
+    const cares = this.data.order.cares.map(c => {
+      const project = projects.find(p => p.careId === c.id);
+      if (!project) return c;
+      const { careId, ...flags } = project;
+      return Object.assign({}, c, flags, { use_card: false, card_id: null, card_name: null,
+        ticket_code: null, ticket: null, card_equip_lock: false, card_pending_open: false,
+        common_charge: 0, discount: 0, ticket_discount: 0 });
+    });
+    this.setData({ 'order.cares': cares, careCardMode: cards.serviceMode(preview.items && preview.items[0]),
+      careCardPreview: cards.displayPreview(preview, cares), careCardError: (preview.errors || []).join('；') });
   },
 
   _invalidateCareCardTrial() {
@@ -33,7 +47,7 @@ const methods = {
     try {
       const preview = await this._cardApi('SaveDraft', { orderId: this.data.order.id, selections: this.data.careCardSelections });
       if (revision !== this._careCardRevision) return;
-      this.setData({ careCardPreview: cards.displayPreview(preview, this.data.order.cares), careCardError: '' });
+      this._applyCareCardPreview(preview);
     } catch (e) {
       if (revision === this._careCardRevision) this.setData({ careCardError: String(e.message || e || '请重新选择卡类') });
     }
@@ -53,7 +67,8 @@ const methods = {
         quantity: (selected.find(s => s.productId === p.id) || {}).quantity || 0,
         priceLabel: Number(p.price || 0).toFixed(2),
         ruleLabel: p.total == null ? '季卡 · 不限总次数' : p.total + '次',
-        bindingLabel: p.requiresBinding ? '限本次绑定雪板' : '不绑定雪板'
+        bindingLabel: p.requiresBinding ? '限本次绑定雪板' : '不绑定雪板',
+        unavailable: cards.serviceMode(p) === 'machine' && this.data.order.cares.length !== 1
       })) });
       await this.onCardRecalculate();
     } catch (e) { this.setData({ cardSaleError: String(e.message || e || '加载卡类失败') }); }
@@ -64,8 +79,10 @@ const methods = {
     if (this.data.cardSaleBusy) return;
     const id = Number(e.currentTarget.dataset.id);
     const delta = Number(e.currentTarget.dataset.delta);
+    const target = this.data.cardSaleProducts.find(p => p.id === id);
+    if (!target || (delta > 0 && target.unavailable)) return;
     const products = this.data.cardSaleProducts.map(p => Object.assign({}, p, {
-      quantity: p.id === id ? Math.max(0, Math.min(20, p.quantity + delta)) : p.quantity
+      quantity: p.id === id ? Math.max(0, Math.min(20, p.quantity + delta)) : (delta > 0 ? 0 : p.quantity)
     }));
     if (products.reduce((sum, p) => sum + p.quantity, 0) > 20) {
       wx.showToast({ title: '最多购买20张', icon: 'none' }); return;
@@ -106,7 +123,7 @@ const methods = {
       await this.saveCareReceptOrder();
       await this._cardApi('SaveDraft', { orderId: this.data.order.id, selections: [] });
       this._hadCareCardDraft = false;
-      this.setData({ careCardSelections: [], careCardPreview: null, careCardError: '', cardSaleShow: false });
+      this.setData({ careCardSelections: [], careCardPreview: null, careCardError: '', careCardMode: '', cardSaleShow: false });
     } catch (e) { wx.showToast({ title: String(e.message || e || '移除失败'), icon: 'none' }); }
     finally { this.setData({ cardSaleBusy: false }); }
   },
@@ -122,26 +139,57 @@ const methods = {
       const orderId = this.data.order.id;
       const saved = await this._cardApi('SaveDraft', { orderId, selections: selected });
       this._hadCareCardDraft = true;
-      this.setData({ careCardSelections: selected, careCardPreview: cards.displayPreview(saved, this.data.order.cares), careCardError: '' });
+      this.setData({ careCardSelections: selected });
+      this._applyCareCardPreview(saved);
       if (cards.signature(saved) !== cards.signature(displayed)) {
         this.setData({ cardSalePreview: cards.displayPreview(saved, this.data.order.cares) });
         wx.showToast({ title: '试算已更新，请重新确认', icon: 'none' }); return;
       }
-      const result = await this._cardApi('Submit', { orderId });
-      this._openCareCardSettlement(result.orderId, result.careOrderId);
+      this.setData({ cardSaleShow: false });
     } catch (e) {
-      // 提交可能已在服务器成功，只是响应丢失。先找原订单，避免重新开单或被草稿保护挡住。
-      try {
-        const draft = await this._cardApi('GetDraft', null, this.data.order.id);
-        if (draft.retailOrderId) { this._openCareCardSettlement(draft.retailOrderId, draft.careOrderId); return; }
-      } catch (lookupError) { console.warn('recover card sale submission failed', lookupError); }
-      this.setData({ cardSaleError: String(e.message || e || '下单失败，请重试') });
+      this.setData({ cardSaleError: String(e.message || e || '保存选卡失败，请重试') });
     }
     finally { this._careCardSubmitting = false; this.setData({ cardSaleBusy: false }); }
   },
 
+  async _checkoutCareCards() {
+    if (this.data.cardSaleBusy || this._careCardSubmitting) return;
+    this._careCardSubmitting = true;
+    this.setData({ cardSaleBusy: true });
+    let submitting = false;
+    try {
+      await this.saveCareReceptOrder();
+      const displayed = this.data.careCardPreview;
+      const orderId = this.data.order.id;
+      const saved = await this._cardApi('SaveDraft', { orderId, selections: this.data.careCardSelections });
+      this._applyCareCardPreview(saved);
+      if (saved.canCheckout === false) throw new Error((saved.errors || []).join('；') || '请完整选择养护项目');
+      if (!displayed || cards.signature(saved) !== cards.signature(displayed)) {
+        this.setData({ cardSaleShow: true, cardSalePreview: cards.displayPreview(saved, this.data.order.cares) });
+        wx.showToast({ title: '试算已更新，请重新确认选卡', icon: 'none' });
+        // 重新打开选择器，以最新售价和权益再次确认。
+        this._careCardSubmitting = false;
+        this.setData({ cardSaleBusy: false });
+        await this.onAddCareCard(); return;
+      }
+      submitting = true;
+      const result = await this._cardApi('Submit', { orderId });
+      this._openCareCardSettlement(result.orderId, result.careOrderId);
+    } catch (e) {
+      if (submitting) {
+        try {
+          const draft = await this._cardApi('GetDraft', null, this.data.order.id);
+          if (draft.retailOrderId) { this._openCareCardSettlement(draft.retailOrderId, draft.careOrderId); return; }
+        } catch (lookupError) { console.warn('recover card sale submission failed', lookupError); }
+      }
+      const message = String(e.message || e || '下单失败，请重试');
+      this.setData({ careCardError: message });
+      wx.showToast({ title: message, icon: 'none' });
+    } finally { this._careCardSubmitting = false; this.setData({ cardSaleBusy: false }); }
+  },
+
   _openCareCardSettlement(retailOrderId, careOrderId) {
-    this.setData({ cardSaleShow: false, careCardSelections: [], careCardPreview: null, careCardError: '',
+    this.setData({ cardSaleShow: false, careCardSelections: [], careCardPreview: null, careCardError: '', careCardMode: '',
       order: Object.assign({}, this.data.order, { id: 0, code: null, valid: 0, recepting: 1, cares: [], retails: [] }) });
     this._hadCareCardDraft = false;
     wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + retailOrderId + '&careOrderId=' + careOrderId });

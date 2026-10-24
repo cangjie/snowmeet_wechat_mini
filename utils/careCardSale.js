@@ -8,6 +8,13 @@ function request(action, body, orderId) {
   return util.performWebRequest(url, body == null ? null : body);
 }
 
+function serviceMode(card) {
+  if (!card) return '';
+  if (card.total == null && (card.name || '').includes('机打蜡')) return 'machine';
+  if (card.requiresBinding) return 'wax';
+  return card.projectCount === 2 || (card.projectCount == null && (card.name || '').includes('双项')) ? 'dual' : 'single';
+}
+
 function selections(products) {
   return (products || []).filter(p => p.quantity > 0)
     .map(p => ({ productId: p.id, quantity: p.quantity }));
@@ -38,4 +45,4 @@ function signature(preview) {
   })) });
 }
 
-module.exports = { request, selections, displayPreview, signature };
+module.exports = { serviceMode, request, selections, displayPreview, signature };

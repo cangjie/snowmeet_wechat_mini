@@ -122,6 +122,8 @@
               <!-- 服务项目 -->
               <view class="form-group">
                 <view class="form-label">养护项目</view>
+                <view wx:if="{{newCardMode === 'single'}}" class="care-card-summary-tip">单项卡：每件装备请选择修刃或热蜡其中一项</view>
+                <view wx:if="{{newCardMode === 'machine'}}" class="care-card-summary-tip">机打蜡季卡：本单一套装备，使用机打蜡</view>
                 <view class="svc-btn-row">
                   <view class="rent-mode-btn {{care.need_edge === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
                         catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="need_edge">修刃</view>

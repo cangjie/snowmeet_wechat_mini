@@ -28,7 +28,7 @@ test('入口位于添加装备下方，养护选卡与结算展示本次试算',
   assert.ok(form.indexOf('<text>添加装备</text>') < form.indexOf('<text>添加卡类'));
   const page = fs.readFileSync(path.join(__dirname, '../pages/admin/reception/recept_new.wxml'), 'utf8');
   assert.match(page, /本次试算/);
-  assert.match(page, /确认并去结算/);
+  assert.match(page, /确认选卡/);
 });
 
 test('旧试算晚到不覆盖新选择；试算不下单、不扣次', async t => {
@@ -65,64 +65,88 @@ test('提交前金额变化需要重新确认，不直接按新价下单', async
   assert.match(toasts[0], /重新确认/);
 });
 
-test('确认后仅创建零售收款，带养护ID进结算并清空下一单购卡', async t => {
+test('确认选卡只保存草稿和项目，留在开单页；原结算按钮才正式提交', async t => {
   const { page, navigations } = setup(t);
-  page.setData({ cardSaleShow: true, cardSaleProducts: [{ id: 101, quantity: 1 }], cardSalePreview: preview() });
+  const trial = preview();
+  trial.projects = [{ careId: 30, need_edge: 1, need_wax: 1, need_unwax: 1, free_wax: 0 }];
+  page.data.order.cares[0].need_wax = 0;
+  page.setData({ cardSaleShow: true, cardSaleProducts: [{ id: 101, quantity: 1 }], cardSalePreview: trial });
   const actions = [];
-  page._cardApi = async (action, body) => {
+  page._cardApi = async action => {
     actions.push(action);
-    if (action === 'SaveDraft') { assert.equal(body.orderId, 20); return preview(); }
-    assert.equal(action, 'Submit');
-    return { orderId: 40, careOrderId: 20 };
+    if (action === 'SaveDraft') return trial;
+    assert.equal(action, 'Submit'); return { orderId: 40, careOrderId: 20 };
   };
   await page.onCareCardConfirm();
-  assert.deepEqual(actions, ['SaveDraft', 'Submit']);
+  assert.deepEqual(actions, ['SaveDraft']); assert.equal(navigations.length, 0);
+  assert.equal(page.data.cardSaleShow, false); assert.equal(page.data.order.id, 20);
+  assert.equal(page.data.order.cares[0].need_wax, 1); assert.equal(page.data.careCardMode, 'dual');
+  await page._checkoutCare(false);
+  assert.deepEqual(actions, ['SaveDraft', 'SaveDraft', 'Submit']);
   assert.equal(navigations[0], '/pages/payment/settle/index?orderId=40&careOrderId=20');
-  assert.equal(page.data.order.id, 0);
-  assert.deepEqual(page.data.order.cares, []);
-  assert.deepEqual(page.data.careCardSelections, []);
+  assert.equal(page.data.order.id, 0); assert.deepEqual(page.data.careCardSelections, []);
 });
 
-test('下单失败保留已保存购卡意向，不能误走普通零元养护', async t => {
+test('单项卡可先确认，未逐件选好项目时禁止结算', async t => {
   const { page, navigations } = setup(t);
-  page.setData({ cardSaleShow: true, cardSaleProducts: [{ id: 101, quantity: 1 }], cardSalePreview: preview() });
-  page._cardApi = async action => { if (action === 'SaveDraft') return preview(); throw new Error('请重试'); };
+  const trial = preview(); trial.items[0].projectCount = 1; trial.items[0].name = '单项10次卡';
+  trial.canCheckout = false; trial.errors = ['第1件装备请选择修刃或热蜡（单项）'];
+  trial.projects = [{ careId: 30, need_edge: 0, need_wax: 0, free_wax: 0 }];
+  page.setData({ cardSaleShow: true, cardSaleProducts: [{ id: 101, quantity: 1 }], cardSalePreview: trial });
+  const actions = []; page._cardApi = async action => { actions.push(action); return trial; };
   await page.onCareCardConfirm();
-  assert.equal(page.data.order.id, 20);
-  assert.equal(page.data.careCardSelections.length, 1);
-  assert.equal(navigations.length, 0);
-  assert.equal(page.data.cardSaleBusy, false);
-  assert.match(page.data.cardSaleError, /请重试/);
+  assert.equal(page.data.cardSaleShow, false); assert.equal(page.data.careCardMode, 'single');
+  await page._checkoutCare(false);
+  assert.deepEqual(actions, ['SaveDraft', 'SaveDraft']); assert.equal(navigations.length, 0);
+  assert.match(page.data.careCardError, /单项/);
 });
 
-test('未选卡时继续普通养护，选卡后先核对试算', t => {
-  const { page } = setup(t);
-  let normal = 0, cards = 0;
-  page._doCheckoutCare = () => normal++;
-  page.onAddCareCard = () => cards++;
-  page._checkoutCare(false);
-  assert.equal(normal, 1);
-  page.data.careCardSelections = [{ productId: 101, quantity: 1 }];
-  page._checkoutCare(false);
-  assert.equal(normal, 1);
-  assert.equal(cards, 1);
+test('下单失败保留已选卡，未选卡仍走普通养护', async t => {
+  const { page, navigations } = setup(t);
+  let normal = 0; page._doCheckoutCare = () => normal++;
+  page._checkoutCare(false); assert.equal(normal, 1);
+  page.setData({ careCardSelections: [{ productId: 101, quantity: 1 }], careCardPreview: preview() });
+  page._cardApi = async action => { if (action === 'SaveDraft') return preview(); throw new Error('请重试'); };
+  await page._checkoutCare(false);
+  assert.equal(page.data.order.id, 20); assert.equal(page.data.careCardSelections.length, 1);
+  assert.equal(navigations.length, 0); assert.equal(normal, 1); assert.match(page.data.careCardError, /请重试/);
 });
 
 test('下单响应丢失时恢复原零售订单，不重复开单', async t => {
   const { page, navigations } = setup(t);
-  page.setData({ cardSaleShow: true, cardSaleProducts: [{ id: 101, quantity: 1 }], cardSalePreview: preview() });
+  page.setData({ careCardSelections: [{ productId: 101, quantity: 1 }], careCardPreview: preview() });
   const actions = [];
   page._cardApi = async action => {
     actions.push(action);
     if (action === 'SaveDraft') return preview();
     if (action === 'Submit') throw new Error('响应超时');
-    assert.equal(action, 'GetDraft');
-    return { retailOrderId: 40, careOrderId: 20 };
+    assert.equal(action, 'GetDraft'); return { retailOrderId: 40, careOrderId: 20 };
   };
-  await page.onCareCardConfirm();
+  await page._checkoutCare(false);
   assert.deepEqual(actions, ['SaveDraft', 'Submit', 'GetDraft']);
   assert.equal(navigations[0], '/pages/payment/settle/index?orderId=40&careOrderId=20');
-  assert.equal(page.data.order.id, 0);
+});
+
+test('换卡自动清空其他品种数量，机打蜡季卡多装备时不可选', async t => {
+  const { page } = setup(t); page.onCardRecalculate = async () => {};
+  page.data.cardSaleProducts = [{ id: 101, quantity: 2 }, { id: 102, quantity: 0 }, { id: 103, quantity: 0, unavailable: true }];
+  page.onCareCardQuantity({ currentTarget: { dataset: { id: 102, delta: 1 } } });
+  assert.deepEqual(page.data.cardSaleProducts.map(p => p.quantity), [0, 1, 0]);
+  page.onCareCardQuantity({ currentTarget: { dataset: { id: 103, delta: 1 } } });
+  assert.deepEqual(page.data.cardSaleProducts.map(p => p.quantity), [0, 1, 0]);
+});
+
+test('单项修刃与热蜡互斥；新增装备继承双项默认；季卡不能再添装备', t => {
+  setup(t);
+  const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {});
+  form.data.newCardMode = 'single'; form.data.displayCares = [{ need_edge: 1, need_wax: 0 }];
+  form._mutate = (i, fn) => fn(form.data.displayCares[i]);
+  const toggle = flag => form.onSvcToggle({ currentTarget: { dataset: { cidx: 0, flag } } });
+  toggle('need_wax'); assert.equal(form.data.displayCares[0].need_edge, 0); assert.equal(form.data.displayCares[0].need_wax, 1);
+  toggle('need_edge'); assert.equal(form.data.displayCares[0].need_edge, 1); assert.equal(form.data.displayCares[0].need_wax, 0);
+  form.data.newCardMode = 'dual'; form.data.cares = []; form._refreshCares = () => {}; form._emitSync = () => {};
+  form.onAddCare(); assert.equal(form.data.cares[0].need_edge, 1); assert.equal(form.data.cares[0].need_wax, 1);
+  form.data.newCardMode = 'machine'; form.onAddCare(); assert.equal(form.data.cares.length, 1);
 });
 
 test('后端未启用时明确提示，不生成购卡订单', async t => {

@@ -681,7 +681,7 @@ Page({
   // 养护去结算：await 落盘 → Order/PlaceCareOrder → settle，本地订单脱钩（同租赁 onCheckout 约定）
   // useDeposit：店员勾选的「使用储值支付」意向，随 PlaceCareOrder 落到订单（本期仅记录，扣款后续规划）
   _checkoutCare(useDeposit) {
-    if (this.data.careCardSelections.length) { this.onAddCareCard(); return; }
+    if (this.data.careCardSelections.length) { return this._checkoutCareCards(); }
     const order = this.data.order;
     if (!order || !order.cares || order.cares.length === 0) {
       wx.showToast({ title: '购物车是空的', icon: 'none' });

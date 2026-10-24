@@ -72,6 +72,11 @@ Component({
     cardError: { type: String, value: '' },
     cardBusy: { type: Boolean, value: false },
     hasCardSelection: { type: Boolean, value: false },
+    newCardMode: { type: String, value: '', observer(mode, previous) {
+      this._priceSeqMap = {}; // 丢弃选卡之前仍在飞的普通计价响应。
+      this._refreshCares();
+      if (!mode && previous) (this.data.displayCares || []).forEach((c, i) => this._fetchPrice(i));
+    } },
   },
   data: {
     displayCares: [],
@@ -150,6 +155,8 @@ Component({
       const hasImage = care.careImages && care.careImages.length > 0;
       const hasBrandScale = care.brand && care.scale;
       if (!hasImage && !hasBrandScale) return { ok: false, label: '图片或品牌长度必填' };
+      if (this.data.newCardMode === 'single' && (care.need_edge === care.need_wax || care.free_wax === 1))
+        return { ok: false, label: '请选择修刃或热蜡（单项）' };
       const hasService = care.need_edge === 1 || care.need_wax === 1 || care.free_wax === 1
         || care.summer != null || (care.repair_charge && care.repair_charge > 0)
         || (care.ticket && (care.ticket.template_id === 17 || care.ticket.template_id === 18));
@@ -334,8 +341,10 @@ Component({
       // 防竞态：按卡片 key 记序号，过期响应丢弃；响应时按 key 反查下标（防中途增删卡片下标漂移）
       const key = care._key || 'i' + cidx;
       this._priceSeqMap = this._priceSeqMap || {};
-      const seq = (this._priceSeqMap[key] || 0) + 1;
+      const seq = (this._priceSeqCounter || 0) + 1;
+      this._priceSeqCounter = seq;
       this._priceSeqMap[key] = seq;
+      if (this.data.newCardMode) return; // 购卡项目由整单试算统一校验，养护金额为零。
       // 全量状态整包提交（用户 2026-07-09 拍板）：店铺/会员 + care 内装备/服务/券码/卡(card_id,card_name)/附加费。
       // 卡选择跟着单件装备（care）走，卡信息只在 care 内、不设平级字段
       const req = {
@@ -389,7 +398,15 @@ Component({
     },
     onAddCare() {
       const cares = (this.data.cares || []).slice();
-      cares.push(blankCare());
+      if (this.data.newCardMode === 'machine' && cares.length) {
+        wx.showToast({ title: '机打蜡季卡仅限一套装备，请先更换卡类', icon: 'none' }); return;
+      }
+      const care = blankCare();
+      if (this.data.newCardMode === 'dual') {
+        care.need_edge = care.need_wax = care.need_unwax = 1; care.edge_degree = '89';
+      } else if (this.data.newCardMode === 'wax') care.need_wax = care.need_unwax = 1;
+      else if (this.data.newCardMode === 'machine') care.free_wax = 1;
+      cares.push(care);
       this.data.cares = cares;
       this._refreshCares();
       this._emitSync(true);
@@ -547,6 +564,23 @@ Component({
       const flag = e.currentTarget.dataset.flag;
       const care = this.data.displayCares[cidx];
       if (!care) return;
+      const mode = this.data.newCardMode;
+      if (mode) {
+        if (mode === 'machine' || mode === 'wax' || !['need_edge', 'need_wax', 'need_unwax', 'urgent'].includes(flag)) return;
+        this._mutate(cidx, c => {
+          c[flag] = c[flag] === 1 ? 0 : 1;
+          if (mode === 'single' && (flag === 'need_edge' || flag === 'need_wax')) {
+            c[flag] = 1;
+            c[flag === 'need_edge' ? 'need_wax' : 'need_edge'] = 0;
+          }
+          if (flag === 'need_wax' || (mode === 'single' && flag === 'need_edge')) c.need_unwax = c.need_wax;
+          c.free_wax = 0;
+          if (c.need_edge === 1 && !c.edge_degree) c.edge_degree = '89';
+          if (c.need_edge !== 1) c.edge_degree = null;
+          c.common_charge = c.discount = c.ticket_discount = 0;
+        });
+        return;
+      }
       if (care.summer != null && (flag === 'need_edge' || flag === 'need_wax' || flag === 'need_unwax' || flag === 'urgent')) {
         wx.showToast({ title: '非雪季养护项目固定', icon: 'none' });
         return;
@@ -687,6 +721,7 @@ Component({
     },
     /* ---------- 优惠券 ---------- */
     onTicketTap(e) {
+      if (this.data.newCardMode) { wx.showToast({ title: '本单统一使用新购卡', icon: 'none' }); return; }
       const cidx = Number(e.currentTarget.dataset.cidx);
       if (!this.data.memberId) {
         wx.showToast({ title: '散客无可用优惠券', icon: 'none' });

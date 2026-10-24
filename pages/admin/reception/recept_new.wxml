@@ -38,6 +38,7 @@
       shop="{{shop}}"
       memberId="{{customer.memberId}}"
       cares="{{order.cares}}"
+      newCardMode="{{careCardMode}}"
       cardPreview="{{careCardPreview}}"
       cardError="{{careCardError}}"
       cardBusy="{{cardSaleBusy}}"
@@ -63,18 +64,19 @@
 <van-popup show="{{cardSaleShow}}" position="bottom" round bind:close="onCareCardClose" close-on-click-overlay="{{!cardSaleBusy}}">
   <view class="card-sale-popup">
     <view class="card-sale-heading"><text>添加养护卡类</text><text class="card-sale-close" bindtap="onCareCardClose">关闭</text></view>
-    <view class="card-sale-caption">先选卡，按本单装备试算；付款后自动发卡并扣次</view>
+    <view class="card-sale-caption">每单只选一种卡，全部装备使用新购卡；确认后回开单页，点击去结算付款</view>
     <scroll-view scroll-y class="card-sale-scroll">
       <view wx:for="{{cardSaleProducts}}" wx:key="id" class="card-sale-product">
         <view class="card-sale-product-main">
           <view class="card-sale-name">{{item.name}}</view>
           <view class="card-sale-rule">{{item.ruleLabel}} · {{item.bindingLabel}}</view>
+          <view wx:if="{{item.unavailable}}" class="card-sale-error">仅一套装备时可选</view>
           <view class="card-sale-price">¥{{item.priceLabel}}</view>
         </view>
         <view class="card-sale-quantity">
           <button class="card-sale-step" data-id="{{item.id}}" data-delta="-1" bindtap="onCareCardQuantity" disabled="{{cardSaleBusy || item.quantity === 0}}">−</button>
           <text class="card-sale-number">{{item.quantity}}</text>
-          <button class="card-sale-step" data-id="{{item.id}}" data-delta="1" bindtap="onCareCardQuantity" disabled="{{cardSaleBusy}}">＋</button>
+          <button class="card-sale-step" data-id="{{item.id}}" data-delta="1" bindtap="onCareCardQuantity" disabled="{{cardSaleBusy || item.unavailable}}">＋</button>
         </view>
       </view>
       <view wx:if="{{!cardSaleProducts.length && !cardSaleLoading && !cardSaleError}}" class="card-sale-empty">暂无在售养护卡</view>
@@ -88,13 +90,14 @@
         </view>
         <view class="card-sale-rule">养护应付 ¥0.00；实际扣次在付款成功后进行</view>
       </view>
+      <view wx:if="{{cardSalePreview.errors.length}}" class="card-sale-error">确认选卡后，请逐件选择修刃或热蜡</view>
       <view wx:if="{{cardSaleLoading}}" class="card-sale-empty">正在加载或试算…</view>
       <view wx:if="{{cardSaleError}}" class="card-sale-error">{{cardSaleError}}</view>
       <view wx:if="{{cardSaleError}}" class="card-sale-retry" bindtap="onCardRecalculate">重新试算</view>
     </scroll-view>
     <view class="card-sale-footer">
       <view class="card-sale-total">应付卡款 <text>¥{{cardSalePreview ? cardSalePreview.amountLabel : '--'}}</text></view>
-      <button class="card-sale-confirm" bindtap="onCareCardConfirm" loading="{{cardSaleBusy}}" disabled="{{cardSaleBusy || cardSaleLoading || !cardSalePreview || !!cardSaleError}}">确认并去结算</button>
+      <button class="card-sale-confirm" bindtap="onCareCardConfirm" loading="{{cardSaleBusy}}" disabled="{{cardSaleBusy || cardSaleLoading || !cardSalePreview || !!cardSaleError}}">确认选卡</button>
     </view>
   </view>
 </van-popup>
