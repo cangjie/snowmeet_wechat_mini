@@ -39,5 +39,6 @@
       <text class="kv-label">应付金额</text>
       <text class="kv-value kv-value--strong">{{payingAmountStr}}</text>
     </view>
+    <linked-care-summary wx:if="{{isRetail && order.careCardSale.careOrderId}}" orderId="{{order.careCardSale.careOrderId}}" />
   </view>
 </view>

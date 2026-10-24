@@ -1,0 +1,11 @@
+.care-summary { width: 100%; }
+.care-summary-title { font-size: 14px; line-height: 1.5; font-weight: 600; color: #0b1c30; }
+.care-summary-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e9ef; }
+.care-summary-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: #0b1c30; font-size: 14px; line-height: 1.5; font-weight: 500; }
+.care-summary-equipment { margin-top: 4px; font-size: 13px; line-height: 1.6; color: #3f4850; word-break: break-all; }
+.care-summary-projects { margin-top: 6px; font-size: 13px; line-height: 1.6; color: #006495; }
+.care-summary-hint, .care-summary-error { margin-top: 6px; font-size: 12px; line-height: 1.6; color: #6f7881; }
+.care-summary-error { color: #a52a25; }
+.care-summary-cancelled { flex-shrink: 0; color: #a52a25; font-size: 12px; font-weight: 400; }
+.care-summary-photos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.care-summary-photo { display: block; width: 56px; height: 56px; border-radius: 6px; }

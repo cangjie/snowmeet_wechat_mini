@@ -3,7 +3,7 @@
     <view wx:if="{{careOrderId}}" class="card-sale-summary">
       <view class="card-sale-summary-title">购卡并用于本次养护</view>
       <view wx:for="{{cardPreview.items}}" wx:key="lineNo" class="card-sale-summary-item">
-        <view>{{item.name}} · ¥{{item.priceLabel}}</view>
+        <view>{{item.name}} · {{item.priceLabel}}</view>
         <view class="card-sale-summary-use">{{item.usageLabel}}</view>
       </view>
       <view class="card-sale-summary-use">养护应付 ¥0.00；付款后自动发卡并扣次，含卡订单不退款</view>

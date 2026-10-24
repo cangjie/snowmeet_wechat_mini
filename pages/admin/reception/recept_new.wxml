@@ -96,7 +96,7 @@
       <view wx:if="{{cardSaleError}}" class="card-sale-retry" bindtap="onCardRecalculate">重新试算</view>
     </scroll-view>
     <view class="card-sale-footer">
-      <view class="card-sale-total">应付卡款 <text>¥{{cardSalePreview ? cardSalePreview.amountLabel : '--'}}</text></view>
+      <view class="card-sale-total">应付卡款 <text>{{cardSalePreview ? cardSalePreview.amountLabel : '--'}}</text></view>
       <button class="card-sale-confirm" bindtap="onCareCardConfirm" loading="{{cardSaleBusy}}" disabled="{{cardSaleBusy || cardSaleLoading || !cardSalePreview || !!cardSaleError}}">确认选卡</button>
     </view>
   </view>

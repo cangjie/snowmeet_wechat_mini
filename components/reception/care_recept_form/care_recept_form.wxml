@@ -248,7 +248,7 @@
   <view wx:if="{{hasCardSelection}}" class="care-card-summary">
     <view class="care-card-summary-title">本次购卡 <text class="care-card-remove" bindtap="onRemoveCards">移除购卡</text></view>
     <view wx:for="{{cardPreview.items}}" wx:key="lineNo" class="care-card-summary-item">
-      <view>{{item.name}} · ¥{{item.priceLabel}}</view>
+      <view>{{item.name}} · {{item.priceLabel}}</view>
       <view class="care-card-summary-tip">{{item.usageLabel}}</view>
       <view class="care-card-summary-tip">{{item.equipmentLabel}}</view>
     </view>
@@ -286,7 +286,7 @@
     <view class="checkout-bar">
       <view class="checkout-info">
         <view class="checkout-count">共 {{summary.count}} 件</view>
-        <text wx:if="{{hasCardSelection}}" class="checkout-rent">应付卡款 {{cardPreview ? '¥' + cardPreview.amountLabel : '待试算'}}</text>
+        <text wx:if="{{hasCardSelection}}" class="checkout-rent">应付卡款 {{cardPreview ? cardPreview.amountLabel : '待试算'}}</text>
         <text wx:else class="checkout-rent">合计 ¥{{summary.totalLabel}}</text>
       </view>
       <button

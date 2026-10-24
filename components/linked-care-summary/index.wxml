@@ -1,0 +1,19 @@
+<view class="care-summary">
+  <view class="care-summary-title">本单养护装备与项目</view>
+  <view wx:if="{{loading}}" class="care-summary-hint">正在加载养护内容…</view>
+  <view wx:elif="{{error}}" class="care-summary-error" bindtap="loadOrder">{{error}}</view>
+  <view wx:elif="{{!rows.length}}" class="care-summary-hint">暂无养护装备</view>
+  <view wx:for="{{rows}}" wx:for-item="care" wx:for-index="rowIndex" wx:key="id" class="care-summary-row">
+    <view class="care-summary-heading">
+      <text>{{care.title}}</text>
+      <text wx:if="{{care.cancelled}}" class="care-summary-cancelled">已取消</text>
+    </view>
+    <view wx:if="{{care.equipment}}" class="care-summary-equipment">{{care.equipment}}</view>
+    <view wx:if="{{care.serial}}" class="care-summary-hint">序列号：{{care.serial}}</view>
+    <view class="care-summary-projects">养护项目：{{care.projects}}</view>
+    <view wx:if="{{care.photos.length}}" class="care-summary-photos">
+      <image wx:for="{{care.photos}}" wx:key="url" class="care-summary-photo" mode="aspectFill" src="{{item.thumb}}"
+             data-row="{{rowIndex}}" data-index="{{index}}" bindtap="onPhotoTap" />
+    </view>
+  </view>
+</view>

@@ -1,7 +1,8 @@
 {
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index",
-    "van-uploader": "@vant/weapp/uploader/index"
+    "van-uploader": "@vant/weapp/uploader/index",
+    "linked-care-summary": "/components/linked-care-summary/index"
   },
   "navigationBarTitleText": "零售订单详情"
 }
