@@ -64,7 +64,7 @@ const methods = {
       if (!result.enabled) throw new Error('服务器尚未启用养护购卡，请先使用原有开单流程');
       const selected = this.data.careCardSelections;
       this.setData({ cardSaleProducts: (result.products || []).map(p => Object.assign({}, p, {
-        quantity: (selected.find(s => s.productId === p.id) || {}).quantity || 0,
+        quantity: selected.some(s => s.productId === p.id) ? 1 : 0,
         priceLabel: Number(p.price || 0).toFixed(2),
         ruleLabel: p.total == null ? '季卡 · 不限总次数' : p.total + '次',
         bindingLabel: p.requiresBinding ? '限本次绑定雪板' : '不绑定雪板',
@@ -75,18 +75,14 @@ const methods = {
     finally { this.setData({ cardSaleLoading: false }); }
   },
 
-  onCareCardQuantity(e) {
+  onCareCardToggle(e) {
     if (this.data.cardSaleBusy) return;
     const id = Number(e.currentTarget.dataset.id);
-    const delta = Number(e.currentTarget.dataset.delta);
     const target = this.data.cardSaleProducts.find(p => p.id === id);
-    if (!target || (delta > 0 && target.unavailable)) return;
+    if (!target || target.unavailable) return;
     const products = this.data.cardSaleProducts.map(p => Object.assign({}, p, {
-      quantity: p.id === id ? Math.max(0, Math.min(20, p.quantity + delta)) : (delta > 0 ? 0 : p.quantity)
+      quantity: p.id === id && !target.quantity ? 1 : 0
     }));
-    if (products.reduce((sum, p) => sum + p.quantity, 0) > 20) {
-      wx.showToast({ title: '最多购买20张', icon: 'none' }); return;
-    }
     this.setData({ cardSaleProducts: products });
     this.onCardRecalculate();
   },

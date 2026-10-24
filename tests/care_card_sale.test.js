@@ -127,13 +127,17 @@ test('下单响应丢失时恢复原零售订单，不重复开单', async t => 
   assert.equal(navigations[0], '/pages/payment/settle/index?orderId=40&careOrderId=20');
 });
 
-test('换卡自动清空其他品种数量，机打蜡季卡多装备时不可选', async t => {
+test('勾选仅购买一张，换卡取消其他勾选，再点取消；不可选季卡不响应', async t => {
   const { page } = setup(t); page.onCardRecalculate = async () => {};
-  page.data.cardSaleProducts = [{ id: 101, quantity: 2 }, { id: 102, quantity: 0 }, { id: 103, quantity: 0, unavailable: true }];
-  page.onCareCardQuantity({ currentTarget: { dataset: { id: 102, delta: 1 } } });
+  page.data.cardSaleProducts = [{ id: 101, quantity: 1 }, { id: 102, quantity: 0 }, { id: 103, quantity: 0, unavailable: true }];
+  page.onCareCardToggle({ currentTarget: { dataset: { id: 102 } } });
   assert.deepEqual(page.data.cardSaleProducts.map(p => p.quantity), [0, 1, 0]);
-  page.onCareCardQuantity({ currentTarget: { dataset: { id: 103, delta: 1 } } });
+  page.onCareCardToggle({ currentTarget: { dataset: { id: 103 } } });
   assert.deepEqual(page.data.cardSaleProducts.map(p => p.quantity), [0, 1, 0]);
+  page.onCareCardToggle({ currentTarget: { dataset: { id: 102 } } });
+  assert.deepEqual(page.data.cardSaleProducts.map(p => p.quantity), [0, 0, 0]);
+  page.onCareCardToggle({ currentTarget: { dataset: { id: 101 } } });
+  assert.deepEqual(page.data.cardSaleProducts.map(p => p.quantity), [1, 0, 0]);
 });
 
 test('单项修刃与热蜡互斥；新增装备继承双项默认；季卡不能再添装备', t => {

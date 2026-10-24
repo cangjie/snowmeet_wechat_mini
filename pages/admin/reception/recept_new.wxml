@@ -64,19 +64,19 @@
 <van-popup show="{{cardSaleShow}}" position="bottom" round bind:close="onCareCardClose" close-on-click-overlay="{{!cardSaleBusy}}">
   <view class="card-sale-popup">
     <view class="card-sale-heading"><text>添加养护卡类</text><text class="card-sale-close" bindtap="onCareCardClose">关闭</text></view>
-    <view class="card-sale-caption">每单只选一种卡，全部装备使用新购卡；确认后回开单页，点击去结算付款</view>
+    <view class="card-sale-caption">每单勾选一种卡，全部装备使用新购卡；确认后回开单页，点击去结算付款</view>
     <scroll-view scroll-y class="card-sale-scroll">
-      <view wx:for="{{cardSaleProducts}}" wx:key="id" class="card-sale-product">
+      <view wx:for="{{cardSaleProducts}}" wx:key="id"
+            class="card-sale-product {{item.quantity > 0 ? 'card-sale-product--selected' : ''}} {{item.unavailable ? 'card-sale-product--disabled' : ''}}"
+            data-id="{{item.id}}" bindtap="onCareCardToggle">
         <view class="card-sale-product-main">
           <view class="card-sale-name">{{item.name}}</view>
           <view class="card-sale-rule">{{item.ruleLabel}} · {{item.bindingLabel}}</view>
-          <view wx:if="{{item.unavailable}}" class="card-sale-error">仅一套装备时可选</view>
+          <view wx:if="{{item.unavailable}}" class="card-sale-unavailable">仅一套装备时可选</view>
           <view class="card-sale-price">¥{{item.priceLabel}}</view>
         </view>
-        <view class="card-sale-quantity">
-          <button class="card-sale-step" data-id="{{item.id}}" data-delta="-1" bindtap="onCareCardQuantity" disabled="{{cardSaleBusy || item.quantity === 0}}">−</button>
-          <text class="card-sale-number">{{item.quantity}}</text>
-          <button class="card-sale-step" data-id="{{item.id}}" data-delta="1" bindtap="onCareCardQuantity" disabled="{{cardSaleBusy || item.unavailable}}">＋</button>
+        <view class="card-sale-checkbox {{item.quantity > 0 ? 'card-sale-checkbox--checked' : ''}}">
+          <van-icon wx:if="{{item.quantity > 0}}" name="success" size="16px" color="#ffffff" />
         </view>
       </view>
       <view wx:if="{{!cardSaleProducts.length && !cardSaleLoading && !cardSaleError}}" class="card-sale-empty">暂无在售养护卡</view>
