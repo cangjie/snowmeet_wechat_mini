@@ -91,6 +91,9 @@
       </view>
     </view>
 
+    <!-- 未收款：去结算页收款 / 核销 -->
+    <view wx:if="{{payment.showGoPay}}" class="btn btn--primary btn--block" catchtap="onGoPay">{{payment.goPayLabel}}</view>
+
     <view class="divider"></view>
 
     <view class="payment-detail-toggle" bindtap="onTogglePayment">

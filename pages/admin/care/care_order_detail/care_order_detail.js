@@ -202,6 +202,17 @@ Page({
         pay_method: r.pay_method || (r.payment && r.payment.pay_method) || '',
       };
     });
+    // 收款入口（与零售详情页同口径）：有效、未生效、未关闭、没有成功收过款的单，跳通用结算页。
+    // 养护 0 元又未生效的单一定用了券/卡/储值抵扣（纯质保/招待 0 元单下单即生效），结算页走核销
+    const paid = Math.round((order.paidAmount || 0) * 100) / 100;
+    const unpaid = order.valid == 1 && order.dealed != 1 && order.closed != 1 && paid === 0;
+    const payingAmount = order.paying_amount || 0;
+    let goPayLabel = '去核销';
+    if (order.pay_with_deposit) {
+      goPayLabel = '去储值扣款 ' + util.showAmount(payingAmount);
+    } else if (payingAmount > 0) {
+      goPayLabel = '去收款 ' + util.showAmount(payingAmount);
+    }
     this.setData({
       order,
       // 编辑中保留草稿，防 onShow 等后台刷新把正在输入的内容冲掉
@@ -215,6 +226,8 @@ Page({
         canRefund: Math.round(((order.paidAmount || 0) - (order.refundAmount || 0)) * 100) / 100 > 0,
         payRows,
         refundRows,
+        showGoPay: unpaid,
+        goPayLabel,
       },
     });
     this._collectRunning(cares);
@@ -484,6 +497,13 @@ Page({
     this._uiState.expanded[care.id] = next;
     if (!next && this._scan && this._scan.careId === care.id) this._closeScan();
     this.setData({ ['cares[' + cidx + ']._expanded']: next });
+  },
+
+  // 「去收款」：跳通用结算页（与开单流程同一页）。付完或核销后返回本页，onShow 重新拉单，按钮自动消失
+  onGoPay() {
+    const order = this.data.order;
+    if (!order || !order.id) return;
+    wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + order.id });
   },
 
   onTogglePayment() {
