@@ -1,5 +1,16 @@
 <view class="page-root">
   <view class="main">
+    <view wx:if="{{careOrderId}}" class="card-sale-summary">
+      <view class="card-sale-summary-title">购卡并用于本次养护</view>
+      <view wx:for="{{cardPreview.items}}" wx:key="lineNo" class="card-sale-summary-item">
+        <view>{{item.name}} · ¥{{item.priceLabel}}</view>
+        <view class="card-sale-summary-use">{{item.usageLabel}}</view>
+      </view>
+      <view class="card-sale-summary-use">养护应付 ¥0.00；付款后自动发卡并扣次，含卡订单不退款</view>
+      <view wx:if="{{cardCompletionBusy}}" class="card-sale-summary-use">已收款，正在确认发卡和养护核销…</view>
+      <view wx:if="{{cardCompletionError}}" class="card-sale-processing-error">{{cardCompletionError}}</view>
+      <button wx:if="{{cardCompletionError}}" bindtap="onCardCompletionRetry" loading="{{cardCompletionBusy}}">重试处理</button>
+    </view>
     <order-summary-card wx:if="{{orderId}}" orderId="{{orderId}}"/>
     <order-payment wx:if="{{orderId}}" orderId="{{orderId}}" bind:paid="onPaid"/>
   </view>

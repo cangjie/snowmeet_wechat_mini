@@ -34,7 +34,7 @@
   <view class="card">
     <view class="sub-title-row">
       <view class="section-title">顾客信息</view>
-      <view wx:if="{{!contactEditing}}" class="edit-link" catchtap="onContactEditTap">
+      <view wx:if="{{!contactEditing && !order.careCardSale}}" class="edit-link" catchtap="onContactEditTap">
         <van-icon name="edit" size="14px" color="#006495"/>
         <text>编辑</text>
       </view>
@@ -83,7 +83,7 @@
   <view class="card">
     <view class="sub-title-row">
       <view class="section-title">零售内容</view>
-      <view wx:if="{{!retailEditing && retail}}" class="edit-link" catchtap="onRetailEditTap">
+      <view wx:if="{{!retailEditing && retail && !order.careCardSale}}" class="edit-link" catchtap="onRetailEditTap">
         <van-icon name="edit" size="14px" color="#006495"/>
         <text>编辑</text>
       </view>
@@ -166,6 +166,11 @@
   </view>
 
   <!-- D 支付信息 -->
+  <view wx:if="{{order.careCardSale}}" class="card">
+    <view class="kv-line"><text class="kv-line-label">购卡数量</text><text class="kv-line-value">{{order.retails.length}} 张</text></view>
+    <view class="pay-empty">含卡订单不退款；取消养护只返还实际扣减次数</view>
+    <view class="btn btn--plain btn--block" catchtap="onViewLinkedCare">查看关联养护单</view>
+  </view>
   <view class="card">
     <view class="section-title">支付信息</view>
     <view class="pay-summary-grid">

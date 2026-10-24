@@ -38,6 +38,12 @@
       shop="{{shop}}"
       memberId="{{customer.memberId}}"
       cares="{{order.cares}}"
+      cardPreview="{{careCardPreview}}"
+      cardError="{{careCardError}}"
+      cardBusy="{{cardSaleBusy}}"
+      hasCardSelection="{{careCardSelections.length > 0}}"
+      bind:addCard="onAddCareCard"
+      bind:removeCards="onRemoveCareCards"
       bind:syncCare="onSyncCare"
       bind:memberSwitch="onMemberSwitchByTicket"
       bind:checkout="onCheckout" />
@@ -53,5 +59,44 @@
   <!-- 接待 tabbar -->
   <reception-tabbar active="open" />
 </view>
+
+<van-popup show="{{cardSaleShow}}" position="bottom" round bind:close="onCareCardClose" close-on-click-overlay="{{!cardSaleBusy}}">
+  <view class="card-sale-popup">
+    <view class="card-sale-heading"><text>添加养护卡类</text><text class="card-sale-close" bindtap="onCareCardClose">关闭</text></view>
+    <view class="card-sale-caption">先选卡，按本单装备试算；付款后自动发卡并扣次</view>
+    <scroll-view scroll-y class="card-sale-scroll">
+      <view wx:for="{{cardSaleProducts}}" wx:key="id" class="card-sale-product">
+        <view class="card-sale-product-main">
+          <view class="card-sale-name">{{item.name}}</view>
+          <view class="card-sale-rule">{{item.ruleLabel}} · {{item.bindingLabel}}</view>
+          <view class="card-sale-price">¥{{item.priceLabel}}</view>
+        </view>
+        <view class="card-sale-quantity">
+          <button class="card-sale-step" data-id="{{item.id}}" data-delta="-1" bindtap="onCareCardQuantity" disabled="{{cardSaleBusy || item.quantity === 0}}">−</button>
+          <text class="card-sale-number">{{item.quantity}}</text>
+          <button class="card-sale-step" data-id="{{item.id}}" data-delta="1" bindtap="onCareCardQuantity" disabled="{{cardSaleBusy}}">＋</button>
+        </view>
+      </view>
+      <view wx:if="{{!cardSaleProducts.length && !cardSaleLoading && !cardSaleError}}" class="card-sale-empty">暂无在售养护卡</view>
+      <view wx:if="{{cardSalePreview}}" class="card-sale-trial">
+        <view class="card-sale-trial-title">本次试算</view>
+        <view wx:for="{{cardSalePreview.items}}" wx:key="lineNo" class="card-sale-trial-item">
+          <view>{{item.name}}</view>
+          <view class="card-sale-rule">{{item.serviceLabel}}</view>
+          <view class="card-sale-use">{{item.usageLabel}}</view>
+          <view class="card-sale-rule">{{item.equipmentLabel}}</view>
+        </view>
+        <view class="card-sale-rule">养护应付 ¥0.00；实际扣次在付款成功后进行</view>
+      </view>
+      <view wx:if="{{cardSaleLoading}}" class="card-sale-empty">正在加载或试算…</view>
+      <view wx:if="{{cardSaleError}}" class="card-sale-error">{{cardSaleError}}</view>
+      <view wx:if="{{cardSaleError}}" class="card-sale-retry" bindtap="onCardRecalculate">重新试算</view>
+    </scroll-view>
+    <view class="card-sale-footer">
+      <view class="card-sale-total">应付卡款 <text>¥{{cardSalePreview ? cardSalePreview.amountLabel : '--'}}</text></view>
+      <button class="card-sale-confirm" bindtap="onCareCardConfirm" loading="{{cardSaleBusy}}" disabled="{{cardSaleBusy || cardSaleLoading || !cardSalePreview || !!cardSaleError}}">确认并去结算</button>
+    </view>
+  </view>
+</van-popup>
 
 <admin-page-help />

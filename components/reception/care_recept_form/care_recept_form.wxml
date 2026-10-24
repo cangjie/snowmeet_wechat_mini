@@ -243,7 +243,18 @@
     </view>
   </block>
 
-  <!-- 底部固定区：添加入口 + 合计 / 去结算 -->
+  <view wx:if="{{hasCardSelection}}" class="care-card-summary">
+    <view class="care-card-summary-title">本次购卡 <text class="care-card-remove" bindtap="onRemoveCards">移除购卡</text></view>
+    <view wx:for="{{cardPreview.items}}" wx:key="lineNo" class="care-card-summary-item">
+      <view>{{item.name}} · ¥{{item.priceLabel}}</view>
+      <view class="care-card-summary-tip">{{item.usageLabel}}</view>
+      <view class="care-card-summary-tip">{{item.equipmentLabel}}</view>
+    </view>
+    <view wx:if="{{cardError}}" class="care-card-error">{{cardError}}</view>
+    <view class="care-card-summary-tip">养护由卡抵扣，应付卡款在付款成功后发卡并扣次</view>
+  </view>
+
+  <!-- 底部固定区：添加装备 → 添加卡类 → 合计 / 去结算 -->
   <view class="bottom-stack">
     <view class="action-bar">
       <view class="action-item action-item--wide" bindtap="onAddCare">
@@ -251,9 +262,15 @@
         <text>添加装备</text>
       </view>
     </view>
+    <view class="action-bar care-card-action">
+      <view class="action-item action-item--wide" bindtap="onAddCard">
+        <van-icon name="plus" size="16px" color="#006495"/>
+        <text>添加卡类{{hasCardSelection ? '（已选择）' : ''}}</text>
+      </view>
+    </view>
 
     <!-- 会员储值：会员且有余额时显示，店员勾选是否用储值（本期仅记录意向） -->
-    <view wx:if="{{hasDeposit}}" class="deposit-bar" bindtap="onToggleUseDeposit">
+    <view wx:if="{{hasDeposit && !hasCardSelection}}" class="deposit-bar" bindtap="onToggleUseDeposit">
       <view class="deposit-info">
         <text class="deposit-label">会员储值</text>
         <text class="deposit-amount">{{depositAvailableStr}}</text>
@@ -267,11 +284,12 @@
     <view class="checkout-bar">
       <view class="checkout-info">
         <view class="checkout-count">共 {{summary.count}} 件</view>
-        <text class="checkout-rent">合计 ¥{{summary.totalLabel}}</text>
+        <text wx:if="{{hasCardSelection}}" class="checkout-rent">应付卡款 {{cardPreview ? '¥' + cardPreview.amountLabel : '待试算'}}</text>
+        <text wx:else class="checkout-rent">合计 ¥{{summary.totalLabel}}</text>
       </view>
       <button
         class="checkout-btn {{!summary.canCheckout ? 'checkout-btn--disabled' : ''}}"
-        disabled="{{!summary.canCheckout}}"
+        disabled="{{!summary.canCheckout || cardBusy}}"
         bindtap="onCheckout">
         去结算
         <van-icon name="arrow" size="14px" color="#ffffff" custom-style="margin-left:4px"/>

@@ -47,7 +47,7 @@
     <view class="order-memo-block">
       <view class="sub-title-row">
         <text class="info-label">订单备注</text>
-        <view wx:if="{{!orderMemoEditing}}" class="edit-link edit-link--memo" catchtap="onOrderMemoEditTap">
+        <view wx:if="{{!orderMemoEditing && !order.careCardSale}}" class="edit-link edit-link--memo" catchtap="onOrderMemoEditTap">
           <van-icon name="edit" size="14px" color="#006495"/>
           <text>编辑</text>
         </view>
@@ -93,6 +93,7 @@
 
     <!-- 未收款：去结算页收款 / 核销 -->
     <view wx:if="{{payment.showGoPay}}" class="btn btn--primary btn--block" catchtap="onGoPay">{{payment.goPayLabel}}</view>
+    <view wx:if="{{order.careCardSale}}" class="btn btn--plain btn--block" catchtap="onViewCardPurchase">查看关联购卡单</view>
 
     <view class="divider"></view>
 
@@ -153,7 +154,7 @@
         <!-- 装备信息（只读 / 编辑二态） -->
         <view class="sub-title-row">
           <view class="section-title section-title--sub">装备信息</view>
-          <view wx:if="{{!care._editing}}" class="edit-link" data-cidx="{{cidx}}" catchtap="onEditTap">
+          <view wx:if="{{!care._editing && (!order.careCardSale || order.careCardSale.completed)}}" class="edit-link" data-cidx="{{cidx}}" catchtap="onEditTap">
             <van-icon name="edit" size="14px" color="#006495"/>
             <text>编辑</text>
           </view>

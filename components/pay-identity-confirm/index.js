@@ -11,6 +11,7 @@ Component({
     payerType: { type: String, value: 'wechat' },
     scannerId: { type: String, value: '' },
     status:    { type: String, value: '' },
+    proxyOnly: { type: Boolean, value: false },
     result:    { type: Object, value: null }
   },
 

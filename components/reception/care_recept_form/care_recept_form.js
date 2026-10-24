@@ -68,6 +68,10 @@ Component({
       observer(v) { this._loadDeposit(v); },
     },
     cares: { type: Array, value: [] },
+    cardPreview: { type: Object, value: null },
+    cardError: { type: String, value: '' },
+    cardBusy: { type: Boolean, value: false },
+    hasCardSelection: { type: Boolean, value: false },
   },
   data: {
     displayCares: [],
@@ -117,6 +121,15 @@ Component({
     },
   },
   methods: {
+    onAddCard() {
+      if (this.data.cardBusy) return;
+      const cares = this.data.displayCares || [];
+      if (!cares.length || cares.some(c => !c.equipment || (!(c.careImages || []).length && !(c.brand && c.scale)))) {
+        wx.showToast({ title: '请先完整填写装备信息', icon: 'none' }); return;
+      }
+      this.triggerEvent('addCard');
+    },
+    onRemoveCards() { this.triggerEvent('removeCards'); },
     /* ---------- 派生渲染数据 ---------- */
     _careKey(care, idx) {
       return care.id > 0 ? 'c' + care.id : 't' + (care.timeStamp || idx);
@@ -736,7 +749,8 @@ Component({
           c.card_name = card.card_name;
           // 限装备季卡：装备信息带入卡绑定值并锁定不可改（用户 2026-07-09 拍板；serial 暂不参与）
           const isSeason = !!(card.isSeason || card.total == null);
-          if (isSeason && card.equipBound) {
+          const needsBinding = isSeason && /打蜡|热蜡/.test(card.card_name || '');
+          if (needsBinding && card.equipBound) {
             if (c.equipment !== card.equip_type) {
               // 类型变化时与 onEquipTap 同口径：品牌/维修字典跟随切换，原维修选择作废
               c.repair_memo = null;
@@ -752,7 +766,7 @@ Component({
             // 季卡但三项装备信息为空 = 还没开卡。发卡/售卡时并不知道顾客拿哪块板来，
             // 第一次用它养护才绑定。这里**不锁装备**——本次录入的装备正是要写进卡的内容，
             // 订单生效时由服务端 EffectCareOrder 写入 punch_card 的 equip_* 三列。
-            c.card_pending_open = isSeason;
+            c.card_pending_open = needsBinding;
           }
         } else if (ticket) {
           c.use_card = false;

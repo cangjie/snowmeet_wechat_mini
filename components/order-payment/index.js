@@ -87,6 +87,7 @@ Component({
           if (!careWriteoff) { patch.isZeroAmount = true }
         }
         that.setData(patch)
+        if (order.careCardSale && order.paidAmount >= order.total_amount) that.markPaid(order)
       })
     },
 
@@ -153,6 +154,8 @@ Component({
             wx.showToast({ title: '核验成功', icon: 'success' })
             if (that._verifyPurpose === 'alipay') {
               that.showAlipayMiniQrCode()
+            } else if (that._verifyPurpose === 'other') {
+              that.onConfirmOtherPaid()
             } else {
               that._doWriteoff()
             }
@@ -190,7 +193,7 @@ Component({
         that.showWepayQrCode()
       } else if (method === 'alipay') {
         // 养护支付宝支付：先微信核验会员本人（wechat_unverified=1），核验通过后再出支付宝支付码
-        if (that.data.isCare && !(that.data.order && that.data.order.wechat_unverified)) {
+        if ((that.data.isCare || (that.data.order && that.data.order.careCardSale)) && !(that.data.order && that.data.order.wechat_unverified)) {
           that._openWechatVerify('alipay')
           return
         }
@@ -263,6 +266,10 @@ Component({
 
     onConfirmOtherPaid() {
       var that = this
+      if (that.data.order && that.data.order.careCardSale && !that.data.order.wechat_unverified) {
+        that._openWechatVerify('other')
+        return
+      }
       var payMethod = that.data.subPayMethod
       if (that.data.subPayMethodIndex === that.data.othersPayMethods.length - 1) {
         payMethod = that.data.inputedPayMethod

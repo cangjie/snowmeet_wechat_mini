@@ -124,6 +124,7 @@ Page({
     const paid = order.paidAmount || 0;
     const status = order.orderStatus || '';
     const unpaid = order.valid == 1 && order.dealed != 1 && order.closed != 1 && paid === 0;
+    const cardProcessing = !!order.careCardSale && order.dealed != 1 && order.closed != 1 && paid >= order.total_amount;
     const payingAmount = order.paying_amount || 0;
     const photos = (order.retailImages || []).map((im) => {
       const img = im.image || {};
@@ -149,15 +150,15 @@ Page({
       mi7: retail ? (retail.mi7_code || '') : '',
       retailType: (retail && retail.retail_type) || '未填',
       entertain,
-      amountStr: util.showAmount(retail ? retail.deal_price : order.total_amount),
+      amountStr: util.showAmount(order.careCardSale ? order.total_amount : (retail ? retail.deal_price : order.total_amount)),
       giveupScore: !!(retail && retail.giveup_score == 1),
       memo: (retail && retail.memo) || '',
       photos,
       // 收款入口：未收款的有效单都能去结算页（招待单 0 元 → 结算页「确认生效」）
-      showGoPay: unpaid,
-      goPayLabel: payingAmount > 0 ? ('去收款 ' + util.showAmount(payingAmount)) : '去确认生效',
+      showGoPay: unpaid || cardProcessing,
+      goPayLabel: cardProcessing ? '继续发卡核销' : payingAmount > 0 ? ('去收款 ' + util.showAmount(payingAmount)) : '去确认生效',
       // 金额只在未收款、非招待时可改（旧版口径：paying_amount 还在才可改）
-      canEditAmount: unpaid && !entertain,
+      canEditAmount: unpaid && !entertain && !order.careCardSale,
     };
     // 支付明细（与养护/租赁详情页同款）
     const payRows = (order.availablePayments || []).map((p) => {
@@ -212,7 +213,13 @@ Page({
   onGoPay() {
     const order = this.data.order;
     if (!order) return;
-    wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + order.id });
+    const sale = order.careCardSale;
+    wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + order.id
+      + (sale ? '&careOrderId=' + sale.careOrderId : '') });
+  },
+  onViewLinkedCare() {
+    const sale = this.data.order && this.data.order.careCardSale;
+    if (sale) wx.navigateTo({ url: '/pages/admin/care/care_order_detail/care_order_detail?id=' + sale.careOrderId });
   },
 
   /* ---------- 顾客信息编辑 ---------- */

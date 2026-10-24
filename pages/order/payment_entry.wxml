@@ -72,6 +72,7 @@
     wx:if="{{order.payStatus != '支付成功' && identity && identity.status && identity.status !== 'direct' && identity.status !== 'care_member_required'}}"
     payment-id="{{paymentId}}"
     payer-type="wechat"
+    proxy-only="{{order.type === '养护' || !!order.careCardSale}}"
     scanner-id="{{scannerId}}"
     status="{{identity.status}}"
     result="{{identity}}"

@@ -204,3 +204,12 @@
   flex-shrink: 0; padding: 12rpx 8rpx 12rpx 24rpx;
   display: flex; align-items: center;
 }
+/* 添加卡类增加一行固定操作，给滚动内容留足底部空间。 */
+.care-recept-form { padding-bottom: calc(265px + env(safe-area-inset-bottom)); }
+.care-card-action { border-top: 1px solid #e5eaf1; }
+.care-card-summary { margin: 16px; padding: 16px; background: #fff; border: 1px solid #bfc7d1; border-radius: 12px; }
+.care-card-summary-title { font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+.care-card-remove { color: #006495; font-size: 13px; padding: 8px 0 8px 16px; }
+.care-card-summary-item { padding: 12px 0; border-bottom: 1px solid #eef1f6; }
+.care-card-summary-tip { color: #6f7881; font-size: 12px; line-height: 1.6; margin-top: 4px; }
+.care-card-error { color: #a52a25; font-size: 13px; line-height: 1.5; padding: 8px 0; }

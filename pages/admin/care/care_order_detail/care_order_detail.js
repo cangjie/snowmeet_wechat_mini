@@ -208,7 +208,9 @@ Page({
     const unpaid = order.valid == 1 && order.dealed != 1 && order.closed != 1 && paid === 0;
     const payingAmount = order.paying_amount || 0;
     let goPayLabel = '去核销';
-    if (order.pay_with_deposit) {
+    if (order.careCardSale) {
+      goPayLabel = '去购卡结算';
+    } else if (order.pay_with_deposit) {
       goPayLabel = '去储值扣款 ' + util.showAmount(payingAmount);
     } else if (payingAmount > 0) {
       goPayLabel = '去收款 ' + util.showAmount(payingAmount);
@@ -503,7 +505,16 @@ Page({
   onGoPay() {
     const order = this.data.order;
     if (!order || !order.id) return;
-    wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + order.id });
+    const sale = order.careCardSale;
+    wx.navigateTo({ url: sale && sale.retailOrderId
+      ? '/pages/payment/settle/index?orderId=' + sale.retailOrderId + '&careOrderId=' + order.id
+      : '/pages/payment/settle/index?orderId=' + order.id });
+  },
+
+  onViewCardPurchase() {
+    const sale = this.data.order && this.data.order.careCardSale;
+    if (sale && sale.retailOrderId)
+      wx.navigateTo({ url: '/pages/admin/retail/retail_order_detail?id=' + sale.retailOrderId });
   },
 
   onTogglePayment() {

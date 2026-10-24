@@ -46,6 +46,8 @@
     ，请选择支付身份：
   </view>
   <view class="btn-row btn-row--vertical">
+    <!-- 养护及其关联购卡只能代付，订单和卡都归开单顾客。 -->
+    <block wx:if="{{!proxyOnly}}">
     <!-- 正常支付：无 cell → getPhoneNumber 触发软授权 -->
     <button wx:if="{{!result.scannerHasCell}}"
             class="btn btn-primary"
@@ -61,6 +63,7 @@
       正常支付（订单转归我）
     </button>
 
+    </block>
     <!-- 替人代付：无 cell → getPhoneNumber 触发软授权（回调里弹代付确认 modal） -->
     <button wx:if="{{!result.scannerHasCell}}"
             class="btn btn-secondary"

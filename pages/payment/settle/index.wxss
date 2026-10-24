@@ -44,3 +44,8 @@
   width: 100%;
   box-sizing: border-box;
 }
+.card-sale-summary { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #dce4ed; }
+.card-sale-summary-title { font-size: 16px; font-weight: 600; color: #003b5b; }
+.card-sale-summary-item { margin-top: 12px; font-size: 14px; line-height: 1.6; }
+.card-sale-summary-use { font-size: 12px; line-height: 1.6; color: #6f7881; margin-top: 4px; }
+.card-sale-processing-error { color: #a52a25; line-height: 1.6; font-size: 13px; margin: 12px 0; }

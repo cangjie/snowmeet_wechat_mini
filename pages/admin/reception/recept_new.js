@@ -8,6 +8,7 @@
 // 当前实现：租赁（rent-recept-form）、养护（care-recept-form）、零售（retail-recept-form）。
 const app = getApp();
 const util = require('../../../utils/util.js');
+const careCardSale = require('./care_card_sale.js');
 
 const BIZ_LABELS = { rent: '租赁', maintain: '养护', retail: '零售' };
 // 找回中断单时从 order.type 反推 bizType（URL/draft 里的 bizType 可能与单子实际业务不符）
@@ -23,6 +24,7 @@ function safeDecode(v) {
 
 Page({
   data: {
+    ...careCardSale.initialData,
     bizType: '',
     bizLabel: '',
     shop: '',
@@ -44,6 +46,8 @@ Page({
       cares: [],
     },
   },
+
+  ...careCardSale.methods,
 
   /* ---------- 生命周期 ---------- */
 
@@ -128,6 +132,7 @@ Page({
         'order.member_id': customer.memberId,
       });
     }
+    await this._restoreCareCardDraft();
   },
 
   onShow() {},
@@ -220,14 +225,17 @@ Page({
       'customer.gender': d.gender || '',
       'order.member_id': memberId,
     });
-    Promise.resolve(this.saveCareReceptOrder()).catch(() => {});
+    this._invalidateCareCardTrial();
+    Promise.resolve(this.saveCareReceptOrder()).then(() => this._refreshSavedCareCards()).catch(() => {});
   },
 
   onSyncCare(e) {
+    if (this._careCardSubmitting) return;
     const detail = e.detail || {};
     const cares = detail.cares || [];
     this.setData({ 'order.cares': cares });
-    Promise.resolve(this.saveCareReceptOrder()).catch(() => {});
+    this._invalidateCareCardTrial();
+    Promise.resolve(this.saveCareReceptOrder()).then(() => this._refreshSavedCareCards()).catch(() => {});
   },
 
   onAddAction(e) {
@@ -673,6 +681,7 @@ Page({
   // 养护去结算：await 落盘 → Order/PlaceCareOrder → settle，本地订单脱钩（同租赁 onCheckout 约定）
   // useDeposit：店员勾选的「使用储值支付」意向，随 PlaceCareOrder 落到订单（本期仅记录，扣款后续规划）
   _checkoutCare(useDeposit) {
+    if (this.data.careCardSelections.length) { this.onAddCareCard(); return; }
     const order = this.data.order;
     if (!order || !order.cares || order.cares.length === 0) {
       wx.showToast({ title: '购物车是空的', icon: 'none' });
