@@ -34,6 +34,7 @@
       bind:sortChange="onSortChange" />
 
     <care-recept-form
+      id="careForm"
       wx:if="{{bizType === 'maintain'}}"
       shop="{{shop}}"
       memberId="{{customer.memberId}}"
@@ -90,6 +91,12 @@
           <view class="card-sale-rule">{{item.equipmentLabel}}</view>
         </view>
         <view class="card-sale-rule">卡款 {{cardSalePreview.cardAmountLabel}} ＋ 养护费用 {{cardSalePreview.careAmountLabel}}；付款成功后发卡扣次</view>
+        <view wx:for="{{cardSalePreview.projects}}" wx:key="careId" class="card-sale-fee-detail">
+          <view>{{item.equipmentLabel}} · {{item.projectsLabel}}</view>
+          <view wx:if="{{item.hasServiceDifference}}">项目补费：{{item.serviceAmountLabel}} − {{item.cardCoveredAmountLabel}} ＝ {{item.commonChargeLabel}}</view>
+          <view wx:else>项目补费：{{item.commonChargeLabel}}</view>
+          <view>附加费 {{item.repairChargeLabel}}，减免 {{item.discountLabel}}，本件应付 {{item.amountLabel}}</view>
+        </view>
       </view>
       <view wx:if="{{cardSalePreview.errors.length}}" class="card-sale-error">确认选卡后，请补全每件装备的养护项目</view>
       <view wx:if="{{cardSaleLoading}}" class="card-sale-empty">正在加载或试算…</view>
@@ -97,6 +104,10 @@
       <view wx:if="{{cardSaleError}}" class="card-sale-retry" bindtap="onCardRecalculate">重新试算</view>
     </scroll-view>
     <view class="card-sale-footer">
+      <view wx:if="{{cardSalePreview}}" class="card-sale-fee-summary">
+        <view>卡款 {{cardSalePreview.cardAmountLabel}} ＋ 养护费用 {{cardSalePreview.careAmountLabel}}</view>
+        <view wx:if="{{cardSalePreview.singleServiceDifference}}">项目补费：{{cardSalePreview.singleServiceDifference}}</view>
+      </view>
       <view class="card-sale-total">应付合计 <text>{{cardSalePreview ? cardSalePreview.amountLabel : '--'}}</text></view>
       <button class="card-sale-confirm" bindtap="onCareCardConfirm" loading="{{cardSaleBusy}}" disabled="{{cardSaleBusy || cardSaleLoading || !cardSalePreview || !!cardSaleError}}">确认选卡</button>
     </view>

@@ -287,11 +287,12 @@
       <view class="checkout-info">
         <view class="checkout-count">共 {{summary.count}} 件</view>
         <text wx:if="{{hasCardSelection}}" class="checkout-rent">应付合计 {{cardPreview ? cardPreview.amountLabel : '待试算'}}</text>
-        <text wx:else class="checkout-rent">合计 ¥{{summary.totalLabel}}</text>
+        <text wx:else class="checkout-rent">合计 {{pricePending ? '计算中…' : priceError ? '计价失败' : '¥' + summary.totalLabel}}</text>
+        <text wx:if="{{priceError && !hasCardSelection}}" bindtap="onRetryPrices">重新计算</text>
       </view>
       <button
         class="checkout-btn {{!summary.canCheckout ? 'checkout-btn--disabled' : ''}}"
-        disabled="{{!summary.canCheckout || cardBusy || autoTicketCheckout}}"
+        disabled="{{!summary.canCheckout || cardBusy || autoTicketCheckout || (!hasCardSelection && (pricePending || priceError))}}"
         loading="{{autoTicketCheckout}}"
         bindtap="onCheckout">
         去结算

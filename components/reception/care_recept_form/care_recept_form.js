@@ -82,6 +82,8 @@ Component({
   data: {
     displayCares: [],
     autoTicketCheckout: false,
+    pricePending: false,
+    priceError: false,
     summary: { count: 0, totalLabel: '0.00', canCheckout: false },
     // 会员储值（会员且有余额时结算条上方显示 + 「使用储值」复选框；本期仅记录意向，实际扣款后续规划）
     hasDeposit: false,
@@ -105,7 +107,8 @@ Component({
   },
   observers: {
     cares() { this._refreshCares(); },
-    'hasCardSelection, cardBusy, cardSubmitted'() { this._scheduleOldCustomerTicket(); },
+    'shop, memberId'() { this._scheduleAllCarePrices(); },
+    'hasCardSelection, cardBusy, cardSubmitted'() { this._scheduleOldCustomerTicket(); this._scheduleAllCarePrices(); },
   },
   lifetimes: {
     attached() {
@@ -322,7 +325,7 @@ Component({
       this.triggerEvent('syncCare', { cares, needUpdate: !!needUpdate });
     },
     // 修改某个 care 的字段后：写回 cares 数组 → 刷新派生 → 同步
-    _mutate(cidx, mutator, needUpdate = true) {
+    _mutate(cidx, mutator, needUpdate = true, recalculate = true) {
       if (this.data.cardSubmitted || this.data.cardBusy) return;
       const cares = (this.data.cares || []).slice();
       if (!cares[cidx]) return;
@@ -331,8 +334,60 @@ Component({
       cares[cidx] = care;
       this.data.cares = cares;
       this._refreshCares();
+      if (recalculate) this._scheduleCarePrice(cidx);
       this._emitSync(needUpdate);
     },
+    _priceIdentity(care, index) {
+      return { id: care.id || 0, timeStamp: care.timeStamp, key: care._key || this._careKey(care, index) };
+    },
+    _findPriceCare(identity) {
+      return this.data.displayCares.findIndex((c, i) => identity.id > 0 ? c.id === identity.id
+        : identity.timeStamp ? c.timeStamp === identity.timeStamp : (c._key || this._careKey(c, i)) === identity.key);
+    },
+    _trackCarePrice(promise) {
+      const work = Promise.resolve(promise);
+      const jobs = this._carePriceWork || (this._carePriceWork = new Set());
+      jobs.add(work);
+      if (!this._ticketAutoDetached) this.setData({ pricePending: true });
+      const done = () => {
+        jobs.delete(work);
+        if (!this._ticketAutoDetached) this.setData({ pricePending: jobs.size > 0 });
+      };
+      work.then(done, done);
+      return work;
+    },
+    _scheduleCarePrice(cidx) {
+      if (this._ticketAutoDetached || !this.data.shop || this.data.newCardMode || this.data.hasCardSelection
+        || this.data.cardBusy || this.data.cardSubmitted) return;
+      const care = this.data.displayCares[cidx];
+      if (!care) return;
+      const identity = this._priceIdentity(care, cidx);
+      const queued = this._queuedCarePrices || (this._queuedCarePrices = {});
+      if (queued[identity.key]) return queued[identity.key].promise;
+      const record = { identity };
+      queued[identity.key] = record;
+      this._priceSeqMap = this._priceSeqMap || {};
+      this._priceSeqMap[identity.key] = this._priceSeqCounter = (this._priceSeqCounter || 0) + 1;
+      record.promise = this._trackCarePrice(Promise.resolve().then(() => {
+        if (queued[identity.key] !== record || this._ticketAutoDetached) return;
+        delete queued[identity.key];
+        const index = this._findPriceCare(identity);
+        if (index >= 0) return this._fetchPrice(index);
+      }).catch(() => { if (!this._ticketAutoDetached) this.setData({ priceError: true }); }));
+      return record.promise;
+    },
+    _scheduleAllCarePrices() {
+      (this.data.displayCares || []).forEach((c, i) => this._scheduleCarePrice(i));
+    },
+    async waitForPrices() {
+      await Promise.resolve(); // 先启动当前事件内合并的计价任务。
+      while (!this._ticketAutoDetached && !this.data.newCardMode && !this.data.hasCardSelection
+        && this._carePriceWork && this._carePriceWork.size) {
+        await Promise.all(Array.from(this._carePriceWork));
+      }
+      if (this.data.priceError && !this.data.hasCardSelection) throw new Error('养护计价失败，请重新计算');
+    },
+    onRetryPrices() { this._scheduleAllCarePrices(); },
     /* ---------- 计费（服务端计算，与 PlaceCareOrder 共用 CareController.CalcCharge；
        附加费/减免由 computeCharge 在服务费之上累加）。
        opts.derive=true（换券/换卡时传）：服务项由服务端按新选择推导；
@@ -344,18 +399,21 @@ Component({
       const changed = (opts && opts.changed) || null;
       const care = this.data.displayCares[cidx];
       if (!care) return;
+      const identity = this._priceIdentity(care, cidx);
+      if (this._queuedCarePrices) delete this._queuedCarePrices[identity.key];
       // 提交剥离 UI 字段的 care（含项目/券码/use_card/summer 等），导航对象与照片置空瘦身
       const payload = this._stripUI(care);
       payload.ticket = null;
       payload.product = null;
       payload.careImages = null;
       // 防竞态：按卡片 key 记序号，过期响应丢弃；响应时按 key 反查下标（防中途增删卡片下标漂移）
-      const key = care._key || 'i' + cidx;
+      const key = identity.key;
       this._priceSeqMap = this._priceSeqMap || {};
       const seq = (this._priceSeqCounter || 0) + 1;
       this._priceSeqCounter = seq;
       this._priceSeqMap[key] = seq;
-      if (this.data.newCardMode) return; // 购卡项目由整单试算返回卡外服务费，附加费与卡款合并收取。
+      if (this._ticketAutoDetached || this.data.newCardMode || this.data.hasCardSelection) return;
+      this.setData({ priceError: false });
       // 全量状态整包提交（用户 2026-07-09 拍板）：店铺/会员 + care 内装备/服务/券码/卡(card_id,card_name)/附加费。
       // 卡选择跟着单件装备（care）走，卡信息只在 care 内、不设平级字段
       const req = {
@@ -365,13 +423,14 @@ Component({
         changedField: changed,
         care: payload,
       };
-      return data.calcCareChargePromise(req, app.globalData.sessionKey)
+      return this._trackCarePrice(data.calcCareChargePromise(req, app.globalData.sessionKey)
         .then((res) => {
-          if (that.data.newCardMode || that.data.hasCardSelection) return;
+          if (that._ticketAutoDetached || that.data.newCardMode || that.data.hasCardSelection) return;
           if ((Number(that.data.memberId) || 0) !== (Number(req.memberId) || 0)) return;
-          if (that._priceSeqMap[key] !== seq) return;
-          const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
+          const idx = that._findPriceCare(identity);
           if (idx < 0) return;
+          const currentKey = that.data.displayCares[idx]._key;
+          if (Math.max(that._priceSeqMap[key] || 0, that._priceSeqMap[currentKey] || 0) !== seq) return;
           const rc = res && res.care;
           that._mutate(idx, (c) => {
             c.product = null;
@@ -391,16 +450,17 @@ Component({
             } else {
               c.common_charge = (res && res.commonCharge) || 0;
             }
-          });
+          }, true, false);
         })
         .catch(() => {
-          if (that.data.newCardMode || that.data.hasCardSelection) return;
+          if (that._ticketAutoDetached || that.data.newCardMode || that.data.hasCardSelection) return;
           if ((Number(that.data.memberId) || 0) !== (Number(req.memberId) || 0)) return;
-          if (that._priceSeqMap[key] !== seq) return;
-          const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
+          const idx = that._findPriceCare(identity);
           if (idx < 0) return;
-          that._mutate(idx, (c) => { c.common_charge = 0; });
-        });
+          const currentKey = that.data.displayCares[idx]._key;
+          if (Math.max(that._priceSeqMap[key] || 0, that._priceSeqMap[currentKey] || 0) !== seq) return;
+          that.setData({ priceError: true });
+        }));
     },
     /* ---------- 卡片开合 / 增删 ---------- */
     onToggleCare(e) {
@@ -425,6 +485,7 @@ Component({
       cares.push(care);
       this.data.cares = cares;
       this._refreshCares();
+      this._scheduleCarePrice(cares.length - 1);
       this._emitSync(true);
     },
     onDeleteCare(e) {
@@ -1097,12 +1158,13 @@ Component({
       try {
         await this._autoSelectOldCustomerTicket();
         await this._oldCustomerPricePromise;
+        await this.waitForPrices();
         if (this._ticketAutoDetached || this.data.cardBusy || !this.data.summary.canCheckout) return;
         const cares = this.data.displayCares.map((c) => this._stripUI(c));
         // 自动选券及优惠计价完成后再提交，避免列表晚到时按原价结算。
         this.triggerEvent('checkout', { cares, useDeposit: this.data.useDeposit });
       } catch (e) {
-        wx.showToast({ title: '优惠券加载失败，请重试', icon: 'none' });
+        wx.showToast({ title: '优惠或计价未完成，请重试', icon: 'none' });
       } finally {
         if (!this._ticketAutoDetached) this.setData({ autoTicketCheckout: false });
       }

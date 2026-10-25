@@ -194,7 +194,9 @@ Page({
     if (this.data.bizType === 'rent') {
       Promise.resolve(this.saveRentReceptOrder()).catch(() => {});
     } else if (this.data.bizType === 'maintain') {
-      Promise.resolve(this.saveCareReceptOrder()).catch(() => {});
+      this._invalidateCareCardTrial();
+      const revision = this._careCardRevision;
+      Promise.resolve(this.saveCareReceptOrder()).then(() => this._refreshSavedCareCards(revision)).catch(() => {});
     }
   },
 
@@ -230,7 +232,8 @@ Page({
       'order.member_id': memberId,
     });
     this._invalidateCareCardTrial();
-    Promise.resolve(this.saveCareReceptOrder()).then(() => this._refreshSavedCareCards()).catch(() => {});
+    const revision = this._careCardRevision;
+    Promise.resolve(this.saveCareReceptOrder()).then(() => this._refreshSavedCareCards(revision)).catch(() => {});
   },
 
   onSyncCare(e) {
@@ -239,7 +242,8 @@ Page({
     const cares = detail.cares || [];
     this.setData({ 'order.cares': cares });
     this._invalidateCareCardTrial();
-    Promise.resolve(this.saveCareReceptOrder()).then(() => this._refreshSavedCareCards()).catch(() => {});
+    const revision = this._careCardRevision;
+    Promise.resolve(this.saveCareReceptOrder()).then(() => this._refreshSavedCareCards(revision)).catch(() => {});
   },
 
   onAddAction(e) {

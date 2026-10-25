@@ -8,6 +8,10 @@ const initialData = {
 
 const methods = {
   _cardApi(action, body, orderId) { return cards.request(action, body, orderId); },
+  async _waitCarePricing() {
+    const form = typeof this.selectComponent === 'function' && this.selectComponent('#careForm');
+    if (form && typeof form.waitForPrices === 'function') await form.waitForPrices();
+  },
 
   async _restoreCareCardDraft() {
     if (this.data.bizType !== 'maintain' || !this.data.order.id) return;
@@ -47,15 +51,19 @@ const methods = {
   _invalidateCareCardTrial() {
     this._careCardRevision = (this._careCardRevision || 0) + 1;
     if (this.data.careCardSelections.length) this.setData({ careCardPreview: null, careCardError: '装备或项目已变更，正在重新试算' });
-    if (this.data.cardSaleShow) this.setData({ cardSalePreview: null });
+    if (this.data.cardSaleShow) this.setData({ cardSalePreview: null, cardSaleError: '',
+      cardSaleLoading: cards.selections(this.data.cardSaleProducts).length > 0 });
   },
 
-  async _refreshSavedCareCards() {
+  async _refreshSavedCareCards(expectedRevision) {
+    if (expectedRevision != null && expectedRevision !== this._careCardRevision) return;
     if (this._careCardSubmitting || this.data.careCardSubmitted) return;
     if (this.data.cardSaleShow) { await this.onCardRecalculate(); return; }
     if (!this.data.careCardSelections.length) return;
     const revision = this._careCardRevision;
     try {
+      await this._waitCarePricing();
+      if (revision !== this._careCardRevision) return;
       const preview = await this._cardApi('SaveDraft', { orderId: this.data.order.id, selections: this.data.careCardSelections });
       if (revision !== this._careCardRevision) return;
       this._applyCareCardPreview(preview);
@@ -71,6 +79,7 @@ const methods = {
     if (!(this.data.order.cares || []).length) { wx.showToast({ title: '请先添加装备', icon: 'none' }); return; }
     this.setData({ cardSaleShow: true, cardSaleLoading: true, cardSaleError: '', cardSalePreview: null });
     try {
+      await this._waitCarePricing();
       await this.saveCareReceptOrder();
       const result = await this._cardApi('GetProducts');
       if (!result.enabled) throw new Error('服务器尚未启用养护购卡，请先使用原有开单流程');
@@ -78,7 +87,8 @@ const methods = {
       this.setData({ cardSaleProducts: (result.products || []).map(p => Object.assign({}, p, {
         quantity: selected.some(s => s.productId === p.id) ? 1 : 0,
         priceLabel: Number(p.price || 0).toFixed(2),
-        ruleLabel: p.total == null ? '季卡 · 不限总次数' : p.total + '次',
+        ruleLabel: (p.total == null ? '季卡 · 不限总次数' : p.total + '次') + ' · '
+          + ({ single: '单项', dual: '双项', machine: '机打蜡', wax: '热蜡' }[cards.serviceMode(p)] || ''),
         bindingLabel: p.requiresBinding ? '限本次绑定雪板' : '不绑定雪板',
         unavailable: cards.serviceMode(p) === 'machine' && this.data.order.cares.length !== 1
       })) });
@@ -106,6 +116,7 @@ const methods = {
     this.setData({ cardSaleLoading: true, cardSalePreview: null, cardSaleError: '' });
     if (!selected.length) { this.setData({ cardSaleLoading: false }); return; }
     try {
+      await this._waitCarePricing();
       await this.saveCareReceptOrder();
       if (revision !== this._careCardRevision) return;
       const preview = await this._cardApi('Preview', { orderId: this.data.order.id, selections: selected });
@@ -129,6 +140,7 @@ const methods = {
     if (this.data.careCardSubmitted) { wx.showToast({ title: '本单已提交，请继续结算', icon: 'none' }); return; }
     this.setData({ cardSaleBusy: true });
     try {
+      await this._waitCarePricing();
       await this.saveCareReceptOrder();
       await this._cardApi('SaveDraft', { orderId: this.data.order.id, selections: [] });
       this._hadCareCardDraft = false;
@@ -144,6 +156,7 @@ const methods = {
     this._careCardSubmitting = true;
     this.setData({ cardSaleBusy: true });
     try {
+      await this._waitCarePricing();
       await this.saveCareReceptOrder();
       const orderId = this.data.order.id;
       const saved = await this._cardApi('SaveDraft', { orderId, selections: selected });
@@ -171,6 +184,7 @@ const methods = {
         await this._openCareCardSettlement(this._careCardSettlement.orderId, this._careCardSettlement.careOrderId);
         return;
       }
+      await this._waitCarePricing();
       await this.saveCareReceptOrder();
       const displayed = this.data.careCardPreview;
       const orderId = this.data.order.id;
