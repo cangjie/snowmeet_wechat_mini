@@ -16,7 +16,13 @@ const methods = {
       if (this._careCardPageUnloaded) return;
       this._hadCareCardDraft = !!(draft.selections && draft.selections.length);
       this.setData({ careCardSelections: draft.selections || [] });
-      if (this._hadCareCardDraft) this._applyCareCardPreview(draft.preview);
+      if (this._hadCareCardDraft) {
+        if (draft.retailOrderId) {
+          // 已提交单保留真实发卡/核销引用，恢复结算只更新展示，不重新清卡。
+          this.setData({ careCardMode: cards.serviceMode(draft.preview.items && draft.preview.items[0]),
+            careCardPreview: cards.displayPreview(draft.preview, this.data.order.cares) });
+        } else this._applyCareCardPreview(draft.preview);
+      }
       if (draft.retailOrderId) {
         this._rememberCareCardSettlement(draft.retailOrderId, draft.careOrderId);
         this.setData({ careCardError: '订单已提交，请点击去结算继续付款' });
@@ -28,11 +34,11 @@ const methods = {
     const projects = preview.projects || [];
     const cares = this.data.order.cares.map(c => {
       const project = projects.find(p => p.careId === c.id);
-      if (!project) return c;
-      const { careId, ...flags } = project;
+      const { careId, ...flags } = project || {};
       return Object.assign({}, c, flags, { use_card: false, card_id: null, card_name: null,
         ticket_code: null, ticket: null, card_equip_lock: false, card_pending_open: false,
-        common_charge: project.common_charge || 0, discount: project.discount || 0, ticket_discount: 0 });
+        common_charge: project ? project.common_charge || 0 : c.common_charge || 0,
+        discount: project ? project.discount || 0 : c.discount || 0, ticket_discount: 0 });
     });
     this.setData({ 'order.cares': cares, careCardMode: cards.serviceMode(preview.items && preview.items[0]),
       careCardPreview: cards.displayPreview(preview, cares), careCardError: (preview.errors || []).join('；') });

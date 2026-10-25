@@ -367,6 +367,7 @@ Component({
       };
       return data.calcCareChargePromise(req, app.globalData.sessionKey)
         .then((res) => {
+          if (that.data.newCardMode || that.data.hasCardSelection) return;
           if ((Number(that.data.memberId) || 0) !== (Number(req.memberId) || 0)) return;
           if (that._priceSeqMap[key] !== seq) return;
           const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
@@ -393,6 +394,7 @@ Component({
           });
         })
         .catch(() => {
+          if (that.data.newCardMode || that.data.hasCardSelection) return;
           if ((Number(that.data.memberId) || 0) !== (Number(req.memberId) || 0)) return;
           if (that._priceSeqMap[key] !== seq) return;
           const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);

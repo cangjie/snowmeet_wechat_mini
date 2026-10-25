@@ -133,3 +133,18 @@ test('立即去结算等待自动选券和优惠计价完成，重复点击只�
   assert.equal(events[0].detail.cares[0].discount, 20);
   assert.equal(form.data.autoTicketCheckout, false);
 });
+
+test('捆绑次卡清空旧券后，迟到的普通计价不能恢复旧券优惠', async t => {
+  let priceReady;
+  const { form } = setup(t, async () => [ticket('OLD')], [care(1)],
+    req => new Promise(resolve => { priceReady = () => resolve({ care: { ...req.care, common_charge: 100, discount: 20 } }); }));
+  form._refreshCares(); await settle();
+  assert.equal(form.data.displayCares[0].ticket_code, 'OLD');
+  form.data.newCardMode = 'dual'; form.data.hasCardSelection = true;
+  form.data.cares = [care(1, { ticket_code: null, ticket: null, discount: 0, common_charge: 0 })];
+  form._refreshCares();
+  priceReady(); await settle();
+  assert.equal(form.data.displayCares[0].ticket_code, null);
+  assert.equal(form.data.displayCares[0].discount, 0);
+  assert.equal(form.data.displayCares[0].common_charge, 0);
+});

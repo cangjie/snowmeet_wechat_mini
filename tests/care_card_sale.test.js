@@ -209,6 +209,7 @@ test('两种跳转都失败时保留单项卡与装备，重试仅打开原订�
 
 test('找回已提交的购卡单后继续打开原结算，不覆盖为草稿', async t => {
   const { page, navigations } = setup(t);
+  Object.assign(page.data.order.cares[0], { use_card: true, card_id: 75, card_name: '本单已发的新卡' });
   const selections = [{ productId: 101, quantity: 1 }];
   page._cardApi = async action => {
     assert.equal(action, 'GetDraft');
@@ -217,8 +218,31 @@ test('找回已提交的购卡单后继续打开原结算，不覆盖为草稿',
   await page._restoreCareCardDraft();
   page.saveCareReceptOrder = async () => { throw new Error('不得重存已提交订单'); };
   assert.equal(page.data.careCardSubmitted, true);
+  assert.equal(page.data.order.cares[0].card_id, 75);
   await page._checkoutCare(false);
   assert.equal(navigations[0], '/pages/payment/settle/index?orderId=40&careOrderId=20');
+});
+
+test('确认捆绑次卡后清空全部装备的旧券卡与绑板状态，保留装备和维修', async t => {
+  const { page } = setup(t);
+  Object.assign(page.data.order.cares[0], { ticket_code: 'OLD-TICKET', ticket: { code: 'OLD-TICKET' }, ticket_discount: 30 });
+  page.data.order.cares.push({ id: 31, equipment: '单板', brand: '旧品牌', scale: '155', need_wax: 1,
+    use_card: true, card_id: 88, card_name: '旧卡', card_equip_lock: true, card_pending_open: true,
+    need_repair: 1, repair_memo: '维修', repair_charge: 5 });
+  const trial = preview();
+  trial.projects = [{ careId: 30, need_edge: 1, need_wax: 1, common_charge: 0, discount: 0 }];
+  page.setData({ cardSaleShow: true, cardSaleProducts: [{ id: 101, quantity: 1 }], cardSalePreview: trial });
+  page._cardApi = async action => { assert.equal(action, 'SaveDraft'); return trial; };
+  await page.onCareCardConfirm();
+  for (const c of page.data.order.cares) {
+    assert.equal(c.ticket_code, null); assert.equal(c.ticket, null); assert.equal(c.ticket_discount, 0);
+    assert.equal(c.use_card, false); assert.equal(c.card_id, null); assert.equal(c.card_name, null);
+    assert.equal(c.card_equip_lock, false); assert.equal(c.card_pending_open, false);
+  }
+  assert.equal(page.data.order.cares[1].equipment, '单板');
+  assert.equal(page.data.order.cares[1].brand, '旧品牌');
+  assert.equal(page.data.order.cares[1].repair_charge, 5);
+  assert.equal(page.data.cardSaleShow, false);
 });
 
 test('勾选仅购买一张，换卡取消其他勾选，再点取消；不可选季卡不响应', async t => {
