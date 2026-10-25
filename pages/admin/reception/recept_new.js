@@ -136,6 +136,7 @@ Page({
   },
 
   onShow() {},
+  onUnload() { this._careCardPageUnloaded = true; this._careCardRevision = (this._careCardRevision || 0) + 1; },
 
   // 建单/存草稿请求附带的参数。isTest：顾客信息页勾了「这是测试订单」，订单记为测试单（order.is_test=1）。
   // 顾客开单前扫码报到过的，后端自己查到后把订单记为「已核验本人」，这里不用带
@@ -157,6 +158,7 @@ Page({
   // 顶部顾客条按手机号匹配到会员。只给散客挂会员：已有会员（扫码识别 / 找回的单）不被手机号改挂，
   // 否则扫码顾客的手机号若登记在别的会员名下，订单会挂错人、顾客手机等不到付款页
   onMemberInfoFound(e) {
+    if (this.data.careCardSubmitted) return;
     const memberId = e && e.detail && e.detail.memberId;
     if (!memberId) return;
     if (this.data.customer && this.data.customer.memberId) return;
@@ -176,6 +178,7 @@ Page({
 
   // 顶部顾客条「编辑」：散客填姓名/性别/电话（都选填），会员补姓名/性别
   onCustomerChange(e) {
+    if (this.data.careCardSubmitted) return;
     const d = e.detail || {};
     this.setData({
       'customer.name': d.name || '',
@@ -215,6 +218,7 @@ Page({
    * 姓名和手机号一起换，否则顶部会员条会停在原顾客身上。
    */
   onMemberSwitchByTicket(e) {
+    if (this.data.careCardSubmitted) return;
     const d = e.detail || {};
     const memberId = Number(d.memberId || 0) || null;
     if (!memberId || this.data.customer.memberId === memberId) return;
@@ -230,7 +234,7 @@ Page({
   },
 
   onSyncCare(e) {
-    if (this._careCardSubmitting) return;
+    if (this._careCardSubmitting || this.data.careCardSubmitted) return;
     const detail = e.detail || {};
     const cares = detail.cares || [];
     this.setData({ 'order.cares': cares });
@@ -572,6 +576,7 @@ Page({
    * 供 _checkoutCare await。
    */
   saveCareReceptOrder() {
+    if (this.data.careCardSubmitted) return Promise.resolve(this.data.order);
     const that = this;
     if (this._careSaveInFlight) {
       if (!this._careSaveQueued) {

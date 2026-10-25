@@ -71,6 +71,7 @@ Component({
     cardPreview: { type: Object, value: null },
     cardError: { type: String, value: '' },
     cardBusy: { type: Boolean, value: false },
+    cardSubmitted: { type: Boolean, value: false },
     hasCardSelection: { type: Boolean, value: false },
     newCardMode: { type: String, value: '', observer(mode, previous) {
       this._priceSeqMap = {}; // 丢弃选卡之前仍在飞的普通计价响应。
@@ -313,6 +314,7 @@ Component({
     },
     // 修改某个 care 的字段后：写回 cares 数组 → 刷新派生 → 同步
     _mutate(cidx, mutator, needUpdate = true) {
+      if (this.data.cardSubmitted || this.data.cardBusy) return;
       const cares = (this.data.cares || []).slice();
       if (!cares[cidx]) return;
       const care = { ...this.data.displayCares[cidx] };
@@ -397,6 +399,7 @@ Component({
       this._refreshCares();
     },
     onAddCare() {
+      if (this.data.cardSubmitted || this.data.cardBusy) return;
       const cares = (this.data.cares || []).slice();
       if (this.data.newCardMode === 'machine' && cares.length) {
         wx.showToast({ title: '机打蜡季卡仅限一套装备，请先更换卡类', icon: 'none' }); return;
@@ -412,6 +415,7 @@ Component({
       this._emitSync(true);
     },
     onDeleteCare(e) {
+      if (this.data.cardSubmitted || this.data.cardBusy) return;
       const that = this;
       const cidx = Number(e.currentTarget.dataset.idx);
       const care = this.data.displayCares[cidx];

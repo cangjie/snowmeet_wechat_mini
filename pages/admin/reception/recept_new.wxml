@@ -42,6 +42,7 @@
       cardPreview="{{careCardPreview}}"
       cardError="{{careCardError}}"
       cardBusy="{{cardSaleBusy}}"
+      cardSubmitted="{{careCardSubmitted}}"
       hasCardSelection="{{careCardSelections.length > 0}}"
       bind:addCard="onAddCareCard"
       bind:removeCards="onRemoveCareCards"

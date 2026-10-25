@@ -9,7 +9,7 @@ function setup(t) {
   const oldWx = global.wx;
   const toasts = [], navigations = [];
   global.getApp = () => ({ globalData: { requestPrefix: 'https://test.invalid/api/', sessionKey: 'test' }, loginPromiseNew: Promise.resolve() });
-  global.wx = { showToast: x => toasts.push(x.title), navigateTo: x => navigations.push(x.url) };
+  global.wx = { showToast: x => toasts.push(x.title), navigateTo: x => { navigations.push(x.url); if (x.success) x.success(); } };
   t.after(() => { global.getApp = oldApp; global.wx = oldWx; });
   const page = loadPage('pages/admin/reception/recept_new.js', {});
   Object.assign(page.data, { bizType: 'maintain', customer: { memberId: 10 },
@@ -124,6 +124,100 @@ test('下单响应丢失时恢复原零售订单，不重复开单', async t => 
   };
   await page._checkoutCare(false);
   assert.deepEqual(actions, ['SaveDraft', 'Submit', 'GetDraft']);
+  assert.equal(navigations[0], '/pages/payment/settle/index?orderId=40&careOrderId=20');
+});
+
+function singlePreview() {
+  const result = preview();
+  result.items[0].name = '单项10次卡';
+  result.items[0].projectCount = 1;
+  result.items[0].serviceLabel = '修刃';
+  result.projects = [{ careId: 30, need_edge: 1, need_wax: 0, need_unwax: 0, free_wax: 0 }];
+  result.canCheckout = true;
+  return result;
+}
+
+test('单项卡提交后等待跳转成功，不能提前清空装备', async t => {
+  const { page } = setup(t);
+  page.setData({ careCardSelections: [{ productId: 101, quantity: 1 }], careCardPreview: singlePreview() });
+  page.data.order.cares[0].need_wax = 0;
+  let navigation;
+  global.wx.navigateTo = options => { navigation = options; };
+  page._cardApi = async action => action === 'SaveDraft' ? singlePreview() : { orderId: 40, careOrderId: 20 };
+  const checkout = page._checkoutCare(false);
+  await settle();
+  assert.ok(navigation);
+  assert.equal(page.data.order.id, 20);
+  assert.equal(page.data.order.cares.length, 1);
+  assert.equal(page.data.order.cares[0].need_edge, 1);
+  assert.equal(page.data.careCardSelections.length, 1);
+  assert.equal(page.data.cardSaleBusy, true);
+  navigation.success();
+  await checkout;
+  assert.equal(page.data.order.id, 0);
+  assert.equal(page.data.order.cares.length, 0);
+  assert.equal(page.data.cardSaleBusy, false);
+});
+
+test('页面栈满时用原零售单替换打开结算，替换成功前装备不丢失', async t => {
+  const { page } = setup(t);
+  page.setData({ careCardSelections: [{ productId: 101, quantity: 1 }], careCardPreview: singlePreview() });
+  let fallback;
+  global.wx.navigateTo = options => options.fail({ errMsg: 'navigateTo:fail webview count limit exceed' });
+  global.wx.redirectTo = options => { fallback = options; };
+  page._cardApi = async action => action === 'SaveDraft' ? singlePreview() : { orderId: 40, careOrderId: 20 };
+  const checkout = page._checkoutCare(false);
+  await settle();
+  assert.equal(fallback.url, '/pages/payment/settle/index?orderId=40&careOrderId=20');
+  assert.equal(page.data.order.id, 20);
+  assert.equal(page.data.order.cares.length, 1);
+  page.onUnload(); // redirectTo 已替换原页面，成功回调不能再更新销毁的开单页。
+  page.setData = () => { throw new Error('不得更新已卸载页面'); };
+  fallback.success();
+  await checkout;
+  assert.equal(page._careCardSettlement, null);
+});
+
+test('两种跳转都失败时保留单项卡与装备，重试仅打开原订单，不重存或重建', async t => {
+  const { page } = setup(t);
+  page.setData({ careCardSelections: [{ productId: 101, quantity: 1 }], careCardPreview: singlePreview() });
+  let saves = 0;
+  page.saveCareReceptOrder = async () => { saves++; return page.data.order; };
+  const actions = [];
+  page._cardApi = async action => { actions.push(action); return action === 'SaveDraft' ? singlePreview() : { orderId: 40, careOrderId: 20 }; };
+  global.wx.navigateTo = options => options.fail({ errMsg: 'navigation failed' });
+  global.wx.redirectTo = options => options.fail({ errMsg: 'redirect failed' });
+  await page._checkoutCare(false);
+  assert.equal(page.data.order.id, 20);
+  assert.equal(page.data.order.cares.length, 1);
+  assert.equal(page.data.order.cares[0].need_wax, 0);
+  assert.equal(page.data.careCardSelections.length, 1);
+  assert.equal(page.data.careCardSubmitted, true);
+  assert.equal(page.data.cardSaleBusy, false);
+  assert.match(page.data.careCardError, /结算页打开失败/);
+  page.onSyncCare({ detail: { cares: [] } });
+  assert.equal(page.data.order.cares.length, 1);
+  global.wx.navigateTo = options => {
+    assert.equal(options.url, '/pages/payment/settle/index?orderId=40&careOrderId=20');
+    options.success();
+  };
+  await page._checkoutCare(false);
+  assert.deepEqual(actions, ['SaveDraft', 'Submit']);
+  assert.equal(saves, 1);
+  assert.equal(page.data.order.id, 0);
+});
+
+test('找回已提交的购卡单后继续打开原结算，不覆盖为草稿', async t => {
+  const { page, navigations } = setup(t);
+  const selections = [{ productId: 101, quantity: 1 }];
+  page._cardApi = async action => {
+    assert.equal(action, 'GetDraft');
+    return { careOrderId: 20, retailOrderId: 40, selections, preview: singlePreview() };
+  };
+  await page._restoreCareCardDraft();
+  page.saveCareReceptOrder = async () => { throw new Error('不得重存已提交订单'); };
+  assert.equal(page.data.careCardSubmitted, true);
+  await page._checkoutCare(false);
   assert.equal(navigations[0], '/pages/payment/settle/index?orderId=40&careOrderId=20');
 });
 

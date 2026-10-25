@@ -1,7 +1,7 @@
 const cards = require('../../../utils/careCardSale.js');
 
 const initialData = {
-  careCardSelections: [], careCardPreview: null, careCardError: '', careCardMode: '',
+  careCardSelections: [], careCardPreview: null, careCardError: '', careCardMode: '', careCardSubmitted: false,
   cardSaleShow: false, cardSaleProducts: [], cardSalePreview: null,
   cardSaleLoading: false, cardSaleBusy: false, cardSaleError: ''
 };
@@ -13,9 +13,14 @@ const methods = {
     if (this.data.bizType !== 'maintain' || !this.data.order.id) return;
     try {
       const draft = await this._cardApi('GetDraft', null, this.data.order.id);
+      if (this._careCardPageUnloaded) return;
       this._hadCareCardDraft = !!(draft.selections && draft.selections.length);
       this.setData({ careCardSelections: draft.selections || [] });
       if (this._hadCareCardDraft) this._applyCareCardPreview(draft.preview);
+      if (draft.retailOrderId) {
+        this._rememberCareCardSettlement(draft.retailOrderId, draft.careOrderId);
+        this.setData({ careCardError: '订单已提交，请点击去结算继续付款' });
+      }
     } catch (e) { console.warn('load care card draft failed', e); }
   },
 
@@ -40,7 +45,7 @@ const methods = {
   },
 
   async _refreshSavedCareCards() {
-    if (this._careCardSubmitting) return;
+    if (this._careCardSubmitting || this.data.careCardSubmitted) return;
     if (this.data.cardSaleShow) { await this.onCardRecalculate(); return; }
     if (!this.data.careCardSelections.length) return;
     const revision = this._careCardRevision;
@@ -55,6 +60,7 @@ const methods = {
 
   async onAddCareCard() {
     if (this.data.cardSaleBusy) return;
+    if (this.data.careCardSubmitted) { wx.showToast({ title: '本单已提交，请继续结算', icon: 'none' }); return; }
     if (!this.data.customer.memberId) { wx.showToast({ title: '请先匹配会员', icon: 'none' }); return; }
     if (!(this.data.order.cares || []).length) { wx.showToast({ title: '请先添加装备', icon: 'none' }); return; }
     this.setData({ cardSaleShow: true, cardSaleLoading: true, cardSaleError: '', cardSalePreview: null });
@@ -114,6 +120,7 @@ const methods = {
 
   async onRemoveCareCards() {
     if (this.data.cardSaleBusy) return;
+    if (this.data.careCardSubmitted) { wx.showToast({ title: '本单已提交，请继续结算', icon: 'none' }); return; }
     this.setData({ cardSaleBusy: true });
     try {
       await this.saveCareReceptOrder();
@@ -154,6 +161,10 @@ const methods = {
     this.setData({ cardSaleBusy: true });
     let submitting = false;
     try {
+      if (this._careCardSettlement) {
+        await this._openCareCardSettlement(this._careCardSettlement.orderId, this._careCardSettlement.careOrderId);
+        return;
+      }
       await this.saveCareReceptOrder();
       const displayed = this.data.careCardPreview;
       const orderId = this.data.order.id;
@@ -170,25 +181,67 @@ const methods = {
       }
       submitting = true;
       const result = await this._cardApi('Submit', { orderId });
-      this._openCareCardSettlement(result.orderId, result.careOrderId);
+      await this._openCareCardSettlement(result.orderId, result.careOrderId);
     } catch (e) {
       if (submitting) {
         try {
           const draft = await this._cardApi('GetDraft', null, this.data.order.id);
-          if (draft.retailOrderId) { this._openCareCardSettlement(draft.retailOrderId, draft.careOrderId); return; }
+          if (draft.retailOrderId) { await this._openCareCardSettlement(draft.retailOrderId, draft.careOrderId); return; }
         } catch (lookupError) { console.warn('recover card sale submission failed', lookupError); }
       }
       const message = String(e.message || e || '下单失败，请重试');
       this.setData({ careCardError: message });
       wx.showToast({ title: message, icon: 'none' });
-    } finally { this._careCardSubmitting = false; this.setData({ cardSaleBusy: false }); }
+    } finally {
+      this._careCardSubmitting = false;
+      if (!this._careCardPageUnloaded) this.setData({ cardSaleBusy: false });
+    }
+  },
+
+  _rememberCareCardSettlement(retailOrderId, careOrderId) {
+    const orderId = Number(retailOrderId);
+    const careId = Number(careOrderId);
+    if (!Number.isInteger(orderId) || orderId <= 0 || !Number.isInteger(careId) || careId <= 0)
+      throw new Error('未获取到结算订单，请重试');
+    this._careCardSettlement = { orderId, careOrderId: careId };
+    this._careCardRevision = (this._careCardRevision || 0) + 1;
+    this.setData({ careCardSubmitted: true, cardSaleShow: false, careCardError: '' });
   },
 
   _openCareCardSettlement(retailOrderId, careOrderId) {
-    this.setData({ cardSaleShow: false, careCardSelections: [], careCardPreview: null, careCardError: '', careCardMode: '',
-      order: Object.assign({}, this.data.order, { id: 0, code: null, valid: 0, recepting: 1, cares: [], retails: [] }) });
-    this._hadCareCardDraft = false;
-    wx.navigateTo({ url: '/pages/payment/settle/index?orderId=' + retailOrderId + '&careOrderId=' + careOrderId });
+    this._rememberCareCardSettlement(retailOrderId, careOrderId);
+    const url = '/pages/payment/settle/index?orderId=' + retailOrderId + '&careOrderId=' + careOrderId;
+    return new Promise(resolve => {
+      const success = () => {
+        // 页面跳转确认成功后，才脱钩旧订单，避免跳转失败时把装备和原订单一起清空。
+        if (!this._careCardPageUnloaded) {
+          this.setData({ cardSaleShow: false, careCardSelections: [], careCardPreview: null, careCardError: '',
+            careCardMode: '', careCardSubmitted: false,
+            order: Object.assign({}, this.data.order, { id: 0, code: null, valid: 0, recepting: 1, cares: [], retails: [] }) });
+        }
+        this._careCardSettlement = null;
+        this._hadCareCardDraft = false;
+        resolve(true);
+      };
+      const failed = error => {
+        if (this._careCardPageUnloaded) { resolve(false); return; }
+        console.warn('open care card settlement failed', error);
+        const message = '订单已创建，结算页打开失败，请点击去结算重试';
+        this.setData({ careCardError: message });
+        wx.showToast({ title: '结算页打开失败，请重试', icon: 'none' });
+        resolve(false);
+      };
+      const open = (method, fail) => {
+        try { wx[method]({ url, success, fail }); }
+        catch (error) { fail(error); }
+      };
+      open('navigateTo', error => {
+        if (this._careCardPageUnloaded) { resolve(false); return; }
+        console.warn('navigate to care card settlement failed, try redirect', error);
+        // 页面栈已满时用替换页面继续原订单；两种跳转都失败则保留装备，允许只重试跳转。
+        open('redirectTo', failed);
+      });
+    });
   }
 };
 

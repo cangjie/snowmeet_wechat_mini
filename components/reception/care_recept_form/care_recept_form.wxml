@@ -10,7 +10,7 @@
 
   <!-- 购物车列表 / 空态 -->
   <block wx:if="{{displayCares && displayCares.length > 0}}">
-    <view class="rent-list">
+    <view class="rent-list" style="{{cardSubmitted || cardBusy ? 'pointer-events: none;' : ''}}">
       <block wx:for="{{displayCares}}" wx:key="_key" wx:for-item="care" wx:for-index="cidx">
         <van-swipe-cell right-width="{{ 72 }}" custom-class="rent-swipe">
           <view class="pkg-card">
@@ -246,7 +246,7 @@
   </block>
 
   <view wx:if="{{hasCardSelection}}" class="care-card-summary">
-    <view class="care-card-summary-title">本次购卡 <text class="care-card-remove" bindtap="onRemoveCards">移除购卡</text></view>
+    <view class="care-card-summary-title">本次购卡 <text wx:if="{{!cardSubmitted}}" class="care-card-remove" bindtap="onRemoveCards">移除购卡</text></view>
     <view wx:for="{{cardPreview.items}}" wx:key="lineNo" class="care-card-summary-item">
       <view>{{item.name}} · {{item.priceLabel}}</view>
       <view class="care-card-summary-tip">{{item.usageLabel}}</view>
@@ -258,13 +258,13 @@
 
   <!-- 底部固定区：添加装备 → 添加卡类 → 合计 / 去结算 -->
   <view class="bottom-stack">
-    <view class="action-bar">
+    <view wx:if="{{!cardSubmitted}}" class="action-bar">
       <view class="action-item action-item--wide" bindtap="onAddCare">
         <van-icon name="plus" size="16px" color="#006495"/>
         <text>添加装备</text>
       </view>
     </view>
-    <view class="action-bar care-card-action">
+    <view wx:if="{{!cardSubmitted}}" class="action-bar care-card-action">
       <view class="action-item action-item--wide" bindtap="onAddCard">
         <van-icon name="plus" size="16px" color="#006495"/>
         <text>添加卡类{{hasCardSelection ? '（已选择）' : ''}}</text>
