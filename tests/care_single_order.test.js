@@ -66,8 +66,13 @@ test('同一订单收取两分钱，使用付款流程而非零元核销', async
 test('养护详情直接展示本单卡销售与合计，含卡订单禁止打开退款', t => {
   const { navigations, toasts } = setup(t);
   const page = loadPage('pages/admin/care/care_order_detail/care_order_detail.js', {});
-  const detail = order(); detail.paidAmount = 0.02; detail.dealed = 1;
+  const detail = order(); detail.paidAmount = 0.02;
   page.renderOrder(detail);
+  assert.equal(page.data.payment.showGoPay, true);
+  assert.equal(page.data.payment.goPayLabel, '继续发卡核销');
+  detail.dealed = 1;
+  page.renderOrder(detail);
+  assert.equal(page.data.payment.showGoPay, false);
   assert.equal(page.data.careCardRows[0].name, '测试次卡');
   assert.equal(page.data.cardAmountStr, '¥0.01');
   assert.equal(page.data.careAmountStr, '¥0.01');

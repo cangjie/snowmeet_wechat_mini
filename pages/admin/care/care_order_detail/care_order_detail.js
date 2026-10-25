@@ -206,10 +206,12 @@ Page({
     // 养护 0 元又未生效的单一定用了券/卡/储值抵扣（纯质保/招待 0 元单下单即生效），结算页走核销
     const paid = Math.round((order.paidAmount || 0) * 100) / 100;
     const unpaid = order.valid == 1 && order.dealed != 1 && order.closed != 1 && paid === 0;
+    const cardProcessing = !!order.careCardSale && order.valid == 1 && order.dealed != 1
+      && order.closed != 1 && paid >= order.total_amount;
     const payingAmount = order.paying_amount || 0;
     let goPayLabel = '去核销';
     if (order.careCardSale) {
-      goPayLabel = '去购卡结算';
+      goPayLabel = cardProcessing ? '继续发卡核销' : '去购卡结算';
     } else if (order.pay_with_deposit) {
       goPayLabel = '去储值扣款 ' + util.showAmount(payingAmount);
     } else if (payingAmount > 0) {
@@ -235,7 +237,7 @@ Page({
         canRefund: !order.careCardSale && Math.round(((order.paidAmount || 0) - (order.refundAmount || 0)) * 100) / 100 > 0,
         payRows,
         refundRows,
-        showGoPay: unpaid,
+        showGoPay: unpaid || cardProcessing,
         goPayLabel,
       },
     });
