@@ -217,6 +217,13 @@ Page({
     }
     this.setData({
       order,
+      careCardRows: (order.retails || []).filter(r => r.retail_type !== '养护附加费用').map(r => ({
+        id: r.id, name: (r.punchCard && r.punchCard.card_name) || (r.product && r.product.name) || '养护卡',
+        amountStr: util.showAmount(r.deal_price || 0)
+      })),
+      cardAmountStr: util.showAmount(order.careCardSale && order.careCardSale.cardAmount || 0),
+      careAmountStr: util.showAmount(order.careCardSale && order.careCardSale.careAmount || 0),
+      orderTotalStr: util.showAmount(order.total_amount || 0),
       // 编辑中保留草稿，防 onShow 等后台刷新把正在输入的内容冲掉
       orderMemoDraft: this.data.orderMemoEditing ? this.data.orderMemoDraft : (order.memo || ''),
       cares,
@@ -225,7 +232,7 @@ Page({
         ...this.data.payment,
         paidStr: util.showAmount(order.paidAmount || 0),
         refundStr: util.showAmount(order.refundAmount || 0),
-        canRefund: Math.round(((order.paidAmount || 0) - (order.refundAmount || 0)) * 100) / 100 > 0,
+        canRefund: !order.careCardSale && Math.round(((order.paidAmount || 0) - (order.refundAmount || 0)) * 100) / 100 > 0,
         payRows,
         refundRows,
         showGoPay: unpaid,
@@ -586,6 +593,10 @@ Page({
   },
 
   onOpenRefundPopup() {
+    if (this.data.order && this.data.order.careCardSale) {
+      wx.showToast({ title: '含卡订单不允许退款', icon: 'none' });
+      return;
+    }
     // 防御性守卫：可退金额为 0 时不开窗（与 wxml 按钮置灰一致）
     if (!this.data.payment.canRefund) {
       wx.showToast({ title: '无可退款金额', icon: 'none' });

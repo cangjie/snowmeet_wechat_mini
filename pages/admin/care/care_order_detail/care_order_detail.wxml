@@ -64,6 +64,19 @@
     </view>
   </view>
 
+  <view wx:if="{{order.careCardSale && order.careCardSale.retailOrderId === order.id}}" class="card">
+    <view class="section-title">本单购买养护卡</view>
+    <view wx:for="{{careCardRows}}" wx:key="id" class="info-cell">
+      <text class="info-label">{{item.name}}</text><text class="info-value">{{item.amountStr}}</text>
+    </view>
+    <view class="info-grid">
+      <view class="info-cell"><text class="info-label">购卡金额</text><text class="info-value">{{cardAmountStr}}</text></view>
+      <view class="info-cell"><text class="info-label">养护费用</text><text class="info-value">{{careAmountStr}}</text></view>
+      <view class="info-cell"><text class="info-label">订单合计</text><text class="info-value">{{orderTotalStr}}</text></view>
+    </view>
+    <text class="info-label">含卡订单不退款；取消养护返还实际扣减次数</text>
+  </view>
+
   <!-- B 支付信息 -->
   <!-- 与租赁详情页同款：2×2 摘要格 + 可折叠支付明细表（代付标红 + 脱敏手机号） -->
   <view class="card">
@@ -93,7 +106,7 @@
 
     <!-- 未收款：去结算页收款 / 核销 -->
     <view wx:if="{{payment.showGoPay}}" class="btn btn--primary btn--block" catchtap="onGoPay">{{payment.goPayLabel}}</view>
-    <view wx:if="{{order.careCardSale}}" class="btn btn--plain btn--block" catchtap="onViewCardPurchase">查看关联购卡单</view>
+    <view wx:if="{{order.careCardSale && order.careCardSale.retailOrderId !== order.id}}" class="btn btn--plain btn--block" catchtap="onViewCardPurchase">查看关联购卡单</view>
 
     <view class="divider"></view>
 

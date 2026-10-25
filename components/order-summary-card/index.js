@@ -50,6 +50,10 @@ Component({
           isCare: (order.type || '').trim() === '养护',
           isRetail: (order.type || '').trim() === '零售',
           retailInfo: retailInfo,
+          cardNames: (order.retails || []).filter(r => r.product_id || r.punch_card_id)
+            .map(r => (r.punchCard && r.punchCard.card_name) || (r.product && r.product.name) || '养护卡').join('、'),
+          cardAmountStr: util.showAmount(order.careCardSale && order.careCardSale.cardAmount || 0),
+          careAmountStr: util.showAmount(order.careCardSale && order.careCardSale.careAmount || 0),
           cares: cares,
           rentals: order.rentals || [],
           payingAmountStr: util.showAmount(order.paying_amount)
