@@ -291,7 +291,8 @@
       </view>
       <button
         class="checkout-btn {{!summary.canCheckout ? 'checkout-btn--disabled' : ''}}"
-        disabled="{{!summary.canCheckout || cardBusy}}"
+        disabled="{{!summary.canCheckout || cardBusy || autoTicketCheckout}}"
+        loading="{{autoTicketCheckout}}"
         bindtap="onCheckout">
         去结算
         <van-icon name="arrow" size="14px" color="#ffffff" custom-style="margin-left:4px"/>

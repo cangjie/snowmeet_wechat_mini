@@ -65,7 +65,7 @@ Component({
     memberId: {
       type: null,
       value: null,
-      observer(v) { this._loadDeposit(v); },
+      observer(v) { this._loadDeposit(v); this._scheduleOldCustomerTicket(); },
     },
     cares: { type: Array, value: [] },
     cardPreview: { type: Object, value: null },
@@ -81,6 +81,7 @@ Component({
   },
   data: {
     displayCares: [],
+    autoTicketCheckout: false,
     summary: { count: 0, totalLabel: '0.00', canCheckout: false },
     // 会员储值（会员且有余额时结算条上方显示 + 「使用储值」复选框；本期仅记录意向，实际扣款后续规划）
     hasDeposit: false,
@@ -104,9 +105,11 @@ Component({
   },
   observers: {
     cares() { this._refreshCares(); },
+    'hasCardSelection, cardBusy, cardSubmitted'() { this._scheduleOldCustomerTicket(); },
   },
   lifetimes: {
     attached() {
+      this._ticketAutoDetached = false;
       const that = this;
       app.loginPromiseNew.then(() => {
         Promise.all([
@@ -124,7 +127,9 @@ Component({
           that._refreshCares();
         }).catch((e) => { console.warn('load care dictionaries failed', e); });
       });
+      this._scheduleOldCustomerTicket();
     },
+    detached() { this._ticketAutoDetached = true; this._oldCustomerTicketState = null; },
   },
   methods: {
     onAddCard() {
@@ -199,6 +204,10 @@ Component({
       this.data.expandedMap = expandedMap;
       const displayCares = raw.map((care, idx) => {
         const key = that._careKey(care, idx);
+        const oldKey = 't' + care.timeStamp;
+        if (care.timeStamp && that._manualTicketChoices && that._manualTicketChoices[oldKey]) {
+          that._manualTicketChoices[key] = true;
+        }
         // 找回中断单时后端 careImages 只带 image 导航对象，没有 van-uploader 需要的 url/thumb，补齐
         (care.careImages || []).forEach((im) => {
           if (!im.url && im.image && im.image.file_path_name) {
@@ -295,6 +304,7 @@ Component({
         displayCares,
         summary: { count, totalLabel: total.toFixed(2), canCheckout },
       });
+      this._scheduleOldCustomerTicket();
     },
     /* ---------- 同步父页 ---------- */
     // 去掉 _ 前缀派生字段和纯前端对象（ticket/product 保留 ticket_code 等标量即可）
@@ -355,8 +365,9 @@ Component({
         changedField: changed,
         care: payload,
       };
-      data.calcCareChargePromise(req, app.globalData.sessionKey)
+      return data.calcCareChargePromise(req, app.globalData.sessionKey)
         .then((res) => {
+          if ((Number(that.data.memberId) || 0) !== (Number(req.memberId) || 0)) return;
           if (that._priceSeqMap[key] !== seq) return;
           const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
           if (idx < 0) return;
@@ -382,6 +393,7 @@ Component({
           });
         })
         .catch(() => {
+          if ((Number(that.data.memberId) || 0) !== (Number(req.memberId) || 0)) return;
           if (that._priceSeqMap[key] !== seq) return;
           const idx = that.data.displayCares.findIndex((c) => (c._key || '') === key);
           if (idx < 0) return;
@@ -721,6 +733,76 @@ Component({
       });
     },
     /* ---------- 优惠券 ---------- */
+    _scheduleOldCustomerTicket() {
+      if (this._ticketAutoQueued || this._ticketAutoDetached) return;
+      this._ticketAutoQueued = true;
+      Promise.resolve().then(() => {
+        this._ticketAutoQueued = false;
+        if (!this._ticketAutoDetached) return this._autoSelectOldCustomerTicket();
+      }).catch(e => console.warn('auto select old customer ticket failed', e));
+    },
+    _autoTicketBlocked() {
+      return this._ticketAutoDetached || this.data.newCardMode || this.data.hasCardSelection
+        || this.data.cardBusy || this.data.cardSubmitted || this.data.ticketPopup.show;
+    },
+    _rememberManualTicketChoice(cidx) {
+      const memberId = Number(this.data.memberId) || 0;
+      if (this._oldCustomerTicketMember !== memberId) {
+        this._oldCustomerTicketMember = memberId;
+        this._oldCustomerTicketState = null;
+        this._oldCustomerPricePromise = null;
+        this._manualTicketChoices = {};
+      }
+      const care = this.data.displayCares[cidx];
+      if (care) (this._manualTicketChoices || (this._manualTicketChoices = {}))[this._careKey(care, cidx)] = true;
+    },
+    async _autoSelectOldCustomerTicket() {
+      const memberId = Number(this.data.memberId) || 0;
+      if (this._oldCustomerTicketMember !== memberId) {
+        this._oldCustomerTicketMember = memberId;
+        this._oldCustomerTicketState = null;
+        this._oldCustomerPricePromise = null;
+        this._manualTicketChoices = {};
+      }
+      if (!(this.data.displayCares || []).length) {
+        this._oldCustomerTicketState = null;
+        this._manualTicketChoices = {};
+        return;
+      }
+      const eligible = (c, i) => !c.ticket_code && !c.use_card && !c.card_id
+        && !c.warranty && !c.entertain && !(this._manualTicketChoices || {})[this._careKey(c, i)];
+      if (!memberId || this._autoTicketBlocked() || !this.data.displayCares.some(eligible)) return;
+      let state = this._oldCustomerTicketState;
+      if (!state) {
+        state = { memberId };
+        this._oldCustomerTicketState = state;
+        state.promise = Promise.resolve(app.loginPromiseNew).then(() =>
+          data.getMemberTicketsPromise(memberId, '养护', true, app.globalData.sessionKey))
+          .then(tickets => (tickets || []).filter(t => t && Number(t.template_id) === 16 && t.code
+            && (t.member_id == null || Number(t.member_id) === memberId))
+            .sort((a, b) => (a.expire_date || '9999') < (b.expire_date || '9999') ? -1
+              : (a.expire_date || '9999') > (b.expire_date || '9999') ? 1 : 0))
+          .catch(e => { if (this._oldCustomerTicketState === state) this._oldCustomerTicketState = null; throw e; });
+      }
+      const tickets = await state.promise;
+      if (this._oldCustomerTicketState !== state || Number(this.data.memberId) !== memberId || this._autoTicketBlocked()) return;
+      const used = new Set(this.data.displayCares.map(c => c.ticket_code).filter(Boolean));
+      const updated = [];
+      const cares = this.data.displayCares.map((care, i) => {
+        if (!eligible(care, i)) return care;
+        const ticket = tickets.find(t => !used.has(t.code));
+        if (!ticket) return care;
+        used.add(ticket.code); updated.push(i);
+        // 自动带券只改变券选择，保留店员已选项目、维修和手动减免。
+        return { ...care, ticket, ticket_code: ticket.code };
+      });
+      if (!updated.length) return;
+      this.data.cares = cares;
+      this._refreshCares();
+      this._emitSync(true);
+      this._oldCustomerPricePromise = Promise.all(updated.map(i => this._fetchPrice(i)));
+      await this._oldCustomerPricePromise;
+    },
     onTicketTap(e) {
       if (this.data.newCardMode) { wx.showToast({ title: '本单统一使用新购卡', icon: 'none' }); return; }
       const cidx = Number(e.currentTarget.dataset.cidx);
@@ -745,6 +827,7 @@ Component({
       const cidx = this.data.ticketPopup.cidx;
       if (e.detail.action !== 'confirm') {
         this.setData({ 'ticketPopup.show': false });
+        this._scheduleOldCustomerTicket();
         return;
       }
       const ticket = e.detail.selectedTicket || null;
@@ -759,6 +842,7 @@ Component({
       const that = this;
       // 选券/选卡后表单可能瞬间变「已录入」，显式记住展开态——装备卡片不自动折叠
       const curCare = this.data.displayCares[cidx];
+      this._rememberManualTicketChoice(cidx);
       if (curCare && curCare._key) {
         this.data.expandedMap[curCare._key] = true;
       }
@@ -946,6 +1030,7 @@ Component({
     // 一律表现为"不在列表里"，不用在前端把服务端的券状态机再实现一遍
     _pickScannedTicket(cidx, code, memberId) {
       const that = this;
+      this._rememberManualTicketChoice(cidx);
       const dup = (that.data.displayCares || []).some(
         (c, i) => i !== cidx && c.ticket_code === code);
       if (dup) {
@@ -963,6 +1048,10 @@ Component({
               content: '该券已使用、已过期，或不属于养护业务线。',
               showCancel: false,
             });
+            return;
+          }
+          if (that.data.displayCares.some((c, i) => i !== cidx && c.ticket_code === code)) {
+            wx.showToast({ title: '这张券已用在本单其它装备上', icon: 'none' });
             return;
           }
           that._applyTicketSelection(cidx, t, null);
@@ -1000,11 +1089,21 @@ Component({
     },
 
     /* ---------- 结算 ---------- */
-    onCheckout() {
-      if (!this.data.summary.canCheckout) return;
-      const cares = this.data.displayCares.map((c) => this._stripUI(c));
-      // useDeposit：店员勾选的「使用储值支付」意向，随去结算落到订单（本期仅记录）
-      this.triggerEvent('checkout', { cares, useDeposit: this.data.useDeposit });
+    async onCheckout() {
+      if (!this.data.summary.canCheckout || this.data.autoTicketCheckout || this.data.cardBusy) return;
+      this.setData({ autoTicketCheckout: true });
+      try {
+        await this._autoSelectOldCustomerTicket();
+        await this._oldCustomerPricePromise;
+        if (this._ticketAutoDetached || this.data.cardBusy || !this.data.summary.canCheckout) return;
+        const cares = this.data.displayCares.map((c) => this._stripUI(c));
+        // 自动选券及优惠计价完成后再提交，避免列表晚到时按原价结算。
+        this.triggerEvent('checkout', { cares, useDeposit: this.data.useDeposit });
+      } catch (e) {
+        wx.showToast({ title: '优惠券加载失败，请重试', icon: 'none' });
+      } finally {
+        if (!this._ticketAutoDetached) this.setData({ autoTicketCheckout: false });
+      }
     },
   },
 });
