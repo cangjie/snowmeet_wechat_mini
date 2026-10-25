@@ -85,19 +85,19 @@
         <view class="card-sale-trial-title">本次试算</view>
         <view wx:for="{{cardSalePreview.items}}" wx:key="lineNo" class="card-sale-trial-item">
           <view>{{item.name}}</view>
-          <view class="card-sale-rule">{{item.serviceLabel}}</view>
+          <view class="card-sale-rule">卡内抵扣：{{item.serviceLabel}}</view>
           <view class="card-sale-use">{{item.usageLabel}}</view>
           <view class="card-sale-rule">{{item.equipmentLabel}}</view>
         </view>
-        <view class="card-sale-rule">养护应付 ¥0.00；实际扣次在付款成功后进行</view>
+        <view class="card-sale-rule">卡款 {{cardSalePreview.cardAmountLabel}} ＋ 养护费用 {{cardSalePreview.careAmountLabel}}；付款成功后发卡扣次</view>
       </view>
-      <view wx:if="{{cardSalePreview.errors.length}}" class="card-sale-error">确认选卡后，请逐件选择修刃或热蜡</view>
+      <view wx:if="{{cardSalePreview.errors.length}}" class="card-sale-error">确认选卡后，请补全每件装备的养护项目</view>
       <view wx:if="{{cardSaleLoading}}" class="card-sale-empty">正在加载或试算…</view>
       <view wx:if="{{cardSaleError}}" class="card-sale-error">{{cardSaleError}}</view>
       <view wx:if="{{cardSaleError}}" class="card-sale-retry" bindtap="onCardRecalculate">重新试算</view>
     </scroll-view>
     <view class="card-sale-footer">
-      <view class="card-sale-total">应付卡款 <text>{{cardSalePreview ? cardSalePreview.amountLabel : '--'}}</text></view>
+      <view class="card-sale-total">应付合计 <text>{{cardSalePreview ? cardSalePreview.amountLabel : '--'}}</text></view>
       <button class="card-sale-confirm" bindtap="onCareCardConfirm" loading="{{cardSaleBusy}}" disabled="{{cardSaleBusy || cardSaleLoading || !cardSalePreview || !!cardSaleError}}">确认选卡</button>
     </view>
   </view>

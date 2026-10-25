@@ -114,7 +114,8 @@ Page({
   },
 
   renderOrder(order) {
-    const retail = (order.retails || [])[0] || null;
+    const cardRows = (order.retails || []).filter(r => r.retail_type !== '养护附加费用');
+    const retail = cardRows[0] || null;
     const bizDate = order.biz_date ? new Date(order.biz_date) : null;
     const member = order.member || null;
     let memberShip = '散客';
@@ -150,6 +151,10 @@ Page({
       mi7: retail ? (retail.mi7_code || '') : '',
       retailType: (retail && retail.retail_type) || '未填',
       entertain,
+      cardCount: cardRows.length,
+      cardAmountStr: util.showAmount(order.careCardSale && order.careCardSale.cardAmount != null
+        ? order.careCardSale.cardAmount : cardRows.reduce((sum, r) => sum + Number(r.deal_price || 0), 0)),
+      careAmountStr: util.showAmount(order.careCardSale && order.careCardSale.careAmount || 0),
       amountStr: util.showAmount(order.careCardSale ? order.total_amount : (retail ? retail.deal_price : order.total_amount)),
       giveupScore: !!(retail && retail.giveup_score == 1),
       memo: (retail && retail.memo) || '',

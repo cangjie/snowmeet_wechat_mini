@@ -6,7 +6,7 @@
         <view>{{item.name}} · {{item.priceLabel}}</view>
         <view class="card-sale-summary-use">{{item.usageLabel}}</view>
       </view>
-      <view class="card-sale-summary-use">养护应付 ¥0.00；付款后自动发卡并扣次，含卡订单不退款</view>
+      <view class="card-sale-summary-use">卡款 {{cardPreview.cardAmountLabel}} ＋ 养护费用 {{cardPreview.careAmountLabel}}，合计 {{cardPreview.amountLabel}}；付款后自动发卡并核销，含卡订单不退款</view>
       <view wx:if="{{cardCompletionBusy}}" class="card-sale-summary-use">已收款，正在确认发卡和养护核销…</view>
       <view wx:if="{{cardCompletionError}}" class="card-sale-processing-error">{{cardCompletionError}}</view>
       <button wx:if="{{cardCompletionError}}" bindtap="onCardCompletionRetry" loading="{{cardCompletionBusy}}">重试处理</button>

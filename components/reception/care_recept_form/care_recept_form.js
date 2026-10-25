@@ -156,9 +156,8 @@ Component({
       const hasImage = care.careImages && care.careImages.length > 0;
       const hasBrandScale = care.brand && care.scale;
       if (!hasImage && !hasBrandScale) return { ok: false, label: '图片或品牌长度必填' };
-      if (this.data.newCardMode === 'single' && (care.need_edge === care.need_wax || care.free_wax === 1))
-        return { ok: false, label: '请选择修刃或热蜡（单项）' };
-      const hasService = care.need_edge === 1 || care.need_wax === 1 || care.free_wax === 1
+      const hasService = care.need_edge === 1 || care.need_wax === 1 || care.free_wax === 1 || care.need_unwax === 1
+        || care.need_repair === 1 || !!care.repair_memo
         || care.summer != null || (care.repair_charge && care.repair_charge > 0)
         || (care.ticket && (care.ticket.template_id === 17 || care.ticket.template_id === 18));
       if (!hasService) return { ok: false, label: '未选项目' };
@@ -282,7 +281,7 @@ Component({
           _specialKey: care.entertain ? 'entertain' : (care.warranty ? 'warranty' : 'none'),
           // 机打蜡按钮显示：券12、或选中机打蜡季卡（卡名含「机打蜡」，与卡的选中状态绑定——
           // 升级热蜡联动清掉 free_wax 后按钮仍在，可切回机打蜡）、或 free_wax=1（找回草稿兜底）
-          _hasFreeWaxTicket: !!((care.ticket && care.ticket.template_id === 12)
+          _hasFreeWaxTicket: !!(that.data.newCardMode === 'machine' || (care.ticket && care.ticket.template_id === 12)
             || (care.use_card && (care.card_name || '').indexOf('机打蜡') >= 0)
             || care.free_wax === 1),
         };
@@ -346,7 +345,7 @@ Component({
       const seq = (this._priceSeqCounter || 0) + 1;
       this._priceSeqCounter = seq;
       this._priceSeqMap[key] = seq;
-      if (this.data.newCardMode) return; // 购卡项目由整单试算统一校验，养护金额为零。
+      if (this.data.newCardMode) return; // 购卡项目由整单试算返回卡外服务费，附加费与卡款合并收取。
       // 全量状态整包提交（用户 2026-07-09 拍板）：店铺/会员 + care 内装备/服务/券码/卡(card_id,card_name)/附加费。
       // 卡选择跟着单件装备（care）走，卡信息只在 care 内、不设平级字段
       const req = {
@@ -570,18 +569,12 @@ Component({
       if (!care) return;
       const mode = this.data.newCardMode;
       if (mode) {
-        if (mode === 'machine' || mode === 'wax' || !['need_edge', 'need_wax', 'need_unwax', 'urgent'].includes(flag)) return;
+        if (!['need_edge', 'need_wax', 'need_unwax', 'free_wax', 'urgent'].includes(flag)) return;
         this._mutate(cidx, c => {
           c[flag] = c[flag] === 1 ? 0 : 1;
-          if (mode === 'single' && (flag === 'need_edge' || flag === 'need_wax')) {
-            c[flag] = 1;
-            c[flag === 'need_edge' ? 'need_wax' : 'need_edge'] = 0;
-          }
-          if (flag === 'need_wax' || (mode === 'single' && flag === 'need_edge')) c.need_unwax = c.need_wax;
-          c.free_wax = 0;
+          if (flag === 'need_wax') c.need_unwax = c.need_wax;
           if (c.need_edge === 1 && !c.edge_degree) c.edge_degree = '89';
           if (c.need_edge !== 1) c.edge_degree = null;
-          c.common_charge = c.discount = c.ticket_discount = 0;
         });
         return;
       }
@@ -602,6 +595,10 @@ Component({
       // 只翻 summer 本身；later→三项 / now→清三项 / 取消立等 等联动由服务端判定
       this._mutate(cidx, (c) => {
         c.summer = c.summer === mode ? null : mode;
+        if (this.data.newCardMode && c.summer != null) {
+          c.need_edge = c.need_wax = c.need_unwax = c.summer === 'later' ? 1 : 0;
+          c.urgent = 0;
+        }
       });
       this._fetchPrice(cidx, { changed: 'summer' });
     },

@@ -32,7 +32,7 @@ const methods = {
       const { careId, ...flags } = project;
       return Object.assign({}, c, flags, { use_card: false, card_id: null, card_name: null,
         ticket_code: null, ticket: null, card_equip_lock: false, card_pending_open: false,
-        common_charge: 0, discount: 0, ticket_discount: 0 });
+        common_charge: project.common_charge || 0, discount: project.discount || 0, ticket_discount: 0 });
     });
     this.setData({ 'order.cares': cares, careCardMode: cards.serviceMode(preview.items && preview.items[0]),
       careCardPreview: cards.displayPreview(preview, cares), careCardError: (preview.errors || []).join('；') });

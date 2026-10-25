@@ -122,8 +122,8 @@
               <!-- 服务项目 -->
               <view class="form-group">
                 <view class="form-label">养护项目</view>
-                <view wx:if="{{newCardMode === 'single'}}" class="care-card-summary-tip">单项卡：每件装备请选择修刃或热蜡其中一项</view>
-                <view wx:if="{{newCardMode === 'machine'}}" class="care-card-summary-tip">机打蜡季卡：本单一套装备，使用机打蜡</view>
+                <view wx:if="{{newCardMode === 'single'}}" class="care-card-summary-tip">单项卡抵扣一项；其他项目按套餐差额及附加费补费</view>
+                <view wx:if="{{newCardMode === 'machine'}}" class="care-card-summary-tip">机打蜡季卡：本单一套装备，升级项目另计费用</view>
                 <view class="svc-btn-row">
                   <view class="rent-mode-btn {{care.need_edge === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
                         catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="need_edge">修刃</view>
@@ -253,7 +253,7 @@
       <view class="care-card-summary-tip">{{item.equipmentLabel}}</view>
     </view>
     <view wx:if="{{cardError}}" class="care-card-error">{{cardError}}</view>
-    <view class="care-card-summary-tip">养护由卡抵扣，应付卡款在付款成功后发卡并扣次</view>
+    <view class="care-card-summary-tip">卡款 {{cardPreview.cardAmountLabel}} ＋ 养护费用 {{cardPreview.careAmountLabel}}，合并收款后发卡并扣次</view>
   </view>
 
   <!-- 底部固定区：添加装备 → 添加卡类 → 合计 / 去结算 -->
@@ -286,7 +286,7 @@
     <view class="checkout-bar">
       <view class="checkout-info">
         <view class="checkout-count">共 {{summary.count}} 件</view>
-        <text wx:if="{{hasCardSelection}}" class="checkout-rent">应付卡款 {{cardPreview ? cardPreview.amountLabel : '待试算'}}</text>
+        <text wx:if="{{hasCardSelection}}" class="checkout-rent">应付合计 {{cardPreview ? cardPreview.amountLabel : '待试算'}}</text>
         <text wx:else class="checkout-rent">合计 ¥{{summary.totalLabel}}</text>
       </view>
       <button

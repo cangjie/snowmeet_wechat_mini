@@ -234,17 +234,49 @@ test('勾选仅购买一张，换卡取消其他勾选，再点取消；不可�
   assert.deepEqual(page.data.cardSaleProducts.map(p => p.quantity), [1, 0, 0]);
 });
 
-test('单项修刃与热蜡互斥；新增装备继承双项默认；季卡不能再添装备', t => {
+test('单项卡可同时选修刃和热蜡；新增装备继承双项默认；季卡不能再添装备', t => {
   setup(t);
   const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {});
   form.data.newCardMode = 'single'; form.data.displayCares = [{ need_edge: 1, need_wax: 0 }];
   form._mutate = (i, fn) => fn(form.data.displayCares[i]);
   const toggle = flag => form.onSvcToggle({ currentTarget: { dataset: { cidx: 0, flag } } });
-  toggle('need_wax'); assert.equal(form.data.displayCares[0].need_edge, 0); assert.equal(form.data.displayCares[0].need_wax, 1);
-  toggle('need_edge'); assert.equal(form.data.displayCares[0].need_edge, 1); assert.equal(form.data.displayCares[0].need_wax, 0);
+  toggle('need_wax'); assert.equal(form.data.displayCares[0].need_edge, 1); assert.equal(form.data.displayCares[0].need_wax, 1);
+  toggle('need_edge'); assert.equal(form.data.displayCares[0].need_edge, 0); assert.equal(form.data.displayCares[0].need_wax, 1);
   form.data.newCardMode = 'dual'; form.data.cares = []; form._refreshCares = () => {}; form._emitSync = () => {};
   form.onAddCare(); assert.equal(form.data.cares[0].need_edge, 1); assert.equal(form.data.cares[0].need_wax, 1);
   form.data.newCardMode = 'machine'; form.onAddCare(); assert.equal(form.data.cares.length, 1);
+});
+
+test('卡款0.01加养护附加费0.01，展示合计0.02且项目与减免不被清空', async t => {
+  const { page, navigations } = setup(t);
+  const combined = singlePreview();
+  combined.amount = 0.02; combined.cardAmount = 0.01; combined.careAmount = 0.01;
+  combined.items[0].price = 0.01;
+  Object.assign(combined.projects[0], { common_charge: 0, repair_charge: 0.02, discount: 0.01, amount: 0.01 });
+  page.data.order.cares[0].need_repair = 1;
+  page.setData({ careCardSelections: [{ productId: 101, quantity: 1 }] });
+  page._applyCareCardPreview(combined);
+  assert.equal(page.data.careCardPreview.amountLabel, '¥0.02');
+  assert.equal(page.data.careCardPreview.cardAmountLabel, '¥0.01');
+  assert.equal(page.data.careCardPreview.careAmountLabel, '¥0.01');
+  assert.equal(page.data.order.cares[0].repair_charge, 0.02);
+  assert.equal(page.data.order.cares[0].discount, 0.01);
+  assert.equal(page.data.order.cares[0].need_repair, 1);
+  page._cardApi = async action => action === 'SaveDraft' ? combined : { orderId: 40, careOrderId: 20 };
+  await page._checkoutCare(false);
+  assert.equal(navigations[0], '/pages/payment/settle/index?orderId=40&careOrderId=20');
+});
+
+test('养护补费明细不计入购卡张数，零售详情显示卡款和养护费', t => {
+  setup(t);
+  const page = loadPage('pages/admin/retail/retail_order_detail.js', {});
+  page.renderOrder({ id: 40, type: '零售', total_amount: 0.02, valid: 1,
+    careCardSale: { careOrderId: 20, retailOrderId: 40, cardAmount: 0.01, careAmount: 0.01 },
+    retails: [{ id: 1, retail_type: '养护卡', deal_price: 0.01 }, { id: 2, retail_type: '养护附加费用', deal_price: 0.01 }] });
+  assert.equal(page.data.view.cardCount, 1);
+  assert.equal(page.data.view.cardAmountStr, '¥0.01');
+  assert.equal(page.data.view.careAmountStr, '¥0.01');
+  assert.equal(page.data.view.amountStr, '¥0.02');
 });
 
 test('后端未启用时明确提示，不生成购卡订单', async t => {

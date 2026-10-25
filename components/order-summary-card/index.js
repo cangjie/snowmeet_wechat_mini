@@ -39,7 +39,7 @@ Component({
           return { id: c.id, name: name }
         })
         // 零售单：一单一笔，展示七色米单号（紧急开单时还没有）+ 订单类型 + 是否招待
-        var retail = (order.retails || [])[0] || null
+        var retail = (order.retails || []).find(r => r.retail_type !== '养护附加费用') || null
         var retailInfo = retail ? {
           mi7: retail.mi7_code || '紧急开单（待补单号）',
           type: retail.retail_type || '零售',

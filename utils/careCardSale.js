@@ -24,6 +24,8 @@ function displayPreview(preview, cares) {
   if (!preview) return null;
   return Object.assign({}, preview, {
     amountLabel: util.showAmount(preview.amount),
+    cardAmountLabel: util.showAmount(preview.cardAmount == null ? (preview.items || []).reduce((sum, i) => sum + Number(i.price || 0), 0) : preview.cardAmount),
+    careAmountLabel: util.showAmount(preview.careAmount || 0),
     items: (preview.items || []).map(i => Object.assign({}, i, {
       priceLabel: util.showAmount(i.price),
       usageLabel: i.total == null ? ('本次使用' + i.punches + '次 · 不限总次数')
@@ -38,7 +40,10 @@ function displayPreview(preview, cares) {
 }
 
 function signature(preview) {
-  return JSON.stringify({ amount: preview.amount, items: (preview.items || []).map(i => ({
+  return JSON.stringify({ amount: preview.amount, careAmount: preview.careAmount || 0,
+    projects: (preview.projects || []).map(p => ({ careId: p.careId, need_edge: p.need_edge, need_wax: p.need_wax,
+      need_unwax: p.need_unwax, free_wax: p.free_wax, common_charge: p.common_charge || 0,
+      repair_charge: p.repair_charge || 0, discount: p.discount || 0, amount: p.amount || 0 })), items: (preview.items || []).map(i => ({
     productId: i.productId, name: i.name, price: i.price, total: i.total, projectCount: i.projectCount,
     serviceLabel: i.serviceLabel,
     requiresBinding: i.requiresBinding, careIds: (i.careIds || []).slice().sort((a, b) => a - b)

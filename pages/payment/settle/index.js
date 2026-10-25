@@ -58,7 +58,7 @@ Page({
     console.log('settle paid', detail)
     wx.showModal({
       title: '收款成功',
-      content: that.data.careOrderId ? '购卡收款完成，卡已发放，本次养护已自动扣次生效。'
+      content: that.data.careOrderId ? '购卡及养护收款完成，卡已发放，本次养护已生效。'
         : (payMethod ? ('已通过「' + payMethod + '」完成收款') : '订单已完成收款'),
       confirmText: '查看订单',   // wx.showModal 按钮文案上限 4 字
       cancelText: '继续开单',

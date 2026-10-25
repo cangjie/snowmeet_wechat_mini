@@ -167,7 +167,9 @@
 
   <!-- D 支付信息 -->
   <view wx:if="{{order.careCardSale}}" class="card">
-    <view class="kv-line"><text class="kv-line-label">购卡数量</text><text class="kv-line-value">{{order.retails.length}} 张</text></view>
+    <view class="kv-line"><text class="kv-line-label">购卡数量</text><text class="kv-line-value">{{view.cardCount}} 张</text></view>
+    <view class="kv-line"><text class="kv-line-label">购卡金额</text><text class="kv-line-value">{{view.cardAmountStr}}</text></view>
+    <view class="kv-line"><text class="kv-line-label">养护费用（已合并收款）</text><text class="kv-line-value">{{view.careAmountStr}}</text></view>
     <linked-care-summary orderId="{{order.careCardSale.careOrderId}}" />
     <view class="pay-empty">含卡订单不退款；取消养护只返还实际扣减次数</view>
     <view class="btn btn--plain btn--block" catchtap="onViewLinkedCare">查看关联养护单</view>
