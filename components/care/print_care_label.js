@@ -249,7 +249,7 @@ Component({
       var more = care.repair_more ? care.repair_more : ''
       var memo = care.repair_memo ? care.repair_memo : ''
       var pole = care.with_pole == true ? '含杖' : ''
-      var orderDate = new Date(care.create_date)
+      var orderDate = new Date(that.properties.order.biz_date || care.create_date)
       var orderDateStr = (orderDate.getMonth() + 1).toString() + '-' + orderDate.getDate().toString()
       var urgent = false
       if (care.urgent == 1) {
@@ -261,21 +261,14 @@ Component({
       }
       else {
         if (!urgent) {
-          pickDate = pickDate.setDate(pickData.getdate() + 1)
+          pickDate.setDate(pickDate.getDate() + 1)
         }
       }
       var pickDateStr = (pickDate.getMonth() + 1).toString() + '-' + pickDate.getDate().toString()
       var scale = care.scale ? care.scale : '未填'
-      var pickDateTitle = '次日'
-      if (pickDate.getDate() == orderDate.getDate()) {
-        pickDateTitle = '当日'
-      }
-      else if (pickDate.getDate() - orderDate.getDate() != 1) {
-        pickDateTitle = '多日'
-      }
-      else {
-        pickDateTitle = '次日'
-      }
+      var pickDays = (Date.UTC(pickDate.getFullYear(), pickDate.getMonth(), pickDate.getDate())
+        - Date.UTC(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate())) / 86400000
+      var pickDateTitle = pickDays == 0 ? '当日' : (pickDays == 1 ? '次日' : '多日')
       var command = tsc.jpPrinter.createNew()
       command.setCls()//清除缓冲区，防止下一个没生效
       command.setSize(75, 50)//设置标签大小，单位mm.具体参数请用尺子量一下
