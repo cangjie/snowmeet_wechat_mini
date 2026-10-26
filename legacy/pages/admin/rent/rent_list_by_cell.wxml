@@ -1,3 +1,5 @@
+<!-- legacy-demo：旧版演示的返回条（build_legacy.py 注入） -->
+<view style="background:#fff3cd;color:#8a6d3b;padding:20rpx 24rpx;font-size:28rpx;text-align:center;" bindtap="__legacyExit">【演示】当前为旧版，点此返回新版</view>
 <!--pages/admin/rent/rent_list_by_cell.wxml-->
 <mp-cells title="填写完整手机号或后四位或订单号" >
   <mp-cell style="text-align: center;">

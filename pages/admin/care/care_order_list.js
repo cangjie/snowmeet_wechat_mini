@@ -177,14 +177,14 @@ Page({
       // 顾客称呼 + 会员标识
       var calledName = ''
       var member = order.member
-      var memberShip = '【散】'
+      var memberShip = '散'
       if (order.contact_name) {
         calledName = order.contact_name + (order.contact_gender === '男' ? '(先生)' : (order.contact_gender === '女' ? '(女士)' : ''))
       } else if (member) {
         calledName = member.real_name + (member.gender === '男' ? ' 先生' : (member.gender === '女' ? ' 女士' : ''))
       }
       if (member && member.following_wechat === 1) {
-        memberShip = '【会】'
+        memberShip = '会'
       }
       order.calledName = calledName
       order.memberShip = memberShip

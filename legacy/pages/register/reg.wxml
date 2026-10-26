@@ -1,3 +1,5 @@
+<!-- legacy-demo：旧版演示的返回条（build_legacy.py 注入） -->
+<view style="background:#fff3cd;color:#8a6d3b;padding:20rpx 24rpx;font-size:28rpx;text-align:center;" bindtap="__legacyExit">【演示】当前为旧版，点此返回新版</view>
 <view wx:if="{{!verified}}" style="margin-top: 50rpx;" >
   <member-auth wx:if="{{member && member.cell == null}}" bindVerified="verified" ></member-auth>
   <view wx:else >找到旧的会员信息，现已和当前账户合并，请告知店员顾客需要重新扫码开单。</view>
