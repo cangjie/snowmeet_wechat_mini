@@ -74,6 +74,7 @@ Page({
   getData(){
     var that = this
     var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProduct/' + that.data.id
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
     wx.request({
       url: getUrl,
       method: 'GET',

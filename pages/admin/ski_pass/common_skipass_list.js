@@ -99,6 +99,7 @@ Page({
     var that = this
     that.setData({querying: true})
     var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?resort=' + encodeURIComponent(that.data.resort) + '&showHidden=1'
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
     wx.request({
       url: getUrl,
       method: 'GET',

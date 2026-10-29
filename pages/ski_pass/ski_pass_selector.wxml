@@ -1,28 +1,51 @@
-<mp-tabs 
-  tabs="{{tabs}}" 
-  activeTab="{{activeTab}}" 
-  swiperClass="weui-tabs-swiper"
-  bindchange="onChange"
-  activeClass="tab-bar-title__selected"
->
-  <block wx:for="{{tabs}}" wx:key="title">
-    <view class="tab-content" slot="tab-content-{{index}}"   >
-    </view>
-  </block>
-</mp-tabs>
-<view>
-  <mp-cells>
-    <mp-cell wx:for="{{productList}}" >
-      <view class="view-row" >
-        <view style="width: 450rpx;">{{item.name}}</view>
-        <!--view style="width: 180rpx;margin-top: 50rpx;text-align: right;">{{item.sale_price_str}}起</view-->
-        <view style="margin-left: 20rpx;margin-top: 20rpx;">
-          <!--button id="{{item.id}}" size="mini" class="input" bind:tap="gotoDetail">预定</button-->
-          <van-button id="{{item.id}}" size="small" type="info" bind:click="gotoDetail" > 预 定 </van-button>
-        </view>
+<view class="page-wrap">
+  <!-- 只有一个雪场时不显示标签栏 -->
+  <mp-tabs
+    wx:if="{{showTabs}}"
+    tabs="{{tabs}}"
+    activeTab="{{activeTab}}"
+    swiperClass="weui-tabs-swiper"
+    bindchange="onChange"
+    activeClass="tab-bar-title__selected"
+  >
+    <block wx:for="{{tabs}}" wx:key="title">
+      <view class="tab-content" slot="tab-content-{{index}}"></view>
+    </block>
+  </mp-tabs>
+
+  <view class="page-head">
+    <text class="page-title">{{resort}}雪票</text>
+    <text class="page-sub">选择时长和场次，下一步选装备和日期</text>
+  </view>
+
+  <!-- 顾客只能看价格，订票由店员办理 -->
+  <view class="notice" wx:if="{{loaded && !isStaff && groups.length}}">
+    <text class="notice-text">仅限店员订票，价格仅供查看</text>
+  </view>
+
+  <view class="group-list" wx:if="{{groups.length}}">
+    <view class="group-card" wx:for="{{groups}}" wx:key="key" data-key="{{item.key}}" bindtap="gotoDetail">
+      <view class="group-main">
+        <text class="group-title">{{item.title}}</text>
+        <text class="group-sub">{{item.subtitle}}</text>
       </view>
-    </mp-cell>
-  </mp-cells>
+      <view class="group-price">
+        <text class="price-yen">¥</text>
+        <text class="price-num">{{item.minPriceStr}}</text>
+        <text class="price-from">起</text>
+      </view>
+      <text class="group-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{loaded && !groups.length && !loadFailed}}">
+    <text class="empty-title">雪票价格暂未发布</text>
+    <text class="empty-sub">上架后这里会显示最新价格</text>
+  </view>
+  <view class="empty" wx:if="{{loadFailed}}">
+    <text class="empty-title">暂时无法获取价格</text>
+    <text class="empty-sub">请检查网络后重新进入</text>
+  </view>
 </view>
 <view style="height: 200rpx;"></view>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
