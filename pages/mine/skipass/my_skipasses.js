@@ -6,9 +6,11 @@ const util = require('../../../utils/util.js')
 var CANCEL_STATUS = {
   '取消中': { text: '退票中', usable: false, hint: '退票处理中，通常几分钟内确认，确认后自动原路退款' },
   '申请取消': { text: '退票中', usable: false, hint: '退票处理中，通常几分钟内确认，确认后自动原路退款' },
-  '已取消': { text: '已退票', usable: false, hint: '退票已确认，退款正在处理' },
-  '已申请退款': { text: '退款中', usable: false, hint: '退款已提交，预计原路退回' },
-  '退款成功': { text: '已退款', usable: false, hint: '' },
+  '已取消': { text: '退票中', usable: false, hint: '退票已确认，退款正在提交' },
+  // 退款已经提交给微信，钱按原路退回；微信的退款成功回调这几个月没有更新库里的状态，
+  // 所以以「已申请退款」为准显示已退票，不等「退款成功」
+  '已申请退款': { text: '已退票', usable: false, hint: '退款已原路退回，到账时间以支付渠道为准' },
+  '退款成功': { text: '已退票', usable: false, hint: '' },
   '出票失败': { text: '出票失败', usable: false, hint: '' },
   '取消失败': { text: '退票未成功', usable: true, hint: '退票没有成功，请联系店员处理' }
 }
@@ -208,13 +210,22 @@ Page({
     const ticket = this.data.unusedList.find(item => item.id === id)
     if (!ticket || !ticket.canUse) return
 
+    // 取票二维码和取票码是下单后由供应商出票才有的，刚下单那一会儿还没有，
+    // 这时没东西可展示，提示稍后再试（原来这里引用了不存在的变量 serial，点了直接报错）
+    const pickup = ticket.pickupCode || pickupCode || ''
+    const cardNo = ticket.card_no || card_no || ''
+    if (!pickup && !cardNo) {
+      wx.showToast({ title: '取票码正在生成，请稍后下拉刷新再试', icon: 'none' })
+      return
+    }
+
     this.setData({
       showUseModal: true,
       useTarget: {
         id,
         title,
-        card_no,
-        pickupCode: ticket.pickupCode || serial.replace(/\s/g, '').slice(0, 10),
+        card_no: cardNo,
+        pickupCode: pickup,
       },
     })
   },

@@ -44,11 +44,39 @@ test('我的雪票：退票中、已退票、退款中、退款成功都不再�
   await settle()
   assert.deepEqual(page.data.unusedList.map(x => x.id), [1, 7])
   const used = page.data.usedList
-  assert.deepEqual(used.map(x => [x.id, x.statusText]), [[2, '退票中'], [3, '退票中'], [4, '已退票'], [5, '退款中'], [6, '已退款']])
+  assert.deepEqual(used.map(x => [x.id, x.statusText]), [[2, '退票中'], [3, '退票中'], [4, '退票中'], [5, '已退票'], [6, '已退票']])
   assert.match(used[0].statusHint, /几分钟内确认.*自动原路退款/)
-  assert.match(used[2].statusHint, /退款正在处理/)
+  assert.match(used[2].statusHint, /退款正在提交/)
+  assert.match(used[3].statusHint, /原路退回/)
   assert.equal(page.data.unusedList[1].statusText, '退票未成功')
   assert.equal(page.data.unusedList[0].statusHint, '')
+  delete global.getApp
+  delete global.wx
+})
+
+test('我的雪票：点「立即使用」——有取票码就打开弹层，刚下单还没出票码就提示稍后，都不报错', () => {
+  const toasts = []
+  global.getApp = () => ({ globalData: { domainName: 'api.test', sessionKey: 'sk' } })
+  global.wx = { showToast(x) { toasts.push(x.title) } }
+  const page = loadPage(FILE, {})
+  page.setData({ unusedList: [
+    { id: 1, canUse: true, card_no: '17993493527191877', pickupCode: 'https://img/qr.png' },
+    { id: 2, canUse: true, card_no: null, pickupCode: null, serial: '1222019805' },
+    { id: 3, canUse: true, card_no: '999', pickupCode: null }
+  ] })
+  const tap = (id, d) => page.onUseTicket({ currentTarget: { dataset: Object.assign({ id, title: 't' }, d || {}) } })
+  tap(1)
+  assert.equal(page.data.showUseModal, true)
+  assert.equal(page.data.useTarget.pickupCode, 'https://img/qr.png')
+  page.setData({ showUseModal: false })
+  assert.doesNotThrow(() => tap(2))
+  assert.equal(page.data.showUseModal, false)
+  assert.equal(toasts.length, 1)
+  assert.match(toasts[0], /取票码正在生成/)
+  tap(3)
+  assert.equal(page.data.showUseModal, true)
+  assert.equal(page.data.useTarget.card_no, '999')
+  assert.equal(page.data.useTarget.pickupCode, '')
   delete global.getApp
   delete global.wx
 })

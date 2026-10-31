@@ -129,6 +129,7 @@
     <view class="qr-wrapper">
       <image
         class="qr-image"
+        wx:if="{{useTarget.pickupCode}}"
         src="{{useTarget.pickupCode}}"
         mode="aspectFit"
       />
