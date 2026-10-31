@@ -9,9 +9,10 @@ const raw = (id, over) => Object.assign({
   card_no: 'C' + id, qr_code_url: 'https://img/' + id + '.png'
 }, over || {})
 
-test('票种、日期、手机号相同的合并成一条，张数 n，金额是各张实付之和，按票号排序', () => {
+test('同一订单里票种、日期、手机号相同的合并成一条，张数 n，金额是各张实付之和，按票号排序', () => {
   const groups = g.buildMyGroups([
-    raw(12), raw(11), raw(13, { reserve_date: '2026-11-04T00:00:00' }), raw(14, { contact_cell: '13900139000' }), raw(15, { product_id: 643 })
+    raw(12, { order_id: 100 }), raw(11, { order_id: 100 }), raw(13, { order_id: 100, reserve_date: '2026-11-04T00:00:00' }),
+    raw(14, { order_id: 100, contact_cell: '13900139000' }), raw(15, { order_id: 100, product_id: 643 })
   ])
   assert.equal(groups.length, 4)
   const first = groups[0]
@@ -22,10 +23,13 @@ test('票种、日期、手机号相同的合并成一条，张数 n，金额是
   assert.deepEqual(groups.map(x => x.count), [2, 1, 1, 1])
 })
 
-test('不同订单里相同的票也合并', () => {
-  const groups = g.buildMyGroups([raw(1, { order_id: 100 }), raw(2, { order_id: 200 })])
-  assert.equal(groups.length, 1)
-  assert.equal(groups[0].count, 2)
+test('不同订单（order_id 不同）的票一定分开，哪怕票种、日期、手机号都一样', () => {
+  const groups = g.buildMyGroups([raw(1, { order_id: 100 }), raw(2, { order_id: 200 }), raw(3, { order_id: 100 }), raw(4, { order_id: 200 })])
+  assert.equal(groups.length, 2)
+  assert.deepEqual(groups.map(x => [x.orderId, x.count, x.tickets.map(t => t.id)]), [[100, 2, [1, 3]], [200, 2, [2, 4]]])
+  // 没有订单号的老数据各自归在「无订单」一组，不会和有订单的混在一起
+  const mixed = g.buildMyGroups([raw(1, { order_id: 100 }), raw(2, { order_id: null }), raw(3, { order_id: null })])
+  assert.deepEqual(mixed.map(x => [x.orderId, x.count]), [[100, 1], [null, 2]])
 })
 
 test('一张票的状态：可使用、出票中、已使用、退票中、已退票、取消失败，以及能不能退', () => {

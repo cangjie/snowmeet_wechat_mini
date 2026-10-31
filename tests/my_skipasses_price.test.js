@@ -7,7 +7,7 @@ const { loadPage, settle } = require('./reception_harness.js')
 const FILE = 'pages/mine/skipass/my_skipasses.js'
 
 const raw = (id, over) => Object.assign({
-  id, product_id: 641, product_name: '【万龙】全雪区日场4小时雪票-11.6', reserve_date: '2026-11-03T00:00:00',
+  id, order_id: 100, product_id: 641, product_name: '【万龙】全雪区日场4小时雪票-11.6', reserve_date: '2026-11-03T00:00:00',
   reserve_no: 'N' + id, deal_price: 309, ticket_price: 296.67, status: '已确认', card_no: 'C' + id, qr_code_url: 'https://img/' + id + '.png',
   contact_cell: '13501177897'
 }, over || {})
@@ -131,5 +131,13 @@ test('我的雪票：退票被后端拒绝时提示，不假装成功', async ()
   page.confirmCancel()
   await settle()
   assert.deepEqual(toasts, ['退票失败，请联系店员'])
+  cleanup()
+})
+
+test('我的雪票：不同订单的相同票不合并，各显示各的张数和金额', async () => {
+  const { page } = setup([raw(1, { order_id: 100 }), raw(2, { order_id: 100 }), raw(3, { order_id: 200 }), raw(4, { order_id: 200 }), raw(5, { order_id: 200 })])
+  page.getData()
+  await settle()
+  assert.deepEqual(page.data.unusedList.map(g => [g.orderId, g.count, g.amountNum]), [[100, 2, 618], [200, 3, 927]])
   cleanup()
 })

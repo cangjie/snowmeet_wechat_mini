@@ -1,5 +1,6 @@
-// 「我的雪票」：后台每张票一条记录，页面上票种、日期、手机号相同的合并成一条显示「× n」，
+// 「我的雪票」：后台每张票一条记录，页面上同一个订单里票种、日期、手机号相同的合并成一条显示「× n」，
 // 点开按票分标签，每张票有自己的二维码、状态和退票按钮。
+// 不同订单（order_id 不同）的票一定分开显示，哪怕票种、日期、手机号都一样：每个订单各自付款、各自退款。
 
 // 后台 status 文案 → 退票/退款相关的显示。取消先提交给供应商，确认可能要几分钟，确认后系统自动按这张票的票款原路退款。
 const CANCEL_STATUS = {
@@ -71,11 +72,11 @@ function buildMyGroups(list) {
   const groups = []
   const byKey = {}
   ;(Array.isArray(list) ? list : []).forEach(raw => {
-    const key = [raw.product_id, dateOf(raw.reserve_date), String(raw.contact_cell || '').trim()].join('|')
+    const key = [raw.order_id == null ? 'none' : raw.order_id, raw.product_id, dateOf(raw.reserve_date), String(raw.contact_cell || '').trim()].join('|')
     let g = byKey[key]
     if (!g) {
       g = byKey[key] = {
-        key, productId: raw.product_id, title: raw.product_name, validDate: dateOf(raw.reserve_date),
+        key, orderId: raw.order_id == null ? null : raw.order_id, productId: raw.product_id, title: raw.product_name, validDate: dateOf(raw.reserve_date),
         cell: String(raw.contact_cell || '').trim(), tickets: []
       }
       groups.push(g)
