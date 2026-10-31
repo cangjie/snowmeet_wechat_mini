@@ -538,3 +538,57 @@ page {
   color: var(--on-surface-variant);
   line-height: 1.5;
 }
+
+/* =====================
+   加入购物车前的确认弹层（从底部升起）
+   ===================== */
+.sheet-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 201;
+  padding: 16rpx 40rpx calc(env(safe-area-inset-bottom) + 32rpx);
+  background: var(--surface-container-lowest);
+  border-radius: 40rpx 40rpx 0 0;
+  box-shadow: 0 -8rpx 40rpx rgba(0, 0, 0, 0.12);
+}
+
+.sheet-handle {
+  width: 72rpx; height: 8rpx; margin: 8rpx auto 24rpx;
+  border-radius: 4rpx; background: var(--outline-variant);
+}
+
+.sheet-title { display: block; font-size: 34rpx; font-weight: 800; color: var(--on-surface); }
+.sheet-product { display: block; margin-top: 8rpx; font-size: 24rpx; color: var(--outline); line-height: 1.5; }
+
+.sheet-field { margin-top: 28rpx; }
+.sheet-label { display: block; font-size: 22rpx; font-weight: 700; color: var(--outline); margin-bottom: 10rpx; }
+.sheet-picker { display: block; }
+
+.sheet-picker-value {
+  display: flex; align-items: center; gap: 16rpx;
+  padding: 22rpx 24rpx; border-radius: 18rpx;
+  background: var(--surface-container-low);
+}
+
+.sheet-value { flex: 1; font-size: 30rpx; font-weight: 700; color: var(--on-surface); }
+.sheet-input { flex: 1; min-width: 0; height: 44rpx; font-size: 30rpx; font-weight: 700; color: var(--on-surface); }
+.sheet-edit { font-size: 24rpx; font-weight: 700; color: var(--primary); }
+
+.sheet-amount {
+  margin-top: 32rpx; display: flex; align-items: baseline; justify-content: space-between;
+  padding-top: 24rpx; border-top: 1rpx solid var(--outline-variant);
+}
+.sheet-amount-label { font-size: 26rpx; color: var(--on-surface-variant); }
+.sheet-amount-value { font-size: 52rpx; font-weight: 800; color: var(--primary); letter-spacing: -1rpx; }
+
+.sheet-actions { margin-top: 28rpx; display: flex; gap: 20rpx; }
+.sheet-btn { flex: 1; padding: 28rpx 0; text-align: center; border-radius: 22rpx; font-size: 30rpx; font-weight: 700; }
+.sheet-btn--ghost { background: var(--surface-container-high); color: var(--on-surface); flex: 0 0 30%; }
+.sheet-btn--primary { background: linear-gradient(135deg, #1A73E8 0%, #4285F4 100%); color: #FFFFFF; }

@@ -118,6 +118,49 @@
   </view>
 </scroll-view>
 
+<!-- 加入购物车前的确认弹层：顾客在这里核对，也可以直接改日期、接收订票短信的手机号 -->
+<view class="sheet-mask" wx:if="{{showConfirm}}" bindtap="onCloseConfirm"></view>
+<view class="sheet" wx:if="{{showConfirm}}" catchtap="">
+  <view class="sheet-handle"></view>
+  <text class="sheet-title">请和顾客确认订票信息</text>
+  <text class="sheet-product">{{productName}}</text>
+
+  <view class="sheet-field">
+    <text class="sheet-label">游玩日期</text>
+    <picker class="sheet-picker" range="{{confirmDateRange}}" value="{{confirmDateIndex}}" bindchange="onConfirmDateChange">
+      <view class="sheet-picker-value">
+        <text class="sheet-value">{{confirmDateText}}</text>
+        <text class="sheet-edit">修改</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="sheet-field">
+    <text class="sheet-label">接收订票短信的手机号</text>
+    <view class="sheet-picker-value">
+      <input class="sheet-input" type="number" maxlength="11" value="{{confirmCell}}" placeholder="请输入手机号" bindinput="onConfirmCellInput" />
+      <text class="sheet-edit">修改</text>
+    </view>
+  </view>
+
+  <view class="sheet-field">
+    <text class="sheet-label">姓名</text>
+    <view class="sheet-picker-value">
+      <input class="sheet-input" value="{{confirmName}}" placeholder="请输入姓名" bindinput="onConfirmNameInput" />
+    </view>
+  </view>
+
+  <view class="sheet-amount">
+    <text class="sheet-amount-label">本张应付</text>
+    <text class="sheet-amount-value">{{confirmPriceStr}}</text>
+  </view>
+
+  <view class="sheet-actions">
+    <view class="sheet-btn sheet-btn--ghost" bindtap="onCloseConfirm">再改改</view>
+    <view class="sheet-btn sheet-btn--primary" bindtap="onConfirmAdd">确认加入购物车</view>
+  </view>
+</view>
+
 <!-- 底部栏：店员是「购物车 + 加入购物车」；顾客只显示价格和订票说明 -->
 <view class="pay-bar" wx:if="{{hasPrice}}">
   <view class="price-section">

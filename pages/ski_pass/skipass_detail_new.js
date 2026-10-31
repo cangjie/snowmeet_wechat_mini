@@ -11,6 +11,12 @@ const { getNavMetrics } = require('../../utils/navbar.js')
 
 const WEEK_DAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
+// 「11月2日 周一」
+function dateLabel(date) {
+  var d = new Date(parseInt(date.slice(0, 4), 10), parseInt(date.slice(5, 7), 10) - 1, parseInt(date.slice(8, 10), 10))
+  return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + WEEK_DAYS[d.getDay()]
+}
+
 function safeDecode(value) {
   try {
     return decodeURIComponent(value)
@@ -51,7 +57,16 @@ Page({
     source: '',
     // 能不能加入购物车 = 店员 + 这一天有价格 + 这个装备已上线
     canAdd: false,
-    cartCount: 0
+    cartCount: 0,
+    // 加入购物车前的确认弹层（顾客在这里核对、修改日期和接收短信的手机号）
+    showConfirm: false,
+    confirmName: '',
+    confirmCell: '',
+    confirmDateRange: [],
+    confirmDateIndex: 0,
+    confirmDate: '',
+    confirmDateText: '',
+    confirmPriceStr: ''
   },
 
   _now() {
@@ -249,8 +264,56 @@ Page({
       wx.showToast({ title: that.data.hasPrice ? '该装备暂不能订票' : '该日期暂无价格', icon: 'none' })
       return
     }
-    var name = (that.data.name || '').trim()
-    var cell = (that.data.cell || '').trim()
+    // 打开确认弹层：和顾客当面确认游玩日期、接收订票短信的手机号，顾客要改就直接在弹层里改，
+    // 金额跟着日期变；确认后才真的加入购物车
+    var options = that._product.prices.map(function (p) { return { date: p.date, price: p.price } })
+    var idx = options.findIndex(function (o) { return o.date === that.data.selectedDate })
+    if (idx < 0) {
+      wx.showToast({ title: '该日期暂无价格', icon: 'none' })
+      return
+    }
+    that._confirmOptions = options
+    that.setData({
+      showConfirm: true,
+      confirmName: (that.data.name || '').trim(),
+      confirmCell: (that.data.cell || '').trim(),
+      confirmDateRange: options.map(function (o) { return dateLabel(o.date) + '  ' + cartUtil.fmtMoney(o.price) }),
+      confirmDateIndex: idx,
+      confirmDate: options[idx].date,
+      confirmDateText: dateLabel(options[idx].date),
+      confirmPriceStr: cartUtil.fmtMoney(options[idx].price)
+    })
+  },
+
+  onConfirmNameInput(e) {
+    this.setData({ confirmName: e.detail.value })
+  },
+
+  onConfirmCellInput(e) {
+    this.setData({ confirmCell: e.detail.value })
+  },
+
+  // 弹层里改日期：这个票种有价格的日期下拉选，应付金额换成新日期的价格
+  onConfirmDateChange(e) {
+    var idx = Number(e.detail.value)
+    var opt = this._confirmOptions && this._confirmOptions[idx]
+    if (!opt) return
+    this.setData({
+      confirmDateIndex: idx,
+      confirmDate: opt.date,
+      confirmDateText: dateLabel(opt.date),
+      confirmPriceStr: cartUtil.fmtMoney(opt.price)
+    })
+  },
+
+  onCloseConfirm() {
+    this.setData({ showConfirm: false })
+  },
+
+  onConfirmAdd() {
+    var that = this
+    var name = (that.data.confirmName || '').trim()
+    var cell = (that.data.confirmCell || '').trim()
     if (!name) {
       wx.showToast({ title: '请填写姓名', icon: 'none' })
       return
@@ -259,34 +322,25 @@ Page({
       wx.showToast({ title: '请填写正确的手机号', icon: 'none' })
       return
     }
-    var hit = that._product.prices.find(function (p) { return p.date === that.data.selectedDate })
-    if (!hit) {
+    var opt = that._confirmOptions && that._confirmOptions[that.data.confirmDateIndex]
+    if (!opt) {
       wx.showToast({ title: '该日期暂无价格', icon: 'none' })
       return
     }
-    // 加入前先和顾客当面确认：游玩日期、接收订票短信的手机号，以及这张票要付多少钱
-    wx.showModal({
-      title: '请和顾客确认',
-      content: '票种：' + that.data.productName
-        + '\n游玩日期：' + that.data.selectedDate + ' ' + (that.data.selectedDateText || '').split(' ').pop()
-        + '\n接收订票短信的手机号：' + cell
-        + '\n本张应付：' + cartUtil.fmtMoney(hit.price),
-      confirmText: '确认加入',
-      cancelText: '再改改',
-      success: (res) => {
-        if (res.confirm) {
-          that._addToCart(name, cell, hit.price)
-        }
-      }
-    })
+    // 弹层里改过的姓名、手机号、日期，回写到页面，下一张默认就是这些
+    that.setData({ showConfirm: false, name: name, cell: cell })
+    if (opt.date !== that.data.selectedDate) {
+      that.setDate(opt.date)
+    }
+    that._addToCart(name, cell, opt.date, opt.price)
   },
 
-  _addToCart(name, cell, price) {
+  _addToCart(name, cell, date, price) {
     var that = this
     var result = cartUtil.addItem(cartUtil.load(), {
       productId: that.data.productId,
       title: that.data.productName,
-      date: that.data.selectedDate,
+      date: date,
       cell: cell,
       name: name,
       price: price,
