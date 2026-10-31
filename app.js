@@ -145,10 +145,15 @@ function startLogin() {
   })
 }
 
-// 店员从这些场景进入小程序（1000 其他、1010 收藏夹、1089 最近使用）时，自动进管理员菜单。
-const STAFF_ENTRY_SCENES = ['1000', '1010', '1089']
+// 店员进入小程序后，第一次落在首页或雪票选购页时自动进管理员菜单；落在其他页面
+// （扫码、分享、付款等指定页面）不适用，不分冷热启动、不分场景。
+const ENTRY_PATHS = ['pages/index/index', 'pages/ski_pass/ski_pass_selector']
 const ADMIN_URL = '/pages/admin/admin'
 const SHOP_URL = '/pages/punchcard/punchcard_shop'
+
+function isEntryPath(path) {
+  return typeof path === 'string' && ENTRY_PATHS.indexOf(path.replace(/^\//, '')) >= 0
+}
 
 function currentRoute() {
   if (typeof getCurrentPages !== 'function') return ''
@@ -161,8 +166,9 @@ function currentRoute() {
 // 「入口」指一次进入小程序：冷启动一次，每次从后台重新进入再算一次，用 entryRevision 区分。
 // 同一入口里店员只自动进一次管理员菜单（entryHandledRevision），之后从菜单打开业务页、返回菜单、
 // 主动回首页都不会再被弹回后台；回首页的普通落点是次卡商城。
-function routeEntry(options) {
-  const app = getApp()
+// 入口落点 entryPath 取自 onLaunch / onShow 的 res.path。
+function routeEntry(options, appRef) {
+  const app = appRef || getApp()
   const fromIndex = !!(options && options.fromIndex)
   const revision = app.globalData.entryRevision
   return app.loginPromiseNew.then(function () {
@@ -171,7 +177,7 @@ function routeEntry(options) {
     const route = currentRoute()
     let target = ''
     if (app.globalData.staff
-      && STAFF_ENTRY_SCENES.indexOf(String(app.globalData.scene)) >= 0
+      && isEntryPath(app.globalData.entryPath)
       && app.globalData.entryHandledRevision !== revision) {
       app.globalData.entryHandledRevision = revision
       // 本次入口已经在管理员页，视为已处理，不重复跳
@@ -213,6 +219,10 @@ App({
     const updateManager = wx.getUpdateManager()
     this.globalData.scene = res.scene
     this.globalData.entryRevision = 1
+    this.globalData.entryPath = res.path
+    if (isEntryPath(res.path) && res.path.replace(/^\//, '') !== 'pages/index/index') {
+      routeEntry({ fromIndex: false }, this)
+    }
     updateManager.onCheckForUpdate(function (res) {
       // 请求完新版本信息的回调
       console.log(res.hasUpdate)
@@ -243,7 +253,7 @@ App({
 
 
   },
-  // 冷启动的分流由首页 onLoad 调 routeEntry 完成；这里只管从后台重新进入。
+  // 冷启动落在首页时由首页 onLoad 调 routeEntry；落在雪票选购页的冷启动、以及所有从后台重新进入，在这里分流。
   onHide: function () {
     // 作废还没跑完的旧入口结果
     this.globalData.entryRevision += 1
@@ -253,7 +263,8 @@ App({
     if (!this._hidden) return
     this._hidden = false
     this.globalData.scene = res && res.scene
-    routeEntry({ fromIndex: false })
+    this.globalData.entryPath = res && res.path
+    routeEntry({ fromIndex: false }, this)
   },
 
   loginPromiseNew: startLogin(),
@@ -294,6 +305,7 @@ App({
     sessionKey: '',
     entryRevision: 1,
     entryHandledRevision: 0,
+    entryPath: '',
     entryNavigating: false,
     cellNumber: '',
     role: '',

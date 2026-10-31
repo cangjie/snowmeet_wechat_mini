@@ -9,7 +9,7 @@ const ADMIN = '/pages/admin/admin'
 const SHOP = '/pages/punchcard/punchcard_shop'
 
 // 运行真实 app.js，替换微信与网络边界。pages 是模拟的页面栈（route 列表）。
-function loadApp({ session, scene = '1089', loginError, sysInfoFail, navFail } = {}) {
+function loadApp({ session, scene = '1089', launchPath = 'pages/index/index', loginError, sysInfoFail, navFail } = {}) {
   const app = {}
   const calls = []
   const stack = []
@@ -55,8 +55,8 @@ function loadApp({ session, scene = '1089', loginError, sysInfoFail, navFail } =
     require(name) { return name === './utils/authSession.js' ? authSession : util },
     console: { log() {}, warn() {} }
   }, { filename: 'app.js' })
-  app.onLaunch({ scene, query: {} })
-  stack.push('pages/index/index')
+  stack.push(launchPath)
+  app.onLaunch({ scene, path: launchPath, query: {} })
   return { app, calls, stack }
 }
 
@@ -65,12 +65,21 @@ const customerSession = { session_key: 'k', member: { id: 1 }, staff: null }
 const tick = () => new Promise((r) => setTimeout(r, 0))
 const urls = (calls) => calls.map((c) => c.url)
 
-test('店员以 1000/1010/1089 冷启动：首页进管理员菜单，只跳一次', async () => {
-  for (const scene of ['1000', '1010', '1089']) {
+test('店员冷启动落在首页：不论什么场景，都进管理员菜单，只跳一次', async () => {
+  for (const scene of ['1000', '1001', '1007', '1010', '1011', '1035', '1047', '1089', '1104']) {
     const { app, calls } = loadApp({ session: staffSession, scene })
     await app.routeEntry({ fromIndex: true })
     await tick()
     assert.deepEqual(urls(calls), [ADMIN], scene)
+  }
+})
+
+test('店员冷启动落在雪票选购页：进管理员菜单；带不带斜杠都认', async () => {
+  for (const path of ['pages/ski_pass/ski_pass_selector', '/pages/ski_pass/ski_pass_selector']) {
+    const { app, calls } = loadApp({ session: staffSession, launchPath: path })
+    await app.loginPromiseNew
+    await tick()
+    assert.deepEqual(calls.map((c) => [c.type, c.url]), [['reLaunch', ADMIN]], path)
   }
 })
 
@@ -88,11 +97,10 @@ test('登录本身不再发出任何跳转', async () => {
   assert.deepEqual(calls, [])
 })
 
-test('普通顾客、其他场景、登录失败：首页都去次卡商城', async () => {
+test('普通顾客、登录失败：首页都去次卡商城', async () => {
   const cases = [
     loadApp({ session: customerSession }),
-    loadApp({ session: staffSession, scene: '1011' }), // 扫码进入
-    loadApp({ session: staffSession, scene: '1007' }), // 分享卡片
+    loadApp({ session: customerSession, scene: '1007' }),
     loadApp({ loginError: '获取会员信息失败' })
   ]
   for (const { app, calls } of cases) {
@@ -102,14 +110,15 @@ test('普通顾客、其他场景、登录失败：首页都去次卡商城', as
   }
 })
 
-test('扫码/分享/付款等非首页入口：冷启动不经首页就不分流', async () => {
-  const { app, calls, stack } = loadApp({ session: staffSession, scene: '1011' })
-  stack.length = 0
-  stack.push('pages/ticket/receive')
-  await app.loginPromiseNew
-  await tick()
-  assert.deepEqual(calls, [])
-  assert.deepEqual(stack, ['pages/ticket/receive'])
+test('冷启动直接进指定页面（扫码、分享、付款等）：店员也不分流', async () => {
+  for (const [scene, path] of [['1011', 'pages/ticket/receive'], ['1007', 'pages/ski_pass/skipass_detail_new'],
+    ['1089', 'pages/punchcard/punchcard_shop'], ['1000', 'pages/admin/admin']]) {
+    const { app, calls, stack } = loadApp({ session: staffSession, scene, launchPath: path })
+    await app.loginPromiseNew
+    await tick()
+    assert.deepEqual(calls, [], path)
+    assert.deepEqual(stack, [path])
+  }
 })
 
 test('进菜单后主动回首页只去商城，不再弹回后台', async () => {
@@ -162,30 +171,42 @@ test('跳管理员菜单失败后撤回标记，下一次还能重试', async ()
   assert.deepEqual(urls(calls), [ADMIN, ADMIN])
 })
 
-test('店员切后台再以 1089 重新进入：新一次入口，重新进菜单', async () => {
-  const { app, calls, stack } = loadApp({ session: staffSession, scene: '1000' })
+test('后台重新进入落在首页或雪票选购页：新一次入口，重新进菜单', async () => {
+  for (const path of ['pages/index/index', 'pages/ski_pass/ski_pass_selector']) {
+    const { app, calls, stack } = loadApp({ session: staffSession, scene: '1000' })
+    await app.routeEntry({ fromIndex: true })
+    await tick()
+    stack.length = 0
+    stack.push('pages/punchcard/punchcard_shop')
+    app.onHide()
+    app.onShow({ scene: '1089', path })
+    await tick()
+    await tick()
+    assert.deepEqual(calls.map((c) => [c.type, c.url]), [['redirectTo', ADMIN], ['reLaunch', ADMIN]], path)
+  }
+})
+
+test('后台重新进入落在其他页面（指定页面或原来的业务页）：不分流', async () => {
+  const { app, calls } = loadApp({ session: staffSession })
   await app.routeEntry({ fromIndex: true })
   await tick()
-  // 菜单 → 商城
-  stack.length = 0
-  stack.push('pages/punchcard/punchcard_shop')
-  app.onHide()
-  app.onShow({ scene: '1089' })
-  await tick()
-  await tick()
-  assert.deepEqual(calls.map((c) => [c.type, c.url]), [['redirectTo', ADMIN], ['reLaunch', ADMIN]])
-  assert.equal(app.globalData.scene, '1089')
+  for (const path of ['pages/ticket/receive', 'pages/punchcard/punchcard_shop', 'pages/admin/care/care_list']) {
+    app.onHide()
+    app.onShow({ scene: '1007', path })
+    await tick()
+  }
+  assert.deepEqual(urls(calls), [ADMIN])
 })
 
 test('冷启动后的第一次 onShow 不处理；顾客重新进入也不分流', async () => {
   const staff = loadApp({ session: staffSession })
-  staff.app.onShow({ scene: '1089' })
+  staff.app.onShow({ scene: '1089', path: 'pages/ski_pass/ski_pass_selector' })
   await tick()
   assert.deepEqual(staff.calls, [])
 
   const customer = loadApp({ session: customerSession })
   customer.app.onHide()
-  customer.app.onShow({ scene: '1089' })
+  customer.app.onShow({ scene: '1089', path: 'pages/index/index' })
   await tick()
   assert.deepEqual(customer.calls, [])
 })
