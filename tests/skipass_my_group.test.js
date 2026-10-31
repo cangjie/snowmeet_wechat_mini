@@ -78,3 +78,24 @@ test('空数据、非数组不报错', () => {
   assert.deepEqual(g.buildMyGroups(null), [])
   assert.deepEqual(g.buildMyGroups([]), [])
 })
+
+test('出票失败：确认出不来了，不管有没有退款都显示「出票失败」，不能退票，说明票款自动退回', () => {
+  const t = (over) => g.parseTicket(raw(1, over))
+  let x = t({ status: '出票失败', is_cancel: -2, reserve_no: null, card_no: null, qr_code_url: null })
+  assert.deepEqual([x.kind, x.stateText, x.usable, x.canCancel], ['failed', '出票失败', false, false])
+  assert.match(x.stateHint, /票款会自动原路退回/)
+  // 退款提交后后台状态变成「已申请退款」，这里仍是出票失败（不是顾客退的票）
+  x = t({ status: '已申请退款', is_cancel: -2, have_refund: 1, reserve_no: null, card_no: null, qr_code_url: null })
+  assert.deepEqual([x.kind, x.stateText], ['failed', '出票失败'])
+  assert.match(x.stateHint, /票款已原路退回/)
+  const grp = g.buildMyGroups([raw(1, { status: '已申请退款', is_cancel: -2, have_refund: 1, reserve_no: null }),
+    raw(2, { status: '出票失败', is_cancel: -2, reserve_no: null })])[0]
+  assert.deepEqual([grp.tab, grp.stampText, grp.statusText], ['used', '出票失败', '2 张出票失败'])
+})
+
+test('出票中：不能退票，提示出票期间不能退，超时会自动退回', () => {
+  const x = g.parseTicket(raw(1, { status: '已付款', reserve_no: null, card_no: null, qr_code_url: null }))
+  assert.deepEqual([x.kind, x.stateText, x.canCancel], ['issuing', '出票中', false])
+  assert.match(x.stateHint, /出票期间不能退票/)
+  assert.match(x.stateHint, /30 分钟/)
+})

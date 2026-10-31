@@ -10,7 +10,7 @@ const CANCEL_STATUS = {
   '已申请退款': { text: '已退票', kind: 'refunded', usable: false, hint: '退款已原路退回，到账时间以支付渠道为准' },
   '退款成功': { text: '已退票', kind: 'refunded', usable: false, hint: '' },
   '已退票': { text: '已退票', kind: 'refunded', usable: false, hint: '' },
-  '出票失败': { text: '出票失败', kind: 'failed', usable: false, hint: '这张票没有出成，票款会自动退回' },
+  '出票失败': { text: '出票失败', kind: 'failed', usable: false, hint: '这张票没有出成，票款会自动原路退回' },
   '取消失败': { text: '退票未成功', kind: 'cancelFailed', usable: true, hint: '退票没有成功，请联系店员处理' }
 }
 
@@ -22,12 +22,18 @@ function parseTicket(raw) {
   const used = USED_STATUS.indexOf(status) >= 0
   const hasCode = !!(raw.qr_code_url || raw.card_no)
   let kind, text, hint = ''
-  if (cancelInfo) {
+  if (raw.is_cancel === -2) {
+    // 出票失败：确认这张票出不来了，系统已停止出票并自动退这一张的票款。退款提交后后台状态会变成「已申请退款」，
+    // 这里仍显示「出票失败」，不能让它看起来像顾客自己退的票
+    const refunded = !!(raw.have_refund || raw.refund_amount)
+    kind = 'failed'; text = '出票失败'
+    hint = refunded ? '这张票没有出成，票款已原路退回，到账时间以支付渠道为准' : '这张票没有出成，票款会自动原路退回'
+  } else if (cancelInfo) {
     kind = cancelInfo.kind; text = cancelInfo.text; hint = cancelInfo.hint
   } else if (used) {
     kind = 'used'; text = '已使用'
   } else if (status === '已付款' && !hasCode && !raw.reserve_no) {
-    kind = 'issuing'; text = '出票中'; hint = '正在向供应商出票，通常一两分钟，请稍后下拉刷新'
+    kind = 'issuing'; text = '出票中'; hint = '正在出票，通常一两分钟；出票期间不能退票。超过 30 分钟没出成会确认出票失败，票款自动退回'
   } else {
     kind = 'ready'; text = status === '已确认' || status === '已出票' ? '可使用' : (status || '可使用')
   }
@@ -87,9 +93,10 @@ function buildMyGroups(list) {
     // 还有能用的票放「未使用」，全都用完或退完放「已使用」
     g.tab = g.usableCount > 0 ? 'unused' : 'used'
     if (g.tab === 'used') {
+      const allFailed = g.tickets.every(t => t.kind === 'failed')
       const allRefund = g.tickets.every(t => ['cancelling', 'refunded', 'failed'].indexOf(t.kind) >= 0)
       const allUsed = g.tickets.every(t => t.kind === 'used')
-      g.stampText = allRefund ? '已退票' : (allUsed ? '已使用' : '已完成')
+      g.stampText = allFailed ? '出票失败' : (allRefund ? '已退票' : (allUsed ? '已使用' : '已完成'))
     } else {
       g.stampText = ''
     }
