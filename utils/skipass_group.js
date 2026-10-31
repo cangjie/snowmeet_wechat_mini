@@ -7,6 +7,11 @@ const DURATION_ORDER = ['4小时', '6小时', '1天', '1.5天', '2天']
 const SESSION_ORDER = ['日场', '夜场', '午连夜']
 const GEAR_ORDER = ['自带板', '不含雪具', '含雪具', '含雪具头盔', '含全套雪具', '']
 
+// 2026-10-31 用户要求：「含全套雪具」不再出现；「含雪具」先灰掉不能选，点了提示暂未上线（上线后把它从 COMING_SOON_GEARS 去掉即可）
+const HIDDEN_GEARS = ['含全套雪具']
+const COMING_SOON_GEARS = ['含雪具']
+const COMING_SOON_TEXT = '含雪具暂未上线，请过几天再看'
+
 const OTHER_KEY = 'other'
 const OTHER_RANK = 9000
 
@@ -124,6 +129,7 @@ function buildGroups(products, now) {
   const groups = {}
   ;(Array.isArray(products) ? products : []).forEach(item => {
     const parsed = parseProductName(item.name)
+    if (HIDDEN_GEARS.indexOf(parsed.gear) >= 0) return
     const prices = bookablePrices(item, firstBookableDate(parsed.session, now))
     if (!prices.length) return
     const key = groupKey(parsed)
@@ -137,6 +143,7 @@ function buildGroups(products, now) {
       gear: parsed.gear,
       variant: parsed.variant,
       gearLabel: [parsed.gear, parsed.variant].filter(Boolean).join('·') || '标准',
+      comingSoon: COMING_SOON_GEARS.indexOf(parsed.gear) >= 0,
       session: parsed.session,
       // 订票和查余额都按商品自己的自我游账号走（万龙自我游 / 大好河山）
       source: item.source || '',
@@ -165,6 +172,7 @@ function findGroupByProductId(groups, id) {
 }
 
 module.exports = {
+  COMING_SOON_TEXT,
   parseProductName,
   groupKey,
   groupTitle,

@@ -168,6 +168,16 @@ page {
   border-color: var(--primary);
 }
 
+/* 暂未上线：灰掉，点了只提示 */
+.gear-chip--disabled {
+  opacity: 0.5;
+}
+
+.gear-chip--disabled .gear-name,
+.gear-chip--disabled .gear-price {
+  color: var(--outline);
+}
+
 .gear-name {
   font-size: 28rpx;
   font-weight: 700;

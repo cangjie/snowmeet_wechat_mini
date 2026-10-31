@@ -34,7 +34,7 @@
           <view
             wx:for="{{gearOptions}}"
             wx:key="id"
-            class="gear-chip {{item.id == productId ? 'gear-chip--active' : ''}}"
+            class="gear-chip {{item.id == productId && !item.disabled ? 'gear-chip--active' : ''}} {{item.disabled ? 'gear-chip--disabled' : ''}}"
             data-id="{{item.id}}"
             bindtap="onSelectGear"
           >

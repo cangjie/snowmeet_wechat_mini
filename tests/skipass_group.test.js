@@ -102,11 +102,13 @@ test('同组多种装备：自带板在前，最低价取各装备里最低的�
   ], MORNING)
   assert.equal(groups.length, 1)
   const grp = groups[0]
-  assert.deepEqual(grp.products.map(p => p.gear), ['自带板', '含雪具', '含全套雪具'])
+  // 「含全套雪具」不再出现；「含雪具」留着但标记暂未上线
+  assert.deepEqual(grp.products.map(p => p.gear), ['自带板', '含雪具'])
+  assert.deepEqual(grp.products.map(p => p.comingSoon), [false, true])
   assert.equal(grp.minPrice, 399)
   assert.equal(grp.minPriceStr, '399')
-  assert.equal(grp.gearCount, 3)
-  assert.equal(grp.subtitle, '3 种装备')
+  assert.equal(grp.gearCount, 2)
+  assert.equal(grp.subtitle, '2 种装备')
   assert.deepEqual(grp.products[0].prices.map(p => p.date), ['2026-11-02', '2026-11-03', '2026-11-07'])
 })
 
@@ -212,10 +214,17 @@ test('试营业 16 个票 + 4 个预售次卡：分组、顺序、装备选项�
     '4小时日场', '6小时日场', '1天日场', '1.5天日场', '2天日场', '午连夜', '3次卡·日场', '3次卡·夜场'
   ])
   const oneDay = groups.find(x => x.title === '1天日场')
-  assert.deepEqual(oneDay.products.map(p => p.gearLabel), ['不含雪具', '含雪具', '含全套雪具'])
+  assert.deepEqual(oneDay.products.map(p => p.gearLabel), ['不含雪具', '含雪具'])
+  assert.deepEqual(oneDay.products.map(p => p.comingSoon), [false, true])
   assert.ok(oneDay.products.every(p => p.source === '大好河山'))
   const night = groups.find(x => x.title === '3次卡·夜场')
   assert.deepEqual(night.products.map(p => p.gearLabel).sort(), ['不含雪具·全雪季通用', '不含雪具·限平日使用'])
   assert.equal(night.subtitle, '2 种装备')
   assert.equal(groups.find(x => x.title === '午连夜').products[0].gearLabel, '标准')
+})
+
+test('含全套雪具的商品整个不出现；只有含全套雪具的分组也不出现', () => {
+  const only = g.buildGroups([product(31, '【25-26雪季】1天日场含全套雪具滑雪票', NOV)], MORNING)
+  assert.deepEqual(only, [])
+  assert.equal(g.COMING_SOON_TEXT, '含雪具暂未上线，请过几天再看')
 })

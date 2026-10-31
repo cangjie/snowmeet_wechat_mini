@@ -88,7 +88,7 @@ test('首页：顾客看到分组卡片和价格，顶部提示仅限店员订�
   assert.equal(page.data.loaded, true)
   assert.equal(page.data.showTabs, false)
   assert.deepEqual(page.data.groups.map(x => [x.title, x.minPriceStr, x.subtitle]), [
-    ['1天日场', '399', '3 种装备'],
+    ['1天日场', '399', '2 种装备'],
     ['夜场', '249', '自带板']
   ])
   const call = env.requests.find(u => u.indexOf('GetProductsByResort') >= 0)
@@ -171,8 +171,9 @@ test('详情页：按分组打开，默认选自带板和第一个有价日期�
   const env = setup({ staff: { id: 28 } })
   const page = await openDetail(env, { group: dayKey(), resort: encodeURIComponent('万龙') })
   assert.equal(page.data.groupTitle, '1天日场')
-  assert.deepEqual(page.data.gearOptions.map(x => [x.id, x.label, x.minPriceStr]), [
-    [32, '自带板', '399'], [33, '含雪具', '579'], [31, '含全套雪具', '659']
+  // 含全套雪具不出现；含雪具留着但置灰
+  assert.deepEqual(page.data.gearOptions.map(x => [x.id, x.label, x.minPriceStr, x.disabled]), [
+    [32, '自带板', '399', false], [33, '含雪具', '579', true]
   ])
   assert.equal(page.data.productId, 32)
   assert.equal(page.data.selectedDate, '2026-11-02')
@@ -184,29 +185,66 @@ test('详情页：按分组打开，默认选自带板和第一个有价日期�
   cleanup()
 })
 
-test('详情页：旧链接只带 id，也能打开所在分组并选中该商品', async () => {
+test('详情页：旧链接只带 id，也能打开所在分组并选中该商品；指到暂未上线的含雪具时改选可选的装备', async () => {
   const env = setup({ staff: { id: 28 } })
-  const page = await openDetail(env, { id: '33' })
+  const page = await openDetail(env, { id: '32' })
   assert.equal(page.data.groupTitle, '1天日场')
-  assert.equal(page.data.productId, 33)
-  assert.equal(page.data.selectedDate, '2026-11-03')
-  assert.equal(page.data.priceStr, '579')
+  assert.equal(page.data.productId, 32)
+  cleanup()
+
+  const env2 = setup({ staff: { id: 28 } })
+  const page2 = await openDetail(env2, { id: '33' })
+  assert.equal(page2.data.groupTitle, '1天日场')
+  assert.equal(page2.data.productId, 32)
+  assert.equal(page2.data.selectedDate, '2026-11-02')
+  assert.equal(page2.data.priceStr, '399')
   cleanup()
 })
 
+const TWO_GEARS = PRODUCTS.concat([
+  { product_id: 34, name: '【25-26雪季】1天日场不含雪具滑雪票', dailyPrice: rows([['2026-11-02', 419], ['2026-11-07', 499]]) }
+])
+
 test('详情页：切换装备，日期还有价就保留，没价就换成第一个有价日期', async () => {
-  const env = setup({ staff: { id: 28 } })
-  const page = await openDetail(env, { group: dayKey() })
+  const env = setup({ staff: { id: 28 }, products: TWO_GEARS })
+  const key = require('../utils/skipass_group.js').buildGroups(TWO_GEARS, NOW).find(g => g.title === '1天日场').key
+  const page = await openDetail(env, { group: key })
   page.onSelectDay({ currentTarget: { dataset: { date: '2026-11-07', enabled: true } } })
   assert.equal(page.data.priceStr, '479')
-  page.onSelectGear({ currentTarget: { dataset: { id: 33 } } })
-  assert.equal(page.data.productId, 33)
+  page.onSelectGear({ currentTarget: { dataset: { id: 34 } } })
+  assert.equal(page.data.productId, 34)
   assert.equal(page.data.selectedDate, '2026-11-07')
-  assert.equal(page.data.priceStr, '659')
+  assert.equal(page.data.priceStr, '499')
+  page.setDate('2026-11-02')
+  page.onSelectGear({ currentTarget: { dataset: { id: 32 } } })
   page.onSelectDay({ currentTarget: { dataset: { date: '2026-11-03', enabled: true } } })
-  page.onSelectGear({ currentTarget: { dataset: { id: 31 } } })
-  assert.equal(page.data.selectedDate, '2026-11-02') // 含全套雪具 11-03 没价格
-  assert.equal(page.data.priceStr, '659')
+  page.onSelectGear({ currentTarget: { dataset: { id: 34 } } })
+  assert.equal(page.data.selectedDate, '2026-11-02') // 不含雪具 11-03 没价格
+  assert.equal(page.data.priceStr, '419')
+  cleanup()
+})
+
+test('详情页：含雪具置灰，点了提示暂未上线、不切换；含全套雪具不出现', async () => {
+  const env = setup({ staff: { id: 28 } })
+  const page = await openDetail(env, { group: dayKey() })
+  assert.equal(page.data.gearOptions.some(x => /全套/.test(x.label)), false)
+  assert.equal(page.data.gearOptions.find(x => x.label === '含雪具').disabled, true)
+  assert.equal(page.data.productId, 32)
+  page.onSelectGear({ currentTarget: { dataset: { id: 33 } } })
+  assert.equal(page.data.productId, 32)
+  assert.equal(page.data.priceStr, '399')
+  assert.deepEqual(env.toasts, ['含雪具暂未上线，请过几天再看'])
+  cleanup()
+})
+
+test('详情页：整个分组只有含雪具（暂未上线）时，打开不报错但不能支付', async () => {
+  const only = [{ product_id: 61, name: '【25-26雪季】1.5天日场含雪具套票', dailyPrice: rows([['2026-11-02', 799]]) }]
+  const env = setup({ staff: { id: 28 }, products: only })
+  const key = require('../utils/skipass_group.js').buildGroups(only, NOW)[0].key
+  const page = await openDetail(env, { group: key })
+  assert.equal(page.data.hasPrice, true)
+  assert.equal(page.data.productId, 61)
+  assert.equal(page.data.canPay, false)
   cleanup()
 })
 
@@ -313,8 +351,8 @@ test('详情页：链接里的分组已经没有价格了，显示暂无价格�
 // ---------------- 两个自我游账号各有各的预存款 ----------------
 
 const MIXED = [
-  { product_id: 71, name: '【万龙】全雪区日场1天雪票-11.6', source: '大好河山', dailyPrice: rows([['2026-11-02', 399], ['2026-11-03', 399]]) },
-  { product_id: 72, name: '【万龙】全雪区日场1天雪票(含雪具)-11.6', source: '万龙自我游', dailyPrice: rows([['2026-11-02', 579], ['2026-11-03', 579]]) }
+  { product_id: 71, name: '【万龙】全雪区日场1天雪票自带板-11.6', source: '大好河山', dailyPrice: rows([['2026-11-02', 399], ['2026-11-03', 399]]) },
+  { product_id: 72, name: '【万龙】全雪区日场1天雪票-11.6', source: '万龙自我游', dailyPrice: rows([['2026-11-02', 579], ['2026-11-03', 579]]) }
 ]
 
 test('详情页：按所选商品所属账号查余额；大好河山账号没钱就不能支付，换到万龙自我游账号的装备就能', async () => {

@@ -125,12 +125,15 @@ Page({
   applyGroup(group, preferProductId) {
     var that = this
     that._group = group
-    var product = group.products.find(function (p) { return String(p.id) === String(preferProductId) }) || group.products[0]
+    // 暂未上线的装备（含雪具）不作为默认选中；整组都没上线的才退回第一个，下单会被挡住
+    var selectable = group.products.filter(function (p) { return !p.comingSoon })
+    var candidates = selectable.length ? selectable : group.products
+    var product = candidates.find(function (p) { return String(p.id) === String(preferProductId) }) || candidates[0]
     that.setData({
       loading: false,
       hasPrice: true,
       groupTitle: group.title,
-      gearOptions: group.products.map(function (p) { return { id: p.id, label: p.gearLabel, minPriceStr: p.minPriceStr } })
+      gearOptions: group.products.map(function (p) { return { id: p.id, label: p.gearLabel, minPriceStr: p.minPriceStr, disabled: !!p.comingSoon } })
     })
     wx.setNavigationBarTitle({ title: that.data.resort + ' ' + group.title })
     that.selectProduct(product.id, '')
@@ -177,6 +180,11 @@ Page({
 
   onSelectGear(e) {
     var that = this
+    var target = that._group && that._group.products.find(function (p) { return String(p.id) === String(e.currentTarget.dataset.id) })
+    if (target && target.comingSoon) {
+      wx.showToast({ title: skipassGroup.COMING_SOON_TEXT, icon: 'none' })
+      return
+    }
     that.selectProduct(e.currentTarget.dataset.id, that.data.selectedDate)
   },
 
@@ -192,7 +200,8 @@ Page({
   // 能支付 = 店员 + 这一天有价格 + 自我游预存款够这一单（预存款不够，付了款也出不了票）
   _refreshPay() {
     var d = this.data
-    var canPay = !!(d.isStaff && d.hasPrice && d.summary > 0 && isFinite(d.balance) && d.summary < d.balance)
+    var comingSoon = !!(this._product && this._product.comingSoon)
+    var canPay = !!(d.isStaff && d.hasPrice && !comingSoon && d.summary > 0 && isFinite(d.balance) && d.summary < d.balance)
     this.setData({ canPay })
   },
 
