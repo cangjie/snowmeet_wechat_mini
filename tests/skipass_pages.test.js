@@ -316,6 +316,38 @@ test('详情页：加入购物车，校验的是用户实际填的姓名和手�
   cleanup()
 })
 
+test('详情页：加入购物车前弹确认——日期、接收短信的手机号、本张应付金额；不确认就不加', async () => {
+  const env = setup({ staff: { id: 28 }, confirm: false })
+  const page = await openDetail(env, { group: dayKey() })
+  page.onNameInput({ detail: { value: '张三' } })
+  page.onPhoneInput({ detail: { value: '13800138000' } })
+  page.onAddToCart()
+  assert.equal(env.modals.length, 1)
+  assert.equal(env.modals[0].title, '请和顾客确认')
+  assert.match(env.modals[0].content, /游玩日期：2026-11-02 周一/)
+  assert.match(env.modals[0].content, /接收订票短信的手机号：13800138000/)
+  assert.match(env.modals[0].content, /本张应付：¥399\.00/)
+  assert.match(env.modals[0].content, /自带板|滑雪票/)
+  assert.equal(env.modals[0].confirmText, '确认加入')
+  // 点「再改改」：什么都没加
+  assert.equal(env.store['skipass_cart_v1'], undefined)
+  assert.equal(page.data.cartCount, 0)
+  assert.deepEqual(env.toasts, [])
+  cleanup()
+})
+
+test('详情页：换了日期，确认框里的日期和金额跟着变', async () => {
+  const env = setup({ staff: { id: 28 }, confirm: false })
+  const page = await openDetail(env, { group: dayKey() })
+  page.onNameInput({ detail: { value: '张三' } })
+  page.onPhoneInput({ detail: { value: '13800138000' } })
+  page.onSelectDay({ currentTarget: { dataset: { date: '2026-11-07', enabled: true } } })
+  page.onAddToCart()
+  assert.match(env.modals[0].content, /游玩日期：2026-11-07 周六/)
+  assert.match(env.modals[0].content, /本张应付：¥479\.00/)
+  cleanup()
+})
+
 test('详情页：购物车满 10 张不能再加', async () => {
   const env = setup({ staff: { id: 28 } })
   const page = await openDetail(env, { group: dayKey() })

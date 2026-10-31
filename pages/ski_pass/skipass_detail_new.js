@@ -264,13 +264,32 @@ Page({
       wx.showToast({ title: '该日期暂无价格', icon: 'none' })
       return
     }
+    // 加入前先和顾客当面确认：游玩日期、接收订票短信的手机号，以及这张票要付多少钱
+    wx.showModal({
+      title: '请和顾客确认',
+      content: '票种：' + that.data.productName
+        + '\n游玩日期：' + that.data.selectedDate + ' ' + (that.data.selectedDateText || '').split(' ').pop()
+        + '\n接收订票短信的手机号：' + cell
+        + '\n本张应付：' + cartUtil.fmtMoney(hit.price),
+      confirmText: '确认加入',
+      cancelText: '再改改',
+      success: (res) => {
+        if (res.confirm) {
+          that._addToCart(name, cell, hit.price)
+        }
+      }
+    })
+  },
+
+  _addToCart(name, cell, price) {
+    var that = this
     var result = cartUtil.addItem(cartUtil.load(), {
       productId: that.data.productId,
       title: that.data.productName,
       date: that.data.selectedDate,
       cell: cell,
       name: name,
-      price: hit.price,
+      price: price,
       source: that.data.source,
       resort: that.data.resort,
       staffId: that.data.staffId
