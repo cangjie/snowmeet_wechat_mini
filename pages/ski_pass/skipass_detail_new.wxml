@@ -139,7 +139,6 @@
     <text class="sheet-label">接收订票短信的手机号</text>
     <view class="sheet-picker-value">
       <input class="sheet-input" type="number" maxlength="11" value="{{confirmCell}}" placeholder="请输入手机号" bindinput="onConfirmCellInput" />
-      <text class="sheet-edit">修改</text>
     </view>
   </view>
 

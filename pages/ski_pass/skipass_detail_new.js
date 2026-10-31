@@ -354,7 +354,8 @@ Page({
     }
     cartUtil.save(result.cart)
     that.setData({ cartCount: cartUtil.ticketCount(result.cart) })
-    wx.showToast({ title: '已加入购物车', icon: 'success' })
+    // 加入后直接进购物车页，店员可以继续选票（购物车页有「继续选票」）或去结算
+    wx.navigateTo({ url: '/pages/ski_pass/skipass_cart' })
   },
 
   onOpenCart() {

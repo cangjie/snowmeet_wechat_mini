@@ -315,7 +315,8 @@ test('详情页：弹层里顾客改日期，应付金额跟着变，确认后�
   assert.deepEqual([item.date, item.price, item.count], ['2026-11-07', 479, 1])
   assert.equal(page.data.selectedDate, '2026-11-07')
   assert.equal(page.data.showConfirm, false)
-  assert.equal(env.toasts[env.toasts.length - 1], '已加入购物车')
+  assert.deepEqual(env.toasts, [])
+  assert.equal(env.navs[env.navs.length - 1], '/pages/ski_pass/skipass_cart')
   cleanup()
 })
 
@@ -342,6 +343,8 @@ test('详情页：弹层里顾客改手机号和姓名，按改后的加入；�
   assert.equal(cart.items[0].resort, '万龙')
   // 弹层里改过的手机号、姓名回写到页面，下一张默认就是这些
   assert.deepEqual([page.data.cell, page.data.name], ['13800138000', '张三'])
+  // 加入后进购物车页
+  assert.equal(env.navs[env.navs.length - 1], '/pages/ski_pass/skipass_cart')
   cleanup()
 })
 
@@ -351,6 +354,7 @@ test('详情页：点「再改改」或点遮罩关闭弹层，什么都不加',
   page.onAddToCart()
   page.onCloseConfirm()
   assert.equal(page.data.showConfirm, false)
+  assert.deepEqual(env.navs, [])
   assert.equal(env.store['skipass_cart_v1'], undefined)
   assert.equal(page.data.cartCount, 0)
   assert.deepEqual(env.toasts, [])
@@ -382,9 +386,11 @@ test('详情页：购物车满 10 张不能再加', async () => {
   const page = await openDetail(env, { group: dayKey() })
   for (let i = 0; i < 10; i++) addViaSheet(page)
   assert.equal(page.data.cartCount, 10)
+  const navsBefore = env.navs.length
   addViaSheet(page)
   assert.equal(env.toasts[env.toasts.length - 1], '购物车最多 10 张票')
   assert.equal(page.data.cartCount, 10)
+  assert.equal(env.navs.length, navsBefore) // 加不进去就不跳
   cleanup()
 })
 

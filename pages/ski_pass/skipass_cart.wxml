@@ -20,7 +20,6 @@
         <view class="meta-field meta-field--cell">
           <input class="cell-input" type="number" maxlength="11" confirm-type="done" value="{{item.cell}}"
             data-key="{{item.key}}" bindblur="onCellBlur" />
-          <text class="meta-edit">改</text>
         </view>
       </view>
       <view class="line-bottom">
