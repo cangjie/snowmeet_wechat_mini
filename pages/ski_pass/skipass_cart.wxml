@@ -1,0 +1,44 @@
+<!--pages/ski_pass/skipass_cart.wxml-->
+<view class="cart-page">
+  <scroll-view scroll-y class="cart-scroll">
+    <view class="cart-line" wx:for="{{lines}}" wx:key="key">
+      <view class="line-top">
+        <text class="line-title">{{item.title}}</text>
+        <text class="line-remove" bindtap="onRemove" data-key="{{item.key}}">删除</text>
+      </view>
+      <view class="line-meta">
+        <text class="line-date">{{item.dateText}}</text>
+        <text class="line-cell">{{item.cell}}</text>
+      </view>
+      <view class="line-bottom">
+        <view class="line-price">
+          <text class="price-unit">{{item.priceStr}}</text>
+          <text class="price-times">× {{item.count}}</text>
+          <text class="price-line-total">{{item.lineTotalStr}}</text>
+        </view>
+        <view class="stepper">
+          <view class="step-btn" bindtap="onDec" data-key="{{item.key}}">−</view>
+          <text class="step-count">{{item.count}}</text>
+          <view class="step-btn" bindtap="onInc" data-key="{{item.key}}">+</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{empty}}">
+      <text class="empty-text">购物车是空的</text>
+      <view class="empty-btn" bindtap="onContinue">去选票</view>
+    </view>
+
+    <view class="cart-tip" wx:if="{{!empty}}">供应商一单只能订 1 张，结算后每张票单独出票、单独退票；金额以结算时的价格为准。</view>
+    <view class="cart-bottom-space" />
+  </scroll-view>
+
+  <view class="cart-bar" wx:if="{{!empty}}">
+    <view class="bar-total">
+      <text class="bar-label">共 {{ticketCount}} 张 · 合计</text>
+      <text class="bar-value">{{totalStr}}</text>
+    </view>
+    <view class="bar-continue" bindtap="onContinue">继续选票</view>
+    <view class="bar-pay {{(paying || !isStaff) ? 'bar-pay--disabled' : ''}}" bindtap="onCheckout">去结算</view>
+  </view>
+</view>

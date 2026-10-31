@@ -118,17 +118,22 @@
   </view>
 </scroll-view>
 
-<!-- 底部栏：店员是支付栏；顾客只显示价格和订票说明 -->
+<!-- 底部栏：店员是「购物车 + 加入购物车」；顾客只显示价格和订票说明 -->
 <view class="pay-bar" wx:if="{{hasPrice}}">
   <view class="price-section">
-    <text class="price-label">{{isStaff ? '总计 (TOTAL PRICE)' : '价格 (PRICE)'}}</text>
+    <text class="price-label">{{isStaff ? '本张 (THIS TICKET)' : '价格 (PRICE)'}}</text>
     <view class="price-row">
       <text class="price-value">{{summaryStr}}</text>
     </view>
   </view>
-  <view wx:if="{{isStaff}}" class="pay-btn {{(!canPay || paying) ? 'pay-btn--disabled' : ''}}" bindtap="onPay">
-    <text class="pay-btn-text">确认支付</text>
-    <text class="pay-btn-arrow">→</text>
+  <view wx:if="{{isStaff}}" class="bar-actions">
+    <view class="cart-entry" bindtap="onOpenCart">
+      <text class="cart-entry-text">购物车</text>
+      <text class="cart-entry-count" wx:if="{{cartCount > 0}}">{{cartCount}}</text>
+    </view>
+    <view class="pay-btn {{!canAdd ? 'pay-btn--disabled' : ''}}" bindtap="onAddToCart">
+      <text class="pay-btn-text">加入购物车</text>
+    </view>
   </view>
   <view wx:else class="staff-only">
     <text class="staff-only-text">仅限店员订票，请联系店员预订</text>

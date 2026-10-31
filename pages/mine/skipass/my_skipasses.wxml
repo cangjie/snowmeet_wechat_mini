@@ -19,29 +19,27 @@
   </view>
 </view>
 
-<!-- 票券列表 -->
+<!-- 票券列表：票种、日期、手机号相同的合并成一条 × n -->
 <scroll-view scroll-y class="ticket-list">
   <view
     wx:for="{{currentList}}"
-    wx:key="id"
+    wx:key="key"
     class="ticket-card"
     style="animation-delay: {{index * 80}}ms"
   >
     <!-- 卡片头部 -->
     <view class="card-header">
       <view class="card-header-left">
-        <view class="badge {{item.tier === 'premium' ? 'badge-premium' : 'badge-standard'}}">
-          {{item.tier === 'premium' ? '' : ''}}
-        </view>
         <text class="ticket-title" style="font-size: 10pt;">{{item.title}}</text>
+        <text class="ticket-times" wx:if="{{item.count > 1}}">× {{item.count}}</text>
       </view>
-      <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
+      <view class="status-tag status-picked">{{item.statusText}}</view>
     </view>
 
     <view class="status-hint" wx:if="{{item.statusHint}}">{{item.statusHint}}</view>
 
-    <!-- 序列号 -->
-    <view class="serial-block">
+    <!-- 只有一张时显示供应商订单号 -->
+    <view class="serial-block" wx:if="{{item.serial}}">
       <text class="serial-label">Serial Number</text>
       <text class="serial-value">{{item.serial}}</text>
     </view>
@@ -52,41 +50,30 @@
         <text class="detail-label">VALID DATE</text>
         <text class="detail-value">{{item.validDate}}</text>
       </view>
-      <view class="detail-item align-right" wx:if="{{item.quantity}}">
-        <text class="detail-label">QUANTITY</text>
-        <text class="detail-value">{{item.quantity}}</text>
+      <view class="detail-item align-right">
+        <text class="detail-label">PHONE</text>
+        <text class="detail-value">{{item.cell}}</text>
       </view>
       <view class="detail-item">
         <text class="detail-label">AMOUNT</text>
-        <text class="detail-value amount {{item.tier === 'premium' ? 'amount-premium' : ''}}">{{item.amount}}</text>
+        <text class="detail-value amount">{{item.amount}}</text>
       </view>
     </view>
 
-    <!-- 操作按钮 -->
+    <!-- 操作按钮：退票在弹层里，每张票各有一个 -->
     <view class="card-actions" wx:if="{{activeTab === 'unused'}}">
       <view
-        class="btn btn-cancel"
-        bindtap="onCancelTicket"
-        data-id="{{item.id}}"
-        data-title="{{item.title}}"
+        class="btn btn-use"
+        bindtap="onUseTicket"
+        data-key="{{item.key}}"
       >
-        申请取消
-      </view>
-      <view
-        class="btn {{item.canUse ? 'btn-use' : 'btn-use-disabled'}}"
-        bindtap="{{item.canUse ? 'onUseTicket' : ''}}"
-        data-id="{{item.id}}"
-        data-card_no="{{item.card_no}}" 
-        data-pickupCode="{{item.pickupCode}}"
-        data-title="{{item.title}}"
-      >
-        立即使用
+        立即使用{{item.count > 1 ? '（' + item.usableCount + ' 张可用）' : ''}}
       </view>
     </view>
 
-    <!-- 已使用状态遮盖 -->
+    <!-- 已使用 / 已退票 状态遮盖 -->
     <view class="used-overlay" wx:if="{{activeTab === 'used'}}">
-      <view class="used-stamp">已使用</view>
+      <view class="used-stamp">{{item.stampText}}</view>
     </view>
   </view>
 
@@ -114,7 +101,7 @@
   </view>
 </view>
 
-<!-- ===== 弹窗：立即使用 - 二维码 ===== -->
+<!-- ===== 弹窗：立即使用 - 二维码；一组多张票用标签切换，每张票有自己的二维码、状态和退票按钮 ===== -->
 <view class="modal-mask {{showUseModal ? 'modal-visible' : ''}}" bindtap="closeUseModal">
   <view class="modal-box qr-modal" catchtap="">
     <!-- 关闭按钮 -->
@@ -124,24 +111,55 @@
 
     <text class="qr-modal-title">扫码取票</text>
     <text class="qr-modal-subtitle">{{useTarget.title}}</text>
+    <text class="qr-modal-meta">{{useTarget.validDate}} · {{useTarget.cell}}</text>
+
+    <!-- 多张票的标签 -->
+    <scroll-view scroll-x class="ticket-tabs" wx:if="{{useTickets.length > 1}}">
+      <view
+        wx:for="{{useTickets}}"
+        wx:key="id"
+        class="ticket-tab {{index === useIndex ? 'ticket-tab--active' : ''}}"
+        bindtap="onSelectTicket"
+        data-index="{{index}}"
+      >
+        <text class="ticket-tab-name">{{item.tag}}</text>
+        <text class="ticket-tab-state ticket-tab-state--{{item.kind}}">{{item.stateText}}</text>
+      </view>
+    </scroll-view>
 
     <!-- 二维码区域 -->
     <view class="qr-wrapper">
       <image
         class="qr-image"
-        wx:if="{{useTarget.pickupCode}}"
-        src="{{useTarget.pickupCode}}"
+        wx:if="{{useTicket.pickupCode && useTicket.usable}}"
+        src="{{useTicket.pickupCode}}"
         mode="aspectFit"
       />
-      <view class="qr-scan-line"></view>
+      <view class="qr-placeholder" wx:elif="{{useTicket.usable}}">取票码正在生成，请稍后下拉刷新</view>
+      <view class="qr-placeholder" wx:else>{{useTicket.stateText}}</view>
+      <view class="qr-scan-line" wx:if="{{useTicket.pickupCode && useTicket.usable}}"></view>
     </view>
 
     <!-- 数字取票码 -->
-    <view class="pickup-code-section">
+    <view class="pickup-code-section" wx:if="{{useTicket.cardNo && useTicket.usable}}">
       <text class="pickup-label">取票码</text>
       <view class="pickup-code-row">
-        <text class="pickup-code">{{useTarget.card_no}}</text>
+        <text class="pickup-code">{{useTicket.cardNo}}</text>
       </view>
+    </view>
+
+    <!-- 这张票的状态和退票 -->
+    <view class="ticket-state-row">
+      <text class="ticket-state-text ticket-state-text--{{useTicket.kind}}">{{useTicket.stateText}}</text>
+      <text class="ticket-state-hint" wx:if="{{useTicket.stateHint}}">{{useTicket.stateHint}}</text>
+    </view>
+    <view
+      class="btn btn-cancel qr-cancel-btn"
+      wx:if="{{useTicket.canCancel}}"
+      bindtap="onCancelTicket"
+      data-id="{{useTicket.id}}"
+    >
+      退这张票
     </view>
 
     <text class="qr-tip">请将此码出示给工作人员，或在自助取票机扫描</text>

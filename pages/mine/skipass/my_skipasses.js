@@ -1,19 +1,7 @@
 // pages/tickets/tickets.js
 const app = getApp()
 const util = require('../../../utils/util.js')
-// 退票状态：后台 status 文案 → 标签文案、是否还能用、给顾客的说明。
-// 取消先提交给供应商，确认可能要几分钟，确认后系统自动原路退款，顾客不用再操作。
-var CANCEL_STATUS = {
-  '取消中': { text: '退票中', usable: false, hint: '退票处理中，通常几分钟内确认，确认后自动原路退款' },
-  '申请取消': { text: '退票中', usable: false, hint: '退票处理中，通常几分钟内确认，确认后自动原路退款' },
-  '已取消': { text: '退票中', usable: false, hint: '退票已确认，退款正在提交' },
-  // 退款已经提交给微信，钱按原路退回；微信的退款成功回调这几个月没有更新库里的状态，
-  // 所以以「已申请退款」为准显示已退票，不等「退款成功」
-  '已申请退款': { text: '已退票', usable: false, hint: '退款已原路退回，到账时间以支付渠道为准' },
-  '退款成功': { text: '已退票', usable: false, hint: '' },
-  '出票失败': { text: '出票失败', usable: false, hint: '' },
-  '取消失败': { text: '退票未成功', usable: true, hint: '退票没有成功，请联系店员处理' }
-}
+const myGroup = require('../../../utils/skipass_my_group.js')
 
 Page({
   data: {
@@ -127,13 +115,12 @@ Page({
     },
 
     // 使用弹窗（二维码）
+    // 立即使用：一组里有多张票时按标签（票1、票2…）切换，每张票各自的二维码、状态和退票按钮
     showUseModal: false,
-    useTarget: {
-      id: '',
-      title: '',
-      serial: '',
-      pickupCode: '',
-    },
+    useTarget: { key: '', title: '', validDate: '', cell: '', count: 0 },
+    useTickets: [],
+    useIndex: 0,
+    useTicket: {},
   },
 
   onLoad() {
@@ -167,9 +154,13 @@ Page({
   },
 
   // ===== 申请取消 =====
+  // 退票按钮在「立即使用」弹层里，每张票各有一个；先关掉票码弹层，再弹确认
   onCancelTicket(e) {
-    const { id, title } = e.currentTarget.dataset
+    const { id } = e.currentTarget.dataset
+    const ticket = this.data.useTickets.find(t => t.id === id)
+    const title = this.data.useTarget.title + (this.data.useTarget.count > 1 && ticket ? '（' + ticket.tag + '）' : '')
     this.setData({
+      showUseModal: false,
       showCancelModal: true,
       cancelTarget: { id, title },
     })
@@ -180,54 +171,33 @@ Page({
   },
 
   confirmCancel() {
-    var that = this
     const { id } = this.data.cancelTarget
+    this.setData({ showCancelModal: false })
+    this.cancel(id)
+  },
 
-    // 从未使用列表中移除（实际开发中替换为 API 调用）
-    const unusedList = this.data.unusedList.filter(item => item.id !== id)
+  // ===== 立即使用：打开这一组的票码弹层 =====
+  onUseTicket(e) {
+    const key = e.currentTarget.dataset.key
+    const group = this.data.unusedList.find(item => item.key === key)
+    if (!group || !group.usableCount) return
+    const tickets = group.tickets.map((t, i) => Object.assign({ tag: '票' + (i + 1) }, t))
+    let index = tickets.findIndex(t => t.usable)
+    if (index < 0) index = 0
     this.setData({
-      unusedList,
-      showCancelModal: false,
-    }, () => {
-      this._refreshCurrentList()
-    })
-
-    wx.showToast({
-      title: '退票申请已提交',
-      icon: 'success',
-      duration: 2000,
-      success:()=>{
-        that.cancel(that.data.cancelTarget.id)
-      }
+      showUseModal: true,
+      useTarget: { key, title: group.title, validDate: group.validDate, cell: group.cell, count: group.count },
+      useTickets: tickets,
+      useIndex: index,
+      useTicket: tickets[index],
     })
   },
 
-  // ===== 立即使用 =====
-  onUseTicket(e) {
-    const { id, card_no, pickupCode, title } = e.currentTarget.dataset
-
-    // 从列表找到完整数据（含 pickupCode）
-    const ticket = this.data.unusedList.find(item => item.id === id)
-    if (!ticket || !ticket.canUse) return
-
-    // 取票二维码和取票码是下单后由供应商出票才有的，刚下单那一会儿还没有，
-    // 这时没东西可展示，提示稍后再试（原来这里引用了不存在的变量 serial，点了直接报错）
-    const pickup = ticket.pickupCode || pickupCode || ''
-    const cardNo = ticket.card_no || card_no || ''
-    if (!pickup && !cardNo) {
-      wx.showToast({ title: '取票码正在生成，请稍后下拉刷新再试', icon: 'none' })
-      return
-    }
-
-    this.setData({
-      showUseModal: true,
-      useTarget: {
-        id,
-        title,
-        card_no: cardNo,
-        pickupCode: pickup,
-      },
-    })
+  onSelectTicket(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    const ticket = this.data.useTickets[index]
+    if (!ticket) return
+    this.setData({ useIndex: index, useTicket: ticket })
   },
 
   closeUseModal() {
@@ -260,33 +230,16 @@ Page({
         }
         var unusedList = []
         var usedList = []
-        var list = res.data
-        console.log('ticket list', list)
-        for(var i = 0; i < list.length; i++){
-          var item = {}
-          item.id = list[i].id
-          item.tire = ''
-          item.title = list[i].product_name
-          item.serial = (list[i].reserve_no==null || list[i].reserve_no == undefined) ? '' : list[i].reserve_no 
-          item.validDate = util.formatDate(new Date(list[i].reserve_date))
-          item.quantity = '1张'
-          // 顾客实际支付的金额（deal_price，已含张数）。ticket_price 是我们和供应商的结算价，不能给顾客看
-          item.amount = util.showAmount(parseFloat(list[i].deal_price))
-          var cancelInfo = CANCEL_STATUS[list[i].status]
-          item.statusText = cancelInfo ? cancelInfo.text : list[i].status
-          item.statusHint = cancelInfo ? cancelInfo.hint : ''
-          item.statusClass = 'status-picked'
-          item.canUse = (list[i].status != '已申请退款' && list[i].status != '已退票' &&  list[i].status != '已取卡'
-          &&  list[i].status != '已退押金' ) && (!cancelInfo || cancelInfo.usable)
-          item.card_no = list[i].card_no
-          item.pickupCode = list[i].qr_code_url
-          if (item.canUse){
-            unusedList.push(item)
+        var groups = myGroup.buildMyGroups(res.data)
+        groups.forEach(function (g) {
+          // 顾客实际支付的金额（各张 deal_price 之和）。ticket_price 是我们和供应商的结算价，不能给顾客看
+          g.amount = util.showAmount(g.amountNum)
+          if (g.tab === 'unused') {
+            unusedList.push(g)
+          } else {
+            usedList.push(g)
           }
-          else{
-            usedList.push(item)
-          }
-        }
+        })
         that.data.unusedList = unusedList
         that.data.usedList = usedList
         that._refreshCurrentList()
@@ -306,16 +259,28 @@ Page({
       }
     })
   },
+  // 退这一张票：先向供应商提交取消，确认后系统自动退这张票的票款；这里只提交、刷新列表
   cancel(id){
     var that = this
     that.setData({cancelling: true})
+    wx.showLoading({ title: '正在提交...' })
     var cancelUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/Cancel/' + id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: cancelUrl,
       success:(res)=>{
-        console.log('cancel result', res)
-        that.setData({activeTab: 'used'})
+        wx.hideLoading()
+        that.setData({cancelling: false})
+        wx.showToast({
+          title: res.statusCode == 200 ? '退票申请已提交' : '退票失败，请联系店员',
+          icon: res.statusCode == 200 ? 'success' : 'none',
+          duration: 2000,
+        })
         that.getData()
+      },
+      fail:()=>{
+        wx.hideLoading()
+        that.setData({cancelling: false})
+        wx.showToast({ title: '网络异常，请稍后再试', icon: 'none' })
       }
     })
   },

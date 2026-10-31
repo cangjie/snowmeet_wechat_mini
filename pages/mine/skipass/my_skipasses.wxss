@@ -580,3 +580,85 @@ page {
   color: var(--color-gray, #888);
   line-height: 1.5;
 }
+
+/* 合并后的张数、标签式多票二维码、每张票的状态 */
+.ticket-times {
+  margin-left: 12rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #1A73E8;
+}
+
+.qr-modal-meta {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #74777F;
+}
+
+.ticket-tabs {
+  white-space: nowrap;
+  margin: 20rpx 0 4rpx;
+}
+
+.ticket-tab {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 128rpx;
+  margin-right: 16rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 16rpx;
+  background: #F3F3F7;
+  border: 2rpx solid transparent;
+}
+
+.ticket-tab--active {
+  background: rgba(26, 115, 232, 0.08);
+  border-color: #1A73E8;
+}
+
+.ticket-tab-name { font-size: 26rpx; font-weight: 700; color: #1A1C1E; }
+.ticket-tab--active .ticket-tab-name { color: #1A73E8; }
+.ticket-tab-state { font-size: 20rpx; color: #74777F; margin-top: 2rpx; }
+.ticket-tab-state--ready { color: #1A73E8; }
+.ticket-tab-state--cancelling,
+.ticket-tab-state--refunded,
+.ticket-tab-state--used { color: #74777F; }
+.ticket-tab-state--failed,
+.ticket-tab-state--cancelFailed { color: #BA1A1A; }
+
+.qr-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 320rpx;
+  font-size: 26rpx;
+  color: #74777F;
+  text-align: center;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+}
+
+.ticket-state-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16rpx;
+}
+
+.ticket-state-text { font-size: 28rpx; font-weight: 800; color: #1A73E8; }
+.ticket-state-text--cancelling,
+.ticket-state-text--refunded,
+.ticket-state-text--used { color: #74777F; }
+.ticket-state-text--failed,
+.ticket-state-text--cancelFailed { color: #BA1A1A; }
+.ticket-state-hint { margin-top: 6rpx; font-size: 22rpx; color: #74777F; text-align: center; line-height: 1.5; }
+
+.qr-cancel-btn {
+  margin: 20rpx auto 0;
+  width: 70%;
+  text-align: center;
+}

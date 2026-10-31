@@ -74,6 +74,7 @@
     "pages/admin/unipay/unipay_detail",
     "pages/admin/unipay/unipay_list",
     "pages/ski_pass/skipass_detail_new",
+    "pages/ski_pass/skipass_cart",
     "pages/mine/skipass/my_skipasses",
     "pages/admin/reception/recept_scan",
     "pages/admin/reception/recept_member",

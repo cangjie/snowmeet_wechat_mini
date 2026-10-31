@@ -1,11 +1,12 @@
 // pages/ski_pass/skipass_detail_new.js
 // 雪票详情页：首页选好「时长 + 场次」这一组，这里选装备和日期（带价格的月历，没价格的日期点不了）。
-// 顾客只能看价格；游客信息和支付栏只给店员，后端 ReserveSkiPass 也只认店员。
+// 顾客只能看价格；游客信息和「加入购物车」只给店员，结算在购物车页，后端也只认店员。
 const app = getApp()
 const data = require('../../utils/data.js')
 const util = require('../../utils/util.js')
 const skipassGroup = require('../../utils/skipass_group.js')
 const skipassCalendar = require('../../utils/skipass_calendar.js')
+const cartUtil = require('../../utils/skipass_cart.js')
 const { getNavMetrics } = require('../../utils/navbar.js')
 
 const WEEK_DAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
@@ -46,22 +47,26 @@ Page({
     cell: '',
     nameFocused: false,
     phoneFocused: false,
-    // 当前商品所属自我游账号的预存款是否够这一单（两个账号各有各的预存款）
+    // 当前商品所属自我游账号；预存款够不够由后端在购物车结算时核对
     source: '',
-    balance: NaN,
-    canPay: false,
-    paying: false
+    // 能不能加入购物车 = 店员 + 这一天有价格 + 这个装备已上线
+    canAdd: false,
+    cartCount: 0
   },
 
   _now() {
     return new Date()
   },
 
+  // 从购物车页回来时刷新右下角张数
+  onShow() {
+    this.setData({ cartCount: cartUtil.ticketCount(cartUtil.load()) })
+  },
+
   onLoad(options) {
     var that = this
     options = options || {}
     that._options = options
-    that._balances = {}
     var resort = options.resort ? safeDecode(options.resort) : ''
     that.setData({
       navTotalHeight: getNavMetrics().totalHeight,
@@ -119,7 +124,7 @@ Page({
     this._group = null
     this._product = null
     this.setData({ loading: false, hasPrice: false, months: [], gearOptions: [], priceStr: '', summary: 0, summaryStr: util.showAmount(0) })
-    this._refreshPay()
+    this._refreshAdd()
   },
 
   applyGroup(group, preferProductId) {
@@ -149,15 +154,8 @@ Page({
     var date = dates.indexOf(keepDate) >= 0 ? keepDate : dates[0]
     var productImage = 'https://mini.snowmeet.top/images/' + (product.session == '日场' ? 'skipass_day.png' : 'skipass_eve.png')
     var source = product.source || ''
-    var cached = that._balances[source]
-    that.setData({
-      productId: product.id, productName: product.name, productImage, source,
-      balance: cached === undefined ? NaN : cached
-    })
+    that.setData({ productId: product.id, productName: product.name, productImage, source })
     that.setDate(date)
-    if (that.data.isStaff && cached === undefined) {
-      that.getBalance(source)
-    }
   },
 
   setDate(date) {
@@ -175,7 +173,7 @@ Page({
       summaryStr: util.showAmount(summary),
       months: skipassCalendar.buildMonths(product.prices, date)
     })
-    that._refreshPay()
+    that._refreshAdd()
   },
 
   onSelectGear(e) {
@@ -197,12 +195,10 @@ Page({
     that.setDate(date)
   },
 
-  // 能支付 = 店员 + 这一天有价格 + 自我游预存款够这一单（预存款不够，付了款也出不了票）
-  _refreshPay() {
+  _refreshAdd() {
     var d = this.data
     var comingSoon = !!(this._product && this._product.comingSoon)
-    var canPay = !!(d.isStaff && d.hasPrice && !comingSoon && d.summary > 0 && isFinite(d.balance) && d.summary < d.balance)
-    this.setData({ canPay })
+    this.setData({ canAdd: !!(d.isStaff && d.hasPrice && !comingSoon && d.summary > 0) })
   },
 
   // ========================
@@ -241,17 +237,16 @@ Page({
   },
 
   // ========================
-  // 确认支付（仅店员）
+  // 加入购物车（仅店员）：票种 + 游玩日期 + 接收短信的手机号；相同的合并成一条，结算在购物车页
   // ========================
-  onPay() {
+  onAddToCart() {
     var that = this
     if (!that.data.isStaff) {
       wx.showToast({ title: '仅限店员订票', icon: 'none' })
       return
     }
-    if (that.data.paying) return
-    if (!that.data.canPay) {
-      wx.showToast({ title: that.data.hasPrice ? '暂时不能出票，请联系管理员' : '该日期暂无价格', icon: 'none' })
+    if (!that.data.canAdd) {
+      wx.showToast({ title: that.data.hasPrice ? '该装备暂不能订票' : '该日期暂无价格', icon: 'none' })
       return
     }
     var name = (that.data.name || '').trim()
@@ -264,109 +259,31 @@ Page({
       wx.showToast({ title: '请填写正确的手机号', icon: 'none' })
       return
     }
-    wx.showModal({
-      title: '确认订单',
-      content: '日期：' + that.data.selectedDate + '\n数量：' + that.data.count + ' 张\n总价：' + that.data.summaryStr
-        + '\n\n姓名：' + name + '\n取票手机号：' + cell,
-      confirmText: '去支付',
-      success: (res) => {
-        if (res.confirm) {
-          that._requestPayment(name, cell)
-        }
-      }
-    })
+    var hit = that._product.prices.find(function (p) { return p.date === that.data.selectedDate })
+    if (!hit) {
+      wx.showToast({ title: '该日期暂无价格', icon: 'none' })
+      return
+    }
+    var result = cartUtil.addItem(cartUtil.load(), {
+      productId: that.data.productId,
+      title: that.data.productName,
+      date: that.data.selectedDate,
+      cell: cell,
+      name: name,
+      price: hit.price,
+      source: that.data.source,
+      staffId: that.data.staffId
+    }, 1)
+    if (result.error) {
+      wx.showToast({ title: result.error, icon: 'none' })
+      return
+    }
+    cartUtil.save(result.cart)
+    that.setData({ cartCount: cartUtil.ticketCount(result.cart) })
+    wx.showToast({ title: '已加入购物车', icon: 'success' })
   },
 
-  // ========================
-  // 下单并发起微信支付（对接实际后端）
-  // ========================
-  _requestPayment(name, cell) {
-    var that = this
-    var idNo = that.data.idNo ? that.data.idNo : ''
-    wx.showLoading({ title: '正在下单...' })
-    that.setData({ paying: true })
-    var fail = function (msg) {
-      wx.hideLoading()
-      that.setData({ paying: false })
-      wx.showToast({ title: msg || '下单失败，请稍后重试', icon: 'none' })
-    }
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + that.data.productId
-      + '?date=' + that.data.selectedDate + '&count=' + that.data.count + '&cell=' + cell
-      + '&name=' + encodeURIComponent(name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-      + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&idNo=' + idNo
-      + (that.data.memberId ? '&refereeMemberId=' + that.data.memberId : '')
-      + (that.data.staffId ? '&staffId=' + that.data.staffId : '')
-    wx.request({
-      url: submitUrl,
-      method: 'GET',
-      success: (res) => {
-        if (res.statusCode != 200) {
-          fail(typeof res.data === 'string' ? res.data : '')
-          return
-        }
-        var order = res.data
-        var paymentId = order.payments[0].id
-        var payUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + paymentId + '?sessionKey=' + app.globalData.sessionKey
-        wx.request({
-          url: payUrl,
-          method: 'GET',
-          success: (res) => {
-            wx.hideLoading()
-            wx.requestPayment({
-              nonceStr: res.data.data.nonce,
-              package: 'prepay_id=' + res.data.data.prepay_id,
-              paySign: res.data.data.sign,
-              timeStamp: res.data.data.timestamp,
-              signType: 'MD5',
-              success: () => {
-                wx.showToast({
-                  title: '支付成功。',
-                  icon: 'success',
-                  complete: () => {
-                    // 新版「我的雪票」（我的 → 我的雪票 同一个页面）；my_skipass 是旧版单页
-                    wx.redirectTo({
-                      url: '/pages/mine/skipass/my_skipasses',
-                    })
-                  }
-                })
-              },
-              fail: () => {
-                that.setData({ paying: false })
-                wx.showToast({ title: '支付已取消', icon: 'none' })
-              }
-            })
-          },
-          fail: () => { fail('') }
-        })
-      },
-      fail: () => { fail('') }
-    })
-  },
-
-  // 自我游预存款余额（只给店员，接口也只认店员会话）。按商品所属账号查，查到的余额缓存起来，切换装备不重复查
-  getBalance(source) {
-    var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/WanlongZiwoyouHelper/GetBalance?sessionKey='
-      + encodeURIComponent(app.globalData.sessionKey || '') + '&source=' + encodeURIComponent(source || '')
-    var done = function (balance) {
-      if (isFinite(balance)) {
-        that._balances[source] = balance
-      }
-      // 用户这时可能已经切到别的账号的商品，只更新还停在这个账号上的页面
-      if (that.data.source === source) {
-        that.setData({ balance })
-        that._refreshPay()
-      }
-    }
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success: (res) => {
-        done(res.statusCode == 200 ? parseFloat(res.data) : NaN)
-      },
-      fail: () => {
-        done(NaN)
-      }
-    })
+  onOpenCart() {
+    wx.navigateTo({ url: '/pages/ski_pass/skipass_cart' })
   }
 })

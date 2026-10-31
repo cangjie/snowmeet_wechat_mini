@@ -24,6 +24,7 @@ const PRODUCTS = [
 function setup(opts) {
   const o = Object.assign({ staff: null, products: PRODUCTS, resorts: ['万龙', '南山'], balance: 5000, myInfo: { real_name: '王店员', cell: '13900139000' } }, opts)
   const requests = []
+  const store = {}
   const navs = []
   const toasts = []
   const modals = []
@@ -51,6 +52,8 @@ function setup(opts) {
       } else if (req.url.indexOf('WechatPayByOrderPayment') >= 0) data = { data: { nonce: 'n', prepay_id: 'p', sign: 's', timestamp: 't' } }
       req.success({ statusCode, data })
     },
+    getStorageSync(k) { return store[k] },
+    setStorageSync(k, v) { store[k] = v },
     navigateTo(x) { navs.push(x.url) },
     redirectTo(x) { navs.push(x.url) },
     showToast(x) { toasts.push(x.title) },
@@ -63,7 +66,7 @@ function setup(opts) {
     getMenuButtonBoundingClientRect() { return { top: 26, left: 280, height: 32 } }
   }
   const fakeData = { getMyInfo() { return Promise.resolve(o.myInfo) } }
-  return { app, requests, navs, toasts, modals, fakeData }
+  return { app, requests, navs, toasts, modals, store, fakeData }
 }
 
 function cleanup() {
@@ -244,7 +247,7 @@ test('详情页：整个分组只有含雪具（暂未上线）时，打开不�
   const page = await openDetail(env, { group: key })
   assert.equal(page.data.hasPrice, true)
   assert.equal(page.data.productId, 61)
-  assert.equal(page.data.canPay, false)
+  assert.equal(page.data.canAdd, false)
   cleanup()
 })
 
@@ -256,86 +259,80 @@ test('详情页：点没有价格的日期没反应', async () => {
   cleanup()
 })
 
-test('详情页：顾客不显示游客信息和支付，不查余额也不取个人信息，不能下单', async () => {
+test('详情页：顾客不显示游客信息和购物车，不取个人信息，不能加入购物车', async () => {
   const env = setup()
   const page = await openDetail(env, { group: dayKey() })
   assert.equal(page.data.isStaff, false)
-  assert.equal(page.data.canPay, false)
-  assert.equal(env.requests.some(u => u.indexOf('GetBalance') >= 0), false)
+  assert.equal(page.data.canAdd, false)
   assert.equal(page.data.priceStr, '399')
-  page.onPay()
-  assert.equal(env.requests.some(u => u.indexOf('ReserveSkiPass') >= 0), false)
+  page.onAddToCart()
   assert.deepEqual(env.toasts, ['仅限店员订票'])
+  assert.equal(env.store['skipass_cart_v1'], undefined)
   cleanup()
 })
 
-test('详情页：店员查余额带会话，并带出本人姓名手机号', async () => {
+test('详情页：店员带出本人姓名手机号，不再查预存款（结算时后端核对）', async () => {
   const env = setup({ staff: { id: 28 } })
   const page = await openDetail(env, { group: dayKey() })
-  const bal = env.requests.find(u => u.indexOf('GetBalance') >= 0)
-  assert.ok(bal.indexOf('sessionKey=' + encodeURIComponent('sk%20x')) >= 0)
   assert.equal(page.data.isStaff, true)
-  assert.equal(page.data.canPay, true)
+  assert.equal(page.data.canAdd, true)
   assert.equal(page.data.name, '王店员')
   assert.equal(page.data.cell, '13900139000')
-  cleanup()
-})
-
-test('详情页：余额不够这单就不能支付', async () => {
-  const env = setup({ staff: { id: 28 }, balance: 300 })
-  const page = await openDetail(env, { group: dayKey() })
-  assert.equal(page.data.canPay, false)
-  page.onPay()
+  assert.equal(env.requests.some(u => u.indexOf('GetBalance') >= 0), false)
   assert.equal(env.requests.some(u => u.indexOf('ReserveSkiPass') >= 0), false)
   cleanup()
 })
 
-test('详情页：店员下单，校验的是用户实际填的姓名和手机号', async () => {
+test('详情页：加入购物车，校验的是用户实际填的姓名和手机号；相同的合并成一条', async () => {
   const env = setup({ staff: { id: 28 }, myInfo: {} })
   const page = await openDetail(env, { group: dayKey(), staffId: '28', memberId: '5' })
-  page.onPay()
+  page.onAddToCart()
   assert.deepEqual(env.toasts, ['请填写姓名'])
   page.onNameInput({ detail: { value: '张三' } })
-  page.onPay()
+  page.onAddToCart()
   assert.equal(env.toasts[1], '请填写正确的手机号')
   page.onPhoneInput({ detail: { value: '12345' } })
-  page.onPay()
+  page.onAddToCart()
   assert.equal(env.toasts[2], '请填写正确的手机号')
-  assert.equal(env.requests.some(u => u.indexOf('ReserveSkiPass') >= 0), false)
+  assert.equal(env.store['skipass_cart_v1'], undefined)
 
   page.onPhoneInput({ detail: { value: '13800138000' } })
-  page.onPay()
-  const reserve = env.requests.find(u => u.indexOf('ReserveSkiPass') >= 0)
-  assert.ok(reserve.indexOf('/core/SkiPass/ReserveSkiPass/32?date=2026-11-02&count=1&cell=13800138000&name=' + encodeURIComponent('张三')) >= 0, reserve)
-  assert.ok(reserve.indexOf('&sessionKey=' + encodeURIComponent('sk%20x')) >= 0)
-  assert.ok(reserve.indexOf('&refereeMemberId=5') >= 0)
-  assert.ok(reserve.indexOf('&staffId=28') >= 0)
-  assert.match(env.modals[0].content, /2026-11-02/)
-  assert.match(env.modals[0].content, /张三/)
+  page.onAddToCart()
+  page.onAddToCart()
+  assert.equal(env.toasts[3], '已加入购物车')
+  const cart = env.store['skipass_cart_v1']
+  assert.equal(cart.items.length, 1)
+  assert.deepEqual([cart.items[0].productId, cart.items[0].date, cart.items[0].cell, cart.items[0].name, cart.items[0].price, cart.items[0].count],
+    [32, '2026-11-02', '13800138000', '张三', 399, 2])
+  assert.equal(cart.staffId, '28')
+  assert.equal(page.data.cartCount, 2)
+  // 换一天，是新的一条
+  page.onSelectDay({ currentTarget: { dataset: { date: '2026-11-03', enabled: true } } })
+  page.onAddToCart()
+  assert.equal(env.store['skipass_cart_v1'].items.length, 2)
+  assert.equal(page.data.cartCount, 3)
+  assert.equal(env.requests.some(u => u.indexOf('ReserveSkiPass') >= 0), false)
   cleanup()
 })
 
-test('详情页：支付成功后跳到新版「我的雪票」，不是旧版单页', async () => {
+test('详情页：购物车满 10 张不能再加', async () => {
   const env = setup({ staff: { id: 28 } })
   const page = await openDetail(env, { group: dayKey() })
-  global.wx.requestPayment = (x) => x.success()
-  global.wx.showToast = (x) => { env.toasts.push(x.title); if (x.complete) x.complete() }
   page.onNameInput({ detail: { value: '张三' } })
   page.onPhoneInput({ detail: { value: '13800138000' } })
-  page.onPay()
-  assert.deepEqual(env.toasts, ['支付成功。'])
-  assert.equal(env.navs[env.navs.length - 1], '/pages/mine/skipass/my_skipasses')
+  for (let i = 0; i < 10; i++) page.onAddToCart()
+  assert.equal(page.data.cartCount, 10)
+  page.onAddToCart()
+  assert.equal(env.toasts[env.toasts.length - 1], '购物车最多 10 张票')
+  assert.equal(page.data.cartCount, 10)
   cleanup()
 })
 
-test('详情页：后端拒绝下单时提示原因并恢复按钮', async () => {
-  const env = setup({ staff: { id: 28 }, reserve: { statusCode: 400, data: '仅限店员订票' } })
+test('详情页：点购物车进购物车页', async () => {
+  const env = setup({ staff: { id: 28 } })
   const page = await openDetail(env, { group: dayKey() })
-  page.onNameInput({ detail: { value: '张三' } })
-  page.onPhoneInput({ detail: { value: '13800138000' } })
-  page.onPay()
-  assert.deepEqual(env.toasts, ['仅限店员订票'])
-  assert.equal(page.data.paying, false)
+  page.onOpenCart()
+  assert.equal(env.navs[env.navs.length - 1], '/pages/ski_pass/skipass_cart')
   cleanup()
 })
 
@@ -343,48 +340,7 @@ test('详情页：链接里的分组已经没有价格了，显示暂无价格�
   const env = setup({ staff: { id: 28 }, products: [PRODUCTS[4]] })
   const page = await openDetail(env, { group: 'whatever' })
   assert.equal(page.data.hasPrice, false)
-  assert.equal(page.data.canPay, false)
+  assert.equal(page.data.canAdd, false)
   assert.deepEqual(page.data.months, [])
-  cleanup()
-})
-
-// ---------------- 两个自我游账号各有各的预存款 ----------------
-
-const MIXED = [
-  { product_id: 71, name: '【万龙】全雪区日场1天雪票自带板-11.6', source: '大好河山', dailyPrice: rows([['2026-11-02', 399], ['2026-11-03', 399]]) },
-  { product_id: 72, name: '【万龙】全雪区日场1天雪票-11.6', source: '万龙自我游', dailyPrice: rows([['2026-11-02', 579], ['2026-11-03', 579]]) }
-]
-
-test('详情页：按所选商品所属账号查余额；大好河山账号没钱就不能支付，换到万龙自我游账号的装备就能', async () => {
-  const env = setup({ staff: { id: 28 }, products: MIXED, balances: { '大好河山': 0, '万龙自我游': 5000 } })
-  const page = await openDetail(env, { group: require('../utils/skipass_group.js').buildGroups(MIXED, NOW)[0].key })
-  assert.equal(page.data.productId, 71)
-  assert.equal(page.data.source, '大好河山')
-  const first = env.requests.filter(u => u.indexOf('GetBalance') >= 0)
-  assert.equal(first.length, 1)
-  assert.ok(first[0].indexOf('source=' + encodeURIComponent('大好河山')) >= 0)
-  assert.equal(page.data.canPay, false)
-
-  page.onSelectGear({ currentTarget: { dataset: { id: 72 } } })
-  assert.equal(page.data.source, '万龙自我游')
-  assert.equal(page.data.canPay, true)
-  const second = env.requests.filter(u => u.indexOf('GetBalance') >= 0)
-  assert.equal(second.length, 2)
-  assert.ok(second[1].indexOf('source=' + encodeURIComponent('万龙自我游')) >= 0)
-
-  // 切回去用缓存，不重复查
-  page.onSelectGear({ currentTarget: { dataset: { id: 71 } } })
-  assert.equal(page.data.canPay, false)
-  assert.equal(env.requests.filter(u => u.indexOf('GetBalance') >= 0).length, 2)
-  cleanup()
-})
-
-test('详情页：余额查询失败不缓存，下次切回来会重新查', async () => {
-  const env = setup({ staff: { id: 28 }, products: MIXED, balances: { '大好河山': 'oops', '万龙自我游': 5000 } })
-  const page = await openDetail(env, { group: require('../utils/skipass_group.js').buildGroups(MIXED, NOW)[0].key })
-  assert.equal(page.data.canPay, false) // 余额不是数字，当作未知，不能支付
-  page.onSelectGear({ currentTarget: { dataset: { id: 72 } } })
-  page.onSelectGear({ currentTarget: { dataset: { id: 71 } } })
-  assert.equal(env.requests.filter(u => u.indexOf('GetBalance') >= 0).length, 3)
   cleanup()
 })
