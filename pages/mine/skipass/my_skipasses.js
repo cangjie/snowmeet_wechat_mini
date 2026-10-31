@@ -1,6 +1,18 @@
 // pages/tickets/tickets.js
 const app = getApp()
 const util = require('../../../utils/util.js')
+// 退票状态：后台 status 文案 → 标签文案、是否还能用、给顾客的说明。
+// 取消先提交给供应商，确认可能要几分钟，确认后系统自动原路退款，顾客不用再操作。
+var CANCEL_STATUS = {
+  '取消中': { text: '退票中', usable: false, hint: '退票处理中，通常几分钟内确认，确认后自动原路退款' },
+  '申请取消': { text: '退票中', usable: false, hint: '退票处理中，通常几分钟内确认，确认后自动原路退款' },
+  '已取消': { text: '已退票', usable: false, hint: '退票已确认，退款正在处理' },
+  '已申请退款': { text: '退款中', usable: false, hint: '退款已提交，预计原路退回' },
+  '退款成功': { text: '已退款', usable: false, hint: '' },
+  '出票失败': { text: '出票失败', usable: false, hint: '' },
+  '取消失败': { text: '退票未成功', usable: true, hint: '退票没有成功，请联系店员处理' }
+}
+
 Page({
   data: {
     activeTab: 'unused', // 'unused' | 'used'
@@ -249,10 +261,12 @@ Page({
           item.quantity = '1张'
           // 顾客实际支付的金额（deal_price，已含张数）。ticket_price 是我们和供应商的结算价，不能给顾客看
           item.amount = util.showAmount(parseFloat(list[i].deal_price))
-          item.statusText = list[i].status
+          var cancelInfo = CANCEL_STATUS[list[i].status]
+          item.statusText = cancelInfo ? cancelInfo.text : list[i].status
+          item.statusHint = cancelInfo ? cancelInfo.hint : ''
           item.statusClass = 'status-picked'
           item.canUse = (list[i].status != '已申请退款' && list[i].status != '已退票' &&  list[i].status != '已取卡'
-          &&  list[i].status != '已退押金' )
+          &&  list[i].status != '已退押金' ) && (!cancelInfo || cancelInfo.usable)
           item.card_no = list[i].card_no
           item.pickupCode = list[i].qr_code_url
           if (item.canUse){

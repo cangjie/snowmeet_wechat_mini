@@ -38,6 +38,8 @@
       <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
     </view>
 
+    <view class="status-hint" wx:if="{{item.statusHint}}">{{item.statusHint}}</view>
+
     <!-- 序列号 -->
     <view class="serial-block">
       <text class="serial-label">Serial Number</text>

@@ -572,3 +572,11 @@ page {
   line-height: 1.6;
   padding: 0 20rpx;
 }
+
+/* 退票、退款进度说明 */
+.status-hint {
+  margin: 8rpx 0 12rpx;
+  font-size: 24rpx;
+  color: var(--color-gray, #888);
+  line-height: 1.5;
+}
