@@ -114,18 +114,18 @@
     <text class="qr-modal-meta">{{useTarget.validDate}} · {{useTarget.cell}}</text>
 
     <!-- 多张票的标签 -->
-    <scroll-view scroll-x class="ticket-tabs" wx:if="{{useTickets.length > 1}}">
+    <view class="ticket-tabs" wx:if="{{useTickets.length > 1}}">
       <view
         wx:for="{{useTickets}}"
         wx:key="id"
         class="ticket-tab {{index === useIndex ? 'ticket-tab--active' : ''}}"
-        bindtap="onSelectTicket"
+        catchtap="onSelectTicket"
         data-index="{{index}}"
       >
         <text class="ticket-tab-name">{{item.tag}}</text>
         <text class="ticket-tab-state ticket-tab-state--{{item.kind}}">{{item.stateText}}</text>
       </view>
-    </scroll-view>
+    </view>
 
     <!-- 二维码区域 -->
     <view class="qr-wrapper">

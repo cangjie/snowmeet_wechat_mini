@@ -484,6 +484,7 @@ page {
 /* 二维码容器 */
 .qr-wrapper {
   position: relative;
+  z-index: 1;
   width: 360rpx;
   height: 360rpx;
   padding: 28rpx;
@@ -597,17 +598,24 @@ page {
 }
 
 .ticket-tabs {
-  white-space: nowrap;
-  margin: 20rpx 0 4rpx;
+  /* 普通 view，不用 scroll-view：弹层是纵向 flex 容器，scroll-view 在里面会被压扁，
+     下面的二维码卡片（position: relative、有大阴影）会盖在标签上，第二张票就点不到 */
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16rpx;
+  width: 100%;
+  margin: 24rpx 0 32rpx;
 }
 
 .ticket-tab {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 128rpx;
-  margin-right: 16rpx;
-  padding: 12rpx 20rpx;
+  min-width: 140rpx;
+  padding: 16rpx 28rpx;
   border-radius: 16rpx;
   background: #F3F3F7;
   border: 2rpx solid transparent;
