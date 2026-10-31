@@ -55,7 +55,7 @@ function addItem(cart, item, count) {
   } else {
     items.push({
       key, productId: item.productId, title: item.title, date: item.date, cell: String(item.cell).trim(),
-      name: item.name, price: item.price, source: item.source || '', count: n
+      name: item.name, price: item.price, source: item.source || '', resort: item.resort || '万龙', count: n
     })
   }
   return { cart: { items, staffId: item.staffId || cart.staffId || '' }, error: '' }
@@ -72,6 +72,40 @@ function changeCount(cart, key, delta) {
     .map(it => it.key === key ? Object.assign({}, it, { count: it.count + delta }) : Object.assign({}, it))
     .filter(it => it.count > 0)
   return { cart: { items, staffId: cart.staffId }, error: '' }
+}
+
+// 改一条的日期（带上新日期的价格）或手机号。改完和别的条目票种、日期、手机号都相同时合并成一条（张数相加，
+// 价格取新的）。changes: { date?, price?, cell? }。手机号不合法返回错误，购物车不变。
+const CELL_REGEX = /^1[3-9]\d{9}$/
+
+function editLine(cart, key, changes) {
+  const hit = cart.items.find(it => it.key === key)
+  if (!hit) return { cart, error: '' }
+  const next = Object.assign({}, hit)
+  if (changes.cell !== undefined) {
+    const cell = String(changes.cell).trim()
+    if (!CELL_REGEX.test(cell)) return { cart, error: '请填写正确的手机号' }
+    next.cell = cell
+  }
+  if (changes.date !== undefined) next.date = changes.date
+  if (changes.price !== undefined) next.price = changes.price
+  next.key = lineKey(next.productId, next.date, next.cell)
+  const items = []
+  let merged = false
+  cart.items.forEach(it => {
+    if (it.key === key) {
+      items.push(next)
+    } else {
+      items.push(Object.assign({}, it))
+    }
+  })
+  const dup = items.find(it => it !== next && it.key === next.key)
+  if (dup) {
+    dup.count += next.count
+    dup.price = next.price
+    merged = true
+  }
+  return { cart: { items: merged ? items.filter(it => it !== next) : items, staffId: cart.staffId }, error: '' }
 }
 
 function remove(cart, key) {
@@ -91,5 +125,5 @@ function fmtMoney(n) {
 }
 
 module.exports = {
-  STORAGE_KEY, MAX_TICKETS, emptyCart, lineKey, load, save, ticketCount, total, addItem, changeCount, remove, toRequest, fmtMoney
+  STORAGE_KEY, MAX_TICKETS, emptyCart, lineKey, load, save, ticketCount, total, addItem, changeCount, editLine, remove, toRequest, fmtMoney
 }

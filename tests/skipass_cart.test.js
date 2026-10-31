@@ -91,3 +91,43 @@ test('本机存取：读不到或坏数据当空车', () => {
   assert.deepEqual(c.load(), c.emptyCart())
   delete global.wx
 })
+
+test('改一条的日期：价格换成新日期的，原条目的张数和姓名不变', () => {
+  let r = c.addItem(c.emptyCart(), item(), 2)
+  const key = r.cart.items[0].key
+  const e = c.editLine(r.cart, key, { date: '2026-11-07', price: 369 })
+  assert.equal(e.error, '')
+  assert.deepEqual([e.cart.items.length, e.cart.items[0].date, e.cart.items[0].price, e.cart.items[0].count, e.cart.items[0].name], [1, '2026-11-07', 369, 2, '张三'])
+  assert.equal(e.cart.items[0].key, c.lineKey(641, '2026-11-07', '13501177897'))
+  assert.equal(c.total(e.cart), 738)
+})
+
+test('改日期或手机号后和别的条目相同：合并张数，价格取新的，顺序其余不变', () => {
+  let r = c.addItem(c.emptyCart(), item(), 2)
+  r = c.addItem(r.cart, item({ date: '2026-11-04' }), 1)
+  r = c.addItem(r.cart, item({ productId: 643, price: 359 }), 1)
+  const e = c.editLine(r.cart, r.cart.items[0].key, { date: '2026-11-04', price: 309 })
+  assert.deepEqual(e.cart.items.map(x => [x.productId, x.date, x.count]), [[641, '2026-11-04', 3], [643, '2026-11-03', 1]])
+  assert.equal(c.ticketCount(e.cart), 4)
+})
+
+test('改手机号：不合法不改；合法的去掉空格；找不到的条目原样返回', () => {
+  const r = c.addItem(c.emptyCart(), item(), 1)
+  const key = r.cart.items[0].key
+  const bad = c.editLine(r.cart, key, { cell: '123' })
+  assert.equal(bad.error, '请填写正确的手机号')
+  assert.equal(bad.cart.items[0].cell, '13501177897')
+  const ok = c.editLine(r.cart, key, { cell: ' 13900139000 ' })
+  assert.equal(ok.cart.items[0].cell, '13900139000')
+  assert.equal(ok.cart.items[0].key, c.lineKey(641, '2026-11-03', '13900139000'))
+  assert.equal(c.editLine(r.cart, 'nope', { cell: '13900139000' }).cart, r.cart)
+})
+
+test('编辑不修改原购物车对象；新加的条目记下雪场', () => {
+  const r = c.addItem(c.emptyCart(), item({ resort: '万龙' }), 1)
+  const before = JSON.stringify(r.cart)
+  c.editLine(r.cart, r.cart.items[0].key, { date: '2026-11-07', price: 369 })
+  assert.equal(JSON.stringify(r.cart), before)
+  assert.equal(r.cart.items[0].resort, '万龙')
+  assert.equal(c.addItem(c.emptyCart(), item(), 1).cart.items[0].resort, '万龙') // 没传默认万龙
+})

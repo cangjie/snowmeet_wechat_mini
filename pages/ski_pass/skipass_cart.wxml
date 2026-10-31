@@ -7,8 +7,21 @@
         <text class="line-remove" bindtap="onRemove" data-key="{{item.key}}">删除</text>
       </view>
       <view class="line-meta">
-        <text class="line-date">{{item.dateText}}</text>
-        <text class="line-cell">{{item.cell}}</text>
+        <picker class="meta-picker" wx:if="{{item.dateRange.length > 0}}" range="{{item.dateRange}}" value="{{item.dateIndex}}"
+          bindchange="onDateChange" data-key="{{item.key}}">
+          <view class="meta-field">
+            <text class="line-date">{{item.dateText}}</text>
+            <text class="meta-edit">改</text>
+          </view>
+        </picker>
+        <view class="meta-field" wx:else>
+          <text class="line-date">{{item.dateText}}</text>
+        </view>
+        <view class="meta-field meta-field--cell">
+          <input class="cell-input" type="number" maxlength="11" confirm-type="done" value="{{item.cell}}"
+            data-key="{{item.key}}" bindblur="onCellBlur" />
+          <text class="meta-edit">改</text>
+        </view>
       </view>
       <view class="line-bottom">
         <view class="line-price">

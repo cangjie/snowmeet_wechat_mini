@@ -305,6 +305,7 @@ test('详情页：加入购物车，校验的是用户实际填的姓名和手�
   assert.deepEqual([cart.items[0].productId, cart.items[0].date, cart.items[0].cell, cart.items[0].name, cart.items[0].price, cart.items[0].count],
     [32, '2026-11-02', '13800138000', '张三', 399, 2])
   assert.equal(cart.staffId, '28')
+  assert.equal(cart.items[0].resort, '万龙')
   assert.equal(page.data.cartCount, 2)
   // 换一天，是新的一条
   page.onSelectDay({ currentTarget: { dataset: { date: '2026-11-03', enabled: true } } })

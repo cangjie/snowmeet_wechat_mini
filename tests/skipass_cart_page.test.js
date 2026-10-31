@@ -6,6 +6,13 @@ const cart = require('../utils/skipass_cart.js')
 
 const FILE = 'pages/ski_pass/skipass_cart.js'
 
+const NOW = new Date(2026, 10, 2, 10, 0, 0) // 2026-11-02 周一 10:00
+const rows = list => list.map(([date, price]) => ({ reserve_date: date + 'T00:00:00', deal_price: price, marketPrice: price }))
+const PRODUCTS = [
+  { product_id: 641, name: '【万龙】全雪区日场4小时雪票-11.6', dailyPrice: rows([['2026-11-03', 309], ['2026-11-04', 309], ['2026-11-06', 309], ['2026-11-07', 369]]) },
+  { product_id: 643, name: '【万龙】全雪区日场6小时雪票-11.6', dailyPrice: rows([['2026-11-04', 359], ['2026-11-07', 419]]) }
+]
+
 function seedCart() {
   let r = cart.addItem(cart.emptyCart(), { productId: 641, title: '【万龙】全雪区日场4小时雪票-11.6', date: '2026-11-03', cell: '13501177897', name: '张三', price: 309, staffId: '28' }, 2)
   r = cart.addItem(r.cart, { productId: 643, title: '【万龙】全雪区日场6小时雪票-11.6', date: '2026-11-04', cell: '13900139000', name: '李四', price: 359 }, 1)
@@ -13,7 +20,7 @@ function seedCart() {
 }
 
 function setup(o) {
-  o = Object.assign({ staff: { id: 28 }, reserve: null, confirm: true, payOk: true }, o)
+  o = Object.assign({ staff: { id: 28 }, reserve: null, confirm: true, payOk: true, products: PRODUCTS }, o)
   const store = {}
   const requests = []
   const toasts = []
@@ -30,7 +37,9 @@ function setup(o) {
     setStorageSync: (k, v) => { store[k] = v },
     request(req) {
       requests.push(req)
-      if (req.url.indexOf('ReserveSkiPassCart') >= 0) {
+      if (req.url.indexOf('GetProductsByResort') >= 0) {
+        req.success({ statusCode: 200, data: o.products })
+      } else if (req.url.indexOf('ReserveSkiPassCart') >= 0) {
         const r = o.reserve || { statusCode: 200, data: { total_amount: 977, payments: [{ id: 7 }] } }
         req.success(r)
       } else if (req.url.indexOf('WechatPayByOrderPayment') >= 0) {
@@ -51,6 +60,7 @@ function cleanup() { delete global.getApp; delete global.wx; delete global.getCu
 
 async function open(env) {
   const page = loadPage(FILE, {})
+  page._now = () => NOW
   page.onLoad()
   await settle()
   return page
@@ -170,6 +180,89 @@ test('购物车页：非店员不能结算；空购物车提示；不确认订�
   env = setup({ confirm: false })
   page = await open(env)
   page.onCheckout()
-  assert.equal(env.requests.length, 0)
+  assert.equal(env.requests.filter(r => r.url.indexOf('GetProductsByResort') < 0).length, 0)
+  cleanup()
+})
+
+test('购物车页：日期下拉列出这个票种有价格的日期，每项带当天价格', async () => {
+  const env = setup()
+  const page = await open(env)
+  assert.deepEqual(page.data.lines[0].dateRange, ['11月3日 周二  ¥309.00', '11月4日 周三  ¥309.00', '11月6日 周五  ¥309.00', '11月7日 周六  ¥369.00'])
+  assert.equal(page.data.lines[0].dateIndex, 0)
+  assert.equal(page.data.lines[1].dateRange.length, 2)
+  assert.equal(page.data.lines[1].dateIndex, 0)
+  assert.ok(env.requests.some(r => r.url.indexOf('GetProductsByResort') >= 0 && r.url.indexOf(encodeURIComponent('万龙')) >= 0))
+  cleanup()
+})
+
+test('购物车页：改日期，价格换成新日期的价格，合计跟着变并存回本机', async () => {
+  const env = setup()
+  const page = await open(env)
+  assert.equal(page.data.totalStr, '¥977.00')
+  const key = page.data.lines[0].key
+  page.onDateChange({ currentTarget: { dataset: { key } }, detail: { value: 3 } }) // 11-07 周六 369
+  assert.equal(page.data.lines[0].dateText, '11月7日 周六')
+  assert.equal(page.data.lines[0].priceStr, '¥369.00')
+  assert.equal(page.data.lines[0].lineTotalStr, '¥738.00')
+  assert.equal(page.data.totalStr, '¥1097.00')
+  const saved = env.store[cart.STORAGE_KEY].items[0]
+  assert.deepEqual([saved.date, saved.price, saved.count], ['2026-11-07', 369, 2])
+  assert.equal(page.data.lines[0].dateIndex, 3)
+  // 选回原来的日期，价格也回来
+  page.onDateChange({ currentTarget: { dataset: { key: page.data.lines[0].key } }, detail: { value: 0 } })
+  assert.equal(page.data.totalStr, '¥977.00')
+  cleanup()
+})
+
+test('购物车页：改日期后和另一条票种、日期、手机号都相同，合并成一条并累加张数', async () => {
+  let r = cart.addItem(cart.emptyCart(), { productId: 641, title: 't', date: '2026-11-03', cell: '13501177897', name: '张三', price: 309 }, 2)
+  r = cart.addItem(r.cart, { productId: 641, title: 't', date: '2026-11-04', cell: '13501177897', name: '张三', price: 309 }, 1)
+  const env = setup({ cart: r.cart })
+  const page = await open(env)
+  page.onDateChange({ currentTarget: { dataset: { key: page.data.lines[0].key } }, detail: { value: 1 } }) // 11-03 → 11-04
+  assert.equal(page.data.lines.length, 1)
+  assert.deepEqual([page.data.lines[0].count, page.data.lines[0].dateText], [3, '11月4日 周三'])
+  assert.equal(page.data.ticketCount, 3)
+  assert.equal(page.data.totalStr, '¥927.00')
+  cleanup()
+})
+
+test('购物车页：改手机号——合法的保存，不合法的提示并恢复，没改不动，改成和另一条相同就合并', async () => {
+  let r = cart.addItem(cart.emptyCart(), { productId: 641, title: 't', date: '2026-11-03', cell: '13501177897', name: '张三', price: 309 }, 1)
+  r = cart.addItem(r.cart, { productId: 641, title: 't', date: '2026-11-03', cell: '13900139000', name: '李四', price: 309 }, 1)
+  const env = setup({ cart: r.cart })
+  const page = await open(env)
+  const key = page.data.lines[0].key
+  page.onCellBlur({ currentTarget: { dataset: { key } }, detail: { value: '12345' } })
+  assert.deepEqual(env.toasts, ['请填写正确的手机号'])
+  assert.equal(page.data.lines[0].cell, '13501177897')
+  page.onCellBlur({ currentTarget: { dataset: { key } }, detail: { value: '13501177897' } })
+  assert.equal(env.toasts.length, 1)
+  page.onCellBlur({ currentTarget: { dataset: { key } }, detail: { value: ' 13600136000 ' } })
+  assert.equal(page.data.lines[0].cell, '13600136000')
+  assert.equal(env.store[cart.STORAGE_KEY].items[0].cell, '13600136000')
+  // 改成和另一条一样的手机号：合并
+  page.onCellBlur({ currentTarget: { dataset: { key: page.data.lines[0].key } }, detail: { value: '13900139000' } })
+  assert.equal(page.data.lines.length, 1)
+  assert.equal(page.data.lines[0].count, 2)
+  cleanup()
+})
+
+test('购物车页：购物车里的价格和现在的价格不一样，打开时同步成现在的价格', async () => {
+  const stale = cart.addItem(cart.emptyCart(), { productId: 641, title: 't', date: '2026-11-03', cell: '13501177897', name: '张三', price: 319 }, 2).cart
+  const env = setup({ cart: stale })
+  const page = await open(env)
+  assert.equal(page.data.lines[0].priceStr, '¥309.00')
+  assert.equal(page.data.totalStr, '¥618.00')
+  assert.equal(env.store[cart.STORAGE_KEY].items[0].price, 309)
+  cleanup()
+})
+
+test('购物车页：这个票种现在没有可选日期（价格接口没给）时，日期显示但不可改', async () => {
+  const env = setup({ products: [] })
+  const page = await open(env)
+  assert.deepEqual(page.data.lines.map(l => l.dateRange.length), [0, 0])
+  page.onDateChange({ currentTarget: { dataset: { key: page.data.lines[0].key } }, detail: { value: 0 } })
+  assert.equal(page.data.lines[0].dateText, '11月3日 周二')
   cleanup()
 })

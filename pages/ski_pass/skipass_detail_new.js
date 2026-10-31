@@ -272,6 +272,7 @@ Page({
       name: name,
       price: hit.price,
       source: that.data.source,
+      resort: that.data.resort,
       staffId: that.data.staffId
     }, 1)
     if (result.error) {

@@ -3,6 +3,7 @@
 // 购物车存在本机（utils/skipass_cart.js）；金额只用来显示，后端结算时按当天价格行重新算并核对预存款。
 const app = getApp()
 const cartUtil = require('../../utils/skipass_cart.js')
+const skipassGroup = require('../../utils/skipass_group.js')
 
 const WEEK_DAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
@@ -12,6 +13,10 @@ function dateText(date) {
 }
 
 Page({
+  _now() {
+    return new Date()
+  },
+
   data: {
     isStaff: false,
     lines: [],
@@ -23,9 +28,11 @@ Page({
 
   onLoad() {
     const that = this
+    that._prices = {}
     app.loginPromiseNew.then(function () {
       that.setData({ isStaff: !!app.globalData.staff })
       that.refresh()
+      that.loadPrices()
     })
   },
 
@@ -33,14 +40,65 @@ Page({
     this.refresh()
   },
 
+  // 取购物车里各雪场的价格，按票种记下每个可订日期的价格：改日期时下拉选这些日期、价格跟着变；
+  // 已在购物车里的条目，价格以现在的价格为准（加入后价格有变就同步过来）
+  loadPrices() {
+    const that = this
+    const resorts = []
+    that._cart.items.forEach(function (it) {
+      const r = it.resort || '万龙'
+      if (resorts.indexOf(r) < 0) resorts.push(r)
+    })
+    resorts.forEach(function (resort) {
+      wx.request({
+        url: 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?showHidden=0&resort='
+          + encodeURIComponent(resort) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || ''),
+        method: 'GET',
+        success: (res) => {
+          if (res.statusCode != 200 || !Array.isArray(res.data)) return
+          skipassGroup.buildGroups(res.data, that._now()).forEach(function (g) {
+            g.products.forEach(function (p) {
+              that._prices[p.id] = p.prices
+            })
+          })
+          that._syncPrices()
+        }
+      })
+    })
+  },
+
+  _syncPrices() {
+    let cart = this._cart
+    let changed = false
+    cart.items.forEach((it) => {
+      const options = this._prices[it.productId]
+      const hit = options && options.find(o => o.date === it.date)
+      if (hit && Math.abs(hit.price - it.price) > 0.005) {
+        const r = cartUtil.editLine(cart, it.key, { price: hit.price })
+        cart = r.cart
+        changed = true
+      }
+    })
+    if (changed) cartUtil.save(cart)
+    this.refresh()
+  },
+
   refresh() {
     const cart = cartUtil.load()
     this._cart = cart
+    const prices = this._prices || {}
     this.setData({
-      lines: cart.items.map(it => ({
-        key: it.key, title: it.title, dateText: dateText(it.date), cell: it.cell, count: it.count,
-        priceStr: cartUtil.fmtMoney(it.price), lineTotalStr: cartUtil.fmtMoney(it.price * it.count)
-      })),
+      lines: cart.items.map(it => {
+        const options = prices[it.productId] || []
+        const idx = options.findIndex(o => o.date === it.date)
+        return {
+          key: it.key, title: it.title, dateText: dateText(it.date), cell: it.cell, count: it.count,
+          priceStr: cartUtil.fmtMoney(it.price), lineTotalStr: cartUtil.fmtMoney(it.price * it.count),
+          // 可改的日期：这个票种现在有价格的日期，每项带当天价格
+          dateRange: options.map(o => dateText(o.date) + '  ' + cartUtil.fmtMoney(o.price)),
+          dateIndex: idx < 0 ? 0 : idx
+        }
+      }),
       ticketCount: cartUtil.ticketCount(cart),
       totalStr: cartUtil.fmtMoney(cartUtil.total(cart)),
       empty: cart.items.length === 0
@@ -61,6 +119,28 @@ Page({
 
   onDec(e) {
     this._apply(cartUtil.changeCount(this._cart, e.currentTarget.dataset.key, -1))
+  },
+
+  // 改日期：价格换成新日期的价格；和别的条目撞成同一条就合并
+  onDateChange(e) {
+    const key = e.currentTarget.dataset.key
+    const line = this._cart.items.find(it => it.key === key)
+    const options = line && this._prices[line.productId]
+    const opt = options && options[Number(e.detail.value)]
+    if (!opt || opt.date === line.date) return
+    this._apply(cartUtil.editLine(this._cart, key, { date: opt.date, price: opt.price }))
+  },
+
+  // 改手机号：输入框失焦（或点完成）时校验保存；不合法提示并恢复原号码
+  onCellBlur(e) {
+    const key = e.currentTarget.dataset.key
+    const line = this._cart.items.find(it => it.key === key)
+    const value = String(e.detail.value || '').trim()
+    if (!line || value === line.cell) {
+      this.refresh()
+      return
+    }
+    this._apply(cartUtil.editLine(this._cart, key, { cell: value }))
   },
 
   onRemove(e) {
