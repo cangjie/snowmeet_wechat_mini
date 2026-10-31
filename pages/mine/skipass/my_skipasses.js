@@ -247,7 +247,8 @@ Page({
           item.serial = (list[i].reserve_no==null || list[i].reserve_no == undefined) ? '' : list[i].reserve_no 
           item.validDate = util.formatDate(new Date(list[i].reserve_date))
           item.quantity = '1张'
-          item.amount = util.showAmount(parseFloat(list[i].ticket_price))
+          // 顾客实际支付的金额（deal_price，已含张数）。ticket_price 是我们和供应商的结算价，不能给顾客看
+          item.amount = util.showAmount(parseFloat(list[i].deal_price))
           item.statusText = list[i].status
           item.statusClass = 'status-picked'
           item.canUse = (list[i].status != '已申请退款' && list[i].status != '已退票' &&  list[i].status != '已取卡'

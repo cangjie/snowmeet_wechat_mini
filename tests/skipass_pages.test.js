@@ -277,6 +277,19 @@ test('详情页：店员下单，校验的是用户实际填的姓名和手机�
   cleanup()
 })
 
+test('详情页：支付成功后跳到新版「我的雪票」，不是旧版单页', async () => {
+  const env = setup({ staff: { id: 28 } })
+  const page = await openDetail(env, { group: dayKey() })
+  global.wx.requestPayment = (x) => x.success()
+  global.wx.showToast = (x) => { env.toasts.push(x.title); if (x.complete) x.complete() }
+  page.onNameInput({ detail: { value: '张三' } })
+  page.onPhoneInput({ detail: { value: '13800138000' } })
+  page.onPay()
+  assert.deepEqual(env.toasts, ['支付成功。'])
+  assert.equal(env.navs[env.navs.length - 1], '/pages/mine/skipass/my_skipasses')
+  cleanup()
+})
+
 test('详情页：后端拒绝下单时提示原因并恢复按钮', async () => {
   const env = setup({ staff: { id: 28 }, reserve: { statusCode: 400, data: '仅限店员订票' } })
   const page = await openDetail(env, { group: dayKey() })

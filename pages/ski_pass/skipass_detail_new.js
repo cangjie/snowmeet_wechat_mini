@@ -314,8 +314,9 @@ Page({
                   title: '支付成功。',
                   icon: 'success',
                   complete: () => {
+                    // 新版「我的雪票」（我的 → 我的雪票 同一个页面）；my_skipass 是旧版单页
                     wx.redirectTo({
-                      url: '../mine/skipass/my_skipass',
+                      url: '/pages/mine/skipass/my_skipasses',
                     })
                   }
                 })
