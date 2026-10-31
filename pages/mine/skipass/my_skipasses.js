@@ -121,6 +121,7 @@ Page({
     useTickets: [],
     useIndex: 0,
     useTicket: {},
+    qrFailed: false,
   },
 
   onLoad() {
@@ -190,14 +191,20 @@ Page({
       useTickets: tickets,
       useIndex: index,
       useTicket: tickets[index],
+      qrFailed: false,
     })
+  },
+
+  // 二维码图片没加载出来：提示稍后重试，取票码文字仍可用
+  onQrError() {
+    this.setData({ qrFailed: true })
   },
 
   onSelectTicket(e) {
     const index = Number(e.currentTarget.dataset.index)
     const ticket = this.data.useTickets[index]
     if (!ticket) return
-    this.setData({ useIndex: index, useTicket: ticket })
+    this.setData({ useIndex: index, useTicket: ticket, qrFailed: false })
   },
 
   closeUseModal() {
@@ -232,6 +239,13 @@ Page({
         var usedList = []
         var groups = myGroup.buildMyGroups(res.data)
         groups.forEach(function (g) {
+          // 取票二维码：供应商的图片域名不在小程序的合法域名里，真机上显示不出来，改由我们的服务器取了再转给小程序
+          g.tickets.forEach(function (t) {
+            t.qrSrc = t.pickupCode
+              ? 'https://' + app.globalData.domainName + '/core/SkiPass/QrImage?skipassId=' + t.id
+                + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+              : ''
+          })
           // 顾客实际支付的金额（各张 deal_price 之和）。ticket_price 是我们和供应商的结算价，不能给顾客看
           g.amount = util.showAmount(g.amountNum)
           if (g.tab === 'unused') {

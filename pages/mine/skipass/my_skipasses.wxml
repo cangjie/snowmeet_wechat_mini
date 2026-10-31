@@ -131,13 +131,15 @@
     <view class="qr-wrapper">
       <image
         class="qr-image"
-        wx:if="{{useTicket.pickupCode && useTicket.usable}}"
-        src="{{useTicket.pickupCode}}"
+        wx:if="{{useTicket.qrSrc && useTicket.usable && !qrFailed}}"
+        src="{{useTicket.qrSrc}}"
         mode="aspectFit"
+        binderror="onQrError"
       />
+      <view class="qr-placeholder" wx:elif="{{useTicket.usable && qrFailed}}">二维码加载失败，请稍后再试，或出示下方的取票码</view>
       <view class="qr-placeholder" wx:elif="{{useTicket.usable}}">取票码正在生成，请稍后下拉刷新</view>
       <view class="qr-placeholder" wx:else>{{useTicket.stateText}}</view>
-      <view class="qr-scan-line" wx:if="{{useTicket.pickupCode && useTicket.usable}}"></view>
+      <view class="qr-scan-line" wx:if="{{useTicket.qrSrc && useTicket.usable && !qrFailed}}"></view>
     </view>
 
     <!-- 数字取票码 -->
