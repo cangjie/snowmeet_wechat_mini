@@ -31,7 +31,7 @@
       <block wx:if="{{form.type === 'job'}}">
         <view wx:for="{{phones}}" wx:key="id" class="pick-row {{form.account_id === item.id ? 'on' : ''}} {{item.assignable ? '' : 'off'}}" data-id="{{item.id}}" bindtap="onPickPhone">
           <view class="radio"></view>
-          <view class="grow col"><text class="card-title small">{{item.tail}}</text><text class="card-meta">{{item.cell}}</text></view>
+          <view class="grow col"><text class="card-title small">{{item.tail}}</text><view style="display: inline-flex; align-items: center;"><text class="card-meta">{{item.cell}}</text><phone-copy phone="{{item.cell}}" /></view></view>
           <text class="tag {{item.statusTag.tone}}">{{item.statusTag.text}}</text>
         </view>
         <view wx:if="{{!loading && !phones.length}}" class="sa-note">没有空闲的工作手机。</view>

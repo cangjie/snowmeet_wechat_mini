@@ -59,7 +59,7 @@
           </view>
           <view class="row-sub row-sub--customer">
             <text>{{item.customerText}}</text>
-            <text class="row-cell">{{item.memberCell || '（无手机号）'}}</text>
+            <view style="display: inline-flex; align-items: center;"><text class="row-cell">{{item.memberCell || '（无手机号）'}}</text><phone-copy phone="{{item.memberCell}}" /></view>
           </view>
           <view class="row-sub row-sub--time">{{item.createDateStr}}</view>
         </view>

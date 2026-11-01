@@ -31,7 +31,7 @@
 
       <view wx:if="{{member}}" class="info-row">
         <text class="info-label">绑定手机号</text>
-        <text class="info-value">{{member.cell || '未绑定手机'}}</text>
+        <view style="display: inline-flex; align-items: center;"><text class="info-value">{{member.cell || '未绑定手机'}}</text><phone-copy phone="{{member.cell}}" /></view>
       </view>
 
       <view class="form-group">

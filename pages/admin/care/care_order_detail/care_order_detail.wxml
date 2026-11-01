@@ -32,7 +32,7 @@
       </view>
       <view class="info-cell" bindtap="onCall">
         <text class="info-label">电话</text>
-        <text class="info-value info-value--link">{{order.contact_num || '--'}}</text>
+        <view style="display: inline-flex; align-items: center;"><text class="info-value info-value--link">{{order.contact_num || '--'}}</text><phone-copy phone="{{order.contact_num}}" /></view>
       </view>
       <view class="info-cell">
         <text class="info-label">业务日期</text>

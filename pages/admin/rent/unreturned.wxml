@@ -35,7 +35,7 @@
         <text class="ur-cat-name">{{sec._title}}<text class="ur-honorific" wx:if="{{sec._honorific}}"> {{sec._honorific}}</text></text>
         <view class="ur-cust-cell" wx:if="{{sec._cell}}" catchtap="call" data-cell="{{sec._cell}}">
           <van-icon name="phone-o" size="14px" color="#2EA6D0" />
-          <text>{{sec._cell}}</text>
+          <text>{{sec._cell}}</text><phone-copy phone="{{sec._cell}}" />
         </view>
         <text class="ur-sec-code" wx:if="{{sec._code}}">{{sec._code}}</text>
         <text class="ur-cat-count">{{sec._count}}</text>
@@ -51,7 +51,7 @@
             <text class="ur-cust-name" wx:if="{{grp._gLeft}}">{{grp._gLeft}}<text class="ur-honorific" wx:if="{{grp._gHonorific}}"> {{grp._gHonorific}}</text></text>
             <view class="ur-cust-cell" wx:if="{{grp._gCell}}" catchtap="call" data-cell="{{grp._gCell}}">
               <van-icon name="phone-o" size="14px" color="#2EA6D0" />
-              <text>{{grp._gCell}}</text>
+              <text>{{grp._gCell}}</text><phone-copy phone="{{grp._gCell}}" />
             </view>
             <text class="ur-order-code" wx:if="{{grp._gRight}}">{{grp._gRight}}</text>
           </view>

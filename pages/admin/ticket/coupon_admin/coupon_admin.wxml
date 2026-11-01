@@ -78,7 +78,7 @@
         <view class="state state--invalid" wx:if="{{item.showInvalid}}">无效</view>
         <view class="state state--inactive" wx:if="{{item.showInactive}}">未激活</view>
       </view>
-      <view class="row-sub">{{item.code}} · {{item.customerText}}<text wx:if="{{item.memberPhone}}"> · {{item.memberPhone}}</text></view>
+      <view class="row-sub">{{item.code}} · {{item.customerText}}<text wx:if="{{item.memberPhone}}"> · {{item.memberPhone}}</text><phone-copy phone="{{item.memberPhone}}" /></view>
       <view class="row-sub">发放 {{item.createDateStr}} · 到期 {{item.expireDateStr}}<text wx:if="{{item.usedTimeStr}}"> · 核销 {{item.usedTimeStr}}</text></view>
       <view class="row-sub" wx:if="{{item.issuerText}}">发券人 {{item.issuerText}}</view>
       <view class="row-transfer" wx:if="{{item.transferText}}">{{item.transferText}}</view>
@@ -93,7 +93,7 @@
       <view class="mem-main">
         <view class="row-head">
           <text class="row-title">{{item.customerText}}</text>
-          <text class="mem-phone" wx:if="{{item.memberPhone}}">{{item.memberPhone}}</text>
+          <text class="mem-phone" wx:if="{{item.memberPhone}}">{{item.memberPhone}}</text><phone-copy phone="{{item.memberPhone}}" />
         </view>
         <view class="row-sub">共 {{item.ticketCount}} 张 · 已核销 {{item.usedCount}} 张 · {{item.transferText}}</view>
         <view class="row-sub">最近发放 {{item.lastCreateDateStr}}</view>

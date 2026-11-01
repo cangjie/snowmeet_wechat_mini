@@ -52,7 +52,7 @@
       </view>
       <view class="detail-item align-right">
         <text class="detail-label">PHONE</text>
-        <text class="detail-value">{{item.cell}}</text>
+        <view style="display: inline-flex; align-items: center;"><text class="detail-value">{{item.cell}}</text><phone-copy phone="{{item.cell}}" /></view>
       </view>
       <view class="detail-item">
         <text class="detail-label">AMOUNT</text>
@@ -111,7 +111,7 @@
 
     <text class="qr-modal-title">扫码取票</text>
     <text class="qr-modal-subtitle">{{useTarget.title}}</text>
-    <text class="qr-modal-meta">{{useTarget.validDate}} · {{useTarget.cell}}</text>
+    <view style="display: inline-flex; align-items: center;"><text class="qr-modal-meta">{{useTarget.validDate}} · {{useTarget.cell}}</text><phone-copy phone="{{useTarget.cell}}" /></view>
 
     <!-- 多张票的标签 -->
     <view class="ticket-tabs" wx:if="{{useTickets.length > 1}}">

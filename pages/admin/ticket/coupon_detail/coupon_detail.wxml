@@ -19,7 +19,7 @@
       </view>
 
       <view class="kv"><text class="k">持有会员</text>
-        <text class="v {{ticket.memberId ? 'v--link' : ''}}" bindtap="onMemberTap">{{ticket.customerText}}<text wx:if="{{ticket.memberPhone}}"> · {{ticket.memberPhone}}</text></text>
+        <view style="display: inline-flex; align-items: center;"><text class="v {{ticket.memberId ? 'v--link' : ''}}" bindtap="onMemberTap">{{ticket.customerText}}<text wx:if="{{ticket.memberPhone}}"> · {{ticket.memberPhone}}</text></text><phone-copy phone="{{ticket.memberPhone}}" /></view>
       </view>
       <view class="kv"><text class="k">发放时间</text><text class="v">{{ticket.createDateStr}}</text></view>
       <view class="kv" wx:if="{{ticket.startDateStr}}"><text class="k">生效时间</text><text class="v">{{ticket.startDateStr}}</text></view>

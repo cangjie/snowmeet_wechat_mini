@@ -21,7 +21,7 @@
           {{(item.member.gender == '女')? '女士' : ''}}
         </view>
         <view class="left-column" >电话：</view>
-        <view class="right-column">{{item.member.cell}}</view>
+        <view class="right-column">{{item.member.cell}}<phone-copy phone="{{item.member.cell}}" /></view>
       </view>
       <view class="view-row" id="{{item.id}}" bindtap="gotoDetail" >
         <view class="left-column" >储值：</view>

@@ -7,7 +7,7 @@
       {{(member.gender == '女')? '女士' : ''}}
     </view>
     <view class="left-column">电话：</view>
-    <view class="right-column">{{member.cell}}</view>
+    <view class="right-column">{{member.cell}}<phone-copy phone="{{member.cell}}" /></view>
   </view>
   <view class="view-row" id="{{member.id}}" bindtap="gotoCharge">
     <view class="left-column">订单日期：</view>

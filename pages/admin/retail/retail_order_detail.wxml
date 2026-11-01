@@ -49,7 +49,7 @@
       </view>
       <view class="info-cell" bindtap="onCall">
         <text class="info-label">电话</text>
-        <text class="info-value {{view.cell ? 'info-value--link' : ''}}">{{view.cell || '--'}}</text>
+        <view style="display: inline-flex; align-items: center;"><text class="info-value {{view.cell ? 'info-value--link' : ''}}">{{view.cell || '--'}}</text><phone-copy phone="{{view.cell}}" /></view>
       </view>
     </view>
     <view wx:else class="edit-panel">

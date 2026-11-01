@@ -1,0 +1,21 @@
+/* 紧跟在手机号后面的小按钮：字号固定，不跟着外层行字号变；点击区域靠 padding 撑大。 */
+:host {
+  display: inline-block;
+  vertical-align: middle;
+}
+.pc-btn {
+  display: inline-block;
+  margin-left: 12rpx;
+  padding: 2rpx 14rpx;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  font-weight: normal;
+  white-space: nowrap;
+  color: #006495;
+  border: 1rpx solid #006495;
+  border-radius: 6rpx;
+  background: #ffffff;
+}
+.pc-btn--hover {
+  background: #e6f1f7;
+}

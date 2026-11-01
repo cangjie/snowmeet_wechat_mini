@@ -11,7 +11,7 @@
           </view>
           <view class="head-phone-row" bindtap="onCallPhone">
             <text class="head-phone">{{account.phone || '—'}}</text>
-            <van-icon wx:if="{{account.phone}}" name="phone-o" size="14px" color="#006495" />
+            <van-icon wx:if="{{account.phone}}" name="phone-o" size="14px" color="#006495" /><phone-copy phone="{{account.phone}}" />
           </view>
         </view>
         <text class="head-type">{{account.typeLabel}}</text>

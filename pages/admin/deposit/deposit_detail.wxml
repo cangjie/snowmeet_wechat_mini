@@ -8,7 +8,7 @@
         {{(account.member.gender == '女')? '女士' : ''}}
       </view>
       <view class="left-column">电话：</view>
-      <view class="right-column">{{account.member.cell}}</view>
+      <view class="right-column">{{account.member.cell}}<phone-copy phone="{{account.member.cell}}" /></view>
     </view>
     <!--view class="view-row" >
     <view class="left-column"  >日期：</view>

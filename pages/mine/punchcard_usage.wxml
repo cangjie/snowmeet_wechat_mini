@@ -36,7 +36,7 @@
   <view wx:if="{{isStaff && member}}" class="card">
     <view class="section-title">顾客信息</view>
     <view class="kv"><text class="kv-k">顾客</text><text class="kv-v">{{member.displayName}}</text></view>
-    <view class="kv"><text class="kv-k">手机号</text><text class="kv-v">{{member.cell || '（无手机号）'}}</text></view>
+    <view class="kv"><text class="kv-k">手机号</text><view style="display: inline-flex; align-items: center;"><text class="kv-v">{{member.cell || '（无手机号）'}}</text><phone-copy phone="{{member.cell}}" /></view></view>
     <view class="kv"><text class="kv-k">购买/开卡时间</text><text class="kv-v">{{card.createTimeStr || card.createDateStr}}</text></view>
   </view>
 

@@ -90,7 +90,7 @@
             <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item.customerName || '-'}}</text>
           </view>
           <view class="care-row">
-            <text class="row-label">电话</text><text class="row-value row-value--wide">{{item.customerCell || '-'}}</text>
+            <text class="row-label">电话</text><view style="display: inline-flex; align-items: center;"><text class="row-value row-value--wide">{{item.customerCell || '-'}}</text><phone-copy phone="{{item.customerCell}}" /></view>
           </view>
           <view class="care-row">
             <text class="row-label">已完成</text><text class="row-value row-value--wide">{{item.completedTaskStr}}</text>

@@ -143,7 +143,7 @@
             <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item.calledName}}</text>
           </view>
           <view class="order-row">
-            <text class="row-label">手机</text><text class="row-value row-value--wide">{{item.customerCell}}</text>
+            <text class="row-label">手机</text><view style="display: inline-flex; align-items: center;"><text class="row-value row-value--wide">{{item.customerCell}}</text><phone-copy phone="{{item.customerCell}}" /></view>
           </view>
           <view class="order-row">
             <text class="row-label">方式</text><text class="row-value row-value--wide row-value--nowrap">{{item.payMethod || '--'}}</text>

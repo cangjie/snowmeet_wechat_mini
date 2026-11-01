@@ -29,7 +29,7 @@
     </view>
     <view style="margin-left: 10rpx;display: flex; flex-direction: row;">
       <view style="width: 50%;">姓名：{{item.contact_name}}</view>
-      <view style="width: 50%;">电话：{{item.contact_cell}}</view>
+      <view style="width: 50%;">电话：{{item.contact_cell}}<phone-copy phone="{{item.contact_cell}}" /></view>
     </view>
     <view style="margin-left: 10rpx;display: flex; flex-direction: row;">
       <view style="width: 50%;">单号：{{item.reserve_no}}</view>

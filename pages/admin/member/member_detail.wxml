@@ -10,7 +10,7 @@
             <text wx:if="{{member.gender}}" class="gchip {{member.female ? 'gchip--f' : ''}}">{{member.gender}}</text>
           </view>
           <view class="head-phone" bindtap="callPhone">
-            <van-icon name="phone-o" size="15px" color="#006495" /><text class="head-phone-txt">{{member.phone || '未绑定手机号'}}</text>
+            <van-icon name="phone-o" size="15px" color="#006495" /><text class="head-phone-txt">{{member.phone || '未绑定手机号'}}</text><phone-copy phone="{{member.phone}}" />
           </view>
         </view>
         <view class="head-edit" catchtap="onEditProfile"><van-icon name="edit" size="13px" color="#006495" /><text class="head-edit-txt">编辑</text></view>
@@ -60,8 +60,8 @@
       <view class="card-title"><van-icon name="link-o" size="16px" color="#006495" /><text class="card-title-txt">绑定账户</text></view>
       <view class="acc-row"><text class="acc-k">微信</text><text class="acc-v">{{member.accounts.wechatOpenId ? '已绑定' : '未绑定'}}</text></view>
       <view class="acc-row"><text class="acc-k">支付宝</text><text class="acc-v">{{member.accounts.alipayPayerId ? '已绑定' : '未绑定'}}</text></view>
-      <view class="acc-row"><text class="acc-k">手机号</text><text class="acc-v mono">{{member.accounts.cell || '未绑定'}}</text></view>
-      <view wx:if="{{member.contactCellsStr}}" class="acc-row"><text class="acc-k">联系手机号</text><text class="acc-v mono">{{member.contactCellsStr}}</text></view>
+      <view class="acc-row"><text class="acc-k">手机号</text><view style="display: inline-flex; align-items: center;"><text class="acc-v mono">{{member.accounts.cell || '未绑定'}}</text><phone-copy phone="{{member.accounts.cell}}" /></view></view>
+      <view wx:if="{{member.contactCellsStr}}" class="acc-row"><text class="acc-k">联系手机号</text><view style="display: inline-flex; align-items: center;"><text class="acc-v mono">{{member.contactCellsStr}}</text><phone-copy phone="{{member.contactCellsStr}}" /></view></view>
     </view>
 
     <!-- 名下次卡 -->
@@ -272,7 +272,7 @@
       <view wx:for="{{mergeResults}}" wx:key="id" class="opt" data-idx="{{index}}" bindtap="onMergeSelect">
         <view class="opt-mid">
           <text class="opt-name">{{item.name}}{{item.gender ? '（' + item.gender + '）' : ''}}</text>
-          <text class="opt-sub mono">ID {{item.id}} · {{item.phone || '无手机号'}}</text>
+          <view style="display: inline-flex; align-items: center;"><text class="opt-sub mono">ID {{item.id}} · {{item.phone || '无手机号'}}</text><phone-copy phone="{{item.phone}}" /></view>
         </view>
         <van-icon name="arrow" size="15px" color="#bfc7d1" />
       </view>

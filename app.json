@@ -275,6 +275,7 @@
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
     "shop-selector": "/components/shop_selector/shop_selector",
+    "phone-copy": "/components/phone_copy/phone_copy",
     "member-info": "/components/user_info/member_info",
     "van-collapse": "@vant/weapp/collapse/index",
     "van-collapse-item": "@vant/weapp/collapse-item/index",

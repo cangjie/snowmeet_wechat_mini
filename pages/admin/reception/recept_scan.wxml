@@ -116,7 +116,7 @@
           data-id="{{ item.id }}"
           bindtap="onRecoverOrderTap">
           <view class="recover-item-name">{{ item.calledName || '（未填姓名）' }}</view>
-          <view class="recover-item-cell">{{ item.contact_num || '未留手机' }}</view>
+          <view class="recover-item-cell">{{ item.contact_num || '未留手机' }}<phone-copy phone="{{item.contact_num}}" /></view>
           <view class="recover-item-time">{{ item.timeStr }}</view>
         </view>
       </scroll-view>

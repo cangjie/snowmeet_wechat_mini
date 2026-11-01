@@ -40,7 +40,7 @@
         <view class="left-column" style="width: 100rpx;" >姓名：</view>
         <view class="right-column" >{{item.name}}</view>
         <view class="left-column" style="width: 120rpx;" >电话：</view>
-        <view class="right-column" >{{item.cell}}</view>
+        <view class="right-column" >{{item.cell}}<phone-copy phone="{{item.cell}}" /></view>
       </view>
       <view class="view-row" bind:tap="gotoBalanceDetail" id="{{item.id}}" >
         <view class="left-column" style="width: 100rpx;" >类型：</view>
@@ -72,7 +72,7 @@
           {{(item.gender == '女')? '女士' : ''}}
         </view>
         <view class="left-column" >电话：</view>
-        <view class="right-column" >{{item.cell}}</view>
+        <view class="right-column" >{{item.cell}}<phone-copy phone="{{item.cell}}" /></view>
       </view>
       <view class="view-row" id="{{item.depositAccounts[0].id}}" bindtap="gotoDetail" >
         <view class="left-column" >创建日期：</view>
