@@ -27,6 +27,20 @@ function atOnceForMode(mode) {
   return mode === 'now' || mode === 'delay';
 }
 
+// 套餐的租赁模式变了（点模式、或改日期自动切模式），套餐里的装备要不要跟着变：
+//   没选过模式 → 跟；
+//   这次在装备上手动选过（onItemModeTap 写 _modeFromPkg=false）→ 不跟；
+//   其它情况（开单时带的默认值、保存往返后前端标记丢了、上次也是跟着套餐变的）：
+//     装备的模式和套餐原来的模式一致，说明它一直跟着套餐 → 跟；不一致，说明是单独选的 → 不跟。
+// 不能只看 _modeFromPkg：开单时装备带的是默认模式、没有这个标记，保存往返还会把它清掉，
+// 以前这样判断会把它们都当成「自己选的」，套餐变了装备不变。
+function itemFollowsPackage(item, pkgPickType) {
+  if (!item.pick_type) return true;
+  if (item._modeFromPkg === true) return true;
+  if (item._modeFromPkg === false) return false;
+  return item.pick_type === pkgPickType;
+}
+
 function pkgKey(r, idx) {
   if (r.id) return 'id_' + r.id;
   if (r.timeStamp) return 'ts_' + r.timeStamp;
@@ -395,9 +409,10 @@ Component({
       const today = formatDate(new Date());
       const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);
       const tmrw = formatDate(tmrwDate);
+      const oldPkgPickType = this.data.displayRentals[ridx].pick_type;
       const items = (this.data.displayRentals[ridx].rentItems || []).map(it => {
-        // 跟随条件：自身没选过 / 上次也是从套餐继承（_modeFromPkg）。已手动自选的保持不动。
-        if (it.pick_type && !it._modeFromPkg) return it;
+        // 跟随规则见 itemFollowsPackage；单独选过模式的装备保持不动。
+        if (!itemFollowsPackage(it, oldPkgPickType)) return it;
         const next = { ...it, pick_type: pickType, atOnce: atOnceForMode(mode), _modeKey: mode, _modeFromPkg: true };
         const entry = evalEntry(next);
         next._entered = entry.ok;

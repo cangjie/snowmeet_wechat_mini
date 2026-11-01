@@ -188,3 +188,71 @@ test('只改起租时间（时间选择器）不动模式和日期', () => {
     assert.equal(r.start_date, daysFromToday(1) + 'T09:30:00')
   } finally { restore() }
 })
+
+// ---------- 装备跟着套餐变（开单时装备带默认模式、没有跟随标记） ----------
+
+function plainItem(extra) {
+  // 开单时创建的装备：pick_type 是默认模式，没有 _modeFromPkg / _modeKey 这些前端标记
+  return Object.assign({ id: 1, name: '雪板', code: 'B', noCode: false, category_id: 3, pick_type: '立即租赁', atOnce: true }, extra || {})
+}
+
+test('开单时带默认模式的装备（没有跟随标记）：改日期后跟着套餐变成延时租赁', () => {
+  const { instance, restore } = loadForm([rental({ rentItems: [plainItem(), plainItem({ id: 2, name: '雪杖', is_associate: true, noCode: true })] })])
+  try {
+    instance._setPkgDate(0, daysFromToday(1))
+    const r = instance.data.displayRentals[0]
+    assert.equal(r.pick_type, '延时租赁')
+    for (const it of r.rentItems) {
+      assert.equal(it.pick_type, '延时租赁', it.name + ' 跟着套餐')
+      assert.equal(it._modeKey, 'delay', it.name)
+      assert.equal(it.atOnce, true, it.name)
+    }
+  } finally { restore() }
+})
+
+test('保存往返把前端标记清掉之后，再改日期装备照样跟着套餐走（延时 → 改回今天 → 立即）', () => {
+  const { instance, restore } = loadForm([rental({ rentItems: [plainItem()] })])
+  try {
+    instance._setPkgDate(0, daysFromToday(2))
+    // 模拟保存往返：父页拿到的是去掉 _ 字段的数据，再原样传回
+    for (const it of instance.data.displayRentals[0].rentItems) { delete it._modeFromPkg; delete it._modeKey }
+    instance._setPkgDate(0, daysFromToday(0))
+    const r = instance.data.displayRentals[0]
+    assert.equal(r.pick_type, '立即租赁')
+    assert.equal(r.rentItems[0].pick_type, '立即租赁')
+    assert.equal(r.rentItems[0]._modeKey, 'now')
+  } finally { restore() }
+})
+
+test('装备单独选的模式和套餐不一致（标记丢了也一样）：改日期时保持不动', () => {
+  const own = plainItem({ id: 3, name: '雪鞋', pick_type: '先租后取', atOnce: false })
+  const { instance, restore } = loadForm([rental({ rentItems: [plainItem(), own] })])
+  try {
+    instance._setPkgDate(0, daysFromToday(1))
+    const items = instance.data.displayRentals[0].rentItems
+    assert.equal(items[0].pick_type, '延时租赁')
+    assert.equal(items[1].pick_type, '先租后取')
+    assert.equal(items[1].atOnce, false)
+  } finally { restore() }
+})
+
+test('这次在装备上手动选过、恰好和套餐一样：套餐变了也不动它', () => {
+  const chosen = plainItem({ id: 3, name: '雪鞋', pick_type: '立即租赁', _modeFromPkg: false })
+  const { instance, restore } = loadForm([rental({ rentItems: [plainItem(), chosen] })])
+  try {
+    instance._setPkgDate(0, daysFromToday(1))
+    const items = instance.data.displayRentals[0].rentItems
+    assert.equal(items[0].pick_type, '延时租赁')
+    assert.equal(items[1].pick_type, '立即租赁')
+  } finally { restore() }
+})
+
+test('点模式按钮也一样：默认模式的装备跟着套餐变（先租后取 → 装备不发放）', () => {
+  const { instance, restore } = loadForm([rental({ rentItems: [plainItem()] })])
+  try {
+    instance.onPkgModeTap({ currentTarget: { dataset: { ridx: 0, mode: 'later' } } })
+    const it = instance.data.displayRentals[0].rentItems[0]
+    assert.equal(it.pick_type, '先租后取')
+    assert.equal(it.atOnce, false)
+  } finally { restore() }
+})
