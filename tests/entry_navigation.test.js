@@ -4,9 +4,11 @@ const fs = require('node:fs')
 const path = require('node:path')
 const vm = require('node:vm')
 const authSession = require('../utils/authSession.js')
+const tabbar = require('../utils/tabbar.js')
 
 const ADMIN = '/pages/admin/admin'
-const SHOP = '/pages/punchcard/punchcard_shop'
+// 次卡暂时隐藏：顾客的默认落点是雪票页（utils/tabbar.js 的 customerLandingUrl）
+const LANDING = '/pages/ski_pass/ski_pass_selector'
 
 // 运行真实 app.js，替换微信与网络边界。pages 是模拟的页面栈（route 列表）。
 function loadApp({ session, scene = '1089', launchPath = 'pages/index/index', loginError, sysInfoFail, navFail } = {}) {
@@ -52,7 +54,11 @@ function loadApp({ session, scene = '1089', launchPath = 'pages/index/index', lo
     getApp: () => app,
     getCurrentPages: () => stack.map((route) => ({ route })),
     wx,
-    require(name) { return name === './utils/authSession.js' ? authSession : util },
+    require(name) {
+      if (name === './utils/authSession.js') return authSession
+      if (name === './utils/tabbar.js') return tabbar
+      return util
+    },
     console: { log() {}, warn() {} }
   }, { filename: 'app.js' })
   stack.push(launchPath)
@@ -97,7 +103,7 @@ test('登录本身不再发出任何跳转', async () => {
   assert.deepEqual(calls, [])
 })
 
-test('普通顾客、登录失败：首页都去次卡商城', async () => {
+test('普通顾客、登录失败：首页都去雪票页', async () => {
   const cases = [
     loadApp({ session: customerSession }),
     loadApp({ session: customerSession, scene: '1007' }),
@@ -106,7 +112,7 @@ test('普通顾客、登录失败：首页都去次卡商城', async () => {
   for (const { app, calls } of cases) {
     await app.routeEntry({ fromIndex: true })
     await tick()
-    assert.deepEqual(urls(calls), [SHOP])
+    assert.deepEqual(urls(calls), [LANDING])
   }
 })
 
@@ -121,7 +127,7 @@ test('冷启动直接进指定页面（扫码、分享、付款等）：店员�
   }
 })
 
-test('进菜单后主动回首页只去商城，不再弹回后台', async () => {
+test('进菜单后主动回首页只去雪票页，不再弹回后台', async () => {
   const { app, calls, stack } = loadApp({ session: staffSession })
   await app.routeEntry({ fromIndex: true })
   await tick()
@@ -131,7 +137,7 @@ test('进菜单后主动回首页只去商城，不再弹回后台', async () =>
   stack.push('pages/index/index')
   await app.routeEntry({ fromIndex: true })
   await tick()
-  assert.deepEqual(urls(calls), [ADMIN, SHOP])
+  assert.deepEqual(urls(calls), [ADMIN, LANDING])
 })
 
 test('同一入口内重复调用不会再跳管理员菜单', async () => {
@@ -218,4 +224,10 @@ test('登录期间又切后台：旧入口的结果作废', async () => {
   assert.equal(await pending, 'stale')
   await tick()
   assert.deepEqual(calls, [])
+})
+
+test('app.globalData.userTabBarItem 是 utils/tabbar.js 的菜单：雪票、我的（次卡暂时隐藏）', () => {
+  const { app } = loadApp({ session: customerSession })
+  assert.deepEqual(app.globalData.userTabBarItem.map((item) => item.text), ['雪票', '我的'])
+  assert.deepEqual(app.globalData.userTabBarItem.map((item) => item.pagePath), [LANDING, '/pages/mine/mine'])
 })

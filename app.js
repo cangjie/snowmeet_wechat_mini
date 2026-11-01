@@ -1,6 +1,7 @@
 import fuiConfig from './components/firstui/fui-config/index'
 var util = require('./utils/util.js')
 var authSession = require('./utils/authSession.js')
+var tabbar = require('./utils/tabbar.js')
 
 function containsChinese(str) {
   return /[\u4e00-\u9fff]/.test(str)
@@ -149,7 +150,6 @@ function startLogin() {
 // （扫码、分享、付款等指定页面）不适用，不分冷热启动、不分场景。
 const ENTRY_PATHS = ['pages/index/index', 'pages/ski_pass/ski_pass_selector']
 const ADMIN_URL = '/pages/admin/admin'
-const SHOP_URL = '/pages/punchcard/punchcard_shop'
 
 function isEntryPath(path) {
   return typeof path === 'string' && ENTRY_PATHS.indexOf(path.replace(/^\//, '')) >= 0
@@ -165,7 +165,7 @@ function currentRoute() {
 // 入口分流，首页冷启动（fromIndex）和后台重新进入共用。
 // 「入口」指一次进入小程序：冷启动一次，每次从后台重新进入再算一次，用 entryRevision 区分。
 // 同一入口里店员只自动进一次管理员菜单（entryHandledRevision），之后从菜单打开业务页、返回菜单、
-// 主动回首页都不会再被弹回后台；回首页的普通落点是次卡商城。
+// 主动回首页都不会再被弹回后台；回首页的普通落点见 utils/tabbar.js 的 customerLandingUrl（次卡隐藏期间是雪票页）。
 // 入口落点 entryPath 取自 onLaunch / onShow 的 res.path。
 function routeEntry(options, appRef) {
   const app = appRef || getApp()
@@ -185,7 +185,7 @@ function routeEntry(options, appRef) {
       target = ADMIN_URL
     }
     else if (fromIndex) {
-      target = SHOP_URL
+      target = tabbar.customerLandingUrl()
     }
     if (!target) return 'stay'
     if (app.globalData.entryNavigating) return 'busy'
@@ -205,7 +205,7 @@ function routeEntry(options, appRef) {
         }
       }
     })
-    return target === ADMIN_URL ? 'admin' : 'shop'
+    return target === ADMIN_URL ? 'admin' : 'landing'
   })
 }
 
@@ -316,30 +316,7 @@ App({
       fontScale: 1,
     },
     //wssUrl: 'wss://' + domainName + '/ws',
-    // ⚠️ 各页面的 tabIndex 是硬编码的（页面 data 里写死 0/1/2），
-    // 往这个数组中间插项会让后面所有页面的高亮错位——增删项时必须同步检查
-    // 所有用了 mp-tabbar 的页面：index / mine / ski_pass_selector / punchcard_shop
-    userTabBarItem: [
-      {
-        "pagePath": "/pages/ski_pass/ski_pass_selector",
-        "text": "预定"
-        /*
-        "iconPath": "/images/book-3-line.png",
-        "selectedIconPath": "/images/book-3-line-hl.png"
-        */
-      },
-      {
-        "pagePath": "/pages/punchcard/punchcard_shop",
-        "text": "次卡"
-      },
-      {
-        "pagePath": "/pages/mine/mine",
-        "text": "我的"
-        /*
-        "iconPath": "/images/home-2-line.png",
-        "selectedIconPath": "/images/home-2-line-hl.png"
-        */
-      }
-    ]
+    // 顾客端底部菜单。定义、隐藏开关、各页面高亮下标都在 utils/tabbar.js，页面用 tabIndexOf 取下标，别写死数字。
+    userTabBarItem: tabbar.tabBarItems()
   }
 })

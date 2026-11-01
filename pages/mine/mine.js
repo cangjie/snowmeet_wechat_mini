@@ -1,5 +1,6 @@
 const app = getApp()
 var wxloginModule = require('../../utils/wxlogin.js')
+const tabbar = require('../../utils/tabbar.js')
 Page({
 
   /**
@@ -8,8 +9,8 @@ Page({
   data: {
     role: '',
     canGetInfo: false,
-    // 底部菜单里「我的」的下标。app.js 的 userTabBarItem 在 预定/我的 之间插了「次卡」后由 1 变 2
-    tabIndex: 2
+    // 底部菜单里「我的」的下标，取自 utils/tabbar.js（次卡隐藏时是 1，显示时是 2）
+    tabIndex: tabbar.tabIndexOf(tabbar.MINE_URL)
   },
 
   /**

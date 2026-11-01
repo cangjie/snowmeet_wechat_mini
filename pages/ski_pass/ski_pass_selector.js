@@ -3,6 +3,7 @@
 // 价格人人可看，订票只有店员能订（后端 ReserveSkiPass 强制，详情页对顾客不显示支付栏）。
 const app = getApp()
 const skipassGroup = require('../../utils/skipass_group.js')
+const tabbar = require('../../utils/tabbar.js')
 
 function safeDecode(value) {
   try {
@@ -20,7 +21,7 @@ Page({
     resortArr: [],
     activeTab: 0,
     showTabs: false,
-    tabIndex: 0,
+    tabIndex: tabbar.tabIndexOf(tabbar.SKIPASS_URL),
     isStaff: false,
     loaded: false,
     loadFailed: false

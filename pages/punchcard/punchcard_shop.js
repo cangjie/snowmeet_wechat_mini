@@ -12,6 +12,7 @@
 var app = getApp()
 var util = require('../../utils/util.js')
 var data = require('../../utils/data.js')
+var tabbar = require('../../utils/tabbar.js')
 
 var BIZ_TYPES = ['租赁', '养护']
 
@@ -19,15 +20,15 @@ Page({
   data: {
     items: [],
     loading: true,
-    // 底部菜单：本页在 app.js userTabBarItem 里是第 2 项「次卡」（预定 / 次卡 / 我的）
-    tabIndex: 1,
+    // 底部菜单高亮：次卡显示在菜单里时是「次卡」那一项；隐藏期间是 -1，菜单不高亮任何一项（utils/tabbar.js）
+    tabIndex: tabbar.tabIndexOf(tabbar.PUNCHCARD_URL),
     tabbarItemList: []
   },
 
   onShow() {
     var that = this
     app.loginPromiseNew.then(function () {
-      that.setData({ tabbarItemList: app.globalData.userTabBarItem, tabIndex: 1 })
+      that.setData({ tabbarItemList: app.globalData.userTabBarItem, tabIndex: tabbar.tabIndexOf(tabbar.PUNCHCARD_URL) })
       that.getData()
     })
   },
