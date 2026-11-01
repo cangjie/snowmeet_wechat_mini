@@ -16,6 +16,17 @@ const RENT_MODES = [
 const PT_TO_KEY = { '立即租赁': 'now', '先租后取': 'later', '延时租赁': 'delay' };
 const KEY_TO_PT = { now: '立即租赁', later: '先租后取', delay: '延时租赁' };
 
+const { repricePreset, modeForDateChange } = require('../../../utils/rent_date_price.js');
+
+// 开单生效时是否当场把装备发给顾客（后端 EffectRental 按 rentItem.atOnce 发放并把租赁物标记为「租赁中」）。
+//   立即租赁：当场发放，从现在起计费。
+//   延时租赁：也当场发放——装备当晚就交给顾客，起租日期（默认明天 00:00）才开始计费，和旧版延时租赁一致。
+//   先租后取：不发放——从现在起先计租金，装备稍后由店员发放（旧版是「未领取」）。
+// 起租日期只管从哪天计费，不管装备什么时候发出去。
+function atOnceForMode(mode) {
+  return mode === 'now' || mode === 'delay';
+}
+
 function pkgKey(r, idx) {
   if (r.id) return 'id_' + r.id;
   if (r.timeStamp) return 'ts_' + r.timeStamp;
@@ -372,17 +383,22 @@ Component({
 
     /* ---------- 套餐字段 ---------- */
     onPkgModeTap(e) {
-      const ridx = Number(e.currentTarget.dataset.ridx);
-      const mode = e.currentTarget.dataset.mode;
+      this._applyPkgMode(Number(e.currentTarget.dataset.ridx), e.currentTarget.dataset.mode);
+    },
+    // 套餐选定租赁模式：改套餐和跟随的装备的模式、发放标记，同时按模式定起租日期和时间。
+    // dateOverride 是店员自己选的起租日期（改日期时自动切模式用），模式只决定钟点，不再改日期。
+    _applyPkgMode(ridx, mode, dateOverride) {
       const pickType = KEY_TO_PT[mode];
-      const { date, time } = dateTimeForMode(mode);
+      const modeDateTime = dateTimeForMode(mode);
+      const date = dateOverride || modeDateTime.date;
+      const time = modeDateTime.time;
       const today = formatDate(new Date());
       const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);
       const tmrw = formatDate(tmrwDate);
       const items = (this.data.displayRentals[ridx].rentItems || []).map(it => {
         // 跟随条件：自身没选过 / 上次也是从套餐继承（_modeFromPkg）。已手动自选的保持不动。
         if (it.pick_type && !it._modeFromPkg) return it;
-        const next = { ...it, pick_type: pickType, atOnce: mode !== 'delay', _modeKey: mode, _modeFromPkg: true };
+        const next = { ...it, pick_type: pickType, atOnce: atOnceForMode(mode), _modeKey: mode, _modeFromPkg: true };
         const entry = evalEntry(next);
         next._entered = entry.ok;
         next._statusLabel = entry.label;
@@ -390,6 +406,8 @@ Component({
       });
       this.setData({
         [`displayRentals[${ridx}].pick_type`]: pickType,
+        // 套餐级 atOnce 跟着模式走：之后换品类重建的附件按它取值（见 _applyCategoryChange）
+        [`displayRentals[${ridx}].atOnce`]: atOnceForMode(mode),
         [`displayRentals[${ridx}]._modeKey`]: mode,
         [`displayRentals[${ridx}].rentItems`]: items,
         [`displayRentals[${ridx}].start_date`]: combineDateTime(date, time),
@@ -400,6 +418,7 @@ Component({
       });
       this._updateRentalChip(ridx);
       this._emitSync(false);
+      this._repriceForDate(ridx, date);
     },
     onPkgModeMixedTap() {
       wx.showToast({ title: '套餐内装备模式不一致', icon: 'none' });
@@ -542,6 +561,12 @@ Component({
       const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);
       const tmrw = formatDate(tmrwDate);
       const r = this.data.displayRentals[ridx] || {};
+      // 改起租日期：晚于今天 → 自动切成延时租赁、起租钟点 00:00；改回今天且原来是延时租赁 → 回立即租赁、钟点是现在
+      const autoMode = modeForDateChange(date, r.pick_type, today);
+      if (autoMode) {
+        this._applyPkgMode(ridx, autoMode, date);
+        return;
+      }
       const oldTime = splitISODateTime(r.start_date).time || r._startTime || '';
       this.setData({
         [`displayRentals[${ridx}].start_date`]: combineDateTime(date, oldTime),
@@ -550,6 +575,46 @@ Component({
         [`displayRentals[${ridx}]._dateIsTomorrow`]: date === tmrw,
       });
       this._updateRentalChip(ridx);
+      this._emitSync(false);
+      this._repriceForDate(ridx, date);
+    },
+
+    // 起租日期变了：租金/日按新日期重新取价（规则见 utils/rent_date_price.js：店员手改过的价不动，只挪日期）。
+    // 价目表优先用 rental.priceList；保存往返后后端会把它清空，这时按套餐/分类现取一次。
+    // 取价目表是异步的：期间又改了起租日期（后发的请求会写自己的日期）、或套餐已不在这个位置，这次结果作废。
+    async _repriceForDate(ridx, dateStr) {
+      const r = this.data.displayRentals[ridx];
+      if (!r || !dateStr) return;
+      const key = pkgKey(r, ridx);
+      let priceList = r.priceList || [];
+      const owner = r.package_id ? { type: '套餐', id: r.package_id }
+        : (r.category_id ? { type: '分类', id: r.category_id } : null);
+      const preset0 = (r.pricePresets || [])[0] || null;
+      if (!priceList.length && owner && !(preset0 && preset0.manual)) {
+        try {
+          const dataLib = require('../../../utils/data.js');
+          const shopObj = await dataLib.getShopByNamePromise(this.properties.shop || '');
+          if (shopObj && shopObj.id) {
+            priceList = (await dataLib.getRentPriceListPromise(shopObj.id, owner.type, owner.id, '门市')) || [];
+          }
+        } catch (err) {
+          console.warn('取价目表失败，只挪日期不改价', err);
+        }
+      }
+      const cur = this.data.displayRentals[ridx];
+      if (!cur || pkgKey(cur, ridx) !== key || splitISODateTime(cur.start_date).date !== dateStr) return;
+      const presets = (cur.pricePresets || []).slice();
+      const next = repricePreset(presets[0] || null, priceList, dateStr, new Date());
+      if (!next) return;
+      if (presets.length) presets[0] = next; else presets.push(next);
+      const rate = Number(next.price) || 0;
+      this.setData({
+        [`displayRentals[${ridx}].pricePresets`]: presets,
+        [`displayRentals[${ridx}].priceList`]: priceList,
+        [`displayRentals[${ridx}]._dailyRate`]: rate,
+        [`displayRentals[${ridx}]._dailyRateInput`]: rate.toFixed(2),
+      });
+      this._refreshSummary();
       this._emitSync(false);
     },
     onPkgDateTap(e) {
@@ -669,7 +734,7 @@ Component({
       const entry = evalEntry({ ...item, pick_type: pickType });
       this.setData({
         [`displayRentals[${ridx}].rentItems[${iidx}].pick_type`]: pickType,
-        [`displayRentals[${ridx}].rentItems[${iidx}].atOnce`]: mode !== 'delay',
+        [`displayRentals[${ridx}].rentItems[${iidx}].atOnce`]: atOnceForMode(mode),
         [`displayRentals[${ridx}].rentItems[${iidx}]._modeKey`]: mode,
         [`displayRentals[${ridx}].rentItems[${iidx}]._modeFromPkg`]: false,
         [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
