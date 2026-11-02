@@ -43,8 +43,8 @@ Page({
         this.setData({ loginError: true, errMsg: '微信登录未完成，请检查网络后重新登录。' })
         return
       }
-      // 首次进入小程序已有微信会话，但尚未建立会员；领取前先授权手机号。
-      if (!app.globalData.member || !app.globalData.member.id) {
+      // 新顾客或尚未绑定手机号的会员，都要先验证手机号再领取。
+      if (!app.globalData.member || !app.globalData.member.id || !app.globalData.member.cell) {
         this.setData({ needMember: true })
         return
       }
@@ -90,7 +90,7 @@ Page({
     this.setData({ authBusy: true, errMsg: '' })
     try {
       const member = await data.bindWechatCellPromise(detail.encryptedData, detail.iv, app.globalData.sessionKey)
-      if (!member || !member.id) throw new Error('手机号授权未完成，请重试')
+      if (!member || !member.id || !member.cell) throw new Error('手机号验证未完成，请重试')
       app.globalData.member = member
       this.setData({ needMember: false })
       await this.load()

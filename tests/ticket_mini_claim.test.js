@@ -10,7 +10,7 @@ function setup(t, file, options = {}) {
   const calls = { follow: 0, accept: 0, shared: 0, fixed: 0, bind: 0, batch: [], redirects: [], toasts: [] }
   const app = {
     loginPromiseNew: Promise.resolve({ authenticated: options.authenticated !== false }),
-    globalData: { sessionKey: options.emptySession ? '' : 'mini-session', member: options.newVisitor ? null : { id: 10 }, domainName: 'test.invalid', requestPrefix: 'https://test.invalid/api/' },
+    globalData: { sessionKey: options.emptySession ? '' : 'mini-session', member: options.newVisitor ? null : { id: 10, cell: options.unverifiedMember ? '' : '13800000000' }, domainName: 'test.invalid', requestPrefix: 'https://test.invalid/api/' },
     retryLogin() {
       app.globalData.sessionKey = 'new-session'
       app.loginPromiseNew = Promise.resolve({ authenticated: true })
@@ -136,6 +136,30 @@ test('新访客先授权手机号建立会员，再加载并领取原卡片的�
   assert.equal(page.data.needMember, false)
   await page.onClaim()
   assert.equal(calls.shared, 1)
+})
+
+test('已有会员未验证手机号也须授权后才能领取批次券', async t => {
+  const { page, calls } = setup(t, CLAIM, { unverifiedMember: true })
+  page.onLoad({ batch: '7' })
+  await settle()
+  assert.equal(page.data.needMember, true)
+  assert.deepEqual(calls.batch, [])
+  await page.onGetCell({ detail: { errMsg: 'getPhoneNumber:ok', encryptedData: 'encrypted', iv: 'iv' } })
+  assert.deepEqual(calls.batch, [[7, 'mini-session']])
+})
+
+test('新访客接受转赠卡片也先验证手机号', async t => {
+  const { page, calls } = setup(t, SHARE, { newVisitor: true,
+    ticket: { code: 'T1', member_id: 40, shared: 1, name: '测试券', memo: '' } })
+  page.onLoad({ code: 'T1' })
+  await settle()
+  assert.equal(page.data.needPhone, true)
+  assert.equal(page.data.canAccept, false)
+  await page.onGetCell({ detail: { errMsg: 'getPhoneNumber:ok', encryptedData: 'encrypted', iv: 'iv' } })
+  assert.equal(page.data.needPhone, false)
+  assert.equal(page.data.canAccept, true)
+  await page.accept()
+  assert.equal(calls.accept, 1)
 })
 
 test('固定小程序码解析 scene，调用独立的固定码领取接口', async t => {

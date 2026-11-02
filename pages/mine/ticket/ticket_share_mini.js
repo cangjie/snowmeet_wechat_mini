@@ -5,7 +5,7 @@ const data = require('../../../utils/data.js')
 Page({
   data: {
     code: '', ticket: null, loading: true, accepting: false,
-    canAccept: false, loginError: false, message: ''
+    canAccept: false, loginError: false, needPhone: false, authBusy: false, message: ''
   },
 
   onLoad(options) {
@@ -20,12 +20,16 @@ Page({
       return
     }
     this._loading = true
-    this.setData({ loading: true, canAccept: false, loginError: false, message: '' })
+    this.setData({ loading: true, canAccept: false, loginError: false, needPhone: false, message: '' })
     try {
       const login = await (retryLogin === true ? app.retryLogin() : app.loginPromiseNew)
       if ((login && login.authenticated === false)
         || typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
         this.setData({ loginError: true, message: '微信登录未完成，请检查网络后重新登录。' })
+        return
+      }
+      if (!app.globalData.member || !app.globalData.member.id || !app.globalData.member.cell) {
+        this.setData({ needPhone: true, message: '验证手机号后才能接受优惠券' })
         return
       }
       const ticket = await data.getTicket(this.data.code)
@@ -49,7 +53,7 @@ Page({
   },
 
   async accept() {
-    if (this.data.accepting || this.data.loading || !this.data.canAccept || !this.data.ticket) return
+    if (this.data.accepting || this.data.loading || this.data.needPhone || !this.data.canAccept || !this.data.ticket) return
     if (!app.globalData.sessionKey) {
       this.setData({ canAccept: false, loginError: true, message: '微信登录未完成，请重新登录。' })
       return
@@ -64,6 +68,26 @@ Page({
       this.setData({ message: typeof err === 'string' ? err : '接受失败，请重试' })
     } finally {
       this.setData({ accepting: false })
+    }
+  },
+
+  async onGetCell(e) {
+    if (this.data.authBusy) return
+    const detail = e && e.detail
+    if (!detail || detail.errMsg !== 'getPhoneNumber:ok' || !detail.encryptedData || !detail.iv) {
+      this.setData({ message: '授权手机号后才能接受优惠券' })
+      return
+    }
+    this.setData({ authBusy: true, message: '' })
+    try {
+      const member = await data.bindWechatCellPromise(detail.encryptedData, detail.iv, app.globalData.sessionKey)
+      if (!member || !member.id || !member.cell) throw new Error('手机号验证未完成，请重试')
+      app.globalData.member = member
+      await this.load()
+    } catch (err) {
+      this.setData({ message: typeof err === 'string' ? err : (err.message || '手机号验证失败，请重试') })
+    } finally {
+      this.setData({ authBusy: false })
     }
   },
 

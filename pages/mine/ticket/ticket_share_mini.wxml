@@ -9,7 +9,8 @@
     <text wx:if="{{loading}}" class="loading-text">正在加载优惠券…</text>
     <block wx:else>
       <text class="share-message" wx:if="{{message}}">{{message}}</text>
-      <button wx:if="{{canAccept}}" class="btn btn-use" bindtap="accept" disabled="{{accepting}}" loading="{{accepting}}">{{accepting ? '正在接受…' : '接受优惠券'}}</button>
+      <button wx:if="{{needPhone}}" class="btn btn-use" open-type="getPhoneNumber" bindgetphonenumber="onGetCell" disabled="{{authBusy}}" loading="{{authBusy}}">验证手机号</button>
+      <button wx:elif="{{canAccept}}" class="btn btn-use" bindtap="accept" disabled="{{accepting}}" loading="{{accepting}}">{{accepting ? '正在接受…' : '接受优惠券'}}</button>
       <button wx:elif="{{loginError}}" class="btn btn-use" bindtap="onRetry">重新登录</button>
       <button wx:elif="{{!ticket}}" class="btn btn-use" bindtap="onRetry">重试</button>
       <button wx:else class="btn btn-use" bindtap="onGoMyTickets">查看我的优惠券</button>
