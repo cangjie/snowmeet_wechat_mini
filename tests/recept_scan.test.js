@@ -217,3 +217,11 @@ test('底部链接进入手动录入入口', () => {
   assert.deepEqual(nav, ['/pages/admin/reception/recept_entry'])
   cleanup(page)
 })
+
+test('底部链接的文字是「远程开单」（原来叫「手动录入顾客信息开单」）', () => {
+  const wxml = require('node:fs').readFileSync(require('node:path').join(__dirname, '../pages/admin/reception/recept_scan.wxml'), 'utf8')
+  const link = /<view class="recover-link" bindtap="onManualEntryTap">([\s\S]*?)<\/view>/.exec(wxml)
+  assert.ok(link, '没找到绑定 onManualEntryTap 的底部链接')
+  assert.match(link[1], /<text>远程开单<\/text>/)
+  assert.doesNotMatch(wxml, /<text>手动录入顾客信息开单<\/text>/)
+})

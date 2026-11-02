@@ -1,7 +1,7 @@
 <!--pages/admin/reception/recept_scan.wxml
   扫码接待（管理员菜单默认进入的开单入口，对应旧版 recept_entry）
     顾客扫码 → 自动跳到顾客信息页（recept_member）选店铺和业务；顾客不扫码点「散客进入」
-    手动录入顾客信息的入口在页面底部
+    「远程开单」（手动录入顾客信息，recept_entry）的入口在页面底部
   样式沿用 recept_entry.wxss（Alpine Operational Minimalist stitch _1）
 -->
 <view class="page-root">
@@ -82,10 +82,10 @@
       <text>找回中断的订单</text>
     </view>
 
-    <!-- 手动录入顾客信息的入口（recept_entry） -->
+    <!-- 远程开单：手动录入顾客信息的入口（recept_entry） -->
     <view class="recover-link" bindtap="onManualEntryTap">
       <van-icon name="edit" size="14px" color="#006495"/>
-      <text>手动录入顾客信息开单</text>
+      <text>远程开单</text>
     </view>
 
   </view>
