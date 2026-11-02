@@ -7,10 +7,10 @@ const CLAIM = 'pages/mine/ticket/ticket_claim_mini/ticket_claim_mini.js'
 
 function setup(t, file, options = {}) {
   const previous = { getApp: global.getApp, wx: global.wx }
-  const calls = { follow: 0, accept: 0, shared: 0, fixed: 0, batch: [], redirects: [], toasts: [] }
+  const calls = { follow: 0, accept: 0, shared: 0, fixed: 0, bind: 0, batch: [], redirects: [], toasts: [] }
   const app = {
     loginPromiseNew: Promise.resolve({ authenticated: options.authenticated !== false }),
-    globalData: { sessionKey: options.emptySession ? '' : 'mini-session', member: { id: 10 }, domainName: 'test.invalid', requestPrefix: 'https://test.invalid/api/' },
+    globalData: { sessionKey: options.emptySession ? '' : 'mini-session', member: options.newVisitor ? null : { id: 10 }, domainName: 'test.invalid', requestPrefix: 'https://test.invalid/api/' },
     retryLogin() {
       app.globalData.sessionKey = 'new-session'
       app.loginPromiseNew = Promise.resolve({ authenticated: true })
@@ -29,6 +29,7 @@ function setup(t, file, options = {}) {
     checkTransferFollowPromise() { calls.follow++; return Promise.resolve(false) },
     acceptMiniTicketPromise(code, memo, key) { calls.accept++; calls.acceptKey = key; return options.accept ? options.accept() : Promise.resolve({ code }) },
     getMiniShareBatchPromise(id, key) { calls.batch.push([id, key]); return Promise.resolve(info) },
+    bindWechatCellPromise(encData, iv, key) { calls.bind++; calls.bindArgs = [encData, iv, key]; return Promise.resolve({ id: 20, cell: '13800000000' }) },
     claimMiniSharedTicketPromise(id, key) { calls.shared++; calls.sharedArgs = [id, key]; return options.claim ? options.claim() : Promise.resolve({ code: 'SHARED' }) },
     claimMiniQrCodeTicketPromise(id, key) { calls.fixed++; calls.fixedArgs = [id, key]; return options.claim ? options.claim() : Promise.resolve({ code: 'FIXED' }) }
   }
@@ -119,6 +120,22 @@ test('普通分享登录后显示领取按钮，不自动发券或要求关注',
   await page.onClaim()
   assert.equal(calls.shared, 1)
   assert.equal(page.data.doneCode, 'SHARED')
+})
+
+test('新访客先授权手机号建立会员，再加载并领取原卡片的券', async t => {
+  const { page, app, calls } = setup(t, CLAIM, { newVisitor: true })
+  page.onLoad({ batch: '7' })
+  await settle()
+  assert.equal(page.data.needMember, true)
+  assert.equal(page.data.batchId, 7)
+  assert.deepEqual(calls.batch, [])
+  await page.onGetCell({ detail: { errMsg: 'getPhoneNumber:ok', encryptedData: 'encrypted', iv: 'iv' } })
+  assert.deepEqual(calls.bindArgs, ['encrypted', 'iv', 'mini-session'])
+  assert.equal(app.globalData.member.id, 20)
+  assert.deepEqual(calls.batch, [[7, 'mini-session']])
+  assert.equal(page.data.needMember, false)
+  await page.onClaim()
+  assert.equal(calls.shared, 1)
 })
 
 test('固定小程序码解析 scene，调用独立的固定码领取接口', async t => {

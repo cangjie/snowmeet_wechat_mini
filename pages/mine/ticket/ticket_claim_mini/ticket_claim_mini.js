@@ -19,7 +19,8 @@ function parseBatchId(options) {
 Page({
   data: {
     batchId: 0, loading: true, claiming: false,
-    loginError: false, errMsg: '', info: null, doneCode: ''
+    loginError: false, needMember: false, authBusy: false,
+    errMsg: '', info: null, doneCode: ''
   },
 
   onLoad(options) {
@@ -34,12 +35,17 @@ Page({
       return
     }
     this._loading = true
-    this.setData({ loading: true, errMsg: '', loginError: false })
+    this.setData({ loading: true, errMsg: '', loginError: false, needMember: false })
     try {
       const login = await (retryLogin === true ? app.retryLogin() : app.loginPromiseNew)
       if ((login && login.authenticated === false)
         || typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
         this.setData({ loginError: true, errMsg: '微信登录未完成，请检查网络后重新登录。' })
+        return
+      }
+      // 首次进入小程序已有微信会话，但尚未建立会员；领取前先授权手机号。
+      if (!app.globalData.member || !app.globalData.member.id) {
+        this.setData({ needMember: true })
         return
       }
       const info = await data.getMiniShareBatchPromise(this.data.batchId, app.globalData.sessionKey)
@@ -55,7 +61,7 @@ Page({
 
   async onClaim() {
     const info = this.data.info
-    if (this.data.loading || this.data.claiming || !info || info.claimed || info.soldOut || this.data.doneCode) return
+    if (this.data.loading || this.data.claiming || this.data.needMember || !info || info.claimed || info.soldOut || this.data.doneCode) return
     if (typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
       this.setData({ loginError: true, errMsg: '微信登录未完成，请重新登录。' })
       return
@@ -71,6 +77,27 @@ Page({
       this.setData({ errMsg: typeof err === 'string' ? err : (err.message || '领取失败，请重试') })
     } finally {
       this.setData({ claiming: false })
+    }
+  },
+
+  async onGetCell(e) {
+    if (this.data.authBusy) return
+    const detail = e && e.detail
+    if (!detail || detail.errMsg !== 'getPhoneNumber:ok' || !detail.encryptedData || !detail.iv) {
+      this.setData({ errMsg: '授权手机号后才能领取优惠券' })
+      return
+    }
+    this.setData({ authBusy: true, errMsg: '' })
+    try {
+      const member = await data.bindWechatCellPromise(detail.encryptedData, detail.iv, app.globalData.sessionKey)
+      if (!member || !member.id) throw new Error('手机号授权未完成，请重试')
+      app.globalData.member = member
+      this.setData({ needMember: false })
+      await this.load()
+    } catch (err) {
+      this.setData({ errMsg: typeof err === 'string' ? err : (err.message || '手机号授权失败，请重试') })
+    } finally {
+      this.setData({ authBusy: false })
     }
   },
 

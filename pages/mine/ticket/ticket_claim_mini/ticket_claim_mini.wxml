@@ -1,11 +1,17 @@
 <view class="page">
   <view class="tip" wx:if="{{loading}}">加载中…</view>
   <block wx:else>
-    <view class="card" wx:if="{{errMsg}}">
+    <view class="card" wx:if="{{needMember}}">
+      <view class="tip">授权手机号后即可领取优惠券</view>
+      <view class="tip tip--err" wx:if="{{errMsg}}">{{errMsg}}</view>
+      <button class="btn" loading="{{authBusy}}" disabled="{{authBusy}}"
+        open-type="getPhoneNumber" bindgetphonenumber="onGetCell">授权手机号</button>
+    </view>
+    <view class="card" wx:if="{{!needMember && errMsg}}">
       <view class="tip tip--err">{{errMsg}}</view>
       <button class="btn" bindtap="onRetry">{{loginError ? '重新登录' : '重新加载'}}</button>
     </view>
-    <block wx:if="{{info && !loginError}}">
+    <block wx:if="{{!needMember && info && !loginError}}">
       <view class="card">
         <view class="tname">{{info.templateName}}</view>
         <view class="tmemo" wx:if="{{info.templateMemo}}">{{info.templateMemo}}</view>
