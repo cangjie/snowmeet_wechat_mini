@@ -1,0 +1,18 @@
+<view class="ticket-page">
+  <view class="ticket-card" wx:if="{{ticket}}">
+    <view class="card-header"><text class="ticket-title">{{ticket.name}}</text></view>
+    <view class="usage-block">
+      <view class="usage-item" wx:for="{{ticket.usage}}" wx:for-item="u" wx:key="*this">· {{u}}</view>
+    </view>
+  </view>
+  <view class="share-panel">
+    <text wx:if="{{loading}}" class="loading-text">正在加载优惠券…</text>
+    <block wx:else>
+      <text class="share-message" wx:if="{{message}}">{{message}}</text>
+      <button wx:if="{{canAccept}}" class="btn btn-use" bindtap="accept" disabled="{{accepting}}" loading="{{accepting}}">{{accepting ? '正在接受…' : '接受优惠券'}}</button>
+      <button wx:elif="{{loginError}}" class="btn btn-use" bindtap="onRetry">重新登录</button>
+      <button wx:elif="{{!ticket}}" class="btn btn-use" bindtap="onRetry">重试</button>
+      <button wx:else class="btn btn-use" bindtap="onGoMyTickets">查看我的优惠券</button>
+    </block>
+  </view>
+</view>

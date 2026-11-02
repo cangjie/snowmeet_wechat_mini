@@ -8,9 +8,15 @@ function request(action, body, orderId) {
   return util.performWebRequest(url, body == null ? null : body);
 }
 
+function isMachineWaxSeasonCard(name, total) {
+  name = name || '';
+  // 普通打蜡季卡（含测试商品）提供机打蜡；明确标注热蜡的季卡保留热蜡权益。
+  return total == null && name.includes('打蜡') && !name.includes('热蜡') && !name.includes('热打蜡');
+}
+
 function serviceMode(card) {
   if (!card) return '';
-  if (card.total == null && (card.name || '').includes('机打蜡')) return 'machine';
+  if (isMachineWaxSeasonCard(card.name, card.total)) return 'machine';
   if (card.requiresBinding) return 'wax';
   return card.projectCount === 2 || (card.projectCount == null && (card.name || '').includes('双项')) ? 'dual' : 'single';
 }
@@ -74,4 +80,4 @@ function signature(preview) {
   })) });
 }
 
-module.exports = { serviceMode, request, selections, displayPreview, signature };
+module.exports = { isMachineWaxSeasonCard, serviceMode, request, selections, displayPreview, signature };

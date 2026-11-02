@@ -23,6 +23,24 @@ function preview(amount = 600) {
     total: 10, projectCount: 2, requiresBinding: false, careIds: [30], punches: 1, remaining: 9 }] };
 }
 
+test('购买测试打蜡季卡后，从商品识别到装备表单都显示机打蜡；热蜡季卡仍为热蜡', t => {
+  const { page } = setup(t);
+  const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {});
+  for (const [name, mode, visible] of [['测试打蜡季卡', 'machine', true],
+    ['26-27雪季机打蜡季卡', 'machine', true], ['热打蜡季卡', 'wax', false], ['热蜡季卡', 'wax', false]]) {
+    const trial = preview(0.01);
+    Object.assign(trial.items[0], { name, total: null, projectCount: null, requiresBinding: true });
+    page._applyCareCardPreview(trial);
+    assert.equal(page.data.careCardMode, mode, name);
+    Object.assign(form.data, { memberId: null, cares: page.data.order.cares });
+    form.setProperty('newCardMode', page.data.careCardMode);
+    assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, visible, name);
+  }
+  const finite = preview().items[0];
+  finite.name = '打蜡10次卡';
+  assert.notEqual(require('../utils/careCardSale').serviceMode(finite), 'machine');
+});
+
 test('入口位于添加装备下方，养护选卡与结算展示本次试算', () => {
   const form = fs.readFileSync(path.join(__dirname, '../components/reception/care_recept_form/care_recept_form.wxml'), 'utf8');
   assert.ok(form.indexOf('<text>添加装备</text>') < form.indexOf('<text>添加卡类'));

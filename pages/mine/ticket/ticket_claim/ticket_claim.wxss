@@ -1,4 +1,6 @@
 /* pages/mine/ticket/ticket_claim/ticket_claim.wxss */
+@import "/styles/ticket_buttons.wxss";
+
 page { background: #F5F6FA; }
 .page { padding: 24rpx; box-sizing: border-box; }
 

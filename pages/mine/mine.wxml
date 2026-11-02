@@ -5,6 +5,8 @@
   <mp-cell value="我的优惠券" footer="" bindtap="gotoTicket"></mp-cell>
   <mp-cell value="我的储值" footer="" bindtap="gotoDeposit"></mp-cell>
   <mp-cell value="我的次卡" footer="" bindtap="gotoPunchCards"></mp-cell>
+  <mp-cell wx:if="{{coach}}" value="我是教练" footer="" bindtap="gotoCoach" ></mp-cell>
+  <mp-cell wx:if="{{hasCoachCard}}" value="我的学员卡" footer="" bindtap="gotoCoachCard" ></mp-cell>
   <mp-cell wx:if="{{staff}}" value="我是管理员" footer="" bindtap="gotoAdmin" ></mp-cell>
   <mp-cells wx:if="{{env=='develop' || env == 'trial'}}" title="环境选项" >
     <mp-cell id="env" bindtap="nav" value="选择环境" ></mp-cell>

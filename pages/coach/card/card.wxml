@@ -1,0 +1,11 @@
+<view class="co-page">
+  <view wx:for="{{cards}}" wx:key="id" class="vip {{item.expired ? 'dim' : ''}}">
+    <view class="vip-small">{{item.expired ? '已过期' : '学员卡'}}</view>
+    <view class="vip-title">{{item.coachName}}的学员卡</view>
+    <view wx:for="{{item.benefit.lines}}" wx:for-item="line" wx:key="label" class="vip-line"><text>{{line.label}}</text><text>单项 <text class="em">{{line.one}}</text> · 双项 <text class="em">{{line.two}}</text></text></view>
+    <view class="vip-line"><text>租赁 · 各店通用</text><text class="em">{{item.benefit.rental}}</text></view>
+    <view class="vip-foot">有效期至 {{item.until}}</view>
+  </view>
+  <view wx:if="{{!cards.length && !loading}}" class="co-empty">你还没有学员卡。向教练要一张分享卡片，点开领取即可</view>
+  <view class="note blue">到店养护、租赁时报手机号或扫码接待，店员开单时会选用学员卡。学员卡和优惠券、次卡二选一；维修费、加急加价不打折。</view>
+</view>

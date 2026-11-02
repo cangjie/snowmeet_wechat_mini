@@ -180,7 +180,8 @@ Component({
 
   properties: {
     shop: { type: String, value: '' },
-    memberId: { type: Number, value: 0 },
+    // 会员变了，已选的学员卡不属于新会员，全部清掉（服务端保存时也会校验）
+    memberId: { type: Number, value: 0, observer(n, o) { if (o && n !== o && this._clearCoachCards) this._clearCoachCards(); } },
     rentals: {
       type: Array,
       value: [],
@@ -190,6 +191,7 @@ Component({
 
   data: {
     sort: 'time',
+    coachPopup: { show: false, ridx: -1, selectedCoachCardId: null, rentalAmount: 0 },
     rentModes: RENT_MODES,
     displayRentals: [],
     expandedPkg: {},
@@ -346,6 +348,43 @@ Component({
           canCheckout,
         },
       });
+    },
+
+    /* ---------- 学员卡（某某教练的学员卡） ----------
+       租赁开单页原来没有「优惠券/卡」一行。新增同样的一行，弹层里只列该会员的学员卡；选中后写 rental.coach_card_id，
+       服务端在租赁生效 / 每日续租时按卡内租赁折扣率强制优惠（店员手改过价的不叠加）。
+       租金在归还结算时才收，所以这里不预填 preset.discount，只提示预计优惠。 */
+    onPkgCoachCardTap(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const pkg = this.data.displayRentals[ridx];
+      if (!pkg) return;
+      if (!this.properties.memberId) { wx.showToast({ title: '散客无可用学员卡', icon: 'none' }); return; }
+      this.setData({ coachPopup: { show: true, ridx, selectedCoachCardId: pkg.coach_card_id || null, rentalAmount: Number(pkg._dailyRate) || 0 } });
+    },
+    onCoachSelectorEvent(e) {
+      const ridx = this.data.coachPopup.ridx;
+      if (e.detail.action !== 'confirm') { this.setData({ 'coachPopup.show': false }); return; }
+      const card = e.detail.selectedCoachCard || null;
+      const patch = { 'coachPopup.show': false };
+      patch[`displayRentals[${ridx}].coach_card_id`] = card ? card.cardId : null;
+      patch[`displayRentals[${ridx}]._coachCardName`] = card ? (card.coachName || '') : '';
+      patch[`displayRentals[${ridx}]._coachHint`] = card
+        ? (card.estimatedDiscount > 0 ? card.benefitText + '，日租金预计优惠 ¥' + card.estimatedDiscount + ' / 天' : card.benefitText)
+        : '';
+      this.setData(patch);
+      this._emitSync(true);
+    },
+    _clearCoachCards() {
+      const patch = {};
+      let any = false;
+      (this.data.displayRentals || []).forEach((r, i) => {
+        if (!r.coach_card_id) return;
+        any = true;
+        patch[`displayRentals[${i}].coach_card_id`] = null;
+        patch[`displayRentals[${i}]._coachCardName`] = '';
+        patch[`displayRentals[${i}]._coachHint`] = '';
+      });
+      if (any) { this.setData(patch); this._emitSync(true); }
     },
 
     _emitSync(needUpdate) {

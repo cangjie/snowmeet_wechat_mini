@@ -3,13 +3,14 @@
     "pages/index/index",
     "pages/mine/mine",
     "pages/admin/admin",
-    "pages/admin/ticket/ticket_template_list",
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
     "pages/ski_pass/ski_pass_selector",
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
     "pages/mine/ticket/ticket_claim/ticket_claim",
+    "pages/mine/ticket/ticket_share_mini",
+    "pages/mine/ticket/ticket_claim_mini/ticket_claim_mini",
     "pages/admin/rent/rent_report",
     "pages/admin/rent/punchcard_products/punchcard_products",
     "pages/admin/rent/punchcard_products/punchcard_product_detail/punchcard_product_detail",
@@ -131,6 +132,20 @@
         "serve/serve",
         "count/count",
         "dash/dash"
+      ]
+    },
+    {
+      "root": "pages/coach",
+      "name": "coach",
+      "pages": [
+        "admin/list/list",
+        "admin/add/add",
+        "admin/detail/detail",
+        "admin/issue/issue",
+        "home/home",
+        "student/student",
+        "claim/claim",
+        "card/card"
       ]
     },
     {

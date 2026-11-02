@@ -33,9 +33,9 @@
 
     <block wx:else>
       <view class="verify-icon verify-icon--err">×</view>
-      <view class="verify-title">验证失败</view>
+      <view class="verify-title">{{login_error ? '微信登录未完成' : '验证失败'}}</view>
       <view class="verify-sub">{{message}}</view>
-      <button class="verify-btn" bindtap="onRetryTap">重试</button>
+      <button class="verify-btn" bindtap="onRetryTap" disabled="{{busy}}">{{login_error ? '重新登录' : '重试'}}</button>
     </block>
   </view>
 </view>

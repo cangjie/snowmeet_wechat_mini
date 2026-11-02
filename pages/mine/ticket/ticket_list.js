@@ -27,6 +27,7 @@ Page({
     expandedCode: '',       // 当前展开「使用说明」的券码，一次只展开一张
     needAuth: false,
     transferShow: false,      // 转赠确认弹层
+    transferRewardEligible: false,
     transferCode: '',
     subscribeBlocked: false   // 订阅被用户永久拒绝，需要引导去设置页
   },
@@ -39,6 +40,14 @@ Page({
   onTransferTap: function (e){
     var that = this
     var code = e.currentTarget.dataset.code
+    var ticket = this.data.ticketArr.find(function (t){ return t.code == code })
+    // 教练转发不回赠（服务端同口径），所以教练看不到「回赠」提示
+    var rewardEligible = !!ticket && ticket.template_id == 16 && !getApp().globalData.coach
+    this.setData({ transferCode: code, transferRewardEligible: rewardEligible, subscribeBlocked: false })
+    if (!rewardEligible){
+      this.setData({ transferShow: true })
+      return
+    }
     ticketHelper.requestTransferSubscribe(function (blocked){
       that.setData({ transferShow: true, transferCode: code, subscribeBlocked: blocked })
     })
@@ -212,14 +221,14 @@ Page({
     }
     var ticket = (that.data.ticketArr || []).filter(function (t){ return t.code === code })[0]
     var title = ticket ? ('赠送优惠券：' + ticket.name) : '赠送优惠券'
-    return data.setTicketToSharePromise(code, app.globalData.sessionKey).then(function (){
+    return data.setTicketToMiniSharePromise(code, app.globalData.sessionKey).then(function (){
       // 分享成功后这张券归到"已分享"标签，不再属于当前"未使用"列表，直接移出；
       // 真正的页面跳转放到 onShow 里做（见上面的注释）
       that._removeTicketFromList(code)
       that._justShared = true
       return {
         title: title,
-        path: '/pages/mine/ticket/ticket_share?code=' + code,
+        path: '/pages/mine/ticket/ticket_share_mini?code=' + encodeURIComponent(code),
         imageUrl: 'https://' + app.globalData.domainName + '/images/snowmeet_logo.png'
       }
     }).catch(function (){

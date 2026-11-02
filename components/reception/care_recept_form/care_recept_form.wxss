@@ -213,3 +213,10 @@
 .care-card-summary-item { padding: 12px 0; border-bottom: 1px solid #eef1f6; }
 .care-card-summary-tip { color: #6f7881; font-size: 12px; line-height: 1.6; margin-top: 4px; }
 .care-card-error { color: #a52a25; font-size: 13px; line-height: 1.5; padding: 8px 0; }
+
+/* 学员卡本单优惠提示（「优惠券/卡」一行下面） */
+.coach-hint {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #6b7280;
+}

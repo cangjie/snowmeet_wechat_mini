@@ -1,0 +1,3 @@
+@import "./ticket_share.wxss";
+.share-panel .btn { width: 100%; }
+.share-message { margin-bottom: 28rpx; font-size: 28rpx; line-height: 1.6; text-align: center; }

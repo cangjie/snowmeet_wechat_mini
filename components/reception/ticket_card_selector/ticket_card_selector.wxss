@@ -205,3 +205,9 @@
   background: #006495;
   color: #ffffff;
 }
+
+/* 学员卡（某某教练的学员卡）条目的小标签，与「养护」「租赁」chip 并列 */
+.tcs-chip--coach {
+  background: #fff1d6;
+  color: #b26a00;
+}

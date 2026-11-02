@@ -1,0 +1,89 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:elif="{{coach}}">
+    <view class="vip {{coach.valid ? '' : 'dim'}}">
+      <view class="vip-small">我的学员卡权益</view>
+      <view class="vip-title">{{coach.name}}的学员卡</view>
+      <view wx:for="{{benefit.lines}}" wx:key="label" class="vip-line"><text>{{item.label}}</text><text>单项 <text class="em">{{item.one}}</text> · 双项 <text class="em">{{item.two}}</text></text></view>
+      <view class="vip-line"><text>租赁 · 各店通用</text><text class="em">{{benefit.rental}}</text></view>
+      <view class="vip-foot">学员领取当天起，有效期至 {{validUntil}}</view>
+    </view>
+    <view wx:if="{{!coach.valid}}" class="note">你的教练身份已停用，不能再发新卡，已领的卡继续有效。</view>
+
+    <view class="tabs">
+      <view class="tab {{tab === 'share' ? 'on' : ''}}" data-tab="share" bindtap="onTab">发卡/分享</view>
+      <view class="tab {{tab === 'status' ? 'on' : ''}}" data-tab="status" bindtap="onTab">领取情况</view>
+      <view class="tab {{tab === 'students' ? 'on' : ''}}" data-tab="students" bindtap="onTab">学员消费</view>
+      <view class="tab {{tab === 'coupons' ? 'on' : ''}}" data-tab="coupons" bindtap="onTab">我的券</view>
+    </view>
+
+    <!-- 发卡 / 分享 -->
+    <block wx:if="{{tab === 'share'}}">
+      <view wx:if="{{coach.valid}}" class="btn primary btn-block {{creating ? 'disabled' : ''}}" bindtap="onCreate">＋ 生成学员卡</view>
+      <view wx:for="{{pending}}" wx:key="id" class="card card-pad">
+        <view class="card-row"><view class="grow card-row"><text class="card-title small">卡 …{{item.tokenTail}}</text><text class="tag warn">待领取</text></view><text class="card-meta">{{item.created}}</text></view>
+        <view class="card-row">
+          <button class="share-btn" open-type="share" data-path="{{item.sharePath}}">分享给学员</button>
+          <view class="btn danger" data-id="{{item.id}}" bindtap="onRevoke">撤销</view>
+        </view>
+      </view>
+      <view wx:if="{{!pending.length}}" class="co-empty">还没有待领取的卡，点上面「生成学员卡」</view>
+      <view class="note blue">每张卡只能一位学员领取。同时待领取的卡最多 50 张。</view>
+    </block>
+
+    <!-- 领取情况 -->
+    <block wx:if="{{tab === 'status'}}">
+      <view wx:if="{{counts}}" class="stats">
+        <view class="stat"><text class="stat-num">{{counts.total}}</text><text class="stat-label">已发</text></view>
+        <view class="stat"><text class="stat-num">{{counts.claimed}}</text><text class="stat-label">已领取</text></view>
+        <view class="stat"><text class="stat-num">{{counts.issued}}</text><text class="stat-label">待领取</text></view>
+        <view class="stat"><text class="stat-num">{{counts.revoked}}</text><text class="stat-label">已撤销</text></view>
+      </view>
+      <view wx:for="{{statusRows}}" wx:key="id" class="card card-pad" style="{{item.status === 'revoked' ? 'opacity: 0.6;' : ''}}">
+        <view class="card-row">
+          <view class="grow card-row">
+            <text class="dot {{item.status === 'claimed' ? '' : (item.status === 'issued' ? 'w' : 'g')}}"></text>
+            <text class="card-title small">{{item.status === 'claimed' ? item.studentName : item.tag.text}}</text>
+          </view>
+          <text class="card-meta">{{item.status === 'claimed' ? '尾号 ' + item.phoneTail : '卡 …' + item.tokenTail}}</text>
+        </view>
+        <view class="card-meta" wx:if="{{item.status === 'claimed'}}">卡 …{{item.tokenTail}} · {{item.claimed}} 领取</view>
+        <view class="card-meta" wx:else>{{item.created}} 创建{{item.status === 'issued' ? ' · 还没有人领取' : ''}}</view>
+      </view>
+      <view wx:if="{{!statusRows.length}}" class="co-empty">还没有发过学员卡</view>
+    </block>
+
+    <!-- 学员消费 -->
+    <block wx:if="{{tab === 'students'}}">
+      <view wx:if="{{studentSummary}}" class="stats">
+        <view class="stat"><text class="stat-num">{{studentSummary.students}}</text><text class="stat-label">学员</text></view>
+        <view class="stat"><text class="stat-num">¥{{studentSummary.amount}}</text><text class="stat-label">累计消费</text></view>
+        <view class="stat"><text class="stat-num">¥{{studentSummary.cardDiscount}}</text><text class="stat-label">用卡优惠</text></view>
+      </view>
+      <view wx:for="{{students}}" wx:key="memberId" class="card card-pad" data-id="{{item.memberId}}" bindtap="onStudent">
+        <view class="card-row"><view class="grow card-row"><text class="card-title small">{{item.name}}</text><text class="tag {{item.sourceTone}}">{{item.sourceText}}</text></view><text class="card-title small">¥{{item.amount}}</text></view>
+        <view class="card-meta">尾号 {{item.phoneTail}} · {{item.orderCount}} 单{{item.last ? ' · 最近 ' + item.last : ''}}</view>
+      </view>
+      <view wx:if="{{!students.length}}" class="co-empty">还没有学员</view>
+      <view class="note blue">只统计学员<text style="font-weight: 700;">领卡/接券当天起</text>的消费，不含更早的订单。只做展示，不涉及分成。</view>
+    </block>
+
+    <!-- 我的优惠券 -->
+    <block wx:if="{{tab === 'coupons'}}">
+      <view wx:if="{{couponSummary}}" class="stats">
+        <view class="stat"><text class="stat-num">{{couponSummary.granted}}</text><text class="stat-label">管理员发放</text></view>
+        <view class="stat"><text class="stat-num">{{couponSummary.held}}</text><text class="stat-label">在手</text></view>
+        <view class="stat"><text class="stat-num">{{couponSummary.accepted}}</text><text class="stat-label">已被接受</text></view>
+        <view class="stat"><text class="stat-num">{{couponSummary.used}}</text><text class="stat-label">已使用</text></view>
+      </view>
+      <view class="btn primary btn-block" bindtap="onGoTickets">去券包转发给学员</view>
+      <view wx:for="{{coupons}}" wx:key="code" class="card card-pad">
+        <view class="card-row"><text class="card-title small grow">{{item.name}}</text><text class="tag {{item.tag.tone}}">{{item.tag.text}}</text></view>
+        <view wx:if="{{item.acceptedName}}" class="card-meta">{{item.acceptedName}} · 尾号 {{item.acceptedPhoneTail}} · {{item.accepted}} 接受</view>
+        <view wx:elif="{{item.state === 'pending'}}" class="card-meta">已转出 · 还没有人接受</view>
+        <view wx:else class="card-meta">有效期至 {{item.expire}}</view>
+      </view>
+      <view wx:if="{{!coupons.length}}" class="co-empty">管理员还没有给你发过券</view>
+    </block>
+  </block>
+</view>

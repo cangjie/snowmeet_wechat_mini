@@ -85,3 +85,77 @@ test('非万龙服务中心的单刮蜡：显示服务端给的原有价格', as
   assert.equal(requests[0].shop, '南山');
   assert.equal(form.data.summary.totalLabel, '0.00');
 });
+
+// ---------- 只选刮蜡：不选任何券、卡（2026-10-30） ----------
+// 单刮蜡是一口价，券和卡都不参与：开单页不自动带老顾客券，服务端发现已选的券/卡/学员卡会清掉并告知前端。
+function ticket16(code = 'OLD') {
+  return { code, template_id: 16, name: '老顾客优惠券', member_id: OLD_MEMBER, expire_date: '2026-12-01' };
+}
+function setupWithTickets(t, { rows, calculate, tickets = [ticket16()] }) {
+  const oldApp = global.getApp, oldWx = global.wx;
+  const toasts = [], requests = [];
+  global.getApp = () => ({ globalData: { sessionKey: 'staff' }, loginPromiseNew: Promise.resolve() });
+  global.wx = { showToast: o => toasts.push(o.title), showModal: o => o.success({ confirm: true }) };
+  t.after(() => { global.getApp = oldApp; global.wx = oldWx; });
+  const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {
+    getMemberTicketsPromise: async () => tickets,
+    calcCareChargePromise: async req => { requests.push(JSON.parse(JSON.stringify(req))); return calculate ? calculate(req) : serverPrice(req); }
+  });
+  Object.assign(form.data, { memberId: OLD_MEMBER, shop: '万龙服务中心', cares: rows });
+  return { form, requests, toasts };
+}
+
+test('单刮蜡的装备不自动带老顾客券；非单刮蜡的照旧自动带', async t => {
+  const { form } = setupWithTickets(t, { rows: [care({ id: 1 }), care({ id: 2, need_unwax: 0, need_edge: 1 })] });
+  form._refreshCares(); await settle(); await form.waitForPrices();
+  assert.equal(form.data.displayCares[0].ticket_code || null, null);
+  assert.equal(form.data.displayCares[1].ticket_code, 'OLD');
+});
+
+test('万龙体验中心的单刮蜡同样不自动带券，别的店不受这条限制', async t => {
+  const experience = setupWithTickets(t, { rows: [care()] });
+  experience.form.data.shop = '万龙体验中心';
+  experience.form._refreshCares(); await settle();
+  assert.equal(experience.form.data.displayCares[0].ticket_code || null, null);
+  const nanshan = setupWithTickets(t, { rows: [care()] });
+  nanshan.form.data.shop = '南山';
+  nanshan.form._refreshCares(); await settle();
+  assert.equal(nanshan.form.data.displayCares[0].ticket_code, 'OLD');
+});
+
+test('服务端清掉了券、卡、学员卡和减免：本地同步清除并提示，之后也不会被自动带回', async t => {
+  const rows = [care({ ticket_code: 'OLD', ticket: ticket16(), use_card: true, card_id: 5, card_name: '次卡',
+    coach_card_id: 9, discount: 20, _manualDiscount: 20 })];
+  const { form, requests, toasts } = setupWithTickets(t, { rows, calculate: async req => ({
+    commonCharge: 80, ticketDiscount: 0, benefitsCleared: true,
+    care: { ...req.care, ticket_code: null, use_card: false, card_id: null, card_name: null, coach_card_id: null, discount: 0, common_charge: 80 } }) });
+  form._refreshCares();
+  form._fetchPrice(0); await form.waitForPrices(); await settle();
+  const c = form.data.displayCares[0];
+  assert.equal(c.ticket_code, null); assert.equal(c.ticket, null);
+  assert.equal(c.use_card, false); assert.equal(c.card_id, null); assert.equal(c.card_name, null);
+  assert.equal(c.coach_card_id, null); assert.equal(c.discount, 0);
+  assert.equal(c.common_charge, 80); assert.equal(form.data.summary.totalLabel, '80.00');
+  assert.equal(toasts.filter(x => /刮蜡/.test(x)).length, 1);
+  assert.equal(form.events.at(-1).detail.cares[0].ticket_code, null);   // 同步给草稿的也是清掉之后的
+  const before = requests.length;
+  form._scheduleOldCustomerTicket(); await settle();
+  assert.equal(form.data.displayCares[0].ticket_code || null, null);
+  assert.equal(requests.length, before);
+});
+
+test('没被服务端清掉东西时不提示、也不动本地的券卡', async t => {
+  const rows = [care({ need_unwax: 0, need_edge: 1, ticket_code: 'OLD', ticket: ticket16() })];
+  const { form, toasts } = setupWithTickets(t, { rows });
+  form._refreshCares(); form._fetchPrice(0); await form.waitForPrices(); await settle();
+  assert.equal(form.data.displayCares[0].ticket_code, 'OLD');
+  assert.equal(toasts.length, 0);
+});
+
+test('在单刮蜡基础上再勾别的项目：自动带上老顾客券', async t => {
+  const { form } = setupWithTickets(t, { rows: [care()] });
+  form._refreshCares(); await settle(); await form.waitForPrices();
+  assert.equal(form.data.displayCares[0].ticket_code || null, null);
+  toggle(form, 'need_edge'); await form.waitForPrices(); await settle(); await form.waitForPrices();
+  assert.equal(form.data.displayCares[0].ticket_code, 'OLD');
+});

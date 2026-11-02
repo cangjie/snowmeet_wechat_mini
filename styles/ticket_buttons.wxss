@@ -1,0 +1,20 @@
+/* 仅由优惠券页面导入，覆盖 app.wxss 的固定高度、顶部内边距和凹槽边框。 */
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 88rpx;
+  height: auto;
+  padding: 20rpx 24rpx;
+  border: 0;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+button::after { border: none; }
+button[disabled] { opacity: 0.6; }

@@ -49,6 +49,16 @@ function loadComponent(file, fakeData, properties) {
     properties: Object.assign({}, properties || {}),
     events,
     setData(patch) { setPath(this.data, patch) },
+    setProperty(name, value) {
+      const previous = this.data[name]
+      this.properties[name] = value
+      this.setData({ [name]: value })
+      const observer = def.properties && def.properties[name] && def.properties[name].observer
+      if (typeof observer === 'function') observer.call(this, value, previous)
+    },
+    invokeLifecycle(name) {
+      if (def.lifetimes && def.lifetimes[name]) return def.lifetimes[name].call(this)
+    },
     triggerEvent(name, detail) { events.push({ name, detail }) }
   }
   Object.keys(def.methods).forEach(name => { instance[name] = def.methods[name].bind(instance) })

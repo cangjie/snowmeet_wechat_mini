@@ -6,6 +6,7 @@
     "van-calendar": "@vant/weapp/calendar/index",
     "van-popup": "@vant/weapp/popup/index",
     "van-tree-select": "@vant/weapp/tree-select/index",
-    "search-product-fuzzy": "../search_product_fuzzy/search_product_fuzzy"
+    "search-product-fuzzy": "../search_product_fuzzy/search_product_fuzzy",
+    "ticket-card-selector": "../ticket_card_selector/ticket_card_selector"
   }
 }

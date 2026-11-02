@@ -15,6 +15,7 @@ Page({
     needAuth: false,
     authBusy: false,
     transferShow: false,      // 转赠确认弹层
+    transferRewardEligible: false,
     subscribeBlocked: false   // 订阅被用户永久拒绝，需要引导去设置页
   },
 
@@ -25,6 +26,13 @@ Page({
   // 领取通知，不该挡住转赠本身。
   onTransferTap(){
     var that = this
+    // 教练转发不回赠（服务端同口径），所以教练看不到「回赠」提示
+    var rewardEligible = !!this.data.ticket && this.data.ticket.template_id == 16 && !getApp().globalData.coach
+    this.setData({ transferRewardEligible: rewardEligible, subscribeBlocked: false })
+    if (!rewardEligible){
+      this.setData({ transferShow: true })
+      return
+    }
     ticketHelper.requestTransferSubscribe(function (blocked){
       that.setData({ transferShow: true, subscribeBlocked: blocked })
     })
@@ -178,14 +186,14 @@ Page({
     if (!ticket || !ticket.canTransfer){
       return {}
     }
-    return data.setTicketToSharePromise(ticket.code, app.globalData.sessionKey).then(function (){
+    return data.setTicketToMiniSharePromise(ticket.code, app.globalData.sessionKey).then(function (){
       ticket.shared = 1
       ticket.statusText = '分享中'
       ticket.statusClass = 'status-shared'
       that.setData({ ticket: ticket })
       return {
         title: '赠送优惠券：' + ticket.name,
-        path: '/pages/mine/ticket/ticket_share?code=' + ticket.code,
+        path: '/pages/mine/ticket/ticket_share_mini?code=' + encodeURIComponent(ticket.code),
         imageUrl: 'https://' + app.globalData.domainName + '/images/snowmeet_logo.png'
       }
     }).catch(function (){

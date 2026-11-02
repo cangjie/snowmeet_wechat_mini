@@ -1,3 +1,5 @@
+@import "/styles/ticket_buttons.wxss";
+
 /* pages/mine/ticket/ticket_card.wxss
    与 pages/mine/skipass/my_skipasses.wxss 同一套新版样式规范（客户端"我的X"系列页面），
    转赠/优惠券列表与详情页共用，通过 @import 引入。 */
@@ -213,7 +215,7 @@ page {
   text-align: center;
   padding: 22rpx 0;
   border-radius: var(--radius-btn);
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 700;
   line-height: 1.4;
 }

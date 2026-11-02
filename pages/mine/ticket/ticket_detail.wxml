@@ -39,7 +39,7 @@
 <view class="tr-mask" wx:if="{{transferShow}}" bindtap="onTransferPanelClose" catchtouchmove="onNoop">
   <view class="tr-panel" catchtap="onNoop">
     <view class="tr-title">转赠优惠券</view>
-    <view class="tr-desc">选择好友后，对方需关注公众号才能领取。领取成功会通知你，并回赠你一张同款券。</view>
+    <view class="tr-desc">好友登录小程序后即可领取。{{transferRewardEligible ? '领取成功后回赠你一张同款券；如已授权订阅，将收到领取提醒。' : '这张券领取后不会回赠同款券。'}}</view>
     <view class="tr-warn" wx:if="{{subscribeBlocked}}">
       你之前选择了不再接收提醒，对方领取后将收不到通知。<text class="tr-warn-link" catchtap="onOpenSubscribeSetting">去开启</text>
     </view>

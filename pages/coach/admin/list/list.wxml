@@ -1,0 +1,38 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view wx:if="{{stats}}" class="stats">
+      <view class="stat"><text class="stat-num">{{stats.coaches}}</text><text class="stat-label">教练</text></view>
+      <view class="stat"><text class="stat-num">{{stats.cardsClaimed}}/{{stats.cardsIssued}}</text><text class="stat-label">已领/已发卡</text></view>
+      <view class="stat"><text class="stat-num">¥{{stats.consumption}}</text><text class="stat-label">学员消费</text></view>
+    </view>
+    <view class="search">
+      <input placeholder="搜索教练姓名或手机尾号" value="{{keyword}}" bindinput="onSearch" confirm-type="search" />
+      <text wx:if="{{keyword}}" class="caret" bindtap="onClear">×</text>
+    </view>
+    <view wx:if="{{rows.length}}" class="col" style="gap: 20rpx;">
+      <view wx:for="{{rows}}" wx:key="id" class="card card-pad" style="{{item.valid ? '' : 'opacity: 0.6;'}}">
+        <view class="card-row" data-id="{{item.id}}" bindtap="onToggle">
+          <view class="checkbox {{selected[item.id] ? 'on' : ''}}">{{selected[item.id] ? '✓' : ''}}</view>
+          <view class="grow card-row wrap" style="gap: 12rpx;">
+            <text class="card-title">{{item.name}}</text>
+            <text class="tag {{item.valid ? 'ok' : 'muted'}}">{{item.valid ? '启用' : '已停用'}}</text>
+          </view>
+          <text class="card-meta">尾号 {{item.phoneTail}}</text>
+        </view>
+        <view data-id="{{item.id}}" bindtap="onOpen" class="col" style="gap: 14rpx;">
+          <view wx:if="{{item.valid}}" class="price-chips">
+            <text wx:for="{{item.chips}}" wx:for-item="chip" wx:key="*this" class="price-chip">{{chip}}</text>
+          </view>
+          <view wx:else class="card-meta">已领的卡继续有效，不能再发新卡</view>
+          <view class="card-meta">发卡 {{item.cards.total}}（已领 {{item.cards.claimed}}）· 学员 {{item.students}} · 本季消费 ¥{{item.seasonAmount}}</view>
+        </view>
+      </view>
+    </view>
+    <view wx:elif="{{!loading}}" class="co-empty">还没有教练，点下方「添加教练」</view>
+  </block>
+</view>
+<view wx:if="{{!blocked}}" class="bottom-bar">
+  <view class="btn ghost" bindtap="onAdd">添加教练</view>
+  <view class="btn primary" bindtap="onIssue">批量发券{{selectedCount ? '（已选 ' + selectedCount + '）' : ''}}</view>
+</view>

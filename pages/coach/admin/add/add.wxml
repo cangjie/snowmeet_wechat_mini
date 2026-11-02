@@ -1,0 +1,28 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card card-pad">
+      <view class="field">
+        <view class="field-label"><text>教练手机号</text></view>
+        <view class="card-row">
+          <input class="input grow" type="number" maxlength="11" placeholder="输入手机号查找会员" value="{{cell}}" bindinput="onCell" />
+          <view class="btn {{looking ? 'disabled' : ''}}" bindtap="onLookup">{{looking ? '查找中' : '查找会员'}}</view>
+        </view>
+      </view>
+      <view wx:if="{{found && found.exists}}" class="note blue">
+        找到会员：{{found.name}}（尾号 {{found.phoneTail}}）<text wx:if="{{found.isCoach}}">，已经是教练</text>
+      </view>
+      <view wx:elif="{{found}}" class="note">该手机号还没有会员，添加时会同时创建会员。</view>
+    </view>
+    <view class="card card-pad">
+      <view class="field">
+        <view class="field-label"><text>教练显示名</text><text class="hint">学员领卡时看到</text></view>
+        <input class="input" placeholder="例如 张教练" value="{{name}}" bindinput="onName" maxlength="20" />
+      </view>
+      <view class="co-note">价格添加后在教练详情里设置。同一个会员只能是一位启用中的教练。</view>
+    </view>
+  </block>
+</view>
+<view wx:if="{{!blocked}}" class="bottom-bar">
+  <view class="btn primary {{saving ? 'disabled' : ''}}" bindtap="onSave">添加为教练</view>
+</view>
