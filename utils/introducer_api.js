@@ -57,5 +57,9 @@ module.exports = {
   listChoices: (type, keyword) => get('Introducer', 'ListChoices', { type, keyword }),
   getOrderShares: orderId => get('OrderIntroducerShare', 'GetOrderShares', { orderId }),
   setShare: body => post('OrderIntroducerShare', 'SetShare', body),
-  removeShare: orderShareId => post('OrderIntroducerShare', 'RemoveShare', { orderShareId })
+  removeShare: orderShareId => post('OrderIntroducerShare', 'RemoveShare', { orderShareId }),
+  // ---- 分账列表与手动分账（店长以上 ≥200）----
+  listShares: query => get('ShareList', 'List', query || {}),
+  nextBatchNo: () => get('ShareList', 'NextBatchNo'),
+  completeManual: body => post('ShareList', 'CompleteManual', body)
 }

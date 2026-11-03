@@ -198,6 +198,9 @@ Page({
       case 'introducer_admin':
         path = '/pages/introducer/admin/list/list'
         break
+      case 'share_list':
+        path = '/pages/introducer/share/list/list'
+        break
       case 'maintain_return':
         path = '/pages/admin/maintain/return_entry'
         break

@@ -154,7 +154,8 @@
       "pages": [
         "admin/list/list",
         "admin/add/add",
-        "share/add/add"
+        "share/add/add",
+        "share/list/list"
       ]
     },
     {

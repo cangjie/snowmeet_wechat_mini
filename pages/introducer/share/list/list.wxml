@@ -1,0 +1,78 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card card-pad filters">
+      <view class="filter-row">
+        <text class="filter-label">状态</text>
+        <text wx:for="{{statusOptions}}" wx:key="label" class="chip {{status === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onStatus">{{item.label}}</text>
+      </view>
+      <view class="filter-row">
+        <text class="filter-label">类型</text>
+        <text wx:for="{{typeOptions}}" wx:key="label" class="chip {{type === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onType">{{item.label}}</text>
+      </view>
+      <view class="filter-row">
+        <text class="filter-label">方式</text>
+        <text wx:for="{{modeOptions}}" wx:key="label" class="chip {{mode === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onMode">{{item.label}}</text>
+      </view>
+      <view class="filter-row">
+        <text class="filter-label">日期</text>
+        <text wx:for="{{rangeOptions}}" wx:key="label" class="chip {{rangeKey === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onRange">{{item.label}}</text>
+      </view>
+      <date-range-picker wx:if="{{rangeKey !== 'all'}}" start-date="{{startDate}}" end-date="{{endDate}}" bind:change="onRangeChange" />
+      <input class="input" placeholder="搜索订单号或收款人" value="{{keyword}}" bindinput="onKeyword" bindconfirm="onSearch" confirm-type="search" />
+    </view>
+
+    <view class="summary">
+      <text>共 {{total}} 条 · ¥{{totalAmount}} · 可勾选 {{selectableCount}} 条</text>
+      <text wx:if="{{selectableCount > 0}}" class="link" bindtap="onSelectAll">全选可选项</text>
+    </view>
+
+    <view wx:if="{{!items.length && !loading}}" class="co-empty">没有符合条件的分账</view>
+
+    <view wx:for="{{items}}" wx:key="orderShareId" class="row {{item.status === '已分' ? 'done' : ''}}" data-id="{{item.orderShareId}}" bindtap="onItem">
+      <view wx:if="{{item.selectable}}" class="box {{item.checked ? 'on' : ''}}" data-id="{{item.orderShareId}}" catchtap="onToggle"><text wx:if="{{item.checked}}">✓</text></view>
+      <view wx:else class="box off"></view>
+      <view class="row-main">
+        <view class="line">
+          <text class="code">{{item.orderCode}}</text>
+          <text class="amount">¥{{item.amount}}</text>
+        </view>
+        <view class="tags">
+          <text class="tag blue">{{item.orderType}}</text>
+          <text class="meta">{{item.shop}}</text>
+          <text class="tag {{item.mode === '手动' ? 'warn' : 'muted'}}">{{item.mode}}{{item.manualReason ? ' · ' + item.manualReason : ''}}</text>
+          <text class="tag {{item.status === '已分' ? 'ok' : 'danger'}}">{{item.status}}</text>
+        </view>
+        <view class="meta">收款人 {{item.payee}} · 申请人 {{item.applicant}}</view>
+        <view class="meta">计划分账 {{item.planDate || '—'}} · 实际分账 {{item.sharedTime || '—'}}</view>
+        <view wx:if="{{item.batch}}" class="meta">批次 {{item.batch}}</view>
+      </view>
+    </view>
+    <view wx:if="{{loading}}" class="co-empty">加载中…</view>
+    <view wx:elif="{{items.length && !hasMore}}" class="co-empty">没有更多了</view>
+
+    <view class="bottom-bar">
+      <view class="bar">
+        <text class="bar-text">已选 {{selectedCount}} 笔 · ¥{{selectedTotal}}</text>
+        <view class="btn primary {{selectedCount ? '' : 'disabled'}}" bindtap="onOpenModal">分账</view>
+      </view>
+    </view>
+
+    <view wx:if="{{modal.show}}" class="mask">
+      <view class="dialog">
+        <view class="dialog-title">手动分账</view>
+        <view class="dialog-sum">共 {{modal.count}} 笔，总计 ¥{{modal.total}}</view>
+        <view wx:if="{{modal.oldCount > 0}}" class="dialog-warn">其中 {{modal.oldCount}} 笔是 30 天前的，请确认都已经分过。</view>
+        <view class="field">
+          <view class="field-label"><text>批次号（系统生成，可以改，不能和已有的重复）</text></view>
+          <input class="input" value="{{modal.batchNo}}" bindinput="onBatchNo" maxlength="40" />
+        </view>
+        <view class="note">点确定只是把这些记成已分账，不会转钱；钱要你们另外转好。</view>
+        <view class="dialog-actions">
+          <view class="btn" bindtap="onCancelModal">取消</view>
+          <view class="btn primary {{submitting ? 'disabled' : ''}}" bindtap="onConfirm">确定</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

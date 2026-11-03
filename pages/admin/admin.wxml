@@ -78,6 +78,9 @@
     <mp-cell id="coach_admin" value="【教练】教练管理" bindtap="nav" wx:if="{{isAdmin}}" ></mp-cell>
     <mp-cell id="introducer_admin" value="【分账】介绍人管理" bindtap="nav" wx:if="{{isAdmin}}" ></mp-cell>
   </mp-cells>
+  <mp-cells  title="分账" wx:if="{{isManager || isAdmin}}" >
+    <mp-cell id="share_list" value="【分账】分账列表" bindtap="nav" ></mp-cell>
+  </mp-cells>
   <mp-cells  title="优惠券" >
     <mp-cell id="coupon_admin" value="【优惠券】管理" bindtap="nav" ></mp-cell>
     <mp-cell id="ticket_use" value="【优惠券】核销" bindtap="nav" ></mp-cell>
