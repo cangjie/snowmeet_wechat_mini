@@ -1,1 +1,1 @@
-{ "component": true, "usingComponents": {} }
+{ "component": true, "usingComponents": { "date-range-picker": "/components/date-range-picker/index" } }

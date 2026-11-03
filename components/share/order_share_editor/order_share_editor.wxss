@@ -1,7 +1,10 @@
 .ose-card { margin: 20rpx 24rpx; padding: 24rpx; background: #fff; border: 2rpx solid #006495; border-radius: 16rpx; display: flex; flex-direction: column; gap: 18rpx; box-sizing: border-box; }
-.ose-head { display: flex; justify-content: space-between; align-items: baseline; }
+.ose-head { display: flex; justify-content: space-between; align-items: center; min-height: 64rpx; }
+.ose-head-right { display: flex; align-items: center; gap: 12rpx; }
 .ose-title { font-size: 30rpx; font-weight: 700; color: #181C20; }
-.ose-side { font-size: 22rpx; color: #5D6A75; }
+.ose-side { font-size: 24rpx; color: #5D6A75; }
+.ose-arrow { display: inline-block; font-size: 40rpx; line-height: 1; color: #5D6A75; transform: rotate(90deg); }
+.ose-arrow.open { transform: rotate(-90deg); }
 .ose-row { border: 2rpx solid #D9E2EC; border-radius: 12rpx; padding: 18rpx; display: flex; flex-direction: column; gap: 10rpx; }
 .ose-line { display: flex; justify-content: space-between; align-items: center; gap: 16rpx; }
 .ose-name { display: flex; align-items: center; gap: 12rpx; }
@@ -17,6 +20,9 @@
 .ose-label { font-size: 24rpx; color: #3D4F5E; }
 .ose-pick { min-height: 88rpx; padding: 0 20rpx; display: flex; align-items: center; justify-content: space-between; border: 2rpx solid #9FB3C4; border-radius: 12rpx; box-sizing: border-box; }
 .ose-pick.on { border-color: #006495; background: #E6F1F8; }
+.ose-placeholder { font-size: 28rpx; color: #8A97A3; }
+.ose-caret { font-size: 28rpx; color: #5D6A75; }
+.ose-add { min-height: 88rpx; display: flex; align-items: center; justify-content: center; border: 2rpx solid #006495; border-radius: 12rpx; color: #006495; font-size: 28rpx; font-weight: 600; box-sizing: border-box; }
 .ose-input { min-height: 88rpx; padding: 0 24rpx; border: 2rpx solid #9FB3C4; border-radius: 12rpx; font-size: 30rpx; box-sizing: border-box; background: #fff; }
 .ose-save { min-height: 96rpx; display: flex; align-items: center; justify-content: center; border-radius: 12rpx; background: #006495; color: #fff; font-size: 30rpx; font-weight: 600; }
 .ose-save.disabled { background: #F3F6FA; color: #8A97A3; }
