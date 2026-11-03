@@ -16,14 +16,5 @@
 .ose-tag.ok { background: #E3F4E8; color: #14602F; }
 .ose-tag.danger { background: #FDE7E5; color: #8C1D18; }
 .ose-remove { min-height: 88rpx; min-width: 88rpx; display: inline-flex; align-items: center; justify-content: center; color: #B3261E; font-size: 26rpx; }
-.ose-form { display: flex; flex-direction: column; gap: 14rpx; }
-.ose-label { font-size: 24rpx; color: #3D4F5E; }
-.ose-pick { min-height: 88rpx; padding: 0 20rpx; display: flex; align-items: center; justify-content: space-between; border: 2rpx solid #9FB3C4; border-radius: 12rpx; box-sizing: border-box; }
-.ose-pick.on { border-color: #006495; background: #E6F1F8; }
-.ose-placeholder { font-size: 28rpx; color: #8A97A3; }
-.ose-caret { font-size: 28rpx; color: #5D6A75; }
-.ose-switch-row { min-height: 88rpx; display: flex; align-items: center; justify-content: space-between; }
-.ose-input { min-height: 88rpx; padding: 0 24rpx; border: 2rpx solid #9FB3C4; border-radius: 12rpx; font-size: 30rpx; box-sizing: border-box; background: #fff; }
 .ose-save { min-height: 96rpx; display: flex; align-items: center; justify-content: center; border-radius: 12rpx; background: #006495; color: #fff; font-size: 30rpx; font-weight: 600; }
-.ose-save.disabled { background: #F3F6FA; color: #8A97A3; }
 .ose-reason { background: #FFF1D6; color: #5C3800; border-radius: 12rpx; padding: 16rpx 20rpx; font-size: 24rpx; line-height: 1.5; }

@@ -53,7 +53,8 @@ module.exports = {
   updateIntroducer: body => post('Introducer', 'UpdateIntroducer', body),
   bindAlipay: introducerId => post('Introducer', 'BindAlipay', { introducerId }),
   // ---- 订单上设置分账（店长以上 ≥200）----
-  listChoices: () => get('Introducer', 'ListChoices'),
+  // type：教练 / KOL / 机构，不传 = 全部；keyword：名称、真实姓名或手机号里包含的文字
+  listChoices: (type, keyword) => get('Introducer', 'ListChoices', { type, keyword }),
   getOrderShares: orderId => get('OrderIntroducerShare', 'GetOrderShares', { orderId }),
   setShare: body => post('OrderIntroducerShare', 'SetShare', body),
   removeShare: orderShareId => post('OrderIntroducerShare', 'RemoveShare', { orderShareId })

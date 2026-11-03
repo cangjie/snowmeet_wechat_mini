@@ -1,22 +1,17 @@
-// 订单详情页里的「介绍人分账」：店长以上（title_level ≥ 200）可以看、设置、删除。
-// 规则由服务端判断：什么时候能设置（canEdit / reason）、自动还是手动（每条的 state）、金额预填（suggested）。
-// 卡片默认折叠，标题右边的摘要说明已经设了几条、合计多少；一单可以给不同的介绍人各设一条。
+// 订单详情页里的「介绍人分账」：店长以上（title_level ≥ 200）才显示；只显示这一单的分账列表（未提交的可以删除），
+// 「添加分账记录」是一个按钮，点了去新页面（pages/introducer/share/add）里填收款人、金额、日期等；回来时列表自动刷新。
+// 规则由服务端判断：什么时候能设置（canEdit / reason）、自动还是手动（每条的 state）。
+// 卡片默认折叠，标题右边的摘要说明已经设了几条、合计多少。
 const api = require('../../../utils/introducer_api.js')
 
 const MANAGER_LEVEL = 200
 // 已经提交的（已分账、被拒绝）不能再删
 const REMOVABLE = ['待自动分账', '手动处理']
 const STATE_CLASS = { '待自动分账': 'blue', '手动处理': 'warn', '已分账': 'ok', '被拒绝': 'danger' }
+const ADD_PAGE = '/pages/introducer/share/add/add'
 
 function decorate(s) {
   return Object.assign({}, s, { stateClass: STATE_CLASS[s.state] || 'muted', removable: REMOVABLE.indexOf(s.state) >= 0 })
-}
-
-// 本地日期 yyyy-MM-dd，和后端、date-range-picker 一致，可以直接按字符串比大小
-function today() {
-  const d = new Date()
-  const pad = n => (n < 10 ? '0' : '') + n
-  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
 }
 
 function summarize(shares) {
@@ -36,14 +31,13 @@ Component({
     orderId: { type: Number, value: 0, observer(value, previous) { if (this._attached && value !== previous) this.load() } }
   },
   data: {
-    hidden: true, loading: false, expanded: false, canEdit: false, reason: '', suggested: 0,
-    // 预计分账日期、自动分账开关只在后端支持时才显示（旧后端没有 suggestedPlanDate / autoShareSupported 这两个字段）
-    supportsPlanDate: false, suggestedPlanDate: '', supportsAutoShare: false,
-    shares: [], summary: '未设置', choices: [],
-    form: { introducerId: '', introducerLabel: '', amount: '', planDate: '', autoShare: true, memo: '' }, saving: false
+    hidden: true, loading: false, expanded: false, canEdit: false, reason: '', shares: [], summary: '未设置'
   },
   lifetimes: {
     attached() { this._attached = true; return this.load() }
+  },
+  pageLifetimes: {
+    show() { this.onPageShow() }
   },
   methods: {
     load() {
@@ -56,16 +50,7 @@ Component({
       if (!orderId) return Promise.resolve()
       this.setData({ hidden: false, loading: true })
       return api.getOrderShares(orderId).then(d => {
-        this.setData(Object.assign({
-          loading: false, canEdit: !!d.canEdit,
-          reason: d.reason || '', suggested: d.suggested || 0,
-          supportsPlanDate: !!d.suggestedPlanDate, suggestedPlanDate: d.suggestedPlanDate || '', supportsAutoShare: !!d.autoShareSupported,
-          'form.amount': d.suggested > 0 ? String(d.suggested) : '', 'form.planDate': d.suggestedPlanDate || ''
-        }, sharesPatch(d.shares)))
-        if (!d.canEdit) return null
-        return api.listChoices().then(c => this.setData({
-          choices: (c.choices || []).map(v => Object.assign({}, v, { label: v.name + ' · ' + v.type }))
-        }))
+        this.setData(Object.assign({ loading: false, canEdit: !!d.canEdit, reason: d.reason || '' }, sharesPatch(d.shares)))
       }).catch(err => {
         this.setData({ loading: false })
         // 网络不通或接口不存在（新版小程序先于后端上线）：这张卡片只是附加功能，静默隐藏，别在每个订单详情页都弹提示
@@ -74,42 +59,18 @@ Component({
       })
     },
 
+    // 从「添加分账记录」页回来时重新读列表；没去过那一页的显示事件（比如第一次显示）不重复请求
+    onPageShow() {
+      if (!this._needRefresh) return Promise.resolve()
+      this._needRefresh = false
+      return this.load()
+    },
+
     onToggle() { this.setData({ expanded: !this.data.expanded }) },
 
-    // picker 的 detail.value 是选项下标，不同基础库给数字或数字字符串
-    onPick(e) {
-      const choice = this.data.choices[Number(e.detail.value)]
-      if (!choice) return
-      this.setData({ 'form.introducerId': choice.id, 'form.introducerLabel': choice.label })
-    },
-    onAmount(e) { this.setData({ 'form.amount': e.detail.value }) },
-    onPlanDate(e) { this.setData({ 'form.planDate': e.detail.date || '' }) },
-    onAutoShare(e) { this.setData({ 'form.autoShare': !!e.detail.value }) },
-    onMemo(e) { this.setData({ 'form.memo': e.detail.value }) },
-
-    onSave() {
-      const d = this.data
-      if (d.saving) return
-      const toast = title => wx.showToast({ title, icon: 'none', duration: 2400 })
-      if (!d.form.introducerId) { toast('请先选择介绍人'); return }
-      const amount = Number(d.form.amount)
-      if (!(amount > 0)) { toast('请填写大于 0 的金额'); return }
-      if (d.supportsPlanDate) {
-        if (!d.form.planDate) { toast('请选择预计分账日期'); return }
-        if (d.form.planDate < today()) { toast('预计分账日期不能早于今天'); return }
-      }
-      const body = { orderId: this.properties.orderId, introducerId: d.form.introducerId, amount, memo: (d.form.memo || '').trim() }
-      if (d.supportsPlanDate) body.planDate = d.form.planDate
-      if (d.supportsAutoShare) body.autoShare = !!d.form.autoShare
-      this.setData({ saving: true })
-      return api.setShare(body).then(r => {
-        this.setData(Object.assign({
-          saving: false,
-          form: { introducerId: '', introducerLabel: '', amount: d.suggested > 0 ? String(d.suggested) : '', planDate: d.suggestedPlanDate,
-            autoShare: true, memo: '' }
-        }, sharesPatch(r.shares)))
-        toast('已保存')
-      }).catch(err => { this.setData({ saving: false }); api.fail(err) })
+    onAdd() {
+      this._needRefresh = true
+      wx.navigateTo({ url: ADD_PAGE + '?orderId=' + this.properties.orderId })
     },
 
     onRemove(e) {
