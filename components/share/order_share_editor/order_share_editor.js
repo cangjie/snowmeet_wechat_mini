@@ -4,11 +4,9 @@
 const api = require('../../../utils/introducer_api.js')
 
 const MANAGER_LEVEL = 200
-const ADMIN_LEVEL = 300
 // 已经提交的（已分账、被拒绝）不能再删
 const REMOVABLE = ['待自动分账', '手动处理']
 const STATE_CLASS = { '待自动分账': 'blue', '手动处理': 'warn', '已分账': 'ok', '被拒绝': 'danger' }
-const ADD_INTRODUCER_PAGE = '/pages/introducer/admin/add/add'
 
 function decorate(s) {
   return Object.assign({}, s, { stateClass: STATE_CLASS[s.state] || 'muted', removable: REMOVABLE.indexOf(s.state) >= 0 })
@@ -38,11 +36,11 @@ Component({
     orderId: { type: Number, value: 0, observer(value, previous) { if (this._attached && value !== previous) this.load() } }
   },
   data: {
-    hidden: true, loading: false, expanded: false, canEdit: false, canAddIntroducer: false, reason: '', suggested: 0,
-    // 预计分账日期只在后端支持时才显示（后端给了 suggestedPlanDate 才算支持；旧后端没有这个字段）
-    supportsPlanDate: false, suggestedPlanDate: '',
+    hidden: true, loading: false, expanded: false, canEdit: false, reason: '', suggested: 0,
+    // 预计分账日期、自动分账开关只在后端支持时才显示（旧后端没有 suggestedPlanDate / autoShareSupported 这两个字段）
+    supportsPlanDate: false, suggestedPlanDate: '', supportsAutoShare: false,
     shares: [], summary: '未设置', choices: [],
-    form: { introducerId: '', introducerLabel: '', amount: '', planDate: '', memo: '' }, saving: false
+    form: { introducerId: '', introducerLabel: '', amount: '', planDate: '', autoShare: true, memo: '' }, saving: false
   },
   lifetimes: {
     attached() { this._attached = true; return this.load() }
@@ -59,9 +57,9 @@ Component({
       this.setData({ hidden: false, loading: true })
       return api.getOrderShares(orderId).then(d => {
         this.setData(Object.assign({
-          loading: false, canEdit: !!d.canEdit, canAddIntroducer: staff.title_level >= ADMIN_LEVEL,
+          loading: false, canEdit: !!d.canEdit,
           reason: d.reason || '', suggested: d.suggested || 0,
-          supportsPlanDate: !!d.suggestedPlanDate, suggestedPlanDate: d.suggestedPlanDate || '',
+          supportsPlanDate: !!d.suggestedPlanDate, suggestedPlanDate: d.suggestedPlanDate || '', supportsAutoShare: !!d.autoShareSupported,
           'form.amount': d.suggested > 0 ? String(d.suggested) : '', 'form.planDate': d.suggestedPlanDate || ''
         }, sharesPatch(d.shares)))
         if (!d.canEdit) return null
@@ -86,8 +84,8 @@ Component({
     },
     onAmount(e) { this.setData({ 'form.amount': e.detail.value }) },
     onPlanDate(e) { this.setData({ 'form.planDate': e.detail.date || '' }) },
+    onAutoShare(e) { this.setData({ 'form.autoShare': !!e.detail.value }) },
     onMemo(e) { this.setData({ 'form.memo': e.detail.value }) },
-    onGoAddIntroducer() { wx.navigateTo({ url: ADD_INTRODUCER_PAGE }) },
 
     onSave() {
       const d = this.data
@@ -102,11 +100,13 @@ Component({
       }
       const body = { orderId: this.properties.orderId, introducerId: d.form.introducerId, amount, memo: (d.form.memo || '').trim() }
       if (d.supportsPlanDate) body.planDate = d.form.planDate
+      if (d.supportsAutoShare) body.autoShare = !!d.form.autoShare
       this.setData({ saving: true })
       return api.setShare(body).then(r => {
         this.setData(Object.assign({
           saving: false,
-          form: { introducerId: '', introducerLabel: '', amount: d.suggested > 0 ? String(d.suggested) : '', planDate: d.suggestedPlanDate, memo: '' }
+          form: { introducerId: '', introducerLabel: '', amount: d.suggested > 0 ? String(d.suggested) : '', planDate: d.suggestedPlanDate,
+            autoShare: true, memo: '' }
         }, sharesPatch(r.shares)))
         toast('已保存')
       }).catch(err => { this.setData({ saving: false }); api.fail(err) })

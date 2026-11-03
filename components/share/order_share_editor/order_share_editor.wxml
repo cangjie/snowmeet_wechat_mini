@@ -44,15 +44,20 @@
           <date-range-picker mode="single" allow-future date="{{form.planDate}}" placeholder="选择预计分账日期" bind:change="onPlanDate" />
           <view class="ose-meta">预填的是最早能分的那天。自动分账的，到这一天夜间 23:00 才提交；要手动转账的，这是预计转账的日子。</view>
         </block>
+        <block wx:if="{{supportsAutoShare}}">
+          <view class="ose-switch-row">
+            <text class="ose-label">自动分账</text>
+            <switch checked="{{form.autoShare}}" bindchange="onAutoShare" color="#006495" />
+          </view>
+          <view class="ose-meta">{{form.autoShare ? '打开：能自动分的，到日期夜间 23:00 自动提交。用了优惠券、介绍人没有收款账号、合计达到门槛的，系统仍会转成手动。' : '关闭：只记账，系统不会自动分账，你自己去转账。'}}</view>
+        </block>
         <view class="ose-label">备注（选填）</view>
         <input class="ose-input" value="{{form.memo}}" bindinput="onMemo" maxlength="40" />
         <view class="ose-save {{saving ? 'disabled' : ''}}" bindtap="onSave">保存介绍人分账</view>
         <view class="ose-meta">合计（万龙 + 介绍人）达到门槛时，这单所有分账都走手动转账；没达到的，夜间 23:00 自动分账。</view>
       </block>
       <block wx:else>
-        <view class="ose-meta">还没有可选的介绍人</view>
-        <view wx:if="{{canAddIntroducer}}" class="ose-add" bindtap="onGoAddIntroducer">去添加介绍人</view>
-        <view wx:else class="ose-meta">请系统管理员先在「介绍人管理」里添加</view>
+        <view class="ose-meta">还没有可选的介绍人，请系统管理员先在「介绍人管理」里添加</view>
       </block>
     </view>
     <view wx:elif="{{reason}}" class="ose-reason">{{reason}}</view>

@@ -22,7 +22,7 @@
 .ose-pick.on { border-color: #006495; background: #E6F1F8; }
 .ose-placeholder { font-size: 28rpx; color: #8A97A3; }
 .ose-caret { font-size: 28rpx; color: #5D6A75; }
-.ose-add { min-height: 88rpx; display: flex; align-items: center; justify-content: center; border: 2rpx solid #006495; border-radius: 12rpx; color: #006495; font-size: 28rpx; font-weight: 600; box-sizing: border-box; }
+.ose-switch-row { min-height: 88rpx; display: flex; align-items: center; justify-content: space-between; }
 .ose-input { min-height: 88rpx; padding: 0 24rpx; border: 2rpx solid #9FB3C4; border-radius: 12rpx; font-size: 30rpx; box-sizing: border-box; background: #fff; }
 .ose-save { min-height: 96rpx; display: flex; align-items: center; justify-content: center; border-radius: 12rpx; background: #006495; color: #fff; font-size: 30rpx; font-weight: 600; }
 .ose-save.disabled { background: #F3F6FA; color: #8A97A3; }

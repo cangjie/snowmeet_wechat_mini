@@ -14,7 +14,7 @@ const SHARE = over => Object.assign({ orderShareId: 31, introducerId: 7, name: '
 
 function setup(t, { handler, staff, modalConfirm }) {
   const previous = { wx: global.wx, getApp: global.getApp }
-  const calls = [], toasts = [], modals = [], navigations = []
+  const calls = [], toasts = [], modals = []
   api.setTransport(options => {
     const [pathPart, query] = options.url.replace(PREFIX, '').split('?')
     const [controller, action] = pathPart.split('/')
@@ -27,8 +27,7 @@ function setup(t, { handler, staff, modalConfirm }) {
   })
   global.wx = {
     showToast(o) { toasts.push(o.title) },
-    showModal(o) { modals.push(o.title); setImmediate(() => o.success && o.success({ confirm: modalConfirm !== false })) },
-    navigateTo(o) { navigations.push(o.url) }
+    showModal(o) { modals.push(o.title); setImmediate(() => o.success && o.success({ confirm: modalConfirm !== false })) }
   }
   global.getApp = () => ({ globalData: { staff, sessionKey: 'sk%2B1', requestPrefix: PREFIX } })
   t.after(() => {
@@ -36,11 +35,10 @@ function setup(t, { handler, staff, modalConfirm }) {
     global.getApp = previous.getApp
     api.setTransport(function (options) { wx.request(options) })
   })
-  return { calls, toasts, modals, navigations }
+  return { calls, toasts, modals }
 }
 
 const MANAGER = { valid: 1, title_level: 200 }
-const ADMIN = { valid: 1, title_level: 300 }
 const FILE = 'components/share/order_share_editor/order_share_editor.js'
 
 test('店员（职级 100）看不到，也不发请求', async t => {
@@ -206,20 +204,67 @@ test('介绍人用下拉选：选项是「名称 · 类型」，选中后记下 
   assert.equal(env.calls.find(c => c.action === 'SetShare').body.introducerId, 8)
 })
 
-test('没有可选的介绍人：系统管理员能直接去添加，店长只看到提示', async t => {
-  const handler = (c, a) => a === 'GetOrderShares' ? OK({ canEdit: true, reason: null, suggested: 86, shares: [] }) : OK({ choices: [] })
+test('没有可选的介绍人：这里只做分账请求，不提供「去添加介绍人」；介绍人在管理页添加', async t => {
+  setup(t, {
+    staff: { valid: 1, title_level: 300 },   // 系统管理员也一样
+    handler: (c, a) => a === 'GetOrderShares' ? OK({ canEdit: true, reason: null, suggested: 86, shares: [] }) : OK({ choices: [] })
+  })
+  const comp = loadComponent(FILE, {}, { orderId: 123 })
+  await comp.load()
+  assert.deepEqual(comp.data.choices, [])
+  assert.equal(comp.onGoAddIntroducer, undefined)
+  assert.equal('canAddIntroducer' in comp.data, false)
+})
 
-  const admin = setup(t, { staff: ADMIN, handler })
-  const adminComp = loadComponent(FILE, {}, { orderId: 123 })
-  await adminComp.load()
-  assert.equal(adminComp.data.canAddIntroducer, true)
-  adminComp.onGoAddIntroducer()
-  assert.deepEqual(admin.navigations, ['/pages/introducer/admin/add/add'])
+test('「自动分账」开关：后端支持才显示，默认打开；关掉后保存带 autoShare:false，保存完回到打开', async t => {
+  const env = setup(t, {
+    staff: MANAGER,
+    handler: (c, a) => {
+      if (a === 'GetOrderShares') return OK({ canEdit: true, reason: null, suggested: 86, autoShareSupported: true, shares: [] })
+      if (a === 'ListChoices') return OK(ONE_CHOICE)
+      return OK({ shares: [SHARE({ state: '手动处理' })] })
+    }
+  })
+  const comp = loadComponent(FILE, {}, { orderId: 123 })
+  await comp.load()
+  assert.equal(comp.data.supportsAutoShare, true)
+  assert.equal(comp.data.form.autoShare, true)
 
-  setup(t, { staff: MANAGER, handler })
-  const managerComp = loadComponent(FILE, {}, { orderId: 123 })
-  await managerComp.load()
-  assert.equal(managerComp.data.canAddIntroducer, false)
+  comp.onPick({ detail: { value: 0 } })
+  comp.onAutoShare({ detail: { value: false } })
+  assert.equal(comp.data.form.autoShare, false)
+  await comp.onSave()
+  assert.equal(env.calls.find(c => c.action === 'SetShare').body.autoShare, false)
+  assert.equal(comp.data.form.autoShare, true)
+
+  comp.onPick({ detail: { value: 0 } })
+  await comp.onSave()
+  assert.equal(env.calls.filter(c => c.action === 'SetShare')[1].body.autoShare, true)
+})
+
+test('后端还不认「自动分账」：不显示开关，保存也不带 autoShare', async t => {
+  const env = setup(t, {
+    staff: MANAGER,
+    handler: (c, a) => {
+      if (a === 'GetOrderShares') return OK({ canEdit: true, reason: null, suggested: 86, shares: [] })
+      if (a === 'ListChoices') return OK(ONE_CHOICE)
+      return OK({ shares: [SHARE()] })
+    }
+  })
+  const comp = loadComponent(FILE, {}, { orderId: 123 })
+  await comp.load()
+  assert.equal(comp.data.supportsAutoShare, false)
+  comp.onPick({ detail: { value: 0 } })
+  await comp.onSave()
+  assert.equal('autoShare' in env.calls.find(c => c.action === 'SetShare').body, false)
+})
+
+test('界面结构：自动分账是一个开关，放在日期和备注之间，后端支持才出现', () => {
+  const wxml = fs.readFileSync(path.join(__dirname, '..', 'components/share/order_share_editor/order_share_editor.wxml'), 'utf8')
+  assert.match(wxml, /<block wx:if="\{\{supportsAutoShare\}\}">[\s\S]*<switch[^>]*checked="\{\{form\.autoShare\}\}"[^>]*bindchange="onAutoShare"/)
+  const at = s => wxml.indexOf(s)
+  assert.ok(at('onAmount') < at('onPlanDate') && at('onPlanDate') < at('onAutoShare') && at('onAutoShare') < at('onMemo'),
+    '顺序应是 金额 → 预计分账日期 → 自动分账 → 备注')
 })
 
 test('可以给不同的介绍人各设一条，未提交的每条都能单独删', async t => {
@@ -342,14 +387,14 @@ test('界面结构：预计分账日期用统一的日期选择控件，列表�
   assert.doesNotMatch(wxml, /mode="date"/)   // 全站禁用原生日期 picker
 })
 
-test('界面结构：标题可点折叠，表单在展开后才出现，介绍人是下拉，没有介绍人时有「去添加」入口', () => {
+test('界面结构：标题可点折叠，表单在展开后才出现，介绍人是下拉，没有介绍人时只有提示', () => {
   const wxml = fs.readFileSync(path.join(__dirname, '..', 'components/share/order_share_editor/order_share_editor.wxml'), 'utf8')
   assert.match(wxml, /class="ose-head"[^>]*bindtap="onToggle"/)
   assert.match(wxml, /wx:if="\{\{expanded\}\}"/)
   assert.match(wxml, /<picker[^>]*range="\{\{choices\}\}"[^>]*range-key="label"[^>]*bindchange="onPick"/)
-  assert.match(wxml, /bindtap="onGoAddIntroducer"/)
-  // 金额、备注、保存只在有可选介绍人时出现；没有时走 wx:else（提示和「去添加」）
-  assert.match(wxml, /<block wx:if="\{\{choices\.length\}\}">[\s\S]*bindinput="onAmount"[\s\S]*bindtap="onSave"[\s\S]*<\/block>\s*<block wx:else>[\s\S]*bindtap="onGoAddIntroducer"/)
+  assert.doesNotMatch(wxml, /去添加介绍人|onGoAddIntroducer/)
+  // 金额、备注、保存只在有可选介绍人时出现；没有时走 wx:else（只有提示）
+  assert.match(wxml, /<block wx:if="\{\{choices\.length\}\}">[\s\S]*bindinput="onAmount"[\s\S]*bindtap="onSave"[\s\S]*<\/block>\s*<block wx:else>[\s\S]*还没有可选的介绍人/)
 })
 
 test('租赁、养护、零售详情页都挂了组件（这一期只有租赁）', () => {
