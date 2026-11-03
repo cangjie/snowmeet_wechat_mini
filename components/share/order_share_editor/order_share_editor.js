@@ -39,7 +39,12 @@ Component({
         })
         if (!d.canEdit) return null
         return api.listChoices().then(c => this.setData({ choices: c.choices || [] }))
-      }).catch(err => { this.setData({ loading: false }); api.fail(err) })
+      }).catch(err => {
+        this.setData({ loading: false })
+        // 网络不通或接口不存在（新版小程序先于后端上线）：这张卡片只是附加功能，静默隐藏，别在每个订单详情页都弹提示
+        if (err && err.code === -1) { this.setData({ hidden: true }); return }
+        api.fail(err)
+      })
     },
 
     onPick(e) { this.setData({ 'form.introducerId': e.currentTarget.dataset.id }) },

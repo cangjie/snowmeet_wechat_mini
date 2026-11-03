@@ -21,7 +21,9 @@ function setup(t, { handler, staff, modalConfirm }) {
     const params = {}
     ;(query || '').split('&').filter(Boolean).forEach(kv => { const [k, v] = kv.split('='); params[k] = decodeURIComponent(v) })
     calls.push({ controller, action, method: options.method, params, body: options.data })
-    setImmediate(() => options.success({ statusCode: 200, data: handler(controller, action, params, options.data) }))
+    const data = handler(controller, action, params, options.data)
+    // handler 返回 { __status: 404 } 模拟接口不存在（新版小程序先于后端上线）
+    setImmediate(() => options.success(data && data.__status ? { statusCode: data.__status, data: {} } : { statusCode: 200, data }))
   })
   global.wx = {
     showToast(o) { toasts.push(o.title) },
@@ -45,6 +47,23 @@ test('店员（职级 100）看不到，也不发请求', async t => {
   await comp.load()
   assert.equal(comp.data.hidden, true)
   assert.equal(env.calls.length, 0)
+})
+
+test('后端还没上线新接口（404）时：卡片静默隐藏，不弹提示', async t => {
+  const env = setup(t, { staff: MANAGER, handler: () => ({ __status: 404 }) })
+  const comp = loadComponent(FILE, {}, { orderId: 123 })
+  await comp.load()
+  assert.equal(comp.data.hidden, true)
+  assert.equal(comp.data.loading, false)
+  assert.deepEqual(env.toasts, [])
+  assert.deepEqual(env.modals, [])
+})
+
+test('服务端明确拒绝（业务错误）时仍然提示原因', async t => {
+  const env = setup(t, { staff: MANAGER, handler: () => ERR(3, '只有店长以上可以设置介绍人分账') })
+  const comp = loadComponent(FILE, {}, { orderId: 123 })
+  await comp.load()
+  assert.deepEqual(env.toasts, ['只有店长以上可以设置介绍人分账'])
 })
 
 test('不能设置时只显示原因，不请求介绍人名单', async t => {
