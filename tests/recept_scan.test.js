@@ -5,7 +5,8 @@ const { loadPage, settle, tap } = require('./reception_harness.js')
 
 const PAGE = 'pages/admin/reception/recept_scan.js'
 
-function setup(pollResult, queryCell) {
+// navFail：模拟 wx.navigateTo 没跳成功（调用 fail 回调），页面不能因此停在空白页
+function setup(pollResult, queryCell, { navFail = false } = {}) {
   const calls = { create: 0, poll: [], stop: [], recoverShop: [], queryCell: [] }
   const nav = []
   const toasts = []
@@ -15,7 +16,10 @@ function setup(pollResult, queryCell) {
     globalData: { sessionKey: 'sk', requestPrefix: 'https://api.example/api/' }
   })
   global.wx = {
-    navigateTo(o) { nav.push(o.url) },
+    navigateTo(o) {
+      nav.push(o.url)
+      if (navFail && o.fail) o.fail({ errMsg: 'navigateTo:fail' })
+    },
     showToast(o) { toasts.push(o.title) }
   }
   const fakeData = {
@@ -174,6 +178,53 @@ test('普通店员输手机号要等店长授权，授权后进入顾客信息�
   await settle()
   assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=phone_authed'])
   assert.equal(page.data.waitingAuth, false)
+  cleanup(page)
+})
+
+// 11-03 12:41～12:43 杨兴的手机：输号码放行后页面已清空，顾客信息页却没打开，只剩空白二维码框，再点确认只弹「二维码还没生成好」
+test('放行后跳顾客信息页没成功：不停在空白页，自动重新出码并提示再输一次手机号', async () => {
+  const { page, calls, nav, toasts } = setup(null, () => Promise.resolve({ id: 5, authed: 1 }), { navFail: true })
+  page.onShow()
+  await settle()
+  page.onCellInput({ detail: { value: '13800138000' } })
+  page.onSubmitCell()
+  await settle()
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=phone_authed'])
+  assert.deepEqual(toasts, ['打开顾客信息页没成功，已重新出码，请再输入手机号'])
+  assert.equal(calls.create, 2)
+  assert.equal(page.data.checkin.id, 6)
+  assert.match(page.data.qrCodeUrl, /rc_abcdefghij_6/)
+  assert.notEqual(page._pollTimer, null)
+  cleanup(page)
+})
+
+test('空白页（没有二维码、也没在出码）上点确认：重新出码并保留已输的手机号', async () => {
+  const { page, calls, toasts } = setup(null, () => Promise.resolve({ id: 6, authed: 1 }))
+  page.onShow()
+  await settle()
+  // 放行并清空页面之后、顾客信息页没打开的状态
+  page._stopPolling()
+  page.setData({ checkin: null, qrCodeUrl: '', stageText: '' })
+  page.onCellInput({ detail: { value: '13800138000' } })
+  page.onSubmitCell()
+  await settle()
+  assert.deepEqual(toasts, ['二维码正在重新生成，请稍候再点确认'])
+  assert.equal(calls.create, 2)
+  assert.equal(page.data.checkin.id, 6)
+  assert.equal(page.data.cell, '13800138000')
+  assert.deepEqual(calls.queryCell, [])
+  cleanup(page)
+})
+
+test('正在出码时点确认只提示等一等，不重复出码', async () => {
+  const { page, calls, toasts } = setup()
+  page.onShow()
+  page.onCellInput({ detail: { value: '13800138000' } })
+  page.onSubmitCell()
+  await settle()
+  assert.deepEqual(toasts, ['二维码还没生成好，请稍候'])
+  assert.equal(calls.create, 1)
+  assert.deepEqual(calls.queryCell, [])
   cleanup(page)
 })
 

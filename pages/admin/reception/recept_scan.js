@@ -67,13 +67,14 @@ Page({
   },
 
   /* ---------- 接待码 ---------- */
-  refreshCheckin() {
+  // keepCell：空白页上重新出码时保留店员已输的手机号
+  refreshCheckin(keepCell) {
     const that = this;
     if (that._creating) return;
     that._creating = true;
     that._stopPolling();
     that._discardUnusedCode();
-    that.setData({ loadingQr: true, checkin: null, qrCodeUrl: '', stageText: '', cell: '', waitingAuth: false, authText: '' });
+    that.setData({ loadingQr: true, checkin: null, qrCodeUrl: '', stageText: '', cell: keepCell ? that.data.cell : '', waitingAuth: false, authText: '' });
     Promise.resolve(app.loginPromiseNew).then(function () {
       return data.createReceptCheckinByStaffPromise(app.globalData.sessionKey);
     }).then(function (checkin) {
@@ -133,7 +134,15 @@ Page({
       this._stopPolling();
       const checkinId = this.data.checkin.id;
       this.setData({ checkin: null, qrCodeUrl: '', stageText: '', cell: '', waitingAuth: false, authText: '' });
-      wx.navigateTo({ url: MEMBER_PAGE + '?checkinId=' + checkinId + '&stage=' + view.stage });
+      wx.navigateTo({
+        url: MEMBER_PAGE + '?checkinId=' + checkinId + '&stage=' + view.stage,
+        // 页面已经清空，跳转没成功就不能停在空白页（11-03 杨兴手机：放行后顾客信息页没打开）：
+        // 重新出码，店员再输一次手机号（当天已授权，会直接放行）
+        fail: () => {
+          wx.showToast({ title: '打开顾客信息页没成功，已重新出码，请再输入手机号', icon: 'none' });
+          this.refreshCheckin();
+        }
+      });
     }
   },
 
@@ -146,7 +155,13 @@ Page({
     const checkin = this.data.checkin;
     const cell = normalizePhone(this.data.cell);
     if (!checkin) {
-      wx.showToast({ title: '二维码还没生成好，请稍候', icon: 'none' });
+      // 正在出码就等；没在出码（页面是空白的）就重新出，免得一直卡在这句提示
+      if (this._creating) {
+        wx.showToast({ title: '二维码还没生成好，请稍候', icon: 'none' });
+      } else {
+        wx.showToast({ title: '二维码正在重新生成，请稍候再点确认', icon: 'none' });
+        this.refreshCheckin(true);
+      }
       return;
     }
     if (!shouldLookupPhone(cell)) {
