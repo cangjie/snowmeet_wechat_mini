@@ -116,12 +116,12 @@ test('添加页：校验提示、请求体、机构要商户号和全称', async
   assert.equal(call.method, 'POST')
   assert.deepEqual(call.body, {
     memberId: 7, type: '机构', name: '某俱乐部', realName: '', wepayAccountNum: '1600000001', wepayAccountName: '某某公司',
-    aliAccountType: '', aliAccountNum: ''
+    aliAccountNum: ''
   })
   assert.equal(page.data.result.ok, true)
 })
 
-test('添加页：支付宝登录号要真实姓名；绑定失败时给出原因，介绍人仍保存', async t => {
+test('添加页：支付宝只填登录号；格式要是手机号或邮箱；要真实姓名；绑定失败时给出原因，介绍人仍保存', async t => {
   const env = setup(t, {
     staff: ADMIN,
     handler: (c, a) => {
@@ -132,11 +132,19 @@ test('添加页：支付宝登录号要真实姓名；绑定失败时给出原�
   const page = loadPage('pages/introducer/admin/add/add.js', {})
   page.onLoad()
   await settle()
+  assert.equal('aliAccountType' in page.data, false)   // 不再选登录号 / 用户号
   page.onCell({ detail: { value: '13691457006' } })
   await page.onLookup()
   page.onType(tap({ type: '教练' }))
-  page.onAliNum({ detail: { value: '13691457006' } })
 
+  for (const bad of ['2088000000000001', '1369145700', 'abc', 'a@b']) {
+    page.onAliNum({ detail: { value: bad } })
+    page.onSave()
+    assert.equal(env.toasts.pop(), '支付宝登录号要填手机号或邮箱', bad)
+  }
+  assert.equal(env.calls.filter(c => c.action === 'AddIntroducer').length, 0)
+
+  page.onAliNum({ detail: { value: '13691457006' } })
   page.onSave()
   assert.equal(env.toasts.pop(), '登录号要同时填真实姓名')
   assert.equal(env.calls.filter(c => c.action === 'AddIntroducer').length, 0)
@@ -146,11 +154,30 @@ test('添加页：支付宝登录号要真实姓名；绑定失败时给出原�
   const call = env.calls.find(c => c.action === 'AddIntroducer')
   assert.deepEqual(call.body, {
     memberId: 7, type: '教练', name: '张三', realName: '张三', wepayAccountNum: '', wepayAccountName: '',
-    aliAccountType: 'loginName', aliAccountNum: '13691457006'
+    aliAccountNum: '13691457006'
   })
   assert.equal(page.data.result.ok, false)
   assert.equal(page.data.result.title, '已保存，但支付宝绑定失败')
   assert.match(page.data.result.body, /账号与姓名不一致/)
+})
+
+test('添加页：支付宝登录号可以是邮箱', async t => {
+  const env = setup(t, {
+    staff: ADMIN,
+    handler: (c, a) => (a === 'LookupMember'
+      ? OK({ exists: true, memberId: 7, name: '张三', phoneTail: '7006', isCoach: false })
+      : OK(ROW({ id: 9, alipay: '已绑定' })))
+  })
+  const page = loadPage('pages/introducer/admin/add/add.js', {})
+  page.onLoad()
+  await settle()
+  page.onCell({ detail: { value: '13691457006' } })
+  await page.onLookup()
+  page.onRealName({ detail: { value: '张三' } })
+  page.onAliNum({ detail: { value: ' zhang.san@example.com ' } })
+  await page.onSave()
+  assert.equal(env.calls.find(c => c.action === 'AddIntroducer').body.aliAccountNum, 'zhang.san@example.com')
+  assert.equal(page.data.result.ok, true)
 })
 
 test('添加页：这个手机号还没有会员，不能保存', async t => {

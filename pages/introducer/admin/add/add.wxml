@@ -47,15 +47,11 @@
 
     <view class="card card-pad">
       <view class="section-title">4 · 支付宝收款（选填）</view>
-      <view class="seg">
-        <text class="seg-item {{aliAccountType === 'loginName' ? 'on' : ''}}" data-type="loginName" bindtap="onAliType">登录号（手机号或邮箱）</text>
-        <text class="seg-item {{aliAccountType === 'userId' ? 'on' : ''}}" data-type="userId" bindtap="onAliType">用户号（2088 开头）</text>
-      </view>
       <view class="field">
-        <view class="field-label"><text>{{aliAccountType === 'loginName' ? '支付宝登录号' : '支付宝用户号'}}</text></view>
-        <input class="input" value="{{aliAccountNum}}" bindinput="onAliNum" />
+        <view class="field-label"><text>支付宝登录号</text><text class="hint">手机号或邮箱</text></view>
+        <input class="input" placeholder="例如 13800001234 或 name@example.com" value="{{aliAccountNum}}" bindinput="onAliNum" />
       </view>
-      <view class="co-note">支付宝和微信一样，要先绑定分账关系。填了账号，保存时会自动去绑定。</view>
+      <view class="co-note">支付宝和微信一样，要先绑定分账关系。填了登录号，保存时会自动去绑定；绑定要核对上面的真实姓名，必须和支付宝实名一致。</view>
     </view>
 
     <view wx:if="{{result}}" class="note {{result.ok ? 'ok' : ''}}">

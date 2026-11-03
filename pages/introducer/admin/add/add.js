@@ -1,14 +1,17 @@
 // 添加介绍人（系统管理员）：先用手机号找到会员，再选类型。
-// 教练、KOL 的微信账号自动取会员在我们小程序里的 openid；机构填商户号和商户全称；支付宝账号选填，填了保存时自动去绑定分账关系。
+// 教练、KOL 的微信账号自动取会员在我们小程序里的 openid；机构填商户号和商户全称；支付宝只填登录号（手机号或邮箱，选填），填了保存时自动去绑定分账关系。
 const api = require('../../../../utils/introducer_api.js')
 
 const ADMIN_LEVEL = 300
+// 支付宝登录号：手机号（11 位，1 开头）或邮箱，和后端 IntroducerRules.IsValidAlipayLoginName 同一口径
+const ALI_PHONE = /^1\d{10}$/
+const ALI_EMAIL = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/
 
 Page({
   data: {
     blocked: '', cell: '', found: null, looking: false, saving: false,
     types: ['教练', 'KOL', '机构'], type: 'KOL', name: '', realName: '',
-    wepayAccountNum: '', wepayAccountName: '', aliAccountType: 'loginName', aliAccountNum: '', result: null
+    wepayAccountNum: '', wepayAccountName: '', aliAccountNum: '', result: null
   },
 
   onLoad() {
@@ -29,7 +32,6 @@ Page({
   onWepayName(e) { this.setData({ wepayAccountName: e.detail.value }) },
   onAliNum(e) { this.setData({ aliAccountNum: e.detail.value }) },
   onType(e) { this.setData({ type: e.currentTarget.dataset.type }) },
-  onAliType(e) { this.setData({ aliAccountType: e.currentTarget.dataset.type }) },
 
   onLookup() {
     const cell = (this.data.cell || '').trim()
@@ -52,12 +54,13 @@ Page({
     const isOrg = d.type === '机构'
     if (isOrg && (!d.wepayAccountNum.trim() || !d.wepayAccountName.trim())) { toast('机构要填商户号和商户全称'); return }
     const aliNum = d.aliAccountNum.trim()
-    if (aliNum && d.aliAccountType === 'loginName' && !d.realName.trim()) { toast('登录号要同时填真实姓名'); return }
+    if (aliNum && !(ALI_PHONE.test(aliNum) || ALI_EMAIL.test(aliNum))) { toast('支付宝登录号要填手机号或邮箱'); return }
+    if (aliNum && !d.realName.trim()) { toast('登录号要同时填真实姓名'); return }
     this.setData({ saving: true })
     return api.addIntroducer({
       memberId: d.found.memberId, type: d.type, name: d.name.trim(), realName: d.realName.trim(),
       wepayAccountNum: isOrg ? d.wepayAccountNum.trim() : '', wepayAccountName: isOrg ? d.wepayAccountName.trim() : '',
-      aliAccountType: aliNum ? d.aliAccountType : '', aliAccountNum: aliNum
+      aliAccountNum: aliNum
     }).then(v => {
       const failed = v.alipay === '未绑定'
       this.setData({
