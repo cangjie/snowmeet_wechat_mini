@@ -1,0 +1,28 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="chips">
+      <text wx:for="{{filters}}" wx:key="*this" class="chip {{filter === item ? 'on' : ''}}" data-name="{{item}}" bindtap="onFilter">{{item}} {{counts[item]}}</text>
+    </view>
+    <view wx:for="{{rows}}" wx:key="id" class="card card-pad" style="{{item.valid ? '' : 'opacity: 0.65;'}}">
+      <view class="card-row wrap" style="gap: 12rpx;">
+        <text class="card-title">{{item.name}}</text>
+        <text class="tag {{item.typeClass}}">{{item.type}}</text>
+        <text wx:if="{{!item.valid}}" class="tag muted">已停用</text>
+      </view>
+      <view class="card-row wrap" style="gap: 12rpx;">
+        <text class="tag {{item.wechatClass}}">微信 {{item.wechat}}</text>
+        <text class="tag {{item.alipayClass}}">支付宝 {{item.alipay}}</text>
+      </view>
+      <view wx:if="{{item.alipay === '未绑定'}}" class="card-meta">支付宝还没有绑定分账关系：这位介绍人在支付宝付款订单上的分账会走手动转账。</view>
+      <view class="btn-row">
+        <view wx:if="{{item.alipay === '未绑定'}}" class="btn" data-id="{{item.id}}" bindtap="onRebind">重新绑定支付宝</view>
+        <view class="btn {{item.valid ? 'danger' : ''}}" data-id="{{item.id}}" data-valid="{{item.valid}}" bindtap="onToggle">{{item.valid ? '停用' : '启用'}}</view>
+      </view>
+    </view>
+    <view wx:if="{{!rows.length && !loading}}" class="co-empty">还没有介绍人，点下方「添加介绍人」</view>
+  </block>
+</view>
+<view wx:if="{{!blocked}}" class="bottom-bar">
+  <view class="btn primary" bindtap="onAdd">添加介绍人</view>
+</view>

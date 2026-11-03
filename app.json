@@ -149,6 +149,14 @@
       ]
     },
     {
+      "root": "pages/introducer",
+      "name": "introducer",
+      "pages": [
+        "admin/list/list",
+        "admin/add/add"
+      ]
+    },
+    {
       "root": "pages/staffadmin",
       "name": "staffadmin",
       "pages": [

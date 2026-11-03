@@ -433,6 +433,9 @@
     </view>
   </view>
 
+  <!-- ── 介绍人分账（店长以上可见，关单后可设置）──────────── -->
+  <order-share-editor wx:if="{{order.id}}" order-id="{{order.id}}"/>
+
   <!-- ── Card 4: 退款 ─────────────────────── -->
   <view class="card">
     <view class="section-title" bindtap="onToggleRefund">

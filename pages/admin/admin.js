@@ -195,6 +195,9 @@ Page({
       case 'coach_admin':
         path = '/pages/coach/admin/list/list'
         break
+      case 'introducer_admin':
+        path = '/pages/introducer/admin/list/list'
+        break
       case 'maintain_return':
         path = '/pages/admin/maintain/return_entry'
         break

@@ -1,0 +1,39 @@
+<view wx:if="{{!hidden}}" class="ose-card">
+  <view class="ose-head">
+    <text class="ose-title">介绍人分账</text>
+    <text class="ose-side">店长以上可设置 · 关单后</text>
+  </view>
+
+  <view wx:for="{{shares}}" wx:key="orderShareId" class="ose-row">
+    <view class="ose-line">
+      <view class="ose-name">
+        <text class="ose-bold">{{item.name}}</text>
+        <text class="ose-tag blue">{{item.type}}</text>
+      </view>
+      <text class="ose-bold">¥{{item.amount}}</text>
+    </view>
+    <view class="ose-line">
+      <text class="ose-tag {{item.stateClass}}">{{item.state}}</text>
+      <text wx:if="{{item.removable}}" class="ose-remove" data-id="{{item.orderShareId}}" bindtap="onRemove">删除</text>
+    </view>
+    <view wx:if="{{item.memo}}" class="ose-meta">备注：{{item.memo}}</view>
+  </view>
+  <view wx:if="{{!shares.length && !loading}}" class="ose-meta">还没有设置介绍人分账</view>
+
+  <view wx:if="{{canEdit}}" class="ose-form">
+    <view class="ose-label">选择介绍人</view>
+    <view wx:if="{{!choices.length}}" class="ose-meta">还没有可选的介绍人，请系统管理员先在「介绍人管理」里添加</view>
+    <view wx:for="{{choices}}" wx:key="id" class="ose-pick {{form.introducerId === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="onPick">
+      <text class="ose-bold">{{item.name}}</text>
+      <text class="ose-tag blue">{{item.type}}</text>
+    </view>
+    <view class="ose-label">分账金额（元）</view>
+    <input class="ose-input" type="digit" value="{{form.amount}}" bindinput="onAmount" />
+    <view wx:if="{{suggested > 0}}" class="ose-meta">预填：租金（扣减免后）的 10% = ¥{{suggested}}，可以改</view>
+    <view class="ose-label">备注（选填）</view>
+    <input class="ose-input" value="{{form.memo}}" bindinput="onMemo" maxlength="40" />
+    <view class="ose-save {{saving ? 'disabled' : ''}}" bindtap="onSave">保存介绍人分账</view>
+    <view class="ose-meta">合计（万龙 + 介绍人）达到门槛时，这单所有分账都走手动转账；没达到的，夜间 23:00 自动分账。</view>
+  </view>
+  <view wx:elif="{{reason}}" class="ose-reason">{{reason}}</view>
+</view>

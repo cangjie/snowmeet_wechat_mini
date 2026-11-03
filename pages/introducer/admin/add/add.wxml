@@ -1,0 +1,70 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card card-pad">
+      <view class="section-title">1 · 找到会员</view>
+      <view class="field">
+        <view class="field-label"><text>会员手机号</text></view>
+        <view class="card-row">
+          <input class="input grow" type="number" maxlength="11" placeholder="输入手机号查找会员" value="{{cell}}" bindinput="onCell" />
+          <view class="btn {{looking ? 'disabled' : ''}}" bindtap="onLookup">{{looking ? '查找中' : '查找'}}</view>
+        </view>
+      </view>
+      <view wx:if="{{found && found.exists}}" class="note ok">找到会员：{{found.name}}（尾号 {{found.phoneTail}}）<text wx:if="{{found.isCoach}}">，已经是教练</text></view>
+      <view wx:elif="{{found}}" class="note">这个手机号还没有会员。介绍人必须先是我们的会员。</view>
+    </view>
+
+    <view class="card card-pad">
+      <view class="section-title">2 · 类型和名称</view>
+      <view class="seg">
+        <text wx:for="{{types}}" wx:key="*this" class="seg-item {{type === item ? 'on' : ''}}" data-type="{{item}}" bindtap="onType">{{item}}</text>
+      </view>
+      <view wx:if="{{type === '教练'}}" class="co-note">教练一般在「教练管理」里添加。这里添加的教练类介绍人，不会自动关联教练记录。</view>
+      <view class="field">
+        <view class="field-label"><text>显示名称</text></view>
+        <input class="input" placeholder="例如 张教练" value="{{name}}" bindinput="onName" maxlength="20" />
+      </view>
+      <view class="field">
+        <view class="field-label"><text>真实姓名</text><text class="hint">支付宝登录号绑定时要核对</text></view>
+        <input class="input" placeholder="选填；填支付宝登录号时必填" value="{{realName}}" bindinput="onRealName" maxlength="20" />
+      </view>
+    </view>
+
+    <view class="card card-pad">
+      <view class="section-title">3 · 微信收款</view>
+      <block wx:if="{{type === '机构'}}">
+        <view class="field">
+          <view class="field-label"><text>商户号（必填）</text></view>
+          <input class="input" type="number" value="{{wepayAccountNum}}" bindinput="onWepayNum" />
+        </view>
+        <view class="field">
+          <view class="field-label"><text>商户全称（必填）</text></view>
+          <input class="input" value="{{wepayAccountName}}" bindinput="onWepayName" />
+        </view>
+      </block>
+      <view wx:else class="note blue">自动取这位会员在我们小程序里的 openid，不用填。会员没用过我们的小程序时取不到，这位介绍人的微信分账会走手动转账。</view>
+    </view>
+
+    <view class="card card-pad">
+      <view class="section-title">4 · 支付宝收款（选填）</view>
+      <view class="seg">
+        <text class="seg-item {{aliAccountType === 'loginName' ? 'on' : ''}}" data-type="loginName" bindtap="onAliType">登录号（手机号或邮箱）</text>
+        <text class="seg-item {{aliAccountType === 'userId' ? 'on' : ''}}" data-type="userId" bindtap="onAliType">用户号（2088 开头）</text>
+      </view>
+      <view class="field">
+        <view class="field-label"><text>{{aliAccountType === 'loginName' ? '支付宝登录号' : '支付宝用户号'}}</text></view>
+        <input class="input" value="{{aliAccountNum}}" bindinput="onAliNum" />
+      </view>
+      <view class="co-note">支付宝和微信一样，要先绑定分账关系。填了账号，保存时会自动去绑定。</view>
+    </view>
+
+    <view wx:if="{{result}}" class="note {{result.ok ? 'ok' : ''}}">
+      <view style="font-weight: 600;">{{result.title}}</view>
+      <view>{{result.body}}</view>
+    </view>
+  </block>
+</view>
+<view wx:if="{{!blocked}}" class="bottom-bar">
+  <view wx:if="{{result}}" class="btn primary" bindtap="onDone">完成，返回列表</view>
+  <view wx:else class="btn primary {{saving ? 'disabled' : ''}}" bindtap="onSave">{{aliAccountNum ? '保存并绑定支付宝' : '保存'}}</view>
+</view>
