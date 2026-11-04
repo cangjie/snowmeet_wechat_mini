@@ -365,6 +365,9 @@
       <scroll-view scroll-y class="history-list">
         <view class="history-item" wx:for="{{historyModal.list}}" wx:key="index"
               data-idx="{{index}}" catchtap="onHistoryPick">
+          <image wx:if="{{item._photoUrl}}" class="history-item-photo"
+               src="{{item._photoUrl}}" mode="aspectFill" lazy-load
+               data-idx="{{index}}" catchtap="onHistoryPhotoTap"/>
           <view class="history-item-main">
             <text class="history-item-brand">{{item._brandDisp}}</text>
             <text wx:if="{{item.scale}}" class="history-item-scale">{{item.scale}}cm</text>

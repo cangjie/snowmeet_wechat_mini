@@ -97,11 +97,11 @@
   <!-- 统计行 + 分页 -->
   <view wx:if="{{total > 0}}" class="summary-section">
     <view class="summary-bar">
-      <text>共 {{total}} 单</text>
-      <text class="summary-sep">·</text>
       <text>本页收款 {{totalEarnStr}}</text>
       <text class="summary-sep">·</text>
-      <text>按时间倒序</text>
+      <text>共 {{total}} 单，{{totalPages}} 页</text>
+      <text class="summary-sep">·</text>
+      <text>共计收款 {{allEarnStr}}</text>
     </view>
     <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
                 disabled="{{querying}}" bind:change="onPagerChange" />

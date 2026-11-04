@@ -5,11 +5,14 @@ const { loadPage, settle, tap } = require('./reception_harness.js')
 
 const PAGE = 'pages/admin/reception/recept_scan.js'
 
+// enterByPhone：服务器一次建好接待记录、写手机号、判授权的返回（QrCode/EnterReceptByPhone），不设置就是「用户不存在」
 // navFail：模拟 wx.navigateTo 没跳成功（调用 fail 回调），页面不能因此停在空白页
-function setup(pollResult, queryCell, { navFail = false } = {}) {
-  const calls = { create: 0, poll: [], stop: [], recoverShop: [], queryCell: [] }
+// slowCreate：出码请求一直不返回，直到 releaseCreate()，模拟「二维码还没出来」
+function setup(pollResult, enterByPhone, { navFail = false, slowCreate = false } = {}) {
+  const calls = { create: 0, poll: [], stop: [], recoverShop: [], enter: [] }
   const nav = []
   const toasts = []
+  const pendingCreates = []
   let nextId = 5
   global.getApp = () => ({
     loginPromiseNew: Promise.resolve(),
@@ -26,14 +29,16 @@ function setup(pollResult, queryCell, { navFail = false } = {}) {
     createReceptCheckinByStaffPromise() {
       calls.create++
       const id = nextId++
-      return Promise.resolve({ id, code: 'rc_abcdefghij_' + id, qrText: 'https://mini.snowmeet.top/mapp/recept_checkin?code=rc_abcdefghij_' + id, stage: 'waiting_scan' })
+      const checkin = { id, code: 'rc_abcdefghij_' + id, qrText: 'https://mini.snowmeet.top/mapp/recept_checkin?code=rc_abcdefghij_' + id, stage: 'waiting_scan' }
+      if (!slowCreate) return Promise.resolve(checkin)
+      return new Promise(resolve => pendingCreates.push(() => resolve(checkin)))
     },
     getReceptCheckinByStaffPromise(id) {
       calls.poll.push(id)
       return Promise.resolve(pollResult ? pollResult() : { code: 0, data: { stage: 'waiting_scan' } })
     },
     stopScanQrCodePromise(id) { calls.stop.push(id); return Promise.resolve() },
-    queryReceptCellPromise(id, cell) { calls.queryCell.push([id, cell]); return queryCell ? queryCell(id, cell) : Promise.reject('用户不存在') },
+    enterReceptByPhonePromise(cell) { calls.enter.push(cell); return enterByPhone ? enterByPhone(cell) : Promise.reject('用户不存在') },
     getRentReceptingOrdersPromise(shop) {
       calls.recoverShop.push(shop)
       return Promise.resolve([{ id: 88, contact_name: '张三', contact_gender: '男', contact_num: '13800138000', biz_date: '2026-10-22T10:00:00' }])
@@ -41,7 +46,7 @@ function setup(pollResult, queryCell, { navFail = false } = {}) {
   }
   const page = loadPage(PAGE, fakeData)
   page.onLoad()
-  return { page, calls, nav, toasts }
+  return { page, calls, nav, toasts, releaseCreate: () => pendingCreates.splice(0).forEach(resolve => resolve()) }
 }
 
 function cleanup(page) {
@@ -142,54 +147,60 @@ test('找回今天所有店铺中断的订单，按单子上的店铺恢复', as
 })
 
 test('店长输会员手机号直接通过，进入顾客信息页', async () => {
-  const { page, calls, nav, toasts } = setup(null, () => Promise.resolve({ id: 5, authed: 1 }))
+  const { page, calls, nav, toasts } = setup(null, () => Promise.resolve({ id: 50, stage: 'phone_authed', memberId: 42 }))
   page.onShow()
   await settle()
   page.onCellInput({ detail: { value: ' 13800138000 ' } })
   page.onSubmitCell()
   await settle()
-  assert.deepEqual(calls.queryCell, [[5, '13800138000']])
-  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=phone_authed'])
+  assert.deepEqual(calls.enter, ['13800138000'])
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=50&stage=phone_authed'])
   assert.equal(page.data.checkin, null)
+  // 页面上没人扫的那张二维码作废，免得过后有人扫到、一直等不到开单
+  assert.deepEqual(calls.stop, [5])
   assert.deepEqual(toasts, [])
   cleanup(page)
 })
 
 test('普通店员输手机号要等店长授权，授权后进入顾客信息页', async () => {
   let stage = { stage: 'need_auth', name: '张三', maskedCell: '138****8000' }
-  const { page, nav, toasts } = setup(() => ({ code: 0, data: stage }), () => Promise.resolve({ id: 5, authed: 0 }))
+  const { page, calls, nav, toasts } = setup(() => ({ code: 0, data: stage }),
+    () => Promise.resolve({ id: 50, stage: 'need_auth', name: '张三', maskedCell: '138****8000' }))
   page.onShow()
   await settle()
   page.onCellInput({ detail: { value: '13800138000' } })
   page.onSubmitCell()
   await settle()
   assert.equal(page.data.waitingAuth, true)
-  assert.match(page.data.authText, /138\*\*\*\*8000/)
+  assert.match(page.data.authText, /张三 138\*\*\*\*8000/)
   assert.deepEqual(toasts, ['需要店长授权'])
   assert.notEqual(page._pollTimer, null)
+  // 之后轮询、授权后跳转的都是手机号这条记录；页面上原来那张二维码作废
+  assert.equal(page.data.checkin.id, 50)
+  assert.deepEqual(calls.stop, [5])
 
   page.pollCheckin()
   await settle()
-  assert.match(page.data.authText, /张三 138\*\*\*\*8000/)
+  assert.equal(calls.poll[calls.poll.length - 1], 50)
   assert.deepEqual(nav, [])
 
   stage = { stage: 'phone_authed', memberId: 42 }
   page.pollCheckin()
   await settle()
-  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=phone_authed'])
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=50&stage=phone_authed'])
   assert.equal(page.data.waitingAuth, false)
   cleanup(page)
 })
 
 // 11-03 12:41～12:43 杨兴的手机：输号码放行后页面已清空，顾客信息页却没打开，只剩空白二维码框，再点确认只弹「二维码还没生成好」
 test('放行后跳顾客信息页没成功：不停在空白页，自动重新出码并提示再输一次手机号', async () => {
-  const { page, calls, nav, toasts } = setup(null, () => Promise.resolve({ id: 5, authed: 1 }), { navFail: true })
+  const { page, calls, nav, toasts } = setup(null, () => Promise.resolve({ id: 50, stage: 'phone_authed' }), { navFail: true })
   page.onShow()
   await settle()
   page.onCellInput({ detail: { value: '13800138000' } })
   page.onSubmitCell()
   await settle()
-  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=5&stage=phone_authed'])
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=50&stage=phone_authed'])
   assert.deepEqual(toasts, ['打开顾客信息页没成功，已重新出码，请再输入手机号'])
   assert.equal(calls.create, 2)
   assert.equal(page.data.checkin.id, 6)
@@ -198,38 +209,77 @@ test('放行后跳顾客信息页没成功：不停在空白页，自动重新�
   cleanup(page)
 })
 
-test('空白页（没有二维码、也没在出码）上点确认：重新出码并保留已输的手机号', async () => {
-  const { page, calls, toasts } = setup(null, () => Promise.resolve({ id: 6, authed: 1 }))
+// 手机号进入不依赖页面上的二维码：服务器一次建好接待记录，页面是空白的、二维码还没出来，都不影响
+test('页面是空白的（没有二维码、也没在出码）时，手机号照样直接进入，不弹任何提示', async () => {
+  const { page, calls, nav, toasts } = setup(null, () => Promise.resolve({ id: 50, stage: 'phone_authed' }))
   page.onShow()
   await settle()
-  // 放行并清空页面之后、顾客信息页没打开的状态
   page._stopPolling()
   page.setData({ checkin: null, qrCodeUrl: '', stageText: '' })
   page.onCellInput({ detail: { value: '13800138000' } })
   page.onSubmitCell()
   await settle()
-  assert.deepEqual(toasts, ['二维码正在重新生成，请稍候再点确认'])
-  assert.equal(calls.create, 2)
-  assert.equal(page.data.checkin.id, 6)
-  assert.equal(page.data.cell, '13800138000')
-  assert.deepEqual(calls.queryCell, [])
+  assert.deepEqual(toasts, [])
+  assert.deepEqual(calls.enter, ['13800138000'])
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_member?checkinId=50&stage=phone_authed'])
   cleanup(page)
 })
 
-test('正在出码时点确认只提示等一等，不重复出码', async () => {
-  const { page, calls, toasts } = setup()
-  page.onShow()
+test('二维码还在生成时就输手机号：不用等；后来才生成好的码直接作废，页面不受影响', async () => {
+  const { page, calls, toasts, releaseCreate } = setup(null,
+    () => Promise.resolve({ id: 50, stage: 'need_auth', name: '张三', maskedCell: '138****8000' }), { slowCreate: true })
+  page.onShow()                                  // 出码请求还没返回
   page.onCellInput({ detail: { value: '13800138000' } })
   page.onSubmitCell()
   await settle()
-  assert.deepEqual(toasts, ['二维码还没生成好，请稍候'])
+  assert.deepEqual(toasts, ['需要店长授权'])
+  assert.equal(page.data.waitingAuth, true)
+  assert.equal(page.data.checkin.id, 50)
+  assert.equal(page.data.loadingQr, false)
+
+  releaseCreate()
+  await settle()
+  assert.deepEqual(calls.stop, [5])              // 迟到的二维码作废了
+  assert.equal(page.data.checkin.id, 50)         // 没有顶掉手机号这条记录
+  assert.equal(page.data.qrCodeUrl, '')
+  assert.equal(page.data.waitingAuth, true)
   assert.equal(calls.create, 1)
-  assert.deepEqual(calls.queryCell, [])
+  cleanup(page)
+})
+
+test('手机号进入后回到本页，重新出码不被还没返回的旧请求挡住', async () => {
+  const { page, calls, releaseCreate } = setup(null, () => Promise.resolve({ id: 50, stage: 'phone_authed' }), { slowCreate: true })
+  page.onShow()                                  // 第一次出码，一直没返回
+  page.onCellInput({ detail: { value: '13800138000' } })
+  page.onSubmitCell()
+  await settle()
+  page.onHide()
+  page.onShow()                                  // 从顾客信息页回来，要重新出码
+  await settle()
+  assert.equal(calls.create, 2)
+
+  releaseCreate()
+  await settle()
+  assert.deepEqual(calls.stop, [5])              // 第一次迟到的码作废
+  assert.equal(page.data.checkin.id, 6)          // 页面上是第二次出的码
+  assert.match(page.data.qrCodeUrl, /rc_abcdefghij_6/)
+  cleanup(page)
+})
+
+test('连点两下确认只提交一次', async () => {
+  const { page, calls } = setup(null, () => Promise.resolve({ id: 50, stage: 'need_auth' }))
+  page.onShow()
+  await settle()
+  page.onCellInput({ detail: { value: '13800138000' } })
+  page.onSubmitCell()
+  page.onSubmitCell()
+  await settle()
+  assert.deepEqual(calls.enter, ['13800138000'])
   cleanup(page)
 })
 
 test('不等授权了：作废这次提交，重新出码', async () => {
-  const { page, calls } = setup(() => ({ code: 0, data: { stage: 'need_auth' } }), () => Promise.resolve({ id: 5, authed: 0 }))
+  const { page, calls } = setup(() => ({ code: 0, data: { stage: 'need_auth' } }), () => Promise.resolve({ id: 50, stage: 'need_auth' }))
   page.onShow()
   await settle()
   page.onCellInput({ detail: { value: '13800138000' } })
@@ -237,28 +287,30 @@ test('不等授权了：作废这次提交，重新出码', async () => {
   await settle()
   page.onCancelAuthTap()
   await settle()
-  assert.deepEqual(calls.stop, [5])
+  assert.deepEqual(calls.stop, [5, 50])          // 原来那张二维码、手机号这条记录都作废
   assert.equal(page.data.waitingAuth, false)
   assert.equal(page.data.cell, '')
   assert.equal(page.data.checkin.id, 6)
   cleanup(page)
 })
 
-test('手机号不完整不提交；不是会员时停在本页', async () => {
+test('手机号不完整不提交；不是会员时停在本页，二维码照旧', async () => {
   const { page, calls, nav, toasts } = setup()
   page.onShow()
   await settle()
   page.onCellInput({ detail: { value: '13800' } })
   page.onSubmitCell()
   assert.deepEqual(toasts, ['请输入完整手机号'])
-  assert.deepEqual(calls.queryCell, [])
+  assert.deepEqual(calls.enter, [])
 
   page.onCellInput({ detail: { value: '13900139000' } })
   page.onSubmitCell()
   await settle()
-  assert.deepEqual(calls.queryCell, [[5, '13900139000']])
+  assert.deepEqual(calls.enter, ['13900139000'])
   assert.equal(page.data.waitingAuth, false)
   assert.deepEqual(nav, [])
+  assert.equal(page.data.checkin.id, 5)
+  assert.deepEqual(calls.stop, [])
   cleanup(page)
 })
 

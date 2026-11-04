@@ -77,7 +77,7 @@
       <view wx:if="{{member}}"
         class="update-btn {{needUpdate ? '' : 'update-btn--disabled'}}"
         bindtap="onUpdateMemberTap">更新顾客信息</view>
-      <view class="form-tip">{{member ? '修改的电话和称呼只用于本次订单；点「更新顾客信息」才会改会员资料。' : '散客的电话和称呼都可以不填。'}}</view>
+      <view class="form-tip">{{member ? '会员资料空缺时补填后会自动保存；已有资料修改后可选择更新会员、仅用于本单或放弃修改。' : '散客的电话和称呼都可以不填。'}}</view>
     </view>
 
     <!-- 选择店铺：shop-selector 内部调 Order/GetShops + beacon 自动选店 -->

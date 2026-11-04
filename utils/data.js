@@ -1094,6 +1094,14 @@ const queryReceptCellPromise = function (checkinId, cell, sessionKey) {
     + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   return util.performWebRequest(url, undefined)
 }
+// 店员在出码页输手机号进入（取代 queryReceptCellPromise）：服务器一次建好接待记录、写手机号、判授权，
+// 不依赖页面上的二维码。返回 { id, stage: 'phone_authed' | 'need_auth', memberId, name, maskedCell }；
+// 不是会员时 performWebRequest 会提示「用户不存在」。后端要先部署 QrCode/EnterReceptByPhone
+const enterReceptByPhonePromise = function (cell, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/EnterReceptByPhone?cell=' + encodeURIComponent(cell)
+    + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
 // 店长：今天店员提交的手机号进入申请（含已授权的）
 const getTodayAuthCellListPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'QrCode/GetTodayAuthCellList'
@@ -2038,6 +2046,7 @@ module.exports = {
   getReceptCheckinByCustomerPromise,
   updateMemberInfoByStaffPromise,
   queryReceptCellPromise,
+  enterReceptByPhonePromise,
   createCarePickByStaffPromise,
   getCarePickByStaffPromise,
   verifyCarePickPromise,

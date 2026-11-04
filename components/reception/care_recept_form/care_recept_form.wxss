@@ -64,6 +64,8 @@
 /* 历史装备弹层 */
 .history-modal {
   padding: 32rpx 0 calc(16rpx + env(safe-area-inset-bottom));
+  max-height: 90vh;
+  box-sizing: border-box;
 }
 .history-modal-title {
   font-size: 32rpx;
@@ -78,7 +80,7 @@
   margin-top: 8rpx;
 }
 .history-list {
-  max-height: 480rpx;
+  max-height: 58vh;
   margin-top: 16rpx;
 }
 .history-item {
@@ -97,6 +99,13 @@
   align-items: baseline;
   gap: 16rpx;
   min-width: 0;
+}
+.history-item-photo {
+  flex: none;
+  width: 115rpx;
+  height: 115rpx;
+  border-radius: 8rpx;
+  background: #f3f5f8;
 }
 .history-item-brand {
   font-size: 30rpx;

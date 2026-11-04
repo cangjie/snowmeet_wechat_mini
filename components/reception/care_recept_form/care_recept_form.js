@@ -17,6 +17,11 @@ const cardRules = require('../../../utils/careCardSale.js');
 // 与 data.js uploadFilePromise 的上传域名保持一致（文件落在处理上传那台服务器的磁盘）
 const UPLOAD_HOST = data.IMAGE_HOST;
 
+function uploadUrl(value) {
+  if (!value) return '';
+  return /^(https?:|wxfile:)/.test(value) ? value : UPLOAD_HOST + value;
+}
+
 // 万龙服务中心「只选了刮蜡」：一口价（服务端定价），不选任何券、会员卡、学员卡。
 // 这里只用来决定「要不要自动带老顾客券」；价格、以及已选券卡的清除都以服务端 CalcCareCharge 为准
 // （后端 CarePricingRules.AppliesScrapeOnlyPrice 同一口径：先把万龙体验中心归并到服务中心）。
@@ -594,6 +599,8 @@ Component({
           ...it,
           _brandDisp: it.brand ? String(it.brand).split('/')[0] : '',
           _dateStr: it.last_care_date ? String(it.last_care_date).slice(0, 10) : '',
+          _photoUrl: uploadUrl(it.photoUrl),
+          _photoPreviewUrl: uploadUrl(it.photoFullUrl || it.photoUrl),
         }));
         const brandListView = that._brandListFor({ equipment: equip }).map((b) => b.displayedName);
         that.setData({
@@ -603,6 +610,12 @@ Component({
           },
         });
       }).catch(() => {}); // 查询失败静默降级为页面填写
+    },
+    onHistoryPhotoTap(e) {
+      const idx = Number(e.currentTarget.dataset.idx);
+      const item = this.data.historyModal.list[idx];
+      if (!item || !item._photoPreviewUrl) return;
+      wx.previewImage({ current: item._photoPreviewUrl, urls: [item._photoPreviewUrl] });
     },
     onHistoryPick(e) {
       const idx = Number(e.currentTarget.dataset.idx);

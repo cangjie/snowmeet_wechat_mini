@@ -23,32 +23,39 @@ function setup(pollResult, options) {
   const calls = { poll: [], getMember: [], update: [], lookup: [] }
   const nav = []
   const modals = []
+  const actionSheets = []
   const toasts = []
   const storage = {}
-  const stored = memberRecord()
+  const events = []
+  const stored = JSON.parse(JSON.stringify(opts.memberRecord || memberRecord()))
   global.getApp = () => ({ loginPromiseNew: Promise.resolve(), globalData: { sessionKey: 'sk' } })
   global.wx = {
-    navigateTo(o) { nav.push(o.url) },
+    navigateTo(o) { nav.push(o.url); events.push('navigate') },
     setStorageSync(k, v) { storage[k] = v },
     showToast(o) { toasts.push(o.title) },
     showLoading() {},
     hideLoading() {},
-    showModal(o) { modals.push(o); if (o.success) o.success({ confirm: true }) }
+    showModal(o) { modals.push(o); if (o.success) o.success({ confirm: true }) },
+    showActionSheet(o) { actionSheets.push(o) }
   }
   const fakeData = {
     getReceptCheckinByStaffPromise(id) { calls.poll.push(id); return Promise.resolve(pollResult()) },
     getMemberPromise(id) { calls.getMember.push(id); return Promise.resolve(JSON.parse(JSON.stringify(stored))) },
     updateMemberInfoByStaffPromise(member, scene) {
       calls.update.push({ member, scene })
+      events.push('update')
+      if (opts.updateFails) return Promise.reject(new Error('保存失败'))
       stored.real_name = member.real_name
       stored.gender = member.gender
-      if (member.currentContactNum) stored.contactNums.push({ id: 3, member_id: 42, type: 'contact', num: member.currentContactNum, valid: 1 })
-      return Promise.resolve(stored)
+      if (member.currentContactNum && !stored.contactNums.some(contact => contact.num === member.currentContactNum)) {
+        stored.contactNums.push({ id: 3, member_id: 42, type: 'contact', num: member.currentContactNum, valid: 1 })
+      }
+      return Promise.resolve(JSON.parse(JSON.stringify(stored)))
     },
     getMemberByNumSilentPromise(cell) { calls.lookup.push(cell); return Promise.resolve(opts.lookup ? opts.lookup(cell) : null) }
   }
   const page = loadPage(PAGE, fakeData)
-  return { page, calls, nav, modals, toasts, storage }
+  return { page, calls, nav, modals, actionSheets, events, toasts, storage }
 }
 
 function cleanup(page) {
@@ -60,6 +67,12 @@ function cleanup(page) {
 async function openVerified(env) {
   env.page.onLoad({ checkinId: '5', stage: 'verified' })
   env.page.onShow()
+  await settle()
+  await settle()
+}
+
+async function chooseAction(env, tapIndex) {
+  env.actionSheets[0].success({ tapIndex })
   await settle()
   await settle()
 }
@@ -134,10 +147,10 @@ test('店员输手机号已授权：直接显示会员信息，不弹窗', async
   cleanup(env.page)
 })
 
-test('改称呼和电话只带进本次订单，不改会员资料', async () => {
+test('已编辑的称呼和电话可选择只作为本次订单联系人', async () => {
   const env = setup(() => VERIFIED)
   await openVerified(env)
-  const { page, calls, nav } = env
+  const { page, calls, nav, actionSheets } = env
   page.onNameInput({ detail: { value: '张三丰' } })
   page.onGenderTap(tap({ value: '女' }))
   page.onCellInput({ detail: { value: '13900139000' } })
@@ -146,11 +159,122 @@ test('改称呼和电话只带进本次订单，不改会员资料', async () =>
 
   page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
   page.onBizTap(tap({ type: 'rent' }))
+  assert.equal(actionSheets.length, 1)
+  assert.deepEqual(actionSheets[0].itemList, ['更新会员信息', '保存为本订单临时联系人', '放弃修改'])
+  assert.deepEqual(nav, [])
+  await chooseAction(env, 1)
   assert.match(nav[0], /customerName=%E5%BC%A0%E4%B8%89%E4%B8%B0/)
   assert.match(nav[0], /gender=%E5%A5%B3/)
   assert.match(nav[0], /customerCell=13900139000/)
   assert.match(nav[0], /memberId=42/)
   assert.deepEqual(calls.update, [])
+  cleanup(page)
+})
+
+test('称呼性别重复点选保持选中，点另一项时切换', async () => {
+  const env = setup(() => VERIFIED)
+  await openVerified(env)
+  const { page } = env
+
+  page.onGenderTap(tap({ value: '男' }))
+  assert.equal(page.data.form.gender, '男')
+  page.onGenderTap(tap({ value: '女' }))
+  assert.equal(page.data.form.gender, '女')
+  page.onGenderTap(tap({ value: '女' }))
+  assert.equal(page.data.form.gender, '女')
+
+  cleanup(page)
+})
+
+test('已有会员姓名和性别都为空时，填写后点业务自动保存再导航', async () => {
+  const emptyMember = memberRecord()
+  emptyMember.real_name = ''
+  emptyMember.gender = ''
+  const env = setup(() => VERIFIED, { memberRecord: emptyMember })
+  const { page, calls, nav, events } = env
+  await openVerified(env)
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
+
+  page.onBizTap(tap({ type: 'maintain' }))
+  assert.deepEqual(nav, [])
+  await settle()
+  await settle()
+
+  assert.equal(calls.update.length, 1)
+  assert.equal(calls.update[0].member.real_name, '张三')
+  assert.equal(calls.update[0].member.gender, '男')
+  assert.equal(events.indexOf('update') < events.indexOf('navigate'), true)
+  assert.equal(nav.length, 1)
+  assert.match(nav[0], /memberId=42/)
+  assert.deepEqual(env.toasts, ['会员信息已自动保存'])
+  cleanup(page)
+})
+
+test('修改已有会员资料后选择更新，保存成功后才进入业务', async () => {
+  const env = setup(() => VERIFIED)
+  const { page, calls, nav, actionSheets, events } = env
+  await openVerified(env)
+  page.onNameInput({ detail: { value: '张三丰' } })
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
+
+  page.onBizTap(tap({ type: 'retail' }))
+  assert.equal(actionSheets.length, 1)
+  assert.deepEqual(nav, [])
+  await chooseAction(env, 0)
+
+  assert.equal(calls.update.length, 1)
+  assert.equal(calls.update[0].member.real_name, '张三丰')
+  assert.equal(events.indexOf('update') < events.indexOf('navigate'), true)
+  assert.equal(nav.length, 1)
+  assert.match(nav[0], /bizType=retail/)
+  cleanup(page)
+})
+
+test('放弃修改恢复原会员资料后继续开单', async () => {
+  const env = setup(() => VERIFIED)
+  const { page, calls, nav } = env
+  await openVerified(env)
+  page.onNameInput({ detail: { value: '临时姓名' } })
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
+
+  page.onBizTap(tap({ type: 'rent' }))
+  await chooseAction(env, 2)
+
+  assert.deepEqual(calls.update, [])
+  assert.deepEqual(page.data.form, { name: '张三', gender: '男', cell: '13800138000' })
+  assert.match(nav[0], /customerName=%E5%BC%A0%E4%B8%89/)
+  assert.match(nav[0], /bizType=rent/)
+  cleanup(page)
+})
+
+test('取消三项选择留在顾客信息页', async () => {
+  const env = setup(() => VERIFIED)
+  const { page, nav, actionSheets } = env
+  await openVerified(env)
+  page.onNameInput({ detail: { value: '临时姓名' } })
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
+
+  page.onBizTap(tap({ type: 'rent' }))
+  actionSheets[0].fail({ errMsg: 'showActionSheet:fail cancel' })
+
+  assert.deepEqual(nav, [])
+  assert.deepEqual(page.data.form, { name: '临时姓名', gender: '男', cell: '13800138000' })
+  cleanup(page)
+})
+
+test('更新会员失败时不进入业务', async () => {
+  const env = setup(() => VERIFIED, { updateFails: true })
+  const { page, calls, nav, toasts } = env
+  await openVerified(env)
+  page.onNameInput({ detail: { value: '张三丰' } })
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
+
+  page.onBizTap(tap({ type: 'rent' }))
+  await chooseAction(env, 0)
+
+  assert.equal(calls.update.length, 1)
+  assert.deepEqual(nav, [])
+  assert.equal(toasts.includes('会员信息保存失败，请重试'), true)
   cleanup(page)
 })
 
@@ -214,8 +338,9 @@ test('顾客不方便授权：改按散客开单，之后的授权结果不再�
   cleanup(page)
 })
 
-test('散客：电话称呼选填；填的手机号是会员就按会员显示，已填的称呼不覆盖', async () => {
-  const { page, calls, nav } = setup(() => VERIFIED, { lookup: () => ({ id: 42 }) })
+test('散客填会员手机号后匹配到会员：保留已填称呼并要求选择保存方式', async () => {
+  const env = setup(() => VERIFIED, { lookup: () => ({ id: 42 }) })
+  const { page, calls, nav, actionSheets } = env
   page.onLoad({ walkin: '1' })
   page.onShow()
   await settle()
@@ -238,8 +363,45 @@ test('散客：电话称呼选填；填的手机号是会员就按会员显示�
 
   page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
   page.onBizTap(tap({ type: 'rent' }))
+  assert.equal(actionSheets.length, 1)
+  await chooseAction(env, 1)
   assert.match(nav[0], /customerName=%E6%9D%8E%E5%9B%9B/)
   assert.match(nav[0], /memberId=42/)
+  cleanup(page)
+})
+
+test('手机号查询晚到时放弃修改恢复数据库会员资料', async () => {
+  const env = setup(() => VERIFIED, { lookup: () => ({ id: 42 }) })
+  const { page, calls, nav, actionSheets } = env
+  page.onLoad({ walkin: '1' })
+  page.onNameInput({ detail: { value: '李四' } })
+  page.onCellInput({ detail: { value: '13800138000' } })
+  await new Promise(resolve => setTimeout(resolve, 500))
+  await settle()
+  assert.equal(page.data.member.id, 42)
+
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
+  page.onBizTap(tap({ type: 'rent' }))
+  assert.equal(actionSheets.length, 1)
+  await chooseAction(env, 2)
+
+  assert.deepEqual(calls.update, [])
+  assert.match(nav[0], /customerName=%E5%BC%A0%E4%B8%89/)
+  assert.match(nav[0], /memberId=42/)
+  cleanup(page)
+})
+
+test('手机号会员查询未完成时阻止进入业务', () => {
+  const env = setup(() => VERIFIED, { lookup: () => new Promise(() => {}) })
+  const { page, nav, toasts } = env
+  page.onLoad({ walkin: '1' })
+  page.onCellInput({ detail: { value: '13800138000' } })
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 1, care: 1 } })
+
+  page.onBizTap(tap({ type: 'retail' }))
+
+  assert.deepEqual(nav, [])
+  assert.equal(toasts.includes('正在查询会员资料，请稍候'), true)
   cleanup(page)
 })
 

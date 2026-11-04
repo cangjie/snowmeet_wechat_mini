@@ -7,15 +7,19 @@ const { loadPage, loadComponent, settle } = require('./reception_harness');
 function setup(t) {
   const oldApp = global.getApp;
   const oldWx = global.wx;
-  const toasts = [], navigations = [];
+  const toasts = [], navigations = [], imagePreviews = [];
   global.getApp = () => ({ globalData: { requestPrefix: 'https://test.invalid/api/', sessionKey: 'test' }, loginPromiseNew: Promise.resolve() });
-  global.wx = { showToast: x => toasts.push(x.title), navigateTo: x => { navigations.push(x.url); if (x.success) x.success(); } };
+  global.wx = {
+    showToast: x => toasts.push(x.title),
+    navigateTo: x => { navigations.push(x.url); if (x.success) x.success(); },
+    previewImage: options => imagePreviews.push(options),
+  };
   t.after(() => { global.getApp = oldApp; global.wx = oldWx; });
   const page = loadPage('pages/admin/reception/recept_new.js', {});
   Object.assign(page.data, { bizType: 'maintain', customer: { memberId: 10 },
     order: { id: 20, cares: [{ id: 30, equipment: '双板', brand: '测试', scale: '170', need_edge: 1, need_wax: 1, common_charge: 100 }] } });
   page.saveCareReceptOrder = async () => page.data.order;
-  return { page, toasts, navigations };
+  return { page, toasts, navigations, imagePreviews };
 }
 
 function preview(amount = 600) {
@@ -47,6 +51,38 @@ test('入口位于添加装备下方，养护选卡与结算展示本次试算',
   const page = fs.readFileSync(path.join(__dirname, '../pages/admin/reception/recept_new.wxml'), 'utf8');
   assert.match(page, /本次试算/);
   assert.match(page, /确认选卡/);
+});
+
+test('历史装备弹层显示上次养护缩略图并增高历史列表', async t => {
+  const { imagePreviews } = setup(t);
+  const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {
+    IMAGE_HOST: 'https://img.snowmeet.top',
+    getMemberCaredEquipmentsPromise: async () => [{
+      brand: 'ABBA', scale: '180', last_care_date: '2026-11-04',
+      photoUrl: '/upload/board-thumb.jpg', photoFullUrl: '/upload/board.jpg'
+    }],
+  });
+  form.data.memberId = 42;
+  form.data.displayCares = [{ equipment: '双板' }];
+  form.data.skiBrandList = [];
+
+  form._maybeShowHistory(0, '双板');
+  await settle();
+
+  assert.equal(form.data.historyModal.list[0]._photoUrl, 'https://img.snowmeet.top/upload/board-thumb.jpg');
+  assert.equal(form.data.historyModal.list[0]._photoPreviewUrl, 'https://img.snowmeet.top/upload/board.jpg');
+  form.onHistoryPhotoTap({ currentTarget: { dataset: { idx: '0' } } });
+  assert.deepEqual(imagePreviews[0], {
+    current: 'https://img.snowmeet.top/upload/board.jpg',
+    urls: ['https://img.snowmeet.top/upload/board.jpg'],
+  });
+  const markup = fs.readFileSync(path.join(__dirname, '../components/reception/care_recept_form/care_recept_form.wxml'), 'utf8');
+  const photoIndex = markup.indexOf('class="history-item-photo"');
+  const brandIndex = markup.indexOf('class="history-item-brand"');
+  assert.ok(photoIndex >= 0 && photoIndex < brandIndex);
+  const styles = fs.readFileSync(path.join(__dirname, '../components/reception/care_recept_form/care_recept_form.wxss'), 'utf8');
+  const listRule = styles.match(/\.history-list\s*\{([^}]+)\}/);
+  assert.match(listRule && listRule[1], /max-height:\s*58vh/, '历史装备滚动区应随屏幕增高');
 });
 
 test('旧试算晚到不覆盖新选择；试算不下单、不扣次', async t => {

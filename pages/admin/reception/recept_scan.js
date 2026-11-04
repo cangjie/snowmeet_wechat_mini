@@ -9,7 +9,8 @@
 // 手动录入顾客信息的入口 recept_entry 保留，由页面底部链接进入。
 //
 // 后端依赖（SnowmeetApi QrCodeController）：
-//   CreateReceptCheckinByStaff / GetReceptCheckinByStaff / QueryCell / StopQeryScan
+//   CreateReceptCheckinByStaff / GetReceptCheckinByStaff / EnterReceptByPhone / StopQeryScan
+//   输手机号进入走 EnterReceptByPhone：服务器一次建好接待记录、写手机号、判授权，不依赖页面上的二维码
 const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
@@ -44,6 +45,9 @@ Page({
   onLoad() {
     this._pollTimer = null;
     this._creating = false;
+    this._entering = false;
+    // 出码请求的序号：手机号进入会让还没返回的出码请求作废，迟到的码直接作废、不显示
+    this._seq = 0;
   },
 
   onShow() {
@@ -67,23 +71,29 @@ Page({
   },
 
   /* ---------- 接待码 ---------- */
-  // keepCell：空白页上重新出码时保留店员已输的手机号
-  refreshCheckin(keepCell) {
+  refreshCheckin() {
     const that = this;
     if (that._creating) return;
     that._creating = true;
+    const seq = ++that._seq;
     that._stopPolling();
     that._discardUnusedCode();
-    that.setData({ loadingQr: true, checkin: null, qrCodeUrl: '', stageText: '', cell: keepCell ? that.data.cell : '', waitingAuth: false, authText: '' });
+    that.setData({ loadingQr: true, checkin: null, qrCodeUrl: '', stageText: '', cell: '', waitingAuth: false, authText: '' });
     Promise.resolve(app.loginPromiseNew).then(function () {
       return data.createReceptCheckinByStaffPromise(app.globalData.sessionKey);
     }).then(function (checkin) {
+      // 出码期间已经用手机号进入了：这张码没用了，作废，不显示
+      if (seq !== that._seq) {
+        data.stopScanQrCodePromise(checkin.id, app.globalData.sessionKey).catch(() => {});
+        return;
+      }
       that._creating = false;
       const qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText='
         + encodeURIComponent(checkin.qrText);
       that.setData({ checkin, qrCodeUrl, loadingQr: false, stageText: '请顾客用微信扫码' });
       that._startPolling();
     }).catch(function () {
+      if (seq !== that._seq) return;
       that._creating = false;
       that.setData({ loadingQr: false, stageText: '二维码生成失败，请点「换一个码」重试' });
     });
@@ -152,32 +162,37 @@ Page({
   },
 
   onSubmitCell() {
-    const checkin = this.data.checkin;
     const cell = normalizePhone(this.data.cell);
-    if (!checkin) {
-      // 正在出码就等；没在出码（页面是空白的）就重新出，免得一直卡在这句提示
-      if (this._creating) {
-        wx.showToast({ title: '二维码还没生成好，请稍候', icon: 'none' });
-      } else {
-        wx.showToast({ title: '二维码正在重新生成，请稍候再点确认', icon: 'none' });
-        this.refreshCheckin(true);
-      }
-      return;
-    }
     if (!shouldLookupPhone(cell)) {
       wx.showToast({ title: '请输入完整手机号', icon: 'none' });
       return;
     }
-    // QueryCell 只认已登记手机号的会员，查不到时 performWebRequest 会提示「用户不存在」
-    data.queryReceptCellPromise(checkin.id, cell, app.globalData.sessionKey).then((sq) => {
-      if (!this.data.checkin || this.data.checkin.id !== checkin.id) return;
-      if (sq && sq.authed === 1) {
-        this.applyCheckin({ stage: 'phone_authed' });
+    if (this._entering) return;
+    this._entering = true;
+    // 不依赖页面上的二维码：服务器一次建好接待记录、写手机号、判授权。
+    // 只认已登记手机号的会员，查不到时 performWebRequest 会提示「用户不存在」，页面保持原样
+    data.enterReceptByPhonePromise(cell, app.globalData.sessionKey).then((view) => {
+      this._entering = false;
+      this._takeOver(view);
+      if (view.stage === 'phone_authed') {
+        this.applyCheckin(view);
         return;
       }
-      this._showWaitingAuth({ maskedCell: cell.length === 11 ? cell.slice(0, 3) + '****' + cell.slice(7) : cell });
+      this._showWaitingAuth(view);
       wx.showToast({ title: '需要店长授权', icon: 'none' });
-    }).catch(() => {});
+    }).catch(() => {
+      this._entering = false;
+    });
+  },
+
+  // 手机号进入成功：页面改为跟进手机号这条接待记录；原来那张没人扫的二维码作废，
+  // 还没出来的，出来后作废（见 refreshCheckin）
+  _takeOver(view) {
+    this._stopPolling();
+    this._discardUnusedCode();
+    this._seq += 1;
+    this._creating = false;
+    this.setData({ checkin: view, qrCodeUrl: '', stageText: '', loadingQr: false });
   },
 
   _showWaitingAuth(view) {
