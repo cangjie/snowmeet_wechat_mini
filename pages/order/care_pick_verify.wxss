@@ -1,2 +1,5 @@
 /* pages/order/care_pick_verify.wxss：与身份核验落地页同一版式 */
 @import "./identity_verify.wxss";
+
+/* 登录失败原因：小字，方便店员拍照发回来排查 */
+.verify-detail { margin-top: 12rpx; font-size: 22rpx; color: #aaa; line-height: 1.4; word-break: break-all; }

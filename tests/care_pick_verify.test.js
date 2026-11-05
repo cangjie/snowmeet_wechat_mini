@@ -207,3 +207,98 @@ test('没有带码打开：直接提示重新扫码', () => {
   assert.deepEqual(calls.verify, [])
   cleanup()
 })
+
+// ---- 登录失败原因：页面用小字显示，方便店员拍照 ----
+test('登录失败：页面显示登录结果带回的失败原因', async t => {
+  t.after(cleanup)
+  const { page } = setup(() => Promise.resolve({ stage: 'matched' }), null, {
+    sessionKey: '', loginResult: { authenticated: false, reason: 'wx_login: login:fail network' }
+  })
+  page.onLoad({ code: CODE })
+  await settle()
+  assert.equal(page.data.login_error, true)
+  assert.equal(page.data.login_reason, 'wx_login: login:fail network')
+})
+
+test('重新登录仍失败：原因更新为最新一次的', async t => {
+  t.after(cleanup)
+  const { page } = setup(() => Promise.resolve({ stage: 'matched' }), null, {
+    sessionKey: '', loginResult: { authenticated: false, reason: 'wx_login: login:fail network' },
+    retryLogin() { return { authenticated: false, reason: 'member_login: request:fail timeout' } }
+  })
+  page.onLoad({ code: CODE })
+  await settle()
+  page.onRetryTap()
+  await settle()
+  assert.equal(page.data.login_reason, 'member_login: request:fail timeout')
+})
+
+test('重新登录抛异常：原因记为 login_exception 加异常信息', async t => {
+  t.after(cleanup)
+  const { page } = setup(() => Promise.resolve({ stage: 'matched' }), null, {
+    sessionKey: '', loginResult: { authenticated: false },
+    retryLogin() { return Promise.reject(new Error('offline')) }
+  })
+  page.onLoad({ code: CODE })
+  await settle()
+  page.onRetryTap()
+  await settle()
+  assert.equal(page.data.login_reason, 'login_exception: offline')
+})
+
+test('登录结果没带原因：用 no_result 兜底，页面不出现 undefined', async t => {
+  t.after(cleanup)
+  const { page } = setup(() => Promise.resolve({ stage: 'matched' }), null, {
+    sessionKey: '', loginResult: { authenticated: false }
+  })
+  page.onLoad({ code: CODE })
+  await settle()
+  assert.equal(page.data.login_reason, 'no_result')
+})
+
+test('认证成功但会话为空：原因记为 empty_session', async t => {
+  t.after(cleanup)
+  const { page } = setup(() => Promise.resolve({ stage: 'matched' }), null, { sessionKey: '  ' })
+  page.onLoad({ code: CODE })
+  await settle()
+  assert.equal(page.data.login_reason, 'empty_session')
+})
+
+test('手机号授权时会话丢失：原因记为 empty_session', async t => {
+  t.after(cleanup)
+  const { page, app } = setup(() => Promise.resolve({ stage: 'need_member' }))
+  page.onLoad({ code: CODE })
+  await settle()
+  app.globalData.sessionKey = ''
+  page.onBindCell({ detail: { errMsg: 'getPhoneNumber:ok', encryptedData: 'enc', iv: 'iv' } })
+  await settle()
+  assert.equal(page.data.login_reason, 'empty_session')
+})
+
+test('重新登录成功后清掉失败原因', async t => {
+  t.after(cleanup)
+  const { page } = setup(() => Promise.resolve({ stage: 'matched' }), null, {
+    sessionKey: '', loginResult: { authenticated: false, reason: 'wx_login: login:fail network' },
+    retryLogin(app) { app.globalData.sessionKey = 'new-session'; return { authenticated: true } }
+  })
+  page.onLoad({ code: CODE })
+  await settle()
+  page.onRetryTap()
+  await settle()
+  assert.equal(page.data.state, 'matched')
+  assert.equal(page.data.login_reason, '')
+})
+
+test('普通验证失败（码过期等）不显示登录原因', async t => {
+  t.after(cleanup)
+  const { page } = setup(() => Promise.reject('二维码已过期，请让店员换一个码'))
+  page.onLoad({ code: CODE })
+  await settle()
+  assert.equal(page.data.state, 'error')
+  assert.equal(page.data.login_reason, '')
+})
+
+test('页面里的失败原因小字只在登录失败且有原因时显示', () => {
+  const wxml = require('node:fs').readFileSync(require('node:path').join(__dirname, '../pages/order/care_pick_verify.wxml'), 'utf8')
+  assert.match(wxml, /wx:if="\{\{login_error && login_reason\}\}"[^>]*>[^<]*\{\{login_reason\}\}/)
+})

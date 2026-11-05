@@ -15,7 +15,8 @@ Page({
     message: '',
     maskedCell: '',
     busy: false,
-    login_error: false
+    login_error: false,
+    login_reason: ''   // 登录失败时的原因（阶段: 微信返回的文字），小字显示，方便店员拍照
   },
 
   onLoad(options) {
@@ -31,10 +32,11 @@ Page({
     this.verifyNow()
   },
 
-  showLoginError() {
+  showLoginError(reason) {
     this.setData({
       state: 'error',
       login_error: true,
+      login_reason: reason || '',
       message: '微信登录未完成，请检查网络后点击“重新登录”；如仍失败，请退出小程序后重新扫描店员二维码。'
     })
   },
@@ -46,18 +48,21 @@ Page({
       that.setData({ state: 'error', login_error: false, message: '二维码参数缺失，请重新扫描店员手机上的二维码' })
       return
     }
-    that.setData({ state: 'loading', message: '', login_error: false, busy: true })
+    that.setData({ state: 'loading', message: '', login_error: false, login_reason: '', busy: true })
     try {
       var loginResult
       try {
         loginResult = await (retryLogin === true ? app.retryLogin() : app.loginPromiseNew)
       } catch (err) {
-        that.showLoginError()
+        that.showLoginError('login_exception: ' + String((err && (err.message || err.errMsg)) || err || '').trim().slice(0, 100))
         return
       }
-      if (!loginResult || loginResult.authenticated !== true
-        || typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
-        that.showLoginError()
+      if (!loginResult || loginResult.authenticated !== true) {
+        that.showLoginError((loginResult && loginResult.reason) || 'no_result')
+        return
+      }
+      if (typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
+        that.showLoginError('empty_session')
         return
       }
       var view = await data.verifyCarePickPromise(that.data.code, app.globalData.sessionKey)
@@ -80,7 +85,7 @@ Page({
     var that = this
     if (that.data.busy) return
     if (typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
-      that.showLoginError()
+      that.showLoginError('empty_session')
       return
     }
     if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
