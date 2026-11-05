@@ -4,7 +4,7 @@
     <block wx:if="{{state == 'loading'}}">
       <view class="verify-spinner"></view>
       <view class="verify-title">正在验证取板身份…</view>
-      <view class="verify-sub">请稍候</view>
+      <view class="verify-sub">{{wait_hint || '请稍候'}}</view>
     </block>
 
     <block wx:elif="{{state == 'matched'}}">

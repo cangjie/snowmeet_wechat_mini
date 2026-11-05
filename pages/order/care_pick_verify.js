@@ -9,6 +9,11 @@ const app = getApp()
 const data = require('../../utils/data.js')
 
 Page({
+  // 自动登录失败后，等 autoRetrySeconds 秒（每 autoRetryTickMs 毫秒倒计时一跳）再自动重试 1 次：
+  // 给手机网络恢复的时间，界面上显示倒计时提示。测试里把秒数改成 0 或把一跳缩短。
+  autoRetrySeconds: 10,
+  autoRetryTickMs: 1000,
+
   data: {
     code: '',
     state: 'loading',   // loading | matched | mismatch | bind_cell | error
@@ -16,7 +21,8 @@ Page({
     maskedCell: '',
     busy: false,
     login_error: false,
-    login_reason: ''   // 登录失败时的原因（阶段: 微信返回的文字），小字显示，方便店员拍照
+    login_reason: '',  // 登录失败时的原因（阶段: 微信返回的文字），小字显示，方便店员拍照
+    wait_hint: ''      // 自动重试前的倒计时 / 重试中的提示，显示在「正在验证」下面；空时显示「请稍候」
   },
 
   onLoad(options) {
@@ -41,6 +47,27 @@ Page({
     })
   },
 
+  // 登录一次：成功返回 { ok: true }；结果不是已认证、或抛异常，返回 { ok: false, reason }。
+  // fresh 为 true 时重新发起登录，否则等启动时那次登录。
+  async loginOnce(fresh) {
+    try {
+      var result = await (fresh ? app.retryLogin() : app.loginPromiseNew)
+      if (result && result.authenticated === true) return { ok: true }
+      return { ok: false, reason: (result && result.reason) || 'no_result' }
+    } catch (err) {
+      return { ok: false, reason: 'login_exception: ' + String((err && (err.message || err.errMsg)) || err || '').trim().slice(0, 100) }
+    }
+  },
+
+  // 自动重试前的倒计时：每跳更新一次界面提示，倒数完返回；秒数为 0 时直接返回。
+  async waitBeforeRetry() {
+    var that = this
+    for (var left = that.autoRetrySeconds; left > 0; left--) {
+      that.setData({ wait_hint: '网络不太稳定，' + left + ' 秒后自动重新登录，请稍候…' })
+      await new Promise(function (resolve) { setTimeout(resolve, that.autoRetryTickMs) })
+    }
+  },
+
   async verifyNow(retryLogin) {
     var that = this
     if (that.data.busy) return
@@ -50,15 +77,16 @@ Page({
     }
     that.setData({ state: 'loading', message: '', login_error: false, login_reason: '', busy: true })
     try {
-      var loginResult
-      try {
-        loginResult = await (retryLogin === true ? app.retryLogin() : app.loginPromiseNew)
-      } catch (err) {
-        that.showLoginError('login_exception: ' + String((err && (err.message || err.errMsg)) || err || '').trim().slice(0, 100))
-        return
+      var attempt = await that.loginOnce(retryLogin === true)
+      // 自动进入时登录失败，先静默重试 1 次（页面仍是「正在验证」）：手机网络瞬断时顾客不用自己点「重新登录」。
+      // 顾客手动点「重新登录」那次不再自动重试。
+      if (!attempt.ok && retryLogin !== true) {
+        await that.waitBeforeRetry()
+        if (that.autoRetrySeconds > 0) that.setData({ wait_hint: '正在重新登录…' })
+        attempt = await that.loginOnce(true)
       }
-      if (!loginResult || loginResult.authenticated !== true) {
-        that.showLoginError((loginResult && loginResult.reason) || 'no_result')
+      if (!attempt.ok) {
+        that.showLoginError(attempt.reason)
         return
       }
       if (typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
@@ -77,7 +105,7 @@ Page({
       var errMsg = (typeof msg === 'string' && msg) ? msg : '验证失败，请重新扫码'
       that.setData({ state: 'error', message: errMsg })
     } finally {
-      that.setData({ busy: false })
+      that.setData({ busy: false, wait_hint: '' })
     }
   },
 
