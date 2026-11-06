@@ -500,6 +500,11 @@ const getOrderByStaffPromise = function (orderId, sessionKey) {
     })
   })
 }
+// 租赁订单手动关单（详情页「订单关闭」按钮）：POST。后端校验能不能关，记录关闭时间和操作的员工；不可逆
+const closeRentOrderByStaffPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Rent/CloseOrderByStaff/' + orderId.toString() + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, {})
+}
 const getAdminPageHelpPromise = function (pageKey, sessionKey, businessContext) {
   var qUrl = app.globalData.requestPrefix + 'AdminAi/GetPageHelpByStaff?sessionKey=' + sessionKey
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
@@ -2001,6 +2006,7 @@ module.exports = {
   getOrdersByStaffPromise,
   getRentOrdersByStaffPagedPromise,
   getOrderByStaffPromise,
+  closeRentOrderByStaffPromise,
   getAdminPageHelpPromise,
   askAdminPageHelpPromise,
   queryRentOrdersByNaturalLanguagePromise,

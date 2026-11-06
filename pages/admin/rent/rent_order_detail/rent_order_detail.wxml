@@ -574,6 +574,13 @@
     <!-- 入口按钮：始终显示 -->
     <view class="append-entry-btn" bindtap="onOpenAppend">+ 追加租赁商品</view>
   </view>
+
+  <!-- ── Card 6: 订单关闭（页面最下方，不可逆）：全部退完押金，或无需退押金且租赁物全部归还后才显示（后端算好 canManualClose），
+       员工职级 >= 100 才有权限；关闭后订单变成了结关闭，后端记录关闭时间和操作的员工 ── -->
+  <view class="card close-card" wx:if="{{order.closed == 0 && order.canManualClose && _canCloseOrder}}">
+    <van-button type="danger" block bind:click="onCloseOrder">订单关闭</van-button>
+    <view class="close-hint">关闭后订单不能恢复，此操作不可逆</view>
+  </view>
 </view>
 <view wx:else class="page-loading">
   <text>加载中…</text>

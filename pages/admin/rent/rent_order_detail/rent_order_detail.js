@@ -28,6 +28,7 @@ Page({
     order: null,
     shopObj: null,
     _compactScreen: false,
+    _canCloseOrder: false,   // 员工职级 >= 100 才显示「订单关闭」
 
     _orderInfoExpanded: true,
     _paymentDetailExpanded: false,
@@ -108,9 +109,35 @@ Page({
     var that = this
     app.loginPromiseNew.then(function () {
       var uiProfile = app.globalData.uiProfile || {}
-      that.setData({ _compactScreen: !!uiProfile.isCompact })
+      var staff = app.globalData.staff
+      that.setData({ _compactScreen: !!uiProfile.isCompact, _canCloseOrder: !!(staff && staff.title_level >= 100) })
       that.getData()
     }).catch(function () {})
+  },
+
+  // 订单关闭（页面最下方，不可逆）：后端校验条件（全部退完押金，或无需退押金且租赁物全部归还），
+  // 记录关闭时间和操作的员工；成功后重新加载订单（按钮随之消失）
+  onCloseOrder() {
+    var that = this
+    if (that._closing) return
+    wx.showModal({
+      title: '确认关闭订单',
+      content: '订单关闭后不能恢复，此操作不可逆。确定要关闭这个订单吗？',
+      confirmText: '确认关闭',
+      confirmColor: '#d03050',
+      success: function (res) {
+        if (!res.confirm) return
+        that._closing = true
+        data.closeRentOrderByStaffPromise(that.data.id, app.globalData.sessionKey).then(function () {
+          that._closing = false
+          wx.showToast({ title: '订单已关闭', icon: 'success' })
+          that.getData()
+        }).catch(function () {
+          // 失败原因 util.performWebRequest 已经提示过
+          that._closing = false
+        })
+      }
+    })
   },
 
   getData() {
