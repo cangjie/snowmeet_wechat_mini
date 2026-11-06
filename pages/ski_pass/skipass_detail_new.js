@@ -1,6 +1,6 @@
 // pages/ski_pass/skipass_detail_new.js
 // 雪票详情页：首页选好「时长 + 场次」这一组，这里选装备和日期（带价格的月历，没价格的日期点不了）。
-// 顾客只能看价格；游客信息和「加入购物车」只给店员，结算在购物车页，后端也只认店员。
+// 所有人都能订（2026-11-06 起开放，之前只有店员能订）：选日期、填游客信息、加入购物车，结算在购物车页。
 const app = getApp()
 const data = require('../../utils/data.js')
 const util = require('../../utils/util.js')
@@ -90,11 +90,9 @@ Page({
       staffId: options.staffId
     })
     app.loginPromiseNew.then(function () {
-      var isStaff = !!app.globalData.staff
-      that.setData({ isStaff })
-      if (isStaff) {
-        that.GetRealName()
-      }
+      // isStaff 只用来区分文案（确认弹层标题）；顾客和店员都带出本人姓名、手机号
+      that.setData({ isStaff: !!app.globalData.staff })
+      that.GetRealName()
       that.loadProducts()
     })
   },
@@ -213,7 +211,7 @@ Page({
   _refreshAdd() {
     var d = this.data
     var comingSoon = !!(this._product && this._product.comingSoon)
-    this.setData({ canAdd: !!(d.isStaff && d.hasPrice && !comingSoon && d.summary > 0) })
+    this.setData({ canAdd: !!(d.hasPrice && !comingSoon && d.summary > 0) })
   },
 
   // ========================
@@ -252,19 +250,15 @@ Page({
   },
 
   // ========================
-  // 加入购物车（仅店员）：票种 + 游玩日期 + 接收短信的手机号；相同的合并成一条，结算在购物车页
+  // 加入购物车：票种 + 游玩日期 + 接收短信的手机号；相同的合并成一条，结算在购物车页
   // ========================
   onAddToCart() {
     var that = this
-    if (!that.data.isStaff) {
-      wx.showToast({ title: '仅限店员订票', icon: 'none' })
-      return
-    }
     if (!that.data.canAdd) {
       wx.showToast({ title: that.data.hasPrice ? '该装备暂不能订票' : '该日期暂无价格', icon: 'none' })
       return
     }
-    // 打开确认弹层：和顾客当面确认游玩日期、接收订票短信的手机号，顾客要改就直接在弹层里改，
+    // 打开确认弹层：确认游玩日期、接收订票短信的手机号（店员订票时和顾客当面确认），要改就直接在弹层里改，
     // 金额跟着日期变；确认后才真的加入购物车
     var options = that._product.prices.map(function (p) { return { date: p.date, price: p.price } })
     var idx = options.findIndex(function (o) { return o.date === that.data.selectedDate })

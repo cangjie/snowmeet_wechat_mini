@@ -51,6 +51,6 @@
       <text class="bar-value">{{totalStr}}</text>
     </view>
     <view class="bar-continue" bindtap="onContinue">继续选票</view>
-    <view class="bar-pay {{(paying || !isStaff) ? 'bar-pay--disabled' : ''}}" bindtap="onCheckout">去结算</view>
+    <view class="bar-pay {{paying ? 'bar-pay--disabled' : ''}}" bindtap="onCheckout">去结算</view>
   </view>
 </view>

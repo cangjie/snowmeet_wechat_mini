@@ -1,4 +1,4 @@
-// 万龙雪票两个页面：首页按「时长 + 场次」分组显示价格，详情页选装备、点带价格的月历；顾客只能看，店员才能订。
+// 万龙雪票两个页面：首页按「时长 + 场次」分组显示价格，详情页选装备、点带价格的月历；所有人都能订（2026-11-06 起开放，之前只有店员能订）。
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const { loadPage, settle } = require('./reception_harness.js')
@@ -82,12 +82,12 @@ function load(file, env) {
 
 // ---------------- 首页 ----------------
 
-test('首页：顾客看到分组卡片和价格，顶部提示仅限店员订票；只有一个雪场不显示标签栏', async () => {
+test('首页：顾客看到分组卡片和价格，没有「仅限店员订票」提示；只有一个雪场不显示标签栏', async () => {
   const env = setup()
   const page = load(SELECTOR, env)
   page.onLoad({ resort: encodeURIComponent('万龙') })
   await settle()
-  assert.equal(page.data.isStaff, false)
+  assert.equal(page.data.isStaff, undefined)   // 首页不再区分店员和顾客
   assert.equal(page.data.loaded, true)
   assert.equal(page.data.showTabs, false)
   assert.deepEqual(page.data.groups.map(x => [x.title, x.minPriceStr, x.subtitle]), [
@@ -102,13 +102,9 @@ test('首页：顾客看到分组卡片和价格，顶部提示仅限店员订�
   cleanup()
 })
 
-test('首页：店员身份标记为店员', async () => {
-  const env = setup({ staff: { id: 28 } })
-  const page = load(SELECTOR, env)
-  page.onLoad({ resort: encodeURIComponent('万龙') })
-  await settle()
-  assert.equal(page.data.isStaff, true)
-  cleanup()
+test('首页：页面上没有「仅限店员订票」提示', () => {
+  const wxml = require('node:fs').readFileSync(require('node:path').join(__dirname, '../pages/ski_pass/ski_pass_selector.wxml'), 'utf8')
+  assert.equal(wxml.includes('仅限店员'), false)
 })
 
 test('首页：整个雪场都没有可订日期，显示价格暂未发布', async () => {
@@ -259,16 +255,37 @@ test('详情页：点没有价格的日期没反应', async () => {
   cleanup()
 })
 
-test('详情页：顾客不显示游客信息和购物车，不取个人信息，不能加入购物车', async () => {
-  const env = setup()
+test('详情页：顾客也能订——带出本人姓名手机号，能加入购物车，没有「仅限店员订票」提示', async () => {
+  const env = setup({ myInfo: { real_name: '张顾客', cell: '13700137000' } })
   const page = await openDetail(env, { group: dayKey() })
   assert.equal(page.data.isStaff, false)
-  assert.equal(page.data.canAdd, false)
+  assert.equal(page.data.canAdd, true)
   assert.equal(page.data.priceStr, '399')
+  assert.equal(page.data.name, '张顾客')
+  assert.equal(page.data.cell, '13700137000')
   page.onAddToCart()
-  assert.deepEqual(env.toasts, ['仅限店员订票'])
-  assert.equal(env.store['skipass_cart_v1'], undefined)
+  assert.equal(page.data.showConfirm, true)
+  assert.deepEqual(env.toasts, [])
   cleanup()
+})
+
+test('详情页：顾客走完加入购物车：确认弹层 → 购物车里有这一条 → 跳购物车页', async () => {
+  const env = setup({ myInfo: { real_name: '张顾客', cell: '13700137000' } })
+  const page = await openDetail(env, { group: dayKey() })
+  page.onAddToCart()
+  page.onConfirmAdd()
+  const item = env.store['skipass_cart_v1'].items[0]
+  assert.deepEqual([item.date, item.price, item.count, item.name, item.cell], ['2026-11-02', 399, 1, '张顾客', '13700137000'])
+  assert.equal(env.navs[env.navs.length - 1], '/pages/ski_pass/skipass_cart')
+  cleanup()
+})
+
+test('详情页：页面里的游客信息、购物车入口不再按店员身份隐藏，确认弹层标题按身份区分', () => {
+  const wxml = require('node:fs').readFileSync(require('node:path').join(__dirname, '../pages/ski_pass/skipass_detail_new.wxml'), 'utf8')
+  assert.equal(wxml.includes('仅限店员'), false)
+  assert.equal(/<view class="info-card" wx:if=/.test(wxml), false)
+  assert.equal(/class="bar-actions"/.test(wxml) && !/wx:if="\{\{isStaff\}\}" class="bar-actions"/.test(wxml), true)
+  assert.match(wxml, /isStaff \? '请和顾客确认订票信息' : '请确认订票信息'/)
 })
 
 test('详情页：店员带出本人姓名手机号，不再查预存款（结算时后端核对）', async () => {

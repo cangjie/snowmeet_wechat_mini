@@ -163,13 +163,26 @@ test('购物车页：后台价格和购物车里不一致，先让店员确认�
   cleanup()
 })
 
-test('购物车页：非店员不能结算；空购物车提示；不确认订单就不下单', async () => {
-  let env = setup({ staff: null })
-  let page = await open(env)
+test('购物车页：顾客（非店员）也能结算——和店员同一条下单、支付路径，不再提示仅限店员', async () => {
+  const env = setup({ staff: null })
+  const page = await open(env)
   page.onCheckout()
-  assert.deepEqual(env.toasts, ['仅限店员订票'])
+  assert.match(env.modals[0].content, /合计 ¥977\.00/)
+  assert.ok(env.requests.some(r => r.url.indexOf('ReserveSkiPassCart') >= 0))
+  assert.ok(env.requests.some(r => r.url.indexOf('WechatPayByOrderPayment') >= 0))
+  assert.equal(env.toasts.includes('仅限店员订票'), false)
+  assert.equal(env.toasts[env.toasts.length - 1], '支付成功。')
   cleanup()
+})
 
+test('购物车页：「去结算」按钮不再按店员身份置灰', () => {
+  const wxml = require('node:fs').readFileSync(require('node:path').join(__dirname, '../pages/ski_pass/skipass_cart.wxml'), 'utf8')
+  assert.equal(wxml.includes('isStaff'), false)
+})
+
+test('购物车页：空购物车提示；不确认订单就不下单', async () => {
+  let env
+  let page
   env = setup({ cart: cart.emptyCart() })
   page = await open(env)
   assert.equal(page.data.empty, true)

@@ -1,6 +1,6 @@
 // pages/ski_pass/ski_pass_selector.js
 // 雪票首页：按「时长 + 场次」分组，每组写最低价；点进去在详情页选装备和日期。
-// 价格人人可看，订票只有店员能订（后端 ReserveSkiPass 强制，详情页对顾客不显示支付栏）。
+// 价格人人可看，订票也对所有人开放（2026-11-06 起；之前只有店员能订）。
 const app = getApp()
 const skipassGroup = require('../../utils/skipass_group.js')
 const tabbar = require('../../utils/tabbar.js')
@@ -22,7 +22,6 @@ Page({
     activeTab: 0,
     showTabs: false,
     tabIndex: tabbar.tabIndexOf(tabbar.SKIPASS_URL),
-    isStaff: false,
     loaded: false,
     loadFailed: false
   },
@@ -56,7 +55,6 @@ Page({
       that.setData({
         tabbarItemList: app.globalData.userTabBarItem,
         canGetInfo: true,
-        isStaff: !!app.globalData.staff
       })
       that.getResortArr()
     })
