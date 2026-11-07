@@ -91,9 +91,22 @@ Page({
           that.pay()
         }
       })
-      .catch(function () {
-        // performWebRequest 已 toast；这里补一个 inline 提示
-        that.setData({ identity: { status: 'error', errorCode: 'check_failed', errorMessage: '身份验证查询失败，请重试' } })
+      .catch(function (err) {
+        // performWebRequest 已 toast。后端拒绝时 err 是它的原话：
+        //   「支付记录不存在」= 这笔付款已被作废（店员重新出过码，旧码不能再付），不是身份问题，要明说二维码失效；
+        //   其他后端原话（如「订单已支付或已取消」）照实显示；
+        //   没有后端原话（网络不通、接口出错）才提示身份验证查询失败。
+        var backendMessage = (typeof err === 'string' && err.trim()) ? err.trim() : ''
+        var errorCode = 'check_failed'
+        var errorMessage = '身份验证查询失败，请重试'
+        if (backendMessage === '支付记录不存在') {
+          errorCode = 'payment_not_found'
+          errorMessage = '二维码已失效，请让店员重新出码'
+        } else if (backendMessage) {
+          errorCode = 'check_rejected'
+          errorMessage = backendMessage
+        }
+        that.setData({ identity: { status: 'error', errorCode: errorCode, errorMessage: errorMessage } })
       })
   },
 
