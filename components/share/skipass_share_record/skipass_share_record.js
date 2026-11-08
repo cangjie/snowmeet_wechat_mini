@@ -1,6 +1,7 @@
 // 「大好河山雪票」页每张票下面的「雪票分账记录」（2026-11-08 暂时替换了这一页原来的「分销商分账」卡片）：
-// 只读，显示系统给推荐员工的分账（每张票 1 元）分给谁、成没成、计划什么时候分、什么时候成功。
-// 店长以上（title_level ≥ 200）才显示，数据来自 SkipassShareRecord/GetByOrder（整张订单的记录，同一订单的几张票显示同样的内容）。
+// 只读，显示这张票那 1 元的系统分账：分给谁、成没成、计划什么时候分、什么时候成功。
+// 分账对应的是雪票不是订单，一张票最多一笔，所以按票的 id 取（SkipassShareRecord/GetBySkipass），同一订单的几张票各看各的。
+// 店长以上（title_level ≥ 200）才显示。
 const api = require('../../../utils/introducer_api.js')
 
 const MANAGER_LEVEL = 200
@@ -10,19 +11,17 @@ function decorate(r) {
   return Object.assign({}, r, { stateClass: STATE_CLASS[r.state] || 'muted' })
 }
 
-function summarize(records, emptyReason) {
-  if (!records.length) return emptyReason || '没有分账记录'
-  const total = Math.round(records.reduce((sum, r) => sum + (Number(r.amount) || 0), 0) * 100) / 100
-  const done = records.filter(r => r.state === '已分账').length
-  return '共 ' + records.length + ' 条 ¥' + total + '，已分账 ' + done + ' 条'
+function summarize(record) {
+  if (!record) return '没有分账'
+  return '¥' + (Number(record.amount) || 0) + ' ' + record.state
 }
 
 Component({
   properties: {
-    orderId: { type: Number, value: 0, observer(value, previous) { if (this._attached && value !== previous) this.load() } }
+    skipassId: { type: Number, value: 0, observer(value, previous) { if (this._attached && value !== previous) this.load() } }
   },
   data: {
-    hidden: true, loading: false, expanded: true, records: [], summary: '', ticketText: ''
+    hidden: true, loading: false, expanded: true, record: null, emptyReason: '', summary: '', ticketText: ''
   },
   lifetimes: {
     attached() { this._attached = true; return this.load() }
@@ -34,16 +33,17 @@ Component({
         this.setData({ hidden: true, loading: false })
         return Promise.resolve()
       }
-      const orderId = this.properties.orderId
-      if (!orderId) return Promise.resolve()
+      const skipassId = this.properties.skipassId
+      if (!skipassId) return Promise.resolve()
       this.setData({ hidden: false, loading: true })
-      return api.getSkipassShareRecords(orderId).then(d => {
-        const records = ((d && d.records) || []).map(decorate)
+      return api.getSkipassShareRecord(skipassId).then(d => {
+        const record = d && d.record ? decorate(d.record) : null
         this.setData({
           loading: false,
-          records,
-          summary: summarize(records, d && d.emptyReason),
-          ticketText: d && d.ticketCount ? '已取票 ' + (d.pickedUpCount || 0) + '/' + d.ticketCount + ' 张' : ''
+          record,
+          emptyReason: record ? '' : ((d && d.emptyReason) || '没有分账'),
+          summary: summarize(record),
+          ticketText: d && d.pickedUp ? '这张票已取票' : '这张票还没取票'
         })
       }).catch(err => {
         this.setData({ loading: false })

@@ -49,7 +49,7 @@
     <view wx:if="{{item.memo.trim() != ''}}" style="margin-top: 50rpx;text-align: left;margin-left: 25rpx;">
       {{item.memo}}
     </view>
-    <skipass-share-record wx:if="{{item.order_id}}" order-id="{{item.order_id}}" />
+    <skipass-share-record wx:if="{{item.id}}" skipass-id="{{item.id}}" />
     <view style="margin-top: 50rpx;text-align: center;">
       <button wx:if="{{item.status == '已取消'}}" size="mini" disabled="{{cancelling}}" id="{{item.id}}" bind:tap="refund" class="input">申请退款</button>
       <button wx:else size="mini" id="{{item.id}}" bind:tap="cancel" class="input" disabled="{{cancelling || (item.status != '已出票' && item.status != '出票失败')}}">申请取消</button>

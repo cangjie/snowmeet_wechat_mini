@@ -56,8 +56,8 @@ module.exports = {
   // type：教练 / KOL / 机构，不传 = 全部；keyword：名称、真实姓名或手机号里包含的文字
   listChoices: (type, keyword) => get('Introducer', 'ListChoices', { type, keyword }),
   getOrderShares: orderId => get('OrderIntroducerShare', 'GetOrderShares', { orderId }),
-  // 雪票订单上系统给推荐员工的分账记录（每张票 1 元，只读，店长以上）：「大好河山雪票」页的卡片用
-  getSkipassShareRecords: orderId => get('SkipassShareRecord', 'GetByOrder', { orderId }),
+  // 一张雪票上那 1 元系统分账的记录（分账对应雪票不是订单，一张票最多一笔；只读，店长以上）：「大好河山雪票」页的卡片用
+  getSkipassShareRecord: skipassId => get('SkipassShareRecord', 'GetBySkipass', { skipassId }),
   setShare: body => post('OrderIntroducerShare', 'SetShare', body),
   removeShare: orderShareId => post('OrderIntroducerShare', 'RemoveShare', { orderShareId }),
   // ---- 分账列表与手动分账（店长以上 ≥200）----
