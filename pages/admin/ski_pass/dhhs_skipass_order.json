@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "skipass-share-record": "/components/share/skipass_share_record/skipass_share_record"
+  },
   "navigationBarTitleText": "大好河山雪票"
 }

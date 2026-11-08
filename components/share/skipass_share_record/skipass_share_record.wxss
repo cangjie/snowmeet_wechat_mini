@@ -1,0 +1,18 @@
+.ssr-card { margin: 20rpx 24rpx; padding: 24rpx; background: #fff; border: 2rpx solid #006495; border-radius: 16rpx; display: flex; flex-direction: column; gap: 18rpx; box-sizing: border-box; }
+.ssr-head { display: flex; justify-content: space-between; align-items: center; min-height: 64rpx; gap: 16rpx; }
+.ssr-head-right { display: flex; align-items: center; gap: 12rpx; }
+.ssr-title { font-size: 30rpx; font-weight: 700; color: #181C20; white-space: nowrap; }
+.ssr-side { font-size: 24rpx; color: #5D6A75; text-align: right; }
+.ssr-arrow { display: inline-block; font-size: 40rpx; line-height: 1; color: #5D6A75; transform: rotate(90deg); }
+.ssr-arrow.open { transform: rotate(-90deg); }
+.ssr-row { border: 2rpx solid #D9E2EC; border-radius: 12rpx; padding: 18rpx; display: flex; flex-direction: column; gap: 10rpx; }
+.ssr-line { display: flex; justify-content: space-between; align-items: center; gap: 16rpx; }
+.ssr-bold { font-size: 28rpx; font-weight: 600; color: #181C20; }
+.ssr-meta { font-size: 24rpx; color: #5D6A75; line-height: 1.5; }
+.ssr-meta.ok { color: #14602F; }
+.ssr-tag { display: inline-flex; align-items: center; padding: 2rpx 12rpx; border-radius: 8rpx; font-size: 24rpx; background: #F3F6FA; color: #5D6A75; white-space: nowrap; }
+.ssr-tag.blue { background: #E6F1F8; color: #00507A; }
+.ssr-tag.warn { background: #FFF1D6; color: #7A4B00; }
+.ssr-tag.ok { background: #E3F4E8; color: #14602F; }
+.ssr-tag.danger { background: #FDE7E5; color: #8C1D18; }
+.ssr-reason { background: #FFF1D6; color: #5C3800; border-radius: 12rpx; padding: 16rpx 20rpx; font-size: 24rpx; line-height: 1.5; }
