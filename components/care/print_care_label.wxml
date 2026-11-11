@@ -17,7 +17,9 @@
     <view class="right-column" style="width: 500rpx;">
       {{care.need_edge == 1? '修刃 ' + care.edge_degree :' ' }}
       {{care.need_wax == 1? '打蜡 ' :' ' }}
+      {{care.maintain_board == 1? '养板 ' :' ' }}
       {{care.need_unwax == 1? '刮蜡 '  :' ' }}
+      {{care.seal_board == 1? '封板 '  :' ' }}
       {{care.repair_memo==null? '' : care.repair_memo}}
     </view>
   </view>

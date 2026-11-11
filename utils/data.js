@@ -1107,6 +1107,14 @@ const enterReceptByPhonePromise = function (cell, sessionKey) {
     + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   return util.performWebRequest(url, undefined)
 }
+// 接待页「VIP开单」：点 VIP 列表里的一位 VIP 直接进入开单。不用顾客扫码、不用店长授权，视同身份已验证。
+// 返回 ReceptCheckinView（stage 固定是 phone_authed）；不是 VIP / 没有手机号 / 会员不存在时 performWebRequest 会提示原因。
+// 要先部署后端 QrCode/EnterReceptByVip
+const enterReceptByVipPromise = function (memberId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/EnterReceptByVip?memberId=' + encodeURIComponent(memberId)
+    + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
 // 店长：今天店员提交的手机号进入申请（含已授权的）
 const getTodayAuthCellListPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'QrCode/GetTodayAuthCellList'
@@ -1612,6 +1620,7 @@ const searchMembersByStaffPromise = function (filter, pageIndex, pageSize, sessi
   if (f.gender) { url += '&gender=' + encodeURIComponent(f.gender) }
   if (f.bizTypes) { url += '&bizTypes=' + encodeURIComponent(f.bizTypes) }
   if (f.tags) { url += '&tags=' + encodeURIComponent(f.tags) }
+  if (f.vip) { url += '&vip=true' }   // 只看 VIP 会员：后端直接按 member.is_vip（有索引）筛
   return new Promise(function (resolve, reject) {
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
   })
@@ -1675,6 +1684,14 @@ const addMemberTagPromise = function (memberId, tag, sessionKey) {
 const removeMemberTagPromise = function (memberId, tag, sessionKey) {
   var url = app.globalData.requestPrefix + 'MemberAdmin/RemoveMemberTag?sessionKey=' + sessionKey
     + '&memberId=' + memberId + '&tag=' + encodeURIComponent(tag)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
+  })
+}
+// 设置 / 取消 VIP（member.is_vip 字段，不是标签）。返回 { isVip }
+const setMemberVipPromise = function (memberId, vip, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberAdmin/SetMemberVip?sessionKey=' + sessionKey
+    + '&memberId=' + memberId + '&vip=' + (vip ? 'true' : 'false')
   return new Promise(function (resolve, reject) {
     util.performWebRequest(url, null).then(function (r) { resolve(r) }).catch(function (e) { reject(e) })
   })
@@ -2053,6 +2070,7 @@ module.exports = {
   updateMemberInfoByStaffPromise,
   queryReceptCellPromise,
   enterReceptByPhonePromise,
+  enterReceptByVipPromise,
   createCarePickByStaffPromise,
   getCarePickByStaffPromise,
   verifyCarePickPromise,
@@ -2134,6 +2152,7 @@ module.exports = {
   addTagPresetPromise,
   addMemberTagPromise,
   removeMemberTagPromise,
+  setMemberVipPromise,
   registerMemberByPhonePromise,
   chargeMemberDepositPromise,
   grantPunchCardPromise,

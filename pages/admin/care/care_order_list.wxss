@@ -199,7 +199,7 @@
 .tag--summer    { background: #fef3c7; color: #b45309; }
 .tag--card      { background: #dbeafe; color: #1e40af; }
 .tag--ticket    { background: #ffedd5; color: #c2410c; }
-.tag--member    { background: #f0fdf4; color: #166534; }
+.tag--new       { background: #ecfccb; color: #3f6212; }
 
 /* 详情行 */
 .order-rows {
@@ -251,23 +251,206 @@
   text-overflow: ellipsis;
 }
 
-/* 装备照片：卡片最右侧竖排 */
-.order-photos {
+/* 订单基本信息：两列。内容区宽 606rpx，左列 55% 放长内容（日期、手机+复制按钮、金额），
+   右列 45% 放短内容；一行放不下的值不折行（省略号），手机号+复制按钮整体不收缩 */
+.info-grid {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8rpx;
-  width: 160rpx;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.info-cell {
+  width: 55%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-width: 0;
+  margin-bottom: 6rpx;
+  font-size: 24rpx;
+}
+
+.info-cell--right {
+  width: 45%;
+  padding-left: 12rpx;
+}
+
+/* 开单店铺：占满一整行，放在订单信息最上面 */
+.info-cell--full {
+  width: 100%;
+}
+
+.info-cell .row-label { width: 88rpx; }
+.info-cell--right .row-label { width: 70rpx; }
+.info-cell .row-value--wide { min-width: 0; }
+.row-label--info { width: 88rpx; }
+
+.info-phone {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
   flex-shrink: 0;
-  margin-left: 12rpx;
+}
+
+/* 装备：通栏放在订单信息下面；每件一块，左边是和订单标签列对齐的图标列（双板 / 单板的图标），
+   窄而高的照片（雪板是竖图）在各自那块的右侧 */
+.care-section {
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.care-section-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 22rpx;
+  color: #888;
+  /* 上下留白加大，作为折叠开关好点；左边让出标签列的位置（标签列宽 + 右间距），文字和上面的订单信息左对齐 */
+  padding: 12rpx 0;
+  padding-left: 64rpx;
+}
+
+.care-toggle {
+  color: #006495;
+}
+
+/* 展开 / 收起右侧的小箭头：收起时朝下，展开时朝上 */
+.care-arrow {
+  display: inline-block;
+  margin-left: 8rpx;
+  font-size: 28rpx;
+  transform: rotate(90deg);
+}
+
+.care-arrow--open {
+  transform: rotate(-90deg);
+}
+
+.care-line {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+/* 图标列：和订单标签列（.tag-col）一样宽、一样的右间距，图标和上面的订单图标上下对齐成一列 */
+.care-icon-col {
+  width: 48rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+  padding-top: 9rpx;
+}
+
+.care-kind {
+  display: block;
+  width: 48rpx;
+  height: 48rpx;
+}
+
+/* 每件装备的内容：虚线分隔从右侧详情列的左边缘开始 */
+.care-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 8rpx 0;
+  border-top: 1rpx dashed #e5e7eb;
+}
+
+.care-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.care-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #222;
+}
+
+.care-services {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 4rpx 0 2rpx;
+}
+
+.svc {
+  font-size: 20rpx;
+  line-height: 30rpx;
+  padding: 0 10rpx;
+  margin: 0 6rpx 4rpx 0;
+  border-radius: 6rpx;
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.svc--urgent { background: #fee2e2; color: #b91c1c; }
+.svc--summer { background: #fef3c7; color: #b45309; }
+
+.care-progress {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+/* 每件装备的金额 / 减免 */
+.care-amount {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #374151;
+}
+
+.care-amount-item {
+  margin-right: 28rpx;
+}
+
+.care-amount-label {
+  margin-right: 8rpx;
+  color: #888;
+}
+
+.progress-chip {
+  font-size: 20rpx;
+  line-height: 30rpx;
+  padding: 0 14rpx;
+  margin-right: 10rpx;
+  border-radius: 20rpx;
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.progress-chip--run    { background: #fef3c7; color: #b45309; }
+.progress-chip--done   { background: #dcfce7; color: #15803d; }
+.progress-chip--cancel { background: #fee2e2; color: #b91c1c; }
+
+.care-current {
+  font-size: 22rpx;
+  color: #666;
 }
 
 .care-thumb {
-  width: 150rpx;
-  height: 150rpx;
+  width: 72rpx;
+  height: 132rpx;
+  flex-shrink: 0;
+  margin-left: 12rpx;
   border-radius: 8rpx;
   background: #f3f4f6;
 }
+
+/* 没付成功的订单：装备块同样置灰 */
+.order-card--unpaid .care-title,
+.order-card--unpaid .care-current,
+.order-card--unpaid .care-section-title,
+.order-card--unpaid .care-toggle { color: #b0b0b0; }
+.order-card--unpaid .care-kind { opacity: 0.4; filter: grayscale(1); }
+.order-card--unpaid .care-amount,
+.order-card--unpaid .care-amount-label { color: #b0b0b0; }
+.order-card--unpaid .svc,
+.order-card--unpaid .progress-chip { background: #f3f4f6; color: #b0b0b0; }
 
 /* 空状态 */
 .empty-tip {

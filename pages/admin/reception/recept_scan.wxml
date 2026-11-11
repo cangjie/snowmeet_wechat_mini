@@ -67,6 +67,16 @@
       <view class="scan-hint cell-hint">只能查已登记手机号的会员；普通店员需要店长授权。不是会员请点「散客进入」。</view>
     </view>
 
+    <!-- VIP 开单：进 VIP 列表，点一位 VIP 直接开单（不用扫码、不用授权，视同已验证身份） -->
+    <view class="card">
+      <view class="card-header">
+        <van-icon name="star-o" size="18px" color="#006495"/>
+        <text class="card-title">VIP 会员</text>
+      </view>
+      <view class="walkin-btn" bindtap="onVipTap">VIP开单</view>
+      <view class="scan-hint cell-hint">在 VIP 列表里点一位会员直接开单，无需顾客扫码或店长授权。</view>
+    </view>
+
     <!-- 散客 -->
     <view class="card">
       <view class="card-header">

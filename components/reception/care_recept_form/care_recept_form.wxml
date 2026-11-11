@@ -132,8 +132,18 @@
                         catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="need_edge">修刃</view>
                   <view class="rent-mode-btn {{care.need_wax === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
                         catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="need_wax">热蜡</view>
+                  <!-- 养板（2026-11-10）：和热蜡同一类业务，互斥、互相替换；选了默认带刮蜡（与封板二选一）。
+                       非雪季养护置灰；购卡模式不出现 -->
+                  <view wx:if="{{!newCardMode}}"
+                        class="rent-mode-btn {{care.maintain_board === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
+                        catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="maintain_board">养板</view>
                   <view class="rent-mode-btn {{care.need_unwax === 1 ? 'rent-mode-btn--active' : ''}} {{care.summer != null ? 'rent-mode-btn--disabled' : ''}}"
                         catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="need_unwax">刮蜡</view>
+                  <!-- 封板（2026-11-09）：不是养护工序，只是个标志——热蜡 / 养板后不刮蜡、蜡留在板面上，取板后发一张开板刮蜡券。
+                       有热蜡或养板时与「刮蜡」二选一（默认刮蜡）；两样都没选、非雪季养护时置灰不可选；购卡模式不出现 -->
+                  <view wx:if="{{!newCardMode}}"
+                        class="rent-mode-btn {{care.seal_board === 1 ? 'rent-mode-btn--active' : ''}} {{(care.summer != null || (care.need_wax !== 1 && care.maintain_board !== 1)) ? 'rent-mode-btn--disabled' : ''}}"
+                        catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="seal_board">封板</view>
                   <view wx:if="{{care._hasFreeWaxTicket}}"
                         class="rent-mode-btn {{care.free_wax === 1 ? 'rent-mode-btn--active' : ''}}"
                         catchtap="onSvcToggle" data-cidx="{{cidx}}" data-flag="free_wax">机打蜡</view>

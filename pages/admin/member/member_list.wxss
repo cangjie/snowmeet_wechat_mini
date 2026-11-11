@@ -44,6 +44,13 @@
 .btn-txt { color: #fff; }
 
 /* 统计 */
+/* VIP 快捷筛选：筛选面板下面的一行，选中时金色填充 */
+.quick { display: flex; align-items: center; padding: 14rpx 24rpx; background: #fff; border-bottom: 1rpx solid rgba(191,199,209,.25); }
+.quick-chip { height: 58rpx; padding: 0 26rpx; border-radius: 999rpx; display: inline-flex; align-items: center; gap: 8rpx;
+  border: 1rpx solid #d9b34f; background: #fffaf0; }
+.quick-chip-txt { font-size: 26rpx; color: #9a6a00; font-weight: 600; }
+.quick-chip--on { border-color: #9a6a00; background: #ffe39a; }
+.quick-chip--on .quick-chip-txt { font-weight: 800; }
 .stats { display: flex; align-items: center; gap: 24rpx; padding: 20rpx 24rpx; background: #eff4ff;
   border-bottom: 1rpx solid rgba(191,199,209,.2); }
 .stats-item { font-size: 25rpx; color: #3f4850; }

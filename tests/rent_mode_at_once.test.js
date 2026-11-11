@@ -143,3 +143,64 @@ test('追加页：没选过模式的草稿默认立即租赁，当晚发放', ()
   assert.equal(rental.atOnce, true)
   assert.equal(rental.rentItems[0].atOnce, true)
 })
+
+// ---------- 选分类后重建的配套项（雪杖等）：当场发放要跟着租赁模式，不能读前端临时字段 rental.atOnce ----------
+// 2026-11-10 WT_ZL_261110_00001：开单先存草稿再选分类，草稿存回来后 rental.atOnce 丢了（租赁表没有这一列），
+// 选【FIS】双板后自动带出的雪杖 atOnce=false，确认时没发放；后端要求应领装备全部发放才计租，当天租金一行都没写。
+// 租赁模式存在 rental.pick_type（落库、往返不丢），配套项按它派生，和追加租赁页一致。
+function loadFormForCategoryChange(displayRentals, associates) {
+  const dataPath = require.resolve('../utils/data.js')
+  const utilPath = require.resolve('../utils/util.js')
+  const file = require.resolve('../components/reception/rent_recept_form/rent_recept_form.js')
+  const originalData = require.cache[dataPath]
+  const originalUtil = require.cache[utilPath]
+  const fakeData = {
+    getRentCategoryPromise: async id => ({ id, name: '【FIS】双板', deposit: 500, associateCategories: associates }),
+    getShopByNamePromise: async () => ({ id: 10 }),
+    getRentPriceListPromise: async () => [],
+  }
+  require.cache[dataPath] = { id: dataPath, filename: dataPath, loaded: true, exports: fakeData }
+  require.cache[utilPath] = { id: utilPath, filename: utilPath, loaded: true, exports: { createRentalDetail() {}, formatDate } }
+  delete require.cache[file]
+  let definition = null
+  global.Component = value => { definition = value }
+  global.wx = { showToast() {}, showLoading() {}, hideLoading() {} }
+  require(file)
+  delete global.Component
+  delete require.cache[file]
+  const syncs = []
+  const instance = {
+    data: { displayRentals, expandedItem: {} },
+    properties: { shop: '万龙体验中心' },
+    setData(values) { Object.keys(values).forEach(k => setByPath(this.data, k, values[k])) },
+    triggerEvent(name, detail) { if (name === 'syncRent') syncs.push(detail) },
+  }
+  Object.keys(definition.methods).forEach(name => { instance[name] = definition.methods[name].bind(instance) })
+  const restore = () => {
+    delete require.cache[file]
+    if (originalData) require.cache[dataPath] = originalData; else delete require.cache[dataPath]
+    if (originalUtil) require.cache[utilPath] = originalUtil; else delete require.cache[utilPath]
+  }
+  return { instance, syncs, restore }
+}
+
+test('选分类重建配套项：立即租赁、延时租赁的雪杖当场发放，先租后取不发放，不依赖丢失的 rental.atOnce', async () => {
+  const associates = [{ associate_id: 27, category: { id: 27, name: '【其他】雪杖' } }]
+  for (const [pickType, want] of [['立即租赁', true], ['延时租赁', true], ['先租后取', false]]) {
+    // 草稿往返之后的样子：pick_type 在，rental.atOnce 没有
+    const rental = {
+      id: 5, pick_type: pickType, start_date: formatDate(new Date()) + 'T09:20:00', expectDays: 1,
+      rentItems: [{ id: 7, is_associate: false, noCode: true, category_id: null, pick_type: pickType, atOnce: true, valid: 1 }],
+    }
+    const { instance, syncs, restore } = loadFormForCategoryChange([rental], associates)
+    try {
+      await instance._applyCategoryChange(0, 0, { id: 4, name: '【FIS】双板' })
+    } finally { restore() }
+    assert.equal(syncs.length, 1, pickType + ' 应触发保存')
+    const items = syncs[0].rentals[0].rentItems
+    const stick = items.find(i => i.is_associate)
+    assert.ok(stick, pickType + ' 要带出雪杖')
+    assert.equal(stick.atOnce, want, pickType + ' 的雪杖 atOnce')
+    assert.equal(stick.pick_type, pickType)
+  }
+})

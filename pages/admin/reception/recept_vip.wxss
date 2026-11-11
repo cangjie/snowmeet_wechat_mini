@@ -1,0 +1,53 @@
+/* pages/admin/reception/recept_vip.wxss
+   与接待相关页面共用 Alpine Operational Minimalist 样式变量，这里只补 VIP 列表 */
+@import "./recept_entry.wxss";
+
+.vip-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 10px;
+  background: var(--surface-container-lowest);
+}
+.vip-search-input { flex: 1; min-width: 0; height: 44px; font-size: 15px; color: var(--on-surface); }
+.vip-hint { font-size: 12px; color: var(--on-surface-variant); }
+
+.vip-list { display: flex; flex-direction: column; gap: 10px; }
+.vip-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  background: var(--surface-container-lowest);
+  box-shadow: 0 1px 2px rgba(11, 28, 48, 0.04);
+}
+.vip-item:active { background: var(--surface-container-low); }
+.vip-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--secondary-container); color: var(--on-secondary-container);
+  font-size: 16px; font-weight: 700; flex-shrink: 0;
+}
+.vip-avatar--f { background: #ffe1ec; color: #9b2c55; }
+.vip-mid { flex: 1; min-width: 0; }
+.vip-line1 { display: flex; align-items: center; gap: 6px; }
+.vip-name { font-size: 16px; font-weight: 700; color: var(--on-surface); }
+.vip-gender {
+  font-size: 11px; padding: 0 6px; border-radius: 999px;
+  background: var(--surface-container); color: var(--on-surface-variant);
+}
+.vip-gender--f { background: #ffe1ec; color: #9b2c55; }
+.vip-phone-row { display: inline-flex; align-items: center; margin-top: 2px; }
+.vip-phone { font-size: 13px; color: var(--on-surface-variant); }
+.vip-go { display: flex; align-items: center; gap: 2px; font-size: 14px; font-weight: 600; color: var(--primary); flex-shrink: 0; }
+
+.vip-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 48px 16px; color: var(--on-surface-variant);
+}
+.vip-empty-txt { font-size: 13px; text-align: center; }

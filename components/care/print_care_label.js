@@ -289,9 +289,11 @@ Component({
       if (memo != undefined && memo != '') {
         command.setText(200, 20 + 40 + 40 + 55 + 35, font, 0, 1, 1, "注：" + memo)
       }
-      if (candle.toString() == '1') {
-        command.setText(20, 20 + 40 + 40 + 55 + 55, font, 0, 1, 1, "热打蜡：")
-        command.setText(20, 20 + 40 + 40 + 55 + 55 + 55, font, 0, 1, 1, "刮蜡：")
+      if (candle.toString() == '1' || care.maintain_board == 1) {
+        // 养板与热蜡同一类业务、互斥：养板那行写「养板：」，其余照旧
+        command.setText(20, 20 + 40 + 40 + 55 + 55, font, 0, 1, 1, care.maintain_board == 1 ? "养板：" : "热打蜡：")
+        // 热蜡 / 养板后二选一：刮蜡（做刮蜡工序）/ 封板（不刮蜡，取板后赠开板刮蜡券）
+        command.setText(20, 20 + 40 + 40 + 55 + 55 + 55, font, 0, 1, 1, care.seal_board == 1 ? "封板（不刮蜡）" : "刮蜡：")
       }
       else if (care.free_wax == 1){
         command.setText(20, 20 + 40 + 40 + 55 + 55, font, 0, 1, 1, "机打蜡：")

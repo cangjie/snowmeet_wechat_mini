@@ -299,8 +299,12 @@ Page({
     }
     if (care.need_edge === 1) chips.push({ text: '修刃' + (care.edge_degree ? care.edge_degree + '°' : ''), cls: 'chip-outline' });
     if (care.need_wax === 1) chips.push({ text: '热蜡', cls: 'chip-outline' });
+    // 养板：与热蜡同一类业务（互斥），工序为 养板打蜡1 → 养板刮蜡1 → 养板打蜡2 → 养板刮蜡2 → 养板打蜡3
+    if (care.maintain_board === 1) chips.push({ text: '养板', cls: 'chip-outline' });
     if (care.free_wax === 1) chips.push({ text: '机打蜡', cls: 'chip-outline' });
     if (care.need_unwax === 1) chips.push({ text: '刮蜡', cls: 'chip-outline' });
+    // 封板：热蜡后不刮蜡、蜡留在板面上（没有刮蜡任务，别让店员误刮）；取板后给顾客发开板刮蜡券
+    if (care.seal_board === 1) chips.push({ text: '封板', cls: 'chip-outline' });
     if (care.urgent === 1) chips.push({ text: '立等', cls: 'chip-outline' });
     if (care.repair_memo) chips.push({ text: '维修:' + care.repair_memo, cls: 'chip-outline' });
     if (care.entertain) chips.push({ text: '招待', cls: 'chip-outline' });

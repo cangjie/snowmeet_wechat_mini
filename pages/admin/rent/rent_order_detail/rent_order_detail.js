@@ -2,6 +2,7 @@
 var app = getApp()
 var util = require('../../../../utils/util.js')
 var data = require('../../../../utils/data.js')
+var rentEstimate = require('../../../../utils/rent_estimate.js')
 
 function formatDisplayOrderCode(rawCode) {
   var code = rawCode == null ? '' : String(rawCode)
@@ -381,8 +382,23 @@ Page({
       }
       rental._rentToNow = rentToNow
       rental._rentToNowStr = util.showAmount(rentToNow)
+      var presetRent = 0
+      for (var pri = 0; rental.pricePresets && pri < rental.pricePresets.length; pri++) {
+        presetRent += parseFloat(rental.pricePresets[pri].price) || 0
+      }
+      // 还没生成过租金明细（未支付/未取件，尚未开始计费）：显示按价格预设算的预计租金，标签改成「预计租金」。
+      // 只用于展示，不进 totalSummary / 应退押金（见 utils/rent_estimate.js）
+      var estimate = rentEstimate.estimateRental(rental, order)
+      rental._rentIsEstimate = estimate.isEstimate
+      rental._rentEstimateAmount = estimate.amount
+      rental._rentDisplayAmount = rental.entertain
+        ? (rentToNow > 0 ? rentToNow : presetRent)
+        : (estimate.isEstimate ? estimate.amount : rentToNow)
+      rental._rentDisplayStr = util.showAmount(rental._rentDisplayAmount)
+      rental._entertainDiscountAmount = rental.entertain ? rental._rentDisplayAmount : 0
+      rental._rentPayableStr = util.showAmount(Math.max(0, rental._rentDisplayAmount - rental._entertainDiscountAmount))
       // showcase 费用格/小计统一走 showAmount 格式化（四舍五入 2 位 + 自带 ¥），避免浮点尾数（如 0.06000000000000005）
-      rental.totalDiscountAmountStr = util.showAmount(rental.totalDiscountAmount || 0)
+      rental.totalDiscountAmountStr = util.showAmount((rental.totalDiscountAmount || 0) + rental._entertainDiscountAmount)
       rental.totalRepairationAmountStr = util.showAmount(rental.totalRepairationAmount || 0)
       rental.totalOvertimeAmountStr = util.showAmount(rental.totalOvertimeAmount || 0)
       rental.totalSummaryStr = util.showAmount(rental.totalSummary || 0)
@@ -483,11 +499,15 @@ Page({
     // 单条 rental，这些订单级标量不会自动重算 → 结算金额（总计赔偿/实际应退）不更新。这里用最新 rentals
     // 重新累加，口径与后端 Order getter 完全一致（赔偿/超时/减免均已含在 rental.totalSummary 内）。
     var sumSummary = 0, sumOvertime = 0, sumRepair = 0
+    var sumExpectedRent = 0   // 还没开始计费的租赁的预计租金（只用于「总计租金」格的展示）
     for (var ri = 0; order.rentals && ri < order.rentals.length; ri++) {
       var rt = order.rentals[ri]
       sumOvertime += rt.totalOvertimeAmount || 0
       sumRepair += rt.totalRepairationAmount || 0
-      if (!rt.experience && !rt.entertain) sumSummary += rt.totalSummary || 0
+      if (!rt.experience && !rt.entertain) {
+        sumSummary += rt.totalSummary || 0
+        if (rt._rentIsEstimate) sumExpectedRent += rt._rentEstimateAmount || 0
+      }
     }
     order.totalRentSummaryAmount = sumSummary
     order.totalRentOverTimeAmount = sumOvertime
@@ -547,6 +567,9 @@ Page({
 
     order.totalGuarantyAmountStr = util.showAmount(order.totalGuarantyAmount)
     order.totalRentSummaryAmountStr = util.showAmount(order.totalRentSummaryAmount)
+    // 退款区「总计租金」格显示值：真实租金 + 未开始计费那几件的预计；应退押金仍只用上面真实的 totalRentSummaryAmount
+    order.totalRentDisplayStr = util.showAmount(order.totalRentSummaryAmount + sumExpectedRent)
+    order._totalRentIsEstimate = sumExpectedRent > 0
     order.totalRentNeedToRefundAmountStr = util.showAmount(order.totalRentNeedToRefundAmount)
     order.totalRentOverTimeAmountStr = util.showAmount(order.totalRentOverTimeAmount)
     order.totalRentRepairationAmountStr = util.showAmount(order.totalRentRepairAmount)

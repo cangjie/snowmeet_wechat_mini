@@ -27,6 +27,12 @@ function atOnceForMode(mode) {
   return mode === 'now' || mode === 'delay';
 }
 
+// 租赁模式存在 pick_type（落库、保存往返不丢），装备是否当场发放按它派生，口径同 atOnceForMode / 追加租赁页。
+// 不能读 rental.atOnce：租赁表没有这一列，草稿保存再读回来就丢了（2026-11-10 WT_ZL_261110_00001，见 _applyCategoryChange）。
+function atOnceForPickType(pickType) {
+  return pickType === '立即租赁' || pickType === '延时租赁';
+}
+
 // 套餐的租赁模式变了（点模式、或改日期自动切模式），套餐里的装备要不要跟着变：
 //   没选过模式 → 跟；
 //   这次在装备上手动选过（onItemModeTap 写 _modeFromPkg=false）→ 不跟；
@@ -1016,7 +1022,9 @@ Component({
         const nonAssociates = rental.rentItems.filter(it => !it.is_associate);
         const associates = (fullCat && fullCat.associateCategories) || [];
         const defaultPickType = rental.pick_type;
-        const atOnce = !!rental.atOnce;
+        // 配套项（雪杖等）当场发放要跟着租赁模式走：按 pick_type 派生。以前读 rental.atOnce，而它只是前端临时字段，
+        // 先存草稿再选分类时已经丢成 false，雪杖开单没发放；后端要求应领装备全部发放才计租，当天租金一行都不写。
+        const atOnce = atOnceForPickType(defaultPickType);
         const newAssociates = associates.map(a => {
           const cat = a.category || {};
           return {

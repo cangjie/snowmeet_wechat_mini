@@ -1,0 +1,10 @@
+{
+  "navigationStyle": "custom",
+  "backgroundTextStyle": "light",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "safe-nav-bar": "/components/safe_nav_bar/safe_nav_bar",
+    "list-pager": "/components/list-pager/index"
+  }
+}

@@ -279,7 +279,7 @@
           </view>
           <text class="rental-head-name">{{item.name}}</text>
           <view class="rental-head-meta">
-            <view class="rental-head-fee">租金<text>{{item._rentToNowStr}}</text></view>
+            <view class="rental-head-fee">{{item._rentIsEstimate ? '预计租金' : '租金'}}<text>{{item._rentDisplayStr}}</text></view>
             <view class="rental-head-fee">押金<text>{{item.guarantyAmountStr}}</text></view>
             <van-icon name="{{_expandedRentals[ridx] ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#999" />
           </view>
@@ -292,12 +292,12 @@
           <view class="rental-showcase">
             <view class="rental-showcase-summary">
               <text>押金 <text class="rental-showcase-summary-value">{{item.guarantyAmountStr}}</text></text>
-              <text>租金 <text class="rental-showcase-summary-value rental-showcase-summary-value--accent">{{item._rentToNowStr}}</text></text>
+              <text>{{item._rentIsEstimate ? '预计租金' : '租金'}} <text class="rental-showcase-summary-value rental-showcase-summary-value--accent">{{item._rentDisplayStr}}</text></text>
             </view>
 
             <view class="rental-showcase-time-row">
               <view class="rental-showcase-time-card rental-showcase-time-card--start">
-                <text class="rental-showcase-time-tag">起租</text>
+                <text class="rental-showcase-time-tag">{{item.realStartDate ? '起租' : '预约起租'}}</text>
                 <text class="rental-showcase-time-date">{{item.start_dateDateStr}}</text>
                 <text class="rental-showcase-time-time">{{item.start_dateTimeStr}}</text>
               </view>
@@ -311,8 +311,12 @@
 
             <view class="rental-showcase-fee-grid">
               <view class="rental-showcase-fee-cell">
-                <text class="rental-showcase-fee-label">租金</text>
-                <text class="rental-showcase-fee-value">{{item._rentToNowStr}}</text>
+                <text class="rental-showcase-fee-label">{{item._rentIsEstimate ? '预计租金' : '租金'}}</text>
+                <text class="rental-showcase-fee-value">{{item._rentDisplayStr}}</text>
+              </view>
+              <view wx:if="{{item.entertain}}" class="rental-showcase-fee-cell">
+                <text class="rental-showcase-fee-label">实付租金</text>
+                <text class="rental-showcase-fee-value">{{item._rentPayableStr}}</text>
               </view>
               <view class="rental-showcase-fee-cell">
                 <text class="rental-showcase-fee-label">减免</text>
@@ -336,7 +340,7 @@
             </view>
 
             <view class="rental-showcase-subtotal">
-              <text class="rental-showcase-subtotal-label">小计</text>
+              <text class="rental-showcase-subtotal-label">{{item.entertain ? '实付金额' : '小计'}}</text>
               <text class="rental-showcase-subtotal-value">{{item.totalSummaryStr}}</text>
             </view>
 
@@ -453,8 +457,8 @@
           <view class="refund-summary-value">{{order.totalGuarantyAmountStr}}</view>
         </view>
         <view class="refund-summary-cell">
-          <view class="refund-summary-label">总计租金</view>
-          <view class="refund-summary-value">{{order.totalRentSummaryAmountStr}}</view>
+          <view class="refund-summary-label">{{order._totalRentIsEstimate ? '预计租金' : '总计租金'}}</view>
+          <view class="refund-summary-value">{{order.totalRentDisplayStr}}</view>
         </view>
         <view class="refund-summary-cell">
           <view class="refund-summary-label">总计超时</view>

@@ -100,6 +100,8 @@ Page({
       m.depositTotalStr = util.showAmount(m.depositTotal || 0)
       m.avatar = (m.name && m.name.length > 0) ? m.name[0] : '?'
       m.female = m.gender === '女'
+      // VIP 是会员自己的字段（member.is_vip），后端随会员明细一起返回
+      m.isVip = !!m.isVip
       // 联系手机号（合并会员时保留的旧号，type=contact）
       m.contactCellsStr = (m.accounts && m.accounts.contactCells && m.accounts.contactCells.length > 0) ? m.accounts.contactCells.join('、') : ''
       m.recentOrders = (m.recentOrders || []).map(function (o) {
@@ -298,6 +300,32 @@ Page({
     }).catch(function () {
       wx.hideLoading(); wx.showToast({ title: '保存失败', icon: 'none' }); that.getData()
     })
+  },
+
+  // ── 设为 / 取消 VIP（member.is_vip 字段，走 MemberAdmin/SetMemberVip；后端记谁在什么时候改的）──
+  onToggleVip() {
+    var that = this
+    var member = that.data.member
+    if (!member || that._vipBusy) return
+    var sk = app.globalData.sessionKey
+    var memberId = that.data.memberId
+    var run = function (vip, doneText) {
+      that._vipBusy = true
+      data.setMemberVipPromise(memberId, vip, sk).then(function () {
+        wx.showToast({ title: doneText, icon: 'success' })
+        that.getData()
+      }).catch(function () { /* 请求层已提示失败原因 */ }).then(function () { that._vipBusy = false })
+    }
+    if (member.isVip) {
+      wx.showModal({
+        title: '取消VIP', content: '确定取消该会员的 VIP 标记？',
+        success: function (res) {
+          if (res.confirm) run(false, '已取消VIP')
+        }
+      })
+    } else {
+      run(true, '已设为VIP')
+    }
   },
 
   // ── 充值储值 ──

@@ -28,8 +28,9 @@ function uploadUrl(value) {
 function isScrapeOnlyCare(care, shop) {
   const name = String(shop || '').trim();
   if (!care || (name !== '万龙服务中心' && name !== '万龙体验中心')) return false;
+  // 养板自带刮蜡（默认带出），它不是「只刮蜡」：养板按自己的价目收，也会自动带老顾客券
   return care.need_unwax === 1 && care.need_edge !== 1 && care.need_wax !== 1 && care.free_wax !== 1
-    && !care.summer && !care.warranty && !care.entertain;
+    && care.maintain_board !== 1 && !care.summer && !care.warranty && !care.entertain;
 }
 
 // 新建一个空 care（snake_case 对齐后端；valid=0 草稿态，PlaceCareOrder 才置 1）
@@ -50,6 +51,8 @@ function blankCare() {
     edge_degree: null,
     need_wax: 0,
     need_unwax: 0,
+    seal_board: 0,   // 封板（2026-11-09）：热蜡 / 养板后不刮蜡、蜡留在板面上；与刮蜡二选一，取板后发开板刮蜡券。不是养护工序，不计费
+    maintain_board: 0,   // 养板（2026-11-10）：和热蜡同一类业务、与热蜡 / 机打蜡互斥；默认带刮蜡（与封板二选一）。单选 220，修刃+养板 280，只认老顾客券
     free_wax: 0,
     need_repair: 0,
     repair_memo: null,
@@ -77,6 +80,8 @@ function blankCare() {
 
 // 学员卡档位：修刃、热打蜡各算一项（与服务端 CarePricingRules.CountChargeableItems 一致），两项=双项，一项=单项
 function coachTier(care) {
+  // 养板有自己的价目，不享受学员卡（服务端 ClearBenefitsForMaintainBoard 会摘掉），不给档位 = 弹层里不报预计优惠
+  if (care && care.maintain_board === 1) return ''
   const n = (care && care.need_edge ? 1 : 0) + (care && care.need_wax ? 1 : 0)
   return n >= 2 ? '双项' : (n === 1 ? '单项' : '')
 }
@@ -194,7 +199,7 @@ Component({
       const hasImage = care.careImages && care.careImages.length > 0;
       const hasBrandScale = care.brand && care.scale;
       if (!hasImage && !hasBrandScale) return { ok: false, label: '图片或品牌长度必填' };
-      const hasService = care.need_edge === 1 || care.need_wax === 1 || care.free_wax === 1 || care.need_unwax === 1
+      const hasService = care.need_edge === 1 || care.need_wax === 1 || care.maintain_board === 1 || care.free_wax === 1 || care.need_unwax === 1
         || care.need_repair === 1 || !!care.repair_memo
         || care.summer != null || (care.repair_charge && care.repair_charge > 0)
         || (care.ticket && (care.ticket.template_id === 17 || care.ticket.template_id === 18));
@@ -207,11 +212,13 @@ Component({
       if (care.summer === 'now') chips.push('非雪季·寄存');
       else if (care.summer === 'later') chips.push('非雪季·先双项');
       else {
-        if (care.need_edge === 1 && care.need_wax === 1) chips.push('双项');
+        if (care.maintain_board === 1) chips.push(care.need_edge === 1 ? '修刃+养板' : '养板');
+        else if (care.need_edge === 1 && care.need_wax === 1) chips.push('双项');
         else if (care.need_edge === 1) chips.push('修刃');
         else if (care.need_wax === 1) chips.push('热蜡');
         if (care.free_wax === 1) chips.push('机打蜡');
-        if (care.need_unwax === 1 && care.need_wax !== 1) chips.push('刮蜡');
+        if (care.need_unwax === 1 && care.need_wax !== 1 && care.maintain_board !== 1) chips.push('刮蜡');
+        if (care.seal_board === 1) chips.push('封板');
         if (care.urgent === 1) chips.push('立等');
       }
       if (care.repair_memo) chips.push('维修');
@@ -476,6 +483,8 @@ Component({
               c.edge_degree = rc.edge_degree || null;
               c.need_wax = rc.need_wax || 0;
               c.need_unwax = rc.need_unwax || 0;
+              c.seal_board = rc.seal_board || 0;
+              c.maintain_board = rc.maintain_board || 0;
               c.free_wax = rc.free_wax || 0;
               c.urgent = rc.urgent || 0;
               c.summer = rc.summer || null;
@@ -491,9 +500,18 @@ Component({
               }
               // 只选刮蜡：服务端把已选的券 / 会员卡 / 学员卡（及随之带来的减免）摘掉了，本地同步清除，
               // 否则界面还挂着券、订单上却没有，店员会以为用上了
-              if (res && res.benefitsCleared) {
+              // 例外：可用的「开板刮蜡券」（封板取板后发的）专抵这口价，服务端会留着（响应里 ticket_code 还在），
+              // 本地的券也留着；抵不了的开板刮蜡券（boardTicketRemoved：别的门店 / 不是单刮蜡 / 已用 / 非本人）服务端摘了，本地同步摘
+              const ticketKept = !!rc.ticket_code;
+              if (res && res.boardTicketRemoved && !ticketKept) {
                 c.ticket = null;
                 c.ticket_code = null;
+              }
+              if (res && res.benefitsCleared) {
+                if (!ticketKept) {
+                  c.ticket = null;
+                  c.ticket_code = null;
+                }
                 c.use_card = false;
                 c.card_id = null;
                 c.card_name = null;
@@ -508,7 +526,13 @@ Component({
               c.common_charge = (res && res.commonCharge) || 0;
             }
           }, true, false);
-          if (res && res.benefitsCleared) wx.showToast({ title: '只选刮蜡按一口价，已取消券和卡', icon: 'none' });
+          if (res && res.boardTicketRemoved) wx.showToast({ title: '开板刮蜡券仅限万龙单独刮蜡，已取消', icon: 'none' });
+          else if (res && res.benefitsCleared) {
+            // 养板只认老顾客券（其余券 / 会员卡 / 学员卡被摘）；只选刮蜡是一口价（几乎所有券卡被摘）
+            const title = rc && rc.maintain_board === 1 ? '养板只能用老顾客券，已取消其它券和卡'
+              : (rc && rc.ticket_code ? '只选刮蜡按一口价，已取消卡和其它优惠' : '只选刮蜡按一口价，已取消券和卡');
+            wx.showToast({ title, icon: 'none' });
+          }
         })
         .catch(() => {
           if (that._ticketAutoDetached || that.data.newCardMode || that.data.hasCardSelection) return;
@@ -719,8 +743,41 @@ Component({
         });
         return;
       }
-      if (care.summer != null && (flag === 'need_edge' || flag === 'need_wax' || flag === 'need_unwax' || flag === 'urgent')) {
+      if (care.summer != null && (flag === 'need_edge' || flag === 'need_wax' || flag === 'maintain_board' || flag === 'need_unwax' || flag === 'seal_board' || flag === 'urgent')) {
         wx.showToast({ title: '非雪季养护项目固定', icon: 'none' });
+        return;
+      }
+      // 养板（2026-11-10）：和热蜡同一类业务，互斥、互相替换——选上就换掉热蜡 / 机打蜡、默认带刮蜡，再点取消（刮蜡 / 封板一并清掉）。
+      // 最终组合由服务端 ApplyServiceLinkage / CareSealRules 收敛，这里先同步免得按钮闪一下。
+      if (flag === 'maintain_board') {
+        const wasScrapeOnly = isScrapeOnlyCare(care, this.data.shop);
+        const turnOn = care.maintain_board !== 1;
+        this._mutate(cidx, (c) => {
+          c.maintain_board = turnOn ? 1 : 0;
+          if (turnOn) { c.need_wax = 0; c.free_wax = 0; c.need_unwax = 1; } else { c.need_unwax = 0; }
+          c.seal_board = 0;
+        });
+        this._fetchPrice(cidx, { changed: 'maintain_board' });
+        // 刚从「只选刮蜡」变成养板：老顾客券之前因为一口价没带，现在补上
+        if (wasScrapeOnly && !isScrapeOnlyCare(this.data.displayCares[cidx], this.data.shop)) this._scheduleOldCustomerTicket();
+        return;
+      }
+      // 刮蜡 / 封板（2026-11-09）：有热蜡或养板时二选一、必选其一（默认刮蜡），所以像单选按钮——
+      // 点已选中的那个不动，点另一个就切过去；封板只能跟热蜡 / 养板一起。最终组合由服务端 ApplyServiceLinkage / CareSealRules 收敛。
+      if (flag === 'seal_board') {
+        if (care.need_wax !== 1 && care.maintain_board !== 1) {
+          wx.showToast({ title: '封板需先选热蜡或养板', icon: 'none' });
+          return;
+        }
+        if (care.seal_board === 1) return;
+        this._mutate(cidx, (c) => { c.seal_board = 1; c.need_unwax = 0; });
+        this._fetchPrice(cidx, { changed: 'seal_board' });
+        return;
+      }
+      if (flag === 'need_unwax' && (care.need_wax === 1 || care.maintain_board === 1)) {
+        if (care.need_unwax === 1) return;
+        this._mutate(cidx, (c) => { c.need_unwax = 1; c.seal_board = 0; });
+        this._fetchPrice(cidx, { changed: 'need_unwax' });
         return;
       }
       // 只翻本次点的开关；联动（热蜡带刮蜡/机打蜡互斥/修刃默认角度）由服务端
@@ -729,6 +786,10 @@ Component({
       const wasScrapeOnly = isScrapeOnlyCare(care, this.data.shop);
       this._mutate(cidx, (c) => {
         c[flag] = c[flag] === 1 ? 0 : 1;
+        // 开/关热蜡都回到默认刮蜡（关热蜡 = 刮蜡、封板都清掉）：服务端联动也这么算，这里先同步免得封板按钮闪一下
+        if (flag === 'need_wax' || flag === 'free_wax') c.seal_board = 0;
+        // 开热蜡 / 机打蜡会换掉养板（互斥）
+        if ((flag === 'need_wax' || flag === 'free_wax') && c[flag] === 1) c.maintain_board = 0;
       });
       this._fetchPrice(cidx, { changed: flag });
       // 刚从「只选刮蜡」变成别的组合：老顾客券之前因为一口价没带，现在补上
@@ -740,6 +801,8 @@ Component({
       // 只翻 summer 本身；later→三项 / now→清三项 / 取消立等 等联动由服务端判定
       this._mutate(cidx, (c) => {
         c.summer = c.summer === mode ? null : mode;
+        c.seal_board = 0;   // 非雪季养护不能封板（切回雪季养护也回到默认刮蜡）
+        c.maintain_board = 0;   // 非雪季养护也没有养板
         if (this.data.newCardMode && c.summer != null) {
           c.need_edge = c.need_wax = c.need_unwax = c.summer === 'later' ? 1 : 0;
           c.urgent = 0;
@@ -1166,6 +1229,8 @@ Component({
           c.edge_degree = null;
           c.need_wax = 0;
           c.need_unwax = 0;
+          c.seal_board = 0;
+          c.maintain_board = 0;
           c.free_wax = 0;
           c.summer = null;
           if (c.biz_type === '非雪季养护') c.biz_type = null;

@@ -130,54 +130,79 @@
           <text wx:if="{{item.isSummerTask}}" class="tag tag--summer">非</text>
           <text wx:if="{{item.useCard}}" class="tag tag--card">卡</text>
           <text wx:if="{{item.haveTicket}}" class="tag tag--ticket">券</text>
-          <text class="tag tag--member">{{item.memberShip}}</text>
+          <text wx:if="{{item.isNewCareCustomer}}" class="tag tag--new">新</text>
         </view>
         <view class="order-rows">
-          <view class="order-row">
-            <text class="row-label">日期</text><text class="row-value row-value--wide">{{item.dateStr}}</text>
-          </view>
-          <view class="order-row">
-            <text class="row-label">时间</text><text class="row-value row-value--wide">{{item.timeStr}}</text>
-          </view>
-          <view class="order-row">
-            <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item.calledName}}</text>
-          </view>
-          <view class="order-row">
-            <text class="row-label">手机</text><view style="display: inline-flex; align-items: center;"><text class="row-value row-value--wide">{{item.customerCell}}</text><phone-copy phone="{{item.customerCell}}" /></view>
-          </view>
-          <view class="order-row">
-            <text class="row-label">方式</text><text class="row-value row-value--wide row-value--nowrap">{{item.payMethod || '--'}}</text>
-          </view>
-          <view class="order-row">
-            <text class="row-label">支付金额</text><text class="row-value row-value--wide">{{item.paidAmountStr}}</text>
-          </view>
-          <view class="order-row">
-            <text class="row-label">退款</text><text class="row-value row-value--wide">{{item.refundAmountStr}}</text>
-          </view>
-          <view class="order-row">
-            <text class="row-label">总计收款</text><text class="row-value row-value--wide row-value--strong">{{item.totalEarnAmountStr}}</text>
-          </view>
-          <view class="order-row">
-            <text class="row-label">装备数量</text><text class="row-value row-value--wide">{{item.careCount}}</text>
-          </view>
-          <view wx:if="{{item.services}}" class="order-row">
-            <text class="row-label">项目</text><text class="row-value row-value--wide">{{item.services}}</text>
-          </view>
-          <view class="order-row">
-            <text class="row-label">开单人</text><text class="row-value row-value--wide">{{item.staff.name}}</text>
+          <!-- 订单基本信息：两列。左列放长内容（日期、手机+复制、金额），右列放短内容 -->
+          <view class="info-grid">
+            <view class="info-cell info-cell--full">
+              <text class="row-label">开单店铺</text><text class="row-value row-value--wide row-value--nowrap">{{item.shop || '--'}}</text>
+            </view>
+            <view class="info-cell">
+              <text class="row-label">日期</text><text class="row-value row-value--wide row-value--nowrap">{{item.dateStr}} {{item.timeStr}}</text>
+            </view>
+            <view class="info-cell info-cell--right">
+              <text class="row-label">顾客</text><text class="row-value row-value--wide row-value--nowrap">{{item.calledName}}</text>
+            </view>
+            <view class="info-cell">
+              <text class="row-label">手机</text><view class="info-phone"><text class="row-value">{{item.customerCell}}</text><phone-copy phone="{{item.customerCell}}" /></view>
+            </view>
+            <view class="info-cell info-cell--right">
+              <text class="row-label">方式</text><text class="row-value row-value--wide row-value--nowrap">{{item.payMethod || '--'}}</text>
+            </view>
+            <view class="info-cell">
+              <text class="row-label">支付金额</text><text class="row-value row-value--wide row-value--nowrap">{{item.paidAmountStr}}</text>
+            </view>
+            <view class="info-cell info-cell--right">
+              <text class="row-label">退款</text><text class="row-value row-value--wide row-value--nowrap">{{item.refundAmountStr}}</text>
+            </view>
+            <view class="info-cell">
+              <text class="row-label">总计收款</text><text class="row-value row-value--wide row-value--nowrap row-value--strong">{{item.totalEarnAmountStr}}</text>
+            </view>
+            <view class="info-cell info-cell--right">
+              <text class="row-label">开单人</text><text class="row-value row-value--wide row-value--nowrap">{{item.staff.name}}</text>
+            </view>
           </view>
           <view wx:if="{{item.memo}}" class="order-row">
-            <text class="row-label">备注</text><text class="row-value row-value--wide">{{item.memo}}</text>
+            <text class="row-label row-label--info">备注</text><text class="row-value row-value--wide">{{item.memo}}</text>
           </view>
-        </view>
 
-        <!-- 装备照片：卡片最右侧竖排 -->
-        <view wx:if="{{item.thumbs.length > 0}}" class="order-photos">
-          <image wx:for="{{item.thumbs}}" wx:for-item="thumb" wx:for-index="ti" wx:key="ti"
-                 class="care-thumb" mode="aspectFill" src="{{thumb}}" />
         </view>
       </view>
-
+      <!-- 装备：通栏放在订单信息下面（不在右侧详情列里），每件装备左边的图标列和上面订单标签列对齐——双板 / 单板在这一列放图标；
+           整体可折叠，默认收起，点标题展开；展开后每件一块（品牌 / 长度 / 项目 / 进度），窄而高的照片在各自那块的右侧 -->
+      <view wx:if="{{item.careRows.length > 0}}" class="care-section">
+        <view class="care-section-title" data-idx="{{index}}" catchtap="onToggleCares">
+          <text>装备 {{item.careCount}} 件</text>
+          <text class="care-toggle">{{item.careExpanded ? '收起' : '展开'}}<text class="care-arrow {{item.careExpanded ? 'care-arrow--open' : ''}}">›</text></text>
+        </view>
+        <block wx:for="{{item.careRows}}" wx:for-item="cr" wx:for-index="ci" wx:key="id">
+          <view wx:if="{{item.careExpanded}}" class="care-line">
+            <view class="care-icon-col">
+              <image wx:if="{{cr.iconSrc}}" class="care-kind" src="{{cr.iconSrc}}" mode="aspectFit" />
+            </view>
+            <view class="care-body">
+              <view class="care-main">
+                <view class="care-title">{{cr.title}}</view>
+                <view wx:if="{{cr.services.length > 0}}" class="care-services">
+                  <text wx:for="{{cr.services}}" wx:for-item="sv" wx:key="text" class="svc {{sv.cls}}">{{sv.text}}</text>
+                </view>
+                <view class="care-progress">
+                  <text class="progress-chip progress-chip--{{cr.statusClass}}">{{cr.statusLabel}}</text>
+                  <text wx:if="{{cr.current}}" class="care-current">当前：{{cr.current}}</text>
+                </view>
+                <!-- 金额 / 减免：每件装备都显示，招待 / 质保也显示（后端按所做项目算标准价、减免到 0 元） -->
+                <view class="care-amount">
+                  <text class="care-amount-item"><text class="care-amount-label">金额</text>{{cr.chargeStr}}</text>
+                  <text class="care-amount-item"><text class="care-amount-label">减免</text>{{cr.discountStr}}</text>
+                </view>
+              </view>
+              <image wx:if="{{cr.thumb}}" class="care-thumb" mode="aspectFill" src="{{cr.thumb}}"
+                     data-idx="{{index}}" data-cid="{{cr.id}}" catchtap="onCarePhotoTap" />
+            </view>
+          </view>
+        </block>
+      </view>
     </view>
   </block>
 
