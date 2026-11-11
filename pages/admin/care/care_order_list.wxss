@@ -326,11 +326,25 @@
   transform: rotate(-90deg);
 }
 
+/* 每件装备整块（图标列 + 内容 + 照片）一个底色色块，按进度分四种：
+   未开始（只做了安全检查或一项没做）灰蓝 / 进行中（除安全检查、发板外的任务有做了、有没做的）琥珀 /
+   待发板（只差发板）紫 / 已完成（发板做完）绿；已取消红。
+   左右各多出 10rpx 再用同样的内边距收回来，里面的内容还是和上面订单信息左对齐 */
 .care-line {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+  margin: 8rpx -10rpx 0;
+  padding: 0 10rpx;
+  border-radius: 12rpx;
+  background: #eef1f6;
 }
+
+.care-line--idle   { background: #eef1f6; }
+.care-line--run    { background: #fdf0c8; }
+.care-line--ready  { background: #ebe6fd; }
+.care-line--done   { background: #daf4e3; }
+.care-line--cancel { background: #fde4e4; }
 
 /* 图标列：和订单标签列（.tag-col）一样宽、一样的右间距，图标和上面的订单图标上下对齐成一列 */
 .care-icon-col {
@@ -346,15 +360,14 @@
   height: 48rpx;
 }
 
-/* 每件装备的内容：虚线分隔从右侧详情列的左边缘开始 */
+/* 每件装备的内容（块与块之间靠 .care-line 的色块和间距分开，不再画虚线） */
 .care-body {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  padding: 8rpx 0;
-  border-top: 1rpx dashed #e5e7eb;
+  padding: 10rpx 0;
 }
 
 .care-main {
@@ -466,6 +479,9 @@
 .care-card-tag--warranty  { background: #cffafe; color: #0e7490; }
 .care-card-tag--entertain { background: #fef3c7; color: #92400e; }
 
+/* 占位行：看不见，但占的高度和真实的权益行一样 */
+.care-card--ghost { visibility: hidden; }
+
 .care-card-name {
   min-width: 0;
   overflow: hidden;
@@ -492,15 +508,15 @@
   padding: 0 14rpx;
   margin-right: 10rpx;
   border-radius: 20rpx;
-  background: #f3f4f6;
+  background: #fff;
   color: #6b7280;
 }
 
-/* 阶段色块：未开始 灰（默认）/ 进行中 琥珀 / 待发板 紫 / 已完成 绿 / 已取消 红 */
-.progress-chip--run    { background: #fef3c7; color: #b45309; }
-.progress-chip--ready  { background: #ede9fe; color: #6d28d9; }
-.progress-chip--done   { background: #dcfce7; color: #15803d; }
-.progress-chip--cancel { background: #fee2e2; color: #b91c1c; }
+/* 阶段文字标签：白底药丸坐在装备色块上（色块本身已经表示阶段），文字颜色跟阶段走 */
+.progress-chip--run    { color: #b45309; }
+.progress-chip--ready  { color: #6d28d9; }
+.progress-chip--done   { color: #15803d; }
+.progress-chip--cancel { color: #b91c1c; }
 
 
 /* 照片盒子：在 .care-body 里 stretch，高度跟整块装备内容走（至少 132rpx）；照片绝对定位铺满盒子 */
@@ -538,8 +554,15 @@
 .order-card--unpaid .care-card-no,
 .order-card--unpaid .care-card-tag { color: #b0b0b0; }
 .order-card--unpaid .care-card-tag { background: #f3f4f6; }
-.order-card--unpaid .svc,
-.order-card--unpaid .progress-chip { background: #f3f4f6; color: #b0b0b0; }
+.order-card--unpaid .svc { background: #f3f4f6; color: #b0b0b0; }
+.order-card--unpaid .progress-chip { background: #fff; color: #b0b0b0; }
+/* 没付成功的订单：装备色块不分阶段，统一浅灰 */
+.order-card--unpaid .care-line,
+.order-card--unpaid .care-line--idle,
+.order-card--unpaid .care-line--run,
+.order-card--unpaid .care-line--ready,
+.order-card--unpaid .care-line--done,
+.order-card--unpaid .care-line--cancel { background: #f7f7f7; }
 
 /* 空状态 */
 .empty-tip {

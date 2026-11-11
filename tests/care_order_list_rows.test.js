@@ -253,7 +253,7 @@ test('「装备 N 件」那一行就是折叠开关：带订单下标、显示�
 })
 
 test('装备明细只在展开时渲染；原来「还有 N 件装备」的局部折叠已被整体折叠取代', () => {
-  assert.match(cardBlock, /<view wx:if="\{\{item\.careExpanded\}\}" class="care-line">/)
+  assert.match(cardBlock, /<view wx:if="\{\{item\.careExpanded\}\}" class="care-line care-line--\{\{cr\.statusClass\}\}">/)
   assert.doesNotMatch(cardBlock, /careHiddenCount|care-more|cr\.folded/)
 })
 
@@ -333,7 +333,7 @@ test('装备区在右侧详情列（order-rows）外面，才能让图标落到�
 })
 
 test('每件装备前面有一格图标列：双板 / 单板才显示图标，图标在内容之前、不是文字', () => {
-  const line = cardBlock.match(/<view wx:if="\{\{item\.careExpanded\}\}" class="care-line">[\s\S]*?<view class="care-main">/)[0]
+  const line = cardBlock.match(/<view wx:if="\{\{item\.careExpanded\}\}" class="care-line care-line--\{\{cr\.statusClass\}\}">[\s\S]*?<view class="care-main">/)[0]
   assert.match(line, /<view class="care-icon-col">/)
   assert.match(line, /<image wx:if="\{\{cr\.iconSrc\}\}" class="care-kind" src="\{\{cr\.iconSrc\}\}"/)
   assert.match(line, /mode="aspectFit"/)
@@ -631,16 +631,81 @@ test('版式：做完绿字、正在做红字、没开始灰字；可换行；�
   assert.match(wxss, /\.order-card--unpaid \.care-task\b[^{]*\{[^}]*#b0b0b0/)
 })
 
-test('版式：阶段色块四种阶段颜色各不相同（未开始灰 / 进行中琥珀 / 待发板紫 / 已完成绿），已取消红；没付款的订单里置灰', () => {
-  const bg = sel => (rule(sel).match(/background:\s*(#[0-9a-f]{6})/) || [])[1]
-  const base = (rule('.progress-chip').match(/background:\s*(#[0-9a-f]{6})/) || [])[1]
-  assert.equal(base, '#f3f4f6')                                   // 未开始：默认灰
-  assert.equal(bg('.progress-chip--run'), '#fef3c7')
-  assert.equal(bg('.progress-chip--ready'), '#ede9fe')
-  assert.equal(bg('.progress-chip--done'), '#dcfce7')
-  assert.equal(bg('.progress-chip--cancel'), '#fee2e2')
-  assert.equal(new Set([base, bg('.progress-chip--run'), bg('.progress-chip--ready'), bg('.progress-chip--done')]).size, 4)
+test('版式：进度文字标签是白底药丸，文字颜色跟阶段走（未开始灰 / 进行中琥珀 / 待发板紫 / 已完成绿 / 已取消红）；没付款的订单里置灰', () => {
+  assert.match(rule('.progress-chip'), /background:\s*#fff\b/)
+  const color = sel => (rule(sel).match(/color:\s*(#[0-9a-f]{6})/) || [])[1]
+  const base = color('.progress-chip')
+  assert.equal(base, '#6b7280')
+  assert.equal(color('.progress-chip--run'), '#b45309')
+  assert.equal(color('.progress-chip--ready'), '#6d28d9')
+  assert.equal(color('.progress-chip--done'), '#15803d')
+  assert.equal(color('.progress-chip--cancel'), '#b91c1c')
+  assert.equal(new Set([base, color('.progress-chip--run'), color('.progress-chip--ready'), color('.progress-chip--done')]).size, 4)
   assert.match(wxss, /\.order-card--unpaid \.progress-chip\s*\{[^}]*#b0b0b0/)
+})
+
+// ───────────── 装备整块的背景色块（按进度分四种） ─────────────
+
+test('背景色块：整块装备（图标列 + 内容 + 照片）的外层 .care-line 带阶段 class，图标列、内容、照片都在它里面', () => {
+  const open = '<view wx:if="{{item.careExpanded}}" class="care-line care-line--{{cr.statusClass}}">'
+  assert.ok(cardBlock.includes(open))
+  assert.equal(insideView(cardBlock, 'class="care-line care-line--{{cr.statusClass}}"', 'class="care-icon-col"'), true)
+  assert.equal(insideView(cardBlock, 'class="care-line care-line--{{cr.statusClass}}"', 'class="care-body"'), true)
+  assert.equal(insideView(cardBlock, 'class="care-line care-line--{{cr.statusClass}}"', 'class="care-thumb-box"'), true)
+})
+
+test('背景色块：四种阶段底色各不相同（未开始灰蓝 / 进行中琥珀 / 待发板紫 / 已完成绿），已取消红；块有圆角和间距', () => {
+  const bg = sel => (rule(sel).match(/background:\s*(#[0-9a-f]{6})/) || [])[1]
+  const idle = bg('.care-line--idle')
+  const run = bg('.care-line--run')
+  const ready = bg('.care-line--ready')
+  const done = bg('.care-line--done')
+  const cancel = bg('.care-line--cancel')
+  for (const c of [idle, run, ready, done, cancel]) assert.match(c, /^#[0-9a-f]{6}$/)
+  assert.equal(new Set([idle, run, ready, done]).size, 4)
+  assert.notEqual(cancel, idle)
+  assert.equal(bg('.care-line'), idle)                           // 没有阶段 class 时也是未开始的底色
+  assert.match(rule('.care-line'), /border-radius:\s*\d+rpx/)
+  assert.match(rule('.care-line'), /margin:\s*8rpx -10rpx 0/)     // 块之间留空；色块左右各伸出 10rpx，内容仍和订单信息对齐
+  assert.match(rule('.care-line'), /padding:\s*0 10rpx/)
+  assert.doesNotMatch(rule('.care-body'), /border-top/)          // 块之间不再画虚线
+})
+
+test('背景色块：没付款的订单里不分阶段、统一浅灰', () => {
+  for (const cls of ['', '--idle', '--run', '--ready', '--done', '--cancel']) {
+    assert.match(wxss, new RegExp('\\.order-card--unpaid \\.care-line' + cls + '[,\\s{]'))
+  }
+  assert.match(wxss, /\.order-card--unpaid \.care-line--cancel\s*\{\s*background:\s*#f7f7f7;/)
+})
+
+test('背景色块：statusClass 与四种阶段一一对应（只做了安全检查 / 没任务 → idle；做了一部分 → run；只差发板 → ready；发板完成 → done）', () => {
+  const cls = tasks => rows.buildCareRows([care({ tasks })], '')[0].statusClass
+  assert.equal(cls([]), 'idle')
+  assert.equal(cls([mkTask(1, '安全检查', '未开始', 10), mkTask(2, '修刃', '未开始', 20), mkTask(3, '发板', '未开始', 60)]), 'idle')
+  assert.equal(cls([mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '未开始', 20), mkTask(3, '发板', '未开始', 60)]), 'idle')
+  assert.equal(cls([mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '已完成', 20), mkTask(3, '热蜡', '未开始', 40), mkTask(4, '发板', '未开始', 60)]), 'run')
+  assert.equal(cls([mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '已完成', 20), mkTask(3, '热蜡', '已完成', 40), mkTask(4, '发板', '未开始', 60)]), 'ready')
+  assert.equal(cls([mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '已完成', 20), mkTask(3, '发板', '已完成', 60)]), 'done')
+})
+
+// ───────────── 没有权益行的装备补占位行，和用了卡 / 券的装备一样高 ─────────────
+
+test('等高：hasBenefit —— 质保 / 招待、次卡、券、学员卡任一个都算有权益行，一个都没有才是 false', () => {
+  const has = c => rows.buildCareRows([care(c)], '')[0].hasBenefit
+  assert.equal(has({}), false)
+  assert.equal(has({ warranty: true }), true)
+  assert.equal(has({ entertain: true }), true)
+  assert.equal(has({ use_card: true, cardDisplayName: '孙伟博学员专用', card_id: 62 }), true)
+  assert.equal(has({ ticket_code: '598420371' }), true)
+  assert.equal(has({ coach_card_id: 5 }), true)
+})
+
+test('等高：没有权益行的装备补一行看不见的占位，结构和真实的权益行一样、放在金额上面', () => {
+  const ghost = cardBlock.match(/<view wx:if="\{\{!cr\.hasBenefit\}\}" class="care-card care-card--ghost">[\s\S]*?<\/view>/)[0]
+  assert.match(ghost, /<text class="care-card-tag">/)                // 和真实权益行同样的标签结构 → 高度一样
+  assert.match(rule('.care-card--ghost'), /visibility:\s*hidden/)    // 占位但看不见
+  assert.ok(cardBlock.indexOf('care-card--ghost') > cardBlock.indexOf('class="care-card care-coach"'), '占位行在所有权益行之后')
+  assert.ok(cardBlock.indexOf('care-card--ghost') < cardBlock.indexOf('class="care-amount"'), '占位行在金额 / 减免上面')
 })
 
 // ───────────── 「正在做」的红色：已开始只存在一小会儿，平时红色标在轮到的这一道 ─────────────

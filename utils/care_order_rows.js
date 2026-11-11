@@ -226,6 +226,8 @@ function buildCareRows(cares, imageHost) {
       isWarranty: benefit.isWarranty,
       isEntertain: benefit.isEntertain,
       hasFlag: benefit.hasFlag,
+      // 有没有权益行（质保 / 招待、次卡、券、学员卡任一）；一行都没有的装备，版面上补一行看不见的占位，高度和有一行权益的装备一样
+      hasBenefit: benefit.hasFlag || card.usesCard || benefit.usesTicket || benefit.usesCoachCard,
       services: serviceChips(care),
       statusLabel: progress.label,
       statusClass: progress.cls,

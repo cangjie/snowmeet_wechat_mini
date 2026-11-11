@@ -177,7 +177,7 @@
           <text class="care-toggle">{{item.careExpanded ? '收起' : '展开'}}<text class="care-arrow {{item.careExpanded ? 'care-arrow--open' : ''}}">›</text></text>
         </view>
         <block wx:for="{{item.careRows}}" wx:for-item="cr" wx:for-index="ci" wx:key="id">
-          <view wx:if="{{item.careExpanded}}" class="care-line">
+          <view wx:if="{{item.careExpanded}}" class="care-line care-line--{{cr.statusClass}}">
             <view class="care-icon-col">
               <image wx:if="{{cr.iconSrc}}" class="care-kind" src="{{cr.iconSrc}}" mode="aspectFit" />
             </view>
@@ -202,6 +202,8 @@
                 <view wx:if="{{cr.usesCard}}" class="care-card"><text class="care-card-tag">次卡</text><text class="care-card-name">{{cr.cardName}}</text><text wx:if="{{cr.cardNo}}" class="care-card-no">{{cr.cardNo}}</text><text class="care-card-remain">{{cr.cardRemain}}</text></view>
                 <view wx:if="{{cr.usesTicket}}" class="care-card care-ticket"><text class="care-card-tag care-card-tag--ticket">券</text><text class="care-card-name">{{cr.ticketName}}</text><text class="care-card-no">{{cr.ticketNo}}</text></view>
                 <view wx:if="{{cr.usesCoachCard}}" class="care-card care-coach"><text class="care-card-tag care-card-tag--coach">学员卡</text><text class="care-card-name">{{cr.coachName}}</text><text class="care-card-no">{{cr.coachNo}}</text></view>
+                <!-- 一行权益都没有的装备：补一行看不见的占位（结构和真实的权益行一样，高度自然一样），这样用了卡 / 券的和没用的装备块一样高，金额 / 减免也上下对齐 -->
+                <view wx:if="{{!cr.hasBenefit}}" class="care-card care-card--ghost"><text class="care-card-tag">次卡</text></view>
                 <!-- 金额 / 减免：每件装备都显示，招待 / 质保也显示（后端按所做项目算标准价、减免到 0 元） -->
                 <view class="care-amount">
                   <text class="care-amount-item"><text class="care-amount-label">金额</text>{{cr.chargeStr}}</text>
