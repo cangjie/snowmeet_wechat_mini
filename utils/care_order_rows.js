@@ -144,6 +144,29 @@ function cardInfo(care) {
   return { usesCard: true, cardName: name, cardNo, cardRemain: remain }
 }
 
+// 装备用的券 / 学员卡 / 质保 / 招待，和次卡一起列在装备块里（不管订单里有几件、每件用了什么，都各列各的）：
+//   · 券：选了券（ticket_code）就列出来，券名取后端给的 ticketDisplayName，读不到显示「优惠券」，券号 = ticket_code；
+//   · 学员卡：选了学员卡（coach_card_id）就列出来，名字取后端给的 coachCardDisplayName（「某某教练的学员卡」），读不到显示「学员卡」，卡号 = 学员卡 id；
+//   · 质保 / 招待：装备自带的标记（warranty / entertain），各出一个标签。
+function benefitInfo(care) {
+  const ticketCode = String(care.ticket_code || '').trim()
+  const coachId = Number(care.coach_card_id)
+  const hasCoach = Number.isInteger(coachId) && coachId > 0
+  const isWarranty = care.warranty === true || care.warranty === 1
+  const isEntertain = care.entertain === true || care.entertain === 1
+  return {
+    usesTicket: ticketCode !== '',
+    ticketName: ticketCode !== '' ? (String(care.ticketDisplayName || '').trim() || '优惠券') : '',
+    ticketNo: ticketCode !== '' ? '券号 ' + ticketCode : '',
+    usesCoachCard: hasCoach,
+    coachName: hasCoach ? (String(care.coachCardDisplayName || '').trim() || '学员卡') : '',
+    coachNo: hasCoach ? '卡号 ' + coachId : '',
+    isWarranty,
+    isEntertain,
+    hasFlag: isWarranty || isEntertain
+  }
+}
+
 function money(n) {
   return '¥' + (Math.round(n * 100) / 100).toFixed(2)
 }
@@ -153,6 +176,7 @@ function buildCareRows(cares, imageHost) {
     const progress = careProgress(care)
     const amount = careAmounts(care)
     const card = cardInfo(care)
+    const benefit = benefitInfo(care)
     return {
       id: care.id,
       title: equipmentTitle(care),
@@ -166,6 +190,15 @@ function buildCareRows(cares, imageHost) {
       cardName: card.cardName,
       cardNo: card.cardNo,
       cardRemain: card.cardRemain,
+      usesTicket: benefit.usesTicket,
+      ticketName: benefit.ticketName,
+      ticketNo: benefit.ticketNo,
+      usesCoachCard: benefit.usesCoachCard,
+      coachName: benefit.coachName,
+      coachNo: benefit.coachNo,
+      isWarranty: benefit.isWarranty,
+      isEntertain: benefit.isEntertain,
+      hasFlag: benefit.hasFlag,
       services: serviceChips(care),
       statusLabel: progress.label,
       statusClass: progress.cls,

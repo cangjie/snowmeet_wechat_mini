@@ -191,13 +191,17 @@
                   <text class="progress-chip progress-chip--{{cr.statusClass}}">{{cr.statusLabel}}</text>
                   <text wx:if="{{cr.current}}" class="care-current">当前：{{cr.current}}</text>
                 </view>
+                <!-- 这件装备用的权益，在金额 / 减免上面，每种一行：质保 / 招待标签；次卡（卡名 + 卡号 + 这件用完之后还剩几次）；
+                     券（券名 + 券号）；学员卡（「某某教练的学员卡」+ 卡号）。不管订单里哪件装备、用了什么卡 / 券，都各列各的 -->
+                <view wx:if="{{cr.hasFlag}}" class="care-card care-flags"><text wx:if="{{cr.isWarranty}}" class="care-card-tag care-card-tag--warranty">质保</text><text wx:if="{{cr.isEntertain}}" class="care-card-tag care-card-tag--entertain">招待</text></view>
+                <view wx:if="{{cr.usesCard}}" class="care-card"><text class="care-card-tag">次卡</text><text class="care-card-name">{{cr.cardName}}</text><text wx:if="{{cr.cardNo}}" class="care-card-no">{{cr.cardNo}}</text><text class="care-card-remain">{{cr.cardRemain}}</text></view>
+                <view wx:if="{{cr.usesTicket}}" class="care-card care-ticket"><text class="care-card-tag care-card-tag--ticket">券</text><text class="care-card-name">{{cr.ticketName}}</text><text class="care-card-no">{{cr.ticketNo}}</text></view>
+                <view wx:if="{{cr.usesCoachCard}}" class="care-card care-coach"><text class="care-card-tag care-card-tag--coach">学员卡</text><text class="care-card-name">{{cr.coachName}}</text><text class="care-card-no">{{cr.coachNo}}</text></view>
                 <!-- 金额 / 减免：每件装备都显示，招待 / 质保也显示（后端按所做项目算标准价、减免到 0 元） -->
                 <view class="care-amount">
                   <text class="care-amount-item"><text class="care-amount-label">金额</text>{{cr.chargeStr}}</text>
                   <text class="care-amount-item"><text class="care-amount-label">减免</text>{{cr.discountStr}}</text>
                 </view>
-                <!-- 用次卡的装备：用的哪张卡（卡名 + 卡号）、这件用完之后还剩几次（金额 / 减免是 0，因为卡抵掉了） -->
-                <view wx:if="{{cr.usesCard}}" class="care-card"><text class="care-card-tag">次卡</text><text class="care-card-name">{{cr.cardName}}</text><text wx:if="{{cr.cardNo}}" class="care-card-no">{{cr.cardNo}}</text><text class="care-card-remain">{{cr.cardRemain}}</text></view>
               </view>
               <!-- 照片：盒子跟着整块装备的高度走（次卡多一行时也一样高），照片铺满盒子 -->
               <view wx:if="{{cr.thumb}}" class="care-thumb-box">

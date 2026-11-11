@@ -424,14 +424,14 @@ test('次卡装备的金额 / 减免仍是库里的值：0 就显示 ¥0.00，�
   assert.equal(row.discountStr, '¥0.00')
 })
 
-test('版式：次卡一行在金额 / 减免下面、装备内容里面，只在用了次卡时才渲染；卡名和剩余次数分开两段', () => {
+test('版式：次卡一行在金额 / 减免上面、装备内容里面，只在用了次卡时才渲染；卡名和剩余次数分开两段', () => {
   assert.equal(insideView(cardBlock, 'class="care-main"', 'class="care-card"'), true)
   const cardRow = cardBlock.match(/<view[^>]*class="care-card"[^>]*>[\s\S]*?<\/view>/)[0]
   assert.match(cardRow, /wx:if="\{\{cr\.usesCard\}\}"/)
   assert.match(cardRow, /次卡/)
   assert.match(cardRow, /class="care-card-name"[^>]*>\{\{cr\.cardName\}\}/)
   assert.match(cardRow, /class="care-card-remain"[^>]*>\{\{cr\.cardRemain\}\}/)
-  assert.ok(cardBlock.indexOf('class="care-amount"') < cardBlock.indexOf('class="care-card"'), '次卡一行在金额 / 减免之后')
+  assert.ok(cardBlock.indexOf('class="care-card"') < cardBlock.indexOf('class="care-amount"'), '次卡一行在金额 / 减免之前（卡在上，金额在下）')
 })
 
 test('版式：卡名太长只省略卡名，剩余次数不收缩；没付款的灰色订单里同样置灰', () => {
@@ -486,4 +486,87 @@ test('版式：照片盒子跟整块装备的高度走（次卡多一行时照�
   assert.match(img, /width:\s*100%/)
   assert.match(img, /height:\s*100%/)
   assert.match(rule('.care-body'), /align-items:\s*stretch/)
+})
+
+// ───────────── 装备用的券 / 学员卡 / 质保 / 招待 ─────────────
+
+test('用了券的装备：列出券名和券号；后端给 ticketDisplayName，没给显示「优惠券」', () => {
+  const row = rows.buildCareRows([care({ ticket_code: '997053438', ticketDisplayName: '老顾客优惠券', discount: 230, common_charge: 230 })], '')[0]
+  assert.equal(row.usesTicket, true)
+  assert.equal(row.ticketName, '老顾客优惠券')
+  assert.equal(row.ticketNo, '券号 997053438')
+  assert.equal(row.chargeStr, '¥230.00')       // 金额 / 减免照常
+  assert.equal(row.discountStr, '¥230.00')
+  const noName = rows.buildCareRows([care({ ticket_code: 'T-GONE' })], '')[0]
+  assert.equal(noName.ticketName, '优惠券')
+  assert.equal(noName.ticketNo, '券号 T-GONE')
+  const blank = rows.buildCareRows([care({ ticket_code: ' ' }), care({ ticket_code: null }), care()], '')
+  assert.deepEqual(blank.map(r => [r.usesTicket, r.ticketName, r.ticketNo]), [[false, '', ''], [false, '', ''], [false, '', '']])
+})
+
+test('用了学员卡的装备：列出「某某教练的学员卡」和卡号；没给名字显示「学员卡」', () => {
+  const row = rows.buildCareRows([care({ coach_card_id: 21, coachCardDisplayName: '张教练的学员卡' })], '')[0]
+  assert.equal(row.usesCoachCard, true)
+  assert.equal(row.coachName, '张教练的学员卡')
+  assert.equal(row.coachNo, '卡号 21')
+  const noName = rows.buildCareRows([care({ coach_card_id: 21 })], '')[0]
+  assert.equal(noName.coachName, '学员卡')
+  const none = rows.buildCareRows([care({ coach_card_id: null }), care({ coach_card_id: 0 }), care()], '')
+  assert.deepEqual(none.map(r => [r.usesCoachCard, r.coachName, r.coachNo]), [[false, '', ''], [false, '', ''], [false, '', '']])
+})
+
+test('质保 / 招待：装备自带的标记各出一个标签，都没有就没有', () => {
+  const [w, e, both, none] = rows.buildCareRows([care({ warranty: true }), care({ entertain: true }), care({ warranty: true, entertain: true }), care()], '')
+  assert.deepEqual([w.isWarranty, w.isEntertain, w.hasFlag], [true, false, true])
+  assert.deepEqual([e.isWarranty, e.isEntertain, e.hasFlag], [false, true, true])
+  assert.deepEqual([both.isWarranty, both.isEntertain, both.hasFlag], [true, true, true])
+  assert.deepEqual([none.isWarranty, none.isEntertain, none.hasFlag], [false, false, false])
+  assert.equal(rows.buildCareRows([care({ warranty: 1 })], '')[0].isWarranty, true)   // 老接口给 0 / 1
+})
+
+test('不管订单里有几件装备、各用什么：每件各列各的，互不串', () => {
+  const list = rows.buildCareRows([
+    care({ id: 1, use_card: true, card_id: 62, cardDisplayName: '孙伟博学员专用', cardRemaining: 6 }),
+    care({ id: 2, ticket_code: '997053438', ticketDisplayName: '老顾客优惠券' }),
+    care({ id: 3, coach_card_id: 21, coachCardDisplayName: '张教练的学员卡' }),
+    care({ id: 4, warranty: true }),
+    care({ id: 5, entertain: true, ticket_code: 'X1' }),
+    care({ id: 6 })
+  ], '')
+  assert.deepEqual(list.map(r => [r.usesCard, r.usesTicket, r.usesCoachCard, r.hasFlag]), [
+    [true, false, false, false], [false, true, false, false], [false, false, true, false],
+    [false, false, false, true], [false, true, false, true], [false, false, false, false]
+  ])
+})
+
+test('版式：权益都在金额 / 减免上面；质保 / 招待、次卡、券、学员卡各一行，各自只在有时才渲染，券和学员卡不依赖次卡', () => {
+  const amountAt = cardBlock.indexOf('class="care-amount"')
+  const flags = cardBlock.match(/<view[^>]*class="care-card care-flags"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.match(flags, /wx:if="\{\{cr\.hasFlag\}\}"/)
+  assert.match(flags, /<text wx:if="\{\{cr\.isWarranty\}\}" class="care-card-tag care-card-tag--warranty">质保<\/text>/)
+  assert.match(flags, /<text wx:if="\{\{cr\.isEntertain\}\}" class="care-card-tag care-card-tag--entertain">招待<\/text>/)
+  const ticket = cardBlock.match(/<view[^>]*class="care-card care-ticket"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.match(ticket, /wx:if="\{\{cr\.usesTicket\}\}"/)
+  assert.match(ticket, /care-card-tag--ticket">券<\/text>/)
+  assert.match(ticket, /class="care-card-name">\{\{cr\.ticketName\}\}/)
+  assert.match(ticket, /class="care-card-no">\{\{cr\.ticketNo\}\}/)
+  const coach = cardBlock.match(/<view[^>]*class="care-card care-coach"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.match(coach, /wx:if="\{\{cr\.usesCoachCard\}\}"/)
+  assert.match(coach, /care-card-tag--coach">学员卡<\/text>/)
+  assert.match(coach, /class="care-card-name">\{\{cr\.coachName\}\}/)
+  assert.match(coach, /class="care-card-no">\{\{cr\.coachNo\}\}/)
+  for (const m of ['class="care-card care-flags"', 'class="care-card"', 'class="care-card care-ticket"', 'class="care-card care-coach"']) {
+    assert.ok(cardBlock.indexOf(m) > cardBlock.indexOf('class="care-progress"') && cardBlock.indexOf(m) < amountAt, m + ' 在进度之后、金额之前')
+    assert.equal(insideView(cardBlock, 'class="care-main"', m), true)
+  }
+  assert.equal(cardBlock.match(/class="care-card"/g).length, 1, '次卡行只有一行；券 / 学员卡 / 标签行各有自己的类')
+})
+
+test('版式：标签配色和订单左侧标签一致（次卡蓝 / 券橙 / 质保青 / 招待琥珀），没付款的灰色订单里标签也置灰', () => {
+  assert.match(rule('.care-card-tag'), /#dbeafe/)
+  assert.match(wxss, /\.care-card-tag--ticket\s*\{[^}]*#ffedd5[^}]*#c2410c/)
+  assert.match(wxss, /\.care-card-tag--warranty\s*\{[^}]*#cffafe[^}]*#0e7490/)
+  assert.match(wxss, /\.care-card-tag--entertain\s*\{[^}]*#fef3c7[^}]*#92400e/)
+  assert.match(wxss, /\.care-card-tag--coach\s*\{/)
+  assert.match(wxss, /\.order-card--unpaid \.care-card-tag\s*\{[^}]*background:\s*#f3f4f6/)
 })
