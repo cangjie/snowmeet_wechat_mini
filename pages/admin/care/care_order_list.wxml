@@ -196,11 +196,14 @@
                   <text class="care-amount-item"><text class="care-amount-label">金额</text>{{cr.chargeStr}}</text>
                   <text class="care-amount-item"><text class="care-amount-label">减免</text>{{cr.discountStr}}</text>
                 </view>
-                <!-- 用次卡的装备：用的哪张卡、还剩几次（金额 / 减免是 0，因为卡抵掉了） -->
-                <view wx:if="{{cr.usesCard}}" class="care-card"><text class="care-card-tag">次卡</text><text class="care-card-name">{{cr.cardName}}</text><text class="care-card-remain">{{cr.cardRemain}}</text></view>
+                <!-- 用次卡的装备：用的哪张卡（卡名 + 卡号）、这件用完之后还剩几次（金额 / 减免是 0，因为卡抵掉了） -->
+                <view wx:if="{{cr.usesCard}}" class="care-card"><text class="care-card-tag">次卡</text><text class="care-card-name">{{cr.cardName}}</text><text wx:if="{{cr.cardNo}}" class="care-card-no">{{cr.cardNo}}</text><text class="care-card-remain">{{cr.cardRemain}}</text></view>
               </view>
-              <image wx:if="{{cr.thumb}}" class="care-thumb" mode="aspectFill" src="{{cr.thumb}}"
-                     data-idx="{{index}}" data-cid="{{cr.id}}" catchtap="onCarePhotoTap" />
+              <!-- 照片：盒子跟着整块装备的高度走（次卡多一行时也一样高），照片铺满盒子 -->
+              <view wx:if="{{cr.thumb}}" class="care-thumb-box">
+                <image class="care-thumb" mode="aspectFill" src="{{cr.thumb}}"
+                       data-idx="{{index}}" data-cid="{{cr.id}}" catchtap="onCarePhotoTap" />
+              </view>
             </view>
           </view>
         </block>

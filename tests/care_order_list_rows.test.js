@@ -440,3 +440,50 @@ test('版式：卡名太长只省略卡名，剩余次数不收缩；没付款�
   assert.match(rule('.care-card-remain'), /flex:\s*none/)
   assert.match(wxss, /\.order-card--unpaid \.care-card[^{]*\{[^}]*#b0b0b0/)
 })
+
+test('次卡装备：显示卡号（卡 id，装备自带的 card_id）；卡号和卡名、剩余次数各自独立', () => {
+  const row = rows.buildCareRows([care({ use_card: true, card_id: 62, cardDisplayName: '孙伟博学员专用', cardRemaining: 6 })], '')[0]
+  assert.equal(row.cardNo, '卡号 62')
+  assert.equal(row.cardName, '孙伟博学员专用')
+  assert.equal(row.cardRemain, '剩余 6 次')
+  // 同一张卡上先后用的两件装备：后端给的 cardRemaining 各不相同（6 / 5），行里原样显示，卡号相同
+  const two = rows.buildCareRows([
+    care({ id: 1, use_card: true, card_id: 62, cardDisplayName: '孙伟博学员专用', cardRemaining: 6 }),
+    care({ id: 2, use_card: true, card_id: 62, cardDisplayName: '孙伟博学员专用', cardRemaining: 5 })
+  ], '')
+  assert.deepEqual(two.map(r => [r.cardNo, r.cardRemain]), [['卡号 62', '剩余 6 次'], ['卡号 62', '剩余 5 次']])
+})
+
+test('卡号：没绑上卡（card_id 空 / 0 / 不是数）不显示；没用次卡的装备不显示；字符串数字也认', () => {
+  assert.equal(rows.buildCareRows([care({ use_card: true, card_id: null })], '')[0].cardNo, '')
+  assert.equal(rows.buildCareRows([care({ use_card: true, card_id: 0 })], '')[0].cardNo, '')
+  assert.equal(rows.buildCareRows([care({ use_card: true, card_id: 'abc' })], '')[0].cardNo, '')
+  assert.equal(rows.buildCareRows([care({ use_card: true })], '')[0].cardNo, '')
+  assert.equal(rows.buildCareRows([care({ use_card: false, card_id: 62 })], '')[0].cardNo, '')
+  assert.equal(rows.buildCareRows([care({ use_card: true, card_id: '62' })], '')[0].cardNo, '卡号 62')
+})
+
+test('版式：卡号在卡名和剩余次数之间，有卡号才渲染', () => {
+  const cardRow = cardBlock.match(/<view[^>]*class="care-card"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.match(cardRow, /<text wx:if="\{\{cr\.cardNo\}\}" class="care-card-no">\{\{cr\.cardNo\}\}<\/text>/)
+  assert.ok(cardRow.indexOf('care-card-name') < cardRow.indexOf('care-card-no') && cardRow.indexOf('care-card-no') < cardRow.indexOf('care-card-remain'))
+  assert.match(rule('.care-card-no'), /flex:\s*none/)                                   // 卡名再长也不挤掉卡号
+  assert.match(wxss, /\.order-card--unpaid \.care-card-no[^{]*\{[^}]*#b0b0b0/)          // 没付款的灰色订单里同样置灰
+})
+
+test('版式：照片盒子跟整块装备的高度走（次卡多一行时照片也跟着变高），照片铺满盒子，点击预览不变', () => {
+  const imgBlock = cardBlock.match(/<view[^>]*class="care-thumb-box"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.match(imgBlock, /wx:if="\{\{cr\.thumb\}\}"/)
+  assert.match(imgBlock, /<image class="care-thumb"[^>]*mode="aspectFill"[^>]*catchtap="onCarePhotoTap"/)
+  assert.equal(insideView(cardBlock, 'class="care-body"', 'class="care-thumb-box"'), true)
+  const box = rule('.care-thumb-box')
+  assert.match(box, /align-self:\s*stretch/)                  // 高度跟 .care-body 里最高的内容走，不写死
+  assert.doesNotMatch(box, /(^|[;\s])height:/)
+  assert.ok(num(box, 'min-height') >= 132, '没有多出内容时至少还是原来的 132rpx')
+  assert.match(box, /position:\s*relative/)
+  const img = rule('.care-thumb')
+  assert.match(img, /position:\s*absolute/)
+  assert.match(img, /width:\s*100%/)
+  assert.match(img, /height:\s*100%/)
+  assert.match(rule('.care-body'), /align-items:\s*stretch/)
+})

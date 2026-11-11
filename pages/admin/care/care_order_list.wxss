@@ -352,7 +352,7 @@
   min-width: 0;
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: stretch;
   padding: 8rpx 0;
   border-top: 1rpx dashed #e5e7eb;
 }
@@ -441,7 +441,13 @@
   white-space: nowrap;
 }
 
-/* 剩余次数不收缩：卡名再长也只省略卡名 */
+/* 卡号、剩余次数都不收缩：卡名再长也只省略卡名 */
+.care-card-no {
+  flex: none;
+  margin-left: 12rpx;
+  color: #6b7280;
+}
+
 .care-card-remain {
   flex: none;
   margin-left: 12rpx;
@@ -467,13 +473,25 @@
   color: #666;
 }
 
-.care-thumb {
+/* 照片盒子：在 .care-body 里 stretch，高度跟整块装备内容走（至少 132rpx）；照片绝对定位铺满盒子 */
+.care-thumb-box {
+  position: relative;
+  flex: none;
+  align-self: stretch;
   width: 72rpx;
-  height: 132rpx;
-  flex-shrink: 0;
+  min-height: 132rpx;
   margin-left: 12rpx;
   border-radius: 8rpx;
+  overflow: hidden;
   background: #f3f4f6;
+}
+
+.care-thumb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* 没付成功的订单：装备块同样置灰 */
@@ -486,6 +504,7 @@
 .order-card--unpaid .care-amount-label,
 .order-card--unpaid .care-card,
 .order-card--unpaid .care-card-remain,
+.order-card--unpaid .care-card-no,
 .order-card--unpaid .care-card-tag { color: #b0b0b0; }
 .order-card--unpaid .care-card-tag { background: #f3f4f6; }
 .order-card--unpaid .svc,
