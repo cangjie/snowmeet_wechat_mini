@@ -642,3 +642,36 @@ test('版式：阶段色块四种阶段颜色各不相同（未开始灰 / 进�
   assert.equal(new Set([base, bg('.progress-chip--run'), bg('.progress-chip--ready'), bg('.progress-chip--done')]).size, 4)
   assert.match(wxss, /\.order-card--unpaid \.progress-chip\s*\{[^}]*#b0b0b0/)
 })
+
+// ───────────── 「正在做」的红色：已开始只存在一小会儿，平时红色标在轮到的这一道 ─────────────
+
+const clsOf = c => rows.buildCareRows([care(c)], '')[0].tasks.map(t => [t.name, t.cls])
+
+test('红色：装备已动工、没有任务是已开始时，红色标在按顺序第一个没做完的任务（实录：热蜡做完、刮蜡还没点开始）', () => {
+  assert.deepEqual(clsOf({ tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '已完成', 20), mkTask(3, '热蜡', '已完成', 40), mkTask(4, '刮蜡', '未开始', 50), mkTask(5, '发板', '未开始', 60)] }),
+    [['安全检查', 'done'], ['修刃', 'done'], ['热蜡', 'done'], ['刮蜡', 'run'], ['发板', 'idle']])
+})
+
+test('红色：待发板的装备，红色标在发板（实录：修刃 / 热蜡 / 刮蜡都做完，只差发板）', () => {
+  assert.deepEqual(clsOf({ tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '已完成', 20), mkTask(3, '热蜡', '已完成', 40), mkTask(4, '刮蜡', '已完成', 50), mkTask(5, '发板', '未开始', 60)] }),
+    [['安全检查', 'done'], ['修刃', 'done'], ['热蜡', 'done'], ['刮蜡', 'done'], ['发板', 'run']])
+})
+
+test('红色：有任务是已开始的，红色只标已开始的，不再多标第一个没做完的', () => {
+  assert.deepEqual(clsOf({ tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '未开始', 20), mkTask(3, '热蜡', '已开始', 40), mkTask(4, '发板', '未开始', 60)] }),
+    [['安全检查', 'done'], ['修刃', 'idle'], ['热蜡', 'run'], ['发板', 'idle']])
+})
+
+test('红色：顺序按任务顺序，强行中止算做完被跳过，轮到的后面的任务仍是灰', () => {
+  assert.deepEqual(clsOf({ tasks: [mkTask(5, '发板', '未开始', 90), mkTask(4, '刮蜡', '未开始', 30), mkTask(2, '修刃', '强行中止', 10), mkTask(1, '安全检查', '已完成', 50), mkTask(3, '热蜡', '未开始', 20)] }),
+    [['安全检查', 'done'], ['修刃', 'done'], ['热蜡', 'run'], ['刮蜡', 'idle'], ['发板', 'idle']])
+})
+
+test('红色：还没动工（未开始）、已完成、已取消的装备没有红色', () => {
+  const noRun = c => clsOf(c).every(([, cls]) => cls !== 'run')
+  assert.equal(noRun({ tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '未开始', 20), mkTask(3, '发板', '未开始', 60)] }), true)     // 只做了安全检查
+  assert.equal(noRun({ tasks: [mkTask(1, '安全检查', '未开始', 10), mkTask(2, '修刃', '未开始', 20), mkTask(3, '发板', '未开始', 60)] }), true)   // 安全检查都没做
+  assert.equal(noRun({ tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '已完成', 20), mkTask(3, '发板', '已完成', 60)] }), true)     // 已完成
+  assert.equal(noRun({ is_cancel: true, tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '未开始', 20), mkTask(3, '发板', '未开始', 60)] }), true)   // 已取消
+  assert.equal(noRun({ tasks: [] }), true)
+})

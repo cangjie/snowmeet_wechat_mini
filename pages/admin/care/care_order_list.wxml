@@ -188,7 +188,7 @@
                   <text wx:for="{{cr.services}}" wx:for-item="sv" wx:key="text" class="svc {{sv.cls}}">{{sv.text}}</text>
                 </view>
                 <!-- 进度：左边一个阶段色块（未开始 / 进行中 / 待发板 / 已完成 / 已取消），后面列出这件装备的全部任务，
-                     做完的绿字、正在做的红字、没开始的灰字 -->
+                     做完的绿字、正在做（轮到的这一道）的红字、还没轮到的灰字 -->
                 <view class="care-progress">
                   <text class="progress-chip progress-chip--{{cr.statusClass}}">{{cr.statusLabel}}</text>
                   <block wx:for="{{cr.tasks}}" wx:for-item="tk" wx:for-index="ti" wx:key="key">

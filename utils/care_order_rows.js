@@ -91,12 +91,16 @@ function careProgress(care) {
   return { label: '未开始', cls: 'idle' }
 }
 
-// 这件装备的全部任务，按做的先后排好：[{ key, name, cls, flag }]。每个任务按自己的状态着色：
-//   已完成 / 强行中止 → done（绿）；已开始（正在做）→ run（红）；未开始 → idle（灰）。
+// 这件装备的全部任务，按做的先后排好：[{ key, name, cls, flag }]。每个任务着色：
+//   已完成 / 强行中止 → done（绿）；正在做 → run（红）；还没轮到的 → idle（灰）。
+// 「正在做」：任务状态是已开始的就是；但已开始只在员工点着「开始」到「结束」那一小会儿存在（库里近 60 天 1180 多个任务里只有 8 个），
+// 平时一件装备处在「上一道做完、下一道还没点开始」的间隙，所以这件装备已经动工（进行中 / 待发板）、又没有任务是已开始时，
+// 把按顺序第一个没做完的任务当作正在做（红），和进度色块一致：进行中 → 轮到的那道工序，待发板 → 发板。
+// 还没动工（未开始）、已完成、已取消的装备没有红色。
 // 强行中止算「做完了」（和进度口径一致），但在名字后面标一个「中止」，免得被当成正常做完。
-// 没有任务（订单还没生效）返回空数组，由页面退回显示进度标签。
-function taskItems(care) {
-  return sortedTasks(care).map((t, i) => {
+// 没有任务（订单还没生效）返回空数组。
+function taskItems(care, stageCls) {
+  const items = sortedTasks(care).map((t, i) => {
     const status = trim(t.status)
     const done = DONE_STATUSES.indexOf(status) >= 0
     return {
@@ -106,6 +110,11 @@ function taskItems(care) {
       flag: status === '强行中止' ? '中止' : ''
     }
   })
+  if ((stageCls === 'run' || stageCls === 'ready') && !items.some(t => t.cls === 'run')) {
+    const current = items.find(t => t.cls === 'idle')
+    if (current) current.cls = 'run'
+  }
+  return items
 }
 
 // 第一张有图的缩略图（列表里只放一张）
@@ -194,7 +203,7 @@ function buildCareRows(cares, imageHost) {
     const amount = careAmounts(care)
     const card = cardInfo(care)
     const benefit = benefitInfo(care)
-    const tasks = taskItems(care)
+    const tasks = taskItems(care, progress.cls)
     return {
       id: care.id,
       title: equipmentTitle(care),
