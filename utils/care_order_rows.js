@@ -91,6 +91,23 @@ function careProgress(care) {
   return { label: '未开始', cls: 'idle', current: '' }
 }
 
+// 这件装备的全部任务，按做的先后排好：[{ key, name, cls, flag }]。每个任务按自己的状态着色：
+//   已完成 / 强行中止 → done（绿）；已开始（正在做）→ run（红）；未开始 → idle（灰）。
+// 强行中止算「做完了」（和进度口径一致），但在名字后面标一个「中止」，免得被当成正常做完。
+// 没有任务（订单还没生效）返回空数组，由页面退回显示进度标签。
+function taskItems(care) {
+  return sortedTasks(care).map((t, i) => {
+    const status = trim(t.status)
+    const done = DONE_STATUSES.indexOf(status) >= 0
+    return {
+      key: t.id !== undefined && t.id !== null ? t.id : 'i' + i,
+      name: trim(t.task_name),
+      cls: done ? 'done' : (status === '' || status === '未开始' ? 'idle' : 'run'),
+      flag: status === '强行中止' ? '中止' : ''
+    }
+  })
+}
+
 // 第一张有图的缩略图（列表里只放一张）
 function firstThumb(care, host) {
   const list = care.careImages || []
@@ -177,6 +194,7 @@ function buildCareRows(cares, imageHost) {
     const amount = careAmounts(care)
     const card = cardInfo(care)
     const benefit = benefitInfo(care)
+    const tasks = taskItems(care)
     return {
       id: care.id,
       title: equipmentTitle(care),
@@ -203,6 +221,9 @@ function buildCareRows(cares, imageHost) {
       statusLabel: progress.label,
       statusClass: progress.cls,
       current: progress.current,
+      tasks,
+      // 有任务就列任务（各自着色）；没有任务（还没生效）或已取消时才显示进度标签
+      showStatusChip: tasks.length === 0 || progress.cls === 'cancel',
       thumb: firstThumb(care, imageHost),
       photos: photoUrls(care, imageHost)
     }

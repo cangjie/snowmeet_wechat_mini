@@ -391,7 +391,33 @@
 .care-progress {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
+}
+
+/* 任务进度：全部任务按先后排开，做完绿字、正在做红字、没开始灰字 */
+.care-task {
+  font-size: 22rpx;
+  line-height: 36rpx;
+}
+
+.care-task--done { color: #16a34a; }
+.care-task--run  { color: #dc2626; font-weight: 600; }
+.care-task--idle { color: #9ca3af; }
+
+/* 强行中止的任务算做完（绿），名字后面标一个小「中止」 */
+.care-task-flag {
+  margin-left: 4rpx;
+  font-size: 18rpx;
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+.care-task-sep {
+  margin: 0 8rpx;
+  font-size: 22rpx;
+  line-height: 36rpx;
+  color: #d1d5db;
 }
 
 /* 每件装备的金额 / 减免 */
@@ -503,6 +529,8 @@
 /* 没付成功的订单：装备块同样置灰 */
 .order-card--unpaid .care-title,
 .order-card--unpaid .care-current,
+.order-card--unpaid .care-task,
+.order-card--unpaid .care-task-sep,
 .order-card--unpaid .care-section-title,
 .order-card--unpaid .care-toggle { color: #b0b0b0; }
 .order-card--unpaid .care-kind { opacity: 0.4; filter: grayscale(1); }

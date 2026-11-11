@@ -570,3 +570,64 @@ test('版式：标签配色和订单左侧标签一致（次卡蓝 / 券橙 / �
   assert.match(wxss, /\.care-card-tag--coach\s*\{/)
   assert.match(wxss, /\.order-card--unpaid \.care-card-tag\s*\{[^}]*background:\s*#f3f4f6/)
 })
+
+// ───────────── 任务进度：列出全部任务，做完绿 / 正在做红 / 没开始灰 ─────────────
+
+const mkTask = (id, name, status, sort, extra) => Object.assign({ id, task_name: name, status, sort, valid: 1 }, extra || {})
+
+test('任务进度：全部任务按先后列出，各自按状态着色（实录：安全检查已完成 / 维修已开始 / 发板未开始）', () => {
+  const row = rows.buildCareRows([care({ tasks: [mkTask(59302, '发板', '未开始', 60), mkTask(59301, '维修', '已开始', 30), mkTask(59300, '安全检查', '已完成', 10)] })], '')[0]
+  assert.deepEqual(row.tasks.map(t => [t.name, t.cls, t.flag]), [['安全检查', 'done', ''], ['维修', 'run', ''], ['发板', 'idle', '']])
+  assert.equal(row.showStatusChip, false)      // 有任务就不再显示「进行中 1/3 当前：维修」
+  assert.deepEqual([row.statusLabel, row.statusClass, row.current], ['进行中 1/3', 'run', '维修'])   // 进度口径本身没变
+})
+
+test('任务进度：安全检查永远排第一；作废的任务不列；没有状态按未开始，不认识的状态按正在做', () => {
+  const row = rows.buildCareRows([care({ tasks: [
+    mkTask(3, '热蜡', '未开始', 40),
+    mkTask(2, '修刃', '', 20),
+    mkTask(1, '安全检查', '已完成', 90),                       // sort 再大也排第一
+    mkTask(4, '刮蜡', '已开始', 50, { valid: 0 }),             // 作废的不列
+    mkTask(5, '机打蜡', '进行中', 45),                          // 不认识的非「未开始」状态按正在做
+    mkTask(6, '发板', '未开始', 60)
+  ] })], '')[0]
+  assert.deepEqual(row.tasks.map(t => [t.name, t.cls]), [['安全检查', 'done'], ['修刃', 'idle'], ['热蜡', 'idle'], ['机打蜡', 'run'], ['发板', 'idle']])
+})
+
+test('任务进度：强行中止算做完（绿），名字后标「中止」；已完成的不标', () => {
+  const row = rows.buildCareRows([care({ tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '刮蜡', '强行中止', 50), mkTask(3, '发板', '已完成', 60)] })], '')[0]
+  assert.deepEqual(row.tasks.map(t => [t.name, t.cls, t.flag]), [['安全检查', 'done', ''], ['刮蜡', 'done', '中止'], ['发板', 'done', '']])
+})
+
+test('任务进度：没有任务（还没生效）退回进度标签；已取消在任务前面标「已取消」；正常进行中不要标签', () => {
+  const none = rows.buildCareRows([care({ tasks: [] }), care()], '')
+  assert.deepEqual(none.map(r => [r.tasks.length, r.showStatusChip, r.statusLabel]), [[0, true, '未开始'], [0, true, '未开始']])
+  const cancelled = rows.buildCareRows([care({ is_cancel: true, tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '发板', '已完成', 60)] })], '')[0]
+  assert.deepEqual([cancelled.showStatusChip, cancelled.statusLabel, cancelled.tasks.length], [true, '已取消', 2])
+  const running = rows.buildCareRows([care({ tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '发板', '未开始', 60)] })], '')[0]
+  assert.equal(running.showStatusChip, false)
+})
+
+test('任务进度：任务没有 id 也有稳定的 key（wx:key 不重复）', () => {
+  const row = rows.buildCareRows([care({ tasks: [{ task_name: '修刃', status: '已完成', sort: 20 }, { task_name: '发板', status: '未开始', sort: 60 }] })], '')[0]
+  assert.equal(new Set(row.tasks.map(t => t.key)).size, 2)
+})
+
+test('版式：任务进度行列出全部任务，用 wx:for 渲染，只在没任务 / 已取消时才有进度标签，不再有「当前：」', () => {
+  const block = cardBlock.match(/<view class="care-progress">[\s\S]*?<\/view>/)[0]
+  assert.match(block, /<text wx:if="\{\{cr\.showStatusChip\}\}" class="progress-chip progress-chip--\{\{cr\.statusClass\}\}">\{\{cr\.statusLabel\}\}<\/text>/)
+  assert.match(block, /wx:for="\{\{cr\.tasks\}\}"[^>]*wx:key="key"/)
+  assert.match(block, /class="care-task care-task--\{\{tk\.cls\}\}">\{\{tk\.name\}\}/)
+  assert.match(block, /<text wx:if="\{\{tk\.flag\}\}" class="care-task-flag">\{\{tk\.flag\}\}<\/text>/)
+  assert.match(block, /<text wx:if="\{\{ti > 0\}\}" class="care-task-sep">/)
+  assert.doesNotMatch(block, /当前/)
+  assert.ok(cardBlock.indexOf('class="care-progress"') < cardBlock.indexOf('class="care-card care-flags"'), '任务进度在权益行上面')
+})
+
+test('版式：做完绿字、正在做红字、没开始灰字；可换行；没付款的灰色订单里同样置灰', () => {
+  assert.match(rule('.care-task--done'), /#16a34a/)
+  assert.match(rule('.care-task--run'), /#dc2626/)
+  assert.match(rule('.care-task--idle'), /#9ca3af/)
+  assert.match(rule('.care-progress'), /flex-wrap:\s*wrap/)
+  assert.match(wxss, /\.order-card--unpaid \.care-task\b[^{]*\{[^}]*#b0b0b0/)
+})
