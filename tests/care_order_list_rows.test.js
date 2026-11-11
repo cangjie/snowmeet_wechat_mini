@@ -63,42 +63,43 @@ test('立等、非雪季用醒目样式，其余默认', () => {
   assert.equal(rows.serviceChips(care({ biz_type: '非雪季养护' }))[0].text, '非雪季')
 })
 
-test('进度：没有任务链（没付款还没生成）显示未开始，不带数字', () => {
-  const p = rows.careProgress(care())
-  assert.deepEqual([p.label, p.cls, p.current], ['未开始', 'idle', ''])
+const stageOf = c => { const p = rows.careProgress(care(c)); return [p.label, p.cls] }
+
+test('进度阶段 ①：没有任务、只做了安全检查、安全检查都没做 → 未开始（灰）', () => {
+  assert.deepEqual(stageOf(), ['未开始', 'idle'])                                  // 没有任务链（没付款还没生成）
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '未开始', 1), task('修刃', '未开始', 10), task('发板', '未开始', 90)] }), ['未开始', 'idle'])   // 安全检查都没做
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '未开始', 10), task('热蜡', '未开始', 20), task('发板', '未开始', 90)] }), ['未开始', 'idle'])   // 只做了安全检查
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('发板', '未开始', 90)] }), ['未开始', 'idle'])   // 没有别的工序，只有安全检查和发板
 })
 
-test('进度：任务都没动过是未开始；动过一个就是进行中 已完成数/总数，并指出当前任务', () => {
-  const fresh = rows.careProgress(care({ tasks: [task('安全检查', '未开始', 1), task('修刃', '未开始', 10), task('发板', '未开始', 90)] }))
-  assert.deepEqual([fresh.label, fresh.cls], ['未开始', 'idle'])
-  const running = rows.careProgress(care({
-    tasks: [task('安全检查', '已完成', 1), task('修刃', '已完成', 10), task('热蜡', '已开始', 20), task('刮蜡', '未开始', 30), task('发板', '未开始', 90)]
-  }))
-  assert.deepEqual([running.label, running.cls, running.current], ['进行中 2/5', 'run', '热蜡'])
+test('进度阶段 ②：安全检查、发板之外的任务有做了的、有没做的（含正在做）→ 进行中（琥珀）', () => {
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '已完成', 10), task('热蜡', '未开始', 20), task('刮蜡', '未开始', 30), task('发板', '未开始', 90)] }), ['进行中', 'run'])
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '已完成', 10), task('热蜡', '已开始', 20), task('发板', '未开始', 90)] }), ['进行中', 'run'])
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('维修', '已开始', 30), task('发板', '未开始', 90)] }), ['进行中', 'run'])   // 只有一个工序且正在做
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '未开始', 1), task('修刃', '已开始', 10), task('发板', '未开始', 90)] }), ['进行中', 'run'])   // 安全检查没做、工序已经动了，以工序为准
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '强行中止', 10), task('热蜡', '未开始', 20), task('发板', '未开始', 90)] }), ['进行中', 'run'])   // 强行中止算做完
 })
 
-test('进度：当前任务按任务顺序取第一个没完成的，安全检查永远排最前；强行中止算已处理', () => {
-  const p = rows.careProgress(care({
-    tasks: [task('发板', '未开始', 90), task('刮蜡', '未开始', 30), task('修刃', '强行中止', 10), task('安全检查', '已完成', 50)]
-  }))
-  assert.deepEqual([p.label, p.current], ['进行中 2/4', '刮蜡'])
+test('进度阶段 ③：除发板外的任务都做完了，只差发板 → 待发板（紫）', () => {
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '已完成', 10), task('热蜡', '已完成', 20), task('刮蜡', '已完成', 30), task('发板', '未开始', 90)] }), ['待发板', 'ready'])
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '强行中止', 10), task('热蜡', '已完成', 20), task('发板', '未开始', 90)] }), ['待发板', 'ready'])
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '已完成', 10), task('发板', '已开始', 90)] }), ['待发板', 'ready'])   // 发板正在办也还没完成
 })
 
-test('进度：发板完成才算已完成；只剩发板没做时当前是发板', () => {
-  const done = rows.careProgress(care({ tasks: [task('修刃', '已完成', 10), task('发板', '已完成', 90)] }))
-  assert.deepEqual([done.label, done.cls, done.current], ['已完成', 'done', ''])
-  const last = rows.careProgress(care({ tasks: [task('修刃', '已完成', 10), task('发板', '未开始', 90)] }))
-  assert.deepEqual([last.label, last.current], ['进行中 1/2', '发板'])
+test('进度阶段 ④：发板完成 → 已完成（绿）；强行索回完成同样算', () => {
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '已完成', 10), task('发板', '已完成', 90)] }), ['已完成', 'done'])
+  assert.deepEqual(stageOf({ tasks: [task('修刃', '已完成', 10), task('发板', '已完成', 90)] }), ['已完成', 'done'])
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '未开始', 10), task('强行索回', '已完成', 90)] }), ['已完成', 'done'])   // 工序没做完但被强行索回
 })
 
-test('进度：取消的装备显示已取消（取消是靠发板任务落库的，不能显示成已完成）', () => {
-  const p = rows.careProgress(care({ is_cancel: true, tasks: [task('修刃', '已完成', 10), task('发板', '已完成', 90)] }))
-  assert.deepEqual([p.label, p.cls, p.current], ['已取消', 'cancel', ''])
+test('进度阶段：任务顺序不影响（按名字判断，不按位置）；作废的任务不算', () => {
+  assert.deepEqual(stageOf({ tasks: [task('发板', '未开始', 90), task('修刃', '已完成', 10), task('安全检查', '已完成', 50)] }), ['待发板', 'ready'])
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '已完成', 10), task('热蜡', '未开始', 20, { valid: 0 }), task('发板', '未开始', 90)] }), ['待发板', 'ready'])
+  assert.deepEqual(stageOf({ tasks: [task('安全检查', '已完成', 1), task('修刃', '未开始', 10, { valid: 0 }), task('发板', '已完成', 90, { valid: 0 })] }), ['未开始', 'idle'])
 })
 
-test('进度：作废的任务不算', () => {
-  const p = rows.careProgress(care({ tasks: [task('修刃', '已完成', 10), task('热蜡', '未开始', 20, { valid: 0 }), task('发板', '未开始', 90)] }))
-  assert.equal(p.label, '进行中 1/2')
+test('进度阶段：取消的装备显示已取消（取消是靠发板任务落库的，不能显示成已完成）', () => {
+  assert.deepEqual(stageOf({ is_cancel: true, tasks: [task('修刃', '已完成', 10), task('发板', '已完成', 90)] }), ['已取消', 'cancel'])
 })
 
 test('照片取第一张的缩略图，补图片域名；已是完整地址的原样用；没有就为空', () => {
@@ -115,7 +116,7 @@ test('每件装备一行：id、标题、项目、进度、照片都带上；没
   assert.equal(r.title, 'ATOMIC · 170cm')
   assert.equal(r.kind, '双板')
   assert.deepEqual(r.services.map(s => s.text), ['修刃'])
-  assert.deepEqual([r.statusLabel, r.statusClass, r.current], ['进行中 0/2', 'run', '修刃'])
+  assert.deepEqual([r.statusLabel, r.statusClass], ['进行中', 'run'])
   assert.deepEqual(rows.buildCareRows(null, ''), [])
   assert.deepEqual(rows.buildCareRows([], ''), [])
 })
@@ -578,8 +579,7 @@ const mkTask = (id, name, status, sort, extra) => Object.assign({ id, task_name:
 test('任务进度：全部任务按先后列出，各自按状态着色（实录：安全检查已完成 / 维修已开始 / 发板未开始）', () => {
   const row = rows.buildCareRows([care({ tasks: [mkTask(59302, '发板', '未开始', 60), mkTask(59301, '维修', '已开始', 30), mkTask(59300, '安全检查', '已完成', 10)] })], '')[0]
   assert.deepEqual(row.tasks.map(t => [t.name, t.cls, t.flag]), [['安全检查', 'done', ''], ['维修', 'run', ''], ['发板', 'idle', '']])
-  assert.equal(row.showStatusChip, false)      // 有任务就不再显示「进行中 1/3 当前：维修」
-  assert.deepEqual([row.statusLabel, row.statusClass, row.current], ['进行中 1/3', 'run', '维修'])   // 进度口径本身没变
+  assert.deepEqual([row.statusLabel, row.statusClass], ['进行中', 'run'])   // 阶段色块：安全检查做完、维修在做 → 进行中
 })
 
 test('任务进度：安全检查永远排第一；作废的任务不列；没有状态按未开始，不认识的状态按正在做', () => {
@@ -599,13 +599,11 @@ test('任务进度：强行中止算做完（绿），名字后标「中止」�
   assert.deepEqual(row.tasks.map(t => [t.name, t.cls, t.flag]), [['安全检查', 'done', ''], ['刮蜡', 'done', '中止'], ['发板', 'done', '']])
 })
 
-test('任务进度：没有任务（还没生效）退回进度标签；已取消在任务前面标「已取消」；正常进行中不要标签', () => {
+test('任务进度：没有任务（还没生效）只有「未开始」色块；已取消是「已取消」色块，任务照常列出', () => {
   const none = rows.buildCareRows([care({ tasks: [] }), care()], '')
-  assert.deepEqual(none.map(r => [r.tasks.length, r.showStatusChip, r.statusLabel]), [[0, true, '未开始'], [0, true, '未开始']])
+  assert.deepEqual(none.map(r => [r.tasks.length, r.statusLabel, r.statusClass]), [[0, '未开始', 'idle'], [0, '未开始', 'idle']])
   const cancelled = rows.buildCareRows([care({ is_cancel: true, tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '发板', '已完成', 60)] })], '')[0]
-  assert.deepEqual([cancelled.showStatusChip, cancelled.statusLabel, cancelled.tasks.length], [true, '已取消', 2])
-  const running = rows.buildCareRows([care({ tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '发板', '未开始', 60)] })], '')[0]
-  assert.equal(running.showStatusChip, false)
+  assert.deepEqual([cancelled.statusLabel, cancelled.statusClass, cancelled.tasks.length], ['已取消', 'cancel', 2])
 })
 
 test('任务进度：任务没有 id 也有稳定的 key（wx:key 不重复）', () => {
@@ -613,9 +611,10 @@ test('任务进度：任务没有 id 也有稳定的 key（wx:key 不重复）',
   assert.equal(new Set(row.tasks.map(t => t.key)).size, 2)
 })
 
-test('版式：任务进度行列出全部任务，用 wx:for 渲染，只在没任务 / 已取消时才有进度标签，不再有「当前：」', () => {
+test('版式：进度行左边是阶段色块、后面用 wx:for 列出全部任务，不再有「当前：」', () => {
   const block = cardBlock.match(/<view class="care-progress">[\s\S]*?<\/view>/)[0]
-  assert.match(block, /<text wx:if="\{\{cr\.showStatusChip\}\}" class="progress-chip progress-chip--\{\{cr\.statusClass\}\}">\{\{cr\.statusLabel\}\}<\/text>/)
+  assert.match(block, /^<view class="care-progress">\s*<text class="progress-chip progress-chip--\{\{cr\.statusClass\}\}">\{\{cr\.statusLabel\}\}<\/text>/)   // 色块一直显示，在任务前面
+  assert.doesNotMatch(block, /showStatusChip/)
   assert.match(block, /wx:for="\{\{cr\.tasks\}\}"[^>]*wx:key="key"/)
   assert.match(block, /class="care-task care-task--\{\{tk\.cls\}\}">\{\{tk\.name\}\}/)
   assert.match(block, /<text wx:if="\{\{tk\.flag\}\}" class="care-task-flag">\{\{tk\.flag\}\}<\/text>/)
@@ -630,4 +629,16 @@ test('版式：做完绿字、正在做红字、没开始灰字；可换行；�
   assert.match(rule('.care-task--idle'), /#9ca3af/)
   assert.match(rule('.care-progress'), /flex-wrap:\s*wrap/)
   assert.match(wxss, /\.order-card--unpaid \.care-task\b[^{]*\{[^}]*#b0b0b0/)
+})
+
+test('版式：阶段色块四种阶段颜色各不相同（未开始灰 / 进行中琥珀 / 待发板紫 / 已完成绿），已取消红；没付款的订单里置灰', () => {
+  const bg = sel => (rule(sel).match(/background:\s*(#[0-9a-f]{6})/) || [])[1]
+  const base = (rule('.progress-chip').match(/background:\s*(#[0-9a-f]{6})/) || [])[1]
+  assert.equal(base, '#f3f4f6')                                   // 未开始：默认灰
+  assert.equal(bg('.progress-chip--run'), '#fef3c7')
+  assert.equal(bg('.progress-chip--ready'), '#ede9fe')
+  assert.equal(bg('.progress-chip--done'), '#dcfce7')
+  assert.equal(bg('.progress-chip--cancel'), '#fee2e2')
+  assert.equal(new Set([base, bg('.progress-chip--run'), bg('.progress-chip--ready'), bg('.progress-chip--done')]).size, 4)
+  assert.match(wxss, /\.order-card--unpaid \.progress-chip\s*\{[^}]*#b0b0b0/)
 })

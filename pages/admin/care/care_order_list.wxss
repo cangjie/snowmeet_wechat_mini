@@ -496,14 +496,12 @@
   color: #6b7280;
 }
 
+/* 阶段色块：未开始 灰（默认）/ 进行中 琥珀 / 待发板 紫 / 已完成 绿 / 已取消 红 */
 .progress-chip--run    { background: #fef3c7; color: #b45309; }
+.progress-chip--ready  { background: #ede9fe; color: #6d28d9; }
 .progress-chip--done   { background: #dcfce7; color: #15803d; }
 .progress-chip--cancel { background: #fee2e2; color: #b91c1c; }
 
-.care-current {
-  font-size: 22rpx;
-  color: #666;
-}
 
 /* 照片盒子：在 .care-body 里 stretch，高度跟整块装备内容走（至少 132rpx）；照片绝对定位铺满盒子 */
 .care-thumb-box {
@@ -528,7 +526,6 @@
 
 /* 没付成功的订单：装备块同样置灰 */
 .order-card--unpaid .care-title,
-.order-card--unpaid .care-current,
 .order-card--unpaid .care-task,
 .order-card--unpaid .care-task-sep,
 .order-card--unpaid .care-section-title,

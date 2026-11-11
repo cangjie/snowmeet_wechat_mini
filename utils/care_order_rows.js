@@ -1,7 +1,8 @@
 // 养护订单列表：把订单里的每件装备整理成「一件一块」的展示行（品牌 / 长度 / 项目 / 进度 / 缩略图）。
 // 纯函数、不依赖 wx / app，方便单测。
 // 叫法对齐详情页（care_order_detail 的 chips）：热蜡、机打蜡、养板、封板、立等；
-// 进度口径对齐后端 Care.status 和详情页：发板（或强行索回）已完成 → 已完成；有任务动过 → 进行中；否则未开始；
+// 进度（一件装备所处的阶段，一个色块）：发板（或强行索回）已完成 → 已完成；除安全检查、发板外的任务全做完、只差发板 → 待发板；
+// 这些任务里有动过（做完 / 正在做）、还没全做完 → 进行中；其余（没任务、只做了安全检查、安全检查都没做）→ 未开始；
 // 取消的装备是靠发板任务落库的，所以先看 is_cancel，显示已取消。
 
 const DONE_STATUSES = ['已完成', '强行中止']
@@ -72,23 +73,22 @@ function sortedTasks(care) {
     .sort((a, b) => (taskOrderValue(a) - taskOrderValue(b)) || ((a.id || 0) - (b.id || 0)))
 }
 
-// 进度：{ label, cls, current }，cls 是 idle / run / done / cancel
+const SAFETY_TASK = '安全检查'
+
+// 进度阶段：{ label, cls }，cls 是 idle 未开始 / run 进行中 / ready 待发板 / done 已完成 / cancel 已取消
 function careProgress(care) {
-  if (care.is_cancel) return { label: '已取消', cls: 'cancel', current: '' }
+  if (care.is_cancel) return { label: '已取消', cls: 'cancel' }
   const tasks = sortedTasks(care)
-  if (tasks.length === 0) return { label: '未开始', cls: 'idle', current: '' }
-  const finish = tasks.find(t => FINISH_TASKS.indexOf(trim(t.task_name)) >= 0)
-  if (finish && trim(finish.status) === '已完成') return { label: '已完成', cls: 'done', current: '' }
   const isDone = t => DONE_STATUSES.indexOf(trim(t.status)) >= 0
-  if (tasks.some(t => trim(t.status) !== '未开始')) {
-    const next = tasks.find(t => !isDone(t))
-    return {
-      label: '进行中 ' + tasks.filter(isDone).length + '/' + tasks.length,
-      cls: 'run',
-      current: next ? trim(next.task_name) : ''
-    }
-  }
-  return { label: '未开始', cls: 'idle', current: '' }
+  const isFinish = t => FINISH_TASKS.indexOf(trim(t.task_name)) >= 0
+  const finish = tasks.find(isFinish)
+  if (finish && isDone(finish)) return { label: '已完成', cls: 'done' }
+  // 除安全检查、发板外的任务：养护 / 维修的具体工序
+  const service = tasks.filter(t => trim(t.task_name) !== SAFETY_TASK && !isFinish(t))
+  if (service.length === 0) return { label: '未开始', cls: 'idle' }
+  if (service.every(isDone)) return finish ? { label: '待发板', cls: 'ready' } : { label: '进行中', cls: 'run' }
+  if (service.some(t => trim(t.status) !== '' && trim(t.status) !== '未开始')) return { label: '进行中', cls: 'run' }
+  return { label: '未开始', cls: 'idle' }
 }
 
 // 这件装备的全部任务，按做的先后排好：[{ key, name, cls, flag }]。每个任务按自己的状态着色：
@@ -220,10 +220,7 @@ function buildCareRows(cares, imageHost) {
       services: serviceChips(care),
       statusLabel: progress.label,
       statusClass: progress.cls,
-      current: progress.current,
       tasks,
-      // 有任务就列任务（各自着色）；没有任务（还没生效）或已取消时才显示进度标签
-      showStatusChip: tasks.length === 0 || progress.cls === 'cancel',
       thumb: firstThumb(care, imageHost),
       photos: photoUrls(care, imageHost)
     }

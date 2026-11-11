@@ -187,10 +187,10 @@
                 <view wx:if="{{cr.services.length > 0}}" class="care-services">
                   <text wx:for="{{cr.services}}" wx:for-item="sv" wx:key="text" class="svc {{sv.cls}}">{{sv.text}}</text>
                 </view>
-                <!-- 任务进度：列出这件装备的全部任务，做完的绿字、正在做的红字、没开始的灰字；
-                     没有任务（还没生效）或已取消时才显示进度标签 -->
+                <!-- 进度：左边一个阶段色块（未开始 / 进行中 / 待发板 / 已完成 / 已取消），后面列出这件装备的全部任务，
+                     做完的绿字、正在做的红字、没开始的灰字 -->
                 <view class="care-progress">
-                  <text wx:if="{{cr.showStatusChip}}" class="progress-chip progress-chip--{{cr.statusClass}}">{{cr.statusLabel}}</text>
+                  <text class="progress-chip progress-chip--{{cr.statusClass}}">{{cr.statusLabel}}</text>
                   <block wx:for="{{cr.tasks}}" wx:for-item="tk" wx:for-index="ti" wx:key="key">
                     <text wx:if="{{ti > 0}}" class="care-task-sep">›</text>
                     <text class="care-task care-task--{{tk.cls}}">{{tk.name}}<text wx:if="{{tk.flag}}" class="care-task-flag">{{tk.flag}}</text></text>
