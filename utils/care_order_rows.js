@@ -127,6 +127,19 @@ function careAmounts(care) {
   }
 }
 
+// 用次卡的装备显示「用的哪张卡、还剩几次」：后端给 cardDisplayName / cardRemaining / cardUnlimited（现在这一刻的余量），
+// 老后端没给时退回装备上记的 card_name。没用次卡不显示；没绑上卡（购卡处理中）或读卡失败只有卡名 / 什么都没有，但仍标出用了次卡。
+// 剩余 0 次要显示出来（0 不是没有）；季卡不限次数。金额 / 减免不受影响，次卡抵掉的装备库里就是 0。
+// 卡名和剩余次数分开给：卡名太长时页面只省略卡名，剩余次数始终显示。
+function cardInfo(care) {
+  if (!care.use_card) return { usesCard: false, cardName: '', cardRemain: '' }
+  const name = String(care.cardDisplayName || care.card_name || '').trim()
+  let remain = ''
+  if (care.cardUnlimited === true) remain = '不限次数'
+  else if (typeof care.cardRemaining === 'number' && isFinite(care.cardRemaining)) remain = '剩余 ' + care.cardRemaining + ' 次'
+  return { usesCard: true, cardName: name, cardRemain: remain }
+}
+
 function money(n) {
   return '¥' + (Math.round(n * 100) / 100).toFixed(2)
 }
@@ -135,6 +148,7 @@ function buildCareRows(cares, imageHost) {
   return (cares || []).map(care => {
     const progress = careProgress(care)
     const amount = careAmounts(care)
+    const card = cardInfo(care)
     return {
       id: care.id,
       title: equipmentTitle(care),
@@ -144,6 +158,9 @@ function buildCareRows(cares, imageHost) {
       discount: amount.discount,
       chargeStr: money(amount.charge),
       discountStr: money(amount.discount),
+      usesCard: card.usesCard,
+      cardName: card.cardName,
+      cardRemain: card.cardRemain,
       services: serviceChips(care),
       statusLabel: progress.label,
       statusClass: progress.cls,

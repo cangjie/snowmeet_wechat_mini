@@ -376,3 +376,67 @@ test('每件装备都有「金额」「减免」一行（在装备内容里面�
 test('没付款的灰色订单：金额 / 减免也置灰', () => {
   assert.match(wxss, /\.order-card--unpaid \.care-amount[^{]*\{[^}]*#b0b0b0/)
 })
+
+// ---- 次卡：用次卡的装备显示「用的哪张卡、还剩几次」（金额 / 减免照常显示库里的 0） ----
+// 卡名和剩余次数分开给：卡名太长时只让卡名省略，剩余次数始终显示
+test('次卡装备：显示卡名和剩余次数；后端给的 cardDisplayName / cardRemaining 优先', () => {
+  const row = rows.buildCareRows([care({ use_card: true, card_name: '装备上记的卡名', cardDisplayName: '孙伟博学员专用', cardRemaining: 5 })], '')[0]
+  assert.equal(row.usesCard, true)
+  assert.equal(row.cardName, '孙伟博学员专用')
+  assert.equal(row.cardRemain, '剩余 5 次')
+})
+
+test('次卡装备：没有 cardDisplayName 时退回装备上记的 card_name', () => {
+  const row = rows.buildCareRows([care({ use_card: true, card_name: '装备上记的卡名', cardRemaining: 3 })], '')[0]
+  assert.equal(row.cardName, '装备上记的卡名')
+  assert.equal(row.cardRemain, '剩余 3 次')
+})
+
+test('次卡装备：剩余 0 次也要显示（0 不是没有）；季卡不限次数', () => {
+  const zero = rows.buildCareRows([care({ use_card: true, cardDisplayName: '次卡A', cardRemaining: 0 })], '')[0]
+  assert.equal(zero.cardRemain, '剩余 0 次')
+  const season = rows.buildCareRows([care({ use_card: true, cardDisplayName: '机打蜡季卡', cardUnlimited: true })], '')[0]
+  assert.equal(season.cardName, '机打蜡季卡')
+  assert.equal(season.cardRemain, '不限次数')
+})
+
+test('次卡装备：没有卡名只有次数、或者两样都没有（购卡处理中 / 读卡失败）时也标出用了次卡，不报错', () => {
+  const onlyRemaining = rows.buildCareRows([care({ use_card: true, cardRemaining: 2 })], '')[0]
+  assert.equal(onlyRemaining.usesCard, true)
+  assert.equal(onlyRemaining.cardName, '')
+  assert.equal(onlyRemaining.cardRemain, '剩余 2 次')
+  const neither = rows.buildCareRows([care({ use_card: true })], '')[0]
+  assert.equal(neither.usesCard, true)
+  assert.equal(neither.cardName, '')
+  assert.equal(neither.cardRemain, '')
+})
+
+test('没用次卡的装备：不显示次卡信息，即使数据里带着卡名', () => {
+  const row = rows.buildCareRows([care({ use_card: false, card_name: '不该显示', cardRemaining: 4 })], '')[0]
+  assert.equal(row.usesCard, false)
+  assert.equal(row.cardName, '')
+  assert.equal(row.cardRemain, '')
+})
+
+test('次卡装备的金额 / 减免仍是库里的值：0 就显示 ¥0.00，不补价', () => {
+  const row = rows.buildCareRows([care({ use_card: true, common_charge: 0, repair_charge: 0, discount: 0, ticket_discount: 0, displayCharge: 0, displayDiscount: 0 })], '')[0]
+  assert.equal(row.chargeStr, '¥0.00')
+  assert.equal(row.discountStr, '¥0.00')
+})
+
+test('版式：次卡一行在金额 / 减免下面、装备内容里面，只在用了次卡时才渲染；卡名和剩余次数分开两段', () => {
+  assert.equal(insideView(cardBlock, 'class="care-main"', 'class="care-card"'), true)
+  const cardRow = cardBlock.match(/<view[^>]*class="care-card"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.match(cardRow, /wx:if="\{\{cr\.usesCard\}\}"/)
+  assert.match(cardRow, /次卡/)
+  assert.match(cardRow, /class="care-card-name"[^>]*>\{\{cr\.cardName\}\}/)
+  assert.match(cardRow, /class="care-card-remain"[^>]*>\{\{cr\.cardRemain\}\}/)
+  assert.ok(cardBlock.indexOf('class="care-amount"') < cardBlock.indexOf('class="care-card"'), '次卡一行在金额 / 减免之后')
+})
+
+test('版式：卡名太长只省略卡名，剩余次数不收缩；没付款的灰色订单里同样置灰', () => {
+  assert.match(wxss, /\.care-card\s*\{/)
+  assert.match(rule('.care-card-name'), /text-overflow:\s*ellipsis/)
+  assert.match(rule('.care-card-remain'), /flex:\s*none/)
+  assert.match(wxss, /\.order-card--unpaid \.care-card[^{]*\{[^}]*#b0b0b0/)
+})

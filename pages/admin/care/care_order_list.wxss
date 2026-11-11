@@ -413,6 +413,41 @@
   color: #888;
 }
 
+/* 用次卡的装备：卡名 + 剩余次数 */
+.care-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #374151;
+}
+
+.care-card-tag {
+  flex: none;
+  margin-right: 10rpx;
+  padding: 0 10rpx;
+  border-radius: 6rpx;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 20rpx;
+  line-height: 32rpx;
+}
+
+.care-card-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 剩余次数不收缩：卡名再长也只省略卡名 */
+.care-card-remain {
+  flex: none;
+  margin-left: 12rpx;
+  color: #92400e;
+}
+
 .progress-chip {
   font-size: 20rpx;
   line-height: 30rpx;
@@ -448,7 +483,11 @@
 .order-card--unpaid .care-toggle { color: #b0b0b0; }
 .order-card--unpaid .care-kind { opacity: 0.4; filter: grayscale(1); }
 .order-card--unpaid .care-amount,
-.order-card--unpaid .care-amount-label { color: #b0b0b0; }
+.order-card--unpaid .care-amount-label,
+.order-card--unpaid .care-card,
+.order-card--unpaid .care-card-remain,
+.order-card--unpaid .care-card-tag { color: #b0b0b0; }
+.order-card--unpaid .care-card-tag { background: #f3f4f6; }
 .order-card--unpaid .svc,
 .order-card--unpaid .progress-chip { background: #f3f4f6; color: #b0b0b0; }
 
