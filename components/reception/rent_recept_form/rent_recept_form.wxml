@@ -167,6 +167,7 @@
                         <view class="item-title-wrap {{rit._marquee ? 'item-title-wrap--marquee' : ''}}">
                           <text class="item-title">{{rit._title}}</text>
                         </view>
+                        <view wx:if="{{rit.pickup_shop}}" class="cross-shop-hint">异店：{{rit.pickup_shop}}</view>
                       </view>
                       <view class="item-head-right">
                         <view wx:if="{{rit._statusLabel}}" class="chip {{rit._entered ? 'chip-success' : 'chip-pending'}}">
@@ -260,6 +261,7 @@
                               data-mode="{{mode.key}}">{{mode.name}}</view>
                           </block>
                         </view>
+                        <view wx:if="{{rit.pickup_shop}}" class="cross-shop-hint">异店领取与归还：{{rit.pickup_shop}}</view>
                       </view>
                     </view>
                   </view>
@@ -309,6 +311,8 @@
         <text class="checkout-deposit">押金 ¥{{summary.depositLabel}}</text>
         <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">已减免 -¥{{summary.depositReduceLabel}}</text>
         <text class="checkout-rent">租金 ¥{{summary.rentLabel}}</text>
+        <text wx:if="{{summary.hasEntertain}}" class="checkout-reduce">减免金额 -¥{{summary.rentReduceLabel}}</text>
+        <text wx:if="{{summary.hasEntertain}}" class="checkout-rent">实付金额 ¥{{summary.rentPayableLabel}}</text>
       </view>
       <button
         class="checkout-btn {{!summary.canCheckout ? 'checkout-btn--disabled' : ''}}"

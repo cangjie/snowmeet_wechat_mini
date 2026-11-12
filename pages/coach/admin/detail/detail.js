@@ -119,9 +119,9 @@ Page({
   },
   onToggleValid() {
     const valid = this.data.coach.valid
-    base.confirm(valid ? '停用教练' : '恢复教练', valid
-      ? '停用后，已领的学员卡继续有效，但这位教练不能再发新卡，没领的卡也不能再领。'
-      : '恢复后教练可以继续发卡，原来的价格保留。', valid ? '停用' : '恢复').then(ok => {
+    base.confirm(valid ? '停用分销商' : '恢复分销商', valid
+      ? '停用后，已领的学员卡继续有效，但这位分销商不能再发新卡，没领的卡也不能再领。'
+      : '恢复后分销商可以继续发卡，原来的价格保留。', valid ? '停用' : '恢复').then(ok => {
       if (ok) api.updateCoach(this.id, null, !valid).then(() => { base.done(valid ? '已停用' : '已恢复'); this.load() }).catch(base.fail)
     })
   }

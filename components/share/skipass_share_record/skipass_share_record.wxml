@@ -1,0 +1,27 @@
+<view wx:if="{{!hidden}}" class="ssr-card">
+  <view class="ssr-head" bindtap="onToggle">
+    <text class="ssr-title">雪票分账记录</text>
+    <view class="ssr-head-right">
+      <text class="ssr-side">{{summary}}</text>
+      <text class="ssr-arrow {{expanded ? 'open' : ''}}">›</text>
+    </view>
+  </view>
+
+  <block wx:if="{{expanded}}">
+    <view class="ssr-meta">{{ticketText}}；这张票分 ¥1，取票后自动分给推荐员工</view>
+    <view wx:if="{{record}}" class="ssr-row">
+      <view class="ssr-line">
+        <text class="ssr-bold">分给：{{record.receiver}}</text>
+        <text class="ssr-bold">¥{{record.amount}}</text>
+      </view>
+      <view class="ssr-line">
+        <text class="ssr-tag {{record.stateClass}}">{{record.state}}</text>
+      </view>
+      <view class="ssr-meta">计划：{{record.plan}}</view>
+      <view wx:if="{{record.submitTime}}" class="ssr-meta">提交：{{record.submitTime}}</view>
+      <view wx:if="{{record.successTime}}" class="ssr-meta ok">成功：{{record.successTime}}</view>
+      <view wx:if="{{record.memo}}" class="ssr-meta">备注：{{record.memo}}</view>
+    </view>
+    <view wx:if="{{!record && !loading}}" class="ssr-reason">{{emptyReason}}</view>
+  </block>
+</view>

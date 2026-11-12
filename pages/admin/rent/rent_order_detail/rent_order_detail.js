@@ -2,6 +2,7 @@
 var app = getApp()
 var util = require('../../../../utils/util.js')
 var data = require('../../../../utils/data.js')
+var rentEstimate = require('../../../../utils/rent_estimate.js')
 
 function formatDisplayOrderCode(rawCode) {
   var code = rawCode == null ? '' : String(rawCode)
@@ -28,6 +29,11 @@ Page({
     order: null,
     shopObj: null,
     _compactScreen: false,
+    _canCloseOrder: false,   // 员工职级 >= 100 才显示「订单关闭」
+    _crossSearchShow: false,
+    _crossCategoryId: null,
+    _crossCategoryName: '',
+    _crossItemId: null,
 
     _orderInfoExpanded: true,
     _paymentDetailExpanded: false,
@@ -108,9 +114,35 @@ Page({
     var that = this
     app.loginPromiseNew.then(function () {
       var uiProfile = app.globalData.uiProfile || {}
-      that.setData({ _compactScreen: !!uiProfile.isCompact })
+      var staff = app.globalData.staff
+      that.setData({ _compactScreen: !!uiProfile.isCompact, _canCloseOrder: !!(staff && staff.title_level >= 100) })
       that.getData()
     }).catch(function () {})
+  },
+
+  // 订单关闭（页面最下方，不可逆）：后端校验条件（全部退完押金，或无需退押金且租赁物全部归还），
+  // 记录关闭时间和操作的员工；成功后重新加载订单（按钮随之消失）
+  onCloseOrder() {
+    var that = this
+    if (that._closing) return
+    wx.showModal({
+      title: '确认关闭订单',
+      content: '订单关闭后不能恢复，此操作不可逆。确定要关闭这个订单吗？',
+      confirmText: '确认关闭',
+      confirmColor: '#d03050',
+      success: function (res) {
+        if (!res.confirm) return
+        that._closing = true
+        data.closeRentOrderByStaffPromise(that.data.id, app.globalData.sessionKey).then(function () {
+          that._closing = false
+          wx.showToast({ title: '订单已关闭', icon: 'success' })
+          that.getData()
+        }).catch(function () {
+          // 失败原因 util.performWebRequest 已经提示过
+          that._closing = false
+        })
+      }
+    })
   },
 
   getData() {
@@ -354,8 +386,23 @@ Page({
       }
       rental._rentToNow = rentToNow
       rental._rentToNowStr = util.showAmount(rentToNow)
+      var presetRent = 0
+      for (var pri = 0; rental.pricePresets && pri < rental.pricePresets.length; pri++) {
+        presetRent += parseFloat(rental.pricePresets[pri].price) || 0
+      }
+      // 还没生成过租金明细（未支付/未取件，尚未开始计费）：显示按价格预设算的预计租金，标签改成「预计租金」。
+      // 只用于展示，不进 totalSummary / 应退押金（见 utils/rent_estimate.js）
+      var estimate = rentEstimate.estimateRental(rental, order)
+      rental._rentIsEstimate = estimate.isEstimate
+      rental._rentEstimateAmount = estimate.amount
+      rental._rentDisplayAmount = rental.entertain
+        ? (rentToNow > 0 ? rentToNow : presetRent)
+        : (estimate.isEstimate ? estimate.amount : rentToNow)
+      rental._rentDisplayStr = util.showAmount(rental._rentDisplayAmount)
+      rental._entertainDiscountAmount = rental.entertain ? rental._rentDisplayAmount : 0
+      rental._rentPayableStr = util.showAmount(Math.max(0, rental._rentDisplayAmount - rental._entertainDiscountAmount))
       // showcase 费用格/小计统一走 showAmount 格式化（四舍五入 2 位 + 自带 ¥），避免浮点尾数（如 0.06000000000000005）
-      rental.totalDiscountAmountStr = util.showAmount(rental.totalDiscountAmount || 0)
+      rental.totalDiscountAmountStr = util.showAmount((rental.totalDiscountAmount || 0) + rental._entertainDiscountAmount)
       rental.totalRepairationAmountStr = util.showAmount(rental.totalRepairationAmount || 0)
       rental.totalOvertimeAmountStr = util.showAmount(rental.totalOvertimeAmount || 0)
       rental.totalSummaryStr = util.showAmount(rental.totalSummary || 0)
@@ -456,11 +503,15 @@ Page({
     // 单条 rental，这些订单级标量不会自动重算 → 结算金额（总计赔偿/实际应退）不更新。这里用最新 rentals
     // 重新累加，口径与后端 Order getter 完全一致（赔偿/超时/减免均已含在 rental.totalSummary 内）。
     var sumSummary = 0, sumOvertime = 0, sumRepair = 0
+    var sumExpectedRent = 0   // 还没开始计费的租赁的预计租金（只用于「总计租金」格的展示）
     for (var ri = 0; order.rentals && ri < order.rentals.length; ri++) {
       var rt = order.rentals[ri]
       sumOvertime += rt.totalOvertimeAmount || 0
       sumRepair += rt.totalRepairationAmount || 0
-      if (!rt.experience && !rt.entertain) sumSummary += rt.totalSummary || 0
+      if (!rt.experience && !rt.entertain) {
+        sumSummary += rt.totalSummary || 0
+        if (rt._rentIsEstimate) sumExpectedRent += rt._rentEstimateAmount || 0
+      }
     }
     order.totalRentSummaryAmount = sumSummary
     order.totalRentOverTimeAmount = sumOvertime
@@ -520,6 +571,9 @@ Page({
 
     order.totalGuarantyAmountStr = util.showAmount(order.totalGuarantyAmount)
     order.totalRentSummaryAmountStr = util.showAmount(order.totalRentSummaryAmount)
+    // 退款区「总计租金」格显示值：真实租金 + 未开始计费那几件的预计；应退押金仍只用上面真实的 totalRentSummaryAmount
+    order.totalRentDisplayStr = util.showAmount(order.totalRentSummaryAmount + sumExpectedRent)
+    order._totalRentIsEstimate = sumExpectedRent > 0
     order.totalRentNeedToRefundAmountStr = util.showAmount(order.totalRentNeedToRefundAmount)
     order.totalRentOverTimeAmountStr = util.showAmount(order.totalRentOverTimeAmount)
     order.totalRentRepairationAmountStr = util.showAmount(order.totalRentRepairAmount)
@@ -785,6 +839,34 @@ Page({
     return !this.data[mapName][key]
   },
 
+  onCrossItemAssign(e) {
+    var ref = this._getItemRef(Number(e.currentTarget.dataset.ridx), Number(e.currentTarget.dataset.iidx))
+    if (!ref || !ref.item.pickup_shop || ref.item.status !== '未发放') return
+    var item = ref.item
+    this.setData({ _crossItemId: item.id })
+    if (item.noCode) {
+      var that = this
+      wx.showModal({ title: '录入租赁物名称', editable: true, content: item.name || '', success: function (res) {
+        if (res.confirm && res.content && res.content.trim()) that._saveCrossItem({ name: res.content.trim() })
+      } })
+    } else {
+      this.setData({ _crossSearchShow: true, _crossCategoryId: item.category_id, _crossCategoryName: item.class_name || '' })
+    }
+  },
+  onCrossSearchClose() { this.setData({ _crossSearchShow: false }) },
+  onCrossProductSelected(e) {
+    var product = e.detail && e.detail.product
+    this.setData({ _crossSearchShow: false })
+    if (product && product.id) this._saveCrossItem({ productId: product.id })
+  },
+  _saveCrossItem(payload) {
+    var that = this
+    var url = app.globalData.requestPrefix + 'Rent/AssignCrossShopItem/' + this.data._crossItemId
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
+    util.performWebRequest(url, payload).then(function (rental) {
+      if (rental && rental.id) { that.refreshStatus(rental); wx.showToast({ title: '已录入', icon: 'success' }) }
+    }).catch(function () { /* 请求层已提示失败原因 */ })
+  },
   onItemPick(e) {
     var that = this
     var id = e.currentTarget.dataset.id
@@ -794,8 +876,9 @@ Page({
       complete: (res) => {
         if (!res.confirm) return
         data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
-          that.refreshStatus(newRental)
-        })
+          // 最后一件发放可能产生首日租金，重新读取订单以同步应收金额。
+          that.getData()
+        }).catch(function () { /* 请求层已提示失败原因 */ })
       }
     })
   },
@@ -811,7 +894,7 @@ Page({
     for (var i = 0; i < rental.rentItems.length; i++) {
       var it = rental.rentItems[i]
       if (it.id == id) continue
-      if (it.status != '已归还' && it.status != '未发放' && it.status != '已更换') {
+      if (!it.noNeed && it.status != '已归还' && it.status != '已更换') {
         allReturned = false
       }
     }
@@ -820,6 +903,7 @@ Page({
         ? '套餐【' + rental.name + '】中的租赁物，即将全部归还，归还后套餐租金自动结算，此操作不可逆。'
         : '即将归还【' + rental.name + '】，租金自动结算，此操作不可逆。')
       : '此操作不可逆。'
+    if (ref.item.pickup_shop) msg = '请确认装备归还至' + ref.item.pickup_shop + '。' + msg
     wx.showModal({
       title: '确认归还',
       content: msg,
@@ -842,7 +926,7 @@ Page({
         if (!res.confirm) return
         data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
           that.refreshStatus(newRental)
-        })
+        }).catch(function () { /* 请求层已提示失败原因 */ })
       }
     })
   },

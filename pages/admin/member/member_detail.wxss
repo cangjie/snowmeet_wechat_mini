@@ -8,6 +8,11 @@
 .card-edit { margin-left: auto; display: flex; align-items: center; gap: 4rpx; height: 50rpx; padding: 0 18rpx;
   border-radius: 12rpx; border: 1rpx solid #006495; background: #e1edf7; }
 .card-edit-txt { font-size: 23rpx; color: #006495; font-weight: 600; }
+/* 标签卡片右上角：[设为VIP/取消VIP] [编辑]——VIP 按钮吃掉 auto 边距靠右，编辑紧跟其后 */
+.card-edit--vip { border-color: #9a6a00; background: #fff4d6; }
+.card-edit--vip-on { background: #ffe39a; }
+.card-edit-txt--vip { color: #9a6a00; }
+.card-edit--next { margin-left: 0; }
 
 /* 资料卡 */
 .head-top { display: flex; align-items: center; gap: 22rpx; }

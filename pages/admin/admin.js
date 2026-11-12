@@ -159,6 +159,9 @@ Page({
       case 'rent_list':
         path = 'rent/new_rent_list'
         break
+      case 'cross_shop_rent_list':
+        path = 'rent/new_rent_list?crossShop=1'
+        break
       case 'member_list':
         path = '/pages/admin/member/member_list'
         break

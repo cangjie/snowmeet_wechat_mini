@@ -41,9 +41,9 @@
           <text class="k">{{item.label}}</text>
           <text wx:if="{{item.error}}" class="v tone-danger">填写有误，见上方</text>
           <text wx:elif="{{item.none}}" class="v" style="font-weight: 400; color: var(--faint);">无优惠</text>
-          <text wx:else class="v">教练价 ¥{{item.price}}（优惠 −¥{{item.discount}}）</text>
+          <text wx:else class="v">分销商价 ¥{{item.price}}（优惠 −¥{{item.discount}}）</text>
         </view>
-        <view wx:if="{{!trial.length}}" class="card-meta">填写试算原价后，这里显示各店各档的教练价。</view>
+        <view wx:if="{{!trial.length}}" class="card-meta">填写试算原价后，这里显示各店各档的分销商价。</view>
       </view>
       <view class="note">修改只影响<text style="font-weight: 700;">之后</text>领取的新卡；已领的卡保持领取时的价格。</view>
     </block>
@@ -79,14 +79,14 @@
     <block wx:if="{{tab === 'manage'}}">
       <view class="card card-pad">
         <view class="field">
-          <view class="field-label"><text>教练显示名</text></view>
+          <view class="field-label"><text>分销商显示名</text></view>
           <view class="card-row"><input class="input grow" value="{{name}}" bindinput="onName" maxlength="20" /><view class="btn" bindtap="onRename">保存</view></view>
         </view>
       </view>
       <view class="card card-pad">
         <view class="card-row"><text class="card-title small grow">{{coach.valid ? '启用中' : '已停用'}}</text><text class="tag {{coach.valid ? 'ok' : 'muted'}}">{{coach.valid ? '启用' : '已停用'}}</text></view>
-        <view class="card-meta">停用后，已领的学员卡继续有效，但这位教练不能再发新卡，没领的卡也不能再领。恢复后价格保留。</view>
-        <view class="btn {{coach.valid ? 'danger' : 'primary'}} btn-block" bindtap="onToggleValid">{{coach.valid ? '停用这位教练' : '恢复这位教练'}}</view>
+        <view class="card-meta">停用后，已领的学员卡继续有效，但这位分销商不能再发新卡，没领的卡也不能再领。恢复后价格保留。</view>
+        <view class="btn {{coach.valid ? 'danger' : 'primary'}} btn-block" bindtap="onToggleValid">{{coach.valid ? '停用这位分销商' : '恢复这位分销商'}}</view>
       </view>
     </block>
   </block>

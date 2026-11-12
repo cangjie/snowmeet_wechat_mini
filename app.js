@@ -74,15 +74,53 @@ function patchWxRequestPostDataDecoder() {
   wx.__snowmeetPostDataDecodedPatched = true
 }
 
+const LOGIN_REASON_MAX = 100
+
+// 把各种拒绝值（字符串、HTTP 状态码、wx 错误对象、Error）整理成一段不超过 100 字的文字。
+function loginFailureText(err) {
+  var text = ''
+  if (typeof err === 'string') text = err
+  else if (typeof err === 'number') text = 'HTTP ' + err
+  else if (err) text = err.message || err.errMsg || ''
+  return String(text).trim().slice(0, LOGIN_REASON_MAX)
+}
+
+// 登录失败原因留一份到微信实时日志（小程序后台「开发管理 → 运维中心 → 实时日志」可查）。
+// 附上当时的网络类型；基础库不支持实时日志时直接略过，不影响登录失败的处理。
+function reportLoginFailure(stage, message) {
+  try {
+    if (typeof wx.getRealtimeLogManager !== 'function') return
+    const logger = wx.getRealtimeLogManager()
+    const write = function (networkType) {
+      logger.error('login failed', { stage: stage, message: message, networkType: networkType })
+    }
+    if (typeof wx.getNetworkType !== 'function') {
+      write('')
+      return
+    }
+    wx.getNetworkType({
+      success: function (res) { write((res && res.networkType) || '') },
+      fail: function () { write('') }
+    })
+  } catch (e) {
+    console.warn('report login failure fail', e)
+  }
+}
+
 // 保持启动时立即登录；需身份的页面可通过 retryLogin 重新发起同一流程。
+// 失败时 resolve 的结果带 stage（wx_login / member_login / no_session / after_login）和 reason，页面可直接显示。
 function startLogin() {
   return new Promise(function (resolve) {
-    function failLogin(err) {
-      console.warn('Login failed, resolving with empty session', err)
+    function failLogin(stage, err) {
+      console.warn('Login failed, resolving with empty session', stage, err)
       authSession.resetAuthenticationState(getApp())
+      const message = loginFailureText(err)
+      reportLoginFailure(stage, message)
       resolve({
         authenticated: false,
-        message: (typeof err === 'string' && err) || (err && (err.message || err.errMsg)) || '微信登录失败'
+        message: message || '微信登录失败',
+        stage: stage,
+        reason: message ? stage + ': ' + message : stage
       })
     }
 
@@ -104,7 +142,8 @@ function startLogin() {
         var url = 'https://' + app.globalData.domainName + '/api/MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
         util.performWebRequest(url, undefined).then(function (session) {
           if (!session || typeof session.session_key !== 'string' || !session.session_key.trim()) {
-            throw new Error('未获取到有效微信会话')
+            failLogin('no_session', '未获取到有效微信会话')
+            return
           }
           app.globalData.sessionKey = encodeURIComponent(session.session_key)
           app.globalData.member = session.member
@@ -138,16 +177,23 @@ function startLogin() {
               console.log('env', env)
             }
           })
-        }).catch(failLogin)
+        }, function (err) {
+          // 请求没成功（网络、状态码、服务端报错）
+          failLogin('member_login', err)
+        }).catch(function (err) {
+          // 拿到会话后的本地处理抛了异常
+          failLogin('after_login', err)
+        })
       },
       // 登录失败也要结束等待，避免所有依赖 loginPromiseNew 的页面永久卡住。
-      fail: failLogin
+      fail: function (err) { failLogin('wx_login', err) }
     })
   })
 }
 
 // 店员进入小程序后，第一次落在首页或雪票选购页时自动进管理员菜单；落在其他页面
 // （扫码、分享、付款等指定页面）不适用，不分冷热启动、不分场景。
+const skipassStaffScene = require('./utils/skipass_staff_scene.js')
 const ENTRY_PATHS = ['pages/index/index', 'pages/ski_pass/ski_pass_selector']
 const ADMIN_URL = '/pages/admin/admin'
 
@@ -177,6 +223,7 @@ function routeEntry(options, appRef) {
     const route = currentRoute()
     let target = ''
     if (app.globalData.staff
+      && !app.globalData.skipassQrEntry
       && isEntryPath(app.globalData.entryPath)
       && app.globalData.entryHandledRevision !== revision) {
       app.globalData.entryHandledRevision = revision
@@ -220,6 +267,8 @@ App({
     this.globalData.scene = res.scene
     this.globalData.entryRevision = 1
     this.globalData.entryPath = res.path
+    this.globalData.skipassQrStaffId = res.path && res.path.replace(/^\//, '') === 'pages/ski_pass/ski_pass_selector' ? skipassStaffScene.fromOptions(res.query) : ''
+    this.globalData.skipassQrEntry = !!this.globalData.skipassQrStaffId
     if (isEntryPath(res.path) && res.path.replace(/^\//, '') !== 'pages/index/index') {
       routeEntry({ fromIndex: false }, this)
     }
@@ -264,6 +313,8 @@ App({
     this._hidden = false
     this.globalData.scene = res && res.scene
     this.globalData.entryPath = res && res.path
+    this.globalData.skipassQrStaffId = res && res.path && res.path.replace(/^\//, '') === 'pages/ski_pass/ski_pass_selector' ? skipassStaffScene.fromOptions(res.query) : ''
+    this.globalData.skipassQrEntry = !!this.globalData.skipassQrStaffId
     routeEntry({ fromIndex: false }, this)
   },
 

@@ -152,7 +152,7 @@ test('删除先确认；已分账、被拒绝的不能删；删除后摘要跟�
   assert.deepEqual(comp.data.shares.map(s => s.stateClass), ['blue', 'ok', 'danger'])
 
   await comp.onRemove(tap({ id: 31 }))
-  assert.deepEqual(env.modals, ['删除介绍人分账'])
+  assert.deepEqual(env.modals, ['删除分销商分账'])
   assert.deepEqual(env.calls.find(c => c.action === 'RemoveShare').body, { orderShareId: 31 })
   assert.equal(comp.data.shares.length, 2)
   assert.equal(comp.data.summary, '已设 2 条，合计 ¥172')

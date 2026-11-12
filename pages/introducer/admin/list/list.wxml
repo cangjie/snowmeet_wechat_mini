@@ -1,28 +1,62 @@
 <view class="co-page">
   <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
   <block wx:else>
+    <view wx:if="{{stats}}" class="card card-pad"><view class="card-meta">启用分销商 {{stats.distributors}} · 已领/已发卡 {{stats.cardsClaimed}}/{{stats.cardsIssued}} · 顾客消费 ¥{{stats.consumption}}</view></view>
+    <view wx:if="{{statsUnavailable}}" class="note">卡券和消费统计暂时不可用，可下拉刷新重试。</view>
+    <view wx:if="{{syncConflicts.length}}" class="card card-pad">
+      <view class="card-title">部分分销商身份需要处理</view>
+      <view wx:for="{{syncConflicts}}" wx:key="*this" class="card-meta">{{item}}</view>
+    </view>
+    <input class="input" placeholder="搜索名称、手机号或尾号" value="{{keyword}}" bindinput="onSearch" />
     <view class="chips">
       <text wx:for="{{filters}}" wx:key="*this" class="chip {{filter === item ? 'on' : ''}}" data-name="{{item}}" bindtap="onFilter">{{item}} {{counts[item]}}</text>
     </view>
+    <view class="chips">
+      <text class="chip {{statusFilter === '' ? 'on' : ''}}" data-value="" bindtap="onStatusFilter">全部状态</text>
+      <text class="chip {{statusFilter === 'active' ? 'on' : ''}}" data-value="active" bindtap="onStatusFilter">启用</text>
+      <text class="chip {{statusFilter === 'stopped' ? 'on' : ''}}" data-value="stopped" bindtap="onStatusFilter">已停用</text>
+    </view>
     <view wx:for="{{rows}}" wx:key="id" class="card card-pad" style="{{item.valid ? '' : 'opacity: 0.65;'}}">
       <view class="card-row wrap" style="gap: 12rpx;">
+        <view wx:if="{{item.valid && item.coachId}}" class="btn" data-id="{{item.id}}" bindtap="onSelect">{{item.checked ? '✓ 已选' : '选择'}}</view>
         <text class="card-title">{{item.name}}</text>
         <text class="tag {{item.typeClass}}">{{item.type}}</text>
         <text wx:if="{{!item.valid}}" class="tag muted">已停用</text>
       </view>
+      <view wx:if="{{item.cards}}" class="card-meta">发卡 {{item.cards.total}}（已领 {{item.cards.claimed}}）· 顾客 {{item.students}} · 本季消费 ¥{{item.seasonAmount}}</view>
       <view class="card-row wrap" style="gap: 12rpx;">
         <text class="tag {{item.wechatClass}}">微信 {{item.wechat}}</text>
         <text class="tag {{item.alipayClass}}">支付宝 {{item.alipay}}</text>
       </view>
-      <view wx:if="{{item.alipay === '未绑定'}}" class="card-meta">支付宝还没有绑定分账关系：这位介绍人在支付宝付款订单上的分账会走手动转账。</view>
+      <view wx:if="{{item.alipay === '未绑定'}}" class="card-meta">支付宝还没有绑定分账关系：这位分销商在支付宝付款订单上的分账会走手动转账。</view>
       <view class="btn-row">
+        <view class="btn" data-id="{{item.id}}" bindtap="onEdit">编辑资料和收款信息</view>
+        <view wx:if="{{item.coachId}}" class="btn" data-id="{{item.coachId}}" bindtap="onOpenPlatform">卡和优惠设置</view>
         <view wx:if="{{item.alipay === '未绑定'}}" class="btn" data-id="{{item.id}}" bindtap="onRebind">重新绑定支付宝</view>
         <view class="btn {{item.valid ? 'danger' : ''}}" data-id="{{item.id}}" data-valid="{{item.valid}}" bindtap="onToggle">{{item.valid ? '停用' : '启用'}}</view>
       </view>
     </view>
-    <view wx:if="{{!rows.length && !loading}}" class="co-empty">还没有介绍人，点下方「添加介绍人」</view>
+    <view wx:if="{{phoneSearching}}" class="co-empty">正在查找会员…</view>
+    <view wx:elif="{{!rows.length && !loading}}" class="co-empty">没有符合条件的分销商</view>
+    <view wx:if="{{edit}}" class="edit-mask"><scroll-view scroll-y class="edit-dialog"><view class="card card-pad">
+      <view class="card-title">编辑分销商</view>
+      <view class="card-meta">修改收款资料仅用于之后提交的新申请；已有申请保留原收款资料。</view>
+      <view class="field"><view class="field-label">分销商类型</view><view class="chips">
+        <text wx:for="{{types}}" wx:key="*this" class="chip {{edit.type === item ? 'on' : ''}}" data-type="{{item}}" bindtap="onEditType">{{item}}</text>
+      </view></view>
+      <view class="field"><view class="field-label">显示名称</view><input class="input" value="{{edit.name}}" bindinput="onEditName" /></view>
+      <view class="field"><view class="field-label">支付宝真实姓名</view><input class="input" value="{{edit.realName}}" bindinput="onEditRealName" /></view>
+      <view class="field"><view class="field-label">支付宝登录号</view><input class="input" placeholder="不修改请留空" value="{{edit.ali}}" bindinput="onEditAli" /></view>
+      <block wx:if="{{edit.type === '机构'}}">
+        <view class="field"><view class="field-label">微信商户号</view><input class="input" placeholder="{{edit.originalType === '机构' ? '不修改请留空' : '请输入商户号'}}" value="{{edit.wepayNum}}" bindinput="onEditWepayNum" /></view>
+        <view class="field"><view class="field-label">商户全称</view><input class="input" placeholder="{{edit.originalType === '机构' ? '不修改请留空' : '请输入商户全称'}}" value="{{edit.wepayName}}" bindinput="onEditWepayName" /></view>
+      </block>
+      <view class="btn-row"><view class="btn" bindtap="onCancelEdit">取消</view><view class="btn primary" bindtap="onSaveEdit">保存</view></view>
+    </view></scroll-view></view>
   </block>
 </view>
 <view wx:if="{{!blocked}}" class="bottom-bar">
-  <view class="btn primary" bindtap="onAdd">添加介绍人</view>
+  <view class="btn" bindtap="onShareList">分销商分账</view>
+  <view class="btn" bindtap="onIssue">批量发券{{selectedCount ? '（' + selectedCount + '）' : ''}}</view>
+  <view class="btn primary" bindtap="onAdd">添加分销商</view>
 </view>

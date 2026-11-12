@@ -328,7 +328,7 @@ const ADMIN = '/pages/admin/admin'
 const LANDING = '/pages/ski_pass/ski_pass_selector'
 
 // 运行真实 app.js，替换微信与网络边界。pages 是模拟的页面栈（route 列表）。
-function loadApp({ session, scene = '1089', launchPath = 'pages/index/index', loginError, sysInfoFail, navFail } = {}) {
+function loadApp({ session, scene = '1089', launchPath = 'pages/index/index', query = {}, loginError, sysInfoFail, navFail } = {}) {
   const app = {}
   const calls = []
   const stack = []
@@ -374,12 +374,13 @@ function loadApp({ session, scene = '1089', launchPath = 'pages/index/index', lo
     require(name) {
       if (name === './utils/authSession.js') return authSession
       if (name === './utils/tabbar.js') return tabbar
+      if (name === './utils/skipass_staff_scene.js') return require('../utils/skipass_staff_scene.js')
       return util
     },
     console: { log() {}, warn() {} }
   }, { filename: 'app.js' })
   stack.push(launchPath)
-  app.onLaunch({ scene, path: launchPath, query: {} })
+  app.onLaunch({ scene, path: launchPath, query })
   return { app, calls, stack }
 }
 
@@ -548,4 +549,30 @@ test('app.globalData.userTabBarItem 是 utils/tabbar.js 的菜单：雪票、我
   assert.deepEqual(app.globalData.userTabBarItem.map((item) => item.text), ['雪票', '我的'])
   assert.deepEqual(app.globalData.userTabBarItem.map((item) => item.pagePath), [LANDING, '/pages/mine/mine'])
 >>>>>>> a405d9abe5ec6517ad3f12b7a1855a64e4fbac7a
+})
+
+
+test('扫码订票入口即使顾客也是店员，也留在雪票页', async () => {
+  const { app, calls } = loadApp({ session: staffSession, launchPath: 'pages/ski_pass/ski_pass_selector', query: { scene: 's%3D42' } })
+  await app.loginPromiseNew
+  await tick()
+  assert.deepEqual(calls, [])
+})
+
+
+test('员工扫描正式订票链接时保持雪票页面', async () => {
+  const { app, calls } = loadApp({ session: staffSession, launchPath: 'pages/ski_pass/ski_pass_selector', query: { q: encodeURIComponent('https://mini.snowmeet.top/mapp/skipass_book?staffId=42') } })
+  await app.loginPromiseNew
+  await tick()
+  assert.deepEqual(calls, [])
+})
+
+test('后台重新扫码正式订票链接时保存本次员工，不跳管理员页', async () => {
+  const { app, calls } = loadApp({ session: staffSession, launchPath: 'pages/ticket/receive' })
+  app.onHide()
+  app.onShow({ path: 'pages/ski_pass/ski_pass_selector', query: { q: encodeURIComponent('https://mini.snowmeet.top/mapp/skipass_book?staffId=42') } })
+  await app.loginPromiseNew
+  await tick()
+  assert.equal(app.globalData.skipassQrStaffId, '42')
+  assert.deepEqual(calls, [])
 })

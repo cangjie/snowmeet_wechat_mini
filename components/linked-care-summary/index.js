@@ -10,6 +10,7 @@ function equipmentRow(care, index) {
   const projects = [];
   if (care.need_edge === 1) projects.push('修刃');
   if (care.need_wax === 1) projects.push('热蜡');
+  if (care.maintain_board === 1) projects.push('养板');
   if (care.need_unwax === 1) projects.push('刮蜡');
   if (care.free_wax === 1) projects.push('机打蜡');
   if (care.need_repair === 1 || care.repair_memo) projects.push('维修');

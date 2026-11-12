@@ -1,6 +1,6 @@
 // 租赁开单：起租日期变了，租金/日要按新日期重新算。
 // 2026-11-01：开单时价格预设按「今天」生成（今天 16 点后是夜场价），选「延时租赁」或改起租日期后如果不重算，
-// 屏幕上和后端收的都是今天的价。规则在 utils/rent_date_price.js；店员手改过的租金（含招待归零）不能被日期一改就冲掉。
+// 屏幕上和后端收的都是今天的价。规则在 utils/rent_date_price.js；店员手改过的租金不能被日期一改就冲掉。
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const rentDatePrice = require('../utils/rent_date_price.js')
@@ -56,7 +56,7 @@ test('今晚 22:16 开的单改成明天：夜场价换成明天的日场价，�
   assert.equal(back.rent_type, '夜场')
 })
 
-test('店员手改过的租金不重算，只挪日期（招待归零同理）', () => {
+test('店员手改过的租金不重算，只挪日期', () => {
   const manual = { id: 5, rent_date: '2026-11-01', day_type: '周末', rent_type: '夜场', scene: '门市', price: 0, discount: 0, manual: true }
   const next = rentDatePrice.repricePreset(manual, PRICE_LIST, '2026-11-02', new Date(2026, 10, 1, 22, 16))
   assert.equal(next.price, 0)
@@ -104,7 +104,6 @@ function loadForm(displayRentals, fakeData) {
   }
   Object.keys(definition.methods).forEach(name => { instance[name] = definition.methods[name].bind(instance) })
   instance._updateRentalChip = () => {}
-  instance._refreshSummary = () => {}
   instance._emitSync = (needUpdate) => { syncs.push({ needUpdate, presets: JSON.parse(JSON.stringify(instance.data.displayRentals.map(r => r.pricePresets))) }) }
   return { instance, syncs, restore() { delete require.cache[file]; if (originalData) require.cache[dataPath] = originalData; else delete require.cache[dataPath] } }
 }
@@ -118,6 +117,27 @@ function rental(extra) {
   }, extra || {})
 }
 const tick = () => new Promise(resolve => setImmediate(resolve))
+
+test('勾选招待保留租金原价，并显示等额减免和零租金实付', () => {
+  const { instance, syncs, restore } = loadForm([rental()])
+  try {
+    const pkg = instance.data.displayRentals[0]
+    pkg._dailyRate = 150
+    pkg._dailyRateInput = '150.00'
+    instance._refreshSummary()
+
+    instance.onPkgEntertainToggle({ currentTarget: { dataset: { ridx: 0 } }, detail: { value: ['1'] } })
+
+    const updated = instance.data.displayRentals[0]
+    assert.equal(updated.entertain, true)
+    assert.equal(updated.pricePresets[0].price, 150)
+    assert.equal(updated._dailyRate, 150)
+    assert.equal(instance.data.summary.rentLabel, '150.00')
+    assert.equal(instance.data.summary.rentReduceLabel, '150.00')
+    assert.equal(instance.data.summary.rentPayableLabel, '0.00')
+    assert.equal(syncs[syncs.length - 1].presets[0][0].price, 150)
+  } finally { restore() }
+})
 
 test('选「延时租赁」：起租日变成明天，租金/日换成明天的价', async () => {
   const { instance, syncs, restore } = loadForm([rental()])
@@ -149,7 +169,7 @@ test('改起租日期（日历 / 今明快捷）后同样重算，改回今天�
   } finally { restore() }
 })
 
-test('店员手改过租金：改日期后价格不变（招待 0 元也不变）', async () => {
+test('店员手改过零租金：改日期后价格不变', async () => {
   const manual = rental({ pricePresets: [{ id: 9, rental_id: 7, rent_date: daysFromToday(0), day_type: '平日', rent_type: '夜场', scene: '门市', price: 0, discount: 0, manual: true }] })
   const { instance, restore } = loadForm([manual])
   try {

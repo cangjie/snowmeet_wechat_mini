@@ -38,7 +38,7 @@ Page({
 
     app.loginPromiseNew.then(() => {
       Promise.all([
-        data.getPackageListPromise(shop),
+        data.getPackageListPromise(shop, true),
         data.getShopByNamePromise(shop),
       ]).then(([packages, shopObj]) => {
         const pkgList = (packages || []).map(p => ({ ...p, qty: 0 }));
@@ -136,7 +136,7 @@ Page({
       for (let i = 0; i < pkg.qty; i++) {
         tasks.push(Promise.all([
           data.getPackagePromise(pkg.id),
-          data.getRentPriceListPromise(shopObj.id, '套餐', pkg.id, '门市'),
+          data.getRentPriceListPromise(shopObj.id, '套餐', pkg.id, '门市', true),
         ]));
       }
     });

@@ -4,7 +4,7 @@
     <block wx:if="{{state == 'loading'}}">
       <view class="verify-spinner"></view>
       <view class="verify-title">正在验证取板身份…</view>
-      <view class="verify-sub">请稍候</view>
+      <view class="verify-sub">{{wait_hint || '请稍候'}}</view>
     </block>
 
     <block wx:elif="{{state == 'matched'}}">
@@ -35,6 +35,7 @@
       <view class="verify-icon verify-icon--err">×</view>
       <view class="verify-title">{{login_error ? '微信登录未完成' : '验证失败'}}</view>
       <view class="verify-sub">{{message}}</view>
+      <view class="verify-detail" wx:if="{{login_error && login_reason}}">错误信息：{{login_reason}}</view>
       <button class="verify-btn" bindtap="onRetryTap" disabled="{{busy}}">{{login_error ? '重新登录' : '重试'}}</button>
     </block>
   </view>

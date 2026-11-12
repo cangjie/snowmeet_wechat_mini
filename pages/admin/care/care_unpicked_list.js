@@ -104,11 +104,13 @@ Page({
       if (care.summer == 'now') svcs.push('非雪季·寄存')
       else if (care.summer == 'later') svcs.push('非雪季·先双项')
       else {
-        if (care.need_edge == 1 && care.need_wax == 1) svcs.push('双项(修刃+热蜡)')
+        if (care.maintain_board == 1) svcs.push(care.need_edge == 1 ? '修刃+养板' : '养板')
+        else if (care.need_edge == 1 && care.need_wax == 1) svcs.push('双项(修刃+热蜡)')
         else if (care.need_edge == 1) svcs.push('修刃')
         else if (care.need_wax == 1) svcs.push('热蜡')
         if (care.free_wax == 1) svcs.push('机打蜡')
-        if (care.need_unwax == 1 && care.need_wax != 1) svcs.push('刮蜡')
+        if (care.need_unwax == 1 && care.need_wax != 1 && care.maintain_board != 1) svcs.push('刮蜡')
+        if (care.seal_board == 1) svcs.push('封板')
         if (care.urgent == 1) svcs.push('立等')
       }
       if (care.repair_memo) svcs.push('维修(' + care.repair_memo + ')')

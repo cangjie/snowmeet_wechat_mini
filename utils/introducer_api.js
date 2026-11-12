@@ -48,6 +48,7 @@ module.exports = {
   fail,
   // ---- 介绍人管理（系统管理员 ≥300）----
   listIntroducers: () => get('Introducer', 'ListIntroducers'),
+  listPlatformCoaches: () => get('CoachAdmin', 'ListCoaches'),
   lookupMember: cell => get('Introducer', 'LookupMember', { cell }),
   addIntroducer: body => post('Introducer', 'AddIntroducer', body),
   updateIntroducer: body => post('Introducer', 'UpdateIntroducer', body),
@@ -56,10 +57,15 @@ module.exports = {
   // type：教练 / KOL / 机构，不传 = 全部；keyword：名称、真实姓名或手机号里包含的文字
   listChoices: (type, keyword) => get('Introducer', 'ListChoices', { type, keyword }),
   getOrderShares: orderId => get('OrderIntroducerShare', 'GetOrderShares', { orderId }),
+  findShareOrder: code => get('OrderIntroducerShare', 'FindOrder', { code }),
+  // 一张雪票上那 1 元系统分账的记录（分账对应雪票不是订单，一张票最多一笔；只读，店长以上）：「大好河山雪票」页的卡片用
+  getSkipassShareRecord: skipassId => get('SkipassShareRecord', 'GetBySkipass', { skipassId }),
   setShare: body => post('OrderIntroducerShare', 'SetShare', body),
   removeShare: orderShareId => post('OrderIntroducerShare', 'RemoveShare', { orderShareId }),
-  // ---- 分账列表与手动分账（店长以上 ≥200）----
+  // ---- 分账列表（店长以上查看，管理员处理）----
   listShares: query => get('ShareList', 'List', query || {}),
   nextBatchNo: () => get('ShareList', 'NextBatchNo'),
-  completeManual: body => post('ShareList', 'CompleteManual', body)
+  completeManual: body => post('ShareList', 'CompleteManual', body),
+  approveAuto: orderShareId => post('ShareList', 'ApproveAuto', { orderShareId }),
+  submitManual: orderShareId => post('ShareList', 'SubmitManual', { orderShareId })
 }

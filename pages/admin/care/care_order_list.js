@@ -6,9 +6,9 @@ const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
 const adminAssistant = require('../../../utils/adminAssistant.js')
+const careOrderRows = require('../../../utils/care_order_rows.js')
 
 const IMG_HOST = data.IMAGE_HOST
-
 // 订单状态 chip 的配色（状态文字是后端 Order.orderStatus，与旧系统其它订单列表、新版零售订单列表同口径）
 const STATUS_CLASS = {
   '临时订单': 'temp',
@@ -173,22 +173,16 @@ Page({
       order.statusLabel = isTemp ? '临时订单' : (order.orderStatus || '未定义')
       order.statusClass = this._statusClass(order.statusLabel)
       order.unpaid = !isTemp && UNPAID_STATUSES.indexOf(order.statusLabel) >= 0
-      order.services = cp ? cp.services : ''
       order.isSummerTask = !!(cp && cp.isSummerTask)
-      // 顾客称呼 + 会员标识
+      // 顾客称呼（原来的「会 / 散」标识已取消，改由后端判定「新」：isNewCareCustomer，该顾客第一次下有效养护订单）
       var calledName = ''
       var member = order.member
-      var memberShip = '散'
       if (order.contact_name) {
         calledName = order.contact_name + (order.contact_gender === '男' ? '(先生)' : (order.contact_gender === '女' ? '(女士)' : ''))
       } else if (member) {
         calledName = member.real_name + (member.gender === '男' ? ' 先生' : (member.gender === '女' ? ' 女士' : ''))
       }
-      if (member && member.following_wechat === 1) {
-        memberShip = '会'
-      }
       order.calledName = calledName
-      order.memberShip = memberShip
       // 支付方式拼接（排除储值/次卡，单列标签）
       var methodSet = {}
       order.haveDeposit = false
@@ -205,19 +199,19 @@ Page({
       order.refundAmountStr = util.showAmount(order.refundAmount)
       order.totalEarnAmountStr = util.showAmount(order.totalEarnAmount)
       order.careCount = order.cares ? order.cares.length : 0
-      // 装备照片缩略图 + 卡券使用派生（任一 care 选了券 →「券」标签；选了卡 → 并入「卡」标签，
+      // 每件装备一块：品牌 / 长度 / 项目 / 照片 / 养护进度（utils/care_order_rows.js）；
+      // 装备明细整体可折叠，默认收起（点「装备 N 件」标题展开）。从详情返回会重新加载列表，
+      // 所以展开过的订单按订单 id 记在页面上，重新加载后保持展开，免得每次返回都要重新点开
+      order.careRows = careOrderRows.buildCareRows(order.cares, IMG_HOST)
+      order.careExpanded = !!(this.expandedCareOrderIds && this.expandedCareOrderIds[order.id])
+      // 卡券使用派生（任一 care 选了券 →「券」标签；选了卡 → 并入「卡」标签，
       // 从 care.ticket_code/use_card 直接看，不依赖 punch_card_used——未生效/历史漏记也能亮）
-      var thumbs = []
       var haveTicket = false
       for (var k = 0; order.cares && k < order.cares.length; k++) {
         var care = order.cares[k]
-        if (care.careImages && care.careImages.length > 0 && care.careImages[0].image) {
-          thumbs.push(IMG_HOST + care.careImages[0].image.thumbUrl)
-        }
         if (care.ticket_code && String(care.ticket_code).trim() !== '') haveTicket = true
         if (care.use_card) order.useCard = true
       }
-      order.thumbs = thumbs
       order.haveTicket = haveTicket
       totalEarn += order.totalEarnAmount || 0
     }
@@ -239,6 +233,28 @@ Page({
     var d = e.detail
     this.setData({ querying: true })
     this.getData(d.page, d.pageSize)
+  },
+
+  // 点「装备 N 件」标题：展开 / 收起本单的装备明细，只切这一单，不进详情（wxml 用 catchtap）
+  onToggleCares(e) {
+    var index = parseInt(e.currentTarget.dataset.idx)
+    var order = this.data.orders[index]
+    if (!order) return
+    var expanded = !order.careExpanded
+    this.expandedCareOrderIds = this.expandedCareOrderIds || {}
+    if (expanded) this.expandedCareOrderIds[order.id] = true
+    else delete this.expandedCareOrderIds[order.id]
+    this.setData({ ['orders[' + index + '].careExpanded']: expanded })
+  },
+
+  // 点装备缩略图：用原图预览这件装备的全部照片（wxml 用 catchtap，不进详情）
+  onCarePhotoTap(e) {
+    var order = this.data.orders[parseInt(e.currentTarget.dataset.idx)]
+    if (!order) return
+    var cid = parseInt(e.currentTarget.dataset.cid)
+    var row = (order.careRows || []).filter(function (r) { return r.id === cid })[0]
+    if (!row || !row.photos || row.photos.length === 0) return
+    wx.previewImage({ current: row.photos[0], urls: row.photos })
   },
 
   gotoDetail(e) {

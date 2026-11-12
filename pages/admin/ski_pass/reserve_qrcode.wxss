@@ -1,1 +1,6 @@
-/* pages/admin/ski_pass/reserve_qrcode.wxss */
+.qr-page { padding: 72rpx 36rpx; text-align: center; }
+.qr-title { font-size: 38rpx; font-weight: 600; color: #202b35; }
+.qr-note { margin-top: 24rpx; font-size: 27rpx; color: #657786; }
+.qr-image { width: 480rpx; height: 480rpx; margin-top: 50rpx; }
+.qr-error { margin-top: 28rpx; color: #b83c32; }
+.qr-retry { margin-left: 12rpx; color: #006495; }

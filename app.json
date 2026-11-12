@@ -79,6 +79,7 @@
     "pages/mine/skipass/my_skipasses",
     "pages/admin/reception/recept_scan",
     "pages/admin/reception/recept_member",
+    "pages/admin/reception/recept_vip",
     "pages/admin/reception/recept_auth_list",
     "pages/admin/reception/recept_entry",
     "pages/admin/reception/recept_new",
@@ -155,7 +156,8 @@
         "admin/list/list",
         "admin/add/add",
         "share/add/add",
-        "share/list/list"
+        "share/list/list",
+        "share/order/order"
       ]
     },
     {

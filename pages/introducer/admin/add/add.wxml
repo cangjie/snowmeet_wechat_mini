@@ -10,8 +10,8 @@
           <view class="btn {{looking ? 'disabled' : ''}}" bindtap="onLookup">{{looking ? '查找中' : '查找'}}</view>
         </view>
       </view>
-      <view wx:if="{{found && found.exists}}" class="note ok">找到会员：{{found.name}}（尾号 {{found.phoneTail}}）<text wx:if="{{found.isCoach}}">，已经是教练</text></view>
-      <view wx:elif="{{found}}" class="note">这个手机号还没有会员。介绍人必须先是我们的会员。</view>
+      <view wx:if="{{found && found.exists}}" class="note ok">找到会员：{{found.name}}（尾号 {{found.phoneTail}}）<text wx:if="{{found.isCoach}}">，已有教练身份</text></view>
+      <view wx:elif="{{found}}" class="note">这个手机号还没有会员。分销商必须先是我们的会员。</view>
     </view>
 
     <view class="card card-pad">
@@ -19,7 +19,7 @@
       <view class="seg">
         <text wx:for="{{types}}" wx:key="*this" class="seg-item {{type === item ? 'on' : ''}}" data-type="{{item}}" bindtap="onType">{{item}}</text>
       </view>
-      <view wx:if="{{type === '教练'}}" class="co-note">教练一般在「教练管理」里添加。这里添加的教练类介绍人，不会自动关联教练记录。</view>
+      <view class="co-note">三类分销商均可分享学员卡和优惠券，并查看顾客消费。</view>
       <view class="field">
         <view class="field-label"><text>显示名称</text></view>
         <input class="input" placeholder="例如 张教练" value="{{name}}" bindinput="onName" maxlength="20" />
@@ -42,7 +42,7 @@
           <input class="input" value="{{wepayAccountName}}" bindinput="onWepayName" />
         </view>
       </block>
-      <view wx:else class="note blue">自动取这位会员在我们小程序里的 openid，不用填。会员没用过我们的小程序时取不到，这位介绍人的微信分账会走手动转账。</view>
+      <view wx:else class="note blue">自动使用这位会员的小程序微信身份。会员没用过小程序时取不到，微信分账会走手动转账。</view>
     </view>
 
     <view class="card card-pad">

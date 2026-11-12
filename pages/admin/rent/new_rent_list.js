@@ -27,10 +27,15 @@ Page({
     totalPages: 0,
     totalRentalAmountStr: '',
     querying: false,
+    crossShopOnly: false,
     aiQueryConditions: ''
   },
 
   onLoad(options) {
+    if (options && options.crossShop === '1') {
+      this.setData({ crossShopOnly: true })
+      wx.setNavigationBarTitle({ title: '异店租赁订单' })
+    }
     var aiState = adminAssistant.applyPageIntent('rental_order.show_results', options)
     if (aiState) {
       this._ignoreInitialShopSelection = true
@@ -112,7 +117,7 @@ Page({
     if (!this.data.aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))) {
       startDate = new Date('2025-10-15')
       endDate = new Date()
-      shop = null
+      if (!this.data.crossShopOnly) shop = null
       isTest = null
       isEntertain = null
       haveDiscount = null
@@ -130,7 +135,7 @@ Page({
       null, p.isTest, p.isEntertain, null, null, p.haveDiscount, null,
       app.globalData.sessionKey, p.cell, null, null, p.keyword, null,
       p.rentCategoryId, p.rentItemName, p.useCard, p.rentStatus, p.hasRetail,
-      page, pageSize
+      page, pageSize, that.data.crossShopOnly
     ).then(function (result) {
       that.renderOrders(result.items || [], result.total || 0, page, pageSize)
       that.setData({ querying: false })
@@ -163,6 +168,13 @@ Page({
     var totalRentalAmount = 0
     for (var i = 0; orders && i < orders.length; i++) {
       var order = orders[i]
+      var crossShops = []
+      ;(order.rentals || []).forEach(function (r) {
+        ;(r.rentItems || []).forEach(function (it) {
+          if (it.valid == 1 && !it.noNeed && it.pickup_shop && crossShops.indexOf(it.pickup_shop) < 0) crossShops.push(it.pickup_shop)
+        })
+      })
+      order.crossShopsText = crossShops.join('、')
       var bizDate = new Date(order.biz_date)
       order.dateStr = util.formatDate(bizDate)
       order.timeStr = util.formatTimeStr(bizDate)

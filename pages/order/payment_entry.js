@@ -91,9 +91,22 @@ Page({
           that.pay()
         }
       })
-      .catch(function () {
-        // performWebRequest 已 toast；这里补一个 inline 提示
-        that.setData({ identity: { status: 'error', errorCode: 'check_failed', errorMessage: '身份验证查询失败，请重试' } })
+      .catch(function (err) {
+        // performWebRequest 已 toast。后端拒绝时 err 是它的原话：
+        //   「支付记录不存在」= 这笔付款已被作废（店员重新出过码，旧码不能再付），不是身份问题，要明说二维码失效；
+        //   其他后端原话（如「订单已支付或已取消」）照实显示；
+        //   没有后端原话（网络不通、接口出错）才提示身份验证查询失败。
+        var backendMessage = (typeof err === 'string' && err.trim()) ? err.trim() : ''
+        var errorCode = 'check_failed'
+        var errorMessage = '身份验证查询失败，请重试'
+        if (backendMessage === '支付记录不存在') {
+          errorCode = 'payment_not_found'
+          errorMessage = '二维码已失效，请让店员重新出码'
+        } else if (backendMessage) {
+          errorCode = 'check_rejected'
+          errorMessage = backendMessage
+        }
+        that.setData({ identity: { status: 'error', errorCode: errorCode, errorMessage: errorMessage } })
       })
   },
 
@@ -217,11 +230,13 @@ Page({
         if (care.summer == 'now') svcs.push('非雪季·寄存')
         else if (care.summer == 'later') svcs.push('非雪季·先双项')
         else {
-          if (care.need_edge == 1 && care.need_wax == 1) svcs.push('双项(修刃+热蜡)')
+          if (care.maintain_board == 1) svcs.push(care.need_edge == 1 ? '修刃+养板' : '养板')
+          else if (care.need_edge == 1 && care.need_wax == 1) svcs.push('双项(修刃+热蜡)')
           else if (care.need_edge == 1) svcs.push('修刃')
           else if (care.need_wax == 1) svcs.push('热蜡')
           if (care.free_wax == 1) svcs.push('机打蜡')
-          if (care.need_unwax == 1 && care.need_wax != 1) svcs.push('刮蜡')
+          if (care.need_unwax == 1 && care.need_wax != 1 && care.maintain_board != 1) svcs.push('刮蜡')
+          if (care.seal_board == 1) svcs.push('封板')
           if (care.urgent == 1) svcs.push('立等')
         }
         if (care.repair_memo) svcs.push('维修(' + care.repair_memo + ')')

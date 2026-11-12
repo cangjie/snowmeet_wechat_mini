@@ -63,6 +63,13 @@
     </view>
   </view>
 
+  <!-- VIP 快捷筛选：一点即查，不用展开上面的筛选面板 -->
+  <view class="quick">
+    <view class="quick-chip {{vipOnly ? 'quick-chip--on' : ''}}" bindtap="onToggleVipOnly">
+      <van-icon name="{{vipOnly ? 'star' : 'star-o'}}" size="15px" color="#9a6a00" /><text class="quick-chip-txt">VIP 会员</text>
+    </view>
+  </view>
+
   <!-- 统计条 -->
   <view class="stats">
     <text class="stats-item">会员数 <text class="stats-num">{{total}}</text></text>

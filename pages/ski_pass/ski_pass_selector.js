@@ -1,9 +1,11 @@
 // pages/ski_pass/ski_pass_selector.js
 // 雪票首页：按「时长 + 场次」分组，每组写最低价；点进去在详情页选装备和日期。
-// 价格人人可看，订票只有店员能订（后端 ReserveSkiPass 强制，详情页对顾客不显示支付栏）。
+// 价格人人可看，订票也对所有人开放（2026-11-06 起；之前只有店员能订）。
 const app = getApp()
 const skipassGroup = require('../../utils/skipass_group.js')
 const tabbar = require('../../utils/tabbar.js')
+const cart = require('../../utils/skipass_cart.js')
+const staffScene = require('../../utils/skipass_staff_scene.js')
 
 function safeDecode(value) {
   try {
@@ -22,7 +24,6 @@ Page({
     activeTab: 0,
     showTabs: false,
     tabIndex: tabbar.tabIndexOf(tabbar.SKIPASS_URL),
-    isStaff: false,
     loaded: false,
     loadFailed: false
   },
@@ -49,17 +50,30 @@ Page({
     if (options.memberId) {
       that.setData({ memberId: options.memberId })
     }
-    if (options.staffId) {
-      that.setData({ staffId: options.staffId })
-    }
+    const staffId = staffScene.fromOptions(options) || options.staffId
+    if (staffId) that.applyStaffId(staffId)
     app.loginPromiseNew.then(function () {
       that.setData({
         tabbarItemList: app.globalData.userTabBarItem,
         canGetInfo: true,
-        isStaff: !!app.globalData.staff
       })
       that.getResortArr()
     })
+  },
+
+  // 已打开的小程序再次扫码时，页面可能复用；在显示时接收这次入口的员工。
+  onShow() {
+    const revision = app.globalData.entryRevision
+    const staffId = app.globalData.skipassQrStaffId
+    if (staffId && this._staffEntryRevision !== revision) {
+      this._staffEntryRevision = revision
+      this.applyStaffId(staffId)
+    }
+  },
+  applyStaffId(staffId) {
+    this.setData({ staffId })
+    const existing = cart.load()
+    if (existing.items.length) cart.save(Object.assign({}, existing, { staffId }))
   },
 
   getResortArr() {

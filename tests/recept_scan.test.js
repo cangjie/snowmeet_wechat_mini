@@ -314,6 +314,28 @@ test('手机号不完整不提交；不是会员时停在本页，二维码照�
   cleanup(page)
 })
 
+test('VIP开单：作废没用上的码，进 VIP 列表页；回到本页重新出码', async () => {
+  const { page, calls, nav } = setup()
+  page.onShow()
+  await settle()
+  page.onVipTap()
+  assert.deepEqual(nav, ['/pages/admin/reception/recept_vip'])
+  assert.deepEqual(calls.stop, [5])
+  assert.equal(page.data.checkin, null)
+  assert.equal(page._pollTimer, null)
+
+  page.onHide()
+  page.onShow()
+  await settle()
+  assert.equal(calls.create, 2)
+  cleanup(page)
+})
+
+test('模板：接待页有「VIP开单」按钮，绑定 onVipTap', () => {
+  const wxml = require('node:fs').readFileSync(require('node:path').join(__dirname, '../pages/admin/reception/recept_scan.wxml'), 'utf8')
+  assert.match(wxml, /<view class="walkin-btn" bindtap="onVipTap">VIP开单<\/view>/)
+})
+
 test('底部链接进入手动录入入口', () => {
   const { page, nav } = setup()
   page.onManualEntryTap()

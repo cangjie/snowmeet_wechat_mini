@@ -4,6 +4,7 @@
 //   → 本页一发现有人扫码，就跳到顾客信息页（recept_member）：老顾客直接显示会员信息，
 //     新顾客在手机上授权手机号后那边弹窗提示，再选店铺和业务开单。
 //   顾客不扫码时点「散客进入」，同样到顾客信息页选店铺和业务。
+//   「VIP开单」进 VIP 列表页（recept_vip），点一位 VIP 直接开单：不用扫码、不用授权，视同身份已验证。
 //   也可以输会员手机号进入（同旧版）：店长及以上直接进入；普通店员要等店长在「【接待】接待授权」
 //   （recept_auth_list）里授权，本页查到授权后进入顾客信息页。
 // 手动录入顾客信息的入口 recept_entry 保留，由页面底部链接进入。
@@ -18,6 +19,7 @@ const { normalizePhone, shouldLookupPhone } = require('../../../utils/phone.js')
 
 const POLL_INTERVAL = 1500;
 const MEMBER_PAGE = '/pages/admin/reception/recept_member';
+const VIP_PAGE = '/pages/admin/reception/recept_vip';
 // 有了顾客、交给顾客信息页的阶段：顾客扫码（待授权手机号 / 已验证），店员输手机号已授权
 const HANDOFF_STAGES = ['need_phone', 'verified', 'phone_authed'];
 
@@ -222,6 +224,15 @@ Page({
     this._discardUnusedCode();
     this.setData({ checkin: null, qrCodeUrl: '', stageText: '', cell: '', waitingAuth: false, authText: '' });
     wx.navigateTo({ url: MEMBER_PAGE + '?walkin=1' });
+  },
+
+  /* ---------- VIP 开单 ---------- */
+  // 和散客进入一样：本页的码没人用了，作废；回到本页（onShow）会重新出码
+  onVipTap() {
+    this._stopPolling();
+    this._discardUnusedCode();
+    this.setData({ checkin: null, qrCodeUrl: '', stageText: '', cell: '', waitingAuth: false, authText: '' });
+    wx.navigateTo({ url: VIP_PAGE });
   },
 
   /* ---------- 手动录入入口 ---------- */

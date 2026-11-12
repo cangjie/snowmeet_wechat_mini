@@ -10,6 +10,10 @@
         <text class="filter-label">类型</text>
         <text wx:for="{{typeOptions}}" wx:key="label" class="chip {{type === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onType">{{item.label}}</text>
       </view>
+      <view wx:if="{{distributorOnly}}" class="filter-row">
+        <text class="filter-label">分销商</text>
+        <text wx:for="{{distributorTypeOptions}}" wx:key="label" class="chip {{distributorType === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onDistributorType">{{item.label}}</text>
+      </view>
       <view class="filter-row">
         <text class="filter-label">方式</text>
         <text wx:for="{{modeOptions}}" wx:key="label" class="chip {{mode === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onMode">{{item.label}}</text>
@@ -19,18 +23,20 @@
         <text wx:for="{{rangeOptions}}" wx:key="label" class="chip {{rangeKey === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onRange">{{item.label}}</text>
       </view>
       <date-range-picker wx:if="{{rangeKey !== 'all'}}" start-date="{{startDate}}" end-date="{{endDate}}" bind:change="onRangeChange" />
+      <view class="meta">按计划分账日期筛选，未设置时按申请日期</view>
       <input class="input" placeholder="搜索订单号或收款人" value="{{keyword}}" bindinput="onKeyword" bindconfirm="onSearch" confirm-type="search" />
+      <view class="link" bindtap="onFindOrder">按订单号申请分销商分账</view>
     </view>
 
     <view class="summary">
-      <text>共 {{total}} 条 · ¥{{totalAmount}} · 可勾选 {{selectableCount}} 条</text>
-      <text wx:if="{{selectableCount > 0}}" class="link" bindtap="onSelectAll">全选可选项</text>
+      <text>共 {{total}} 条 · ¥{{totalAmount}}<text wx:if="{{isAdmin}}"> · 可勾选 {{selectableCount}} 条</text></text>
+      <text wx:if="{{isAdmin && selectableCount > 0}}" class="link" bindtap="onSelectAll">全选已加载项</text>
     </view>
 
     <view wx:if="{{!items.length && !loading}}" class="co-empty">没有符合条件的分账</view>
 
     <view wx:for="{{items}}" wx:key="orderShareId" class="row {{item.status === '已分' ? 'done' : ''}}" data-id="{{item.orderShareId}}" bindtap="onItem">
-      <view wx:if="{{item.selectable}}" class="box {{item.checked ? 'on' : ''}}" data-id="{{item.orderShareId}}" catchtap="onToggle"><text wx:if="{{item.checked}}">✓</text></view>
+      <view wx:if="{{isAdmin && item.selectable}}" class="box {{item.checked ? 'on' : ''}}" data-id="{{item.orderShareId}}" catchtap="onToggle"><text wx:if="{{item.checked}}">✓</text></view>
       <view wx:else class="box off"></view>
       <view class="row-main">
         <view class="line">
@@ -40,29 +46,36 @@
         <view class="tags">
           <text class="tag blue">{{item.orderType}}</text>
           <text class="meta">{{item.shop}}</text>
-          <text class="tag {{item.mode === '手动' ? 'warn' : 'muted'}}">{{item.mode}}{{item.manualReason ? ' · ' + item.manualReason : ''}}</text>
-          <text class="tag {{item.status === '已分' ? 'ok' : 'danger'}}">{{item.status}}</text>
+          <text class="tag {{item.mode === '自动' ? 'muted' : 'warn'}}">{{item.mode}}{{item.manualReason ? ' · ' + item.manualReason : ''}}</text>
+          <text class="tag {{item.status === '已分' ? 'ok' : 'danger'}}">{{item.status === '已分' && item.mode === '银行转账' ? '已人工记账' : item.status}}</text>
         </view>
         <view class="meta">收款人 {{item.payee}} · 申请人 {{item.applicant}}</view>
-        <view class="meta">计划分账 {{item.planDate || '—'}} · 实际分账 {{item.sharedTime || '—'}}</view>
-        <view wx:if="{{item.batch}}" class="meta">批次 {{item.batch}}</view>
+        <view wx:if="{{item.distributorType}}" class="meta">分销商类型 {{item.distributorType}}</view>
+        <view wx:if="{{item.approvalState}}" class="meta">审核 {{item.approvalState}}</view>
+        <view wx:if="{{item.channelState}}" class="meta">处理状态 {{item.channelState}}</view>
+        <view wx:if="{{item.channelMessage}}" class="meta">处理说明 {{item.channelMessage}}</view>
+        <view class="meta">提交申请 {{item.applicationDate || '—'}} · 自动分账设置 {{item.autoShare == null ? '—' : (item.autoShare ? '是' : '否')}}</view>
+        <view class="meta">计划分账 {{item.planDate || '—'}} · {{item.mode === '银行转账' && item.batch ? '记账时间' : '实际分账'}} {{item.sharedTime || '—'}}</view>
+        <view wx:if="{{item.batch && item.mode === '银行转账'}}" class="meta">批次 {{item.batch}}</view>
+        <view wx:if="{{isAdmin && item.canApprove}}" class="btn primary" data-id="{{item.orderShareId}}" catchtap="onApprove">审核通过</view>
+        <view wx:if="{{isAdmin && item.canSubmitManual}}" class="btn primary" data-id="{{item.orderShareId}}" catchtap="onManualSubmit">分账</view>
       </view>
     </view>
     <view wx:if="{{loading}}" class="co-empty">加载中…</view>
     <view wx:elif="{{items.length && !hasMore}}" class="co-empty">没有更多了</view>
 
-    <view class="bottom-bar">
+    <view wx:if="{{isAdmin}}" class="bottom-bar">
       <view class="bar">
         <text class="bar-text">已选 {{selectedCount}} 笔 · ¥{{selectedTotal}}</text>
-        <view class="btn primary {{selectedCount ? '' : 'disabled'}}" bindtap="onOpenModal">分账</view>
+        <view class="btn primary {{selectedCount ? '' : 'disabled'}}" bindtap="onOpenModal">银行转账记账</view>
       </view>
     </view>
 
     <view wx:if="{{modal.show}}" class="mask">
       <view class="dialog">
-        <view class="dialog-title">手动分账</view>
+        <view class="dialog-title">银行转账记账</view>
         <view class="dialog-sum">共 {{modal.count}} 笔，总计 ¥{{modal.total}}</view>
-        <view wx:if="{{modal.oldCount > 0}}" class="dialog-warn">其中 {{modal.oldCount}} 笔是 30 天前的，请确认都已经分过。</view>
+        <view wx:if="{{modal.oldCount > 0}}" class="dialog-warn">其中 {{modal.oldCount}} 笔是 30 天前的，请确认银行转账已完成。</view>
         <view class="field">
           <view class="field-label"><text>批次号（系统生成，可以改，不能和已有的重复）</text></view>
           <input class="input" value="{{modal.batchNo}}" bindinput="onBatchNo" maxlength="40" />

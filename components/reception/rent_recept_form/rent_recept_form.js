@@ -11,20 +11,28 @@ const RENT_MODES = [
   { key: 'now',   name: '立即租赁' },
   { key: 'later', name: '先租后取' },
   { key: 'delay', name: '延时租赁' },
+  { key: 'cross', name: '异店租赁' },
 ];
 
-const PT_TO_KEY = { '立即租赁': 'now', '先租后取': 'later', '延时租赁': 'delay' };
-const KEY_TO_PT = { now: '立即租赁', later: '先租后取', delay: '延时租赁' };
+const PT_TO_KEY = { '立即租赁': 'now', '先租后取': 'later', '延时租赁': 'delay', '异店租赁': 'cross' };
+const KEY_TO_PT = { now: '立即租赁', later: '先租后取', delay: '延时租赁', cross: '异店租赁' };
+const { destinations } = require('../../../utils/cross_shop_rent.js');
 
 const { repricePreset, modeForDateChange } = require('../../../utils/rent_date_price.js');
 
 // 开单生效时是否当场把装备发给顾客（后端 EffectRental 按 rentItem.atOnce 发放并把租赁物标记为「租赁中」）。
 //   立即租赁：当场发放，从现在起计费。
 //   延时租赁：也当场发放——装备当晚就交给顾客，起租日期（默认明天 00:00）才开始计费，和旧版延时租赁一致。
-//   先租后取：不发放——从现在起先计租金，装备稍后由店员发放（旧版是「未领取」）。
+//   先租后取：不发放，全部装备领取后开始计租。
 // 起租日期只管从哪天计费，不管装备什么时候发出去。
 function atOnceForMode(mode) {
   return mode === 'now' || mode === 'delay';
+}
+
+// 租赁模式存在 pick_type（落库、保存往返不丢），装备是否当场发放按它派生，口径同 atOnceForMode / 追加租赁页。
+// 不能读 rental.atOnce：租赁表没有这一列，草稿保存再读回来就丢了（2026-11-10 WT_ZL_261110_00001，见 _applyCategoryChange）。
+function atOnceForPickType(pickType) {
+  return pickType === '立即租赁' || pickType === '延时租赁';
 }
 
 // 套餐的租赁模式变了（点模式、或改日期自动切模式），套餐里的装备要不要跟着变：
@@ -65,6 +73,9 @@ function evalEntry(item) {
   if (item && item.noNeed) return { ok: true, label: '' };
   if (item && !item.is_associate && !item.category_id) {
     return { ok: false, label: '分类未选' };
+  }
+  if (item && item.pick_type === '异店租赁') {
+    return item.pickup_shop ? { ok: true, label: '异店待领取' } : { ok: false, label: '领取门店未选' };
   }
   const missing = [];
   if (item && item.noCode) {
@@ -327,23 +338,34 @@ Component({
     },
 
     _refreshSummary() {
-      let deposit = 0, rent = 0, reduce = 0;
+      let deposit = 0, rent = 0, depositReduce = 0, rentReduce = 0, hasEntertain = false;
       const list = this.data.displayRentals || [];
       list.forEach(r => {
         deposit += Number(r._depositLabel) || 0;
-        rent += Number(r._dailyRate) || 0;
-        reduce += Number(r.guaranty_discount) || 0;
+        const dailyRate = Number(r._dailyRate) || 0;
+        rent += dailyRate;
+        if (r.entertain) {
+          hasEntertain = true;
+          rentReduce += dailyRate;
+        }
+        depositReduce += Number(r.guaranty_discount) || 0;
       });
       deposit = Math.round(deposit * 100) / 100;
-      reduce = Math.round(reduce * 100) / 100;
+      depositReduce = Math.round(depositReduce * 100) / 100;
+      rent = Math.round(rent * 100) / 100;
+      rentReduce = Math.round(rentReduce * 100) / 100;
       const count = list.length;
       const canCheckout = count > 0 && list.every(r => r._rentalEntered);
       this.setData({
         summary: {
           depositLabel: deposit.toLocaleString('en-US'),
-          depositReduce: reduce,
-          depositReduceLabel: reduce.toLocaleString('en-US'),
+          depositReduce: depositReduce,
+          depositReduceLabel: depositReduce.toLocaleString('en-US'),
           rentLabel: rent.toFixed(2),
+          rentReduce: rentReduce,
+          rentReduceLabel: rentReduce.toFixed(2),
+          rentPayableLabel: Math.max(0, rent - rentReduce).toFixed(2),
+          hasEntertain,
           count,
           canCheckout,
         },
@@ -436,11 +458,19 @@ Component({
 
     /* ---------- 套餐字段 ---------- */
     onPkgModeTap(e) {
-      this._applyPkgMode(Number(e.currentTarget.dataset.ridx), e.currentTarget.dataset.mode);
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const mode = e.currentTarget.dataset.mode;
+      if (mode === 'cross') {
+        const shops = destinations(this.data.shop);
+        if (!shops.length) { wx.showToast({ title: '当前门店不支持异店租赁', icon: 'none' }); return; }
+        wx.showActionSheet({ itemList: shops, success: res => this._applyPkgMode(ridx, mode, null, shops[res.tapIndex]) });
+        return;
+      }
+      this._applyPkgMode(ridx, mode);
     },
     // 套餐选定租赁模式：改套餐和跟随的装备的模式、发放标记，同时按模式定起租日期和时间。
     // dateOverride 是店员自己选的起租日期（改日期时自动切模式用），模式只决定钟点，不再改日期。
-    _applyPkgMode(ridx, mode, dateOverride) {
+    _applyPkgMode(ridx, mode, dateOverride, pickupShop) {
       const pickType = KEY_TO_PT[mode];
       const modeDateTime = dateTimeForMode(mode);
       const date = dateOverride || modeDateTime.date;
@@ -450,9 +480,13 @@ Component({
       const tmrw = formatDate(tmrwDate);
       const oldPkgPickType = this.data.displayRentals[ridx].pick_type;
       const items = (this.data.displayRentals[ridx].rentItems || []).map(it => {
+        if (it.noNeed) return it;
         // 跟随规则见 itemFollowsPackage；单独选过模式的装备保持不动。
-        if (!itemFollowsPackage(it, oldPkgPickType)) return it;
-        const next = { ...it, pick_type: pickType, atOnce: atOnceForMode(mode), _modeKey: mode, _modeFromPkg: true };
+        if (mode !== 'cross' && !itemFollowsPackage(it, oldPkgPickType)) return it;
+        const next = { ...it, pick_type: pickType, pickup_shop: mode === 'cross' ? pickupShop : null, atOnce: atOnceForMode(mode), _modeKey: mode, _modeFromPkg: true };
+        if (!it.noCode && (it.pickup_shop || null) !== (next.pickup_shop || null)) {
+          next.code = ''; next.name = ''; next.rent_product_id = null;
+        }
         const entry = evalEntry(next);
         next._entered = entry.ok;
         next._statusLabel = entry.label;
@@ -596,16 +630,15 @@ Component({
       this._emitSync(false);
     },
 
-    // 招待：勾选后该 rental 免单 —— entertain 落库（后端 totalSummary 排除租金），
-    // 并把押金、租金/日 默认归零（仍可手动改回）。
+    // 招待：勾选后后端按 entertain 免租；本地保留日租原价供界面显示减免和实付。
     onPkgEntertainToggle(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
       const checked = e.detail.value.length > 0;
       this.setData({ [`displayRentals[${ridx}].entertain`]: checked });
       if (checked) {
         this._applyPkgDeposit(ridx, 0); // 押金归零（含 guaranty / realGuaranty / _depositInput）
-        this._applyPkgRate(ridx, 0);    // 租金/日归零（含 pricePresets / _dailyRateInput）
       } else {
+        this._refreshSummary();
         this._emitSync(false);
       }
     },
@@ -616,7 +649,7 @@ Component({
       const tmrw = formatDate(tmrwDate);
       const r = this.data.displayRentals[ridx] || {};
       // 改起租日期：晚于今天 → 自动切成延时租赁、起租钟点 00:00；改回今天且原来是延时租赁 → 回立即租赁、钟点是现在
-      const autoMode = modeForDateChange(date, r.pick_type, today);
+      const autoMode = r.pick_type === '异店租赁' ? null : modeForDateChange(date, r.pick_type, today);
       if (autoMode) {
         this._applyPkgMode(ridx, autoMode, date);
         return;
@@ -644,12 +677,13 @@ Component({
       const owner = r.package_id ? { type: '套餐', id: r.package_id }
         : (r.category_id ? { type: '分类', id: r.category_id } : null);
       const preset0 = (r.pricePresets || [])[0] || null;
-      if (!priceList.length && owner && !(preset0 && preset0.manual)) {
+      const isServiceCenter = ((this.properties && this.properties.shop) || '').trim() === '万龙服务中心';
+      if ((!priceList.length || isServiceCenter) && owner && !(preset0 && preset0.manual)) {
         try {
           const dataLib = require('../../../utils/data.js');
           const shopObj = await dataLib.getShopByNamePromise(this.properties.shop || '');
           if (shopObj && shopObj.id) {
-            priceList = (await dataLib.getRentPriceListPromise(shopObj.id, owner.type, owner.id, '门市')) || [];
+            priceList = (await dataLib.getRentPriceListPromise(shopObj.id, owner.type, owner.id, '门市', true)) || [];
           }
         } catch (err) {
           console.warn('取价目表失败，只挪日期不改价', err);
@@ -784,16 +818,34 @@ Component({
       const { ridx, iidx, mode } = e.currentTarget.dataset;
       const item = this.data.displayRentals[ridx].rentItems[iidx];
       if (item.noNeed) return;
+      if (mode === 'cross') {
+        const shops = destinations(this.data.shop);
+        if (!shops.length) { wx.showToast({ title: '当前门店不支持异店租赁', icon: 'none' }); return; }
+        wx.showActionSheet({ itemList: shops, success: res => this._applyItemMode(ridx, iidx, mode, shops[res.tapIndex]) });
+        return;
+      }
+      this._applyItemMode(ridx, iidx, mode, null);
+    },
+    _applyItemMode(ridx, iidx, mode, pickupShop) {
+      const item = this.data.displayRentals[ridx].rentItems[iidx];
       const pickType = KEY_TO_PT[mode];
-      const entry = evalEntry({ ...item, pick_type: pickType });
-      this.setData({
+      const changedShop = !item.noCode && (item.pickup_shop || null) !== (pickupShop || null);
+      const entry = evalEntry({ ...item, code: changedShop ? '' : item.code, name: changedShop ? '' : item.name, pick_type: pickType, pickup_shop: pickupShop });
+      const patch = {
         [`displayRentals[${ridx}].rentItems[${iidx}].pick_type`]: pickType,
+        [`displayRentals[${ridx}].rentItems[${iidx}].pickup_shop`]: pickupShop,
         [`displayRentals[${ridx}].rentItems[${iidx}].atOnce`]: atOnceForMode(mode),
         [`displayRentals[${ridx}].rentItems[${iidx}]._modeKey`]: mode,
         [`displayRentals[${ridx}].rentItems[${iidx}]._modeFromPkg`]: false,
         [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
         [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
-      });
+      };
+      if (changedShop) {
+        patch[`displayRentals[${ridx}].rentItems[${iidx}].code`] = '';
+        patch[`displayRentals[${ridx}].rentItems[${iidx}].name`] = '';
+        patch[`displayRentals[${ridx}].rentItems[${iidx}].rent_product_id`] = null;
+      }
+      this.setData(patch);
       this._updateRentalChip(Number(ridx));
       this._emitSync(false);
     },
@@ -996,7 +1048,7 @@ Component({
           wx.showToast({ title: '店铺信息未加载，请重试', icon: 'none' });
           return;
         }
-        const priceList = await dataLib.getRentPriceListPromise(shopObj.id, '分类', newCat.id, '门市');
+        const priceList = await dataLib.getRentPriceListPromise(shopObj.id, '分类', newCat.id, '门市', true);
         wx.hideLoading();
 
         const rentals = stripUI(this.data.displayRentals);
@@ -1016,7 +1068,9 @@ Component({
         const nonAssociates = rental.rentItems.filter(it => !it.is_associate);
         const associates = (fullCat && fullCat.associateCategories) || [];
         const defaultPickType = rental.pick_type;
-        const atOnce = !!rental.atOnce;
+        // 配套项（雪杖等）当场发放要跟着租赁模式走：按 pick_type 派生。以前读 rental.atOnce，而它只是前端临时字段，
+        // 先存草稿再选分类时已经丢成 false，雪杖开单没发放；后端要求应领装备全部发放才计租，当天租金一行都不写。
+        const atOnce = atOnceForPickType(defaultPickType);
         const newAssociates = associates.map(a => {
           const cat = a.category || {};
           return {
@@ -1036,6 +1090,7 @@ Component({
             memo: '',
             category: cat,
             pick_type: defaultPickType,
+            pickup_shop: defaultPickType === '异店租赁' ? main.pickup_shop : null,
             atOnce,
             valid: 1,
           };

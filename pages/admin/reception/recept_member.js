@@ -380,7 +380,7 @@ Page({
       currentShopName: shop || '',
       shop: shop || '',
       sale: sale || 0,
-      rent: rent || 0,
+      rent: shop === '万龙服务中心' ? 1 : (rent || 0),
       care: care || 0,
       restuarant: restuarant || 0,
     });

@@ -72,8 +72,8 @@
         </view>
       </view>
 
-      <!-- 游客信息：只有店员订票时才填 -->
-      <view class="info-card" wx:if="{{isStaff}}">
+      <!-- 游客信息：顾客自己订和店员代订都要填 -->
+      <view class="info-card">
         <view class="info-card-header">
           <view class="header-accent" />
           <text class="info-card-title">游客信息 (Guest Details)</text>
@@ -122,7 +122,7 @@
 <view class="sheet-mask" wx:if="{{showConfirm}}" bindtap="onCloseConfirm"></view>
 <view class="sheet" wx:if="{{showConfirm}}" catchtap="">
   <view class="sheet-handle"></view>
-  <text class="sheet-title">请和顾客确认订票信息</text>
+  <text class="sheet-title">{{isStaff ? '请和顾客确认订票信息' : '请确认订票信息'}}</text>
   <text class="sheet-product">{{productName}}</text>
 
   <view class="sheet-field">
@@ -160,15 +160,15 @@
   </view>
 </view>
 
-<!-- 底部栏：店员是「购物车 + 加入购物车」；顾客只显示价格和订票说明 -->
+<!-- 底部栏：购物车 + 加入购物车（所有人） -->
 <view class="pay-bar" wx:if="{{hasPrice}}">
   <view class="price-section">
-    <text class="price-label">{{isStaff ? '本张 (THIS TICKET)' : '价格 (PRICE)'}}</text>
+    <text class="price-label">本张 (THIS TICKET)</text>
     <view class="price-row">
       <text class="price-value">{{summaryStr}}</text>
     </view>
   </view>
-  <view wx:if="{{isStaff}}" class="bar-actions">
+  <view class="bar-actions">
     <view class="cart-entry" bindtap="onOpenCart">
       <text class="cart-entry-text">购物车</text>
       <text class="cart-entry-count" wx:if="{{cartCount > 0}}">{{cartCount}}</text>
@@ -176,9 +176,6 @@
     <view class="pay-btn {{!canAdd ? 'pay-btn--disabled' : ''}}" bindtap="onAddToCart">
       <text class="pay-btn-text">加入购物车</text>
     </view>
-  </view>
-  <view wx:else class="staff-only">
-    <text class="staff-only-text">仅限店员订票，请联系店员预订</text>
   </view>
 </view>
 

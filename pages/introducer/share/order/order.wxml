@@ -1,0 +1,12 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card card-pad">
+      <view class="section-title">按订单号查找</view>
+      <input class="input" value="{{code}}" placeholder="输入完整订单号" bindinput="onCode" bindconfirm="onFind" />
+      <view class="btn primary {{loading ? 'disabled' : ''}}" bindtap="onFind">查找订单</view>
+      <view wx:if="{{orderLabel}}" class="note">{{orderLabel}}</view>
+    </view>
+    <order-share-editor wx:if="{{orderId}}" order-id="{{orderId}}" />
+  </block>
+</view>

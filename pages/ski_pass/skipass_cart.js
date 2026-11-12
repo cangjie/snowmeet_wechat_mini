@@ -1,5 +1,5 @@
 // pages/ski_pass/skipass_cart.js
-// 雪票购物车（仅店员）：票种 日期 手机号 × 张数 合并成一条，底部合计，去结算 → 一个订单一次微信支付。
+// 雪票购物车（所有人，2026-11-06 起开放）：票种 日期 手机号 × 张数 合并成一条，底部合计，去结算 → 一个订单一次微信支付。
 // 购物车存在本机（utils/skipass_cart.js）；金额只用来显示，后端结算时按当天价格行重新算并核对预存款。
 const app = getApp()
 const cartUtil = require('../../utils/skipass_cart.js')
@@ -18,7 +18,6 @@ Page({
   },
 
   data: {
-    isStaff: false,
     lines: [],
     ticketCount: 0,
     totalStr: '¥0.00',
@@ -30,7 +29,6 @@ Page({
     const that = this
     that._prices = {}
     app.loginPromiseNew.then(function () {
-      that.setData({ isStaff: !!app.globalData.staff })
       that.refresh()
       that.loadPrices()
     })
@@ -156,14 +154,10 @@ Page({
   },
 
   // ========================
-  // 去结算（仅店员）
+  // 去结算
   // ========================
   onCheckout() {
     const that = this
-    if (!that.data.isStaff) {
-      wx.showToast({ title: '仅限店员订票', icon: 'none' })
-      return
-    }
     if (that.data.paying) return
     if (that.data.empty) {
       wx.showToast({ title: '购物车是空的', icon: 'none' })

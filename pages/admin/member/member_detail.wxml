@@ -41,7 +41,8 @@
     <view class="card">
       <view class="card-title">
         <van-icon name="label-o" size="16px" color="#006495" /><text class="card-title-txt">标签</text>
-        <view class="card-edit" bindtap="onEditTags"><van-icon name="edit" size="13px" color="#006495" /><text class="card-edit-txt">编辑</text></view>
+        <view class="card-edit card-edit--vip {{member.isVip ? 'card-edit--vip-on' : ''}}" bindtap="onToggleVip"><van-icon name="{{member.isVip ? 'star' : 'star-o'}}" size="13px" color="#9a6a00" /><text class="card-edit-txt card-edit-txt--vip">{{member.isVip ? '取消VIP' : '设为VIP'}}</text></view>
+        <view class="card-edit card-edit--next" bindtap="onEditTags"><van-icon name="edit" size="13px" color="#006495" /><text class="card-edit-txt">编辑</text></view>
       </view>
       <view class="tag-sub">系统标签 · 按参与业务自动生成</view>
       <view class="tag-wrap">

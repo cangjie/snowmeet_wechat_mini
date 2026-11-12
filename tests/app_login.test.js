@@ -7,9 +7,9 @@ const authSession = require('../utils/authSession.js')
 const tabbar = require('../utils/tabbar.js')
 
 // 运行真实 App 定义，仅替换微信与网络边界，不发起真实登录请求。
-function loadApp(attempts) {
+function loadApp(attempts, options = {}) {
   const app = {}
-  const calls = { login: 0, requests: [], redirects: [] }
+  const calls = { login: 0, requests: [], redirects: [], realtimeErrors: [] }
   let current
   const wx = {
     login(options) {
@@ -21,14 +21,21 @@ function loadApp(attempts) {
       })
     },
     getAccountInfoSync() { return { miniProgram: { envVersion: 'trial' } } },
-    getDeviceInfo() { return {} },
+    getDeviceInfo() {
+      if (current.deviceThrows) throw new Error(current.deviceThrows)
+      return {}
+    },
     getWindowInfo() { return { windowWidth: 375 } },
     getAppBaseInfo() { return {} },
     getSystemInfoAsync(options) {
       options.success({ windowWidth: 375 })
       options.complete({})
     },
+    getNetworkType(o) { queueMicrotask(() => o.success({ networkType: options.networkType || 'wifi' })) },
     redirectTo(options) { calls.redirects.push(options.url) }
+  }
+  if (options.realtime) {
+    wx.getRealtimeLogManager = () => ({ error(...args) { calls.realtimeErrors.push(args) } })
   }
   const util = {
     performWebRequest(url) {
@@ -123,4 +130,90 @@ test('成功后再次登录失败不会残留上一份会话和会员身份', as
   assert.equal(app.globalData.sessionKey, '')
   assert.equal(app.globalData.member, null)
   assert.equal(app.globalData.staff, null)
+})
+
+// ---- 登录失败原因：结果里带阶段和原因，页面显示，微信实时日志留底 ----
+const settle = () => new Promise(resolve => setImmediate(resolve))
+
+test('wx.login 失败：结果带阶段 wx_login 和微信返回的原因', async () => {
+  const { app } = loadApp([{ wxError: 'login:fail network' }])
+  const result = await app.loginPromiseNew
+  assert.equal(result.authenticated, false)
+  assert.equal(result.stage, 'wx_login')
+  assert.equal(result.reason, 'wx_login: login:fail network')
+})
+
+test('MemberLogin 网络失败：保留 request:fail 的原因，不再丢成空对象', async () => {
+  const { app } = loadApp([{ error: { errMsg: 'request:fail timeout' } }])
+  const result = await app.loginPromiseNew
+  assert.equal(result.stage, 'member_login')
+  assert.equal(result.reason, 'member_login: request:fail timeout')
+})
+
+test('MemberLogin 返回非 200 状态码：原因写 HTTP 状态码', async () => {
+  const { app } = loadApp([{ error: 502 }])
+  const result = await app.loginPromiseNew
+  assert.equal(result.reason, 'member_login: HTTP 502')
+})
+
+test('MemberLogin 服务端报错：原因带服务端消息', async () => {
+  const { app } = loadApp([{ error: '获取session失败 40029 invalid code' }])
+  const result = await app.loginPromiseNew
+  assert.equal(result.stage, 'member_login')
+  assert.equal(result.reason, 'member_login: 获取session失败 40029 invalid code')
+})
+
+test('拒绝值里什么文字都没有：原因至少写出失败阶段', async () => {
+  const { app } = loadApp([{ error: {} }])
+  const result = await app.loginPromiseNew
+  assert.equal(result.stage, 'member_login')
+  assert.equal(result.reason, 'member_login')
+})
+
+test('会员接口没返回有效会话：阶段 no_session', async () => {
+  const { app } = loadApp([{ session: {} }])
+  const result = await app.loginPromiseNew
+  assert.equal(result.stage, 'no_session')
+  assert.match(result.reason, /^no_session: /)
+})
+
+test('登录成功后的处理抛异常：阶段 after_login 带异常信息', async () => {
+  const { app } = loadApp([{ session, deviceThrows: 'wx.getDeviceInfo is not a function' }])
+  const result = await app.loginPromiseNew
+  assert.equal(result.authenticated, false)
+  assert.equal(result.stage, 'after_login')
+  assert.equal(result.reason, 'after_login: wx.getDeviceInfo is not a function')
+  assert.equal(app.globalData.sessionKey, '')
+})
+
+test('原因文字过长会截断，页面不会被撑满', async () => {
+  const { app } = loadApp([{ error: 'x'.repeat(300) }])
+  const result = await app.loginPromiseNew
+  assert.equal(result.reason, 'member_login: ' + 'x'.repeat(100))
+})
+
+test('登录失败写入微信实时日志：阶段、原因和网络类型', async () => {
+  const { app, calls } = loadApp([{ error: { errMsg: 'request:fail timeout' } }], { realtime: true, networkType: '4g' })
+  await app.loginPromiseNew
+  await settle()
+  assert.equal(calls.realtimeErrors.length, 1)
+  assert.equal(calls.realtimeErrors[0][0], 'login failed')
+  // app.js 在 vm 沙箱里运行，对象原型和测试进程不同，先转成普通对象再比较
+  assert.deepEqual(JSON.parse(JSON.stringify(calls.realtimeErrors[0][1])), {
+    stage: 'member_login', message: 'request:fail timeout', networkType: '4g'
+  })
+})
+
+test('基础库不支持实时日志时，登录失败结果照常返回', async () => {
+  const { app } = loadApp([{ wxError: 'login:fail network' }])
+  const result = await app.loginPromiseNew
+  await settle()
+  assert.equal(result.reason, 'wx_login: login:fail network')
+})
+
+test('登录成功不写实时日志错误', async () => {
+  const { app, calls } = loadApp([{ session }], { realtime: true })
+  await app.loginPromiseNew
+  await settle()
+  assert.deepEqual(calls.realtimeErrors, [])
 })

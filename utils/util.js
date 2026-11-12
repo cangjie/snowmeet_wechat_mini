@@ -132,7 +132,8 @@ const performWebRequest = function (url, data) {
           title: '网络不通',
           icon: 'error'
         })
-        reject({})
+        // 仍然拒绝一个对象（旧调用方当 {} 处理），只多带一份微信返回的原因，登录失败时用来排查
+        reject({ errMsg: (res && res.errMsg) || '' })
       }
     })
   })

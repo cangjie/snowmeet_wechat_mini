@@ -32,7 +32,7 @@ Page({
   load() {
     return api.getMyCoach().then(d => {
       if (!d.isCoach) {
-        this.setData({ loading: false, blocked: '你还不是教练，请联系管理员添加' })
+        this.setData({ loading: false, blocked: '你还不是分销商，请联系管理员添加' })
         return
       }
       this.loadedOnce = true
@@ -41,7 +41,7 @@ Page({
         benefit: view.benefitLines(d.coach.carePrices, d.coach.rentalRate), validUntil: view.dayText(d.coach.validUntil)
       })
       return this.loadTab()
-    }).catch(err => { this.setData({ loading: false }); if (err && err.code === 3) this.setData({ blocked: '你还不是教练，请联系管理员添加' }); else base.fail(err) })
+    }).catch(err => { this.setData({ loading: false }); if (err && err.code === 3) this.setData({ blocked: '你还不是分销商，请联系管理员添加' }); else base.fail(err) })
   },
 
   loadTab() {
@@ -73,7 +73,7 @@ Page({
     this.setData({ creating: true })
     api.createCard().then(() => {
       this.setData({ creating: false })
-      base.done('已生成，点「分享给学员」发出去')
+      base.done('已生成，点「分享给顾客」发出去')
       return this.loadCards()
     }).catch(err => { this.setData({ creating: false }); base.fail(err) })
   },
@@ -89,7 +89,7 @@ Page({
   onShareAppMessage(e) {
     const d = this.data
     const target = e && e.target && e.target.dataset
-    const name = d.coach ? d.coach.name : '教练'
+    const name = d.coach ? d.coach.name : '分销商'
     const path = (target && target.path) || (d.pending[0] && d.pending[0].sharePath) || '/pages/mine/mine'
     return { title: name + '送你一张学员卡', path }
   },

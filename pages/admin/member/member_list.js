@@ -13,6 +13,7 @@ Page({
     filter: { name: '', cell: '', gender: '全部' },
     sysTags: mkTagObjs(SYS_TAGS),
     presetTags: [],
+    vipOnly: false,       // 列表上方「VIP」快捷按钮：只看 VIP 会员（后端按 member.is_vip 索引筛）
     activeCount: 0,
 
     members: [],
@@ -58,8 +59,16 @@ Page({
     var idx = e.currentTarget.dataset.idx
     this.setData({ ['presetTags[' + idx + '].on']: !this.data.presetTags[idx].on })
   },
+  // 「VIP」快捷按钮：一点即查（从第 1 页），再点取消。不用展开筛选面板。
+  // 上一次查询还没回来时忽略这次点击，免得按钮状态和列表结果对不上。
+  onToggleVipOnly() {
+    if (this.data.querying) return
+    this.setData({ vipOnly: !this.data.vipOnly })
+    this.getData(1, this.data.pageSize)
+  },
   onResetFilter() {
     this.setData({
+      vipOnly: false,
       filter: { name: '', cell: '', gender: '全部' },
       sysTags: this.data.sysTags.map(function (t) { return { name: t.name, on: false } }),
       presetTags: this.data.presetTags.map(function (t) { return { name: t.name, on: false } })
@@ -77,6 +86,7 @@ Page({
     var f = this.data.filter
     return (f.name ? 1 : 0) + (f.cell ? 1 : 0) + (f.gender !== '全部' ? 1 : 0)
       + this._selectedNames(this.data.sysTags).length + this._selectedNames(this.data.presetTags).length
+      + (this.data.vipOnly ? 1 : 0)
   },
 
   getData(page, pageSize) {
@@ -88,7 +98,8 @@ Page({
       cell: f.cell,
       gender: f.gender === '全部' ? '' : f.gender,
       bizTypes: that._selectedNames(that.data.sysTags).join(','),
-      tags: that._selectedNames(that.data.presetTags).join(',')
+      tags: that._selectedNames(that.data.presetTags).join(','),
+      vip: that.data.vipOnly
     }
     that.setData({ querying: true, activeCount: that._activeCount() })
     data.searchMembersByStaffPromise(param, page, pageSize, app.globalData.sessionKey).then(function (r) {

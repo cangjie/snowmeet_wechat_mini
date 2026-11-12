@@ -4,6 +4,7 @@
     "van-icon": "@vant/weapp/icon/index",
     "van-popup": "@vant/weapp/popup/index",
     "van-uploader": "@vant/weapp/uploader/index",
-    "print-care": "/components/care/print_care_label"
+    "print-care": "/components/care/print_care_label",
+    "order-share-editor": "/components/share/order_share_editor/order_share_editor"
   }
 }
