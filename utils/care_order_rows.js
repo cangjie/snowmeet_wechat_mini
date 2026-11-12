@@ -240,4 +240,12 @@ function buildCareRows(cares, imageHost) {
   })
 }
 
-module.exports = { buildCareRows, equipmentTitle, equipmentKind, serviceChips, careProgress }
+// 整单的装备是不是都已经发板了（列表里整张订单卡片据此换底色）：
+// 已取消的装备不算（取消的不用发板）；至少要有一件没取消的装备，并且这些装备的进度都是已完成。
+// 参数是 buildCareRows 的结果。
+function allCaresDone(rows) {
+  const live = (rows || []).filter(row => row.statusClass !== 'cancel')
+  return live.length > 0 && live.every(row => row.statusClass === 'done')
+}
+
+module.exports = { buildCareRows, equipmentTitle, equipmentKind, serviceChips, careProgress, allCaresDone }

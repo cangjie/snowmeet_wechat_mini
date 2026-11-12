@@ -782,3 +782,33 @@ test('样式：两种备注都能折行（长内容不被截断），没付款�
   assert.match(wxss, /\.order-memo \.row-value\s*\{[^}]*word-break:\s*break-all/)
   assert.match(wxss, /\.order-card--unpaid \.care-memo-label/)
 })
+
+// ---- 整单底色：所有装备都已发板 ----
+test('整单都发板：每件没取消的装备都已完成才算；取消的装备不算，全取消、没装备都不算', () => {
+  const done = () => care({ tasks: [task('安全检查', '已完成', 10), task('发板', '已完成', 60)] })
+  const running = () => care({ tasks: [task('安全检查', '已完成', 10), task('热蜡', '未开始', 20), task('发板', '未开始', 60)] })
+  const cancelled = () => care({ is_cancel: true, tasks: [task('发板', '已完成', 60, { status: '已完成' })] })
+  const allDone = list => rows.allCaresDone(rows.buildCareRows(list, ''))
+  assert.equal(allDone([done(), done()]), true)
+  assert.equal(allDone([done(), running()]), false)       // 还有一件没发板
+  assert.equal(allDone([running()]), false)
+  assert.equal(allDone([done(), care({ is_cancel: true, tasks: [] })]), true)   // 取消的装备不用发板
+  assert.equal(allDone([care({ is_cancel: true, tasks: [] })]), false)          // 全取消了，不算都发板
+  assert.equal(allDone([]), false)
+  assert.equal(allDone(null), false)
+  assert.equal(allDone([care({ tasks: [] })]), false)    // 还没有任务（没生效）
+  assert.equal(allDone([care({ tasks: [task('安全检查', '已完成', 10), task('强行索回', '已完成', 60)] })]), true)   // 强行索回也算完成
+  assert.equal(allDone([cancelled()]), false)
+})
+
+test('列表渲染：订单带 allCaresDone，所有装备发板的订单卡片套浅绿底，没付款的订单不套', () => {
+  const page = loadList()
+  const finished = () => care({ id: 9, tasks: [task('安全检查', '已完成', 10), task('发板', '已完成', 60)] })
+  const doneOrder = Object.assign(orderWith(0), { id: 1, cares: [finished(), finished()] })
+  const partial = Object.assign(orderWith(0), { id: 2, cares: [finished(), care({ id: 10, tasks: [task('热蜡', '未开始', 20)] })] })
+  page.renderOrders([doneOrder, partial], 2, 1, 50)
+  assert.deepEqual(page.data.orders.map(o => o.allCaresDone), [true, false])
+  const cardClass = cardBlock.match(/<view class="order-card ([^"]*)"/)[1]
+  assert.match(cardClass, /item\.allCaresDone && !item\.unpaid \? 'order-card--done'/)
+  assert.match(wxss, /\.order-card--done\s*\{\s*background:\s*#f0faf4/)
+})

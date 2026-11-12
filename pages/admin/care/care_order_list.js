@@ -204,6 +204,8 @@ Page({
       // 所以展开过的订单按订单 id 记在页面上，重新加载后保持展开，免得每次返回都要重新点开
       order.careRows = careOrderRows.buildCareRows(order.cares, IMG_HOST)
       order.careExpanded = !!(this.expandedCareOrderIds && this.expandedCareOrderIds[order.id])
+      // 所有装备（不含已取消的）都发板了：整张订单卡片换底色
+      order.allCaresDone = careOrderRows.allCaresDone(order.careRows)
       // 卡券使用派生（任一 care 选了券 →「券」标签；选了卡 → 并入「卡」标签，
       // 从 care.ticket_code/use_card 直接看，不依赖 punch_card_used——未生效/历史漏记也能亮）
       var haveTicket = false

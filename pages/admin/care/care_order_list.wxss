@@ -123,6 +123,9 @@
   box-shadow: 0 1rpx 4rpx rgba(0,0,0,0.06);
 }
 
+/* 所有装备都发板了的订单：整张卡片浅绿底（比装备块的「已完成」绿更浅，装备块仍然看得出来）；没付款的订单不换 */
+.order-card--done { background: #f0faf4; }
+
 /* 卡头 */
 .order-header {
   display: flex;
