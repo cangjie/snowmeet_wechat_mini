@@ -163,8 +163,9 @@
               <text class="row-label">开单人</text><text class="row-value row-value--wide row-value--nowrap">{{item.staff.name}}</text>
             </view>
           </view>
-          <view wx:if="{{item.memo}}" class="order-row">
-            <text class="row-label row-label--info">备注</text><text class="row-value row-value--wide">{{item.memo}}</text>
+          <!-- 整单备注：订单自己的备注（订单详情页里改的那个）；没有就不占地方。每件装备自己的备注在装备块里 -->
+          <view wx:if="{{item.memo}}" class="order-row order-memo">
+            <text class="row-label row-label--info">整单备注</text><text class="row-value row-value--wide">{{item.memo}}</text>
           </view>
 
         </view>
@@ -209,6 +210,8 @@
                   <text class="care-amount-item"><text class="care-amount-label">金额</text>{{cr.chargeStr}}</text>
                   <text class="care-amount-item"><text class="care-amount-label">减免</text>{{cr.discountStr}}</text>
                 </view>
+                <!-- 单项备注：这件装备自己的备注，在金额 / 减免下面；没有就不占地方，可以多行 -->
+                <view wx:if="{{cr.memo}}" class="care-memo"><text class="care-memo-label">单项备注</text><text class="care-memo-text">{{cr.memo}}</text></view>
               </view>
               <!-- 照片：盒子跟着整块装备的高度走（次卡多一行时也一样高），照片铺满盒子 -->
               <view wx:if="{{cr.thumb}}" class="care-thumb-box">

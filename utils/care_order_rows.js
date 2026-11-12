@@ -229,6 +229,8 @@ function buildCareRows(cares, imageHost) {
       // 有没有权益行（质保 / 招待、次卡、券、学员卡任一）；一行都没有的装备，版面上补一行看不见的占位，高度和有一行权益的装备一样
       hasBenefit: benefit.hasFlag || card.usesCard || benefit.usesTicket || benefit.usesCoachCard,
       services: serviceChips(care),
+      // 这件装备自己的备注（care.memo；整单备注是订单的 memo，另外显示）
+      memo: trim(care.memo),
       statusLabel: progress.label,
       statusClass: progress.cls,
       tasks,

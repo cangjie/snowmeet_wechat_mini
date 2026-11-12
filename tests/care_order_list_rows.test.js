@@ -740,3 +740,43 @@ test('红色：还没动工（未开始）、已完成、已取消的装备没�
   assert.equal(noRun({ is_cancel: true, tasks: [mkTask(1, '安全检查', '已完成', 10), mkTask(2, '修刃', '未开始', 20), mkTask(3, '发板', '未开始', 60)] }), true)   // 已取消
   assert.equal(noRun({ tasks: [] }), true)
 })
+
+// ---- 备注：整单备注（订单的 memo）和单项备注（每件装备的 memo） ----
+test('单项备注：取装备自己的 memo，去掉首尾空白；没写、空白、null 都是空，不会冒出 undefined', () => {
+  const memoOf = extra => rows.buildCareRows([care(extra)], '')[0].memo
+  assert.equal(memoOf({ memo: '  左脚固定器松，已紧固  ' }), '左脚固定器松，已紧固')
+  assert.equal(memoOf({ memo: '' }), '')
+  assert.equal(memoOf({ memo: '   ' }), '')
+  assert.equal(memoOf({ memo: null }), '')
+  assert.equal(memoOf({}), '')
+})
+
+test('单项备注只跟着自己那件装备走，不和整单备注混在一起', () => {
+  const page = loadList()
+  const order = Object.assign(orderWith(2), { memo: '客人下午三点取' })
+  order.cares[0].memo = '板底有划痕，别磨太狠'
+  page.renderOrders([order], 1, 1, 50)
+  const [o] = page.data.orders
+  assert.equal(o.memo, '客人下午三点取')
+  assert.deepEqual(o.careRows.map(r => r.memo), ['板底有划痕，别磨太狠', ''])
+})
+
+test('模板：整单备注在订单信息下面、装备明细上面；单项备注在装备块里、金额 / 减免下面；都没写就不显示', () => {
+  const orderMemo = cardBlock.match(/<view wx:if="\{\{item\.memo\}\}"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.match(orderMemo, /整单备注/)
+  assert.match(orderMemo, /\{\{item\.memo\}\}/)
+  assert.ok(cardBlock.indexOf('class="info-grid"') < cardBlock.indexOf(orderMemo), '整单备注应在订单信息区下面')
+  assert.ok(cardBlock.indexOf(orderMemo) < cardBlock.indexOf('class="care-section"'), '整单备注应在装备明细上面')
+  const careMemo = cardBlock.match(/<view wx:if="\{\{cr\.memo\}\}"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.match(careMemo, /单项备注/)
+  assert.match(careMemo, /\{\{cr\.memo\}\}/)
+  const amount = cardBlock.indexOf('class="care-amount"')
+  assert.ok(amount > 0 && cardBlock.indexOf(careMemo) > amount, '单项备注应在金额 / 减免下面')
+  assert.ok(cardBlock.indexOf(careMemo) < cardBlock.indexOf('class="care-thumb-box"'), '单项备注应在这件装备的文字区里，不在照片盒里')
+})
+
+test('样式：两种备注都能折行（长内容不被截断），没付款的订单也跟着变灰', () => {
+  assert.match(wxss, /\.care-memo-text\s*\{[^}]*word-break:\s*break-all/)
+  assert.match(wxss, /\.order-memo \.row-value\s*\{[^}]*word-break:\s*break-all/)
+  assert.match(wxss, /\.order-card--unpaid \.care-memo-label/)
+})

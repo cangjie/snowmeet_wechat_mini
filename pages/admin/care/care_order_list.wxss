@@ -284,6 +284,9 @@
 .info-cell--right .row-label { width: 70rpx; }
 .info-cell .row-value--wide { min-width: 0; }
 .row-label--info { width: 88rpx; }
+/* 整单备注：内容长了往下折行，不省略 */
+.order-memo { align-items: flex-start; line-height: 34rpx; }
+.order-memo .row-value { word-break: break-all; }
 
 .info-phone {
   display: inline-flex;
@@ -452,6 +455,29 @@
   color: #888;
 }
 
+/* 单项备注：金额 / 减免下面一行，标签灰、内容深色，内容长了往下折行 */
+.care-memo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  color: #374151;
+}
+
+.care-memo-label {
+  flex-shrink: 0;
+  margin-right: 8rpx;
+  color: #888;
+}
+
+.care-memo-text {
+  flex: 1;
+  min-width: 0;
+  word-break: break-all;
+}
+
 /* 装备用的权益：质保 / 招待、次卡（卡名 + 卡号 + 剩余次数）、券（券名 + 券号）、学员卡（名 + 卡号），每种一行，在金额 / 减免上面 */
 .care-card {
   display: flex;
@@ -549,6 +575,8 @@
 .order-card--unpaid .care-kind { opacity: 0.4; filter: grayscale(1); }
 .order-card--unpaid .care-amount,
 .order-card--unpaid .care-amount-label,
+.order-card--unpaid .care-memo,
+.order-card--unpaid .care-memo-label,
 .order-card--unpaid .care-card,
 .order-card--unpaid .care-card-remain,
 .order-card--unpaid .care-card-no,
