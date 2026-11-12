@@ -126,7 +126,9 @@ test('账户里有机打蜡券时，现有和随后添加的每套装备都显�
   form.setProperty('memberId', 10); await settle();
   form.data.cares.push(care({ id: 3, brand: '新装备', scale: '180' })); form._refreshCares();
   assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, true, true]);
-  assert.ok(form.data.displayCares.every(c => c.free_wax === 0 && !c.use_card && !c.ticket_code));
+  // 装备对得上的第一件在载入时自动选了季卡，装备对不上的和之后添加的不选；机打蜡券都不会被自动用掉
+  assert.deepEqual(form.data.displayCares.map(c => c.card_id || null), [9, null, null]);
+  assert.ok(form.data.displayCares.every(c => c.free_wax === 0 && !c.ticket_code));
 });
 
 test('账户里有未绑定机打蜡季卡时，现有和随后添加的每套装备都显示选项', async t => {
@@ -137,7 +139,9 @@ test('账户里有未绑定机打蜡季卡时，现有和随后添加的每套�
   form.data.cares.push(care({ id: 3, equipment: null, brand: null, scale: null })); form._refreshCares();
   assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, true, true]);
   assert.deepEqual(cardRequests, [[10, '养护', 'staff']]);
-  assert.equal(form.events.length, 0);
+  // 季卡自动选上第一件（未开卡的 8 号与 9 号同类，id 小的先用），第二件的装备对不上 9 号，没有卡可选
+  assert.deepEqual(form.data.displayCares.map(c => c.card_id || null), [8, null, null]);
+  assert.equal(form.events.at(-1).detail.cares[0].card_id, 8);   // 自动选卡会同步给上层，计价回填也会再同步
 });
 
 test('只有已绑定机打蜡季卡时，只匹配类型、品牌和长度的装备显示选项', async t => {
@@ -151,7 +155,8 @@ test('只有已绑定机打蜡季卡时，只匹配类型、品牌和长度的�
 
 test('新增或修改装备信息后，绑定季卡的显示资格随装备变化重新判断', async t => {
   const { form } = setup(t, async () => [], {}, async () => [season(8)]);
-  form.setProperty('memberId', 10); await settle();
+  // 手选过的装备不会被自动带上季卡（否则装备被卡锁住，改不了长度）
+  form.setProperty('memberId', 10); form._rememberManualTicketChoice(0); await settle();
   assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, true);
   form.onFieldBlur({ currentTarget: { dataset: { cidx: 0, field: 'scale' } }, detail: { value: '180' } });
   await form.waitForPrices(); assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, false);

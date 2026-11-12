@@ -33,23 +33,64 @@ function isScrapeOnlyCare(care, shop) {
     && care.maintain_board !== 1 && !care.summer && !care.warranty && !care.entertain;
 }
 
-// 自动带出的次卡：只取按次数计的次卡，且还有剩余次数。
-// 不限次数的季卡（含机打蜡季卡）有绑定装备、每天限一次等自己的规则，仍由店员手选或机打蜡联动处理；
-// 卡名含「机打蜡」的卡推导出来的是机打蜡服务，也不在自动带出之列。按开卡先后用（id 小的先用）。
-function autoPunchCards(cards, memberId) {
+// 自动带出的养护会员卡，按优先顺序排好：季卡 > 次卡；同类里双项 > 单项；再按开卡先后（id 小的先用）。
+// 季卡不限总次数，但每天限用一次（本单最多一件装备用），次卡的次数是剩余次数。
+// 卡名含「机打蜡」的次卡推导出来的是机打蜡服务，不在自动带出之列；用完的次卡、已退款的卡不带。
+// 季卡判定与选卡弹层一致：total 为空，或旧数据卡名含「季卡」。
+function autoCareCards(cards, memberId) {
   return (cards || []).map(card => {
-    if (!card || !card.id || card.is_refund || card.isSeason || card.total == null) return null;
+    if (!card || !card.id || card.is_refund) return null;
     if (card.member_id != null && Number(card.member_id) !== memberId) return null;
     if (card.biz_type && card.biz_type !== '养护') return null;
     const name = card.card_name || '';
-    if (name.indexOf('季卡') >= 0 || name.indexOf('机打蜡') >= 0) return null;
+    const season = !!(card.isSeason || card.total == null || name.indexOf('季卡') >= 0);
+    // 单项/双项以卡上的 care_project_count 为准，历史卡没有才看卡名（服务端 ApplyDefaultServices 同一口径）
+    const double = card.care_project_count != null ? Number(card.care_project_count) === 2 : name.indexOf('双项') >= 0;
+    if (season) return { card, season, double, capacity: 1 };
+    if (name.indexOf('机打蜡') >= 0) return null;
     const remaining = card.remaining != null ? Number(card.remaining) : Number(card.total) - Number(card.punches || 0);
-    return remaining > 0 ? { card, remaining } : null;
-  }).filter(Boolean).sort((a, b) => Number(a.card.id) - Number(b.card.id));
+    return remaining > 0 ? { card, season, double, capacity: remaining } : null;
+  }).filter(Boolean).sort((a, b) => Number(b.season) - Number(a.season) || Number(b.double) - Number(a.double)
+    || Number(a.card.id) - Number(b.card.id));
+}
+
+// 这件装备能不能自动用这张卡：true 能 / false 不能 / null 还要等装备填完才知道。
+// 次卡随便用；季卡今天用过的不能再用；限装备的季卡只给装备完全对得上的那件（与机打蜡自动选卡同一口径），
+// 对不上就不带，免得把卡绑的装备硬写进别人的板子。装备三项还没填全、目前也没有填错的，先等着——
+// 这类卡排在前面，直接往下选别的会让常客的季卡永远排不上。
+function careFitsCard(care, { card, season }) {
+  if (!season) return true;
+  if (card.usedToday) return false;
+  const text = value => value == null ? '' : String(value).trim();
+  const binding = [card.equip_type, card.equip_brand, card.equip_scale].map(text);
+  if (!card.equipBound && binding.every(value => !value)) return true;
+  if (!binding.every(Boolean)) return false;   // 只绑了一部分的异常数据，和机打蜡选卡一样不开放
+  const equip = [care.equipment, care.brand, care.scale].map(text);
+  if (equip.some((value, i) => value && value !== binding[i])) return false;
+  return equip.every(Boolean) ? true : null;
+}
+
+// 按优先顺序挑第一张能用的卡；前面有张卡要等装备填完才能判定，就整体等一等（wait），不往下选。
+function pickCareCard(care, cards, left) {
+  for (const entry of cards) {
+    if (!(left[entry.card.id] > 0)) continue;
+    const fits = careFitsCard(care, entry);
+    if (fits === true) return { entry };
+    if (fits === null) return { wait: true };
+  }
+  return null;
+}
+
+// 与手选弹层选卡同一口径的卡字段：限装备季卡锁装备，没开卡的打蜡/热蜡季卡标「待开卡」，订单生效时由服务端绑定
+function autoCardFields({ card, season }) {
+  const needsBinding = season && /打蜡|热蜡/.test(card.card_name || '');
+  return { ticket: null, ticket_code: null, use_card: true, card_id: card.id, card_name: card.card_name,
+    card_equip_lock: needsBinding && !!card.equipBound, card_pending_open: needsBinding && !card.equipBound };
 }
 
 function hasChosenService(care) {
-  return care.need_edge === 1 || care.need_wax === 1 || care.need_unwax === 1 || care.free_wax === 1 || !!care.summer;
+  return care.need_edge === 1 || care.need_wax === 1 || care.need_unwax === 1 || care.free_wax === 1
+    || care.seal_board === 1 || care.maintain_board === 1 || !!care.summer;
 }
 
 // 新建一个空 care（snake_case 对齐后端；valid=0 草稿态，PlaceCareOrder 才置 1）
@@ -1138,10 +1179,10 @@ Component({
       if (!state) {
         state = { memberId };
         this._oldCustomerTicketState = state;
-        // 次卡优先于老顾客券：卡列表读不出来不挡开单，当作没有次卡，照旧带老顾客券。
+        // 会员卡（季卡、次卡）优先于老顾客券：卡列表读不出来不挡开单，当作没有卡，照旧带老顾客券。
         const cardsLoad = this._getMemberCareCards(memberId).promise
-          .then(cards => autoPunchCards(cards, memberId))
-          .catch(e => { console.warn('load punch cards for auto select failed', e); return []; });
+          .then(cards => autoCareCards(cards, memberId))
+          .catch(e => { console.warn('load member cards for auto select failed', e); return []; });
         const ticketsLoad = this._getMemberCareTickets(memberId).promise
           .then(tickets => (tickets || []).filter(t => t && Number(t.template_id) === 16 && t.code
             && (t.member_id == null || Number(t.member_id) === memberId))
@@ -1154,26 +1195,27 @@ Component({
       const { tickets, cards } = await state.promise;
       if (this._oldCustomerTicketState !== state || Number(this.data.memberId) !== memberId || this._autoTicketBlocked()) return;
       const used = new Set(this.data.displayCares.map(c => c.ticket_code).filter(Boolean));
-      // 每件装备用一次，每张卡还能用几件：剩余次数减去本单别的装备已经占用的。
+      // 每件装备用一次，每张卡还能用几件：次卡是剩余次数，季卡是 1，都减去本单别的装备已经占用的。
       const left = {};
-      cards.forEach(({ card, remaining }) => {
-        left[card.id] = remaining - this.data.displayCares
+      cards.forEach(({ card, capacity }) => {
+        left[card.id] = capacity - this.data.displayCares
           .filter(c => !c.is_cancel && c.use_card && Number(c.card_id) === Number(card.id)).length;
       });
       const updated = [];
       const cares = this.data.displayCares.map((care, i) => {
         if (!eligible(care, i)) return care;
-        // 机打蜡、非雪季养护、养板不走次卡（服务端不让次卡抵扣非雪季；养板只认老顾客券，选了卡会被清掉），
-        // 这几类仍只带老顾客券。
+        // 机打蜡、非雪季养护、养板不在这里选卡：机打蜡由机打蜡联动挑季卡/券，服务端不让卡抵扣非雪季，
+        // 养板只认老顾客券（选了卡会被清掉），这几类仍只带老顾客券。
         const noCard = care.free_wax === 1 || care.summer || care.maintain_board;
-        const picked = noCard ? null : cards.find(({ card }) => left[card.id] > 0);
+        const found = noCard ? null : pickCareCard(care, cards, left);
+        if (found && found.wait) return care;   // 限装备季卡要等装备填完才能判定，先不带券，免得挤掉它
+        const picked = found && found.entry;
         if (picked) {
           left[picked.card.id] -= 1;
-          // 还没选服务项：和手选次卡一样按卡推导（双项卡带出修刃+热蜡+刮蜡）；
+          // 还没选服务项：和手选会员卡一样按卡推导（双项卡带出修刃+热蜡+刮蜡，机打蜡季卡带出机打蜡）；
           // 已经选了：只换权益，保留店员选的项目、维修和手动减免，不够的部分由服务端补差。
           updated.push({ i, derive: !hasChosenService(care) });
-          return { ...care, ticket: null, ticket_code: null, use_card: true, card_id: picked.card.id,
-            card_name: picked.card.card_name, card_equip_lock: false, card_pending_open: false };
+          return { ...care, ...autoCardFields(picked) };
         }
         const ticket = tickets.find(t => !used.has(t.code));
         if (!ticket) return care;

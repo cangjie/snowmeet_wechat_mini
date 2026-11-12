@@ -195,14 +195,100 @@ test('次卡按开卡先后用，每件装备占一次，用完的卡和本单�
   assert.deepEqual(one.data.displayCares.map(c => c.ticket_code || null), [null, 'OLD']);
 });
 
-test('季卡、机打蜡卡、已退款卡、别人的卡和非养护卡不自动选，仍带老顾客券', async t => {
+test('机打蜡次卡、已退款卡、别人的卡和非养护卡不自动选，仍带老顾客券', async t => {
   const { form } = setup(t, async () => [ticket('OLD')], [care(1)], undefined, [
-    punch(1, { total: null, remaining: null, isSeason: true, card_name: '养护季卡' }),
     punch(2, { card_name: '机打蜡次卡' }), punch(3, { is_refund: true }), punch(4, { member_id: 99 }),
     punch(5, { biz_type: '租赁' })]);
   form._refreshCares(); await settle();
   const selected = form.data.displayCares[0];
   assert.equal(selected.ticket_code, 'OLD'); assert.ok(!selected.use_card); assert.ok(!selected.card_id);
+});
+
+function season(id, patch) {
+  return { id, biz_type: '养护', card_name: '养护季卡', total: null, punches: 0, remaining: null, isSeason: true,
+    usedToday: false, equipBound: false, equip_type: null, equip_brand: null, equip_scale: null, ...patch };
+}
+
+test('既有季卡又有次卡时选季卡，哪怕次卡是双项、开得更早；每张季卡本单只给一件装备，其余件回到次卡', async t => {
+  const { form, prices } = setup(t, async () => [ticket('OLD')], [care(1, noService), care(2, noService)], undefined,
+    [punch(3, { card_name: '养护双项次卡', care_project_count: 2 }), season(9)]);
+  form._refreshCares(); await settle();
+  assert.deepEqual(form.data.displayCares.map(c => c.card_id), [9, 3]);
+  assert.deepEqual(form.data.displayCares.map(c => c.ticket_code || null), [null, null]);
+  assert.deepEqual(prices.map(p => p.deriveServices), [true, true]);
+});
+
+test('季卡今天已经用过就跳过，改选次卡；本单别的装备已占用的季卡也不重复选', async t => {
+  const used = setup(t, async () => [ticket('OLD')], [care(1)], undefined, [season(9, { usedToday: true }), punch(3)]).form;
+  used._refreshCares(); await settle();
+  assert.equal(used.data.displayCares[0].card_id, 3);
+  const taken = setup(t, async () => [ticket('OLD')], [care(1, { use_card: true, card_id: 9 }), care(2)], undefined,
+    [season(9), punch(3)]).form;
+  taken._refreshCares(); await settle();
+  assert.deepEqual(taken.data.displayCares.map(c => c.card_id), [9, 3]);
+});
+
+test('限装备季卡只给装备对得上的那件，对不上就不带；没开卡的打蜡季卡标待开卡', async t => {
+  const bound = { equipBound: true, equip_type: '双板', equip_brand: '测试', equip_scale: '170' };
+  const match = setup(t, async () => [ticket('OLD')], [care(1)], undefined, [season(9, bound), punch(3)]).form;
+  match._refreshCares(); await settle();
+  const picked = match.data.displayCares[0];
+  assert.equal(picked.card_id, 9); assert.equal(picked.card_equip_lock, false); assert.equal(picked.card_pending_open, false);
+  const wax = setup(t, async () => [ticket('OLD')], [care(1)], undefined,
+    [season(9, { ...bound, card_name: '热蜡季卡' })]).form;
+  wax._refreshCares(); await settle();
+  assert.equal(wax.data.displayCares[0].card_equip_lock, true); assert.equal(wax.data.displayCares[0].card_pending_open, false);
+  // 品牌或长度填了但对不上，或装备类型已经不一样，都不带季卡，改用次卡
+  const other = setup(t, async () => [ticket('OLD')], [care(1, { scale: '165' }),
+    care(2, { equipment: '单板', brand: null, scale: null })], undefined, [season(9, bound), punch(3, { remaining: 4 })]).form;
+  other._refreshCares(); await settle();
+  assert.deepEqual(other.data.displayCares.map(c => c.card_id), [3, 3]);
+  const fresh = setup(t, async () => [ticket('OLD')], [care(1)], undefined, [season(9, { card_name: '热蜡季卡' })]).form;
+  fresh._refreshCares(); await settle();
+  const pending = fresh.data.displayCares[0];
+  assert.equal(pending.card_id, 9); assert.equal(pending.card_pending_open, true); assert.equal(pending.card_equip_lock, false);
+});
+
+test('限装备季卡要等装备填完才判得出，期间不带券也不带次卡；填完对得上就选季卡，对不上才改用次卡', async t => {
+  const bound = { equipBound: true, equip_type: '双板', equip_brand: '测试', equip_scale: '170' };
+  const blank = { equipment: null, brand: null, scale: null };
+  const { form } = setup(t, async () => [ticket('OLD')], [care(1, blank), care(2, blank)], undefined,
+    [season(9, bound), punch(3)]);
+  form._refreshCares(); await settle();
+  assert.deepEqual(form.data.displayCares.map(c => c.card_id || null), [null, null]);
+  assert.deepEqual(form.data.displayCares.map(c => c.ticket_code || null), [null, null]);
+  Object.assign(form.data.cares[0], { equipment: '双板', brand: '测试', scale: '170' });
+  Object.assign(form.data.cares[1], { equipment: '双板', brand: '测试', scale: '180' });
+  form._refreshCares(); await settle();
+  assert.deepEqual(form.data.displayCares.map(c => c.card_id), [9, 3]);
+  assert.equal(form.data.displayCares[0].card_equip_lock, false);
+});
+
+test('既有双项又有单项次卡先选双项，以卡上的项目数为准，历史卡才看卡名，同类按开卡先后', async t => {
+  const pick = async cards => {
+    const { form } = setup(t, async () => [ticket('OLD')], [care(1)], undefined, cards);
+    form._refreshCares(); await settle();
+    return form.data.displayCares[0].card_id;
+  };
+  assert.equal(await pick([punch(3, { care_project_count: 1 }), punch(8, { care_project_count: 2 })]), 8);
+  assert.equal(await pick([punch(3, { card_name: '养护单项次卡' }), punch(8, { card_name: '养护双项次卡' })]), 8);
+  // 卡上写了单项就是单项，哪怕卡名里有「双项」两个字；没写的历史卡才看卡名
+  assert.equal(await pick([punch(3, { card_name: '双项体验次卡', care_project_count: 1 }), punch(8, { care_project_count: 1 })]), 3);
+  assert.equal(await pick([punch(3, { care_project_count: 1 }), punch(8, { card_name: '老双项卡' })]), 8);
+  assert.equal(await pick([punch(8, { care_project_count: 2 }), punch(3, { care_project_count: 2 })]), 3);
+  // 双项卡用完了就退到单项卡
+  assert.equal(await pick([punch(3, { care_project_count: 1 }), punch(8, { care_project_count: 2, remaining: 0, punches: 5 })]), 3);
+  // 双项季卡也排在单项季卡前面
+  assert.equal(await pick([season(3, { care_project_count: 1 }), season(8, { care_project_count: 2 })]), 8);
+});
+
+test('已选封板或养板算选了项目，选卡不重新推导；还没选项目的机打蜡季卡按卡带出机打蜡', async t => {
+  const sealed = setup(t, async () => [ticket('OLD')], [care(1, { ...noService, seal_board: 1 })], undefined, [punch(3)]);
+  sealed.form._refreshCares(); await settle();
+  assert.equal(sealed.form.data.displayCares[0].card_id, 3); assert.equal(sealed.prices[0].deriveServices, false);
+  const machine = setup(t, async () => [ticket('OLD')], [care(1, noService)], undefined, [season(9, { card_name: '机打蜡季卡' })]);
+  machine.form._refreshCares(); await settle();
+  assert.equal(machine.form.data.displayCares[0].card_id, 9); assert.equal(machine.prices[0].deriveServices, true);
 });
 
 test('机打蜡和非雪季养护不自动选次卡，仍只带老顾客券', async t => {

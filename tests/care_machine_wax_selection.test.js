@@ -67,7 +67,8 @@ test('同时有季卡和券时优先匹配装备的季卡，保留当前装备�
     season(2), season(3, { equipBound: false, equip_type: null, equip_brand: null, equip_scale: null })] });
   await settle(); toggle(form); await form.waitForPrices();
   const selected = form.data.displayCares[0];
-  assert.deepEqual(cardRequests, [[10, '养护', 'staff'], [10, '养护', 'staff']]);
+  // 装备对得上的季卡在载入时就已自动选上，点机打蜡不用再查一遍卡
+  assert.deepEqual(cardRequests, [[10, '养护', 'staff']]);
   assert.equal(selected.use_card, true); assert.equal(selected.card_id, 2); assert.equal(selected.ticket_code, null);
   assert.equal(selected.card_equip_lock, true); assert.equal(selected.scale, '170');
   assert.equal(selected.free_wax, 1); assert.equal(selected.need_edge, 1);
