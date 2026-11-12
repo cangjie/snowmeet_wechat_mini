@@ -39,6 +39,7 @@ Page({
     pageSize: 50,
     totalPages: 0,
     totalEarnStr: '',
+    allEarnStr: '暂不可用',
     querying: false,
     aiQueryConditions: ''
   },
@@ -141,7 +142,7 @@ Page({
       null,
       page, pageSize
     ).then(function (result) {
-      that.renderOrders(result.items || [], result.total || 0, page, pageSize)
+      that.renderOrders(result.items || [], result.total || 0, page, pageSize, result.totalEarnAmount)
       that.setData({ querying: false })
     }).catch(function (exp) {
       console.log('error', exp)
@@ -158,7 +159,7 @@ Page({
     return STATUS_CLASS[s] || 'unknown'
   },
 
-  renderOrders(orders, total, page, pageSize) {
+  renderOrders(orders, total, page, pageSize, allEarn) {
     var totalEarn = 0
     for (var i = 0; orders && i < orders.length; i++) {
       var order = orders[i]
@@ -227,7 +228,8 @@ Page({
       page,
       pageSize,
       totalPages,
-      totalEarnStr: util.showAmount(totalEarn)
+      totalEarnStr: util.showAmount(totalEarn),
+      allEarnStr: allEarn == null ? '暂不可用' : util.showAmount(allEarn)
     })
   },
 

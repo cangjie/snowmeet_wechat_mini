@@ -1,0 +1,53 @@
+/* 介绍人管理共享样式：骨架沿用 pages/coach/common/coach.wxss（分包之间不能互相引用，复制需要的部分），主色用原型里的 #006495 */
+page {
+  --bg: #F8F9FF; --card: #FFFFFF; --ink: #181C20; --muted: #5D6A75; --faint: #8A97A3; --line: #D9E2EC; --gray: #F3F6FA;
+  --blue: #006495; --blue-soft: #E6F1F8; --warn: #7A4B00; --warn-bg: #FFF1D6; --danger: #B3261E; --danger-bg: #FDE7E5;
+  --ok: #14602F; --ok-bg: #E3F4E8;
+  background: var(--bg); color: var(--ink);
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+}
+.co-page { padding: 28rpx 32rpx calc(200rpx + env(safe-area-inset-bottom)); box-sizing: border-box; display: flex; flex-direction: column; gap: 24rpx; }
+.co-blocked { margin-top: 80rpx; padding: 48rpx 40rpx; background: var(--card); border-radius: 16rpx; text-align: center; font-size: 26rpx; color: var(--muted); line-height: 1.6; }
+.co-empty { padding: 60rpx 0; text-align: center; font-size: 26rpx; color: var(--faint); }
+.co-note { font-size: 24rpx; color: var(--muted); line-height: 1.6; padding: 4rpx 8rpx; }
+
+.card { background: var(--card); border: 2rpx solid var(--line); border-radius: 16rpx; overflow: hidden; }
+.card-pad { padding: 28rpx 30rpx; display: flex; flex-direction: column; gap: 20rpx; }
+.card-row { display: flex; align-items: center; gap: 20rpx; }
+.card-title { font-size: 30rpx; font-weight: 700; }
+.card-meta { font-size: 22rpx; color: var(--muted); line-height: 1.5; }
+.section-title { font-size: 28rpx; font-weight: 700; }
+.grow { flex: 1; min-width: 0; }
+.wrap { flex-wrap: wrap; }
+
+.tag { display: inline-flex; align-items: center; padding: 4rpx 14rpx; border-radius: 8rpx; font-size: 22rpx; background: var(--gray); color: var(--muted); white-space: nowrap; }
+.tag.ok { background: var(--ok-bg); color: var(--ok); }
+.tag.warn { background: var(--warn-bg); color: var(--warn); }
+.tag.danger { background: var(--danger-bg); color: var(--danger); }
+.tag.blue { background: var(--blue-soft); color: #00507A; }
+.tag.kol { background: #EFE9FB; color: #4B3190; }
+.tag.org { background: #DFF3EF; color: #00594E; }
+.tag.muted { background: var(--gray); color: var(--muted); }
+
+.chips { display: flex; gap: 12rpx; white-space: nowrap; }
+.chip { flex: none; display: inline-block; padding: 14rpx 26rpx; border-radius: 999rpx; font-size: 24rpx; background: var(--card); color: var(--ink); border: 2rpx solid #9FB3C4; }
+.chip.on { background: var(--blue); color: #fff; border-color: var(--blue); }
+.seg { display: flex; gap: 12rpx; }
+.seg-item { flex: 1; text-align: center; padding: 22rpx 0; border-radius: 12rpx; font-size: 26rpx; border: 2rpx solid #9FB3C4; background: var(--card); }
+.seg-item.on { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 88rpx; padding: 0 32rpx; border-radius: 12rpx; font-size: 26rpx; font-weight: 600; background: var(--blue-soft); color: var(--blue); border: 2rpx solid var(--blue); box-sizing: border-box; }
+.btn.primary { background: var(--blue); color: #fff; }
+.btn.danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-bg); }
+.btn.disabled { background: var(--gray); color: var(--faint); border-color: var(--line); }
+.btn-row { display: flex; gap: 16rpx; flex-wrap: wrap; }
+.bottom-bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom)); background: var(--card); border-top: 2rpx solid var(--line); display: flex; gap: 16rpx; z-index: 10; }
+.bottom-bar .btn { flex: 1; }
+
+.field { display: flex; flex-direction: column; gap: 10rpx; }
+.field-label { font-size: 24rpx; color: var(--muted); display: flex; justify-content: space-between; }
+.field-label .hint { color: var(--faint); font-size: 22rpx; }
+.input { background: #fff; border: 2rpx solid #9FB3C4; border-radius: 12rpx; min-height: 88rpx; padding: 0 24rpx; font-size: 30rpx; box-sizing: border-box; display: flex; align-items: center; }
+.note { font-size: 24rpx; line-height: 1.6; color: var(--warn); background: var(--warn-bg); border-radius: 12rpx; padding: 16rpx 20rpx; }
+.note.blue { color: #00507A; background: var(--blue-soft); }
+.note.ok { color: var(--ok); background: var(--ok-bg); }

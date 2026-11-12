@@ -15,7 +15,7 @@
     <view class="card"><view class="card-pad">
       <view class="card-row"><text class="card-title small grow">手机与微信</text><text wx:if="{{staff.typeTag}}" class="tag {{staff.typeTag.tone}}">{{staff.typeTag.text}}</text></view>
       <block wx:if="{{staff.binding}}">
-        <view class="kv"><text class="k">手机号</text><text class="v">{{staff.binding.cell}}</text></view>
+        <view class="kv"><text class="k">手机号</text><view style="display: inline-flex; align-items: center;"><text class="v">{{staff.binding.cell}}</text><phone-copy phone="{{staff.binding.cell}}" /></view></view>
         <view class="kv"><text class="k">微信</text><text class="v tone-{{staff.wechatTag.tone}}">{{staff.wechatTag.text}}</text></view>
         <view class="kv"><text class="k">开始日期</text><text class="v">{{staff.binding.start_date}}</text></view>
       </block>
@@ -86,7 +86,7 @@
       <view class="col" style="gap: 16rpx;">
         <view wx:for="{{phones}}" wx:key="id" class="pick-row {{pickPhoneId === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="onPickPhone">
           <view class="radio"></view>
-          <view class="grow col"><text class="card-title small">{{item.tail}}</text><text class="card-meta">{{item.cell}}</text></view>
+          <view class="grow col"><text class="card-title small">{{item.tail}}</text><view style="display: inline-flex; align-items: center;"><text class="card-meta">{{item.cell}}</text><phone-copy phone="{{item.cell}}" /></view></view>
           <text class="tag {{item.statusTag.tone}}">{{item.statusTag.text}}</text>
         </view>
       </view>

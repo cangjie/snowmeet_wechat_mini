@@ -14,7 +14,8 @@ Page({
     state: 'loading',   // loading | matched | mismatch | bind_cell | error
     message: '',
     maskedCell: '',
-    busy: false
+    busy: false,
+    login_error: false
   },
 
   onLoad(options) {
@@ -30,16 +31,36 @@ Page({
     this.verifyNow()
   },
 
-  verifyNow() {
+  showLoginError() {
+    this.setData({
+      state: 'error',
+      login_error: true,
+      message: '微信登录未完成，请检查网络后点击“重新登录”；如仍失败，请退出小程序后重新扫描店员二维码。'
+    })
+  },
+
+  async verifyNow(retryLogin) {
     var that = this
+    if (that.data.busy) return
     if (!that.data.code) {
-      that.setData({ state: 'error', message: '二维码参数缺失，请重新扫描店员手机上的二维码' })
+      that.setData({ state: 'error', login_error: false, message: '二维码参数缺失，请重新扫描店员手机上的二维码' })
       return
     }
-    that.setData({ state: 'loading', message: '' })
-    app.loginPromiseNew.then(function () {
-      return data.verifyCarePickPromise(that.data.code, app.globalData.sessionKey)
-    }).then(function (view) {
+    that.setData({ state: 'loading', message: '', login_error: false, busy: true })
+    try {
+      var loginResult
+      try {
+        loginResult = await (retryLogin === true ? app.retryLogin() : app.loginPromiseNew)
+      } catch (err) {
+        that.showLoginError()
+        return
+      }
+      if (!loginResult || loginResult.authenticated !== true
+        || typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
+        that.showLoginError()
+        return
+      }
+      var view = await data.verifyCarePickPromise(that.data.code, app.globalData.sessionKey)
       if (view && view.stage === 'matched') {
         that.setData({ state: 'matched' })
       } else if (view && view.stage === 'need_member') {
@@ -47,15 +68,21 @@ Page({
       } else {
         that.setData({ state: 'mismatch', maskedCell: (view && view.orderMemberMaskedCell) || '' })
       }
-    }).catch(function (msg) {
+    } catch (msg) {
       var errMsg = (typeof msg === 'string' && msg) ? msg : '验证失败，请重新扫码'
       that.setData({ state: 'error', message: errMsg })
-    })
+    } finally {
+      that.setData({ busy: false })
+    }
   },
 
   onBindCell(e) {
     var that = this
     if (that.data.busy) return
+    if (typeof app.globalData.sessionKey !== 'string' || !app.globalData.sessionKey.trim()) {
+      that.showLoginError()
+      return
+    }
     if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
       wx.showToast({ title: '未授权手机号', icon: 'none' })
       return
@@ -74,6 +101,6 @@ Page({
   },
 
   onRetryTap() {
-    this.verifyNow()
+    return this.verifyNow(this.data.login_error)
   }
 })

@@ -1,0 +1,15 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:elif="{{student}}">
+    <view class="card card-pad">
+      <view class="card-row"><view class="grow card-row"><text class="card-title">{{student.name}}</text><text class="tag blue">{{student.sourceText}}</text></view><text class="card-meta">尾号 {{student.phoneTail}}</text></view>
+      <view class="card-meta">自 {{student.since}} 起算 · 共 {{student.orderCount}} 单 · ¥{{student.amount}}</view>
+    </view>
+    <view wx:for="{{orders}}" wx:key="orderId" class="card card-pad">
+      <view class="card-row"><text class="card-title small grow">{{item.itemName}}</text><text class="card-title small">¥{{item.amount}}</text></view>
+      <view class="card-meta">{{item.day}}<text wx:if="{{item.usedCoachCard}}" class="tone-ok"> · 用学员卡 −¥{{item.cardDiscount}}</text></view>
+    </view>
+    <view wx:if="{{!orders.length && !loading}}" class="co-empty">自起算日起还没有消费</view>
+    <view class="note blue">租赁订单不含未退的押金；只做展示，不涉及分成。</view>
+  </block>
+</view>

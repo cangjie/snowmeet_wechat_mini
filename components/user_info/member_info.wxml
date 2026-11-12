@@ -9,7 +9,7 @@
     <view class="view-row" >
       <view class="left-column" >【绑定手机号】</view>
       <view class="right-column"  style="display: flex;flex-direction: row;">
-        {{member.cell? member.cell:'未绑定手机'}}
+        {{member.cell? member.cell:'未绑定手机'}}<phone-copy phone="{{member.cell}}" />
       </view>
     </view>
   </mp-cell>

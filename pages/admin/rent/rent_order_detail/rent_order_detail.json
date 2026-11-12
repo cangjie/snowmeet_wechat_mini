@@ -2,6 +2,7 @@
   "navigationBarTitleText": "租赁订单明细",
   "usingComponents": {
     "van-icon": "/miniprogram_npm/@vant/weapp/icon/index",
-    "van-button": "/miniprogram_npm/@vant/weapp/button/index"
+    "van-button": "/miniprogram_npm/@vant/weapp/button/index",
+    "order-share-editor": "/components/share/order_share_editor/order_share_editor"
   }
 }

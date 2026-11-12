@@ -1094,6 +1094,14 @@ const queryReceptCellPromise = function (checkinId, cell, sessionKey) {
     + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   return util.performWebRequest(url, undefined)
 }
+// 店员在出码页输手机号进入（取代 queryReceptCellPromise）：服务器一次建好接待记录、写手机号、判授权，
+// 不依赖页面上的二维码。返回 { id, stage: 'phone_authed' | 'need_auth', memberId, name, maskedCell }；
+// 不是会员时 performWebRequest 会提示「用户不存在」。后端要先部署 QrCode/EnterReceptByPhone
+const enterReceptByPhonePromise = function (cell, sessionKey) {
+  var url = app.globalData.requestPrefix + 'QrCode/EnterReceptByPhone?cell=' + encodeURIComponent(cell)
+    + '&sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+  return util.performWebRequest(url, undefined)
+}
 // 店长：今天店员提交的手机号进入申请（含已授权的）
 const getTodayAuthCellListPromise = function (sessionKey) {
   var url = app.globalData.requestPrefix + 'QrCode/GetTodayAuthCellList'
@@ -1456,6 +1464,25 @@ const getOaLimitQrCodeUrlPromise = function (scene, sessionKey) {
 }
 // 我发起的分享批次（不传 templateId 就是全部模板的）
 // 全店所有员工在该模板下的分享批次（撤回仍只限自己发起的，服务端挡）
+// ---- 教练引流平台（学员卡）----
+// 我是不是教练（「我的」页入口）；不是教练返回 { isCoach: false }
+const getMyCoachPromise = function (sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'Coach/GetMyCoach?sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+// 我已领取的学员卡
+const getMyCoachCardsPromise = function (sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'CoachCard/GetMyCards?sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+// 开单选卡弹层：该会员可用的学员卡及本单预计优惠。养护传 shop/tier/commonCharge/basePrice，租赁传 rentalAmount
+const listUsableCoachCardsPromise = function (memberId, bizType, params, sessionKey) {
+  params = params || {}
+  var url = app.globalData.requestPrefix + 'CoachCard/ListUsableCards?memberId=' + memberId
+    + '&bizType=' + encodeURIComponent(bizType || '养护') + '&sessionKey=' + encodeURIComponent(sessionKey || '')
+  ;['shop', 'tier', 'commonCharge', 'basePrice', 'rentalAmount', 'urgent'].forEach(function (k) {
+    if (params[k] !== undefined && params[k] !== null && params[k] !== '') url += '&' + k + '=' + encodeURIComponent(params[k])
+  })
+  return util.performWebRequest(url, null)
+}
 const getShareBatchesPromise = function (templateId, sessionKey, startDate, endDate) {
   var url = app.globalData.requestPrefix + 'TicketTemplateAdmin/GetShareBatches?sessionKey=' + sessionKey
   if (templateId) { url += '&templateId=' + templateId }
@@ -1479,6 +1506,43 @@ const claimSharedTicketPromise = function (batchId, sessionKey) {
   var url = app.globalData.requestPrefix + 'TicketShare/ClaimSharedTicket?sessionKey=' + sessionKey
     + '&batchId=' + batchId
   return util.performWebRequest(url, null)
+}
+// 今后新发起的小程序分享使用独立接口；上方旧接口继续服务已有链接。
+const setTicketToMiniSharePromise = function (code, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'Ticket/SetTicketToMiniShare/'
+    + encodeURIComponent(code) + '?sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const acceptMiniTicketPromise = function (code, memo, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'Ticket/AcceptMiniTicket/'
+    + encodeURIComponent(code) + '?memo=' + encodeURIComponent(memo || '')
+    + '&sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const shareMiniTicketTemplatePromise = function (templateId, shareType, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'TicketTemplateAdmin/ShareMiniTicketTemplateByStaff'
+    + '?templateId=' + templateId + '&shareType=' + encodeURIComponent(shareType || 'personal')
+    + '&sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const createMiniQrCodeBatchPromise = function (templateId, channel, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'TicketTemplateAdmin/CreateMiniQrCodeBatchByStaff'
+    + '?templateId=' + templateId + '&channel=' + encodeURIComponent(channel || '')
+    + '&sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const getMiniShareBatchPromise = function (batchId, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'TicketShare/GetMiniShareBatch'
+    + '?batchId=' + batchId + '&sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const claimMiniSharedTicketPromise = function (batchId, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'TicketShare/ClaimMiniSharedTicket'
+    + '?batchId=' + batchId + '&sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const claimMiniQrCodeTicketPromise = function (batchId, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'TicketShare/ClaimMiniQrCodeTicket'
+    + '?batchId=' + batchId + '&sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const generateMiniTicketPosterPromise = function (batchId, sessionKey, envVersion) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'TicketPoster/GenerateMini'
+    + '?batchId=' + batchId + '&sessionKey=' + encodeURIComponent(sessionKey || '')
+    + '&envVersion=' + encodeURIComponent(envVersion || 'release'), null)
 }
 // 商品选择器。只列与模板同业务线的商品——业务线取自 category.biz_type（不是 product.type）。
 // bizType 必传，服务端没有它会直接拒（否则会把 596 条雪票和别的业务线商品一股脑列出来）。
@@ -1982,6 +2046,7 @@ module.exports = {
   getReceptCheckinByCustomerPromise,
   updateMemberInfoByStaffPromise,
   queryReceptCellPromise,
+  enterReceptByPhonePromise,
   createCarePickByStaffPromise,
   getCarePickByStaffPromise,
   verifyCarePickPromise,
@@ -2023,10 +2088,21 @@ module.exports = {
   generateTicketPosterPromise,
   createQrCodeBatchPromise,
   getOaLimitQrCodeUrlPromise,
+  getMyCoachPromise,
+  getMyCoachCardsPromise,
+  listUsableCoachCardsPromise,
   getShareBatchesPromise,
   revokeShareBatchPromise,
   getShareBatchPromise,
   claimSharedTicketPromise,
+  setTicketToMiniSharePromise,
+  acceptMiniTicketPromise,
+  shareMiniTicketTemplatePromise,
+  createMiniQrCodeBatchPromise,
+  getMiniShareBatchPromise,
+  claimMiniSharedTicketPromise,
+  claimMiniQrCodeTicketPromise,
+  generateMiniTicketPosterPromise,
   getCareProductsPromise,
   saveCareProductPromise,
   deleteCareProductPromise,

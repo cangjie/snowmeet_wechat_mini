@@ -168,6 +168,7 @@
             class="kv-value kv-value--inline kv-value--nowrap {{order.customerCell ? 'kv-value--link' : ''}}"
             bindtap="onCall"
           >{{order.customerCell || '—'}}</text>
+          <phone-copy phone="{{order.customerCell}}" />
         </view>
         <view class="kv-cell kv-cell--right kv-cell--shop">
           <text class="kv-label">门店</text>
@@ -431,6 +432,9 @@
       <view class="pc-sale-date">{{item.createDateStr}}</view>
     </view>
   </view>
+
+  <!-- ── 介绍人分账（店长以上可见，关单后可设置）──────────── -->
+  <order-share-editor wx:if="{{order.id}}" order-id="{{order.id}}"/>
 
   <!-- ── Card 4: 退款 ─────────────────────── -->
   <view class="card">

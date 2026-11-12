@@ -1,4 +1,6 @@
 /* pages/admin/ticket/coupon_admin/coupon_admin.wxss */
+@import "/styles/ticket_buttons.wxss";
+
 page { background: #F5F6FA; }
 .page { padding: 24rpx; box-sizing: border-box; }
 
@@ -107,13 +109,7 @@ page { background: #F5F6FA; }
 .query-btn {
   background: #2EA6D0;
   color: #fff;
-  border-radius: 999rpx;
-  font-size: 30rpx;
-  font-weight: 600;
-  line-height: 80rpx;
-  height: 80rpx;
 }
-.query-btn::after { border: none; }
 .query-btn[disabled] { background: #B7D9E6; color: #fff; }
 
 /* ═══ 券种背景（与顾客端 banner 同一套配色）═══

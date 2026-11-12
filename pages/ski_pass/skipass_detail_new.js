@@ -1,391 +1,240 @@
-// pages/ticket-booking/index.js
-
-const UNIT_PRICE = 253.00
+// pages/ski_pass/skipass_detail_new.js
+// 雪票详情页：首页选好「时长 + 场次」这一组，这里选装备和日期（带价格的月历，没价格的日期点不了）。
+// 顾客只能看价格；游客信息和「加入购物车」只给店员，结算在购物车页，后端也只认店员。
 const app = getApp()
 const data = require('../../utils/data.js')
 const util = require('../../utils/util.js')
+const skipassGroup = require('../../utils/skipass_group.js')
+const skipassCalendar = require('../../utils/skipass_calendar.js')
+const cartUtil = require('../../utils/skipass_cart.js')
 const { getNavMetrics } = require('../../utils/navbar.js')
+
+const WEEK_DAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+
+// 「11月2日 周一」
+function dateLabel(date) {
+  var d = new Date(parseInt(date.slice(0, 4), 10), parseInt(date.slice(5, 7), 10) - 1, parseInt(date.slice(8, 10), 10))
+  return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + WEEK_DAYS[d.getDay()]
+}
+
+function safeDecode(value) {
+  try {
+    return decodeURIComponent(value)
+  } catch (e) {
+    return value
+  }
+}
+
 Page({
 
   data: {
     // 导航栏总高度（状态栏 + 导航栏），主内容区据此留出上边距；onLoad 里按机型取实际值
     navTotalHeight: 64,
-    // 当前选中日期（显示用）
-    selectedDate: '2026-03-20',
-    // 购票数量
-    quantity: 1,
-    // 总价
-    totalPrice: '253.00',
-    // 游客姓名
-    guestName: '李源',
-    // 游客手机号
-    guestPhone: '15810602258',
-    // 输入框聚焦状态
+    resort: '万龙',
+    loading: true,
+    isStaff: false,
+    hasPrice: false,
+    groupTitle: '',
+    gearOptions: [],
+    productId: 0,
+    productName: '',
+    productImage: '',
+    weekLabels: skipassCalendar.WEEK_LABELS,
+    months: [],
+    selectedDate: '',
+    selectedDateText: '',
+    priceStr: '',
+    // 购票数量固定 1 张
+    count: 1,
+    summary: 0,
+    summaryStr: '',
+    // 游客信息（店员填）
+    name: '',
+    cell: '',
     nameFocused: false,
     phoneFocused: false,
-    // 日期弹窗
-    showDatePicker: false,
-    // 日期选项列表
-    dateOptions: [],
-    // picker 当前选中 index
-    pickerValue: [0],
-    // 临时选中 index（未确认前）
-    tempPickerIndex: 0,
-    count: 1
+    // 当前商品所属自我游账号；预存款够不够由后端在购物车结算时核对
+    source: '',
+    // 能不能加入购物车 = 店员 + 这一天有价格 + 这个装备已上线
+    canAdd: false,
+    cartCount: 0,
+    // 加入购物车前的确认弹层（顾客在这里核对、修改日期和接收短信的手机号）
+    showConfirm: false,
+    confirmName: '',
+    confirmCell: '',
+    confirmDateRange: [],
+    confirmDateIndex: 0,
+    confirmDate: '',
+    confirmDateText: '',
+    confirmPriceStr: ''
+  },
+
+  _now() {
+    return new Date()
+  },
+
+  // 从购物车页回来时刷新右下角张数
+  onShow() {
+    this.setData({ cartCount: cartUtil.ticketCount(cartUtil.load()) })
   },
 
   onLoad(options) {
     var that = this
-    that.setData({selectedDate: util.formatDate(new Date()), navTotalHeight: getNavMetrics().totalHeight})
-    app.loginPromiseNew.then(function (resolve) {
-      that._initDateOptions()
-      that.getBalance()
-      that.setData({
-        id: options.id, memberId: options.memberId, staffId: options.staffId
-      })
-      that.getData()
-    })
-  },
-
-  // ========================
-  // 初始化日期列表（从今天起 5 天）
-  // ========================
-  _initDateOptions() {
-    const options = []
-    const today = new Date()
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(today)
-      d.setDate(today.getDate() + i)
-      const yyyy = d.getFullYear()
-      const mm = String(d.getMonth() + 1).padStart(2, '0')
-      const dd = String(d.getDate()).padStart(2, '0')
-      const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-      const week = weekDays[d.getDay()]
-      const label = i === 0 ? '今天' : i === 1 ? '明天' : week
-      options.push(`${yyyy}-${mm}-${dd}  ${label}`)
-    }
-    this.setData({ dateOptions: options })
-  },
-
-  // ========================
-  // 计算并更新总价
-  // ========================
-  _updateTotalPrice() {
-    const total = (UNIT_PRICE * this.data.quantity).toFixed(2)
-    this.setData({ totalPrice: total })
-  },
-
-  // 顶部导航：返回由 safe-nav-bar 处理（navigateBack，直接打开时回首页）
-
-  // ========================
-  // 日期选择
-  // ========================
-  onSelectDate() {
-    this.setData({ showDatePicker: true })
-  },
-
-  onCloseDatePicker() {
-    var that = this
-    that.setData({ showDatePicker: false })
-
-  },
-
-  preventBubble() {
-    // 阻止点击面板时关闭弹窗
-  },
-
-  onPickerChange(e) {
-    const index = e.detail.value[0]
-    this.setData({
-      pickerValue: [index],
-      tempPickerIndex: index,
-    })
-  },
-
-  onConfirmDate() {
-    var that = this
-    const index = this.data.tempPickerIndex
-    // 取日期部分（去掉星期）
-    const raw = this.data.dateOptions[index] || ''
-    const dateStr = raw.split(' ')[0].trim()
+    options = options || {}
+    that._options = options
+    var resort = options.resort ? safeDecode(options.resort) : ''
     that.setData({
-      selectedDate: dateStr,
-      showDatePicker: false,
+      navTotalHeight: getNavMetrics().totalHeight,
+      resort: resort && resort != 'undefined' ? resort : '万龙',
+      memberId: options.memberId,
+      staffId: options.staffId
     })
-    wx.showToast({
-      title: `已选择 ${dateStr}`,
-      icon: 'success',
-      duration: 1500,
+    app.loginPromiseNew.then(function () {
+      var isStaff = !!app.globalData.staff
+      that.setData({ isStaff })
+      if (isStaff) {
+        that.GetRealName()
+      }
+      that.loadProducts()
+    })
+  },
+
+  // ========================
+  // 取这个雪场全部商品，按首页同一套规则分组，打开链接指定的那一组
+  // ========================
+  loadProducts() {
+    var that = this
+    var getUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/GetProductsByResort?showHidden=0&resort='
+      + encodeURIComponent(that.data.resort) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
+    wx.request({
+      url: getUrl,
+      method: 'GET',
       success: (res) => {
-        that.setDate(new Date(that.data.selectedDate))
+        if (res.statusCode != 200 || !Array.isArray(res.data)) {
+          that.showNoPrice()
+          return
+        }
+        var groups = skipassGroup.buildGroups(res.data, that._now())
+        var group = null
+        var options = that._options
+        if (options.group) {
+          group = skipassGroup.findGroup(groups, safeDecode(options.group))
+        } else if (options.id) {
+          // 旧链接只带商品 id：找它所在的分组，并选中它
+          group = skipassGroup.findGroupByProductId(groups, options.id)
+        }
+        if (!group) {
+          that.showNoPrice()
+          return
+        }
+        that.applyGroup(group, options.id)
+      },
+      fail: () => {
+        that.showNoPrice()
       }
     })
   },
 
-  // ========================
-  // 数量加减
-  // ========================
-  onIncrease() {
-    // 加号已禁用，不执行任何操作
+  showNoPrice() {
+    this._group = null
+    this._product = null
+    this.setData({ loading: false, hasPrice: false, months: [], gearOptions: [], priceStr: '', summary: 0, summaryStr: util.showAmount(0) })
+    this._refreshAdd()
   },
 
-  onDecrease() {
-    const qty = this.data.quantity - 1
-    if (qty < 1) {
-      wx.showToast({ title: '至少购买 1 张', icon: 'none' })
+  applyGroup(group, preferProductId) {
+    var that = this
+    that._group = group
+    // 暂未上线的装备（含雪具）不作为默认选中；整组都没上线的才退回第一个，下单会被挡住
+    var selectable = group.products.filter(function (p) { return !p.comingSoon })
+    var candidates = selectable.length ? selectable : group.products
+    var product = candidates.find(function (p) { return String(p.id) === String(preferProductId) }) || candidates[0]
+    that.setData({
+      loading: false,
+      hasPrice: true,
+      groupTitle: group.title,
+      gearOptions: group.products.map(function (p) { return { id: p.id, label: p.gearLabel, minPriceStr: p.minPriceStr, disabled: !!p.comingSoon } })
+    })
+    wx.setNavigationBarTitle({ title: that.data.resort + ' ' + group.title })
+    that.selectProduct(product.id, '')
+  },
+
+  // 选中某个装备（商品）：原来选的日期在新商品上还有价格就保留，否则落到它的第一个有价日期
+  selectProduct(productId, keepDate) {
+    var that = this
+    var product = that._group.products.find(function (p) { return String(p.id) === String(productId) })
+    if (!product) return
+    that._product = product
+    var dates = product.prices.map(function (p) { return p.date })
+    var date = dates.indexOf(keepDate) >= 0 ? keepDate : dates[0]
+    var productImage = 'https://mini.snowmeet.top/images/' + (product.session == '日场' ? 'skipass_day.png' : 'skipass_eve.png')
+    var source = product.source || ''
+    that.setData({ productId: product.id, productName: product.name, productImage, source })
+    that.setDate(date)
+  },
+
+  setDate(date) {
+    var that = this
+    var product = that._product
+    var hit = product.prices.find(function (p) { return p.date === date })
+    if (!hit) return
+    var d = new Date(parseInt(date.slice(0, 4), 10), parseInt(date.slice(5, 7), 10) - 1, parseInt(date.slice(8, 10), 10))
+    var summary = hit.price * that.data.count
+    that.setData({
+      selectedDate: date,
+      selectedDateText: (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + WEEK_DAYS[d.getDay()],
+      priceStr: skipassGroup.fmtPrice(hit.price),
+      summary,
+      summaryStr: util.showAmount(summary),
+      months: skipassCalendar.buildMonths(product.prices, date)
+    })
+    that._refreshAdd()
+  },
+
+  onSelectGear(e) {
+    var that = this
+    var target = that._group && that._group.products.find(function (p) { return String(p.id) === String(e.currentTarget.dataset.id) })
+    if (target && target.comingSoon) {
+      wx.showToast({ title: skipassGroup.COMING_SOON_TEXT, icon: 'none' })
       return
     }
-    this.setData({ quantity: qty })
-    this._updateTotalPrice()
+    that.selectProduct(e.currentTarget.dataset.id, that.data.selectedDate)
+  },
+
+  onSelectDay(e) {
+    var that = this
+    var date = e.currentTarget.dataset.date
+    if (!that._product || !that._product.prices.some(function (p) { return p.date === date })) {
+      return
+    }
+    that.setDate(date)
+  },
+
+  _refreshAdd() {
+    var d = this.data
+    var comingSoon = !!(this._product && this._product.comingSoon)
+    this.setData({ canAdd: !!(d.isStaff && d.hasPrice && !comingSoon && d.summary > 0) })
   },
 
   // ========================
   // 游客信息输入
   // ========================
   onNameInput(e) {
-    //this.setData({ guestName: e.detail.value })
-    var that = this
-    that.data.name = e.detail.value
+    this.data.name = e.detail.value
   },
 
   onPhoneInput(e) {
-    //this.setData({ guestPhone: e.detail.value })
-    var that = this
-    that.data.cell = e.detail.value
+    this.data.cell = e.detail.value
   },
 
-  // ========================
-  // 自动获取手机号（需用户授权）
-  // ========================
-  onAutoFill() {
-    wx.getUserProfile({
-      desc: '用于自动填写手机号',
-      success: () => {
-        // 实际项目中通过 getPhoneNumber button 获取，此处为演示
-        wx.showToast({ title: '请使用按钮授权获取', icon: 'none' })
-      },
-      fail: () => {
-        wx.showToast({ title: '取消授权', icon: 'none' })
-      }
-    })
-  },
-
-  // ========================
-  // 确认支付
-  // ========================
-  onPay() {
-    var that = this
-    const { guestName, guestPhone, selectedDate, quantity, totalPrice } = this.data
-
-    // 基础校验
-    if (!guestName.trim()) {
-      wx.showToast({ title: '请填写姓名', icon: 'none' })
-      return
-    }
-    if (!/^1[3-9]\d{9}$/.test(guestPhone)) {
-      wx.showToast({ title: '请填写正确的手机号', icon: 'none' })
-      return
-    }
-
-    wx.showModal({
-      title: '确认订单',
-      content: `日期：${selectedDate}\n数量：${that.data.count} 张\n总价：${that.data.summaryStr}\n\n姓名：${that.data.name}\n取票手机号：${that.data.cell}`,
-      confirmText: '去支付',
-      success: (res) => {
-        if (res.confirm) {
-          this._requestPayment()
-        }
-      }
-    })
-  },
-
-  // ========================
-  // 发起微信支付（对接实际后端）
-  // ========================
-  _requestPayment() {
-    var that = this
-    var product = that.data.product
-    var idNo = that.data.idNo? that.data.idNo: ''
-    wx.showLoading({ title: '正在下单...' })
-    that.setData({paying: true})
-    var submitUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/ReserveSkiPass/' + product.product_id + '?date=' + that.data.selectedDate + '&count=' + that.data.count + '&cell=' + that.data.cell + '&name=' + encodeURIComponent(that.data.name) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid') + '&idNo=' + idNo + (that.data.memberId ? '&refereeMemberId=' + that.data.memberId : '')
-      + (that.data.staffId ? '&staffId=' + that.data.staffId : '')
-    wx.request({
-      url: submitUrl,
-      method: 'GET',
-      success: (res) => {
-        if (res.statusCode != 200) {
-          return
-        }
-        console.log('skipass booked', res)
-        var order = res.data
-        var paymentId = order.payments[0].id
-        var payUrl = app.globalData.requestPrefix + 'Order/WechatPayByOrderPayment/' + paymentId + '?sessionKey=' + app.globalData.sessionKey
-        wx.request({
-          url: payUrl,
-          method: 'GET',
-          success: (res) => {
-            wx.requestPayment({
-              nonceStr: res.data.data.nonce,
-              package: 'prepay_id=' + res.data.data.prepay_id,
-              paySign: res.data.data.sign,
-              timeStamp: res.data.data.timestamp,
-              signType: 'MD5',
-              success: (res) => {
-                wx.showToast({
-                  title: '支付成功。',
-                  icon: 'success',
-                  complete: () => {
-                    wx.redirectTo({
-                      url: '../mine/skipass/my_skipass',
-                    })
-                  }
-                })
-              }
-            })
-          }
-        })
-      }
-    })
-    // TODO: 替换为真实的后端接口
-    // wx.request({
-    //   url: 'https://your-server.com/api/order/create',
-    //   method: 'POST',
-    //   data: {
-    //     date: this.data.selectedDate,
-    //     quantity: this.data.quantity,
-    //     name: this.data.guestName,
-    //     phone: this.data.guestPhone,
-    //   },
-    //   success: (res) => {
-    //     const { timeStamp, nonceStr, package: pkg, signType, paySign } = res.data
-    //     wx.requestPayment({
-    //       timeStamp, nonceStr, package: pkg, signType, paySign,
-    //       success: () => {
-    //         wx.hideLoading()
-    //         wx.navigateTo({ url: '/pages/payment-success/index' })
-    //       },
-    //       fail: () => {
-    //         wx.hideLoading()
-    //         wx.showToast({ title: '支付已取消', icon: 'none' })
-    //       }
-    //     })
-    //   },
-    //   fail: () => {
-    //     wx.hideLoading()
-    //     wx.showToast({ title: '网络错误，请重试', icon: 'none' })
-    //   }
-    // })
-
-    // 演示：模拟成功
-    setTimeout(() => {
-      /*
-      wx.hideLoading()
-      wx.showToast({ title: '支付成功！', icon: 'success', duration: 2000 })
-      */
-    }, 1500)
-    
-    
-  },
-  getBalance() {
-    var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/WanlongZiwoyouHelper/GetBalance'
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success: (res) => {
-        if (res.statusCode != 200) {
-          that.setData({ canReserve: false })
-        }
-        try {
-          var balance = parseFloat(res.data)
-          var canReserve = true
-          if (balance <= that.data.summary) {
-            canReserve = false
-          }
-          that.setData({ balance, canReserve })
-
-        }
-        catch {
-          that.setData({ canReserve: false })
-        }
-      }
-    })
-  },
-  getData() {
-    var that = this
-    var getUrl = 'https://' + app.globalData.domainName + '/core/WanlongZiwoyouHelper/GetProductById/' + that.data.id
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success: (res) => {
-        if (res.statusCode != 200) {
-          return
-        }
-        var product = res.data
-        that.setData({ product })
-        console.log('get product', product)
-        var title = product.resort + ' 雪票预定'
-        var currentDate = new Date(that.data.selectedDate)
-        wx.setNavigationBarTitle({
-          title: title,
-        })
-        var productImage = 'https://mini.snowmeet.top/images/skipass_day.png'
-        if (product.name.indexOf('夜场') >= 0) {
-          productImage = 'https://mini.snowmeet.top/images/skipass_eve.png'
-          if (currentDate.getHours() >= 20) {
-            currentDate = new Date()
-            currentDate = currentDate.setDate(currentDate.getDate() + 1)
-            currentDate = new Date(currentDate)
-          }
-        }
-        else {
-          currentDate = new Date()
-          if (currentDate.getHours() >= 14) {
-            currentDate = new Date()
-            currentDate = currentDate.setDate(currentDate.getDate() + 1)
-            currentDate = new Date(currentDate)
-          }
-        }
-        that.setData({ selectedDate: util.formatDate(currentDate), productImage })
-        that.GetRealName()
-        that.getDailyPrice()
-        var summary = that.data.count * that.data.dailyPrice.deal_price
-        var canReserve = true
-        if (isNaN(that.data.balance) || summary >= that.data.balance) {
-          canReserve = false
-        }
-        var summary = that.data.count * that.data.dailyPrice.deal_price
-        that.setData({ canReserve, summary, summaryStr: util.showAmount(summary) })
-      }
-    })
-  },
   GetRealName() {
     var that = this
     data.getMyInfo(app.globalData.sessionKey).then(function (info) {
-      that.setData({ name: info.real_name, cell: info.cell })
+      info = info || {}
+      that.setData({ name: info.real_name || '', cell: info.cell || '' })
     })
   },
-  getDailyPrice() {
-    var that = this
-    var product = that.data.product
-    var currentDate = util.formatDate(new Date(that.data.selectedDate))
-    var find = false
-    for (var i = 0; i < product.dailyPrice.length; i++) {
-      var pDate = util.formatDate(new Date(product.dailyPrice[i].reserve_date))
-      if (pDate == currentDate) {
-        find = true
-        var dailyPrice = product.dailyPrice[i]
-        dailyPrice.deal_priceStr = util.showAmount(parseFloat(dailyPrice.deal_price))
-        dailyPrice.marketPriceStr = util.showAmount(parseFloat(dailyPrice.marketPrice))
-        that.setData({ dailyPrice: dailyPrice })
-        break
-      }
-    }
-    if (!find) {
-      that.setData({ dailyPrice: undefined })
-    }
-  },
+
   getCell(e) {
     var that = this
     var url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateWechatMemberCell?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&encData=' + encodeURIComponent(e.detail.encryptedData) + '&iv=' + encodeURIComponent(e.detail.iv)
@@ -397,28 +246,119 @@ Page({
           return
         }
         var member = res.data
-        console.log('get member', member)
         that.setData({ cell: member.currentCell })
       }
     })
   },
-  setDate(date) {
+
+  // ========================
+  // 加入购物车（仅店员）：票种 + 游玩日期 + 接收短信的手机号；相同的合并成一条，结算在购物车页
+  // ========================
+  onAddToCart() {
     var that = this
-    //var date = new Date(e.detail.value)
-    that.setData({ currentDate: util.formatDate(date) })
-    that.getDailyPrice()
-    if (that.data.dailyPrice) {
-      var dealPrice = that.data.dailyPrice.deal_price
-      var count = that.data.count
-      var summary = dealPrice * count
-      var canReserve = true
-      if (isNaN(that.data.balance) || summary >= that.data.balance) {
-        canReserve = false
-      }
-      that.setData({ summary, summaryStr: util.showAmount(summary), canReserve })
+    if (!that.data.isStaff) {
+      wx.showToast({ title: '仅限店员订票', icon: 'none' })
+      return
     }
-    else {
-      that.setData({ summary: 0, summaryStr: util.showAmount(0), canReserve: false })
+    if (!that.data.canAdd) {
+      wx.showToast({ title: that.data.hasPrice ? '该装备暂不能订票' : '该日期暂无价格', icon: 'none' })
+      return
     }
+    // 打开确认弹层：和顾客当面确认游玩日期、接收订票短信的手机号，顾客要改就直接在弹层里改，
+    // 金额跟着日期变；确认后才真的加入购物车
+    var options = that._product.prices.map(function (p) { return { date: p.date, price: p.price } })
+    var idx = options.findIndex(function (o) { return o.date === that.data.selectedDate })
+    if (idx < 0) {
+      wx.showToast({ title: '该日期暂无价格', icon: 'none' })
+      return
+    }
+    that._confirmOptions = options
+    that.setData({
+      showConfirm: true,
+      confirmName: (that.data.name || '').trim(),
+      confirmCell: (that.data.cell || '').trim(),
+      confirmDateRange: options.map(function (o) { return dateLabel(o.date) + '  ' + cartUtil.fmtMoney(o.price) }),
+      confirmDateIndex: idx,
+      confirmDate: options[idx].date,
+      confirmDateText: dateLabel(options[idx].date),
+      confirmPriceStr: cartUtil.fmtMoney(options[idx].price)
+    })
   },
+
+  onConfirmNameInput(e) {
+    this.setData({ confirmName: e.detail.value })
+  },
+
+  onConfirmCellInput(e) {
+    this.setData({ confirmCell: e.detail.value })
+  },
+
+  // 弹层里改日期：这个票种有价格的日期下拉选，应付金额换成新日期的价格
+  onConfirmDateChange(e) {
+    var idx = Number(e.detail.value)
+    var opt = this._confirmOptions && this._confirmOptions[idx]
+    if (!opt) return
+    this.setData({
+      confirmDateIndex: idx,
+      confirmDate: opt.date,
+      confirmDateText: dateLabel(opt.date),
+      confirmPriceStr: cartUtil.fmtMoney(opt.price)
+    })
+  },
+
+  onCloseConfirm() {
+    this.setData({ showConfirm: false })
+  },
+
+  onConfirmAdd() {
+    var that = this
+    var name = (that.data.confirmName || '').trim()
+    var cell = (that.data.confirmCell || '').trim()
+    if (!name) {
+      wx.showToast({ title: '请填写姓名', icon: 'none' })
+      return
+    }
+    if (!/^1[3-9]\d{9}$/.test(cell)) {
+      wx.showToast({ title: '请填写正确的手机号', icon: 'none' })
+      return
+    }
+    var opt = that._confirmOptions && that._confirmOptions[that.data.confirmDateIndex]
+    if (!opt) {
+      wx.showToast({ title: '该日期暂无价格', icon: 'none' })
+      return
+    }
+    // 弹层里改过的姓名、手机号、日期，回写到页面，下一张默认就是这些
+    that.setData({ showConfirm: false, name: name, cell: cell })
+    if (opt.date !== that.data.selectedDate) {
+      that.setDate(opt.date)
+    }
+    that._addToCart(name, cell, opt.date, opt.price)
+  },
+
+  _addToCart(name, cell, date, price) {
+    var that = this
+    var result = cartUtil.addItem(cartUtil.load(), {
+      productId: that.data.productId,
+      title: that.data.productName,
+      date: date,
+      cell: cell,
+      name: name,
+      price: price,
+      source: that.data.source,
+      resort: that.data.resort,
+      staffId: that.data.staffId
+    }, 1)
+    if (result.error) {
+      wx.showToast({ title: result.error, icon: 'none' })
+      return
+    }
+    cartUtil.save(result.cart)
+    that.setData({ cartCount: cartUtil.ticketCount(result.cart) })
+    // 加入后直接进购物车页，店员可以继续选票（购物车页有「继续选票」）或去结算
+    wx.navigateTo({ url: '/pages/ski_pass/skipass_cart' })
+  },
+
+  onOpenCart() {
+    wx.navigateTo({ url: '/pages/ski_pass/skipass_cart' })
+  }
 })

@@ -167,7 +167,6 @@ Page({
       }, function () {
         that._updateQrOverlay()
         that._setPosterPreviewRatio(coverUrl)
-        that._prepareTimelineShare()
       })
     }).catch(function () {
       that.setData({ loading: false })
@@ -372,7 +371,7 @@ Page({
   // 发给谁是店员在微信自己的面板里选的，小程序拿不到结果。所以只能让店员**先选模式**。
   //
   // 「分享给好友」：调接口按模板生成一张待领取的券，卡片带券码，与顾客转赠同一条领取链路。
-  // 「分享到群」和朋友圈：使用模板海报叠加本次批次的动态公众号二维码。
+  // 新生成的群海报和朋友圈海报叠加本次批次的小程序码；旧海报保持原流程。
 
   // 两个按钮都是 open-type="share"，点谁只是置个模式标记，
   // 真正的分享由微信在 onShareAppMessage 里取内容
@@ -403,10 +402,10 @@ Page({
     }
     that.setData({ generatingGroupPoster: true })
     var createBatch = that.data.groupQrMode === 'static'
-      ? data.createQrCodeBatchPromise(that.data.id, '群分享', app.globalData.sessionKey)
-      : data.shareTicketTemplatePromise(that.data.id, 'group', app.globalData.sessionKey)
-    createBatch.then(function (res) {
-      return data.generateTicketPosterPromise(res.batchId, app.globalData.sessionKey)
+      ? data.createMiniQrCodeBatchPromise(that.data.id, '群分享', app.globalData.sessionKey)
+      : data.shareMiniTicketTemplatePromise(that.data.id, 'group', app.globalData.sessionKey)
+    return createBatch.then(function (res) {
+      return data.generateMiniTicketPosterPromise(res.batchId, app.globalData.sessionKey, app.globalData.env)
     }).then(function (poster) {
       return that._downloadPoster(poster.url)
     }).then(function (filePath) {
@@ -476,11 +475,11 @@ Page({
       return {}
     }
     that.setData({ shareMode: '' })
-    return data.shareTicketTemplatePromise(that.data.id, mode, app.globalData.sessionKey)
+    return data.shareMiniTicketTemplatePromise(that.data.id, mode, app.globalData.sessionKey)
       .then(function (res) {
         // 分享动作已经建了批次，刷一下列表，店员能立刻看到并在需要时撤回
         that.loadShareBatches()
-        return data.generateTicketPosterPromise(res.batchId, app.globalData.sessionKey).then(function (poster) {
+        return data.generateMiniTicketPosterPromise(res.batchId, app.globalData.sessionKey, app.globalData.env).then(function (poster) {
           return {
           title: '送你一张' + (res.templateName || that.data.name),
           path: res.sharePath,
@@ -504,14 +503,22 @@ Page({
     }
   },
 
+  onPrepareTimelineTap() {
+    if (!this.data.coverUploadId) {
+      wx.showToast({ title: '请先上传并保存分享海报', icon: 'none' })
+      return
+    }
+    return this._prepareTimelineShare()
+  },
+
   _prepareTimelineShare() {
     var that = this
     if (that.data.id <= 0 || that.data.sharable !== 1 || !that.data.coverUploadId
       || that.data.timelinePreparing || that.data.timelinePosterUrl) { return }
     that.setData({ timelinePreparing: true })
-    data.shareTicketTemplatePromise(that.data.id, 'group', app.globalData.sessionKey)
+    return data.shareMiniTicketTemplatePromise(that.data.id, 'group', app.globalData.sessionKey)
       .then(function (res) {
-        return data.generateTicketPosterPromise(res.batchId, app.globalData.sessionKey).then(function (poster) {
+        return data.generateMiniTicketPosterPromise(res.batchId, app.globalData.sessionKey, app.globalData.env).then(function (poster) {
           that.setData({
             timelineSharePath: res.sharePath,
             timelinePosterUrl: poster.url,

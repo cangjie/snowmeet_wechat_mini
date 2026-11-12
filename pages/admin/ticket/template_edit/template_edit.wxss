@@ -1,6 +1,8 @@
 /* pages/admin/ticket/template_edit/template_edit.wxss */
+@import "/styles/ticket_buttons.wxss";
+
 page { background: #F5F6FA; }
-.page { padding: 24rpx; box-sizing: border-box; }
+.page { padding: 24rpx 24rpx calc(32rpx + env(safe-area-inset-bottom)); box-sizing: border-box; }
 
 .card {
   background: #fff; border-radius: 16rpx;
@@ -120,7 +122,7 @@ page { background: #F5F6FA; }
 .share-btn {
   flex: 1; margin: 0 8rpx;
   background: #2EA6D0; color: #fff;
-  font-size: 28rpx; border-radius: 12rpx;
+  font-size: 30rpx; border-radius: 12rpx;
 }
 .share-btn--ghost {
   background: #fff; color: #2EA6D0;

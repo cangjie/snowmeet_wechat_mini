@@ -124,8 +124,10 @@
 
       <block wx:if="{{sharable == 1 && id > 0}}">
         <button class="share-btn share-btn--ghost poster-share-btn" loading="{{generatingGroupPoster}}" bindtap="onShareGroupTap">生成群分享海报</button>
+        <button class="share-btn share-btn--ghost poster-share-btn" loading="{{timelinePreparing}}" disabled="{{timelinePreparing || timelinePosterUrl}}" bindtap="onPrepareTimelineTap">{{timelinePosterUrl ? '朋友圈分享已准备' : '准备朋友圈分享'}}</button>
+        <view class="sec-hint">准备完成后，可通过右上角菜单分享到朋友圈。</view>
         <view class="sec-hint">
-          群海报默认使用动态二维码，每次生成独立批次；下载完成后可直接发到微信群。
+          群海报默认使用动态小程序码，每次生成独立批次；下载完成后可直接发到微信群。
         </view>
         <view class="chip-group">
           <view class="chip {{groupQrMode == 'dynamic' ? 'chip--active' : ''}}" data-mode="dynamic" bindtap="onGroupQrModeTap">动态二维码</view>
@@ -143,7 +145,7 @@
       </view>
       <view class="acc-body" wx:if="{{shareOpen.card}}">
         <view class="sec-hint">
-          发出去的卡片，好友点开后未关注公众号的先关注，然后领到一张本模板的新券。
+          发出去的卡片，好友打开并登录小程序后，即可领取一张本模板的新券。
           券会记在你名下（后台按发券人可以查到）。
         </view>
         <view class="share-btns">

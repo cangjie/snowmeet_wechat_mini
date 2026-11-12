@@ -616,3 +616,10 @@ button[disabled].checkout-btn {
   background: var(--primary);
   color: var(--on-primary);
 }
+
+/* 学员卡本单优惠提示（「优惠券/卡」一行下面） */
+.coach-hint {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #6b7280;
+}

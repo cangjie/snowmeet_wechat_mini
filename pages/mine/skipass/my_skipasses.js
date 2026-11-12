@@ -1,6 +1,8 @@
 // pages/tickets/tickets.js
 const app = getApp()
 const util = require('../../../utils/util.js')
+const myGroup = require('../../../utils/skipass_my_group.js')
+
 Page({
   data: {
     activeTab: 'unused', // 'unused' | 'used'
@@ -113,13 +115,13 @@ Page({
     },
 
     // 使用弹窗（二维码）
+    // 立即使用：一组里有多张票时按标签（票1、票2…）切换，每张票各自的二维码、状态和退票按钮
     showUseModal: false,
-    useTarget: {
-      id: '',
-      title: '',
-      serial: '',
-      pickupCode: '',
-    },
+    useTarget: { key: '', title: '', validDate: '', cell: '', count: 0 },
+    useTickets: [],
+    useIndex: 0,
+    useTicket: {},
+    qrFailed: false,
   },
 
   onLoad() {
@@ -153,9 +155,13 @@ Page({
   },
 
   // ===== 申请取消 =====
+  // 退票按钮在「立即使用」弹层里，每张票各有一个；先关掉票码弹层，再弹确认
   onCancelTicket(e) {
-    const { id, title } = e.currentTarget.dataset
+    const { id } = e.currentTarget.dataset
+    const ticket = this.data.useTickets.find(t => t.id === id)
+    const title = this.data.useTarget.title + (this.data.useTarget.count > 1 && ticket ? '（' + ticket.tag + '）' : '')
     this.setData({
+      showUseModal: false,
       showCancelModal: true,
       cancelTarget: { id, title },
     })
@@ -166,45 +172,39 @@ Page({
   },
 
   confirmCancel() {
-    var that = this
     const { id } = this.data.cancelTarget
+    this.setData({ showCancelModal: false })
+    this.cancel(id)
+  },
 
-    // 从未使用列表中移除（实际开发中替换为 API 调用）
-    const unusedList = this.data.unusedList.filter(item => item.id !== id)
+  // ===== 立即使用：打开这一组的票码弹层 =====
+  onUseTicket(e) {
+    const key = e.currentTarget.dataset.key
+    const group = this.data.unusedList.find(item => item.key === key)
+    if (!group || !group.usableCount) return
+    const tickets = group.tickets.map((t, i) => Object.assign({ tag: '票' + (i + 1) }, t))
+    let index = tickets.findIndex(t => t.usable)
+    if (index < 0) index = 0
     this.setData({
-      unusedList,
-      showCancelModal: false,
-    }, () => {
-      this._refreshCurrentList()
-    })
-
-    wx.showToast({
-      title: '退票申请已提交',
-      icon: 'success',
-      duration: 2000,
-      success:()=>{
-        that.cancel(that.data.cancelTarget.id)
-      }
+      showUseModal: true,
+      useTarget: { key, title: group.title, validDate: group.validDate, cell: group.cell, count: group.count },
+      useTickets: tickets,
+      useIndex: index,
+      useTicket: tickets[index],
+      qrFailed: false,
     })
   },
 
-  // ===== 立即使用 =====
-  onUseTicket(e) {
-    const { id, card_no, pickupCode, title } = e.currentTarget.dataset
+  // 二维码图片没加载出来：提示稍后重试，取票码文字仍可用
+  onQrError() {
+    this.setData({ qrFailed: true })
+  },
 
-    // 从列表找到完整数据（含 pickupCode）
-    const ticket = this.data.unusedList.find(item => item.id === id)
-    if (!ticket || !ticket.canUse) return
-
-    this.setData({
-      showUseModal: true,
-      useTarget: {
-        id,
-        title,
-        card_no,
-        pickupCode: ticket.pickupCode || serial.replace(/\s/g, '').slice(0, 10),
-      },
-    })
+  onSelectTicket(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    const ticket = this.data.useTickets[index]
+    if (!ticket) return
+    this.setData({ useIndex: index, useTicket: ticket, qrFailed: false })
   },
 
   closeUseModal() {
@@ -237,30 +237,23 @@ Page({
         }
         var unusedList = []
         var usedList = []
-        var list = res.data
-        console.log('ticket list', list)
-        for(var i = 0; i < list.length; i++){
-          var item = {}
-          item.id = list[i].id
-          item.tire = ''
-          item.title = list[i].product_name
-          item.serial = (list[i].reserve_no==null || list[i].reserve_no == undefined) ? '' : list[i].reserve_no 
-          item.validDate = util.formatDate(new Date(list[i].reserve_date))
-          item.quantity = '1张'
-          item.amount = util.showAmount(parseFloat(list[i].ticket_price))
-          item.statusText = list[i].status
-          item.statusClass = 'status-picked'
-          item.canUse = (list[i].status != '已申请退款' && list[i].status != '已退票' &&  list[i].status != '已取卡'
-          &&  list[i].status != '已退押金' )
-          item.card_no = list[i].card_no
-          item.pickupCode = list[i].qr_code_url
-          if (item.canUse){
-            unusedList.push(item)
+        var groups = myGroup.buildMyGroups(res.data)
+        groups.forEach(function (g) {
+          // 取票二维码：供应商的图片域名不在小程序的合法域名里，真机上显示不出来，改由我们的服务器取了再转给小程序
+          g.tickets.forEach(function (t) {
+            t.qrSrc = t.pickupCode
+              ? 'https://' + app.globalData.domainName + '/core/SkiPass/QrImage?skipassId=' + t.id
+                + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
+              : ''
+          })
+          // 顾客实际支付的金额（各张 deal_price 之和）。ticket_price 是我们和供应商的结算价，不能给顾客看
+          g.amount = util.showAmount(g.amountNum)
+          if (g.tab === 'unused') {
+            unusedList.push(g)
+          } else {
+            usedList.push(g)
           }
-          else{
-            usedList.push(item)
-          }
-        }
+        })
         that.data.unusedList = unusedList
         that.data.usedList = usedList
         that._refreshCurrentList()
@@ -280,16 +273,28 @@ Page({
       }
     })
   },
+  // 退这一张票：先向供应商提交取消，确认后系统自动退这张票的票款；这里只提交、刷新列表
   cancel(id){
     var that = this
     that.setData({cancelling: true})
+    wx.showLoading({ title: '正在提交...' })
     var cancelUrl = 'https://' + app.globalData.domainName + '/core/SkiPass/Cancel/' + id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
     wx.request({
       url: cancelUrl,
       success:(res)=>{
-        console.log('cancel result', res)
-        that.setData({activeTab: 'used'})
+        wx.hideLoading()
+        that.setData({cancelling: false})
+        wx.showToast({
+          title: res.statusCode == 200 ? '退票申请已提交' : '退票失败，请联系店员',
+          icon: res.statusCode == 200 ? 'success' : 'none',
+          duration: 2000,
+        })
         that.getData()
+      },
+      fail:()=>{
+        wx.hideLoading()
+        that.setData({cancelling: false})
+        wx.showToast({ title: '网络异常，请稍后再试', icon: 'none' })
       }
     })
   },

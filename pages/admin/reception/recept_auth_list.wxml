@@ -20,7 +20,7 @@
         <view class="auth-row">
           <text class="auth-name">{{item.name || '（未填姓名）'}}</text>
           <text wx:if="{{item.gender}}" class="auth-gender">{{item.gender}}</text>
-          <text class="auth-cell">{{item.cell}}</text>
+          <view style="display: inline-flex; align-items: center;"><text class="auth-cell">{{item.cell}}</text><phone-copy phone="{{item.cell}}" /></view>
           <view class="auth-status {{item.authed ? 'auth-status--ok' : ''}}">{{item.authed ? '已授权' : '未授权'}}</view>
         </view>
         <view class="auth-meta">店员 {{item.staffName || '—'}} · {{item.timeStr}}</view>

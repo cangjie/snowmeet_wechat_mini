@@ -14,7 +14,7 @@
         <view class="sub-row" data-id="{{item.id}}" bindtap="onToggle">
           <view class="grow col">
             <view class="card-row" style="gap: 12rpx;"><text class="card-title small">{{item.tail}}</text><text class="tag {{item.statusTag.tone}}">{{item.statusTag.text}}</text></view>
-            <view class="card-meta">{{item.cell}}<text wx:if="{{item.holder}}"> · {{item.holder.name}}</text></view>
+            <view class="card-meta">{{item.cell}}<phone-copy phone="{{item.cell}}" /><text wx:if="{{item.holder}}"> · {{item.holder.name}}</text></view>
           </view>
           <text class="caret">{{openId === item.id ? '˄' : '˅'}}</text>
         </view>

@@ -1,8 +1,8 @@
 // pages/admin/reception/recept_member.js
 // 接待·顾客信息（对应旧版 recept_member_info + components/user_info/member_info）：
 //   直接显示顾客信息，店员可以改联系电话、称呼（姓名 + 先生/女士），再选店铺和业务进入开单。
-//   - 改的内容只用于本次订单（带到开单页，存为订单的 contact_name / contact_gender / contact_num），会员资料不变；
-//   - 会员点「更新顾客信息」才改会员资料：姓名、性别写回会员，新的联系电话追加为联系号码（不动绑定手机号）。
+//   - 已有资料改动后，开单前选择更新会员资料、只用于本单或放弃修改；空白资料会在进入业务前自动保存。
+//   - 更新会员资料时，姓名和性别写回会员，新的联系电话追加为联系号码（不动绑定手机号）。
 //   从扫码接待页（recept_scan）进来有两种情况：
 //   - 顾客扫码（checkinId）：老顾客直接显示会员信息；新顾客要在手机上授权手机号，本页轮询，
 //     授权后弹窗提示店员，再显示会员信息。顾客不方便授权时可改按散客开单。
@@ -24,6 +24,7 @@ Page({
     checkinId: 0,
     // 顾客已扫码、还没授权手机号
     waitingPhone: false,
+    memberLoading: false,
 
     // 会员档案（Member/GetMember 的摘要）；null = 散客
     // { id, cell, realName, gender, contactNums: [号码], availableDepositStr, availablePoints }
@@ -53,7 +54,15 @@ Page({
     this._pollTimer = null;
     this._lookupTimer = null;
     this._lastLookupCell = '';
+    this._memberLookupSequence = 0;
+    this._memberLookupPending = false;
+    this._memberLoadPending = false;
+    this._memberUpdatePending = false;
+    this._businessContinuationPending = false;
     this._memberRaw = null;   // GetMember 原始数据，「更新顾客信息」时用
+    this._originalForm = null;
+    this._memberBaselineForm = null;
+    this._memberProfileMissing = false;
     const checkinId = Number(options.checkinId || 0);
     if (!checkinId) {
       this.setData({ mode: 'walkin' });
@@ -136,10 +145,16 @@ Page({
       success: (res) => {
         if (!res.confirm) return;
         this._stopPolling();
+        this._memberLookupSequence++;
+        this._memberLookupPending = false;
         this._memberRaw = null;
+        this._originalForm = null;
+        this._memberBaselineForm = null;
+        this._memberProfileMissing = false;
         this.setData({
           mode: 'walkin',
           waitingPhone: false,
+          memberLoading: false,
           member: null,
           form: { name: '', gender: '', cell: '' },
           otherNums: [],
@@ -150,32 +165,65 @@ Page({
   },
 
   /* ---------- 会员档案 ---------- */
+  _formSnapshot(form) {
+    const source = form || {};
+    return {
+      name: (source.name || '').trim(),
+      gender: (source.gender || '').trim(),
+      cell: (source.cell || '').trim(),
+    };
+  },
+
+  _applyMemberRecord(raw) {
+    if (!raw || !raw.id) {
+      this._memberRaw = null;
+      this._originalForm = null;
+      this._memberBaselineForm = null;
+      this._memberProfileMissing = false;
+      this.setData({ member: null, memberLoading: false, otherNums: [], needUpdate: false });
+      return null;
+    }
+    this._memberRaw = raw;
+    const contactNums = (raw.contactNums || []).map((contact) => (contact.num || '').trim()).filter((num) => num);
+    const member = {
+      id: raw.id,
+      cell: (raw.cell || '').trim(),
+      realName: (raw.real_name || '').trim(),
+      gender: (raw.gender || '').trim(),
+      contactNums,
+      availableDepositStr: util.showAmount(raw.availableDeposit || 0),
+      availablePoints: raw.avaliablePoints || 0,
+    };
+    const baselineForm = {
+      name: member.realName,
+      gender: member.gender === '男' || member.gender === '女' ? member.gender : '',
+      cell: member.cell || contactNums[0] || '',
+    };
+    this._memberBaselineForm = this._formSnapshot(baselineForm);
+    const form = Object.assign({}, this.data.form);
+    if (!form.name && member.realName) form.name = member.realName;
+    if (!form.gender && (member.gender === '男' || member.gender === '女')) form.gender = member.gender;
+    if (!form.cell) form.cell = member.cell || contactNums[0] || '';
+    this._originalForm = this._formSnapshot(form);
+    this._memberProfileMissing = !member.realName && !member.gender;
+    this.setData({ member, form, memberLoading: false });
+    this._refreshDerived();
+    return member;
+  },
+
   loadMember(memberId) {
-    if (!memberId) return Promise.resolve(null);
+    if (!memberId) return Promise.resolve(this._applyMemberRecord(null));
+    this._memberLoadPending = true;
+    this.setData({ memberLoading: true });
     return Promise.resolve(app.loginPromiseNew).then(() => {
       return data.getMemberPromise(memberId, app.globalData.sessionKey);
     }).then((m) => {
-      if (!m || !m.id) return null;
-      this._memberRaw = m;
-      const contactNums = (m.contactNums || []).map((c) => (c.num || '').trim()).filter((n) => n);
-      const member = {
-        id: m.id,
-        cell: (m.cell || '').trim(),
-        realName: (m.real_name || '').trim(),
-        gender: (m.gender || '').trim(),
-        contactNums,
-        availableDepositStr: util.showAmount(m.availableDeposit || 0),
-        availablePoints: m.avaliablePoints || 0,
-      };
-      // 店员没填的用会员档案补上，已填的不覆盖
-      const form = Object.assign({}, this.data.form);
-      if (!form.name && member.realName) form.name = member.realName;
-      if (!form.gender && (member.gender === '男' || member.gender === '女')) form.gender = member.gender;
-      if (!form.cell) form.cell = member.cell || contactNums[0] || '';
-      this.setData({ member, form });
-      this._refreshDerived();
+      return this._applyMemberRecord(m);
+    }).catch(() => this._applyMemberRecord(null)).then((member) => {
+      this._memberLoadPending = false;
+      this.setData({ memberLoading: false });
       return member;
-    }).catch(() => null);
+    });
   },
 
   // 联系号码候选 + 是否和会员资料不一致
@@ -202,16 +250,36 @@ Page({
     });
   },
 
+  _isFormDirty() {
+    const original = this._originalForm;
+    if (!this.data.member || !original) return false;
+    const current = this._formSnapshot(this.data.form);
+    return current.name !== original.name || current.gender !== original.gender || current.cell !== original.cell
+      || this.data.needUpdate;
+  },
+
+  _hasProfileDataToSave() {
+    const member = this.data.member;
+    if (!member || !this._memberProfileMissing) return false;
+    const form = this._formSnapshot(this.data.form);
+    const hasName = !member.realName && !!form.name;
+    const hasGender = !member.gender && (form.gender === '男' || form.gender === '女');
+    const knownNumbers = [member.cell].concat(member.contactNums || []);
+    const hasNewContact = !!form.cell && isValidInternationalPhone(form.cell) && !knownNumbers.includes(form.cell);
+    return hasName || hasGender || hasNewContact;
+  },
+
   /* ---------- 顾客信息表单（只改本次订单） ---------- */
   onNameInput(e) {
     this.setData({ 'form.name': e.detail.value });
     this._refreshDerived();
   },
 
-  // 再点一次已选的称呼 = 取消选择（散客性别选填）
+  // 称呼性别为单选：重复点击当前项不取消选择。
   onGenderTap(e) {
     const value = e.currentTarget.dataset.value;
-    this.setData({ 'form.gender': this.data.form.gender === value ? '' : value });
+    if (this.data.form.gender === value) return;
+    this.setData({ 'form.gender': value });
     this._refreshDerived();
   },
 
@@ -233,8 +301,11 @@ Page({
       clearTimeout(this._lookupTimer);
       this._lookupTimer = null;
     }
+    const sequence = ++this._memberLookupSequence;
+    this._memberLookupPending = false;
     const normalized = normalizePhone(cell);
     if (!shouldLookupPhone(normalized) || normalized === this._lastLookupCell) return;
+    this._memberLookupPending = true;
     this._lookupTimer = setTimeout(() => {
       this._lookupTimer = null;
       this._lastLookupCell = normalized;
@@ -243,15 +314,17 @@ Page({
       }).then((found) => {
         const memberId = found && (found.id || found.member_id || found.memberId);
         // 查询期间号码改了或已挂上会员，丢弃
-        if (!memberId || this.data.member || normalizePhone(this.data.form.cell) !== normalized) return;
-        this.loadMember(memberId);
+        if (!memberId || this.data.member || normalizePhone(this.data.form.cell) !== normalized) return null;
+        return this.loadMember(memberId);
+      }).catch(() => null).then(() => {
+        if (sequence === this._memberLookupSequence) this._memberLookupPending = false;
       });
     }, 450);
   },
 
   /* ---------- 更新顾客信息（改会员资料） ---------- */
   onUpdateMemberTap() {
-    if (!this.data.member || !this.data.needUpdate || !this._memberRaw) return;
+    if (!this.data.member || !this.data.needUpdate || !this._memberRaw || this._memberUpdatePending) return;
     wx.showModal({
       title: '更新顾客信息',
       content: (this._changes || []).join('\n'),
@@ -262,30 +335,35 @@ Page({
     });
   },
 
-  _updateMember() {
+  _updateMember(options) {
     const raw = this._memberRaw;
-    const form = this.data.form;
-    const name = (form.name || '').trim();
-    const cell = (form.cell || '').trim();
+    const form = this._formSnapshot(this.data.form);
+    const updateOptions = options || {};
+    if (!raw || this._memberUpdatePending) return Promise.resolve(false);
     // 后端只用这几个字段：姓名、性别写回会员；currentContactNum 不在已有号码里就追加为联系号码
     const payload = {
       id: raw.id,
-      real_name: name || raw.real_name || '',
-      gender: form.gender || raw.gender || '',
-      currentContactNum: cell && isValidInternationalPhone(cell) ? cell : null,
+      real_name: form.name,
+      gender: form.gender,
+      currentContactNum: form.cell && isValidInternationalPhone(form.cell) ? form.cell : null,
       memberSocialAccounts: (raw.contactNums || []).map((c) => ({
         id: c.id, member_id: c.member_id, type: c.type, num: c.num, valid: c.valid,
       })),
     };
+    this._memberUpdatePending = true;
     wx.showLoading({ title: '更新中...', mask: true });
-    data.updateMemberInfoByStaffPromise(payload, '开单', app.globalData.sessionKey).then(() => {
-      return this.loadMember(raw.id);
+    return data.updateMemberInfoByStaffPromise(payload, '开单', app.globalData.sessionKey).then((updated) => {
+      return this._applyMemberRecord(updated);
     }).then(() => {
       wx.hideLoading();
-      wx.showToast({ title: '已更新顾客信息', icon: 'success' });
+      this._memberUpdatePending = false;
+      if (updateOptions.showSuccessToast !== false) wx.showToast({ title: '已更新顾客信息', icon: 'success' });
+      return !!this.data.member;
     }).catch(() => {
       // performWebRequest 已提示错误
       wx.hideLoading();
+      this._memberUpdatePending = false;
+      return false;
     });
   },
 
@@ -317,8 +395,13 @@ Page({
     const bizType = e.currentTarget.dataset.type;
     const { shop, sale, rent, care } = this.data;
 
+    if (this._businessContinuationPending || this._memberUpdatePending) return;
     if (this.data.waitingPhone) {
       wx.showToast({ title: '请等顾客授权手机号', icon: 'none' });
+      return;
+    }
+    if (this._memberLoadPending || this._memberLookupPending || this.data.memberLoading) {
+      wx.showToast({ title: '正在查询会员资料，请稍候', icon: 'none' });
       return;
     }
     if (!shop) {
@@ -344,6 +427,53 @@ Page({
       wx.showToast({ title: '请输入正确手机号', icon: 'none' });
       return;
     }
+
+    this._businessContinuationPending = true;
+    if (this.data.member && this._hasProfileDataToSave()) {
+      this._saveMemberThenContinue(bizType, '会员信息已自动保存');
+      return;
+    }
+    if (this.data.member && this._isFormDirty()) {
+      wx.showActionSheet({
+        itemList: ['更新会员信息', '保存为本订单临时联系人', '放弃修改'],
+        success: (result) => {
+          if (result.tapIndex === 0) {
+            this._saveMemberThenContinue(bizType, '会员信息已更新');
+          } else if (result.tapIndex === 1) {
+            this._navigateToBusiness(bizType);
+          } else if (result.tapIndex === 2) {
+            this.setData({ form: Object.assign({}, this._memberBaselineForm) });
+            this._refreshDerived();
+            this._navigateToBusiness(bizType);
+          } else {
+            this._businessContinuationPending = false;
+          }
+        },
+        fail: () => { this._businessContinuationPending = false; },
+      });
+      return;
+    }
+    this._navigateToBusiness(bizType);
+  },
+
+  _saveMemberThenContinue(bizType, successMessage) {
+    this._updateMember({ showSuccessToast: false }).then((saved) => {
+      if (!saved) {
+        this._businessContinuationPending = false;
+        wx.showToast({ title: '会员信息保存失败，请重试', icon: 'none' });
+        return;
+      }
+      if (successMessage) wx.showToast({ title: successMessage, icon: 'success' });
+      this._navigateToBusiness(bizType);
+    });
+  },
+
+  _navigateToBusiness(bizType) {
+    this._businessContinuationPending = false;
+    const { shop } = this.data;
+    const form = this.data.form;
+    const name = (form.name || '').trim();
+    const cell = (form.cell || '').trim();
 
     // 暂存订单标识信息（PRD §1.4.6 订单找回），字段与 recept_entry 一致
     wx.setStorageSync('reception_draft', {

@@ -85,7 +85,7 @@
       </view>
       <view class="done-box">
         <view class="done-row"><text class="done-k">会员 ID</text><text class="done-v mono">{{newMember.id}}</text></view>
-        <view class="done-row"><text class="done-k">手机号</text><text class="done-v mono">{{newMember.phone}}</text></view>
+        <view class="done-row"><text class="done-k">手机号</text><view style="display: inline-flex; align-items: center;"><text class="done-v mono">{{newMember.phone}}</text><phone-copy phone="{{newMember.phone}}" /></view></view>
         <view class="done-row"><text class="done-k">姓名</text><text class="done-v">{{newMember.name}}</text></view>
         <view class="done-row"><text class="done-k">初始储值</text><text class="done-v">{{newMember.depositStr}}</text></view>
       </view>

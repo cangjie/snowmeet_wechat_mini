@@ -153,9 +153,6 @@ Page({
       case 'reserve_instructor_list':
         path = '/pages/admin/school/lesson/lesson_list'
         break
-      case 'ticket_print':
-        path = '/pages/admin/ticket/ticket_template_list'
-        break
       case 'ticket_template_admin':
         path = '/pages/admin/ticket/template_admin/template_admin'
         break
@@ -194,6 +191,15 @@ Page({
         break
       case 'staff_account_admin':
         path = '/pages/staffadmin/list/list'
+        break
+      case 'coach_admin':
+        path = '/pages/coach/admin/list/list'
+        break
+      case 'introducer_admin':
+        path = '/pages/introducer/admin/list/list'
+        break
+      case 'share_list':
+        path = '/pages/introducer/share/list/list'
         break
       case 'maintain_return':
         path = '/pages/admin/maintain/return_entry'

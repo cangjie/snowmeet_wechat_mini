@@ -1,0 +1,1 @@
+{ "navigationBarTitleText": "分账列表", "backgroundColor": "#F8F9FF", "onReachBottomDistance": 80, "usingComponents": { "date-range-picker": "/components/date-range-picker/index" } }

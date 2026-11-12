@@ -1,0 +1,96 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:elif="{{coach}}">
+    <view class="tabs">
+      <view class="tab {{tab === 'price' ? 'on' : ''}}" data-tab="price" bindtap="onTab">价格设置</view>
+      <view class="tab {{tab === 'cards' ? 'on' : ''}}" data-tab="cards" bindtap="onTab">他的卡</view>
+      <view class="tab {{tab === 'manage' ? 'on' : ''}}" data-tab="manage" bindtap="onTab">停用</view>
+    </view>
+
+    <!-- 价格设置 -->
+    <block wx:if="{{tab === 'price'}}">
+      <view class="card card-pad">
+        <view class="card-row"><text class="card-title small">养护</text><text class="card-meta">按门店、单项/双项分别设置</text></view>
+        <block wx:for="{{cells}}" wx:key="key" wx:for-index="i">
+          <view wx:if="{{i % 2 === 0}}" class="shop-title" style="{{i === 0 ? 'border-top: none; padding-top: 0;' : ''}}">{{item.shop}}</view>
+          <view class="price-row">
+            <text class="lab">{{item.tier}}</text>
+            <view class="seg">
+              <view wx:for="{{modes}}" wx:for-item="m" wx:key="key" class="chip-sq {{item.mode === m.key ? 'on' : ''}}" data-i="{{i}}" data-mode="{{m.key}}" bindtap="onMode">{{m.label}}</view>
+            </view>
+            <view class="val {{item.mode === 'none' ? 'off' : ''}}">
+              <input type="digit" value="{{item.text}}" disabled="{{item.mode === 'none'}}" data-i="{{i}}" bindinput="onCellText" />
+              <text class="unit">{{item.mode === 'rate' ? '折' : (item.mode === 'fixed' ? '元' : '')}}</text>
+            </view>
+          </view>
+          <view wx:if="{{item.err}}" class="danger-line" style="margin-left: 76rpx;">{{item.err}}</view>
+        </block>
+        <view class="card-meta">一口价 = 养护服务费封顶价，维修费不打折；加急单只对单/双项的基础价生效，加急加价照收。折扣填「8」表示 8 折。</view>
+      </view>
+      <view class="card card-pad">
+        <view class="card-row"><text class="card-title small">租赁</text><text class="card-meta">各店、各项目通用</text></view>
+        <view class="price-row">
+          <text class="lab" style="width: 96rpx;">折扣</text>
+          <view class="val" style="width: 220rpx;"><input type="digit" placeholder="不优惠留空" value="{{rentalText}}" bindinput="onRentalText" /><text class="unit">折</text></view>
+        </view>
+        <view class="card-meta">只设折扣率，不分门店和租赁项目，不设一口价。</view>
+      </view>
+      <view class="card card-pad" style="background: var(--blue-soft);">
+        <view class="card-row"><text class="card-meta">试算：养护原价</text><input class="input" style="height: 60rpx; width: 180rpx;" type="digit" value="{{trialBase}}" bindinput="onTrialBase" /></view>
+        <view wx:for="{{trial}}" wx:key="key" class="kv">
+          <text class="k">{{item.label}}</text>
+          <text wx:if="{{item.error}}" class="v tone-danger">填写有误，见上方</text>
+          <text wx:elif="{{item.none}}" class="v" style="font-weight: 400; color: var(--faint);">无优惠</text>
+          <text wx:else class="v">教练价 ¥{{item.price}}（优惠 −¥{{item.discount}}）</text>
+        </view>
+        <view wx:if="{{!trial.length}}" class="card-meta">填写试算原价后，这里显示各店各档的教练价。</view>
+      </view>
+      <view class="note">修改只影响<text style="font-weight: 700;">之后</text>领取的新卡；已领的卡保持领取时的价格。</view>
+    </block>
+
+    <!-- 他的卡 -->
+    <block wx:if="{{tab === 'cards'}}">
+      <view wx:if="{{cardCounts}}" class="chips" style="flex-wrap: wrap;">
+        <view class="chip {{cardFilter === '' ? 'on' : ''}}" data-s="" bindtap="onCardFilter">全部 {{cardCounts.total}}</view>
+        <view class="chip {{cardFilter === 'issued' ? 'on' : ''}}" data-s="issued" bindtap="onCardFilter">待领取 {{cardCounts.issued}}</view>
+        <view class="chip {{cardFilter === 'claimed' ? 'on' : ''}}" data-s="claimed" bindtap="onCardFilter">已领取 {{cardCounts.claimed}}</view>
+        <view class="chip {{cardFilter === 'revoked' ? 'on' : ''}}" data-s="revoked" bindtap="onCardFilter">已撤销 {{cardCounts.revoked}}</view>
+      </view>
+      <view wx:for="{{cards}}" wx:key="id" class="card card-pad" style="{{item.status === 'revoked' ? 'opacity: 0.65;' : ''}}">
+        <view class="card-row"><text class="card-title small grow">卡 …{{item.tokenTail}}</text><text class="tag {{item.tag.tone}}">{{item.tag.text}}</text></view>
+        <block wx:if="{{item.status === 'claimed' || item.memberId}}">
+          <view class="kv"><text class="k">领取人</text><text class="v">{{item.studentName}} · 尾号 {{item.phoneTail}}</text></view>
+          <view class="kv"><text class="k">领取时间</text><text class="v">{{item.claimed}}</text></view>
+          <view class="kv"><text class="k">锁定价 · 万龙养护</text><text class="v">单 / 双 {{item.care1}}</text></view>
+          <view class="kv"><text class="k">锁定价 · 崇礼养护</text><text class="v">单 / 双 {{item.care2}}</text></view>
+          <view class="kv"><text class="k">锁定价 · 租赁</text><text class="v">{{item.rental}}</text></view>
+          <view class="kv"><text class="k">有效期至</text><text class="v">{{item.until}}</text></view>
+          <view class="kv"><text class="k">已用卡</text><text class="v">{{item.useCount}} 次</text></view>
+        </block>
+        <view wx:else class="kv"><text class="k">创建时间</text><text class="v">{{item.created}}</text></view>
+        <view wx:if="{{item.status === 'issued' || item.status === 'claimed'}}" class="btn-row" style="justify-content: flex-end;">
+          <view class="btn danger" data-id="{{item.id}}" bindtap="onRevoke">撤销</view>
+        </view>
+      </view>
+      <view wx:if="{{!cards.length}}" class="co-empty">没有学员卡</view>
+    </block>
+
+    <!-- 停用 / 改名 -->
+    <block wx:if="{{tab === 'manage'}}">
+      <view class="card card-pad">
+        <view class="field">
+          <view class="field-label"><text>教练显示名</text></view>
+          <view class="card-row"><input class="input grow" value="{{name}}" bindinput="onName" maxlength="20" /><view class="btn" bindtap="onRename">保存</view></view>
+        </view>
+      </view>
+      <view class="card card-pad">
+        <view class="card-row"><text class="card-title small grow">{{coach.valid ? '启用中' : '已停用'}}</text><text class="tag {{coach.valid ? 'ok' : 'muted'}}">{{coach.valid ? '启用' : '已停用'}}</text></view>
+        <view class="card-meta">停用后，已领的学员卡继续有效，但这位教练不能再发新卡，没领的卡也不能再领。恢复后价格保留。</view>
+        <view class="btn {{coach.valid ? 'danger' : 'primary'}} btn-block" bindtap="onToggleValid">{{coach.valid ? '停用这位教练' : '恢复这位教练'}}</view>
+      </view>
+    </block>
+  </block>
+</view>
+<view wx:if="{{!blocked && coach && tab === 'price'}}" class="bottom-bar">
+  <view class="btn primary {{dirty ? '' : 'disabled'}}" bindtap="onSave">保存</view>
+</view>

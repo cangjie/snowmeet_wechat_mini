@@ -3,8 +3,10 @@
 // - 优惠券 tab：列 code / 名称 / 到期日 / 来源(create_memo)
 // - 会员卡 tab：卡名含「季卡」显示上次使用时间，其余按次卡显示已用/剩余
 // - 全局单选：券与券、卡与卡、券与卡互斥，外加「不使用」；确认时三者最多一个非空
+//   学员卡（2026-10-30）：「会员卡」标签里并入某某教练的学员卡（chip「教练」），数据来自 CoachCard/ListUsableCards，
+//   条目显示本单预计优惠；与券、次卡、季卡同样单选互斥。租赁开单页传 coachOnly，弹层里只列学员卡。
 //   事件契约：triggerEvent('Event', {action:'cancel'})
-//   / {action:'confirm', selectedTicket, selectedCard}（都为 null 表示清除所选）
+//   / {action:'confirm', selectedTicket, selectedCard, selectedCoachCard}（都为 null 表示清除所选；selectedCoachCard 仅选学员卡时有值）
 const app = getApp();
 const util = require('../../../utils/util.js');
 const data = require('../../../utils/data.js');
@@ -33,6 +35,16 @@ Component({
     selectedCode: { type: String, value: null },
     selectedCardId: { type: null, value: null },
     disabledCodes: { type: Array, value: [] },
+    // 学员卡：已选的卡 id；本单的门店 / 档位（单项、双项）/ 该件服务费 / 单双项基础价（不含加急）/ 租赁金额，用来算预计优惠
+    selectedCoachCardId: { type: null, value: null },
+    shop: { type: String, value: '' },
+    tier: { type: String, value: '' },
+    commonCharge: { type: Number, value: 0 },
+    basePrice: { type: Number, value: 0 },
+    urgent: { type: Number, value: 0 },
+    rentalAmount: { type: Number, value: 0 },
+    // 只列学员卡（租赁开单页用）
+    coachOnly: { type: Boolean, value: false },
   },
   data: {
     activeTab: 'ticket', // ticket | card
@@ -43,22 +55,32 @@ Component({
     pickedCode: null,    // 当前选中券 code（与 pickedCardId/pickedNone 互斥）
     pickedCardId: null,  // 当前选中卡 id
     pickedNone: false,   // 选中「不使用」
+    coachCards: [],      // 该会员可用的学员卡（含本单预计优惠）
+    coachLoading: false,
+    pickedCoachCardId: null, // 当前选中学员卡 id（与 pickedCode/pickedCardId/pickedNone 互斥）
   },
   methods: {
     _load() {
       const that = this;
       const memberId = this.data.memberId;
+      const coachPicked = this.data.selectedCoachCardId || null;
+      const coachOnly = !!this.data.coachOnly;
       this.setData({
-        activeTab: this.data.selectedCardId ? 'card' : 'ticket',
-        pickedCode: this.data.selectedCardId ? null : (this.data.selectedCode || null),
-        pickedCardId: this.data.selectedCardId || null,
+        activeTab: (this.data.selectedCardId || coachPicked || coachOnly) ? 'card' : 'ticket',
+        pickedCode: (this.data.selectedCardId || coachPicked) ? null : (this.data.selectedCode || null),
+        pickedCardId: coachPicked ? null : (this.data.selectedCardId || null),
+        pickedCoachCardId: coachPicked,
         pickedNone: false,
         tickets: [],
         cards: [],
-        ticketsLoading: !!memberId,
-        cardsLoading: !!memberId,
+        coachCards: [],
+        ticketsLoading: !!memberId && !coachOnly,
+        cardsLoading: !!memberId && !coachOnly,
+        coachLoading: !!memberId,
       });
       if (!memberId) return;
+      this._loadCoachCards(memberId);
+      if (coachOnly) return;
       data.getMemberTicketsPromise(memberId, this.data.ticketType, true, app.globalData.sessionKey)
         .then((tickets) => {
           const disabled = that.data.disabledCodes || [];
@@ -90,6 +112,30 @@ Component({
         })
         .catch(() => that.setData({ cardsLoading: false }));
     },
+    // 学员卡：按本单的门店 / 档位 / 金额算预计优惠；接口失败不影响券和次卡的选择
+    _loadCoachCards(memberId) {
+      const that = this;
+      const d = this.data;
+      data.listUsableCoachCardsPromise(memberId, d.ticketType, {
+        shop: d.shop, tier: d.tier, commonCharge: d.commonCharge, basePrice: d.basePrice, rentalAmount: d.rentalAmount, urgent: d.urgent,
+      }, app.globalData.sessionKey).then((res) => {
+        const list = ((res && res.cards) || []).map((c) => Object.assign({}, c, {
+          _until: c.validUntil ? util.formatDate(new Date(c.validUntil)) : '--',
+        }));
+        that.setData({ coachCards: list, coachLoading: false });
+      }).catch(() => that.setData({ coachLoading: false }));
+    },
+    onCoachCardTap(e) {
+      const idx = Number(e.currentTarget.dataset.idx);
+      const c = this.data.coachCards[idx];
+      if (!c) return;
+      // 这张卡在本单的门店 / 档位没有优惠：说明原因，不让选（选了也不会优惠，还会挤掉券）
+      if (!c.applicable) {
+        wx.showToast({ title: '这张学员卡在本单没有优惠', icon: 'none' });
+        return;
+      }
+      this.setData({ pickedCoachCardId: c.cardId, pickedCode: null, pickedCardId: null, pickedNone: false });
+    },
     onTabTap(e) {
       this.setData({ activeTab: e.currentTarget.dataset.tab });
     },
@@ -97,7 +143,7 @@ Component({
       const idx = Number(e.currentTarget.dataset.idx);
       const t = this.data.tickets[idx];
       if (!t || t._disabled) return;
-      this.setData({ pickedCode: t.code, pickedCardId: null, pickedNone: false });
+      this.setData({ pickedCode: t.code, pickedCardId: null, pickedCoachCardId: null, pickedNone: false });
     },
     onCardTap(e) {
       const idx = Number(e.currentTarget.dataset.idx);
@@ -109,10 +155,10 @@ Component({
         wx.showToast({ title: '该季卡今天已使用过，每天限一次', icon: 'none' });
         return;
       }
-      this.setData({ pickedCardId: c.id, pickedCode: null, pickedNone: false });
+      this.setData({ pickedCardId: c.id, pickedCode: null, pickedCoachCardId: null, pickedNone: false });
     },
     onNoneTap() {
-      this.setData({ pickedCode: null, pickedCardId: null, pickedNone: true });
+      this.setData({ pickedCode: null, pickedCardId: null, pickedCoachCardId: null, pickedNone: true });
     },
     onClose() {
       this.triggerEvent('Event', { action: 'cancel' });
@@ -126,6 +172,11 @@ Component({
         const code = this.data.pickedCode;
         const ticket = this.data.tickets.filter((t) => t.code === code)[0] || null;
         this.triggerEvent('Event', { action: 'confirm', selectedTicket: ticket, selectedCard: null });
+        return;
+      }
+      if (this.data.pickedCoachCardId) {
+        const coachCard = this.data.coachCards.filter((c) => c.cardId === this.data.pickedCoachCardId)[0] || null;
+        this.triggerEvent('Event', { action: 'confirm', selectedTicket: null, selectedCard: null, selectedCoachCard: coachCard });
         return;
       }
       if (this.data.pickedCardId) {

@@ -1,0 +1,51 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <view wx:elif="{{!canEdit && !loading}}" class="co-blocked">{{reason || '这一单现在不能设置介绍人分账'}}</view>
+  <block wx:elif="{{canEdit}}">
+    <view class="card card-pad">
+      <view class="section-title">1 · 收款人</view>
+      <view class="type-row">
+        <text wx:for="{{types}}" wx:key="*this" class="chip {{(item === '全部' ? !type : type === item) ? 'on' : ''}}" data-type="{{item}}" bindtap="onType">{{item}}</text>
+      </view>
+      <input class="input" placeholder="搜索名称、真实姓名或手机号" value="{{keyword}}" bindinput="onKeyword" bindconfirm="onSearch" confirm-type="search" />
+      <view wx:if="{{pickedId}}" class="note blue">已选：{{pickedLabel}}</view>
+      <view wx:if="{{!choices.length}}" class="co-empty">没有符合条件的介绍人</view>
+      <view wx:for="{{choices}}" wx:key="id" class="pick {{pickedId === item.id ? 'on' : ''}}" data-id="{{item.id}}" bindtap="onPick">
+        <view>
+          <text class="pick-name">{{item.name}}</text>
+          <text class="tag {{item.type === 'KOL' ? 'kol' : (item.type === '机构' ? 'org' : 'blue')}}">{{item.type}}</text>
+        </view>
+        <text class="note">{{item.tail}}</text>
+      </view>
+    </view>
+
+    <view class="card card-pad">
+      <view class="section-title">2 · 分账内容</view>
+      <view class="field">
+        <view class="field-label"><text>金额（元）</text></view>
+        <input class="input" type="digit" value="{{form.amount}}" bindinput="onAmount" />
+        <view wx:if="{{suggested > 0}}" class="note">预填：租金（扣减免后）的 10% = ¥{{suggested}}，可以改</view>
+      </view>
+      <view wx:if="{{supportsPlanDate}}" class="field">
+        <view class="field-label"><text>预计分账日期</text></view>
+        <date-range-picker mode="single" allow-future date="{{form.planDate}}" placeholder="选择预计分账日期" bind:change="onPlanDate" />
+        <view class="note">预填的是最早能分的那天。自动分账的，到这一天夜间 23:00 才提交；要手动转账的，这是预计转账的日子。</view>
+      </view>
+      <view wx:if="{{supportsAutoShare}}" class="field">
+        <view class="switch-row">
+          <text>自动分账</text>
+          <switch checked="{{form.autoShare}}" bindchange="onAutoShare" color="#006495" />
+        </view>
+        <view class="note">{{form.autoShare ? '打开：能自动分的，到日期夜间 23:00 自动提交。用了优惠券、介绍人没有收款账号、合计达到门槛的，系统仍会转成手动。' : '关闭：只记账，系统不会自动分账，你自己去转账。'}}</view>
+      </view>
+      <view class="field">
+        <view class="field-label"><text>备注（选填）</text></view>
+        <input class="input" value="{{form.memo}}" bindinput="onMemo" maxlength="40" />
+      </view>
+    </view>
+
+    <view class="bottom-bar">
+      <view class="btn primary {{saving ? 'disabled' : ''}}" bindtap="onSave">保存分账记录</view>
+    </view>
+  </block>
+</view>

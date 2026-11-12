@@ -7,15 +7,19 @@ const { loadPage, loadComponent, settle } = require('./reception_harness');
 function setup(t) {
   const oldApp = global.getApp;
   const oldWx = global.wx;
-  const toasts = [], navigations = [];
+  const toasts = [], navigations = [], imagePreviews = [];
   global.getApp = () => ({ globalData: { requestPrefix: 'https://test.invalid/api/', sessionKey: 'test' }, loginPromiseNew: Promise.resolve() });
-  global.wx = { showToast: x => toasts.push(x.title), navigateTo: x => { navigations.push(x.url); if (x.success) x.success(); } };
+  global.wx = {
+    showToast: x => toasts.push(x.title),
+    navigateTo: x => { navigations.push(x.url); if (x.success) x.success(); },
+    previewImage: options => imagePreviews.push(options),
+  };
   t.after(() => { global.getApp = oldApp; global.wx = oldWx; });
   const page = loadPage('pages/admin/reception/recept_new.js', {});
   Object.assign(page.data, { bizType: 'maintain', customer: { memberId: 10 },
     order: { id: 20, cares: [{ id: 30, equipment: '双板', brand: '测试', scale: '170', need_edge: 1, need_wax: 1, common_charge: 100 }] } });
   page.saveCareReceptOrder = async () => page.data.order;
-  return { page, toasts, navigations };
+  return { page, toasts, navigations, imagePreviews };
 }
 
 function preview(amount = 600) {
@@ -23,12 +27,62 @@ function preview(amount = 600) {
     total: 10, projectCount: 2, requiresBinding: false, careIds: [30], punches: 1, remaining: 9 }] };
 }
 
+test('购买测试打蜡季卡后，从商品识别到装备表单都显示机打蜡；热蜡季卡仍为热蜡', t => {
+  const { page } = setup(t);
+  const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {});
+  for (const [name, mode, visible] of [['测试打蜡季卡', 'machine', true],
+    ['26-27雪季机打蜡季卡', 'machine', true], ['热打蜡季卡', 'wax', false], ['热蜡季卡', 'wax', false]]) {
+    const trial = preview(0.01);
+    Object.assign(trial.items[0], { name, total: null, projectCount: null, requiresBinding: true });
+    page._applyCareCardPreview(trial);
+    assert.equal(page.data.careCardMode, mode, name);
+    Object.assign(form.data, { memberId: null, cares: page.data.order.cares });
+    form.setProperty('newCardMode', page.data.careCardMode);
+    assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, visible, name);
+  }
+  const finite = preview().items[0];
+  finite.name = '打蜡10次卡';
+  assert.notEqual(require('../utils/careCardSale').serviceMode(finite), 'machine');
+});
+
 test('入口位于添加装备下方，养护选卡与结算展示本次试算', () => {
   const form = fs.readFileSync(path.join(__dirname, '../components/reception/care_recept_form/care_recept_form.wxml'), 'utf8');
   assert.ok(form.indexOf('<text>添加装备</text>') < form.indexOf('<text>添加卡类'));
   const page = fs.readFileSync(path.join(__dirname, '../pages/admin/reception/recept_new.wxml'), 'utf8');
   assert.match(page, /本次试算/);
   assert.match(page, /确认选卡/);
+});
+
+test('历史装备弹层显示上次养护缩略图并增高历史列表', async t => {
+  const { imagePreviews } = setup(t);
+  const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {
+    IMAGE_HOST: 'https://img.snowmeet.top',
+    getMemberCaredEquipmentsPromise: async () => [{
+      brand: 'ABBA', scale: '180', last_care_date: '2026-11-04',
+      photoUrl: '/upload/board-thumb.jpg', photoFullUrl: '/upload/board.jpg'
+    }],
+  });
+  form.data.memberId = 42;
+  form.data.displayCares = [{ equipment: '双板' }];
+  form.data.skiBrandList = [];
+
+  form._maybeShowHistory(0, '双板');
+  await settle();
+
+  assert.equal(form.data.historyModal.list[0]._photoUrl, 'https://img.snowmeet.top/upload/board-thumb.jpg');
+  assert.equal(form.data.historyModal.list[0]._photoPreviewUrl, 'https://img.snowmeet.top/upload/board.jpg');
+  form.onHistoryPhotoTap({ currentTarget: { dataset: { idx: '0' } } });
+  assert.deepEqual(imagePreviews[0], {
+    current: 'https://img.snowmeet.top/upload/board.jpg',
+    urls: ['https://img.snowmeet.top/upload/board.jpg'],
+  });
+  const markup = fs.readFileSync(path.join(__dirname, '../components/reception/care_recept_form/care_recept_form.wxml'), 'utf8');
+  const photoIndex = markup.indexOf('class="history-item-photo"');
+  const brandIndex = markup.indexOf('class="history-item-brand"');
+  assert.ok(photoIndex >= 0 && photoIndex < brandIndex);
+  const styles = fs.readFileSync(path.join(__dirname, '../components/reception/care_recept_form/care_recept_form.wxss'), 'utf8');
+  const listRule = styles.match(/\.history-list\s*\{([^}]+)\}/);
+  assert.match(listRule && listRule[1], /max-height:\s*58vh/, '历史装备滚动区应随屏幕增高');
 });
 
 test('旧试算晚到不覆盖新选择；试算不下单、不扣次', async t => {

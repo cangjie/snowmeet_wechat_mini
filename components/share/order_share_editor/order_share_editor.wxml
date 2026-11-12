@@ -1,0 +1,31 @@
+<view wx:if="{{!hidden}}" class="ose-card">
+  <view class="ose-head" bindtap="onToggle">
+    <text class="ose-title">介绍人分账</text>
+    <view class="ose-head-right">
+      <text class="ose-side">{{summary}}</text>
+      <text class="ose-arrow {{expanded ? 'open' : ''}}">›</text>
+    </view>
+  </view>
+
+  <block wx:if="{{expanded}}">
+    <view wx:for="{{shares}}" wx:key="orderShareId" class="ose-row">
+      <view class="ose-line">
+        <view class="ose-name">
+          <text class="ose-bold">{{item.name}}</text>
+          <text class="ose-tag blue">{{item.type}}</text>
+        </view>
+        <text class="ose-bold">¥{{item.amount}}</text>
+      </view>
+      <view class="ose-line">
+        <text class="ose-tag {{item.stateClass}}">{{item.state}}</text>
+        <text wx:if="{{item.removable}}" class="ose-remove" data-id="{{item.orderShareId}}" bindtap="onRemove">删除</text>
+      </view>
+      <view wx:if="{{item.planDate}}" class="ose-meta">预计分账：{{item.planDate}}</view>
+      <view wx:if="{{item.memo}}" class="ose-meta">备注：{{item.memo}}</view>
+    </view>
+    <view wx:if="{{!shares.length && !loading}}" class="ose-meta">还没有设置介绍人分账</view>
+
+    <view wx:if="{{canEdit}}" class="ose-save" bindtap="onAdd">添加分账记录</view>
+    <view wx:elif="{{reason}}" class="ose-reason">{{reason}}</view>
+  </block>
+</view>

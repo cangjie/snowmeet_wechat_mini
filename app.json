@@ -3,13 +3,14 @@
     "pages/index/index",
     "pages/mine/mine",
     "pages/admin/admin",
-    "pages/admin/ticket/ticket_template_list",
     "pages/mine/ticket/ticket_list",
     "pages/mine/ticket/ticket_bind",
     "pages/ski_pass/ski_pass_selector",
     "pages/mine/ticket/ticket_detail",
     "pages/mine/ticket/ticket_share",
     "pages/mine/ticket/ticket_claim/ticket_claim",
+    "pages/mine/ticket/ticket_share_mini",
+    "pages/mine/ticket/ticket_claim_mini/ticket_claim_mini",
     "pages/admin/rent/rent_report",
     "pages/admin/rent/punchcard_products/punchcard_products",
     "pages/admin/rent/punchcard_products/punchcard_product_detail/punchcard_product_detail",
@@ -74,6 +75,7 @@
     "pages/admin/unipay/unipay_detail",
     "pages/admin/unipay/unipay_list",
     "pages/ski_pass/skipass_detail_new",
+    "pages/ski_pass/skipass_cart",
     "pages/mine/skipass/my_skipasses",
     "pages/admin/reception/recept_scan",
     "pages/admin/reception/recept_member",
@@ -130,6 +132,30 @@
         "serve/serve",
         "count/count",
         "dash/dash"
+      ]
+    },
+    {
+      "root": "pages/coach",
+      "name": "coach",
+      "pages": [
+        "admin/list/list",
+        "admin/add/add",
+        "admin/detail/detail",
+        "admin/issue/issue",
+        "home/home",
+        "student/student",
+        "claim/claim",
+        "card/card"
+      ]
+    },
+    {
+      "root": "pages/introducer",
+      "name": "introducer",
+      "pages": [
+        "admin/list/list",
+        "admin/add/add",
+        "share/add/add",
+        "share/list/list"
       ]
     },
     {
@@ -274,6 +300,7 @@
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
     "shop-selector": "/components/shop_selector/shop_selector",
+    "phone-copy": "/components/phone_copy/phone_copy",
     "member-info": "/components/user_info/member_info",
     "van-collapse": "@vant/weapp/collapse/index",
     "van-collapse-item": "@vant/weapp/collapse-item/index",

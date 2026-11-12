@@ -81,7 +81,7 @@
               <text class="mcard-name">{{item.name}}</text>
               <text wx:if="{{item.gender}}" class="gchip {{item.female ? 'gchip--f' : ''}}">{{item.gender}}</text>
             </view>
-            <text class="mcard-phone">{{item.phone}}</text>
+            <view style="display: inline-flex; align-items: center;"><text class="mcard-phone">{{item.phone}}</text><phone-copy phone="{{item.phone}}" /></view>
           </view>
           <view class="mcard-right">
             <view><text class="mcard-dep-label">储值 </text><text class="mcard-dep">{{item.depositStr}}</text></view>

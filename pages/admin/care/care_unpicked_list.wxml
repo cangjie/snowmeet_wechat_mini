@@ -107,7 +107,7 @@
             <text class="row-label">顾客</text><text class="row-value row-value--wide">{{item._customerName}}</text>
           </view>
           <view class="care-row" catchtap="call" data-cell="{{item._customerCell}}">
-            <text class="row-label">电话</text><text class="row-value row-value--wide row-value--link">{{item._customerCell || '-'}}</text>
+            <text class="row-label">电话</text><view style="display: inline-flex; align-items: center;"><text class="row-value row-value--wide row-value--link">{{item._customerCell || '-'}}</text><phone-copy phone="{{item._customerCell}}" /></view>
           </view>
           <view class="care-row">
             <text class="row-label">已寄存</text><text class="row-value row-value--wide row-value--strong">{{item.storedDays}} 天</text>

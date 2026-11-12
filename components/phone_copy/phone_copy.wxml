@@ -1,0 +1,1 @@
+<text wx:if="{{text}}" class="pc-btn" hover-class="pc-btn--hover" catchtap="onCopy">复制</text>

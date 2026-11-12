@@ -1,0 +1,37 @@
+<view class="co-page">
+  <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
+  <block wx:else>
+    <view class="card card-pad">
+      <view class="card-meta">发给（{{coaches.length}} 位）</view>
+      <view class="btn-row">
+        <text wx:for="{{coaches}}" wx:key="id" class="tag blue" data-id="{{item.id}}" bindtap="onRemove" style="font-size: 24rpx; padding: 10rpx 18rpx;">{{item.name}} ✕</text>
+      </view>
+    </view>
+    <view class="card card-pad">
+      <view class="field">
+        <view class="field-label"><text>券模板</text></view>
+        <picker range="{{templates}}" range-key="name" value="{{tplIdx}}" bindchange="onTemplate">
+          <view class="input"><text wx:if="{{tplIdx >= 0}}">{{templates[tplIdx].name}}</text><text wx:else class="placeholder">点此选择券模板</text></view>
+        </picker>
+      </view>
+      <view class="card-row">
+        <text class="grow" style="font-size: 28rpx;">每位教练发</text>
+        <view class="card-row" style="gap: 0; border: 2rpx solid var(--line); border-radius: 14rpx; overflow: hidden;">
+          <view style="padding: 10rpx 28rpx; background: var(--gray);" bindtap="onMinus">−</view>
+          <view style="padding: 10rpx 32rpx; min-width: 60rpx; text-align: center;">{{count}}</view>
+          <view style="padding: 10rpx 28rpx; background: var(--gray);" bindtap="onPlus">＋</view>
+        </view>
+      </view>
+      <view class="co-note">每人 1～50 张；一次最多 100 位教练、共 2000 张。</view>
+    </view>
+    <view class="card card-pad" style="background: var(--blue-soft);">
+      <view class="kv"><text class="k">合计</text><text class="v">{{coaches.length}} 位 × {{count}} 张 = {{coaches.length * count}} 张</text></view>
+      <view class="kv"><text class="k">有效期</text><text class="v">按券模板</text></view>
+    </view>
+    <view class="note blue">教练把这些券转发给学员时，<text style="font-weight: 700;">不会</text>再回赠同样的券给教练；教练的券不受「仅限部分模板可转赠」的限制。</view>
+    <view wx:if="{{doneText}}" class="note" style="background: var(--ok-bg); color: var(--ok);">{{doneText}}</view>
+  </block>
+</view>
+<view wx:if="{{!blocked}}" class="bottom-bar">
+  <view class="btn primary {{sending ? 'disabled' : ''}}" bindtap="onSend">确认发放</view>
+</view>

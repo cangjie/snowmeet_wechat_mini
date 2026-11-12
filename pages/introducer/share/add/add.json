@@ -1,0 +1,1 @@
+{ "navigationBarTitleText": "添加分账记录", "backgroundColor": "#F8F9FF", "usingComponents": { "date-range-picker": "/components/date-range-picker/index" } }

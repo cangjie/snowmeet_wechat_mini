@@ -104,6 +104,17 @@
                 </view>
               </view>
 
+              <!-- 优惠券/卡：只列学员卡（租赁没有券和次卡的选择）。选了学员卡，租金按卡内折扣率优惠 -->
+              <view wx:if="{{memberId}}" class="kv-row">
+                <view class="kv-cell kv-cell--tap" data-ridx="{{ridx}}" catchtap="onPkgCoachCardTap">
+                  <text class="kv-label">优惠券/卡</text>
+                  <view class="kv-input-wrap">
+                    <text class="kv-input kv-input--display">{{pkg.coach_card_id ? '(卡)' + (pkg._coachCardName ? pkg._coachCardName + '的学员卡' : '学员卡') : '点此选择学员卡（可跳过）'}}</text>
+                  </view>
+                </view>
+              </view>
+              <view wx:if="{{pkg.coach_card_id && pkg._coachHint}}" class="coach-hint">{{pkg._coachHint}}</view>
+
               <!-- 起租日期 / 时间 -->
               <view class="kv-row">
                 <view class="kv-cell">
@@ -379,3 +390,12 @@
   </van-popup>
 
 </view>
+
+<!-- 学员卡选择弹层（租赁：只列学员卡） -->
+<ticket-card-selector show="{{coachPopup.show}}"
+                      bindEvent="onCoachSelectorEvent"
+                      ticketType="租赁"
+                      coachOnly="{{true}}"
+                      memberId="{{memberId}}"
+                      selectedCoachCardId="{{coachPopup.selectedCoachCardId}}"
+                      rentalAmount="{{coachPopup.rentalAmount}}"/>

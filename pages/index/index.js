@@ -23,17 +23,9 @@ Page({
       url: '/pages/maintain/in_shop_request/in_shop_request',
     })
     */
-    app.loginPromiseNew.then(function(resolve){
-      // 首页只是个跳板，所有人（含店员）统一落到次卡销售首页。
-      // 原来这里有个「店员自动进后台」的分支，但它跳的是 '/admin/admin' —— app.json 注册的是
-      // 'pages/admin/admin'，路径不存在、navigateTo 必然失败，且失败后不会走 else，
-      // 结果店员打开小程序就卡在空白首页。店员进后台的入口在「我的 → 我是管理员」（wx:if="{{staff}}"），
-      // 不依赖这里，所以直接去掉该分支，不再按身份分流。
-      // 雪票选购页 ski_pass_selector 保留、未删除，仍可从底部菜单「预定」进入。
-      wx.redirectTo({
-        url: '/pages/punchcard/punchcard_shop',
-      })
-    })
+    // 首页只是个跳板：店员从 1000/1010/1089 冷启动进管理员菜单，其余（含主动回首页）去次卡商城。
+    // 规则在 app.js 的 routeEntry，同一次入口里店员只自动进一次菜单。
+    app.routeEntry({ fromIndex: true })
     
     
   },

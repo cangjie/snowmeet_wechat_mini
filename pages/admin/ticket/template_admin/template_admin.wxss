@@ -1,6 +1,8 @@
 /* pages/admin/ticket/template_admin/template_admin.wxss */
+@import "/styles/ticket_buttons.wxss";
+
 page { background: #F5F6FA; }
-.page { padding: 24rpx; box-sizing: border-box; }
+.page { padding: 24rpx 24rpx calc(32rpx + env(safe-area-inset-bottom)); box-sizing: border-box; }
 
 .view-switch {
   display: flex; background: #E4E7EF; border-radius: 999rpx;
