@@ -1,4 +1,4 @@
-// 养护订单列表：每件装备一块（品牌 / 长度 / 项目 / 照片 / 养护进度），订单信息排成两列并显示开单店铺
+// 养护订单列表：每件装备一块（品牌 / 长度 / 项目 / 照片 / 养护进度），订单信息排成两列并显示开单门店
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
@@ -215,15 +215,15 @@ test('没有装备的临时订单没有装备行，不报错', () => {
   assert.equal(page.data.orders[0].careCount, 0)
 })
 
-// ---- 版式：信息两列、显示开单店铺、左侧标签列保留、去掉被取代的行 ----
+// ---- 版式：信息两列、显示开单门店、左侧标签列保留、去掉被取代的行 ----
 const wxml = fs.readFileSync(path.join(__dirname, '..', 'pages/admin/care/care_order_list.wxml'), 'utf8')
 const cardBlock = wxml.slice(wxml.indexOf('<!-- 订单列表 -->'), wxml.indexOf('<!-- 列表底部分页 -->'))
 
-test('订单卡片显示开单店铺，并且是订单信息里最上面的一行（在日期之前）', () => {
-  assert.match(cardBlock, /开单店铺/)
+test('订单卡片显示开单门店，并且是订单信息里最上面的一行（在日期之前）', () => {
+  assert.match(cardBlock, /开单门店/)
   assert.match(cardBlock, /\{\{item\.shop/)
-  assert.ok(cardBlock.indexOf('开单店铺') < cardBlock.indexOf('>日期<'), '开单店铺应排在日期之前')
-  assert.ok(cardBlock.indexOf('开单店铺') > cardBlock.indexOf('class="info-grid"'), '开单店铺应在订单信息区内')
+  assert.ok(cardBlock.indexOf('开单门店') < cardBlock.indexOf('>日期<'), '开单门店应排在日期之前')
+  assert.ok(cardBlock.indexOf('开单门店') > cardBlock.indexOf('class="info-grid"'), '开单门店应在订单信息区内')
   assert.match(cardBlock, /info-cell--full/)
 })
 

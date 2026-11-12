@@ -136,7 +136,7 @@
           <!-- 订单基本信息：两列。左列放长内容（日期、手机+复制、金额），右列放短内容 -->
           <view class="info-grid">
             <view class="info-cell info-cell--full">
-              <text class="row-label">开单店铺</text><text class="row-value row-value--wide row-value--nowrap">{{item.shop || '--'}}</text>
+              <text class="row-label">开单门店</text><text class="row-value row-value--wide row-value--nowrap">{{item.shop || '--'}}</text>
             </view>
             <view class="info-cell">
               <text class="row-label">日期</text><text class="row-value row-value--wide row-value--nowrap">{{item.dateStr}} {{item.timeStr}}</text>
