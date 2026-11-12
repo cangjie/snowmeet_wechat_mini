@@ -491,6 +491,8 @@ Page({
       // 立刻把本地订单脱钩，让下一次"去结算"在后端建一个全新订单（而不是给已下单的订单累加 payment）。
       // 清空 server 端绑定的 id/code/valid，并把所有 rental / rentItem 的 id 清零，
       // 这样后续 saveRentReceptOrder 会被后端当作新订单处理。
+      // guaranties 也要清：PlaceRentOrder 刚给这单生成了保证金记录并随响应带回，留着它再保存新单，
+      // 后端会按已有 id 插入而 500（2026-11-12 生产实录）。
       this.setData({
         order: {
           ...rentOrder,
@@ -501,6 +503,7 @@ Page({
             ...r,
             id: 0,
             order_id: 0,
+            guaranties: [],
             rentItems: (r.rentItems || []).map((ri) => ({
               ...ri,
               id: 0,
@@ -550,6 +553,8 @@ Page({
         }
         copy.details = null;
         copy.category = null;
+        // 保证金记录只由「去结算」生成，草稿保存不回传
+        copy.guaranties = [];
         return copy;
       }),
     };
