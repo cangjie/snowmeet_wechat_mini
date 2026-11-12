@@ -5,3 +5,4 @@
 .pick.on { border-color: var(--blue); background: var(--blue-soft); }
 .pick-name { font-size: 28rpx; font-weight: 600; margin-right: 12rpx; }
 .switch-row { min-height: 88rpx; display: flex; align-items: center; justify-content: space-between; }
+.chip.unavailable { opacity: .4; }

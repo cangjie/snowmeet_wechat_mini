@@ -1,7 +1,7 @@
 // 添加分账记录（店长以上）：从订单详情页的「介绍人分账」卡片进入，带 orderId。
 // 分账请求 = 收款人（从介绍人里选：按 教练 / KOL / 机构 筛选，也能用关键词、手机号搜）+ 金额 + 预计分账日期 + 是否自动分账 + 备注。
 // 规则都在服务端：能不能设置（canEdit / reason）、金额预填（suggested）、最早能分的日期（suggestedPlanDate）、
-// 自动还是手动最终由系统判断；预计分账日期、自动分账开关只在后端支持时才显示和发送（旧后端没有那两个字段）。
+// 新后端明确返回渠道资格；旧后端仍沿用自动开关的兼容逻辑。
 const api = require('../../../../utils/introducer_api.js')
 
 const MANAGER_LEVEL = 200
@@ -18,9 +18,9 @@ function today() {
 Page({
   data: {
     blocked: '', loading: true, orderId: 0, canEdit: false, reason: '',
-    suggested: 0, suggestedPlanDate: '', supportsPlanDate: false, supportsAutoShare: false,
+    suggested: 0, suggestedPlanDate: '', supportsPlanDate: false, supportsAutoShare: false, supportsMethods: false, channelShareAvailable: false,
     types: [ALL, '教练', 'KOL', '机构'], type: '', keyword: '', choices: [], pickedId: '', pickedLabel: '',
-    form: { amount: '', planDate: '', autoShare: true, memo: '' }, saving: false
+    form: { amount: '', planDate: '', autoShare: true, shareMethod: 'auto', memo: '' }, saving: false
   },
 
   onLoad(options) {
@@ -43,7 +43,9 @@ Page({
       this.setData({
         loading: false, canEdit: !!d.canEdit, reason: d.reason || '', suggested: d.suggested || 0,
         suggestedPlanDate: d.suggestedPlanDate || '', supportsPlanDate: !!d.suggestedPlanDate, supportsAutoShare: !!d.autoShareSupported,
-        'form.amount': d.suggested > 0 ? String(d.suggested) : '', 'form.planDate': d.suggestedPlanDate || ''
+        supportsMethods: !!d.shareMethodSupported, channelShareAvailable: !!d.channelShareAvailable,
+        'form.amount': d.suggested > 0 ? String(d.suggested) : '', 'form.planDate': d.suggestedPlanDate || '',
+        'form.shareMethod': d.shareMethodSupported && !d.channelShareAvailable ? 'bank' : 'auto'
       })
       return d.canEdit ? this.loadChoices() : null
     })
@@ -86,6 +88,11 @@ Page({
   onAmount(e) { this.setData({ 'form.amount': e.detail.value }) },
   onPlanDate(e) { this.setData({ 'form.planDate': e.detail.date || '' }) },
   onAutoShare(e) { this.setData({ 'form.autoShare': !!e.detail.value }) },
+  onShareMethod(e) {
+    const method = e.currentTarget.dataset.method
+    if (!['auto', 'manual', 'bank'].includes(method) || (method !== 'bank' && !this.data.channelShareAvailable)) return
+    this.setData({ 'form.shareMethod': method })
+  },
   onMemo(e) { this.setData({ 'form.memo': e.detail.value }) },
 
   onSave() {
@@ -101,7 +108,8 @@ Page({
     }
     const body = { orderId: d.orderId, introducerId: d.pickedId, amount, memo: (d.form.memo || '').trim() }
     if (d.supportsPlanDate) body.planDate = d.form.planDate
-    if (d.supportsAutoShare) body.autoShare = !!d.form.autoShare
+    if (d.supportsMethods) body.shareMethod = d.form.shareMethod
+    else if (d.supportsAutoShare) body.autoShare = !!d.form.autoShare
     this.setData({ saving: true })
     return api.setShare(body).then(() => {
       this.setData({ saving: false })

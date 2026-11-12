@@ -10,7 +10,7 @@
     <view class="filter-row">
       <text class="filter-label">店铺</text>
       <view class="filter-value">
-        <shop-selector wx:if="{{!aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))}}" defaultShop="全部店铺"
+        <shop-selector wx:if="{{!crossShopOnly && !aiQueryApplied && ((cell != null && cell != '') || (keyword != null && keyword != ''))}}" defaultShop="全部店铺"
           bindShopSelected="shopSelected"></shop-selector>
         <shop-selector wx:else defaultShop="{{aiQueryApplied ? (shop || '全部店铺') : ''}}"
           bindShopSelected="shopSelected"></shop-selector>
@@ -149,6 +149,7 @@
       <!-- 内容区：左侧标签列 + 右侧详情 -->
       <view class="order-body">
         <view class="tag-col">
+          <text wx:if="{{item.hasCrossShopRent}}" class="tag tag--cross">异</text>
           <text wx:if="{{item.is_test == 1}}" class="tag tag--test">测</text>
           <text wx:if="{{item.haveEntertain}}" class="tag tag--entertain">招</text>
           <text wx:if="{{item.haveOnCredit}}" class="tag tag--credit">挂</text>
@@ -159,6 +160,12 @@
           <text class="tag tag--member">{{item.memberShip}}</text>
         </view>
         <view class="order-rows">
+          <view class="order-row">
+            <text class="row-label">门店</text><text class="row-value row-value--wide">{{item.shop || '--'}}</text>
+          </view>
+          <view wx:if="{{crossShopOnly && item.crossShopsText}}" class="order-row">
+            <text class="row-label">领取店</text><text class="row-value row-value--wide">{{item.crossShopsText}}</text>
+          </view>
           <view class="order-row">
             <text class="row-label">日期</text><text class="row-value">{{item.dateStr}}</text>
             <text class="row-label row-label--mid">时间</text><text class="row-value">{{item.timeStr}}</text>

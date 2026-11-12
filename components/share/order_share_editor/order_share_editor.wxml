@@ -1,6 +1,6 @@
 <view wx:if="{{!hidden}}" class="ose-card">
   <view class="ose-head" bindtap="onToggle">
-    <text class="ose-title">介绍人分账</text>
+    <text class="ose-title">分销商分账</text>
     <view class="ose-head-right">
       <text class="ose-side">{{summary}}</text>
       <text class="ose-arrow {{expanded ? 'open' : ''}}">›</text>
@@ -23,7 +23,7 @@
       <view wx:if="{{item.planDate}}" class="ose-meta">预计分账：{{item.planDate}}</view>
       <view wx:if="{{item.memo}}" class="ose-meta">备注：{{item.memo}}</view>
     </view>
-    <view wx:if="{{!shares.length && !loading}}" class="ose-meta">还没有设置介绍人分账</view>
+    <view wx:if="{{!shares.length && !loading}}" class="ose-meta">还没有设置分销商分账</view>
 
     <view wx:if="{{canEdit}}" class="ose-save" bindtap="onAdd">添加分账记录</view>
     <view wx:elif="{{reason}}" class="ose-reason">{{reason}}</view>

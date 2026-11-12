@@ -6,14 +6,14 @@ const shareList = require('../utils/share_list.js')
 
 const PREFIX = 'https://x/api/'
 
-test('点条目跳到各类型订单的详情页；雪票用雪票 id，没有就不跳', () => {
+test('点条目跳到对应订单；雪票和其他类型按订单 id 打开分账页', () => {
   const item = over => Object.assign({ orderId: 55, orderType: '租赁', skipassId: null }, over)
   assert.equal(shareList.detailUrl(item({ orderType: '租赁' })), '/pages/admin/rent/rent_order_detail/rent_order_detail?id=55')
   assert.equal(shareList.detailUrl(item({ orderType: '养护' })), '/pages/admin/care/care_order_detail/care_order_detail?id=55')
   assert.equal(shareList.detailUrl(item({ orderType: '零售' })), '/pages/admin/retail/retail_order_detail?id=55')
-  assert.equal(shareList.detailUrl(item({ orderType: '雪票', skipassId: 21 })), '/pages/admin/ski_pass/common_skipass_detail?id=21')
-  assert.equal(shareList.detailUrl(item({ orderType: '雪票', skipassId: null })), null)
-  assert.equal(shareList.detailUrl(item({ orderType: '餐饮' })), null)
+  assert.equal(shareList.detailUrl(item({ orderType: '雪票', skipassId: 21 })), '/pages/introducer/share/order/order?orderId=55')
+  assert.equal(shareList.detailUrl(item({ orderType: '雪票', skipassId: null })), '/pages/introducer/share/order/order?orderId=55')
+  assert.equal(shareList.detailUrl(item({ orderType: '餐饮' })), '/pages/introducer/share/order/order?orderId=55')
 })
 
 test('选中汇总：笔数、合计按两位小数、30 天前的条数（正好 30 天前不算旧，31 天前算）', () => {

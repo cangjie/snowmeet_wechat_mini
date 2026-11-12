@@ -30,6 +30,10 @@ Page({
     shopObj: null,
     _compactScreen: false,
     _canCloseOrder: false,   // 员工职级 >= 100 才显示「订单关闭」
+    _crossSearchShow: false,
+    _crossCategoryId: null,
+    _crossCategoryName: '',
+    _crossItemId: null,
 
     _orderInfoExpanded: true,
     _paymentDetailExpanded: false,
@@ -835,6 +839,34 @@ Page({
     return !this.data[mapName][key]
   },
 
+  onCrossItemAssign(e) {
+    var ref = this._getItemRef(Number(e.currentTarget.dataset.ridx), Number(e.currentTarget.dataset.iidx))
+    if (!ref || !ref.item.pickup_shop || ref.item.status !== '未发放') return
+    var item = ref.item
+    this.setData({ _crossItemId: item.id })
+    if (item.noCode) {
+      var that = this
+      wx.showModal({ title: '录入租赁物名称', editable: true, content: item.name || '', success: function (res) {
+        if (res.confirm && res.content && res.content.trim()) that._saveCrossItem({ name: res.content.trim() })
+      } })
+    } else {
+      this.setData({ _crossSearchShow: true, _crossCategoryId: item.category_id, _crossCategoryName: item.class_name || '' })
+    }
+  },
+  onCrossSearchClose() { this.setData({ _crossSearchShow: false }) },
+  onCrossProductSelected(e) {
+    var product = e.detail && e.detail.product
+    this.setData({ _crossSearchShow: false })
+    if (product && product.id) this._saveCrossItem({ productId: product.id })
+  },
+  _saveCrossItem(payload) {
+    var that = this
+    var url = app.globalData.requestPrefix + 'Rent/AssignCrossShopItem/' + this.data._crossItemId
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
+    util.performWebRequest(url, payload).then(function (rental) {
+      if (rental && rental.id) { that.refreshStatus(rental); wx.showToast({ title: '已录入', icon: 'success' }) }
+    }).catch(function () { /* 请求层已提示失败原因 */ })
+  },
   onItemPick(e) {
     var that = this
     var id = e.currentTarget.dataset.id
@@ -844,8 +876,9 @@ Page({
       complete: (res) => {
         if (!res.confirm) return
         data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
-          that.refreshStatus(newRental)
-        })
+          // 最后一件发放可能产生首日租金，重新读取订单以同步应收金额。
+          that.getData()
+        }).catch(function () { /* 请求层已提示失败原因 */ })
       }
     })
   },
@@ -861,7 +894,7 @@ Page({
     for (var i = 0; i < rental.rentItems.length; i++) {
       var it = rental.rentItems[i]
       if (it.id == id) continue
-      if (it.status != '已归还' && it.status != '未发放' && it.status != '已更换') {
+      if (!it.noNeed && it.status != '已归还' && it.status != '已更换') {
         allReturned = false
       }
     }
@@ -870,6 +903,7 @@ Page({
         ? '套餐【' + rental.name + '】中的租赁物，即将全部归还，归还后套餐租金自动结算，此操作不可逆。'
         : '即将归还【' + rental.name + '】，租金自动结算，此操作不可逆。')
       : '此操作不可逆。'
+    if (ref.item.pickup_shop) msg = '请确认装备归还至' + ref.item.pickup_shop + '。' + msg
     wx.showModal({
       title: '确认归还',
       content: msg,
@@ -892,7 +926,7 @@ Page({
         if (!res.confirm) return
         data.setRentItemStatsPromise(id, '已发放', app.globalData.sessionKey).then(function (newRental) {
           that.refreshStatus(newRental)
-        })
+        }).catch(function () { /* 请求层已提示失败原因 */ })
       }
     })
   },

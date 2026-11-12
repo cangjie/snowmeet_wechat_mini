@@ -210,6 +210,7 @@
 }
 
 .tag--test    { background: #fee2e2; color: #b91c1c; }
+.tag--cross   { background: #e0e7ff; color: #3730a3; }
 .tag--entertain { background: #fef3c7; color: #92400e; }
 .tag--credit  { background: #fce7f3; color: #9d174d; }
 .tag--discount { background: #d1fae5; color: #065f46; }

@@ -1,106 +1,27 @@
-// pages/admin/ski_pass/reserve_qrcode.js
+// 用正式环境链接生成员工二维码，扫码时由公众平台跳转到小程序。
 const app = getApp()
 Page({
-
-  /**
-   * Page initial data
-   */
-  data: {
-
+  data: { qrUrl: '', bookingUrl: '', error: '', loading: false },
+  onLoad() {
+    return Promise.resolve(app.loginPromiseNew).then(() => this.getQrCode())
+      .catch(() => this.setData({ error: '登录失败，请重试', loading: false }))
   },
-
-  /**
-   * Lifecycle function--Called when page load
-   */
-  onLoad(options) {
-    var that = this
-    app.loginPromiseNew.then(function(resolve){
-      //that.getMemberId()
-      that.getQrCode()
-    })
+  getQrCode() {
+    if (!app.globalData.staff || !app.globalData.sessionKey) {
+      this.setData({ error: '请使用员工账号登录', qrUrl: '', loading: false })
+      return
+    }
+    const staffId = Number(app.globalData.staff.id)
+    if (!Number.isSafeInteger(staffId) || staffId <= 0 || staffId > 2147483647) {
+      this.setData({ error: '员工编号无效', qrUrl: '', bookingUrl: '', loading: false })
+      return
+    }
+    // 固定正式环境域名；公众平台扫码规则将该链接映射到雪票选购页。
+    const bookingUrl = 'https://mini.snowmeet.top/mapp/skipass_book?staffId=' + staffId
+    const url = 'https://' + app.globalData.domainName + '/api/MediaHelper/GetQRCode?qrCodeText=' + encodeURIComponent(bookingUrl)
+    this.setData({ qrUrl: url, bookingUrl, error: '', loading: true })
   },
-
-  /**
-   * Lifecycle function--Called when page is initially rendered
-   */
-  onReady() {
-
-  },
-
-  /**
-   * Lifecycle function--Called when page show
-   */
-  onShow() {
-
-  },
-
-  /**
-   * Lifecycle function--Called when page hide
-   */
-  onHide() {
-
-  },
-
-  /**
-   * Lifecycle function--Called when page unload
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * Page event handler function--Called when user drop down
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * Called when page reach bottom
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * Called when user click on the top right corner to share
-   */
-  onShareAppMessage() {
-
-  },
-  getMemberId(){
-    var that = this
-    var getMemberUrl = 'https://' + app.globalData.domainName + '/core/Member/GetMemberByCell/' + app.globalData.memberInfo.cell + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getMemberUrl,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        var memberId = res.data.id
-        that.setData({memberId})
-        that.getQrCode()
-      }
-    
-    })
-  },
-  getQrCode(){
-    var that = this
-    var memberId = that.data.memberId
-    var scene = 'reserveskipassbystaff_' + app.globalData.staff.id.toString()
-    var getUrl = 'https://wxoa.snowmeet.top/api/OfficialAccountApi/GetOALimitQrCodeBySessionKey?content=' + encodeURIComponent(scene) + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey)
-    wx.request({
-      url: getUrl,
-      method: 'GET',
-      success:(res)=>{
-        if (res.statusCode != 200){
-          return
-        }
-        var qrUrl = res.data
-        that.setData({qrUrl})
-      }
-    })
-  }
-
+  copyLink() { if (this.data.bookingUrl) wx.setClipboardData({ data: this.data.bookingUrl }) },
+  onQrLoad() { this.setData({ loading: false }) },
+  onQrError() { this.setData({ loading: false, error: '小程序码生成失败，请重试' }) }
 })

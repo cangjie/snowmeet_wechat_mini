@@ -57,19 +57,20 @@ for (const page of sub.pages) {
 
 test('修改过的现有组件：WXML 仍然配对，新增的事件处理函数存在', () => {
   for (const f of ['components/reception/ticket_card_selector/ticket_card_selector.wxml', 'components/reception/care_recept_form/care_recept_form.wxml',
-    'components/reception/rent_recept_form/rent_recept_form.wxml', 'pages/mine/mine.wxml', 'pages/admin/admin.wxml']) {
+    'components/reception/rent_recept_form/rent_recept_form.wxml', 'pages/mine/mine.wxml', 'pages/admin/admin.wxml',
+    'pages/introducer/admin/list/list.wxml', 'pages/introducer/share/list/list.wxml']) {
     checkBalanced(fs.readFileSync(path.join(root, f), 'utf8'), f)
   }
   const rentJson = JSON.parse(fs.readFileSync(path.join(root, 'components/reception/rent_recept_form/rent_recept_form.json'), 'utf8'))
   assert.equal(rentJson.usingComponents['ticket-card-selector'], '../ticket_card_selector/ticket_card_selector')
 })
 
-test('入口：管理员菜单有「教练管理」，「我的」页有教练和学员卡入口，登录会话保存 coach', () => {
+test('入口：管理员菜单有分销商管理，「我的」页有分销商和学员卡入口，登录会话保存 coach', () => {
   const adminWxml = fs.readFileSync(path.join(root, 'pages/admin/admin.wxml'), 'utf8')
-  assert.match(adminWxml, /id="coach_admin"[^>]*wx:if="\{\{isAdmin\}\}"/)
-  assert.match(fs.readFileSync(path.join(root, 'pages/admin/admin.js'), 'utf8'), /case 'coach_admin':\s*path = '\/pages\/coach\/admin\/list\/list'/)
+  assert.match(adminWxml, /id="introducer_admin"[^>]*wx:if="\{\{isAdmin\}\}"/)
+  assert.match(fs.readFileSync(path.join(root, 'pages/admin/admin.js'), 'utf8'), /case 'introducer_admin':\s*path = '\/pages\/introducer\/admin\/list\/list'/)
   const mine = fs.readFileSync(path.join(root, 'pages/mine/mine.wxml'), 'utf8')
-  assert.match(mine, /wx:if="\{\{coach\}\}" value="我是教练"/)
+  assert.match(mine, /wx:if="\{\{coach\}\}" value="我是分销商"/)
   assert.match(mine, /wx:if="\{\{hasCoachCard\}\}" value="我的学员卡"/)
   assert.match(fs.readFileSync(path.join(root, 'app.js'), 'utf8'), /app\.globalData\.coach = session\.coach \|\| null/)
 })

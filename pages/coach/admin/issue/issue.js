@@ -31,10 +31,10 @@ Page({
   onSend() {
     const d = this.data
     if (d.sending) return
-    if (!d.coaches.length) { wx.showToast({ title: '请选择要发券的教练', icon: 'none' }); return }
+    if (!d.coaches.length) { wx.showToast({ title: '请选择要发券的分销商', icon: 'none' }); return }
     if (d.tplIdx < 0) { wx.showToast({ title: '请选择券模板', icon: 'none' }); return }
     const tpl = d.templates[d.tplIdx]
-    base.confirm('确认发放', '给 ' + d.coaches.length + ' 位教练各发 ' + d.count + ' 张「' + tpl.name + '」，共 ' + d.coaches.length * d.count + ' 张。', '确认发放').then(ok => {
+    base.confirm('确认发放', '给 ' + d.coaches.length + ' 位分销商各发 ' + d.count + ' 张「' + tpl.name + '」，共 ' + d.coaches.length * d.count + ' 张。', '确认发放').then(ok => {
       if (!ok) return
       this.setData({ sending: true })
       return api.grantCoupons(d.coaches.map(c => c.id), tpl.id, d.count, this.requestId).then(r => {

@@ -427,3 +427,43 @@ test('详情页：链接里的分组已经没有价格了，显示暂无价格�
   assert.deepEqual(page.data.months, [])
   cleanup()
 })
+
+
+test('扫码进雪票页时携带员工并覆盖已有购物车的归属', async () => {
+  const env = setup()
+  env.store.skipass_cart_v1 = { items: [{ key: 'existing', count: 1 }], staffId: '12' }
+  const page = load(SELECTOR, env)
+  page.onLoad({ scene: encodeURIComponent('s=42') })
+  await settle()
+  assert.equal(String(page.data.staffId), '42')
+  assert.equal(String(env.store.skipass_cart_v1.staffId), '42')
+  page.gotoDetail({ currentTarget: { dataset: { key: '1天日场' } } })
+  assert.match(env.navs[env.navs.length - 1], /[?&]staffId=42/)
+  cleanup()
+})
+
+test('小程序已打开时再次扫码，当前选购页也切换到新员工', async () => {
+  const env = setup()
+  env.app.globalData.entryRevision = 3
+  env.app.globalData.skipassQrStaffId = '42'
+  env.store.skipass_cart_v1 = { items: [{ key: 'existing', count: 1 }], staffId: '12' }
+  const page = load(SELECTOR, env)
+  page.onLoad({})
+  page.onShow()
+  await settle()
+  assert.equal(String(page.data.staffId), '42')
+  assert.equal(String(env.store.skipass_cart_v1.staffId), '42')
+  cleanup()
+})
+
+
+test('扫码普通链接能恢复员工并更新购物车归属', async () => {
+  const env = setup()
+  env.store.skipass_cart_v1 = { items: [{ key: 'existing', count: 1 }], staffId: '12' }
+  const page = load(SELECTOR, env)
+  page.onLoad({ q: encodeURIComponent('https://mini.snowmeet.top/mapp/skipass_book?staffId=42') })
+  await settle()
+  assert.equal(String(page.data.staffId), '42')
+  assert.equal(String(env.store.skipass_cart_v1.staffId), '42')
+  cleanup()
+})

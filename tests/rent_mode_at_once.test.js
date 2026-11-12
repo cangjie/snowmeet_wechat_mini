@@ -1,7 +1,7 @@
-// 租赁模式和装备是否当场发放：立即租赁、延时租赁当场发放；先租后取不发放（先计租金，装备稍后取走）。
+// 租赁模式和装备是否当场发放：立即租赁、延时租赁当场发放；先租后取稍后发放。
 // 2026-11-01：旧版的延时租赁是装备当晚交给顾客、明天才开始计费；新版开单页原来选「延时租赁」会把 atOnce 设成 false，
 // 装备开单时不发放；而「先租后取」原来反过来被当成当场发放。现在和旧版一致：
-// 延时租赁当晚发放、明天起计费；先租后取先从现在起计租金、装备稍后由店员发放。起租日期只管从哪天计费。
+// 延时租赁当晚发放、明天起计费；先租后取等待装备全部发放后计费。
 // 后端 EffectRental 按 rentItem.atOnce 决定是否当场发放（SnowmeetApi.Tests/RentalDelayIssueTests.cs 钉住后端那一半）。
 const test = require('node:test')
 const assert = require('node:assert/strict')
@@ -75,13 +75,13 @@ test('套餐选「立即租赁」：当场发放，从现在起计费', () => {
   assert.equal(patches['displayRentals[0].start_date'].slice(0, 10), formatDate(new Date()))
 })
 
-test('套餐选「先租后取」：不发放，从现在起先计租金，装备稍后取走', () => {
+test('套餐选「先租后取」：不当场发放，装备稍后取走', () => {
   const { instance, patches } = loadForm([rentalWithItems([item({ atOnce: true }), item({ id: 2, name: '雪杖', is_associate: true, noCode: true, atOnce: true })])])
   instance.onPkgModeTap({ currentTarget: { dataset: { ridx: 0, mode: 'later' } } })
   assert.equal(patches['displayRentals[0].pick_type'], '先租后取')
   assert.equal(patches['displayRentals[0].atOnce'], false)
   for (const it of patches['displayRentals[0].rentItems']) assert.equal(it.atOnce, false, it.name + ' 不当场发放')
-  assert.equal(patches['displayRentals[0].start_date'].slice(0, 10), formatDate(new Date()), '起租是今天，租金从现在起算')
+  assert.equal(patches['displayRentals[0].start_date'].slice(0, 10), formatDate(new Date()), '预约起租是今天')
 })
 
 test('套餐里自己单独选过模式的装备不会被套餐模式覆盖', () => {

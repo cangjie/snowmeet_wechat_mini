@@ -4,6 +4,8 @@
 const app = getApp()
 const skipassGroup = require('../../utils/skipass_group.js')
 const tabbar = require('../../utils/tabbar.js')
+const cart = require('../../utils/skipass_cart.js')
+const staffScene = require('../../utils/skipass_staff_scene.js')
 
 function safeDecode(value) {
   try {
@@ -48,9 +50,8 @@ Page({
     if (options.memberId) {
       that.setData({ memberId: options.memberId })
     }
-    if (options.staffId) {
-      that.setData({ staffId: options.staffId })
-    }
+    const staffId = staffScene.fromOptions(options) || options.staffId
+    if (staffId) that.applyStaffId(staffId)
     app.loginPromiseNew.then(function () {
       that.setData({
         tabbarItemList: app.globalData.userTabBarItem,
@@ -58,6 +59,21 @@ Page({
       })
       that.getResortArr()
     })
+  },
+
+  // 已打开的小程序再次扫码时，页面可能复用；在显示时接收这次入口的员工。
+  onShow() {
+    const revision = app.globalData.entryRevision
+    const staffId = app.globalData.skipassQrStaffId
+    if (staffId && this._staffEntryRevision !== revision) {
+      this._staffEntryRevision = revision
+      this.applyStaffId(staffId)
+    }
+  },
+  applyStaffId(staffId) {
+    this.setData({ staffId })
+    const existing = cart.load()
+    if (existing.items.length) cart.save(Object.assign({}, existing, { staffId }))
   },
 
   getResortArr() {

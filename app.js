@@ -193,6 +193,7 @@ function startLogin() {
 
 // 店员进入小程序后，第一次落在首页或雪票选购页时自动进管理员菜单；落在其他页面
 // （扫码、分享、付款等指定页面）不适用，不分冷热启动、不分场景。
+const skipassStaffScene = require('./utils/skipass_staff_scene.js')
 const ENTRY_PATHS = ['pages/index/index', 'pages/ski_pass/ski_pass_selector']
 const ADMIN_URL = '/pages/admin/admin'
 
@@ -222,6 +223,7 @@ function routeEntry(options, appRef) {
     const route = currentRoute()
     let target = ''
     if (app.globalData.staff
+      && !app.globalData.skipassQrEntry
       && isEntryPath(app.globalData.entryPath)
       && app.globalData.entryHandledRevision !== revision) {
       app.globalData.entryHandledRevision = revision
@@ -265,6 +267,8 @@ App({
     this.globalData.scene = res.scene
     this.globalData.entryRevision = 1
     this.globalData.entryPath = res.path
+    this.globalData.skipassQrStaffId = res.path && res.path.replace(/^\//, '') === 'pages/ski_pass/ski_pass_selector' ? skipassStaffScene.fromOptions(res.query) : ''
+    this.globalData.skipassQrEntry = !!this.globalData.skipassQrStaffId
     if (isEntryPath(res.path) && res.path.replace(/^\//, '') !== 'pages/index/index') {
       routeEntry({ fromIndex: false }, this)
     }
@@ -309,6 +313,8 @@ App({
     this._hidden = false
     this.globalData.scene = res && res.scene
     this.globalData.entryPath = res && res.path
+    this.globalData.skipassQrStaffId = res && res.path && res.path.replace(/^\//, '') === 'pages/ski_pass/ski_pass_selector' ? skipassStaffScene.fromOptions(res.query) : ''
+    this.globalData.skipassQrEntry = !!this.globalData.skipassQrStaffId
     routeEntry({ fromIndex: false }, this)
   },
 

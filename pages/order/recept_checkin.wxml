@@ -20,7 +20,6 @@
     </block>
 
     <block wx:elif="{{state == 'waiting'}}">
-      <view class="verify-spinner"></view>
       <view class="verify-title">请耐心等待店员开单</view>
       <view class="verify-sub">店员开好单后，本页会自动打开付款页面，请不要关闭</view>
       <view wx:if="{{maskedCell}}" class="verify-sub">已验证手机号 {{maskedCell}}</view>

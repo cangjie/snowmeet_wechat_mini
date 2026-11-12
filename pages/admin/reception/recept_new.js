@@ -352,7 +352,7 @@ Page({
         wx.showToast({ title: '店铺信息未加载，请重试', icon: 'none' });
         return;
       }
-      const priceList = await data.getRentPriceListPromise(shopObj.id, '分类', product.category.id, '门市');
+      const priceList = await data.getRentPriceListPromise(shopObj.id, '分类', product.category.id, '门市', true);
       wx.hideLoading();
 
       const now = new Date();

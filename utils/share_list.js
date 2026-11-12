@@ -19,8 +19,7 @@ function detailUrl(item) {
     case '租赁': return '/pages/admin/rent/rent_order_detail/rent_order_detail?id=' + item.orderId
     case '养护': return '/pages/admin/care/care_order_detail/care_order_detail?id=' + item.orderId
     case '零售': return '/pages/admin/retail/retail_order_detail?id=' + item.orderId
-    case '雪票': return item.skipassId ? '/pages/admin/ski_pass/common_skipass_detail?id=' + item.skipassId : null
-    default: return null
+    default: return item.orderId ? '/pages/introducer/share/order/order?orderId=' + item.orderId : null
   }
 }
 

@@ -195,7 +195,7 @@
 }
 .rent-mode {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 8px;
 }
 .rent-mode-btn {
@@ -215,6 +215,11 @@
 }
 .rent-mode-btn--disabled {
   opacity: 0.4;
+}
+.cross-shop-hint {
+  color: #006495;
+  font-size: 12px;
+  margin-top: 6px;
 }
 
 /* KV row */

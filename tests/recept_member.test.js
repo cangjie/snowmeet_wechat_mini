@@ -405,11 +405,22 @@ test('手机号会员查询未完成时阻止进入业务', () => {
   cleanup(page)
 })
 
+test('万龙服务中心允许进入租赁开单，即使门店旧配置尚未启用租赁', () => {
+  const { page, nav, toasts } = setup(() => VERIFIED)
+  page.onLoad({ walkin: '1' })
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 0, care: 1 } })
+  page.onBizTap(tap({ type: 'rent' }))
+  assert.equal(page.data.rent, 1)
+  assert.match(nav[0], /bizType=rent/)
+  assert.deepEqual(toasts, [])
+  cleanup(page)
+})
+
 test('没选店铺、门店不支持或电话格式不对时不进开单', () => {
   const { page, nav, toasts } = setup(() => VERIFIED)
   page.onLoad({ walkin: '1' })
   page.onBizTap(tap({ type: 'rent' }))
-  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 0, care: 1 } })
+  page.shopSelected({ detail: { shop: '其他门店', sale: 1, rent: 0, care: 1 } })
   page.onBizTap(tap({ type: 'rent' }))
   page.onCellInput({ detail: { value: '12ab' } })
   page.onBizTap(tap({ type: 'retail' }))

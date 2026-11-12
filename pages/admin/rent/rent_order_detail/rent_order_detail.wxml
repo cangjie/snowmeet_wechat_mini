@@ -9,6 +9,7 @@
         <view class="rid-head-title">
           <text class="rid-name">{{rentItem.name || '—'}}</text>
           <view class="chip {{rentItem._statusClass}} rid-badge">{{rentItem._statusLabel}}</view>
+          <view wx:if="{{rentItem.pickup_shop}}" class="chip chip--status-unreturned">异店：{{rentItem.pickup_shop}}</view>
         </view>
         <view class="rid-head-sub">
           <text class="rid-sub-label">编码</text>
@@ -62,6 +63,9 @@
     </view>
 
     <view class="rid-actions" wx:if="{{!readonly && !rentItem.noNeed && !rentItem._replaced}}">
+      <view class="rid-act" wx:if="{{rentItem.pickup_shop && rentItem.status == '未发放'}}" bindtap="onCrossItemAssign" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+        <van-icon name="edit" size="15px" /><text>录入装备</text>
+      </view>
       <view class="rid-act rid-act--primary" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemReturn" data-id="{{rentItem.id}}" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
         <van-icon name="replay" size="15px" /><text>归还</text>
       </view>
@@ -873,4 +877,5 @@
   </view>
 </view>
 
+<search-product-fuzzy show="{{_crossSearchShow}}" category-id="{{_crossCategoryId}}" category-name="{{_crossCategoryName}}" bind:select="onCrossProductSelected" bind:close="onCrossSearchClose" />
 <admin-page-help />

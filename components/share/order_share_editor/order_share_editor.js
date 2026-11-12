@@ -6,8 +6,8 @@ const api = require('../../../utils/introducer_api.js')
 
 const MANAGER_LEVEL = 200
 // 已经提交的（已分账、被拒绝）不能再删
-const REMOVABLE = ['待自动分账', '手动处理']
-const STATE_CLASS = { '待自动分账': 'blue', '手动处理': 'warn', '已分账': 'ok', '被拒绝': 'danger' }
+const REMOVABLE = ['待审核', '待自动分账', '待手动分账', '待银行转账', '手动处理']
+const STATE_CLASS = { '待审核': 'warn', '待自动分账': 'blue', '待手动分账': 'warn', '待银行转账': 'warn', '处理中': 'blue', '手动处理': 'warn', '已分账': 'ok', '被拒绝': 'danger' }
 const ADD_PAGE = '/pages/introducer/share/add/add'
 
 function decorate(s) {
@@ -76,7 +76,7 @@ Component({
     onRemove(e) {
       const id = e.currentTarget.dataset.id
       return new Promise(resolve => {
-        wx.showModal({ title: '删除介绍人分账', content: '删除后这一份分账记录作废，其余分账会按新的合计重新判断自动还是手动。', confirmText: '删除',
+        wx.showModal({ title: '删除分销商分账', content: '删除后这一份分账申请作废。', confirmText: '删除',
           success: res => resolve(!!res.confirm) })
       }).then(ok => {
         if (!ok) return null

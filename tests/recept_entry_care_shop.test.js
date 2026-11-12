@@ -84,3 +84,25 @@ test('万龙体验中心服务端放开养护（care=1）后能开养护单，�
   delete global.wx
 })
 
+test('万龙服务中心的直接接待入口允许租赁', () => {
+  let definition
+  let url
+  global.getApp = () => ({ globalData: {} })
+  global.Page = value => { definition = value }
+  global.wx = { setStorageSync() {}, navigateTo(o) { url = o.url }, showToast() {} }
+  const pagePath = require.resolve('../pages/admin/reception/recept_entry.js')
+  delete require.cache[pagePath]
+  require(pagePath)
+  delete global.Page
+  const page = { data: { ...definition.data }, setData(patch) { Object.assign(this.data, patch) } }
+  for (const [name, method] of Object.entries(definition)) {
+    if (typeof method === 'function') page[name] = method.bind(page)
+  }
+  Object.assign(page.data, { customerName: '测试', customerCell: '13800138000', gender: '男' })
+  page.shopSelected({ detail: { shop: '万龙服务中心', sale: 1, rent: 0, care: 1 } })
+  page.onBizTap({ currentTarget: { dataset: { type: 'rent' } } })
+  assert.equal(page.data.rent, 1)
+  assert.match(url, /bizType=rent/)
+  delete global.getApp
+  delete global.wx
+})

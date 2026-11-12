@@ -30,6 +30,8 @@
     </view>
   </view>
 
+  <order-share-editor wx:if="{{order.id}}" order-id="{{order.id}}" />
+
   <!-- B 顾客信息 -->
   <view class="card">
     <view class="sub-title-row">

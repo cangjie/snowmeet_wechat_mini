@@ -1,11 +1,23 @@
 // 顾客扫码报到页（pages/order/recept_checkin）：验证手机号 → 等待开单 → 微信支付自动跳付款页 / 支付宝只提示
 const test = require('node:test')
 const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const path = require('node:path')
 const { loadPage, settle } = require('./reception_harness.js')
 
 const PAGE = 'pages/order/recept_checkin.js'
 const CODE = 'rc_abcdefghij_9'
 const Q = encodeURIComponent('https://mini.snowmeet.top/mapp/recept_checkin?code=' + CODE)
+
+test('等待店员开单时不显示转圈，识别身份时仍显示加载提示', () => {
+  const wxml = fs.readFileSync(path.join(__dirname, '../pages/order/recept_checkin.wxml'), 'utf8')
+  const loading = wxml.match(/<block wx:if="\{\{state == 'loading'\}\}">([\s\S]*?)<\/block>/)[1]
+  const waiting = wxml.match(/<block wx:elif="\{\{state == 'waiting'\}\}">([\s\S]*?)<\/block>/)[1]
+  assert.match(loading, /verify-spinner/)
+  assert.doesNotMatch(waiting, /verify-spinner/)
+  assert.match(waiting, /请耐心等待店员开单/)
+  assert.match(waiting, /本页会自动打开付款页面/)
+})
 
 function setup(fake) {
   const calls = { scan: [], verify: [], poll: 0 }

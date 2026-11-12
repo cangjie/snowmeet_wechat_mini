@@ -12,6 +12,7 @@ const OK = data => ({ code: 0, message: '', data })
 const ERR = (code, message) => ({ code, message, data: null })
 const FILE = 'pages/introducer/share/list/list.js'
 const MANAGER = { valid: 1, title_level: 200 }
+const ADMIN = { valid: 1, title_level: 300 }
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8')
 
 function ymd(offsetDays) {
@@ -23,7 +24,7 @@ function ymd(offsetDays) {
 
 const ITEM = over => Object.assign({
   orderShareId: 1, orderId: 11, orderCode: 'WT_ZL_261031_00001', shop: '万龙体验中心', orderType: '租赁', payee: '李教练', amount: 40, applicant: '苍杰',
-  mode: '手动', manualReason: '设为手动', status: '未分', planDate: ymd(2), sharedTime: null, batch: null, selectable: true, skipassId: null, listDate: ymd(0)
+  mode: '银行转账', manualReason: null, status: '未分', planDate: ymd(2), sharedTime: null, batch: null, selectable: true, skipassId: null, listDate: ymd(0)
 }, over)
 
 const ITEMS = [
@@ -69,7 +70,7 @@ function backend(all, overrides) {
 }
 
 async function open(t, all = ITEMS, overrides) {
-  const env = setup(t, { staff: MANAGER, handler: backend(all, overrides) })
+  const env = setup(t, { staff: ADMIN, handler: backend(all, overrides) })
   const page = loadPage(FILE, {})
   await page.onLoad({})
   await settle()
@@ -81,8 +82,22 @@ test('店员（职级 100）进来被挡，不发请求', async t => {
   const page = loadPage(FILE, {})
   await page.onLoad({})
   await settle()
-  assert.equal(page.data.blocked, '只有店长以上可以查看和处理分账')
+  assert.equal(page.data.blocked, '只有店长以上可以查看分账')
   assert.equal(env.calls.length, 0)
+})
+
+test('分销商入口只查询分销商并可按类别筛选，显示申请日期和自动设置', async t => {
+  const env = setup(t, { staff: MANAGER, handler: backend(ITEMS) })
+  const page = loadPage(FILE, {})
+  await page.onLoad({ distributors: '1' })
+  await settle()
+  assert.equal(env.calls.find(c => c.action === 'List').params.distributorOnly, 'true')
+  await page.onDistributorType(tap({ value: 'KOL' }))
+  assert.equal(env.calls.filter(c => c.action === 'List').at(-1).params.distributorType, 'KOL')
+  const wxml = read('pages/introducer/share/list/list.wxml')
+  assert.match(wxml, /item\.applicationDate/)
+  assert.match(wxml, /item\.autoShare/)
+  assert.match(wxml, /已人工记账/)
 })
 
 test('进来默认：未分 + 近 30 天 + 第 1 页，列表和合计显示出来', async t => {
@@ -161,7 +176,7 @@ test('勾选：只有可勾选的能勾；笔数合计跟着变；全选可选�
   assert.equal(page.data.selectedCount, 0)
 })
 
-test('点条目：租赁、养护、零售、雪票各跳自己的详情页；雪票没有雪票 id 时提示不跳', async t => {
+test('点条目：租赁、养护、零售跳订单详情；雪票按订单 id 跳分账页', async t => {
   const noSki = ITEM({ orderShareId: 9, orderType: '雪票', skipassId: null, selectable: false })
   const { env, page } = await open(t, [...ITEMS, noSki])
   page.onItem(tap({ id: 1 }))
@@ -171,12 +186,11 @@ test('点条目：租赁、养护、零售、雪票各跳自己的详情页；�
   assert.deepEqual(env.nav, [
     '/pages/admin/rent/rent_order_detail/rent_order_detail?id=11',
     '/pages/admin/care/care_order_detail/care_order_detail?id=12',
-    '/pages/admin/ski_pass/common_skipass_detail?id=21',
+    '/pages/introducer/share/order/order?orderId=13',
     '/pages/admin/retail/retail_order_detail?id=14'
   ])
   page.onItem(tap({ id: 9 }))
-  assert.equal(env.nav.length, 4)
-  assert.equal(env.toasts.pop(), '没有找到对应的雪票')
+  assert.equal(env.nav[4], '/pages/introducer/share/order/order?orderId=11')
 })
 
 test('点「分账」：没勾选提示；勾选后弹窗显示笔数、合计、30 天前的条数，并预填默认批次号', async t => {
@@ -211,7 +225,7 @@ test('确定：发 CompleteManual，成功后关弹窗、清勾选、重新加�
   assert.equal(page.data.modal.show, false)
   assert.equal(page.data.selectedCount, 0)
   assert.equal(page.data.submitting, false)
-  assert.equal(env.toasts.pop(), '已记账 2 笔，批次 MS-MINE-1')
+  assert.equal(env.toasts.pop(), '银行转账已记账 2 笔，批次 MS-MINE-1')
   assert.equal(lists().length, 2)                                  // 记完重新读了一次第 1 页
   assert.equal(lists()[1].params.pageIndex, '1')
 })
@@ -247,7 +261,7 @@ test('界面结构：筛选条、搜索、列表项可点、可勾选项有复�
   assert.match(wxml, /wx:for="\{\{items\}\}"[^>]*bindtap="onItem"/)
   assert.match(wxml, /catchtap="onToggle"/)
   assert.match(wxml, /bindtap="onSelectAll"/)
-  assert.match(wxml, /bindtap="onOpenModal"[^>]*>分账/)
+  assert.match(wxml, /bindtap="onOpenModal"[^>]*>银行转账记账/)
   assert.match(wxml, /<input[^>]*value="\{\{modal\.batchNo\}\}"[^>]*bindinput="onBatchNo"/)
   assert.match(wxml, /bindtap="onCancelModal"/)
   assert.match(wxml, /bindtap="onConfirm"/)

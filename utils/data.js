@@ -2,8 +2,9 @@ const util = require('./util.js')
 const adminAssistant = require('./adminAssistant.js')
 const app = getApp()
 //获取租赁套餐列表
-const getPackageListPromise = function (shop) {
+const getPackageListPromise = function (shop, fallbackExperience) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPackageList' + (shop ? ('?shop=' + encodeURIComponent(shop)) : '')
+  if (fallbackExperience) getUrl += (shop ? '&' : '?') + 'fallbackExperience=true'
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (packages) {
       resolve(packages)
@@ -190,8 +191,9 @@ const getEnumListPromise = function (type) {
     })
   })
 }
-const getRentPriceListPromise = function (shopId, type, id, scene) {
+const getRentPriceListPromise = function (shopId, type, id, scene, fallbackExperience) {
   var getUrl = app.globalData.requestPrefix + 'Rent/GetRentPriceList/' + shopId + '?type=' + encodeURIComponent(type) + '&id=' + id.toString() + '&scene=' + encodeURIComponent(scene)
+  if (fallbackExperience) getUrl += '&fallbackExperience=true'
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (list) {
       resolve(list)
@@ -455,7 +457,7 @@ const getOrdersByStaffPromise = function (orderId, shop, memberId, staffId, type
     })
   })
 }
-const getRentOrdersByStaffPagedPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey, cell, haveWarranty, retailType, keyword, isSummerCare, rentCategoryId, rentItemName, useCard, rentStatus, hasRetail, pageIndex, pageSize) {
+const getRentOrdersByStaffPagedPromise = function (orderId, shop, memberId, staffId, type, startDate, endDate, payOption, isTest, isEntertain, isPackage, isOnCredit, haveDiscount, status, sessionKey, cell, haveWarranty, retailType, keyword, isSummerCare, rentCategoryId, rentItemName, useCard, rentStatus, hasRetail, pageIndex, pageSize, crossShopOnly) {
   var qUrl = app.globalData.requestPrefix + 'Order/GetOrdersByStaffPaged?sessionKey=' + sessionKey
   if (orderId != null) { qUrl += '&orderId=' + orderId }
   if (shop != null) { qUrl += '&shop=' + encodeURIComponent(shop) }
@@ -480,6 +482,7 @@ const getRentOrdersByStaffPagedPromise = function (orderId, shop, memberId, staf
   if (rentItemName != null) { qUrl += '&rentItemName=' + rentItemName }
   if (useCard != null) { qUrl += '&useCard=' + useCard }
   if (hasRetail != null) { qUrl += '&hasRetail=' + hasRetail }
+  if (crossShopOnly) { qUrl += '&crossShopOnly=true' }
   qUrl += '&pageIndex=' + (pageIndex || 1)
   qUrl += '&pageSize=' + (pageSize || 10)
   return new Promise(function (resolve, reject) {

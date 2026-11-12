@@ -156,7 +156,8 @@
         "admin/list/list",
         "admin/add/add",
         "share/add/add",
-        "share/list/list"
+        "share/list/list",
+        "share/order/order"
       ]
     },
     {

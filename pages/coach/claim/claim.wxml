@@ -41,29 +41,29 @@
   <view wx:elif="{{state === 'taken'}}" class="center">
     <view class="state-icon gray">!</view>
     <view class="big-title">这张学员卡已被领取</view>
-    <view class="card-meta" style="margin-top: 12rpx;">每张卡只能一位学员领取，请向教练再要一张。</view>
+    <view class="card-meta" style="margin-top: 12rpx;">每张卡只能一位顾客领取，请向分销商再要一张。</view>
   </view>
 
   <!-- 已失效 -->
   <view wx:elif="{{state === 'invalid'}}" class="center">
     <view class="state-icon warn">×</view>
     <view class="big-title">这张学员卡已失效</view>
-    <view class="card-meta" style="margin-top: 12rpx;">可能已被教练撤销或已过期，请联系教练重新发送。</view>
+    <view class="card-meta" style="margin-top: 12rpx;">可能已被分销商撤销或已过期，请联系分销商重新发送。</view>
   </view>
 
-  <!-- 教练本人 -->
+  <!-- 分销商本人 -->
   <view wx:elif="{{state === 'self'}}" class="center">
     <view class="state-icon info">i</view>
     <view class="big-title">这是你发出的学员卡</view>
-    <view class="card-meta" style="margin: 12rpx 0 28rpx;">转发给你的学员即可，教练本人不能领取。</view>
-    <view class="btn primary" bindtap="onGoCoach">回到教练中心</view>
+    <view class="card-meta" style="margin: 12rpx 0 28rpx;">转发给你的顾客即可，分销商本人不能领取。</view>
+    <view class="btn primary" bindtap="onGoCoach">回到分销商中心</view>
   </view>
 
-  <!-- 已有该教练的卡 -->
+  <!-- 已有该分销商的卡 -->
   <view wx:elif="{{state === 'already_has'}}" class="center">
     <view class="state-icon info">i</view>
     <view class="big-title">你已有{{coachName}}的学员卡</view>
-    <view class="card-meta" style="margin: 12rpx 0 28rpx;">本雪季每位教练的卡只能领取一张，有效期至 {{validUntil}}。</view>
+    <view class="card-meta" style="margin: 12rpx 0 28rpx;">本雪季每位分销商的卡只能领取一张，有效期至 {{validUntil}}。</view>
     <view class="btn primary" bindtap="onGoMine">查看我的学员卡</view>
   </view>
 </view>

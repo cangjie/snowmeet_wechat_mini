@@ -210,7 +210,7 @@ test('教练中心：不是教练被挡；发卡后分享路径来自服务端�
     }[a] || (() => OK({})))()
   })
   const page = s.load('pages/coach/home/home.js'); page.onLoad(); await settle()
-  assert.match(page.data.blocked, /还不是教练/)
+  assert.match(page.data.blocked, /还不是分销商/)
 
   isCoach = true; page.onLoad(); await settle()
   assert.equal(page.data.blocked, ''); assert.equal(page.data.coach.name, '张教练')

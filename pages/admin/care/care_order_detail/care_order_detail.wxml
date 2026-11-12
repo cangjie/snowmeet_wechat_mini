@@ -77,6 +77,8 @@
     <text class="info-label">含卡订单不退款；取消养护返还实际扣减次数</text>
   </view>
 
+  <order-share-editor wx:if="{{order.id}}" order-id="{{order.id}}" />
+
   <!-- B 支付信息 -->
   <!-- 与租赁详情页同款：2×2 摘要格 + 可折叠支付明细表（代付标红 + 脱敏手机号） -->
   <view class="card">
