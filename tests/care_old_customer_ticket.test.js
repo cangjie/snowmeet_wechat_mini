@@ -9,13 +9,17 @@ function care(id, patch) {
   return { id, equipment: '双板', brand: '测试', scale: '170', need_edge: 1, need_wax: 1,
     need_unwax: 1, edge_degree: '89', discount: 0, ...patch };
 }
-function setup(t, fetch, cares = [care(1)], calculate) {
+function punch(id, patch) {
+  return { id, biz_type: '养护', card_name: '养护单项次卡', total: 5, punches: 1, remaining: 4, isSeason: false, ...patch };
+}
+function setup(t, fetch, cares = [care(1)], calculate, cards = []) {
   const previous = global.getApp;
   global.getApp = () => ({ globalData: { sessionKey: 'staff' }, loginPromiseNew: Promise.resolve() });
   t.after(() => { global.getApp = previous; });
-  const prices = [], requests = [];
+  const prices = [], requests = [], cardRequests = [];
   const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {
     getMemberTicketsPromise: (...args) => { requests.push(args); return fetch(...args); },
+    getMemberCardsPromise: (...args) => { cardRequests.push(args); return typeof cards === 'function' ? cards(...args) : Promise.resolve(cards); },
     calcCareChargePromise: async req => {
       prices.push(req);
       if (calculate) return calculate(req);
@@ -23,7 +27,7 @@ function setup(t, fetch, cares = [care(1)], calculate) {
     }
   });
   Object.assign(form.data, { memberId: 10, shop: '测试店', cares });
-  return { form, prices, requests };
+  return { form, prices, requests, cardRequests };
 }
 
 test('自动选中可用老顾客券并重新计费，已选项目、维修和较大手动减免保留', async t => {
@@ -147,4 +151,80 @@ test('捆绑次卡清空旧券后，迟到的普通计价不能恢复旧券优�
   assert.equal(form.data.displayCares[0].ticket_code, null);
   assert.equal(form.data.displayCares[0].discount, 0);
   assert.equal(form.data.displayCares[0].common_charge, 0);
+});
+
+const noService = { need_edge: 0, need_wax: 0, need_unwax: 0, edge_degree: null };
+
+test('顾客有可用次卡时优先选次卡而不是老顾客券，还没选项目就按卡推导服务', async t => {
+  const { form, prices, cardRequests } = setup(t, async () => [ticket('OLD')], [care(1, noService)],
+    req => ({ care: { ...req.care, need_edge: 1, need_wax: 1, need_unwax: 1, edge_degree: '89', common_charge: 0 } }),
+    [punch(7, { card_name: '养护双项次卡' })]);
+  form._refreshCares(); await settle();
+  const selected = form.data.displayCares[0];
+  assert.deepEqual(cardRequests, [[10, '养护', 'staff']]);
+  assert.equal(selected.use_card, true); assert.equal(selected.card_id, 7); assert.equal(selected.card_name, '养护双项次卡');
+  assert.equal(selected.ticket_code, null); assert.equal(selected.ticket, null);
+  assert.equal(prices.length, 1); assert.equal(prices[0].deriveServices, true);
+  assert.equal(prices[0].care.card_id, 7); assert.equal(prices[0].care.ticket_code, null);
+  assert.equal(selected.need_edge, 1); assert.equal(selected.need_wax, 1); assert.equal(selected.need_unwax, 1);
+  assert.equal(form.events.at(-1).detail.cares[0].card_id, 7);
+});
+
+test('已经选了养护项目时选次卡保留项目、维修和手动减免，不让服务端重新推导', async t => {
+  const { form, prices } = setup(t, async () => [ticket('OLD')], [
+    care(1, { need_repair: 1, repair_memo: '维修', repair_charge: 5, discount: 30 })
+  ], undefined, [punch(7)]);
+  form._refreshCares(); await settle();
+  const selected = form.data.displayCares[0];
+  assert.equal(selected.card_id, 7); assert.equal(selected.ticket_code, null);
+  assert.equal(selected.need_edge, 1); assert.equal(selected.need_wax, 1); assert.equal(selected.need_unwax, 1);
+  assert.equal(selected.repair_memo, '维修'); assert.equal(selected.repair_charge, 5); assert.equal(selected.discount, 30);
+  assert.equal(prices.length, 1); assert.equal(prices[0].deriveServices, false);
+});
+
+test('次卡按开卡先后用，每件装备占一次，用完的卡和本单别的装备已占的次数都扣掉，没卡了回退老顾客券', async t => {
+  const { form } = setup(t, async () => [ticket('OLD')],
+    [care(1, { use_card: true, card_id: 3 }), care(2), care(3), care(4)], undefined,
+    [punch(9, { remaining: 5 }), punch(3, { remaining: 2 }), punch(5, { remaining: 0, punches: 5 })]);
+  form._refreshCares(); await settle();
+  assert.deepEqual(form.data.displayCares.map(c => c.card_id || null), [3, 3, 9, 9]);
+  assert.deepEqual(form.data.displayCares.map(c => c.ticket_code || null), [null, null, null, null]);
+  const one = setup(t, async () => [ticket('OLD')], [care(1), care(2)], undefined, [punch(3, { remaining: 1 })]).form;
+  one._refreshCares(); await settle();
+  assert.deepEqual(one.data.displayCares.map(c => c.card_id || null), [3, null]);
+  assert.deepEqual(one.data.displayCares.map(c => c.ticket_code || null), [null, 'OLD']);
+});
+
+test('季卡、机打蜡卡、已退款卡、别人的卡和非养护卡不自动选，仍带老顾客券', async t => {
+  const { form } = setup(t, async () => [ticket('OLD')], [care(1)], undefined, [
+    punch(1, { total: null, remaining: null, isSeason: true, card_name: '养护季卡' }),
+    punch(2, { card_name: '机打蜡次卡' }), punch(3, { is_refund: true }), punch(4, { member_id: 99 }),
+    punch(5, { biz_type: '租赁' })]);
+  form._refreshCares(); await settle();
+  const selected = form.data.displayCares[0];
+  assert.equal(selected.ticket_code, 'OLD'); assert.ok(!selected.use_card); assert.ok(!selected.card_id);
+});
+
+test('机打蜡和非雪季养护不自动选次卡，仍只带老顾客券', async t => {
+  const wx = global.wx; global.wx = { showToast() {} }; t.after(() => { global.wx = wx; });
+  const { form } = setup(t, async () => [ticket('A'), ticket('B', '2027-02-01')],
+    [care(1, { free_wax: 1, need_edge: 0, need_wax: 0, need_unwax: 0 }), care(2, { summer: 'now' }),
+      care(3, { maintain_board: 1 })], undefined, [punch(7)]);
+  form._refreshCares(); await settle();
+  assert.ok(form.data.displayCares.every(c => !c.card_id && !c.use_card));
+  // 临近到期的先用；养板只认老顾客券，所以第三件没有券可带就空着，不是被次卡占了
+  assert.deepEqual(form.data.displayCares.map(c => c.ticket_code || null), ['B', 'A', null]);
+});
+
+test('次卡列表读取失败不挡开单，照旧带老顾客券；手选不使用后不再自动换成次卡', async t => {
+  const failed = setup(t, async () => [ticket('OLD')], [care(1)], undefined, () => Promise.reject(new Error('offline')));
+  const warn = console.warn; console.warn = () => {}; t.after(() => { console.warn = warn; });
+  failed.form._refreshCares(); await settle();
+  assert.equal(failed.form.data.displayCares[0].ticket_code, 'OLD');
+  const { form } = setup(t, async () => [ticket('OLD')], [care(1)], undefined, [punch(7)]);
+  form._refreshCares(); await settle();
+  form._applyTicketSelection(0, null, null); await settle();
+  form.data.cares.push(care(2)); form._refreshCares(); await settle();
+  assert.equal(form.data.displayCares[0].card_id, null); assert.equal(form.data.displayCares[0].ticket_code, null);
+  assert.equal(form.data.displayCares[1].card_id, 7);
 });

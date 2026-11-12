@@ -32,6 +32,25 @@ function isScrapeOnlyCare(care, shop) {
     && !care.summer && !care.warranty && !care.entertain;
 }
 
+// 自动带出的次卡：只取按次数计的次卡，且还有剩余次数。
+// 不限次数的季卡（含机打蜡季卡）有绑定装备、每天限一次等自己的规则，仍由店员手选或机打蜡联动处理；
+// 卡名含「机打蜡」的卡推导出来的是机打蜡服务，也不在自动带出之列。按开卡先后用（id 小的先用）。
+function autoPunchCards(cards, memberId) {
+  return (cards || []).map(card => {
+    if (!card || !card.id || card.is_refund || card.isSeason || card.total == null) return null;
+    if (card.member_id != null && Number(card.member_id) !== memberId) return null;
+    if (card.biz_type && card.biz_type !== '养护') return null;
+    const name = card.card_name || '';
+    if (name.indexOf('季卡') >= 0 || name.indexOf('机打蜡') >= 0) return null;
+    const remaining = card.remaining != null ? Number(card.remaining) : Number(card.total) - Number(card.punches || 0);
+    return remaining > 0 ? { card, remaining } : null;
+  }).filter(Boolean).sort((a, b) => Number(a.card.id) - Number(b.card.id));
+}
+
+function hasChosenService(care) {
+  return care.need_edge === 1 || care.need_wax === 1 || care.need_unwax === 1 || care.free_wax === 1 || !!care.summer;
+}
+
 // 新建一个空 care（snake_case 对齐后端；valid=0 草稿态，PlaceCareOrder 才置 1）
 function blankCare() {
   return {
@@ -1056,22 +1075,46 @@ Component({
       if (!state) {
         state = { memberId };
         this._oldCustomerTicketState = state;
-        state.promise = this._getMemberCareTickets(memberId).promise
+        // 次卡优先于老顾客券：卡列表读不出来不挡开单，当作没有次卡，照旧带老顾客券。
+        const cardsLoad = this._getMemberCareCards(memberId).promise
+          .then(cards => autoPunchCards(cards, memberId))
+          .catch(e => { console.warn('load punch cards for auto select failed', e); return []; });
+        const ticketsLoad = this._getMemberCareTickets(memberId).promise
           .then(tickets => (tickets || []).filter(t => t && Number(t.template_id) === 16 && t.code
             && (t.member_id == null || Number(t.member_id) === memberId))
             .sort((a, b) => (a.expire_date || '9999') < (b.expire_date || '9999') ? -1
-              : (a.expire_date || '9999') > (b.expire_date || '9999') ? 1 : 0))
+              : (a.expire_date || '9999') > (b.expire_date || '9999') ? 1 : 0));
+        state.promise = Promise.all([ticketsLoad, cardsLoad])
+          .then(([tickets, cards]) => ({ tickets, cards }))
           .catch(e => { if (this._oldCustomerTicketState === state) this._oldCustomerTicketState = null; throw e; });
       }
-      const tickets = await state.promise;
+      const { tickets, cards } = await state.promise;
       if (this._oldCustomerTicketState !== state || Number(this.data.memberId) !== memberId || this._autoTicketBlocked()) return;
       const used = new Set(this.data.displayCares.map(c => c.ticket_code).filter(Boolean));
+      // 每件装备用一次，每张卡还能用几件：剩余次数减去本单别的装备已经占用的。
+      const left = {};
+      cards.forEach(({ card, remaining }) => {
+        left[card.id] = remaining - this.data.displayCares
+          .filter(c => !c.is_cancel && c.use_card && Number(c.card_id) === Number(card.id)).length;
+      });
       const updated = [];
       const cares = this.data.displayCares.map((care, i) => {
         if (!eligible(care, i)) return care;
+        // 机打蜡、非雪季养护、养板不走次卡（服务端不让次卡抵扣非雪季；养板只认老顾客券，选了卡会被清掉），
+        // 这几类仍只带老顾客券。
+        const noCard = care.free_wax === 1 || care.summer || care.maintain_board;
+        const picked = noCard ? null : cards.find(({ card }) => left[card.id] > 0);
+        if (picked) {
+          left[picked.card.id] -= 1;
+          // 还没选服务项：和手选次卡一样按卡推导（双项卡带出修刃+热蜡+刮蜡）；
+          // 已经选了：只换权益，保留店员选的项目、维修和手动减免，不够的部分由服务端补差。
+          updated.push({ i, derive: !hasChosenService(care) });
+          return { ...care, ticket: null, ticket_code: null, use_card: true, card_id: picked.card.id,
+            card_name: picked.card.card_name, card_equip_lock: false, card_pending_open: false };
+        }
         const ticket = tickets.find(t => !used.has(t.code));
         if (!ticket) return care;
-        used.add(ticket.code); updated.push(i);
+        used.add(ticket.code); updated.push({ i, derive: false });
         // 自动带券只改变券选择，保留店员已选项目、维修和手动减免。
         return { ...care, ticket, ticket_code: ticket.code };
       });
@@ -1079,7 +1122,7 @@ Component({
       this.data.cares = cares;
       this._refreshCares();
       this._emitSync(true);
-      this._oldCustomerPricePromise = Promise.all(updated.map(i => this._fetchPrice(i)));
+      this._oldCustomerPricePromise = Promise.all(updated.map(({ i, derive }) => this._fetchPrice(i, derive ? { derive: true } : undefined)));
       await this._oldCustomerPricePromise;
     },
     onTicketTap(e) {
