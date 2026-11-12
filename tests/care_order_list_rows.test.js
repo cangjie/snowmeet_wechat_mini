@@ -763,12 +763,14 @@ test('单项备注只跟着自己那件装备走，不和整单备注混在一�
 
 test('模板：整单备注在订单信息下面、装备明细上面；单项备注在装备块里、金额 / 减免下面；都没写就不显示', () => {
   const orderMemo = cardBlock.match(/<view wx:if="\{\{item\.memo\}\}"[^>]*>[\s\S]*?<\/view>/)[0]
-  assert.match(orderMemo, /整单备注/)
+  assert.match(orderMemo, /备注：/)
+  assert.doesNotMatch(orderMemo, /整单备注/, '订单信息区里的备注，标签直接写「备注：」，位置已经说明是整单的')
   assert.match(orderMemo, /\{\{item\.memo\}\}/)
   assert.ok(cardBlock.indexOf('class="info-grid"') < cardBlock.indexOf(orderMemo), '整单备注应在订单信息区下面')
   assert.ok(cardBlock.indexOf(orderMemo) < cardBlock.indexOf('class="care-section"'), '整单备注应在装备明细上面')
   const careMemo = cardBlock.match(/<view wx:if="\{\{cr\.memo\}\}"[^>]*>[\s\S]*?<\/view>/)[0]
-  assert.match(careMemo, /单项备注/)
+  assert.match(careMemo, /备注：/)
+  assert.doesNotMatch(careMemo, /单项备注/, '装备块里的备注，标签直接写「备注：」，位置已经说明是这件装备的')
   assert.match(careMemo, /\{\{cr\.memo\}\}/)
   const amount = cardBlock.indexOf('class="care-amount"')
   assert.ok(amount > 0 && cardBlock.indexOf(careMemo) > amount, '单项备注应在金额 / 减免下面')
