@@ -36,10 +36,16 @@ test('标签列：不再有「会 / 散」，改成「新」，且只在后端�
   assert.ok(m, '应有 <text wx:if="{{item.isNewCareCustomer}}" class="tag tag--new">新</text>')
 })
 
-test('标签列：原有的其它标签都还在（测 招 单 挂 减 质 非 卡 券）', () => {
-  for (const t of ['tag--test', 'tag--entertain', 'tag--single', 'tag--credit', 'tag--discount', 'tag--warranty', 'tag--summer', 'tag--card', 'tag--ticket']) {
+test('标签列：原有的其它标签都还在（测 招 挂 减 质 非 卡 券）', () => {
+  for (const t of ['tag--test', 'tag--entertain', 'tag--credit', 'tag--discount', 'tag--warranty', 'tag--summer', 'tag--card', 'tag--ticket']) {
     assert.ok(tagCol.includes(t), '标签列缺少 ' + t)
   }
+})
+
+test('标签列：不再有「单」（is_package == 0 是非复合订单，养护单全是，没有区分作用；双板 / 单板由装备块的图标表示）', () => {
+  assert.ok(!tagCol.includes('tag--single'), '标签列里不应再有「单」标签')
+  assert.ok(!tagCol.includes('is_package'), '标签列里不应再按 is_package 显示标签')
+  assert.ok(!/\.tag--single/.test(fs.readFileSync(path.join(__dirname, '..', 'pages/admin/care/care_order_list.wxss'), 'utf8')), '样式里也不留「单」标签的规则')
 })
 
 test('页面不再计算 memberShip（会/散），也不再有这个字段', () => {
