@@ -68,12 +68,12 @@
         <text class="line-label">今日养护雪板数量</text>
         <text class="line-num">{{report.activity.worked}}</text>
       </view>
-      <view class="stat-hint">当天有过操作（任务开始或完成，含安全检查）的雪板，完成的和没完成的都算</view>
+      <view class="stat-hint">当天做过养护工序（开始或完成，含安全检查；发板不算）的雪板，完成的和没完成的都算</view>
       <view class="line-row">
         <text class="line-label">待完成里今天没有操作的</text>
         <text class="line-num line-num--warn">{{report.activity.idlePending}}</text>
       </view>
-      <view class="stat-hint">工序还没做完、而且今天一次操作都没有的雪板，也就是压着没人动的</view>
+      <view class="stat-hint">工序还没做完、而且今天一道养护工序都没动过的雪板，也就是压着没人动的</view>
     </view>
 
     <!-- 工序数量 -->
