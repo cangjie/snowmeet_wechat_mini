@@ -57,7 +57,8 @@
         </view>
       </view>
       <view wx:if="{{report.flow.hasCanceled}}" class="stat-note">完成里包含取消 {{report.flow.canceled}} 块</view>
-      <view class="stat-hint">初始待完成指当天 00:00 时已经收下、还没发板的；完成指发板（或取消）</view>
+      <view class="stat-hint">初始待完成指当天 00:00 时已经收下、工序还没做完的；工序都做完、只差发板就算完成（取消也算）</view>
+      <view class="stat-hint">不统计：非雪季养护、2026-04-30 以前开的单、测试单</view>
     </view>
 
     <!-- 今日养护雪板 -->
@@ -72,7 +73,7 @@
         <text class="line-label">待完成里今天没有操作的</text>
         <text class="line-num line-num--warn">{{report.activity.idlePending}}</text>
       </view>
-      <view class="stat-hint">还没完成、而且今天一次操作都没有的雪板，也就是压着没人动的</view>
+      <view class="stat-hint">工序还没做完、而且今天一次操作都没有的雪板，也就是压着没人动的</view>
     </view>
 
     <!-- 工序数量 -->

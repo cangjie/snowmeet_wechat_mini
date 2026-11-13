@@ -211,4 +211,7 @@ test('模板：进出四个数、今日养护雪板数量、无操作的待完�
     assert.match(js, new RegExp('\\n  ' + m[1] + '\\('), '页面里没有定义 ' + m[1])
   }
   assert.match(wxml, /<picker mode="date" value="\{\{date\}\}" end="\{\{today\}\}"/)   // 不能选将来的日期
+  // 口径说明写在页面上：只差发板算完成；非雪季养护、老单、测试单不统计
+  assert.ok(wxml.includes('只差发板就算完成'), '进出统计要说明「只差发板算完成」')
+  assert.ok(wxml.includes('不统计：非雪季养护、2026-04-30 以前开的单、测试单'), '要说明哪些装备不统计')
 })
