@@ -67,7 +67,7 @@ function staffCounts(staff, key) {
     }))
     .filter(p => p.count > 0)
     .sort((a, b) => (b.count - a.count) || (a.id === 0 ? 1 : 0) - (b.id === 0 ? 1 : 0) || a.name.localeCompare(b.name, 'zh'))
-    .map(p => ({ name: p.name, count: p.count }))
+    .map(p => ({ id: p.id, name: p.name, count: p.count }))
 }
 
 function buildWorkloadView(stat) {
@@ -108,4 +108,90 @@ function buildWorkloadView(stat) {
   }
 }
 
-module.exports = { PROCESSES, buildWorkloadView, shiftDate, weekdayOf, staffCounts }
+// ---- 点数字看明细 ----
+
+// 每个数叫什么（明细页的标题）；工序类的在后面加「数量」
+const BOARD_METRICS = {
+  initialPending: '初始待完成',
+  added: '新增',
+  completed: '完成',
+  pending: '待完成',
+  idlePending: '待完成里今天没有操作的',
+  worked: '今日养护雪板'
+}
+
+function isProcess(metric) {
+  return PROCESSES.some(p => p.key === metric)
+}
+
+// 明细页标题：「待完成」「修刃数量」「修刃数量 · 王政」
+function metricTitle(metric, staffName) {
+  if (BOARD_METRICS[metric]) return BOARD_METRICS[metric]
+  const p = PROCESSES.filter(x => x.key === metric)[0]
+  if (!p) return ''
+  return p.label + '数量' + (staffName ? ' · ' + staffName : '')
+}
+
+// 明细页地址。小程序的页面参数不会自动解码，所以这里编码、页面 onLoad 里解码
+function itemsUrl(q) {
+  const parts = ['metric=' + encodeURIComponent(q.metric), 'date=' + encodeURIComponent(q.date || '')]
+  if (q.shop) parts.push('shop=' + encodeURIComponent(q.shop))
+  if (q.staffId !== undefined && q.staffId !== null && q.staffId !== '') {
+    parts.push('staffId=' + encodeURIComponent(q.staffId))
+    parts.push('staffName=' + encodeURIComponent(q.staffName || ''))
+  }
+  return '/pages/careadmin/workload_items/workload_items?' + parts.join('&')
+}
+
+function monthDayTimeOrTime(value, date) {
+  const m = /^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/.exec(String(value || ''))
+  if (!m) return ''
+  return m[1] === date ? m[2] : m[1].slice(5) + ' ' + m[2]
+}
+
+// 把后端 GetDailyWorkloadItemsByStaff 的结果整理成列表行。
+// 装备标题、进度色块、任务着色复用养护订单列表那一套（careOrderRows = utils/care_order_rows.js）。
+function buildItemsView(result, careOrderRows) {
+  const r = result || {}
+  const process = isProcess(r.metric)
+  const items = (Array.isArray(r.items) ? r.items : []).map(it => {
+    const care = {
+      id: it.careId, equipment: it.equipment, brand: it.brand, scale: it.scale, is_cancel: !!it.isCancel, careImages: [],
+      tasks: (it.tasks || []).map(t => ({ id: t.id, task_name: t.name, status: t.status, sort: t.sort, valid: 1 }))
+    }
+    const row = careOrderRows.buildCareRows([care], '')[0]
+    return {
+      careId: it.careId,
+      orderId: it.orderId,
+      orderCode: it.orderCode || ('#' + it.orderId),
+      shop: it.shop || '',
+      customerName: it.customerName || '',
+      title: row.title,
+      iconSrc: row.iconSrc,
+      statusLabel: row.statusLabel,
+      statusClass: row.statusClass,
+      tasks: row.tasks,
+      enteredLabel: monthDayTimeOrTime(it.enteredAt, r.date),
+      finishedLabel: monthDayTimeOrTime(it.finishedAt, r.date),
+      isCancel: !!it.isCancel,
+      hits: (it.hits || []).map((h, i) => ({
+        key: i,
+        text: (h.taskName || '') + ' · ' + ((h.staffId && h.staffName) || (h.staffId ? '员工' + h.staffId : '未记录')) + (timePart(h.endTime) ? ' · ' + timePart(h.endTime) : '')
+      }))
+    }
+  })
+  const total = num(r.total)
+  return {
+    date: r.date || '',
+    shopLabel: r.shop ? String(r.shop) : '全部门店',
+    asOfLabel: timePart(r.asOf) ? '统计至 ' + timePart(r.asOf) : '',
+    isProcess: process,
+    total,
+    // 工序类的数是「完成的任务条数」，一块板可能有几条（养板打蜡三道），所以两个数都写出来
+    countLabel: process ? '共 ' + total + ' 道工序，' + items.length + ' 块雪板' : '共 ' + total + ' 块雪板',
+    items,
+    empty: items.length === 0
+  }
+}
+
+module.exports = { PROCESSES, buildWorkloadView, shiftDate, weekdayOf, staffCounts, metricTitle, itemsUrl, buildItemsView }

@@ -114,7 +114,8 @@
       "root": "pages/careadmin",
       "name": "careadmin",
       "pages": [
-        "workload/workload"
+        "workload/workload",
+        "workload_items/workload_items"
       ]
     },
     {

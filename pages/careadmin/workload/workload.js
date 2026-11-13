@@ -69,6 +69,18 @@ Page({
     this.query()
   },
 
+  // 点数字看明细：进出、有无操作、各工序（修刃下面每个人那一行只看这个人的）。数字是 0 就不跳
+  onMetricTap(e) {
+    var d = e.currentTarget.dataset
+    if (!d.metric || !(Number(d.count) > 0)) return
+    wx.navigateTo({
+      url: workloadView.itemsUrl({
+        metric: d.metric, date: this.data.date, shop: this.data.shop,
+        staffId: d.staff === undefined ? null : d.staff, staffName: d.staffname
+      })
+    })
+  },
+
   // 总是 resolve（失败只在页面上给提示）；快速连点日期 / 门店时，只认最后一次请求的结果
   query() {
     var that = this

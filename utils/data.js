@@ -1880,6 +1880,16 @@ const getCareDailyWorkloadPromise = function (date, shop, sessionKey) {
   if (shop != null && shop !== '') { qUrl += '&shop=' + encodeURIComponent(shop) }
   return util.performWebRequest(qUrl, null)
 }
+// 日养护工作列表里某个数的明细（后端 CareWorkload/GetDailyWorkloadItemsByStaff）。
+// metric：initialPending / added / completed / pending / idlePending / worked，或工序 edge / wax / scrape / patchBottom / repair；
+// staffId 只对工序有效（只看这个人完成的，0 = 没记录完成人），不传 = 不限
+const getCareDailyWorkloadItemsPromise = function (date, shop, metric, staffId, sessionKey) {
+  var qUrl = app.globalData.requestPrefix + 'CareWorkload/GetDailyWorkloadItemsByStaff?sessionKey=' + sessionKey + '&metric=' + encodeURIComponent(metric)
+  if (date != null && date !== '') { qUrl += '&date=' + encodeURIComponent(date) }
+  if (shop != null && shop !== '') { qUrl += '&shop=' + encodeURIComponent(shop) }
+  if (staffId != null && staffId !== '') { qUrl += '&staffId=' + encodeURIComponent(staffId) }
+  return util.performWebRequest(qUrl, null)
+}
 const queryRentItemChangeCompatibleCategory = function (categoryId){
   var getUrl = app.globalData.requestPrefix + 'Rent/QueryChangeCompatibleCategory/' + categoryId.toString()
   return util.performWebRequest(getUrl, null)
@@ -2181,6 +2191,7 @@ module.exports = {
   getUnpickedCareItemsByStaffPromise,
   getIncompleteCareItemsByStaffPromise,
   getCareDailyWorkloadPromise,
+  getCareDailyWorkloadItemsPromise,
   queryRentItemChangeCompatibleCategory,
   updateRentPackageCategoryPromise,
   getPackageListByShopPromise,

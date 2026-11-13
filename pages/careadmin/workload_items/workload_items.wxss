@@ -1,0 +1,89 @@
+/* 养护工作明细：一块雪板一张卡片，底色按进度分（和养护订单列表的装备块同一套颜色） */
+.page-root {
+  min-height: 100vh;
+  background: #f8f9ff;
+  padding: 16rpx 0 48rpx;
+  box-sizing: border-box;
+}
+
+.head-card {
+  background: #fff;
+  border-radius: 8rpx;
+  margin: 0 16rpx 16rpx;
+  padding: 20rpx 24rpx;
+}
+.head-title { font-size: 30rpx; font-weight: 600; color: #222; }
+.head-sub { margin-top: 6rpx; font-size: 24rpx; color: #888; }
+.head-count { margin-top: 10rpx; font-size: 26rpx; color: #006495; font-weight: 600; }
+
+.item-card {
+  border-radius: 8rpx;
+  margin: 0 16rpx 12rpx;
+  padding: 16rpx 20rpx;
+  background: #eef1f6;
+}
+.item-card--idle   { background: #eef1f6; }
+.item-card--run    { background: #fdf0c8; }
+.item-card--ready  { background: #ebe6fd; }
+.item-card--done   { background: #daf4e3; }
+.item-card--cancel { background: #fde4e4; }
+
+.item-head {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+.item-code { font-size: 26rpx; font-weight: 600; color: #222; }
+.item-shop { font-size: 22rpx; color: #6b7280; }
+
+.item-body {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.item-icon-col { width: 56rpx; flex-shrink: 0; }
+.item-kind { width: 40rpx; height: 40rpx; }
+.item-main { flex: 1; min-width: 0; }
+.item-arrow { flex-shrink: 0; margin-left: 12rpx; font-size: 32rpx; color: #9ca3af; align-self: center; }
+
+.item-title { font-size: 26rpx; font-weight: 600; color: #222; }
+.item-customer { margin-left: 16rpx; font-size: 24rpx; font-weight: 400; color: #555; }
+
+.item-progress {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+}
+.progress-chip {
+  padding: 2rpx 12rpx;
+  margin-right: 10rpx;
+  border-radius: 20rpx;
+  background: #fff;
+  font-size: 22rpx;
+}
+.progress-chip--idle   { color: #475569; }
+.progress-chip--run    { color: #b45309; }
+.progress-chip--ready  { color: #6d28d9; }
+.progress-chip--done   { color: #15803d; }
+.progress-chip--cancel { color: #b91c1c; }
+.task-sep { margin: 0 6rpx; color: #b8c4cc; }
+.task--done { color: #16a34a; }
+.task--run  { color: #dc2626; font-weight: 600; }
+.task--idle { color: #9ca3af; }
+.task-flag { margin-left: 4rpx; font-size: 20rpx; color: #b45309; }
+
+.item-times { margin-top: 8rpx; font-size: 22rpx; color: #6b7280; }
+.item-time-gap { margin-left: 24rpx; }
+.item-hit { margin-top: 6rpx; font-size: 24rpx; color: #1f2937; }
+
+.empty-tip {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 26rpx;
+  padding: 40rpx 0;
+}

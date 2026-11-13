@@ -36,42 +36,43 @@
     <view class="stat-card">
       <view class="stat-title">雪板进出</view>
       <view class="flow-row">
-        <view class="flow-cell">
-          <text class="flow-num">{{report.flow.initialPending}}</text>
+        <view class="flow-cell" data-metric="initialPending" data-count="{{report.flow.initialPending}}" bindtap="onMetricTap">
+          <text class="flow-num flow-num--link">{{report.flow.initialPending}}</text>
           <text class="flow-cap">初始待完成</text>
         </view>
         <text class="flow-op">+</text>
-        <view class="flow-cell">
-          <text class="flow-num">{{report.flow.added}}</text>
+        <view class="flow-cell" data-metric="added" data-count="{{report.flow.added}}" bindtap="onMetricTap">
+          <text class="flow-num flow-num--link">{{report.flow.added}}</text>
           <text class="flow-cap">新增</text>
         </view>
         <text class="flow-op">−</text>
-        <view class="flow-cell">
-          <text class="flow-num">{{report.flow.completed}}</text>
+        <view class="flow-cell" data-metric="completed" data-count="{{report.flow.completed}}" bindtap="onMetricTap">
+          <text class="flow-num flow-num--link">{{report.flow.completed}}</text>
           <text class="flow-cap">完成</text>
         </view>
         <text class="flow-op">=</text>
-        <view class="flow-cell flow-cell--result">
-          <text class="flow-num flow-num--result">{{report.flow.pending}}</text>
+        <view class="flow-cell flow-cell--result" data-metric="pending" data-count="{{report.flow.pending}}" bindtap="onMetricTap">
+          <text class="flow-num flow-num--result flow-num--link">{{report.flow.pending}}</text>
           <text class="flow-cap">待完成</text>
         </view>
       </view>
       <view wx:if="{{report.flow.hasCanceled}}" class="stat-note">完成里包含取消 {{report.flow.canceled}} 块</view>
       <view class="stat-hint">初始待完成指当天 00:00 时已经收下、工序还没做完的；工序都做完、只差发板就算完成（取消也算）</view>
       <view class="stat-hint">不统计：非雪季养护、2026-04-30 以前开的单、测试单</view>
+      <view class="stat-hint">点任何一个数字，可以看对应的雪板和订单</view>
     </view>
 
     <!-- 今日养护雪板 -->
     <view class="stat-card">
       <view class="stat-title">今日养护雪板</view>
-      <view class="line-row">
+      <view class="line-row" data-metric="worked" data-count="{{report.activity.worked}}" bindtap="onMetricTap">
         <text class="line-label">今日养护雪板数量</text>
-        <text class="line-num">{{report.activity.worked}}</text>
+        <text class="line-num">{{report.activity.worked}}<text class="line-arrow">›</text></text>
       </view>
       <view class="stat-hint">当天做过养护工序（开始或完成，含安全检查；发板不算）的雪板，完成的和没完成的都算</view>
-      <view class="line-row">
+      <view class="line-row" data-metric="idlePending" data-count="{{report.activity.idlePending}}" bindtap="onMetricTap">
         <text class="line-label">待完成里今天没有操作的</text>
-        <text class="line-num line-num--warn">{{report.activity.idlePending}}</text>
+        <text class="line-num line-num--warn">{{report.activity.idlePending}}<text class="line-arrow">›</text></text>
       </view>
       <view class="stat-hint">工序还没做完、而且今天一道养护工序都没动过的雪板，也就是压着没人动的</view>
     </view>
@@ -80,13 +81,14 @@
     <view class="stat-card">
       <view class="stat-title">工序数量</view>
       <block wx:for="{{report.processes}}" wx:key="key">
-        <view class="line-row">
+        <view class="line-row" data-metric="{{item.key}}" data-count="{{item.count}}" bindtap="onMetricTap">
           <text class="line-label">{{item.label}}数量</text>
-          <text class="line-num">{{item.count}}</text>
+          <text class="line-num">{{item.count}}<text class="line-arrow">›</text></text>
         </view>
-        <view wx:for="{{item.staff}}" wx:for-item="person" wx:key="name" class="staff-row">
+        <view wx:for="{{item.staff}}" wx:for-item="person" wx:key="id" class="staff-row"
+              data-metric="{{item.key}}" data-count="{{person.count}}" data-staff="{{person.id}}" data-staffname="{{person.name}}" bindtap="onMetricTap">
           <text class="staff-name">{{person.name}}</text>
-          <text class="staff-num">{{person.count}}</text>
+          <text class="staff-num">{{person.count}}<text class="line-arrow">›</text></text>
         </view>
       </block>
       <view class="stat-hint">按工序「完成」的时间算在当天，算在点完成的人名下；打蜡含热蜡、机打蜡、养板打蜡，刮蜡含养板刮蜡；补板底单列，维修只算其它维修</view>

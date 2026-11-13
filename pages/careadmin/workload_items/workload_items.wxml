@@ -1,0 +1,46 @@
+<view wx:if="{{staff && staff.title_level >= 100}}" class="page-root">
+
+  <!-- 这是哪个数、哪天、哪家店 -->
+  <view class="head-card">
+    <view class="head-title">{{title}}</view>
+    <view class="head-sub">{{date}}<text wx:if="{{view}}"> · {{view.shopLabel}}<text wx:if="{{view.asOfLabel}}"> · {{view.asOfLabel}}</text></text></view>
+    <view wx:if="{{view}}" class="head-count">{{view.countLabel}}</view>
+  </view>
+
+  <view wx:if="{{errorText}}" class="empty-tip">{{errorText}}</view>
+  <view wx:elif="{{!view}}" class="empty-tip">{{querying ? '加载中…' : ''}}</view>
+  <view wx:elif="{{view.empty}}" class="empty-tip">没有对应的雪板</view>
+
+  <block wx:if="{{view}}">
+    <view wx:for="{{view.items}}" wx:key="careId" class="item-card item-card--{{item.statusClass}}"
+          data-orderid="{{item.orderId}}" data-careid="{{item.careId}}" bindtap="gotoDetail">
+      <view class="item-head">
+        <text class="item-code">{{item.orderCode}}</text>
+        <text class="item-shop">{{item.shop}}</text>
+      </view>
+      <view class="item-body">
+        <view class="item-icon-col">
+          <image wx:if="{{item.iconSrc}}" class="item-kind" src="{{item.iconSrc}}" mode="aspectFit" />
+        </view>
+        <view class="item-main">
+          <view class="item-title">{{item.title}}<text wx:if="{{item.customerName}}" class="item-customer">{{item.customerName}}</text></view>
+          <!-- 进度：阶段色块 + 全部任务（做完绿、轮到的红、没轮到的灰），和养护订单列表同一套 -->
+          <view class="item-progress">
+            <text class="progress-chip progress-chip--{{item.statusClass}}">{{item.statusLabel}}</text>
+            <block wx:for="{{item.tasks}}" wx:for-item="tk" wx:for-index="ti" wx:key="key">
+              <text wx:if="{{ti > 0}}" class="task-sep">›</text>
+              <text class="task task--{{tk.cls}}">{{tk.name}}<text wx:if="{{tk.flag}}" class="task-flag">{{tk.flag}}</text></text>
+            </block>
+          </view>
+          <view class="item-times">
+            <text>进店 {{item.enteredLabel}}</text>
+            <text wx:if="{{item.finishedLabel}}" class="item-time-gap">{{item.isCancel ? '取消' : '完成'}} {{item.finishedLabel}}</text>
+          </view>
+          <!-- 工序类的数：谁在几点做完的 -->
+          <view wx:for="{{item.hits}}" wx:for-item="hit" wx:key="key" class="item-hit">{{hit.text}}</view>
+        </view>
+        <text class="item-arrow">›</text>
+      </view>
+    </view>
+  </block>
+</view>

@@ -173,3 +173,8 @@
   font-size: 26rpx;
   padding: 40rpx 0;
 }
+
+/* 数字可以点开看明细 */
+.flow-num--link { text-decoration: underline; text-decoration-color: #cbd5e1; text-underline-offset: 6rpx; }
+.flow-num--result.flow-num--link { text-decoration-color: #9fcbe3; }
+.line-arrow { margin-left: 8rpx; font-size: 28rpx; font-weight: 400; color: #b8c4cc; }
