@@ -1872,6 +1872,14 @@ const getIncompleteCareItemsByStaffPromise = function (shop, equipment, brand, c
     })
   })
 }
+// 日养护工作列表：某一天雪板的进出统计和各工序完成数（后端 CareWorkload/GetDailyWorkloadByStaff）。
+// date：yyyy-MM-dd，不传 = 今天；shop：门店名，不传 = 全部门店
+const getCareDailyWorkloadPromise = function (date, shop, sessionKey) {
+  var qUrl = app.globalData.requestPrefix + 'CareWorkload/GetDailyWorkloadByStaff?sessionKey=' + sessionKey
+  if (date != null && date !== '') { qUrl += '&date=' + encodeURIComponent(date) }
+  if (shop != null && shop !== '') { qUrl += '&shop=' + encodeURIComponent(shop) }
+  return util.performWebRequest(qUrl, null)
+}
 const queryRentItemChangeCompatibleCategory = function (categoryId){
   var getUrl = app.globalData.requestPrefix + 'Rent/QueryChangeCompatibleCategory/' + categoryId.toString()
   return util.performWebRequest(getUrl, null)
@@ -2172,6 +2180,7 @@ module.exports = {
   getUnreturnedRentItemPromise,
   getUnpickedCareItemsByStaffPromise,
   getIncompleteCareItemsByStaffPromise,
+  getCareDailyWorkloadPromise,
   queryRentItemChangeCompatibleCategory,
   updateRentPackageCategoryPromise,
   getPackageListByShopPromise,

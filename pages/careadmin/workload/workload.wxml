@@ -1,0 +1,96 @@
+<view wx:if="{{staff && staff.title_level >= 100}}" class="page-root">
+
+  <!-- 日期 + 门店 -->
+  <view class="filter-card">
+    <view class="filter-row">
+      <text class="filter-label">日期</text>
+      <view class="date-bar">
+        <view class="date-btn" bindtap="onPrevDay">‹</view>
+        <picker mode="date" value="{{date}}" end="{{today}}" bindchange="onDateChange">
+          <view class="date-text">{{date}} {{report.weekday}}</view>
+        </picker>
+        <view class="date-btn {{isToday ? 'date-btn--off' : ''}}" bindtap="onNextDay">›</view>
+        <view wx:if="{{!isToday}}" class="date-today" bindtap="onToday">回到今天</view>
+      </view>
+    </view>
+    <view class="filter-row">
+      <text class="filter-label">店铺</text>
+      <view class="filter-value">
+        <shop-selector bindShopSelected="shopSelected"></shop-selector>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{errorText}}" class="empty-tip">{{errorText}}</view>
+
+  <block wx:if="{{report}}">
+    <!-- 数据来源：实时 / 快照，统计到几点 -->
+    <view class="source-line">
+      <text class="source-chip source-chip--{{report.isSnapshot ? 'snapshot' : 'live'}}">{{report.sourceLabel}}</text>
+      <text class="source-text">{{report.shopLabel}}<text wx:if="{{report.asOfLabel}}"> · {{report.asOfLabel}}</text><text wx:if="{{report.updatedLabel}}"> · 更新于 {{report.updatedLabel}}</text></text>
+    </view>
+
+    <view wx:if="{{report.empty}}" class="empty-tip">这一天没有养护装备的进出和操作</view>
+
+    <!-- ① 雪板进出：初始待完成 + 新增 − 完成 = 待完成 -->
+    <view class="stat-card">
+      <view class="stat-title">雪板进出</view>
+      <view class="flow-row">
+        <view class="flow-cell">
+          <text class="flow-num">{{report.flow.initialPending}}</text>
+          <text class="flow-cap">初始待完成</text>
+        </view>
+        <text class="flow-op">+</text>
+        <view class="flow-cell">
+          <text class="flow-num">{{report.flow.added}}</text>
+          <text class="flow-cap">新增</text>
+        </view>
+        <text class="flow-op">−</text>
+        <view class="flow-cell">
+          <text class="flow-num">{{report.flow.completed}}</text>
+          <text class="flow-cap">完成</text>
+        </view>
+        <text class="flow-op">=</text>
+        <view class="flow-cell flow-cell--result">
+          <text class="flow-num flow-num--result">{{report.flow.pending}}</text>
+          <text class="flow-cap">待完成</text>
+        </view>
+      </view>
+      <view wx:if="{{report.flow.hasCanceled}}" class="stat-note">完成里包含取消 {{report.flow.canceled}} 块</view>
+      <view class="stat-hint">初始待完成指当天 00:00 时已经收下、还没发板的；完成指发板（或取消）</view>
+    </view>
+
+    <!-- 今日养护雪板 -->
+    <view class="stat-card">
+      <view class="stat-title">今日养护雪板</view>
+      <view class="line-row">
+        <text class="line-label">今日养护雪板数量</text>
+        <text class="line-num">{{report.activity.worked}}</text>
+      </view>
+      <view class="stat-hint">当天有过操作（任务开始或完成，含安全检查）的雪板，完成的和没完成的都算</view>
+      <view class="line-row">
+        <text class="line-label">待完成里今天没有操作的</text>
+        <text class="line-num line-num--warn">{{report.activity.idlePending}}</text>
+      </view>
+      <view class="stat-hint">还没完成、而且今天一次操作都没有的雪板，也就是压着没人动的</view>
+    </view>
+
+    <!-- 工序数量 -->
+    <view class="stat-card">
+      <view class="stat-title">工序数量</view>
+      <block wx:for="{{report.processes}}" wx:key="key">
+        <view class="line-row">
+          <text class="line-label">{{item.label}}数量</text>
+          <text class="line-num">{{item.count}}</text>
+        </view>
+        <view wx:for="{{item.staff}}" wx:for-item="person" wx:key="name" class="staff-row">
+          <text class="staff-name">{{person.name}}</text>
+          <text class="staff-num">{{person.count}}</text>
+        </view>
+      </block>
+      <view class="stat-hint">按工序「完成」的时间算在当天，算在点完成的人名下；打蜡含热蜡、机打蜡、养板打蜡，刮蜡含养板刮蜡；补板底单列，维修只算其它维修</view>
+    </view>
+  </block>
+
+  <view wx:elif="{{!errorText}}" class="empty-tip">{{querying ? '加载中…' : ''}}</view>
+</view>

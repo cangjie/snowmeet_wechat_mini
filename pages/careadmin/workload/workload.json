@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "日养护工作列表",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#F0F2F7",
+  "usingComponents": {
+    "shop-selector": "/components/shop_selector/shop_selector"
+  }
+}

@@ -111,6 +111,13 @@
   "lazyCodeLoading": "requiredComponents",
   "subPackages": [
     {
+      "root": "pages/careadmin",
+      "name": "careadmin",
+      "pages": [
+        "workload/workload"
+      ]
+    },
+    {
       "root": "pages/payment",
       "name": "pay",
       "pages": [

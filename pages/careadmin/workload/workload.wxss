@@ -1,0 +1,175 @@
+/* 日养护工作列表：版式沿用养护列表的卡片风格 */
+.page-root {
+  min-height: 100vh;
+  background: #f8f9ff;
+  padding: 16rpx 0 48rpx;
+  box-sizing: border-box;
+}
+
+.filter-card {
+  background: #fff;
+  border-radius: 8rpx;
+  margin: 0 16rpx 16rpx;
+  padding: 8rpx 24rpx;
+}
+
+.filter-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 88rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.filter-row:last-of-type { border-bottom: none; }
+
+.filter-label {
+  width: 120rpx;
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: #555;
+  font-weight: 500;
+}
+
+.filter-value { flex: 1; font-size: 26rpx; }
+
+/* 日期条：前一天 / 日期 / 后一天 */
+.date-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+}
+.date-btn {
+  width: 64rpx;
+  height: 56rpx;
+  line-height: 52rpx;
+  text-align: center;
+  font-size: 40rpx;
+  color: #006495;
+  background: #eef6fb;
+  border-radius: 8rpx;
+}
+.date-btn--off { color: #b8c4cc; background: #f4f6f8; }
+.date-text {
+  min-width: 260rpx;
+  padding: 0 20rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #222;
+}
+.date-today {
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: #006495;
+}
+
+/* 数据来源 */
+.source-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 24rpx 12rpx;
+  font-size: 22rpx;
+  color: #888;
+}
+.source-chip {
+  flex-shrink: 0;
+  padding: 2rpx 12rpx;
+  margin-right: 12rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+}
+.source-chip--live { background: #dcfce7; color: #15803d; }
+.source-chip--snapshot { background: #e0e7ff; color: #4338ca; }
+.source-text { flex: 1; min-width: 0; }
+
+/* 统计卡片 */
+.stat-card {
+  background: #fff;
+  border-radius: 8rpx;
+  margin: 0 16rpx 16rpx;
+  padding: 20rpx 24rpx 16rpx;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.06);
+}
+.stat-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 16rpx;
+}
+.stat-note {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #b45309;
+}
+.stat-hint {
+  margin: 8rpx 0 12rpx;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  color: #9ca3af;
+}
+
+/* 进出：四个数 + 运算符 */
+.flow-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.flow-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flow-num {
+  font-size: 44rpx;
+  font-weight: 600;
+  color: #222;
+  line-height: 56rpx;
+}
+.flow-num--result { color: #006495; }
+.flow-cap {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #888;
+}
+.flow-op {
+  width: 36rpx;
+  text-align: center;
+  font-size: 32rpx;
+  color: #9ca3af;
+}
+
+/* 一行一个数 */
+.line-row {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 8rpx 0 4rpx;
+}
+.line-label { font-size: 26rpx; color: #333; }
+.line-num { font-size: 32rpx; font-weight: 600; color: #222; }
+.line-num--warn { color: #b45309; }
+
+/* 每个人的数量：缩进一格 */
+.staff-row {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2rpx 0 2rpx 32rpx;
+  font-size: 24rpx;
+  color: #555;
+}
+.staff-name { color: #555; }
+.staff-num { font-weight: 600; color: #333; }
+
+.empty-tip {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 26rpx;
+  padding: 40rpx 0;
+}

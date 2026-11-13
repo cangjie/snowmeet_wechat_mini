@@ -219,6 +219,9 @@ Page({
       case 'care_unfinished':
         path = '/pages/admin/care/care_unfinished_list'
         break
+      case 'care_daily_workload':
+        path = '/pages/careadmin/workload/workload'
+        break
       case 'rent_search_fuzzy':
         path = '/pages/admin/rent/search_fuzzy'
         break
