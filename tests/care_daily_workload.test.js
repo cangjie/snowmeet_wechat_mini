@@ -53,12 +53,19 @@ test('整理：工序按 修刃 打蜡 刮蜡 补板底 维修 的顺序，补�
     [['edge', '修刃', 7], ['wax', '打蜡', 9], ['scrape', '刮蜡', 6], ['patchBottom', '补板底', 2], ['repair', '维修', 1]])
 })
 
-test('整理：每个人的修刃数量，多的排前面，同样多的按名字，没记录完成人的排最后；没修过刃的人不列；只有修刃按人展开', () => {
+test('整理：每个工序都列出每个人完成的数量，多的排前面，同样多的按名字，没记录完成人的排最后；没做过这道工序的人不列', () => {
   const v = view.buildWorkloadView(stat())
   assert.deepEqual(v.processes[0].staff, [
     { id: 1, name: '甲', count: 4 }, { id: 3, name: '丙', count: 1 }, { id: 2, name: '乙', count: 1 }, { id: 0, name: '未记录', count: 1 }
   ])
-  assert.deepEqual(v.processes.slice(1).map(p => p.staff), [[], [], [], []])
+  // 打蜡只有丁做过；刮蜡、补板底、维修没有分人数据就不列人（总数照常显示）
+  assert.deepEqual(v.processes.slice(1).map(p => p.staff), [[{ id: 4, name: '丁', count: 5 }], [], [], []])
+  const all = view.buildWorkloadView(stat({ staff: [
+    { staffId: 1, name: '甲', process: { edge: 2, wax: 1, scrape: 3, patchBottom: 1, repair: 0 } },
+    { staffId: 2, name: '乙', process: { edge: 0, wax: 4, scrape: 3, patchBottom: 0, repair: 2 } }
+  ] }))
+  assert.deepEqual(all.processes.map(p => [p.label, p.staff.map(x => x.name + x.count).join(' ')]),
+    [['修刃', '甲2'], ['打蜡', '乙4 甲1'], ['刮蜡', '甲3 乙3'], ['补板底', '甲1'], ['维修', '乙2']])
 })
 
 test('整理：员工表里没有名字的人显示「员工 id」；没有数据的结果标 empty，不报错', () => {

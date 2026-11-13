@@ -10,8 +10,8 @@ const PROCESSES = [
   { key: 'repair', label: '维修' }
 ]
 
-// 要按人拆开显示的工序：需求只要「每个人的修刃数量」；后端已经把每个人的所有工序都带出来了，以后要加只改这里
-const SPLIT_BY_STAFF = ['edge']
+// 要按人拆开显示的工序：五个工序都列出每个人完成的数量（用户 2026-11-13：其它工序也要具体列出每个人的工作量）
+const SPLIT_BY_STAFF = PROCESSES.map(p => p.key)
 
 const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
