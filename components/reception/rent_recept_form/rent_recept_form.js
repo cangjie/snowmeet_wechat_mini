@@ -680,11 +680,15 @@ Component({
 
     // 招待：勾选后后端按 entertain 免租；本地保留日租原价供界面显示减免和实付。
     // 押金不再悄悄归零：还没免押金时弹窗问「是否同时免押金」，选「免押金」等同勾选免押金，选「收押金」押金照收。
-    // 取消招待不动免押金。
+    // 取消招待：免押金如果勾着，同时取消，押金恢复成标准押金（2026-11-13 用户要求）。
     onPkgEntertainToggle(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
       const checked = e.detail.value.length > 0;
       this.setData({ [`displayRentals[${ridx}].entertain`]: checked });
+      if (!checked && (this.data.displayRentals[ridx] || {}).noGuaranty) {
+        this._restoreStandardDeposit(ridx); // 清标志、取标准押金，完成后自己会刷新汇总并同步（带上 entertain=false）
+        return;
+      }
       if (checked && !(this.data.displayRentals[ridx] || {}).noGuaranty) {
         wx.showModal({
           title: '招待',

@@ -218,17 +218,87 @@ test('已经免押金时再勾选招待：不再弹窗', () => {
   } finally { restore() }
 })
 
-test('取消招待：不弹窗，也不动免押金', () => {
+// 2026-11-13 用户补充：取消招待时，免押金如果勾着也要同时取消，押金恢复到正常金额。
+test('取消招待：免押金勾着就同时取消，押金恢复成标准押金', async () => {
+  const asked = []
   const { instance, syncs, calls, restore } = loadForm(
-    [rental({ entertain: true, noGuaranty: true, guaranty: 0, realGuaranty: 0, _depositLabel: 0, _depositInput: '0' })])
+    [rental({ entertain: true, noGuaranty: true, guaranty: 0, realGuaranty: 0, _depositLabel: 0, _depositInput: '0' })],
+    { data: { getPackagePromise: async id => { asked.push(id); return { id, deposit: 3000 } } } })
+  try {
+    instance.onPkgEntertainToggle(toggle(false))
+    await new Promise(r => setImmediate(r))
+
+    assert.equal(calls.modals.length, 0)
+    assert.deepEqual(asked, [41])
+    const r = instance.data.displayRentals[0]
+    assert.equal(r.entertain, false)
+    assert.equal(r.noGuaranty, false)
+    assert.equal(r.guaranty, 3000)
+    assert.equal(r.realGuaranty, 3000)
+    assert.equal(r._depositLabel, 3000)
+    assert.equal(instance.data.summary.depositLabel, '3,000')
+    assert.equal(syncs.length, 1)
+    assert.equal(lastSynced(syncs).entertain, false, '取消招待要随保存带给后端')
+    assert.equal(lastSynced(syncs).noGuaranty, false)
+    assert.equal(lastSynced(syncs).guaranty, 3000)
+  } finally { restore() }
+})
+
+test('勾选招待选「免押金」后再取消招待：押金回到标准金额', async () => {
+  const { instance, syncs, restore } = loadForm([rental()], {
+    modalAnswer: 'free',
+    data: { getPackagePromise: async id => ({ id, deposit: 3000 }) } })
+  try {
+    instance.onPkgEntertainToggle(toggle(true))
+    assert.equal(instance.data.displayRentals[0].noGuaranty, true)
+    assert.equal(instance.data.displayRentals[0].guaranty, 0)
+
+    instance.onPkgEntertainToggle(toggle(false))
+    await new Promise(r => setImmediate(r))
+
+    const r = instance.data.displayRentals[0]
+    assert.equal(r.entertain, false)
+    assert.equal(r.noGuaranty, false)
+    assert.equal(r.guaranty, 3000)
+    assert.equal(instance.data.summary.depositLabel, '3,000')
+    assert.equal(lastSynced(syncs).entertain, false)
+    assert.equal(lastSynced(syncs).guaranty, 3000)
+  } finally { restore() }
+})
+
+test('取消招待时免押金没勾：押金不动，也不去取标准押金', () => {
+  const { instance, syncs, calls, restore } = loadForm(
+    [rental({ entertain: true, guaranty: 1500, realGuaranty: 1500, _depositLabel: 1500, _depositInput: '1500' })],
+    { data: { getPackagePromise: async () => { throw new Error('不该取标准押金') } } })
   try {
     instance.onPkgEntertainToggle(toggle(false))
 
     assert.equal(calls.modals.length, 0)
+    assert.equal(calls.loading, 0)
     const r = instance.data.displayRentals[0]
     assert.equal(r.entertain, false)
-    assert.equal(r.noGuaranty, true)
-    assert.equal(lastSynced(syncs).noGuaranty, true)
+    assert.ok(!r.noGuaranty)
+    assert.equal(r.guaranty, 1500, '店员手改过的押金不能被冲掉')
+    assert.equal(syncs.length, 1)
+    assert.equal(lastSynced(syncs).entertain, false)
+  } finally { restore() }
+})
+
+test('取消招待取不到标准押金：免押金照样取消，押金保持 0 并提示手填', async () => {
+  const { instance, syncs, calls, restore } = loadForm(
+    [rental({ entertain: true, noGuaranty: true, guaranty: 0, realGuaranty: 0, _depositLabel: 0, _depositInput: '0' })],
+    { data: { getPackagePromise: async () => { throw new Error('网络错误') } } })
+  try {
+    instance.onPkgEntertainToggle(toggle(false))
+    await new Promise(r => setImmediate(r))
+
+    const r = instance.data.displayRentals[0]
+    assert.equal(r.entertain, false)
+    assert.equal(r.noGuaranty, false)
+    assert.equal(r.guaranty, 0)
+    assert.match(calls.toasts[0].title, /手动填写/)
+    assert.equal(lastSynced(syncs).entertain, false)
+    assert.equal(lastSynced(syncs).noGuaranty, false)
   } finally { restore() }
 })
 
