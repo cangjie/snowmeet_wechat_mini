@@ -527,20 +527,68 @@ Component({
         },
       });
     },
-    _applyPkgDeposit(ridx, v) {
+    _applyPkgDeposit(ridx, v, noGuaranty) {
       // 同时更新 guaranty 与 realGuaranty：服务端往返不一定保留 realGuaranty，
       // 而 _refreshRentals 会在 realGuaranty 缺失时回退到 guaranty，
       // 若不同步更新 guaranty，UI 会被刷回旧值。
       // modal 编辑是绝对覆盖，把 guaranty_discount 清零；外部减免（如会员/券）需走各自的路径。
-      this.setData({
+      // noGuaranty = rental.noGuaranty（免押金标志，后端 PlaceRentOrder 据此不生成押金记录）：
+      //   显式传入就照写；没传时，店员手输了正数押金说明要收，顺手清掉标志，避免「标志位 + 有金额」互相矛盾。
+      const patch = {
         [`displayRentals[${ridx}].guaranty`]: v,
         [`displayRentals[${ridx}].realGuaranty`]: v,
         [`displayRentals[${ridx}].guaranty_discount`]: 0,
         [`displayRentals[${ridx}]._depositLabel`]: v,
         [`displayRentals[${ridx}]._depositInput`]: String(v),
-      });
+      };
+      if (noGuaranty !== undefined) {
+        patch[`displayRentals[${ridx}].noGuaranty`] = !!noGuaranty;
+      } else if (v > 0 && (this.data.displayRentals[ridx] || {}).noGuaranty) {
+        patch[`displayRentals[${ridx}].noGuaranty`] = false;
+      }
+      this.setData(patch);
       this._refreshSummary();
       this._emitSync(false);
+    },
+    // 免押金：勾选 → 押金归零并设 noGuaranty；取消 → 清标志，押金恢复成该商品/套餐的标准押金。
+    onPkgFreeDepositToggle(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const checked = e.detail.value.length > 0;
+      if (checked) {
+        this._applyPkgDeposit(ridx, 0, true);
+      } else {
+        this._restoreStandardDeposit(ridx);
+      }
+    },
+    // 标准押金不留在库里（勾选免押金时 guaranty 已写成 0），取消时按套餐 / 分类重新取：
+    // 套餐取 getPackagePromise().deposit，单品取 getRentCategoryPromise().deposit。店员之前手改过的押金不会找回。
+    // 取不到就保持 0 并提示手填，不拦着取消。异步期间用 loading 遮罩挡住操作，返回后核对这一项还在原位。
+    async _restoreStandardDeposit(ridx) {
+      const r = this.data.displayRentals[ridx];
+      if (!r) return;
+      const key = pkgKey(r, ridx);
+      this.setData({ [`displayRentals[${ridx}].noGuaranty`]: false });
+      wx.showLoading({ title: '加载中...', mask: true });
+      let standard = null;
+      try {
+        const dataLib = require('../../../utils/data.js');
+        const full = r.package_id
+          ? await dataLib.getPackagePromise(r.package_id)
+          : (r.category_id ? await dataLib.getRentCategoryPromise(r.category_id) : null);
+        if (full && full.deposit != null) standard = Number(full.deposit) || 0;
+      } catch (err) {
+        console.warn('取标准押金失败', err);
+      }
+      wx.hideLoading();
+      const cur = this.data.displayRentals[ridx];
+      if (!cur || pkgKey(cur, ridx) !== key) return;
+      if (standard === null) {
+        wx.showToast({ title: '没取到标准押金，请点「押金」手动填写', icon: 'none' });
+        this._refreshSummary();
+        this._emitSync(false);
+        return;
+      }
+      this._applyPkgDeposit(ridx, standard, false);
     },
 
     // 租金/日：点击 → 输入 modal（带小数点数字键盘） → 确认 modal → 应用
@@ -631,12 +679,27 @@ Component({
     },
 
     // 招待：勾选后后端按 entertain 免租；本地保留日租原价供界面显示减免和实付。
+    // 押金不再悄悄归零：还没免押金时弹窗问「是否同时免押金」，选「免押金」等同勾选免押金，选「收押金」押金照收。
+    // 取消招待不动免押金。
     onPkgEntertainToggle(e) {
       const ridx = Number(e.currentTarget.dataset.ridx);
       const checked = e.detail.value.length > 0;
       this.setData({ [`displayRentals[${ridx}].entertain`]: checked });
-      if (checked) {
-        this._applyPkgDeposit(ridx, 0); // 押金归零（含 guaranty / realGuaranty / _depositInput）
+      if (checked && !(this.data.displayRentals[ridx] || {}).noGuaranty) {
+        wx.showModal({
+          title: '招待',
+          content: '是否同时免押金？',
+          confirmText: '免押金',
+          cancelText: '收押金',
+          success: (res) => {
+            if (res.confirm) {
+              this._applyPkgDeposit(ridx, 0, true);
+            } else {
+              this._refreshSummary();
+              this._emitSync(false);
+            }
+          },
+        });
       } else {
         this._refreshSummary();
         this._emitSync(false);
@@ -1101,8 +1164,9 @@ Component({
         rental.category_id = newCat.id;
         rental.category = newCat;
         rental.name = newCat.name || '';
-        rental.guaranty = newCat.deposit || 0;
-        rental.realGuaranty = newCat.deposit || 0;
+        // 免押金的租赁换分类后押金仍是 0，标志位不变
+        rental.guaranty = rental.noGuaranty ? 0 : (newCat.deposit || 0);
+        rental.realGuaranty = rental.guaranty;
         rental.guaranty_discount = 0;
         rental.priceList = priceList || [];
 

@@ -125,6 +125,8 @@ test('勾选招待保留租金原价，并显示等额减免和零租金实付',
     pkg._dailyRate = 150
     pkg._dailyRateInput = '150.00'
     instance._refreshSummary()
+    // 勾选招待现在会弹窗问是否免押金：这里选「收押金」，租金相关断言不变
+    global.wx.showModal = opt => opt.success({ confirm: false, cancel: true })
 
     instance.onPkgEntertainToggle({ currentTarget: { dataset: { ridx: 0 } }, detail: { value: ['1'] } })
 
