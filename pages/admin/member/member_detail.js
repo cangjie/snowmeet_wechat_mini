@@ -22,6 +22,7 @@ Page({
     orderTabs: ['全部'],
     orderTab: '全部',
     filteredOrders: [],
+    orderSummary: { show: false, count: 0, totalStr: '', discountStr: '', paidStr: '' },
 
     // 名下优惠券（可折叠）。一次拉全，按 未使用/已核销/已过期 前端切换——
     // 三个桶是完备互斥划分，由后端 bucket 字段决定，前端不再自己判过期
@@ -124,7 +125,8 @@ Page({
         member: m, loading: false,
         orderTabs: ['全部'].concat(typeSet),
         orderTab: '全部',
-        filteredOrders: m.recentOrders
+        filteredOrders: m.recentOrders,
+        orderSummary: recentOrders.summarize(m.recentOrders)
       })
     }).catch(function () {
       that.setData({ loading: false })
@@ -235,7 +237,8 @@ Page({
     var t = e.currentTarget.dataset.t
     var all = (this.data.member && this.data.member.recentOrders) || []
     var list = t === '全部' ? all : all.filter(function (o) { return o.type === t })
-    this.setData({ orderTab: t, filteredOrders: list })
+    // 合计是「列出来的订单」的合计，所以随分类 tab 切换重算
+    this.setData({ orderTab: t, filteredOrders: list, orderSummary: recentOrders.summarize(list) })
   },
 
   // 最近订单 → 按业务类型进对应详情页

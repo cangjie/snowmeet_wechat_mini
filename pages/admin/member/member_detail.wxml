@@ -88,9 +88,20 @@
         <view wx:for="{{orderTabs}}" wx:key="*this" class="otab-item {{orderTab === item ? 'otab-item--on' : ''}}"
               data-t="{{item}}" bindtap="onOrderTab">{{item}}</view>
       </scroll-view>
+      <!-- 列出来的订单的合计（随分类 tab 切换） -->
+      <view class="order-sum" wx:if="{{orderSummary.show}}">
+        <text class="order-sum-k">共 {{orderSummary.count}} 单</text>
+        <text class="order-sum-i">订单金额 <text class="order-sum-v">{{orderSummary.totalStr}}</text></text>
+        <text class="order-sum-i">减免 <text class="order-sum-v order-sum-v--discount">{{orderSummary.discountStr}}</text></text>
+        <text class="order-sum-i">实付 <text class="order-sum-v order-sum-v--paid">{{orderSummary.paidStr}}</text></text>
+      </view>
       <view wx:for="{{filteredOrders}}" wx:key="id" class="order-row order-row--tap" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="gotoOrder">
         <!-- 图标位：先放订单类型图标，后面还要放别的图标就接在它后面 -->
-        <view class="order-icons"><view class="type-ico type-ico--{{item.icon.cls}}">{{item.icon.char}}</view></view>
+        <view class="order-icons">
+          <view class="type-ico type-ico--{{item.icon.cls}}">{{item.icon.char}}</view>
+          <!-- 类型图标后面：用了卡「卡」、用了券「券」、有减免「减」 -->
+          <view wx:for="{{item.badges}}" wx:for-item="b" wx:key="cls" class="type-ico type-ico--{{b.cls}}">{{b.char}}</view>
+        </view>
         <view class="order-l">
           <view class="order-line1">
             <text class="order-code mono">{{item.code}}</text>
