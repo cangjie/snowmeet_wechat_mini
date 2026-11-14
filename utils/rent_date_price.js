@@ -67,4 +67,39 @@ function modeForDateChange(dateStr, pickType, todayStr) {
   return null
 }
 
-module.exports = { parseLocalDate, rentTypeForDate, dayTypeForDate, repricePreset, modeForDateChange }
+// 开单时新加的租赁（套餐、搜索单品、无码物品）默认怎么起租（2026-11-14 用户要求）：
+//   万龙系店铺 → 立即租赁，从现在起；
+//   崇礼旗舰店 → 每天 18:00（含）到 24:00 默认「延时租赁」，起租日期是第二天、钟点 00:00，
+//                和店员自己点「延时租赁」一样（装备当晚发放，第二天才开始计费，租金按第二天的价）；
+//                过了 0 点（0:00～17:59）恢复成「立即租赁」，从现在起，商品和租赁物都一样；
+//   其它店 → 不预选，由店员自己选。
+// 只决定「这一刻新加的租赁」的默认值：购物车里已有的租赁保持各自的模式，不会跟着时间变。
+// 返回的 startDateTime 直接写 rental.start_date；startDateIsWeekend 按起租日期算（不是按今天）。
+const CHONGLI_SHOP = '崇礼旗舰店'
+const CHONGLI_DELAY_FROM_HOUR = 18
+
+function defaultRentStart(shop, now) {
+  const current = now || new Date()
+  const name = String(shop || '').trim()
+  let pickType = null
+  if (name.indexOf('万龙') === 0) pickType = '立即租赁'
+  else if (name === CHONGLI_SHOP) pickType = current.getHours() >= CHONGLI_DELAY_FROM_HOUR ? '延时租赁' : '立即租赁'
+  const start = new Date(current.getTime())
+  let time = String(current.getHours()).padStart(2, '0') + ':' + String(current.getMinutes()).padStart(2, '0')
+  if (pickType === '延时租赁') {
+    start.setDate(start.getDate() + 1)
+    time = '00:00'
+  }
+  const date = util.formatDate(start)
+  return {
+    pickType,
+    date,
+    time,
+    startDateTime: `${date}T${time}:00`,
+    startDateIsWeekend: util.isWeekend(start),
+    // 立即租赁、延时租赁装备当场（当晚）发放；先租后取不发放；没选模式时按未发放
+    atOnce: pickType === '立即租赁' || pickType === '延时租赁',
+  }
+}
+
+module.exports = { parseLocalDate, rentTypeForDate, dayTypeForDate, repricePreset, modeForDateChange, defaultRentStart }

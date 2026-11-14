@@ -6,6 +6,7 @@
 const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
+const rentDatePrice = require('../../../utils/rent_date_price.js');
 
 // 大类 code 前两位白名单：双板=01 / 单板=02 / 双板鞋=03 / 单板鞋=04。
 // 槽位的全部可选品类的大类 code 都不在白名单内 → 默认勾选「无编码」。
@@ -121,14 +122,16 @@ Page({
     }
 
     wx.showLoading({ title: '加载中...' });
-    const now = new Date();
-    const startDate = util.formatDate(now);
-    const startDateIsWeekend = util.isWeekend(now);
     // 起租日期+时间合并写入 start_date（snake_case，对齐后端 Rental.start_date 字段）；
     // camelCase startDate / startTime 后端模型上不存在，会被静默丢弃。
-    const startDateTime = `${startDate}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:00`;
-    // 万龙系店铺默认为「立即租赁」（套餐 + 套餐内装备）
-    const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
+    // 默认模式和起租时间见 rentDatePrice.defaultRentStart：万龙系店铺立即租赁（套餐 + 套餐内装备）；
+    // 崇礼旗舰店每天 18 点后延时租赁、第二天起租。
+    const start = rentDatePrice.defaultRentStart(this.data.shop, new Date());
+    const startDate = start.date;
+    const startDateIsWeekend = start.startDateIsWeekend;
+    const startDateTime = start.startDateTime;
+    const defaultPickType = start.pickType;
+    const defaultAtOnce = start.atOnce;
 
     // 每个套餐 × qty 份 → 并行加载完整套餐信息 + 价格列表
     const tasks = [];
@@ -160,9 +163,9 @@ Page({
           memo: '',
           timeStamp: Date.now(),
           pick_type: defaultPickType,
-          atOnce: defaultPickType === '立即租赁',
+          atOnce: defaultAtOnce,
         };
-        rental.rentItems = (fullPkg.rentPackageItemCategories || []).map(itemCat => {
+        rental.rentItems =(fullPkg.rentPackageItemCategories || []).map(itemCat => {
           const cats = itemCat.categories || [];
           const allCatNames = cats.map(c => c && c.name).filter(Boolean).join('/');
           const requiresCode = cats.some(c => c && c.code && CODE_REQUIRED_PREFIXES.indexOf(String(c.code).substr(0, 2)) >= 0);
@@ -182,7 +185,7 @@ Page({
             memo: '',
             category: cats[0] || null,
             pick_type: defaultPickType,
-            atOnce: defaultPickType === '立即租赁',
+            atOnce: defaultAtOnce,
           };
         });
         util.createRentalDetail(rental, new Date(startDate), new Date(startDate));

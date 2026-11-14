@@ -8,6 +8,7 @@
 // 当前实现：租赁（rent-recept-form）、养护（care-recept-form）、零售（retail-recept-form）。
 const app = getApp();
 const util = require('../../../utils/util.js');
+const rentDatePrice = require('../../../utils/rent_date_price.js');
 const careCardSale = require('./care_card_sale.js');
 
 const BIZ_LABELS = { rent: '租赁', maintain: '养护', retail: '零售' };
@@ -280,12 +281,13 @@ Page({
   // 用户在 form 组件内点 rentItem 的「分类」行打开分类选择 modal；选定后由 form 组件内的
   // _applyCategoryChange 拉 fullCategory + priceList，更新主项 + 按 associateCategories 重建附件项。
   _addBlankRental() {
-    const now = new Date();
-    const startDate = util.formatDate(now);
-    const startDateIsWeekend = util.isWeekend(now);
-    const startDateTime = `${startDate}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:00`;
-    const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
-    const atOnce = defaultPickType === '立即租赁';
+    // 默认模式和起租时间见 rentDatePrice.defaultRentStart（万龙立即租赁；崇礼旗舰店 18 点后延时租赁、第二天起租）
+    const start = rentDatePrice.defaultRentStart(this.data.shop, new Date());
+    const startDate = start.date;
+    const startDateIsWeekend = start.startDateIsWeekend;
+    const startDateTime = start.startDateTime;
+    const defaultPickType = start.pickType;
+    const atOnce = start.atOnce;
 
     const mainItem = {
       id: 0,
@@ -355,12 +357,13 @@ Page({
       const priceList = await data.getRentPriceListPromise(shopObj.id, '分类', product.category.id, '门市', true);
       wx.hideLoading();
 
-      const now = new Date();
-      const startDate = util.formatDate(now);
-      const startDateIsWeekend = util.isWeekend(now);
-      const startDateTime = `${startDate}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:00`;
-      const defaultPickType = (this.data.shop || '').indexOf('万龙') === 0 ? '立即租赁' : null;
-      const atOnce = defaultPickType === '立即租赁';
+      // 默认模式和起租时间见 rentDatePrice.defaultRentStart（万龙立即租赁；崇礼旗舰店 18 点后延时租赁、第二天起租）
+      const start = rentDatePrice.defaultRentStart(this.data.shop, new Date());
+      const startDate = start.date;
+      const startDateIsWeekend = start.startDateIsWeekend;
+      const startDateTime = start.startDateTime;
+      const defaultPickType = start.pickType;
+      const atOnce = start.atOnce;
       const deposit = (product.category && product.category.deposit) || 0;
 
       // 主装备项（已填好的单品）
