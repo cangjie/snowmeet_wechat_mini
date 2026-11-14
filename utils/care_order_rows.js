@@ -5,6 +5,8 @@
 // 这些任务里有动过（做完 / 正在做）、还没全做完 → 进行中；其余（没任务、只做了安全检查、安全检查都没做）→ 未开始；
 // 取消的装备是靠发板任务落库的，所以先看 is_cancel，显示已取消。
 
+const repairMedia = require('./care_repair_media.js')
+
 const DONE_STATUSES = ['已完成', '强行中止']
 const FINISH_TASKS = ['发板', '强行索回']
 
@@ -121,6 +123,7 @@ function taskItems(care, stageCls) {
 function firstThumb(care, host) {
   const list = care.careImages || []
   for (let i = 0; i < list.length; i++) {
+    if (list[i] && repairMedia.isRepairStage(list[i].title)) continue   // 维修前 / 维修后的照片视频不是装备照片
     const image = list[i] && list[i].image
     const url = image && (image.thumbUrl || image.file_path_name)
     if (url) return fullUrl(host, url)
@@ -132,6 +135,7 @@ function firstThumb(care, host) {
 function photoUrls(care, host) {
   const urls = []
   ;(care.careImages || []).forEach(item => {
+    if (item && repairMedia.isRepairStage(item.title)) return   // 维修前 / 维修后的照片视频不是装备照片
     const image = item && item.image
     const url = image && (image.file_path_name || image.thumbUrl)
     if (url) urls.push(fullUrl(host, url))

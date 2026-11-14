@@ -7,6 +7,7 @@
 const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
+const repairMedia = require('../../../utils/care_repair_media.js')
 
 const IMG_HOST = data.IMAGE_HOST
 
@@ -126,6 +127,7 @@ Page({
       var thumbs = []
       if (care.careImages) {
         for (var k = 0; k < care.careImages.length; k++) {
+          if (repairMedia.isRepairStage(care.careImages[k].title)) continue   // 维修前 / 维修后的照片视频不是装备照片
           if (care.careImages[k].image && care.careImages[k].image.thumbUrl) {
             thumbs.push(IMG_HOST + care.careImages[k].image.thumbUrl)
           }

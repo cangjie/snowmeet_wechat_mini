@@ -1,5 +1,6 @@
 const app = getApp();
 const data = require('../../utils/data.js');
+const repairMedia = require('../../utils/care_repair_media.js');
 
 function imageUrl(value) {
   if (!value) return '';
@@ -16,7 +17,7 @@ function equipmentRow(care, index) {
   if (care.need_repair === 1 || care.repair_memo) projects.push('维修');
   if (care.summer != null) projects.push('寄存');
   if (care.urgent === 1) projects.push('立等');
-  const photos = (care.careImages || []).map(im => {
+  const photos = (care.careImages || []).filter(im => !repairMedia.isRepairStage(im && im.title)).map(im => {
     const image = im.image || {};
     const url = imageUrl(im.url || image.file_path_name);
     return { url, thumb: imageUrl(im.thumb || image.thumbUrl) || url };

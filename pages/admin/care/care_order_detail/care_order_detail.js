@@ -8,6 +8,7 @@
 const app = getApp();
 const util = require('../../../../utils/util.js');
 const data = require('../../../../utils/data.js');
+const repairMedia = require('../../../../utils/care_repair_media.js');
 
 // 与 data.js uploadFilePromise 的上传域名保持一致（照片落在处理上传那台服务器的磁盘）
 const IMG_HOST = data.IMAGE_HOST;
@@ -322,7 +323,9 @@ Page({
     if (care.warranty || care.entertain) summary = 0;
     care._summaryStr = util.showAmount(Math.round(summary * 100) / 100);
     // 照片展示地址
-    care._photos = (care.careImages || []).map((im) => {
+    // 装备照片只放普通装备照片；维修前 / 维修后的照片视频（care_image.title）单独放在维修任务下面
+    const groupedImages = repairMedia.groupCareImages(care.careImages, IMG_HOST);
+    care._photos = groupedImages.equipment.map((im) => {
       const img = im.image || {};
       return {
         id: im.id,
@@ -330,6 +333,12 @@ Page({
         url: fullUrl(img.file_path_name),
       };
     });
+    // 维修留证：有「维修」任务的装备，维修前后各要传照片或视频；维修任务没做完（也没取消）时才能增删
+    care._repairBefore = groupedImages.before;
+    care._repairAfter = groupedImages.after;
+    care._hasRepairTask = repairMedia.hasRepairTask(care.tasks);
+    const repairTask = (care.tasks || []).find((t) => t && t.task_name === '维修' && t.valid !== 0);
+    care._repairEditable = !!repairTask && repairTask.status !== '已完成' && repairTask.status !== '强行中止' && !care.is_cancel;
     // 取板凭证（拍照核销后展示）
     if (care.pickImage) {
       care._pickThumb = fullUrl(care.pickImage.thumbUrl || care.pickImage.file_path_name);
@@ -372,6 +381,14 @@ Page({
           task._hint = task._isMine
             ? '完成后请及时点击结束，系统将记录真实结束时间'
             : ((task._staffName || '他人') + ' 执行中');
+        }
+        // 维修：开始前要有维修前的照片 / 视频，结束前要有维修后的（见下面的「维修留证」）
+        if (t.task_name === '维修') {
+          if (t.status === '未开始' && groupedImages.before.length === 0) {
+            task._hint = '开始维修前，请先在下面上传维修前的照片或视频';
+          } else if (task._running && task._isMine && groupedImages.after.length === 0) {
+            task._hint = '结束维修前，请先在下面上传维修后的照片或视频';
+          }
         }
       }
       switch (t.task_name) {
@@ -720,6 +737,138 @@ Page({
     if (care && care._pickUrl) wx.previewImage({ urls: [care._pickUrl] });
   },
 
+  /* ---------- 维修留证：维修前 / 维修后的照片或视频 ---------- */
+  // 点「+」：拍照 / 录视频 / 从相册选（照片和视频都行），传完存成这件装备的「维修前」或「维修后」
+  onRepairMediaAdd(e) {
+    const that = this;
+    const cidx = this._careIdx(e);
+    const care = this.data.cares[cidx];
+    if (!care || !care._repairEditable) return;
+    const stage = e.currentTarget.dataset.stage === 'after' ? repairMedia.STAGE_AFTER : repairMedia.STAGE_BEFORE;
+    const have = (stage === repairMedia.STAGE_AFTER ? care._repairAfter : care._repairBefore).length;
+    const room = repairMedia.MAX_PER_STAGE - have;
+    if (room <= 0) {
+      wx.showToast({ title: '最多放 ' + repairMedia.MAX_PER_STAGE + ' 个', icon: 'none' });
+      return;
+    }
+    if (this._repairBusy) {
+      wx.showToast({ title: '上一批还在上传，请稍等', icon: 'none' });
+      return;
+    }
+    wx.chooseMedia({
+      count: room,
+      mediaType: ['image', 'video'],
+      sourceType: ['camera', 'album'],
+      sizeType: ['compressed'],
+      maxDuration: repairMedia.MAX_VIDEO_SECONDS,
+      camera: 'back',
+      success(res) { that._uploadRepairMedia(care.id, stage, res.tempFiles || []); },
+      fail() { /* 用户取消，不用提示 */ },
+    });
+  },
+
+  // 一个一个传（每个都读最新的装备再追加，不会把前一个冲掉）
+  async _uploadRepairMedia(careId, stage, files) {
+    const picked = (files || []).filter(Boolean);
+    const tooBig = picked.map(repairMedia.checkPickedFile).filter(Boolean);
+    if (tooBig.length > 0) wx.showToast({ title: tooBig[0], icon: 'none', duration: 3000 });
+    const todo = picked.filter((f) => !repairMedia.checkPickedFile(f));
+    if (todo.length === 0) return;
+    this._repairBusy = true;
+    let done = 0;
+    let failed = 0;
+    for (let i = 0; i < todo.length; i++) {
+      wx.showLoading({ title: '上传中 ' + (i + 1) + '/' + todo.length, mask: true });
+      try {
+        await this._uploadOneRepairMedia(careId, stage, todo[i]);
+        done += 1;
+      } catch (err) {
+        console.warn('repair media upload failed', err);
+        failed += 1;
+      }
+    }
+    wx.hideLoading();
+    this._repairBusy = false;
+    wx.showToast({
+      title: failed > 0 ? ('成功 ' + done + ' 个，失败 ' + failed + ' 个，请重试失败的') : '已上传',
+      icon: failed > 0 ? 'none' : 'success',
+      duration: failed > 0 ? 3000 : 1500,
+    });
+    this.loadOrder();
+  },
+
+  async _uploadOneRepairMedia(careId, stage, file) {
+    const sessionKey = app.globalData.sessionKey;
+    const uploaded = await data.uploadFilePromise(null, file.tempFilePath, '养护' + stage, file.fileType, sessionKey);
+    if (!uploaded || !uploaded.id) throw new Error('上传没有返回文件');
+    let saved = uploaded;
+    // 视频的封面图是方块里显示的图；封面传不上不影响视频本身
+    if (file.fileType === 'video' && file.thumbTempFilePath) {
+      try {
+        saved = await data.uploadFilePromise(uploaded.id, file.thumbTempFilePath, null, null, sessionKey);
+      } catch (err) { saved = uploaded; }
+    }
+    // 读最新的装备再追加：后端按 id 对比整份照片，用旧数据提交会把别处刚传的当成删掉
+    const order = await data.getOrderByStaffPromise(this.data.orderId, sessionKey);
+    const fresh = ((order && order.cares) || []).find((c) => c.id === careId);
+    if (!fresh) throw new Error('找不到这件装备');
+    const payload = { ...fresh };
+    payload.careImages = repairMedia.withNewMediaRow(fresh.careImages, fresh.id, saved.id, stage);
+    payload.tasks = fresh.tasks;
+    await data.updateCarePromise(payload, '养护' + stage + '上传', sessionKey);
+  },
+
+  // 点缩略图：照片、视频放在一起预览
+  onRepairMediaTap(e) {
+    const care = this.data.cares[this._careIdx(e)];
+    if (!care) return;
+    const list = e.currentTarget.dataset.stage === 'after' ? care._repairAfter : care._repairBefore;
+    const idx = Number(e.currentTarget.dataset.idx) || 0;
+    const sources = (list || []).map((m) => (m.isVideo
+      ? { url: m.url, type: 'video', poster: m.poster || undefined }
+      : { url: m.url, type: 'image' }));
+    if (sources.length === 0) return;
+    wx.previewMedia({ sources, current: Math.min(idx, sources.length - 1) });
+  },
+
+  // 删掉传错的（维修任务没做完之前才能删；删了不能恢复）
+  onRepairMediaRemove(e) {
+    const that = this;
+    const care = this.data.cares[this._careIdx(e)];
+    const rowId = Number(e.currentTarget.dataset.id);
+    if (!care || !care._repairEditable || !rowId) return;
+    wx.showModal({
+      title: '删除',
+      content: '确认删除这个照片 / 视频吗？删除后不能恢复。',
+      success(res) {
+        if (!res.confirm) return;
+        that._removeRepairMedia(care.id, rowId);
+      },
+    });
+  },
+
+  async _removeRepairMedia(careId, rowId) {
+    wx.showLoading({ title: '删除中', mask: true });
+    try {
+      const sessionKey = app.globalData.sessionKey;
+      const order = await data.getOrderByStaffPromise(this.data.orderId, sessionKey);
+      const fresh = ((order && order.cares) || []).find((c) => c.id === careId);
+      const row = fresh && (fresh.careImages || []).find((im) => im.id === rowId);
+      // 只删维修前 / 维修后的留证，普通装备照片不在这里删
+      if (!row || !repairMedia.isRepairStage(row.title)) throw new Error('不是维修留证');
+      const payload = { ...fresh };
+      payload.careImages = repairMedia.withoutMediaRow(fresh.careImages, fresh.id, rowId);
+      payload.tasks = fresh.tasks;
+      await data.updateCarePromise(payload, '养护维修留证删除', sessionKey);
+      wx.hideLoading();
+      this.loadOrder();
+    } catch (err) {
+      wx.hideLoading();
+      console.warn('repair media remove failed', err);
+      wx.showToast({ title: '删除失败', icon: 'none' });
+    }
+  },
+
   // careImages 去导航（防后端 EF 图附加撞键；既有行保留全部标量字段，create_date 等不被冲掉）
   _stripImageNavs(careImages, careId) {
     return (careImages || []).map((im) => {
@@ -853,6 +1002,15 @@ Page({
       wx.showToast({ title: '请填写后点确认安全', icon: 'none' });
       return;
     }
+    // 维修：开始前必须已上传维修前的照片或视频
+    if (taskName === '维修') {
+      const startCare = this.data.cares[this._careIdx(e)];
+      const gate = repairMedia.repairGate(startCare && startCare.careImages, 'start');
+      if (gate) {
+        wx.showToast({ title: gate, icon: 'none', duration: 2500 });
+        return;
+      }
+    }
     wx.showModal({
       title: '开始任务',
       content: '点击确定后将记录「' + taskName + '」的实际开始时间，请确保现在开始操作。',
@@ -882,6 +1040,14 @@ Page({
         },
       });
       return;
+    }
+    // 维修：结束前必须已上传维修后的照片或视频（强行中止他人的任务不查，上面已经走掉了）
+    if (task.task_name === '维修') {
+      const gate = repairMedia.repairGate(care.careImages, 'end');
+      if (gate) {
+        wx.showToast({ title: gate, icon: 'none', duration: 2500 });
+        return;
+      }
     }
     const elapsedMs = task.start_time ? (Date.now() - new Date(task.start_time).valueOf()) : 0;
     const durStr = this._fmtDuration(elapsedMs);
@@ -1208,7 +1374,7 @@ Page({
     const diff = serials.indexOf('|') >= 0;
     const arr = serials.split('|');
     // 编辑照片列表（van-uploader file-list 格式，image_id 对齐服务端）
-    const photoFiles = (raw.careImages || []).map((im) => {
+    const photoFiles = repairMedia.groupCareImages(raw.careImages, IMG_HOST).equipment.map((im) => {
       const img = im.image || {};
       return {
         id: im.id,
@@ -1361,6 +1527,15 @@ Page({
         }
       }
       payload.careImages.push({ id: 0, care_id: raw.id, image_id: f.image_id, valid: true });
+    });
+    // 维修前 / 维修后的留证不在编辑面板里，原样带上，否则会被后端当成删掉的照片物理删除
+    (raw.careImages || []).forEach((im) => {
+      if (!repairMedia.isRepairStage(im.title)) return;
+      const keep = { ...im };
+      delete keep.image;
+      delete keep.care;
+      keep.care_id = raw.id;
+      payload.careImages.push(keep);
     });
     payload.tasks = raw.tasks;
     data.updateCarePromise(payload, '养护订单详情页修改装备信息', app.globalData.sessionKey).then(() => {

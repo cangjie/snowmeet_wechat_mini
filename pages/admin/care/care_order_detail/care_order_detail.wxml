@@ -353,6 +353,49 @@
               </view>
             </view>
 
+            <!-- 维修留证：有「维修」任务的装备，维修前、维修后各要传至少 1 张照片或视频，并且分开放。
+                 开始维修前必须有「维修前」的，结束维修前必须有「维修后」的（见 onTaskStart / onTaskEnd）；
+                 维修任务没做完之前可以增删，做完后只能看 -->
+            <view wx:if="{{task.task_name === '维修' && care._hasRepairTask}}" class="task-panel repair-media">
+              <view class="repair-block">
+                <view class="edit-block-head">
+                  <text class="info-label">维修前 *</text>
+                  <text class="repair-state {{care._repairBefore.length > 0 ? 'repair-state--ok' : ''}}">{{care._repairBefore.length > 0 ? '已传 ' + care._repairBefore.length + ' 个' : '开始维修前必传'}}</text>
+                </view>
+                <view class="repair-media-row">
+                  <view wx:for="{{care._repairBefore}}" wx:key="id" wx:for-item="m" wx:for-index="mi" class="repair-tile"
+                        data-cidx="{{cidx}}" data-stage="before" data-idx="{{mi}}" bindtap="onRepairMediaTap">
+                    <image wx:if="{{m.poster}}" class="repair-tile-img" src="{{m.poster}}" mode="aspectFill"/>
+                    <view wx:else class="repair-tile-img repair-tile-img--blank"></view>
+                    <view wx:if="{{m.isVideo}}" class="repair-tile-play">▶</view>
+                    <view wx:if="{{care._repairEditable}}" class="repair-tile-del" data-cidx="{{cidx}}" data-id="{{m.id}}" catchtap="onRepairMediaRemove">×</view>
+                  </view>
+                  <view wx:if="{{care._repairEditable && care._repairBefore.length < 9}}" class="repair-tile repair-tile--add"
+                        data-cidx="{{cidx}}" data-stage="before" catchtap="onRepairMediaAdd">+</view>
+                  <text wx:if="{{!care._repairEditable && care._repairBefore.length === 0}}" class="repair-none">没有上传</text>
+                </view>
+              </view>
+              <view class="repair-block">
+                <view class="edit-block-head">
+                  <text class="info-label">维修后 *</text>
+                  <text class="repair-state {{care._repairAfter.length > 0 ? 'repair-state--ok' : ''}}">{{care._repairAfter.length > 0 ? '已传 ' + care._repairAfter.length + ' 个' : '结束维修前必传'}}</text>
+                </view>
+                <view class="repair-media-row">
+                  <view wx:for="{{care._repairAfter}}" wx:key="id" wx:for-item="m" wx:for-index="mi" class="repair-tile"
+                        data-cidx="{{cidx}}" data-stage="after" data-idx="{{mi}}" bindtap="onRepairMediaTap">
+                    <image wx:if="{{m.poster}}" class="repair-tile-img" src="{{m.poster}}" mode="aspectFill"/>
+                    <view wx:else class="repair-tile-img repair-tile-img--blank"></view>
+                    <view wx:if="{{m.isVideo}}" class="repair-tile-play">▶</view>
+                    <view wx:if="{{care._repairEditable}}" class="repair-tile-del" data-cidx="{{cidx}}" data-id="{{m.id}}" catchtap="onRepairMediaRemove">×</view>
+                  </view>
+                  <view wx:if="{{care._repairEditable && care._repairAfter.length < 9}}" class="repair-tile repair-tile--add"
+                        data-cidx="{{cidx}}" data-stage="after" catchtap="onRepairMediaAdd">+</view>
+                  <text wx:if="{{!care._repairEditable && care._repairAfter.length === 0}}" class="repair-none">没有上传</text>
+                </view>
+              </view>
+              <view wx:if="{{care._repairEditable}}" class="task-hint task-hint--left">照片、视频都可以（视频最长 60 秒）；传错了点右上角的 × 删掉</view>
+            </view>
+
             <!-- 安全检查录入区 -->
             <view wx:if="{{task.task_name === '安全检查' && task._current && care._safeChecking}}" class="task-panel">
                 <view class="kv-grid">

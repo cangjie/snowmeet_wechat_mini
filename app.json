@@ -109,6 +109,9 @@
     "getFuzzyLocation"
   ],
   "lazyCodeLoading": "requiredComponents",
+  "networkTimeout": {
+    "uploadFile": 300000
+  },
   "subPackages": [
     {
       "root": "pages/careadmin",
