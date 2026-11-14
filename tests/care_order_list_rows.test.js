@@ -1062,3 +1062,54 @@ test('招待列表里一单都没生效：显示空，总数 0，不报错；总
   await settle()
   assert.equal(odd.data.total, 0)
 })
+
+// ---- 查询结果的应收 / 减免 / 共计收款 ----
+const careAmount = (id, charge, discount, extra) => Object.assign({ id, equipment: '双板', displayCharge: charge, displayDiscount: discount, tasks: [] }, extra || {})
+const summaryOrder = (id, cares, earn) => Object.assign(orderWith(1), { id, code: 'WF_YH_261114_0000' + id, cares, totalEarnAmount: earn })
+
+test('应收 = 每件装备卡上的「金额」之和，减免 = 「减免」之和；招待 / 质保的标准价和减免也算（与卡上一致）', () => {
+  const page = loadList()
+  page.renderOrders([
+    summaryOrder(1, [careAmount(11, 230, 30), careAmount(12, 100, 0)], 300),
+    summaryOrder(2, [careAmount(21, 230, 230, { entertain: true })], 0)
+  ], 2, 1, 50, 300)
+  assert.equal(page.data.pageChargeStr, '¥560.00')
+  assert.equal(page.data.pageDiscountStr, '¥260.00')
+  assert.equal(page.data.totalEarnStr, '¥300.00')
+})
+
+test('已取消的装备不会再收，不计入应收 / 减免；没有装备的订单、金额缺失的装备按 0', () => {
+  const page = loadList()
+  page.renderOrders([
+    summaryOrder(1, [careAmount(11, 230, 30), careAmount(12, 100, 20, { is_cancel: true })], 200),
+    summaryOrder(2, [], 0),
+    summaryOrder(3, [{ id: 31, equipment: '双板', tasks: [] }], 0)
+  ], 3, 1, 50, 200)
+  assert.equal(page.data.pageChargeStr, '¥230.00')
+  assert.equal(page.data.pageDiscountStr, '¥30.00')
+})
+
+test('没有结果或空页：应收 / 减免是 ¥0.00，不报错；金额按分四舍五入', () => {
+  const page = loadList()
+  page.renderOrders([], 0, 1, 50, 0)
+  assert.equal(page.data.pageChargeStr, '¥0.00')
+  assert.equal(page.data.pageDiscountStr, '¥0.00')
+  page.renderOrders([summaryOrder(1, [careAmount(11, 0.1, 0), careAmount(12, 0.2, 0)], 0)], 1, 1, 50, 0)
+  assert.equal(page.data.pageChargeStr, '¥0.30')   // 0.1 + 0.2 不会变成 0.30000000000000004
+})
+
+test('汇总行：只有一页时写「应收 · 减免 · 共计收款」；多页时标明「本页」，共计收款放到下一行', () => {
+  const bar = wxml.slice(wxml.indexOf('<!-- 统计行 + 分页 -->'), wxml.indexOf('<!-- 订单列表 -->'))
+  const single = bar.match(/<view wx:if="\{\{totalPages <= 1\}\}" class="summary-bar">[\s\S]*?<\/view>/)[0]
+  assert.match(single, /应收 \{\{pageChargeStr\}\}/)
+  assert.match(single, /减免 \{\{pageDiscountStr\}\}/)
+  assert.match(single, /共计收款 \{\{allEarnStr\}\}/)
+  assert.doesNotMatch(single, /本页/)
+  const multi = bar.match(/<view wx:else class="summary-bar">[\s\S]*?<\/view>/)[0]
+  assert.match(multi, /本页 应收 \{\{pageChargeStr\}\}/)
+  assert.match(multi, /减免 \{\{pageDiscountStr\}\}/)
+  assert.match(multi, /收款 \{\{totalEarnStr\}\}/)
+  const count = bar.slice(bar.indexOf('<view class="summary-bar">'), bar.indexOf('<list-pager'))
+  assert.match(count, /共 \{\{total\}\} 单，\{\{totalPages\}\} 页/)
+  assert.match(count, /wx:if="\{\{totalPages > 1\}\}"[\s\S]*共计收款 \{\{allEarnStr\}\}/)
+})

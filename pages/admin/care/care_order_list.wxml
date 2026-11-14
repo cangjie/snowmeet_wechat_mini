@@ -92,12 +92,28 @@
 
   <!-- 统计行 + 分页 -->
   <view wx:if="{{total > 0}}" class="summary-section">
-    <view class="summary-bar">
-      <text>本页收款 {{totalEarnStr}}</text>
+    <!-- 查询结果的金额：应收（装备金额合计）、减免、共计收款。只有一页时这一页就是全部结果，直接写「共计收款」；
+         多页时应收 / 减免只能算本页（后端只给了全部结果的收款合计），所以标明「本页」，共计收款放在下一行 -->
+    <view wx:if="{{totalPages <= 1}}" class="summary-bar">
+      <text>应收 {{pageChargeStr}}</text>
       <text class="summary-sep">·</text>
-      <text>共 {{total}} 单，{{totalPages}} 页</text>
+      <text>减免 {{pageDiscountStr}}</text>
       <text class="summary-sep">·</text>
       <text>共计收款 {{allEarnStr}}</text>
+    </view>
+    <view wx:else class="summary-bar">
+      <text>本页 应收 {{pageChargeStr}}</text>
+      <text class="summary-sep">·</text>
+      <text>减免 {{pageDiscountStr}}</text>
+      <text class="summary-sep">·</text>
+      <text>收款 {{totalEarnStr}}</text>
+    </view>
+    <view class="summary-bar">
+      <text>共 {{total}} 单，{{totalPages}} 页</text>
+      <block wx:if="{{totalPages > 1}}">
+        <text class="summary-sep">·</text>
+        <text>共计收款 {{allEarnStr}}</text>
+      </block>
     </view>
     <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
                 disabled="{{querying}}" bind:change="onPagerChange" />

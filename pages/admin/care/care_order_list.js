@@ -43,6 +43,9 @@ Page({
     totalPages: 0,
     totalEarnStr: '',
     allEarnStr: '暂不可用',
+    // 本页的应收 / 减免合计（把每件装备卡上显示的「金额」「减免」加起来，已取消的装备不算；见 renderOrders）
+    pageChargeStr: '',
+    pageDiscountStr: '',
     querying: false,
     aiQueryConditions: ''
   },
@@ -178,6 +181,8 @@ Page({
 
   renderOrders(orders, total, page, pageSize, allEarn) {
     var totalEarn = 0
+    var pageCharge = 0
+    var pageDiscount = 0
     for (var i = 0; orders && i < orders.length; i++) {
       var order = orders[i]
       var bizDate = new Date(order.biz_date)
@@ -223,6 +228,12 @@ Page({
       order.careExpanded = !!(this.expandedCareOrderIds && this.expandedCareOrderIds[order.id])
       // 所有装备（不含已取消的）都发板了：整张订单卡片换底色
       order.allCaresDone = careOrderRows.allCaresDone(order.careRows)
+      // 应收 / 减免合计：每件装备卡上的「金额」「减免」加起来（招待 / 质保按标准价、减免到 0 元，与卡上显示一致）；已取消的装备不会再收，不算
+      for (var r = 0; r < order.careRows.length; r++) {
+        if (order.careRows[r].statusClass === 'cancel') continue
+        pageCharge += order.careRows[r].charge || 0
+        pageDiscount += order.careRows[r].discount || 0
+      }
       // 卡券使用派生（任一 care 选了券 →「券」标签；选了卡 → 并入「卡」标签，
       // 从 care.ticket_code/use_card 直接看，不依赖 punch_card_used——未生效/历史漏记也能亮）
       var haveTicket = false
@@ -242,7 +253,9 @@ Page({
       pageSize,
       totalPages,
       totalEarnStr: util.showAmount(totalEarn),
-      allEarnStr: allEarn == null ? '暂不可用' : util.showAmount(allEarn)
+      allEarnStr: allEarn == null ? '暂不可用' : util.showAmount(allEarn),
+      pageChargeStr: util.showAmount(Math.round(pageCharge * 100) / 100),
+      pageDiscountStr: util.showAmount(Math.round(pageDiscount * 100) / 100)
     })
   },
 
