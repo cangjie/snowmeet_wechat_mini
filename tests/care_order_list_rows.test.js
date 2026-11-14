@@ -912,3 +912,80 @@ test('详情页：订单页上每件装备卡的 id 是 care-装备id，滚动�
   const detailWxml = fs.readFileSync(path.join(__dirname, '..', 'pages/admin/care/care_order_detail/care_order_detail.wxml'), 'utf8')
   assert.match(detailWxml, /<view class="card" id="care-\{\{care\.id\}\}">/)
 })
+
+// ---- 筛选「招待」那一行的第四个选项：质保 ----
+const entertainRow = wxml.slice(wxml.indexOf('<!-- 招待 -->'), wxml.indexOf('<!-- 减免 -->'))
+
+test('招待那一行：正常 / 招待 / 质保 / 全部，质保排在招待和全部之间，和其它选项一样在手机 / 备注搜索时禁用', () => {
+  const labels = [...entertainRow.matchAll(/<label class="radio-item"><radio ([^>]*)\/>([^<]+)<\/label>/g)].map(m => [m[2], (m[1].match(/value="([^"]*)"/) || [])[1]])
+  assert.deepEqual(labels, [['正常', 'false'], ['招待', 'true'], ['质保', 'warranty'], ['全部', 'null']])
+  const warranty = entertainRow.match(/<radio value="warranty"[^>]*\/>/)[0]
+  assert.match(warranty, /disabled="\{\{\(cell != null && cell != ''\) \|\| \(keyword != null && keyword != ''\) \|\| querying\}\}"/)
+})
+
+function queryWith(page, value) {
+  page.setQueryOptionValue('isEntertain', value)
+  return page._buildQueryParams()
+}
+
+test('选「质保」：只按质保查（haveWarranty=true），招待不限；其它三项仍是原来的意思', () => {
+  const page = loadList()
+  const w = queryWith(page, 'warranty')
+  assert.equal(w.haveWarranty, true)
+  assert.equal(w.isEntertain, null)
+  const normal = queryWith(page, 'false')
+  assert.deepEqual([normal.isEntertain, normal.haveWarranty], [false, null])
+  const entertain = queryWith(page, 'true')
+  assert.deepEqual([entertain.isEntertain, entertain.haveWarranty], [true, null])
+  const all = queryWith(page, 'null')
+  assert.deepEqual([all.isEntertain, all.haveWarranty], [null, null])
+})
+
+test('选了质保再改回别的，不会残留质保条件；其它筛选项不受影响', () => {
+  const page = loadList()
+  page.setQueryOptionValue('haveDiscount', 'true')
+  page.setQueryOptionValue('useCard', 'false')
+  const w = queryWith(page, 'warranty')
+  assert.deepEqual([w.haveDiscount, w.useCard, w.isTest], [true, false, false])
+  assert.equal(queryWith(page, 'false').haveWarranty, null)
+})
+
+test('输了手机号或备注关键词：和旧版一样放宽所有筛选，质保条件也放开', () => {
+  const page = loadList()
+  page.setQueryOptionValue('isEntertain', 'warranty')
+  page.setData({ cell: '7897' })
+  const p = page._buildQueryParams()
+  assert.deepEqual([p.isEntertain, p.haveWarranty], [null, null])
+})
+
+test('查询时 haveWarranty 传给列表接口的对应位置，其它位置不错位', () => {
+  const calls = []
+  global.getApp = () => ({ globalData: { sessionKey: 'sk' } })
+  global.wx = {}
+  const page = loadPage('pages/admin/care/care_order_list.js', {
+    IMAGE_HOST: 'https://img.example',
+    getRentOrdersByStaffPagedPromise: (...args) => { calls.push(args); return new Promise(() => {}) }
+  })
+  delete global.getApp
+  delete global.wx
+  page.setData({ startDate: '2026-11-14', endDate: '2026-11-14', shop: '万龙服务中心' })
+  page.setQueryOptionValue('isEntertain', 'warranty')
+  page.getData(1, 50)
+  assert.equal(calls.length, 1)
+  const a = calls[0]
+  // 参数顺序见 utils/data.js getRentOrdersByStaffPagedPromise：4=type 8=isTest 9=isEntertain 16=haveWarranty 17=retailType
+  assert.equal(a[4], '养护')
+  assert.equal(a[9], null)
+  assert.equal(a[16], true)
+  assert.equal(a[17], null)
+  assert.equal(a[14], 'sk')
+})
+
+test('data.js 把 haveWarranty=true 带进 Order/GetOrdersByStaffPaged 的地址', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'utils/data.js'), 'utf8')
+  const fn = src.slice(src.indexOf('const getRentOrdersByStaffPagedPromise'), src.indexOf('const getOrderByStaffPromise'))
+  assert.match(fn, /Order\/GetOrdersByStaffPaged/)
+  assert.match(fn, /haveWarranty != null\) \{ qUrl \+= '&haveWarranty=' \+ haveWarranty \}/)
+  // 参数位置：…, sessionKey, cell, haveWarranty, retailType, …
+  assert.match(fn, /sessionKey, cell, haveWarranty, retailType, keyword/)
+})

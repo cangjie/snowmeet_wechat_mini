@@ -43,6 +43,7 @@
       <radio-group id="isEntertain" class="radio-group" bindchange="setQueryOptions">
         <label class="radio-item"><radio checked="{{true}}" value="false" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>正常</label>
         <label class="radio-item"><radio value="true" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>招待</label>
+        <label class="radio-item"><radio value="warranty" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>质保</label>
         <label class="radio-item"><radio value="null" disabled="{{(cell != null && cell != '') || (keyword != null && keyword != '') || querying}}"/>全部</label>
       </radio-group>
     </view>

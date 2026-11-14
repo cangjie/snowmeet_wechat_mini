@@ -9,6 +9,9 @@ const adminAssistant = require('../../../utils/adminAssistant.js')
 const careOrderRows = require('../../../utils/care_order_rows.js')
 
 const IMG_HOST = data.IMAGE_HOST
+// 「招待」那一行的第四个选项「质保」的取值：它不是「招待与否」，而是只看带「质」标识（有质保装备）的订单，
+// 查询时换成后端的 haveWarranty=true、isEntertain 不限（见 _buildQueryParams）
+const WARRANTY_OPTION = 'warranty'
 // 订单状态 chip 的配色（状态文字是后端 Order.orderStatus，与旧系统其它订单列表、新版零售订单列表同口径）
 const STATUS_CLASS = {
   '临时订单': 'temp',
@@ -98,7 +101,7 @@ Page({
   },
 
   _buildQueryParams() {
-    var isTest = null, isEntertain = null, haveDiscount = null, isSummerCare = null, useCard = null
+    var isTest = null, isEntertain = null, haveDiscount = null, isSummerCare = null, useCard = null, haveWarranty = null
     var queryOptions = this.data.queryOptions
     for (var i = 0; i < queryOptions.length; i++) {
       switch (queryOptions[i].key) {
@@ -108,6 +111,10 @@ Page({
         case 'summer':       isSummerCare = queryOptions[i].value; break
         case 'useCard':      useCard      = queryOptions[i].value; break
       }
+    }
+    if (isEntertain === WARRANTY_OPTION) {
+      isEntertain = null
+      haveWarranty = true
     }
     var shop = this.data.shop
     var startDate = this.data.startDate
@@ -122,11 +129,12 @@ Page({
       shop = null
       isTest = null
       isEntertain = null
+      haveWarranty = null
       haveDiscount = null
       isSummerCare = null
       useCard = null
     }
-    return { shop, startDate, endDate, cell, keyword, isTest, isEntertain, haveDiscount, isSummerCare, useCard }
+    return { shop, startDate, endDate, cell, keyword, isTest, isEntertain, haveWarranty, haveDiscount, isSummerCare, useCard }
   },
 
   getData(page, pageSize) {
@@ -137,7 +145,7 @@ Page({
     data.getRentOrdersByStaffPagedPromise(
       null, p.shop, null, null, '养护', p.startDate, p.endDate,
       null, p.isTest, p.isEntertain, null, null, p.haveDiscount, null,
-      app.globalData.sessionKey, p.cell, null, null, p.keyword, p.isSummerCare,
+      app.globalData.sessionKey, p.cell, p.haveWarranty, null, p.keyword, p.isSummerCare,
       null, null, p.useCard, null,
       null,
       page, pageSize
