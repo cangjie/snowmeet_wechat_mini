@@ -11,9 +11,20 @@
 // 后端依赖（SnowmeetApi）：QrCode/GetReceptCheckinByStaff、Member/GetMember、Member/UpdateMemberInfo；
 //   选店由 shop-selector 组件内部调 Order/GetShops
 const app = getApp();
+
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 const { normalizePhone, isValidInternationalPhone, shouldLookupPhone } = require('../../../utils/phone.js');
+
+// 开发 / 测试专用的店员号：登录会员的手机号（绑定号或登记的号码）尾号是 7897。
+// 这样的店员勾「这是测试订单」不用再确认；其余店员要确认（见 onTestToggle）
+const TESTER_CELL_SUFFIX = '7897';
+function isTesterStaff() {
+  const member = (app.globalData && app.globalData.member) || null;
+  if (!member) return false;
+  const nums = [member.cell].concat((member.memberSocialAccounts || []).filter((a) => a && a.type === 'cell').map((a) => a.num));
+  return nums.some((n) => n !== null && n !== undefined && String(n).trim().endsWith(TESTER_CELL_SUFFIX));
+}
 
 const POLL_INTERVAL = 1500;
 
@@ -386,8 +397,27 @@ Page({
     });
   },
 
+  // 勾 / 取消「这是测试订单」：取消勾选直接生效；勾选时，测试号（手机尾号 7897，开发测试专用）直接生效，
+  // 其他店员要先弹窗确认一次——测试单不计入营业数据，别把真实顾客的单勾成测试单
   onTestToggle() {
-    this.setData({ isTest: !this.data.isTest });
+    if (this.data.isTest) {
+      this.setData({ isTest: false });
+      return;
+    }
+    if (isTesterStaff()) {
+      this.setData({ isTest: true });
+      return;
+    }
+    const that = this;
+    wx.showModal({
+      title: '确认测试订单',
+      content: '确认这是一张测试订单吗？测试订单不计入营业数据。',
+      confirmText: '确认',
+      cancelText: '取消',
+      success(res) {
+        if (res && res.confirm) that.setData({ isTest: true });
+      }
+    });
   },
 
   /* ---------- 选业务进入开单 ---------- */

@@ -91,7 +91,7 @@
   color: var(--on-surface-variant);
 }
 
-/* 测试订单勾选：勾上后用红色提醒这是测试单 */
+/* 测试订单勾选：在页面内容最上面，勾上后用红色提醒这是测试单 */
 .test-row {
   display: flex;
   align-items: center;
