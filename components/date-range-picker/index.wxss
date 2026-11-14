@@ -26,14 +26,16 @@
 .dpr-shortcuts {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 10rpx;
 }
 
 .dpr-btn {
   flex: 1;
+  white-space: nowrap;
   text-align: center;
   font-size: 22rpx;
-  padding: 6rpx 0;
+  padding: 6rpx 6rpx;
   border-radius: 6rpx;
   border: 1rpx solid #d0d0d0;
   color: #555;

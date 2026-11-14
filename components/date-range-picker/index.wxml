@@ -12,6 +12,10 @@
           data-key="thisweek" bindtap="onShortcut">本周</view>
     <view class="dpr-btn {{activeShortcut == 'lastweek' ? 'dpr-btn--active' : ''}}"
           data-key="lastweek" bindtap="onShortcut">上周</view>
+    <view class="dpr-btn {{activeShortcut == 'season' ? 'dpr-btn--active' : ''}}"
+          data-key="season" bindtap="onShortcut">本雪季</view>
+    <view class="dpr-btn {{activeShortcut == 'all' ? 'dpr-btn--active' : ''}}"
+          data-key="all" bindtap="onShortcut">全部</view>
   </view>
 </view>
 

@@ -16,6 +16,15 @@ function _fmt(d) {
   return util.formatDate(d)
 }
 
+// 雪季每年 10 月 15 日开始：「本雪季」= 最近一个 10-15（含当天）到今天，
+// 「全部」= 2015-10-15 到今天。可选日历仍只往回 3 年，这两个快捷键直接给出区间，不经日历。
+const ALL_START = '2015-10-15'
+
+function _seasonStart(today) {
+  var thisYear = new Date(today.getFullYear(), 9, 15)
+  return _fmt(today.getTime() >= thisYear.getTime() ? thisYear : new Date(today.getFullYear() - 1, 9, 15))
+}
+
 function _getMonday(d) {
   var day = d.getDay() || 7
   var m = new Date(d)
@@ -126,6 +135,14 @@ Component({
           end = _fmt(lastSunday)
           break
         }
+        case 'season':
+          start = _seasonStart(today)
+          end = _fmt(today)
+          break
+        case 'all':
+          start = ALL_START
+          end = _fmt(today)
+          break
       }
       this.setData({ activeShortcut: key })
       this.triggerEvent('change', { startDate: start, endDate: end })
