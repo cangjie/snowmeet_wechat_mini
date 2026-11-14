@@ -253,7 +253,7 @@ test('「装备 N 件」那一行就是折叠开关：带订单下标、显示�
 })
 
 test('装备明细只在展开时渲染；原来「还有 N 件装备」的局部折叠已被整体折叠取代', () => {
-  assert.match(cardBlock, /<view wx:if="\{\{item\.careExpanded\}\}" class="care-line care-line--\{\{cr\.statusClass\}\}">/)
+  assert.match(cardBlock, /<view wx:if="\{\{item\.careExpanded\}\}" class="care-line care-line--\{\{cr\.statusClass\}\}"[^>]*>/)
   assert.doesNotMatch(cardBlock, /careHiddenCount|care-more|cr\.folded/)
 })
 
@@ -333,7 +333,7 @@ test('装备区在右侧详情列（order-rows）外面，才能让图标落到�
 })
 
 test('每件装备前面有一格图标列：双板 / 单板才显示图标，图标在内容之前、不是文字', () => {
-  const line = cardBlock.match(/<view wx:if="\{\{item\.careExpanded\}\}" class="care-line care-line--\{\{cr\.statusClass\}\}">[\s\S]*?<view class="care-main">/)[0]
+  const line = cardBlock.match(/<view wx:if="\{\{item\.careExpanded\}\}" class="care-line care-line--\{\{cr\.statusClass\}\}"[^>]*>[\s\S]*?<view class="care-main">/)[0]
   assert.match(line, /<view class="care-icon-col">/)
   assert.match(line, /<image wx:if="\{\{cr\.iconSrc\}\}" class="care-kind" src="\{\{cr\.iconSrc\}\}"/)
   assert.match(line, /mode="aspectFit"/)
@@ -647,7 +647,7 @@ test('版式：进度文字标签是白底药丸，文字颜色跟阶段走（�
 // ───────────── 装备整块的背景色块（按进度分四种） ─────────────
 
 test('背景色块：整块装备（图标列 + 内容 + 照片）的外层 .care-line 带阶段 class，图标列、内容、照片都在它里面', () => {
-  const open = '<view wx:if="{{item.careExpanded}}" class="care-line care-line--{{cr.statusClass}}">'
+  const open = '<view wx:if="{{item.careExpanded}}" class="care-line care-line--{{cr.statusClass}}"'
   assert.ok(cardBlock.includes(open))
   assert.equal(insideView(cardBlock, 'class="care-line care-line--{{cr.statusClass}}"', 'class="care-icon-col"'), true)
   assert.equal(insideView(cardBlock, 'class="care-line care-line--{{cr.statusClass}}"', 'class="care-body"'), true)
@@ -811,4 +811,104 @@ test('列表渲染：订单带 allCaresDone，所有装备发板的订单卡片�
   const cardClass = cardBlock.match(/<view class="order-card ([^"]*)"/)[1]
   assert.match(cardClass, /item\.allCaresDone && !item\.unpaid \? 'order-card--done'/)
   assert.match(wxss, /\.order-card--done\s*\{\s*background:\s*#f0faf4/)
+})
+
+// ---- 点装备进详情并定位到这一件 ----
+function careLineTag() {
+  return cardBlock.match(/<view wx:if="\{\{item\.careExpanded\}\}" class="care-line[^>]*>/)[0]
+}
+
+test('点某一件装备：进订单详情并带上这件装备的 careId', () => {
+  const page = loadList()
+  page.renderOrders([orderWith(1), orderWith(3)], 2, 1, 50)
+  page.data.orders[1].id = 77
+  const calls = []
+  global.wx = { navigateTo: arg => calls.push(arg) }
+  try {
+    page.onCareTap(tap({ idx: '1', cid: '2' }))
+    page.onCareTap(tap({ idx: '0', cid: '1' }))
+  } finally {
+    delete global.wx
+  }
+  assert.deepEqual(calls, [
+    { url: 'care_order_detail/care_order_detail?orderId=77&careId=2' },
+    { url: 'care_order_detail/care_order_detail?orderId=' + page.data.orders[0].id + '&careId=1' }
+  ])
+})
+
+test('点订单公共部分仍然只带 orderId，不带 careId（详情页走原来的默认展开）', () => {
+  const page = loadList()
+  page.renderOrders([orderWith(2)], 1, 1, 50)
+  const calls = []
+  global.wx = { navigateTo: arg => calls.push(arg) }
+  try {
+    page.gotoDetail({ currentTarget: { id: '0' } })
+  } finally {
+    delete global.wx
+  }
+  assert.deepEqual(calls, [{ url: 'care_order_detail/care_order_detail?orderId=' + page.data.orders[0].id }])
+})
+
+test('点装备：临时订单、找不到订单或装备时不跳转', () => {
+  const page = loadList()
+  page.renderOrders([Object.assign(orderWith(2), { careProperties: { orderStatus: '临时订单' } }), orderWith(2)], 2, 1, 50)
+  const calls = []
+  global.wx = { navigateTo: arg => calls.push(arg) }
+  try {
+    page.onCareTap(tap({ idx: '0', cid: '1' }))   // 临时订单
+    page.onCareTap(tap({ idx: '9', cid: '1' }))   // 没有这一单
+    page.onCareTap(tap({ idx: '1', cid: '' }))    // 没有装备
+  } finally {
+    delete global.wx
+  }
+  assert.deepEqual(calls, [])
+})
+
+test('装备块自己接管点击（catchtap），不会冒泡成整单点击；带订单下标和装备 id', () => {
+  const tag = careLineTag()
+  assert.match(tag, /catchtap="onCareTap"/)
+  assert.match(tag, /data-idx="\{\{index\}\}"/)
+  assert.match(tag, /data-cid="\{\{cr\.id\}\}"/)
+  // 整张卡片的点击还是进详情（订单公共部分）
+  assert.match(cardBlock, /class="order-card[^"]*"[^>]*bindtap="gotoDetail"/)
+})
+
+// 详情页：收到 careId 后只展开这一件、收起其它、并滚动到这一件
+function loadDetail() {
+  global.getApp = () => ({ globalData: {} })
+  global.wx = {}
+  const util = require('../utils/util.js')
+  const page = loadPage('pages/admin/care/care_order_detail/care_order_detail.js', { IMAGE_HOST: 'https://img.example' })
+  void util
+  delete global.getApp
+  delete global.wx
+  return page
+}
+
+test('详情页收到 careId：目标装备展开、其它全部收起，并滚动到目标装备', async () => {
+  const page = loadDetail()
+  page._uiState = { expanded: {}, veriType: {}, safeCheck: {}, cancelReason: {} }
+  page._targetCareId = 12
+  page.data.cares = [
+    { id: 11, _expanded: true },
+    { id: 12, _expanded: false },
+    { id: 13, _expanded: true }
+  ]
+  const scrolls = []
+  global.wx = { pageScrollTo: arg => scrolls.push(arg) }
+  try {
+    page._applyTargetCare()
+    assert.deepEqual(page.data.cares.map(c => [c.id, c._expanded]), [[11, false], [12, true], [13, false]])
+    assert.deepEqual(page._uiState.expanded, { 11: false, 12: true, 13: false })
+    await new Promise(r => setTimeout(r, 400))
+  } finally {
+    delete global.wx
+  }
+  assert.equal(scrolls.length, 1)
+  assert.equal(scrolls[0].selector, '#care-12')
+})
+
+test('详情页：订单页上每件装备卡的 id 是 care-装备id，滚动选择器对得上', () => {
+  const detailWxml = fs.readFileSync(path.join(__dirname, '..', 'pages/admin/care/care_order_detail/care_order_detail.wxml'), 'utf8')
+  assert.match(detailWxml, /<view class="card" id="care-\{\{care\.id\}\}">/)
 })

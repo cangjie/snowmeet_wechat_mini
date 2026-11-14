@@ -267,6 +267,15 @@ Page({
     }
   },
 
+  // 点某一件装备（整块，照片除外）：进订单详情并定位到这件——详情页收到 careId 后只展开这一件、收起其它、滚动到这一件。
+  // 点订单公共部分仍走 gotoDetail（不带 careId）。wxml 用 catchtap，不会再冒泡成整单的点击
+  onCareTap(e) {
+    var order = this.data.orders[parseInt(e.currentTarget.dataset.idx)]
+    var cid = parseInt(e.currentTarget.dataset.cid)
+    if (!order || !cid || !order.careProperties || order.careProperties.orderStatus === '临时订单') return
+    wx.navigateTo({ url: 'care_order_detail/care_order_detail?orderId=' + order.id + '&careId=' + cid })
+  },
+
   setCell(e) {
     this.setData({ cell: e.detail.value })
   },

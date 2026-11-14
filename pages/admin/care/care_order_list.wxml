@@ -177,7 +177,7 @@
           <text class="care-toggle">{{item.careExpanded ? '收起' : '展开'}}<text class="care-arrow {{item.careExpanded ? 'care-arrow--open' : ''}}">›</text></text>
         </view>
         <block wx:for="{{item.careRows}}" wx:for-item="cr" wx:for-index="ci" wx:key="id">
-          <view wx:if="{{item.careExpanded}}" class="care-line care-line--{{cr.statusClass}}">
+          <view wx:if="{{item.careExpanded}}" class="care-line care-line--{{cr.statusClass}}" data-idx="{{index}}" data-cid="{{cr.id}}" catchtap="onCareTap">
             <view class="care-icon-col">
               <image wx:if="{{cr.iconSrc}}" class="care-kind" src="{{cr.iconSrc}}" mode="aspectFit" />
             </view>
