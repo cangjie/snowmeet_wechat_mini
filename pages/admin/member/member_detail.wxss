@@ -79,8 +79,25 @@
 .order-empty { padding: 40rpx 0; text-align: center; color: #6f7881; font-size: 25rpx; }
 .order-row--tap:active { background: #f3f8fc; }
 .order-l, .punch-l { display: flex; flex-direction: column; gap: 4rpx; }
+.order-l { flex: 1; min-width: 0; }
 .order-code { font-size: 25rpx; font-weight: 600; color: #0b1c30; }
 .order-meta { font-size: 22rpx; color: #6f7881; }
+/* 最近订单：图标位 + 两行（订单号 + 金额 / 日期 + 券和卡） */
+.order-row .order-icons { display: flex; flex-direction: row; align-items: center; gap: 6rpx; width: 64rpx; flex-shrink: 0; margin-right: 12rpx; }
+.type-ico { width: 48rpx; height: 48rpx; line-height: 48rpx; text-align: center; border-radius: 12rpx; font-size: 25rpx; font-weight: 700; }
+.type-ico--rent { color: #006495; background: #e1edf7; }
+.type-ico--care { color: #1f7a4d; background: #e1f3ea; }
+.type-ico--retail { color: #b45309; background: #fdeed8; }
+.type-ico--ski { color: #6d3fb5; background: #eee6fa; }
+.type-ico--other { color: #5b6672; background: #eceff3; }
+.order-line1, .order-line2 { display: flex; flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 14rpx; row-gap: 2rpx; }
+.order-amt { font-size: 22rpx; color: #6f7881; }
+.order-amt--total { color: #0b1c30; font-weight: 600; }
+.order-amt--discount.order-amt--on { color: #c2410c; }
+.order-amt--paid { color: #006495; font-weight: 600; }
+.order-use { font-size: 22rpx; color: #3f4850; }
+.order-use--ticket { color: #b45309; }
+.order-use--card { color: #1f7a4d; }
 .punch-name { font-size: 27rpx; font-weight: 600; color: #0b1c30; }
 .punch-biz { font-size: 22rpx; color: #6f7881; }
 .punch-remain { font-size: 25rpx; font-weight: 600; color: #006495; }

@@ -89,7 +89,22 @@
               data-t="{{item}}" bindtap="onOrderTab">{{item}}</view>
       </scroll-view>
       <view wx:for="{{filteredOrders}}" wx:key="id" class="order-row order-row--tap" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="gotoOrder">
-        <view class="order-l"><text class="order-code mono">{{item.code}}</text><text class="order-meta">{{item.type}} · {{item.dateStr}}</text></view>
+        <!-- 图标位：先放订单类型图标，后面还要放别的图标就接在它后面 -->
+        <view class="order-icons"><view class="type-ico type-ico--{{item.icon.cls}}">{{item.icon.char}}</view></view>
+        <view class="order-l">
+          <view class="order-line1">
+            <text class="order-code mono">{{item.code}}</text>
+            <block wx:if="{{item.hasAmounts}}">
+              <text class="order-amt order-amt--total">{{item.totalStr}}</text>
+              <text class="order-amt order-amt--discount {{item.hasDiscount ? 'order-amt--on' : ''}}">减免{{item.discountStr}}</text>
+              <text class="order-amt order-amt--paid">实付{{item.paidStr}}</text>
+            </block>
+          </view>
+          <view class="order-line2">
+            <text class="order-meta">{{item.dateStr}}</text>
+            <text wx:for="{{item.uses}}" wx:for-item="u" wx:key="text" class="order-use order-use--{{u.kind}}">{{u.text}}</text>
+          </view>
+        </view>
         <van-icon name="arrow" size="15px" color="#bfc7d1" />
       </view>
       <view wx:if="{{filteredOrders.length === 0}}" class="order-empty">该分类暂无订单</view>

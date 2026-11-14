@@ -3,6 +3,7 @@
 const app = getApp()
 const data = require('../../../utils/data.js')
 const util = require('../../../utils/util.js')
+const recentOrders = require('../../../utils/member_recent_orders.js')
 
 Page({
   data: {
@@ -104,9 +105,8 @@ Page({
       m.isVip = !!m.isVip
       // 联系手机号（合并会员时保留的旧号，type=contact）
       m.contactCellsStr = (m.accounts && m.accounts.contactCells && m.accounts.contactCells.length > 0) ? m.accounts.contactCells.join('、') : ''
-      m.recentOrders = (m.recentOrders || []).map(function (o) {
-        return { id: o.id, code: o.code, type: o.type, dateStr: o.bizDate ? util.formatDate(new Date(o.bizDate)) : '' }
-      })
+      // 每条：类型图标 + 订单号 + 订单金额 / 减免 / 实付 + 日期 + 用了的券和卡（见 utils/member_recent_orders.js）
+      m.recentOrders = (m.recentOrders || []).map(recentOrders.recentOrderView)
       m.punchCards = (m.punchCards || []).map(function (c) {
         // total=NULL 即季卡（不限次数，2026-07-09 起）
         var isSeason = c.total == null
