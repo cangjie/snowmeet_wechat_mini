@@ -27,10 +27,14 @@
       </view>
 
       <view class="rental-items" wx:if="{{rental.expanded}}">
+        <!-- 每件租赁物：第一行品类，第二行编码 + 名称放在同一行（无编码的只显示名称） -->
         <view class="item-row" wx:for="{{rental.rentItems}}" wx:for-item="item" wx:key="id">
-          <view class="row"><text class="label">编码</text><text class="value">{{item.code || '-'}}</text></view>
-          <view class="row"><text class="label">名称</text><text class="value">{{item.name || '-'}}</text></view>
-          <view class="row"><text class="label">品类</text><text class="value">{{item.categoryName}}</text></view>
+          <view class="item-category">{{item.categoryName}}</view>
+          <view class="item-main">
+            <text class="item-code" wx:if="{{item.code}}">{{item.code}}</text>
+            <text class="item-name" wx:if="{{item.name}}">{{item.name}}</text>
+            <text class="item-name" wx:if="{{!item.code && !item.name}}">-</text>
+          </view>
         </view>
       </view>
     </block>

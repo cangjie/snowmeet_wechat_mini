@@ -130,6 +130,29 @@
   border-bottom: none;
 }
 
+.item-category {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 4rpx;
+}
+
+.item-main {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.item-code {
+  font-weight: 600;
+  margin-right: 20rpx;
+}
+
+.item-name {
+  word-break: break-all;
+}
+
 .rental-divider {
   height: 1rpx;
   background: #EEE;

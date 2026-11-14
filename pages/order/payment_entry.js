@@ -88,7 +88,9 @@ Page({
         // autoPay 只用一次：支付弹窗关掉后 onShow 会再查身份，不能再弹一遍
         if (that._autoPay && result.status === 'direct') {
           that._autoPay = false
-          that.pay()
+          // 租赁单不自动调起微信支付：顾客要先看清租赁商品、租赁物和押金租金，再自己点「敬请支付」（2026-11-14 用户要求）。
+          // 其它业务照旧。订单没拉到时认不出业务类型，也照旧。
+          if (!that._isRentOrder()) that.pay()
         }
       })
       .catch(function (err) {
@@ -120,8 +122,13 @@ Page({
     if (result.status === 'direct') {
       that.setData({ identity: result })
       data.getOrderFromPaymentByCustomer(that.data.paymentId, app.globalData.sessionKey).then(function (order){
-        console.log('[payment_entry] refresh order OK, auto-calling pay()')
         that.renderData(order)
+        // 租赁单：身份确认完也不自动支付，留给顾客自己点「敬请支付」（同 _refreshIdentity 的 autoPay 规则）
+        if (that._isRentOrder()) {
+          console.log('[payment_entry] refresh order OK, rent order: waiting for the customer to tap pay')
+          return
+        }
+        console.log('[payment_entry] refresh order OK, auto-calling pay()')
         that.pay()
       }).catch(function (err) {
         console.warn('[payment_entry] refresh order failed after direct, NOT auto-paying', err)
@@ -167,6 +174,11 @@ Page({
   onShareAppMessage() {
 
   },
+  // 当前已加载的订单是不是租赁单（订单没拉到时为 false）
+  _isRentOrder(){
+    var order = this.data.order
+    return !!(order && order.type == '租赁')
+  },
   renderData(order){
     var that = this
     // 选「当前扫码这笔 paymentId」对应的 payment；一张订单可有多笔 OrderPayment
@@ -210,7 +222,8 @@ Page({
           presetTotal += (rental.pricePresets[p].price || 0) - (rental.pricePresets[p].discount || 0)
         }
         rental.totalRentalAmountStr = util.showAmount(presetTotal > 0 ? presetTotal : (rental.totalRentalAmount || 0))
-        rental.expanded = false
+        // 租赁物默认展开：顾客付款前要能直接看到每件租赁物（点标题行可收起）
+        rental.expanded = true
         for (var k = 0; k < rental.rentItems.length; k++){
           var item = rental.rentItems[k]
           item.categoryName = (item.category && item.category.name) || item.class_name || '-'
