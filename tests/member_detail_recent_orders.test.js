@@ -159,6 +159,13 @@ test('模板：图标位里类型图标后面循环显示 卡 / 券 / 减 图标
   assert.match(sum, /wx:if="\{\{orderSummary\.show\}\}"/)
 })
 
+test('样式：图标位里的图标竖着排（一列，不换行），类型图标在最上面', () => {
+  const rule = WXSS.match(/\.order-row \.order-icons\s*\{[^}]*\}/)
+  assert.ok(rule, '找到图标位样式')
+  assert.match(rule[0], /flex-direction:\s*column/)
+  assert.equal(/flex-wrap:\s*wrap/.test(rule[0]), false, '不能再两列换行')
+})
+
 test('样式：图标位、四种类型图标、两行、金额和券卡文字的样式都有定义', () => {
   for (const cls of ['.order-icons', '.type-ico', '.type-ico--rent', '.type-ico--care', '.type-ico--retail', '.type-ico--ski', '.type-ico--other',
     '.order-line1', '.order-line2', '.order-amt', '.order-use', '.type-ico--card', '.type-ico--ticket', '.type-ico--discount', '.order-sum', '.order-amt--refund', '.order-amt--net']) {

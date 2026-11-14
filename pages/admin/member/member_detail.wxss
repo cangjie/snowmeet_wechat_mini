@@ -83,7 +83,8 @@
 .order-code { font-size: 25rpx; font-weight: 600; color: #0b1c30; }
 .order-meta { font-size: 22rpx; color: #6f7881; }
 /* 最近订单：图标位 + 两行（订单号 + 金额 / 日期 + 券和卡） */
-.order-row .order-icons { display: flex; flex-direction: row; flex-wrap: wrap; align-content: center; gap: 6rpx; width: 90rpx; flex-shrink: 0; margin-right: 14rpx; }
+/* 图标位：图标竖着排，类型图标在最上面，后面依次是 卡 / 券 / 减 */
+.order-row .order-icons { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6rpx; width: 42rpx; flex-shrink: 0; margin-right: 18rpx; }
 .type-ico { width: 42rpx; height: 42rpx; line-height: 42rpx; text-align: center; border-radius: 10rpx; font-size: 23rpx; font-weight: 700; }
 .type-ico--rent { color: #006495; background: #e1edf7; }
 .type-ico--care { color: #1f7a4d; background: #e1f3ea; }
