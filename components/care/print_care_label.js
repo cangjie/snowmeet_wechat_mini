@@ -3,6 +3,18 @@ const app = getApp()
 const data = require('../../utils/data.js')
 const util = require('../../utils/util.js')
 var tsc = require("../../utils/ble_label_printer/tsc.js")
+
+// 含包 / 含杖（care.with_bag / care.with_pole，开单时二选一，单板没有雪杖）：标签上写「含包」或「含杖」，
+// 并且只要含包或含杖，【存根】一次打两张（一张跟装备、一张跟包 / 杖）；顾客联不变，一张
+function extrasText(care) {
+  var list = []
+  if (care && care.with_bag == true) list.push('含包')
+  if (care && care.with_pole == true) list.push('含杖')
+  return list.join(' ')
+}
+function stubCopies(care) {
+  return extrasText(care) != '' ? 2 : 1
+}
 Component({
 
   /**
@@ -239,7 +251,8 @@ Component({
         that.data.copies = 1
       }
       else {
-        that.data.copies = 1
+        // 存根：含包 / 含杖打两张，其余一张
+        that.data.copies = stubCopies(care)
       }
       var summer = care.biz_type == '非雪季养护' ? true: false
       var edge = care.need_edge
@@ -248,7 +261,7 @@ Component({
       var type = care.equipment
       var more = care.repair_more ? care.repair_more : ''
       var memo = care.repair_memo ? care.repair_memo : ''
-      var pole = care.with_pole == true ? '含杖' : ''
+      var extras = extrasText(care)
       var orderDate = new Date(that.properties.order.biz_date || care.create_date)
       var orderDateStr = (orderDate.getMonth() + 1).toString() + '-' + orderDate.getDate().toString()
       var urgent = false
@@ -276,7 +289,11 @@ Component({
       command.setCls()//清除缓冲区
       command.setText(20, 20, font, 0, 1, 1, labelType + ' ' + (urgent ? '(急)' : '') + orderNum)
       command.setText(20, 20 + 40, font, 0, 1, 1, maskedName + " " + maskedCell)
-      command.setText(20, 20 + 40 + 40, font, 0, 1, 1, type + "：" + brand + " 长度：" + scale + "  " + pole)
+      command.setText(20, 20 + 40 + 40, font, 0, 1, 1, type + "：" + brand + " 长度：" + scale)
+      if (extras != '') {
+        // 含包 / 含杖：标在右上角（订单号、姓名手机号右边的空位，二维码上方），只有一个时放大一倍更醒目
+        command.setText(420, 45, font, 0, extras.length > 2 ? 1 : 2, extras.length > 2 ? 1 : 2, extras)
+      }
       if (edge.toString() == '1') {
         command.setText(20, 20 + 40 + 40 + 55, font, 0, 1, 1, "修刃 " + degree + "：")
       }
@@ -452,9 +469,10 @@ Component({
       })
     },
     printCommonLabel(e) {
+      var care = this.properties.care
       wx.showModal({
         title: '打印确认',
-        content: '即将打印【标签存根】',
+        content: '即将打印【标签存根】' + (stubCopies(care) > 1 ? '，共 ' + stubCopies(care) + ' 张（' + extrasText(care) + '）' : ''),
         complete: (res) => {
           if (res.cancel) {
 

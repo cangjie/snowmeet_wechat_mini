@@ -25,6 +25,21 @@ const KIND_ICONS = {
   '单板': '/images/care/icon-snowboard.svg'
 }
 
+// 含包 / 含杖（care.with_bag / care.with_pole，开单时二选一、单板没有雪杖）：在列表里用小图标放在双板 / 单板图标下面，不写字
+const EXTRA_ICONS = {
+  bag: { key: 'bag', label: '含包', src: '/images/care/icon-bag.svg' },
+  pole: { key: 'pole', label: '含杖', src: '/images/care/icon-pole.svg' }
+}
+
+// 这件装备带的是包还是杖：返回要显示的图标（顺序：包、杖）。正常数据只会有一个（二选一）；
+// 万一两个都为真（不该发生）如实都显示，不替人选一个
+function equipmentExtras(care) {
+  const list = []
+  if (care && care.with_bag === true) list.push(EXTRA_ICONS.bag)
+  if (care && care.with_pole === true) list.push(EXTRA_ICONS.pole)
+  return list
+}
+
 // 装备类型：'双板' / '单板'，其它（头盔等）和没填的返回 ''
 function equipmentKind(care) {
   const type = trim(care.equipment)
@@ -213,6 +228,7 @@ function buildCareRows(cares, imageHost) {
       title: equipmentTitle(care),
       kind: equipmentKind(care),
       iconSrc: KIND_ICONS[equipmentKind(care)] || '',
+      extras: equipmentExtras(care),
       charge: amount.charge,
       discount: amount.discount,
       chargeStr: money(amount.charge),
@@ -264,4 +280,4 @@ function effectiveOrders(orders) {
   return (orders || []).filter(isEffectiveOrder)
 }
 
-module.exports = { buildCareRows, equipmentTitle, equipmentKind, serviceChips, careProgress, allCaresDone, isEffectiveOrder, effectiveOrders }
+module.exports = { buildCareRows, equipmentTitle, equipmentKind, equipmentExtras, serviceChips, careProgress, allCaresDone, isEffectiveOrder, effectiveOrders }

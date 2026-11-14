@@ -9,6 +9,7 @@ const app = getApp();
 const util = require('../../../../utils/util.js');
 const data = require('../../../../utils/data.js');
 const repairMedia = require('../../../../utils/care_repair_media.js');
+const careOrderRows = require('../../../../utils/care_order_rows.js');
 
 // 与 data.js uploadFilePromise 的上传域名保持一致（照片落在处理上传那台服务器的磁盘）
 const IMG_HOST = data.IMAGE_HOST;
@@ -310,7 +311,12 @@ Page({
     if (care.repair_memo) chips.push({ text: '维修:' + care.repair_memo, cls: 'chip-outline' });
     if (care.entertain) chips.push({ text: '招待', cls: 'chip-outline' });
     if (care.warranty) chips.push({ text: '质保', cls: 'chip-outline' });
+    // 含包 / 含杖（开单时二选一，单板没有雪杖）：带小图标的 chip，和订单列表里装备图标下面的小图标同一套
+    careOrderRows.equipmentExtras(care).forEach((ex) => {
+      chips.push({ text: ex.label, cls: 'chip-extra chip-extra--' + ex.key, icon: ex.src });
+    });
     care._chips = chips;
+    care._extrasText = careOrderRows.equipmentExtras(care).map((ex) => (ex.key === 'bag' ? '雪包' : '雪杖')).join(' ');
     // 用了卡/券 → chips 行显示卡券 icon，点击 toast 详情（onBenefitTap）
     care._hasBenefit = !!(care.use_card && care.card_id)
       || !!(care.ticket_code && String(care.ticket_code).trim());
@@ -1440,9 +1446,26 @@ Page({
     });
   },
 
+  // 雪包 / 雪杖二选一：点一个勾上时另一个自动取消，再点取消，也可以都不选（不可能既含包又含杖）；单板没有雪杖
+  onWithBagTap(e) {
+    const cidx = this._careIdx(e);
+    const on = !this.data.cares[cidx].with_bag;
+    const patch = { ['cares[' + cidx + '].with_bag']: on };
+    if (on) patch['cares[' + cidx + '].with_pole'] = false;
+    this.setData(patch);
+  },
+
   onWithPoleTap(e) {
     const cidx = this._careIdx(e);
-    this.setData({ ['cares[' + cidx + '].with_pole']: !this.data.cares[cidx].with_pole });
+    const care = this.data.cares[cidx];
+    if (care.equipment === '单板') {
+      wx.showToast({ title: '单板没有雪杖', icon: 'none' });
+      return;
+    }
+    const on = !care.with_pole;
+    const patch = { ['cares[' + cidx + '].with_pole']: on };
+    if (on) patch['cares[' + cidx + '].with_bag'] = false;
+    this.setData(patch);
   },
 
   onEditPhotoRead(e) {
@@ -1506,7 +1529,9 @@ Page({
       ? ((care._leftSerial || '') + '|' + (care._rightSerial || ''))
       : (care.serials || '');
     // bool 字段 coerce，不发 null（后端非可空 bool，null 反序列化 400）
-    payload.with_pole = !!care.with_pole;
+    // 雪包 / 雪杖二选一、单板没有雪杖：提交前再收一次，不管页面上怎么点的，存下去的不会既含包又含杖
+    payload.with_bag = !!care.with_bag;
+    payload.with_pole = !!care.with_pole && care.equipment !== '单板' && !payload.with_bag;
     payload.entertain = !!care.entertain;
     payload.warranty = !!care.warranty;
     payload.use_card = !!raw.use_card;

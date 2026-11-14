@@ -604,3 +604,19 @@
   text-align: center;
 }
 .repair-none { font-size: 24rpx; color: #9aa3ac; line-height: 128rpx; }
+
+/* 含包 / 含杖：服务 chip 行里带小图标的 chip（和订单列表装备图标下面的小图标同一套） */
+.chip-extra { font-weight: 600; }
+.chip-extra--bag { background: #fef3c7; color: #92400e; }
+.chip-extra--pole { background: #ede9fe; color: #5b21b6; }
+.chip-icon {
+  width: 24rpx;
+  height: 24rpx;
+  margin-right: 6rpx;
+}
+/* 编辑装备信息里的雪包 / 雪杖按钮：并排 */
+.edit-extra-btns {
+  display: flex;
+  flex-direction: row;
+  gap: 12rpx;
+}

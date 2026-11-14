@@ -106,7 +106,8 @@ function blankCare() {
     year: null,
     serials: null,
     boot_length: null,
-    with_pole: null,
+    with_pole: null,   // 含杖（单板没有）
+    with_bag: null,    // 含包（2026-11-14）；与含杖二选一
     need_edge: 0,
     edge_degree: null,
     need_wax: 0,
@@ -669,8 +670,33 @@ Component({
         c.brand = null;
         c.repair_memo = null;
         c.need_repair = 0;
+        // 单板没有雪杖：换成单板时取消「含杖」
+        if (equip === '单板') c.with_pole = false;
       });
       this._maybeShowHistory(cidx, equip);
+    },
+    // 含包 / 含杖二选一：点「含包」勾上时自动取消「含杖」，再点一下取消；不影响价格，所以不重新计价
+    onWithBagTap(e) {
+      const cidx = Number(e.currentTarget.dataset.cidx);
+      this._mutate(cidx, (c) => {
+        const on = !c.with_bag;
+        c.with_bag = on;
+        if (on) c.with_pole = false;
+      }, true, false);
+    },
+    // 点「含杖」勾上时自动取消「含包」；单板没有雪杖，点了没用（按钮已置灰）
+    onWithPoleTap(e) {
+      const cidx = Number(e.currentTarget.dataset.cidx);
+      const cur = this.data.displayCares[cidx];
+      if (cur && cur.equipment === '单板') {
+        wx.showToast({ title: '单板没有雪杖', icon: 'none' });
+        return;
+      }
+      this._mutate(cidx, (c) => {
+        const on = !c.with_pole;
+        c.with_pole = on;
+        if (on) c.with_bag = false;
+      }, true, false);
     },
     /* ---------- 历史装备弹层：会员 + 有同类型养护记录才弹 ---------- */
     _maybeShowHistory(cidx, equip) {
@@ -1364,6 +1390,7 @@ Component({
               c.need_repair = 0;
             }
             c.equipment = card.equip_type;
+            if (c.equipment === '单板') c.with_pole = false;   // 季卡绑的是单板：没有雪杖
             c.brand = card.equip_brand;
             c.scale = card.equip_scale;
             c.card_equip_lock = true;

@@ -229,3 +229,33 @@
   font-size: 22rpx;
   color: #6b7280;
 }
+
+/* 含包 / 含杖勾选：放在装备类型那一行（4 列网格）右边两个空格里，和类型按钮同高 */
+.extra-chk {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+.extra-box {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--outline);
+  border-radius: 4px;
+  background: var(--surface-container-lowest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.extra-chk--on { color: var(--primary); }
+.extra-chk--on .extra-box {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+/* 单板没有雪杖：置灰、不可点 */
+.extra-chk--disabled { opacity: 0.4; }

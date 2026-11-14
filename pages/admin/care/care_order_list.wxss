@@ -365,6 +365,14 @@
   height: 48rpx;
 }
 
+/* 含包 / 含杖的小图标：放在双板 / 单板图标正下面，居中对齐 */
+.care-extra {
+  display: block;
+  width: 36rpx;
+  height: 36rpx;
+  margin: 8rpx auto 0;
+}
+
 /* 每件装备的内容（块与块之间靠 .care-line 的色块和间距分开，不再画虚线） */
 .care-body {
   flex: 1;
@@ -574,7 +582,8 @@
 .order-card--unpaid .care-task-sep,
 .order-card--unpaid .care-section-title,
 .order-card--unpaid .care-toggle { color: #b0b0b0; }
-.order-card--unpaid .care-kind { opacity: 0.4; filter: grayscale(1); }
+.order-card--unpaid .care-kind,
+.order-card--unpaid .care-extra { opacity: 0.4; filter: grayscale(1); }
 .order-card--unpaid .care-amount,
 .order-card--unpaid .care-amount-label,
 .order-card--unpaid .care-memo,

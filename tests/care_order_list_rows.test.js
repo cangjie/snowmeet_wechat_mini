@@ -361,7 +361,7 @@ test('「装备 N 件」标题的内容从右侧详情列的左边缘开始（�
 })
 
 test('没付款的灰色订单：装备图标同样置灰', () => {
-  assert.match(wxss, /\.order-card--unpaid \.care-kind\s*\{[^}]*(opacity|grayscale)/)
+  assert.match(wxss, /\.order-card--unpaid \.care-kind,\s*\.order-card--unpaid \.care-extra\s*\{[^}]*(opacity|grayscale)/)   // 含包 / 含杖的小图标一起置灰
 })
 
 
@@ -1112,4 +1112,37 @@ test('汇总行：只有一页时写「应收 · 减免 · 共计收款」；多
   const count = bar.slice(bar.indexOf('<view class="summary-bar">'), bar.indexOf('<list-pager'))
   assert.match(count, /共 \{\{total\}\} 单，\{\{totalPages\}\} 页/)
   assert.match(count, /wx:if="\{\{totalPages > 1\}\}"[\s\S]*共计收款 \{\{allEarnStr\}\}/)
+})
+
+// ---- 含包 / 含杖：双板 / 单板图标下面的小图标 ----
+test('含包 / 含杖的装备：行上带对应的小图标（图标文件真实存在）；都没带的没有；单板含包也行', () => {
+  const [bag, pole, none, boardBag, nullFlags] = rows.buildCareRows([
+    care({ id: 1, with_bag: true }), care({ id: 2, with_pole: true }), care({ id: 3 }),
+    care({ id: 4, equipment: '单板', with_bag: true }), care({ id: 5, with_bag: null, with_pole: null })
+  ], '')
+  assert.deepEqual(bag.extras.map(e => [e.key, e.label]), [['bag', '含包']])
+  assert.deepEqual(pole.extras.map(e => [e.key, e.label]), [['pole', '含杖']])
+  assert.deepEqual(none.extras, [])
+  assert.deepEqual(boardBag.extras.map(e => e.key), ['bag'])
+  assert.deepEqual(nullFlags.extras, [])
+  for (const e of [...bag.extras, ...pole.extras]) {
+    assert.match(e.src, /^\/images\/care\/icon-(bag|pole)\.svg$/)
+    const file = path.join(__dirname, '..', e.src)
+    assert.ok(fs.existsSync(file), e.src + ' 不存在')
+    assert.match(fs.readFileSync(file, 'utf8'), /^<svg[^>]*viewBox=[\s\S]*<\/svg>\s*$/)
+  }
+})
+
+test('包和杖二选一：数据里万一两个都为真（不该发生），如实两个都显示，不替人选；只有真值才显示（0 / 字符串不算）', () => {
+  assert.deepEqual(rows.equipmentExtras({ with_bag: true, with_pole: true }).map(e => e.key), ['bag', 'pole'])
+  assert.deepEqual(rows.equipmentExtras({ with_bag: 1, with_pole: 'true' }), [])
+  assert.deepEqual(rows.equipmentExtras(null), [])
+})
+
+test('列表模板：双板 / 单板图标下面按装备行的 extras 画小图标，在同一个图标列里', () => {
+  const col = cardBlock.match(/<view class="care-icon-col">[\s\S]*?<\/view>/)[0]
+  assert.match(col, /class="care-kind"/)
+  assert.match(col, /wx:for="\{\{cr\.extras\}\}"[^>]*class="care-extra"/)
+  assert.ok(col.indexOf('care-kind') < col.indexOf('care-extra'), '小图标在双板 / 单板图标下面')
+  assert.match(rule('.care-extra'), /width:\s*36rpx/)
 })

@@ -158,7 +158,7 @@
 
       <!-- 服务 chips + 金额（折叠态也显示） -->
       <view class="care-chips">
-        <view wx:for="{{care._chips}}" wx:key="text" wx:for-item="chip" class="chip {{chip.cls}}">{{chip.text}}</view>
+        <view wx:for="{{care._chips}}" wx:key="text" wx:for-item="chip" class="chip {{chip.cls}}"><image wx:if="{{chip.icon}}" class="chip-icon" src="{{chip.icon}}" mode="aspectFit"/>{{chip.text}}</view>
         <view wx:if="{{care._hasBenefit}}" class="benefit-icon" data-cidx="{{cidx}}" catchtap="onBenefitTap">
           <van-icon name="coupon-o" size="16px" color="#006495"/>
         </view>
@@ -182,7 +182,7 @@
           </view>
           <view class="info-cell">
             <text class="info-label">附件</text>
-            <text class="info-value">{{care.with_pole ? '雪杖 ' : ''}}{{care.others_associates || ''}}</text>
+            <text class="info-value">{{care._extrasText ? care._extrasText + ' ' : ''}}{{care.others_associates || ''}}</text>
           </view>
           <view class="info-cell">
             <text class="info-label">项目收费</text>
@@ -272,9 +272,14 @@
           <view class="edit-block">
             <view class="edit-block-head">
               <text class="info-label">附件</text>
-              <view wx:if="{{care.equipment === '双板'}}"
-                    class="btn btn--sm {{care.with_pole ? 'btn--primary' : 'btn--plain'}}"
-                    data-cidx="{{cidx}}" catchtap="onWithPoleTap">雪杖</view>
+              <!-- 雪包 / 雪杖二选一（点一个，另一个自动取消）；单板没有雪杖，不显示雪杖按钮 -->
+              <view class="edit-extra-btns">
+                <view class="btn btn--sm {{care.with_bag ? 'btn--primary' : 'btn--plain'}}"
+                      data-cidx="{{cidx}}" catchtap="onWithBagTap">雪包</view>
+                <view wx:if="{{care.equipment === '双板'}}"
+                      class="btn btn--sm {{care.with_pole ? 'btn--primary' : 'btn--plain'}}"
+                      data-cidx="{{cidx}}" catchtap="onWithPoleTap">雪杖</view>
+              </view>
             </view>
             <input class="panel-input" placeholder="其他附件" value="{{care.others_associates || ''}}"
                    data-cidx="{{cidx}}" data-field="others_associates" bindblur="onEditFieldBlur"/>

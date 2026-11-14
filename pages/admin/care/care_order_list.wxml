@@ -192,6 +192,8 @@
           <view wx:if="{{item.careExpanded}}" class="care-line care-line--{{cr.statusClass}}" data-idx="{{index}}" data-cid="{{cr.id}}" catchtap="onCareTap">
             <view class="care-icon-col">
               <image wx:if="{{cr.iconSrc}}" class="care-kind" src="{{cr.iconSrc}}" mode="aspectFit" />
+              <!-- 含包 / 含杖：双板 / 单板图标下面的小图标（二选一，单板没有雪杖） -->
+              <image wx:for="{{cr.extras}}" wx:for-item="ex" wx:key="key" class="care-extra" src="{{ex.src}}" mode="aspectFit" />
             </view>
             <view class="care-body">
               <view class="care-main">
