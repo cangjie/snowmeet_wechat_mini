@@ -87,6 +87,10 @@ Page({
     _repairItemId: null,
     _repairAmount: '',
     _repairAmountOrig: '',
+    // 赔偿减免（2026-11-14）：和赔偿金额同一个弹窗；留空 = 沿用原值
+    _repairDiscount: '',
+    _repairDiscountOrig: '',
+    _repairActualStr: '',
 
     // 更换租赁物弹窗
     _chgShow: false,
@@ -267,6 +271,10 @@ Page({
           rentItem._statusClass = 'chip--status-noneed'
         }
         rentItem.totalRepairationAmountStr = util.showAmount(rentItem.totalRepairationAmount)
+        // 赔偿减免 / 实际赔偿（后端 GetRental 随租赁物下发减免；老后端没有这个字段时按 0 算，实际赔偿 = 赔偿金额）
+        rentItem.totalRepairationDiscountAmountStr = util.showAmount(rentItem.totalRepairationDiscountAmount || 0)
+        rentItem.actualRepairationAmountStr = util.showAmount((rentItem.totalRepairationAmount || 0) - (rentItem.totalRepairationDiscountAmount || 0))
+        rentItem._hasRepair = (rentItem.totalRepairationAmount || 0) > 0
         if (rentItem.pickDate == null) {
           rentItem.pickDateStr = '--'
           rentItem.pickTimeStr = '--'
@@ -402,8 +410,15 @@ Page({
       rental._entertainDiscountAmount = rental.entertain ? rental._rentDisplayAmount : 0
       rental._rentPayableStr = util.showAmount(Math.max(0, rental._rentDisplayAmount - rental._entertainDiscountAmount))
       // showcase 费用格/小计统一走 showAmount 格式化（四舍五入 2 位 + 自带 ¥），避免浮点尾数（如 0.06000000000000005）
-      rental.totalDiscountAmountStr = util.showAmount((rental.totalDiscountAmount || 0) + rental._entertainDiscountAmount)
-      rental.totalRepairationAmountStr = util.showAmount(rental.totalRepairationAmount || 0)
+      // 「减免」格只算租金这类减免；赔偿减免（挂在赔偿明细上，已含在 totalDiscountAmount 里）单独一格，
+      // 这样 租金 - 减免 + 赔偿 - 赔偿减免 + 超时 各格相加对得上
+      var repairDiscount = rental.totalRepairationDiscountAmount || 0
+      var repairTotal = rental.totalRepairationAmount || 0
+      rental.totalDiscountAmountStr = util.showAmount((rental.totalDiscountAmount || 0) - repairDiscount + rental._entertainDiscountAmount)
+      rental.totalRepairationAmountStr = util.showAmount(repairTotal)
+      rental.totalRepairationDiscountAmountStr = util.showAmount(repairDiscount)
+      rental.actualRepairationAmountStr = util.showAmount(repairTotal - repairDiscount)
+      rental._hasRepair = repairTotal > 0
       rental.totalOvertimeAmountStr = util.showAmount(rental.totalOvertimeAmount || 0)
       rental.totalSummaryStr = util.showAmount(rental.totalSummary || 0)
     }
@@ -502,12 +517,13 @@ Page({
     // 但 getData 会逐条用 GetRental 替换 order.rentals，且改赔偿/超时/租金后只 refreshStatus 局部替换
     // 单条 rental，这些订单级标量不会自动重算 → 结算金额（总计赔偿/实际应退）不更新。这里用最新 rentals
     // 重新累加，口径与后端 Order getter 完全一致（赔偿/超时/减免均已含在 rental.totalSummary 内）。
-    var sumSummary = 0, sumOvertime = 0, sumRepair = 0
+    var sumSummary = 0, sumOvertime = 0, sumRepair = 0, sumRepairDiscount = 0
     var sumExpectedRent = 0   // 还没开始计费的租赁的预计租金（只用于「总计租金」格的展示）
     for (var ri = 0; order.rentals && ri < order.rentals.length; ri++) {
       var rt = order.rentals[ri]
       sumOvertime += rt.totalOvertimeAmount || 0
       sumRepair += rt.totalRepairationAmount || 0
+      sumRepairDiscount += rt.totalRepairationDiscountAmount || 0
       if (!rt.experience && !rt.entertain) {
         sumSummary += rt.totalSummary || 0
         if (rt._rentIsEstimate) sumExpectedRent += rt._rentEstimateAmount || 0
@@ -577,6 +593,10 @@ Page({
     order.totalRentNeedToRefundAmountStr = util.showAmount(order.totalRentNeedToRefundAmount)
     order.totalRentOverTimeAmountStr = util.showAmount(order.totalRentOverTimeAmount)
     order.totalRentRepairationAmountStr = util.showAmount(order.totalRentRepairAmount)
+    // 赔偿减免 / 实际赔偿：有赔偿时退款摘要多显示这两格
+    order.totalRentRepairationDiscountAmountStr = util.showAmount(sumRepairDiscount)
+    order.totalRentActualRepairationAmountStr = util.showAmount(sumRepair - sumRepairDiscount)
+    order._hasRepair = sumRepair > 0
     if (order.rentProperties) {
       order.rentProperties.totalPaidGuarantyAmountStr = util.showAmount(order.rentProperties.totalPaidGuarantyAmount)
       order.rentProperties.relieveGuarantyAmountStr = util.showAmount(order.rentProperties.relieveGuarantyAmount)
@@ -1091,16 +1111,43 @@ Page({
     var ref = this._getItemRef(ridx, iidx)
     if (!ref) return
     var cur = ref.item.totalRepairationAmount != null ? ref.item.totalRepairationAmount : 0
+    var curDiscount = ref.item.totalRepairationDiscountAmount != null ? ref.item.totalRepairationDiscountAmount : 0
     this.setData({
       _repairShow: true,
       _repairItemId: ref.item.id,
       _repairAmount: '',
       _repairAmountOrig: String(cur),
+      _repairDiscount: '',
+      _repairDiscountOrig: String(curDiscount),
+      _repairActualStr: util.showAmount(Math.max(0, cur - curDiscount)),
     })
   },
 
   onRepairInput(e) {
     this.setData({ _repairAmount: e.detail.value })
+    this._refreshRepairActual()
+  },
+
+  onRepairDiscountInput(e) {
+    this.setData({ _repairDiscount: e.detail.value })
+    this._refreshRepairActual()
+  },
+
+  // 赔偿弹窗里两个输入框的最终取值：留空 = 沿用原值；赔偿金额为 0（取消赔偿）时减免一定是 0；
+  // 减免留空沿用原值、而原值比新的赔偿金额大时，按赔偿金额封顶（不让店员为了改小赔偿先去改减免）。
+  _resolveRepairValues() {
+    var amount = this._resolveDayChargeVal(this.data._repairAmount, this.data._repairAmountOrig)
+    var discountTyped = String(this.data._repairDiscount == null ? '' : this.data._repairDiscount).trim() !== ''
+    var discount = this._resolveDayChargeVal(this.data._repairDiscount, this.data._repairDiscountOrig)
+    if (amount <= 0) discount = 0
+    else if (!discountTyped && discount > amount) discount = amount
+    return { amount: amount, discount: discount }
+  },
+
+  // 弹窗里实时显示「实际赔偿 = 赔偿金额 - 赔偿减免」
+  _refreshRepairActual() {
+    var v = this._resolveRepairValues()
+    this.setData({ _repairActualStr: util.showAmount(Math.max(0, v.amount - v.discount)) })
   },
 
   onRepairCancel() {
@@ -1112,13 +1159,24 @@ Page({
     var itemId = that.data._repairItemId
     if (itemId == null) { that.setData({ _repairShow: false }); return }
     // 留空 → 回退原值（与租金明细弹窗一致，点开无需退格删原金额）
-    var amount = that._resolveDayChargeVal(that.data._repairAmount, that.data._repairAmountOrig)
+    var values = that._resolveRepairValues()
+    var amount = values.amount
+    var discount = values.discount
     if (amount < 0) {
       wx.showToast({ title: '请输入有效赔偿金额', icon: 'none' })
       return
     }
+    if (discount < 0) {
+      wx.showToast({ title: '请输入有效赔偿减免金额', icon: 'none' })
+      return
+    }
+    if (Math.round((discount - amount) * 100) > 0) {
+      wx.showToast({ title: '赔偿减免不能大于赔偿金额', icon: 'none' })
+      return
+    }
     wx.showLoading({ title: '保存中' })
-    var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemRepairAmount/' + itemId + '?amount=' + amount + '&sessionKey=' + app.globalData.sessionKey
+    var setUrl = app.globalData.requestPrefix + 'Rent/SetRentItemRepairAmount/' + itemId + '?amount=' + amount
+      + '&discount=' + discount + '&sessionKey=' + app.globalData.sessionKey
     util.performWebRequest(setUrl, null).then(function (newRental) {
       wx.hideLoading()
       that.setData({ _repairShow: false })

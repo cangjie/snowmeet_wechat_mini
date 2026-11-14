@@ -51,6 +51,19 @@
         </view>
       </view>
     </view>
+    <!-- 有赔偿时再显示：赔偿减免、实际赔偿（= 赔偿金额 - 赔偿减免） -->
+    <view class="rid-kv" wx:if="{{!rentItem.noNeed && rentItem._hasRepair}}">
+      <text class="rid-kv-label">赔偿减免</text>
+      <view class="rid-kv-right">
+        <text class="rid-kv-value">{{rentItem.totalRepairationDiscountAmountStr}}</text>
+      </view>
+    </view>
+    <view class="rid-kv" wx:if="{{!rentItem.noNeed && rentItem._hasRepair}}">
+      <text class="rid-kv-label">实际赔偿</text>
+      <view class="rid-kv-right">
+        <text class="rid-kv-value">{{rentItem.actualRepairationAmountStr}}</text>
+      </view>
+    </view>
 
     <view class="rental-showcase-memo-row" style="margin-top:8rpx;" wx:if="{{!readonly}}">
       <view class="rental-showcase-memo-box" bindtap="onItemMemoTap" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
@@ -330,6 +343,14 @@
                 <text class="rental-showcase-fee-label">赔偿</text>
                 <text class="rental-showcase-fee-value">{{item.totalRepairationAmountStr}}</text>
               </view>
+              <view wx:if="{{item._hasRepair}}" class="rental-showcase-fee-cell">
+                <text class="rental-showcase-fee-label">赔偿减免</text>
+                <text class="rental-showcase-fee-value">{{item.totalRepairationDiscountAmountStr}}</text>
+              </view>
+              <view wx:if="{{item._hasRepair}}" class="rental-showcase-fee-cell">
+                <text class="rental-showcase-fee-label">实际赔偿</text>
+                <text class="rental-showcase-fee-value">{{item.actualRepairationAmountStr}}</text>
+              </view>
               <view class="rental-showcase-fee-cell">
                 <text class="rental-showcase-fee-label">超时</text>
                 <text class="rental-showcase-fee-value">{{item.totalOvertimeAmountStr}}</text>
@@ -471,6 +492,14 @@
         <view class="refund-summary-cell">
           <view class="refund-summary-label">总计赔偿</view>
           <view class="refund-summary-value">{{order.totalRentRepairationAmountStr}}</view>
+        </view>
+        <view class="refund-summary-cell" wx:if="{{order._hasRepair}}">
+          <view class="refund-summary-label">赔偿减免</view>
+          <view class="refund-summary-value">{{order.totalRentRepairationDiscountAmountStr}}</view>
+        </view>
+        <view class="refund-summary-cell" wx:if="{{order._hasRepair}}">
+          <view class="refund-summary-label">实际赔偿</view>
+          <view class="refund-summary-value">{{order.totalRentActualRepairationAmountStr}}</view>
         </view>
         <view class="refund-summary-cell">
           <view class="refund-summary-label">总计消费</view>
@@ -750,10 +779,18 @@
 <!-- 赔偿金额编辑弹窗（与租金明细弹窗同款） -->
 <view wx:if="{{_repairShow}}" class="dc-mask" bindtap="onRepairCancel" catchtouchmove="noop">
   <view class="dc-card" catchtap="noop">
-    <view class="dc-title">修改赔偿金额</view>
+    <view class="dc-title">修改赔偿</view>
     <view class="dc-field">
       <text class="dc-label">赔偿金额</text>
       <input class="dc-input" type="digit" value="{{_repairAmount}}" bindinput="onRepairInput" placeholder="{{_repairAmountOrig}}" focus="{{_repairShow}}" />
+    </view>
+    <view class="dc-field">
+      <text class="dc-label">赔偿减免</text>
+      <input class="dc-input" type="digit" value="{{_repairDiscount}}" bindinput="onRepairDiscountInput" placeholder="{{_repairDiscountOrig}}" />
+    </view>
+    <view class="dc-field">
+      <text class="dc-label">实际赔偿</text>
+      <text class="dc-input" style="font-weight:700;">{{_repairActualStr}}</text>
     </view>
     <view class="dc-actions">
       <view class="dc-btn dc-btn--cancel" bindtap="onRepairCancel">取消</view>
