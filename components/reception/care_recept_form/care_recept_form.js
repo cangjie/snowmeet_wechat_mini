@@ -658,7 +658,11 @@ Component({
         wx.showToast({ title: '该季卡已绑定装备，不可修改', icon: 'none' });
         return;
       }
-      if (cur && cur.equipment === equip) return; // 重复点同类型：不动数据也不弹历史
+      if (cur && cur.equipment === equip) {
+        // 重新选择同类型装备时，先保留当前信息，选定历史装备后再更新。
+        this._maybeShowHistory(cidx, equip);
+        return;
+      }
       this._mutate(cidx, (c) => {
         c.equipment = equip;
         // 换类型后品牌/其它服务字典跟随切换，原选择作废
@@ -895,6 +899,22 @@ Component({
       const cidx = Number(e.currentTarget.dataset.cidx);
       const key = e.currentTarget.dataset.special; // none | entertain | warranty
       this._mutate(cidx, (c) => {
+        const enteringSpecial = (key === 'entertain' && !c.entertain) || (key === 'warranty' && !c.warranty);
+        if (enteringSpecial && (c.ticket_code || c.use_card || c.card_id || c.coach_card_id)) {
+          // 先带券/卡再切招待或质保时，取消已有权益；保留服务和店员手动减免。
+          c.ticket = null;
+          c.ticket_code = null;
+          c.ticket_discount = 0;
+          c.use_card = false;
+          c.card_id = null;
+          c.card_name = null;
+          c.card_equip_lock = false;
+          c.card_pending_open = false;
+          c.coach_card_id = null;
+          c._coachCardName = '';
+          c._coachHint = '';
+          c.discount = Number(c._manualDiscount) || 0;
+        }
         c.entertain = key === 'entertain';
         c.warranty = key === 'warranty';
       });
@@ -1031,7 +1051,8 @@ Component({
       const currentIndex = () => {
         if (pending[identity.key] !== selection || Number(this.data.memberId) !== memberId || this._autoTicketBlocked()) return -1;
         const index = this._findPriceCare(identity);
-        return index >= 0 && this.data.displayCares[index].free_wax === 1 ? index : -1;
+        const care = index >= 0 && this.data.displayCares[index];
+        return care && care.free_wax === 1 && !care.warranty && !care.entertain ? index : -1;
       };
       const work = Promise.resolve(app.loginPromiseNew).then(() => {
         if (!memberId) throw new Error('请先选择顾客');

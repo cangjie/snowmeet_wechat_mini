@@ -111,6 +111,21 @@ test('等待权益选择时取消机打蜡，迟到结果不能恢复项目或�
   assert.equal(selected.free_wax, 0); assert.equal(selected.use_card, false); assert.equal(selected.ticket_code, null);
 });
 
+test('等待机打蜡权益时切为招待或质保，迟到结果不能自动用卡券', async t => {
+  for (const special of ['entertain', 'warranty']) {
+    let ready;
+    const { form } = setup(t, { getCards: () => new Promise(resolve => { ready = resolve; }) });
+    await settle(); toggle(form); await settle();
+    form.onSpecialTap(tap({ cidx: 0, special }));
+    if (ready) ready([season(1)]);
+    await form.waitForPrices();
+    const selected = form.data.displayCares[0];
+    assert.equal(selected[special], true);
+    assert.equal(selected.use_card, false);
+    assert.equal(selected.ticket_code, null);
+  }
+});
+
 test('点击后立即结算会等待季卡选择和新价格完成，重复结算仅提交一次', async t => {
   let ready;
   const { form } = setup(t, { getCards: () => new Promise(resolve => { ready = resolve; }) });

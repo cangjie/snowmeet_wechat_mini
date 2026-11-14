@@ -85,6 +85,59 @@ test('历史装备弹层显示上次养护缩略图并增高历史列表', async
   assert.match(listRule && listRule[1], /max-height:\s*58vh/, '历史装备滚动区应随屏幕增高');
 });
 
+test('重新点击当前装备类型可重新选择历史装备，跳过不改变原信息', async t => {
+  setup(t);
+  const calls = [];
+  const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {
+    getMemberCaredEquipmentsPromise: async (memberId, equip) => {
+      calls.push([memberId, equip]);
+      return [{ brand: '新品牌', scale: '155' }, { brand: '原品牌', scale: '170' }];
+    },
+  });
+  Object.assign(form.data, { memberId: 42, cares: [
+    { id: 1, equipment: '双板', brand: '另一件', scale: '180' },
+    { id: 2, equipment: '双板', brand: '原品牌', scale: '170', need_repair: 1, repair_memo: '维修' },
+  ] });
+  form._refreshCares();
+  const tap = { currentTarget: { dataset: { cidx: 1, equip: '双板' } } };
+
+  form.onEquipTap(tap);
+  await settle();
+  assert.deepEqual(calls, [[42, '双板']]);
+  assert.equal(form.data.historyModal.show, true);
+  assert.equal(form.data.displayCares[1].brand, '原品牌');
+  form.onHistoryClose();
+  assert.equal(form.data.displayCares[1].scale, '170');
+  assert.equal(form.data.displayCares[1].repair_memo, '维修');
+
+  form.onEquipTap(tap);
+  await settle();
+  form.onHistoryPick({ currentTarget: { dataset: { idx: 0 } } });
+  assert.equal(form.data.historyModal.show, false);
+  assert.equal(form.data.displayCares[1].brand, '新品牌');
+  assert.equal(form.data.displayCares[1].scale, '155');
+  assert.equal(form.data.displayCares[0].brand, '另一件');
+  assert.equal(form.data.displayCares[1].repair_memo, '维修');
+  assert.equal(form.events.at(-1).detail.cares[1].brand, '新品牌');
+});
+
+test('季卡绑定装备时重复点击类型仍不可修改', async t => {
+  const { toasts } = setup(t);
+  let queried = false;
+  const form = loadComponent('components/reception/care_recept_form/care_recept_form.js', {
+    getMemberCaredEquipmentsPromise: async () => { queried = true; return []; },
+  });
+  Object.assign(form.data, { memberId: 42, cares: [
+    { id: 1, equipment: '双板', brand: '原品牌', scale: '170', card_equip_lock: true },
+  ] });
+  form._refreshCares();
+  form.onEquipTap({ currentTarget: { dataset: { cidx: 0, equip: '双板' } } });
+  await settle();
+  assert.equal(queried, false);
+  assert.equal(form.data.historyModal.show, false);
+  assert.match(toasts.at(-1), /已绑定装备/);
+});
+
 test('旧试算晚到不覆盖新选择；试算不下单、不扣次', async t => {
   const { page } = setup(t);
   page.setData({ cardSaleShow: true, cardSaleProducts: [{ id: 101, quantity: 1 }] });

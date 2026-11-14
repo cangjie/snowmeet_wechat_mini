@@ -57,6 +57,49 @@ test('多件装备一券一件，临近到期优先，不覆盖已有券卡或�
   assert.equal(form.data.displayCares[1].card_id, 5);
 });
 
+test('切换招待或质保清除已带入的券卡，保留项目及手动减免，仍可主动选择', async t => {
+  for (const special of ['entertain', 'warranty']) {
+    const { form } = setup(t, async () => [ticket('OLD')], [
+      care(1, { need_repair: 1, repair_memo: '维修', repair_charge: 50, _manualDiscount: 7 }),
+    ]);
+    form._refreshCares(); await settle();
+    assert.equal(form.data.displayCares[0].ticket_code, 'OLD');
+    form.onSpecialTap({ currentTarget: { dataset: { cidx: 0, special } } });
+    await settle();
+    let c = form.data.displayCares[0];
+    assert.equal(c[special], true);
+    assert.equal(c.ticket_code, null);
+    assert.equal(c.ticket, null);
+    assert.equal(c.need_edge, 1); assert.equal(c.need_wax, 1);
+    assert.equal(c.repair_charge, 50); assert.equal(c.discount, 7);
+    assert.equal(form.events.at(-1).detail.cares[0].ticket_code, null);
+    form._applyTicketSelection(0, ticket('MANUAL'), null, { preserveServices: true });
+    await settle();
+    c = form.data.displayCares[0];
+    assert.equal(c.ticket_code, 'MANUAL');
+    form.onSpecialTap({ currentTarget: { dataset: { cidx: 0, special } } });
+    assert.equal(form.data.displayCares[0].ticket_code, 'MANUAL');
+  }
+});
+
+test('切换招待清除自动次卡与锁定，不影响其他装备或迟到的自动选券', async t => {
+  let resolve;
+  const { form } = setup(t, () => new Promise(r => { resolve = r; }), [
+    care(1, { use_card: true, card_id: 9, card_name: '双项卡', card_equip_lock: true }),
+    care(2, { ticket_code: 'OTHER' }),
+    care(3),
+  ]);
+  form._refreshCares(); await settle();
+  form.onSpecialTap({ currentTarget: { dataset: { cidx: 0, special: 'entertain' } } });
+  form.onSpecialTap({ currentTarget: { dataset: { cidx: 2, special: 'warranty' } } });
+  resolve([ticket('OLD')]); await settle();
+  assert.equal(form.data.displayCares[0].use_card, false);
+  assert.equal(form.data.displayCares[0].card_id, null);
+  assert.equal(form.data.displayCares[0].card_equip_lock, false);
+  assert.equal(form.data.displayCares[1].ticket_code, 'OTHER');
+  assert.equal(form.data.displayCares[2].ticket_code || null, null);
+});
+
 test('券列表晚到不覆盖手动不使用，草稿落库换ID后也保持选择', async t => {
   let resolve;
   const { form } = setup(t, () => new Promise(r => { resolve = r; }), [care(0, { timeStamp: 123 })]);
