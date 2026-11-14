@@ -1,11 +1,6 @@
 <view wx:if="{{staff && staff.title_level >= 100}}" class="page-root">
   <view class="filter-card">
-    <view class="filter-row">
-      <text class="filter-label">店铺</text>
-      <view class="filter-value">
-        <shop-selector bindShopSelected="shopSelected"></shop-selector>
-      </view>
-    </view>
+    <shop-selector show-area="{{true}}" row-class="filter-row" label-class="filter-label" value-class="filter-value" bindShopSelected="shopSelected"></shop-selector>
     <view class="filter-row filter-row--date">
       <text class="filter-label">日期</text>
       <date-range-picker

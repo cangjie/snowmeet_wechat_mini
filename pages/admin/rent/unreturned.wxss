@@ -13,10 +13,27 @@
   padding: 20rpx 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 100, 149, 0.05);
 }
+.ur-area-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 72rpx;
+}
+.ur-area-label {
+  width: 120rpx;
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: #555;
+  font-weight: 500;
+}
+.ur-area-value {
+  flex: 1;
+  font-size: 26rpx;
+}
 .ur-shop-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 20rpx;
 }
 .ur-query-btn {

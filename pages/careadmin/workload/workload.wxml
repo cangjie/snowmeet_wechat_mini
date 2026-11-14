@@ -13,12 +13,7 @@
         <view wx:if="{{!isToday}}" class="date-today" bindtap="onToday">回到今天</view>
       </view>
     </view>
-    <view class="filter-row">
-      <text class="filter-label">店铺</text>
-      <view class="filter-value">
-        <shop-selector bindShopSelected="shopSelected"></shop-selector>
-      </view>
-    </view>
+    <shop-selector show-area="{{true}}" row-class="filter-row" label-class="filter-label" value-class="filter-value" bindShopSelected="shopSelected"></shop-selector>
   </view>
 
   <view wx:if="{{errorText}}" class="empty-tip">{{errorText}}</view>

@@ -17,15 +17,23 @@
 //
 // 失败 / 兜底分支：
 //   - 全店未配 beacon → 静默 _fallback（staff.base_shop_id → 万龙服务中心 → 列表第一家），不打扰
-//   - scene='recept'（开单入口）：列表首项是「请选择店铺」，**不默认选店**（2026-10-22 用户要求，
-//     取代 2026-07-08 的开扫前先落默认店）：扫描期间首项显示「正在识别附近店铺…」，beacon 命中才选中；
-//     没命中（未配 beacon / 蓝牙不可用 / 超时）就停在「请选择店铺」，由店员手动选，业务入口在选店前保持灰
+//   - scene='recept'（开单入口）：列表首项是「请选择门店」，**不默认选店**（2026-10-22 用户要求，
+//     取代 2026-07-08 的开扫前先落默认店）：扫描期间首项显示「正在识别附近门店…」，beacon 命中才选中；
+//     没命中（未配 beacon / 蓝牙不可用 / 超时）就停在「请选择门店」，由店员手动选，业务入口在选店前保持灰
 //   - iOS 上 startBeaconDiscovery 失败（多为定位权限/精确位置关）→ 弹 toast 提示用户去 iOS 设置改
 //   - Android openBluetoothAdapter 失败（蓝牙未开/权限拒）→ 静默 _fallback
 //   - 30 秒超时（扫了但全程没命中） → 弹 toast「未检测到店内 beacon  配置:N / BLE:M / iBeacon:K」
-//                                    （recept 场景改为提示手动选择店铺）+ 不再改选
+//                                    （recept 场景改为提示手动选择门店）+ 不再改选
+//
+// 区域（show-area，2026-11-14 起，只给查询 / 报表页用，规则见 utils/shop_area.js）：
+//   门店行上面多一行「区域」checkbox（万龙 / 旗舰，默认都勾 = 不限区域），门店下拉按勾选的区域过滤；
+//   区域=万龙 + 全部门店 → ShopSelected 的 shop 是 '万龙服务中心,万龙体验中心'（后端按逗号联合查询）。
+//   beacon 识别到万龙任一家 → 只勾万龙 + 全部门店；识别到崇礼旗舰店 → 只勾旗舰；识别失败 / 没配 beacon → 按员工基地店推断
+//   （基地店 → 它的区域 + 全部门店；不属于任何区域的店 → 区域不限 + 选中该店）。show-area 时不再做「万龙互换成基地店」。
+//   不开 show-area 的页面（开单入口、租赁设置等把门店当写入目标的页面）行为不变。
 const app = getApp()
 const util = require('../../utils/util.js')
+const shopArea = require('../../utils/shop_area.js')
 
 const SCAN_TIMEOUT_MS = 30 * 1000
 
@@ -33,8 +41,8 @@ const SCAN_TIMEOUT_MS = 30 * 1000
 const DEFAULT_SHOP_NAME = '万龙服务中心'
 
 // 开单场景（scene='recept'）列表首项：不默认选店，beacon 没命中就让店员手动选
-const RECEPT_PLACEHOLDER = '请选择店铺'
-const RECEPT_SCANNING = '正在识别附近店铺…'
+const RECEPT_PLACEHOLDER = '请选择门店'
+const RECEPT_SCANNING = '正在识别附近门店…'
 
 // 去冒号/空格 + 大写。Android wx 回调的 deviceId 通常是 "AA:BB:CC:DD:EE:FF" 格式，
 // DB 字段约定同格式，但代码两边归一防止偶发空格/小写
@@ -105,6 +113,9 @@ function _resolveFallbackShop(shopList) {
 }
 
 Component({
+  // 区域行 / 门店行的样式类由宿主页面传入（各页的筛选行样式不同）：row-class 套在每一行，label-class 是行首文字，value-class 是右侧控件
+  externalClasses: ['row-class', 'label-class', 'value-class'],
+
   properties: {
     defaultShop: {
       type: String,
@@ -113,11 +124,21 @@ Component({
     scene: {
       type: String,
       value: ''
-    }
+    },
+    // 是否显示「区域」行（查询 / 报表页用）；为 true 时组件自己渲染「区域」和「门店」两行
+    showArea: {
+      type: Boolean,
+      value: false
+    },
+    // 区域行 / 门店行的行首文字（页面的其它标签带【】时可以传「【区域】」「【门店】」）
+    areaLabel: { type: String, value: '区域' },
+    shopLabel: { type: String, value: '门店' }
   },
 
   data: {
-    currentSelectedIndex: 0
+    currentSelectedIndex: 0,
+    areaWanlong: true,
+    areaFlagship: true
   },
 
   lifetimes: {
@@ -126,20 +147,19 @@ Component({
       app.loginPromiseNew.then(function () {
         var url = app.globalData.requestPrefix + 'Order/GetShops'
         util.performWebRequest(url, undefined).then(function (shopList) {
-          var name_list = []
-          if (!that.properties.scene || that.properties.scene == null || that.properties.scene == '') {
-            name_list.push('全部店铺')
-          } else if (that.properties.scene === 'recept') {
-            name_list.push(RECEPT_PLACEHOLDER)
-          }
-          for (var i = 0; i < shopList.length; i++) {
-            name_list.push(shopList[i].name)
-          }
-          that.setData({ shop_list: shopList, name_list: name_list })
+          that.setData({ shop_list: shopList })
+          var name_list = that._buildNameList(shopList)
+          that.setData({ name_list: name_list })
 
-          // AI/跨页查询显式要求“全部店铺”时，不启动 beacon 自动选店，
+          // AI/跨页查询显式要求“全部门店”（旧页面传的是“全部店铺”）时，不启动 beacon 自动选店，
           // 避免页面结果被异步缩小到员工基地店。
-          if (that.properties.defaultShop === '全部店铺' && !that.properties.scene) {
+          if (shopArea.isAllLabel(that.properties.defaultShop) && !that.properties.scene) {
+            if (that.properties.showArea) {
+              that._setAreas(shopArea.AREAS)
+              that.setData({ currentSelectedIndex: 0 })
+              that._emitSelection()
+              return
+            }
             that.setData({ currentSelectedIndex: 0 })
             that.triggerEvent('ShopSelected', { shop: '', sale: 0, care: 0, rent: 0, restuarant: 0 })
             return
@@ -148,6 +168,10 @@ Component({
           // defaultShop 显式命中 → 直接选中（不扫蓝牙）
           var defaultShop = that.getShop(that.properties.defaultShop)
           if (defaultShop != null) {
+            if (that.properties.showArea) {
+              that._applyAreaSelection(defaultShop)
+              return
+            }
             for (var j = 0; j < name_list.length; j++) {
               if (name_list[j] == that.properties.defaultShop) {
                 that.setData({ currentSelectedIndex: j })
@@ -181,7 +205,13 @@ Component({
       that._stopScan()
       that.setData({ currentSelectedIndex: e.detail.value })
 
-      // 首项是「全部店铺」（无 scene）或「请选择店铺」（开单场景），都表示没有选定门店
+      // 带区域行的页面：门店 + 勾选的区域一起决定对外发出的 shop
+      if (that.properties.showArea) {
+        that._emitSelection()
+        return
+      }
+
+      // 首项是「全部门店」（无 scene）或「请选择门店」（开单场景），都表示没有选定门店
       if (e.detail.value == 0 && (!that.properties.scene || that.properties.scene === 'recept')) {
         that.triggerEvent('ShopSelected', { shop: '', sale: 0, care: 0, rent: 0, restuarant: 0 })
         return
@@ -190,6 +220,76 @@ Component({
       if (shop) {
         that.triggerEvent('ShopSelected', { shop: shop.name, sale: shop.sale, care: shop.care, rent: shop.rent, restuarant: shop.restuarant })
       }
+    },
+
+    // 门店下拉的名单：首项（全部门店 / 请选择门店）+ 门店；带区域行时只列勾选区域里的门店
+    _buildNameList(shopList) {
+      var name_list = []
+      var scene = this.properties.scene
+      if (!scene) {
+        name_list.push(shopArea.ALL_LABEL)
+      } else if (scene === 'recept') {
+        name_list.push(RECEPT_PLACEHOLDER)
+      }
+      var shops = this.properties.showArea ? shopArea.shopsForAreas(shopList, this._checkedAreas()) : shopList
+      for (var i = 0; i < shops.length; i++) {
+        name_list.push(shops[i].name)
+      }
+      return name_list
+    },
+
+    _checkedAreas() {
+      var areas = []
+      if (this.data.areaWanlong) areas.push(shopArea.WANLONG)
+      if (this.data.areaFlagship) areas.push(shopArea.FLAGSHIP)
+      return areas
+    },
+
+    // 设置勾选的区域并按它重建门店下拉（不发事件、不动当前选中项）
+    _setAreas(areas) {
+      this.setData({
+        areaWanlong: areas.indexOf(shopArea.WANLONG) >= 0,
+        areaFlagship: areas.indexOf(shopArea.FLAGSHIP) >= 0
+      })
+      this.setData({ name_list: this._buildNameList(this.data.shop_list || []) })
+    },
+
+    // 用户勾选 / 取消勾选区域：手动操作优先，停掉还在跑的自动定位
+    areaChanged: function (e) {
+      var that = this
+      that._stopScan()
+      var values = (e && e.detail && e.detail.value) || []
+      var shopList = that.data.shop_list || []
+      var idx = Number(that.data.currentSelectedIndex) || 0
+      var current = idx > 0 ? (that.data.name_list || [])[idx] : ''
+      var areas = values.filter(function (a) { return shopArea.AREAS.indexOf(a) >= 0 })
+      that._setAreas(areas)
+      // 选中的门店不在新区域的下拉里 → 回到「全部门店」
+      var newIdx = current && shopArea.contains(shopList, areas, current) ? that.data.name_list.indexOf(current) : 0
+      that.setData({ currentSelectedIndex: newIdx < 0 ? 0 : newIdx })
+      that._emitSelection()
+    },
+
+    // 带区域行时对外发出当前选择：shop = 具体门店名，或全部门店时按区域给空串 / 逗号串（后端联合查询）；areas = 勾选的区域
+    _emitSelection() {
+      var idx = Number(this.data.currentSelectedIndex) || 0
+      var name = idx > 0 ? (this.data.name_list || [])[idx] : ''
+      var shop = name ? this.getShop(name) : null
+      var areas = this._checkedAreas()
+      var detail = shop
+        ? { shop: shop.name, sale: shop.sale, care: shop.care, rent: shop.rent, restuarant: shop.restuarant }
+        : { shop: shopArea.shopParam(this.data.shop_list || [], areas, ''), sale: 0, care: 0, rent: 0, restuarant: 0 }
+      detail.areas = areas
+      this.triggerEvent('ShopSelected', detail)
+    },
+
+    // beacon 命中 / 基地店兜底 / 页面指定门店：由这家店推断区域和门店（万龙 → 万龙 + 全部门店，旗舰 → 旗舰 + 全部门店）
+    _applyAreaSelection(shop) {
+      var inferred = shopArea.fromShop(shop.name)
+      this._setAreas(inferred.areas)
+      var idx = inferred.shop ? this.data.name_list.indexOf(inferred.shop) : 0
+      this.setData({ currentSelectedIndex: idx < 0 ? 0 : idx })
+      this._emitSelection()
     },
 
     getShop(name) {
@@ -206,6 +306,10 @@ Component({
     // 选店落地：开单入口以 beacon 命中的店为准；其它旧页面保留万龙系基地店逻辑。
     _applySelectedShop(shop, idx) {
       if (!shop) return
+      if (this.properties.showArea) {
+        this._applyAreaSelection(shop)
+        return
+      }
       if (idx >= 0) this.setData({ currentSelectedIndex: idx })
       else {
         var name_list = this.data.name_list || []
@@ -236,7 +340,7 @@ Component({
       })
     },
 
-    // 走 fallback：staff.base_shop_id → 列表第一家。开单场景不默认选店，停在「请选择店铺」
+    // 走 fallback：staff.base_shop_id → 列表第一家。开单场景不默认选店，停在「请选择门店」
     _fallback(shopList) {
       if (this.properties.scene === 'recept') {
         this._setReceptPlaceholder(RECEPT_PLACEHOLDER)
@@ -246,7 +350,7 @@ Component({
       if (shop) this._applySelectedShop(shop, -1)
     },
 
-    // 开单场景列表首项的文字：扫描中 / 请选择店铺
+    // 开单场景列表首项的文字：扫描中 / 请选择门店
     _setReceptPlaceholder(text) {
       if (this.properties.scene !== 'recept') return
       var list = this.data.name_list
@@ -356,7 +460,7 @@ Component({
         })
         if (that.properties.scene === 'recept') {
           // 开单场景：诊断信息只留在 console，给店员一句能照做的提示
-          wx.showToast({ title: '没有识别到附近店铺，请手动选择店铺', icon: 'none', duration: 3000 })
+          wx.showToast({ title: '没有识别到附近门店，请手动选择门店', icon: 'none', duration: 3000 })
           return
         }
         var extra = ''
@@ -585,7 +689,7 @@ Component({
 
     _stopScan: function () {
       this._scanActive = false
-      // 不再扫描：开单场景首项从「正在识别附近店铺…」恢复为「请选择店铺」（命中时随后会选中门店）
+      // 不再扫描：开单场景首项从「正在识别附近门店…」恢复为「请选择门店」（命中时随后会选中门店）
       this._setReceptPlaceholder(RECEPT_PLACEHOLDER)
       if (this._foundHandler) {
         try { wx.offBluetoothDeviceFound(this._foundHandler) } catch (e) {}

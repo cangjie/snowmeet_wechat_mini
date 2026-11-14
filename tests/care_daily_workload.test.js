@@ -47,6 +47,12 @@ test('整理：没有取消就不显示取消角标；不传门店 = 全部门�
   assert.deepEqual([snap.isSnapshot, snap.sourceLabel, snap.updatedLabel], [true, '快照', '11-10 22:10'])
 })
 
+test('整理：联合查询两家门店时，后端回显的逗号串在页面上用顿号连起来', () => {
+  assert.equal(view.buildWorkloadView(stat({ shop: '万龙服务中心,万龙体验中心' })).shopLabel, '万龙服务中心、万龙体验中心')
+  assert.equal(view.buildWorkloadView(stat({ shop: '万龙服务中心，万龙体验中心' })).shopLabel, '万龙服务中心、万龙体验中心')
+  assert.equal(view.buildWorkloadView(stat({ shop: '' })).shopLabel, '全部门店')
+})
+
 test('整理：工序按 修刃 打蜡 刮蜡 补板底 维修 的顺序，补板底和维修各是各的数', () => {
   const v = view.buildWorkloadView(stat())
   assert.deepEqual(v.processes.map(p => [p.key, p.label, p.count]),

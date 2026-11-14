@@ -16,3 +16,16 @@
   border-style: solid; 
   border-width: 1rpx;
 }
+/* 区域行：两个 checkbox 并排 */
+.area-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.area-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 36rpx;
+  font-size: 26rpx;
+}

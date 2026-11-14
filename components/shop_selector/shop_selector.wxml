@@ -1,3 +1,23 @@
-<picker mode="selector" range="{{name_list}}" bindchange="selectChanged" class="input" style="width: 200rpx;" >
+<!-- 带区域行（show-area，查询 / 报表页）：「区域」和「门店」两行都由组件渲染，样式类由宿主页面传入 -->
+<block wx:if="{{showArea}}">
+  <view class="row-class">
+    <text class="label-class">{{areaLabel}}</text>
+    <view class="value-class">
+      <checkbox-group class="area-group" bindchange="areaChanged">
+        <label class="area-item"><checkbox value="万龙" checked="{{areaWanlong}}" />万龙</label>
+        <label class="area-item"><checkbox value="旗舰" checked="{{areaFlagship}}" />旗舰</label>
+      </checkbox-group>
+    </view>
+  </view>
+  <view class="row-class">
+    <text class="label-class">{{shopLabel}}</text>
+    <view class="value-class">
+      <picker mode="selector" range="{{name_list}}" value="{{currentSelectedIndex}}" bindchange="selectChanged" class="input" style="width: 200rpx;">
+        <picker-view>{{name_list[currentSelectedIndex]}}</picker-view>
+      </picker>
+    </view>
+  </view>
+</block>
+<picker wx:else mode="selector" range="{{name_list}}" bindchange="selectChanged" class="input" style="width: 200rpx;" >
   <picker-view >{{name_list[currentSelectedIndex]}}</picker-view>
 </picker>

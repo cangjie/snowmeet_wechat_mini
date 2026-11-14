@@ -8,17 +8,12 @@
         <view class="fui-right-column">{{aiQueryConditions}}</view>
       </fui-col>
     </fui-row>
-    <fui-row>
-      <fui-col span="5">
-        <view class="fui-left-column">【店铺】</view>
-      </fui-col>
-      <fui-col span="18">
-        <view class="fui-right-column">
-          <shop-selector wx:if="{{!aiQueryApplied && cell != null && cell != ''}}" defaultShop="" bindShopSelected="shopSelected"></shop-selector>
-          <shop-selector wx:else defaultShop="{{aiQueryApplied ? (shop || '全部店铺') : ''}}" bindShopSelected="shopSelected"></shop-selector>
-        </view>
-      </fui-col>
-    </fui-row>
+    <!-- 区域 + 门店：shop-selector 带 show-area 时自己渲染这两行（样式类见本页 wxss） -->
+    <shop-selector wx:if="{{!aiQueryApplied && cell != null && cell != ''}}" show-area="{{true}}" area-label="【区域】" shop-label="【门店】"
+      row-class="shop-area-row" label-class="shop-area-label" value-class="shop-area-value" defaultShop="" bindShopSelected="shopSelected"></shop-selector>
+    <shop-selector wx:else show-area="{{true}}" area-label="【区域】" shop-label="【门店】"
+      row-class="shop-area-row" label-class="shop-area-label" value-class="shop-area-value"
+      defaultShop="{{aiQueryApplied ? (shop || '全部门店') : ''}}" bindShopSelected="shopSelected"></shop-selector>
     <fui-row style="margin-top: 20rpx;">
       <fui-col span="5">
         <view class="fui-left-column">【日期】</view>

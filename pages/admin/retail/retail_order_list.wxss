@@ -12,3 +12,18 @@
 .fui-left-column{
   text-align: left;
 }
+/* 区域 + 门店（shop-selector show-area）：和下面 fui 的 5/23 栏位对齐 */
+.shop-area-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.shop-area-label {
+  width: 20.83%;
+  flex-shrink: 0;
+  text-align: left;
+}
+.shop-area-value {
+  flex: 1;
+}

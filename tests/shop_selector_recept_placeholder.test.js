@@ -1,4 +1,4 @@
-// 开单场景（scene='recept'）的店铺选择：首项「请选择店铺」、不默认选店，beacon 命中才选中，没命中由店员手动选
+// 开单场景（scene='recept'）的门店选择：首项「请选择门店」、不默认选店，beacon 命中才选中，没命中由店员手动选
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
@@ -52,11 +52,11 @@ function cleanup(instance) {
 
 const flush = () => new Promise(resolve => setImmediate(resolve))
 
-test('没配 beacon 的门店：停在「请选择店铺」，不默认选员工基地店', async () => {
+test('没配 beacon 的门店：停在「请选择门店」，不默认选员工基地店', async () => {
   const { definition, instance, events } = load([SERVICE, EXPERIENCE])
   definition.lifetimes.ready.call(instance)
   await flush()
-  assert.deepEqual(instance.data.name_list, ['请选择店铺', '万龙服务中心', '万龙体验中心'])
+  assert.deepEqual(instance.data.name_list, ['请选择门店', '万龙服务中心', '万龙体验中心'])
   assert.equal(instance.data.currentSelectedIndex, 0)
   assert.deepEqual(events, [])
 
@@ -68,23 +68,23 @@ test('没配 beacon 的门店：停在「请选择店铺」，不默认选员工
   cleanup(instance)
 })
 
-test('扫描中首项提示正在识别；beacon 命中后选中该店，首项恢复「请选择店铺」', async () => {
+test('扫描中首项提示正在识别；beacon 命中后选中该店，首项恢复「请选择门店」', async () => {
   const service = Object.assign({}, SERVICE, { beacon_uuid: UUID })
   const { definition, instance, events, wxCalls } = load([service, EXPERIENCE])
   definition.lifetimes.ready.call(instance)
   await flush()
-  assert.equal(instance.data.name_list[0], '正在识别附近店铺…')
+  assert.equal(instance.data.name_list[0], '正在识别附近门店…')
   assert.equal(instance.data.currentSelectedIndex, 0)
   assert.deepEqual(events, [])
 
   wxCalls.beaconHandler({ beacons: [{ uuid: UUID, major: 1, minor: 1, rssi: -50 }] })
-  assert.equal(instance.data.name_list[0], '请选择店铺')
+  assert.equal(instance.data.name_list[0], '请选择门店')
   assert.equal(instance.data.currentSelectedIndex, 1)
   assert.deepEqual(events, [{ shop: '万龙服务中心', sale: 1, rent: 0, care: 1, restuarant: 0 }])
   cleanup(instance)
 })
 
-test('30 秒没识别到店铺：提示手动选择，仍不默认选店', async (t) => {
+test('30 秒没识别到门店：提示手动选择，仍不默认选店', async (t) => {
   t.mock.timers.enable({ apis: ['setTimeout'] })
   const service = Object.assign({}, SERVICE, { beacon_uuid: UUID })
   const { definition, instance, events, toasts } = load([service, EXPERIENCE])
@@ -92,8 +92,8 @@ test('30 秒没识别到店铺：提示手动选择，仍不默认选店', async
   await flush()
   await flush()
   t.mock.timers.tick(30 * 1000)
-  assert.deepEqual(toasts, ['没有识别到附近店铺，请手动选择店铺'])
-  assert.equal(instance.data.name_list[0], '请选择店铺')
+  assert.deepEqual(toasts, ['没有识别到附近门店，请手动选择门店'])
+  assert.equal(instance.data.name_list[0], '请选择门店')
   assert.equal(instance.data.currentSelectedIndex, 0)
   assert.deepEqual(events, [])
   cleanup(instance)

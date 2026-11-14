@@ -2,8 +2,10 @@
 
   <!-- 顶部工具栏：店铺选择 + 查询 + 模糊搜索 -->
   <view class="ur-toolbar">
+    <!-- 区域 + 门店：shop-selector 带 show-area 时自己渲染这两行 -->
+    <shop-selector show-area="{{true}}" row-class="ur-area-row" label-class="ur-area-label" value-class="ur-area-value"
+      bindShopSelected="shopSelected"></shop-selector>
     <view class="ur-shop-row">
-      <shop-selector bindShopSelected="shopSelected"></shop-selector>
       <van-button class="ur-query-btn" disabled="{{querying}}" size="small" type="info" bind:click="getData">查 询</van-button>
     </view>
     <view class="ur-search">

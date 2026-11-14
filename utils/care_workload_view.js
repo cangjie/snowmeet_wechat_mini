@@ -15,6 +15,12 @@ const SPLIT_BY_STAFF = PROCESSES.map(p => p.key)
 
 const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
+// 门店名：不带 = 全部门店；联合查询时后端回显逗号串（万龙服务中心,万龙体验中心），页面上用顿号连起来
+function shopText(shop) {
+  if (!shop) return '全部门店'
+  return String(shop).split(/[,，]/).map(function (n) { return n.trim() }).filter(Boolean).join('、') || '全部门店'
+}
+
 function pad(n) {
   return n < 10 ? '0' + n : '' + n
 }
@@ -88,7 +94,7 @@ function buildWorkloadView(stat) {
   return {
     date: s.date || '',
     weekday: weekdayOf(s.date),
-    shopLabel: s.shop ? String(s.shop) : '全部门店',
+    shopLabel: shopText(s.shop),
     asOfLabel: timePart(s.asOf) ? '统计至 ' + timePart(s.asOf) : '',
     isSnapshot,
     sourceLabel: isSnapshot ? '快照' : '实时',
@@ -183,7 +189,7 @@ function buildItemsView(result, careOrderRows) {
   const total = num(r.total)
   return {
     date: r.date || '',
-    shopLabel: r.shop ? String(r.shop) : '全部门店',
+    shopLabel: shopText(r.shop),
     asOfLabel: timePart(r.asOf) ? '统计至 ' + timePart(r.asOf) : '',
     isProcess: process,
     total,
