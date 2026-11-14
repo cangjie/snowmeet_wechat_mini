@@ -48,6 +48,12 @@ function fromShop(shopName) {
   return { areas: AREAS.slice(), shop: shopName || '' }
 }
 
+// 页面 / 店员明确指定了某一家：就是这一家（区域跟着它，门店不变）；不属于任何区域的店，区域保持不限
+function fromChosenShop(shopName) {
+  var a = areaOf(shopName)
+  return { areas: a ? [a] : AREAS.slice(), shop: shopName || '' }
+}
+
 // 当前选中的门店是否还在这组区域的下拉里（全部门店永远在）
 function contains(shopList, areas, shopName) {
   if (!shopName) return true
@@ -56,5 +62,5 @@ function contains(shopList, areas, shopName) {
 
 module.exports = {
   WANLONG, FLAGSHIP, AREAS, ALL_LABEL, ALL_LABELS,
-  isAllLabel, areaOf, isLimited, shopsForAreas, shopParam, fromShop, contains
+  isAllLabel, areaOf, isLimited, shopsForAreas, shopParam, fromShop, fromChosenShop, contains
 }

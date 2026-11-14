@@ -31,6 +31,11 @@
 //   beacon 识别到万龙任一家 → 只勾万龙 + 全部门店；识别到崇礼旗舰店 → 只勾旗舰；识别失败 / 没配 beacon → 按员工基地店推断
 //   （基地店 → 它的区域 + 全部门店；不属于任何区域的店 → 区域不限 + 选中该店）。show-area 时不再做「万龙互换成基地店」。
 //   不开 show-area 的页面（开单入口、租赁设置等把门店当写入目标的页面）行为不变。
+//
+// 已经有选定的门店时 beacon 识别必须终止（2026-11-14 用户要求，识别结果会改掉已选的门店）：
+//   店员手动选门店、勾选 / 取消勾选区域（哪怕门店列表还没回来）、页面在组件启动后才给出门店（defaultShop 变化，
+//   AI 查询 / 草稿恢复）都算「已经选定」，立刻停扫并记下（_hasSelection）；之后启动扫描、识别命中、兜底、失败回调
+//   一律不再改选。识别或兜底自动选过一次之后同理。
 const app = getApp()
 const util = require('../../utils/util.js')
 const shopArea = require('../../utils/shop_area.js')
@@ -119,7 +124,9 @@ Component({
   properties: {
     defaultShop: {
       type: String,
-      value: ''
+      value: '',
+      // 页面在组件启动之后才给出门店：已经有选定的门店，终止识别（门店列表还没回来时 ready 会按最新值处理）
+      observer: function (value) { this._onDefaultShopChanged(value) }
     },
     scene: {
       type: String,
@@ -151,6 +158,12 @@ Component({
           var name_list = that._buildNameList(shopList)
           that.setData({ name_list: name_list })
 
+          // 门店列表回来之前店员已经动过区域：不再扫描、不再套用默认，按店员的选择出结果
+          if (that._hasSelection) {
+            if (that.properties.showArea) that._emitSelection()
+            return
+          }
+
           // AI/跨页查询显式要求“全部门店”（旧页面传的是“全部店铺”）时，不启动 beacon 自动选店，
           // 避免页面结果被异步缩小到员工基地店。
           if (shopArea.isAllLabel(that.properties.defaultShop) && !that.properties.scene) {
@@ -169,7 +182,7 @@ Component({
           var defaultShop = that.getShop(that.properties.defaultShop)
           if (defaultShop != null) {
             if (that.properties.showArea) {
-              that._applyAreaSelection(defaultShop)
+              that._applyChosenShop(defaultShop)
               return
             }
             for (var j = 0; j < name_list.length; j++) {
@@ -202,7 +215,7 @@ Component({
       // 用户手动选择必须优先：立即停掉可能仍在后台跑的自动定位扫描（beacon 命中是异步的，
       // 若不停掉，稍后命中会通过 _finalizeIfHit → _applySelectedShop 静默覆盖这次手动选择，
       // 且「万龙互换逻辑」会把结果换成店员自己的基地店，与手动选的店不一致）
-      that._stopScan()
+      that._markSelected()
       that.setData({ currentSelectedIndex: e.detail.value })
 
       // 带区域行的页面：门店 + 勾选的区域一起决定对外发出的 shop
@@ -257,7 +270,7 @@ Component({
     // 用户勾选 / 取消勾选区域：手动操作优先，停掉还在跑的自动定位
     areaChanged: function (e) {
       var that = this
-      that._stopScan()
+      that._markSelected()
       var values = (e && e.detail && e.detail.value) || []
       var shopList = that.data.shop_list || []
       var idx = Number(that.data.currentSelectedIndex) || 0
@@ -267,6 +280,8 @@ Component({
       // 选中的门店不在新区域的下拉里 → 回到「全部门店」
       var newIdx = current && shopArea.contains(shopList, areas, current) ? that.data.name_list.indexOf(current) : 0
       that.setData({ currentSelectedIndex: newIdx < 0 ? 0 : newIdx })
+      // 门店列表还没回来：只记下店员的区域选择，等列表回来（ready）再统一出结果
+      if (!that.data.shop_list) return
       that._emitSelection()
     },
 
@@ -285,9 +300,48 @@ Component({
 
     // beacon 命中 / 基地店兜底 / 页面指定门店：由这家店推断区域和门店（万龙 → 万龙 + 全部门店，旗舰 → 旗舰 + 全部门店）
     _applyAreaSelection(shop) {
+      this._hasSelection = true
       var inferred = shopArea.fromShop(shop.name)
       this._setAreas(inferred.areas)
       var idx = inferred.shop ? this.data.name_list.indexOf(inferred.shop) : 0
+      this.setData({ currentSelectedIndex: idx < 0 ? 0 : idx })
+      this._emitSelection()
+    },
+
+    // 已经有选定的门店（店员手动选 / 勾区域 / 页面指定）：记下并立刻停止 beacon 识别，之后识别和兜底都不能再改选
+    _markSelected() {
+      this._hasSelection = true
+      this._stopScan()
+    },
+
+    // 页面在组件启动之后才给出 / 改了门店
+    _onDefaultShopChanged(value) {
+      if (!value || !this.data || !this.data.shop_list) return   // 列表还没回来：ready 会按最新的 defaultShop 处理
+      this._markSelected()
+      this._showChosen(value)
+    },
+
+    // 只更新界面显示页面指定的门店，不发事件（页面自己已经知道）
+    _showChosen(name) {
+      var showArea = this.properties.showArea
+      if (shopArea.isAllLabel(name)) {
+        if (showArea) this._setAreas(shopArea.AREAS)
+        this.setData({ currentSelectedIndex: 0 })
+        return
+      }
+      var shop = this.getShop(name)
+      if (!shop) return
+      if (showArea) this._setAreas(shopArea.fromChosenShop(name).areas)
+      var idx = (this.data.name_list || []).indexOf(name)
+      if (idx >= 0) this.setData({ currentSelectedIndex: idx })
+    },
+
+    // 页面 / 店员明确指定的某一家（带区域行）：区域跟着它，门店就是这一家，对外发这一家
+    _applyChosenShop(shop) {
+      this._hasSelection = true
+      var chosen = shopArea.fromChosenShop(shop.name)
+      this._setAreas(chosen.areas)
+      var idx = (this.data.name_list || []).indexOf(shop.name)
       this.setData({ currentSelectedIndex: idx < 0 ? 0 : idx })
       this._emitSelection()
     },
@@ -306,6 +360,7 @@ Component({
     // 选店落地：开单入口以 beacon 命中的店为准；其它旧页面保留万龙系基地店逻辑。
     _applySelectedShop(shop, idx) {
       if (!shop) return
+      this._hasSelection = true
       if (this.properties.showArea) {
         this._applyAreaSelection(shop)
         return
@@ -342,6 +397,7 @@ Component({
 
     // 走 fallback：staff.base_shop_id → 列表第一家。开单场景不默认选店，停在「请选择门店」
     _fallback(shopList) {
+      if (this._hasSelection) return   // 已经有选定的门店（手动选 / 页面指定 / 已识别过）：兜底不能再改
       if (this.properties.scene === 'recept') {
         this._setReceptPlaceholder(RECEPT_PLACEHOLDER)
         return
@@ -363,6 +419,7 @@ Component({
     // 双路径 beacon 扫描自动选店
     _autoSelectByBeacon(shopList) {
       var that = this
+      if (that._hasSelection) return   // 已经有选定的门店：不启动识别
 
       // 构 mac/uuid 映射表（跳过未配的店）
       var macMap = {}   // normalize MAC → shop

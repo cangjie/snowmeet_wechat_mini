@@ -54,6 +54,13 @@ test('fromShop：由一家店推断区域和门店（beacon 命中 / 基地店�
   assert.deepEqual(area.fromShop('南山'), { areas: ['万龙', '旗舰'], shop: '南山' })   // 不属于任何区域：区域不限 + 选中该店
 })
 
+test('fromChosenShop：明确指定某一家就是这一家（区域跟着它），不属于任何区域的店区域保持不限', () => {
+  assert.deepEqual(area.fromChosenShop('万龙服务中心'), { areas: ['万龙'], shop: '万龙服务中心' })
+  assert.deepEqual(area.fromChosenShop('万龙体验中心'), { areas: ['万龙'], shop: '万龙体验中心' })
+  assert.deepEqual(area.fromChosenShop('崇礼旗舰店'), { areas: ['旗舰'], shop: '崇礼旗舰店' })
+  assert.deepEqual(area.fromChosenShop('南山'), { areas: ['万龙', '旗舰'], shop: '南山' })
+})
+
 test('contains：当前选中的门店是否还在这组区域的下拉里', () => {
   assert.equal(area.contains(SHOPS, ['万龙'], '万龙服务中心'), true)
   assert.equal(area.contains(SHOPS, ['万龙'], '崇礼旗舰店'), false)
