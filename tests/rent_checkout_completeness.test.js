@@ -53,7 +53,8 @@ test('必须所有商品及租赁物的必要信息都完整，修改或移除�
 
 test('缺商品模式、起租日期、主项分类、租赁物模式或异店领取门店时不能结算', () => {
   const cases = [
-    rental([item()], { pick_type: null }),
+    // 商品没选模式、装备模式也对不上才算缺商品模式；装备模式一致时商品按钮会按装备亮起、校验也认（见 rent_mode_derived_from_items.test.js）
+    rental([item(), item({ pick_type: '先租后取', code: 'B-2' })], { pick_type: null }),
     rental([item()], { start_date: null }),
     rental([item({ category_id: null })]),
     rental([item({ pick_type: null })]),

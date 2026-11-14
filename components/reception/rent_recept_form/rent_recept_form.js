@@ -59,6 +59,16 @@ function rentalModeDisplay(rental, items) {
   };
 }
 
+// 租赁商品实际生效的租赁模式：商品自己有就用商品的；没有但应领装备的模式一致（店员在装备上选的），就按装备的——
+// 商品按钮正是这样亮起来的（rentalModeDisplay）。录入校验、新增配套项的发放标记都要和按钮一致，
+// 否则按钮亮着「立即租赁」，状态却报「模式未选」、结算被拦（2026-11-14 用户截图）。装备模式不一致且商品没选过则为空。
+function effectivePickType(rental, items) {
+  if (rental && rental.pick_type) return rental.pick_type;
+  const modes = new Set(((items || (rental && rental.rentItems)) || []).filter(it => !it.noNeed).map(it => it.pick_type || ''));
+  if (modes.size !== 1) return '';
+  return modes.values().next().value || '';
+}
+
 function pkgKey(r, idx) {
   if (r.id) return 'id_' + r.id;
   if (r.timeStamp) return 'ts_' + r.timeStamp;
@@ -104,7 +114,7 @@ function evalEntry(item) {
 //   3. rentItems 有 N 件未录入（noNeed 不计） → 「N 件未录入」
 //   4. 全齐 → 「已录入」
 function evalRental(rental) {
-  if (!rental || !rental.pick_type) return { ok: false, label: '模式未选' };
+  if (!rental || !effectivePickType(rental)) return { ok: false, label: '模式未选' };
   if (!rental.startDate && !rental.start_date) return { ok: false, label: '起租时间未填' };
   const items = rental.rentItems || [];
   const unfinished = items.filter(it => !it.noNeed && !evalEntry(it).ok).length;
@@ -926,6 +936,18 @@ Component({
         patch[`displayRentals[${ridx}].rentItems[${iidx}].rent_product_id`] = null;
       }
       this.setData(patch);
+      // 商品没选过模式、装备选完后模式一致：商品按钮已按装备亮起来，数据也跟上（保存下来、之后换品类的配套项按它发放）。
+      // 只补 pick_type / atOnce，起租日期不动（日期随商品自己点模式或改日期才变）。
+      const rentalNow = this.data.displayRentals[ridx];
+      if (!rentalNow.pick_type) {
+        const effective = effectivePickType(rentalNow, rentalNow.rentItems);
+        if (effective) {
+          this.setData({
+            [`displayRentals[${ridx}].pick_type`]: effective,
+            [`displayRentals[${ridx}].atOnce`]: atOnceForPickType(effective),
+          });
+        }
+      }
       this._updateRentalChip(Number(ridx));
       this._emitSync(false);
     },
@@ -1147,7 +1169,8 @@ Component({
         // 2) 删旧附件 + 按新分类的 associateCategories 重建
         const nonAssociates = rental.rentItems.filter(it => !it.is_associate);
         const associates = (fullCat && fullCat.associateCategories) || [];
-        const defaultPickType = rental.pick_type;
+        // 商品没选过模式时按装备一致的模式（同商品按钮），别让配套项（雪杖等）因为 pick_type 为空而不当场发放
+        const defaultPickType = effectivePickType(rental, rental.rentItems) || rental.pick_type;
         // 配套项（雪杖等）当场发放要跟着租赁模式走：按 pick_type 派生。以前读 rental.atOnce，而它只是前端临时字段，
         // 先存草稿再选分类时已经丢成 false，雪杖开单没发放；后端要求应领装备全部发放才计租，当天租金一行都不写。
         const atOnce = atOnceForPickType(defaultPickType);
