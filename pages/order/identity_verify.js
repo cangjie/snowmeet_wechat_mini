@@ -4,6 +4,7 @@
 // order.wechat_unverified 置 1，店员端轮询到后放行「储值付租金」勾选。
 const app = getApp()
 const data = require('../../utils/data.js')
+const profileAuth = require('../../utils/profile_auth.js')
 
 Page({
   data: {
@@ -67,7 +68,8 @@ Page({
     data.bindWechatCellPromise(e.detail.encryptedData, e.detail.iv, app.globalData.sessionKey).then(function () {
       wx.hideLoading()
       that.setData({ busy: false })
-      that.verifyNow()
+      // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再继续核验
+      return profileAuth.ensureOn(that).then(function () { that.verifyNow() })
     }).catch(function () {
       wx.hideLoading()
       that.setData({ busy: false })

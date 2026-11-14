@@ -2,6 +2,7 @@
 const app = getApp()
 const util = require('../../../utils/util.js')
 const data = require('../../../utils/data.js')
+const profileAuth = require('../../../utils/profile_auth.js')
 const ticketHelper = require('./ticket_helper.js')
 Page({
 
@@ -84,9 +85,10 @@ Page({
       .then(function (member) {
         app.globalData.member = member
         that.setData({ authBusy: false })
+        // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再放行
         // 后端偶发返回不带 cell 的 member（会话归属没回填上），此时别放行，
         // 否则遮罩没了、人却还是没手机号
-        that._checkCell()
+        return profileAuth.ensureOn(that).then(function () { that._checkCell() })
       }).catch(function () {
         that.setData({ authBusy: false })
         wx.showToast({ title: '手机号验证失败，请重试', icon: 'none' })

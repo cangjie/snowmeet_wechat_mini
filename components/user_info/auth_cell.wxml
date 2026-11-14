@@ -3,3 +3,5 @@
     请授权您的手机号
   </van-button>
 </view>
+<!-- 手机号验证成功后请顾客授权头像和昵称（可跳过），见 components/profile_auth、utils/profile_auth.js -->
+<profile-auth id="profileAuth" />

@@ -1,6 +1,7 @@
 // 今后新发起的转赠使用此页；已有链接仍进入原 ticket_share 页面。
 const app = getApp()
 const data = require('../../../utils/data.js')
+const profileAuth = require('../../../utils/profile_auth.js')
 
 Page({
   data: {
@@ -83,6 +84,8 @@ Page({
       const member = await data.bindWechatCellPromise(detail.encryptedData, detail.iv, app.globalData.sessionKey)
       if (!member || !member.id || !member.cell) throw new Error('手机号验证未完成，请重试')
       app.globalData.member = member
+      // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再接受转赠
+      await profileAuth.ensureOn(this)
       await this.load()
     } catch (err) {
       this.setData({ message: typeof err === 'string' ? err : (err.message || '手机号验证失败，请重试') })

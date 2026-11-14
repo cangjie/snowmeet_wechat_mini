@@ -8,6 +8,7 @@
 // 后端：QrCode/ScanReceptCheckin、VerifyReceptCheckinPhone、GetReceptCheckinByCustomer
 const app = getApp()
 const data = require('../../utils/data.js')
+const profileAuth = require('../../utils/profile_auth.js')
 
 const POLL_INTERVAL = 2000
 
@@ -140,7 +141,8 @@ Page({
       .then(function (view) {
         wx.hideLoading()
         that.setData({ busy: false })
-        that.applyView(view)
+        // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再继续等店员开单
+        return profileAuth.ensureOn(that).then(function () { that.applyView(view) })
       }).catch(function () {
         // performWebRequest 已 toast 错误信息
         wx.hideLoading()

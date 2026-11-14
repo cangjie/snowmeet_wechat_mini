@@ -4,6 +4,7 @@ const app = getApp()
 const api = require('../common/api.js')
 const view = require('../common/coach-view.js')
 const data = require('../../../utils/data.js')
+const profileAuth = require('../../../utils/profile_auth.js')
 
 function parseToken(options) {
   options = options || {}
@@ -93,6 +94,8 @@ Page({
       return
     }
     this.setData({ claiming: false })
+    // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再领取
+    await profileAuth.ensureOn(this)
     return this.onClaim()
   },
 

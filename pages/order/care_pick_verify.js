@@ -7,6 +7,7 @@
 // 后端：QrCode/VerifyCarePick；绑定手机号 core/MiniAppUser/UpdateWechatMemberCell
 const app = getApp()
 const data = require('../../utils/data.js')
+const profileAuth = require('../../utils/profile_auth.js')
 
 Page({
   // 自动登录失败后，等 autoRetrySeconds 秒（每 autoRetryTickMs 毫秒倒计时一跳）再自动重试 1 次：
@@ -125,7 +126,8 @@ Page({
     data.bindWechatCellPromise(e.detail.encryptedData, e.detail.iv, app.globalData.sessionKey).then(function () {
       wx.hideLoading()
       that.setData({ busy: false })
-      that.verifyNow()
+      // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再继续核验取板
+      return profileAuth.ensureOn(that).then(function () { that.verifyNow() })
     }).catch(function () {
       wx.hideLoading()
       that.setData({ busy: false })

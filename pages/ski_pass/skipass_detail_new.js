@@ -3,6 +3,7 @@
 // 所有人都能订（2026-11-06 起开放，之前只有店员能订）：选日期、填游客信息、加入购物车，结算在购物车页。
 const app = getApp()
 const data = require('../../utils/data.js')
+const profileAuth = require('../../utils/profile_auth.js')
 const util = require('../../utils/util.js')
 const skipassGroup = require('../../utils/skipass_group.js')
 const skipassCalendar = require('../../utils/skipass_calendar.js')
@@ -244,7 +245,13 @@ Page({
           return
         }
         var member = res.data
-        that.setData({ cell: member.currentCell })
+        var fillCell = function () { that.setData({ cell: member.currentCell }) }
+        // 手机号授权成功才请顾客完善头像昵称（可跳过）；拒绝授权照旧
+        if (e.detail && e.detail.errMsg === 'getPhoneNumber:ok') {
+          profileAuth.ensureOn(that).then(fillCell)
+        } else {
+          fillCell()
+        }
       }
     })
   },

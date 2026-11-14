@@ -1,6 +1,7 @@
 // 新分享批次的领取入口；历史批次与旧海报继续使用原领取页面。
 const app = getApp()
 const data = require('../../../../utils/data.js')
+const profileAuth = require('../../../../utils/profile_auth.js')
 
 function parseBatchId(options) {
   options = options || {}
@@ -92,6 +93,8 @@ Page({
       const member = await data.bindWechatCellPromise(detail.encryptedData, detail.iv, app.globalData.sessionKey)
       if (!member || !member.id || !member.cell) throw new Error('手机号验证未完成，请重试')
       app.globalData.member = member
+      // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再领券
+      await profileAuth.ensureOn(this)
       this.setData({ needMember: false })
       await this.load()
     } catch (err) {

@@ -1053,6 +1053,49 @@ const createReceptCheckinByStaffPromise = function (sessionKey) {
     + '?sessionKey=' + encodeURIComponent(sessionKey) + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
   return util.performWebRequest(url, undefined)
 }
+// ---- 顾客验证手机号之后授权头像和昵称（2026-11-14）：后端 api/MemberProfile/*，头像存 S3 ----
+// 要不要弹「完善资料」：静默请求，resolve 原始 ApiResult；失败 / 后端还没部署（404）都 resolve(null)，页面当作不用弹
+const getMyProfilePromise = function (sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberProfile/GetMyProfile?sessionKey=' + encodeURIComponent(sessionKey)
+    + '&sessionType=wechat_mini_openid'
+  return _silentApiGet(url)
+}
+// 保存昵称和头像，resolve 原始 ApiResult（code 0 才算成功，code 1 的 message 给用户看）；HTTP 错误和网络错误 reject。
+// 选了头像：wx.uploadFile（文件字段 avatar，昵称是表单字段）；只改昵称：wx.request 发表单编码。
+const saveMyProfilePromise = function (options) {
+  var opts = options || {}
+  var url = app.globalData.requestPrefix + 'MemberProfile/SaveMyProfile?sessionKey=' + encodeURIComponent(opts.sessionKey)
+    + '&sessionType=wechat_mini_openid'
+  var nickName = opts.nickName || ''
+  return new Promise(function (resolve, reject) {
+    if (opts.avatarPath) {
+      wx.uploadFile({
+        url: url,
+        filePath: opts.avatarPath,
+        name: 'avatar',
+        formData: { nickName: nickName },
+        success: function (res) {
+          // wx.uploadFile 对任何 HTTP 状态码都走 success：非 2xx 必须 reject
+          if (res.statusCode < 200 || res.statusCode >= 300) { reject(res); return }
+          try { resolve(JSON.parse(res.data)) } catch (e) { reject(e) }
+        },
+        fail: function (err) { reject(err) }
+      })
+      return
+    }
+    wx.request({
+      url: url,
+      method: 'POST',
+      header: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: { nickName: nickName },
+      success: function (res) {
+        if (res.statusCode < 200 || res.statusCode >= 300 || !res.data || typeof res.data !== 'object') { reject(res); return }
+        resolve(res.data)
+      },
+      fail: function (err) { reject(err) }
+    })
+  })
+}
 // 店员轮询接待码：stage = waiting_scan / need_phone / verified / expired / stopped
 const getReceptCheckinByStaffPromise = function (id, sessionKey) {
   var url = app.globalData.requestPrefix + 'QrCode/GetReceptCheckinByStaff/' + id.toString()
@@ -2010,6 +2053,8 @@ const uploadMatExpirePhotoPromise = function (filePath, sessionKey) {
 }
 
 module.exports = {
+  getMyProfilePromise,
+  saveMyProfilePromise,
   IMAGE_HOST,
   getPackageListPromise: getPackageListPromise,
   getPackagePromise: getPackagePromise,
