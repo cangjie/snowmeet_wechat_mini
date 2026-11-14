@@ -491,14 +491,16 @@ Page({
       // 立刻把本地订单脱钩，让下一次"去结算"在后端建一个全新订单（而不是给已下单的订单累加 payment）。
       // 清空 server 端绑定的 id/code/valid，并把所有 rental / rentItem 的 id 清零，
       // 这样后续 saveRentReceptOrder 会被后端当作新订单处理。
-      // guaranties 也要清：PlaceRentOrder 刚给这单生成了保证金记录并随响应带回，留着它再保存新单，
-      // 后端会按已有 id 插入而 500（2026-11-12 生产实录）。
+      // 保证金记录也要清：PlaceRentOrder 刚给这单生成了保证金记录并随响应带回，留着它再保存新单，
+      // 后端会按已有 id 插入而 500（2026-11-12 生产实录）。它同时挂在订单级 guarantys 和每个 rental 的
+      // guaranties 两处，两处都清（11-14 杨天帅又 500：上次只清了 rental 级）。
       this.setData({
         order: {
           ...rentOrder,
           id: 0,
           code: null,
           valid: 0,
+          guarantys: [],
           rentals: (rentOrder.rentals || []).map((r) => ({
             ...r,
             id: 0,
@@ -545,6 +547,8 @@ Page({
       type:           '租赁',
       valid:          0,
       recepting:      1,
+      // 保证金记录只由「去结算」生成，草稿保存不回传（订单级 guarantys + 每个 rental 的 guaranties）
+      guarantys:      [],
       rentals: (order.rentals || []).map((r) => {
         const copy = { ...r };
         if (copy.startDate) copy.startDate = util.formatDate(new Date(copy.startDate));
@@ -553,7 +557,6 @@ Page({
         }
         copy.details = null;
         copy.category = null;
-        // 保证金记录只由「去结算」生成，草稿保存不回传
         copy.guaranties = [];
         return copy;
       }),
