@@ -206,6 +206,7 @@
                           placeholder="输入租赁物名称..."
                           placeholder-class="form-input-placeholder"
                           disabled="{{rit.noNeed || !rit.noCode}}"
+                          catchinput="onItemFieldInput"
                           catchblur="onItemFieldBlur"
                           data-ridx="{{ridx}}"
                           data-iidx="{{iidx}}"

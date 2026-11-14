@@ -49,6 +49,16 @@ function itemFollowsPackage(item, pkgPickType) {
   return item.pick_type === pkgPickType;
 }
 
+// 商品按钮优先反映实际需要的租赁物；未选模式也参与比较，避免部分未选时误显示一致。
+function rentalModeDisplay(rental, items) {
+  const modes = new Set((items || []).filter(it => !it.noNeed).map(it => it.pick_type || ''));
+  const onlyMode = modes.size === 1 ? modes.values().next().value : '';
+  return {
+    key: PT_TO_KEY[onlyMode] || PT_TO_KEY[rental.pick_type] || '',
+    mixed: modes.size > 1,
+  };
+}
+
 function pkgKey(r, idx) {
   if (r.id) return 'id_' + r.id;
   if (r.timeStamp) return 'ts_' + r.timeStamp;
@@ -300,10 +310,7 @@ Component({
           };
         });
 
-        // 套餐内 rentItems 的模式是否存在差异（noNeed 项跳过，空 / null 视为同一种"未选"）
-        const modeSet = new Set();
-        items.forEach(it => { if (!it.noNeed) modeSet.add(it.pick_type || ''); });
-        const modeMixed = modeSet.size > 1;
+        const modeDisplay = rentalModeDisplay(r, items);
 
         const rentalEntry = evalRental({ ...r, rentItems: items });
         const displayName = r.name || (r.category && r.category.name) || '';
@@ -326,8 +333,8 @@ Component({
           _startTime: startTime || '09:00',
           _dateIsToday: !!startDate && startDate === today,
           _dateIsTomorrow: !!startDate && startDate === tmrw,
-          _modeKey: PT_TO_KEY[r.pick_type] || '',
-          _modeMixed: modeMixed,
+          _modeKey: modeDisplay.key,
+          _modeMixed: modeDisplay.mixed,
           _rentalEntered: rentalEntry.ok,
           _rentalStatusLabel: rentalEntry.label,
           rentItems: items,
@@ -355,7 +362,7 @@ Component({
       rent = Math.round(rent * 100) / 100;
       rentReduce = Math.round(rentReduce * 100) / 100;
       const count = list.length;
-      const canCheckout = count > 0 && list.every(r => r._rentalEntered);
+      const canCheckout = count > 0 && list.every(r => evalRental(r).ok);
       this.setData({
         summary: {
           depositLabel: deposit.toLocaleString('en-US'),
@@ -417,7 +424,10 @@ Component({
       const r = this.data.displayRentals[ridx];
       if (!r) return;
       const entry = evalRental(r);
+      const modeDisplay = rentalModeDisplay(r, r.rentItems);
       this.setData({
+        [`displayRentals[${ridx}]._modeKey`]: modeDisplay.key,
+        [`displayRentals[${ridx}]._modeMixed`]: modeDisplay.mixed,
         [`displayRentals[${ridx}]._rentalEntered`]: entry.ok,
         [`displayRentals[${ridx}]._rentalStatusLabel`]: entry.label,
       });
@@ -825,7 +835,7 @@ Component({
     },
 
     /* ---------- 单品字段 ---------- */
-    onItemFieldBlur(e) {
+    onItemFieldInput(e) {
       const { ridx, iidx, field } = e.currentTarget.dataset;
       const value = e.detail.value;
       const map = { itemName: 'name', code: 'code', note: 'memo' };
@@ -839,6 +849,9 @@ Component({
         [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
       });
       this._updateRentalChip(Number(ridx));
+    },
+    onItemFieldBlur(e) {
+      this.onItemFieldInput(e);
       this._emitSync(false);
     },
     onItemCodeFlag(e) {
@@ -1226,6 +1239,11 @@ Component({
     onCheckout() {
       if (!this.data.displayRentals || this.data.displayRentals.length === 0) {
         wx.showToast({ title: '请先添加租赁商品', icon: 'none' });
+        return;
+      }
+      if (!this.data.displayRentals.every(r => evalRental(r).ok)) {
+        this._refreshSummary();
+        wx.showToast({ title: '请先填写完整租赁信息', icon: 'none' });
         return;
       }
       this.triggerEvent('checkout', { rentals: stripUI(this.data.displayRentals) });
