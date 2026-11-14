@@ -248,4 +248,16 @@ function allCaresDone(rows) {
   return live.length > 0 && live.every(row => row.statusClass === 'done')
 }
 
-module.exports = { buildCareRows, equipmentTitle, equipmentKind, serviceChips, careProgress, allCaresDone }
+// 订单是否已经「生效」：order.dealed == 1（付款成功 / 招待、质保确认生效 / 零元核销后由后端置 1）。
+// 服务端的 valid 只表示订单没被作废；开了单却从没生效的（没付款、装备也没生成任务）valid 仍是 1，dealed 是 0。
+// 详情页判断「还没生效」用的也是 dealed（care_order_detail.js 的 unpaid）。
+function isEffectiveOrder(order) {
+  return !!order && Number(order.dealed) === 1
+}
+
+// 只留下已生效的订单（养护「招待」列表用：招待单不用付款，开了没确认生效的就是废单，不显示）
+function effectiveOrders(orders) {
+  return (orders || []).filter(isEffectiveOrder)
+}
+
+module.exports = { buildCareRows, equipmentTitle, equipmentKind, serviceChips, careProgress, allCaresDone, isEffectiveOrder, effectiveOrders }

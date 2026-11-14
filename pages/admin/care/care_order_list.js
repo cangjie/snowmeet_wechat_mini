@@ -150,7 +150,16 @@ Page({
       null,
       page, pageSize
     ).then(function (result) {
-      that.renderOrders(result.items || [], result.total || 0, page, pageSize, result.totalEarnAmount)
+      var items = result.items || []
+      var total = result.total || 0
+      // 「招待」列表只显示已生效的订单：开了招待单却没确认生效的（dealed=0，没付款也没任务）是废单，在这里滤掉，
+      // 服务端不动。共 N 单跟着减去本页滤掉的条数（只有一页时是准的；多页时其它页滤掉的没法知道，总数可能略多）
+      if (p.isEntertain === true) {
+        var kept = careOrderRows.effectiveOrders(items)
+        total = Math.max(0, total - (items.length - kept.length))
+        items = kept
+      }
+      that.renderOrders(items, total, page, pageSize, result.totalEarnAmount)
       that.setData({ querying: false })
     }).catch(function (exp) {
       console.log('error', exp)

@@ -989,3 +989,76 @@ test('data.js 把 haveWarranty=true 带进 Order/GetOrdersByStaffPaged 的地址
   // 参数位置：…, sessionKey, cell, haveWarranty, retailType, …
   assert.match(fn, /sessionKey, cell, haveWarranty, retailType, keyword/)
 })
+
+// ---- 「招待」列表只显示已生效的订单（客户端过滤，服务端不动） ----
+test('已生效 = dealed 为 1；没生效、字段缺失、空订单都不算', () => {
+  assert.equal(rows.isEffectiveOrder({ dealed: 1 }), true)
+  assert.equal(rows.isEffectiveOrder({ dealed: '1' }), true)
+  assert.equal(rows.isEffectiveOrder({ dealed: 0 }), false)
+  assert.equal(rows.isEffectiveOrder({}), false)
+  assert.equal(rows.isEffectiveOrder({ dealed: null }), false)
+  assert.equal(rows.isEffectiveOrder(null), false)
+  assert.equal(rows.isEffectiveOrder(undefined), false)
+  assert.deepEqual(rows.effectiveOrders([{ id: 1, dealed: 1 }, { id: 2, dealed: 0 }, { id: 3, dealed: 1 }, null]).map(o => o.id), [1, 3])
+  assert.deepEqual(rows.effectiveOrders(null), [])
+})
+
+// 用假的列表接口走页面真实的查询路径：看最后显示的订单和总数
+function listWith(items, total) {
+  global.getApp = () => ({ globalData: { sessionKey: 'sk' } })
+  global.wx = {}
+  const page = loadPage('pages/admin/care/care_order_list.js', {
+    IMAGE_HOST: 'https://img.example',
+    getRentOrdersByStaffPagedPromise: () => Promise.resolve({ items: JSON.parse(JSON.stringify(items)), total, totalEarnAmount: 0 })
+  })
+  delete global.getApp
+  delete global.wx
+  page.setData({ startDate: '2026-11-14', endDate: '2026-11-14', shop: '万龙服务中心' })
+  return page
+}
+const settle = () => new Promise(r => setTimeout(r, 20))
+const entertainOrder = (id, dealed) => Object.assign(orderWith(1), { id, code: 'WF_YH_261114_0000' + id, dealed, orderStatus: dealed === 1 ? '已下单' : '待生成' })
+
+test('选了「招待」：没生效的订单（待生成那种）不显示，已生效的照常显示；共几单跟着减', async () => {
+  const page = listWith([entertainOrder(2, 1), entertainOrder(1, 0), entertainOrder(5, 1)], 3)
+  page.setQueryOptionValue('isEntertain', 'true')
+  page.getData(1, 50)
+  await settle()
+  assert.deepEqual(page.data.orders.map(o => o.id), [2, 5])
+  assert.equal(page.data.total, 2)
+  assert.equal(page.data.querying, false)
+})
+
+test('没选「招待」（正常 / 全部 / 质保）：不过滤，没生效的订单照旧显示，总数不变', async () => {
+  for (const value of ['false', 'null', 'warranty']) {
+    const page = listWith([entertainOrder(2, 1), entertainOrder(1, 0)], 2)
+    page.setQueryOptionValue('isEntertain', value)
+    page.getData(1, 50)
+    await settle()
+    assert.deepEqual(page.data.orders.map(o => o.id), [2, 1], value)
+    assert.equal(page.data.total, 2, value)
+  }
+})
+
+test('选了「招待」又按手机号 / 备注搜索：搜索放宽所有筛选，也不过滤没生效的', async () => {
+  const page = listWith([entertainOrder(2, 1), entertainOrder(1, 0)], 2)
+  page.setQueryOptionValue('isEntertain', 'true')
+  page.setData({ cell: '7897' })
+  page.getData(1, 50)
+  await settle()
+  assert.deepEqual(page.data.orders.map(o => o.id), [2, 1])
+})
+
+test('招待列表里一单都没生效：显示空，总数 0，不报错；总数不会减成负数', async () => {
+  const none = listWith([entertainOrder(1, 0), entertainOrder(3, 0)], 2)
+  none.setQueryOptionValue('isEntertain', 'true')
+  none.getData(1, 50)
+  await settle()
+  assert.deepEqual(none.data.orders, [])
+  assert.equal(none.data.total, 0)
+  const odd = listWith([entertainOrder(1, 0), entertainOrder(3, 0)], 1)   // 服务端总数比本页条数还小的异常情况
+  odd.setQueryOptionValue('isEntertain', 'true')
+  odd.getData(1, 50)
+  await settle()
+  assert.equal(odd.data.total, 0)
+})
