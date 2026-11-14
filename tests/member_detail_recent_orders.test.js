@@ -4,6 +4,8 @@
 //   第二行：日期 + 用了优惠券显示券名，用了卡显示卡名（次卡再写「记几次，余几次」）。
 // 同一天追加（2026-11-14 用户看了真机截图后）：图标位里类型图标后面，用了卡的加「卡」图标、用了券的加「券」图标、有减免的加「减」图标；
 //   并且要把列出来的订单（随分类 tab 切换）的订单金额、减免、实付各合计一下，显示在列表上方。
+// 再追加（2026-11-14 用户：租赁订单押金不能算实付）：支付里含租赁押金，所以每条改成「支付 · 退款 · 实付」，
+//   实付 = 支付 − 退款（后端 recentOrders.refundAmount）；合计行同步；旧后端没有退款字段时只显示支付、不显示退款和实付。
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
@@ -16,14 +18,14 @@ const WXML = read('pages/admin/member/member_detail.wxml')
 const WXSS = read('pages/admin/member/member_detail.wxss')
 
 const RAW = [
-  { id: 5, code: 'WF_YH_261114_00001', type: '养护', bizDate: '2026-11-14T10:00:00', totalAmount: 230, discountAmount: 30, paidAmount: 200,
+  { id: 5, code: 'WF_YH_261114_00001', type: '养护', bizDate: '2026-11-14T10:00:00', totalAmount: 230, discountAmount: 30, paidAmount: 200, refundAmount: 20,
     tickets: [{ name: '老顾客优惠券', count: 2 }], cards: [{ name: '张教练的学员卡', kind: 'coach', used: 1, remaining: null }] },
-  { id: 4, code: 'WT_ZL_251227_00020', type: '租赁', bizDate: '2025-12-27T08:00:00', totalAmount: 0, discountAmount: 0, paidAmount: 5000,
+  { id: 4, code: 'WT_ZL_251227_00020', type: '租赁', bizDate: '2025-12-27T08:00:00', totalAmount: 0, discountAmount: 0, paidAmount: 5000, refundAmount: 5000,
     tickets: [], cards: [{ name: '租赁10次卡', kind: 'punch', used: 1, remaining: 9 }] },
-  { id: 3, code: 'WT_LS_251225_00001', type: '零售', bizDate: '2025-12-25T08:00:00', totalAmount: 99, discountAmount: 0, paidAmount: 99, tickets: [], cards: [] },
-  { id: 2, code: 'QJ_XP_251224_00001', type: '雪票', bizDate: '2025-12-24T08:00:00', totalAmount: 309, discountAmount: 0, paidAmount: 309,
+  { id: 3, code: 'WT_LS_251225_00001', type: '零售', bizDate: '2025-12-25T08:00:00', totalAmount: 99, discountAmount: 0, paidAmount: 99, refundAmount: 0, tickets: [], cards: [] },
+  { id: 2, code: 'QJ_XP_251224_00001', type: '雪票', bizDate: '2025-12-24T08:00:00', totalAmount: 309, discountAmount: 0, paidAmount: 309, refundAmount: 0,
     tickets: [{ name: '免费打蜡券', count: 1 }], cards: [{ name: '机打蜡季卡', kind: 'season', used: 3, remaining: null }] },
-  { id: 1, code: 'XX_1', type: '聚合', bizDate: '2025-12-20T08:00:00', totalAmount: 1, discountAmount: 0, paidAmount: 1 }
+  { id: 1, code: 'XX_1', type: '聚合', bizDate: '2025-12-20T08:00:00', totalAmount: 1, discountAmount: 0, paidAmount: 1, refundAmount: 0 }
 ]
 
 test('订单类型图标：租赁=租、养护=养、零售=售、雪票=票，其它类型取第一个字', () => {
@@ -41,13 +43,18 @@ test('第一行金额：订单金额、减免、实付各自格式化；旧后�
   const care = view.recentOrderView(RAW[0])
   assert.equal(care.hasAmounts, true)
   assert.deepEqual([care.totalStr, care.discountStr, care.paidStr], ['¥230.00', '¥30.00', '¥200.00'])
+  assert.deepEqual([care.hasNet, care.refundStr, care.netStr], [true, '¥20.00', '¥180.00'])      // 实付 = 支付 − 退款
   assert.equal(care.hasDiscount, true)
   const rent = view.recentOrderView(RAW[1])
   assert.deepEqual([rent.totalStr, rent.discountStr, rent.paidStr], ['¥0.00', '¥0.00', '¥5000.00'])
+  assert.deepEqual([rent.hasNet, rent.refundStr, rent.netStr], [true, '¥5000.00', '¥0.00'])      // 押金全退：实付 0
   assert.equal(rent.hasDiscount, false)
   const old = view.recentOrderView({ id: 9, code: 'OLD', type: '租赁', bizDate: '2025-01-01T08:00:00' })
   assert.equal(old.hasAmounts, false)
   assert.deepEqual(old.uses, [])
+  // 后端有金额但还没有退款字段：只显示支付，不显示退款和实付（不能把押金当实付）
+  const noRefund = view.recentOrderView({ id: 9, code: 'X', type: '租赁', bizDate: '2025-01-01T08:00:00', totalAmount: 0, discountAmount: 0, paidAmount: 5000 })
+  assert.deepEqual([noRefund.hasAmounts, noRefund.paidStr, noRefund.hasNet, noRefund.netStr], [true, '¥5000.00', false, ''])
 })
 
 test('第二行：用了券显示券名（多张同名带数量），用了卡显示卡名；次卡写记几次、余几次，季卡只写记几次，学员卡只有名称', () => {
@@ -74,12 +81,15 @@ test('图标位：类型图标后面，用了卡加「卡」、用了券加「�
 test('合计：列出的订单的订单金额、减免、实付各加起来，按分四舍五入；没有金额字段的订单不参与', () => {
   const views = RAW.map(view.recentOrderView)
   const all = view.summarize(views)
-  assert.deepEqual(all, { show: true, count: 5, totalStr: '¥639.00', discountStr: '¥30.00', paidStr: '¥5609.00' })
+  assert.deepEqual(all, { show: true, count: 5, totalStr: '¥639.00', discountStr: '¥30.00', paidStr: '¥5609.00', hasNet: true, refundStr: '¥5020.00', netStr: '¥589.00' })
   const rentOnly = view.summarize(views.filter(v => v.type === '租赁'))
-  assert.deepEqual(rentOnly, { show: true, count: 1, totalStr: '¥0.00', discountStr: '¥0.00', paidStr: '¥5000.00' })
+  assert.deepEqual(rentOnly, { show: true, count: 1, totalStr: '¥0.00', discountStr: '¥0.00', paidStr: '¥5000.00', hasNet: true, refundStr: '¥5000.00', netStr: '¥0.00' })
   // 浮点误差：0.1 + 0.2 之类要按分取整
   const floats = view.summarize([0.1, 0.2].map((n, i) => view.recentOrderView({ id: i, code: 'F' + i, type: '零售', totalAmount: n, discountAmount: n, paidAmount: n })))
   assert.deepEqual([floats.totalStr, floats.discountStr, floats.paidStr], ['¥0.30', '¥0.30', '¥0.30'])
+  // 只要有一条订单没有退款字段，合计就不显示退款和实付（算不出净额）
+  const mixed = view.summarize([view.recentOrderView(RAW[2]), view.recentOrderView({ id: 7, code: 'M', type: '租赁', totalAmount: 0, discountAmount: 0, paidAmount: 5000 })])
+  assert.deepEqual([mixed.show, mixed.count, mixed.paidStr, mixed.hasNet], [true, 2, '¥5099.00', false])
   // 没有订单 / 旧后端（没有金额字段）：不显示合计
   assert.equal(view.summarize([]).show, false)
   assert.equal(view.summarize([view.recentOrderView({ id: 1, code: 'OLD', type: '租赁' })]).show, false)
@@ -110,7 +120,7 @@ test('页面：最近订单按新的视图数据显示，分类 tab 和点击进
   assert.equal(page.data.orderSummary.paidStr, '¥5609.00')
   page.onOrderTab(tap({ t: '租赁' }))
   assert.deepEqual(page.data.filteredOrders.map(o => o.id), [4])
-  assert.deepEqual(page.data.orderSummary, { show: true, count: 1, totalStr: '¥0.00', discountStr: '¥0.00', paidStr: '¥5000.00' })   // 合计随分类切换重算
+  assert.deepEqual(page.data.orderSummary, { show: true, count: 1, totalStr: '¥0.00', discountStr: '¥0.00', paidStr: '¥5000.00', hasNet: true, refundStr: '¥5000.00', netStr: '¥0.00' })   // 合计随分类切换重算
   page.onOrderTab(tap({ t: '全部' }))
   assert.equal(page.data.orderSummary.count, 5)
   page.onOrderTab(tap({ t: '租赁' }))
@@ -125,7 +135,10 @@ test('模板：每条订单前面是图标位（类型图标），第一行订�
   assert.match(block, /class="type-ico type-ico--\{\{item\.icon\.cls\}\}">\{\{item\.icon\.char\}\}</)
   const line1 = block.slice(block.indexOf('order-line1'), block.indexOf('order-line2'))
   assert.ok(line1.includes('{{item.code}}'))
-  for (const f of ['item.totalStr', 'item.discountStr', 'item.paidStr']) assert.ok(line1.includes(f), f)
+  for (const f of ['item.totalStr', 'item.discountStr', 'item.paidStr', 'item.refundStr', 'item.netStr']) assert.ok(line1.includes(f), f)
+  assert.match(line1, /wx:if="\{\{item\.hasNet\}\}"/)
+  assert.ok(line1.indexOf('item.paidStr') < line1.indexOf('item.refundStr') && line1.indexOf('item.refundStr') < line1.indexOf('item.netStr'), '顺序：支付 → 退款 → 实付')
+  assert.equal(/实付\{\{item\.paidStr\}\}/.test(line1), false, '支付金额不能再叫实付')
   assert.match(line1, /wx:if="\{\{item\.hasAmounts\}\}"/)
   const line2 = block.slice(block.indexOf('order-line2'))
   assert.ok(line2.includes('{{item.dateStr}}') && line2.includes('item.uses') && line2.includes('{{u.text}}'))
@@ -141,13 +154,14 @@ test('模板：图标位里类型图标后面循环显示 卡 / 券 / 减 图标
   const sumAt = card.indexOf('order-sum'), listAt = card.indexOf('wx:for="{{filteredOrders}}"')
   assert.ok(sumAt >= 0 && sumAt < listAt, '合计行在订单列表上方')
   const sum = card.slice(sumAt, listAt)
-  for (const f of ['orderSummary.count', 'orderSummary.totalStr', 'orderSummary.discountStr', 'orderSummary.paidStr']) assert.ok(sum.includes(f), f)
+  for (const f of ['orderSummary.count', 'orderSummary.totalStr', 'orderSummary.discountStr', 'orderSummary.paidStr', 'orderSummary.refundStr', 'orderSummary.netStr']) assert.ok(sum.includes(f), f)
+  assert.match(sum, /wx:if="\{\{orderSummary\.hasNet\}\}"/)
   assert.match(sum, /wx:if="\{\{orderSummary\.show\}\}"/)
 })
 
 test('样式：图标位、四种类型图标、两行、金额和券卡文字的样式都有定义', () => {
   for (const cls of ['.order-icons', '.type-ico', '.type-ico--rent', '.type-ico--care', '.type-ico--retail', '.type-ico--ski', '.type-ico--other',
-    '.order-line1', '.order-line2', '.order-amt', '.order-use', '.type-ico--card', '.type-ico--ticket', '.type-ico--discount', '.order-sum']) {
+    '.order-line1', '.order-line2', '.order-amt', '.order-use', '.type-ico--card', '.type-ico--ticket', '.type-ico--discount', '.order-sum', '.order-amt--refund', '.order-amt--net']) {
     assert.ok(WXSS.includes(cls), '缺少 ' + cls)
   }
 })

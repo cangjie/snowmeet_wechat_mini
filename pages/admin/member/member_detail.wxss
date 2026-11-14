@@ -100,12 +100,14 @@
 .order-sum-i { font-size: 22rpx; color: #6f7881; }
 .order-sum-v { font-size: 24rpx; font-weight: 700; color: #0b1c30; }
 .order-sum-v--discount { color: #c2410c; }
+.order-sum-v--refund { color: #b45309; }
 .order-sum-v--paid { color: #006495; }
 .order-line1, .order-line2 { display: flex; flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 14rpx; row-gap: 2rpx; }
 .order-amt { font-size: 22rpx; color: #6f7881; }
 .order-amt--total { color: #0b1c30; font-weight: 600; }
 .order-amt--discount.order-amt--on { color: #c2410c; }
-.order-amt--paid { color: #006495; font-weight: 600; }
+.order-amt--refund.order-amt--on { color: #b45309; }
+.order-amt--net { color: #006495; font-weight: 600; }
 .order-use { font-size: 22rpx; color: #3f4850; }
 .order-use--ticket { color: #b45309; }
 .order-use--card { color: #1f7a4d; }

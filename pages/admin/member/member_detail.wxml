@@ -93,7 +93,11 @@
         <text class="order-sum-k">共 {{orderSummary.count}} 单</text>
         <text class="order-sum-i">订单金额 <text class="order-sum-v">{{orderSummary.totalStr}}</text></text>
         <text class="order-sum-i">减免 <text class="order-sum-v order-sum-v--discount">{{orderSummary.discountStr}}</text></text>
-        <text class="order-sum-i">实付 <text class="order-sum-v order-sum-v--paid">{{orderSummary.paidStr}}</text></text>
+        <text class="order-sum-i">支付 <text class="order-sum-v">{{orderSummary.paidStr}}</text></text>
+        <block wx:if="{{orderSummary.hasNet}}">
+          <text class="order-sum-i">退款 <text class="order-sum-v order-sum-v--refund">{{orderSummary.refundStr}}</text></text>
+          <text class="order-sum-i">实付 <text class="order-sum-v order-sum-v--paid">{{orderSummary.netStr}}</text></text>
+        </block>
       </view>
       <view wx:for="{{filteredOrders}}" wx:key="id" class="order-row order-row--tap" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="gotoOrder">
         <!-- 图标位：先放订单类型图标，后面还要放别的图标就接在它后面 -->
@@ -108,7 +112,12 @@
             <block wx:if="{{item.hasAmounts}}">
               <text class="order-amt order-amt--total">{{item.totalStr}}</text>
               <text class="order-amt order-amt--discount {{item.hasDiscount ? 'order-amt--on' : ''}}">减免{{item.discountStr}}</text>
-              <text class="order-amt order-amt--paid">实付{{item.paidStr}}</text>
+              <text class="order-amt">支付{{item.paidStr}}</text>
+              <!-- 支付里含租赁押金：实付 = 支付 − 退款（旧后端没有退款字段时不显示这两项） -->
+              <block wx:if="{{item.hasNet}}">
+                <text class="order-amt order-amt--refund {{item.hasRefund ? 'order-amt--on' : ''}}">退款{{item.refundStr}}</text>
+                <text class="order-amt order-amt--net">实付{{item.netStr}}</text>
+              </block>
             </block>
           </view>
           <view class="order-line2">

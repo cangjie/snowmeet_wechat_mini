@@ -22,7 +22,7 @@ Page({
     orderTabs: ['全部'],
     orderTab: '全部',
     filteredOrders: [],
-    orderSummary: { show: false, count: 0, totalStr: '', discountStr: '', paidStr: '' },
+    orderSummary: { show: false, count: 0, totalStr: '', discountStr: '', paidStr: '', hasNet: false, refundStr: '', netStr: '' },
 
     // 名下优惠券（可折叠）。一次拉全，按 未使用/已核销/已过期 前端切换——
     // 三个桶是完备互斥划分，由后端 bucket 字段决定，前端不再自己判过期
