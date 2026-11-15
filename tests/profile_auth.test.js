@@ -637,3 +637,11 @@ test('组件：点「我的」页顶部修改（edit）同样先要隐私授权'
   await c.onSkip()
   await done
 })
+
+test('版式：头像按钮和下面的提示文字自己居中（不依赖 form 是不是 flex：微信里 form 里面还有一层，align-items 不一定生效）', () => {
+  const wxss = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxss'), 'utf8')
+  const rule = name => (wxss.match(new RegExp('\\.' + name + '\\s*\\{([^}]*)\\}')) || [])[1] || ''
+  assert.match(rule('pa-avatar-btn'), /margin:\s*\d+rpx\s+auto\s+0/, '头像按钮左右 auto 才会居中')
+  assert.match(rule('pa-avatar-tip'), /text-align:\s*center/)
+  assert.match(rule('pa-avatar-tip'), /width:\s*100%/)
+})

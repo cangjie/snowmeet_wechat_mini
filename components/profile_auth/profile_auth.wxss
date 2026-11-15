@@ -21,10 +21,8 @@
   align-items: center;
 }
 .pa-form {
+  display: block;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 .pa-title {
   font-size: 36rpx;
@@ -39,7 +37,7 @@
 }
 /* app.wxss 给所有 button 设了 groove 灰边框、背景色和 40px 高度，这里的按钮要自己把它们盖掉 */
 .pa-avatar-btn {
-  margin: 32rpx 0 0;
+  margin: 32rpx auto 0;
   padding: 0;
   width: 160rpx;
   height: 160rpx;
@@ -67,6 +65,8 @@
   justify-content: center;
 }
 .pa-avatar-tip {
+  width: 100%;
+  text-align: center;
   margin-top: 14rpx;
   font-size: 24rpx;
   color: #07c160;
