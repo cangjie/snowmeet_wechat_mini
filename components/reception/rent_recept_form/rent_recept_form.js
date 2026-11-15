@@ -741,9 +741,15 @@ Component({
         this._applyPkgMode(ridx, autoMode, date);
         return;
       }
-      const oldTime = splitISODateTime(r.start_date).time || r._startTime || '';
+      // 没有自动切模式的情况（异店租赁、立即租赁/先租后取改到别的日期…）：只要起租日期真的变了，起租时间就设成当天 00:00，
+      // 不管是延时租赁还是异店租赁（2026-11-15 用户要求；自动切成延时租赁的分支上面已经是 00:00）。
+      // 日期没变（比如点「今」时本来就是今天）不动原来的钟点；店员之后仍可以在时间选择器里改。
+      const split = splitISODateTime(r.start_date);
+      const oldDate = split.date || r._startDate || '';
+      const startTime = date !== oldDate ? '00:00' : (split.time || r._startTime || '09:00');
       this.setData({
-        [`displayRentals[${ridx}].start_date`]: combineDateTime(date, oldTime),
+        [`displayRentals[${ridx}].start_date`]: combineDateTime(date, startTime),
+        [`displayRentals[${ridx}]._startTime`]: startTime,
         [`displayRentals[${ridx}]._startDate`]: date,
         [`displayRentals[${ridx}]._dateIsToday`]: date === today,
         [`displayRentals[${ridx}]._dateIsTomorrow`]: date === tmrw,

@@ -179,6 +179,71 @@ test('套餐里自己单独选过模式的装备，改日期时保持自己的�
   } finally { restore() }
 })
 
+// ---------- 2026-11-15 用户要求：只要修改起租日期，起租时间就设为当天 00:00，不管延时租赁还是异店租赁 ----------
+
+function crossRental(extra) {
+  return rental(Object.assign({
+    pick_type: '异店租赁', atOnce: false,
+    rentItems: [
+      { id: 1, name: '全能板', noCode: true, category_id: 3, pick_type: '异店租赁', pickup_shop: '万龙体验中心', _modeFromPkg: true, atOnce: false },
+    ],
+  }, extra || {}))
+}
+
+test('异店租赁改起租日期：起租时间设为当天 00:00，模式和相关门店不变', () => {
+  const { instance, restore } = loadForm([crossRental()])
+  try {
+    instance._setPkgDate(0, daysFromToday(1))
+    const r = instance.data.displayRentals[0]
+    assert.equal(r.pick_type, '异店租赁')
+    assert.equal(r.start_date, daysFromToday(1) + 'T00:00:00')
+    assert.equal(r._startDate, daysFromToday(1))
+    assert.equal(r._startTime, '00:00')
+    assert.equal(r.rentItems[0].pick_type, '异店租赁')
+    assert.equal(r.rentItems[0].pickup_shop, '万龙体验中心')
+  } finally { restore() }
+})
+
+test('异店租赁：之后再改到别的日期（包括改回今天），时间也是新日期的 00:00，不沿用原来的钟点', () => {
+  const { instance, restore } = loadForm([crossRental({ start_date: daysFromToday(1) + 'T09:30:00', _startDate: daysFromToday(1), _startTime: '09:30' })])
+  try {
+    instance._setPkgDate(0, daysFromToday(3))
+    assert.equal(instance.data.displayRentals[0].start_date, daysFromToday(3) + 'T00:00:00')
+    instance._setPkgDate(0, daysFromToday(0))
+    const r = instance.data.displayRentals[0]
+    assert.equal(r.start_date, daysFromToday(0) + 'T00:00:00')
+    assert.equal(r._startTime, '00:00')
+    assert.equal(r._dateIsToday, true)
+    assert.equal(r.pick_type, '异店租赁', '异店租赁不会因为改日期自动切模式')
+  } finally { restore() }
+})
+
+test('延时租赁再改到别的日期：时间重新设为 00:00（店员之前手改过的钟点不保留）', () => {
+  const { instance, restore } = loadForm([rental({
+    pick_type: '延时租赁', start_date: daysFromToday(1) + 'T09:30:00', _startDate: daysFromToday(1), _startTime: '09:30',
+    rentItems: [{ id: 1, name: '雪板', code: 'B', category_id: 3, pick_type: '延时租赁', _modeFromPkg: true, atOnce: true }],
+  })])
+  try {
+    instance._setPkgDate(0, daysFromToday(2))
+    const r = instance.data.displayRentals[0]
+    assert.equal(r.pick_type, '延时租赁')
+    assert.equal(r.start_date, daysFromToday(2) + 'T00:00:00')
+    assert.equal(r._startTime, '00:00')
+  } finally { restore() }
+})
+
+test('日期没有变（选了同一天）：不动起租时间；改日期之后店员仍可在时间选择器里改钟点', () => {
+  const { instance, restore } = loadForm([crossRental({ start_date: daysFromToday(1) + 'T09:30:00', _startDate: daysFromToday(1), _startTime: '09:30' })])
+  try {
+    instance._setPkgDate(0, daysFromToday(1))
+    assert.equal(instance.data.displayRentals[0].start_date, daysFromToday(1) + 'T09:30:00')
+    instance._setPkgDate(0, daysFromToday(2))
+    assert.equal(instance.data.displayRentals[0].start_date, daysFromToday(2) + 'T00:00:00')
+    instance.onPkgTimeChange({ currentTarget: { dataset: { ridx: 0 } }, detail: { value: '14:20' } })
+    assert.equal(instance.data.displayRentals[0].start_date, daysFromToday(2) + 'T14:20:00')
+  } finally { restore() }
+})
+
 test('只改起租时间（时间选择器）不动模式和日期', () => {
   const { instance, restore } = loadForm([rental({ pick_type: '延时租赁', start_date: daysFromToday(1) + 'T00:00:00', _startDate: daysFromToday(1) })])
   try {
