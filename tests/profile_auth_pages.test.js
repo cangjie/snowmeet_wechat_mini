@@ -276,3 +276,61 @@ test('pay-identity-confirm（支付身份确认）：授权手机号、正常支
     assert.ok(log.includes('refreshed'), '直接通知父页继续')
   }
 })
+
+// ---------- 5. 接待报到：手机号早就绑过的会员扫码识别身份时也问一次（2026-11-15 用户：18911212780 扫码识别身份准备开单，没有询问昵称头像） ----------
+// 手机号早就绑过的会员扫码报到时没有「授权手机号」这一步，原来的弹层（授权手机号之后）永远碰不到他们。
+// 现在报到成功、进入「等待店员开单」（stage=waiting）时再问一次；不拦页面自己的状态和轮询；付款阶段（wepay / alipay）不问。
+
+function checkinPage(t, view) {
+  installGlobals(t)
+  const page = loadPage('pages/order/recept_checkin.js', {
+    scanReceptCheckinPromise: async () => view,
+    getReceptCheckinByCustomerPromise: async () => null,
+  })
+  page.setData({ code: 'rc_x' })
+  const log = []
+  page._startPolling = () => { log.push('poll') }
+  page._stopPolling = () => {}
+  page.gotoPay = () => { log.push('pay') }
+  return { page, log }
+}
+
+test('接待报到：手机号已绑的会员扫码后进入等待开单，先把页面状态定下来、轮询照常，再弹头像昵称；弹层不拦页面', async t => {
+  const { page, log } = checkinPage(t, { stage: 'waiting', maskedCell: '189****2780' })
+  const gate = withProfileGate(page, log)
+  page.checkin()
+  await settle()
+  assert.equal(page.data.state, 'waiting', '页面状态不被弹层拦住')
+  assert.deepEqual(log.sort(), ['ensure', 'poll'])
+  gate.resolve()
+  await settle()
+})
+
+test('接待报到：只在「等待开单」时问；要授权手机号、支付宝、微信付款、过期、异常都不在报到这里问', async t => {
+  for (const view of [{ stage: 'need_phone' }, { stage: 'alipay' }, { stage: 'wepay', paymentId: 9 }, { stage: 'expired' }, { stage: 'bogus' }]) {
+    const { page, log } = checkinPage(t, view)
+    withProfileGate(page, log)
+    page.checkin()
+    await settle()
+    assert.ok(!log.includes('ensure'), JSON.stringify(view))
+  }
+})
+
+test('接待报到：每次回到前台都会重新报到，弹层组件记着已处理，所以同一次运行里不会反复弹（这里每次都交给组件判断）', async t => {
+  const { page, log } = checkinPage(t, { stage: 'waiting' })
+  withProfileGate(page, log)
+  page.checkin()
+  await settle()
+  page.checkin()
+  await settle()
+  assert.equal(log.filter(x => x === 'ensure').length, 2, '页面每次都问组件，由组件决定弹不弹')
+})
+
+test('接待报到：取不到弹层组件时不影响等待开单', async t => {
+  const { page, log } = checkinPage(t, { stage: 'waiting' })
+  page.selectComponent = () => null
+  page.checkin()
+  await settle()
+  assert.equal(page.data.state, 'waiting')
+  assert.deepEqual(log, ['poll'])
+})
