@@ -69,6 +69,24 @@ function ensureOn(owner) {
   return Promise.resolve()
 }
 
+// 弹头像昵称之前，先确认顾客已经同意小程序的隐私协议。昵称输入框（type="nickname"）和头像按钮要用到「用户隐私」，
+// 没同意过时昵称框会降级成普通输入框、头像选择也会失败（开发者工具报 showNicknameAccessory:fail ... errno:104），
+// 而 type="nickname" 自己不会触发隐私弹窗，所以要先主动要一次：wx.requirePrivacyAuthorize（已同意会直接成功）。
+// 返回 true = 可以往下弹（已同意 / 刚同意 / 旧基础库没有这个接口 / 查不到状态，都交给微信自己处理）；false = 顾客拒绝了。
+function requirePrivacy(wxApi) {
+  const w = wxApi !== undefined ? wxApi : (typeof wx !== 'undefined' ? wx : null)
+  return new Promise(resolve => {
+    if (!w || typeof w.getPrivacySetting !== 'function' || typeof w.requirePrivacyAuthorize !== 'function') { resolve(true); return }
+    w.getPrivacySetting({
+      success: res => {
+        if (!res || !res.needAuthorization) { resolve(true); return }
+        w.requirePrivacyAuthorize({ success: () => resolve(true), fail: () => resolve(false) })
+      },
+      fail: () => resolve(true)
+    })
+  })
+}
+
 // 「我的」页点顶部头像昵称：打开修改弹层（带出已存的昵称和头像），等用户保存或取消。永远不 reject。
 function editOn(owner) {
   try {
@@ -82,4 +100,4 @@ function editOn(owner) {
   return Promise.resolve()
 }
 
-module.exports = { NICK_MAX, cleanNickName, canSave, needPrompt, hasProfile, profileView, isDone, markDone, ensureOn, editOn }
+module.exports = { NICK_MAX, cleanNickName, canSave, needPrompt, hasProfile, profileView, isDone, markDone, ensureOn, editOn, requirePrivacy }

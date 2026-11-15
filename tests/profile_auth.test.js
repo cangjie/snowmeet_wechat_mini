@@ -155,12 +155,17 @@ test('saveMyProfilePromise：HTTP 非 2xx（wx.uploadFile 对任何状态码都�
 
 // ---------- 弹层组件 ----------
 
-function setupComponent(t, { profile, saveResult, sessionKey = 'sess-1', modalConfirm = true } = {}) {
-  const calls = { get: 0, save: [], toasts: [], modals: [] }
+function setupComponent(t, { profile, saveResult, sessionKey = 'sess-1', modalConfirm = true, privacy = 'unsupported' } = {}) {
+  const calls = { get: 0, save: [], toasts: [], modals: [], privacyAsked: 0, privacyChecked: 0 }
   // getApp() 在真机上每次返回同一个对象，globalData 里记的「本次运行已处理」才会一直在
   const app = { globalData: { sessionKey, requestPrefix: 'https://t.test/api/' } }
   global.getApp = () => app
   global.wx = { showToast(o) { calls.toasts.push(o) }, showModal(o) { calls.modals.push(o); if (o.success) o.success({ confirm: modalConfirm }) } }
+  // 隐私协议授权的模拟：unsupported 没有这两个接口（旧基础库）；agreed 已同意；accept / refuse 还没同意，弹出系统弹窗后同意 / 拒绝
+  if (privacy !== 'unsupported') {
+    global.wx.getPrivacySetting = o => { calls.privacyChecked++; if (privacy === 'check-fails') o.fail({ errMsg: 'x' }); else o.success({ needAuthorization: privacy === 'accept' || privacy === 'refuse' }) }
+    global.wx.requirePrivacyAuthorize = o => { calls.privacyAsked++; setTimeout(() => { if (privacy === 'refuse') o.fail({ errno: 104 }); else o.success({}) }, 20) }
+  }
   t.after(() => { delete global.getApp; delete global.wx })
   const fakeData = {
     getMyProfilePromise: async () => { calls.get++; return profile === undefined ? { code: 0, data: { needProfile: true } } : profile },
@@ -533,4 +538,66 @@ test('editOn：和 ensureOn 一样，取不到组件、组件出错都当作没�
   let called = false
   await profileAuth.editOn({ selectComponent(sel) { assert.equal(sel, '#profileAuth'); return { edit() { called = true; return Promise.resolve() } } } })
   assert.equal(called, true)
+})
+
+// ---------- 隐私协议：顾客还没同意时，先请他同意再弹头像昵称（2026-11-15 开发者工具报 showNicknameAccessory:fail ... errno:104） ----------
+// 昵称输入框（type="nickname"）和头像按钮要用到「用户隐私」，顾客没在微信里同意过小程序的隐私协议时，昵称框降级成普通输入框、
+// 头像选择也会失败。type="nickname" 自己不会触发隐私弹窗，所以要先主动要一次：wx.requirePrivacyAuthorize。
+
+test('requirePrivacy：已经同意 / 接口不存在 / 查不到状态，都直接往下走；没同意就弹系统弹窗，同意才算数', async () => {
+  const run = (wxApi) => profileAuth.requirePrivacy(wxApi)
+  assert.equal(await run(null), true)
+  assert.equal(await run({}), true, '旧基础库没有这两个接口')
+  assert.equal(await run({ getPrivacySetting: o => o.success({ needAuthorization: false }), requirePrivacyAuthorize: () => { throw new Error('不该再要一次') } }), true)
+  assert.equal(await run({ getPrivacySetting: o => o.fail({}), requirePrivacyAuthorize: () => { throw new Error('查不到状态就不要了') } }), true)
+  assert.equal(await run({ getPrivacySetting: o => o.success({ needAuthorization: true }), requirePrivacyAuthorize: o => o.success({}) }), true)
+  assert.equal(await run({ getPrivacySetting: o => o.success({ needAuthorization: true }), requirePrivacyAuthorize: o => o.fail({ errno: 104 }) }), false)
+})
+
+test('组件：隐私协议已经同意 → 直接弹，不再要授权', async t => {
+  const { c, calls } = setupComponent(t, { privacy: 'agreed' })
+  const done = c.ensure()
+  await settle()
+  assert.equal(c.data.visible, true)
+  assert.equal(calls.privacyChecked, 1)
+  assert.equal(calls.privacyAsked, 0)
+  await c.onSkip()
+  await done
+})
+
+test('组件：隐私协议还没同意 → 先弹系统的隐私弹窗，顾客同意之后才弹头像昵称弹层，并且昵称框才获得焦点', async t => {
+  const { c, calls } = setupComponent(t, { privacy: 'accept' })
+  const done = c.ensure()
+  await settle()
+  assert.equal(calls.privacyAsked, 1)
+  assert.equal(c.data.visible, false, '顾客还没点同意，我们的弹层不能先出来')
+  assert.equal(c.data.focusNick, false)
+  await new Promise(resolve => setTimeout(resolve, 60))
+  assert.equal(c.data.visible, true)
+  assert.equal(c.data.focusNick, true)
+  await c.onSkip()
+  await done
+})
+
+test('组件：顾客不同意隐私协议 → 不弹头像昵称，本次运行里不再问（下次重新打开小程序再问）', async t => {
+  const { c, calls } = setupComponent(t, { privacy: 'refuse' })
+  await c.ensure()
+  await new Promise(resolve => setTimeout(resolve, 60))
+  assert.equal(calls.privacyAsked, 1)
+  assert.equal(c.data.visible, false)
+  assert.equal(calls.save.length, 0)
+  await c.ensure()
+  assert.equal(calls.privacyAsked, 1, '不再重复要授权')
+  assert.equal(calls.get, 1, '也不再请求后端')
+})
+
+test('组件：点「我的」页顶部修改（edit）同样先要隐私授权', async t => {
+  const stored = { code: 0, data: { needProfile: false, nickName: '旧昵称', avatarUrl: 'https://x/a.jpg', updateDate: '2026-11-15T08:00:00' } }
+  const { c, calls } = setupComponent(t, { privacy: 'accept', profile: stored })
+  const done = c.edit()
+  await new Promise(resolve => setTimeout(resolve, 60))
+  assert.equal(calls.privacyAsked, 1)
+  assert.equal(c.data.visible, true)
+  await c.onSkip()
+  await done
 })

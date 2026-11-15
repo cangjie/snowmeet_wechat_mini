@@ -67,6 +67,12 @@ Component({
         if (profileAuth.hasProfile(res)) profileAuth.markDone(globalData, sessionKey)
         return
       }
+      // 先确认顾客同意了小程序的隐私协议，再弹我们的弹层：没同意时昵称框会降级、头像选择会失败。
+      // 顾客在微信弹出的隐私弹窗里点了不同意：本次运行里不再问（下次重新打开小程序再问）
+      if (!(await profileAuth.requirePrivacy())) {
+        profileAuth.markDone(globalData, sessionKey)
+        return
+      }
       const stored = (res && res.data) || {}
       const nickName = typeof stored.nickName === 'string' ? stored.nickName : ''
       this._sessionKey = sessionKey
