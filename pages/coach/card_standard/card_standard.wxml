@@ -1,7 +1,22 @@
 <view class="co-page">
   <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
-  <block wx:elif="{{!loading}}">
-    <view class="note blue">{{name}}的会员卡标准。有优惠的项目就是会员卡指定的商品和服务；顾客领卡当天起到 {{validUntil}} 按这里的价格消费。</view>
+  <block wx:elif="{{!loading && !editing}}">
+    <view class="note blue">创建不同卡种，例如学员卡、教练卡；每种卡都可以分享给多位顾客领取。</view>
+    <view class="btn primary btn-block" bindtap="onNew">＋ 创建卡种</view>
+    <view wx:for="{{templates}}" wx:key="id" class="card card-pad">
+      <view class="card-title">{{item.name}}</view>
+      <view wx:for="{{item.benefit.lines}}" wx:for-item="line" wx:key="label" class="card-meta">{{line.label}}：单项 {{line.one}} · 双项 {{line.two}}</view>
+      <view class="card-meta">租赁：{{item.benefit.rental}}</view>
+      <view class="btn-row">
+        <button class="share-btn" open-type="share" data-path="{{item.sharePath}}" data-name="{{item.name}}">分享给顾客</button>
+        <view class="btn" data-id="{{item.id}}" bindtap="onEdit">编辑</view>
+      </view>
+    </view>
+    <view wx:if="{{!templates.length}}" class="co-empty">还没有卡种，先创建一张</view>
+  </block>
+  <block wx:elif="{{!loading && editing}}">
+    <view class="note blue">设置卡种的名称和权益，价格不能低于管理员设定的底价。</view>
+    <view class="card card-pad"><view class="card-title small">卡种名称</view><input class="input" placeholder="例如学员卡、教练卡" value="{{name}}" maxlength="50" bindinput="onName" /></view>
     <view wx:if="{{!canEdit}}" class="note">{{reason}}</view>
 
     <view class="card card-pad">
@@ -34,9 +49,10 @@
       <view wx:if="{{rental.belowFloor}}" class="below-floor" style="margin-left: 0;">当前设置低于底价，保存前请调整。</view>
     </view>
 
-    <view class="note">保存即生效，只影响<text style="font-weight: 700;">之后</text>领取的新卡；已领的卡保持领取时的价格。设置完成后，到「发卡与领取情况」生成会员卡发给顾客。</view>
+    <view class="note">修改只影响之后领取的新卡，已领取的卡保留领取时的名称和价格。保存后可在分销商中心分享。</view>
   </block>
 </view>
-<view wx:if="{{!blocked && !loading && canEdit}}" class="bottom-bar">
+<view wx:if="{{!blocked && !loading && editing && canEdit}}" class="bottom-bar">
+  <view class="btn" bindtap="onBackToList">返回</view>
   <view class="btn primary {{dirty && !saving ? '' : 'disabled'}}" bindtap="onSave">保存</view>
 </view>

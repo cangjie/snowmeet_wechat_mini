@@ -515,6 +515,7 @@ Component({
       const patch = { 'coachPopup.show': false };
       patch[`displayRentals[${ridx}].coach_card_id`] = card ? card.cardId : null;
       patch[`displayRentals[${ridx}]._coachCardName`] = card ? (card.coachName || '') : '';
+      patch[`displayRentals[${ridx}]._coachCardLabel`] = card ? (card.cardName || '') : '';
       patch[`displayRentals[${ridx}]._coachHint`] = card
         ? (card.estimatedDiscount > 0 ? card.benefitText + '，日租金预计优惠 ¥' + card.estimatedDiscount + ' / 天' : card.benefitText)
         : '';

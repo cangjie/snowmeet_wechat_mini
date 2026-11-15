@@ -7,7 +7,7 @@ const view = require('../common/coach-view.js')
 Page({
   data: {
     blocked: '', loading: true, canEdit: false, reason: '', name: '', modes: view.MODES,
-    cells: [], rental: null, rentalText: '', dirty: false, validUntil: '', saving: false
+    cells: [], rental: null, rentalText: '', dirty: false, validUntil: '', saving: false, editing: false, templates: [], templateId: null
   },
 
   onLoad() { base.boot(this, 'coach').then(() => this.load()).catch(() => {}) },
@@ -18,19 +18,31 @@ Page({
     this.loadedOnce = true
     const rental = view.rentalStandard(d.rental)
     this.setData({
-      loading: false, blocked: '', canEdit: !!d.canEdit, reason: d.reason || '', name: d.name || '',
+      loading: false, blocked: '', editing: true, templateId: d.id || null, canEdit: !!d.canEdit, reason: d.reason || '', name: d.name || '',
       cells: view.standardCells(d.cells), rental, rentalText: rental.text, dirty: false, saving: false,
       validUntil: view.dayText(d.validUntil)
     })
   },
 
   load() {
-    return api.getMyCardStandard().then(d => this.apply(d)).catch(err => {
+    return api.listCardTemplates().then(d => {
+      this.loadedOnce = true
+      this.setData({ loading: false, blocked: '', editing: false, dirty: false, templates: (d.templates || []).map(t => Object.assign({}, t, { benefit: view.benefitLines(t.carePrices, t.rentalRate) })) })
+    }).catch(err => {
       this.setData({ loading: false })
       if (err && err.code === 3) this.setData({ blocked: '你还不是教练或机构' })
       else base.fail(err)
     })
   },
+
+  onNew() { return api.getCardTemplate().then(d => this.apply(d)).catch(base.fail) },
+  onEdit(e) { return api.getCardTemplate(e.currentTarget.dataset.id).then(d => this.apply(d)).catch(base.fail) },
+  onShareAppMessage(e) {
+    const target = e && e.target && e.target.dataset
+    return { title: '送你一张' + ((target && target.name) || '会员卡'), path: (target && target.path) || '/pages/mine/mine' }
+  },
+  onName(e) { this.setData({ name: e.detail.value, dirty: true }) },
+  onBackToList() { return this.load() },
 
   onMode(e) {
     if (!this.data.canEdit) return
@@ -54,10 +66,11 @@ Page({
 
   onSave() {
     if (!this.data.canEdit || !this.data.dirty || this.data.saving) return
+    if (!this.data.name.trim()) { wx.showToast({ title: '请填写卡种名称', icon: 'none' }); return }
     const r = view.standardPayload(this.data.cells, this.data.rentalText, this.data.rental)
     if (r.error) { wx.showToast({ title: r.error, icon: 'none', duration: 2800 }); return }
     this.setData({ saving: true })
-    api.saveMyCardStandard(r.care, r.rate).then(d => { this.apply(d); base.done('已保存，之后领取的新卡按这个价格') }).catch(err => {
+    api.saveCardTemplate({ id: this.data.templateId, name: this.data.name.trim(), care: r.care, rental_rate: r.rate }).then(() => { base.done('卡种已保存'); return this.load() }).catch(err => {
       this.setData({ saving: false })
       base.fail(err)
     })

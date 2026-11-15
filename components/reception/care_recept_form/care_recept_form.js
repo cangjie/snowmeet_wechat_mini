@@ -555,7 +555,7 @@ Component({
               // 学员卡：显示名和本单优惠提示来自计价响应；没带 coach 字段 = 本单没享受（质保/招待/非雪季等）
               const coach = res && res.coach;
               if (c.coach_card_id) {
-                if (coach) c._coachCardName = coach.coachName || c._coachCardName || '';
+                if (coach) { c._coachCardName = coach.coachName || c._coachCardName || ''; c._coachCardLabel = coach.cardName || ''; }
                 c._coachHint = coach ? (coach.discount > 0 ? '学员卡优惠 −¥' + coach.discount : '这张学员卡在本单没有优惠')
                   : '质保、招待和非雪季养护不享受学员卡优惠';
               }
@@ -1335,6 +1335,7 @@ Component({
         c._manualDiscount = 0;
         c.coach_card_id = coachCard.cardId;
         c._coachCardName = coachCard.coachName || '';
+        c._coachCardLabel = coachCard.cardName || '';
         c._coachHint = '';
       });
       return this._fetchPrice(cidx);

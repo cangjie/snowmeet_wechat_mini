@@ -133,7 +133,7 @@
                 <view wx:if="{{memberId}}" class="kv-cell kv-cell--tap" data-ridx="{{ridx}}" catchtap="onPkgCoachCardTap">
                   <text class="kv-label">优惠券/卡</text>
                   <view class="kv-input-wrap">
-                    <text class="kv-input kv-input--display">{{pkg.coach_card_id ? '(卡)' + (pkg._coachCardName ? pkg._coachCardName + '的学员卡' : '学员卡') : '点此选择学员卡（可跳过）'}}</text>
+                    <text class="kv-input kv-input--display">{{pkg.coach_card_id ? '(卡)' + (pkg._coachCardLabel || (pkg._coachCardName ? pkg._coachCardName + '的学员卡' : '学员卡')) : '点此选择学员卡（可跳过）'}}</text>
                   </view>
                 </view>
               </view>

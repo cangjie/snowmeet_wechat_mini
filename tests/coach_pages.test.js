@@ -314,3 +314,23 @@ test('我的学员卡：已领取的卡、有效期与各店价格', async t => 
   const page = s.load('pages/coach/card/card.js'); page.onLoad(); await settle()
   assert.equal(page.data.cards.length, 1); assert.equal(page.data.cards[0].until, '2027-04-30'); assert.equal(page.data.cards[0].benefit.lines[1].one, '¥68')
 })
+
+test('机构卡种可直接分享，顾客通过卡种链接领取并显示自定义名称', async t => {
+  const template = { id: 8, name: '教练卡', sharePath: '/pages/coach/claim/claim?template=AbCd123456789012', carePrices: [], rentalRate: 0.8 }
+  const s = setup(t, { handler: (c, a) => {
+    if (a === 'GetMyCoach') return OK({ isCoach: true, coach: COACH({ introducerType: '机构' }), cards: {} })
+    if (a === 'ListMyCards') return OK({ cards: [], counts: {} })
+    if (a === 'ListMyCardTemplates') return OK({ templates: [template] })
+    if (a === 'GetShareTemplate') return OK({ view: { state: 'claimable', cardName: '教练卡', coachName: '某机构', carePrices: [], rentalRate: 0.8 }, needMember: false })
+    if (a === 'ClaimShareTemplate') return OK({ view: { state: 'claimed_by_me', cardName: '教练卡', coachName: '某机构', carePrices: [], rentalRate: 0.8 }, needMember: false })
+    return OK({})
+  } })
+  const home = s.load('pages/coach/home/home.js'); home.onLoad({}); await settle()
+  assert.equal(home.data.templates[0].name, '教练卡')
+  assert.deepEqual(home.onShareAppMessage({ target: { dataset: { name: '教练卡', path: template.sharePath } } }), { title: '张教练送你一张教练卡', path: template.sharePath })
+  const claim = s.load('pages/coach/claim/claim.js'); await claim.onLoad({ template: 'AbCd123456789012' })
+  assert.equal(claim.data.state, 'claimable'); assert.equal(claim.data.cardName, '教练卡')
+  await claim.onClaim()
+  assert.equal(claim.data.state, 'claimed_by_me')
+  assert.equal(s.calls.find(c => c.action === 'ClaimShareTemplate').method, 'POST')
+})

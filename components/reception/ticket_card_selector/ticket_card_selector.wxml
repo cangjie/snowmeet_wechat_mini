@@ -60,7 +60,7 @@
           <view class="tcs-item-body">
             <view class="tcs-card-head">
               <text class="tcs-chip tcs-chip--coach">教练</text>
-              <text class="tcs-card-name">{{cc.coachName}}的学员卡</text>
+              <text class="tcs-card-name">{{cc.cardName || cc.coachName + '的学员卡'}}</text>
             </view>
             <view class="tcs-card-meta">
               <text>{{cc.benefitText}}</text>
@@ -119,7 +119,7 @@
           <view class="tcs-item-body">
             <view class="tcs-card-head">
               <text class="tcs-chip tcs-chip--coach">教练</text>
-              <text class="tcs-card-name">{{cc.coachName}}的学员卡</text>
+              <text class="tcs-card-name">{{cc.cardName || cc.coachName + '的学员卡'}}</text>
             </view>
             <view class="tcs-card-meta"><text>{{cc.benefitText}}</text></view>
             <view class="tcs-card-meta"><text>有效期至 {{cc._until}}</text></view>

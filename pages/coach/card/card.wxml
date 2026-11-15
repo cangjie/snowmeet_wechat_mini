@@ -1,7 +1,7 @@
 <view class="co-page">
   <view wx:for="{{cards}}" wx:key="id" class="vip {{item.expired ? 'dim' : ''}}">
     <view class="vip-small">{{item.expired ? '已过期' : '学员卡'}}</view>
-    <view class="vip-title">{{item.coachName}}的学员卡</view>
+    <view class="vip-title">{{item.cardName || item.coachName + '的学员卡'}}</view>
     <view wx:for="{{item.benefit.lines}}" wx:for-item="line" wx:key="label" class="vip-line"><text>{{line.label}}</text><text>单项 <text class="em">{{line.one}}</text> · 双项 <text class="em">{{line.two}}</text></text></view>
     <view class="vip-line"><text>租赁 · 各店通用</text><text class="em">{{item.benefit.rental}}</text></view>
     <view class="vip-foot">有效期至 {{item.until}}</view>

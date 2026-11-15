@@ -16,7 +16,7 @@
   <block wx:elif="{{state === 'claimable'}}">
     <view class="vip">
       <view class="vip-small">送你一张</view>
-      <view class="vip-title">{{coachName}}的学员卡</view>
+      <view class="vip-title">{{cardName}}</view>
       <view wx:for="{{benefit.lines}}" wx:key="label" class="vip-line"><text>{{item.label}}</text><text>单项 <text class="em">{{item.one}}</text> · 双项 <text class="em">{{item.two}}</text></text></view>
       <view class="vip-line"><text>租赁 · 各店通用</text><text class="em">{{benefit.rental}}</text></view>
       <view class="vip-foot">领取当天起，有效期至 {{validUntil}}</view>
@@ -32,7 +32,7 @@
   <view wx:elif="{{state === 'claimed_by_me'}}" class="center">
     <view class="state-icon ok">✓</view>
     <view class="big-title">已领取</view>
-    <view class="card-meta" style="margin: 12rpx 0 28rpx;">{{coachName}}的学员卡 · 有效期至 {{validUntil}}</view>
+    <view class="card-meta" style="margin: 12rpx 0 28rpx;">{{cardName}} · 有效期至 {{validUntil}}</view>
     <view class="card card-pad" style="text-align: left;"><view class="card-meta" style="line-height: 1.7;">到店养护、租赁时，说手机号或扫码接待，店员开单时选择这张卡即可享受优惠。</view></view>
     <view class="btn primary btn-block" style="margin-top: 24rpx;" bindtap="onGoMine">查看我的学员卡</view>
   </view>
@@ -48,7 +48,7 @@
   <view wx:elif="{{state === 'invalid'}}" class="center">
     <view class="state-icon warn">×</view>
     <view class="big-title">这张学员卡已失效</view>
-    <view class="card-meta" style="margin-top: 12rpx;">可能已被分销商撤销或已过期，请联系分销商重新发送。</view>
+    <view class="card-meta" style="margin-top: 12rpx;">{{message || '可能已被分销商撤销或已过期，请联系分销商重新发送。'}}</view>
   </view>
 
   <!-- 分销商本人 -->

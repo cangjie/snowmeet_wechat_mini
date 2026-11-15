@@ -19,10 +19,11 @@ function parseToken(options) {
 }
 
 Page({
-  data: { token: '', loading: true, claiming: false, loginError: false, errMsg: '', state: '', message: '', coachName: '', needMember: false, benefit: null, validUntil: '' },
+  data: { token: '', isTemplate: false, loading: true, claiming: false, loginError: false, errMsg: '', state: '', message: '', coachName: '', cardName: '', needMember: false, benefit: null, validUntil: '' },
 
   onLoad(options) {
-    this.setData({ token: parseToken(options) })
+    const template = options && options.template
+    this.setData({ token: template ? parseToken({ t: template }) : parseToken(options), isTemplate: !!template })
     return this.load()
   },
 
@@ -37,7 +38,7 @@ Page({
         this.setData({ loginError: true, errMsg: '微信登录未完成，请检查网络后重新登录。' })
         return
       }
-      this.apply(await api.getShareCard(this.data.token))
+      this.apply(await (this.data.isTemplate ? api.getShareTemplate(this.data.token) : api.getShareCard(this.data.token)))
     } catch (err) {
       this.setData({ errMsg: (err && err.message) || '加载失败，请重试' })
     } finally {
@@ -50,7 +51,7 @@ Page({
   apply(d) {
     const v = d.view || {}
     this.setData({
-      state: v.state || 'invalid', message: v.message || '', coachName: v.coachName || '', needMember: !!d.needMember,
+      state: v.state || 'invalid', message: v.message || '', coachName: v.coachName || '', cardName: v.cardName || ((v.coachName || '') + '的学员卡'), needMember: !!d.needMember,
       benefit: view.benefitLines(v.carePrices, v.rentalRate), validUntil: view.dayText(v.validUntil)
     })
   },
@@ -60,7 +61,7 @@ Page({
     if (this.data.loading || this.data.claiming) return
     this.setData({ claiming: true, errMsg: '' })
     try {
-      this.apply(await api.claimShareCard(this.data.token))
+      this.apply(await (this.data.isTemplate ? api.claimShareTemplate(this.data.token) : api.claimShareCard(this.data.token)))
       this.setData({ needMember: false })
       wx.showToast({ title: '领取成功', icon: 'success' })
     } catch (err) {

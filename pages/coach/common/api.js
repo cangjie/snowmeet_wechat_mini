@@ -53,6 +53,9 @@ module.exports = {
   // ---- 机构自己制作会员卡（Distributor 控制器；教练看到 canEdit=false）----
   getMyCardStandard: () => get('Distributor', 'GetMyCardStandard'),
   saveMyCardStandard: (care, rentalRate) => post('Distributor', 'SaveMyCardStandard', { care, rental_rate: rentalRate }),
+  listCardTemplates: () => get('Distributor', 'ListMyCardTemplates'),
+  getCardTemplate: id => get('Distributor', 'GetMyCardTemplate', { id }),
+  saveCardTemplate: form => post('Distributor', 'SaveMyCardTemplate', form),
   // 机构按管理员设的底价生成自己的优惠券（Distributor 控制器；教练 canMake=false）
   getMyCouponMaker: () => get('Distributor', 'GetMyCouponMaker'),
   makeMyCoupons: form => post('Distributor', 'MakeMyCoupons', form),
@@ -66,6 +69,8 @@ module.exports = {
   getMyCoupons: () => get('Coach', 'GetMyCoupons'),
   // ---- 学员 ----
   getShareCard: t => get('CoachCard', 'GetShareCard', { t }),
+  getShareTemplate: t => get('CoachCard', 'GetShareTemplate', { t }),
+  claimShareTemplate: t => request('POST', 'CoachCard', 'ClaimShareTemplate', { t }, {}),
   claimShareCard: t => get('CoachCard', 'ClaimShareCard', { t }),
   getMyCards: () => get('CoachCard', 'GetMyCards')
 }

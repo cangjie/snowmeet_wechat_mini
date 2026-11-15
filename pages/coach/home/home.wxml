@@ -1,7 +1,7 @@
 <view class="co-page">
   <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
   <block wx:elif="{{coach}}">
-    <view class="vip {{coach.valid ? '' : 'dim'}}">
+    <view wx:if="{{coach.introducerType !== '机构'}}" class="vip {{coach.valid ? '' : 'dim'}}">
       <view class="vip-small">我的学员卡权益</view>
       <view class="vip-title">{{coach.name}}的学员卡</view>
       <view wx:for="{{benefit.lines}}" wx:key="label" class="vip-line"><text>{{item.label}}</text><text>单项 <text class="em">{{item.one}}</text> · 双项 <text class="em">{{item.two}}</text></text></view>
@@ -19,7 +19,18 @@
 
     <!-- 发卡 / 分享 -->
     <block wx:if="{{tab === 'share'}}">
-      <view wx:if="{{coach.valid}}" class="btn primary btn-block {{creating ? 'disabled' : ''}}" bindtap="onCreate">＋ 生成学员卡</view>
+      <block wx:if="{{coach.introducerType === '机构'}}">
+        <view wx:if="{{coach.valid}}" class="btn primary btn-block" bindtap="onManageTemplates">＋ 管理卡种</view>
+        <view wx:for="{{templates}}" wx:key="id" class="card card-pad">
+          <view class="card-title">{{item.name}}</view>
+          <view wx:for="{{item.benefit.lines}}" wx:for-item="line" wx:key="label" class="card-meta">{{line.label}}：单项 {{line.one}} · 双项 {{line.two}}</view>
+          <view class="card-meta">租赁：{{item.benefit.rental}}</view>
+          <button class="share-btn" open-type="share" data-path="{{item.sharePath}}" data-name="{{item.name}}">分享给顾客</button>
+        </view>
+        <view wx:if="{{!templates.length}}" class="co-empty">还没有卡种，请先创建</view>
+        <view class="note blue">同一个卡种可分享给多人，每人每雪季可领取一张。</view>
+      </block>
+      <view wx:elif="{{coach.valid}}" class="btn primary btn-block {{creating ? 'disabled' : ''}}" bindtap="onCreate">＋ 生成学员卡</view>
       <view wx:for="{{pending}}" wx:key="id" class="card card-pad">
         <view class="card-row"><view class="grow card-row"><text class="card-title small">卡 …{{item.tokenTail}}</text><text class="tag warn">待领取</text></view><text class="card-meta">{{item.created}}</text></view>
         <view class="card-row">
@@ -27,8 +38,8 @@
           <view class="btn danger" data-id="{{item.id}}" bindtap="onRevoke">撤销</view>
         </view>
       </view>
-      <view wx:if="{{!pending.length}}" class="co-empty">还没有待领取的卡，点上面「生成学员卡」</view>
-      <view class="note blue">每张卡只能一位顾客领取。同时待领取的卡最多 50 张。</view>
+      <view wx:if="{{coach.introducerType !== '机构' && !pending.length}}" class="co-empty">还没有待领取的卡，点上面「生成学员卡」</view>
+      <view wx:if="{{coach.introducerType !== '机构' || pending.length}}" class="note blue">旧分享卡每张只能一位顾客领取。</view>
     </block>
 
     <!-- 领取情况 -->
@@ -47,7 +58,7 @@
           </view>
           <text class="card-meta">{{item.status === 'claimed' ? '尾号 ' + item.phoneTail : '卡 …' + item.tokenTail}}</text>
         </view>
-        <view class="card-meta" wx:if="{{item.status === 'claimed'}}">卡 …{{item.tokenTail}} · {{item.claimed}} 领取</view>
+        <view class="card-meta" wx:if="{{item.status === 'claimed'}}">{{item.cardName || '学员卡'}} · 卡 …{{item.tokenTail}} · {{item.claimed}} 领取</view>
         <view class="card-meta" wx:else>{{item.created}} 创建{{item.status === 'issued' ? ' · 还没有人领取' : ''}}</view>
       </view>
       <view wx:if="{{!statusRows.length}}" class="co-empty">还没有发过学员卡</view>

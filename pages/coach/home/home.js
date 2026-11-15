@@ -11,7 +11,7 @@ const COUPON_STATE = {
 Page({
   data: {
     blocked: '', loading: true, tab: 'share', coach: null, counts: null, benefit: null, validUntil: '',
-    cards: [], pending: [], statusRows: [],
+    cards: [], pending: [], statusRows: [], templates: [],
     students: [], studentSummary: null,
     couponSummary: null, coupons: [], creating: false
   },
@@ -48,10 +48,12 @@ Page({
     const tab = this.data.tab
     if (tab === 'students') return this.loadStudents()
     if (tab === 'coupons') return this.loadCoupons()
-    return this.loadCards()
+    return this.loadCards().then(() => this.data.coach && this.data.coach.introducerType === '机构' ? this.loadTemplates() : null)
   },
 
   onTab(e) { this.setData({ tab: e.currentTarget.dataset.tab }); this.loadTab() },
+  loadTemplates() { return api.listCardTemplates().then(d => this.setData({ templates: (d.templates || []).map(t => Object.assign({}, t, { benefit: view.benefitLines(t.carePrices, t.rentalRate) })) })).catch(base.fail) },
+  onManageTemplates() { wx.navigateTo({ url: '../card_standard/card_standard' }) },
 
   // ---- 发卡 / 领取情况 ----
   loadCards() {
@@ -91,7 +93,7 @@ Page({
     const target = e && e.target && e.target.dataset
     const name = d.coach ? d.coach.name : '分销商'
     const path = (target && target.path) || (d.pending[0] && d.pending[0].sharePath) || '/pages/mine/mine'
-    return { title: name + '送你一张学员卡', path }
+    return { title: name + '送你一张' + ((target && target.name) || '学员卡'), path }
   },
 
   // ---- 学员消费 ----
