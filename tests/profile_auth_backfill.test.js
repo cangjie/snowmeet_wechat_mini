@@ -1,8 +1,8 @@
-// 已经绑过手机号的老会员不会再走验证手机号入口，所以另外在两个地方补问头像昵称（2026-11-15 用户要求）：
+// 已经绑过手机号的老会员不会再走验证手机号入口，所以另外在「我的」页补问头像昵称（2026-11-15 用户要求）：
 //   · 「我的」页（pages/mine/mine）：每次显示都问一次（组件自己记着已有资料 / 已跳过，不会重复弹，也不会每次都请求）
-//   · 顾客付款页（pages/order/payment_entry）：扫付款码进来、身份查询回来、自动支付之前问；
-//     只在付款人已经绑了手机号时才问（没绑的在 pay-identity-confirm 里授权手机号之后问，不能在授权前先弹）
-// 都可以跳过，跳过不影响任何流程。
+// 可以跳过，跳过不影响任何流程。
+// 付款页不补问：2026-11-15 用户「不论什么情况，付款的环节都不要询问，让顾客授权昵称和头像」，
+// 这里有测试保证付款页永远不弹（付款环节的其它入口见 profile_auth_pages.test.js）。
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const fs = require('fs')
@@ -74,7 +74,7 @@ test('「我的」页：还没有登录会话时不问；组件取不到也不�
   await settle()
 })
 
-// ---------- 顾客付款页 ----------
+// ---------- 顾客付款页：永远不问 ----------
 
 function paymentPage(t, identity, options = {}) {
   installGlobals(t)
@@ -87,61 +87,32 @@ function paymentPage(t, identity, options = {}) {
   const log = []
   page.pay = () => { log.push('pay') }
   page._isRentOrder = () => !!options.rent
+  // 万一有人把弹层加回来：selectComponent 一被调就记下来，并且永远不放行
+  page.selectComponent = () => ({ ensure() { log.push('ensure'); return new Promise(() => {}) } })
   return { page, log }
 }
 
-test('顾客付款页：付款人已绑手机号、要自动支付时，先弹头像昵称、处理完才自动调起支付', async t => {
-  const { page, log } = paymentPage(t, { status: 'direct', scannerHasCell: true })
-  const gate = withProfileGate(page, log)
-  page._refreshIdentity()
-  await settle()
-  assert.deepEqual(log, ['ensure'], '支付要等弹层处理完，不能叠在一起')
-  gate.resolve()
-  await settle()
-  assert.deepEqual(log, ['ensure', 'pay'])
-})
-
-test('顾客付款页：不自动支付的情形（租赁单、不是 direct、没有 autoPay）也照样补问，但不会触发支付', async t => {
-  for (const options of [{ rent: true }, { autoPay: false }]) {
-    const { page, log } = paymentPage(t, { status: 'direct', scannerHasCell: true }, options)
-    const gate = withProfileGate(page, log)
-    page._refreshIdentity()
-    await settle()
-    gate.resolve()
-    await settle()
-    assert.deepEqual(log, ['ensure'], JSON.stringify(options))
-  }
-  const { page, log } = paymentPage(t, { status: 'choose_identity', scannerHasCell: true })
-  const gate = withProfileGate(page, log)
-  page._refreshIdentity()
-  await settle()
-  gate.resolve()
-  await settle()
-  assert.deepEqual(log, ['ensure'])
-})
-
-test('顾客付款页：付款人还没绑手机号 / 身份查询出错时不在这里弹（没绑的由 pay-identity-confirm 在授权手机号之后问）', async t => {
-  for (const identity of [{ status: 'phone_required', scannerHasCell: false }, { status: 'direct_to_scanner', scannerHasCell: false },
-    { status: 'error', errorCode: 'x' }]) {
+test('顾客付款页：付款人不论是不是已绑手机号、什么身份状态，都不弹头像昵称；自动支付照常、立即发起', async t => {
+  for (const identity of [
+    { status: 'direct', scannerHasCell: true }, { status: 'direct', scannerHasCell: false },
+    { status: 'choose_identity', scannerHasCell: true }, { status: 'phone_required', scannerHasCell: false },
+    { status: 'direct_to_scanner', scannerHasCell: false }, { status: 'error', errorCode: 'x' },
+  ]) {
     const { page, log } = paymentPage(t, identity)
-    withProfileGate(page, log)
     page._refreshIdentity()
     await settle()
     assert.ok(!log.includes('ensure'), JSON.stringify(identity))
+    if (identity.status === 'direct') assert.deepEqual(log, ['pay'], '自动支付不能被拦')
   }
-})
-
-test('顾客付款页：取不到弹层组件时不拦自动支付', async t => {
-  const { page, log } = paymentPage(t, { status: 'direct', scannerHasCell: true })
-  page.selectComponent = () => null
-  page._refreshIdentity()
+  const rent = paymentPage(t, { status: 'direct', scannerHasCell: true }, { rent: true })
+  rent.page._refreshIdentity()
   await settle()
-  assert.deepEqual(log, ['pay'])
+  assert.deepEqual(rent.log, [], '租赁单照旧不自动支付，也不弹')
 })
 
-test('两个页面的 wxml 都放了 <profile-auth id="profileAuth" />', () => {
-  for (const rel of ['pages/mine/mine.wxml', 'pages/order/payment_entry.wxml']) {
-    const wxml = fs.readFileSync(path.join(ROOT, rel), 'utf8')
-    assert.match(wxml, /<profile-auth\s+id="profileAuth"\s*(\/>|><\/profile-auth>)/, rel)
-  }
+test('「我的」页的 wxml 放了 <profile-auth id="profileAuth" />，付款页没有', () => {
+  const mine = fs.readFileSync(path.join(ROOT, 'pages/mine/mine.wxml'), 'utf8')
+  assert.match(mine, /<profile-auth\s+id="profileAuth"\s*(\/>|><\/profile-auth>)/)
+  const pay = fs.readFileSync(path.join(ROOT, 'pages/order/payment_entry.wxml'), 'utf8')
+  assert.doesNotMatch(pay, /<profile-auth/)
 })

@@ -1,6 +1,8 @@
 // 顾客验证手机号之后授权头像和昵称（2026-11-14 用户要求）：所有顾客端手机号入口都接上 profile-auth 弹层。
 //   1. 防遗漏：扫描所有非 legacy、非 staffadmin（店员绑定）且有 open-type="getPhoneNumber" 按钮的 wxml，
 //      必须同时放 <profile-auth id="profileAuth" />，并且它的 js 里调 profileAuth.ensureOn(...)。以后谁新加手机号入口忘了接，这里失败。
+//      例外：付款 / 收款环节一律不问（2026-11-15 用户：不论什么情况，付款的环节都不要询问，让顾客授权昵称和头像）——
+//      付款页、支付身份确认、收银身份核验、次卡购买；这几处有另一组测试保证它们永远不弹，谁想加回去会失败。
 //   2. 顺序：手机号验证成功后，先等弹层处理完（保存或跳过），才继续页面自己的后续步骤（核验、领券、购买、支付……）；
 //      手机号没授权成功时不弹。弹层没弹出来（组件取不到）时后续步骤照常走，不被拦住。
 const test = require('node:test')
@@ -24,12 +26,18 @@ function walk(dir, out) {
 
 const PHONE_BUTTON = /open-type=["']getPhoneNumber["']/
 // staffadmin：店员绑定 / 自助注册，不是顾客；legacy：旧版演示分包
-const phoneEntries = [...walk('pages', []), ...walk('components', [])]
+const allPhoneEntries = [...walk('pages', []), ...walk('components', [])]
   .filter(rel => !/^pages[\\/](staffadmin|legacy)[\\/]/.test(rel) && !/^components[\\/]legacy[\\/]/.test(rel))
   .filter(rel => PHONE_BUTTON.test(fs.readFileSync(path.join(ROOT, rel), 'utf8')))
 
+// 付款 / 收款环节：永远不弹头像昵称。payment_entry 是付款页（没有手机号按钮，授权在 pay-identity-confirm 里）
+const PAYMENT_FLOW_ENTRIES = ['pages/order/identity_verify.wxml', 'pages/punchcard/punchcard_detail.wxml', 'components/pay-identity-confirm/index.wxml']
+const PAYMENT_FLOW_FILES = [...PAYMENT_FLOW_ENTRIES, 'pages/order/payment_entry.wxml']
+const norm = rel => rel.replace(/\\/g, '/')
+const phoneEntries = allPhoneEntries.filter(rel => !PAYMENT_FLOW_ENTRIES.includes(norm(rel)))
+
 test('扫描能找到已知的顾客端手机号入口（防止扫描规则本身失效）', () => {
-  const names = phoneEntries.map(p => p.replace(/\\/g, '/'))
+  const names = allPhoneEntries.map(norm)
   for (const expected of [
     'pages/order/recept_checkin.wxml', 'pages/order/care_pick_verify.wxml', 'pages/order/identity_verify.wxml',
     'pages/coach/claim/claim.wxml', 'pages/mine/ticket/ticket_claim_mini/ticket_claim_mini.wxml',
@@ -47,6 +55,16 @@ test('每个手机号入口的 wxml 都放了 <profile-auth id="profileAuth" />�
     const js = fs.readFileSync(path.join(ROOT, jsFile), 'utf8')
     assert.match(js, /profileAuth\.ensureOn\(/, `${jsFile} 手机号成功后要调 profileAuth.ensureOn(...)`)
     assert.match(js, /require\(['"](\.\.\/)+utils\/profile_auth\.js['"]\)/, `${jsFile} 要引入 utils/profile_auth.js`)
+  }
+})
+
+test('付款 / 收款环节的 wxml 和 js 里没有头像昵称弹层（付款页、支付身份确认、收银身份核验、次卡购买）', () => {
+  for (const rel of PAYMENT_FLOW_FILES) {
+    const wxml = fs.readFileSync(path.join(ROOT, rel), 'utf8')
+    assert.doesNotMatch(wxml, /<profile-auth/, `${rel} 付款环节不能放头像昵称弹层`)
+    const jsFile = rel.replace(/\.wxml$/, '.js')
+    const js = fs.readFileSync(path.join(ROOT, jsFile), 'utf8')
+    assert.doesNotMatch(js, /profile_auth|profileAuth/, `${jsFile} 付款环节不能调头像昵称弹层`)
   }
 })
 
@@ -93,10 +111,6 @@ const PAGE_CASES = [
     data: { bindWechatCellPromise: () => Promise.resolve({ id: 7 }), verifyCarePickPromise: async () => ({}) },
   },
   {
-    name: 'identity_verify（支付身份核验）', file: 'pages/order/identity_verify.js', handler: 'onBindCell', next: 'verifyNow',
-    data: { bindWechatCellPromise: () => Promise.resolve({ id: 7 }), verifyWechatIdentityPromise: async () => ({}) },
-  },
-  {
     name: 'coach/claim（学员卡领取）', file: 'pages/coach/claim/claim.js', handler: 'onPhone', next: 'onClaim',
     data: { bindWechatCellPromise: () => Promise.resolve({ id: 7, cell: '13800000000' }) },
   },
@@ -110,10 +124,6 @@ const PAGE_CASES = [
   },
   {
     name: 'ticket_detail（优惠券详情）', file: 'pages/mine/ticket/ticket_detail.js', handler: 'onGetCell', next: '_checkCell',
-    data: { bindWechatCellPromise: () => Promise.resolve({ id: 7, cell: '13800000000' }) },
-  },
-  {
-    name: 'punchcard_detail（次卡详情）', file: 'pages/punchcard/punchcard_detail.js', handler: 'onGetCell', next: 'onBuyNow',
     data: { bindWechatCellPromise: () => Promise.resolve({ id: 7, cell: '13800000000' }) },
   },
 ]
@@ -208,6 +218,33 @@ test('user_info/auth_cell：验证失败不弹层，照旧把失败交给页面'
   assert.deepEqual(log, ['Verified:false'])
 })
 
+// ---------- 4. 付款 / 收款环节：不论什么情况都不弹 ----------
+
+const NO_PROMPT_PAGE_CASES = [
+  { name: 'identity_verify（收银身份核验）', file: 'pages/order/identity_verify.js', handler: 'onBindCell', next: 'verifyNow',
+    data: { bindWechatCellPromise: () => Promise.resolve({ id: 7 }), verifyWechatIdentityPromise: async () => ({}) } },
+  { name: 'punchcard_detail（次卡购买）', file: 'pages/punchcard/punchcard_detail.js', handler: 'onGetCell', next: 'onBuyNow',
+    data: { bindWechatCellPromise: () => Promise.resolve({ id: 7, cell: '13800000000' }) } },
+]
+
+// 万一有人把弹层加回来：selectComponent 一被调就记下来，并且永远不放行，页面要是还在等它，后续步骤就会走不到
+function trapPrompt(owner, log) {
+  owner.selectComponent = () => ({ ensure() { log.push('ensure'); return new Promise(() => {}) } })
+}
+
+for (const c of NO_PROMPT_PAGE_CASES) {
+  test(`${c.name}：手机号验证成功后直接继续，不弹头像昵称`, async t => {
+    installGlobals(t)
+    const page = loadPage(c.file, Object.assign({}, c.data))
+    const log = []
+    page[c.next] = () => { log.push('next'); return Promise.resolve() }
+    trapPrompt(page, log)
+    await page[c.handler](PHONE_OK)
+    await settle()
+    assert.deepEqual(log, ['next'])
+  })
+}
+
 function payIdentity(t, confirmResults) {
   installGlobals(t)
   const calls = []
@@ -217,49 +254,25 @@ function payIdentity(t, confirmResults) {
   const log = []
   const origTrigger = comp.triggerEvent
   comp.triggerEvent = (name, detail) => { log.push(name); return origTrigger.call(comp, name, detail) }
+  trapPrompt(comp, log)
   return { comp, calls, log }
 }
 
-for (const entry of [
-  { handler: 'onGetPhoneNumber', desc: '手机号一键授权（phone_required）' },
-  { handler: 'onGetPhoneNumberAndConfirmDirect', desc: '确认并继续（direct_to_scanner）' },
-  { handler: 'onGetPhoneNumberAndChooseSelf', desc: '正常支付（choose_identity，没绑手机号）' },
-]) {
-  test(`pay-identity-confirm ${entry.desc}：手机号提交成功后先弹层，处理完才通知父页继续（refreshed）`, async t => {
+test('pay-identity-confirm（支付身份确认）：授权手机号、正常支付、替人代付，成功后都直接通知父页继续（自动支付），不弹头像昵称', async t => {
+  global.wx = null
+  for (const action of [
+    c => c.onGetPhoneNumber(PHONE_OK),
+    c => c.onGetPhoneNumberAndConfirmDirect(PHONE_OK),
+    c => c.onGetPhoneNumberAndChooseSelf(PHONE_OK),
+    c => { global.wx.showModal = o => o.success({ confirm: true }); return c.onGetPhoneNumberAndChooseProxy(PHONE_OK) },
+    c => c.onGetPhoneNumberAndConfirmDirect(PHONE_DENIED),
+    c => c.onConfirmDirect(),
+    c => c.onChooseSelf(),
+  ]) {
     const { comp, log } = payIdentity(t, {})
-    const gate = withProfileGate(comp, log)
-    const done = comp[entry.handler](PHONE_OK)
-    await settle()
-    assert.ok(log.includes('ensure'), '提交手机号成功后要弹')
-    assert.ok(!log.includes('refreshed'), '弹层没处理完，父页（付款页）不能继续自动支付')
-    gate.resolve()
-    await done
-    await settle()
-    assert.deepEqual(log.filter(x => x === 'ensure' || x === 'refreshed'), ['ensure', 'refreshed'])
-  })
-}
-
-test('pay-identity-confirm 替人代付（没绑手机号）：手机号提交成功后同样先弹层再继续', async t => {
-  const { comp, log } = payIdentity(t, {})
-  global.wx.showModal = o => o.success({ confirm: true })
-  const gate = withProfileGate(comp, log)
-  comp.onGetPhoneNumberAndChooseProxy(PHONE_OK)
-  await settle()
-  assert.ok(log.includes('ensure'))
-  assert.ok(!log.includes('refreshed'))
-  gate.resolve()
-  await settle()
-  assert.deepEqual(log.filter(x => x === 'ensure' || x === 'refreshed'), ['ensure', 'refreshed'])
-})
-
-test('pay-identity-confirm：用户拒绝授权手机号 / 点普通确认按钮，不弹层，直接通知父页', async t => {
-  for (const action of [c => c.onGetPhoneNumberAndConfirmDirect(PHONE_DENIED), c => c.onConfirmDirect(), c => c.onChooseSelf(),
-    c => c.onGetPhoneNumberAndChooseSelf(PHONE_DENIED)]) {
-    const { comp, log } = payIdentity(t, {})
-    withProfileGate(comp, log)
     await action(comp)
     await settle()
-    assert.ok(!log.includes('ensure'), '没验证手机号不弹')
-    assert.ok(log.includes('refreshed'))
+    assert.ok(!log.includes('ensure'), '付款环节不弹')
+    assert.ok(log.includes('refreshed'), '直接通知父页继续')
   }
 })

@@ -4,7 +4,6 @@
 // 调 PaymentIdentity/ConfirmPayIdentity 落库，再通过 `refreshed` 事件回传最新结果。
 const app = getApp();
 const data = require('../../utils/data.js');
-const profileAuth = require('../../utils/profile_auth.js');
 
 Component({
   properties: {
@@ -28,12 +27,12 @@ Component({
         wx.showToast({ title: '未授权手机号', icon: 'none' });
         return;
       }
-      // 手机号提交成功后，先请顾客完善头像昵称（可跳过），处理完再通知父页继续
+      // 付款环节不弹头像昵称（2026-11-15 用户：不论什么情况，付款的环节都不要询问）
       this._confirm({
         action: 'submit_phone',
         encData: e.detail.encryptedData,
         iv: e.detail.iv
-      }, { profileAfter: true });
+      });
     },
 
     // 直接归扫码方（status == 'direct_to_scanner'）
@@ -78,8 +77,7 @@ Component({
         console.log('[pay-identity-confirm] confirm_direct OK', { status: finalResult && finalResult.status, scannerMemberId: finalResult && finalResult.scannerMemberId })
         wx.hideLoading();
         that.setData({ busy: false });
-        // 手机号提交成功：先请顾客完善头像昵称（可跳过），处理完再通知父页继续（父页会自动发起支付）
-        return profileAuth.ensureOn(that).then(function () { that.triggerEvent('refreshed', { result: finalResult }); });
+        that.triggerEvent('refreshed', { result: finalResult });
       }).catch(function (err) {
         console.warn('[pay-identity-confirm] submit_phone or confirm_direct failed', err)
         wx.hideLoading();
@@ -145,8 +143,7 @@ Component({
       }).then(function (finalResult) {
         wx.hideLoading();
         that.setData({ busy: false });
-        // 手机号提交成功：先请顾客完善头像昵称（可跳过），处理完再通知父页继续（父页会自动发起支付）
-        return profileAuth.ensureOn(that).then(function () { that.triggerEvent('refreshed', { result: finalResult }); });
+        that.triggerEvent('refreshed', { result: finalResult });
       }).catch(function () {
         wx.hideLoading();
         that.setData({ busy: false });
@@ -174,8 +171,7 @@ Component({
     },
 
     // 内部统一 confirm 调用
-    // opts.profileAfter：这次提交的是手机号，成功后先弹头像昵称，处理完再通知父页
-    _confirm(extra, opts) {
+    _confirm(extra) {
       const body = Object.assign({
         paymentId: this.data.paymentId,
         payerType: this.data.payerType,
@@ -187,9 +183,6 @@ Component({
         wx.hideLoading();
         this.setData({ busy: false });
         // performWebRequest 已对 code!=0 自动 toast 并 reject，所以这里走到说明 code==0
-        if (opts && opts.profileAfter) {
-          return profileAuth.ensureOn(this).then(() => { this.triggerEvent('refreshed', { result }); });
-        }
         this.triggerEvent('refreshed', { result });
       }).catch(() => {
         wx.hideLoading();

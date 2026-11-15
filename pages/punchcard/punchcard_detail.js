@@ -9,7 +9,6 @@
 var app = getApp()
 var util = require('../../utils/util.js')
 var data = require('../../utils/data.js')
-var profileAuth = require('../../utils/profile_auth.js')
 
 Page({
   data: {
@@ -61,8 +60,7 @@ Page({
       wx.hideLoading()
       if (!member || !member.cell) { return Promise.reject('no cell') }
       that.setData({ hasCell: true })
-      // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再继续购买
-      return profileAuth.ensureOn(that).then(function () { that.onBuyNow() })
+      that.onBuyNow()
     }).catch(function () {
       wx.hideLoading()
       wx.showToast({ title: '手机号验证失败', icon: 'none' })

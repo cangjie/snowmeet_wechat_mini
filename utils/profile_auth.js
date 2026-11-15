@@ -5,9 +5,12 @@
 //       await profileAuth.ensureOn(this)    // 或 profileAuth.ensureOn(this).then(...)
 //     再继续自己的后续步骤（自动支付、跳转、轮询……）。弹层没弹出来（已有资料、后端没部署、没有会员、没有登录）时立即返回；
 //     弹出来时等用户「保存」或「跳过」才返回，所以不会和微信支付弹窗叠在一起。永远不会 reject。
+//   · 付款 / 收款环节一律不问（2026-11-15 用户：不论什么情况，付款的环节都不要询问，让顾客授权昵称和头像）：
+//     付款页、支付身份确认（pay-identity-confirm）、收银身份核验（identity_verify）、次卡购买（punchcard_detail）都不接这个弹层，
+//     tests/profile_auth_pages.test.js 会保证它们永远不弹。
 //   · 可以跳过（微信运营规范不允许为了基本功能强制要头像昵称）；同一次运行里保存或跳过过就不再弹，重新登录后才会再问。
-//   · 已经绑过手机号的老会员不会再走验证手机号入口，所以另外在「我的」页和顾客付款页补问（2026-11-15 用户要求），
-//     同样是 profileAuth.ensureOn(this)；组件记着「已有资料 / 已处理」，这两个页面每次显示都调也不会重复弹、重复请求。
+//   · 已经绑过手机号的老会员不会再走验证手机号入口，所以另外在「我的」页补问（2026-11-15 用户要求），
+//     同样是 profileAuth.ensureOn(this)；组件记着「已有资料 / 已处理」，「我的」页每次显示都调也不会重复弹、重复请求。
 //   · 「超过一定时间重新获取」本次不做，规则入口在后端 MemberProfileRules.NeedPrompt。
 
 const NICK_MAX = 32   // 和后端 MemberProfileRules.NickNameMaxLength 一致

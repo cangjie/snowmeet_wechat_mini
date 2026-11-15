@@ -123,5 +123,3 @@
 <!-- 手机号授权已合并到 pay-identity-confirm 的「确认并继续」(open-type=getPhoneNumber)按钮:
      微信原生授权页直接弹出,用户授权/取消都在 onGetPhoneNumberAndConfirmDirect 回调里走 submit_phone+confirm_direct。
      不再需要本页自己的 phone-prompt-overlay 弹窗。 -->
-<!-- 已经绑过手机号的老会员在这里补问头像昵称（可跳过），见 components/profile_auth、utils/profile_auth.js -->
-<profile-auth id="profileAuth" />
