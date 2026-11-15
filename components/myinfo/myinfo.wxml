@@ -1,4 +1,11 @@
-<view class="weui-flex" >
+<!-- 顾客授权过头像或昵称：显示他自己的（2026-11-15 用户要求）。整行居中，昵称长了也不会被挤在窄列里 -->
+<view class="userinfo-me" wx:if="{{avatarUrl || nickName}}">
+  <image class="userinfo-avatar-img" wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill"></image>
+  <view class="userinfo-avatar-img userinfo-avatar-empty" wx:else></view>
+  <text class="userinfo-nickname-text" wx:if="{{nickName}}">{{nickName}}</text>
+</view>
+<!-- 没有授权过：保持原来微信自带的显示（现在只会是灰头像和「微信用户」） -->
+<view class="weui-flex" wx:else>
   <view class="weui-flex__item"></view>
   <view class="weui-flex__item" style="text-align:center;width:70rpx">
     <view class="userinfo-avatar"  ><open-data class="userinfo-avatar" type="userAvatarUrl"  style="text-align:center"  ></open-data></view>

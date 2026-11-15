@@ -38,6 +38,14 @@ function hasProfile(res) {
   return !!(res && typeof res === 'object' && res.code === 0 && res.data && res.data.needProfile === false && res.data.updateDate)
 }
 
+// 「我的」页顶部要显示的头像（完整网址）和昵称；没有、请求失败、旧后端没有这个接口时都是空串（页面保持默认显示）
+function profileView(res) {
+  if (!res || typeof res !== 'object' || res.code !== 0 || !res.data) return { nickName: '', avatarUrl: '' }
+  const nickName = typeof res.data.nickName === 'string' ? res.data.nickName.trim() : ''
+  const avatarUrl = typeof res.data.avatarUrl === 'string' ? res.data.avatarUrl.trim() : ''
+  return { nickName: nickName, avatarUrl: avatarUrl }
+}
+
 // 同一次运行里保存或跳过过就不再弹：按登录会话记，换了会话（重新登录）才会再问
 function isDone(globalData, sessionKey) {
   return !!(globalData && sessionKey && globalData.profilePromptedKey === sessionKey)
@@ -59,4 +67,4 @@ function ensureOn(owner) {
   return Promise.resolve()
 }
 
-module.exports = { NICK_MAX, cleanNickName, canSave, needPrompt, hasProfile, isDone, markDone, ensureOn }
+module.exports = { NICK_MAX, cleanNickName, canSave, needPrompt, hasProfile, profileView, isDone, markDone, ensureOn }

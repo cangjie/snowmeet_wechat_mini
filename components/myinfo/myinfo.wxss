@@ -11,3 +11,29 @@
 .userinfo-nickname {
   color: #aaa;
 }
+
+/* 顾客自己授权的头像和昵称：整行居中 */
+.userinfo-me {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 40rpx;
+}
+.userinfo-avatar-img {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+}
+.userinfo-avatar-empty {
+  background: #ededed;
+}
+.userinfo-nickname-text {
+  margin-top: 12rpx;
+  max-width: 600rpx;
+  font-size: 30rpx;
+  color: #333;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

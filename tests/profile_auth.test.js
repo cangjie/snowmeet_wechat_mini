@@ -393,3 +393,15 @@ test('组件：先填昵称、再选头像，一次保存两样都带上', async
   await done
   assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '雪友小明', avatarPath: 'http://tmp/a.jpg' })
 })
+
+// ---------- 「我的」页顶部显示头像和昵称（2026-11-15 用户：已授权的用户，这里应该显示头像和昵称） ----------
+
+test('profileView：从 GetMyProfile 的返回取要显示的头像（完整网址）和昵称；没有、失败、旧后端都是空串', () => {
+  assert.deepEqual(profileAuth.profileView({ code: 0, data: { nickName: ' 雪友小明 ', avatarUrl: 'https://img.snowmeet.top/upload/20261115/avatar_x.jpg', needProfile: false } }),
+    { nickName: '雪友小明', avatarUrl: 'https://img.snowmeet.top/upload/20261115/avatar_x.jpg' })
+  assert.deepEqual(profileAuth.profileView({ code: 0, data: { nickName: null, avatarUrl: null } }), { nickName: '', avatarUrl: '' })
+  assert.deepEqual(profileAuth.profileView({ code: 0, data: { nickName: '只有昵称' } }), { nickName: '只有昵称', avatarUrl: '' })
+  assert.deepEqual(profileAuth.profileView({ code: 1, data: { nickName: '不该显示' } }), { nickName: '', avatarUrl: '' })
+  assert.deepEqual(profileAuth.profileView(null), { nickName: '', avatarUrl: '' })
+  assert.deepEqual(profileAuth.profileView('Not Found'), { nickName: '', avatarUrl: '' })
+})

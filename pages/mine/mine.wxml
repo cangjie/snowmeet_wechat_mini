@@ -1,4 +1,4 @@
-<my-info ></my-info>
+<my-info avatarUrl="{{profileAvatar}}" nickName="{{profileNick}}"></my-info>
 
 <mp-cells  >
   <mp-cell value="我的雪票" footer="" bindtap="gotoSkipass"></mp-cell>

@@ -66,7 +66,8 @@ function installGlobals(t, sessionKey = 'sk') {
 }
 
 function minePage(data) {
-  const base = { getMyCoachPromise: async () => ({ isCoach: false }), getMyCoachCardsPromise: async () => ({ cards: [] }) }
+  // 「我的」页顶部还会请求头像昵称（getMyProfilePromise，2026-11-15）；这里的用例不关心它，给个空返回
+  const base = { getMyCoachPromise: async () => ({ isCoach: false }), getMyCoachCardsPromise: async () => ({ cards: [] }), getMyProfilePromise: async () => null }
   const page = loadPage('pages/mine/mine.js', Object.assign(base, data))
   page.selectComponent = () => null
   return page
