@@ -1,5 +1,6 @@
 // 添加介绍人（系统管理员）：先用手机号找到会员，再选类型。
-// 教练、KOL 的微信账号自动取会员在我们小程序里的 openid；机构填商户号和商户全称；支付宝只填登录号（手机号或邮箱，选填），填了保存时自动去绑定分账关系。
+// 教练、KOL、机构收款方式一样（用户 2026-11-15 定）：微信账号自动取会员在我们小程序里的 openid，不需要商户号；
+// 支付宝只填登录号（手机号或邮箱，选填），填了保存时自动去绑定分账关系。
 const api = require('../../../../utils/introducer_api.js')
 
 const ADMIN_LEVEL = 300
@@ -11,7 +12,7 @@ Page({
   data: {
     blocked: '', cell: '', found: null, looking: false, saving: false,
     types: ['教练', 'KOL', '机构'], type: 'KOL', name: '', realName: '',
-    wepayAccountNum: '', wepayAccountName: '', aliAccountNum: '', result: null
+    aliAccountNum: '', result: null
   },
 
   onLoad() {
@@ -28,8 +29,6 @@ Page({
   onCell(e) { this.setData({ cell: e.detail.value, found: null }) },
   onName(e) { this.setData({ name: e.detail.value }) },
   onRealName(e) { this.setData({ realName: e.detail.value }) },
-  onWepayNum(e) { this.setData({ wepayAccountNum: e.detail.value }) },
-  onWepayName(e) { this.setData({ wepayAccountName: e.detail.value }) },
   onAliNum(e) { this.setData({ aliAccountNum: e.detail.value }) },
   onType(e) { this.setData({ type: e.currentTarget.dataset.type }) },
 
@@ -51,15 +50,12 @@ Page({
     if (!d.found) { toast('请先点「查找」找到会员'); return }
     if (!d.found.exists) { toast('这个手机号还没有会员，介绍人必须先是会员'); return }
     if (!d.name.trim()) { toast('请填写显示名称'); return }
-    const isOrg = d.type === '机构'
-    if (isOrg && (!d.wepayAccountNum.trim() || !d.wepayAccountName.trim())) { toast('机构要填商户号和商户全称'); return }
     const aliNum = d.aliAccountNum.trim()
     if (aliNum && !(ALI_PHONE.test(aliNum) || ALI_EMAIL.test(aliNum))) { toast('支付宝登录号要填手机号或邮箱'); return }
     if (aliNum && !d.realName.trim()) { toast('登录号要同时填真实姓名'); return }
     this.setData({ saving: true })
     return api.addIntroducer({
       memberId: d.found.memberId, type: d.type, name: d.name.trim(), realName: d.realName.trim(),
-      wepayAccountNum: isOrg ? d.wepayAccountNum.trim() : '', wepayAccountName: isOrg ? d.wepayAccountName.trim() : '',
       aliAccountNum: aliNum
     }).then(v => {
       const failed = v.alipay === '未绑定'

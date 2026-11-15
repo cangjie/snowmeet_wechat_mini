@@ -42,28 +42,29 @@ function setup(t, { handler, staff }) {
 
 const ADMIN = { valid: 1, title_level: 300 }
 
-test('编辑分销商时可以切换角色，改为机构须填写商户信息', async t => {
+test('编辑分销商时可以切换角色；机构和教练、KOL 一样，不需要商户号和商户全称', async t => {
   const template = fs.readFileSync(path.join(__dirname, '../pages/introducer/admin/list/list.wxml'), 'utf8')
   assert.match(template, /bindtap="onEditType"/)
+  assert.doesNotMatch(template, /商户号|商户全称|onEditWepay/)
   const env = setup(t, { staff: ADMIN, handler: (c, a) => a === 'ListIntroducers'
     ? OK({ introducers: [ROW()] }) : a === 'ListCoaches' ? OK({ coaches: [] }) : OK(ROW({ type: '机构' })) })
   const page = loadPage('pages/introducer/admin/list/list.js', {})
   await page.onLoad()
   page.onEdit(tap({ id: 1 }))
   assert.equal(typeof page.onEditType, 'function')
+  assert.equal(page.onEditWepayNum, undefined)
   page.onEditType(tap({ type: '教练' }))
   await page.onSaveEdit()
   assert.equal(env.calls.find(c => c.action === 'UpdateIntroducer').body.type, '教练')
   page.onEdit(tap({ id: 1 }))
   page.onEditType(tap({ type: '机构' }))
-  await page.onSaveEdit()
-  assert.ok(env.toasts.includes('机构要填商户号和商户全称'))
-  page.onEditWepayNum({ detail: { value: '1600000001' } })
-  page.onEditWepayName({ detail: { value: '机构商户' } })
-  await page.onSaveEdit()
+  await page.onSaveEdit()                                    // 改成机构直接保存，不再被商户号拦下
   const updates = env.calls.filter(c => c.action === 'UpdateIntroducer')
+  assert.equal(updates.length, 2)
   assert.equal(updates[1].body.type, '机构')
-  assert.equal(updates[1].body.wepayAccountNum, '1600000001')
+  assert.equal('wepayAccountNum' in updates[1].body, false)
+  assert.equal('wepayAccountName' in updates[1].body, false)
+  assert.ok(!env.toasts.some(x => /商户/.test(x)))
 })
 
 test('管理员和分销商入口使用统一的分销商名称', () => {
@@ -263,7 +264,7 @@ test('管理员进列表页：加载、按类型筛选、补绑支付宝、停�
   assert.deepEqual(update.body, { introducerId: 2, valid: false })
 })
 
-test('添加页：校验提示、请求体、机构要商户号和全称', async t => {
+test('添加页：校验提示、请求体；机构和教练、KOL 一样不需要商户号', async t => {
   const env = setup(t, {
     staff: ADMIN,
     handler: (c, a, params, body) => {
@@ -283,20 +284,16 @@ test('添加页：校验提示、请求体、机构要商户号和全称', async
   assert.equal(page.data.found.memberId, 7)
   assert.equal(page.data.name, '示例')
 
+  const wxml = fs.readFileSync(path.join(__dirname, '../pages/introducer/admin/add/add.wxml'), 'utf8')
+  assert.doesNotMatch(wxml, /商户号（必填）|商户全称（必填）|onWepay/)
+  assert.equal(page.onWepayNum, undefined)
+
   page.onType(tap({ type: '机构' }))
   page.onName({ detail: { value: '某俱乐部' } })
-  page.onSave()
-  assert.equal(env.toasts.pop(), '机构要填商户号和商户全称')
-
-  page.onWepayNum({ detail: { value: '1600000001' } })
-  page.onWepayName({ detail: { value: '某某公司' } })
-  await page.onSave()
+  await page.onSave()                                        // 机构不填商户号也能保存
   const call = env.calls.find(c => c.action === 'AddIntroducer')
   assert.equal(call.method, 'POST')
-  assert.deepEqual(call.body, {
-    memberId: 7, type: '机构', name: '某俱乐部', realName: '', wepayAccountNum: '1600000001', wepayAccountName: '某某公司',
-    aliAccountNum: ''
-  })
+  assert.deepEqual(call.body, { memberId: 7, type: '机构', name: '某俱乐部', realName: '', aliAccountNum: '' })
   assert.equal(page.data.result.ok, true)
 })
 
@@ -332,7 +329,7 @@ test('添加页：支付宝只填登录号；格式要是手机号或邮箱；�
   await page.onSave()
   const call = env.calls.find(c => c.action === 'AddIntroducer')
   assert.deepEqual(call.body, {
-    memberId: 7, type: '教练', name: '张三', realName: '张三', wepayAccountNum: '', wepayAccountName: '',
+    memberId: 7, type: '教练', name: '张三', realName: '张三',
     aliAccountNum: '13691457006'
   })
   assert.equal(page.data.result.ok, false)

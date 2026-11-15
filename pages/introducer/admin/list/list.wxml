@@ -47,10 +47,6 @@
       <view class="field"><view class="field-label">显示名称</view><input class="input" value="{{edit.name}}" bindinput="onEditName" /></view>
       <view class="field"><view class="field-label">支付宝真实姓名</view><input class="input" value="{{edit.realName}}" bindinput="onEditRealName" /></view>
       <view class="field"><view class="field-label">支付宝登录号</view><input class="input" placeholder="不修改请留空" value="{{edit.ali}}" bindinput="onEditAli" /></view>
-      <block wx:if="{{edit.type === '机构'}}">
-        <view class="field"><view class="field-label">微信商户号</view><input class="input" placeholder="{{edit.originalType === '机构' ? '不修改请留空' : '请输入商户号'}}" value="{{edit.wepayNum}}" bindinput="onEditWepayNum" /></view>
-        <view class="field"><view class="field-label">商户全称</view><input class="input" placeholder="{{edit.originalType === '机构' ? '不修改请留空' : '请输入商户全称'}}" value="{{edit.wepayName}}" bindinput="onEditWepayName" /></view>
-      </block>
       <view class="btn-row"><view class="btn" bindtap="onCancelEdit">取消</view><view class="btn primary" bindtap="onSaveEdit">保存</view></view>
     </view></scroll-view></view>
   </block>

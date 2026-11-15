@@ -32,17 +32,7 @@
 
     <view class="card card-pad">
       <view class="section-title">3 · 微信收款</view>
-      <block wx:if="{{type === '机构'}}">
-        <view class="field">
-          <view class="field-label"><text>商户号（必填）</text></view>
-          <input class="input" type="number" value="{{wepayAccountNum}}" bindinput="onWepayNum" />
-        </view>
-        <view class="field">
-          <view class="field-label"><text>商户全称（必填）</text></view>
-          <input class="input" value="{{wepayAccountName}}" bindinput="onWepayName" />
-        </view>
-      </block>
-      <view wx:else class="note blue">自动使用这位会员的小程序微信身份。会员没用过小程序时取不到，微信分账会走手动转账。</view>
+      <view class="note blue">教练、KOL、机构一样：自动使用这位会员的小程序微信身份，不需要商户号。会员没用过小程序时取不到，微信分账会走手动转账。</view>
     </view>
 
     <view class="card card-pad">

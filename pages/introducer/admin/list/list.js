@@ -110,25 +110,21 @@ Page({
   onShareList() { wx.navigateTo({ url: '/pages/introducer/share/list/list?distributors=1' }) },
   onEdit(e) {
     const row = (this.all || []).find(r => r.id === e.currentTarget.dataset.id)
-    if (row) this.setData({ edit: { id: row.id, originalType: row.type, type: row.type, name: row.name, realName: row.realName, ali: '', wepayNum: '', wepayName: '' } })
+    if (row) this.setData({ edit: { id: row.id, originalType: row.type, type: row.type, name: row.name, realName: row.realName, ali: '' } })
   },
   onEditType(e) { this.setData({ 'edit.type': e.currentTarget.dataset.type }) },
   onEditName(e) { this.setData({ 'edit.name': e.detail.value }) },
   onEditRealName(e) { this.setData({ 'edit.realName': e.detail.value }) },
   onEditAli(e) { this.setData({ 'edit.ali': e.detail.value }) },
-  onEditWepayNum(e) { this.setData({ 'edit.wepayNum': e.detail.value }) },
-  onEditWepayName(e) { this.setData({ 'edit.wepayName': e.detail.value }) },
   onCancelEdit() { this.setData({ edit: null }) },
   onSaveEdit() {
     const e = this.data.edit
     if (!e || this.data.savingEdit) return Promise.resolve()
     if (!e.name.trim()) { wx.showToast({ title: '请填写显示名称', icon: 'none' }); return Promise.resolve() }
     if (e.ali.trim() && !e.realName.trim()) { wx.showToast({ title: '支付宝登录号需要真实姓名', icon: 'none' }); return Promise.resolve() }
-    if (e.type === '机构' && e.originalType !== '机构' && (!e.wepayNum.trim() || !e.wepayName.trim())) { wx.showToast({ title: '机构要填商户号和商户全称', icon: 'none' }); return Promise.resolve() }
-    if (e.type === '机构' && !!e.wepayNum.trim() !== !!e.wepayName.trim()) { wx.showToast({ title: '机构商户号和商户全称需要一起填写', icon: 'none' }); return Promise.resolve() }
     this.setData({ savingEdit: true })
     return api.updateIntroducer({ introducerId: e.id, type: e.type, name: e.name.trim(), realName: e.realName.trim() || null,
-      aliAccountNum: e.ali.trim() || null, wepayAccountNum: e.type === '机构' ? e.wepayNum.trim() || null : null, wepayAccountName: e.type === '机构' ? e.wepayName.trim() || null : null })
+      aliAccountNum: e.ali.trim() || null })
       .then(v => {
         this.setData({ savingEdit: false, edit: null })
         wx.showToast({ title: v.alipay === '未绑定' ? '已保存，支付宝绑定失败：' + (v.alipayMessage || '请核对账号') : '已保存', icon: 'none', duration: 2800 })
