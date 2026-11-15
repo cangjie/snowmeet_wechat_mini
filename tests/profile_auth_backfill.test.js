@@ -124,6 +124,33 @@ test('「我的」页：还没有登录会话时什么都不请求；组件取�
   await settle()
 })
 
+test('「我的」页：点顶部头像昵称 → 打开修改弹层，处理完立刻再取一次刷新顶部', async t => {
+  const { page, log } = minePage(t, [SAVED, { code: 0, data: { needProfile: false, nickName: '改过的昵称', avatarUrl: 'https://img.snowmeet.top/upload/20261115/avatar_y.jpg', updateDate: '2026-11-15T09:00:00' } }])
+  page.onShow()
+  await settle()
+  assert.equal(page.data.profileNick, '雪友小明')
+  const gate = deferred()
+  page.selectComponent = sel => { assert.equal(sel, '#profileAuth'); return { edit() { log.push('edit'); return gate.promise } } }
+  page.onEditProfile()
+  await settle()
+  assert.deepEqual(log, ['edit'])
+  assert.equal(page.data.profileNick, '雪友小明', '修改弹层还开着，先不变')
+  gate.resolve()
+  await settle()
+  assert.equal(page.data.profileNick, '改过的昵称')
+  assert.equal(page.data.profileAvatar, 'https://img.snowmeet.top/upload/20261115/avatar_y.jpg')
+})
+
+test('「我的」页：没有登录会话时点顶部什么都不做；顶部外面包了一层可点的 view', async t => {
+  const { page, log } = minePage(t, [SAVED], { sessionKey: '' })
+  page.selectComponent = () => ({ edit() { log.push('edit'); return Promise.resolve() } })
+  page.onEditProfile()
+  await settle()
+  assert.deepEqual(log, [])
+  const mine = fs.readFileSync(path.join(ROOT, 'pages/mine/mine.wxml'), 'utf8')
+  assert.match(mine, /<view[^>]*bindtap="onEditProfile"[^>]*>\s*<my-info/)
+})
+
 test('头部组件 myinfo：授权过就显示自己的头像（圆形）和昵称，没授权就还是微信自带的；「我的」页把存好的头像昵称传给它', () => {
   const wxml = fs.readFileSync(path.join(ROOT, 'components/myinfo/myinfo.wxml'), 'utf8')
   assert.match(wxml, /wx:if="\{\{avatarUrl \|\| nickName\}\}"/)

@@ -67,4 +67,17 @@ function ensureOn(owner) {
   return Promise.resolve()
 }
 
-module.exports = { NICK_MAX, cleanNickName, canSave, needPrompt, hasProfile, profileView, isDone, markDone, ensureOn }
+// 「我的」页点顶部头像昵称：打开修改弹层（带出已存的昵称和头像），等用户保存或取消。永远不 reject。
+function editOn(owner) {
+  try {
+    const c = owner && typeof owner.selectComponent === 'function' ? owner.selectComponent('#profileAuth') : null
+    if (c && typeof c.edit === 'function') {
+      return Promise.resolve(c.edit()).then(() => undefined, () => undefined)
+    }
+  } catch (e) {
+    // 组件取不到不能拦页面
+  }
+  return Promise.resolve()
+}
+
+module.exports = { NICK_MAX, cleanNickName, canSave, needPrompt, hasProfile, profileView, isDone, markDone, ensureOn, editOn }

@@ -1,28 +1,31 @@
-<!-- 验证手机号之后授权头像和昵称：可以保存，也可以跳过（不影响开单、支付、取板）。逻辑见 profile_auth.js -->
+<!-- 验证手机号之后授权头像和昵称：可以保存，也可以跳过（不影响开单、支付、取板）；「我的」页点顶部头像昵称时用来修改。逻辑见 profile_auth.js -->
 <view class="pa-mask" wx:if="{{visible}}" catchtouchmove="noop">
   <view class="pa-sheet">
-    <view class="pa-title">完善个人资料</view>
-    <view class="pa-sub">先填昵称，再选头像，方便店里认出您。也可以先跳过。</view>
+    <view class="pa-title">{{editing ? '修改个人资料' : '完善个人资料'}}</view>
+    <view class="pa-sub">{{editing ? '改好后点「保存」。' : '先填昵称，再选头像，方便店里认出您。也可以先跳过。'}}</view>
 
-    <!-- 头像和昵称微信没有一次授权的接口（getUserProfile 已收回），所以先填昵称、再选头像；弹出来时昵称框自动获得焦点，
-         键盘上方直接出现「用微信昵称」 -->
-    <view class="pa-field">
-      <text class="pa-label">昵称</text>
-      <input class="pa-input" type="nickname" value="{{nickName}}" placeholder="先填昵称（可选「用微信昵称」）" maxlength="32"
-             focus="{{focusNick}}" bindinput="onNickInput" bindblur="onNickInput" bindchange="onNickInput" />
-    </view>
+    <!-- 保存走表单提交：保存那一刻读昵称框里的内容，不依赖输入事件 -->
+    <form class="pa-form" bindsubmit="onSubmit">
+      <!-- 头像和昵称微信没有一次授权的接口（getUserProfile 已收回），所以先填昵称、再选头像；弹出来时昵称框自动获得焦点，
+           键盘上方直接出现「用微信昵称」 -->
+      <view class="pa-field">
+        <text class="pa-label">昵称</text>
+        <input class="pa-input" name="nickName" type="nickname" value="{{nickName}}" placeholder="先填昵称（可选「用微信昵称」）" maxlength="32"
+               focus="{{focusNick}}" bindinput="onNickInput" bindblur="onNickInput" bindchange="onNickInput" />
+      </view>
 
-    <button class="pa-avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar" hover-class="none">
-      <image class="pa-avatar" wx:if="{{avatarPath}}" src="{{avatarPath}}" mode="aspectFill"></image>
-      <view class="pa-avatar pa-avatar-empty" wx:else>头像</view>
-    </button>
-    <view class="pa-avatar-tip">{{avatarPath ? '点击头像更换' : '再选头像（可选「用微信头像」）'}}</view>
+      <button class="pa-avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar" hover-class="none">
+        <image class="pa-avatar" wx:if="{{avatarPath || currentAvatarUrl}}" src="{{avatarPath || currentAvatarUrl}}" mode="aspectFill"></image>
+        <view class="pa-avatar pa-avatar-empty" wx:else>头像</view>
+      </button>
+      <view class="pa-avatar-tip">{{(avatarPath || currentAvatarUrl) ? '点击头像更换' : '再选头像（可选「用微信头像」）'}}</view>
 
-    <view class="pa-error" wx:if="{{error}}">{{error}}</view>
+      <view class="pa-error" wx:if="{{error}}">{{error}}</view>
 
-    <view class="pa-actions">
-      <button class="pa-btn pa-btn-skip" bindtap="onSkip" disabled="{{saving}}">跳过</button>
-      <button class="pa-btn pa-btn-save" type="primary" bindtap="onSave" loading="{{saving}}" disabled="{{!canSave || saving}}">保存</button>
-    </view>
+      <view class="pa-actions">
+        <button class="pa-btn pa-btn-skip" bindtap="onSkip" disabled="{{saving}}">{{editing ? '取消' : '跳过'}}</button>
+        <button class="pa-btn pa-btn-save" type="primary" form-type="submit" loading="{{saving}}" disabled="{{!canSave || saving}}">保存</button>
+      </view>
+    </form>
   </view>
 </view>

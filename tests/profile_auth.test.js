@@ -155,12 +155,12 @@ test('saveMyProfilePromise：HTTP 非 2xx（wx.uploadFile 对任何状态码都�
 
 // ---------- 弹层组件 ----------
 
-function setupComponent(t, { profile, saveResult, sessionKey = 'sess-1' } = {}) {
-  const calls = { get: 0, save: [], toasts: [] }
+function setupComponent(t, { profile, saveResult, sessionKey = 'sess-1', modalConfirm = true } = {}) {
+  const calls = { get: 0, save: [], toasts: [], modals: [] }
   // getApp() 在真机上每次返回同一个对象，globalData 里记的「本次运行已处理」才会一直在
   const app = { globalData: { sessionKey, requestPrefix: 'https://t.test/api/' } }
   global.getApp = () => app
-  global.wx = { showToast(o) { calls.toasts.push(o) } }
+  global.wx = { showToast(o) { calls.toasts.push(o) }, showModal(o) { calls.modals.push(o); if (o.success) o.success({ confirm: modalConfirm }) } }
   t.after(() => { delete global.getApp; delete global.wx })
   const fakeData = {
     getMyProfilePromise: async () => { calls.get++; return profile === undefined ? { code: 0, data: { needProfile: true } } : profile },
@@ -308,7 +308,9 @@ test('组件模板：头像用 chooseAvatar 按钮，昵称用 type="nickname" �
   assert.match(wxml, /bind:?chooseavatar="onChooseAvatar"/)
   assert.match(wxml, /<input[^>]*type="nickname"/)
   assert.match(wxml, /bindtap="onSkip"/)
-  assert.match(wxml, /bindtap="onSave"/)
+  assert.match(wxml, /<form[^>]*bindsubmit="onSubmit"/, '保存走表单提交，保存那一刻才读昵称框的内容，不会漏掉')
+  assert.match(wxml, /<input[^>]*name="nickName"/)
+  assert.match(wxml, /<button[^>]*form-type="submit"/)
   assert.match(wxml, /wx:if="\{\{visible\}\}"/)
   const json = JSON.parse(fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.json'), 'utf8'))
   assert.equal(json.component, true)
@@ -404,4 +406,131 @@ test('profileView：从 GetMyProfile 的返回取要显示的头像（完整网�
   assert.deepEqual(profileAuth.profileView({ code: 1, data: { nickName: '不该显示' } }), { nickName: '', avatarUrl: '' })
   assert.deepEqual(profileAuth.profileView(null), { nickName: '', avatarUrl: '' })
   assert.deepEqual(profileAuth.profileView('Not Found'), { nickName: '', avatarUrl: '' })
+})
+
+// ---------- 昵称一定要带上、存过头像没存昵称的补填、点「我的」页顶部修改（2026-11-15 用户：两个都做） ----------
+
+test('保存走表单提交：以表单里昵称框此刻的内容为准（不依赖输入事件有没有触发过），表单里没有才用已记下的', async t => {
+  const { c, calls } = setupComponent(t)
+  const done = c.ensure()
+  await settle()
+  c.onNickInput({ detail: { value: '旧的' } })
+  await c.onSubmit({ detail: { value: { nickName: '表单里的昵称' } } })
+  await done
+  assert.equal(calls.save[0].nickName, '表单里的昵称')
+
+  const second = setupComponent(t)
+  const done2 = second.c.ensure()
+  await settle()
+  second.c.onNickInput({ detail: { value: '事件里记下的' } })
+  await second.c.onSubmit({ detail: { value: {} } })
+  await done2
+  assert.equal(second.calls.save[0].nickName, '事件里记下的')
+})
+
+test('只选了头像、昵称是空的：先提示「还没填昵称」，选「去填昵称」不保存、回到昵称框；选「只保存头像」才保存', async t => {
+  const cancel = setupComponent(t, { modalConfirm: false })
+  const done = cancel.c.ensure()
+  await settle()
+  cancel.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await cancel.c.onSave()
+  assert.equal(cancel.calls.modals.length, 1)
+  assert.match(cancel.calls.modals[0].title + cancel.calls.modals[0].content, /昵称/)
+  assert.equal(cancel.calls.save.length, 0, '选了去填昵称就不保存')
+  assert.equal(cancel.c.data.visible, true)
+  await cancel.c.onSkip()
+  await done
+
+  const ok = setupComponent(t, { modalConfirm: true })
+  const done2 = ok.c.ensure()
+  await settle()
+  ok.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await ok.c.onSave()
+  await done2
+  assert.deepEqual(ok.calls.save[0], { sessionKey: 'sess-1', nickName: '', avatarPath: 'http://tmp/a.jpg' })
+})
+
+test('昵称已经填了、或者本来就存过昵称：只换头像不再提示', async t => {
+  const filled = setupComponent(t)
+  const d1 = filled.c.ensure()
+  await settle()
+  filled.c.onNickInput({ detail: { value: '雪友' } })
+  filled.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await filled.c.onSave()
+  await d1
+  assert.equal(filled.calls.modals.length, 0)
+
+  const existing = setupComponent(t, { profile: { code: 0, data: { needProfile: true, nickName: '已有昵称', avatarUrl: null, updateDate: '2026-11-15T08:00:00' } } })
+  const d2 = existing.c.ensure()
+  await settle()
+  assert.equal(existing.c.data.nickName, '已有昵称', '存过的昵称带进输入框')
+  existing.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await existing.c.onSave()
+  await d2
+  assert.equal(existing.calls.modals.length, 0)
+  assert.equal(existing.calls.save[0].nickName, '已有昵称')
+})
+
+test('资料不全（存过头像没存昵称）时 ensure 会再弹，已存的头像显示在弹层里，昵称框等着补', async t => {
+  const { c } = setupComponent(t, { profile: { code: 0, data: { needProfile: true, nickName: null, avatarUrl: 'https://img.snowmeet.top/upload/x/avatar_a.jpg', updateDate: '2026-11-15T07:14:48' } } })
+  const done = c.ensure()
+  await settle()
+  assert.equal(c.data.visible, true)
+  assert.equal(c.data.currentAvatarUrl, 'https://img.snowmeet.top/upload/x/avatar_a.jpg')
+  assert.equal(c.data.nickName, '')
+  assert.equal(c.data.editing, false)
+  await c.onSkip()
+  await done
+})
+
+test('edit（点「我的」页顶部修改）：不管是不是「已处理」都能打开，带出已存的昵称和头像，可以只改昵称', async t => {
+  const stored = { code: 0, data: { needProfile: false, nickName: '旧昵称', avatarUrl: 'https://img.snowmeet.top/upload/x/avatar_a.jpg', updateDate: '2026-11-15T08:00:00' } }
+  const { c, calls, app } = setupComponent(t, { profile: stored })
+  app.globalData.profilePromptedKey = 'sess-1'       // 本次运行已经处理过，ensure 不会再弹，但点头部修改还是要能打开
+  const done = c.edit()
+  await settle()
+  assert.equal(c.data.visible, true)
+  assert.equal(c.data.editing, true)
+  assert.equal(c.data.nickName, '旧昵称')
+  assert.equal(c.data.currentAvatarUrl, 'https://img.snowmeet.top/upload/x/avatar_a.jpg')
+  c.onNickInput({ detail: { value: '新昵称' } })
+  await c.onSave()
+  await done
+  assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '新昵称', avatarPath: '' })
+  assert.equal(calls.modals.length, 0)
+  assert.equal(c.data.visible, false)
+})
+
+test('edit：点「取消」直接关掉，什么都不保存；没有会员 / 没有登录会话时打不开', async t => {
+  const { c, calls } = setupComponent(t, { profile: { code: 0, data: { needProfile: false, nickName: '旧昵称', avatarUrl: 'https://x/a.jpg', updateDate: '2026-11-15T08:00:00' } } })
+  const done = c.edit()
+  await settle()
+  await c.onSkip()
+  await done
+  assert.equal(calls.save.length, 0)
+
+  const noMember = setupComponent(t, { profile: { code: 0, data: { needProfile: false, nickName: null, avatarUrl: null, updateDate: null } } })
+  await noMember.c.edit()
+  assert.equal(noMember.c.data.visible, false)
+
+  const noSession = setupComponent(t, { sessionKey: '' })
+  await noSession.c.edit()
+  assert.equal(noSession.calls.get, 0)
+  assert.equal(noSession.c.data.visible, false)
+})
+
+test('edit 时弹层的标题和按钮是「修改」「取消」，不是「完善」「跳过」', () => {
+  const wxml = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxml'), 'utf8')
+  assert.match(wxml, /\{\{editing \? '修改个人资料' : '完善个人资料'\}\}/)
+  assert.match(wxml, /\{\{editing \? '取消' : '跳过'\}\}/)
+  assert.match(wxml, /\{\{avatarPath \|\| currentAvatarUrl\}\}/, '已存的头像也要能显示出来')
+})
+
+test('editOn：和 ensureOn 一样，取不到组件、组件出错都当作没事，永远不 reject', async () => {
+  assert.equal(await profileAuth.editOn(null), undefined)
+  assert.equal(await profileAuth.editOn({ selectComponent: () => null }), undefined)
+  assert.equal(await profileAuth.editOn({ selectComponent: () => ({ edit: () => Promise.reject(new Error('x')) }) }), undefined)
+  let called = false
+  await profileAuth.editOn({ selectComponent(sel) { assert.equal(sel, '#profileAuth'); return { edit() { called = true; return Promise.resolve() } } } })
+  assert.equal(called, true)
 })

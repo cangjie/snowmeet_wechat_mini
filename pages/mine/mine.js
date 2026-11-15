@@ -102,6 +102,19 @@ Page({
     }).catch(function () {})
   },
 
+  // 点顶部头像昵称：打开修改弹层（补填或修改），保存后立刻刷新顶部
+  onEditProfile: function () {
+    var that = this
+    var sessionKey = app.globalData.sessionKey
+    if (typeof sessionKey !== 'string' || !sessionKey) return
+    return profileAuth.editOn(that).then(function () {
+      return data.getMyProfilePromise(sessionKey).then(function (res) {
+        var view = profileAuth.profileView(res)
+        that.setData({ profileAvatar: view.avatarUrl, profileNick: view.nickName })
+      }).catch(function () {})
+    })
+  },
+
   /**
    * Lifecycle function--Called when page hide
    */
