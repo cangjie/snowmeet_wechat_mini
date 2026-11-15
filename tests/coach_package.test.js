@@ -13,7 +13,7 @@ const sub = app.subPackages.find(s => s.root === 'pages/coach')
 test('app.json 注册了教练分包，页面一个不少，且没有同时出现在主包（主包体积紧张）', () => {
   assert.ok(sub, '缺少 pages/coach 分包')
   assert.equal(sub.name, 'coach')
-  assert.deepEqual(sub.pages.slice().sort(), ['admin/add/add', 'admin/detail/detail', 'admin/issue/issue', 'admin/list/list', 'card/card', 'claim/claim', 'home/home', 'student/student'])
+  assert.deepEqual(sub.pages.slice().sort(), ['admin/add/add', 'admin/detail/detail', 'admin/issue/issue', 'admin/list/list', 'card/card', 'card_standard/card_standard', 'claim/claim', 'coupon_maker/coupon_maker', 'home/home', 'student/student'])
   assert.ok(!app.pages.some(p => p.indexOf('pages/coach/') === 0))
 })
 
@@ -70,7 +70,8 @@ test('入口：管理员菜单有分销商管理，「我的」页有分销商�
   assert.match(adminWxml, /id="introducer_admin"[^>]*wx:if="\{\{isAdmin\}\}"/)
   assert.match(fs.readFileSync(path.join(root, 'pages/admin/admin.js'), 'utf8'), /case 'introducer_admin':\s*path = '\/pages\/introducer\/admin\/list\/list'/)
   const mine = fs.readFileSync(path.join(root, 'pages/mine/mine.wxml'), 'utf8')
-  assert.match(mine, /wx:if="\{\{coach\}\}" value="我是分销商"/)
+  // 新后端有分销商菜单区域；只有老后端（没有 Distributor 接口）时才退回单个「我是分销商」入口
+  assert.match(mine, /wx:if="\{\{coach && !distributor\}\}" value="我是分销商"/)
   assert.match(mine, /wx:if="\{\{hasCoachCard\}\}" value="我的学员卡"/)
   assert.match(fs.readFileSync(path.join(root, 'app.js'), 'utf8'), /app\.globalData\.coach = session\.coach \|\| null/)
 })

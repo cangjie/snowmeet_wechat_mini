@@ -88,7 +88,8 @@ Page({
       navTotalHeight: getNavMetrics().totalHeight,
       resort: resort && resort != 'undefined' ? resort : '万龙',
       memberId: options.memberId,
-      staffId: options.staffId
+      staffId: options.staffId,
+      distributorId: options.distributorId
     })
     app.loginPromiseNew.then(function () {
       // isStaff 只用来区分文案（确认弹层标题）；顾客和店员都带出本人姓名、手机号
@@ -347,7 +348,8 @@ Page({
       price: price,
       source: that.data.source,
       resort: that.data.resort,
-      staffId: that.data.staffId
+      staffId: that.data.staffId,
+      distributorId: that.data.distributorId
     }, 1)
     if (result.error) {
       wx.showToast({ title: result.error, icon: 'none' })

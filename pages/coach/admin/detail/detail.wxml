@@ -3,6 +3,7 @@
   <block wx:elif="{{coach}}">
     <view class="tabs">
       <view class="tab {{tab === 'price' ? 'on' : ''}}" data-tab="price" bindtap="onTab">价格设置</view>
+      <view wx:if="{{coach.introducerType === '机构'}}" class="tab {{tab === 'floor' ? 'on' : ''}}" data-tab="floor" bindtap="onTab">底价</view>
       <view class="tab {{tab === 'cards' ? 'on' : ''}}" data-tab="cards" bindtap="onTab">他的卡</view>
       <view class="tab {{tab === 'manage' ? 'on' : ''}}" data-tab="manage" bindtap="onTab">停用</view>
     </view>
@@ -46,6 +47,30 @@
         <view wx:if="{{!trial.length}}" class="card-meta">填写试算原价后，这里显示各店各档的分销商价。</view>
       </view>
       <view class="note">修改只影响<text style="font-weight: 700;">之后</text>领取的新卡；已领的卡保持领取时的价格。</view>
+    </block>
+
+    <!-- 底价（机构自己制作会员卡的下限） -->
+    <block wx:if="{{tab === 'floor'}}">
+      <view class="card card-pad">
+        <view class="card-row"><text class="card-title small">养护底价</text><text class="card-meta">机构能设的最低折扣 / 最低一口价</text></view>
+        <block wx:for="{{floorCells}}" wx:key="key" wx:for-index="i">
+          <view wx:if="{{i % 2 === 0}}" class="shop-title" style="{{i === 0 ? 'border-top: none; padding-top: 0;' : ''}}">{{item.shop}}</view>
+          <view class="price-row">
+            <text class="lab">{{item.tier}}</text>
+            <view class="val" style="flex: 1;"><input type="digit" placeholder="最低折扣" value="{{item.rateText}}" data-i="{{i}}" bindinput="onFloorRate" /><text class="unit">折</text></view>
+            <view class="val" style="flex: 1;"><input type="digit" placeholder="最低一口价" value="{{item.fixedText}}" data-i="{{i}}" bindinput="onFloorFixed" /><text class="unit">元</text></view>
+          </view>
+        </block>
+        <view class="card-meta">两个都留空 = 这一项不开放，机构不能给这一项设优惠。只填最低折扣 = 机构只能设折扣；只填最低一口价 = 只能设一口价。折扣填「7」表示不能比 7 折更低。</view>
+      </view>
+      <view class="card card-pad">
+        <view class="card-row"><text class="card-title small">租赁底价</text><text class="card-meta">各店、各项目通用</text></view>
+        <view class="price-row">
+          <text class="lab" style="width: 96rpx;">最低折扣</text>
+          <view class="val" style="width: 220rpx;"><input type="digit" placeholder="留空不开放" value="{{floorRentalText}}" bindinput="onFloorRental" /><text class="unit">折</text></view>
+        </view>
+      </view>
+      <view class="note">底价只限制机构自己在「制作会员卡」里设的价格，管理员在「价格设置」里改价不受它限制。已经设好的价格不会被底价追溯修改，机构下次保存时才会被要求调整。</view>
     </block>
 
     <!-- 他的卡 -->
@@ -93,4 +118,7 @@
 </view>
 <view wx:if="{{!blocked && coach && tab === 'price'}}" class="bottom-bar">
   <view class="btn primary {{dirty ? '' : 'disabled'}}" bindtap="onSave">保存</view>
+</view>
+<view wx:if="{{!blocked && coach && tab === 'floor'}}" class="bottom-bar">
+  <view class="btn primary {{floorDirty ? '' : 'disabled'}}" bindtap="onFloorSave">保存底价</view>
 </view>

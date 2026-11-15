@@ -11,6 +11,14 @@ function staffId(scene) {
   const match = /^s=([1-9]\d{0,9})$/.exec(decode(scene))
   return match ? validId(match[1]) : ''
 }
+// 分销商（教练 / 机构）订票码：scene 是 d=<分销商编号>（员工码是 s=<员工编号>）
+function distributorId(scene) {
+  const match = /^d=([1-9]\d{0,9})$/.exec(decode(scene))
+  return match ? validId(match[1]) : ''
+}
+function distributorFromOptions(options) {
+  return distributorId((options || {}).scene)
+}
 function fromOptions(options) {
   options = options || {}
   const fromScene = staffId(options.scene)
@@ -18,4 +26,4 @@ function fromOptions(options) {
   const match = /^https:\/\/mini\.snowmeet\.top\/mapp\/skipass_book\?staffId=([1-9]\d{0,9})$/.exec(decode(options.q))
   return match ? validId(match[1]) : ''
 }
-module.exports = { staffId, fromOptions }
+module.exports = { staffId, fromOptions, distributorId, distributorFromOptions }

@@ -1,0 +1,20 @@
+<view class="cu-page">
+  <view wx:if="{{loading}}" class="cu-note">正在加载…</view>
+  <view wx:elif="{{error}}" class="cu-error">{{error}} <text class="cu-link" bindtap="load">重试</text></view>
+  <block wx:else>
+    <view wx:if="{{summary}}" class="cu-stats">
+      <view class="cu-stat"><text class="cu-num">{{summary.customers}}</text><text class="cu-label">名下顾客</text></view>
+      <view class="cu-stat"><text class="cu-num">{{summary.orders}}</text><text class="cu-label">订单</text></view>
+      <view class="cu-stat"><text class="cu-num">¥{{summary.amount}}</text><text class="cu-label">消费合计</text></view>
+    </view>
+    <view wx:for="{{customers}}" wx:key="memberId" class="cu-card" data-id="{{item.memberId}}" bindtap="onCustomer">
+      <view class="cu-row">
+        <view class="cu-name">{{item.name}}<text class="cu-tag {{item.tag.tone}}">{{item.tag.text}}</text></view>
+        <text class="cu-amount">¥{{item.amount}}</text>
+      </view>
+      <view class="cu-meta">尾号 {{item.phoneTail}} · {{item.orderCount}} 单{{item.last ? ' · 最近 ' + item.last : ''}}</view>
+    </view>
+    <view wx:if="{{!customers.length}}" class="cu-empty">还没有顾客。顾客接受你转发的优惠券、领取你的学员卡，或通过你的订票二维码订票后，会出现在这里。</view>
+    <view class="cu-rule">顾客先到先得：还没有归属分销商的顾客会成为你的顾客；已经有归属的顾客关系不变，但这一笔订单记在你名下。消费只统计归属你的订单的实付净额（已付减已退）。</view>
+  </block>
+</view>

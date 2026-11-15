@@ -268,7 +268,8 @@ App({
     this.globalData.entryRevision = 1
     this.globalData.entryPath = res.path
     this.globalData.skipassQrStaffId = res.path && res.path.replace(/^\//, '') === 'pages/ski_pass/ski_pass_selector' ? skipassStaffScene.fromOptions(res.query) : ''
-    this.globalData.skipassQrEntry = !!this.globalData.skipassQrStaffId
+    this.globalData.skipassQrDistributorId = res.path && res.path.replace(/^\//, '') === 'pages/ski_pass/ski_pass_selector' ? skipassStaffScene.distributorFromOptions(res.query) : ''
+    this.globalData.skipassQrEntry = !!(this.globalData.skipassQrStaffId || this.globalData.skipassQrDistributorId)
     if (isEntryPath(res.path) && res.path.replace(/^\//, '') !== 'pages/index/index') {
       routeEntry({ fromIndex: false }, this)
     }
@@ -314,7 +315,8 @@ App({
     this.globalData.scene = res && res.scene
     this.globalData.entryPath = res && res.path
     this.globalData.skipassQrStaffId = res && res.path && res.path.replace(/^\//, '') === 'pages/ski_pass/ski_pass_selector' ? skipassStaffScene.fromOptions(res.query) : ''
-    this.globalData.skipassQrEntry = !!this.globalData.skipassQrStaffId
+    this.globalData.skipassQrDistributorId = res && res.path && res.path.replace(/^\//, '') === 'pages/ski_pass/ski_pass_selector' ? skipassStaffScene.distributorFromOptions(res.query) : ''
+    this.globalData.skipassQrEntry = !!(this.globalData.skipassQrStaffId || this.globalData.skipassQrDistributorId)
     routeEntry({ fromIndex: false }, this)
   },
 

@@ -1,0 +1,14 @@
+page { background: #F5F6FA; color: #111827; }
+.py-page { padding: 28rpx 32rpx 80rpx; }
+.py-card { background: #fff; border-radius: 32rpx; padding: 12rpx 32rpx 20rpx; box-shadow: 0 4rpx 40rpx rgba(0, 0, 0, 0.06); }
+.py-title { font-size: 32rpx; font-weight: 700; padding: 24rpx 0; border-bottom: 2rpx solid #F3F4F6; }
+.py-row { display: flex; justify-content: space-between; align-items: center; padding: 26rpx 0; border-bottom: 2rpx solid #F3F4F6; font-size: 28rpx; }
+.py-row:last-child { border-bottom: none; }
+.py-label { color: #6B7280; }
+.py-val { color: #111827; }
+.py-val.off { color: #9CA3AF; }
+.py-val.ok { color: #15803D; }
+.py-val.warn { color: #B45309; }
+.py-note { margin-top: 28rpx; padding: 0 8rpx; font-size: 24rpx; color: #6B7280; line-height: 1.6; }
+.py-error { margin-top: 60rpx; text-align: center; color: #b83c32; font-size: 27rpx; }
+.py-link { margin-left: 12rpx; color: #006495; }

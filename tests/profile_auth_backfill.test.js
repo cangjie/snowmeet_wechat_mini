@@ -42,6 +42,7 @@ test('「我的」页：显示时（已登录）请头像昵称弹层检查一�
   const calls = []
   const page = loadPage('pages/mine/mine.js', {
     getMyCoachPromise: async () => { calls.push('coach'); return { isCoach: false } },
+    getMyDistributorPromise: async () => { calls.push('distributor'); return { isDistributor: false } },
     getMyCoachCardsPromise: async () => { calls.push('cards'); return { cards: [] } },
   })
   const log = []
@@ -49,7 +50,7 @@ test('「我的」页：显示时（已登录）请头像昵称弹层检查一�
   page.onShow()
   await settle()
   assert.deepEqual(log, ['ensure'])
-  assert.deepEqual(calls.sort(), ['cards', 'coach'], '弹层开着也不能拦住页面自己的数据刷新')
+  assert.deepEqual(calls.sort(), ['cards', 'coach', 'distributor'], '弹层开着也不能拦住页面自己的数据刷新')
   gate.resolve()
   await settle()
   page.onShow()
@@ -59,7 +60,7 @@ test('「我的」页：显示时（已登录）请头像昵称弹层检查一�
 
 test('「我的」页：还没有登录会话时不问；组件取不到也不报错', async t => {
   installGlobals(t, '')
-  const page = loadPage('pages/mine/mine.js', { getMyCoachPromise: async () => ({}), getMyCoachCardsPromise: async () => ({}) })
+  const page = loadPage('pages/mine/mine.js', { getMyCoachPromise: async () => ({}), getMyDistributorPromise: async () => ({}), getMyCoachCardsPromise: async () => ({}) })
   const log = []
   withProfileGate(page, log)
   page.onShow()
@@ -67,7 +68,7 @@ test('「我的」页：还没有登录会话时不问；组件取不到也不�
   assert.deepEqual(log, [])
 
   installGlobals(t, 'sk')
-  const page2 = loadPage('pages/mine/mine.js', { getMyCoachPromise: async () => ({}), getMyCoachCardsPromise: async () => ({}) })
+  const page2 = loadPage('pages/mine/mine.js', { getMyCoachPromise: async () => ({}), getMyDistributorPromise: async () => ({}), getMyCoachCardsPromise: async () => ({}) })
   page2.selectComponent = () => null
   assert.doesNotThrow(() => page2.onShow())
   await settle()

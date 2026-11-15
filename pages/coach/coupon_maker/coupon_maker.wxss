@@ -1,0 +1,9 @@
+@import "../common/coach.wxss";
+.opt-grid { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.opt { padding: 16rpx 28rpx; border-radius: 16rpx; border: 2rpx solid var(--line); font-size: 26rpx; background: var(--card); }
+.opt.on { border-color: var(--blue); background: var(--blue-soft); color: #17607D; font-weight: 700; }
+.opt.off { opacity: 0.45; }
+.hint-line { font-size: 22rpx; color: var(--faint); line-height: 1.5; }
+.hint-line.closed { color: var(--warn); }
+.row-val { display: flex; align-items: center; gap: 12rpx; }
+.row-val .input { flex: 1; }

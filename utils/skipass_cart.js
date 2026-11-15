@@ -4,6 +4,13 @@
 const STORAGE_KEY = 'skipass_cart_v1'
 const MAX_TICKETS = 10
 
+// 购物车上的 distributorId（扫了教练 / 机构的订票码）只有有值时才出现；和 staffId 互斥，后扫的覆盖先扫的
+function withItems(cart, items) {
+  const next = { items, staffId: cart.staffId }
+  if (cart.distributorId) next.distributorId = cart.distributorId
+  return next
+}
+
 function emptyCart() {
   return { items: [], staffId: '' }
 }
@@ -16,7 +23,9 @@ function load() {
   try {
     const stored = wx.getStorageSync(STORAGE_KEY)
     if (stored && Array.isArray(stored.items)) {
-      return { items: stored.items.filter(it => it && it.count > 0), staffId: stored.staffId || '' }
+      const loaded = { items: stored.items.filter(it => it && it.count > 0), staffId: stored.staffId || '' }
+      if (stored.distributorId) loaded.distributorId = String(stored.distributorId)
+      return loaded
     }
   } catch (e) {
     // 读不到就当空车
@@ -58,7 +67,12 @@ function addItem(cart, item, count) {
       name: item.name, price: item.price, source: item.source || '', resort: item.resort || '万龙', count: n
     })
   }
-  return { cart: { items, staffId: item.staffId || cart.staffId || '' }, error: '' }
+  let staffId = item.staffId || cart.staffId || ''
+  let distributorId = cart.distributorId || ''
+  if (item.distributorId) { distributorId = String(item.distributorId); staffId = '' } else if (item.staffId) { distributorId = '' }
+  const next = { items, staffId }
+  if (distributorId) next.distributorId = distributorId
+  return { cart: next, error: '' }
 }
 
 // delta 为 +1 / -1；减到 0 就删掉这一条；超过上限的加一返回原车
@@ -71,7 +85,7 @@ function changeCount(cart, key, delta) {
   const items = cart.items
     .map(it => it.key === key ? Object.assign({}, it, { count: it.count + delta }) : Object.assign({}, it))
     .filter(it => it.count > 0)
-  return { cart: { items, staffId: cart.staffId }, error: '' }
+  return { cart: withItems(cart, items), error: '' }
 }
 
 // 改一条的日期（带上新日期的价格）或手机号。改完和别的条目票种、日期、手机号都相同时合并成一条（张数相加，
@@ -105,19 +119,22 @@ function editLine(cart, key, changes) {
     dup.price = next.price
     merged = true
   }
-  return { cart: { items: merged ? items.filter(it => it !== next) : items, staffId: cart.staffId }, error: '' }
+  return { cart: withItems(cart, merged ? items.filter(it => it !== next) : items), error: '' }
 }
 
 function remove(cart, key) {
-  return { items: cart.items.filter(it => it.key !== key).map(it => Object.assign({}, it)), staffId: cart.staffId }
+  return withItems(cart, cart.items.filter(it => it.key !== key).map(it => Object.assign({}, it)))
 }
 
 // 结算请求体：后端只认商品、日期、手机号、姓名、张数
 function toRequest(cart) {
-  return {
+  const request = {
     staffId: cart.staffId ? Number(cart.staffId) : null,
     items: cart.items.map(it => ({ productId: it.productId, date: it.date, cell: it.cell, name: it.name, count: it.count }))
   }
+  // 分销商码：服务端校验启用、教练或机构、不是顾客本人；没扫码就不带这个字段
+  if (cart.distributorId) request.introducerId = Number(cart.distributorId)
+  return request
 }
 
 function fmtMoney(n) {

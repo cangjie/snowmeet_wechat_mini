@@ -82,6 +82,154 @@ function previewPrice(cell, base) {
   return { price: Math.round(price * 100) / 100, discount: Math.round((base - price) * 100) / 100 }
 }
 
+
+// ---- 机构自己制作会员卡：管理员设底价（下限），机构在底价之内设置 ----
+function floorHint(c) {
+  if (!c || !c.open) return '管理员未开放'
+  const parts = []
+  if (c.minRate !== null && c.minRate !== undefined) parts.push('折扣不低于 ' + round1(c.minRate) + ' 折')
+  if (c.minFixed !== null && c.minFixed !== undefined) parts.push('一口价不低于 ¥' + num(c.minFixed))
+  return parts.join('，')
+}
+
+// 服务端 GetMyCardStandard 的 cells → 编辑模型（固定 4 格，带底价提示）
+function standardCells(cells) {
+  const base = editCells(cells)
+  return base.map(b => {
+    const c = findCell(cells, b.shop, b.tier) || {}
+    return Object.assign({}, b, {
+      open: !!c.open, minRate: c.minRate === undefined ? null : c.minRate, minFixed: c.minFixed === undefined ? null : c.minFixed,
+      belowFloor: !!c.belowFloor, hint: floorHint(c)
+    })
+  })
+}
+
+function rentalStandard(rental) {
+  const r = rental || {}
+  const minRate = r.minRate === undefined ? null : r.minRate
+  return {
+    text: rentalEditText(r.rate), open: !!r.open, minRate, belowFloor: !!r.belowFloor,
+    hint: r.open && minRate !== null ? '折扣不低于 ' + round1(minRate) + ' 折' : '管理员未开放'
+  }
+}
+
+// 保存前先在本地按底价检查一遍（服务端仍会再校验）；返回 { care, rate } 或 { error }
+function standardPayload(cells, rentalText, rental) {
+  const parsed = cellsPayload(cells)
+  if (parsed.error) return parsed
+  for (let i = 0; i < cells.length; i++) {
+    const c = cells[i]
+    const p = parsed.care[i]
+    const label = SHORT[c.shop] + c.tier
+    if (p.mode === 'none') continue
+    if (!c.open) return { error: label + '：管理员还没有开放这一项' }
+    if (p.mode === 'rate') {
+      if (c.minRate === null) return { error: label + '：这一项只开放了一口价，不能设折扣' }
+      if (p.value + 1e-9 < c.minRate) return { error: label + '：折扣不能低于 ' + round1(c.minRate) + ' 折' }
+    } else {
+      if (c.minFixed === null) return { error: label + '：这一项只开放了折扣，不能设一口价' }
+      if (p.value + 1e-9 < c.minFixed) return { error: label + '：一口价不能低于 ¥' + num(c.minFixed) }
+    }
+  }
+  const r = rentalPayload(rentalText)
+  if (r.error) return r
+  if (r.rate !== null) {
+    if (!rental || !rental.open || rental.minRate === null) return { error: '租赁：管理员还没有开放租赁折扣' }
+    if (r.rate + 1e-9 < rental.minRate) return { error: '租赁：折扣不能低于 ' + round1(rental.minRate) + ' 折' }
+  }
+  return { care: parsed.care, rate: r.rate }
+}
+
+// ---- 管理员设底价 ----
+function floorEditCells(floorView) {
+  const list = (floorView && floorView.care) || []
+  const cells = []
+  SHOPS.forEach(shop => TIERS.forEach(tier => {
+    const f = list.find(x => x.shop === shop && x.tier === tier) || {}
+    cells.push({
+      key: shop + tier, shop, tier,
+      rateText: f.minRate === null || f.minRate === undefined ? '' : String(round1(f.minRate)),
+      fixedText: f.minFixed === null || f.minFixed === undefined ? '' : num(f.minFixed)
+    })
+  }))
+  return cells
+}
+
+function floorRentalText(floorView) {
+  const r = floorView && floorView.rentalMinRate
+  return r === null || r === undefined ? '' : String(round1(r))
+}
+
+// 空 = 不设（该方式不开放）；折扣按「折」填（7 = 7 折），一口价按元
+function floorsPayload(cells, rentalText) {
+  const care = []
+  for (const c of cells) {
+    const label = SHORT[c.shop] + c.tier
+    let minRate = null, minFixed = null
+    const rt = String(c.rateText === undefined || c.rateText === null ? '' : c.rateText).trim()
+    const ft = String(c.fixedText === undefined || c.fixedText === null ? '' : c.fixedText).trim()
+    if (rt !== '') {
+      const v = Number(rt)
+      if (!isFinite(v) || !(v > 0 && v <= 10)) return { error: label + '：最低折扣填 0.1～10（7 表示 7 折）' }
+      minRate = Math.round(v * 10) / 100
+    }
+    if (ft !== '') {
+      const v = Number(ft)
+      if (!isFinite(v) || !(v >= 0)) return { error: label + '：最低一口价不能为负数' }
+      minFixed = Math.round(v * 100) / 100
+    }
+    care.push({ shop: c.shop, tier: c.tier, min_rate: minRate, min_fixed: minFixed })
+  }
+  const rt = String(rentalText === undefined || rentalText === null ? '' : rentalText).trim()
+  let rentalMin = null
+  if (rt !== '') {
+    const v = Number(rt)
+    if (!isFinite(v) || !(v > 0 && v <= 10)) return { error: '租赁：最低折扣填 0.1～10（8 表示 8 折）' }
+    rentalMin = Math.round(v * 10) / 100
+  }
+  return { care, rentalMinRate: rentalMin }
+}
+
+// ---- 机构自己生成优惠券：能做的格子来自管理员设的底价（和会员卡共用）----
+const COUPON_MAX = 50
+
+// 服务端 GetMyCouponMaker 的 cells → 选择项：每格能用哪些方式（折扣 / 一口价）、是否可选、提示
+function couponCells(cells) {
+  return (cells || []).map(c => {
+    const modes = []
+    if (c.open && c.minRate !== null && c.minRate !== undefined) modes.push({ key: 'rate', label: '折扣' })
+    if (c.open && c.minFixed !== null && c.minFixed !== undefined) modes.push({ key: 'fixed', label: '一口价' })
+    const available = !!c.open && !!c.productReady && modes.length > 0
+    return {
+      key: c.shop + c.tier, shop: c.shop, tier: c.tier, label: SHORT[c.shop] + c.tier, modes, available,
+      minRate: c.minRate === undefined ? null : c.minRate, minFixed: c.minFixed === undefined ? null : c.minFixed,
+      hint: !c.open ? '管理员未开放' : (!c.productReady ? '这家店还没有配置养护价目' : floorHint(c))
+    }
+  })
+}
+
+// 表单 → 接口入参；校验不过返回 { error }（服务端仍会再按底价校验一遍）
+function couponPayload(cell, mode, valueText, countText) {
+  if (!cell || !cell.available) return { error: '请选择一个已开放的项目' }
+  if (!mode) return { error: '请选择折扣或一口价' }
+  const t = String(valueText === undefined || valueText === null ? '' : valueText).trim()
+  const v = Number(t)
+  if (t === '' || !isFinite(v)) return { error: '请填写' + (mode === 'rate' ? '折扣' : '一口价') }
+  let value
+  if (mode === 'rate') {
+    if (!(v > 0 && v <= 10)) return { error: '折扣填 0.1～10（8 表示 8 折）' }
+    value = Math.round(v * 10) / 100
+    if (cell.minRate === null || value + 1e-9 < cell.minRate) return { error: cell.label + '：折扣不能低于 ' + round1(cell.minRate) + ' 折' }
+  } else {
+    if (!(v >= 0)) return { error: '一口价不能为负数' }
+    value = Math.round(v * 100) / 100
+    if (cell.minFixed === null || value + 1e-9 < cell.minFixed) return { error: cell.label + '：一口价不能低于 ¥' + num(cell.minFixed) }
+  }
+  const n = Number(countText)
+  if (!Number.isInteger(n) || n < 1 || n > COUPON_MAX) return { error: '张数填 1～' + COUPON_MAX }
+  return { shop: cell.shop, tier: cell.tier, mode, value, count: n }
+}
+
 const CARD_STATUS = {
   issued: { text: '待领取', tone: 'warn' },
   claimed: { text: '已领取', tone: 'ok' },
@@ -117,5 +265,7 @@ function benefitLines(carePrices, rentalRate) {
 
 module.exports = {
   SHOPS, TIERS, SHORT, MODES, cellText, rentalText, priceChips, editCells, cellsPayload, rentalPayload, rentalEditText,
-  previewPrice, statusTag, dateText, dayText, benefitLines
+  previewPrice, statusTag, dateText, dayText, benefitLines,
+  floorHint, standardCells, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
+  COUPON_MAX, couponCells, couponPayload
 }

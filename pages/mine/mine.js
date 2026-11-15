@@ -3,6 +3,7 @@ var wxloginModule = require('../../utils/wxlogin.js')
 const data = require('../../utils/data.js')
 const profileAuth = require('../../utils/profile_auth.js')
 const tabbar = require('../../utils/tabbar.js')
+const distributorMenu = require('../../utils/distributor_menu.js')
 Page({
 
   /**
@@ -15,7 +16,11 @@ Page({
     tabIndex: tabbar.tabIndexOf(tabbar.MINE_URL),
     // 教练入口：是教练才显示「我是教练」；领过学员卡才显示「我的学员卡」
     coach: null,
-    hasCoachCard: false
+    hasCoachCard: false,
+    // 分销商菜单区域（教练 / 机构）：身份和条目都由服务端 Distributor/GetMyDistributor 决定
+    distributor: null,
+    distributorTitle: '',
+    distributorEntries: []
   },
 
   /**
@@ -57,6 +62,11 @@ Page({
       data.getMyCoachPromise(sessionKey).then(function (d) {
         app.globalData.coach = d && d.isCoach ? d.coach : null
         that.setData({coach: app.globalData.coach})
+      }).catch(function () {})
+      data.getMyDistributorPromise(sessionKey).then(function (d) {
+        var menu = distributorMenu.build(d)
+        app.globalData.distributor = menu.distributor
+        that.setData({distributor: menu.distributor, distributorTitle: menu.title, distributorEntries: menu.entries})
       }).catch(function () {})
       data.getMyCoachCardsPromise(sessionKey).then(function (d) {
         that.setData({hasCoachCard: !!(d && d.cards && d.cards.length)})
@@ -126,6 +136,13 @@ Page({
   gotoCoach: function(){
     wx.navigateTo({
       url: '/pages/coach/home/home',
+    })
+  },
+  gotoDistributorEntry: function(e){
+    var url = e.currentTarget.dataset.url
+    if (!url) return
+    wx.navigateTo({
+      url: url,
     })
   },
   gotoCoachCard: function(){

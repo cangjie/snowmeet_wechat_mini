@@ -155,9 +155,21 @@
         "admin/detail/detail",
         "admin/issue/issue",
         "home/home",
+        "card_standard/card_standard",
+        "coupon_maker/coupon_maker",
         "student/student",
         "claim/claim",
         "card/card"
+      ]
+    },
+    {
+      "root": "pages/distributor",
+      "name": "distributor",
+      "pages": [
+        "qrcode/qrcode",
+        "payee/payee",
+        "customers/customers",
+        "customer_orders/customer_orders"
       ]
     },
     {

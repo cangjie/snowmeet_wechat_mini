@@ -52,6 +52,9 @@ Page({
     }
     const staffId = staffScene.fromOptions(options) || options.staffId
     if (staffId) that.applyStaffId(staffId)
+    // 扫的是教练 / 机构的订票码（scene d=）：本次订票归这位分销商，不再带员工
+    const distributorId = staffScene.distributorFromOptions(options) || options.distributorId
+    if (distributorId) that.applyDistributorId(distributorId)
     app.loginPromiseNew.then(function () {
       that.setData({
         tabbarItemList: app.globalData.userTabBarItem,
@@ -65,15 +68,27 @@ Page({
   onShow() {
     const revision = app.globalData.entryRevision
     const staffId = app.globalData.skipassQrStaffId
-    if (staffId && this._staffEntryRevision !== revision) {
+    const distributorId = app.globalData.skipassQrDistributorId
+    if ((staffId || distributorId) && this._staffEntryRevision !== revision) {
       this._staffEntryRevision = revision
-      this.applyStaffId(staffId)
+      if (distributorId) this.applyDistributorId(distributorId)
+      else this.applyStaffId(staffId)
     }
   },
   applyStaffId(staffId) {
-    this.setData({ staffId })
+    // 员工码和分销商码互斥，后扫的覆盖先扫的
+    this.setData({ staffId, distributorId: '' })
     const existing = cart.load()
-    if (existing.items.length) cart.save(Object.assign({}, existing, { staffId }))
+    if (existing.items.length) {
+      const next = Object.assign({}, existing, { staffId })
+      delete next.distributorId
+      cart.save(next)
+    }
+  },
+  applyDistributorId(distributorId) {
+    this.setData({ distributorId: String(distributorId), staffId: '' })
+    const existing = cart.load()
+    if (existing.items.length) cart.save(Object.assign({}, existing, { distributorId: String(distributorId), staffId: '' }))
   },
 
   getResortArr() {
@@ -151,6 +166,7 @@ Page({
     var url = 'skipass_detail_new?group=' + encodeURIComponent(key) + '&resort=' + encodeURIComponent(that.data.resort)
     url += (that.data.memberId ? ('&memberId=' + that.data.memberId) : '')
     url += (that.data.staffId ? ('&staffId=' + that.data.staffId) : '')
+    url += (that.data.distributorId ? ('&distributorId=' + that.data.distributorId) : '')
     wx.navigateTo({
       url: url,
     })

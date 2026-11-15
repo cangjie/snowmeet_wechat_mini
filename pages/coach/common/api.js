@@ -42,11 +42,20 @@ module.exports = {
   addCoach: form => post('CoachAdmin', 'AddCoach', form),
   updateCoach: (coachId, name, valid) => post('CoachAdmin', 'UpdateCoach', { coachId, name, valid }),
   // care: [{shop, tier, mode, value}]；rental_rate 为空 = 租赁不优惠
+  // 机构自己制作会员卡的底价（下限）：管理员设；min_rate = 最低折扣率，min_fixed = 最低一口价，都空 = 不开放
+  getCoachFloors: coachId => get('CoachAdmin', 'GetCoachFloors', { coachId }),
+  setCoachFloors: (coachId, care, rentalMinRate) => post('CoachAdmin', 'SetCoachFloors', { coachId, care, rental_min_rate: rentalMinRate }),
   setPricing: (coachId, care, rentalRate) => post('CoachAdmin', 'SetCoachPricing', { coachId, care, rental_rate: rentalRate }),
   listCoachCards: (coachId, status) => get('CoachAdmin', 'ListCoachCards', { coachId, status }),
   revokeCard: cardId => post('CoachAdmin', 'RevokeCard', { cardId }),
   listCouponTemplates: () => get('CoachAdmin', 'ListCouponTemplates'),
   grantCoupons: (coachIds, templateId, countEach, requestId) => post('CoachAdmin', 'GrantCoupons', { coachIds, templateId, countEach, requestId }),
+  // ---- 机构自己制作会员卡（Distributor 控制器；教练看到 canEdit=false）----
+  getMyCardStandard: () => get('Distributor', 'GetMyCardStandard'),
+  saveMyCardStandard: (care, rentalRate) => post('Distributor', 'SaveMyCardStandard', { care, rental_rate: rentalRate }),
+  // 机构按管理员设的底价生成自己的优惠券（Distributor 控制器；教练 canMake=false）
+  getMyCouponMaker: () => get('Distributor', 'GetMyCouponMaker'),
+  makeMyCoupons: form => post('Distributor', 'MakeMyCoupons', form),
   // ---- 教练自己 ----
   getMyCoach: () => get('Coach', 'GetMyCoach'),
   createCard: () => post('Coach', 'CreateCard'),

@@ -1,0 +1,13 @@
+page { background: #F5F6FA; color: #111827; }
+.co-page { padding: 28rpx 32rpx 80rpx; display: flex; flex-direction: column; gap: 24rpx; }
+.co-head { padding: 8rpx 8rpx 0; }
+.co-name { font-size: 34rpx; font-weight: 700; }
+.co-meta { margin-top: 8rpx; font-size: 22rpx; color: #9CA3AF; }
+.co-card { background: #fff; border-radius: 32rpx; padding: 28rpx 32rpx; box-shadow: 0 4rpx 40rpx rgba(0, 0, 0, 0.06); display: flex; flex-direction: column; gap: 12rpx; }
+.co-row { display: flex; justify-content: space-between; align-items: center; gap: 20rpx; }
+.co-title { font-size: 28rpx; font-weight: 700; flex: 1; min-width: 0; }
+.co-amount { font-size: 28rpx; font-weight: 700; }
+.co-empty { padding: 60rpx 0; text-align: center; font-size: 26rpx; color: #9CA3AF; }
+.co-note { margin-top: 60rpx; text-align: center; color: #6B7280; font-size: 26rpx; }
+.co-error { margin-top: 60rpx; text-align: center; color: #b83c32; font-size: 27rpx; }
+.co-link { margin-left: 12rpx; color: #006495; }

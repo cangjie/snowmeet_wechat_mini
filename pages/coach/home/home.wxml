@@ -71,7 +71,7 @@
     <!-- 我的优惠券 -->
     <block wx:if="{{tab === 'coupons'}}">
       <view wx:if="{{couponSummary}}" class="stats">
-        <view class="stat"><text class="stat-num">{{couponSummary.granted}}</text><text class="stat-label">管理员发放</text></view>
+        <view class="stat"><text class="stat-num">{{couponSummary.granted}}</text><text class="stat-label">发放（含自制）</text></view>
         <view class="stat"><text class="stat-num">{{couponSummary.held}}</text><text class="stat-label">在手</text></view>
         <view class="stat"><text class="stat-num">{{couponSummary.accepted}}</text><text class="stat-label">已被接受</text></view>
         <view class="stat"><text class="stat-num">{{couponSummary.used}}</text><text class="stat-label">已使用</text></view>
@@ -83,7 +83,7 @@
         <view wx:elif="{{item.state === 'pending'}}" class="card-meta">已转出 · 还没有人接受</view>
         <view wx:else class="card-meta">有效期至 {{item.expire}}</view>
       </view>
-      <view wx:if="{{!coupons.length}}" class="co-empty">管理员还没有给你发过券</view>
+      <view wx:if="{{!coupons.length}}" class="co-empty">还没有券：管理员发给你的、或你自己生成的券都会出现在这里</view>
     </block>
   </block>
 </view>

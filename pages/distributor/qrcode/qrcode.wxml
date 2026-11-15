@@ -1,0 +1,10 @@
+<view class="qr-page">
+  <view class="qr-title">我的雪票订购码</view>
+  <view class="qr-note">顾客扫码直达雪票订购页，购买后每张票 ¥1 分账给你</view>
+  <image wx:if="{{qrUrl}}" src="{{qrUrl}}" class="qr-image" mode="aspectFit" show-menu-by-longpress bindload="onQrLoad" binderror="onQrError" />
+  <view wx:if="{{loading}}" class="qr-note">正在生成二维码…</view>
+  <view wx:if="{{error}}" class="qr-error">{{error}} <text class="qr-retry" bindtap="getQrCode">重试</text></view>
+  <view wx:if="{{qrUrl && !error && !loading}}" class="qr-note">长按二维码可转发给顾客，或保存到相册</view>
+  <view wx:if="{{qrUrl && !error && !loading}}" class="qr-btn" bindtap="saveQr">保存到相册</view>
+  <view class="qr-rule">顾客取票成功后，还没有归属分销商的会成为你的顾客；已有归属的顾客关系不变，但这一笔订单记在你名下。你自己扫自己的码不分账。</view>
+</view>

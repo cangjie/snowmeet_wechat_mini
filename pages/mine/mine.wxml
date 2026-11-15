@@ -5,13 +5,19 @@
   <mp-cell value="我的优惠券" footer="" bindtap="gotoTicket"></mp-cell>
   <mp-cell value="我的储值" footer="" bindtap="gotoDeposit"></mp-cell>
   <mp-cell value="我的次卡" footer="" bindtap="gotoPunchCards"></mp-cell>
-  <mp-cell wx:if="{{coach}}" value="我是分销商" footer="" bindtap="gotoCoach" ></mp-cell>
+  <mp-cell wx:if="{{coach && !distributor}}" value="我是分销商" footer="" bindtap="gotoCoach" ></mp-cell>
   <mp-cell wx:if="{{hasCoachCard}}" value="我的学员卡" footer="" bindtap="gotoCoachCard" ></mp-cell>
   <mp-cell wx:if="{{staff}}" value="我是管理员" footer="" bindtap="gotoAdmin" ></mp-cell>
   <mp-cells wx:if="{{env=='develop' || env == 'trial'}}" title="环境选项" >
     <mp-cell id="env" bindtap="nav" value="选择环境" ></mp-cell>
   </mp-cells>
 </mp-cells>
+<!-- 分销商菜单区域（教练 / 机构）：条目由服务端返回。老后端没有这个接口时 distributor 为空，仍用上面单个「我是分销商」入口 -->
+<view wx:if="{{distributor}}" class="distributor-area">
+  <mp-cells title="{{distributorTitle}}">
+    <mp-cell wx:for="{{distributorEntries}}" wx:key="key" value="{{item.title}}" footer="" data-url="{{item.url}}" bindtap="gotoDistributorEntry"></mp-cell>
+  </mp-cells>
+</view>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
 <!-- 已经绑过手机号的老会员在这里补问头像昵称（可跳过），见 components/profile_auth、utils/profile_auth.js -->
 <profile-auth id="profileAuth" />

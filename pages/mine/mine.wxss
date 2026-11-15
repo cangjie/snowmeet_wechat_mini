@@ -1,1 +1,3 @@
 /* pages/mine/mine.wxss */
+/* 分销商区域在底部固定 tabbar 之上留出空间 */
+.distributor-area { padding-bottom: calc(160rpx + env(safe-area-inset-bottom)); }

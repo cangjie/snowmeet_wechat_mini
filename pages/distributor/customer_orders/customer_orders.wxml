@@ -1,0 +1,15 @@
+<view class="co-page">
+  <view wx:if="{{loading}}" class="co-note">正在加载…</view>
+  <view wx:elif="{{error}}" class="co-error">{{error}} <text class="co-link" bindtap="load">重试</text></view>
+  <block wx:else>
+    <view wx:if="{{customer}}" class="co-head">
+      <view class="co-name">{{customer.name}}</view>
+      <view class="co-meta">尾号 {{customer.phoneTail}} · 记在你名下 {{customer.orderCount}} 单 · ¥{{customer.amount}}</view>
+    </view>
+    <view wx:for="{{orders}}" wx:key="orderId" class="co-card">
+      <view class="co-row"><text class="co-title">{{item.type}} · {{item.itemName}}</text><text class="co-amount">¥{{item.amount}}</text></view>
+      <view class="co-meta">{{item.day}} · 来源：{{item.from}}</view>
+    </view>
+    <view wx:if="{{!orders.length}}" class="co-empty">没有记在你名下的订单</view>
+  </block>
+</view>

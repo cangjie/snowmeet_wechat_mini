@@ -7,7 +7,8 @@ Page({
   data: {
     blocked: '', loading: true, tab: 'price', coach: null, modes: view.MODES,
     cells: [], rentalText: '', dirty: false, trialBase: '168', trial: [],
-    cardFilter: '', cardCounts: null, cards: [], name: ''
+    cardFilter: '', cardCounts: null, cards: [], name: '',
+    floorCells: [], floorRentalText: '', floorDirty: false
   },
 
   onLoad(options) {
@@ -27,6 +28,7 @@ Page({
       wx.setNavigationBarTitle({ title: c.name })
       this.refreshTrial()
       if (this.data.tab === 'cards') return this.loadCards()
+      if (this.data.tab === 'floor') return this.loadFloors()
     }).catch(err => { this.setData({ loading: false }); base.fail(err) })
   },
 
@@ -34,6 +36,34 @@ Page({
     const tab = e.currentTarget.dataset.tab
     this.setData({ tab })
     if (tab === 'cards') this.loadCards()
+    if (tab === 'floor') this.loadFloors()
+  },
+
+  // ---- 底价（只有机构有）：机构自己制作会员卡时，价格不能低于这里设的底价；没设的格子 = 不开放 ----
+  loadFloors() {
+    return api.getCoachFloors(this.id).then(f => {
+      this.setData({ floorCells: view.floorEditCells(f), floorRentalText: view.floorRentalText(f), floorDirty: false })
+    }).catch(base.fail)
+  },
+  onFloorRate(e) {
+    const patch = { floorDirty: true }
+    patch['floorCells[' + Number(e.currentTarget.dataset.i) + '].rateText'] = e.detail.value
+    this.setData(patch)
+  },
+  onFloorFixed(e) {
+    const patch = { floorDirty: true }
+    patch['floorCells[' + Number(e.currentTarget.dataset.i) + '].fixedText'] = e.detail.value
+    this.setData(patch)
+  },
+  onFloorRental(e) { this.setData({ floorRentalText: e.detail.value, floorDirty: true }) },
+  onFloorSave() {
+    if (!this.data.floorDirty) return
+    const r = view.floorsPayload(this.data.floorCells, this.data.floorRentalText)
+    if (r.error) { wx.showToast({ title: r.error, icon: 'none', duration: 2800 }); return }
+    api.setCoachFloors(this.id, r.care, r.rentalMinRate).then(f => {
+      this.setData({ floorCells: view.floorEditCells(f), floorRentalText: view.floorRentalText(f), floorDirty: false })
+      base.done('底价已保存')
+    }).catch(base.fail)
   },
 
   // ---- 价格设置 ----

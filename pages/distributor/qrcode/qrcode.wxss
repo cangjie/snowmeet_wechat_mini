@@ -1,0 +1,8 @@
+.qr-page { padding: 72rpx 36rpx; text-align: center; }
+.qr-title { font-size: 38rpx; font-weight: 600; color: #202b35; }
+.qr-note { margin-top: 24rpx; font-size: 27rpx; color: #657786; }
+.qr-image { width: 480rpx; height: 480rpx; margin-top: 50rpx; }
+.qr-error { margin-top: 28rpx; color: #b83c32; }
+.qr-retry { margin-left: 12rpx; color: #006495; }
+.qr-btn { margin: 40rpx auto 0; width: 320rpx; padding: 22rpx 0; border-radius: 48rpx; background: #2EA6D0; color: #fff; font-size: 30rpx; }
+.qr-rule { margin-top: 56rpx; padding: 24rpx 28rpx; border-radius: 20rpx; background: #E8F6FB; color: #657786; font-size: 24rpx; line-height: 1.6; text-align: left; }

@@ -1,0 +1,20 @@
+page { background: #F5F6FA; color: #111827; }
+.cu-page { padding: 28rpx 32rpx 80rpx; display: flex; flex-direction: column; gap: 24rpx; }
+.cu-stats { display: flex; gap: 20rpx; }
+.cu-stat { flex: 1; background: #fff; border-radius: 28rpx; padding: 26rpx 12rpx; display: flex; flex-direction: column; align-items: center; gap: 8rpx; box-shadow: 0 4rpx 40rpx rgba(0, 0, 0, 0.06); }
+.cu-num { font-size: 36rpx; font-weight: 700; }
+.cu-label { font-size: 22rpx; color: #9CA3AF; }
+.cu-card { background: #fff; border-radius: 32rpx; padding: 28rpx 32rpx; box-shadow: 0 4rpx 40rpx rgba(0, 0, 0, 0.06); display: flex; flex-direction: column; gap: 12rpx; }
+.cu-row { display: flex; justify-content: space-between; align-items: center; }
+.cu-name { font-size: 30rpx; font-weight: 700; }
+.cu-amount { font-size: 30rpx; font-weight: 700; }
+.cu-meta { font-size: 22rpx; color: #9CA3AF; }
+.cu-tag { margin-left: 16rpx; padding: 4rpx 14rpx; border-radius: 12rpx; font-size: 20rpx; font-weight: 600; }
+.cu-tag.ok { background: #DCFCE7; color: #15803D; }
+.cu-tag.warn { background: #FEF3C7; color: #B45309; }
+.cu-tag.gray { background: #F3F4F6; color: #6B7280; }
+.cu-empty { padding: 60rpx 20rpx; text-align: center; font-size: 26rpx; color: #9CA3AF; line-height: 1.6; }
+.cu-rule { padding: 0 8rpx; font-size: 22rpx; color: #6B7280; line-height: 1.6; }
+.cu-note { margin-top: 60rpx; text-align: center; color: #6B7280; font-size: 26rpx; }
+.cu-error { margin-top: 60rpx; text-align: center; color: #b83c32; font-size: 27rpx; }
+.cu-link { margin-left: 12rpx; color: #006495; }

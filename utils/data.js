@@ -1528,6 +1528,10 @@ const getOaLimitQrCodeUrlPromise = function (scene, sessionKey) {
 const getMyCoachPromise = function (sessionKey) {
   return util.performWebRequest(app.globalData.requestPrefix + 'Coach/GetMyCoach?sessionKey=' + encodeURIComponent(sessionKey || ''), null)
 }
+// 我是不是教练/机构分销商（「我的」页分销商区域）；不是返回 { isDistributor: false }，是则带 entries 条目 key
+const getMyDistributorPromise = function (sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'Distributor/GetMyDistributor?sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
 // 我已领取的学员卡
 const getMyCoachCardsPromise = function (sessionKey) {
   return util.performWebRequest(app.globalData.requestPrefix + 'CoachCard/GetMyCards?sessionKey=' + encodeURIComponent(sessionKey || ''), null)
@@ -2179,6 +2183,7 @@ module.exports = {
   createQrCodeBatchPromise,
   getOaLimitQrCodeUrlPromise,
   getMyCoachPromise,
+  getMyDistributorPromise,
   getMyCoachCardsPromise,
   listUsableCoachCardsPromise,
   getShareBatchesPromise,

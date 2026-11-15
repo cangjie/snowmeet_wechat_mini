@@ -1,0 +1,35 @@
+<view class="py-page">
+  <view wx:if="{{loading}}" class="py-note">正在加载…</view>
+  <view wx:elif="{{error}}" class="py-error">{{error}} <text class="py-link" bindtap="load">重试</text></view>
+  <block wx:elif="{{payee}}">
+    <view class="py-card">
+      <view class="py-title">{{payee.name}}{{payee.type ? ' · ' + payee.type : ''}}</view>
+
+      <view class="py-row">
+        <text class="py-label">微信收款</text>
+        <text wx:if="{{payee.wechat.filled}}" class="py-val">{{payee.wechat.kind}}已填写</text>
+        <text wx:else class="py-val off">未填写</text>
+      </view>
+      <view wx:if="{{payee.wechat.merchantName}}" class="py-row">
+        <text class="py-label">商户全称</text>
+        <text class="py-val">{{payee.wechat.merchantName}}</text>
+      </view>
+
+      <view class="py-row">
+        <text class="py-label">支付宝</text>
+        <text wx:if="{{!payee.alipay.filled}}" class="py-val off">未填写</text>
+        <text wx:elif="{{payee.alipay.bound}}" class="py-val ok">已绑定</text>
+        <text wx:else class="py-val warn">已填写，未绑定</text>
+      </view>
+      <view wx:if="{{payee.alipay.filled}}" class="py-row">
+        <text class="py-label">登录号</text>
+        <text class="py-val">{{payee.alipay.loginName}}</text>
+      </view>
+      <view wx:if="{{payee.alipay.filled && payee.alipay.realName}}" class="py-row">
+        <text class="py-label">真实姓名</text>
+        <text class="py-val">{{payee.alipay.realName}}</text>
+      </view>
+    </view>
+    <view class="py-note">这里只能查看。收款资料有误或要更换，请联系系统管理员修改。登录号和姓名已做脱敏显示。</view>
+  </block>
+</view>
