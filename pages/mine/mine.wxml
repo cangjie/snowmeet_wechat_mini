@@ -13,3 +13,5 @@
   </mp-cells>
 </mp-cells>
 <mp-tabbar style="position:fixed;bottom:0;width:100%;left:0;right:0;" current="{{tabIndex}}" list="{{tabbarItemList}}" bindchange="tabSwitch" ></mp-tabbar>
+<!-- 已经绑过手机号的老会员在这里补问头像昵称（可跳过），见 components/profile_auth、utils/profile_auth.js -->
+<profile-auth id="profileAuth" />

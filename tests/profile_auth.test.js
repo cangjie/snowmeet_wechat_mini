@@ -318,3 +318,43 @@ test('组件在 app.json 里全局注册为 profile-auth', () => {
   const app = JSON.parse(fs.readFileSync(path.join(ROOT, 'app.json'), 'utf8'))
   assert.equal(app.usingComponents['profile-auth'], '/components/profile_auth/profile_auth')
 })
+
+// ---------- 已经绑过手机号的老会员：在「我的」页、顾客付款页补问（2026-11-15 用户要求） ----------
+
+test('已有资料的判断：code 0、不用弹、并且有更新时间（有会员且存过资料）才算「已有资料」；没会员的会话不算', () => {
+  assert.equal(profileAuth.hasProfile({ code: 0, data: { needProfile: false, updateDate: '2026-11-15T08:00:00' } }), true)
+  assert.equal(profileAuth.hasProfile({ code: 0, data: { needProfile: false, updateDate: null } }), false, '没验证手机号的会话也是不用弹，但不是已有资料')
+  assert.equal(profileAuth.hasProfile({ code: 0, data: { needProfile: true, updateDate: null } }), false)
+  assert.equal(profileAuth.hasProfile({ code: 1, data: { updateDate: 'x' } }), false)
+  assert.equal(profileAuth.hasProfile(null), false)
+  assert.equal(profileAuth.hasProfile(undefined), false)
+})
+
+test('组件：后端说这个会员已经有资料，记下来，本次运行里 ensure 不再每次都去问后端（「我的」页每次显示都会调）', async t => {
+  const { c, calls } = setupComponent(t, { profile: { code: 0, data: { needProfile: false, updateDate: '2026-11-15T08:00:00', nickName: '雪友' } } })
+  await c.ensure()
+  await c.ensure()
+  await c.ensure()
+  assert.equal(calls.get, 1)
+  assert.equal(c.data.visible, false)
+})
+
+test('组件：会话还没有会员（没验证手机号）时的「不用弹」不能记成已有资料，之后验证了手机号还要问', async t => {
+  const { c, calls } = setupComponent(t, { profile: { code: 0, data: { needProfile: false, updateDate: null } } })
+  await c.ensure()
+  await c.ensure()
+  assert.equal(calls.get, 2, '没记「已处理」，下次还要问后端')
+})
+
+test('组件：先查到没有会员，同一会话里验证手机号之后再 ensure，会正常弹出', async t => {
+  const { c, calls } = setupComponent(t, { profile: { code: 0, data: { needProfile: false, updateDate: null } } })
+  await c.ensure()
+  assert.equal(c.data.visible, false)
+  const verified = setupComponent(t, { profile: { code: 0, data: { needProfile: true } } })
+  const done = verified.c.ensure()
+  await settle()
+  assert.equal(verified.c.data.visible, true)
+  await verified.c.onSkip()
+  await done
+  assert.equal(calls.get, 1)
+})

@@ -1,6 +1,7 @@
 // pages/order/payment_entry.js
 const app = getApp()
 const data = require('../../utils/data.js')
+const profileAuth = require('../../utils/profile_auth.js')
 const util = require('../../utils/util.js')
 Page({
 
@@ -85,13 +86,18 @@ Page({
           orderMemberName: result.orderMemberName
         })
         that.setData({ identity: result })
-        // autoPay 只用一次：支付弹窗关掉后 onShow 会再查身份，不能再弹一遍
-        if (that._autoPay && result.status === 'direct') {
-          that._autoPay = false
-          // 租赁单不自动调起微信支付：顾客要先看清租赁商品、租赁物和押金租金，再自己点「敬请支付」（2026-11-14 用户要求）。
-          // 其它业务照旧。订单没拉到时认不出业务类型，也照旧。
-          if (!that._isRentOrder()) that.pay()
-        }
+        // 付款人已经绑了手机号（老会员）：付款前补问头像昵称（可跳过），处理完再往下走（2026-11-15 用户要求）。
+        // 没绑手机号的不在这里问：他们在 pay-identity-confirm 里授权手机号之后才问，不能在授权前先弹。
+        var askProfile = !!(result && result.status !== 'error' && result.scannerHasCell)
+        return (askProfile ? profileAuth.ensureOn(that) : Promise.resolve()).then(function () {
+          // autoPay 只用一次：支付弹窗关掉后 onShow 会再查身份，不能再弹一遍
+          if (that._autoPay && result.status === 'direct') {
+            that._autoPay = false
+            // 租赁单不自动调起微信支付：顾客要先看清租赁商品、租赁物和押金租金，再自己点「敬请支付」（2026-11-14 用户要求）。
+            // 其它业务照旧。订单没拉到时认不出业务类型，也照旧。
+            if (!that._isRentOrder()) that.pay()
+          }
+        })
       })
       .catch(function (err) {
         // performWebRequest 已 toast。后端拒绝时 err 是它的原话：

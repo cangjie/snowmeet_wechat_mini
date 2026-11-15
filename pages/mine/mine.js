@@ -1,6 +1,7 @@
 const app = getApp()
 var wxloginModule = require('../../utils/wxlogin.js')
 const data = require('../../utils/data.js')
+const profileAuth = require('../../utils/profile_auth.js')
 const tabbar = require('../../utils/tabbar.js')
 Page({
 
@@ -60,6 +61,8 @@ Page({
       data.getMyCoachCardsPromise(sessionKey).then(function (d) {
         that.setData({hasCoachCard: !!(d && d.cards && d.cards.length)})
       }).catch(function () {})
+      // 已经绑过手机号的老会员不会再走验证手机号入口：在这里补问头像昵称（可跳过，组件记着已处理，不会重复弹）
+      profileAuth.ensureOn(that)
     })
   },
 

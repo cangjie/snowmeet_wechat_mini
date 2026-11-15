@@ -44,7 +44,11 @@ Component({
       if (typeof sessionKey !== 'string' || !sessionKey.trim()) return
       if (profileAuth.isDone(globalData, sessionKey)) return
       const res = await data.getMyProfilePromise(sessionKey)
-      if (!profileAuth.needPrompt(res)) return
+      if (!profileAuth.needPrompt(res)) {
+        // 已经存过资料：记下来，本次运行里「我的」页、付款页再显示时不用每次都去问后端
+        if (profileAuth.hasProfile(res)) profileAuth.markDone(globalData, sessionKey)
+        return
+      }
       this._sessionKey = sessionKey
       this.setData({ visible: true, avatarPath: '', nickName: (res.data && res.data.nickName) || '', canSave: false, saving: false, error: '' })
       this._refreshCanSave()
