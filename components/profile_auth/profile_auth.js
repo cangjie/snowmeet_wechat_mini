@@ -18,6 +18,7 @@ Component({
     visible: false,
     avatarPath: '',
     nickName: '',
+    focusNick: false,
     canSave: false,
     saving: false,
     error: ''
@@ -50,13 +51,14 @@ Component({
         return
       }
       this._sessionKey = sessionKey
-      this.setData({ visible: true, avatarPath: '', nickName: (res.data && res.data.nickName) || '', canSave: false, saving: false, error: '' })
+      // 先填昵称、再选头像：弹出来时昵称框自动获得焦点，键盘上方直接出现「用微信昵称」
+      this.setData({ visible: true, avatarPath: '', nickName: (res.data && res.data.nickName) || '', focusNick: true, canSave: false, saving: false, error: '' })
       this._refreshCanSave()
       await new Promise(resolve => { this._resolve = resolve })
     },
 
     _finish() {
-      if (this.data.visible) this.setData({ visible: false })
+      if (this.data.visible) this.setData({ visible: false, focusNick: false })
       const resolve = this._resolve
       this._resolve = null
       if (resolve) resolve()

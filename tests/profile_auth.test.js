@@ -358,3 +358,38 @@ test('组件：先查到没有会员，同一会话里验证手机号之后再 e
   await done
   assert.equal(calls.get, 1)
 })
+
+// ---------- 先填昵称、再选头像（2026-11-15 用户：头像和昵称没法一次授权，那就先获取昵称，再获取头像） ----------
+
+test('弹层模板：昵称在头像前面，昵称框自动获得焦点（键盘上方直接出现「用微信昵称」，省一次点击）', () => {
+  const wxml = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxml'), 'utf8')
+  const nickAt = wxml.search(/<input[^>]*type="nickname"/)
+  const avatarAt = wxml.indexOf('open-type="chooseAvatar"')
+  assert.ok(nickAt > 0 && avatarAt > 0)
+  assert.ok(nickAt < avatarAt, '昵称要排在头像前面')
+  assert.match(wxml, /<input[^>]*type="nickname"[^>]*focus="\{\{focusNick\}\}"/)
+})
+
+test('组件：弹出来时昵称框要焦点；关掉后焦点收回，下次再弹还是从昵称开始', async t => {
+  const { c } = setupComponent(t)
+  assert.equal(c.data.focusNick, false)
+  const done = c.ensure()
+  await settle()
+  assert.equal(c.data.visible, true)
+  assert.equal(c.data.focusNick, true)
+  await c.onSkip()
+  await done
+  assert.equal(c.data.focusNick, false)
+})
+
+test('组件：先填昵称、再选头像，一次保存两样都带上', async t => {
+  const { c, calls } = setupComponent(t)
+  const done = c.ensure()
+  await settle()
+  c.onNickInput({ detail: { value: '雪友小明' } })
+  assert.equal(c.data.canSave, true, '只填了昵称就能保存')
+  c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await c.onSave()
+  await done
+  assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '雪友小明', avatarPath: 'http://tmp/a.jpg' })
+})
