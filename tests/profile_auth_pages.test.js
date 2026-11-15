@@ -102,11 +102,6 @@ function withProfileGate(owner, log) {
 // 每个入口：怎么装载、手机号成功要调哪个处理函数、成功之后「下一步」是哪个函数（装成记号）
 const PAGE_CASES = [
   {
-    name: 'recept_checkin（接待报到）', file: 'pages/order/recept_checkin.js', handler: 'onGetPhoneNumber', next: 'applyView',
-    data: { verifyReceptCheckinPhonePromise: () => Promise.resolve({ stage: 'waiting' }), getReceptCheckinByCustomerPromise: async () => null },
-    prepare: page => { page.setData({ code: 'rc_x' }) },
-  },
-  {
     name: 'care_pick_verify（扫码取板）', file: 'pages/order/care_pick_verify.js', handler: 'onBindCell', next: 'verifyNow',
     data: { bindWechatCellPromise: () => Promise.resolve({ id: 7 }), verifyCarePickPromise: async () => ({}) },
   },
@@ -277,14 +272,18 @@ test('pay-identity-confirm（支付身份确认）：授权手机号、正常支
   }
 })
 
-// ---------- 5. 接待报到：手机号早就绑过的会员扫码识别身份时也问一次（2026-11-15 用户：18911212780 扫码识别身份准备开单，没有询问昵称头像） ----------
-// 手机号早就绑过的会员扫码报到时没有「授权手机号」这一步，原来的弹层（授权手机号之后）永远碰不到他们。
-// 现在报到成功、进入「等待店员开单」（stage=waiting）时再问一次；不拦页面自己的状态和轮询；付款阶段（wepay / alipay）不问。
+// ---------- 5. 接待报到：先手机号，无论授权还是跳过，等约 5 秒再问昵称和头像（2026-11-15 用户定的顾客侧流程） ----------
+// 顾客扫码后：第一，没授权手机号的先提示授权手机号；第二，无论授权还是跳过，大概等 5 秒，再提示授权昵称，最后授权头像
+// （昵称和头像在同一个弹层里：昵称在上、自动获得焦点，头像在下）。手机号早就绑过的会员没有第一步，扫码报到成功后同样等 5 秒再问。
+// 付款阶段（wepay / alipay）不问；离开页面、去付款页就不再问。
 
-function checkinPage(t, view) {
+const PROFILE_DELAY_FOR_TEST = 5
+
+function checkinPage(t, view, verifyView) {
   installGlobals(t)
   const page = loadPage('pages/order/recept_checkin.js', {
     scanReceptCheckinPromise: async () => view,
+    verifyReceptCheckinPhonePromise: async () => verifyView || { stage: 'waiting' },
     getReceptCheckinByCustomerPromise: async () => null,
   })
   page.setData({ code: 'rc_x' })
@@ -292,45 +291,106 @@ function checkinPage(t, view) {
   page._startPolling = () => { log.push('poll') }
   page._stopPolling = () => {}
   page.gotoPay = () => { log.push('pay') }
+  page.profilePromptDelay = PROFILE_DELAY_FOR_TEST
+  t.after(() => { if (page._stopProfileTimer) page._stopProfileTimer() })
   return { page, log }
 }
 
-test('接待报到：手机号已绑的会员扫码后进入等待开单，先把页面状态定下来、轮询照常，再弹头像昵称；弹层不拦页面', async t => {
+const afterDelay = () => new Promise(resolve => setTimeout(resolve, PROFILE_DELAY_FOR_TEST * 6 + 20))
+
+test('接待报到：间隔默认是 5 秒', () => {
+  installGlobals({ after() {} })
+  const page = loadPage('pages/order/recept_checkin.js', {})
+  assert.equal(page.profilePromptDelay, 5000)
+})
+
+test('接待报到：手机号已绑的会员扫码后进入等待开单，页面状态和轮询立刻定下来，约 5 秒后才弹昵称头像', async t => {
   const { page, log } = checkinPage(t, { stage: 'waiting', maskedCell: '189****2780' })
+  page.profilePromptDelay = 60
   const gate = withProfileGate(page, log)
   page.checkin()
   await settle()
-  assert.equal(page.data.state, 'waiting', '页面状态不被弹层拦住')
-  assert.deepEqual(log.sort(), ['ensure', 'poll'])
+  assert.equal(page.data.state, 'waiting')
+  assert.deepEqual(log, ['poll'], '刚扫完码还不弹')
+  await new Promise(resolve => setTimeout(resolve, 120))
+  assert.deepEqual(log.sort(), ['ensure', 'poll'], '过了间隔才弹')
   gate.resolve()
-  await settle()
 })
 
-test('接待报到：只在「等待开单」时问；要授权手机号、支付宝、微信付款、过期、异常都不在报到这里问', async t => {
-  for (const view of [{ stage: 'need_phone' }, { stage: 'alipay' }, { stage: 'wepay', paymentId: 9 }, { stage: 'expired' }, { stage: 'bogus' }]) {
+test('接待报到：没授权手机号的先提示授权手机号，这时不弹昵称头像', async t => {
+  const { page, log } = checkinPage(t, { stage: 'need_phone' })
+  withProfileGate(page, log)
+  page.checkin()
+  await afterDelay()
+  assert.equal(page.data.state, 'need_phone')
+  assert.deepEqual(log, [], '手机号这一步没做完，不抢着问昵称头像')
+})
+
+test('接待报到：授权了手机号 → 先继续等店员开单，等间隔之后才弹昵称头像（不是授权完立刻弹）', async t => {
+  const { page, log } = checkinPage(t, { stage: 'need_phone' }, { stage: 'waiting' })
+  page.profilePromptDelay = 60
+  withProfileGate(page, log)
+  await page.onGetPhoneNumber(PHONE_OK)
+  await settle()
+  assert.equal(page.data.state, 'waiting')
+  assert.ok(!log.includes('ensure'), '授权完立刻不弹')
+  await new Promise(resolve => setTimeout(resolve, 120))
+  assert.ok(log.includes('ensure'), '过了间隔才弹')
+})
+
+test('接待报到：跳过 / 拒绝授权手机号，一样等间隔之后问昵称头像；页面还停在授权手机号，之后仍可以授权', async t => {
+  const { page, log } = checkinPage(t, { stage: 'need_phone' })
+  page.profilePromptDelay = 60
+  withProfileGate(page, log)
+  page.checkin()
+  await settle()
+  await page.onGetPhoneNumber(PHONE_DENIED)
+  assert.equal(page.data.state, 'need_phone')
+  assert.deepEqual(log, [], '拒绝后立刻不弹')
+  await new Promise(resolve => setTimeout(resolve, 120))
+  assert.deepEqual(log, ['ensure'])
+  assert.equal(page.data.state, 'need_phone', '还在等他授权手机号')
+})
+
+test('接待报到：付款阶段（微信付款、支付宝）、过期、异常都不问；微信付款直接去付款页', async t => {
+  for (const view of [{ stage: 'alipay' }, { stage: 'wepay', paymentId: 9 }, { stage: 'expired' }, { stage: 'bogus' }]) {
     const { page, log } = checkinPage(t, view)
     withProfileGate(page, log)
     page.checkin()
-    await settle()
+    await afterDelay()
     assert.ok(!log.includes('ensure'), JSON.stringify(view))
   }
 })
 
-test('接待报到：每次回到前台都会重新报到，弹层组件记着已处理，所以同一次运行里不会反复弹（这里每次都交给组件判断）', async t => {
+test('接待报到：等待期间离开页面（隐藏、销毁、去付款页）就不再问', async t => {
+  for (const leave of [p => p.onHide(), p => p.onUnload(), p => { p._leaving = true }]) {
+    const { page, log } = checkinPage(t, { stage: 'waiting' })
+    page.profilePromptDelay = 60
+    withProfileGate(page, log)
+    page.checkin()
+    await settle()
+    leave(page)
+    await new Promise(resolve => setTimeout(resolve, 120))
+    assert.ok(!log.includes('ensure'))
+  }
+})
+
+test('接待报到：每次回到前台都会重新报到，但只有一个计时，不会叠出好几次；弹层组件记着已处理', async t => {
   const { page, log } = checkinPage(t, { stage: 'waiting' })
+  page.profilePromptDelay = 60
   withProfileGate(page, log)
   page.checkin()
-  await settle()
   page.checkin()
-  await settle()
-  assert.equal(log.filter(x => x === 'ensure').length, 2, '页面每次都问组件，由组件决定弹不弹')
+  page.checkin()
+  await new Promise(resolve => setTimeout(resolve, 150))
+  assert.equal(log.filter(x => x === 'ensure').length, 1)
 })
 
 test('接待报到：取不到弹层组件时不影响等待开单', async t => {
   const { page, log } = checkinPage(t, { stage: 'waiting' })
   page.selectComponent = () => null
   page.checkin()
-  await settle()
+  await afterDelay()
   assert.equal(page.data.state, 'waiting')
   assert.deepEqual(log, ['poll'])
 })
