@@ -6,7 +6,8 @@
 //   edit()：「我的」页点顶部头像昵称时打开同一个弹层来修改（带出已存的昵称和头像，不看「已处理」，按钮是「取消」）。
 //   资料不全（存过头像没存昵称，或反过来）后端也会说需要再问，弹层里带出已存的那一半，让顾客补齐。
 // 头像：<button open-type="chooseAvatar"> 拿到临时文件，保存时 wx.uploadFile 传到后端，后端存 S3；
-// 昵称：<input type="nickname">，微信键盘上可以直接选「用微信昵称」。
+// 昵称：<input type="nickname">（画成「点击获取昵称」按钮的样子），微信键盘上可以直接选「用微信昵称」。
+// 点昵称、点头像都先弹「请稍候」toast，等微信自己的提示出来再收掉（见 _showWait / _hideWait）。
 const data = require('../../utils/data.js')
 const profileAuth = require('../../utils/profile_auth.js')
 
@@ -88,6 +89,7 @@ Component({
     },
 
     _finish() {
+      this._hideWait()
       if (this.data.visible) this.setData({ visible: false })
       const resolve = this._resolve
       this._resolve = null
@@ -99,6 +101,7 @@ Component({
     },
 
     onChooseAvatar(e) {
+      this._hideWait()
       const path = e && e.detail && e.detail.avatarUrl
       if (!path) return
       this.setData({ avatarPath: path, error: '' })
@@ -107,18 +110,40 @@ Component({
 
     // type="nickname" 输入框：手动输入走 input / blur，选「用微信昵称」时走 change，都读 e.detail.value
     onNickInput(e) {
+      this._hideWait()
       this.setData({ nickName: (e && e.detail && e.detail.value) || '', error: '' })
       this._refreshCanSave()
     },
 
-    // 保存走表单提交：以表单里昵称框此刻的内容为准，不依赖输入事件有没有触发过（2026-11-15 有一次头像存上了、昵称没带上）
-    onSubmit(e) {
-      const value = e && e.detail && e.detail.value
-      if (value && typeof value.nickName === 'string' && value.nickName.trim() && value.nickName !== this.data.nickName) {
-        this.setData({ nickName: value.nickName })
-        this._refreshCanSave()
-      }
-      return this.onSave()
+    // 点「点击获取昵称」：先弹「请稍候」，微信的昵称提示（键盘上方的「用微信昵称」）出来就收掉
+    onNickTap() {
+      this._showWait()
+    },
+
+    // 点头像：同样先弹「请稍候」，微信的头像选择出来（选好头像触发 chooseavatar）就收掉
+    onAvatarTap() {
+      this._showWait()
+    },
+
+    // 键盘升起来（高度 > 0）说明微信的昵称提示出来了；开发者工具里没有键盘，靠超时收掉
+    onKeyboardHeight(e) {
+      const height = e && e.detail && e.detail.height
+      if (height > 0) this._hideWait()
+    },
+
+    // 「请稍候」toast：不挡操作（mask 为 false）；只会有一个，不叠；到点（默认 1.5 秒）自动收，免得微信没有事件可等时一直转
+    _showWait() {
+      if (this._waiting || typeof wx === 'undefined' || typeof wx.showLoading !== 'function') return
+      this._waiting = true
+      wx.showLoading({ title: '请稍候', mask: false })
+      this._waitTimer = setTimeout(() => this._hideWait(), this.waitMs || 1500)
+    },
+
+    _hideWait() {
+      if (this._waitTimer) { clearTimeout(this._waitTimer); this._waitTimer = null }
+      if (!this._waiting) return
+      this._waiting = false
+      if (typeof wx !== 'undefined' && typeof wx.hideLoading === 'function') wx.hideLoading()
     },
 
     // 只选了头像、昵称是空的（本来也没存过昵称）：提示一下，免得以为昵称存上了

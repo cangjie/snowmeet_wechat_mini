@@ -317,9 +317,8 @@ test('组件模板：头像用 chooseAvatar 按钮，昵称用 type="nickname" �
   assert.match(wxml, /bind:?chooseavatar="onChooseAvatar"/)
   assert.match(wxml, /<input[^>]*type="nickname"/)
   assert.match(wxml, /bindtap="onSkip"/)
-  assert.match(wxml, /<form[^>]*bindsubmit="onSubmit"/, '保存走表单提交，保存那一刻才读昵称框的内容，不会漏掉')
-  assert.match(wxml, /<input[^>]*name="nickName"/)
-  assert.match(wxml, /<button[^>]*form-type="submit"/)
+  assert.doesNotMatch(wxml, /<form/, 'form 在微信里会多包一层，头像、昵称、按钮的居中和宽度都被弄乱，不用')
+  assert.match(wxml, /bindtap="onSave"/)
   assert.match(wxml, /wx:if="\{\{visible\}\}"/)
   const json = JSON.parse(fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.json'), 'utf8'))
   assert.equal(json.component, true)
@@ -379,12 +378,13 @@ test('弹层模板：昵称在头像前面，昵称框不设自动聚焦（要�
   assert.ok(nickAt > 0 && avatarAt > 0)
   assert.ok(nickAt < avatarAt, '昵称要排在头像前面')
   // 不能给昵称框设 focus：程序自动聚焦不是用户点的，开发者工具报 invalid init scl: init before tap，「用微信昵称」要顾客自己点输入框
-  assert.doesNotMatch(wxml.slice(nickAt, wxml.indexOf('/>', nickAt)), /focus=/)
+  // （bindfocus 是事件绑定，不算；要排除的是单独的 focus 属性）
+  assert.doesNotMatch(wxml.slice(nickAt, wxml.indexOf('/>', nickAt)), /\sfocus=/)
 })
 
 test('hintText：昵称、头像都缺 → 两步都写；只缺一样 → 只写那一步', () => {
   const both = profileAuth.hintText({ needNick: true, needAvatar: true })
-  assert.match(both, /昵称/); assert.match(both, /用微信昵称/); assert.match(both, /头像/); assert.match(both, /用微信头像/)
+  assert.match(both, /点击获取昵称/); assert.match(both, /用微信昵称/); assert.match(both, /头像/); assert.match(both, /用微信头像/)
   assert.ok(both.indexOf('昵称') < both.indexOf('头像'), '先昵称后头像')
   const nickOnly = profileAuth.hintText({ needNick: true, needAvatar: false })
   assert.match(nickOnly, /用微信昵称/); assert.doesNotMatch(nickOnly, /用微信头像/)
@@ -452,24 +452,6 @@ test('profileView：从 GetMyProfile 的返回取要显示的头像（完整网�
 })
 
 // ---------- 昵称一定要带上、存过头像没存昵称的补填、点「我的」页顶部修改（2026-11-15 用户：两个都做） ----------
-
-test('保存走表单提交：以表单里昵称框此刻的内容为准（不依赖输入事件有没有触发过），表单里没有才用已记下的', async t => {
-  const { c, calls } = setupComponent(t)
-  const done = c.ensure()
-  await settle()
-  c.onNickInput({ detail: { value: '旧的' } })
-  await c.onSubmit({ detail: { value: { nickName: '表单里的昵称' } } })
-  await done
-  assert.equal(calls.save[0].nickName, '表单里的昵称')
-
-  const second = setupComponent(t)
-  const done2 = second.c.ensure()
-  await settle()
-  second.c.onNickInput({ detail: { value: '事件里记下的' } })
-  await second.c.onSubmit({ detail: { value: {} } })
-  await done2
-  assert.equal(second.calls.save[0].nickName, '事件里记下的')
-})
 
 test('只选了头像、昵称是空的：先提示「还没填昵称」，选「去填昵称」不保存、回到昵称框；选「只保存头像」才保存', async t => {
   const cancel = setupComponent(t, { modalConfirm: false })
@@ -638,10 +620,124 @@ test('组件：点「我的」页顶部修改（edit）同样先要隐私授权'
   await done
 })
 
-test('版式：头像按钮和下面的提示文字自己居中（不依赖 form 是不是 flex：微信里 form 里面还有一层，align-items 不一定生效）', () => {
+test('版式：头像放在一行 flex 居中的容器里、提示文字整行居中；弹层本身是块布局，不靠 flex 列居中', () => {
   const wxss = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxss'), 'utf8')
+  const wxml = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxml'), 'utf8')
   const rule = name => (wxss.match(new RegExp('\\.' + name + '\\s*\\{([^}]*)\\}')) || [])[1] || ''
-  assert.match(rule('pa-avatar-btn'), /margin:\s*\d+rpx\s+auto\s+0/, '头像按钮左右 auto 才会居中')
+  assert.match(rule('pa-avatar-row'), /display:\s*flex/)
+  assert.match(rule('pa-avatar-row'), /justify-content:\s*center/)
+  assert.match(rule('pa-avatar-row'), /width:\s*100%/)
+  assert.match(wxml, /<view class="pa-avatar-row">\s*<button class="pa-avatar-btn"/, '头像按钮在居中的那一行里面')
   assert.match(rule('pa-avatar-tip'), /text-align:\s*center/)
   assert.match(rule('pa-avatar-tip'), /width:\s*100%/)
+  assert.match(rule('pa-sheet'), /display:\s*block/)
+  assert.doesNotMatch(rule('pa-sheet'), /align-items/, '弹层不再用 flex 列 + align-items 居中（外面多一层时会缩成内容宽度）')
+  assert.match(rule('pa-nick-btn'), /width:\s*100%/)
+})
+
+// ---------- 2026-11-15 用户：昵称那块换成「点击获取昵称」按钮；点昵称、点头像都先提示「请稍候」，等微信的提示出来 ----------
+
+test('弹层模板：昵称是一个显示「点击获取昵称」的按钮样式（实际是 type="nickname" 的输入框，微信只认这个），没有左边的「昵称」标签', () => {
+  const wxml = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxml'), 'utf8')
+  const input = wxml.match(/<input[^>]*type="nickname"[^>]*\/>/)
+  assert.ok(input, '昵称仍然要用 type="nickname" 的输入框，微信只有这一个办法拿到微信昵称')
+  assert.match(input[0], /class="pa-nick-btn"/)
+  assert.match(input[0], /placeholder="点击获取昵称"/)
+  assert.match(input[0], /bindfocus="onNickTap"/)
+  assert.match(input[0], /bindkeyboardheightchange="onKeyboardHeight"/)
+  assert.doesNotMatch(wxml, /class="pa-label"/)
+  assert.match(wxml, /<button[^>]*open-type="chooseAvatar"[^>]*bindtap="onAvatarTap"|<button[^>]*bindtap="onAvatarTap"[^>]*open-type="chooseAvatar"/)
+  const wxss = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxss'), 'utf8')
+  assert.match((wxss.match(/\.pa-nick-btn\s*\{([^}]*)\}/) || [])[1] || '', /text-align:\s*center/)
+})
+
+function waitFor(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
+
+function setupWaiting(t) {
+  const loading = []
+  const ctx = setupComponent(t)
+  ctx.loading = loading
+  global.wx.showLoading = o => loading.push('show:' + o.title + ':' + o.mask)
+  global.wx.hideLoading = () => loading.push('hide')
+  return ctx
+}
+
+test('点「点击获取昵称」：先弹「请稍候」toast，微信的昵称提示（键盘上方那条）出来了就收掉', async t => {
+  const { c, loading } = setupWaiting(t)
+  const done = c.ensure()
+  await settle()
+  c.onNickTap()
+  assert.deepEqual(loading, ['show:请稍候:false'], 'mask 为 false，不挡住下面的操作')
+  c.onKeyboardHeight({ detail: { height: 0 } })
+  assert.deepEqual(loading, ['show:请稍候:false'], '键盘还没出来，不收')
+  c.onKeyboardHeight({ detail: { height: 300 } })
+  assert.deepEqual(loading, ['show:请稍候:false', 'hide'])
+  c.onKeyboardHeight({ detail: { height: 300 } })
+  assert.equal(loading.filter(x => x === 'hide').length, 1, '收过就不重复收')
+  await c.onSkip()
+  await done
+})
+
+test('点「点击获取昵称」：键盘事件一直不来（开发者工具里没有），到时间自动收掉，不会一直转', async t => {
+  const { c, loading } = setupWaiting(t)
+  c.waitMs = 30
+  const done = c.ensure()
+  await settle()
+  c.onNickTap()
+  assert.deepEqual(loading, ['show:请稍候:false'])
+  await waitFor(80)
+  assert.deepEqual(loading, ['show:请稍候:false', 'hide'])
+  await c.onSkip()
+  await done
+})
+
+test('填了昵称（输入 / 失焦 / 选了微信昵称）也收掉「请稍候」', async t => {
+  for (const handler of ['onNickInput']) {
+    const { c, loading } = setupWaiting(t)
+    const done = c.ensure()
+    await settle()
+    c.onNickTap()
+    c[handler]({ detail: { value: '雪友' } })
+    assert.deepEqual(loading, ['show:请稍候:false', 'hide'])
+    await c.onSkip()
+    await done
+  }
+})
+
+test('点头像：同样先弹「请稍候」，选好头像（chooseavatar）就收掉；超时也收掉', async t => {
+  const { c, loading } = setupWaiting(t)
+  c.waitMs = 30
+  const done = c.ensure()
+  await settle()
+  c.onAvatarTap()
+  assert.deepEqual(loading, ['show:请稍候:false'])
+  c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  assert.deepEqual(loading, ['show:请稍候:false', 'hide'])
+
+  c.onAvatarTap()
+  await waitFor(80)
+  assert.equal(loading.filter(x => x === 'hide').length, 2, '没选头像（取消）时到时间也自动收')
+  await c.onSkip()
+  await done
+})
+
+test('连点昵称和头像：只有一个「请稍候」，不叠；弹层关掉、页面销毁时一并收掉', async t => {
+  const { c, loading } = setupWaiting(t)
+  const done = c.ensure()
+  await settle()
+  c.onNickTap()
+  c.onAvatarTap()
+  c.onNickTap()
+  assert.equal(loading.filter(x => x.startsWith('show')).length, 1, '已经在转就不再叠')
+  await c.onSkip()
+  await done
+  assert.deepEqual(loading.filter(x => x === 'hide').length, 1, '关弹层时收掉')
+
+  const second = setupWaiting(t)
+  const done2 = second.c.ensure()
+  await settle()
+  second.c.onAvatarTap()
+  second.c.invokeLifecycle('detached')
+  await done2
+  assert.equal(second.loading.filter(x => x === 'hide').length, 1, '页面销毁时收掉')
 })

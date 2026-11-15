@@ -74,7 +74,7 @@ function ensureOn(owner) {
 function hintText(options) {
   const o = options || {}
   const lines = []
-  if (o.needNick) lines.push('点击「昵称」输入框，再点键盘上方的「用微信昵称」')
+  if (o.needNick) lines.push('点上方的「点击获取昵称」，再点键盘上方的「用微信昵称」')
   if (o.needAvatar) lines.push('点击下方圆形的「头像」，选择「用微信头像」')
   if (lines.length === 0) return ''
   const numbered = lines.length === 1 ? lines : lines.map((line, i) => (i === 0 ? '①' : '②') + ' ' + line)

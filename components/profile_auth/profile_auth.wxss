@@ -1,4 +1,5 @@
-/* 验证手机号之后授权头像和昵称的弹层（底部弹出）。z-index 要压过页面里的遮罩和支付确认。 */
+/* 验证手机号之后授权头像和昵称的弹层（底部弹出）。z-index 要压过页面里的遮罩和支付确认。
+   版式全用普通块布局 + 明确宽度：不用 flex 列居中（外面有 form 之类多一层时，flex 会把内容缩成内容宽度、居中就偏了）。 */
 .pa-mask {
   position: fixed;
   left: 0;
@@ -16,28 +17,52 @@
   background: #fff;
   border-radius: 28rpx 28rpx 0 0;
   padding: 40rpx 40rpx calc(40rpx + env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.pa-form {
   display: block;
-  width: 100%;
+  text-align: center;
 }
 .pa-title {
+  width: 100%;
   font-size: 36rpx;
   font-weight: 600;
   color: #181818;
+  text-align: center;
 }
 .pa-sub {
+  width: 100%;
   margin-top: 12rpx;
   font-size: 26rpx;
   color: #888;
   text-align: center;
 }
+/* 昵称：实际是 type="nickname" 的输入框，画成按钮样子；没填时显示「点击获取昵称」，填了显示昵称 */
+.pa-nick-btn {
+  display: block;
+  width: 100%;
+  height: 88rpx;
+  margin: 36rpx 0 0;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+  font-size: 32rpx;
+  line-height: 88rpx;
+  color: #181818;
+  text-align: center;
+  background: #f2f2f2;
+  border-radius: 12rpx;
+}
+.pa-nick-ph {
+  color: #07c160;
+  text-align: center;
+}
+/* 头像：外面一行用 flex 居中，按钮本身不靠 margin 居中 */
+.pa-avatar-row {
+  width: 100%;
+  margin-top: 32rpx;
+  display: flex;
+  justify-content: center;
+}
 /* app.wxss 给所有 button 设了 groove 灰边框、背景色和 40px 高度，这里的按钮要自己把它们盖掉 */
 .pa-avatar-btn {
-  margin: 32rpx auto 0;
+  margin: 0;
   padding: 0;
   width: 160rpx;
   height: 160rpx;
@@ -70,28 +95,6 @@
   margin-top: 14rpx;
   font-size: 24rpx;
   color: #07c160;
-}
-.pa-field {
-  margin-top: 32rpx;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0 8rpx;
-  height: 96rpx;
-  border-top: 1rpx solid #eee;
-  border-bottom: 1rpx solid #eee;
-  box-sizing: border-box;
-}
-.pa-label {
-  width: 110rpx;
-  font-size: 30rpx;
-  color: #181818;
-}
-.pa-input {
-  flex: 1;
-  height: 96rpx;
-  font-size: 30rpx;
-  text-align: left;
 }
 .pa-error {
   margin-top: 20rpx;
