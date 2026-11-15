@@ -19,6 +19,9 @@ const PRICE_LIST = [
   { day_type: '周末', rent_type: '日场', scene: '门市', price: 360 },
   { day_type: '平日', rent_type: '夜场', scene: '门市', price: 150 },
   { day_type: '周末', rent_type: '夜场', scene: '门市', price: 200 },
+  // 下午场（13:00～16:00 起租当天用）：价目表里没有这一档时取不到，「改回今天」用例在这个时段会拿到日场、断言失败（2026-11-15 14:47 复现）
+  { day_type: '平日', rent_type: '下午场', scene: '门市', price: 200 },
+  { day_type: '周末', rent_type: '下午场', scene: '门市', price: 300 },
 ]
 function expectedDayPrice(dateStr) {
   return rentDatePrice.dayTypeForDate(dateStr) === '周末' ? 360 : 260

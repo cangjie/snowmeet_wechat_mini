@@ -56,6 +56,14 @@ function repricePreset(preset, priceList, dateStr, now) {
   return moved
 }
 
+// 价目表（某个场景：门市 / 预约 的价目）里，这一天、现在这个钟点的价；没有就返回 null。
+// 租赁开单选「门市价 / 预约价」时用它判断：选中的场景在这一天有没有价（没有就不能切过去）。
+function catalogPriceFor(priceList, dateStr, now) {
+  const date = parseLocalDate(dateStr)
+  if (!date || !priceList || !priceList.length) return null
+  return util.getRentPrice(priceList, date, rentTypeForDate(dateStr, now)) || null
+}
+
 // 店员改起租日期时，租赁模式怎么跟着变（返回 'delay' / 'now'，不用变返回 null）：
 //   改成晚于今天的日期 → 延时租赁，起租钟点自动 00:00（装备当晚发放，那天才开始计费）；
 //   改回今天，且原来是延时租赁 → 回到立即租赁，起租钟点是现在；
@@ -102,4 +110,4 @@ function defaultRentStart(shop, now) {
   }
 }
 
-module.exports = { parseLocalDate, rentTypeForDate, dayTypeForDate, repricePreset, modeForDateChange, defaultRentStart }
+module.exports = { parseLocalDate, rentTypeForDate, dayTypeForDate, repricePreset, modeForDateChange, defaultRentStart, catalogPriceFor }

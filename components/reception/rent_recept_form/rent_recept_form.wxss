@@ -248,6 +248,23 @@
 }
 .kv-picker-text { font-size: 13px; color: var(--on-surface); padding: 2px 0; }
 .kv-cell--tap:active { background: var(--surface-container-low); }
+/* 租金价目单选（门市价 / 预约价）：圆点单选，选中是实心点；没有预约价时「预约价」整体变灰、不可点 */
+.scene-radios { display: flex; align-items: center; gap: 16px; min-height: 22px; }
+.scene-radio { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--on-surface); }
+.scene-radio-dot {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--outline);
+  border-radius: 50%;
+  background: #ffffff;
+}
+.scene-radio--on .scene-radio-dot {
+  border-color: var(--primary);
+  background: radial-gradient(circle, var(--primary) 0, var(--primary) 4px, #ffffff 4.5px);
+}
+.scene-radio--on { font-weight: 600; }
+.scene-radio--disabled { opacity: 0.4; }
 .kv-input--display {
   display: flex;
   align-items: center;

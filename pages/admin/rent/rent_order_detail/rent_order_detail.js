@@ -12,6 +12,48 @@ function formatDisplayOrderCode(rawCode) {
   return '…' + code.slice(6)
 }
 
+// 价目场景显示文字：预约价 / 会员价 / 门市价（空和其它都按门市价）
+function sceneLabel(scene) {
+  var s = String(scene || '').trim()
+  if (s === '预约') return '预约价'
+  if (s === '会员') return '会员价'
+  return '门市价'
+}
+
+// 价目标签颜色：预约蓝、会员金、门市灰
+function sceneClass(scene) {
+  var s = String(scene || '').trim()
+  if (s === '预约') return 'reserve'
+  if (s === '会员') return 'member'
+  return 'shop'
+}
+
+// 这个租赁的租金是门市价还是预约价（2026-11-15 用户要求订单详情页显示）：
+// 来源是每天租金明细的 scene（后端按开单时选的价目生成；连租按预约价封顶的那天也记预约）；
+// 历史明细没有这一列时看价格预设，再没有按门市价。门市、预约都有时显示「门市价、预约价」。
+function priceSceneInfo(rental) {
+  var rents = (rental.details || []).filter(function (d) {
+    return (d.charge_type || '').trim() == '租金' && d.valid == 1
+  })
+  rents.sort(function (a, b) { return new Date(a.rental_date) - new Date(b.rental_date) })
+  var seen = []
+  rents.forEach(function (d) {
+    var s = String(d.scene || '').trim()
+    if (s && seen.indexOf(s) < 0) seen.push(s)
+  })
+  if (!seen.length) {
+    var p = (rental.pricePresets || [])[0]
+    var ps = p ? String(p.scene || '').trim() : ''
+    seen = [ps === '预约' || ps === '会员' ? ps : '门市']
+  }
+  return {
+    scene: seen[0],
+    str: seen.map(sceneLabel).join('、'),
+    hasReserve: seen.indexOf('预约') >= 0,
+    cls: sceneClass(seen.indexOf('预约') >= 0 ? '预约' : seen[0]),
+  }
+}
+
 // 手机号脱敏：保留前 3 后 4，中间打码；空值返回 '—'
 function maskCell(cell) {
   if (!cell && cell !== 0) return '—'
@@ -342,7 +384,7 @@ Page({
         var dayKey = util.formatDate(new Date(detail.rental_date))
         var row = feeDayMap[dayKey]
         if (!row) {
-          row = { dateStr: dayKey, rentDetailId: null, rent: 0, overtime: 0, discount: 0,
+          row = { dateStr: dayKey, rentDetailId: null, rent: 0, overtime: 0, discount: 0, scene: '',
                   waived: false, _rentValid1: false, _otValidSum: 0, _otAllSum: 0 }
           feeDayMap[dayKey] = row
           feeRows.push(row)
@@ -352,6 +394,7 @@ Page({
           // 优先取 valid=1 的租金明细；该天只有 valid=0 时标记免除（仍取原值供恢复/划线展示）
           if (isV1 || !row._rentValid1) {
             row.rentDetailId = detail.id
+            row.scene = String(detail.scene || '').trim()   // 这天是门市价还是预约价（历史明细为空）
             row.rent = parseFloat(detail.amount) || 0
             // 当天非票券「日租金」减免（不论 valid，取原值——免除后 valid=0 仍能取到）
             var dsum = 0
@@ -375,12 +418,19 @@ Page({
         // 免除天取全部超时费（含 valid=0 原值供恢复/划线）；正常天只取 valid=1
         r0.overtime = r0.waived ? r0._otAllSum : r0._otValidSum
         r0.subtotal = r0.rent + r0.overtime - r0.discount
+        r0.sceneStr = r0.scene ? sceneLabel(r0.scene) : ''
+        r0.sceneClass = sceneClass(r0.scene)
         r0.rentStr = util.showAmount(r0.rent)
         r0.overtimeStr = util.showAmount(r0.overtime)
         r0.discountStr = util.showAmount(r0.discount)
         r0.subtotalStr = util.showAmount(r0.subtotal)
       }
       rental.feeRows = feeRows
+      var sceneInfo = priceSceneInfo(rental)
+      rental._priceScene = sceneInfo.scene
+      rental._priceSceneStr = sceneInfo.str
+      rental._priceSceneReserve = sceneInfo.hasReserve
+      rental._priceSceneClass = sceneInfo.cls
 
       // 截止到当前的租金：累计 rental_date 不晚于今天的有效「租金」明细（毛额，招待也照常显示）
       var rentToNow = 0

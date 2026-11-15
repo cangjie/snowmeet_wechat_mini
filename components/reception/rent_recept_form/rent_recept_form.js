@@ -18,7 +18,7 @@ const PT_TO_KEY = { '立即租赁': 'now', '先租后取': 'later', '延时租�
 const KEY_TO_PT = { now: '立即租赁', later: '先租后取', delay: '延时租赁', cross: '异店租赁' };
 const { destinations } = require('../../../utils/cross_shop_rent.js');
 
-const { repricePreset, modeForDateChange } = require('../../../utils/rent_date_price.js');
+const { repricePreset, modeForDateChange, catalogPriceFor } = require('../../../utils/rent_date_price.js');
 
 // 开单生效时是否当场把装备发给顾客（后端 EffectRental 按 rentItem.atOnce 发放并把租赁物标记为「租赁中」）。
 //   立即租赁：当场发放，从现在起计费。
@@ -67,6 +67,12 @@ function effectivePickType(rental, items) {
   const modes = new Set(((items || (rental && rental.rentItems)) || []).filter(it => !it.noNeed).map(it => it.pick_type || ''));
   if (modes.size !== 1) return '';
   return modes.values().next().value || '';
+}
+
+// 这个租赁的租金按门市价还是预约价：价格预设（第一条）的 scene；不是「预约」的（含历史上的 会员、空值）都按门市显示
+function priceSceneOf(r) {
+  const p = ((r && r.pricePresets) || [])[0];
+  return p && String(p.scene || '').trim() === '预约' ? '预约' : '门市';
 }
 
 function pkgKey(r, idx) {
@@ -347,11 +353,113 @@ Component({
           _modeMixed: modeDisplay.mixed,
           _rentalEntered: rentalEntry.ok,
           _rentalStatusLabel: rentalEntry.label,
+          // 租金按门市价还是预约价（价格预设的 scene）；预约价单选项要这个商品有预约价才可点（价目缓存里查）
+          _priceScene: priceSceneOf(r),
+          _reserveAvailable: this._reserveAvailableFromCache(r),
           rentItems: items,
         };
       });
 
-      this.setData({ displayRentals: augmented, expandedPkg, expandedItem }, () => this._refreshSummary());
+      this.setData({ displayRentals: augmented, expandedPkg, expandedItem }, () => {
+        this._refreshSummary();
+        this._ensureReserveLists();
+      });
+    },
+
+    /* ---------- 门市价 / 预约价 ----------
+       2026-11-15 用户要求：租金下面加单选「门市价 / 预约价」；租金预设（pricePresets[].scene）记下选的是哪种，
+       后端据此生成每天的日租金记录并记 scene。价目表里没有这个商品的预约价时，「预约价」保持灰色不可选。 */
+
+    // 租赁商品的价目所有者：套餐按套餐价目，单品按分类价目
+    _priceOwner(r) {
+      if (r && r.package_id) return { type: '套餐', id: r.package_id };
+      if (r && r.category_id) return { type: '分类', id: r.category_id };
+      return null;
+    },
+    _sceneCacheKey(r, scene) {
+      const owner = this._priceOwner(r);
+      if (!owner) return '';
+      const shop = ((this.properties && this.properties.shop) || '').trim();
+      return [shop, scene, owner.type, owner.id].join('|');
+    },
+    _reserveAvailableFromCache(r) {
+      const key = this._sceneCacheKey(r, '预约');
+      const list = key && this._sceneLists ? this._sceneLists[key] : null;
+      return !!(list && list.length);
+    },
+    // 取某个场景的价目表（带缓存；查到才缓存，失败返回空表、下次再试）。门市价优先用租赁自带的 priceList。
+    async _scenePriceList(r, scene) {
+      const owner = this._priceOwner(r);
+      if (!owner) return [];
+      if (scene === '门市' && r.priceList && r.priceList.length) return r.priceList;
+      const key = this._sceneCacheKey(r, scene);
+      this._sceneLists = this._sceneLists || {};
+      if (this._sceneLists[key]) return this._sceneLists[key];
+      try {
+        const dataLib = require('../../../utils/data.js');
+        const shopObj = await dataLib.getShopByNamePromise(((this.properties && this.properties.shop) || ''));
+        if (!shopObj || !shopObj.id) return [];
+        const list = (await dataLib.getRentPriceListPromise(shopObj.id, owner.type, owner.id, scene, true)) || [];
+        this._sceneLists[key] = list;
+        return list;
+      } catch (err) {
+        return [];
+      }
+    },
+    // 购物车里每个商品都把预约价目查一遍（缓存里有的不再查），查完刷新「预约价」是否可点
+    async _ensureReserveLists() {
+      const rentals = this.data.displayRentals || [];
+      const pending = rentals.filter(r => {
+        const key = this._sceneCacheKey(r, '预约');
+        return key && !(this._sceneLists && this._sceneLists[key]);
+      });
+      if (!pending.length) return;
+      await Promise.all(pending.map(r => this._scenePriceList(r, '预约')));
+      const patch = {};
+      (this.data.displayRentals || []).forEach((r, i) => {
+        const available = this._reserveAvailableFromCache(r);
+        if (!!r._reserveAvailable !== available) patch[`displayRentals[${i}]._reserveAvailable`] = available;
+      });
+      if (Object.keys(patch).length) this.setData(patch);
+    },
+    onPkgSceneTap(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const scene = e.currentTarget.dataset.scene === '预约' ? '预约' : '门市';
+      const r = this.data.displayRentals[ridx];
+      if (!r) return;
+      if (scene === (r._priceScene || '门市')) return;
+      if (scene === '预约' && !r._reserveAvailable) return;   // 没有预约价：单选项是灰的，点了没反应
+      this._applyPkgScene(ridx, scene);
+    },
+    // 切换价目场景：租金/日换成该场景当天的价目价（店员手改过的租金不动，只记下场景）
+    async _applyPkgScene(ridx, scene) {
+      const r = this.data.displayRentals[ridx];
+      if (!r) return;
+      const key = pkgKey(r, ridx);
+      const list = await this._scenePriceList(r, scene);
+      const cur = this.data.displayRentals[ridx];
+      if (!cur || pkgKey(cur, ridx) !== key || (cur._priceScene || '门市') === scene) return;
+      const dateStr = splitISODateTime(cur.start_date).date || cur._startDate || formatDate(new Date());
+      const presets = (cur.pricePresets || []).slice();
+      const preset0 = presets[0] || null;
+      const manual = !!(preset0 && preset0.manual);
+      if (!manual && !catalogPriceFor(list, dateStr, new Date())) {
+        wx.showToast({ title: scene === '预约' ? '这一天没有预约价' : '这一天没有门市价', icon: 'none' });
+        return;
+      }
+      const next = manual
+        ? Object.assign({}, preset0, { scene })
+        : Object.assign({}, repricePreset(preset0, list, dateStr, new Date()), { scene });
+      if (presets.length) presets[0] = next; else presets.push(next);
+      const rate = Number(next.price) || 0;
+      this.setData({
+        [`displayRentals[${ridx}].pricePresets`]: presets,
+        [`displayRentals[${ridx}]._dailyRate`]: rate,
+        [`displayRentals[${ridx}]._dailyRateInput`]: rate ? rate.toFixed(2) : '',
+        [`displayRentals[${ridx}]._priceScene`]: scene,
+      });
+      this._refreshSummary();
+      this._emitSync(false);
     },
 
     _refreshSummary() {
@@ -682,7 +790,7 @@ Component({
           rental_id: r.id || 0,
           rent_type: '日场',
           day_type: (dow === 0 || dow === 6) ? '周末' : '平日',
-          scene: '门市',
+          scene: r._priceScene === '预约' ? '预约' : '门市',
           price: v,
           discount: 0,
           rent_date: startDateStr,
@@ -771,7 +879,18 @@ Component({
         : (r.category_id ? { type: '分类', id: r.category_id } : null);
       const preset0 = (r.pricePresets || [])[0] || null;
       const isServiceCenter = ((this.properties && this.properties.shop) || '').trim() === '万龙服务中心';
-      if ((!priceList.length || isServiceCenter) && owner && !(preset0 && preset0.manual)) {
+      // 租金按预约价的租赁，换日期后按预约价目重算；那天没有预约价就退回门市价（提示一下），不能留着门市价却标预约价
+      let scene = r._priceScene === '预约' ? '预约' : '门市';
+      let fellBack = false;
+      if (scene === '预约') {
+        priceList = await this._scenePriceList(r, '预约');
+        if (!(preset0 && preset0.manual) && !catalogPriceFor(priceList, dateStr, new Date())) {
+          wx.showToast({ title: '这一天没有预约价，已改回门市价', icon: 'none' });
+          scene = '门市';
+          fellBack = true;
+          priceList = await this._scenePriceList(r, '门市');
+        }
+      } else if ((!priceList.length || isServiceCenter) && owner && !(preset0 && preset0.manual)) {
         try {
           const dataLib = require('../../../utils/data.js');
           const shopObj = await dataLib.getShopByNamePromise(this.properties.shop || '');
@@ -787,13 +906,15 @@ Component({
       const presets = (cur.pricePresets || []).slice();
       const next = repricePreset(presets[0] || null, priceList, dateStr, new Date());
       if (!next) return;
+      if (scene === '预约' || fellBack) next.scene = scene;
       if (presets.length) presets[0] = next; else presets.push(next);
       const rate = Number(next.price) || 0;
       this.setData({
         [`displayRentals[${ridx}].pricePresets`]: presets,
-        [`displayRentals[${ridx}].priceList`]: priceList,
+        [`displayRentals[${ridx}].priceList`]: scene === '预约' ? (cur.priceList || []) : priceList,
         [`displayRentals[${ridx}]._dailyRate`]: rate,
         [`displayRentals[${ridx}]._dailyRateInput`]: rate.toFixed(2),
+        [`displayRentals[${ridx}]._priceScene`]: scene,
       });
       this._refreshSummary();
       this._emitSync(false);
@@ -1215,6 +1336,11 @@ Component({
         rental.realGuaranty = rental.guaranty;
         rental.guaranty_discount = 0;
         rental.priceList = priceList || [];
+        // 换了品类：原来按预约价的预设是旧品类的价，作废，下面按新品类的门市价目重新生成（价格场景回到门市价，
+        // 新品类有没有预约价由 _ensureReserveLists 重新查）
+        if ((rental.pricePresets || []).some(p => String(p.scene || '').trim() === '预约')) {
+          rental.pricePresets = [];
+        }
 
         // 4) 用 util.createRentalDetail 重算 pricePresets（getDailyRate 取 pricePresets[0].price）
         const sd = splitISODateTime(rental.start_date);

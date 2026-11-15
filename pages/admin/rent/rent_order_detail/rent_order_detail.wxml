@@ -178,8 +178,9 @@
       </view>
 
       <!-- 手机号 + 所属门店（双列紧凑布局） -->
-      <view class="kv-row kv-row--dual">
-        <view class="kv-cell">
+      <!-- 手机号按内容撑开、完整显示（不截断），门店放不下时折到下一行：见 wxss 的 kv-row--phone -->
+      <view class="kv-row kv-row--dual kv-row--phone">
+        <view class="kv-cell kv-cell--phone">
           <text class="kv-label">手机</text>
           <text
             class="kv-value kv-value--inline kv-value--nowrap {{order.customerCell ? 'kv-value--link' : ''}}"
@@ -296,6 +297,7 @@
           </view>
           <text class="rental-head-name">{{item.name}}</text>
           <view class="rental-head-meta">
+            <text class="scene-tag scene-tag--{{item._priceSceneClass}}" wx:if="{{item._priceSceneStr}}">{{item._priceSceneStr}}</text>
             <view class="rental-head-fee">{{item._rentIsEstimate ? '预计租金' : '租金'}}<text>{{item._rentDisplayStr}}</text></view>
             <view class="rental-head-fee">押金<text>{{item.guarantyAmountStr}}</text></view>
             <van-icon name="{{_expandedRentals[ridx] ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#999" />
@@ -310,6 +312,7 @@
             <view class="rental-showcase-summary">
               <text>押金 <text class="rental-showcase-summary-value">{{item.guarantyAmountStr}}</text></text>
               <text>{{item._rentIsEstimate ? '预计租金' : '租金'}} <text class="rental-showcase-summary-value rental-showcase-summary-value--accent">{{item._rentDisplayStr}}</text></text>
+              <text class="scene-tag scene-tag--{{item._priceSceneClass}}" wx:if="{{item._priceSceneStr}}">{{item._priceSceneStr}}</text>
             </view>
 
             <view class="rental-showcase-time-row">
@@ -355,12 +358,12 @@
                 <text class="rental-showcase-fee-label">超时</text>
                 <text class="rental-showcase-fee-value">{{item.totalOvertimeAmountStr}}</text>
               </view>
-              <view class="rental-showcase-fee-cell rental-showcase-fee-cell--tappable" bindtap="onToggleEntertain" data-ridx="{{ridx}}">
-                <view class="rental-showcase-fee-label rental-showcase-fee-label--row">
-                  <text>招待</text>
-                  <van-icon name="edit" size="11px" color="#9aa4b2" />
+              <!-- 招待：复选框（只有这个小方框能点，整格不再响应点击，避免误触）；点了仍先弹窗二次确认，确认后才保存 -->
+              <view class="rental-showcase-fee-cell">
+                <text class="rental-showcase-fee-label">招待</text>
+                <view class="entertain-check {{item.entertain ? 'entertain-check--on' : ''}}" bindtap="onToggleEntertain" data-ridx="{{ridx}}">
+                  <van-icon wx:if="{{item.entertain}}" name="success" size="12px" color="#ffffff" />
                 </view>
-                <text class="rental-showcase-fee-value {{item.entertain ? 'rental-showcase-fee-value--entertain' : ''}}">{{item.entertain ? '是' : '否'}}</text>
               </view>
             </view>
 
@@ -398,7 +401,10 @@
                 <text class="detail-col-subtotal">小计</text>
               </view>
               <view class="detail-table-row detail-table-row--tappable {{row.waived ? 'detail-table-row--waived' : ''}}" wx:for="{{item.feeRows}}" wx:key="dateStr" wx:for-item="row" wx:for-index="fidx" bindtap="onEditDayCharge" data-ridx="{{ridx}}" data-fidx="{{fidx}}">
-                <text class="detail-col-date">{{row.dateStr}}</text>
+                <view class="detail-col-date">
+                  <text>{{row.dateStr}}</text>
+                  <text class="scene-tag scene-tag--{{row.sceneClass}}" wx:if="{{row.sceneStr}}">{{row.sceneStr}}</text>
+                </view>
                 <text class="detail-col-amount">{{row.rentStr}}</text>
                 <text class="detail-col-overtime">{{row.overtimeStr}}</text>
                 <text class="detail-col-discount">{{row.discountStr}}</text>

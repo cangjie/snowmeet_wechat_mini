@@ -46,6 +46,28 @@
 .kv-cell--shop {
   flex: 1.1;
 }
+/* 手机号一行（2026-11-15 用户反馈手机号被截成「155075…」）：手机号 + 复制按钮按内容撑开、完整显示，
+   字号固定 26rpx；门店放不下时整格折到下一行，不再挤占手机号。只作用于这一行，其它双列行不变。 */
+.kv-row--phone {
+  flex-wrap: wrap;
+  row-gap: 4rpx;
+}
+.kv-row--phone .kv-cell--phone {
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.kv-row--phone .kv-cell--phone .kv-value {
+  flex: 0 0 auto;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+  font-size: 26rpx;
+  letter-spacing: 0;
+}
+.kv-row--phone .kv-cell--shop {
+  flex: 1 1 auto;
+  min-width: 240rpx;
+}
 .kv-label {
   color: #666;
   flex: 0 0 72rpx;
@@ -239,6 +261,21 @@
 .rental-head-fee { font-size: 24rpx; color: #6f7881; }
 .rental-head-fee text { color: #0b1c30; font-weight: 600; }
 
+/* 租金价目标签：门市价 / 预约价 / 会员价 */
+.scene-tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0 8rpx;
+  line-height: 32rpx;
+  border-radius: 6rpx;
+  font-size: 20rpx;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.scene-tag--shop { background: #eef1f4; color: #6f7881; }
+.scene-tag--reserve { background: #e1f1fb; color: #0b8fd6; }
+.scene-tag--member { background: #fdf0d8; color: #b7791f; }
+
 .rental-showcase {
   background: #f8fbff;
   padding: 12rpx;
@@ -345,6 +382,23 @@
 }
 .rental-showcase-fee-value--entertain {
   color: #d97706;
+}
+/* 招待复选框（2026-11-15 用户要求：原来整格可点容易误触，改成复选框，只有这个小方框响应点击） */
+.entertain-check {
+  box-sizing: border-box;
+  width: 44rpx;
+  height: 44rpx;
+  margin-top: 8rpx;
+  border: 2rpx solid #9aa4b2;
+  border-radius: 8rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.entertain-check--on {
+  background: #d97706;
+  border-color: #d97706;
 }
 .rental-showcase-subtotal {
   height: 68rpx;
@@ -515,7 +569,7 @@
 .detail-table-head .detail-col-overtime,
 .detail-table-head .detail-col-discount,
 .detail-table-head .detail-col-subtotal { color: #999; font-weight: 400; }
-.detail-col-date { flex: 0 0 140rpx; color: #666; }
+.detail-col-date { flex: 0 0 140rpx; color: #666; display: flex; flex-direction: column; align-items: flex-start; padding: 4rpx 0; }
 .detail-col-amount { flex: 0 0 100rpx; text-align: right; font-weight: 600; color: #333; }
 .detail-col-overtime { flex: 0 0 100rpx; text-align: right; color: #333; }
 .detail-col-discount { flex: 0 0 84rpx; text-align: right; color: #999; }
