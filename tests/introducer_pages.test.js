@@ -154,8 +154,30 @@ test('分销商列表可搜索并勾选启用的分销商批量发券', async t 
   page.onSearch({ detail: { value: '小王' } })
   assert.deepEqual(page.data.rows.map(r => r.name), ['小王'])
   page.onSelect(tap({ id: 1 }))
+  assert.equal(page.data.rows[0].checked, true)
+  page.onSelect(tap({ id: 1 }))
+  assert.equal(page.data.rows[0].checked, false)
+  page.onSelect(tap({ id: 1 }))
   page.onIssue()
   assert.deepEqual(env.nav, ['/pages/coach/admin/issue/issue?ids=17'])
+})
+
+test('分销商列表显示完整手机号，旧接口从会员详情补全，失败时提示暂不可用', async t => {
+  const env = setup(t, { staff: ADMIN, handler: (c, a) => {
+    if (a === 'ListIntroducers') return OK({ introducers: [ROW({ id: 1, phone: '13800001234', phoneTail: '1234' }), ROW({ id: 2, phoneTail: '5678' }), ROW({ id: 3 }), ROW({ id: 4, phoneTail: '9999' })] })
+    if (a === 'GetMemberDetailByStaff') return ++calls === 1 ? OK({ phone: '13900005678' }) : { code: 1, message: '查询失败' }
+    return OK({ coaches: [] })
+  } })
+  let calls = 0
+  const page = loadPage('pages/introducer/admin/list/list.js', {})
+  await page.load()
+  assert.deepEqual(page.data.rows.map(r => r.phoneDisplay), ['13800001234', '13900005678', '未填写', '手机号暂不可用'])
+  assert.equal(env.calls.filter(c => c.action === 'GetMemberDetailByStaff').length, 2)
+  const template = fs.readFileSync(path.join(__dirname, '../pages/introducer/admin/list/list.wxml'), 'utf8')
+  assert.match(template, /<checkbox-group[^>]*bindchange="onSelect"/)
+  assert.match(template, /<checkbox checked="\{\{item.checked\}\}"/)
+  assert.match(template, /distributor-name[\s\S]*?distributor-phone[\s\S]*?<\/view>/)
+  assert.match(template, /<phone-copy[^>]*phone="\{\{item.phone\}\}"/)
 })
 
 test('分销商列表可按启用状态筛选', async t => {

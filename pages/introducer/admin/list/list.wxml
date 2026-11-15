@@ -17,11 +17,14 @@
       <text class="chip {{statusFilter === 'stopped' ? 'on' : ''}}" data-value="stopped" bindtap="onStatusFilter">已停用</text>
     </view>
     <view wx:for="{{rows}}" wx:key="id" class="card card-pad" style="{{item.valid ? '' : 'opacity: 0.65;'}}">
-      <view class="card-row wrap" style="gap: 12rpx;">
-        <view wx:if="{{item.valid && item.coachId}}" class="btn" data-id="{{item.id}}" bindtap="onSelect">{{item.checked ? '✓ 已选' : '选择'}}</view>
-        <text class="card-title">{{item.name}}</text>
+      <view class="card-row distributor-heading">
+        <checkbox-group wx:if="{{item.valid && item.coachId}}" data-id="{{item.id}}" bindchange="onSelect">
+          <checkbox checked="{{item.checked}}" value="{{item.id}}" color="#006495" aria-label="选择{{item.name}}" />
+        </checkbox-group>
+        <text class="card-title distributor-name">{{item.name}}</text>
         <text class="tag {{item.typeClass}}">{{item.type}}</text>
         <text wx:if="{{!item.valid}}" class="tag muted">已停用</text>
+        <view class="card-meta distributor-phone">{{item.phoneDisplay}}<phone-copy wx:if="{{item.phone}}" phone="{{item.phone}}" /></view>
       </view>
       <view wx:if="{{item.cards}}" class="card-meta">发卡 {{item.cards.total}}（已领 {{item.cards.claimed}}）· 顾客 {{item.students}} · 本季消费 ¥{{item.seasonAmount}}</view>
       <view class="card-row wrap" style="gap: 12rpx;">

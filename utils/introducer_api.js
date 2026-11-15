@@ -48,6 +48,7 @@ module.exports = {
   fail,
   // ---- 介绍人管理（系统管理员 ≥300）----
   listIntroducers: () => get('Introducer', 'ListIntroducers'),
+  getMemberDetail: memberId => get('MemberAdmin', 'GetMemberDetailByStaff/' + encodeURIComponent(memberId)),
   listPlatformCoaches: () => get('CoachAdmin', 'ListCoaches'),
   lookupMember: cell => get('Introducer', 'LookupMember', { cell }),
   addIntroducer: body => post('Introducer', 'AddIntroducer', body),

@@ -1098,17 +1098,50 @@ test('没有结果或空页：应收 / 减免是 ¥0.00，不报错；金额按�
   assert.equal(page.data.pageChargeStr, '¥0.30')   // 0.1 + 0.2 不会变成 0.30000000000000004
 })
 
-test('汇总行：只有一页时写「应收 · 减免 · 共计收款」；多页时标明「本页」，共计收款放到下一行', () => {
+test('卡类零售 = 本页各订单的 careCardAmount 之和（养护购卡单的卡款，不在任何装备金额里）；没有的订单按 0', () => {
+  const page = loadList()
+  page.renderOrders([
+    // 今天 11-15 的真实形态：装备用刚买的卡，金额 0；卡款 1800 单独记在订单上
+    summaryOrder(1, [careAmount(11, 0, 0)], 1800),
+    summaryOrder(2, [careAmount(21, 230, 30)], 200),
+    summaryOrder(3, [careAmount(31, 100, 0)], 100)
+  ].map((o, i) => (i === 0 ? Object.assign(o, { careCardAmount: 1800 }) : o)), 3, 1, 50, 2100)
+  assert.equal(page.data.pageCardStr, '¥1800.00')
+  // 应收 − 减免 + 卡类零售 = 收款（这三单都已付清、没有退款）
+  assert.equal(page.data.pageChargeStr, '¥330.00')
+  assert.equal(page.data.pageDiscountStr, '¥30.00')
+  assert.equal(page.data.totalEarnStr, '¥2100.00')
+})
+
+test('卡类零售：多张购卡单累加、按分四舍五入；没有购卡单或空页是 ¥0.00', () => {
+  const page = loadList()
+  page.renderOrders([
+    Object.assign(summaryOrder(1, [], 1200), { careCardAmount: 1200 }),
+    Object.assign(summaryOrder(2, [], 0.1), { careCardAmount: 0.1 }),
+    Object.assign(summaryOrder(3, [], 0.2), { careCardAmount: 0.2 })
+  ], 3, 1, 50, 1200.3)
+  assert.equal(page.data.pageCardStr, '¥1200.30')
+  page.renderOrders([summaryOrder(4, [careAmount(41, 230, 0)], 230)], 1, 1, 50, 230)
+  assert.equal(page.data.pageCardStr, '¥0.00')
+  page.renderOrders([], 0, 1, 50, 0)
+  assert.equal(page.data.pageCardStr, '¥0.00')
+})
+
+test('汇总行：只有一页时写「应收 · 卡类零售 · 减免 · 共计收款」；多页时标明「本页」，共计收款放到下一行', () => {
   const bar = wxml.slice(wxml.indexOf('<!-- 统计行 + 分页 -->'), wxml.indexOf('<!-- 订单列表 -->'))
   const single = bar.match(/<view wx:if="\{\{totalPages <= 1\}\}" class="summary-bar">[\s\S]*?<\/view>/)[0]
   assert.match(single, /应收 \{\{pageChargeStr\}\}/)
   assert.match(single, /减免 \{\{pageDiscountStr\}\}/)
+  assert.match(single, /卡类零售 \{\{pageCardStr\}\}/)
   assert.match(single, /共计收款 \{\{allEarnStr\}\}/)
+  assert.ok(single.indexOf('应收') < single.indexOf('卡类零售') && single.indexOf('卡类零售') < single.indexOf('减免') && single.indexOf('减免') < single.indexOf('共计收款'))
   assert.doesNotMatch(single, /本页/)
   const multi = bar.match(/<view wx:else class="summary-bar">[\s\S]*?<\/view>/)[0]
   assert.match(multi, /本页 应收 \{\{pageChargeStr\}\}/)
   assert.match(multi, /减免 \{\{pageDiscountStr\}\}/)
+  assert.match(multi, /卡类零售 \{\{pageCardStr\}\}/)
   assert.match(multi, /收款 \{\{totalEarnStr\}\}/)
+  assert.ok(multi.indexOf('应收') < multi.indexOf('卡类零售') && multi.indexOf('卡类零售') < multi.indexOf('减免') && multi.indexOf('减免') < multi.indexOf('收款 {{totalEarnStr}}'))
   const count = bar.slice(bar.indexOf('<view class="summary-bar">'), bar.indexOf('<list-pager'))
   assert.match(count, /共 \{\{total\}\} 单，\{\{totalPages\}\} 页/)
   assert.match(count, /wx:if="\{\{totalPages > 1\}\}"[\s\S]*共计收款 \{\{allEarnStr\}\}/)

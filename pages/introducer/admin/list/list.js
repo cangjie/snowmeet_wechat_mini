@@ -7,10 +7,24 @@ const TYPE_CLASS = { '教练': 'blue', 'KOL': 'kol', '机构': 'org' }
 
 function decorate(r) {
   return {
-    id: r.id, memberId: r.memberId, coachId: r.coachId, name: r.name, realName: r.realName || '', phoneTail: r.phoneTail || '', type: r.type, valid: r.valid, wechat: r.wechat, alipay: r.alipay, alipayMessage: r.alipayMessage || '',
+    id: r.id, memberId: r.memberId, coachId: r.coachId, name: r.name, realName: r.realName || '', phone: r.phone || '', phoneTail: r.phoneTail || '', phoneDisplay: r.phone || (r.phoneUnavailable ? '手机号暂不可用' : '未填写'), type: r.type, valid: r.valid, wechat: r.wechat, alipay: r.alipay, alipayMessage: r.alipayMessage || '',
     typeClass: TYPE_CLASS[r.type] || 'muted',
     wechatClass: r.wechat === '已填写' ? 'ok' : 'warn',
     alipayClass: r.alipay === '已绑定' ? 'ok' : (r.alipay === '未绑定' ? 'danger' : 'muted')
+  }
+}
+
+// 旧版列表只返回尾号，用已有会员详情接口补全；限并发，升级后端后无需额外请求。
+async function fillLegacyPhones(rows) {
+  const pending = rows.filter(r => !Object.prototype.hasOwnProperty.call(r, 'phone') && r.phoneTail && r.memberId)
+  for (let i = 0; i < pending.length; i += 4) {
+    await Promise.all(pending.slice(i, i + 4).map(async r => {
+      try {
+        const member = await api.getMemberDetail(r.memberId)
+        if (!member || typeof member.phone !== 'string') throw new Error('手机号不可用')
+        r.phone = member.phone
+      } catch (_) { r.phoneUnavailable = true }
+    }))
   }
 }
 
@@ -34,7 +48,8 @@ Page({
   load() {
     return api.listIntroducers().then(d => api.listPlatformCoaches()
       .then(platform => ({ d, platform, statsUnavailable: false }))
-      .catch(() => ({ d, platform: { coaches: [] }, statsUnavailable: true }))).then(({ d, platform, statsUnavailable }) => {
+      .catch(() => ({ d, platform: { coaches: [] }, statsUnavailable: true }))).then(async ({ d, platform, statsUnavailable }) => {
+      await fillLegacyPhones(d.introducers || [])
       this.loadedOnce = true
       const byId = {}
       ;(platform.coaches || []).forEach(r => { byId[r.coach.id] = r })

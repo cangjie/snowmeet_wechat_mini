@@ -46,6 +46,8 @@ Page({
     // 本页的应收 / 减免合计（把每件装备卡上显示的「金额」「减免」加起来，已取消的装备不算；见 renderOrders）
     pageChargeStr: '',
     pageDiscountStr: '',
+    // 本页养护购卡单里卖出的卡款（后端 Order.careCardAmount；买卡的钱不在任何装备的金额里，单列一项，才对得上收款）
+    pageCardStr: '',
     querying: false,
     aiQueryConditions: ''
   },
@@ -183,6 +185,7 @@ Page({
     var totalEarn = 0
     var pageCharge = 0
     var pageDiscount = 0
+    var pageCard = 0
     for (var i = 0; orders && i < orders.length; i++) {
       var order = orders[i]
       var bizDate = new Date(order.biz_date)
@@ -243,6 +246,7 @@ Page({
         if (care.use_card) order.useCard = true
       }
       order.haveTicket = haveTicket
+      pageCard += order.careCardAmount || 0
       totalEarn += order.totalEarnAmount || 0
     }
     var totalPages = Math.max(1, Math.ceil(total / pageSize))
@@ -255,7 +259,8 @@ Page({
       totalEarnStr: util.showAmount(totalEarn),
       allEarnStr: allEarn == null ? '暂不可用' : util.showAmount(allEarn),
       pageChargeStr: util.showAmount(Math.round(pageCharge * 100) / 100),
-      pageDiscountStr: util.showAmount(Math.round(pageDiscount * 100) / 100)
+      pageDiscountStr: util.showAmount(Math.round(pageDiscount * 100) / 100),
+      pageCardStr: util.showAmount(Math.round(pageCard * 100) / 100)
     })
   },
 
