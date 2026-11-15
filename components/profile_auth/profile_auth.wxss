@@ -31,12 +31,15 @@
   color: #888;
   text-align: center;
 }
+/* app.wxss 给所有 button 设了 groove 灰边框、背景色和 40px 高度，这里的按钮要自己把它们盖掉 */
 .pa-avatar-btn {
   margin: 36rpx 0 0;
   padding: 0;
   width: 160rpx;
   height: 160rpx;
   line-height: 1;
+  border: none;
+  border-style: none;
   border-radius: 50%;
   background: transparent;
   overflow: hidden;
@@ -100,12 +103,26 @@
 .pa-btn {
   width: 48%;
   margin: 0;
+  padding: 0;
   height: 88rpx;
   line-height: 88rpx;
   font-size: 32rpx;
+  border: none;
+  border-style: none;
   border-radius: 12rpx;
+}
+.pa-btn::after {
+  border: none;
 }
 .pa-btn-skip {
   background: #f2f2f2;
   color: #555;
+}
+.pa-btn-save {
+  background: #07c160;
+  color: #fff;
+}
+.pa-btn-save[disabled] {
+  background: #9ce0bb;
+  color: #fff;
 }

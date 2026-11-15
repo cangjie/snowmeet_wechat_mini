@@ -1,6 +1,6 @@
 <!-- 验证手机号之后授权头像和昵称：可以保存，也可以跳过（不影响开单、支付、取板）。逻辑见 profile_auth.js -->
-<view class="pa-mask" wx:if="{{visible}}" catchtouchmove="noop" catchtap="noop">
-  <view class="pa-sheet" catchtap="noop">
+<view class="pa-mask" wx:if="{{visible}}" catchtouchmove="noop">
+  <view class="pa-sheet">
     <view class="pa-title">完善个人资料</view>
     <view class="pa-sub">设置头像和昵称，方便店里认出您。也可以先跳过。</view>
 
