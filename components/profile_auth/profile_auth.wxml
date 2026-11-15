@@ -6,12 +6,12 @@
 
     <!-- 保存走表单提交：保存那一刻读昵称框里的内容，不依赖输入事件 -->
     <form class="pa-form" bindsubmit="onSubmit">
-      <!-- 头像和昵称微信没有一次授权的接口（getUserProfile 已收回），所以先填昵称、再选头像；弹出来时昵称框自动获得焦点，
-           键盘上方直接出现「用微信昵称」 -->
+      <!-- 头像和昵称微信没有一次授权的接口（getUserProfile 已收回），所以先填昵称、再选头像；
+           弹层出来时 modal 提示怎么操作。昵称框不能自动聚焦（程序聚焦不是顾客点的，「用微信昵称」会报 init before tap），要顾客自己点 -->
       <view class="pa-field">
         <text class="pa-label">昵称</text>
         <input class="pa-input" name="nickName" type="nickname" value="{{nickName}}" placeholder="先填昵称（可选「用微信昵称」）" maxlength="32"
-               focus="{{focusNick}}" bindinput="onNickInput" bindblur="onNickInput" bindchange="onNickInput" />
+               bindinput="onNickInput" bindblur="onNickInput" bindchange="onNickInput" />
       </view>
 
       <button class="pa-avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar" hover-class="none">

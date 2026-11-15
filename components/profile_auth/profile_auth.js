@@ -23,7 +23,6 @@ Component({
     currentAvatarUrl: '',
     nickName: '',
     hasNick: false,
-    focusNick: false,
     canSave: false,
     saving: false,
     error: ''
@@ -76,18 +75,20 @@ Component({
       const stored = (res && res.data) || {}
       const nickName = typeof stored.nickName === 'string' ? stored.nickName : ''
       this._sessionKey = sessionKey
-      // 先填昵称、再选头像：弹出来时昵称框自动获得焦点，键盘上方直接出现「用微信昵称」；
       // 已经存过的昵称、头像带出来（资料不全时补齐、修改时改）
       this.setData({
         visible: true, editing: !!editing, avatarPath: '', currentAvatarUrl: stored.avatarUrl || '',
-        nickName: nickName, hasNick: !!nickName.trim(), focusNick: true, canSave: false, saving: false, error: ''
+        nickName: nickName, hasNick: !!nickName.trim(), canSave: false, saving: false, error: ''
       })
       this._refreshCanSave()
+      // 用 modal 提示怎么操作（先昵称后头像，只缺一样就只写那一样）；顾客自己点开修改时不用提示。
+      // 昵称框不自动聚焦：程序聚焦不是顾客点的，开发者工具报 invalid init scl: init before tap。modal 不拦弹层。
+      if (!editing) this._showHint(!nickName.trim(), !stored.avatarUrl)
       await new Promise(resolve => { this._resolve = resolve })
     },
 
     _finish() {
-      if (this.data.visible) this.setData({ visible: false, focusNick: false })
+      if (this.data.visible) this.setData({ visible: false })
       const resolve = this._resolve
       this._resolve = null
       if (resolve) resolve()
@@ -135,9 +136,11 @@ Component({
       })
     },
 
-    // 回到昵称框：先收焦点再给，输入框才会重新获得焦点
-    _refocusNick() {
-      this.setData({ focusNick: false }, () => this.setData({ focusNick: true }))
+    // 弹层出来时的操作提示（只有「知道了」）
+    _showHint(needNick, needAvatar) {
+      const content = profileAuth.hintText({ needNick: needNick, needAvatar: needAvatar })
+      if (!content || typeof wx === 'undefined' || typeof wx.showModal !== 'function') return
+      wx.showModal({ title: '请授权昵称和头像', content: content, showCancel: false, confirmText: '知道了' })
     },
 
     async onSave() {
@@ -149,11 +152,9 @@ Component({
         return
       }
       if (!nickName && !this.data.hasNick) {
+        // 选了「去填昵称」就回到弹层，由顾客自己点昵称框
         const proceed = await this._confirmAvatarOnly()
-        if (!proceed) {
-          this._refocusNick()
-          return
-        }
+        if (!proceed) return
       }
       const app = currentApp()
       const sessionKey = this._sessionKey || (app && app.globalData && app.globalData.sessionKey)

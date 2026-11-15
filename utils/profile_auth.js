@@ -69,6 +69,18 @@ function ensureOn(owner) {
   return Promise.resolve()
 }
 
+// 弹层出来时用 modal 提示怎么操作（2026-11-15 用户：提示不明显，用个 modal）。先昵称后头像；只缺一样就只写那一样。
+// 昵称框不能自动聚焦：程序聚焦不是顾客点的，开发者工具报 invalid init scl: init before tap，「用微信昵称」要顾客自己点输入框。
+function hintText(options) {
+  const o = options || {}
+  const lines = []
+  if (o.needNick) lines.push('点击「昵称」输入框，再点键盘上方的「用微信昵称」')
+  if (o.needAvatar) lines.push('点击下方圆形的「头像」，选择「用微信头像」')
+  if (lines.length === 0) return ''
+  const numbered = lines.length === 1 ? lines : lines.map((line, i) => (i === 0 ? '①' : '②') + ' ' + line)
+  return numbered.join('\n') + '\n\n也可以点「跳过」。'
+}
+
 // 弹头像昵称之前，先确认顾客已经同意小程序的隐私协议。昵称输入框（type="nickname"）和头像按钮要用到「用户隐私」，
 // 没同意过时昵称框会降级成普通输入框、头像选择也会失败（开发者工具报 showNicknameAccessory:fail ... errno:104），
 // 而 type="nickname" 自己不会触发隐私弹窗，所以要先主动要一次：wx.requirePrivacyAuthorize（已同意会直接成功）。
@@ -100,4 +112,4 @@ function editOn(owner) {
   return Promise.resolve()
 }
 
-module.exports = { NICK_MAX, cleanNickName, canSave, needPrompt, hasProfile, profileView, isDone, markDone, ensureOn, editOn, requirePrivacy }
+module.exports = { NICK_MAX, cleanNickName, canSave, needPrompt, hasProfile, profileView, isDone, markDone, ensureOn, editOn, requirePrivacy, hintText }

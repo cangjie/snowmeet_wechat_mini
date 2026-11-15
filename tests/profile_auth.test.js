@@ -155,6 +155,10 @@ test('saveMyProfilePromise：HTTP 非 2xx（wx.uploadFile 对任何状态码都�
 
 // ---------- 弹层组件 ----------
 
+// 提示用的 modal（只有「知道了」，showCancel:false）和需要选择的 modal（「只保存头像吗？」）分开数
+const confirmModals = calls => calls.modals.filter(m => m.showCancel !== false)
+const hintModals = calls => calls.modals.filter(m => m.showCancel === false)
+
 function setupComponent(t, { profile, saveResult, sessionKey = 'sess-1', modalConfirm = true, privacy = 'unsupported' } = {}) {
   const calls = { get: 0, save: [], toasts: [], modals: [], privacyAsked: 0, privacyChecked: 0 }
   // getApp() 在真机上每次返回同一个对象，globalData 里记的「本次运行已处理」才会一直在
@@ -368,25 +372,59 @@ test('组件：先查到没有会员，同一会话里验证手机号之后再 e
 
 // ---------- 先填昵称、再选头像（2026-11-15 用户：头像和昵称没法一次授权，那就先获取昵称，再获取头像） ----------
 
-test('弹层模板：昵称在头像前面，昵称框自动获得焦点（键盘上方直接出现「用微信昵称」，省一次点击）', () => {
+test('弹层模板：昵称在头像前面，昵称框不设自动聚焦（要顾客自己点）', () => {
   const wxml = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxml'), 'utf8')
   const nickAt = wxml.search(/<input[^>]*type="nickname"/)
   const avatarAt = wxml.indexOf('open-type="chooseAvatar"')
   assert.ok(nickAt > 0 && avatarAt > 0)
   assert.ok(nickAt < avatarAt, '昵称要排在头像前面')
-  assert.match(wxml, /<input[^>]*type="nickname"[^>]*focus="\{\{focusNick\}\}"/)
+  // 不能给昵称框设 focus：程序自动聚焦不是用户点的，开发者工具报 invalid init scl: init before tap，「用微信昵称」要顾客自己点输入框
+  assert.doesNotMatch(wxml.slice(nickAt, wxml.indexOf('/>', nickAt)), /focus=/)
 })
 
-test('组件：弹出来时昵称框要焦点；关掉后焦点收回，下次再弹还是从昵称开始', async t => {
-  const { c } = setupComponent(t)
-  assert.equal(c.data.focusNick, false)
+test('hintText：昵称、头像都缺 → 两步都写；只缺一样 → 只写那一步', () => {
+  const both = profileAuth.hintText({ needNick: true, needAvatar: true })
+  assert.match(both, /昵称/); assert.match(both, /用微信昵称/); assert.match(both, /头像/); assert.match(both, /用微信头像/)
+  assert.ok(both.indexOf('昵称') < both.indexOf('头像'), '先昵称后头像')
+  const nickOnly = profileAuth.hintText({ needNick: true, needAvatar: false })
+  assert.match(nickOnly, /用微信昵称/); assert.doesNotMatch(nickOnly, /用微信头像/)
+  const avatarOnly = profileAuth.hintText({ needNick: false, needAvatar: true })
+  assert.match(avatarOnly, /用微信头像/); assert.doesNotMatch(avatarOnly, /用微信昵称/)
+  assert.equal(profileAuth.hintText({ needNick: false, needAvatar: false }), '')
+})
+
+test('组件：弹层出来时用 modal 提示怎么操作（只有「知道了」），先昵称后头像；modal 不拦弹层', async t => {
+  const { c, calls } = setupComponent(t)
   const done = c.ensure()
   await settle()
   assert.equal(c.data.visible, true)
-  assert.equal(c.data.focusNick, true)
+  assert.equal(hintModals(calls).length, 1)
+  const hint = hintModals(calls)[0]
+  assert.equal(hint.showCancel, false)
+  assert.match(hint.content, /用微信昵称/)
+  assert.match(hint.content, /用微信头像/)
+  assert.ok(hint.content.indexOf('用微信昵称') < hint.content.indexOf('用微信头像'))
   await c.onSkip()
   await done
-  assert.equal(c.data.focusNick, false)
+})
+
+test('组件：只缺昵称（已有头像）只提示昵称，只缺头像（已有昵称）只提示头像；点顶部修改时不提示', async t => {
+  const nickMissing = setupComponent(t, { profile: { code: 0, data: { needProfile: true, nickName: null, avatarUrl: 'https://x/a.jpg', updateDate: '2026-11-15T08:00:00' } } })
+  const d1 = nickMissing.c.ensure(); await settle()
+  assert.match(hintModals(nickMissing.calls)[0].content, /用微信昵称/)
+  assert.doesNotMatch(hintModals(nickMissing.calls)[0].content, /用微信头像/)
+  await nickMissing.c.onSkip(); await d1
+
+  const avatarMissing = setupComponent(t, { profile: { code: 0, data: { needProfile: true, nickName: '已有昵称', avatarUrl: null, updateDate: '2026-11-15T08:00:00' } } })
+  const d2 = avatarMissing.c.ensure(); await settle()
+  assert.match(hintModals(avatarMissing.calls)[0].content, /用微信头像/)
+  assert.doesNotMatch(hintModals(avatarMissing.calls)[0].content, /用微信昵称/)
+  await avatarMissing.c.onSkip(); await d2
+
+  const editing = setupComponent(t, { profile: { code: 0, data: { needProfile: false, nickName: '旧昵称', avatarUrl: 'https://x/a.jpg', updateDate: '2026-11-15T08:00:00' } } })
+  const d3 = editing.c.edit(); await settle()
+  assert.equal(hintModals(editing.calls).length, 0, '用户自己点开修改，不用再提示')
+  await editing.c.onSkip(); await d3
 })
 
 test('组件：先填昵称、再选头像，一次保存两样都带上', async t => {
@@ -439,8 +477,8 @@ test('只选了头像、昵称是空的：先提示「还没填昵称」，选�
   await settle()
   cancel.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
   await cancel.c.onSave()
-  assert.equal(cancel.calls.modals.length, 1)
-  assert.match(cancel.calls.modals[0].title + cancel.calls.modals[0].content, /昵称/)
+  assert.equal(confirmModals(cancel.calls).length, 1)
+  assert.match(confirmModals(cancel.calls)[0].title + confirmModals(cancel.calls)[0].content, /昵称/)
   assert.equal(cancel.calls.save.length, 0, '选了去填昵称就不保存')
   assert.equal(cancel.c.data.visible, true)
   await cancel.c.onSkip()
@@ -463,7 +501,7 @@ test('昵称已经填了、或者本来就存过昵称：只换头像不再提�
   filled.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
   await filled.c.onSave()
   await d1
-  assert.equal(filled.calls.modals.length, 0)
+  assert.equal(confirmModals(filled.calls).length, 0)
 
   const existing = setupComponent(t, { profile: { code: 0, data: { needProfile: true, nickName: '已有昵称', avatarUrl: null, updateDate: '2026-11-15T08:00:00' } } })
   const d2 = existing.c.ensure()
@@ -472,7 +510,7 @@ test('昵称已经填了、或者本来就存过昵称：只换头像不再提�
   existing.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
   await existing.c.onSave()
   await d2
-  assert.equal(existing.calls.modals.length, 0)
+  assert.equal(confirmModals(existing.calls).length, 0)
   assert.equal(existing.calls.save[0].nickName, '已有昵称')
 })
 
@@ -502,7 +540,7 @@ test('edit（点「我的」页顶部修改）：不管是不是「已处理」�
   await c.onSave()
   await done
   assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '新昵称', avatarPath: '' })
-  assert.equal(calls.modals.length, 0)
+  assert.equal(confirmModals(calls).length, 0)
   assert.equal(c.data.visible, false)
 })
 
@@ -565,16 +603,14 @@ test('组件：隐私协议已经同意 → 直接弹，不再要授权', async 
   await done
 })
 
-test('组件：隐私协议还没同意 → 先弹系统的隐私弹窗，顾客同意之后才弹头像昵称弹层，并且昵称框才获得焦点', async t => {
+test('组件：隐私协议还没同意 → 先弹系统的隐私弹窗，顾客同意之后才弹头像昵称弹层', async t => {
   const { c, calls } = setupComponent(t, { privacy: 'accept' })
   const done = c.ensure()
   await settle()
   assert.equal(calls.privacyAsked, 1)
   assert.equal(c.data.visible, false, '顾客还没点同意，我们的弹层不能先出来')
-  assert.equal(c.data.focusNick, false)
   await new Promise(resolve => setTimeout(resolve, 60))
   assert.equal(c.data.visible, true)
-  assert.equal(c.data.focusNick, true)
   await c.onSkip()
   await done
 })
