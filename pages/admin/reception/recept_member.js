@@ -75,6 +75,7 @@ Page({
     this._memberBaselineForm = null;
     this._memberProfileMissing = false;
     const checkinId = Number(options.checkinId || 0);
+    this._scannedCheckin = options.stage === 'need_phone' || options.stage === 'verified';
     if (!checkinId) {
       this.setData({ mode: 'walkin' });
       return;
@@ -524,6 +525,9 @@ Page({
     ];
     if (this.data.member) {
       params.push('memberId=' + encodeURIComponent(this.data.member.id));
+    }
+    if (this._scannedCheckin && this.data.checkinId) {
+      params.push('receptCheckinId=' + encodeURIComponent(this.data.checkinId));
     }
     if (this.data.isTest) {
       params.push('isTest=1');

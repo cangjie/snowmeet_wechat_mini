@@ -147,6 +147,24 @@ test('店员输手机号已授权：直接显示会员信息，不弹窗', async
   cleanup(env.page)
 })
 
+test('扫码后跳过手机号：开单链接携带本次接待记录；手动手机号入口不携带', async () => {
+  const scanned = setup(() => ({ code: 0, data: { stage: 'need_phone' } }))
+  scanned.page.onLoad({ checkinId: '5', stage: 'need_phone' })
+  await settle()
+  scanned.page.onWalkInInstead()
+  scanned.page.shopSelected({ detail: { shop: '万龙服务中心', care: 1 } })
+  scanned.page.onBizTap(tap({ type: 'maintain' }))
+  assert.match(scanned.nav[0], /receptCheckinId=5/)
+  cleanup(scanned.page)
+
+  const byPhone = setup(() => ({ code: 0, data: { stage: 'phone_authed', memberId: 42 } }))
+  byPhone.page.onLoad({ checkinId: '6', stage: 'phone_authed' })
+  await settle(); await settle()
+  byPhone.page._navigateToBusiness('maintain')
+  assert.doesNotMatch(byPhone.nav[0], /receptCheckinId=/)
+  cleanup(byPhone.page)
+})
+
 test('已编辑的称呼和电话可选择只作为本次订单联系人', async () => {
   const env = setup(() => VERIFIED)
   await openVerified(env)

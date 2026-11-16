@@ -64,6 +64,9 @@ Page({
 
     let customer = { memberId: null, name: '', cell: '', gender: '' };
     let orderId = options.orderId ? safeDecode(options.orderId) : null;
+    // 只认本次页面明确带来的接待记录，不从本机草稿回填，避免找回旧单时串人。
+    this._receptCheckinId = !orderId && Number.isSafeInteger(Number(options.receptCheckinId)) && Number(options.receptCheckinId) > 0
+      ? Number(options.receptCheckinId) : 0;
     // 顾客信息页勾了「这是测试订单」：建单/存草稿时让后端记为测试单
     this._isTest = safeDecode(options.isTest) === '1';
     let orderCustomerLoaded = false;
@@ -140,9 +143,16 @@ Page({
   onUnload() { this._careCardPageUnloaded = true; this._careCardRevision = (this._careCardRevision || 0) + 1; },
 
   // 建单/存草稿请求附带的参数。isTest：顾客信息页勾了「这是测试订单」，订单记为测试单（order.is_test=1）。
-  // 顾客开单前扫码报到过的，后端自己查到后把订单记为「已核验本人」，这里不用带
+  // 接待记录只作为关联凭据；后端按店员、扫码时间和会员状态校验。
   _receptQuery() {
-    return this._isTest ? '&isTest=true' : '';
+    return (this._isTest ? '&isTest=true' : '')
+      + (this._receptCheckinId ? '&receptCheckinId=' + encodeURIComponent(this._receptCheckinId) : '');
+  },
+
+  _acceptReceptMember(submitted) {
+    if (submitted && submitted.member_id && !this.data.customer.memberId) {
+      this.setData({ 'customer.memberId': submitted.member_id });
+    }
   },
 
   /* ---------- 通用：返回 / 顶部 ---------- */
@@ -575,6 +585,7 @@ Page({
           r.timeStamp = (new Date(r.create_date || Date.now())).getTime();
         });
       }
+      this._acceptReceptMember(submitted);
       this.setData({ order: submitted });
       return submitted;
     }).catch((err) => {
@@ -690,6 +701,7 @@ Page({
         });
       }
       if (submitted) submitted.rentals = submitted.rentals || [];
+      this._acceptReceptMember(submitted);
       this.setData({ order: submitted });
       return submitted;
     }).catch((err) => {
