@@ -2,6 +2,7 @@
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/coach-view.js')
+const shareCover = require('../common/share-cover.js')
 
 const COUPON_STATE = {
   held: { text: '在手', tone: 'blue' }, pending: { text: '待接受', tone: 'warn' }, accepted: { text: '已被接受', tone: 'ok' },
@@ -23,6 +24,8 @@ Page({
     this.boot()
   },
   onShow() { if (this.loadedOnce) this.load() },
+  onReady() { this._membershipCanvasReady = true; shareCover.prepareList(this, 'templates', '学员卡'); shareCover.prepareList(this, 'pending', '学员卡') },
+  onUnload() { this._membershipCanvasClosed = true },
   onPullDownRefresh() { this.load().then(() => wx.stopPullDownRefresh()) },
 
   boot() {
@@ -52,8 +55,16 @@ Page({
   },
 
   onTab(e) { this.setData({ tab: e.currentTarget.dataset.tab }); this.loadTab() },
-  loadTemplates() { return api.listCardTemplates().then(d => this.setData({ templates: (d.templates || []).map(t => Object.assign({}, t, { benefit: view.benefitLines(t.carePrices, t.rentalRate) })) })).catch(base.fail) },
+  loadTemplates() { return api.listCardTemplates().then(d => {
+    const rows = (d.templates || []).map(t => Object.assign({}, t, { benefit: view.benefitLines(t.carePrices, t.rentalRate) }))
+    this.setData({ templates: shareCover.decorate(this, rows, '学员卡') })
+    shareCover.prepareList(this, 'templates', '学员卡')
+  }).catch(base.fail) },
   onManageTemplates() { wx.navigateTo({ url: '../card_standard/card_standard' }) },
+  onRetryCover(e) {
+    const d = e.currentTarget.dataset
+    if (d.field === 'templates' || d.field === 'pending') shareCover.retry(this, d.field, d.name, '学员卡')
+  },
 
   // ---- 发卡 / 领取情况 ----
   loadCards() {
@@ -64,9 +75,10 @@ Page({
       }))
       this.setData({
         counts: d.counts, cards: rows,
-        pending: rows.filter(r => r.status === 'issued'),
+        pending: shareCover.decorate(this, rows.filter(r => r.status === 'issued'), '学员卡'),
         statusRows: rows
       })
+      shareCover.prepareList(this, 'pending', '学员卡')
     }).catch(base.fail)
   },
 
@@ -93,7 +105,7 @@ Page({
     const target = e && e.target && e.target.dataset
     const name = d.coach ? d.coach.name : '分销商'
     const path = (target && target.path) || (d.pending[0] && d.pending[0].sharePath) || '/pages/mine/mine'
-    return { title: name + '送你一张' + ((target && target.name) || '学员卡'), path }
+    return { title: name + '送你一张' + ((target && target.name) || '学员卡'), path, imageUrl: (target && target.cover) || shareCover.FALLBACK }
   },
 
   // ---- 学员消费 ----

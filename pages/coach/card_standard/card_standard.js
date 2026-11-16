@@ -3,6 +3,7 @@
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/coach-view.js')
+const shareCover = require('../common/share-cover.js')
 
 Page({
   data: {
@@ -12,6 +13,8 @@ Page({
 
   onLoad() { base.boot(this, 'coach').then(() => this.load()).catch(() => {}) },
   onShow() { if (this.loadedOnce && !this.data.dirty) this.load() },
+  onReady() { this._membershipCanvasReady = true; shareCover.prepareList(this, 'templates', '学员卡') },
+  onUnload() { this._membershipCanvasClosed = true },
   onPullDownRefresh() { this.load().then(() => wx.stopPullDownRefresh(), () => wx.stopPullDownRefresh()) },
 
   apply(d) {
@@ -27,7 +30,9 @@ Page({
   load() {
     return api.listCardTemplates().then(d => {
       this.loadedOnce = true
-      this.setData({ loading: false, blocked: '', editing: false, dirty: false, templates: (d.templates || []).map(t => Object.assign({}, t, { benefit: view.benefitLines(t.carePrices, t.rentalRate) })) })
+      const rows = (d.templates || []).map(t => Object.assign({}, t, { benefit: view.benefitLines(t.carePrices, t.rentalRate) }))
+      this.setData({ loading: false, blocked: '', editing: false, dirty: false, templates: shareCover.decorate(this, rows, '学员卡') })
+      shareCover.prepareList(this, 'templates', '学员卡')
     }).catch(err => {
       this.setData({ loading: false })
       if (err && err.code === 3) this.setData({ blocked: '你还不是教练或机构' })
@@ -39,8 +44,9 @@ Page({
   onEdit(e) { return api.getCardTemplate(e.currentTarget.dataset.id).then(d => this.apply(d)).catch(base.fail) },
   onShareAppMessage(e) {
     const target = e && e.target && e.target.dataset
-    return { title: '送你一张' + ((target && target.name) || '会员卡'), path: (target && target.path) || '/pages/mine/mine' }
+    return { title: '送你一张' + ((target && target.name) || '会员卡'), path: (target && target.path) || '/pages/mine/mine', imageUrl: (target && target.cover) || shareCover.FALLBACK }
   },
+  onRetryCover(e) { shareCover.retry(this, 'templates', e.currentTarget.dataset.name, '学员卡') },
   onName(e) { this.setData({ name: e.detail.value, dirty: true }) },
   onBackToList() { return this.load() },
 

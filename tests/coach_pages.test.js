@@ -218,7 +218,7 @@ test('教练中心：不是教练被挡；发卡后分享路径来自服务端�
   assert.equal(page.data.pending.length, 1)
   // 分享：用卡片按钮上的路径，不分享教练中心
   assert.deepEqual(page.onShareAppMessage({ from: 'button', target: { dataset: { path: '/pages/coach/claim/claim?t=aaaaaaaaaaaaaaaaaaaaaaaa' } } }),
-    { title: '张教练送你一张学员卡', path: '/pages/coach/claim/claim?t=aaaaaaaaaaaaaaaaaaaaaaaa' })
+    { title: '张教练送你一张学员卡', path: '/pages/coach/claim/claim?t=aaaaaaaaaaaaaaaaaaaaaaaa', imageUrl: '/pages/coach/assets/membership-share-cover.jpg' })
   page.onCreate(); await settle(); assert.ok(s.calls.some(c => c.action === 'CreateCard' && c.method === 'POST'))
   page.onRevoke(tap({ id: 1 })); await settle(); assert.ok(s.calls.some(c => c.action === 'RevokeMyCard' && c.body.cardId === 1))
   page.onTab(tap({ tab: 'status' })); await settle()
@@ -327,10 +327,37 @@ test('机构卡种可直接分享，顾客通过卡种链接领取并显示自�
   } })
   const home = s.load('pages/coach/home/home.js'); home.onLoad({}); await settle()
   assert.equal(home.data.templates[0].name, '教练卡')
-  assert.deepEqual(home.onShareAppMessage({ target: { dataset: { name: '教练卡', path: template.sharePath } } }), { title: '张教练送你一张教练卡', path: template.sharePath })
+  assert.deepEqual(home.onShareAppMessage({ target: { dataset: { name: '教练卡', path: template.sharePath, cover: 'wxfile://coach-card.jpg' } } }), { title: '张教练送你一张教练卡', path: template.sharePath, imageUrl: 'wxfile://coach-card.jpg' })
   const claim = s.load('pages/coach/claim/claim.js'); await claim.onLoad({ template: 'AbCd123456789012' })
   assert.equal(claim.data.state, 'claimable'); assert.equal(claim.data.cardName, '教练卡')
   await claim.onClaim()
   assert.equal(claim.data.state, 'claimed_by_me')
   assert.equal(s.calls.find(c => c.action === 'ClaimShareTemplate').method, 'POST')
+})
+
+test('机构中心在分享前为不同卡种生成对应封面并保留各自领取链接', async t => {
+  const templates = [
+    { id: 8, name: '学员卡', sharePath: '/pages/coach/claim/claim?template=Student1', carePrices: [], rentalRate: 0.8 },
+    { id: 9, name: '教练卡', sharePath: '/pages/coach/claim/claim?template=Teacher1', carePrices: [], rentalRate: 0.9 }
+  ]
+  const s = setup(t, { handler: (c, a) => {
+    if (a === 'GetMyCoach') return OK({ isCoach: true, coach: COACH({ introducerType: '机构' }), cards: {} })
+    if (a === 'ListMyCards') return OK({ cards: [], counts: {} })
+    if (a === 'ListMyCardTemplates') return OK({ templates })
+    return OK({})
+  } })
+  let drawn = ''
+  global.wx.createCanvasContext = () => {
+    let words = ''
+    return { drawImage() {}, setTextAlign() {}, setTextBaseline() {}, setFillStyle() {}, setFontSize() {},
+      measureText(text) { return { width: text.length * 30 } }, fillText(text) { words += text },
+      draw(_, done) { drawn = words; setImmediate(done) } }
+  }
+  global.wx.canvasToTempFilePath = o => setImmediate(() => o.success({ tempFilePath: 'wxfile://' + drawn }))
+  const home = s.load('pages/coach/home/home.js')
+  home.onLoad({}); home.onReady(); await settle()
+  assert.deepEqual(home.data.templates.map(t => t.coverPath), ['wxfile://学员卡', 'wxfile://教练卡'])
+  const second = home.data.templates[1]
+  assert.deepEqual(home.onShareAppMessage({ target: { dataset: { name: second.name, path: second.sharePath, cover: second.coverPath } } }),
+    { title: '张教练送你一张教练卡', path: second.sharePath, imageUrl: 'wxfile://教练卡' })
 })

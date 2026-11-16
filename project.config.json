@@ -49,7 +49,16 @@
   "compileType": "miniprogram",
   "packOptions": {
     "ignore": [],
-    "include": []
+    "include": [
+      {
+        "type": "file",
+        "value": "pages/coach/assets/membership-share-cover.jpg"
+      },
+      {
+        "type": "file",
+        "value": "pages/coach/assets/membership-share-background.jpg"
+      }
+    ]
   },
   "editorSetting": {
     "tabIndent": "insertSpaces",

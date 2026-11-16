@@ -25,7 +25,9 @@
           <view class="card-title">{{item.name}}</view>
           <view wx:for="{{item.benefit.lines}}" wx:for-item="line" wx:key="label" class="card-meta">{{line.label}}：单项 {{line.one}} · 双项 {{line.two}}</view>
           <view class="card-meta">租赁：{{item.benefit.rental}}</view>
-          <button class="share-btn" open-type="share" data-path="{{item.sharePath}}" data-name="{{item.name}}">分享给顾客</button>
+          <button wx:if="{{item.coverPath}}" class="share-btn" open-type="share" data-path="{{item.sharePath}}" data-name="{{item.name}}" data-cover="{{item.coverPath}}">分享给顾客</button>
+          <view wx:elif="{{item.coverError}}" class="card-meta" data-field="templates" data-name="{{item.name}}" bindtap="onRetryCover">封面生成失败，点此重试</view>
+          <view wx:else class="card-meta">正在生成分享封面…</view>
         </view>
         <view wx:if="{{!templates.length}}" class="co-empty">还没有卡种，请先创建</view>
         <view class="note blue">同一个卡种可分享给多人，每人每雪季可领取一张。</view>
@@ -34,7 +36,9 @@
       <view wx:for="{{pending}}" wx:key="id" class="card card-pad">
         <view class="card-row"><view class="grow card-row"><text class="card-title small">卡 …{{item.tokenTail}}</text><text class="tag warn">待领取</text></view><text class="card-meta">{{item.created}}</text></view>
         <view class="card-row">
-          <button class="share-btn" open-type="share" data-path="{{item.sharePath}}">分享给顾客</button>
+          <button wx:if="{{item.coverPath}}" class="share-btn" open-type="share" data-path="{{item.sharePath}}" data-cover="{{item.coverPath}}">分享给顾客</button>
+          <view wx:elif="{{item.coverError}}" class="card-meta" data-field="pending" bindtap="onRetryCover">封面生成失败，点此重试</view>
+          <view wx:else class="card-meta">正在生成分享封面…</view>
           <view class="btn danger" data-id="{{item.id}}" bindtap="onRevoke">撤销</view>
         </view>
       </view>
@@ -98,3 +102,4 @@
     </block>
   </block>
 </view>
+<canvas canvas-id="membershipShareCover" style="position: fixed; left: -10000px; top: 0; width: 500px; height: 400px; pointer-events: none;"></canvas>
