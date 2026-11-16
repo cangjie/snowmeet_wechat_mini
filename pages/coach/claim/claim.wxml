@@ -62,8 +62,8 @@
   <!-- 已有该分销商的卡 -->
   <view wx:elif="{{state === 'already_has'}}" class="center">
     <view class="state-icon info">i</view>
-    <view class="big-title">你已有{{coachName}}的学员卡</view>
-    <view class="card-meta" style="margin: 12rpx 0 28rpx;">本雪季每位分销商的卡只能领取一张，有效期至 {{validUntil}}。</view>
+    <view class="big-title">你已领取过这类卡</view>
+    <view class="card-meta" style="margin: 12rpx 0 28rpx;">本雪季同一卡种只能领取一张，有效期至 {{validUntil}}。</view>
     <view class="btn primary" bindtap="onGoMine">查看我的学员卡</view>
   </view>
 </view>

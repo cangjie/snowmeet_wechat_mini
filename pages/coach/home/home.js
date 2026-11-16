@@ -70,7 +70,7 @@ Page({
   loadCards() {
     return api.listMyCards().then(d => {
       const rows = d.cards.map(x => Object.assign({}, x.card, {
-        sharePath: x.sharePath, tag: view.statusTag(x.card.status),
+        sharePath: x.sharePath, name: x.card.cardName || '学员卡', tag: view.statusTag(x.card.status),
         created: view.dateText(x.card.createDate), claimed: view.dateText(x.card.claimedAt)
       }))
       this.setData({
@@ -80,6 +80,20 @@ Page({
       })
       shareCover.prepareList(this, 'pending', '学员卡')
     }).catch(base.fail)
+  },
+
+  onCreateForTemplate(e) {
+    if (this.data.creating) return
+    const id = Number(e.currentTarget.dataset.id)
+    const template = this.data.templates.find(t => t.id === id)
+    if (!template) return
+    this.setData({ creating: true })
+    return api.createCard(id).then(card => {
+      const pending = this.data.pending.concat([{ id: card.cardId, name: card.cardName || template.name, tokenTail: card.tokenTail, sharePath: card.sharePath }])
+      this.setData({ creating: false, pending: shareCover.decorate(this, pending, '学员卡') })
+      shareCover.prepareList(this, 'pending', '学员卡')
+      base.done('已生成，请分享给一位顾客')
+    }).catch(err => { this.setData({ creating: false }); base.fail(err) })
   },
 
   onCreate() {
@@ -95,7 +109,7 @@ Page({
   onRevoke(e) {
     const id = e.currentTarget.dataset.id
     base.confirm('撤销学员卡', '撤销后这张卡不能再被领取。', '撤销').then(ok => {
-      if (ok) api.revokeMyCard(id).then(() => { base.done('已撤销'); this.loadCards() }).catch(base.fail)
+      if (ok) api.revokeMyCard(id).then(() => { this.setData({ pending: this.data.pending.filter(c => c.id !== id) }); base.done('已撤销'); this.loadCards() }).catch(base.fail)
     })
   },
 

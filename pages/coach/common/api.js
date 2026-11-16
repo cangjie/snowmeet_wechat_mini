@@ -61,7 +61,7 @@ module.exports = {
   makeMyCoupons: form => post('Distributor', 'MakeMyCoupons', form),
   // ---- 教练自己 ----
   getMyCoach: () => get('Coach', 'GetMyCoach'),
-  createCard: () => post('Coach', 'CreateCard'),
+  createCard: templateId => post('Coach', 'CreateCard', templateId == null ? {} : { templateId }),
   listMyCards: status => get('Coach', 'ListMyCards', { status }),
   revokeMyCard: cardId => post('Coach', 'RevokeMyCard', { cardId }),
   getStudents: () => get('Coach', 'GetStudents'),

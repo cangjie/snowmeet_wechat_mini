@@ -8,12 +8,12 @@ const shareCover = require('../common/share-cover.js')
 Page({
   data: {
     blocked: '', loading: true, canEdit: false, reason: '', name: '', modes: view.MODES,
-    cells: [], rental: null, rentalText: '', dirty: false, validUntil: '', saving: false, editing: false, templates: [], templateId: null
+    cells: [], rental: null, rentalText: '', dirty: false, validUntil: '', saving: false, editing: false, templates: [], pending: [], pendingError: false, templateId: null, creating: false
   },
 
   onLoad() { base.boot(this, 'coach').then(() => this.load()).catch(() => {}) },
   onShow() { if (this.loadedOnce && !this.data.dirty) this.load() },
-  onReady() { this._membershipCanvasReady = true; shareCover.prepareList(this, 'templates', '学员卡') },
+  onReady() { this._membershipCanvasReady = true; shareCover.prepareList(this, 'pending', '学员卡') },
   onUnload() { this._membershipCanvasClosed = true },
   onPullDownRefresh() { this.load().then(() => wx.stopPullDownRefresh(), () => wx.stopPullDownRefresh()) },
 
@@ -32,7 +32,7 @@ Page({
       this.loadedOnce = true
       const rows = (d.templates || []).map(t => Object.assign({}, t, { benefit: view.benefitLines(t.carePrices, t.rentalRate) }))
       this.setData({ loading: false, blocked: '', editing: false, dirty: false, templates: shareCover.decorate(this, rows, '学员卡') })
-      shareCover.prepareList(this, 'templates', '学员卡')
+      return this.loadPending()
     }).catch(err => {
       this.setData({ loading: false })
       if (err && err.code === 3) this.setData({ blocked: '你还不是教练或机构' })
@@ -40,13 +40,42 @@ Page({
     })
   },
 
+  loadPending() {
+    const revision = this._pendingRevision || 0
+    return api.listMyCards('issued').then(d => {
+      if (revision !== (this._pendingRevision || 0)) return
+      const rows = (d.cards || []).map(x => ({ id: x.card.id, name: x.card.cardName || '学员卡', tokenTail: x.card.tokenTail, sharePath: x.sharePath }))
+      this.setData({ pending: shareCover.decorate(this, rows, '学员卡'), pendingError: false })
+      shareCover.prepareList(this, 'pending', '学员卡')
+    }).catch(() => { this.setData({ pendingError: true }) })
+  },
+  onCreateShare(e) {
+    if (this.data.creating) return
+    const id = Number(e.currentTarget.dataset.id)
+    const template = this.data.templates.find(t => t.id === id)
+    if (!template) return
+    this.setData({ creating: true })
+    return api.createCard(id).then(card => {
+      this._pendingRevision = (this._pendingRevision || 0) + 1
+      const pending = this.data.pending.concat([{ id: card.cardId, name: card.cardName || template.name, tokenTail: card.tokenTail, sharePath: card.sharePath }])
+      this.setData({ creating: false, pending: shareCover.decorate(this, pending, '学员卡') })
+      shareCover.prepareList(this, 'pending', '学员卡')
+      base.done('已生成，请分享给一位顾客')
+    }).catch(err => { this.setData({ creating: false }); base.fail(err) })
+  },
+  onRevokePending(e) {
+    const id = Number(e.currentTarget.dataset.id)
+    return base.confirm('撤销待领取卡', '撤销后这张卡不能再被领取。', '撤销').then(ok => {
+      if (ok) return api.revokeMyCard(id).then(() => { this._pendingRevision = (this._pendingRevision || 0) + 1; this.setData({ pending: this.data.pending.filter(c => c.id !== id) }); return this.loadPending() }).catch(base.fail)
+    })
+  },
   onNew() { return api.getCardTemplate().then(d => this.apply(d)).catch(base.fail) },
   onEdit(e) { return api.getCardTemplate(e.currentTarget.dataset.id).then(d => this.apply(d)).catch(base.fail) },
   onShareAppMessage(e) {
     const target = e && e.target && e.target.dataset
     return { title: '送你一张' + ((target && target.name) || '会员卡'), path: (target && target.path) || '/pages/mine/mine', imageUrl: (target && target.cover) || shareCover.FALLBACK }
   },
-  onRetryCover(e) { shareCover.retry(this, 'templates', e.currentTarget.dataset.name, '学员卡') },
+  onRetryCover(e) { shareCover.retry(this, 'pending', e.currentTarget.dataset.name, '学员卡') },
   onName(e) { this.setData({ name: e.detail.value, dirty: true }) },
   onBackToList() { return this.load() },
 

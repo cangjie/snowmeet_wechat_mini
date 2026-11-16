@@ -97,6 +97,7 @@ const OK = data => ({ code: 0, message: '', data })
 test('机构创建具名卡种并按底价校验，保存后显示在卡种列表', async t => {
   let templates = []
   const calls = env(t, (p, body) => {
+    if (p === 'Coach/ListMyCards') return OK({ cards: [] })
     if (p === 'Distributor/ListMyCardTemplates') return OK({ templates })
     if (p === 'Distributor/GetMyCardTemplate') return OK(STANDARD({ name: '' }))
     if (p === 'Distributor/SaveMyCardTemplate') {
@@ -125,8 +126,8 @@ test('机构创建具名卡种并按底价校验，保存后显示在卡种列�
   assert.equal(save.method, 'POST'); assert.equal(save.body.name, '学员卡')
   assert.equal(save.body.care[0].value, 0.75); assert.equal(save.body.rental_rate, 0.85)
   assert.equal(page.data.editing, false); assert.equal(page.data.templates[0].name, '学员卡')
-  assert.deepEqual(page.onShareAppMessage({ target: { dataset: { name: '学员卡', path: '/pages/coach/claim/claim?template=AbCd1234', cover: 'wxfile://student-card.jpg' } } }),
-    { title: '送你一张学员卡', path: '/pages/coach/claim/claim?template=AbCd1234', imageUrl: 'wxfile://student-card.jpg' })
+  assert.deepEqual(page.onShareAppMessage({ target: { dataset: { name: '学员卡', path: '/pages/coach/claim/claim?t=AbCd1234', cover: 'wxfile://student-card.jpg' } } }),
+    { title: '送你一张学员卡', path: '/pages/coach/claim/claim?t=AbCd1234', imageUrl: 'wxfile://student-card.jpg' })
 })
 
 test('无机构身份被拦；保存被服务端拒绝后保留编辑内容', async t => {
@@ -188,9 +189,14 @@ test('制作会员卡页的 wxml / json / wxss 齐全，事件处理函数都在
   for (const m of wxml.matchAll(/bind(?:tap|input)="(\w+)"/g)) assert.match(js, new RegExp('\\b' + m[1] + '\\s*\\('), m[1])
 })
 
-test('卡种管理页生成带名称的封面并用于对应卡种分享', async t => {
-  const card = { id: 9, name: '教练卡', sharePath: '/pages/coach/claim/claim?template=Teacher1', carePrices: [], rentalRate: null }
-  env(t, p => p === 'Distributor/ListMyCardTemplates' ? OK({ templates: [card] }) : OK({}))
+test('卡种生成独立分享卡，分享链接来自服务端且封面使用卡种名', async t => {
+  const card = { id: 9, name: '教练卡', carePrices: [], rentalRate: null }
+  const calls = env(t, (p, body) => {
+    if (p === 'Distributor/ListMyCardTemplates') return OK({ templates: [card] })
+    if (p === 'Coach/ListMyCards') return OK({ cards: [] })
+    if (p === 'Coach/CreateCard') return OK({ cardId: 1, cardName: '教练卡', tokenTail: '1234', sharePath: '/pages/coach/claim/claim?t=unique1234' })
+    throw new Error(p)
+  })
   let drawn = ''
   global.wx.createCanvasContext = () => {
     let words = ''
@@ -201,8 +207,10 @@ test('卡种管理页生成带名称的封面并用于对应卡种分享', async
   global.wx.canvasToTempFilePath = o => setImmediate(() => o.success({ tempFilePath: 'wxfile://' + drawn }))
   const page = loadPage('pages/coach/card_standard/card_standard.js', {})
   page.onLoad(); page.onReady(); await settle()
-  const row = page.data.templates[0]
+  await page.onCreateShare({ currentTarget: { dataset: { id: 9 } } }); await settle()
+  assert.equal(calls.api.find(c => c.path === 'Coach/CreateCard').body.templateId, 9)
+  const row = page.data.pending[0]
   assert.equal(row.coverPath, 'wxfile://教练卡')
   assert.deepEqual(page.onShareAppMessage({ target: { dataset: { name: row.name, path: row.sharePath, cover: row.coverPath } } }),
-    { title: '送你一张教练卡', path: row.sharePath, imageUrl: 'wxfile://教练卡' })
+    { title: '送你一张教练卡', path: '/pages/coach/claim/claim?t=unique1234', imageUrl: 'wxfile://教练卡' })
 })
