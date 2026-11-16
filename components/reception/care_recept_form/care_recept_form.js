@@ -13,6 +13,7 @@ const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 const cardRules = require('../../../utils/careCardSale.js');
+const bestBenefit = require('../../../utils/care_best_benefit.js');
 
 // 与 data.js uploadFilePromise 的上传域名保持一致（文件落在处理上传那台服务器的磁盘）
 const UPLOAD_HOST = data.IMAGE_HOST;
@@ -70,17 +71,6 @@ function careFitsCard(care, { card, season }) {
   return equip.every(Boolean) ? true : null;
 }
 
-// 按优先顺序挑第一张能用的卡；前面有张卡要等装备填完才能判定，就整体等一等（wait），不往下选。
-function pickCareCard(care, cards, left) {
-  for (const entry of cards) {
-    if (!(left[entry.card.id] > 0)) continue;
-    const fits = careFitsCard(care, entry);
-    if (fits === true) return { entry };
-    if (fits === null) return { wait: true };
-  }
-  return null;
-}
-
 // 与手选弹层选卡同一口径的卡字段：限装备季卡锁装备，没开卡的打蜡/热蜡季卡标「待开卡」，订单生效时由服务端绑定
 function autoCardFields({ card, season }) {
   const needsBinding = season && /打蜡|热蜡/.test(card.card_name || '');
@@ -91,6 +81,26 @@ function autoCardFields({ card, season }) {
 function hasChosenService(care) {
   return care.need_edge === 1 || care.need_wax === 1 || care.need_unwax === 1 || care.free_wax === 1
     || care.seal_board === 1 || care.maintain_board === 1 || !!care.summer;
+}
+
+function selectedBenefitKey(care) {
+  if (care.ticket_code) return 'ticket:' + care.ticket_code;
+  if (care.use_card && care.card_id) return 'card:' + care.card_id;
+  if (care.coach_card_id) return 'coach:' + care.coach_card_id;
+  return null;
+}
+
+async function mapConcurrent(items, limit, fn) {
+  const result = new Array(items.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, async () => {
+    for (;;) {
+      const i = next++;
+      if (i >= items.length) break;
+      result[i] = await fn(items[i], i);
+    }
+  }));
+  return result;
 }
 
 // 新建一个空 care（snake_case 对齐后端；valid=0 草稿态，PlaceCareOrder 才置 1）
@@ -478,7 +488,8 @@ Component({
       await Promise.resolve(); // 先启动当前事件内合并的计价任务。
       while (!this._ticketAutoDetached && !this.data.newCardMode && !this.data.hasCardSelection
         && this._carePriceWork && this._carePriceWork.size) {
-        await Promise.all(Array.from(this._carePriceWork));
+        try { await Promise.all(Array.from(this._carePriceWork)); }
+        catch (_) { throw new Error('养护优惠或计价失败，请重新计算'); }
       }
       if (!this.data.newCardMode && !this.data.hasCardSelection
         && this.data.displayCares.some(c => this._needsMachineWaxBenefit(c))) {
@@ -486,7 +497,13 @@ Component({
       }
       if (this.data.priceError && !this.data.hasCardSelection) throw new Error('养护计价失败，请重新计算');
     },
-    onRetryPrices() { this._scheduleAllCarePrices(); },
+    onRetryPrices() {
+      this._bestBenefitState = null;
+      this._memberCareTicketsLoad = null;
+      this._memberCareCardsLoad = null;
+      this._scheduleOldCustomerTicket();
+      this._scheduleAllCarePrices();
+    },
     /* ---------- 计费（服务端计算，与 PlaceCareOrder 共用 CareController.CalcCharge；
        附加费/减免由 computeCharge 在服务费之上累加）。
        opts.derive=true（换券/换卡时传）：服务项由服务端按新选择推导；
@@ -515,8 +532,7 @@ Component({
       this._priceSeqCounter = seq;
       this._priceSeqMap[key] = seq;
       if (this._ticketAutoDetached || this.data.newCardMode || this.data.hasCardSelection) return;
-      if (this._needsMachineWaxBenefit(care)) return this._autoSelectMachineWaxBenefit(cidx);
-      this.setData({ priceError: false });
+      if (!this._benefitBasisFailed && (!this._bestBenefitState || !this._bestBenefitState.failed)) this.setData({ priceError: false });
       // 全量状态整包提交（用户 2026-07-09 拍板）：店铺/会员 + care 内装备/服务/券码/卡(card_id,card_name)/附加费。
       // 卡选择跟着单件装备（care）走，卡信息只在 care 内、不设平级字段
       const req = {
@@ -526,7 +542,7 @@ Component({
         changedField: changed,
         care: payload,
       };
-      return this._trackCarePrice(data.calcCareChargePromise(req, app.globalData.sessionKey)
+      const work = this._trackCarePrice(data.calcCareChargePromise(req, app.globalData.sessionKey)
         .then((res) => {
           if (that._ticketAutoDetached || that.data.newCardMode || that.data.hasCardSelection) return;
           if ((Number(that.data.memberId) || 0) !== (Number(req.memberId) || 0)) return;
@@ -604,6 +620,10 @@ Component({
           if (Math.max(that._priceSeqMap[key] || 0, that._priceSeqMap[currentKey] || 0) !== seq) return;
           that.setData({ priceError: true });
         }));
+      const serviceWork = this._servicePriceWork || (this._servicePriceWork = new Set());
+      serviceWork.add(work);
+      work.then(() => serviceWork.delete(work), () => serviceWork.delete(work));
+      return work;
     },
     /* ---------- 卡片开合 / 增删 ---------- */
     onToggleCare(e) {
@@ -825,6 +845,7 @@ Component({
       const mode = this.data.newCardMode;
       if (mode) {
         if (!['need_edge', 'need_wax', 'need_unwax', 'free_wax', 'urgent'].includes(flag)) return;
+        this._releaseManualBenefitForServiceChange(care, cidx);
         this._mutate(cidx, c => {
           c[flag] = c[flag] === 1 ? 0 : 1;
           if (flag === 'need_wax') c.need_unwax = c.need_wax;
@@ -840,6 +861,7 @@ Component({
       // 养板（2026-11-10）：和热蜡同一类业务，互斥、互相替换——选上就换掉热蜡 / 机打蜡、默认带刮蜡，再点取消（刮蜡 / 封板一并清掉）。
       // 最终组合由服务端 ApplyServiceLinkage / CareSealRules 收敛，这里先同步免得按钮闪一下。
       if (flag === 'maintain_board') {
+        this._releaseManualBenefitForServiceChange(care, cidx);
         const wasScrapeOnly = isScrapeOnlyCare(care, this.data.shop);
         const turnOn = care.maintain_board !== 1;
         this._mutate(cidx, (c) => {
@@ -860,19 +882,21 @@ Component({
           return;
         }
         if (care.seal_board === 1) return;
+        this._releaseManualBenefitForServiceChange(care, cidx);
         this._mutate(cidx, (c) => { c.seal_board = 1; c.need_unwax = 0; });
         this._fetchPrice(cidx, { changed: 'seal_board' });
         return;
       }
       if (flag === 'need_unwax' && (care.need_wax === 1 || care.maintain_board === 1)) {
         if (care.need_unwax === 1) return;
+        this._releaseManualBenefitForServiceChange(care, cidx);
         this._mutate(cidx, (c) => { c.need_unwax = 1; c.seal_board = 0; });
         this._fetchPrice(cidx, { changed: 'need_unwax' });
         return;
       }
       // 只翻本次点的开关；联动（热蜡带刮蜡/机打蜡互斥/修刃默认角度）由服务端
       // ApplyServiceLinkage 判定，响应整个 care 回填
-      if (flag === 'free_wax') this._rememberManualTicketChoice(cidx);
+      this._releaseManualBenefitForServiceChange(care, cidx);
       const wasScrapeOnly = isScrapeOnlyCare(care, this.data.shop);
       this._mutate(cidx, (c) => {
         c[flag] = c[flag] === 1 ? 0 : 1;
@@ -888,6 +912,7 @@ Component({
     onSummerTap(e) {
       const cidx = Number(e.currentTarget.dataset.cidx);
       const mode = e.currentTarget.dataset.mode; // 'now' | 'later'
+      this._releaseManualBenefitForServiceChange(this.data.displayCares[cidx], cidx);
       // 只翻 summer 本身；later→三项 / now→清三项 / 取消立等 等联动由服务端判定
       this._mutate(cidx, (c) => {
         c.summer = c.summer === mode ? null : mode;
@@ -980,6 +1005,15 @@ Component({
         return;
       }
       this.setData({ 'amountModal.show': false });
+      if (field === 'discount') {
+        this._ensureBenefitMember();
+        const care = this.data.displayCares[cidx];
+        if (care) {
+          const key = this._benefitIdentity(care, cidx);
+          this._autoBenefitBaseDiscount[key] = v;
+          delete this._benefitBasisSnapshots[key];
+        }
+      }
       this._mutate(cidx, (c) => { c[field] = v; if (field === 'discount') c._manualDiscount = v; });
     },
     /* ---------- 照片（对齐旧 afterRead/delImage，即传即得 image_id） ---------- */
@@ -1052,8 +1086,14 @@ Component({
         });
     },
     _canShowMachineWax(care) {
-      return this.data.newCardMode === 'machine' || this.data.hasMachineWaxTicket
-        || this._availableMachineWaxCards(care).length > 0;
+      const memberId = Number(this.data.memberId) || 0;
+      const cards = this._machineWaxCardsMemberId === memberId ? this._machineWaxSeasonCards || [] : [];
+      // 按顾客账户显示按钮；使用时仍检查季卡今天是否已用及绑定装备是否匹配。
+      return this.data.newCardMode === 'machine' || this.data.hasMachineWaxTicket || cards.some(card => card && !card.is_refund
+        && (card.member_id == null || Number(card.member_id) === memberId)
+        && (!card.biz_type || card.biz_type === '养护')
+        && (card.isSeason || card.total === null || (card.card_name || '').includes('季卡'))
+        && cardRules.isMachineWaxSeasonCard(card.card_name, null));
     },
     _hasMachineWaxBenefit(care) {
       const memberId = Number(this.data.memberId) || 0;
@@ -1066,55 +1106,6 @@ Component({
     _needsMachineWaxBenefit(care) {
       return care.free_wax === 1 && !care.warranty && !care.entertain && care.summer == null
         && !this._hasMachineWaxBenefit(care);
-    },
-    _autoSelectMachineWaxBenefit(cidx) {
-      const memberId = Number(this.data.memberId) || 0;
-      const identity = this._priceIdentity(this.data.displayCares[cidx], cidx);
-      const pending = this._machineWaxSelections || (this._machineWaxSelections = {});
-      if (pending[identity.key] && pending[identity.key].memberId === memberId) return pending[identity.key].promise;
-      const selection = { memberId };
-      pending[identity.key] = selection;
-      const currentIndex = () => {
-        if (pending[identity.key] !== selection || Number(this.data.memberId) !== memberId || this._autoTicketBlocked()) return -1;
-        const index = this._findPriceCare(identity);
-        const care = index >= 0 && this.data.displayCares[index];
-        return care && care.free_wax === 1 && !care.warranty && !care.entertain ? index : -1;
-      };
-      const work = Promise.resolve(app.loginPromiseNew).then(() => {
-        if (!memberId) throw new Error('请先选择顾客');
-        // 点击时重新读取，沿用服务端的券有效期和季卡今日使用状态。
-        return Promise.all([
-          this._getMemberCareCards(memberId, true).promise,
-          data.getMemberTicketsPromise(memberId, '养护', true, app.globalData.sessionKey),
-        ]);
-      }).then(([cards, tickets]) => {
-        const index = currentIndex();
-        if (index < 0) return;
-        const care = this.data.displayCares[index];
-        if (this._hasMachineWaxBenefit(care)) return this._fetchPrice(index, { changed: 'free_wax' });
-        const others = this.data.displayCares.filter((c, i) => i !== index && !c.is_cancel);
-        const availableCards = this._availableMachineWaxCards(care, cards)
-          .filter(card => !others.some(c => c.use_card && Number(c.card_id) === Number(card.id)))
-          .sort((a, b) => Number(!!b.equipBound) - Number(!!a.equipBound) || Number(a.id) - Number(b.id));
-        const availableTickets = (tickets || []).filter(ticket => ticket && ticket.code && Number(ticket.template_id) === 12
-          && (ticket.member_id == null || Number(ticket.member_id) === memberId)
-          && !others.some(c => c.ticket_code === ticket.code))
-          .sort((a, b) => (a.expire_date || '9999').localeCompare(b.expire_date || '9999'));
-        // 保留已有有效选择；否则优先季卡，再用最早到期的单次券。
-        const existing = availableTickets.find(ticket => ticket.code === care.ticket_code);
-        const card = existing ? null : availableCards[0];
-        const ticket = existing || (!card && availableTickets[0]);
-        if (!card && !ticket) throw new Error('没有可用于当前装备的机打蜡季卡或券');
-        return this._applyTicketSelection(index, ticket || null, card || null, { preserveServices: true });
-      }).catch(error => {
-        if (currentIndex() < 0) return;
-        this.setData({ priceError: true });
-        wx.showToast({ title: error.message || '查询机打蜡权益失败，请重试', icon: 'none' });
-      }).finally(() => {
-        if (pending[identity.key] === selection) delete pending[identity.key];
-      });
-      selection.promise = this._trackCarePrice(work);
-      return selection.promise;
     },
     _getMemberCareCards(memberId, refresh = false) {
       let load = this._memberCareCardsLoad;
@@ -1184,98 +1175,269 @@ Component({
     _scheduleOldCustomerTicket() {
       if (this._ticketAutoQueued || this._ticketAutoDetached) return;
       this._ticketAutoQueued = true;
-      Promise.resolve().then(() => {
+      const scheduled = Promise.resolve().then(() => {
         this._ticketAutoQueued = false;
         if (!this._ticketAutoDetached) return this._autoSelectOldCustomerTicket();
       }).catch(e => console.warn('auto select old customer ticket failed', e));
+      // 包含等待服务联动的阶段，确保结算和 waitForPrices 不会在比价开始前结束。
+      this._trackCarePrice(scheduled);
     },
     _autoTicketBlocked() {
       return this._ticketAutoDetached || this.data.newCardMode || this.data.hasCardSelection
         || this.data.cardBusy || this.data.cardSubmitted || this.data.ticketPopup.show;
     },
-    _rememberManualTicketChoice(cidx) {
+    _ensureBenefitMember() {
       const memberId = Number(this.data.memberId) || 0;
       if (this._oldCustomerTicketMember !== memberId) {
         this._oldCustomerTicketMember = memberId;
         this._oldCustomerTicketState = null;
         this._oldCustomerPricePromise = null;
         this._manualTicketChoices = {};
+        this._autoBenefitSelections = {};
+        this._autoBenefitBaseDiscount = {};
+        this._benefitBasisSnapshots = {};
+        this._bestBenefitState = null;
       }
+      this._autoBenefitBaseDiscount = this._autoBenefitBaseDiscount || {};
+      this._benefitBasisSnapshots = this._benefitBasisSnapshots || {};
+    },
+    _rememberManualTicketChoice(cidx) {
+      this._ensureBenefitMember();
       const care = this.data.displayCares[cidx];
-      if (care) (this._manualTicketChoices || (this._manualTicketChoices = {}))[this._careKey(care, cidx)] = true;
+      if (care) {
+        (this._manualTicketChoices || (this._manualTicketChoices = {}))[this._careKey(care, cidx)] = true;
+        const key = this._benefitIdentity(care, cidx);
+        delete this._benefitBasisSnapshots[key];
+        delete this._autoBenefitBaseDiscount[key];
+      }
+    },
+    _benefitIdentity(care, index) {
+      return care.timeStamp ? 't' + care.timeStamp : this._careKey(care, index);
+    },
+    _releaseManualBenefitForServiceChange(care, index) {
+      if (!care) return;
+      this._ensureBenefitMember();
+      if (this._manualTicketChoices) delete this._manualTicketChoices[this._careKey(care, index)];
+      const selected = selectedBenefitKey(care);
+      const key = this._benefitIdentity(care, index);
+      if (selected) {
+        // 旧草稿的 discount 可能包含券卡优惠：先按旧项目还原权益优惠，再比较新项目。
+        if (care._manualDiscount == null && this._autoBenefitBaseDiscount[key] == null && Number(care.discount) > 0
+          && !this._benefitBasisSnapshots[key]) {
+          const payload = this._stripUI(care);
+          Object.assign(payload, { ticket: null, product: null, careImages: null, discount: 0, ticket_discount: 0 });
+          this._benefitBasisSnapshots[key] = { care: payload, discount: Number(care.discount) };
+        }
+        (this._autoBenefitSelections || (this._autoBenefitSelections = {}))[key] = selected;
+      }
+    },
+    async _resolveBenefitBases(memberId) {
+      const snapshots = this._benefitBasisSnapshots;
+      const entries = Object.entries(snapshots);
+      if (!entries.length) {
+        if (this._benefitBasisFailed) { this._benefitBasisFailed = false; this.setData({ priceError: false }); }
+        return;
+      }
+      if (!memberId || !this.data.shop) return;
+      try {
+        await Promise.all(entries.map(async ([key, snapshot]) => {
+          const result = await data.calcCareChargePromise({ shop: this.data.shop, memberId,
+            care: snapshot.care, deriveServices: false }, app.globalData.sessionKey);
+          if (this._benefitBasisSnapshots !== snapshots || snapshots[key] !== snapshot) return;
+          if (!result || !result.care) throw new Error('原券卡优惠计算失败');
+          const benefitDiscount = Number(result.care.discount) || 0;
+          this._autoBenefitBaseDiscount[key] = snapshot.discount > benefitDiscount ? snapshot.discount : 0;
+          delete snapshots[key];
+        }));
+        if (this._benefitBasisFailed && this._benefitBasisSnapshots === snapshots) {
+          this._benefitBasisFailed = false;
+          this.setData({ priceError: false });
+        }
+      } catch (error) {
+        if (this._benefitBasisSnapshots === snapshots) {
+          this._benefitBasisFailed = true;
+          this.setData({ priceError: true });
+        }
+        throw error;
+      }
+    },
+    _benefitInput(care, index) {
+      const key = this._benefitIdentity(care, index);
+      const selection = selectedBenefitKey(care);
+      const auto = !!selection && this._autoBenefitSelections && this._autoBenefitSelections[key] === selection;
+      const manual = !!(this._manualTicketChoices || {})[this._careKey(care, index)] || (!!selection && !auto);
+      const saved = this._autoBenefitBaseDiscount && this._autoBenefitBaseDiscount[key];
+      const discount = care._manualDiscount != null ? Number(care._manualDiscount) || 0
+        : auto && saved != null ? saved : Number(care.discount) || 0;
+      return { key, selection, auto, manual, discount };
+    },
+    _benefitSignature() {
+      const fields = ['id', 'timeStamp', 'equipment', 'brand', 'scale', 'need_edge', 'edge_degree', 'need_wax', 'need_unwax',
+        'free_wax', 'maintain_board', 'seal_board', 'summer', 'urgent', 'repair_charge', 'need_repair', 'repair_memo',
+        'warranty', 'entertain', 'is_cancel'];
+      return JSON.stringify({ memberId: Number(this.data.memberId) || 0, shop: this.data.shop,
+        cares: (this.data.displayCares || []).map((c, i) => {
+          const info = this._benefitInput(c, i), v = { key: info.key, manual: info.manual, discount: info.discount };
+          fields.forEach(k => { v[k] = c[k] == null ? null : c[k]; });
+          if (info.manual) v.selection = info.selection;
+          return v;
+        }) });
     },
     async _autoSelectOldCustomerTicket() {
+      this._ensureBenefitMember();
       const memberId = Number(this.data.memberId) || 0;
-      if (this._oldCustomerTicketMember !== memberId) {
-        this._oldCustomerTicketMember = memberId;
-        this._oldCustomerTicketState = null;
-        this._oldCustomerPricePromise = null;
-        this._manualTicketChoices = {};
+      await this._resolveBenefitBases(memberId);
+      // 先等项目开关的服务端联动（例如热蜡带刮蜡）落回，再比较权益。
+      await Promise.resolve();
+      while (this._servicePriceWork && this._servicePriceWork.size && !this._autoTicketBlocked()) {
+        await Promise.all(Array.from(this._servicePriceWork));
       }
-      if (!(this.data.displayCares || []).length) {
-        this._oldCustomerTicketState = null;
+      if (this.data.priceError && (!this._bestBenefitState || !this._bestBenefitState.failed)) return;
+      if ((Number(this.data.memberId) || 0) !== memberId) return;
+      const current = this.data.displayCares || [];
+      if (!current.length) {
+        this._bestBenefitState = null;
         this._memberCareTicketsLoad = null;
         this._manualTicketChoices = {};
         return;
       }
-      const eligible = (c, i) => !c.ticket_code && !c.use_card && !c.card_id && !c.coach_card_id
-        && !c.warranty && !c.entertain && !(this._manualTicketChoices || {})[this._careKey(c, i)]
-        && !isScrapeOnlyCare(c, this.data.shop);   // 只选刮蜡是一口价，不自动带券
-      if (!memberId || this._autoTicketBlocked() || !this.data.displayCares.some(eligible)) return;
-      let state = this._oldCustomerTicketState;
-      if (!state) {
-        state = { memberId };
-        this._oldCustomerTicketState = state;
-        // 会员卡（季卡、次卡）优先于老顾客券：卡列表读不出来不挡开单，当作没有卡，照旧带老顾客券。
-        const cardsLoad = this._getMemberCareCards(memberId).promise
-          .then(cards => autoCareCards(cards, memberId))
-          .catch(e => { console.warn('load member cards for auto select failed', e); return []; });
-        const ticketsLoad = this._getMemberCareTickets(memberId).promise
-          .then(tickets => (tickets || []).filter(t => t && Number(t.template_id) === 16 && t.code
-            && (t.member_id == null || Number(t.member_id) === memberId))
-            .sort((a, b) => (a.expire_date || '9999') < (b.expire_date || '9999') ? -1
-              : (a.expire_date || '9999') > (b.expire_date || '9999') ? 1 : 0));
-        state.promise = Promise.all([ticketsLoad, cardsLoad])
-          .then(([tickets, cards]) => ({ tickets, cards }))
-          .catch(e => { if (this._oldCustomerTicketState === state) this._oldCustomerTicketState = null; throw e; });
-      }
-      const { tickets, cards } = await state.promise;
-      if (this._oldCustomerTicketState !== state || Number(this.data.memberId) !== memberId || this._autoTicketBlocked()) return;
-      const used = new Set(this.data.displayCares.map(c => c.ticket_code).filter(Boolean));
-      // 每件装备用一次，每张卡还能用几件：次卡是剩余次数，季卡是 1，都减去本单别的装备已经占用的。
-      const left = {};
-      cards.forEach(({ card, capacity }) => {
-        left[card.id] = capacity - this.data.displayCares
-          .filter(c => !c.is_cancel && c.use_card && Number(c.card_id) === Number(card.id)).length;
-      });
-      const updated = [];
-      const cares = this.data.displayCares.map((care, i) => {
-        if (!eligible(care, i)) return care;
-        // 机打蜡、非雪季养护、养板不在这里选卡：机打蜡由机打蜡联动挑季卡/券，服务端不让卡抵扣非雪季，
-        // 养板只认老顾客券（选了卡会被清掉），这几类仍只带老顾客券。
-        const noCard = care.free_wax === 1 || care.summer || care.maintain_board;
-        const found = noCard ? null : pickCareCard(care, cards, left);
-        if (found && found.wait) return care;   // 限装备季卡要等装备填完才能判定，先不带券，免得挤掉它
-        const picked = found && found.entry;
-        if (picked) {
-          left[picked.card.id] -= 1;
-          // 还没选服务项：和手选会员卡一样按卡推导（双项卡带出修刃+热蜡+刮蜡，机打蜡季卡带出机打蜡）；
-          // 已经选了：只换权益，保留店员选的项目、维修和手动减免，不够的部分由服务端补差。
-          updated.push({ i, derive: !hasChosenService(care) });
-          return { ...care, ...autoCardFields(picked) };
+      if (!memberId || !this.data.shop || this._autoTicketBlocked()) return;
+      const signature = this._benefitSignature();
+      if (this._bestBenefitState && this._bestBenefitState.signature === signature) return this._bestBenefitState.promise;
+      const state = { signature, memberId };
+      this._bestBenefitState = state;
+      const stillCurrent = () => this._bestBenefitState === state && !this._autoTicketBlocked()
+        && Number(this.data.memberId) === memberId && this._benefitSignature() === signature;
+      const abandon = () => { if (this._bestBenefitState === state) this._bestBenefitState = null; };
+      const snapshot = current.map((care, i) => ({ care, i, info: this._benefitInput(care, i) }));
+      const targets = snapshot.filter(x => !x.info.manual && !x.care.is_cancel && !x.care.warranty && !x.care.entertain
+        && (hasChosenService(x.care) || x.info.auto));
+      if (!targets.length) { state.promise = Promise.resolve(); return state.promise; }
+      state.promise = this._trackCarePrice((async () => {
+        const coachLoad = typeof data.listUsableCoachCardsPromise === 'function'
+          ? data.listUsableCoachCardsPromise(memberId, '养护', { shop: this.data.shop }, app.globalData.sessionKey)
+          : Promise.resolve({ cards: [] });
+        const [tickets, cardList, coachResult] = await Promise.all([
+          this._getMemberCareTickets(memberId).promise, this._getMemberCareCards(memberId).promise, coachLoad,
+        ]);
+        if (!stillCurrent()) { abandon(); return; }
+        const manual = snapshot.filter(x => x.info.manual && !x.care.is_cancel);
+        const occupiedTickets = new Set(manual.map(x => x.care.ticket_code).filter(Boolean));
+        const cardEntries = autoCareCards(cardList, memberId);
+        const resources = [];
+        (tickets || []).forEach(ticket => {
+          if (!ticket || !ticket.code || occupiedTickets.has(ticket.code)) return;
+          resources.push({ key: 'ticket:' + ticket.code, id: ticket.code, type: 'ticket', capacity: 1,
+            expire: ticket.expire_date, ticket });
+        });
+        cardEntries.forEach(entry => {
+          const card = entry.card;
+          if (entry.season && card.usedToday) return;
+          const occupied = manual.filter(x => x.care.use_card && Number(x.care.card_id) === Number(card.id)).length;
+          const capacity = entry.capacity - occupied;
+          if (capacity > 0) resources.push({ key: 'card:' + card.id, id: card.id, type: entry.season ? 'season' : 'punch',
+            capacity, card, entry });
+        });
+        ((coachResult && coachResult.cards) || []).forEach(coach => {
+          if (coach && coach.cardId) resources.push({ key: 'coach:' + coach.cardId, id: coach.cardId,
+            type: 'coach', capacity: targets.length, expire: coach.validUntil, coach });
+        });
+        if (!resources.length && targets.every(x => !x.info.auto)) {
+          if (targets.some(x => x.care.free_wax === 1)) throw new Error('没有可用的养护权益，请重新选择');
+          return;
         }
-        const ticket = tickets.find(t => !used.has(t.code));
-        if (!ticket) return care;
-        used.add(ticket.code); updated.push({ i, derive: false });
-        // 自动带券只改变券选择，保留店员已选项目、维修和手动减免。
-        return { ...care, ticket, ticket_code: ticket.code };
-      });
-      if (!updated.length) return;
-      this.data.cares = cares;
-      this._refreshCares();
-      this._emitSync(true);
-      this._oldCustomerPricePromise = Promise.all(updated.map(({ i, derive }) => this._fetchPrice(i, derive ? { derive: true } : undefined)));
-      await this._oldCustomerPricePromise;
+        const byKey = new Map(resources.map(r => [r.key, r]));
+        const jobs = [], plans = [];
+        targets.forEach(target => {
+          const c = target.care;
+          if (!hasChosenService(c)) { plans.push({ target, baseline: 0, options: [], requiresBenefit: false }); return; }
+          const payload = this._stripUI(c);
+          Object.assign(payload, { ticket: null, product: null, careImages: null, ticket_code: null,
+            ticket_discount: 0, use_card: false, card_id: null, card_name: null, coach_card_id: null,
+            discount: target.info.discount });
+          const plan = { target, baseline: null, options: [], requiresBenefit: c.free_wax === 1 };
+          plans.push(plan);
+          jobs.push({ plan, payload, resource: null });
+          const grouped = new Map();
+          resources.forEach(r => {
+            if (r.card && careFitsCard(c, r.entry) !== true) return;
+            if (c.free_wax === 1 && !(r.ticket && Number(r.ticket.template_id) === 12)
+              && !(r.card && r.type === 'season' && cardRules.isMachineWaxSeasonCard(r.card.card_name, null))) return;
+            if (r.card && (c.summer || c.maintain_board)) return;
+            const group = r.ticket ? 'ticket-template:' + (r.ticket.template_id || r.id)
+              : r.card ? 'card-pricing:' + JSON.stringify([r.type, r.card.card_name, r.card.care_project_count]) : r.key;
+            if (!grouped.has(group)) grouped.set(group, []);
+            grouped.get(group).push(r);
+          });
+          grouped.forEach(group => jobs.push({ plan, payload, resource: group[0], group }));
+        });
+        await mapConcurrent(jobs, 4, async job => {
+          // 项目或顾客变化后，尚未发出的旧报价不再占用网络。
+          if (!stillCurrent()) { abandon(); return; }
+          const care = { ...job.payload }, r = job.resource;
+          if (r && r.ticket) care.ticket_code = r.ticket.code;
+          if (r && r.card) { care.use_card = true; care.card_id = r.card.id; care.card_name = r.card.card_name; }
+          if (r && r.coach) care.coach_card_id = r.coach.cardId;
+          const result = await data.calcCareChargePromise({ shop: this.data.shop, memberId, care, deriveServices: false }, app.globalData.sessionKey);
+          if (!result || !result.care) throw new Error('券卡试算未返回完整价格');
+          const priced = result.care;
+          const net = (Number(priced.common_charge) || 0) + (Number(priced.repair_charge) || 0)
+            - (Number(priced.discount) || 0) - (Number(priced.ticket_discount) || 0);
+          // 下单会累加原始金额；手动减免加上卡优惠导致负数时，不能当成免费自动选卡。
+          if (r && net < -0.005) return;
+          const amount = Math.max(0, net);
+          if (!r) { job.plan.baseline = amount; job.plan.baselineQuote = priced; return; }
+          const kept = r.ticket ? priced.ticket_code === r.ticket.code
+            : r.card ? priced.use_card && Number(priced.card_id) === Number(r.card.id)
+              : Number(priced.coach_card_id) === Number(r.coach.cardId) && result.coach && result.coach.discount > 0;
+          if (kept) job.group.forEach(item => job.plan.options.push({ key: item.key, amount, quote: priced }));
+        });
+        if (!stillCurrent()) { abandon(); return; }
+        plans.forEach(p => { if (p.requiresBenefit) p.baseline = null; });
+        const selected = bestBenefit.assign(plans, resources);
+        if (!stillCurrent()) { abandon(); return; }
+        const changed = [];
+        const cares = (this.data.cares || []).slice();
+        plans.forEach((plan, pidx) => {
+          const { target } = plan, i = target.i, prev = this.data.displayCares[i];
+          const resource = byKey.get(selected[pidx]);
+          if (!this._autoBenefitSelections) this._autoBenefitSelections = {};
+          if (!this._autoBenefitBaseDiscount) this._autoBenefitBaseDiscount = {};
+          this._autoBenefitSelections[target.info.key] = selected[pidx] || null;
+          this._autoBenefitBaseDiscount[target.info.key] = target.info.discount;
+          if (selectedBenefitKey(prev) === (selected[pidx] || null)) {
+            const quote = selected[pidx] ? (plan.options.find(o => o.key === selected[pidx]) || {}).quote : plan.baselineQuote;
+            if (quote && ((Number(prev.common_charge) || 0) !== (Number(quote.common_charge) || 0)
+              || (Number(prev.discount) || 0) !== (Number(quote.discount) || 0)
+              || (Number(prev.ticket_discount) || 0) !== (Number(quote.ticket_discount) || 0))) changed.push(i);
+            return;
+          }
+          const c = { ...prev, ticket: null, ticket_code: null, ticket_discount: 0, use_card: false, card_id: null,
+            card_name: null, card_equip_lock: false, card_pending_open: false, coach_card_id: null,
+            _coachCardName: '', _coachCardLabel: '', _coachHint: '', discount: target.info.discount };
+          if (resource && resource.ticket) { c.ticket = resource.ticket; c.ticket_code = resource.ticket.code; }
+          if (resource && resource.card) Object.assign(c, autoCardFields(resource.entry));
+          if (resource && resource.coach) { c.coach_card_id = resource.coach.cardId; c._coachCardName = resource.coach.coachName || ''; c._coachCardLabel = resource.coach.cardName || ''; }
+          cares[i] = c; changed.push(i);
+        });
+        if (changed.length) {
+          this.data.cares = cares;
+          this._refreshCares();
+          this._emitSync(true);
+          await Promise.all(changed.map(i => this._fetchPrice(i)));
+        }
+        if (this._bestBenefitState === state) this.setData({ priceError: false });
+      })().catch(error => {
+        if (stillCurrent()) {
+          state.failed = true;
+          this.setData({ priceError: true });
+          if (error && /没有可用的养护权益/.test(error.message || '')) {
+            wx.showToast({ title: '机打蜡权益不足或装备不匹配', icon: 'none' });
+          }
+        }
+        throw error;
+      }));
+      return state.promise;
     },
     onTicketTap(e) {
       if (this.data.newCardMode) { wx.showToast({ title: '本单统一使用新购卡', icon: 'none' }); return; }
@@ -1326,13 +1488,13 @@ Component({
       this._mutate(cidx, (c) => {
         c.ticket = null;
         c.ticket_code = null;
+        c.ticket_discount = 0;
         c.use_card = false;
         c.card_id = null;
         c.card_name = null;
         c.card_equip_lock = false;
         c.card_pending_open = false;
-        c.discount = 0;
-        c._manualDiscount = 0;
+        c.discount = Number(c._manualDiscount) || 0;
         c.coach_card_id = coachCard.cardId;
         c._coachCardName = coachCard.coachName || '';
         c._coachCardLabel = coachCard.cardName || '';
@@ -1344,19 +1506,16 @@ Component({
     // 「扫出来的效果要和手选一模一样」靠的是同一段代码，不是两段写成一样
     _applyTicketSelection(cidx, ticket, card, options) {
       const that = this;
-      const preserveServices = !!(options && options.preserveServices);
       // 选券/选卡后表单可能瞬间变「已录入」，显式记住展开态——装备卡片不自动折叠
       const curCare = this.data.displayCares[cidx];
+      const preserveServices = !!(options && options.preserveServices) || !!(curCare && hasChosenService(curCare));
       this._rememberManualTicketChoice(cidx);
       if (curCare && curCare._key) {
         this.data.expandedMap[curCare._key] = true;
       }
       this._mutate(cidx, (c) => {
-        // 更改券/卡（含改选「不使用」）时：先清空已选服务（用户 2026-07-09 拍板）。
-        // 默认服务项由服务端 CalcCareCharge(deriveServices=true) 推导，响应 services 回填——
-        // 这里的清空只为响应前的即时 UI 反馈，真理之源在服务端 ApplyDefaultServices。
-        // 清空范围 = 养护项目行 + 非雪季状态 + 减免（减免可能来自折扣券 16，区分不了来源、一并清）；
-        // 立等/维修/质保/招待与券无关，保留
+        // 已选服务时以店员选的项目为准；尚未选择服务时，手选卡仍沿用原有服务推导。
+        // 立等/维修/质保/招待与券无关，保留。
         if (!preserveServices) {
           c.need_edge = 0;
           c.edge_degree = null;
@@ -1368,8 +1527,8 @@ Component({
           c.summer = null;
           if (c.biz_type === '非雪季养护') c.biz_type = null;
         }
-        c.discount = 0;
-        c._manualDiscount = 0;
+        c.discount = Number(c._manualDiscount) || 0;
+        c.ticket_discount = 0;
         // 学员卡与券、会员卡互斥：换券/换卡/改选「不使用」都先清掉学员卡
         c.coach_card_id = null;
         c._coachCardName = '';
@@ -1422,7 +1581,8 @@ Component({
         }
       });
       // 点击机打蜡自动带权益时保留其他项目，只应用机蜡联动；手动换券卡仍推导默认服务。
-      return that._fetchPrice(cidx, preserveServices ? { changed: 'free_wax' } : { derive: true });
+      return that._fetchPrice(cidx, preserveServices
+        ? (options && options.preserveServices ? { changed: 'free_wax' } : undefined) : { derive: true });
     },
     /* ---------- 扫码用券 ---------- */
     // 顾客在「我的优惠券」详情页出示二维码（内容就是券码），店员扫一下：
@@ -1612,8 +1772,11 @@ Component({
       if (!this.data.summary.canCheckout || this.data.autoTicketCheckout || this.data.cardBusy) return;
       this.setData({ autoTicketCheckout: true });
       try {
+        // 结算前刷新账户权益，避免使用开单期间被其他订单核销的券或次卡。
+        this._bestBenefitState = null;
+        this._memberCareTicketsLoad = null;
+        this._memberCareCardsLoad = null;
         await this._autoSelectOldCustomerTicket();
-        await this._oldCustomerPricePromise;
         await this.waitForPrices();
         if (this._ticketAutoDetached || this.data.cardBusy || !this.data.summary.canCheckout) return;
         const cares = this.data.displayCares.map((c) => this._stripUI(c));

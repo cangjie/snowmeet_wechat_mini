@@ -241,10 +241,17 @@ test('养板留着老顾客券：服务端没摘券时本地的券保留', async
 
 test('养板（自带刮蜡）不算只选刮蜡：会自动带上老顾客券，单独的刮蜡则不带', async t => {
   const tickets = [{ code: 'OLD16', template_id: 16, member_id: 10, expire_date: '2027-01-01' }];
-  const board = setup(t, { rows: [care(1, { maintain_board: 1, need_unwax: 1 })], tickets });
+  const calculate = req => {
+    const result = serverLinkage(req), c = result.care;
+    c.common_charge = c.maintain_board ? 220 : 100;
+    if (c.ticket_code && c.maintain_board) c.discount = 20;
+    else if (c.ticket_code) { c.ticket_code = null; result.benefitsCleared = true; }
+    return result;
+  };
+  const board = setup(t, { rows: [care(1, { maintain_board: 1, need_unwax: 1 })], tickets, calculate });
   await settle();
   assert.equal(board.c().ticket_code, 'OLD16');
-  const scrape = setup(t, { rows: [care(1, { need_unwax: 1 })], tickets });
+  const scrape = setup(t, { rows: [care(1, { need_unwax: 1 })], tickets, calculate });
   await settle();
   assert.equal(scrape.c().ticket_code || null, null);
 });

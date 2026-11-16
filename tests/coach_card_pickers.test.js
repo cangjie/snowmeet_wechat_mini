@@ -144,10 +144,10 @@ test('养护开单：选了学员卡后，老顾客券不会被自动顶回来',
   form._refreshCares(); await settle()
   assert.ok(!form.data.displayCares[0].ticket_code)          // 没有被自动带上老顾客券
   assert.equal(form.data.displayCares[0].coach_card_id, 7)
-  // 对照：没选学员卡时仍自动带券
+  // 对照：假服务端不给券优惠时，不应消耗这张券。
   const plain = careForm(t, { cares: [care(1)], tickets: [ticket('OLD')], calculate: coachServer })
   plain.form._refreshCares(); await settle()
-  assert.equal(plain.form.data.displayCares[0].ticket_code, 'OLD')
+  assert.ok(!plain.form.data.displayCares[0].ticket_code)
 })
 
 test('养护开单：改服务项重算时减免重置为手动录入部分，手动减免保留，改减免本身不重置', async t => {

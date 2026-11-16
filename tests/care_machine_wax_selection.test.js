@@ -29,6 +29,9 @@ function setup(t, { cards = [], tickets = [ticket('WAX')], rows = [care()], getC
       if (calculate) return calculate(req);
       const result = { ...req.care };
       if (req.changedField === 'free_wax' && result.free_wax === 1) result.need_wax = result.need_unwax = 0;
+      result.common_charge = result.free_wax ? 0 : 170;
+      if (result.ticket_code === 'OLD' && !result.free_wax) result.discount = 20;
+      if (result.card_id && !result.free_wax) result.common_charge = 150;
       return { care: result };
     },
   });
@@ -58,7 +61,7 @@ test('点击机打蜡自动换成最早到期的机打蜡券，保留修刃和�
   assert.equal(selected.ticket_code, 'EARLY'); assert.equal(selected.use_card, false);
   assert.equal(selected.free_wax, 1); assert.equal(selected.need_edge, 1);
   assert.equal(selected.need_wax, 0); assert.equal(selected.need_unwax, 0); assert.equal(selected.repair_charge, 9);
-  assert.equal(prices.at(-1).deriveServices, false); assert.equal(prices.at(-1).changedField, 'free_wax');
+  assert.equal(prices.at(-1).deriveServices, false); assert.ok(prices.some(p => p.changedField === 'free_wax'));
   assert.equal(prices.at(-1).care.ticket_code, 'EARLY');
 });
 
@@ -103,7 +106,7 @@ test('多件装备同时选机打蜡时每件使用不同的券', async t => {
 
 test('等待权益选择时取消机打蜡，迟到结果不能恢复项目或套用季卡', async t => {
   let ready;
-  const { form } = setup(t, { getCards: () => new Promise(resolve => { ready = resolve; }) });
+  const { form } = setup(t, { rows: [care(1, { need_edge: 0 })], getCards: () => new Promise(resolve => { ready = resolve; }) });
   await settle(); toggle(form); await settle(); toggle(form);
   if (ready) ready([season(1)]);
   await form.waitForPrices();
@@ -128,7 +131,8 @@ test('等待机打蜡权益时切为招待或质保，迟到结果不能自动�
 
 test('点击后立即结算会等待季卡选择和新价格完成，重复结算仅提交一次', async t => {
   let ready;
-  const { form } = setup(t, { getCards: () => new Promise(resolve => { ready = resolve; }) });
+  const pending = new Promise(resolve => { ready = resolve; });
+  const { form } = setup(t, { getCards: () => pending });
   await settle(); toggle(form);
   const checkout = form.onCheckout(); await form.onCheckout(); await settle();
   assert.equal(form.events.filter(e => e.name === 'checkout').length, 0);
@@ -162,23 +166,26 @@ test('权益查询失败时阻止结算，重新计算会重试选卡并恢复�
 
 test('查询期间切换顾客或手动选不使用，迟到结果不覆盖新选择', async t => {
   for (const action of ['member', 'manual']) {
-    let ready;
-    const { form } = setup(t, { getCards: () => new Promise(resolve => { ready = resolve; }) });
+    const pending = [];
+    const { form } = setup(t, { rows: [care(1, { need_edge: 0 })], getCards: memberId => new Promise(resolve => { pending.push({ memberId, resolve }); }) });
     await settle(); toggle(form); await settle();
     if (action === 'member') { form.setProperty('memberId', 11); form.data.cares = [care()]; form._refreshCares(); }
     else form._applyTicketSelection(0, null, null);
-    if (ready) ready([season(1)]);
+    await settle();
+    pending.forEach(p => p.resolve(p.memberId === 10 ? [season(1)] : []));
+    if (action === 'manual') toggle(form);
     await settle(); await form.waitForPrices();
     assert.equal(form.data.displayCares[0].card_id, null); assert.equal(form.data.displayCares[0].ticket_code, null);
   }
 });
 
-test('保留已选的机打蜡券，新购卡模式不自动替换为账户中的旧卡券', async t => {
+test('项目变化后重新比较季卡与券，新购卡模式不自动替换为账户中的旧卡券', async t => {
   const { form, cardRequests } = setup(t, { cards: [season(1)], rows: [care(1, { ticket_code: 'CHOSEN', ticket: ticket('CHOSEN') })] });
   await settle();
   const loaded = cardRequests.length;
   toggle(form); await form.waitForPrices();
-  assert.equal(form.data.displayCares[0].ticket_code, 'CHOSEN'); assert.equal(cardRequests.length, loaded);
+  assert.equal(form.data.displayCares[0].card_id, 1); assert.equal(form.data.displayCares[0].ticket_code, null);
+  assert.equal(cardRequests.length, loaded);
   form.data.newCardMode = 'machine'; form.data.hasCardSelection = true;
   form.data.cares = [care()]; form._refreshCares(); toggle(form); await settle();
   assert.equal(form.data.displayCares[0].use_card, false); assert.equal(form.data.displayCares[0].ticket_code, null);

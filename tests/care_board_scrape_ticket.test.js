@@ -65,17 +65,17 @@ function setup(t, { rows, shop = WANLONG, tickets = [old16()] } = {}) {
   return { form, requests, toasts, c: () => form.data.displayCares[0] };
 }
 
-test('选开板刮蜡券：按券推导成只刮蜡，服务费被券整笔抵掉，合计 0 元，券留在装备上', async t => {
+test('已选热蜡时手选开板刮蜡券保留项目，不适用的券由服务端摘除', async t => {
   const { form, requests, toasts, c } = setup(t, { rows: [care({ need_wax: 1, need_unwax: 1 })] });
   await settle(); requests.length = 0;
   await form._applyTicketSelection(0, board(), null); await form.waitForPrices(); await settle();
-  assert.equal(requests.at(-1).deriveServices, true);
+  assert.equal(requests.at(-1).deriveServices, false);
   assert.equal(requests.at(-1).care.ticket_code, 'BOARD');
-  assert.equal(c().ticket_code, 'BOARD'); assert.equal(c().ticket.template_id, 20);
-  assert.equal(c().need_unwax, 1); assert.equal(c().need_wax, 0); assert.equal(c().need_edge, 0);
-  assert.equal(c().common_charge, 100); assert.equal(c().discount, 100);
-  assert.equal(form.data.summary.totalLabel, '0.00');
-  assert.deepEqual(toasts, []);
+  assert.equal(c().ticket_code, null); assert.equal(c().ticket, null);
+  assert.equal(c().need_unwax, 1); assert.equal(c().need_wax, 1); assert.equal(c().need_edge, 0);
+  assert.equal(c().common_charge, 170); assert.equal(c().discount, 0);
+  assert.equal(form.data.summary.totalLabel, '170.00');
+  assert.deepEqual(toasts, ['开板刮蜡券仅限万龙单独刮蜡，已取消']);
 });
 
 test('单刮蜡 + 开板刮蜡券 + 会员卡：服务端只摘了卡，本地券留着，提示不再说「取消券」', async t => {
@@ -110,7 +110,7 @@ test('选了开板刮蜡券后再点热蜡：不再是单刮蜡，服务端摘�
   assert.equal(c().discount, 0); assert.equal(c().common_charge, 170);
   assert.equal(form.data.summary.totalLabel, '170.00');
   assert.deepEqual(toasts, ['开板刮蜡券仅限万龙单独刮蜡，已取消']);
-  assert.equal(requests.length, 1);   // 没有后续的自动带券计价
+  assert.ok(requests.length >= 1);   // 变化后可重新试算账户内权益
   assert.equal(form.events.at(-1).detail.cares[0].ticket_code, null);
 });
 

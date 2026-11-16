@@ -126,8 +126,8 @@ test('账户里有机打蜡券时，现有和随后添加的每套装备都显�
   form.setProperty('memberId', 10); await settle();
   form.data.cares.push(care({ id: 3, brand: '新装备', scale: '180' })); form._refreshCares();
   assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, true, true]);
-  // 装备对得上的第一件在载入时自动选了季卡，装备对不上的和之后添加的不选；机打蜡券都不会被自动用掉
-  assert.deepEqual(form.data.displayCares.map(c => c.card_id || null), [9, null, null]);
+  // 假定本次试算没有优惠时，不提前消耗季卡或机打蜡券。
+  assert.deepEqual(form.data.displayCares.map(c => c.card_id || null), [null, null, null]);
   assert.ok(form.data.displayCares.every(c => c.free_wax === 0 && !c.ticket_code));
 });
 
@@ -139,39 +139,40 @@ test('账户里有未绑定机打蜡季卡时，现有和随后添加的每套�
   form.data.cares.push(care({ id: 3, equipment: null, brand: null, scale: null })); form._refreshCares();
   assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, true, true]);
   assert.deepEqual(cardRequests, [[10, '养护', 'staff']]);
-  // 季卡自动选上第一件（未开卡的 8 号与 9 号同类，id 小的先用），第二件的装备对不上 9 号，没有卡可选
-  assert.deepEqual(form.data.displayCares.map(c => c.card_id || null), [8, null, null]);
-  assert.equal(form.events.at(-1).detail.cares[0].card_id, 8);   // 自动选卡会同步给上层，计价回填也会再同步
+  assert.deepEqual(form.data.displayCares.map(c => c.card_id || null), [null, null, null]);
 });
 
-test('只有已绑定机打蜡季卡时，只匹配类型、品牌和长度的装备显示选项', async t => {
+test('账户有已绑定机打蜡季卡时，各装备显示按钮，实际选卡仍校验绑定', async t => {
   const { form } = setup(t, async () => [], { cares: [care(),
     care({ id: 2, scale: '180', free_wax: 1, use_card: true, card_id: 8, card_name: '机打蜡季卡' }),
     care({ id: 3, brand: '其他' }), care({ id: 4, equipment: '单板' }),
     care({ id: 5, equipment: null, brand: null, scale: null })] }, async () => [season(8)]);
   form.setProperty('memberId', 10); await settle();
-  assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, false, false, false, false]);
+  assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, true, true, true, true]);
+  assert.deepEqual(form.data.displayCares.map(c => form._availableMachineWaxCards(c).length), [1, 0, 0, 0, 0]);
 });
 
-test('新增或修改装备信息后，绑定季卡的显示资格随装备变化重新判断', async t => {
+test('新增或修改装备信息后仍显示按钮，使用资格随绑定装备变化', async t => {
   const { form } = setup(t, async () => [], {}, async () => [season(8)]);
   // 手选过的装备不会被自动带上季卡（否则装备被卡锁住，改不了长度）
   form.setProperty('memberId', 10); form._rememberManualTicketChoice(0); await settle();
   assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, true);
   form.onFieldBlur({ currentTarget: { dataset: { cidx: 0, field: 'scale' } }, detail: { value: '180' } });
-  await form.waitForPrices(); assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, false);
+  await form.waitForPrices(); assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, true);
+  assert.equal(form._availableMachineWaxCards(form.data.displayCares[0]).length, 0);
   form.onFieldBlur({ currentTarget: { dataset: { cidx: 0, field: 'scale' } }, detail: { value: '170' } });
   await form.waitForPrices(); assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, true);
   form.data.cares.push(care({ id: 2, scale: '180' })); form._refreshCares();
-  assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, false]);
+  assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, true]);
 });
 
-test('已用、已退、其他顾客、租赁或热蜡季卡，以及部分绑定的异常数据，不开放机打蜡', async t => {
+test('已用或绑定不完整的机打蜡季卡仍显示入口，但不能使用', async t => {
   const { form } = setup(t, async () => [], {}, async () => [season(1, { usedToday: true }),
     season(2, { is_refund: true }), season(3, { member_id: 99 }), season(4, { biz_type: '租赁' }),
     season(5, { card_name: '热蜡季卡' }), season(6, { equipBound: false, equip_brand: null, equip_scale: null })]);
   form.setProperty('memberId', 10); await settle();
-  assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, false);
+  assert.equal(form.data.displayCares[0]._hasFreeWaxTicket, true);
+  assert.equal(form._availableMachineWaxCards(form.data.displayCares[0]).length, 0);
 });
 
 test('切换顾客立即清除旧季卡资格，旧顾客的迟到卡列表不能扩散到新顾客装备', async t => {
@@ -182,10 +183,10 @@ test('切换顾客立即清除旧季卡资格，旧顾客的迟到卡列表不�
   form.setProperty('memberId', 11); await settle();
   assert.deepEqual(pending.map(p => p.memberId), [10, 11]);
   pending.find(p => p.memberId === 11).resolve([season(8)]); await settle();
-  assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, false]);
+  assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, true]);
   pending.find(p => p.memberId === 10).resolve([season(9,
     { equipBound: false, equip_type: null, equip_brand: null, equip_scale: null })]); await settle();
-  assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, false]);
+  assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [true, true]);
   form.setProperty('memberId', null);
   assert.deepEqual(form.data.displayCares.map(c => c._hasFreeWaxTicket), [false, false]);
 });
