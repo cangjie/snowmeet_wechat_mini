@@ -2,16 +2,16 @@
 <view class="pa-mask" wx:if="{{visible}}" catchtouchmove="noop">
   <view class="pa-sheet">
     <view class="pa-title">{{editing ? '修改个人资料' : '完善个人资料'}}</view>
-    <view class="pa-sub">{{editing ? '改好后点「保存」。' : '先点昵称，再点头像，方便店里认出您。也可以先跳过。'}}</view>
+    <view class="pa-sub">昵称和头像选定后自动保存，方便店里认出您。也可以先跳过。</view>
 
-    <!-- 不用 form：form 在微信里会多包一层，头像居中、宽度都被它弄乱。保存读 data 里的昵称（输入、失焦、选「用微信昵称」都会更新它）。
+    <!-- 不用 form：form 在微信里会多包一层，头像居中、宽度都被它弄乱。
          头像和昵称微信没有一次授权的接口（getUserProfile 已收回），所以先昵称、再头像；弹层出来时 modal 提示怎么操作。
          昵称要用 type="nickname" 的输入框（微信只有这一个办法拿到微信昵称），这里把它画成按钮样子，显示「点击获取昵称」；
          不能自动聚焦（程序聚焦不是顾客点的，「用微信昵称」会报 init before tap），要顾客自己点。
          点昵称、点头像都先弹「请稍候」，微信自己的提示（键盘上方的「用微信昵称」、头像选择）出来后收掉 -->
     <input class="pa-nick-btn" placeholder-class="pa-nick-ph" type="nickname" value="{{nickName}}" placeholder="点击获取昵称" maxlength="32"
            bindfocus="onNickTap" bindkeyboardheightchange="onKeyboardHeight"
-           bindinput="onNickInput" bindblur="onNickInput" bindchange="onNickInput" />
+           bindinput="onNickInput" bindblur="onNickCommit" bindchange="onNickCommit" />
 
     <view class="pa-avatar-row">
       <button class="pa-avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar" bindtap="onAvatarTap" hover-class="none">
@@ -22,10 +22,11 @@
     <view class="pa-avatar-tip">{{(avatarPath || currentAvatarUrl) ? '点击头像更换' : '点击获取头像（可选「用微信头像」）'}}</view>
 
     <view class="pa-error" wx:if="{{error}}">{{error}}</view>
+    <button wx:if="{{error}}" class="pa-btn pa-btn-skip pa-retry" bindtap="onRetrySave" disabled="{{saving}}">重试保存</button>
 
     <view class="pa-actions">
-      <button class="pa-btn pa-btn-skip" bindtap="onSkip" disabled="{{saving}}">{{editing ? '取消' : '跳过'}}</button>
-      <button class="pa-btn pa-btn-save" type="primary" bindtap="onSave" loading="{{saving}}" disabled="{{!canSave || saving}}">保存</button>
+      <button class="pa-btn pa-btn-skip" bindtap="onSkip" disabled="{{saving}}">{{editing ? '关闭' : '跳过'}}</button>
+      <button class="pa-btn pa-btn-save" type="primary" bindtap="onSave" loading="{{saving}}" disabled="{{!canSave || saving || error}}">保存</button>
     </view>
   </view>
 </view>

@@ -101,6 +101,9 @@ Page({
       if (!m) { that.setData({ loading: false }); wx.showToast({ title: '会员不存在', icon: 'none' }); return }
       m.depositTotalStr = util.showAmount(m.depositTotal || 0)
       m.avatar = (m.name && m.name.length > 0) ? m.name[0] : '?'
+      m.nickName = typeof m.nickName === 'string' ? m.nickName.trim() : ''
+      m.avatarUrl = typeof m.avatarUrl === 'string' ? m.avatarUrl.trim() : ''
+      m.avatarError = false
       m.female = m.gender === '女'
       // VIP 是会员自己的字段（member.is_vip），后端随会员明细一起返回
       m.isVip = !!m.isVip
@@ -132,6 +135,11 @@ Page({
       that.setData({ loading: false })
       wx.showToast({ title: '加载失败', icon: 'none' })
     })
+  },
+
+  onAvatarError(e) {
+    var src = e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.src
+    if (this.data.member && this.data.member.avatarUrl === src) this.setData({ 'member.avatarError': true })
   },
 
   // 优惠券折叠区：首次展开才拉数据，收起不清空（再展开不用重拉）

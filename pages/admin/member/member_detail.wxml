@@ -3,12 +3,15 @@
     <!-- 资料卡 -->
     <view class="card head">
       <view class="head-top">
-        <view class="avatar {{member.female ? 'avatar--f' : ''}}">{{member.avatar}}</view>
+        <image wx:if="{{member.avatarUrl && !member.avatarError}}" class="avatar avatar-img" mode="aspectFill" src="{{member.avatarUrl}}"
+               data-src="{{member.avatarUrl}}" binderror="onAvatarError" />
+        <view wx:else class="avatar {{member.female ? 'avatar--f' : ''}}">{{member.avatar}}</view>
         <view class="head-mid">
           <view class="head-line1">
             <text class="head-name">{{member.name}}</text>
             <text wx:if="{{member.gender}}" class="gchip {{member.female ? 'gchip--f' : ''}}">{{member.gender}}</text>
           </view>
+          <view class="head-nick">昵称：{{member.nickName || '未设置'}}</view>
           <view class="head-phone" bindtap="callPhone">
             <van-icon name="phone-o" size="15px" color="#006495" /><text class="head-phone-txt">{{member.phone || '未绑定手机号'}}</text><phone-copy phone="{{member.phone}}" />
           </view>

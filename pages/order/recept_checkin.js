@@ -2,8 +2,8 @@
 // 店铺接待扫码落地页（顾客侧）：顾客用微信扫店员手机上的接待码，直接进入本页（不经公众号）。
 //   报到 → 没有手机号的先一键授权验证 → 「请耐心等待店员开单」
 //   头像昵称（2026-11-15 用户定的顾客侧流程）：扫码后没授权手机号的先提示授权手机号；无论授权还是跳过，
-//   等约 5 秒，再提示授权昵称、最后授权头像（同一个弹层：昵称在上、头像在下，都可以跳过）。
-//   手机号早就绑过的会员没有第一步，扫码报到成功后同样等 5 秒再问。付款阶段不问；离开页面就不再问。
+//   等约 3 秒，再提示授权昵称、最后授权头像（同一个弹层：昵称在上、头像在下，都可以跳过）。
+//   手机号早就绑过的会员没有第一步，扫码报到成功后同样等 3 秒再问。付款阶段不问；离开页面就不再问。
 //   → 店员开单后在结算页选微信支付：轮询到待支付的微信支付单，redirectTo 付款页并自动调起支付；
 //     选支付宝：提示顾客用支付宝扫店员手机上的码（支付宝付款流程不变）。
 // 扫码打开依赖小程序后台「扫普通链接二维码打开小程序」规则：
@@ -15,7 +15,7 @@ const profileAuth = require('../../utils/profile_auth.js')
 
 const POLL_INTERVAL = 2000
 // 手机号这一步（授权或跳过）做完之后，等多久再问昵称头像
-const PROFILE_PROMPT_DELAY_MS = 5000
+const PROFILE_PROMPT_DELAY_MS = 3000
 
 Page({
   // 实例上的间隔，测试里改小
@@ -90,7 +90,7 @@ Page({
       return data.scanReceptCheckinPromise(that.data.code, app.globalData.sessionKey)
     }).then(function (view) {
       that.applyView(view)
-      // 手机号早就绑过的会员没有「授权手机号」这一步：报到成功、进入「等待店员开单」后，等 5 秒再问昵称头像。
+      // 手机号早就绑过的会员没有「授权手机号」这一步：报到成功、进入「等待店员开单」后，等 3 秒再问昵称头像。
       // 没绑手机号的（need_phone）先授权手机号，那一步做完再计时；付款阶段（wepay / alipay）不问。
       if (view && view.stage === 'waiting') that._scheduleProfilePrompt()
     }).catch(function (msg) {
@@ -167,7 +167,7 @@ Page({
     if (that.data.busy) return
     if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok') {
       wx.showToast({ title: '验证手机号后，店员才能为您开单', icon: 'none' })
-      // 跳过 / 拒绝授权也一样：等 5 秒再问昵称头像（页面还停在授权手机号，之后仍可以授权）
+      // 跳过 / 拒绝授权也一样：等 3 秒再问昵称头像（页面还停在授权手机号，之后仍可以授权）
       that._scheduleProfilePrompt()
       return
     }
@@ -177,7 +177,7 @@ Page({
       .then(function (view) {
         wx.hideLoading()
         that.setData({ busy: false })
-        // 手机号验证成功：先继续等店员开单，等 5 秒再问昵称头像（不是授权完立刻弹）
+        // 手机号验证成功：先继续等店员开单，等 3 秒再问昵称头像（不是授权完立刻弹）
         that.applyView(view)
         that._scheduleProfilePrompt()
       }).catch(function () {

@@ -1060,6 +1060,19 @@ const getMyProfilePromise = function (sessionKey) {
     + '&sessionType=wechat_mini_openid'
   return _silentApiGet(url)
 }
+// 行为记录是尽力而为，不弹错误、不等待；会话放请求体，不写在 URL 访问日志中。
+const logNicknameClick = function (sessionKey, sourcePage) {
+  if (!sessionKey) return
+  try {
+    wx.request({
+      url: app.globalData.requestPrefix + 'MemberProfile/LogNicknameClick',
+      method: 'POST',
+      header: { 'content-type': 'application/json' },
+      data: { sessionKey: sessionKey, sessionType: 'wechat_mini_openid', sourcePage: sourcePage || '' },
+      fail: function () {}
+    })
+  } catch (e) { /* 记录失败不影响顾客操作 */ }
+}
 // 保存昵称和头像，resolve 原始 ApiResult（code 0 才算成功，code 1 的 message 给用户看）；HTTP 错误和网络错误 reject。
 // 选了头像：wx.uploadFile（文件字段 avatar，昵称是表单字段）；只改昵称：wx.request 发表单编码。
 const saveMyProfilePromise = function (options) {
@@ -2058,6 +2071,7 @@ const uploadMatExpirePhotoPromise = function (filePath, sessionKey) {
 
 module.exports = {
   getMyProfilePromise,
+  logNicknameClick,
   saveMyProfilePromise,
   IMAGE_HOST,
   getPackageListPromise: getPackageListPromise,

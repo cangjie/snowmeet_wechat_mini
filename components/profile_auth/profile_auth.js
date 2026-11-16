@@ -3,10 +3,9 @@
 // 用法：页面 wxml 放 <profile-auth id="profileAuth" />，手机号验证成功后 await profileAuth.ensureOn(this)（见 utils/profile_auth.js）。
 //   ensure() 先问后端要不要弹（没有头像昵称才弹）；弹出来后等用户「保存」或「跳过」才完成；
 //   不需要弹、后端没部署、没有会员、没有登录会话时立即完成。可以跳过；同一次运行里保存或跳过过就不再弹。
-//   edit()：「我的」页点顶部头像昵称时打开同一个弹层来修改（带出已存的昵称和头像，不看「已处理」，按钮是「取消」）。
+//   edit()：「我的」页点顶部头像昵称时打开同一个弹层来修改（带出已存的昵称和头像，不看「已处理」）。
 //   资料不全（存过头像没存昵称，或反过来）后端也会说需要再问，弹层里带出已存的那一半，让顾客补齐。
-// 头像：<button open-type="chooseAvatar"> 拿到临时文件，保存时 wx.uploadFile 传到后端，后端存 S3；
-// 昵称：<input type="nickname">（画成「点击获取昵称」按钮的样子），微信键盘上可以直接选「用微信昵称」。
+// 头像选定后、昵称确认或失焦后分别自动保存；保存按钮只关闭弹层。
 // 点昵称、点头像都先弹「请稍候」toast，等微信自己的提示出来再收掉（见 _showWait / _hideWait）。
 const data = require('../../utils/data.js')
 const profileAuth = require('../../utils/profile_auth.js')
@@ -31,6 +30,7 @@ Component({
   lifetimes: {
     detached() {
       // 页面销毁时弹层还开着：放开等待，不能让页面的后续流程永远卡住
+      this._autoSave = null
       this._finish()
     }
   },
@@ -76,6 +76,11 @@ Component({
       const stored = (res && res.data) || {}
       const nickName = typeof stored.nickName === 'string' ? stored.nickName : ''
       this._sessionKey = sessionKey
+      this._autoSave = {
+        sessionKey,
+        nick: { saved: profileAuth.cleanNickName(nickName), desired: '', running: false, failed: false, message: '' },
+        avatar: { saved: '', desired: '', running: false, failed: false, message: '' }
+      }
       // 已经存过的昵称、头像带出来（资料不全时补齐、修改时改）
       this.setData({
         visible: true, editing: !!editing, avatarPath: '', currentAvatarUrl: stored.avatarUrl || '',
@@ -104,20 +109,107 @@ Component({
       this._hideWait()
       const path = e && e.detail && e.detail.avatarUrl
       if (!path) return
-      this.setData({ avatarPath: path, error: '' })
+      this.setData({ avatarPath: path })
       this._refreshCanSave()
+      this._queueAutoSave('avatar', path)
     },
 
-    // type="nickname" 输入框：手动输入走 input / blur，选「用微信昵称」时走 change，都读 e.detail.value
+    // 输入过程中只更新画面，避免逐字上传；选择微信昵称或输入结束时保存。
     onNickInput(e) {
       this._hideWait()
-      this.setData({ nickName: (e && e.detail && e.detail.value) || '', error: '' })
+      this.setData({ nickName: (e && e.detail && e.detail.value) || '' })
       this._refreshCanSave()
     },
 
-    // 点「点击获取昵称」：先弹「请稍候」，微信的昵称提示（键盘上方的「用微信昵称」）出来就收掉
+    onNickCommit(e) {
+      this.onNickInput(e)
+      const nickName = profileAuth.cleanNickName(this.data.nickName)
+      if (nickName) this._queueAutoSave('nick', nickName)
+    },
+
+    _queueAutoSave(field, value) {
+      const state = this._autoSave
+      if (!state || !value) return
+      const item = state[field]
+      // change 和 blur 可能对同一个值各触发一次，不要重复上传。
+      if (item.desired === value && (item.running || item.saved === value || item.failed)) return
+      if (!item.running && item.saved === value) {
+        item.desired = value
+        item.failed = false
+        item.message = ''
+        this._syncAutoSave(state)
+        return
+      }
+      item.desired = value
+      item.failed = false
+      item.message = ''
+      this._pumpAutoSave(state, field)
+    },
+
+    _pumpAutoSave(state, field) {
+      const item = state[field]
+      if (item.running || item.failed || !item.desired || item.desired === item.saved) {
+        this._syncAutoSave(state)
+        return
+      }
+      const value = item.desired
+      item.running = true
+      this._syncAutoSave(state)
+      const options = {
+        sessionKey: state.sessionKey,
+        nickName: field === 'nick' ? value : '',
+        avatarPath: field === 'avatar' ? value : ''
+      }
+      Promise.resolve().then(() => data.saveMyProfilePromise(options)).then(res => {
+        if (!res || res.code !== 0) {
+          const err = new Error((res && res.message) || '请重试')
+          err.profileMessage = true
+          throw err
+        }
+        item.saved = value
+        item.failed = false
+        item.message = ''
+        if (field === 'nick' && this._autoSave === state) this.setData({ hasNick: true })
+      }).catch(err => {
+        // 已经选了新值时继续保存新值，不让旧请求的失败盖住它。
+        item.failed = item.desired === value
+        item.message = item.failed ? (err && err.profileMessage ? err.message : '网络不太稳定，请重试') : ''
+      }).then(() => {
+        item.running = false
+        if (this._autoSave !== state) return
+        this._pumpAutoSave(state, field)
+      })
+    },
+
+    _syncAutoSave(state) {
+      if (this._autoSave !== state) return
+      const failed = ['nick', 'avatar'].filter(field => state[field].failed)
+      const names = { nick: '昵称', avatar: '头像' }
+      const error = failed.map(field => names[field] + '保存失败：' + state[field].message).join('；')
+      this.setData({ saving: state.nick.running || state.avatar.running, error })
+    },
+
+    onRetrySave() {
+      const state = this._autoSave
+      if (!state) return
+      for (const field of ['nick', 'avatar']) {
+        if (!state[field].failed) continue
+        state[field].failed = false
+        state[field].message = ''
+        this._pumpAutoSave(state, field)
+      }
+    },
+
+    // 实际聚焦昵称输入框时记一笔；这不代表顾客已选择微信昵称。
     onNickTap() {
       this._showWait()
+      try {
+        const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : []
+        const page = pages && pages.length ? pages[pages.length - 1] : null
+        if (this.data.visible && this._sessionKey && typeof data.logNicknameClick === 'function') {
+          data.logNicknameClick(this._sessionKey, (page && page.route) || '')
+        }
+      } catch (e) { /* 行为记录不能影响输入昵称 */ }
     },
 
     // 点头像：同样先弹「请稍候」，微信的头像选择出来（选好头像触发 chooseavatar）就收掉
@@ -146,21 +238,6 @@ Component({
       if (typeof wx !== 'undefined' && typeof wx.hideLoading === 'function') wx.hideLoading()
     },
 
-    // 只选了头像、昵称是空的（本来也没存过昵称）：提示一下，免得以为昵称存上了
-    _confirmAvatarOnly() {
-      return new Promise(resolve => {
-        if (typeof wx === 'undefined' || typeof wx.showModal !== 'function') { resolve(true); return }
-        wx.showModal({
-          title: '还没填昵称',
-          content: '只保存头像吗？之后可以在「我的」页点头像补填昵称。',
-          confirmText: '只保存头像',
-          cancelText: '去填昵称',
-          success: res => resolve(!!(res && res.confirm)),
-          fail: () => resolve(true)
-        })
-      })
-    },
-
     // 弹层出来时的操作提示（只有「知道了」）
     _showHint(needNick, needAvatar) {
       const content = profileAuth.hintText({ needNick: needNick, needAvatar: needAvatar })
@@ -168,35 +245,12 @@ Component({
       wx.showModal({ title: '请授权昵称和头像', content: content, showCancel: false, confirmText: '知道了' })
     },
 
-    async onSave() {
-      if (this.data.saving) return
-      const nickName = profileAuth.cleanNickName(this.data.nickName)
-      const avatarPath = this.data.avatarPath
-      if (!profileAuth.canSave(nickName, avatarPath)) {
-        this.setData({ error: '请选择头像或填写昵称' })
-        return
-      }
-      if (!nickName && !this.data.hasNick) {
-        // 选了「去填昵称」就回到弹层，由顾客自己点昵称框
-        const proceed = await this._confirmAvatarOnly()
-        if (!proceed) return
-      }
+    onSave() {
+      if (!this.data.canSave || this.data.saving || this.data.error) return
       const app = currentApp()
       const sessionKey = this._sessionKey || (app && app.globalData && app.globalData.sessionKey)
-      this.setData({ saving: true, error: '' })
-      try {
-        const res = await data.saveMyProfilePromise({ sessionKey, nickName, avatarPath })
-        if (res && res.code === 0) {
-          profileAuth.markDone(app && app.globalData, sessionKey)
-          this.setData({ saving: false })
-          if (typeof wx !== 'undefined' && wx.showToast) wx.showToast({ title: '已保存', icon: 'success' })
-          this._finish()
-          return
-        }
-        this.setData({ saving: false, error: (res && res.message) || '保存失败，请重试' })
-      } catch (err) {
-        this.setData({ saving: false, error: '网络不太稳定，保存没成功，请重试' })
-      }
+      profileAuth.markDone(app && app.globalData, sessionKey)
+      this._finish()
     },
 
     onSkip() {

@@ -37,9 +37,11 @@
 .avatar { width: 100rpx; height: 100rpx; border-radius: 999rpx; background: #d9e7f5; color: #006495; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 44rpx; }
 .avatar--f { background: #fde4ee; color: #b03a6e; }
+.avatar-img { display: block; }
 .head-mid { flex: 1; min-width: 0; }
 .head-line1 { display: flex; align-items: center; gap: 14rpx; }
 .head-name { font-size: 38rpx; font-weight: 700; color: #0b1c30; }
+.head-nick { font-size: 24rpx; color: #6f7881; margin-top: 8rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gchip { font-size: 22rpx; font-weight: 600; padding: 2rpx 14rpx; border-radius: 999rpx; background: #dceaff; color: #0a5d8c; }
 .gchip--f { background: #fde4ee; color: #b03a6e; }
 .head-phone { display: inline-flex; align-items: center; gap: 8rpx; margin-top: 10rpx; }

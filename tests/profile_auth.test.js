@@ -108,6 +108,20 @@ test('getMyProfilePromise：GET，会话密钥编码进 query；网络错 / 非 
   } finally { restore() }
 })
 
+test('昵称点击记录以 JSON 发送，不把会话放在 URL，失败静默处理', () => {
+  const calls = []
+  const { data, restore } = loadData({ request(o) { calls.push(o); o.fail({ errMsg: 'offline' }) } })
+  try {
+    data.logNicknameClick('', 'pages/order/recept_checkin')
+    assert.equal(calls.length, 0)
+    assert.doesNotThrow(() => data.logNicknameClick('secret-session', 'pages/order/recept_checkin'))
+    assert.equal(calls[0].url, 'https://t.test/api/MemberProfile/LogNicknameClick')
+    assert.equal(calls[0].method, 'POST')
+    assert.equal(calls[0].header['content-type'], 'application/json')
+    assert.deepEqual(calls[0].data, { sessionKey: 'secret-session', sessionType: 'wechat_mini_openid', sourcePage: 'pages/order/recept_checkin' })
+  } finally { restore() }
+})
+
 test('saveMyProfilePromise：选了头像用 wx.uploadFile（文件字段 avatar，昵称放表单）；只改昵称用表单编码的 wx.request', async () => {
   const uploads = [], requests = []
   const { data, restore } = loadData({
@@ -159,8 +173,8 @@ test('saveMyProfilePromise：HTTP 非 2xx（wx.uploadFile 对任何状态码都�
 const confirmModals = calls => calls.modals.filter(m => m.showCancel !== false)
 const hintModals = calls => calls.modals.filter(m => m.showCancel === false)
 
-function setupComponent(t, { profile, saveResult, sessionKey = 'sess-1', modalConfirm = true, privacy = 'unsupported' } = {}) {
-  const calls = { get: 0, save: [], toasts: [], modals: [], privacyAsked: 0, privacyChecked: 0 }
+function setupComponent(t, { profile, saveResult, saveImpl, clickImpl, sessionKey = 'sess-1', modalConfirm = true, privacy = 'unsupported' } = {}) {
+  const calls = { get: 0, save: [], clicks: [], toasts: [], modals: [], privacyAsked: 0, privacyChecked: 0 }
   // getApp() 在真机上每次返回同一个对象，globalData 里记的「本次运行已处理」才会一直在
   const app = { globalData: { sessionKey, requestPrefix: 'https://t.test/api/' } }
   global.getApp = () => app
@@ -173,8 +187,10 @@ function setupComponent(t, { profile, saveResult, sessionKey = 'sess-1', modalCo
   t.after(() => { delete global.getApp; delete global.wx })
   const fakeData = {
     getMyProfilePromise: async () => { calls.get++; return profile === undefined ? { code: 0, data: { needProfile: true } } : profile },
+    logNicknameClick: (session, page) => { calls.clicks.push({ session, page }); if (clickImpl) clickImpl() },
     saveMyProfilePromise: async body => {
       calls.save.push(body)
+      if (saveImpl) return saveImpl(body)
       if (saveResult instanceof Error) throw saveResult
       return saveResult || { code: 0, data: { nickName: body.nickName } }
     },
@@ -182,6 +198,19 @@ function setupComponent(t, { profile, saveResult, sessionKey = 'sess-1', modalCo
   const c = loadComponent('components/profile_auth/profile_auth.js', fakeData)
   return { c, calls, app }
 }
+
+test('昵称获得焦点时记录会话和页面，不保存昵称；记录失败不影响操作', async t => {
+  global.getCurrentPages = () => [{ route: 'pages/order/recept_checkin' }]
+  t.after(() => { delete global.getCurrentPages })
+  const { c, calls } = setupComponent(t, { clickImpl: () => { throw new Error('offline') } })
+  const done = c.ensure()
+  await settle()
+  assert.doesNotThrow(() => c.onNickTap())
+  assert.deepEqual(calls.clicks, [{ session: 'sess-1', page: 'pages/order/recept_checkin' }])
+  assert.equal(calls.save.length, 0)
+  await c.onSkip()
+  await done
+})
 
 test('组件：后端说不用弹 / 接口失败 / 没有登录会话 → ensure 立即完成，不弹层', async t => {
   for (const profile of [{ code: 0, data: { needProfile: false } }, null, { code: 1, message: 'x' }]) {
@@ -208,7 +237,7 @@ test('组件：需要弹时 ensure 一直等到用户保存或跳过才完成（
   assert.equal(c.data.visible, false)
 })
 
-test('组件：选头像 + 填昵称后保存 → 调保存接口（昵称是清洗后的）、关闭弹层、提示已保存', async t => {
+test('组件：昵称确认和头像选定后分别自动保存；点击保存只关闭弹层', async t => {
   const { c, calls } = setupComponent(t)
   const done = c.ensure()
   await settle()
@@ -216,59 +245,137 @@ test('组件：选头像 + 填昵称后保存 → 调保存接口（昵称是清
   c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/avatar.jpg' } })
   assert.equal(c.data.avatarPath, 'http://tmp/avatar.jpg')
   assert.equal(c.data.canSave, true)
-  c.onNickInput({ detail: { value: '  雪友小明 ' } })
+  c.onNickCommit({ detail: { value: '  雪友小明 ' } })
+  await settle()
+  assert.deepEqual(calls.save, [
+    { sessionKey: 'sess-1', nickName: '', avatarPath: 'http://tmp/avatar.jpg' },
+    { sessionKey: 'sess-1', nickName: '雪友小明', avatarPath: '' }
+  ])
   await c.onSave()
   await done
-  assert.equal(calls.save.length, 1)
-  assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '雪友小明', avatarPath: 'http://tmp/avatar.jpg' })
+  assert.equal(calls.save.length, 2, '点击保存不能再发请求')
   assert.equal(c.data.visible, false)
-  assert.ok(calls.toasts.some(x => /已保存/.test(x.title)))
 })
 
-test('组件：只填昵称也能保存（不带头像）', async t => {
+test('组件：只填昵称，确认后自动保存（不带头像）', async t => {
   const { c, calls } = setupComponent(t)
   const done = c.ensure()
   await settle()
   c.onNickInput({ detail: { value: '雪友' } })
+  await settle()
+  assert.equal(calls.save.length, 0, '输入时不逐字上传')
+  c.onNickCommit({ detail: { value: '雪友' } })
+  await settle()
+  assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '雪友', avatarPath: '' })
   await c.onSave()
   await done
-  assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '雪友', avatarPath: '' })
+  assert.equal(calls.save.length, 1)
 })
 
-test('组件：保存失败（后端说不行 / 网络错）弹层不关、流程不放行，给出原因，可以重试或跳过', async t => {
+test('组件：自动保存失败显示原因，可显式重试或跳过；保存按钮不触发请求', async t => {
   for (const saveResult of [{ code: 1, message: '头像图片太大，请换一张小一点的' }, new Error('uploadFile:fail')]) {
     const { c, calls } = setupComponent(t, { saveResult })
     let finished = false
     const done = c.ensure().then(() => { finished = true })
     await settle()
-    c.onNickInput({ detail: { value: '雪友' } })
+    c.onNickCommit({ detail: { value: '雪友' } })
+    await settle()
     await c.onSave()
     await settle()
     assert.equal(finished, false)
     assert.equal(c.data.visible, true)
-    assert.equal(c.data.saving, false, '按钮要能再点')
+    assert.equal(c.data.saving, false)
     assert.ok(c.data.error, '要告诉用户为什么没成功')
     assert.match(c.data.error, saveResult instanceof Error ? /网络/ : /太大/, '后端给的原因要原样给用户看；网络错给通用提示')
+    assert.equal(calls.save.length, 1, '点保存没有触发重试')
+    c.onRetrySave()
+    await settle()
+    assert.equal(calls.save.length, 2, '重试按钮重新发送失败的字段')
     await c.onSkip()
     await done
     assert.equal(finished, true)
-    assert.equal(calls.save.length, 1)
+    assert.equal(calls.save.length, 2)
   }
 })
 
-test('组件：什么都没填点保存不发请求；保存中再点不重复发', async t => {
+test('组件：重复的昵称确认只发送一次；点击保存不重复发', async t => {
   const { c, calls } = setupComponent(t)
   const done = c.ensure()
   await settle()
   await c.onSave()
   assert.equal(calls.save.length, 0)
-  assert.ok(c.data.error)
-  c.onNickInput({ detail: { value: '雪友' } })
-  const first = c.onSave()
-  const second = c.onSave()
-  await Promise.all([first, second])
+  assert.equal(c.data.visible, true)
+  c.onNickCommit({ detail: { value: '雪友' } })
+  c.onNickCommit({ detail: { value: '雪友' } })
+  await settle()
+  c.onNickCommit({ detail: { value: '雪友' } })
+  await c.onSave()
   await done
   assert.equal(calls.save.length, 1)
+})
+
+test('组件：同一字段连续修改按顺序保存，较晚选择不会被较早响应覆盖', async t => {
+  const pending = []
+  const { c, calls } = setupComponent(t, { saveImpl: body => new Promise(resolve => pending.push({ body, resolve })) })
+  const done = c.ensure()
+  await settle()
+  c.onNickCommit({ detail: { value: '昵称一' } })
+  c.onNickCommit({ detail: { value: '昵称二' } })
+  c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/one.jpg' } })
+  c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/two.jpg' } })
+  await settle()
+  assert.deepEqual(calls.save.map(x => [x.nickName, x.avatarPath]), [
+    ['昵称一', ''], ['', 'http://tmp/one.jpg']
+  ])
+  c.onSave()
+  assert.equal(c.data.visible, true, '自动保存进行中不能提前关闭')
+  pending[0].resolve({ code: 0 })
+  pending[1].resolve({ code: 0 })
+  await settle()
+  assert.deepEqual(calls.save.map(x => [x.nickName, x.avatarPath]), [
+    ['昵称一', ''], ['', 'http://tmp/one.jpg'], ['昵称二', ''], ['', 'http://tmp/two.jpg']
+  ])
+  pending[2].resolve({ code: 0 })
+  pending[3].resolve({ code: 0 })
+  await settle()
+  assert.equal(c.data.saving, false)
+  c.onSave()
+  await done
+  assert.equal(calls.save.length, 4, '保存按钮不发送请求')
+})
+
+test('组件：旧值保存失败后仍会自动发送已经选定的新值', async t => {
+  const pending = []
+  const { c, calls } = setupComponent(t, { saveImpl: body => new Promise((resolve, reject) => pending.push({ body, resolve, reject })) })
+  const done = c.ensure()
+  await settle()
+  c.onNickCommit({ detail: { value: '旧昵称' } })
+  c.onNickCommit({ detail: { value: '新昵称' } })
+  await settle()
+  pending[0].reject(new Error('offline'))
+  await settle()
+  assert.equal(calls.save.length, 2)
+  assert.equal(calls.save[1].nickName, '新昵称')
+  assert.equal(c.data.error, '')
+  pending[1].resolve({ code: 0 })
+  await settle()
+  c.onSave()
+  await done
+})
+
+test('组件：修改失败后改回已保存昵称，清除错误且不再发请求', async t => {
+  const stored = { code: 0, data: { needProfile: false, nickName: '原昵称', avatarUrl: 'https://x/a.jpg', updateDate: '2026-11-15T08:00:00' } }
+  const { c, calls } = setupComponent(t, { profile: stored, saveResult: new Error('offline') })
+  const done = c.edit()
+  await settle()
+  c.onNickCommit({ detail: { value: '新昵称' } })
+  await settle()
+  assert.match(c.data.error, /昵称保存失败/)
+  c.onNickCommit({ detail: { value: '原昵称' } })
+  assert.equal(c.data.error, '')
+  assert.equal(calls.save.length, 1)
+  c.onSave()
+  await done
 })
 
 test('组件：跳过 / 保存之后，同一个登录会话里再 ensure 不会再弹，也不再问后端；换了会话才会再问', async t => {
@@ -427,16 +534,20 @@ test('组件：只缺昵称（已有头像）只提示昵称，只缺头像（�
   await editing.c.onSkip(); await d3
 })
 
-test('组件：先填昵称、再选头像，一次保存两样都带上', async t => {
+test('组件：先确认昵称、再选头像，各自独立保存', async t => {
   const { c, calls } = setupComponent(t)
   const done = c.ensure()
   await settle()
-  c.onNickInput({ detail: { value: '雪友小明' } })
+  c.onNickCommit({ detail: { value: '雪友小明' } })
   assert.equal(c.data.canSave, true, '只填了昵称就能保存')
   c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await settle()
   await c.onSave()
   await done
-  assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '雪友小明', avatarPath: 'http://tmp/a.jpg' })
+  assert.deepEqual(calls.save, [
+    { sessionKey: 'sess-1', nickName: '雪友小明', avatarPath: '' },
+    { sessionKey: 'sess-1', nickName: '', avatarPath: 'http://tmp/a.jpg' }
+  ])
 })
 
 // ---------- 「我的」页顶部显示头像和昵称（2026-11-15 用户：已授权的用户，这里应该显示头像和昵称） ----------
@@ -453,34 +564,25 @@ test('profileView：从 GetMyProfile 的返回取要显示的头像（完整网�
 
 // ---------- 昵称一定要带上、存过头像没存昵称的补填、点「我的」页顶部修改（2026-11-15 用户：两个都做） ----------
 
-test('只选了头像、昵称是空的：先提示「还没填昵称」，选「去填昵称」不保存、回到昵称框；选「只保存头像」才保存', async t => {
-  const cancel = setupComponent(t, { modalConfirm: false })
-  const done = cancel.c.ensure()
+test('只选择头像时立即单独保存，不要求先填写昵称', async t => {
+  const { c, calls } = setupComponent(t)
+  const done = c.ensure()
   await settle()
-  cancel.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
-  await cancel.c.onSave()
-  assert.equal(confirmModals(cancel.calls).length, 1)
-  assert.match(confirmModals(cancel.calls)[0].title + confirmModals(cancel.calls)[0].content, /昵称/)
-  assert.equal(cancel.calls.save.length, 0, '选了去填昵称就不保存')
-  assert.equal(cancel.c.data.visible, true)
-  await cancel.c.onSkip()
+  c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await settle()
+  assert.deepEqual(calls.save, [{ sessionKey: 'sess-1', nickName: '', avatarPath: 'http://tmp/a.jpg' }])
+  assert.equal(confirmModals(calls).length, 0)
+  await c.onSave()
   await done
-
-  const ok = setupComponent(t, { modalConfirm: true })
-  const done2 = ok.c.ensure()
-  await settle()
-  ok.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
-  await ok.c.onSave()
-  await done2
-  assert.deepEqual(ok.calls.save[0], { sessionKey: 'sess-1', nickName: '', avatarPath: 'http://tmp/a.jpg' })
 })
 
 test('昵称已经填了、或者本来就存过昵称：只换头像不再提示', async t => {
   const filled = setupComponent(t)
   const d1 = filled.c.ensure()
   await settle()
-  filled.c.onNickInput({ detail: { value: '雪友' } })
+  filled.c.onNickCommit({ detail: { value: '雪友' } })
   filled.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await settle()
   await filled.c.onSave()
   await d1
   assert.equal(confirmModals(filled.calls).length, 0)
@@ -490,10 +592,11 @@ test('昵称已经填了、或者本来就存过昵称：只换头像不再提�
   await settle()
   assert.equal(existing.c.data.nickName, '已有昵称', '存过的昵称带进输入框')
   existing.c.onChooseAvatar({ detail: { avatarUrl: 'http://tmp/a.jpg' } })
+  await settle()
   await existing.c.onSave()
   await d2
   assert.equal(confirmModals(existing.calls).length, 0)
-  assert.equal(existing.calls.save[0].nickName, '已有昵称')
+  assert.equal(existing.calls.save[0].nickName, '', '只上传头像，不覆盖已有昵称')
 })
 
 test('资料不全（存过头像没存昵称）时 ensure 会再弹，已存的头像显示在弹层里，昵称框等着补', async t => {
@@ -518,7 +621,8 @@ test('edit（点「我的」页顶部修改）：不管是不是「已处理」�
   assert.equal(c.data.editing, true)
   assert.equal(c.data.nickName, '旧昵称')
   assert.equal(c.data.currentAvatarUrl, 'https://img.snowmeet.top/upload/x/avatar_a.jpg')
-  c.onNickInput({ detail: { value: '新昵称' } })
+  c.onNickCommit({ detail: { value: '新昵称' } })
+  await settle()
   await c.onSave()
   await done
   assert.deepEqual(calls.save[0], { sessionKey: 'sess-1', nickName: '新昵称', avatarPath: '' })
@@ -544,10 +648,11 @@ test('edit：点「取消」直接关掉，什么都不保存；没有会员 / �
   assert.equal(noSession.c.data.visible, false)
 })
 
-test('edit 时弹层的标题和按钮是「修改」「取消」，不是「完善」「跳过」', () => {
+test('edit 时弹层说明自动保存，关闭按钮不暗示可以撤销', () => {
   const wxml = fs.readFileSync(path.join(ROOT, 'components/profile_auth/profile_auth.wxml'), 'utf8')
   assert.match(wxml, /\{\{editing \? '修改个人资料' : '完善个人资料'\}\}/)
-  assert.match(wxml, /\{\{editing \? '取消' : '跳过'\}\}/)
+  assert.match(wxml, /\{\{editing \? '关闭' : '跳过'\}\}/)
+  assert.match(wxml, /选定后自动保存/)
   assert.match(wxml, /\{\{avatarPath \|\| currentAvatarUrl\}\}/, '已存的头像也要能显示出来')
 })
 

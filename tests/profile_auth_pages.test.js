@@ -272,9 +272,9 @@ test('pay-identity-confirm（支付身份确认）：授权手机号、正常支
   }
 })
 
-// ---------- 5. 接待报到：先手机号，无论授权还是跳过，等约 5 秒再问昵称和头像（2026-11-15 用户定的顾客侧流程） ----------
-// 顾客扫码后：第一，没授权手机号的先提示授权手机号；第二，无论授权还是跳过，大概等 5 秒，再提示授权昵称，最后授权头像
-// （昵称和头像在同一个弹层里：昵称在上、自动获得焦点，头像在下）。手机号早就绑过的会员没有第一步，扫码报到成功后同样等 5 秒再问。
+// ---------- 5. 接待报到：先手机号，无论授权还是跳过，等约 3 秒再问昵称和头像 ----------
+// 顾客扫码后：没授权手机号的先提示授权手机号，无论授权还是跳过，大概等 3 秒再提示昵称和头像。
+// 昵称和头像在同一个弹层里；会员需自行点击昵称输入框。手机号早就绑过的会员扫码报到成功后同样等 3 秒再问。
 // 付款阶段（wepay / alipay）不问；离开页面、去付款页就不再问。
 
 const PROFILE_DELAY_FOR_TEST = 5
@@ -298,13 +298,13 @@ function checkinPage(t, view, verifyView) {
 
 const afterDelay = () => new Promise(resolve => setTimeout(resolve, PROFILE_DELAY_FOR_TEST * 6 + 20))
 
-test('接待报到：间隔默认是 5 秒', () => {
+test('接待报到：间隔默认是 3 秒', () => {
   installGlobals({ after() {} })
   const page = loadPage('pages/order/recept_checkin.js', {})
-  assert.equal(page.profilePromptDelay, 5000)
+  assert.equal(page.profilePromptDelay, 3000)
 })
 
-test('接待报到：手机号已绑的会员扫码后进入等待开单，页面状态和轮询立刻定下来，约 5 秒后才弹昵称头像', async t => {
+test('接待报到：手机号已绑的会员扫码后进入等待开单，页面状态和轮询立刻定下来，等待后才弹昵称头像', async t => {
   const { page, log } = checkinPage(t, { stage: 'waiting', maskedCell: '189****2780' })
   page.profilePromptDelay = 60
   const gate = withProfileGate(page, log)

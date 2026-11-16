@@ -111,6 +111,9 @@ Page({
           id: m.id,
           name: m.name || '—',
           avatar: (m.name && m.name.length > 0) ? m.name[0] : '?',
+          nickName: typeof m.nickName === 'string' ? m.nickName.trim() : '',
+          avatarUrl: typeof m.avatarUrl === 'string' ? m.avatarUrl.trim() : '',
+          avatarError: false,
           female: m.gender === '女',
           gender: m.gender,
           phone: m.phone || '',
@@ -139,6 +142,12 @@ Page({
   onPagerChange(e) {
     var d = e.detail || {}
     this.getData(d.page || 1, d.pageSize || this.data.pageSize)
+  },
+
+  onAvatarError(e) {
+    var d = (e.currentTarget && e.currentTarget.dataset) || {}
+    var index = this.data.members.findIndex(function (m) { return m.id === d.id && m.avatarUrl === d.src })
+    if (index >= 0) this.setData({ ['members[' + index + '].avatarError']: true })
   },
 
   gotoDetail(e) {
