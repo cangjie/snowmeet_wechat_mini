@@ -182,8 +182,9 @@ test('批量发券：二次确认后提交，requestId 页面内固定（重试�
 
 function homeSetup(t, getCoach) {
   const cardRows = [
-    { card: { id: 1, tokenTail: 'C7D9', status: 'issued', createDate: '2026-10-30T09:12:00' }, sharePath: '/pages/coach/claim/claim?t=aaaaaaaaaaaaaaaaaaaaaaaa' },
-    { card: { id: 2, tokenTail: 'A1B2', status: 'claimed', createDate: '2026-10-08T09:00:00', studentName: '王同学', phoneTail: '0231', claimedAt: '2026-10-08T14:20:00' } }
+    { card: { id: 1, tokenTail: 'C7D9', status: 'issued', channel: 'card', createDate: '2026-10-30T09:12:00' }, sharePath: '/pages/coach/claim/claim?t=aaaaaaaaaaaaaaaaaaaaaaaa' },
+    { card: { id: 2, tokenTail: 'A1B2', status: 'claimed', channel: 'qr', cardName: '教练卡', createDate: '2026-10-08T09:00:00', studentName: '王同学', nickName: '雪友小王', avatarUrl: 'https://img.snowmeet.top/upload/20261008/avatar_a.jpg', cardNo: 'HJ000002', phoneTail: '0231', claimedAt: '2026-10-08T14:20:00' } },
+    { card: { id: 3, tokenTail: 'E5F6', status: 'revoked', channel: 'qr', createDate: '2026-10-07T09:00:00' } }
   ]
   return setup(t, {
     staff: null,
@@ -212,7 +213,6 @@ test('分销商中心（教练 / KOL）：不是分销商被挡；没有发卡�
     const p = s.load('pages/coach/home/home.js'); p.onLoad({ tab: 'share' }); await settle()      // 旧入口带 tab=share 进来
     assert.equal(p.data.blocked, ''); assert.equal(p.data.coach.name, '张教练')
     assert.equal(p.data.tab, 'coupons', type + '没有发卡，落到我的券')
-    assert.equal(p.data.pending.length, 0)
     assert.equal(p.data.coupons.length, 3)
     p.onTab(tap({ tab: 'students' })); await settle()
     assert.deepEqual(p.data.students.map(x => [x.name, x.sourceText]), [['王同学', '学员卡'], ['刘同学', '优惠券']])
@@ -225,23 +225,34 @@ test('分销商中心（教练 / KOL）：不是分销商被挡；没有发卡�
   assert.doesNotMatch(wxml, /生成学员卡/)
 })
 
-test('分销商中心（机构）：发卡分享路径来自服务端；撤销；领取情况 / 顾客 / 券各 Tab', async t => {
+test('分销商中心（机构）：「发卡/分享」只是去制作会员卡的入口；领取情况每条带头像昵称和卡号，没领取的可以取消；顾客 / 券各 Tab', async t => {
   const s = homeSetup(t, () => ({ introducerType: '机构' }))
+  global.wx.showModal = o => o.success({ confirm: true })
   const page = s.load('pages/coach/home/home.js'); page.onLoad(); await settle()
   assert.equal(page.data.blocked, ''); assert.equal(page.data.tab, 'share')
-  assert.equal(page.data.pending.length, 1)
-  // 分享：用卡片按钮上的路径，不分享分销商中心
-  assert.deepEqual(page.onShareAppMessage({ from: 'button', target: { dataset: { path: '/pages/coach/claim/claim?t=aaaaaaaaaaaaaaaaaaaaaaaa' } } }),
-    { title: '张教练送你一张学员卡', path: '/pages/coach/claim/claim?t=aaaaaaaaaaaaaaaaaaaaaaaa', imageUrl: '/pages/coach/assets/membership-share-cover.jpg' })
-  page.onRevoke(tap({ id: 1 })); await settle(); assert.ok(s.calls.some(c => c.action === 'RevokeMyCard' && c.body.cardId === 1))
+  assert.ok(!s.calls.some(c => c.action === 'ListMyCards' || c.action === 'CreateCard' || c.action === 'ListMyCardTemplates'), '这个标签只是入口，不查卡、不建卡')
+  page.onGoShare(); assert.equal(s.nav.at(-1), '../card_standard/card_standard')
+  assert.equal(typeof page.onShareAppMessage, 'undefined', '分享在制作会员卡页，这里不再有分享')
+  assert.equal(typeof page.onCreateForTemplate, 'undefined')
   page.onTab(tap({ tab: 'status' })); await settle()
-  assert.equal(page.data.statusRows[1].studentName, '王同学')
+  assert.deepEqual(page.data.statusRows.map(r => [r.statusText, r.tone, r.canCancel]), [['待领取', 'warn', true], ['已领取', 'ok', false], ['已取消', 'muted', false]])
+  const done = page.data.statusRows[1]
+  assert.deepEqual([done.nickName, done.avatarUrl, done.cardNo, done.channelText, done.name], ['雪友小王', 'https://img.snowmeet.top/upload/20261008/avatar_a.jpg', 'HJ000002', '二维码', '教练卡'])
+  assert.equal(page.data.statusRows[0].channelText, '小程序卡片')
+  // 取消没领取的分享：确认后调接口并刷新列表；已领取、已取消的没有取消按钮
+  const before = s.calls.filter(c => c.action === 'ListMyCards').length
+  await page.onCancelShare(tap({ id: 1 })); await settle()
+  assert.ok(s.calls.some(c => c.action === 'RevokeMyCard' && c.body.cardId === 1))
+  assert.equal(s.calls.filter(c => c.action === 'ListMyCards').length, before + 1)
   page.onTab(tap({ tab: 'students' })); await settle()
   assert.equal(page.data.studentSummary.cardDiscount, 33.6)
   page.onStudent(tap({ id: 3 })); assert.equal(s.nav.at(-1), '../student/student?id=3')
   page.onTab(tap({ tab: 'coupons' })); await settle()
   assert.deepEqual(page.data.coupons.map(x => x.tag.text), ['已被接受', '待接受', '在手'])
   assert.equal(page.data.coupons[0].acceptedPhoneTail, '3306')
+  const wxml = fs.readFileSync(path.join(__dirname, '../pages/coach/home/home.wxml'), 'utf8')
+  assert.match(wxml, /bindtap="onGoShare"/); assert.match(wxml, /bindtap="onCancelShare"/)
+  assert.doesNotMatch(wxml, /open-type="share"|生成分享卡|onCreateForTemplate/)
 })
 
 test('学员订单明细：起算日、来源、用卡标记', async t => {
@@ -307,6 +318,98 @@ test('领取页：还不是会员 → 授权手机号 → 成为会员后自动�
   assert.equal(page.data.state, 'claimed_by_me'); assert.equal(page.data.needMember, false)
 })
 
+// 领取会籍卡要求头像和昵称都已授权（2026-11-17）：页面先弹授权层（跳过过也再弹），服务端兜底拒绝
+function profileGate(page, log) {
+  page.selectComponent = sel => { assert.equal(sel, '#profileAuth'); return { ensure(force) { log.push(force === true ? 'ensure(force)' : 'ensure'); return Promise.resolve() } } }
+}
+
+test('领取页：头像昵称没授权 → 按钮是「授权头像昵称并领取」，先弹授权层（强制）再领取，成功后显示和本人绑定的卡号', async t => {
+  let claimed = false
+  const s = setup(t, {
+    staff: null,
+    handler: (c, a) => a === 'GetShareCard' ? OK(VIEW('claimable', { needProfile: true }))
+      : (claimed = true, OK(Object.assign({ state: 'claimed_by_me', claimed: true }, VIEW('claimed_by_me', { cardNo: 'HJ000123', cardName: '雪季会籍卡' }))))
+  })
+  const page = s.load('pages/coach/claim/claim.js'); const log = []; profileGate(page, log)
+  page.onLoad({ t: TOKEN }); await settle()
+  assert.equal(page.data.state, 'claimable'); assert.equal(page.data.needProfile, true)
+  const wxml = fs.readFileSync(path.join(__dirname, '../pages/coach/claim/claim.wxml'), 'utf8')
+  assert.match(wxml, /needProfile \? '授权头像昵称并领取' : '领取会籍卡'/)
+  assert.match(wxml, /<profile-auth id="profileAuth"/)
+  await page.onClaim()
+  assert.deepEqual(log, ['ensure(force)'], '授权层弹一次，跳过过也要再弹')
+  assert.equal(claimed, true)
+  assert.equal(page.data.state, 'claimed_by_me'); assert.equal(page.data.cardNo, 'HJ000123'); assert.equal(page.data.needProfile, false)
+  assert.match(wxml, /卡号 \{\{cardNo\}\}/)
+})
+
+test('领取页：资料已完整的会员直接领取，不弹授权层', async t => {
+  const s = setup(t, { staff: null, handler: (c, a) => a === 'GetShareCard' ? OK(VIEW('claimable')) : OK(Object.assign({ state: 'claimed_by_me', claimed: true }, VIEW('claimed_by_me', { cardNo: 'HJ000007' }))) })
+  const page = s.load('pages/coach/claim/claim.js'); const log = []; profileGate(page, log)
+  page.onLoad({ t: TOKEN }); await settle()
+  assert.equal(page.data.needProfile, false)
+  await page.onClaim()
+  assert.deepEqual(log, [])
+  assert.equal(page.data.cardNo, 'HJ000007')
+})
+
+test('领取页：页面没带「需要授权」标志、服务端却说需要 → 补弹一次授权层再领；授权后领取成功', async t => {
+  let attempts = 0
+  const s = setup(t, {
+    staff: null,
+    handler: (c, a) => a === 'GetShareCard' ? OK(VIEW('claimable'))
+      : (++attempts === 1 ? ERR(1, '领取会籍卡前，请先授权头像和昵称', { state: 'need_profile' })
+        : OK(Object.assign({ state: 'claimed_by_me', claimed: true }, VIEW('claimed_by_me', { cardNo: 'HJ000009' }))))
+  })
+  const page = s.load('pages/coach/claim/claim.js'); const log = []; profileGate(page, log)
+  page.onLoad({ t: TOKEN }); await settle()
+  await page.onClaim()
+  assert.deepEqual(log, ['ensure(force)']); assert.equal(attempts, 2)
+  assert.equal(page.data.state, 'claimed_by_me'); assert.equal(page.data.cardNo, 'HJ000009')
+})
+
+test('领取页：顾客跳过了授权 → 领取被拒，仍停在可领取，提示怎么办；不会反复弹，授权后可再领', async t => {
+  let attempts = 0, granted = false
+  const s = setup(t, {
+    staff: null,
+    handler: (c, a) => a === 'GetShareCard' ? OK(VIEW('claimable', { needProfile: true }))
+      : (++attempts, granted ? OK(Object.assign({ state: 'claimed_by_me', claimed: true }, VIEW('claimed_by_me', { cardNo: 'HJ000010' })))
+        : ERR(1, '领取会籍卡前，请先授权头像和昵称', { state: 'need_profile' }))
+  })
+  const page = s.load('pages/coach/claim/claim.js'); const log = []; profileGate(page, log)
+  page.onLoad({ t: TOKEN }); await settle()
+  await page.onClaim()
+  assert.deepEqual(log, ['ensure(force)'], '已经问过就不在同一次点击里再问')
+  assert.equal(attempts, 1)
+  assert.equal(page.data.state, 'claimable'); assert.equal(page.data.needProfile, true)
+  assert.match(page.data.errMsg, /授权头像和昵称/)
+  granted = true
+  await page.onClaim()
+  assert.equal(log.length, 2); assert.equal(page.data.state, 'claimed_by_me'); assert.equal(page.data.cardNo, 'HJ000010')
+})
+
+test('领取页：还不是会员 → 授权手机号后只弹一次头像昵称授权层（强制）再领取', async t => {
+  let member = false
+  const s = setup(t, {
+    staff: null,
+    handler: (c, a) => a === 'GetShareCard' ? OK(Object.assign(VIEW('claimable'), { needMember: !member }))
+      : OK(Object.assign({ state: 'claimed_by_me', claimed: true }, VIEW('claimed_by_me', { cardNo: 'HJ000011' })))
+  })
+  const page = s.load('pages/coach/claim/claim.js', { bindWechatCellPromise: () => { member = true; return Promise.resolve({ id: 9 }) } })
+  const log = []; profileGate(page, log)
+  page.onLoad({ t: TOKEN }); await settle()
+  await page.onPhone({ detail: { encryptedData: 'ENC', iv: 'IV' } })
+  assert.deepEqual(log, ['ensure(force)'])
+  assert.equal(page.data.state, 'claimed_by_me'); assert.equal(page.data.cardNo, 'HJ000011')
+})
+
+test('我的会籍卡：显示卡号', async t => {
+  const s = setup(t, { staff: null, handler: () => OK({ cards: [{ id: 1, cardNo: 'HJ000123', coachName: '某机构', cardName: '雪季会籍卡', validUntil: '2027-04-30T23:59:59', expired: false, carePrices: [], rentalRate: null }] }) })
+  const page = s.load('pages/coach/card/card.js'); page.onLoad(); await settle()
+  assert.equal(page.data.cards[0].cardNo, 'HJ000123')
+  assert.match(fs.readFileSync(path.join(__dirname, '../pages/coach/card/card.wxml'), 'utf8'), /卡号 \{\{item\.cardNo\}\}/)
+})
+
 test('领取页：已失效 / 教练本人 / 已有该教练的卡 / 登录失败可重试', async t => {
   let state = 'invalid'
   const s = setup(t, { staff: null, handler: () => OK(VIEW(state, { message: '提示' })) })
@@ -326,20 +429,3 @@ test('我的学员卡：已领取的卡、有效期与各店价格', async t => 
   assert.equal(page.data.cards.length, 1); assert.equal(page.data.cards[0].until, '2027-04-30'); assert.equal(page.data.cards[0].benefit.lines[1].one, '¥68')
 })
 
-test('机构中心每次生成独立卡并分享服务端单卡链接', async t => {
-  const template = { id: 8, name: '教练卡', carePrices: [], rentalRate: 0.8 }
-  let sequence = 0
-  const s = setup(t, { handler: (c, a) => {
-    if (a === 'GetMyCoach') return OK({ isCoach: true, coach: COACH({ introducerType: '机构' }), cards: {} })
-    if (a === 'ListMyCards') return OK({ cards: [], counts: {} })
-    if (a === 'ListMyCardTemplates') return OK({ templates: [template] })
-    if (a === 'CreateCard') { sequence++; return OK({ cardId: sequence, cardName: '教练卡', tokenTail: '000' + sequence, sharePath: '/pages/coach/claim/claim?t=unique000' + sequence }) }
-    return OK({})
-  } })
-  const home = s.load('pages/coach/home/home.js'); home.onLoad({}); await settle()
-  await home.onCreateForTemplate({ currentTarget: { dataset: { id: 8 } } })
-  await home.onCreateForTemplate({ currentTarget: { dataset: { id: 8 } } })
-  assert.equal(home.data.pending.length, 2)
-  assert.notEqual(home.data.pending[0].sharePath, home.data.pending[1].sharePath)
-  assert.deepEqual(s.calls.filter(c => c.action === 'CreateCard').map(c => c.body.templateId), [8, 8])
-})

@@ -1,30 +1,39 @@
 <view class="co-page">
   <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
   <block wx:elif="{{!loading && !editing}}">
-    <view class="note blue">创建不同卡种；每次生成一张分享卡，每张卡只能由一位顾客领取。</view>
+    <view class="note blue">创建不同卡种；每个卡种可以「分享二维码」或「分享小程序卡片」。每次分享都会记一条，一次分享只能一位顾客领取，顾客领取时需要授权头像和昵称。</view>
     <view class="btn primary btn-block" bindtap="onNew">＋ 创建卡种</view>
     <view wx:for="{{templates}}" wx:key="id" class="card card-pad">
-      <view class="card-title">{{item.name}}</view>
+      <view class="card-row"><view class="card-title grow">{{item.name}}</view><view class="btn" data-id="{{item.id}}" bindtap="onEdit">编辑</view></view>
       <view wx:for="{{item.benefit.lines}}" wx:for-item="line" wx:key="label" class="card-meta">{{line.label}}：单项 {{line.one}} · 双项 {{line.two}}</view>
       <view class="card-meta">租赁：{{item.benefit.rental}}</view>
       <view class="btn-row">
-        <view class="btn primary {{creating ? 'disabled' : ''}}" data-id="{{item.id}}" bindtap="onCreateShare">生成分享卡</view>
-        <view class="btn" data-id="{{item.id}}" bindtap="onEdit">编辑</view>
+        <view class="btn primary {{sharingQr ? 'disabled' : ''}}" data-id="{{item.id}}" bindtap="onShareQr">分享二维码</view>
+        <button wx:if="{{item.coverPath}}" class="btn primary" open-type="share" data-id="{{item.id}}" data-name="{{item.name}}" data-cover="{{item.coverPath}}">分享小程序卡片</button>
+        <view wx:elif="{{item.coverError}}" class="card-meta" data-name="{{item.name}}" bindtap="onRetryCover">封面生成失败，点此重试</view>
+        <view wx:else class="btn disabled">分享小程序卡片（封面生成中…）</view>
       </view>
     </view>
     <view wx:if="{{!templates.length}}" class="co-empty">还没有卡种，先创建一张</view>
-    <view wx:if="{{pendingError}}" class="note">待领取卡加载失败，请下拉刷新重试。</view>
-    <view wx:if="{{pending.length}}" class="shop-title">待分享 / 待领取</view>
-    <view wx:for="{{pending}}" wx:key="id" class="card card-pad">
-      <view class="card-title small">{{item.name}} · 卡 …{{item.tokenTail}}</view>
-      <view class="card-meta">每张卡仅一人领取；发给其他顾客请再生成一张。</view>
-      <view class="btn-row">
-        <button wx:if="{{item.coverPath}}" class="share-btn" open-type="share" data-path="{{item.sharePath}}" data-name="{{item.name}}" data-cover="{{item.coverPath}}">分享给顾客</button>
-        <view wx:elif="{{item.coverError}}" class="card-meta" data-name="{{item.name}}" bindtap="onRetryCover">封面生成失败，点此重试</view>
-        <view wx:else class="card-meta">正在生成分享封面…</view>
-        <view class="btn danger" data-id="{{item.id}}" bindtap="onRevokePending">撤销</view>
+
+    <view class="co-section-title"><text>分享记录</text><text class="side">每次分享一条，新的在前</text></view>
+    <view wx:if="{{sharesError}}" class="note">分享记录加载失败，请下拉刷新重试。</view>
+    <view wx:for="{{shares}}" wx:key="id" class="card card-pad" style="{{item.status === 'revoked' ? 'opacity: 0.6;' : ''}}">
+      <view class="card-row">
+        <image wx:if="{{item.avatarUrl}}" class="share-avatar" src="{{item.avatarUrl}}" mode="aspectFill" />
+        <view wx:elif="{{item.status === 'claimed'}}" class="share-avatar">{{item.initial || '客'}}</view>
+        <view wx:else class="share-avatar empty">?</view>
+        <view class="grow">
+          <view class="card-title small">{{item.status === 'claimed' ? (item.nickName || '顾客') : '等待顾客领取'}}</view>
+          <view class="card-meta">{{item.name}}{{item.channelText ? ' · ' + item.channelText : ''}}</view>
+        </view>
+        <text class="tag {{item.tone}}">{{item.statusText}}</text>
       </view>
+      <view class="card-meta">分享于 {{item.created}}</view>
+      <view wx:if="{{item.status === 'claimed'}}" class="card-meta">卡号 {{item.cardNo}} · {{item.claimed}} 领取</view>
+      <view wx:if="{{item.canCancel}}" class="btn-row"><view class="btn danger" data-id="{{item.id}}" bindtap="onCancelShare">取消分享</view></view>
     </view>
+    <view wx:if="{{!shares.length && !sharesError}}" class="co-empty">还没有分享记录</view>
   </block>
   <block wx:elif="{{!loading && editing}}">
     <view class="note blue">设置卡种的名称和权益，价格不能低于管理员设定的底价。</view>
@@ -68,6 +77,20 @@
 
     <view class="note">修改只影响之后领取的新卡，已领取的卡保留领取时的名称和价格。保存后可在分销商中心分享。</view>
   </block>
+  <view wx:if="{{qr.show}}" class="qr-mask">
+    <view class="qr-pop">
+      <view class="card-title">{{qr.name}}</view>
+      <view class="card-meta">让顾客用微信「扫一扫」或长按识别二维码，授权头像昵称后即可领取。一个二维码只能一位顾客领取。</view>
+      <image wx:if="{{qr.url}}" class="qr-img" src="{{qr.url}}" mode="aspectFit" show-menu-by-longpress bindload="onQrLoad" binderror="onQrError" />
+      <view wx:if="{{qr.loading}}" class="card-meta">正在生成二维码…</view>
+      <view wx:if="{{qr.error}}" class="danger-line">{{qr.error}}</view>
+      <view class="btn-row">
+        <view wx:if="{{qr.error}}" class="btn" bindtap="onQrRetry">重试</view>
+        <view wx:else class="btn" bindtap="onQrSave">保存到相册</view>
+        <view class="btn primary" bindtap="onQrClose">完成</view>
+      </view>
+    </view>
+  </view>
 </view>
 <canvas canvas-id="membershipShareCover" style="position: fixed; left: -10000px; top: 0; width: 500px; height: 400px; pointer-events: none;"></canvas>
 <view wx:if="{{!blocked && !loading && editing && canEdit}}" class="bottom-bar">

@@ -64,7 +64,13 @@ module.exports = {
   makeMyCoupons: form => post('Distributor', 'MakeMyCoupons', form),
   // ---- 教练自己 ----
   getMyCoach: () => get('Coach', 'GetMyCoach'),
-  createCard: templateId => post('Coach', 'CreateCard', templateId == null ? {} : { templateId }),
+  // channel：qr 分享二维码 / card 分享小程序卡片；每次分享都在服务端记一条待领取的卡（旧版不传 channel 也行）
+  createCard: (templateId, channel) => post('Coach', 'CreateCard', Object.assign({}, templateId == null ? {} : { templateId }, channel ? { channel } : {})),
+  // 分享二维码是 PNG 图片，直接给 <image src>；服务端只给这张卡的所属机构、且卡还没被领取没被取消时出码
+  cardQrUrl: (cardId, envVersion) => {
+    const g = getApp().globalData
+    return g.requestPrefix + 'Coach/GetCardQr?sessionKey=' + g.sessionKey + '&cardId=' + encodeURIComponent(cardId) + '&envVersion=' + encodeURIComponent(envVersion || 'release')
+  },
   listMyCards: status => get('Coach', 'ListMyCards', { status }),
   revokeMyCard: cardId => post('Coach', 'RevokeMyCard', { cardId }),
   getStudents: () => get('Coach', 'GetStudents'),

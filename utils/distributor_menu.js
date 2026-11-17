@@ -8,8 +8,8 @@ const ENTRIES = {
   makeCard: { title: '制作会员卡', url: '/pages/coach/card_standard/card_standard' },
   // 机构按管理员设的底价生成自己的优惠券（教练没有这个条目）
   makeCoupon: { title: '制作优惠券', url: '/pages/coach/coupon_maker/coupon_maker' },
-  // 发卡、券复用教练中心，按 tab 直达
-  cards: { title: '发卡与领取情况', url: '/pages/coach/home/home?tab=share' },
+  // 领取情况（每次分享一条，可取消没领取的）、券复用教练中心，按 tab 直达；分享在「制作会员卡」页（2026-11-17）
+  cards: { title: '发卡与领取情况', url: '/pages/coach/home/home?tab=status' },
   coupons: { title: '我的优惠券', url: '/pages/coach/home/home?tab=coupons' },
   payee: { title: '收款资料', url: '/pages/distributor/payee/payee' }
 }

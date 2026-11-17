@@ -57,11 +57,12 @@ function markDone(globalData, sessionKey) {
 }
 
 // 页面（或组件）里放了 <profile-auth id="profileAuth" />：让它在需要时弹出来，并等到用户处理完。永远不 reject。
-function ensureOn(owner) {
+// force=true：领取会籍卡这类「必须有头像昵称」的场合，本次运行里跳过过也再弹一次（2026-11-17）
+function ensureOn(owner, force) {
   try {
     const c = owner && typeof owner.selectComponent === 'function' ? owner.selectComponent('#profileAuth') : null
     if (c && typeof c.ensure === 'function') {
-      return Promise.resolve(c.ensure()).then(() => undefined, () => undefined)
+      return Promise.resolve(c.ensure(force === true)).then(() => undefined, () => undefined)
     }
   } catch (e) {
     // 组件取不到不能拦后续流程

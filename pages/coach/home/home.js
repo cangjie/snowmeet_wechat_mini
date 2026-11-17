@@ -1,8 +1,8 @@
-// 分销商中心：机构发会籍卡并分享、看领取情况；所有分销商看顾客消费、看自己的优惠券。教练和 KOL 没有发卡（2026-11-17：只有机构能发整个雪季有效的会籍卡）
+// 分销商中心：机构看会籍卡的领取情况（每次分享一条，可取消没领取的）、去「制作会员卡」分享；所有分销商看顾客消费、看自己的优惠券。
+// 教练和 KOL 没有发卡（2026-11-17：只有机构能发整个雪季有效的会籍卡）。分享二维码 / 分享小程序卡片都在 pages/coach/card_standard。
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/coach-view.js')
-const shareCover = require('../common/share-cover.js')
 
 const COUPON_STATE = {
   held: { text: '在手', tone: 'blue' }, pending: { text: '待接受', tone: 'warn' }, accepted: { text: '已被接受', tone: 'ok' },
@@ -12,20 +12,18 @@ const COUPON_STATE = {
 Page({
   data: {
     blocked: '', loading: true, tab: 'share', coach: null, counts: null, benefit: null, validUntil: '',
-    cards: [], pending: [], statusRows: [], templates: [],
+    statusRows: [],
     students: [], studentSummary: null,
-    couponSummary: null, coupons: [], creating: false
+    couponSummary: null, coupons: []
   },
 
   onLoad(options) {
     if (options && options.tab) this.setData({ tab: options.tab })
-    // 只允许用卡片里的按钮分享，不让右上角菜单把教练中心本身分享出去
+    // 这个页面本身不分享（分享在「制作会员卡」页），不让右上角菜单把分销商中心转发出去
     if (wx.hideShareMenu) wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] })
     this.boot()
   },
   onShow() { if (this.loadedOnce) this.load() },
-  onReady() { this._membershipCanvasReady = true; shareCover.prepareList(this, 'templates', '学员卡'); shareCover.prepareList(this, 'pending', '学员卡') },
-  onUnload() { this._membershipCanvasClosed = true },
   onPullDownRefresh() { this.load().then(() => wx.stopPullDownRefresh()) },
 
   boot() {
@@ -53,75 +51,25 @@ Page({
     const tab = this.data.tab
     if (tab === 'students') return this.loadStudents()
     if (tab === 'coupons') return this.loadCoupons()
-    return this.loadCards().then(() => this.data.coach && this.data.coach.introducerType === '机构' ? this.loadTemplates() : null)
+    if (tab === 'status') return this.loadCards()
+    return null    // 发卡/分享：只是去「制作会员卡」的入口，不用加载
   },
 
   onTab(e) { this.setData({ tab: e.currentTarget.dataset.tab }); this.loadTab() },
-  loadTemplates() { return api.listCardTemplates().then(d => {
-    const rows = (d.templates || []).map(t => Object.assign({}, t, { benefit: view.benefitLines(t.carePrices, t.rentalRate) }))
-    this.setData({ templates: shareCover.decorate(this, rows, '学员卡') })
-    shareCover.prepareList(this, 'templates', '学员卡')
-  }).catch(base.fail) },
-  onManageTemplates() { wx.navigateTo({ url: '../card_standard/card_standard' }) },
-  onRetryCover(e) {
-    const d = e.currentTarget.dataset
-    if (d.field === 'templates' || d.field === 'pending') shareCover.retry(this, d.field, d.name, '学员卡')
-  },
+  onGoShare() { wx.navigateTo({ url: '../card_standard/card_standard' }) },
 
-  // ---- 发卡 / 领取情况 ----
+  // ---- 领取情况：每次分享一条，领取人的头像昵称和卡号；没领取的可以取消 ----
   loadCards() {
     return api.listMyCards().then(d => {
-      const rows = d.cards.map(x => Object.assign({}, x.card, {
-        sharePath: x.sharePath, name: x.card.cardName || '学员卡', tag: view.statusTag(x.card.status),
-        created: view.dateText(x.card.createDate), claimed: view.dateText(x.card.claimedAt)
-      }))
-      this.setData({
-        counts: d.counts, cards: rows,
-        pending: shareCover.decorate(this, rows.filter(r => r.status === 'issued'), '学员卡'),
-        statusRows: rows
-      })
-      shareCover.prepareList(this, 'pending', '学员卡')
+      this.setData({ counts: d.counts, statusRows: (d.cards || []).map(x => view.shareRow(x.card)) })
     }).catch(base.fail)
   },
 
-  onCreateForTemplate(e) {
-    if (this.data.creating) return
+  onCancelShare(e) {
     const id = Number(e.currentTarget.dataset.id)
-    const template = this.data.templates.find(t => t.id === id)
-    if (!template) return
-    this.setData({ creating: true })
-    return api.createCard(id).then(card => {
-      const pending = this.data.pending.concat([{ id: card.cardId, name: card.cardName || template.name, tokenTail: card.tokenTail, sharePath: card.sharePath }])
-      this.setData({ creating: false, pending: shareCover.decorate(this, pending, '学员卡') })
-      shareCover.prepareList(this, 'pending', '学员卡')
-      base.done('已生成，请分享给一位顾客')
-    }).catch(err => { this.setData({ creating: false }); base.fail(err) })
-  },
-
-  onCreate() {
-    if (this.data.creating) return
-    this.setData({ creating: true })
-    api.createCard().then(() => {
-      this.setData({ creating: false })
-      base.done('已生成，点「分享给顾客」发出去')
-      return this.loadCards()
-    }).catch(err => { this.setData({ creating: false }); base.fail(err) })
-  },
-
-  onRevoke(e) {
-    const id = e.currentTarget.dataset.id
-    base.confirm('撤销学员卡', '撤销后这张卡不能再被领取。', '撤销').then(ok => {
-      if (ok) api.revokeMyCard(id).then(() => { this.setData({ pending: this.data.pending.filter(c => c.id !== id) }); base.done('已撤销'); this.loadCards() }).catch(base.fail)
+    return base.confirm('取消这次分享', '取消后，对方扫码或点开都不能再领取这张会籍卡。', '取消分享').then(ok => {
+      if (ok) return api.revokeMyCard(id).then(() => { base.done('已取消'); return this.loadCards() }).catch(err => { base.fail(err); return this.loadCards() })
     })
-  },
-
-  // 分享按钮（open-type="share"）：路径由服务端给，指向学员领取页
-  onShareAppMessage(e) {
-    const d = this.data
-    const target = e && e.target && e.target.dataset
-    const name = d.coach ? d.coach.name : '分销商'
-    const path = (target && target.path) || (d.pending[0] && d.pending[0].sharePath) || '/pages/mine/mine'
-    return { title: name + '送你一张' + ((target && target.name) || '学员卡'), path, imageUrl: (target && target.cover) || shareCover.FALLBACK }
   },
 
   // ---- 学员消费 ----

@@ -38,7 +38,7 @@ test('菜单：发卡 / 券直达教练中心对应标签；顾客有自己的�
   assert.equal(menu.ENTRIES.makeCard.url, '/pages/coach/card_standard/card_standard')
   assert.equal(menu.ENTRIES.makeCoupon.url, '/pages/coach/coupon_maker/coupon_maker')
   assert.equal(menu.ENTRIES.customers.url, '/pages/distributor/customers/customers')
-  assert.equal(menu.ENTRIES.cards.url, '/pages/coach/home/home?tab=share')
+  assert.equal(menu.ENTRIES.cards.url, '/pages/coach/home/home?tab=status')
   assert.equal(menu.ENTRIES.coupons.url, '/pages/coach/home/home?tab=coupons')
   assert.equal(menu.build({ isDistributor: true, distributor: { type: '教练' } }).entries.length, 0)
 })

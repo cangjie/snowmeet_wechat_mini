@@ -15,7 +15,7 @@
   <!-- 可领取 -->
   <block wx:elif="{{state === 'claimable'}}">
     <view class="vip">
-      <view class="vip-small">送你一张</view>
+      <view class="vip-small">送你一张会籍卡</view>
       <view class="vip-title">{{cardName}}</view>
       <view wx:for="{{benefit.lines}}" wx:key="label" class="vip-line"><text>{{item.label}}</text><text>单项 <text class="em">{{item.one}}</text> · 双项 <text class="em">{{item.two}}</text></text></view>
       <view class="vip-line"><text>租赁 · 各店通用</text><text class="em">{{benefit.rental}}</text></view>
@@ -24,30 +24,32 @@
     <view class="card card-pad"><view class="card-meta" style="line-height: 1.7;">到店养护、租赁时，由店员在开单页选择使用这张卡，和优惠券、次卡二选一。维修费、加急加价不打折。</view></view>
     <view wx:if="{{errMsg}}" class="danger-line center">{{errMsg}}</view>
     <button wx:if="{{needMember}}" class="btn primary btn-block {{claiming ? 'disabled' : ''}}" open-type="getPhoneNumber" bindgetphonenumber="onPhone">授权手机号并领取</button>
-    <view wx:else class="btn primary btn-block {{claiming ? 'disabled' : ''}}" bindtap="onClaim">领取学员卡</view>
-    <view wx:if="{{needMember}}" class="note blue">需要先授权手机号，这样到店报手机号，店员就能在开单时选到这张卡。</view>
+    <view wx:else class="btn primary btn-block {{claiming ? 'disabled' : ''}}" bindtap="onClaim">{{needProfile ? '授权头像昵称并领取' : '领取会籍卡'}}</view>
+    <view wx:if="{{needMember}}" class="note blue">需要先授权手机号，这样到店报手机号，店员就能在开单时选到这张卡。领取时还需要授权头像和昵称。</view>
+    <view wx:elif="{{needProfile}}" class="note blue">领取会籍卡需要先授权头像和昵称。点上面的按钮，按提示选择微信头像、微信昵称后即可领取。</view>
   </block>
 
   <!-- 已领取（本人） -->
   <view wx:elif="{{state === 'claimed_by_me'}}" class="center">
     <view class="state-icon ok">✓</view>
     <view class="big-title">已领取</view>
+    <view wx:if="{{cardNo}}" class="big-title" style="font-size: 36rpx; margin-top: 8rpx;">卡号 {{cardNo}}</view>
     <view class="card-meta" style="margin: 12rpx 0 28rpx;">{{cardName}} · 有效期至 {{validUntil}}</view>
     <view class="card card-pad" style="text-align: left;"><view class="card-meta" style="line-height: 1.7;">到店养护、租赁时，说手机号或扫码接待，店员开单时选择这张卡即可享受优惠。</view></view>
-    <view class="btn primary btn-block" style="margin-top: 24rpx;" bindtap="onGoMine">查看我的学员卡</view>
+    <view class="btn primary btn-block" style="margin-top: 24rpx;" bindtap="onGoMine">查看我的会籍卡</view>
   </view>
 
   <!-- 已被别人领走 -->
   <view wx:elif="{{state === 'taken'}}" class="center">
     <view class="state-icon gray">!</view>
-    <view class="big-title">这张学员卡已被领取</view>
+    <view class="big-title">这张会籍卡已被领取</view>
     <view class="card-meta" style="margin-top: 12rpx;">每张卡只能一位顾客领取，请向分销商再要一张。</view>
   </view>
 
   <!-- 已失效 -->
   <view wx:elif="{{state === 'invalid'}}" class="center">
     <view class="state-icon warn">×</view>
-    <view class="big-title">这张学员卡已失效</view>
+    <view class="big-title">这张会籍卡已失效</view>
     <view class="card-meta" style="margin-top: 12rpx;">{{message || '可能已被分销商撤销或已过期，请联系分销商重新发送。'}}</view>
   </view>
 

@@ -333,6 +333,15 @@ const CARD_STATUS = {
 }
 const statusTag = s => CARD_STATUS[s] || { text: s, tone: 'muted' }
 
+// 分享记录里的状态：没人领的叫「待领取」，机构自己取消的叫「已取消」（用户 2026-11-17：没领取的可以取消）
+const SHARE_STATUS = {
+  issued: { text: '待领取', tone: 'warn' },
+  claimed: { text: '已领取', tone: 'ok' },
+  revoked: { text: '已取消', tone: 'muted' },
+  merged: { text: '已作废', tone: 'muted' }
+}
+const SHARE_CHANNEL = { qr: '二维码', card: '小程序卡片' }
+
 function dateText(v) {
   if (!v) return ''
   const d = new Date(v)
@@ -340,6 +349,19 @@ function dateText(v) {
   const p = n => (n < 10 ? '0' + n : '' + n)
   return p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes())
 }
+// 分享列表的一行：每次分享一条（待领取 / 已领取 / 已取消）；已领取的带领取人的头像、昵称和会籍卡卡号，待领取的可以取消
+function shareRow(card) {
+  const c = card || {}
+  const st = SHARE_STATUS[c.status] || { text: c.status || '', tone: 'muted' }
+  const nick = c.nickName || c.studentName || ''
+  return {
+    id: c.id, status: c.status, name: c.cardName || '会籍卡', statusText: st.text, tone: st.tone,
+    channelText: SHARE_CHANNEL[c.channel] || '', created: dateText(c.createDate), claimed: dateText(c.claimedAt),
+    cardNo: c.cardNo || '', nickName: nick, avatarUrl: c.avatarUrl || '', initial: nick ? Array.from(nick)[0] : '',
+    canCancel: c.status === 'issued', tokenTail: c.tokenTail || ''
+  }
+}
+
 function dayText(v) {
   if (!v) return ''
   const d = new Date(v)
@@ -360,7 +382,7 @@ function benefitLines(carePrices, rentalRate) {
 
 module.exports = {
   SHOPS, TIERS, SHORT, MODES, cellText, rentalText, priceChips, editCells, cellsPayload, rentalPayload, rentalEditText,
-  previewPrice, statusTag, dateText, dayText, benefitLines,
+  previewPrice, statusTag, shareRow, dateText, dayText, benefitLines,
   floorHint, standardCells, effectiveStandardCell, cardUnit, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
   COUPON_MAX, couponCells, couponPayload, couponFloorEditCells, couponFloorsPayload
 }

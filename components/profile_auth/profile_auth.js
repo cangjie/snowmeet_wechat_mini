@@ -36,8 +36,9 @@ Component({
   },
   methods: {
     // 需要时弹出，等用户处理完才完成；永远不 reject
-    ensure() {
-      return this._start(false)
+    // force=true：本次运行里跳过过也再问（领取会籍卡必须有头像昵称，不能让「跳过」把它绕过去）
+    ensure(force) {
+      return this._start(false, force === true)
     },
 
     // 「我的」页点顶部头像昵称：不看「已处理」，已有资料也能打开修改
@@ -45,19 +46,19 @@ Component({
       return this._start(true)
     },
 
-    _start(editing) {
+    _start(editing, force) {
       if (this._pending) return this._pending
-      const run = this._run(editing).catch(() => {}).then(() => { this._pending = null })
+      const run = this._run(editing, force).catch(() => {}).then(() => { this._pending = null })
       this._pending = run
       return run
     },
 
-    async _run(editing) {
+    async _run(editing, force) {
       const app = currentApp()
       const globalData = app && app.globalData
       const sessionKey = globalData && globalData.sessionKey
       if (typeof sessionKey !== 'string' || !sessionKey.trim()) return
-      if (!editing && profileAuth.isDone(globalData, sessionKey)) return
+      if (!editing && !force && profileAuth.isDone(globalData, sessionKey)) return
       const res = await data.getMyProfilePromise(sessionKey)
       if (editing) {
         // 会话还没有会员（没验证手机号）时没有资料可改：后端说不用弹、也没有更新时间

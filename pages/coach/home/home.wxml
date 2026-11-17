@@ -11,52 +11,39 @@
       <view class="tab {{tab === 'coupons' ? 'on' : ''}}" data-tab="coupons" bindtap="onTab">我的券</view>
     </view>
 
-    <!-- 发卡 / 分享 -->
+    <!-- 发卡 / 分享：分享二维码、分享小程序卡片都在「制作会员卡」页，这里只是入口 -->
     <block wx:if="{{tab === 'share'}}">
-      <block wx:if="{{coach.introducerType === '机构'}}">
-        <view wx:if="{{coach.valid}}" class="btn primary btn-block" bindtap="onManageTemplates">＋ 管理卡种</view>
-        <view wx:for="{{templates}}" wx:key="id" class="card card-pad">
-          <view class="card-title">{{item.name}}</view>
-          <view wx:for="{{item.benefit.lines}}" wx:for-item="line" wx:key="label" class="card-meta">{{line.label}}：单项 {{line.one}} · 双项 {{line.two}}</view>
-          <view class="card-meta">租赁：{{item.benefit.rental}}</view>
-          <view class="btn primary {{creating ? 'disabled' : ''}}" data-id="{{item.id}}" bindtap="onCreateForTemplate">生成分享卡</view>
-        </view>
-        <view wx:if="{{!templates.length}}" class="co-empty">还没有卡种，请先创建</view>
-        <view class="note blue">每次生成一张分享卡，每张卡只能由一位顾客领取。</view>
-      </block>
-      <view wx:for="{{pending}}" wx:key="id" class="card card-pad">
-        <view class="card-row"><view class="grow card-row"><text class="card-title small">{{item.name}} · 卡 …{{item.tokenTail}}</text><text class="tag warn">待领取</text></view><text class="card-meta">{{item.created}}</text></view>
-        <view class="card-row">
-          <button wx:if="{{item.coverPath}}" class="share-btn" open-type="share" data-path="{{item.sharePath}}" data-name="{{item.name}}" data-cover="{{item.coverPath}}">分享给顾客</button>
-          <view wx:elif="{{item.coverError}}" class="card-meta" data-field="pending" bindtap="onRetryCover">封面生成失败，点此重试</view>
-          <view wx:else class="card-meta">正在生成分享封面…</view>
-          <view class="btn danger" data-id="{{item.id}}" bindtap="onRevoke">撤销</view>
-        </view>
+      <view class="card card-pad">
+        <view class="card-title">分享会籍卡</view>
+        <view class="card-meta" style="line-height: 1.7;">在「制作会员卡」里选好卡种，点「分享二维码」或「分享小程序卡片」发给顾客。每次分享都会记一条，一次分享只能一位顾客领取；顾客领取时需要授权头像和昵称，领取后在「领取情况」里能看到他的头像、昵称和卡号，没领取的可以取消。</view>
+        <view class="btn primary btn-block" bindtap="onGoShare">去分享会籍卡</view>
       </view>
-      <view wx:if="{{!pending.length}}" class="co-empty">还没有待领取的分享卡，点卡种上的「生成分享卡」</view>
-      <view wx:if="{{coach.introducerType !== '机构' || pending.length}}" class="note blue">每张分享卡只能一位顾客领取，发给其他顾客请再生成一张。</view>
     </block>
 
-    <!-- 领取情况 -->
+    <!-- 领取情况：每次分享一条 -->
     <block wx:if="{{tab === 'status'}}">
       <view wx:if="{{counts}}" class="stats">
-        <view class="stat"><text class="stat-num">{{counts.total}}</text><text class="stat-label">已发</text></view>
+        <view class="stat"><text class="stat-num">{{counts.total}}</text><text class="stat-label">已分享</text></view>
         <view class="stat"><text class="stat-num">{{counts.claimed}}</text><text class="stat-label">已领取</text></view>
         <view class="stat"><text class="stat-num">{{counts.issued}}</text><text class="stat-label">待领取</text></view>
-        <view class="stat"><text class="stat-num">{{counts.revoked}}</text><text class="stat-label">已撤销</text></view>
+        <view class="stat"><text class="stat-num">{{counts.revoked}}</text><text class="stat-label">已取消</text></view>
       </view>
       <view wx:for="{{statusRows}}" wx:key="id" class="card card-pad" style="{{item.status === 'revoked' ? 'opacity: 0.6;' : ''}}">
         <view class="card-row">
-          <view class="grow card-row">
-            <text class="dot {{item.status === 'claimed' ? '' : (item.status === 'issued' ? 'w' : 'g')}}"></text>
-            <text class="card-title small">{{item.status === 'claimed' ? item.studentName : item.tag.text}}</text>
+          <image wx:if="{{item.avatarUrl}}" class="share-avatar" src="{{item.avatarUrl}}" mode="aspectFill" />
+          <view wx:elif="{{item.status === 'claimed'}}" class="share-avatar">{{item.initial || '客'}}</view>
+          <view wx:else class="share-avatar empty">?</view>
+          <view class="grow">
+            <view class="card-title small">{{item.status === 'claimed' ? (item.nickName || '顾客') : '等待顾客领取'}}</view>
+            <view class="card-meta">{{item.name}}{{item.channelText ? ' · ' + item.channelText : ''}}</view>
           </view>
-          <text class="card-meta">{{item.status === 'claimed' ? '尾号 ' + item.phoneTail : '卡 …' + item.tokenTail}}</text>
+          <text class="tag {{item.tone}}">{{item.statusText}}</text>
         </view>
-        <view class="card-meta" wx:if="{{item.status === 'claimed'}}">{{item.cardName || '学员卡'}} · 卡 …{{item.tokenTail}} · {{item.claimed}} 领取</view>
-        <view class="card-meta" wx:else>{{item.created}} 创建{{item.status === 'issued' ? ' · 还没有人领取' : ''}}</view>
+        <view class="card-meta">分享于 {{item.created}}</view>
+        <view wx:if="{{item.status === 'claimed'}}" class="card-meta">卡号 {{item.cardNo}} · {{item.claimed}} 领取</view>
+        <view wx:if="{{item.canCancel}}" class="btn-row"><view class="btn danger" data-id="{{item.id}}" bindtap="onCancelShare">取消分享</view></view>
       </view>
-      <view wx:if="{{!statusRows.length}}" class="co-empty">还没有发过学员卡</view>
+      <view wx:if="{{!statusRows.length}}" class="co-empty">还没有分享过会籍卡</view>
     </block>
 
     <!-- 顾客消费 -->

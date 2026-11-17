@@ -398,6 +398,38 @@ test('组件：跳过 / 保存之后，同一个登录会话里再 ensure 不会
   await again
 })
 
+test('强制授权（领取会籍卡要头像昵称）：跳过过也再弹，且仍只在资料不全时才弹；不带 force 的行为不变', async t => {
+  const { c, calls } = setupComponent(t)
+  const first = c.ensure()
+  await settle()
+  await c.onSkip()
+  await first
+  await c.ensure()
+  assert.equal(c.data.visible, false, '没带 force：跳过过就不再弹')
+
+  const forced = c.ensure(true)
+  await settle()
+  assert.equal(c.data.visible, true, '带 force：跳过过也再弹一次')
+  assert.equal(calls.get, 2)
+  await c.onSkip()
+  await forced
+})
+
+test('强制授权：资料已经完整（后端说不用弹）时 force 也不弹', async t => {
+  const { c } = setupComponent(t, { profile: { code: 0, data: { needProfile: false, updateDate: '2026-11-15T10:00:00' } } })
+  await c.ensure(true)
+  assert.equal(c.data.visible, false)
+})
+
+test('ensureOn(owner, true) 把 force 传给组件；不传就是普通的 ensure', async () => {
+  const seen = []
+  const owner = { selectComponent: () => ({ ensure: force => { seen.push(force); return Promise.resolve() } }) }
+  await profileAuth.ensureOn(owner)
+  await profileAuth.ensureOn(owner, true)
+  await profileAuth.ensureOn(owner, 'yes')
+  assert.deepEqual(seen, [false, true, false])
+})
+
 test('组件：弹着的时候又来一次 ensure，共用同一次等待，不会弹第二层', async t => {
   const { c, calls } = setupComponent(t)
   const a = c.ensure()

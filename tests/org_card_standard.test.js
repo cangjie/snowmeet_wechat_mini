@@ -136,8 +136,6 @@ test('机构创建具名卡种并按底价校验，保存后显示在卡种列�
   assert.equal(save.method, 'POST'); assert.equal(save.body.name, '学员卡')
   assert.equal(save.body.care[0].value, 0.75); assert.equal(save.body.rental_rate, 0.85)
   assert.equal(page.data.editing, false); assert.equal(page.data.templates[0].name, '学员卡')
-  assert.deepEqual(page.onShareAppMessage({ target: { dataset: { name: '学员卡', path: '/pages/coach/claim/claim?t=AbCd1234', cover: 'wxfile://student-card.jpg' } } }),
-    { title: '送你一张学员卡', path: '/pages/coach/claim/claim?t=AbCd1234', imageUrl: 'wxfile://student-card.jpg' })
 })
 
 test('无机构身份被拦；保存被服务端拒绝后保留编辑内容', async t => {
@@ -200,30 +198,146 @@ test('制作会员卡页的 wxml / json / wxss 齐全，事件处理函数都在
   for (const m of wxml.matchAll(/bind(?:tap|input)="(\w+)"/g)) assert.match(js, new RegExp('\\b' + m[1] + '\\s*\\('), m[1])
 })
 
-test('卡种生成独立分享卡，分享链接来自服务端且封面使用卡种名', async t => {
-  const card = { id: 9, name: '教练卡', carePrices: [], rentalRate: null }
+// ---------- 卡种列表：分享二维码 / 分享小程序卡片（用户 2026-11-17），每次分享记一条 ----------
+const SHARE_CARD = { id: 9, name: '教练卡', carePrices: [], rentalRate: null }
+function shareEnv(t, over) {
+  const state = { cards: [], seq: 0 }
   const calls = env(t, (p, body) => {
-    if (p === 'Distributor/ListMyCardTemplates') return OK({ templates: [card] })
-    if (p === 'Coach/ListMyCards') return OK({ cards: [] })
-    if (p === 'Coach/CreateCard') return OK({ cardId: 1, cardName: '教练卡', tokenTail: '1234', sharePath: '/pages/coach/claim/claim?t=unique1234' })
+    if (over && over[p]) return over[p](body, state)
+    if (p === 'Distributor/ListMyCardTemplates') return OK({ templates: [SHARE_CARD] })
+    if (p === 'Coach/ListMyCards') return OK({ cards: state.cards.map(card => ({ card })), counts: {} })
+    if (p === 'Coach/CreateCard') {
+      state.seq++
+      state.cards.unshift({ id: state.seq, status: 'issued', cardName: body.templateId === 9 ? '教练卡' : '', channel: body.channel, createDate: '2026-11-17T10:0' + state.seq + ':00' })
+      return OK({ cardId: state.seq, cardName: '教练卡', tokenTail: 'AB0' + state.seq, sharePath: '/pages/coach/claim/claim?t=unique000' + state.seq, channel: body.channel })
+    }
+    if (p === 'Coach/RevokeMyCard') { state.cards.find(c => c.id === body.cardId).status = 'revoked'; return OK({ cardId: body.cardId }) }
     throw new Error(p)
   })
-  let drawn = ''
+  global.wx.showModal = o => o.success({ confirm: true })
   global.wx.createCanvasContext = () => {
     let words = ''
     return { drawImage() {}, setTextAlign() {}, setTextBaseline() {}, setFillStyle() {}, setFontSize() {},
       measureText(text) { return { width: text.length * 30 } }, fillText(text) { words += text },
-      draw(_, done) { drawn = words; setImmediate(done) } }
+      draw(_, done) { state.drawn = words; setImmediate(done) } }
   }
-  global.wx.canvasToTempFilePath = o => setImmediate(() => o.success({ tempFilePath: 'wxfile://' + drawn }))
+  global.wx.canvasToTempFilePath = o => setImmediate(() => o.success({ tempFilePath: 'wxfile://' + state.drawn }))
+  return { calls, state }
+}
+
+test('卡种列表：每个卡种只有「分享二维码」和「分享小程序卡片」两个按钮，没有「生成分享卡」，也没有旧的待分享列表', () => {
+  const wxml = fs.readFileSync(path.join(ROOT, 'pages/coach/card_standard/card_standard.wxml'), 'utf8')
+  assert.match(wxml, /bindtap="onShareQr"[^>]*>分享二维码</)
+  assert.match(wxml, /open-type="share"[^>]*>分享小程序卡片</)
+  assert.doesNotMatch(wxml, /生成分享卡|onCreateShare|onRevokePending|待分享 \/ 待领取/)
+  const js = fs.readFileSync(path.join(ROOT, 'pages/coach/card_standard/card_standard.js'), 'utf8')
+  assert.doesNotMatch(js, /onCreateShare|onRevokePending|loadPending/)
+})
+
+test('分享小程序卡片：选好转发对象时才记一次分享，路径来自服务端；每次都是新的一张；封面使用卡种名', async t => {
+  const { calls, state } = shareEnv(t)
   const page = loadPage('pages/coach/card_standard/card_standard.js', {})
   page.onLoad(); page.onReady(); await settle()
-  await page.onCreateShare({ currentTarget: { dataset: { id: 9 } } }); await settle()
-  assert.equal(calls.api.find(c => c.path === 'Coach/CreateCard').body.templateId, 9)
-  const row = page.data.pending[0]
+  const row = page.data.templates[0]
   assert.equal(row.coverPath, 'wxfile://教练卡')
-  assert.deepEqual(page.onShareAppMessage({ target: { dataset: { name: row.name, path: row.sharePath, cover: row.coverPath } } }),
-    { title: '送你一张教练卡', path: '/pages/coach/claim/claim?t=unique1234', imageUrl: 'wxfile://教练卡' })
+  assert.equal(calls.api.filter(c => c.path === 'Coach/CreateCard').length, 0, '只是列出卡种，不记分享')
+  const target = { target: { dataset: { id: row.id, name: row.name, cover: row.coverPath } } }
+
+  const first = page.onShareAppMessage(target)
+  assert.equal(first.title, '送你一张教练卡'); assert.equal(first.imageUrl, 'wxfile://教练卡')
+  assert.equal(first.path, '/pages/coach/claim/claim', '服务端没回之前（或超时）的兜底路径没有 token，不会被人领走')
+  assert.deepEqual(await first.promise, { title: '送你一张教练卡', path: '/pages/coach/claim/claim?t=unique0001', imageUrl: 'wxfile://教练卡' })
+  const second = await page.onShareAppMessage(target).promise
+  assert.equal(second.path, '/pages/coach/claim/claim?t=unique0002')
+  assert.deepEqual(calls.api.filter(c => c.path === 'Coach/CreateCard').map(c => [c.body.templateId, c.body.channel]), [[9, 'card'], [9, 'card']])
+  await settle()
+  assert.equal(page.data.shares.length, 2)
+  assert.deepEqual(page.data.shares.map(r => [r.id, r.channelText, r.statusText]), [[2, '小程序卡片', '待领取'], [1, '小程序卡片', '待领取']])
+
+  // 右上角菜单之类没有卡种的分享：不记录、不带 token
+  const before = calls.api.length
+  assert.deepEqual(page.onShareAppMessage({}), { title: '送你一张会籍卡', path: '/pages/coach/claim/claim', imageUrl: '/pages/coach/assets/membership-share-cover.jpg' })
+  assert.equal(calls.api.length, before)
+  assert.equal(state.cards.length, 2)
+})
+
+test('分享小程序卡片：服务端拒绝建卡（比如待领取已满）时提示原因，转发出去的卡片不带 token', async t => {
+  const { calls } = shareEnv(t, { 'Coach/CreateCard': () => ({ code: 1, message: '待领取的学员卡已有 50 张，请等学员领取或撤销一些再生成' }) })
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); page.onReady(); await settle()
+  const row = page.data.templates[0]
+  const result = await page.onShareAppMessage({ target: { dataset: { id: row.id, name: row.name, cover: row.coverPath } } }).promise
+  assert.equal(result.path, '/pages/coach/claim/claim')
+  assert.match(calls.toasts.at(-1), /待领取的学员卡已有 50 张/)
+})
+
+test('分享二维码：点一下记一次分享，显示这张卡的二维码（来自服务端、带登录态和小程序版本）；关闭后刷新记录', async t => {
+  const { calls, state } = shareEnv(t)
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); page.onReady(); await settle()
+  assert.equal(page.data.qr.show, false)
+  await page.onShareQr({ currentTarget: { dataset: { id: 9 } } }); await settle()
+  assert.deepEqual(calls.api.filter(c => c.path === 'Coach/CreateCard').map(c => [c.body.templateId, c.body.channel]), [[9, 'qr']])
+  assert.equal(page.data.qr.show, true); assert.equal(page.data.qr.name, '教练卡'); assert.equal(page.data.qr.cardId, 1)
+  assert.match(page.data.qr.url, /^https:\/\/x\/api\/Coach\/GetCardQr\?sessionKey=sk&cardId=1&envVersion=release&_=\d+$/)
+  assert.deepEqual(page.data.shares.map(r => [r.channelText, r.statusText]), [['二维码', '待领取']], '点的时候就已经记了')
+  // 二维码没出来：给出重试，重试是同一张卡的码，不会再记一次分享
+  page.onQrError(); assert.match(page.data.qr.error, /重试/)
+  page.onQrRetry(); assert.equal(page.data.qr.error, ''); assert.equal(page.data.qr.loading, true)
+  assert.match(page.data.qr.url, /cardId=1/)
+  assert.equal(calls.api.filter(c => c.path === 'Coach/CreateCard').length, 1)
+  page.onQrLoad(); assert.equal(page.data.qr.loading, false)
+  await page.onQrClose(); assert.equal(page.data.qr.show, false); assert.equal(state.cards.length, 1)
+  // 再点一次 = 再记一次、新的二维码
+  await page.onShareQr({ currentTarget: { dataset: { id: 9 } } }); await settle()
+  assert.equal(page.data.qr.cardId, 2); assert.equal(page.data.shares.length, 2)
+})
+
+test('分享记录：待领取 / 已领取（领取人头像昵称、卡号）/ 已取消；没领取的可以取消，取消后留在记录里', async t => {
+  const { calls, state } = shareEnv(t)
+  state.cards = [
+    { id: 3, status: 'issued', cardName: '教练卡', channel: 'qr', createDate: '2026-11-17T10:30:00' },
+    { id: 2, status: 'claimed', cardName: '教练卡', channel: 'card', createDate: '2026-11-17T10:00:00', claimedAt: '2026-11-17T10:05:00', nickName: '雪友小A', avatarUrl: 'https://img.snowmeet.top/upload/20261117/avatar_a.jpg', cardNo: 'HJ000002', memberId: 7 },
+    { id: 1, status: 'revoked', cardName: '教练卡', channel: 'qr', createDate: '2026-11-16T09:00:00' }
+  ]
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); await settle()
+  const rows = page.data.shares
+  assert.deepEqual(rows.map(r => [r.statusText, r.tone, r.canCancel]), [['待领取', 'warn', true], ['已领取', 'ok', false], ['已取消', 'muted', false]])
+  assert.deepEqual([rows[1].nickName, rows[1].avatarUrl, rows[1].cardNo, rows[1].claimed, rows[1].channelText], ['雪友小A', 'https://img.snowmeet.top/upload/20261117/avatar_a.jpg', 'HJ000002', '11-17 10:05', '小程序卡片'])
+  assert.equal(rows[0].created, '11-17 10:30')
+
+  await page.onCancelShare({ currentTarget: { dataset: { id: 3 } } }); await settle()
+  assert.deepEqual(calls.api.filter(c => c.path === 'Coach/RevokeMyCard').map(c => c.body.cardId), [3])
+  assert.deepEqual(page.data.shares.map(r => r.statusText), ['已取消', '已领取', '已取消'])
+  assert.ok(page.data.shares.every(r => r.id !== 3 || !r.canCancel))
+
+  // 不确认就不取消
+  global.wx.showModal = o => o.success({ confirm: false })
+  const n = calls.api.length
+  await page.onCancelShare({ currentTarget: { dataset: { id: 2 } } }); await settle()
+  assert.equal(calls.api.length, n)
+  // 取消时对方刚好领走了：服务端拒绝，提示并刷新成最新状态
+  global.wx.showModal = o => o.success({ confirm: true })
+  state.cards[0].status = 'issued'
+  const calls2 = shareEnv(t, { 'Coach/RevokeMyCard': () => ({ code: 1, message: '学员已领取的卡不能自行撤销，请联系管理员' }) })
+  const page2 = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page2.onLoad(); await settle()
+  await page2.onCancelShare({ currentTarget: { dataset: { id: 1 } } }); await settle()
+  assert.match(calls2.calls.toasts.at(-1), /已领取的卡不能自行撤销/)
+})
+
+test('分享记录：领取人没有昵称时用真实姓名，都没有就写「顾客」；分享记录加载失败有提示', async t => {
+  assert.equal(view.shareRow({ id: 1, status: 'claimed', studentName: '王同学' }).nickName, '王同学')
+  assert.equal(view.shareRow({ id: 1, status: 'claimed', nickName: '雪友', studentName: '王同学' }).nickName, '雪友')
+  assert.equal(view.shareRow({ id: 1, status: 'claimed', nickName: '雪友' }).initial, '雪')
+  assert.equal(view.shareRow({ id: 1, status: 'issued' }).canCancel, true)
+  assert.equal(view.shareRow({ id: 1, status: 'claimed' }).canCancel, false)
+  assert.equal(view.shareRow({ id: 1, status: 'issued' }).channelText, '', '旧版小程序发的卡没有分享方式')
+  shareEnv(t, { 'Coach/ListMyCards': () => ({ code: 3, message: 'x' }) })
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); await settle()
+  assert.equal(page.data.sharesError, true)
 })
 
 test('只设置了一口价底价的分销商：会籍卡页只有一口价，没有折扣和「无」，没开放的租赁整块不出现（用户 2026-11-17）', async t => {

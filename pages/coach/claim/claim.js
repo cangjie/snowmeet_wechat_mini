@@ -1,10 +1,14 @@
-// 学员领取页：打开教练分享的小程序卡片。状态：可领取 / 已领取 / 已被别人领走 / 已失效 / 教练本人 / 已有该教练的卡。
-// 还不是会员的人先授权手机号（成为会员），再领取。别人再点同一张卡片显示「已被领取」
+// 会籍卡领取页：顾客扫分享二维码或点开分享的小程序卡片到这里。状态：可领取 / 已领取 / 已被别人领走 / 已失效 / 分销商本人 / 已有该卡种。
+// 还不是会员的人先授权手机号（成为会员），再领取；领取要求头像和昵称都已授权（2026-11-17），没授权的会弹出授权层，
+// 授权完才领；领取成功显示和本人绑定的会籍卡卡号。别人再点同一张卡片显示「已被领取」
 const app = getApp()
 const api = require('../common/api.js')
 const view = require('../common/coach-view.js')
 const data = require('../../../utils/data.js')
 const profileAuth = require('../../../utils/profile_auth.js')
+
+// 服务端「领取需要先授权头像和昵称」：code 1 + data.state = need_profile
+function isNeedProfile(err) { return !!(err && err.data && err.data.state === 'need_profile') }
 
 function parseToken(options) {
   options = options || {}
@@ -19,7 +23,7 @@ function parseToken(options) {
 }
 
 Page({
-  data: { token: '', isTemplate: false, loading: true, claiming: false, loginError: false, errMsg: '', state: '', message: '', coachName: '', cardName: '', needMember: false, benefit: null, validUntil: '' },
+  data: { token: '', isTemplate: false, loading: true, claiming: false, loginError: false, errMsg: '', state: '', message: '', coachName: '', cardName: '', needMember: false, needProfile: false, cardNo: '', benefit: null, validUntil: '' },
 
   onLoad(options) {
     const template = options && options.template
@@ -51,19 +55,33 @@ Page({
   apply(d) {
     const v = d.view || {}
     this.setData({
-      state: v.state || 'invalid', message: v.message || '', coachName: v.coachName || '', cardName: v.cardName || ((v.coachName || '') + '的学员卡'), needMember: !!d.needMember,
+      state: v.state || 'invalid', message: v.message || '', coachName: v.coachName || '', cardName: v.cardName || ((v.coachName || '') + '的会籍卡'), needMember: !!d.needMember,
+      needProfile: !!v.needProfile, cardNo: v.cardNo || '',
       benefit: view.benefitLines(v.carePrices, v.rentalRate), validUntil: view.dayText(v.validUntil)
     })
   },
 
-  // 已是会员：直接领取
+  // 领取。头像昵称没授权的先弹授权层（跳过过也再弹）；授权完才领，顾客跳过了服务端会拒绝，卡仍留着，授权后可再领
   async onClaim() {
     if (this.data.loading || this.data.claiming) return
     this.setData({ claiming: true, errMsg: '' })
     try {
-      this.apply(await (this.data.isTemplate ? api.claimShareTemplate(this.data.token) : api.claimShareCard(this.data.token)))
-      this.setData({ needMember: false })
-      wx.showToast({ title: '领取成功', icon: 'success' })
+      // onPhone 刚在授权手机号后问过一次头像昵称：这次不重复问
+      let asked = this._profileAsked === true
+      this._profileAsked = false
+      if (this.data.needProfile && !asked) { await profileAuth.ensureOn(this, true); asked = true }
+      for (;;) {
+        try {
+          this.apply(await (this.data.isTemplate ? api.claimShareTemplate(this.data.token) : api.claimShareCard(this.data.token)))
+          this.setData({ needMember: false, needProfile: false })
+          wx.showToast({ title: '领取成功', icon: 'success' })
+          return
+        } catch (err) {
+          // 页面没带「需要授权」的标志、服务端却说需要（刚改过资料、旧页面）：这里补弹一次再领
+          if (isNeedProfile(err) && !asked) { asked = true; this.setData({ needProfile: true }); await profileAuth.ensureOn(this, true); continue }
+          throw err
+        }
+      }
     } catch (err) {
       await this.onClaimFailed(err)
     } finally {
@@ -73,6 +91,7 @@ Page({
 
   // 领取失败：code 5 = 还不是会员；其余带 state 的（已被领走、已失效、本人、已有该教练的卡）显示对应画面
   async onClaimFailed(err) {
+    if (isNeedProfile(err)) { this.setData({ needProfile: true, errMsg: '领取会籍卡需要先授权头像和昵称，请点「授权头像昵称并领取」，按提示完成后再领' }); return }
     if (err && err.code === 5) { this.setData({ needMember: true, errMsg: '需要先授权手机号' }); return }
     const state = err && err.data && err.data.state
     if (state) { this.setData({ state, message: err.message || '', needMember: false }); return }
@@ -94,9 +113,11 @@ Page({
       this.setData({ claiming: false, errMsg: '手机号授权失败，请重试' })
       return
     }
+    // 手机号验证成功：领取要求头像昵称，先请顾客授权（已有完整资料的不会弹；跳过过也再弹一次），处理完再领取；
+    // 顾客跳过了，服务端会拒绝领取（卡仍留着），页面提示授权后再领
     this.setData({ claiming: false })
-    // 手机号验证成功：先请顾客完善头像昵称（可跳过），处理完再领取
-    await profileAuth.ensureOn(this)
+    await profileAuth.ensureOn(this, true)
+    this._profileAsked = true
     return this.onClaim()
   },
 
