@@ -1,4 +1,5 @@
 // 机构「制作会员卡」：机构自己设养护 / 租赁优惠，不能低于管理员设的底价；保存即生效，只影响之后领取的新卡。
+// 只显示管理员在「会籍卡底价」里设置了的项目和方式：只设了一口价的格子只有一个一口价输入框，没设的方式不出现（用户 2026-11-17）。
 // 有优惠的格子（门店 × 单项/双项的养护，和租赁）就是会员卡「指定的商品和服务」；没设优惠的格子不享受会员卡价。
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
@@ -8,7 +9,7 @@ const shareCover = require('../common/share-cover.js')
 Page({
   data: {
     blocked: '', loading: true, canEdit: false, reason: '', name: '', modes: view.MODES,
-    cells: [], rental: null, rentalText: '', dirty: false, validUntil: '', saving: false, editing: false, templates: [], pending: [], pendingError: false, templateId: null, creating: false
+    cells: [], rental: null, rentalText: '', showRental: false, nothingOpen: false, dirty: false, validUntil: '', saving: false, editing: false, templates: [], pending: [], pendingError: false, templateId: null, creating: false
   },
 
   onLoad() { base.boot(this, 'coach').then(() => this.load()).catch(() => {}) },
@@ -20,9 +21,12 @@ Page({
   apply(d) {
     this.loadedOnce = true
     const rental = view.rentalStandard(d.rental)
+    const cells = view.standardCells(d.cells)
     this.setData({
       loading: false, blocked: '', editing: true, templateId: d.id || null, canEdit: !!d.canEdit, reason: d.reason || '', name: d.name || '',
-      cells: view.standardCells(d.cells), rental, rentalText: rental.text, dirty: false, saving: false,
+      cells, rental, rentalText: rental.text, dirty: false, saving: false,
+      // 管理员什么都没开放（养护格子和租赁都没有）时，页面提示去联系管理员
+      showRental: !!rental.open || !!rental.text, nothingOpen: !cells.some(c => c.visible) && !rental.open && !rental.text,
       validUntil: view.dayText(d.validUntil)
     })
   },
@@ -79,22 +83,31 @@ Page({
   onName(e) { this.setData({ name: e.detail.value, dirty: true }) },
   onBackToList() { return this.load() },
 
+  // 有多种方式的格子才有方式按钮（一口价 / 折扣）；点方式不会清空已填的数
   onMode(e) {
     if (!this.data.canEdit) return
     const i = Number(e.currentTarget.dataset.i)
     const mode = e.currentTarget.dataset.mode
     const cell = this.data.cells[i]
-    // 管理员没开放的格子只能是「无」，别让机构白填半天
-    if (mode !== 'none' && !cell.open) { wx.showToast({ title: '管理员还没有开放这一项', icon: 'none' }); return }
+    if (!cell || !cell.modes.some(m => m.key === mode)) return
     const patch = { dirty: true }
     patch['cells[' + i + '].mode'] = mode
-    if (mode === 'none') patch['cells[' + i + '].text'] = ''
+    patch['cells[' + i + '].unit'] = view.cardUnit(Object.assign({}, cell, { mode }))
     this.setData(patch)
   },
+  // 输入数：只有一种方式的格子自动按那种方式；留空 = 不优惠
   onCellText(e) {
     if (!this.data.canEdit) return
+    const i = Number(e.currentTarget.dataset.i)
+    const cell = this.data.cells[i]
+    if (!cell) return
+    const text = e.detail.value
     const patch = { dirty: true }
-    patch['cells[' + Number(e.currentTarget.dataset.i) + '].text'] = e.detail.value
+    patch['cells[' + i + '].text'] = text
+    if (cell.modes.length === 1) {
+      patch['cells[' + i + '].mode'] = String(text).trim() === '' ? 'none' : cell.modes[0].key
+      patch['cells[' + i + '].unit'] = view.cardUnit(Object.assign({}, cell, { mode: patch['cells[' + i + '].mode'] }))
+    }
     this.setData(patch)
   },
   onRentalText(e) { if (this.data.canEdit) this.setData({ rentalText: e.detail.value, dirty: true }) },

@@ -52,12 +52,19 @@ test('保存前本地校验：不能低于底价、不能设没开放的格子�
   assert.equal(ok.rate, 0.8)
   assert.match(view.standardPayload(edit({ [WL + '单项']: { mode: 'rate', text: '6.9' } }), '', rental).error, /万龙单项：折扣不能低于 7 折/)
   assert.match(view.standardPayload(edit({ [WL + '双项']: { mode: 'rate', text: '9' } }), '', rental).error, /万龙双项：管理员还没有开放/)
-  assert.match(view.standardPayload(edit({ [CL + '单项']: { mode: 'rate', text: '9' } }), '', rental).error, /崇礼单项：这一项只开放了一口价/)
+  // 崇礼单项只开放了一口价：填的数一律按一口价算（没有折扣可选），低于底价被拦
+  assert.match(view.standardPayload(edit({ [CL + '单项']: { mode: 'rate', text: '9' } }), '', rental).error, /崇礼单项：一口价不能低于 ¥60/)
   assert.match(view.standardPayload(edit({ [CL + '单项']: { mode: 'fixed', text: '59' } }), '', rental).error, /崇礼单项：一口价不能低于 ¥60/)
   assert.match(view.standardPayload(edit({}), '7.5', rental).error, /租赁：折扣不能低于 8 折/)
   assert.match(view.standardPayload(edit({}), '9', view.rentalStandard({ rate: null, open: false })).error, /租赁：管理员还没有开放/)
   assert.equal(view.standardPayload(edit({}), '', view.rentalStandard({ rate: null, open: false })).rate, null)   // 不优惠总可以
-  assert.match(view.standardPayload(edit({ [WL + '单项']: { mode: 'rate', text: '' } }), '', rental).error, /请填写/)
+  // 留空 = 不优惠（不再有「无」按钮，也不再提示「请填写」）
+  const blank = view.standardPayload(edit({ [WL + '单项']: { mode: 'rate', text: '' } }), '', rental)
+  assert.equal(blank.error, undefined)
+  assert.equal(blank.care[0].mode, 'none')
+  // 一个格子开放了不止一种方式却没选：要求先选
+  const both = edit({}); both[0] = Object.assign({}, both[0], { modes: [{ key: 'fixed', label: '一口价' }, { key: 'rate', label: '折扣' }], minFixed: 100, mode: 'none', text: '120' })
+  assert.match(view.standardPayload(both, '', rental).error, /万龙单项：请选择一口价或折扣/)
 })
 
 test('管理员底价：空 = 不开放；折扣按折填、一口价按元；填错给出原因', () => {
@@ -111,9 +118,12 @@ test('机构创建具名卡种并按底价校验，保存后显示在卡种列�
   assert.equal(page.data.templates.length, 0)
   await page.onNew()
   assert.equal(page.data.cells[0].hint, '折扣不低于 7 折')
+  // 管理员没开放的格子根本不显示；开放的格子只显示底价里设置了的方式
+  assert.deepEqual(page.data.cells.map(c => c.visible), [true, false, true, false])
+  assert.deepEqual(page.data.cells[0].modes.map(m => m.key), ['rate'])
   page.onMode({ currentTarget: { dataset: { i: 1, mode: 'rate' } } })
   assert.equal(page.data.cells[1].mode, 'none')
-  assert.ok(calls.toasts.includes('管理员还没有开放这一项'))
+  assert.equal(page.data.dirty, false)
   page.onName({ detail: { value: '学员卡' } })
   page.onCellText({ currentTarget: { dataset: { i: 0 } }, detail: { value: '6' } })
   page.onSave()
@@ -214,4 +224,65 @@ test('卡种生成独立分享卡，分享链接来自服务端且封面使用�
   assert.equal(row.coverPath, 'wxfile://教练卡')
   assert.deepEqual(page.onShareAppMessage({ target: { dataset: { name: row.name, path: row.sharePath, cover: row.coverPath } } }),
     { title: '送你一张教练卡', path: '/pages/coach/claim/claim?t=unique1234', imageUrl: 'wxfile://教练卡' })
+})
+
+test('只设置了一口价底价的分销商：会籍卡页只有一口价，没有折扣和「无」，没开放的租赁整块不出现（用户 2026-11-17）', async t => {
+  const onlyFixed = (shop, tier, min) => cell(shop, tier, { open: true, minFixed: min, minRate: null })
+  const state = STANDARD({
+    cells: [onlyFixed(WL, '单项', 50), onlyFixed(WL, '双项', 100), onlyFixed(CL, '单项', 40), onlyFixed(CL, '双项', 80)],
+    rental: { rate: null, open: false, minRate: null, belowFloor: false }
+  })
+  const calls = env(t, (p, body) => {
+    if (p === 'Coach/ListMyCards') return OK({ cards: [] })
+    if (p === 'Distributor/ListMyCardTemplates') return OK({ templates: [] })
+    if (p === 'Distributor/GetMyCardTemplate') return OK(Object.assign({ name: '' }, state))
+    if (p === 'Distributor/SaveMyCardTemplate') return OK({ id: 1 })
+    throw new Error(p)
+  })
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); await settle()
+  await page.onNew()
+  // 四格都开放，但每格只有「一口价」这一种方式：不出方式按钮，也没有折扣
+  assert.deepEqual(page.data.cells.map(c => c.visible), [true, true, true, true])
+  assert.ok(page.data.cells.every(c => c.modes.length === 1 && c.modes[0].key === 'fixed'))
+  assert.ok(page.data.cells.every(c => c.unit === '元' && /一口价/.test(c.placeholder) && !/折/.test(c.placeholder)))
+  assert.deepEqual(page.data.cells.map(c => c.hint), ['一口价不低于 ¥50', '一口价不低于 ¥100', '一口价不低于 ¥40', '一口价不低于 ¥80'])
+  assert.equal(page.data.showRental, false)                      // 租赁底价没设置：整块不出现
+  assert.equal(page.data.nothingOpen, false)
+  const wxml = fs.readFileSync(path.join(ROOT, 'pages/coach/card_standard/card_standard.wxml'), 'utf8')
+  assert.match(wxml, /wx:if="\{\{item\.modes\.length > 1\}\}"/)           // 方式按钮只在设置了不止一种方式时才有
+  assert.doesNotMatch(wxml, /wx:for="\{\{modes\}\}"|>无</)                // 不再有写死的「无 / 折扣 / 一口价」按钮组
+  assert.match(wxml, /wx:if="\{\{item\.visible\}\}"/)
+  assert.match(wxml, /wx:if="\{\{showRental\}\}"/)
+  // 填数就是一口价、留空就是不优惠；低于底价被拦；保存时租赁不优惠
+  page.onName({ detail: { value: '学员卡' } })
+  page.onCellText({ currentTarget: { dataset: { i: 0 } }, detail: { value: '30' } })
+  assert.equal(page.data.cells[0].mode, 'fixed')
+  page.onSave()
+  assert.match(calls.toasts.at(-1), /万龙单项：一口价不能低于 ¥50/)
+  page.onCellText({ currentTarget: { dataset: { i: 0 } }, detail: { value: '58' } })
+  page.onCellText({ currentTarget: { dataset: { i: 1 } }, detail: { value: '120' } })
+  page.onCellText({ currentTarget: { dataset: { i: 1 } }, detail: { value: '' } })       // 又清空：双项不优惠
+  assert.equal(page.data.cells[1].mode, 'none')
+  page.onSave(); await settle()
+  const save = calls.api.find(c => c.path.endsWith('SaveMyCardTemplate'))
+  assert.deepEqual(save.body.care.map(c => [c.mode, c.value]), [['fixed', 58], ['none', 0], ['none', 0], ['none', 0]])
+  assert.equal(save.body.rental_rate, null)
+})
+
+test('管理员什么都没开放（养护格子和租赁都没有）：会籍卡页不显示任何选项，提示联系管理员', async t => {
+  const closed = STANDARD({ cells: [cell(WL, '单项'), cell(WL, '双项'), cell(CL, '单项'), cell(CL, '双项')], rental: { rate: null, open: false, minRate: null } })
+  env(t, (p) => {
+    if (p === 'Coach/ListMyCards') return OK({ cards: [] })
+    if (p === 'Distributor/ListMyCardTemplates') return OK({ templates: [] })
+    if (p === 'Distributor/GetMyCardTemplate') return OK(Object.assign({ name: '' }, closed))
+    throw new Error(p)
+  })
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); await settle()
+  await page.onNew()
+  assert.equal(page.data.nothingOpen, true)
+  assert.ok(page.data.cells.every(c => !c.visible))
+  assert.equal(page.data.showRental, false)
+  assert.match(fs.readFileSync(path.join(ROOT, 'pages/coach/card_standard/card_standard.wxml'), 'utf8'), /管理员还没有给你开放会籍卡的项目/)
 })

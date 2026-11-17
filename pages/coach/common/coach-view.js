@@ -92,16 +92,52 @@ function floorHint(c) {
   return parts.join('，')
 }
 
-// 服务端 GetMyCardStandard 的 cells → 编辑模型（固定 4 格，带底价提示）
+// 会籍卡每格能用的方式（一口价 / 折扣）：只列管理员在「会籍卡底价」里设置了的；没设置的方式不出现，免得误导（用户 2026-11-17）
+const CARD_MODE_LABEL = { fixed: '一口价', rate: '折扣' }
+
+function cardUnit(c) {
+  const key = c.mode !== 'none' ? c.mode : (c.modes.length === 1 ? c.modes[0].key : '')
+  return key === 'rate' ? '折' : (key === 'fixed' ? '元' : '')
+}
+function cardPlaceholder(c) {
+  if (c.modes.length === 1) return CARD_MODE_LABEL[c.modes[0].key] + '，' + (c.modes[0].key === 'rate' ? '8 表示 8 折' : '元') + '；留空 = 不优惠'
+  return '先选方式；留空 = 不优惠'
+}
+
+// 服务端卡种 / 会籍卡标准的 cells → 编辑模型。固定 4 格，但**只有管理员开放了的格子才显示**（visible），
+// 每格只显示底价里设置了的方式（modes）；只设置了一种方式的格子不出方式按钮，直接一个输入框，留空 = 不优惠。
+// 已经设置着、但现在底价里不再开放的方式仍然显示出来（标红提示），否则机构看不到也改不掉。
 function standardCells(cells) {
   const base = editCells(cells)
+  let lastShop = null
   return base.map(b => {
     const c = findCell(cells, b.shop, b.tier) || {}
-    return Object.assign({}, b, {
-      open: !!c.open, minRate: c.minRate === undefined ? null : c.minRate, minFixed: c.minFixed === undefined ? null : c.minFixed,
-      belowFloor: !!c.belowFloor, hint: floorHint(c)
+    const minRate = c.minRate === undefined ? null : c.minRate
+    const minFixed = c.minFixed === undefined ? null : c.minFixed
+    const modes = []
+    if (minFixed !== null) modes.push({ key: 'fixed', label: CARD_MODE_LABEL.fixed })
+    if (minRate !== null) modes.push({ key: 'rate', label: CARD_MODE_LABEL.rate })
+    if (b.mode !== 'none' && !modes.some(m => m.key === b.mode)) modes.push({ key: b.mode, label: CARD_MODE_LABEL[b.mode] || b.mode })
+    const visible = !!c.open || b.mode !== 'none'
+    const cell = Object.assign({}, b, {
+      open: !!c.open, minRate, minFixed, belowFloor: !!c.belowFloor, hint: floorHint(c), modes, visible,
+      showShop: visible && lastShop !== b.shop
     })
+    if (visible) lastShop = b.shop
+    cell.unit = cardUnit(cell)
+    cell.placeholder = cardPlaceholder(cell)
+    return cell
   })
+}
+
+// 把表单里的格子整理成「有效方式」：留空 = 不优惠；只有一种方式的格子填了数就是那种方式；有多种方式却没选的返回 ambiguous
+function effectiveStandardCell(c) {
+  const blank = String(c.text === undefined || c.text === null ? '' : c.text).trim() === ''
+  if (blank) return Object.assign({}, c, { mode: 'none', text: '' })
+  if (c.modes.length === 0) return Object.assign({}, c, { mode: 'closed' })        // 没开放的格子里不该有数
+  if (c.mode !== 'none' && c.modes.some(m => m.key === c.mode)) return c
+  if (c.modes.length === 1) return Object.assign({}, c, { mode: c.modes[0].key })
+  return Object.assign({}, c, { mode: 'ambiguous' })
 }
 
 function rentalStandard(rental) {
@@ -114,7 +150,12 @@ function rentalStandard(rental) {
 }
 
 // 保存前先在本地按底价检查一遍（服务端仍会再校验）；返回 { care, rate } 或 { error }
-function standardPayload(cells, rentalText, rental) {
+function standardPayload(rawCells, rentalText, rental) {
+  const cells = rawCells.map(effectiveStandardCell)
+  const closed = cells.find(c => c.mode === 'closed')
+  if (closed) return { error: SHORT[closed.shop] + closed.tier + '：管理员还没有开放这一项' }
+  const unclear = cells.find(c => c.mode === 'ambiguous')
+  if (unclear) return { error: SHORT[unclear.shop] + unclear.tier + '：请选择一口价或折扣' }
   const parsed = cellsPayload(cells)
   if (parsed.error) return parsed
   for (let i = 0; i < cells.length; i++) {
@@ -320,6 +361,6 @@ function benefitLines(carePrices, rentalRate) {
 module.exports = {
   SHOPS, TIERS, SHORT, MODES, cellText, rentalText, priceChips, editCells, cellsPayload, rentalPayload, rentalEditText,
   previewPrice, statusTag, dateText, dayText, benefitLines,
-  floorHint, standardCells, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
+  floorHint, standardCells, effectiveStandardCell, cardUnit, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
   COUPON_MAX, couponCells, couponPayload, couponFloorEditCells, couponFloorsPayload
 }

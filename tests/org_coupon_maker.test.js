@@ -163,6 +163,24 @@ test('制作优惠券页：只开放一种方式的格子自动选好；同一�
   assert.ok(calls.toasts.includes('这批券之前已经生成过了'))          // 服务端说是重复提交
 })
 
+test('只设置了一口价底价（0 元起）的分销商：优惠券页只有一口价，自动选好，没有折扣和减免；一口价 0 元可以', async t => {
+  const onlyFixed = (shop, tier) => cell(shop, tier, { open: true, productReady: true, modes: ['fixed'], minFixed: 0 })
+  const state = MAKER({ cells: [onlyFixed(WL, '单项'), onlyFixed(WL, '双项'), onlyFixed(CL, '单项'), onlyFixed(CL, '双项')] })
+  const calls = env(t, (p) => p === 'Distributor/GetMyCouponMaker' ? OK(state) : OK({ made: { created: 2, repeated: false }, maker: state }))
+  const page = loadPage('pages/coach/coupon_maker/coupon_maker.js', {})
+  page.onLoad(); await settle()
+  assert.equal(page.data.cells.length, 4)
+  assert.ok(page.data.cells.every(c => c.modes.length === 1 && c.modes[0].key === 'fixed'))
+  tapCell(page, 0)
+  assert.equal(page.data.mode, 'fixed')                               // 只有一种方式：自动选好
+  assert.deepEqual(page.data.selModes.map(m => m.label), ['一口价'])  // 页面不会出现折扣、减免
+  assert.equal(page.data.selHint, '一口价不低于 ¥0')
+  page.onValue({ detail: { value: '0' } })
+  page.onSubmit(); await settle()
+  const make = calls.api.find(c => c.path.endsWith('MakeMyCoupons'))
+  assert.deepEqual([make.body.mode, make.body.value], ['fixed', 0])
+})
+
 test('制作优惠券页：不是分销商显示拦截；提交中不重复提交；管理员什么都没开放时不显示任何选项', async t => {
   let mode = 'none'
   const calls = env(t, (p) => {

@@ -31,33 +31,38 @@
     <view class="card card-pad"><view class="card-title small">卡种名称</view><input class="input" placeholder="例如学员卡、教练卡" value="{{name}}" maxlength="50" bindinput="onName" /></view>
     <view wx:if="{{!canEdit}}" class="note">{{reason}}</view>
 
-    <view class="card card-pad">
+    <view wx:if="{{nothingOpen}}" class="note">管理员还没有给你开放会籍卡的项目，请联系管理员设置会籍卡底价。</view>
+
+    <view wx:if="{{cells.length && !nothingOpen}}" class="card card-pad">
       <view class="card-row"><text class="card-title small">养护</text><text class="card-meta">按门店、单项/双项分别设置</text></view>
       <block wx:for="{{cells}}" wx:key="key" wx:for-index="i">
-        <view wx:if="{{i % 2 === 0}}" class="shop-title" style="{{i === 0 ? 'border-top: none; padding-top: 0;' : ''}}">{{item.shop}}</view>
-        <view class="price-row">
-          <text class="lab">{{item.tier}}</text>
-          <view class="seg">
-            <view wx:for="{{modes}}" wx:for-item="m" wx:key="key" class="chip-sq {{item.mode === m.key ? 'on' : ''}}" data-i="{{i}}" data-mode="{{m.key}}" bindtap="onMode">{{m.label}}</view>
+        <block wx:if="{{item.visible}}">
+          <view wx:if="{{item.showShop}}" class="shop-title" style="{{i === 0 ? 'border-top: none; padding-top: 0;' : ''}}">{{item.shop}}</view>
+          <view class="price-row">
+            <text class="lab">{{item.tier}}</text>
+            <!-- 只有设置了不止一种方式时才有方式按钮；没设置的方式不显示 -->
+            <view wx:if="{{item.modes.length > 1}}" class="seg">
+              <view wx:for="{{item.modes}}" wx:for-item="m" wx:key="key" class="chip-sq {{item.mode === m.key ? 'on' : ''}}" data-i="{{i}}" data-mode="{{m.key}}" bindtap="onMode">{{m.label}}</view>
+            </view>
+            <view class="val" style="flex: 1;">
+              <input type="digit" placeholder="{{item.placeholder}}" value="{{item.text}}" disabled="{{!canEdit}}" data-i="{{i}}" bindinput="onCellText" />
+              <text class="unit">{{item.unit}}</text>
+            </view>
           </view>
-          <view class="val {{item.mode === 'none' ? 'off' : ''}}">
-            <input type="digit" value="{{item.text}}" disabled="{{item.mode === 'none' || !canEdit}}" data-i="{{i}}" bindinput="onCellText" />
-            <text class="unit">{{item.mode === 'rate' ? '折' : (item.mode === 'fixed' ? '元' : '')}}</text>
-          </view>
-        </view>
-        <view class="floor-hint {{item.open ? '' : 'closed'}}">底价：{{item.hint}}</view>
-        <view wx:if="{{item.belowFloor}}" class="below-floor">当前设置低于底价，保存前请调整。</view>
+          <view class="floor-hint">底价：{{item.hint}}</view>
+          <view wx:if="{{item.belowFloor}}" class="below-floor">当前设置低于底价或方式已不开放，保存前请调整。</view>
+        </block>
       </block>
-      <view class="card-meta">一口价 = 养护服务费封顶价，维修费不打折；加急单只对单/双项的基础价生效，加急加价照收。折扣填「8」表示 8 折。</view>
+      <view class="card-meta">一口价 = 养护服务费封顶价，维修费不打折；加急单只对单/双项的基础价生效，加急加价照收。留空 = 这一项不优惠。</view>
     </view>
 
-    <view class="card card-pad">
+    <view wx:if="{{showRental}}" class="card card-pad">
       <view class="card-row"><text class="card-title small">租赁</text><text class="card-meta">各店、各项目通用</text></view>
       <view class="price-row">
         <text class="lab" style="width: 96rpx;">折扣</text>
         <view class="val" style="width: 220rpx;"><input type="digit" placeholder="不优惠留空" value="{{rentalText}}" disabled="{{!canEdit}}" bindinput="onRentalText" /><text class="unit">折</text></view>
       </view>
-      <view class="floor-hint {{rental.open ? '' : 'closed'}}" style="margin-left: 0;">底价：{{rental.hint}}</view>
+      <view class="floor-hint" style="margin-left: 0;">底价：{{rental.hint}}</view>
       <view wx:if="{{rental.belowFloor}}" class="below-floor" style="margin-left: 0;">当前设置低于底价，保存前请调整。</view>
     </view>
 
