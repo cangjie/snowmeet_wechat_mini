@@ -147,12 +147,13 @@ test('无机构身份被拦；保存被服务端拒绝后保留编辑内容', as
   assert.match(calls.toasts.at(-1), /折扣不能低于 7 折/)
 })
 
-test('管理员教练详情：机构才有「底价」标签；加载、改、保存带正确入参', async t => {
+test('管理员分销商详情：机构才有「会籍卡底价」标签；加载、改、保存带正确入参', async t => {
   let floor = { care: [{ shop: WL, tier: '单项', minRate: 0.7, minFixed: null }, { shop: WL, tier: '双项', minRate: null, minFixed: null },
     { shop: CL, tier: '单项', minRate: null, minFixed: 60 }, { shop: CL, tier: '双项', minRate: null, minFixed: null }], rentalMinRate: 0.8 }
   const COACH = introducerType => ({ id: 9, memberId: 6, name: '某机构', valid: true, phoneTail: '1006', introducerType, rentalRate: null, carePrices: [], cards: { total: 0, issued: 0, claimed: 0, revoked: 0 } })
   const calls = env(t, (p, body) => {
     if (p === 'CoachAdmin/GetCoach') return OK(COACH('机构'))
+    if (p === 'CoachAdmin/GetCouponFloors') return OK({ care: [] })           // 默认先开「优惠券底价」标签
     if (p === 'CoachAdmin/GetCoachFloors') return OK(floor)
     if (p === 'CoachAdmin/SetCoachFloors') { floor = { care: body.care.map(c => ({ shop: c.shop, tier: c.tier, minRate: c.min_rate, minFixed: c.min_fixed })), rentalMinRate: body.rental_min_rate }; return OK(floor) }
     throw new Error(p)

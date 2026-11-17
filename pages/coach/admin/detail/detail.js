@@ -1,12 +1,14 @@
-// 教练详情（管理员）：价格设置 / 他的卡 / 停用与改名。价格只影响之后领取的新卡
+// 分销商详情（管理员）：优惠券底价 / 会籍卡底价（只有机构）/ 他的卡 / 停用与改名。
+// 2026-11-17：原来的「价格设置」改成「优惠券底价」——限制这位分销商自己生成的单张优惠券不能低于多少钱、多少折扣、减免不能超过多少；
+// 原来的「底价」改名「会籍卡底价」，只管机构自己的会籍卡。
 const api = require('../../common/api.js')
 const base = require('../../common/page-base.js')
 const view = require('../../common/coach-view.js')
 
 Page({
   data: {
-    blocked: '', loading: true, tab: 'price', coach: null, modes: view.MODES,
-    cells: [], rentalText: '', dirty: false, trialBase: '168', trial: [],
+    blocked: '', loading: true, tab: 'coupon', coach: null,
+    couponCells: [], couponDirty: false,
     cardFilter: '', cardCounts: null, cards: [], name: '',
     floorCells: [], floorRentalText: '', floorDirty: false
   },
@@ -15,18 +17,17 @@ Page({
     this.id = Number(options.id)
     base.boot(this, 'admin').then(() => this.load()).catch(() => {})
   },
-  onShow() { if (this.loadedOnce && !this.data.dirty) this.load() },
+  onShow() { if (this.loadedOnce && !this.data.couponDirty && !this.data.floorDirty) this.load() },
   onPullDownRefresh() { this.load().then(() => wx.stopPullDownRefresh()) },
 
   load() {
     return api.getCoach(this.id).then(c => {
       this.loadedOnce = true
       this.setData({
-        loading: false, coach: c, name: c.name, dirty: false,
-        cells: view.editCells(c.carePrices), rentalText: view.rentalEditText(c.rentalRate)
+        loading: false, coach: c, name: c.name
       })
       wx.setNavigationBarTitle({ title: c.name })
-      this.refreshTrial()
+      if (this.data.tab === 'coupon') return this.loadCouponFloors()
       if (this.data.tab === 'cards') return this.loadCards()
       if (this.data.tab === 'floor') return this.loadFloors()
     }).catch(err => { this.setData({ loading: false }); base.fail(err) })
@@ -35,11 +36,36 @@ Page({
   onTab(e) {
     const tab = e.currentTarget.dataset.tab
     this.setData({ tab })
+    if (tab === 'coupon') this.loadCouponFloors()
     if (tab === 'cards') this.loadCards()
     if (tab === 'floor') this.loadFloors()
   },
 
-  // ---- 底价（只有机构有）：机构自己制作会员卡时，价格不能低于这里设的底价；没设的格子 = 不开放 ----
+  // ---- 优惠券底价：这位分销商自己生成单张优惠券时，一口价不能低于 / 折扣不能低于 / 减免不能超过；某种方式留空 = 没开放，他的界面不显示 ----
+  loadCouponFloors() {
+    return api.getCouponFloors(this.id).then(f => {
+      this.setData({ couponCells: view.couponFloorEditCells(f), couponDirty: false })
+    }).catch(base.fail)
+  },
+  onCouponFixed(e) { this.setCouponText(e, 'fixedText') },
+  onCouponRate(e) { this.setCouponText(e, 'rateText') },
+  onCouponOff(e) { this.setCouponText(e, 'offText') },
+  setCouponText(e, key) {
+    const patch = { couponDirty: true }
+    patch['couponCells[' + Number(e.currentTarget.dataset.i) + '].' + key] = e.detail.value
+    this.setData(patch)
+  },
+  onCouponSave() {
+    if (!this.data.couponDirty) return
+    const r = view.couponFloorsPayload(this.data.couponCells)
+    if (r.error) { wx.showToast({ title: r.error, icon: 'none', duration: 2800 }); return }
+    api.setCouponFloors(this.id, r.care).then(f => {
+      this.setData({ couponCells: view.couponFloorEditCells(f), couponDirty: false })
+      base.done('优惠券底价已保存')
+    }).catch(base.fail)
+  },
+
+  // ---- 会籍卡底价（只有机构有）：机构自己制作会籍卡时，价格不能低于这里设的底价；没设的格子 = 不开放 ----
   loadFloors() {
     return api.getCoachFloors(this.id).then(f => {
       this.setData({ floorCells: view.floorEditCells(f), floorRentalText: view.floorRentalText(f), floorDirty: false })
@@ -64,56 +90,6 @@ Page({
       this.setData({ floorCells: view.floorEditCells(f), floorRentalText: view.floorRentalText(f), floorDirty: false })
       base.done('底价已保存')
     }).catch(base.fail)
-  },
-
-  // ---- 价格设置 ----
-  onMode(e) {
-    const i = Number(e.currentTarget.dataset.i)
-    const patch = {}
-    patch['cells[' + i + '].mode'] = e.currentTarget.dataset.mode
-    if (e.currentTarget.dataset.mode === 'none') patch['cells[' + i + '].text'] = ''
-    patch.dirty = true
-    this.setData(patch)
-    this.refreshTrial()
-  },
-  onCellText(e) {
-    const patch = { dirty: true }
-    patch['cells[' + Number(e.currentTarget.dataset.i) + '].text'] = e.detail.value
-    this.setData(patch)
-    this.refreshTrial()
-  },
-  onRentalText(e) { this.setData({ rentalText: e.detail.value, dirty: true }) },
-  onTrialBase(e) { this.setData({ trialBase: e.detail.value }); this.refreshTrial() },
-
-  // 试算：按填写的原价，算各门店单项/双项的教练价。4 格每格都显示：没设价格显示「无优惠」，
-  // 填得不对（如折扣填了 80）显示红色提示，同一句话也挂在那一行下面——不能悄悄跳过
-  refreshTrial() {
-    const base = Number(this.data.trialBase)
-    const patch = {}
-    const trial = []
-    this.data.cells.forEach((c, i) => {
-      const label = view.SHORT[c.shop] + c.tier
-      const payload = view.cellsPayload([c])
-      // 单格校验的提示去掉「万龙单项：」前缀，行内显示更紧凑
-      const err = payload.error ? payload.error.replace(/^[^：]*：/, '') : ''
-      patch['cells[' + i + '].err'] = err
-      if (err) { trial.push({ key: c.key, label, error: err }); return }
-      if (c.mode === 'none') { trial.push({ key: c.key, label, none: true }); return }
-      if (!(base > 0)) return
-      const r = view.previewPrice(payload.care[0], base)
-      trial.push({ key: c.key, label, price: r.price, discount: r.discount })
-    })
-    patch.trial = trial
-    this.setData(patch)
-  },
-
-  onSave() {
-    if (!this.data.dirty) return
-    const care = view.cellsPayload(this.data.cells)
-    if (care.error) { wx.showToast({ title: care.error, icon: 'none', duration: 2800 }); return }
-    const rental = view.rentalPayload(this.data.rentalText)
-    if (rental.error) { wx.showToast({ title: rental.error, icon: 'none', duration: 2800 }); return }
-    api.setPricing(this.id, care.care, rental.rate).then(() => { base.done('已保存'); this.load() }).catch(base.fail)
   },
 
   // ---- 他的卡 ----

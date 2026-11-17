@@ -1,4 +1,4 @@
-// 教练中心（教练自己）：发学员卡并分享、看领取情况、看学员消费、看自己的优惠券
+// 分销商中心：机构发会籍卡并分享、看领取情况；所有分销商看顾客消费、看自己的优惠券。教练和 KOL 没有发卡（2026-11-17：只有机构能发整个雪季有效的会籍卡）
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/coach-view.js')
@@ -43,6 +43,8 @@ Page({
         loading: false, blocked: '', coach: d.coach, counts: d.cards,
         benefit: view.benefitLines(d.coach.carePrices, d.coach.rentalRate), validUntil: view.dayText(d.coach.validUntil)
       })
+      // 教练 / KOL 没有发卡和领取情况：从旧入口带 tab=share 进来也落到「我的券」
+      if (d.coach.introducerType !== '机构' && (this.data.tab === 'share' || this.data.tab === 'status')) this.setData({ tab: 'coupons' })
       return this.loadTab()
     }).catch(err => { this.setData({ loading: false }); if (err && err.code === 3) this.setData({ blocked: '你还不是分销商，请联系管理员添加' }); else base.fail(err) })
   },

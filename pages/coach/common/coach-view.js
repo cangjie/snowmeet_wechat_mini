@@ -190,44 +190,98 @@ function floorsPayload(cells, rentalText) {
   return { care, rentalMinRate: rentalMin }
 }
 
-// ---- 机构自己生成优惠券：能做的格子来自管理员设的底价（和会员卡共用）----
+// ---- 分销商（教练 / KOL / 机构）自己生成单张优惠券：能做的格子和方式来自管理员设的「优惠券底价」----
 const COUPON_MAX = 50
+const COUPON_MODE_LABEL = { fixed: '一口价', rate: '折扣', off: '减免' }
+const COUPON_MODE_ORDER = ['fixed', 'rate', 'off']
 
-// 服务端 GetMyCouponMaker 的 cells → 选择项：每格能用哪些方式（折扣 / 一口价）、是否可选、提示
+function couponModeHint(c) {
+  const parts = []
+  if (c.minFixed !== null && c.minFixed !== undefined) parts.push('一口价不低于 ¥' + num(c.minFixed))
+  if (c.minRate !== null && c.minRate !== undefined) parts.push('折扣不低于 ' + round1(c.minRate) + ' 折')
+  if (c.maxOff !== null && c.maxOff !== undefined) parts.push('减免不超过 ¥' + num(c.maxOff))
+  return parts.join('，')
+}
+
+// 服务端 GetMyCouponMaker 的 cells → 选择项。**只保留管理员开放了的格子，每格只保留设置了的方式**；
+// 没设置的格子和方式不返回，页面上就不会出现（用户 2026-11-17：没设置的不要显示出来，免得误导）
 function couponCells(cells) {
-  return (cells || []).map(c => {
-    const modes = []
-    if (c.open && c.minRate !== null && c.minRate !== undefined) modes.push({ key: 'rate', label: '折扣' })
-    if (c.open && c.minFixed !== null && c.minFixed !== undefined) modes.push({ key: 'fixed', label: '一口价' })
-    const available = !!c.open && !!c.productReady && modes.length > 0
+  return (cells || []).filter(c => c.open && c.productReady && Array.isArray(c.modes) && c.modes.length > 0).map(c => {
+    const modes = COUPON_MODE_ORDER.filter(k => c.modes.indexOf(k) >= 0).map(k => ({ key: k, label: COUPON_MODE_LABEL[k] }))
     return {
-      key: c.shop + c.tier, shop: c.shop, tier: c.tier, label: SHORT[c.shop] + c.tier, modes, available,
-      minRate: c.minRate === undefined ? null : c.minRate, minFixed: c.minFixed === undefined ? null : c.minFixed,
-      hint: !c.open ? '管理员未开放' : (!c.productReady ? '这家店还没有配置养护价目' : floorHint(c))
+      key: c.shop + c.tier, shop: c.shop, tier: c.tier, label: SHORT[c.shop] + c.tier, modes,
+      minFixed: c.minFixed === undefined ? null : c.minFixed, minRate: c.minRate === undefined ? null : c.minRate, maxOff: c.maxOff === undefined ? null : c.maxOff,
+      hint: couponModeHint(c)
     }
   })
 }
 
 // 表单 → 接口入参；校验不过返回 { error }（服务端仍会再按底价校验一遍）
 function couponPayload(cell, mode, valueText, countText) {
-  if (!cell || !cell.available) return { error: '请选择一个已开放的项目' }
-  if (!mode) return { error: '请选择折扣或一口价' }
+  if (!cell) return { error: '请选择一个项目' }
+  if (!mode || !cell.modes.some(m => m.key === mode)) return { error: '请选择优惠方式' }
   const t = String(valueText === undefined || valueText === null ? '' : valueText).trim()
   const v = Number(t)
-  if (t === '' || !isFinite(v)) return { error: '请填写' + (mode === 'rate' ? '折扣' : '一口价') }
+  if (t === '' || !isFinite(v)) return { error: '请填写' + COUPON_MODE_LABEL[mode] }
   let value
   if (mode === 'rate') {
     if (!(v > 0 && v <= 10)) return { error: '折扣填 0.1～10（8 表示 8 折）' }
     value = Math.round(v * 10) / 100
-    if (cell.minRate === null || value + 1e-9 < cell.minRate) return { error: cell.label + '：折扣不能低于 ' + round1(cell.minRate) + ' 折' }
-  } else {
+    if (value + 1e-9 < cell.minRate) return { error: cell.label + '：折扣不能低于 ' + round1(cell.minRate) + ' 折' }
+  } else if (mode === 'fixed') {
     if (!(v >= 0)) return { error: '一口价不能为负数' }
     value = Math.round(v * 100) / 100
-    if (cell.minFixed === null || value + 1e-9 < cell.minFixed) return { error: cell.label + '：一口价不能低于 ¥' + num(cell.minFixed) }
+    if (value + 1e-9 < cell.minFixed) return { error: cell.label + '：一口价不能低于 ¥' + num(cell.minFixed) }
+  } else {
+    if (!(v > 0)) return { error: '减免金额要大于 0' }
+    value = Math.round(v * 100) / 100
+    if (value > cell.maxOff + 1e-9) return { error: cell.label + '：减免不能超过 ¥' + num(cell.maxOff) }
   }
   const n = Number(countText)
   if (!Number.isInteger(n) || n < 1 || n > COUPON_MAX) return { error: '张数填 1～' + COUPON_MAX }
   return { shop: cell.shop, tier: cell.tier, mode, value, count: n }
+}
+
+// ---- 管理员设「优惠券底价」（原来的价格设置）：每格三种方式各自可空，空 = 没开放 ----
+function couponFloorEditCells(floorView) {
+  const list = (floorView && floorView.care) || []
+  const cells = []
+  SHOPS.forEach(shop => TIERS.forEach(tier => {
+    const f = list.find(x => x.shop === shop && x.tier === tier) || {}
+    cells.push({
+      key: shop + tier, shop, tier,
+      fixedText: f.minFixed === null || f.minFixed === undefined ? '' : num(f.minFixed),
+      rateText: f.minRate === null || f.minRate === undefined ? '' : String(round1(f.minRate)),
+      offText: f.maxOff === null || f.maxOff === undefined ? '' : num(f.maxOff)
+    })
+  }))
+  return cells
+}
+
+function couponFloorsPayload(cells) {
+  const care = []
+  for (const c of cells) {
+    const label = SHORT[c.shop] + c.tier
+    const read = text => String(text === undefined || text === null ? '' : text).trim()
+    let minFixed = null, minRate = null, maxOff = null
+    if (read(c.fixedText) !== '') {
+      const v = Number(read(c.fixedText))
+      if (!isFinite(v) || !(v >= 0)) return { error: label + '：最低一口价不能为负数' }
+      minFixed = Math.round(v * 100) / 100
+    }
+    if (read(c.rateText) !== '') {
+      const v = Number(read(c.rateText))
+      if (!isFinite(v) || !(v > 0 && v <= 10)) return { error: label + '：最低折扣填 0.1～10（7 表示 7 折）' }
+      minRate = Math.round(v * 10) / 100
+    }
+    if (read(c.offText) !== '') {
+      const v = Number(read(c.offText))
+      if (!isFinite(v) || !(v > 0)) return { error: label + '：最高减免要大于 0' }
+      maxOff = Math.round(v * 100) / 100
+    }
+    care.push({ shop: c.shop, tier: c.tier, min_fixed: minFixed, min_rate: minRate, max_off: maxOff })
+  }
+  return { care }
 }
 
 const CARD_STATUS = {
@@ -267,5 +321,5 @@ module.exports = {
   SHOPS, TIERS, SHORT, MODES, cellText, rentalText, priceChips, editCells, cellsPayload, rentalPayload, rentalEditText,
   previewPrice, statusTag, dateText, dayText, benefitLines,
   floorHint, standardCells, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
-  COUPON_MAX, couponCells, couponPayload
+  COUPON_MAX, couponCells, couponPayload, couponFloorEditCells, couponFloorsPayload
 }

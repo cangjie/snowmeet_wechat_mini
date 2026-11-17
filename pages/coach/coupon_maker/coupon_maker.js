@@ -1,5 +1,6 @@
-// 机构「制作优惠券」：按管理员设的底价（和会员卡共用）生成一批自己的优惠券，放进自己的券包，
-// 再到「我的优惠券」转发给顾客。券价不能低于底价；每张券限用一次，只用于该店单项 / 双项养护，加急加价、维修费照收。
+// 「制作优惠券」（教练 / KOL / 机构都有）：按管理员设的「优惠券底价」生成一批自己的单张优惠券，放进自己的券包，
+// 再到「我的优惠券」转发给顾客。一口价不能低于、折扣不能低于、减免不能超过底价；每张券限用一次，只用于该店单项 / 双项养护，加急加价、维修费照收。
+// 管理员只开放了的项目和方式才会显示，没设置的一律不出现（用户 2026-11-17：免得误导）。
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/coach-view.js')
@@ -37,7 +38,7 @@ Page({
     if (!this.data.canMake) return
     const i = Number(e.currentTarget.dataset.i)
     const cell = this.data.cells[i]
-    if (!cell.available) { wx.showToast({ title: cell.hint, icon: 'none' }); return }
+    if (!cell) return
     this.touch()
     this.setData({ sel: i, selHint: cell.hint, selModes: cell.modes, mode: cell.modes.length === 1 ? cell.modes[0].key : '', valueText: '' })
   },

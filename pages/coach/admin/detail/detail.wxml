@@ -2,57 +2,34 @@
   <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
   <block wx:elif="{{coach}}">
     <view class="tabs">
-      <view class="tab {{tab === 'price' ? 'on' : ''}}" data-tab="price" bindtap="onTab">价格设置</view>
-      <view wx:if="{{coach.introducerType === '机构'}}" class="tab {{tab === 'floor' ? 'on' : ''}}" data-tab="floor" bindtap="onTab">底价</view>
+      <view class="tab {{tab === 'coupon' ? 'on' : ''}}" data-tab="coupon" bindtap="onTab">优惠券底价</view>
+      <view wx:if="{{coach.introducerType === '机构'}}" class="tab {{tab === 'floor' ? 'on' : ''}}" data-tab="floor" bindtap="onTab">会籍卡底价</view>
       <view class="tab {{tab === 'cards' ? 'on' : ''}}" data-tab="cards" bindtap="onTab">他的卡</view>
       <view class="tab {{tab === 'manage' ? 'on' : ''}}" data-tab="manage" bindtap="onTab">停用</view>
     </view>
 
-    <!-- 价格设置 -->
-    <block wx:if="{{tab === 'price'}}">
+    <!-- 优惠券底价（原来的「价格设置」） -->
+    <block wx:if="{{tab === 'coupon'}}">
       <view class="card card-pad">
-        <view class="card-row"><text class="card-title small">养护</text><text class="card-meta">按门店、单项/双项分别设置</text></view>
-        <block wx:for="{{cells}}" wx:key="key" wx:for-index="i">
+        <view class="card-row"><text class="card-title small">养护优惠券底价</text><text class="card-meta">限制他自己生成的单张优惠券</text></view>
+        <block wx:for="{{couponCells}}" wx:key="key" wx:for-index="i">
           <view wx:if="{{i % 2 === 0}}" class="shop-title" style="{{i === 0 ? 'border-top: none; padding-top: 0;' : ''}}">{{item.shop}}</view>
           <view class="price-row">
             <text class="lab">{{item.tier}}</text>
-            <view class="seg">
-              <view wx:for="{{modes}}" wx:for-item="m" wx:key="key" class="chip-sq {{item.mode === m.key ? 'on' : ''}}" data-i="{{i}}" data-mode="{{m.key}}" bindtap="onMode">{{m.label}}</view>
-            </view>
-            <view class="val {{item.mode === 'none' ? 'off' : ''}}">
-              <input type="digit" value="{{item.text}}" disabled="{{item.mode === 'none'}}" data-i="{{i}}" bindinput="onCellText" />
-              <text class="unit">{{item.mode === 'rate' ? '折' : (item.mode === 'fixed' ? '元' : '')}}</text>
-            </view>
+            <view class="val" style="flex: 1;"><input type="digit" placeholder="最低价" value="{{item.fixedText}}" data-i="{{i}}" bindinput="onCouponFixed" /><text class="unit">元</text></view>
+            <view class="val" style="flex: 1;"><input type="digit" placeholder="最低折" value="{{item.rateText}}" data-i="{{i}}" bindinput="onCouponRate" /><text class="unit">折</text></view>
+            <view class="val" style="flex: 1;"><input type="digit" placeholder="最高减" value="{{item.offText}}" data-i="{{i}}" bindinput="onCouponOff" /><text class="unit">元</text></view>
           </view>
-          <view wx:if="{{item.err}}" class="danger-line" style="margin-left: 76rpx;">{{item.err}}</view>
         </block>
-        <view class="card-meta">一口价 = 养护服务费封顶价，维修费不打折；加急单只对单/双项的基础价生效，加急加价照收。折扣填「8」表示 8 折。</view>
+        <view class="card-meta">每格三个框依次是：<text style="font-weight: 700;">一口价不能低于</text>多少元、<text style="font-weight: 700;">折扣不能低于</text>几折（7 = 7 折）、<text style="font-weight: 700;">减免不能超过</text>多少元。某一种留空 = 没开放，他生成优惠券时看不到这种方式；三个都留空 = 这一项整格不开放。</view>
       </view>
-      <view class="card card-pad">
-        <view class="card-row"><text class="card-title small">租赁</text><text class="card-meta">各店、各项目通用</text></view>
-        <view class="price-row">
-          <text class="lab" style="width: 96rpx;">折扣</text>
-          <view class="val" style="width: 220rpx;"><input type="digit" placeholder="不优惠留空" value="{{rentalText}}" bindinput="onRentalText" /><text class="unit">折</text></view>
-        </view>
-        <view class="card-meta">只设折扣率，不分门店和租赁项目，不设一口价。</view>
-      </view>
-      <view class="card card-pad" style="background: var(--blue-soft);">
-        <view class="card-row"><text class="card-meta">试算：养护原价</text><input class="input" style="height: 60rpx; width: 180rpx;" type="digit" value="{{trialBase}}" bindinput="onTrialBase" /></view>
-        <view wx:for="{{trial}}" wx:key="key" class="kv">
-          <text class="k">{{item.label}}</text>
-          <text wx:if="{{item.error}}" class="v tone-danger">填写有误，见上方</text>
-          <text wx:elif="{{item.none}}" class="v" style="font-weight: 400; color: var(--faint);">无优惠</text>
-          <text wx:else class="v">分销商价 ¥{{item.price}}（优惠 −¥{{item.discount}}）</text>
-        </view>
-        <view wx:if="{{!trial.length}}" class="card-meta">填写试算原价后，这里显示各店各档的分销商价。</view>
-      </view>
-      <view class="note">修改只影响<text style="font-weight: 700;">之后</text>领取的新卡；已领的卡保持领取时的价格。</view>
+      <view class="note">这是限制他生成<text style="font-weight: 700;">单张优惠券</text>（单次核销）的底价，教练、KOL、机构都一样。只有机构能发整个雪季有效的会籍卡，会籍卡的底价在「会籍卡底价」里。修改只影响他之后生成的券，已生成的券不变。</view>
     </block>
 
-    <!-- 底价（机构自己制作会员卡的下限） -->
+    <!-- 会籍卡底价（机构自己制作会籍卡的下限） -->
     <block wx:if="{{tab === 'floor'}}">
       <view class="card card-pad">
-        <view class="card-row"><text class="card-title small">养护底价</text><text class="card-meta">机构能设的最低折扣 / 最低一口价</text></view>
+        <view class="card-row"><text class="card-title small">会籍卡养护底价</text><text class="card-meta">机构自己的会籍卡能设的最低折扣 / 最低一口价</text></view>
         <block wx:for="{{floorCells}}" wx:key="key" wx:for-index="i">
           <view wx:if="{{i % 2 === 0}}" class="shop-title" style="{{i === 0 ? 'border-top: none; padding-top: 0;' : ''}}">{{item.shop}}</view>
           <view class="price-row">
@@ -70,7 +47,7 @@
           <view class="val" style="width: 220rpx;"><input type="digit" placeholder="留空不开放" value="{{floorRentalText}}" bindinput="onFloorRental" /><text class="unit">折</text></view>
         </view>
       </view>
-      <view class="note">底价只限制机构自己在「制作会员卡」里设的价格，管理员在「价格设置」里改价不受它限制。已经设好的价格不会被底价追溯修改，机构下次保存时才会被要求调整。</view>
+      <view class="note">会籍卡底价只限制机构自己制作会籍卡时的价格；优惠券的底价在「优惠券底价」里，两份互不影响。已经设好的价格不会被底价追溯修改，机构下次保存时才会被要求调整。</view>
     </block>
 
     <!-- 他的卡 -->
@@ -116,9 +93,9 @@
     </block>
   </block>
 </view>
-<view wx:if="{{!blocked && coach && tab === 'price'}}" class="bottom-bar">
-  <view class="btn primary {{dirty ? '' : 'disabled'}}" bindtap="onSave">保存</view>
+<view wx:if="{{!blocked && coach && tab === 'coupon'}}" class="bottom-bar">
+  <view class="btn primary {{couponDirty ? '' : 'disabled'}}" bindtap="onCouponSave">保存优惠券底价</view>
 </view>
 <view wx:if="{{!blocked && coach && tab === 'floor'}}" class="bottom-bar">
-  <view class="btn primary {{floorDirty ? '' : 'disabled'}}" bindtap="onFloorSave">保存底价</view>
+  <view class="btn primary {{floorDirty ? '' : 'disabled'}}" bindtap="onFloorSave">保存会籍卡底价</view>
 </view>

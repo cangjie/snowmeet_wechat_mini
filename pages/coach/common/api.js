@@ -43,6 +43,9 @@ module.exports = {
   updateCoach: (coachId, name, valid) => post('CoachAdmin', 'UpdateCoach', { coachId, name, valid }),
   // care: [{shop, tier, mode, value}]；rental_rate 为空 = 租赁不优惠
   // 机构自己制作会员卡的底价（下限）：管理员设；min_rate = 最低折扣率，min_fixed = 最低一口价，都空 = 不开放
+  // 优惠券底价（原来的「价格设置」）：限制分销商自己生成的单张优惠券。每格 min_fixed 一口价不能低于 / min_rate 折扣不能低于 / max_off 减免不能超过，空 = 没开放
+  getCouponFloors: coachId => get('CoachAdmin', 'GetCouponFloors', { coachId }),
+  setCouponFloors: (coachId, care) => post('CoachAdmin', 'SetCouponFloors', { coachId, care }),
   getCoachFloors: coachId => get('CoachAdmin', 'GetCoachFloors', { coachId }),
   setCoachFloors: (coachId, care, rentalMinRate) => post('CoachAdmin', 'SetCoachFloors', { coachId, care, rental_min_rate: rentalMinRate }),
   setPricing: (coachId, care, rentalRate) => post('CoachAdmin', 'SetCoachPricing', { coachId, care, rental_rate: rentalRate }),

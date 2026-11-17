@@ -1,33 +1,36 @@
 <view class="co-page">
   <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
   <block wx:elif="{{!loading}}">
-    <view class="note blue">按管理员给你设的底价生成{{name}}自己的优惠券，券价不能低于底价。每张券限用一次，只用于该店单项 / 双项养护，加急加价、维修费照收，有效期至 {{validUntil}}。生成后放进你的券包，到「我的优惠券」转发给顾客。</view>
+    <view class="note blue">按管理员给你设的优惠券底价生成{{name}}自己的单张优惠券。每张券限用一次，只用于该店单项 / 双项养护，加急加价、维修费照收，有效期至 {{validUntil}}。生成后放进你的券包，到「我的优惠券」转发给顾客。</view>
     <view wx:if="{{!canMake}}" class="note">{{reason}}</view>
+    <view wx:elif="{{!cells.length}}" class="note">管理员还没有给你开放优惠券的项目，请联系管理员设置优惠券底价。</view>
 
-    <view class="card card-pad">
-      <view class="card-row"><text class="card-title small">1 选项目</text><text class="card-meta">灰色的是管理员还没有开放的</text></view>
-      <view class="opt-grid">
-        <view wx:for="{{cells}}" wx:key="key" class="opt {{sel === index ? 'on' : ''}} {{item.available ? '' : 'off'}}" data-i="{{index}}" bindtap="onCell">{{item.label}}</view>
+    <block wx:if="{{canMake && cells.length}}">
+      <view class="card card-pad">
+        <view class="card-row"><text class="card-title small">1 选项目</text></view>
+        <view class="opt-grid">
+          <view wx:for="{{cells}}" wx:key="key" class="opt {{sel === index ? 'on' : ''}}" data-i="{{index}}" bindtap="onCell">{{item.label}}</view>
+        </view>
+        <view wx:if="{{sel >= 0}}" class="hint-line">底价：{{selHint}}</view>
       </view>
-      <view wx:if="{{sel >= 0}}" class="hint-line">底价：{{selHint}}</view>
-    </view>
 
-    <view wx:if="{{sel >= 0}}" class="card card-pad">
-      <view class="card-row"><text class="card-title small">2 定价格</text></view>
-      <view wx:if="{{selModes.length > 1}}" class="opt-grid">
-        <view wx:for="{{selModes}}" wx:for-item="m" wx:key="key" class="opt {{mode === m.key ? 'on' : ''}}" data-mode="{{m.key}}" bindtap="onMode">{{m.label}}</view>
+      <view wx:if="{{sel >= 0}}" class="card card-pad">
+        <view class="card-row"><text class="card-title small">2 定价格</text></view>
+        <view wx:if="{{selModes.length > 1}}" class="opt-grid">
+          <view wx:for="{{selModes}}" wx:for-item="m" wx:key="key" class="opt {{mode === m.key ? 'on' : ''}}" data-mode="{{m.key}}" bindtap="onMode">{{m.label}}</view>
+        </view>
+        <view wx:if="{{mode}}" class="row-val">
+          <view class="input"><input type="digit" placeholder="{{mode === 'rate' ? '折扣，8 表示 8 折' : (mode === 'fixed' ? '一口价，元' : '减免金额，元')}}" value="{{valueText}}" bindinput="onValue" /></view>
+          <text class="card-meta">{{mode === 'rate' ? '折' : '元'}}</text>
+        </view>
+        <view class="card-row"><text class="card-title small">3 生成几张</text></view>
+        <view class="row-val">
+          <view class="input"><input type="number" value="{{countText}}" bindinput="onCount" /></view>
+          <text class="card-meta">张（一次最多 50）</text>
+        </view>
+        <view class="hint-line">名下没用完、没过期的自制券 {{outstanding}} / {{maxOutstanding}} 张。</view>
       </view>
-      <view wx:if="{{mode}}" class="row-val">
-        <view class="input"><input type="digit" placeholder="{{mode === 'rate' ? '折扣，8 表示 8 折' : '一口价，元'}}" value="{{valueText}}" bindinput="onValue" /></view>
-        <text class="card-meta">{{mode === 'rate' ? '折' : '元'}}</text>
-      </view>
-      <view class="card-row"><text class="card-title small">3 生成几张</text></view>
-      <view class="row-val">
-        <view class="input"><input type="number" value="{{countText}}" bindinput="onCount" /></view>
-        <text class="card-meta">张（一次最多 50）</text>
-      </view>
-      <view class="hint-line">名下没用完、没过期的自制券 {{outstanding}} / {{maxOutstanding}} 张。</view>
-    </view>
+    </block>
 
     <view wx:if="{{recent.length}}" class="card card-pad">
       <view class="card-row"><text class="card-title small">最近生成的券</text><view class="btn" bindtap="onGoCoupons">去转发</view></view>
