@@ -1,4 +1,4 @@
-// 分销商中心：机构看会籍卡的领取情况（每次分享一条，可取消没领取的）、去「制作会员卡」分享；所有分销商看顾客消费、看自己的优惠券。
+// 分销商中心：机构看会籍卡的领取情况（每次分享一条，没领取的可直接删除）、去「制作会员卡」分享；所有分销商看顾客消费、看自己的优惠券。
 // 教练和 KOL 没有发卡（2026-11-17：只有机构能发整个雪季有效的会籍卡）。分享二维码 / 分享小程序卡片都在 pages/coach/card_standard。
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
@@ -58,17 +58,18 @@ Page({
   onTab(e) { this.setData({ tab: e.currentTarget.dataset.tab }); this.loadTab() },
   onGoShare() { wx.navigateTo({ url: '../card_standard/card_standard' }) },
 
-  // ---- 领取情况：每次分享一条，领取人的头像昵称和卡号；没领取的可以取消 ----
+  // ---- 领取情况：每次分享一条，领取人的头像昵称和卡号；没领取的可以直接删除 ----
   loadCards() {
     return api.listMyCards().then(d => {
       this.setData({ counts: d.counts, statusRows: (d.cards || []).map(x => view.shareRow(x.card)) })
     }).catch(base.fail)
   },
 
-  onCancelShare(e) {
+  // 删除还没人领取的分享：删除后二维码和小程序卡片都不能再领，这条记录不再列出
+  onDeleteShare(e) {
     const id = Number(e.currentTarget.dataset.id)
-    return base.confirm('取消这次分享', '取消后，对方扫码或点开都不能再领取这张会籍卡。', '取消分享').then(ok => {
-      if (ok) return api.revokeMyCard(id).then(() => { base.done('已取消'); return this.loadCards() }).catch(err => { base.fail(err); return this.loadCards() })
+    return base.confirm('删除这条分享', '删除后，这条分享记录会消失，对方扫码或点开都不能再领取这张会籍卡。', '删除').then(ok => {
+      if (ok) return api.revokeMyCard(id).then(() => { base.done('已删除'); return this.loadCards() }).catch(err => { base.fail(err); return this.loadCards() })
     })
   },
 

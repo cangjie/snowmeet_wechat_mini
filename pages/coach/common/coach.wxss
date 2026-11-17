@@ -148,3 +148,8 @@ button.share-btn::after { border: none; }
 .qr-mask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; }
 .qr-pop { width: 620rpx; max-width: 90%; box-sizing: border-box; background: var(--card); border-radius: 32rpx; padding: 40rpx 36rpx; display: flex; flex-direction: column; align-items: center; gap: 20rpx; text-align: center; }
 .qr-img { width: 440rpx; height: 440rpx; background: var(--gray); border-radius: 16rpx; }
+
+/* 卡种下的分享记录：默认折叠，展开后每次分享一条（2026-11-18） */
+.share-toggle { display: flex; align-items: center; gap: 16rpx; padding-top: 20rpx; border-top: 2rpx solid var(--gray); }
+.share-arrow { flex: none; font-size: 22rpx; font-weight: 600; color: var(--blue); }
+.share-rec { background: var(--gray); border-radius: 20rpx; padding: 22rpx 24rpx; display: flex; flex-direction: column; gap: 14rpx; }

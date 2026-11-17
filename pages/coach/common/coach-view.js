@@ -333,11 +333,12 @@ const CARD_STATUS = {
 }
 const statusTag = s => CARD_STATUS[s] || { text: s, tone: 'muted' }
 
-// 分享记录里的状态：没人领的叫「待领取」，机构自己取消的叫「已取消」（用户 2026-11-17：没领取的可以取消）
+// 分享记录里的状态：没人领的叫「待领取」；机构自己「删除」的分享（没人领取就撤销）服务端不再列出，
+// 列表里还能看到的「已撤销」只会是领取后被管理员撤销的卡（用户 2026-11-18：没领取的可以直接删除）
 const SHARE_STATUS = {
   issued: { text: '待领取', tone: 'warn' },
   claimed: { text: '已领取', tone: 'ok' },
-  revoked: { text: '已取消', tone: 'muted' },
+  revoked: { text: '已撤销', tone: 'muted' },
   merged: { text: '已作废', tone: 'muted' }
 }
 const SHARE_CHANNEL = { qr: '二维码', card: '小程序卡片' }
@@ -349,7 +350,8 @@ function dateText(v) {
   const p = n => (n < 10 ? '0' + n : '' + n)
   return p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes())
 }
-// 分享列表的一行：每次分享一条（待领取 / 已领取 / 已取消）；已领取的带领取人的头像、昵称和会籍卡卡号，待领取的可以取消
+// 分享列表的一行：每次分享一条（待领取 / 已领取）；已领取的带领取人的头像、昵称和会籍卡卡号；
+// 待领取的可以再次看二维码、再次分享小程序卡片（同一张卡，sharePath 来自服务端），也可以直接删除
 function shareRow(card) {
   const c = card || {}
   const st = SHARE_STATUS[c.status] || { text: c.status || '', tone: 'muted' }
@@ -358,8 +360,23 @@ function shareRow(card) {
     id: c.id, status: c.status, name: c.cardName || '会籍卡', statusText: st.text, tone: st.tone,
     channelText: SHARE_CHANNEL[c.channel] || '', created: dateText(c.createDate), claimed: dateText(c.claimedAt),
     cardNo: c.cardNo || '', nickName: nick, avatarUrl: c.avatarUrl || '', initial: nick ? Array.from(nick)[0] : '',
-    canCancel: c.status === 'issued', tokenTail: c.tokenTail || ''
+    canDelete: c.status === 'issued', sharePath: c.sharePath || '', templateId: c.templateId == null ? null : c.templateId, tokenTail: c.tokenTail || ''
   }
+}
+
+// 分享记录按卡种分组（每个卡种一个默认折叠的分享记录）；卡种已不在列表里的（旧卡、卡种被停用）归到 other
+function groupShares(rows, templateIds) {
+  const known = {}
+  ;(templateIds || []).forEach(id => { known[id] = true })
+  const byTemplate = {}, other = []
+  ;(rows || []).forEach(r => {
+    if (r.templateId != null && known[r.templateId]) (byTemplate[r.templateId] = byTemplate[r.templateId] || []).push(r)
+    else other.push(r)
+  })
+  const stat = list => ({ total: list.length, pending: list.filter(r => r.status === 'issued').length, claimed: list.filter(r => r.status === 'claimed').length })
+  const stats = {}
+  ;(templateIds || []).forEach(id => { stats[id] = stat(byTemplate[id] || []) })
+  return { byTemplate, stats, other, otherStats: stat(other) }
 }
 
 function dayText(v) {
@@ -382,7 +399,7 @@ function benefitLines(carePrices, rentalRate) {
 
 module.exports = {
   SHOPS, TIERS, SHORT, MODES, cellText, rentalText, priceChips, editCells, cellsPayload, rentalPayload, rentalEditText,
-  previewPrice, statusTag, shareRow, dateText, dayText, benefitLines,
+  previewPrice, statusTag, shareRow, groupShares, dateText, dayText, benefitLines,
   floorHint, standardCells, effectiveStandardCell, cardUnit, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
   COUPON_MAX, couponCells, couponPayload, couponFloorEditCells, couponFloorsPayload
 }

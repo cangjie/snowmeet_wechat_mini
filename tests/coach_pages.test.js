@@ -184,7 +184,7 @@ function homeSetup(t, getCoach) {
   const cardRows = [
     { card: { id: 1, tokenTail: 'C7D9', status: 'issued', channel: 'card', createDate: '2026-10-30T09:12:00' }, sharePath: '/pages/coach/claim/claim?t=aaaaaaaaaaaaaaaaaaaaaaaa' },
     { card: { id: 2, tokenTail: 'A1B2', status: 'claimed', channel: 'qr', cardName: '教练卡', createDate: '2026-10-08T09:00:00', studentName: '王同学', nickName: '雪友小王', avatarUrl: 'https://img.snowmeet.top/upload/20261008/avatar_a.jpg', cardNo: 'HJ000002', phoneTail: '0231', claimedAt: '2026-10-08T14:20:00' } },
-    { card: { id: 3, tokenTail: 'E5F6', status: 'revoked', channel: 'qr', createDate: '2026-10-07T09:00:00' } }
+    { card: { id: 3, tokenTail: 'E5F6', status: 'revoked', channel: 'qr', createDate: '2026-10-07T09:00:00', memberId: 8, nickName: '雪友小李', cardNo: 'HJ000003' } }
   ]
   return setup(t, {
     staff: null,
@@ -225,9 +225,8 @@ test('分销商中心（教练 / KOL）：不是分销商被挡；没有发卡�
   assert.doesNotMatch(wxml, /生成学员卡/)
 })
 
-test('分销商中心（机构）：「发卡/分享」只是去制作会员卡的入口；领取情况每条带头像昵称和卡号，没领取的可以取消；顾客 / 券各 Tab', async t => {
+test('分销商中心（机构）：「发卡/分享」只是去制作会员卡的入口；领取情况每条带头像昵称和卡号，没领取的可以直接删除；顾客 / 券各 Tab', async t => {
   const s = homeSetup(t, () => ({ introducerType: '机构' }))
-  global.wx.showModal = o => o.success({ confirm: true })
   const page = s.load('pages/coach/home/home.js'); page.onLoad(); await settle()
   assert.equal(page.data.blocked, ''); assert.equal(page.data.tab, 'share')
   assert.ok(!s.calls.some(c => c.action === 'ListMyCards' || c.action === 'CreateCard' || c.action === 'ListMyCardTemplates'), '这个标签只是入口，不查卡、不建卡')
@@ -235,13 +234,14 @@ test('分销商中心（机构）：「发卡/分享」只是去制作会员卡�
   assert.equal(typeof page.onShareAppMessage, 'undefined', '分享在制作会员卡页，这里不再有分享')
   assert.equal(typeof page.onCreateForTemplate, 'undefined')
   page.onTab(tap({ tab: 'status' })); await settle()
-  assert.deepEqual(page.data.statusRows.map(r => [r.statusText, r.tone, r.canCancel]), [['待领取', 'warn', true], ['已领取', 'ok', false], ['已取消', 'muted', false]])
+  assert.deepEqual(page.data.statusRows.map(r => [r.statusText, r.tone, r.canDelete]), [['待领取', 'warn', true], ['已领取', 'ok', false], ['已撤销', 'muted', false]])
   const done = page.data.statusRows[1]
   assert.deepEqual([done.nickName, done.avatarUrl, done.cardNo, done.channelText, done.name], ['雪友小王', 'https://img.snowmeet.top/upload/20261008/avatar_a.jpg', 'HJ000002', '二维码', '教练卡'])
   assert.equal(page.data.statusRows[0].channelText, '小程序卡片')
-  // 取消没领取的分享：确认后调接口并刷新列表；已领取、已取消的没有取消按钮
+  // 删除没领取的分享：确认后调接口并刷新列表；已领取、已撤销的没有删除按钮
   const before = s.calls.filter(c => c.action === 'ListMyCards').length
-  await page.onCancelShare(tap({ id: 1 })); await settle()
+  await page.onDeleteShare(tap({ id: 1 })); await settle()
+  assert.equal(s.modals.at(-1), '删除这条分享'); assert.equal(typeof page.onCancelShare, 'undefined')
   assert.ok(s.calls.some(c => c.action === 'RevokeMyCard' && c.body.cardId === 1))
   assert.equal(s.calls.filter(c => c.action === 'ListMyCards').length, before + 1)
   page.onTab(tap({ tab: 'students' })); await settle()
@@ -251,7 +251,7 @@ test('分销商中心（机构）：「发卡/分享」只是去制作会员卡�
   assert.deepEqual(page.data.coupons.map(x => x.tag.text), ['已被接受', '待接受', '在手'])
   assert.equal(page.data.coupons[0].acceptedPhoneTail, '3306')
   const wxml = fs.readFileSync(path.join(__dirname, '../pages/coach/home/home.wxml'), 'utf8')
-  assert.match(wxml, /bindtap="onGoShare"/); assert.match(wxml, /bindtap="onCancelShare"/)
+  assert.match(wxml, /bindtap="onGoShare"/); assert.match(wxml, /bindtap="onDeleteShare"/); assert.doesNotMatch(wxml, /onCancelShare|取消分享/)
   assert.doesNotMatch(wxml, /open-type="share"|生成分享卡|onCreateForTemplate/)
 })
 

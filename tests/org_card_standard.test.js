@@ -205,10 +205,10 @@ function shareEnv(t, over) {
   const calls = env(t, (p, body) => {
     if (over && over[p]) return over[p](body, state)
     if (p === 'Distributor/ListMyCardTemplates') return OK({ templates: [SHARE_CARD] })
-    if (p === 'Coach/ListMyCards') return OK({ cards: state.cards.map(card => ({ card })), counts: {} })
+    if (p === 'Coach/ListMyCards') return OK({ cards: state.cards.filter(c => c.status !== 'revoked' || c.memberId).map(card => ({ card, sharePath: card.status === 'issued' ? '/pages/coach/claim/claim?t=tok' + card.id : null })), counts: {} })
     if (p === 'Coach/CreateCard') {
       state.seq++
-      state.cards.unshift({ id: state.seq, status: 'issued', cardName: body.templateId === 9 ? '教练卡' : '', channel: body.channel, createDate: '2026-11-17T10:0' + state.seq + ':00' })
+      state.cards.unshift({ id: state.seq, status: 'issued', templateId: body.templateId, cardName: body.templateId === 9 ? '教练卡' : '', channel: body.channel, createDate: '2026-11-17T10:0' + state.seq + ':00' })
       return OK({ cardId: state.seq, cardName: '教练卡', tokenTail: 'AB0' + state.seq, sharePath: '/pages/coach/claim/claim?t=unique000' + state.seq, channel: body.channel })
     }
     if (p === 'Coach/RevokeMyCard') { state.cards.find(c => c.id === body.cardId).status = 'revoked'; return OK({ cardId: body.cardId }) }
@@ -251,8 +251,7 @@ test('分享小程序卡片：选好转发对象时才记一次分享，路径�
   assert.equal(second.path, '/pages/coach/claim/claim?t=unique0002')
   assert.deepEqual(calls.api.filter(c => c.path === 'Coach/CreateCard').map(c => [c.body.templateId, c.body.channel]), [[9, 'card'], [9, 'card']])
   await settle()
-  assert.equal(page.data.shares.length, 2)
-  assert.deepEqual(page.data.shares.map(r => [r.id, r.channelText, r.statusText]), [[2, '小程序卡片', '待领取'], [1, '小程序卡片', '待领取']])
+  assert.deepEqual(page.data.shareRows[9].map(r => [r.id, r.channelText, r.statusText]), [[2, '小程序卡片', '待领取'], [1, '小程序卡片', '待领取']])
 
   // 右上角菜单之类没有卡种的分享：不记录、不带 token
   const before = calls.api.length
@@ -280,7 +279,7 @@ test('分享二维码：点一下记一次分享，显示这张卡的二维码�
   assert.deepEqual(calls.api.filter(c => c.path === 'Coach/CreateCard').map(c => [c.body.templateId, c.body.channel]), [[9, 'qr']])
   assert.equal(page.data.qr.show, true); assert.equal(page.data.qr.name, '教练卡'); assert.equal(page.data.qr.cardId, 1)
   assert.match(page.data.qr.url, /^https:\/\/x\/api\/Coach\/GetCardQr\?sessionKey=sk&cardId=1&envVersion=release&_=\d+$/)
-  assert.deepEqual(page.data.shares.map(r => [r.channelText, r.statusText]), [['二维码', '待领取']], '点的时候就已经记了')
+  assert.deepEqual(page.data.shareRows[9].map(r => [r.channelText, r.statusText]), [['二维码', '待领取']], '点的时候就已经记了')
   // 二维码没出来：给出重试，重试是同一张卡的码，不会再记一次分享
   page.onQrError(); assert.match(page.data.qr.error, /重试/)
   page.onQrRetry(); assert.equal(page.data.qr.error, ''); assert.equal(page.data.qr.loading, true)
@@ -290,50 +289,104 @@ test('分享二维码：点一下记一次分享，显示这张卡的二维码�
   await page.onQrClose(); assert.equal(page.data.qr.show, false); assert.equal(state.cards.length, 1)
   // 再点一次 = 再记一次、新的二维码
   await page.onShareQr({ currentTarget: { dataset: { id: 9 } } }); await settle()
-  assert.equal(page.data.qr.cardId, 2); assert.equal(page.data.shares.length, 2)
+  assert.equal(page.data.qr.cardId, 2); assert.equal(page.data.shareStats[9].total, 2)
 })
 
-test('分享记录：待领取 / 已领取（领取人头像昵称、卡号）/ 已取消；没领取的可以取消，取消后留在记录里', async t => {
-  const { calls, state } = shareEnv(t)
+test('分享记录按卡种分组、默认折叠；已领取的显示领取人头像昵称和卡号', async t => {
+  const { state } = shareEnv(t)
   state.cards = [
-    { id: 3, status: 'issued', cardName: '教练卡', channel: 'qr', createDate: '2026-11-17T10:30:00' },
-    { id: 2, status: 'claimed', cardName: '教练卡', channel: 'card', createDate: '2026-11-17T10:00:00', claimedAt: '2026-11-17T10:05:00', nickName: '雪友小A', avatarUrl: 'https://img.snowmeet.top/upload/20261117/avatar_a.jpg', cardNo: 'HJ000002', memberId: 7 },
-    { id: 1, status: 'revoked', cardName: '教练卡', channel: 'qr', createDate: '2026-11-16T09:00:00' }
+    { id: 3, status: 'issued', templateId: 9, cardName: '教练卡', channel: 'qr', createDate: '2026-11-17T10:30:00' },
+    { id: 2, status: 'claimed', templateId: 9, cardName: '教练卡', channel: 'card', createDate: '2026-11-17T10:00:00', claimedAt: '2026-11-17T10:05:00', nickName: '雪友小A', avatarUrl: 'https://img.snowmeet.top/upload/20261117/avatar_a.jpg', cardNo: 'HJ000002', memberId: 7 },
+    { id: 1, status: 'issued', templateId: 77, cardName: '旧卡种', channel: 'qr', createDate: '2026-11-10T09:00:00' }
   ]
   const page = loadPage('pages/coach/card_standard/card_standard.js', {})
   page.onLoad(); await settle()
-  const rows = page.data.shares
-  assert.deepEqual(rows.map(r => [r.statusText, r.tone, r.canCancel]), [['待领取', 'warn', true], ['已领取', 'ok', false], ['已取消', 'muted', false]])
+  assert.deepEqual(page.data.expanded, {}, '默认全部折叠')
+  assert.deepEqual(page.data.shareStats[9], { total: 2, pending: 1, claimed: 1 })
+  const rows = page.data.shareRows[9]
+  assert.deepEqual(rows.map(r => [r.statusText, r.tone, r.canDelete]), [['待领取', 'warn', true], ['已领取', 'ok', false]])
   assert.deepEqual([rows[1].nickName, rows[1].avatarUrl, rows[1].cardNo, rows[1].claimed, rows[1].channelText], ['雪友小A', 'https://img.snowmeet.top/upload/20261117/avatar_a.jpg', 'HJ000002', '11-17 10:05', '小程序卡片'])
   assert.equal(rows[0].created, '11-17 10:30')
+  // 卡种已不在列表里的记录单独归到「其他」
+  assert.deepEqual(page.data.otherShares.map(r => r.id), [1]); assert.deepEqual(page.data.otherStats, { total: 1, pending: 1, claimed: 0 })
+  // 展开 / 折叠
+  page.onToggleShares({ currentTarget: { dataset: { id: 9 } } }); assert.equal(page.data.expanded[9], true)
+  page.onToggleShares({ currentTarget: { dataset: { id: 9 } } }); assert.equal(page.data.expanded[9], false)
+  page.onToggleShares({ currentTarget: { dataset: { id: 'other' } } }); assert.equal(page.data.expanded.other, true)
 
-  await page.onCancelShare({ currentTarget: { dataset: { id: 3 } } }); await settle()
-  assert.deepEqual(calls.api.filter(c => c.path === 'Coach/RevokeMyCard').map(c => c.body.cardId), [3])
-  assert.deepEqual(page.data.shares.map(r => r.statusText), ['已取消', '已领取', '已取消'])
-  assert.ok(page.data.shares.every(r => r.id !== 3 || !r.canCancel))
-
-  // 不确认就不取消
-  global.wx.showModal = o => o.success({ confirm: false })
-  const n = calls.api.length
-  await page.onCancelShare({ currentTarget: { dataset: { id: 2 } } }); await settle()
-  assert.equal(calls.api.length, n)
-  // 取消时对方刚好领走了：服务端拒绝，提示并刷新成最新状态
-  global.wx.showModal = o => o.success({ confirm: true })
-  state.cards[0].status = 'issued'
-  const calls2 = shareEnv(t, { 'Coach/RevokeMyCard': () => ({ code: 1, message: '学员已领取的卡不能自行撤销，请联系管理员' }) })
-  const page2 = loadPage('pages/coach/card_standard/card_standard.js', {})
-  page2.onLoad(); await settle()
-  await page2.onCancelShare({ currentTarget: { dataset: { id: 1 } } }); await settle()
-  assert.match(calls2.calls.toasts.at(-1), /已领取的卡不能自行撤销/)
+  const wxml = fs.readFileSync(path.join(ROOT, 'pages/coach/card_standard/card_standard.wxml'), 'utf8')
+  assert.match(wxml, /bindtap="onToggleShares"/)
+  assert.match(wxml, /wx:if="\{\{expanded\[item\.id\]\}\}"/, '展开了才渲染记录')
+  assert.match(wxml, /src="\{\{rec\.avatarUrl\}\}"/); assert.match(wxml, /rec\.nickName/)
+  assert.doesNotMatch(wxml, /onCancelShare|取消分享/)
 })
 
-test('分享记录：领取人没有昵称时用真实姓名，都没有就写「顾客」；分享记录加载失败有提示', async t => {
+test('没领取的分享：再次查看二维码、再次分享小程序卡片都是同一张卡，不新记一次；可以直接删除（删后不再列出）', async t => {
+  const { calls, state } = shareEnv(t)
+  state.cards = [
+    { id: 3, status: 'issued', templateId: 9, cardName: '教练卡', channel: 'qr', createDate: '2026-11-17T10:30:00' },
+    { id: 2, status: 'claimed', templateId: 9, cardName: '教练卡', channel: 'card', createDate: '2026-11-17T10:00:00', claimedAt: '2026-11-17T10:05:00', nickName: '雪友小A', cardNo: 'HJ000002', memberId: 7 }
+  ]
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); page.onReady(); await settle()
+  const rec = page.data.shareRows[9][0]
+  assert.equal(rec.sharePath, '/pages/coach/claim/claim?t=tok3')
+  const wxml = fs.readFileSync(path.join(ROOT, 'pages/coach/card_standard/card_standard.wxml'), 'utf8')
+  // 只有待领取的记录有这三个按钮（claimed 的没有）
+  assert.match(wxml, /wx:if="\{\{rec\.canDelete\}\}"[\s\S]*?bindtap="onViewQr"[\s\S]*?open-type="share"[\s\S]*?bindtap="onDeleteShare"/)
+  assert.deepEqual(page.data.shareRows[9].map(r => r.canDelete), [true, false])
+
+  const writes = () => calls.api.filter(c => c.path === 'Coach/CreateCard').length
+  // 再次查看二维码：同一张卡的码，没有新建
+  page.onViewQr({ currentTarget: { dataset: { cardId: rec.id, name: rec.name } } })
+  assert.equal(page.data.qr.show, true); assert.equal(page.data.qr.cardId, 3)
+  assert.match(page.data.qr.url, /Coach\/GetCardQr\?sessionKey=sk&cardId=3&envVersion=release/)
+  assert.equal(writes(), 0)
+  await page.onQrClose()
+  // 再次分享小程序卡片：路径就是这张卡的，用卡种封面，没有 promise、不新建
+  const cover = page.data.templates[0].coverPath
+  const again = page.onShareAppMessage({ target: { dataset: { path: rec.sharePath, name: rec.name, cover } } })
+  assert.deepEqual(again, { title: '送你一张教练卡', path: '/pages/coach/claim/claim?t=tok3', imageUrl: cover })
+  assert.equal(again.promise, undefined); assert.equal(writes(), 0)
+
+  // 直接删除：确认后撤销，列表里这条消失，已领取的那条还在
+  await page.onDeleteShare({ currentTarget: { dataset: { id: 3 } } }); await settle()
+  assert.deepEqual(calls.api.filter(c => c.path === 'Coach/RevokeMyCard').map(c => c.body.cardId), [3])
+  assert.deepEqual(page.data.shareRows[9].map(r => r.id), [2])
+  assert.deepEqual(page.data.shareStats[9], { total: 1, pending: 0, claimed: 1 })
+  assert.match(calls.toasts.at(-1), /已删除/)
+  // 不确认就不删
+  global.wx.showModal = o => o.success({ confirm: false })
+  const n = calls.api.length
+  await page.onDeleteShare({ currentTarget: { dataset: { id: 2 } } }); await settle()
+  assert.equal(calls.api.length, n)
+})
+
+test('删除时对方刚好领走了：服务端拒绝，提示原因并刷新成最新状态', async t => {
+  const { calls, state } = shareEnv(t, { 'Coach/RevokeMyCard': () => ({ code: 1, message: '学员已领取的卡不能自行撤销，请联系管理员' }) })
+  state.cards = [{ id: 1, status: 'issued', templateId: 9, cardName: '教练卡', channel: 'qr', createDate: '2026-11-17T10:00:00' }]
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); await settle()
+  const before = calls.api.filter(c => c.path === 'Coach/ListMyCards').length
+  await page.onDeleteShare({ currentTarget: { dataset: { id: 1 } } }); await settle()
+  assert.match(calls.toasts.at(-1), /已领取的卡不能自行撤销/)
+  assert.equal(calls.api.filter(c => c.path === 'Coach/ListMyCards').length, before + 1)
+})
+
+test('分享记录：领取人没有昵称时用真实姓名；分组统计；分享记录加载失败有提示', async t => {
   assert.equal(view.shareRow({ id: 1, status: 'claimed', studentName: '王同学' }).nickName, '王同学')
   assert.equal(view.shareRow({ id: 1, status: 'claimed', nickName: '雪友', studentName: '王同学' }).nickName, '雪友')
   assert.equal(view.shareRow({ id: 1, status: 'claimed', nickName: '雪友' }).initial, '雪')
-  assert.equal(view.shareRow({ id: 1, status: 'issued' }).canCancel, true)
-  assert.equal(view.shareRow({ id: 1, status: 'claimed' }).canCancel, false)
+  assert.equal(view.shareRow({ id: 1, status: 'issued' }).canDelete, true)
+  assert.equal(view.shareRow({ id: 1, status: 'claimed' }).canDelete, false)
   assert.equal(view.shareRow({ id: 1, status: 'issued' }).channelText, '', '旧版小程序发的卡没有分享方式')
+  assert.equal(view.shareRow({ id: 1, status: 'revoked', memberId: 8 }).statusText, '已撤销')
+  const g = view.groupShares([
+    view.shareRow({ id: 5, status: 'issued', templateId: 1 }), view.shareRow({ id: 4, status: 'claimed', templateId: 1 }),
+    view.shareRow({ id: 3, status: 'issued', templateId: 2 }), view.shareRow({ id: 2, status: 'issued' }), view.shareRow({ id: 1, status: 'issued', templateId: 99 })
+  ], [1, 2, 3])
+  assert.deepEqual(g.stats, { 1: { total: 2, pending: 1, claimed: 1 }, 2: { total: 1, pending: 1, claimed: 0 }, 3: { total: 0, pending: 0, claimed: 0 } })
+  assert.deepEqual(g.byTemplate[1].map(r => r.id), [5, 4]); assert.deepEqual(g.other.map(r => r.id), [2, 1])
   shareEnv(t, { 'Coach/ListMyCards': () => ({ code: 3, message: 'x' }) })
   const page = loadPage('pages/coach/card_standard/card_standard.js', {})
   page.onLoad(); await settle()

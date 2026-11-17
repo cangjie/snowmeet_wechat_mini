@@ -4,8 +4,9 @@
 // 卡种列表（2026-11-17）：每个卡种两个分享按钮——「分享二维码」「分享小程序卡片」，不再有「生成分享卡」。
 //   · 每点一次分享，服务端就记一条待领取的卡（一次分享 = 一张卡 = 一位顾客领取）；二维码在点击时记，小程序卡片在选好转发对象时记
 //     （onShareAppMessage 的 promise 里建卡，拿到路径再发出去）。
-//   · 对方扫码 / 点开后在领取页授权头像昵称并领取，得到和本人绑定的卡号；下面「分享记录」里每条都能看到有没有领取、领取人的头像昵称和卡号，
-//     没领取的可以取消（取消后码和卡片都失效）。
+//   · 对方扫码 / 点开后在领取页授权头像昵称并领取，得到和本人绑定的卡号。
+//   · 每个卡种下面有「分享记录」（默认折叠，用户 2026-11-18）：每次分享一条，已领取的显示领取人的头像、昵称和卡号；
+//     没领取的可以再次看二维码、再次分享小程序卡片（同一张卡，不新记一次），也可以直接删除（删除后码和卡片都失效，记录不再列出）。
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/coach-view.js')
@@ -17,7 +18,7 @@ const BROKEN_PATH = '/pages/coach/claim/claim'
 Page({
   data: {
     blocked: '', loading: true, canEdit: false, reason: '', name: '', modes: view.MODES,
-    cells: [], rental: null, rentalText: '', showRental: false, nothingOpen: false, dirty: false, validUntil: '', saving: false, editing: false, templates: [], shares: [], sharesError: false, templateId: null, sharingQr: false,
+    cells: [], rental: null, rentalText: '', showRental: false, nothingOpen: false, dirty: false, validUntil: '', saving: false, editing: false, templates: [], shareRows: {}, shareStats: {}, otherShares: [], otherStats: { total: 0, pending: 0, claimed: 0 }, expanded: {}, fallbackCover: shareCover.FALLBACK, sharesError: false, templateId: null, sharingQr: false,
     qr: { show: false, url: '', name: '', cardId: null, loading: false, error: '' }
   },
 
@@ -58,13 +59,20 @@ Page({
     })
   },
 
-  // 分享记录：这个机构每一次分享一条（待领取 / 已领取 / 已取消），新的在前
+  // 分享记录：这个机构每一次分享一条，按卡种分组，每组默认折叠；新的在前。删除的分享服务端已不再返回
   loadShares() {
     const revision = this._sharesRevision = (this._sharesRevision || 0) + 1
     return api.listMyCards().then(d => {
       if (revision !== this._sharesRevision) return
-      this.setData({ shares: (d.cards || []).map(x => view.shareRow(x.card)), sharesError: false })
+      const rows = (d.cards || []).map(x => view.shareRow(Object.assign({}, x.card, { sharePath: x.sharePath })))
+      const g = view.groupShares(rows, this.data.templates.map(t => t.id))
+      this.setData({ shareRows: g.byTemplate, shareStats: g.stats, otherShares: g.other, otherStats: g.otherStats, sharesError: false })
     }).catch(() => { if (revision === this._sharesRevision) this.setData({ sharesError: true }) })
+  },
+  // 展开 / 折叠某个卡种的分享记录（other = 卡种已不在列表里的记录）
+  onToggleShares(e) {
+    const id = e.currentTarget.dataset.id
+    this.setData({ ['expanded.' + id]: !this.data.expanded[id] })
   },
 
   // 分享二维码：点一下记一次分享（建一张待领取的卡），再显示这张卡的二维码；顾客扫码后领取
@@ -84,8 +92,14 @@ Page({
     const env = (getApp().globalData && getApp().globalData.env) || 'release'
     return api.cardQrUrl(cardId, env) + '&_=' + Date.now()
   },
+  // 再次查看一条还没人领取的分享的二维码：同一张卡，不新记一次
+  onViewQr(e) {
+    const d = e.currentTarget.dataset
+    if (!d.cardId) return
+    this.setData({ qr: { show: true, url: this.qrUrl(d.cardId), name: d.name || '会籍卡', cardId: Number(d.cardId), loading: true, error: '' } })
+  },
   onQrLoad() { this.setData({ 'qr.loading': false, 'qr.error': '' }) },
-  onQrError() { this.setData({ 'qr.loading': false, 'qr.error': '二维码没生成出来，请点「重试」。这次分享已经记录，不用时可以在下面的分享记录里取消。' }) },
+  onQrError() { this.setData({ 'qr.loading': false, 'qr.error': '二维码没生成出来，请点「重试」。这次分享已经记录，不用时可以在卡种的「分享记录」里删除。' }) },
   onQrRetry() { if (this.data.qr.cardId) this.setData({ 'qr.url': this.qrUrl(this.data.qr.cardId), 'qr.loading': true, 'qr.error': '' }) },
   onQrClose() { this.setData({ qr: { show: false, url: '', name: '', cardId: null, loading: false, error: '' } }); return this.loadShares() },
   onQrSave() {
@@ -104,25 +118,28 @@ Page({
     })
   },
 
-  // 取消还没人领取的分享：取消后二维码和小程序卡片都不能再领
-  onCancelShare(e) {
+  // 直接删除还没人领取的分享：删除后二维码和小程序卡片都不能再领，这条记录不再列出
+  onDeleteShare(e) {
     const id = Number(e.currentTarget.dataset.id)
-    return base.confirm('取消这次分享', '取消后，对方扫码或点开都不能再领取这张会籍卡。', '取消分享').then(ok => {
+    return base.confirm('删除这条分享', '删除后，这条分享记录会消失，对方扫码或点开都不能再领取这张会籍卡。', '删除').then(ok => {
       if (!ok) return
-      return api.revokeMyCard(id).then(() => { base.done('已取消'); return this.loadShares() }).catch(err => { base.fail(err); return this.loadShares() })
+      return api.revokeMyCard(id).then(() => { base.done('已删除'); return this.loadShares() }).catch(err => { base.fail(err); return this.loadShares() })
     })
   },
 
   onNew() { return api.getCardTemplate().then(d => this.apply(d)).catch(base.fail) },
   onEdit(e) { return api.getCardTemplate(e.currentTarget.dataset.id).then(d => this.apply(d)).catch(base.fail) },
-  // 分享小程序卡片：按钮是 open-type="share"，转发时才在 promise 里向服务端记一次分享（建一张待领取的卡）并拿到领取路径；
-  // 建卡失败（比如待领取的卡已有 50 张）时提示原因，转发出去的卡片指向「分享链接不完整」页，不会被人领走。
+  // 分享小程序卡片：按钮是 open-type="share"。
+  //   · 卡种上的按钮（带 data-id = 卡种）：转发时才在 promise 里向服务端记一次分享（建一张待领取的卡）并拿到领取路径；
+  //     建卡失败（比如待领取的卡已有 50 张）时提示原因，转发出去的卡片指向「分享链接不完整」页，不会被人领走。
+  //   · 分享记录里还没人领取的那条上的按钮（带 data-path = 服务端给的那张卡的路径）：再次分享同一张卡，不新记一次。
   onShareAppMessage(e) {
     const target = e && e.target && e.target.dataset
     const id = target && Number(target.id)
     const name = (target && target.name) || '会籍卡'
     const title = '送你一张' + name
     const imageUrl = (target && target.cover) || shareCover.FALLBACK
+    if (target && target.path) return { title, path: target.path, imageUrl }
     if (!id) return { title, path: BROKEN_PATH, imageUrl }
     const promise = api.createCard(id, 'card').then(card => {
       this.loadShares()

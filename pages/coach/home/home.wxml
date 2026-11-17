@@ -15,7 +15,7 @@
     <block wx:if="{{tab === 'share'}}">
       <view class="card card-pad">
         <view class="card-title">分享会籍卡</view>
-        <view class="card-meta" style="line-height: 1.7;">在「制作会员卡」里选好卡种，点「分享二维码」或「分享小程序卡片」发给顾客。每次分享都会记一条，一次分享只能一位顾客领取；顾客领取时需要授权头像和昵称，领取后在「领取情况」里能看到他的头像、昵称和卡号，没领取的可以取消。</view>
+        <view class="card-meta" style="line-height: 1.7;">在「制作会员卡」里选好卡种，点「分享二维码」或「分享小程序卡片」发给顾客。每次分享都会记一条，一次分享只能一位顾客领取；顾客领取时需要授权头像和昵称，领取后在「领取情况」里能看到他的头像、昵称和卡号，没领取的可以直接删除；再次查看二维码、再次分享都在「制作会员卡」里。</view>
         <view class="btn primary btn-block" bindtap="onGoShare">去分享会籍卡</view>
       </view>
     </block>
@@ -26,7 +26,7 @@
         <view class="stat"><text class="stat-num">{{counts.total}}</text><text class="stat-label">已分享</text></view>
         <view class="stat"><text class="stat-num">{{counts.claimed}}</text><text class="stat-label">已领取</text></view>
         <view class="stat"><text class="stat-num">{{counts.issued}}</text><text class="stat-label">待领取</text></view>
-        <view class="stat"><text class="stat-num">{{counts.revoked}}</text><text class="stat-label">已取消</text></view>
+        <view class="stat"><text class="stat-num">{{counts.revoked}}</text><text class="stat-label">已撤销</text></view>
       </view>
       <view wx:for="{{statusRows}}" wx:key="id" class="card card-pad" style="{{item.status === 'revoked' ? 'opacity: 0.6;' : ''}}">
         <view class="card-row">
@@ -41,7 +41,7 @@
         </view>
         <view class="card-meta">分享于 {{item.created}}</view>
         <view wx:if="{{item.status === 'claimed'}}" class="card-meta">卡号 {{item.cardNo}} · {{item.claimed}} 领取</view>
-        <view wx:if="{{item.canCancel}}" class="btn-row"><view class="btn danger" data-id="{{item.id}}" bindtap="onCancelShare">取消分享</view></view>
+        <view wx:if="{{item.canDelete}}" class="btn-row"><view class="btn danger" data-id="{{item.id}}" bindtap="onDeleteShare">删除</view></view>
       </view>
       <view wx:if="{{!statusRows.length}}" class="co-empty">还没有分享过会籍卡</view>
     </block>
