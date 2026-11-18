@@ -59,6 +59,8 @@ module.exports = {
   listCardTemplates: () => get('Distributor', 'ListMyCardTemplates'),
   getCardTemplate: id => get('Distributor', 'GetMyCardTemplate', { id }),
   saveCardTemplate: form => post('Distributor', 'SaveMyCardTemplate', form),
+  // 删除卡种：只有从来没人领取过的卡种能删，它还没人领取的分享一并撤销
+  deleteCardTemplate: id => post('Distributor', 'DeleteMyCardTemplate', { id }),
   // 机构按管理员设的底价生成自己的优惠券（Distributor 控制器；教练 canMake=false）
   getMyCouponMaker: () => get('Distributor', 'GetMyCouponMaker'),
   makeMyCoupons: form => post('Distributor', 'MakeMyCoupons', form),

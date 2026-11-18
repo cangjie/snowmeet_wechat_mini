@@ -7,6 +7,7 @@
 //   · 对方扫码 / 点开后在领取页授权头像昵称并领取，得到和本人绑定的卡号。
 //   · 每个卡种下面有「分享记录」（默认折叠，用户 2026-11-18）：每次分享一条，已领取的显示领取人的头像、昵称和卡号；
 //     没领取的可以再次看二维码、再次分享小程序卡片（同一张卡，不新记一次），也可以直接删除（删除后码和卡片都失效，记录不再列出）。
+//   · 卡种本身：从来没人领取过的可以删除（连同它还没人领取的分享一起删）；有人领取过的不能删，卡片上写明已有几位领取（用户 2026-11-18）。
 const api = require('../common/api.js')
 const base = require('../common/page-base.js')
 const view = require('../common/coach-view.js')
@@ -115,6 +116,20 @@ Page({
         })
       },
       fail: () => wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+    })
+  },
+
+  // 删除卡种：只有从来没人领取过的才有「删除」按钮（服务端也会拦）；它还没人领取的分享一并删除
+  onDeleteTemplate(e) {
+    const d = e.currentTarget.dataset
+    const id = Number(d.id)
+    const pending = Number(d.pending) || 0
+    const content = pending > 0
+      ? '这个卡种还有 ' + pending + ' 条没人领取的分享，会一起删除，已发出的二维码和小程序卡片都会失效。删除后不能恢复。'
+      : '删除后不能恢复。'
+    return base.confirm('删除卡种「' + (d.name || '') + '」', content, '删除').then(ok => {
+      if (!ok) return
+      return api.deleteCardTemplate(id).then(() => { base.done('已删除'); return this.load() }).catch(err => { base.fail(err); return this.load() })
     })
   },
 

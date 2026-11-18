@@ -5,9 +5,14 @@
     <view class="btn primary btn-block" bindtap="onNew">＋ 创建卡种</view>
     <view wx:if="{{sharesError}}" class="note">分享记录加载失败，请下拉刷新重试。</view>
     <view wx:for="{{templates}}" wx:key="id" class="card card-pad">
-      <view class="card-row"><view class="card-title grow">{{item.name}}</view><view class="btn" data-id="{{item.id}}" bindtap="onEdit">编辑</view></view>
+      <view class="card-row">
+        <view class="card-title grow">{{item.name}}</view>
+        <view wx:if="{{item.canDelete}}" class="btn danger" data-id="{{item.id}}" data-name="{{item.name}}" data-pending="{{item.pendingCount}}" bindtap="onDeleteTemplate">删除</view>
+        <view class="btn" data-id="{{item.id}}" bindtap="onEdit">编辑</view>
+      </view>
       <view wx:for="{{item.benefit.lines}}" wx:for-item="line" wx:key="label" class="card-meta">{{line.label}}：单项 {{line.one}} · 双项 {{line.two}}</view>
       <view class="card-meta">租赁：{{item.benefit.rental}}</view>
+      <view wx:if="{{item.claimedCount > 0}}" class="card-meta">已有 {{item.claimedCount}} 位顾客领取过，不能删除</view>
       <view class="btn-row">
         <view class="btn primary {{sharingQr ? 'disabled' : ''}}" data-id="{{item.id}}" bindtap="onShareQr">分享二维码</view>
         <button wx:if="{{item.coverPath}}" class="btn primary" open-type="share" data-id="{{item.id}}" data-name="{{item.name}}" data-cover="{{item.coverPath}}">分享小程序卡片</button>

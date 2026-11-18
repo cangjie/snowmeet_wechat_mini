@@ -393,6 +393,53 @@ test('分享记录：领取人没有昵称时用真实姓名；分组统计；�
   assert.equal(page.data.sharesError, true)
 })
 
+test('卡种删除：没人领取过的有「删除」按钮，确认后调接口并刷新；领取过的没有按钮，写明已有几位领取', async t => {
+  let templates = [
+    { id: 9, name: '普通会员卡', carePrices: [], rentalRate: null, claimedCount: 0, pendingCount: 2, canDelete: true },
+    { id: 8, name: '测试会籍', carePrices: [], rentalRate: null, claimedCount: 3, pendingCount: 0, canDelete: false }
+  ]
+  const { calls } = shareEnv(t, {
+    'Distributor/ListMyCardTemplates': () => OK({ templates }),
+    'Distributor/DeleteMyCardTemplate': body => { templates = templates.filter(x => x.id !== body.id); return OK({ id: body.id, revokedShares: 2 }) }
+  })
+  const modals = []
+  global.wx.showModal = o => { modals.push([o.title, o.content]); o.success({ confirm: true }) }
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); page.onReady(); await settle()
+  assert.deepEqual(page.data.templates.map(x => [x.id, x.canDelete, x.claimedCount]), [[9, true, 0], [8, false, 3]])
+  const wxml = fs.readFileSync(path.join(ROOT, 'pages/coach/card_standard/card_standard.wxml'), 'utf8')
+  assert.match(wxml, /wx:if="\{\{item\.canDelete\}\}"[^>]*bindtap="onDeleteTemplate"[^>]*>删除</)
+  assert.match(wxml, /已有 \{\{item\.claimedCount\}\} 位顾客领取过，不能删除/)
+
+  await page.onDeleteTemplate({ currentTarget: { dataset: { id: 9, name: '普通会员卡', pending: 2 } } }); await settle()
+  assert.equal(modals[0][0], '删除卡种「普通会员卡」'); assert.match(modals[0][1], /2 条没人领取的分享，会一起删除/)
+  assert.deepEqual(calls.api.filter(c => c.path === 'Distributor/DeleteMyCardTemplate').map(c => [c.method, c.body]), [['POST', { id: 9 }]])
+  assert.match(calls.toasts.at(-1), /已删除/)
+  assert.deepEqual(page.data.templates.map(x => x.id), [8], '删除后列表刷新')
+
+  // 没有待领取分享的卡种：提示里不提分享；不确认就不删
+  templates = [{ id: 7, name: '空卡种', carePrices: [], rentalRate: null, claimedCount: 0, pendingCount: 0, canDelete: true }]
+  await page.load(); await settle()
+  global.wx.showModal = o => { modals.push([o.title, o.content]); o.success({ confirm: false }) }
+  const n = calls.api.length
+  await page.onDeleteTemplate({ currentTarget: { dataset: { id: 7, name: '空卡种', pending: 0 } } }); await settle()
+  assert.equal(modals.at(-1)[1], '删除后不能恢复。'); assert.equal(calls.api.length, n)
+})
+
+test('卡种删除：服务端拒绝（刚好有人领取了）时提示原因并刷新', async t => {
+  const { calls } = shareEnv(t, {
+    'Distributor/ListMyCardTemplates': () => OK({ templates: [{ id: 9, name: '普通会员卡', carePrices: [], rentalRate: null, claimedCount: 0, pendingCount: 0, canDelete: true }] }),
+    'Distributor/DeleteMyCardTemplate': () => ({ code: 1, message: '这个卡种已经有 1 位顾客领取过，不能删除' })
+  })
+  global.wx.showModal = o => o.success({ confirm: true })
+  const page = loadPage('pages/coach/card_standard/card_standard.js', {})
+  page.onLoad(); page.onReady(); await settle()
+  const before = calls.api.filter(c => c.path === 'Distributor/ListMyCardTemplates').length
+  await page.onDeleteTemplate({ currentTarget: { dataset: { id: 9, name: '普通会员卡', pending: 0 } } }); await settle()
+  assert.match(calls.toasts.at(-1), /已经有 1 位顾客领取过/)
+  assert.equal(calls.api.filter(c => c.path === 'Distributor/ListMyCardTemplates').length, before + 1)
+})
+
 test('只设置了一口价底价的分销商：会籍卡页只有一口价，没有折扣和「无」，没开放的租赁整块不出现（用户 2026-11-17）', async t => {
   const onlyFixed = (shop, tier, min) => cell(shop, tier, { open: true, minFixed: min, minRate: null })
   const state = STANDARD({
