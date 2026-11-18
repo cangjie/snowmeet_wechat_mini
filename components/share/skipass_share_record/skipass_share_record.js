@@ -5,7 +5,8 @@
 const api = require('../../../utils/introducer_api.js')
 
 const MANAGER_LEVEL = 200
-const STATE_CLASS = { '已分账': 'ok', '处理中': 'blue', '待分账': 'warn', '不能自动分': 'warn', '部分分账': 'warn', '被拒绝': 'danger' }
+// 「已取消」：票取消了（取消已确认或出票失败），这 1 元分账也是取消状态（2026-11-18 用户要求），灰色
+const STATE_CLASS = { '已分账': 'ok', '处理中': 'blue', '待分账': 'warn', '不能自动分': 'warn', '部分分账': 'warn', '被拒绝': 'danger', '已取消': 'muted' }
 
 function decorate(r) {
   return Object.assign({}, r, { stateClass: STATE_CLASS[r.state] || 'muted' })
@@ -21,7 +22,7 @@ Component({
     skipassId: { type: Number, value: 0, observer(value, previous) { if (this._attached && value !== previous) this.load() } }
   },
   data: {
-    hidden: true, loading: false, expanded: true, record: null, emptyReason: '', summary: '', ticketText: ''
+    hidden: true, loading: false, expanded: true, record: null, emptyReason: '', summary: '', ticketText: '', voided: false
   },
   lifetimes: {
     attached() { this._attached = true; return this.load() }
@@ -43,7 +44,9 @@ Component({
           record,
           emptyReason: record ? '' : ((d && d.emptyReason) || '没有分账'),
           summary: summarize(record),
-          ticketText: d && d.pickedUp ? '这张票已取票' : '这张票还没取票'
+          // 数据里不叫 cancelled：phone_copy 的扫描测试把变量名里的「cell」当成手机号（cancelled 里有 cell）
+          voided: !!(d && d.cancelled),
+          ticketText: d && d.cancelled ? '这张票已取消' : (d && d.pickedUp ? '这张票已取票' : '这张票还没取票')
         })
       }).catch(err => {
         this.setData({ loading: false })

@@ -159,3 +159,38 @@ test('卡片上写出：分给、状态、计划、提交、成功、是否取�
     assert.ok(wxml.includes(text), text)
   assert.doesNotMatch(wxml, /wx:for/)
 })
+
+// ---------- 2026-11-18 用户：票取消了，分账也应该是取消状态 ----------
+
+test('票已取消：显示「已取消」（灰色）、摘要「¥1 已取消」、票状态写「这张票已取消」', async t => {
+  setup(t, { staff: MANAGER, handler: () => OK(RESULT(REC({ state: '已取消', plan: '票已取消，不再分账', submitTime: null, successTime: null }),
+    { pickedUp: false, cancelled: true })) })
+  const comp = loadComponent(FILE, {}, { skipassId: 8393 })
+  await comp.load()
+  assert.equal(comp.data.summary, '¥1 已取消')
+  assert.equal(comp.data.record.state, '已取消')
+  assert.equal(comp.data.record.stateClass, 'muted')
+  assert.equal(comp.data.ticketText, '这张票已取消')
+  assert.equal(comp.data.voided, true)
+})
+
+test('票已取消、没有分账记录：也写「这张票已取消」，原因照后端给的显示', async t => {
+  setup(t, { staff: MANAGER, handler: () => OK(RESULT(null, { pickedUp: false, cancelled: true, emptyReason: '这张票已取消，没有分账' })) })
+  const comp = loadComponent(FILE, {}, { skipassId: 8393 })
+  await comp.load()
+  assert.equal(comp.data.ticketText, '这张票已取消')
+  assert.equal(comp.data.emptyReason, '这张票已取消，没有分账')
+})
+
+test('没取消的票不受影响（旧后端没有 cancelled 字段也一样）', async t => {
+  setup(t, { staff: MANAGER, handler: () => OK(RESULT(REC({ state: '待分账', submitTime: null, successTime: null }), { pickedUp: false })) })
+  const comp = loadComponent(FILE, {}, { skipassId: 8370 })
+  await comp.load()
+  assert.equal(comp.data.voided, false)
+  assert.equal(comp.data.ticketText, '这张票还没取票')
+})
+
+test('模板：票已取消时不再写「取票后自动分给推荐员工」，其余照旧', () => {
+  const wxml = read('components/share/skipass_share_record/skipass_share_record.wxml')
+  assert.match(wxml, /\{\{ticketText\}\}\{\{voided \? '' : '；这张票分 ¥1，取票后自动分给推荐员工'\}\}/)
+})

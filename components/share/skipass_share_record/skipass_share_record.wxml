@@ -8,7 +8,7 @@
   </view>
 
   <block wx:if="{{expanded}}">
-    <view class="ssr-meta">{{ticketText}}；这张票分 ¥1，取票后自动分给推荐员工</view>
+    <view class="ssr-meta">{{ticketText}}{{voided ? '' : '；这张票分 ¥1，取票后自动分给推荐员工'}}</view>
     <view wx:if="{{record}}" class="ssr-row">
       <view class="ssr-line">
         <text class="ssr-bold">分给：{{record.receiver}}</text>
