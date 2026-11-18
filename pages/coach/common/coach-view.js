@@ -342,7 +342,7 @@ function couponBatchPayload(editCells, nameText, countText, max) {
   return { name: String(nameText).trim(), items, count: n }
 }
 
-// 优惠券批次的一行（用户 2026-11-18）：每做一次 = 一个分享批次，规定张数；领取人（头像、昵称、券码、有没有用）在展开的领取记录里
+// 优惠券批次的一行（用户 2026-11-18）：每做一次 = 一个分享批次，规定张数；数字按「已领取 → 已使用 → 还剩」的顺序显示；领取人（头像、昵称、券码、有没有用）在展开的领取记录里
 function batchRow(b) {
   const x = b || {}
   const total = Number(x.total) || 0, claimed = Number(x.claimed) || 0
@@ -356,7 +356,7 @@ function batchRow(b) {
   return {
     id: x.id, name: x.name || '优惠券', memo: x.memo || '', total, claimed, remaining: Number(x.remaining) || Math.max(0, total - claimed),
     soldOut: !!x.soldOut, statusText: x.soldOut ? '已领完' : '领取中', tone: x.soldOut ? 'muted' : 'ok',
-    progress: '已领 ' + claimed + ' / ' + total + ' 张', canDelete: !!x.canDelete, sharePath: x.sharePath || '', created: dateText(x.createDate), claimers
+    usedCount: claimers.filter(c => c.used).length, canDelete: !!x.canDelete, sharePath: x.sharePath || '', created: dateText(x.createDate), claimers
   }
 }
 
