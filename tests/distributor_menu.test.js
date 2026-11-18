@@ -18,23 +18,34 @@ function resp(type, entries) {
   return { isDistributor: true, distributor: { id: 2, type, name: type + '甲', coachId: 3 }, entries: entries || ALL }
 }
 
-test('菜单：不是分销商 / 空响应 → 没有区域；教练和机构按服务端顺序列出全部条目并带页面', () => {
+// 暂时不显示的条目（用户 2026-11-18：「我的顾客与消费」「发卡与领取情况」「我的优惠券」暂时去掉，以后再加回来）
+const SHOWN_ORG = ['qrcode', 'makeCard', 'makeCoupon', 'payee']
+const SHOWN_COACH = ['qrcode', 'payee']
+
+test('菜单：不是分销商 / 空响应 → 没有区域；教练和机构按服务端顺序列出条目并带页面，暂时去掉的三个不显示', () => {
   for (const r of [null, undefined, {}, { isDistributor: false }]) {
     assert.deepEqual(menu.build(r), { distributor: null, title: '', entries: [] })
   }
+  assert.deepEqual(menu.HIDDEN, ['customers', 'cards', 'coupons'])
   for (const type of ['教练', '机构']) {
     const m = menu.build(resp(type, type === '机构' ? ORG : ALL))
     assert.equal(m.title, '分销商 · ' + type)
-    assert.deepEqual(m.entries.map(e => e.key), type === '机构' ? ORG : ALL)
-    assert.deepEqual(m.entries.map(e => e.title), type === '机构'
-      ? ['订票二维码', '我的顾客与消费', '制作会员卡', '制作优惠券', '发卡与领取情况', '我的优惠券', '收款资料']
-      : ['订票二维码', '我的顾客与消费', '发卡与领取情况', '我的优惠券', '收款资料'])
+    assert.deepEqual(m.entries.map(e => e.key), type === '机构' ? SHOWN_ORG : SHOWN_COACH)
+    assert.deepEqual(m.entries.map(e => e.title), type === '机构' ? ['订票二维码', '制作会员卡', '制作优惠券', '收款资料'] : ['订票二维码', '收款资料'])
   }
 })
 
+test('菜单：暂时去掉的三个条目只是不显示——条目定义和页面都还在，把 key 从 HIDDEN 里删掉就加回来', () => {
+  for (const key of menu.HIDDEN) assert.ok(menu.ENTRIES[key] && menu.ENTRIES[key].url, key + ' 的条目定义不能删，以后要加回来')
+  // 以后加回来：不隐藏任何条目时，服务端给的顺序原样列出
+  assert.deepEqual(menu.build(resp('机构', ORG), []).entries.map(e => e.key), ORG)
+  assert.deepEqual(menu.build(resp('教练', ALL), []).entries.map(e => e.key), ALL)
+  assert.deepEqual(menu.build(resp('机构', ORG), ['customers']).entries.map(e => e.key), ORG.filter(k => k !== 'customers'))
+})
+
 test('菜单：发卡 / 券直达教练中心对应标签；顾客有自己的页面；不认识的条目 key 被忽略（以后服务端加条目，旧小程序不出错）', () => {
-  const m = menu.build(resp('机构', ['qrcode', 'makeSomethingNew', 'customers', 'coupons']))
-  assert.deepEqual(m.entries.map(e => e.key), ['qrcode', 'customers', 'coupons'])      // 以后服务端新增、这版小程序还不认识的条目，直接忽略
+  const m = menu.build(resp('机构', ['qrcode', 'makeSomethingNew', 'customers', 'coupons', 'payee']), [])
+  assert.deepEqual(m.entries.map(e => e.key), ['qrcode', 'customers', 'coupons', 'payee'])      // 以后服务端新增、这版小程序还不认识的条目，直接忽略
   assert.equal(menu.ENTRIES.makeCard.url, '/pages/coach/card_standard/card_standard')
   assert.equal(menu.ENTRIES.makeCoupon.url, '/pages/coach/coupon_maker/coupon_maker')
   assert.equal(menu.ENTRIES.customers.url, '/pages/distributor/customers/customers')
@@ -79,7 +90,7 @@ test('「我的」页：教练 / 机构显示时拿到区域标题和条目，�
   page.onShow()
   await settle()
   assert.equal(page.data.distributorTitle, '分销商 · 机构')
-  assert.deepEqual(page.data.distributorEntries.map(e => e.key), ORG)
+  assert.deepEqual(page.data.distributorEntries.map(e => e.key), SHOWN_ORG)      // 顾客与消费、发卡与领取情况、我的优惠券暂时不显示
   assert.equal(app.globalData.distributor.type, '机构')
   page.gotoDistributorEntry({ currentTarget: { dataset: { url: '/pages/distributor/qrcode/qrcode' } } })
   page.gotoDistributorEntry({ currentTarget: { dataset: {} } })

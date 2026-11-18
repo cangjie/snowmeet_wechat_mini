@@ -14,13 +14,19 @@ const ENTRIES = {
   payee: { title: '收款资料', url: '/pages/distributor/payee/payee' }
 }
 
+// 暂时不在「我的」菜单里显示的条目（用户 2026-11-18：「我的顾客与消费」「发卡与领取情况」「我的优惠券」暂时去掉，以后再加回来）。
+// 页面、ENTRIES、服务端返回的条目都没动，只是菜单不显示；要加回来，把对应的 key 从这个列表里删掉就行。
+const HIDDEN = ['customers', 'cards', 'coupons']
+
 // resp: GetMyDistributor 的 data。返回 { distributor, title, entries }；不是分销商时 distributor 为 null、entries 为空。
-function build(resp) {
+// hidden 默认是上面的 HIDDEN（测试里传 [] 可以看到加回来之后的样子）。
+function build(resp, hidden) {
   if (!resp || !resp.isDistributor || !resp.distributor) return { distributor: null, title: '', entries: [] }
   const keys = Array.isArray(resp.entries) ? resp.entries : []
-  const entries = keys.filter(k => ENTRIES[k]).map(k => ({ key: k, title: ENTRIES[k].title, url: ENTRIES[k].url }))
+  const off = Array.isArray(hidden) ? hidden : HIDDEN
+  const entries = keys.filter(k => ENTRIES[k] && off.indexOf(k) < 0).map(k => ({ key: k, title: ENTRIES[k].title, url: ENTRIES[k].url }))
   const type = resp.distributor.type || ''
   return { distributor: resp.distributor, title: type ? '分销商 · ' + type : '分销商', entries }
 }
 
-module.exports = { ENTRIES, build }
+module.exports = { ENTRIES, HIDDEN, build }
