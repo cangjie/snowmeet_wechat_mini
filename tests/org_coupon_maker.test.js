@@ -272,9 +272,11 @@ test('批次列表：领取进度、状态、默认折叠的领取记录（领�
   const page = loadPage('pages/coach/coupon_maker/coupon_maker.js', {})
   page.onLoad(); page.onReady(); await settle()
   const [open, done] = page.data.batches
-  // 数字按「已领取 → 已使用 → 还剩」：已使用由领取记录里 used 的个数算
-  assert.deepEqual([open.statusText, open.tone, open.total, open.claimed, open.usedCount, open.remaining, open.canDelete], ['领取中', 'ok', 10, 3, 0, 7, true])
-  assert.deepEqual([done.statusText, done.tone, done.total, done.claimed, done.usedCount, done.remaining, done.canDelete], ['已领完', 'muted', 2, 2, 1, 0, false])
+  assert.deepEqual([open.statusText, open.tone, open.progress, open.canDelete], ['领取中', 'ok', '已领 3 / 10 张', true])
+  assert.deepEqual([done.statusText, done.tone, done.progress, done.canDelete], ['已领完', 'muted', '已领 2 / 2 张', false])
+  // 「领取记录」那一行右边：已领取 → 已使用 → 最后才是还剩；已使用由领取记录里 used 的个数算
+  assert.deepEqual([open.usedCount, open.statsText], [0, '已领取 3 张 · 已使用 0 张 · 还剩 7 张'])
+  assert.deepEqual([done.usedCount, done.statsText], [1, '已领取 2 张 · 已使用 1 张 · 还剩 0 张'])
   assert.equal(open.created, '11-18 10:00')
   assert.deepEqual(page.data.expanded, {}, '领取记录默认折叠')
   assert.deepEqual(done.claimers.map(c => [c.nickName, c.avatarUrl, c.codeTail, c.used, c.claimed]),
@@ -285,10 +287,25 @@ test('批次列表：领取进度、状态、默认折叠的领取记录（领�
   const wxml = fs.readFileSync(path.join(ROOT, 'pages/coach/coupon_maker/coupon_maker.wxml'), 'utf8')
   assert.match(wxml, /bindtap="onToggleClaimers"/); assert.match(wxml, /wx:if="\{\{expanded\['c' \+ item\.id\]\}\}"/, '展开了才渲染记录')
   assert.match(wxml, /rec\.avatarUrl/); assert.match(wxml, /rec\.nickName/)
-  // 批次卡片上的三个数字：已领取 → 已使用 → 还剩，还剩放最后（用户 2026-11-18）
-  const order = ['{{item.claimed}}</text><text class="stat-label">已领取', '{{item.usedCount}}</text><text class="stat-label">已使用', '{{item.remaining}}</text><text class="stat-label">还剩'].map(x => wxml.indexOf(x))
-  assert.ok(order.every(i => i > 0) && order[0] < order[1] && order[1] < order[2], '顺序不对：' + order)
-  assert.doesNotMatch(wxml, /item\.progress/)
+  // 券名下面写明优惠项目（用户 2026-11-18）；「领取记录」那一行右边写数字，不再有并排的三个统计块
+  assert.match(wxml, /wx:for="\{\{item\.itemLines\}\}"[^>]*>\{\{line\.shop\}\}：\{\{line\.text\}\}</)
+  assert.match(wxml, /创建于 \{\{item\.created\}\} · \{\{item\.progress\}\}/)
+  assert.ok(wxml.indexOf('item.itemLines') < wxml.indexOf('bindtap="onViewQr"'), '优惠项目在分享按钮上面')
+  const toggle = wxml.slice(wxml.indexOf('class="share-toggle"'), wxml.indexOf('onToggleClaimers') > 0 ? wxml.indexOf('<block wx:if="{{expanded') : -1)
+  assert.match(toggle, /领取记录（\{\{item\.claimed\}\}）/); assert.match(toggle, /\{\{item\.statsText\}\}/); assert.match(toggle, /展开 ▾/)
+  assert.doesNotMatch(wxml, /class="stats"|stat mini|stat-num/, '并排的统计块已去掉')
+})
+
+test('批次的优惠项目：按门店一行，单项 / 双项各自写明方式和价格（一口价、折扣、减免）', () => {
+  assert.deepEqual(view.couponItemLines([
+    { shop: WL, tier: '单项', mode: 'fixed', value: 68 }, { shop: WL, tier: '双项', mode: 'rate', value: 0.8 }, { shop: CL, tier: '单项', mode: 'off', value: 20 }]),
+  [{ shop: WL, text: '单项 一口价 ¥68 · 双项 8 折' }, { shop: CL, text: '单项 减 ¥20' }])
+  assert.deepEqual(view.couponItemLines([{ shop: CL, tier: '双项', mode: 'rate', value: 0.75 }]), [{ shop: CL, text: '双项 7.5 折' }])
+  assert.deepEqual(view.couponItemLines([{ shop: WL, tier: '单项', mode: 'fixed', value: 59.5 }]), [{ shop: WL, text: '单项 一口价 ¥59.5' }])
+  assert.deepEqual(view.couponItemLines(null), [])                          // 旧后端没有 items：不显示这一行，不出错
+  assert.deepEqual(view.batchRow({ id: 1, total: 3, claimed: 1, claimers: [] }).itemLines, [])
+  const row = view.batchRow({ id: 1, total: 5, claimed: 2, remaining: 3, items: [{ shop: WL, tier: '单项', mode: 'fixed', value: 68 }], claimers: [{ ticketCode: 'A', used: true }, { ticketCode: 'B', used: false }] })
+  assert.deepEqual([row.itemLines[0].text, row.statsText], ['单项 一口价 ¥68', '已领取 2 张 · 已使用 1 张 · 还剩 3 张'])
 })
 
 test('批次：分享二维码是这个批次自己的码（带登录态和小程序版本）；分享小程序卡片用批次的领取路径，不新建任何东西', async t => {

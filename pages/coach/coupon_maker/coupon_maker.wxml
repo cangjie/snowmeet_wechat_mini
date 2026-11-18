@@ -13,16 +13,12 @@
         <view class="card-row">
           <view class="grow">
             <view class="card-title small">{{item.name}}</view>
-            <view class="card-meta">创建于 {{item.created}} · 共 {{item.total}} 张</view>
+            <view class="card-meta">创建于 {{item.created}} · {{item.progress}}</view>
           </view>
           <text class="tag {{item.tone}}">{{item.statusText}}</text>
         </view>
-        <!-- 已领取多少张、已使用多少张，最后才是还剩多少张（用户 2026-11-18） -->
-        <view class="stats">
-          <view class="stat mini"><text class="stat-num">{{item.claimed}}</text><text class="stat-label">已领取（张）</text></view>
-          <view class="stat mini"><text class="stat-num">{{item.usedCount}}</text><text class="stat-label">已使用（张）</text></view>
-          <view class="stat mini"><text class="stat-num">{{item.remaining}}</text><text class="stat-label">还剩（张）</text></view>
-        </view>
+        <!-- 优惠项目：这张券适用的每个服务和价格 -->
+        <view wx:for="{{item.itemLines}}" wx:for-item="line" wx:key="shop" class="card-meta">{{line.shop}}：{{line.text}}</view>
         <view class="btn-row">
           <view class="btn primary" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="onViewQr">分享二维码</view>
           <button wx:if="{{item.coverPath}}" class="btn primary" open-type="share" data-path="{{item.sharePath}}" data-name="{{item.name}}" data-cover="{{item.coverPath}}">分享小程序卡片</button>
@@ -34,7 +30,7 @@
         <!-- 领取记录：默认折叠；领取人的头像、昵称、券码、有没有用 -->
         <view class="share-toggle" data-id="{{item.id}}" bindtap="onToggleClaimers">
           <text class="card-title small">领取记录（{{item.claimed}}）</text>
-          <text class="card-meta grow" style="text-align: right;"></text>
+          <text class="card-meta grow" style="text-align: right; font-size: 20rpx; line-height: 1.4;">{{item.statsText}}</text>
           <text class="share-arrow">{{expanded['c' + item.id] ? '收起 ▴' : '展开 ▾'}}</text>
         </view>
         <block wx:if="{{expanded['c' + item.id]}}">

@@ -158,7 +158,3 @@ button.share-btn::after { border: none; }
 .floor-hint { margin-left: 76rpx; font-size: 22rpx; color: var(--faint); line-height: 1.5; }
 .floor-hint.closed { color: var(--warn); }
 .below-floor { margin-left: 76rpx; font-size: 22rpx; color: var(--danger); line-height: 1.5; }
-
-/* 卡片里的小统计块（优惠券批次：已领取 / 已使用 / 还剩）：卡片本身是白底，所以统计块用灰底 */
-.stat.mini { background: var(--gray); padding: 18rpx 22rpx; border-radius: 20rpx; }
-.stat.mini .stat-num { font-size: 36rpx; }

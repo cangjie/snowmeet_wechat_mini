@@ -342,7 +342,20 @@ function couponBatchPayload(editCells, nameText, countText, max) {
   return { name: String(nameText).trim(), items, count: n }
 }
 
-// 优惠券批次的一行（用户 2026-11-18）：每做一次 = 一个分享批次，规定张数；数字按「已领取 → 已使用 → 还剩」的顺序显示；领取人（头像、昵称、券码、有没有用）在展开的领取记录里
+// 批次的优惠项目，按门店一行：「万龙服务中心：单项 一口价 ¥68 · 双项 8折」「崇礼旗舰店：单项 减 ¥20」（服务端 items 来自券模板上的价格规则）
+function couponItemLines(items) {
+  const lines = []
+  ;(items || []).forEach(it => {
+    const text = it.tier + ' ' + (it.mode === 'rate' ? round1(it.value) + ' 折' : it.mode === 'off' ? '减 ¥' + num(it.value) : '一口价 ¥' + num(it.value))
+    const last = lines[lines.length - 1]
+    if (last && last.shop === it.shop) last.text += ' · ' + text
+    else lines.push({ shop: it.shop, text })
+  })
+  return lines
+}
+
+// 优惠券批次的一行（用户 2026-11-18）：每做一次 = 一个分享批次，规定张数；优惠项目（每个服务的方式和价格）写在券名下面，
+// 「领取记录」那一行右边按「已领取 → 已使用 → 还剩」的顺序写数字；领取人（头像、昵称、券码、有没有用）在展开的领取记录里
 function batchRow(b) {
   const x = b || {}
   const total = Number(x.total) || 0, claimed = Number(x.claimed) || 0
@@ -353,10 +366,13 @@ function batchRow(b) {
       nickName: nick || '顾客', avatarUrl: c.avatarUrl || '', initial: nick ? Array.from(nick)[0] : '客', phoneTail: c.phoneTail || '', claimed: dateText(c.claimedAt)
     }
   })
+  const usedCount = claimers.filter(c => c.used).length
+  const remaining = x.remaining === undefined || x.remaining === null ? Math.max(0, total - claimed) : Number(x.remaining)
   return {
-    id: x.id, name: x.name || '优惠券', memo: x.memo || '', total, claimed, remaining: Number(x.remaining) || Math.max(0, total - claimed),
+    id: x.id, name: x.name || '优惠券', memo: x.memo || '', total, claimed, remaining,
     soldOut: !!x.soldOut, statusText: x.soldOut ? '已领完' : '领取中', tone: x.soldOut ? 'muted' : 'ok',
-    usedCount: claimers.filter(c => c.used).length, canDelete: !!x.canDelete, sharePath: x.sharePath || '', created: dateText(x.createDate), claimers
+    progress: '已领 ' + claimed + ' / ' + total + ' 张', usedCount, statsText: '已领取 ' + claimed + ' 张 · 已使用 ' + usedCount + ' 张 · 还剩 ' + remaining + ' 张',
+    itemLines: couponItemLines(x.items), canDelete: !!x.canDelete, sharePath: x.sharePath || '', created: dateText(x.createDate), claimers
   }
 }
 
@@ -478,5 +494,5 @@ module.exports = {
   SHOPS, TIERS, SHORT, MODES, cellText, rentalText, priceChips, editCells, cellsPayload, rentalPayload, rentalEditText,
   previewPrice, statusTag, shareRow, groupShares, dateText, dayText, benefitLines,
   floorHint, standardCells, effectiveStandardCell, cardUnit, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
-  COUPON_MAX, couponCells, couponPayload, couponUnit, couponPlaceholder, couponEditCells, couponNameError, couponBatchPayload, batchRow, couponFloorEditCells, couponFloorsPayload
+  COUPON_MAX, couponCells, couponPayload, couponItemLines, couponUnit, couponPlaceholder, couponEditCells, couponNameError, couponBatchPayload, batchRow, couponFloorEditCells, couponFloorsPayload
 }
