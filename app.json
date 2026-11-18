@@ -157,6 +157,7 @@
         "home/home",
         "card_standard/card_standard",
         "coupon_maker/coupon_maker",
+        "coupon_claim/coupon_claim",
         "student/student",
         "claim/claim",
         "card/card"

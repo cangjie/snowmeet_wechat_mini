@@ -1,0 +1,77 @@
+<view class="co-page">
+  <view wx:if="{{loginError}}" class="center">
+    <view class="state-icon warn">!</view>
+    <view class="big-title">微信登录未完成</view>
+    <view class="card-meta" style="margin: 12rpx 0 28rpx;">{{errMsg}}</view>
+    <view class="btn primary" bindtap="onRetry">重新登录</view>
+  </view>
+  <view wx:elif="{{errMsg && !state}}" class="center">
+    <view class="state-icon gray">!</view>
+    <view class="big-title">{{errMsg}}</view>
+    <view wx:if="{{token}}" class="btn primary" style="margin-top: 28rpx;" bindtap="onRetry">重试</view>
+  </view>
+  <view wx:elif="{{loading && !state}}" class="co-empty">加载中…</view>
+
+  <!-- 可领取 -->
+  <block wx:elif="{{state === 'claimable'}}">
+    <view class="vip">
+      <view class="vip-small">{{distributorName}}送你一张优惠券</view>
+      <view class="vip-title">{{name}}</view>
+      <view class="vip-foot">有效期至 {{validUntil}} · 这批还剩 {{remaining}} / {{total}} 张</view>
+    </view>
+    <view wx:if="{{memo}}" class="card card-pad"><view class="card-meta" style="line-height: 1.7;">{{memo}}</view></view>
+    <view wx:if="{{errMsg}}" class="danger-line center">{{errMsg}}</view>
+    <button wx:if="{{needMember}}" class="btn primary btn-block {{claiming ? 'disabled' : ''}}" open-type="getPhoneNumber" bindgetphonenumber="onPhone">授权手机号并领取</button>
+    <view wx:else class="btn primary btn-block {{claiming ? 'disabled' : ''}}" bindtap="onClaim">领取优惠券</view>
+    <view wx:if="{{needMember}}" class="note blue">需要先授权手机号，这样到店报手机号，店员就能在开单时选到这张券。</view>
+    <view class="note blue">每人每天只能领取一张机构优惠券，同一批次只能领取一次；领满后不能再领。</view>
+  </block>
+
+  <!-- 已领取 -->
+  <view wx:elif="{{state === 'claimed_by_me'}}" class="center">
+    <view class="state-icon ok">✓</view>
+    <view class="big-title">已领取</view>
+    <view wx:if="{{code}}" class="big-title" style="font-size: 36rpx; margin-top: 8rpx;">券码 {{code}}</view>
+    <view class="card-meta" style="margin: 12rpx 0 28rpx;">{{name}} · 有效期至 {{validUntil}}</view>
+    <view class="card card-pad" style="text-align: left;"><view class="card-meta" style="line-height: 1.7;">到店养护时，说手机号或扫码接待，店员开单时在「优惠券/卡」里选择这张券即可。每张券限用一次。</view></view>
+    <view class="btn primary btn-block" style="margin-top: 24rpx;" bindtap="onGoMine">查看我的优惠券</view>
+  </view>
+
+  <!-- 今天已经领过 -->
+  <view wx:elif="{{state === 'daily_limit'}}" class="center">
+    <view class="state-icon info">i</view>
+    <view class="big-title">今天已经领过一张了</view>
+    <view class="card-meta" style="margin: 12rpx 0 28rpx;">每人每天只能领取一张机构优惠券，明天再来领这批吧。</view>
+    <view class="btn primary" bindtap="onGoMine">查看我的优惠券</view>
+  </view>
+
+  <!-- 已领完 -->
+  <view wx:elif="{{state === 'sold_out'}}" class="center">
+    <view class="state-icon gray">!</view>
+    <view class="big-title">这批优惠券已经被领完了</view>
+    <view class="card-meta" style="margin-top: 12rpx;">可以向分销商再要一批的链接。</view>
+  </view>
+
+  <!-- 已过期 -->
+  <view wx:elif="{{state === 'expired'}}" class="center">
+    <view class="state-icon warn">×</view>
+    <view class="big-title">这批优惠券已经过期了</view>
+    <view class="card-meta" style="margin-top: 12rpx;">{{message}}</view>
+  </view>
+
+  <!-- 已失效 -->
+  <view wx:elif="{{state === 'invalid'}}" class="center">
+    <view class="state-icon warn">×</view>
+    <view class="big-title">这批优惠券已经不能领取了</view>
+    <view class="card-meta" style="margin-top: 12rpx;">{{message || '可能已被分销商删除或已停用，请联系分销商重新发送。'}}</view>
+  </view>
+
+  <!-- 分销商本人 -->
+  <view wx:elif="{{state === 'self'}}" class="center">
+    <view class="state-icon info">i</view>
+    <view class="big-title">这是你自己发出的优惠券</view>
+    <view class="card-meta" style="margin-top: 12rpx;">转发给你的顾客即可，分销商本人不能领取。</view>
+  </view>
+</view>
+<!-- 手机号验证成功后请顾客授权头像和昵称（可跳过），见 components/profile_auth、utils/profile_auth.js -->
+<profile-auth id="profileAuth" />

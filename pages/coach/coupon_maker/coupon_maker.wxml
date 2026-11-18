@@ -1,7 +1,7 @@
 <view class="co-page">
   <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
   <block wx:elif="{{!loading}}">
-    <view class="note blue">按管理员给你设的优惠券底价生成{{name}}自己的单张优惠券。每张券限用一次，只用于该店单项 / 双项养护，加急加价、维修费照收，有效期至 {{validUntil}}。生成后放进你的券包，到「我的优惠券」转发给顾客。</view>
+    <view class="note blue">按管理员给你设的优惠券底价，做{{name}}自己的优惠券。每做一次是一个分享批次：规定这批多少张，创建时不生成券；分享二维码或小程序卡片，转发给个人或放进群里让大家领，顾客领取时才生成券。每位顾客每天只能领一张，同一批次只能领一次，领满不能再领。每张券限用一次，只用于该店单项 / 双项养护，加急加价、维修费照收，有效期至 {{validUntil}}。</view>
     <view wx:if="{{!canMake}}" class="note">{{reason}}</view>
     <view wx:elif="{{!cells.length}}" class="note">管理员还没有给你开放优惠券的项目，请联系管理员设置优惠券底价。</view>
 
@@ -23,24 +23,72 @@
           <view class="input"><input type="digit" placeholder="{{mode === 'rate' ? '折扣，8 表示 8 折' : (mode === 'fixed' ? '一口价，元' : '减免金额，元')}}" value="{{valueText}}" bindinput="onValue" /></view>
           <text class="card-meta">{{mode === 'rate' ? '折' : '元'}}</text>
         </view>
-        <view class="card-row"><text class="card-title small">3 生成几张</text></view>
+        <view class="card-row"><text class="card-title small">3 这批规定多少张</text></view>
         <view class="row-val">
           <view class="input"><input type="number" value="{{countText}}" bindinput="onCount" /></view>
-          <text class="card-meta">张（一次最多 50）</text>
+          <text class="card-meta">张（一批最多 {{maxBatchSize}}）</text>
         </view>
-        <view class="hint-line">名下没用完、没过期的自制券 {{outstanding}} / {{maxOutstanding}} 张。</view>
+        <view class="hint-line">券在顾客领取时才生成。还没领完的批次，剩余可领张数合计最多 {{maxOpenCapacity}} 张。</view>
       </view>
     </block>
 
-    <view wx:if="{{recent.length}}" class="card card-pad">
-      <view class="card-row"><text class="card-title small">最近生成的券</text><view class="btn" bindtap="onGoCoupons">去转发</view></view>
-      <view wx:for="{{recent}}" wx:key="templateId" class="kv">
-        <text class="k">{{item.name}}</text>
-        <text class="v">{{item.count}} 张，已用 {{item.used}}</text>
+    <view class="co-section-title"><text>优惠券批次</text><text class="side" bindtap="onGoCoupons">看领取后的券和消费 ›</text></view>
+    <view wx:for="{{batches}}" wx:key="id" class="card card-pad">
+      <view class="card-row">
+        <view class="grow">
+          <view class="card-title small">{{item.name}}</view>
+          <view class="card-meta">创建于 {{item.created}} · {{item.progress}}</view>
+        </view>
+        <text class="tag {{item.tone}}">{{item.statusText}}</text>
+      </view>
+      <view class="btn-row">
+        <view class="btn primary" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="onViewQr">分享二维码</view>
+        <button wx:if="{{item.coverPath}}" class="btn primary" open-type="share" data-path="{{item.sharePath}}" data-name="{{item.name}}" data-cover="{{item.coverPath}}">分享小程序卡片</button>
+        <view wx:elif="{{item.coverError}}" class="card-meta" data-name="{{item.name}}" bindtap="onRetryCover">封面生成失败，点此重试</view>
+        <view wx:else class="btn disabled">分享小程序卡片（封面生成中…）</view>
+        <view wx:if="{{item.canDelete}}" class="btn danger" data-id="{{item.id}}" bindtap="onDeleteBatch">删除</view>
+      </view>
+
+      <!-- 领取记录：默认折叠；领取人的头像、昵称、券码、有没有用 -->
+      <view class="share-toggle" data-id="{{item.id}}" bindtap="onToggleClaimers">
+        <text class="card-title small">领取记录（{{item.claimed}}）</text>
+        <text class="card-meta grow" style="text-align: right;">{{item.soldOut ? '已领完' : '还剩 ' + item.remaining + ' 张'}}</text>
+        <text class="share-arrow">{{expanded['c' + item.id] ? '收起 ▴' : '展开 ▾'}}</text>
+      </view>
+      <block wx:if="{{expanded['c' + item.id]}}">
+        <view wx:if="{{!item.claimers.length}}" class="card-meta">还没有人领取，没人领取过的批次可以删除</view>
+        <view wx:for="{{item.claimers}}" wx:for-item="rec" wx:key="ticketCode" class="share-rec">
+          <view class="card-row">
+            <image wx:if="{{rec.avatarUrl}}" class="share-avatar" src="{{rec.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="share-avatar">{{rec.initial}}</view>
+            <view class="grow">
+              <view class="card-title small">{{rec.nickName}}</view>
+              <view class="card-meta">券码 …{{rec.codeTail}} · {{rec.claimed}} 领取</view>
+            </view>
+            <text class="tag {{rec.used ? 'ok' : 'warn'}}">{{rec.used ? '已使用' : '未使用'}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+    <view wx:if="{{!batches.length}}" class="co-empty">还没有批次，在上面选好项目、价格和张数后创建</view>
+  </block>
+
+  <view wx:if="{{qr.show}}" class="qr-mask">
+    <view class="qr-pop">
+      <view class="card-title">{{qr.name}}</view>
+      <view class="card-meta">让顾客用微信「扫一扫」或长按识别二维码领取，也可以保存图片放进群里。每位顾客每天只能领一张，领满后不能再领。</view>
+      <image wx:if="{{qr.url}}" class="qr-img" src="{{qr.url}}" mode="aspectFit" show-menu-by-longpress bindload="onQrLoad" binderror="onQrError" />
+      <view wx:if="{{qr.loading}}" class="card-meta">正在生成二维码…</view>
+      <view wx:if="{{qr.error}}" class="danger-line">{{qr.error}}</view>
+      <view class="btn-row">
+        <view wx:if="{{qr.error}}" class="btn" bindtap="onQrRetry">重试</view>
+        <view wx:else class="btn" bindtap="onQrSave">保存到相册</view>
+        <view class="btn primary" bindtap="onQrClose">完成</view>
       </view>
     </view>
-  </block>
+  </view>
 </view>
-<view wx:if="{{!blocked && !loading && canMake}}" class="bottom-bar">
-  <view class="btn primary {{sel >= 0 && !submitting ? '' : 'disabled'}}" bindtap="onSubmit">{{submitting ? '生成中…' : '生成并放进我的券包'}}</view>
+<canvas canvas-id="membershipShareCover" style="position: fixed; left: -10000px; top: 0; width: 500px; height: 400px; pointer-events: none;"></canvas>
+<view wx:if="{{!blocked && !loading && canMake && cells.length}}" class="bottom-bar">
+  <view class="btn primary {{sel >= 0 && !submitting ? '' : 'disabled'}}" bindtap="onSubmit">{{submitting ? '创建中…' : '创建批次'}}</view>
 </view>

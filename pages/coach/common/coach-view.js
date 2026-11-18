@@ -258,7 +258,8 @@ function couponCells(cells) {
 }
 
 // 表单 → 接口入参；校验不过返回 { error }（服务端仍会再按底价校验一遍）
-function couponPayload(cell, mode, valueText, countText) {
+// max：这一批最多多少张（服务端 GetMyCouponMaker 的 maxBatchSize；不传按旧版「一次生成」的 50）
+function couponPayload(cell, mode, valueText, countText, max) {
   if (!cell) return { error: '请选择一个项目' }
   if (!mode || !cell.modes.some(m => m.key === mode)) return { error: '请选择优惠方式' }
   const t = String(valueText === undefined || valueText === null ? '' : valueText).trim()
@@ -279,8 +280,27 @@ function couponPayload(cell, mode, valueText, countText) {
     if (value > cell.maxOff + 1e-9) return { error: cell.label + '：减免不能超过 ¥' + num(cell.maxOff) }
   }
   const n = Number(countText)
-  if (!Number.isInteger(n) || n < 1 || n > COUPON_MAX) return { error: '张数填 1～' + COUPON_MAX }
+  const limit = Number.isInteger(max) && max > 0 ? max : COUPON_MAX
+  if (!Number.isInteger(n) || n < 1 || n > limit) return { error: '张数填 1～' + limit }
   return { shop: cell.shop, tier: cell.tier, mode, value, count: n }
+}
+
+// 优惠券批次的一行（用户 2026-11-18）：每做一次 = 一个分享批次，规定张数；领取人（头像、昵称、券码、有没有用）在展开的领取记录里
+function batchRow(b) {
+  const x = b || {}
+  const total = Number(x.total) || 0, claimed = Number(x.claimed) || 0
+  const claimers = (x.claimers || []).map(c => {
+    const nick = c.nickName || c.name || ''
+    return {
+      memberId: c.memberId, ticketCode: c.ticketCode || '', codeTail: String(c.ticketCode || '').slice(-4), used: !!c.used,
+      nickName: nick || '顾客', avatarUrl: c.avatarUrl || '', initial: nick ? Array.from(nick)[0] : '客', phoneTail: c.phoneTail || '', claimed: dateText(c.claimedAt)
+    }
+  })
+  return {
+    id: x.id, name: x.name || '优惠券', memo: x.memo || '', total, claimed, remaining: Number(x.remaining) || Math.max(0, total - claimed),
+    soldOut: !!x.soldOut, statusText: x.soldOut ? '已领完' : '领取中', tone: x.soldOut ? 'muted' : 'ok',
+    progress: '已领 ' + claimed + ' / ' + total + ' 张', canDelete: !!x.canDelete, sharePath: x.sharePath || '', created: dateText(x.createDate), claimers
+  }
 }
 
 // ---- 管理员设「优惠券底价」（原来的价格设置）：每格三种方式各自可空，空 = 没开放 ----
@@ -401,5 +421,5 @@ module.exports = {
   SHOPS, TIERS, SHORT, MODES, cellText, rentalText, priceChips, editCells, cellsPayload, rentalPayload, rentalEditText,
   previewPrice, statusTag, shareRow, groupShares, dateText, dayText, benefitLines,
   floorHint, standardCells, effectiveStandardCell, cardUnit, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
-  COUPON_MAX, couponCells, couponPayload, couponFloorEditCells, couponFloorsPayload
+  COUPON_MAX, couponCells, couponPayload, batchRow, couponFloorEditCells, couponFloorsPayload
 }

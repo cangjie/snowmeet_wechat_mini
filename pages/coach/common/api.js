@@ -64,6 +64,13 @@ module.exports = {
   // 机构按管理员设的底价生成自己的优惠券（Distributor 控制器；教练 canMake=false）
   getMyCouponMaker: () => get('Distributor', 'GetMyCouponMaker'),
   makeMyCoupons: form => post('Distributor', 'MakeMyCoupons', form),
+  // 优惠券分享批次（2026-11-18）：创建时不生成券，领取时才生成；二维码是 PNG 图片，直接给 <image src>
+  createCouponBatch: form => post('Distributor', 'CreateMyCouponBatch', form),
+  deleteCouponBatch: id => post('Distributor', 'DeleteMyCouponBatch', { id }),
+  couponBatchQrUrl: (batchId, envVersion) => {
+    const g = getApp().globalData
+    return g.requestPrefix + 'Distributor/GetCouponBatchQr?sessionKey=' + g.sessionKey + '&batchId=' + encodeURIComponent(batchId) + '&envVersion=' + encodeURIComponent(envVersion || 'release')
+  },
   // ---- 教练自己 ----
   getMyCoach: () => get('Coach', 'GetMyCoach'),
   // channel：qr 分享二维码 / card 分享小程序卡片；每次分享都在服务端记一条待领取的卡（旧版不传 channel 也行）
@@ -83,5 +90,8 @@ module.exports = {
   getShareTemplate: t => get('CoachCard', 'GetShareTemplate', { t }),
   claimShareTemplate: t => request('POST', 'CoachCard', 'ClaimShareTemplate', { t }, {}),
   claimShareCard: t => get('CoachCard', 'ClaimShareCard', { t }),
-  getMyCards: () => get('CoachCard', 'GetMyCards')
+  getMyCards: () => get('CoachCard', 'GetMyCards'),
+  // 顾客领取分销商的优惠券批次
+  getCouponShare: c => get('CouponBatch', 'GetShare', { c }),
+  claimCoupon: c => request('POST', 'CouponBatch', 'Claim', { c }, {})
 }

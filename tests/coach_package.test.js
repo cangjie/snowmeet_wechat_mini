@@ -13,7 +13,7 @@ const sub = app.subPackages.find(s => s.root === 'pages/coach')
 test('app.json 注册了教练分包，页面一个不少，且没有同时出现在主包（主包体积紧张）', () => {
   assert.ok(sub, '缺少 pages/coach 分包')
   assert.equal(sub.name, 'coach')
-  assert.deepEqual(sub.pages.slice().sort(), ['admin/add/add', 'admin/detail/detail', 'admin/issue/issue', 'admin/list/list', 'card/card', 'card_standard/card_standard', 'claim/claim', 'coupon_maker/coupon_maker', 'home/home', 'student/student'])
+  assert.deepEqual(sub.pages.slice().sort(), ['admin/add/add', 'admin/detail/detail', 'admin/issue/issue', 'admin/list/list', 'card/card', 'card_standard/card_standard', 'claim/claim', 'coupon_claim/coupon_claim', 'coupon_maker/coupon_maker', 'home/home', 'student/student'])
   assert.ok(!app.pages.some(p => p.indexOf('pages/coach/') === 0))
 })
 
