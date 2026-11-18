@@ -1,4 +1,1 @@
 @import "../common/coach.wxss";
-.floor-hint { margin-left: 76rpx; font-size: 22rpx; color: var(--faint); line-height: 1.5; }
-.floor-hint.closed { color: var(--warn); }
-.below-floor { margin-left: 76rpx; font-size: 22rpx; color: var(--danger); line-height: 1.5; }

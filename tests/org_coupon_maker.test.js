@@ -88,6 +88,38 @@ test('管理员设优惠券底价（原来的价格设置）：三种方式各�
   assert.match(bad({ offText: 'abc' }).error, /最高减免要大于 0/)
 })
 
+test('创建表单模型：每个开放的服务一行，按门店分组；多种方式出方式按钮，只有一种的自动选好；留空 = 不适用', () => {
+  const rows = view.couponEditCells(MAKER().cells)
+  assert.deepEqual(rows.map(c => [c.label, c.showShop, c.mode, c.unit, c.text]), [['万龙单项', true, 'none', '', ''], ['万龙双项', false, 'rate', '折', '']])
+  assert.match(rows[0].placeholder, /先选方式/); assert.match(rows[1].placeholder, /折扣，8 表示 8 折/)
+  assert.equal(view.couponUnit(Object.assign({}, rows[0], { mode: 'fixed' })), '元'); assert.equal(view.couponUnit(Object.assign({}, rows[0], { mode: 'off' })), '元')
+  assert.equal(view.couponUnit(Object.assign({}, rows[0], { mode: 'rate' })), '折')
+  const two = view.couponEditCells([cell(WL, '单项', { open: true, productReady: true, modes: ['off'], maxOff: 50 }), cell(CL, '单项', { open: true, productReady: true, modes: ['fixed'], minFixed: 80 })])
+  assert.deepEqual(two.map(c => [c.shop, c.showShop]), [[WL, true], [CL, true]])
+})
+
+test('批次入参：券名必填且 ≤ 24 个汉字、没有特殊符号；每个填了价格的服务逐格按底价校验，问题一次说清；至少一个服务；张数 1～上限', () => {
+  const rows = () => view.couponEditCells(MAKER().cells)
+  const fill = (cells, patch) => { patch.forEach(([i, mode, text]) => { cells[i].mode = mode; cells[i].text = text }); return cells }
+  assert.deepEqual(view.couponBatchPayload(fill(rows(), [[0, 'fixed', '68'], [1, 'rate', '8']]), ' 万龙双服务券 ', '20', 500),
+    { name: '万龙双服务券', items: [{ shop: WL, tier: '单项', mode: 'fixed', value: 68 }, { shop: WL, tier: '双项', mode: 'rate', value: 0.8 }], count: 20 })
+  // 只填一个服务；留空的服务不出现在入参里
+  assert.deepEqual(view.couponBatchPayload(fill(rows(), [[1, 'rate', '7']]), '券', '1', 500).items, [{ shop: WL, tier: '双项', mode: 'rate', value: 0.7 }])
+  assert.match(view.couponBatchPayload(rows(), '券', '5', 500).error, /请至少给一个服务设置价格/)
+  assert.match(view.couponBatchPayload(fill(rows(), [[1, 'rate', '8']]), '', '5', 500).error, /请填写券名/)
+  assert.match(view.couponBatchPayload(fill(rows(), [[1, 'rate', '8']]), '养护券¥68', '5', 500).error, /特殊符号/)
+  assert.match(view.couponBatchPayload(fill(rows(), [[1, 'rate', '8']]), '养护体验券🎿', '5', 500).error, /特殊符号/)
+  assert.match(view.couponBatchPayload(fill(rows(), [[1, 'rate', '8']]), '一二三四五六七八九十一二三四五六七八九十一二三四五', '5', 500).error, /最多 24 个汉字/)
+  assert.equal(view.couponNameError('一二三四五六七八九十一二三四五六七八九十一二三四'), '')
+  // 多种方式却没选方式；两格都有问题一次说清
+  assert.match(view.couponBatchPayload(fill(rows(), [[0, 'none', '68']]), '券', '5', 500).error, /万龙单项：请选择优惠方式/)
+  const bad = view.couponBatchPayload(fill(rows(), [[0, 'fixed', '59'], [1, 'rate', '6']]), '券', '5', 500).error
+  assert.match(bad, /万龙单项：一口价不能低于 ¥60；万龙双项：折扣不能低于 7 折/)
+  assert.match(view.couponBatchPayload(fill(rows(), [[0, 'off', '31']]), '券', '5', 500).error, /减免不能超过 ¥30/)
+  assert.match(view.couponBatchPayload(fill(rows(), [[1, 'rate', '11']]), '券', '5', 500).error, /万龙双项：折扣填 0.1～10/)    // 通用错误也带上是哪个服务
+  for (const n of ['0', '501', '1.5', 'abc', '']) assert.match(view.couponBatchPayload(fill(rows(), [[1, 'rate', '8']]), '券', n, 500).error, /张数填 1～500/)
+})
+
 function env(t, handler) {
   const calls = { api: [], toasts: [], nav: [], modals: [], downloads: [] }
   global.getApp = () => ({ loginPromiseNew: Promise.resolve(), globalData: { sessionKey: 'sk', requestPrefix: PREFIX } })
@@ -105,15 +137,17 @@ function env(t, handler) {
   t.after(() => { delete global.getApp; delete global.wx; api.setTransport(function (o) { wx.request(o) }) })
   return calls
 }
-const tapCell = (page, i) => page.onCell({ currentTarget: { dataset: { i } } })
+// 创建表单：每个开放的服务一行（和做会员卡选项目一样），每行自己选方式、填价格
+const setMode = (page, i, mode) => page.onMode({ currentTarget: { dataset: { i, mode } } })
+const setPrice = (page, i, value) => page.onCellText({ currentTarget: { dataset: { i } }, detail: { value } })
 const CREATE = 'Distributor/CreateMyCouponBatch'
 
-test('制作优惠券页：只显示开放的项目；选项目、选方式、定价格、定张数、创建批次；入参正确，成功后刷新批次并提示（不生成券）', async t => {
+test('制作优惠券页：创建表单和做会员卡一样，每个开放的服务一行各自定价；入参正确，成功后回到列表并刷新批次（不生成券）', async t => {
   let state = MAKER()
   const calls = env(t, (p, body) => {
     if (p === 'Distributor/GetMyCouponMaker') return OK(state)
     if (p === CREATE) {
-      state = MAKER({ batches: [BATCH({ id: 6, total: 20, remaining: 20, name: '某教练 万龙单项减20元券' })] })
+      state = MAKER({ batches: [BATCH({ id: 6, total: 20, remaining: 20, name: '万龙双服务券' })] })
       return OK({ made: { id: 6, total: 20, repeated: false, sharePath: '/pages/coach/coupon_claim/coupon_claim?c=bbbbbbbbbbbbbbbbbbbbbbbb' }, maker: state })
     }
     throw new Error(p)
@@ -122,39 +156,41 @@ test('制作优惠券页：只显示开放的项目；选项目、选方式、�
   page.onLoad(); await settle()
   assert.equal(page.data.canMake, true)
   assert.equal(page.data.validUntil, '2027-04-30')
-  assert.deepEqual(page.data.cells.map(c => c.label), ['万龙单项', '万龙双项'])      // 没开放的崇礼格子压根不在列表里
   assert.equal(page.data.maxBatchSize, 500)
-  tapCell(page, 0)
-  assert.equal(page.data.sel, 0)
-  assert.equal(page.data.mode, '')                                    // 三种方式都开放：让分销商自己选
-  assert.deepEqual(page.data.selModes.map(m => m.key), ['fixed', 'rate', 'off'])
-  assert.equal(page.data.selHint, '一口价不低于 ¥60，折扣不低于 7 折，减免不超过 ¥30')
-  page.onSubmit()                                                     // 没选方式：本地拦下，不发请求
-  assert.match(calls.toasts[calls.toasts.length - 1], /优惠方式/)
-  page.onMode({ currentTarget: { dataset: { mode: 'off' } } })
-  page.onValue({ detail: { value: '40' } })
-  page.onSubmit()                                                     // 减免超过上限：本地拦下
-  assert.match(calls.toasts[calls.toasts.length - 1], /减免不能超过 ¥30/)
-  page.onValue({ detail: { value: '20' } })
-  page.onCount({ detail: { value: '501' } })
-  page.onSubmit()                                                     // 张数超过批次上限
-  assert.match(calls.toasts[calls.toasts.length - 1], /张数填 1～500/)
+  page.onNew()
+  assert.deepEqual(page.data.editCells.map(c => [c.label, c.showShop, c.mode, c.modes.map(m => m.key)]),
+    [['万龙单项', true, 'none', ['fixed', 'rate', 'off']], ['万龙双项', false, 'rate', ['rate']]])     // 没开放的崇礼格子压根不在表单里；只开放一种方式的自动选好
+  assert.deepEqual(page.data.editCells.map(c => c.hint), ['一口价不低于 ¥60，折扣不低于 7 折，减免不超过 ¥30', '折扣不低于 7 折'])
+  page.onSubmit()                                                     // 没填券名：本地拦下，不发请求
+  assert.match(calls.toasts.at(-1), /请填写券名/)
+  page.onName({ detail: { value: '万龙双服务券' } })
+  page.onSubmit()                                                     // 一个服务都没设价格
+  assert.match(calls.toasts.at(-1), /请至少给一个服务设置价格/)
+  setPrice(page, 0, '68')                                             // 单项有多种方式却没选
+  page.onSubmit(); assert.match(calls.toasts.at(-1), /万龙单项：请选择优惠方式/)
+  setMode(page, 0, 'off'); setPrice(page, 0, '40'); setPrice(page, 1, '6')
+  page.onSubmit()                                                     // 两格都有问题：一次说清楚
+  assert.match(calls.toasts.at(-1), /万龙单项：减免不能超过 ¥30；万龙双项：折扣不能低于 7 折/)
+  setMode(page, 0, 'fixed'); setPrice(page, 0, '68'); setPrice(page, 1, '8')
+  page.onCount({ detail: { value: '501' } }); page.onSubmit()         // 张数超过批次上限
+  assert.match(calls.toasts.at(-1), /张数填 1～500/)
   assert.equal(calls.api.filter(c => c.path === CREATE).length, 0)
   page.onCount({ detail: { value: '20' } })
   page.onSubmit(); await settle()
   const make = calls.api.find(c => c.path === CREATE)
   assert.equal(make.method, 'POST')
-  assert.deepEqual([make.body.shop, make.body.tier, make.body.mode, make.body.value, make.body.count], [WL, '单项', 'off', 20, 20])
+  assert.equal(make.body.name, '万龙双服务券'); assert.equal(make.body.count, 20)
+  assert.deepEqual(make.body.items, [{ shop: WL, tier: '单项', mode: 'fixed', value: 68 }, { shop: WL, tier: '双项', mode: 'rate', value: 0.8 }])
   assert.match(make.body.requestId, /^c\d+/)
   assert.ok(!calls.api.some(c => c.path.endsWith('MakeMyCoupons')), '不再一次性生成券')
   assert.deepEqual(page.data.batches.map(b => [b.id, b.total]), [[6, 20]])
-  assert.equal(page.data.submitting, false)
+  assert.equal(page.data.submitting, false); assert.equal(page.data.editing, false)
   assert.ok(calls.toasts.includes('已创建批次，在下面分享二维码或小程序卡片'))
   page.onGoCoupons()
   assert.deepEqual(calls.nav, ['/pages/coach/home/home?tab=coupons'])
 })
 
-test('制作优惠券页：只开放一种方式的格子自动选好；同一份表单重试用同一个请求编号，改了表单才换', async t => {
+test('制作优惠券页：同一份表单重试用同一个请求编号，改了表单（券名、价格、方式、张数）才换', async t => {
   let attempts = 0
   const calls = env(t, (p) => {
     if (p === 'Distributor/GetMyCouponMaker') return OK(MAKER())
@@ -163,44 +199,42 @@ test('制作优惠券页：只开放一种方式的格子自动选好；同一�
   })
   const page = loadPage('pages/coach/coupon_maker/coupon_maker.js', {})
   page.onLoad(); await settle()
-  tapCell(page, 1)                                                    // 万龙双项只开放折扣
-  assert.equal(page.data.mode, 'rate')
-  assert.equal(page.data.selModes.length, 1)
-  page.onValue({ detail: { value: '8' } })
-  page.onCount({ detail: { value: '5' } })
+  page.onNew(); page.onName({ detail: { value: '体验券' } }); setPrice(page, 1, '8'); page.onCount({ detail: { value: '5' } })
   page.onSubmit(); await settle()                                     // 第一次失败：填的内容还在
-  assert.equal(page.data.submitting, false)
-  assert.equal(page.data.valueText, '8')
+  assert.equal(page.data.submitting, false); assert.equal(page.data.editing, true)
+  assert.equal(page.data.editCells[1].text, '8'); assert.equal(page.data.nameText, '体验券')
   page.onSubmit(); await settle()                                     // 重试：同一个请求编号
   const ids = calls.api.filter(c => c.path === CREATE).map(c => c.body.requestId)
-  assert.equal(ids.length, 2)
-  assert.equal(ids[0], ids[1])
-  page.onValue({ detail: { value: '7.5' } })                          // 改了表单：换新编号
+  assert.equal(ids.length, 2); assert.equal(ids[0], ids[1])
+  page.onNew(); page.onName({ detail: { value: '体验券' } }); setPrice(page, 1, '7.5')      // 重新打开表单：换新编号
   page.onSubmit(); await settle()
   const ids2 = calls.api.filter(c => c.path === CREATE).map(c => c.body.requestId)
   assert.notEqual(ids2[2], ids[0])
   assert.ok(calls.toasts.includes('这个批次之前已经创建过了'))          // 服务端说是重复提交
+  for (const edit of [() => page.onName({ detail: { value: '别的名字' } }), () => setPrice(page, 1, '7.6'), () => page.onCount({ detail: { value: '6' } })]) {
+    page._requestId = 'keep'; edit(); assert.equal(page._requestId, '', '表单一改就换请求编号')
+  }
 })
 
-test('只设置了一口价底价（0 元起）的分销商：优惠券页只有一口价，自动选好，没有折扣和减免；一口价 0 元可以', async t => {
+test('只设置了一口价底价（0 元起）的分销商：每个服务都只有一口价，没有折扣和减免按钮；一口价 0 元可以', async t => {
   const onlyFixed = (shop, tier) => cell(shop, tier, { open: true, productReady: true, modes: ['fixed'], minFixed: 0 })
   const state = MAKER({ cells: [onlyFixed(WL, '单项'), onlyFixed(WL, '双项'), onlyFixed(CL, '单项'), onlyFixed(CL, '双项')] })
   const calls = env(t, (p) => p === 'Distributor/GetMyCouponMaker' ? OK(state) : OK({ made: { id: 6, total: 10, repeated: false }, maker: state }))
   const page = loadPage('pages/coach/coupon_maker/coupon_maker.js', {})
   page.onLoad(); await settle()
-  assert.equal(page.data.cells.length, 4)
-  assert.ok(page.data.cells.every(c => c.modes.length === 1 && c.modes[0].key === 'fixed'))
-  tapCell(page, 0)
-  assert.equal(page.data.mode, 'fixed')                               // 只有一种方式：自动选好
-  assert.deepEqual(page.data.selModes.map(m => m.label), ['一口价'])  // 页面不会出现折扣、减免
-  assert.equal(page.data.selHint, '一口价不低于 ¥0')
-  page.onValue({ detail: { value: '0' } })
+  page.onNew()
+  assert.equal(page.data.editCells.length, 4)
+  assert.deepEqual(page.data.editCells.map(c => [c.shop, c.showShop]), [[WL, true], [WL, false], [CL, true], [CL, false]])      // 按门店分组
+  assert.ok(page.data.editCells.every(c => c.modes.length === 1 && c.modes[0].key === 'fixed' && c.unit === '元'))             // 只有一种方式：不出方式按钮
+  assert.equal(page.data.editCells[0].hint, '一口价不低于 ¥0')
+  page.onName({ detail: { value: '随便用' } })
+  setPrice(page, 0, '0'); setPrice(page, 2, '88')
   page.onSubmit(); await settle()
   const make = calls.api.find(c => c.path === CREATE)
-  assert.deepEqual([make.body.mode, make.body.value], ['fixed', 0])
+  assert.deepEqual(make.body.items, [{ shop: WL, tier: '单项', mode: 'fixed', value: 0 }, { shop: CL, tier: '单项', mode: 'fixed', value: 88 }])
 })
 
-test('制作优惠券页：不是分销商显示拦截；提交中不重复提交；管理员什么都没开放时不显示任何选项', async t => {
+test('制作优惠券页：不是分销商显示拦截；提交中不重复提交；管理员什么都没开放时进不了创建表单', async t => {
   let mode = 'none'
   const calls = env(t, (p) => {
     if (mode === 'none') return { code: 3, message: '你还不是教练或机构' }
@@ -216,19 +250,18 @@ test('制作优惠券页：不是分销商显示拦截；提交中不重复提�
   closed.onLoad(); await settle()
   assert.deepEqual(closed.data.cells, [])
   assert.match(fs.readFileSync(path.join(ROOT, 'pages/coach/coupon_maker/coupon_maker.wxml'), 'utf8'), /管理员还没有给你开放优惠券的项目/)
+  closed.onNew(); assert.equal(closed.data.editing, false)
   closed.onSubmit()
   assert.equal(calls.api.filter(c => c.path === CREATE).length, 0)
 
   mode = 'org'
   const org = loadPage('pages/coach/coupon_maker/coupon_maker.js', {})
   org.onLoad(); await settle()
-  tapCell(org, 0); org.onMode({ currentTarget: { dataset: { mode: 'fixed' } } }); org.onValue({ detail: { value: '68' } })
+  org.onNew(); org.onName({ detail: { value: '体验券' } }); setMode(org, 0, 'fixed'); setPrice(org, 0, '68')
   org.onSubmit(); org.onSubmit()                                      // 连点两下
   await settle()
   assert.equal(calls.api.filter(c => c.path === CREATE).length, 1)
 })
-
-// ---------- 批次：进度、领取记录、二维码、小程序卡片、删除 ----------
 
 test('批次列表：领取进度、状态、默认折叠的领取记录（领取人头像昵称、券码、有没有用）', async t => {
   const claimed = BATCH({ id: 4, name: '某教练 万龙单项减20元券', total: 2, claimed: 2, remaining: 0, soldOut: true, canDelete: false, createDate: '2026-11-17T09:00:00', claimers: [
@@ -303,6 +336,51 @@ test('批次：没人领取过的有「删除」，确认后调接口并刷新�
   await page.onDeleteBatch({ currentTarget: { dataset: { id: 4 } } }); await settle()
   assert.match(calls.toasts.at(-1), /已经有 1 位顾客领取过/)
   assert.equal(calls.api.filter(c => c.path === 'Distributor/GetMyCouponMaker').length, before + 1)
+})
+
+test('制作优惠券页和制作会员卡一样：默认是批次列表；点「＋ 创建批次」才进入创建表单（空白），返回回到列表，创建成功回到列表且新批次在最上面', async t => {
+  let state = MAKER({ batches: [BATCH({ id: 5 })] })
+  const calls = env(t, (p) => {
+    if (p === 'Distributor/GetMyCouponMaker') return OK(state)
+    state = MAKER({ batches: [BATCH({ id: 7, total: 3, remaining: 3, name: '万龙双项8折券' })].concat(state.batches) })
+    return OK({ made: { id: 7, total: 3, repeated: false }, maker: state })
+  })
+  const page = loadPage('pages/coach/coupon_maker/coupon_maker.js', {})
+  page.onLoad(); page.onReady(); await settle()
+  assert.equal(page.data.editing, false, '默认是列表，不是表单')
+  assert.deepEqual(page.data.batches.map(b => b.id), [5])
+  const wxml = fs.readFileSync(path.join(ROOT, 'pages/coach/coupon_maker/coupon_maker.wxml'), 'utf8')
+  const [listPart, formPart] = wxml.split('<!-- 创建批次表单')
+  assert.match(listPart, /bindtap="onNew">＋ 创建批次</); assert.match(listPart, /bindtap="onViewQr"/); assert.match(listPart, /open-type="share"/)
+  assert.doesNotMatch(listPart, /bindtap="onMode"|bindinput="onCellText"|bindinput="onCount"|bindinput="onName"/, '列表里没有创建表单')
+  assert.match(formPart, /bindinput="onName"/); assert.match(formPart, /bindtap="onMode"/); assert.match(formPart, /bindinput="onCellText"/); assert.match(formPart, /bindinput="onCount"/)
+  assert.match(formPart, /wx:for="\{\{editCells\}\}"/, '每个开放的服务一行，和做会员卡一样')
+  assert.match(wxml, /wx:if="\{\{!blocked && !loading && editing && canMake && cells\.length\}\}" class="bottom-bar"/)
+  // 进入创建：空白表单（上一次填的不带过来）
+  page.onNew(); page.onName({ detail: { value: '旧名字' } }); setPrice(page, 1, '8'); page.onCount({ detail: { value: '99' } })
+  page.onBackToList(); assert.equal(page.data.editing, false)
+  page.onNew()
+  assert.deepEqual([page.data.editing, page.data.nameText, page.data.countText, page.data.editCells.every(c => c.text === '')], [true, '', '10', true])
+  // 创建成功回到列表
+  page.onName({ detail: { value: '万龙双项8折券' } }); setPrice(page, 1, '8'); page.onCount({ detail: { value: '3' } })
+  page.onSubmit(); await settle()
+  assert.equal(page.data.editing, false)
+  assert.deepEqual(page.data.batches.map(b => b.id), [7, 5])
+  assert.equal(calls.api.filter(c => c.path === CREATE).length, 1)
+})
+
+test('制作优惠券页：管理员没开放项目时列表里没有「＋ 创建批次」，点不进创建表单；已有批次照样显示', async t => {
+  const closed = MAKER({ cells: [cell(WL, '单项'), cell(CL, '双项')], batches: [BATCH({ id: 5 })] })
+  env(t, (p) => p === 'Distributor/GetMyCouponMaker' ? OK(closed) : null)
+  const page = loadPage('pages/coach/coupon_maker/coupon_maker.js', {})
+  page.onLoad(); page.onReady(); await settle()
+  page.onNew(); assert.equal(page.data.editing, false)
+  assert.deepEqual(page.data.batches.map(b => b.id), [5])
+  const blocked = MAKER({ canMake: false, reason: '你的分销商身份已停用', batches: [BATCH({ id: 5 })] })
+  env(t, (p) => p === 'Distributor/GetMyCouponMaker' ? OK(blocked) : null)
+  const stopped = loadPage('pages/coach/coupon_maker/coupon_maker.js', {})
+  stopped.onLoad(); await settle()
+  stopped.onNew(); assert.equal(stopped.data.editing, false)
 })
 
 test('制作优惠券页的文件齐全，wxml 里的事件处理函数都在页面里；页面不再有「灰色」的未开放项，也不再一次性生成券', () => {

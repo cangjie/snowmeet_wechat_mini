@@ -285,6 +285,63 @@ function couponPayload(cell, mode, valueText, countText, max) {
   return { shop: cell.shop, tier: cell.tier, mode, value, count: n }
 }
 
+// ---- 创建优惠券批次的表单（用户 2026-11-18：一张优惠券可以适用于不同的服务，和做会员卡选项目一样，每个服务各自定价）----
+// 每个管理员开放了的服务（门店 × 单项 / 双项）一行：有多种方式（一口价 / 折扣 / 减免）的出方式按钮，只有一种的直接一个输入框；
+// 留空 = 这张券不适用于这个服务。每格的底价提示来自管理员设的优惠券底价。
+function couponUnit(c) {
+  const key = c.mode && c.mode !== 'none' ? c.mode : (c.modes.length === 1 ? c.modes[0].key : '')
+  return key === 'rate' ? '折' : (key === 'fixed' || key === 'off' ? '元' : '')
+}
+function couponPlaceholder(c) {
+  const key = c.mode && c.mode !== 'none' ? c.mode : (c.modes.length === 1 ? c.modes[0].key : '')
+  if (!key) return '先选方式；留空 = 不适用'
+  return (key === 'rate' ? '折扣，8 表示 8 折' : (key === 'fixed' ? '一口价，元' : '减免金额，元')) + '；留空 = 不适用'
+}
+function couponEditCells(cells) {
+  let lastShop = null
+  return couponCells(cells).map(c => {
+    const cell = Object.assign({}, c, { mode: c.modes.length === 1 ? c.modes[0].key : 'none', text: '', showShop: lastShop !== c.shop })
+    lastShop = c.shop
+    cell.unit = couponUnit(cell)
+    cell.placeholder = couponPlaceholder(cell)
+    return cell
+  })
+}
+
+// 券名：最多 24 个汉字（服务端 varchar(50)，汉字 2 字节，按 48 字节算），不能带表情、¥ 这类 GBK 里没有的符号
+function couponNameError(raw) {
+  const name = String(raw === undefined || raw === null ? '' : raw).trim()
+  if (!name) return '请填写券名'
+  if (/[\u0000-\u001f\u007f-\u009f\ud800-\udfff¥￥]/.test(name)) return '券名里不要用表情、¥ 等特殊符号，写成「68元」这样'
+  const bytes = Array.from(name).reduce((n, ch) => n + (ch.charCodeAt(0) > 127 ? 2 : 1), 0)
+  if (bytes > 48) return '券名太长了，最多 24 个汉字'
+  return ''
+}
+
+// 表单 → 批次入参：券名、每个填了价格的服务（门店、档位、方式、数值）、张数。校验不过返回 { error }（逐格校验，一次说清所有问题；
+// 服务端仍会再按底价校验一遍）
+function couponBatchPayload(editCells, nameText, countText, max) {
+  const nameError = couponNameError(nameText)
+  if (nameError) return { error: nameError }
+  const problems = []
+  const items = []
+  ;(editCells || []).forEach(c => {
+    const blank = String(c.text === undefined || c.text === null ? '' : c.text).trim() === ''
+    if (blank) return
+    const mode = c.mode !== 'none' && c.modes.some(m => m.key === c.mode) ? c.mode : (c.modes.length === 1 ? c.modes[0].key : '')
+    if (!mode) { problems.push(c.label + '：请选择优惠方式'); return }
+    const r = couponPayload(c, mode, c.text, '1', 1)
+    if (r.error) { problems.push(r.error.indexOf(c.label) >= 0 ? r.error : c.label + '：' + r.error); return }
+    items.push({ shop: r.shop, tier: r.tier, mode: r.mode, value: r.value })
+  })
+  if (problems.length) return { error: problems.join('；') }
+  if (!items.length) return { error: '请至少给一个服务设置价格' }
+  const limit = Number.isInteger(max) && max > 0 ? max : COUPON_MAX
+  const n = Number(countText)
+  if (!Number.isInteger(n) || n < 1 || n > limit) return { error: '张数填 1～' + limit }
+  return { name: String(nameText).trim(), items, count: n }
+}
+
 // 优惠券批次的一行（用户 2026-11-18）：每做一次 = 一个分享批次，规定张数；领取人（头像、昵称、券码、有没有用）在展开的领取记录里
 function batchRow(b) {
   const x = b || {}
@@ -421,5 +478,5 @@ module.exports = {
   SHOPS, TIERS, SHORT, MODES, cellText, rentalText, priceChips, editCells, cellsPayload, rentalPayload, rentalEditText,
   previewPrice, statusTag, shareRow, groupShares, dateText, dayText, benefitLines,
   floorHint, standardCells, effectiveStandardCell, cardUnit, rentalStandard, standardPayload, floorEditCells, floorRentalText, floorsPayload,
-  COUPON_MAX, couponCells, couponPayload, batchRow, couponFloorEditCells, couponFloorsPayload
+  COUPON_MAX, couponCells, couponPayload, couponUnit, couponPlaceholder, couponEditCells, couponNameError, couponBatchPayload, batchRow, couponFloorEditCells, couponFloorsPayload
 }

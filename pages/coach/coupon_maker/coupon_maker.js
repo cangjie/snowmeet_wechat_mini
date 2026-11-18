@@ -1,7 +1,9 @@
 // 「制作优惠券」（教练 / KOL / 机构都有）：按管理员设的「优惠券底价」做一个**分享批次**（用户 2026-11-18）——
+// 起个券名，像做会员卡选项目一样给每个服务（万龙 / 崇礼的单项、双项）各自定价（一张券可以适用于不同的服务，留空 = 不适用），
 // 规定这批多少张，创建时**不生成券**；配一个分享二维码 / 小程序卡片，可以转发给个人，也可以放进群里让大家领。
 // 顾客扫码 / 点开后领取，领取时服务端才生成一张券；领满规定张数不能再领，每个 openid 每天只能领一次、同一批次只能领一次。
 // 每个批次显示领取进度和领取人（头像、昵称、券码、有没有用）；没人领取过的批次可以删除。
+// 页面和「制作会员卡」一样：默认是批次列表（每个批次上有分享二维码 / 分享小程序卡片），点「＋ 创建批次」才进入创建表单，创建成功回到列表。
 // 一口价不能低于、折扣不能低于、减免不能超过底价；每张券限用一次，只用于该店单项 / 双项养护，加急加价、维修费照收。
 // 管理员只开放了的项目和方式才会显示，没设置的一律不出现（用户 2026-11-17：免得误导）。
 const api = require('../common/api.js')
@@ -15,9 +17,9 @@ const NO_QR = { show: false, url: '', name: '', batchId: null, loading: false, e
 
 Page({
   data: {
-    blocked: '', loading: true, canMake: false, reason: '', name: '', validUntil: '',
-    cells: [], batches: [], maxBatchSize: 0, maxOpenCapacity: 0, expanded: {}, fallbackCover: shareCover.FALLBACK, qr: NO_QR,
-    sel: -1, selHint: '', selModes: [], mode: '', valueText: '', countText: '10', submitting: false
+    blocked: '', loading: true, editing: false, canMake: false, reason: '', name: '', validUntil: '',
+    cells: [], cellDefs: [], editCells: [], batches: [], maxBatchSize: 0, maxOpenCapacity: 0, expanded: {}, fallbackCover: shareCover.FALLBACK, qr: NO_QR,
+    nameText: '', countText: '10', submitting: false
   },
 
   onLoad() {
@@ -33,7 +35,7 @@ Page({
     const rows = (d.batches || []).map(view.batchRow)
     this.setData({
       loading: false, blocked: '', canMake: !!d.canMake, reason: d.reason || '', name: d.name || '',
-      validUntil: view.dayText(d.validUntil), cells: view.couponCells(d.cells), maxBatchSize: d.maxBatchSize || 0, maxOpenCapacity: d.maxOpenCapacity || 0,
+      validUntil: view.dayText(d.validUntil), cells: view.couponCells(d.cells), cellDefs: d.cells, maxBatchSize: d.maxBatchSize || 0, maxOpenCapacity: d.maxOpenCapacity || 0,
       batches: shareCover.decorate(this, rows, '优惠券')
     })
     shareCover.prepareList(this, 'batches', '优惠券')
@@ -47,33 +49,48 @@ Page({
     })
   },
 
+  // 进入创建表单（空白表单：每个开放的服务一行，上一次填的不带过来）/ 回到批次列表
+  onNew() {
+    if (!this.data.canMake || !this.data.cells.length) return
+    this.touch()
+    this.setData({ editing: true, editCells: view.couponEditCells(this.data.cellDefs), nameText: '', countText: '10' })
+  },
+  onBackToList() { this.setData({ editing: false }) },
+
   // 表单变了就换一个请求编号：同一份表单重试（网络不好）用同一个编号，服务端不会重复建批次
   touch() { this._requestId = '' },
 
-  onCell(e) {
-    if (!this.data.canMake) return
-    const i = Number(e.currentTarget.dataset.i)
-    const cell = this.data.cells[i]
-    if (!cell) return
-    this.touch()
-    this.setData({ sel: i, selHint: cell.hint, selModes: cell.modes, mode: cell.modes.length === 1 ? cell.modes[0].key : '', valueText: '' })
-  },
-  onMode(e) { this.touch(); this.setData({ mode: e.currentTarget.dataset.mode, valueText: '' }) },
-  onValue(e) { this.touch(); this.setData({ valueText: e.detail.value }) },
+  onName(e) { this.touch(); this.setData({ nameText: e.detail.value }) },
   onCount(e) { this.touch(); this.setData({ countText: e.detail.value }) },
+  // 有多种方式的服务才有方式按钮（一口价 / 折扣 / 减免）；点方式不会清空已填的数
+  onMode(e) {
+    const i = Number(e.currentTarget.dataset.i)
+    const mode = e.currentTarget.dataset.mode
+    const cell = this.data.editCells[i]
+    if (!cell || !cell.modes.some(m => m.key === mode)) return
+    this.touch()
+    const next = Object.assign({}, cell, { mode })
+    this.setData({ ['editCells[' + i + '].mode']: mode, ['editCells[' + i + '].unit']: view.couponUnit(next), ['editCells[' + i + '].placeholder']: view.couponPlaceholder(next) })
+  },
+  // 输入价格：只有一种方式的服务自动按那种方式；留空 = 这张券不适用于这个服务
+  onCellText(e) {
+    const i = Number(e.currentTarget.dataset.i)
+    if (!this.data.editCells[i]) return
+    this.touch()
+    this.setData({ ['editCells[' + i + '].text']: e.detail.value })
+  },
 
   // 创建批次：不生成券，只记规定张数和分享链接
   onSubmit() {
     if (!this.data.canMake || this.data.submitting) return
-    const cell = this.data.sel >= 0 ? this.data.cells[this.data.sel] : null
-    const r = view.couponPayload(cell, this.data.mode, this.data.valueText, this.data.countText, this.data.maxBatchSize)
-    if (r.error) { wx.showToast({ title: r.error, icon: 'none', duration: 2800 }); return }
+    const r = view.couponBatchPayload(this.data.editCells, this.data.nameText, this.data.countText, this.data.maxBatchSize)
+    if (r.error) { wx.showToast({ title: r.error, icon: 'none', duration: 3200 }); return }
     if (!this._requestId) this._requestId = 'c' + Date.now() + Math.floor(Math.random() * 1000000)
     this.setData({ submitting: true })
     api.createCouponBatch(Object.assign({ requestId: this._requestId }, r)).then(res => {
       this._requestId = ''
       this.apply(res.maker)
-      this.setData({ submitting: false })
+      this.setData({ submitting: false, editing: false })     // 回到列表，新批次在最上面
       base.done(res.made.repeated ? '这个批次之前已经创建过了' : '已创建批次，在下面分享二维码或小程序卡片')
     }).catch(err => {
       this.setData({ submitting: false })

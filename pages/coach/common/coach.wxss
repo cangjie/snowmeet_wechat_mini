@@ -153,3 +153,8 @@ button.share-btn::after { border: none; }
 .share-toggle { display: flex; align-items: center; gap: 16rpx; padding-top: 20rpx; border-top: 2rpx solid var(--gray); }
 .share-arrow { flex: none; font-size: 22rpx; font-weight: 600; color: var(--blue); }
 .share-rec { background: var(--gray); border-radius: 20rpx; padding: 22rpx 24rpx; display: flex; flex-direction: column; gap: 14rpx; }
+
+/* 会籍卡编辑页和优惠券批次创建页共用：每个服务下面的底价提示 */
+.floor-hint { margin-left: 76rpx; font-size: 22rpx; color: var(--faint); line-height: 1.5; }
+.floor-hint.closed { color: var(--warn); }
+.below-floor { margin-left: 76rpx; font-size: 22rpx; color: var(--danger); line-height: 1.5; }
