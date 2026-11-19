@@ -170,9 +170,85 @@ function annotateTicket(ticket, tab){
   return ticket
 }
 
+// 把后端下发的 expireText（yyyy.M.d，不补零）转成可字典序比较的键；「长期有效」等不是日期的用 '9999' 排到最后
+function expireKey(t){
+  var s = (t && t.expireText) || ''
+  var m = /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/.exec(s)
+  if (!m){ return '9999' }
+  return m[1] + ('0' + m[2]).slice(-2) + ('0' + m[3]).slice(-2)
+}
+
+// 「我的优惠券」按券种分组（2026-11-19 用户要求：同一种券合并成「免费打蜡券 × N」）。
+// tickets 已经排好序：组按「这个券种第一张出现的位置」排，组内保持原来的顺序。
+// 券种 = 券名（顾客看到的就是券名）；没有券名的按模板 id 分，免得全混成一组。
+// 同一券种有 2 张以上才成「组」（single=false），只有一张的照旧直接显示那张券。
+// openKeys：哪些组是展开的 { 券种键: true }。tab：pending / used / shared，决定汇总文字，只有未使用的写到期日。
+function groupTickets(tickets, openKeys, tab){
+  openKeys = openKeys || {}
+  var groups = []
+  var index = {}
+  ;(tickets || []).forEach(function (t){
+    var name = ((t && t.name) || '').trim()
+    var key = name || ('模板' + t.template_id)
+    var g = index[key]
+    if (!g){
+      g = { key: key, name: name || '优惠券', bannerLabel: t.bannerLabel, bannerCls: t.bannerCls, tickets: [] }
+      index[key] = g
+      groups.push(g)
+    }
+    g.tickets.push(t)
+  })
+  var word = tab == 'used' ? '已使用' : (tab == 'shared' ? '已分享' : '可用')
+  groups.forEach(function (g){
+    g.count = g.tickets.length
+    g.single = g.count === 1
+    g.countText = '× ' + g.count
+    g.open = !!openKeys[g.key]
+    // 整组都失效（已使用、对方已接受）才降灰；有一张还有效就不降灰
+    g.muted = g.tickets.every(function (t){ return !!t.muted })
+    g.summaryText = g.count + ' 张' + word
+    g.expireLine = ''
+    g.urgentCount = 0
+    g.urgentLine = ''
+    if (tab != 'used' && tab != 'shared'){
+      var best = null
+      g.tickets.forEach(function (t){ if (!best || expireKey(t) < expireKey(best)){ best = t } })
+      g.expireLine = expireKey(best) === '9999' ? (best.expireText || '长期有效') : ('最近到期 ' + best.expireText)
+      g.urgentCount = g.tickets.filter(function (t){ return !!t.expireUrgent }).length
+      g.urgentLine = g.urgentCount > 0 ? ('其中 ' + g.urgentCount + ' 张 30 天内到期') : ''
+    }
+  })
+  return groups
+}
+
+// 分组 → 页面上一行一行显示的列表（WXML 只遍历这个）：
+// 只有一张的券种：一行券；多张的：先一行组头，展开了再跟着每一张。
+// 券行带着券自己的全部字段（模板里照旧写 item.xxx），组头行不带 tickets（不把整批券在 setData 里再传一遍）。
+function buildRows(groups){
+  var rows = []
+  groups.forEach(function (g){
+    if (g.single){
+      rows.push(Object.assign({}, g.tickets[0], { rowType: 'card', rowKey: g.tickets[0].code, inGroup: false }))
+      return
+    }
+    var head = Object.assign({}, g, { rowType: 'group', rowKey: 'g:' + g.key })
+    delete head.tickets
+    rows.push(head)
+    if (g.open){
+      g.tickets.forEach(function (t){
+        rows.push(Object.assign({}, t, { rowType: 'card', rowKey: t.code, inGroup: true }))
+      })
+    }
+  })
+  return rows
+}
+
 module.exports = {
   formatTicketCode,
   annotateTicket,
+  expireKey,
+  groupTickets,
+  buildRows,
   requestTransferSubscribe,
   openSubscribeSetting,
   isSubscribePermanentlyBlocked,

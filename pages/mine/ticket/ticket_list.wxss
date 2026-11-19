@@ -101,3 +101,53 @@
   margin-bottom: 24rpx;
 }
 .tr-warn-link{ color: #2EA6D0; text-decoration: underline; margin-left: 6rpx; }
+
+/* ===== 同一券种合并的汇总卡（「免费打蜡券 × N」，点开看每一张） ===== */
+.group-card {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  margin-bottom: 24rpx;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+.group-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.group-count {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-blue);
+  white-space: nowrap;
+}
+.tk-banner--muted .group-count { color: #6B7280; }
+.group-summary {
+  padding: 28rpx 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.group-summary-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+.group-summary-line {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.group-arrow {
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+/* 展开后组里的每一张：缩进一点，和组头区分开 */
+.ticket-card--in-group {
+  margin-left: 28rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.05);
+}

@@ -3,15 +3,6 @@ const app = getApp()
 const data = require('../../../utils/data.js')
 const ticketHelper = require('./ticket_helper.js')
 
-// 把后端下发的 expireText（yyyy.M.d，不补零）转成可字典序比较的键；
-// 「长期有效」用 '9999' 排到最后
-function _expireKey(t){
-  var s = t.expireText || ''
-  var m = /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/.exec(s)
-  if (!m){ return '9999' }
-  return m[1] + ('0' + m[2]).slice(-2) + ('0' + m[3]).slice(-2)
-}
-
 Page({
 
   /**
@@ -19,7 +10,9 @@ Page({
    */
   data: {
     activeTab: 'pending',   // pending: 未使用 | shared: 已分享 | used: 已使用
-    ticketArr:[],
+    ticketArr:[],           // 平铺的全部券（转赠、详情、分享、撤回都靠它）
+    rowArr:[],              // 页面上显示的行：券种组头 + 券（同一券种多张合并成「免费打蜡券 × N」，点开看每一张）
+    openGroups: {},         // 展开的券种 { 券种键: true }
     summaryText: '',        // 「3 张可用 · 1 张 30 天内到期」，仅未使用 tab
     pendingCount: 0,        // 未使用 tab 上的角标数量
     sortBy: 'expire',       // expire 按有效期 | time 按获得时间
@@ -113,8 +106,10 @@ Page({
       summary = tickets.length + ' 张可用'
       if (urgent > 0){ summary += ' · ' + urgent + ' 张 30 天内到期' }
     }
+    var groups = ticketHelper.groupTickets(tickets, this.data.openGroups, this.data.activeTab)
     this.setData({
       ticketArr: tickets,
+      rowArr: ticketHelper.buildRows(groups),
       summaryText: summary,
       // 角标只在未使用 tab 显示：三个 tab 是 redirect 各自重新加载页面，
       // 站在别的 tab 上拿不到未使用的张数，为一个角标再多打一次接口不值当
@@ -128,7 +123,7 @@ Page({
       if (byExpire){
         // 后端不下发可比较的到期时间戳，用 expireText（yyyy.M.d）补零后按字典序排；
         // 「长期有效」排最后
-        var ka = _expireKey(a), kb = _expireKey(b)
+        var ka = ticketHelper.expireKey(a), kb = ticketHelper.expireKey(b)
         if (ka !== kb){ return ka < kb ? -1 : 1 }
       }
       // 同到期日、或按获得时间排：新的在前
@@ -144,6 +139,15 @@ Page({
       sortBy: next,
       sortLabel: next == 'expire' ? '按有效期排序' : '按获得时间排序'
     })
+    this._render(this.data.ticketArr)
+  },
+
+  // 点券种组头：展开这一种的每一张券，再点收起
+  onToggleGroup: function (e){
+    var key = e.currentTarget.dataset.key
+    var open = Object.assign({}, this.data.openGroups)
+    open[key] = !open[key]
+    this.setData({ openGroups: open })
     this._render(this.data.ticketArr)
   },
 

@@ -15,8 +15,29 @@
     <text class="summary-sort" bindtap="onToggleSort">{{sortLabel}} ⌄</text>
   </view>
 
-  <!-- 优惠券列表 -->
-  <view wx:for="{{ticketArr}}" wx:key="code" class="ticket-card">
+  <!-- 优惠券列表：同一券种多张合并成一张汇总卡「免费打蜡券 × N」，点开看每一张；只有一张的券种照旧直接显示那张券。
+       rowArr 由 ticket_helper.buildRows 生成（组头行 + 券行），平铺的 ticketArr 只给转赠、详情、分享用 -->
+  <block wx:for="{{rowArr}}" wx:key="rowKey">
+
+  <view wx:if="{{item.rowType == 'group'}}" class="group-card">
+    <view class="tk-banner tk-banner--{{item.bannerCls}} {{item.muted ? 'tk-banner--muted' : ''}}" data-key="{{item.key}}" bindtap="onToggleGroup">
+      <text class="tk-banner-kind">{{item.bannerLabel}}</text>
+      <view class="group-title-row">
+        <text class="tk-banner-name">{{item.name}}</text>
+        <text class="group-count">{{item.countText}}</text>
+      </view>
+    </view>
+    <view class="group-summary" data-key="{{item.key}}" bindtap="onToggleGroup">
+      <view class="group-summary-main">
+        <text class="group-summary-line">{{item.summaryText}}</text>
+        <text wx:if="{{item.expireLine}}" class="meta-line">{{item.expireLine}}</text>
+        <text wx:if="{{item.urgentLine}}" class="meta-line meta-line--urgent">{{item.urgentLine}}</text>
+      </view>
+      <text class="group-arrow">{{item.open ? '收起 ⌃' : '展开 ⌄'}}</text>
+    </view>
+  </view>
+
+  <view wx:else class="ticket-card {{item.inGroup ? 'ticket-card--in-group' : ''}}">
 
     <!-- 券种通栏 banner：底色 + 几何图案按券种区分，失效统一降灰。
          券名放这里（原设计稿这里右侧还有个 ¥ 金额，已按业务要求全站去掉） -->
@@ -57,6 +78,8 @@
       <button size="mini" class="btn btn-use" bindtap="onTransferTap" data-code="{{item.code}}">转赠好友</button>
     </view>
   </view>
+
+  </block>
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{ticketArr.length == 0}}">
