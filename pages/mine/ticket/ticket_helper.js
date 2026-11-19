@@ -179,7 +179,10 @@ function expireKey(t){
 }
 
 // 「我的优惠券」按券种分组（2026-11-19 用户要求：同一种券合并成「免费打蜡券 × N」）。
-// tickets 已经排好序：组按「这个券种第一张出现的位置」排，组内保持原来的顺序。
+// 组的顺序：按各券种里「最后得到的那张」的时间倒序（2026-11-19 用户要求）——不论是系统赠送、订单赠送还是别人转赠，
+// 只要这个券种刚得到新券，它就排到最前。时间用后端下发的 displayTimeText（yyyy-MM-dd HH:mm，可以直接比大小；
+// 未使用 tab 里转赠来的是领取时间、自己获得的是获得时间）；没有时间的排最后，时间一样的保持传进来的先后。
+// 组内每一张保持传进来的顺序（页面按「有效期 / 获得时间」排好再传进来）。
 // 券种 = 券名（顾客看到的就是券名）；没有券名的按模板 id 分，免得全混成一组。
 // 同一券种有 2 张以上才成「组」（single=false），只有一张的照旧直接显示那张券。
 // openKeys：哪些组是展开的 { 券种键: true }。tab：pending / used / shared，决定汇总文字，只有未使用的写到期日。
@@ -199,7 +202,12 @@ function groupTickets(tickets, openKeys, tab){
     g.tickets.push(t)
   })
   var word = tab == 'used' ? '已使用' : (tab == 'shared' ? '已分享' : '可用')
-  groups.forEach(function (g){
+  groups.forEach(function (g, i){
+    g.order = i    // 同一时间的组保持第一次出现的先后
+    g.latestTime = g.tickets.reduce(function (latest, t){
+      var time = (t && t.displayTimeText) || ''
+      return time > latest ? time : latest
+    }, '')
     g.count = g.tickets.length
     g.single = g.count === 1
     g.countText = '× ' + g.count
@@ -217,6 +225,10 @@ function groupTickets(tickets, openKeys, tab){
       g.urgentCount = g.tickets.filter(function (t){ return !!t.expireUrgent }).length
       g.urgentLine = g.urgentCount > 0 ? ('其中 ' + g.urgentCount + ' 张 30 天内到期') : ''
     }
+  })
+  groups.sort(function (a, b){
+    if (a.latestTime !== b.latestTime){ return a.latestTime > b.latestTime ? -1 : 1 }
+    return a.order - b.order
   })
   return groups
 }

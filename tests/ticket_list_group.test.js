@@ -15,7 +15,7 @@ const T = (code, kind, over) => Object.assign({ code, expireText: '2027.4.30', e
 
 // ---------- 纯函数：groupTickets / buildRows ----------
 
-test('按券种名分组：组按「第一张出现的位置」排，组内保持原来的顺序', () => {
+test('按券种名分组：时间相同时组按「第一张出现的位置」排，组内保持原来的顺序', () => {
   const list = [T('a1', WAX), T('o1', OLD), T('a2', WAX), T('e1', EDGE), T('a3', WAX), T('o2', OLD)]
   const groups = helper.groupTickets(list, {}, 'pending')
   assert.deepEqual(groups.map(g => [g.name, g.count]), [['免费打蜡券', 3], ['老顾客优惠券', 2], ['修刃体验券', 1]])
@@ -149,14 +149,15 @@ test('页面：分享出去一张后，组里的张数跟着减；减到只剩�
   assert.equal(page.data.summaryText, '2 张可用')
 })
 
-test('页面：切换排序后仍是分组的；组顺序跟着它最靠前的那张券', async t => {
+test('页面：切换排序只改组里每一张的顺序，组的顺序始终按最新获得时间（见下面「券种排序」）', async t => {
   const list = [T('a1', WAX, { expireText: '2027.4.30', displayTimeText: '2026-08-01 10:00' }), T('o1', OLD, { expireText: '2026.12.1', displayTimeText: '2026-09-01 10:00' }),
     T('a2', WAX, { expireText: '2027.5.1', displayTimeText: '2026-10-01 10:00' }), T('o2', OLD, { expireText: '2026.12.2', displayTimeText: '2026-07-01 10:00' })]
   const page = setup(t, list)
   await settle()
-  assert.deepEqual(page.data.rowArr.map(r => r.rowKey), ['g:老顾客优惠券', 'g:免费打蜡券'])     // 按有效期：老顾客券 12 月到期，最靠前
+  page.onToggleGroup(tap({ key: '免费打蜡券' }))
+  assert.deepEqual(page.data.rowArr.map(r => r.rowKey), ['g:免费打蜡券', 'a1', 'a2', 'g:老顾客优惠券'])      // 免费打蜡券最新获得 10-01 > 老顾客券 09-01；组里按有效期
   page.onToggleSort()
-  assert.deepEqual(page.data.rowArr.map(r => r.rowKey), ['g:免费打蜡券', 'g:老顾客优惠券'])     // 按获得时间：最新的是 a2（10-01），免费打蜡券靠前
+  assert.deepEqual(page.data.rowArr.map(r => r.rowKey), ['g:免费打蜡券', 'a2', 'a1', 'g:老顾客优惠券'])      // 组还在最前，组里改按获得时间（新的在前）
 })
 
 test('页面：已使用、已分享 tab 也分组；已使用的组整组降灰', async t => {
@@ -237,4 +238,45 @@ test('样式：.btn 字号 34rpx（比原来的 30rpx 大），行高和高度�
   assert.match(rule, /font-size:\s*34rpx/)
   assert.match(rule, /line-height:\s*88rpx/)
   assert.match(rule, /height:\s*88rpx/)
+})
+
+// ---------- 2026-11-19 用户：券种按「最后得到的时间」倒序 ----------
+// 不论是系统赠送、订单赠送还是别人转赠，只要某个券种有刚得到的券，这个券种就排到最前。
+// 时间用后端下发的 displayTimeText（未使用：转赠来的是领取时间、自己获得的是获得时间；格式 yyyy-MM-dd HH:mm，可以直接比大小）。
+
+test('券种排序：按各券种里「最后得到的那张」的时间倒序', () => {
+  const list = [T('a1', WAX, { displayTimeText: '2026-08-15 17:02' }), T('a2', WAX, { displayTimeText: '2026-08-20 09:00' }),
+    T('o1', OLD, { displayTimeText: '2026-10-31 23:01' }), T('o2', OLD, { displayTimeText: '2026-09-01 10:00' }), T('e1', EDGE, { displayTimeText: '2026-11-18 10:22' })]
+  assert.deepEqual(helper.groupTickets(list, {}, 'pending').map(g => g.name), ['修刃体验券', '老顾客优惠券', '免费打蜡券'])
+})
+
+test('券种排序：看的是券种里最新的一张，不是第一张；别人转赠来的新券也会把这个券种顶到最前', () => {
+  const list = [T('o1', OLD, { displayTimeText: '2026-10-31 23:01' }),
+    T('a1', WAX, { displayTimeText: '2026-08-01 10:00' }), T('a2', WAX, { displayTimeText: '2026-11-19 10:18', displayTimeLabel: '领取时间' })]
+  const groups = helper.groupTickets(list, {}, 'pending')
+  assert.deepEqual(groups.map(g => g.name), ['免费打蜡券', '老顾客优惠券'])
+  assert.equal(groups[0].latestTime, '2026-11-19 10:18')
+})
+
+test('券种排序：和传进来的顺序无关；时间一样的保持原来的先后；没有时间的排最后', () => {
+  const a = T('a1', WAX, { displayTimeText: '2026-09-01 10:00' }), o = T('o1', OLD, { displayTimeText: '2026-09-01 10:00' })
+  const none = T('x1', { name: '没时间的券', template_id: 99, bannerLabel: '', bannerCls: '' }, { displayTimeText: '' })
+  const e = T('e1', EDGE, { displayTimeText: '2026-10-01 10:00' })
+  assert.deepEqual(helper.groupTickets([none, a, o, e], {}, 'pending').map(g => g.name), ['修刃体验券', '免费打蜡券', '老顾客优惠券', '没时间的券'])
+  assert.deepEqual(helper.groupTickets([e, o, a, none], {}, 'pending').map(g => g.name), ['修刃体验券', '老顾客优惠券', '免费打蜡券', '没时间的券'])   // 同时间按传入先后
+})
+
+test('券种排序：已使用、已分享 tab 同样按各券种里最新的那个时间（核销时间、分享时间）倒序', () => {
+  const list = [T('a1', WAX, { displayTimeText: '2026-09-01 10:00' }), T('o1', OLD, { displayTimeText: '2026-10-01 10:00' })]
+  for (const tab of ['used', 'shared']) {
+    assert.deepEqual(helper.groupTickets(list, {}, tab).map(g => g.name), ['老顾客优惠券', '免费打蜡券'])
+  }
+})
+
+test('页面：未使用 tab 一进来券种就按最新获得时间倒序（默认的按有效期排序只影响组里）', async t => {
+  const list = [T('a1', WAX, { expireText: '2026.12.1', displayTimeText: '2026-08-15 17:02' }), T('o1', OLD, { expireText: '2032.2.17', displayTimeText: '2026-10-31 23:01' }),
+    T('e1', EDGE, { expireText: '2027.4.30', displayTimeText: '2026-11-18 10:22' })]
+  const page = setup(t, list)
+  await settle()
+  assert.deepEqual(page.data.rowArr.map(r => r.rowKey), ['e1', 'o1', 'a1'])     // 即使免费打蜡券最先到期，它的券最早得到，排最后
 })
