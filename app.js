@@ -107,6 +107,12 @@ function reportLoginFailure(stage, message) {
   }
 }
 
+// 环境（域名）：开发版、体验版可以在「我的 → 选择环境」里切换，选的域名存在 USER_DATA_PATH/domain.txt，启动时读回来，API 前缀跟着变。
+// 正式版永远用线上域名，不看这个文件。只认线上域名和本机（localhost / 127.0.0.1 带端口，给本地测试后端用）；
+// 文件里是别的（比如已经注销的旧测试域名）一律当没选，回到线上域名。
+const DEFAULT_DOMAIN = 'mini.snowmeet.top'
+const ALLOWED_DOMAIN = /^(mini\.snowmeet\.top|localhost:\d{2,5}|127\.0\.0\.1:\d{2,5})$/
+
 // 保持启动时立即登录；需身份的页面可通过 retryLogin 重新发起同一流程。
 // 失败时 resolve 的结果带 stage（wx_login / member_login / no_session / after_login）和 reason，页面可直接显示。
 function startLogin() {
@@ -137,7 +143,8 @@ function startLogin() {
           app.globalData.env = 'trial'
         }
 
-        // 开发、体验和正式版继续使用同一个域名。
+        // 登录请求发出之前先应用选好的环境（开发版、体验版）；正式版和没选过的都是线上域名。
+        if (typeof app.getDomain === 'function') app.getDomain()
         console.log('weixin log in success.', res)
         var url = 'https://' + app.globalData.domainName + '/api/MiniAppHelper/MemberLogin?code=' + res.code + '&openIdType=' + encodeURIComponent('wechat_mini_openid')
         util.performWebRequest(url, undefined).then(function (session) {
@@ -260,6 +267,7 @@ App({
   routeEntry: routeEntry,
 
   onLaunch: function (res) {
+    if (typeof this.getDomain === 'function') this.getDomain()   // 先应用选好的环境，再有任何请求
     patchWxRequestPostDataDecoder()
     wx.$fui = fuiConfig
 
@@ -328,27 +336,38 @@ App({
     return this.loginPromiseNew
   },
 
+  // 读选好的环境。读出来是什么都不抛异常：读不到、不认识、正式版，都是线上域名。
   getDomain() {
-    const fileManager = wx.getFileSystemManager();
-    console.log('path', wx.env.USER_DATA_PATH)
-    var domainName = ''
+    var domainName = DEFAULT_DOMAIN
     try {
-      fileManager.accessSync(wx.env.USER_DATA_PATH + '/domain.txt')
-      domainName = fileManager.readFileSync(wx.env.USER_DATA_PATH + '/domain.txt', 'utf-8', 0)
+      var envVersion = wx.getAccountInfoSync().miniProgram.envVersion
+      if (envVersion !== 'release') {
+        var stored = String(wx.getFileSystemManager().readFileSync(wx.env.USER_DATA_PATH + '/domain.txt', 'utf-8') || '').trim()
+        if (ALLOWED_DOMAIN.test(stored)) domainName = stored
+      }
+    } catch (e) {
+      // 没有选过环境（没有这个文件）：线上域名
     }
-    catch {
-      domainName = 'mini.snowmeet.top'
-      fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domainName, 'utf-8')
-    }
-    this.globalData.requestPrefix = 'https://' + domainName + '/api/'
+    this._applyDomain(domainName)
     return domainName
   },
 
+  // 「选择环境」页选了域名：存起来，并且当场生效（API 前缀、域名一起换）
   setDomain(domain) {
-    const fileManager = wx.getFileSystemManager();
-    fileManager.writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domain, 'utf-8')
+    try {
+      wx.getFileSystemManager().writeFileSync(wx.env.USER_DATA_PATH + '/domain.txt', domain, 'utf-8')
+    } catch (e) {
+      console.warn('save domain failed', e)
+    }
+    this._applyDomain(domain)
+  },
+
+  // 域名和 API 前缀同时改：所有请求都是用 globalData.requestPrefix 拼的，只改域名不改前缀等于没切
+  _applyDomain(domain) {
+    this.globalData.domainName = domain
+    this.globalData.requestPrefix = 'https://' + domain + '/api/'
     this.domainName = domain
-    this.requestPrefix = 'https://' + this.domainName + '/api/'
+    this.requestPrefix = this.globalData.requestPrefix
   },
   globalData: {
     appId: 'wxd1310896f2aa68bb',
