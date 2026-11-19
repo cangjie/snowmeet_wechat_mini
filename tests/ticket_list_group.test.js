@@ -195,3 +195,25 @@ test('样式：组头的数量、展开箭头、组内券的缩进都有样式',
   const wxss = read('pages/mine/ticket/ticket_list.wxss')
   for (const cls of ['.group-count', '.group-summary', '.group-arrow', '.ticket-card--in-group']) assert.ok(wxss.includes(cls), cls)
 })
+
+// ---------- 2026-11-19 用户：展开后重复的内容不要显示；按钮文字样式要修（文字偏上、太粗） ----------
+
+test('模板：展开后组里的券不再显示 banner（券种名和类别字和组头重复）；单张的券、独立显示的券仍有 banner', () => {
+  const wxml = read('pages/mine/ticket/ticket_list.wxml')
+  const card = wxml.slice(wxml.indexOf('<view wx:else class="ticket-card'))
+  assert.match(card, /<view wx:if="\{\{!item\.inGroup\}\}" class="tk-banner tk-banner--\{\{item\.bannerCls\}\}/)
+  // 组头那张汇总卡的 banner 照旧有
+  assert.match(wxml.slice(0, wxml.indexOf('<view wx:else class="ticket-card')), /class="tk-banner tk-banner--\{\{item\.bannerCls\}\}/)
+  // 点券看详情不靠 banner：票根那一行也能点
+  assert.match(card, /<view class="stub-row[^"]*"[^>]*id="\{\{item\.code\}\}"[^>]*bindtap="showDetail"/)
+})
+
+test('样式：卡片按钮文字垂直居中——固定高度 + 同高的行高 + 不留上下内边距，字重不要太粗', () => {
+  const wxss = read('pages/mine/ticket/ticket_card.wxss')
+  const rule = (wxss.match(/\n\.btn\s*\{([^}]*)\}/) || [])[1] || ''
+  assert.match(rule, /display:\s*block/)
+  assert.match(rule, /height:\s*88rpx/)
+  assert.match(rule, /line-height:\s*88rpx/)
+  assert.match(rule, /padding:\s*0\b/)
+  assert.doesNotMatch(rule, /font-weight:\s*700/)
+})

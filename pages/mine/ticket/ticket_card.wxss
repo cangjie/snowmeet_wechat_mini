@@ -212,12 +212,18 @@ page {
 
 .btn {
   flex: 1;
+  display: block;
+  box-sizing: border-box;
+  height: 88rpx;
+  min-height: 88rpx;
+  padding: 0;
   text-align: center;
-  padding: 22rpx 0;
+  /* 文字垂直居中：固定高度 + 同高的行高 + 不留上下内边距。
+     原来靠 padding + flex 居中，微信里 button 的文字偏上（2026-11-19 用户指出）；字重也从 700 降到 600，不那么粗 */
+  line-height: 88rpx;
   border-radius: var(--radius-btn);
   font-size: 30rpx;
-  font-weight: 700;
-  line-height: 1.4;
+  font-weight: 600;
 }
 
 .btn::after {

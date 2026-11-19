@@ -40,8 +40,9 @@
   <view wx:else class="ticket-card {{item.inGroup ? 'ticket-card--in-group' : ''}}">
 
     <!-- 券种通栏 banner：底色 + 几何图案按券种区分，失效统一降灰。
-         券名放这里（原设计稿这里右侧还有个 ¥ 金额，已按业务要求全站去掉） -->
-    <view class="tk-banner tk-banner--{{item.bannerCls}} {{item.muted ? 'tk-banner--muted' : ''}}"
+         券名放这里（原设计稿这里右侧还有个 ¥ 金额，已按业务要求全站去掉）。
+         展开后组里的券不再显示：券种名和类别字在组头已经有了，重复（2026-11-19 用户要求） -->
+    <view wx:if="{{!item.inGroup}}" class="tk-banner tk-banner--{{item.bannerCls}} {{item.muted ? 'tk-banner--muted' : ''}}"
           id="{{item.code}}" bindtap="showDetail">
       <text class="tk-banner-kind">{{item.bannerLabel}}</text>
       <text class="tk-banner-name">{{item.name}}</text>
