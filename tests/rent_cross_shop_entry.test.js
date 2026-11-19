@@ -158,3 +158,77 @@ test('已经录入的异店租赁物仍然可以发放：弹发放确认', () =>
   } finally { delete global.wx }
   assert.deepEqual(calls.modals, ['确认发放'])
 })
+
+// ---------- 录入装备：无码的异店租赁物也可以按编码选择 ----------
+
+function assignSetup(extra) {
+  const { page, rendered } = render([item(extra)])
+  const calls = { sheets: [], modals: [], toasts: [], saves: [] }
+  global.wx = {
+    showActionSheet(o) { calls.sheets.push(o); calls.sheetPick = i => o.success({ tapIndex: i }) },
+    showModal(o) { calls.modals.push(o); calls.modalAnswer = (content, confirm = true) => o.success({ confirm, content }) },
+    showToast(o) { calls.toasts.push(o.title) }, showLoading() {}, hideLoading() {},
+  }
+  page.setData({ order: { id: 100, rentals: [{ id: 5, rentItems: rendered }] } })
+  page._saveCrossItem = payload => { calls.saves.push(payload) }
+  return { page, calls, cleanup: () => { delete global.wx } }
+}
+const tapAssign = { currentTarget: { dataset: { ridx: 0, iidx: 0 } } }
+
+test('无码的异店租赁物点「录入装备」：先选「录入名称」还是「按编码选择租赁物」', () => {
+  const { page, calls, cleanup } = assignSetup({ id: 1, noCode: true, category_id: 5, class_name: '【中级】全能板' })
+  try {
+    page.onCrossItemAssign(tapAssign)
+    assert.equal(calls.sheets.length, 1)
+    assert.deepEqual(calls.sheets[0].itemList, ['录入名称', '按编码选择租赁物'])
+    assert.equal(calls.modals.length, 0, '选之前不直接弹名称框')
+  } finally { cleanup() }
+})
+
+test('选「录入名称」：弹名称框，填了名称才保存（空的不保存）', () => {
+  const { page, calls, cleanup } = assignSetup({ id: 1, noCode: true })
+  try {
+    page.onCrossItemAssign(tapAssign)
+    calls.sheetPick(0)
+    assert.equal(calls.modals[0].title, '录入租赁物名称')
+    calls.modalAnswer('   ')
+    assert.deepEqual(calls.saves, [], '空名称不保存')
+    calls.modalAnswer(' 雪鞋 红色 42 ')
+    assert.deepEqual(calls.saves, [{ name: '雪鞋 红色 42' }])
+  } finally { cleanup() }
+})
+
+test('选「按编码选择租赁物」：打开按这件分类的搜索页，选中租赁物后按 productId 保存（后端把它改成带码的）', () => {
+  const { page, calls, cleanup } = assignSetup({ id: 1, noCode: true, category_id: 5, class_name: '【中级】全能板' })
+  try {
+    page.onCrossItemAssign(tapAssign)
+    calls.sheetPick(1)
+    assert.equal(page.data._crossSearchShow, true)
+    assert.equal(page.data._crossCategoryId, 5)
+    assert.equal(page.data._crossCategoryName, '【中级】全能板')
+    assert.equal(calls.modals.length, 0)
+    page.onCrossProductSelected({ detail: { product: { id: 310 } } })
+    assert.deepEqual(calls.saves, [{ productId: 310 }])
+    assert.equal(page.data._crossSearchShow, false)
+  } finally { cleanup() }
+})
+
+test('带码的异店租赁物点「录入装备」：直接打开搜索页，不弹选择', () => {
+  const { page, calls, cleanup } = assignSetup({ id: 1, noCode: false, category_id: 5 })
+  try {
+    page.onCrossItemAssign(tapAssign)
+    assert.equal(calls.sheets.length, 0)
+    assert.equal(page.data._crossSearchShow, true)
+  } finally { cleanup() }
+})
+
+test('已发放的、本店的租赁物点「录入装备」没反应', () => {
+  for (const extra of [{ status: '已发放', noCode: true }, { pickup_shop: null, pick_type: '立即租赁', noCode: true }]) {
+    const { page, calls, cleanup } = assignSetup(extra)
+    try {
+      page.onCrossItemAssign(tapAssign)
+      assert.equal(calls.sheets.length + calls.modals.length, 0)
+      assert.notEqual(page.data._crossSearchShow, true)
+    } finally { cleanup() }
+  }
+})

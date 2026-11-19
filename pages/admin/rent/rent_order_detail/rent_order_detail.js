@@ -918,15 +918,29 @@ Page({
     var ref = this._getItemRef(Number(e.currentTarget.dataset.ridx), Number(e.currentTarget.dataset.iidx))
     if (!ref || !ref.item.pickup_shop || ref.item.status !== '未发放') return
     var item = ref.item
+    var that = this
     this.setData({ _crossItemId: item.id })
     if (item.noCode) {
-      var that = this
-      wx.showModal({ title: '录入租赁物名称', editable: true, content: item.name || '', success: function (res) {
-        if (res.confirm && res.content && res.content.trim()) that._saveCrossItem({ name: res.content.trim() })
-      } })
+      // 无码的异店租赁物：可以只录入名称，也可以按编码选择具体的租赁物（选了就改成带码的，2026-11-19 用户要求）
+      wx.showActionSheet({
+        itemList: ['录入名称', '按编码选择租赁物'],
+        success: function (res) {
+          if (res.tapIndex === 0) that._promptCrossName(item)
+          else if (res.tapIndex === 1) that._openCrossSearch(item)
+        },
+      })
     } else {
-      this.setData({ _crossSearchShow: true, _crossCategoryId: item.category_id, _crossCategoryName: item.class_name || '' })
+      this._openCrossSearch(item)
     }
+  },
+  _promptCrossName(item) {
+    var that = this
+    wx.showModal({ title: '录入租赁物名称', editable: true, content: item.name || '', success: function (res) {
+      if (res.confirm && res.content && res.content.trim()) that._saveCrossItem({ name: res.content.trim() })
+    } })
+  },
+  _openCrossSearch(item) {
+    this.setData({ _crossSearchShow: true, _crossCategoryId: item.category_id, _crossCategoryName: item.class_name || '' })
   },
   onCrossSearchClose() { this.setData({ _crossSearchShow: false }) },
   onCrossProductSelected(e) {
