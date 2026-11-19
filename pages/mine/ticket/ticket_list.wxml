@@ -7,6 +7,7 @@
     </navigator>
     <navigator class="tab-item {{activeTab == 'used' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=used" open-type="redirect" hover-class="none">已使用</navigator>
     <navigator class="tab-item {{activeTab == 'shared' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=shared" open-type="redirect" hover-class="none">已分享</navigator>
+    <navigator class="tab-item {{activeTab == 'accepted' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=accepted" open-type="redirect" hover-class="none">已接受</navigator>
   </view>
 
   <!-- 汇总行：仅未使用 tab -->
@@ -86,7 +87,7 @@
   <view class="empty-state" wx:if="{{ticketArr.length == 0}}">
     <view class="empty-icon-box"><view class="empty-icon-inner"></view></view>
     <text class="empty-title">这里还没有券</text>
-    <text class="empty-text">到店养护或参与活动可获得体验券</text>
+    <text class="empty-text">{{emptyText}}</text>
   </view>
 
 </view>

@@ -143,11 +143,33 @@ function annotateTicket(ticket, tab){
   // 那样会把券码、时间这些小字压到读不清
   // 顾客端「未使用」tab 后端已经滤掉过期券、「已使用」tab 全是 used==1，
   // 所以这里只需判这两种；不引用后端并不下发的 expired 字段
-  ticket.muted = ticket.used == 1 || !!ticket.transferredOut
+  // 「已接受」tab 里还有已过期的券（后端 expired 字段）：同样降灰
+  var expiredInAccepted = tab == 'accepted' && !!ticket.expired && ticket.used != 1
+  ticket.muted = ticket.used == 1 || !!ticket.transferredOut || expiredInAccepted
+  if (expiredInAccepted){
+    ticket.metaLine = '已过期 · ' + (ticket.expireText || '')
+  }
   // 教练券（管理员批量发给教练的，服务端标 coachGranted）不受「仅模板 12、16 可转赠」限制，教练可转发给学员
   ticket.canTransfer = (TRANSFERABLE_TEMPLATE_IDS.indexOf(ticket.template_id) >= 0 || !!ticket.coachGranted) && ticket.used != 1
   ticket.actionable = true       // 是否还允许任何操作（转赠/撤回分享/核销二维码等）
   ticket.canCancelShare = false  // 是否显示"撤回分享"按钮。wxml 一律用这个，不要直接判 shared
+  if (tab == 'accepted'){
+    // 「已接受」只是一份「我收到过哪些券」的清单：只读，不放转赠、撤回分享按钮（要转赠去「未使用」里）
+    ticket.canTransfer = false
+    if (ticket.used == 1){
+      ticket.statusText = '已使用'
+      ticket.statusClass = 'status-used'
+    }
+    else if (ticket.expired){
+      ticket.statusText = '已过期'
+      ticket.statusClass = 'status-used'
+    }
+    else{
+      ticket.statusText = '待使用'
+      ticket.statusClass = 'status-pending'
+    }
+    return ticket
+  }
   if (ticket.used == 1){
     ticket.statusText = '已使用'
     ticket.statusClass = 'status-used'
@@ -201,7 +223,7 @@ function groupTickets(tickets, openKeys, tab){
     }
     g.tickets.push(t)
   })
-  var word = tab == 'used' ? '已使用' : (tab == 'shared' ? '已分享' : '可用')
+  var word = tab == 'used' ? '已使用' : (tab == 'shared' ? '已分享' : (tab == 'accepted' ? '已接受' : '可用'))
   groups.forEach(function (g, i){
     g.order = i    // 同一时间的组保持第一次出现的先后
     g.latestTime = g.tickets.reduce(function (latest, t){
@@ -218,7 +240,7 @@ function groupTickets(tickets, openKeys, tab){
     g.expireLine = ''
     g.urgentCount = 0
     g.urgentLine = ''
-    if (tab != 'used' && tab != 'shared'){
+    if (tab != 'used' && tab != 'shared' && tab != 'accepted'){
       var best = null
       g.tickets.forEach(function (t){ if (!best || expireKey(t) < expireKey(best)){ best = t } })
       g.expireLine = expireKey(best) === '9999' ? (best.expireText || '长期有效') : ('最近到期 ' + best.expireText)

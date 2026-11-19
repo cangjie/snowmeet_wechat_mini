@@ -17,12 +17,13 @@
   text-align: center;
   padding: 20rpx 0;
   border-radius: 999rpx;
-  font-size: 28rpx;
+  /* 四个 tab（未使用 / 已使用 / 已分享 / 已接受）并排，字号和间距比三个 tab 时小一点，未使用的数量角标才放得下 */
+  font-size: 26rpx;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10rpx;
+  gap: 6rpx;
 }
 
 /* 未使用 tab 的数量角标。三个 tab 是 redirect 各自重新加载页面，

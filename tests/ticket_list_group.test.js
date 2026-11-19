@@ -105,12 +105,15 @@ test('buildRows：收起的组只有一行组头；展开后组头后面跟着�
 function setup(t, tickets, tab) {
   const previous = { wx: global.wx, getApp: global.getApp }
   global.getApp = () => ({ globalData: { sessionKey: 'sk', domainName: 'test.invalid' }, loginPromiseNew: Promise.resolve() })
-  global.wx = { showToast() {}, showModal() {}, navigateTo() {} }
+  global.wx = { showToast() {}, showModal() {}, navigateTo(o) { global.__navigated = (global.__navigated || []).concat(o.url) } }
   const fake = {
     getMyTickets() { return Promise.resolve(JSON.parse(JSON.stringify(tickets))) },
-    getMySharedTicketsPromise() { return Promise.resolve(JSON.parse(JSON.stringify(tickets))) }
+    getMySharedTicketsPromise() { return Promise.resolve(JSON.parse(JSON.stringify(tickets))) },
+    getMyAcceptedTicketsPromise(sessionKey) { fake.acceptedCalls.push(sessionKey); return Promise.resolve(JSON.parse(JSON.stringify(tickets))) },
+    acceptedCalls: []
   }
   const page = loadPage('pages/mine/ticket/ticket_list.js', fake)
+  page._fake = fake
   page.onLoad({ tab: tab || 'pending' })
   t.after(() => {
     if (previous.wx === undefined) delete global.wx; else global.wx = previous.wx
@@ -279,4 +282,84 @@ test('页面：未使用 tab 一进来券种就按最新获得时间倒序（默
   const page = setup(t, list)
   await settle()
   assert.deepEqual(page.data.rowArr.map(r => r.rowKey), ['e1', 'o1', 'a1'])     // 即使免费打蜡券最先到期，它的券最早得到，排最后
+})
+
+// ---------- 2026-11-19 用户：新增「已接受」tab，列出我通过别人分享收到的券 ----------
+// 数据来自新接口 Ticket/GetMyAcceptedTickets（后端先部署；旧后端没有这个接口时页面静默显示空状态）。
+
+test('data.js：getMyAcceptedTicketsPromise 请求 Ticket/GetMyAcceptedTickets，带会话', () => {
+  const src = read('utils/data.js')
+  assert.match(src, /const getMyAcceptedTicketsPromise = function \(sessionKey\)/)
+  assert.match(src, /'Ticket\/GetMyAcceptedTickets\?sessionKey=' \+ encodeURIComponent\(sessionKey\)/)
+  assert.match(src, /^\s+getMyAcceptedTicketsPromise,$/m)
+})
+
+test('模板：顶部多一个「已接受」tab，链接带 tab=accepted，高亮按 activeTab', () => {
+  const wxml = read('pages/mine/ticket/ticket_list.wxml')
+  assert.match(wxml, /<navigator class="tab-item \{\{activeTab == 'accepted' \? 'tab-active' : 'tab-inactive'\}\}" url="ticket_list\?tab=accepted" open-type="redirect"[^>]*>已接受<\/navigator>/)
+  assert.equal((wxml.match(/class="tab-item /g) || []).length, 4)
+  // 顺序：未使用、已使用、已分享、已接受
+  const order = ['tab=pending', 'tab=used', 'tab=shared', 'tab=accepted'].map(k => wxml.indexOf(k))
+  assert.deepEqual(order, order.slice().sort((a, b) => a - b))
+})
+
+test('页面：已接受 tab 用新接口拉券，按券种分组，汇总文字「N 张已接受」，不显示汇总行和排序', async t => {
+  const list = [T('a1', WAX, { displayTimeText: '2026-11-10 10:00', displayTimeLabel: '领取时间' }), T('a2', WAX, { displayTimeText: '2026-11-05 08:30', displayTimeLabel: '领取时间' }),
+    T('e1', EDGE, { displayTimeText: '2026-11-12 18:00', displayTimeLabel: '领取时间' })]
+  const page = setup(t, list, 'accepted')
+  await settle()
+  assert.deepEqual(page._fake.acceptedCalls, ['sk'])
+  assert.deepEqual(page.data.rowArr.map(r => r.rowType + ':' + r.rowKey), ['card:e1', 'group:g:免费打蜡券'])     // 按领取时间：修刃券最新，排最前
+  assert.equal(page.data.rowArr[1].summaryText, '2 张已接受')
+  assert.equal(page.data.rowArr[1].expireLine, '')
+  assert.equal(page.data.summaryText, '')
+  assert.equal(page.data.pendingCount, 0)
+})
+
+test('已接受 tab 的券：未使用是待使用、已使用降灰、已过期降灰；都只读（不能转赠、撤回分享）', () => {
+  const unused = helper.annotateTicket(T('a1', WAX, { template_id: 12 }), 'accepted')
+  assert.deepEqual([unused.statusText, unused.muted, unused.canTransfer, unused.canCancelShare], ['待使用', false, false, false])
+  const used = helper.annotateTicket(T('a2', WAX, { used: 1, template_id: 12 }), 'accepted')
+  assert.deepEqual([used.statusText, used.statusClass, used.muted, used.canTransfer], ['已使用', 'status-used', true, false])
+  const expired = helper.annotateTicket(T('a3', WAX, { expired: true, expireText: '2018.5.1', template_id: 12 }), 'accepted')
+  assert.deepEqual([expired.statusText, expired.statusClass, expired.muted, expired.canTransfer], ['已过期', 'status-used', true, false])
+  assert.equal(expired.metaLine, '已过期 · 2018.5.1')
+})
+
+test('已接受 tab：能用的券点进详情（按未使用的口径），已使用、已过期的不跳转', async t => {
+  global.__navigated = []
+  const page = setup(t, [helper.annotateTicket(T('u1', WAX), 'accepted'), helper.annotateTicket(T('d1', WAX, { used: 1 }), 'accepted'),
+    helper.annotateTicket(T('x1', WAX, { expired: true }), 'accepted')], 'accepted')
+  await settle()
+  page.showDetail({ currentTarget: { id: 'd1' } })
+  page.showDetail({ currentTarget: { id: 'x1' } })
+  assert.deepEqual(global.__navigated, [])
+  page.showDetail({ currentTarget: { id: 'u1' } })
+  assert.match(global.__navigated[0], /^ticket_detail\?code=u1&tab=pending&transferred=0$/)
+  delete global.__navigated
+})
+
+test('已接受 tab 没有券：空状态写「朋友转赠给你的券会出现在这里」', async t => {
+  const page = setup(t, [], 'accepted')
+  await settle()
+  assert.equal(page.data.emptyText, '朋友转赠给你的券会出现在这里')
+  const pending = setup(t, [], 'pending')
+  await settle()
+  assert.equal(pending.data.emptyText, '到店养护或参与活动可获得体验券')
+  assert.match(read('pages/mine/ticket/ticket_list.wxml'), /\{\{emptyText\}\}/)
+})
+
+test('已接受的分组：不写到期日；整组都已使用才降灰', () => {
+  const g = helper.groupTickets([T('a1', WAX, { muted: true }), T('a2', WAX)], {}, 'accepted')[0]
+  assert.equal(g.summaryText, '2 张已接受')
+  assert.equal(g.expireLine, '')
+  assert.equal(g.urgentLine, '')
+  assert.equal(g.muted, false)
+})
+
+test('样式：四个 tab 并排，字号 26rpx、间距 6rpx，放得下未使用的数量角标', () => {
+  const wxss = read('pages/mine/ticket/ticket_list.wxss')
+  const rule = (wxss.match(/\n\.tab-item\s*\{([^}]*)\}/) || [])[1] || ''
+  assert.match(rule, /font-size:\s*26rpx/)
+  assert.match(rule, /gap:\s*6rpx/)
 })

@@ -9,7 +9,8 @@ Page({
    * Page initial data
    */
   data: {
-    activeTab: 'pending',   // pending: 未使用 | shared: 已分享 | used: 已使用
+    activeTab: 'pending',   // pending: 未使用 | shared: 已分享 | used: 已使用 | accepted: 已接受（我通过别人分享收到的券）
+    emptyText: '到店养护或参与活动可获得体验券',
     ticketArr:[],           // 平铺的全部券（转赠、详情、分享、撤回都靠它）
     rowArr:[],              // 页面上显示的行：券种组头 + 券（同一券种多张合并成「免费打蜡券 × N」，点开看每一张）
     openGroups: {},         // 展开的券种 { 券种键: true }
@@ -74,8 +75,16 @@ Page({
   onLoad: function (options) {
     var that = this
     var tab = options.tab || 'pending'
-    this.setData({ activeTab: tab })
+    this.setData({ activeTab: tab, emptyText: tab == 'accepted' ? '朋友转赠给你的券会出现在这里' : '到店养护或参与活动可获得体验券' })
     app.loginPromiseNew.then(function(resolve){
+      if (tab == 'accepted'){
+        // 新接口（Ticket/GetMyAcceptedTickets）：后端没部署时请求失败，静默显示空状态，不影响别的 tab
+        data.getMyAcceptedTicketsPromise(app.globalData.sessionKey).then(function (tickets){
+          tickets = (tickets || []).map(function (t){ return ticketHelper.annotateTicket(t, tab) })
+          that._render(tickets)
+        }).catch(function (exp){})
+        return
+      }
       if (tab == 'shared'){
         data.getMySharedTicketsPromise(app.globalData.sessionKey).then(function (tickets){
           tickets = that._dedupeByCode(tickets || [])
@@ -272,12 +281,21 @@ Page({
       return
     }
     var code = source.currentTarget.id
+    var detailTab = this.data.activeTab
+    if (detailTab == 'accepted'){
+      // 已接受里已使用、已过期的券没有可做的事，不进详情；还能用的按「未使用」的口径看详情
+      var picked = (this.data.ticketArr || []).filter(function (t){ return t.code == code })[0]
+      if (!picked || picked.used == 1 || picked.expired){
+        return
+      }
+      detailTab = 'pending'
+    }
     // 详情页拉券走的是 GetTicket（不带会话、判断不了归属），所以把列表这边由后端
     // 下发的"已转赠出去"结论一并带过去，保证两页的状态和操作权限一致
     var current = (this.data.ticketArr || []).filter(function (t){ return t.code == code })[0]
     var transferred = (current && current.transferredOut) ? 1 : 0
     wx.navigateTo({
-      url: 'ticket_detail?code=' + code + '&tab=' + this.data.activeTab + '&transferred=' + transferred,
+      url: 'ticket_detail?code=' + code + '&tab=' + detailTab + '&transferred=' + transferred,
     })
   }
 })

@@ -242,6 +242,17 @@ const getMySharedTicketsPromise = function (sessionKey) {
     })
   })
 }
+// 「我的优惠券 - 已接受」：我通过别人分享（真转赠）收到的券，不论已使用、已过期（2026-11-19）。新接口，后端要先部署
+const getMyAcceptedTicketsPromise = function (sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'Ticket/GetMyAcceptedTickets?sessionKey=' + encodeURIComponent(sessionKey)
+  return new Promise(function (resolve, reject) {
+    util.performWebRequest(getUrl, null).then(function (tickets) {
+      resolve(tickets)
+    }).catch(function (exp) {
+      reject(exp)
+    })
+  })
+}
 const getTicket = function (code) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetTicket/' + code
   return new Promise(function (resolve, reject) {
@@ -2092,6 +2103,7 @@ module.exports = {
   getMyTickets,
   getTicket,
   getMySharedTicketsPromise,
+  getMyAcceptedTicketsPromise,
   setTicketToSharePromise,
   acceptTicketPromise,
   checkTransferFollowPromise,
