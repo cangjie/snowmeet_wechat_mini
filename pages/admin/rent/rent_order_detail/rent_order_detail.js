@@ -312,6 +312,11 @@ Page({
           rentItem._statusLabel = rentItem.status || '—'
           rentItem._statusClass = 'chip--status-noneed'
         }
+        // 异店租赁的租赁物开单时只选分类，必须先录入编码（带码的）/名称（无码的）才能发放（2026-11-19 用户定，后端同样拒绝）：
+        // 没录入时「发放」按钮换成突出的「录入装备」
+        rentItem._needAssign = !rentItem.noNeed && rentItem.status == '未发放'
+          && !!(rentItem.pickup_shop || String(rentItem.pick_type || '').trim() == '异店租赁')
+          && String((rentItem.noCode ? rentItem.name : rentItem.code) || '').trim() === ''
         rentItem.totalRepairationAmountStr = util.showAmount(rentItem.totalRepairationAmount)
         // 赔偿减免 / 实际赔偿（后端 GetRental 随租赁物下发减免；老后端没有这个字段时按 0 算，实际赔偿 = 赔偿金额）
         rentItem.totalRepairationDiscountAmountStr = util.showAmount(rentItem.totalRepairationDiscountAmount || 0)
@@ -940,6 +945,11 @@ Page({
   onItemPick(e) {
     var that = this
     var id = e.currentTarget.dataset.id
+    var pickRef = that._getItemRef(Number(e.currentTarget.dataset.ridx), Number(e.currentTarget.dataset.iidx))
+    if (pickRef && pickRef.item._needAssign) {
+      wx.showToast({ title: '请先录入装备（编码或名称）再发放', icon: 'none' })
+      return
+    }
     wx.showModal({
       title: '确认发放',
       content: '',

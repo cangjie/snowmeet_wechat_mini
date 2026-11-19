@@ -76,7 +76,7 @@
     </view>
 
     <view class="rid-actions" wx:if="{{!readonly && !rentItem.noNeed && !rentItem._replaced}}">
-      <view class="rid-act" wx:if="{{rentItem.pickup_shop && rentItem.status == '未发放'}}" bindtap="onCrossItemAssign" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
+      <view class="rid-act {{rentItem._needAssign ? 'rid-act--primary' : ''}}" wx:if="{{rentItem.pickup_shop && rentItem.status == '未发放'}}" bindtap="onCrossItemAssign" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
         <van-icon name="edit" size="15px" /><text>录入装备</text>
       </view>
       <view class="rid-act rid-act--primary" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemReturn" data-id="{{rentItem.id}}" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
@@ -88,7 +88,7 @@
       <view class="rid-act" wx:if="{{rentItem.status == '已发放'}}" bindtap="onItemChange" data-id="{{rentItem.id}}">
         <van-icon name="exchange" size="15px" /><text>更换</text>
       </view>
-      <view class="rid-act rid-act--primary" wx:if="{{rentItem.status == '已暂存' || rentItem.status == '未发放'}}" bindtap="onItemPick" data-id="{{rentItem.id}}">
+      <view class="rid-act rid-act--primary" wx:if="{{(rentItem.status == '已暂存' || rentItem.status == '未发放') && !rentItem._needAssign}}" bindtap="onItemPick" data-id="{{rentItem.id}}" data-ridx="{{ridx}}" data-iidx="{{iidx}}">
         <van-icon name="sign" size="15px" /><text>发放</text>
       </view>
       <block wx:if="{{rentItem.status == '已归还'}}">
