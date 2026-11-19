@@ -73,10 +73,10 @@
     </block>
 
     <view class="card-actions" wx:if="{{item.canCancelShare}}">
-      <button size="mini" class="btn btn-cancel-share" bindtap="onCancelShare" data-code="{{item.code}}">撤回分享</button>
+      <button class="btn btn-cancel-share" bindtap="onCancelShare" data-code="{{item.code}}">撤回分享</button>
     </view>
     <view class="card-actions" wx:elif="{{item.canTransfer}}">
-      <button size="mini" class="btn btn-use" bindtap="onTransferTap" data-code="{{item.code}}">转赠好友</button>
+      <button class="btn btn-use" bindtap="onTransferTap" data-code="{{item.code}}">转赠好友</button>
     </view>
   </view>
 

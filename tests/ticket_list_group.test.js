@@ -217,3 +217,24 @@ test('样式：卡片按钮文字垂直居中——固定高度 + 同高的行�
   assert.match(rule, /padding:\s*0\b/)
   assert.doesNotMatch(rule, /font-weight:\s*700/)
 })
+
+// ---------- 2026-11-19 用户（第二次）：按钮文字还是偏上，而且要大一些 ----------
+// 根因：按钮写了 size="mini"，微信内置的 button[size=mini]（字号 13px、行高 2.3、左右内边距 1.34em）优先级比 .btn 高，
+// 上一次改的行高和字号被盖掉了。所以这里不能再用 size="mini"，字号也要比原来的大。
+
+test('模板：券卡片上的操作按钮不用 size="mini"（它的内置样式会盖掉 .btn 的字号和行高）', () => {
+  for (const file of ['pages/mine/ticket/ticket_list.wxml', 'pages/mine/ticket/ticket_detail.wxml', 'pages/mine/ticket/ticket_share_mini.wxml', 'pages/mine/ticket/ticket_share.wxml']) {
+    const wxml = read(file)
+    const buttons = wxml.match(/<button[^>]*class="btn[^"]*"[^>]*>/g) || []
+    assert.ok(buttons.length > 0, file)
+    for (const b of buttons) assert.doesNotMatch(b, /size="mini"/, file + '：' + b)
+  }
+})
+
+test('样式：.btn 字号 34rpx（比原来的 30rpx 大），行高和高度仍同为 88rpx', () => {
+  const wxss = read('pages/mine/ticket/ticket_card.wxss')
+  const rule = (wxss.match(/\n\.btn\s*\{([^}]*)\}/) || [])[1] || ''
+  assert.match(rule, /font-size:\s*34rpx/)
+  assert.match(rule, /line-height:\s*88rpx/)
+  assert.match(rule, /height:\s*88rpx/)
+})
