@@ -523,6 +523,18 @@ const closeRentOrderByStaffPromise = function (orderId, sessionKey) {
   var url = app.globalData.requestPrefix + 'Rent/CloseOrderByStaff/' + orderId.toString() + '?sessionKey=' + sessionKey
   return util.performWebRequest(url, {})
 }
+// 订单重开（详情页「订单重开」按钮）：沿用老接口 Order/SetOrderCloseStatus（GET，closed=false）。
+// 后端校验职级、订单已关闭且有关闭时间；记录重开时间和操作的员工
+const reopenOrderByStaffPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Order/SetOrderCloseStatus/' + orderId.toString()
+    + '?closed=false&sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
+// 订单的关闭 / 重开记录：每次的时间和操作的员工（夜间自动关单显示「系统自动」）
+const getOrderCloseHistoryPromise = function (orderId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Order/GetOrderCloseHistory/' + orderId.toString() + '?sessionKey=' + sessionKey
+  return util.performWebRequest(url, null)
+}
 const getAdminPageHelpPromise = function (pageKey, sessionKey, businessContext) {
   var qUrl = app.globalData.requestPrefix + 'AdminAi/GetPageHelpByStaff?sessionKey=' + sessionKey
     + '&sessionType=' + encodeURIComponent('wechat_mini_openid')
@@ -2155,6 +2167,8 @@ module.exports = {
   getRentOrdersByStaffPagedPromise,
   getOrderByStaffPromise,
   closeRentOrderByStaffPromise,
+  reopenOrderByStaffPromise,
+  getOrderCloseHistoryPromise,
   getAdminPageHelpPromise,
   askAdminPageHelpPromise,
   queryRentOrdersByNaturalLanguagePromise,

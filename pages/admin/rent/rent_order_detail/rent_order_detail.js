@@ -82,6 +82,8 @@ Page({
     _orderInfoExpanded: true,
     _paymentDetailExpanded: false,
     _refundExpanded: true,
+    _closeHistory: [],            // 关闭 / 重开记录（员工职级 >= 100 才拉）
+    _closeHistoryExpanded: false, // 记录列表默认折叠
     payWithDeposit: false,
     _verifyShow: false,
     _verifyQrUrl: '',
@@ -195,6 +197,54 @@ Page({
     })
   },
 
+  // 订单重开（页面最下方，订单已关闭才显示）：后端校验职级和订单状态，记录重开时间和操作的员工；
+  // 重开后订单恢复为未关闭，夜间不会自动再关，条件满足后再点「订单关闭」。成功后重新加载订单（按钮、记录随之更新）
+  onReopenOrder() {
+    var that = this
+    if (that._reopening) return
+    wx.showModal({
+      title: '确认重开订单',
+      content: '重开后订单恢复为未关闭，可以继续追加、退款和归还。夜间不会自动再关闭它，条件满足后请在页面最下方点「订单关闭」。确定重开这个订单吗？',
+      confirmText: '确认重开',
+      success: function (res) {
+        if (!res.confirm) return
+        that._reopening = true
+        data.reopenOrderByStaffPromise(that.data.id, app.globalData.sessionKey).then(function () {
+          that._reopening = false
+          wx.showToast({ title: '订单已重开', icon: 'success' })
+          that.getData()
+        }).catch(function () {
+          // 失败原因 util.performWebRequest 已经提示过
+          that._reopening = false
+        })
+      }
+    })
+  },
+
+  // 关闭 / 重开记录：每次的时间、操作的员工；列表默认折叠（点标题展开）。拉不到不影响订单页
+  loadCloseHistory() {
+    var that = this
+    if (!that.data._canCloseOrder) return
+    data.getOrderCloseHistoryPromise(that.data.id, app.globalData.sessionKey).then(function (list) {
+      var rows = []
+      for (var i = 0; list && i < list.length; i++) {
+        var e = list[i]
+        var d = new Date(e.time)
+        rows.push({
+          kind: e.action === '重开' ? 'reopen' : 'close',
+          action: e.action,
+          timeStr: util.formatDate(d) + ' ' + util.formatTimeStr(d),
+          staffName: e.staffName || (e.auto ? '系统自动' : ''),
+          memo: e.memo || ''
+        })
+      }
+      that.setData({ _closeHistory: rows })
+    }).catch(function () {})
+  },
+  onToggleCloseHistory() {
+    this.setData({ _closeHistoryExpanded: !this.data._closeHistoryExpanded })
+  },
+
   getData(afterData) {
     wx.showLoading({ title: '加载中' })
     var that = this
@@ -216,6 +266,7 @@ Page({
           wx.hideLoading()
           that.setData({ order, allValid }, function () {
             that.applyDeepLinkExpand(order)
+            that.loadCloseHistory()
             if (typeof afterData === 'function') afterData()
           })
         }

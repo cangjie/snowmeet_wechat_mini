@@ -1111,6 +1111,15 @@
 /* 订单关闭卡片（页面最下方） */
 .close-card { margin-bottom: 40rpx; }
 .close-hint { margin-top: 16rpx; font-size: 24rpx; color: #999; text-align: center; line-height: 1.5; }
+/* 关闭 / 重开记录（可折叠） */
+.close-log-card { margin-bottom: 40rpx; }
+.close-log-row { display: flex; align-items: center; padding: 16rpx 0; border-top: 1rpx solid #f0f0f0; }
+.close-log-action { flex: none; width: 88rpx; text-align: center; font-size: 24rpx; line-height: 44rpx; border-radius: 8rpx; margin-right: 20rpx; }
+.close-log-action--close { color: #d03050; background: #fdecee; }
+.close-log-action--reopen { color: #18a058; background: #e8f5ee; }
+.close-log-main { flex: 1; display: flex; justify-content: space-between; align-items: center; font-size: 26rpx; }
+.close-log-time { color: #333; }
+.close-log-staff { color: #999; margin-left: 16rpx; }
 
 /* 整单每日租金弹窗 */
 .rent-list-open { margin-top: 16rpx; }

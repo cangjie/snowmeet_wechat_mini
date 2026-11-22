@@ -639,6 +639,31 @@
     <van-button type="danger" block bind:click="onCloseOrder">订单关闭</van-button>
     <view class="close-hint">关闭后订单不能恢复，此操作不可逆</view>
   </view>
+
+  <!-- ── Card 7: 订单重开（订单已关闭才显示；员工职级 >= 100，后端另校验：未付款作废的订单没有关闭时间，不能重开）── -->
+  <view class="card close-card" wx:if="{{order.closed == 1 && order.close_date && _canCloseOrder}}">
+    <van-button type="warning" plain block bind:click="onReopenOrder">订单重开</van-button>
+    <view class="close-hint">重开后订单恢复为未关闭；每次关闭、重开的时间和操作人都会记录</view>
+  </view>
+
+  <!-- ── Card 8: 关闭 / 重开记录（可折叠，默认折叠；夜间自动关单显示「系统自动」）── -->
+  <view class="card close-log-card" wx:if="{{_canCloseOrder && _closeHistory.length > 0}}">
+    <view class="section-title" bindtap="onToggleCloseHistory">
+      关闭 / 重开记录（{{_closeHistory.length}}）
+      <view class="section-title-right">
+        <van-icon name="{{_closeHistoryExpanded ? 'arrow-up' : 'arrow-down'}}" size="18px" color="#999" />
+      </view>
+    </view>
+    <block wx:if="{{_closeHistoryExpanded}}">
+      <view class="close-log-row" wx:for="{{_closeHistory}}" wx:key="index">
+        <text class="close-log-action close-log-action--{{item.kind}}">{{item.action}}</text>
+        <view class="close-log-main">
+          <text class="close-log-time">{{item.timeStr}}</text>
+          <text class="close-log-staff">{{item.staffName}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
 </view>
 <view wx:else class="page-loading">
   <text>加载中…</text>
