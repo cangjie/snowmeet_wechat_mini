@@ -7,6 +7,8 @@ const recentOrders = require('../../../utils/member_recent_orders.js')
 
 Page({
   data: {
+    // 龙珠先不显示（2026-11-22 用户要求）：只是隐藏，数据（member.points）和页面里的块都留着，改成 true 就恢复
+    showPoints: false,
     memberId: 0,
     member: null,
     loading: true,

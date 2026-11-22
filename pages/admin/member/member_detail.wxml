@@ -27,13 +27,13 @@
 
     <!-- 储值 & 龙珠 -->
     <view class="card">
-      <view class="card-title"><van-icon name="balance-o" size="16px" color="#006495" /><text class="card-title-txt">储值与龙珠</text></view>
+      <view class="card-title"><van-icon name="balance-o" size="16px" color="#006495" /><text class="card-title-txt">{{showPoints ? '储值与龙珠' : '储值'}}</text></view>
       <view class="asset-row">
         <view class="asset-cell">
           <text class="asset-label">储值合计（C 类）</text>
           <text class="asset-big">{{member.depositTotalStr}}</text>
         </view>
-        <view class="asset-cell asset-cell--r">
+        <view class="asset-cell asset-cell--r" wx:if="{{showPoints}}">
           <text class="asset-label">可用龙珠</text>
           <text class="asset-points">{{member.points}}</text>
         </view>
