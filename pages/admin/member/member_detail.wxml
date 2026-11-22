@@ -62,7 +62,7 @@
     <!-- 绑定账户 -->
     <view class="card">
       <view class="card-title"><van-icon name="link-o" size="16px" color="#006495" /><text class="card-title-txt">绑定账户</text></view>
-      <view class="acc-row"><text class="acc-k">微信</text><text class="acc-v">{{member.accounts.wechatOpenId ? '已绑定' : '未绑定'}}</text></view>
+      <view class="acc-row"><text class="acc-k">微信</text><view><text class="acc-v">{{member.accounts.wechatOpenId ? '已绑定' : '未绑定'}}</text><text wx:if="{{!member.accounts.wechatOpenId}}" class="bind-link" bindtap="onWechatBindOpen">扫码绑定</text></view></view>
       <view class="acc-row"><text class="acc-k">支付宝</text><text class="acc-v">{{member.accounts.alipayPayerId ? '已绑定' : '未绑定'}}</text></view>
       <view class="acc-row"><text class="acc-k">手机号</text><view style="display: inline-flex; align-items: center;"><text class="acc-v mono">{{member.accounts.cell || '未绑定'}}</text><phone-copy phone="{{member.accounts.cell}}" /></view></view>
       <view wx:if="{{member.contactCellsStr}}" class="acc-row"><text class="acc-k">联系手机号</text><view style="display: inline-flex; align-items: center;"><text class="acc-v mono">{{member.contactCellsStr}}</text><phone-copy phone="{{member.contactCellsStr}}" /></view></view>
@@ -184,6 +184,18 @@
 </view>
 
 <view wx:else class="loading-tip">加载中…</view>
+
+<view wx:if="{{wechatBindShow}}" class="mask" bindtap="onWechatBindClose" catchtouchmove="noop">
+  <view class="modal" catchtap="noop">
+    <view class="modal-title">绑定微信</view>
+    <view class="bind-qr-hint">{{wechatBindMessage}}</view>
+    <image wx:if="{{wechatBindImage}}" class="bind-qr-image" src="{{wechatBindImage}}" data-src="{{wechatBindImage}}" mode="aspectFit" binderror="onWechatBindImageError" />
+    <view class="modal-foot">
+      <view class="btn btn-ghost" bindtap="onWechatBindClose">关闭</view>
+      <view class="btn btn-primary" bindtap="onWechatBindOpen">重新生成</view>
+    </view>
+  </view>
+</view>
 
 <!-- ───── 标签编辑弹层 ───── -->
 <view wx:if="{{tagSheetShow}}" class="mask" bindtap="onTagSheetClose" catchtouchmove="noop">

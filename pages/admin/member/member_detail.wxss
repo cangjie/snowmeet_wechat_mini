@@ -73,6 +73,9 @@
   border-top: 1rpx solid rgba(191,199,209,.15); }
 .acc-row:first-of-type, .order-row:first-of-type, .punch-row:first-of-type { border-top: none; }
 .acc-k { font-size: 26rpx; color: #3f4850; }
+.bind-link { color: #006495; font-size: 25rpx; margin-left: 20rpx; }
+.bind-qr-hint { font-size: 26rpx; color: #3f4850; text-align: center; margin: 20rpx 0; }
+.bind-qr-image { display: block; width: 360rpx; height: 360rpx; margin: 0 auto; }
 .acc-v { font-size: 26rpx; color: #0b1c30; font-weight: 600; }
 .otab { white-space: nowrap; margin-bottom: 6rpx; }
 .otab-item { display: inline-block; height: 56rpx; line-height: 56rpx; padding: 0 24rpx; margin-right: 12rpx;

@@ -3,7 +3,6 @@
 // 所有人都能订（2026-11-06 起开放，之前只有店员能订）：选日期、填游客信息、加入购物车，结算在购物车页。
 const app = getApp()
 const data = require('../../utils/data.js')
-const profileAuth = require('../../utils/profile_auth.js')
 const util = require('../../utils/util.js')
 const skipassGroup = require('../../utils/skipass_group.js')
 const skipassCalendar = require('../../utils/skipass_calendar.js')
@@ -63,6 +62,7 @@ Page({
     showConfirm: false,
     confirmName: '',
     confirmCell: '',
+    confirmPhoneLoading: false,
     confirmDateRange: [],
     confirmDateIndex: 0,
     confirmDate: '',
@@ -246,13 +246,7 @@ Page({
           return
         }
         var member = res.data
-        var fillCell = function () { that.setData({ cell: member.currentCell }) }
-        // 手机号授权成功才请顾客完善头像昵称（可跳过）；拒绝授权照旧
-        if (e.detail && e.detail.errMsg === 'getPhoneNumber:ok') {
-          profileAuth.ensureOn(that).then(fillCell)
-        } else {
-          fillCell()
-        }
+        that.setData({ cell: member.currentCell })
       }
     })
   },
@@ -293,6 +287,33 @@ Page({
 
   onConfirmCellInput(e) {
     this.setData({ confirmCell: e.detail.value })
+  },
+
+  onConfirmGetCell(e) {
+    const detail = e && e.detail
+    if (!detail || detail.errMsg !== 'getPhoneNumber:ok') return
+    if (!detail.encryptedData || !detail.iv) {
+      wx.showToast({ title: '获取失败，请手动输入手机号', icon: 'none' })
+      return
+    }
+    if (this.data.confirmPhoneLoading) return
+    this.setData({ confirmPhoneLoading: true })
+    const url = 'https://' + app.globalData.domainName + '/core/MiniAppUser/UpdateWechatMemberCell?sessionKey='
+      + encodeURIComponent(app.globalData.sessionKey) + '&encData=' + encodeURIComponent(detail.encryptedData) + '&iv=' + encodeURIComponent(detail.iv)
+    wx.request({
+      url: url,
+      method: 'GET',
+      success: (res) => {
+        const cell = res && res.data && res.data.currentCell
+        if (res.statusCode !== 200 || typeof cell !== 'string' || !/^1[3-9]\d{9}$/.test(cell.trim())) {
+          wx.showToast({ title: '获取失败，请手动输入手机号', icon: 'none' })
+          return
+        }
+        this.setData({ confirmCell: cell.trim() })
+      },
+      fail: () => wx.showToast({ title: '获取失败，请手动输入手机号', icon: 'none' }),
+      complete: () => this.setData({ confirmPhoneLoading: false })
+    })
   },
 
   // 弹层里改日期：这个票种有价格的日期下拉选，应付金额换成新日期的价格

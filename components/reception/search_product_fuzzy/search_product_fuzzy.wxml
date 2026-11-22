@@ -43,6 +43,7 @@
             <view class="search-item-cat">{{item.category.name}}</view>
             <view class="search-item-code">{{item.barcode}}</view>
             <view class="search-item-name">{{item.name}}</view>
+            <view wx:if="{{item._disabled}}" class="search-item-name">该租赁物暂不可用</view>
           </view>
         </view>
       </block>

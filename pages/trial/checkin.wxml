@@ -1,0 +1,26 @@
+<view class="verify-page">
+  <view class="verify-box">
+    <block wx:if="{{done}}">
+      <view class="verify-icon verify-icon--ok">✓</view>
+      <view class="verify-title">签到成功</view>
+      <view class="verify-sub">请向店员领取单板。</view>
+    </block>
+    <block wx:elif="{{info}}">
+      <view class="verify-title">试滑身份确认</view>
+      <view class="verify-sub">{{info.reservation_date}} · {{info.barcode}} · {{info.name}}</view>
+      <view class="verify-sub">试滑免费，无租金和押金。请确认是您本人领取。</view>
+      <view wx:if="{{error}}" class="verify-error">{{error}}</view>
+      <button class="verify-btn" disabled="{{busy}}" bindtap="confirm">确认本人试滑</button>
+    </block>
+    <block wx:elif="{{error}}">
+      <view class="verify-icon verify-icon--err">×</view>
+      <view class="verify-title">无法确认身份</view>
+      <view class="verify-sub">{{error}}</view>
+    </block>
+    <block wx:else>
+      <view class="verify-spinner"></view>
+      <view class="verify-title">正在加载预约信息…</view>
+      <view class="verify-sub">请稍候</view>
+    </block>
+  </view>
+</view>

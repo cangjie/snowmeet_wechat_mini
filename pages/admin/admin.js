@@ -138,6 +138,9 @@ Page({
     }
     // legacy-demo end
     switch(id) {
+      case 'trial_list':
+        path = '/pages/trial/staff'
+        break
       case 'expierence_admit':
         path = '/pages/admin/expierence/expierence_admit'
         break
@@ -152,6 +155,9 @@ Page({
         break
       case 'reserve_instructor_list':
         path = '/pages/admin/school/lesson/lesson_list'
+        break
+      case 'staff_coupon_batches':
+        path = '/pages/admin/ticket/staff_coupon_batches/staff_coupon_batches'
         break
       case 'ticket_template_admin':
         path = '/pages/admin/ticket/template_admin/template_admin'
@@ -188,9 +194,6 @@ Page({
         break
       case 'recept_list':
         path = '/pages/admin/recept/recept_list'
-        break
-      case 'vip_maintain':
-        path = '/pages/admin/vip/maintain_recept'
         break
       case 'staff_account_admin':
         path = '/pages/staffadmin/list/list'
@@ -274,15 +277,6 @@ Page({
         break
       case 'ziwoyou_order':
         path = '/pages/admin/ski_pass/dhhs_skipass_order'
-        break
-      case 'deposit_list':
-        path = '/pages/admin/deposit/deposit_list'
-        break
-      case 'deposit_add':
-        path = '/pages/admin/deposit/deposit_charge_search'
-        break
-      case 'deposit_balance':
-        path = '/pages/admin/deposit/deposit_balance'
         break
       case 'deposit_account_list':
         path = '/pages/admin/deposit/deposit_account_list'

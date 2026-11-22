@@ -10,6 +10,9 @@ Page({
     memberId: 0,
     member: null,
     loading: true,
+    wechatBindShow: false,
+    wechatBindImage: '',
+    wechatBindMessage: '',
 
     // 标签编辑弹层
     tagSheetShow: false,
@@ -80,7 +83,83 @@ Page({
     }).catch(function () {})
   },
   onShow() {
+    this._wechatBindHidden = false
     if (this.data.memberId) this.getData()
+    if (this.data.wechatBindShow && this._wechatBindId) this._startWechatBindPolling()
+  },
+  onHide() { this._wechatBindHidden = true; this._stopWechatBindPolling() },
+  onUnload() { this._cancelWechatBind(); this._wechatBindSeq = (this._wechatBindSeq || 0) + 1; this._stopWechatBindPolling() },
+
+  onWechatBindOpen() {
+    if (this._wechatBindCreating) {
+      wx.showToast({ title: '二维码正在生成，请稍候', icon: 'none' })
+      return
+    }
+    this._wechatBindCreating = true
+    const seq = this._wechatBindSeq = (this._wechatBindSeq || 0) + 1
+    this._stopWechatBindPolling()
+    this._cancelWechatBind()
+    this._wechatBindId = null
+    this.setData({ wechatBindShow: true, wechatBindImage: '', wechatBindMessage: '正在生成二维码…' })
+    const base = app.globalData.requestPrefix + 'MemberWechatBind/'
+    const key = encodeURIComponent(app.globalData.sessionKey || '')
+    util.performWebRequest(base + 'Create?memberId=' + this.data.memberId + '&sessionKey=' + key, {})
+      .then(qr => {
+        if (seq !== this._wechatBindSeq) { this._cancelWechatBind(qr.id); return }
+        this._wechatBindId = qr.id
+        const info = wx.getAccountInfoSync()
+        const version = (info.miniProgram && info.miniProgram.envVersion) || 'release'
+        this.setData({ wechatBindImage: base + 'Image?id=' + qr.id + '&sessionKey=' + key + '&envVersion=' + version,
+          wechatBindMessage: '请会员扫码并授权本人手机号，二维码两分钟内有效' })
+        this._startWechatBindPolling()
+      }).catch(() => {
+        if (seq === this._wechatBindSeq) this.setData({ wechatBindMessage: '生成失败，请重试' })
+      }).finally(() => { this._wechatBindCreating = false })
+  },
+  onWechatBindClose() {
+    this._wechatBindSeq = (this._wechatBindSeq || 0) + 1
+    this._stopWechatBindPolling()
+    this._cancelWechatBind()
+    this._wechatBindId = null
+    this.setData({ wechatBindShow: false, wechatBindImage: '' })
+  },
+  onWechatBindImageError(e) {
+    if (!e.currentTarget || e.currentTarget.dataset.src !== this.data.wechatBindImage) return
+    this._cancelWechatBind()
+    this._wechatBindId = null
+    this.setData({ wechatBindImage: '', wechatBindMessage: '二维码图片生成失败，请重试' })
+    this._stopWechatBindPolling()
+  },
+  _cancelWechatBind(id) {
+    id = id || this._wechatBindId
+    if (!id) return
+    const url = app.globalData.requestPrefix + 'MemberWechatBind/Cancel?id=' + id
+      + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
+    util.performWebRequest(url, {}).catch(err => console.warn('作废微信绑定码失败', err))
+  },
+  _stopWechatBindPolling() {
+    if (this._wechatBindTimer) clearInterval(this._wechatBindTimer)
+    this._wechatBindTimer = null
+  },
+  _startWechatBindPolling() {
+    this._stopWechatBindPolling()
+    const id = this._wechatBindId
+    if (!id || this._wechatBindHidden) return
+    this._wechatBindTimer = setInterval(() => {
+      const url = app.globalData.requestPrefix + 'MemberWechatBind/Status?id=' + id
+        + '&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
+      util.performWebRequest(url, null).then(result => {
+        if (id !== this._wechatBindId) return
+        if (result.stage === 'bound') {
+          this.onWechatBindClose()
+          this.getData()
+          wx.showToast({ title: '微信绑定成功', icon: 'success' })
+        } else if (result.stage === 'expired') {
+          this._stopWechatBindPolling()
+          this.setData({ wechatBindImage: '', wechatBindMessage: '二维码已过期，请重新生成' })
+        }
+      }).catch(err => console.warn('查询微信绑定状态失败', err))
+    }, 2000)
   },
 
   // 标签库（从 DB 读，member_tag_preset）

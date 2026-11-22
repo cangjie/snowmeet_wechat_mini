@@ -58,6 +58,8 @@ Page({
     hide: 0,
     valid: 1,
     sharable: 0,
+    marketingPromotion: 0,
+    savedMarketingPromotion: 0,
     coverUploadId: null,
     coverUrl: '',
     posterWidth: 1080,
@@ -150,6 +152,8 @@ Page({
         hide: d.hide || 0,
         valid: d.valid == null ? 1 : d.valid,
         sharable: d.sharable || 0,
+        marketingPromotion: d.marketingPromotion || 0,
+        savedMarketingPromotion: d.marketingPromotion || 0,
         coverUploadId: d.coverUploadId || null,
         coverUrl: coverUrl,
         posterWidth: d.posterWidth || 1080,
@@ -162,7 +166,7 @@ Page({
         validityMode: d.validityMode || 'forever',
         availableDays: d.availableDays == null ? '' : String(d.availableDays),
         expireDate: d.expireDate || '',
-        rules: that._decorate(d.rules || []),
+        rules: that._decorate(d.rules || [], d.bizType),
         loading: false
       }, function () {
         that._updateQrOverlay()
@@ -174,11 +178,12 @@ Page({
   },
 
   // WXML 不支持方法调用，行上要用的判断一律在这里派生好
-  _decorate(rules) {
+  _decorate(rules, bizType) {
     return rules.map(function (r) {
       return Object.assign({}, r, {
         priceText: r.productId === 0 ? '' : ('原价 ¥' + r.salePrice),
-        isWildcard: r.productId === 0
+        isWildcard: r.productId === 0,
+        productName: bizType === '租赁' && r.productId === 0 ? '整单租金' : r.productName
       })
     })
   },
@@ -256,7 +261,13 @@ Page({
 
   onSwitch(e) {
     var patch = {}
-    patch[e.currentTarget.dataset.field] = e.detail.value ? 1 : 0
+    var field = e.currentTarget.dataset.field
+    patch[field] = e.detail.value ? 1 : 0
+    if (field === 'marketingPromotion' && !e.detail.value) {
+      patch.timelinePosterUrl = ''
+      patch.timelineSharePath = ''
+      patch.shareMode = ''
+    }
     this.setData(patch)
   },
 
@@ -345,6 +356,7 @@ Page({
       hide: that.data.hide,
       valid: that.data.valid,
       sharable: that.data.sharable,
+      marketingPromotion: that.data.marketingPromotion,
       coverUploadId: that.data.coverUploadId,
       posterWidth: parseInt(that.data.posterWidth, 10) || 1080,
       posterHeight: parseInt(that.data.posterHeight, 10) || 1440,
@@ -356,9 +368,9 @@ Page({
       wx.showToast({ title: '已保存', icon: 'success' })
       // 新建完要留在本页继续配商品优惠，所以就地转成编辑态而不是返回
       if (that.data.id <= 0 && res && res.id) {
-        that.setData({ id: res.id, isNew: false, saving: false })
+        that.setData({ id: res.id, isNew: false, saving: false, savedMarketingPromotion: that.data.marketingPromotion })
       } else {
-        that.setData({ saving: false })
+        that.setData({ saving: false, savedMarketingPromotion: that.data.marketingPromotion })
       }
     }).catch(function () {
       that.setData({ saving: false })
@@ -376,7 +388,7 @@ Page({
   // 两个按钮都是 open-type="share"，点谁只是置个模式标记，
   // 真正的分享由微信在 onShareAppMessage 里取内容
   onShareFriendTap() {
-    if (this.data.sharable !== 1) { return }
+    if (this.data.marketingPromotion !== 1 || this.data.savedMarketingPromotion !== 1) { return }
     this.setData({ shareMode: 'personal' })
   },
 
@@ -395,7 +407,7 @@ Page({
 
   onShareGroupTap() {
     var that = this
-    if (that.data.generatingGroupPoster || that.data.sharable !== 1) { return }
+    if (that.data.generatingGroupPoster || that.data.marketingPromotion !== 1 || that.data.savedMarketingPromotion !== 1) { return }
     if (!that.data.coverUploadId) {
       wx.showToast({ title: '请先上传并保存分享海报', icon: 'none' })
       return
@@ -471,7 +483,7 @@ Page({
     var that = this
     // 不是从分享按钮进来的（比如右上角菜单转发），不发券
     var mode = that.data.shareMode
-    if ((mode !== 'personal' && mode !== 'group') || that.data.sharable !== 1 || that.data.id <= 0) {
+    if ((mode !== 'personal' && mode !== 'group') || that.data.marketingPromotion !== 1 || that.data.savedMarketingPromotion !== 1 || that.data.id <= 0) {
       return {}
     }
     that.setData({ shareMode: '' })
@@ -492,7 +504,7 @@ Page({
   },
 
   onShareTimeline() {
-    if (!this.data.timelinePosterUrl || !this.data.timelineSharePath) {
+    if (this.data.marketingPromotion !== 1 || this.data.savedMarketingPromotion !== 1 || !this.data.timelinePosterUrl || !this.data.timelineSharePath) {
       wx.showToast({ title: '海报正在准备，请稍后再试', icon: 'none' })
       return {}
     }
@@ -513,7 +525,7 @@ Page({
 
   _prepareTimelineShare() {
     var that = this
-    if (that.data.id <= 0 || that.data.sharable !== 1 || !that.data.coverUploadId
+    if (that.data.id <= 0 || that.data.marketingPromotion !== 1 || that.data.savedMarketingPromotion !== 1 || !that.data.coverUploadId
       || that.data.timelinePreparing || that.data.timelinePosterUrl) { return }
     that.setData({ timelinePreparing: true })
     return data.shareMiniTicketTemplatePromise(that.data.id, 'group', app.globalData.sessionKey)
@@ -541,7 +553,7 @@ Page({
       rulePanel: 'form',
       editRuleId: 0,
       editProductId: 0,
-      editProductName: '',
+      editProductName: this.data.bizType === '租赁' ? '整单租金' : '',
       editMode: 'fixed',
       editValue: '',
       modeHint: MODE_HINT.fixed
@@ -601,7 +613,8 @@ Page({
       templateId: that.data.id,
       productId: that.data.editProductId,
       mode: that.data.editMode,
-      value: value
+      value: value,
+      rentalWholeOrder: that.data.bizType === '租赁'
     }, app.globalData.sessionKey).then(function () {
       that.setData({ rulePanel: '' })
       that.getData()

@@ -232,6 +232,10 @@ const getMyTickets = function (used, sessionKey) {
     })
   })
 }
+const getMyTicketsByStatePromise = function (state, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Ticket/GetMyTicketsByState?state=' + encodeURIComponent(state) + '&sessionKey=' + encodeURIComponent(sessionKey)
+  return util.performWebRequest(url, null)
+}
 const getMySharedTicketsPromise = function (sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Ticket/GetMySharedTickets?sessionKey=' + encodeURIComponent(sessionKey)
   return new Promise(function (resolve, reject) {
@@ -373,7 +377,7 @@ const getRentReceptingOrdersPromise = function (shop, sessionKey) {
   })
 }
 const getRentReceptingOrderPromise = function (id, sessionKey) {
-  var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrder/' + id.toString() + '?sessionKey=' + sessionKey
+  var getUrl = app.globalData.requestPrefix + 'Rent/GetReceptingOrder/' + id.toString() + '?sessionKey=' + sessionKey + '&benefitOptions=true'
   return new Promise(function (resolve, reject) {
     util.performWebRequest(getUrl, null).then(function (order) {
       resolve(order)
@@ -1282,9 +1286,21 @@ const getRentalPunchCardInfoPromise = function (orderId, sessionKey) {
     })
   })
 }
+const getRentalBenefitQuotePromise = function (orderId, sessionKey, draftAuto) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'RentalBenefit/Preview/' + orderId
+    + '?sessionKey=' + encodeURIComponent(sessionKey || '') + (draftAuto ? '&draftAuto=true' : ''), null)
+}
+const setRentalBenefitModePromise = function (orderId, mode, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'RentalBenefit/SetMode/' + orderId
+    + '?sessionKey=' + encodeURIComponent(sessionKey || ''), { mode: mode })
+}
+const commitRentalBenefitPromise = function (orderId, fingerprint, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'RentalBenefit/Commit/' + orderId
+    + '?sessionKey=' + encodeURIComponent(sessionKey || ''), { fingerprint: fingerprint })
+}
 // 次卡核销：用指定卡抵 punch_count 次（body = { card_id, punch_count }）
 const useRentalPunchCardPromise = function (orderId, body, sessionKey) {
-  var url = app.globalData.requestPrefix + 'Rent/UseRentalPunchCard/' + orderId + '?sessionKey=' + sessionKey
+  var url = app.globalData.requestPrefix + 'Rent/UseRentalPunchCard/' + orderId + '?sessionKey=' + sessionKey + '&requireVerified=true'
   return new Promise(function (resolve, reject) {
     util.performWebRequest(url, body).then(function (order) {
       resolve(order)
@@ -1613,6 +1629,24 @@ const createMiniQrCodeBatchPromise = function (templateId, channel, sessionKey) 
   return util.performWebRequest(app.globalData.requestPrefix + 'TicketTemplateAdmin/CreateMiniQrCodeBatchByStaff'
     + '?templateId=' + templateId + '&channel=' + encodeURIComponent(channel || '')
     + '&sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const staffCouponTemplatesPromise = function (sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'StaffCouponBatch/Templates?sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const staffCouponBatchesPromise = function (templateId, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'StaffCouponBatch/Batches?templateId=' + templateId + '&sessionKey=' + encodeURIComponent(sessionKey || ''), null)
+}
+const createStaffCouponBatchPromise = function (form, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'StaffCouponBatch/Create?sessionKey=' + encodeURIComponent(sessionKey || ''), form)
+}
+const revokeStaffCouponBatchPromise = function (batchId, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'StaffCouponBatch/Revoke?batchId=' + batchId + '&sessionKey=' + encodeURIComponent(sessionKey || ''), {})
+}
+const deleteStaffCouponBatchPromise = function (batchId, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'StaffCouponBatch/Delete?batchId=' + batchId + '&sessionKey=' + encodeURIComponent(sessionKey || ''), {})
+}
+const claimStaffCouponBatchPromise = function (batchId, sessionKey) {
+  return util.performWebRequest(app.globalData.requestPrefix + 'TicketShare/ClaimStaffBatch?batchId=' + batchId + '&sessionKey=' + encodeURIComponent(sessionKey || ''), {})
 }
 const getMiniShareBatchPromise = function (batchId, sessionKey) {
   return util.performWebRequest(app.globalData.requestPrefix + 'TicketShare/GetMiniShareBatch'
@@ -2101,6 +2135,7 @@ module.exports = {
   updateRentPricePromise,
   getShopByNamePromise,
   getMyTickets,
+  getMyTicketsByStatePromise,
   getTicket,
   getMySharedTicketsPromise,
   getMyAcceptedTicketsPromise,
@@ -2180,6 +2215,9 @@ module.exports = {
   payWithDepositPromise,
   writeoffCareOrderPromise,
   getRentalPunchCardInfoPromise,
+  getRentalBenefitQuotePromise,
+  setRentalBenefitModePromise,
+  commitRentalBenefitPromise,
   useRentalPunchCardPromise,
   getPunchCardProductsPromise,
   getPunchCardProductPromise,
@@ -2220,6 +2258,12 @@ module.exports = {
   acceptMiniTicketPromise,
   shareMiniTicketTemplatePromise,
   createMiniQrCodeBatchPromise,
+  staffCouponTemplatesPromise,
+  staffCouponBatchesPromise,
+  createStaffCouponBatchPromise,
+  revokeStaffCouponBatchPromise,
+  deleteStaffCouponBatchPromise,
+  claimStaffCouponBatchPromise,
   getMiniShareBatchPromise,
   claimMiniSharedTicketPromise,
   claimMiniQrCodeTicketPromise,

@@ -72,12 +72,6 @@
     <mp-cell  id="rent_recepting" value="【租赁】未完成的接待" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells  title="储值管理" >
-    <mp-cell id="deposit_list" value="【储值】账户列表" bindtap="nav" ></mp-cell>
-    <mp-cell id="deposit_add" value="【储值】新增储值" bindtap="nav" ></mp-cell>
-    <mp-cell id="deposit_balance" value="【储值】资金流水" bindtap="nav" ></mp-cell>
-  </mp-cells>
-  <mp-cells  title="VIP" >
-    <mp-cell id="vip_maintain" value="【招待】养护招待" bindtap="nav" ></mp-cell>
   </mp-cells>
   <mp-cells  title="用户管理" >
     <mp-cell id="staff_reg" value="【人事】新员工入职" bindtap="nav" wx:if="{{isManager}}" ></mp-cell>

@@ -138,6 +138,7 @@
                 </view>
               </view>
               <view wx:if="{{pkg.coach_card_id && pkg._coachHint}}" class="coach-hint">{{pkg._coachHint}}</view>
+              <view wx:if="{{pkg.benefit_mode == 'manual' || pkg.benefit_mode == 'none'}}" class="coach-hint" data-ridx="{{ridx}}" catchtap="onPkgAutoBenefitTap">恢复自动匹配</view>
 
               <!-- 起租日期 / 时间 -->
               <view class="kv-row">
@@ -309,6 +310,7 @@
     </view>
   </block>
 
+  <view wx:if="{{trialMessage}}" style="color:#c62828">{{trialMessage}}</view>
   <!-- 底部固定区：4 个快捷入口 + 押金合计 / 去结算 -->
   <view class="bottom-stack">
     <view class="action-bar">
@@ -336,6 +338,7 @@
         <text class="checkout-deposit">押金 ¥{{summary.depositLabel}}</text>
         <text wx:if="{{summary.depositReduce > 0}}" class="checkout-reduce">已减免 -¥{{summary.depositReduceLabel}}</text>
         <text class="checkout-rent">租金 ¥{{summary.rentLabel}}</text>
+        <text wx:if="{{benefitQuote}}" class="checkout-reduce">{{benefitQuote.label}} · 预计优惠 ¥{{benefitQuote.saved}} · 租金 ¥{{benefitQuote.payable}}</text>
         <text wx:if="{{summary.hasEntertain}}" class="checkout-reduce">减免金额 -¥{{summary.rentReduceLabel}}</text>
         <text wx:if="{{summary.hasEntertain}}" class="checkout-rent">实付金额 ¥{{summary.rentPayableLabel}}</text>
       </view>

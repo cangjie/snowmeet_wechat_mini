@@ -27,12 +27,16 @@
     </view>
     <view class="frow">
       <text class="flabel">可分享</text>
-      <switch class="fswitch" checked="{{sharable == 1}}" data-field="sharable" bindchange="onSwitch" color="#2EA6D0" />
+      <switch class="fswitch" checked="{{sharable == 1}}" data-field="sharable" bindchange="onSwitch" disabled="{{saving}}" color="#2EA6D0" />
     </view>
     <view class="sec-hint">
-      打开后，本页底部会出现分享按钮，店员可以把这个模板的券以小程序卡片发给微信好友。
-      像「非雪季赠双项」这类随单自动发的券别开，误分享就是白送一张。
+      控制符合现有转赠规则的顾客是否可以互相转赠此券，与市场推广分别设置。
     </view>
+    <view class="frow">
+      <text class="flabel">市场推广</text>
+      <switch class="fswitch" checked="{{marketingPromotion == 1}}" data-field="marketingPromotion" bindchange="onSwitch" disabled="{{saving}}" color="#2EA6D0" />
+    </view>
+    <view class="sec-hint">打开并保存后，店员可以批次分享此模板，并生成分享海报和小程序卡片。关闭后已发出的链接仍可领取。</view>
   </view>
 
   <!-- 业务类型 -->
@@ -81,8 +85,9 @@
 
   <!-- 商品优惠 -->
   <view class="card">
-    <view class="sec-title">商品优惠</view>
-    <view class="sec-hint">
+    <view class="sec-title">{{bizType == '租赁' ? '整单租金优惠' : '商品优惠'}}</view>
+    <view class="sec-hint" wx:if="{{bizType == '租赁'}}">每张券作用于整笔订单的租金，不抵押金、超时费或赔偿费。</view>
+    <view class="sec-hint" wx:else>
       这个模板的券用在哪些商品上、怎么优惠。没配到的商品按原价，券只起「能核销」的作用。
     </view>
 
@@ -98,7 +103,7 @@
     </view>
     <view class="empty" wx:if="{{rules.length == 0}}">还没有商品优惠</view>
 
-    <view class="rule-add" bindtap="onAddRuleTap">+ 添加商品优惠</view>
+    <view class="rule-add" bindtap="onAddRuleTap">{{bizType == '租赁' ? '+ 设置整单优惠' : '+ 添加商品优惠'}}</view>
   </view>
 
   <!-- 分享：海报 / 小程序卡片 / 记录，三个子区各自折叠 -->
@@ -122,7 +127,7 @@
       <view class="frow"><text class="flabel">二维码宽</text><input class="finput" type="number" value="{{qrWidth}}" data-field="qrWidth" bindinput="onInput" /></view>
       <view class="frow"><text class="flabel">二维码高</text><input class="finput" type="number" value="{{qrHeight}}" data-field="qrHeight" bindinput="onInput" /></view>
 
-      <block wx:if="{{sharable == 1 && id > 0}}">
+      <block wx:if="{{marketingPromotion == 1 && savedMarketingPromotion == 1 && id > 0}}">
         <button class="share-btn share-btn--ghost poster-share-btn" loading="{{generatingGroupPoster}}" bindtap="onShareGroupTap">生成群分享海报</button>
         <button class="share-btn share-btn--ghost poster-share-btn" loading="{{timelinePreparing}}" disabled="{{timelinePreparing || timelinePosterUrl}}" bindtap="onPrepareTimelineTap">{{timelinePosterUrl ? '朋友圈分享已准备' : '准备朋友圈分享'}}</button>
         <view class="sec-hint">准备完成后，可通过右上角菜单分享到朋友圈。</view>
@@ -135,10 +140,10 @@
         </view>
         <view class="sec-hint">静态二维码会复用本模板的长期二维码；动态二维码仅对应本次群分享。</view>
       </block>
-      <view class="sec-hint" wx:else>模板要先保存、并打开「可分享」，才能生成群分享海报。</view>
+      <view class="sec-hint" wx:else>模板要先保存并打开「市场推广」，才能生成群分享海报。</view>
     </view>
 
-    <block wx:if="{{sharable == 1 && id > 0}}">
+    <block wx:if="{{marketingPromotion == 1 && savedMarketingPromotion == 1 && id > 0}}">
       <view class="acc-head" data-key="card" bindtap="onShareSectionTap">
         <text class="acc-title">分享小程序卡片</text>
         <text class="acc-arrow {{shareOpen.card ? 'acc-arrow--open' : ''}}">›</text>
@@ -153,6 +158,8 @@
         </view>
       </view>
 
+    </block>
+    <block wx:if="{{id > 0}}">
       <view class="acc-head" data-key="batch" bindtap="onShareSectionTap">
         <text class="acc-title">分享记录</text>
         <text class="acc-count" wx:if="{{shareBatches.length > 0}}">{{shareBatches.length}}</text>
@@ -189,9 +196,9 @@
   <view class="panel" catchtap="onNoop">
 
     <block wx:if="{{rulePanel == 'form'}}">
-      <view class="panel-title">商品优惠</view>
+      <view class="panel-title">{{bizType == '租赁' ? '整单租金优惠' : '商品优惠'}}</view>
 
-      <view class="frow" bindtap="onPickProductTap">
+      <view class="frow" wx:if="{{bizType != '租赁'}}" bindtap="onPickProductTap">
         <text class="flabel">商品</text>
         <view class="fpicker">{{editProductName || '请选择'}}</view>
         <text class="rrow-arrow">›</text>

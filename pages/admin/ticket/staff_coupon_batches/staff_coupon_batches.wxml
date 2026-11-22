@@ -1,0 +1,51 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="notice">加载中…</view>
+  <view wx:elif="{{blocked}}" class="notice">{{blocked}}</view>
+  <block wx:elif="{{!selected}}">
+    <view class="notice">选择管理员已开启市场推广的优惠券模板，然后创建分享批次。</view>
+    <view class="card" wx:for="{{templates}}" wx:key="id" data-id="{{item.id}}" bindtap="selectTemplate">
+      <view class="title">{{item.name}} <text class="arrow">›</text></view>
+      <view class="meta" wx:if="{{item.memo}}">{{item.memo}}</view>
+    </view>
+    <view wx:if="{{!templates.length}}" class="notice">暂无开启市场推广的优惠券模板</view>
+  </block>
+  <block wx:elif="{{editing}}">
+    <view class="card">
+      <view class="title">{{selected.name}}</view>
+      <view class="label">发放方式</view>
+      <view class="modes">
+        <view class="mode {{mode == 'single' ? 'active' : ''}}" data-mode="single" bindtap="setMode">发给一人，多张</view>
+        <view class="mode {{mode == 'multiple' ? 'active' : ''}}" data-mode="multiple" bindtap="setMode">发给多人，每人一张</view>
+      </view>
+      <view class="meta">{{mode == 'single' ? '一位顾客一次领取本批全部优惠券，其他人不能再领。' : '每位顾客限领一张，领完为止。'}}</view>
+      <view class="label">本批总张数</view>
+      <input class="input" type="number" placeholder="请输入 1～500" value="{{count}}" bindinput="setCount" />
+      <view class="meta">创建时不生成券，顾客领取后生成。</view>
+      <view class="actions"><button class="action-btn" bindtap="cancelEdit">返回</button><button class="action-btn primary" loading="{{busy}}" disabled="{{busy}}" bindtap="create">创建批次</button></view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="card"><view class="title">{{selected.name}}</view><view class="meta">{{selected.memo}}</view><view class="actions"><button class="action-btn" bindtap="back">返回模板</button><button class="action-btn primary" bindtap="newBatch">＋ 创建批次</button></view></view>
+    <view wx:if="{{coverPath}}" class="cover-preview"><view class="cover-label">分享封面预览</view><image class="cover-image" src="{{coverPath}}" mode="widthFix" /></view>
+    <view class="heading">分享批次</view>
+    <view class="card" wx:for="{{batches}}" wx:key="batchId">
+      <view class="title">{{item.mode == 'single' ? '发给一人' : (item.mode == 'multiple' ? '发给多人' : '历史分享')}} <text class="status">{{!item.valid ? '已撤回' : (item.remaining === 0 ? '已领完' : '分享中')}}</text></view>
+      <view class="meta">{{item.created}} · {{item.staffName}}</view>
+      <view class="stats">总共 {{item.total == null ? '不限' : item.total}} 张 · {{item.people}} 人领取</view>
+      <view class="stats">已领取 {{item.claimed}} 张 · 剩余 {{item.remaining == null ? '不限' : item.remaining}} 张</view>
+      <view class="actions" wx:if="{{item.mode != 'legacy' && item.valid && item.remaining > 0}}">
+        <button class="action-btn" data-id="{{item.batchId}}" bindtap="showQr">分享二维码</button>
+        <button wx:if="{{coverPath}}" class="action-btn primary" open-type="share" data-path="{{item.sharePath}}" data-cover="{{coverPath}}">分享小程序卡片</button>
+        <button wx:elif="{{coverError}}" class="action-btn" bindtap="retryCover">重试生成封面</button>
+        <button wx:else class="action-btn" disabled>封面生成中…</button>
+        <button wx:if="{{item.isMine}}" class="action-btn danger" data-id="{{item.batchId}}" bindtap="revoke">撤回</button>
+      </view>
+      <view class="actions" wx:if="{{item.canDelete}}">
+        <button class="action-btn danger" data-id="{{item.batchId}}" bindtap="deleteBatch" loading="{{deletingBatchId == item.batchId}}" disabled="{{!!deletingBatchId}}">删除</button>
+      </view>
+    </view>
+    <view wx:if="{{!batches.length}}" class="notice">暂无分享批次</view>
+  </block>
+  <view wx:if="{{qr}}" class="mask" bindtap="closeQr"><view class="popup" catchtap="noop"><view class="title">分享二维码</view><image src="{{qr.url}}" mode="aspectFit" show-menu-by-longpress /><view class="meta">长按二维码可保存或分享</view><button class="action-btn" bindtap="closeQr">关闭</button></view></view>
+  <canvas type="2d" id="staffCouponShareCover" style="position: fixed; left: -10000px; top: 0; width: 500px; height: 400px; pointer-events: none;"></canvas>
+</view>

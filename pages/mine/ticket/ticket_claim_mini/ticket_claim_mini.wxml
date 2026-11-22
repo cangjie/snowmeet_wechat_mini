@@ -18,13 +18,15 @@
       </view>
       <view class="card" wx:if="{{doneCode || info.claimed}}">
         <view class="ok">已领取</view>
-        <view class="ok-sub" wx:if="{{doneCode}}">券码 {{doneCode}}</view>
+        <view class="ok-sub" wx:if="{{info.shareType == 'staff_batch'}}">共领取 {{doneCount || info.claimQuantity}} 张，可到我的优惠券查看</view>
+        <view class="ok-sub" wx:elif="{{doneCode}}">券码 {{doneCode}}</view>
         <button class="btn" bindtap="onGoMyTickets">去我的优惠券</button>
       </view>
       <view class="card" wx:elif="{{info.soldOut}}">
         <view class="tip tip--err">{{info.shareType == 'personal' ? '这张券已经被别人领走了' : '这次分享的券已经领完了'}}</view>
       </view>
       <view class="card" wx:else>
+        <view class="tip" wx:if="{{info.shareType == 'staff_batch'}}">本次可领取 {{info.claimQuantity}} 张</view>
         <button class="btn" loading="{{claiming}}" disabled="{{claiming}}" bindtap="onClaim">领取优惠券</button>
       </view>
     </block>

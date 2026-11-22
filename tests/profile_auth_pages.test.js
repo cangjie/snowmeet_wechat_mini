@@ -1,7 +1,7 @@
 // 顾客验证手机号之后授权头像和昵称（2026-11-14 用户要求）：所有顾客端手机号入口都接上 profile-auth 弹层。
 //   1. 防遗漏：扫描所有非 legacy、非 staffadmin（店员绑定）且有 open-type="getPhoneNumber" 按钮的 wxml，
 //      必须同时放 <profile-auth id="profileAuth" />，并且它的 js 里调 profileAuth.ensureOn(...)。以后谁新加手机号入口忘了接，这里失败。
-//      例外：付款 / 收款环节一律不问（2026-11-15 用户：不论什么情况，付款的环节都不要询问，让顾客授权昵称和头像）——
+//      例外：雪票购买、付款 / 收款环节一律不问头像昵称——
 //      付款页、支付身份确认、收银身份核验、次卡购买；这几处有另一组测试保证它们永远不弹，谁想加回去会失败。
 //   2. 顺序：手机号验证成功后，先等弹层处理完（保存或跳过），才继续页面自己的后续步骤（核验、领券、购买、支付……）；
 //      手机号没授权成功时不弹。弹层没弹出来（组件取不到）时后续步骤照常走，不被拦住。
@@ -31,7 +31,7 @@ const allPhoneEntries = [...walk('pages', []), ...walk('components', [])]
   .filter(rel => PHONE_BUTTON.test(fs.readFileSync(path.join(ROOT, rel), 'utf8')))
 
 // 付款 / 收款环节：永远不弹头像昵称。payment_entry 是付款页（没有手机号按钮，授权在 pay-identity-confirm 里）
-const PAYMENT_FLOW_ENTRIES = ['pages/order/identity_verify.wxml', 'pages/punchcard/punchcard_detail.wxml', 'components/pay-identity-confirm/index.wxml']
+const PAYMENT_FLOW_ENTRIES = ['pages/order/identity_verify.wxml', 'pages/punchcard/punchcard_detail.wxml', 'components/pay-identity-confirm/index.wxml', 'pages/ski_pass/skipass_detail_new.wxml']
 const PAYMENT_FLOW_FILES = [...PAYMENT_FLOW_ENTRIES, 'pages/order/payment_entry.wxml']
 const norm = rel => rel.replace(/\\/g, '/')
 const phoneEntries = allPhoneEntries.filter(rel => !PAYMENT_FLOW_ENTRIES.includes(norm(rel)))
@@ -168,21 +168,32 @@ for (const c of PAGE_CASES) {
   })
 }
 
-test('skipass_detail_new（雪票预订，自动获取手机号）：绑定成功后弹层处理完，才把手机号填进页面', async t => {
+test('雪票预订：手机号授权后直接填入，不弹头像昵称', async t => {
   installGlobals(t, {
     request(o) { o.success({ statusCode: 200, data: { currentCell: '13800000000' } }) },
   })
   const page = loadPage('pages/ski_pass/skipass_detail_new.js', {})
   const log = []
-  const gate = withProfileGate(page, log)
+  withProfileGate(page, log)
   const done = page.getCell(PHONE_OK)
   await settle()
-  assert.deepEqual(log, ['ensure'])
-  assert.notEqual(page.data.cell, '13800000000')
-  gate.resolve()
+  assert.deepEqual(log, [])
   await done
   await settle()
   assert.equal(page.data.cell, '13800000000')
+})
+
+test('雪票确认弹层：微信手机号成功后填写号码，不弹头像昵称', async t => {
+  installGlobals(t, {
+    request(o) { o.success({ statusCode: 200, data: { currentCell: '13800000000' } }); o.complete() },
+  })
+  const page = loadPage('pages/ski_pass/skipass_detail_new.js', {})
+  const log = []
+  withProfileGate(page, log)
+  page.onConfirmGetCell(PHONE_OK)
+  await settle()
+  assert.equal(page.data.confirmCell, '13800000000')
+  assert.deepEqual(log, [])
 })
 
 // ---------- 3. 组件里的手机号入口 ----------

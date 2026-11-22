@@ -176,9 +176,6 @@ __L.Page({
       case 'recept_list':
         path = '/legacy/pages/admin/recept/recept_list'
         break
-      case 'vip_maintain':
-        path = '/legacy/pages/admin/vip/maintain_recept'
-        break
       case 'staff_list':
         path = '/legacy/pages/admin/user/staff_list'
         break
@@ -250,17 +247,8 @@ __L.Page({
       case 'ziwoyou_order':
         path = '/legacy/pages/admin/ski_pass/dhhs_skipass_order'
         break
-      case 'deposit_list':
-        path = '/legacy/pages/admin/deposit/deposit_list'
-        break
-      case 'deposit_add':
-        path = '/legacy/pages/admin/deposit/deposit_charge_search'
-        break
       case 'recept_auth':
         path = '/legacy/pages/admin/recept/recept_auth_list'
-        break
-      case 'deposit_balance':
-        path = '/legacy/pages/admin/deposit/deposit_balance'
         break
       case 'enterain_form':
         path = '/legacy/pages/admin/sale/enterain_form'

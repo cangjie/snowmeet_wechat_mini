@@ -10,7 +10,9 @@ Page({
     blocked: '', loading: true, tab: 'coupon', coach: null,
     couponCells: [], couponDirty: false,
     cardFilter: '', cardCounts: null, cards: [], name: '',
-    floorCells: [], floorRentalText: '', floorDirty: false
+    floorCells: [], floorRentalText: '', floorDirty: false,
+    reportLoading: false, reportLoaded: false, reportError: '', cardKinds: [], couponKinds: [],
+    reportOpen: '', recipients: [], recipientLoading: false, recipientError: '', recipientPage: 0, recipientTotal: 0
   },
 
   onLoad(options) {
@@ -30,15 +32,54 @@ Page({
       if (this.data.tab === 'coupon') return this.loadCouponFloors()
       if (this.data.tab === 'cards') return this.loadCards()
       if (this.data.tab === 'floor') return this.loadFloors()
+      if (this.data.tab === 'cardReport' || this.data.tab === 'couponReport') return this.loadDistribution()
     }).catch(err => { this.setData({ loading: false }); base.fail(err) })
   },
 
   onTab(e) {
     const tab = e.currentTarget.dataset.tab
-    this.setData({ tab })
+    this._recipientVersion = (this._recipientVersion || 0) + 1
+    this.setData({ tab, reportOpen: '', recipients: [], recipientError: '', recipientLoading: false })
     if (tab === 'coupon') this.loadCouponFloors()
     if (tab === 'cards') this.loadCards()
     if (tab === 'floor') this.loadFloors()
+    if ((tab === 'cardReport' || tab === 'couponReport') && !this.data.reportLoaded && !this.data.reportLoading) this.loadDistribution()
+  },
+
+  // ---- 每种会籍卡 / 优惠券的领取统计 ----
+  loadDistribution() {
+    this.setData({ reportLoading: true, reportError: '' })
+    return api.getDistributionSummary(this.id).then(d => {
+      this.setData({ reportLoading: false, reportLoaded: true, cardKinds: d.cards || [], couponKinds: d.coupons || [] })
+    }).catch(err => { this.setData({ reportLoading: false, reportError: (err && err.message) || '加载失败，请重试' }) })
+  },
+  onReportToggle(e) {
+    const kind = e.currentTarget.dataset.kind
+    const id = Number(e.currentTarget.dataset.id)
+    const key = kind + ':' + id
+    this._recipientVersion = (this._recipientVersion || 0) + 1
+    if (this.data.reportOpen === key) {
+      this.setData({ reportOpen: '', recipients: [], recipientLoading: false, recipientError: '' })
+      return
+    }
+    this.setData({ reportOpen: key, recipients: [], recipientPage: 0, recipientTotal: 0, recipientError: '', recipientLoading: false })
+    this.loadReportRecipients(kind, id, 1, this._recipientVersion)
+  },
+  onReportMore() {
+    if (this.data.recipientLoading || !this.data.reportOpen) return
+    const parts = this.data.reportOpen.split(':')
+    this.loadReportRecipients(parts[0], Number(parts[1]), this.data.recipientPage + 1, this._recipientVersion)
+  },
+  loadReportRecipients(kind, id, page, version) {
+    this.setData({ recipientLoading: true, recipientError: '' })
+    return api.getDistributionRecipients(this.id, kind, id, page).then(result => {
+      if (version !== this._recipientVersion) return
+      const rows = (result.items || []).map(r => Object.assign({}, r, { claimed: r.claimedAt ? String(r.claimedAt).replace('T', ' ').slice(0, 16) : '未知' }))
+      this.setData({ recipientLoading: false, recipientPage: page, recipientTotal: result.total,
+        recipients: page === 1 ? rows : this.data.recipients.concat(rows) })
+    }).catch(err => {
+      if (version === this._recipientVersion) this.setData({ recipientLoading: false, recipientError: (err && err.message) || '加载失败，请重试' })
+    })
   },
 
   // ---- 优惠券底价：这位分销商自己生成单张优惠券时，一口价不能低于 / 折扣不能低于 / 减免不能超过；某种方式留空 = 没开放，他的界面不显示 ----

@@ -16,6 +16,7 @@ const app = getApp();
 const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 const { normalizePhone, shouldLookupPhone } = require('../../../utils/phone.js');
+const localQrImage = require('../../../utils/local_qr_image.js');
 
 const POLL_INTERVAL = 1500;
 const MEMBER_PAGE = '/pages/admin/reception/recept_member';
@@ -68,6 +69,7 @@ Page({
   },
 
   onUnload() {
+    this._seq += 1;
     this._stopPolling();
     this._discardUnusedCode();
   },
@@ -92,8 +94,20 @@ Page({
       that._creating = false;
       const qrCodeUrl = app.globalData.requestPrefix + 'MediaHelper/GetQRCode?qrCodeText='
         + encodeURIComponent(checkin.qrText);
-      that.setData({ checkin, qrCodeUrl, loadingQr: false, stageText: '请顾客用微信扫码' });
+      const local = localQrImage.isLocalUrl(qrCodeUrl);
+      that.setData({ checkin, qrCodeUrl: local ? '' : qrCodeUrl, loadingQr: local,
+        stageText: local ? '正在生成二维码…' : '请顾客用微信扫码' });
       that._startPolling();
+      if (local) {
+        localQrImage.load(qrCodeUrl).then(image => {
+          if (seq !== that._seq || !that.data.checkin || that.data.checkin.id !== checkin.id) return;
+          that.setData({ qrCodeUrl: image, loadingQr: false, stageText: '请顾客用微信扫码' });
+        }).catch(err => {
+          if (seq !== that._seq || !that.data.checkin || that.data.checkin.id !== checkin.id) return;
+          console.warn('接待二维码加载失败', err.message);
+          that.setData({ loadingQr: false, stageText: err.message + '，请点「换一个码」重试' });
+        });
+      }
     }).catch(function () {
       if (seq !== that._seq) return;
       that._creating = false;
@@ -103,6 +117,11 @@ Page({
 
   onRefreshTap() {
     this.refreshCheckin();
+  },
+
+  onQrImageError(e) {
+    if (!this.data.checkin || String(e.currentTarget.dataset.checkinId) !== String(this.data.checkin.id)) return;
+    this.setData({ qrCodeUrl: '', loadingQr: false, stageText: '二维码图片加载失败，请点「换一个码」重试' });
   },
 
   _startPolling() {

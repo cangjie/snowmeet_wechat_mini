@@ -7,6 +7,7 @@ Page({
   data: { loading: true, cards: [] },
 
   onLoad() { Promise.resolve(getApp().loginPromiseNew).then(() => this.load()).catch(() => {}) },
+  onShow() { if (this.loadedOnce) return this.load() },
   onPullDownRefresh() { this.load().then(() => wx.stopPullDownRefresh()) },
 
   load() {
@@ -14,6 +15,7 @@ Page({
       const cards = d.cards.map(c => Object.assign({}, c, {
         benefit: view.benefitLines(c.carePrices, c.rentalRate), until: view.dayText(c.validUntil)
       }))
+      this.loadedOnce = true
       this.setData({ loading: false, cards })
     }).catch(err => { this.setData({ loading: false }); base.fail(err) })
   }

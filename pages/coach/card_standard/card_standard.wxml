@@ -119,7 +119,7 @@
       <view wx:if="{{rental.belowFloor}}" class="below-floor" style="margin-left: 0;">当前设置低于底价，保存前请调整。</view>
     </view>
 
-    <view class="note">修改只影响之后领取的新卡，已领取的卡保留领取时的名称和价格。保存后可在分销商中心分享。</view>
+    <view class="note">保存后，已领取和之后领取的卡都会使用卡种的最新优惠；已开单的订单金额不变。</view>
   </block>
   <view wx:if="{{qr.show}}" class="qr-mask">
     <view class="qr-pop">

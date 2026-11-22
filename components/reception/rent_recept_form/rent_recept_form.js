@@ -19,6 +19,15 @@ const KEY_TO_PT = { now: '立即租赁', later: '先租后取', delay: '延时�
 const { destinations } = require('../../../utils/cross_shop_rent.js');
 
 const { repricePreset, modeForDateChange, catalogPriceFor } = require('../../../utils/rent_date_price.js');
+const rentBenefit = require('../../../utils/rent_benefit.js');
+const { isUnavailable } = require('../../../utils/rent_product_availability.js');
+const trialApi = require('../../../utils/trial_api.js');
+const AUTO_SNOWBOARD_CODES = new Set(['108', '109', '110', '111', '112']);
+const ORDINARY_SNOWBOARD_CATEGORY_ID = 69;
+function isTrialBoard(item) {
+  return item && Number(item.category_id) === ORDINARY_SNOWBOARD_CATEGORY_ID
+    && AUTO_SNOWBOARD_CODES.has(String(item.barcode || item.code || '').trim());
+}
 
 // 开单生效时是否当场把装备发给顾客（后端 EffectRental 按 rentItem.atOnce 发放并把租赁物标记为「租赁中」）。
 //   立即租赁：当场发放，从现在起计费。
@@ -100,6 +109,10 @@ function evalEntry(item) {
   if (item && !item.is_associate && !item.category_id) {
     return { ok: false, label: '分类未选' };
   }
+  if (item && item.noCode && Number(item.category_id) === ORDINARY_SNOWBOARD_CATEGORY_ID
+      && AUTO_SNOWBOARD_CODES.has(String(item.name || ''))) {
+    return { ok: false, label: '单板编码待确认' };
+  }
   if (item && item.pick_type === '异店租赁') {
     return item.pickup_shop ? { ok: true, label: '异店待领取' } : { ok: false, label: '领取门店未选' };
   }
@@ -146,6 +159,11 @@ function formatDate(d) {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+function trialStartDate(rental, item) {
+  const today = formatDate(new Date());
+  const start = rental ? (splitISODateTime(rental.start_date).date || today) : today;
+  return item && (item.atOnce || atOnceForPickType(item.pick_type)) && start > today ? today : start;
 }
 
 function formatTime(d) {
@@ -217,8 +235,9 @@ Component({
 
   properties: {
     shop: { type: String, value: '' },
+    orderId: { type: Number, value: 0, observer() { if (this._scheduleBenefitQuote) this._scheduleBenefitQuote(); } },
     // 会员变了，已选的学员卡不属于新会员，全部清掉（服务端保存时也会校验）
-    memberId: { type: Number, value: 0, observer(n, o) { if (o && n !== o && this._clearCoachCards) this._clearCoachCards(); } },
+    memberId: { type: Number, value: 0, observer(n, o) { if (o && n !== o && this._clearCoachCards) this._clearCoachCards(); if (this._scheduleBenefitQuote) this._scheduleBenefitQuote(); } },
     rentals: {
       type: Array,
       value: [],
@@ -231,6 +250,7 @@ Component({
     coachPopup: { show: false, ridx: -1, selectedCoachCardId: null, rentalAmount: 0 },
     rentModes: RENT_MODES,
     displayRentals: [],
+    benefitQuote: null,
     expandedPkg: {},
     expandedItem: {},
     summary: {
@@ -278,7 +298,23 @@ Component({
   },
 
   lifetimes: {
-    attached() { this._refreshRentals(this.properties.rentals || []); },
+    attached() {
+      this._refreshRentals(this.properties.rentals || []);
+      this._trialTimer = setInterval(() => {
+        if (this._trialCheckKey && this._trialCheckKey !== '[]') {
+          this._trialCheckKey = null;
+          this._refreshSummary();
+        }
+      }, 10000);
+    },
+    detached() {
+      if (this._benefitTimer) clearTimeout(this._benefitTimer);
+      if (this._trialTimer) clearInterval(this._trialTimer);
+      this._trialCheckKey = null;
+      this._trialCheckSeq = (this._trialCheckSeq || 0) + 1;
+      this._benefitSeq = (this._benefitSeq || 0) + 1;
+      Object.keys(this._snowboardLookups || {}).forEach(id => this._cancelSnowboardLookup(id));
+    },
   },
 
   methods: {
@@ -293,9 +329,12 @@ Component({
       const today = formatDate(new Date());
       const tmrwDate = new Date(); tmrwDate.setDate(tmrwDate.getDate() + 1);
       const tmrw = formatDate(tmrwDate);
+      const previousRentals = this.data.displayRentals || [];
 
       const augmented = raw.map((r, idx) => {
         const key = pkgKey(r, idx);
+        const previous = previousRentals.find(old =>
+          (r.id && old.id === r.id) || (r.rentClientKey && old.rentClientKey === r.rentClientKey));
         if (expandedPkg[key] === undefined) expandedPkg[key] = (idx === 0);
 
         const dailyRate = getDailyRate(r);
@@ -308,14 +347,21 @@ Component({
 
         const items = (r.rentItems || []).map((it, iidx) => {
           const ikey = itemKey(it, idx, iidx);
+          const previousItem = previous && (previous.rentItems || []).find(old =>
+            (it.id && old.id === it.id) || (it.rentItemClientKey && old.rentItemClientKey === it.rentItemClientKey));
+          const pendingLookup = previousItem && (this._snowboardLookups || {})[previousItem._snowboardLookupId];
+          const preserveLookup = pendingLookup && previousItem.name === pendingLookup.value
+            && previousItem.category_id === it.category_id && it.noCode && !it.noNeed;
+          const displayItem = preserveLookup ? { ...it, name: previousItem.name } : it;
           // 待选分类的主项（无码物品入口创建时）默认展开，让用户立刻看到分类入口
-          const needsCategory = !it.is_associate && !it.category_id && !it.noNeed;
+          const needsCategory = !displayItem.is_associate && !displayItem.category_id && !displayItem.noNeed;
           if (expandedItem[ikey] === undefined) expandedItem[ikey] = needsCategory;
-          const catName = it.class_name || it.categoryName || (it.category && it.category.name) || '';
-          const title = catName || it.name || (needsCategory ? '待选分类' : '待录入');
-          const entry = evalEntry(it);
+          const catName = displayItem.class_name || displayItem.categoryName || (displayItem.category && displayItem.category.name) || '';
+          const title = catName || displayItem.name || (needsCategory ? '待选分类' : '待录入');
+          const entry = evalEntry(displayItem);
           return {
-            ...it,
+            ...displayItem,
+            _snowboardLookupId: preserveLookup ? previousItem._snowboardLookupId : null,
             _key: ikey,
             _expanded: expandedItem[ikey],
             _title: title,
@@ -363,7 +409,25 @@ Component({
       this.setData({ displayRentals: augmented, expandedPkg, expandedItem }, () => {
         this._refreshSummary();
         this._ensureReserveLists();
+        this._scheduleBenefitQuote();
       });
+    },
+
+    _scheduleBenefitQuote() {
+      if (this._benefitTimer) clearTimeout(this._benefitTimer);
+      const seq = this._benefitSeq = (this._benefitSeq || 0) + 1;
+      const orderId = Number(this.properties.orderId) || 0;
+      if (!orderId || !this.properties.memberId) { this.setData({ benefitQuote: null }); return; }
+      this._benefitTimer = setTimeout(() => {
+        const benefitData = require('../../../utils/data.js');
+        benefitData.getRentalBenefitQuotePromise(orderId, getApp().globalData.sessionKey, true).then((result) => {
+          if (seq !== this._benefitSeq) return;
+          const q = result && result.quote;
+          const raw = result && result.units ? result.units.reduce((sum, u) => sum + Number(u.gross || 0), 0) : 0;
+          this.setData({ benefitQuote: q ? { payable: Number(q.payable || 0).toFixed(2),
+            saved: Math.max(0, raw - Number(q.payable || 0)).toFixed(2), label: rentBenefit.describe(result) } : null });
+        }).catch(() => { if (seq === this._benefitSeq) this.setData({ benefitQuote: null }); });
+      }, 300);
     },
 
     /* ---------- 门市价 / 预约价 ----------
@@ -480,8 +544,34 @@ Component({
       rent = Math.round(rent * 100) / 100;
       rentReduce = Math.round(rentReduce * 100) / 100;
       const count = list.length;
-      const canCheckout = count > 0 && list.every(r => evalRental(r).ok);
+      const trials = [];
+      list.forEach(r => (r.rentItems || []).forEach(item => {
+        if (!item.noNeed && item.rent_product_id && isTrialBoard(item)) trials.push({
+          productId: item.rent_product_id,
+          date: trialStartDate(r, item)
+        });
+      }));
+      const key = JSON.stringify(trials);
+      if (key !== this._trialCheckKey) {
+        this._trialCheckKey = key;
+        const seq = this._trialCheckSeq = (this._trialCheckSeq || 0) + 1;
+        this._trialBlocked = trials.length > 0;
+        this._trialMessage = trials.length ? '正在检查试滑预约…' : '';
+        if (trials.length) Promise.all(trials.map(t => trialApi.request('RentalAvailability', t))).then(results => {
+          if (this._trialCheckKey !== key || this._trialCheckSeq !== seq) return;
+          this._trialBlocked = results.some(r => !r.available);
+          this._trialMessage = this._trialBlocked ? '该租赁物暂不可用，请更换租赁物' : '';
+          this._refreshSummary();
+        }).catch(() => {
+          if (this._trialCheckKey !== key || this._trialCheckSeq !== seq) return;
+          this._trialBlocked = true;
+          this._trialMessage = '查询试滑预约失败，请重新选择租赁物';
+          this._refreshSummary();
+        });
+      }
+      const canCheckout = count > 0 && list.every(r => evalRental(r).ok) && !this._trialBlocked;
       this.setData({
+        trialMessage: this._trialMessage || '',
         summary: {
           depositLabel: deposit.toLocaleString('en-US'),
           depositReduce: depositReduce,
@@ -514,6 +604,7 @@ Component({
       const card = e.detail.selectedCoachCard || null;
       const patch = { 'coachPopup.show': false };
       patch[`displayRentals[${ridx}].coach_card_id`] = card ? card.cardId : null;
+      patch[`displayRentals[${ridx}].benefit_mode`] = card ? 'manual' : 'none';
       patch[`displayRentals[${ridx}]._coachCardName`] = card ? (card.coachName || '') : '';
       patch[`displayRentals[${ridx}]._coachCardLabel`] = card ? (card.cardName || '') : '';
       patch[`displayRentals[${ridx}]._coachHint`] = card
@@ -522,13 +613,25 @@ Component({
       this.setData(patch);
       this._emitSync(true);
     },
+    onPkgAutoBenefitTap(e) {
+      const ridx = Number(e.currentTarget.dataset.ridx);
+      const patch = {};
+      patch[`displayRentals[${ridx}].coach_card_id`] = null;
+      patch[`displayRentals[${ridx}].benefit_mode`] = 'auto';
+      patch[`displayRentals[${ridx}]._coachCardName`] = '';
+      patch[`displayRentals[${ridx}]._coachCardLabel`] = '';
+      patch[`displayRentals[${ridx}]._coachHint`] = '';
+      this.setData(patch);
+      this._emitSync(true);
+    },
     _clearCoachCards() {
       const patch = {};
       let any = false;
       (this.data.displayRentals || []).forEach((r, i) => {
-        if (!r.coach_card_id) return;
+        if (!r.coach_card_id && !r.benefit_mode) return;
         any = true;
         patch[`displayRentals[${i}].coach_card_id`] = null;
+        patch[`displayRentals[${i}].benefit_mode`] = 'auto';
         patch[`displayRentals[${i}]._coachCardName`] = '';
         patch[`displayRentals[${i}]._coachHint`] = '';
       });
@@ -973,6 +1076,91 @@ Component({
     },
 
     /* ---------- 单品字段 ---------- */
+    _cancelSnowboardLookup(id) {
+      const lookup = (this._snowboardLookups || {})[id];
+      if (!lookup) return;
+      if (lookup.timer) clearTimeout(lookup.timer);
+      delete this._snowboardLookups[id];
+    },
+    _findSnowboardLookupItem(id) {
+      for (let ridx = 0; ridx < this.data.displayRentals.length; ridx++) {
+        const items = this.data.displayRentals[ridx].rentItems || [];
+        for (let iidx = 0; iidx < items.length; iidx++) {
+          if (items[iidx]._snowboardLookupId === id) return { ridx, iidx, item: items[iidx] };
+        }
+      }
+      return null;
+    },
+    _searchSnowboard(code) {
+      return require('../../../utils/data.js').searchBarCodeFuzzyPromise(code, ORDINARY_SNOWBOARD_CATEGORY_ID);
+    },
+    _scheduleSnowboardLookup(ridx, iidx, value) {
+      const item = this.data.displayRentals[ridx].rentItems[iidx];
+      this._cancelSnowboardLookup(item._snowboardLookupId);
+      const id = String(this._snowboardLookupSeq = (this._snowboardLookupSeq || 0) + 1);
+      this.setData({ [`displayRentals[${ridx}].rentItems[${iidx}]._snowboardLookupId`]: null });
+      if (Number(item.category_id) !== ORDINARY_SNOWBOARD_CATEGORY_ID || !item.noCode || item.noNeed || !AUTO_SNOWBOARD_CODES.has(value)) return;
+      this._snowboardLookups = this._snowboardLookups || {};
+      this._snowboardLookups[id] = { value, blurred: false };
+      this.setData({ [`displayRentals[${ridx}].rentItems[${iidx}]._snowboardLookupId`]: id });
+      this._snowboardLookups[id].timer = setTimeout(() => this._lookupSnowboard(id), 1000);
+    },
+    async _lookupSnowboard(id) {
+      const lookup = (this._snowboardLookups || {})[id];
+      if (!lookup) return;
+      let target = this._findSnowboardLookupItem(id);
+      if (!target || target.item.name !== lookup.value || !target.item.noCode || target.item.noNeed
+          || Number(target.item.category_id) !== ORDINARY_SNOWBOARD_CATEGORY_ID) {
+        this._cancelSnowboardLookup(id);
+        return;
+      }
+      try {
+        const products = await this._searchSnowboard(lookup.value);
+        if (!(this._snowboardLookups || {})[id]) return;
+        target = this._findSnowboardLookupItem(id);
+        if (!target || target.item.name !== lookup.value || !target.item.noCode || target.item.noNeed
+            || Number(target.item.category_id) !== ORDINARY_SNOWBOARD_CATEGORY_ID) {
+          this._cancelSnowboardLookup(id);
+          return;
+        }
+        const matches = (products || []).filter(p => Number(p.category_id) === ORDINARY_SNOWBOARD_CATEGORY_ID
+          && String(p.barcode || '').trim() === lookup.value);
+        if (matches.length !== 1) {
+          wx.showToast({ title: matches.length ? '编码存在重复，请手动选择' : '未找到该编码的单板', icon: 'none' });
+        } else if (isUnavailable(matches[0])) {
+          wx.showToast({ title: '该租赁物暂不可用', icon: 'none' });
+        } else {
+          const startDate = this.data.displayRentals[target.ridx].start_date;
+          const available = await this._trialProductAvailable(matches[0], target.ridx, target.iidx);
+          if (!(this._snowboardLookups || {})[id]) return;
+          target = this._findSnowboardLookupItem(id);
+          if (!target || target.item.name !== lookup.value || !target.item.noCode || target.item.noNeed
+              || Number(target.item.category_id) !== ORDINARY_SNOWBOARD_CATEGORY_ID) {
+            this._cancelSnowboardLookup(id);
+            return;
+          }
+          if (this.data.displayRentals[target.ridx].start_date !== startDate) {
+            this._cancelSnowboardLookup(id);
+            wx.showToast({ title: '起租日期已变更，请重新选择单板', icon: 'none' });
+            return;
+          }
+          if (!available) wx.showToast({ title: '该租赁物暂不可用', icon: 'none' });
+          else if (this._applyProductToItem(target.ridx, target.iidx, matches[0], false)) {
+            this._cancelSnowboardLookup(id);
+            this._emitSync(false);
+            return;
+          }
+        }
+      } catch (err) {
+        if (!(this._snowboardLookups || {})[id]) return;
+        if (!this._findSnowboardLookupItem(id)) { this._cancelSnowboardLookup(id); return; }
+        console.warn('查询普通单板失败', err);
+        wx.showToast({ title: '查询单板失败，请重试', icon: 'none' });
+      }
+      const blurred = lookup.blurred;
+      this._cancelSnowboardLookup(id);
+      if (blurred && this._findSnowboardLookupItem(id)) this._emitSync(false);
+    },
     onItemFieldInput(e) {
       const { ridx, iidx, field } = e.currentTarget.dataset;
       const value = e.detail.value;
@@ -980,6 +1168,8 @@ Component({
       const fld = map[field];
       if (!fld) return;
       const cur = this.data.displayRentals[ridx].rentItems[iidx];
+      if (fld === 'name' && !cur.noCode) return;
+      const changed = cur[fld] !== value;
       const entry = evalEntry({ ...cur, [fld]: value });
       this.setData({
         [`displayRentals[${ridx}].rentItems[${iidx}].${fld}`]: value,
@@ -987,9 +1177,19 @@ Component({
         [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
       });
       this._updateRentalChip(Number(ridx));
+      if (fld === 'name' && changed) this._scheduleSnowboardLookup(Number(ridx), Number(iidx), value);
     },
     onItemFieldBlur(e) {
       this.onItemFieldInput(e);
+      const { ridx, iidx, field } = e.currentTarget.dataset;
+      const item = ((this.data.displayRentals[ridx] || {}).rentItems || [])[iidx];
+      let lookup = item && (this._snowboardLookups || {})[item._snowboardLookupId];
+      if (field === 'itemName' && item && !lookup && item.noCode && !item.noNeed
+          && Number(item.category_id) === ORDINARY_SNOWBOARD_CATEGORY_ID && AUTO_SNOWBOARD_CODES.has(item.name)) {
+        this._scheduleSnowboardLookup(Number(ridx), Number(iidx), item.name);
+        lookup = (this._snowboardLookups || {})[item._snowboardLookupId];
+      }
+      if (field === 'itemName' && lookup) { lookup.blurred = true; return; }
       this._emitSync(false);
     },
     onItemCodeFlag(e) {
@@ -1013,6 +1213,7 @@ Component({
           nextName = '';
           patch[`${path}.name`] = '';
         }
+        patch[`${path}.rent_product_id`] = null;
       } else if (flag === 'not_required') {
         nextNoNeed = !item.noNeed;
         patch[`${path}.noNeed`] = nextNoNeed;
@@ -1021,6 +1222,7 @@ Component({
           nextCode = '';
           patch[`${path}.name`] = '';
           patch[`${path}.code`] = '';
+          patch[`${path}.rent_product_id`] = null;
         }
       }
 
@@ -1090,6 +1292,7 @@ Component({
           const entry = evalEntry({ ...cur, code });
           this.setData({
             [`displayRentals[${ridx}].rentItems[${iidx}].code`]: code,
+            [`displayRentals[${ridx}].rentItems[${iidx}].rent_product_id`]: null,
             [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
             [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
           });
@@ -1117,11 +1320,40 @@ Component({
     onSearchClose() {
       this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1, searchAddNew: false });
     },
-    onProductConfirm(e) {
+    async _trialProductAvailable(product, ridx, iidx) {
+      if (!isTrialBoard(product)) return true;
+      const rental = this.data.displayRentals[ridx];
+      const item = rental && (rental.rentItems || [])[iidx];
+      const date = trialStartDate(rental, item);
+      const result = await trialApi.request('RentalAvailability', { productId: product.id, date });
+      return result.available;
+    },
+    async onProductConfirm(e) {
       const product = e.detail && e.detail.product;
       if (!product) {
         this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1, searchAddNew: false });
         return;
+      }
+      if (isUnavailable(product)) {
+        wx.showToast({ title: '该租赁物暂不可用', icon: 'none' });
+        return;
+      }
+      if (isTrialBoard(product)) {
+        const searchRidx = this.data.searchRidx;
+        const searchIidx = this.data.searchIidx;
+        const rental = this.data.displayRentals[searchRidx];
+        const startDate = rental && rental.start_date;
+        try {
+          if (!await this._trialProductAvailable(product, searchRidx, searchIidx)) {
+            wx.showToast({ title: '该租赁物暂不可用', icon: 'none' });
+            return;
+          }
+          if (searchRidx !== this.data.searchRidx || searchIidx !== this.data.searchIidx
+              || (rental && this.data.displayRentals[searchRidx]?.start_date !== startDate)) return;
+        } catch (err) {
+          wx.showToast({ title: '查询试滑预约失败，请重试', icon: 'none' });
+          return;
+        }
       }
       const code = String(product.barcode || '');
       // 「搜索单品」底部入口：选中后由 page 构造 rental 追加到购物车
@@ -1146,6 +1378,16 @@ Component({
         this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1 });
         return;
       }
+      if (!this._applyProductToItem(ridx, iidx, product, true)) return;
+      this.setData({ searchShow: false, searchRidx: -1, searchIidx: -1 });
+      this._emitSync(false);
+    },
+    _applyProductToItem(ridx, iidx, product, clearMemo) {
+      if (isUnavailable(product)) {
+        wx.showToast({ title: '该租赁物暂不可用', icon: 'none' });
+        return false;
+      }
+      const code = String(product.barcode || '').trim();
       // 重复编码校验：同一购物车内除自己以外不允许相同编码
       const dup = (this.data.displayRentals || []).some((r, ri) =>
         (r.rentItems || []).some((it, ii) =>
@@ -1154,21 +1396,23 @@ Component({
       );
       if (dup) {
         wx.showToast({ title: '编码已被占用', icon: 'none' });
-        return;
+        return false;
       }
       const cur = this.data.displayRentals[ridx].rentItems[iidx];
       const next = {
         ...cur,
+        noCode: false,
         code,
         name: product.name || '',
         category_id: product.category_id != null ? product.category_id : cur.category_id,
         rent_product_id: product.id,
         class_name: (product.category && product.category.name) || cur.class_name || '',
-        memo: '',
+        memo: clearMemo ? '' : cur.memo,
       };
       const entry = evalEntry(next);
       this.setData({
         [`displayRentals[${ridx}].rentItems[${iidx}].code`]: next.code,
+        [`displayRentals[${ridx}].rentItems[${iidx}].noCode`]: false,
         [`displayRentals[${ridx}].rentItems[${iidx}].name`]: next.name,
         [`displayRentals[${ridx}].rentItems[${iidx}].category_id`]: next.category_id,
         [`displayRentals[${ridx}].rentItems[${iidx}].rent_product_id`]: next.rent_product_id,
@@ -1176,12 +1420,9 @@ Component({
         [`displayRentals[${ridx}].rentItems[${iidx}].memo`]: next.memo,
         [`displayRentals[${ridx}].rentItems[${iidx}]._entered`]: entry.ok,
         [`displayRentals[${ridx}].rentItems[${iidx}]._statusLabel`]: entry.label,
-        searchShow: false,
-        searchRidx: -1,
-        searchIidx: -1,
       });
       this._updateRentalChip(Number(ridx));
-      this._emitSync(false);
+      return true;
     },
 
     /* ---------- 分类选择 modal（无码物品主项选分类 / 主项分类切换） ---------- */
@@ -1393,6 +1634,16 @@ Component({
 
     /* ---------- 结算 ---------- */
     onCheckout() {
+      for (const id of Object.keys(this._snowboardLookups || {})) {
+        const target = this._findSnowboardLookupItem(id);
+        const lookup = this._snowboardLookups[id];
+        if (target && target.item.noCode && !target.item.noNeed
+            && Number(target.item.category_id) === ORDINARY_SNOWBOARD_CATEGORY_ID && target.item.name === lookup.value) {
+          wx.showToast({ title: '正在查询单板，请稍候', icon: 'none' });
+          return;
+        }
+        this._cancelSnowboardLookup(id);
+      }
       if (!this.data.displayRentals || this.data.displayRentals.length === 0) {
         wx.showToast({ title: '请先添加租赁商品', icon: 'none' });
         return;
@@ -1400,6 +1651,10 @@ Component({
       if (!this.data.displayRentals.every(r => evalRental(r).ok)) {
         this._refreshSummary();
         wx.showToast({ title: '请先填写完整租赁信息', icon: 'none' });
+        return;
+      }
+      if (this._trialBlocked) {
+        wx.showToast({ title: this._trialMessage || '该租赁物暂不可用', icon: 'none' });
         return;
       }
       this.triggerEvent('checkout', { rentals: stripUI(this.data.displayRentals) });

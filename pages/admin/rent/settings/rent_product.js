@@ -30,7 +30,11 @@ Page({
     isDescEditing: false,
     isCategoryEditing: false,
     html: '',
-    images: ''
+    images: '',
+    unavailablePeriods: [],
+    periodEditing: false,
+    periodId: null,
+    startDate: '', startTime: '', endDate: '', endTime: '',
   },
 
   getCategories(){
@@ -121,6 +125,50 @@ Page({
       }
     })
     */
+  },
+  periodUrl(action, id) {
+    return app.globalData.requestPrefix + 'Rent/' + action + '/' + id + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey) + '&sessionType=wechat_mini_openid'
+  },
+  getUnavailablePeriods() {
+    util.performWebRequest(this.periodUrl('GetRentProductUnavailability', this.data.id), null).then(list => {
+      this.setData({ unavailablePeriods: (list || []).map(p => ({ ...p,
+        startLabel: p.start_time ? p.start_time.replace('T', ' ').slice(0, 16) : '不限',
+        endLabel: p.end_time ? p.end_time.replace('T', ' ').slice(0, 16) : '不限' })) })
+    }).catch(() => {})
+  },
+  addPeriod() {
+    this.setData({ periodEditing: true, periodId: null, startDate: '', startTime: '', endDate: '', endTime: '' })
+  },
+  editPeriod(e) {
+    const p = this.data.unavailablePeriods.find(x => x.id === Number(e.currentTarget.dataset.id))
+    if (!p) return
+    this.setData({ periodEditing: true, periodId: p.id,
+      startDate: p.start_time ? p.start_time.slice(0, 10) : '', startTime: p.start_time ? p.start_time.slice(11, 16) : '',
+      endDate: p.end_time ? p.end_time.slice(0, 10) : '', endTime: p.end_time ? p.end_time.slice(11, 16) : '' })
+  },
+  changePeriodDate(e) { this.setData({ [e.currentTarget.dataset.field]: e.detail.value }) },
+  clearPeriodDate(e) {
+    const prefix = e.currentTarget.dataset.field
+    this.setData({ [prefix + 'Date']: '', [prefix + 'Time']: '' })
+  },
+  cancelPeriod() { this.setData({ periodEditing: false }) },
+  savePeriod() {
+    const d = this.data
+    if ((!d.startDate && d.startTime) || (!d.endDate && d.endTime)) {
+      wx.showToast({ title: '请先选择日期', icon: 'none' }); return
+    }
+    const start = d.startDate ? d.startDate + 'T' + (d.startTime || '00:00') + ':00' : null
+    const end = d.endDate ? d.endDate + 'T' + (d.endTime || '00:00') + ':00' : null
+    if (start && end && start >= end) { wx.showToast({ title: '结束时间须晚于开始时间', icon: 'none' }); return }
+    util.performWebRequest(this.periodUrl('AddRentProductUnavailability', d.id), { id: d.periodId, start_time: start, end_time: end })
+      .then(() => { this.setData({ periodEditing: false }); this.getUnavailablePeriods(); this.getProduct() }).catch(() => {})
+  },
+  deletePeriod(e) {
+    const id = e.currentTarget.dataset.id
+    wx.showModal({ title: '删除不可用时段？', content: '删除后将按其余时段判断租赁物状态。', success: res => {
+      if (res.confirm) util.performWebRequest(this.periodUrl('DeleteRentProductUnavailability', id), {})
+        .then(() => { this.getUnavailablePeriods(); this.getProduct() }).catch(() => {})
+    } })
   },
   getProductCategoryInfo(){
     var that = this
@@ -408,6 +456,7 @@ Page({
     })
     //that.getCategories()
     that.getProduct()
+    that.getUnavailablePeriods()
   },
 
   /**

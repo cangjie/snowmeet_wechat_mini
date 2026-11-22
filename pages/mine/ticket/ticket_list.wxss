@@ -2,22 +2,29 @@
 @import "./ticket_card.wxss";
 
 /* ===== Tab 导航 ===== */
+.tab-scroll {
+  width: 100%;
+  margin-bottom: 32rpx;
+  border-radius: 999rpx;
+  background: #E4E7EF;
+  white-space: nowrap;
+}
 .tab-nav {
   display: flex;
   background: #E4E7EF;
   border-radius: 999rpx;
   padding: 8rpx;
-  margin-bottom: 32rpx;
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   box-sizing: border-box;
 }
 
 .tab-item {
-  flex: 1;
+  flex: none;
   text-align: center;
-  padding: 20rpx 0;
+  padding: 20rpx 24rpx;
   border-radius: 999rpx;
-  /* 四个 tab（未使用 / 已使用 / 已分享 / 已接受）并排，字号和间距比三个 tab 时小一点，未使用的数量角标才放得下 */
+  white-space: nowrap;
   font-size: 26rpx;
   font-weight: 600;
   display: flex;

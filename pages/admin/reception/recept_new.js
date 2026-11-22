@@ -219,6 +219,9 @@ Page({
   onSyncRent(e) {
     const detail = e.detail || {};
     const rentals = detail.rentals || [];
+    this._tagRentDrafts(rentals);
+    this._rentRevision = (this._rentRevision || 0) + 1;
+    if (this.data.order) this.data.order.rentals = rentals;
     this.setData({ 'order.rentals': rentals });
     // fire-and-forget：错误已在内部 console.warn，这里吞掉 rejection 避免 unhandled
     Promise.resolve(this.saveRentReceptOrder()).catch(() => {});
@@ -444,7 +447,7 @@ Page({
         pick_type: defaultPickType,
         atOnce,
         category: product.category,
-        rentItems: [mainItem, ...associateItems],
+        rentItems: [mainItem].concat(associateItems),
       };
       util.createRentalDetail(rental, new Date(startDate), new Date(startDate));
       this._appendRentals([rental]);
@@ -458,6 +461,9 @@ Page({
   _appendRentals(rentals) {
     const current = (this.data.order && this.data.order.rentals) ? this.data.order.rentals.slice() : [];
     const merged = current.concat(rentals);
+    this._tagRentDrafts(merged);
+    this._rentRevision = (this._rentRevision || 0) + 1;
+    if (this.data.order) this.data.order.rentals = merged;
     this.setData({ 'order.rentals': merged });
     Promise.resolve(this.saveRentReceptOrder()).catch(() => {});
   },
@@ -490,7 +496,7 @@ Page({
       const placedOrderId = (this.data.order && this.data.order.id) || order.id;
       const placeUrl = app.globalData.requestPrefix
         + 'Order/PlaceRentOrder/' + placedOrderId
-        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+        + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '') + '&autoBenefit=true';
       return util.performWebRequest(placeUrl, null);
     }).then((rentOrder) => {
       wx.hideLoading();
@@ -530,7 +536,7 @@ Page({
     }).catch((err) => {
       wx.hideLoading();
       console.warn('checkout failed', err);
-      wx.showToast({ title: '下单失败', icon: 'none' });
+      wx.showToast({ title: err === '该租赁物暂不可用' ? err : '下单失败', icon: 'none' });
     });
   },
 
@@ -539,7 +545,34 @@ Page({
    * 调用方未消费 Promise 时（fire-and-forget），异常已在 .catch 里吞掉，不会抛到外面。
    */
   saveRentReceptOrder() {
+    const that = this;
+    if (this._rentSaveInFlight) {
+      if (!this._rentSaveQueued) {
+        this._rentSaveQueued = this._rentSaveInFlight.catch(() => {}).then(() => {
+          that._rentSaveQueued = null;
+          return that.saveRentReceptOrder();
+        });
+      }
+      return this._rentSaveQueued;
+    }
+    const clear = () => { that._rentSaveInFlight = null; };
+    const request = Promise.resolve(this._doSaveRentRecept());
+    this._rentSaveInFlight = request.then(r => { clear(); return r; }, e => { clear(); throw e; });
+    return this._rentSaveInFlight;
+  },
+
+  _tagRentDrafts(rentals) {
+    const next = () => 'rent-' + Date.now() + '-' + (this._rentClientSeq = (this._rentClientSeq || 0) + 1);
+    (rentals || []).forEach(r => {
+      if (!r.id && !r.rentClientKey) r.rentClientKey = next();
+      (r.rentItems || []).forEach(item => { if (!item.id && !item.rentItemClientKey) item.rentItemClientKey = next(); });
+    });
+  },
+
+  _doSaveRentRecept() {
     const order = this.data.order;
+    const revision = this._rentRevision || 0;
+    this._tagRentDrafts(order.rentals);
     if (!order.shop) {
       wx.showToast({ title: '店铺不能为空', icon: 'error' });
       return Promise.reject(new Error('店铺不能为空'));
@@ -564,6 +597,7 @@ Page({
       guarantys:      [],
       rentals: (order.rentals || []).map((r) => {
         const copy = { ...r };
+        copy.rentItems = (r.rentItems || []).map(item => ({ ...item }));
         if (copy.startDate) copy.startDate = util.formatDate(new Date(copy.startDate));
         if (copy.pricePresets) {
           copy.pricePresets = copy.pricePresets.map((p) => ({ ...p, id: 0 }));
@@ -577,15 +611,36 @@ Page({
 
     const url = app.globalData.requestPrefix
       + 'Rent/SaveRentRecept?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
-      + this._receptQuery();
+      + this._receptQuery() + '&benefitOptions=true';
     return util.performWebRequest(url, payload).then((submitted) => {
       // 后端返回的最新 order，本地同步（保持 timeStamp 用于 wx:key）
       if (submitted && submitted.rentals) {
         submitted.rentals.forEach((r) => {
           r.timeStamp = (new Date(r.create_date || Date.now())).getTime();
         });
+        if ((this._rentRevision || 0) !== revision) {
+          const current = (this.data.order && this.data.order.rentals) || [];
+          const sent = payload.rentals || [];
+          submitted.rentals = current.map((local, index) => {
+            let sentIndex = sent.findIndex(s => local.id && s.id === local.id);
+            if (sentIndex < 0 && local.rentClientKey) sentIndex = sent.findIndex(s => s.rentClientKey === local.rentClientKey);
+            if (sentIndex < 0 && !local.rentClientKey && local.timeStamp) sentIndex = sent.findIndex(s => s.timeStamp === local.timeStamp);
+            const saved = sentIndex >= 0 ? submitted.rentals[sentIndex] : null;
+            if (!saved) return local;
+            const sentItems = sent[sentIndex].rentItems || [];
+            const savedItems = saved.rentItems || [];
+            const rentItems = (local.rentItems || []).map((item, itemIndex) => {
+              let j = sentItems.findIndex(s => item.id && s.id === item.id);
+              if (j < 0 && item.rentItemClientKey) j = sentItems.findIndex(s => s.rentItemClientKey === item.rentItemClientKey);
+              const serverItem = j >= 0 ? savedItems[j] : null;
+              return serverItem ? { ...item, id: item.id || serverItem.id, rental_id: serverItem.rental_id || saved.id } : item;
+            });
+            return { ...local, id: local.id || saved.id, order_id: local.order_id || saved.order_id || submitted.id, rentItems };
+          });
+        }
       }
       this._acceptReceptMember(submitted);
+      this.data.order = submitted;
       this.setData({ order: submitted });
       return submitted;
     }).catch((err) => {

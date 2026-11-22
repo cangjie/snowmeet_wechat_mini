@@ -115,6 +115,9 @@ test('搜索单品：崇礼旗舰店晚上 7 点开单 → 延时租赁、明天
   await page.onAddSingleProduct({ detail: { product: { id: 9, name: '全能 170', barcode: 'B-170', category: CATEGORY } } })
 
   const r = added[0]
+  assert.equal(r.rentItems.length, 2)
+  assert.equal(r.rentItems[0].rent_product_id, 9)
+  assert.equal(r.rentItems[1].category_id, 27)
   assert.equal(r.pick_type, '延时租赁')
   assert.equal(r.atOnce, true)
   assert.equal(r.start_date, '2026-11-14T00:00:00')

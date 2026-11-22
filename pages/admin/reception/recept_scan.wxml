@@ -34,7 +34,7 @@
       <block wx:else>
         <view class="scan-qr-wrap">
           <view class="scan-qr-box">
-            <image wx:if="{{qrCodeUrl}}" class="scan-qr" src="{{qrCodeUrl}}" mode="aspectFit"/>
+            <image wx:if="{{qrCodeUrl}}" class="scan-qr" src="{{qrCodeUrl}}" mode="aspectFit" data-checkin-id="{{checkin.id}}" binderror="onQrImageError"/>
             <van-loading wx:elif="{{loadingQr}}" size="24px"/>
           </view>
           <view class="scan-stage">{{stageText}}</view>

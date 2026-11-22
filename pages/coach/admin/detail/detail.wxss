@@ -1,1 +1,10 @@
 @import "../../common/coach.wxss";
+.detail-tabs { flex-wrap: wrap; }
+.detail-tabs .tab { flex: 1 1 30%; box-sizing: border-box; padding: 22rpx 8rpx; white-space: nowrap; }
+.report-toggle { min-width: 0; }
+.report-toggle .caret { font-size: 22rpx; white-space: nowrap; }
+.report-counts { font-size: 24rpx; line-height: 1.6; color: var(--ink); }
+.report-recipients { border-top: 1rpx solid var(--line); padding-top: 8rpx; }
+.report-recipient { padding: 18rpx 0; border-bottom: 1rpx solid var(--line); }
+.report-person { font-size: 25rpx; font-weight: 600; word-break: break-all; }
+.report-more { padding: 22rpx 0 4rpx; color: var(--blue); text-align: center; font-size: 24rpx; }

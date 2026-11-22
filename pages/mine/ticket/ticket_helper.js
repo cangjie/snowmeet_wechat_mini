@@ -153,6 +153,25 @@ function annotateTicket(ticket, tab){
   ticket.canTransfer = (TRANSFERABLE_TEMPLATE_IDS.indexOf(ticket.template_id) >= 0 || !!ticket.coachGranted) && ticket.used != 1
   ticket.actionable = true       // 是否还允许任何操作（转赠/撤回分享/核销二维码等）
   ticket.canCancelShare = false  // 是否显示"撤回分享"按钮。wxml 一律用这个，不要直接判 shared
+  if (tab == 'inactive' || tab == 'expired'){
+    ticket.canTransfer = false
+    ticket.actionable = false
+    ticket.canCancelShare = false
+    if (tab == 'expired'){
+      ticket.muted = true
+      ticket.statusText = '已过期'
+      ticket.statusClass = 'status-used'
+      ticket.metaLine = '已过期 · ' + (ticket.expireText || '')
+      ticket.expireUrgent = false
+    } else {
+      ticket.statusText = ticket.is_active == 1 ? '尚未生效' : '待激活'
+      ticket.statusClass = 'status-pending'
+      if (ticket.is_active == 1 && ticket.start_date){
+        ticket.startLine = '生效日期 ' + String(ticket.start_date).slice(0, 10)
+      }
+    }
+    return ticket
+  }
   if (tab == 'accepted'){
     // 「已接受」只是一份「我收到过哪些券」的清单：只读，不放转赠、撤回分享按钮（要转赠去「未使用」里）
     ticket.canTransfer = false
@@ -223,7 +242,7 @@ function groupTickets(tickets, openKeys, tab){
     }
     g.tickets.push(t)
   })
-  var word = tab == 'used' ? '已使用' : (tab == 'shared' ? '已分享' : (tab == 'accepted' ? '已接受' : '可用'))
+  var word = tab == 'used' ? '已使用' : (tab == 'shared' ? '已分享' : (tab == 'accepted' ? '已接受' : (tab == 'inactive' ? '待激活' : (tab == 'expired' ? '已过期' : '可用'))))
   groups.forEach(function (g, i){
     g.order = i    // 同一时间的组保持第一次出现的先后
     g.latestTime = g.tickets.reduce(function (latest, t){
@@ -240,7 +259,7 @@ function groupTickets(tickets, openKeys, tab){
     g.expireLine = ''
     g.urgentCount = 0
     g.urgentLine = ''
-    if (tab != 'used' && tab != 'shared' && tab != 'accepted'){
+    if (tab == 'pending' || tab == 'inactive'){
       var best = null
       g.tickets.forEach(function (t){ if (!best || expireKey(t) < expireKey(best)){ best = t } })
       g.expireLine = expireKey(best) === '9999' ? (best.expireText || '长期有效') : ('最近到期 ' + best.expireText)

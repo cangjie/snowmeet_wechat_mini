@@ -9,8 +9,9 @@ Page({
    * Page initial data
    */
   data: {
-    activeTab: 'pending',   // pending: 未使用 | shared: 已分享 | used: 已使用 | accepted: 已接受（我通过别人分享收到的券）
+    activeTab: 'pending',   // pending: 可用 | inactive: 待激活 | expired: 已过期 | used/shared/accepted
     emptyText: '到店养护或参与活动可获得体验券',
+    loadError: '',
     ticketArr:[],           // 平铺的全部券（转赠、详情、分享、撤回都靠它）
     rowArr:[],              // 页面上显示的行：券种组头 + 券（同一券种多张合并成「免费打蜡券 × N」，点开看每一张）
     openGroups: {},         // 展开的券种 { 券种键: true }
@@ -75,7 +76,8 @@ Page({
   onLoad: function (options) {
     var that = this
     var tab = options.tab || 'pending'
-    this.setData({ activeTab: tab, emptyText: tab == 'accepted' ? '朋友转赠给你的券会出现在这里' : '到店养护或参与活动可获得体验券' })
+    var emptyText = tab == 'accepted' ? '朋友转赠给你的券会出现在这里' : (tab == 'inactive' ? '暂无待激活或尚未生效的优惠券' : (tab == 'expired' ? '暂无已过期的优惠券' : '到店养护或参与活动可获得体验券'))
+    this.setData({ activeTab: tab, emptyText: emptyText })
     app.loginPromiseNew.then(function(resolve){
       if (tab == 'accepted'){
         // 新接口（Ticket/GetMyAcceptedTickets）：后端没部署时请求失败，静默显示空状态，不影响别的 tab
@@ -93,16 +95,13 @@ Page({
         }).catch(function (exp){})
         return
       }
-      var used = (tab == 'used') ? 1 : 0
-      data.getMyTickets(used, app.globalData.sessionKey).then(function (tickets){
+      var request = tab == 'used'
+        ? data.getMyTickets(1, app.globalData.sessionKey)
+        : data.getMyTicketsByStatePromise(tab == 'inactive' ? 'inactive' : (tab == 'expired' ? 'expired' : 'available'), app.globalData.sessionKey)
+      request.then(function (tickets){
         tickets = (tickets || []).map(function (t){ return ticketHelper.annotateTicket(t, tab) })
-        // used=0 拉回来的既有待使用也有分享中的："未使用" tab 只留没在分享中的，
-        // 分享中的挪到"已分享" tab 去看（那边走的是 GetMySharedTickets）
-        if (tab == 'pending'){
-          tickets = tickets.filter(function (t){ return t.shared != 1 })
-        }
         that._render(tickets)
-      }).catch(function (exp){})
+      }).catch(function (){ that.setData({ loadError: '加载失败，请稍后重试' }) })
     })
   },
 
@@ -277,7 +276,7 @@ Page({
     })
   },
   showDetail: function(source){
-    if (this.data.activeTab == 'used'){
+    if (this.data.activeTab == 'used' || this.data.activeTab == 'inactive' || this.data.activeTab == 'expired'){
       return
     }
     var code = source.currentTarget.id

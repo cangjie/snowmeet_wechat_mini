@@ -4,6 +4,8 @@ const data = require('../../utils/data.js')
 const profileAuth = require('../../utils/profile_auth.js')
 const tabbar = require('../../utils/tabbar.js')
 const distributorMenu = require('../../utils/distributor_menu.js')
+const trialApi = require('../../utils/trial_api.js')
+const util = require('../../utils/util.js')
 Page({
 
   /**
@@ -17,6 +19,7 @@ Page({
     // 教练入口：是教练才显示「我是教练」；领过学员卡才显示「我的学员卡」
     coach: null,
     hasCoachCard: false,
+    hasTrialMembership: false,
     // 分销商菜单区域（教练 / 机构）：身份和条目都由服务端 Distributor/GetMyDistributor 决定
     distributor: null,
     distributorTitle: '',
@@ -59,9 +62,21 @@ Page({
   onShow: function () {
     // 教练身份和学员卡每次显示都刷新：管理员中途把这个会员设为教练、或学员刚领了卡，不用重新登录
     var that = this
+    var trialSeq = this._trialSeq = (this._trialSeq || 0) + 1
+    this.setData({hasTrialMembership: false})
     app.loginPromiseNew.then(function () {
+      if (that._trialSeq !== trialSeq) return
       var sessionKey = app.globalData.sessionKey
       if (!sessionKey) return
+      trialApi.request('Options', { date: util.formatDate(new Date()) }).then(function (result) {
+        if (that._trialSeq === trialSeq && app.globalData.sessionKey === sessionKey) {
+          that.setData({hasTrialMembership: !!(result && result.eligible === true)})
+        }
+      }).catch(function (err) {
+        if (that._trialSeq === trialSeq && app.globalData.sessionKey === sessionKey) {
+          console.warn('试滑会籍资格查询失败', err)
+        }
+      })
       data.getMyCoachPromise(sessionKey).then(function (d) {
         app.globalData.coach = d && d.isCoach ? d.coach : null
         that.setData({coach: app.globalData.coach})
@@ -119,14 +134,14 @@ Page({
    * Lifecycle function--Called when page hide
    */
   onHide: function () {
-
+    this._trialSeq = (this._trialSeq || 0) + 1
   },
 
   /**
    * Lifecycle function--Called when page unload
    */
   onUnload: function () {
-
+    this._trialSeq = (this._trialSeq || 0) + 1
   },
 
   /**
@@ -188,6 +203,9 @@ Page({
     wx.navigateTo({
       url: '/pages/coach/card/card',
     })
+  },
+  gotoTrial: function(){
+    wx.navigateTo({ url: '/pages/trial/index' })
   },
   gotoTicket: function(){
     wx.navigateTo({

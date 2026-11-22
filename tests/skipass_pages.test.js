@@ -21,6 +21,36 @@ const PRODUCTS = [
   { product_id: 51, name: '【25-26雪季】4小时日场自带板滑雪票', dailyPrice: [] }
 ]
 
+test('确认弹层：授权手机号后填入短信手机号，拒绝和接口失败时可手动填写', () => {
+  const env = setup()
+  const page = load(DETAIL, env)
+  page.setData({ showConfirm: true, confirmCell: '13800138000' })
+  let count = 0
+  global.wx.request = req => {
+    count++
+    assert.ok(req.url.includes('/core/MiniAppUser/UpdateWechatMemberCell?'))
+    assert.ok(req.url.includes('encData=encrypted%2Bdata'))
+    req.success({ statusCode: 200, data: { currentCell: '13900139000' } })
+    req.complete()
+  }
+  page.onConfirmGetCell({ detail: { errMsg: 'getPhoneNumber:fail user deny' } })
+  assert.equal(count, 0)
+  assert.equal(page.data.confirmCell, '13800138000')
+  page.onConfirmGetCell({ detail: { errMsg: 'getPhoneNumber:ok', encryptedData: 'encrypted+data', iv: 'iv' } })
+  assert.equal(page.data.confirmCell, '13900139000')
+  assert.equal(page.data.confirmPhoneLoading, false)
+  global.wx.request = req => { req.fail({}); req.complete() }
+  page.onConfirmGetCell({ detail: { errMsg: 'getPhoneNumber:ok', encryptedData: 'encrypted+data', iv: 'iv' } })
+  assert.equal(page.data.confirmCell, '13900139000')
+  assert.match(env.toasts.at(-1), /手动输入/)
+  cleanup()
+})
+
+test('确认弹层：手机号自动获取按钮调用微信授权', () => {
+  const wxml = require('node:fs').readFileSync(require('node:path').join(__dirname, '../pages/ski_pass/skipass_detail_new.wxml'), 'utf8')
+  assert.match(wxml, /open-type="getPhoneNumber"\s+bindgetphonenumber="onConfirmGetCell"/)
+})
+
 function setup(opts) {
   const o = Object.assign({ staff: null, products: PRODUCTS, resorts: ['万龙', '南山'], balance: 5000, myInfo: { real_name: '王店员', cell: '13900139000' } }, opts)
   const requests = []

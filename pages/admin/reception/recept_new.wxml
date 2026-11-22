@@ -24,6 +24,7 @@
     <rent-recept-form
       wx:if="{{bizType === 'rent'}}"
       shop="{{shop}}"
+      orderId="{{order.id}}"
       memberId="{{customer.memberId}}"
       rentals="{{order.rentals}}"
       bind:syncRent="onSyncRent"

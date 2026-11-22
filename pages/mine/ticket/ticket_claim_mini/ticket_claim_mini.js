@@ -69,10 +69,10 @@ Page({
     }
     this.setData({ claiming: true, errMsg: '' })
     try {
-      const claim = info.shareType === 'qrcode' ? data.claimMiniQrCodeTicketPromise : data.claimMiniSharedTicketPromise
+      const claim = info.shareType === 'staff_batch' ? data.claimStaffCouponBatchPromise : info.shareType === 'qrcode' ? data.claimMiniQrCodeTicketPromise : data.claimMiniSharedTicketPromise
       const result = await claim(this.data.batchId, app.globalData.sessionKey)
       if (!result || !result.code) throw new Error('领取结果无效，请重试')
-      this.setData({ doneCode: result.code })
+      this.setData({ doneCode: result.code, doneCount: result.count || 1 })
       wx.showToast({ title: '领取成功', icon: 'success' })
     } catch (err) {
       this.setData({ errMsg: typeof err === 'string' ? err : (err.message || '领取失败，请重试') })

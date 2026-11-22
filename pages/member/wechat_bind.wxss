@@ -1,0 +1,5 @@
+.page { min-height: 100vh; background: #f8f9ff; padding: 32rpx; box-sizing: border-box; }
+.card { background: white; border-radius: 20rpx; padding: 40rpx; }
+.title { font-size: 36rpx; font-weight: 700; }
+.hint, .message { font-size: 27rpx; line-height: 1.6; margin: 28rpx 0; color: #3f4850; }
+.message { color: #006495; }

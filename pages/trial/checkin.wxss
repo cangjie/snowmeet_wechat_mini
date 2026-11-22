@@ -1,0 +1,4 @@
+@import "../order/identity_verify.wxss";
+
+.verify-error { margin-top: 20rpx; font-size: 26rpx; line-height: 1.5; color: #e64340; }
+.verify-btn[disabled] { opacity: 0.5; }

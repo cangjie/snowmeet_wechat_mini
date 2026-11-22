@@ -1,0 +1,9 @@
+<view class="page">
+  <view class="card">
+    <view class="title">绑定会员微信</view>
+    <view class="hint">请会员本人授权与会员资料一致的手机号，确认后绑定当前微信。</view>
+    <view class="message" wx:if="{{message}}">{{message}}</view>
+    <button wx:if="{{token && !bound}}" type="primary" open-type="getPhoneNumber" bindgetphonenumber="onPhone" loading="{{busy}}" disabled="{{busy}}">授权手机号并绑定</button>
+  </view>
+  <profile-auth id="profileAuth" />
+</view>

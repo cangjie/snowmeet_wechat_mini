@@ -305,3 +305,10 @@
   content: "\e964";
 }
 
+
+.unavailable-row, .period-form { width: 100%; }
+.unavailable-actions, .period-line { display: flex; align-items: center; gap: 16rpx; margin-top: 12rpx; }
+.unavailable-actions button { margin: 0; }
+.period-line picker { padding: 10rpx 16rpx; background: #f3f5f7; border-radius: 8rpx; }
+.period-line text:last-child { color: #006495; }
+.period-hint { color: #777; font-size: 24rpx; margin: 12rpx 0; }

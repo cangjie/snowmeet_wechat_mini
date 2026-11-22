@@ -1,10 +1,12 @@
 <view class="co-page">
   <view wx:if="{{blocked}}" class="co-blocked">{{blocked}}</view>
   <block wx:elif="{{coach}}">
-    <view class="tabs">
+    <view class="tabs detail-tabs">
       <view class="tab {{tab === 'coupon' ? 'on' : ''}}" data-tab="coupon" bindtap="onTab">优惠券底价</view>
       <view wx:if="{{coach.introducerType === '机构'}}" class="tab {{tab === 'floor' ? 'on' : ''}}" data-tab="floor" bindtap="onTab">会籍卡底价</view>
       <view class="tab {{tab === 'cards' ? 'on' : ''}}" data-tab="cards" bindtap="onTab">他的卡</view>
+      <view class="tab {{tab === 'cardReport' ? 'on' : ''}}" data-tab="cardReport" bindtap="onTab">会籍卡领取</view>
+      <view class="tab {{tab === 'couponReport' ? 'on' : ''}}" data-tab="couponReport" bindtap="onTab">优惠券领取</view>
       <view class="tab {{tab === 'manage' ? 'on' : ''}}" data-tab="manage" bindtap="onTab">停用</view>
     </view>
 
@@ -77,6 +79,43 @@
       <view wx:if="{{!cards.length}}" class="co-empty">没有学员卡</view>
     </block>
 
+    <!-- 管理员按卡种查看领取人 -->
+    <block wx:if="{{tab === 'cardReport'}}">
+      <view class="co-note">按会籍卡种查看领取情况，包含领取后被撤销的卡。</view>
+      <view wx:if="{{reportLoading}}" class="co-empty">正在加载…</view>
+      <view wx:elif="{{reportError}}" class="co-blocked" bindtap="loadDistribution">{{reportError}}，点击重试</view>
+      <block wx:else>
+        <view wx:for="{{cardKinds}}" wx:key="id" class="card card-pad">
+          <view class="card-row report-toggle" data-kind="card" data-id="{{item.id}}" bindtap="onReportToggle">
+            <view class="grow"><view class="card-title small">{{item.name}}</view><view class="card-meta">已领取 {{item.claimed}} 张</view></view>
+            <text class="caret">{{reportOpen === 'card:' + item.id ? '收起 ⌃' : '查看领取人 ⌄'}}</text>
+          </view>
+          <block wx:if="{{reportOpen === 'card:' + item.id}}"><template is="recipients" data="{{recipients: recipients, recipientLoading: recipientLoading, recipientError: recipientError, recipientTotal: recipientTotal}}" /></block>
+        </view>
+        <view wx:if="{{!cardKinds.length}}" class="co-empty">暂无会籍卡种</view>
+      </block>
+    </block>
+
+    <!-- 管理员按券种查看领取及使用情况 -->
+    <block wx:if="{{tab === 'couponReport'}}">
+      <view class="co-note">未使用包含已过期的券；领取人按首次领券记录统计。管理员发放后由分销商转赠的券也列在这里。</view>
+      <view wx:if="{{reportLoading}}" class="co-empty">正在加载…</view>
+      <view wx:elif="{{reportError}}" class="co-blocked" bindtap="loadDistribution">{{reportError}}，点击重试</view>
+      <block wx:else>
+        <view wx:for="{{couponKinds}}" wx:key="id" class="card card-pad">
+          <view class="card-row report-toggle" data-kind="coupon" data-id="{{item.id}}" bindtap="onReportToggle">
+            <view class="grow"><view class="card-title small">{{item.name}}</view><view class="card-meta">{{item.source}}</view></view>
+            <text class="caret">{{reportOpen === 'coupon:' + item.id ? '收起 ⌃' : '查看领取人 ⌄'}}</text>
+          </view>
+          <view wx:if="{{item.memo}}" class="card-meta">{{item.memo}}</view>
+          <view class="report-counts">已领取 {{item.claimed}} 张 · 已使用 {{item.used}} 张 · 未使用 {{item.unused}} 张</view>
+          <view class="card-meta">未使用中已过期 {{item.expired}} 张<text wx:if="{{item.invalid}}"> · 其他失效 {{item.invalid}} 张</text><text wx:if="{{item.unknown}}"> · 券记录缺失 {{item.unknown}} 张</text></view>
+          <block wx:if="{{reportOpen === 'coupon:' + item.id}}"><template is="recipients" data="{{recipients: recipients, recipientLoading: recipientLoading, recipientError: recipientError, recipientTotal: recipientTotal}}" /></block>
+        </view>
+        <view wx:if="{{!couponKinds.length}}" class="co-empty">暂无优惠券</view>
+      </block>
+    </block>
+
     <!-- 停用 / 改名 -->
     <block wx:if="{{tab === 'manage'}}">
       <view class="card card-pad">
@@ -93,6 +132,19 @@
     </block>
   </block>
 </view>
+
+<template name="recipients">
+  <view class="report-recipients">
+    <view wx:for="{{recipients}}" wx:key="code" class="report-recipient">
+      <view class="card-row"><text class="grow report-person">{{item.name}}<text wx:if="{{item.phone}}"> · {{item.phone}}</text></text><text class="tag {{item.status === '已使用' || item.status === '已领取' ? 'ok' : 'muted'}}">{{item.status}}</text></view>
+      <view class="card-meta">领取时间 {{item.claimed}}<text wx:if="{{item.code}}"> · {{item.code}}</text></view>
+    </view>
+    <view wx:if="{{recipientLoading}}" class="card-meta">正在加载领取人…</view>
+    <view wx:elif="{{recipientError}}" class="report-more" bindtap="onReportMore">{{recipientError}}，点击重试</view>
+    <view wx:elif="{{recipients.length < recipientTotal}}" class="report-more" bindtap="onReportMore">加载更多（{{recipients.length}} / {{recipientTotal}}）</view>
+    <view wx:elif="{{!recipients.length}}" class="card-meta">暂无领取人</view>
+  </view>
+</template>
 <view wx:if="{{!blocked && coach && tab === 'coupon'}}" class="bottom-bar">
   <view class="btn primary {{couponDirty ? '' : 'disabled'}}" bindtap="onCouponSave">保存优惠券底价</view>
 </view>

@@ -108,9 +108,10 @@ function setup(t, tickets, tab) {
   global.wx = { showToast() {}, showModal() {}, navigateTo(o) { global.__navigated = (global.__navigated || []).concat(o.url) } }
   const fake = {
     getMyTickets() { return Promise.resolve(JSON.parse(JSON.stringify(tickets))) },
+    getMyTicketsByStatePromise(state, sessionKey) { fake.stateCalls.push([state, sessionKey]); return Promise.resolve(JSON.parse(JSON.stringify(tickets))) },
     getMySharedTicketsPromise() { return Promise.resolve(JSON.parse(JSON.stringify(tickets))) },
     getMyAcceptedTicketsPromise(sessionKey) { fake.acceptedCalls.push(sessionKey); return Promise.resolve(JSON.parse(JSON.stringify(tickets))) },
-    acceptedCalls: []
+    acceptedCalls: [], stateCalls: []
   }
   const page = loadPage('pages/mine/ticket/ticket_list.js', fake)
   page._fake = fake
@@ -297,9 +298,8 @@ test('data.js：getMyAcceptedTicketsPromise 请求 Ticket/GetMyAcceptedTickets�
 test('模板：顶部多一个「已接受」tab，链接带 tab=accepted，高亮按 activeTab', () => {
   const wxml = read('pages/mine/ticket/ticket_list.wxml')
   assert.match(wxml, /<navigator class="tab-item \{\{activeTab == 'accepted' \? 'tab-active' : 'tab-inactive'\}\}" url="ticket_list\?tab=accepted" open-type="redirect"[^>]*>已接受<\/navigator>/)
-  assert.equal((wxml.match(/class="tab-item /g) || []).length, 4)
-  // 顺序：未使用、已使用、已分享、已接受
-  const order = ['tab=pending', 'tab=used', 'tab=shared', 'tab=accepted'].map(k => wxml.indexOf(k))
+  assert.equal((wxml.match(/class="tab-item /g) || []).length, 6)
+  const order = ['tab=pending', 'tab=inactive', 'tab=expired', 'tab=used', 'tab=shared', 'tab=accepted'].map(k => wxml.indexOf(k))
   assert.deepEqual(order, order.slice().sort((a, b) => a - b))
 })
 
@@ -346,7 +346,7 @@ test('已接受 tab 没有券：空状态写「朋友转赠给你的券会出现
   const pending = setup(t, [], 'pending')
   await settle()
   assert.equal(pending.data.emptyText, '到店养护或参与活动可获得体验券')
-  assert.match(read('pages/mine/ticket/ticket_list.wxml'), /\{\{emptyText\}\}/)
+  assert.match(read('pages/mine/ticket/ticket_list.wxml'), /\{\{loadError \|\| emptyText\}\}/)
 })
 
 test('已接受的分组：不写到期日；整组都已使用才降灰', () => {
@@ -357,9 +357,35 @@ test('已接受的分组：不写到期日；整组都已使用才降灰', () =>
   assert.equal(g.muted, false)
 })
 
-test('样式：四个 tab 并排，字号 26rpx、间距 6rpx，放得下未使用的数量角标', () => {
+test('样式：六个 tab 可横向滑动，字号 26rpx、间距 6rpx', () => {
   const wxss = read('pages/mine/ticket/ticket_list.wxss')
   const rule = (wxss.match(/\n\.tab-item\s*\{([^}]*)\}/) || [])[1] || ''
   assert.match(rule, /font-size:\s*26rpx/)
   assert.match(rule, /gap:\s*6rpx/)
+  assert.match(read('pages/mine/ticket/ticket_list.wxml'), /<scroll-view class="tab-scroll" scroll-x="true"/)
+})
+
+test('待激活与已过期券按券种分组展开，不能转赠或进入核销详情', async t => {
+  for (const tab of ['inactive', 'expired']) {
+    const tickets = [T('a1', WAX, { is_active: 0 }), T('a2', WAX, { is_active: 1, start_date: '2027-01-01T00:00:00' })]
+    const page = setup(t, tickets, tab)
+    await settle()
+    assert.deepEqual(page._fake.stateCalls, [[tab, 'sk']])
+    assert.equal(page.data.rowArr[0].summaryText, tab === 'inactive' ? '2 张待激活' : '2 张已过期')
+    page.onToggleGroup(tap({ key: '免费打蜡券' }))
+    assert.equal(page.data.rowArr.length, 3)
+    assert.ok(page.data.rowArr.slice(1).every(row => !row.canTransfer && !row.canCancelShare))
+    global.__navigated = []
+    page.showDetail({ currentTarget: { id: 'a1' } })
+    assert.deepEqual(global.__navigated, [])
+    if (tab === 'inactive') assert.equal(page.data.rowArr[2].startLine, '生效日期 2027-01-01')
+    else assert.ok(page.data.rowArr.slice(1).every(row => row.statusText === '已过期' && row.muted))
+    delete global.__navigated
+  }
+})
+
+test('未使用页向服务端请求已生效且未过期的券', async t => {
+  const page = setup(t, MANY, 'pending')
+  await settle()
+  assert.deepEqual(page._fake.stateCalls, [['available', 'sk']])
 })

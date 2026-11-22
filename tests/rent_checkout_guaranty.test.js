@@ -55,3 +55,21 @@ test('开单页保存草稿时不回传保证金记录', async t => {
   // 本地数据不被改写：页面自己的购物车对象保持原样
   assert.equal(posts[0].body.rentals[0].name, '中级双板套餐');
 });
+
+test('结算时租赁物已不可用，保留草稿并提示更换', async t => {
+  setup(t);
+  const toasts = [];
+  let navigated = false;
+  global.wx.showToast = ({ title }) => toasts.push(title);
+  global.wx.navigateTo = () => { navigated = true; };
+  util.performWebRequest = async (url, body) => {
+    if (url.includes('SaveRentRecept')) return { ...body, id: 72702 };
+    throw '该租赁物暂不可用';
+  };
+  const page = loadPage('pages/admin/reception/recept_new.js', {});
+  page.setData({ bizType: 'rent', order: { ...localOrder(), id: 72702 } });
+  page.onCheckout({ detail: {} }); await settle(); await settle();
+  assert.equal(toasts.at(-1), '该租赁物暂不可用');
+  assert.equal(page.data.order.id, 72702);
+  assert.equal(navigated, false);
+});

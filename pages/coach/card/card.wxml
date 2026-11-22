@@ -8,5 +8,5 @@
     <view class="vip-foot">有效期至 {{item.until}}</view>
   </view>
   <view wx:if="{{!cards.length && !loading}}" class="co-empty">你还没有学员卡。向分销商要一张分享卡片，点开领取即可</view>
-  <view class="note blue">到店养护、租赁时报手机号或扫码接待，店员开单时会选用学员卡。学员卡和优惠券、次卡二选一；维修费、加急加价不打折。</view>
+  <view class="note blue">卡种的优惠更新后，本卡权益会同步变化；到店开单时以当前适用权益和实际金额为准。维修费、加急加价不打折。</view>
 </view>

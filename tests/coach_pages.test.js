@@ -140,6 +140,37 @@ test('分销商详情：「优惠券底价」每格三种方式各自可空；�
   assert.ok(s.calls.some(c => c.action === 'UpdateCoach' && c.body.valid === false && c.body.coachId === 1))
 })
 
+test('管理员按卡种、券种查看领取统计与分页领取人', async t => {
+  const s = setup(t, { staff: ADMIN, handler: (c, a, p) => {
+    if (a === 'GetCoach') return OK(COACH({ introducerType: '机构' }))
+    if (a === 'GetCouponFloors') return OK(FLOORS())
+    if (a === 'GetDistributionSummary') return OK({ cards: [{ id: 2, name: '学员卡', claimed: 2 }], coupons: [{ id: 12, name: '体验券', claimed: 2, used: 1, unused: 1, expired: 1 }] })
+    if (a === 'GetDistributionRecipients') return OK({ total: 2, page: Number(p.page), items: [{ memberId: Number(p.page) + 2,
+      name: '顾客' + p.page, phone: '13800001003', code: 'code-' + p.page, status: p.kind === 'card' ? '已领取' : '未使用 · 已过期', claimedAt: '2026-11-20T11:35:00' }] })
+    return OK({})
+  } })
+  const page = s.load('pages/coach/admin/detail/detail.js'); page.onLoad({ id: '1' }); await settle()
+  page.onTab(tap({ tab: 'cardReport' })); await settle()
+  assert.equal(page.data.cardKinds[0].name, '学员卡')
+  page.onReportToggle(tap({ kind: 'card', id: 2 })); await settle()
+  assert.equal(page.data.recipients[0].phone, '13800001003')
+  assert.equal(page.data.recipients[0].claimed, '2026-11-20 11:35')
+  page.onReportMore(); await settle()
+  assert.equal(page.data.recipients.length, 2)
+  page.onTab(tap({ tab: 'couponReport' })); await settle()
+  assert.equal(page.data.reportOpen, '')
+  assert.equal(page.data.couponKinds[0].expired, 1)
+  assert.equal(s.calls.filter(c => c.action === 'GetDistributionSummary').length, 1)
+  page.onReportToggle(tap({ kind: 'coupon', id: 12 })); await settle()
+  assert.equal(page.data.recipients[0].status, '未使用 · 已过期')
+  const request = s.calls.find(c => c.action === 'GetDistributionRecipients' && c.params.kind === 'coupon')
+  assert.deepEqual([request.params.coachId, request.params.templateId, request.params.page], ['1', '12', '1'])
+  const wxml = fs.readFileSync(path.join(__dirname, '../pages/coach/admin/detail/detail.wxml'), 'utf8')
+  assert.match(wxml, /未使用包含已过期/)
+  assert.match(wxml, /会籍卡领取/)
+  assert.match(wxml, /优惠券领取/)
+})
+
 test('添加教练：先查找会员；已是教练不能再加；新手机号同时创建会员', async t => {
   let found = { exists: true, memberId: 5, name: '王明', phoneTail: '6612', isCoach: false }
   const s = setup(t, { staff: ADMIN, handler: (c, a) => a === 'LookupMember' ? OK(found) : OK(COACH({ id: 7 })) })
@@ -429,3 +460,15 @@ test('我的学员卡：已领取的卡、有效期与各店价格', async t => 
   assert.equal(page.data.cards.length, 1); assert.equal(page.data.cards[0].until, '2027-04-30'); assert.equal(page.data.cards[0].benefit.lines[1].one, '¥68')
 })
 
+
+test('返回我的会籍卡时刷新，展示卡种最新权益', async t => {
+  let rate = 0.9
+  const s = setup(t, { staff: null, handler: () => OK({ cards: [{ id: 1, coachName: '机构', validUntil: '2027-04-30', carePrices: [], rentalRate: rate }] }) })
+  const page = s.load('pages/coach/card/card.js')
+  page.onLoad(); page.onShow(); await settle()
+  assert.equal(page.data.cards[0].benefit.rental, '9折')
+  rate = 0.7
+  await page.onShow()
+  assert.equal(page.data.cards[0].benefit.rental, '7折')
+  assert.equal(s.calls.filter(x => x.action === 'GetMyCards').length, 2)
+})

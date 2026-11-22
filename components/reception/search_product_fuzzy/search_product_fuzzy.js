@@ -1,4 +1,5 @@
 const data = require('../../../utils/data.js');
+const { isUnavailable } = require('../../../utils/rent_product_availability.js');
 
 Component({
   properties: {
@@ -37,8 +38,7 @@ Component({
 
   methods: {
     _isDisabledByStatus(product) {
-      const status = String((product && product.status) || '').trim();
-      return status !== '' && status !== '正常';
+      return isUnavailable(product);
     },
     _decorateProducts(products) {
       const list = Array.isArray(products) ? products : [];
@@ -63,6 +63,9 @@ Component({
       data.searchBarCodeFuzzyPromise(key, this.data.categoryId || null)
         .then(products => {
           const list = this._decorateProducts(products);
+          const exact = list.filter(p => String(p.barcode || '').trim() === key);
+          const exactUnavailable = exact.length === 1 && exact[0]._disabled;
+          if (exactUnavailable) wx.showToast({ title: '该租赁物暂不可用', icon: 'none' });
           // 派生品类筛选项：按 category.id 去重 + 计数
           const map = new Map();
           list.forEach(p => {
@@ -78,7 +81,7 @@ Component({
             displayProducts: list,
             categoryFilters: filters,
             activeFilterCatId: null,
-            selectedIndex: this._firstEnabledIndex(list),
+            selectedIndex: exactUnavailable ? -1 : this._firstEnabledIndex(list),
             hasSearched: true,
             loading: false,
           });
@@ -111,8 +114,10 @@ Component({
     },
     onSelect(e) {
       const idx = Number(e.currentTarget.dataset.idx);
-       const item = this.data.displayProducts[idx];
+      const item = this.data.displayProducts[idx];
       if (item && item._disabled) {
+        this.setData({ selectedIndex: -1 });
+        wx.showToast({ title: '该租赁物暂不可用', icon: 'none' });
         return;
       }
       this.setData({ selectedIndex: idx });
@@ -125,7 +130,7 @@ Component({
         return;
       }
       if (product._disabled) {
-        wx.showToast({ title: '该租赁物当前不可选', icon: 'none' });
+        wx.showToast({ title: '该租赁物暂不可用', icon: 'none' });
         return;
       }
       this.triggerEvent('select', { product });

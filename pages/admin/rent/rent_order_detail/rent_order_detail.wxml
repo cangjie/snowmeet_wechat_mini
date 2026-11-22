@@ -450,6 +450,9 @@
         <van-button type="primary" block bindtap="onReturnAllOrder">全部归还</van-button>
       </view>
     </block>
+    <view class="rent-list-open">
+      <van-button type="primary" block bind:click="onOpenRentList">查看租金</van-button>
+    </view>
   </view>
 
   <!-- ── Card 3.5: 零售信息（子订单）──────────
@@ -535,6 +538,17 @@
           </view>
         </view>
       </view>
+      <view class="refund-amount-row" wx:if="{{order.benefitQuote && order.benefitQuote.canChange}}">
+        <text class="refund-amount-label">租赁优惠</text>
+        <view class="refund-deposit-right">
+          <text class="refund-amount-value">{{order.benefitQuote.mode == 'auto' ? (order._autoBenefit ? (order._autoBenefitLabel + ' · 租金 ' + order._autoBenefitPayableStr) : '等待租金明细') : '未启用自动匹配'}}</text>
+          <van-button size="mini" bind:click="onToggleAutoBenefit">{{order.benefitQuote.mode == 'auto' ? '关闭自动' : '自动匹配'}}</van-button>
+        </view>
+      </view>
+      <view class="refund-amount-row" wx:elif="{{order._benefitLoadFailed && order.closed != 1}}">
+        <text class="refund-amount-label">租赁优惠加载失败</text>
+        <van-button size="mini" bind:click="onToggleAutoBenefit">关闭自动匹配</van-button>
+      </view>
       <view class="refund-amount-row" wx:if="{{(order.punchCardInfo.cards.length > 0 && order.punchCardInfo.totalPunchNeed > 0) || order.punchCardInfo.usedPunches > 0}}">
         <text class="refund-amount-label">次卡消费</text>
         <view class="refund-deposit-right">
@@ -549,26 +563,27 @@
       </view>
       <!-- 购买次卡（退押金推荐购买）：与「次卡消费」/「储值付租金」互斥，三者同时跑会冲突（都要动同一批租金天数）；
            本单已经卖过一张次卡（_hasPunchCardSale）就不再推荐，避免同一单反复加卖 -->
-      <view class="refund-amount-row" wx:if="{{order._allRentalsReturned && !punchCardSelected && !payWithDeposit && !(order.punchCardInfo.usedPunches > 0) && !(order.depositPaidAmount > 0) && !order._hasPunchCardSale}}">
+      <view class="refund-amount-row" wx:if="{{order._allRentalsReturned && !order._autoBenefit && !punchCardSelected && !payWithDeposit && !(order.punchCardInfo.usedPunches > 0) && !(order.depositPaidAmount > 0) && !order._hasPunchCardSale}}">
         <text class="refund-amount-label">推荐次卡</text>
         <van-button size="mini" type="primary" bind:click="onOpenSellPunchCard">购买次卡</van-button>
       </view>
       <view class="refund-amount-row">
         <text class="refund-amount-label">实际应退</text>
-        <text class="refund-amount-value refund-need">
-          {{order.totalRentUnRefund <= 0 ? '¥0.00' : order.totalRentUnRefundStr}}
-        </text>
-      </view>
-
-      <!-- 退款 / 确认核销按钮：应退>0→申请退款；无应退但有储值/次卡待核销→确认核销 -->
-      <view class="refund-btn-row">
-        <van-button
-          type="danger"
-          block
-          disabled="{{order.closed == 1 || !order._allRentalsReturned || (order.totalRentUnRefund <= 0 && !order._pendingWriteoff)}}"
-          bind:click="onRefund">
-          {{order.totalRentUnRefund > 0 ? ('申请退款 ' + order.totalRentUnRefundStr) : (order._pendingWriteoff ? '确认核销' : '申请退款')}}
-        </van-button>
+        <view class="refund-action-right">
+          <view class="refund-amount-value refund-need">
+            {{order.totalRentUnRefund <= 0 ? '¥0.00' : order.totalRentUnRefundStr}}
+          </view>
+          <view class="refund-action-button">
+            <van-button
+              type="danger"
+              size="mini"
+              custom-style="display: flex; margin: 0;"
+              disabled="{{order.closed == 1 || !order._allRentalsReturned || (order.totalRentUnRefund <= 0 && !order._pendingWriteoff)}}"
+              bind:click="onRefund">
+              {{order.totalRentUnRefund > 0 ? '申请退款' : (order._pendingWriteoff ? '确认核销' : '申请退款')}}
+            </van-button>
+          </view>
+        </view>
       </view>
       <view wx:if="{{!order._allRentalsReturned && (order.totalRentUnRefund > 0 || order.punchCardInfo.totalPunchNeed > 0 || order.member.availableDeposit > 0) && order.closed != 1}}" class="refund-hint">
         所有租赁物归还后才能退款 / 核销储值次卡
@@ -752,8 +767,59 @@
   </view>
 </view>
 
+<!-- 整单每日租金：按商品或日期查看 -->
+<view wx:if="{{_rentListShow}}" class="rent-list-mask" bindtap="onCloseRentList" catchtouchmove="noop">
+  <view class="rent-list-dialog" catchtap="noop">
+    <view class="rent-list-header">
+      <view><view class="rent-list-title">每日租金</view><view class="rent-list-caption">当前订单的租赁商品</view></view>
+      <view class="rent-list-close" bindtap="onCloseRentList"><van-icon name="cross" size="18px" /></view>
+    </view>
+    <view class="rent-list-tabs">
+      <view class="rent-list-tab {{_rentListGroup == 'product' ? 'rent-list-tab--active' : ''}}" data-group="product" bindtap="onRentListGroupChange">按租赁商品</view>
+      <view class="rent-list-tab {{_rentListGroup == 'date' ? 'rent-list-tab--active' : ''}}" data-group="date" bindtap="onRentListGroupChange">按租赁日期</view>
+    </view>
+    <scroll-view class="rent-list-scroll" scroll-y>
+      <block wx:if="{{_rentListGroup == 'product'}}">
+        <view class="rent-list-group" wx:for="{{order._rentByProduct}}" wx:key="key" wx:for-item="group">
+          <view class="rent-list-group-title rent-list-group-heading">
+            <text class="rent-list-group-name">{{group.name}}</text>
+            <view class="rent-list-group-total" wx:if="{{group.rows.length}}"><text>总计</text><text>{{group.totalStr}}</text></view>
+          </view>
+          <view class="rent-list-row" wx:for="{{group.rows}}" wx:key="key" wx:for-item="row" bindtap="onEditDayCharge" data-ridx="{{row.rentalIndex}}" data-fidx="{{row.feeIndex}}">
+            <view class="rent-list-row-main">
+              <view class="rent-list-row-info"><text>{{row.date}}</text><text class="rent-list-scene" wx:if="{{row.sceneStr}}">{{row.sceneStr}}</text><text class="rent-list-tag" wx:if="{{row.waived}}">已免除</text><text class="rent-list-tag" wx:elif="{{row.entertain}}">招待</text></view>
+              <view class="rent-list-row-charges {{row.waived ? 'rent-list-amount--waived' : ''}}">租金 {{row.rentStr}} · 超时 {{row.overtimeStr}} · 减免 {{row.discountStr}}</view>
+            </view>
+            <view class="rent-list-row-right"><view class="rent-list-subtotal-label">小计</view><view class="rent-list-amount {{row.waived ? 'rent-list-amount--waived' : ''}}">{{row.subtotalStr}}</view><view class="rent-list-edit">编辑 ›</view></view>
+          </view>
+          <view class="rent-list-empty" wx:if="{{!group.rows.length}}">暂无租金明细</view>
+        </view>
+        <view class="rent-list-empty" wx:if="{{!order._rentByProduct.length}}">暂无租赁商品</view>
+      </block>
+      <block wx:else>
+        <view class="rent-list-group" wx:for="{{order._rentByDate}}" wx:key="key" wx:for-item="group">
+          <view class="rent-list-group-title rent-list-group-heading">
+            <text class="rent-list-group-name">{{group.date}}</text>
+            <view class="rent-list-group-total"><text>总计</text><text>{{group.totalStr}}</text></view>
+          </view>
+          <view class="rent-list-row" wx:for="{{group.rows}}" wx:key="key" wx:for-item="row" bindtap="onEditDayCharge" data-ridx="{{row.rentalIndex}}" data-fidx="{{row.feeIndex}}">
+            <view class="rent-list-row-main">
+              <view class="rent-list-row-info"><text>{{row.name}}</text><text class="rent-list-scene" wx:if="{{row.sceneStr}}">{{row.sceneStr}}</text><text class="rent-list-tag" wx:if="{{row.waived}}">已免除</text><text class="rent-list-tag" wx:elif="{{row.entertain}}">招待</text></view>
+              <view class="rent-list-row-charges {{row.waived ? 'rent-list-amount--waived' : ''}}">租金 {{row.rentStr}} · 超时 {{row.overtimeStr}} · 减免 {{row.discountStr}}</view>
+            </view>
+            <view class="rent-list-row-right"><view class="rent-list-subtotal-label">小计</view><view class="rent-list-amount {{row.waived ? 'rent-list-amount--waived' : ''}}">{{row.subtotalStr}}</view><view class="rent-list-edit">编辑 ›</view></view>
+          </view>
+        </view>
+        <view class="rent-list-empty" wx:if="{{!order._rentByDate.length}}">暂无租金明细</view>
+      </block>
+    </scroll-view>
+    <view class="rent-list-footnote">点击明细可编辑；总计为未免除小计之和，券及招待等优惠以结算为准。</view>
+    <view class="rent-list-done" bindtap="onCloseRentList">关闭</view>
+  </view>
+</view>
+
 <!-- 租金明细按天编辑弹窗 -->
-<view wx:if="{{_dayChargeShow}}" class="dc-mask" bindtap="onDayChargeCancel" catchtouchmove="noop">
+<view wx:if="{{_dayChargeShow}}" class="dc-mask {{_rentListShow ? 'dc-mask--over-rent-list' : ''}}" bindtap="onDayChargeCancel" catchtouchmove="noop">
   <view class="dc-card" catchtap="noop">
     <view class="dc-title">编辑租金明细</view>
     <view class="dc-date">{{_dayChargeDate}}</view>

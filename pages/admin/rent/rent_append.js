@@ -241,37 +241,41 @@ Page({
       wx.showToast({ title: '请先添加追加项', icon: 'none' });
       return;
     }
-    // 预估应付押金（押金净额合计）：>0 走支付、=0 走二次确认
-    let totalDeposit = 0;
-    appendings.forEach(function (r) {
-      if (r.noGuaranty) return;
-      let d = r.realGuaranty;
-      if (d == null) d = (r.guaranty || 0) - (r.guaranty_discount || 0);
-      totalDeposit += (d || 0);
-    });
-    if (totalDeposit > 0) {
-      that._doSaveAppendings(true);
-    } else {
+    if (this._confirmAppendBusy) return;
+    this._confirmAppendBusy = true;
+    wx.showLoading({ title: '计算押金', mask: true });
+    const url = app.globalData.requestPrefix + 'Rent/GetAppendDepositQuote/' + order.id
+      + '?sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+    util.performWebRequest(url, appendings).then(function (quote) {
+      wx.hideLoading();
       wx.showModal({
         title: '确认追加',
-        content: '本次追加无需支付，确认后立即生效。',
+        content: '追加押金 ' + util.showAmount(quote.deposit) + '\n可退押金抵扣 ' + util.showAmount(quote.offset)
+          + '\n还需支付 ' + util.showAmount(quote.payable),
         confirmText: '确认',
-        complete: function (res) {
-          if (res.confirm) that._doSaveAppendings(false);
-        }
+        success: function (res) {
+          if (res.confirm) that._doSaveAppendings(quote.payable > 0, quote.offset);
+          else that._confirmAppendBusy = false;
+        },
+        fail: function () { that._confirmAppendBusy = false; },
       });
-    }
+    }).catch(function () {
+      wx.hideLoading();
+      that._confirmAppendBusy = false;
+    });
   },
 
-  _doSaveAppendings(needPay) {
+  _doSaveAppendings(needPay, expectedOffset) {
     const that = this;
     const order = this.data.order;
     const appendings = order.appendingRentals || [];
     wx.showLoading({ title: needPay ? '生成支付' : '确认中', mask: true });
     const url = app.globalData.requestPrefix
       + 'Rent/SaveAppendings/' + order.id.toString()
-      + '?commit=true&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '');
+      + '?commit=true&sessionKey=' + encodeURIComponent(app.globalData.sessionKey || '')
+      + '&expectedOffset=' + encodeURIComponent(expectedOffset);
     util.performWebRequest(url, appendings).then(function (updatedOrder) {
+      that._confirmAppendBusy = false;
       wx.hideLoading();
       if (updatedOrder && updatedOrder.paying_amount > 0) {
         // 应付>0：跳结算页，支付成功后追加项生效（settle.onPaid 自行收尾）
@@ -282,8 +286,8 @@ Page({
         setTimeout(function () { wx.navigateBack({ delta: 1 }); }, 700);
       }
     }).catch(function () {
+      that._confirmAppendBusy = false;
       wx.hideLoading();
-      wx.showToast({ title: '确认失败', icon: 'none' });
     });
   },
 });

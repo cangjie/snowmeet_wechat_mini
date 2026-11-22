@@ -8,7 +8,7 @@ const PAGE = 'pages/admin/reception/recept_scan.js'
 // enterByPhone：服务器一次建好接待记录、写手机号、判授权的返回（QrCode/EnterReceptByPhone），不设置就是「用户不存在」
 // navFail：模拟 wx.navigateTo 没跳成功（调用 fail 回调），页面不能因此停在空白页
 // slowCreate：出码请求一直不返回，直到 releaseCreate()，模拟「二维码还没出来」
-function setup(pollResult, enterByPhone, { navFail = false, slowCreate = false } = {}) {
+function setup(pollResult, enterByPhone, { navFail = false, slowCreate = false, requestPrefix = 'https://api.example/api/' } = {}) {
   const calls = { create: 0, poll: [], stop: [], recoverShop: [], enter: [] }
   const nav = []
   const toasts = []
@@ -16,7 +16,7 @@ function setup(pollResult, enterByPhone, { navFail = false, slowCreate = false }
   let nextId = 5
   global.getApp = () => ({
     loginPromiseNew: Promise.resolve(),
-    globalData: { sessionKey: 'sk', requestPrefix: 'https://api.example/api/' }
+    globalData: { sessionKey: 'sk', requestPrefix }
   })
   global.wx = {
     navigateTo(o) {
@@ -77,6 +77,53 @@ test('出码后新顾客扫码，跳到顾客信息页等授权；回到本页�
   assert.equal(calls.create, 2)
   assert.equal(page.data.checkin.id, 6)
   cleanup(page)
+})
+
+test('本地接待码通过请求读取 PNG，换码后不显示旧图片', async () => {
+  const { page } = setup(null, null, { requestPrefix: 'https://localhost:5001/api/' })
+  const requests = []
+  wx.request = options => requests.push(options)
+  wx.arrayBufferToBase64 = data => Buffer.from(data).toString('base64')
+  page.onShow(); await settle()
+  assert.equal(page.data.loadingQr, true)
+  assert.equal(requests[0].responseType, 'arraybuffer')
+  page.onRefreshTap(); await settle()
+  requests[0].success({ statusCode: 200, data: Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10]).buffer })
+  await settle()
+  assert.equal(page.data.qrCodeUrl, '')
+  requests[1].success({ statusCode: 200, data: Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10]).buffer })
+  await settle()
+  assert.equal(page.data.qrCodeUrl, 'data:image/png;base64,iVBORw0KGgo=')
+  assert.equal(page.data.stageText, '请顾客用微信扫码')
+  page.onQrImageError({ currentTarget: { dataset: { checkinId: 5 } } })
+  assert.equal(page.data.stageText, '请顾客用微信扫码')
+  page.onQrImageError({ currentTarget: { dataset: { checkinId: 6 } } })
+  assert.match(page.data.stageText, /图片加载失败/)
+  cleanup(page)
+})
+
+test('本地接待码图片请求失败时显示错误并允许换码', async () => {
+  const { page } = setup(null, null, { requestPrefix: 'https://localhost:5001/api/' })
+  wx.request = options => options.success({ statusCode: 500, data: new ArrayBuffer(0) })
+  page.onShow(); await settle(); await settle()
+  assert.equal(page.data.loadingQr, false)
+  assert.match(page.data.stageText, /HTTP 500/)
+  cleanup(page)
+})
+
+test('本地接待码网络失败会提示，卸载后不处理迟到结果', async () => {
+  const { page } = setup(null, null, { requestPrefix: 'https://localhost:5001/api/' })
+  let request
+  wx.request = options => { request = options }
+  page.onShow(); await settle()
+  request.fail({ errMsg: 'network error' }); await settle()
+  assert.match(page.data.stageText, /网络请求失败/)
+  page.onRefreshTap(); await settle()
+  const previous = page.data.stageText
+  page.onUnload()
+  request.fail({ errMsg: 'late network error' }); await settle()
+  assert.equal(page.data.stageText, previous)
+  page.onHide()
 })
 
 test('老顾客扫码直接跳顾客信息页显示会员信息', async () => {

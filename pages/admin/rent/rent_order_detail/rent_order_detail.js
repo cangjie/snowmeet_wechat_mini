@@ -3,6 +3,8 @@ var app = getApp()
 var util = require('../../../../utils/util.js')
 var data = require('../../../../utils/data.js')
 var rentEstimate = require('../../../../utils/rent_estimate.js')
+var rentBenefit = require('../../../../utils/rent_benefit.js')
+var rentDailyGroups = require('../../../../utils/rent_daily_groups.js')
 
 function formatDisplayOrderCode(rawCode) {
   var code = rawCode == null ? '' : String(rawCode)
@@ -86,6 +88,8 @@ Page({
     _verifyTip: '',
 
     _rentalTab: 0,
+    _rentListShow: false,
+    _rentListGroup: 'product',
     _expandedRentals: {},
     _expandedDetails: {},
     _expandedItems: {},
@@ -191,7 +195,7 @@ Page({
     })
   },
 
-  getData() {
+  getData(afterData) {
     wx.showLoading({ title: '加载中' })
     var that = this
     var sessionKey = app.globalData.sessionKey
@@ -210,8 +214,10 @@ Page({
           order = that.renderOrder(order)
           var allValid = that.checkAppendingRentalValid(order)
           wx.hideLoading()
-          that.setData({ order, allValid })
-          that.applyDeepLinkExpand(order)
+          that.setData({ order, allValid }, function () {
+            that.applyDeepLinkExpand(order)
+            if (typeof afterData === 'function') afterData()
+          })
         }
         // 补拉完整会员（availableDeposit，「可用储值/储值付租金」用）+ 次卡信息（次卡消费用），并行后 finish。
         var emptyPunch = { cards: [], skiRentals: [], totalPunchNeed: 0, usedPunches: 0 }
@@ -225,7 +231,13 @@ Page({
               order.punchCardInfo = info || emptyPunch
             }).catch(function () { order.punchCardInfo = emptyPunch })
           : Promise.resolve(order.punchCardInfo = emptyPunch)
-        Promise.all([memberP, punchP]).then(function () { finish() })
+        var benefitP = order.member_id
+          ? data.getRentalBenefitQuotePromise(order.id, sessionKey, false).then(function (q) {
+              order.benefitQuote = q
+              order._benefitLoadFailed = false
+            }).catch(function () { order.benefitQuote = null; order._benefitLoadFailed = true })
+          : Promise.resolve()
+        Promise.all([memberP, punchP, benefitP]).then(function () { finish() })
       }).catch(function () { wx.hideLoading() })
     }).catch(function () { wx.hideLoading() })
   },
@@ -584,6 +596,16 @@ Page({
         if (rt._rentIsEstimate) sumExpectedRent += rt._rentEstimateAmount || 0
       }
     }
+    var benefit = order.benefitQuote
+    var autoBenefit = benefit && benefit.mode === 'auto' && benefit.canChange && benefit.quote && benefit.units && benefit.units.length > 0
+    if (autoBenefit) {
+      var oldRent = (benefit.units || []).reduce(function (sum, u) { return sum + Number(u.currentPayable || 0) }, 0)
+      sumSummary = parseFloat((sumSummary + Number(benefit.quote.payable || 0) - oldRent).toFixed(2))
+      order._autoBenefitPayableStr = util.showAmount(benefit.quote.payable || 0)
+      order._autoBenefitLabel = rentBenefit.describe(benefit)
+      order._autoBenefitAssets = (benefit.quote.lines || []).some(function (l) { return l.usesPunch || l.usesSeason })
+    }
+    order._autoBenefit = !!autoBenefit
     order.totalRentSummaryAmount = sumSummary
     order.totalRentOverTimeAmount = sumOvertime
     order.totalRentRepairAmount = sumRepair
@@ -626,7 +648,7 @@ Page({
     }
     order.totalRentUnRefund = order.totalRentUnRefund + addBack
     // 有待核销（储值/次卡勾选未落库）→ 即使应退为 0，「申请退款」按钮也应可点（变「确认核销」）
-    order._pendingWriteoff = pendingDeposit || pendingPunch
+    order._pendingWriteoff = pendingDeposit || pendingPunch || !!autoBenefit
     // 可用储值（会员储值余额，后端已随 order.member 下发）
     if (order.member && order.member.availableDeposit) {
       order.member.availableDepositStr = util.showAmount(order.member.availableDeposit)
@@ -713,8 +735,22 @@ Page({
       }
     }
     order._allRentItems = allRentItems
+    var dailyGroups = rentDailyGroups.buildRentalDailyGroups(order.rentals)
+    order._rentByProduct = dailyGroups.products
+    order._rentByDate = dailyGroups.dates
 
     return order
+  },
+
+  onOpenRentList() {
+    this.setData({ _rentListShow: true, _rentListGroup: 'product' })
+  },
+  onCloseRentList() {
+    this.setData({ _rentListShow: false })
+  },
+  onRentListGroupChange(e) {
+    var group = e.currentTarget.dataset.group
+    if (group === 'product' || group === 'date') this.setData({ _rentListGroup: group })
   },
 
   onToggleOrderInfo() {
@@ -763,6 +799,7 @@ Page({
             od = that.renderOrder(od)
             wx.hideLoading()
             that.setData({ order: od })
+            if (od.benefitQuote && od.benefitQuote.mode === 'auto') that.getData()
             wx.showToast({ title: next ? '已设为招待' : '已取消招待', icon: 'success' })
           }).catch(function () {
             wx.hideLoading()
@@ -840,6 +877,7 @@ Page({
         od = that.renderOrder(od)
         wx.hideLoading()
         that.setData({ order: od, _dayChargeShow: false })
+        if (od.benefitQuote && od.benefitQuote.mode === 'auto') that.getData()
         wx.showToast({ title: '已保存', icon: 'success' })
       }).catch(function () {
         wx.hideLoading()
@@ -1043,6 +1081,7 @@ Page({
   refreshStatus(newRental) {
     var order = this.data.order
     if (!order || !order.rentals) { this.getData(); return }
+    if (order.benefitQuote && order.benefitQuote.mode === 'auto') { this.getData(); return }
     for (var i = 0; i < order.rentals.length; i++) {
       if (order.rentals[i].id == newRental.id) {
         order.rentals[i] = newRental
@@ -1468,12 +1507,28 @@ Page({
   },
 
   // ── 次卡消费 ──────────────────────────
+  onToggleAutoBenefit() {
+    var that = this
+    var order = that.data.order
+    if (!order || (!order._benefitLoadFailed && (!order.benefitQuote || !order.benefitQuote.canChange))) return
+    var mode = order._benefitLoadFailed || order.benefitQuote.mode === 'auto' ? 'none' : 'auto'
+    data.setRentalBenefitModePromise(order.id, mode, app.globalData.sessionKey).then(function () {
+      that._clearWriteoffPreview()
+      that.getData()
+    }).catch(function () {})
+  },
   // 次卡是会员资产，做成复选框（同储值「勾选预览」）：勾选 → 微信身份核验 → 选卡弹窗记下「抵几次」并预览；
   // 真正核销（UseRentalPunchCard）在「申请退款」时随储值一起落库。已核销过（usedPunches>0）则勾选并锁定。
   onTogglePunchCard() {
     var that = this
     var order = that.data.order
     var info = order && order.punchCardInfo
+    if (order && order._autoBenefit) {
+      data.setRentalBenefitModePromise(order.id, 'none', app.globalData.sessionKey).then(function () {
+        that.getData(function () { that.onTogglePunchCard() })
+      }).catch(function () {})
+      return
+    }
     if (!info || !info.cards || info.cards.length === 0) return
     // 已核销 → 复选框勾选并锁定，不再操作
     if (info.usedPunches > 0) { wx.showToast({ title: '次卡已核销', icon: 'none' }); return }
@@ -1559,7 +1614,7 @@ Page({
     var that = this
     var order = that.data.order
     that._verifyPurpose = purpose || 'deposit'
-    var tip = that._verifyPurpose === 'punch'
+    var tip = that._verifyPurpose === 'punch' || that._verifyPurpose === 'benefit'
       ? '请订单会员本人微信扫码，核验通过后才能用次卡消费'
       : '请订单会员本人微信扫码，核验通过后才能用储值付租金'
     // 专用扫码落地路径 order_verify（需在公众平台「扫普通链接二维码打开小程序」登记 → pages/order/identity_verify）
@@ -1579,7 +1634,11 @@ Page({
         if (res && res.verified) {
           that._stopVerifyPolling()
           order.wechat_unverified = true
-          if (that._verifyPurpose === 'punch') {
+          if (that._verifyPurpose === 'benefit') {
+            that.setData({ _verifyShow: false, order: order })
+            wx.showToast({ title: '核验成功', icon: 'success' })
+            that.onRefund()
+          } else if (that._verifyPurpose === 'punch') {
             // 核验通过 → 关二维码、落 wechat_unverified，弹选卡弹窗（次卡核销即生效）
             that.setData({ _verifyShow: false, order: order })
             wx.showToast({ title: '核验成功', icon: 'success' })
@@ -1829,6 +1888,26 @@ Page({
     // 防御性守卫：所有租赁物退租后才能退款/核销（与 wxml disabled 一致）
     if (!od._allRentalsReturned) {
       wx.showToast({ title: '所有租赁物退租后才能操作', icon: 'none' })
+      return
+    }
+    if (od._benefitLoadFailed) { wx.showToast({ title: '优惠加载失败，请刷新后重试', icon: 'none' }); return }
+    if (od._autoBenefit) {
+      if (od._autoBenefitAssets && !od.wechat_unverified) { that._openWechatVerify('benefit'); return }
+      wx.showModal({ title: '确认使用优惠',
+        content: '系统已匹配当前最划算的优惠，租金 ' + od._autoBenefitPayableStr + '。确认核销并继续结算？',
+        success: function (res) {
+          if (!res.confirm) return
+          wx.showLoading({ title: '核销优惠中', mask: true })
+          data.commitRentalBenefitPromise(od.id, od.benefitQuote.fingerprint, app.globalData.sessionKey).then(function () {
+            wx.hideLoading()
+            that.getData(function () {
+              var refreshed = that.data.order || {}
+              if (!(refreshed.totalRentUnRefund > 0) && !that.data.payWithDeposit && !that.data.punchCardSelected) {
+                wx.showToast({ title: '优惠已核销', icon: 'success' })
+              } else that.onRefund()
+            })
+          }).catch(function () { wx.hideLoading(); that.getData() })
+        } })
       return
     }
     var pendingDeposit = that.data.payWithDeposit && !(od.depositPaidAmount > 0)

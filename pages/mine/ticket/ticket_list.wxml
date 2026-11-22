@@ -1,14 +1,18 @@
 <view class="ticket-page">
 
   <!-- 顶部 Tab 导航 -->
+  <scroll-view class="tab-scroll" scroll-x="true" scroll-into-view="tab-{{activeTab}}" show-scrollbar="{{false}}">
   <view class="tab-nav">
-    <navigator class="tab-item {{activeTab == 'pending' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=pending" open-type="redirect" hover-class="none">
+    <navigator class="tab-item {{activeTab == 'pending' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=pending" open-type="redirect" id="tab-pending" hover-class="none">
       未使用<text class="tab-badge" wx:if="{{pendingCount > 0}}">{{pendingCount}}</text>
     </navigator>
-    <navigator class="tab-item {{activeTab == 'used' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=used" open-type="redirect" hover-class="none">已使用</navigator>
-    <navigator class="tab-item {{activeTab == 'shared' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=shared" open-type="redirect" hover-class="none">已分享</navigator>
-    <navigator class="tab-item {{activeTab == 'accepted' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=accepted" open-type="redirect" hover-class="none">已接受</navigator>
+    <navigator class="tab-item {{activeTab == 'inactive' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=inactive" open-type="redirect" id="tab-inactive" hover-class="none">待激活</navigator>
+    <navigator class="tab-item {{activeTab == 'expired' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=expired" open-type="redirect" id="tab-expired" hover-class="none">已过期</navigator>
+    <navigator class="tab-item {{activeTab == 'used' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=used" open-type="redirect" id="tab-used" hover-class="none">已使用</navigator>
+    <navigator class="tab-item {{activeTab == 'shared' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=shared" open-type="redirect" id="tab-shared" hover-class="none">已分享</navigator>
+    <navigator class="tab-item {{activeTab == 'accepted' ? 'tab-active' : 'tab-inactive'}}" url="ticket_list?tab=accepted" open-type="redirect" id="tab-accepted" hover-class="none">已接受</navigator>
   </view>
+  </scroll-view>
 
   <!-- 汇总行：仅未使用 tab -->
   <view class="list-summary" wx:if="{{summaryText}}">
@@ -55,6 +59,7 @@
           <view class="status-tag {{item.statusClass}}">{{item.statusText}}</view>
         </view>
         <text class="meta-line {{item.expireUrgent ? 'meta-line--urgent' : ''}}">{{item.metaLine}}</text>
+        <text wx:if="{{item.startLine}}" class="meta-line">{{item.startLine}}</text>
         <text class="code-time-line">{{item.codeTimeLine}}</text>
       </view>
     </view>
@@ -86,8 +91,8 @@
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{ticketArr.length == 0}}">
     <view class="empty-icon-box"><view class="empty-icon-inner"></view></view>
-    <text class="empty-title">这里还没有券</text>
-    <text class="empty-text">{{emptyText}}</text>
+    <text class="empty-title">{{loadError ? '暂时无法加载' : '这里还没有券'}}</text>
+    <text class="empty-text">{{loadError || emptyText}}</text>
   </view>
 
 </view>

@@ -14,7 +14,7 @@ function setup(t, file) {
     options.success({ [options.tmplIds[0]]: 'accept' })
   } }
   const fake = {
-    getTicketTemplateDetailPromise() { return Promise.resolve({name:'免费打蜡券', sharable:1, coverUploadId:10, coverUrl:'https://test.invalid/cover.png', rules:[]}) },
+    getTicketTemplateDetailPromise() { return Promise.resolve({name:'免费打蜡券', sharable:1, marketingPromotion:1, coverUploadId:10, coverUrl:'https://test.invalid/cover.png', rules:[]}) },
     setTicketToMiniSharePromise(...args) { calls.transfer.push(args); return Promise.resolve({}) },
     shareMiniTicketTemplatePromise(...args) { calls.batch.push(args); return Promise.resolve({ batchId: 8, templateName: '券', sharePath: '/pages/mine/ticket/ticket_claim_mini/ticket_claim_mini?batch=8' }) },
     createMiniQrCodeBatchPromise(...args) { calls.fixed.push(args); return Promise.resolve({ batchId: 9 }) },
@@ -49,7 +49,7 @@ test('券详情新发起转赠使用新接口和新接收页', async t => {
 
 test('员工新分享卡片建新批次并生成对应环境的小程序码海报', async t => {
   const { page, calls } = setup(t, 'pages/admin/ticket/template_edit/template_edit.js')
-  page.setData({ id: 12, sharable: 1, shareMode: 'personal' })
+  page.setData({ id: 12, sharable: 0, marketingPromotion: 1, savedMarketingPromotion: 1, shareMode: 'personal' })
   page.loadShareBatches = () => {}
   const result = await page.onShareAppMessage()
   assert.deepEqual(calls.batch, [[12, 'personal', 'sk']])
@@ -59,7 +59,7 @@ test('员工新分享卡片建新批次并生成对应环境的小程序码海�
 
 test('员工新生成固定海报不复用旧公众号批次或海报接口', async t => {
   const { page, calls } = setup(t, 'pages/admin/ticket/template_edit/template_edit.js')
-  page.setData({ id: 12, sharable: 1, coverUploadId: 5, groupQrMode: 'static' })
+  page.setData({ id: 12, sharable: 0, marketingPromotion: 1, savedMarketingPromotion: 1, coverUploadId: 5, groupQrMode: 'static' })
   page._downloadPoster = () => Promise.resolve('/tmp/local-poster.png')
   page.loadShareBatches = () => {}
   await page.onShareGroupTap()
@@ -151,4 +151,17 @@ test('打开模板不自动生成朋友圈分享批次，主动准备时才创�
   assert.deepEqual(calls.batch, [[12, 'group', 'sk']])
   assert.deepEqual(calls.poster, [[8, 'sk', 'trial']])
   assert.ok(page.data.timelinePosterUrl)
+})
+
+test('市场推广关闭或尚未保存时不生成分享，关闭后清除已准备的朋友圈分享', async t => {
+  const { page, calls } = setup(t, 'pages/admin/ticket/template_edit/template_edit.js')
+  page.setData({ id: 12, sharable: 1, marketingPromotion: 1, savedMarketingPromotion: 0, shareMode: 'personal', coverUploadId: 5 })
+  assert.deepEqual(page.onShareAppMessage(), {})
+  await page.onShareGroupTap()
+  await page.onPrepareTimelineTap()
+  assert.equal(calls.batch.length, 0)
+  page.setData({ savedMarketingPromotion: 1, timelinePosterUrl: 'poster', timelineSharePath: '/claim?batch=1' })
+  page.onSwitch({ currentTarget: { dataset: { field: 'marketingPromotion' } }, detail: { value: false } })
+  assert.equal(page.data.timelinePosterUrl, '')
+  assert.deepEqual(page.onShareTimeline(), {})
 })

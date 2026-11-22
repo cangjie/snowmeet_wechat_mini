@@ -73,6 +73,29 @@
     </view>
   </mp-cell>
 </mp-cells>
+<mp-cells title="不可用时段">
+  <mp-cell><view>当前状态：{{product.status || '正常'}}</view></mp-cell>
+  <mp-cell wx:for="{{unavailablePeriods}}" wx:key="id">
+    <view class="unavailable-row">
+      <view>{{item.startLabel}} 至 {{item.endLabel}}</view>
+      <view class="unavailable-actions">
+        <button size="mini" data-id="{{item.id}}" bindtap="editPeriod">编辑</button>
+        <button size="mini" data-id="{{item.id}}" bindtap="deletePeriod">删除</button>
+      </view>
+    </view>
+  </mp-cell>
+  <mp-cell wx:if="{{!unavailablePeriods.length}}"><view>暂无不可用时段</view></mp-cell>
+  <mp-cell wx:if="{{periodEditing}}">
+    <view class="period-form">
+      <view class="period-hint">时间留空表示该方向不限；两端均留空表示持续不可用。</view>
+      <view class="period-line"><text>开始</text><picker mode="date" value="{{startDate}}" data-field="startDate" bindchange="changePeriodDate"><view>{{startDate || '选择日期'}}</view></picker><picker mode="time" value="{{startTime}}" data-field="startTime" bindchange="changePeriodDate"><view>{{startTime || '00:00'}}</view></picker><text data-field="start" bindtap="clearPeriodDate">清空</text></view>
+      <view class="period-line"><text>结束</text><picker mode="date" value="{{endDate}}" data-field="endDate" bindchange="changePeriodDate"><view>{{endDate || '选择日期'}}</view></picker><picker mode="time" value="{{endTime}}" data-field="endTime" bindchange="changePeriodDate"><view>{{endTime || '00:00'}}</view></picker><text data-field="end" bindtap="clearPeriodDate">清空</text></view>
+      <view class="period-hint">从开始时间起不可用，至结束时间恢复。</view>
+      <view class="unavailable-actions"><button size="mini" bindtap="savePeriod">保存</button><button size="mini" bindtap="cancelPeriod">取消</button></view>
+    </view>
+  </mp-cell>
+  <mp-cell wx:else><button size="mini" bindtap="addPeriod">添加不可用时段</button></mp-cell>
+</mp-cells>
 <mp-cells title="上传图片">
   <mp-cell>
     <multi-uploader bindUploaded="uploaded" uploaded_files="{{images}}"></multi-uploader>
