@@ -112,7 +112,7 @@ Page({
         const info = wx.getAccountInfoSync()
         const version = (info.miniProgram && info.miniProgram.envVersion) || 'release'
         this.setData({ wechatBindImage: base + 'Image?id=' + qr.id + '&sessionKey=' + key + '&envVersion=' + version,
-          wechatBindMessage: '请会员扫码并授权本人手机号，二维码两分钟内有效' })
+          wechatBindMessage: '请会员扫码并授权本人手机号，二维码 30 分钟内有效' })   // 有效期以后端 MemberWechatBindController.QrValidMinutes 为准，改的时候两边一起改
         this._startWechatBindPolling()
       }).catch(() => {
         if (seq === this._wechatBindSeq) this.setData({ wechatBindMessage: '生成失败，请重试' })
