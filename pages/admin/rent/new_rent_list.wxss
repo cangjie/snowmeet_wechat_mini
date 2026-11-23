@@ -250,6 +250,12 @@
   font-size: 24rpx;
 }
 
+/* 总计租金后面的「未了结」：装备都已归还但订单还没关闭，租金已定、还没计入页上的租金合计 */
+.row-pending {
+  margin-left: 6rpx;
+  font-size: 22rpx;
+  color: #b7791f;
+}
 .row-value--wide {
   flex: 1;
   width: auto;

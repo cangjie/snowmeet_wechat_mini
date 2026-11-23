@@ -257,6 +257,8 @@
   flex: 1; font-size: 28rpx; font-weight: 600; color: #0b1c30;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+/* 招待租赁标注：橙色文字（和招待复选框同一个橙色），和价目标签（灰/蓝/金）、套餐单品标签区分开 */
+.rental-head-entertain { flex-shrink: 0; font-size: 24rpx; font-weight: 600; color: #d97706; }
 .rental-head-meta { display: flex; align-items: center; gap: 8rpx; flex-shrink: 0; }
 .rental-head-fee { font-size: 24rpx; color: #6f7881; }
 .rental-head-fee text { color: #0b1c30; font-weight: 600; }

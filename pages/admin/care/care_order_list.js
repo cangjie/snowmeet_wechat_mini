@@ -231,11 +231,19 @@ Page({
       order.careExpanded = !!(this.expandedCareOrderIds && this.expandedCareOrderIds[order.id])
       // 所有装备（不含已取消的）都发板了：整张订单卡片换底色
       order.allCaresDone = careOrderRows.allCaresDone(order.careRows)
-      // 应收 / 减免合计：每件装备卡上的「金额」「减免」加起来（招待 / 质保按标准价、减免到 0 元，与卡上显示一致）；已取消的装备不会再收，不算
-      for (var r = 0; r < order.careRows.length; r++) {
-        if (order.careRows[r].statusClass === 'cancel') continue
-        pageCharge += order.careRows[r].charge || 0
-        pageDiscount += order.careRows[r].discount || 0
+      // 应收 / 减免合计：每件装备卡上的「金额」「减免」加起来（招待 / 质保按标准价、减免到 0 元，与卡上显示一致）。
+      // 全额退款的订单资金流已归零（totalEarnAmount = 0），装备金额和减免不再计入，否则公式对不上；
+      // 未支付的订单（待生成 / 待支付 / 订单关闭）还没有收到钱，同样不计入。
+      // 部分退款的订单：未取消的装备仍在服务，金额 / 减免照常计入（部分退款反映在 totalEarnAmount 里）。
+      // 已取消的装备（is_cancel）不会再收，不算。
+      var skipOrderAmounts = order.statusLabel === '全额退款' || order.unpaid
+      order.skipAmounts = skipOrderAmounts
+      if (!skipOrderAmounts) {
+        for (var r = 0; r < order.careRows.length; r++) {
+          if (order.careRows[r].statusClass === 'cancel') continue
+          pageCharge += order.careRows[r].charge || 0
+          pageDiscount += order.careRows[r].discount || 0
+        }
       }
       // 卡券使用派生（任一 care 选了券 →「券」标签；选了卡 → 并入「卡」标签，
       // 从 care.ticket_code/use_card 直接看，不依赖 punch_card_used——未生效/历史漏记也能亮）

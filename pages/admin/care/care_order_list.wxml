@@ -114,10 +114,6 @@
     </view>
     <view class="summary-bar">
       <text>共 {{total}} 单，{{totalPages}} 页</text>
-      <block wx:if="{{totalPages > 1}}">
-        <text class="summary-sep">·</text>
-        <text>共计收款 {{allEarnStr}}</text>
-      </block>
     </view>
     <list-pager page="{{page}}" total-pages="{{totalPages}}" page-size="{{pageSize}}"
                 disabled="{{querying}}" bind:change="onPagerChange" />
@@ -223,9 +219,10 @@
                 <!-- 一行权益都没有的装备：补一行看不见的占位（结构和真实的权益行一样，高度自然一样），这样用了卡 / 券的和没用的装备块一样高，金额 / 减免也上下对齐 -->
                 <view wx:if="{{!cr.hasBenefit}}" class="care-card care-card--ghost"><text class="care-card-tag">次卡</text></view>
                 <!-- 金额 / 减免：每件装备都显示，招待 / 质保也显示（后端按所做项目算标准价、减免到 0 元） -->
-                <view class="care-amount">
+                <view class="care-amount {{item.skipAmounts ? 'care-amount--skip' : ''}}">
                   <text class="care-amount-item"><text class="care-amount-label">金额</text>{{cr.chargeStr}}</text>
                   <text class="care-amount-item"><text class="care-amount-label">减免</text>{{cr.discountStr}}</text>
+                  <text wx:if="{{item.skipAmounts}}" class="care-amount-note">（不计入汇总）</text>
                 </view>
                 <!-- 单项备注：这件装备自己的备注，在金额 / 减免下面；没有就不占地方，可以多行 -->
                 <view wx:if="{{cr.memo}}" class="care-memo"><text class="care-memo-label">备注：</text><text class="care-memo-text">{{cr.memo}}</text></view>

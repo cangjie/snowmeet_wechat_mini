@@ -296,6 +296,8 @@
             {{item._isPackage ? '套餐' : '单品'}}
           </view>
           <text class="rental-head-name">{{item.name}}</text>
+          <!-- 招待租赁在折叠态就标出来（用户 2026-11-22 要求：不用展开就能看出是不是招待） -->
+          <text class="rental-head-entertain" wx:if="{{item.entertain}}">招待</text>
           <view class="rental-head-meta">
             <text class="scene-tag scene-tag--{{item._priceSceneClass}}" wx:if="{{item._priceSceneStr}}">{{item._priceSceneStr}}</text>
             <view class="rental-head-fee">{{item._rentIsEstimate ? '预计租金' : '租金'}}<text>{{item._rentDisplayStr}}</text></view>

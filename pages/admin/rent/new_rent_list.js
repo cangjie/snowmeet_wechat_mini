@@ -222,7 +222,13 @@ Page({
       var methods = Object.keys(methodSet)
       order.payMethod = methods.length > 0 ? methods.join('/') : null
       order.displayedRental = 0
+      order.displayedRentalPending = false
       var orderClosed = order.rentProperties && order.rentProperties.rentStatus === '了结关闭'
+      // 租金已经定下来、但订单还没了结关闭（装备都已归还，押金还没退完/还没点关闭）：2026-11-22 起也显示总计租金，
+      // 标「未了结」；页上的租金合计（totalRentalAmount）仍只算已了结的订单，不受影响。
+      // 还在租、部分归还、未开始的租金还在变，仍不显示。
+      var rentSettledNotClosed = !orderClosed && order.rentProperties
+        && ['全部归还', '部分退押金', '全额退押金'].indexOf(order.rentProperties.rentStatus) >= 0
       for (var j = 0; order.rentals && j < order.rentals.length; j++) {
         var rental = order.rentals[j]
         if (rental.entertain) {
@@ -237,6 +243,9 @@ Page({
         } else if (orderClosed) {
           order.displayedRental += (rental.totalRentalAmount - rental.totalDiscountAmount)
           totalRentalAmount += (rental.totalRentalAmount - rental.totalDiscountAmount)
+        } else if (rentSettledNotClosed) {
+          order.displayedRental += ((rental.totalRentalAmount || 0) - (rental.totalDiscountAmount || 0))
+          order.displayedRentalPending = true
         }
       }
       if (order.displayedRental > 0) {

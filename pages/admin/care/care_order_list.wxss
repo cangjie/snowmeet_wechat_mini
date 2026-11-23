@@ -610,3 +610,16 @@
   font-size: 26rpx;
   padding: 60rpx 0;
 }
+
+/* 全额退款 / 未支付订单的装备金额：置灰 + 删除线，表示不计入汇总 */
+.care-amount--skip {
+  opacity: 0.45;
+}
+.care-amount--skip .care-amount-item {
+  text-decoration: line-through;
+}
+.care-amount-note {
+  font-size: 22rpx;
+  color: #999;
+  margin-left: 12rpx;
+}

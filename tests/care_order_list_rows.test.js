@@ -367,11 +367,12 @@ test('没付款的灰色订单：装备图标同样置灰', () => {
 
 // ---- 版式：每件装备显示金额和减免（招待 / 质保也显示） ----
 test('每件装备都有「金额」「减免」一行（在装备内容里面），没有按招待 / 质保 / 金额是否为 0 隐藏的条件', () => {
-  assert.equal(insideView(cardBlock, 'class="care-main"', 'class="care-amount"'), true)
-  const amountRow = cardBlock.match(/<view class="care-amount"[^>]*>[\s\S]*?<\/view>/)[0]
+  assert.equal(insideView(cardBlock, 'class="care-main"', 'class="care-amount'), true)
+  const amountRow = cardBlock.match(/<view class="care-amount[^"]*"[^>]*>[\s\S]*?<\/view>/)[0]
   assert.match(amountRow, />金额<[\s\S]*\{\{cr\.chargeStr\}\}/)
   assert.match(amountRow, />减免<[\s\S]*\{\{cr\.discountStr\}\}/)
-  assert.doesNotMatch(amountRow, /wx:if/)
+  // 金额/减免行本身不受 wx:if 控制（始终渲染），内部的「不计入汇总」提示可以有条件
+  assert.doesNotMatch(amountRow, /<view[^>]*wx:if/)
 })
 
 test('没付款的灰色订单：金额 / 减免也置灰', () => {
@@ -432,7 +433,7 @@ test('版式：次卡一行在金额 / 减免上面、装备内容里面，只�
   assert.match(cardRow, /次卡/)
   assert.match(cardRow, /class="care-card-name"[^>]*>\{\{cr\.cardName\}\}/)
   assert.match(cardRow, /class="care-card-remain"[^>]*>\{\{cr\.cardRemain\}\}/)
-  assert.ok(cardBlock.indexOf('class="care-card"') < cardBlock.indexOf('class="care-amount"'), '次卡一行在金额 / 减免之前（卡在上，金额在下）')
+  assert.ok(cardBlock.indexOf('class="care-card"') < cardBlock.indexOf('class="care-amount'), '次卡一行在金额 / 减免之前（卡在上，金额在下）')
 })
 
 test('版式：卡名太长只省略卡名，剩余次数不收缩；没付款的灰色订单里同样置灰', () => {
@@ -541,7 +542,7 @@ test('不管订单里有几件装备、各用什么：每件各列各的，互�
 })
 
 test('版式：权益都在金额 / 减免上面；质保 / 招待、次卡、券、学员卡各一行，各自只在有时才渲染，券和学员卡不依赖次卡', () => {
-  const amountAt = cardBlock.indexOf('class="care-amount"')
+  const amountAt = cardBlock.indexOf('class="care-amount')
   const flags = cardBlock.match(/<view[^>]*class="care-card care-flags"[^>]*>[\s\S]*?<\/view>/)[0]
   assert.match(flags, /wx:if="\{\{cr\.hasFlag\}\}"/)
   assert.match(flags, /<text wx:if="\{\{cr\.isWarranty\}\}" class="care-card-tag care-card-tag--warranty">质保<\/text>/)
@@ -705,7 +706,7 @@ test('等高：没有权益行的装备补一行看不见的占位，结构和�
   assert.match(ghost, /<text class="care-card-tag">/)                // 和真实权益行同样的标签结构 → 高度一样
   assert.match(rule('.care-card--ghost'), /visibility:\s*hidden/)    // 占位但看不见
   assert.ok(cardBlock.indexOf('care-card--ghost') > cardBlock.indexOf('class="care-card care-coach"'), '占位行在所有权益行之后')
-  assert.ok(cardBlock.indexOf('care-card--ghost') < cardBlock.indexOf('class="care-amount"'), '占位行在金额 / 减免上面')
+  assert.ok(cardBlock.indexOf('care-card--ghost') < cardBlock.indexOf('class="care-amount'), '占位行在金额 / 减免上面')
 })
 
 // ───────────── 「正在做」的红色：已开始只存在一小会儿，平时红色标在轮到的这一道 ─────────────
@@ -772,7 +773,7 @@ test('模板：整单备注在订单信息下面、装备明细上面；单项�
   assert.match(careMemo, /备注：/)
   assert.doesNotMatch(careMemo, /单项备注/, '装备块里的备注，标签直接写「备注：」，位置已经说明是这件装备的')
   assert.match(careMemo, /\{\{cr\.memo\}\}/)
-  const amount = cardBlock.indexOf('class="care-amount"')
+  const amount = cardBlock.indexOf('class="care-amount')
   assert.ok(amount > 0 && cardBlock.indexOf(careMemo) > amount, '单项备注应在金额 / 减免下面')
   assert.ok(cardBlock.indexOf(careMemo) < cardBlock.indexOf('class="care-thumb-box"'), '单项备注应在这件装备的文字区里，不在照片盒里')
 })
@@ -1127,7 +1128,85 @@ test('卡类零售：多张购卡单累加、按分四舍五入；没有购卡�
   assert.equal(page.data.pageCardStr, '¥0.00')
 })
 
-test('汇总行：只有一页时写「应收 · 卡类零售 · 减免 · 共计收款」；多页时标明「本页」，共计收款放到下一行', () => {
+test('全额退款的订单：装备金额和减免不计入应收 / 减免（资金流已归零）', () => {
+  const page = loadList()
+  page.renderOrders([
+    // 正常订单：金额 230 减免 30，收 200
+    summaryOrder(1, [careAmount(11, 230, 30)], 200),
+    // 全额退款订单：金额 170 减免 20，收 0（150 − 150）
+    Object.assign(summaryOrder(2, [careAmount(21, 170, 20)], 0), { orderStatus: '全额退款' })
+  ], 2, 1, 50, 200)
+  // 应收只算正常订单的 230，不含全额退款订单的 170
+  assert.equal(page.data.pageChargeStr, '¥230.00')
+  // 减免只算正常订单的 30，不含全额退款订单的 20
+  assert.equal(page.data.pageDiscountStr, '¥30.00')
+  assert.equal(page.data.totalEarnStr, '¥200.00')
+})
+
+test('全额退款的订单带 skipAmounts 标记（供模板置灰），正常订单不带', () => {
+  const page = loadList()
+  page.renderOrders([
+    summaryOrder(1, [careAmount(11, 230, 30)], 200),
+    Object.assign(summaryOrder(2, [careAmount(21, 170, 20)], 0), { orderStatus: '全额退款' })
+  ], 2, 1, 50, 200)
+  assert.equal(page.data.orders[0].skipAmounts, false)
+  assert.equal(page.data.orders[1].skipAmounts, true)
+})
+
+test('未支付的订单（待生成 / 待支付 / 订单关闭）：装备金额和减免不计入应收 / 减免', () => {
+  const page = loadList()
+  page.renderOrders([
+    summaryOrder(1, [careAmount(11, 300, 50)], 250),
+    // 待支付订单：有装备金额但还没付款
+    Object.assign(summaryOrder(2, [careAmount(21, 100, 0)], 0), { orderStatus: '待支付' })
+  ], 2, 1, 50, 250)
+  assert.equal(page.data.pageChargeStr, '¥300.00')
+  assert.equal(page.data.pageDiscountStr, '¥50.00')
+})
+
+test('部分退款的订单：未取消的装备金额和减免照常计入（部分退款反映在收款里）', () => {
+  const page = loadList()
+  page.renderOrders([
+    Object.assign(summaryOrder(1, [
+      careAmount(11, 230, 30),
+      careAmount(12, 100, 0, { is_cancel: true })   // 被取消的装备
+    ], 170), { orderStatus: '部分退款' })
+  ], 1, 1, 50, 170)
+  // 部分退款订单里没取消的装备 230/30 仍计入
+  assert.equal(page.data.pageChargeStr, '¥230.00')
+  assert.equal(page.data.pageDiscountStr, '¥30.00')
+})
+
+test('今日实际场景复现：00004 全额退款 + 00005 购卡单，汇总行对得上收款', () => {
+  const page = loadList()
+  // 模拟今日 16 单中关键的几单
+  const normalOrders = [
+    summaryOrder(1, [careAmount(11, 150, 0)], 150),     // 普通订单
+    summaryOrder(3, [careAmount(31, 300, 0)], 300),     // 普通订单
+  ]
+  // 00004：全额退款
+  const order04 = Object.assign(
+    summaryOrder(4, [careAmount(41, 170, 20)], 0),
+    { orderStatus: '全额退款' }
+  )
+  // 00005：购卡单（卡款 1200 + 装备金额 0）
+  const order05 = Object.assign(
+    summaryOrder(5, [careAmount(51, 0, 0)], 1200),
+    { careCardAmount: 1200 }
+  )
+  page.renderOrders([...normalOrders, order04, order05], 4, 1, 50, 1650)
+  // 应收 = 150 + 300 + 0（00004 跳过）+ 0（00005 装备金额本身就是 0）= 450
+  assert.equal(page.data.pageChargeStr, '¥450.00')
+  // 减免 = 0 + 0 + 0（00004 跳过）+ 0 = 0
+  assert.equal(page.data.pageDiscountStr, '¥0.00')
+  // 卡类零售 = 1200
+  assert.equal(page.data.pageCardStr, '¥1200.00')
+  // 收款 = 150 + 300 + 0 + 1200 = 1650
+  assert.equal(page.data.totalEarnStr, '¥1650.00')
+  // 公式验证：450 + 1200 - 0 = 1650 ✅
+})
+
+test('汇总行：只有一页时写「应收 · 卡类零售 · 减免 · 共计收款」；多页时标明「本页」，第二行只显示总单数和页数', () => {
   const bar = wxml.slice(wxml.indexOf('<!-- 统计行 + 分页 -->'), wxml.indexOf('<!-- 订单列表 -->'))
   const single = bar.match(/<view wx:if="\{\{totalPages <= 1\}\}" class="summary-bar">[\s\S]*?<\/view>/)[0]
   assert.match(single, /应收 \{\{pageChargeStr\}\}/)
@@ -1144,7 +1223,8 @@ test('汇总行：只有一页时写「应收 · 卡类零售 · 减免 · 共�
   assert.ok(multi.indexOf('应收') < multi.indexOf('卡类零售') && multi.indexOf('卡类零售') < multi.indexOf('减免') && multi.indexOf('减免') < multi.indexOf('收款 {{totalEarnStr}}'))
   const count = bar.slice(bar.indexOf('<view class="summary-bar">'), bar.indexOf('<list-pager'))
   assert.match(count, /共 \{\{total\}\} 单，\{\{totalPages\}\} 页/)
-  assert.match(count, /wx:if="\{\{totalPages > 1\}\}"[\s\S]*共计收款 \{\{allEarnStr\}\}/)
+  // 多页时第二行不再显示共计收款
+  assert.doesNotMatch(count, /共计收款/)
 })
 
 // ---- 含包 / 含杖：双板 / 单板图标下面的小图标 ----

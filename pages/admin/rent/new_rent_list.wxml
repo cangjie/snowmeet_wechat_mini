@@ -178,7 +178,7 @@
             <text class="row-label">方式</text><text class="row-value row-value--wide row-value--nowrap">{{item.payMethod || '--'}}</text>
           </view>
           <view class="order-row">
-            <text class="row-label">总计租金</text><text class="row-value">{{item.displayedRentalStr || '--'}}</text>
+            <text class="row-label">总计租金</text><text class="row-value">{{item.displayedRentalStr || '--'}}<text class="row-pending" wx:if="{{item.displayedRentalPending && item.displayedRentalStr}}">（未了结）</text></text>
           </view>
           <view class="order-row">
             <text class="row-label">开单人</text><text class="row-value row-value--wide">{{item.staff.name}}</text>
