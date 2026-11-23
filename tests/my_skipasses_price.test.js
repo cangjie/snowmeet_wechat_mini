@@ -12,6 +12,8 @@ const raw = (id, over) => Object.assign({
   contact_cell: '13501177897'
 }, over || {})
 
+let current = null   // 当前测试的页面：收尾时模拟离开页面，停掉它「等取票码」的自动刷新定时器
+
 function setup(list, extra) {
   const requests = []
   const toasts = []
@@ -29,10 +31,15 @@ function setup(list, extra) {
     getMenuButtonBoundingClientRect() { return { top: 26, left: 280, height: 32 } }
   }
   const page = loadPage(FILE, {})
+  current = page
   return { page, requests, toasts }
 }
 
-function cleanup() { delete global.getApp; delete global.wx }
+function cleanup() {
+  if (current) current.onUnload()
+  current = null
+  delete global.getApp; delete global.wx
+}
 
 test('我的雪票：金额取各张 deal_price 之和（实付），不显示 ticket_price（结算价）', async () => {
   const { page } = setup([raw(1), raw(2), raw(3, { product_id: 643, product_name: '6小时', deal_price: 359, ticket_price: 342.01, reserve_date: '2026-11-04T00:00:00' })])

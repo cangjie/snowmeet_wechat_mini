@@ -17,6 +17,16 @@ const CANCEL_STATUS = {
 
 const USED_STATUS = ['已取卡', '已退押金']
 
+// 付款后供应商通常十几秒到一分钟出码；下单超过这个时间还没有码的票不再自动等（再等也没用，每次进页面都刷三分钟太浪费）
+const CODE_WAIT_MAX_MS = 2 * 3600 * 1000
+
+// 下单时间读不出来时按新票处理（宁可多刷几次，也别让刚买的票卡在「正在生成」）
+function isRecentTicket(createDate) {
+  const t = new Date(String(createDate || '').replace(' ', 'T')).getTime()
+  if (isNaN(t)) return true
+  return Date.now() - t <= CODE_WAIT_MAX_MS
+}
+
 function parseTicket(raw) {
   const status = raw.status || ''
   const cancelInfo = CANCEL_STATUS[status]
@@ -41,12 +51,15 @@ function parseTicket(raw) {
   const usable = !used && (!cancelInfo || cancelInfo.usable)
   // 已出票（有供应商订单号）、还没取卡、没有在退票流程里的才能退；出票中的先别退
   const canCancel = !used && !!raw.reserve_no && (kind === 'ready' || kind === 'cancelFailed')
+  // 在等供应商出码：还在出票中，或已向供应商下单成功但还没有取票码/二维码。页面据此自动刷新
+  const awaitingCode = !hasCode && isRecentTicket(raw.create_date)
+    && (kind === 'issuing' || (kind === 'ready' && !!raw.reserve_no))
   return {
     id: raw.id,
     serial: raw.reserve_no || '',
     cardNo: raw.card_no || '',
     pickupCode: raw.qr_code_url || '',
-    status, kind, stateText: text, stateHint: hint, usable, canCancel,
+    status, kind, stateText: text, stateHint: hint, usable, canCancel, awaitingCode,
     amountNum: Number(raw.deal_price) || 0
   }
 }
@@ -105,4 +118,9 @@ function buildMyGroups(list) {
   return groups
 }
 
-module.exports = { CANCEL_STATUS, parseTicket, buildMyGroups }
+// groups: buildMyGroups 的返回。任何一张票在等码，页面就该定时刷新
+function needsCodePolling(groups) {
+  return (Array.isArray(groups) ? groups : []).some(g => g.tickets.some(t => t.awaitingCode))
+}
+
+module.exports = { CANCEL_STATUS, parseTicket, buildMyGroups, needsCodePolling }
